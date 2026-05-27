@@ -114,7 +114,7 @@ export function UserCreate() {
         title={t('users.create_user_title')}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<ArrowLeft size={16} />}
             onPress={() => navigate(tenantPath('/admin/users'))}
           >
@@ -219,10 +219,10 @@ export function UserCreate() {
             />
 
             {/* Send Welcome Email */}
-            <div className="flex items-center justify-between rounded-lg border border-default-200 p-4">
+            <div className="flex items-center justify-between rounded-lg border border-border p-4">
               <div>
                 <p className="text-sm font-medium text-foreground">{t('users.send_welcome_email')}</p>
-                <p className="text-xs text-default-500">
+                <p className="text-xs text-muted">
                   {t('users.send_welcome_email_description')}
                 </p>
               </div>
@@ -237,7 +237,7 @@ export function UserCreate() {
             {/* Submit */}
             <div className="flex justify-end gap-3 pt-2">
               <Button
-                variant="flat"
+                variant="tertiary"
                 onPress={() => navigate(tenantPath('/admin/users'))}
                 isDisabled={submitting}
               >
@@ -245,7 +245,6 @@ export function UserCreate() {
               </Button>
               <Button
                 type="submit"
-                color="primary"
                 startContent={!submitting ? <Save size={16} /> : undefined}
                 isLoading={submitting}
               >

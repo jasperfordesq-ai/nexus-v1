@@ -132,7 +132,7 @@ export function ActivityLog() {
           <div>
             <p className="font-medium text-foreground">{entry.user_name}</p>
             {entry.user_email && (
-              <p className="text-xs text-default-400">{entry.user_email}</p>
+              <p className="text-xs text-muted">{entry.user_email}</p>
             )}
           </div>
         </div>
@@ -149,7 +149,7 @@ export function ActivityLog() {
           ? entry.action.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
           : translated;
         return (
-          <Chip size="sm" variant="flat" color={getActionColor(entry.action)}>
+          <Chip size="sm" variant="soft" color={getActionColor(entry.action)}>
             {label}
           </Chip>
         );
@@ -159,7 +159,7 @@ export function ActivityLog() {
       key: 'description',
       label: t('system.col_description'),
       render: (entry) => (
-        <span className="text-sm text-default-600 line-clamp-2">
+        <span className="text-sm text-muted line-clamp-2">
           {entry.description || '—'}
         </span>
       ),
@@ -168,7 +168,7 @@ export function ActivityLog() {
       key: 'ip_address',
       label: t('system.col_ip_address'),
       render: (entry) => (
-        <code className="text-xs text-default-500 bg-default-100 px-1.5 py-0.5 rounded">
+        <code className="text-xs text-muted bg-surface-secondary px-1.5 py-0.5 rounded">
           {entry.ip_address || '—'}
         </code>
       ),
@@ -178,7 +178,7 @@ export function ActivityLog() {
       label: t('system.col_date'),
       sortable: true,
       render: (entry) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {formatDate(entry.created_at)}
         </span>
       ),
@@ -192,7 +192,7 @@ export function ActivityLog() {
         description={t('system.activity_log_desc')}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<RefreshCw size={16} />}
             onPress={loadData}
             isLoading={loading}
@@ -215,7 +215,7 @@ export function ActivityLog() {
         pageSize={20}
         onPageChange={setPage}
         emptyContent={
-          <div className="flex flex-col items-center gap-2 py-8 text-default-400">
+          <div className="flex flex-col items-center gap-2 py-8 text-muted">
             <Activity size={40} />
             <p>{t('system.no_activity_log_entries')}</p>
           </div>

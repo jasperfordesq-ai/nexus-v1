@@ -79,7 +79,7 @@ export function RegistrationBreakerCard() {
 
   if (loading) {
     return (
-      <Card shadow="sm">
+      <Card >
         <CardBody className="flex items-center justify-center py-6">
           <Spinner size="sm" />
         </CardBody>
@@ -98,7 +98,7 @@ export function RegistrationBreakerCard() {
       : 0;
 
   return (
-    <Card shadow="sm" className={tripped ? 'border-2 border-danger' : ''}>
+    <Card  className={tripped ? 'border-2 border-danger' : ''}>
       <CardHeader className="pb-0">
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2">
@@ -109,7 +109,7 @@ export function RegistrationBreakerCard() {
             )}
             <div>
               <h3 className="text-lg font-semibold">{t('system.registration_breaker.title')}</h3>
-              <p className="text-sm text-default-500 mt-1">
+              <p className="text-sm text-muted mt-1">
                 {t('system.registration_breaker.description')}
               </p>
             </div>
@@ -117,7 +117,7 @@ export function RegistrationBreakerCard() {
           <Button
             isIconOnly
             size="sm"
-            variant="light"
+            variant="tertiary"
             onPress={fetchStatus}
             aria-label={t('system.registration_breaker.refresh_status')}
           >
@@ -129,12 +129,12 @@ export function RegistrationBreakerCard() {
         <div className="flex items-center gap-3">
           <Chip
             color={tripped ? 'danger' : 'success'}
-            variant="flat"
+            variant="soft"
             startContent={tripped ? <ShieldAlert size={14} /> : <ShieldCheck size={14} />}
           >
             {tripped ? t('system.registration_breaker.status_paused') : t('system.registration_breaker.status_active')}
           </Chip>
-          <span className="text-sm text-default-600">
+          <span className="text-sm text-muted">
             {t('system.registration_breaker.signups_this_hour', {
               count: status.count_in_current_hour,
               threshold: status.threshold,
@@ -150,15 +150,14 @@ export function RegistrationBreakerCard() {
         {tripped && (
           <div className="bg-danger-50 dark:bg-danger-900/20 border border-danger-200 dark:border-danger-800 rounded-lg p-3 text-sm">
             <p className="font-medium text-danger">{t('system.registration_breaker.paused_title')}</p>
-            <p className="text-default-700 mt-1">
+            <p className="text-foreground mt-1">
               {t('system.registration_breaker.paused_body', {
                 threshold: status.threshold,
                 minutes: Math.ceil((status.auto_resume_in_seconds ?? 3600) / 60),
               })}
             </p>
             <Button
-              color="danger"
-              variant="solid"
+              variant="primary"
               size="sm"
               className="mt-3"
               startContent={<PlayCircle size={16} />}
@@ -171,7 +170,7 @@ export function RegistrationBreakerCard() {
         )}
 
         {!tripped && (
-          <p className="text-xs text-default-500">
+          <p className="text-xs text-muted">
             {t('system.registration_breaker.threshold_prefix')}{' '}
             <code className="font-mono">REGISTRATION_TENANT_HOURLY_CAP</code>.
             {' '}{t('system.registration_breaker.threshold_suffix')}

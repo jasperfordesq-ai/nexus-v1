@@ -121,14 +121,14 @@ export function DeliverablesList() {
     {
       key: 'assigned_to',
       label: t('deliverability.col_assigned_to'),
-      render: (item) => <span className="text-sm text-default-500">{item.assigned_to || '--'}</span>,
+      render: (item) => <span className="text-sm text-muted">{item.assigned_to || '--'}</span>,
     },
     {
       key: 'due_date',
       label: t('deliverability.col_due_date'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {item.due_date ? new Date(item.due_date).toLocaleDateString() : '--'}
         </span>
       ),
@@ -141,7 +141,7 @@ export function DeliverablesList() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
+            variant="tertiary"
             onPress={() => navigate(tenantPath(`/admin/deliverability/edit/${item.id}`))}
             aria-label={t('deliverability.label_edit_deliverable')}
           >
@@ -150,8 +150,7 @@ export function DeliverablesList() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
-            color="danger"
+            variant="danger"
             onPress={() => setConfirmDelete(item)}
             aria-label={t('deliverability.label_delete_deliverable')}
           >
@@ -178,7 +177,6 @@ export function DeliverablesList() {
         description={t('deliverability.deliverables_list_desc')}
         actions={
           <Button
-            color="primary"
             startContent={<Plus size={16} />}
             onPress={() => navigate(tenantPath('/admin/deliverability/create'))}
           >
@@ -188,12 +186,12 @@ export function DeliverablesList() {
       />
 
       {loadError ? (
-        <Card shadow="sm">
+        <Card >
           <CardBody className="flex flex-col items-center gap-3 py-10 text-center">
             <AlertTriangle size={32} className="text-danger" />
             <div className="text-base font-semibold">{t('common.error_loading_data')}</div>
-            <div className="text-sm text-default-500">{loadError}</div>
-            <Button color="primary" variant="flat" onPress={fetchData}>{t('common.retry')}</Button>
+            <div className="text-sm text-muted">{loadError}</div>
+            <Button variant="tertiary" onPress={fetchData}>{t('common.retry')}</Button>
           </CardBody>
         </Card>
       ) : data.length === 0 ? (

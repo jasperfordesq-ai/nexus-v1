@@ -30,7 +30,7 @@ export function GroupGeocode() {
         description={t('groups.geocode_description')}
       />
 
-      <Card shadow="sm" className="border border-warning/30 bg-warning/5 max-w-2xl">
+      <Card  className="border border-warning/30 bg-warning/5 max-w-2xl">
         <CardHeader className="flex items-center gap-2">
           <MapPin size={20} className="text-warning" />
           <h3 className="text-lg font-semibold">
@@ -40,8 +40,8 @@ export function GroupGeocode() {
         <Separator />
         <CardBody className="gap-3">
           <div className="flex items-start gap-3">
-            <Info size={18} className="text-default-400 shrink-0 mt-0.5" />
-            <p className="text-sm text-default-600">
+            <Info size={18} className="text-muted shrink-0 mt-0.5" />
+            <p className="text-sm text-muted">
               {t('groups.geocode_not_migrated_desc')}
             </p>
           </div>

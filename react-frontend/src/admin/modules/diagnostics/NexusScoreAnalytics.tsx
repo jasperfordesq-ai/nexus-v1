@@ -71,7 +71,6 @@ export function NexusScoreAnalytics() {
           label={t('diagnostics.label_avg_nexus_score')}
           value={stats.avg_nexus_score !== undefined ? `${Number(stats.avg_nexus_score).toFixed(1)}` : String(stats.total_xp_awarded)}
           icon={BarChart3}
-          color="primary"
         />
         <StatCard
           label={t('diagnostics.label_top_10_percent_threshold')}
@@ -89,25 +88,24 @@ export function NexusScoreAnalytics() {
           label={t('diagnostics.label_score_trend_30d')}
           value={stats.score_trend_30d !== undefined ? `${stats.score_trend_30d > 0 ? '+' : ''}${stats.score_trend_30d}%` : String(stats.active_campaigns)}
           icon={TrendingUp}
-          color="secondary"
         />
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <Card shadow="sm">
+        <Card >
           <CardHeader><h3 className="text-lg font-semibold">{t('diagnostics.score_distribution')}</h3></CardHeader>
           <CardBody>
             {stats.badge_distribution && stats.badge_distribution.length > 0 ? (
               <div className="space-y-3">
                 {stats.badge_distribution.map(({ badge_name, count }) => (
-                  <div key={badge_name} className="flex items-center justify-between py-1 border-b border-default-100 last:border-0">
+                  <div key={badge_name} className="flex items-center justify-between py-1 border-b border-border last:border-0">
                     <span className="text-sm">{badge_name}</span>
                     <span className="text-sm font-medium text-accent">{count}</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col items-center py-8 text-default-400">
+              <div className="flex flex-col items-center py-8 text-muted">
                 <BarChart3 size={40} className="mb-3" />
                 <p>{t('diagnostics.score_distribution_empty')}</p>
               </div>
@@ -115,10 +113,10 @@ export function NexusScoreAnalytics() {
           </CardBody>
         </Card>
 
-        <Card shadow="sm">
+        <Card >
           <CardHeader><h3 className="text-lg font-semibold">{t('diagnostics.score_factors')}</h3></CardHeader>
           <CardBody>
-            <p className="text-xs text-default-400 mb-3">{t('diagnostics.score_factors_desc')}</p>
+            <p className="text-xs text-muted mb-3">{t('diagnostics.score_factors_desc')}</p>
             <div className="space-y-3">
               {[
                 { factor: t('diagnostics.factor_transaction_activity'), weight: '25%' },
@@ -128,7 +126,7 @@ export function NexusScoreAnalytics() {
                 { factor: t('diagnostics.factor_community_participation'), weight: '15%' },
                 { factor: t('diagnostics.factor_review_quality'), weight: '10%' },
               ].map(({ factor, weight }) => (
-                <div key={factor} className="flex items-center justify-between py-1 border-b border-default-100 last:border-0">
+                <div key={factor} className="flex items-center justify-between py-1 border-b border-border last:border-0">
                   <span className="text-sm">{factor}</span>
                   <span className="text-sm font-medium text-accent">{weight}</span>
                 </div>

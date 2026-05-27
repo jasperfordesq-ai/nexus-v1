@@ -150,7 +150,7 @@ export function RoleForm() {
         description={isEdit ? t('enterprise.edit_role_desc') : t('enterprise.create_role_desc')}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<ArrowLeft size={16} />}
             onPress={() => navigate(tenantPath('/admin/enterprise/roles'))}
             size="sm"
@@ -162,14 +162,14 @@ export function RoleForm() {
 
       <div className="space-y-6">
         {/* Basic Info */}
-        <Card shadow="sm">
+        <Card >
           <CardBody className="p-4 space-y-4">
             <h3 className="text-lg font-semibold">{t('enterprise.basic_information')}</h3>
             <Input
               label={t('enterprise.label_role_name')}
               value={name}
               onValueChange={setName}
-              variant="bordered"
+              variant="secondary"
               isRequired
               placeholder={t('enterprise.placeholder_role_name')}
             />
@@ -177,7 +177,7 @@ export function RoleForm() {
               label={t('enterprise.label_description')}
               value={description}
               onValueChange={setDescription}
-              variant="bordered"
+              variant="secondary"
               placeholder={t('enterprise.placeholder_role_description')}
               minRows={2}
             />
@@ -185,7 +185,7 @@ export function RoleForm() {
         </Card>
 
         {/* Permissions */}
-        <Card shadow="sm">
+        <Card >
           <CardBody className="p-4">
             <h3 className="text-lg font-semibold mb-4">{t('enterprise.col_permissions')}</h3>
             <div className="space-y-6">
@@ -211,7 +211,7 @@ export function RoleForm() {
                         onValueChange={() => togglePermission(perm)}
                         size="sm"
                       >
-                        <span className="text-sm text-default-600">{permissionLabel(perm)}</span>
+                        <span className="text-sm text-muted">{permissionLabel(perm)}</span>
                       </Checkbox>
                     ))}
                   </div>
@@ -224,13 +224,12 @@ export function RoleForm() {
         {/* Actions */}
         <div className="flex justify-end gap-3">
           <Button
-            variant="flat"
+            variant="tertiary"
             onPress={() => navigate(tenantPath('/admin/enterprise/roles'))}
           >
             {t('enterprise.cancel')}
           </Button>
           <Button
-            color="primary"
             startContent={<Save size={16} />}
             onPress={handleSubmit}
             isLoading={saving}

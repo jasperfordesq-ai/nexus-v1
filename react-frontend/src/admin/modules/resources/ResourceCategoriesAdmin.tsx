@@ -219,14 +219,14 @@ export function ResourceCategoriesAdmin() {
       label: t('federation.col_slug'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">{item.slug}</span>
+        <span className="text-sm text-muted">{item.slug}</span>
       ),
     },
     {
       key: 'description',
       label: t('content.label_description'),
       render: (item) => (
-        <span className="text-sm text-default-500 line-clamp-2">
+        <span className="text-sm text-muted line-clamp-2">
           {item.description || '--'}
         </span>
       ),
@@ -236,7 +236,7 @@ export function ResourceCategoriesAdmin() {
       label: t('resources.sort_order'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">{item.sort_order}</span>
+        <span className="text-sm text-muted">{item.sort_order}</span>
       ),
     },
     {
@@ -247,8 +247,7 @@ export function ResourceCategoriesAdmin() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
-            color="primary"
+            variant="tertiary"
             onPress={() => openEditModal(item)}
             aria-label={t('resources.label_edit_category')}
           >
@@ -257,8 +256,7 @@ export function ResourceCategoriesAdmin() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
-            color="danger"
+            variant="danger"
             onPress={() => setConfirmDelete(item)}
             aria-label={t('resources.label_delete_category')}
           >
@@ -279,14 +277,13 @@ export function ResourceCategoriesAdmin() {
         actions={
           <div className="flex items-center gap-2">
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/resources'))}
             >
               {t('common.back')}
             </Button>
             <Button
-              color="primary"
               startContent={<Plus size={16} />}
               onPress={openCreateModal}
             >
@@ -360,11 +357,10 @@ export function ResourceCategoriesAdmin() {
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={closeModal} isDisabled={submitting}>
+            <Button variant="tertiary" onPress={closeModal} isDisabled={submitting}>
               {t('cancel')}
             </Button>
             <Button
-              color="primary"
               onPress={handleSubmit}
               isLoading={submitting}
               isDisabled={submitting}

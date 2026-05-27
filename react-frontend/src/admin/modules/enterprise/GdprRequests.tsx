@@ -36,20 +36,20 @@ function SlaChip({ createdAt, t }: { createdAt: string; t: (key: string, opts?: 
   if (daysRemaining < 0) {
     const days = Math.abs(daysRemaining);
     return (
-      <Chip size="sm" variant="flat" color="danger">
+      <Chip size="sm" variant="soft" color="danger">
         {t('enterprise.gdpr_sla_overdue', { count: days })}
       </Chip>
     );
   }
   if (daysRemaining <= 7) {
     return (
-      <Chip size="sm" variant="flat" color="warning">
+      <Chip size="sm" variant="soft" color="warning">
         {t('enterprise.gdpr_sla_days_left', { count: daysRemaining })}
       </Chip>
     );
   }
   return (
-    <Chip size="sm" variant="flat" color="success">
+    <Chip size="sm" variant="soft" color="success">
       {t('enterprise.gdpr_sla_days_left', { count: daysRemaining })}
     </Chip>
   );
@@ -147,7 +147,7 @@ export function GdprRequests() {
       render: (r) => (
         <Dropdown>
           <DropdownTrigger>
-            <Button isIconOnly size="sm" variant="light" aria-label={t('enterprise.gdpr_actions')}>
+            <Button isIconOnly size="sm" variant="tertiary" aria-label={t('enterprise.gdpr_actions')}>
               <MoreVertical size={14} />
             </Button>
           </DropdownTrigger>
@@ -161,7 +161,7 @@ export function GdprRequests() {
             <DropdownItem key="completed" id="completed" onPress={() => handleStatusUpdate(r.id, 'completed')}>
               {t('enterprise.gdpr_mark_completed')}
             </DropdownItem>
-            <DropdownItem key="rejected" id="rejected" className="text-danger" color="danger" onPress={() => handleStatusUpdate(r.id, 'rejected')}>
+            <DropdownItem key="rejected" id="rejected" className="text-danger" variant="danger" onPress={() => handleStatusUpdate(r.id, 'rejected')}>
               {t('enterprise.gdpr_reject')}
             </DropdownItem>
           </DropdownMenu>
@@ -178,7 +178,7 @@ export function GdprRequests() {
         actions={
           <div className="flex gap-2">
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<RefreshCw size={16} />}
               onPress={loadData}
               isLoading={loading}
@@ -187,7 +187,6 @@ export function GdprRequests() {
               {t('enterprise.refresh')}
             </Button>
             <Button
-              color="primary"
               startContent={<Plus size={16} />}
               onPress={() => navigate(tenantPath('/admin/enterprise/gdpr/requests/create'))}
               size="sm"
@@ -209,7 +208,7 @@ export function GdprRequests() {
           }}
           className="max-w-xs"
           size="sm"
-          variant="bordered"
+          variant="secondary"
         >
           {STATUS_OPTION_KEYS.map((key) => (
             <SelectItem key={key} id={key}>{t(`enterprise.status_${key}`)}</SelectItem>

@@ -56,7 +56,7 @@ export function GdprConsents() {
       label: t('enterprise.gdpr_type'),
       sortable: true,
       render: (c) => (
-        <Chip size="sm" variant="flat" color="primary" className="capitalize">
+        <Chip size="sm" variant="soft" className="capitalize">
           {c.consent_type}
         </Chip>
       ),
@@ -92,7 +92,7 @@ export function GdprConsents() {
         description={t('enterprise.gdpr_consents_desc')}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<RefreshCw size={16} />}
             onPress={loadData}
             isLoading={loading}

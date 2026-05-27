@@ -62,7 +62,7 @@ export function ErrorLogs() {
       label: t('enterprise.col_action'),
       sortable: true,
       render: (entry) => (
-        <Chip size="sm" variant="flat" color="danger">
+        <Chip size="sm" variant="soft" color="danger">
           {entry.action}
         </Chip>
       ),
@@ -95,7 +95,7 @@ export function ErrorLogs() {
         description={t('enterprise.error_logs_desc')}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<RefreshCw size={16} />}
             onPress={loadData}
             isLoading={loading}

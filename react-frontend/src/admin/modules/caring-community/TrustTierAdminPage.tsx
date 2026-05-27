@@ -56,7 +56,7 @@ function TierRow({ tierName, criteria, onChange }: TierRowProps) {
           value={String(criteria.hours_logged)}
           min={0}
           onValueChange={(v) => onChange(tierName, 'hours_logged', Math.max(0, parseInt(v || '0', 10)))}
-          variant="bordered"
+          variant="secondary"
           size="sm"
         />
         <Input
@@ -65,7 +65,7 @@ function TierRow({ tierName, criteria, onChange }: TierRowProps) {
           value={String(criteria.reviews_received)}
           min={0}
           onValueChange={(v) => onChange(tierName, 'reviews_received', Math.max(0, parseInt(v || '0', 10)))}
-          variant="bordered"
+          variant="secondary"
           size="sm"
         />
         <div className="flex items-center gap-2 pt-2">
@@ -157,8 +157,7 @@ export function TrustTierAdminPage() {
           <div className="flex flex-wrap items-start gap-2 sm:justify-end">
             <div className="flex flex-col items-end gap-1">
               <Button
-                color="default"
-                variant="bordered"
+                variant="secondary"
                 size="sm"
                 startContent={<RefreshCw className="h-4 w-4" aria-hidden="true" />}
                 onPress={() => void handleRecompute()}
@@ -172,7 +171,6 @@ export function TrustTierAdminPage() {
               </p>
             </div>
             <Button
-              color="primary"
               size="sm"
               startContent={<Save className="h-4 w-4" aria-hidden="true" />}
               onPress={() => void handleSave()}
@@ -185,13 +183,13 @@ export function TrustTierAdminPage() {
         }
       />
 
-      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" >
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('admin.trust_tier.about.title')}</p>
-              <p className="text-default-600">{t('admin.trust_tier.about.body')}</p>
+              <p className="text-muted">{t('admin.trust_tier.about.body')}</p>
             </div>
           </div>
         </CardBody>

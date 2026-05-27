@@ -103,7 +103,7 @@ export function LegalDocList() {
       label: t('enterprise.label_type'),
       sortable: true,
       render: (doc) => (
-        <Chip size="sm" variant="flat" color="primary">
+        <Chip size="sm" variant="soft">
           {DOC_TYPE_KEYS[doc.type] ? t(DOC_TYPE_KEYS[doc.type] ?? '') : doc.type}
         </Chip>
       ),
@@ -129,7 +129,7 @@ export function LegalDocList() {
           <Button
             isIconOnly
             size="sm"
-            variant="light"
+            variant="tertiary"
             onPress={() => navigate(tenantPath(`/admin/legal-documents/${doc.id}/versions`))}
             aria-label={t('enterprise.label_manage_versions')}
           >
@@ -138,7 +138,7 @@ export function LegalDocList() {
           <Button
             isIconOnly
             size="sm"
-            variant="light"
+            variant="tertiary"
             onPress={() => navigate(tenantPath(`/admin/legal-documents/${doc.id}/edit`))}
             aria-label={t('enterprise.label_edit_document')}
           >
@@ -147,8 +147,7 @@ export function LegalDocList() {
           <Button
             isIconOnly
             size="sm"
-            variant="light"
-            color="danger"
+            variant="danger"
             onPress={() => setDeleteTarget(doc)}
             aria-label={t('enterprise.label_delete_document')}
           >
@@ -168,7 +167,6 @@ export function LegalDocList() {
           <Button
             as={Link}
             to={tenantPath('/admin/legal-documents/create')}
-            color="primary"
             startContent={<Plus size={16} />}
             size="sm"
           >

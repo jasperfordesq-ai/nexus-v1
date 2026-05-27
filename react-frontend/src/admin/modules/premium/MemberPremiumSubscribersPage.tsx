@@ -99,9 +99,9 @@ export function MemberPremiumSubscribersPage() {
               </SelectItem>
             ))}
           </Select>
-          <span className="text-sm text-default-500">{t('member_premium_admin.subscribers_page.total', { count: total })}</span>
+          <span className="text-sm text-muted">{t('member_premium_admin.subscribers_page.total', { count: total })}</span>
           <div className="flex-1" />
-          <Button size="sm" variant="flat" onPress={load} isLoading={loading}>{t('member_premium_admin.subscribers_page.refresh')}</Button>
+          <Button size="sm" variant="tertiary" onPress={load} isLoading={loading}>{t('member_premium_admin.subscribers_page.refresh')}</Button>
         </CardBody>
       </Card>
 
@@ -110,7 +110,7 @@ export function MemberPremiumSubscribersPage() {
           {loading ? (
             <div className="flex justify-center py-10"><Spinner /></div>
           ) : rows.length === 0 ? (
-            <div className="text-center py-10 text-default-500">{t('member_premium_admin.subscribers_page.empty')}</div>
+            <div className="text-center py-10 text-muted">{t('member_premium_admin.subscribers_page.empty')}</div>
           ) : (
             <Table removeWrapper aria-label={t('member_premium_admin.subscribers_page.table_aria')}>
               <TableHeader>
@@ -130,7 +130,7 @@ export function MemberPremiumSubscribersPage() {
                     <TableCell>{r.tier_name}</TableCell>
                     <TableCell>{t(`member_premium_admin.subscribers_page.interval.${r.billing_interval}`)}</TableCell>
                     <TableCell>
-                      <Chip size="sm" color={statusColor(r.status)} variant="flat">{t(`member_premium_admin.subscribers_page.status.${r.status}`)}</Chip>
+                      <Chip size="sm" color={statusColor(r.status)} variant="soft">{t(`member_premium_admin.subscribers_page.status.${r.status}`)}</Chip>
                     </TableCell>
                     <TableCell>
                       {r.current_period_end ? new Date(r.current_period_end).toLocaleDateString() : t('member_premium_admin.empty.value')}

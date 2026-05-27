@@ -70,7 +70,7 @@ const ACTIVITY_DOT_COLOR_MAP: Record<string, string> = {
   listing_created: 'bg-warning',
   exchange_completed: 'bg-success',
   note_added: 'bg-default',
-  task_created: 'bg-default-400',
+  task_created: 'bg-muted',
   profile_updated: 'bg-accent',
   group_joined: 'bg-warning',
 };
@@ -200,7 +200,7 @@ export function ActivityTimeline() {
         description={"Chronological timeline of member actions and coordinator interactions"}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<RefreshCw size={16} />}
             onPress={() => loadTimeline()}
             isDisabled={loading}
@@ -265,7 +265,7 @@ export function ActivityTimeline() {
         {hasActiveFilters && (
           <Button
             size="sm"
-            variant="flat"
+            variant="tertiary"
             onPress={handleClearFilters}
           >
             {t('crm.clear_filters')}
@@ -281,9 +281,9 @@ export function ActivityTimeline() {
       ) : entries.length === 0 ? (
         <Card>
           <CardBody className="flex flex-col items-center py-16 text-center">
-            <Activity size={48} className="text-default-300 mb-4" />
-            <p className="text-default-500 text-lg font-medium">{t('crm.no_activity_found')}</p>
-            <p className="text-default-400 text-sm mt-1">
+            <Activity size={48} className="text-muted mb-4" />
+            <p className="text-muted text-lg font-medium">{t('crm.no_activity_found')}</p>
+            <p className="text-muted text-sm mt-1">
               {hasActiveFilters
                 ? "No activity matches your current filters"
                 : "No activity has been recorded yet"}
@@ -296,7 +296,7 @@ export function ActivityTimeline() {
           <div className="relative">
             {entries.map((entry, index) => {
               const isLast = index === entries.length - 1;
-              const dotColor = ACTIVITY_DOT_COLOR_MAP[entry.activity_type] || 'bg-default-400';
+              const dotColor = ACTIVITY_DOT_COLOR_MAP[entry.activity_type] || 'bg-muted';
               const chipColor = ACTIVITY_COLOR_MAP[entry.activity_type] || 'default';
 
               return (
@@ -307,7 +307,7 @@ export function ActivityTimeline() {
                       className={`w-3 h-3 rounded-full mt-1.5 shrink-0 ring-4 ring-background ${dotColor}`}
                     />
                     {!isLast && (
-                      <div className="w-px flex-1 bg-default-200 dark:bg-default-100 mt-1" />
+                      <div className="w-px flex-1 bg-surface-secondary dark:bg-surface-secondary mt-1" />
                     )}
                   </div>
 
@@ -333,7 +333,7 @@ export function ActivityTimeline() {
                               </Link>
                               <Chip
                                 size="sm"
-                                variant="flat"
+                                variant="soft"
                                 color={chipColor}
                                 startContent={
                                   <span className="ml-1">{getActivityIcon(entry.activity_type)}</span>
@@ -342,13 +342,13 @@ export function ActivityTimeline() {
                                 {getActivityLabel(entry.activity_type)}
                               </Chip>
                             </div>
-                            <p className="text-sm text-default-600 mt-1">
+                            <p className="text-sm text-muted mt-1">
                               {entry.description}
                             </p>
                             {entry.metadata && Object.keys(entry.metadata).length > 0 && (
                               <div className="flex flex-wrap gap-1.5 mt-2">
                                 {Object.entries(entry.metadata).map(([key, value]) => (
-                                  <Chip key={key} size="sm" variant="bordered" className="text-xs">
+                                  <Chip key={key} size="sm" variant="soft" className="text-xs">
                                     {key}: {String(value)}
                                   </Chip>
                                 ))}
@@ -359,10 +359,10 @@ export function ActivityTimeline() {
 
                         {/* Right: timestamp */}
                         <div className="text-right shrink-0">
-                          <p className="text-xs text-default-400 whitespace-nowrap" title={formatDateTime(entry.created_at)}>
+                          <p className="text-xs text-muted whitespace-nowrap" title={formatDateTime(entry.created_at)}>
                             {formatRelativeTime(entry.created_at, t)}
                           </p>
-                          <p className="text-xs text-default-300 mt-0.5">
+                          <p className="text-xs text-muted mt-0.5">
                             #{entry.user_id}
                           </p>
                         </div>

@@ -155,7 +155,7 @@ export default function CategoryCoefficientsAdminPage() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
+            variant="tertiary"
             onPress={load}
             isLoading={loading}
             aria-label={t('category_coefficients.actions.refresh_aria')}
@@ -166,19 +166,19 @@ export default function CategoryCoefficientsAdminPage() {
       />
 
       {/* Intro card */}
-      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" >
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('category_coefficients.about.title')}</p>
-              <p className="text-default-600">
+              <p className="text-muted">
                 {t('category_coefficients.about.body_prefix')}{' '}
                 <Abbr term="CHF">{t('category_coefficients.about.chf_amount')}</Abbr>
                 {t('category_coefficients.about.body_middle')}{' '}
                 <Abbr term="KISS" /> {t('category_coefficients.about.body_suffix')}
               </p>
-              <p className="text-default-500">
+              <p className="text-muted">
                 {t('category_coefficients.about.range_prefix')} <Abbr term="ROI" /> {t('category_coefficients.about.range_suffix')}
               </p>
             </div>
@@ -239,7 +239,7 @@ export default function CategoryCoefficientsAdminPage() {
                         <span className="font-medium">{row.name}</span>
                       </TableCell>
                       <TableCell>
-                        <Chip size="sm" variant="flat">
+                        <Chip size="sm" variant="soft">
                           {row.source_table}
                         </Chip>
                       </TableCell>
@@ -261,7 +261,6 @@ export default function CategoryCoefficientsAdminPage() {
                       <TableCell className="text-right">
                         <Button
                           size="sm"
-                          color="primary"
                           variant={dirty ? 'solid' : 'flat'}
                           startContent={!isSaving && <Save size={14} />}
                           onPress={() => handleSave(row)}

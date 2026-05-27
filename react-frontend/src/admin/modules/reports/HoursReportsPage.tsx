@@ -101,8 +101,8 @@ interface HoursSummary {
 
 const tooltipStyle = {
   borderRadius: '8px',
-  border: '1px solid hsl(var(--heroui-default-200))',
-  backgroundColor: 'hsl(var(--heroui-content1))',
+  border: '1px solid var(--color-border)',
+  backgroundColor: 'var(--color-surface)',
   color: 'hsl(var(--heroui-foreground))',
 };
 
@@ -223,7 +223,6 @@ export function HoursReportsPage() {
         label={t('reports.label_total_transactions')}
         value={summary?.total_transactions ?? '\u2014'}
         icon={ArrowLeftRight}
-        color="primary"
         loading={!summary}
       />
       <StatCard
@@ -237,7 +236,6 @@ export function HoursReportsPage() {
         label={t('reports.label_avg_hours_transaction')}
         value={summary ? (summary.avg_hours_per_transaction ?? 0).toFixed(1) : '\u2014'}
         icon={Activity}
-        color="secondary"
         loading={!summary}
       />
     </div>
@@ -253,7 +251,7 @@ export function HoursReportsPage() {
     return (
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Bar Chart */}
-        <Card shadow="sm">
+        <Card >
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <BarChart3 size={18} className="text-accent" />
             <h3 className="font-semibold">{t('reports.chart_hours_by_category')}</h3>
@@ -272,7 +270,7 @@ export function HoursReportsPage() {
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <p className="flex h-[350px] items-center justify-center text-sm text-default-400">
+              <p className="flex h-[350px] items-center justify-center text-sm text-muted">
                 {t('reports.no_category_data')}
               </p>
             )}
@@ -280,7 +278,7 @@ export function HoursReportsPage() {
         </Card>
 
         {/* Pie Chart */}
-        <Card shadow="sm">
+        <Card >
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <PieChartIcon size={18} className="text-accent" />
             <h3 className="font-semibold">{t('reports.chart_category_distribution')}</h3>
@@ -320,7 +318,7 @@ export function HoursReportsPage() {
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <p className="flex h-[350px] items-center justify-center text-sm text-default-400">
+              <p className="flex h-[350px] items-center justify-center text-sm text-muted">
                 {t('reports.no_category_data')}
               </p>
             )}
@@ -359,7 +357,7 @@ export function HoursReportsPage() {
           </Select>
         </div>
 
-        <Table aria-label={t('reports.label_hours_by_member')} shadow="sm">
+        <Table aria-label={t('reports.label_hours_by_member')} >
           <TableHeader>
             <TableColumn>{t('reports.col_member')}</TableColumn>
             <TableColumn>{t('reports.col_hours_given')}</TableColumn>
@@ -382,11 +380,11 @@ export function HoursReportsPage() {
                 </TableCell>
                 <TableCell className="text-sm text-success font-medium">{(m.hours_given ?? 0).toFixed(1)}</TableCell>
                 <TableCell className="text-sm text-warning font-medium">{(m.hours_received ?? 0).toFixed(1)}</TableCell>
-                <TableCell className="text-sm text-default-600 font-medium">{(m.total_hours ?? 0).toFixed(1)}</TableCell>
+                <TableCell className="text-sm text-muted font-medium">{(m.total_hours ?? 0).toFixed(1)}</TableCell>
                 <TableCell>
                   <Chip
                     size="sm"
-                    variant="flat"
+                    variant="soft"
                     color={(m.balance ?? 0) >= 0 ? 'success' : 'danger'}
                   >
                     {(m.balance ?? 0) >= 0 ? '+' : ''}{(m.balance ?? 0).toFixed(1)}
@@ -408,7 +406,7 @@ export function HoursReportsPage() {
     const periods = (data?.periods ?? []) as PeriodHours[];
 
     return (
-      <Card shadow="sm">
+      <Card >
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
           <TrendingUp size={18} className="text-accent" />
           <h3 className="font-semibold">{t('reports.chart_monthly_hours_trend')}</h3>
@@ -453,7 +451,7 @@ export function HoursReportsPage() {
               </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <p className="flex h-[350px] items-center justify-center text-sm text-default-400">
+            <p className="flex h-[350px] items-center justify-center text-sm text-muted">
               {t('reports.no_period_data')}
             </p>
           )}
@@ -480,7 +478,7 @@ export function HoursReportsPage() {
               onValueChange={setDateFrom}
               aria-label={t('reports.label_from_date')}
               className="w-36"
-              variant="bordered"
+              variant="secondary"
             />
             <Input
               type="date"
@@ -489,10 +487,10 @@ export function HoursReportsPage() {
               onValueChange={setDateTo}
               aria-label={t('reports.label_to_date')}
               className="w-36"
-              variant="bordered"
+              variant="secondary"
             />
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<Download size={16} />}
               onPress={async () => {
                 try { await exportCsv(groupBy, dateFrom, dateTo); } catch { toast.error(t('reports.failed_to_export_c_s_v')); }
@@ -502,7 +500,7 @@ export function HoursReportsPage() {
               {t('reports.export_csv')}
             </Button>
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<RefreshCw size={16} />}
               onPress={() => { loadSummary(); loadData(); }}
               isLoading={loading}
@@ -521,7 +519,6 @@ export function HoursReportsPage() {
         selectedKey={groupBy}
         onSelectionChange={(key) => setGroupBy(String(key))}
         variant="underlined"
-        color="primary"
         classNames={{ tabList: 'mb-4' }}
       >
         <Tab key="category" title={<span className="flex items-center gap-1.5"><PieChartIcon size={14} /> {t('reports.tab_by_category')}</span>} />

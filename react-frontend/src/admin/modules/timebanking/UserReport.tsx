@@ -160,7 +160,7 @@ export function UserReport() {
               >
                 {user.name}
               </Link>
-              <p className="text-xs text-default-400 truncate">{user.email}</p>
+              <p className="text-xs text-muted truncate">{user.email}</p>
             </div>
           </div>
         ),
@@ -210,8 +210,7 @@ export function UserReport() {
           <div className="flex gap-1">
             <Button
               size="sm"
-              variant="flat"
-              color="secondary"
+              variant="tertiary"
               startContent={<PlusCircle size={14} />}
               onPress={() => openAdjustModal(user)}
             >
@@ -219,7 +218,7 @@ export function UserReport() {
             </Button>
             <Button
               size="sm"
-              variant="light"
+              variant="tertiary"
               isIconOnly
               aria-label={t('timebanking.download_statement_for', { name: user.name })}
               isLoading={downloadingId === user.id}
@@ -243,7 +242,7 @@ export function UserReport() {
           <Button
             as={Link}
             to={tenantPath('/admin/timebanking')}
-            variant="flat"
+            variant="tertiary"
             startContent={<ArrowLeft size={16} />}
             size="sm"
           >
@@ -266,8 +265,8 @@ export function UserReport() {
         onRefresh={loadUsers}
         emptyContent={
           <div className="flex flex-col items-center gap-2 py-8">
-            <Users size={32} className="text-default-300" />
-            <p className="text-sm text-default-400">{t('timebanking.no_users_found')}</p>
+            <Users size={32} className="text-muted" />
+            <p className="text-sm text-muted">{t('timebanking.no_users_found')}</p>
           </div>
         }
       />
@@ -279,7 +278,7 @@ export function UserReport() {
               {t('timebanking.adjust_balance_for', { name: adjustTarget.name })}
             </ModalHeader>
             <ModalBody className="gap-4">
-              <p className="text-sm text-default-500">
+              <p className="text-sm text-muted">
                 {t('timebanking.current_balance')}: <strong>{adjustTarget.balance}h</strong>
               </p>
               <Input
@@ -288,7 +287,7 @@ export function UserReport() {
                 type="number"
                 value={adjustAmount}
                 onValueChange={setAdjustAmount}
-                variant="bordered"
+                variant="secondary"
                 description={t('timebanking.desc_positive_to_credit_negative_to_debit')}
                 isRequired
               />
@@ -297,16 +296,16 @@ export function UserReport() {
                 placeholder={t('timebanking.placeholder_explain_why_this_adjustment_is_needed')}
                 value={adjustReason}
                 onValueChange={setAdjustReason}
-                variant="bordered"
+                variant="secondary"
                 minRows={2}
                 isRequired
               />
             </ModalBody>
             <ModalFooter>
-              <Button variant="flat" onPress={() => setAdjustTarget(null)} isDisabled={adjustLoading}>
+              <Button variant="tertiary" onPress={() => setAdjustTarget(null)} isDisabled={adjustLoading}>
                 {t('common.cancel')}
               </Button>
-              <Button color="primary" onPress={handleAdjustBalance} isLoading={adjustLoading} isDisabled={adjustLoading}>
+              <Button onPress={handleAdjustBalance} isLoading={adjustLoading} isDisabled={adjustLoading}>
                 {t('timebanking.adjust_balance')}
               </Button>
             </ModalFooter>

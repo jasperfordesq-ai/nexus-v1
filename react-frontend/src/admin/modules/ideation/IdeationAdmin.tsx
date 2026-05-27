@@ -120,7 +120,7 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
   return (
     <Dropdown>
       <DropdownTrigger>
-        <Button isIconOnly size="sm" variant="light" aria-label={t('common.actions')}>
+        <Button isIconOnly size="sm" variant="tertiary" aria-label={t('common.actions')}>
           <MoreVertical size={16} />
         </Button>
       </DropdownTrigger>
@@ -146,7 +146,6 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
         <DropdownItem
           key="voting" id="voting"
           startContent={<Vote size={14} />}
-          color="primary"
           className={challenge.status !== 'voting' ? 'text-accent' : 'hidden'}
         >
           {t('ideation.mark_as_voting')}
@@ -177,7 +176,7 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
           key="delete" id="delete"
           startContent={<Trash2 size={14} />}
           className="text-danger"
-          color="danger"
+          variant="danger"
         >
           {t('common.delete')}
         </DropdownItem>
@@ -292,7 +291,7 @@ export function IdeationAdmin() {
       label: t('ideation.col_creator'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">{item.creator_name || t('common.unknown')}</span>
+        <span className="text-sm text-muted">{item.creator_name || t('common.unknown')}</span>
       ),
     },
     {
@@ -300,7 +299,7 @@ export function IdeationAdmin() {
       label: t('ideation.col_ideas'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">{item.ideas_count}</span>
+        <span className="text-sm text-muted">{item.ideas_count}</span>
       ),
     },
     {
@@ -310,7 +309,7 @@ export function IdeationAdmin() {
       render: (item) => (
         <Chip
           size="sm"
-          variant="flat"
+          variant="soft"
           color={statusColors[item.status] || 'default'}
           className="capitalize"
         >
@@ -323,7 +322,7 @@ export function IdeationAdmin() {
       label: t('ideation.col_start_date'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {item.start_date ? new Date(item.start_date).toLocaleDateString() : '\u2014'}
         </span>
       ),
@@ -333,7 +332,7 @@ export function IdeationAdmin() {
       label: t('ideation.col_end_date'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {item.end_date ? new Date(item.end_date).toLocaleDateString() : '\u2014'}
         </span>
       ),
@@ -361,13 +360,13 @@ export function IdeationAdmin() {
         description={t('ideation.ideation_admin_desc')}
         actions={
           <div className="flex gap-2 items-center">
-            <Chip variant="flat" startContent={<Lightbulb size={14} />}>
+            <Chip variant="soft" startContent={<Lightbulb size={14} />}>
               {t('ideation.total_count', { count: total })}
             </Chip>
             <Button
               isIconOnly
               size="sm"
-              variant="flat"
+              variant="tertiary"
               onPress={loadItems}
               aria-label={t('common.refresh')}
             >
@@ -447,26 +446,26 @@ export function IdeationAdmin() {
         >
           <div className="space-y-3">
             <div>
-              <span className="text-sm font-medium text-default-500">{t('ideation.ideation')}</span>
+              <span className="text-sm font-medium text-muted">{t('ideation.ideation')}</span>
               <p className="text-foreground">{detailItem.title}</p>
             </div>
             <div className="flex gap-6">
               <div>
-                <span className="text-sm font-medium text-default-500">{t('ideation.col_creator')}</span>
+                <span className="text-sm font-medium text-muted">{t('ideation.col_creator')}</span>
                 <p className="text-foreground">{detailItem.creator_name || t('common.unknown')}</p>
               </div>
               <div>
-                <span className="text-sm font-medium text-default-500">{t('ideation.col_ideas')}</span>
+                <span className="text-sm font-medium text-muted">{t('ideation.col_ideas')}</span>
                 <p className="text-foreground">{detailItem.ideas_count}</p>
               </div>
             </div>
             <div className="flex gap-6">
               <div>
-                <span className="text-sm font-medium text-default-500">{t('ideation.col_status')}</span>
+                <span className="text-sm font-medium text-muted">{t('ideation.col_status')}</span>
                 <p>
                   <Chip
                     size="sm"
-                    variant="flat"
+                    variant="soft"
                     color={statusColors[detailItem.status] || 'default'}
                     className="capitalize"
                   >
@@ -475,7 +474,7 @@ export function IdeationAdmin() {
                 </p>
               </div>
               <div>
-                <span className="text-sm font-medium text-default-500">{t('ideation.col_start_date')}</span>
+                <span className="text-sm font-medium text-muted">{t('ideation.col_start_date')}</span>
                 <p className="text-foreground">
                   {detailItem.start_date
                     ? new Date(detailItem.start_date).toLocaleDateString()
@@ -483,7 +482,7 @@ export function IdeationAdmin() {
                 </p>
               </div>
               <div>
-                <span className="text-sm font-medium text-default-500">{t('ideation.col_end_date')}</span>
+                <span className="text-sm font-medium text-muted">{t('ideation.col_end_date')}</span>
                 <p className="text-foreground">
                   {detailItem.end_date
                     ? new Date(detailItem.end_date).toLocaleDateString()
@@ -492,7 +491,7 @@ export function IdeationAdmin() {
               </div>
             </div>
             <div>
-              <span className="text-sm font-medium text-default-500">{t('ideation.col_created')}</span>
+              <span className="text-sm font-medium text-muted">{t('ideation.col_created')}</span>
               <p className="text-foreground">
                 {new Date(detailItem.created_at).toLocaleString()}
               </p>

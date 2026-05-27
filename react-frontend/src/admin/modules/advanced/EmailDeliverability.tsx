@@ -300,7 +300,7 @@ export default function EmailDeliverability() {
   );
 
   const statusChip = (status: string) => (
-    <Chip size="sm" color={STATUS_COLORS[status] ?? 'default'} variant="flat">
+    <Chip size="sm" color={STATUS_COLORS[status] ?? 'default'} variant="soft">
       {statusLabel(status)}
     </Chip>
   );
@@ -389,7 +389,7 @@ export default function EmailDeliverability() {
             <SelectItem key="90" id="90">{t('email_deliverability.windows.90')}</SelectItem>
           </Select>
           <Tooltip content={t('email_deliverability.actions.refresh')}>
-            <Button size="sm" variant="flat" onPress={loadSummary} isIconOnly aria-label={t('email_deliverability.actions.refresh')}>
+            <Button size="sm" variant="tertiary" onPress={loadSummary} isIconOnly aria-label={t('email_deliverability.actions.refresh')}>
               <RotateCcw className="h-4 w-4" />
             </Button>
           </Tooltip>
@@ -402,7 +402,7 @@ export default function EmailDeliverability() {
             <Alert
               key={`${warning.code}-${warning.severity}-${index}`}
               color={warning.severity === 'critical' ? 'danger' : warning.severity === 'warning' ? 'warning' : 'primary'}
-              variant="flat"
+              variant="tertiary"
               startContent={<AlertTriangle className="h-4 w-4" />}
               title={t([
                 `email_deliverability.warnings.${warning.code}.title`,
@@ -443,11 +443,11 @@ export default function EmailDeliverability() {
           </div>
           <div className="flex flex-wrap gap-2">
             {summaryStatuses.length > 0 ? summaryStatuses.map((status) => (
-              <Chip key={status} size="sm" color={STATUS_COLORS[status] ?? 'default'} variant="flat">
+              <Chip key={status} size="sm" color={STATUS_COLORS[status] ?? 'default'} variant="soft">
                 {statusLabel(status)}: {summary?.by_status[status]}
               </Chip>
             )) : (
-              <Chip size="sm" variant="flat">{t('email_deliverability.empty.no_statuses')}</Chip>
+              <Chip size="sm" variant="soft">{t('email_deliverability.empty.no_statuses')}</Chip>
             )}
           </div>
         </CardHeader>
@@ -490,7 +490,7 @@ export default function EmailDeliverability() {
               {triggerIssues.map((issue, index) => (
                 <TableRow key={`${issue.code}-${issue.tenant_id ?? 'all'}-${index}`}>
                   <TableCell>
-                    <Chip size="sm" color={SEVERITY_COLORS[issue.severity] ?? 'default'} variant="flat">
+                    <Chip size="sm" color={SEVERITY_COLORS[issue.severity] ?? 'default'} variant="soft">
                       {t(`email_deliverability.severity.${issue.severity}`)}
                     </Chip>
                   </TableCell>
@@ -530,7 +530,7 @@ export default function EmailDeliverability() {
             <p className="text-sm text-theme-secondary">{t('email_deliverability.queues.subtitle')}</p>
           </div>
           <Tooltip content={t('email_deliverability.actions.refresh')}>
-            <Button size="sm" variant="flat" onPress={loadQueues} isIconOnly aria-label={t('email_deliverability.actions.refresh')}>
+            <Button size="sm" variant="tertiary" onPress={loadQueues} isIconOnly aria-label={t('email_deliverability.actions.refresh')}>
               <RotateCcw className="h-4 w-4" />
             </Button>
           </Tooltip>
@@ -552,7 +552,7 @@ export default function EmailDeliverability() {
                 {queueRows.map((row) => (
                   <TableRow key={`${row.source}-${row.id}`}>
                     <TableCell>
-                      <Chip size="sm" variant="flat">
+                      <Chip size="sm" variant="soft">
                         {t(`email_deliverability.queues.sources.${row.source}`)}
                       </Chip>
                     </TableCell>
@@ -609,8 +609,8 @@ export default function EmailDeliverability() {
               <Input size="sm" type="date" label={t('email_deliverability.filters.since')} value={logSince} onValueChange={setLogSince} />
               <Input size="sm" type="date" label={t('email_deliverability.filters.until')} value={logUntil} onValueChange={setLogUntil} />
               <div className="flex items-end gap-2">
-                <Button size="sm" color="primary" onPress={runLogSearch}>{t('email_deliverability.actions.search')}</Button>
-                <Button size="sm" variant="flat" onPress={resetLogFilters}>{t('email_deliverability.actions.reset')}</Button>
+                <Button size="sm" onPress={runLogSearch}>{t('email_deliverability.actions.search')}</Button>
+                <Button size="sm" variant="tertiary" onPress={resetLogFilters}>{t('email_deliverability.actions.reset')}</Button>
               </div>
             </div>
           </div>
@@ -632,7 +632,7 @@ export default function EmailDeliverability() {
                 {logRows.map((row) => (
                   <TableRow key={row.id}>
                     <TableCell className="font-mono text-xs">{row.recipient_email}</TableCell>
-                    <TableCell>{row.category ? <Chip size="sm" variant="flat">{row.category}</Chip> : '-'}</TableCell>
+                    <TableCell>{row.category ? <Chip size="sm" variant="soft">{row.category}</Chip> : '-'}</TableCell>
                     <TableCell className="max-w-xs truncate">{row.subject ?? '-'}</TableCell>
                     <TableCell>{statusChip(row.status)}</TableCell>
                     <TableCell className="text-xs">{row.provider ?? '-'}</TableCell>
@@ -699,8 +699,8 @@ export default function EmailDeliverability() {
                   <SelectItem key={reason} id={reason}>{reason ? t(`email_deliverability.suppressions.reasons.${reason}`) : t('email_deliverability.filters.all')}</SelectItem>
                 ))}
               </Select>
-              <Button size="sm" color="primary" onPress={runSuppressionSearch}>{t('email_deliverability.actions.search')}</Button>
-              <Button size="sm" variant="flat" onPress={resetSuppressionFilters}>{t('email_deliverability.actions.reset')}</Button>
+              <Button size="sm" onPress={runSuppressionSearch}>{t('email_deliverability.actions.search')}</Button>
+              <Button size="sm" variant="tertiary" onPress={resetSuppressionFilters}>{t('email_deliverability.actions.reset')}</Button>
             </div>
           </div>
         </CardHeader>
@@ -719,7 +719,7 @@ export default function EmailDeliverability() {
                   <TableRow key={row.id}>
                     <TableCell className="font-mono text-xs">{row.email}</TableCell>
                     <TableCell>
-                      <Chip size="sm" variant="flat">{suppressionReasonLabel(row.reason)}</Chip>
+                      <Chip size="sm" variant="soft">{suppressionReasonLabel(row.reason)}</Chip>
                     </TableCell>
                     <TableCell className="max-w-xs truncate">{row.detail ?? '-'}</TableCell>
                     <TableCell className="text-xs">{row.suppressed_at}</TableCell>
@@ -727,8 +727,7 @@ export default function EmailDeliverability() {
                       <Tooltip content={t('email_deliverability.suppressions.remove')}>
                         <Button
                           size="sm"
-                          variant="flat"
-                          color="danger"
+                          variant="danger"
                           isIconOnly
                           aria-label={t('email_deliverability.suppressions.remove')}
                           onPress={() => removeSuppression(row.id, row.email)}

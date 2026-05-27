@@ -164,7 +164,7 @@ export default function LegalDocVersionComparison({
       </ModalBody>
 
       <ModalFooter>
-        <Button color="primary" onPress={onClose}>
+        <Button onPress={onClose}>
           {t('enterprise.btn_close')}
         </Button>
       </ModalFooter>

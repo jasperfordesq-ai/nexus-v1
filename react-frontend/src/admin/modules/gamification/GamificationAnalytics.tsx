@@ -75,7 +75,7 @@ export function GamificationAnalytics() {
         description={t('gamification.gamification_analytics_desc')}
         actions={
           <Link to={tenantPath("/admin/gamification")}>
-            <Button variant="flat" startContent={<ArrowLeft size={16} />}>
+            <Button variant="tertiary" startContent={<ArrowLeft size={16} />}>
               {t('gamification.back_to_hub')}
             </Button>
           </Link>
@@ -88,7 +88,6 @@ export function GamificationAnalytics() {
           label={t('gamification.label_total_badges_awarded')}
           value={stats?.total_badges_awarded ?? 0}
           icon={Award}
-          color="primary"
           loading={loading}
         />
         <StatCard
@@ -109,18 +108,17 @@ export function GamificationAnalytics() {
           label={t('gamification.label_active_campaigns')}
           value={stats?.active_campaigns ?? 0}
           icon={Target}
-          color="secondary"
           loading={loading}
         />
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Badge Distribution */}
-        <Card shadow="sm">
+        <Card >
           <CardHeader className="pb-0">
             <div>
               <h3 className="text-lg font-semibold text-foreground">{t('gamification.badge_distribution')}</h3>
-              <p className="text-sm text-default-500">{t('gamification.top_10_badges')}</p>
+              <p className="text-sm text-muted">{t('gamification.top_10_badges')}</p>
             </div>
           </CardHeader>
           <CardBody>
@@ -135,7 +133,7 @@ export function GamificationAnalytics() {
                     <span className="w-32 truncate text-sm text-foreground font-medium" title={badge.badge_name}>
                       {badge.badge_name}
                     </span>
-                    <div className="flex-1 h-6 rounded-lg bg-default-100 overflow-hidden">
+                    <div className="flex-1 h-6 rounded-lg bg-surface-secondary overflow-hidden">
                       <div
                         className="h-full rounded-lg bg-accent transition-all duration-500"
                         style={{ width: `${Math.max(2, (badge.count / maxDistCount) * 100)}%` }}
@@ -149,19 +147,19 @@ export function GamificationAnalytics() {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center">
-                <Award size={40} className="text-default-300 mb-2" />
-                <p className="text-default-500">{t('gamification.no_badges_awarded')}</p>
+                <Award size={40} className="text-muted mb-2" />
+                <p className="text-muted">{t('gamification.no_badges_awarded')}</p>
               </div>
             )}
           </CardBody>
         </Card>
 
         {/* Badge Catalogue Summary */}
-        <Card shadow="sm">
+        <Card >
           <CardHeader className="pb-0">
             <div>
               <h3 className="text-lg font-semibold text-foreground">{t('gamification.badge_catalogue')}</h3>
-              <p className="text-sm text-default-500">
+              <p className="text-sm text-muted">
                 {t('gamification.total_badges')}
               </p>
             </div>
@@ -176,7 +174,7 @@ export function GamificationAnalytics() {
                 {badges.slice(0, 20).map((badge) => (
                   <div
                     key={badge.key}
-                    className="flex items-center justify-between gap-2 rounded-lg bg-default-50 px-3 py-2"
+                    className="flex items-center justify-between gap-2 rounded-lg bg-surface-secondary px-3 py-2"
                   >
                     <div className="flex items-center gap-2 min-w-0">
                       <Award size={16} className={badge.type === 'custom' ? 'text-success' : 'text-accent'} />
@@ -187,21 +185,21 @@ export function GamificationAnalytics() {
                         </span>
                       )}
                     </div>
-                    <span className="text-xs text-default-500 whitespace-nowrap">
+                    <span className="text-xs text-muted whitespace-nowrap">
                       {t('gamification.users_awarded')}
                     </span>
                   </div>
                 ))}
                 {badges.length > 20 && (
-                  <p className="text-center text-xs text-default-400 pt-2">
+                  <p className="text-center text-xs text-muted pt-2">
                     {t('gamification.and_more')}
                   </p>
                 )}
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center">
-                <Award size={40} className="text-default-300 mb-2" />
-                <p className="text-default-500">{t('gamification.no_badges_defined')}</p>
+                <Award size={40} className="text-muted mb-2" />
+                <p className="text-muted">{t('gamification.no_badges_defined')}</p>
               </div>
             )}
           </CardBody>

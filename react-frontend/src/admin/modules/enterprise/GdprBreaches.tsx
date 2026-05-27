@@ -111,7 +111,7 @@ export function GdprBreaches() {
       label: t('enterprise.gdpr_severity_label'),
       sortable: true,
       render: (b) => (
-        <Chip size="sm" variant="flat" color={severityColorMap[b.severity] || 'default'} className="capitalize">
+        <Chip size="sm" variant="soft" color={severityColorMap[b.severity] || 'default'} className="capitalize">
           {b.severity}
         </Chip>
       ),
@@ -139,7 +139,7 @@ export function GdprBreaches() {
         actions={
           <div className="flex gap-2">
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<RefreshCw size={16} />}
               onPress={loadData}
               isLoading={loading}
@@ -148,7 +148,7 @@ export function GdprBreaches() {
               {t('enterprise.refresh')}
             </Button>
             <Button
-              color="danger"
+              variant="danger"
               startContent={<Plus size={16} />}
               onPress={openReportModal}
               size="sm"
@@ -179,7 +179,7 @@ export function GdprBreaches() {
               placeholder={t('enterprise.gdpr_breach_title_placeholder')}
               value={breachTitle}
               onValueChange={setBreachTitle}
-              variant="bordered"
+              variant="secondary"
               isRequired
             />
             <Textarea
@@ -187,7 +187,7 @@ export function GdprBreaches() {
               placeholder={t('enterprise.gdpr_breach_description_placeholder')}
               value={breachDescription}
               onValueChange={setBreachDescription}
-              variant="bordered"
+              variant="secondary"
               minRows={3}
             />
             <div className="grid grid-cols-2 gap-4">
@@ -198,7 +198,7 @@ export function GdprBreaches() {
                   const val = Array.from(keys)[0] as string;
                   if (val) setBreachSeverity(val);
                 }}
-                variant="bordered"
+                variant="secondary"
               >
                 {SEVERITY_KEYS.map((key) => (
                   <SelectItem key={key} id={key}>{t(`common.${key}`)}</SelectItem>
@@ -210,15 +210,15 @@ export function GdprBreaches() {
                 type="number"
                 value={affectedUsers}
                 onValueChange={setAffectedUsers}
-                variant="bordered"
+                variant="secondary"
               />
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={() => setReportOpen(false)} isDisabled={reportLoading}>
+            <Button variant="tertiary" onPress={() => setReportOpen(false)} isDisabled={reportLoading}>
               {t('enterprise.gdpr_cancel')}
             </Button>
-            <Button color="danger" onPress={handleReportBreach} isLoading={reportLoading} isDisabled={reportLoading}>
+            <Button variant="danger" onPress={handleReportBreach} isLoading={reportLoading} isDisabled={reportLoading}>
               {t('enterprise.gdpr_report_breach')}
             </Button>
           </ModalFooter>

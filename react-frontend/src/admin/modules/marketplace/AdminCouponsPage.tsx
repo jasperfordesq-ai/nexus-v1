@@ -117,7 +117,7 @@ export default function AdminCouponsPage() {
                       <Chip
                         size="sm"
                         color={c.status === 'active' ? 'success' : c.status === 'paused' ? 'warning' : 'default'}
-                        variant="flat"
+                        variant="soft"
                       >
                         {t(`marketplace.coupons.status.${c.status}`)}
                       </Chip>
@@ -130,7 +130,7 @@ export default function AdminCouponsPage() {
                       <div className="flex gap-1">
                         <Button
                           size="sm"
-                          variant="light"
+                          variant="tertiary"
                           color="warning"
                           startContent={<Pause className="w-4 h-4" />}
                           onPress={() => handleSuspend(c.id)}
@@ -140,8 +140,7 @@ export default function AdminCouponsPage() {
                         </Button>
                         <Button
                           size="sm"
-                          variant="light"
-                          color="danger"
+                          variant="danger"
                           startContent={<Trash2 className="w-4 h-4" />}
                           onPress={() => handleDelete(c.id)}
                         >

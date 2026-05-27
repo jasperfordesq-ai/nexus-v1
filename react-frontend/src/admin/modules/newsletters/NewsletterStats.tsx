@@ -377,7 +377,6 @@ export function NewsletterStats() {
           label={t('newsletters.label_open_rate')}
           value={`${engagement.open_rate}%`}
           icon={Eye}
-          color="default"
           description={`${engagement.unique_opens.toLocaleString()} ${t('newsletters.unique_opens_label')}`}
         />
         <StatCard
@@ -391,7 +390,6 @@ export function NewsletterStats() {
           label={t('newsletters.label_click_to_open_rate')}
           value={`${engagement.click_to_open_rate}%`}
           icon={BarChart3}
-          color="default"
           description={`${engagement.total_clicks.toLocaleString()} ${t('newsletters.total_clicks_desc')}`}
         />
       </div>
@@ -603,7 +601,7 @@ export function NewsletterStats() {
                     <YAxis fontSize={12} className="fill-default-500" />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: 'hsl(var(--heroui-content1))',
+                        backgroundColor: 'var(--color-surface)',
                         borderColor: 'hsl(var(--heroui-divider))',
                         borderRadius: '8px',
                         fontSize: '13px',

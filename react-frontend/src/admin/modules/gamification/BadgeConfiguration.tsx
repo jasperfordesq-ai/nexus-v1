@@ -148,10 +148,10 @@ export function BadgeConfiguration() {
       </Tabs>
 
       {filtered.length === 0 ? (
-        <Card shadow="sm">
+        <Card >
           <CardBody className="flex flex-col items-center justify-center py-12">
-            <Award size={40} className="text-default-300 mb-2" />
-            <p className="text-default-500">{t('gamification.no_badges_for_filter')}</p>
+            <Award size={40} className="text-muted mb-2" />
+            <p className="text-muted">{t('gamification.no_badges_for_filter')}</p>
           </CardBody>
         </Card>
       ) : (
@@ -160,10 +160,10 @@ export function BadgeConfiguration() {
           .map((tier) => (
             <div key={tier} className="mb-8">
               <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
-                <Chip color={TIER_COLORS[tier] ?? 'primary'} size="sm" variant="flat">
+                <Chip color={TIER_COLORS[tier] ?? 'primary'} size="sm" variant="soft">
                   {t(`gamification.badge_tiers.${tier}`)}
                 </Chip>
-                <span className="text-default-400 text-sm font-normal">
+                <span className="text-muted text-sm font-normal">
                   {t('gamification.badge_count', { count: (grouped[tier] ?? []).length })}
                 </span>
               </h2>
@@ -174,7 +174,7 @@ export function BadgeConfiguration() {
                   return (
                     <Card
                       key={badge.key}
-                      shadow="sm"
+
                       className={`transition-opacity ${!badge.is_enabled ? 'opacity-50' : ''}`}
                     >
                       <CardBody className="gap-3 p-4">
@@ -185,7 +185,7 @@ export function BadgeConfiguration() {
                             </div>
                             <div className="min-w-0">
                               <p className="font-medium text-foreground truncate">{badge.name}</p>
-                              <p className="text-xs text-default-500 line-clamp-2">{badge.description}</p>
+                              <p className="text-xs text-muted line-clamp-2">{badge.description}</p>
                             </div>
                           </div>
                           <Switch
@@ -197,21 +197,21 @@ export function BadgeConfiguration() {
                           />
                         </div>
                         <div className="flex flex-wrap items-center gap-2">
-                          <Chip size="sm" variant="flat" color={RARITY_COLORS[badge.rarity] ?? 'default'}>
+                          <Chip size="sm" variant="soft" color={RARITY_COLORS[badge.rarity] ?? 'default'}>
                             {t(`gamification.badge_rarities.${badge.rarity}`)}
                           </Chip>
                           {badge.threshold > 0 && (
-                            <Chip size="sm" variant="flat" color="default">
+                            <Chip size="sm" variant="soft">
                               {t('gamification.threshold_count', { count: badge.threshold })}
                             </Chip>
                           )}
                           {badge.xp_value > 0 && (
-                            <Chip size="sm" variant="flat" color="warning">
+                            <Chip size="sm" variant="soft" color="warning">
                               {t('gamification.xp_count', { count: badge.xp_value })}
                             </Chip>
                           )}
                           {badge.has_override && (
-                            <Chip size="sm" variant="dot" color="secondary">
+                            <Chip size="sm" variant="dot">
                               {t('gamification.customized')}
                             </Chip>
                           )}
@@ -219,8 +219,7 @@ export function BadgeConfiguration() {
                         {badge.has_override && (
                           <Button
                             size="sm"
-                            variant="light"
-                            color="danger"
+                            variant="danger"
                             startContent={<RotateCcw size={14} />}
                             isLoading={isUpdating}
                             onPress={() => handleReset(badge)}

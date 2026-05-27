@@ -57,30 +57,30 @@ function ExpandableDetails({ details }: { details: Record<string, unknown> | str
   const [expanded, setExpanded] = useState(false);
   const { t } = useTranslation('admin');
 
-  if (!details) return <span className="text-default-300">-</span>;
+  if (!details) return <span className="text-muted">-</span>;
 
   const text =
     typeof details === 'string' ? details : JSON.stringify(details, null, 2);
 
   if (text.length <= 50) {
     return (
-      <span className="text-xs text-default-500 font-mono break-all">{text}</span>
+      <span className="text-xs text-muted font-mono break-all">{text}</span>
     );
   }
 
   return (
     <div>
       <Button
-        variant="light"
+        variant="tertiary"
         size="sm"
-        className="flex items-center gap-1 text-xs text-accent hover:text-accent transition-colors h-auto min-w-0 p-0"
+        className="flex items-center gap-1 text-xs text-accent hover:text-accent transition-colors min-h-10 min-w-0 p-0"
         onPress={() => setExpanded((prev) => !prev)}
       >
         {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
         {expanded ? t('groups.collapse') : t('groups.expand')}
       </Button>
       {expanded && (
-        <pre className="mt-1 text-xs text-default-500 font-mono bg-default-100 p-2 rounded-md overflow-x-auto max-h-48 whitespace-pre-wrap break-all">
+        <pre className="mt-1 text-xs text-muted font-mono bg-surface-secondary p-2 rounded-md overflow-x-auto max-h-48 whitespace-pre-wrap break-all">
           {text}
         </pre>
       )}
@@ -152,7 +152,7 @@ export function GroupAuditLog({ groupId }: GroupAuditLogProps) {
             const selected = Array.from(keys)[0];
             if (typeof selected === 'string') setActionFilter(selected);
           }}
-          variant="bordered"
+          variant="secondary"
           size="sm"
           className="max-w-[200px]"
           items={[
@@ -169,7 +169,7 @@ export function GroupAuditLog({ groupId }: GroupAuditLogProps) {
           <Spinner size="lg" />
         </div>
       ) : entries.length === 0 ? (
-        <p className="text-sm text-default-400 text-center py-8">
+        <p className="text-sm text-muted text-center py-8">
           {t('groups.audit_empty')}
         </p>
       ) : (
@@ -185,21 +185,21 @@ export function GroupAuditLog({ groupId }: GroupAuditLogProps) {
             {entries.map((entry) => (
               <TableRow key={entry.id}>
                 <TableCell>
-                  <span className="text-xs text-default-500 whitespace-nowrap">
+                  <span className="text-xs text-muted whitespace-nowrap">
                     {new Date(entry.created_at).toLocaleString()}
                   </span>
                 </TableCell>
                 <TableCell>
                   <Chip
                     size="sm"
-                    variant="flat"
+                    variant="soft"
                     color={getActionColor(entry.action)}
                   >
                     {entry.action}
                   </Chip>
                 </TableCell>
                 <TableCell>
-                  <span className="text-xs text-default-600">
+                  <span className="text-xs text-muted">
                     #{entry.user_id}
                   </span>
                 </TableCell>
@@ -209,7 +209,7 @@ export function GroupAuditLog({ groupId }: GroupAuditLogProps) {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className="text-xs text-default-400 font-mono">
+                  <span className="text-xs text-muted font-mono">
                     {entry.ip_address ?? '-'}
                   </span>
                 </TableCell>

@@ -137,7 +137,7 @@ export function LegalDocForm() {
         description={isEdit ? t('legal_doc_form.edit_description') : t('legal_doc_form.create_description')}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<ArrowLeft size={16} />}
             onPress={() => navigate(tenantPath('/admin/legal-documents'))}
             size="sm"
@@ -149,14 +149,14 @@ export function LegalDocForm() {
 
       <div className="space-y-6">
         {/* Metadata */}
-        <Card shadow="sm">
+        <Card >
           <CardBody className="p-4 space-y-4">
             <h3 className="text-lg font-semibold">{t('legal_doc_form.document_details')}</h3>
             <Input
               label={t('enterprise.label_title')}
               value={title}
               onValueChange={setTitle}
-              variant="bordered"
+              variant="secondary"
               isRequired
               placeholder={t('legal_doc_form.title_placeholder')}
             />
@@ -168,7 +168,7 @@ export function LegalDocForm() {
                   const selected = Array.from(keys)[0] as string;
                   if (selected) setType(selected);
                 }}
-                variant="bordered"
+                variant="secondary"
               >
                 {DOC_TYPES.map((dt) => (
                   <SelectItem key={dt.value} id={dt.value}>{dt.label}</SelectItem>
@@ -178,7 +178,7 @@ export function LegalDocForm() {
                 label={t('enterprise.label_version')}
                 value={version}
                 onValueChange={setVersion}
-                variant="bordered"
+                variant="secondary"
                 placeholder="1.0"
               />
               <Select
@@ -188,7 +188,7 @@ export function LegalDocForm() {
                   const selected = Array.from(keys)[0] as string;
                   if (selected) setStatus(selected);
                 }}
-                variant="bordered"
+                variant="secondary"
               >
                 {STATUS_OPTIONS.map((s) => (
                   <SelectItem key={s.value} id={s.value}>{s.label}</SelectItem>
@@ -199,14 +199,14 @@ export function LegalDocForm() {
         </Card>
 
         {/* Content */}
-        <Card shadow="sm">
+        <Card >
           <CardBody className="p-4">
             <h3 className="text-lg font-semibold mb-3">{t('legal_doc_form.content')}</h3>
             <Textarea
               label={t('legal_doc_form.document_content')}
               value={content}
               onValueChange={setContent}
-              variant="bordered"
+              variant="secondary"
               minRows={12}
               placeholder={t('legal_doc_form.content_placeholder')}
             />
@@ -216,13 +216,12 @@ export function LegalDocForm() {
         {/* Actions */}
         <div className="flex justify-end gap-3">
           <Button
-            variant="flat"
+            variant="tertiary"
             onPress={() => navigate(tenantPath('/admin/legal-documents'))}
           >
             {t('legal_doc_form.cancel')}
           </Button>
           <Button
-            color="primary"
             startContent={<Save size={16} />}
             onPress={handleSubmit}
             isLoading={saving}

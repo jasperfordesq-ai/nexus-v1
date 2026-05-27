@@ -134,7 +134,7 @@ export function SeoAudit() {
           <div className="flex items-center gap-2">
             {hasResults && (
               <Button
-                variant="flat"
+                variant="tertiary"
                 startContent={<RefreshCw size={16} />}
                 onPress={loadAudit}
                 size="sm"
@@ -143,7 +143,6 @@ export function SeoAudit() {
               </Button>
             )}
             <Button
-              color="primary"
               startContent={!running ? <Play size={16} /> : undefined}
               onPress={handleRunAudit}
               isLoading={running}
@@ -156,18 +155,18 @@ export function SeoAudit() {
 
       {hasResults && (
         <div className="flex flex-wrap items-center gap-2 mb-4">
-          {passCount > 0 && <Chip color="success" variant="flat">{t('passed_count_with_value', { count: passCount })}</Chip>}
-          {warnCount > 0 && <Chip color="warning" variant="flat">{t('warnings_count_with_value', { count: warnCount })}</Chip>}
-          {failCount > 0 && <Chip color="danger" variant="flat">{t('failed_count_with_value', { count: failCount })}</Chip>}
+          {passCount > 0 && <Chip color="success" variant="soft">{t('passed_count_with_value', { count: passCount })}</Chip>}
+          {warnCount > 0 && <Chip color="warning" variant="soft">{t('warnings_count_with_value', { count: warnCount })}</Chip>}
+          {failCount > 0 && <Chip color="danger" variant="soft">{t('failed_count_with_value', { count: failCount })}</Chip>}
           {lastRunAt && (
-            <span className="text-xs text-default-400 ml-2">
+            <span className="text-xs text-muted ml-2">
               {t('last_run')}
             </span>
           )}
         </div>
       )}
 
-      <Card shadow="sm">
+      <Card >
         <CardHeader>
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <ClipboardCheck size={20} /> {t('audit_results')}
@@ -175,7 +174,7 @@ export function SeoAudit() {
         </CardHeader>
         <CardBody>
           {!hasResults ? (
-            <div className="flex flex-col items-center py-8 text-default-400">
+            <div className="flex flex-col items-center py-8 text-muted">
               <ClipboardCheck size={40} className="mb-2" />
               <p className="font-medium">{t('no_audit_results')}</p>
               <p className="text-sm mt-1">{t('no_audit_results_desc')}</p>
@@ -183,17 +182,17 @@ export function SeoAudit() {
           ) : (
             <div className="space-y-3">
               {checks.map((check) => (
-                <div key={check.name} className="flex items-center justify-between rounded-lg border border-default-200 p-3">
+                <div key={check.name} className="flex items-center justify-between rounded-lg border border-border p-3">
                   <div className="flex-1 min-w-0">
                     <p className="font-medium">{check.name}</p>
-                    <p className="text-xs text-default-400">{check.description}</p>
+                    <p className="text-xs text-muted">{check.description}</p>
                     {check.details && (
-                      <p className="text-xs text-default-500 mt-1">{check.details}</p>
+                      <p className="text-xs text-muted mt-1">{check.details}</p>
                     )}
                   </div>
                   <Chip
                     size="sm"
-                    variant="flat"
+                    variant="soft"
                     color={statusColorMap[check.status] ?? 'default'}
                     className="capitalize shrink-0 ml-3"
                   >

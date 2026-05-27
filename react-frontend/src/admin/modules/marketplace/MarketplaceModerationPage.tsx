@@ -219,7 +219,7 @@ export function MarketplaceModerationPage() {
       label: t('marketplace.col_seller'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">{item.user?.name ?? '--'}</span>
+        <span className="text-sm text-muted">{item.user?.name ?? '--'}</span>
       ),
     },
     {
@@ -227,7 +227,7 @@ export function MarketplaceModerationPage() {
       label: t('marketplace.col_price'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">
+        <span className="text-sm text-muted">
           {item.price_currency ?? ''}{Number(item.price ?? 0).toFixed(2)}
         </span>
       ),
@@ -237,7 +237,7 @@ export function MarketplaceModerationPage() {
       label: t('marketplace.col_category'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">{item.category || '--'}</span>
+        <span className="text-sm text-muted">{item.category || '--'}</span>
       ),
     },
     {
@@ -247,7 +247,7 @@ export function MarketplaceModerationPage() {
       render: (item) => (
         <Chip
           size="sm"
-          variant="flat"
+          variant="soft"
           color={statusColors[item.status] || 'default'}
           className="capitalize"
         >
@@ -262,7 +262,7 @@ export function MarketplaceModerationPage() {
       render: (item) => (
         <Chip
           size="sm"
-          variant="flat"
+          variant="soft"
           color={moderationColors[item.moderation_status] || 'default'}
           className="capitalize"
         >
@@ -275,7 +275,7 @@ export function MarketplaceModerationPage() {
       label: t('marketplace.col_created'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {new Date(item.created_at).toLocaleDateString()}
         </span>
       ),
@@ -291,7 +291,7 @@ export function MarketplaceModerationPage() {
                 <Button
                   isIconOnly
                   size="sm"
-                  variant="flat"
+                  variant="tertiary"
                   color="success"
                   onPress={() => handleApprove(item)}
                   isDisabled={actionLoading}
@@ -304,8 +304,7 @@ export function MarketplaceModerationPage() {
                 <Button
                   isIconOnly
                   size="sm"
-                  variant="flat"
-                  color="danger"
+                  variant="danger"
                   onPress={() => {
                     setRejectTarget(item);
                     setRejectNotes('');
@@ -322,8 +321,7 @@ export function MarketplaceModerationPage() {
             <Button
               isIconOnly
               size="sm"
-              variant="flat"
-              color="primary"
+              variant="tertiary"
               as="a"
               href={tenantPath(`/marketplace/${item.id}`)}
               target="_blank"
@@ -337,8 +335,7 @@ export function MarketplaceModerationPage() {
             <Button
               isIconOnly
               size="sm"
-              variant="flat"
-              color="danger"
+              variant="danger"
               onPress={() => setConfirmDelete(item)}
               isDisabled={actionLoading}
               aria-label={t('marketplace.action_delete_listing')}
@@ -358,7 +355,7 @@ export function MarketplaceModerationPage() {
         description={t('marketplace.moderation_description')}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<RefreshCw size={16} />}
             onPress={loadListings}
           >
@@ -478,7 +475,7 @@ export function MarketplaceModerationPage() {
               {t('marketplace.reject_listing_title')}
             </ModalHeader>
             <ModalBody>
-              <p className="text-sm text-default-600 mb-3">
+              <p className="text-sm text-muted mb-3">
                 {t('marketplace.reject_listing_message')}
               </p>
               <Textarea
@@ -488,12 +485,12 @@ export function MarketplaceModerationPage() {
                 onValueChange={setRejectNotes}
                 minRows={3}
                 maxRows={6}
-                variant="bordered"
+                variant="secondary"
               />
             </ModalBody>
             <ModalFooter>
               <Button
-                variant="flat"
+                variant="tertiary"
                 onPress={() => {
                   setRejectTarget(null);
                   setRejectNotes('');
@@ -503,7 +500,7 @@ export function MarketplaceModerationPage() {
                 {t('marketplace.cancel')}
               </Button>
               <Button
-                color="danger"
+                variant="danger"
                 onPress={handleRejectSubmit}
                 isLoading={rejectLoading}
                 isDisabled={rejectLoading || !rejectNotes.trim()}

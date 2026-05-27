@@ -254,7 +254,7 @@ export function VolunteerTraining() {
       label: t('volunteering.col_training_type'),
       sortable: true,
       render: (item) => (
-        <Chip size="sm" variant="flat">
+        <Chip size="sm" variant="soft">
           {t(`volunteering.type_${item.training_type}`)}
         </Chip>
       ),
@@ -264,7 +264,7 @@ export function VolunteerTraining() {
       label: t('volunteering.col_completed'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {item.completed_date ? new Date(item.completed_date).toLocaleDateString() : '--'}
         </span>
       ),
@@ -274,10 +274,10 @@ export function VolunteerTraining() {
       label: t('volunteering.col_expires'),
       sortable: true,
       render: (item) => {
-        if (!item.expires_date) return <span className="text-sm text-default-400">--</span>;
+        if (!item.expires_date) return <span className="text-sm text-muted">--</span>;
         const isExpired = new Date(item.expires_date) < new Date();
         return (
-          <span className={`text-sm ${isExpired ? 'text-danger font-medium' : 'text-default-500'}`}>
+          <span className={`text-sm ${isExpired ? 'text-danger font-medium' : 'text-muted'}`}>
             {new Date(item.expires_date).toLocaleDateString()}
           </span>
         );
@@ -287,7 +287,7 @@ export function VolunteerTraining() {
       key: 'certificate_ref',
       label: t('volunteering.col_certificate_ref'),
       render: (item) => (
-        <span className="text-sm font-mono text-default-500">
+        <span className="text-sm font-mono text-muted">
           {item.certificate_ref || '--'}
         </span>
       ),
@@ -297,7 +297,7 @@ export function VolunteerTraining() {
       label: t('volunteering.col_status'),
       sortable: true,
       render: (item) => (
-        <Chip size="sm" color={STATUS_COLORS[item.status] || 'default'} variant="flat">
+        <Chip size="sm" color={STATUS_COLORS[item.status] || 'default'} variant="soft">
           {t(`volunteering.status_${item.status}`)}
         </Chip>
       ),
@@ -311,7 +311,7 @@ export function VolunteerTraining() {
             <>
               <Button
                 size="sm"
-                variant="flat"
+                variant="tertiary"
                 color="success"
                 startContent={<CheckCircle size={14} />}
                 onPress={() => handleVerify(item.id)}
@@ -322,8 +322,7 @@ export function VolunteerTraining() {
               </Button>
               <Button
                 size="sm"
-                variant="flat"
-                color="danger"
+                variant="danger"
                 startContent={<XCircle size={14} />}
                 onPress={() => handleReject(item.id)}
                 isLoading={actionId === item.id}
@@ -334,17 +333,17 @@ export function VolunteerTraining() {
             </>
           )}
           {item.status === 'verified' && (
-            <Chip size="sm" color="success" variant="flat" startContent={<ShieldCheck size={12} />}>
+            <Chip size="sm" color="success" variant="soft" startContent={<ShieldCheck size={12} />}>
               {t('volunteering.verified')}
             </Chip>
           )}
           {item.status === 'expired' && (
-            <Chip size="sm" color="danger" variant="flat" startContent={<AlertTriangle size={12} />}>
+            <Chip size="sm" color="danger" variant="soft" startContent={<AlertTriangle size={12} />}>
               {t('volunteering.expired')}
             </Chip>
           )}
           {item.status === 'rejected' && (
-            <Chip size="sm" color="default" variant="flat">
+            <Chip size="sm" variant="soft">
               {t('volunteering.rejected')}
             </Chip>
           )}
@@ -362,7 +361,7 @@ export function VolunteerTraining() {
         description={t('volunteering.training_desc')}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<RefreshCw size={16} />}
             onPress={loadData}
             isLoading={loading}
@@ -378,7 +377,6 @@ export function VolunteerTraining() {
           label={t('volunteering.stat_total_submissions')}
           value={stats?.total_submissions ?? 0}
           icon={GraduationCap}
-          color="default"
           loading={loading}
         />
         <StatCard
@@ -443,7 +441,7 @@ export function VolunteerTraining() {
           <Button
             size="sm"
             color="success"
-            variant="flat"
+            variant="tertiary"
             startContent={<CheckCircle size={14} />}
             onPress={handleBulkVerify}
             isLoading={bulkVerifying}
@@ -452,7 +450,7 @@ export function VolunteerTraining() {
           </Button>
           <Button
             size="sm"
-            variant="light"
+            variant="tertiary"
             onPress={() => setSelectedIds(new Set())}
           >
             {t('volunteering.clear_selection')}

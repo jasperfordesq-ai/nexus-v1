@@ -137,7 +137,7 @@ export default function FederationWhitelist() {
               const selected = Array.from(keys)[0];
               setSelectedTenantId(selected ? String(selected) : '');
             }}
-            variant="bordered"
+            variant="secondary"
           >
             {availableTenants.map(tenant => (
               <SelectItem key={tenant.id.toString()} id={tenant.id.toString()}>
@@ -151,12 +151,11 @@ export default function FederationWhitelist() {
             placeholder={t('federation_whitelist.notes_placeholder')}
             value={notes}
             onValueChange={setNotes}
-            variant="bordered"
+            variant="secondary"
             minRows={2}
           />
 
           <Button
-            color="primary"
             onPress={handleAdd}
             startContent={<Plus className="w-4 h-4" />}
           >
@@ -173,7 +172,7 @@ export default function FederationWhitelist() {
           </h3>
         </CardHeader>
         <CardBody>
-          <Table aria-label={t('federation_whitelist.whitelisted_tenants_aria')} shadow="sm" isStriped>
+          <Table aria-label={t('federation_whitelist.whitelisted_tenants_aria')}  isStriped>
             <TableHeader>
               <TableColumn>{t('federation_whitelist.col_tenant')}</TableColumn>
               <TableColumn>{t('federation_whitelist.col_domain')}</TableColumn>
@@ -193,12 +192,12 @@ export default function FederationWhitelist() {
                       {entry.tenant_name}
                     </Link>
                   </TableCell>
-                  <TableCell className="text-sm text-default-600">{entry.domain}</TableCell>
-                  <TableCell className="text-sm text-default-600">{entry.approved_by_name}</TableCell>
-                  <TableCell className="text-sm text-default-600">
+                  <TableCell className="text-sm text-muted">{entry.domain}</TableCell>
+                  <TableCell className="text-sm text-muted">{entry.approved_by_name}</TableCell>
+                  <TableCell className="text-sm text-muted">
                     {new Date(entry.approved_at).toLocaleDateString()}
                   </TableCell>
-                  <TableCell className="text-sm text-default-600 max-w-xs truncate">
+                  <TableCell className="text-sm text-muted max-w-xs truncate">
                     {entry.notes || '-'}
                   </TableCell>
                   <TableCell>
@@ -207,15 +206,13 @@ export default function FederationWhitelist() {
                         as={Link}
                         to={tenantPath(`/admin/super/federation/tenant/${entry.tenant_id}/features`)}
                         size="sm"
-                        variant="flat"
-                        color="primary"
+                        variant="tertiary"
                       >
                         {t('federation_whitelist.view')}
                       </Button>
                       <Button
                         size="sm"
-                        variant="flat"
-                        color="danger"
+                        variant="danger"
                         onPress={() => setRemoving(entry.tenant_id)}
                         startContent={<Trash2 className="w-4 h-4" />}
                       >

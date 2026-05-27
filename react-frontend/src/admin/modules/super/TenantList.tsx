@@ -152,7 +152,7 @@ export function TenantList() {
     return (
       <Dropdown>
         <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="light" aria-label={t('super.tenant_actions')}>
+          <Button isIconOnly size="sm" variant="tertiary" aria-label={t('super.tenant_actions')}>
             <MoreVertical size={16} />
           </Button>
         </DropdownTrigger>
@@ -175,7 +175,7 @@ export function TenantList() {
               {t('super.reactivate')}
             </DropdownItem>
           )}
-          <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
+          <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" variant="danger">
             {t('common.delete')}
           </DropdownItem>
         </DropdownMenu>
@@ -196,7 +196,7 @@ export function TenantList() {
           >
             {tenant.name}
           </Link>
-          <p className="text-xs text-default-400">{tenant.slug}</p>
+          <p className="text-xs text-muted">{tenant.slug}</p>
         </div>
       ),
     },
@@ -204,7 +204,7 @@ export function TenantList() {
       key: 'domain',
       label: t('super.label_domain'),
       render: (tenant) => (
-        <span className="text-sm text-default-500">{tenant.domain || '---'}</span>
+        <span className="text-sm text-muted">{tenant.domain || '---'}</span>
       ),
     },
     {
@@ -212,7 +212,7 @@ export function TenantList() {
       label: t('super.label_status'),
       sortable: true,
       render: (tenant) => (
-        <Chip size="sm" variant="flat" color={tenant.is_active ? 'success' : 'default'}>
+        <Chip size="sm" variant="soft" color={tenant.is_active ? 'success' : 'default'}>
           {tenant.is_active ? t('common.active') : t('super.inactive_label')}
         </Chip>
       ),
@@ -228,16 +228,16 @@ export function TenantList() {
       label: t('super.hub'),
       render: (tenant) =>
         tenant.allows_subtenants ? (
-          <Chip size="sm" variant="flat" color="secondary">{t('super.hub')}</Chip>
+          <Chip size="sm" variant="soft">{t('super.hub')}</Chip>
         ) : (
-          <span className="text-default-400">---</span>
+          <span className="text-muted">---</span>
         ),
     },
     {
       key: 'parent_name',
       label: t('super.parent'),
       render: (tenant) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {tenant.parent_name || '---'}
         </span>
       ),
@@ -247,7 +247,7 @@ export function TenantList() {
       label: t('super.created'),
       sortable: true,
       render: (tenant) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {new Date(tenant.created_at).toLocaleDateString()}
         </span>
       ),
@@ -261,7 +261,7 @@ export function TenantList() {
 
   return (
     <div>
-      <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-default-500 mb-1">
+      <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-muted mb-1">
         <Link to={tenantPath('/admin/super')} className="hover:text-accent">{t('super.breadcrumb_super_admin')}</Link>
         <span>/</span>
         <span className="text-foreground">{t('super.breadcrumb_tenants')}</span>
@@ -272,21 +272,20 @@ export function TenantList() {
         actions={
           <div className="flex items-center gap-2">
             {lastRefreshed && (
-              <span className="text-xs text-default-400">
+              <span className="text-xs text-muted">
                 {t('super.updated_at', { time: lastRefreshed.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) })}
               </span>
             )}
             <Button
               as={Link}
               to={tenantPath('/admin/super/tenants/hierarchy')}
-              variant="flat"
+              variant="tertiary"
               startContent={<Network size={16} />}
               size="sm"
             >
               {t('super.view_hierarchy')}
             </Button>
             <Button
-              color="primary"
               startContent={<Plus size={16} />}
               onPress={() => navigate(tenantPath('/admin/super/tenants/create'))}
             >

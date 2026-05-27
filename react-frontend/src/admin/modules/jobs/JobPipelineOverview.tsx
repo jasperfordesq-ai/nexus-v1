@@ -209,7 +209,7 @@ export function JobPipelineOverview() {
               {item.candidate_name ?? '—'}
             </p>
             {item.candidate_email && (
-              <p className="text-xs text-default-500 truncate">
+              <p className="text-xs text-muted truncate">
                 {item.candidate_email}
               </p>
             )}
@@ -220,7 +220,7 @@ export function JobPipelineOverview() {
         key: 'interview_type',
         label: t('jobs.pipeline_type'),
         render: (item) => (
-          <Chip size="sm" variant="flat" color="primary" className="capitalize">
+          <Chip size="sm" variant="soft" className="capitalize">
             {item.interview_type}
           </Chip>
         ),
@@ -248,7 +248,7 @@ export function JobPipelineOverview() {
         key: 'status',
         label: t('jobs.pipeline_status'),
         render: (item) => (
-          <Chip size="sm" variant="flat" color={getStatusColor(item.status)} className="capitalize">
+          <Chip size="sm" variant="soft" color={getStatusColor(item.status)} className="capitalize">
             {t(getStatusKey(item.status))}
           </Chip>
         ),
@@ -276,7 +276,7 @@ export function JobPipelineOverview() {
               {item.candidate_name ?? '—'}
             </p>
             {item.candidate_email && (
-              <p className="text-xs text-default-500 truncate">
+              <p className="text-xs text-muted truncate">
                 {item.candidate_email}
               </p>
             )}
@@ -313,7 +313,7 @@ export function JobPipelineOverview() {
         key: 'status',
         label: t('jobs.pipeline_status'),
         render: (item) => (
-          <Chip size="sm" variant="flat" color={getStatusColor(item.status)} className="capitalize">
+          <Chip size="sm" variant="soft" color={getStatusColor(item.status)} className="capitalize">
             {t(getStatusKey(item.status))}
           </Chip>
         ),
@@ -347,7 +347,6 @@ export function JobPipelineOverview() {
         aria-label={t('jobs.pipeline_tabs')}
         selectedKey={activeTab}
         onSelectionChange={(key) => setActiveTab(String(key))}
-        color="primary"
         variant="underlined"
         classNames={{ tabList: 'mb-4' }}
       >
@@ -359,14 +358,14 @@ export function JobPipelineOverview() {
               <CalendarClock size={16} />
               {t('jobs.pipeline_interviews')}
               {interviewsTotal > 0 && (
-                <Chip size="sm" variant="flat" color="primary">
+                <Chip size="sm" variant="soft">
                   {interviewsTotal}
                 </Chip>
               )}
             </div>
           }
         >
-          <Card shadow="sm">
+          <Card >
             <CardBody>
               <div className="mb-4">
                 <Select
@@ -377,7 +376,7 @@ export function JobPipelineOverview() {
                     if (selected) setInterviewsStatus(String(selected));
                   }}
                   size="sm"
-                  variant="bordered"
+                  variant="secondary"
                   className="max-w-xs"
                 >
                   {INTERVIEW_STATUSES.map((s) => (
@@ -423,14 +422,14 @@ export function JobPipelineOverview() {
               <Handshake size={16} />
               {t('jobs.pipeline_offers')}
               {offersTotal > 0 && (
-                <Chip size="sm" variant="flat" color="primary">
+                <Chip size="sm" variant="soft">
                   {offersTotal}
                 </Chip>
               )}
             </div>
           }
         >
-          <Card shadow="sm">
+          <Card >
             <CardBody>
               <div className="mb-4">
                 <Select
@@ -441,7 +440,7 @@ export function JobPipelineOverview() {
                     if (selected) setOffersStatus(String(selected));
                   }}
                   size="sm"
-                  variant="bordered"
+                  variant="secondary"
                   className="max-w-xs"
                 >
                   {OFFER_STATUSES.map((s) => (

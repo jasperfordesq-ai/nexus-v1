@@ -109,7 +109,7 @@ export function LogFiles() {
         description={t('enterprise.log_files_desc')}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<RefreshCw size={16} />}
             onPress={loadData}
             isLoading={loading}
@@ -122,20 +122,20 @@ export function LogFiles() {
 
       {/* Stats Row */}
       <div className="flex gap-4 mb-6">
-        <Card shadow="sm" className="flex-1">
+        <Card  className="flex-1">
           <CardBody className="flex flex-row items-center gap-3 p-4">
             <Files size={20} className="text-accent" />
             <div>
-              <p className="text-xs text-default-500">{t('log_files_labels.total_files')}</p>
+              <p className="text-xs text-muted">{t('log_files_labels.total_files')}</p>
               <p className="text-lg font-bold text-foreground">{files.length}</p>
             </div>
           </CardBody>
         </Card>
-        <Card shadow="sm" className="flex-1">
+        <Card  className="flex-1">
           <CardBody className="flex flex-row items-center gap-3 p-4">
             <HardDrive size={20} className="text-warning" />
             <div>
-              <p className="text-xs text-default-500">{t('log_files_labels.total_size')}</p>
+              <p className="text-xs text-muted">{t('log_files_labels.total_size')}</p>
               <p className="text-lg font-bold text-foreground">{formatBytes(totalSize)}</p>
             </div>
           </CardBody>
@@ -146,10 +146,10 @@ export function LogFiles() {
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <Input type="search" name="admin-search" autoComplete="off"
           placeholder={t('log_files_labels.search_placeholder')}
-          startContent={<Search size={16} className="text-default-400" />}
+          startContent={<Search size={16} className="text-muted" />}
           value={search}
           onValueChange={setSearch}
-          variant="bordered"
+          variant="secondary"
           size="sm"
           className="w-64"
         />
@@ -173,9 +173,9 @@ export function LogFiles() {
           <Spinner size="lg" />
         </div>
       ) : filtered.length === 0 ? (
-        <Card shadow="sm">
+        <Card >
           <CardBody className="py-16 text-center">
-            <p className="text-default-500">{t('enterprise.no_log_files')}</p>
+            <p className="text-muted">{t('enterprise.no_log_files')}</p>
           </CardBody>
         </Card>
       ) : (
@@ -185,10 +185,10 @@ export function LogFiles() {
             const iconColor = getFileIconColor(file.name);
 
             return (
-              <Card key={file.name} shadow="sm" isPressable as={Link} to={tenantPath(`/admin/enterprise/monitoring/log-files/${file.name}`)}>
+              <Card key={file.name}  isPressable as={Link} to={tenantPath(`/admin/enterprise/monitoring/log-files/${file.name}`)}>
                 <CardBody className="p-4">
                   <div className="flex items-start gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-default-100">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-secondary">
                       <Icon size={20} className={iconColor} />
                     </div>
                     <div className="min-w-0 flex-1">
@@ -196,20 +196,20 @@ export function LogFiles() {
                         {file.name}
                       </p>
                       <div className="flex items-center gap-2 mt-1">
-                        <Chip size="sm" variant="flat" color="default">
+                        <Chip size="sm" variant="soft">
                           {file.size}
                         </Chip>
-                        <span className="text-xs text-default-400">
+                        <span className="text-xs text-muted">
                           {t('log_files_labels.lines_count', { count: file.line_count })}
                         </span>
                       </div>
-                      <p className="text-xs text-default-400 mt-1">
+                      <p className="text-xs text-muted mt-1">
                         {new Date(file.modified_at).toLocaleString()}
                       </p>
                     </div>
                     <Button
                       size="sm"
-                      variant="flat"
+                      variant="tertiary"
                       isIconOnly
                       aria-label={t('log_files_labels.download')}
                       onPress={() => window.open(`/v2/admin/enterprise/monitoring/log-files/${file.name}?download=1`, '_blank')}

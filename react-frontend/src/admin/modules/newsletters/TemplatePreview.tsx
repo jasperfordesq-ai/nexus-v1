@@ -71,7 +71,7 @@ export function TemplatePreview({ templateId, isOpen, onClose }: TemplatePreview
     }
     if (!html) {
       return (
-        <div className="flex items-center justify-center py-20 text-default-400">
+        <div className="flex items-center justify-center py-20 text-muted">
           {t('newsletters.no_content_found')}
         </div>
       );
@@ -98,7 +98,7 @@ export function TemplatePreview({ templateId, isOpen, onClose }: TemplatePreview
         <ModalHeader className="flex flex-col gap-1">
           <span>{name}</span>
           {subject && (
-            <span className="text-sm font-normal text-default-500">
+            <span className="text-sm font-normal text-muted">
               {t('newsletters.col_subject')} {subject}
             </span>
           )}
@@ -108,7 +108,7 @@ export function TemplatePreview({ templateId, isOpen, onClose }: TemplatePreview
         </ModalBody>
         <ModalFooter>
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<X size={16} />}
             onPress={onClose}
           >

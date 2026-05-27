@@ -61,7 +61,7 @@ export function SmartMatchUsers() {
       render: (item) => (
         <div>
           <p className="font-medium text-sm">{item.user_1_name}</p>
-          {item.user_1_email && <p className="text-xs text-default-400">{item.user_1_email}</p>}
+          {item.user_1_email && <p className="text-xs text-muted">{item.user_1_email}</p>}
         </div>
       ),
     },
@@ -72,7 +72,7 @@ export function SmartMatchUsers() {
       render: (item) => (
         <div>
           <p className="font-medium text-sm">{item.user_2_name}</p>
-          {item.user_2_email && <p className="text-xs text-default-400">{item.user_2_email}</p>}
+          {item.user_2_email && <p className="text-xs text-muted">{item.user_2_email}</p>}
         </div>
       ),
     },
@@ -80,7 +80,7 @@ export function SmartMatchUsers() {
       key: 'listing_title',
       label: "Listing",
       render: (item) => (
-        <span className="text-sm text-default-500">{item.listing_title || '--'}</span>
+        <span className="text-sm text-muted">{item.listing_title || '--'}</span>
       ),
     },
     {
@@ -90,7 +90,7 @@ export function SmartMatchUsers() {
       render: (item) => (
         <Chip
           size="sm"
-          variant="flat"
+          variant="soft"
           color={item.match_score >= 80 ? 'success' : item.match_score >= 50 ? 'warning' : 'default'}
         >
           {Number(item.match_score).toFixed(0)}%
@@ -108,7 +108,7 @@ export function SmartMatchUsers() {
       label: "Date",
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {new Date(item.created_at).toLocaleDateString()}
         </span>
       ),

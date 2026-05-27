@@ -138,8 +138,8 @@ export default function AgentsAdminPage() {
       />
 
       {loading && (
-        <Card shadow="sm" className="border border-divider/70 bg-surface">
-          <CardBody className="py-8 text-sm text-default-500">
+        <Card  className="border border-divider/70 bg-surface">
+          <CardBody className="py-8 text-sm text-muted">
             {t('agents.definitions.loading')}
           </CardBody>
         </Card>
@@ -155,13 +155,13 @@ export default function AgentsAdminPage() {
 
       <div className="grid gap-4 md:grid-cols-2">
         {items.map((def) => (
-          <Card key={def.id} className="border border-default-200">
+          <Card key={def.id} className="border border-border">
             <CardHeader className="flex justify-between items-start gap-4">
               <div className="flex gap-3 items-start">
                 <Brain className="w-6 h-6 text-accent mt-1" />
                 <div>
                   <h2 className="text-lg font-semibold">{def.name}</h2>
-                  <p className="text-xs text-default-500 font-mono">{def.slug}</p>
+                  <p className="text-xs text-muted font-mono">{def.slug}</p>
                 </div>
               </div>
               <Switch
@@ -172,15 +172,15 @@ export default function AgentsAdminPage() {
             </CardHeader>
             <CardBody className="space-y-3">
               {def.description && (
-                <p className="text-sm text-default-600">{def.description}</p>
+                <p className="text-sm text-muted">{def.description}</p>
               )}
               <div className="flex flex-wrap gap-2 text-xs">
-                <Chip size="sm" variant="flat" color={def.is_enabled ? 'success' : 'default'}>
+                <Chip size="sm" variant="soft" color={def.is_enabled ? 'success' : 'default'}>
                   {t(def.is_enabled ? 'agents.status.enabled' : 'agents.status.disabled')}
                 </Chip>
-                <Chip size="sm" variant="flat">{def.agent_type}</Chip>
+                <Chip size="sm" variant="soft">{def.agent_type}</Chip>
                 {def.last_run_at && (
-                  <Chip size="sm" variant="flat" color="primary">
+                  <Chip size="sm" variant="soft">
                     {t('agents.definitions.last_run', {
                       date: new Date(def.last_run_at).toLocaleString(),
                     })}
@@ -190,7 +190,7 @@ export default function AgentsAdminPage() {
               <div className="flex gap-2">
                 <Button
                   size="sm"
-                  variant="flat"
+                  variant="tertiary"
                   startContent={<Play className="w-4 h-4" />}
                   onPress={() => handleRunNow(def)}
                   isDisabled={!def.is_enabled || busyId === def.id}
@@ -200,7 +200,7 @@ export default function AgentsAdminPage() {
                 </Button>
                 <Button
                   size="sm"
-                  variant="flat"
+                  variant="tertiary"
                   startContent={<Edit3 className="w-4 h-4" />}
                   onPress={() => openEdit(def)}
                 >
@@ -230,8 +230,8 @@ export default function AgentsAdminPage() {
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={() => setEditing(null)}>{t('agents.actions.cancel')}</Button>
-            <Button color="primary" onPress={handleSaveEdit}>{t('agents.actions.save')}</Button>
+            <Button variant="tertiary" onPress={() => setEditing(null)}>{t('agents.actions.cancel')}</Button>
+            <Button onPress={handleSaveEdit}>{t('agents.actions.save')}</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

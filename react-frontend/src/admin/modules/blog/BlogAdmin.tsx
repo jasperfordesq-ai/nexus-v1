@@ -137,9 +137,9 @@ export function BlogAdmin() {
       render: (item) => (
         <Button
           type="button"
-          variant="light"
+          variant="tertiary"
           onPress={() => navigate(tenantPath(`/admin/blog/edit/${item.id}`))}
-          className="text-left font-medium text-accent hover:underline min-w-0 h-auto p-0 justify-start"
+          className="text-left font-medium text-accent hover:underline min-w-0 min-h-10 p-0 justify-start"
         >
           {item.title}
         </Button>
@@ -152,7 +152,7 @@ export function BlogAdmin() {
       render: (item) => (
         <Chip
           size="sm"
-          variant="flat"
+          variant="soft"
           color={statusColors[item.status] || 'default'}
           className="capitalize"
         >
@@ -165,7 +165,7 @@ export function BlogAdmin() {
       label: t('blog.label_author'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">{item.author_name || t('blog.unknown')}</span>
+        <span className="text-sm text-muted">{item.author_name || t('blog.unknown')}</span>
       ),
     },
     {
@@ -173,7 +173,7 @@ export function BlogAdmin() {
       label: t('blog.label_categories'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">{item.category_name || '--'}</span>
+        <span className="text-sm text-muted">{item.category_name || '--'}</span>
       ),
     },
     {
@@ -181,7 +181,7 @@ export function BlogAdmin() {
       label: t('blog.label_created'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {new Date(item.created_at).toLocaleDateString()}
         </span>
       ),
@@ -194,8 +194,7 @@ export function BlogAdmin() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
-            color="primary"
+            variant="tertiary"
             onPress={() => navigate(tenantPath(`/admin/blog/edit/${item.id}`))}
             aria-label={t('blog.label_edit_post')}
           >
@@ -204,7 +203,7 @@ export function BlogAdmin() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
+            variant="tertiary"
             color={item.status === 'published' ? 'warning' : 'success'}
             onPress={() => handleToggleStatus(item)}
             aria-label={item.status === 'published' ? t('blog.unpublish') : t('blog.publish')}
@@ -214,8 +213,7 @@ export function BlogAdmin() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
-            color="danger"
+            variant="danger"
             onPress={() => setConfirmDelete(item)}
             aria-label={t('blog.label_delete_post')}
           >
@@ -233,7 +231,6 @@ export function BlogAdmin() {
         description={t('blog.blog_admin_desc')}
         actions={
           <Button
-            color="primary"
             startContent={<Plus size={16} />}
             onPress={() => navigate(tenantPath('/admin/blog/create'))}
           >

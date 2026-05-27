@@ -74,25 +74,25 @@ export function DeliverabilityDashboard() {
       <PageHeader title={t('deliverability.deliverability_dashboard_title')} description={t('deliverability.deliverability_dashboard_desc')} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
-        <StatCard label={t('deliverability.label_total_deliverables')} value={stats.total} icon={Target} color="primary" />
+        <StatCard label={t('deliverability.label_total_deliverables')} value={stats.total} icon={Target} />
         <StatCard label={t('deliverability.label_completed')} value={completed} icon={CheckCircle} color="success" />
         <StatCard label={t('deliverability.label_in_progress')} value={inProgress} icon={Clock} color="warning" />
         <StatCard label={t('deliverability.label_overdue')} value={stats.overdue} icon={AlertCircle} color="danger" />
       </div>
 
-      <Card shadow="sm">
+      <Card >
         <CardHeader><h3 className="text-lg font-semibold">{t('deliverability.recent_activity')}</h3></CardHeader>
         <CardBody>
           {stats.recent_activity && stats.recent_activity.length > 0 ? (
             <div className="space-y-3">
               {stats.recent_activity.map((activity) => (
-                <div key={activity.id} className="flex items-start gap-3 py-2 border-b border-default-100 last:border-0">
+                <div key={activity.id} className="flex items-start gap-3 py-2 border-b border-border last:border-0">
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent/10">
                     <Target size={14} className="text-accent" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium">{activity.deliverable_title}</p>
-                    <p className="text-xs text-default-400">
+                    <p className="text-xs text-muted">
                       {t('deliverability.activity_by_user_date', {
                         action: activity.action_type,
                         user: activity.user_name,
@@ -104,7 +104,7 @@ export function DeliverabilityDashboard() {
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center py-8 text-default-400">
+            <div className="flex flex-col items-center py-8 text-muted">
               <Target size={40} className="mb-3" />
               <p>{t('deliverability.empty_dashboard')}</p>
             </div>

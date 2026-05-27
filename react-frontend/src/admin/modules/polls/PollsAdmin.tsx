@@ -157,7 +157,7 @@ export function PollsAdmin() {
       label: t('polls.col_options'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">{item.options_count}</span>
+        <span className="text-sm text-muted">{item.options_count}</span>
       ),
     },
     {
@@ -165,7 +165,7 @@ export function PollsAdmin() {
       label: t('polls.col_votes'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">{item.votes_count}</span>
+        <span className="text-sm text-muted">{item.votes_count}</span>
       ),
     },
     {
@@ -173,7 +173,7 @@ export function PollsAdmin() {
       label: t('polls.col_creator'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">
+        <span className="text-sm text-muted">
           {item.creator_name || t('polls.unknown')}
         </span>
       ),
@@ -185,7 +185,7 @@ export function PollsAdmin() {
       render: (item) => (
         <Chip
           size="sm"
-          variant="flat"
+          variant="soft"
           color={statusColors[item.status] || 'default'}
           className="capitalize"
         >
@@ -198,7 +198,7 @@ export function PollsAdmin() {
       label: t('polls.col_created'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {new Date(item.created_at).toLocaleDateString()}
         </span>
       ),
@@ -211,8 +211,7 @@ export function PollsAdmin() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
-            color="primary"
+            variant="tertiary"
             onPress={() => setDetailPoll(item)}
             aria-label={t('polls.label_view_poll_details')}
           >
@@ -221,8 +220,7 @@ export function PollsAdmin() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
-            color="danger"
+            variant="danger"
             onPress={() => setConfirmDelete(item)}
             aria-label={t('polls.label_delete_poll')}
           >
@@ -241,7 +239,7 @@ export function PollsAdmin() {
         title={t('polls.polls_admin_title')}
         description={t('polls.polls_admin_desc')}
         actions={
-          <Chip variant="flat" startContent={<BarChart3 size={14} />}>
+          <Chip variant="soft" startContent={<BarChart3 size={14} />}>
             {t('polls.total_count')}
           </Chip>
         }
@@ -295,30 +293,30 @@ export function PollsAdmin() {
         >
           <div className="space-y-3">
             <div>
-              <span className="text-sm font-medium text-default-500">{t('polls.question')}</span>
+              <span className="text-sm font-medium text-muted">{t('polls.question')}</span>
               <p className="text-foreground">{detailPoll.question}</p>
             </div>
             <div className="flex gap-6">
               <div>
-                <span className="text-sm font-medium text-default-500">{t('polls.options')}</span>
+                <span className="text-sm font-medium text-muted">{t('polls.options')}</span>
                 <p className="text-foreground">{detailPoll.options_count}</p>
               </div>
               <div>
-                <span className="text-sm font-medium text-default-500">{t('polls.votes')}</span>
+                <span className="text-sm font-medium text-muted">{t('polls.votes')}</span>
                 <p className="text-foreground">{detailPoll.votes_count}</p>
               </div>
             </div>
             <div className="flex gap-6">
               <div>
-                <span className="text-sm font-medium text-default-500">{t('polls.creator')}</span>
+                <span className="text-sm font-medium text-muted">{t('polls.creator')}</span>
                 <p className="text-foreground">{detailPoll.creator_name || t('polls.unknown')}</p>
               </div>
               <div>
-                <span className="text-sm font-medium text-default-500">{t('polls.status')}</span>
+                <span className="text-sm font-medium text-muted">{t('polls.status')}</span>
                 <p>
                   <Chip
                     size="sm"
-                    variant="flat"
+                    variant="soft"
                     color={statusColors[detailPoll.status] || 'default'}
                     className="capitalize"
                   >
@@ -328,7 +326,7 @@ export function PollsAdmin() {
               </div>
             </div>
             <div>
-              <span className="text-sm font-medium text-default-500">{t('polls.created')}</span>
+              <span className="text-sm font-medium text-muted">{t('polls.created')}</span>
               <p className="text-foreground">
                 {new Date(detailPoll.created_at).toLocaleString()}
               </p>

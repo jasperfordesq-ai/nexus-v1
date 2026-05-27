@@ -97,9 +97,9 @@ export function PagesAdmin() {
       render: (item) => (
         <Button
           type="button"
-          variant="light"
+          variant="tertiary"
           onPress={() => navigate(tenantPath(`/admin/pages/builder/${item.id}`))}
-          className="text-left font-medium text-accent hover:underline min-w-0 h-auto p-0 justify-start"
+          className="text-left font-medium text-accent hover:underline min-w-0 min-h-10 p-0 justify-start"
         >
           {item.title}
         </Button>
@@ -109,7 +109,7 @@ export function PagesAdmin() {
       key: 'slug',
       label: "Slug",
       sortable: true,
-      render: (item) => <span className="text-sm text-default-500">/{item.slug}</span>,
+      render: (item) => <span className="text-sm text-muted">/{item.slug}</span>,
     },
     {
       key: 'status',
@@ -122,11 +122,11 @@ export function PagesAdmin() {
       label: t('content.in_menu'),
       sortable: true,
       render: (item) => item.show_in_menu ? (
-        <Chip size="sm" variant="flat" color="primary">
+        <Chip size="sm" variant="soft">
           {item.menu_location === 'footer' ? "Footer" : "About"}
         </Chip>
       ) : (
-        <span className="text-sm text-default-400">{"No"}</span>
+        <span className="text-sm text-muted">{"No"}</span>
       ),
     },
     {
@@ -134,7 +134,7 @@ export function PagesAdmin() {
       label: "Created",
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {new Date(item.created_at).toLocaleDateString()}
         </span>
       ),
@@ -147,8 +147,7 @@ export function PagesAdmin() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
-            color="primary"
+            variant="tertiary"
             onPress={() => navigate(tenantPath(`/admin/pages/builder/${item.id}`))}
             aria-label={"Edit Page"}
           >
@@ -157,8 +156,7 @@ export function PagesAdmin() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
-            color="danger"
+            variant="danger"
             onPress={() => setConfirmDelete(item)}
             aria-label={"Delete Page"}
           >
@@ -185,7 +183,6 @@ export function PagesAdmin() {
         description={"Create and manage custom pages for your platform"}
         actions={
           <Button
-            color="primary"
             startContent={<Plus size={16} />}
             onPress={() => navigate(tenantPath('/admin/pages/builder/new'))}
           >

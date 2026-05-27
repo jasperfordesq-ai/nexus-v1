@@ -46,48 +46,48 @@ export default function GroupRecommendations() {
     <div className="p-6 space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground">{t('groups.group_recommendations_title')}</h1>
-        <p className="text-sm text-default-500 mt-1">
+        <p className="text-sm text-muted mt-1">
           {t('groups.group_recommendations_desc')}
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card shadow="sm">
+        <Card >
           <CardBody className="p-6">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center">
               <TrendingUp className="w-6 h-6 text-accent" />
             </div>
             <div>
-              <div className="text-sm text-default-500">{t('groups.total_recommendations')}</div>
+              <div className="text-sm text-muted">{t('groups.total_recommendations')}</div>
               <div className="text-2xl font-bold mt-1">{stats.total}</div>
             </div>
           </div>
           </CardBody>
         </Card>
 
-        <Card shadow="sm">
+        <Card >
           <CardBody className="p-6">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-lg bg-success/10 flex items-center justify-center">
               <Target className="w-6 h-6 text-success" />
             </div>
             <div>
-              <div className="text-sm text-default-500">{t('groups.avg_match_score')}</div>
+              <div className="text-sm text-muted">{t('groups.avg_match_score')}</div>
               <div className="text-2xl font-bold mt-1">{stats.avg_score.toFixed(2)}</div>
             </div>
           </div>
           </CardBody>
         </Card>
 
-        <Card shadow="sm">
+        <Card >
           <CardBody className="p-6">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-lg bg-warning/10 flex items-center justify-center">
               <Users className="w-6 h-6 text-warning" />
             </div>
             <div>
-              <div className="text-sm text-default-500">{t('groups.join_rate')}</div>
+              <div className="text-sm text-muted">{t('groups.join_rate')}</div>
               <div className="text-2xl font-bold mt-1">{stats.join_rate}%</div>
             </div>
           </div>
@@ -95,7 +95,7 @@ export default function GroupRecommendations() {
         </Card>
       </div>
 
-      <Card shadow="sm">
+      <Card >
         <CardBody className="p-4">
         <h2 className="text-lg font-semibold mb-4 text-foreground">{t('groups.recent_recommendations')}</h2>
         <Table aria-label={t('groups.label_recommendations_table')}>
@@ -116,7 +116,7 @@ export default function GroupRecommendations() {
                 <TableCell>{rec.group_name}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Progress aria-label={t('groups.col_score')} value={rec.score * 100} size="sm" className="w-24" color="primary" />
+                    <Progress aria-label={t('groups.col_score')} value={rec.score * 100} size="sm" className="w-24" />
                     <span className="text-sm">{(rec.score * 100).toFixed(0)}%</span>
                   </div>
                 </TableCell>

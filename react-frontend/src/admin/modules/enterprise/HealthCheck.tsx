@@ -30,7 +30,7 @@ function statusBorderClass(status: string): string {
     case 'fail':
       return 'border-danger';
     default:
-      return 'border-default-200';
+      return 'border-border';
   }
 }
 
@@ -115,7 +115,7 @@ export function HealthCheck() {
         description={t('enterprise.health_check_desc')}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<RefreshCw size={16} />}
             onPress={handleRefresh}
             isLoading={loading}
@@ -133,14 +133,14 @@ export function HealthCheck() {
       ) : result ? (
         <div className="space-y-6">
           {/* Overall Status */}
-          <Card shadow="sm">
+          <Card >
             <CardBody className="flex flex-row items-center gap-4 p-6">
               <div className={`flex h-14 w-14 items-center justify-center rounded-full bg-${statusColor}/10`}>
                 <HeartPulse size={28} className={`text-${statusColor}`} />
               </div>
               <div>
                 <h3 className="text-lg font-bold text-foreground">{t('enterprise.system_status')}</h3>
-                <Chip size="sm" variant="flat" color={statusColor} className="mt-1 capitalize">
+                <Chip size="sm" variant="soft" color={statusColor} className="mt-1 capitalize">
                   {getOverallStatusLabel(result.status)}
                 </Chip>
               </div>
@@ -152,7 +152,7 @@ export function HealthCheck() {
             {result.checks.map((check) => (
               <Card
                 key={check.name}
-                shadow="sm"
+
                 className={`border-l-4 ${statusBorderClass(check.status)}`}
               >
                 <CardBody className="flex flex-row items-center gap-4 p-5">
@@ -165,11 +165,11 @@ export function HealthCheck() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-base font-semibold text-foreground">{check.name}</p>
-                    <p className="text-sm text-default-500">
+                    <p className="text-sm text-muted">
                       {getCheckStatusLabel(check.status)}
                     </p>
                     {(check.free || check.total) && (
-                      <p className="text-xs text-default-400 mt-1">
+                      <p className="text-xs text-muted mt-1">
                         {check.free && t('enterprise.free_value', { value: check.free })}
                         {check.free && check.total && t('enterprise.value_separator')}
                         {check.total && t('enterprise.total_value', { value: check.total })}
@@ -178,7 +178,7 @@ export function HealthCheck() {
                   </div>
                   <Chip
                     size="sm"
-                    variant="flat"
+                    variant="soft"
                     color={check.status === 'ok' ? 'success' : 'danger'}
                   >
                     {getCheckStatusCodeLabel(check.status)}
@@ -189,11 +189,11 @@ export function HealthCheck() {
           </div>
 
           {/* Health Check History */}
-          <Card shadow="sm">
+          <Card >
             <CardHeader className="flex items-center gap-2 px-6 pt-5 pb-0">
-              <History size={18} className="text-default-500" />
+              <History size={18} className="text-muted" />
               <h3 className="text-base font-semibold">{t('enterprise.history')}</h3>
-              <Chip size="sm" variant="flat" color="default">
+              <Chip size="sm" variant="soft">
                 {t('enterprise.last_n_checks', { count: history.length })}
               </Chip>
             </CardHeader>
@@ -205,7 +205,7 @@ export function HealthCheck() {
                 </div>
               ) : history.length === 0 ? (
                 <div className="py-8 text-center">
-                  <p className="text-default-500">{t('enterprise.no_history_available')}</p>
+                  <p className="text-muted">{t('enterprise.no_history_available')}</p>
                 </div>
               ) : (
                 <Table aria-label={t('enterprise.health_check_history')} removeWrapper>
@@ -220,17 +220,17 @@ export function HealthCheck() {
                       return (
                         <TableRow key={entry.id}>
                           <TableCell>
-                            <Chip size="sm" variant="flat" color={histColor} className="capitalize">
+                            <Chip size="sm" variant="soft" color={histColor} className="capitalize">
                               {getOverallStatusLabel(entry.status)}
                             </Chip>
                           </TableCell>
                           <TableCell>
-                            <span className="font-mono text-default-600">
+                            <span className="font-mono text-muted">
                               {entry.latency_ms !== null ? t('enterprise.latency_ms', { value: entry.latency_ms }) : t('enterprise.empty_value')}
                             </span>
                           </TableCell>
                           <TableCell>
-                            <span className="text-default-500">
+                            <span className="text-muted">
                               {new Date(entry.created_at).toLocaleString()}
                             </span>
                           </TableCell>

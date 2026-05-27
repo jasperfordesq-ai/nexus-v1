@@ -143,7 +143,7 @@ export function ResourcesAdmin() {
       label: "Categories",
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">{item.category || '--'}</span>
+        <span className="text-sm text-muted">{item.category || '--'}</span>
       ),
     },
     {
@@ -151,7 +151,7 @@ export function ResourcesAdmin() {
       label: "Author",
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">{item.author_name || t('resources.unknown')}</span>
+        <span className="text-sm text-muted">{item.author_name || t('resources.unknown')}</span>
       ),
     },
     {
@@ -159,8 +159,8 @@ export function ResourcesAdmin() {
       label: t('resources.views'),
       sortable: true,
       render: (item) => (
-        <div className="flex items-center gap-1 text-sm text-default-500">
-          <Eye size={14} className="text-default-400" />
+        <div className="flex items-center gap-1 text-sm text-muted">
+          <Eye size={14} className="text-muted" />
           {(item.views ?? 0).toLocaleString()}
         </div>
       ),
@@ -170,8 +170,8 @@ export function ResourcesAdmin() {
       label: t('resources.helpful'),
       sortable: true,
       render: (item) => (
-        <div className="flex items-center gap-1 text-sm text-default-500">
-          <ThumbsUp size={14} className="text-default-400" />
+        <div className="flex items-center gap-1 text-sm text-muted">
+          <ThumbsUp size={14} className="text-muted" />
           {(item.helpful_votes ?? 0).toLocaleString()}
         </div>
       ),
@@ -183,7 +183,7 @@ export function ResourcesAdmin() {
       render: (item) => (
         <Chip
           size="sm"
-          variant="flat"
+          variant="soft"
           color={statusColors[item.status] || 'default'}
           className="capitalize"
         >
@@ -196,7 +196,7 @@ export function ResourcesAdmin() {
       label: t('resources.updated'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {item.updated_at ? new Date(item.updated_at).toLocaleDateString() : '--'}
         </span>
       ),
@@ -209,8 +209,7 @@ export function ResourcesAdmin() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
-            color="primary"
+            variant="tertiary"
             onPress={() => navigate(tenantPath(`/admin/resources/edit/${item.id}`))}
             aria-label={t('resources.label_edit_resource')}
           >
@@ -219,8 +218,7 @@ export function ResourcesAdmin() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
-            color="default"
+            variant="tertiary"
             as="a"
             href={tenantPath(`/kb/${item.id}`)}
             target="_blank"
@@ -232,8 +230,7 @@ export function ResourcesAdmin() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
-            color="danger"
+            variant="danger"
             onPress={() => setConfirmDelete(item)}
             aria-label={"Delete Resource"}
           >
@@ -254,14 +251,13 @@ export function ResourcesAdmin() {
         actions={
           <div className="flex items-center gap-2">
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<FolderTree size={16} />}
               onPress={() => navigate(tenantPath('/admin/resources/categories'))}
             >
               {t('resources.manage_categories')}
             </Button>
             <Button
-              color="primary"
               startContent={<Plus size={16} />}
               onPress={() => navigate(tenantPath('/admin/resources/create'))}
             >

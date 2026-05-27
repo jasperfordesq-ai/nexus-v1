@@ -124,7 +124,7 @@ function StatCard({ label, value, color = 'default', icon }: StatCardProps) {
   return (
     <Card className="p-1">
       <CardBody className="gap-2">
-        <div className="flex items-center gap-2 text-default-500 text-sm">
+        <div className="flex items-center gap-2 text-muted text-sm">
           {icon}
           <span>{label}</span>
         </div>
@@ -185,12 +185,12 @@ export function RevenueDashboard() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold">{t('billing.revenue_title')}</h1>
-          <p className="text-default-500 text-sm mt-1">{t('billing.revenue_desc')}</p>
+          <p className="text-muted text-sm mt-1">{t('billing.revenue_desc')}</p>
         </div>
         <Button
           as={Link}
           to={tenantPath('/admin/super/billing')}
-          variant="flat"
+          variant="tertiary"
           size="sm"
         >
           {t('billing.back_to_billing')}
@@ -214,7 +214,6 @@ export function RevenueDashboard() {
             <StatCard
               label={t('billing.mrr')}
               value={`${formatCurrency(data.mrr)}/mo`}
-              color="primary"
               icon={<DollarSign className="w-4 h-4" />}
             />
             <StatCard
@@ -282,13 +281,13 @@ export function RevenueDashboard() {
                         <TableCell>{formatCurrency(row.mrr_contribution)}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <div className="flex-1 h-2 bg-default-100 rounded-full overflow-hidden">
+                            <div className="flex-1 h-2 bg-surface-secondary rounded-full overflow-hidden">
                               <div
                                 className="h-full bg-accent rounded-full"
                                 style={{ width: `${pct}%` }}
                               />
                             </div>
-                            <span className="text-sm text-default-500 w-9 text-right">{pct}%</span>
+                            <span className="text-sm text-muted w-9 text-right">{pct}%</span>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -320,7 +319,7 @@ export function RevenueDashboard() {
                       <TableCell>
                         <Chip
                           size="sm"
-                          variant="flat"
+                          variant="soft"
                           color={actionChipColor(change.action)}
                         >
                           {t(actionLabelKey(change.action))}

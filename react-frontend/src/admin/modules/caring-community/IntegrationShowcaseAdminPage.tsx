@@ -114,7 +114,7 @@ export default function IntegrationShowcaseAdminPage() {
             <Button
               isIconOnly
               size="sm"
-              variant="flat"
+              variant="tertiary"
               onPress={load}
               isLoading={loading}
               aria-label={t('integration_showcase.actions.refresh_aria')}
@@ -125,16 +125,16 @@ export default function IntegrationShowcaseAdminPage() {
         }
       />
 
-      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" >
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('integration_showcase.about.title')}</p>
-              <p className="text-default-600">
+              <p className="text-muted">
                 {t('integration_showcase.about.body')}
               </p>
-              <p className="text-default-500 text-xs">{t('integration_showcase.about.last_refreshed', { date: updatedLabel })}</p>
+              <p className="text-muted text-xs">{t('integration_showcase.about.last_refreshed', { date: updatedLabel })}</p>
             </div>
           </div>
         </CardBody>
@@ -162,7 +162,7 @@ export default function IntegrationShowcaseAdminPage() {
                 }
               >
                 <div className="space-y-4 pb-2">
-                  <p className="text-sm text-default-600">{section.body}</p>
+                  <p className="text-sm text-muted">{section.body}</p>
 
                   {section.items && section.items.length > 0 && (
                     <div className="space-y-2">
@@ -174,13 +174,13 @@ export default function IntegrationShowcaseAdminPage() {
                           <Chip
                             size="sm"
                             color={METHOD_COLOUR[item.method] ?? 'default'}
-                            variant="flat"
+                            variant="soft"
                             className="font-mono text-xs"
                           >
                             {item.method}
                           </Chip>
-                          <code className="flex-1 text-xs font-mono text-default-700">{item.path}</code>
-                          <span className="text-xs text-default-500">{item.label}</span>
+                          <code className="flex-1 text-xs font-mono text-foreground">{item.path}</code>
+                          <span className="text-xs text-muted">{item.label}</span>
                         </div>
                       ))}
                     </div>
@@ -193,7 +193,7 @@ export default function IntegrationShowcaseAdminPage() {
                       </CardHeader>
                       <CardBody className="pt-0">
                         <Snippet
-                          variant="flat"
+                          variant="tertiary"
                           symbol=""
                           className="text-xs whitespace-pre w-full"
                         >
@@ -215,18 +215,18 @@ export default function IntegrationShowcaseAdminPage() {
                         <Card key={`${section.id}-sample-${i}`} className="border border-[var(--color-border)]">
                           <CardHeader className="pb-1 flex items-center justify-between">
                             <span className="text-xs font-semibold">{sample.label}</span>
-                            <Chip size="sm" variant="flat">{sample.kind.toUpperCase()}</Chip>
+                            <Chip size="sm" variant="soft">{sample.kind.toUpperCase()}</Chip>
                           </CardHeader>
                           <CardBody className="pt-0 space-y-2">
                             {sample.headers && sample.headers.length > 0 && (
-                              <div className="rounded bg-[var(--color-surface-alt)] p-2 font-mono text-[11px] text-default-600">
+                              <div className="rounded bg-[var(--color-surface-alt)] p-2 font-mono text-[11px] text-muted">
                                 {sample.headers.map((h, j) => (
                                   <div key={`${section.id}-hdr-${i}-${j}`}>{h}</div>
                                 ))}
                               </div>
                             )}
                             <Snippet
-                              variant="flat"
+                              variant="tertiary"
                               symbol=""
                               className="text-xs whitespace-pre w-full overflow-auto"
                             >
@@ -239,7 +239,7 @@ export default function IntegrationShowcaseAdminPage() {
                   )}
 
                   {section.checklist && section.checklist.length > 0 && (
-                    <ul className="list-disc pl-5 text-sm text-default-700 space-y-1">
+                    <ul className="list-disc pl-5 text-sm text-foreground space-y-1">
                       {section.checklist.map((c, i) => (
                         <li key={`${section.id}-cl-${i}`}>{c}</li>
                       ))}

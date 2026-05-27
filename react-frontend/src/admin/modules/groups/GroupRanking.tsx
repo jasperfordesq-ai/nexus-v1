@@ -67,12 +67,11 @@ export default function GroupRanking() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">{t('groups.group_ranking_title')}</h1>
-          <p className="text-sm text-default-500 mt-1">
+          <p className="text-sm text-muted mt-1">
             {t('groups.group_ranking_desc')}
           </p>
         </div>
         <Button
-          color="primary"
           startContent={<RefreshCw className="w-4 h-4" />}
           onPress={handleUpdateRankings}
           isLoading={updating}
@@ -81,7 +80,7 @@ export default function GroupRanking() {
         </Button>
       </div>
 
-      <Card shadow="sm">
+      <Card >
         <CardBody className="p-4">
         <Table aria-label={t('groups.label_featured_groups_table')}>
           <TableHeader>
@@ -104,7 +103,7 @@ export default function GroupRanking() {
                 <TableCell>{group.member_count ?? 0}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Progress aria-label={t('groups.col_engagement')} value={Math.min(100, Number(group.engagement_score ?? 0))} size="sm" className="w-16" color="primary" />
+                    <Progress aria-label={t('groups.col_engagement')} value={Math.min(100, Number(group.engagement_score ?? 0))} size="sm" className="w-16" />
                     <span className="text-sm">{Number(group.engagement_score ?? 0).toFixed(0)}</span>
                   </div>
                 </TableCell>
@@ -130,10 +129,10 @@ export default function GroupRanking() {
         </CardBody>
       </Card>
 
-      <Card shadow="sm">
+      <Card >
         <CardBody className="p-6">
         <h2 className="text-lg font-semibold mb-3 text-foreground">{t('groups.ranking_algorithm_title')}</h2>
-        <div className="space-y-2 text-sm text-default-500">
+        <div className="space-y-2 text-sm text-muted">
           <p>
             <strong className="text-foreground">{t('groups.total_score_formula_label')}</strong>{' '}
             {t('groups.total_score_formula')}

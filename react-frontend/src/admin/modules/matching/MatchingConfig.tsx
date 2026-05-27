@@ -195,7 +195,7 @@ export function MatchingConfig() {
         actions={
           <div className="flex items-center gap-2">
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/smart-matching'))}
               size="sm"
@@ -203,7 +203,6 @@ export function MatchingConfig() {
               {t('matching.back')}
             </Button>
             <Button
-              color="primary"
               startContent={<Save size={16} />}
               onPress={handleSave}
               isLoading={saving}
@@ -218,7 +217,7 @@ export function MatchingConfig() {
 
       <div className="space-y-6">
         {/* Algorithm Toggles */}
-        <Card shadow="sm">
+        <Card >
           <CardHeader className="px-4 pt-4 pb-0">
             <h3 className="font-semibold">{t('matching.algorithm_settings')}</h3>
           </CardHeader>
@@ -227,7 +226,7 @@ export function MatchingConfig() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium">{t('matching.smart_matching_enabled')}</p>
-                  <p className="text-xs text-default-500">
+                  <p className="text-xs text-muted">
                     {t('matching.smart_matching_enabled_desc')}
                   </p>
                 </div>
@@ -244,7 +243,7 @@ export function MatchingConfig() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium">{t('matching.broker_approval_required')}</p>
-                  <p className="text-xs text-default-500">
+                  <p className="text-xs text-muted">
                     {t('matching.broker_approval_required_desc')}
                   </p>
                 </div>
@@ -267,7 +266,7 @@ export function MatchingConfig() {
                     setConfig((prev) => ({ ...prev, max_distance_km: parseInt(val) || 50 }));
                     setDirty(true);
                   }}
-                  variant="bordered"
+                  variant="secondary"
                   size="sm"
                 />
                 <Input
@@ -278,7 +277,7 @@ export function MatchingConfig() {
                     setConfig((prev) => ({ ...prev, min_match_score: parseInt(val) || 40 }));
                     setDirty(true);
                   }}
-                  variant="bordered"
+                  variant="secondary"
                   size="sm"
                 />
                 <Input
@@ -289,7 +288,7 @@ export function MatchingConfig() {
                     setConfig((prev) => ({ ...prev, hot_match_threshold: parseInt(val) || 80 }));
                     setDirty(true);
                   }}
-                  variant="bordered"
+                  variant="secondary"
                   size="sm"
                 />
               </div>
@@ -298,7 +297,7 @@ export function MatchingConfig() {
         </Card>
 
         {/* Algorithm Weights */}
-        <Card shadow="sm">
+        <Card >
           <CardHeader className="flex items-center justify-between px-4 pt-4 pb-0">
             <h3 className="font-semibold">{t('matching.algorithm_weights')}</h3>
             <span
@@ -359,12 +358,12 @@ export function MatchingConfig() {
         </Card>
 
         {/* Proximity Bands */}
-        <Card shadow="sm">
+        <Card >
           <CardHeader className="px-4 pt-4 pb-0">
             <h3 className="font-semibold">{t('matching.proximity_bands')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
-            <p className="text-sm text-default-500 mb-4">
+            <p className="text-sm text-muted mb-4">
               {t('matching.proximity_bands_desc')}
             </p>
             <Table
@@ -392,7 +391,7 @@ export function MatchingConfig() {
                         onValueChange={(val) =>
                           updateBand(i, 'distance_km', parseInt(val) || 0)
                         }
-                        variant="bordered"
+                        variant="secondary"
                         size="sm"
                         className="w-24"
                         aria-label={t('matching.band_distance_aria', {
@@ -407,7 +406,7 @@ export function MatchingConfig() {
                         onValueChange={(val) =>
                           updateBand(i, 'score', parseFloat(val) || 0)
                         }
-                        variant="bordered"
+                        variant="secondary"
                         size="sm"
                         className="w-24"
                         step={0.1}
@@ -426,15 +425,14 @@ export function MatchingConfig() {
         </Card>
 
         {/* Cache Management & Actions */}
-        <Card shadow="sm">
+        <Card >
           <CardHeader className="px-4 pt-4 pb-0">
             <h3 className="font-semibold">{t('matching.cache_management')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             <div className="flex flex-wrap gap-3">
               <Button
-                color="danger"
-                variant="flat"
+                variant="danger"
                 startContent={<Trash2 size={16} />}
                 onPress={() => setClearModalOpen(true)}
               >
@@ -442,7 +440,7 @@ export function MatchingConfig() {
               </Button>
               <Button
                 color="warning"
-                variant="flat"
+                variant="tertiary"
                 startContent={<RotateCcw size={16} />}
                 onPress={() => setResetModalOpen(true)}
               >
@@ -498,7 +496,7 @@ function WeightSlider({
       <div className="flex items-center justify-between mb-1">
         <div>
           <p className="text-sm font-medium">{label}</p>
-          <p className="text-xs text-default-500">{description}</p>
+          <p className="text-xs text-muted">{description}</p>
         </div>
         <span className="text-sm font-semibold tabular-nums w-12 text-right">
           {pct}%

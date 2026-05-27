@@ -107,7 +107,7 @@ export function OrgWallets() {
         label: t('timebanking.col_created'),
         sortable: true,
         render: (wallet) => (
-          <span className="text-sm text-default-500">
+          <span className="text-sm text-muted">
             {new Date(wallet.created_at).toLocaleDateString()}
           </span>
         ),
@@ -125,7 +125,7 @@ export function OrgWallets() {
           <Button
             as={Link}
             to={tenantPath('/admin/timebanking')}
-            variant="flat"
+            variant="tertiary"
             startContent={<ArrowLeft size={16} />}
             size="sm"
           >
@@ -142,8 +142,8 @@ export function OrgWallets() {
         onRefresh={loadWallets}
         emptyContent={
           <div className="flex flex-col items-center gap-2 py-8">
-            <Building2 size={32} className="text-default-300" />
-            <p className="text-sm text-default-400">{t('timebanking.no_org_wallets')}</p>
+            <Building2 size={32} className="text-muted" />
+            <p className="text-sm text-muted">{t('timebanking.no_org_wallets')}</p>
           </div>
         }
       />

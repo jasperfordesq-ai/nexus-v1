@@ -219,7 +219,7 @@ export function GoalsAdmin() {
         description={t('goals.goals_admin_desc')}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<RefreshCw size={16} />}
             onPress={loadGoals}
             isDisabled={loading}
@@ -237,12 +237,12 @@ export function GoalsAdmin() {
           value={searchInput}
           onValueChange={setSearchInput}
           onKeyDown={handleSearchKeyDown}
-          startContent={<Search size={16} className="text-default-400" />}
+          startContent={<Search size={16} className="text-muted" />}
           isClearable
           onClear={() => { setSearchInput(''); setSearch(''); setPage(1); }}
           className="max-w-md"
         />
-        <Button color="primary" variant="flat" onPress={handleSearch}>
+        <Button variant="tertiary" onPress={handleSearch}>
           {t('goals.search')}
         </Button>
       </div>
@@ -255,7 +255,7 @@ export function GoalsAdmin() {
               <Spinner size="lg" label={t('goals.loading_goals')} />
             </div>
           ) : goals.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-3 py-16 text-default-400">
+            <div className="flex flex-col items-center justify-center gap-3 py-16 text-muted">
               <Target size={48} />
               <p className="text-lg font-medium">{t('goals.no_goals_found')}</p>
               <p className="text-sm">
@@ -285,10 +285,10 @@ export function GoalsAdmin() {
                       <span className="font-medium text-foreground">{goal.title}</span>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm text-default-600">{goal.member_name}</span>
+                      <span className="text-sm text-muted">{goal.member_name}</span>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm text-default-600">{goal.target_value}</span>
+                      <span className="text-sm text-muted">{goal.target_value}</span>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2 min-w-[120px]">
@@ -299,7 +299,7 @@ export function GoalsAdmin() {
                           className="flex-1"
                           aria-label={t('goals.progress_complete', { percent: progressPercent(goal) })}
                         />
-                        <span className="text-xs text-default-500 w-10 text-right">
+                        <span className="text-xs text-muted w-10 text-right">
                           {progressPercent(goal)}%
                         </span>
                       </div>
@@ -307,7 +307,7 @@ export function GoalsAdmin() {
                     <TableCell>
                       <Chip
                         size="sm"
-                        variant="flat"
+                        variant="soft"
                         color={statusColors[goal.status] || 'default'}
                       >
                         {t(statusLabelKey(goal.status))}
@@ -316,22 +316,21 @@ export function GoalsAdmin() {
                     <TableCell>
                       <Chip
                         size="sm"
-                        variant="flat"
+                        variant="soft"
                         color={goal.has_buddy ? 'success' : 'default'}
                       >
                         {goal.has_buddy ? t('goals.yes') : t('goals.no')}
                       </Chip>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm text-default-500">{formatDate(goal.created_at)}</span>
+                      <span className="text-sm text-muted">{formatDate(goal.created_at)}</span>
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-1">
                         <Button
                           isIconOnly
                           size="sm"
-                          variant="flat"
-                          color="primary"
+                          variant="tertiary"
                           aria-label={t('goals.label_view_goal')}
                           onPress={() => window.open(tenantPath(`/goals/${goal.id}`), '_blank')}
                         >
@@ -340,8 +339,7 @@ export function GoalsAdmin() {
                         <Button
                           isIconOnly
                           size="sm"
-                          variant="flat"
-                          color="danger"
+                          variant="danger"
                           aria-label={t('goals.label_delete_goal')}
                           onPress={() => setConfirmDelete(goal)}
                         >
@@ -360,7 +358,7 @@ export function GoalsAdmin() {
       {/* Pagination */}
       {meta.total_pages > 1 && (
         <div className="mt-4 flex items-center justify-between">
-          <span className="text-sm text-default-500">
+          <span className="text-sm text-muted">
             {t('goals.showing_of_total', { count: goals.length, total: meta.total })}
           </span>
           <Pagination

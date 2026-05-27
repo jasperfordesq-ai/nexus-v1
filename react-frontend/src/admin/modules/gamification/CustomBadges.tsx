@@ -83,7 +83,7 @@ export function CustomBadges() {
         description={t('gamification.custom_badges_desc')}
         actions={
           <Link to={tenantPath("/admin/custom-badges/create")}>
-            <Button color="primary" startContent={<Plus size={16} />}>
+            <Button startContent={<Plus size={16} />}>
               {t('gamification.create_badge')}
             </Button>
           </Link>
@@ -93,17 +93,17 @@ export function CustomBadges() {
       {loading ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
-            <Card key={i} shadow="sm">
+            <Card key={i} >
               <CardBody className="p-4">
                 <div className="animate-pulse space-y-3">
                   <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-xl bg-default-200" />
+                    <div className="h-12 w-12 rounded-xl bg-surface-secondary" />
                     <div className="flex-1 space-y-2">
-                      <div className="h-4 w-32 rounded bg-default-200" />
-                      <div className="h-3 w-20 rounded bg-default-200" />
+                      <div className="h-4 w-32 rounded bg-surface-secondary" />
+                      <div className="h-3 w-20 rounded bg-surface-secondary" />
                     </div>
                   </div>
-                  <div className="h-3 w-full rounded bg-default-100" />
+                  <div className="h-3 w-full rounded bg-surface-secondary" />
                 </div>
               </CardBody>
             </Card>
@@ -120,7 +120,7 @@ export function CustomBadges() {
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {badges.map((badge) => (
-            <Card key={badge.key} shadow="sm" className="group">
+            <Card key={badge.key}  className="group">
               <CardBody className="p-4">
                 <div className="flex items-start gap-3">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-success/10 text-success">
@@ -128,15 +128,14 @@ export function CustomBadges() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <h4 className="font-semibold text-foreground truncate">{badge.name}</h4>
-                    <p className="text-xs text-default-500 mt-0.5">
+                    <p className="text-xs text-muted mt-0.5">
                       {t('gamification.users_awarded')}
                     </p>
                   </div>
                   <Button
                     isIconOnly
                     size="sm"
-                    variant="light"
-                    color="danger"
+                    variant="danger"
                     className="opacity-0 group-hover:opacity-100 transition-opacity"
                     onPress={() => setDeleteTarget(badge)}
                     aria-label={t('gamification.delete_badge_aria', { name: badge.name })}
@@ -145,7 +144,7 @@ export function CustomBadges() {
                   </Button>
                 </div>
                 {badge.description && (
-                  <p className="mt-2 text-sm text-default-600 line-clamp-2">{badge.description}</p>
+                  <p className="mt-2 text-sm text-muted line-clamp-2">{badge.description}</p>
                 )}
               </CardBody>
             </Card>

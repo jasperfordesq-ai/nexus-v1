@@ -62,7 +62,7 @@ export function TimebankingDashboard() {
         description={t('timebanking.timebanking_dashboard_desc')}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<RefreshCw size={16} />}
             onPress={loadStats}
             isLoading={loading}
@@ -79,7 +79,6 @@ export function TimebankingDashboard() {
           label={t('timebanking.label_total_transactions')}
           value={stats?.total_transactions ?? '—'}
           icon={ArrowLeftRight}
-          color="primary"
           loading={loading}
         />
         <StatCard
@@ -93,7 +92,6 @@ export function TimebankingDashboard() {
           label={t('timebanking.label_avg_transaction')}
           value={stats?.avg_transaction ?? '—'}
           icon={Wallet}
-          color="secondary"
           loading={loading}
         />
         <StatCard
@@ -108,7 +106,7 @@ export function TimebankingDashboard() {
       {/* Top Earners & Top Spenders */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 mb-6">
         {/* Top Earners */}
-        <Card shadow="sm">
+        <Card >
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <TrendingUp size={18} className="text-success" />
             <h3 className="font-semibold">{t('timebanking.top_earners')}</h3>
@@ -143,7 +141,7 @@ export function TimebankingDashboard() {
                 ))}
               </div>
             ) : (
-              <p className="py-8 text-center text-sm text-default-400">
+              <p className="py-8 text-center text-sm text-muted">
                 {t('timebanking.no_transaction_data')}
               </p>
             )}
@@ -151,7 +149,7 @@ export function TimebankingDashboard() {
         </Card>
 
         {/* Top Spenders */}
-        <Card shadow="sm">
+        <Card >
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Wallet size={18} className="text-warning" />
             <h3 className="font-semibold">{t('timebanking.top_spenders')}</h3>
@@ -186,7 +184,7 @@ export function TimebankingDashboard() {
                 ))}
               </div>
             ) : (
-              <p className="py-8 text-center text-sm text-default-400">
+              <p className="py-8 text-center text-sm text-muted">
                 {t('timebanking.no_transaction_data')}
               </p>
             )}
@@ -195,7 +193,7 @@ export function TimebankingDashboard() {
       </div>
 
       {/* Quick Links */}
-      <Card shadow="sm">
+      <Card >
         <CardHeader className="px-4 pt-4 pb-0">
           <h3 className="font-semibold">{t('timebanking.quick_links')}</h3>
         </CardHeader>

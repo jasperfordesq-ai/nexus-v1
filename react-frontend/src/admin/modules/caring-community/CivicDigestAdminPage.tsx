@@ -102,7 +102,7 @@ export default function CivicDigestAdminPage() {
               as={Link}
               to={tenantPath('/caring-community/civic-digest')}
               size="sm"
-              variant="flat"
+              variant="tertiary"
               endContent={<ExternalLink size={14} />}
             >
               {t('admin.civic_digest.preview_member_view')}
@@ -111,7 +111,7 @@ export default function CivicDigestAdminPage() {
               <Button
                 isIconOnly
                 size="sm"
-                variant="flat"
+                variant="tertiary"
                 onPress={load}
                 isLoading={loading}
                 aria-label={t('admin.common.refresh')}
@@ -123,13 +123,13 @@ export default function CivicDigestAdminPage() {
         }
       />
 
-      <Card className="border border-accent/30 bg-accent-soft shadow-sm shadow-accent/10 dark:bg-accent-soft" shadow="none">
+      <Card className="border border-accent/30 bg-accent-soft shadow-sm shadow-accent/10 dark:bg-accent-soft" >
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('admin.civic_digest.about.title')}</p>
-              <p className="text-default-600">{t('admin.civic_digest.about.body')}</p>
+              <p className="text-muted">{t('admin.civic_digest.about.body')}</p>
             </div>
           </div>
         </CardBody>
@@ -143,16 +143,16 @@ export default function CivicDigestAdminPage() {
 
       {!loading && (
         <>
-          <Card shadow="none" className="border border-divider/70 shadow-sm shadow-black/[0.03]">
+          <Card  className="border border-divider/70 shadow-sm shadow-black/[0.03]">
             <CardHeader className="pb-2">
               <div className="flex flex-wrap items-center justify-between gap-3 w-full">
                 <div>
                   <p className="text-sm font-semibold">{t('admin.civic_digest.cadence.title')}</p>
-                  <p className="text-xs text-default-500 mt-0.5">
+                  <p className="text-xs text-muted mt-0.5">
                     {t('admin.civic_digest.cadence.description')}
                   </p>
                 </div>
-                <Chip size="sm" variant="flat" color={cadence === 'off' ? 'default' : 'primary'}>
+                <Chip size="sm" variant="soft" color={cadence === 'off' ? 'default' : 'primary'}>
                   {t('admin.civic_digest.cadence.current', { cadence: t(`admin.civic_digest.options.${cadence}.label`) })}
                 </Chip>
               </div>
@@ -176,14 +176,13 @@ export default function CivicDigestAdminPage() {
 
               <div className="flex items-center justify-end gap-2">
                 <Button
-                  variant="flat"
+                  variant="tertiary"
                   onPress={() => setDraft(cadence)}
                   isDisabled={!isDirty || saving}
                 >
                   {t('admin.civic_digest.reset')}
                 </Button>
                 <Button
-                  color="primary"
                   startContent={<Save size={14} />}
                   onPress={save}
                   isLoading={saving}
@@ -195,15 +194,15 @@ export default function CivicDigestAdminPage() {
             </CardBody>
           </Card>
 
-          <Card shadow="none" className="border border-divider/70 shadow-sm shadow-black/[0.03]">
+          <Card  className="border border-divider/70 shadow-sm shadow-black/[0.03]">
             <CardBody className="space-y-2">
               <p className="text-sm font-semibold">{t('admin.civic_digest.includes.title')}</p>
-              <p className="text-xs text-default-500">
+              <p className="text-xs text-muted">
                 {t('admin.civic_digest.includes.description')}
               </p>
               <div className="flex flex-wrap gap-1.5 mt-1">
                 {DIGEST_SOURCES.map((tag) => (
-                  <Chip key={tag} size="sm" variant="flat" color="default">
+                  <Chip key={tag} size="sm" variant="soft">
                     {t(`admin.civic_digest.includes.sources.${tag}`)}
                   </Chip>
                 ))}
@@ -212,7 +211,7 @@ export default function CivicDigestAdminPage() {
           </Card>
 
           <Separator />
-          <p className="text-xs text-default-500">
+          <p className="text-xs text-muted">
             {t('admin.civic_digest.member_override')}
           </p>
         </>

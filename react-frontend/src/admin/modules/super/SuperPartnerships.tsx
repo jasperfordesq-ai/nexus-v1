@@ -211,7 +211,7 @@ export default function Partnerships() {
                 <TrendingUp className="w-5 h-5 text-success" />
               </div>
               <div>
-                <p className="text-xs text-default-500">{t('super.status_active')}</p>
+                <p className="text-xs text-muted">{t('super.status_active')}</p>
                 <p className="text-2xl font-bold text-success">{stats.active}</p>
               </div>
             </div>
@@ -225,7 +225,7 @@ export default function Partnerships() {
                 <TrendingUp className="w-5 h-5 text-warning" />
               </div>
               <div>
-                <p className="text-xs text-default-500">{t('super.status_pending')}</p>
+                <p className="text-xs text-muted">{t('super.status_pending')}</p>
                 <p className="text-2xl font-bold text-warning">{stats.pending}</p>
               </div>
             </div>
@@ -239,7 +239,7 @@ export default function Partnerships() {
                 <Pause className="w-5 h-5 text-danger" />
               </div>
               <div>
-                <p className="text-xs text-default-500">{t('super.status_suspended')}</p>
+                <p className="text-xs text-muted">{t('super.status_suspended')}</p>
                 <p className="text-2xl font-bold text-danger">{stats.suspended}</p>
               </div>
             </div>
@@ -249,11 +249,11 @@ export default function Partnerships() {
         <Card>
           <CardBody>
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-default-100">
-                <XCircle className="w-5 h-5 text-default-500" />
+              <div className="p-2 rounded-lg bg-surface-secondary">
+                <XCircle className="w-5 h-5 text-muted" />
               </div>
               <div>
-                <p className="text-xs text-default-500">{t('super.status_terminated')}</p>
+                <p className="text-xs text-muted">{t('super.status_terminated')}</p>
                 <p className="text-2xl font-bold">{stats.terminated}</p>
               </div>
             </div>
@@ -276,7 +276,7 @@ export default function Partnerships() {
           </Tabs>
         </CardHeader>
         <CardBody>
-          <Table aria-label={t('super.label_federation_partnerships')} shadow="sm" isStriped>
+          <Table aria-label={t('super.label_federation_partnerships')}  isStriped>
             <TableHeader>
               <TableColumn>{t('super.col_partnership')}</TableColumn>
               <TableColumn>{t('super.col_level')}</TableColumn>
@@ -291,12 +291,12 @@ export default function Partnerships() {
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <span className="font-medium">{partnership.tenant_a_name}</span>
-                      <span className="text-default-500">↔</span>
+                      <span className="text-muted">↔</span>
                       <span className="font-medium">{partnership.tenant_b_name}</span>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Chip size="sm" color={getLevelColor(partnership.level)} variant="flat">
+                    <Chip size="sm" color={getLevelColor(partnership.level)} variant="soft">
                       {t('super.level_value', { level: partnership.level })}
                     </Chip>
                   </TableCell>
@@ -312,11 +312,11 @@ export default function Partnerships() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Chip size="sm" color={getStatusColor(partnership.status)} variant="flat">
+                    <Chip size="sm" color={getStatusColor(partnership.status)} variant="soft">
                       {t(statusLabelKey(partnership.status))}
                     </Chip>
                   </TableCell>
-                  <TableCell className="text-sm text-default-600">
+                  <TableCell className="text-sm text-muted">
                     {new Date(partnership.created_at).toLocaleDateString()}
                   </TableCell>
                   <TableCell>
@@ -324,7 +324,7 @@ export default function Partnerships() {
                       {partnership.status === 'active' && (
                         <Button
                           size="sm"
-                          variant="flat"
+                          variant="tertiary"
                           color="warning"
                           onPress={() => setActionPartnership({ id: partnership.id, action: 'suspend' })}
                           startContent={<Pause className="w-4 h-4" />}
@@ -335,8 +335,7 @@ export default function Partnerships() {
                       {(partnership.status === 'active' || partnership.status === 'suspended') && (
                         <Button
                           size="sm"
-                          variant="flat"
-                          color="danger"
+                          variant="danger"
                           onPress={() => setActionPartnership({ id: partnership.id, action: 'terminate' })}
                           startContent={<XCircle className="w-4 h-4" />}
                         >

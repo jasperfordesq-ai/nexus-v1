@@ -199,7 +199,7 @@ export function NewsletterBounces() {
         actions={
           <div className="flex gap-2">
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<RefreshCw size={16} />}
               onPress={() => activeTab === 'bounces' ? loadBounces() : loadSuppressionList()}
               isLoading={loading}
@@ -208,7 +208,7 @@ export function NewsletterBounces() {
             </Button>
             {activeTab === 'bounces' && (
               <Button
-                variant="flat"
+                variant="tertiary"
                 startContent={<Download size={16} />}
                 onPress={exportBounces}
                 isDisabled={bounces.length === 0}
@@ -224,7 +224,7 @@ export function NewsletterBounces() {
         <Card>
           <CardBody className="gap-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-default-500">{t('newsletter_bounces.stat_total_bounces_7d')}</span>
+              <span className="text-sm text-muted">{t('newsletter_bounces.stat_total_bounces_7d')}</span>
               <AlertTriangle size={20} className="text-warning" />
             </div>
             <p className="text-2xl font-bold">{totalBounces7d.toLocaleString()}</p>
@@ -234,7 +234,7 @@ export function NewsletterBounces() {
         <Card>
           <CardBody className="gap-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-default-500">{t('newsletter_bounces.stat_hard_bounces')}</span>
+              <span className="text-sm text-muted">{t('newsletter_bounces.stat_hard_bounces')}</span>
               <AlertTriangle size={20} className="text-danger" />
             </div>
             <p className="text-2xl font-bold">{hardBounces.toLocaleString()}</p>
@@ -244,8 +244,8 @@ export function NewsletterBounces() {
         <Card>
           <CardBody className="gap-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-default-500">{t('newsletter_bounces.stat_suppressed_emails')}</span>
-              <Trash2 size={20} className="text-default-400" />
+              <span className="text-sm text-muted">{t('newsletter_bounces.stat_suppressed_emails')}</span>
+              <Trash2 size={20} className="text-muted" />
             </div>
             <p className="text-2xl font-bold">{suppressedCount.toLocaleString()}</p>
           </CardBody>
@@ -283,16 +283,16 @@ export function NewsletterBounces() {
             </CardHeader>
             <CardBody>
               {reasonSummary.length === 0 ? (
-                <p className="text-sm text-default-400">{t('shared.no_data_available')}</p>
+                <p className="text-sm text-muted">{t('shared.no_data_available')}</p>
               ) : (
                 <div className="space-y-2">
                   {reasonSummary.map((r) => (
                     <div key={`${r.bounce_type}-${r.reason}`} className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2 min-w-0 flex-1">
-                        <Chip size="sm" color={getBadgeColor(r.bounce_type)} variant="flat">
+                        <Chip size="sm" color={getBadgeColor(r.bounce_type)} variant="soft">
                           {r.bounce_type}
                         </Chip>
-                        <span className="text-xs text-default-600 truncate">{r.reason}</span>
+                        <span className="text-xs text-muted truncate">{r.reason}</span>
                       </div>
                       <span className="text-xs font-semibold shrink-0">{r.count}</span>
                     </div>
@@ -359,18 +359,18 @@ export function NewsletterBounces() {
                       <span className="font-mono text-sm">{bounce.email}</span>
                     </TableCell>
                     <TableCell>
-                      <Chip size="sm" color={getBadgeColor(bounce.bounce_type)} variant="flat">
+                      <Chip size="sm" color={getBadgeColor(bounce.bounce_type)} variant="soft">
                         {bounce.bounce_type}
                       </Chip>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm text-default-600">{bounce.bounce_reason || '—'}</span>
+                      <span className="text-sm text-muted">{bounce.bounce_reason || '—'}</span>
                     </TableCell>
                     <TableCell>
                       <span className="text-sm">{bounce.newsletter_subject || '—'}</span>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm text-default-500">
+                      <span className="text-sm text-muted">
                         {new Date(bounce.bounced_at).toLocaleDateString()}
                       </span>
                     </TableCell>
@@ -397,21 +397,20 @@ export function NewsletterBounces() {
                       <span className="font-mono text-sm">{entry.email}</span>
                     </TableCell>
                     <TableCell>
-                      <Chip size="sm" variant="flat">{entry.reason}</Chip>
+                      <Chip size="sm" variant="soft">{entry.reason}</Chip>
                     </TableCell>
                     <TableCell>
                       <span className="text-sm">{entry.bounce_count}</span>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm text-default-500">
+                      <span className="text-sm text-muted">
                         {new Date(entry.suppressed_at).toLocaleDateString()}
                       </span>
                     </TableCell>
                     <TableCell>
                       <Button
                         size="sm"
-                        variant="light"
-                        color="primary"
+                        variant="tertiary"
                         onPress={() => setUnsuppressTarget(entry.email)}
                       >
                         {t('newsletter_bounces.unsuppress')}

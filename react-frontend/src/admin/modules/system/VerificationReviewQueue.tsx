@@ -138,7 +138,7 @@ export function VerificationReviewQueue() {
             <ClipboardCheck className="w-5 h-5 text-amber-500" />
             <h3 className="text-lg font-semibold">{t('verification.pending_reviews_title')}</h3>
             {sessions.length > 0 && (
-              <Chip size="sm" color="warning" variant="flat">
+              <Chip size="sm" color="warning" variant="soft">
                 {t('verification.n_pending', { count: sessions.length })}
               </Chip>
             )}
@@ -146,7 +146,7 @@ export function VerificationReviewQueue() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
+            variant="tertiary"
             onPress={fetchSessions}
             aria-label={t('verification.refresh_pending_reviews_aria')}
           >
@@ -191,7 +191,7 @@ export function VerificationReviewQueue() {
                       <Chip
                         size="sm"
                         color={STATUS_COLORS[session.status] || 'default'}
-                        variant="flat"
+                        variant="soft"
                       >
                         {t(`verification.status_${session.status}`)}
                       </Chip>
@@ -204,7 +204,7 @@ export function VerificationReviewQueue() {
                         <Button
                           size="sm"
                           color="success"
-                          variant="flat"
+                          variant="tertiary"
                           startContent={<CheckCircle className="w-3.5 h-3.5" />}
                           onPress={() => openConfirmation(session, 'approve')}
                         >
@@ -212,8 +212,7 @@ export function VerificationReviewQueue() {
                         </Button>
                         <Button
                           size="sm"
-                          color="danger"
-                          variant="flat"
+                          variant="danger"
                           startContent={<XCircle className="w-3.5 h-3.5" />}
                           onPress={() => openConfirmation(session, 'reject')}
                         >
@@ -260,7 +259,7 @@ export function VerificationReviewQueue() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={confirmModal.onClose} isDisabled={actionLoading}>
+            <Button variant="tertiary" onPress={confirmModal.onClose} isDisabled={actionLoading}>
               {t('verification.cancel')}
             </Button>
             <Button

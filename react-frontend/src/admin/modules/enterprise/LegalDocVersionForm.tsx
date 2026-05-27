@@ -200,10 +200,10 @@ export default function LegalDocVersionForm({
         </div>
       </ModalBody>
       <ModalFooter>
-        <Button variant="flat" onPress={onCancel}>
+        <Button variant="tertiary" onPress={onCancel}>
           {t('enterprise.cancel')}
         </Button>
-        <Button color="primary" type="submit" isLoading={submitting} isDisabled={submitting}>
+        <Button type="submit" isLoading={submitting} isDisabled={submitting}>
           {isEditMode ? t('enterprise.version_form.btn_update') : t('enterprise.version_form.btn_create')}
         </Button>
       </ModalFooter>

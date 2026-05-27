@@ -27,7 +27,7 @@ export function AdminNotFound() {
   return (
     <div>
       <PageHeader title={t('admin_not_found.title')} />
-      <Card shadow="sm">
+      <Card >
         <CardBody className="flex flex-col items-center justify-center py-16 text-center">
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-danger/10">
             <FileQuestion size={32} className="text-danger" />
@@ -35,14 +35,13 @@ export function AdminNotFound() {
           <h3 className="text-lg font-semibold text-foreground">
             {t('admin_not_found.heading')}
           </h3>
-          <p className="mt-2 max-w-md text-sm text-default-500">
+          <p className="mt-2 max-w-md text-sm text-muted">
             {t('admin_not_found.description')}
           </p>
           <Button
             as={Link}
             to={tenantPath('/admin')}
-            variant="flat"
-            color="primary"
+            variant="tertiary"
             className="mt-6"
             startContent={<ArrowLeft size={16} />}
           >

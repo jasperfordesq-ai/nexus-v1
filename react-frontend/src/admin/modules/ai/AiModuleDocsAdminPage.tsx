@@ -147,20 +147,20 @@ export default function AiModuleDocsAdminPage() {
         <BookOpen size={28} className="text-accent" />
         <div>
           <h1 className="text-2xl font-bold">{t('ai.module_docs.meta.title')}</h1>
-          <p className="text-sm text-default-500">
+          <p className="text-sm text-muted">
             {t('ai.module_docs.meta.description')}
           </p>
         </div>
         <div className="ml-auto flex gap-2">
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<Sparkles size={16} />}
             onPress={handleSeedDefaults}
             isLoading={seeding}
           >
             {t('ai.module_docs.actions.seed_defaults')}
           </Button>
-          <Button color="primary" startContent={<Plus size={16} />} onPress={openCreate}>
+          <Button startContent={<Plus size={16} />} onPress={openCreate}>
             {t('ai.module_docs.actions.new_doc')}
           </Button>
         </div>
@@ -169,7 +169,7 @@ export default function AiModuleDocsAdminPage() {
       <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft">
         <CardBody className="flex flex-row gap-3 p-4">
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
-          <div className="space-y-1 text-sm text-default-600">
+          <div className="space-y-1 text-sm text-muted">
             <p>
               {t('ai.module_docs.about.body')}
             </p>
@@ -206,12 +206,12 @@ export default function AiModuleDocsAdminPage() {
               <TableCell>
                 <div className="flex flex-wrap gap-1 max-w-[20rem]">
                   {doc.keywords.slice(0, 6).map((k) => (
-                    <Chip key={k} size="sm" variant="flat">
+                    <Chip key={k} size="sm" variant="soft">
                       {k}
                     </Chip>
                   ))}
                   {doc.keywords.length > 6 && (
-                    <Chip size="sm" variant="flat" color="default">
+                    <Chip size="sm" variant="soft">
                       +{doc.keywords.length - 6}
                     </Chip>
                   )}
@@ -227,13 +227,12 @@ export default function AiModuleDocsAdminPage() {
               </TableCell>
               <TableCell>
                 <div className="flex gap-1">
-                  <Button size="sm" variant="flat" isIconOnly onPress={() => openEdit(doc)} aria-label={t('ai.module_docs.actions.edit')}>
+                  <Button size="sm" variant="tertiary" isIconOnly onPress={() => openEdit(doc)} aria-label={t('ai.module_docs.actions.edit')}>
                     <Pencil size={14} />
                   </Button>
                   <Button
                     size="sm"
-                    color="danger"
-                    variant="flat"
+                    variant="danger"
                     isIconOnly
                     onPress={() => void handleDelete(doc)}
                     aria-label={t('ai.module_docs.actions.delete')}
@@ -259,7 +258,7 @@ export default function AiModuleDocsAdminPage() {
                     placeholder={t('ai.module_docs.editor.placeholders.module_slug')}
                     value={form.module_slug}
                     onValueChange={(v) => setForm((f) => ({ ...f, module_slug: v }))}
-                    variant="bordered"
+                    variant="secondary"
                     isDisabled={Boolean(editing)}
                     description={t('ai.module_docs.editor.hints.module_slug')}
                   />
@@ -268,14 +267,14 @@ export default function AiModuleDocsAdminPage() {
                     placeholder={t('ai.module_docs.editor.placeholders.title')}
                     value={form.title}
                     onValueChange={(v) => setForm((f) => ({ ...f, title: v }))}
-                    variant="bordered"
+                    variant="secondary"
                   />
                   <Input
                     label={t('ai.module_docs.editor.fields.keywords')}
                     placeholder={t('ai.module_docs.editor.placeholders.keywords')}
                     value={form.keywords}
                     onValueChange={(v) => setForm((f) => ({ ...f, keywords: v }))}
-                    variant="bordered"
+                    variant="secondary"
                     description={t('ai.module_docs.editor.hints.keywords')}
                   />
                   <Textarea
@@ -283,14 +282,14 @@ export default function AiModuleDocsAdminPage() {
                     placeholder={t('ai.module_docs.editor.placeholders.body')}
                     value={form.body}
                     onValueChange={(v) => setForm((f) => ({ ...f, body: v }))}
-                    variant="bordered"
+                    variant="secondary"
                     minRows={10}
                     maxRows={20}
                   />
-                  <div className="flex items-center justify-between rounded-xl border border-default-200 p-3">
+                  <div className="flex items-center justify-between rounded-xl border border-border p-3">
                     <div>
                       <p className="text-sm font-medium">{t('ai.module_docs.editor.fields.active')}</p>
-                      <p className="text-xs text-default-400">{t('ai.module_docs.editor.hints.active')}</p>
+                      <p className="text-xs text-muted">{t('ai.module_docs.editor.hints.active')}</p>
                     </div>
                     <Switch
                       isSelected={form.is_active}
@@ -301,10 +300,10 @@ export default function AiModuleDocsAdminPage() {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button variant="light" onPress={onClose}>
+                <Button variant="tertiary" onPress={onClose}>
                   {t('ai.common.cancel')}
                 </Button>
-                <Button color="primary" onPress={handleSave} isLoading={saving}>
+                <Button onPress={handleSave} isLoading={saving}>
                   {editing ? t('ai.common.save_changes') : t('ai.module_docs.actions.create_doc')}
                 </Button>
               </ModalFooter>

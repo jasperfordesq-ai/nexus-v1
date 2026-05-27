@@ -108,7 +108,7 @@ export function MatchingAnalytics() {
         actions={
           <div className="flex items-center gap-2">
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/smart-matching'))}
               size="sm"
@@ -116,7 +116,7 @@ export function MatchingAnalytics() {
               {t('common.back')}
             </Button>
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<RefreshCw size={16} />}
               onPress={loadStats}
               isLoading={loading}
@@ -148,7 +148,6 @@ export function MatchingAnalytics() {
               label={t('matching.label_total_matches')}
               value={overview?.total_matches_month ?? 0}
               icon={Target}
-              color="primary"
               loading={loading}
             />
             <StatCard
@@ -164,7 +163,6 @@ export function MatchingAnalytics() {
                 ? `${overview.avg_match_score}%`
                 : '---'}
               icon={TrendingUp}
-              color="primary"
               loading={loading}
             />
             <StatCard
@@ -180,7 +178,7 @@ export function MatchingAnalytics() {
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             {/* Score Distribution */}
-            <Card shadow="sm">
+            <Card >
               <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
                 <Zap size={18} className="text-accent" />
                 <h3 className="font-semibold">{t('matching.score_distribution')}</h3>
@@ -197,7 +195,7 @@ export function MatchingAnalytics() {
                       return (
                         <div key={range}>
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-sm text-default-600">
+                            <span className="text-sm text-muted">
                               {SCORE_LABEL_KEYS[range] ? t(SCORE_LABEL_KEYS[range]) : range}
                             </span>
                             <span className="text-sm font-medium tabular-nums">
@@ -219,7 +217,7 @@ export function MatchingAnalytics() {
                     })}
                   </div>
                 ) : (
-                  <p className="py-8 text-center text-sm text-default-400">
+                  <p className="py-8 text-center text-sm text-muted">
                     {t('matching.no_score_data')}
                   </p>
                 )}
@@ -227,7 +225,7 @@ export function MatchingAnalytics() {
             </Card>
 
             {/* Distance Distribution */}
-            <Card shadow="sm">
+            <Card >
               <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
                 <MapPin size={18} className="text-accent" />
                 <h3 className="font-semibold">{t('matching.distance_distribution')}</h3>
@@ -245,7 +243,7 @@ export function MatchingAnalytics() {
                         return (
                           <div key={band}>
                             <div className="flex items-center justify-between mb-1">
-                              <span className="text-sm text-default-600">
+                              <span className="text-sm text-muted">
                                 {DIST_LABEL_KEYS[band] ? t(DIST_LABEL_KEYS[band]) : band}
                               </span>
                               <span className="text-sm font-medium tabular-nums">
@@ -268,7 +266,7 @@ export function MatchingAnalytics() {
                     )}
                   </div>
                 ) : (
-                  <p className="py-8 text-center text-sm text-default-400">
+                  <p className="py-8 text-center text-sm text-muted">
                     {t('matching.no_distance_data')}
                   </p>
                 )}
@@ -276,7 +274,7 @@ export function MatchingAnalytics() {
             </Card>
 
             {/* Matching Activity */}
-            <Card shadow="sm">
+            <Card >
               <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
                 <Users size={18} className="text-accent" />
                 <h3 className="font-semibold">{t('matching.matching_activity')}</h3>
@@ -320,7 +318,7 @@ export function MatchingAnalytics() {
                     />
                   </div>
                 ) : (
-                  <p className="py-8 text-center text-sm text-default-400">
+                  <p className="py-8 text-center text-sm text-muted">
                     {t('matching.no_activity_data')}
                   </p>
                 )}
@@ -328,7 +326,7 @@ export function MatchingAnalytics() {
             </Card>
 
             {/* Approval Metrics */}
-            <Card shadow="sm">
+            <Card >
               <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
                 <CheckCircle size={18} className="text-accent" />
                 <h3 className="font-semibold">{t('matching.approval_metrics')}</h3>
@@ -355,7 +353,7 @@ export function MatchingAnalytics() {
                     />
                     <Separator />
                     <div className="flex items-center justify-between py-1">
-                      <span className="text-sm text-default-600">{t('matching.label_approval_rate')}</span>
+                      <span className="text-sm text-muted">{t('matching.label_approval_rate')}</span>
                       <span className="text-sm font-bold text-success">
                         {stats.approval_rate}%
                       </span>
@@ -368,14 +366,14 @@ export function MatchingAnalytics() {
                     />
                     <Separator />
                     <div className="flex items-center justify-between py-1">
-                      <span className="text-sm text-default-600">
+                      <span className="text-sm text-muted">
                         {t('matching.label_broker_approval')}
                       </span>
                       <span
                         className={`text-sm font-medium ${
                           stats.broker_approval_enabled
                             ? 'text-success'
-                            : 'text-default-400'
+                            : 'text-muted'
                         }`}
                       >
                         {stats.broker_approval_enabled ? t('matching.enabled') : t('matching.disabled')}
@@ -383,7 +381,7 @@ export function MatchingAnalytics() {
                     </div>
                   </div>
                 ) : (
-                  <p className="py-8 text-center text-sm text-default-400">
+                  <p className="py-8 text-center text-sm text-muted">
                     {t('matching.no_approval_data')}
                   </p>
                 )}
@@ -408,7 +406,7 @@ function ActivityRow({
 }) {
   return (
     <div className="flex items-center justify-between py-1">
-      <span className="text-sm text-default-600">{label}</span>
+      <span className="text-sm text-muted">{label}</span>
       <span className={`text-sm font-bold tabular-nums ${color ?? 'text-foreground'}`}>
         {value.toLocaleString()}
       </span>

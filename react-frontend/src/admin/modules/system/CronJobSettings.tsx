@@ -169,7 +169,7 @@ export function CronJobSettingsPage() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Per-Job Settings */}
-        <Card shadow="sm">
+        <Card >
           <CardHeader className="flex items-center gap-2">
             <Settings size={18} className="text-accent" />
             <span className="text-lg font-semibold">{t('system.section_per_job_settings')}</span>
@@ -184,7 +184,7 @@ export function CronJobSettingsPage() {
                 <Select
                   label={t('system.label_select_job')}
                   placeholder={t('system.placeholder_choose_a_job_to_configure')}
-                  variant="bordered"
+                  variant="secondary"
                   selectedKeys={selectedJobId ? [selectedJobId] : []}
                   onChange={(e) => setSelectedJobId(e.target.value)}
                 >
@@ -213,7 +213,7 @@ export function CronJobSettingsPage() {
                         >
                           <div className="flex flex-col gap-1">
                             <span className="text-sm font-medium">{t('system.label_enable_job')}</span>
-                            <span className="text-xs text-default-400">
+                            <span className="text-xs text-muted">
                               {t('system.desc_job_will_run_when_enabled')}
                             </span>
                           </div>
@@ -223,7 +223,7 @@ export function CronJobSettingsPage() {
                           label={t('system.label_custom_schedule')}
                           placeholder={t('system.placeholder_cron_expression')}
                           description={t('system.desc_cron_expression_leave_empty_to_use_defa')}
-                          variant="bordered"
+                          variant="secondary"
                           value={jobSettings.custom_schedule || ''}
                           onChange={(e) =>
                             setJobSettings({
@@ -232,7 +232,7 @@ export function CronJobSettingsPage() {
                             })
                           }
                           startContent={
-                            <Info size={16} className="text-default-400" />
+                            <Info size={16} className="text-muted" />
                           }
                         />
 
@@ -249,7 +249,7 @@ export function CronJobSettingsPage() {
                             <span className="text-sm font-medium">
                               {t('system.label_notify_on_failure')}
                             </span>
-                            <span className="text-xs text-default-400">
+                            <span className="text-xs text-muted">
                               {t('system.desc_notify_on_failure')}
                             </span>
                           </div>
@@ -260,7 +260,7 @@ export function CronJobSettingsPage() {
                             label={t('system.label_notification_emails')}
                             placeholder={t('system.placeholder_notification_emails')}
                             description={t('system.desc_comma_separated_emails')}
-                            variant="bordered"
+                            variant="secondary"
                             minRows={2}
                             value={jobSettings.notify_emails || ''}
                             onChange={(e) =>
@@ -277,7 +277,7 @@ export function CronJobSettingsPage() {
                           type="number"
                           placeholder={t('system.placeholder_max_retries')}
                           description={t('system.desc_number_of_times_to_retry_failed_jobs')}
-                          variant="bordered"
+                          variant="secondary"
                           value={jobSettings.max_retries.toString()}
                           onChange={(e) =>
                             setJobSettings({
@@ -292,7 +292,7 @@ export function CronJobSettingsPage() {
                           type="number"
                           placeholder={t('system.placeholder_timeout_seconds')}
                           description={t('system.desc_maximum_execution_time')}
-                          variant="bordered"
+                          variant="secondary"
                           value={jobSettings.timeout_seconds.toString()}
                           onChange={(e) =>
                             setJobSettings({
@@ -303,7 +303,6 @@ export function CronJobSettingsPage() {
                         />
 
                         <Button
-                          color="primary"
                           startContent={<Save size={16} />}
                           onPress={handleSaveJobSettings}
                           isLoading={savingJobSettings}
@@ -317,7 +316,7 @@ export function CronJobSettingsPage() {
                 )}
 
                 {!selectedJobId && (
-                  <div className="flex flex-col items-center gap-2 py-8 text-default-400">
+                  <div className="flex flex-col items-center gap-2 py-8 text-muted">
                     <AlertCircle size={32} />
                     <p className="text-sm">{t('system.label_select_job')}</p>
                   </div>
@@ -328,7 +327,7 @@ export function CronJobSettingsPage() {
         </Card>
 
         {/* Global Settings */}
-        <Card shadow="sm">
+        <Card >
           <CardHeader className="flex items-center gap-2">
             <Settings size={18} className="text-accent" />
             <span className="text-lg font-semibold">{t('system.section_global_settings')}</span>
@@ -345,7 +344,7 @@ export function CronJobSettingsPage() {
                   type="email"
                   placeholder={t('system.placeholder_default_notification_email')}
                   description={t('system.desc_fallback_email_for_job_failure_notificat')}
-                  variant="bordered"
+                  variant="secondary"
                   value={globalSettings.default_notify_email || ''}
                   onChange={(e) =>
                     setGlobalSettings({
@@ -360,7 +359,7 @@ export function CronJobSettingsPage() {
                   type="number"
                   placeholder={t('system.placeholder_log_retention_days')}
                   description={t('system.desc_how_long_to_keep_job_execution_logs')}
-                  variant="bordered"
+                  variant="secondary"
                   value={globalSettings.log_retention_days.toString()}
                   onChange={(e) =>
                     setGlobalSettings({
@@ -375,7 +374,7 @@ export function CronJobSettingsPage() {
                   type="number"
                   placeholder={t('system.placeholder_max_concurrent_jobs')}
                   description={t('system.desc_maximum_number_of_jobs_that_can_run_simu')}
-                  variant="bordered"
+                  variant="secondary"
                   value={globalSettings.max_concurrent_jobs.toString()}
                   onChange={(e) =>
                     setGlobalSettings({
@@ -386,7 +385,6 @@ export function CronJobSettingsPage() {
                 />
 
                 <Button
-                  color="primary"
                   startContent={<Save size={16} />}
                   onPress={handleSaveGlobalSettings}
                   isLoading={savingGlobalSettings}

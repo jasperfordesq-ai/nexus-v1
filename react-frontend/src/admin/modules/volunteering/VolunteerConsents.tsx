@@ -114,7 +114,7 @@ export default function VolunteerConsents() {
       label: t('volunteering.col_status'),
       sortable: true,
       render: (row) => (
-        <Chip size="sm" color={statusColorMap[row.status] || 'default'} variant="flat">
+        <Chip size="sm" color={statusColorMap[row.status] || 'default'} variant="soft">
           {t(`volunteering.status_${row.status}`)}
         </Chip>
       ),
@@ -162,7 +162,7 @@ export default function VolunteerConsents() {
             as="a"
             href={`mailto:${row.guardian_email}?subject=${subject}&body=${body}`}
             size="sm"
-            variant="flat"
+            variant="tertiary"
             color="warning"
             startContent={<Mail size={14} />}
           >
@@ -179,7 +179,7 @@ export default function VolunteerConsents() {
         title={t('volunteering.consents_title')}
         description={t('volunteering.consents_desc')}
         actions={
-          <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>
+          <Button variant="tertiary" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>
             {t('volunteering.refresh')}
           </Button>
         }
@@ -199,7 +199,7 @@ export default function VolunteerConsents() {
                 </p>
                 <ul className="mt-2 space-y-1">
                   {expiringConsents.map((c) => (
-                    <li key={c.id} className="text-sm text-default-600">
+                    <li key={c.id} className="text-sm text-muted">
                       <span className="font-medium">{c.minor_name}</span>
                       {' '}&mdash;{' '}
                       {c.opportunity_title}

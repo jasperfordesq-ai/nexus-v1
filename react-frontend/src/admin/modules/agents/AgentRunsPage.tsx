@@ -78,15 +78,15 @@ export default function AgentRunsPage() {
         description={t('agents.runs.subtitle')}
         icon={<Bot className="h-5 w-5" />}
         actions={(
-          <Button variant="flat" onPress={() => void fetchItems()} isLoading={loading}>
+          <Button variant="tertiary" onPress={() => void fetchItems()} isLoading={loading}>
             {t('agents.actions.refresh')}
           </Button>
         )}
       />
 
       {loading && (
-        <Card shadow="sm" className="border border-divider/70 bg-surface">
-          <CardBody className="py-8 text-sm text-default-500">
+        <Card  className="border border-divider/70 bg-surface">
+          <CardBody className="py-8 text-sm text-muted">
             {t('agents.runs.loading')}
           </CardBody>
         </Card>
@@ -126,7 +126,7 @@ export default function AgentRunsPage() {
                     {r.started_at ? new Date(r.started_at).toLocaleString() : t('agents.common.empty_dash')}
                   </TableCell>
                   <TableCell>
-                    <Chip size="sm" variant="flat" color={statusColor(r.status)}>
+                    <Chip size="sm" variant="soft" color={statusColor(r.status)}>
                       {t(`agents.run_status.${r.status}`, r.status)}
                     </Chip>
                   </TableCell>
@@ -144,7 +144,7 @@ export default function AgentRunsPage() {
               if (expanded === r.id) {
                 rows.push(
                   <TableRow key={`detail-${r.id}`}>
-                    <TableCell colSpan={8} className="bg-default-50">
+                    <TableCell colSpan={8} className="bg-surface-secondary">
                       <div className="space-y-2 py-2">
                         {r.error_message && (
                           <div>
@@ -154,12 +154,12 @@ export default function AgentRunsPage() {
                         )}
                         {r.output_summary && (
                           <div>
-                            <p className="text-xs font-semibold uppercase text-default-500">{t('agents.runs.detail.summary')}</p>
+                            <p className="text-xs font-semibold uppercase text-muted">{t('agents.runs.detail.summary')}</p>
                             <p className="text-sm">{r.output_summary}</p>
                           </div>
                         )}
                         {r.completed_at && (
-                          <p className="text-xs text-default-500">
+                          <p className="text-xs text-muted">
                             {t('agents.runs.detail.completed', {
                               date: new Date(r.completed_at).toLocaleString(),
                             })}

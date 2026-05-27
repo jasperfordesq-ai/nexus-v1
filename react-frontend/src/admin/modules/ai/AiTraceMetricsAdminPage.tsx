@@ -76,7 +76,7 @@ export default function AiTraceMetricsAdminPage() {
         <BarChart3 size={28} className="text-accent" />
         <div>
           <h1 className="text-2xl font-bold">{t('ai.trace_metrics.meta.title')}</h1>
-          <p className="text-sm text-default-500">
+          <p className="text-sm text-muted">
             {t('ai.trace_metrics.meta.description')}
           </p>
         </div>
@@ -109,18 +109,18 @@ export default function AiTraceMetricsAdminPage() {
           {metrics && metrics.top_tools.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {metrics.top_tools.map((t) => (
-                <Chip key={t.name} variant="flat" color="primary">
+                <Chip key={t.name} variant="soft">
                   {t.name} - {t.calls}
                 </Chip>
               ))}
             </div>
           ) : loading ? (
-            <div className="flex items-center gap-2 text-sm text-default-500">
+            <div className="flex items-center gap-2 text-sm text-muted">
               <Spinner size="sm" />
               {t('ai.trace_metrics.empty.loading_tools')}
             </div>
           ) : (
-            <p className="text-sm text-default-400">{t('ai.trace_metrics.empty.no_tools')}</p>
+            <p className="text-sm text-muted">{t('ai.trace_metrics.empty.no_tools')}</p>
           )}
         </CardBody>
       </Card>
@@ -129,7 +129,7 @@ export default function AiTraceMetricsAdminPage() {
         <CardBody className="p-4 gap-3">
           <div>
             <p className="font-semibold">{t('ai.trace_metrics.unanswered.title')}</p>
-            <p className="text-xs text-default-500">
+            <p className="text-xs text-muted">
               {t('ai.trace_metrics.unanswered.description')}
             </p>
           </div>
@@ -150,7 +150,7 @@ export default function AiTraceMetricsAdminPage() {
                     <span className="text-sm line-clamp-2 max-w-[20rem] block">{u.user_text}</span>
                   </TableCell>
                   <TableCell>
-                    <span className="text-xs text-default-500 line-clamp-2 max-w-[24rem] block">{u.assistant_text}</span>
+                    <span className="text-xs text-muted line-clamp-2 max-w-[24rem] block">{u.assistant_text}</span>
                   </TableCell>
                   <TableCell>
                     <span className="text-xs italic">{u.note ?? t('ai.common.empty_dash')}</span>
@@ -178,7 +178,7 @@ function Stat({ icon: Icon, label, value, loading, color = 'default' }: StatProp
   return (
     <Card>
       <CardBody className="p-3 gap-1">
-        <div className={`flex items-center gap-2 text-xs text-default-500`}>
+        <div className={`flex items-center gap-2 text-xs text-muted`}>
           <Icon size={14} className={tint} />
           {label}
         </div>

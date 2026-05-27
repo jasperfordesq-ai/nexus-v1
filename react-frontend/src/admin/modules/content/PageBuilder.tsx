@@ -179,11 +179,10 @@ export function PageBuilder() {
         description={t('content.pages_admin_desc')}
         actions={
           <div className="flex gap-2">
-            <Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/pages'))}>{t('content.back')}</Button>
+            <Button variant="tertiary" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/pages'))}>{t('content.back')}</Button>
             {isEdit && formData.slug && (
               <Button
-                variant="flat"
-                color="primary"
+                variant="tertiary"
                 startContent={<ExternalLink size={16} />}
                 onPress={() => {
                   // Use tenant.slug (from TenantContext) or user.tenant_slug (from auth JWT)
@@ -204,14 +203,14 @@ export function PageBuilder() {
       />
 
       <div className="flex flex-col gap-4">
-        <Card shadow="sm">
+        <Card >
           <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><FileText size={20} /> {t('content.label_content')}</h3></CardHeader>
           <CardBody className="gap-4">
             <Input
               label={t('content.label_name')}
               placeholder={t('content.placeholder_page_name')}
               isRequired
-              variant="bordered"
+              variant="secondary"
               value={formData.title}
               onValueChange={(v) => {
                 handleChange('title', v);
@@ -221,7 +220,7 @@ export function PageBuilder() {
             <Input
               label={t('content.label_url_slug')}
               placeholder={t('content.placeholder_slug')}
-              variant="bordered"
+              variant="secondary"
               description={isReservedSlug ? undefined : t('content.page_slug_description')}
               isInvalid={isReservedSlug}
               errorMessage={isReservedSlug ? t('content.slug_reserved_error', { slug: formData.slug }) : undefined}
@@ -243,13 +242,13 @@ export function PageBuilder() {
             <Input
               label={t('content.label_meta_description')}
               placeholder={t('content.placeholder_meta_description')}
-              variant="bordered"
+              variant="secondary"
               value={formData.meta_description}
               onValueChange={(v) => handleChange('meta_description', v)}
             />
             <Select
               label={t('content.label_status')}
-              variant="bordered"
+              variant="secondary"
               selectedKeys={[formData.status]}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
@@ -262,7 +261,7 @@ export function PageBuilder() {
           </CardBody>
         </Card>
 
-        <Card shadow="sm">
+        <Card >
           <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Menu size={20} /> {t('content.navigation_settings')}</h3></CardHeader>
           <CardBody className="gap-4">
             <Switch
@@ -275,7 +274,7 @@ export function PageBuilder() {
               <>
                 <Select
                   label={t('content.label_location')}
-                  variant="bordered"
+                  variant="secondary"
                   description={t('content.page_menu_location_desc')}
                   selectedKeys={[formData.menu_location]}
                   onSelectionChange={(keys) => {
@@ -289,7 +288,7 @@ export function PageBuilder() {
                 <Input
                   type="number"
                   label={t('content.menu_order')}
-                  variant="bordered"
+                  variant="secondary"
                   description={t('content.page_menu_order_desc')}
                   value={String(formData.menu_order)}
                   onValueChange={(v) => handleChange('menu_order', parseInt(v, 10) || 0)}
@@ -300,9 +299,8 @@ export function PageBuilder() {
         </Card>
 
         <div className="flex justify-end gap-2">
-          <Button variant="flat" onPress={() => navigate(tenantPath('/admin/pages'))}>{t('content.cancel')}</Button>
+          <Button variant="tertiary" onPress={() => navigate(tenantPath('/admin/pages'))}>{t('content.cancel')}</Button>
           <Button
-            color="primary"
             startContent={<Save size={16} />}
             onPress={handleSave}
             isLoading={saving}

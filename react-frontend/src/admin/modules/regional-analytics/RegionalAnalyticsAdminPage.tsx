@@ -148,13 +148,13 @@ export default function RegionalAnalyticsAdminPage() {
         title={t('regional_analytics_admin.meta.title')}
         description={t('regional_analytics_admin.meta.description')}
         actions={
-          <Button color="primary" startContent={<Plus size={16} />} onPress={() => setCreateOpen(true)}>
+          <Button startContent={<Plus size={16} />} onPress={() => setCreateOpen(true)}>
             {t('regional_analytics_admin.actions.new_subscription')}
           </Button>
         }
       />
 
-      <Card shadow="sm">
+      <Card >
         <CardBody className="p-0">
           {loading ? (
             <div className="p-10 flex justify-center">
@@ -184,17 +184,17 @@ export default function RegionalAnalyticsAdminPage() {
                       <div className="text-xs text-[var(--color-text-muted)]">{s.contact_email}</div>
                     </TableCell>
                     <TableCell>
-                      <Chip size="sm" variant="flat">
+                      <Chip size="sm" variant="soft">
                         {t(`regional_analytics_admin.partner_types.${s.partner_type}`)}
                       </Chip>
                     </TableCell>
                     <TableCell>
-                      <Chip size="sm" color={tierColor(s.plan_tier)} variant="flat">
+                      <Chip size="sm" color={tierColor(s.plan_tier)} variant="soft">
                         {t(`regional_analytics_admin.plan_tiers.${s.plan_tier}`)}
                       </Chip>
                     </TableCell>
                     <TableCell>
-                      <Chip size="sm" color={statusColor(s.status)} variant="flat">
+                      <Chip size="sm" color={statusColor(s.status)} variant="soft">
                         {t(`regional_analytics_admin.statuses.${s.status}`)}
                       </Chip>
                     </TableCell>
@@ -212,7 +212,7 @@ export default function RegionalAnalyticsAdminPage() {
                       <div className="flex gap-1">
                         <Button
                           size="sm"
-                          variant="light"
+                          variant="tertiary"
                           isIconOnly
                           aria-label={t('regional_analytics_admin.actions.generate_report_now')}
                           onPress={() => generateReport(s.id)}
@@ -221,7 +221,7 @@ export default function RegionalAnalyticsAdminPage() {
                         </Button>
                         <Button
                           size="sm"
-                          variant="light"
+                          variant="tertiary"
                           isIconOnly
                           aria-label={t('regional_analytics_admin.actions.view_access_log')}
                           onPress={() => openLog(s)}
@@ -231,7 +231,7 @@ export default function RegionalAnalyticsAdminPage() {
                         {s.status === 'active' || s.status === 'trialing' ? (
                           <Button
                             size="sm"
-                            variant="light"
+                            variant="tertiary"
                             isIconOnly
                             aria-label={t('regional_analytics_admin.actions.suspend')}
                             onPress={() => updateStatus(s.id, 'past_due')}
@@ -241,7 +241,7 @@ export default function RegionalAnalyticsAdminPage() {
                         ) : (
                           <Button
                             size="sm"
-                            variant="light"
+                            variant="tertiary"
                             isIconOnly
                             aria-label={t('regional_analytics_admin.actions.resume')}
                             onPress={() => updateStatus(s.id, 'active')}
@@ -306,7 +306,7 @@ export default function RegionalAnalyticsAdminPage() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={() => setLogSub(null)}>
+            <Button variant="tertiary" onPress={() => setLogSub(null)}>
               {t('regional_analytics_admin.actions.close')}
             </Button>
           </ModalFooter>
@@ -484,10 +484,10 @@ function CreateSubscriptionModal({
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button variant="light" onPress={onClose} isDisabled={submitting}>
+          <Button variant="tertiary" onPress={onClose} isDisabled={submitting}>
             {t('regional_analytics_admin.actions.cancel')}
           </Button>
-          <Button color="primary" onPress={submit} isLoading={submitting}>
+          <Button onPress={submit} isLoading={submitting}>
             {t('regional_analytics_admin.actions.create')}
           </Button>
         </ModalFooter>

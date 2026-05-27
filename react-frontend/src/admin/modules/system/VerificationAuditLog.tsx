@@ -95,7 +95,7 @@ export function VerificationAuditLog() {
         <div className="flex items-center gap-2">
           <ScrollText className="w-5 h-5 text-indigo-500" />
           <h3 className="text-lg font-semibold">{t('verification.audit_log_title')}</h3>
-          <Chip size="sm" variant="flat">{t('verification.total_events', { count: total })}</Chip>
+          <Chip size="sm" variant="soft">{t('verification.total_events', { count: total })}</Chip>
         </div>
         <div className="flex items-center gap-2">
           <Select
@@ -116,7 +116,7 @@ export function VerificationAuditLog() {
               </SelectItem>
             ))}
           </Select>
-          <Button isIconOnly size="sm" variant="flat" onPress={fetchEvents} aria-label={t('verification.refresh_aria')}>
+          <Button isIconOnly size="sm" variant="tertiary" onPress={fetchEvents} aria-label={t('verification.refresh_aria')}>
             <RefreshCw className="w-4 h-4" />
           </Button>
         </div>
@@ -166,7 +166,7 @@ export function VerificationAuditLog() {
                         {event.user_email && <div className="text-xs text-theme-muted">{event.user_email}</div>}
                       </TableCell>
                       <TableCell>
-                        <Chip size="sm" color={typeInfo.color} variant="flat">
+                        <Chip size="sm" color={typeInfo.color} variant="soft">
                           {typeLabel}
                         </Chip>
                       </TableCell>
@@ -194,7 +194,7 @@ export function VerificationAuditLog() {
                 <div className="flex gap-2">
                   <Button
                     size="sm"
-                    variant="flat"
+                    variant="tertiary"
                     isDisabled={page === 0}
                     onPress={() => setPage((p) => p - 1)}
                     startContent={<ChevronLeft className="w-4 h-4" />}
@@ -203,7 +203,7 @@ export function VerificationAuditLog() {
                   </Button>
                   <Button
                     size="sm"
-                    variant="flat"
+                    variant="tertiary"
                     isDisabled={page >= totalPages - 1}
                     onPress={() => setPage((p) => p + 1)}
                     endContent={<ChevronRight className="w-4 h-4" />}

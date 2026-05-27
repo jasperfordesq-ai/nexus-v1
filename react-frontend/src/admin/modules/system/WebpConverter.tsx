@@ -70,7 +70,6 @@ export function WebpConverter() {
         description={t('system.webp_converter_desc')}
         actions={
           <Button
-            color="primary"
             startContent={!converting ? <Play size={16} /> : undefined}
             onPress={handleConvert}
             isLoading={converting}
@@ -80,7 +79,7 @@ export function WebpConverter() {
           </Button>
         }
       />
-      <Card shadow="sm">
+      <Card >
         <CardHeader>
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <Image size={20} /> {t('system.image_conversion')}
@@ -94,26 +93,26 @@ export function WebpConverter() {
           ) : (
             <div className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <div className="rounded-lg border border-default-200 p-4 text-center">
+                <div className="rounded-lg border border-border p-4 text-center">
                   <p className="text-2xl font-bold text-foreground">
                     {stats?.total_images?.toLocaleString() ?? '--'}
                   </p>
-                  <p className="text-sm text-default-500">{t('system.total_images')}</p>
+                  <p className="text-sm text-muted">{t('system.total_images')}</p>
                 </div>
-                <div className="rounded-lg border border-default-200 p-4 text-center">
+                <div className="rounded-lg border border-border p-4 text-center">
                   <p className="text-2xl font-bold text-success">
                     {stats?.webp_images?.toLocaleString() ?? '--'}
                   </p>
-                  <p className="text-sm text-default-500">{t('system.already_webp')}</p>
+                  <p className="text-sm text-muted">{t('system.already_webp')}</p>
                 </div>
-                <div className="rounded-lg border border-default-200 p-4 text-center">
+                <div className="rounded-lg border border-border p-4 text-center">
                   <p className="text-2xl font-bold text-warning">
                     {stats?.pending_conversion?.toLocaleString() ?? '--'}
                   </p>
-                  <p className="text-sm text-default-500">{t('system.pending_conversion')}</p>
+                  <p className="text-sm text-muted">{t('system.pending_conversion')}</p>
                 </div>
               </div>
-              <p className="text-sm text-default-400">
+              <p className="text-sm text-muted">
                 {t('system.webp_converter_body')}
               </p>
             </div>

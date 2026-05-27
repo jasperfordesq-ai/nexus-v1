@@ -145,14 +145,14 @@ export default function CareRecipientCirclePage() {
       />
 
       {/* Intro card */}
-      <Card className="border border-accent/30 bg-accent-soft shadow-sm shadow-accent/10 dark:bg-accent-soft" shadow="none">
+      <Card className="border border-accent/30 bg-accent-soft shadow-sm shadow-accent/10 dark:bg-accent-soft" >
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('admin.recipient_circle.about.title')}</p>
-              <p className="text-default-600">{t('admin.recipient_circle.about.body')}</p>
-              <div className="space-y-0.5 pt-1 text-default-500">
+              <p className="text-muted">{t('admin.recipient_circle.about.body')}</p>
+              <div className="space-y-0.5 pt-1 text-muted">
                 <p><strong>{t('admin.recipient_circle.about.trust_tiers_label')}</strong> {t('admin.recipient_circle.about.trust_tiers_body')}</p>
                 <p><strong>{t('admin.recipient_circle.about.safeguarding_label')}</strong> {t('admin.recipient_circle.about.safeguarding_body')}</p>
                 <p><strong>{t('admin.recipient_circle.about.privacy_label')}</strong> {t('admin.recipient_circle.about.privacy_body')}</p>
@@ -163,7 +163,7 @@ export default function CareRecipientCirclePage() {
       </Card>
 
       {/* Lookup bar */}
-      <Card shadow="none" className="border border-divider/70 shadow-sm shadow-black/[0.03]">
+      <Card  className="border border-divider/70 shadow-sm shadow-black/[0.03]">
         <CardBody>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
             <Input
@@ -172,13 +172,12 @@ export default function CareRecipientCirclePage() {
               value={userIdInput}
               onValueChange={setUserIdInput}
               onKeyDown={handleKeyDown}
-              variant="bordered"
+              variant="secondary"
               className="max-w-xs"
               type="number"
               min={1}
             />
             <Button
-              color="primary"
               onPress={handleLookup}
               isLoading={loading}
               isDisabled={!userIdInput.trim()}
@@ -210,9 +209,9 @@ export default function CareRecipientCirclePage() {
       {circle && !loading && (
         <>
           {/* Recipient profile card */}
-          <Card shadow="none" className="border border-divider/70 shadow-sm shadow-black/[0.03]">
+          <Card  className="border border-divider/70 shadow-sm shadow-black/[0.03]">
             <CardHeader className="pb-2">
-              <span className="text-sm font-semibold text-default-600 uppercase tracking-wide">
+              <span className="text-sm font-semibold text-muted uppercase tracking-wide">
                 {t('admin.recipient_circle.recipient')}
               </span>
             </CardHeader>
@@ -220,7 +219,7 @@ export default function CareRecipientCirclePage() {
               <div className="flex flex-wrap items-center gap-4">
                 <div>
                   <p className="text-xl font-bold">{circle.recipient.name}</p>
-                  <p className="text-sm text-default-500">
+                  <p className="text-sm text-muted">
                     {t('admin.recipient_circle.member_since', {
                       date: fmtDate(circle.recipient.member_since, t('admin.common.empty_dash')),
                     })}
@@ -228,7 +227,7 @@ export default function CareRecipientCirclePage() {
                 </div>
                 <Chip
                   color={tierColor(circle.recipient.trust_tier)}
-                  variant="flat"
+                  variant="soft"
                   size="sm"
                 >
                   {tierLabel(circle.recipient.trust_tier)}
@@ -236,7 +235,7 @@ export default function CareRecipientCirclePage() {
                 {circle.safeguarding_flags > 0 && (
                   <Chip
                     color="danger"
-                    variant="solid"
+                    variant="soft"
                     size="sm"
                     startContent={<ShieldAlert size={12} />}
                   >
@@ -253,7 +252,6 @@ export default function CareRecipientCirclePage() {
               label={t('admin.recipient_circle.stats.total_hours')}
               value={circle.total_hours_received}
               icon={Clock}
-              color="primary"
             />
             <StatCard
               label={t('admin.recipient_circle.stats.active_supporters')}
@@ -272,13 +270,13 @@ export default function CareRecipientCirclePage() {
           <Separator />
 
           {/* Support Relationships table */}
-          <Card shadow="none" className="border border-divider/70 shadow-sm shadow-black/[0.03]">
+          <Card  className="border border-divider/70 shadow-sm shadow-black/[0.03]">
             <CardHeader>
               <span className="font-semibold text-sm">{t('admin.recipient_circle.relationships.title')}</span>
             </CardHeader>
             <CardBody className="p-0">
               {circle.support_relationships.length === 0 ? (
-                <div className="flex flex-col items-center gap-2 py-10 text-default-500">
+                <div className="flex flex-col items-center gap-2 py-10 text-muted">
                   <Users2 size={36} className="opacity-30" />
                   <p className="text-sm">{t('admin.recipient_circle.relationships.empty')}</p>
                 </div>
@@ -304,12 +302,12 @@ export default function CareRecipientCirclePage() {
                       <TableRow key={rel.id}>
                         <TableCell>
                           <div className="font-medium text-sm">{rel.supporter.name}</div>
-                          <div className="text-xs text-default-400">{t('admin.recipient_circle.member_id_value', { id: rel.supporter.id })}</div>
+                          <div className="text-xs text-muted">{t('admin.recipient_circle.member_id_value', { id: rel.supporter.id })}</div>
                         </TableCell>
                         <TableCell>
                           <Chip
                             color={tierColor(rel.supporter.trust_tier)}
-                            variant="flat"
+                            variant="soft"
                             size="sm"
                           >
                             {tierLabel(rel.supporter.trust_tier)}
@@ -319,7 +317,7 @@ export default function CareRecipientCirclePage() {
                         <TableCell className="text-sm font-mono">
                           {rel.hours_logged.toLocaleString()}
                         </TableCell>
-                        <TableCell className="text-sm text-default-500 whitespace-nowrap">
+                        <TableCell className="text-sm text-muted whitespace-nowrap">
                           {fmtDate(rel.last_activity_at, t('admin.common.empty_dash'))}
                         </TableCell>
                         <TableCell>
@@ -331,7 +329,7 @@ export default function CareRecipientCirclePage() {
                                   ? 'warning'
                                   : 'default'
                             }
-                            variant="flat"
+                            variant="soft"
                             size="sm"
                           >
                             {statusLabel(rel.status)}

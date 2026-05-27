@@ -176,7 +176,7 @@ export function ProvisioningRequestsPage() {
         actions={
           <Button
             size="sm"
-            variant="flat"
+            variant="tertiary"
             startContent={<RefreshCw className="w-4 h-4" />}
             onPress={load}
             isLoading={loading}
@@ -226,7 +226,7 @@ export function ProvisioningRequestsPage() {
                       {req.country_code}{req.region_or_canton ? ` · ${req.region_or_canton}` : ''}
                     </p>
                   </div>
-                  <Chip size="sm" color={statusColor(req.status)} variant="flat">{req.status}</Chip>
+                  <Chip size="sm" color={statusColor(req.status)} variant="soft">{req.status}</Chip>
                 </div>
                 <p className="text-xs text-gray-500 truncate">
                   <Globe className="inline w-3 h-3 mr-1" />/{req.requested_slug}
@@ -249,7 +249,7 @@ export function ProvisioningRequestsPage() {
               <ModalHeader className="flex items-center gap-2">
                 <Building className="w-5 h-5 text-indigo-500" />
                 {selected.org_name}
-                <Chip size="sm" color={statusColor(selected.status)} variant="flat">
+                <Chip size="sm" color={statusColor(selected.status)} variant="soft">
                   {selected.status}
                 </Chip>
               </ModalHeader>
@@ -338,12 +338,11 @@ export function ProvisioningRequestsPage() {
                 </div>
               </ModalBody>
               <ModalFooter className="flex flex-wrap gap-2 justify-end">
-                <Button variant="light" onPress={detail.onClose}>{t('close')}</Button>
+                <Button variant="tertiary" onPress={detail.onClose}>{t('close')}</Button>
                 {(selected.status === 'pending' || selected.status === 'under_review') && (
                   <>
                     <Button
-                      color="danger"
-                      variant="flat"
+                      variant="danger"
                       startContent={<XCircle className="w-4 h-4" />}
                       isLoading={actionInFlight}
                       onPress={handleReject}

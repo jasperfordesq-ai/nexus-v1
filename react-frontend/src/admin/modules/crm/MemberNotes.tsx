@@ -274,7 +274,7 @@ export function MemberNotes() {
         title={t('crm.member_notes_title')}
         description={t('crm.member_notes_desc')}
         actions={
-          <Button color="primary" startContent={<Plus size={16} />} onPress={openCreateModal}>
+          <Button startContent={<Plus size={16} />} onPress={openCreateModal}>
             {t('crm.add_note')}
           </Button>
         }
@@ -334,7 +334,7 @@ export function MemberNotes() {
         {(filterCategory || filterUserId || searchQuery) && (
           <Button
             size="sm"
-            variant="flat"
+            variant="tertiary"
             onPress={() => {
               setFilterCategory('');
               setFilterUserId('');
@@ -356,9 +356,9 @@ export function MemberNotes() {
       ) : notes.length === 0 ? (
         <Card>
           <CardBody className="flex flex-col items-center py-16 text-center">
-            <StickyNote size={48} className="text-default-300 mb-4" />
-            <p className="text-default-500 text-lg font-medium">{t('crm.no_notes_found')}</p>
-            <p className="text-default-400 text-sm mt-1">
+            <StickyNote size={48} className="text-muted mb-4" />
+            <p className="text-muted text-lg font-medium">{t('crm.no_notes_found')}</p>
+            <p className="text-muted text-sm mt-1">
               {filterCategory || filterUserId
                 ? t('crm.no_notes_hint_filtered')
                 : t('crm.no_notes_hint_default')}
@@ -384,13 +384,13 @@ export function MemberNotes() {
                     >
                       {note.user_name}
                     </Link>
-                    <p className="text-xs text-default-400">
+                    <p className="text-xs text-muted">
                       {t('crm.user_with_id', { id: note.user_id })}
                     </p>
                   </div>
                   <Chip
                     size="sm"
-                    variant="flat"
+                    variant="soft"
                     color={CATEGORY_COLORS[note.category] || 'default'}
                   >
                     {getCategoryLabel(note.category)}
@@ -401,7 +401,7 @@ export function MemberNotes() {
                 </div>
                 <Dropdown>
                   <DropdownTrigger>
-                    <Button isIconOnly size="sm" variant="light" aria-label={t('crm.label_note_actions')}>
+                    <Button isIconOnly size="sm" variant="tertiary" aria-label={t('crm.label_note_actions')}>
                       <MoreVertical size={16} />
                     </Button>
                   </DropdownTrigger>
@@ -423,7 +423,7 @@ export function MemberNotes() {
                       key="delete" id="delete"
                       startContent={<Trash2 size={14} />}
                       className="text-danger"
-                      color="danger"
+                      variant="danger"
                     >
                       {t('crm.note_action_delete')}
                     </DropdownItem>
@@ -431,8 +431,8 @@ export function MemberNotes() {
                 </Dropdown>
               </CardHeader>
               <CardBody className="pt-0">
-                <p className="text-default-700 whitespace-pre-wrap">{note.content}</p>
-                <div className="flex items-center gap-2 mt-3 text-xs text-default-400">
+                <p className="text-foreground whitespace-pre-wrap">{note.content}</p>
+                <div className="flex items-center gap-2 mt-3 text-xs text-muted">
                   <span>{t('crm.note_by')} {note.author_name}</span>
                   <span>·</span>
                   <span>{formatDate(note.created_at)}</span>
@@ -516,10 +516,10 @@ export function MemberNotes() {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={formModal.onClose} isDisabled={saving}>
+            <Button variant="tertiary" onPress={formModal.onClose} isDisabled={saving}>
               {t('crm.action_cancel')}
             </Button>
-            <Button color="primary" onPress={handleSave} isLoading={saving} isDisabled={saving}>
+            <Button onPress={handleSave} isLoading={saving} isDisabled={saving}>
               {editingNote ? t('crm.update_note') : t('crm.create_note')}
             </Button>
           </ModalFooter>

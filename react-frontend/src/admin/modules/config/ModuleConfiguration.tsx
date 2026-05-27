@@ -134,10 +134,10 @@ export default function ModuleConfiguration() {
         description={t('config.module_configuration_desc')}
         actions={
           <div className="flex items-center gap-2">
-            <Chip color="warning" variant="flat" size="sm" startContent={<Construction size={14} />}>
+            <Chip color="warning" variant="soft" size="sm" startContent={<Construction size={14} />}>
               {t('config.beta')}
             </Chip>
-            <Button variant="flat" size="sm" startContent={<RefreshCw size={16} />} onPress={loadConfig}>
+            <Button variant="tertiary" size="sm" startContent={<RefreshCw size={16} />} onPress={loadConfig}>
               {t('common.refresh')}
             </Button>
           </div>
@@ -148,7 +148,7 @@ export default function ModuleConfiguration() {
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
         <Input
           size="sm"
-          variant="bordered"
+          variant="secondary"
           type="text"
           autoComplete="off"
           data-form-type="other"
@@ -156,7 +156,7 @@ export default function ModuleConfiguration() {
           data-bwignore="true"
           data-1p-ignore=""
           placeholder={t('config.search_modules')}
-          startContent={<Search size={16} className="text-default-400" />}
+          startContent={<Search size={16} className="text-muted" />}
           value={searchQuery}
           onValueChange={(val) => {
             // Reject autofill injections — module names never contain @
@@ -167,7 +167,7 @@ export default function ModuleConfiguration() {
           isClearable
           onClear={() => setSearchQuery('')}
         />
-        <ButtonGroup size="sm" variant="flat">
+        <ButtonGroup size="sm" variant="tertiary">
           <Button
             color={filterType === 'all' ? 'primary' : 'default'}
             onPress={() => setFilterType('all')}
@@ -236,11 +236,11 @@ export default function ModuleConfiguration() {
 
       {/* No results */}
       {!loading && filteredCore.length === 0 && filteredFeatures.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-16 text-default-400">
+        <div className="flex flex-col items-center justify-center py-16 text-muted">
           <Search size={48} className="mb-4" />
           <p className="text-lg">{t('config.no_modules_match')}</p>
           <Button
-            variant="light"
+            variant="tertiary"
             size="sm"
             className="mt-2"
             onPress={() => { setSearchQuery(''); setFilterType('all'); }}
@@ -254,7 +254,7 @@ export default function ModuleConfiguration() {
       {!loading && !searchQuery && (
         <section className="mt-10">
           <h2 className="text-lg font-semibold mb-1">{t('config.platform_infrastructure')}</h2>
-          <p className="text-sm text-default-500 mb-4">
+          <p className="text-sm text-muted mb-4">
             {t('config.platform_infrastructure_desc')}
           </p>
           <PlatformInfrastructure config={config} onConfigChange={setConfig} />

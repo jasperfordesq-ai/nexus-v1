@@ -225,7 +225,7 @@ export default function RegionalPointsAdminPage() {
         actions={
           <Button
             size="sm"
-            variant="bordered"
+            variant="secondary"
             startContent={<RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />}
             onPress={() => void loadAll()}
             isDisabled={refreshing}
@@ -236,16 +236,16 @@ export default function RegionalPointsAdminPage() {
       />
 
       {/* Intro card */}
-      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" >
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('admin.regional_points.about.title')}</p>
-              <p className="text-default-600">
+              <p className="text-muted">
                 {t('admin.regional_points.about.body')}
               </p>
-              <p className="text-default-500">
+              <p className="text-muted">
                 {t('admin.regional_points.about.secondary')}
               </p>
             </div>
@@ -271,13 +271,11 @@ export default function RegionalPointsAdminPage() {
           icon={SlidersHorizontal}
           label={t('admin.regional_points.stats.lifetime_spent')}
           value={Number(stats.total_spent ?? 0).toFixed(2)}
-          color="primary"
         />
         <StatCard
           icon={Coins}
           label={t('admin.regional_points.stats.member_accounts')}
           value={String(stats.total_accounts ?? 0)}
-          color="default"
         />
       </div>
 
@@ -292,7 +290,7 @@ export default function RegionalPointsAdminPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium">{t('admin.regional_points.config.enabled')}</p>
-              <p className="text-xs text-default-500">
+              <p className="text-xs text-muted">
                 {t('admin.regional_points.config.enabled_hint')}
               </p>
             </div>
@@ -321,7 +319,7 @@ export default function RegionalPointsAdminPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium">{t('admin.regional_points.config.auto_issue')}</p>
-              <p className="text-xs text-default-500">
+              <p className="text-xs text-muted">
                 {t('admin.regional_points.config.auto_issue_hint')}
               </p>
             </div>
@@ -349,7 +347,7 @@ export default function RegionalPointsAdminPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium">{t('admin.regional_points.config.member_transfers')}</p>
-              <p className="text-xs text-default-500">{t('admin.regional_points.config.member_transfers_hint')}</p>
+              <p className="text-xs text-muted">{t('admin.regional_points.config.member_transfers_hint')}</p>
             </div>
             <Switch
               isSelected={config.member_transfers_enabled}
@@ -361,7 +359,7 @@ export default function RegionalPointsAdminPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium">{t('admin.regional_points.config.marketplace_redemption')}</p>
-              <p className="text-xs text-default-500">
+              <p className="text-xs text-muted">
                 {t('admin.regional_points.config.marketplace_redemption_hint')}
               </p>
             </div>
@@ -376,7 +374,6 @@ export default function RegionalPointsAdminPage() {
 
           <div className="flex justify-end">
             <Button
-              color="primary"
               startContent={<Save className="w-4 h-4" />}
               onPress={() => void handleSaveConfig()}
               isLoading={savingConfig}
@@ -426,7 +423,6 @@ export default function RegionalPointsAdminPage() {
                   />
                   <div className="flex justify-end">
                     <Button
-                      color="primary"
                       onPress={() => void handleIssue()}
                       isLoading={submittingIssue}
                     >
@@ -471,7 +467,7 @@ export default function RegionalPointsAdminPage() {
         <CardHeader className="flex items-center gap-2">
           <Coins className="w-5 h-5 text-warning" />
           <h2 className="text-base font-semibold">{t('admin.regional_points.ledger.title')}</h2>
-          <Chip size="sm" variant="flat" className="ml-auto">
+          <Chip size="sm" variant="soft" className="ml-auto">
             {items.length}
           </Chip>
         </CardHeader>
@@ -496,11 +492,11 @@ export default function RegionalPointsAdminPage() {
                     {row.user_name || t('admin.regional_points.ledger.user_fallback', { id: row.user_id })}
                   </TableCell>
                   <TableCell className="text-sm">
-                    <Chip size="sm" variant="flat">
+                    <Chip size="sm" variant="soft">
                       {row.type}
                     </Chip>
                   </TableCell>
-                  <TableCell className="hidden text-sm text-default-600 md:table-cell">
+                  <TableCell className="hidden text-sm text-muted md:table-cell">
                     {row.description || t('admin.common.empty_dash')}
                   </TableCell>
                   <TableCell
@@ -511,7 +507,7 @@ export default function RegionalPointsAdminPage() {
                     {row.direction === 'in' ? '+' : '-'}
                     {row.points.toFixed(2)}
                   </TableCell>
-                  <TableCell className="hidden text-right text-sm tabular-nums text-default-500 md:table-cell">
+                  <TableCell className="hidden text-right text-sm tabular-nums text-muted md:table-cell">
                     {row.balance_after.toFixed(2)}
                   </TableCell>
                 </TableRow>

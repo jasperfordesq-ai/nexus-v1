@@ -225,7 +225,7 @@ export function FederationAuditLog() {
       label: t('super.label_timestamp'),
       sortable: true,
       render: (entry) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {new Date(entry.created_at).toLocaleString()}
         </span>
       ),
@@ -236,7 +236,7 @@ export function FederationAuditLog() {
       render: (entry) => {
         const cat = categorizeAction(entry.action_type);
         return (
-          <Chip size="sm" variant="flat" color={categoryColorMap[cat] || 'primary'}>
+          <Chip size="sm" variant="soft" color={categoryColorMap[cat] || 'primary'}>
             {t(`super.cat_${cat}`)}
           </Chip>
         );
@@ -248,7 +248,7 @@ export function FederationAuditLog() {
       render: (entry) => {
         const lvl = inferLevel(entry.action_type);
         return (
-          <Chip size="sm" variant="flat" color={levelColorMap[lvl] || 'primary'}>
+          <Chip size="sm" variant="soft" color={levelColorMap[lvl] || 'primary'}>
             {t(`super.level_${lvl}`)}
           </Chip>
         );
@@ -265,7 +265,7 @@ export function FederationAuditLog() {
       key: 'actor',
       label: t('super.label_actor'),
       render: (entry) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {entry.actor_name || t('super.user_with_id', { id: entry.actor_id })}
         </span>
       ),
@@ -279,7 +279,7 @@ export function FederationAuditLog() {
         description={t('super.federation_audit_log_desc')}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             size="sm"
             startContent={<Download size={16} />}
             onPress={exportCsv}
@@ -296,7 +296,6 @@ export function FederationAuditLog() {
           label={t('super.label_total_actions_30d')}
           value={stats.total}
           icon={Activity}
-          color="primary"
           loading={loading && stats.total === 0}
         />
         <StatCard
@@ -310,7 +309,6 @@ export function FederationAuditLog() {
           label={t('super.label_partnership_actions')}
           value={stats.partnerships}
           icon={Handshake}
-          color="secondary"
           loading={loading && stats.total === 0}
         />
         <StatCard
@@ -385,8 +383,7 @@ export function FederationAuditLog() {
         {hasFilters && (
           <Button
             size="sm"
-            variant="light"
-            color="danger"
+            variant="danger"
             startContent={<X size={14} />}
           onPress={clearFilters}
         >

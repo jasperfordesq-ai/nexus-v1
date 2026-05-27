@@ -410,12 +410,12 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
             <div className="flex items-center gap-2">
               <span>{moduleName}</span>
               {!isEditable && (
-                <Chip size="sm" variant="flat" color="warning" startContent={<Construction size={12} />}>
+                <Chip size="sm" variant="soft" color="warning" startContent={<Construction size={12} />}>
                   {t('config.beta')}
                 </Chip>
               )}
             </div>
-            <p className="text-sm font-normal text-default-500">{moduleDesc}</p>
+            <p className="text-sm font-normal text-muted">{moduleDesc}</p>
           </div>
         </ModalHeader>
 
@@ -429,18 +429,17 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
 
           {/* Link-out: onboarding */}
           {isLinkOut && (
-            <Card className="bg-default-50">
+            <Card className="bg-surface-secondary">
               <CardBody className="flex flex-col items-center gap-4 py-8">
-                <Info size={40} className="text-default-400" />
+                <Info size={40} className="text-muted" />
                 <div className="text-center">
-                  <p className="text-sm text-default-600">
+                  <p className="text-sm text-muted">
                     {t('config.modal_onboarding_desc')}
                   </p>
                 </div>
                 {module.detailPageUrl && (
                   <Button
-                    color="primary"
-                    variant="flat"
+                    variant="tertiary"
                     startContent={<ExternalLink size={16} />}
                     onPress={handleNavigateToDetail}
                   >
@@ -467,9 +466,9 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
           {!isLinkOut && (!isEditable || !loading) && categories.map(category => {
             const categoryOptions = module.configOptions.filter(o => o.category === category);
             return (
-              <div key={category} className="mb-5 rounded-lg border border-default-200 bg-default-50/50">
+              <div key={category} className="mb-5 rounded-lg border border-border bg-surface-secondary/50">
                 <div className="px-5 pt-4 pb-1">
-                  <h4 className="text-sm font-semibold text-default-700">{getCategoryLabel(t, category)}</h4>
+                  <h4 className="text-sm font-semibold text-foreground">{getCategoryLabel(t, category)}</h4>
                 </div>
                 <div className="px-5 pb-4">
                   {categoryOptions.map((option, idx) => {
@@ -524,7 +523,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
           {isBroker && module.detailPageUrl && (
             <div className="flex justify-center pt-2">
               <Button
-                variant="light"
+                variant="tertiary"
                 size="sm"
                 startContent={<ExternalLink size={14} />}
                 onPress={handleNavigateToDetail}
@@ -536,12 +535,11 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
         </ModalBody>
 
         <ModalFooter>
-          <Button variant="flat" onPress={onClose}>
+          <Button variant="tertiary" onPress={onClose}>
             {isEditable && hasChanges ? t('config.cancel') : t('config.close')}
           </Button>
           {isEditable && (
             <Button
-              color="primary"
               startContent={<Save size={16} />}
               isLoading={saving}
               isDisabled={!hasChanges || (isBroker && !brokerConfig) || (isGroupConfig && !groupConfig) || (isListingConfig && !listingConfig) || (isVolunteeringConfig && !volunteeringConfig) || (isJobConfig && !jobConfig) || (isIdentityConfig && !identityConfig)}
@@ -578,10 +576,10 @@ function ConfigOptionRow({ option, value, onChange, disabled }: ConfigOptionRowP
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-sm font-medium">{label}</span>
           {option.comingSoon && (
-            <Chip size="sm" variant="flat" color="warning">{t('config.coming_soon')}</Chip>
+            <Chip size="sm" variant="soft" color="warning">{t('config.coming_soon')}</Chip>
           )}
         </div>
-        <p className="text-xs text-default-500 mt-1 leading-relaxed">{description}</p>
+        <p className="text-xs text-muted mt-1 leading-relaxed">{description}</p>
       </div>
       <div className="flex-shrink-0 pt-0.5">
         {option.type === 'boolean' && (
@@ -597,7 +595,7 @@ function ConfigOptionRow({ option, value, onChange, disabled }: ConfigOptionRowP
           <Input
             type="number"
             size="sm"
-            variant="bordered"
+            variant="secondary"
             className="w-28"
             value={String(value)}
             min={option.min}
@@ -610,7 +608,7 @@ function ConfigOptionRow({ option, value, onChange, disabled }: ConfigOptionRowP
         {option.type === 'string' && (
           <Input
             size="sm"
-            variant="bordered"
+            variant="secondary"
             className="w-56"
             value={value as string}
             isDisabled={disabled}
@@ -621,7 +619,7 @@ function ConfigOptionRow({ option, value, onChange, disabled }: ConfigOptionRowP
         {option.type === 'select' && option.choices && (
           <Select
             size="sm"
-            variant="bordered"
+            variant="secondary"
             className="w-40"
             selectedKeys={[value as string]}
             isDisabled={disabled}

@@ -112,8 +112,8 @@ export default function AdminHelpCenterPage() {
           placeholder={t('admin_help.search_placeholder', { count: totalArticles })}
           value={query}
           onValueChange={setQuery}
-          startContent={<SearchIcon size={16} className="text-default-400 shrink-0" />}
-          variant="bordered"
+          startContent={<SearchIcon size={16} className="text-muted shrink-0" />}
+          variant="secondary"
           size="md"
           aria-label={t('admin_help.search_aria')}
           isClearable
@@ -123,7 +123,7 @@ export default function AdminHelpCenterPage() {
 
       {/* Empty state */}
       {isEmpty && (
-        <div className="flex flex-col items-center gap-3 py-16 text-center text-default-400">
+        <div className="flex flex-col items-center gap-3 py-16 text-center text-muted">
           <SearchIcon size={40} className="opacity-40" />
           <p className="text-sm">{t('admin_help.no_matches')}</p>
         </div>
@@ -137,7 +137,7 @@ export default function AdminHelpCenterPage() {
               <h2 className="text-base font-semibold text-foreground">{t(categoryKey(category))}</h2>
               <Chip
                 size="sm"
-                variant="flat"
+                variant="soft"
                 color={CATEGORY_CHIP_COLOR[category]}
               >
                 {articles.length}
@@ -159,13 +159,12 @@ export default function AdminHelpCenterPage() {
                     </span>
                   </CardHeader>
                   <CardBody className="flex flex-col gap-3 pt-0">
-                    <p className="line-clamp-2 text-xs text-default-500 leading-relaxed">
+                    <p className="line-clamp-2 text-xs text-muted leading-relaxed">
                       {article.summary}
                     </p>
                     <Button
                       size="sm"
-                      variant="flat"
-                      color="primary"
+                      variant="tertiary"
                       className="self-start"
                       onPress={() => navigate(tenantPath(path))}
                       startContent={<HelpCircle size={14} />}

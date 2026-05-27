@@ -126,7 +126,7 @@ export default function GroupTypes() {
             {t('groups.group_types_desc')}
           </p>
         </div>
-        <Button color="primary" startContent={<Plus className="w-4 h-4" />} onPress={onCreateOpen}>
+        <Button startContent={<Plus className="w-4 h-4" />} onPress={onCreateOpen}>
           {t('groups.create_type')}
         </Button>
       </div>
@@ -172,8 +172,7 @@ export default function GroupTypes() {
                   <div className="flex items-center gap-2">
                     <Button
                       size="sm"
-                      variant="flat"
-                      color="primary"
+                      variant="tertiary"
                       startContent={<Settings className="w-3 h-3" />}
                       onPress={() => openPolicies(type)}
                     >
@@ -181,7 +180,7 @@ export default function GroupTypes() {
                     </Button>
                     <Button
                       size="sm"
-                      variant="flat"
+                      variant="tertiary"
                       isIconOnly
                       aria-label={t('groups.label_edit_group_type')}
                       onPress={() => openEdit(type)}
@@ -190,8 +189,7 @@ export default function GroupTypes() {
                     </Button>
                     <Button
                       size="sm"
-                      variant="flat"
-                      color="danger"
+                      variant="danger"
                       isIconOnly
                       aria-label={t('groups.label_delete_group_type')}
                       onPress={() => handleDelete(type.id)}
@@ -239,10 +237,10 @@ export default function GroupTypes() {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={onCreateClose}>
+            <Button variant="tertiary" onPress={onCreateClose}>
               {t('groups.edit_cancel')}
             </Button>
-            <Button color="primary" onPress={handleCreate}>
+            <Button onPress={handleCreate}>
               {t('groups.create')}
             </Button>
           </ModalFooter>
@@ -282,10 +280,10 @@ export default function GroupTypes() {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={onEditClose}>
+            <Button variant="tertiary" onPress={onEditClose}>
               {t('groups.edit_cancel')}
             </Button>
-            <Button color="primary" onPress={handleEdit}>
+            <Button onPress={handleEdit}>
               {t('groups.save')}
             </Button>
           </ModalFooter>

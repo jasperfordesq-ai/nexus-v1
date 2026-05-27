@@ -241,7 +241,7 @@ export function VolunteerApprovals() {
           <Avatar name={`${item.first_name} ${item.last_name}`} size="sm" className="ring-2 ring-surface" />
           <div>
             <p className="font-medium text-foreground">{item.first_name} {item.last_name}</p>
-            <p className="text-xs text-default-500">{item.email}</p>
+            <p className="text-xs text-muted">{item.email}</p>
           </div>
         </div>
       ),
@@ -253,7 +253,7 @@ export function VolunteerApprovals() {
     },
     {
       key: 'created_at', label: t('volunteering.col_applied'), sortable: true,
-      render: (item) => <span className="text-sm text-default-500">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}</span>,
+      render: (item) => <span className="text-sm text-muted">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}</span>,
     },
     {
       key: 'actions', label: t('volunteering.col_actions'),
@@ -263,7 +263,7 @@ export function VolunteerApprovals() {
             <>
               <Button
                 size="sm"
-                variant="flat"
+                variant="tertiary"
                 color="success"
                 startContent={<CheckCircle size={14} />}
                 onPress={() => handleApprove(item.id)}
@@ -274,8 +274,7 @@ export function VolunteerApprovals() {
               </Button>
               <Button
                 size="sm"
-                variant="flat"
-                color="danger"
+                variant="danger"
                 startContent={<XCircle size={14} />}
                 onPress={() => handleDecline(item.id)}
                 isLoading={actionId === item.id}
@@ -320,7 +319,7 @@ export function VolunteerApprovals() {
           <Input type="search" name="admin-search" autoComplete="off"
             className="max-w-xs"
             placeholder={t('volunteering.search_applicants')}
-            startContent={<Search size={16} className="text-default-400" />}
+            startContent={<Search size={16} className="text-muted" />}
             value={searchQuery}
             onValueChange={setSearchQuery}
             isClearable
@@ -355,7 +354,7 @@ export function VolunteerApprovals() {
               onValueChange={handleSelectAll}
               size="sm"
             >
-              <span className="text-xs text-default-500">
+              <span className="text-xs text-muted">
                 {selectedIds.size > 0
                   ? t('volunteering.selected_count', { count: selectedIds.size })
                   : t('volunteering.select_all')}
@@ -368,7 +367,7 @@ export function VolunteerApprovals() {
             <>
               <Button
                 size="sm"
-                variant="flat"
+                variant="tertiary"
                 color="success"
                 startContent={<CheckCircle size={14} />}
                 onPress={handleBulkApprove}
@@ -378,8 +377,7 @@ export function VolunteerApprovals() {
               </Button>
               <Button
                 size="sm"
-                variant="flat"
-                color="danger"
+                variant="danger"
                 startContent={<XCircle size={14} />}
                 onPress={handleBulkDecline}
                 isLoading={bulkLoading}
@@ -392,7 +390,7 @@ export function VolunteerApprovals() {
           {/* Export */}
           <Button
             size="sm"
-            variant="flat"
+            variant="tertiary"
             startContent={<Download size={14} />}
             onPress={handleExport}
             isDisabled={filteredItems.length === 0}
@@ -418,7 +416,7 @@ export function VolunteerApprovals() {
       <PageHeader
         title={t('volunteering.volunteer_approvals_title')}
         description={t('volunteering.volunteer_approvals_desc')}
-        actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('volunteering.refresh')}</Button>}
+        actions={<Button variant="tertiary" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('volunteering.refresh')}</Button>}
       />
       <DataTable
         columns={columns}

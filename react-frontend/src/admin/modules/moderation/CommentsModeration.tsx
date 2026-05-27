@@ -145,7 +145,7 @@ export default function CommentsModeration() {
           />
           <div className="flex flex-col">
             <span className="text-sm font-medium">{comment.user_name}</span>
-            <span className="text-xs text-default-400">{t('moderation.member_id', { id: comment.user_id })}</span>
+            <span className="text-xs text-muted">{t('moderation.member_id', { id: comment.user_id })}</span>
           </div>
         </div>
       </TableCell>,
@@ -154,7 +154,7 @@ export default function CommentsModeration() {
     if (isSuperAdmin) {
       cells.push(
         <TableCell key="tenant">
-          <Chip size="sm" variant="flat" color="secondary">
+          <Chip size="sm" variant="soft">
             {comment.tenant_name}
           </Chip>
         </TableCell>
@@ -166,19 +166,19 @@ export default function CommentsModeration() {
         <div className="max-w-md">
           <p className="text-sm line-clamp-2">{comment.content}</p>
           {comment.is_flagged && (
-            <Chip size="sm" color="warning" variant="flat" className="mt-1">
+            <Chip size="sm" color="warning" variant="soft" className="mt-1">
               {t('moderation.flagged')}
             </Chip>
           )}
         </div>
       </TableCell>,
       <TableCell key="contentType">
-        <Chip size="sm" variant="flat">
+        <Chip size="sm" variant="soft">
           {t(`moderation.content_type_${comment.content_type || 'comment'}`)}
         </Chip>
       </TableCell>,
       <TableCell key="created">
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {new Date(comment.created_at).toLocaleDateString()}
         </span>
       </TableCell>,
@@ -186,7 +186,7 @@ export default function CommentsModeration() {
         <div className="flex items-center gap-2">
           <Button
             size="sm"
-            variant="flat"
+            variant="tertiary"
             color="warning"
             startContent={<EyeOff className="w-4 h-4" />}
             onPress={() => setConfirmAction({ type: 'hide', comment })}
@@ -195,8 +195,7 @@ export default function CommentsModeration() {
           </Button>
           <Button
             size="sm"
-            variant="flat"
-            color="danger"
+            variant="danger"
             startContent={<Trash2 className="w-4 h-4" />}
             onPress={() => setConfirmAction({ type: 'delete', comment })}
           >
@@ -234,8 +233,7 @@ export default function CommentsModeration() {
         description={isSuperAdmin ? t('moderation.comments_desc_super') : t('moderation.comments_desc')}
         actions={
           <Button
-            color="primary"
-            variant="flat"
+            variant="tertiary"
             startContent={<RefreshCw className="w-4 h-4" />}
             onPress={() => execute()}
             isLoading={isLoading}
@@ -253,7 +251,7 @@ export default function CommentsModeration() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-          startContent={<Search className="w-4 h-4 text-default-400" />}
+          startContent={<Search className="w-4 h-4 text-muted" />}
           className="flex-1"
         />
         <Select
@@ -286,10 +284,10 @@ export default function CommentsModeration() {
           </Select>
         )}
         <div className="flex gap-2">
-          <Button color="primary" onPress={handleSearch}>
+          <Button onPress={handleSearch}>
             {t('moderation.apply')}
           </Button>
-          <Button variant="flat" onPress={handleClear}>
+          <Button variant="tertiary" onPress={handleClear}>
             {t('moderation.clear')}
           </Button>
         </div>
@@ -297,7 +295,7 @@ export default function CommentsModeration() {
 
       {/* Stats */}
       {meta && (
-        <div className="text-sm text-default-500">
+        <div className="text-sm text-muted">
           {t('moderation.showing_count')}
           {isSuperAdmin && !activeTenant && ` (${t('moderation.all_tenants')})`}
         </div>
@@ -322,7 +320,7 @@ export default function CommentsModeration() {
           isLoading={isLoading}
           loadingContent={<Spinner />}
           emptyContent={
-            <div className="text-center py-8 text-default-400">
+            <div className="text-center py-8 text-muted">
               {activeSearch || activeContentType
                 ? t('moderation.no_comments_match_filters')
                 : t('moderation.no_comments_to_moderate')}
@@ -345,7 +343,6 @@ export default function CommentsModeration() {
             page={page}
             onChange={setPage}
             showControls
-            color="primary"
           />
         </div>
       )}

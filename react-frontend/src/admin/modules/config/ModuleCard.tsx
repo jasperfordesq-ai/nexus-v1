@@ -36,7 +36,7 @@ export default function ModuleCard({ module, enabled, onToggle, onConfigure, tog
   const moduleDesc = translatedDesc === descKey ? module.description : translatedDesc;
 
   return (
-    <Card shadow="sm" className="h-full">
+    <Card  className="h-full">
       <CardBody className={`p-4 flex flex-col gap-3 ${!enabled ? 'opacity-60' : ''}`}>
         {/* Header: icon + name + toggle */}
         <div className="flex items-start gap-3">
@@ -61,7 +61,7 @@ export default function ModuleCard({ module, enabled, onToggle, onConfigure, tog
                 className="flex-shrink-0"
               />
             </div>
-            <p className="text-xs text-default-500 line-clamp-2 mt-0.5">{moduleDesc}</p>
+            <p className="text-xs text-muted line-clamp-2 mt-0.5">{moduleDesc}</p>
           </div>
         </div>
 
@@ -69,22 +69,22 @@ export default function ModuleCard({ module, enabled, onToggle, onConfigure, tog
         <div className="flex items-center justify-between mt-auto pt-2">
           <div className="flex items-center gap-1.5">
             {optionCount > 0 ? (
-              <Chip size="sm" variant="flat" color={liveCount > 0 ? 'primary' : 'default'}>
+              <Chip size="sm" variant="soft" color={liveCount > 0 ? 'primary' : 'default'}>
                 {liveCount > 0
                   ? t('config.option_count', { count: liveCount })
                   : t('config.planned_count', { count: optionCount })}
               </Chip>
             ) : (
-              <Chip size="sm" variant="flat" color="default">{t('config.no_options')}</Chip>
+              <Chip size="sm" variant="soft">{t('config.no_options')}</Chip>
             )}
             {module.type === 'core' && (
-              <Chip size="sm" variant="flat" color="secondary">{t('config.core')}</Chip>
+              <Chip size="sm" variant="soft">{t('config.core')}</Chip>
             )}
           </div>
           {optionCount > 0 && (
             <Button
               size="sm"
-              variant="flat"
+              variant="tertiary"
               startContent={<Settings2 size={14} />}
               onPress={() => onConfigure(module)}
             >

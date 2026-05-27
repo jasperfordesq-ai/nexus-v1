@@ -89,7 +89,7 @@ export function Segments() {
         <div>
           <p className="font-medium text-foreground">{item.name}</p>
           {item.description && (
-            <p className="text-xs text-default-400 mt-0.5 line-clamp-1">{item.description}</p>
+            <p className="text-xs text-muted mt-0.5 line-clamp-1">{item.description}</p>
           )}
         </div>
       ),
@@ -100,7 +100,7 @@ export function Segments() {
       render: (item) => (
         <Chip
           size="sm"
-          variant="flat"
+          variant="soft"
           color={item.is_active ? 'success' : 'default'}
         >
           {item.is_active ? t('segment_form.status_active') : t('segment_form.status_inactive')}
@@ -111,7 +111,7 @@ export function Segments() {
       key: 'match_type',
       label: t('segment_form.label_match_logic'),
       render: (item) => (
-        <Chip size="sm" variant="flat" color="primary">
+        <Chip size="sm" variant="soft">
           {item.match_type === 'any' ? t('newsletter_segments.match_any') : t('newsletter_segments.match_all')}
         </Chip>
       ),
@@ -122,7 +122,7 @@ export function Segments() {
       sortable: true,
       render: (item) => (
         <div className="flex items-center gap-1.5">
-          <Users size={14} className="text-default-400" />
+          <Users size={14} className="text-muted" />
           <span>{(item.subscriber_count || 0).toLocaleString()}</span>
         </div>
       ),
@@ -132,7 +132,7 @@ export function Segments() {
       label: t('newsletter_segments.col_created'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}
         </span>
       ),
@@ -144,7 +144,7 @@ export function Segments() {
         <div className="flex justify-end">
           <Dropdown>
             <DropdownTrigger>
-              <Button isIconOnly size="sm" variant="light" aria-label={t('newsletters.col_actions')}>
+              <Button isIconOnly size="sm" variant="tertiary" aria-label={t('newsletters.col_actions')}>
                 <MoreVertical size={16} />
               </Button>
             </DropdownTrigger>
@@ -160,7 +160,7 @@ export function Segments() {
                 key="delete" id="delete"
                 startContent={<Trash2 size={14} />}
                 className="text-danger"
-                color="danger"
+                variant="danger"
                 onPress={() => {
                   setDeleteTarget(item);
                   onDeleteOpen();
@@ -183,7 +183,6 @@ export function Segments() {
           description={t('newsletter_segments.description')}
           actions={
             <Button
-              color="primary"
               startContent={<Plus size={16} />}
               onPress={() => navigate(tenantPath('/admin/newsletters/segments/create'))}
             >
@@ -210,7 +209,7 @@ export function Segments() {
         actions={
           <div className="flex gap-2">
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<RefreshCw size={16} />}
               onPress={loadData}
               isLoading={loading}
@@ -218,7 +217,6 @@ export function Segments() {
               {t('newsletters.refresh')}
             </Button>
             <Button
-              color="primary"
               startContent={<Plus size={16} />}
               onPress={() => navigate(tenantPath('/admin/newsletters/segments/create'))}
             >

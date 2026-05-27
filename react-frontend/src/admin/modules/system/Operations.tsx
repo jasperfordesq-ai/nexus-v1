@@ -81,37 +81,37 @@ export default function Operations() {
         title="Operations"
         description="Cache statistics and background job controls."
         actions={
-          <Button variant="flat" size="sm" startContent={<RefreshCw size={16} />} onPress={load}>
+          <Button variant="tertiary" size="sm" startContent={<RefreshCw size={16} />} onPress={load}>
             Refresh
           </Button>
         }
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card shadow="sm">
+        <Card >
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Database size={18} className="text-warning" />
             <h3 className="font-semibold">Cache</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4 space-y-3">
             <div className="flex justify-between text-sm">
-              <span className="text-default-500">Redis</span>
+              <span className="text-muted">Redis</span>
               <span className={cacheStats?.redis_connected ? 'text-success' : 'text-danger'}>
                 {cacheStats?.redis_connected ? 'Connected' : 'Disconnected'}
               </span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-default-500">Memory used</span>
+              <span className="text-muted">Memory used</span>
               <span>{cacheStats?.redis_memory_used || '—'}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-default-500">Keys</span>
+              <span className="text-muted">Keys</span>
               <span>{cacheStats?.redis_keys_count ?? '—'}</span>
             </div>
             <Separator />
             <Button
               fullWidth
-              variant="flat"
+              variant="tertiary"
               color="warning"
               startContent={<Trash2 size={14} />}
               onPress={handleClearCache}
@@ -122,7 +122,7 @@ export default function Operations() {
           </CardBody>
         </Card>
 
-        <Card shadow="sm">
+        <Card >
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Timer size={18} className="text-accent" />
             <h3 className="font-semibold">Background jobs</h3>
@@ -132,14 +132,14 @@ export default function Operations() {
               <div key={job.id} className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium">{job.name}</p>
-                  <p className="text-xs text-default-400">
+                  <p className="text-xs text-muted">
                     {job.last_run_at ? `Last run: ${new Date(job.last_run_at).toLocaleString()}` : 'Never run'}
                   </p>
                 </div>
                 <Button
                   isIconOnly
                   size="sm"
-                  variant="flat"
+                  variant="tertiary"
                   onPress={() => handleRunJob(job.id)}
                   aria-label={`Run ${job.name}`}
                 >
@@ -147,7 +147,7 @@ export default function Operations() {
                 </Button>
               </div>
             )) : (
-              <p className="text-sm text-default-400">No background jobs configured</p>
+              <p className="text-sm text-muted">No background jobs configured</p>
             )}
           </CardBody>
         </Card>

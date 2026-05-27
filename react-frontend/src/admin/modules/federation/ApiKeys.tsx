@@ -97,41 +97,40 @@ export function ApiKeys() {
     { key: 'name', label: t('federation.col_key_name'), sortable: true },
     {
       key: 'key_prefix', label: t('federation.col_prefix'),
-      render: (item) => <code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">{item.key_prefix}...</code>,
+      render: (item) => <code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">{item.key_prefix}...</code>,
     },
     {
       key: 'status', label: t('federation.col_status'),
       render: (item) => (
-        <Chip size="sm" variant="flat" color={getStatusColor(item)} className="capitalize">{getStatusLabel(item)}</Chip>
+        <Chip size="sm" variant="soft" color={getStatusColor(item)} className="capitalize">{getStatusLabel(item)}</Chip>
       ),
     },
     {
       key: 'scopes', label: t('federation.col_scopes'),
-      render: (item) => <span className="text-sm text-default-500">{Array.isArray(item.scopes) ? item.scopes.join(', ') : '--'}</span>,
+      render: (item) => <span className="text-sm text-muted">{Array.isArray(item.scopes) ? item.scopes.join(', ') : '--'}</span>,
     },
     {
       key: 'expires_at', label: t('federation.col_expires'),
       render: (item) => {
-        if (!item.expires_at) return <span className="text-sm text-default-400">{t('federation.never_expires')}</span>;
+        if (!item.expires_at) return <span className="text-sm text-muted">{t('federation.never_expires')}</span>;
         const isExpired = new Date(item.expires_at) < new Date();
-        return <span className={`text-sm ${isExpired ? 'text-warning' : 'text-default-500'}`}>{new Date(item.expires_at).toLocaleDateString()}</span>;
+        return <span className={`text-sm ${isExpired ? 'text-warning' : 'text-muted'}`}>{new Date(item.expires_at).toLocaleDateString()}</span>;
       },
     },
     {
       key: 'last_used_at', label: t('federation.col_last_used'),
-      render: (item) => <span className="text-sm text-default-500">{item.last_used_at ? new Date(item.last_used_at).toLocaleDateString() : t('federation.never')}</span>,
+      render: (item) => <span className="text-sm text-muted">{item.last_used_at ? new Date(item.last_used_at).toLocaleDateString() : t('federation.never')}</span>,
     },
     {
       key: 'created_at', label: t('federation.col_created'), sortable: true,
-      render: (item) => <span className="text-sm text-default-500">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}</span>,
+      render: (item) => <span className="text-sm text-muted">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}</span>,
     },
     {
       key: 'actions' as keyof ApiKey, label: '',
       render: (item) => item.status === 'active' ? (
         <Button
           size="sm"
-          variant="flat"
-          color="danger"
+          variant="danger"
           startContent={<Ban size={14} />}
           isLoading={revokingId === item.id}
           onPress={() => setRevokeTarget(item)}
@@ -148,7 +147,7 @@ export function ApiKeys() {
         <PageHeader
           title={t('federation.api_keys_title')}
           description={t('federation.api_keys_desc')}
-          actions={<Button color="primary" startContent={<Plus size={16} />} onPress={() => navigate(tenantPath('/admin/federation/api-keys/create'))}>{t('federation.create_key')}</Button>}
+          actions={<Button startContent={<Plus size={16} />} onPress={() => navigate(tenantPath('/admin/federation/api-keys/create'))}>{t('federation.create_key')}</Button>}
         />
         <EmptyState icon={Key} title={t('federation.no_api_keys')} description={t('federation.no_api_keys_desc')} actionLabel={t('federation.create_api_key_action')} onAction={() => navigate(tenantPath('/admin/federation/api-keys/create'))} />
       </div>
@@ -162,8 +161,8 @@ export function ApiKeys() {
         description={t('federation.api_keys_desc')}
         actions={
           <div className="flex gap-2">
-            <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('common.refresh')}</Button>
-            <Button color="primary" startContent={<Plus size={16} />} onPress={() => navigate(tenantPath('/admin/federation/api-keys/create'))}>{t('federation.create_key')}</Button>
+            <Button variant="tertiary" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('common.refresh')}</Button>
+            <Button startContent={<Plus size={16} />} onPress={() => navigate(tenantPath('/admin/federation/api-keys/create'))}>{t('federation.create_key')}</Button>
           </div>
         }
       />

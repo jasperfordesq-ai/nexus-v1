@@ -109,14 +109,14 @@ export function GroupApprovals() {
       label: t('groups.col_group'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">{item.group_name}</span>
+        <span className="text-sm text-muted">{item.group_name}</span>
       ),
     },
     {
       key: 'status',
       label: t('groups.col_status'),
       render: () => (
-        <Chip size="sm" variant="flat" color="warning" className="capitalize">
+        <Chip size="sm" variant="soft" color="warning" className="capitalize">
           {t('groups.pending')}
         </Chip>
       ),
@@ -126,7 +126,7 @@ export function GroupApprovals() {
       label: t('groups.col_requested'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}
         </span>
       ),
@@ -139,7 +139,7 @@ export function GroupApprovals() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
+            variant="tertiary"
             color="success"
             isLoading={actionLoading === item.id}
             onPress={() => handleApprove(item)}
@@ -150,8 +150,7 @@ export function GroupApprovals() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
-            color="danger"
+            variant="danger"
             isDisabled={actionLoading === item.id}
             onPress={() => setConfirmReject(item)}
             aria-label={t('groups.label_reject_membership')}

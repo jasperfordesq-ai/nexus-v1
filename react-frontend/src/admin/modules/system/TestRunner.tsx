@@ -42,7 +42,7 @@ const statusIcon = (status: string) => {
     case 'pass': return <CheckCircle size={16} className="text-success" />;
     case 'fail': return <XCircle size={16} className="text-danger" />;
     case 'running': return <div className="h-4 w-4 animate-spin rounded-full border-2 border-accent border-t-transparent" />;
-    default: return <div className="h-4 w-4 rounded-full bg-default-200" />;
+    default: return <div className="h-4 w-4 rounded-full bg-surface-secondary" />;
   }
 };
 
@@ -128,7 +128,7 @@ export function TestRunner() {
         title={"Test Runner"}
         description={"Run automated tests to verify platform functionality"}
         actions={
-          <Button color="primary" startContent={<Play size={16} />} onPress={runTests} isLoading={running}>
+          <Button startContent={<Play size={16} />} onPress={runTests} isLoading={running}>
             Run All Tests
           </Button>
         }
@@ -136,12 +136,12 @@ export function TestRunner() {
 
       {(passCount > 0 || failCount > 0) && (
         <div className="flex gap-2 mb-4">
-          <Chip color="success" variant="flat">{passCount} passed</Chip>
-          {failCount > 0 && <Chip color="danger" variant="flat">{failCount} failed</Chip>}
+          <Chip color="success" variant="soft">{passCount} passed</Chip>
+          {failCount > 0 && <Chip color="danger" variant="soft">{failCount} failed</Chip>}
         </div>
       )}
 
-      <Card shadow="sm">
+      <Card >
         <CardHeader>
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <FlaskConical size={20} /> Test Suites
@@ -150,7 +150,7 @@ export function TestRunner() {
         <CardBody>
           <div className="space-y-2">
             {tests.map((test) => (
-              <div key={test.name} className="flex items-center justify-between rounded-lg border border-default-200 p-3">
+              <div key={test.name} className="flex items-center justify-between rounded-lg border border-border p-3">
                 <div className="flex items-center gap-3">
                   {statusIcon(test.status)}
                   <div>
@@ -161,7 +161,7 @@ export function TestRunner() {
                   </div>
                 </div>
                 {test.duration !== undefined && (
-                  <span className="text-xs text-default-400">{test.duration}ms</span>
+                  <span className="text-xs text-muted">{test.duration}ms</span>
                 )}
               </div>
             ))}

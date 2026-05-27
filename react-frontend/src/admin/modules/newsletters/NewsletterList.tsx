@@ -144,8 +144,8 @@ export function NewsletterList() {
         <div className="min-w-0">
           <p className="font-medium truncate">{item.subject || item.name}</p>
           <div className="flex gap-1 mt-1">
-            {item.ab_test_enabled && <Chip size="sm" color="warning" variant="flat">{t('newsletter_form.ab_test_short')}</Chip>}
-            {item.is_recurring && <Chip size="sm" color="secondary" variant="flat">{t('newsletter_form.recurring_label')}</Chip>}
+            {item.ab_test_enabled && <Chip size="sm" color="warning" variant="soft">{t('newsletter_form.ab_test_short')}</Chip>}
+            {item.is_recurring && <Chip size="sm" variant="soft">{t('newsletter_form.recurring_label')}</Chip>}
           </div>
         </div>
       ),
@@ -169,7 +169,7 @@ export function NewsletterList() {
     {
       key: 'created_at', label: t('newsletters.col_date'), sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {item.sent_at
             ? new Date(item.sent_at).toLocaleDateString()
             : item.created_at
@@ -183,7 +183,7 @@ export function NewsletterList() {
       render: (item) => (
         <Dropdown>
           <DropdownTrigger>
-            <Button isIconOnly size="sm" variant="light" aria-label={t('newsletters.col_actions')}><MoreVertical size={16} /></Button>
+            <Button isIconOnly size="sm" variant="tertiary" aria-label={t('newsletters.col_actions')}><MoreVertical size={16} /></Button>
           </DropdownTrigger>
           <DropdownMenu aria-label={t('newsletters.col_actions')} onAction={(key) => {
             if (key === 'edit') navigate(tenantPath(`/admin/newsletters/edit/${item.id}`));
@@ -224,7 +224,7 @@ export function NewsletterList() {
             >
               {t('newsletters.resend_to_non_openers')}
             </DropdownItem>
-            <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">{t('newsletters.delete')}</DropdownItem>
+            <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" variant="danger">{t('newsletters.delete')}</DropdownItem>
           </DropdownMenu>
         </Dropdown>
       ),
@@ -238,8 +238,8 @@ export function NewsletterList() {
         description={t('newsletters.newsletter_list_desc')}
         actions={
           <div className="flex gap-2">
-            <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('newsletters.refresh')}</Button>
-            <Button color="primary" startContent={<Plus size={16} />} onPress={() => navigate(tenantPath('/admin/newsletters/create'))}>{t('newsletters.create_newsletter')}</Button>
+            <Button variant="tertiary" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('newsletters.refresh')}</Button>
+            <Button startContent={<Plus size={16} />} onPress={() => navigate(tenantPath('/admin/newsletters/create'))}>{t('newsletters.create_newsletter')}</Button>
           </div>
         }
       />
@@ -254,7 +254,7 @@ export function NewsletterList() {
         onPageChange={setPage}
         onRefresh={loadData}
         emptyContent={
-          <div className="flex flex-col items-center gap-2 py-8 text-default-400">
+          <div className="flex flex-col items-center gap-2 py-8 text-muted">
             <Mail size={40} />
             <p>{t('newsletters.no_newsletters_found')}</p>
             <p className="text-xs">{t('newsletters.create_first_newsletter')}</p>

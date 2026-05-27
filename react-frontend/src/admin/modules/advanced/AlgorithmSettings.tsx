@@ -263,7 +263,7 @@ export function AlgorithmSettings() {
 
         {/* ── Algorithm Cards ── */}
         {areas.map(areaData => (
-          <Card key={areaData.area} shadow="sm">
+          <Card key={areaData.area} >
             <CardHeader className="flex flex-col items-start justify-between gap-4 sm:flex-row">
               <div className="flex items-center gap-3">
                 <Cpu size={20} className="text-accent shrink-0" />
@@ -289,7 +289,7 @@ export function AlgorithmSettings() {
                     <div key={param.key}>
                       <div className="mb-1 flex items-center justify-between gap-3">
                         <p className="text-sm font-medium">{t(param.labelKey)}</p>
-                        <Chip size="sm" variant="flat">
+                        <Chip size="sm" variant="soft">
                           {(areaData.weights[param.key] ?? param.min).toFixed(param.step < 1 ? 2 : 0)}
                         </Chip>
                       </div>
@@ -312,7 +312,6 @@ export function AlgorithmSettings() {
 
                 <div className="flex justify-end">
                   <Button
-                    color="primary"
                     size="sm"
                     startContent={<Save size={14} />}
                     onPress={() => handleSave(areaData)}
@@ -332,7 +331,6 @@ export function AlgorithmSettings() {
                 </p>
                 <div className="flex justify-end mt-3">
                   <Button
-                    color="primary"
                     size="sm"
                     startContent={<Save size={14} />}
                     onPress={() => handleSave(areaData)}
@@ -348,7 +346,7 @@ export function AlgorithmSettings() {
         ))}
 
         {/* ── Health Dashboard ── */}
-        <Card shadow="sm">
+        <Card >
           <CardHeader className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Activity size={20} className="text-accent" />
@@ -361,7 +359,7 @@ export function AlgorithmSettings() {
             </div>
             <Button
               size="sm"
-              variant="flat"
+              variant="tertiary"
               startContent={<RefreshCw size={14} className={healthLoading ? 'animate-spin' : ''} />}
               onPress={loadHealth}
               isDisabled={healthLoading}
@@ -392,7 +390,7 @@ export function AlgorithmSettings() {
                         key={table}
                         size="sm"
                         color={ok ? 'success' : 'danger'}
-                        variant="flat"
+                        variant="soft"
                         startContent={ok ? <CheckCircle size={12} /> : <XCircle size={12} />}
                       >
                         {table}
@@ -401,7 +399,7 @@ export function AlgorithmSettings() {
                   </div>
                   {(!health.fulltext.listings || !health.fulltext.users || !health.fulltext.feed_activity) && (
                     <p className="text-xs text-warning mt-2">
-                      {t('missing_indexes_hint_prefix')} <code className="bg-default-100 px-1 rounded">php scripts/safe_migrate.php</code> {t('missing_indexes_hint_suffix')}
+                      {t('missing_indexes_hint_prefix')} <code className="bg-surface-secondary px-1 rounded">php scripts/safe_migrate.php</code> {t('missing_indexes_hint_suffix')}
                     </p>
                   )}
                 </div>
@@ -449,14 +447,14 @@ export function AlgorithmSettings() {
                     <Chip
                       size="sm"
                       color={health.embeddings.total > 0 ? 'success' : 'default'}
-                      variant="flat"
+                      variant="tertiary"
                     >
                       {t('total_count')}
                     </Chip>
                   </div>
                   {health.embeddings.total === 0 && (
                     <p className="text-xs text-foreground-400 mt-2">
-                      {t('generate_embeddings_hint_prefix')} <code className="bg-default-100 px-1 rounded">php scripts/backfill_embeddings.php --tenant=&lt;id&gt;</code> {t('generate_embeddings_hint_suffix')}
+                      {t('generate_embeddings_hint_prefix')} <code className="bg-surface-secondary px-1 rounded">php scripts/backfill_embeddings.php --tenant=&lt;id&gt;</code> {t('generate_embeddings_hint_suffix')}
                     </p>
                   )}
                 </div>
@@ -472,7 +470,7 @@ export function AlgorithmSettings() {
                         <Chip
                           size="sm"
                           color={health.search.meilisearch_available ? 'success' : 'warning'}
-                          variant="flat"
+                          variant="soft"
                           startContent={health.search.meilisearch_available ? <CheckCircle size={12} /> : <XCircle size={12} />}
                         >
                           {health.search.meilisearch_available ? t('meilisearch_online') : t('meilisearch_offline')}
@@ -480,7 +478,7 @@ export function AlgorithmSettings() {
                       </div>
                       {!health.search.meilisearch_available && (
                         <p className="text-xs text-foreground-400 mt-2">
-                          {t('sync_search_hint_prefix')} <code className="bg-default-100 px-1 rounded">php scripts/sync_search_index.php --all-tenants</code> {t('sync_search_hint_suffix')}
+                          {t('sync_search_hint_prefix')} <code className="bg-surface-secondary px-1 rounded">php scripts/sync_search_index.php --all-tenants</code> {t('sync_search_hint_suffix')}
                         </p>
                       )}
                     </div>

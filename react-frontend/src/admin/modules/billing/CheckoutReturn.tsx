@@ -84,7 +84,7 @@ export function CheckoutReturn() {
               <h2 className="text-xl font-semibold mt-4">
                 {t('billing.processing')}
               </h2>
-              <p className="text-default-500">
+              <p className="text-muted">
                 {t('billing.processing_desc')}
               </p>
             </>
@@ -96,7 +96,7 @@ export function CheckoutReturn() {
               <h2 className="text-xl font-semibold mt-4">
                 {t('billing.checkout_success')}
               </h2>
-              <p className="text-default-500">
+              <p className="text-muted">
                 {subscription
                   ? t('billing.checkout_success_desc', {
                       plan: subscription.plan_name,
@@ -106,7 +106,6 @@ export function CheckoutReturn() {
               <Button
                 as={Link}
                 to={tenantPath('/admin/billing')}
-                color="primary"
                 endContent={<ArrowRight className="w-4 h-4" />}
                 className="mt-4"
               >
@@ -121,20 +120,19 @@ export function CheckoutReturn() {
               <h2 className="text-xl font-semibold mt-4">
                 {t('billing.checkout_failed')}
               </h2>
-              <p className="text-default-500">{t('billing.checkout_failed_desc')}</p>
+              <p className="text-muted">{t('billing.checkout_failed_desc')}</p>
               <div className="flex gap-3 justify-center mt-4">
                 <Button
                   as={Link}
                   to={tenantPath('/admin/billing/plans')}
-                  color="primary"
-                  variant="flat"
+                  variant="tertiary"
                 >
                   {t('billing.try_again')}
                 </Button>
                 <Button
                   as={Link}
                   to={tenantPath('/admin/billing')}
-                  variant="bordered"
+                  variant="secondary"
                 >
                   {t('billing.go_to_billing')}
                 </Button>

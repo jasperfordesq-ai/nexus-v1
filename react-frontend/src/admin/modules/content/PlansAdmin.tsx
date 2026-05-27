@@ -122,9 +122,9 @@ export function PlansAdmin() {
           {isSuperAdmin ? (
             <Button
               type="button"
-              variant="light"
+              variant="tertiary"
               onPress={() => navigate(tenantPath(`/admin/plans/edit/${item.id}`))}
-              className="text-left font-semibold text-accent hover:underline min-w-0 h-auto p-0 justify-start"
+              className="text-left font-semibold text-accent hover:underline min-w-0 min-h-10 p-0 justify-start"
             >
               {item.name}
             </Button>
@@ -132,7 +132,7 @@ export function PlansAdmin() {
             <span className="font-semibold">{item.name}</span>
           )}
           {item.description && (
-            <span className="text-xs text-default-400 line-clamp-1">{item.description}</span>
+            <span className="text-xs text-muted line-clamp-1">{item.description}</span>
           )}
         </div>
       ),
@@ -144,7 +144,7 @@ export function PlansAdmin() {
       render: (item) => (
         <Chip
           size="sm"
-          variant="flat"
+          variant="soft"
           color={TIER_COLORS[item.tier_level] ?? 'default'}
         >
           {item.tier_level === 0 ? t('content.free') : t('content.tier_level_badge', { level: item.tier_level })}
@@ -158,7 +158,7 @@ export function PlansAdmin() {
       render: (item) => (
         <div className="flex flex-col gap-0.5">
           <span className="text-sm font-medium">{formatPrice(item.price_monthly)}</span>
-          <span className="text-xs text-default-400">{t('content.yearly_price_suffix', { price: formatPrice(item.price_yearly) })}</span>
+          <span className="text-xs text-muted">{t('content.yearly_price_suffix', { price: formatPrice(item.price_yearly) })}</span>
         </div>
       ),
     },
@@ -169,7 +169,7 @@ export function PlansAdmin() {
       ) as unknown as string,
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">{item.tenant_count}</span>
+        <span className="text-sm text-muted">{item.tenant_count}</span>
       ),
     },
     {
@@ -200,7 +200,7 @@ export function PlansAdmin() {
       key: 'is_active',
       label: t('content.label_status'),
       render: (item) => (
-        <Chip size="sm" variant="flat" color={item.is_active ? 'success' : 'default'}>
+        <Chip size="sm" variant="soft" color={item.is_active ? 'success' : 'default'}>
           {item.is_active ? t('content.label_active') : t('reports.label_inactive')}
         </Chip>
       ),
@@ -212,7 +212,7 @@ export function PlansAdmin() {
         <div className="flex gap-1">
           <Tooltip content={t('content.edit_plan')}>
             <Button
-              isIconOnly size="sm" variant="flat" color="primary"
+              isIconOnly size="sm" variant="tertiary"
               onPress={() => navigate(tenantPath(`/admin/plans/edit/${item.id}`))}
               aria-label={t('content.label_edit_plan')}
             >
@@ -221,7 +221,7 @@ export function PlansAdmin() {
           </Tooltip>
           <Tooltip content={t('content.sync_to_stripe')}>
             <Button
-              isIconOnly size="sm" variant="flat" color="secondary"
+              isIconOnly size="sm" variant="tertiary"
               onPress={() => handleSyncStripe(item)}
               isLoading={syncingId === item.id}
               aria-label={t('content.sync_to_stripe')}
@@ -231,7 +231,7 @@ export function PlansAdmin() {
           </Tooltip>
           <Tooltip content={item.tenant_count > 0 ? t('content.active_tenants_cannot_delete', { count: item.tenant_count }) : t('content.delete_plan')}>
             <Button
-              isIconOnly size="sm" variant="flat" color="danger"
+              isIconOnly size="sm" variant="danger"
               onPress={() => setConfirmDelete(item)}
               isDisabled={item.tenant_count > 0}
               aria-label={t('content.label_delete_plan')}
@@ -261,7 +261,6 @@ export function PlansAdmin() {
         actions={
           isSuperAdmin ? (
             <Button
-              color="primary"
               startContent={<Plus size={16} />}
               onPress={() => navigate(tenantPath('/admin/plans/create'))}
             >

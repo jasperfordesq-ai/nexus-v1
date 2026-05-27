@@ -64,7 +64,7 @@ export function GroupAnalytics() {
       <div>
         <PageHeader title={t('groups.group_analytics_title')} description={t('groups.group_analytics_desc')} />
         <Card>
-          <CardBody className="py-10 text-center text-default-500">
+          <CardBody className="py-10 text-center text-muted">
             {t('groups.no_analytics_data')}
           </CardBody>
         </Card>
@@ -82,7 +82,6 @@ export function GroupAnalytics() {
           label={t('groups.label_total_groups')}
           value={data.total_groups}
           icon={Users}
-          color="primary"
         />
         <StatCard
           label={t('groups.label_total_members')}
@@ -94,7 +93,6 @@ export function GroupAnalytics() {
           label={t('groups.label_avg_members_group')}
           value={data.avg_members_per_group}
           icon={BarChart3}
-          color="secondary"
         />
         <StatCard
           label={t('groups.label_active_groups')}
@@ -123,7 +121,7 @@ export function GroupAnalytics() {
         </CardHeader>
         <CardBody>
           {data.most_active_groups.length === 0 ? (
-            <p className="text-sm text-default-500 py-4 text-center">{t('groups.no_groups_found')}</p>
+            <p className="text-sm text-muted py-4 text-center">{t('groups.no_groups_found')}</p>
           ) : (
             <div className="divide-y divide-default-100">
               {data.most_active_groups.map((group, index) => (
@@ -134,7 +132,7 @@ export function GroupAnalytics() {
                     </span>
                     <span className="font-medium text-foreground">{group.name}</span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-sm text-default-500">
+                  <div className="flex items-center gap-1.5 text-sm text-muted">
                     <Users size={14} />
                     <span>{t('groups.member')}</span>
                   </div>

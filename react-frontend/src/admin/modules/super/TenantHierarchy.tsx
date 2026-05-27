@@ -45,14 +45,14 @@ function TreeNode({ node, depth, onNavigate, expandedIds, onToggle, t }: TreeNod
   return (
     <div>
       <div
-        className="flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-default-100 cursor-pointer transition-colors"
+        className="flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-surface-secondary cursor-pointer transition-colors"
         style={{ paddingLeft: `${depth * 24 + 12}px` }}
       >
         {hasChildren ? (
           <Button
             isIconOnly
             size="sm"
-            variant="light"
+            variant="tertiary"
             aria-label={expanded ? t('common.collapse') : t('common.expand')}
             onPress={() => onToggle(node.id)}
             className="shrink-0"
@@ -73,22 +73,22 @@ function TreeNode({ node, depth, onNavigate, expandedIds, onToggle, t }: TreeNod
           <Building2 size={18} className="text-accent shrink-0" />
           <div className="min-w-0 flex-1">
             <span className="font-medium text-foreground">{node.name}</span>
-            <span className="text-xs text-default-400 ml-2">({node.slug})</span>
+            <span className="text-xs text-muted ml-2">({node.slug})</span>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <span className="flex items-center gap-1 text-xs text-default-500">
+            <span className="flex items-center gap-1 text-xs text-muted">
               <Users size={12} />
               {node.user_count}
             </span>
             <Chip
               size="sm"
-              variant="flat"
+              variant="soft"
               color={node.is_active ? 'success' : 'default'}
             >
               {node.is_active ? t('super.status_active_label') : t('super.status_inactive_label')}
             </Chip>
             {node.allows_subtenants && (
-              <Chip size="sm" variant="flat" color="secondary">{t('super.hub')}</Chip>
+              <Chip size="sm" variant="soft">{t('super.hub')}</Chip>
             )}
           </div>
         </div>
@@ -186,7 +186,7 @@ export function TenantHierarchy() {
 
   return (
     <div>
-      <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-default-500 mb-1">
+      <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-muted mb-1">
         <Link to={tenantPath('/admin/super')} className="hover:text-accent">{t('super.super_dashboard_title')}</Link>
         <span>/</span>
         <Link to={tenantPath('/admin/super/tenants')} className="hover:text-accent">{t('super.tenants')}</Link>
@@ -199,7 +199,7 @@ export function TenantHierarchy() {
         actions={
           <div className="flex items-center gap-2">
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<ChevronsUpDown size={16} />}
               onPress={expandAll}
               size="sm"
@@ -207,7 +207,7 @@ export function TenantHierarchy() {
               {t('super.expand_all')}
             </Button>
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<ChevronsDownUp size={16} />}
               onPress={collapseAll}
               size="sm"
@@ -217,7 +217,7 @@ export function TenantHierarchy() {
             <Button
               as={Link}
               to={tenantPath('/admin/super/tenants')}
-              variant="flat"
+              variant="tertiary"
               startContent={<List size={16} />}
               size="sm"
             >
@@ -226,14 +226,13 @@ export function TenantHierarchy() {
             <Button
               as={Link}
               to={tenantPath('/admin/super/tenants/create')}
-              color="primary"
               startContent={<Plus size={16} />}
               size="sm"
             >
               {t('super.create_tenant')}
             </Button>
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<RefreshCw size={16} />}
               onPress={loadHierarchy}
               isLoading={loading}
@@ -250,15 +249,15 @@ export function TenantHierarchy() {
           <Spinner size="lg" />
         </div>
       ) : hierarchy.length === 0 ? (
-        <Card shadow="sm">
-          <CardBody className="flex flex-col items-center py-12 text-default-400">
+        <Card >
+          <CardBody className="flex flex-col items-center py-12 text-muted">
             <Network size={40} className="mb-2" />
             <p>{t('super.no_hierarchy_data')}</p>
             <p className="text-xs">{t('super.no_hierarchy_data_desc')}</p>
           </CardBody>
         </Card>
       ) : (
-        <Card shadow="sm">
+        <Card >
           <CardBody className="p-4">
             {hierarchy.map((node) => (
               <TreeNode

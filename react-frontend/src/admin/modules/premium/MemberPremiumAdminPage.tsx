@@ -187,10 +187,10 @@ export function MemberPremiumAdminPage() {
         icon={<Crown size={24} />}
         actions={
           <div className="flex gap-2">
-            <Button as={Link} to={tenantPath('/admin/member-premium/subscribers')} variant="flat" startContent={<Users size={16} />}>
+            <Button as={Link} to={tenantPath('/admin/member-premium/subscribers')} variant="tertiary" startContent={<Users size={16} />}>
               {t('member_premium_admin.actions.subscribers')}
             </Button>
-            <Button color="primary" startContent={<Plus size={16} />} onPress={openCreate}>
+            <Button startContent={<Plus size={16} />} onPress={openCreate}>
               {t('member_premium_admin.actions.new_tier')}
             </Button>
           </div>
@@ -203,7 +203,7 @@ export function MemberPremiumAdminPage() {
         </div>
       ) : tiers.length === 0 ? (
         <Card>
-          <CardBody className="text-center py-10 text-default-500">
+          <CardBody className="text-center py-10 text-muted">
             {t('member_premium_admin.empty.tiers')}
           </CardBody>
         </Card>
@@ -240,13 +240,13 @@ export function MemberPremiumAdminPage() {
                         </span>
                       </TableCell>
                       <TableCell>
-                        <Chip size="sm" color={tier.is_active ? 'success' : 'default'} variant="flat">
+                        <Chip size="sm" color={tier.is_active ? 'success' : 'default'} variant="soft">
                           {tier.is_active ? t('member_premium_admin.status.active') : t('member_premium_admin.status.inactive')}
                         </Chip>
                       </TableCell>
                       <TableCell>{tier.active_subscriber_count ?? 0}</TableCell>
                       <TableCell>
-                        <Chip size="sm" color={fullySynced ? 'success' : 'warning'} variant="flat">
+                        <Chip size="sm" color={fullySynced ? 'success' : 'warning'} variant="soft">
                           {fullySynced ? t('member_premium_admin.stripe.synced') : t('member_premium_admin.stripe.needs_sync')}
                         </Chip>
                       </TableCell>
@@ -254,7 +254,7 @@ export function MemberPremiumAdminPage() {
                         <div className="flex gap-1">
                           <Button
                             size="sm"
-                            variant="flat"
+                            variant="tertiary"
                             isIconOnly
                             onPress={() => openEdit(tier)}
                             aria-label={t('member_premium_admin.actions.edit')}
@@ -263,8 +263,7 @@ export function MemberPremiumAdminPage() {
                           </Button>
                           <Button
                             size="sm"
-                            variant="flat"
-                            color="primary"
+                            variant="tertiary"
                             isIconOnly
                             isLoading={syncing === tier.id}
                             onPress={() => syncTier(tier)}
@@ -274,8 +273,7 @@ export function MemberPremiumAdminPage() {
                           </Button>
                           <Button
                             size="sm"
-                            variant="flat"
-                            color="danger"
+                            variant="danger"
                             isIconOnly
                             isLoading={deleting === tier.id}
                             onPress={() => deleteTier(tier)}
@@ -363,8 +361,8 @@ export function MemberPremiumAdminPage() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onClose} isDisabled={saving}>{t('member_premium_admin.actions.cancel')}</Button>
-            <Button color="primary" onPress={save} isLoading={saving}>
+            <Button variant="tertiary" onPress={onClose} isDisabled={saving}>{t('member_premium_admin.actions.cancel')}</Button>
+            <Button onPress={save} isLoading={saving}>
               {form.id ? t('member_premium_admin.actions.save_changes') : t('member_premium_admin.actions.create_tier')}
             </Button>
           </ModalFooter>

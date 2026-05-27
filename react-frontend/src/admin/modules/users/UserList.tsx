@@ -312,7 +312,7 @@ export function UserList() {
     return (
       <Dropdown>
         <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="flat" aria-label={t('users.actions_menu')} className="bg-default-100/70">
+          <Button isIconOnly size="sm" variant="tertiary" aria-label={t('users.actions_menu')} className="bg-surface-secondary/70">
             <MoreVertical size={16} />
           </Button>
         </DropdownTrigger>
@@ -352,7 +352,7 @@ export function UserList() {
             >
               {user.name}
             </Link>
-            <p className="text-xs text-default-400">{user.email}</p>
+            <p className="text-xs text-muted">{user.email}</p>
           </div>
         </div>
       ),
@@ -365,13 +365,13 @@ export function UserList() {
         <div className="flex items-center gap-1">
           <Chip
             size="sm"
-            variant="flat"
+            variant="soft"
             color={user.is_super_admin || user.role === 'super_admin' ? 'secondary' : user.role === 'admin' || user.role === 'tenant_admin' ? 'primary' : 'default'}
           >
             {user.role}
           </Chip>
           {user.is_super_admin && (
-            <Chip size="sm" variant="flat" color="warning" startContent={<Shield size={10} />}>
+            <Chip size="sm" variant="soft" color="warning" startContent={<Shield size={10} />}>
               SA
             </Chip>
           )}
@@ -395,7 +395,7 @@ export function UserList() {
       label: t('users.col_joined'),
       sortable: true,
       render: (user) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {new Date(user.created_at).toLocaleDateString()}
         </span>
       ),
@@ -415,14 +415,13 @@ export function UserList() {
         actions={
           <div className="flex items-center gap-2">
             <Button
-              variant="bordered"
+              variant="secondary"
               startContent={<Upload size={16} />}
               onPress={() => setImportOpen(true)}
             >
               {t('users.import_csv')}
             </Button>
             <Button
-              color="primary"
               startContent={<Plus size={16} />}
               onPress={() => navigate(tenantPath('/admin/users/create'))}
             >
@@ -541,14 +540,14 @@ export function UserList() {
           <ModalBody>
             {!importResults ? (
               <div className="flex flex-col gap-4">
-                <p className="text-sm text-default-500">
+                <p className="text-sm text-muted">
                   {t('users.import_csv_description')}
                 </p>
 
                 <div className="flex items-center gap-2">
                   <Button
                     size="sm"
-                    variant="flat"
+                    variant="tertiary"
                     startContent={<Download size={14} />}
                     onPress={() => adminUsers.downloadImportTemplate()}
                   >
@@ -565,7 +564,7 @@ export function UserList() {
                     type="file"
                     accept=".csv"
                     onChange={(e) => setImportFile(e.target.files?.[0] || null)}
-                    className="block w-full text-sm text-default-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-accent-soft file:text-accent hover:file:bg-accent-soft"
+                    className="block w-full text-sm text-muted file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-accent-soft file:text-accent hover:file:bg-accent-soft"
                   />
                 </div>
 
@@ -577,7 +576,7 @@ export function UserList() {
                     if (selected) setImportRole(selected);
                   }}
                   size="sm"
-                  variant="bordered"
+                  variant="secondary"
                 >
                   <SelectItem key="member" id="member">{t('users.import_role_member')}</SelectItem>
                   <SelectItem key="broker" id="broker">{t('users.import_role_broker')}</SelectItem>
@@ -597,7 +596,7 @@ export function UserList() {
                       <span className="font-medium">{t('users.import_skipped')}</span>
                     </div>
                   )}
-                  <span className="text-sm text-default-400">
+                  <span className="text-sm text-muted">
                     {t('users.import_total_rows')}
                   </span>
                 </div>
@@ -617,12 +616,11 @@ export function UserList() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={resetImportModal} isDisabled={importLoading}>
+            <Button variant="tertiary" onPress={resetImportModal} isDisabled={importLoading}>
               {importResults ? t('users.close') : t('users.cancel')}
             </Button>
             {!importResults && (
               <Button
-                color="primary"
                 onPress={handleImport}
                 isLoading={importLoading}
                 isDisabled={!importFile}

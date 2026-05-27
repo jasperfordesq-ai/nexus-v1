@@ -162,14 +162,14 @@ export default function GroupPolicies({
         <ModalHeader>
           <div>
             <div className="text-lg font-semibold text-foreground">{t('groups.group_policies')}</div>
-            <div className="text-sm font-normal text-default-500 mt-1">{typeName}</div>
+            <div className="text-sm font-normal text-muted mt-1">{typeName}</div>
           </div>
         </ModalHeader>
         <ModalBody>
           {loading ? (
-            <div className="text-center py-8 text-default-500">{t('groups.loading_policies')}</div>
+            <div className="text-center py-8 text-muted">{t('groups.loading_policies')}</div>
           ) : sections.length === 0 ? (
-            <div className="text-center py-8 text-default-500">{t('groups.no_policies_configured')}</div>
+            <div className="text-center py-8 text-muted">{t('groups.no_policies_configured')}</div>
           ) : (
             <div className="space-y-6">
               {sections.map((section) => (
@@ -181,12 +181,12 @@ export default function GroupPolicies({
                     {section.policies.map((policy) => (
                       <div
                         key={policy.key}
-                        className="flex items-center justify-between gap-4 rounded-lg border border-default-200 bg-default-50/70 px-3 py-3 dark:bg-default-100/5"
+                        className="flex items-center justify-between gap-4 rounded-lg border border-border bg-surface-secondary/70 px-3 py-3 dark:bg-surface-secondary/5"
                       >
                         <div className="flex-1">
                           <div className="font-medium text-sm">{policy.label}</div>
                           {policy.description && (
-                            <div className="text-xs text-default-500 mt-1">{policy.description}</div>
+                            <div className="text-xs text-muted mt-1">{policy.description}</div>
                           )}
                         </div>
                         <div className="flex items-center gap-2">
@@ -202,7 +202,7 @@ export default function GroupPolicies({
           )}
         </ModalBody>
         <ModalFooter>
-          <Button variant="light" onPress={onClose}>
+          <Button variant="tertiary" onPress={onClose}>
             {t('common.close')}
           </Button>
         </ModalFooter>

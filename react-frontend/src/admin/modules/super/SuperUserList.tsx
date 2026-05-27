@@ -121,7 +121,7 @@ export function SuperUserList() {
             <Link to={tenantPath(`/admin/super/users/${user.id}`)} className="font-medium text-foreground hover:text-accent">
               {user.name}
             </Link>
-            <p className="text-xs text-default-400">{user.email}</p>
+            <p className="text-xs text-muted">{user.email}</p>
           </div>
         </div>
       ),
@@ -130,14 +130,14 @@ export function SuperUserList() {
       key: 'tenant', label: t('super.col_tenant'), sortable: true,
       render: (user) => (
         <Link to={tenantPath(`/admin/super/tenants/${user.tenant_id}`)} className="hover:text-accent">
-          <Chip size="sm" variant="flat">{user.tenant_name || t('super.tenant_with_id', { id: user.tenant_id })}</Chip>
+          <Chip size="sm" variant="soft">{user.tenant_name || t('super.tenant_with_id', { id: user.tenant_id })}</Chip>
         </Link>
       ),
     },
     {
       key: 'role', label: t('super.col_role'), sortable: true,
       render: (user) => (
-        <Chip size="sm" variant="flat" color={user.role === 'admin' || user.role === 'tenant_admin' ? 'primary' : 'default'}>
+        <Chip size="sm" variant="soft" color={user.role === 'admin' || user.role === 'tenant_admin' ? 'primary' : 'default'}>
           {user.role}
         </Chip>
       ),
@@ -151,15 +151,15 @@ export function SuperUserList() {
       render: (user) => (
         <div className="flex items-center gap-1">
           {user.is_super_admin ? (
-            <Chip size="sm" variant="flat" color="danger" startContent={<Shield size={10} />}>
+            <Chip size="sm" variant="soft" color="danger" startContent={<Shield size={10} />}>
               {t('super.global_sa')}
             </Chip>
           ) : user.is_tenant_super_admin ? (
-            <Chip size="sm" variant="flat" color="secondary" startContent={<Shield size={10} />}>
+            <Chip size="sm" variant="soft" startContent={<Shield size={10} />}>
               {t('super.tenant_sa')}
             </Chip>
           ) : (
-            <span className="text-default-400">—</span>
+            <span className="text-muted">—</span>
           )}
         </div>
       ),
@@ -167,7 +167,7 @@ export function SuperUserList() {
     {
       key: 'last_login_at', label: t('super.col_last_login'), sortable: true,
       render: (user) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {user.last_login_at
             ? new Date(user.last_login_at).toLocaleDateString()
             : t('super.never')}
@@ -178,7 +178,7 @@ export function SuperUserList() {
       key: 'actions', label: t('super.col_actions'),
       render: (user) => (
         <Dropdown>
-          <DropdownTrigger><Button isIconOnly size="sm" variant="light" aria-label={t('super.label_user_actions')}><MoreVertical size={16} /></Button></DropdownTrigger>
+          <DropdownTrigger><Button isIconOnly size="sm" variant="tertiary" aria-label={t('super.label_user_actions')}><MoreVertical size={16} /></Button></DropdownTrigger>
           <DropdownMenu aria-label={t('super.label_user_actions')} onAction={(key) => {
             if (key === 'view') navigate(tenantPath(`/admin/super/users/${user.id}`));
             else if (key === 'edit') navigate(tenantPath(`/admin/super/users/${user.id}/edit`));
@@ -212,7 +212,7 @@ export function SuperUserList() {
 
   return (
     <div>
-      <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-default-500 mb-1">
+      <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-muted mb-1">
         <Link to={tenantPath('/admin/super')} className="hover:text-accent">{t('super.breadcrumb_super_admin')}</Link>
         <span>/</span>
         <span className="text-foreground">{t('super.breadcrumb_users')}</span>
@@ -223,11 +223,11 @@ export function SuperUserList() {
         actions={
           <div className="flex items-center gap-2">
             {lastRefreshed && (
-              <span className="text-xs text-default-400">
+              <span className="text-xs text-muted">
                 {t('super.updated_at', { time: lastRefreshed.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) })}
               </span>
             )}
-            <Button color="primary" startContent={<Plus size={16} />}
+            <Button startContent={<Plus size={16} />}
               onPress={() => navigate(tenantPath('/admin/super/users/create'))}>
               {t('super.create_user')}
             </Button>

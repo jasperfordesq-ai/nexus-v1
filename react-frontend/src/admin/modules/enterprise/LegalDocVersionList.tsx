@@ -188,14 +188,13 @@ export default function LegalDocVersionList() {
         </div>
         <div className="flex gap-2">
           <Button
-            color="primary"
             startContent={<Plus size={18} />}
             onPress={() => setShowFormModal(true)}
           >
             {t('enterprise.create_new_version')}
           </Button>
           <Button
-            variant="bordered"
+            variant="secondary"
             onPress={() => navigate(tenantPath('/admin/legal-documents/compliance'))}
           >
             {t('legal_versions.compliance_dashboard')}
@@ -226,7 +225,7 @@ export default function LegalDocVersionList() {
                         {t('enterprise.version_number_label', { version: version.version_number })}
                       </h3>
                       {version.version_label && (
-                        <Chip size="sm" color="default">
+                        <Chip size="sm">
                           {version.version_label}
                         </Chip>
                       )}
@@ -283,7 +282,7 @@ export default function LegalDocVersionList() {
                         <Button
                           size="sm"
                           color="success"
-                          variant="flat"
+                          variant="tertiary"
                           startContent={<CheckCircle2 size={16} />}
                           onPress={() => {
                             setSelectedVersion(version);
@@ -296,7 +295,7 @@ export default function LegalDocVersionList() {
                       <Tooltip content={t('enterprise.tooltip_edit_draft')}>
                         <Button
                           size="sm"
-                          variant="flat"
+                          variant="tertiary"
                           startContent={<Pencil size={16} />}
                           onPress={() => {
                             setEditTarget(version);
@@ -309,8 +308,7 @@ export default function LegalDocVersionList() {
                       <Tooltip content={t('enterprise.tooltip_delete_draft')}>
                         <Button
                           size="sm"
-                          color="danger"
-                          variant="flat"
+                          variant="danger"
                           startContent={<Trash2 size={16} />}
                           onPress={() => {
                             setDeleteTarget(version);
@@ -327,8 +325,7 @@ export default function LegalDocVersionList() {
                     <Tooltip content={t('enterprise.btn_notify')}>
                       <Button
                         size="sm"
-                        color="primary"
-                        variant="flat"
+                        variant="tertiary"
                         startContent={<Send size={16} />}
                         onPress={() => openNotifyModal(version)}
                       >
@@ -341,7 +338,7 @@ export default function LegalDocVersionList() {
                     <Tooltip content={t('enterprise.btn_compare')}>
                       <Button
                         size="sm"
-                        variant="bordered"
+                        variant="secondary"
                         startContent={<GitCompare size={16} />}
                         onPress={() => { const prev = versions[index + 1]; if (prev) openCompareModal(version, prev); }}
                       >
@@ -353,7 +350,7 @@ export default function LegalDocVersionList() {
                   <Tooltip content={t('enterprise.tooltip_view_content')}>
                     <Button
                       size="sm"
-                      variant="bordered"
+                      variant="secondary"
                       isIconOnly
                       aria-label={t('enterprise.label_view_full_content')}
                       onPress={() => {
@@ -462,7 +459,7 @@ export default function LegalDocVersionList() {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>
+                <Button variant="tertiary" onPress={onClose}>
                   {t('enterprise.cancel')}
                 </Button>
                 <Button
@@ -526,7 +523,7 @@ export default function LegalDocVersionList() {
                 />
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>
+                <Button variant="tertiary" onPress={onClose}>
                   {t('enterprise.btn_close')}
                 </Button>
               </ModalFooter>
@@ -578,11 +575,10 @@ export default function LegalDocVersionList() {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>
+                <Button variant="tertiary" onPress={onClose}>
                   {t('enterprise.cancel')}
                 </Button>
                 <Button
-                  color="primary"
                   onPress={handleNotifyUsers}
                   isLoading={submitting}
                   startContent={<Send size={16} />}
@@ -615,11 +611,11 @@ export default function LegalDocVersionList() {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>
+                <Button variant="tertiary" onPress={onClose}>
                   {t('enterprise.cancel')}
                 </Button>
                 <Button
-                  color="danger"
+                  variant="danger"
                   onPress={handleDeleteDraft}
                   isLoading={submitting}
                   startContent={<Trash2 size={16} />}

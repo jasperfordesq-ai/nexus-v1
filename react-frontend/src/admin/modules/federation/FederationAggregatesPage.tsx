@@ -176,7 +176,7 @@ export default function FederationAggregatesPage() {
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <div className="font-medium">{t('federation_aggregates.consent.enable_label')}</div>
-                  <div className="text-sm text-default-500">
+                  <div className="text-sm text-muted">
                     {t('federation_aggregates.consent.endpoint_prefix')} <code>/api/v2/federation/aggregates</code>{' '}
                     {t('federation_aggregates.consent.endpoint_suffix')}
                   </div>
@@ -192,31 +192,30 @@ export default function FederationAggregatesPage() {
               <div className="flex flex-wrap items-center gap-3 text-sm">
                 <Chip
                   color={consent?.enabled ? 'success' : 'default'}
-                  variant="flat"
+                  variant="soft"
                   size="sm"
                 >
                   {consent?.enabled ? t('federation_aggregates.status.enabled') : t('federation_aggregates.status.disabled')}
                 </Chip>
                 <Chip
                   color={consent?.has_secret ? 'primary' : 'warning'}
-                  variant="flat"
+                  variant="soft"
                   size="sm"
                 >
                   {consent?.has_secret ? t('federation_aggregates.status.signing_secret_present') : t('federation_aggregates.status.no_signing_secret')}
                 </Chip>
                 {consent?.last_rotated_at ? (
-                  <span className="text-default-500">
+                  <span className="text-muted">
                     {t('federation_aggregates.status.last_rotated', { date: new Date(consent.last_rotated_at).toLocaleString() })}
                   </span>
                 ) : (
-                  <span className="text-default-500">{t('federation_aggregates.status.never_rotated')}</span>
+                  <span className="text-muted">{t('federation_aggregates.status.never_rotated')}</span>
                 )}
               </div>
 
               <div className="flex flex-wrap gap-2 pt-2">
                 <Button
-                  color="primary"
-                  variant="flat"
+                  variant="tertiary"
                   startContent={<KeyRound className="h-4 w-4" aria-hidden="true" />}
                   isLoading={rotating}
                   onPress={handleRotate}
@@ -224,21 +223,21 @@ export default function FederationAggregatesPage() {
                   {t('federation_aggregates.actions.rotate_secret')}
                 </Button>
                 <Button
-                  variant="flat"
+                  variant="tertiary"
                   startContent={<Eye className="h-4 w-4" aria-hidden="true" />}
                   onPress={openPreview}
                 >
                   {t('federation_aggregates.actions.preview_payload')}
                 </Button>
                 <Button
-                  variant="flat"
+                  variant="tertiary"
                   startContent={<FileSearch className="h-4 w-4" aria-hidden="true" />}
                   onPress={openAudit}
                 >
                   {t('federation_aggregates.actions.show_audit_log')}
                 </Button>
                 <Button
-                  variant="light"
+                  variant="tertiary"
                   startContent={<RefreshCw className="h-4 w-4" aria-hidden="true" />}
                   onPress={loadConsent}
                 >
@@ -264,7 +263,7 @@ export default function FederationAggregatesPage() {
                 <Spinner size="sm" /> {t('federation_aggregates.audit.loading')}
               </div>
             ) : auditEntries.length === 0 ? (
-              <div className="text-default-500">{t('federation_aggregates.audit.empty')}</div>
+              <div className="text-muted">{t('federation_aggregates.audit.empty')}</div>
             ) : (
               <Table aria-label={t('federation_aggregates.audit.table_aria')}>
                 <TableHeader>
@@ -293,7 +292,7 @@ export default function FederationAggregatesPage() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={() => setAuditOpen(false)}>
+            <Button variant="tertiary" onPress={() => setAuditOpen(false)}>
               {t('federation_aggregates.actions.close')}
             </Button>
           </ModalFooter>
@@ -314,15 +313,15 @@ export default function FederationAggregatesPage() {
                 <Spinner size="sm" /> {t('federation_aggregates.preview.loading')}
               </div>
             ) : previewData ? (
-              <pre className="bg-default-100 rounded p-4 text-xs overflow-x-auto whitespace-pre-wrap">
+              <pre className="bg-surface-secondary rounded p-4 text-xs overflow-x-auto whitespace-pre-wrap">
                 {JSON.stringify(previewData, null, 2)}
               </pre>
             ) : (
-              <div className="text-default-500">{t('federation_aggregates.preview.empty')}</div>
+              <div className="text-muted">{t('federation_aggregates.preview.empty')}</div>
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={() => setPreviewOpen(false)}>
+            <Button variant="tertiary" onPress={() => setPreviewOpen(false)}>
               {t('federation_aggregates.actions.close')}
             </Button>
           </ModalFooter>

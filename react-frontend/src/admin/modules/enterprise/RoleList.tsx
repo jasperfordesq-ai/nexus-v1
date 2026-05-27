@@ -93,7 +93,7 @@ export function RoleList() {
       key: 'permissions',
       label: t('enterprise.col_permissions'),
       render: (role) => (
-        <Chip size="sm" variant="flat" color="primary">
+        <Chip size="sm" variant="soft">
           {t('enterprise.permissions_count', { count: role.permissions?.length ?? 0 })}
         </Chip>
       ),
@@ -114,7 +114,7 @@ export function RoleList() {
           <Button
             isIconOnly
             size="sm"
-            variant="light"
+            variant="tertiary"
             onPress={() => navigate(tenantPath(`/admin/enterprise/roles/${role.id}/edit`))}
             aria-label={t('enterprise.label_edit_role')}
           >
@@ -123,8 +123,7 @@ export function RoleList() {
           <Button
             isIconOnly
             size="sm"
-            variant="light"
-            color="danger"
+            variant="danger"
             onPress={() => setDeleteTarget(role)}
             isDisabled={role.slug === 'admin' || role.slug === 'super_admin'}
             aria-label={t('enterprise.label_delete_role')}
@@ -145,7 +144,6 @@ export function RoleList() {
           <Button
             as={Link}
             to={tenantPath('/admin/enterprise/roles/create')}
-            color="primary"
             startContent={<Plus size={16} />}
             size="sm"
           >

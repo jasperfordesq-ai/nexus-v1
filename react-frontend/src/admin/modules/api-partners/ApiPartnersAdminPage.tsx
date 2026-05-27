@@ -163,13 +163,13 @@ export default function ApiPartnersAdminPage() {
         title={t('api_partners.header.title')}
         description={t('api_partners.header.description')}
         actions={
-          <Button color="primary" startContent={<Plus size={16} />} onPress={() => setCreateOpen(true)}>
+          <Button startContent={<Plus size={16} />} onPress={() => setCreateOpen(true)}>
             {t('api_partners.actions.new_partner')}
           </Button>
         }
       />
 
-      <Card shadow="sm">
+      <Card >
         <CardBody className="p-0">
           {loading ? (
             <div className="p-10 flex justify-center">
@@ -196,7 +196,7 @@ export default function ApiPartnersAdminPage() {
                     <TableCell className="font-medium">{p.name}</TableCell>
                     <TableCell className="font-mono text-xs">{p.slug}</TableCell>
                     <TableCell>
-                      <Chip size="sm" color={statusColor(p.status)} variant="flat">
+                      <Chip size="sm" color={statusColor(p.status)} variant="soft">
                         {t(`api_partners.status.${p.status}`)}
                       </Chip>
                     </TableCell>
@@ -207,7 +207,7 @@ export default function ApiPartnersAdminPage() {
                       <div className="flex gap-1">
                         <Button
                           size="sm"
-                          variant="light"
+                          variant="tertiary"
                           isIconOnly
                           aria-label={t('api_partners.actions.view_call_log')}
                           onPress={() => openDetail(p)}
@@ -216,7 +216,7 @@ export default function ApiPartnersAdminPage() {
                         </Button>
                         <Button
                           size="sm"
-                          variant="light"
+                          variant="tertiary"
                           isIconOnly
                           aria-label={t('api_partners.actions.regenerate_credentials')}
                           onPress={() => handleRegenerate(p.id)}
@@ -226,7 +226,7 @@ export default function ApiPartnersAdminPage() {
                         {p.status === 'active' ? (
                           <Button
                             size="sm"
-                            variant="light"
+                            variant="tertiary"
                             isIconOnly
                             aria-label={t('api_partners.actions.suspend')}
                             onPress={() => handleSuspend(p.id)}
@@ -236,7 +236,7 @@ export default function ApiPartnersAdminPage() {
                         ) : (
                           <Button
                             size="sm"
-                            variant="light"
+                            variant="tertiary"
                             isIconOnly
                             aria-label={t('api_partners.actions.activate')}
                             onPress={() => handleActivate(p.id)}
@@ -306,7 +306,7 @@ export default function ApiPartnersAdminPage() {
                         <TableRow key={c.id}>
                           <TableCell className="text-xs">{c.created_at}</TableCell>
                           <TableCell>
-                            <Chip size="sm" variant="flat">{c.method}</Chip>
+                            <Chip size="sm" variant="soft">{c.method}</Chip>
                           </TableCell>
                           <TableCell className="font-mono text-xs">{c.path}</TableCell>
                           <TableCell>{c.status_code}</TableCell>
@@ -320,7 +320,7 @@ export default function ApiPartnersAdminPage() {
             </Tabs>
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={() => setDetailPartner(null)}>
+            <Button variant="tertiary" onPress={() => setDetailPartner(null)}>
               {t('api_partners.actions.close')}
             </Button>
           </ModalFooter>
@@ -453,10 +453,10 @@ function CreatePartnerModal({
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button variant="light" onPress={onClose} isDisabled={submitting}>
+          <Button variant="tertiary" onPress={onClose} isDisabled={submitting}>
             {t('api_partners.actions.cancel')}
           </Button>
-          <Button color="primary" onPress={handleSubmit} isLoading={submitting}>
+          <Button onPress={handleSubmit} isLoading={submitting}>
             {t('api_partners.create_modal.submit')}
           </Button>
         </ModalFooter>
@@ -503,7 +503,7 @@ function CredentialsModal({
                 <Input value={credentials?.client_id ?? ''} readOnly className="font-mono" />
                 <Button
                   isIconOnly
-                  variant="flat"
+                  variant="tertiary"
                   aria-label={t('api_partners.credentials_modal.copy_client_id')}
                   onPress={() => credentials && copy(credentials.client_id, t('api_partners.credentials_modal.client_id'))}
                 >
@@ -517,7 +517,7 @@ function CredentialsModal({
                 <Input value={credentials?.client_secret ?? ''} readOnly className="font-mono" />
                 <Button
                   isIconOnly
-                  variant="flat"
+                  variant="tertiary"
                   aria-label={t('api_partners.credentials_modal.copy_client_secret')}
                   onPress={() => credentials && copy(credentials.client_secret, t('api_partners.credentials_modal.client_secret'))}
                 >
@@ -528,7 +528,7 @@ function CredentialsModal({
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button color="primary" onPress={onClose}>
+          <Button onPress={onClose}>
             {t('api_partners.credentials_modal.saved_button')}
           </Button>
         </ModalFooter>

@@ -277,7 +277,7 @@ export default function LegalDocComplianceDashboard() {
                       <div className="flex gap-2">
                         <Button
                           size="sm"
-                          variant="flat"
+                          variant="tertiary"
                           startContent={<Eye size={16} />}
                           onPress={() => {
                             if (doc.current_version_id) {
@@ -291,7 +291,7 @@ export default function LegalDocComplianceDashboard() {
                         </Button>
                         <Button
                           size="sm"
-                          variant="bordered"
+                          variant="secondary"
                           startContent={<Download size={16} />}
                           onPress={() => handleExport(doc.id)}
                           isLoading={exportingDocId === doc.id}
@@ -330,8 +330,7 @@ export default function LegalDocComplianceDashboard() {
               className="flex-1"
             />
             <Button
-              color="default"
-              variant="flat"
+              variant="tertiary"
               onPress={() => setDateRange({ start: '', end: '' })}
             >
               {t('enterprise.btn_clear')}
@@ -392,7 +391,7 @@ export default function LegalDocComplianceDashboard() {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button color="primary" onPress={onClose}>
+                <Button onPress={onClose}>
                   {t('enterprise.btn_close')}
                 </Button>
               </ModalFooter>

@@ -77,67 +77,67 @@ export function ImageSettings() {
       <PageHeader title={t('system.image_settings_title')} description={t('system.image_settings_desc')} />
 
       <div className="space-y-4">
-        <Card shadow="sm">
+        <Card >
           <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Image size={20} /> {t('system.upload_limits')}</h3></CardHeader>
           <CardBody className="gap-4">
             <Input
               label={t('system.label_max_file_size')}
               type="number"
-              variant="bordered"
+              variant="secondary"
               value={String(formData.max_file_size || '')}
               onValueChange={(v) => updateField('max_file_size', v)}
             />
             <Input
               label={t('system.label_max_width')}
               type="number"
-              variant="bordered"
+              variant="secondary"
               value={String(formData.max_width || '')}
               onValueChange={(v) => updateField('max_width', v)}
             />
             <Input
               label={t('system.label_max_height')}
               type="number"
-              variant="bordered"
+              variant="secondary"
               value={String(formData.max_height || '')}
               onValueChange={(v) => updateField('max_height', v)}
             />
             <Input
               label={t('system.label_allowed_formats')}
-              variant="bordered"
+              variant="secondary"
               isReadOnly
               value={String(formData.allowed_formats || 'jpg, jpeg, png, gif, webp')}
             />
           </CardBody>
         </Card>
 
-        <Card shadow="sm">
+        <Card >
           <CardHeader><h3 className="text-lg font-semibold">{t('system.processing_heading')}</h3></CardHeader>
           <CardBody className="space-y-3">
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{t('system.auto_resize')}</p>
-                <p className="text-sm text-default-500">{t('system.auto_resize_desc')}</p>
+                <p className="text-sm text-muted">{t('system.auto_resize_desc')}</p>
               </div>
               <Switch isSelected={!!formData.auto_resize} onValueChange={(v) => updateField('auto_resize', v)} aria-label={t('system.auto_resize')} />
             </div>
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{t('system.auto_convert_webp')}</p>
-                <p className="text-sm text-default-500">{t('system.auto_convert_webp_desc')}</p>
+                <p className="text-sm text-muted">{t('system.auto_convert_webp_desc')}</p>
               </div>
               <Switch isSelected={!!formData.auto_webp} onValueChange={(v) => updateField('auto_webp', v)} aria-label={t('system.label_auto_web_p')} />
             </div>
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{t('system.strip_exif')}</p>
-                <p className="text-sm text-default-500">{t('system.strip_exif_desc')}</p>
+                <p className="text-sm text-muted">{t('system.strip_exif_desc')}</p>
               </div>
               <Switch isSelected={!!formData.strip_exif} onValueChange={(v) => updateField('strip_exif', v)} aria-label={t('system.label_strip_e_x_i_f')} />
             </div>
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{t('system.generate_thumbnails')}</p>
-                <p className="text-sm text-default-500">{t('system.generate_thumbnails_desc')}</p>
+                <p className="text-sm text-muted">{t('system.generate_thumbnails_desc')}</p>
               </div>
               <Switch isSelected={!!formData.generate_thumbnails} onValueChange={(v) => updateField('generate_thumbnails', v)} aria-label={t('system.label_thumbnails')} />
             </div>
@@ -145,7 +145,7 @@ export function ImageSettings() {
         </Card>
 
         <div className="flex justify-end">
-          <Button color="primary" startContent={<Save size={16} />} onPress={handleSave} isLoading={saving}>{t('system.save_settings')}</Button>
+          <Button startContent={<Save size={16} />} onPress={handleSave} isLoading={saving}>{t('system.save_settings')}</Button>
         </div>
       </div>
     </div>

@@ -116,9 +116,9 @@ export function MenusAdmin() {
       render: (item) => (
         <Button
           type="button"
-          variant="light"
+          variant="tertiary"
           onPress={() => navigate(tenantPath(`/admin/menus/builder/${item.id}`))}
-          className="text-left font-medium text-accent hover:underline min-w-0 h-auto p-0 justify-start"
+          className="text-left font-medium text-accent hover:underline min-w-0 min-h-10 p-0 justify-start"
         >
           {item.name}
         </Button>
@@ -129,7 +129,7 @@ export function MenusAdmin() {
       label: t('content.label_location'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {LOCATION_LABELS[item.location] ?? item.location ?? '--'}
         </span>
       ),
@@ -138,13 +138,13 @@ export function MenusAdmin() {
       key: 'item_count',
       label: t('content.items'),
       sortable: true,
-      render: (item) => <span className="text-sm text-default-600">{item.item_count ?? 0}</span>,
+      render: (item) => <span className="text-sm text-muted">{item.item_count ?? 0}</span>,
     },
     {
       key: 'is_active',
       label: t('content.label_active'),
       render: (item) => (
-        <Chip size="sm" variant="flat" color={item.is_active ? 'success' : 'default'}>
+        <Chip size="sm" variant="soft" color={item.is_active ? 'success' : 'default'}>
           {item.is_active ? t('content.label_active') : t('content.label_inactive')}
         </Chip>
       ),
@@ -157,8 +157,7 @@ export function MenusAdmin() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
-            color="primary"
+            variant="tertiary"
             onPress={() => navigate(tenantPath(`/admin/menus/builder/${item.id}`))}
             aria-label={t('content.label_edit_menu')}
           >
@@ -167,8 +166,7 @@ export function MenusAdmin() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
-            color="danger"
+            variant="danger"
             onPress={() => setConfirmDelete(item)}
             aria-label={t('content.label_delete_menu')}
           >
@@ -195,7 +193,6 @@ export function MenusAdmin() {
         description={t('content.menus_admin_desc')}
         actions={
           <Button
-            color="primary"
             startContent={<Plus size={16} />}
             onPress={() => navigate(tenantPath('/admin/menus/builder/new'))}
           >

@@ -126,7 +126,7 @@ export function FederationAnalytics() {
               <SelectItem key="90d" id="90d">{t('federation.analytics.range_90d')}</SelectItem>
             </Select>
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<RefreshCw size={16} />}
               onPress={loadData}
               isLoading={loading}
@@ -143,7 +143,6 @@ export function FederationAnalytics() {
           label={t('federation.analytics.kpi_total_partnerships')}
           value={kpis?.total_partnerships ?? 0}
           icon={Handshake}
-          color="primary"
           loading={loading}
         />
         <StatCard
@@ -164,14 +163,12 @@ export function FederationAnalytics() {
           label={t('federation.analytics.kpi_external_partners')}
           value={kpis?.external_partners ?? 0}
           icon={Globe}
-          color="secondary"
           loading={loading}
         />
         <StatCard
           label={t('federation.analytics.kpi_federated_transactions')}
           value={kpis?.federated_transactions ?? 0}
           icon={ArrowRightLeft}
-          color="primary"
           loading={loading}
           description={t('federation.analytics.kpi_window')}
         />
@@ -179,7 +176,6 @@ export function FederationAnalytics() {
           label={t('federation.analytics.kpi_federated_messages')}
           value={kpis?.federated_messages ?? 0}
           icon={MessageSquare}
-          color="primary"
           loading={loading}
           description={t('federation.analytics.kpi_window')}
         />
@@ -187,7 +183,6 @@ export function FederationAnalytics() {
           label={t('federation.analytics.kpi_federated_listings')}
           value={kpis?.federated_listings ?? 0}
           icon={Package}
-          color="secondary"
           loading={loading}
         />
         <StatCard
@@ -201,7 +196,7 @@ export function FederationAnalytics() {
 
       {/* Charts */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 mb-6">
-        <Card shadow="sm">
+        <Card >
           <CardHeader>
             <h3 className="text-lg font-semibold">
               {t('federation.analytics.chart_daily_calls')}
@@ -232,7 +227,7 @@ export function FederationAnalytics() {
           </CardBody>
         </Card>
 
-        <Card shadow="sm">
+        <Card >
           <CardHeader className="flex items-center gap-2">
             <Users size={18} />
             <h3 className="text-lg font-semibold">
@@ -257,7 +252,7 @@ export function FederationAnalytics() {
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="flex h-full items-center justify-center text-default-400">
+                <div className="flex h-full items-center justify-center text-muted">
                   {t('federation.analytics.no_partner_activity')}
                 </div>
               )}
@@ -267,7 +262,7 @@ export function FederationAnalytics() {
       </div>
 
       {/* Recent errors */}
-      <Card shadow="sm">
+      <Card >
         <CardHeader className="flex items-center gap-2">
           <AlertTriangle size={18} className="text-warning" />
           <h3 className="text-lg font-semibold">
@@ -294,12 +289,12 @@ export function FederationAnalytics() {
               {(row) => (
                 <TableRow key={row.id}>
                   <TableCell>
-                    <span className="text-xs text-default-500">
+                    <span className="text-xs text-muted">
                       {new Date(row.created_at).toLocaleString()}
                     </span>
                   </TableCell>
                   <TableCell>
-                    <Chip size="sm" variant="flat">
+                    <Chip size="sm" variant="soft">
                       {row.method}
                     </Chip>
                   </TableCell>
@@ -310,13 +305,13 @@ export function FederationAnalytics() {
                     <Chip
                       size="sm"
                       color={row.response_code >= 500 ? 'danger' : 'warning'}
-                      variant="flat"
+                      variant="tertiary"
                     >
                       {row.response_code || '—'}
                     </Chip>
                   </TableCell>
                   <TableCell>
-                    <span className="text-xs text-default-500">{row.ip_address}</span>
+                    <span className="text-xs text-muted">{row.ip_address}</span>
                   </TableCell>
                 </TableRow>
               )}

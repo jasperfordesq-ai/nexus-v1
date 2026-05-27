@@ -214,7 +214,7 @@ export function AttributesAdmin() {
     return (
       <Dropdown>
         <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="light" aria-label={t('content.label_attribute_actions')}>
+          <Button isIconOnly size="sm" variant="tertiary" aria-label={t('content.label_attribute_actions')}>
             <MoreVertical size={16} />
           </Button>
         </DropdownTrigger>
@@ -222,7 +222,7 @@ export function AttributesAdmin() {
           <DropdownItem key="edit" id="edit" startContent={<Edit size={14} />}>
             {t('content.label_edit_item')}
           </DropdownItem>
-          <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
+          <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" variant="danger">
             {t('content.label_delete_item')}
           </DropdownItem>
         </DropdownMenu>
@@ -239,13 +239,13 @@ export function AttributesAdmin() {
       sortable: true,
       render: (item) => <span className="font-medium text-foreground">{item.name}</span>,
     },
-    { key: 'slug', label: t('content.label_slug'), render: (item) => <span className="text-sm text-default-500 font-mono">{item.slug}</span> },
+    { key: 'slug', label: t('content.label_slug'), render: (item) => <span className="text-sm text-muted font-mono">{item.slug}</span> },
     {
       key: 'type',
       label: t('content.label_type'),
       sortable: true,
       render: (item) => (
-        <Chip size="sm" variant="flat" color="primary">
+        <Chip size="sm" variant="soft">
           {t(`content.attr_type_${item.type}`)}
         </Chip>
       ),
@@ -255,14 +255,14 @@ export function AttributesAdmin() {
       label: t('content.label_categories'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">{item.category_name || '--'}</span>
+        <span className="text-sm text-muted">{item.category_name || '--'}</span>
       ),
     },
     {
       key: 'is_active',
       label: t('content.label_status'),
       render: (item) => (
-        <Chip size="sm" variant="flat" color={item.is_active ? 'success' : 'default'}>
+        <Chip size="sm" variant="soft" color={item.is_active ? 'success' : 'default'}>
           {item.is_active ? t('content.label_active') : t('content.label_inactive')}
         </Chip>
       ),
@@ -283,8 +283,8 @@ export function AttributesAdmin() {
         description={t('content.attributes_admin_desc')}
         actions={
           <div className="flex gap-2">
-            <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('content.refresh')}</Button>
-            <Button color="primary" startContent={<Plus size={16} />} onPress={openCreateModal}>{t('content.create_attributes')}</Button>
+            <Button variant="tertiary" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('content.refresh')}</Button>
+            <Button startContent={<Plus size={16} />} onPress={openCreateModal}>{t('content.create_attributes')}</Button>
           </div>
         }
       />
@@ -322,7 +322,7 @@ export function AttributesAdmin() {
               value={formData.name}
               onValueChange={(v) => setFormData((prev) => ({ ...prev, name: v }))}
               isRequired
-              variant="bordered"
+              variant="secondary"
               autoFocus
             />
 
@@ -333,7 +333,7 @@ export function AttributesAdmin() {
                 const selected = Array.from(keys)[0] as string;
                 if (selected) setFormData((prev) => ({ ...prev, type: selected }));
               }}
-              variant="bordered"
+              variant="secondary"
             >
               {ATTRIBUTE_TYPES.map((attrType) => (
                 <SelectItem key={attrType.key} id={attrType.key}>{t(`content.attr_type_${attrType.key}`)}</SelectItem>
@@ -347,7 +347,7 @@ export function AttributesAdmin() {
                 const selected = Array.from(keys)[0] as string | undefined;
                 setFormData((prev) => ({ ...prev, category_id: selected || '' }));
               }}
-              variant="bordered"
+              variant="secondary"
             >
               {categories.map((cat) => (
                 <SelectItem key={String(cat.id)} id={String(cat.id)}>{cat.name}</SelectItem>
@@ -358,7 +358,7 @@ export function AttributesAdmin() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">{t('content.label_active')}</p>
-                  <p className="text-sm text-default-500">{t('content.attribute_active_desc')}</p>
+                  <p className="text-sm text-muted">{t('content.attribute_active_desc')}</p>
                 </div>
                 <Switch
                   isSelected={formData.is_active}
@@ -369,10 +369,10 @@ export function AttributesAdmin() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={closeModal} isDisabled={saving}>
+            <Button variant="tertiary" onPress={closeModal} isDisabled={saving}>
               {t('common.cancel')}
             </Button>
-            <Button color="primary" onPress={handleSave} isLoading={saving} isDisabled={saving}>
+            <Button onPress={handleSave} isLoading={saving} isDisabled={saving}>
               {editingItem ? t('content.save_changes') : t('content.create_attributes')}
             </Button>
           </ModalFooter>

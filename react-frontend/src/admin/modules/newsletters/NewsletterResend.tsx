@@ -104,14 +104,14 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
                 <Mail size={20} />
                 <span>{t('newsletter_resend.resend_newsletter')}</span>
               </div>
-              <p className="text-sm font-normal text-default-500">
+              <p className="text-sm font-normal text-muted">
                 {t('newsletter_resend.subtitle')}
               </p>
             </ModalHeader>
             <ModalBody>
               {loading ? (
                 <div className="flex items-center justify-center py-8">
-                  <div className="text-default-400">{t('newsletter_resend.loading')}</div>
+                  <div className="text-muted">{t('newsletter_resend.loading')}</div>
                 </div>
               ) : info ? (
                 <div className="space-y-4">
@@ -119,15 +119,15 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
                     <CardBody className="gap-2">
                       <div className="grid grid-cols-3 gap-4 text-center">
                         <div>
-                          <p className="text-sm text-default-500">{t('newsletter_resend.total_sent')}</p>
+                          <p className="text-sm text-muted">{t('newsletter_resend.total_sent')}</p>
                           <p className="text-2xl font-bold">{info.total_sent.toLocaleString()}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-default-500">{t('newsletter_resend.opened')}</p>
+                          <p className="text-sm text-muted">{t('newsletter_resend.opened')}</p>
                           <p className="text-2xl font-bold text-success">{info.total_opened.toLocaleString()}</p>
                         </div>
                         <div>
-                          <p className="text-sm text-default-500">{t('newsletter_resend.clicked')}</p>
+                          <p className="text-sm text-muted">{t('newsletter_resend.clicked')}</p>
                           <p className="text-2xl font-bold text-accent">{info.total_clicked.toLocaleString()}</p>
                         </div>
                       </div>
@@ -142,7 +142,7 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
                     <Radio value="non_openers">
                       <div className="flex flex-col gap-1">
                         <span>{t('newsletter_resend.non_openers')}</span>
-                        <span className="text-xs text-default-500">
+                        <span className="text-xs text-muted">
                           {t('newsletter_resend.non_openers_count', { count: info.non_openers_count })}
                         </span>
                       </div>
@@ -150,7 +150,7 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
                     <Radio value="non_clickers">
                       <div className="flex flex-col gap-1">
                         <span>{t('newsletter_resend.non_clickers')}</span>
-                        <span className="text-xs text-default-500">
+                        <span className="text-xs text-muted">
                           {t('newsletter_resend.non_clickers_count', { count: info.non_clickers_count })}
                         </span>
                       </div>
@@ -165,12 +165,12 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
                     description={t('newsletter_resend.subject_override_desc')}
                   />
 
-                  <Card className="bg-default-100">
+                  <Card className="bg-surface-secondary">
                     <CardBody className="flex-row items-center gap-3">
                       <Users size={20} className="text-accent" />
                       <div className="flex-1">
                         <p className="text-sm font-medium">{t('newsletter_resend.preview_recipient_count')}</p>
-                        <p className="text-xs text-default-500">
+                        <p className="text-xs text-muted">
                           {t('newsletter_resend.preview_recipient_count_desc', { count: recipientCount })}
                         </p>
                       </div>
@@ -198,11 +198,10 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
               )}
             </ModalBody>
             <ModalFooter>
-              <Button variant="light" onPress={onModalClose}>
+              <Button variant="tertiary" onPress={onModalClose}>
                 {t('newsletter_resend.cancel')}
               </Button>
               <Button
-                color="primary"
                 onPress={handleResend}
                 isLoading={sending}
                 isDisabled={!info || recipientCount === 0 || loading}

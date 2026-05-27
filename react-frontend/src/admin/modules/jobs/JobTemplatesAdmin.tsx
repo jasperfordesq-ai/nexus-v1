@@ -153,7 +153,7 @@ export function JobTemplatesAdmin() {
       render: (tpl) => (
         <Chip
           size="sm"
-          variant="flat"
+          variant="soft"
           color={typeColors[tpl.type] ?? 'default'}
           className="capitalize"
         >
@@ -171,7 +171,7 @@ export function JobTemplatesAdmin() {
           </Tooltip>
         ) : (
           <Tooltip content={t('jobs.templates_private')}>
-            <Lock size={16} className="text-default-400" />
+            <Lock size={16} className="text-muted" />
           </Tooltip>
         ),
     },
@@ -196,12 +196,11 @@ export function JobTemplatesAdmin() {
       key: 'actions',
       label: t('jobs.templates_col_actions'),
       render: (tpl) => (
-        <Tooltip content={t('jobs.templates_delete')} color="danger">
+        <Tooltip content={t('jobs.templates_delete')}>
           <Button
             isIconOnly
             size="sm"
-            variant="light"
-            color="danger"
+            variant="danger"
             onPress={() => setConfirmDelete(tpl)}
             aria-label={t('jobs.templates_delete')}
           >
@@ -221,7 +220,7 @@ export function JobTemplatesAdmin() {
         description={t('jobs.templates_page_description')}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<RefreshCw size={16} />}
             onPress={loadItems}
           >

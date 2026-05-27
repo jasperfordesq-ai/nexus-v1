@@ -86,7 +86,7 @@ export function SeedGenerator() {
         </div>
       </div>
 
-      <Card shadow="sm">
+      <Card >
         <CardHeader>
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <Database size={20} /> {t('seed_generator.data_types_heading')}
@@ -95,11 +95,11 @@ export function SeedGenerator() {
         <CardBody>
           <div className="space-y-3">
             {SEED_OPTIONS.map(opt => (
-              <div key={opt.key} className="flex items-center justify-between rounded-lg border border-default-200 p-3">
+              <div key={opt.key} className="flex items-center justify-between rounded-lg border border-border p-3">
                 <Checkbox isSelected={selected.includes(opt.key)} onValueChange={() => toggleOption(opt.key)}>
                   <div>
                     <p className="font-medium">{t(opt.labelKey)}</p>
-                    <p className="text-xs text-default-400">{t(opt.descKey)}</p>
+                    <p className="text-xs text-muted">{t(opt.descKey)}</p>
                   </div>
                 </Checkbox>
                 <Input
@@ -107,7 +107,7 @@ export function SeedGenerator() {
                   type="number"
                   defaultValue={String(opt.count)}
                   className="w-20"
-                  variant="bordered"
+                  variant="secondary"
                   aria-label={t('seed_generator.count_aria_label', { label: t(opt.labelKey) })}
                   onValueChange={(val) => handleCountChange(opt.key, val)}
                 />
@@ -116,7 +116,6 @@ export function SeedGenerator() {
           </div>
           <div className="flex justify-end mt-4">
             <Button
-              color="primary"
               startContent={!running ? <Play size={16} /> : undefined}
               onPress={handleRun}
               isLoading={running}

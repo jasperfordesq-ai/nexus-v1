@@ -163,7 +163,7 @@ export function MatchApprovals() {
               {item.user_1_name}
             </p>
           </div>
-          <span className="text-xs text-default-400 shrink-0">↔</span>
+          <span className="text-xs text-muted shrink-0">↔</span>
           <Avatar
             src={item.user_2_avatar || undefined}
             name={item.user_2_name}
@@ -185,7 +185,7 @@ export function MatchApprovals() {
         item.listing_title ? (
           <span className="text-sm text-foreground">{item.listing_title}</span>
         ) : (
-          <span className="text-sm text-default-400 italic">{t('matching.no_listing')}</span>
+          <span className="text-sm text-muted italic">{t('matching.no_listing')}</span>
         ),
     },
     {
@@ -203,7 +203,7 @@ export function MatchApprovals() {
           />
           <Chip
             size="sm"
-            variant="flat"
+            variant="soft"
             color={scoreColor(item.match_score)}
           >
             {Math.round(item.match_score)}%
@@ -222,7 +222,7 @@ export function MatchApprovals() {
       label: t('matching.col_submitted'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {new Date(item.created_at).toLocaleDateString()}
         </span>
       ),
@@ -237,7 +237,7 @@ export function MatchApprovals() {
               <Button
                 isIconOnly
                 size="sm"
-                variant="flat"
+                variant="tertiary"
                 color="success"
                 onPress={() => handleApprove(item)}
                 isLoading={actionLoading === item.id}
@@ -248,8 +248,7 @@ export function MatchApprovals() {
               <Button
                 isIconOnly
                 size="sm"
-                variant="flat"
-                color="danger"
+                variant="danger"
                 onPress={() => {
                   setRejectModal({ item });
                   setRejectReason('');
@@ -263,7 +262,7 @@ export function MatchApprovals() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
+            variant="tertiary"
             onPress={() => navigate(tenantPath(`/admin/match-approvals/${item.id}`))}
             aria-label={t('matching.label_view_match_details')}
           >
@@ -308,7 +307,6 @@ export function MatchApprovals() {
           label={t('matching.label_approval_rate')}
           value={stats ? `${stats.approval_rate}%` : '0%'}
           icon={TrendingUp}
-          color="primary"
           loading={statsLoading}
         />
       </div>
@@ -329,7 +327,7 @@ export function MatchApprovals() {
               <Clock size={14} />
               <span>{t('matching.tab_pending')}</span>
               {stats && stats.pending_count > 0 && (
-                <Chip size="sm" variant="flat" color="warning">
+                <Chip size="sm" variant="soft" color="warning">
                   {stats.pending_count}
                 </Chip>
               )}
@@ -372,8 +370,8 @@ export function MatchApprovals() {
         onPageChange={setPage}
         emptyContent={
           <div className="flex flex-col items-center gap-2 py-8">
-            <BarChart3 size={40} className="text-default-300" />
-            <p className="text-default-500">
+            <BarChart3 size={40} className="text-muted" />
+            <p className="text-muted">
               {status === 'pending'
                 ? t('matching.no_pending_match_approvals')
                 : t('matching.no_matches_for_status', { status: status === 'all' ? t('matching.tab_all').toLowerCase() : t(`matching.tab_${status}`).toLowerCase() })}
@@ -399,7 +397,7 @@ export function MatchApprovals() {
           <ModalBody>
             {rejectModal && (
               <div className="mb-3">
-                <p className="text-sm text-default-600">
+                <p className="text-sm text-muted">
                   {t('matching.rejecting_match_between', {
                     user1: rejectModal.item.user_1_name,
                     user2: rejectModal.item.user_2_name,
@@ -412,14 +410,14 @@ export function MatchApprovals() {
               placeholder={t('matching.placeholder_explain_why_this_match_is_being_rejected')}
               value={rejectReason}
               onValueChange={setRejectReason}
-              variant="bordered"
+              variant="secondary"
               minRows={3}
               isRequired
             />
           </ModalBody>
           <ModalFooter>
             <Button
-              variant="flat"
+              variant="tertiary"
               onPress={() => {
                 setRejectModal(null);
                 setRejectReason('');
@@ -429,7 +427,7 @@ export function MatchApprovals() {
               {t('matching.cancel')}
             </Button>
             <Button
-              color="danger"
+              variant="danger"
               onPress={handleReject}
               isLoading={rejectLoading}
               isDisabled={!rejectReason.trim()}

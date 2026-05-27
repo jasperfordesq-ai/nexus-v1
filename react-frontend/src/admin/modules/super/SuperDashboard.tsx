@@ -86,7 +86,7 @@ export function SuperDashboard() {
         description={t('super.super_dashboard_desc')}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<RefreshCw size={16} />}
             onPress={loadData}
             isLoading={loading}
@@ -104,7 +104,6 @@ export function SuperDashboard() {
             label={t('super.label_total_tenants')}
             value={stats?.total_tenants ?? '---'}
             icon={Building2}
-            color="primary"
             loading={loading}
           />
         </Link>
@@ -122,7 +121,6 @@ export function SuperDashboard() {
             label={t('super.label_total_users')}
             value={stats?.total_users ?? '---'}
             icon={Users}
-            color="secondary"
             loading={loading}
           />
         </Link>
@@ -138,7 +136,7 @@ export function SuperDashboard() {
       </div>
 
       {/* Quick Actions */}
-      <Card shadow="sm" className="mb-6">
+      <Card  className="mb-6">
         <CardBody className="p-4">
           <h3 className="text-lg font-semibold text-foreground mb-4">{t('super.quick_actions')}</h3>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -166,8 +164,8 @@ export function SuperDashboard() {
           <Spinner size="lg" />
         </div>
       ) : tenants.length === 0 ? (
-        <Card shadow="sm">
-          <CardBody className="flex flex-col items-center py-12 text-default-400">
+        <Card >
+          <CardBody className="flex flex-col items-center py-12 text-muted">
             <Building2 size={40} className="mb-2" />
             <p>{t('super.no_tenants_found')}</p>
           </CardBody>
@@ -177,7 +175,7 @@ export function SuperDashboard() {
           {tenants.map((tenant) => (
             <Card
               key={tenant.id}
-              shadow="sm"
+
               isPressable
               as={Link}
               to={tenantPath(`/admin/super/tenants/${tenant.id}`)}
@@ -186,23 +184,23 @@ export function SuperDashboard() {
                 <div className="flex items-start justify-between mb-2">
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold text-foreground truncate">{tenant.name}</p>
-                    <p className="text-xs text-default-400 truncate">{tenant.domain || tenant.slug}</p>
+                    <p className="text-xs text-muted truncate">{tenant.domain || tenant.slug}</p>
                   </div>
                   <Chip
                     size="sm"
-                    variant="flat"
+                    variant="soft"
                     color={tenant.is_active ? 'success' : 'default'}
                   >
                     {tenant.is_active ? t('common.active') : t('super.inactive_label')}
                   </Chip>
                 </div>
-                <div className="flex items-center gap-4 text-sm text-default-500">
+                <div className="flex items-center gap-4 text-sm text-muted">
                   <span className="flex items-center gap-1">
                     <Users size={14} />
                     {t('super.users_count', { count: tenant.user_count ?? 0 })}
                   </span>
                   {tenant.allows_subtenants && (
-                    <Chip size="sm" variant="flat" color="secondary">{t('super.hub')}</Chip>
+                    <Chip size="sm" variant="soft">{t('super.hub')}</Chip>
                   )}
                 </div>
               </CardBody>
@@ -217,7 +215,7 @@ export function SuperDashboard() {
           <Button
             as={Link}
             to={tenantPath('/admin/super/tenants')}
-            variant="flat"
+            variant="tertiary"
             endContent={<ArrowRight size={16} />}
           >
             {t('super.view_all_tenants')}

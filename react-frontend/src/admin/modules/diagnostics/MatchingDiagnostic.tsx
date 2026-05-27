@@ -101,14 +101,13 @@ export function MatchingDiagnostic() {
       <PageHeader title={t('diagnostics.matching_diagnostic_title')} description={t('diagnostics.matching_diagnostic_desc')} />
 
       <div className="space-y-4">
-        <Card shadow="sm">
+        <Card >
           <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Stethoscope size={20} /> {t('diagnostics.diagnose_user_matches')}</h3></CardHeader>
           <CardBody className="gap-4">
-            <p className="text-sm text-default-500">{t('diagnostics.diagnose_user_matches_desc')}</p>
+            <p className="text-sm text-muted">{t('diagnostics.diagnose_user_matches_desc')}</p>
             <div className="flex gap-3">
-              <Input label={t('diagnostics.label_user_i_d')} placeholder="e.g., 42" type="number" value={userId} onValueChange={setUserId} variant="bordered" className="max-w-xs" />
+              <Input label={t('diagnostics.label_user_i_d')} placeholder="e.g., 42" type="number" value={userId} onValueChange={setUserId} variant="secondary" className="max-w-xs" />
               <Button
-                color="primary"
                 startContent={loadingUser ? undefined : <Search size={16} />}
                 className="self-end"
                 isDisabled={!userId}
@@ -119,7 +118,7 @@ export function MatchingDiagnostic() {
               </Button>
             </div>
             {userResult && (
-              <Card className="mt-2 bg-default-50">
+              <Card className="mt-2 bg-surface-secondary">
                 <CardBody>
                   <pre className="text-xs overflow-auto max-h-64 whitespace-pre-wrap">
                     {JSON.stringify(userResult, null, 2)}
@@ -128,19 +127,18 @@ export function MatchingDiagnostic() {
               </Card>
             )}
             {!userId && !userResult && (
-              <p className="text-xs text-default-400">{t('diagnostics.user_prompt')}</p>
+              <p className="text-xs text-muted">{t('diagnostics.user_prompt')}</p>
             )}
           </CardBody>
         </Card>
 
-        <Card shadow="sm">
+        <Card >
           <CardHeader><h3 className="text-lg font-semibold">{t('diagnostics.diagnose_listing_matches')}</h3></CardHeader>
           <CardBody className="gap-4">
-            <p className="text-sm text-default-500">{t('diagnostics.diagnose_listing_matches_desc')}</p>
+            <p className="text-sm text-muted">{t('diagnostics.diagnose_listing_matches_desc')}</p>
             <div className="flex gap-3">
-              <Input label={t('diagnostics.label_listing_i_d')} placeholder="e.g., 105" type="number" value={listingId} onValueChange={setListingId} variant="bordered" className="max-w-xs" />
+              <Input label={t('diagnostics.label_listing_i_d')} placeholder="e.g., 105" type="number" value={listingId} onValueChange={setListingId} variant="secondary" className="max-w-xs" />
               <Button
-                color="primary"
                 startContent={loadingListing ? undefined : <Search size={16} />}
                 className="self-end"
                 isDisabled={!listingId}
@@ -151,7 +149,7 @@ export function MatchingDiagnostic() {
               </Button>
             </div>
             {listingResult && (
-              <Card className="mt-2 bg-default-50">
+              <Card className="mt-2 bg-surface-secondary">
                 <CardBody>
                   <pre className="text-xs overflow-auto max-h-64 whitespace-pre-wrap">
                     {JSON.stringify(listingResult, null, 2)}
@@ -162,23 +160,23 @@ export function MatchingDiagnostic() {
           </CardBody>
         </Card>
 
-        <Card shadow="sm">
+        <Card >
           <CardHeader><h3 className="text-lg font-semibold">{t('diagnostics.engine_status')}</h3></CardHeader>
           <CardBody>
             {loadingEngine ? (
               <div className="flex justify-center py-4"><Spinner size="sm" /></div>
             ) : (
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                <div className="rounded-lg border border-default-200 p-3 text-center">
-                  <p className="text-sm text-default-500">{t('diagnostics.matches_today')}</p>
+                <div className="rounded-lg border border-border p-3 text-center">
+                  <p className="text-sm text-muted">{t('diagnostics.matches_today')}</p>
                   <p className="font-medium">{overview?.total_matches_today ?? '--'}</p>
                 </div>
-                <div className="rounded-lg border border-default-200 p-3 text-center">
-                  <p className="text-sm text-default-500">{t('diagnostics.cache_entries')}</p>
+                <div className="rounded-lg border border-border p-3 text-center">
+                  <p className="text-sm text-muted">{t('diagnostics.cache_entries')}</p>
                   <p className="font-medium">{overview?.cache_entries ?? '--'}</p>
                 </div>
-                <div className="rounded-lg border border-default-200 p-3 text-center">
-                  <p className="text-sm text-default-500">{t('diagnostics.avg_match_score')}</p>
+                <div className="rounded-lg border border-border p-3 text-center">
+                  <p className="text-sm text-muted">{t('diagnostics.avg_match_score')}</p>
                   <p className="font-medium">
                     {overview?.avg_match_score !== undefined
                       ? `${Number(overview.avg_match_score).toFixed(1)}%`

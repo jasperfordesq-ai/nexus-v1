@@ -130,8 +130,7 @@ export function Redirects() {
       render: (item) => (
         <Button
           isIconOnly
-          variant="light"
-          color="danger"
+          variant="danger"
           size="sm"
           onPress={() => setDeleteTarget(item)}
           aria-label={t('label_delete_redirect')}
@@ -159,7 +158,7 @@ export function Redirects() {
         title={t('redirects_title')}
         description={t('redirects_desc')}
         actions={
-          <Button color="primary" startContent={<Plus size={16} />} onPress={onAddOpen}>
+          <Button startContent={<Plus size={16} />} onPress={onAddOpen}>
             {t('add_redirect')}
           </Button>
         }
@@ -190,7 +189,7 @@ export function Redirects() {
             <Input
               label={t('col_from_url')}
               placeholder="/old-page"
-              variant="bordered"
+              variant="secondary"
               value={fromUrl}
               onValueChange={setFromUrl}
               description={t('desc_the_u_r_l_path_to_redirect_from')}
@@ -198,17 +197,17 @@ export function Redirects() {
             <Input
               label={t('col_to_url')}
               placeholder="/new-page"
-              variant="bordered"
+              variant="secondary"
               value={toUrl}
               onValueChange={setToUrl}
               description={t('desc_the_destination_u_r_l_path')}
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onAddClose} isDisabled={saving}>
+            <Button variant="tertiary" onPress={onAddClose} isDisabled={saving}>
               {t('cancel')}
             </Button>
-            <Button color="primary" onPress={handleAdd} isLoading={saving} isDisabled={saving}>
+            <Button onPress={handleAdd} isLoading={saving} isDisabled={saving}>
               {t('create_redirect')}
             </Button>
           </ModalFooter>

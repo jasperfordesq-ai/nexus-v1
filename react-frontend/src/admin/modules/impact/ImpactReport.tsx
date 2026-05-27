@@ -170,8 +170,8 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
 
 const tooltipStyle = {
   borderRadius: '8px',
-  border: '1px solid hsl(var(--heroui-default-200))',
-  backgroundColor: 'hsl(var(--heroui-content1))',
+  border: '1px solid var(--color-border)',
+  backgroundColor: 'var(--color-surface)',
   color: 'hsl(var(--heroui-foreground))',
 };
 
@@ -558,7 +558,6 @@ export function ImpactReport() {
           label={t('impact.label_monetary_value')}
           value={data ? formatCurrency(data.sroi.monetary_value, currency) : '\u2014'}
           icon={TrendingUp}
-          color="default"
           loading={loading}
         />
         <StatCard
@@ -572,7 +571,6 @@ export function ImpactReport() {
           label={t('impact.label_sroi_ratio')}
           value={data ? `${data.sroi.sroi_ratio}:1` : '\u2014'}
           icon={TrendingUp}
-          color="default"
           loading={loading}
         />
       </div>
@@ -651,7 +649,6 @@ export function ImpactReport() {
               label={t('impact.label_active_members')}
               value={extras.members?.active_traders ?? '\u2014'}
               icon={Users}
-              color="default"
               loading={loading}
             />
             <StatCard
@@ -734,14 +731,12 @@ export function ImpactReport() {
           label={t('impact.label_engagement_rate')}
           value={data ? formatPercent(data.health.engagement_rate) : '\u2014'}
           icon={Users}
-          color="default"
           loading={loading}
         />
         <StatCard
           label={t('impact.label_reciprocity_score')}
           value={data ? data.health.reciprocity_score.toFixed(2) : '\u2014'}
           icon={ArrowLeftRight}
-          color="default"
           loading={loading}
         />
         <StatCard

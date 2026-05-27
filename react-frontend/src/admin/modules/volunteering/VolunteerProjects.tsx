@@ -185,7 +185,7 @@ export default function VolunteerProjects() {
       label: t('volunteering.col_status'),
       sortable: true,
       render: (row) => (
-        <Chip size="sm" color={statusColorMap[row.status] || 'default'} variant="flat">
+        <Chip size="sm" color={statusColorMap[row.status] || 'default'} variant="soft">
           {t(`volunteering.project_status_${row.status}`)}
         </Chip>
       ),
@@ -210,8 +210,7 @@ export default function VolunteerProjects() {
         <div className="flex items-center gap-1">
           <Button
             size="sm"
-            variant="flat"
-            color="primary"
+            variant="tertiary"
             startContent={<ClipboardCheck size={14} />}
             onPress={() => openReview(row)}
           >
@@ -220,7 +219,7 @@ export default function VolunteerProjects() {
           {row.status === 'approved' && (
             <Button
               size="sm"
-              variant="flat"
+              variant="tertiary"
               color="success"
               startContent={<PlusCircle size={14} />}
               onPress={() => handleCreateOpportunity(row)}
@@ -239,7 +238,7 @@ export default function VolunteerProjects() {
         title={t('volunteering.projects_title')}
         description={t('volunteering.projects_desc')}
         actions={
-          <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={() => loadData()} isLoading={loading}>
+          <Button variant="tertiary" startContent={<RefreshCw size={16} />} onPress={() => loadData()} isLoading={loading}>
             {t('volunteering.refresh')}
           </Button>
         }
@@ -252,7 +251,6 @@ export default function VolunteerProjects() {
             label={t('volunteering.total_projects')}
             value={stats.total}
             icon={FolderKanban}
-            color="default"
             loading={loading}
           />
           <StatCard
@@ -266,14 +264,12 @@ export default function VolunteerProjects() {
             label={t('volunteering.active_projects')}
             value={stats.active}
             icon={Play}
-            color="primary"
             loading={loading}
           />
           <StatCard
             label={t('volunteering.completed_projects')}
             value={stats.completed}
             icon={Flag}
-            color="secondary"
             loading={loading}
           />
           <StatCard
@@ -297,7 +293,7 @@ export default function VolunteerProjects() {
           <DataTable columns={columns} data={projects} isLoading={loading} />
           {hasMore && (
             <div className="flex justify-center">
-              <Button variant="flat" onPress={() => loadData(true, cursor)} isLoading={loadingMore}>
+              <Button variant="tertiary" onPress={() => loadData(true, cursor)} isLoading={loadingMore}>
                 {t('volunteering.load_more')}
               </Button>
             </div>
@@ -320,7 +316,7 @@ export default function VolunteerProjects() {
                   const selected = Array.from(keys)[0];
                   if (typeof selected === 'string') setReviewStatus(selected);
                 }}
-                variant="bordered"
+                variant="secondary"
                 isRequired
               >
                 {reviewStatuses.map((status) => (
@@ -333,15 +329,15 @@ export default function VolunteerProjects() {
                 label={t('volunteering.review_notes')}
                 value={reviewNotes}
                 onValueChange={setReviewNotes}
-                variant="bordered"
+                variant="secondary"
                 placeholder={t('volunteering.review_notes_placeholder')}
                 minRows={3}
               />
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onClose}>{t('volunteering.cancel')}</Button>
-            <Button color="primary" onPress={handleReview} isLoading={saving}>
+            <Button variant="tertiary" onPress={onClose}>{t('volunteering.cancel')}</Button>
+            <Button onPress={handleReview} isLoading={saving}>
               {t('volunteering.submit_review')}
             </Button>
           </ModalFooter>

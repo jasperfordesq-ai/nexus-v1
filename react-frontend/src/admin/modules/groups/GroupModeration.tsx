@@ -80,14 +80,13 @@ export function GroupModeration() {
           {item.report_count > 0 ? (
             <Chip
               size="sm"
-              variant="flat"
-              color="danger"
+              variant="soft" color="danger"
               startContent={<Flag size={12} />}
             >
               {t('groups.report_count')}
             </Chip>
           ) : (
-            <span className="text-sm text-default-400">{t('groups.none')}</span>
+            <span className="text-sm text-muted">{t('groups.none')}</span>
           )}
         </div>
       ),
@@ -97,7 +96,7 @@ export function GroupModeration() {
       label: t('groups.col_created'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {new Date(item.created_at).toLocaleDateString()}
         </span>
       ),

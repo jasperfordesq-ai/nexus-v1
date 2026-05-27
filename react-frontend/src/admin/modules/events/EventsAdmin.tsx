@@ -210,7 +210,7 @@ export function EventsAdmin() {
       label: "Date Time",
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">
+        <span className="text-sm text-muted">
           {formatDateTime(item.start_date)}
         </span>
       ),
@@ -219,7 +219,7 @@ export function EventsAdmin() {
       key: 'location',
       label: "Location",
       render: (item) => (
-        <span className="flex items-center gap-1 text-sm text-default-500">
+        <span className="flex items-center gap-1 text-sm text-muted">
           {item.location ? (
             <>
               <MapPin size={12} className="shrink-0" />
@@ -236,7 +236,7 @@ export function EventsAdmin() {
       label: "Organizer",
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">
+        <span className="text-sm text-muted">
           {item.organizer_name || "Unknown"}
         </span>
       ),
@@ -248,7 +248,7 @@ export function EventsAdmin() {
       render: (item) => (
         <Chip
           size="sm"
-          variant="flat"
+          variant="soft"
           color={statusColors[item.status] || 'default'}
           className="capitalize"
         >
@@ -261,7 +261,7 @@ export function EventsAdmin() {
       label: "Attendees",
       sortable: true,
       render: (item) => (
-        <span className="flex items-center gap-1 text-sm text-default-600">
+        <span className="flex items-center gap-1 text-sm text-muted">
           <Users size={12} />
           {item.attendees_count ?? 0}
           {item.max_attendees ? ` / ${item.max_attendees}` : ''}
@@ -280,8 +280,7 @@ export function EventsAdmin() {
             rel="noopener noreferrer"
             isIconOnly
             size="sm"
-            variant="flat"
-            color="primary"
+            variant="tertiary"
             aria-label={"View Event"}
           >
             <Eye size={14} />
@@ -290,7 +289,7 @@ export function EventsAdmin() {
             <Button
               isIconOnly
               size="sm"
-              variant="flat"
+              variant="tertiary"
               color="warning"
               onPress={() => setConfirmCancel(item)}
               aria-label={"Cancel Event"}
@@ -301,8 +300,7 @@ export function EventsAdmin() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
-            color="danger"
+            variant="danger"
             onPress={() => setConfirmDelete(item)}
             aria-label={"Delete Event"}
           >

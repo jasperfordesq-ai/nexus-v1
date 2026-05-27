@@ -71,7 +71,7 @@ export function UserPermissions() {
         title={t('users.permissions_title')}
         description={t('users.permissions_description')}
         actions={
-          <Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/users'))}>
+          <Button variant="tertiary" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/users'))}>
             {t('common.back')}
           </Button>
         }
@@ -80,33 +80,33 @@ export function UserPermissions() {
       {loading ? (
         <div className="flex justify-center py-12"><Spinner size="lg" /></div>
       ) : !user ? (
-        <Card shadow="sm">
-          <CardBody className="py-8 text-center text-default-500">
+        <Card >
+          <CardBody className="py-8 text-center text-muted">
             {t('users.failed_to_load_user')}
           </CardBody>
         </Card>
       ) : (
         <div className="flex flex-col gap-4">
-          <Card shadow="sm">
+          <Card >
             <CardHeader className="flex items-center gap-2">
               <Shield size={20} />
               <h3 className="text-lg font-semibold">{user.name}</h3>
-              <span className="text-sm text-default-500">({user.email})</span>
+              <span className="text-sm text-muted">({user.email})</span>
             </CardHeader>
             <CardBody className="gap-4">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-sm font-medium">{t('users.role_label')}:</span>
-                <Chip color={roleColorFor(user.role)} variant="flat" size="sm">
+                <Chip color={roleColorFor(user.role)} variant="soft" size="sm">
                   {user.role}
                 </Chip>
                 {user.is_super_admin && (
-                  <Chip color="secondary" variant="flat" size="sm">super_admin</Chip>
+                  <Chip variant="soft" size="sm">super_admin</Chip>
                 )}
                 {user.is_tenant_super_admin && (
-                  <Chip color="primary" variant="flat" size="sm">tenant_super_admin</Chip>
+                  <Chip variant="soft" size="sm">tenant_super_admin</Chip>
                 )}
                 {user.is_admin && (
-                  <Chip color="primary" variant="flat" size="sm">admin</Chip>
+                  <Chip variant="soft" size="sm">admin</Chip>
                 )}
               </div>
 
@@ -115,22 +115,22 @@ export function UserPermissions() {
                 {user.permissions && user.permissions.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {user.permissions.map((p) => (
-                      <Chip key={p} variant="flat" size="sm">{p}</Chip>
+                      <Chip key={p} variant="soft" size="sm">{p}</Chip>
                     ))}
                   </div>
                 ) : (
-                  <div className="text-sm text-default-500">{t('users.no_explicit_permissions')}</div>
+                  <div className="text-sm text-muted">{t('users.no_explicit_permissions')}</div>
                 )}
               </div>
             </CardBody>
           </Card>
 
-          <Card shadow="sm" className="border border-warning/30 bg-warning/5">
+          <Card  className="border border-warning/30 bg-warning/5">
             <CardBody className="flex flex-row items-start gap-3">
               <Info size={20} className="text-warning shrink-0 mt-0.5" />
               <div>
                 <div className="font-medium">{t('users.permissions_editor_coming_soon_title')}</div>
-                <p className="text-sm text-default-500 mt-1">{t('users.permissions_editor_coming_soon_desc')}</p>
+                <p className="text-sm text-muted mt-1">{t('users.permissions_editor_coming_soon_desc')}</p>
               </div>
             </CardBody>
           </Card>

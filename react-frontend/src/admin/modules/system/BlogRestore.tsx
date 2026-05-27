@@ -122,7 +122,7 @@ export function BlogRestore() {
           description={t('system.desc_blog_post_backups_will_appear_here_when_')}
         />
       ) : (
-        <Card shadow="sm">
+        <Card >
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <FileArchive size={20} /> {t('system.available_backups', { count: backups.length })}
@@ -133,23 +133,22 @@ export function BlogRestore() {
               {backups.map((backup) => (
                 <div
                   key={backup.id}
-                  className="flex items-center justify-between rounded-lg border border-default-200 p-4"
+                  className="flex items-center justify-between rounded-lg border border-border p-4"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-default-100">
-                      <FileArchive size={20} className="text-default-500" />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-surface-secondary">
+                      <FileArchive size={20} className="text-muted" />
                     </div>
                     <div>
                       <p className="font-medium text-foreground">{backup.filename}</p>
-                      <p className="text-xs text-default-400">
+                      <p className="text-xs text-muted">
                         {new Date(backup.created_at).toLocaleString()} &middot; {backup.size}
                       </p>
                     </div>
                   </div>
                   <Button
                     size="sm"
-                    color="primary"
-                    variant="flat"
+                    variant="tertiary"
                     startContent={<Download size={14} />}
                     onPress={() => setConfirmBackup(backup)}
                     isLoading={restoringId === backup.id}

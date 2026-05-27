@@ -139,7 +139,7 @@ export function FraudAlerts() {
         render: (alert) => (
           <Chip
             size="sm"
-            variant="flat"
+            variant="soft"
             color={SEVERITY_COLOR_MAP[alert.severity] || 'default'}
             className="capitalize"
           >
@@ -154,7 +154,7 @@ export function FraudAlerts() {
         render: (alert) => (
           <Chip
             size="sm"
-            variant="flat"
+            variant="soft"
             color={STATUS_COLOR_MAP[alert.status] || 'default'}
             className="capitalize"
           >
@@ -167,7 +167,7 @@ export function FraudAlerts() {
         label: t('timebanking.col_date'),
         sortable: true,
         render: (alert) => (
-          <span className="text-sm text-default-500">
+          <span className="text-sm text-muted">
             {new Date(alert.created_at).toLocaleDateString()}
           </span>
         ),
@@ -178,7 +178,7 @@ export function FraudAlerts() {
         render: (alert) => (
           <Dropdown>
             <DropdownTrigger>
-              <Button isIconOnly size="sm" variant="light" aria-label={t('timebanking.label_actions')}>
+              <Button isIconOnly size="sm" variant="tertiary" aria-label={t('timebanking.label_actions')}>
                 <MoreVertical size={16} />
               </Button>
             </DropdownTrigger>
@@ -193,7 +193,7 @@ export function FraudAlerts() {
               <DropdownItem key="resolved" id="resolved" description={t('timebanking.desc_mark_as_resolved')} className="text-success">
                 {t('timebanking.action_resolve')}
               </DropdownItem>
-              <DropdownItem key="dismissed" id="dismissed" description={t('timebanking.desc_dismiss_this_alert')} className="text-default-400">
+              <DropdownItem key="dismissed" id="dismissed" description={t('timebanking.desc_dismiss_this_alert')} className="text-muted">
                 {t('timebanking.action_dismiss')}
               </DropdownItem>
             </DropdownMenu>
@@ -213,7 +213,7 @@ export function FraudAlerts() {
           <Button
             as={Link}
             to={tenantPath('/admin/timebanking')}
-            variant="flat"
+            variant="tertiary"
             startContent={<ArrowLeft size={16} />}
             size="sm"
           >
@@ -250,8 +250,8 @@ export function FraudAlerts() {
         onRefresh={loadAlerts}
         emptyContent={
           <div className="flex flex-col items-center gap-2 py-8">
-            <AlertTriangle size={32} className="text-default-300" />
-            <p className="text-sm text-default-400">{t('timebanking.no_fraud_alerts')}</p>
+            <AlertTriangle size={32} className="text-muted" />
+            <p className="text-sm text-muted">{t('timebanking.no_fraud_alerts')}</p>
           </div>
         }
       />

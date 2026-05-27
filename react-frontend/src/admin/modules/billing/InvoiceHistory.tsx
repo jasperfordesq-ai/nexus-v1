@@ -86,7 +86,7 @@ export function InvoiceHistory() {
       label: t('billing.invoice_date'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">
+        <span className="text-sm text-muted">
           {item.date ? new Date(item.date).toLocaleDateString() : '--'}
         </span>
       ),
@@ -104,7 +104,7 @@ export function InvoiceHistory() {
       label: t('billing.invoice_status'),
       sortable: true,
       render: (item) => (
-        <Chip size="sm" variant="flat" color={invoiceStatusColor(item.status)}>
+        <Chip size="sm" variant="soft" color={invoiceStatusColor(item.status)}>
           {item.status}
         </Chip>
       ),
@@ -117,7 +117,7 @@ export function InvoiceHistory() {
           {item.hosted_invoice_url && (
             <Button
               size="sm"
-              variant="flat"
+              variant="tertiary"
               startContent={<ExternalLink className="w-3 h-3" />}
               onPress={() => window.open(item.hosted_invoice_url!, '_blank', 'noopener,noreferrer')}
             >
@@ -127,7 +127,7 @@ export function InvoiceHistory() {
           {item.invoice_pdf && (
             <Button
               size="sm"
-              variant="flat"
+              variant="tertiary"
               startContent={<Download className="w-3 h-3" />}
               onPress={() => window.open(item.invoice_pdf!, '_blank', 'noopener,noreferrer')}
             >

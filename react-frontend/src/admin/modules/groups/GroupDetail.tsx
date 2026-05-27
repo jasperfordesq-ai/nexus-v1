@@ -133,7 +133,7 @@ export default function GroupDetail() {
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center gap-4">
-        <Button isIconOnly variant="light" aria-label={t('groups.go_back')} onPress={() => navigate(-1)}>
+        <Button isIconOnly variant="tertiary" aria-label={t('groups.go_back')} onPress={() => navigate(-1)}>
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <div className="flex-1">
@@ -141,11 +141,11 @@ export default function GroupDetail() {
           <p className="text-sm text-gray-500">{t('groups.group_id')}</p>
         </div>
         {editMode ? (
-          <Button color="primary" startContent={<Save className="w-4 h-4" />} onPress={handleSave}>
+          <Button startContent={<Save className="w-4 h-4" />} onPress={handleSave}>
             {t('groups.save')}
           </Button>
         ) : (
-          <Button variant="flat" onPress={() => setEditMode(true)}>
+          <Button variant="tertiary" onPress={() => setEditMode(true)}>
             {t('groups.edit')}
           </Button>
         )}
@@ -240,14 +240,14 @@ export default function GroupDetail() {
                     <TableCell>{new Date(member.joined_at).toLocaleDateString()}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        {member.role === 'member' && <Button size="sm" variant="flat" onPress={() => handlePromote(member.user_id)}>{t('groups.promote')}</Button>}
+                        {member.role === 'member' && <Button size="sm" variant="tertiary" onPress={() => handlePromote(member.user_id)}>{t('groups.promote')}</Button>}
                         {member.role === 'admin' && (
                           <>
-                            <Button size="sm" variant="flat" onPress={() => handlePromote(member.user_id)}>{t('groups.make_owner')}</Button>
-                            <Button size="sm" variant="flat" onPress={() => handleDemote(member.user_id)}>{t('groups.demote')}</Button>
+                            <Button size="sm" variant="tertiary" onPress={() => handlePromote(member.user_id)}>{t('groups.make_owner')}</Button>
+                            <Button size="sm" variant="tertiary" onPress={() => handleDemote(member.user_id)}>{t('groups.demote')}</Button>
                           </>
                         )}
-                        {member.role !== 'owner' && <Button size="sm" variant="flat" color="danger" onPress={() => handleKick(member.user_id)}>{t('groups.kick')}</Button>}
+                        {member.role !== 'owner' && <Button size="sm" variant="danger" onPress={() => handleKick(member.user_id)}>{t('groups.kick')}</Button>}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -270,7 +270,6 @@ export default function GroupDetail() {
               </div>
             )}
             <Button
-              color="primary"
               startContent={<MapPin className="w-4 h-4" />}
               onPress={handleGeocode}
               isDisabled={!group.location}

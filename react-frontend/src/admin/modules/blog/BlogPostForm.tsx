@@ -206,7 +206,7 @@ export function BlogPostForm() {
           title={t('blog.page_title_edit')}
           actions={
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/blog'))}
             >
@@ -220,7 +220,7 @@ export function BlogPostForm() {
               {loadError || t('blog.failed_to_load_blog_posts')}
             </p>
             <div className="mt-4 flex justify-center">
-              <Button variant="flat" onPress={() => navigate(tenantPath('/admin/blog'))}>
+              <Button variant="tertiary" onPress={() => navigate(tenantPath('/admin/blog'))}>
                 {t('blog.back')}
               </Button>
             </div>
@@ -236,7 +236,7 @@ export function BlogPostForm() {
         title={isEdit && post?.title ? t('blog.page_title_edit_with_title', { title: post.title }) : t('blog.page_title_create')}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<ArrowLeft size={16} />}
             onPress={() => navigate(tenantPath('/admin/blog'))}
           >
@@ -340,7 +340,7 @@ export function BlogPostForm() {
 
             {/* SEO Override (Optional) */}
             <Separator />
-            <div className="flex items-center gap-2 text-default-600">
+            <div className="flex items-center gap-2 text-muted">
               <Search size={16} />
               <span className="text-sm font-semibold">{t('blog.seo_override')}</span>
             </div>
@@ -365,7 +365,7 @@ export function BlogPostForm() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium">{t('blog.noindex')}</p>
-                <p className="text-xs text-default-400">{t('blog.noindex_desc')}</p>
+                <p className="text-xs text-muted">{t('blog.noindex_desc')}</p>
               </div>
               <Switch
                 isSelected={noindex}
@@ -378,7 +378,7 @@ export function BlogPostForm() {
             {/* Submit */}
             <div className="flex justify-end gap-3 pt-2">
               <Button
-                variant="flat"
+                variant="tertiary"
                 onPress={() => navigate(tenantPath('/admin/blog'))}
                 isDisabled={submitting}
               >
@@ -386,7 +386,6 @@ export function BlogPostForm() {
               </Button>
               <Button
                 type="submit"
-                color="primary"
                 startContent={!submitting ? <Save size={16} /> : undefined}
                 isLoading={submitting}
                 isDisabled={submitting}

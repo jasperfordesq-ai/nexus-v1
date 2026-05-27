@@ -222,7 +222,7 @@ export function TemplateForm() {
           title={t('newsletters.edit_template')}
           actions={
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/newsletters/templates'))}
             >
@@ -237,7 +237,7 @@ export function TemplateForm() {
             </p>
             <div className="mt-4 flex justify-center">
               <Button
-                variant="flat"
+                variant="tertiary"
                 onPress={() => navigate(tenantPath('/admin/newsletters/templates'))}
               >
                 {t('newsletters.return_to_templates')}
@@ -255,7 +255,7 @@ export function TemplateForm() {
         title={isEdit ? t('newsletters.edit_template_name_title', { name: template?.name ?? name }) : t('newsletters.create_template')}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<ArrowLeft size={16} />}
             onPress={() => navigate(tenantPath('/admin/newsletters/templates'))}
           >
@@ -366,18 +366,17 @@ export function TemplateForm() {
 
                 {/* Merge variables */}
                 <div>
-                  <p className="mb-2 text-sm font-medium text-default-700">
+                  <p className="mb-2 text-sm font-medium text-foreground">
                     {t('newsletters.available_merge_variables')}
                   </p>
-                  <p className="mb-3 text-xs text-default-500">
+                  <p className="mb-3 text-xs text-muted">
                     {t('newsletters.merge_variables_desc')}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {MERGE_VARIABLES.map((variable) => (
                       <Chip
                         key={variable}
-                        variant="flat"
-                        color="primary"
+                        variant="soft"
                         size="sm"
                         className="cursor-pointer"
                         onClick={() => copyToClipboard(variable)}
@@ -398,7 +397,6 @@ export function TemplateForm() {
               <CardBody className="gap-3">
                 <Button
                   type="submit"
-                  color="primary"
                   className="w-full"
                   startContent={<Save size={16} />}
                   isLoading={submitting}
@@ -408,7 +406,7 @@ export function TemplateForm() {
 
                 {isEdit && (
                   <Button
-                    variant="flat"
+                    variant="tertiary"
                     className="w-full"
                     startContent={<Copy size={16} />}
                     onPress={handleDuplicate}
@@ -419,7 +417,7 @@ export function TemplateForm() {
                 )}
 
                 <Button
-                  variant="flat"
+                  variant="tertiary"
                   className="w-full"
                   onPress={() => navigate(tenantPath('/admin/newsletters/templates'))}
                   isDisabled={submitting}
@@ -453,14 +451,14 @@ export function TemplateForm() {
               <Card>
                 <CardBody className="gap-2">
                   <div className="flex items-center gap-2">
-                    <BarChart3 size={16} className="text-default-500" />
+                    <BarChart3 size={16} className="text-muted" />
                     <span className="text-sm font-semibold">{t('newsletters.usage_stats')}</span>
                   </div>
                   <div className="flex items-baseline gap-2">
                     <span className="text-3xl font-bold">
                       {template.usage_count ?? 0}
                     </span>
-                    <span className="text-sm text-default-500">
+                    <span className="text-sm text-muted">
                       {(template.usage_count ?? 0) !== 1
                         ? t('newsletters.usage_stats_sent_plural')
                         : t('newsletters.usage_stats_sent')}

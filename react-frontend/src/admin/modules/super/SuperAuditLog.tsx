@@ -139,7 +139,7 @@ export default function SuperAuditLog() {
             ) : (
               <span className="font-medium">{entry.target_label}</span>
             )}
-            <span className="text-xs text-default-400 ml-2">({entry.target_type})</span>
+            <span className="text-xs text-muted ml-2">({entry.target_type})</span>
           </div>
         );
       },
@@ -156,12 +156,12 @@ export default function SuperAuditLog() {
     },
     {
       key: 'description', label: t('super.col_description'),
-      render: (entry) => <span className="text-sm text-default-500">{entry.description}</span>,
+      render: (entry) => <span className="text-sm text-muted">{entry.description}</span>,
     },
     {
       key: 'created_at', label: t('super.col_date'), sortable: true,
       render: (entry) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {new Date(entry.created_at).toLocaleString()}
         </span>
       ),
@@ -170,7 +170,7 @@ export default function SuperAuditLog() {
 
   return (
     <div>
-      <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-default-500 mb-1">
+      <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-muted mb-1">
         <Link to={tenantPath('/admin/super')} className="hover:text-accent">{t('super.breadcrumb_super_admin')}</Link>
         <span>/</span>
         <span className="text-foreground">{t('super.audit_log')}</span>
@@ -180,7 +180,7 @@ export default function SuperAuditLog() {
         description={t('super.super_audit_log_desc')}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             size="sm"
             startContent={<Download size={16} />}
             onPress={exportCsv}
@@ -260,8 +260,7 @@ export default function SuperAuditLog() {
         {hasFilters && (
           <Button
             size="sm"
-            variant="light"
-            color="danger"
+            variant="danger"
             startContent={<X size={14} />}
             onPress={clearFilters}
           >

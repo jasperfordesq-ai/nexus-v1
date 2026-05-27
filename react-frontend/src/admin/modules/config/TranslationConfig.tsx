@@ -247,7 +247,7 @@ export function TranslationConfig() {
 
       <div className="space-y-6">
         {/* General Settings */}
-        <Card shadow="sm">
+        <Card >
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Settings size={18} className="text-accent" />
             <h3 className="font-semibold">{t('config.translation_general_settings')}</h3>
@@ -257,7 +257,7 @@ export function TranslationConfig() {
             <div className="flex items-center justify-between py-3">
               <div>
                 <p className="font-medium">{meta('translation.enabled').label}</p>
-                <p className="text-sm text-default-500">{meta('translation.enabled').description}</p>
+                <p className="text-sm text-muted">{meta('translation.enabled').description}</p>
               </div>
               <Switch
                 isSelected={!!getValue('translation.enabled')}
@@ -271,7 +271,7 @@ export function TranslationConfig() {
             <div className="flex items-center justify-between py-3">
               <div>
                 <p className="font-medium">{meta('translation.engine').label}</p>
-                <p className="text-sm text-default-500">{meta('translation.engine').description}</p>
+                <p className="text-sm text-muted">{meta('translation.engine').description}</p>
               </div>
               <Select
                 aria-label={t('config.translation_engine_label')}
@@ -294,7 +294,7 @@ export function TranslationConfig() {
             <div className="flex items-center justify-between py-3">
               <div>
                 <p className="font-medium">{meta('translation.context_aware').label}</p>
-                <p className="text-sm text-default-500">{meta('translation.context_aware').description}</p>
+                <p className="text-sm text-muted">{meta('translation.context_aware').description}</p>
               </div>
               <Switch
                 isSelected={!!getValue('translation.context_aware')}
@@ -308,7 +308,7 @@ export function TranslationConfig() {
             <div className="flex items-center justify-between py-3">
               <div>
                 <p className="font-medium">{meta('translation.context_messages').label}</p>
-                <p className="text-sm text-default-500">{meta('translation.context_messages').description}</p>
+                <p className="text-sm text-muted">{meta('translation.context_messages').description}</p>
               </div>
               <Input
                 aria-label={meta('translation.context_messages').label}
@@ -330,7 +330,7 @@ export function TranslationConfig() {
             <div className="flex items-center justify-between py-3">
               <div>
                 <p className="font-medium">{meta('translation.auto_translate_default').label}</p>
-                <p className="text-sm text-default-500">{meta('translation.auto_translate_default').description}</p>
+                <p className="text-sm text-muted">{meta('translation.auto_translate_default').description}</p>
               </div>
               <Switch
                 isSelected={!!getValue('translation.auto_translate_default')}
@@ -344,7 +344,7 @@ export function TranslationConfig() {
             <div className="flex items-center justify-between py-3">
               <div>
                 <p className="font-medium">{meta('translation.max_per_user_per_hour').label}</p>
-                <p className="text-sm text-default-500">{meta('translation.max_per_user_per_hour').description}</p>
+                <p className="text-sm text-muted">{meta('translation.max_per_user_per_hour').description}</p>
               </div>
               <Input
                 aria-label={meta('translation.max_per_user_per_hour').label}
@@ -368,7 +368,7 @@ export function TranslationConfig() {
             <div className="flex items-center justify-between py-3">
               <div>
                 <p className="font-medium">{meta('translation.glossary_enabled').label}</p>
-                <p className="text-sm text-default-500">{meta('translation.glossary_enabled').description}</p>
+                <p className="text-sm text-muted">{meta('translation.glossary_enabled').description}</p>
               </div>
               <Switch
                 isSelected={glossaryEnabled}
@@ -382,11 +382,11 @@ export function TranslationConfig() {
 
         {/* Glossary Management — only when glossary is enabled */}
         {glossaryEnabled && (
-          <Card shadow="sm">
+          <Card >
             <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
               <BookOpen size={18} className="text-accent" />
               <h3 className="font-semibold">{t('config.translation_glossary_management')}</h3>
-              <span className="text-sm text-default-400">{t('config.translation_glossary_management_desc')}</span>
+              <span className="text-sm text-muted">{t('config.translation_glossary_management_desc')}</span>
             </CardHeader>
             <CardBody className="px-4 pb-4 space-y-4">
               {/* Add entry form */}
@@ -423,7 +423,6 @@ export function TranslationConfig() {
                   ))}
                 </Select>
                 <Button
-                  color="primary"
                   startContent={<Plus size={16} />}
                   onPress={handleAddEntry}
                   isLoading={addingEntry}
@@ -442,7 +441,7 @@ export function TranslationConfig() {
                   <Spinner size="sm" />
                 </div>
               ) : glossary.length === 0 ? (
-                <p className="py-4 text-center text-sm text-default-400">
+                <p className="py-4 text-center text-sm text-muted">
                   {t('config.translation_glossary_empty')}
                 </p>
               ) : (
@@ -465,8 +464,7 @@ export function TranslationConfig() {
                             <Button
                               isIconOnly
                               size="sm"
-                              variant="light"
-                              color="danger"
+                              variant="danger"
                               onPress={() => handleDeleteEntry(entry.id)}
                               isDisabled={deletingId === entry.id}
                               aria-label={t('config.translation_delete_entry', { term: entry.source_term })}

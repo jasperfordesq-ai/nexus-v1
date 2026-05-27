@@ -93,7 +93,7 @@ function ComparisonPanel({ result, onClose, t }: { result: ComparisonResult; onC
             </span>
           </span>
         </div>
-        <Button size="sm" variant="light" onPress={onClose}>
+        <Button size="sm" variant="tertiary" onPress={onClose}>
           {t('kpi_baselines.actions.close')}
         </Button>
       </CardHeader>
@@ -120,7 +120,7 @@ function ComparisonPanel({ result, onClose, t }: { result: ComparisonResult; onC
                 <div className="flex items-center justify-between gap-1">
                   <span className="text-xs text-[var(--color-text-muted)] font-medium">{label}</span>
                   {isImpact && (
-                    <Chip size="sm" color="success" variant="flat" startContent={<CheckCircle2 size={12} />}>
+                    <Chip size="sm" color="success" variant="soft" startContent={<CheckCircle2 size={12} />}>
                       {t('kpi_baselines.comparison.impact_achieved')}
                     </Chip>
                   )}
@@ -275,7 +275,7 @@ export default function KpiBaselineAdminPage() {
               <Button
                 isIconOnly
                 size="sm"
-                variant="flat"
+                variant="tertiary"
                 onPress={loadBaselines}
                 isLoading={loading}
                 aria-label={t('kpi_baselines.actions.refresh_aria')}
@@ -284,7 +284,6 @@ export default function KpiBaselineAdminPage() {
               </Button>
             </Tooltip>
             <Button
-              color="primary"
               size="sm"
               startContent={<Plus size={15} />}
               onPress={() => setCaptureModalOpen(true)}
@@ -295,16 +294,16 @@ export default function KpiBaselineAdminPage() {
         }
       />
 
-      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" >
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('kpi_baselines.about.title')}</p>
-              <p className="text-default-600">
+              <p className="text-muted">
                 <Abbr term="KPI" /> {t('kpi_baselines.about.body_prefix')} <Abbr term="KPI" /> {t('kpi_baselines.about.body_suffix')}
               </p>
-              <p className="text-default-600">
+              <p className="text-muted">
                 {t('kpi_baselines.about.compare_prefix')} <strong>{t('kpi_baselines.actions.compare')}</strong> {t('kpi_baselines.about.compare_suffix')}
               </p>
             </div>
@@ -324,7 +323,6 @@ export default function KpiBaselineAdminPage() {
               <Database size={40} className="opacity-30" />
               <p className="text-sm">{t('kpi_baselines.empty.no_baselines')}</p>
               <Button
-                color="primary"
                 size="sm"
                 startContent={<Plus size={14} />}
                 onPress={() => setCaptureModalOpen(true)}
@@ -420,7 +418,7 @@ export default function KpiBaselineAdminPage() {
                   placeholder={t('kpi_baselines.fields.baseline_placeholder')}
                   value={captureLabel}
                   onValueChange={setCaptureLabel}
-                  variant="bordered"
+                  variant="secondary"
                   description={t('kpi_baselines.fields.baseline_description')}
                 />
                 <div className="grid grid-cols-2 gap-3">
@@ -429,7 +427,7 @@ export default function KpiBaselineAdminPage() {
                     type="date"
                     value={capturePeriodStart}
                     onValueChange={setCapturePeriodStart}
-                    variant="bordered"
+                    variant="secondary"
                     description={t('kpi_baselines.fields.period_start_description')}
                   />
                   <Input
@@ -437,7 +435,7 @@ export default function KpiBaselineAdminPage() {
                     type="date"
                     value={capturePeriodEnd}
                     onValueChange={setCapturePeriodEnd}
-                    variant="bordered"
+                    variant="secondary"
                     description={t('kpi_baselines.fields.period_end_description')}
                   />
                 </div>
@@ -446,7 +444,7 @@ export default function KpiBaselineAdminPage() {
                   placeholder={t('kpi_baselines.fields.notes_placeholder')}
                   value={captureNotes}
                   onValueChange={setCaptureNotes}
-                  variant="bordered"
+                  variant="secondary"
                   minRows={2}
                   description={t('kpi_baselines.fields.notes_description')}
                 />
@@ -456,11 +454,10 @@ export default function KpiBaselineAdminPage() {
                 </p>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose} isDisabled={capturing}>
+                <Button variant="tertiary" onPress={onClose} isDisabled={capturing}>
                   {t('kpi_baselines.actions.cancel')}
                 </Button>
                 <Button
-                  color="primary"
                   onPress={handleCapture}
                   isLoading={capturing}
                   startContent={!capturing ? <Database size={15} /> : undefined}

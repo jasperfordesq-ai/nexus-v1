@@ -93,7 +93,7 @@ export function FeedAlgorithm() {
       <PageHeader title={t('feed_algorithm_title')} description={t('feed_algorithm_desc')} />
 
       <div className="space-y-4">
-        <Card shadow="sm">
+        <Card >
           <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Rss size={20} /> {t('feed_ranking_weights')}</h3></CardHeader>
           <CardBody className="gap-6">
             <div>
@@ -115,27 +115,27 @@ export function FeedAlgorithm() {
           </CardBody>
         </Card>
 
-        <Card shadow="sm">
+        <Card >
           <CardHeader><h3 className="text-lg font-semibold">{t('feed_options')}</h3></CardHeader>
           <CardBody className="space-y-3">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0">
                 <p className="font-medium">{t('chronological_mode')}</p>
-                <p className="text-sm text-default-500">{t('chronological_mode_desc')}</p>
+                <p className="text-sm text-muted">{t('chronological_mode_desc')}</p>
               </div>
               <Switch className="shrink-0" isSelected={!!formData.chronological_mode} onValueChange={(v) => updateField('chronological_mode', v)} aria-label={t('chronological_mode')} />
             </div>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0">
                 <p className="font-medium">{t('include_polls')}</p>
-                <p className="text-sm text-default-500">{t('include_polls_desc')}</p>
+                <p className="text-sm text-muted">{t('include_polls_desc')}</p>
               </div>
               <Switch className="shrink-0" isSelected={!!formData.include_polls} onValueChange={(v) => updateField('include_polls', v)} aria-label={t('include_polls')} />
             </div>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0">
                 <p className="font-medium">{t('include_events')}</p>
-                <p className="text-sm text-default-500">{t('include_events_desc')}</p>
+                <p className="text-sm text-muted">{t('include_events_desc')}</p>
               </div>
               <Switch className="shrink-0" isSelected={!!formData.include_events} onValueChange={(v) => updateField('include_events', v)} aria-label={t('include_events')} />
             </div>
@@ -143,7 +143,7 @@ export function FeedAlgorithm() {
         </Card>
 
         <div className="flex justify-end">
-          <Button color="primary" startContent={<Save size={16} />} onPress={handleSave} isLoading={saving} isDisabled={saving}>{t('save_algorithm')}</Button>
+          <Button startContent={<Save size={16} />} onPress={handleSave} isLoading={saving} isDisabled={saving}>{t('save_algorithm')}</Button>
         </div>
       </div>
     </div>

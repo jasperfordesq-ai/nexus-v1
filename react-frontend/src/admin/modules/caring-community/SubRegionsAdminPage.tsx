@@ -280,12 +280,11 @@ export default function SubRegionsAdminPage() {
             <MapPin className="h-5 w-5 text-accent" aria-hidden="true" />
             {t('sub_regions.meta.title')}
           </h1>
-          <p className="text-sm text-default-500 mt-0.5">
+          <p className="text-sm text-muted mt-0.5">
             {t('sub_regions.meta.subtitle')}
           </p>
         </div>
         <Button
-          color="primary"
           startContent={<Plus className="h-4 w-4" aria-hidden="true" />}
           onPress={openCreate}
         >
@@ -294,16 +293,16 @@ export default function SubRegionsAdminPage() {
       </div>
 
       {/* Intro card */}
-      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" >
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('sub_regions.about.title')}</p>
-              <p className="text-default-600">
+              <p className="text-muted">
                 {t('sub_regions.about.body')}
               </p>
-              <p className="text-default-500">
+              <p className="text-muted">
                 {t('sub_regions.about.postal_codes_note')}
               </p>
             </div>
@@ -362,33 +361,33 @@ export default function SubRegionsAdminPage() {
                 <TableCell>
                   <div>
                     <p className="font-medium">{region.name}</p>
-                    <p className="text-xs text-default-500 font-mono">{region.slug}</p>
+                    <p className="text-xs text-muted font-mono">{region.slug}</p>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Chip size="sm" color={typeColor(region.type)} variant="flat">
+                  <Chip size="sm" color={typeColor(region.type)} variant="soft">
                     {t(`sub_regions.type_options.${region.type}`)}
                   </Chip>
                 </TableCell>
                 <TableCell>
-                  <span className="text-xs text-default-600 font-mono">
+                  <span className="text-xs text-muted font-mono">
                     {postalCodesPreview(region.postal_codes)}
                   </span>
                 </TableCell>
                 <TableCell>
                   {region.center_latitude !== null && region.center_longitude !== null ? (
-                    <span className="text-xs text-default-500 font-mono">
+                    <span className="text-xs text-muted font-mono">
                       {region.center_latitude.toFixed(4)}, {region.center_longitude.toFixed(4)}
                     </span>
                   ) : (
-                    <span className="text-xs text-default-400">—</span>
+                    <span className="text-xs text-muted">—</span>
                   )}
                 </TableCell>
                 <TableCell>
                   <Chip
                     size="sm"
                     color={region.status === 'active' ? 'success' : 'default'}
-                    variant="flat"
+                    variant="soft"
                   >
                     {t(`sub_regions.status.${region.status}`)}
                   </Chip>
@@ -397,7 +396,7 @@ export default function SubRegionsAdminPage() {
                   <div className="flex items-center gap-2">
                     <Button
                       size="sm"
-                      variant="flat"
+                      variant="tertiary"
                       isIconOnly
                       onPress={() => openEdit(region)}
                       aria-label={t('sub_regions.actions.edit_aria')}
@@ -407,8 +406,7 @@ export default function SubRegionsAdminPage() {
                     {region.status === 'active' && (
                       <Button
                         size="sm"
-                        variant="flat"
-                        color="danger"
+                        variant="danger"
                         isIconOnly
                         onPress={() => handleDelete(region)}
                         aria-label={t('sub_regions.actions.mark_inactive')}
@@ -511,10 +509,10 @@ export default function SubRegionsAdminPage() {
                 </Select>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={closeModal} isDisabled={saving}>
+                <Button variant="tertiary" onPress={closeModal} isDisabled={saving}>
                   {t('sub_regions.actions.cancel')}
                 </Button>
-                <Button color="primary" onPress={handleSave} isLoading={saving}>
+                <Button onPress={handleSave} isLoading={saving}>
                   {editTarget ? t('sub_regions.actions.save_changes') : t('sub_regions.actions.create')}
                 </Button>
               </ModalFooter>

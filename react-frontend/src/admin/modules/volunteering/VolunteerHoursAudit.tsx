@@ -269,7 +269,7 @@ export function VolunteerHoursAudit() {
       label: t('volunteering.col_date'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}
         </span>
       ),
@@ -279,7 +279,7 @@ export function VolunteerHoursAudit() {
       label: t('volunteering.col_status'),
       sortable: true,
       render: (item) => (
-        <Chip size="sm" variant="flat" color={STATUS_COLORS[item.status] || 'default'} className="capitalize">
+        <Chip size="sm" variant="soft" color={STATUS_COLORS[item.status] || 'default'} className="capitalize">
           {t(`volunteering.status_${item.status}`)}
         </Chip>
       ),
@@ -291,11 +291,11 @@ export function VolunteerHoursAudit() {
         const isPaid = item.paid === 1 || item.paid === true;
         return (
           <div className="flex items-center gap-1">
-            <Chip size="sm" variant="flat" color={isPaid ? 'success' : 'default'}>
+            <Chip size="sm" variant="soft" color={isPaid ? 'success' : 'default'}>
               {isPaid ? t('volunteering.yes') : t('volunteering.no')}
             </Chip>
             {isPaid && item.paid_amount > 0 && (
-              <span className="text-xs text-default-400 font-mono">{item.paid_amount}</span>
+              <span className="text-xs text-muted font-mono">{item.paid_amount}</span>
             )}
           </div>
         );
@@ -311,7 +311,7 @@ export function VolunteerHoursAudit() {
           <div className="flex gap-1">
             <Button
               size="sm"
-              variant="flat"
+              variant="tertiary"
               color="success"
               startContent={<ThumbsUp size={14} />}
               isLoading={isThisItem}
@@ -321,8 +321,7 @@ export function VolunteerHoursAudit() {
             </Button>
             <Button
               size="sm"
-              variant="flat"
-              color="danger"
+              variant="danger"
               startContent={<ThumbsDown size={14} />}
               isLoading={isThisItem}
               onPress={() => handleVerify(item.id, 'decline')}
@@ -360,7 +359,7 @@ export function VolunteerHoursAudit() {
           className="w-44"
           value={dateFrom}
           onValueChange={setDateFrom}
-          startContent={<CalendarRange size={14} className="text-default-400" />}
+          startContent={<CalendarRange size={14} className="text-muted" />}
         />
         <Input
           type="date"
@@ -369,12 +368,12 @@ export function VolunteerHoursAudit() {
           className="w-44"
           value={dateTo}
           onValueChange={setDateTo}
-          startContent={<CalendarRange size={14} className="text-default-400" />}
+          startContent={<CalendarRange size={14} className="text-muted" />}
         />
         {(dateFrom || dateTo) && (
           <Button
             size="sm"
-            variant="light"
+            variant="tertiary"
             onPress={() => { setDateFrom(''); setDateTo(''); }}
           >
             {t('volunteering.clear_dates')}
@@ -382,7 +381,7 @@ export function VolunteerHoursAudit() {
         )}
         <Button
           size="sm"
-          variant="flat"
+          variant="tertiary"
           startContent={<Download size={14} />}
           onPress={handleExportCsv}
           isDisabled={filteredItems.length === 0}
@@ -390,7 +389,7 @@ export function VolunteerHoursAudit() {
           {t('volunteering.export_csv')}
         </Button>
         {hasMore && (
-          <Button size="sm" variant="flat" onPress={() => loadData(cursor ?? undefined)} isLoading={loading}>
+          <Button size="sm" variant="tertiary" onPress={() => loadData(cursor ?? undefined)} isLoading={loading}>
             {t('volunteering.load_more')}
           </Button>
         )}
@@ -404,7 +403,7 @@ export function VolunteerHoursAudit() {
         title={t('volunteering.hours_audit_title')}
         description={t('volunteering.hours_audit_desc')}
         actions={
-          <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={() => loadData()} isLoading={loading}>
+          <Button variant="tertiary" startContent={<RefreshCw size={16} />} onPress={() => loadData()} isLoading={loading}>
             {t('volunteering.refresh')}
           </Button>
         }
@@ -416,7 +415,6 @@ export function VolunteerHoursAudit() {
           label={t('volunteering.stat_total_hours')}
           value={stats.total_hours}
           icon={Clock}
-          color="primary"
           loading={loading}
         />
         <StatCard
@@ -437,7 +435,6 @@ export function VolunteerHoursAudit() {
           label={t('volunteering.stat_total_paid')}
           value={stats.total_paid}
           icon={CreditCard}
-          color="secondary"
           loading={loading}
         />
       </div>
@@ -530,11 +527,11 @@ export function VolunteerHoursAudit() {
           <CardBody>
             {paidEntries.length === 0 ? (
               <div className="text-center py-8">
-                <CreditCard size={40} className="mx-auto mb-3 text-default-300" />
-                <p className="text-default-500 text-sm">
+                <CreditCard size={40} className="mx-auto mb-3 text-muted" />
+                <p className="text-muted text-sm">
                   {t('volunteering.no_paid_entries')}
                 </p>
-                <p className="text-default-400 text-xs mt-1">
+                <p className="text-muted text-xs mt-1">
                   {t('volunteering.payment_tracking_note')}
                 </p>
               </div>
@@ -564,7 +561,7 @@ export function VolunteerHoursAudit() {
                         <TableCell className="font-mono text-success">
                           {entry.paid_amount > 0 ? entry.paid_amount.toFixed(2) : '--'}
                         </TableCell>
-                        <TableCell className="text-default-500">
+                        <TableCell className="text-muted">
                           {entry.created_at ? new Date(entry.created_at).toLocaleDateString() : '--'}
                         </TableCell>
                       </TableRow>

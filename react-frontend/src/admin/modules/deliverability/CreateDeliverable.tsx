@@ -85,31 +85,31 @@ export function CreateDeliverable() {
       <PageHeader
         title={t('deliverability.create_title')}
         description={t('deliverability.create_description')}
-        actions={<Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/deliverability/list'))}>{t('common.back')}</Button>}
+        actions={<Button variant="tertiary" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/deliverability/list'))}>{t('common.back')}</Button>}
       />
 
-      <Card shadow="sm">
+      <Card >
         <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Target size={20} /> {t('deliverability.details_heading')}</h3></CardHeader>
         <CardBody className="gap-4">
           <Input
             label={t('deliverability.title_label')}
             placeholder={t('deliverability.title_placeholder')}
             isRequired
-            variant="bordered"
+            variant="secondary"
             value={formData.title}
             onValueChange={(v) => handleChange('title', v)}
           />
           <Textarea
             label={t('deliverability.label_description')}
             placeholder={t('deliverability.placeholder_describe_the_deliverable')}
-            variant="bordered"
+            variant="secondary"
             minRows={3}
             value={formData.description}
             onValueChange={(v) => handleChange('description', v)}
           />
           <Select
             label={t('deliverability.priority_label')}
-            variant="bordered"
+            variant="secondary"
             selectedKeys={[formData.priority]}
             onSelectionChange={(keys) => {
               const selected = Array.from(keys)[0] as string;
@@ -123,7 +123,7 @@ export function CreateDeliverable() {
           </Select>
           <Select
             label={t('deliverability.status_label')}
-            variant="bordered"
+            variant="secondary"
             selectedKeys={[formData.status]}
             onSelectionChange={(keys) => {
               const selected = Array.from(keys)[0] as string;
@@ -138,21 +138,20 @@ export function CreateDeliverable() {
           <Input
             label={t('deliverability.due_date_label')}
             type="date"
-            variant="bordered"
+            variant="secondary"
             value={formData.due_date}
             onValueChange={(v) => handleChange('due_date', v)}
           />
           <Input
             label={t('deliverability.assigned_to_label')}
             placeholder={t('deliverability.assigned_to_placeholder')}
-            variant="bordered"
+            variant="secondary"
             value={formData.assigned_to}
             onValueChange={(v) => handleChange('assigned_to', v)}
           />
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="flat" onPress={() => navigate(tenantPath('/admin/deliverability/list'))}>{t('common.cancel')}</Button>
+            <Button variant="tertiary" onPress={() => navigate(tenantPath('/admin/deliverability/list'))}>{t('common.cancel')}</Button>
             <Button
-              color="primary"
               startContent={<Save size={16} />}
               onPress={handleSave}
               isLoading={saving}

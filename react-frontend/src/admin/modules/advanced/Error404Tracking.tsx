@@ -102,7 +102,7 @@ export function Error404Tracking() {
       label: t('col_referrer'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500 break-all">
+        <span className="text-sm text-muted break-all">
           {item.referrer || t('direct_referrer')}
         </span>
       ),
@@ -120,8 +120,7 @@ export function Error404Tracking() {
       render: (item) => (
         <Button
           isIconOnly
-          variant="light"
-          color="danger"
+          variant="danger"
           size="sm"
           onPress={() => setDeleteTarget(item)}
           aria-label={t('dismiss')}

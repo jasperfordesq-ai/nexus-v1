@@ -166,12 +166,12 @@ export function MarketplaceSellerAdmin() {
   function renderRating(rating: number) {
     const num = Number(rating);
     if (!num || num === 0) {
-      return <span className="text-sm text-default-400">--</span>;
+      return <span className="text-sm text-muted">--</span>;
     }
     return (
       <div className="flex items-center gap-1">
         <Star size={14} className="text-warning fill-warning" />
-        <span className="text-sm text-default-600">{num.toFixed(1)}</span>
+        <span className="text-sm text-muted">{num.toFixed(1)}</span>
       </div>
     );
   }
@@ -201,7 +201,7 @@ export function MarketplaceSellerAdmin() {
       render: (item) => (
         <Chip
           size="sm"
-          variant="flat"
+          variant="soft"
           color={typeColors[item.seller_type] || 'default'}
           className="capitalize"
         >
@@ -214,7 +214,7 @@ export function MarketplaceSellerAdmin() {
       label: t('marketplace.col_active_listings'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">{item.active_listings}</span>
+        <span className="text-sm text-muted">{item.active_listings}</span>
       ),
     },
     {
@@ -222,7 +222,7 @@ export function MarketplaceSellerAdmin() {
       label: t('marketplace.col_sales'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">{item.total_sales}</span>
+        <span className="text-sm text-muted">{item.total_sales}</span>
       ),
     },
     {
@@ -236,7 +236,7 @@ export function MarketplaceSellerAdmin() {
       label: t('marketplace.col_joined'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {item.joined_marketplace_at
             ? new Date(item.joined_marketplace_at).toLocaleDateString()
             : '--'}
@@ -253,7 +253,7 @@ export function MarketplaceSellerAdmin() {
               <Button
                 isIconOnly
                 size="sm"
-                variant="flat"
+                variant="tertiary"
                 color="success"
                 onPress={() => setConfirmVerify(item)}
                 isDisabled={actionLoading}
@@ -267,8 +267,7 @@ export function MarketplaceSellerAdmin() {
             <Button
               isIconOnly
               size="sm"
-              variant="flat"
-              color="danger"
+              variant="danger"
               onPress={() => setConfirmSuspend(item)}
               isDisabled={actionLoading}
               aria-label={t('marketplace.action_suspend_seller')}
@@ -280,8 +279,7 @@ export function MarketplaceSellerAdmin() {
             <Button
               isIconOnly
               size="sm"
-              variant="flat"
-              color="primary"
+              variant="tertiary"
               as="a"
               href={tenantPath(`/profile/${item.user_id}`)}
               target="_blank"
@@ -303,7 +301,7 @@ export function MarketplaceSellerAdmin() {
         description={t('marketplace.sellers_description')}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<RefreshCw size={16} />}
             onPress={loadSellers}
           >

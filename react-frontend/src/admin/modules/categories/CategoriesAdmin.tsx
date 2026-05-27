@@ -224,7 +224,7 @@ export function CategoriesAdmin() {
     return (
       <Dropdown>
         <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="light" aria-label={t('categories.label_category_actions')}>
+          <Button isIconOnly size="sm" variant="tertiary" aria-label={t('categories.label_category_actions')}>
             <MoreVertical size={16} />
           </Button>
         </DropdownTrigger>
@@ -232,7 +232,7 @@ export function CategoriesAdmin() {
           <DropdownItem key="edit" id="edit" startContent={<Edit size={14} />}>
             {t('common.edit')}
           </DropdownItem>
-          <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
+          <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" variant="danger">
             {t('common.delete')}
           </DropdownItem>
         </DropdownMenu>
@@ -261,7 +261,7 @@ export function CategoriesAdmin() {
       key: 'slug',
       label: t('categories.label_slug'),
       render: (cat) => (
-        <span className="text-sm text-default-500 font-mono">{cat.slug}</span>
+        <span className="text-sm text-muted font-mono">{cat.slug}</span>
       ),
     },
     {
@@ -269,7 +269,7 @@ export function CategoriesAdmin() {
       label: t('categories.label_type'),
       sortable: true,
       render: (cat) => (
-        <Chip size="sm" variant="flat" color={TYPE_COLORS[cat.type] || 'default'}>
+        <Chip size="sm" variant="soft" color={TYPE_COLORS[cat.type] || 'default'}>
           {TYPE_LABELS[cat.type] || cat.type}
         </Chip>
       ),
@@ -279,7 +279,7 @@ export function CategoriesAdmin() {
       label: t('categories.label_listings'),
       sortable: true,
       render: (cat) => (
-        <Chip size="sm" variant="flat" color={cat.listing_count > 0 ? 'primary' : 'default'}>
+        <Chip size="sm" variant="soft" color={cat.listing_count > 0 ? 'primary' : 'default'}>
           {cat.listing_count}
         </Chip>
       ),
@@ -289,7 +289,7 @@ export function CategoriesAdmin() {
       label: t('categories.label_created'),
       sortable: true,
       render: (cat) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {new Date(cat.created_at).toLocaleDateString()}
         </span>
       ),
@@ -310,7 +310,6 @@ export function CategoriesAdmin() {
         description={t('categories.categories_admin_desc')}
         actions={
           <Button
-            color="primary"
             startContent={<Plus size={16} />}
             onPress={openCreateModal}
           >
@@ -336,12 +335,12 @@ export function CategoriesAdmin() {
       </div>
 
       {loadError && !loading ? (
-        <Card shadow="sm">
+        <Card >
           <CardBody className="flex flex-col items-center gap-3 py-10 text-center">
             <AlertTriangle size={32} className="text-danger" />
             <div className="text-base font-semibold">{t('common.error_loading_data')}</div>
-            <div className="text-sm text-default-500">{loadError}</div>
-            <Button color="primary" variant="flat" onPress={loadCategories}>{t('common.retry')}</Button>
+            <div className="text-sm text-muted">{loadError}</div>
+            <Button variant="tertiary" onPress={loadCategories}>{t('common.retry')}</Button>
           </CardBody>
         </Card>
       ) : categories.length === 0 && !loading ? (
@@ -377,7 +376,7 @@ export function CategoriesAdmin() {
               value={formData.name}
               onValueChange={(v) => setFormData((prev) => ({ ...prev, name: v }))}
               isRequired
-              variant="bordered"
+              variant="secondary"
               autoFocus
             />
 
@@ -388,7 +387,7 @@ export function CategoriesAdmin() {
                 const selected = Array.from(keys)[0] as string;
                 if (selected) setFormData((prev) => ({ ...prev, type: selected }));
               }}
-              variant="bordered"
+              variant="secondary"
             >
               {CATEGORY_TYPES.map((t) => (
                 <SelectItem key={t.key} id={t.key}>{t.label}</SelectItem>
@@ -402,7 +401,7 @@ export function CategoriesAdmin() {
                 const selected = Array.from(keys)[0] as string;
                 if (selected) setFormData((prev) => ({ ...prev, color: selected }));
               }}
-              variant="bordered"
+              variant="secondary"
               renderValue={(items) => {
                 return items.map((item) => (
                   <div key={item.key} className="flex items-center gap-2">
@@ -429,10 +428,10 @@ export function CategoriesAdmin() {
             </Select>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={closeModal} isDisabled={saving}>
+            <Button variant="tertiary" onPress={closeModal} isDisabled={saving}>
               {t('common.cancel')}
             </Button>
-            <Button color="primary" onPress={handleSave} isLoading={saving} isDisabled={saving}>
+            <Button onPress={handleSave} isLoading={saving} isDisabled={saving}>
               {editingCategory ? t('categories.save_changes') : t('categories.create_category')}
             </Button>
           </ModalFooter>

@@ -223,14 +223,14 @@ export function CampaignForm() {
         description={t(isEdit ? 'gamification.edit_campaign_desc' : 'gamification.create_campaign_desc')}
         actions={
           <Link to={tenantPath("/admin/gamification/campaigns")}>
-            <Button variant="flat" startContent={<ArrowLeft size={16} />}>
+            <Button variant="tertiary" startContent={<ArrowLeft size={16} />}>
               {t('gamification.back_to_campaigns')}
             </Button>
           </Link>
         }
       />
 
-      <Card shadow="sm" className="max-w-2xl">
+      <Card  className="max-w-2xl">
         <CardHeader className="pb-0">
           <h3 className="text-lg font-semibold text-foreground">{t('gamification.campaign_details')}</h3>
         </CardHeader>
@@ -241,7 +241,7 @@ export function CampaignForm() {
             value={formData.name}
             onValueChange={(v) => { updateField('name', v); setFieldErrors((prev) => ({ ...prev, name: '' })); }}
             isRequired
-            variant="bordered"
+            variant="secondary"
             autoFocus
             isInvalid={!!fieldErrors.name}
             errorMessage={fieldErrors.name}
@@ -252,7 +252,7 @@ export function CampaignForm() {
             placeholder={t('gamification.campaign_description_placeholder')}
             value={formData.description}
             onValueChange={(v) => updateField('description', v)}
-            variant="bordered"
+            variant="secondary"
             minRows={3}
             isInvalid={!!fieldErrors.description}
             errorMessage={fieldErrors.description}
@@ -266,7 +266,7 @@ export function CampaignForm() {
                 const selected = Array.from(keys)[0] as string;
                 if (selected) updateField('status', selected);
               }}
-              variant="bordered"
+              variant="secondary"
             >
               {STATUS_OPTIONS.map((opt) => (
                 <SelectItem key={opt.key} id={opt.key}>{t(opt.labelKey)}</SelectItem>
@@ -280,7 +280,7 @@ export function CampaignForm() {
                 const selected = Array.from(keys)[0] as string;
                 if (selected) updateField('type', selected);
               }}
-              variant="bordered"
+              variant="secondary"
             >
               {TYPE_OPTIONS.map((opt) => (
                 <SelectItem key={opt.key} id={opt.key}>{t(opt.labelKey)}</SelectItem>
@@ -295,7 +295,7 @@ export function CampaignForm() {
               const selected = Array.from(keys)[0] as string;
               updateField('badge_key', selected || '');
             }}
-            variant="bordered"
+            variant="secondary"
             isLoading={loadingBadges}
             placeholder={t('gamification.select_badge')}
           >
@@ -303,7 +303,7 @@ export function CampaignForm() {
               <SelectItem key={badge.key} id={badge.key} textValue={badge.name}>
                 <div className="flex items-center gap-2">
                   <span>{badge.name}</span>
-                  <span className="text-xs text-default-400">({badge.type})</span>
+                  <span className="text-xs text-muted">({badge.type})</span>
                 </div>
               </SelectItem>
             ))}
@@ -315,7 +315,7 @@ export function CampaignForm() {
             placeholder="0"
             value={formData.xp_amount}
             onValueChange={(v) => updateField('xp_amount', v)}
-            variant="bordered"
+            variant="secondary"
             description={t('gamification.bonus_xp')}
             isInvalid={!!fieldErrors.xp_amount}
             errorMessage={fieldErrors.xp_amount}
@@ -328,7 +328,7 @@ export function CampaignForm() {
               const selected = Array.from(keys)[0] as string;
               if (selected) updateField('target_audience', selected);
             }}
-            variant="bordered"
+            variant="secondary"
           >
             {AUDIENCE_OPTIONS.map((opt) => (
               <SelectItem key={opt.key} id={opt.key}>{t(opt.labelKey)}</SelectItem>
@@ -343,7 +343,7 @@ export function CampaignForm() {
                 const selected = Array.from(keys)[0] as string;
                 updateField('schedule', selected || '');
               }}
-              variant="bordered"
+              variant="secondary"
               placeholder={t('gamification.select_frequency')}
             >
               <SelectItem key="daily" id="daily">{t('gamification.schedule_daily')}</SelectItem>
@@ -354,10 +354,9 @@ export function CampaignForm() {
 
           <div className="flex justify-end gap-2 pt-2">
             <Link to={tenantPath("/admin/gamification/campaigns")}>
-              <Button variant="flat" isDisabled={saving}>{t('gamification.cancel')}</Button>
+              <Button variant="tertiary" isDisabled={saving}>{t('gamification.cancel')}</Button>
             </Link>
             <Button
-              color="primary"
               startContent={<Save size={16} />}
               onPress={handleSave}
               isLoading={saving}

@@ -144,7 +144,7 @@ export function Templates() {
     return (
       <Dropdown>
         <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="light" aria-label={t('newsletters.col_actions')}>
+          <Button isIconOnly size="sm" variant="tertiary" aria-label={t('newsletters.col_actions')}>
             <MoreVertical size={16} />
           </Button>
         </DropdownTrigger>
@@ -180,7 +180,7 @@ export function Templates() {
             key="delete" id="delete"
             startContent={<Trash2 size={14} />}
             className="text-danger"
-            color="danger"
+            variant="danger"
           >
             {t('newsletters.delete')}
           </DropdownItem>
@@ -198,7 +198,7 @@ export function Templates() {
         <div>
           <p className="font-medium">{item.name}</p>
           {item.description && (
-            <p className="text-xs text-default-400 line-clamp-1">{item.description}</p>
+            <p className="text-xs text-muted line-clamp-1">{item.description}</p>
           )}
         </div>
       ),
@@ -209,7 +209,7 @@ export function Templates() {
       render: (item) => (
         <Chip
           size="sm"
-          variant="flat"
+          variant="soft"
           color={CATEGORY_COLORS[item.category] || 'default'}
         >
           {CATEGORY_LABELS[item.category] || item.category}
@@ -220,7 +220,7 @@ export function Templates() {
       key: 'subject',
       label: t('template_form.label_default_subject_line'),
       render: (item) => (
-        <span className="text-sm text-default-600 line-clamp-1">
+        <span className="text-sm text-muted line-clamp-1">
           {item.subject || '--'}
         </span>
       ),
@@ -243,7 +243,7 @@ export function Templates() {
       label: t('newsletter_templates.col_created'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}
         </span>
       ),
@@ -272,7 +272,6 @@ export function Templates() {
           description={t('newsletter_templates.description')}
           actions={
             <Button
-              color="primary"
               startContent={<Plus size={16} />}
               onPress={() => navigate(tenantPath('/admin/newsletters/templates/create'))}
             >
@@ -299,7 +298,7 @@ export function Templates() {
         actions={
           <div className="flex gap-2">
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<RefreshCw size={16} />}
               onPress={loadData}
               isLoading={loading}
@@ -307,7 +306,6 @@ export function Templates() {
               {t('newsletters.refresh')}
             </Button>
             <Button
-              color="primary"
               startContent={<Plus size={16} />}
               onPress={() => navigate(tenantPath('/admin/newsletters/templates/create'))}
             >

@@ -115,7 +115,7 @@ export function CampaignList() {
     return (
       <Dropdown>
         <DropdownTrigger>
-          <Button isIconOnly size="sm" variant="light" aria-label={t('gamification.label_campaign_actions')}>
+          <Button isIconOnly size="sm" variant="tertiary" aria-label={t('gamification.label_campaign_actions')}>
             <MoreVertical size={16} />
           </Button>
         </DropdownTrigger>
@@ -147,7 +147,7 @@ export function CampaignList() {
           >
             {t('gamification.resume')}
           </DropdownItem>
-          <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
+          <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" variant="danger">
             {t('gamification.delete')}
           </DropdownItem>
         </DropdownMenu>
@@ -174,14 +174,14 @@ export function CampaignList() {
       key: 'badge_name',
       label: t('gamification.col_badge'),
       render: (c) => (
-        <span className="text-sm text-default-600">{c.badge_name || c.badge_key || '—'}</span>
+        <span className="text-sm text-muted">{c.badge_name || c.badge_key || '—'}</span>
       ),
     },
     {
       key: 'target_audience',
       label: t('gamification.col_target'),
       render: (c) => (
-        <span className="text-sm text-default-600 capitalize">
+        <span className="text-sm text-muted capitalize">
           {(c.target_audience || '').replace(/_/g, ' ')}
         </span>
       ),
@@ -199,7 +199,7 @@ export function CampaignList() {
       label: t('gamification.col_created'),
       sortable: true,
       render: (c) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {c.created_at ? new Date(c.created_at).toLocaleDateString() : '—'}
         </span>
       ),
@@ -218,7 +218,7 @@ export function CampaignList() {
         description={t('gamification.campaign_list_desc')}
         actions={
           <Link to={tenantPath("/admin/gamification/campaigns/create")}>
-            <Button color="primary" startContent={<Plus size={16} />}>
+            <Button startContent={<Plus size={16} />}>
               {t('gamification.create_campaign')}
             </Button>
           </Link>

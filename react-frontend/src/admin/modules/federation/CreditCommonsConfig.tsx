@@ -146,10 +146,10 @@ export function CreditCommonsConfig() {
         description={t('federation.cc_config_desc')}
         actions={
           <div className="flex items-center gap-2">
-            <Button variant="flat" size="sm" startContent={<RefreshCw size={16} />} onPress={loadConfig}>
+            <Button variant="tertiary" size="sm" startContent={<RefreshCw size={16} />} onPress={loadConfig}>
               {t('federation.refresh')}
             </Button>
-            <Button color="primary" size="sm" startContent={<Save size={16} />} isLoading={saving} onPress={handleSave}>
+            <Button size="sm" startContent={<Save size={16} />} isLoading={saving} onPress={handleSave}>
               {t('federation.save_changes')}
             </Button>
           </div>
@@ -189,12 +189,12 @@ export function CreditCommonsConfig() {
 
             {config?.absolute_path && (
               <div className="pt-2">
-                <p className="text-sm text-default-500 mb-1">{t('federation.cc_node_path')}</p>
+                <p className="text-sm text-muted mb-1">{t('federation.cc_node_path')}</p>
                 <div className="flex items-center gap-1">
                   {config.absolute_path.map((segment, i) => (
                     <span key={i} className="flex items-center gap-1">
-                      {i > 0 && <span className="text-default-300">/</span>}
-                      <Chip size="sm" variant="flat" color={i === config.absolute_path.length - 1 ? 'primary' : 'default'}>
+                      {i > 0 && <span className="text-muted">/</span>}
+                      <Chip size="sm" variant="soft" color={i === config.absolute_path.length - 1 ? 'primary' : 'default'}>
                         {segment}
                       </Chip>
                     </span>
@@ -258,27 +258,27 @@ export function CreditCommonsConfig() {
           <CardBody>
             <div className="space-y-3">
               <div>
-                <p className="text-sm text-default-500">{t('federation.cc_last_hash')}</p>
-                <code className="text-xs bg-default-100 px-2 py-1 rounded block mt-1 break-all">
+                <p className="text-sm text-muted">{t('federation.cc_last_hash')}</p>
+                <code className="text-xs bg-surface-secondary px-2 py-1 rounded block mt-1 break-all">
                   {config?.last_hash || t('federation.cc_no_hash')}
                 </code>
               </div>
               <Separator />
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-default-500">{t('federation.cc_total_trades')}</p>
+                  <p className="text-sm text-muted">{t('federation.cc_total_trades')}</p>
                   <p className="text-lg font-semibold">{config?.stats?.trades ?? 0}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-default-500">{t('federation.cc_active_traders')}</p>
+                  <p className="text-sm text-muted">{t('federation.cc_active_traders')}</p>
                   <p className="text-lg font-semibold">{config?.stats?.traders ?? 0}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-default-500">{t('federation.cc_volume')}</p>
+                  <p className="text-sm text-muted">{t('federation.cc_volume')}</p>
                   <p className="text-lg font-semibold">{(config?.stats?.volume ?? 0).toFixed(2)}h</p>
                 </div>
                 <div>
-                  <p className="text-sm text-default-500">{t('federation.cc_accounts')}</p>
+                  <p className="text-sm text-muted">{t('federation.cc_accounts')}</p>
                   <p className="text-lg font-semibold">{config?.stats?.accounts ?? 0}</p>
                 </div>
               </div>

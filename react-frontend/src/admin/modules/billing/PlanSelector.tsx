@@ -142,7 +142,7 @@ export function PlanSelector() {
                 onPress={() => setBillingInterval('yearly')}
               >
                 {t('billing.yearly')}
-                <Chip size="sm" color="success" variant="flat" className="ml-2">
+                <Chip size="sm" color="success" variant="soft" className="ml-2">
                   {t('billing.save_percent')}
                 </Chip>
               </Button>
@@ -165,8 +165,7 @@ export function PlanSelector() {
                   {isCurrent && (
                     <Chip
                       size="sm"
-                      color="primary"
-                      variant="solid"
+                      variant="primary"
                       className="absolute top-3 right-3 z-10"
                     >
                       {t('billing.current')}
@@ -175,8 +174,7 @@ export function PlanSelector() {
                   {isDowngradeBlocked && (
                     <Chip
                       size="sm"
-                      color="default"
-                      variant="flat"
+                      variant="soft"
                       className="absolute top-3 right-3 z-10"
                     >
                       {t('billing.not_available')}
@@ -184,12 +182,12 @@ export function PlanSelector() {
                   )}
                   <CardHeader className="flex-col items-start gap-1 pb-0">
                     <h3 className="text-xl font-bold">{plan.name}</h3>
-                    <p className="text-sm text-default-500">{plan.description}</p>
+                    <p className="text-sm text-muted">{plan.description}</p>
                   </CardHeader>
                   <CardBody className="gap-4">
                     <div>
                       <span className="text-3xl font-bold">{formatPrice(price)}</span>
-                      <span className="text-default-500 text-sm ml-1">
+                      <span className="text-muted text-sm ml-1">
                         /{billingInterval === 'monthly'
                           ? t('billing.per_month')
                           : t('billing.per_year')}
@@ -229,7 +227,7 @@ export function PlanSelector() {
           </div>
 
           {plans.length === 0 && (
-            <div className="text-center py-12 text-default-500">
+            <div className="text-center py-12 text-muted">
               {t('billing.no_plans')}
             </div>
           )}

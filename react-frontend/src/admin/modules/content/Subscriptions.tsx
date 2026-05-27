@@ -73,7 +73,7 @@ export function Subscriptions() {
       key: 'plan_name',
       label: "Plans",
       sortable: true,
-      render: (item) => <span className="text-sm text-default-600">{item.plan_name || '--'}</span>,
+      render: (item) => <span className="text-sm text-muted">{item.plan_name || '--'}</span>,
     },
     {
       key: 'status',
@@ -85,14 +85,14 @@ export function Subscriptions() {
       key: 'plan_tier_level',
       label: t('content.tier'),
       sortable: true,
-      render: (item) => <span className="text-sm text-default-500">{item.plan_tier_level ?? '--'}</span>,
+      render: (item) => <span className="text-sm text-muted">{item.plan_tier_level ?? '--'}</span>,
     },
     {
       key: 'starts_at',
       label: t('content.started'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {item.starts_at ? new Date(item.starts_at).toLocaleDateString() : '--'}
         </span>
       ),
@@ -102,7 +102,7 @@ export function Subscriptions() {
       label: t('users.expires'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {item.expires_at ? new Date(item.expires_at).toLocaleDateString() : '--'}
         </span>
       ),
@@ -112,7 +112,7 @@ export function Subscriptions() {
       label: t('content.trial_ends'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {item.trial_ends_at ? new Date(item.trial_ends_at).toLocaleDateString() : '--'}
         </span>
       ),
@@ -122,7 +122,7 @@ export function Subscriptions() {
       label: t('content.stripe_subscription_id'),
       sortable: true,
       render: (item) => (
-        <span className="text-xs text-default-400 font-mono">
+        <span className="text-xs text-muted font-mono">
           {item.stripe_subscription_id || '--'}
         </span>
       ),
