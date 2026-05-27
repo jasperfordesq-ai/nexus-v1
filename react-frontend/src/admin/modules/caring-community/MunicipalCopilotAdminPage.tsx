@@ -433,7 +433,7 @@ export default function MunicipalCopilotAdminPage() {
         </CardHeader>
         <CardBody className="pt-0">
           {loading ? (
-            <div className="flex justify-center py-10">
+            <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-10">
               <Spinner />
             </div>
           ) : proposals.length === 0 ? (

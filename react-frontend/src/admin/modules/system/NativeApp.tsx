@@ -145,7 +145,7 @@ export function NativeApp() {
 
   if (loading) {
     return (
-      <div className="flex h-64 items-center justify-center">
+      <div role="status" aria-busy="true" aria-label="Loading" className="flex h-64 items-center justify-center">
         <Spinner size="lg" />
       </div>
     );

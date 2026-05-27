@@ -259,7 +259,7 @@ export default function IsolatedNodeAdminPage() {
               <p className="font-semibold text-accent dark:text-accent">{t('isolated_node.about.title')}</p>
               <p className="text-muted">
                 {t('isolated_node.about.body_prefix')} <Abbr term="NEXUS" /> {t('isolated_node.about.body_middle')}{' '}
-                <Abbr term="AGORIS" /> {t('isolated_node.about.body_suffix')}
+                Caring Community {t('isolated_node.about.body_suffix')}
               </p>
               <p className="text-muted">
                 {t('isolated_node.about.workflow')}
@@ -284,7 +284,7 @@ export default function IsolatedNodeAdminPage() {
       </Card>
 
       {loading && (
-        <div className="flex justify-center py-16">
+        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
       )}

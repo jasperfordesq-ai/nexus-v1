@@ -432,7 +432,7 @@ export default function MunicipalityFeedbackAdminPage() {
       <Card>
         <CardBody className="p-0">
           {loading ? (
-            <div className="flex justify-center py-12">
+            <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-12">
               <Spinner size="lg" />
             </div>
           ) : items.length === 0 ? (

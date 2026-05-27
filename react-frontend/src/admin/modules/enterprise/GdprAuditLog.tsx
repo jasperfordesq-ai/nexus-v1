@@ -399,7 +399,7 @@ export function GdprAuditLog() {
                     )}
                   </div>
                 ) : (
-                  <div className="flex justify-center py-8">
+                  <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-8">
                     <Spinner />
                   </div>
                 )}

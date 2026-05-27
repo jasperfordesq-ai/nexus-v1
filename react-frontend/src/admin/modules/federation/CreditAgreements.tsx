@@ -316,7 +316,7 @@ export function CreditAgreements() {
     return (
       <div>
         <PageHeader title={t('federation.credit_agreements_title')} description={t('federation.credit_agreements_desc')} />
-        <div className="flex h-64 items-center justify-center">
+        <div role="status" aria-busy="true" aria-label="Loading" className="flex h-64 items-center justify-center">
           <Spinner size="lg" />
         </div>
       </div>
@@ -523,7 +523,7 @@ export function CreditAgreements() {
 
           {/* Per-partner balances */}
           {balancesLoading ? (
-            <div className="flex h-32 items-center justify-center">
+            <div role="status" aria-busy="true" aria-label="Loading" className="flex h-32 items-center justify-center">
               <Spinner size="lg" />
             </div>
           ) : balances.length === 0 ? (

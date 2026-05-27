@@ -788,7 +788,7 @@ export function Partnerships() {
               </ModalHeader>
               <ModalBody>
                 {detailLoading ? (
-                  <div className="flex h-40 items-center justify-center">
+                  <div role="status" aria-busy="true" aria-label="Loading" className="flex h-40 items-center justify-center">
                     <Spinner size="lg" />
                   </div>
                 ) : detailPartnership ? (

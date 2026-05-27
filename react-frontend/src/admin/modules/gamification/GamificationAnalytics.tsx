@@ -123,7 +123,7 @@ export function GamificationAnalytics() {
           </CardHeader>
           <CardBody>
             {loading ? (
-              <div className="flex items-center justify-center py-12">
+              <div role="status" aria-busy="true" aria-label="Loading" className="flex items-center justify-center py-12">
                 <Spinner size="lg" />
               </div>
             ) : stats?.badge_distribution && stats.badge_distribution.length > 0 ? (
@@ -166,7 +166,7 @@ export function GamificationAnalytics() {
           </CardHeader>
           <CardBody>
             {loading ? (
-              <div className="flex items-center justify-center py-12">
+              <div role="status" aria-busy="true" aria-label="Loading" className="flex items-center justify-center py-12">
                 <Spinner size="lg" />
               </div>
             ) : badges.length > 0 ? (

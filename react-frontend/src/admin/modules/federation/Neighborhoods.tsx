@@ -210,7 +210,7 @@ export function Neighborhoods() {
     return (
       <div>
         <PageHeader title={t('federation.neighborhoods_title')} description={t('federation.neighborhoods_desc')} />
-        <div className="flex h-64 items-center justify-center">
+        <div role="status" aria-busy="true" aria-label="Loading" className="flex h-64 items-center justify-center">
           <Spinner size="lg" />
         </div>
       </div>

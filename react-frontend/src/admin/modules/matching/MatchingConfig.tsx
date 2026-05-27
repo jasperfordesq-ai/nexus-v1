@@ -180,7 +180,7 @@ export function MatchingConfig() {
           title={t('matching.matching_config_title')}
           description={t('matching.matching_config_desc')}
         />
-        <div className="flex h-64 items-center justify-center">
+        <div role="status" aria-busy="true" aria-label="Loading" className="flex h-64 items-center justify-center">
           <Spinner size="lg" />
         </div>
       </div>

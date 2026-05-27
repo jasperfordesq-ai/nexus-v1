@@ -180,7 +180,7 @@ export function SmartMatchingOverview() {
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
-              <div className="flex h-48 items-center justify-center">
+              <div role="status" aria-busy="true" aria-label="Loading" className="flex h-48 items-center justify-center">
                 <Spinner />
               </div>
             ) : config ? (
@@ -294,7 +294,7 @@ export function SmartMatchingOverview() {
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
-              <div className="flex h-32 items-center justify-center">
+              <div role="status" aria-busy="true" aria-label="Loading" className="flex h-32 items-center justify-center">
                 <Spinner />
               </div>
             ) : overview ? (

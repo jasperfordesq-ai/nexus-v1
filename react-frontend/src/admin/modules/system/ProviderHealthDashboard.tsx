@@ -133,7 +133,7 @@ export function ProviderHealthDashboard() {
           </h3>
         </CardHeader>
         <CardBody>
-          <div className="flex justify-center py-8">
+          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-8">
             <Spinner size="lg" />
           </div>
         </CardBody>

@@ -257,7 +257,7 @@ export default function MunicipalRoiAdminPage() {
               <p className="font-semibold text-accent dark:text-accent">{t('municipal_roi_page.about.title')}</p>
               <p className="text-muted">
                 {t('municipal_roi_page.about.body_prefix')} <Abbr term="ROI" /> {t('municipal_roi_page.about.body_middle')}{' '}
-                <Abbr term="KISS" />/{t('municipal_roi_page.about.body_suffix')}
+                Caring Community {t('municipal_roi_page.about.body_suffix')}
               </p>
               <p className="text-muted">
                 {t('municipal_roi_page.about.formula_prefix')} <Abbr term="CHF" /> {t('municipal_roi_page.about.formula_suffix')}
@@ -340,7 +340,7 @@ export default function MunicipalRoiAdminPage() {
                 ). {t('municipal_roi_page.methodology.prevention_value_prefix', {
                   multiplier: data.methodology.prevention_multiplier,
                 })}{' '}
-                <Abbr term="KISS" /> {t('municipal_roi_page.methodology.prevention_value_suffix')}{' '}
+                Caring Community {t('municipal_roi_page.methodology.prevention_value_suffix')}{' '}
                 {data.methodology.substitution_applied
                   ? t('municipal_roi_page.methodology.substitution_applied')
                   : t('municipal_roi_page.methodology.substitution_not_applied')}
@@ -351,7 +351,7 @@ export default function MunicipalRoiAdminPage() {
                 <Abbr term="CHF">{t('municipal_roi_page.methodology.default_rate')}</Abbr>{' '}
                 ({t('municipal_roi_page.methodology.default_source')}).{' '}
                 {t('municipal_roi_page.methodology.default_prevention_prefix')}{' '}
-                <Abbr term="KISS" /> {t('municipal_roi_page.methodology.default_prevention_suffix')}
+                Caring Community {t('municipal_roi_page.methodology.default_prevention_suffix')}
               </>
             )}
           </p>
@@ -360,7 +360,7 @@ export default function MunicipalRoiAdminPage() {
 
       {/* Loading */}
       {loading && (
-        <div className="flex justify-center py-16">
+        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
       )}

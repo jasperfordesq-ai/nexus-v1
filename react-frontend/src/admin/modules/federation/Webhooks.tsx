@@ -378,7 +378,7 @@ export function Webhooks() {
           title={t('federation.webhooks_title')}
           description={t('federation.webhooks_desc')}
         />
-        <div className="flex h-64 items-center justify-center">
+        <div role="status" aria-busy="true" aria-label="Loading" className="flex h-64 items-center justify-center">
           <Spinner size="lg" />
         </div>
       </div>
@@ -615,7 +615,7 @@ export function Webhooks() {
               </ModalHeader>
               <ModalBody>
                 {logsLoading ? (
-                  <div className="flex h-48 items-center justify-center">
+                  <div role="status" aria-busy="true" aria-label="Loading" className="flex h-48 items-center justify-center">
                     <Spinner size="lg" />
                   </div>
                 ) : logs.length === 0 ? (

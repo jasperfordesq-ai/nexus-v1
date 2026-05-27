@@ -114,7 +114,7 @@ export function SystemRequirements() {
       />
 
       {loading ? (
-        <div className="flex justify-center py-16">
+        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
       ) : data ? (

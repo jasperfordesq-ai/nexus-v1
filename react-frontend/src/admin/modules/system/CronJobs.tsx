@@ -181,7 +181,7 @@ export function CronJobs() {
 
       {/* Loading state */}
       {loading && jobs.length === 0 && (
-        <div className="flex items-center justify-center py-20">
+        <div role="status" aria-busy="true" aria-label={t('system.loading_cron_jobs')} className="flex items-center justify-center py-20">
           <Spinner size="lg" label={t('system.loading_cron_jobs')} />
         </div>
       )}

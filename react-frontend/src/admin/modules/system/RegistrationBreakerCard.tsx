@@ -80,7 +80,7 @@ export function RegistrationBreakerCard() {
   if (loading) {
     return (
       <Card >
-        <CardBody className="flex items-center justify-center py-6">
+        <CardBody role="status" aria-busy="true" aria-label="Loading" className="flex items-center justify-center py-6">
           <Spinner size="sm" />
         </CardBody>
       </Card>

@@ -300,7 +300,7 @@ export function MatchDebugPanel() {
 
       {/* Loading state */}
       {matchesLoading && (
-        <div className="flex justify-center py-16">
+        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-16">
           <div className="flex flex-col items-center gap-3">
             <Spinner size="lg" />
             <p className="text-sm text-muted">{t('loading_match_scores')}</p>

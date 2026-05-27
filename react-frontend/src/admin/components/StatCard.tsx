@@ -72,7 +72,7 @@ export function StatCard({
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium text-muted">{resolvedLabel}</p>
         {loading ? (
-          <div className="mt-1 h-7 w-20 animate-pulse rounded bg-surface-tertiary" />
+          <div role="status" aria-busy="true" aria-label="Loading" className="mt-1 h-7 w-20 animate-pulse rounded bg-surface-tertiary" />
         ) : (
           <p className="mt-0.5 text-2xl font-semibold text-foreground">
             {typeof value === 'number' ? value.toLocaleString() : value}

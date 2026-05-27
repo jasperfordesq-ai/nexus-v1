@@ -123,7 +123,7 @@ export function MatchDetail() {
   // Loading state
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
+      <div role="status" aria-busy="true" aria-label="Loading" className="flex items-center justify-center py-20">
         <Spinner size="lg" />
       </div>
     );

@@ -584,7 +584,7 @@ export function ImpactReport() {
             <div>
               <p className="text-sm text-muted">{t('impact.chart_transactions_name')}</p>
               {loading ? (
-                <div className="mt-1 h-6 w-16 animate-pulse rounded bg-surface-tertiary" />
+                <div role="status" aria-busy="true" aria-label="Loading" className="mt-1 h-6 w-16 animate-pulse rounded bg-surface-tertiary" />
               ) : (
                 <p className="text-xl font-bold text-foreground">
                   {data?.sroi.total_transactions.toLocaleString() ?? '\u2014'}
@@ -601,7 +601,7 @@ export function ImpactReport() {
             <div>
               <p className="text-sm text-muted">{t('impact.pdf_unique_givers')}</p>
               {loading ? (
-                <div className="mt-1 h-6 w-16 animate-pulse rounded bg-surface-tertiary" />
+                <div role="status" aria-busy="true" aria-label="Loading" className="mt-1 h-6 w-16 animate-pulse rounded bg-surface-tertiary" />
               ) : (
                 <p className="text-xl font-bold text-foreground">
                   {data?.sroi.unique_givers.toLocaleString() ?? '\u2014'}
@@ -618,7 +618,7 @@ export function ImpactReport() {
             <div>
               <p className="text-sm text-muted">{t('impact.pdf_unique_receivers')}</p>
               {loading ? (
-                <div className="mt-1 h-6 w-16 animate-pulse rounded bg-surface-tertiary" />
+                <div role="status" aria-busy="true" aria-label="Loading" className="mt-1 h-6 w-16 animate-pulse rounded bg-surface-tertiary" />
               ) : (
                 <p className="text-xl font-bold text-foreground">
                   {data?.sroi.unique_receivers.toLocaleString() ?? '\u2014'}
@@ -760,7 +760,7 @@ export function ImpactReport() {
           <CardBody className="p-4">
             <p className="text-sm text-muted">{t('impact.label_total_members')}</p>
             {loading ? (
-              <div className="mt-1 h-7 w-20 animate-pulse rounded bg-surface-tertiary" />
+              <div role="status" aria-busy="true" aria-label="Loading" className="mt-1 h-7 w-20 animate-pulse rounded bg-surface-tertiary" />
             ) : (
               <p className="text-2xl font-bold text-foreground">
                 {data?.health.total_users.toLocaleString() ?? '\u2014'}
@@ -772,7 +772,7 @@ export function ImpactReport() {
           <CardBody className="p-4">
             <p className="text-sm text-muted">{t('impact.label_active_90d')}</p>
             {loading ? (
-              <div className="mt-1 h-7 w-20 animate-pulse rounded bg-surface-tertiary" />
+              <div role="status" aria-busy="true" aria-label="Loading" className="mt-1 h-7 w-20 animate-pulse rounded bg-surface-tertiary" />
             ) : (
               <p className="text-2xl font-bold text-foreground">
                 {data?.health.active_users_90d.toLocaleString() ?? '\u2014'}
@@ -784,7 +784,7 @@ export function ImpactReport() {
           <CardBody className="p-4">
             <p className="text-sm text-muted">{t('impact.label_new_30d')}</p>
             {loading ? (
-              <div className="mt-1 h-7 w-20 animate-pulse rounded bg-surface-tertiary" />
+              <div role="status" aria-busy="true" aria-label="Loading" className="mt-1 h-7 w-20 animate-pulse rounded bg-surface-tertiary" />
             ) : (
               <p className="text-2xl font-bold text-foreground">
                 {data?.health.new_users_30d.toLocaleString() ?? '\u2014'}
@@ -796,7 +796,7 @@ export function ImpactReport() {
           <CardBody className="p-4">
             <p className="text-sm text-muted">{t('impact.label_network_density')}</p>
             {loading ? (
-              <div className="mt-1 h-7 w-20 animate-pulse rounded bg-surface-tertiary" />
+              <div role="status" aria-busy="true" aria-label="Loading" className="mt-1 h-7 w-20 animate-pulse rounded bg-surface-tertiary" />
             ) : (
               <p className="text-2xl font-bold text-foreground">
                 {data?.health.network_density.toFixed(4) ?? '\u2014'}

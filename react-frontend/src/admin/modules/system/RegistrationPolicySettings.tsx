@@ -299,7 +299,7 @@ export function RegistrationPolicySettings() {
     return (
       <div>
         <PageHeader title={t('system.registration_policy_settings_title')} description={t('system.reg.page_description')} />
-        <div className="flex justify-center py-16"><Spinner size="lg" /></div>
+        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-16"><Spinner size="lg" /></div>
       </div>
     );
   }
@@ -686,7 +686,7 @@ export function RegistrationPolicySettings() {
             </CardHeader>
             <CardBody>
               {inviteCodesLoading ? (
-                <div className="flex justify-center py-4"><Spinner /></div>
+                <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner /></div>
               ) : inviteCodes.length === 0 ? (
                 <div className="text-center py-8">
               <Ticket size={32} className="mx-auto text-muted mb-2" />

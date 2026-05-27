@@ -297,7 +297,7 @@ export function BillingControl() {
           title={t('billing.control_title')}
           description={t('billing.control_desc')}
         />
-        <div className="flex justify-center py-12">
+        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-12">
           <Spinner size="lg" />
         </div>
       </div>
