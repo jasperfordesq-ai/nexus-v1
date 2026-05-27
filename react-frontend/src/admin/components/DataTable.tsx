@@ -202,7 +202,7 @@ export function DataTable<T extends Record<string, any>>({
     >
       <TableHeader>
         {selectable ? (
-          <TableColumn className="w-10 pr-0">
+          <TableColumn className="w-10 pr-0" aria-label={t('shared.select_all_rows')}>
             <Checkbox aria-label={t('shared.select_all_rows')} slot="selection" />
           </TableColumn>
         ) : null}

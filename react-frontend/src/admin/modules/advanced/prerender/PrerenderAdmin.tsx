@@ -1007,7 +1007,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
       ) : (
         <Table aria-label={t('table_aria')} removeWrapper isStriped>
           <TableHeader>
-            <TableColumn>
+            <TableColumn aria-label={t('actions.select_all_visible')}>
               {isSuperAdmin ? (
                 <Checkbox
                   size="sm"
