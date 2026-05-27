@@ -2302,7 +2302,7 @@ function TtlInspector() {
             {t('actions.inspect')}
           </Button>
         </div>
-        {error && <p className="text-danger text-sm">{error}</p>}
+        {error && <p className="text-danger text-sm" role="alert">{error}</p>}
         {result && (
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-3">
@@ -2388,7 +2388,7 @@ function SitemapExplorer() {
             {t('actions.explore')}
           </Button>
         </div>
-        {error && <p className="text-danger text-sm">{error}</p>}
+        {error && <p className="text-danger text-sm" role="alert">{error}</p>}
         {data && (
           <div className="space-y-3">
             <div className="flex gap-2">

@@ -233,7 +233,7 @@ export function PilotApplyPage() {
         <p className="text-sm text-theme-muted mb-5">{t('provisioning.intro')}</p>
 
         {error && (
-          <div className="mb-4 p-3 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 text-sm">
+          <div className="mb-4 p-3 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 text-sm" role="alert">
             {error}
           </div>
         )}

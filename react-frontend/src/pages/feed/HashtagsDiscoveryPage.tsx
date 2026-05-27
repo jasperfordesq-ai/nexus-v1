@@ -158,7 +158,7 @@ export function HashtagsDiscoveryPage() {
 
       {/* Error */}
       {error && !isLoading && (
-        <GlassCard className="p-8 text-center">
+        <GlassCard className="p-8 text-center" role="alert">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('hashtags.unable_to_load')}</h3>
           <p className="text-theme-muted mb-4">{error}</p>

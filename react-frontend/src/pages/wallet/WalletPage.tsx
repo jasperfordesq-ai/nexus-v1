@@ -252,7 +252,7 @@ export function WalletPage() {
       {/* Error State */}
       {error && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-          <GlassCard className="p-6 text-center sm:p-8">
+          <GlassCard className="p-6 text-center sm:p-8" role="alert">
             <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
             <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h3>
             <p className="text-theme-muted mb-4">{error}</p>

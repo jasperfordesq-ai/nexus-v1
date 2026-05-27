@@ -197,9 +197,9 @@ export default function CareRecipientCirclePage() {
 
       {/* Error */}
       {error && !loading && (
-        <Card className="border border-danger/30">
+        <Card className="border border-danger/30" role="alert">
           <CardBody className="flex flex-row items-center gap-3 text-danger">
-            <AlertTriangle size={18} />
+            <AlertTriangle size={18} aria-hidden="true" />
             <span className="text-sm">{error}</span>
           </CardBody>
         </Card>

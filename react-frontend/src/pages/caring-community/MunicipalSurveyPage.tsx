@@ -292,7 +292,7 @@ function SurveyForm({ survey, onBack, onSuccess, t }: SurveyFormProps) {
       ))}
 
       {error && (
-        <p className="text-danger text-sm px-1">{error}</p>
+        <p className="text-danger text-sm px-1" role="alert">{error}</p>
       )}
 
       <div className="flex gap-3 justify-end">

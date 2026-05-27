@@ -354,7 +354,7 @@ export function TalentSearchPage() {
 
       {/* Error */}
       {error && !isLoading && (
-        <GlassCard className="p-6 text-center">
+        <GlassCard className="p-6 text-center" role="alert">
           <p className="text-danger mb-3">{error}</p>
           <Button
             variant="flat"

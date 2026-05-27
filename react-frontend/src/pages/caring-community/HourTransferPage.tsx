@@ -317,7 +317,7 @@ export function HourTransferPage() {
             </p>
 
             {error && (
-              <p className="rounded-lg bg-danger/10 px-4 py-3 text-sm text-danger">{error}</p>
+              <p className="rounded-lg bg-danger/10 px-4 py-3 text-sm text-danger" role="alert">{error}</p>
             )}
 
             <Button
