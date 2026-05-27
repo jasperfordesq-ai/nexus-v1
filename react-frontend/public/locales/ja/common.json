@@ -785,7 +785,8 @@
     "clear_location": "位置情報をクリア",
     "select_category": "カテゴリを選択",
     "verification_badges": "認証バッジ",
-    "search_skills": "スキルを検索"
+    "search_skills": "スキルを検索",
+    "user_menu_trigger": "User menu for {{name}}"
   },
   "skills": {
     "browse_title": "コミュニティスキルディレクトリ",

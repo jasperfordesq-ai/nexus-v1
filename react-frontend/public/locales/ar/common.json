@@ -785,7 +785,8 @@
     "clear_location": "مسح الموقع",
     "select_category": "اختر فئة",
     "verification_badges": "شارات التحقق",
-    "search_skills": "البحث عن مهارات"
+    "search_skills": "البحث عن مهارات",
+    "user_menu_trigger": "User menu for {{name}}"
   },
   "skills": {
     "browse_title": "دليل مهارات المجتمع",

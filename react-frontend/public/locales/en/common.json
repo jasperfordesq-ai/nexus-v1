@@ -785,7 +785,8 @@
     "clear_location": "Clear location",
     "select_category": "Select a category",
     "verification_badges": "Verification badges",
-    "search_skills": "Search skills"
+    "search_skills": "Search skills",
+    "user_menu_trigger": "User menu for {{name}}"
   },
   "skills": {
     "browse_title": "Community Skills Directory",

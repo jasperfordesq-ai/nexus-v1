@@ -14,7 +14,7 @@ import {
   useContext,
   useMemo,
 } from 'react';
-import { Modal as HeroUIModal } from '@heroui/react';
+import { Modal as HeroUIModal, ModalHeading as HeroUIModalHeading } from '@heroui/react';
 
 import { cn } from '@/lib/helpers';
 
@@ -239,18 +239,18 @@ export const ModalContent = forwardRef(function ModalContent(
 
 export const ModalHeader = forwardRef(function ModalHeader(
   { children, className, ...props }: ModalSectionProps,
-  ref: Ref<HTMLDivElement>,
+  ref: Ref<HTMLElement>,
 ) {
   const { classNames } = useContext(ModalContext);
 
   return (
-    <HeroUIModal.Header
+    <HeroUIModalHeading
       ref={ref}
       className={cn(classNames?.header, className)}
       {...props}
     >
       {children}
-    </HeroUIModal.Header>
+    </HeroUIModalHeading>
   );
 });
 

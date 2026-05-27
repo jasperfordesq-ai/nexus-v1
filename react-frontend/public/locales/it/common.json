@@ -785,7 +785,8 @@
     "clear_location": "Cancella posizione",
     "select_category": "Seleziona una categoria",
     "verification_badges": "Badge di verifica",
-    "search_skills": "Cerca competenze"
+    "search_skills": "Cerca competenze",
+    "user_menu_trigger": "User menu for {{name}}"
   },
   "skills": {
     "browse_title": "Elenco Competenze della Comunità",

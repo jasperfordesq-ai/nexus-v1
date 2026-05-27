@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from 'react';
 import {
+  CloseButton as HeroUICloseButton,
   Description,
   FieldError,
   Input as HeroUIInput,
@@ -151,17 +152,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({
   };
 
   const clearButton = isClearable ? (
-    <button
-      type="button"
-      className="shrink-0 px-1 text-sm text-muted hover:text-foreground"
-      aria-label="Clear"
-      onClick={() => {
+    <HeroUICloseButton
+      className="shrink-0"
+      onPress={() => {
         onClear?.();
         onValueChange?.('');
       }}
-    >
-      x
-    </button>
+    />
   ) : null;
   const trailingContent = endContent ?? clearButton;
 

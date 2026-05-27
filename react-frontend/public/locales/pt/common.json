@@ -785,7 +785,8 @@
     "clear_location": "Limpar localização",
     "select_category": "Selecionar uma categoria",
     "verification_badges": "Emblemas de verificação",
-    "search_skills": "Pesquisar competências"
+    "search_skills": "Pesquisar competências",
+    "user_menu_trigger": "User menu for {{name}}"
   },
   "skills": {
     "browse_title": "Diretório de Competências da Comunidade",

@@ -2703,7 +2703,7 @@ export default function CaringCommunityWorkflowPage() {
                             size="sm"
                             isIconOnly
                             variant="tertiary"
-                            title={t('caring_workflow.invite_codes.copy_url')}
+                            aria-label={t('caring_workflow.invite_codes.copy_url')}
                             onPress={() => copyInviteCode(ic.invite_url)}
                           >
                             <Copy size={14} />
@@ -2713,7 +2713,7 @@ export default function CaringCommunityWorkflowPage() {
                               size="sm"
                               isIconOnly
                               variant="tertiary"
-                              title={t('caring_workflow.invite_codes.print_card')}
+                              aria-label={t('caring_workflow.invite_codes.print_card')}
                               onPress={() => printInviteCard(ic)}
                             >
                               <Printer size={14} />

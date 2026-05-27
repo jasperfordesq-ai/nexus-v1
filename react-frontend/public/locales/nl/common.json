@@ -785,7 +785,8 @@
     "clear_location": "Locatie wissen",
     "select_category": "Selecteer een categorie",
     "verification_badges": "Verificatiebadges",
-    "search_skills": "Vaardigheden zoeken"
+    "search_skills": "Vaardigheden zoeken",
+    "user_menu_trigger": "User menu for {{name}}"
   },
   "skills": {
     "browse_title": "Gemeenschaps vaardigheidsgids",

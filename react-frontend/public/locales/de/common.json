@@ -785,7 +785,8 @@
     "clear_location": "Standort löschen",
     "select_category": "Kategorie auswählen",
     "verification_badges": "Verifizierungsabzeichen",
-    "search_skills": "Fähigkeiten suchen"
+    "search_skills": "Fähigkeiten suchen",
+    "user_menu_trigger": "User menu for {{name}}"
   },
   "skills": {
     "browse_title": "Gemeinschafts-Fähigkeitenverzeichnis",

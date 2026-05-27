@@ -796,9 +796,12 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   {/* User Dropdown */}
                   <Dropdown placement="bottom-end" isOpen={userOpen} onOpenChange={handleUserOpenChange} shouldBlockScroll={false}>
                     <DropdownTrigger>
-                      <div className="relative cursor-pointer">
+                      <button
+                        type="button"
+                        aria-label={t('aria.user_menu_trigger', { name: user?.first_name || '' })}
+                        className="relative cursor-pointer rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                      >
                         <Avatar
-                          as="button"
                           name={`${user?.first_name} ${user?.last_name}`}
                           src={resolveAvatarUrl(user?.avatar_url || user?.avatar)}
                           size="sm"
@@ -806,7 +809,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                           showFallback
                         />
                         {user?.id && <PresenceIndicator userId={user.id} size="lg" showOffline />}
-                      </div>
+                      </button>
                     </DropdownTrigger>
                     <DropdownMenu
                       aria-label={t('aria.user_actions')}

@@ -785,7 +785,8 @@
     "clear_location": "Limpiar ubicación",
     "select_category": "Seleccionar una categoría",
     "verification_badges": "Insignias de verificación",
-    "search_skills": "Buscar habilidades"
+    "search_skills": "Buscar habilidades",
+    "user_menu_trigger": "User menu for {{name}}"
   },
   "skills": {
     "browse_title": "Directorio de Habilidades de la Comunidad",

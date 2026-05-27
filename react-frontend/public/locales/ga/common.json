@@ -785,7 +785,8 @@
     "clear_location": "Glan suíomh",
     "select_category": "Roghnaigh catagóir",
     "verification_badges": "Suaitheantais fhírúcháin",
-    "search_skills": "Cuardaigh scileanna"
+    "search_skills": "Cuardaigh scileanna",
+    "user_menu_trigger": "User menu for {{name}}"
   },
   "skills": {
     "browse_title": "Eolaire Scileanna Pobail",

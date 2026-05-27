@@ -145,7 +145,6 @@ export function Chip({
       {endContent}
       {onClose ? (
         <CloseButton
-          aria-label="Close"
           className={classNames?.closeButton}
           onPress={onClose}
         />

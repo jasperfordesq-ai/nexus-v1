@@ -324,7 +324,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
         body: 'p-0',
       }}
     >
-      <DrawerContent id="mobile-drawer" style={{ paddingTop: 'var(--safe-area-top)', paddingRight: 'var(--safe-area-right)', paddingBottom: 'var(--safe-area-bottom)' }}>
+      <DrawerContent id="mobile-drawer" aria-label={t('aria.mobile_navigation')} style={{ paddingTop: 'var(--safe-area-top)', paddingRight: 'var(--safe-area-right)', paddingBottom: 'var(--safe-area-bottom)' }}>
         {/* Header */}
         <DrawerHeader className="flex items-center justify-between">
           <TenantLogo size="lg" showName />

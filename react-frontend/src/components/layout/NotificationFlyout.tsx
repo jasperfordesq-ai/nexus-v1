@@ -283,7 +283,7 @@ export function NotificationFlyout() {
             body: 'p-0',
           }}
         >
-          <DrawerContent style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+          <DrawerContent aria-label={t('title')} style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
             <DrawerHeader>
               {/* Drag handle */}
               <div className="flex justify-center pt-2 pb-1">

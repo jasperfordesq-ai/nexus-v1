@@ -785,7 +785,8 @@
     "clear_location": "Effacer la localisation",
     "select_category": "Choisir une catégorie",
     "verification_badges": "Badges de vérification",
-    "search_skills": "Rechercher des compétences"
+    "search_skills": "Rechercher des compétences",
+    "user_menu_trigger": "User menu for {{name}}"
   },
   "skills": {
     "browse_title": "Répertoire des compétences communautaires",
