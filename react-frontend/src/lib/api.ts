@@ -51,6 +51,7 @@ const DEFAULT_TENANT_ID = import.meta.env.VITE_DEFAULT_TENANT_ID || null;
 
 // Custom events
 export const SESSION_EXPIRED_EVENT = 'nexus:session_expired';
+export const SESSION_EXPIRING_EVENT = 'nexus:session_expiring';
 export const API_ERROR_EVENT = 'nexus:api_error';
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -23,6 +23,7 @@ import { InstallModalHost } from '@/components/pwa/InstallModalHost';
 import EmergencyAlertBanner from '@/components/caring-community/EmergencyAlertBanner';
 import { FadpConsentBanner } from '@/components/legal/FadpConsentBanner';
 import { SessionExpiredModal } from '@/components/feedback/SessionExpiredModal';
+import { SessionTimeoutWarning } from '@/components/feedback/SessionTimeoutWarning';
 import { AppUpdateModal } from '@/components/feedback/AppUpdateModal';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { SeoHead } from '@/components/seo/SeoHead';
@@ -208,6 +209,9 @@ export function Layout({
 
       {/* Back to top button */}
       <BackToTop />
+
+      {/* WCAG 2.2.1 — warns ≥ 30 s before session token expires */}
+      <SessionTimeoutWarning />
 
       {/* Session Expired Modal */}
       <SessionExpiredModal />

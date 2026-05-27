@@ -43,5 +43,9 @@
   "offline_message": "Sembra che tu sia offline",
   "session_expired": "Sessione scaduta",
   "session_expired_message": "La sessione ? scaduta. Accedi di nuovo per continuare.",
+  "session_expiring": "Your session is about to expire",
+  "session_expiring_message": "Your session will expire in {{seconds}} seconds. Extend your session to stay logged in.",
+  "session_expiring_countdown_aria": "Session expires in {{seconds}} seconds",
+  "extend_session": "Extend session",
   "dismiss": "Chiudi"
 }

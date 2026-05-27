@@ -24,7 +24,7 @@ import {
   useMemo,
   type ReactNode,
 } from 'react';
-import { api, tokenManager, SESSION_EXPIRED_EVENT } from '@/lib/api';
+import { api, tokenManager, SESSION_EXPIRED_EVENT, SESSION_EXPIRING_EVENT } from '@/lib/api';
 import { logError, logWarn } from '@/lib/logger';
 import i18n from '@/i18n';
 import { validateResponseIfPresent } from '@/lib/api-validation';
@@ -83,6 +83,8 @@ interface AuthContextValue extends AuthState {
   refreshUser: () => Promise<void>;
   clearError: () => void;
   cancel2FA: () => void;
+  /** WCAG 2.2.1 — reschedule the session-expiry warning after a silent token refresh */
+  scheduleSessionWarning: (expiresInSeconds: number) => void;
 }
 
 interface LoginResult {
@@ -122,6 +124,29 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Prevent concurrent logout calls (e.g., triggered by 401 loop while logout is in flight)
   const isLoggingOutRef = useRef(false);
+
+  // WCAG 2.2.1 — session expiry warning timer.
+  // Fires SESSION_EXPIRING_EVENT 30 seconds before the access token expires,
+  // giving the user a chance to extend their session before being logged out.
+  const sessionWarningTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearSessionWarningTimer = useCallback(() => {
+    if (sessionWarningTimerRef.current !== null) {
+      clearTimeout(sessionWarningTimerRef.current);
+      sessionWarningTimerRef.current = null;
+    }
+  }, []);
+
+  const scheduleSessionWarning = useCallback((expiresInSeconds: number) => {
+    clearSessionWarningTimer();
+    // Warn at 30 s before expiry; skip if the token has fewer than 35 s left
+    // (the warning + 5 s buffer would overlap with actual expiry).
+    const warnAfterMs = (expiresInSeconds - 30) * 1000;
+    if (warnAfterMs < 5000) return;
+    sessionWarningTimerRef.current = setTimeout(() => {
+      window.dispatchEvent(new CustomEvent(SESSION_EXPIRING_EVENT));
+    }, warnAfterMs);
+  }, [clearSessionWarningTimer]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // User Refresh
@@ -267,6 +292,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       i18n.changeLanguage(loginData.user.preferred_language);
     }
 
+    // WCAG 2.2.1 — schedule a warning 30 s before the access token expires
+    if (loginData.expires_in) {
+      scheduleSessionWarning(loginData.expires_in);
+    }
+
     wasAuthenticated.current = true;
     setState({
       user: loginData.user,
@@ -277,7 +307,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     });
 
     return { success: true, requires2FA: false };
-  }, []);
+  }, [scheduleSessionWarning]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // Biometric / WebAuthn Login
@@ -412,6 +442,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       tokenManager.setTenantId(data.user.tenant_id);
     }
 
+    // WCAG 2.2.1 — schedule warning 30 s before the new access token expires
+    if (data.expires_in) {
+      scheduleSessionWarning(data.expires_in);
+    }
+
     wasAuthenticated.current = true;
     setState({
       user: data.user,
@@ -422,7 +457,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     });
 
     return true;
-  }, [state.twoFactorToken]);
+  }, [state.twoFactorToken, scheduleSessionWarning]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // Cancel 2FA (go back to login)
@@ -526,6 +561,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // Guard against re-entrant logout calls (e.g., a 401 firing while logout is in flight)
     if (isLoggingOutRef.current) return;
     isLoggingOutRef.current = true;
+    clearSessionWarningTimer();
 
     const userId = state.user?.id;
     const refreshToken = tokenManager.getRefreshToken();
@@ -575,7 +611,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } finally {
       isLoggingOutRef.current = false;
     }
-  }, [state.user?.id]);
+  }, [state.user?.id, clearSessionWarningTimer]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // Clear Error
@@ -591,6 +627,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     const handleSessionExpired = () => {
+      // Cancel any pending warning timer — the session is already gone
+      clearSessionWarningTimer();
       // Only set error message if user had an active session — stale tokens
       // on first visit should silently clear without showing "session expired"
       if (wasAuthenticated.current) {
@@ -617,7 +655,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => {
       window.removeEventListener(SESSION_EXPIRED_EVENT, handleSessionExpired);
     };
-  }, []);
+  }, [clearSessionWarningTimer]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // Cross-Tab Logout — sync auth state when tokens are cleared in another tab
@@ -675,8 +713,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       refreshUser,
       clearError,
       cancel2FA,
+      scheduleSessionWarning,
     }),
-    [state, login, loginWithBiometric, verify2FA, register, logout, refreshUser, clearError, cancel2FA]
+    [state, login, loginWithBiometric, verify2FA, register, logout, refreshUser, clearError, cancel2FA, scheduleSessionWarning]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

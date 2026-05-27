@@ -378,7 +378,8 @@
     "personal_message_placeholder": "Nóta don iarrthóir...",
     "interview_location_placeholder": "https://meet.google.com/...",
     "offer_salary_placeholder": "m.sh. 45000",
-    "tabs_aria": "Job pipeline sections"
+    "tabs_aria": "Job pipeline sections",
+    "change_stage_aria": "Change stage for {{name}}"
   },
   "apply": {
     "button": "Cuir Isteach Anois",

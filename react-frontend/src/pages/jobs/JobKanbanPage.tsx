@@ -123,6 +123,8 @@ function getApplicationStatusLabel(t: (key: string) => string, status: string): 
 interface AppCardProps {
   application: KanbanApplication;
   onDragStart: (appId: number) => void;
+  /** WCAG 2.5.1 — keyboard-accessible stage change (alternative to drag-and-drop) */
+  onStageChange?: (appId: number, targetStatus: string) => void;
   onDownloadCv?: (appId: number, applicantName: string) => void;
   onScheduleInterview?: (app: KanbanApplication) => void;
   onSendOffer?: (app: KanbanApplication) => void;
@@ -132,7 +134,7 @@ interface AppCardProps {
   aiRanking?: { rank: number; score: number; reason: string };
 }
 
-function AppKanbanCard({ application, onDragStart, onDownloadCv, onScheduleInterview, onSendOffer, onScoreApplicant, onSelect, isSelected, aiRanking }: AppCardProps) {
+function AppKanbanCard({ application, onDragStart, onStageChange, onDownloadCv, onScheduleInterview, onSendOffer, onScoreApplicant, onSelect, isSelected, aiRanking }: AppCardProps) {
   const { t } = useTranslation('jobs');
   const appliedDate = new Date(application.created_at);
   const stage = application.stage ?? application.status;
@@ -265,6 +267,32 @@ function AppKanbanCard({ application, onDragStart, onDownloadCv, onScheduleInter
             {t('scorecard.title')}
           </Button>
         )}
+
+        {/* WCAG 2.5.1 — keyboard-accessible stage selector as single-pointer
+            alternative to the drag-and-drop column reordering above */}
+        {onStageChange && (
+          <Select
+            size="sm"
+            aria-label={t('kanban.change_stage_aria', { name: application.applicant.name })}
+            selectedKeys={new Set([stage])}
+            onSelectionChange={(keys) => {
+              const selected = Array.from(keys)[0] as string | undefined;
+              if (selected && selected !== stage) {
+                onStageChange(application.id, selected);
+              }
+            }}
+            classNames={{
+              trigger: 'min-h-7 h-7 text-xs bg-theme-elevated border-theme-default',
+              value: 'text-xs',
+            }}
+          >
+            {COLUMNS.map((col) => (
+              <SelectItem key={col.status} textValue={getApplicationStatusLabel(t, col.status)}>
+                {getApplicationStatusLabel(t, col.status)}
+              </SelectItem>
+            ))}
+          </Select>
+        )}
       </GlassCard>
     </motion.div>
   );
@@ -279,6 +307,8 @@ interface ColumnProps {
   applications: KanbanApplication[];
   onDragStart: (appId: number) => void;
   onDrop: (columnStatus: string) => void;
+  /** WCAG 2.5.1 — keyboard-accessible stage change (passed through to cards) */
+  onStageChange?: (appId: number, targetStatus: string) => void;
   onDownloadCv?: (appId: number, applicantName: string) => void;
   onScheduleInterview?: (app: KanbanApplication) => void;
   onSendOffer?: (app: KanbanApplication) => void;
@@ -288,7 +318,7 @@ interface ColumnProps {
   aiRankings?: Record<number, { rank: number; score: number; reason: string }>;
 }
 
-function KanbanColumn({ column, applications, onDragStart, onDrop, onDownloadCv, onScheduleInterview, onSendOffer, onScoreApplicant, onSelect, selectedAppIds, aiRankings }: ColumnProps) {
+function KanbanColumn({ column, applications, onDragStart, onDrop, onStageChange, onDownloadCv, onScheduleInterview, onSendOffer, onScoreApplicant, onSelect, selectedAppIds, aiRankings }: ColumnProps) {
   const { t } = useTranslation('jobs');
   const [isDragOver, setIsDragOver] = useState(false);
 
@@ -343,6 +373,7 @@ function KanbanColumn({ column, applications, onDragStart, onDrop, onDownloadCv,
               key={app.id}
               application={app}
               onDragStart={onDragStart}
+              onStageChange={onStageChange}
               onDownloadCv={onDownloadCv}
               onScheduleInterview={onScheduleInterview}
               onSendOffer={onSendOffer}
@@ -511,6 +542,35 @@ export function JobKanbanPage() {
       logError('JobKanbanPage: failed to update status', err);
       setApplications((prev) =>
         prev.map((a) => a.id === capturedId ? { ...a, status: app.status, stage: app.stage } : a)
+      );
+      toastRef.current.error(tRef.current('detail.status_update_error'));
+    }
+  };
+
+  // WCAG 2.5.1 — keyboard-accessible stage change (single-pointer alternative to drag-and-drop)
+  const handleStageChange = async (appId: number, targetStatus: string) => {
+    const app = applications.find((a) => a.id === appId);
+    if (!app) return;
+
+    // Optimistic update
+    setApplications((prev) =>
+      prev.map((a) => a.id === appId ? { ...a, status: targetStatus, stage: targetStatus } : a)
+    );
+
+    try {
+      const response = await api.put(`/v2/jobs/applications/${appId}`, { status: targetStatus });
+      if (!response.success) {
+        setApplications((prev) =>
+          prev.map((a) => a.id === appId ? { ...a, status: app.status, stage: app.stage } : a)
+        );
+        toastRef.current.error(tRef.current('detail.status_update_error'));
+      } else {
+        toastRef.current.success(tRef.current('detail.status_updated'));
+      }
+    } catch (err) {
+      logError('JobKanbanPage: failed to update status via select', err);
+      setApplications((prev) =>
+        prev.map((a) => a.id === appId ? { ...a, status: app.status, stage: app.stage } : a)
       );
       toastRef.current.error(tRef.current('detail.status_update_error'));
     }
@@ -861,6 +921,7 @@ export function JobKanbanPage() {
               applications={columnApplications(column.status)}
               onDragStart={handleDragStart}
               onDrop={handleDrop}
+              onStageChange={handleStageChange}
               onDownloadCv={handleDownloadCv}
               onScheduleInterview={setInterviewModalApp}
               onSendOffer={setOfferModalApp}
