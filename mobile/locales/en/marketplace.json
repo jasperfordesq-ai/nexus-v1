@@ -169,6 +169,11 @@
     "deleteFailed": "Could not delete this listing.",
     "renewFailed": "Could not renew this listing."
   },
+  "inventory": {
+    "soldOut": "Sold out",
+    "low": "Low stock: {{count}}",
+    "count": "Stock: {{count}}"
+  },
   "myListings": {
     "eyebrow": "Seller dashboard",
     "title": "My listings",

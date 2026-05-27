@@ -57,6 +57,7 @@ export default function MarketplaceListingCard({
         : primary;
   const imageUrl = resolveImageUrl(item.image?.thumbnail_url ?? item.image?.url ?? item.images?.[0]?.thumbnail_url ?? item.images?.[0]?.url);
   const price = formatMarketplacePrice(item.price, item.price_type, item.price_currency, t('common.free'));
+  const inventory = inventoryChip(item);
 
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={item.title} onPress={onPress}>
@@ -108,6 +109,12 @@ export default function MarketplaceListingCard({
                     <Chip.Label>{item.category.name}</Chip.Label>
                   </Chip>
                 ) : null}
+                {inventory ? (
+                  <Chip size="sm" variant="secondary">
+                    <Ionicons name={inventory.icon} size={12} color={inventory.tone} />
+                    <Chip.Label style={{ color: inventory.tone }}>{t(inventory.labelKey, inventory.params)}</Chip.Label>
+                  </Chip>
+                ) : null}
               </View>
 
               <View className="flex-row items-center gap-2">
@@ -128,4 +135,21 @@ export default function MarketplaceListingCard({
       </HeroCard>
     </Pressable>
   );
+}
+
+function inventoryChip(item: MarketplaceListingItem): null | {
+  icon: React.ComponentProps<typeof Ionicons>['name'];
+  labelKey: string;
+  params?: Record<string, number>;
+  tone: string;
+} {
+  const inventory = item.inventory_count;
+  if (inventory === null || inventory === undefined) return null;
+  if (inventory <= 0) {
+    return { icon: 'close-circle-outline', labelKey: 'inventory.soldOut', tone: '#ef4444' };
+  }
+  if (item.low_stock_threshold !== null && item.low_stock_threshold !== undefined && inventory <= item.low_stock_threshold) {
+    return { icon: 'alert-circle-outline', labelKey: 'inventory.low', params: { count: inventory }, tone: '#f59e0b' };
+  }
+  return { icon: 'cube-outline', labelKey: 'inventory.count', params: { count: inventory }, tone: '#64748b' };
 }
