@@ -126,7 +126,7 @@ function AdminLayoutShell() {
         role="dialog"
         aria-modal="true"
         aria-label={t('admin_navigation', 'Admin navigation')}
-        {...(!mobileDrawerOpen ? { inert: 'true' } : {})}
+        inert={!mobileDrawerOpen || undefined}
         className={`fixed left-0 top-0 z-40 h-[100dvh] w-64 max-w-[calc(100dvw-var(--safe-area-left)-var(--safe-area-right))] border-r border-divider bg-surface transition-transform duration-300 md:hidden ${mobileDrawerOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
         <AdminSidebar

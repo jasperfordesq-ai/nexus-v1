@@ -14,6 +14,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { FocusScope } from '@react-aria/focus';
 import { motion } from '@/lib/motion';import X from 'lucide-react/icons/x';
 import Camera from 'lucide-react/icons/camera';
 import Type from 'lucide-react/icons/type';
@@ -237,6 +238,18 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
       startCamera();
     }
   }, [cameraFacing]); // eslint-disable-line react-hooks/exhaustive-deps -- restart camera on facing change; startCamera excluded to avoid loop
+
+  // Close on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown, true);
+    return () => document.removeEventListener('keydown', handleKeyDown, true);
+  }, [onClose]);
 
   // Cleanup camera on unmount
   useEffect(() => {
@@ -516,6 +529,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
   };
 
   const creatorContent = (
+    <FocusScope contain restoreFocus autoFocus>
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -1176,6 +1190,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
         </div>
       </div>
     </motion.div>
+    </FocusScope>
   );
 
   return createPortal(creatorContent, document.body);

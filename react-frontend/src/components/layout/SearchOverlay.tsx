@@ -13,6 +13,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { FocusScope } from '@react-aria/focus';
 import { useNavigate } from 'react-router-dom';import Search from 'lucide-react/icons/search';
 import X from 'lucide-react/icons/x';
 import ListTodo from 'lucide-react/icons/list-todo';
@@ -260,6 +261,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
 
   // ─── Render via portal ─────────────────────────────────────────────────
   return createPortal(
+    <FocusScope contain restoreFocus autoFocus>
     <div className="fixed inset-0 z-[9999]">
       {/* Backdrop - clicking closes */}
       <div
@@ -465,7 +467,8 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
           </div>
         </div>
       </div>
-    </div>,
+    </div>
+    </FocusScope>,
     document.body
   );
 }

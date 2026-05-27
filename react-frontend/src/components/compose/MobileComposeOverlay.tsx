@@ -11,7 +11,9 @@
  * animation for a native-app feel.
  */
 
+import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { FocusScope } from '@react-aria/focus';
 import { motion, AnimatePresence } from '@/lib/motion';
 import { ScrollShadow } from '@/components/ui';
 import X from 'lucide-react/icons/x';
@@ -44,10 +46,27 @@ export function MobileComposeOverlay({
   const { t } = useTranslation('feed');
   const { registration } = useComposeSubmit();
 
+  // Close on Escape key
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown, true);
+    return () => document.removeEventListener('keydown', handleKeyDown, true);
+  }, [isOpen, onClose]);
+
   return createPortal(
     <AnimatePresence>
       {isOpen && (
+        <FocusScope contain restoreFocus autoFocus>
         <motion.div
+          role="dialog"
+          aria-modal="true"
+          aria-label={t('compose.compose_post')}
           className="fixed inset-0 z-[400] flex flex-col bg-[var(--surface-base)]"
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
@@ -134,6 +153,7 @@ export function MobileComposeOverlay({
             {children}
           </ScrollShadow>
         </motion.div>
+        </FocusScope>
       )}
     </AnimatePresence>,
     document.body,

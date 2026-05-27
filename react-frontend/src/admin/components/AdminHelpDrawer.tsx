@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react';
+import { FocusScope } from '@react-aria/focus';
 import { Separator } from '@heroui/react';
 import { Link } from 'react-router-dom';
 import X from 'lucide-react/icons/x';
@@ -15,6 +17,32 @@ interface AdminHelpDrawerProps {
 
 export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerProps) {
   const { t } = useTranslation('admin');
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Move focus into the close button when the drawer opens; close on Escape
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // Focus the first focusable element in the panel (close button)
+    const timer = setTimeout(() => {
+      const firstFocusable = panelRef.current?.querySelector<HTMLElement>(
+        'button:not([disabled]), a[href], input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      firstFocusable?.focus();
+    }, 50); // slight delay to allow CSS transition to start
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown, true);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('keydown', handleKeyDown, true);
+    };
+  }, [isOpen, onClose]);
 
   return (
     <>
@@ -27,11 +55,13 @@ export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerPro
         onClick={onClose}
       />
 
-      {/* Drawer panel */}
+      {/* Drawer panel — inert when off-screen so keyboard users cannot reach hidden content */}
       <div
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label={t('help_drawer.aria_label', { title: article.title })}
+        inert={!isOpen || undefined}
         className={`fixed inset-y-0 right-0 z-50 flex w-full max-w-[min(24rem,calc(100dvw-var(--safe-area-left)-var(--safe-area-right)))] flex-col bg-overlay shadow-xl transition-transform duration-300 ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
