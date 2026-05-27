@@ -816,6 +816,7 @@
       }
     },
     "push": {
+      "page_title": "Push Campaigns",
       "chart_opens_title": "{{count}} opens",
       "chart_sends_title": "{{count}} sends",
       "create_title": "New push campaign",
@@ -7700,7 +7701,7 @@
     "update_role": "Update Role",
     "vm_memory": "VM Memory",
     "vm_memory_usage": "VM memory usage",
-    "validation_email": "Enter a valid email address",
+    "validation_email": "Enter a valid email address (e.g., name@example.com)",
     "validation_format": "Invalid format",
     "validation_max": "Must be {{value}} or less",
     "validation_min": "Must be {{value}} or greater",
@@ -13394,7 +13395,7 @@
     "create_failed": "Failed to create user",
     "create_success": "Create successfully",
     "email": "Email",
-    "email_invalid": "Please enter a valid email address",
+    "email_invalid": "Please enter a valid email address (e.g., name@example.com)",
     "email_placeholder": "email@example.com",
     "email_required": "Email is required",
     "first_name": "First Name",
@@ -13603,13 +13604,13 @@
       "welcome_email_sent": "Welcome email sent"
     },
     "validation": {
-      "email_invalid": "Email Invalid",
-      "email_required": "Email Required",
+      "email_invalid": "Please enter a valid email address (e.g., name@example.com)",
+      "email_required": "Email is required",
       "first_name_required": "First name is required",
       "last_name_required": "Last name is required",
       "password_min": "Password must be at least 8 characters",
-      "role_required": "Role Required",
-      "status_required": "Status Required"
+      "role_required": "Role is required",
+      "status_required": "Status is required"
     },
     "values": {
       "expires_prefix": " - Expires",
@@ -13746,7 +13747,7 @@
     "role_tenant_admin": "Tenant Admin",
     "send_welcome_email": "Send Welcome Email",
     "send_welcome_email_description": "Send a welcome email with login instructions to the new user",
-    "validation_email_invalid": "Please enter a valid email address",
+    "validation_email_invalid": "Please enter a valid email address (e.g., name@example.com)",
     "validation_email_required": "Email is required",
     "validation_first_name_required": "First name is required",
     "validation_last_name_required": "Last name is required",
