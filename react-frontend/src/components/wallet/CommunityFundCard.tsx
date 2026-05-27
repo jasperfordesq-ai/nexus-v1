@@ -104,7 +104,7 @@ export function CommunityFundCard({ onDonateClick, compact = false }: CommunityF
             <Button
               size="sm"
               variant="secondary"
-              className="bg-rose-500/10 text-rose-400"
+              className="bg-rose-500/10 text-rose-600 dark:text-rose-400"
               startContent={<Heart className="w-3 h-3" />}
               onPress={onDonateClick}
             >

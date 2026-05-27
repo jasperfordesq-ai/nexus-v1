@@ -262,7 +262,7 @@ export function ReactionPicker({
       case 'wow':
         return 'text-[var(--color-warning)] font-medium';
       case 'sad':
-        return 'text-blue-400 font-medium';
+        return 'text-blue-700 dark:text-blue-400 font-medium';
       case 'celebrate':
         return 'text-emerald-500 font-medium';
       case 'clap':

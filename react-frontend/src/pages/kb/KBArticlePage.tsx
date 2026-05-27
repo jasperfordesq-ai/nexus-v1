@@ -301,7 +301,7 @@ export function KBArticlePage() {
             </h1>
             <div className="flex items-center gap-3 flex-wrap text-xs text-theme-subtle">
               {article.category_name && (
-                <Chip size="sm" variant="flat" className="bg-blue-500/10 text-blue-400">
+                <Chip size="sm" variant="flat" className="bg-blue-500/10 text-blue-700 dark:text-blue-400">
                   {article.category_name}
                 </Chip>
               )}
@@ -343,8 +343,8 @@ export function KBArticlePage() {
             <div
               className="prose prose-sm dark:prose-invert max-w-none text-theme-primary
                 prose-headings:text-theme-primary prose-p:text-theme-secondary
-                prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
-                prose-strong:text-theme-primary prose-code:text-blue-400
+                prose-a:text-blue-700 dark:prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
+                prose-strong:text-theme-primary prose-code:text-blue-700 dark:prose-code:text-blue-400
                 prose-pre:bg-theme-elevated prose-pre:border prose-pre:border-theme-default
                 prose-img:rounded-lg prose-blockquote:border-blue-400
                 prose-li:text-theme-secondary"
@@ -453,7 +453,7 @@ export function KBArticlePage() {
               <div className="flex items-center justify-center gap-3">
                 <Button
                   variant="flat"
-                  className="bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+                  className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20"
                   startContent={<ThumbsUp className="w-4 h-4" aria-hidden="true" />}
                   onPress={() => handleFeedback(true)}
                   isLoading={isSubmittingFeedback}
@@ -462,7 +462,7 @@ export function KBArticlePage() {
                 </Button>
                 <Button
                   variant="flat"
-                  className="bg-red-500/10 text-red-400 hover:bg-red-500/20"
+                  className="bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20"
                   startContent={<ThumbsDown className="w-4 h-4" aria-hidden="true" />}
                   onPress={() => handleFeedback(false)}
                   isLoading={isSubmittingFeedback}

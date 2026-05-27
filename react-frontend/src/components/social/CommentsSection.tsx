@@ -251,7 +251,7 @@ function CommentItemInner({
                     variant="danger-soft"
                     size="sm"
                     onPress={() => setShowDeleteModal(true)}
-                    className="flex min-h-[24px] items-center gap-0.5 px-0 py-0 text-[10px] text-red-400 hover:text-[var(--color-error)]"
+                    className="flex min-h-[24px] items-center gap-0.5 px-0 py-0 text-[10px] text-red-600 dark:text-red-400 hover:text-[var(--color-error)]"
                     startContent={<Trash2 className="w-2.5 h-2.5" aria-hidden="true" />}
                   >
                     {tr('delete', 'Delete')}

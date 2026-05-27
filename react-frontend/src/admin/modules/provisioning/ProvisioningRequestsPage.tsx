@@ -258,7 +258,7 @@ export function ProvisioningRequestsPage() {
                   <div>
                     <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.applicant')}</p>
                     <p>{selected.applicant_name}</p>
-                    <p className="text-indigo-400">{selected.applicant_email}</p>
+                    <p className="text-indigo-700 dark:text-indigo-400">{selected.applicant_email}</p>
                     {selected.applicant_phone && <p>{selected.applicant_phone}</p>}
                   </div>
                   <div>
@@ -301,7 +301,7 @@ export function ProvisioningRequestsPage() {
                 {selected.rejection_reason && (
                   <div>
                     <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">{t('fields.rejection_reason')}</p>
-                    <p className="text-rose-400">{selected.rejection_reason}</p>
+                    <p className="text-rose-600 dark:text-rose-400">{selected.rejection_reason}</p>
                   </div>
                 )}
 

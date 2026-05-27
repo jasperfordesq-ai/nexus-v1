@@ -233,7 +233,7 @@ export function KnowledgeBasePage() {
           <Chip
             size="sm"
             variant="flat"
-            className="bg-blue-500/10 text-blue-400"
+            className="bg-blue-500/10 text-blue-700 dark:text-blue-400"
             onClose={() => { setSearchQuery(''); setSearchResults(null); }}
           >
             {t('search_results', { count: searchResults.length, query: searchQuery })}
