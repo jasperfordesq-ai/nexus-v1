@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Proprietary brand names removed from the Caring Community module.** All visible mentions of "KISS", "AGORIS/Agoris", "Age-Stiftung", and "Koordination und Innovation für Soziales" have been replaced with "Caring Community" throughout the frontend, admin panel, and all 11 language files. The Agoris node option was removed from the pilot inquiry form. Database table and column names, the `agoris` tenant slug, and internal service class names are unchanged.
+
 - **React upgraded from 18 to 19.** Full production upgrade including React 19 concurrent features, updated type definitions (`@types/react` 19.x), and Vitest/testing-library compatibility fixes. All 223 usages of deprecated APIs resolved. Build, type-check, and smoke tests pass.
 
 - **`framer-motion` removed.** As part of the React 19 modernization, the `framer-motion` dependency was dropped and replaced with a local CSS-transition-backed shim at `@/lib/motion`, repointing every animation import site. Smaller bundle and one fewer heavy dependency, with no visible change to animations.
