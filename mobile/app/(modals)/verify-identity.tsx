@@ -12,10 +12,17 @@ import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface, Text } 
 
 import AppTopBar from '@/components/ui/AppTopBar';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
-import { getIdentityStatus, saveIdentityDateOfBirth, startIdentityVerification, type IdentityStatus } from '@/lib/api/verification';
+import {
+  createIdentityVerificationPayment,
+  getIdentityStatus,
+  saveIdentityDateOfBirth,
+  startIdentityVerification,
+  type IdentityStatus,
+} from '@/lib/api/verification';
 import { APP_URL } from '@/lib/constants';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
+import { presentIdentityPayment } from '@/lib/payments/identityPayment';
 import { withAlpha } from '@/lib/utils/color';
 
 type PageState = 'loading' | 'dob_collection' | 'payment_required' | 'start' | 'in_progress' | 'verified' | 'failed' | 'error';
@@ -40,6 +47,7 @@ function VerifyIdentityScreenInner() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isSavingDob, setIsSavingDob] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
+  const [isCreatingPayment, setIsCreatingPayment] = useState(false);
 
   const stopPolling = useCallback(() => {
     if (pollRef.current) {
@@ -148,6 +156,46 @@ function VerifyIdentityScreenInner() {
     }
   }
 
+  async function handleCreatePayment() {
+    setIsCreatingPayment(true);
+    try {
+      const response = await createIdentityVerificationPayment();
+      const data = response.data;
+
+      if (data?.already_paid || data?.payment_required === false) {
+        await refreshStatus();
+        return;
+      }
+
+      if (!data?.client_secret) {
+        Alert.alert(t('identity.error_title'), t('identity.error_create_payment'));
+        return;
+      }
+
+      const paymentResult = await presentIdentityPayment({
+        clientSecret: data.client_secret,
+        publishableKey: data.publishable_key,
+        merchantDisplayName: 'Project NEXUS',
+      });
+
+      if (paymentResult.status === 'redirected' || paymentResult.status === 'canceled') {
+        return;
+      }
+
+      if (paymentResult.status === 'failed') {
+        Alert.alert(t('identity.error_title'), paymentResult.message || t(data.publishable_key ? 'identity.error_create_payment' : 'identity.error_missing_publishable_key'));
+        return;
+      }
+
+      Alert.alert(t('identity.payment_success_title'), t('identity.payment_success_body'));
+      await refreshStatus();
+    } catch {
+      Alert.alert(t('identity.error_title'), t('identity.error_create_payment'));
+    } finally {
+      setIsCreatingPayment(false);
+    }
+  }
+
   const fee = status ? formatFee(status.fee_cents, status.fee_currency) : '';
 
   return (
@@ -208,8 +256,16 @@ function VerifyIdentityScreenInner() {
             <HeroCard.Body className="gap-4 p-4">
               <Text className="text-base font-bold" style={{ color: theme.text }}>{t('identity.fee_title')}</Text>
               <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('identity.mobile_payment_body', { fee })}</Text>
-              <HeroButton variant="primary" onPress={() => void Linking.openURL(`${APP_URL}/settings/verify-identity`)} style={{ backgroundColor: primary }}>
-                <Ionicons name="open-outline" size={17} color="#fff" />
+              <Surface variant="secondary" className="items-center gap-1 rounded-panel-inner p-4">
+                <Text className="text-3xl font-bold" style={{ color: theme.text }}>{fee}</Text>
+                <Text className="text-xs font-semibold uppercase" style={{ color: theme.textMuted }}>{t('identity.fee_one_time_label')}</Text>
+              </Surface>
+              <HeroButton testID="identity-pay-button" variant="primary" onPress={() => void handleCreatePayment()} isDisabled={isCreatingPayment} style={{ backgroundColor: primary }}>
+                {isCreatingPayment ? <Spinner size="sm" /> : <Ionicons name="card-outline" size={17} color="#fff" />}
+                <HeroButton.Label>{t('identity.pay_button', { fee })}</HeroButton.Label>
+              </HeroButton>
+              <HeroButton variant="secondary" onPress={() => void Linking.openURL(`${APP_URL}/settings/verify-identity`)}>
+                <Ionicons name="open-outline" size={17} color={primary} />
                 <HeroButton.Label>{t('identity.open_web_flow')}</HeroButton.Label>
               </HeroButton>
               <HeroButton variant="secondary" onPress={() => void handleRefresh()}>

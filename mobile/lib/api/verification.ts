@@ -84,6 +84,16 @@ export interface StartIdentityVerificationResponse {
   already_verified?: boolean;
 }
 
+export interface IdentityPaymentResponse {
+  client_secret?: string;
+  payment_intent_id?: string;
+  publishable_key?: string;
+  fee_cents?: number;
+  fee_currency?: string;
+  payment_required?: boolean;
+  already_paid?: boolean;
+}
+
 export function getIdentityStatus(): Promise<ApiEnvelope<IdentityStatus>> {
   return api.get<ApiEnvelope<IdentityStatus>>(`${API_V2}/identity/status`);
 }
@@ -96,4 +106,8 @@ export function saveIdentityDateOfBirth(dateOfBirth: string): Promise<ApiEnvelop
 
 export function startIdentityVerification(): Promise<ApiEnvelope<StartIdentityVerificationResponse>> {
   return api.post<ApiEnvelope<StartIdentityVerificationResponse>>(`${API_V2}/identity/start`);
+}
+
+export function createIdentityVerificationPayment(): Promise<ApiEnvelope<IdentityPaymentResponse>> {
+  return api.post<ApiEnvelope<IdentityPaymentResponse>>(`${API_V2}/identity/create-payment`);
 }

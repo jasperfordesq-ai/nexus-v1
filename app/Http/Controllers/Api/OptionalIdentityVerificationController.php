@@ -256,6 +256,7 @@ class OptionalIdentityVerificationController extends BaseApiController
 
             return $this->respondWithData([
                 'client_secret' => $result['client_secret'],
+                'publishable_key' => (string) config('services.stripe.publishable', env('STRIPE_PUBLISHABLE_KEY', '')),
                 'fee_cents' => $feeCents,
                 'fee_currency' => 'eur',
             ]);

@@ -18,9 +18,31 @@ const appJson = require('./app.json');
 
 module.exports = () => {
   const projectId = process.env.EAS_PROJECT_ID ?? null;
+  const plugins = [...(appJson.expo.plugins ?? [])];
+  const hasStripePlugin = plugins.some((plugin) => {
+    return Array.isArray(plugin) ? plugin[0] === '@stripe/stripe-react-native' : plugin === '@stripe/stripe-react-native';
+  });
+
+  if (!hasStripePlugin) {
+    plugins.push([
+      '@stripe/stripe-react-native',
+      {
+        merchantIdentifier: '',
+        enableGooglePay: false,
+      },
+    ]);
+  }
 
   return {
     ...appJson.expo,
+    plugins,
+    ios: {
+      ...appJson.expo.ios,
+      infoPlist: {
+        ...(appJson.expo.ios?.infoPlist ?? {}),
+        CFBundleAllowMixedLocalizations: true,
+      },
+    },
     extra: {
       ...(appJson.expo.extra ?? {}),
       apiUrl: process.env.EXPO_PUBLIC_API_URL ?? 'https://api.project-nexus.ie',
