@@ -273,7 +273,7 @@ function SeasonCard() {
               <span className="text-sm font-medium text-theme-primary">{t('leaderboard.season.your_progress')}</span>
               <div className="flex items-center gap-2">
                 {userPosition && (
-                  <span className="text-sm font-bold text-indigo-400">#{userPosition}</span>
+                  <span className="text-sm font-bold text-indigo-700 dark:text-indigo-400">#{userPosition}</span>
                 )}
               </div>
             </div>
@@ -307,7 +307,7 @@ function SeasonCard() {
           <Button
             variant="light"
             size="sm"
-            className="text-purple-400"
+            className="text-purple-700 dark:text-purple-400"
             endContent={
               <ChevronRight
                 className={`w-4 h-4 transition-transform ${showAllSeasons ? 'rotate-90' : ''}`}
@@ -497,7 +497,7 @@ export function LeaderboardPage() {
       case 'nexus_score':
         return (
           <>
-            <span className="font-bold text-indigo-400">{value.toLocaleString()}</span>
+            <span className="font-bold text-indigo-700 dark:text-indigo-400">{value.toLocaleString()}</span>
             <span className="text-xs text-theme-subtle ml-1">{t('leaderboard.score_unit.nexus_score')}</span>
           </>
         );
@@ -852,9 +852,9 @@ function CompetitiveLeaderboard(props: CompetitiveLeaderboardProps) {
 
                         {/* Name & Level */}
                         <div className="flex-1 min-w-0">
-                          <p className={`font-medium truncate ${entry.is_current_user ? 'text-indigo-400' : 'text-theme-primary'}`}>
+                          <p className={`font-medium truncate ${entry.is_current_user ? 'text-indigo-700 dark:text-indigo-400' : 'text-theme-primary'}`}>
                             {entry.user.name}
-                            {entry.is_current_user && <span className="text-xs ml-2 text-indigo-400">{t('leaderboard.you')}</span>}
+                            {entry.is_current_user && <span className="text-xs ml-2 text-indigo-700 dark:text-indigo-400">{t('leaderboard.you')}</span>}
                           </p>
                           <p className="text-xs text-theme-subtle">{t('leaderboard.level', { level: entry.level })}</p>
                         </div>
