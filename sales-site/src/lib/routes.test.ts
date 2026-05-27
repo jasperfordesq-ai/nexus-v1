@@ -16,4 +16,12 @@ describe('sales routes', () => {
   it('shows Pricing as the primary commercial navigation item', () => {
     expect(salesNavItems.slice(0, 3).map((item) => item.label)).toEqual(['Platform', 'Features', 'Pricing']);
   });
+
+  it('routes legal policy pages directly instead of falling back to the front page', () => {
+    expect(normaliseSalesPath('/legal/terms')).toBe('/legal/terms');
+    expect(normaliseSalesPath('/legal/privacy?ref=footer')).toBe('/legal/privacy');
+    expect(normaliseSalesPath('/legal/cookies#analytics')).toBe('/legal/cookies');
+    expect(normaliseSalesPath('/legal/acceptable-use')).toBe('/legal/acceptable-use');
+    expect(normaliseSalesPath('/legal/data-processing')).toBe('/legal/data-processing');
+  });
 });

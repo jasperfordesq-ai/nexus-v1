@@ -3,7 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-export type SalesPath = '/' | '/features' | '/hosting';
+import { legalPages, type LegalPath } from '../data/legal';
+
+export type SalesPath = '/' | '/features' | '/hosting' | LegalPath;
 
 export interface SalesNavItem {
   href: SalesPath | string;
@@ -19,6 +21,12 @@ export const salesNavItems: SalesNavItem[] = [
 ];
 
 export function normaliseSalesPath(path: string): SalesPath {
+  const legalMatch = legalPages.find((page) => path.startsWith(page.path));
+
+  if (legalMatch) {
+    return legalMatch.path;
+  }
+
   if (path.startsWith('/features')) {
     return '/features';
   }

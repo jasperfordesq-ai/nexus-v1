@@ -7,6 +7,7 @@ import { Button } from '@heroui/react';
 import { GitBranch, Menu, X } from 'lucide-react';
 import { type ReactNode, useState } from 'react';
 
+import { legalPages } from '../data/legal';
 import { salesNavItems } from '../lib/routes';
 
 interface SiteShellProps {
@@ -128,7 +129,7 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
       <main>{children}</main>
 
       <footer className="border-t border-white/10 bg-[var(--surface-base)]">
-        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-12 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
+        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-12 lg:grid-cols-[1.35fr_1fr_1fr_1fr_1fr]">
           <div>
             <div className="mb-4 flex items-center gap-3">
               <img src="/favicon.svg" alt="" className="size-8" />
@@ -136,6 +137,9 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
             </div>
             <p className="max-w-md text-sm leading-7 text-white/62">
               Community timebanking from EUR29/month, plus full managed platform hosting for volunteering, civic participation, federation, and multi-community networks.
+            </p>
+            <p className="mt-4 max-w-md text-xs leading-6 text-white/52">
+              Managed hosting in association with PROJECT NEXUS PLATFORM IRELAND LTD, hosting partner. Reg. Number 812763.
             </p>
             <p className="mt-4 text-xs text-white/45">
               Copyright © 2024-2026 Jasper Ford. Licensed under AGPL-3.0-or-later.
@@ -160,6 +164,7 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
             ]}
             onNavigate={handleInternalNav}
           />
+          <FooterColumn title="Legal" links={legalPages.map((page): [string, string] => [page.label, page.path])} onNavigate={handleInternalNav} />
           <FooterColumn
             title="Contact"
             links={[

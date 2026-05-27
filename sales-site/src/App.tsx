@@ -8,7 +8,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import FeaturesPage from './components/FeaturesPage';
 import HomePage from './components/HomePage';
 import HostingPage from './components/HostingPage';
+import LegalPage from './components/LegalPage';
 import SiteShell from './components/SiteShell';
+import { legalPages, type LegalPath } from './data/legal';
 import { normaliseSalesPath } from './lib/routes';
 
 export default function App() {
@@ -34,6 +36,11 @@ export default function App() {
 
     if (path === '/features') {
       return <FeaturesPage onNavigate={navigate} />;
+    }
+
+    const legalPage = legalPages.find((page) => page.path === path);
+    if (legalPage) {
+      return <LegalPage path={path as LegalPath} onNavigate={navigate} />;
     }
 
     return <HomePage onNavigate={navigate} />;
