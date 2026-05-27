@@ -185,6 +185,10 @@ function DashboardCard({ stats, primary }: { stats: MarketplaceDashboard; primar
             <HeroButton.Label>{t('myListings.payments')}</HeroButton.Label>
           </HeroButton>
         </View>
+        <HeroButton variant="secondary" onPress={() => router.push('/(modals)/marketplace-shipping-options' as Href)}>
+          <Ionicons name="car-outline" size={16} color={primary} />
+          <HeroButton.Label>{t('myListings.shipping')}</HeroButton.Label>
+        </HeroButton>
       </HeroCard.Body>
     </HeroCard>
   );

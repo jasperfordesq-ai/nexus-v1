@@ -100,6 +100,10 @@ function MarketplaceToolsScreen() {
                     <HeroButton.Label>{t('tools.payments')}</HeroButton.Label>
                   </HeroButton>
                 </View>
+                <HeroButton variant="secondary" onPress={() => router.push('/(modals)/marketplace-shipping-options' as Href)}>
+                  <Ionicons name="car-outline" size={16} color={primary} />
+                  <HeroButton.Label>{t('tools.shipping')}</HeroButton.Label>
+                </HeroButton>
               </HeroCard.Body>
             </HeroCard>
 

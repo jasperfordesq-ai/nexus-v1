@@ -72,6 +72,12 @@ export interface MarketplaceListingItem {
   is_oversold_protected?: boolean;
 }
 
+export interface MarketplaceNearbyListing extends MarketplaceListingItem {
+  latitude?: number | null;
+  longitude?: number | null;
+  distance_km?: number | null;
+}
+
 export interface MarketplaceListingDetail extends MarketplaceListingItem {
   description: string;
   quantity: number;
@@ -218,6 +224,17 @@ export interface MarketplacePickupSlotOption {
   remaining: number;
 }
 
+export interface MarketplaceShippingOption {
+  id: number;
+  courier_name: string;
+  courier_code?: string | null;
+  price: number;
+  currency: string;
+  estimated_days?: number | null;
+  is_default: boolean;
+  is_active?: boolean;
+}
+
 export interface MarketplacePaymentIntent {
   checkout_url?: string;
   client_secret?: string;
@@ -362,6 +379,20 @@ export function getMarketplaceListings(
   addQueryValue(query, 'limit', params.limit ?? 20);
   addQueryValue(query, 'user_id', params.user_id);
   return api.get<MarketplaceCollectionResponse<MarketplaceListingItem>>(`${API_V2}/marketplace/listings`, query);
+}
+
+export function getNearbyMarketplaceListings(params: {
+  latitude: number;
+  longitude: number;
+  radius?: number;
+  limit?: number;
+}): Promise<MarketplaceDataResponse<MarketplaceNearbyListing[]>> {
+  const query: Record<string, string> = {};
+  addQueryValue(query, 'latitude', params.latitude);
+  addQueryValue(query, 'longitude', params.longitude);
+  addQueryValue(query, 'radius', params.radius ?? 25);
+  addQueryValue(query, 'limit', params.limit ?? 20);
+  return api.get<MarketplaceDataResponse<MarketplaceNearbyListing[]>>(`${API_V2}/marketplace/listings/nearby`, query);
 }
 
 export function getFeaturedMarketplaceListings(): Promise<MarketplaceDataResponse<MarketplaceListingItem[]>> {
@@ -629,6 +660,40 @@ export function promoteMarketplaceListing(id: number, promotionType: Marketplace
 
 export function getMarketplacePickupSlots(): Promise<MarketplaceDataResponse<MarketplacePickupSlot[]>> {
   return api.get<MarketplaceDataResponse<MarketplacePickupSlot[]>>(`${API_V2}/marketplace/seller/pickup-slots`);
+}
+
+export function getMarketplaceShippingOptions(): Promise<MarketplaceDataResponse<MarketplaceShippingOption[]>> {
+  return api.get<MarketplaceDataResponse<MarketplaceShippingOption[]>>(`${API_V2}/marketplace/seller/shipping-options`);
+}
+
+export function createMarketplaceShippingOption(payload: {
+  courier_name: string;
+  courier_code?: string | null;
+  price: number;
+  currency?: string;
+  estimated_days?: number | null;
+  is_default?: boolean;
+}): Promise<MarketplaceDataResponse<MarketplaceShippingOption>> {
+  return api.post<MarketplaceDataResponse<MarketplaceShippingOption>>(`${API_V2}/marketplace/seller/shipping-options`, payload);
+}
+
+export function updateMarketplaceShippingOption(
+  id: number,
+  payload: Partial<{
+    courier_name: string;
+    courier_code: string | null;
+    price: number;
+    currency: string;
+    estimated_days: number | null;
+    is_default: boolean;
+    is_active: boolean;
+  }>,
+): Promise<MarketplaceDataResponse<MarketplaceShippingOption>> {
+  return api.put<MarketplaceDataResponse<MarketplaceShippingOption>>(`${API_V2}/marketplace/seller/shipping-options/${id}`, payload);
+}
+
+export function deleteMarketplaceShippingOption(id: number): Promise<void> {
+  return api.delete<void>(`${API_V2}/marketplace/seller/shipping-options/${id}`);
 }
 
 export function createMarketplacePickupSlot(payload: {

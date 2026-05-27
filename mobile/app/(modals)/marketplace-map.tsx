@@ -1,0 +1,187 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { useState } from 'react';
+import { Alert, FlatList, TextInput, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { router, type Href, useLocalSearchParams } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
+import { useTranslation } from 'react-i18next';
+
+import MarketplaceListingCard from '@/components/marketplace/MarketplaceListingCard';
+import AppTopBar from '@/components/ui/AppTopBar';
+import EmptyState from '@/components/ui/EmptyState';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
+import {
+  getNearbyMarketplaceListings,
+  type MarketplaceNearbyListing,
+} from '@/lib/api/marketplace';
+import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
+import { useTheme } from '@/lib/hooks/useTheme';
+import { withAlpha } from '@/lib/utils/color';
+
+export default function MarketplaceMapRoute() {
+  return (
+    <ModalErrorBoundary>
+      <MarketplaceMapScreen />
+    </ModalErrorBoundary>
+  );
+}
+
+function MarketplaceMapScreen() {
+  const { t } = useTranslation(['marketplace', 'common']);
+  const params = useLocalSearchParams<{ latitude?: string; longitude?: string; radius?: string }>();
+  const { hasFeature } = useTenant();
+  const primary = usePrimaryColor();
+  const theme = useTheme();
+  const [latitude, setLatitude] = useState(params.latitude ?? '');
+  const [longitude, setLongitude] = useState(params.longitude ?? '');
+  const [radius, setRadius] = useState(params.radius ?? '25');
+  const [items, setItems] = useState<MarketplaceNearbyListing[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function search() {
+    const lat = Number(latitude);
+    const lng = Number(longitude);
+    const radiusKm = Number(radius) || 25;
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      Alert.alert(t('common:errors.alertTitle'), t('map.invalidCoordinates'));
+      return;
+    }
+
+    setIsLoading(true);
+    setHasSearched(true);
+    setError(null);
+    try {
+      const response = await getNearbyMarketplaceListings({
+        latitude: lat,
+        longitude: lng,
+        radius: radiusKm,
+        limit: 50,
+      });
+      setItems(response.data);
+    } catch (err) {
+      setItems([]);
+      setError(err instanceof Error ? err.message : t('map.loadFailed'));
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  if (!hasFeature('marketplace')) {
+    return (
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('map.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
+        <EmptyState icon="map-outline" title={t('featureGate.title')} subtitle={t('featureGate.description')} />
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <SafeAreaView className="flex-1 bg-background">
+      <AppTopBar title={t('map.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
+      <FlatList
+        data={items}
+        keyExtractor={(item) => String(item.id)}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 132 }}
+        ListHeaderComponent={
+          <View>
+            <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
+              <View className="h-1.5" style={{ backgroundColor: primary }} />
+              <HeroCard.Body className="gap-4 p-4">
+                <View className="flex-row items-start gap-3">
+                  <View className="size-13 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+                    <Ionicons name="map-outline" size={25} color={primary} />
+                  </View>
+                  <View className="min-w-0 flex-1 gap-1">
+                    <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('map.eyebrow')}</Text>
+                    <Text className="text-2xl font-bold" style={{ color: theme.text }}>{t('map.title')}</Text>
+                    <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('map.subtitle')}</Text>
+                  </View>
+                </View>
+                <Surface variant="secondary" className="gap-3 rounded-panel-inner p-3">
+                  <View className="flex-row gap-2">
+                    <CoordinateInput label={t('map.latitude')} value={latitude} onChangeText={setLatitude} placeholder={t('map.latitudePlaceholder')} />
+                    <CoordinateInput label={t('map.longitude')} value={longitude} onChangeText={setLongitude} placeholder={t('map.longitudePlaceholder')} />
+                  </View>
+                  <CoordinateInput label={t('map.radius')} value={radius} onChangeText={setRadius} placeholder={t('map.radiusPlaceholder')} />
+                  <HeroButton variant="primary" onPress={() => void search()} isDisabled={isLoading} style={{ backgroundColor: primary }}>
+                    <Ionicons name="locate-outline" size={16} color="#fff" />
+                    <HeroButton.Label>{t('map.search')}</HeroButton.Label>
+                  </HeroButton>
+                </Surface>
+                <Text className="text-xs leading-4" style={{ color: theme.textMuted }}>{t('map.helper')}</Text>
+              </HeroCard.Body>
+            </HeroCard>
+            {items.length > 0 ? (
+              <View className="mb-2 flex-row items-center justify-between">
+                <Text className="text-sm font-bold" style={{ color: theme.text }}>{t('map.results', { count: items.length })}</Text>
+                <Chip size="sm" variant="secondary"><Chip.Label>{t('map.radiusLabel', { radius })}</Chip.Label></Chip>
+              </View>
+            ) : null}
+          </View>
+        }
+        renderItem={({ item }) => (
+          <View>
+            {item.distance_km != null ? (
+              <View className="mb-1 self-start">
+                <Chip size="sm" variant="secondary">
+                  <Ionicons name="navigate-outline" size={12} color={primary} />
+                  <Chip.Label>{t('map.distance', { distance: Number(item.distance_km).toFixed(1) })}</Chip.Label>
+                </Chip>
+              </View>
+            ) : null}
+            <MarketplaceListingCard
+              item={item}
+              onPress={() => router.push({ pathname: '/(modals)/marketplace-detail', params: { id: String(item.id) } } as unknown as Href)}
+            />
+          </View>
+        )}
+        ListEmptyComponent={
+          isLoading ? (
+            <View className="py-16"><LoadingSpinner /></View>
+          ) : hasSearched ? (
+            <EmptyState icon="map-outline" title={error ?? t('map.emptyTitle')} subtitle={t('map.emptySubtitle')} actionLabel={t('common:buttons.retry')} onAction={() => void search()} />
+          ) : (
+            <EmptyState icon="location-outline" title={t('map.startTitle')} subtitle={t('map.startSubtitle')} />
+          )
+        }
+      />
+    </SafeAreaView>
+  );
+}
+
+function CoordinateInput({
+  label,
+  value,
+  onChangeText,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChangeText: (value: string) => void;
+  placeholder: string;
+}) {
+  const theme = useTheme();
+  return (
+    <View className="min-w-0 flex-1 gap-2">
+      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{label}</Text>
+      <TextInput
+        className="min-h-12 rounded-panel-inner border px-3 text-sm"
+        style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg }}
+        placeholder={placeholder}
+        placeholderTextColor={theme.textMuted}
+        value={value}
+        onChangeText={onChangeText}
+        keyboardType="decimal-pad"
+      />
+    </View>
+  );
+}

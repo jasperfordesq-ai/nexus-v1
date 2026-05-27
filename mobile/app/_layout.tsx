@@ -289,6 +289,14 @@ function RootNavigator() {
         options={{ ...modalOptions, headerShown: false, title: t('marketplace:tools.title') }}
       />
       <Stack.Screen
+        name="(modals)/marketplace-map"
+        options={{ ...modalOptions, headerShown: false, title: t('marketplace:map.title') }}
+      />
+      <Stack.Screen
+        name="(modals)/marketplace-shipping-options"
+        options={{ ...modalOptions, headerShown: false, title: t('marketplace:shipping.title') }}
+      />
+      <Stack.Screen
         name="(modals)/marketplace-collections"
         options={{ ...modalOptions, headerShown: false, title: t('marketplace:collections.title') }}
       />

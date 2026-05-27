@@ -17,9 +17,11 @@ import {
   createMarketplaceCollection,
   createMarketplacePaymentIntent,
   createMarketplacePickupSlot,
+  createMarketplaceShippingOption,
   createMarketplaceSavedSearch,
   createMerchantCoupon,
   completeMerchantOnboarding,
+  deleteMarketplaceShippingOption,
   getMarketplaceCategories,
   getMarketplaceCollectionItems,
   getMarketplaceCollections,
@@ -28,9 +30,11 @@ import {
   getMarketplaceListings,
   getMarketplaceOffers,
   getMarketplacePickupSlots,
+  getMarketplaceShippingOptions,
   getMarketplaceSavedSearches,
   getMarketplaceStripeOnboardingStatus,
   getMerchantOnboardingStatus,
+  getNearbyMarketplaceListings,
   getMyMarketplaceListings,
   getMyMarketplacePickups,
   getMyMarketplacePromotions,
@@ -45,6 +49,7 @@ import {
   saveMerchantOnboardingStep2,
   saveMerchantOnboardingStep3,
   startMarketplaceStripeOnboarding,
+  updateMarketplaceShippingOption,
   updateMarketplaceListing,
   uploadMarketplaceImages,
   validateMarketplaceCoupon,
@@ -88,6 +93,19 @@ describe('marketplace api', () => {
       limit: '20',
       sort: 'newest',
       user_id: '42',
+    });
+  });
+
+  it('loads nearby marketplace listings with backend geolocation params', async () => {
+    (api.get as jest.Mock).mockResolvedValue({ data: [] });
+
+    await getNearbyMarketplaceListings({ latitude: 51.55, longitude: -9.26, radius: 50, limit: 30 });
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/listings/nearby', {
+      latitude: '51.55',
+      longitude: '-9.26',
+      radius: '50',
+      limit: '30',
     });
   });
 
@@ -202,6 +220,27 @@ describe('marketplace api', () => {
       slot_end: '2026-06-01 12:00',
       capacity: 4,
     });
+
+    await getMarketplaceShippingOptions();
+    expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/seller/shipping-options');
+
+    await createMarketplaceShippingOption({ courier_name: 'An Post', price: 6.5, currency: 'EUR', estimated_days: 3, is_default: true });
+    expect(api.post).toHaveBeenCalledWith('/api/v2/marketplace/seller/shipping-options', {
+      courier_name: 'An Post',
+      price: 6.5,
+      currency: 'EUR',
+      estimated_days: 3,
+      is_default: true,
+    });
+
+    await updateMarketplaceShippingOption(4, { courier_name: 'Courier', price: 8 });
+    expect(api.put).toHaveBeenCalledWith('/api/v2/marketplace/seller/shipping-options/4', {
+      courier_name: 'Courier',
+      price: 8,
+    });
+
+    await deleteMarketplaceShippingOption(4);
+    expect(api.delete).toHaveBeenCalledWith('/api/v2/marketplace/seller/shipping-options/4');
 
     await getMyMarketplacePickups();
     expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/me/pickups');
