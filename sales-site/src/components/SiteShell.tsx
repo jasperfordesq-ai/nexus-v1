@@ -25,7 +25,7 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
 
   return (
     <div className="min-h-screen text-[var(--nexus-ink)]">
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-[#07080d]/88 backdrop-blur-xl">
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-[var(--surface-base)]/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3">
           <button
             type="button"
@@ -66,7 +66,7 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
                   key={item.href}
                   type="button"
                   className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                    isActive ? 'bg-white text-[#0b0d14]' : 'text-white/72 hover:bg-white/8 hover:text-white'
+                    isActive ? 'bg-white text-[var(--text-inverse)]' : 'text-white/72 hover:bg-white/8 hover:text-white'
                   }`}
                   onClick={() => handleInternalNav(item.href)}
                 >
@@ -127,7 +127,7 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
 
       <main>{children}</main>
 
-      <footer className="border-t border-white/10 bg-[#07080d]">
+      <footer className="border-t border-white/10 bg-[var(--surface-base)]">
         <div className="mx-auto grid max-w-7xl gap-10 px-5 py-12 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
           <div>
             <div className="mb-4 flex items-center gap-3">

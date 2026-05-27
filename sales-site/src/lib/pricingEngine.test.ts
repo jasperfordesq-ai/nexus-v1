@@ -30,7 +30,7 @@ describe('pricingEngine', () => {
     expect(recommendCommunityTimebankPlan(5000).id).toBe('community-pro');
   });
 
-  it('prices Community Edition below the Made Open community timebanking entry benchmark', () => {
+  it('prices Community Edition as a low-cost annual entry plan', () => {
     const quote = estimateQuote({
       productLine: 'community-timebanking',
       activeMembers: 150,

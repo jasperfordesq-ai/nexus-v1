@@ -24,8 +24,6 @@ export interface HostingPlan {
 export interface CommunityTimebankPlan extends HostingPlan {
   annualMonthlyEur: number;
   annualEur: number;
-  comparisonMonthlyGbp: number;
-  comparisonAnnualGbp: number;
   summary: string;
   included: string[];
   heldBack: string[];
@@ -47,62 +45,6 @@ export interface OneOffOption {
   description: string;
 }
 
-export interface CompetitorBenchmark {
-  name: string;
-  monthlyGbp: number;
-  annualGbp: number;
-  features: string[];
-  source: string;
-}
-
-export const madeOpenCheckedOn = '27 May 2026';
-
-export const madeOpenCommunityBenchmarks: CompetitorBenchmark[] = [
-  {
-    name: 'Made Open Timebank',
-    monthlyGbp: 49.99,
-    annualGbp: 499.99,
-    source: 'https://madeopen.co.uk/pricing',
-    features: [
-      'Offers and requests',
-      'Hours and minutes logging',
-      'Events',
-      'Customisation settings',
-      'About page',
-      'Member management',
-      'Optional chatroom',
-      'Invite to timebank',
-    ],
-  },
-  {
-    name: 'Made Open Timebank Plus',
-    monthlyGbp: 74.99,
-    annualGbp: 749.99,
-    source: 'https://madeopen.co.uk/pricing',
-    features: ['All Timebank features', 'Downloads of recorded time', 'Rewards', 'Donations'],
-  },
-  {
-    name: 'Made Open Timebank Pro',
-    monthlyGbp: 99.99,
-    annualGbp: 999.99,
-    source: 'https://madeopen.co.uk/pricing',
-    features: ['All Timebank Plus features', 'Dedicated landing page', 'Embedding multiple timebanks', 'Annual report'],
-  },
-];
-
-export const madeOpenPlatformBenchmarks = [
-  {
-    name: 'Made Open Innovator',
-    annualGbp: 12000,
-    detail: 'Single licensing organisation, up to 3,000 registered users, choice of 4 key features, setup, onboarding, auto reports, and 2 hours account support per month.',
-  },
-  {
-    name: 'Made Open Enterprise',
-    annualGbp: 24000,
-    detail: 'Up to 6 licensing organisations, up to 12,000 registered users, unlimited features and add-ons, customisation, KPI reports, and quarterly reviews.',
-  },
-];
-
 export const communityTimebankPlans: CommunityTimebankPlan[] = [
   {
     id: 'community-edition',
@@ -113,8 +55,6 @@ export const communityTimebankPlans: CommunityTimebankPlan[] = [
     annualMonthlyEur: 29,
     annualEur: 348,
     setupEur: 0,
-    comparisonMonthlyGbp: 49.99,
-    comparisonAnnualGbp: 499.99,
     infrastructure: 'Shared NEXUS community cluster',
     tenants: '1 timebank tenant',
     storage: '2 GB',
@@ -148,8 +88,6 @@ export const communityTimebankPlans: CommunityTimebankPlan[] = [
     annualMonthlyEur: 59,
     annualEur: 708,
     setupEur: 150,
-    comparisonMonthlyGbp: 74.99,
-    comparisonAnnualGbp: 749.99,
     infrastructure: 'Shared NEXUS community cluster',
     tenants: '1 timebank tenant',
     storage: '10 GB',
@@ -181,8 +119,6 @@ export const communityTimebankPlans: CommunityTimebankPlan[] = [
     annualMonthlyEur: 89,
     annualEur: 1068,
     setupEur: 250,
-    comparisonMonthlyGbp: 99.99,
-    comparisonAnnualGbp: 999.99,
     infrastructure: 'Shared NEXUS community cluster with reserved capacity',
     tenants: '1 tenant plus public landing space',
     storage: '25 GB',

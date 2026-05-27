@@ -36,17 +36,19 @@ describe('sales-site public content policy', () => {
     expect(`${pricingEngine}\n${siteShell}\n${orderForm}`).not.toContain('mailto:hello@project-nexus.ie');
   });
 
-  it('keeps the detailed platform banner below the hero copy instead of behind it', () => {
+  it('uses an immersive product hero and keeps the detailed platform map visible', () => {
     const homePage = readFileSync(resolve(__dirname, '..', 'components', 'HomePage.tsx'), 'utf8');
-    const heroStart = homePage.indexOf('<section className="border-b border-white/10">');
-    const heroEnd = homePage.indexOf('<section className="mx-auto max-w-7xl px-5 py-16">');
+    const styles = readFileSync(resolve(__dirname, '..', 'styles.css'), 'utf8');
+    const heroStart = homePage.indexOf('<section className="sales-hero border-b border-white/10">');
+    const heroEnd = homePage.indexOf('<section className="border-b border-white/10 bg-white/[0.025]">');
     const heroMarkup = homePage.slice(heroStart, heroEnd);
 
     expect(heroStart).toBeGreaterThan(-1);
     expect(heroEnd).toBeGreaterThan(heroStart);
-    expect(heroMarkup).toContain('src="/images/nexus-banner.png"');
-    expect(heroMarkup).not.toContain('absolute inset-0 h-full w-full object-cover');
-    expect(heroMarkup).not.toContain('bg-[linear-gradient');
+    expect(heroMarkup).toContain('src="/images/nexus-logo.png"');
+    expect(homePage).toContain('src="/images/nexus-banner.png"');
+    expect(styles).toContain('.sales-hero');
+    expect(styles).toContain('.sales-hero__image');
   });
 
   it('uses stacked feature catalogue sections instead of uneven module category cards', () => {
@@ -57,7 +59,7 @@ describe('sales-site public content policy', () => {
     expect(featuresPage).not.toContain('className="grid module-grid gap-4"');
   });
 
-  it('keeps the hosting page focused on pricing and order flow, not the old comparison workbench', () => {
+  it('keeps the hosting page focused on pricing and order flow, not public competitor comparison cards', () => {
     const hostingPage = readFileSync(resolve(__dirname, '..', 'components', 'HostingPage.tsx'), 'utf8');
 
     expect(hostingPage).not.toContain('ComparisonWorkbench');
@@ -65,8 +67,9 @@ describe('sales-site public content policy', () => {
     expect(hostingPage).not.toContain('SourceDrawer');
     expect(hostingPage).not.toContain('selectedCompetitorId');
     expect(hostingPage).not.toContain('Compare competitors');
-    expect(hostingPage).toContain('Made Open');
-    expect(hostingPage).toContain('Community Timebanks benchmark');
+    expect(hostingPage).not.toContain('Made Open');
+    expect(hostingPage).not.toContain('Community Timebanks benchmark');
+    expect(hostingPage).not.toContain('GBP');
     expect(hostingPage).toContain('Community Edition details');
   });
 
@@ -89,7 +92,8 @@ describe('sales-site public content policy', () => {
 
     expect(pricing).toContain("id: 'community-edition'");
     expect(pricing).toContain('annualMonthlyEur: 29');
-    expect(pricing).toContain('comparisonMonthlyGbp: 49.99');
+    expect(pricing).not.toContain('comparisonMonthlyGbp');
+    expect(`${pricing}\n${hostingPage}\n${quoteBuilder}`).not.toContain('Made Open');
     expect(hostingPage).toContain('A cheaper way in, without cheapening the platform.');
     expect(quoteBuilder).toContain('Feature-limited on purpose.');
   });

@@ -10,7 +10,6 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   communityOnboardingPackages,
   communityTimebankPlans,
-  madeOpenCheckedOn,
   maintenancePlans,
   onboardingPackages,
   oneOffServices,
@@ -158,7 +157,7 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
       <div className="mx-auto grid max-w-7xl gap-8 px-5 py-14 xl:grid-cols-[0.88fr_1.12fr]">
         <div>
           <div className="sticky top-24">
-            <p className="mb-3 flex items-center gap-2 text-sm font-bold tracking-[0.16em] text-[#9edbd2] uppercase">
+            <p className="mb-3 flex items-center gap-2 text-sm font-bold tracking-[0.16em] text-[var(--color-accent)] uppercase">
               <Calculator className="size-4" />
               Quote builder
             </p>
@@ -182,7 +181,7 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
                   <p className="mt-1 text-sm text-white/58">{quote.hostingPlan.activeMemberLabel}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-3xl font-black text-[#55d6be]">{formatCurrency(quote.monthlyRecurring)}</p>
+                  <p className="text-3xl font-black text-[var(--color-accent)]">{formatCurrency(quote.monthlyRecurring)}</p>
                   <p className="text-xs font-semibold text-white/45 uppercase">monthly recurring</p>
                 </div>
               </div>
@@ -191,8 +190,8 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
                 <Metric label="Annual saving" value={formatCurrency(quote.annualSavings)} />
                 <Metric label="One-off" value={formatCurrency(quote.oneOffTotal)} />
               </div>
-              <div className="mt-5 rounded-xl border border-[#55d6be]/20 bg-[#55d6be]/8 p-4">
-                <p className="flex items-center gap-2 text-sm font-bold text-[#bffbf2]">
+              <div className="mt-5 rounded-xl border border-[color:var(--color-accent)]/20 bg-[color:var(--color-accent)]/8 p-4">
+                <p className="flex items-center gap-2 text-sm font-bold text-[var(--color-accent)]">
                   {isCommunity ? <LockKeyhole className="size-4" /> : <Server className="size-4" />}
                   {isCommunity ? 'Feature-limited on purpose.' : 'All stable modules are included on full platform hosting.'}
                 </p>
@@ -217,7 +216,7 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
                 active={input.productLine === 'community-timebanking'}
                 title="Community Timebanking"
                 price="from EUR29/mo"
-                detail="Core timebanking only, priced below Made Open's public Community Timebanks entry plan."
+                detail="Core timebanking only, built for small communities that need a lower-cost managed start."
                 onPress={() => switchProductLine(setInput, 'community-timebanking')}
               />
               <ProductLineButton
@@ -235,7 +234,7 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
               <Card className="border border-white/10 bg-white/[0.055] p-5">
                 <h3 className="text-xl font-black text-white">2. Pick the Community Timebanking plan.</h3>
                 <p className="mt-1 text-sm leading-6 text-white/55">
-                  Benchmark checked {madeOpenCheckedOn}. The entry tier is cheaper, but the feature set is intentionally smaller.
+                  The entry tier is cheaper because the feature set is intentionally smaller.
                 </p>
                 <div className="mt-5 grid gap-4 lg:grid-cols-3">
                   {communityTimebankPlans.map((plan) => (
@@ -457,21 +456,21 @@ function ProductLineButton({
     <button
       type="button"
       className={`rounded-2xl border p-5 text-left transition ${
-        active ? 'border-[#55d6be] bg-[#55d6be]/12 shadow-lg shadow-[#55d6be]/10' : 'border-white/10 bg-black/18 hover:border-white/24'
+        active ? 'border-[color:var(--color-accent)] bg-[color:var(--color-accent)]/12 shadow-lg shadow-[var(--glow-accent-subtle)]' : 'border-white/10 bg-black/18 hover:border-white/24'
       }`}
       onClick={onPress}
     >
       <span className="flex items-start gap-3">
         <span
           className={`mt-1 grid size-5 shrink-0 place-items-center rounded-full border ${
-            active ? 'border-[#55d6be] bg-[#55d6be] text-black' : 'border-white/20 text-transparent'
+            active ? 'border-[color:var(--color-accent)] bg-[color:var(--color-accent)] text-[var(--text-inverse)]' : 'border-white/20 text-transparent'
           }`}
         >
           <CheckCircle2 className="size-3.5" />
         </span>
         <span>
           <span className="block text-lg font-black text-white">{title}</span>
-          <span className="mt-2 block text-2xl font-black text-[#f5c86a]">{price}</span>
+          <span className="mt-2 block text-2xl font-black text-[var(--color-primary)]">{price}</span>
           <span className="mt-2 block text-sm leading-6 text-white/58">{detail}</span>
         </span>
       </span>
@@ -492,7 +491,7 @@ function CommunityPlanCard({
     <button
       type="button"
       className={`flex h-full flex-col rounded-2xl border p-4 text-left transition ${
-        selected ? 'border-[#55d6be] bg-[#55d6be]/12 shadow-lg shadow-[#55d6be]/10' : 'border-white/10 bg-black/18 hover:border-white/24'
+        selected ? 'border-[color:var(--color-accent)] bg-[color:var(--color-accent)]/12 shadow-lg shadow-[var(--glow-accent-subtle)]' : 'border-white/10 bg-black/18 hover:border-white/24'
       }`}
       onClick={onPress}
     >
@@ -501,14 +500,12 @@ function CommunityPlanCard({
           <span className="block text-lg font-black text-white">{plan.name}</span>
           <span className="mt-1 block text-xs font-semibold text-white/45 uppercase">{plan.activeMemberLabel}</span>
         </span>
-        {selected ? <CheckCircle2 className="size-5 text-[#55d6be]" /> : null}
+        {selected ? <CheckCircle2 className="size-5 text-[var(--color-accent)]" /> : null}
       </span>
-      <span className="mt-4 block text-3xl font-black text-[#f5c86a]">{formatCurrency(plan.annualMonthlyEur)}</span>
+      <span className="mt-4 block text-3xl font-black text-[var(--color-primary)]">{formatCurrency(plan.annualMonthlyEur)}</span>
       <span className="text-xs font-semibold text-white/45 uppercase">per month, billed annually</span>
       <span className="mt-3 block text-sm leading-6 text-white/60">{plan.summary}</span>
-      <span className="mt-auto pt-4 text-xs leading-5 text-white/42">
-        Benchmark: GBP{plan.comparisonMonthlyGbp}/mo or GBP{plan.comparisonAnnualGbp}/yr on the nearest Made Open Community Timebanks tier.
-      </span>
+      <span className="mt-auto pt-4 text-xs leading-5 text-white/42">{plan.upgradeTrigger}</span>
     </button>
   );
 }
@@ -517,13 +514,13 @@ function FeatureList({ title, items, tone }: { title: string; items: string[]; t
   return (
     <div className="rounded-xl border border-white/10 bg-black/18 p-4">
       <p className="mb-4 flex items-center gap-2 text-sm font-black text-white">
-        {tone === 'include' ? <CheckCircle2 className="size-4 text-[#55d6be]" /> : <LockKeyhole className="size-4 text-[#f5c86a]" />}
+        {tone === 'include' ? <CheckCircle2 className="size-4 text-[var(--color-accent)]" /> : <LockKeyhole className="size-4 text-[var(--color-primary)]" />}
         {title}
       </p>
       <ul className="grid gap-3">
         {items.map((item) => (
           <li key={item} className="grid grid-cols-[auto_1fr] gap-2 text-sm leading-6 text-white/58">
-            <span className={tone === 'include' ? 'mt-2 size-1.5 rounded-full bg-[#55d6be]' : 'mt-2 size-1.5 rounded-full bg-[#f5c86a]'} />
+            <span className={tone === 'include' ? 'mt-2 size-1.5 rounded-full bg-[color:var(--color-accent)]' : 'mt-2 size-1.5 rounded-full bg-[color:var(--color-primary)]'} />
             <span>{item}</span>
           </li>
         ))}
@@ -561,12 +558,12 @@ function CapacityPreset({
     <button
       type="button"
       className={`rounded-2xl border p-4 text-left transition ${
-        active ? 'border-[#55d6be] bg-[#55d6be]/12 shadow-lg shadow-[#55d6be]/10' : 'border-white/10 bg-black/18 hover:border-white/24'
+        active ? 'border-[color:var(--color-accent)] bg-[color:var(--color-accent)]/12 shadow-lg shadow-[var(--glow-accent-subtle)]' : 'border-white/10 bg-black/18 hover:border-white/24'
       }`}
       onClick={onPress}
     >
       <span className="block text-sm font-black text-white">{label}</span>
-      <span className="mt-1 block text-2xl font-black text-[#f5c86a]">{members.toLocaleString('en-IE')}</span>
+      <span className="mt-1 block text-2xl font-black text-[var(--color-primary)]">{members.toLocaleString('en-IE')}</span>
       <span className="mt-2 block text-xs leading-5 text-white/52">{detail}</span>
     </button>
   );
@@ -604,14 +601,14 @@ function ChoiceCardSection({
               key={choice.id}
               type="button"
               className={`grid gap-4 rounded-2xl border p-4 text-left transition md:grid-cols-[1fr_auto] md:items-center ${
-                selected ? 'border-[#55d6be] bg-[#55d6be]/12 shadow-lg shadow-[#55d6be]/10' : 'border-white/10 bg-black/18 hover:border-white/24'
+                selected ? 'border-[color:var(--color-accent)] bg-[color:var(--color-accent)]/12 shadow-lg shadow-[var(--glow-accent-subtle)]' : 'border-white/10 bg-black/18 hover:border-white/24'
               }`}
               onClick={() => onSelect(choice.id)}
             >
               <span className="flex gap-3">
                 <span
                   className={`mt-1 grid size-5 shrink-0 place-items-center rounded-full border ${
-                    selected ? 'border-[#55d6be] bg-[#55d6be] text-black' : 'border-white/20 text-transparent'
+                    selected ? 'border-[color:var(--color-accent)] bg-[color:var(--color-accent)] text-[var(--text-inverse)]' : 'border-white/20 text-transparent'
                   }`}
                 >
                   <CheckCircle2 className="size-3.5" />
@@ -622,7 +619,7 @@ function ChoiceCardSection({
                   {option ? <span className="mt-2 block text-xs leading-5 text-white/40">{option.description}</span> : null}
                 </span>
               </span>
-              <span className="rounded-full border border-white/10 bg-black/24 px-3 py-2 text-sm font-black text-[#f5c86a]">
+              <span className="rounded-full border border-white/10 bg-black/24 px-3 py-2 text-sm font-black text-[var(--color-primary)]">
                 {amount === 0 ? 'Included' : `${formatCurrency(amount)}${cadence === 'monthly' ? '/mo' : ''}`}
               </span>
             </button>
@@ -659,7 +656,7 @@ function OptionCounterSection({
               <div>
                 <p className="font-bold text-white">{option.label}</p>
                 <p className="mt-1 text-sm leading-6 text-white/55">{option.description}</p>
-                <p className="mt-2 text-sm font-bold text-[#f5c86a]">
+                <p className="mt-2 text-sm font-bold text-[var(--color-primary)]">
                   {formatCurrency(amount)}
                   {cadence === 'monthly' ? '/mo' : ''}
                 </p>

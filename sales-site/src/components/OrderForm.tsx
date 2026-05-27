@@ -37,7 +37,7 @@ export default function OrderForm({ quote }: OrderFormProps) {
     <Card className="border border-white/10 bg-white/[0.065] p-5" id="order">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="flex items-center gap-2 text-sm font-bold tracking-[0.16em] text-[#9edbd2] uppercase">
+          <p className="flex items-center gap-2 text-sm font-bold tracking-[0.16em] text-[var(--color-accent)] uppercase">
             <Mail className="size-4" />
             Order enquiry
           </p>
@@ -56,7 +56,7 @@ export default function OrderForm({ quote }: OrderFormProps) {
       <div className="mt-5 grid gap-3 md:grid-cols-4">
         {['Estimate saved', 'Discovery call', 'Written quote', 'Order agreement'].map((stage, index) => (
           <div key={stage} className="rounded-xl border border-white/10 bg-black/18 p-3">
-            <p className="text-xs font-black text-[#f5c86a]">0{index + 1}</p>
+            <p className="text-xs font-black text-[var(--color-primary)]">0{index + 1}</p>
             <p className="mt-1 text-sm font-bold text-white">{stage}</p>
           </div>
         ))}
