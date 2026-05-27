@@ -13347,7 +13347,7 @@
         "body": "La politica operativa definisce le regole del vostro programma di assistenza comunitaria: chi può approvare gli orari, quanto velocemente devono rispondere i coordinatori, come viene calcolato il valore sociale e come si presenta il ciclo di rendicontazione. Configuralo prima di avviare il progetto pilota. Le modifiche hanno effetto immediato e vengono registrate a fini di controllo.",
         "methodology_prefix": "IL",
         "methodology_middle": "I campi della tariffa oraria e del moltiplicatore di prevenzione utilizzano il file",
-        "methodology_suffix": "metodologia (Caring Community) sviluppata con Caring Community. Se non utilizzi un Caring Community/",
+        "methodology_suffix": "hourly rate and prevention multiplier fields use the Caring Community methodology. If your community uses a different currency or local care economics, set the rate to your local formal-care hourly equivalent and the multiplier to 1.0.",
         "methodology_tail": "pilota, imposta la tariffa sull'equivalente orario dell'assistenza formale locale e il moltiplicatore su 1.0."
       },
       "sections": {
@@ -14850,13 +14850,13 @@
     },
     "methodology": {
       "chf_per_hour": "CHF {{amount}}/ora",
-      "default_prevention_prefix": "Il valore di prevenzione applica un moltiplicatore 2x per Caring Community/",
+      "default_prevention_prefix": "Prevention value applies a 2x multiplier per",
       "default_prevention_suffix": "metodologia di valutazione.",
       "default_rate": "CHF 35/ora",
       "default_source": "Tasso svizzero degli assistenti sanitari formali, SECO 2024",
       "hours_are_valued_at": "Le ore hanno un valore",
       "hours_valued_at": "Ore valutate a",
-      "prevention_value_prefix": "Il valore di prevenzione applica un moltiplicatore {{multiplier}}x per Caring Community/",
+      "prevention_value_prefix": "Prevention value applies a {{multiplier}}x multiplier per",
       "prevention_value_suffix": "metodologia di valutazione.",
       "substitution_applied": "Le ore sono ponderate in base ai coefficienti di sostituzione per categoria.",
       "substitution_not_applied": "Tutte le ore sono ponderate a 1,0x.",
@@ -15078,8 +15078,8 @@
   },
   "national_kiss_dashboard": {
     "about": {
-      "body_prefix": "Caring Community (Caring Community) è una metodologia svizzera per il coordinamento dell'assistenza su base comunitaria sviluppata con Caring Community. Questa dashboard di super amministratore aggrega i parametri di ogni cooperativa NEXUS che gestisce il programma Caring Community a livello nazionale, offrendo alla Fondazione",
-      "body_suffix": "una visione inter-cooperativa delle ore scambiate, della partecipazione dei membri e della salute cooperativa. I conteggi dei membri vengono visualizzati come parentesi di tutela della privacy (ad esempio \"50-99\") anziché come numeri esatti.",
+      "body_prefix": "Caring Community is a methodology for community-based care coordination. This super-admin dashboard aggregates metrics across every NEXUS cooperative running the Caring Community programme nationally - giving the national",
+      "body_suffix": "foundation a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member counts are shown as privacy-preserving brackets (e.g. \"50-99\") rather than exact numbers.",
       "health_prefix": "Utilizza il selettore del periodo per confrontare i trimestri. La tabella comparativa classifica le cooperative in base agli orari, ai soci o allo stato di salute. Lo stato di salute deriva dalle tendenze dell'attività:",
       "stable_definition": "attività piatta,",
       "struggling_definition": "attività in calo o coinvolgimento molto basso.",
@@ -16333,7 +16333,7 @@
   },
   "category_coefficients": {
     "about": {
-      "body_middle": "). Un coefficiente di 0,5 significa che sostituisce mezz'ora. Un coefficiente pari a 2,0 significa che sostituisce due ore di assistenza formale, ad esempio assistenza personale intensiva o supporto specialistico. Il Caring Community/",
+      "body_middle": "). Un coefficiente di 0,5 significa che sostituisce mezz'ora. Un coefficiente pari a 2,0 significa che sostituisce due ore di assistenza formale, ad esempio assistenza personale intensiva o supporto specialistico. Il",
       "body_prefix": "I coefficienti di sostituzione controllano il valore sociale di ciascuna categoria di assistenza nel calcolo della compensazione dei costi. Un coefficiente pari a 1,0 significa che un'ora equivale a un'ora di assistenza formale Spitex/Pflege (",
       "body_suffix": "La metodologia consiglia di iniziare tutte le categorie da 1.0 e di adattarle in base all'intensità di cura osservata.",
       "chf_amount": "35 franchi",

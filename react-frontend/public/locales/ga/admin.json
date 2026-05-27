@@ -13347,7 +13347,7 @@
         "body": "Sainmhíníonn Beartas Oibriúcháin rialacha do chlár cúraim phobail: cé atá in ann uaireanta a cheadú, cé chomh tapa agus a chaithfidh comhordaitheoirí freagairt, conas a ríomhtar luach sóisialta, agus cén chuma atá ar an timthriall tuairiscithe. Cumraigh é seo roimh an treoir phíolótach a sheoladh. Tagann athruithe i bhfeidhm láithreach agus déantar iad a logáil chun críocha iniúchta.",
         "methodology_prefix": "Tá an",
         "methodology_middle": "ráta in aghaidh na huaire agus réimsí iolraitheora chosc úsáid an",
-        "methodology_suffix": "modheolaíocht (Caring Community) forbartha le Caring Community. Mura bhfuil tú ag rith na hEilvéise Caring Community/",
+        "methodology_suffix": "hourly rate and prevention multiplier fields use the Caring Community methodology. If your community uses a different currency or local care economics, set the rate to your local formal-care hourly equivalent and the multiplier to 1.0.",
         "methodology_tail": "píolótach, socraigh an ráta chuig do choibhéis uaire áitiúil um chúram foirmiúil agus an t-iolraitheoir go 1.0."
       },
       "sections": {
@@ -14850,13 +14850,13 @@
     },
     "methodology": {
       "chf_per_hour": "CHF {{amount}}/uair",
-      "default_prevention_prefix": "Baineann luach coiscthe iolraitheoir 2x in aghaidh Caring Community/",
+      "default_prevention_prefix": "Prevention value applies a 2x multiplier per",
       "default_prevention_suffix": "modheolaíocht meastóireachta.",
       "default_rate": "CHF 35/uair",
       "default_source": "Ráta cúntóir foirmeálta na hEilvéise, SECO 2024",
       "hours_are_valued_at": "Déantar luacháil ar uaireanta ag",
       "hours_valued_at": "Uaireanta luacháilte ag",
-      "prevention_value_prefix": "Baineann luach coiscthe iolraitheoir {{multiplier}}x in aghaidh Caring Community/",
+      "prevention_value_prefix": "Prevention value applies a {{multiplier}}x multiplier per",
       "prevention_value_suffix": "modheolaíocht meastóireachta.",
       "substitution_applied": "Déantar uaireanta a ualú de réir comhéifeachtaí ionadaíochta in aghaidh na catagóire.",
       "substitution_not_applied": "Gach uair an chloig ualaithe ag 1.0x.",
@@ -15078,8 +15078,8 @@
   },
   "national_kiss_dashboard": {
     "about": {
-      "body_prefix": "Is modheolaíocht na hEilvéise é Caring Community (Caring Community) do chomhordú cúraim phobalbhunaithe a forbraíodh le Caring Community. Comhiomlánaíonn an painéal sár-riaracháin seo méadracht ar fud gach comharchumann NEXUS a reáchtálann an clár Caring Community go náisiúnta - ag tabhairt an Fondation",
-      "body_suffix": "dearcadh tras-chomhoibríoch ar uaireanta a mhalartaítear, rannpháirtíocht na mball, agus sláinte chomhoibríoch. Taispeántar comhaireamh na mball mar lúibíní caomhnaithe príobháideachais (m.sh. \"50-99\") seachas mar uimhreacha beachta.",
+      "body_prefix": "Caring Community is a methodology for community-based care coordination. This super-admin dashboard aggregates metrics across every NEXUS cooperative running the Caring Community programme nationally - giving the national",
+      "body_suffix": "foundation a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member counts are shown as privacy-preserving brackets (e.g. \"50-99\") rather than exact numbers.",
       "health_prefix": "Úsáid an roghnóir peiriad chun ceathrúna a chur i gcomparáid. Rangaíonn an tábla comparáideach comharchumainn de réir uaireanta, baill, nó stádas sláinte. Díorthaítear stádas sláinte ó threochtaí gníomhaíochta:",
       "stable_definition": "gníomhaíocht chothrom,",
       "struggling_definition": "laghdú ar ghníomhaíocht nó rannpháirtíocht an-íseal.",
@@ -16333,7 +16333,7 @@
   },
   "category_coefficients": {
     "about": {
-      "body_middle": "). Ciallaíonn comhéifeacht 0.5 go ndéanann sé ionadú ar feadh leathuaire. Ciallaíonn comhéifeacht 2.0 go gcuirtear dhá uair an chloig de chúram foirmiúil ina ionad - mar shampla, dianchúram pearsanta nó saintacaíocht. an Caring Community/",
+      "body_middle": "). Ciallaíonn comhéifeacht 0.5 go ndéanann sé ionadú ar feadh leathuaire. Ciallaíonn comhéifeacht 2.0 go gcuirtear dhá uair an chloig de chúram foirmiúil ina ionad - mar shampla, dianchúram pearsanta nó saintacaíocht. an",
       "body_prefix": "Rialaíonn Comhéifeachtaí Ionaid cé mhéad luach sóisialta is fiú gach catagóir cúraim i ríomh an fhritháirimh costais. Ciallaíonn comhéifeacht 1.0 uair is ionann uair an chloig agus uair an chloig de chúram foirmiúil Spitex/Pflege (",
       "body_suffix": "molann an mhodheolaíocht tús a chur le gach catagóir ag 1.0 agus coigeartú a dhéanamh bunaithe ar dhéine an chúraim a breathnaíodh.",
       "chf_amount": "CHF 35",

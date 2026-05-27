@@ -13347,7 +13347,7 @@
         "body": "Polityka operacyjna określa zasady programu opieki środowiskowej: kto może zatwierdzać godziny pracy, jak szybko koordynatorzy muszą zareagować, w jaki sposób obliczana jest wartość społeczna i jak wygląda cykl raportowania. Skonfiguruj to przed uruchomieniem pilota. Zmiany wchodzą w życie natychmiast i są rejestrowane w celach audytowych.",
         "methodology_prefix": "The",
         "methodology_middle": "Pola stawki godzinowej i mnożnika zapobiegania korzystają z",
-        "methodology_suffix": "metodologia (Caring Community) opracowana przy pomocy Caring Community. Jeśli nie używasz szwajcarskiego Caring Community/",
+        "methodology_suffix": "hourly rate and prevention multiplier fields use the Caring Community methodology. If your community uses a different currency or local care economics, set the rate to your local formal-care hourly equivalent and the multiplier to 1.0.",
         "methodology_tail": "pilotażowego, ustaw stawkę na lokalny odpowiednik godzinowy opieki formalnej i mnożnik na 1.0."
       },
       "sections": {
@@ -14850,13 +14850,13 @@
     },
     "methodology": {
       "chf_per_hour": "CHF {{amount}}/godz",
-      "default_prevention_prefix": "Wartość zapobiegania stosuje mnożnik 2x na Caring Community/",
+      "default_prevention_prefix": "Prevention value applies a 2x multiplier per",
       "default_prevention_suffix": "metodologia oceny.",
       "default_rate": "CHF 35/godz",
       "default_source": "Stawka asystenta opieki formalnej w Szwajcarii, SECO 2024",
       "hours_are_valued_at": "Godziny są wyceniane na",
       "hours_valued_at": "Godziny wyceniane na",
-      "prevention_value_prefix": "Wartość zapobiegania stosuje mnożnik {{multiplier}}x na Caring Community/",
+      "prevention_value_prefix": "Prevention value applies a {{multiplier}}x multiplier per",
       "prevention_value_suffix": "metodologia oceny.",
       "substitution_applied": "Godziny są ważone współczynnikami substytucji według kategorii.",
       "substitution_not_applied": "Wszystkie godziny ważone przy 1,0x.",
@@ -15078,8 +15078,8 @@
   },
   "national_kiss_dashboard": {
     "about": {
-      "body_prefix": "Caring Community (Koordynacja und Innovation fur Soziales) to szwajcarska metodologia koordynacji opieki środowiskowej opracowana wspólnie z Caring Community. Ten panel superadministratora gromadzi dane dotyczące każdej NEXUS spółdzielni prowadzącej program Caring Community na poziomie krajowym, dzięki czemu Fundacja",
-      "body_suffix": "międzyspółdzielczy pogląd na wymieniane godziny, uczestnictwo członków i zdrowie spółdzielni. Liczba członków jest pokazywana w nawiasach chroniących prywatność (np. „50–99”), a nie w dokładnych liczbach.",
+      "body_prefix": "Caring Community is a methodology for community-based care coordination. This super-admin dashboard aggregates metrics across every NEXUS cooperative running the Caring Community programme nationally - giving the national",
+      "body_suffix": "foundation a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member counts are shown as privacy-preserving brackets (e.g. \"50-99\") rather than exact numbers.",
       "health_prefix": "Użyj selektora okresu, aby porównać kwartały. Tabela porównawcza klasyfikuje spółdzielnie według godzin pracy, członków lub stanu zdrowia. Stan zdrowia wynika z trendów aktywności:",
       "stable_definition": "płaska aktywność,",
       "struggling_definition": "spadek aktywności lub bardzo niskie zaangażowanie.",
@@ -16333,7 +16333,7 @@
   },
   "category_coefficients": {
     "about": {
-      "body_middle": "). Współczynnik 0,5 oznacza, że ​​zastępuje pół godziny. Współczynnik 2,0 oznacza, że ​​zastępuje dwie godziny formalnej opieki – na przykład intensywnej opieki osobistej lub wsparcia specjalistycznego. Caring Community/",
+      "body_middle": "). Współczynnik 0,5 oznacza, że ​​zastępuje pół godziny. Współczynnik 2,0 oznacza, że ​​zastępuje dwie godziny formalnej opieki – na przykład intensywnej opieki osobistej lub wsparcia specjalistycznego.",
       "body_prefix": "Współczynniki substytucji kontrolują wartość społeczną każdej kategorii opieki w kalkulacji kompensacji kosztów. Współczynnik 1,0 oznacza, że ​​jedna godzina równa się jednej godzinie opieki formalnej Spitex/Pflege (",
       "body_suffix": "Metodologia zaleca rozpoczęcie wszystkich kategorii od 1,0 i dostosowanie ich w oparciu o zaobserwowaną intensywność opieki.",
       "chf_amount": "35 CHF",

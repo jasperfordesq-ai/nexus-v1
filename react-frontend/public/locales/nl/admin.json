@@ -13347,7 +13347,7 @@
         "body": "Operating Policy definieert de regels van uw wijkzorgprogramma: wie uren kan goedkeuren, hoe snel coördinatoren moeten reageren, hoe maatschappelijke waarde wordt berekend en hoe de rapportagecyclus eruit ziet. Configureer dit voordat u de pilot start. Wijzigingen worden onmiddellijk van kracht en worden geregistreerd voor auditdoeleinden.",
         "methodology_prefix": "De",
         "methodology_middle": "uurtarief en preventie-multipliervelden gebruiken de",
-        "methodology_suffix": "methodologie (Caring Community) ontwikkeld met Caring Community. Als u geen Zwitserse Caring Community/",
+        "methodology_suffix": "hourly rate and prevention multiplier fields use the Caring Community methodology. If your community uses a different currency or local care economics, set the rate to your local formal-care hourly equivalent and the multiplier to 1.0.",
         "methodology_tail": "pilot, stel het tarief in op uw lokale uuruurequivalent voor formele zorg en de vermenigvuldiger op 1.0."
       },
       "sections": {
@@ -14850,13 +14850,13 @@
     },
     "methodology": {
       "chf_per_hour": "CHF {{amount}}/uur",
-      "default_prevention_prefix": "Preventiewaarde past een vermenigvuldiger van 2x toe per Caring Community/",
+      "default_prevention_prefix": "Prevention value applies a 2x multiplier per",
       "default_prevention_suffix": "evaluatiemethodologie.",
       "default_rate": "CHF 35/uur",
       "default_source": "Tarief Zwitserse formele zorgassistenten, SECO 2024",
       "hours_are_valued_at": "Uren worden gewaardeerd op",
       "hours_valued_at": "Uren gewaardeerd op",
-      "prevention_value_prefix": "Preventiewaarde past een {{multiplier}}x vermenigvuldiger toe per Caring Community/",
+      "prevention_value_prefix": "Prevention value applies a {{multiplier}}x multiplier per",
       "prevention_value_suffix": "evaluatiemethodologie.",
       "substitution_applied": "Uren worden gewogen op basis van substitutiecoëfficiënten per categorie.",
       "substitution_not_applied": "Alle uren gewogen op 1,0x.",
@@ -15078,8 +15078,8 @@
   },
   "national_kiss_dashboard": {
     "about": {
-      "body_prefix": "Caring Community (Koördinatie und Innovation fur Soziales) is een Zwitserse methodologie voor zorgcoördinatie in de gemeenschap, ontwikkeld in samenwerking met Caring Community. Dit superbeheerdersdashboard verzamelt statistieken van elke NEXUS coöperatie die het Caring Community-programma op nationaal niveau uitvoert, waardoor de Fondation",
-      "body_suffix": "een coöperatief beeld van uitgewisselde uren, ledenparticipatie en coöperatieve gezondheid. Het aantal leden wordt weergegeven als privacybeschermende haakjes (bijvoorbeeld '50-99') in plaats van exacte cijfers.",
+      "body_prefix": "Caring Community is a methodology for community-based care coordination. This super-admin dashboard aggregates metrics across every NEXUS cooperative running the Caring Community programme nationally - giving the national",
+      "body_suffix": "foundation a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member counts are shown as privacy-preserving brackets (e.g. \"50-99\") rather than exact numbers.",
       "health_prefix": "Gebruik de periodekiezer om kwartalen te vergelijken. De vergelijkende tabel rangschikt coöperaties op uren, leden of gezondheidsstatus. De gezondheidsstatus wordt afgeleid van activiteitstrends:",
       "stable_definition": "vlakke activiteit,",
       "struggling_definition": "afnemende activiteit of een zeer lage betrokkenheid.",
@@ -16333,7 +16333,7 @@
   },
   "category_coefficients": {
     "about": {
-      "body_middle": "). Een coëfficiënt van 0,5 betekent dat het een half uur vervangt. Een coëfficiënt van 2,0 betekent dat het twee uur formele zorg vervangt, bijvoorbeeld intensieve persoonlijke zorg of specialistische ondersteuning. De Caring Community/",
+      "body_middle": "). Een coëfficiënt van 0,5 betekent dat het een half uur vervangt. Een coëfficiënt van 2,0 betekent dat het twee uur formele zorg vervangt, bijvoorbeeld intensieve persoonlijke zorg of specialistische ondersteuning. De",
       "body_prefix": "Substitutiecoëfficiënten bepalen hoeveel maatschappelijke waarde elke zorgcategorie waard is in de kostencompensatieberekening. Een coëfficiënt van 1,0 betekent dat één uur gelijk is aan één uur formele Spitex/Pflege zorg (",
       "body_suffix": "De methodologie beveelt aan om alle categorieën op 1,0 te starten en deze aan te passen op basis van de waargenomen zorgintensiteit.",
       "chf_amount": "CHF 35",

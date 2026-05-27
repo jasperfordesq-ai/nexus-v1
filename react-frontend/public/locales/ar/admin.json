@@ -13347,7 +13347,7 @@
         "body": "تحدد سياسة التشغيل قواعد برنامج رعاية المجتمع الخاص بك: من يمكنه الموافقة على ساعات العمل، ومدى سرعة استجابة المنسقين، وكيفية حساب القيمة الاجتماعية، وكيف تبدو دورة إعداد التقارير. قم بتكوين هذا قبل إطلاق البرنامج التجريبي. تسري التغييرات على الفور ويتم تسجيلها لأغراض التدقيق.",
         "methodology_prefix": "ال",
         "methodology_middle": "تستخدم حقول معدل الأجر بالساعة ومضاعف المنع",
-        "methodology_suffix": "المنهجية (Caring Community، Schwyz) تم تطويرها باستخدام Caring Community. إذا كنت لا تقوم بتشغيل Swiss Caring Community/",
+        "methodology_suffix": "hourly rate and prevention multiplier fields use the Caring Community methodology. If your community uses a different currency or local care economics, set the rate to your local formal-care hourly equivalent and the multiplier to 1.0.",
         "methodology_tail": "تجريبي، قم بتعيين السعر على ما يعادل الرعاية الرسمية المحلية الخاصة بك بالساعة والمضاعف على 1.0."
       },
       "sections": {
@@ -14850,13 +14850,13 @@
     },
     "methodology": {
       "chf_per_hour": "CHF {{amount}}/ساعة",
-      "default_prevention_prefix": "تنطبق قيمة المنع على مضاعف 2x لكل Caring Community/",
+      "default_prevention_prefix": "Prevention value applies a 2x multiplier per",
       "default_prevention_suffix": "منهجية التقييم.",
       "default_rate": "CHF 35/ساعة",
       "default_source": "معدل مساعد الرعاية الرسمية السويسري، SECO 2024",
       "hours_are_valued_at": "الساعات تقدر ب",
       "hours_valued_at": "ساعات تقدر بـ",
-      "prevention_value_prefix": "تنطبق قيمة المنع على مضاعف {{multiplier}}x لكل Caring Community/",
+      "prevention_value_prefix": "Prevention value applies a {{multiplier}}x multiplier per",
       "prevention_value_suffix": "منهجية التقييم.",
       "substitution_applied": "يتم ترجيح الساعات حسب معاملات الاستبدال لكل فئة.",
       "substitution_not_applied": "جميع الساعات مرجحة بـ 1.0x.",
@@ -15078,8 +15078,8 @@
   },
   "national_kiss_dashboard": {
     "about": {
-      "body_prefix": "Caring Community (Caring Community) هي منهجية سويسرية لتنسيق الرعاية المجتمعية تم تطويرها بواسطة Caring Community. تقوم لوحة التحكم الخاصة بالمشرف المتميز هذه بتجميع المقاييس عبر كل تعاونية NEXUS تدير برنامج Caring Community على المستوى الوطني - مما يمنح المؤسسة",
-      "body_suffix": "وجهة نظر تعاونية مشتركة لساعات التبادل ومشاركة الأعضاء والصحة التعاونية. يتم عرض أعداد الأعضاء كأقواس للحفاظ على الخصوصية (على سبيل المثال، \"50-99\") بدلاً من الأرقام الدقيقة.",
+      "body_prefix": "Caring Community is a methodology for community-based care coordination. This super-admin dashboard aggregates metrics across every NEXUS cooperative running the Caring Community programme nationally - giving the national",
+      "body_suffix": "foundation a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member counts are shown as privacy-preserving brackets (e.g. \"50-99\") rather than exact numbers.",
       "health_prefix": "استخدم محدد الفترة لمقارنة الأرباع. يصنف الجدول المقارن التعاونيات حسب ساعات العمل أو الأعضاء أو الحالة الصحية. الحالة الصحية مستمدة من اتجاهات النشاط:",
       "stable_definition": "نشاط مسطح,",
       "struggling_definition": "انخفاض النشاط أو المشاركة المنخفضة جدًا.",
@@ -16333,7 +16333,7 @@
   },
   "category_coefficients": {
     "about": {
-      "body_middle": "). معامل 0.5 يعني أنه يستبدل نصف ساعة. معامل 2.0 يعني أنه يحل محل ساعتين من الرعاية الرسمية - على سبيل المثال، العناية الشخصية المكثفة أو الدعم المتخصص. Caring Community/",
+      "body_middle": "). معامل 0.5 يعني أنه يستبدل نصف ساعة. معامل 2.0 يعني أنه يحل محل ساعتين من الرعاية الرسمية - على سبيل المثال، العناية الشخصية المكثفة أو الدعم المتخصص.",
       "body_prefix": "تتحكم معاملات الاستبدال في مقدار القيمة الاجتماعية التي تستحقها كل فئة رعاية في حساب تعويض التكلفة. معامل 1.0 يعني أن ساعة واحدة تساوي ساعة واحدة من الرعاية الرسمية Spitex/Pflege (",
       "body_suffix": "توصي المنهجية ببدء جميع الفئات عند 1.0 والتعديل بناءً على كثافة الرعاية الملحوظة.",
       "chf_amount": "35 فرنك سويسري",

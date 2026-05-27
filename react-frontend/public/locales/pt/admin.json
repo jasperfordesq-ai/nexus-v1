@@ -13347,7 +13347,7 @@
         "body": "A Política Operacional define as regras do seu programa de cuidados comunitários: quem pode aprovar os horários, com que rapidez os coordenadores devem responder, como o valor social é calculado e como é o ciclo de relatórios. Configure isso antes de lançar o piloto. As alterações entram em vigor imediatamente e são registradas para fins de auditoria.",
         "methodology_prefix": "O",
         "methodology_middle": "Os campos de taxa horária e multiplicador de prevenção usam o",
-        "methodology_suffix": "metodologia (Caring Community) desenvolvida com Caring Community. Se você não estiver executando um Swiss Caring Community/",
+        "methodology_suffix": "hourly rate and prevention multiplier fields use the Caring Community methodology. If your community uses a different currency or local care economics, set the rate to your local formal-care hourly equivalent and the multiplier to 1.0.",
         "methodology_tail": "piloto, defina a taxa para o equivalente por hora de cuidado formal local e o multiplicador para 1.0."
       },
       "sections": {
@@ -14850,13 +14850,13 @@
     },
     "methodology": {
       "chf_per_hour": "CHF {{amount}}/h",
-      "default_prevention_prefix": "O valor de prevenção aplica um multiplicador de 2x por Caring Community/",
+      "default_prevention_prefix": "Prevention value applies a 2x multiplier per",
       "default_prevention_suffix": "metodologia de avaliação.",
       "default_rate": "CHF 35/h",
       "default_source": "Taxa de assistente de cuidados formais na Suíça, SECO 2024",
       "hours_are_valued_at": "As horas são avaliadas em",
       "hours_valued_at": "Horas avaliadas em",
-      "prevention_value_prefix": "O valor de prevenção aplica um multiplicador {{multiplier}}x por Caring Community/",
+      "prevention_value_prefix": "Prevention value applies a {{multiplier}}x multiplier per",
       "prevention_value_suffix": "metodologia de avaliação.",
       "substitution_applied": "As horas são ponderadas por coeficientes de substituição por categoria.",
       "substitution_not_applied": "Todas as horas ponderadas em 1,0x.",
@@ -15078,8 +15078,8 @@
   },
   "national_kiss_dashboard": {
     "about": {
-      "body_prefix": "Caring Community (Koordenação e Inovação para Soziales) é uma metodologia suíça para coordenação de cuidados de base comunitária desenvolvida com Caring Community. Este painel de superadministrador agrega métricas de todas as cooperativas NEXUS que executam o programa Caring Community nacionalmente - dando à Fundação",
-      "body_suffix": "uma visão intercooperativa de horas trocadas, participação dos membros e saúde cooperativa. As contagens de membros são mostradas como colchetes que preservam a privacidade (por exemplo, \"50-99\") em vez de números exatos.",
+      "body_prefix": "Caring Community is a methodology for community-based care coordination. This super-admin dashboard aggregates metrics across every NEXUS cooperative running the Caring Community programme nationally - giving the national",
+      "body_suffix": "foundation a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member counts are shown as privacy-preserving brackets (e.g. \"50-99\") rather than exact numbers.",
       "health_prefix": "Use o seletor de período para comparar trimestres. A tabela comparativa classifica as cooperativas por horário, membros ou estado de saúde. O estado de saúde é derivado das tendências de atividade:",
       "stable_definition": "atividade plana,",
       "struggling_definition": "atividade em declínio ou envolvimento muito baixo.",
@@ -16333,7 +16333,7 @@
   },
   "category_coefficients": {
     "about": {
-      "body_middle": "). Um coeficiente de 0,5 significa que substitui meia hora. Um coeficiente de 2,0 significa que substitui duas horas de cuidados formais – por exemplo, cuidados pessoais intensivos ou apoio especializado. O Caring Community/",
+      "body_middle": "). Um coeficiente de 0,5 significa que substitui meia hora. Um coeficiente de 2,0 significa que substitui duas horas de cuidados formais – por exemplo, cuidados pessoais intensivos ou apoio especializado. O",
       "body_prefix": "Os Coeficientes de Substituição controlam quanto valor social vale cada categoria de cuidados no cálculo da compensação de custos. Um coeficiente de 1,0 significa que uma hora é igual a uma hora de cuidado formal Spitex/Pflege (",
       "body_suffix": "a metodologia recomenda iniciar todas as categorias em 1,0 e ajustar com base na intensidade de cuidado observada.",
       "chf_amount": "CHF 35",
