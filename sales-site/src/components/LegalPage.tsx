@@ -5,6 +5,7 @@
 
 import { Button, Card } from '@heroui/react';
 import { ArrowRight, BookOpenText, Building2, FileText, GitBranch, Scale, ShieldCheck } from 'lucide-react';
+import { type MouseEvent } from 'react';
 
 import { findLegalPage, legalPages, type LegalPath, type LegalPageContent } from '../data/legal';
 
@@ -24,6 +25,14 @@ const pageIcons: Record<LegalPath, typeof Scale> = {
 export default function LegalPage({ path, onNavigate }: LegalPageProps) {
   const page = findLegalPage(path);
   const Icon = pageIcons[page.path];
+  const handleInternalLink = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.altKey || event.ctrlKey || event.shiftKey) {
+      return;
+    }
+
+    event.preventDefault();
+    onNavigate(href);
+  };
 
   return (
     <article>
@@ -81,16 +90,16 @@ export default function LegalPage({ path, onNavigate }: LegalPageProps) {
             <p className="text-xs font-black tracking-[0.16em] text-white/45 uppercase">Legal pages</p>
             <nav className="mt-4 grid gap-2" aria-label="Legal navigation">
               {legalPages.map((item) => (
-                <button
+                <a
                   key={item.path}
-                  type="button"
+                  href={item.path}
                   className={`rounded-lg px-3 py-2 text-left text-sm font-bold transition ${
                     item.path === page.path ? 'bg-white text-[var(--text-inverse)]' : 'text-white/62 hover:bg-white/8 hover:text-white'
                   }`}
-                  onClick={() => onNavigate(item.path)}
+                  onClick={(event) => handleInternalLink(event, item.path)}
                 >
                   {item.label}
-                </button>
+                </a>
               ))}
             </nav>
           </aside>

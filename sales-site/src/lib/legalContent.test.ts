@@ -28,6 +28,18 @@ describe('sales legal content', () => {
     expect(siteShell).toContain('legalPages.map');
   });
 
+  it('renders internal sales-site navigation as real links with hrefs', () => {
+    const siteShell = readFileSync(resolve(__dirname, '..', 'components', 'SiteShell.tsx'), 'utf8');
+    const legalPage = readFileSync(resolve(__dirname, '..', 'components', 'LegalPage.tsx'), 'utf8');
+
+    expect(siteShell).toContain('href={href}');
+    expect(siteShell).toContain('onClick={(event) => handleInternalLink(event, href)}');
+    expect(legalPage).toContain('href={item.path}');
+    expect(legalPage).toContain('onClick={(event) => handleInternalLink(event, item.path)}');
+    expect(siteShell).not.toContain('<button key={href} type="button" className="text-left hover:text-white" onClick={() => onNavigate(href)}>');
+    expect(legalPage).not.toContain('<button');
+  });
+
   it('separates software authorship, managed hosting, and customer-controller responsibilities', () => {
     const content = JSON.stringify(legalPages);
 

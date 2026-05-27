@@ -5,7 +5,7 @@
 
 import { Button } from '@heroui/react';
 import { GitBranch, Menu, X } from 'lucide-react';
-import { type ReactNode, useState } from 'react';
+import { type MouseEvent, type ReactNode, useState } from 'react';
 
 import { legalPages } from '../data/legal';
 import { salesNavItems } from '../lib/routes';
@@ -24,14 +24,23 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
     onNavigate(href);
   };
 
+  const handleInternalLink = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.altKey || event.ctrlKey || event.shiftKey) {
+      return;
+    }
+
+    event.preventDefault();
+    handleInternalNav(href);
+  };
+
   return (
     <div className="min-h-screen text-[var(--nexus-ink)]">
       <header className="sticky top-0 z-50 border-b border-white/10 bg-[var(--surface-base)]/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3">
-          <button
-            type="button"
+          <a
+            href="/"
             className="flex items-center gap-3 text-left"
-            onClick={() => handleInternalNav('/')}
+            onClick={(event) => handleInternalLink(event, '/')}
             aria-label="Go to Project NEXUS home"
           >
             <span className="grid size-10 place-items-center rounded-xl border border-white/15 bg-white/6">
@@ -41,7 +50,7 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
               <span className="block text-sm font-black tracking-[0.18em] text-white uppercase">Project NEXUS</span>
               <span className="block text-xs text-[var(--nexus-muted)]">Open-source community infrastructure</span>
             </span>
-          </button>
+          </a>
 
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Main navigation">
             {salesNavItems.map((item) => {
@@ -63,16 +72,16 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
               }
 
               return (
-                <button
+                <a
                   key={item.href}
-                  type="button"
+                  href={item.href}
                   className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
                     isActive ? 'bg-white text-[var(--text-inverse)]' : 'text-white/72 hover:bg-white/8 hover:text-white'
                   }`}
-                  onClick={() => handleInternalNav(item.href)}
+                  onClick={(event) => handleInternalLink(event, item.href)}
                 >
                   {item.label}
-                </button>
+                </a>
               );
             })}
           </nav>
@@ -111,14 +120,14 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
                     {item.label}
                   </a>
                 ) : (
-                  <button
+                  <a
                     key={item.href}
-                    type="button"
                     className="rounded-xl px-3 py-3 text-left font-semibold text-white/78"
-                    onClick={() => handleInternalNav(item.href)}
+                    href={item.href}
+                    onClick={(event) => handleInternalLink(event, item.href)}
                   >
                     {item.label}
-                  </button>
+                  </a>
                 ),
               )}
             </nav>
@@ -189,15 +198,24 @@ function FooterColumn({
   links: [string, string][];
   onNavigate: (href: string) => void;
 }) {
+  const handleInternalLink = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.altKey || event.ctrlKey || event.shiftKey) {
+      return;
+    }
+
+    event.preventDefault();
+    onNavigate(href);
+  };
+
   return (
     <div>
       <h2 className="mb-4 text-sm font-bold tracking-[0.16em] text-white/58 uppercase">{title}</h2>
       <div className="flex flex-col gap-3 text-sm text-white/70">
         {links.map(([label, href]) =>
           href.startsWith('/') ? (
-            <button key={href} type="button" className="text-left hover:text-white" onClick={() => onNavigate(href)}>
+            <a key={href} href={href} className="text-left hover:text-white" onClick={(event) => handleInternalLink(event, href)}>
               {label}
-            </button>
+            </a>
           ) : (
             <a key={href} href={href} className="hover:text-white">
               {label}
