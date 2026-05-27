@@ -239,7 +239,7 @@ export function MegaMenu({
       <PopoverContent className="p-0 bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-2xl rounded-xl max-h-[75vh] max-w-[90vw] overflow-y-auto">
         <nav
           ref={menuRef}
-          className="grid grid-cols-2 gap-0 p-2 min-w-[500px]"
+          className="grid grid-cols-1 gap-0 p-2 w-full min-w-0 sm:grid-cols-2 sm:min-w-[500px]"
           aria-label={t('aria.more_navigation')}
           onKeyDown={handleKeyDown}
         >
