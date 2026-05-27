@@ -56,7 +56,20 @@
       "overview": "Overview",
       "discussion": "Discussions",
       "members": "Members",
-      "announcements": "Announcements"
+      "announcements": "Announcements",
+      "marketplace": "Marketplace"
+    },
+    "marketplace": {
+      "title": "Group marketplace",
+      "subtitle": "Browse listings from members of this group.",
+      "active": "{{count}} active",
+      "total": "{{count}} listed",
+      "sellers": "{{count}} sellers",
+      "sellToGroup": "Sell to group",
+      "joinToView": "Join this group to view group marketplace listings.",
+      "empty": "No marketplace listings from this group yet.",
+      "loadFailed": "Could not load group marketplace listings.",
+      "loadMoreFailed": "Could not load more group marketplace listings."
     },
     "roles": {
       "owner": "Owner",

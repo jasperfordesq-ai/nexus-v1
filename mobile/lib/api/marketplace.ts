@@ -145,6 +145,13 @@ export interface MarketplaceDashboard {
   saves_30d?: number;
 }
 
+export interface MarketplaceGroupStats {
+  active_listings: number;
+  total_listed: number;
+  total_sellers: number;
+  categories: MarketplaceCategory[];
+}
+
 export interface MarketplaceSavedSearch {
   id: number;
   name: string;
@@ -605,6 +612,35 @@ export function getMarketplaceSellerListings(
 
 export function getMarketplaceDashboard(): Promise<MarketplaceDataResponse<MarketplaceDashboard>> {
   return api.get<MarketplaceDataResponse<MarketplaceDashboard>>(`${API_V2}/marketplace/seller/dashboard`);
+}
+
+export function getGroupMarketplaceListings(
+  groupId: number,
+  params: {
+    category_id?: number | null;
+    search?: string | null;
+    price_min?: number | string;
+    price_max?: number | string;
+    condition?: string | null;
+    sort?: 'newest' | 'price_asc' | 'price_desc' | 'popular';
+    cursor?: string | null;
+    limit?: number;
+  } = {},
+): Promise<MarketplaceCollectionResponse<MarketplaceListingItem>> {
+  const query: Record<string, string> = {};
+  addQueryValue(query, 'category_id', params.category_id);
+  addQueryValue(query, 'search', params.search);
+  addQueryValue(query, 'price_min', params.price_min);
+  addQueryValue(query, 'price_max', params.price_max);
+  addQueryValue(query, 'condition', params.condition);
+  addQueryValue(query, 'sort', params.sort ?? 'newest');
+  addQueryValue(query, 'cursor', params.cursor);
+  addQueryValue(query, 'limit', params.limit ?? 20);
+  return api.get<MarketplaceCollectionResponse<MarketplaceListingItem>>(`${API_V2}/marketplace/groups/${groupId}/listings`, query);
+}
+
+export function getGroupMarketplaceStats(groupId: number): Promise<MarketplaceDataResponse<MarketplaceGroupStats>> {
+  return api.get<MarketplaceDataResponse<MarketplaceGroupStats>>(`${API_V2}/marketplace/groups/${groupId}/stats`);
 }
 
 export function getMarketplaceSavedSearches(): Promise<MarketplaceDataResponse<MarketplaceSavedSearch[]>> {

@@ -26,6 +26,8 @@ import {
   getMarketplaceCategories,
   getMarketplaceCollectionItems,
   getMarketplaceCollections,
+  getGroupMarketplaceListings,
+  getGroupMarketplaceStats,
   getMarketplaceListing,
   getMarketplaceListingPickupSlots,
   getMarketplaceListings,
@@ -117,6 +119,31 @@ describe('marketplace api', () => {
       radius: '50',
       limit: '30',
     });
+  });
+
+  it('wires group marketplace listings and stats', async () => {
+    (api.get as jest.Mock).mockResolvedValue({ data: [], meta: { cursor: null, has_more: false } });
+
+    await getGroupMarketplaceListings(12, {
+      category_id: 3,
+      search: 'tools',
+      condition: 'good',
+      sort: 'popular',
+      cursor: 'next',
+      limit: 20,
+    });
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/groups/12/listings', {
+      category_id: '3',
+      search: 'tools',
+      condition: 'good',
+      sort: 'popular',
+      cursor: 'next',
+      limit: '20',
+    });
+
+    await getGroupMarketplaceStats(12);
+    expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/groups/12/stats');
   });
 
   it('uses the backend category and detail endpoints', async () => {

@@ -35,8 +35,18 @@ import {
   type GroupDiscussion,
   type GroupMemberListItem,
 } from '@/lib/api/groups';
+import {
+  getGroupMarketplaceListings,
+  getGroupMarketplaceStats,
+  marketplaceHasMore,
+  marketplaceNextCursor,
+  saveMarketplaceListing,
+  unsaveMarketplaceListing,
+  type MarketplaceCategory,
+  type MarketplaceListingItem,
+} from '@/lib/api/marketplace';
 import { useApi } from '@/lib/hooks/useApi';
-import { usePrimaryColor } from '@/lib/hooks/useTenant';
+import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
@@ -44,12 +54,13 @@ import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
+import MarketplaceListingCard from '@/components/marketplace/MarketplaceListingCard';
 
 const WEB_URL = 'https://app.project-nexus.ie';
 const CARD_MIN_HEIGHT = 118;
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
-type TabKey = 'overview' | 'discussion' | 'members' | 'announcements';
+type TabKey = 'overview' | 'discussion' | 'members' | 'announcements' | 'marketplace';
 type ApiGroupDetail = GroupDetail & {
   viewer_membership?: { status?: string; role?: string; is_admin?: boolean } | null;
   avatar_url?: string | null;
@@ -169,7 +180,8 @@ export default function GroupDetailScreen() {
 }
 
 function GroupDetailScreenInner() {
-  const { t } = useTranslation(['groups', 'common']);
+  const { t } = useTranslation(['groups', 'common', 'marketplace']);
+  const { hasFeature } = useTenant();
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
@@ -352,6 +364,9 @@ function GroupDetailScreenInner() {
     { key: 'members', label: t('detail.tabs.members'), icon: 'people-outline' },
     { key: 'announcements', label: t('detail.tabs.announcements'), icon: 'megaphone-outline' },
   ];
+  if (hasFeature('marketplace')) {
+    tabs.push({ key: 'marketplace', label: t('detail.tabs.marketplace'), icon: 'bag-handle-outline' });
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -696,7 +711,145 @@ function GroupDetailScreenInner() {
             )}
           </View>
         ) : null}
+
+        {activeTab === 'marketplace' ? (
+          <GroupMarketplacePanel groupId={loadedGroup.id} canView={userCanSeeMemberContent} />
+        ) : null}
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+function GroupMarketplacePanel({ groupId, canView }: { groupId: number; canView: boolean }) {
+  const { t } = useTranslation(['groups', 'marketplace', 'common']);
+  const primary = usePrimaryColor();
+  const theme = useTheme();
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [items, setItems] = useState<MarketplaceListingItem[]>([]);
+  const [cursor, setCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const statsApi = useApi(() => getGroupMarketplaceStats(groupId), [groupId], { enabled: canView });
+  const stats = statsApi.data?.data;
+
+  const loadListings = useCallback(async (append = false, categoryId = selectedCategory) => {
+    if (!canView) return;
+    if (append) setIsLoadingMore(true);
+    else setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await getGroupMarketplaceListings(groupId, {
+        category_id: categoryId,
+        cursor: append ? cursor : null,
+        limit: 20,
+        sort: 'newest',
+      });
+      setCursor(marketplaceNextCursor(response));
+      setHasMore(marketplaceHasMore(response));
+      setItems((current) => append ? [...current, ...response.data] : response.data);
+    } catch (err) {
+      if (!append) setError(err instanceof Error ? err.message : t('detail.marketplace.loadFailed'));
+      else Alert.alert(t('common:errors.alertTitle'), t('detail.marketplace.loadMoreFailed'));
+    } finally {
+      setIsLoading(false);
+      setIsLoadingMore(false);
+    }
+  }, [canView, cursor, groupId, selectedCategory, t]);
+
+  useEffect(() => {
+    void loadListings(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupId, selectedCategory, canView]);
+
+  function chooseCategory(category: MarketplaceCategory | null) {
+    setCursor(null);
+    setSelectedCategory(category?.id ?? null);
+  }
+
+  async function toggleSave(item: MarketplaceListingItem) {
+    const nextSaved = !item.is_saved;
+    setItems((current) => current.map((listing) => listing.id === item.id ? { ...listing, is_saved: nextSaved } : listing));
+    try {
+      if (nextSaved) await saveMarketplaceListing(item.id);
+      else await unsaveMarketplaceListing(item.id);
+    } catch {
+      setItems((current) => current.map((listing) => listing.id === item.id ? item : listing));
+      Alert.alert(t('common:errors.alertTitle'), t('marketplace:common.save_failed'));
+    }
+  }
+
+  if (!canView) {
+    return <EmptyCard icon="lock-closed-outline" message={t('detail.marketplace.joinToView')} />;
+  }
+
+  return (
+    <View className="gap-3">
+      <HeroCard className="rounded-panel p-0">
+        <HeroCard.Body className="gap-4 p-4">
+          <View className="flex-row items-start gap-3">
+            <View className="size-12 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+              <Ionicons name="bag-handle-outline" size={23} color={primary} />
+            </View>
+            <View className="min-w-0 flex-1">
+              <Text className="text-base font-semibold" style={{ color: theme.text }}>{t('detail.marketplace.title')}</Text>
+              <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('detail.marketplace.subtitle')}</Text>
+            </View>
+          </View>
+
+          {stats ? (
+            <View className="flex-row flex-wrap gap-2">
+              <StatusChip icon="cube-outline" label={t('detail.marketplace.active', { count: stats.active_listings ?? 0 })} color={primary} />
+              <StatusChip icon="pricetag-outline" label={t('detail.marketplace.total', { count: stats.total_listed ?? 0 })} color={theme.success} />
+              <StatusChip icon="people-outline" label={t('detail.marketplace.sellers', { count: stats.total_sellers ?? 0 })} color={theme.textMuted} />
+            </View>
+          ) : statsApi.isLoading ? <Spinner size="sm" /> : null}
+
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-2">
+            <HeroButton size="sm" variant={selectedCategory === null ? 'primary' : 'secondary'} onPress={() => chooseCategory(null)} style={selectedCategory === null ? { backgroundColor: primary } : undefined}>
+              <HeroButton.Label>{t('marketplace:filters.allCategories')}</HeroButton.Label>
+            </HeroButton>
+            {(stats?.categories ?? []).map((category) => (
+              <HeroButton key={category.id} size="sm" variant={selectedCategory === category.id ? 'primary' : 'secondary'} onPress={() => chooseCategory(category)} style={selectedCategory === category.id ? { backgroundColor: primary } : undefined}>
+                <HeroButton.Label>{category.name}</HeroButton.Label>
+              </HeroButton>
+            ))}
+          </ScrollView>
+
+          <HeroButton variant="secondary" onPress={() => router.push({ pathname: '/(modals)/new-marketplace-listing', params: { group_id: String(groupId) } } as never)}>
+            <Ionicons name="add-outline" size={16} color={primary} />
+            <HeroButton.Label>{t('detail.marketplace.sellToGroup')}</HeroButton.Label>
+          </HeroButton>
+        </HeroCard.Body>
+      </HeroCard>
+
+      {isLoading ? (
+        <HeroCard className="rounded-panel p-0">
+          <HeroCard.Body className="min-h-[140px] items-center justify-center">
+            <Spinner size="md" />
+          </HeroCard.Body>
+        </HeroCard>
+      ) : items.length === 0 ? (
+        <EmptyCard icon="bag-handle-outline" message={error ?? t('detail.marketplace.empty')} />
+      ) : (
+        <>
+          {items.map((item) => (
+            <MarketplaceListingCard
+              key={item.id}
+              item={item}
+              onPress={() => router.push({ pathname: '/(modals)/marketplace-detail', params: { id: String(item.id) } } as never)}
+              onSavePress={() => void toggleSave(item)}
+            />
+          ))}
+          {hasMore ? (
+            <HeroButton variant="secondary" isDisabled={isLoadingMore} onPress={() => void loadListings(true)}>
+              {isLoadingMore ? <Spinner size="sm" /> : <HeroButton.Label>{t('marketplace:loadMore')}</HeroButton.Label>}
+            </HeroButton>
+          ) : null}
+        </>
+      )}
+    </View>
   );
 }
