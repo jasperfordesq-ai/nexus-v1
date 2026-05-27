@@ -349,8 +349,8 @@ export function GroupExchangesPage() {
                               <span className={`
                                 text-xs px-2 py-1 rounded-full
                                 ${isOrganizer
-                                  ? 'bg-indigo-500/20 text-indigo-400'
-                                  : 'bg-emerald-500/20 text-emerald-400'}
+                                  ? 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-400'
+                                  : 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400'}
                               `}>
                                 {isOrganizer ? t('role_organizer') : t('role_participant')}
                               </span>

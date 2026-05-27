@@ -115,13 +115,13 @@ interface StatusConfig {
 
 const STATUS_CONFIGS: Record<GroupExchangeStatus, StatusConfig> = {
   draft: { color: 'default', bgClass: 'bg-gray-500/20 text-gray-600 dark:text-gray-400' },
-  pending_participants: { color: 'warning', bgClass: 'bg-amber-500/20 text-amber-400' },
-  pending_broker: { color: 'secondary', bgClass: 'bg-purple-500/20 text-purple-400' },
-  active: { color: 'primary', bgClass: 'bg-indigo-500/20 text-indigo-400' },
-  pending_confirmation: { color: 'warning', bgClass: 'bg-amber-500/20 text-amber-400' },
-  completed: { color: 'success', bgClass: 'bg-emerald-500/20 text-emerald-400' },
-  cancelled: { color: 'danger', bgClass: 'bg-red-500/20 text-red-400' },
-  disputed: { color: 'danger', bgClass: 'bg-red-500/20 text-red-400' },
+  pending_participants: { color: 'warning', bgClass: 'bg-amber-500/20 text-amber-700 dark:text-amber-400' },
+  pending_broker: { color: 'secondary', bgClass: 'bg-purple-500/20 text-purple-700 dark:text-purple-400' },
+  active: { color: 'primary', bgClass: 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-400' },
+  pending_confirmation: { color: 'warning', bgClass: 'bg-amber-500/20 text-amber-700 dark:text-amber-400' },
+  completed: { color: 'success', bgClass: 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400' },
+  cancelled: { color: 'danger', bgClass: 'bg-red-500/20 text-red-600 dark:text-red-400' },
+  disputed: { color: 'danger', bgClass: 'bg-red-500/20 text-red-600 dark:text-red-400' },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -487,11 +487,11 @@ export function GroupExchangeDetailPage() {
           </div>
           <div className="bg-theme-elevated rounded-lg p-4">
             <p className="text-sm text-theme-muted">{t('detail.providers')}</p>
-            <p className="text-2xl font-bold text-emerald-400">{providers.length}</p>
+            <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-400">{providers.length}</p>
           </div>
           <div className="bg-theme-elevated rounded-lg p-4">
             <p className="text-sm text-theme-muted">{t('detail.receivers')}</p>
-            <p className="text-2xl font-bold text-amber-400">{receivers.length}</p>
+            <p className="text-2xl font-bold text-amber-700 dark:text-amber-400">{receivers.length}</p>
           </div>
           <div className="bg-theme-elevated rounded-lg p-4">
             <p className="text-sm text-theme-muted">{t('detail.created')}</p>
@@ -506,7 +506,7 @@ export function GroupExchangeDetailPage() {
         {/* Broker Notes */}
         {exchange.broker_notes && (
           <div className="bg-amber-500/10 rounded-lg p-4 mt-4">
-            <h3 className="text-sm font-medium text-amber-400 mb-2">{t('detail.broker_notes')}</h3>
+            <h3 className="text-sm font-medium text-amber-700 dark:text-amber-400 mb-2">{t('detail.broker_notes')}</h3>
             <p className="text-theme-primary">{exchange.broker_notes}</p>
           </div>
         )}
@@ -514,7 +514,7 @@ export function GroupExchangeDetailPage() {
         {/* Completed notice */}
         {exchange.status === 'completed' && exchange.completed_at && (
           <div className="bg-emerald-500/10 rounded-lg p-4 mt-4">
-            <h3 className="text-sm font-medium text-emerald-400 mb-1 flex items-center gap-2">
+            <h3 className="text-sm font-medium text-emerald-700 dark:text-emerald-400 mb-1 flex items-center gap-2">
               <CheckCircle className="w-4 h-4" aria-hidden="true" />
               {t('detail.exchange_completed')}
             </h3>
@@ -527,7 +527,7 @@ export function GroupExchangeDetailPage() {
         {/* Cancelled notice */}
         {exchange.status === 'cancelled' && (
           <div className="bg-red-500/10 rounded-lg p-4 mt-4">
-            <h3 className="text-sm font-medium text-red-400 mb-1 flex items-center gap-2">
+            <h3 className="text-sm font-medium text-red-600 dark:text-red-400 mb-1 flex items-center gap-2">
               <XCircle className="w-4 h-4" aria-hidden="true" />
               {t('detail.exchange_cancelled')}
             </h3>
@@ -663,7 +663,7 @@ export function GroupExchangeDetailPage() {
                 </TableCell>
                 <TableCell className="text-center">
                   {p.confirmed ? (
-                    <span className="flex items-center justify-center gap-1 text-emerald-400 text-xs">
+                    <span className="flex items-center justify-center gap-1 text-emerald-700 dark:text-emerald-400 text-xs">
                       <CheckCircle className="w-4 h-4" aria-hidden="true" />
                       {t('detail.confirmed')}
                     </span>
@@ -709,11 +709,11 @@ export function GroupExchangeDetailPage() {
             <TableBody>
               {splitRows.map((row, idx) => (
                 <TableRow key={idx}>
-                  <TableCell className="text-emerald-400">{row.providerName}</TableCell>
+                  <TableCell className="text-emerald-700 dark:text-emerald-400">{row.providerName}</TableCell>
                   <TableCell className="text-center text-theme-subtle">
                     <ArrowRight className="w-4 h-4 inline" aria-label={t('detail.gives_to')} />
                   </TableCell>
-                  <TableCell className="text-amber-400">{row.receiverName}</TableCell>
+                  <TableCell className="text-amber-700 dark:text-amber-400">{row.receiverName}</TableCell>
                   <TableCell className="text-right font-medium text-theme-primary">{t('detail.hours_amount', { count: row.amount })}</TableCell>
                 </TableRow>
               ))}

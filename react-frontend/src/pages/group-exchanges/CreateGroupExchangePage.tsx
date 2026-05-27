@@ -661,7 +661,7 @@ export function CreateGroupExchangePage() {
                   {/* Providers */}
                   {providers.length > 0 && (
                     <div className="mb-4">
-                      <h4 className="text-sm font-medium text-emerald-400 mb-2">
+                      <h4 className="text-sm font-medium text-emerald-700 dark:text-emerald-400 mb-2">
                         {t('create.providers_count', { count: providers.length })}
                       </h4>
                       <div className="space-y-2">
@@ -683,7 +683,7 @@ export function CreateGroupExchangePage() {
                   {/* Receivers */}
                   {receivers.length > 0 && (
                     <div>
-                      <h4 className="text-sm font-medium text-amber-400 mb-2">
+                      <h4 className="text-sm font-medium text-amber-700 dark:text-amber-400 mb-2">
                         {t('create.receivers_count', { count: receivers.length })}
                       </h4>
                       <div className="space-y-2">
@@ -707,7 +707,7 @@ export function CreateGroupExchangePage() {
 
               {/* Validation message */}
               {!canProceedStep2 && participants.length > 0 && (
-                <div className="text-center text-sm text-amber-400">
+                <div className="text-center text-sm text-amber-700 dark:text-amber-400">
                   {t('create.validation_min_participants')}
                 </div>
               )}
@@ -737,7 +737,7 @@ export function CreateGroupExchangePage() {
                 <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6">
                   <div className="bg-theme-elevated rounded-xl p-3 sm:p-4 text-center">
                     <p className="text-xs sm:text-sm text-theme-muted">{t('detail.providers')}</p>
-                    <p className="text-xl sm:text-2xl font-bold text-emerald-400">{providers.length}</p>
+                    <p className="text-xl sm:text-2xl font-bold text-emerald-700 dark:text-emerald-400">{providers.length}</p>
                   </div>
                   <div className="bg-theme-elevated rounded-xl p-3 sm:p-4 text-center">
                     <p className="text-xs sm:text-sm text-theme-muted">{t('detail.total_hours')}</p>
@@ -745,7 +745,7 @@ export function CreateGroupExchangePage() {
                   </div>
                   <div className="bg-theme-elevated rounded-xl p-3 sm:p-4 text-center">
                     <p className="text-xs sm:text-sm text-theme-muted">{t('detail.receivers')}</p>
-                    <p className="text-xl sm:text-2xl font-bold text-amber-400">{receivers.length}</p>
+                    <p className="text-xl sm:text-2xl font-bold text-amber-700 dark:text-amber-400">{receivers.length}</p>
                   </div>
                 </div>
 
@@ -771,11 +771,11 @@ export function CreateGroupExchangePage() {
                   <TableBody emptyContent={<div className="text-center py-6 text-theme-muted">{t('create.unable_to_calculate')}</div>}>
                     {splitPreview.map((split, idx) => (
                       <TableRow key={idx}>
-                        <TableCell className="text-emerald-400">{split.providerName}</TableCell>
+                        <TableCell className="text-emerald-700 dark:text-emerald-400">{split.providerName}</TableCell>
                         <TableCell className="text-center text-theme-subtle">
                           <ArrowRight className="w-4 h-4 inline" aria-label={t('detail.gives_to')} />
                         </TableCell>
-                        <TableCell className="text-amber-400">{split.receiverName}</TableCell>
+                        <TableCell className="text-amber-700 dark:text-amber-400">{split.receiverName}</TableCell>
                         <TableCell className="text-right font-medium text-theme-primary">{t('create.hours_value', { hours: split.amount })}</TableCell>
                       </TableRow>
                     ))}
