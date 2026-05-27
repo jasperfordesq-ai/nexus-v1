@@ -30,6 +30,15 @@ jest.mock('react-i18next', () => ({
         'notifications': 'Notifications',
         'listings': 'Listings',
         'marketplace': 'Marketplace',
+        'marketplaceSection': 'Marketplace',
+        'marketplaceBrowse': 'Browse marketplace',
+        'marketplaceSell': 'Sell something',
+        'marketplaceMyListings': 'My marketplace listings',
+        'marketplaceOrders': 'Marketplace orders',
+        'marketplaceOffers': 'Marketplace offers',
+        'marketplaceSaved': 'Saved marketplace',
+        'marketplaceTools': 'Seller tools',
+        'marketplacePayments': 'Seller payments',
         'signOut': 'Sign out',
         'signOutConfirmTitle': 'Sign out',
         'signOutConfirmMessage': 'Are you sure you want to sign out?',
@@ -65,6 +74,14 @@ jest.mock('react-i18next', () => ({
         'navDescriptions.search': 'Search listings, members, events, groups, and posts.',
         'navDescriptions.listings': 'Browse offers, requests, and timebank exchanges.',
         'navDescriptions.marketplace': 'Buy, sell, save, and manage community marketplace listings.',
+        'navDescriptions.marketplaceBrowse': 'Browse all marketplace listings, categories, maps, and saved searches.',
+        'navDescriptions.marketplaceSell': 'Create a new marketplace listing with photos, price, delivery, and category details.',
+        'navDescriptions.marketplaceMyListings': 'Review, edit, and manage the marketplace items you have listed.',
+        'navDescriptions.marketplaceOrders': 'Track marketplace purchases, sales, payments, pickup, delivery, ratings, and disputes.',
+        'navDescriptions.marketplaceOffers': 'Review offers you have made or received on marketplace listings.',
+        'navDescriptions.marketplaceSaved': 'Open your saved marketplace collections and saved search alerts.',
+        'navDescriptions.marketplaceTools': 'Manage seller tools, promotions, pickup slots, collections, searches, and coupons.',
+        'navDescriptions.marketplacePayments': 'Set up or review Stripe Connect seller payments.',
         'navDescriptions.jobs': 'Browse job vacancies, applications, and your own postings.',
         'navDescriptions.events': 'Browse workshops, meetups, and community gatherings.',
         'navDescriptions.browseMembers': 'Find neighbours by name, profile, or shared interests.',
@@ -178,11 +195,11 @@ describe('MoreScreen (More tab)', () => {
   });
 
   it('renders Discover section with community navigation items', () => {
-    const { getByText } = render(<MoreScreen />);
+    const { getAllByText, getByText } = render(<MoreScreen />);
     expect(getByText('Discover')).toBeTruthy();
     expect(getByText('Search')).toBeTruthy();
     expect(getByText('Listings')).toBeTruthy();
-    expect(getByText('Marketplace')).toBeTruthy();
+    expect(getAllByText('Marketplace').length).toBeGreaterThanOrEqual(1);
     expect(getByText('Jobs')).toBeTruthy();
     expect(getByText('Events')).toBeTruthy();
     expect(getByText('Browse Members')).toBeTruthy();
@@ -190,6 +207,19 @@ describe('MoreScreen (More tab)', () => {
     expect(getByText('Blog')).toBeTruthy();
     expect(getByText('Skills & Endorsements')).toBeTruthy();
     expect(getByText('AI Assistant')).toBeTruthy();
+  });
+
+  it('renders the Marketplace section with seller and buyer shortcuts', () => {
+    const { getAllByText, getByText } = render(<MoreScreen />);
+    expect(getAllByText('Marketplace').length).toBeGreaterThanOrEqual(2);
+    expect(getByText('Browse marketplace')).toBeTruthy();
+    expect(getByText('Sell something')).toBeTruthy();
+    expect(getByText('My marketplace listings')).toBeTruthy();
+    expect(getByText('Marketplace orders')).toBeTruthy();
+    expect(getByText('Marketplace offers')).toBeTruthy();
+    expect(getByText('Saved marketplace')).toBeTruthy();
+    expect(getByText('Seller tools')).toBeTruthy();
+    expect(getByText('Seller payments')).toBeTruthy();
   });
 
   it('renders Settings in the Account section', () => {

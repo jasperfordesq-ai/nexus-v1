@@ -54,6 +54,17 @@ const DISCOVER: MenuItem[] = [
   { labelKey: 'federation', descriptionKey: 'navDescriptions.federation', icon: 'globe-outline', route: '/(modals)/federation', tone: '#0ea5e9', featureGate: 'federation' },
 ];
 
+const MARKETPLACE: MenuItem[] = [
+  { labelKey: 'marketplaceBrowse', descriptionKey: 'navDescriptions.marketplaceBrowse', icon: 'bag-handle-outline', route: '/(modals)/marketplace' as Href, tone: '#0ea5e9', featureGate: 'marketplace' },
+  { labelKey: 'marketplaceSell', descriptionKey: 'navDescriptions.marketplaceSell', icon: 'add-circle-outline', route: '/(modals)/new-marketplace-listing' as Href, tone: '#22c55e', featureGate: 'marketplace' },
+  { labelKey: 'marketplaceMyListings', descriptionKey: 'navDescriptions.marketplaceMyListings', icon: 'albums-outline', route: '/(modals)/marketplace-my-listings' as Href, tone: '#6366f1', featureGate: 'marketplace' },
+  { labelKey: 'marketplaceOrders', descriptionKey: 'navDescriptions.marketplaceOrders', icon: 'receipt-outline', route: '/(modals)/marketplace-orders' as Href, tone: '#f97316', featureGate: 'marketplace' },
+  { labelKey: 'marketplaceOffers', descriptionKey: 'navDescriptions.marketplaceOffers', icon: 'pricetag-outline', route: '/(modals)/marketplace-offers' as Href, tone: '#14b8a6', featureGate: 'marketplace' },
+  { labelKey: 'marketplaceSaved', descriptionKey: 'navDescriptions.marketplaceSaved', icon: 'folder-open-outline', route: '/(modals)/marketplace-collections' as Href, tone: '#8b5cf6', featureGate: 'marketplace' },
+  { labelKey: 'marketplaceTools', descriptionKey: 'navDescriptions.marketplaceTools', icon: 'construct-outline', route: '/(modals)/marketplace-tools' as Href, tone: '#64748b', featureGate: 'marketplace' },
+  { labelKey: 'marketplacePayments', descriptionKey: 'navDescriptions.marketplacePayments', icon: 'card-outline', route: '/(modals)/marketplace-stripe-onboarding' as Href, tone: '#0f766e', featureGate: 'marketplace' },
+];
+
 const ACCOUNT: MenuItem[] = [
   { labelKey: 'settings', descriptionKey: 'navDescriptions.settings', icon: 'settings-outline', route: '/(modals)/settings', tone: '#64748b' },
 ];
@@ -68,6 +79,7 @@ export default function MoreScreen() {
   const rawBalance = user && 'balance' in user ? (user.balance as number | null) : null;
   const balance = typeof rawBalance === 'number' && Number.isFinite(rawBalance) ? rawBalance : null;
   const visibleDiscover = DISCOVER.filter((item) => !item.featureGate || hasFeature(item.featureGate));
+  const visibleMarketplace = MARKETPLACE.filter((item) => !item.featureGate || hasFeature(item.featureGate));
 
   function navigate(route: Href) {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -141,6 +153,7 @@ export default function MoreScreen() {
         </View>
 
         <MenuSection title={t('discover')} items={visibleDiscover} onNavigate={navigate} theme={theme} />
+        <MenuSection title={t('marketplaceSection')} items={visibleMarketplace} onNavigate={navigate} theme={theme} />
         <MenuSection title={t('mySpace')} items={MY_SPACE} onNavigate={navigate} theme={theme} />
         <MenuSection title={t('account')} items={ACCOUNT} onNavigate={navigate} theme={theme} />
 
