@@ -93,7 +93,7 @@ export function CustomPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-24">
+      <div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center items-center py-24">
         <Spinner size="lg" />
       </div>
     );

@@ -807,8 +807,8 @@ export function OnboardingPage() {
                   </div>
 
                   {isUploadingAvatar ? (
-                    <p className="text-sm text-theme-muted flex items-center gap-2">
-                      <Spinner size="sm" /> {t('uploading')}
+                    <p role="status" aria-busy="true" aria-label={t('uploading')} className="text-sm text-theme-muted flex items-center gap-2">
+                      <Spinner size="sm" aria-hidden="true" /> {t('uploading')}
                     </p>
                   ) : hasAvatar ? (
                     <div className="text-center">
@@ -916,7 +916,7 @@ export function OnboardingPage() {
                 </p>
 
                 {categoriesLoading ? (
-                  <div className="flex items-center justify-center py-12">
+                  <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex items-center justify-center py-12">
                     <Spinner size="lg" />
                   </div>
                 ) : categories.length === 0 ? (
@@ -1014,7 +1014,7 @@ export function OnboardingPage() {
                 </p>
 
                 {categoriesLoading ? (
-                  <div className="flex items-center justify-center py-8">
+                  <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex items-center justify-center py-8">
                     <Spinner size="md" />
                   </div>
                 ) : categories.length === 0 ? (
@@ -1070,7 +1070,7 @@ export function OnboardingPage() {
                 </p>
 
                 {categoriesLoading ? (
-                  <div className="flex items-center justify-center py-8">
+                  <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex items-center justify-center py-8">
                     <Spinner size="md" />
                   </div>
                 ) : categories.length === 0 ? (

@@ -174,7 +174,7 @@ export function GoalProgressHistory({ goalId, className = '' }: GoalProgressHist
 
   if (isLoading) {
     return (
-      <div className={`flex items-center justify-center py-8 ${className}`}>
+      <div role="status" aria-busy="true" aria-label={t('insights.loading')} className={`flex items-center justify-center py-8 ${className}`}>
         <Spinner size="md" color="primary" />
       </div>
     );
@@ -182,7 +182,7 @@ export function GoalProgressHistory({ goalId, className = '' }: GoalProgressHist
 
   if (error) {
     return (
-      <div className={`text-center py-6 ${className}`}>
+      <div role="alert" className={`text-center py-6 ${className}`}>
         <p className="text-sm text-theme-muted mb-2">{error}</p>
         <Button
           size="sm"

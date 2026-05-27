@@ -1360,7 +1360,7 @@ export function FederationMessagesPage() {
                     value={composeRecipientQuery}
                     onChange={(e) => setComposeRecipientQuery(e.target.value)}
                     startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
-                    endContent={isSearchingRecipients ? <Spinner size="sm" /> : null}
+                    endContent={isSearchingRecipients ? <span role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })}><Spinner size="sm" /></span> : null}
                     classNames={{
                       input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
                       inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',

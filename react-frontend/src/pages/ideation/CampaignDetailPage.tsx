@@ -204,7 +204,7 @@ export function CampaignDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-12">
+      <div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-12">
         <Spinner size="lg" />
       </div>
     );

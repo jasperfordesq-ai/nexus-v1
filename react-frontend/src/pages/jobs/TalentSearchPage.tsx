@@ -346,8 +346,8 @@ export function TalentSearchPage() {
 
       {/* Loading */}
       {isLoading && (
-        <div className="flex items-center justify-center py-12">
-          <Spinner size="lg" />
+        <div role="status" aria-busy="true" aria-label={t('talent_search.loading')} className="flex items-center justify-center py-12">
+          <Spinner size="lg" aria-hidden="true" />
           <span className="ml-3 text-theme-muted">{t('talent_search.loading')}</span>
         </div>
       )}

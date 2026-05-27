@@ -249,7 +249,7 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
+      <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex items-center justify-center py-12">
         <Spinner size="lg" />
       </div>
     );

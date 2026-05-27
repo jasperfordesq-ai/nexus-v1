@@ -372,7 +372,7 @@ export function VolunteeringPage() {
               {activeTab === 'group-signups' && isTabEnabled('group-signups') && <GroupSignUpTab />}
               {activeTab === 'hours-review' && isTabEnabled('hours-review') && <HoursReviewTab />}
               <ErrorBoundary>
-                <Suspense fallback={<div className="flex justify-center py-12"><Spinner size="lg" /></div>}>
+                <Suspense fallback={<div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-12"><Spinner size="lg" /></div>}>
                   {activeTab === 'expenses' && isTabEnabled('expenses') && <ExpensesTab />}
                   {activeTab === 'safeguarding' && isTabEnabled('safeguarding') && <SafeguardingTab />}
                   {activeTab === 'community-projects' && isTabEnabled('community-projects') && <CommunityProjectsTab />}

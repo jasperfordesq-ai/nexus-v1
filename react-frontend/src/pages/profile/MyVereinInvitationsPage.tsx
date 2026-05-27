@@ -167,7 +167,7 @@ export default function MyVereinInvitationsPage() {
         <Separator />
         <CardBody>
           {loading ? (
-            <div className="flex items-center justify-center py-8">
+            <div role="status" aria-busy="true" aria-label={t('loading')} className="flex items-center justify-center py-8">
               <Spinner size="lg" />
             </div>
           ) : (

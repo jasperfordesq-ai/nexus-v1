@@ -115,7 +115,7 @@ export function NewDiscussionModal({
                     />
                   }
                 >
-                  <Suspense fallback={<div className="flex justify-center py-4"><Spinner size="sm" /></div>}>
+                  <Suspense fallback={<div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex justify-center py-4"><Spinner size="sm" /></div>}>
                     <RichTextEditor
                       value={newDiscussionContent}
                       onChange={onContentChange}

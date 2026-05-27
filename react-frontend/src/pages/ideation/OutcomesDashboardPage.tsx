@@ -136,27 +136,29 @@ export function OutcomesDashboardPage() {
 
       {/* Loading */}
       {isLoading && (
-        <div className="flex justify-center py-12">
+        <div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-12">
           <Spinner size="lg" />
         </div>
       )}
 
       {/* Error */}
       {error && !isLoading && (
-        <EmptyState
-          icon={<AlertTriangle className="w-10 h-10 text-theme-subtle" />}
-          title={t('challenges.load_error')}
-          action={
-            <Button
-              color="primary"
-              variant="flat"
-              startContent={<RefreshCw className="w-4 h-4" />}
-              onPress={fetchDashboard}
-            >
-              {t('actions.retry')}
-            </Button>
-          }
-        />
+        <div role="alert">
+          <EmptyState
+            icon={<AlertTriangle className="w-10 h-10 text-theme-subtle" />}
+            title={t('challenges.load_error')}
+            action={
+              <Button
+                color="primary"
+                variant="flat"
+                startContent={<RefreshCw className="w-4 h-4" />}
+                onPress={fetchDashboard}
+              >
+                {t('actions.retry')}
+              </Button>
+            }
+          />
+        </div>
       )}
 
       {/* Dashboard */}

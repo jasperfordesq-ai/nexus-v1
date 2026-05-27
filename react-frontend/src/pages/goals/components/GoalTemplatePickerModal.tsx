@@ -156,11 +156,11 @@ export function GoalTemplatePickerModal({
         </ModalHeader>
         <ModalBody>
           {isLoading ? (
-            <div className="flex items-center justify-center py-12">
+            <div role="status" aria-busy="true" aria-label={t('insights.loading')} className="flex items-center justify-center py-12">
               <Spinner size="lg" color="primary" />
             </div>
           ) : error ? (
-            <div className="text-center py-8">
+            <div role="alert" className="text-center py-8">
               <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
               <p className="text-theme-muted mb-4">{error}</p>
               <Button

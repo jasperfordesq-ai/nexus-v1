@@ -315,7 +315,7 @@ export function GroupHeader({
             {t('detail.pending_requests_title')} ({joinRequests.length})
           </h3>
           {requestsLoading ? (
-            <div className="flex justify-center py-4">
+            <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex justify-center py-4">
               <Spinner size="sm" />
             </div>
           ) : joinRequests.length === 0 ? (

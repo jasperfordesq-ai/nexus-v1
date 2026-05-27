@@ -91,15 +91,15 @@ export function SubscriptionReturnPage() {
       <Card className="border border-border bg-surface/95">
         <Card.Content className="text-center py-10 flex flex-col items-center gap-4">
           {status === 'pending' && (
-            <>
-              <Spinner size="lg" />
+            <div role="status" aria-busy="true" aria-label={t('premium.return_pending')} className="flex flex-col items-center gap-4">
+              <Spinner size="lg" aria-hidden="true" />
               <h1 className="text-xl font-semibold">
                 {t('premium.return_pending')}
               </h1>
               <p className="text-[var(--color-text-secondary)]">
                 {t('premium.return_pending_body')}
               </p>
-            </>
+            </div>
           )}
 
           {status === 'success' && (

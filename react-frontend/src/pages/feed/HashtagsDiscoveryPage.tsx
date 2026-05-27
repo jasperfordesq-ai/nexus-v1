@@ -148,7 +148,7 @@ export function HashtagsDiscoveryPage() {
           onChange={(e) => handleSearch(e.target.value)}
           startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
           aria-label={t('hashtags.search_placeholder')}
-          endContent={isSearching ? <Spinner size="sm" /> : undefined}
+          endContent={isSearching ? <span role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })}><Spinner size="sm" /></span> : undefined}
           classNames={{
             input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
             inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
@@ -174,7 +174,7 @@ export function HashtagsDiscoveryPage() {
 
       {/* Loading */}
       {isLoading && (
-        <div className="flex justify-center py-12">
+        <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex justify-center py-12">
           <Spinner size="lg" />
         </div>
       )}

@@ -89,7 +89,7 @@ export function PilotApplyStatusPage() {
           </div>
 
           {loading ? (
-            <div className="flex justify-center py-8"><Spinner /></div>
+            <div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-8"><Spinner /></div>
           ) : error ? (
             <p className="text-theme-muted text-sm">{error}</p>
           ) : info ? (

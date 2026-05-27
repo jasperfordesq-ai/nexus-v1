@@ -261,7 +261,7 @@ export function SecurityTab({
           </h2>
 
           {sessionsLoading ? (
-            <div className="flex items-center justify-center py-8">
+            <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex items-center justify-center py-8">
               <Spinner size="lg" />
             </div>
           ) : sessionsError ? (

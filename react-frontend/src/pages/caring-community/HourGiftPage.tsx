@@ -327,7 +327,7 @@ export function HourGiftPage() {
                         variant="bordered"
                         startContent={<Search className="h-4 w-4 text-muted" aria-hidden="true" />}
                       />
-                      {searching && <Spinner size="sm" className="mt-2" />}
+                      {searching && <span role="status" aria-busy="true" aria-label={t('loading')}><Spinner size="sm" className="mt-2" /></span>}
                       {recipientResults.length > 0 && (
                         <ul className="mt-2 divide-y divide-border overflow-hidden rounded-lg border border-border">
                           {recipientResults.map((m) => (

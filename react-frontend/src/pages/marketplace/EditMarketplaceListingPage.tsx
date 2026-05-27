@@ -727,8 +727,8 @@ export function EditMarketplaceListingPage() {
 
           {/* Dynamic template fields */}
           {isLoadingTemplate && (
-            <div className="flex items-center gap-2 py-2">
-              <Spinner size="sm" />
+            <div role="status" aria-busy="true" aria-label={t('create.loading_category_fields')} className="flex items-center gap-2 py-2">
+              <Spinner size="sm" aria-hidden="true" />
               <span className="text-sm text-muted">{t('create.loading_category_fields')}</span>
             </div>
           )}

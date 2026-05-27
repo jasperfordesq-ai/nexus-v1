@@ -166,7 +166,7 @@ export default function RegionalPointsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-16">
+      <div role="status" aria-busy="true" aria-label={t('loading')} className="flex items-center justify-center py-16">
         <Spinner size="lg" />
       </div>
     );

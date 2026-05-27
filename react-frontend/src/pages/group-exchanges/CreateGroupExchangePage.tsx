@@ -582,7 +582,7 @@ export function CreateGroupExchangePage() {
                     value={searchQuery}
                     onChange={(e) => handleSearchChange(e.target.value)}
                     startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
-                    endContent={isSearching ? <Spinner size="sm" /> : null}
+                    endContent={isSearching ? <span role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })}><Spinner size="sm" /></span> : null}
                     classNames={inputClassNames}
                     aria-label={t('detail.search_members_aria')}
                   />

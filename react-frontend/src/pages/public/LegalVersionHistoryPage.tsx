@@ -217,7 +217,7 @@ export function LegalVersionHistoryPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[50vh]">
+      <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex justify-center items-center min-h-[50vh]">
         <Spinner size="lg" />
       </div>
     );
@@ -361,7 +361,7 @@ export function LegalVersionHistoryPage() {
                   {expandedId === version.id && (
                     <div className="border-t border-[var(--border-default)]">
                       {loadingContent && (
-                        <div className="flex justify-center py-8">
+                        <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex justify-center py-8">
                           <Spinner size="md" />
                         </div>
                       )}
@@ -420,7 +420,7 @@ export function LegalVersionHistoryPage() {
                                 className="overflow-hidden"
                               >
                                 {loadingDiff && (
-                                  <div className="flex justify-center py-6">
+                                  <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex justify-center py-6">
                                     <Spinner size="md" />
                                   </div>
                                 )}

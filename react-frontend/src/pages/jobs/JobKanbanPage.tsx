@@ -735,7 +735,7 @@ export function JobKanbanPage() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-16">
+      <div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-16">
         <Spinner size="lg" />
       </div>
     );
@@ -879,7 +879,7 @@ export function JobKanbanPage() {
       {activeTab === 'activity' && (
         <div className="space-y-3">
           {auditLoading ? (
-            <div className="flex justify-center py-12"><Spinner size="lg" /></div>
+            <div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-12"><Spinner size="lg" /></div>
           ) : auditEvents.length === 0 ? (
             <div className="text-center py-12 text-muted">
               <ScrollText size={32} className="mx-auto mb-3" />

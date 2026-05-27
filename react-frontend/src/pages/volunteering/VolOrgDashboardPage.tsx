@@ -247,7 +247,7 @@ export default function VolOrgDashboardPage() {
       </div>
 
       {/* Tab Content */}
-      <Suspense fallback={<div className="flex justify-center py-16"><Spinner size="lg" /></div>}>
+      <Suspense fallback={<div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-16"><Spinner size="lg" /></div>}>
         {tab === 'overview' && (
           <OrgOverviewTab orgId={orgId} onTabChange={(t) => setTab(t as OrgDashTab)} />
         )}

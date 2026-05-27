@@ -536,7 +536,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
               className='overflow-hidden'>
               <div className='mt-3 pt-3 border-t border-divider'>
                 <p className='text-xs font-semibold text-muted uppercase tracking-wide mb-3'>{t('history.status_history')}</p>
-                {historyLoading && <div className='flex justify-center py-3'><div role="status" aria-label={t('loading')}><Spinner size='sm' /></div></div>}
+                {historyLoading && <div className='flex justify-center py-3'><div role="status" aria-busy="true" aria-label={t('loading')}><Spinner size='sm' /></div></div>}
                 {!historyLoading && history.length === 0 && (
                   <p className='text-xs text-muted'>{t('history.empty')}</p>
                 )}

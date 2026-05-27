@@ -217,7 +217,7 @@ export function GoalCheckinModal({
             /* Check-in History */
             <div>
               {isLoadingHistory ? (
-                <div className="flex items-center justify-center py-8">
+                <div role="status" aria-busy="true" aria-label={t('insights.loading')} className="flex items-center justify-center py-8">
                   <Spinner size="md" color="primary" />
                 </div>
               ) : checkins.length === 0 ? (

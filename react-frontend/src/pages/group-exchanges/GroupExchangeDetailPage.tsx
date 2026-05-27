@@ -800,7 +800,7 @@ export function GroupExchangeDetailPage() {
               onChange={(e) => handleSearchMembers(e.target.value)}
               startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
               aria-label={t('detail.search_members_placeholder')}
-              endContent={isSearching ? <Spinner size="sm" /> : null}
+              endContent={isSearching ? <span role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })}><Spinner size="sm" /></span> : null}
               classNames={{
                 input: 'bg-transparent text-theme-primary',
                 inputWrapper: 'bg-theme-elevated border-theme-default',

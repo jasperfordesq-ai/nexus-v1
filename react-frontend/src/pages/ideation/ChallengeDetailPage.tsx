@@ -1312,7 +1312,7 @@ export function ChallengeDetailPage() {
           <ModalBody>
             {/* Drafts Section */}
             {isLoadingDrafts && (
-              <div className="flex justify-center py-2">
+              <div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-2">
                 <Spinner size="sm" />
               </div>
             )}

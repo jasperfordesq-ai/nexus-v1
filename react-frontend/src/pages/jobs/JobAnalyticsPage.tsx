@@ -489,7 +489,7 @@ export function JobAnalyticsPage() {
         </div>
 
         {predictionsLoading ? (
-          <div className="flex justify-center py-8"><Spinner size="lg" /></div>
+          <div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-8"><Spinner size="lg" /></div>
         ) : !predictions ? (
           <p className="text-center text-muted py-6">{t('analytics.no_predictions')}</p>
         ) : (
