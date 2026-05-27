@@ -12,6 +12,7 @@
     "myListings": "My listings",
     "offers": "Offers",
     "orders": "Orders",
+    "pickups": "Pickups",
     "tools": "Tools",
     "freeItems": "Free items",
     "collections": "Collections",
@@ -344,7 +345,23 @@
   },
   "pickup": {
     "chooseSlot": "Pickup slot",
-    "slotFallback": "Slot {{id}}"
+    "slotFallback": "Slot {{id}}",
+    "myEyebrow": "Click-and-collect",
+    "myTitle": "My pickups",
+    "mySubtitle": "Show pickup reservations and QR codes for marketplace orders.",
+    "openOrders": "Open marketplace orders",
+    "noPickups": "No pickup reservations yet",
+    "noPickupsHint": "Pickup reservations from marketplace checkout will appear here.",
+    "order": "Order #{{order}}",
+    "window": "Pickup window: {{time}}",
+    "windowRange": "{{start}} to {{end}}",
+    "showCode": "Show this code at pickup",
+    "status": {
+      "reserved": "Reserved",
+      "picked_up": "Picked up",
+      "cancelled": "Cancelled",
+      "no_show": "No show"
+    }
   },
   "seller": {
     "eyebrow": "Seller profile",

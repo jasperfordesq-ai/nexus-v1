@@ -218,26 +218,32 @@ function MarketplaceScreen() {
                     <Ionicons name="receipt-outline" size={16} color={primary} />
                     <HeroButton.Label>{t('actions.orders')}</HeroButton.Label>
                   </HeroButton>
+                  <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-pickups' as Href)}>
+                    <Ionicons name="qr-code-outline" size={16} color={primary} />
+                    <HeroButton.Label>{t('actions.pickups')}</HeroButton.Label>
+                  </HeroButton>
+                </View>
+                <View className="flex-row gap-2">
                   <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-tools' as Href)}>
                     <Ionicons name="construct-outline" size={16} color={primary} />
                     <HeroButton.Label>{t('actions.tools')}</HeroButton.Label>
                   </HeroButton>
-                </View>
-                <View className="flex-row gap-2">
                   <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-free' as Href)}>
                     <Ionicons name="gift-outline" size={16} color={theme.success} />
                     <HeroButton.Label>{t('actions.freeItems')}</HeroButton.Label>
                   </HeroButton>
+                </View>
+                <View className="flex-row gap-2">
                   <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-collections' as Href)}>
                     <Ionicons name="folder-open-outline" size={16} color={primary} />
                     <HeroButton.Label>{t('actions.collections')}</HeroButton.Label>
                   </HeroButton>
-                </View>
-                <View className="flex-row gap-2">
                   <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-search' as Href)}>
                     <Ionicons name="options-outline" size={16} color={primary} />
                     <HeroButton.Label>{t('actions.search')}</HeroButton.Label>
                   </HeroButton>
+                </View>
+                <View className="flex-row gap-2">
                   <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-map' as Href)}>
                     <Ionicons name="map-outline" size={16} color={primary} />
                     <HeroButton.Label>{t('actions.nearby')}</HeroButton.Label>

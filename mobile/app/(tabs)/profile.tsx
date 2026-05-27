@@ -59,6 +59,7 @@ const MARKETPLACE: MenuItem[] = [
   { labelKey: 'marketplaceSell', descriptionKey: 'navDescriptions.marketplaceSell', icon: 'add-circle-outline', route: '/(modals)/new-marketplace-listing' as Href, tone: '#22c55e', featureGate: 'marketplace' },
   { labelKey: 'marketplaceMyListings', descriptionKey: 'navDescriptions.marketplaceMyListings', icon: 'albums-outline', route: '/(modals)/marketplace-my-listings' as Href, tone: '#6366f1', featureGate: 'marketplace' },
   { labelKey: 'marketplaceOrders', descriptionKey: 'navDescriptions.marketplaceOrders', icon: 'receipt-outline', route: '/(modals)/marketplace-orders' as Href, tone: '#f97316', featureGate: 'marketplace' },
+  { labelKey: 'marketplacePickups', descriptionKey: 'navDescriptions.marketplacePickups', icon: 'qr-code-outline', route: '/(modals)/marketplace-pickups' as Href, tone: '#0ea5e9', featureGate: 'marketplace' },
   { labelKey: 'marketplaceOffers', descriptionKey: 'navDescriptions.marketplaceOffers', icon: 'pricetag-outline', route: '/(modals)/marketplace-offers' as Href, tone: '#14b8a6', featureGate: 'marketplace' },
   { labelKey: 'marketplaceSaved', descriptionKey: 'navDescriptions.marketplaceSaved', icon: 'folder-open-outline', route: '/(modals)/marketplace-collections' as Href, tone: '#8b5cf6', featureGate: 'marketplace' },
   { labelKey: 'marketplaceTools', descriptionKey: 'navDescriptions.marketplaceTools', icon: 'construct-outline', route: '/(modals)/marketplace-tools' as Href, tone: '#64748b', featureGate: 'marketplace' },

@@ -257,10 +257,12 @@ export interface MarketplacePickupReservation {
   slot_id?: number;
   order_id: number;
   listing_id?: number;
+  listing_title?: string | null;
   qr_code?: string;
   status: string;
   reserved_at?: string | null;
   picked_up_at?: string | null;
+  slot?: { slot_start?: string | null; slot_end?: string | null } | null;
 }
 
 export interface MarketplacePickupSlotOption {
