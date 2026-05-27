@@ -851,6 +851,7 @@ class AdminEnterpriseController extends BaseApiController
 
             // Invalidate cache (outside transaction — non-critical)
             try { app(\App\Services\RedisCache::class)->delete('tenant_bootstrap', $tenantId); } catch (\Throwable $e) { \Illuminate\Support\Facades\Log::warning('[AdminEnterprise] Cache invalidation failed: ' . $e->getMessage()); }
+            try { app(\App\Services\TenantSettingsService::class)->clearCacheForTenant($tenantId); } catch (\Throwable $e) { \Illuminate\Support\Facades\Log::warning('[AdminEnterprise] Tenant settings cache invalidation failed: ' . $e->getMessage()); }
 
             // Return full merged view by re-reading
             return $this->config();

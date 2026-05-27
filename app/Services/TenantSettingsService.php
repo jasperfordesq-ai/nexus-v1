@@ -295,21 +295,33 @@ class TenantSettingsService
 
         try {
             return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($tenantId) {
-                $rows = DB::select(
-                    "SELECT setting_key, setting_value FROM tenant_settings WHERE tenant_id = ?",
-                    [$tenantId]
-                );
-
-                $settings = [];
-                foreach ($rows as $row) {
-                    $settings[$row->setting_key] = $row->setting_value;
-                }
-                return $settings;
+                return $this->loadAllFromDatabase($tenantId);
             });
         } catch (\Throwable $e) {
-            // If DB/cache fails, return empty to avoid blocking login
-            \Illuminate\Support\Facades\Log::warning('[TenantSettingsService] loadAll failed for tenant ' . $tenantId . ': ' . $e->getMessage());
-            return [];
+            \Illuminate\Support\Facades\Log::warning('[TenantSettingsService] cache load failed for tenant ' . $tenantId . ': ' . $e->getMessage());
+
+            try {
+                return $this->loadAllFromDatabase($tenantId);
+            } catch (\Throwable $fallbackError) {
+                // If both cache and DB fail, return empty to avoid blocking login.
+                \Illuminate\Support\Facades\Log::warning('[TenantSettingsService] DB fallback failed for tenant ' . $tenantId . ': ' . $fallbackError->getMessage());
+                return [];
+            }
         }
+    }
+
+    private function loadAllFromDatabase(int $tenantId): array
+    {
+        $rows = DB::select(
+            "SELECT setting_key, setting_value FROM tenant_settings WHERE tenant_id = ?",
+            [$tenantId]
+        );
+
+        $settings = [];
+        foreach ($rows as $row) {
+            $settings[$row->setting_key] = $row->setting_value;
+        }
+
+        return $settings;
     }
 }

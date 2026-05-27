@@ -1053,6 +1053,7 @@ class AdminConfigController extends BaseApiController
         ]);
 
         $this->redisCache->delete('tenant_bootstrap', $tenantId);
+        $this->tenantSettingsService->clearCacheForTenant($tenantId);
 
         return $this->respondWithData([
             'updated' => true,

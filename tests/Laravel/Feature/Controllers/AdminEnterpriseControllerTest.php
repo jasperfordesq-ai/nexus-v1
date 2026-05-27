@@ -8,6 +8,7 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -212,6 +213,49 @@ class AdminEnterpriseControllerTest extends TestCase
         $response = $this->apiGet('/v2/admin/enterprise/config');
 
         $response->assertStatus(403);
+    }
+
+    public function test_disabling_registration_through_enterprise_config_updates_public_registration_status_after_cache_warm(): void
+    {
+        DB::table('tenant_registration_policies')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId],
+            [
+                'registration_mode' => 'open',
+                'verification_level' => 'none',
+                'post_verification' => 'activate',
+                'fallback_mode' => 'none',
+                'require_email_verify' => 1,
+                'is_active' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+        DB::table('tenant_settings')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId, 'setting_key' => 'general.registration_mode'],
+            [
+                'setting_value' => 'open',
+                'setting_type' => 'string',
+                'updated_at' => now(),
+            ]
+        );
+        app(\App\Services\TenantSettingsService::class)->clearCacheForTenant($this->testTenantId);
+
+        $this->apiGet('/v2/auth/registration-info')
+            ->assertStatus(200)
+            ->assertJsonPath('data.can_register', true);
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $this->apiPut('/v2/admin/enterprise/config', [
+            'registration_enabled' => false,
+        ])->assertStatus(200);
+
+        $this->apiGet('/v2/auth/registration-info')
+            ->assertStatus(200)
+            ->assertJsonPath('data.can_register', false)
+            ->assertJsonPath('data.is_closed', true)
+            ->assertJsonPath('data.registration_mode', 'closed');
     }
 
     // ================================================================

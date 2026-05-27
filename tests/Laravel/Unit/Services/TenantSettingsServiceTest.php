@@ -30,6 +30,26 @@ class TenantSettingsServiceTest extends TestCase
         $this->assertEquals('default_val', $result);
     }
 
+    public function test_get_falls_back_to_database_when_cache_read_fails(): void
+    {
+        Cache::shouldReceive('remember')
+            ->once()
+            ->andThrow(new \RuntimeException('cache unavailable'));
+        DB::shouldReceive('select')
+            ->once()
+            ->with('SELECT setting_key, setting_value FROM tenant_settings WHERE tenant_id = ?', [2])
+            ->andReturn([
+                (object) [
+                    'setting_key' => 'general.registration_mode',
+                    'setting_value' => 'closed',
+                ],
+            ]);
+
+        $result = $this->service->get(2, 'general.registration_mode', 'open');
+
+        $this->assertSame('closed', $result);
+    }
+
     public function test_getBool_returns_default_when_null(): void
     {
         Cache::shouldReceive('remember')->andReturn([]);
