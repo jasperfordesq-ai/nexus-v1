@@ -14,7 +14,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import Clock from 'lucide-react/icons/clock';
 import ListTodo from 'lucide-react/icons/list-todo';
@@ -659,7 +659,7 @@ export function DashboardPage() {
           <motion.div variants={itemVariants} className="md:col-span-2">
             <GlassCard className="p-5 sm:p-6">
               <SectionHeader icon={<Sparkles className="w-4 h-4 text-emerald-500 dark:text-emerald-400" aria-hidden="true" />} iconColor="emerald" title={t('sections.quick_actions')} />
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+              <div className="grid grid-cols-[repeat(auto-fit,minmax(7.5rem,1fr))] gap-3">
                 <QuickActionLink to={tenantPath('/listings/create')} icon={<Plus aria-hidden="true" />} label={t('quick_actions.create_listing')} />
                 <QuickActionLink to={tenantPath('/messages')} icon={<MessageSquare aria-hidden="true" />} label={t('quick_actions.messages')} />
                 <QuickActionLink to={tenantPath('/wallet')} icon={<Wallet aria-hidden="true" />} label={t('quick_actions.view_wallet')} />
@@ -710,11 +710,12 @@ function QuickActionLink({ to, icon, label }: QuickActionLinkProps) {
     <Button
       as={Link}
       to={to}
-      variant="tertiary"
-      className="min-h-24 min-w-0 flex-col gap-2 rounded-lg border border-theme-default bg-theme-elevated px-3 py-3 text-center text-theme-secondary data-[hover=true]:border-theme-default data-[hover=true]:bg-theme-hover data-[hover=true]:text-theme-primary"
+      fullWidth
+      variant="secondary"
+      className="min-h-24 min-w-0 flex-col items-center justify-center gap-2 rounded-lg border border-border bg-surface-secondary px-3 py-3 text-center text-foreground shadow-none transition-colors data-[hover=true]:border-accent data-[hover=true]:bg-surface-tertiary"
     >
-      <span className="text-[var(--color-primary)] [&>svg]:h-5 [&>svg]:w-5">{icon}</span>
-      <span className="max-w-full whitespace-normal break-words text-center text-xs font-medium leading-tight">{label}</span>
+      <span className="text-accent [&>svg]:h-5 [&>svg]:w-5">{icon}</span>
+      <span className="max-w-full whitespace-normal break-words text-center text-xs font-semibold leading-snug">{label}</span>
     </Button>
   );
 }
