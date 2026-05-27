@@ -538,7 +538,7 @@ export function ImpactReport() {
 
       <div className="mb-2">
         <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-          <Sparkles size={20} className="text-accent" />
+          <Sparkles size={20} className="text-accent" aria-hidden="true" />
           {t('impact.section_sroi')}
         </h2>
         <p className="text-sm text-muted mt-0.5">
@@ -636,7 +636,7 @@ export function ImpactReport() {
           <Separator className="mb-6" />
           <div className="mb-2">
             <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-              <Lightbulb size={20} className="text-warning" />
+              <Lightbulb size={20} className="text-warning" aria-hidden="true" />
               {t('impact.section_skills_events')}
             </h2>
             <p className="text-sm text-muted mt-0.5">
@@ -684,7 +684,7 @@ export function ImpactReport() {
           {extras.skills && (
             <Card  className="mb-8">
               <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-                <Lightbulb size={18} className="text-warning" />
+                <Lightbulb size={18} className="text-warning" aria-hidden="true" />
                 <h3 className="font-semibold">{t('impact.section_skills_overview')}</h3>
               </CardHeader>
               <CardBody className="px-4 pb-4">
@@ -718,7 +718,7 @@ export function ImpactReport() {
 
       <div className="mb-2">
         <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-          <Activity size={20} className="text-success" />
+          <Activity size={20} className="text-success" aria-hidden="true" />
           {t('impact.section_community_health')}
         </h2>
         <p className="text-sm text-muted mt-0.5">
@@ -816,12 +816,12 @@ export function ImpactReport() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 mb-8">
         <Card>
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <Clock size={18} className="text-accent" />
+            <Clock size={18} className="text-accent" aria-hidden="true" />
             <h3 className="font-semibold">{t('impact.chart_hours_exchanged_title')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
-              <div className="flex h-[300px] items-center justify-center">
+              <div className="flex h-[300px] items-center justify-center" role="status" aria-busy="true" aria-label={t('common.loading')}>
                 <Spinner />
               </div>
             ) : chartData.length > 0 ? (
@@ -857,12 +857,12 @@ export function ImpactReport() {
 
         <Card>
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <Activity size={18} className="text-success" />
+            <Activity size={18} className="text-success" aria-hidden="true" />
             <h3 className="font-semibold">{t('impact.chart_activity_breakdown_title')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
-              <div className="flex h-[300px] items-center justify-center">
+              <div className="flex h-[300px] items-center justify-center" role="status" aria-busy="true" aria-label={t('common.loading')}>
                 <Spinner />
               </div>
             ) : chartData.length > 0 ? (
@@ -891,7 +891,7 @@ export function ImpactReport() {
       {extras?.summary && (
         <Card  className="mb-8">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <Sparkles size={18} className="text-success" />
+            <Sparkles size={18} className="text-success" aria-hidden="true" />
             <h3 className="font-semibold">{t('impact.section_impact_summary')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">

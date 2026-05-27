@@ -144,7 +144,7 @@ export default function AiModuleDocsAdminPage() {
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center gap-3">
-        <BookOpen size={28} className="text-accent" />
+        <BookOpen size={28} className="text-accent" aria-hidden="true" />
         <div>
           <h1 className="text-2xl font-bold">{t('ai.module_docs.meta.title')}</h1>
           <p className="text-sm text-muted">

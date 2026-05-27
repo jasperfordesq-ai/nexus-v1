@@ -203,10 +203,10 @@ export function ProvisioningRequestsPage() {
 
       {/* Grid */}
       {loading ? (
-        <div className="flex justify-center py-12"><Spinner size="lg" /></div>
+        <div className="flex justify-center py-12" role="status" aria-busy="true" aria-label={t('loading')}><Spinner size="lg" /></div>
       ) : requests.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
-          <Building className="w-12 h-12 mx-auto mb-3 opacity-30" />
+          <Building className="w-12 h-12 mx-auto mb-3 opacity-30" aria-hidden="true" />
           <p>{t('empty_status')}</p>
         </div>
       ) : (
@@ -229,7 +229,7 @@ export function ProvisioningRequestsPage() {
                   <Chip size="sm" color={statusColor(req.status)} variant="soft">{req.status}</Chip>
                 </div>
                 <p className="text-xs text-gray-500 truncate">
-                  <Globe className="inline w-3 h-3 mr-1" />/{req.requested_slug}
+                  <Globe className="inline w-3 h-3 mr-1" aria-hidden="true" />/{req.requested_slug}
                 </p>
                 <p className="text-xs text-gray-400 truncate">{req.applicant_name} — {req.applicant_email}</p>
                 <p className="text-xs text-gray-400">
@@ -247,7 +247,7 @@ export function ProvisioningRequestsPage() {
           {selected && (
             <>
               <ModalHeader className="flex items-center gap-2">
-                <Building className="w-5 h-5 text-indigo-500" />
+                <Building className="w-5 h-5 text-indigo-500" aria-hidden="true" />
                 {selected.org_name}
                 <Chip size="sm" color={statusColor(selected.status)} variant="soft">
                   {selected.status}

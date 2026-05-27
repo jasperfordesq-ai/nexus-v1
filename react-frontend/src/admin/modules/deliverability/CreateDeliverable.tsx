@@ -89,7 +89,7 @@ export function CreateDeliverable() {
       />
 
       <Card >
-        <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Target size={20} /> {t('deliverability.details_heading')}</h3></CardHeader>
+        <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Target size={20} aria-hidden="true" /> {t('deliverability.details_heading')}</h3></CardHeader>
         <CardBody className="gap-4">
           <Input
             label={t('deliverability.title_label')}

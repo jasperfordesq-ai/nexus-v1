@@ -99,7 +99,7 @@ export default function PerformanceDashboard() {
         <Card className="p-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-accent/10 rounded-lg">
-              <Activity className="w-5 h-5 text-accent" />
+              <Activity className="w-5 h-5 text-accent" aria-hidden="true" />
             </div>
             <div>
               <div className="text-sm text-muted">{t('performance.label_total_requests')}</div>
@@ -111,7 +111,7 @@ export default function PerformanceDashboard() {
         <Card className="p-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-warning/10 rounded-lg">
-              <Clock className="w-5 h-5 text-warning" />
+              <Clock className="w-5 h-5 text-warning" aria-hidden="true" />
             </div>
             <div>
               <div className="text-sm text-muted">{t('performance.label_slow_queries')}</div>
@@ -123,7 +123,7 @@ export default function PerformanceDashboard() {
         <Card className="p-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-danger/10 rounded-lg">
-              <AlertTriangle className="w-5 h-5 text-danger" />
+              <AlertTriangle className="w-5 h-5 text-danger" aria-hidden="true" />
             </div>
             <div>
               <div className="text-sm text-muted">{t('performance.label_n_plus_one_warnings')}</div>
@@ -135,7 +135,7 @@ export default function PerformanceDashboard() {
         <Card className="p-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-accent-soft rounded-lg">
-              <MemoryStick className="w-5 h-5 text-accent" />
+              <MemoryStick className="w-5 h-5 text-accent" aria-hidden="true" />
             </div>
             <div>
               <div className="text-sm text-muted">{t('performance.label_memory_spikes')}</div>
@@ -211,7 +211,7 @@ export default function PerformanceDashboard() {
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
-                  <Database className="w-4 h-4 text-accent" />
+                  <Database className="w-4 h-4 text-accent" aria-hidden="true" />
                   <span className="text-sm text-muted">{formatTimestamp(query.timestamp)}</span>
                 </div>
                 <code className="text-sm bg-surface-secondary dark:bg-surface-secondary p-2 rounded block overflow-x-auto">
@@ -253,7 +253,7 @@ export default function PerformanceDashboard() {
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
-                  <MemoryStick className="w-4 h-4 text-accent" />
+                  <MemoryStick className="w-4 h-4 text-accent" aria-hidden="true" />
                   <code className="text-sm truncate">{spike.endpoint}</code>
                 </div>
                 <div className="flex items-center gap-4 text-sm text-muted">
@@ -314,7 +314,7 @@ export default function PerformanceDashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-96">
+      <div className="flex items-center justify-center h-96" role="status" aria-busy="true" aria-label={t('common.loading')}>
         <Spinner size="lg" />
       </div>
     );
@@ -325,7 +325,7 @@ export default function PerformanceDashboard() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Zap className="w-7 h-7 text-accent" />
+            <Zap className="w-7 h-7 text-accent" aria-hidden="true" />
             {t('performance.page_title')}
           </h1>
           <p className="text-muted mt-1">
@@ -390,7 +390,7 @@ export default function PerformanceDashboard() {
       {summary && summary.n_plus_one_warnings > 0 && (
         <Card className="p-4 mt-6 border-l-4 border-warning">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-warning mt-0.5" />
+            <AlertTriangle className="w-5 h-5 text-warning mt-0.5" aria-hidden="true" />
             <div>
               <h3 className="font-semibold text-warning mb-1">{t('performance.n_plus_one_title')}</h3>
               <p className="text-sm text-muted">

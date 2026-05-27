@@ -157,7 +157,7 @@ export default function RegionalAnalyticsAdminPage() {
       <Card >
         <CardBody className="p-0">
           {loading ? (
-            <div className="p-10 flex justify-center">
+            <div className="p-10 flex justify-center" role="status" aria-busy="true" aria-label={t('common.loading')}>
               <Spinner />
             </div>
           ) : subs.length === 0 ? (
@@ -271,11 +271,11 @@ export default function RegionalAnalyticsAdminPage() {
       <Modal isOpen={logSub !== null} onClose={() => setLogSub(null)} size="3xl">
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <BarChart3 size={18} /> {t('regional_analytics_admin.access_log.title', { name: logSub?.partner_name })}
+            <BarChart3 size={18} aria-hidden="true" /> {t('regional_analytics_admin.access_log.title', { name: logSub?.partner_name })}
           </ModalHeader>
           <ModalBody>
             {logLoading ? (
-              <div className="p-6 flex justify-center">
+              <div className="p-6 flex justify-center" role="status" aria-busy="true" aria-label={t('common.loading')}>
                 <Spinner />
               </div>
             ) : log.length === 0 ? (

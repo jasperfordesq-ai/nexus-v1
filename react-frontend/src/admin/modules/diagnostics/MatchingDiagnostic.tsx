@@ -102,7 +102,7 @@ export function MatchingDiagnostic() {
 
       <div className="space-y-4">
         <Card >
-          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Stethoscope size={20} /> {t('diagnostics.diagnose_user_matches')}</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Stethoscope size={20} aria-hidden="true" /> {t('diagnostics.diagnose_user_matches')}</h3></CardHeader>
           <CardBody className="gap-4">
             <p className="text-sm text-muted">{t('diagnostics.diagnose_user_matches_desc')}</p>
             <div className="flex gap-3">
@@ -164,7 +164,7 @@ export function MatchingDiagnostic() {
           <CardHeader><h3 className="text-lg font-semibold">{t('diagnostics.engine_status')}</h3></CardHeader>
           <CardBody>
             {loadingEngine ? (
-              <div className="flex justify-center py-4"><Spinner size="sm" /></div>
+              <div className="flex justify-center py-4" role="status" aria-busy="true" aria-label={t('common.loading')}><Spinner size="sm" /></div>
             ) : (
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <div className="rounded-lg border border-border p-3 text-center">

@@ -119,7 +119,7 @@ export function SmartMatchUsers() {
     return (
       <div>
         <PageHeader title={"Smart Match Users"} description={"View and manage users participating in the smart matching system"} />
-        <div className="flex justify-center py-12"><Spinner size="lg" /></div>
+        <div className="flex justify-center py-12" role="status" aria-busy="true" aria-label="Loading"><Spinner size="lg" /></div>
       </div>
     );
   }

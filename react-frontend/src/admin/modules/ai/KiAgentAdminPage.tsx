@@ -344,7 +344,7 @@ export default function KiAgentAdminPage() {
     <div className="space-y-6 p-6">
       {/* Page header */}
       <div className="flex items-center gap-3">
-        <Brain size={28} className="text-accent" />
+        <Brain size={28} className="text-accent" aria-hidden="true" />
         <div>
           <h1 className="text-2xl font-bold">{t('ai.ki_agents.meta.title')}</h1>
           <p className="text-sm text-muted">
@@ -395,7 +395,7 @@ export default function KiAgentAdminPage() {
           key="config"
           title={
             <div className="flex items-center gap-2">
-              <Zap size={16} />
+              <Zap size={16} aria-hidden="true" />
               <span>{t('ai.ki_agents.tabs.config')}</span>
             </div>
           }
@@ -515,7 +515,7 @@ export default function KiAgentAdminPage() {
             </div>
           ) : (
             <Card className="mt-4 border border-border">
-              <CardBody className="flex flex-row items-center gap-3 text-sm text-muted">
+              <CardBody className="flex flex-row items-center gap-3 text-sm text-muted" role="status" aria-busy="true" aria-label={t('ai.ki_agents.empty.loading_config')}>
                 <Spinner size="sm" />
                 {t('ai.ki_agents.empty.loading_config')}
               </CardBody>
@@ -530,7 +530,7 @@ export default function KiAgentAdminPage() {
           key="proposals"
           title={
             <div className="flex items-center gap-2">
-              <Activity size={16} />
+              <Activity size={16} aria-hidden="true" />
               <span>
                 {t('ai.ki_agents.tabs.proposals')}{pendingCount > 0 && ` (${pendingCount})`}
               </span>
@@ -668,7 +668,7 @@ export default function KiAgentAdminPage() {
           key="runs"
           title={
             <div className="flex items-center gap-2">
-              <BarChart3 size={16} />
+              <BarChart3 size={16} aria-hidden="true" />
               <span>{t('ai.ki_agents.tabs.runs')}</span>
             </div>
           }
@@ -676,7 +676,7 @@ export default function KiAgentAdminPage() {
           <div className="mt-4 space-y-4">
             {/* Trigger run */}
             <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border p-4">
-              <Bot size={20} className="text-accent" />
+              <Bot size={20} className="text-accent" aria-hidden="true" />
               <p className="font-semibold text-sm">{t('ai.ki_agents.runs.trigger_title')}</p>
               <Select
                 size="sm"
@@ -773,7 +773,7 @@ export default function KiAgentAdminPage() {
           {(onClose) => (
             <>
               <ModalHeader className="flex items-center gap-2">
-                <Bot size={18} />
+                <Bot size={18} aria-hidden="true" />
                 {t('ai.ki_agents.run_detail.title', { id: selectedRun?.id ?? empty, type: selectedRun ? agentTypeText(selectedRun.agent_type) : '' })}
               </ModalHeader>
               <ModalBody>

@@ -60,7 +60,7 @@ export function DeliverabilityDashboard() {
     return (
       <div>
         <PageHeader title={t('deliverability.deliverability_dashboard_title')} description={t('deliverability.deliverability_dashboard_desc')} />
-        <div className="flex justify-center py-12"><Spinner size="lg" /></div>
+        <div className="flex justify-center py-12" role="status" aria-busy="true" aria-label={t('common.loading')}><Spinner size="lg" /></div>
       </div>
     );
   }
@@ -105,7 +105,7 @@ export function DeliverabilityDashboard() {
             </div>
           ) : (
             <div className="flex flex-col items-center py-8 text-muted">
-              <Target size={40} className="mb-3" />
+              <Target size={40} className="mb-3" aria-hidden="true" />
               <p>{t('deliverability.empty_dashboard')}</p>
             </div>
           )}

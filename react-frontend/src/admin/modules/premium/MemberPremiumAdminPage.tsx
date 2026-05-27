@@ -198,7 +198,7 @@ export function MemberPremiumAdminPage() {
       />
 
       {loading ? (
-        <div className="flex justify-center py-10">
+        <div className="flex justify-center py-10" role="status" aria-busy="true" aria-label={t('common.loading')}>
           <Spinner />
         </div>
       ) : tiers.length === 0 ? (

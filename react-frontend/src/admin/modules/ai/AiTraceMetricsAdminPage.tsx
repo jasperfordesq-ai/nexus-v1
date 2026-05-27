@@ -73,7 +73,7 @@ export default function AiTraceMetricsAdminPage() {
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center gap-3">
-        <BarChart3 size={28} className="text-accent" />
+        <BarChart3 size={28} className="text-accent" aria-hidden="true" />
         <div>
           <h1 className="text-2xl font-bold">{t('ai.trace_metrics.meta.title')}</h1>
           <p className="text-sm text-muted">
@@ -115,7 +115,7 @@ export default function AiTraceMetricsAdminPage() {
               ))}
             </div>
           ) : loading ? (
-            <div className="flex items-center gap-2 text-sm text-muted">
+            <div className="flex items-center gap-2 text-sm text-muted" role="status" aria-busy="true" aria-label={t('ai.trace_metrics.empty.loading_tools')}>
               <Spinner size="sm" />
               {t('ai.trace_metrics.empty.loading_tools')}
             </div>
@@ -179,7 +179,7 @@ function Stat({ icon: Icon, label, value, loading, color = 'default' }: StatProp
     <Card>
       <CardBody className="p-3 gap-1">
         <div className={`flex items-center gap-2 text-xs text-muted`}>
-          <Icon size={14} className={tint} />
+          <Icon size={14} className={tint} aria-hidden="true" />
           {label}
         </div>
         <p className="text-2xl font-bold">{loading ? '…' : value}</p>

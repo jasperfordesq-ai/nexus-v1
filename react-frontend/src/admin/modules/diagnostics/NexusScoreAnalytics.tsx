@@ -55,7 +55,7 @@ export function NexusScoreAnalytics() {
     return (
       <div>
         <PageHeader title={t('diagnostics.nexus_score_analytics_title')} description={t('diagnostics.nexus_score_analytics_desc')} />
-        <div className="flex justify-center py-12"><Spinner size="lg" /></div>
+        <div className="flex justify-center py-12" role="status" aria-busy="true" aria-label={t('common.loading')}><Spinner size="lg" /></div>
       </div>
     );
   }
@@ -106,7 +106,7 @@ export function NexusScoreAnalytics() {
               </div>
             ) : (
               <div className="flex flex-col items-center py-8 text-muted">
-                <BarChart3 size={40} className="mb-3" />
+                <BarChart3 size={40} className="mb-3" aria-hidden="true" />
                 <p>{t('diagnostics.score_distribution_empty')}</p>
               </div>
             )}

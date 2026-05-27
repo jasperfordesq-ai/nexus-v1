@@ -108,7 +108,7 @@ export function MemberPremiumSubscribersPage() {
       <Card>
         <CardBody className="p-0">
           {loading ? (
-            <div className="flex justify-center py-10"><Spinner /></div>
+            <div className="flex justify-center py-10" role="status" aria-busy="true" aria-label={t('common.loading')}><Spinner /></div>
           ) : rows.length === 0 ? (
             <div className="text-center py-10 text-muted">{t('member_premium_admin.subscribers_page.empty')}</div>
           ) : (

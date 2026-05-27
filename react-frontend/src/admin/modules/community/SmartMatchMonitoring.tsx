@@ -44,7 +44,7 @@ export function SmartMatchMonitoring() {
     return (
       <div>
         <PageHeader title={t('community.smart_match_monitoring_title')} description={t('community.smart_match_monitoring_desc')} />
-        <div className="flex justify-center py-12"><Spinner size="lg" /></div>
+        <div className="flex justify-center py-12" role="status" aria-busy="true" aria-label={t('common.loading')}><Spinner size="lg" /></div>
       </div>
     );
   }
@@ -122,7 +122,7 @@ export function SmartMatchMonitoring() {
               </div>
             ) : (
               <div className="flex flex-col items-center py-8 text-muted">
-                <Activity size={40} className="mb-3" />
+                <Activity size={40} className="mb-3" aria-hidden="true" />
                 <p>{t('community.no_monitoring_data')}</p>
                 <p className="text-xs mt-1">{t('community.configure_matching_hint')}</p>
               </div>
@@ -144,7 +144,7 @@ export function SmartMatchMonitoring() {
               </div>
             ) : (
               <div className="flex flex-col items-center py-8 text-muted">
-                <BarChart3 size={40} className="mb-3" />
+                <BarChart3 size={40} className="mb-3" aria-hidden="true" />
                 <p className="text-sm">{t('community.no_score_distribution')}</p>
               </div>
             )}

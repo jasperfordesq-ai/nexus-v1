@@ -53,7 +53,7 @@ export function DeliverabilityAnalytics() {
     return (
       <div>
         <PageHeader title={t('deliverability.deliverability_analytics_title')} description={t('deliverability.deliverability_analytics_desc')} />
-        <div className="flex justify-center py-12"><Spinner size="lg" /></div>
+        <div className="flex justify-center py-12" role="status" aria-busy="true" aria-label={t('common.loading')}><Spinner size="lg" /></div>
       </div>
     );
   }
@@ -64,7 +64,7 @@ export function DeliverabilityAnalytics() {
         <PageHeader title={t('deliverability.deliverability_analytics_title')} description={t('deliverability.deliverability_analytics_desc')} />
         <Card >
           <CardBody className="flex flex-col items-center justify-center py-16 text-center">
-            <BarChart3 size={48} className="text-muted mb-3" />
+            <BarChart3 size={48} className="text-muted mb-3" aria-hidden="true" />
             <h3 className="text-lg font-semibold text-foreground">{t('deliverability.no_analytics_data')}</h3>
             <p className="mt-1 max-w-md text-sm text-muted">
               {t('deliverability.no_analytics_desc')}

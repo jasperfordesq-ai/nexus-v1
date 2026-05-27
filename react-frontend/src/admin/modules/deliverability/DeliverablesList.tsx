@@ -165,7 +165,7 @@ export function DeliverablesList() {
     return (
       <div>
         <PageHeader title={t('deliverability.deliverables_list_title')} description={t('deliverability.deliverables_list_desc')} />
-        <div className="flex justify-center py-12"><Spinner size="lg" /></div>
+        <div className="flex justify-center py-12" role="status" aria-busy="true" aria-label={t('common.loading')}><Spinner size="lg" /></div>
       </div>
     );
   }
@@ -187,8 +187,8 @@ export function DeliverablesList() {
 
       {loadError ? (
         <Card >
-          <CardBody className="flex flex-col items-center gap-3 py-10 text-center">
-            <AlertTriangle size={32} className="text-danger" />
+          <CardBody className="flex flex-col items-center gap-3 py-10 text-center" role="alert">
+            <AlertTriangle size={32} className="text-danger" aria-hidden="true" />
             <div className="text-base font-semibold">{t('common.error_loading_data')}</div>
             <div className="text-sm text-muted">{loadError}</div>
             <Button variant="tertiary" onPress={fetchData}>{t('common.retry')}</Button>

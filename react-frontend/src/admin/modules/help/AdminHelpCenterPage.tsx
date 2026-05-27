@@ -124,7 +124,7 @@ export default function AdminHelpCenterPage() {
       {/* Empty state */}
       {isEmpty && (
         <div className="flex flex-col items-center gap-3 py-16 text-center text-muted">
-          <SearchIcon size={40} className="opacity-40" />
+          <SearchIcon size={40} className="opacity-40" aria-hidden="true" />
           <p className="text-sm">{t('admin_help.no_matches')}</p>
         </div>
       )}
@@ -153,7 +153,7 @@ export default function AdminHelpCenterPage() {
                   className="transition-shadow hover:shadow-md"
                 >
                   <CardHeader className="flex items-start gap-2 pb-1">
-                    <BookOpen size={16} className="mt-0.5 shrink-0 text-accent" />
+                    <BookOpen size={16} className="mt-0.5 shrink-0 text-accent" aria-hidden="true" />
                     <span className="text-sm font-semibold text-foreground leading-snug">
                       {article.title}
                     </span>

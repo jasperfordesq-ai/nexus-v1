@@ -365,7 +365,7 @@ export function FadpAdminPage() {
       <div className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-border bg-surface p-5 shadow-sm">
         <div className="min-w-0">
           <h1 className="flex items-center gap-2 text-2xl font-bold text-[var(--color-text)]">
-            <ShieldCheck className="text-danger-500" size={24} />
+            <ShieldCheck className="text-danger-500" size={24} aria-hidden="true" />
             {t('fadp.header.title')}
           </h1>
           <p className="mt-1 max-w-3xl text-sm text-muted">
@@ -388,7 +388,7 @@ export function FadpAdminPage() {
       </div>
 
       <Tabs aria-label={t('fadp.tabs.aria')} variant="underlined">
-        <Tab key="register" title={<span className="flex items-center gap-2"><FileText size={14} />{t('fadp.tabs.register')}</span>}>
+        <Tab key="register" title={<span className="flex items-center gap-2"><FileText size={14} aria-hidden="true" />{t('fadp.tabs.register')}</span>}>
           <div className="space-y-4 pt-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="max-w-3xl text-sm text-muted">
@@ -405,7 +405,7 @@ export function FadpAdminPage() {
             </div>
 
             {activitiesLoading ? (
-              <div className="flex justify-center py-12"><Spinner /></div>
+              <div className="flex justify-center py-12" role="status" aria-busy="true" aria-label={t('common.loading')}><Spinner /></div>
             ) : (
               <Card >
                 <CardBody className="p-0">
@@ -485,10 +485,10 @@ export function FadpAdminPage() {
           </div>
         </Tab>
 
-        <Tab key="retention" title={<span className="flex items-center gap-2"><Database size={14} />{t('fadp.tabs.retention')}</span>}>
+        <Tab key="retention" title={<span className="flex items-center gap-2"><Database size={14} aria-hidden="true" />{t('fadp.tabs.retention')}</span>}>
           <div className="max-w-2xl space-y-6 pt-4">
             {retentionLoading ? (
-              <div className="flex justify-center py-12"><Spinner /></div>
+              <div className="flex justify-center py-12" role="status" aria-busy="true" aria-label={t('common.loading')}><Spinner /></div>
             ) : (
               <>
                 <Card >
@@ -557,7 +557,7 @@ export function FadpAdminPage() {
           </div>
         </Tab>
 
-        <Tab key="ledger" title={<span className="flex items-center gap-2"><ShieldCheck size={14} />{t('fadp.tabs.ledger')}</span>}>
+        <Tab key="ledger" title={<span className="flex items-center gap-2"><ShieldCheck size={14} aria-hidden="true" />{t('fadp.tabs.ledger')}</span>}>
           <div className="space-y-4 pt-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="max-w-3xl text-sm text-muted">
@@ -569,7 +569,7 @@ export function FadpAdminPage() {
             </div>
 
             {consentLoading ? (
-              <div className="flex justify-center py-12"><Spinner /></div>
+              <div className="flex justify-center py-12" role="status" aria-busy="true" aria-label={t('common.loading')}><Spinner /></div>
             ) : (
               <Card >
                 <CardBody className="p-0">
@@ -622,7 +622,7 @@ export function FadpAdminPage() {
           </div>
         </Tab>
 
-        <Tab key="residency" title={<span className="flex items-center gap-2"><Globe size={14} />{t('fadp.tabs.residency')}</span>}>
+        <Tab key="residency" title={<span className="flex items-center gap-2"><Globe size={14} aria-hidden="true" />{t('fadp.tabs.residency')}</span>}>
           <div className="max-w-2xl space-y-4 pt-4">
             <Card >
               <CardBody className="space-y-4 p-6">

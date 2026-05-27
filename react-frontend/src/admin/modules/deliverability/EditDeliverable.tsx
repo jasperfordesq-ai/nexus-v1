@@ -124,7 +124,7 @@ export function EditDeliverable() {
     return (
       <div>
         <PageHeader title={t('deliverability.edit_title')} description={t('deliverability.edit_description')} />
-        <div className="flex justify-center py-12"><Spinner size="lg" /></div>
+        <div className="flex justify-center py-12" role="status" aria-busy="true" aria-label={t('common.loading')}><Spinner size="lg" /></div>
       </div>
     );
   }
@@ -138,7 +138,7 @@ export function EditDeliverable() {
       />
 
       <Card >
-        <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Target size={20} /> {t('deliverability.details_heading')}</h3></CardHeader>
+        <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Target size={20} aria-hidden="true" /> {t('deliverability.details_heading')}</h3></CardHeader>
         <CardBody className="gap-4">
           <Input
             label={t('deliverability.title_label')}
