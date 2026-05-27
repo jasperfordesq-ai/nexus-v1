@@ -356,6 +356,14 @@ export interface MerchantCoupon {
   applies_to_ids?: number[] | null;
 }
 
+export type PublicMerchantCoupon = MerchantCoupon;
+
+export interface MerchantCouponQrPayload {
+  token: string;
+  expires_at: string;
+  coupon_code: string;
+}
+
 export interface MerchantCouponRedemption {
   id: number;
   coupon_id: number;
@@ -974,6 +982,18 @@ export function deleteMerchantCoupon(id: number): Promise<MarketplaceDataRespons
 
 export function getMerchantCouponRedemptions(id: number): Promise<MarketplaceDataResponse<{ items: MerchantCouponRedemption[] }>> {
   return api.get<MarketplaceDataResponse<{ items: MerchantCouponRedemption[] }>>(`${API_V2}/marketplace/seller/coupons/${id}/redemptions`);
+}
+
+export function getPublicMerchantCoupons(): Promise<MarketplaceDataResponse<{ items: PublicMerchantCoupon[] }>> {
+  return api.get<MarketplaceDataResponse<{ items: PublicMerchantCoupon[] }>>(`${API_V2}/coupons`);
+}
+
+export function getPublicMerchantCoupon(id: number): Promise<MarketplaceDataResponse<PublicMerchantCoupon>> {
+  return api.get<MarketplaceDataResponse<PublicMerchantCoupon>>(`${API_V2}/coupons/${id}`);
+}
+
+export function generatePublicMerchantCouponQr(id: number): Promise<MarketplaceDataResponse<MerchantCouponQrPayload>> {
+  return api.post<MarketplaceDataResponse<MerchantCouponQrPayload>>(`${API_V2}/coupons/${id}/qr`, {});
 }
 
 export function marketplaceNextCursor<T>(response: MarketplaceCollectionResponse<T>): string | null {

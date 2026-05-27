@@ -244,6 +244,12 @@ function MarketplaceScreen() {
                   </HeroButton>
                 </View>
                 <View className="flex-row gap-2">
+                  {hasFeature('merchant_coupons') ? (
+                    <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-coupons' as Href)}>
+                      <Ionicons name="ticket-outline" size={16} color={primary} />
+                      <HeroButton.Label>{t('actions.coupons')}</HeroButton.Label>
+                    </HeroButton>
+                  ) : null}
                   <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-map' as Href)}>
                     <Ionicons name="map-outline" size={16} color={primary} />
                     <HeroButton.Label>{t('actions.nearby')}</HeroButton.Label>

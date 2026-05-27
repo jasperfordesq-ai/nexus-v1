@@ -13,6 +13,7 @@
     "offers": "Offers",
     "orders": "Orders",
     "pickups": "Pickups",
+    "coupons": "Coupons",
     "tools": "Tools",
     "freeItems": "Free items",
     "collections": "Collections",
@@ -362,6 +363,30 @@
       "cancelled": "Cancelled",
       "no_show": "No show"
     }
+  },
+  "publicCoupons": {
+    "eyebrow": "Member coupons",
+    "title": "Marketplace coupons",
+    "subtitle": "Browse active merchant coupons and open a checkout code or in-store QR.",
+    "details": "Coupon details",
+    "code": "Coupon code",
+    "empty": "No active coupons yet",
+    "emptyHint": "Merchant coupons will appear here when sellers publish them.",
+    "unavailableTitle": "Coupons are not available",
+    "unavailableSubtitle": "This community has not enabled marketplace coupons.",
+    "notFound": "Coupon not found",
+    "backToCoupons": "Back to coupons",
+    "validUntil": "Valid until {{date}}",
+    "useOnline": "Use online",
+    "redeemInStore": "Redeem in store",
+    "generatingQr": "Generating QR",
+    "showQr": "Show QR code",
+    "qrAlt": "Coupon QR code",
+    "scanAtCheckout": "Ask the seller to scan this QR code at checkout.",
+    "qrExpires": "Expires at {{time}}",
+    "percentSuffix": "%",
+    "fixedValue": "EUR {{value}} off",
+    "bogo": "BOGO"
   },
   "seller": {
     "eyebrow": "Seller profile",

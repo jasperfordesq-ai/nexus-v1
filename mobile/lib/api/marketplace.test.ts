@@ -50,6 +50,8 @@ import {
   getMerchantCouponRedemptions,
   getMerchantOnboardingStatus,
   getNearbyMarketplaceListings,
+  getPublicMerchantCoupon,
+  getPublicMerchantCoupons,
   getMyMarketplaceListings,
   getMyMarketplacePickups,
   getMyMarketplacePromotions,
@@ -67,6 +69,7 @@ import {
   saveMerchantOnboardingStep2,
   saveMerchantOnboardingStep3,
   startMarketplaceStripeOnboarding,
+  generatePublicMerchantCouponQr,
   shipMarketplaceOrder,
   updateMarketplaceShippingOption,
   updateMarketplaceListing,
@@ -328,6 +331,15 @@ describe('marketplace api', () => {
 
     await getMerchantCouponRedemptions(5);
     expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/seller/coupons/5/redemptions');
+
+    await getPublicMerchantCoupons();
+    expect(api.get).toHaveBeenCalledWith('/api/v2/coupons');
+
+    await getPublicMerchantCoupon(7);
+    expect(api.get).toHaveBeenCalledWith('/api/v2/coupons/7');
+
+    await generatePublicMerchantCouponQr(7);
+    expect(api.post).toHaveBeenCalledWith('/api/v2/coupons/7/qr', {});
   });
 
   it('wires checkout payment, pickup reservation, and coupon validation', async () => {
