@@ -357,6 +357,7 @@ export function GroupList() {
 
       <div className="mb-4">
         <Tabs
+          aria-label={t('groups.status_tabs_aria')}
           selectedKey={status}
           onSelectionChange={(key) => { setStatus(key as string); setPage(1); }}
           variant="underlined"

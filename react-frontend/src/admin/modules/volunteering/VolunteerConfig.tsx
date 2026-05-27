@@ -135,6 +135,7 @@ export default function VolunteerConfig() {
       />
 
       <Tabs
+        aria-label={t('volunteering.config_tabs_aria')}
         selectedKey={activeTab}
         onSelectionChange={(key) => setActiveTab(String(key))}
         variant="underlined"

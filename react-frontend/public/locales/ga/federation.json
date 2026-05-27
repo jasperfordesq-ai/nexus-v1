@@ -374,7 +374,8 @@
     "accepted_success": "Ceangal glactha",
     "rejected_success": "Ceangal dhiúltaigh",
     "removed_success": "Ceangal bainte",
-    "action_failed": "Theip ar an ngníomh. Bain triail eile as."
+    "action_failed": "Theip ar an ngníomh. Bain triail eile as.",
+    "tabs_aria": "Federation connection status"
   },
   "partner_detail": {
     "page_title": "Comhphobal",

@@ -265,6 +265,7 @@ export default function Partnerships() {
       <Card>
         <CardHeader>
           <Tabs
+            aria-label={t('super.partnerships_tabs_aria')}
             selectedKey={filter}
             onSelectionChange={(key) => setFilter(key as PartnershipStatus)}
           >

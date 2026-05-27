@@ -302,6 +302,7 @@ export function VolunteerApprovals() {
     <div className="flex flex-col gap-4 rounded-2xl border border-divider/70 bg-surface p-3 shadow-sm shadow-black/[0.03]">
       {/* Status Tabs */}
       <Tabs
+        aria-label={t('volunteering.approvals_tabs_aria')}
         selectedKey={statusTab}
         onSelectionChange={(key) => { setStatusTab(key as string); setSelectedIds(new Set()); }}
         variant="underlined"

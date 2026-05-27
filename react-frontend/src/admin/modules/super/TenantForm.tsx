@@ -338,7 +338,7 @@ export function TenantForm() {
         }
       />
 
-      <Tabs variant="underlined" className="mb-4">
+      <Tabs aria-label={t('tenant_form.tabs_aria')} variant="underlined" className="mb-4">
         <Tab key="details" title={t('tenant_form.tab_details')}>
           <Card>
             <CardBody className="space-y-4 p-6">

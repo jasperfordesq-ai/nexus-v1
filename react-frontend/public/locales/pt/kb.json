@@ -51,5 +51,6 @@
   "all_categories": "Tudo",
   "author_by": "por {{name}}",
   "attachments": "Anexos",
-  "breadcrumb": "Breadcrumb"
+  "breadcrumb": "Breadcrumb",
+  "category_tabs_aria": "Knowledge base categories"
 }

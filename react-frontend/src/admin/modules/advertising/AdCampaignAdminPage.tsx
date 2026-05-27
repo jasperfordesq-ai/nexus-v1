@@ -531,6 +531,7 @@ export function AdCampaignAdminPage() {
       {/* ── Status filter tabs ── */}
       <div className="mb-4">
         <Tabs
+          aria-label={t('advertising.tabs_aria')}
           selectedKey={statusFilter}
           onSelectionChange={(key) => { setStatusFilter(key as string); setPage(1); }}
           variant="underlined"

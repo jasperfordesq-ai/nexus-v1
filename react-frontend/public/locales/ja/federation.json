@@ -374,7 +374,8 @@
     "accepted_success": "接続が受け入れられました",
     "rejected_success": "接続が拒否されました",
     "removed_success": "接続が削除されました",
-    "action_failed": "アクションが失敗しました。もう一度試してください。"
+    "action_failed": "アクションが失敗しました。もう一度試してください。",
+    "tabs_aria": "Federation connection status"
   },
   "partner_detail": {
     "page_title": "パートナーコミュニティ",

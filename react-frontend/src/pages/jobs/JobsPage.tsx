@@ -361,6 +361,7 @@ export function JobsPage() {
       {/* J1: Tabs for browse/saved */}
       {isAuthenticated && (
         <Tabs
+          aria-label={t('tabs_aria')}
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(key as string)}
           variant="underlined"

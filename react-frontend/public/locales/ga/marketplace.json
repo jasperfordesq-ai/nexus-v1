@@ -805,5 +805,11 @@
     "not_available_title": "Ag Socrú Próiseála Íocaíochtaí",
     "not_available_description": "Tá próiseáil íocaíochtaí á socrú. Déan teagmháil leis an díoltóir chun íocaíocht a shocrú."
   },
-  "breadcrumb": "Breadcrumb"
+  "breadcrumb": "Breadcrumb",
+  "buyer_orders_tabs_aria": "Buyer order status filter",
+  "collections_tabs_aria": "Marketplace collections sections",
+  "my_listings_tabs_aria": "My listings status filter",
+  "my_offers_tabs_aria": "My offers sections",
+  "seller_orders_tabs_aria": "Seller order status filter",
+  "seller_profile_tabs_aria": "Seller profile sections"
 }

@@ -445,6 +445,7 @@ export function RiskTagsPage() {
 
       <div className="mb-4">
         <Tabs
+          aria-label={t('risk_tags.tabs_aria')}
           selectedKey={riskLevel}
           onSelectionChange={(key) => setRiskLevel(key as RiskLevel)}
           variant="underlined"

@@ -241,6 +241,7 @@ export function BlogAdmin() {
 
       <div className="mb-4">
         <Tabs
+          aria-label={t('blog.tabs_aria')}
           selectedKey={status}
           onSelectionChange={(key) => { setStatus(key as string); setPage(1); }}
           variant="underlined"

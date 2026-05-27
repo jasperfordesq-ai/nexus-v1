@@ -27,5 +27,6 @@
   "match_hidden": "Dopasowanie ukryte — pokażemy Ci mniej takich",
   "page_meta": {
     "title": "Dopasowania"
-  }
+  },
+  "filter_tabs_aria": "Match source filter"
 }

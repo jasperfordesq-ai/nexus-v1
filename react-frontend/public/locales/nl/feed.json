@@ -229,7 +229,8 @@
     "file_size_mb": "{{name}} ({{size}}MB)",
     "listing_preview_alt": "Voorbeeld van vermelding",
     "image_preview_alt": "Uploadvoorbeeld",
-    "listing_type_label": "Listing type"
+    "listing_type_label": "Listing type",
+    "type_tabs_aria": "Compose content type"
   },
   "moderation": {
     "unauthorized": "Je hebt geen toestemming om deze actie uit te voeren."

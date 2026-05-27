@@ -27,5 +27,6 @@
   "not_interested": "No me interesa",
   "page_meta": {
     "title": "Coincidencias"
-  }
+  },
+  "filter_tabs_aria": "Match source filter"
 }

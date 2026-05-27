@@ -374,7 +374,8 @@
     "accepted_success": "Verbindung akzeptiert",
     "rejected_success": "Verbindung abgelehnt",
     "removed_success": "Verbindung entfernt",
-    "action_failed": "Aktion fehlgeschlagen. Bitte versuchen Sie es erneut."
+    "action_failed": "Aktion fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "tabs_aria": "Federation connection status"
   },
   "partner_detail": {
     "page_title": "Partner-Community",

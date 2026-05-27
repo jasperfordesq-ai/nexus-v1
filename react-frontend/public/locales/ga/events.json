@@ -132,7 +132,8 @@
     "join_meeting": "Bí páirteach sa chruinniú",
     "join_meeting_aria": "Glac páirt sa chruinniú do {{title}}",
     "join_waitlist_aria": "Téigh ar liosta feithimh an imeachta seo",
-    "leave_waitlist_aria": "Fág liosta feithimh an imeachta seo"
+    "leave_waitlist_aria": "Fág liosta feithimh an imeachta seo",
+    "tabs_aria": "Event detail sections"
   },
   "card": {
     "cancelled": "Cealaithe",

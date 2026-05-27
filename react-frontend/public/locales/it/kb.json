@@ -51,5 +51,6 @@
   "all_categories": "Tutto",
   "author_by": "di {{name}}",
   "attachments": "Allegati",
-  "breadcrumb": "Breadcrumb"
+  "breadcrumb": "Breadcrumb",
+  "category_tabs_aria": "Knowledge base categories"
 }

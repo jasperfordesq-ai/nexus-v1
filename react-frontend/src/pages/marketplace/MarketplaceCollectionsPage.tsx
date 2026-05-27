@@ -366,6 +366,7 @@ export function MarketplaceCollectionsPage() {
 
         {/* Tabs */}
         <Tabs
+          aria-label={t('collections_tabs_aria')}
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(key as string)}
           variant="secondary"

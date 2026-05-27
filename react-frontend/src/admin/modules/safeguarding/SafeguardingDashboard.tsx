@@ -441,6 +441,7 @@ export function SafeguardingDashboard() {
 
       {/* Tabs */}
       <Tabs
+        aria-label={t('safeguarding.tabs_aria')}
         selectedKey={activeTab}
         onSelectionChange={(key) => setActiveTab(key as string)}
       >

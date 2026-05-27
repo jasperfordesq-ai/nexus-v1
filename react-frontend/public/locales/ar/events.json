@@ -132,7 +132,8 @@
     "join_meeting": "الانضمام إلى الاجتماع",
     "join_meeting_aria": "الانضمام إلى اجتماع {{title}}",
     "join_waitlist_aria": "الانضمام إلى قائمة انتظار هذه الفعالية",
-    "leave_waitlist_aria": "مغادرة قائمة انتظار هذه الفعالية"
+    "leave_waitlist_aria": "مغادرة قائمة انتظار هذه الفعالية",
+    "tabs_aria": "Event detail sections"
   },
   "card": {
     "cancelled": "تم الإلغاء",

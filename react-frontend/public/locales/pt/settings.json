@@ -607,5 +607,6 @@
     "stay": "Ficar"
   },
   "push_campaign_opt_in": "Receber notificações push patrocinadas",
-  "push_campaign_opt_in_description": "Permita que empresas e organizações locais lhe enviem notificações push direcionadas. Pode cancelar a qualquer momento."
+  "push_campaign_opt_in_description": "Permita que empresas e organizações locais lhe enviem notificações push direcionadas. Pode cancelar a qualquer momento.",
+  "tabs_aria": "Settings sections"
 }

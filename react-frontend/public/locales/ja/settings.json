@@ -607,5 +607,6 @@
     "stay": "留まる"
   },
   "push_campaign_opt_in": "プロモーションのプッシュ通知を受け取る",
-  "push_campaign_opt_in_description": "地域のビジネスや団体がターゲット型プッシュ通知を送信することを許可します。いつでも解除できます。"
+  "push_campaign_opt_in_description": "地域のビジネスや団体がターゲット型プッシュ通知を送信することを許可します。いつでも解除できます。",
+  "tabs_aria": "Settings sections"
 }

@@ -314,6 +314,7 @@ export function MatchApprovals() {
       {/* Status tabs */}
       <div className="rounded-2xl border border-divider/70 bg-surface p-2 shadow-sm shadow-black/[0.03]">
         <Tabs
+          aria-label={t('matching.tabs_aria')}
           selectedKey={status}
           onSelectionChange={(key) => {
             setStatus(key as string);

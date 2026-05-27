@@ -510,6 +510,7 @@ export function ListingsAdmin() {
       {/* Top-level tabs: Content | Featured */}
       <div className="rounded-2xl border border-divider/70 bg-surface p-2 shadow-sm shadow-black/[0.03]">
         <Tabs
+          aria-label={t('listings.section_tabs_aria')}
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(key as string)}
           variant="primary"
@@ -534,6 +535,7 @@ export function ListingsAdmin() {
           {/* Status filter sub-tabs */}
           <div className="rounded-2xl border border-divider/70 bg-surface p-2 shadow-sm shadow-black/[0.03]">
             <Tabs
+              aria-label={t('listings.filter_tabs_aria')}
               selectedKey={status}
               onSelectionChange={(key) => { setStatus(key as string); setPage(1); }}
               variant="underlined"

@@ -371,6 +371,7 @@ export function MyListingsPage() {
 
         {/* Tabs */}
         <Tabs
+          aria-label={t('my_listings_tabs_aria')}
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(key as ListingTab)}
 

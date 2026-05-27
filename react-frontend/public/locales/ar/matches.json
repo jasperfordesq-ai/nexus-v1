@@ -27,5 +27,6 @@
   "match_hidden": "المطابقة مخفية — سنعرض لك عددًا أقل مثل هذه",
   "page_meta": {
     "title": "المطابقات"
-  }
+  },
+  "filter_tabs_aria": "Match source filter"
 }

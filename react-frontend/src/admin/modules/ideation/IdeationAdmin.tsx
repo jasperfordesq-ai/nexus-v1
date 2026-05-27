@@ -378,6 +378,7 @@ export function IdeationAdmin() {
 
       <div className="mb-4">
         <Tabs
+          aria-label={t('ideation.tabs_aria')}
           selectedKey={status}
           onSelectionChange={(key) => {
             setStatus(key as string);

@@ -602,6 +602,7 @@ export function MemberReportsPage() {
       />
 
       <Tabs
+        aria-label={t('reports.members_tabs_aria')}
         selectedKey={reportType}
         onSelectionChange={(key) => setReportType(String(key))}
         variant="underlined"

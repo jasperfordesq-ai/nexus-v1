@@ -193,7 +193,8 @@
     "time_hours_ago": "{{count}} u ó shin",
     "time_days_ago": "{{count}} l ó shin",
     "note_system_author": "Córas",
-    "hours_short": "u"
+    "hours_short": "u",
+    "tabs_aria": "Member status filter"
   },
   "onboarding": {
     "title": "Inbhordáil",
@@ -458,7 +459,8 @@
     "detail_broker_conditions": "Coinníollacha an Bhróicéara",
     "detail_history": "Stair",
     "detail_history_by": "ag {{name}}",
-    "detail_no_history": "Níl aon stair ar fáil."
+    "detail_no_history": "Níl aon stair ar fáil.",
+    "tabs_aria": "Exchange status filter"
   },
   "messages": {
     "title": "Athbhreithniú Teachtaireachtaí",
@@ -566,7 +568,8 @@
     "copy_reason_new_member": "Ball nua",
     "copy_reason_flagged_user": "Úsáideoir marcáilte",
     "copy_reason_manual_monitoring": "Monatóireacht láimhe",
-    "copy_reason_random_sample": "Sampla randamach"
+    "copy_reason_random_sample": "Sampla randamach",
+    "review_tabs_aria": "Message review filter"
   },
   "monitoring": {
     "title": "Monatóireacht úsáideoirí",
@@ -679,7 +682,8 @@
     "category_legal": "Dlíthiúil",
     "category_reputation": "Cáil",
     "category_fraud": "Calaois fhéideartha",
-    "category_other": "Eile"
+    "category_other": "Eile",
+    "tabs_aria": "Risk level filter"
   },
   "insurance": {
     "title": "Teastais árachais",
@@ -774,7 +778,8 @@
     "label_certificate_file": "Comhad teastais",
     "label_created": "Cruthaithe",
     "label_verified_at": "Fíoraithe ag",
-    "label_verified_by": "Fíoraithe ag"
+    "label_verified_by": "Fíoraithe ag",
+    "tabs_aria": "Insurance certificate status filter"
   },
   "archives": {
     "title": "Cartlann Athbhreithnithe",
@@ -832,7 +837,8 @@
     "severity_low": "Íseal",
     "severity_medium": "Meánach",
     "severity_high": "Ard",
-    "severity_critical": "Criticiúil"
+    "severity_critical": "Criticiúil",
+    "tabs_aria": "Review archive filter"
   },
   "configuration": {
     "title": "Cumraíocht Bhróicéara",

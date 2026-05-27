@@ -812,6 +812,7 @@ export function VettingRecords() {
       {/* Filter Tabs */}
       <div className="mb-4">
         <Tabs
+          aria-label={t('vetting.tabs_aria')}
           selectedKey={statusFilter}
           onSelectionChange={(key) => { setStatusFilter(key as VettingStatus); setPage(1); }}
           variant="underlined"

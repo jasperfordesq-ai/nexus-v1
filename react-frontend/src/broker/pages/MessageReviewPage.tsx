@@ -375,6 +375,7 @@ export function MessageReview() {
 
       <div className="mb-4">
         <Tabs
+          aria-label={t('messages.review_tabs_aria')}
           selectedKey={filter}
           onSelectionChange={(key) => { setFilter(key as MessageFilter); setPage(1); }}
           variant="underlined"

@@ -251,6 +251,7 @@ export function ExchangeManagement() {
 
       <div className="mb-4">
         <Tabs
+          aria-label={t('exchanges.tabs_aria')}
           selectedKey={status}
           onSelectionChange={(key) => { setStatus(key as ExchangeStatus); setPage(1); }}
           variant="underlined"

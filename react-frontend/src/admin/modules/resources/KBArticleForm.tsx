@@ -434,6 +434,7 @@ export function KBArticleForm() {
             {/* Mode tabs (create only — in edit mode, mode is inferred from content_type) */}
             {!isEdit && (
               <Tabs
+                aria-label={t('resources.kb_mode_tabs_aria')}
                 selectedKey={mode}
                 onSelectionChange={(key) => {
                   setMode(key as 'write' | 'upload');

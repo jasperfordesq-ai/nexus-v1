@@ -10,6 +10,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Calendar from 'lucide-react/icons/calendar';
 import Eye from 'lucide-react/icons/eye';
@@ -95,6 +96,7 @@ export function EventsAdmin() {
   useAdminPageMeta({ title: "Events" });
   const { tenantPath } = useTenant();
   const toast = useToast();
+  const { t } = useTranslation('admin');
 
   const [items, setItems] = useState<AdminEvent[]>([]);
   const [total, setTotal] = useState(0);
@@ -322,6 +324,7 @@ export function EventsAdmin() {
 
       <div className="mb-4">
         <Tabs
+          aria-label={t('events.tabs_aria')}
           selectedKey={status}
           onSelectionChange={(key) => {
             setStatus(key as string);

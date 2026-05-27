@@ -190,7 +190,7 @@ export default function GroupDetail() {
         </Card>
       </div>
 
-      <Tabs>
+      <Tabs aria-label={t('groups.detail_tabs_aria')}>
         <Tab key="overview" title={t('groups.overview')}>
           <Card className="p-6 mt-4 space-y-4">
             {editMode ? (

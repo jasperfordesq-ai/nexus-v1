@@ -318,6 +318,7 @@ export function Templates() {
       {/* Category filter tabs */}
       <div className="mb-4">
         <Tabs
+          aria-label={t('newsletters.template_tabs_aria')}
           selectedKey={categoryFilter}
           onSelectionChange={(key) => setCategoryFilter(key as string)}
           variant="underlined"

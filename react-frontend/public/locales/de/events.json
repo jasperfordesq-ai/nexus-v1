@@ -132,7 +132,8 @@
     "join_meeting": "Meeting beitreten",
     "join_meeting_aria": "Meeting für {{title}} beitreten",
     "join_waitlist_aria": "Der Warteliste für diese Veranstaltung beitreten",
-    "leave_waitlist_aria": "Warteliste für diese Veranstaltung verlassen"
+    "leave_waitlist_aria": "Warteliste für diese Veranstaltung verlassen",
+    "tabs_aria": "Event detail sections"
   },
   "card": {
     "cancelled": "Abgesagt",

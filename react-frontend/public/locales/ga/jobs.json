@@ -377,7 +377,8 @@
     "personal_message": "Teachtaireacht Phearsanta",
     "personal_message_placeholder": "Nóta don iarrthóir...",
     "interview_location_placeholder": "https://meet.google.com/...",
-    "offer_salary_placeholder": "m.sh. 45000"
+    "offer_salary_placeholder": "m.sh. 45000",
+    "tabs_aria": "Job pipeline sections"
   },
   "apply": {
     "button": "Cuir Isteach Anois",
@@ -1031,5 +1032,6 @@
   },
   "jobs": {
     "view_details": "Féach ar shonraí an phoist"
-  }
+  },
+  "tabs_aria": "Jobs view"
 }

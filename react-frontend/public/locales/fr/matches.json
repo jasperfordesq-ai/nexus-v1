@@ -27,5 +27,6 @@
   "not_interested": "Pas intéressé(e)",
   "page_meta": {
     "title": "Correspondances"
-  }
+  },
+  "filter_tabs_aria": "Match source filter"
 }

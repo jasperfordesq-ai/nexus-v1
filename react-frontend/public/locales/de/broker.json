@@ -193,7 +193,8 @@
     "time_hours_ago": "vor {{count}} Std",
     "time_days_ago": "vor {{count}} T",
     "note_system_author": "System",
-    "hours_short": "Std"
+    "hours_short": "Std",
+    "tabs_aria": "Member status filter"
   },
   "onboarding": {
     "title": "Onboarding",
@@ -458,7 +459,8 @@
     "detail_broker_conditions": "Broker-Bedingungen",
     "detail_history": "Verlauf",
     "detail_history_by": "von {{name}}",
-    "detail_no_history": "Kein Verlauf verfügbar."
+    "detail_no_history": "Kein Verlauf verfügbar.",
+    "tabs_aria": "Exchange status filter"
   },
   "messages": {
     "title": "Nachrichtenüberprüfung",
@@ -566,7 +568,8 @@
     "copy_reason_new_member": "Neues Mitglied",
     "copy_reason_flagged_user": "Markierter Nutzer",
     "copy_reason_manual_monitoring": "Manuelle Überwachung",
-    "copy_reason_random_sample": "Zufallsstichprobe"
+    "copy_reason_random_sample": "Zufallsstichprobe",
+    "review_tabs_aria": "Message review filter"
   },
   "monitoring": {
     "title": "Nutzerüberwachung",
@@ -679,7 +682,8 @@
     "category_legal": "Rechtlich",
     "category_reputation": "Ruf",
     "category_fraud": "Möglicher Betrug",
-    "category_other": "Sonstige"
+    "category_other": "Sonstige",
+    "tabs_aria": "Risk level filter"
   },
   "insurance": {
     "title": "Versicherungszertifikate",
@@ -774,7 +778,8 @@
     "label_certificate_file": "Zertifikatsdatei",
     "label_created": "Erstellt",
     "label_verified_at": "Verifiziert am",
-    "label_verified_by": "Verifiziert von"
+    "label_verified_by": "Verifiziert von",
+    "tabs_aria": "Insurance certificate status filter"
   },
   "archives": {
     "title": "Prüfungsarchiv",
@@ -832,7 +837,8 @@
     "severity_low": "Niedrig",
     "severity_medium": "Mittel",
     "severity_high": "Hoch",
-    "severity_critical": "Kritisch"
+    "severity_critical": "Kritisch",
+    "tabs_aria": "Review archive filter"
   },
   "configuration": {
     "title": "Broker-Konfiguration",

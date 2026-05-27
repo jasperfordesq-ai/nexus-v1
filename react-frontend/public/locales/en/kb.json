@@ -48,5 +48,6 @@
   "page_description": "Articles, guides, and tutorials for the community.",
   "all_categories": "All",
   "author_by": "by {{name}}",
-  "attachments": "Attachments"
+  "attachments": "Attachments",
+  "category_tabs_aria": "Knowledge base categories"
 }

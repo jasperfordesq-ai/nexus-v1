@@ -229,7 +229,8 @@
     "file_size_mb": "{{name}} ({{size}}MB)",
     "listing_preview_alt": "??????????",
     "image_preview_alt": "????????????",
-    "listing_type_label": "Listing type"
+    "listing_type_label": "Listing type",
+    "type_tabs_aria": "Compose content type"
   },
   "moderation": {
     "unauthorized": "この操作を実行する権限がありません。"

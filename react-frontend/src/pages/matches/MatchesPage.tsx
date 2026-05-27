@@ -207,6 +207,7 @@ export function MatchesPage() {
 
       {/* Source filter tabs */}
       <Tabs
+        aria-label={t('filter_tabs_aria')}
         selectedKey={filter}
         onSelectionChange={(key) => setFilter(key as SourceFilter)}
         classNames={{

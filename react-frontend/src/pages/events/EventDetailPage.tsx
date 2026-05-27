@@ -853,6 +853,7 @@ export function EventDetailPage() {
 
         {/* Tabs: Details / Attendees / Check-in (organizer only) */}
         <Tabs
+          aria-label={t('detail.tabs_aria')}
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(key as string)}
           variant="underlined"

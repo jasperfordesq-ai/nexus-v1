@@ -27,5 +27,6 @@
   "not_interested": "Sem interesse",
   "page_meta": {
     "title": "Correspondências"
-  }
+  },
+  "filter_tabs_aria": "Match source filter"
 }

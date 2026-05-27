@@ -229,7 +229,8 @@
     "file_size_mb": "{{name}} ({{size}}MB)",
     "listing_preview_alt": "Podgl?d og?oszenia",
     "image_preview_alt": "Podgl?d przesy?ania",
-    "listing_type_label": "Listing type"
+    "listing_type_label": "Listing type",
+    "type_tabs_aria": "Compose content type"
   },
   "moderation": {
     "unauthorized": "Nie masz uprawnień do wykonania tej czynności."

@@ -607,5 +607,6 @@
     "stay": "Rester"
   },
   "push_campaign_opt_in": "Recevoir des notifications push sponsorisées",
-  "push_campaign_opt_in_description": "Autorisez les entreprises et organisations locales à vous envoyer des notifications push ciblées. Vous pouvez vous désabonner à tout moment."
+  "push_campaign_opt_in_description": "Autorisez les entreprises et organisations locales à vous envoyer des notifications push ciblées. Vous pouvez vous désabonner à tout moment.",
+  "tabs_aria": "Settings sections"
 }

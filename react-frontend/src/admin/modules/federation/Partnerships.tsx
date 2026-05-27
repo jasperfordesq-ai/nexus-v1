@@ -794,6 +794,7 @@ export function Partnerships() {
                 ) : detailPartnership ? (
                   <div className="space-y-4">
                     <Tabs
+                      aria-label={t('federation.partnership_detail_tabs_aria')}
                       selectedKey={detailTab}
                       onSelectionChange={(key) => setDetailTab(String(key))}
                       variant="underlined"

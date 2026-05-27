@@ -27,5 +27,6 @@
   "match_hidden": "マッチが非表示 — このようなものは少なく表示します",
   "page_meta": {
     "title": "マッチ"
-  }
+  },
+  "filter_tabs_aria": "Match source filter"
 }

@@ -132,7 +132,8 @@
     "join_meeting": "Dołącz do spotkania",
     "join_meeting_aria": "Dołącz do spotkania {{title}}",
     "join_waitlist_aria": "Dołącz do listy oczekujących na to wydarzenie",
-    "leave_waitlist_aria": "Opuść listę oczekujących na to wydarzenie"
+    "leave_waitlist_aria": "Opuść listę oczekujących na to wydarzenie",
+    "tabs_aria": "Event detail sections"
   },
   "card": {
     "cancelled": "Odwołany",

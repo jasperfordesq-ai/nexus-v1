@@ -374,7 +374,8 @@
     "accepted_success": "Verbinding geaccepteerd",
     "rejected_success": "Verbinding geweigerd",
     "removed_success": "Verbinding verwijderd",
-    "action_failed": "Actie mislukt. Probeer het opnieuw."
+    "action_failed": "Actie mislukt. Probeer het opnieuw.",
+    "tabs_aria": "Federation connection status"
   },
   "partner_detail": {
     "page_title": "Partnergemeenschap",

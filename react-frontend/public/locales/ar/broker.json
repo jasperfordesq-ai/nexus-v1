@@ -193,7 +193,8 @@
     "time_hours_ago": "قبل {{count}} ساعة",
     "time_days_ago": "قبل {{count}} يوم",
     "note_system_author": "النظام",
-    "hours_short": "س"
+    "hours_short": "س",
+    "tabs_aria": "Member status filter"
   },
   "onboarding": {
     "title": "الإلحاق",
@@ -458,7 +459,8 @@
     "detail_broker_conditions": "شروط الوسيط",
     "detail_history": "السجل",
     "detail_history_by": "بواسطة {{name}}",
-    "detail_no_history": "لا يوجد سجل متاح."
+    "detail_no_history": "لا يوجد سجل متاح.",
+    "tabs_aria": "Exchange status filter"
   },
   "messages": {
     "title": "مراجعة الرسالة",
@@ -566,7 +568,8 @@
     "copy_reason_new_member": "عضو جديد",
     "copy_reason_flagged_user": "مستخدم مُعلَّم",
     "copy_reason_manual_monitoring": "مراقبة يدوية",
-    "copy_reason_random_sample": "عينة عشوائية"
+    "copy_reason_random_sample": "عينة عشوائية",
+    "review_tabs_aria": "Message review filter"
   },
   "monitoring": {
     "title": "مراقبة المستخدمين",
@@ -679,7 +682,8 @@
     "category_legal": "قانوني",
     "category_reputation": "السمعة",
     "category_fraud": "احتيال محتمل",
-    "category_other": "أخرى"
+    "category_other": "أخرى",
+    "tabs_aria": "Risk level filter"
   },
   "insurance": {
     "title": "شهادات التأمين",
@@ -774,7 +778,8 @@
     "label_certificate_file": "ملف الشهادة",
     "label_created": "أُنشئت في",
     "label_verified_at": "تم التحقق في",
-    "label_verified_by": "تم التحقق بواسطة"
+    "label_verified_by": "تم التحقق بواسطة",
+    "tabs_aria": "Insurance certificate status filter"
   },
   "archives": {
     "title": "أرشيف المراجعة",
@@ -832,7 +837,8 @@
     "severity_low": "منخفضة",
     "severity_medium": "متوسطة",
     "severity_high": "عالية",
-    "severity_critical": "حرجة"
+    "severity_critical": "حرجة",
+    "tabs_aria": "Review archive filter"
   },
   "configuration": {
     "title": "إعدادات الوسيط",

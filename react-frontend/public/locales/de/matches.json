@@ -27,5 +27,6 @@
   "not_interested": "Kein Interesse",
   "page_meta": {
     "title": "Treffer"
-  }
+  },
+  "filter_tabs_aria": "Match source filter"
 }

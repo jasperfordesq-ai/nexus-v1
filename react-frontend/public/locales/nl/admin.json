@@ -1351,7 +1351,8 @@
     "page_title_edit_with_title": "Bewerken:{{title}}",
     "placeholder_featured_image": "https://example.com/image.jpg",
     "save_changes": "Wijzigingen opslaan",
-    "search_placeholder": "Blogposts zoeken..."
+    "search_placeholder": "Blogposts zoeken...",
+    "tabs_aria": "Blog post status filter"
   },
   "breadcrumbs": {
     "activity_log": "Activiteitenlogboek",
@@ -2075,7 +2076,8 @@
     "label_slug": "Naaktslak",
     "listings": "Advertenties",
     "save_changes": "Wijzigingen opslaan",
-    "search_placeholder": "Categorieën zoeken..."
+    "search_placeholder": "Categorieën zoeken...",
+    "tabs_aria": "Category type filter"
   },
   "common": {
     "an_unexpected_error": "Er is een onverwachte fout opgetreden",
@@ -4413,7 +4415,8 @@
     "tab_cancelled": "Geannuleerd",
     "tab_draft": "Diepgang",
     "tab_published": "Gepubliceerd",
-    "unknown": "Onbekend"
+    "unknown": "Onbekend",
+    "tabs_aria": "Event status filter"
   },
   "federation": {
     "active_partner": "Actieve partner",
@@ -5249,7 +5252,9 @@
     "webhook_transaction_created": "Transactie gemaakt",
     "webhooks_sample_message": "Dit is een testlevering van Project NEXUS Federatie",
     "website": "Website",
-    "website_desc": "Openbare website voor deze gemeenschap."
+    "website_desc": "Openbare website voor deze gemeenschap.",
+    "api_docs_tabs_aria": "API example language selector",
+    "partnership_detail_tabs_aria": "Partnership detail sections"
   },
   "gamification": {
     "activate": "Activeer",
@@ -5810,7 +5815,9 @@
     "clone_name_copy": "{{name}}(kopie)",
     "clear_accent_color": "Heldere accentkleur",
     "clear_primary_color": "Duidelijke primaire kleur",
-    "delete": "Verwijderen"
+    "delete": "Verwijderen",
+    "detail_tabs_aria": "Group detail sections",
+    "status_tabs_aria": "Group status filter"
   },
   "header": {
     "admin_menu": "Beheerdersmenu",
@@ -5888,7 +5895,8 @@
     "status_open": "Openen",
     "status_voting": "Stemmen",
     "top_matches_for_user_one": "Top{{count}}-match voor{{name}}",
-    "top_matches_for_user_other": "Top{{count}}-wedstrijden voor{{name}}"
+    "top_matches_for_user_other": "Top{{count}}-wedstrijden voor{{name}}",
+    "tabs_aria": "Challenge status filter"
   },
   "impact": {
     "chart_activity_breakdown_title": "Uitsplitsing van activiteiten",
@@ -6219,7 +6227,9 @@
     "type": "Typ",
     "unfeature": "Uitgelicht",
     "unfeature_listing": "Lijst met functies ongedaan maken",
-    "unfeatured_success": "Met succes uitgelicht"
+    "unfeatured_success": "Met succes uitgelicht",
+    "section_tabs_aria": "Listings management sections",
+    "filter_tabs_aria": "Listing status filter"
   },
   "live": "LIVE",
   "matching": {
@@ -6411,7 +6421,8 @@
     "associated_listing": "Bijbehorende vermelding",
     "listing_owner": "Eigenaar van vermelding",
     "matched_user": "Gematchte gebruiker",
-    "review_details": "Beoordelingsdetails"
+    "review_details": "Beoordelingsdetails",
+    "tabs_aria": "Match approval status filter"
   },
   "moderation": {
     "action_failed": "Mislukt",
@@ -7003,7 +7014,8 @@
     "section_engagement_summary_desc": "Unieke en totale betrokkenheid bij afgeleverde nieuwsbriefcampagnes.",
     "section_monthly_performance_desc": "Maandelijkse leverings- en betrokkenheidstrends voor verzonden nieuwsbrieven.",
     "section_top_performers_desc": "Nieuwsbrieven met de sterkste recente betrokkenheid.",
-    "winner": "Winnaar"
+    "winner": "Winnaar",
+    "template_tabs_aria": "Newsletter template category filter"
   },
   "no_data": "Geen gegevens beschikbaar",
   "not_found": {
@@ -7288,7 +7300,9 @@
     "status_pending": "In behandeling",
     "status_rejected": "Afgewezen",
     "unknown_content_type": "Onbekend type:{{type}}",
-    "unknown_status": "Onbekende status:{{status}}"
+    "unknown_status": "Onbekende status:{{status}}",
+    "hours_tabs_aria": "Hours report view",
+    "members_tabs_aria": "Member report type"
   },
   "resources": {
     "an_unexpected_error_occurred": "Er is een onverwachte fout opgetreden",
@@ -7367,7 +7381,9 @@
     "save_changes": "Wijzigingen opslaan",
     "slug": "Naaktslak",
     "sort_order_placeholder": "0",
-    "video_url_placeholder": "https://www.youtube.com/watch?v=..."
+    "video_url_placeholder": "https://www.youtube.com/watch?v=...",
+    "kb_mode_tabs_aria": "Knowledge base article content mode",
+    "status_tabs_aria": "Resource status filter"
   },
   "review": "Beoordeling",
   "safeguarding": {
@@ -7667,7 +7683,8 @@
         "export_csv": "Exporteer CSV",
         "export_suffix": "actie in de ledendetailweergave wanneer u een bestand nodig heeft dat u kunt bijvoegen bij een incidentrapport of kunt delen met een toezichthouder. De CSV is UTF-8 met een BOM, dus Excel opent deze correct zonder om codering te vragen."
       }
-    }
+    },
+    "tabs_aria": "Safeguarding sections"
   },
   "stats": {
     "active_listings": "Actieve vermeldingen",
@@ -8390,7 +8407,9 @@
     "user_with_id": "Gebruiker #{{id}}",
     "users_error_detail": "Gebruikers: {{error}}",
     "view_full_details": "Bekijk volledige details",
-    "breadcrumb_nav_aria": "Breadcrumb"
+    "breadcrumb_nav_aria": "Breadcrumb",
+    "partnerships_tabs_aria": "Federation partnership status filter",
+    "tenant_list_tabs_aria": "Tenant status filter"
   },
   "system": {
     "active": "Actief",
@@ -9860,7 +9879,8 @@
     "validation_first_name_required": "Voornaam is vereist",
     "validation_last_name_required": "Achternaam is vereist",
     "validation_password_min": "Wachtwoord moet minimaal 8 tekens lang zijn",
-    "validation_role_required": "Rol is vereist"
+    "validation_role_required": "Rol is vereist",
+    "tabs_aria": "User status filter"
   },
   "view_all": "Bekijk alles",
   "visibility_rules": {
@@ -10481,7 +10501,11 @@
     "applies_to_shift": "Verschuiving",
     "applies_to_profile": "Profiel",
     "webhook_events_placeholder": "applicatie.gemaakt, dienst.voltooid, uren.gelogd",
-    "webhook_url_placeholder": "https://example.com/webhook"
+    "webhook_url_placeholder": "https://example.com/webhook",
+    "approvals_tabs_aria": "Volunteer approval status filter",
+    "config_tabs_aria": "Volunteer configuration sections",
+    "giving_days_tabs_aria": "Giving days donor and donation sections",
+    "hours_audit_tabs_aria": "Volunteer hours audit sections"
   },
   "mailer": {
     "gmail_not_enabled": "Gmail-API is niet ingeschakeld",
@@ -10771,7 +10795,9 @@
     "filter_flagged": "Gemarkeerd",
     "filter_pending": "In behandeling",
     "filter_rejected": "Afgewezen",
-    "verify_business": "Verifieer bedrijf"
+    "verify_business": "Verifieer bedrijf",
+    "moderation_tabs_aria": "Marketplace moderation status filter",
+    "seller_tabs_aria": "Seller status filter"
   },
   "spam": {
     "title": "Spamdetectie",
@@ -11949,7 +11975,8 @@
     "feature_feed": "Voer",
     "feature_feed_desc": "Schakel de communityfeed in.",
     "feature_marketplace": "Marktplaats",
-    "feature_marketplace_desc": "Schakel marktplaatsfuncties in."
+    "feature_marketplace_desc": "Schakel marktplaatsfuncties in.",
+    "tabs_aria": "Tenant form sections"
   },
   "tenant_list": {
     "action_delete": "Verwijderen",
@@ -14039,7 +14066,8 @@
         "reject_failed": "Het is niet gelukt om te weigeren",
         "rejected": "Voorstel afgewezen"
       }
-    }
+    },
+    "tabs_aria": "Agent proposal status filter"
   },
   "fadp": {
     "meta": {
@@ -14662,7 +14690,8 @@
         "reject_failed": "Kan de campagne niet afwijzen.",
         "required_fields": "Naam, titel en hoofdtekst zijn vereist."
       }
-    }
+    },
+    "tabs_aria": "Ad campaign status filter"
   },
   "municipal_copilot": {
     "about": {

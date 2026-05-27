@@ -472,6 +472,7 @@ export default function MembersPage() {
       />
 
       <Tabs
+        aria-label={t('members.tabs_aria')}
         selectedKey={activeTab}
         onSelectionChange={handleTabChange}
         variant="underlined"

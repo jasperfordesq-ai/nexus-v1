@@ -607,5 +607,6 @@
     "stay": "Zostań"
   },
   "push_campaign_opt_in": "Otrzymuj promowane powiadomienia push",
-  "push_campaign_opt_in_description": "Zezwól lokalnym firmom i organizacjom na wysyłanie ukierunkowanych powiadomień push. Możesz zrezygnować w dowolnym momencie."
+  "push_campaign_opt_in_description": "Zezwól lokalnym firmom i organizacjom na wysyłanie ukierunkowanych powiadomień push. Możesz zrezygnować w dowolnym momencie.",
+  "tabs_aria": "Settings sections"
 }

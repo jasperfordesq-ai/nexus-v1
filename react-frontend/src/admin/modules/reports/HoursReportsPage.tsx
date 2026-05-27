@@ -516,6 +516,7 @@ export function HoursReportsPage() {
       {renderSummary()}
 
       <Tabs
+        aria-label={t('reports.hours_tabs_aria')}
         selectedKey={groupBy}
         onSelectionChange={(key) => setGroupBy(String(key))}
         variant="underlined"

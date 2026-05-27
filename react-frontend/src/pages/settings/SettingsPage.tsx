@@ -931,6 +931,7 @@ export function SettingsPage() {
         className="relative max-w-full rounded-2xl border border-theme-default bg-theme-surface p-2 after:pointer-events-none after:absolute after:inset-y-2 after:right-2 after:w-10 after:rounded-r-xl after:bg-gradient-to-l after:from-[var(--background)] after:via-[var(--background)]/80 after:to-transparent sm:after:hidden"
       >
         <Tabs
+          aria-label={t('tabs_aria')}
           selectedKey={activeTab}
           onSelectionChange={handleTabSelection}
           classNames={{

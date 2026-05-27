@@ -1351,7 +1351,8 @@
     "page_title_edit_with_title": "تحرير:{{title}}",
     "placeholder_featured_image": "https://example.com/image.jpg",
     "save_changes": "حفظ التغييرات",
-    "search_placeholder": "البحث في منشورات المدونة..."
+    "search_placeholder": "البحث في منشورات المدونة...",
+    "tabs_aria": "Blog post status filter"
   },
   "breadcrumbs": {
     "activity_log": "سجل النشاط",
@@ -2075,7 +2076,8 @@
     "label_slug": "سبيكة",
     "listings": "القوائم",
     "save_changes": "حفظ التغييرات",
-    "search_placeholder": "فئات البحث..."
+    "search_placeholder": "فئات البحث...",
+    "tabs_aria": "Category type filter"
   },
   "common": {
     "an_unexpected_error": "حدث خطأ غير متوقع",
@@ -4413,7 +4415,8 @@
     "tab_cancelled": "تم الإلغاء",
     "tab_draft": "مسودة",
     "tab_published": "تم النشر",
-    "unknown": "مجهول"
+    "unknown": "مجهول",
+    "tabs_aria": "Event status filter"
   },
   "federation": {
     "active_partner": "شريك نشط",
@@ -5249,7 +5252,9 @@
     "webhook_transaction_created": "تم إنشاء المعاملة",
     "webhooks_sample_message": "هذا تسليم تجريبي من اتحاد Project NEXUS",
     "website": "موقع إلكتروني",
-    "website_desc": "موقع عام لهذا المجتمع."
+    "website_desc": "موقع عام لهذا المجتمع.",
+    "api_docs_tabs_aria": "API example language selector",
+    "partnership_detail_tabs_aria": "Partnership detail sections"
   },
   "gamification": {
     "activate": "فعل",
@@ -5810,7 +5815,9 @@
     "clone_name_copy": "{{name}}(نسخة)",
     "clear_accent_color": "لون مميز واضح",
     "clear_primary_color": "مسح اللون الأساسي",
-    "delete": "يمسح"
+    "delete": "يمسح",
+    "detail_tabs_aria": "Group detail sections",
+    "status_tabs_aria": "Group status filter"
   },
   "header": {
     "admin_menu": "قائمة المشرف",
@@ -5888,7 +5895,8 @@
     "status_open": "يفتح",
     "status_voting": "التصويت",
     "top_matches_for_user_one": "أفضل تطابق لـ{{count}}لـ{{name}}",
-    "top_matches_for_user_other": "أهم مباريات{{count}}لـ{{name}}"
+    "top_matches_for_user_other": "أهم مباريات{{count}}لـ{{name}}",
+    "tabs_aria": "Challenge status filter"
   },
   "impact": {
     "chart_activity_breakdown_title": "انهيار النشاط",
@@ -6219,7 +6227,9 @@
     "type": "يكتب",
     "unfeature": "غير مميز",
     "unfeature_listing": "قائمة غير مميزة",
-    "unfeatured_success": "تم عدم المميز بنجاح"
+    "unfeatured_success": "تم عدم المميز بنجاح",
+    "section_tabs_aria": "Listings management sections",
+    "filter_tabs_aria": "Listing status filter"
   },
   "live": "LIVE",
   "matching": {
@@ -6411,7 +6421,8 @@
     "associated_listing": "القائمة المرتبطة",
     "listing_owner": "مالك القائمة",
     "matched_user": "المستخدم المطابق",
-    "review_details": "تفاصيل المراجعة"
+    "review_details": "تفاصيل المراجعة",
+    "tabs_aria": "Match approval status filter"
   },
   "moderation": {
     "action_failed": "فشل",
@@ -7003,7 +7014,8 @@
     "section_engagement_summary_desc": "مشاركة فريدة وكاملة عبر حملات الرسائل الإخبارية التي يتم تسليمها.",
     "section_monthly_performance_desc": "اتجاهات التسليم والمشاركة الشهرية للرسائل الإخبارية المرسلة.",
     "section_top_performers_desc": "النشرات الإخبارية مع أقوى المشاركة الأخيرة.",
-    "winner": "الفائز"
+    "winner": "الفائز",
+    "template_tabs_aria": "Newsletter template category filter"
   },
   "no_data": "لا توجد بيانات متاحة",
   "not_found": {
@@ -7288,7 +7300,9 @@
     "status_pending": "قيد الانتظار",
     "status_rejected": "مرفوض",
     "unknown_content_type": "نوع غير معروف:{{type}}",
-    "unknown_status": "حالة غير معروفة:{{status}}"
+    "unknown_status": "حالة غير معروفة:{{status}}",
+    "hours_tabs_aria": "Hours report view",
+    "members_tabs_aria": "Member report type"
   },
   "resources": {
     "an_unexpected_error_occurred": "حدث خطأ غير متوقع",
@@ -7367,7 +7381,9 @@
     "save_changes": "حفظ التغييرات",
     "slug": "سبيكة",
     "sort_order_placeholder": "0",
-    "video_url_placeholder": "https://www.youtube.com/watch?v=..."
+    "video_url_placeholder": "https://www.youtube.com/watch?v=...",
+    "kb_mode_tabs_aria": "Knowledge base article content mode",
+    "status_tabs_aria": "Resource status filter"
   },
   "review": "مراجعة",
   "safeguarding": {
@@ -7667,7 +7683,8 @@
         "export_csv": "تصدير CSV",
         "export_suffix": "الإجراء الخاص بعرض تفاصيل العضو عندما تحتاج إلى ملف يمكنك إرفاقه بتقرير الحادث أو مشاركته مع جهة تنظيمية. CSV هو UTF-8 مع BOM لذا يفتحه Excel بشكل صحيح دون المطالبة بالتشفير."
       }
-    }
+    },
+    "tabs_aria": "Safeguarding sections"
   },
   "stats": {
     "active_listings": "القوائم النشطة",
@@ -8390,7 +8407,9 @@
     "user_with_id": "المستخدم #{{id}}",
     "users_error_detail": "المستخدمون: {{error}}",
     "view_full_details": "عرض التفاصيل الكاملة",
-    "breadcrumb_nav_aria": "Breadcrumb"
+    "breadcrumb_nav_aria": "Breadcrumb",
+    "partnerships_tabs_aria": "Federation partnership status filter",
+    "tenant_list_tabs_aria": "Tenant status filter"
   },
   "system": {
     "active": "نشيط",
@@ -9860,7 +9879,8 @@
     "validation_first_name_required": "الاسم الأول مطلوب",
     "validation_last_name_required": "الاسم الأخير مطلوب",
     "validation_password_min": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",
-    "validation_role_required": "الدور مطلوب"
+    "validation_role_required": "الدور مطلوب",
+    "tabs_aria": "User status filter"
   },
   "view_all": "عرض الكل",
   "visibility_rules": {
@@ -10481,7 +10501,11 @@
     "applies_to_shift": "يحول",
     "applies_to_profile": "حساب تعريفي",
     "webhook_events_placeholder": "تم إنشاء التطبيق، واكتمل التحول، وساعات.تسجيل الدخول",
-    "webhook_url_placeholder": "https://example.com/webhook"
+    "webhook_url_placeholder": "https://example.com/webhook",
+    "approvals_tabs_aria": "Volunteer approval status filter",
+    "config_tabs_aria": "Volunteer configuration sections",
+    "giving_days_tabs_aria": "Giving days donor and donation sections",
+    "hours_audit_tabs_aria": "Volunteer hours audit sections"
   },
   "mailer": {
     "gmail_not_enabled": "لم يتم تمكين واجهة برمجة تطبيقات Gmail",
@@ -10771,7 +10795,9 @@
     "filter_flagged": "تم وضع علامة عليها",
     "filter_pending": "قيد الانتظار",
     "filter_rejected": "مرفوض",
-    "verify_business": "التحقق من الأعمال"
+    "verify_business": "التحقق من الأعمال",
+    "moderation_tabs_aria": "Marketplace moderation status filter",
+    "seller_tabs_aria": "Seller status filter"
   },
   "spam": {
     "title": "كشف البريد العشوائي",
@@ -11949,7 +11975,8 @@
     "feature_feed": "يٌطعم",
     "feature_feed_desc": "تمكين خلاصة المجتمع.",
     "feature_marketplace": "السوق",
-    "feature_marketplace_desc": "تمكين ميزات السوق."
+    "feature_marketplace_desc": "تمكين ميزات السوق.",
+    "tabs_aria": "Tenant form sections"
   },
   "tenant_list": {
     "action_delete": "يمسح",
@@ -14039,7 +14066,8 @@
         "reject_failed": "فشل في الرفض",
         "rejected": "تم رفض الاقتراح"
       }
-    }
+    },
+    "tabs_aria": "Agent proposal status filter"
   },
   "fadp": {
     "meta": {
@@ -14662,7 +14690,8 @@
         "reject_failed": "فشل رفض الحملة.",
         "required_fields": "الاسم والعنوان والجسم مطلوبة."
       }
-    }
+    },
+    "tabs_aria": "Ad campaign status filter"
   },
   "municipal_copilot": {
     "about": {

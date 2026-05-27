@@ -270,6 +270,7 @@ export function MyOffersPage() {
 
         {/* Tabs */}
         <Tabs
+          aria-label={t('my_offers_tabs_aria')}
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(key as OfferTab)}
 

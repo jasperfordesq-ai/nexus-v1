@@ -161,5 +161,7 @@
   },
   "comments": {
     "edit_label": "Edit comment"
-  }
+  },
+  "reactions_tabs_aria": "Reaction type filter",
+  "content_type_tabs_aria": "Bookmark content type filter"
 }

@@ -193,7 +193,8 @@
     "time_hours_ago": "{{count}}時間前",
     "time_days_ago": "{{count}}日前",
     "note_system_author": "システム",
-    "hours_short": "時間"
+    "hours_short": "時間",
+    "tabs_aria": "Member status filter"
   },
   "onboarding": {
     "title": "オンボーディング",
@@ -458,7 +459,8 @@
     "detail_broker_conditions": "ブローカー条件",
     "detail_history": "履歴",
     "detail_history_by": "{{name}}による",
-    "detail_no_history": "履歴はありません。"
+    "detail_no_history": "履歴はありません。",
+    "tabs_aria": "Exchange status filter"
   },
   "messages": {
     "title": "メッセージレビュー",
@@ -566,7 +568,8 @@
     "copy_reason_new_member": "新規メンバー",
     "copy_reason_flagged_user": "フラグ付きユーザー",
     "copy_reason_manual_monitoring": "手動監視",
-    "copy_reason_random_sample": "ランダムサンプル"
+    "copy_reason_random_sample": "ランダムサンプル",
+    "review_tabs_aria": "Message review filter"
   },
   "monitoring": {
     "title": "ユーザー監視",
@@ -679,7 +682,8 @@
     "category_legal": "法務",
     "category_reputation": "評判",
     "category_fraud": "不正の可能性",
-    "category_other": "その他"
+    "category_other": "その他",
+    "tabs_aria": "Risk level filter"
   },
   "insurance": {
     "title": "保険証明書",
@@ -774,7 +778,8 @@
     "label_certificate_file": "証明書ファイル",
     "label_created": "作成日",
     "label_verified_at": "検証日時",
-    "label_verified_by": "検証者"
+    "label_verified_by": "検証者",
+    "tabs_aria": "Insurance certificate status filter"
   },
   "archives": {
     "title": "レビューアーカイブ",
@@ -832,7 +837,8 @@
     "severity_low": "低",
     "severity_medium": "中",
     "severity_high": "高",
-    "severity_critical": "重大"
+    "severity_critical": "重大",
+    "tabs_aria": "Review archive filter"
   },
   "configuration": {
     "title": "ブローカー設定",

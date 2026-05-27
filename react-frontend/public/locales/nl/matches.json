@@ -27,5 +27,6 @@
   "match_hidden": "Match verborgen — we tonen je er minder zoals deze",
   "page_meta": {
     "title": "Overeenkomsten"
-  }
+  },
+  "filter_tabs_aria": "Match source filter"
 }

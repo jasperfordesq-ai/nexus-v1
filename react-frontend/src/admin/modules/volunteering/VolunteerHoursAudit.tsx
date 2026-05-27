@@ -477,6 +477,7 @@ export function VolunteerHoursAudit() {
 
       {/* Tabs: Hours table + Payment reconciliation */}
       <Tabs
+        aria-label={t('volunteering.hours_audit_tabs_aria')}
         selectedKey={activeTab}
         onSelectionChange={(key) => setActiveTab(key as string)}
         variant="underlined"

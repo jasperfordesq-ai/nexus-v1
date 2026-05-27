@@ -132,7 +132,8 @@
     "join_meeting": "Rejoindre la réunion",
     "join_meeting_aria": "Rejoindre la réunion pour {{title}}",
     "join_waitlist_aria": "Rejoindre la liste d'attente de cet événement",
-    "leave_waitlist_aria": "Quitter la liste d'attente de cet événement"
+    "leave_waitlist_aria": "Quitter la liste d'attente de cet événement",
+    "tabs_aria": "Event detail sections"
   },
   "card": {
     "cancelled": "Annulé",

@@ -607,5 +607,6 @@
     "stay": "Fan"
   },
   "push_campaign_opt_in": "Fógraí brú maoinithe a fháil",
-  "push_campaign_opt_in_description": "Ceadaigh do ghnólachtaí agus eagraíochtaí áitiúla fógraí brú dírithe a sheoladh chugat. Is féidir leat díliostáil am ar bith."
+  "push_campaign_opt_in_description": "Ceadaigh do ghnólachtaí agus eagraíochtaí áitiúla fógraí brú dírithe a sheoladh chugat. Is féidir leat díliostáil am ar bith.",
+  "tabs_aria": "Settings sections"
 }

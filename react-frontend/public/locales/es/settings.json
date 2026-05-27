@@ -607,5 +607,6 @@
     "stay": "Quedarse"
   },
   "push_campaign_opt_in": "Recibir notificaciones push promocionadas",
-  "push_campaign_opt_in_description": "Permite que empresas y organizaciones locales te envíen notificaciones push dirigidas. Puedes darte de baja en cualquier momento."
+  "push_campaign_opt_in_description": "Permite que empresas y organizaciones locales te envíen notificaciones push dirigidas. Puedes darte de baja en cualquier momento.",
+  "tabs_aria": "Settings sections"
 }

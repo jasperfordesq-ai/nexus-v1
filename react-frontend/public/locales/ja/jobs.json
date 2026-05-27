@@ -377,7 +377,8 @@
     "personal_message": "個人的なメッセージ",
     "personal_message_placeholder": "候補者へのメモ...",
     "interview_location_placeholder": "https://meet.google.com/...",
-    "offer_salary_placeholder": "例: 45000"
+    "offer_salary_placeholder": "例: 45000",
+    "tabs_aria": "Job pipeline sections"
   },
   "apply": {
     "button": "今すぐ応募",
@@ -1031,5 +1032,6 @@
   },
   "jobs": {
     "view_details": "求人詳細を見る"
-  }
+  },
+  "tabs_aria": "Jobs view"
 }

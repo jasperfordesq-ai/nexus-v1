@@ -1351,7 +1351,8 @@
     "page_title_edit_with_title": "Editar:{{title}}",
     "placeholder_featured_image": "https://example.com/image.jpg",
     "save_changes": "Salvar alterações",
-    "search_placeholder": "Pesquisar postagens do blog..."
+    "search_placeholder": "Pesquisar postagens do blog...",
+    "tabs_aria": "Blog post status filter"
   },
   "breadcrumbs": {
     "activity_log": "Registro de atividades",
@@ -2075,7 +2076,8 @@
     "label_slug": "Lesma",
     "listings": "Listagens",
     "save_changes": "Salvar alterações",
-    "search_placeholder": "Pesquisar categorias..."
+    "search_placeholder": "Pesquisar categorias...",
+    "tabs_aria": "Category type filter"
   },
   "common": {
     "an_unexpected_error": "Ocorreu um erro inesperado",
@@ -4413,7 +4415,8 @@
     "tab_cancelled": "Cancelado",
     "tab_draft": "Rascunho",
     "tab_published": "Publicado",
-    "unknown": "Desconhecido"
+    "unknown": "Desconhecido",
+    "tabs_aria": "Event status filter"
   },
   "federation": {
     "active_partner": "Parceiro ativo",
@@ -5249,7 +5252,9 @@
     "webhook_transaction_created": "Transação criada",
     "webhooks_sample_message": "Esta é uma entrega de teste da Federação Project NEXUS",
     "website": "Site",
-    "website_desc": "Site público desta comunidade."
+    "website_desc": "Site público desta comunidade.",
+    "api_docs_tabs_aria": "API example language selector",
+    "partnership_detail_tabs_aria": "Partnership detail sections"
   },
   "gamification": {
     "activate": "Ativar",
@@ -5810,7 +5815,9 @@
     "clone_name_copy": "{{name}}(Cópia)",
     "clear_accent_color": "Cor de destaque clara",
     "clear_primary_color": "Limpar cor primária",
-    "delete": "Excluir"
+    "delete": "Excluir",
+    "detail_tabs_aria": "Group detail sections",
+    "status_tabs_aria": "Group status filter"
   },
   "header": {
     "admin_menu": "Menu de administração",
@@ -5888,7 +5895,8 @@
     "status_open": "Abrir",
     "status_voting": "Votação",
     "top_matches_for_user_one": "Melhor correspondência de{{count}}para{{name}}",
-    "top_matches_for_user_other": "Principais correspondências de{{count}}para{{name}}"
+    "top_matches_for_user_other": "Principais correspondências de{{count}}para{{name}}",
+    "tabs_aria": "Challenge status filter"
   },
   "impact": {
     "chart_activity_breakdown_title": "Divisão de atividades",
@@ -6219,7 +6227,9 @@
     "type": "Tipo",
     "unfeature": "Desapresentar",
     "unfeature_listing": "Listagem sem recursos",
-    "unfeatured_success": "Descaracterizado com sucesso"
+    "unfeatured_success": "Descaracterizado com sucesso",
+    "section_tabs_aria": "Listings management sections",
+    "filter_tabs_aria": "Listing status filter"
   },
   "live": "LIVE",
   "matching": {
@@ -6411,7 +6421,8 @@
     "associated_listing": "Listagem Associada",
     "listing_owner": "Proprietário da listagem",
     "matched_user": "Usuário correspondente",
-    "review_details": "Detalhes da revisão"
+    "review_details": "Detalhes da revisão",
+    "tabs_aria": "Match approval status filter"
   },
   "moderation": {
     "action_failed": "Falha",
@@ -7003,7 +7014,8 @@
     "section_engagement_summary_desc": "Envolvimento único e total em campanhas de newsletter entregues.",
     "section_monthly_performance_desc": "Tendências mensais de entrega e engajamento para newsletters enviadas.",
     "section_top_performers_desc": "Boletins informativos com o envolvimento recente mais forte.",
-    "winner": "Ganhador"
+    "winner": "Ganhador",
+    "template_tabs_aria": "Newsletter template category filter"
   },
   "no_data": "Não há dados disponíveis",
   "not_found": {
@@ -7288,7 +7300,9 @@
     "status_pending": "Pendente",
     "status_rejected": "Rejeitado",
     "unknown_content_type": "Tipo desconhecido:{{type}}",
-    "unknown_status": "Status desconhecido:{{status}}"
+    "unknown_status": "Status desconhecido:{{status}}",
+    "hours_tabs_aria": "Hours report view",
+    "members_tabs_aria": "Member report type"
   },
   "resources": {
     "an_unexpected_error_occurred": "Ocorreu um erro inesperado",
@@ -7367,7 +7381,9 @@
     "save_changes": "Salvar alterações",
     "slug": "Lesma",
     "sort_order_placeholder": "0",
-    "video_url_placeholder": "https://www.youtube.com/watch?v=..."
+    "video_url_placeholder": "https://www.youtube.com/watch?v=...",
+    "kb_mode_tabs_aria": "Knowledge base article content mode",
+    "status_tabs_aria": "Resource status filter"
   },
   "review": "Revisão",
   "safeguarding": {
@@ -7667,7 +7683,8 @@
         "export_csv": "Exportar CSV",
         "export_suffix": "ação na visualização de detalhes do membro quando você precisar de um arquivo que pode ser anexado a um relatório de incidente ou compartilhado com um regulador. O CSV é UTF-8 com um BOM, portanto Excel o abre corretamente sem solicitar codificação."
       }
-    }
+    },
+    "tabs_aria": "Safeguarding sections"
   },
   "stats": {
     "active_listings": "Listagens Ativas",
@@ -8390,7 +8407,9 @@
     "user_with_id": "Usuário #{{id}}",
     "users_error_detail": "Usuários: {{error}}",
     "view_full_details": "Ver detalhes completos",
-    "breadcrumb_nav_aria": "Breadcrumb"
+    "breadcrumb_nav_aria": "Breadcrumb",
+    "partnerships_tabs_aria": "Federation partnership status filter",
+    "tenant_list_tabs_aria": "Tenant status filter"
   },
   "system": {
     "active": "Ativo",
@@ -9860,7 +9879,8 @@
     "validation_first_name_required": "O primeiro nome é obrigatório",
     "validation_last_name_required": "O sobrenome é obrigatório",
     "validation_password_min": "A senha deve ter pelo menos 8 caracteres",
-    "validation_role_required": "A função é obrigatória"
+    "validation_role_required": "A função é obrigatória",
+    "tabs_aria": "User status filter"
   },
   "view_all": "Ver tudo",
   "visibility_rules": {
@@ -10481,7 +10501,11 @@
     "applies_to_shift": "Mudança",
     "applies_to_profile": "Perfil",
     "webhook_events_placeholder": "aplicativo.criado, turno.concluído, horas.logged",
-    "webhook_url_placeholder": "https://example.com/webhook"
+    "webhook_url_placeholder": "https://example.com/webhook",
+    "approvals_tabs_aria": "Volunteer approval status filter",
+    "config_tabs_aria": "Volunteer configuration sections",
+    "giving_days_tabs_aria": "Giving days donor and donation sections",
+    "hours_audit_tabs_aria": "Volunteer hours audit sections"
   },
   "mailer": {
     "gmail_not_enabled": "A API do Gmail não está ativada",
@@ -10771,7 +10795,9 @@
     "filter_flagged": "Sinalizado",
     "filter_pending": "Pendente",
     "filter_rejected": "Rejeitado",
-    "verify_business": "Verifique o negócio"
+    "verify_business": "Verifique o negócio",
+    "moderation_tabs_aria": "Marketplace moderation status filter",
+    "seller_tabs_aria": "Seller status filter"
   },
   "spam": {
     "title": "Detecção de Spam",
@@ -11949,7 +11975,8 @@
     "feature_feed": "Alimentar",
     "feature_feed_desc": "Ative o feed da comunidade.",
     "feature_marketplace": "Mercado",
-    "feature_marketplace_desc": "Habilite recursos do mercado."
+    "feature_marketplace_desc": "Habilite recursos do mercado.",
+    "tabs_aria": "Tenant form sections"
   },
   "tenant_list": {
     "action_delete": "Excluir",
@@ -14039,7 +14066,8 @@
         "reject_failed": "Falha ao rejeitar",
         "rejected": "Proposta rejeitada"
       }
-    }
+    },
+    "tabs_aria": "Agent proposal status filter"
   },
   "fadp": {
     "meta": {
@@ -14662,7 +14690,8 @@
         "reject_failed": "Falha ao rejeitar a campanha.",
         "required_fields": "Nome, cargo e corpo são obrigatórios."
       }
-    }
+    },
+    "tabs_aria": "Ad campaign status filter"
   },
   "municipal_copilot": {
     "about": {

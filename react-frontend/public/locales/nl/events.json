@@ -132,7 +132,8 @@
     "join_meeting": "Neem deel aan de vergadering",
     "join_meeting_aria": "Deelnemen aan vergadering voor {{title}}",
     "join_waitlist_aria": "Op de wachtlijst voor dit evenement",
-    "leave_waitlist_aria": "Wachtlijst voor dit evenement verlaten"
+    "leave_waitlist_aria": "Wachtlijst voor dit evenement verlaten",
+    "tabs_aria": "Event detail sections"
   },
   "card": {
     "cancelled": "Geannuleerd",

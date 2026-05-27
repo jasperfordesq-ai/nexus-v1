@@ -434,6 +434,7 @@ export function UserList() {
       {/* Status Filter Tabs */}
       <div className="rounded-2xl border border-divider/70 bg-surface p-2 shadow-sm shadow-black/[0.03]">
         <Tabs
+          aria-label={t('users.tabs_aria')}
           selectedKey={filter}
           onSelectionChange={(key) => handleFilterChange(key as string)}
           variant="underlined"

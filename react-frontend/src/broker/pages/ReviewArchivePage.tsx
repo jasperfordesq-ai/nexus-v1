@@ -172,6 +172,7 @@ export function ReviewArchive() {
 
       <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <Tabs
+          aria-label={t('archives.tabs_aria')}
           selectedKey={filter}
           onSelectionChange={handleFilterChange}
           variant="underlined"

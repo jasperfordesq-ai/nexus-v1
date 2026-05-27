@@ -190,6 +190,7 @@ export function ComposeHub({
               {/* Underlined tabs — hidden in edit mode (locked to Post tab) */}
               {!editItem && (
                 <Tabs
+                  aria-label={t('compose.type_tabs_aria')}
                   selectedKey={activeTab}
                   onSelectionChange={(key) => setActiveTab(key as ComposeTab)}
                   variant="underlined"

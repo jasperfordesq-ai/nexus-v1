@@ -27,5 +27,6 @@
   "not_interested": "Níl suim agam",
   "page_meta": {
     "title": "Meaitseálacha"
-  }
+  },
+  "filter_tabs_aria": "Match source filter"
 }

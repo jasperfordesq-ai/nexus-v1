@@ -193,7 +193,8 @@
     "time_hours_ago": "{{count}}h ago",
     "time_days_ago": "{{count}}d ago",
     "note_system_author": "System",
-    "hours_short": "hrs"
+    "hours_short": "hrs",
+    "tabs_aria": "Member status filter"
   },
   "onboarding": {
     "title": "Onboarding",
@@ -293,7 +294,7 @@
     "stat_verified": "Verified",
     "stat_expiring": "Expiring Soon",
     "stat_expiring_soon": "Expiring Soon",
-    "tabs_aria": "Vetting status tabs",
+    "tabs_aria": "Vetting status filter",
     "confirm_verify_title": "Confirm Verification",
     "confirm_verify_message": "Verify {{name}}'s {{type}} record?",
     "confirm_reject_title": "Confirm Rejection",
@@ -458,7 +459,8 @@
     "detail_broker_conditions": "Broker Conditions",
     "detail_history": "History",
     "detail_history_by": "by {{name}}",
-    "detail_no_history": "No history available."
+    "detail_no_history": "No history available.",
+    "tabs_aria": "Exchange status filter"
   },
   "messages": {
     "title": "Message Review",
@@ -566,7 +568,8 @@
     "copy_reason_new_member": "New Member",
     "copy_reason_flagged_user": "Flagged User",
     "copy_reason_manual_monitoring": "Manual Monitoring",
-    "copy_reason_random_sample": "Random Sample"
+    "copy_reason_random_sample": "Random Sample",
+    "review_tabs_aria": "Message review filter"
   },
   "monitoring": {
     "title": "User Monitoring",
@@ -679,7 +682,8 @@
     "category_legal": "Legal",
     "category_reputation": "Reputation",
     "category_fraud": "Potential Fraud",
-    "category_other": "Other"
+    "category_other": "Other",
+    "tabs_aria": "Risk level filter"
   },
   "insurance": {
     "title": "Insurance Certificates",
@@ -774,7 +778,8 @@
     "label_certificate_file": "Certificate File",
     "label_created": "Created",
     "label_verified_at": "Verified at",
-    "label_verified_by": "Verified by"
+    "label_verified_by": "Verified by",
+    "tabs_aria": "Insurance certificate status filter"
   },
   "archives": {
     "title": "Review Archive",
@@ -832,7 +837,8 @@
     "severity_low": "Low",
     "severity_medium": "Medium",
     "severity_high": "High",
-    "severity_critical": "Critical"
+    "severity_critical": "Critical",
+    "tabs_aria": "Review archive filter"
   },
   "configuration": {
     "title": "Broker Configuration",

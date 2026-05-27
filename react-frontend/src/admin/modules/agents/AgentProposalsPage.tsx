@@ -148,6 +148,7 @@ export default function AgentProposalsPage() {
       />
 
       <Tabs
+        aria-label={t('agents.tabs_aria')}
         selectedKey={filter}
         onSelectionChange={(k) => setFilter(k as ProposalStatus)}
       >

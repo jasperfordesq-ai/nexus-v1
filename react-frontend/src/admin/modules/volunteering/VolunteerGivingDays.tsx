@@ -482,7 +482,7 @@ export default function VolunteerGivingDays() {
               </Card>
             </div>
 
-            <Tabs variant="underlined" classNames={{ tabList: 'mb-3' }}>
+            <Tabs aria-label={t('volunteering.giving_days_tabs_aria')} variant="underlined" classNames={{ tabList: 'mb-3' }}>
               <Tab
                 key="donors"
                 title={

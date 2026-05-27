@@ -132,7 +132,8 @@
     "join_meeting": "ミーティングに参加する",
     "join_meeting_aria": "{{title}} のミーティングに参加",
     "join_waitlist_aria": "このイベントのキャンセル待ちに参加",
-    "leave_waitlist_aria": "このイベントのキャンセル待ちから外れる"
+    "leave_waitlist_aria": "このイベントのキャンセル待ちから外れる",
+    "tabs_aria": "Event detail sections"
   },
   "card": {
     "cancelled": "キャンセル",

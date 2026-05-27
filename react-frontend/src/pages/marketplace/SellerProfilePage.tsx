@@ -364,6 +364,7 @@ export function SellerProfilePage() {
 
         {/* Tabs */}
         <Tabs
+          aria-label={t('seller_profile_tabs_aria')}
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(String(key))}
           variant="secondary"

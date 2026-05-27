@@ -297,6 +297,7 @@ export function TenantList() {
 
       <div className="mb-4">
         <Tabs
+          aria-label={t('super.tenant_list_tabs_aria')}
           selectedKey={filter}
           onSelectionChange={(key) => { setFilter(key as string); }}
           variant="underlined"

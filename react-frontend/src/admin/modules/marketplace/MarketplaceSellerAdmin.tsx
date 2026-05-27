@@ -313,6 +313,7 @@ export function MarketplaceSellerAdmin() {
       {/* Filter tabs */}
       <div className="mb-4">
         <Tabs
+          aria-label={t('marketplace.seller_tabs_aria')}
           selectedKey={filter}
           onSelectionChange={(key) => {
             setFilter(key as string);

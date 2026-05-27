@@ -377,7 +377,8 @@
     "personal_message": "رسالة شخصية",
     "personal_message_placeholder": "ملاحظة للمرشح...",
     "interview_location_placeholder": "https://meet.google.com/...",
-    "offer_salary_placeholder": "مثال: 45000"
+    "offer_salary_placeholder": "مثال: 45000",
+    "tabs_aria": "Job pipeline sections"
   },
   "apply": {
     "button": "قدّم الآن",
@@ -1031,5 +1032,6 @@
   },
   "jobs": {
     "view_details": "عرض تفاصيل الوظيفة"
-  }
+  },
+  "tabs_aria": "Jobs view"
 }

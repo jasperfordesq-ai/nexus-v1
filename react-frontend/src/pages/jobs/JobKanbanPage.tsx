@@ -807,7 +807,7 @@ export function JobKanbanPage() {
       </div>
 
       {/* Tab navigation */}
-      <Tabs selectedKey={activeTab} onSelectionChange={(k) => setActiveTab(k as 'pipeline' | 'activity')} variant="underlined" className="mb-4">
+      <Tabs aria-label={t('kanban.tabs_aria')} selectedKey={activeTab} onSelectionChange={(k) => setActiveTab(k as 'pipeline' | 'activity')} variant="underlined" className="mb-4">
         <Tab key="pipeline" title={<div className="flex items-center gap-2"><Briefcase size={15} /><span>{t('kanban.tab_pipeline')}</span></div>} />
         <Tab key="activity" title={<div className="flex items-center gap-2"><ScrollText size={15} /><span>{t('kanban.tab_activity')}</span></div>} />
       </Tabs>

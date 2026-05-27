@@ -607,5 +607,6 @@
     "stay": "Rimani"
   },
   "push_campaign_opt_in": "Ricevi notifiche push sponsorizzate",
-  "push_campaign_opt_in_description": "Consenti a imprese e organizzazioni locali di inviarle notifiche push mirate. Può cancellarsi in qualsiasi momento."
+  "push_campaign_opt_in_description": "Consenti a imprese e organizzazioni locali di inviarle notifiche push mirate. Può cancellarsi in qualsiasi momento.",
+  "tabs_aria": "Settings sections"
 }

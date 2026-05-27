@@ -245,6 +245,7 @@ export function KnowledgeBasePage() {
       {!searchResults && categories.length > 1 && !isLoading && (
         <div className="flex justify-center">
           <Tabs
+            aria-label={t('category_tabs_aria')}
             selectedKey={activeCategory}
             onSelectionChange={(key) => setActiveCategory(key as string)}
             variant="underlined"

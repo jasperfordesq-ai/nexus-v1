@@ -374,7 +374,8 @@
     "accepted_success": "Conexão aceita",
     "rejected_success": "Conexão recusada",
     "removed_success": "Conexão removida",
-    "action_failed": "A ação falhou. Por favor, tente novamente."
+    "action_failed": "A ação falhou. Por favor, tente novamente.",
+    "tabs_aria": "Federation connection status"
   },
   "partner_detail": {
     "page_title": "Comunidade de parceiros",

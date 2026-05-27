@@ -193,7 +193,8 @@
     "time_hours_ago": "{{count}} u geleden",
     "time_days_ago": "{{count}} d geleden",
     "note_system_author": "Systeem",
-    "hours_short": "u"
+    "hours_short": "u",
+    "tabs_aria": "Member status filter"
   },
   "onboarding": {
     "title": "Aan boord",
@@ -458,7 +459,8 @@
     "detail_broker_conditions": "Voorwaarden van de makelaar",
     "detail_history": "Geschiedenis",
     "detail_history_by": "door {{name}}",
-    "detail_no_history": "Geen geschiedenis beschikbaar."
+    "detail_no_history": "Geen geschiedenis beschikbaar.",
+    "tabs_aria": "Exchange status filter"
   },
   "messages": {
     "title": "Bericht Beoordeling",
@@ -566,7 +568,8 @@
     "copy_reason_new_member": "Nieuw lid",
     "copy_reason_flagged_user": "Gemarkeerde gebruiker",
     "copy_reason_manual_monitoring": "Handmatige monitoring",
-    "copy_reason_random_sample": "Willekeurige steekproef"
+    "copy_reason_random_sample": "Willekeurige steekproef",
+    "review_tabs_aria": "Message review filter"
   },
   "monitoring": {
     "title": "Gebruikersbewaking",
@@ -679,7 +682,8 @@
     "category_legal": "Juridisch",
     "category_reputation": "Reputatie",
     "category_fraud": "Mogelijke fraude",
-    "category_other": "Anders"
+    "category_other": "Anders",
+    "tabs_aria": "Risk level filter"
   },
   "insurance": {
     "title": "Verzekeringscertificaten",
@@ -774,7 +778,8 @@
     "label_certificate_file": "Certificaatbestand",
     "label_created": "Aangemaakt",
     "label_verified_at": "Geverifieerd op",
-    "label_verified_by": "Geverifieerd door"
+    "label_verified_by": "Geverifieerd door",
+    "tabs_aria": "Insurance certificate status filter"
   },
   "archives": {
     "title": "Beoordelingsarchief",
@@ -832,7 +837,8 @@
     "severity_low": "Laag",
     "severity_medium": "Gemiddeld",
     "severity_high": "Hoog",
-    "severity_critical": "Kritiek"
+    "severity_critical": "Kritiek",
+    "tabs_aria": "Review archive filter"
   },
   "configuration": {
     "title": "Makelaarconfiguratie",

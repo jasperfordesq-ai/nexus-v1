@@ -1351,7 +1351,8 @@
     "page_title_edit_with_title": "編集:{{title}}",
     "placeholder_featured_image": "https://example.com/image.jpg",
     "save_changes": "変更を保存する",
-    "search_placeholder": "ブログ投稿を検索..."
+    "search_placeholder": "ブログ投稿を検索...",
+    "tabs_aria": "Blog post status filter"
   },
   "breadcrumbs": {
     "activity_log": "アクティビティログ",
@@ -2075,7 +2076,8 @@
     "label_slug": "ナメクジ",
     "listings": "リスト",
     "save_changes": "変更を保存する",
-    "search_placeholder": "カテゴリを検索..."
+    "search_placeholder": "カテゴリを検索...",
+    "tabs_aria": "Category type filter"
   },
   "common": {
     "an_unexpected_error": "予期しないエラーが発生しました",
@@ -4413,7 +4415,8 @@
     "tab_cancelled": "キャンセルされました",
     "tab_draft": "草案",
     "tab_published": "発行済み",
-    "unknown": "不明"
+    "unknown": "不明",
+    "tabs_aria": "Event status filter"
   },
   "federation": {
     "active_partner": "アクティブパートナー",
@@ -5249,7 +5252,9 @@
     "webhook_transaction_created": "トランザクションが作成されました",
     "webhooks_sample_message": "これは Project NEXUS フェデレーションからのテスト配信です",
     "website": "Webサイト",
-    "website_desc": "このコミュニティの公開 Web サイト。"
+    "website_desc": "このコミュニティの公開 Web サイト。",
+    "api_docs_tabs_aria": "API example language selector",
+    "partnership_detail_tabs_aria": "Partnership detail sections"
   },
   "gamification": {
     "activate": "アクティブ化する",
@@ -5810,7 +5815,9 @@
     "clone_name_copy": "{{name}}(コピー)",
     "clear_accent_color": "クリアなアクセントカラー",
     "clear_primary_color": "はっきりとした原色",
-    "delete": "消去"
+    "delete": "消去",
+    "detail_tabs_aria": "Group detail sections",
+    "status_tabs_aria": "Group status filter"
   },
   "header": {
     "admin_menu": "管理者メニュー",
@@ -5888,7 +5895,8 @@
     "status_open": "開ける",
     "status_voting": "投票",
     "top_matches_for_user_one": "{{name}}の上位{{count}}一致",
-    "top_matches_for_user_other": "{{name}}の上位{{count}}一致"
+    "top_matches_for_user_other": "{{name}}の上位{{count}}一致",
+    "tabs_aria": "Challenge status filter"
   },
   "impact": {
     "chart_activity_breakdown_title": "活動の内訳",
@@ -6219,7 +6227,9 @@
     "type": "タイプ",
     "unfeature": "特徴がない",
     "unfeature_listing": "未機能リスト",
-    "unfeatured_success": "正常に非表示になりました"
+    "unfeatured_success": "正常に非表示になりました",
+    "section_tabs_aria": "Listings management sections",
+    "filter_tabs_aria": "Listing status filter"
   },
   "live": "LIVE",
   "matching": {
@@ -6411,7 +6421,8 @@
     "associated_listing": "関連リスト",
     "listing_owner": "リスティングの所有者",
     "matched_user": "一致したユーザー",
-    "review_details": "レビューの詳細"
+    "review_details": "レビューの詳細",
+    "tabs_aria": "Match approval status filter"
   },
   "moderation": {
     "action_failed": "失敗しました",
@@ -7003,7 +7014,8 @@
     "section_engagement_summary_desc": "配信されたニュースレター キャンペーン全体にわたる独自の総合的なエンゲージメント。",
     "section_monthly_performance_desc": "送信されたニュースレターの毎月の配信とエンゲージメントの傾向。",
     "section_top_performers_desc": "最近最もエンゲージメントが高かったニュースレター。",
-    "winner": "勝者"
+    "winner": "勝者",
+    "template_tabs_aria": "Newsletter template category filter"
   },
   "no_data": "利用可能なデータがありません",
   "not_found": {
@@ -7288,7 +7300,9 @@
     "status_pending": "保留中",
     "status_rejected": "拒否されました",
     "unknown_content_type": "不明なタイプ:{{type}}",
-    "unknown_status": "不明なステータス:{{status}}"
+    "unknown_status": "不明なステータス:{{status}}",
+    "hours_tabs_aria": "Hours report view",
+    "members_tabs_aria": "Member report type"
   },
   "resources": {
     "an_unexpected_error_occurred": "予期しないエラーが発生しました",
@@ -7367,7 +7381,9 @@
     "save_changes": "変更を保存",
     "slug": "ナメクジ",
     "sort_order_placeholder": "0",
-    "video_url_placeholder": "https://www.youtube.com/watch?v=..."
+    "video_url_placeholder": "https://www.youtube.com/watch?v=...",
+    "kb_mode_tabs_aria": "Knowledge base article content mode",
+    "status_tabs_aria": "Resource status filter"
   },
   "review": "レビュー",
   "safeguarding": {
@@ -7667,7 +7683,8 @@
         "export_csv": "CSV をエクスポートする",
         "export_suffix": "インシデントレポートに添付したり規制当局と共有したりできるファイルが必要な場合は、メンバーの詳細ビューでアクションを実行します。 CSV は BOM を備えた UTF-8 であるため、Excel はエンコードを要求することなく正しく開きます。"
       }
-    }
+    },
+    "tabs_aria": "Safeguarding sections"
   },
   "stats": {
     "active_listings": "アクティブなリスト",
@@ -8390,7 +8407,9 @@
     "user_with_id": "ユーザー番号{{id}}",
     "users_error_detail": "ユーザー: {{error}}",
     "view_full_details": "詳細を表示",
-    "breadcrumb_nav_aria": "Breadcrumb"
+    "breadcrumb_nav_aria": "Breadcrumb",
+    "partnerships_tabs_aria": "Federation partnership status filter",
+    "tenant_list_tabs_aria": "Tenant status filter"
   },
   "system": {
     "active": "アクティブ",
@@ -9860,7 +9879,8 @@
     "validation_first_name_required": "名は必須です",
     "validation_last_name_required": "姓は必須です",
     "validation_password_min": "パスワードは8文字以上である必要があります",
-    "validation_role_required": "役割は必須です"
+    "validation_role_required": "役割は必須です",
+    "tabs_aria": "User status filter"
   },
   "view_all": "すべて見る",
   "visibility_rules": {
@@ -10481,7 +10501,11 @@
     "applies_to_shift": "シフト",
     "applies_to_profile": "プロフィール",
     "webhook_events_placeholder": "application.created、shift.completed、hours.logged",
-    "webhook_url_placeholder": "https://example.com/webhook"
+    "webhook_url_placeholder": "https://example.com/webhook",
+    "approvals_tabs_aria": "Volunteer approval status filter",
+    "config_tabs_aria": "Volunteer configuration sections",
+    "giving_days_tabs_aria": "Giving days donor and donation sections",
+    "hours_audit_tabs_aria": "Volunteer hours audit sections"
   },
   "mailer": {
     "gmail_not_enabled": "Gmail APIが有効になっていません",
@@ -10771,7 +10795,9 @@
     "filter_flagged": "フラグ付き",
     "filter_pending": "保留中",
     "filter_rejected": "拒否されました",
-    "verify_business": "ビジネスの検証"
+    "verify_business": "ビジネスの検証",
+    "moderation_tabs_aria": "Marketplace moderation status filter",
+    "seller_tabs_aria": "Seller status filter"
   },
   "spam": {
     "title": "スパムの検出",
@@ -11949,7 +11975,8 @@
     "feature_feed": "餌",
     "feature_feed_desc": "コミュニティ フィードを有効にします。",
     "feature_marketplace": "市場",
-    "feature_marketplace_desc": "マーケットプレイス機能を有効にします。"
+    "feature_marketplace_desc": "マーケットプレイス機能を有効にします。",
+    "tabs_aria": "Tenant form sections"
   },
   "tenant_list": {
     "action_delete": "削除",
@@ -14039,7 +14066,8 @@
         "reject_failed": "拒否できませんでした",
         "rejected": "提案は拒否されました"
       }
-    }
+    },
+    "tabs_aria": "Agent proposal status filter"
   },
   "fadp": {
     "meta": {
@@ -14662,7 +14690,8 @@
         "reject_failed": "キャンペーンを拒否できませんでした。",
         "required_fields": "名前、タイトル、本文は必須です。"
       }
-    }
+    },
+    "tabs_aria": "Ad campaign status filter"
   },
   "municipal_copilot": {
     "about": {

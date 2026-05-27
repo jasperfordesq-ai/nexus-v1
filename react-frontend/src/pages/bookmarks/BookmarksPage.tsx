@@ -333,6 +333,7 @@ export default function BookmarksPage() {
 
       {/* Content Type Tabs */}
       <Tabs
+        aria-label={t('content_type_tabs_aria')}
         selectedKey={activeTab}
         onSelectionChange={(key) => { setActiveTab(key as ContentTab); setPage(1); }}
         variant="underlined"

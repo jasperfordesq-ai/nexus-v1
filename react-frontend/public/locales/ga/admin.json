@@ -1351,7 +1351,8 @@
     "page_title_edit_with_title": "Cuir:{{title}}",
     "placeholder_featured_image": "https://example.com/image.jpg",
     "save_changes": "Sábháil athruithe",
-    "search_placeholder": "Cuardaigh blogphoist..."
+    "search_placeholder": "Cuardaigh blogphoist...",
+    "tabs_aria": "Blog post status filter"
   },
   "breadcrumbs": {
     "activity_log": "Loga Gníomhaíochta",
@@ -2075,7 +2076,8 @@
     "label_slug": "Drúchtín",
     "listings": "Liostaí",
     "save_changes": "Sábháil athruithe",
-    "search_placeholder": "Cuardaigh catagóirí..."
+    "search_placeholder": "Cuardaigh catagóirí...",
+    "tabs_aria": "Category type filter"
   },
   "common": {
     "an_unexpected_error": "Tharla earráid gan choinne",
@@ -4413,7 +4415,8 @@
     "tab_cancelled": "Ar ceal",
     "tab_draft": "Dréacht",
     "tab_published": "Foilsithe",
-    "unknown": "Anaithnid"
+    "unknown": "Anaithnid",
+    "tabs_aria": "Event status filter"
   },
   "federation": {
     "active_partner": "Comhpháirtí Gníomhach",
@@ -5249,7 +5252,9 @@
     "webhook_transaction_created": "Idirbheart cruthaithe",
     "webhooks_sample_message": "Seo seachadadh tástála ó Project NEXUS Federation",
     "website": "Suíomh Gréasáin",
-    "website_desc": "Suíomh gréasáin poiblí don phobal seo."
+    "website_desc": "Suíomh gréasáin poiblí don phobal seo.",
+    "api_docs_tabs_aria": "API example language selector",
+    "partnership_detail_tabs_aria": "Partnership detail sections"
   },
   "gamification": {
     "activate": "Gníomhachtaigh",
@@ -5810,7 +5815,9 @@
     "clone_name_copy": "{{name}}(Cóip)",
     "clear_accent_color": "Dath accent soiléir",
     "clear_primary_color": "Dath bunscoile soiléir",
-    "delete": "Scrios"
+    "delete": "Scrios",
+    "detail_tabs_aria": "Group detail sections",
+    "status_tabs_aria": "Group status filter"
   },
   "header": {
     "admin_menu": "Roghchlár admin",
@@ -5888,7 +5895,8 @@
     "status_open": "Oscail",
     "status_voting": "Vótáil",
     "top_matches_for_user_one": "Cluiche barr{{count}}do{{name}}",
-    "top_matches_for_user_other": "Na cluichí is fearr do{{count}}do{{name}}"
+    "top_matches_for_user_other": "Na cluichí is fearr do{{count}}do{{name}}",
+    "tabs_aria": "Challenge status filter"
   },
   "impact": {
     "chart_activity_breakdown_title": "Miondealú Gníomhaíochta",
@@ -6219,7 +6227,9 @@
     "type": "Cineál",
     "unfeature": "Neamhghné",
     "unfeature_listing": "Liostú Neamhghné",
-    "unfeatured_success": "D'éirigh le neamh-feiceáil"
+    "unfeatured_success": "D'éirigh le neamh-feiceáil",
+    "section_tabs_aria": "Listings management sections",
+    "filter_tabs_aria": "Listing status filter"
   },
   "live": "LIVE",
   "matching": {
@@ -6411,7 +6421,8 @@
     "associated_listing": "Liostú Gaolmhar",
     "listing_owner": "Úinéir Liostú",
     "matched_user": "Úsáideoir Meaitseála",
-    "review_details": "Sonraí Athbhreithnithe"
+    "review_details": "Sonraí Athbhreithnithe",
+    "tabs_aria": "Match approval status filter"
   },
   "moderation": {
     "action_failed": "Theip",
@@ -7003,7 +7014,8 @@
     "section_engagement_summary_desc": "Rannpháirtíocht uathúil agus iomlán ar fud feachtais nuachtlitreach seachadta.",
     "section_monthly_performance_desc": "Treochtaí seachadta míosúla agus rannpháirtíochta do nuachtlitreacha a sheoltar.",
     "section_top_performers_desc": "Nuachtlitreacha leis an rannpháirtíocht is láidre le déanaí.",
-    "winner": "Buaiteoir"
+    "winner": "Buaiteoir",
+    "template_tabs_aria": "Newsletter template category filter"
   },
   "no_data": "Níl aon sonraí ar fáil",
   "not_found": {
@@ -7288,7 +7300,9 @@
     "status_pending": "Ar feitheamh",
     "status_rejected": "Diúltaithe",
     "unknown_content_type": "Cineál anaithnid:{{type}}",
-    "unknown_status": "Stádas anaithnid:{{status}}"
+    "unknown_status": "Stádas anaithnid:{{status}}",
+    "hours_tabs_aria": "Hours report view",
+    "members_tabs_aria": "Member report type"
   },
   "resources": {
     "an_unexpected_error_occurred": "Tharla earráid gan choinne",
@@ -7367,7 +7381,9 @@
     "save_changes": "Sábháil Athruithe",
     "slug": "Drúchtín",
     "sort_order_placeholder": "0",
-    "video_url_placeholder": "https://www.youtube.com/watch?v=..."
+    "video_url_placeholder": "https://www.youtube.com/watch?v=...",
+    "kb_mode_tabs_aria": "Knowledge base article content mode",
+    "status_tabs_aria": "Resource status filter"
   },
   "review": "Léirmheas",
   "safeguarding": {
@@ -7667,7 +7683,8 @@
         "export_csv": "Easpórtáil CSV",
         "export_suffix": "gníomh ar dhearcadh mionsonraí an bhaill nuair a bhíonn comhad uait is féidir leat a cheangal le tuairisc teagmhais nó a roinnt le rialtóir. Is é an CSV ná UTF-8 le BOM agus mar sin osclaíonn Excel i gceart é gan leideanna chun ionchódú a dhéanamh."
       }
-    }
+    },
+    "tabs_aria": "Safeguarding sections"
   },
   "stats": {
     "active_listings": "Liostaí Gníomhacha",
@@ -8390,7 +8407,9 @@
     "user_with_id": "Úsáideoir #{{id}}",
     "users_error_detail": "Úsáideoirí: {{error}}",
     "view_full_details": "Féach ar na Sonraí Iomlána",
-    "breadcrumb_nav_aria": "Breadcrumb"
+    "breadcrumb_nav_aria": "Breadcrumb",
+    "partnerships_tabs_aria": "Federation partnership status filter",
+    "tenant_list_tabs_aria": "Tenant status filter"
   },
   "system": {
     "active": "Gníomhach",
@@ -9860,7 +9879,8 @@
     "validation_first_name_required": "Céad ainm ag teastáil",
     "validation_last_name_required": "Tá sloinne ag teastáil",
     "validation_password_min": "Caithfidh pasfhocal a bheith 8 gcarachtar ar a laghad",
-    "validation_role_required": "Tá ról ag teastáil"
+    "validation_role_required": "Tá ról ag teastáil",
+    "tabs_aria": "User status filter"
   },
   "view_all": "Féach ar Uile",
   "visibility_rules": {
@@ -10481,7 +10501,11 @@
     "applies_to_shift": "Shift",
     "applies_to_profile": "Próifíl",
     "webhook_events_placeholder": "iarratas.cruthaithe, shift.completed, hours.logged",
-    "webhook_url_placeholder": "https://example.com/webhook"
+    "webhook_url_placeholder": "https://example.com/webhook",
+    "approvals_tabs_aria": "Volunteer approval status filter",
+    "config_tabs_aria": "Volunteer configuration sections",
+    "giving_days_tabs_aria": "Giving days donor and donation sections",
+    "hours_audit_tabs_aria": "Volunteer hours audit sections"
   },
   "mailer": {
     "gmail_not_enabled": "Níl Gmail API cumasaithe",
@@ -10771,7 +10795,9 @@
     "filter_flagged": "Bratach",
     "filter_pending": "Ar feitheamh",
     "filter_rejected": "Diúltaithe",
-    "verify_business": "Fíoraigh Gnó"
+    "verify_business": "Fíoraigh Gnó",
+    "moderation_tabs_aria": "Marketplace moderation status filter",
+    "seller_tabs_aria": "Seller status filter"
   },
   "spam": {
     "title": "Brath Turscar",
@@ -11949,7 +11975,8 @@
     "feature_feed": "Feed",
     "feature_feed_desc": "Cumasaigh an beathú pobail.",
     "feature_marketplace": "Margadh",
-    "feature_marketplace_desc": "Cumasaigh gnéithe margadh."
+    "feature_marketplace_desc": "Cumasaigh gnéithe margadh.",
+    "tabs_aria": "Tenant form sections"
   },
   "tenant_list": {
     "action_delete": "Scrios",
@@ -14039,7 +14066,8 @@
         "reject_failed": "Theip ar dhiúltú",
         "rejected": "Diúltaíodh don togra"
       }
-    }
+    },
+    "tabs_aria": "Agent proposal status filter"
   },
   "fadp": {
     "meta": {
@@ -14662,7 +14690,8 @@
         "reject_failed": "Theip ar an bhfeachtas a dhiúltú.",
         "required_fields": "Tá ainm, teideal agus corp ag teastáil."
       }
-    }
+    },
+    "tabs_aria": "Ad campaign status filter"
   },
   "municipal_copilot": {
     "about": {

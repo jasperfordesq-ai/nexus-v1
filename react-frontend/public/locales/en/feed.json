@@ -229,7 +229,8 @@
     "video_remove": "Remove video",
     "file_size_mb": "{{name}} ({{size}}MB)",
     "listing_preview_alt": "Listing preview",
-    "image_preview_alt": "Upload preview"
+    "image_preview_alt": "Upload preview",
+    "type_tabs_aria": "Compose content type"
   },
   "moderation": {
     "unauthorized": "You do not have permission to perform this action."

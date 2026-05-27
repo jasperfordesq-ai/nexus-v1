@@ -193,7 +193,8 @@
     "time_hours_ago": "il y a {{count}} h",
     "time_days_ago": "il y a {{count}} j",
     "note_system_author": "Système",
-    "hours_short": "h"
+    "hours_short": "h",
+    "tabs_aria": "Member status filter"
   },
   "onboarding": {
     "title": "Intégration",
@@ -458,7 +459,8 @@
     "detail_broker_conditions": "Conditions du courtier",
     "detail_history": "Historique",
     "detail_history_by": "par {{name}}",
-    "detail_no_history": "Aucun historique disponible."
+    "detail_no_history": "Aucun historique disponible.",
+    "tabs_aria": "Exchange status filter"
   },
   "messages": {
     "title": "Examen des messages",
@@ -566,7 +568,8 @@
     "copy_reason_new_member": "Nouveau membre",
     "copy_reason_flagged_user": "Utilisateur signalé",
     "copy_reason_manual_monitoring": "Surveillance manuelle",
-    "copy_reason_random_sample": "Échantillon aléatoire"
+    "copy_reason_random_sample": "Échantillon aléatoire",
+    "review_tabs_aria": "Message review filter"
   },
   "monitoring": {
     "title": "Surveillance des utilisateurs",
@@ -679,7 +682,8 @@
     "category_legal": "Juridique",
     "category_reputation": "Réputation",
     "category_fraud": "Fraude potentielle",
-    "category_other": "Autre"
+    "category_other": "Autre",
+    "tabs_aria": "Risk level filter"
   },
   "insurance": {
     "title": "Certificats d'assurance",
@@ -774,7 +778,8 @@
     "label_certificate_file": "Fichier du certificat",
     "label_created": "Créé",
     "label_verified_at": "Vérifié le",
-    "label_verified_by": "Vérifié par"
+    "label_verified_by": "Vérifié par",
+    "tabs_aria": "Insurance certificate status filter"
   },
   "archives": {
     "title": "Archive de révision",
@@ -832,7 +837,8 @@
     "severity_low": "Faible",
     "severity_medium": "Moyenne",
     "severity_high": "Élevée",
-    "severity_critical": "Critique"
+    "severity_critical": "Critique",
+    "tabs_aria": "Review archive filter"
   },
   "configuration": {
     "title": "Configuration du courtier",

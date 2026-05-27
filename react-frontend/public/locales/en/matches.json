@@ -27,5 +27,6 @@
   "match_hidden": "Match hidden — we'll show you fewer like this",
   "page_meta": {
     "title": "Matches"
-  }
+  },
+  "filter_tabs_aria": "Match source filter"
 }

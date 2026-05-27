@@ -51,5 +51,6 @@
   "all_categories": "すべて",
   "author_by": "{{name}}による",
   "attachments": "添付ファイル",
-  "breadcrumb": "Breadcrumb"
+  "breadcrumb": "Breadcrumb",
+  "category_tabs_aria": "Knowledge base categories"
 }

@@ -1003,6 +1003,7 @@ function ExamplesTab() {
     <div className="space-y-6">
       {/* Language switcher */}
       <Tabs
+        aria-label={t('federation.api_docs_tabs_aria')}
         selectedKey={lang}
         onSelectionChange={(key) => setLang(key as ExampleLang)}
         variant="secondary"

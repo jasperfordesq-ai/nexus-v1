@@ -607,5 +607,6 @@
     "stay": "Blijven"
   },
   "push_campaign_opt_in": "Gesponsorde pushmeldingen ontvangen",
-  "push_campaign_opt_in_description": "Sta lokale bedrijven en organisaties toe om gerichte pushmeldingen naar je te sturen. Je kunt je op elk moment afmelden."
+  "push_campaign_opt_in_description": "Sta lokale bedrijven en organisaties toe om gerichte pushmeldingen naar je te sturen. Je kunt je op elk moment afmelden.",
+  "tabs_aria": "Settings sections"
 }

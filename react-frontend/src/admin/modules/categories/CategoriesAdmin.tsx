@@ -321,6 +321,7 @@ export function CategoriesAdmin() {
       {/* Type Filter Tabs */}
       <div className="mb-4">
         <Tabs
+          aria-label={t('categories.tabs_aria')}
           selectedKey={typeFilter}
           onSelectionChange={(key) => setTypeFilter(key as string)}
           variant="underlined"

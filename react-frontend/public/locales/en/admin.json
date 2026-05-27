@@ -259,7 +259,8 @@
         "reject_failed": "Failed to reject",
         "rejected": "Proposal rejected"
       }
-    }
+    },
+    "tabs_aria": "Agent proposal status filter"
   },
   "ai": {
     "common": {
@@ -882,7 +883,8 @@
         "reject_failed": "Failed to reject campaign.",
         "required_fields": "Name, title, and body are required."
       }
-    }
+    },
+    "tabs_aria": "Ad campaign status filter"
   },
   "caring_community": {
     "meta": {
@@ -5027,7 +5029,8 @@
     "page_title_edit_with_title": "Edit: {{title}}",
     "placeholder_featured_image": "https://example.com/image.jpg",
     "save_changes": "Save changes",
-    "search_placeholder": "Search blog posts..."
+    "search_placeholder": "Search blog posts...",
+    "tabs_aria": "Blog post status filter"
   },
   "breadcrumbs": {
     "community_fund": "Community Fund",
@@ -5915,7 +5918,8 @@
     "type_event": "Event",
     "type_listing": "Listing",
     "type_resource": "Resource",
-    "type_vol_opportunity": "Vol Opportunity"
+    "type_vol_opportunity": "Vol Opportunity",
+    "tabs_aria": "Category type filter"
   },
   "common": {
     "an_unexpected_error": "An unexpected error occurred",
@@ -8253,7 +8257,8 @@
     "tab_cancelled": "Cancelled",
     "tab_draft": "Draft",
     "tab_published": "Published",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "tabs_aria": "Event status filter"
   },
   "federation": {
     "active_partner": "Active Partner",
@@ -9089,7 +9094,9 @@
       "bulk_approved_count_plural": "Approved {{count}} partnership requests",
       "bulk_rejected_count": "Rejected {{count}} partnership request",
       "bulk_rejected_count_plural": "Rejected {{count}} partnership requests"
-    }
+    },
+    "api_docs_tabs_aria": "API example language selector",
+    "partnership_detail_tabs_aria": "Partnership detail sections"
   },
   "gamification": {
     "activate": "Activate",
@@ -9650,7 +9657,9 @@
     "status_inactive": "Inactive",
     "unarchive": "Unarchive",
     "geocode_description": "Geocode group locations to enable map display and distance-based discovery.",
-    "geocode_not_migrated_desc": "The batch geocoding admin screen has not yet been rebuilt in React. For now, run the Artisan command on the server:"
+    "geocode_not_migrated_desc": "The batch geocoding admin screen has not yet been rebuilt in React. For now, run the Artisan command on the server:",
+    "detail_tabs_aria": "Group detail sections",
+    "status_tabs_aria": "Group status filter"
   },
   "header": {
     "admin_menu": "Admin menu",
@@ -9728,7 +9737,8 @@
     "view_details": "View Details",
     "no_challenges_found": "No challenges found found",
     "no_matching_challenges": "No matching challenges found",
-    "no_status_challenges": "No status challenges found"
+    "no_status_challenges": "No status challenges found",
+    "tabs_aria": "Challenge status filter"
   },
   "impact": {
     "chart_activity_breakdown_title": "Activity Breakdown",
@@ -10059,7 +10069,9 @@
     "type": "Type",
     "unfeature": "Unfeature",
     "unfeature_listing": "Unfeature Listing",
-    "unfeatured_success": "Unfeatured successfully"
+    "unfeatured_success": "Unfeatured successfully",
+    "section_tabs_aria": "Listings management sections",
+    "filter_tabs_aria": "Listing status filter"
   },
   "live": "LIVE",
   "matching": {
@@ -10251,7 +10263,8 @@
     "reviewed_by": "Reviewed by",
     "unknown": "Unknown",
     "cache_cleared_count": "Cleared {{count}} cache entry",
-    "cache_cleared_count_plural": "Cleared {{count}} cache entries"
+    "cache_cleared_count_plural": "Cleared {{count}} cache entries",
+    "tabs_aria": "Match approval status filter"
   },
   "moderation": {
     "action_failed": "Failed",
@@ -10843,7 +10856,8 @@
     "winner_subject": "Winner Subject",
     "winning_metric": "Winning Metric",
     "resend_queued_count": "Queued {{count}} resend",
-    "resend_queued_count_plural": "Queued {{count}} resends"
+    "resend_queued_count_plural": "Queued {{count}} resends",
+    "template_tabs_aria": "Newsletter template category filter"
   },
   "newsletter_activity": {
     "all_events": "All events",
@@ -11232,7 +11246,9 @@
     "unknown_status": "Unknown status: {{status}}",
     "tab_by_category": "By Category",
     "tab_by_member": "By Member",
-    "tab_monthly_trend": "Monthly Trend"
+    "tab_monthly_trend": "Monthly Trend",
+    "hours_tabs_aria": "Hours report view",
+    "members_tabs_aria": "Member report type"
   },
   "resources": {
     "an_unexpected_error_occurred": "An unexpected error occurred",
@@ -11311,7 +11327,9 @@
     "video_url": "YouTube Video URL",
     "video_url_placeholder": "https://www.youtube.com/watch?v=...",
     "excerpt_desc": "A short summary shown in article lists and search results.",
-    "video_url_desc": "Optional. A YouTube or Vimeo URL embedded at the top of the article."
+    "video_url_desc": "Optional. A YouTube or Vimeo URL embedded at the top of the article.",
+    "kb_mode_tabs_aria": "Knowledge base article content mode",
+    "status_tabs_aria": "Resource status filter"
   },
   "review": "Review",
   "safeguarding": {
@@ -11611,7 +11629,8 @@
     "vetting_garda": "Vetting Garda",
     "vetting_international": "Vetting International",
     "vetting_other": "Vetting Other",
-    "vetting_pvg_scotland": "Vetting Pvg Scotland"
+    "vetting_pvg_scotland": "Vetting Pvg Scotland",
+    "tabs_aria": "Safeguarding sections"
   },
   "stats": {
     "active_listings": "Active Listings",
@@ -12334,7 +12353,9 @@
     "target_hub_tenant": "Target Hub Tenant",
     "select_hub_tenant": "Select a hub tenant",
     "no_hub_tenants_found": "No hub tenants found",
-    "impersonate_user_warning": "Impersonation logs every action under this user's identity. Use only when necessary for support."
+    "impersonate_user_warning": "Impersonation logs every action under this user's identity. Use only when necessary for support.",
+    "partnerships_tabs_aria": "Federation partnership status filter",
+    "tenant_list_tabs_aria": "Tenant status filter"
   },
   "system": {
     "active": "Active",
@@ -13701,7 +13722,8 @@
     "validation_first_name_required": "First name is required",
     "validation_last_name_required": "Last name is required",
     "validation_password_min": "Password must be at least 8 characters",
-    "validation_role_required": "Role is required"
+    "validation_role_required": "Role is required",
+    "tabs_aria": "User status filter"
   },
   "view_all": "View All",
   "visibility_rules": {
@@ -14322,7 +14344,11 @@
     "time_hours_ago_plural": "{{count}} hours ago",
     "time_just_now": "Just now",
     "time_minutes_ago": "{{count}} minute ago",
-    "time_minutes_ago_plural": "{{count}} minutes ago"
+    "time_minutes_ago_plural": "{{count}} minutes ago",
+    "approvals_tabs_aria": "Volunteer approval status filter",
+    "config_tabs_aria": "Volunteer configuration sections",
+    "giving_days_tabs_aria": "Giving days donor and donation sections",
+    "hours_audit_tabs_aria": "Volunteer hours audit sections"
   },
   "mailer": {
     "gmail_not_enabled": "Gmail API is not enabled",
@@ -14612,7 +14638,9 @@
     "verify_btn": "Verify",
     "verify_seller_message": "This will mark the seller as verified. Continue?",
     "verify_seller_title": "Verify Seller",
-    "view_all": "View All"
+    "view_all": "View All",
+    "moderation_tabs_aria": "Marketplace moderation status filter",
+    "seller_tabs_aria": "Seller status filter"
   },
   "spam": {
     "title": "Spam Detection",
@@ -15790,7 +15818,8 @@
     "feature_feed": "Feed",
     "feature_feed_desc": "Enable the community feed.",
     "feature_marketplace": "Marketplace",
-    "feature_marketplace_desc": "Enable marketplace features."
+    "feature_marketplace_desc": "Enable marketplace features.",
+    "tabs_aria": "Tenant form sections"
   },
   "tenant_list": {
     "action_delete": "Delete",

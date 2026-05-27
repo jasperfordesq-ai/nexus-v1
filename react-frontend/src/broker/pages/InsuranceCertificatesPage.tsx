@@ -710,6 +710,7 @@ export function InsuranceCertificates() {
       {/* Filter Tabs */}
       <div className="mb-4">
         <Tabs
+          aria-label={t('insurance.tabs_aria')}
           selectedKey={statusFilter}
           onSelectionChange={(key) => { setStatusFilter(key as InsuranceStatus); setPage(1); }}
           variant="underlined"

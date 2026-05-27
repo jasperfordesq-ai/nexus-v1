@@ -145,6 +145,7 @@ export function FederationConnectionsPage() {
       </div>
 
       <Tabs
+        aria-label={t('connections.tabs_aria')}
         selectedKey={activeTab}
         onSelectionChange={handleTabChange}
         variant="underlined"

@@ -374,7 +374,8 @@
     "accepted_success": "تم قبول الاتصال",
     "rejected_success": "تم رفض الاتصال",
     "removed_success": "تمت إزالة الاتصال",
-    "action_failed": "فشل الإجراء. يرجى المحاولة مرة أخرى."
+    "action_failed": "فشل الإجراء. يرجى المحاولة مرة أخرى.",
+    "tabs_aria": "Federation connection status"
   },
   "partner_detail": {
     "page_title": "مجتمع الشركاء",

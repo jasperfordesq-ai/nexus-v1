@@ -377,7 +377,8 @@
     "personal_message": "Persönliche Nachricht",
     "personal_message_placeholder": "Eine Notiz an den Kandidaten...",
     "interview_location_placeholder": "https://meet.google.com/...",
-    "offer_salary_placeholder": "z. B. 45000"
+    "offer_salary_placeholder": "z. B. 45000",
+    "tabs_aria": "Job pipeline sections"
   },
   "apply": {
     "button": "Jetzt bewerben",
@@ -1031,5 +1032,6 @@
   },
   "jobs": {
     "view_details": "Stellendetails anzeigen"
-  }
+  },
+  "tabs_aria": "Jobs view"
 }

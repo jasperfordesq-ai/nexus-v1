@@ -369,6 +369,7 @@ export function SellerOrdersPage() {
 
         {/* Tabs */}
         <Tabs
+          aria-label={t('seller_orders_tabs_aria')}
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(key as OrderTab)}
 

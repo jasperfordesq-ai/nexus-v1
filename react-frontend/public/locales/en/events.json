@@ -132,7 +132,8 @@
     "join_meeting": "Join Meeting",
     "join_meeting_aria": "Join meeting for {{title}}",
     "join_waitlist_aria": "Join the waitlist for this event",
-    "leave_waitlist_aria": "Leave the waitlist for this event"
+    "leave_waitlist_aria": "Leave the waitlist for this event",
+    "tabs_aria": "Event detail sections"
   },
   "card": {
     "cancelled": "Cancelled",

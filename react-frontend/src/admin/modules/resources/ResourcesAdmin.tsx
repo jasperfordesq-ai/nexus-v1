@@ -269,6 +269,7 @@ export function ResourcesAdmin() {
 
       <div className="mb-4">
         <Tabs
+          aria-label={t('resources.status_tabs_aria')}
           selectedKey={status}
           onSelectionChange={(key) => { setStatus(key as string); setPage(1); }}
           variant="underlined"

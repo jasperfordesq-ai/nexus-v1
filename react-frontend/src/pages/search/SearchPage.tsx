@@ -296,6 +296,7 @@ export function SearchPage() {
 
           {/* Tabs */}
           <Tabs
+            aria-label={t('tabs_aria')}
             selectedKey={activeTab}
             onSelectionChange={(key) => setActiveTab(key as SearchTab)}
             classNames={{
