@@ -115,7 +115,7 @@ export function SmartMatchingOverview() {
         actions={
           <Button
             variant="tertiary"
-            startContent={<RefreshCw size={16} />}
+            startContent={<RefreshCw aria-hidden="true" size={16} />}
             onPress={loadData}
             isLoading={loading}
             size="sm"
@@ -165,7 +165,7 @@ export function SmartMatchingOverview() {
         <Card>
           <CardHeader className="flex items-center justify-between px-4 pt-4 pb-0">
             <div className="flex items-center gap-2">
-              <Zap size={18} className="text-accent" />
+              <Zap aria-hidden="true" size={18} className="text-accent" />
               <h3 className="font-semibold">{t('matching.algorithm_weights')}</h3>
             </div>
             {config && (
@@ -232,7 +232,7 @@ export function SmartMatchingOverview() {
         {/* Quick Actions */}
         <Card>
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <Settings size={18} className="text-accent" />
+            <Settings aria-hidden="true" size={18} className="text-accent" />
             <h3 className="font-semibold">{t('matching.quick_actions')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
@@ -242,7 +242,7 @@ export function SmartMatchingOverview() {
                 to={tenantPath('/admin/smart-matching/configuration')}
                 fullWidth
                 variant="secondary"
-                startContent={<Settings size={16} />}
+                startContent={<Settings aria-hidden="true" size={16} />}
                 className="justify-start"
               >
                 {t('matching.configure_algorithm')}
@@ -252,7 +252,7 @@ export function SmartMatchingOverview() {
                 to={tenantPath('/admin/smart-matching/analytics')}
                 fullWidth
                 variant="tertiary"
-                startContent={<BarChart3 size={16} />}
+                startContent={<BarChart3 aria-hidden="true" size={16} />}
                 className="justify-start"
               >
                 {t('matching.view_analytics')}
@@ -260,7 +260,7 @@ export function SmartMatchingOverview() {
               <Button
                 fullWidth
                 variant="danger-soft"
-                startContent={<Trash2 size={16} />}
+                startContent={<Trash2 aria-hidden="true" size={16} />}
                 className="justify-start"
                 onPress={() => setClearModalOpen(true)}
               >
@@ -272,7 +272,7 @@ export function SmartMatchingOverview() {
                 to={tenantPath('/admin/match-approvals')}
                 fullWidth
                 variant="tertiary"
-                startContent={<ShieldCheck size={16} />}
+                startContent={<ShieldCheck aria-hidden="true" size={16} />}
                 className="justify-start"
               >
                 {t('matching.broker_approvals')}
@@ -289,7 +289,7 @@ export function SmartMatchingOverview() {
         {/* Matching Activity Summary */}
         <Card>
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <Users size={18} className="text-accent" />
+            <Users aria-hidden="true" size={18} className="text-accent" />
             <h3 className="font-semibold">{t('matching.matching_activity')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
@@ -347,7 +347,7 @@ export function SmartMatchingOverview() {
         {/* Approval Summary */}
         <Card>
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <ShieldCheck size={18} className="text-accent" />
+            <ShieldCheck aria-hidden="true" size={18} className="text-accent" />
             <h3 className="font-semibold">{t('matching.approval_summary')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">

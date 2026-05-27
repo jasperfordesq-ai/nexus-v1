@@ -210,7 +210,7 @@ export function JobModerationQueue() {
         actions={
           <Button
             variant="secondary"
-            startContent={<RefreshCw size={16} />}
+            startContent={<RefreshCw aria-hidden="true" size={16} />}
             onPress={() => { loadPendingJobs(); loadStats(); }}
           >
             {t('moderation.refresh')}
@@ -261,7 +261,7 @@ export function JobModerationQueue() {
       {spamStats && spamStats.total_analyzed > 0 && (
         <Card className="mb-6">
           <CardHeader className="flex items-center gap-2 pb-2">
-            <ShieldAlert size={18} className="text-warning" />
+            <ShieldAlert aria-hidden="true" size={18} className="text-warning" />
             <h3 className="text-sm font-semibold text-foreground">
               {t('spam.title')}
             </h3>
@@ -378,7 +378,7 @@ export function JobModerationQueue() {
                             size="sm"
                             variant="soft"
                             color={getSpamScoreColor(job.spam_score)}
-                            startContent={<AlertTriangle size={12} />}
+                            startContent={<AlertTriangle aria-hidden="true" size={12} />}
                           >
                             {t('moderation.spam_score', { score: job.spam_score })}
                           </Chip>
@@ -394,7 +394,7 @@ export function JobModerationQueue() {
                     <Button
                       size="sm"
                       variant="secondary"
-                      startContent={<CheckCircle2 size={14} />}
+                      startContent={<CheckCircle2 aria-hidden="true" size={14} />}
                       onPress={() => openActionModal('approve', job)}
                     >
                       {t('moderation.approve')}
@@ -402,7 +402,7 @@ export function JobModerationQueue() {
                     <Button
                       size="sm"
                       variant="danger"
-                      startContent={<XCircle size={14} />}
+                      startContent={<XCircle aria-hidden="true" size={14} />}
                       onPress={() => openActionModal('reject', job)}
                     >
                       {t('moderation.reject')}
@@ -410,7 +410,7 @@ export function JobModerationQueue() {
                     <Button
                       size="sm"
                       variant="outline"
-                      startContent={<Flag size={14} />}
+                      startContent={<Flag aria-hidden="true" size={14} />}
                       onPress={() => openActionModal('flag', job)}
                     >
                       {t('moderation.flag')}
@@ -449,7 +449,7 @@ export function JobModerationQueue() {
             return (
               <>
                 <ModalHeader className="flex items-center gap-2">
-                  <ActionIcon size={20} className={`text-${config.color}`} />
+                  <ActionIcon aria-hidden="true" size={20} className={`text-${config.color}`} />
                   {config.label}: {actionModal.job.title}
                 </ModalHeader>
                 <ModalBody>
@@ -486,7 +486,7 @@ export function JobModerationQueue() {
                     isLoading={actionLoading}
                     isDisabled={requiresReason && !actionReason.trim()}
                     onPress={executeAction}
-                    startContent={!actionLoading && <ActionIcon size={16} />}
+                    startContent={!actionLoading && <ActionIcon aria-hidden="true" size={16} />}
                   >
                     {config.label}
                   </Button>

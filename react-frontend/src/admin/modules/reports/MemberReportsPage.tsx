@@ -272,7 +272,7 @@ export function MemberReportsPage() {
     return (
       <Card >
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-          <TrendingUp size={18} className="text-success" />
+          <TrendingUp size={18} className="text-success" aria-hidden="true" />
           <h3 className="font-semibold">{t('reports.registration_trends')}</h3>
           <div className="ml-auto">
             <Select
@@ -293,7 +293,7 @@ export function MemberReportsPage() {
         </CardHeader>
         <CardBody className="px-4 pb-4">
           {loading ? (
-            <div className="flex h-[350px] items-center justify-center"><Spinner /></div>
+            <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex h-[350px] items-center justify-center"><Spinner /></div>
           ) : trends.length > 0 ? (
             <ResponsiveContainer width="100%" height={350}>
               <BarChart data={trends}>
@@ -321,7 +321,7 @@ export function MemberReportsPage() {
     return (
       <Card >
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-          <UserCheck size={18} className="text-accent" />
+          <UserCheck size={18} className="text-accent" aria-hidden="true" />
           <h3 className="font-semibold">{t('reports.retention_cohorts')}</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">
@@ -453,7 +453,7 @@ export function MemberReportsPage() {
     return (
       <Card >
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-          <Trophy size={18} className="text-warning" />
+          <Trophy size={18} className="text-warning" aria-hidden="true" />
           <h3 className="font-semibold">{t('reports.top_contributors')}</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">
@@ -580,7 +580,7 @@ export function MemberReportsPage() {
             </Select>
             <Button
               variant="tertiary"
-              startContent={<Download size={16} />}
+              startContent={<Download size={16} aria-hidden="true" />}
               onPress={async () => {
                 try { await exportCsv(reportType); } catch { toast.error(t('reports.failed_to_export_c_s_v')); }
               }}
@@ -590,7 +590,7 @@ export function MemberReportsPage() {
             </Button>
             <Button
               variant="tertiary"
-              startContent={<RefreshCw size={16} />}
+              startContent={<RefreshCw size={16} aria-hidden="true" />}
               onPress={loadData}
               isLoading={loading}
               size="sm"
@@ -608,12 +608,12 @@ export function MemberReportsPage() {
         variant="underlined"
         classNames={{ tabList: 'mb-4' }}
       >
-        <Tab key="active" title={<span className="flex items-center gap-1.5"><Users size={14} /> {t('reports.tab_active')}</span>} />
-        <Tab key="registrations" title={<span className="flex items-center gap-1.5"><TrendingUp size={14} /> {t('reports.tab_registrations')}</span>} />
-        <Tab key="retention" title={<span className="flex items-center gap-1.5"><UserCheck size={14} /> {t('reports.tab_retention')}</span>} />
-        <Tab key="engagement" title={<span className="flex items-center gap-1.5"><Activity size={14} /> {t('reports.tab_engagement')}</span>} />
-        <Tab key="top_contributors" title={<span className="flex items-center gap-1.5"><Trophy size={14} /> {t('reports.tab_top_contributors')}</span>} />
-        <Tab key="least_active" title={<span className="flex items-center gap-1.5"><UserX size={14} /> {t('reports.tab_least_active')}</span>} />
+        <Tab key="active" title={<span className="flex items-center gap-1.5"><Users size={14} aria-hidden="true" /> {t('reports.tab_active')}</span>} />
+        <Tab key="registrations" title={<span className="flex items-center gap-1.5"><TrendingUp size={14} aria-hidden="true" /> {t('reports.tab_registrations')}</span>} />
+        <Tab key="retention" title={<span className="flex items-center gap-1.5"><UserCheck size={14} aria-hidden="true" /> {t('reports.tab_retention')}</span>} />
+        <Tab key="engagement" title={<span className="flex items-center gap-1.5"><Activity size={14} aria-hidden="true" /> {t('reports.tab_engagement')}</span>} />
+        <Tab key="top_contributors" title={<span className="flex items-center gap-1.5"><Trophy size={14} aria-hidden="true" /> {t('reports.tab_top_contributors')}</span>} />
+        <Tab key="least_active" title={<span className="flex items-center gap-1.5"><UserX size={14} aria-hidden="true" /> {t('reports.tab_least_active')}</span>} />
       </Tabs>
 
       {reportType === 'active' && renderActiveMembers()}

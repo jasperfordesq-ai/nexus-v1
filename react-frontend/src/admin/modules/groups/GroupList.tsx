@@ -239,7 +239,7 @@ export function GroupList() {
         const Icon = visibilityIcons[item.visibility] || Eye;
         return (
           <div className="flex items-center gap-1.5">
-            <Icon size={14} className="text-muted" />
+            <Icon size={14} className="text-muted" aria-hidden="true" />
             <span className="text-sm text-muted capitalize">{t(`groups.visibility_${item.visibility}`)}</span>
           </div>
         );
@@ -251,7 +251,7 @@ export function GroupList() {
       sortable: true,
       render: (item) => (
         <div className="flex items-center gap-1.5">
-          <Users size={14} className="text-muted" />
+          <Users size={14} className="text-muted" aria-hidden="true" />
           <span className="text-sm text-muted">{item.member_count}</span>
         </div>
       ),

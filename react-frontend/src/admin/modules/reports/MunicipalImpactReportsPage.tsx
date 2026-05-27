@@ -459,7 +459,7 @@ export default function MunicipalImpactReportsPage() {
       </div>
 
       {loading && (
-        <div className="flex min-h-64 items-center justify-center">
+        <div role="status" aria-busy="true" aria-label={t('municipal_reports.loading')} className="flex min-h-64 items-center justify-center">
           <Spinner label={t('municipal_reports.loading')} />
         </div>
       )}

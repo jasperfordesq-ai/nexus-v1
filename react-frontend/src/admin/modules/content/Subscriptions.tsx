@@ -133,7 +133,7 @@ export function Subscriptions() {
     return (
       <div>
         <PageHeader title={"Subscriptions"} description={"View and manage active member subscriptions"} />
-        <div className="flex justify-center py-12"><Spinner size="lg" /></div>
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
   }

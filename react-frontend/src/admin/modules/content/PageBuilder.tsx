@@ -167,7 +167,7 @@ export function PageBuilder() {
           title={isEdit ? t('content.edit_pages') : t('content.pages_admin_title')}
           description={t('content.loading_pages')}
         />
-        <div className="flex justify-center py-12"><Spinner size="lg" /></div>
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
   }

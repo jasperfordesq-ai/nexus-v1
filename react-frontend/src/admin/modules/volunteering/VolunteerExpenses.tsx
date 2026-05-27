@@ -354,14 +354,14 @@ export function VolunteerExpenses() {
       render: (item) =>
         item.has_receipt ? (
           <div className="flex items-center gap-1.5">
-            <Chip size="sm" color="success" variant="soft" startContent={<FileText size={12} />}>
+            <Chip size="sm" color="success" variant="soft" startContent={<FileText aria-hidden="true" size={12} />}>
               {t('volunteering.yes')}
             </Chip>
             {item.receipt_path && (
               <Button
                 size="sm"
                 variant="tertiary"
-                startContent={item.receipt_path.toLowerCase().endsWith('.pdf') ? <ExternalLink size={12} /> : <Eye size={12} />}
+                startContent={item.receipt_path.toLowerCase().endsWith('.pdf') ? <ExternalLink aria-hidden="true" size={12} /> : <Eye aria-hidden="true" size={12} />}
                 onPress={() => openReceipt(item)}
                 className="min-w-0 px-2"
               >
@@ -399,14 +399,14 @@ export function VolunteerExpenses() {
           <div className="flex gap-2">
             <Button
               variant="tertiary"
-              startContent={<Download size={16} />}
+              startContent={<Download aria-hidden="true" size={16} />}
               onPress={handleExport}
             >
               {t('volunteering.export_csv')}
             </Button>
             <Button
               variant="tertiary"
-              startContent={<RefreshCw size={16} />}
+              startContent={<RefreshCw aria-hidden="true" size={16} />}
               onPress={loadData}
               isLoading={loading}
             >
@@ -457,7 +457,7 @@ export function VolunteerExpenses() {
           className="w-44"
           value={dateFrom}
           onValueChange={setDateFrom}
-          startContent={<CalendarRange size={14} className="text-muted" />}
+          startContent={<CalendarRange aria-hidden="true" size={14} className="text-muted" />}
         />
         <Input
           type="date"
@@ -466,7 +466,7 @@ export function VolunteerExpenses() {
           className="w-44"
           value={dateTo}
           onValueChange={setDateTo}
-          startContent={<CalendarRange size={14} className="text-muted" />}
+          startContent={<CalendarRange aria-hidden="true" size={14} className="text-muted" />}
         />
         {(dateFrom || dateTo) && (
           <Button
@@ -495,7 +495,7 @@ export function VolunteerExpenses() {
         <Card className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Building2 size={18} />
+              <Building2 aria-hidden="true" size={18} />
               <span className="font-semibold">
                 {t('volunteering.expense_org_breakdown_title')}
               </span>
@@ -543,7 +543,7 @@ export function VolunteerExpenses() {
       <Card className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Settings size={18} />
+            <Settings aria-hidden="true" size={18} />
             <span className="font-semibold">
               {t('volunteering.expense_policies_title')}
             </span>
@@ -684,9 +684,9 @@ export function VolunteerExpenses() {
               onPress={handleReview}
               isLoading={actionLoading}
               startContent={
-                reviewAction === 'rejected' ? <XCircle size={16} /> :
-                reviewAction === 'paid' ? <CreditCard size={16} /> :
-                <CheckCircle size={16} />
+                reviewAction === 'rejected' ? <XCircle aria-hidden="true" size={16} /> :
+                reviewAction === 'paid' ? <CreditCard aria-hidden="true" size={16} /> :
+                <CheckCircle aria-hidden="true" size={16} />
               }
             >
               {reviewAction === 'approved' && t('volunteering.approve')}
@@ -725,7 +725,7 @@ export function VolunteerExpenses() {
             </Button>
             <Button
               variant="tertiary"
-              startContent={<ExternalLink size={14} />}
+              startContent={<ExternalLink aria-hidden="true" size={14} />}
               onPress={() => window.open(receiptUrl, '_blank')}
             >
               {t('volunteering.open_full_size')}

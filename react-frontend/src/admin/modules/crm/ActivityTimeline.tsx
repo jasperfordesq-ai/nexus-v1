@@ -87,23 +87,23 @@ const ITEMS_PER_PAGE = 25;
 function getActivityIcon(type: string) {
   switch (type) {
     case 'login':
-      return <LogIn size={16} />;
+      return <LogIn aria-hidden="true" size={16} />;
     case 'signup':
-      return <UserPlus size={16} />;
+      return <UserPlus aria-hidden="true" size={16} />;
     case 'listing_created':
-      return <FileText size={16} />;
+      return <FileText aria-hidden="true" size={16} />;
     case 'exchange_completed':
-      return <ArrowRightLeft size={16} />;
+      return <ArrowRightLeft aria-hidden="true" size={16} />;
     case 'note_added':
-      return <StickyNote size={16} />;
+      return <StickyNote aria-hidden="true" size={16} />;
     case 'task_created':
-      return <ClipboardList size={16} />;
+      return <ClipboardList aria-hidden="true" size={16} />;
     case 'profile_updated':
-      return <User size={16} />;
+      return <User aria-hidden="true" size={16} />;
     case 'group_joined':
-      return <Activity size={16} />;
+      return <Activity aria-hidden="true" size={16} />;
     default:
-      return <Activity size={16} />;
+      return <Activity aria-hidden="true" size={16} />;
   }
 }
 
@@ -201,7 +201,7 @@ export function ActivityTimeline() {
         actions={
           <Button
             variant="tertiary"
-            startContent={<RefreshCw size={16} />}
+            startContent={<RefreshCw aria-hidden="true" size={16} />}
             onPress={() => loadTimeline()}
             isDisabled={loading}
           >
@@ -233,7 +233,7 @@ export function ActivityTimeline() {
           placeholder={t('crm.placeholder_all_types')}
           className="w-52"
           size="sm"
-          startContent={<Filter size={14} />}
+          startContent={<Filter aria-hidden="true" size={14} />}
           selectedKeys={filterType ? [filterType] : []}
           onSelectionChange={(keys) => {
             const val = Array.from(keys)[0] as string || '';
@@ -281,7 +281,7 @@ export function ActivityTimeline() {
       ) : entries.length === 0 ? (
         <Card>
           <CardBody className="flex flex-col items-center py-16 text-center">
-            <Activity size={48} className="text-muted mb-4" />
+            <Activity aria-hidden="true" size={48} className="text-muted mb-4" />
             <p className="text-muted text-lg font-medium">{t('crm.no_activity_found')}</p>
             <p className="text-muted text-sm mt-1">
               {hasActiveFilters

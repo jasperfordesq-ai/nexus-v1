@@ -134,14 +134,14 @@ export default function GroupDetail() {
     <div className="p-6 space-y-6">
       <div className="flex items-center gap-4">
         <Button isIconOnly variant="tertiary" aria-label={t('groups.go_back')} onPress={() => navigate(-1)}>
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="w-5 h-5" aria-hidden="true" />
         </Button>
         <div className="flex-1">
           <h1 className="text-2xl font-bold">{group.name}</h1>
           <p className="text-sm text-gray-500">{t('groups.group_id')}</p>
         </div>
         {editMode ? (
-          <Button startContent={<Save className="w-4 h-4" />} onPress={handleSave}>
+          <Button startContent={<Save className="w-4 h-4" aria-hidden="true" />} onPress={handleSave}>
             {t('groups.save')}
           </Button>
         ) : (
@@ -270,7 +270,7 @@ export default function GroupDetail() {
               </div>
             )}
             <Button
-              startContent={<MapPin className="w-4 h-4" />}
+              startContent={<MapPin className="w-4 h-4" aria-hidden="true" />}
               onPress={handleGeocode}
               isDisabled={!group.location}
             >

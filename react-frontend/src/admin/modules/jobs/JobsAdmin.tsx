@@ -70,19 +70,19 @@ function ApplicationCard({ application, onStatusUpdate }: ApplicationCardProps) 
           <p className='text-xs text-muted/80 mt-0.5'>{t('jobs.applied_date')}{' '}{new Date(application.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</p>
           <div className='flex items-center gap-1.5 mt-1 flex-wrap'>
             {application.cv_url && (
-              <Chip size='sm' variant='soft' color='accent' startContent={<FileText size={10} />} className='h-5 text-[10px]'>{t('jobs.cv_label')}</Chip>
+              <Chip size='sm' variant='soft' color='accent' startContent={<FileText aria-hidden="true" size={10} />} className='h-5 text-[10px]'>{t('jobs.cv_label')}</Chip>
             )}
             {application.has_interview && (
-              <Chip size='sm' variant='soft' color='warning' startContent={<Calendar size={10} />} className='h-5 text-[10px] capitalize'>{application.interview_status ?? t('jobs.interview_label')}</Chip>
+              <Chip size='sm' variant='soft' color='warning' startContent={<Calendar aria-hidden="true" size={10} />} className='h-5 text-[10px] capitalize'>{application.interview_status ?? t('jobs.interview_label')}</Chip>
             )}
             {application.has_offer && (
-              <Chip size='sm' variant='soft' color='accent' startContent={<Gift size={10} />} className='h-5 text-[10px] capitalize'>{application.offer_status ?? t('jobs.offer_label')}</Chip>
+              <Chip size='sm' variant='soft' color='accent' startContent={<Gift aria-hidden="true" size={10} />} className='h-5 text-[10px] capitalize'>{application.offer_status ?? t('jobs.offer_label')}</Chip>
             )}
           </div>
         </div>
       </div>
       {application.message && (<div><Button variant="ghost" size="sm" className='flex min-h-8 items-center gap-1 px-0 text-xs text-muted hover:text-foreground' onPress={() => setExpanded((v) => !v)} aria-expanded={expanded}>
-        {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />} {t('jobs.cover_message')}</Button>
+        {expanded ? <ChevronUp aria-hidden="true" size={12} /> : <ChevronDown aria-hidden="true" size={12} />} {t('jobs.cover_message')}</Button>
         {expanded && <p className='mt-2 rounded-lg bg-surface-secondary p-3 text-sm leading-relaxed text-foreground whitespace-pre-wrap'>{application.message}</p>}
       </div>)}
       <div className='flex items-end gap-2 flex-wrap'>
@@ -94,7 +94,7 @@ function ApplicationCard({ application, onStatusUpdate }: ApplicationCardProps) 
         <Tooltip content={notesOpen ? t('jobs.hide_notes') : t('jobs.add_edit_notes')}>
           <Button isIconOnly size='sm' variant='tertiary' onPress={() => setNotesOpen((v) => !v)} aria-label={t('jobs.toggle_notes')}><ClipboardList size={14} /></Button>
         </Tooltip>
-        <Button size='sm' variant={isDirty ? 'primary' : 'tertiary'} isDisabled={!isDirty || saving} isLoading={saving} startContent={!saving && <Save size={13} />} onPress={handleSave}>{t('jobs.update_btn')}</Button>
+        <Button size='sm' variant={isDirty ? 'primary' : 'tertiary'} isDisabled={!isDirty || saving} isLoading={saving} startContent={!saving && <Save aria-hidden="true" size={13} />} onPress={handleSave}>{t('jobs.update_btn')}</Button>
       </div>
       {notesOpen && <Textarea size='sm' label={t('jobs.internal_notes')} placeholder={t('jobs.notes_placeholder')} value={notes} onValueChange={setNotes} minRows={2} maxRows={6} classNames={{ inputWrapper: 'bg-surface-secondary' }} />}
     </CardBody></Card>
@@ -258,7 +258,7 @@ export function JobsAdmin() {
                       <p className={['text-sm font-medium leading-snug truncate',
                         isSelected ? 'text-accent dark:text-accent' : 'text-foreground'].join(' ')}>{job.title}</p>
                       <div className='flex items-center gap-1.5 mt-1'>
-                        <Users size={11} className='text-muted shrink-0' />
+                        <Users aria-hidden="true" size={11} className='text-muted shrink-0' />
                         <span className='text-xs text-muted'>{t(job.applications_count === 1 ? 'jobs.application_count_one' : 'jobs.application_count_other', { count: job.applications_count })}</span>
                       </div>
                       {(job.organization_name || job.poster_name) && <p className='text-xs text-muted/80 truncate mt-0.5'>{job.organization_name || job.poster_name}</p>}
@@ -272,7 +272,7 @@ export function JobsAdmin() {
         <div className='flex-1 min-w-0'>
           {!selectedJob ? (
             <div className='flex flex-col items-center justify-center h-64 text-center gap-3'>
-              <div className='w-14 h-14 rounded-full bg-surface-secondary flex items-center justify-center'><ClipboardList size={24} className='text-muted' /></div>
+              <div className='w-14 h-14 rounded-full bg-surface-secondary flex items-center justify-center'><ClipboardList aria-hidden="true" size={24} className='text-muted' /></div>
               <div>
                 <p className='text-sm font-medium text-foreground/80'>{t('jobs.select_job')}</p>
                 <p className='text-xs text-muted/80 mt-1'>{t('jobs.select_job_hint')}</p>
@@ -285,7 +285,7 @@ export function JobsAdmin() {
                   <h3 className='font-semibold text-foreground truncate'>{selectedJob.title}</h3>
                   <p className='text-sm text-muted mt-0.5'>{selectedJob.organization_name || selectedJob.poster_name || t('jobs.no_organization')}{' '}&middot;{' '}<span className='capitalize'>{t(`jobs.status_${selectedJob.status}`)}</span></p>
                 </div>
-                <Button size='sm' variant='tertiary' startContent={<RefreshCw size={13} />} onPress={() => loadApplications(selectedJob)} isDisabled={appsLoading}>{t('jobs.refresh')}</Button>
+                <Button size='sm' variant='tertiary' startContent={<RefreshCw aria-hidden="true" size={13} />} onPress={() => loadApplications(selectedJob)} isDisabled={appsLoading}>{t('jobs.refresh')}</Button>
               </div>
               {appsLoading && <div className='flex justify-center py-12'><Spinner label={t('jobs.loading_applications')} /></div>}
               {!appsLoading && appsError && (
@@ -296,7 +296,7 @@ export function JobsAdmin() {
               )}
               {!appsLoading && !appsError && applications.length === 0 && (
                 <div className='flex flex-col items-center justify-center py-12 text-center gap-3'>
-                  <div className='w-12 h-12 rounded-full bg-surface-secondary flex items-center justify-center'><CheckCircle2 size={20} className='text-muted' /></div>
+                  <div className='w-12 h-12 rounded-full bg-surface-secondary flex items-center justify-center'><CheckCircle2 aria-hidden="true" size={20} className='text-muted' /></div>
                   <div><p className='text-sm font-medium text-foreground/80'>{t('jobs.no_applications_yet')}</p><p className='text-xs text-muted/80 mt-1'>{t('jobs.no_applications_hint')}</p></div>
                 </div>
               )}
@@ -318,7 +318,7 @@ export function JobsAdmin() {
   return (
     <div>
       <PageHeader title={t('jobs.page_title')} description={t('jobs.page_description')}
-        actions={<Button variant='tertiary' startContent={<RefreshCw size={16} />} onPress={loadJobs}>{t('jobs.refresh')}</Button>}
+        actions={<Button variant='tertiary' startContent={<RefreshCw aria-hidden="true" size={16} />} onPress={loadJobs}>{t('jobs.refresh')}</Button>}
       />
       <div className='grid grid-cols-2 md:grid-cols-4 gap-4 mb-6'>
         <StatCard label={t('jobs.stat_total_jobs')} value={stats?.total_jobs ?? 0} icon={Briefcase} color='secondary' loading={statsLoading} />
@@ -329,8 +329,8 @@ export function JobsAdmin() {
       <div className='mb-6'>
         <Tabs selectedKey={panelTab} onSelectionChange={(key) => setPanelTab(key as 'listings' | 'applications')}
           variant='underlined' size='md' aria-label={t('jobs.panels_aria')}>
-          <Tab key='listings' title={<div className='flex items-center gap-2'><Briefcase size={15} /><span>{t('jobs.tab_listings')}</span></div>} />
-          <Tab key='applications' title={<div className='flex items-center gap-2'><Users size={15} /><span>{t('jobs.tab_applications')}</span></div>} />
+          <Tab key='listings' title={<div className='flex items-center gap-2'><Briefcase aria-hidden="true" size={15} /><span>{t('jobs.tab_listings')}</span></div>} />
+          <Tab key='applications' title={<div className='flex items-center gap-2'><Users aria-hidden="true" size={15} /><span>{t('jobs.tab_applications')}</span></div>} />
         </Tabs>
       </div>
       {panelTab === 'listings' && (

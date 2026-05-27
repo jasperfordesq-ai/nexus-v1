@@ -199,7 +199,7 @@ export function PlanForm() {
     return (
       <div>
         <PageHeader title={t(isEdit ? 'content.plan_edit_title' : 'content.plan_create_title')} description="" />
-        <div className="flex justify-center py-12"><Spinner size="lg" /></div>
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
   }

@@ -165,7 +165,7 @@ export function GroupAuditLog({ groupId }: GroupAuditLogProps) {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-10">
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex items-center justify-center py-10">
           <Spinner size="lg" />
         </div>
       ) : entries.length === 0 ? (

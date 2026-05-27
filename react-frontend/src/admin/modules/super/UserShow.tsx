@@ -242,14 +242,14 @@ export function UserShow() {
           <div className="flex items-center gap-2">
             <Button
               variant="primary"
-              startContent={<Edit size={16} />}
+              startContent={<Edit aria-hidden="true" size={16} />}
               onPress={() => navigate(tenantPath(`/admin/super/users/${user.id}/edit`))}
             >
               {t('super.edit')}
             </Button>
             <Button
               variant="secondary"
-              startContent={<ArrowLeft size={16} />}
+              startContent={<ArrowLeft aria-hidden="true" size={16} />}
               onPress={() => navigate(tenantPath('/admin/super/users'))}
             >
               {t('super.back_to_users')}
@@ -264,7 +264,7 @@ export function UserShow() {
           {/* User Information */}
           <Card>
             <CardHeader className="font-semibold text-lg flex items-center gap-2">
-              <User size={18} />
+              <User aria-hidden="true" size={18} />
               {t('super.user_information')}
             </CardHeader>
             <Separator />
@@ -293,12 +293,12 @@ export function UserShow() {
                       {user.status}
                     </Chip>
                     {user.is_super_admin && (
-                      <Chip size="sm" variant="soft" color="danger" startContent={<ShieldAlert size={12} />}>
+                      <Chip size="sm" variant="soft" color="danger" startContent={<ShieldAlert aria-hidden="true" size={12} />}>
                         {t('super.privilege_global_super_admin')}
                       </Chip>
                     )}
                     {user.is_tenant_super_admin && (
-                      <Chip size="sm" variant="soft" color="default" startContent={<Shield size={12} />}>
+                      <Chip size="sm" variant="soft" color="default" startContent={<Shield aria-hidden="true" size={12} />}>
                         {t('super.privilege_tenant_super_admin')}
                       </Chip>
                     )}
@@ -315,28 +315,28 @@ export function UserShow() {
             <CardBody>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex items-center gap-3">
-                  <MapPin size={16} className="text-muted shrink-0" />
+                  <MapPin aria-hidden="true" size={16} className="text-muted shrink-0" />
                   <div>
                     <p className="text-xs text-muted">{t('super.label_location')}</p>
                     <p className="text-sm text-foreground">{user.location || t('super.not_set')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Phone size={16} className="text-muted shrink-0" />
+                  <Phone aria-hidden="true" size={16} className="text-muted shrink-0" />
                   <div>
                     <p className="text-xs text-muted">{t('super.label_phone')}</p>
                     <p className="text-sm text-foreground">{user.phone || t('super.not_set')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CalendarDays size={16} className="text-muted shrink-0" />
+                  <CalendarDays aria-hidden="true" size={16} className="text-muted shrink-0" />
                   <div>
                     <p className="text-xs text-muted">{t('super.label_member_since')}</p>
                     <p className="text-sm text-foreground">{formatDate(user.created_at, t('super.never'))}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Clock size={16} className="text-muted shrink-0" />
+                  <Clock aria-hidden="true" size={16} className="text-muted shrink-0" />
                   <div>
                     <p className="text-xs text-muted">{t('super.label_last_login')}</p>
                     <p className="text-sm text-foreground">{formatDate(user.last_login_at, t('super.never'))}</p>
@@ -344,7 +344,7 @@ export function UserShow() {
                 </div>
                 {user.balance !== undefined && (
                   <div className="flex items-center gap-3">
-                    <Wallet size={16} className="text-muted shrink-0" />
+                    <Wallet aria-hidden="true" size={16} className="text-muted shrink-0" />
                     <div>
                       <p className="text-xs text-muted">{t('super.label_time_balance')}</p>
                       <p className="text-sm font-medium text-foreground">{user.balance} {t('super.hours')}</p>
@@ -358,7 +358,7 @@ export function UserShow() {
           {/* Tenant Association */}
           <Card>
             <CardHeader className="font-semibold text-lg flex items-center gap-2">
-              <Building2 size={18} />
+              <Building2 aria-hidden="true" size={18} />
               {t('super.tenant_association')}
             </CardHeader>
             <Separator />
@@ -382,14 +382,14 @@ export function UserShow() {
               <div className="flex flex-col gap-2">
                 <Button
                   variant="secondary"
-                  startContent={<ArrowRightLeft size={16} />}
+                  startContent={<ArrowRightLeft aria-hidden="true" size={16} />}
                   onPress={() => setMoveModalOpen(true)}
                 >
                   {t('super.move_to_different_tenant')}
                 </Button>
                 <Button
                   variant="secondary"
-                  startContent={<Crown size={16} />}
+                  startContent={<Crown aria-hidden="true" size={16} />}
                   onPress={() => setPromoteModalOpen(true)}
                 >
                   {t('super.move_and_promote_to_hub')}
@@ -404,7 +404,7 @@ export function UserShow() {
           {/* GOD-Level Super Admin Actions */}
           <Card className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-2 border-purple-500/30">
             <CardHeader className="font-semibold text-lg flex items-center gap-2">
-              <ShieldAlert size={18} className="text-purple-600 dark:text-purple-400" />
+              <ShieldAlert aria-hidden="true" size={18} className="text-purple-600 dark:text-purple-400" />
               <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                 {t('super.god_level_access')}
               </span>
@@ -418,7 +418,7 @@ export function UserShow() {
                 <Button
                   variant="danger-soft"
                   className="bg-gradient-to-r from-red-500/10 to-pink-500/10 border border-red-500/30"
-                  startContent={<ShieldOff size={16} />}
+                  startContent={<ShieldOff aria-hidden="true" size={16} />}
                   onPress={() => setConfirmAction('revoke-global')}
                 >
                   <span className="bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent font-medium">
@@ -430,7 +430,7 @@ export function UserShow() {
                   <Button
                     variant="secondary"
                     className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-2 border-purple-500/50 w-full"
-                    startContent={<ShieldAlert size={16} />}
+                    startContent={<ShieldAlert aria-hidden="true" size={16} />}
                     onPress={() => setConfirmAction('grant-global')}
                   >
                     <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent font-semibold">
@@ -448,7 +448,7 @@ export function UserShow() {
           {/* Tenant Super Admin Toggle */}
           <Card>
             <CardHeader className="font-semibold text-lg flex items-center gap-2">
-              <Shield size={18} />
+              <Shield aria-hidden="true" size={18} />
               {t('super.tenant_super_admin')}
             </CardHeader>
             <Separator />
@@ -460,7 +460,7 @@ export function UserShow() {
                 <Button
                   variant="secondary"
                   className="text-warning"
-                  startContent={<ShieldOff size={16} />}
+                  startContent={<ShieldOff aria-hidden="true" size={16} />}
                   onPress={() => setConfirmAction('revoke-sa')}
                 >
                   {t('super.revoke_tenant_sa')}
@@ -468,7 +468,7 @@ export function UserShow() {
               ) : (
                 <Button
                   variant="secondary"
-                  startContent={<Shield size={16} />}
+                  startContent={<Shield aria-hidden="true" size={16} />}
                   onPress={() => setConfirmAction('grant-sa')}
                 >
                   {t('super.grant_tenant_sa')}
@@ -490,11 +490,11 @@ export function UserShow() {
                   'bg-surface-tertiary'
                 }`}>
                   {privilege.level >= 3 ? (
-                    <CrownIcon size={28} className={
+                    <CrownIcon aria-hidden="true" size={28} className={
                       privilege.level === 4 ? 'text-purple-600' : 'text-accent'
                     } />
                   ) : (
-                    <Shield size={28} className={
+                    <Shield aria-hidden="true" size={28} className={
                       privilege.level === 2 ? 'text-accent' : 'text-muted'
                     } />
                   )}
@@ -536,7 +536,7 @@ export function UserShow() {
               <div className="flex flex-col gap-2">
                 <Button
                   variant="primary"
-                  startContent={<Edit size={16} />}
+                  startContent={<Edit aria-hidden="true" size={16} />}
                   fullWidth
                   onPress={() => navigate(tenantPath(`/admin/super/users/${user.id}/edit`))}
                 >
@@ -546,7 +546,7 @@ export function UserShow() {
                   <Button
                     variant="secondary"
                     className="text-warning"
-                    startContent={<UserCog size={16} />}
+                    startContent={<UserCog aria-hidden="true" size={16} />}
                     fullWidth
                     onPress={() => setImpersonateModalOpen(true)}
                   >
@@ -555,7 +555,7 @@ export function UserShow() {
                 )}
                 <Button
                   variant="secondary"
-                  startContent={<ArrowLeft size={16} />}
+                  startContent={<ArrowLeft aria-hidden="true" size={16} />}
                   fullWidth
                   onPress={() => navigate(tenantPath('/admin/super/users'))}
                 >
@@ -626,7 +626,7 @@ export function UserShow() {
       >
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <UserCog size={20} className="text-warning" />
+            <UserCog aria-hidden="true" size={20} className="text-warning" />
             {t('super.impersonate_user_title')}
           </ModalHeader>
           <ModalBody>
@@ -654,7 +654,7 @@ export function UserShow() {
               className="text-warning"
               onPress={handleImpersonate}
               isLoading={impersonateLoading}
-              startContent={<UserCog size={16} />}
+              startContent={<UserCog aria-hidden="true" size={16} />}
             >
               {t('super.impersonate_confirm')}
             </Button>
@@ -666,7 +666,7 @@ export function UserShow() {
       <Modal isOpen={promoteModalOpen} onClose={() => { setPromoteModalOpen(false); setPromoteTargetTenant(''); }} size="md">
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <Crown size={20} className="text-accent" />
+            <Crown aria-hidden="true" size={20} className="text-accent" />
             {t('super.move_and_promote')}
           </ModalHeader>
           <ModalBody>

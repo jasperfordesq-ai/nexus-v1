@@ -378,7 +378,7 @@ export function KBArticleForm() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
+      <div role="status" aria-busy="true" aria-label={t('resources.loading_article')} className="flex items-center justify-center py-20">
         <Spinner size="lg" label={t('resources.loading_article')} />
       </div>
     );

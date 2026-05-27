@@ -110,7 +110,7 @@ export function CrmDashboard() {
             <Button
               variant="tertiary"
               size="sm"
-              startContent={<Download size={14} />}
+              startContent={<Download aria-hidden="true" size={14} />}
               onPress={() => handleExport('dashboard')}
             >
               {t('crm.export_stats')}
@@ -118,7 +118,7 @@ export function CrmDashboard() {
             <Button
               variant="tertiary"
               size="sm"
-              startContent={<Download size={14} />}
+              startContent={<Download aria-hidden="true" size={14} />}
               onPress={() => handleExport('notes')}
             >
               {t('crm.export_notes')}
@@ -126,14 +126,14 @@ export function CrmDashboard() {
             <Button
               variant="tertiary"
               size="sm"
-              startContent={<Download size={14} />}
+              startContent={<Download aria-hidden="true" size={14} />}
               onPress={() => handleExport('tasks')}
             >
               {t('crm.export_tasks')}
             </Button>
             <Button
               variant="tertiary"
-              startContent={<RefreshCw size={16} />}
+              startContent={<RefreshCw aria-hidden="true" size={16} />}
               onPress={loadDashboard}
               isLoading={loading}
             >
@@ -220,11 +220,11 @@ export function CrmDashboard() {
                   variant="tertiary"
                   className="justify-between"
                   fullWidth
-                  endContent={<ChevronRight size={16} className="text-muted" />}
+                  endContent={<ChevronRight aria-hidden="true" size={16} className="text-muted" />}
                 >
                   <span className="flex items-center gap-3">
                     <span className={`flex h-8 w-8 items-center justify-center rounded-lg ${action.color}`}>
-                      <Icon size={16} />
+                      <Icon aria-hidden="true" size={16} />
                     </span>
                     <span>{t(action.labelKey)}</span>
                   </span>
@@ -244,7 +244,7 @@ export function CrmDashboard() {
             <div className="flex items-center justify-between rounded-lg bg-surface-secondary p-3">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg text-success bg-success/10">
-                  <Activity size={20} />
+                  <Activity aria-hidden="true" size={20} />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-foreground">{t('crm.active_in_last_30')}</p>
@@ -259,7 +259,7 @@ export function CrmDashboard() {
             <div className="flex items-center justify-between rounded-lg bg-surface-secondary p-3">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg text-accent bg-accent-soft">
-                  <UserPlus size={20} />
+                  <UserPlus aria-hidden="true" size={20} />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-foreground">{t('crm.new_this_month_summary')}</p>
@@ -274,7 +274,7 @@ export function CrmDashboard() {
             <div className="flex items-center justify-between rounded-lg bg-surface-secondary p-3">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg text-warning bg-warning/10">
-                  <AlertTriangle size={20} />
+                  <AlertTriangle aria-hidden="true" size={20} />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-foreground">{t('crm.never_logged_in')}</p>
@@ -289,7 +289,7 @@ export function CrmDashboard() {
             <div className="flex items-center justify-between rounded-lg bg-surface-secondary p-3">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg text-accent bg-accent/10">
-                  <TrendingUp size={20} />
+                  <TrendingUp aria-hidden="true" size={20} />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-foreground">{t('crm.retention_rate_summary')}</p>

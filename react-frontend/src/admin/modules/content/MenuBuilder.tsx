@@ -207,7 +207,7 @@ function LivePreview({ items, t }: { items: MenuItemData[]; t: TFunction }) {
     <Card className="mb-4 border border-border bg-surface">
       <CardHeader className="pb-2">
         <h3 className="text-sm font-semibold flex items-center gap-2 text-accent">
-          <Eye size={15} />
+          <Eye size={15} aria-hidden="true" />
           {t('menu_builder.live_preview')}
           <Chip size="sm" variant="soft" className="text-[10px]">
             {t('menu_builder.preview')}
@@ -234,15 +234,15 @@ function LivePreview({ items, t }: { items: MenuItemData[]; t: TFunction }) {
                       variant="tertiary"
                       className="min-h-8 min-w-0 gap-1.5 px-3 text-xs font-medium text-foreground"
                     >
-                      <DynamicIcon name={item.icon} className="w-3.5 h-3.5 shrink-0" />
+                      <DynamicIcon name={item.icon} className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                       <span>{item.label}</span>
-                      <ChevronDown size={11} />
+                      <ChevronDown size={11} aria-hidden="true" />
                     </Button>
                     {children.length > 0 && (
                       <div className="absolute left-0 top-full z-20 hidden min-w-[150px] rounded-lg border border-border bg-overlay p-1 shadow-overlay group-hover/preview:block">
                         {children.map((child) => (
                           <div key={child.id} className="flex items-center gap-2 rounded px-3 py-1.5 text-xs hover:bg-surface-secondary">
-                            <DynamicIcon name={child.icon} className="h-3 w-3 shrink-0 text-muted" />
+                            <DynamicIcon name={child.icon} className="h-3 w-3 shrink-0 text-muted" aria-hidden="true" />
                             <span>{child.label}</span>
                           </div>
                         ))}
@@ -318,10 +318,10 @@ function SortableItem({ item, isSelected, onSelect, onDelete, t, depth = 0 }: So
         aria-label={t('menu_builder.drag_to_reorder')}
         onClick={(e) => e.stopPropagation()}
       >
-        <GripVertical size={16} />
+        <GripVertical size={16} aria-hidden="true" />
       </Button>
 
-      <DynamicIcon name={item.icon} className="w-4 h-4 text-theme-muted shrink-0" />
+      <DynamicIcon name={item.icon} className="w-4 h-4 text-theme-muted shrink-0" aria-hidden="true" />
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5">
@@ -329,7 +329,7 @@ function SortableItem({ item, isSelected, onSelect, onDelete, t, depth = 0 }: So
           <Chip size="sm" variant="soft" className="h-4 shrink-0 text-[10px]">
             {getTypeLabel(item.type, t)}
           </Chip>
-          {!item.is_active && <EyeOff size={12} className="shrink-0 text-muted" />}
+          {!item.is_active && <EyeOff size={12} className="shrink-0 text-muted" aria-hidden="true" />}
         </div>
         {item.url && (
           <p className="truncate text-[11px] text-muted">{item.url}</p>
@@ -350,7 +350,7 @@ function SortableItem({ item, isSelected, onSelect, onDelete, t, depth = 0 }: So
         aria-label={t('menu_builder.edit_item')}
         onClick={(e) => e.stopPropagation()}
       >
-        <Pencil size={13} />
+        <Pencil size={13} aria-hidden="true" />
       </Button>
 
       <Button
@@ -361,7 +361,7 @@ function SortableItem({ item, isSelected, onSelect, onDelete, t, depth = 0 }: So
         aria-label={t('menu_builder.delete_item')}
         onClick={(e) => e.stopPropagation()}
       >
-        <Trash2 size={13} />
+        <Trash2 size={13} aria-hidden="true" />
       </Button>
     </div>
   );
@@ -371,7 +371,7 @@ function SortableItem({ item, isSelected, onSelect, onDelete, t, depth = 0 }: So
 function DragItemCard({ item, t }: { item: MenuItemData; t: TFunction }) {
   return (
     <div className="flex items-center gap-2 rounded-lg border border-accent/40 bg-accent-soft p-2.5 opacity-90 shadow-overlay">
-      <GripVertical size={16} className="shrink-0 text-accent" />
+      <GripVertical size={16} className="shrink-0 text-accent" aria-hidden="true" />
       <DynamicIcon name={item.icon} className="h-4 w-4 shrink-0 text-accent" />
       <p className="truncate text-sm font-medium text-accent-soft-foreground">{item.label}</p>
       <Chip size="sm" variant="soft" className="h-4 shrink-0 text-[10px]">
@@ -762,7 +762,7 @@ export function MenuBuilder() {
     return (
       <div>
         <PageHeader title={t('menu_builder.menu_builder_title')} description={t('menu_builder.menu_builder_desc')} />
-        <div className="flex justify-center py-12"><Spinner size="lg" /></div>
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
   }
@@ -777,20 +777,20 @@ export function MenuBuilder() {
             <Button
               variant="secondary"
               size="sm"
-              startContent={showPreview ? <EyeOff size={15} /> : <Eye size={15} />}
+              startContent={showPreview ? <EyeOff size={15} aria-hidden="true" /> : <Eye size={15} aria-hidden="true" />}
               onPress={() => setShowPreview((v) => !v)}
             >
               {showPreview ? t('menu_builder.hide_preview') : t('menu_builder.live_preview')}
             </Button>
             <Button
               variant="secondary"
-              startContent={<ArrowLeft size={16} />}
+              startContent={<ArrowLeft size={16} aria-hidden="true" />}
               onPress={() => navigate(tenantPath('/admin/menus'))}
             >
               {t('menu_builder.back')}
             </Button>
             <Button
-              startContent={<Save size={16} />}
+              startContent={<Save size={16} aria-hidden="true" />}
               onPress={handleSave}
               isLoading={saving}
             >
@@ -856,13 +856,13 @@ export function MenuBuilder() {
           <Card className="border border-border bg-surface">
             <CardHeader className="flex items-center justify-between">
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Menu size={20} /> {t('menu_builder.menu_builder_title')}
+                <Menu size={20} aria-hidden="true" /> {t('menu_builder.menu_builder_title')}
                 <Chip size="sm" variant="soft">{menuItems.length}</Chip>
               </h3>
               <Button
                 size="sm"
                 variant="secondary"
-                startContent={<Plus size={14} />}
+                startContent={<Plus size={14} aria-hidden="true" />}
                 onPress={handleAddItem}
               >
                 {t('menu_builder.add')}
@@ -871,12 +871,12 @@ export function MenuBuilder() {
             <CardBody>
               {menuItems.length === 0 ? (
                 <div className="flex flex-col items-center gap-3 py-12 text-muted">
-                  <Menu size={40} />
+                  <Menu size={40} aria-hidden="true" />
                   <p className="text-sm">{t('menu_builder.no_data')}</p>
                   <div className="flex gap-2 flex-wrap justify-center">
                     <Button
                       size="sm"
-                      startContent={<Plus size={14} />}
+                      startContent={<Plus size={14} aria-hidden="true" />}
                       onPress={handleAddItem}
                     >
                       {t('menu_builder.add')}
@@ -884,7 +884,7 @@ export function MenuBuilder() {
                     <Button
                       size="sm"
                       variant="secondary"
-                      startContent={<Eye size={14} />}
+                      startContent={<Eye size={14} aria-hidden="true" />}
                       onPress={() => setMenuItems(getDefaultItems(t as TFunction))}
                     >
                       {t('menu_builder.load_defaults')}
@@ -1112,7 +1112,7 @@ export function MenuBuilder() {
                     size="sm"
                   >
                     <span className="text-sm flex items-center gap-1.5">
-                      {editForm.is_active ? <Eye size={14} /> : <EyeOff size={14} />}
+                      {editForm.is_active ? <Eye size={14} aria-hidden="true" /> : <EyeOff size={14} aria-hidden="true" />}
                       {editForm.is_active ? t('menu_builder.visible') : t('menu_builder.hidden')}
                     </span>
                   </Switch>
@@ -1125,7 +1125,7 @@ export function MenuBuilder() {
                     className="min-h-8 justify-start gap-1.5 p-0 text-sm text-muted hover:text-accent"
                     onPress={() => setShowAdvanced(!showAdvanced)}
                   >
-                    {showAdvanced ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                    {showAdvanced ? <ChevronDown size={14} aria-hidden="true" /> : <ChevronRight size={14} aria-hidden="true" />}
                     {t('menu_builder.advanced_options')}
                   </Button>
 

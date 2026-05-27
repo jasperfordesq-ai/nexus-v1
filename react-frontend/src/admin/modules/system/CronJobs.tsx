@@ -169,7 +169,7 @@ export function CronJobs() {
         actions={
           <Button
             variant="secondary"
-            startContent={<RefreshCw size={16} />}
+            startContent={<RefreshCw aria-hidden="true" size={16} />}
             onPress={loadJobs}
             isLoading={loading}
             size="sm"
@@ -193,7 +193,7 @@ export function CronJobs() {
           {healthMetrics.alert_status === 'critical' && (
             <Card className="mb-4 border-2 border-danger">
               <CardBody className="flex flex-row items-center gap-3 p-4 bg-danger/10">
-                <AlertTriangle size={24} className="text-danger shrink-0" />
+                <AlertTriangle aria-hidden="true" size={24} className="text-danger shrink-0" />
                 <div>
                   <p className="font-semibold text-danger">{t('system.critical_cron_failing')}</p>
                   <p className="text-sm text-danger-700 dark:text-danger-300">
@@ -208,7 +208,7 @@ export function CronJobs() {
             {/* Health Score Card */}
             <Card>
               <CardHeader className="flex items-center gap-2 pb-2">
-                <Activity size={16} className="text-muted" />
+                <Activity aria-hidden="true" size={16} className="text-muted" />
                 <span className="text-sm font-medium">{t('system.health_score')}</span>
               </CardHeader>
               <CardBody className="pt-0">
@@ -240,7 +240,7 @@ export function CronJobs() {
             {/* Success Rate Card */}
             <Card>
               <CardHeader className="flex items-center gap-2 pb-2">
-                <CheckCircle size={16} className="text-success" />
+                <CheckCircle aria-hidden="true" size={16} className="text-success" />
                 <span className="text-sm font-medium">{t('system.seven_day_success_rate')}</span>
               </CardHeader>
               <CardBody className="pt-0">
@@ -259,7 +259,7 @@ export function CronJobs() {
             {/* Recent Failures Card */}
             <Card>
               <CardHeader className="flex items-center gap-2 pb-2">
-                <XCircle size={16} className="text-danger" />
+                <XCircle aria-hidden="true" size={16} className="text-danger" />
                 <span className="text-sm font-medium">{t('system.twenty_four_h_failures')}</span>
               </CardHeader>
               <CardBody className="pt-0">
@@ -311,7 +311,7 @@ export function CronJobs() {
           {healthMetrics.jobs_overdue.length > 0 && (
             <Card className="mt-4 border border-warning">
               <CardHeader className="flex items-center gap-2 bg-warning/10">
-                <AlertTriangle size={16} className="text-warning" />
+                <AlertTriangle aria-hidden="true" size={16} className="text-warning" />
                 <span className="text-sm font-semibold">{t('system.overdue_jobs')}</span>
               </CardHeader>
               <CardBody className="p-0">
@@ -341,7 +341,7 @@ export function CronJobs() {
           <Card>
             <CardBody className="flex flex-row items-center gap-3 p-4">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10">
-                <Clock size={20} className="text-accent" />
+                <Clock aria-hidden="true" size={20} className="text-accent" />
               </div>
               <div>
                 <p className="text-xs text-muted">{t('system.total_jobs')}</p>
@@ -352,7 +352,7 @@ export function CronJobs() {
           <Card>
             <CardBody className="flex flex-row items-center gap-3 p-4">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-success/10">
-                <CheckCircle size={20} className="text-success" />
+                <CheckCircle aria-hidden="true" size={20} className="text-success" />
               </div>
               <div>
                 <p className="text-xs text-muted">{t('system.active')}</p>
@@ -363,7 +363,7 @@ export function CronJobs() {
           <Card>
             <CardBody className="flex flex-row items-center gap-3 p-4">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-success/10">
-                <CheckCircle size={20} className="text-success" />
+                <CheckCircle aria-hidden="true" size={20} className="text-success" />
               </div>
               <div>
                 <p className="text-xs text-muted">{t('system.last_succeeded')}</p>
@@ -374,7 +374,7 @@ export function CronJobs() {
           <Card>
             <CardBody className="flex flex-row items-center gap-3 p-4">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-danger/10">
-                <XCircle size={20} className="text-danger" />
+                <XCircle aria-hidden="true" size={20} className="text-danger" />
               </div>
               <div>
                 <p className="text-xs text-muted">{t('system.last_failed')}</p>
@@ -389,7 +389,7 @@ export function CronJobs() {
       {!loading && jobs.length === 0 && (
         <Card>
           <CardBody className="flex flex-col items-center gap-3 py-16 text-muted">
-            <Clock size={48} />
+            <Clock aria-hidden="true" size={48} />
             <p className="text-lg font-medium">{t('system.no_cron_jobs')}</p>
             <p className="text-sm">{t('system.no_cron_jobs_hint')}</p>
           </CardBody>
@@ -434,7 +434,7 @@ export function CronJobs() {
                   <CardBody className="px-4 py-3 gap-2.5">
                     {/* Command */}
                     <div className="flex items-start gap-2">
-                      <Terminal size={14} className="mt-0.5 shrink-0 text-muted" />
+                      <Terminal aria-hidden="true" size={14} className="mt-0.5 shrink-0 text-muted" />
                       <code className="break-all rounded bg-surface-secondary px-2 py-1 text-xs text-foreground">
                         {job.command}
                       </code>
@@ -442,7 +442,7 @@ export function CronJobs() {
 
                     {/* Schedule */}
                     <div className="flex items-center gap-2">
-                      <Clock size={14} className="shrink-0 text-muted" />
+                      <Clock aria-hidden="true" size={14} className="shrink-0 text-muted" />
                       <span className="text-xs text-foreground">
                         {t('system.schedule')}: <code className="rounded bg-surface-secondary px-1.5 py-0.5">{job.schedule}</code>
                       </span>
@@ -453,15 +453,15 @@ export function CronJobs() {
                     {/* Last Run */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Calendar size={14} className="shrink-0 text-muted" />
+                        <Calendar aria-hidden="true" size={14} className="shrink-0 text-muted" />
                         <span className="text-xs text-muted">{t('system.last_run')}:</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         {job.last_status === 'success' && (
-                          <CheckCircle size={12} className="text-success" />
+                          <CheckCircle aria-hidden="true" size={12} className="text-success" />
                         )}
                         {job.last_status === 'failed' && (
-                          <XCircle size={12} className="text-danger" />
+                          <XCircle aria-hidden="true" size={12} className="text-danger" />
                         )}
                         <span className="text-xs text-foreground" title={formatDate(job.last_run_at)}>
                           {timeAgo(job.last_run_at)}
@@ -473,7 +473,7 @@ export function CronJobs() {
                     {job.last_status && (
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <Tag size={14} className="shrink-0 text-muted" />
+                          <Tag aria-hidden="true" size={14} className="shrink-0 text-muted" />
                           <span className="text-xs text-muted">{t('system.last_status')}:</span>
                         </div>
                         <StatusBadge status={job.last_status} />
@@ -483,7 +483,7 @@ export function CronJobs() {
                     {/* Next Run */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Clock size={14} className="shrink-0 text-muted" />
+                        <Clock aria-hidden="true" size={14} className="shrink-0 text-muted" />
                         <span className="text-xs text-muted">{t('system.next_run')}:</span>
                       </div>
                       <span className="text-xs text-foreground">
@@ -499,7 +499,7 @@ export function CronJobs() {
                       variant="secondary"
                       className="w-full"
                       startContent={
-                        runningJob === job.id ? undefined : <Play size={14} />
+                        runningJob === job.id ? undefined : <Play aria-hidden="true" size={14} />
                       }
                       isLoading={runningJob === job.id}
                       isDisabled={job.status === 'disabled' || runningJob !== null}

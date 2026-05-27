@@ -132,13 +132,13 @@ export function GamificationHub() {
           <div className="flex gap-2">
             <Button
               variant="secondary"
-              startContent={<Gift size={16} />}
+              startContent={<Gift aria-hidden="true" size={16} />}
               onPress={handleOpenBulkAward}
             >
               {t('gamification.bulk_award_button')}
             </Button>
             <Button
-              startContent={<RefreshCw size={16} />}
+              startContent={<RefreshCw aria-hidden="true" size={16} />}
               onPress={handleRecheckAll}
               isLoading={rechecking}
             >
@@ -215,7 +215,7 @@ export function GamificationHub() {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center">
-                <Award size={40} className="text-muted mb-2" />
+                <Award aria-hidden="true" size={40} className="text-muted mb-2" />
                 <p className="text-muted">{t('gamification.no_badges_awarded')}</p>
               </div>
             )}
@@ -232,13 +232,13 @@ export function GamificationHub() {
               <Card className="bg-surface-secondary hover:bg-surface-tertiary transition-colors cursor-pointer">
                 <CardBody className="flex flex-row items-center gap-3 p-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
-                    <Megaphone size={20} />
+                    <Megaphone aria-hidden="true" size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-foreground">{t('gamification.campaigns')}</p>
                     <p className="text-xs text-muted">{t('gamification.manage_badge_campaigns')}</p>
                   </div>
-                  <ArrowRight size={16} className="text-muted" />
+                  <ArrowRight aria-hidden="true" size={16} className="text-muted" />
                 </CardBody>
               </Card>
             </Link>
@@ -247,13 +247,13 @@ export function GamificationHub() {
               <Card className="bg-surface-secondary hover:bg-surface-tertiary transition-colors cursor-pointer">
                 <CardBody className="flex flex-row items-center gap-3 p-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-success/10 text-success">
-                    <Award size={20} />
+                    <Award aria-hidden="true" size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-foreground">{t('gamification.custom_badges')}</p>
                     <p className="text-xs text-muted">{t('gamification.create_and_manage_badges')}</p>
                   </div>
-                  <ArrowRight size={16} className="text-muted" />
+                  <ArrowRight aria-hidden="true" size={16} className="text-muted" />
                 </CardBody>
               </Card>
             </Link>
@@ -262,13 +262,13 @@ export function GamificationHub() {
               <Card className="bg-surface-secondary hover:bg-surface-tertiary transition-colors cursor-pointer">
                 <CardBody className="flex flex-row items-center gap-3 p-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent">
-                    <Settings2 size={20} />
+                    <Settings2 aria-hidden="true" size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-foreground">{t('gamification.badge_configuration')}</p>
                     <p className="text-xs text-muted">{t('gamification.configure_badge_availability')}</p>
                   </div>
-                  <ArrowRight size={16} className="text-muted" />
+                  <ArrowRight aria-hidden="true" size={16} className="text-muted" />
                 </CardBody>
               </Card>
             </Link>
@@ -277,13 +277,13 @@ export function GamificationHub() {
               <Card className="bg-surface-secondary hover:bg-surface-tertiary transition-colors cursor-pointer">
                 <CardBody className="flex flex-row items-center gap-3 p-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-warning/10 text-warning">
-                    <BarChart3 size={20} />
+                    <BarChart3 aria-hidden="true" size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-foreground">{t('gamification.analytics')}</p>
                     <p className="text-xs text-muted">{t('gamification.gamification_insights')}</p>
                   </div>
-                  <ArrowRight size={16} className="text-muted" />
+                  <ArrowRight aria-hidden="true" size={16} className="text-muted" />
                 </CardBody>
               </Card>
             </Link>

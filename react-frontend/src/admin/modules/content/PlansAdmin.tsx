@@ -248,7 +248,7 @@ export function PlansAdmin() {
     return (
       <div>
         <PageHeader title={t('content.plans_admin_title')} description={t('content.plans_admin_desc')} />
-        <div className="flex justify-center py-12"><Spinner size="lg" /></div>
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-12"><Spinner size="lg" /></div>
       </div>
     );
   }

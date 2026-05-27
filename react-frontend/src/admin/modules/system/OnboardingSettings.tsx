@@ -279,7 +279,7 @@ export function OnboardingSettings() {
                 return (
                   <div key={step.key} className="flex items-center justify-between p-3 rounded-lg bg-theme-elevated">
                     <div className="flex items-center gap-3">
-                      <Icon className="w-5 h-5 text-theme-muted" />
+                      <Icon aria-hidden="true" className="w-5 h-5 text-theme-muted" />
                       <div>
                         <p className="font-medium text-sm">{t(step.labelKey)}</p>
                         <p className="text-xs text-theme-muted">{t(step.descriptionKey)}</p>
@@ -329,7 +329,7 @@ export function OnboardingSettings() {
         <Card>
           <CardHeader className="flex flex-col items-start gap-1 pb-0">
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <ListChecks className="w-5 h-5" />
+              <ListChecks aria-hidden="true" className="w-5 h-5" />
               {t('system.onboarding.listing_creation')}
             </h3>
             <p className="text-sm text-theme-muted">{t('system.onboarding.listing_creation_desc')}</p>
@@ -355,7 +355,7 @@ export function OnboardingSettings() {
         <Card>
           <CardHeader className="flex flex-col items-start gap-1 pb-0">
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Eye className="w-5 h-5" />
+              <Eye aria-hidden="true" className="w-5 h-5" />
               {t('system.onboarding.visibility_gating')}
             </h3>
             <p className="text-sm text-theme-muted">{t('system.onboarding.visibility_gating_desc')}</p>
@@ -386,7 +386,7 @@ export function OnboardingSettings() {
         <Card>
           <CardHeader className="flex flex-col items-start gap-1 pb-0">
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Shield className="w-5 h-5" />
+              <Shield aria-hidden="true" className="w-5 h-5" />
               {t('system.onboarding.safeguarding_config')}
             </h3>
             <p className="text-sm text-theme-muted">{t('system.onboarding.safeguarding_config_desc')}</p>
@@ -399,7 +399,7 @@ export function OnboardingSettings() {
                   return (
                     <SelectItem key={key} id={key} textValue={label}>
                       <div className="flex items-center gap-2">
-                        <Globe className="w-4 h-4" />
+                        <Globe aria-hidden="true" className="w-4 h-4" />
                         {label}
                       </div>
                     </SelectItem>
@@ -412,7 +412,7 @@ export function OnboardingSettings() {
             </div>
 
             <div className="flex items-start gap-2 p-3 rounded-lg bg-warning-50 dark:bg-warning-950/20 border border-warning-200 dark:border-warning-800">
-              <AlertTriangle className="w-5 h-5 text-warning-600 flex-shrink-0 mt-0.5" />
+              <AlertTriangle aria-hidden="true" className="w-5 h-5 text-warning-600 flex-shrink-0 mt-0.5" />
               <div className="text-sm">
                 <p className="font-medium text-warning-700 dark:text-warning-400">{t('system.onboarding.legal_notice')}</p>
                 <p className="text-warning-600 dark:text-warning-500 mt-1">{t('system.onboarding.legal_notice_desc')}</p>
@@ -430,7 +430,7 @@ export function OnboardingSettings() {
                 <div className="space-y-1.5">
                   {safeguardingOptions.filter(o => o.is_active).map((opt) => (
                     <div key={opt.id} className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="w-3.5 h-3.5 text-success-500" />
+                      <CheckCircle aria-hidden="true" className="w-3.5 h-3.5 text-success-500" />
                       <span>{opt.label}</span>
                       {opt.triggers && Object.values(opt.triggers).some(Boolean) && (
                         <Chip size="sm" variant="soft" color="warning" className="text-xs">{t('system.onboarding.has_triggers')}</Chip>
@@ -454,7 +454,7 @@ export function OnboardingSettings() {
         <Card>
           <CardHeader className="flex flex-col items-start gap-1 pb-0">
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <FileText className="w-5 h-5" />
+              <FileText aria-hidden="true" className="w-5 h-5" />
               {t('system.onboarding.custom_text')}
             </h3>
             <p className="text-sm text-theme-muted">{t('system.onboarding.custom_text_desc')}</p>
@@ -467,7 +467,7 @@ export function OnboardingSettings() {
 
         {/* Save Button */}
         <div className="flex justify-end">
-          <Button size="lg" startContent={!saving ? <Save className="w-5 h-5" /> : undefined} onPress={handleSave} isLoading={saving} isDisabled={saving}>
+          <Button size="lg" startContent={!saving ? <Save aria-hidden="true" className="w-5 h-5" /> : undefined} onPress={handleSave} isLoading={saving} isDisabled={saving}>
             {t('system.onboarding.save_settings')}
           </Button>
         </div>

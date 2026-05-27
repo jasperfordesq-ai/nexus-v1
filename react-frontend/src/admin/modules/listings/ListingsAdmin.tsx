@@ -219,7 +219,7 @@ function FeaturedListingsPanel() {
             className="mb-3"
           />
           {searching && (
-            <div className="flex items-center justify-center py-4">
+            <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex items-center justify-center py-4">
               <Spinner size="sm" />
             </div>
           )}

@@ -480,7 +480,7 @@ function ForecastMiniChart({ title, series, valueSuffix, t }: { title: string; s
     <div className="rounded-lg border border-border p-4">
       <div className="flex items-center justify-between gap-2">
         <div className="text-sm font-semibold text-foreground">{title}</div>
-        <Chip size="sm" variant="soft" color={chip.color} startContent={<ChipIcon size={14} />}>
+        <Chip size="sm" variant="soft" color={chip.color} startContent={<ChipIcon aria-hidden="true" size={14} />}>
           {chip.label}
         </Chip>
       </div>
@@ -563,7 +563,7 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: Pred
       <CardHeader className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold flex items-center gap-2">
-            <BrainCircuit size={18} className="text-accent" />
+            <BrainCircuit aria-hidden="true" size={18} className="text-accent" />
             {t('caring_workflow.predictive.title')}
           </h2>
           <p className="mt-1 text-sm text-muted">
@@ -573,7 +573,7 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: Pred
         <Button
           size="sm"
           variant="secondary"
-          startContent={<RefreshCw size={16} />}
+          startContent={<RefreshCw aria-hidden="true" size={16} />}
           isLoading={loading}
           onPress={onRefresh}
         >
@@ -589,7 +589,7 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: Pred
         ) : error ? (
           <div className="rounded-lg bg-danger-50 p-4 text-sm text-danger-700 flex items-center justify-between gap-3">
             <span>{error}</span>
-            <Button size="sm" variant="danger" startContent={<RefreshCw size={14} />} onPress={onRefresh}>
+            <Button size="sm" variant="danger" startContent={<RefreshCw aria-hidden="true" size={14} />} onPress={onRefresh}>
               {t('caring_workflow.actions.retry')}
             </Button>
           </div>
@@ -611,7 +611,7 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: Pred
             {forecast.sub_region_demand && forecast.sub_region_demand.sub_regions.length > 0 && (
               <div className="space-y-2">
                 <div className="text-sm font-semibold text-foreground flex items-center gap-2">
-                  <Info size={14} />
+                  <Info aria-hidden="true" size={14} />
                   {t('caring_workflow.predictive.sub_region_coverage', {
                     days: forecast.sub_region_demand.window_days.long,
                   })}
@@ -653,7 +653,7 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: Pred
             {forecast.helper_churn && forecast.helper_churn.overall.prior_active > 0 && (
               <div className="space-y-2">
                 <div className="text-sm font-semibold text-foreground flex items-center gap-2">
-                  <Info size={14} />
+                  <Info aria-hidden="true" size={14} />
                   {t('caring_workflow.predictive.helper_churn', {
                     days: forecast.helper_churn.lapsed_threshold_days,
                   })}
@@ -699,7 +699,7 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: Pred
             {forecast.coefficient_drift && forecast.coefficient_drift.categories.length > 0 && (
               <div className="space-y-2">
                 <div className="text-sm font-semibold text-foreground flex items-center gap-2">
-                  <Info size={14} />
+                  <Info aria-hidden="true" size={14} />
                   {t('caring_workflow.predictive.coefficient_drift')}
                   {forecast.coefficient_drift.drift_count > 0 && (
                     <Chip size="sm" variant="soft" color="warning">
@@ -746,7 +746,7 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: Pred
             {forecast.alerts.length > 0 && (
               <div className="space-y-2">
                 <div className="text-sm font-semibold text-foreground flex items-center gap-2">
-                  <Info size={14} />
+                  <Info aria-hidden="true" size={14} />
                   {t('caring_workflow.predictive.proactive_alerts')}
                 </div>
                 {forecast.alerts.map((alert) => (
@@ -1515,7 +1515,7 @@ export default function CaringCommunityWorkflowPage() {
               to={tenantPath('/admin/volunteering/hours')}
               variant="secondary"
               size="sm"
-              startContent={<ClipboardCheck size={16} />}
+              startContent={<ClipboardCheck aria-hidden="true" size={16} />}
             >
               {t('caring_workflow.actions.open_hour_review')}
             </Button>
@@ -1524,14 +1524,14 @@ export default function CaringCommunityWorkflowPage() {
               to={tenantPath('/caring/municipal-impact')}
               variant="secondary"
               size="sm"
-              startContent={<FileText size={16} />}
+              startContent={<FileText aria-hidden="true" size={16} />}
             >
               {t('caring_workflow.actions.open_report_pack')}
             </Button>
             <Button
               variant="secondary"
               size="sm"
-              startContent={<RefreshCw size={16} />}
+              startContent={<RefreshCw aria-hidden="true" size={16} />}
               onPress={loadWorkflow}
             >
               {t('caring_workflow.actions.refresh')}
@@ -1612,7 +1612,7 @@ export default function CaringCommunityWorkflowPage() {
                     <Button
                       size="sm"
                       variant={review.is_escalated ? 'danger' : 'secondary'}
-                      startContent={review.is_escalated ? <TriangleAlert size={16} /> : <UserPlus size={16} />}
+                      startContent={review.is_escalated ? <TriangleAlert aria-hidden="true" size={16} /> : <UserPlus aria-hidden="true" size={16} />}
                       isLoading={escalatingReviewId === review.id}
                       isDisabled={decidingReviewId === review.id}
                       onPress={() => escalateReview(review)}
@@ -1622,7 +1622,7 @@ export default function CaringCommunityWorkflowPage() {
                     <Button
                       size="sm"
                       variant="primary"
-                      startContent={<CheckCircle2 size={16} />}
+                      startContent={<CheckCircle2 aria-hidden="true" size={16} />}
                       isLoading={decidingReviewId === review.id}
                       onPress={() => decideReview(review, 'approve')}
                     >
@@ -1631,7 +1631,7 @@ export default function CaringCommunityWorkflowPage() {
                     <Button
                       size="sm"
                       variant="danger"
-                      startContent={<XCircle size={16} />}
+                      startContent={<XCircle aria-hidden="true" size={16} />}
                       isDisabled={decidingReviewId === review.id}
                       onPress={() => decideReview(review, 'decline')}
                     >
@@ -1652,7 +1652,7 @@ export default function CaringCommunityWorkflowPage() {
               <Button
                 size="sm"
                 variant="secondary"
-                startContent={<RefreshCw size={16} />}
+                startContent={<RefreshCw aria-hidden="true" size={16} />}
                 isLoading={loadingRelationships}
                 onPress={loadSupportRelationships}
               >
@@ -1739,7 +1739,7 @@ export default function CaringCommunityWorkflowPage() {
                     <Button
                       size="sm"
                       variant="secondary"
-                      startContent={relationship.status === 'active' ? <Pause size={16} /> : <CheckCircle2 size={16} />}
+                      startContent={relationship.status === 'active' ? <Pause aria-hidden="true" size={16} /> : <CheckCircle2 aria-hidden="true" size={16} />}
                       isLoading={updatingRelationshipId === relationship.id}
                       onPress={() => updateSupportRelationshipStatus(relationship, relationship.status === 'active' ? 'paused' : 'active')}
                     >
@@ -1777,7 +1777,7 @@ export default function CaringCommunityWorkflowPage() {
                           size="sm"
                           variant="primary"
                           className="self-end"
-                          startContent={<ClipboardCheck size={16} />}
+                          startContent={<ClipboardCheck aria-hidden="true" size={16} />}
                           isLoading={loggingRelationshipId === relationship.id}
                           onPress={() => logSupportRelationshipHours(relationship)}
                         >
@@ -1796,7 +1796,7 @@ export default function CaringCommunityWorkflowPage() {
             <CardHeader className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <h2 className="text-lg font-semibold flex items-center gap-2">
-                  <TriangleAlert size={18} className="text-danger" />
+                  <TriangleAlert aria-hidden="true" size={18} className="text-danger" />
                   {t('caring_workflow.safeguarding.title')}
                 </h2>
                 <p className="mt-1 text-sm text-muted">
@@ -1807,7 +1807,7 @@ export default function CaringCommunityWorkflowPage() {
                 <Button
                   size="sm"
                   variant="secondary"
-                  startContent={<RefreshCw size={16} />}
+                  startContent={<RefreshCw aria-hidden="true" size={16} />}
                   isLoading={loadingSafeguarding}
                   onPress={loadSafeguardingSummary}
                 >
@@ -1852,7 +1852,7 @@ export default function CaringCommunityWorkflowPage() {
                     </div>
                     <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-center">
                       <p className="text-xs uppercase tracking-wide text-rose-700 dark:text-rose-300 flex items-center justify-center gap-1">
-                        <TriangleAlert size={12} /> {t('caring_workflow.safeguarding.overdue')}
+                        <TriangleAlert aria-hidden="true" size={12} /> {t('caring_workflow.safeguarding.overdue')}
                       </p>
                       <p className="text-2xl font-semibold">{safeguardingSummary.overdue}</p>
                     </div>
@@ -1949,7 +1949,7 @@ export default function CaringCommunityWorkflowPage() {
             <CardHeader className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <h2 className="text-lg font-semibold flex items-center gap-2">
-                  <Sparkles size={18} className="text-accent" />
+                  <Sparkles aria-hidden="true" size={18} className="text-accent" />
                   {t('caring_workflow.tandem.title')}
                 </h2>
                 <p className="mt-1 text-sm text-muted">
@@ -1959,7 +1959,7 @@ export default function CaringCommunityWorkflowPage() {
               <Button
                 size="sm"
                 variant="secondary"
-                startContent={<RefreshCw size={16} />}
+                startContent={<RefreshCw aria-hidden="true" size={16} />}
                 isLoading={loadingTandems}
                 onPress={loadTandemSuggestions}
               >
@@ -2019,7 +2019,7 @@ export default function CaringCommunityWorkflowPage() {
                               <div className="text-xs text-muted">{t('caring_workflow.relationships.supporter')}</div>
                             </div>
                           </div>
-                          <HeartHandshake size={20} className="text-accent" />
+                          <HeartHandshake aria-hidden="true" size={20} className="text-accent" />
                           <div className="flex items-center gap-2">
                             <div className="h-9 w-9 overflow-hidden rounded-full bg-surface-secondary flex items-center justify-center text-xs font-semibold">
                               {suggestion.recipient.avatar_url ? (
@@ -2054,7 +2054,7 @@ export default function CaringCommunityWorkflowPage() {
                         <Button
                           size="sm"
                           variant="tertiary"
-                          startContent={<XCircle size={16} />}
+                          startContent={<XCircle aria-hidden="true" size={16} />}
                           isLoading={dismissingTandemKey === key}
                           onPress={() => dismissTandemSuggestion(suggestion)}
                         >
@@ -2063,7 +2063,7 @@ export default function CaringCommunityWorkflowPage() {
                         <Button
                           size="sm"
                           variant="primary"
-                          startContent={<Heart size={16} />}
+                          startContent={<Heart aria-hidden="true" size={16} />}
                           onPress={() => createTandemFromSuggestion(suggestion)}
                         >
                           {t('caring_workflow.tandem.create')}
@@ -2089,7 +2089,7 @@ export default function CaringCommunityWorkflowPage() {
                 </div>
                 <Button
                   size="sm"
-                  startContent={<Save size={16} />}
+                  startContent={<Save aria-hidden="true" size={16} />}
                   isLoading={savingPolicy}
                   onPress={savePolicy}
                 >
@@ -2216,7 +2216,7 @@ export default function CaringCommunityWorkflowPage() {
               <div className="flex flex-wrap gap-2">
                 <Button
                   variant="primary"
-                  startContent={<Search size={16} />}
+                  startContent={<Search aria-hidden="true" size={16} />}
                   isLoading={loadingStatement}
                   onPress={loadMemberStatement}
                 >
@@ -2224,7 +2224,7 @@ export default function CaringCommunityWorkflowPage() {
                 </Button>
                 <Button
                   variant="secondary"
-                  startContent={<Download size={16} />}
+                  startContent={<Download aria-hidden="true" size={16} />}
                   isLoading={loadingStatement}
                   onPress={exportMemberStatement}
                 >
@@ -2579,7 +2579,7 @@ export default function CaringCommunityWorkflowPage() {
           <Button
             size="sm"
             variant="secondary"
-            startContent={<RefreshCw size={16} />}
+            startContent={<RefreshCw aria-hidden="true" size={16} />}
             isLoading={loadingInviteCodes}
             onPress={loadInviteCodes}
           >

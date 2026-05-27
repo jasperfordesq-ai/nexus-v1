@@ -258,7 +258,7 @@ export function HoursReportsPage() {
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
-              <div className="flex h-[350px] items-center justify-center"><Spinner /></div>
+              <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex h-[350px] items-center justify-center"><Spinner /></div>
             ) : categories.length > 0 ? (
               <div role="img" aria-label={t('reports.hours_by_category_aria')}>
                 <ResponsiveContainer width="100%" height={350}>
@@ -287,7 +287,7 @@ export function HoursReportsPage() {
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
-              <div className="flex h-[350px] items-center justify-center"><Spinner /></div>
+              <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex h-[350px] items-center justify-center"><Spinner /></div>
             ) : categories.length > 0 ? (
               <div role="img" aria-label={t('reports.hours_distribution_aria')}>
                 <ResponsiveContainer width="100%" height={350}>

@@ -129,14 +129,14 @@ const AGE_GROUP_ORDER = ['under_25', '25_34', '35_44', '45_54', '55_64', '65_plu
 function TabPanel({ loading, error, t, children }: { loading: boolean; error: string | null; t: AdminT; children: React.ReactNode }) {
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-16">
+      <div role="status" aria-busy="true" aria-label={t('analytics.regional.loading.section')} className="flex items-center justify-center py-16">
         <Spinner label={t('analytics.regional.loading.section')} size="lg" />
       </div>
     );
   }
   if (error) {
     return (
-      <div className="rounded-lg bg-danger-50 p-4 text-sm text-danger">
+      <div role="alert" className="rounded-lg bg-danger-50 p-4 text-sm text-danger">
         {error === 'data_unavailable'
           ? t('analytics.regional.errors.data_unavailable')
           : t('analytics.regional.errors.load_data', { error })}
@@ -729,7 +729,7 @@ export default function RegionalAnalyticsPage() {
       </div>
 
       {overviewError && (
-        <div className="rounded-lg bg-danger-50 p-4 text-sm text-danger">
+        <div role="alert" className="rounded-lg bg-danger-50 p-4 text-sm text-danger">
           {overviewError === 'data_unavailable'
             ? t('analytics.regional.errors.data_unavailable')
             : overviewError}
