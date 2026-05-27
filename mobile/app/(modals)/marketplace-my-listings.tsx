@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert, FlatList, RefreshControl, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
@@ -19,6 +19,7 @@ import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import {
   deleteMarketplaceListing,
   getMarketplaceDashboard,
+  getMerchantOnboardingStatus,
   getMyMarketplaceListings,
   marketplaceHasMore,
   marketplaceNextCursor,
@@ -31,11 +32,13 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
+import { storage } from '@/lib/storage';
 import { withAlpha } from '@/lib/utils/color';
 
 type ListingTab = 'active' | 'draft' | 'sold' | 'expired';
 
 const LISTING_TABS: ListingTab[] = ['active', 'draft', 'sold', 'expired'];
+const ONBOARDING_DISMISS_KEY = 'nx_merchant_onboarding_dismissed';
 
 export default function MarketplaceMyListingsRoute() {
   return (
@@ -51,7 +54,9 @@ function MarketplaceMyListingsScreen() {
   const theme = useTheme();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<ListingTab>('active');
+  const [onboardingDismissed, setOnboardingDismissed] = useState(true);
   const dashboard = useApi(() => getMarketplaceDashboard(), [], { enabled: true });
+  const onboarding = useApi(() => getMerchantOnboardingStatus(), [], { enabled: true });
   const list = usePaginatedApi<MarketplaceListingItem, Awaited<ReturnType<typeof getMyMarketplaceListings>>>(
     (cursor) => getMyMarketplaceListings(cursor, user?.id, activeTab),
     (response) => ({
@@ -63,6 +68,22 @@ function MarketplaceMyListingsScreen() {
   );
 
   const stats = dashboard.data?.data ?? {};
+  const showOnboardingNudge = !onboardingDismissed && onboarding.data?.data && !onboarding.data.data.onboarding_completed;
+
+  useEffect(() => {
+    let mounted = true;
+    storage.get(ONBOARDING_DISMISS_KEY).then((value) => {
+      if (mounted) setOnboardingDismissed(value === '1');
+    });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  function dismissOnboardingNudge() {
+    setOnboardingDismissed(true);
+    void storage.set(ONBOARDING_DISMISS_KEY, '1');
+  }
 
   async function removeListing(item: MarketplaceListingItem) {
     Alert.alert(t('owner.deleteTitle'), t('owner.deleteMessage'), [
@@ -108,7 +129,12 @@ function MarketplaceMyListingsScreen() {
         keyExtractor={(item) => String(item.id)}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 132 }}
         refreshControl={<RefreshControl refreshing={list.isLoading && list.items.length > 0} onRefresh={list.refresh} />}
-        ListHeaderComponent={<DashboardCard stats={stats} primary={primary} activeTab={activeTab} onTabChange={setActiveTab} />}
+        ListHeaderComponent={
+          <>
+            <DashboardCard stats={stats} primary={primary} activeTab={activeTab} onTabChange={setActiveTab} />
+            {showOnboardingNudge ? <OnboardingNudge primary={primary} onDismiss={dismissOnboardingNudge} /> : null}
+          </>
+        }
         renderItem={({ item }) => (
           <View>
             <MarketplaceListingCard item={item} onPress={() => router.push({ pathname: '/(modals)/marketplace-detail', params: { id: String(item.id) } } as unknown as Href)} />
@@ -233,6 +259,36 @@ function DashboardCard({
           <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-shipping-options' as Href)}>
             <Ionicons name="car-outline" size={16} color={primary} />
             <HeroButton.Label>{t('myListings.shipping')}</HeroButton.Label>
+          </HeroButton>
+        </View>
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function OnboardingNudge({ primary, onDismiss }: { primary: string; onDismiss: () => void }) {
+  const { t } = useTranslation('marketplace');
+  const theme = useTheme();
+  return (
+    <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
+      <View className="h-1.5" style={{ backgroundColor: primary }} />
+      <HeroCard.Body className="gap-4 p-4">
+        <View className="flex-row items-start gap-3">
+          <View className="size-12 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+            <Ionicons name="ribbon-outline" size={24} color={primary} />
+          </View>
+          <View className="min-w-0 flex-1 gap-1">
+            <Text className="text-base font-bold" style={{ color: theme.text }}>{t('myListings.onboardingNudge.title')}</Text>
+            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('myListings.onboardingNudge.subtitle')}</Text>
+          </View>
+        </View>
+        <View className="flex-row gap-2">
+          <HeroButton className="flex-1" variant="primary" onPress={() => router.push('/(modals)/marketplace-merchant-onboarding' as Href)} style={{ backgroundColor: primary }}>
+            <Ionicons name="storefront-outline" size={16} color="#fff" />
+            <HeroButton.Label>{t('myListings.onboardingNudge.start')}</HeroButton.Label>
+          </HeroButton>
+          <HeroButton className="flex-1" variant="secondary" onPress={onDismiss}>
+            <HeroButton.Label>{t('myListings.onboardingNudge.dismiss')}</HeroButton.Label>
           </HeroButton>
         </View>
       </HeroCard.Body>

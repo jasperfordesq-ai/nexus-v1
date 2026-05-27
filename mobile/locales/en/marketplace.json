@@ -209,6 +209,12 @@
         "title": "No expired listings",
         "subtitle": "Expired listings will appear here so you can renew them."
       }
+    },
+    "onboardingNudge": {
+      "title": "Complete your seller setup",
+      "subtitle": "Add seller details, branding, and payment readiness to unlock a stronger marketplace profile.",
+      "start": "Start setup",
+      "dismiss": "Dismiss"
     }
   },
   "offers": {
