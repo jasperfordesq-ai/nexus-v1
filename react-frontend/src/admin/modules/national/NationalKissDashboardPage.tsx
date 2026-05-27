@@ -464,47 +464,62 @@ export function NationalKissDashboardPage() {
             >
               <TableHeader>
                 <TableColumn
-                  role="columnheader"
-                  tabIndex={0}
-                  onClick={() => handleSort('name')}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSort('name'); } }}
                   aria-sort={sortKey === 'name' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
                   className="cursor-pointer"
-                >{t('national_kiss_dashboard.comparative.cooperative')}</TableColumn>
+                >
+                  <button
+                    type="button"
+                    className="w-full text-left font-inherit bg-transparent border-0 p-0 cursor-pointer"
+                    onClick={() => handleSort('name')}
+                    onKeyDown={(e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSort('name'); } }}
+                  >{t('national_kiss_dashboard.comparative.cooperative')}</button>
+                </TableColumn>
                 <TableColumn
-                  role="columnheader"
-                  tabIndex={0}
-                  onClick={() => handleSort('hours')}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSort('hours'); } }}
                   aria-sort={sortKey === 'hours' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
                   className="cursor-pointer text-right"
-                ><span title={t('national_kiss_dashboard.comparative.hours_title')}>{t('national_kiss_dashboard.comparative.hours_sort')}</span></TableColumn>
+                >
+                  <button
+                    type="button"
+                    className="w-full text-right font-inherit bg-transparent border-0 p-0 cursor-pointer"
+                    onClick={() => handleSort('hours')}
+                    onKeyDown={(e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSort('hours'); } }}
+                  ><span title={t('national_kiss_dashboard.comparative.hours_title')}>{t('national_kiss_dashboard.comparative.hours_sort')}</span></button>
+                </TableColumn>
                 <TableColumn><span title={t('national_kiss_dashboard.comparative.members_title')}>{t('national_kiss_dashboard.comparative.members')}</span></TableColumn>
                 <TableColumn><span title={t('national_kiss_dashboard.comparative.recipients_title')}>{t('national_kiss_dashboard.comparative.recipients')}</span></TableColumn>
                 <TableColumn
-                  role="columnheader"
-                  tabIndex={0}
-                  onClick={() => handleSort('active_tandems')}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSort('active_tandems'); } }}
                   aria-sort={sortKey === 'active_tandems' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
                   className="cursor-pointer text-right"
-                ><span title={t('national_kiss_dashboard.comparative.tandems_title')}>{t('national_kiss_dashboard.comparative.tandems_sort')}</span></TableColumn>
+                >
+                  <button
+                    type="button"
+                    className="w-full text-right font-inherit bg-transparent border-0 p-0 cursor-pointer"
+                    onClick={() => handleSort('active_tandems')}
+                    onKeyDown={(e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSort('active_tandems'); } }}
+                  ><span title={t('national_kiss_dashboard.comparative.tandems_title')}>{t('national_kiss_dashboard.comparative.tandems_sort')}</span></button>
+                </TableColumn>
                 <TableColumn
-                  role="columnheader"
-                  tabIndex={0}
-                  onClick={() => handleSort('retention_rate_pct')}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSort('retention_rate_pct'); } }}
                   aria-sort={sortKey === 'retention_rate_pct' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
                   className="cursor-pointer text-right"
-                ><span title={t('national_kiss_dashboard.comparative.retention_title')}>{t('national_kiss_dashboard.comparative.retention_sort')}</span></TableColumn>
+                >
+                  <button
+                    type="button"
+                    className="w-full text-right font-inherit bg-transparent border-0 p-0 cursor-pointer"
+                    onClick={() => handleSort('retention_rate_pct')}
+                    onKeyDown={(e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSort('retention_rate_pct'); } }}
+                  ><span title={t('national_kiss_dashboard.comparative.retention_title')}>{t('national_kiss_dashboard.comparative.retention_sort')}</span></button>
+                </TableColumn>
                 <TableColumn
-                  role="columnheader"
-                  tabIndex={0}
-                  onClick={() => handleSort('reciprocity_pct')}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSort('reciprocity_pct'); } }}
                   aria-sort={sortKey === 'reciprocity_pct' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
                   className="cursor-pointer text-right"
-                ><span title={t('national_kiss_dashboard.comparative.reciprocity_title')}>{t('national_kiss_dashboard.comparative.reciprocity_sort')}</span></TableColumn>
+                >
+                  <button
+                    type="button"
+                    className="w-full text-right font-inherit bg-transparent border-0 p-0 cursor-pointer"
+                    onClick={() => handleSort('reciprocity_pct')}
+                    onKeyDown={(e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSort('reciprocity_pct'); } }}
+                  ><span title={t('national_kiss_dashboard.comparative.reciprocity_title')}>{t('national_kiss_dashboard.comparative.reciprocity_sort')}</span></button>
+                </TableColumn>
                 <TableColumn>{t('national_kiss_dashboard.comparative.status')}</TableColumn>
               </TableHeader>
               <TableBody>
