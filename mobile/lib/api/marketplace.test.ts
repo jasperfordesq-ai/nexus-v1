@@ -19,6 +19,7 @@ import {
   createMarketplaceSavedSearch,
   createMerchantCoupon,
   getMarketplaceCategories,
+  getMarketplaceCollectionItems,
   getMarketplaceCollections,
   getMarketplaceListing,
   getMarketplaceListings,
@@ -32,6 +33,7 @@ import {
   marketplaceHasMore,
   marketplaceNextCursor,
   promoteMarketplaceListing,
+  removeMarketplaceCollectionItem,
   scanMarketplacePickup,
   updateMarketplaceListing,
   uploadMarketplaceImages,
@@ -142,6 +144,14 @@ describe('marketplace api', () => {
 
     await getMarketplaceCollections();
     expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/collections');
+
+    await getMarketplaceCollectionItems(7, null, 50);
+    expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/collections/7/items', {
+      limit: '50',
+    });
+
+    await removeMarketplaceCollectionItem(7, 99);
+    expect(api.delete).toHaveBeenCalledWith('/api/v2/marketplace/collections/7/items/99');
 
     await createMarketplaceCollection({ name: 'Garden kit', description: 'Useful things', is_public: false });
     expect(api.post).toHaveBeenCalledWith('/api/v2/marketplace/collections', {

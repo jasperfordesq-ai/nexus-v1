@@ -223,6 +223,16 @@ function MarketplaceScreen() {
                     <HeroButton.Label>{t('actions.tools')}</HeroButton.Label>
                   </HeroButton>
                 </View>
+                <View className="flex-row gap-2">
+                  <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-free' as Href)}>
+                    <Ionicons name="gift-outline" size={16} color={theme.success} />
+                    <HeroButton.Label>{t('actions.freeItems')}</HeroButton.Label>
+                  </HeroButton>
+                  <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-collections' as Href)}>
+                    <Ionicons name="folder-open-outline" size={16} color={primary} />
+                    <HeroButton.Label>{t('actions.collections')}</HeroButton.Label>
+                  </HeroButton>
+                </View>
               </HeroCard.Body>
             </HeroCard>
 
@@ -255,7 +265,7 @@ function MarketplaceScreen() {
                   key={category.id}
                   size="sm"
                   variant={selectedCategory === category.id ? 'primary' : 'secondary'}
-                  onPress={() => setSelectedCategory(category.id)}
+                  onPress={() => router.push({ pathname: '/(modals)/marketplace-category', params: { id: String(category.id), name: category.name } } as unknown as Href)}
                   style={selectedCategory === category.id ? { backgroundColor: primary } : undefined}
                 >
                   <HeroButton.Label>{category.name}</HeroButton.Label>

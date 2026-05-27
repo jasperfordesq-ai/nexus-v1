@@ -253,6 +253,14 @@ function RootNavigator() {
         options={{ ...modalOptions, headerShown: false, title: t('marketplace:title') }}
       />
       <Stack.Screen
+        name="(modals)/marketplace-free"
+        options={{ ...modalOptions, headerShown: false, title: t('marketplace:free.title') }}
+      />
+      <Stack.Screen
+        name="(modals)/marketplace-category"
+        options={{ ...modalOptions, headerShown: false, title: t('marketplace:category.title') }}
+      />
+      <Stack.Screen
         name="(modals)/marketplace-detail"
         options={{ ...modalOptions, headerShown: false, title: t('marketplace:detail.title') }}
       />
@@ -279,6 +287,10 @@ function RootNavigator() {
       <Stack.Screen
         name="(modals)/marketplace-tools"
         options={{ ...modalOptions, headerShown: false, title: t('marketplace:tools.title') }}
+      />
+      <Stack.Screen
+        name="(modals)/marketplace-collections"
+        options={{ ...modalOptions, headerShown: false, title: t('marketplace:collections.title') }}
       />
       <Stack.Screen
         name="(modals)/marketplace-seller"

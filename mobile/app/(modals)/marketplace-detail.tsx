@@ -19,11 +19,14 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import { formatMarketplacePrice } from '@/components/marketplace/MarketplaceListingCard';
 import {
+  addMarketplaceCollectionItem,
   createMarketplaceOrder,
+  getMarketplaceCollections,
   getMarketplaceListing,
   makeMarketplaceOffer,
   saveMarketplaceListing,
   unsaveMarketplaceListing,
+  type MarketplaceCollection,
   type MarketplaceListingDetail,
 } from '@/lib/api/marketplace';
 import { APP_URL } from '@/lib/constants';
@@ -54,6 +57,9 @@ function MarketplaceDetailScreen() {
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
   const [offerOpen, setOfferOpen] = useState(false);
+  const [collectionOpen, setCollectionOpen] = useState(false);
+  const [collections, setCollections] = useState<MarketplaceCollection[]>([]);
+  const [isCollectionLoading, setIsCollectionLoading] = useState(false);
   const [offerAmount, setOfferAmount] = useState('');
   const [offerMessage, setOfferMessage] = useState('');
 
@@ -165,6 +171,35 @@ function MarketplaceDetailScreen() {
       Alert.alert(t('offers.sent'), t('offers.sentHint'));
     } catch (err) {
       Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('offers.failed'));
+    } finally {
+      setIsActionLoading(false);
+    }
+  }
+
+  async function openCollections() {
+    setCollectionOpen(true);
+    if (collections.length > 0 || isCollectionLoading) return;
+    setIsCollectionLoading(true);
+    try {
+      const response = await getMarketplaceCollections();
+      setCollections(response.data);
+    } catch {
+      Alert.alert(t('common:errors.alertTitle'), t('collections.unableToLoad'));
+    } finally {
+      setIsCollectionLoading(false);
+    }
+  }
+
+  async function addToCollection(collection: MarketplaceCollection) {
+    if (!listing) return;
+    setIsActionLoading(true);
+    try {
+      await addMarketplaceCollectionItem(collection.id, listing.id);
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setCollectionOpen(false);
+      Alert.alert(t('collections.addedTitle'), t('collections.addedHint', { name: collection.name }));
+    } catch {
+      Alert.alert(t('common:errors.alertTitle'), t('collections.addFailed'));
     } finally {
       setIsActionLoading(false);
     }
@@ -318,24 +353,65 @@ function MarketplaceDetailScreen() {
 
       {!isOwner ? (
         <Surface variant="default" className="border-t border-border/50 px-4 pt-3 pb-4">
-          <View className="flex-row gap-2">
-            <HeroButton className="flex-1" variant="secondary" onPress={handleToggleSave}>
-              <Ionicons name={listing.is_saved ? 'heart' : 'heart-outline'} size={17} color={primary} />
-              <HeroButton.Label>{listing.is_saved ? t('detail.saved') : t('detail.save')}</HeroButton.Label>
-            </HeroButton>
-            <HeroButton className="flex-1" variant="secondary" onPress={() => setOfferOpen(true)}>
-              <Ionicons name="hand-left-outline" size={17} color={primary} />
-              <HeroButton.Label>{t('detail.makeOffer')}</HeroButton.Label>
-            </HeroButton>
-            {canBuy ? (
-              <HeroButton className="flex-1" variant="primary" onPress={handleBuyNow} isDisabled={isActionLoading} style={{ backgroundColor: primary }}>
-                <Ionicons name="card-outline" size={17} color="#fff" />
-                <HeroButton.Label>{t('detail.buyNow')}</HeroButton.Label>
+          <View className="gap-2">
+            <View className="flex-row gap-2">
+              <HeroButton className="flex-1" variant="secondary" onPress={handleToggleSave}>
+                <Ionicons name={listing.is_saved ? 'heart' : 'heart-outline'} size={17} color={primary} />
+                <HeroButton.Label>{listing.is_saved ? t('detail.saved') : t('detail.save')}</HeroButton.Label>
               </HeroButton>
-            ) : null}
+              <HeroButton className="flex-1" variant="secondary" onPress={() => void openCollections()}>
+                <Ionicons name="folder-open-outline" size={17} color={primary} />
+                <HeroButton.Label>{t('detail.addToCollection')}</HeroButton.Label>
+              </HeroButton>
+            </View>
+            <View className="flex-row gap-2">
+              <HeroButton className="flex-1" variant="secondary" onPress={() => setOfferOpen(true)}>
+                <Ionicons name="hand-left-outline" size={17} color={primary} />
+                <HeroButton.Label>{t('detail.makeOffer')}</HeroButton.Label>
+              </HeroButton>
+              {canBuy ? (
+                <HeroButton className="flex-1" variant="primary" onPress={handleBuyNow} isDisabled={isActionLoading} style={{ backgroundColor: primary }}>
+                  <Ionicons name="card-outline" size={17} color="#fff" />
+                  <HeroButton.Label>{t('detail.buyNow')}</HeroButton.Label>
+                </HeroButton>
+              ) : null}
+            </View>
           </View>
         </Surface>
       ) : null}
+
+      <Modal visible={collectionOpen} transparent animationType="slide" onRequestClose={() => setCollectionOpen(false)}>
+        <View className="flex-1 justify-end bg-black/40">
+          <Surface variant="default" className="max-h-[72%] rounded-t-[28px] p-4">
+            <View className="mb-4 flex-row items-center justify-between">
+              <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('collections.addTitle')}</Text>
+              <HeroButton isIconOnly variant="secondary" onPress={() => setCollectionOpen(false)}>
+                <Ionicons name="close-outline" size={20} color={primary} />
+              </HeroButton>
+            </View>
+            {isCollectionLoading ? (
+              <View className="py-8"><LoadingSpinner /></View>
+            ) : collections.length === 0 ? (
+              <View className="gap-3">
+                <EmptyState icon="folder-open-outline" title={t('collections.empty')} subtitle={t('collections.emptyHint')} />
+                <HeroButton variant="primary" onPress={() => { setCollectionOpen(false); router.push('/(modals)/marketplace-tools' as Href); }} style={{ backgroundColor: primary }}>
+                  <Ionicons name="add-outline" size={17} color="#fff" />
+                  <HeroButton.Label>{t('collections.manage')}</HeroButton.Label>
+                </HeroButton>
+              </View>
+            ) : (
+              <ScrollView contentContainerStyle={{ gap: 10 }}>
+                {collections.map((collection) => (
+                  <HeroButton key={collection.id} variant="secondary" onPress={() => void addToCollection(collection)} isDisabled={isActionLoading}>
+                    <Ionicons name="folder-outline" size={17} color={primary} />
+                    <HeroButton.Label>{collection.name}</HeroButton.Label>
+                  </HeroButton>
+                ))}
+              </ScrollView>
+            )}
+          </Surface>
+        </View>
+      </Modal>
 
       <Modal visible={offerOpen} transparent animationType="slide" onRequestClose={() => setOfferOpen(false)}>
         <View className="flex-1 justify-end bg-black/40">

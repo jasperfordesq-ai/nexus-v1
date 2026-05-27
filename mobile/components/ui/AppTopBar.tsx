@@ -23,6 +23,7 @@ interface AppTopBarProps {
   title: string;
   backLabel: string;
   fallbackHref?: Href;
+  onBack?: () => void;
   rightAction?: AppTopBarAction;
 }
 
@@ -30,12 +31,18 @@ export default function AppTopBar({
   title,
   backLabel,
   fallbackHref = '/(tabs)/home',
+  onBack,
   rightAction,
 }: AppTopBarProps) {
   const primary = usePrimaryColor();
   const theme = useTheme();
 
   function goBack() {
+    if (onBack) {
+      onBack();
+      return;
+    }
+
     if (typeof router.canGoBack === 'function' && router.canGoBack()) {
       router.back();
     } else {

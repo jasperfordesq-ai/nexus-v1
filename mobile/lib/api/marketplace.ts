@@ -489,10 +489,11 @@ export function deleteMarketplaceCollection(id: number): Promise<MarketplaceData
 export function getMarketplaceCollectionItems(
   id: number,
   cursor?: string | null,
+  limit = 20,
 ): Promise<MarketplaceCollectionResponse<MarketplaceCollectionItem>> {
   const query: Record<string, string> = {};
   addQueryValue(query, 'cursor', cursor);
-  addQueryValue(query, 'limit', 20);
+  addQueryValue(query, 'limit', limit);
   return api.get<MarketplaceCollectionResponse<MarketplaceCollectionItem>>(`${API_V2}/marketplace/collections/${id}/items`, query);
 }
 
@@ -501,6 +502,10 @@ export function addMarketplaceCollectionItem(id: number, listingId: number, note
     listing_id: listingId,
     note,
   });
+}
+
+export function removeMarketplaceCollectionItem(id: number, listingId: number): Promise<MarketplaceDataResponse<{ deleted: boolean }>> {
+  return api.delete<MarketplaceDataResponse<{ deleted: boolean }>>(`${API_V2}/marketplace/collections/${id}/items/${listingId}`);
 }
 
 export function getMarketplacePromotionProducts(): Promise<MarketplaceDataResponse<MarketplacePromotionProduct[]>> {

@@ -51,7 +51,7 @@ export default function NewMarketplaceListingRoute() {
 
 export function MarketplaceListingForm() {
   const { t } = useTranslation(['marketplace', 'common']);
-  const params = useLocalSearchParams<{ id?: string }>();
+  const params = useLocalSearchParams<{ id?: string; price_type?: MarketplacePriceType }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const listingId = Number(params.id);
@@ -62,7 +62,8 @@ export function MarketplaceListingForm() {
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [timeCredits, setTimeCredits] = useState('');
-  const [priceType, setPriceType] = useState<MarketplacePriceType>('fixed');
+  const initialPriceType = PRICE_TYPES.includes(params.price_type as MarketplacePriceType) ? params.price_type as MarketplacePriceType : 'fixed';
+  const [priceType, setPriceType] = useState<MarketplacePriceType>(initialPriceType);
   const [condition, setCondition] = useState<MarketplaceCondition>('good');
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [quantity, setQuantity] = useState('1');
