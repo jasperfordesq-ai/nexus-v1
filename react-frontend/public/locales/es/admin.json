@@ -17002,5 +17002,27 @@
   },
   "national": {
     "trend_chart_aria": "Chart showing community activity trends over time"
+  },
+  "operations": {
+    "title": "Operations",
+    "description": "Cache statistics and background job controls.",
+    "refresh": "Refresh",
+    "cache_heading": "Cache",
+    "bg_jobs_heading": "Background Jobs",
+    "redis_label": "Redis",
+    "redis_connected": "Connected",
+    "redis_disconnected": "Disconnected",
+    "memory_used": "Memory used",
+    "keys": "Keys",
+    "clear_cache": "Clear tenant cache",
+    "cache_cleared": "Cache cleared successfully",
+    "cache_clear_failed": "Failed to clear cache",
+    "job_triggered": "Job triggered successfully",
+    "job_trigger_failed": "Failed to trigger job",
+    "run_job_label": "Run {{name}}",
+    "last_run": "Last run: {{date}}",
+    "never_run": "Never run",
+    "no_jobs": "No background jobs configured",
+    "loading": "Loading"
   }
 }

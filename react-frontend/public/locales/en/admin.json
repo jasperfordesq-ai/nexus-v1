@@ -5176,6 +5176,7 @@
     "recommendations": "Recommendations",
     "redirects": "Redirects",
     "reports": "Reports",
+    "support_reports": "Support Reports",
     "requests": "Requests",
     "requirements": "Requirements",
     "resources": "Resources",
@@ -5268,6 +5269,90 @@
     "regional_analytics": "Regional Analytics",
     "help": "Help",
     "whitelist": "Whitelist"
+  },
+  "support_reports": {
+    "meta_title": "Support Reports",
+    "title": "Support Reports",
+    "subtitle": "Review member-submitted bug reports with page diagnostics, Sentry event IDs, and triage notes.",
+    "loading": "Loading support reports...",
+    "empty": "No support reports match these filters.",
+    "empty_value": "-",
+    "unassigned": "Unassigned",
+    "actions": {
+      "refresh": "Refresh",
+      "search": "Search",
+      "clear": "Clear",
+      "review": "Review",
+      "open_page": "Open page",
+      "open_sentry": "Open Sentry",
+      "copy_diagnostics": "Copy diagnostics",
+      "close": "Close",
+      "save": "Save triage"
+    },
+    "stats": {
+      "open": "Open",
+      "triaged": "Triaged",
+      "blocked": "Blocked",
+      "unassigned": "Unassigned"
+    },
+    "filters": {
+      "search": "Search reference, route, reporter, or summary",
+      "status": "Status",
+      "impact": "Impact"
+    },
+    "status": {
+      "all": "All statuses",
+      "open": "Open",
+      "triaged": "Triaged",
+      "resolved": "Resolved",
+      "closed": "Closed"
+    },
+    "impact": {
+      "all": "All impacts",
+      "blocked": "Blocked",
+      "major": "Major",
+      "minor": "Minor",
+      "cosmetic": "Cosmetic"
+    },
+    "table": {
+      "aria": "Support reports",
+      "reference": "Reference",
+      "summary": "Summary",
+      "impact": "Impact",
+      "status": "Status",
+      "reporter": "Reporter",
+      "assignee": "Assignee",
+      "created": "Created",
+      "actions": "Actions"
+    },
+    "detail": {
+      "title": "Report {{reference}}",
+      "loading": "Loading report...",
+      "summary": "Summary",
+      "description": "Description",
+      "reporter": "Reporter",
+      "page": "Page",
+      "created": "Created",
+      "user_agent": "User agent",
+      "sentry_event": "Sentry event",
+      "diagnostics": "Diagnostics"
+    },
+    "fields": {
+      "status": "Status",
+      "assignee": "Assignee",
+      "sentry_issue_url": "Sentry issue URL",
+      "triage_notes": "Triage notes"
+    },
+    "messages": {
+      "saved": "Support report updated.",
+      "copied": "Diagnostics copied."
+    },
+    "errors": {
+      "load": "Failed to load support reports.",
+      "load_detail": "Failed to load the support report.",
+      "save": "Failed to save the support report.",
+      "copy": "Could not copy diagnostics."
+    }
   },
   "admin_help": {
     "page_title": "Help Centre",
@@ -16771,5 +16856,27 @@
   },
   "national": {
     "trend_chart_aria": "Chart showing community activity trends over time"
+  },
+  "operations": {
+    "title": "Operations",
+    "description": "Cache statistics and background job controls.",
+    "refresh": "Refresh",
+    "cache_heading": "Cache",
+    "bg_jobs_heading": "Background Jobs",
+    "redis_label": "Redis",
+    "redis_connected": "Connected",
+    "redis_disconnected": "Disconnected",
+    "memory_used": "Memory used",
+    "keys": "Keys",
+    "clear_cache": "Clear tenant cache",
+    "cache_cleared": "Cache cleared successfully",
+    "cache_clear_failed": "Failed to clear cache",
+    "job_triggered": "Job triggered successfully",
+    "job_trigger_failed": "Failed to trigger job",
+    "run_job_label": "Run {{name}}",
+    "last_run": "Last run: {{date}}",
+    "never_run": "Never run",
+    "no_jobs": "No background jobs configured",
+    "loading": "Loading"
   }
 }

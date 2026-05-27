@@ -1,16 +1,3 @@
-import { Card, CardBody, CardHeader, Spinner, Button } from '@/components/ui';
-import { useState, useCallback, useEffect } from 'react';
-import { Separator } from '@heroui/react';
-import RefreshCw from 'lucide-react/icons/refresh-cw';
-import Trash2 from 'lucide-react/icons/trash-2';
-import Database from 'lucide-react/icons/database';
-import Timer from 'lucide-react/icons/timer';
-import Play from 'lucide-react/icons/play';
-import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
-import { adminConfig } from '../../api/adminApi';
-import { PageHeader } from '../../components';
-import type { CacheStats, BackgroundJob } from '../../api/types';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -23,9 +10,24 @@ import type { CacheStats, BackgroundJob } from '../../api/types';
  * Previously lived inside /admin/tenant-features (now retired).
  */
 
+import { Card, CardBody, CardHeader, Spinner, Button } from '@/components/ui';
+import { useState, useCallback, useEffect } from 'react';
+import { Separator } from '@heroui/react';
+import { useTranslation } from 'react-i18next';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Database from 'lucide-react/icons/database';
+import Timer from 'lucide-react/icons/timer';
+import Play from 'lucide-react/icons/play';
+import { usePageTitle } from '@/hooks';
+import { useToast } from '@/contexts';
+import { adminConfig } from '../../api/adminApi';
+import { PageHeader } from '../../components';
+import type { CacheStats, BackgroundJob } from '../../api/types';
 
 export default function Operations() {
-  usePageTitle('Operations');
+  const { t } = useTranslation('admin');
+  usePageTitle(t('operations.title'));
   const toast = useToast();
 
   const [cacheStats, setCacheStats] = useState<CacheStats | null>(null);
@@ -50,27 +52,27 @@ export default function Operations() {
   const handleClearCache = async () => {
     const res = await adminConfig.clearCache('tenant');
     if (res.success) {
-      toast.success('Cache cleared successfully');
+      toast.success(t('operations.cache_cleared'));
       const statsRes = await adminConfig.getCacheStats();
       if (statsRes.success && statsRes.data) setCacheStats(statsRes.data);
     } else {
-      toast.error('Failed to clear cache');
+      toast.error(t('operations.cache_clear_failed'));
     }
   };
 
   const handleRunJob = async (jobId: string) => {
     const res = await adminConfig.runJob(jobId);
     if (res.success) {
-      toast.success('Job triggered successfully');
+      toast.success(t('operations.job_triggered'));
     } else {
-      toast.error('Failed to trigger job');
+      toast.error(t('operations.job_trigger_failed'));
     }
   };
 
   if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" /></div>
+        <div role="status" aria-busy="true" aria-label={t('operations.loading')} className="flex justify-center py-4"><Spinner size="lg" /></div>
       </div>
     );
   }
@@ -78,34 +80,34 @@ export default function Operations() {
   return (
     <div>
       <PageHeader
-        title="Operations"
-        description="Cache statistics and background job controls."
+        title={t('operations.title')}
+        description={t('operations.description')}
         actions={
           <Button variant="tertiary" size="sm" startContent={<RefreshCw aria-hidden="true" size={16} />} onPress={load}>
-            Refresh
+            {t('operations.refresh')}
           </Button>
         }
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card >
+        <Card>
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Database aria-hidden="true" size={18} className="text-warning" />
-            <h3 className="font-semibold">Cache</h3>
+            <h3 className="font-semibold">{t('operations.cache_heading')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4 space-y-3">
             <div className="flex justify-between text-sm">
-              <span className="text-muted">Redis</span>
+              <span className="text-muted">{t('operations.redis_label')}</span>
               <span className={cacheStats?.redis_connected ? 'text-success' : 'text-danger'}>
-                {cacheStats?.redis_connected ? 'Connected' : 'Disconnected'}
+                {cacheStats?.redis_connected ? t('operations.redis_connected') : t('operations.redis_disconnected')}
               </span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-muted">Memory used</span>
+              <span className="text-muted">{t('operations.memory_used')}</span>
               <span>{cacheStats?.redis_memory_used || '—'}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-muted">Keys</span>
+              <span className="text-muted">{t('operations.keys')}</span>
               <span>{cacheStats?.redis_keys_count ?? '—'}</span>
             </div>
             <Separator />
@@ -117,15 +119,15 @@ export default function Operations() {
               onPress={handleClearCache}
               size="sm"
             >
-              Clear tenant cache
+              {t('operations.clear_cache')}
             </Button>
           </CardBody>
         </Card>
 
-        <Card >
+        <Card>
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Timer aria-hidden="true" size={18} className="text-accent" />
-            <h3 className="font-semibold">Background jobs</h3>
+            <h3 className="font-semibold">{t('operations.bg_jobs_heading')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4 space-y-3">
             {jobs.length > 0 ? jobs.map((job) => (
@@ -133,7 +135,9 @@ export default function Operations() {
                 <div>
                   <p className="text-sm font-medium">{job.name}</p>
                   <p className="text-xs text-muted">
-                    {job.last_run_at ? `Last run: ${new Date(job.last_run_at).toLocaleString()}` : 'Never run'}
+                    {job.last_run_at
+                      ? t('operations.last_run', { date: new Date(job.last_run_at).toLocaleString() })
+                      : t('operations.never_run')}
                   </p>
                 </div>
                 <Button
@@ -141,13 +145,13 @@ export default function Operations() {
                   size="sm"
                   variant="tertiary"
                   onPress={() => handleRunJob(job.id)}
-                  aria-label={`Run ${job.name}`}
+                  aria-label={t('operations.run_job_label', { name: job.name })}
                 >
                   <Play aria-hidden="true" size={14} />
                 </Button>
               </div>
             )) : (
-              <p className="text-sm text-muted">No background jobs configured</p>
+              <p className="text-sm text-muted">{t('operations.no_jobs')}</p>
             )}
           </CardBody>
         </Card>
