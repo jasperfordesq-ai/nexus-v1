@@ -524,7 +524,20 @@ function CouponsPanel() {
             ))}
           </ScrollView>
         </View>
-        <FormInput label={t('tools.coupons.value')} value={form.discountValue} onChangeText={(value) => updateForm('discountValue', value)} placeholder={t('tools.coupons.valuePlaceholder')} keyboardType="decimal-pad" />
+        <FormInput
+          label={form.discountType === 'fixed' ? t('tools.coupons.valueFixed') : t('tools.coupons.value')}
+          value={form.discountValue}
+          onChangeText={(value) => updateForm('discountValue', value)}
+          placeholder={form.discountType === 'fixed' ? t('tools.coupons.valueFixedPlaceholder') : t('tools.coupons.valuePlaceholder')}
+          keyboardType="decimal-pad"
+        />
+        <FormInput
+          label={t('tools.coupons.minOrder')}
+          value={form.minOrderCents}
+          onChangeText={(value) => updateForm('minOrderCents', value)}
+          placeholder={t('tools.coupons.minOrderPlaceholder')}
+          keyboardType="decimal-pad"
+        />
         <View className="flex-row gap-2">
           <View className="min-w-0 flex-1">
             <FormInput label={t('tools.coupons.maxUses')} value={form.maxUses} onChangeText={(value) => updateForm('maxUses', value)} placeholder={t('tools.coupons.maxUsesPlaceholder')} keyboardType="decimal-pad" />
@@ -658,7 +671,7 @@ function couponPayload(form: CouponFormState) {
 
 function couponDiscountLabel(coupon: MerchantCoupon): string {
   if (coupon.discount_type === 'percent') return `${coupon.discount_value ?? 0}%`;
-  if (coupon.discount_type === 'fixed') return `${coupon.discount_value ?? 0}`;
+  if (coupon.discount_type === 'fixed') return `€${((coupon.discount_value ?? 0) / 100).toFixed(2)}`;
   return 'BOGO';
 }
 
