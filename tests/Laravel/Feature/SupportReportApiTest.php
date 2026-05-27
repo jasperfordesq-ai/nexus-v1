@@ -20,6 +20,7 @@ class SupportReportApiTest extends TestCase
     public function test_member_can_submit_support_report_with_sanitised_diagnostics(): void
     {
         $member = User::factory()->forTenant($this->testTenantId)->create();
+        $this->fakeSupportReportMailer();
         Sanctum::actingAs($member, ['*']);
 
         $response = $this->apiPost('/v2/support/reports', [
@@ -67,6 +68,7 @@ class SupportReportApiTest extends TestCase
     public function test_support_report_discards_diagnostics_without_explicit_consent(): void
     {
         $member = User::factory()->forTenant($this->testTenantId)->create();
+        $this->fakeSupportReportMailer();
         Sanctum::actingAs($member, ['*']);
 
         $response = $this->apiPost('/v2/support/reports', [
@@ -104,13 +106,13 @@ class SupportReportApiTest extends TestCase
 
     public function test_report_submission_notifies_tenant_admins(): void
     {
-        $admin = User::factory()->admin()->forTenant($this->testTenantId)->create([
+        $tenantId = $this->useIsolatedTenant();
+        $admin = User::factory()->admin()->forTenant($tenantId)->create([
             'email' => 'support-admin-' . uniqid('', true) . '@example.test',
             'preferred_language' => 'en',
         ]);
-        $member = User::factory()->forTenant($this->testTenantId)->create();
-        $mailer = new SupportReportSuccessfulEmailDispatchService();
-        app()->instance(EmailDispatchService::class, $mailer);
+        $member = User::factory()->forTenant($tenantId)->create();
+        $mailer = $this->fakeSupportReportMailer();
         Sanctum::actingAs($member, ['*']);
 
         $response = $this->apiPost('/v2/support/reports', [
@@ -127,11 +129,11 @@ class SupportReportApiTest extends TestCase
         $this->assertCount(1, $mailer->calls);
         $this->assertSame($admin->email, $mailer->calls[0]['to']);
         $this->assertSame('support_report', $mailer->calls[0]['options']['category']);
-        $this->assertSame($this->testTenantId, $mailer->calls[0]['options']['tenant_id']);
+        $this->assertSame($tenantId, $mailer->calls[0]['options']['tenant_id']);
         $this->assertStringContainsString((string) $reference, $mailer->calls[0]['subject']);
 
         $this->assertDatabaseHas('notifications', [
-            'tenant_id' => $this->testTenantId,
+            'tenant_id' => $tenantId,
             'user_id' => $admin->id,
             'type' => 'support_report',
             'link' => '/admin/support-reports?report=' . $reportId,
@@ -140,12 +142,15 @@ class SupportReportApiTest extends TestCase
 
     public function test_admin_can_list_and_view_only_tenant_support_reports(): void
     {
-        $admin = User::factory()->admin()->forTenant($this->testTenantId)->create();
-        $member = User::factory()->forTenant($this->testTenantId)->create();
-        $otherTenantMember = User::factory()->forTenant($this->testTenantId + 100)->create();
+        $tenantId = $this->useIsolatedTenant();
+        $otherTenantId = $tenantId + 1;
+        $this->seedTenant($otherTenantId);
+        $admin = User::factory()->admin()->forTenant($tenantId)->create();
+        $member = User::factory()->forTenant($tenantId)->create();
+        $otherTenantMember = User::factory()->forTenant($otherTenantId)->create();
 
         $ownReportId = DB::table('support_reports')->insertGetId([
-            'tenant_id' => $this->testTenantId,
+            'tenant_id' => $tenantId,
             'user_id' => $member->id,
             'reference' => 'NXR-260527-TENANT',
             'source' => 'in_app',
@@ -160,7 +165,7 @@ class SupportReportApiTest extends TestCase
         ]);
 
         DB::table('support_reports')->insert([
-            'tenant_id' => $this->testTenantId + 100,
+            'tenant_id' => $otherTenantId,
             'user_id' => $otherTenantMember->id,
             'reference' => 'NXR-260527-FOREIGN',
             'source' => 'in_app',
@@ -194,11 +199,12 @@ class SupportReportApiTest extends TestCase
 
     public function test_admin_can_update_support_report_triage_state(): void
     {
-        $admin = User::factory()->admin()->forTenant($this->testTenantId)->create();
-        $member = User::factory()->forTenant($this->testTenantId)->create();
+        $tenantId = $this->useIsolatedTenant();
+        $admin = User::factory()->admin()->forTenant($tenantId)->create();
+        $member = User::factory()->forTenant($tenantId)->create();
 
         $reportId = DB::table('support_reports')->insertGetId([
-            'tenant_id' => $this->testTenantId,
+            'tenant_id' => $tenantId,
             'user_id' => $member->id,
             'reference' => 'NXR-260527-TRIAGE',
             'source' => 'in_app',
@@ -227,7 +233,7 @@ class SupportReportApiTest extends TestCase
 
         $this->assertDatabaseHas('support_reports', [
             'id' => $reportId,
-            'tenant_id' => $this->testTenantId,
+            'tenant_id' => $tenantId,
             'status' => 'triaged',
             'assigned_user_id' => $admin->id,
             'sentry_issue_url' => 'https://example.sentry.io/issues/123',
@@ -240,6 +246,38 @@ class SupportReportApiTest extends TestCase
         Sanctum::actingAs($member, ['*']);
 
         $this->apiGet('/v2/admin/support-reports')->assertForbidden();
+    }
+
+    private function fakeSupportReportMailer(): SupportReportSuccessfulEmailDispatchService
+    {
+        $mailer = new SupportReportSuccessfulEmailDispatchService();
+        app()->instance(EmailDispatchService::class, $mailer);
+
+        return $mailer;
+    }
+
+    private function useIsolatedTenant(): int
+    {
+        $tenantId = random_int(20000, 90000);
+        $this->seedTenant($tenantId);
+        $this->withTenant($tenantId);
+
+        return $tenantId;
+    }
+
+    private function seedTenant(int $tenantId): void
+    {
+        DB::table('tenants')->insertOrIgnore([
+            'id' => $tenantId,
+            'name' => 'Support Report Test ' . $tenantId,
+            'slug' => 'support-report-test-' . $tenantId,
+            'domain' => null,
+            'is_active' => true,
+            'depth' => 0,
+            'allows_subtenants' => false,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 }
 

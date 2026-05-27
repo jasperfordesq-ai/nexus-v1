@@ -4,7 +4,7 @@
 
 **Goal:** Build a professional in-app problem reporting system for Nexus that captures user reports, redacted diagnostic context, and support workflow state without making email or Canny the system of record.
 
-**Architecture:** Nexus owns the user-facing intake, triage data, tenant scoping, and admin workflow. Sentry remains the technical diagnostics engine for crashes, stack traces, breadcrumbs, releases, and optional masked replay. GitHub, Linear, or another engineering tracker is fed from accepted reports rather than receiving raw user submissions directly.
+**Architecture:** Nexus owns the user-facing intake, triage data, tenant scoping, and admin workflow. Sentry remains the technical diagnostics engine for crashes, stack traces, breadcrumbs, releases, and optional masked replay. There is no automatic GitHub issue creation in this rollout; engineering handoff stays inside Nexus as triage notes, Sentry links, and copyable diagnostics.
 
 **Tech Stack:** React 19, TypeScript, HeroUI v3, Tailwind CSS 4, Laravel 12/PHP 8.2, MariaDB, Sentry React/PHP, existing Nexus i18n and notification conventions.
 
@@ -17,7 +17,7 @@ The correct professional pattern is a hybrid system:
 - **Nexus in-app reporter:** first-class, translated, tenant-aware user intake.
 - **Sentry:** stack traces, breadcrumbs, release/build metadata, optional masked replay, alerting.
 - **Nexus admin triage:** statuses, severity, dedupe, owner, notes, member follow-up.
-- **Engineering tracker:** GitHub/Linear/Jira issues created only after triage.
+- **Engineering handoff:** after triage, copy the Nexus report context into the coding agent or internal engineering workflow; do not auto-create GitHub issues.
 - **Canny:** product ideas, public roadmap, voting, and non-sensitive feedback only.
 
 The current footer-only Canny link is too hidden and sends bug reports to the wrong kind of system. Keep Canny for product feedback, but move operational bug reporting into Nexus.
@@ -109,7 +109,7 @@ Core admin actions:
 - Add internal note.
 - Mark duplicate.
 - Link Sentry issue/event.
-- Link GitHub/Linear issue.
+- Copy an engineering-ready summary for the coding agent when needed.
 - Send translated member update.
 
 ## Implementation Tasks
@@ -131,11 +131,11 @@ Core admin actions:
 - Modify: API route definitions.
 - Test: Laravel feature test for creating a support report.
 
-- [ ] Write a failing feature test for an authenticated member submitting a support report.
-- [ ] Create a tenant-scoped `support_reports` table with JSON diagnostics and nullable external links.
-- [ ] Add a controller that validates title/body/impact/diagnostics and stores the report for the current tenant and user.
-- [ ] Return a stable public reference code in the API response.
-- [ ] Verify unauthenticated or cross-tenant writes cannot occur.
+- [x] Write a failing feature test for an authenticated member submitting a support report.
+- [x] Create a tenant-scoped `support_reports` table with JSON diagnostics and nullable external links.
+- [x] Add a controller that validates summary/body/impact/diagnostics and stores the report for the current tenant and user.
+- [x] Return a stable public reference code in the API response.
+- [x] Verify unauthenticated or cross-tenant writes cannot occur.
 
 ### Task 3: Frontend Diagnostics Buffer
 
@@ -145,25 +145,24 @@ Core admin actions:
 - Modify: `react-frontend/src/lib/sentry.ts`
 - Test: Vitest unit tests for redaction and bounded buffers.
 
-- [ ] Write failing tests for token/email/password redaction.
-- [ ] Write failing tests that API and console buffers keep only the most recent safe entries.
-- [ ] Implement a small in-memory diagnostics buffer.
-- [ ] Add API breadcrumbs into the buffer alongside existing Sentry breadcrumbs.
-- [ ] Add safe console warning/error capture without breaking browser console behaviour.
+- [x] Write failing tests for token/email/password redaction.
+- [x] Write failing tests that API and console buffers keep only the most recent safe entries.
+- [x] Implement a small in-memory diagnostics buffer.
+- [x] Add API breadcrumbs into the buffer alongside existing Sentry breadcrumbs.
+- [x] Add safe console warning/error capture without breaking browser console behaviour.
 
 ### Task 4: In-App Problem Reporter
 
 **Files:**
-- Create: `react-frontend/src/components/support/ReportProblemModal.tsx`
-- Create: `react-frontend/src/components/support/ReportProblemButton.tsx`
+- Create: `react-frontend/src/components/feedback/ReportProblemButton.tsx`
 - Create or modify: translations under `react-frontend/src/locales/*`
 - Test: React/Vitest tests for modal submission and diagnostics opt-in.
 
-- [ ] Write failing tests for opening the modal, filling the form, and posting the report.
-- [ ] Build the modal using HeroUI v3 `Modal`, `Button`, `TextArea`, `Select`, `Checkbox`, and `Alert`.
-- [ ] Use translated strings for every visible label and message.
-- [ ] Submit to the backend support report endpoint.
-- [ ] Show the returned report reference after success.
+- [x] Write failing tests for opening the modal, filling the form, and posting the report.
+- [x] Build the modal using HeroUI v3 `Modal`, `Button`, `TextArea`, `Select`, and checkbox controls.
+- [x] Use translated strings for every visible label and message.
+- [x] Submit to the backend support report endpoint.
+- [x] Show the returned report reference after success.
 
 ### Task 5: Prominent Entry Points
 
@@ -173,7 +172,7 @@ Core admin actions:
 - Modify: `react-frontend/src/components/feedback/ErrorBoundary.tsx`
 - Test: component tests for each entry point where coverage exists.
 
-- [ ] Replace the footer Canny bug link with a native Nexus report action.
+- [x] Replace the footer Canny bug link with a native Nexus report action.
 - [ ] Add `Report a problem` to visible support/profile navigation.
 - [ ] Add a report action to the error boundary fallback.
 - [ ] Keep Canny linked separately as product feedback or roadmap if desired.
@@ -182,15 +181,15 @@ Core admin actions:
 
 **Files:**
 - Create: backend admin list/detail/update endpoints.
-- Create: `react-frontend/src/admin/modules/support/SupportReportsAdminPage.tsx`
+- Create: `react-frontend/src/admin/modules/support/SupportReportsPage.tsx`
 - Modify: admin routing/sidebar.
 - Test: Laravel authorization tests and React list/update tests.
 
-- [ ] List reports by status, severity, tenant, and date.
-- [ ] View redacted diagnostics.
-- [ ] Update status/severity/owner.
-- [ ] Link Sentry and GitHub/Linear references.
-- [ ] Add internal notes.
+- [x] List reports by status, impact, tenant scope, and created date.
+- [x] View redacted diagnostics.
+- [x] Update status, owner, Sentry issue URL, and triage notes.
+- [x] Link Sentry references without creating GitHub issues.
+- [x] Add internal triage notes.
 
 ### Task 7: Notifications And SLAs
 
@@ -199,9 +198,9 @@ Core admin actions:
 - Modify: `lang/en/emails.json` and notification translation files.
 - Test: locale-context notification tests.
 
-- [ ] Notify tenant admins on new P0/P1 reports.
-- [ ] Send all user-facing email text through translations.
-- [ ] Wrap per-recipient email rendering in `LocaleContext::withLocale`.
+- [x] Notify tenant admins when new reports arrive.
+- [x] Send all user-facing email text through translations.
+- [x] Wrap per-recipient email rendering in `LocaleContext::withLocale`.
 - [ ] Add digest/low-priority routing for P2/P3 to avoid alert fatigue.
 
 ### Task 8: Sentry Feedback, Replay, And Issue Links
@@ -211,11 +210,12 @@ Core admin actions:
 - Modify: deployment/env documentation.
 - Test: Sentry helper unit tests where practical.
 
+- [x] Capture a Sentry message/event ID when frontend Sentry is enabled and consent allows it.
 - [ ] Add Sentry user feedback integration behind consent/config.
 - [ ] Enable masked on-error replay only after privacy copy is updated.
 - [ ] Upload source maps in CI/deploy so stack traces are readable.
 - [ ] Configure Sentry alerts for new P0/P1 issues.
-- [ ] Configure Linear/GitHub integration for accepted engineering issues.
+- [ ] Add a copyable engineering handoff summary in Nexus if report volume needs it.
 
 ## Verification Commands
 
@@ -245,6 +245,6 @@ Ship in this order:
 3. Admin triage dashboard.
 4. Notifications and status updates.
 5. Sentry feedback/replay enhancements.
-6. Engineering tracker automation.
+6. Engineering handoff improvements inside Nexus.
 
-Do not enable broad session replay, request/response body capture, or auto-created public GitHub issues in the first release.
+Do not enable broad session replay, request/response body capture, or auto-created GitHub issues in the first release.
