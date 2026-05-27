@@ -21,6 +21,7 @@
 import { validateResponse } from '@/lib/api-validation';
 import { apiResponseSchema } from '@/lib/api-schemas';
 import { captureApiCall, addSentryBreadcrumb, captureSentryMessage } from '@/lib/sentry';
+import { recordApiDiagnostic } from '@/lib/supportDiagnostics';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -701,6 +702,7 @@ class ApiClient {
       // Capture API call in Sentry (success or error)
       const duration = performance.now() - startTime;
       captureApiCall(method, endpoint, response.status, duration);
+      recordApiDiagnostic({ method, endpoint, status: response.status, durationMs: duration });
 
       // Stale-client gate — every response carries the server's build SHA.
       // Triggers the soft-update path on first mismatch and force-redirects
@@ -822,6 +824,7 @@ class ApiClient {
       if (error instanceof DOMException && error.name === 'AbortError') {
         const duration = performance.now() - startTime;
         captureApiCall(method, endpoint, 408, duration); // 408 Request Timeout
+        recordApiDiagnostic({ method, endpoint, status: 408, durationMs: duration });
         const message = 'Request timed out. Please try again.';
         this.dispatchApiError(message, 'TIMEOUT', endpoint);
         return { success: false, error: message, code: 'TIMEOUT' };

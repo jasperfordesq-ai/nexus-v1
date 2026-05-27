@@ -157,6 +157,13 @@ return [
     'role_name_required'           => 'Role name is required',
     'breach_type_required'         => 'Breach type is required',
     'policy_key_required'          => 'Policy key is required',
+    'support_reports_summary_required' => 'Please add a short summary of the problem.',
+    'support_reports_summary_max'   => 'The summary must be 180 characters or fewer.',
+    'support_reports_description_required' => 'Please describe what happened.',
+    'support_reports_description_min' => 'Please add a little more detail so support can reproduce the problem.',
+    'support_reports_description_max' => 'The description must be 5,000 characters or fewer.',
+    'support_reports_impact_required' => 'Please choose how much this is affecting you.',
+    'support_reports_impact_invalid' => 'Please choose a valid impact level.',
 
     // ============================================
     // VALIDATION — FORMATTING / VALUES

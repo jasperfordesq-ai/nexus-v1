@@ -10856,6 +10856,43 @@ CREATE TABLE `super_admin_audit_log` (
   KEY `idx_actor_tenant` (`actor_tenant_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2084 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Audit trail for Super Admin Panel hierarchy changes';
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `support_reports`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `support_reports` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned DEFAULT NULL,
+  `assigned_user_id` bigint(20) unsigned DEFAULT NULL,
+  `reference` varchar(40) NOT NULL,
+  `source` varchar(40) NOT NULL DEFAULT 'in_app',
+  `summary` varchar(180) NOT NULL,
+  `description` text NOT NULL,
+  `impact` varchar(20) NOT NULL DEFAULT 'minor',
+  `status` varchar(24) NOT NULL DEFAULT 'open',
+  `module` varchar(100) DEFAULT NULL,
+  `route` varchar(255) DEFAULT NULL,
+  `page_url` varchar(2048) DEFAULT NULL,
+  `sentry_event_id` varchar(191) DEFAULT NULL,
+  `sentry_issue_url` varchar(2048) DEFAULT NULL,
+  `diagnostics` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`diagnostics`)),
+  `user_agent` varchar(512) DEFAULT NULL,
+  `ip_hash` varchar(64) DEFAULT NULL,
+  `triage_notes` text DEFAULT NULL,
+  `triaged_at` timestamp NULL DEFAULT NULL,
+  `resolved_at` timestamp NULL DEFAULT NULL,
+  `closed_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `support_reports_reference_unique` (`reference`),
+  KEY `idx_support_reports_tenant_status_created` (`tenant_id`,`status`,`created_at`),
+  KEY `idx_support_reports_tenant_impact_created` (`tenant_id`,`impact`,`created_at`),
+  KEY `idx_support_reports_assignee` (`tenant_id`,`assigned_user_id`),
+  KEY `idx_support_reports_sentry_event` (`tenant_id`,`sentry_event_id`),
+  KEY `idx_support_reports_user_created` (`tenant_id`,`user_id`,`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `team_documents`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -13707,7 +13744,8 @@ INSERT INTO `laravel_migrations` VALUES
 (236,'2026_05_17_130000_backfill_newsletter_templates_for_all_tenants',104),
 (237,'2026_05_17_140000_drop_dead_email_preferences_column',104),
 (238,'2026_05_19_071000_add_batch_retry_columns_to_notification_queue',105),
-(239,'2026_05_19_072000_add_batch_columns_to_newsletter_queue',105);
+(239,'2026_05_19_072000_add_batch_columns_to_newsletter_queue',105),
+(240,'2026_05_27_000001_create_support_reports_table',106);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

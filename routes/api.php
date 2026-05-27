@@ -112,6 +112,12 @@ Route::get('/v2/groups/{id}/members', [\App\Http\Controllers\Api\GroupsControlle
 // ============================================
 Route::middleware('auth:sanctum')->group(function () {
 
+// ============================================
+// Support reports — in-app problem reporting
+// ============================================
+Route::post('/v2/support/reports', [\App\Http\Controllers\Api\SupportReportController::class, 'store'])
+    ->middleware('throttle:10,1');
+
 // Explore — authenticated actions (tracking, dismissals, experiments)
 Route::post('/v2/explore/track', [\App\Http\Controllers\Api\ExploreController::class, 'track']);
 Route::post('/v2/explore/dismiss', [\App\Http\Controllers\Api\ExploreController::class, 'dismiss']);

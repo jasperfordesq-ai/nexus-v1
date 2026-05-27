@@ -10,12 +10,12 @@ import Mail from 'lucide-react/icons/mail';
 import Phone from 'lucide-react/icons/phone';
 import MapPin from 'lucide-react/icons/map-pin';
 import Cookie from 'lucide-react/icons/cookie';
-import Bug from 'lucide-react/icons/bug';
 import { TenantLogo } from '@/components/branding';
 import Sparkles from 'lucide-react/icons/sparkles';
 import { RELEASE_STATUS } from '@/config/releaseStatus';
 import { SourceRepositoryLink } from './SourceRepositoryLink';
 import { Button } from '@/components/ui';
+import { ReportProblemButton } from '@/components/feedback/ReportProblemButton';
 
 
 export interface FooterProps {
@@ -170,15 +170,10 @@ export function Footer({ children, copyright }: FooterProps) {
                   <li><FooterLink href={tenantPath('/contact')}>{t('footer.contact_us')}</FooterLink></li>
                   <li><FooterLink href={tenantPath('/about')}>{t('footer.about')}</FooterLink></li>
                   <li>
-                    <a
-                      href="https://project-nexus.canny.io/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-sm text-theme-muted hover:text-theme-primary transition-colors"
-                    >
-                      <Bug className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-                      {t('footer.report_bug')}
-                    </a>
+                    <ReportProblemButton
+                      mode="footer-link"
+                      className="inline-flex min-h-0 min-w-0 gap-1.5 px-0 py-0 text-sm text-theme-muted hover:text-theme-primary"
+                    />
                   </li>
                 </ul>
               </nav>

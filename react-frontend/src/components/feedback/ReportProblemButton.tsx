@@ -1,0 +1,192 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { type FormEvent, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import Bug from 'lucide-react/icons/bug';
+import Send from 'lucide-react/icons/send';
+
+import {
+  Alert,
+  Button,
+  Checkbox,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Select,
+  SelectItem,
+  Textarea,
+} from '@/components/ui';
+import { useAuth, useToast } from '@/contexts';
+import { api } from '@/lib/api';
+import { getSupportDiagnosticsSnapshot } from '@/lib/supportDiagnostics';
+
+type Impact = 'blocked' | 'major' | 'minor' | 'cosmetic';
+
+interface ReportProblemResponse {
+  report: {
+    id: number;
+    reference: string;
+    status: string;
+    impact: Impact;
+    summary: string;
+    created_at?: string;
+  };
+}
+
+interface ReportProblemButtonProps {
+  className?: string;
+  mode?: 'button' | 'footer-link';
+}
+
+const IMPACT_OPTIONS: Impact[] = ['blocked', 'major', 'minor', 'cosmetic'];
+
+export function ReportProblemButton({ className, mode = 'button' }: ReportProblemButtonProps) {
+  const { t } = useTranslation('common');
+  const toast = useToast();
+  const { isAuthenticated } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
+  const [summary, setSummary] = useState('');
+  const [description, setDescription] = useState('');
+  const [impact, setImpact] = useState<Impact>('minor');
+  const [includeDiagnostics, setIncludeDiagnostics] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [reference, setReference] = useState<string | null>(null);
+
+  const canSubmit = useMemo(
+    () => isAuthenticated && summary.trim().length >= 3 && description.trim().length >= 10 && !isSubmitting,
+    [description, isAuthenticated, isSubmitting, summary],
+  );
+
+  const resetForm = () => {
+    setSummary('');
+    setDescription('');
+    setImpact('minor');
+    setIncludeDiagnostics(true);
+    setReference(null);
+  };
+
+  const close = () => {
+    setIsOpen(false);
+    resetForm();
+  };
+
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!canSubmit) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    const diagnostics = includeDiagnostics ? getSupportDiagnosticsSnapshot() : undefined;
+    const response = await api.post<ReportProblemResponse>('/v2/support/reports', {
+      summary: summary.trim(),
+      description: description.trim(),
+      impact,
+      page_url: typeof window === 'undefined' ? undefined : window.location.href,
+      route: typeof window === 'undefined' ? undefined : `${window.location.pathname}${window.location.search}${window.location.hash}`,
+      include_diagnostics: includeDiagnostics,
+      diagnostics,
+    });
+    setIsSubmitting(false);
+
+    if (!response.success || !response.data?.report) {
+      toast.error(response.error || t('report_problem.submit_failed'));
+      return;
+    }
+
+    setReference(response.data.report.reference);
+    toast.success(t('report_problem.submit_success'));
+  };
+
+  return (
+    <>
+      <Button
+        type="button"
+        variant={mode === 'footer-link' ? 'tertiary' : 'secondary'}
+        size={mode === 'footer-link' ? 'sm' : 'md'}
+        onPress={() => setIsOpen(true)}
+        className={className}
+        startContent={<Bug className={mode === 'footer-link' ? 'h-3.5 w-3.5' : 'h-4 w-4'} aria-hidden="true" />}
+      >
+        {t('report_problem.trigger')}
+      </Button>
+
+      <Modal isOpen={isOpen} onClose={close} size="lg" scrollBehavior="inside">
+        <ModalContent>
+          <form onSubmit={submit}>
+            <ModalHeader>{t('report_problem.title')}</ModalHeader>
+            <ModalBody className="space-y-4">
+              {!isAuthenticated ? (
+                <Alert color="warning" title={t('report_problem.auth_title')} description={t('report_problem.auth_description')} />
+              ) : null}
+
+              {reference ? (
+                <Alert
+                  color="success"
+                  title={t('report_problem.success_title')}
+                  description={t('report_problem.success_description', { reference })}
+                />
+              ) : null}
+
+              <Input
+                isRequired
+                label={t('report_problem.summary_label')}
+                value={summary}
+                maxLength={180}
+                onValueChange={setSummary}
+              />
+
+              <Textarea
+                isRequired
+                label={t('report_problem.description_label')}
+                value={description}
+                minRows={5}
+                maxLength={5000}
+                onValueChange={setDescription}
+              />
+
+              <Select
+                label={t('report_problem.impact_label')}
+                value={impact}
+                onValueChange={(value) => {
+                  if (IMPACT_OPTIONS.includes(value as Impact)) {
+                    setImpact(value as Impact);
+                  }
+                }}
+              >
+                {IMPACT_OPTIONS.map((option) => (
+                  <SelectItem key={option} id={option}>
+                    {t(`report_problem.impact.${option}`)}
+                  </SelectItem>
+                ))}
+              </Select>
+
+              <Checkbox isSelected={includeDiagnostics} onValueChange={setIncludeDiagnostics}>
+                {t('report_problem.include_diagnostics')}
+              </Checkbox>
+            </ModalBody>
+            <ModalFooter>
+              <Button type="button" variant="tertiary" onPress={close}>
+                {t('report_problem.cancel')}
+              </Button>
+              <Button
+                type="submit"
+                isDisabled={!canSubmit || Boolean(reference)}
+                isLoading={isSubmitting}
+                startContent={!isSubmitting ? <Send className="h-4 w-4" aria-hidden="true" /> : undefined}
+              >
+                {t('report_problem.submit')}
+              </Button>
+            </ModalFooter>
+          </form>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}

@@ -14,7 +14,9 @@ console.info(`[NEXUS] Build: ${__BUILD_COMMIT__} | ${__BUILD_TIME__}`);
 
 // Initialize Sentry error tracking (before React renders)
 import { initSentry, SentryErrorBoundary, addSentryBreadcrumb } from '@/lib/sentry';
+import { installSupportDiagnosticsCapture } from '@/lib/supportDiagnostics';
 initSentry();
+installSupportDiagnosticsCapture();
 
 // Initialise the prerender readiness signal. Routes that load data and want a
 // truthful snapshot should call usePrerenderReady(dataLoaded). Static pages

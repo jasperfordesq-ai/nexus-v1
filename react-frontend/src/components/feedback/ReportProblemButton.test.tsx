@@ -1,0 +1,76 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor, userEvent } from '@/test/test-utils';
+import { ReportProblemButton } from './ReportProblemButton';
+
+const mocks = vi.hoisted(() => ({
+  apiPost: vi.fn(),
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    warning: vi.fn(),
+  },
+}));
+
+vi.mock('@/contexts', () => ({
+  useAuth: () => ({ isAuthenticated: true }),
+  useToast: () => mocks.toast,
+}));
+
+vi.mock('@/lib/api', () => ({
+  api: {
+    post: (...args: unknown[]) => mocks.apiPost(...args),
+  },
+}));
+
+vi.mock('@/lib/supportDiagnostics', () => ({
+  getSupportDiagnosticsSnapshot: () => ({
+    captured_at: '2026-05-27T00:00:00.000Z',
+    entries: [{ kind: 'console', level: 'error', message: 'Captured error' }],
+  }),
+}));
+
+describe('ReportProblemButton', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.apiPost.mockResolvedValue({
+      success: true,
+      data: {
+        report: {
+          id: 1,
+          reference: 'NXR-260527-ABC123',
+          status: 'open',
+          impact: 'minor',
+          summary: 'Checkout broken',
+        },
+      },
+    });
+  });
+
+  it('submits a support report with diagnostics when selected', async () => {
+    const user = userEvent.setup();
+    render(<ReportProblemButton />);
+
+    await user.click(screen.getByRole('button', { name: 'Report a problem' }));
+    await user.type(screen.getByLabelText('Short summary'), 'Checkout broken');
+    await user.type(screen.getByLabelText('What happened?'), 'The checkout button does not respond.');
+    await user.click(screen.getByRole('button', { name: 'Send report' }));
+
+    await waitFor(() => expect(mocks.apiPost).toHaveBeenCalledTimes(1));
+    expect(mocks.apiPost).toHaveBeenCalledWith('/v2/support/reports', expect.objectContaining({
+      summary: 'Checkout broken',
+      description: 'The checkout button does not respond.',
+      impact: 'minor',
+      include_diagnostics: true,
+      diagnostics: expect.objectContaining({
+        entries: [expect.objectContaining({ message: 'Captured error' })],
+      }),
+    }));
+    expect(await screen.findByText('Reference NXR-260527-ABC123 has been created.')).toBeInTheDocument();
+  });
+});
