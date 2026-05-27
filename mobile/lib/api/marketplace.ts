@@ -118,6 +118,25 @@ export interface MarketplaceOrder {
   created_at: string;
 }
 
+export interface MarketplaceOrderRating {
+  id: number;
+  order_id?: number;
+  rating: number;
+  comment?: string | null;
+  rater_role?: string | null;
+  is_anonymous?: boolean;
+  created_at?: string | null;
+}
+
+export interface MarketplaceOrderDispute {
+  id: number;
+  order_id?: number;
+  reason: string;
+  description: string;
+  status?: string | null;
+  created_at?: string | null;
+}
+
 export interface MarketplaceSellerProfile {
   id: number;
   user_id: number;
@@ -535,6 +554,24 @@ export function confirmMarketplaceOrderDelivery(id: number): Promise<Marketplace
 
 export function cancelMarketplaceOrder(id: number, reason: string): Promise<MarketplaceDataResponse<MarketplaceOrder>> {
   return api.put<MarketplaceDataResponse<MarketplaceOrder>>(`${API_V2}/marketplace/orders/${id}/cancel`, { reason });
+}
+
+export function rateMarketplaceOrder(
+  id: number,
+  payload: { rating: number; comment?: string | null; is_anonymous?: boolean },
+): Promise<MarketplaceDataResponse<MarketplaceOrderRating>> {
+  return api.post<MarketplaceDataResponse<MarketplaceOrderRating>>(`${API_V2}/marketplace/orders/${id}/rate`, payload);
+}
+
+export function disputeMarketplaceOrder(
+  id: number,
+  payload: { reason: string; description: string; evidence_urls?: string[] },
+): Promise<MarketplaceDataResponse<MarketplaceOrderDispute>> {
+  return api.post<MarketplaceDataResponse<MarketplaceOrderDispute>>(`${API_V2}/marketplace/orders/${id}/dispute`, payload);
+}
+
+export function getMarketplaceOrderRatings(id: number): Promise<MarketplaceDataResponse<MarketplaceOrderRating[]>> {
+  return api.get<MarketplaceDataResponse<MarketplaceOrderRating[]>>(`${API_V2}/marketplace/orders/${id}/ratings`);
 }
 
 export function createMarketplaceOrder(payload: {

@@ -18,9 +18,11 @@ import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import {
   cancelMarketplaceOrder,
   confirmMarketplaceOrderDelivery,
+  disputeMarketplaceOrder,
   getMarketplaceOrders,
   marketplaceHasMore,
   marketplaceNextCursor,
+  rateMarketplaceOrder,
   shipMarketplaceOrder,
   type MarketplaceOrder,
 } from '@/lib/api/marketplace';
@@ -30,7 +32,9 @@ import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 
 type OrderMode = 'purchases' | 'sales';
+type DisputeReason = 'not_received' | 'not_as_described' | 'damaged' | 'wrong_item' | 'other';
 const SHIPPING_METHODS = ['standard', 'express', 'tracked', 'hand_delivery', 'other'];
+const DISPUTE_REASONS: DisputeReason[] = ['not_received', 'not_as_described', 'damaged', 'wrong_item', 'other'];
 
 export default function MarketplaceOrdersRoute() {
   return (
@@ -47,10 +51,17 @@ function MarketplaceOrdersScreen() {
   const [mode, setMode] = useState<OrderMode>('purchases');
   const [shipOrder, setShipOrder] = useState<MarketplaceOrder | null>(null);
   const [cancelOrder, setCancelOrder] = useState<MarketplaceOrder | null>(null);
+  const [rateOrder, setRateOrder] = useState<MarketplaceOrder | null>(null);
+  const [disputeOrder, setDisputeOrder] = useState<MarketplaceOrder | null>(null);
   const [trackingNumber, setTrackingNumber] = useState('');
   const [trackingUrl, setTrackingUrl] = useState('');
   const [shippingMethod, setShippingMethod] = useState('standard');
   const [cancelReason, setCancelReason] = useState('');
+  const [rating, setRating] = useState(5);
+  const [ratingComment, setRatingComment] = useState('');
+  const [isAnonymousRating, setIsAnonymousRating] = useState(false);
+  const [disputeReason, setDisputeReason] = useState<DisputeReason>('not_received');
+  const [disputeDescription, setDisputeDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const orders = usePaginatedApi<MarketplaceOrder, Awaited<ReturnType<typeof getMarketplaceOrders>>>(
     (cursor) => getMarketplaceOrders(mode, cursor),
@@ -72,6 +83,19 @@ function MarketplaceOrdersScreen() {
   function openCancelModal(order: MarketplaceOrder) {
     setCancelOrder(order);
     setCancelReason('');
+  }
+
+  function openRateModal(order: MarketplaceOrder) {
+    setRateOrder(order);
+    setRating(5);
+    setRatingComment('');
+    setIsAnonymousRating(false);
+  }
+
+  function openDisputeModal(order: MarketplaceOrder) {
+    setDisputeOrder(order);
+    setDisputeReason('not_received');
+    setDisputeDescription('');
   }
 
   async function submitShipment() {
@@ -122,6 +146,49 @@ function MarketplaceOrdersScreen() {
     }
   }
 
+  async function submitRating() {
+    if (!rateOrder || rating < 1) {
+      Alert.alert(t('common:errors.alertTitle'), t('orders.ratingRequired'));
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      await rateMarketplaceOrder(rateOrder.id, {
+        rating,
+        comment: ratingComment.trim() || null,
+        is_anonymous: isAnonymousRating,
+      });
+      setRateOrder(null);
+      setRatingComment('');
+      orders.refresh();
+    } catch (err) {
+      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('orders.actionFailed'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function submitDispute() {
+    if (!disputeOrder || !disputeDescription.trim()) {
+      Alert.alert(t('common:errors.alertTitle'), t('orders.disputeDescriptionRequired'));
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      await disputeMarketplaceOrder(disputeOrder.id, {
+        reason: disputeReason,
+        description: disputeDescription.trim(),
+      });
+      setDisputeOrder(null);
+      setDisputeDescription('');
+      orders.refresh();
+    } catch (err) {
+      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('orders.actionFailed'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-background">
       <AppTopBar title={t('orders.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
@@ -162,6 +229,8 @@ function MarketplaceOrdersScreen() {
             onShip={() => openShipModal(item)}
             onConfirmDelivery={() => void confirmDelivery(item)}
             onCancel={() => openCancelModal(item)}
+            onRate={() => openRateModal(item)}
+            onDispute={() => openDisputeModal(item)}
           />
         )}
         ListEmptyComponent={
@@ -235,6 +304,83 @@ function MarketplaceOrdersScreen() {
           </Surface>
         </View>
       </Modal>
+
+      <Modal visible={Boolean(rateOrder)} transparent animationType="slide" onRequestClose={() => setRateOrder(null)}>
+        <View className="flex-1 justify-end bg-black/40">
+          <Surface variant="default" className="rounded-t-[28px] p-4">
+            <View className="mb-4 flex-row items-center justify-between">
+              <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('orders.rateTitle')}</Text>
+              <HeroButton isIconOnly variant="secondary" onPress={() => setRateOrder(null)}>
+                <Ionicons name="close-outline" size={20} color={primary} />
+              </HeroButton>
+            </View>
+            <View className="gap-3">
+              <View className="gap-2">
+                <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('orders.rating')}</Text>
+                <View className="flex-row gap-2">
+                  {[1, 2, 3, 4, 5].map((value) => (
+                    <HeroButton
+                      key={value}
+                      isIconOnly
+                      size="sm"
+                      variant={rating >= value ? 'primary' : 'secondary'}
+                      onPress={() => setRating(value)}
+                      style={rating >= value ? { backgroundColor: theme.warning } : undefined}
+                    >
+                      <Ionicons name={rating >= value ? 'star' : 'star-outline'} size={17} color={rating >= value ? '#111827' : primary} />
+                    </HeroButton>
+                  ))}
+                </View>
+              </View>
+              <OrderInput label={t('orders.ratingComment')} value={ratingComment} onChangeText={setRatingComment} placeholder={t('orders.ratingCommentPlaceholder')} multiline />
+              <HeroButton variant={isAnonymousRating ? 'primary' : 'secondary'} onPress={() => setIsAnonymousRating((value) => !value)} style={isAnonymousRating ? { backgroundColor: primary } : undefined}>
+                <Ionicons name={isAnonymousRating ? 'eye-off-outline' : 'eye-outline'} size={17} color={isAnonymousRating ? '#fff' : primary} />
+                <HeroButton.Label>{t('orders.anonymousRating')}</HeroButton.Label>
+              </HeroButton>
+              <HeroButton variant="primary" isDisabled={isSubmitting} onPress={() => void submitRating()} style={{ backgroundColor: primary }}>
+                <Ionicons name="star-outline" size={17} color="#fff" />
+                <HeroButton.Label>{t('orders.submitRating')}</HeroButton.Label>
+              </HeroButton>
+            </View>
+          </Surface>
+        </View>
+      </Modal>
+
+      <Modal visible={Boolean(disputeOrder)} transparent animationType="slide" onRequestClose={() => setDisputeOrder(null)}>
+        <View className="flex-1 justify-end bg-black/40">
+          <Surface variant="default" className="max-h-[86%] rounded-t-[28px] p-4">
+            <View className="mb-4 flex-row items-center justify-between">
+              <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('orders.disputeTitle')}</Text>
+              <HeroButton isIconOnly variant="secondary" onPress={() => setDisputeOrder(null)}>
+                <Ionicons name="close-outline" size={20} color={primary} />
+              </HeroButton>
+            </View>
+            <ScrollView contentContainerStyle={{ gap: 12 }} showsVerticalScrollIndicator={false}>
+              <View className="gap-2">
+                <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('orders.disputeReason')}</Text>
+                <View className="flex-row flex-wrap gap-2">
+                  {DISPUTE_REASONS.map((reason) => (
+                    <HeroButton
+                      key={reason}
+                      size="sm"
+                      variant={disputeReason === reason ? 'primary' : 'secondary'}
+                      onPress={() => setDisputeReason(reason)}
+                      style={disputeReason === reason ? { backgroundColor: primary } : { minWidth: '46%' }}
+                    >
+                      <HeroButton.Label>{t(`orders.disputeReasons.${reason}`)}</HeroButton.Label>
+                    </HeroButton>
+                  ))}
+                </View>
+              </View>
+              <OrderInput label={t('orders.disputeDescription')} value={disputeDescription} onChangeText={setDisputeDescription} placeholder={t('orders.disputeDescriptionPlaceholder')} multiline />
+              <HeroButton variant="danger" isDisabled={isSubmitting} onPress={() => void submitDispute()}>
+                <Ionicons name="alert-circle-outline" size={17} color="#fff" />
+                <HeroButton.Label>{t('orders.submitDispute')}</HeroButton.Label>
+              </HeroButton>
+            </ScrollView>
+          </Surface>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -246,6 +392,8 @@ function OrderCard({
   onShip,
   onConfirmDelivery,
   onCancel,
+  onRate,
+  onDispute,
 }: {
   item: MarketplaceOrder;
   mode: OrderMode;
@@ -253,6 +401,8 @@ function OrderCard({
   onShip: () => void;
   onConfirmDelivery: () => void;
   onCancel: () => void;
+  onRate: () => void;
+  onDispute: () => void;
 }) {
   const { t } = useTranslation('marketplace');
   const primary = usePrimaryColor();
@@ -297,6 +447,18 @@ function OrderCard({
             <HeroButton className="flex-1" size="sm" variant="danger" isDisabled={isSubmitting} onPress={onCancel} style={{ minWidth: '46%' }}>
               <Ionicons name="close-circle-outline" size={14} color="#fff" />
               <HeroButton.Label>{t('orders.cancel')}</HeroButton.Label>
+            </HeroButton>
+          ) : null}
+          {item.status === 'completed' ? (
+            <HeroButton className="flex-1" size="sm" variant="secondary" isDisabled={isSubmitting} onPress={onRate} style={{ minWidth: '46%' }}>
+              <Ionicons name="star-outline" size={14} color={primary} />
+              <HeroButton.Label>{t('orders.rate')}</HeroButton.Label>
+            </HeroButton>
+          ) : null}
+          {mode === 'purchases' && ['paid', 'processing', 'shipped', 'delivered'].includes(item.status) ? (
+            <HeroButton className="flex-1" size="sm" variant="secondary" isDisabled={isSubmitting} onPress={onDispute} style={{ minWidth: '46%' }}>
+              <Ionicons name="alert-circle-outline" size={14} color={theme.error} />
+              <HeroButton.Label>{t('orders.dispute')}</HeroButton.Label>
             </HeroButton>
           ) : null}
         </View>

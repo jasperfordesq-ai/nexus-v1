@@ -25,6 +25,7 @@ import {
   cancelMarketplaceOrder,
   confirmMarketplaceOrderDelivery,
   deleteMarketplaceShippingOption,
+  disputeMarketplaceOrder,
   getMarketplaceCategories,
   getMarketplaceCollectionItems,
   getMarketplaceCollections,
@@ -33,6 +34,7 @@ import {
   getMarketplaceListing,
   getMarketplaceListingPickupSlots,
   getMarketplaceListings,
+  getMarketplaceOrderRatings,
   getMarketplaceOffers,
   getMarketplacePickupSlots,
   getMarketplaceShippingOptions,
@@ -48,6 +50,7 @@ import {
   marketplaceNextCursor,
   promoteMarketplaceListing,
   counterMarketplaceOffer,
+  rateMarketplaceOrder,
   removeMarketplaceCollectionItem,
   reserveMarketplacePickup,
   scanMarketplacePickup,
@@ -334,6 +337,8 @@ describe('marketplace api', () => {
 
   it('wires marketplace order lifecycle actions', async () => {
     (api.put as jest.Mock).mockResolvedValue({ data: { id: 14 } });
+    (api.post as jest.Mock).mockResolvedValue({ data: { id: 2 } });
+    (api.get as jest.Mock).mockResolvedValue({ data: [] });
 
     await shipMarketplaceOrder(14, {
       tracking_number: 'TRACK123',
@@ -353,6 +358,22 @@ describe('marketplace api', () => {
     expect(api.put).toHaveBeenCalledWith('/api/v2/marketplace/orders/14/cancel', {
       reason: 'Changed plans',
     });
+
+    await rateMarketplaceOrder(14, { rating: 5, comment: 'Great order', is_anonymous: false });
+    expect(api.post).toHaveBeenCalledWith('/api/v2/marketplace/orders/14/rate', {
+      rating: 5,
+      comment: 'Great order',
+      is_anonymous: false,
+    });
+
+    await disputeMarketplaceOrder(14, { reason: 'not_received', description: 'The item has not arrived.' });
+    expect(api.post).toHaveBeenCalledWith('/api/v2/marketplace/orders/14/dispute', {
+      reason: 'not_received',
+      description: 'The item has not arrived.',
+    });
+
+    await getMarketplaceOrderRatings(14);
+    expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/orders/14/ratings');
   });
 
   it('wires merchant and Stripe onboarding endpoints', async () => {
