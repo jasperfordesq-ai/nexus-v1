@@ -1878,7 +1878,8 @@
       "window": "Finestra di ritiro",
       "choose_slot": "Scegli uno slot di ritiro",
       "no_slot_selected": "Nessuno slot di ritiro",
-      "left": "rimanenti"
+      "left": "rimanenti",
+      "slot_delete_confirm": "Delete this pickup slot? This cannot be undone."
     },
     "inventory": {
       "section_title": "Magazzino",

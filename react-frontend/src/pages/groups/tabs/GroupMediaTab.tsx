@@ -168,6 +168,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
 
   const handleDelete = async (mediaId: number, e?: React.MouseEvent) => {
     e?.stopPropagation();
+    if (!window.confirm(t('media.delete_confirm'))) return;
     setDeleting(mediaId);
     try {
       await api.delete(`/v2/groups/${groupId}/media/${mediaId}`);

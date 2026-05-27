@@ -413,7 +413,8 @@
     "next": "Ar aghaidh",
     "video_player": "Imreoir físeáin",
     "fullsize_alt": "Íomhá lánmhéide",
-    "delete": "Scrios"
+    "delete": "Scrios",
+    "delete_confirm": "Delete this media item? This cannot be undone."
   },
   "webhooks": {
     "load_failed": "Theip ar lódáil na ngréasánghríoga",
@@ -440,7 +441,8 @@
     "secret_label": "Rún (roghnach)",
     "secret_placeholder": "Rún sínithe le haghaidh fíorúcháin pálasta",
     "cancel": "Cealaigh",
-    "create_btn": "Cruthaigh gréasánghríoga"
+    "create_btn": "Cruthaigh gréasánghríoga",
+    "delete_confirm": "Delete this webhook? This cannot be undone."
   },
   "toast": {
     "left": "D'fhág tú an grúpa",

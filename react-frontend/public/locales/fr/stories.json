@@ -131,7 +131,8 @@
     "story_options": "Options de la story",
     "reply_placeholder_generic": "Répondre à la story...",
     "react_with": "Réagir avec {{type}}",
-    "viewers_title_count": "Spectateurs ({{count}})"
+    "viewers_title_count": "Spectateurs ({{count}})",
+    "delete_story_confirm": "Delete this story? This cannot be undone."
   },
   "highlights": {
     "no_stories": "Ce highlight n'a pas de stories",
@@ -159,6 +160,7 @@
     "stories_in_highlight": "Stories dans ce highlight",
     "story_type_image": "Story image",
     "story_type_text": "Story texte",
-    "story_type_poll": "Story sondage"
+    "story_type_poll": "Story sondage",
+    "delete_confirm": "Delete this highlight? This cannot be undone."
   }
 }

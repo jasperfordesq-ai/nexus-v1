@@ -109,6 +109,7 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
   };
 
   const handleDelete = async (id: number) => {
+    if (!window.confirm(tRef.current('delete_confirm'))) return;
     try {
       await api.delete(`/v2/search/saved/${id}`);
       setSavedSearches((prev) => prev.filter((s) => s.id !== id));

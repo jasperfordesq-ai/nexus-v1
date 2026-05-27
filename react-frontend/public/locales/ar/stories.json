@@ -128,7 +128,8 @@
     "story_options": "خيارات القصة",
     "reply_placeholder_generic": "رد على القصة...",
     "react_with": "تفاعل بـ {{type}}",
-    "viewers_title_count": "المشاهدون ({{count}})"
+    "viewers_title_count": "المشاهدون ({{count}})",
+    "delete_story_confirm": "Delete this story? This cannot be undone."
   },
   "empty": {
     "no_stories": "لا توجد قصص متاحة"
@@ -159,6 +160,7 @@
     "stories_in_highlight": "القصص في هذا التسليط",
     "story_type_image": "قصة صورة",
     "story_type_text": "قصة نصية",
-    "story_type_poll": "قصة استطلاع"
+    "story_type_poll": "قصة استطلاع",
+    "delete_confirm": "Delete this highlight? This cannot be undone."
   }
 }

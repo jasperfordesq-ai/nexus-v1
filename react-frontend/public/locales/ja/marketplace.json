@@ -669,7 +669,8 @@
     "local_pickup_subtitle": "直接受け取り",
     "recommended": "おすすめ",
     "loading": "配送オプションを読み込み中…",
-    "no_options": "このセラーには利用可能な配送オプションがありません。"
+    "no_options": "このセラーには利用可能な配送オプションがありません。",
+    "delete_confirm": "Remove this shipping option? This cannot be undone."
   },
   "listing_location": {
     "location_title": "場所",

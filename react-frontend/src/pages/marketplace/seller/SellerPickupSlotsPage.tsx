@@ -99,6 +99,7 @@ export function SellerPickupSlotsPage() {
   };
 
   const handleDelete = async (id: number) => {
+    if (!window.confirm(t('marketplace.pickup.slot_delete_confirm'))) return;
     try {
       const res = await api.delete(`/v2/marketplace/seller/pickup-slots/${id}`);
       if (res.success) {

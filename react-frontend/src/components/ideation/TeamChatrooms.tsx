@@ -228,6 +228,7 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
   };
 
   const handleDeleteMessage = async (messageId: number) => {
+    if (!window.confirm(tRef.current('confirm.delete_message'))) return;
     try {
       await api.delete(`/v2/group-chatroom-messages/${messageId}`);
       setMessages(prev => prev.filter(m => m.id !== messageId));

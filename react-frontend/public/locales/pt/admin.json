@@ -7406,7 +7406,8 @@
     "resources_admin_actions": "Actions",
     "resources_admin_empty": "No resources found",
     "resources_admin_delete_title": "Delete Resource",
-    "resources_admin_delete_message": "Are you sure you want to delete \"{{title}}\"? This action cannot be undone."
+    "resources_admin_delete_message": "Are you sure you want to delete \"{{title}}\"? This action cannot be undone.",
+    "attachment_delete_confirm": "Delete this attachment? This cannot be undone."
   },
   "review": "Revisão",
   "safeguarding": {
@@ -8811,7 +8812,8 @@
       "note_desc": "Nota interna para ajudá-lo a lembrar para que serve esta credencial",
       "require_email_tooltip": "Somente superadministradores da plataforma podem alterar esta configuração",
       "total_codes_count": "Códigos totais: {{count}}",
-      "webhook_desc": "Usado para verificar a autenticidade de cargas úteis de webhook recebidas"
+      "webhook_desc": "Usado para verificar a autenticidade de cargas úteis de webhook recebidas",
+      "credentials_remove_confirm": "Remove these credentials? This cannot be undone."
     },
     "registration_policy_saved_successfully": "Política de registro salva com sucesso",
     "registration_policy_settings_title": "Registration Policy Settings",
@@ -12795,7 +12797,8 @@
       "placeholders": {
         "description": "Nota opcional para referência futura - por ex. 'Usado para apresentação anual da AGM'",
         "name": "por exemplo Relatório do Cantão do terceiro trimestre de 2025 para financiadores"
-      }
+      },
+      "delete_confirm": "Delete template \"{{name}}\"? This cannot be undone."
     },
     "about": {
       "body_1_after_chf": "valor de horas x multiplicador de prevenção).",

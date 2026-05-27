@@ -304,6 +304,7 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
 
   // ─── Delete ────────────────────────────────────────────────────────────────
   const handleDelete = useCallback(async (id: number) => {
+    if (!window.confirm(t('shipping.delete_confirm'))) return;
     try {
       await api.delete(`/v2/marketplace/seller/shipping-options/${id}`);
       setOptions((prev) => prev.filter((o) => o.id !== id));

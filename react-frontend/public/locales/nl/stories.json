@@ -131,7 +131,8 @@
     "story_options": "Verhaalopties",
     "reply_placeholder_generic": "Beantwoord verhaal...",
     "react_with": "Reageer met {{type}}",
-    "viewers_title_count": "Kijkers ({{count}})"
+    "viewers_title_count": "Kijkers ({{count}})",
+    "delete_story_confirm": "Delete this story? This cannot be undone."
   },
   "highlights": {
     "no_stories": "Dit highlight heeft geen verhalen",
@@ -159,6 +160,7 @@
     "stories_in_highlight": "Verhalen in dit highlight",
     "story_type_image": "Beeldverhaal",
     "story_type_text": "Tekstverhaal",
-    "story_type_poll": "Enquêteverhaal"
+    "story_type_poll": "Enquêteverhaal",
+    "delete_confirm": "Delete this highlight? This cannot be undone."
   }
 }

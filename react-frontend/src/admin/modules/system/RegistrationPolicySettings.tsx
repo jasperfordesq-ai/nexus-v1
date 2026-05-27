@@ -244,6 +244,7 @@ export function RegistrationPolicySettings() {
   };
 
   const handleDeleteCredentials = async (slug: string) => {
+    if (!window.confirm(t('system.reg.credentials_remove_confirm'))) return;
     try {
       await api.delete(`/v2/admin/identity/provider-credentials/${slug}`);
       toast.success(t('system.reg.credentials_removed'));

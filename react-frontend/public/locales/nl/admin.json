@@ -7406,7 +7406,8 @@
     "resources_admin_actions": "Actions",
     "resources_admin_empty": "No resources found",
     "resources_admin_delete_title": "Delete Resource",
-    "resources_admin_delete_message": "Are you sure you want to delete \"{{title}}\"? This action cannot be undone."
+    "resources_admin_delete_message": "Are you sure you want to delete \"{{title}}\"? This action cannot be undone.",
+    "attachment_delete_confirm": "Delete this attachment? This cannot be undone."
   },
   "review": "Beoordeling",
   "safeguarding": {
@@ -8811,7 +8812,8 @@
       "note_desc": "Interne notitie om u te helpen herinneren waarvoor deze identificatie dient",
       "require_email_tooltip": "Alleen platformsuperbeheerders kunnen deze instelling wijzigen",
       "total_codes_count": "Totaal aantal codes: {{count}}",
-      "webhook_desc": "Wordt gebruikt om de authenticiteit van inkomende webhook-payloads te verifiëren"
+      "webhook_desc": "Wordt gebruikt om de authenticiteit van inkomende webhook-payloads te verifiëren",
+      "credentials_remove_confirm": "Remove these credentials? This cannot be undone."
     },
     "registration_policy_saved_successfully": "Registratiebeleid succesvol opgeslagen",
     "registration_policy_settings_title": "Registration Policy Settings",
@@ -12795,7 +12797,8 @@
       "placeholders": {
         "description": "Optionele opmerking voor toekomstig gebruik - b.v. 'Gebruikt voor jaarlijkse AVA-presentatie'",
         "name": "bijv. Kantonrapport over het derde kwartaal van 2025 voor financiers"
-      }
+      },
+      "delete_confirm": "Delete template \"{{name}}\"? This cannot be undone."
     },
     "about": {
       "body_1_after_chf": "waarde van uren x preventiemultiplier).",

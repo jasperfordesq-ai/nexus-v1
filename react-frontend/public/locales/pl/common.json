@@ -1878,7 +1878,8 @@
       "window": "Okno odbioru",
       "choose_slot": "Wybierz termin odbioru",
       "no_slot_selected": "Nie wybrano terminu odbioru",
-      "left": "pozostało"
+      "left": "pozostało",
+      "slot_delete_confirm": "Delete this pickup slot? This cannot be undone."
     },
     "inventory": {
       "section_title": "Magazyn",

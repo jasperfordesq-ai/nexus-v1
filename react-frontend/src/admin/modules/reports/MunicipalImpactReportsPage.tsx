@@ -326,7 +326,8 @@ export default function MunicipalImpactReportsPage() {
     }
   };
 
-  const deleteTemplate = async (templateId: number) => {
+  const deleteTemplate = async (templateId: number, templateName?: string) => {
+    if (!window.confirm(t('municipal_reports.templates.delete_confirm', { name: templateName ?? '' }))) return;
     setDeletingTemplateId(templateId);
     try {
       await api.delete(`/v2/admin/reports/municipal-impact/templates/${templateId}`);
@@ -608,7 +609,7 @@ export default function MunicipalImpactReportsPage() {
                 size="sm"
                 startContent={<Trash2 size={16} />}
                 isLoading={deletingTemplateId === selectedTemplate.id}
-                onPress={() => deleteTemplate(selectedTemplate.id)}
+                onPress={() => deleteTemplate(selectedTemplate.id, selectedTemplate.name)}
               >
                 {t('municipal_reports.templates.delete')}
               </Button>

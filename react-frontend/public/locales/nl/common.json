@@ -1878,7 +1878,8 @@
       "window": "Afhaalvenster",
       "choose_slot": "Kies een afhaaltijd",
       "no_slot_selected": "Geen afhaaltijd geselecteerd",
-      "left": "resterend"
+      "left": "resterend",
+      "slot_delete_confirm": "Delete this pickup slot? This cannot be undone."
     },
     "inventory": {
       "section_title": "Voorraad",

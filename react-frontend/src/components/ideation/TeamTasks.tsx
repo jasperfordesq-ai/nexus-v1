@@ -199,6 +199,7 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
   };
 
   const handleDeleteTask = async (taskId: number) => {
+    if (!window.confirm(tRef.current('confirm.delete_task'))) return;
     try {
       await api.delete(`/v2/team-tasks/${taskId}`);
       toastRef.current.success(tRef.current('toast.task_deleted'));

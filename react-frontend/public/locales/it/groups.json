@@ -413,7 +413,8 @@
     "next": "Successivo",
     "video_player": "Lettore video",
     "fullsize_alt": "Immagine a dimensione piena",
-    "delete": "Elimina"
+    "delete": "Elimina",
+    "delete_confirm": "Delete this media item? This cannot be undone."
   },
   "webhooks": {
     "load_failed": "Impossibile caricare i webhook",
@@ -440,7 +441,8 @@
     "secret_label": "Segreto (opzionale)",
     "secret_placeholder": "Segreto di firma per la verifica del payload",
     "cancel": "Annulla",
-    "create_btn": "Crea webhook"
+    "create_btn": "Crea webhook",
+    "delete_confirm": "Delete this webhook? This cannot be undone."
   },
   "toast": {
     "left": "Ha lasciato il gruppo",

@@ -669,7 +669,8 @@
     "local_pickup_subtitle": "Ritira di persona",
     "recommended": "Consigliato",
     "loading": "Caricamento opzioni di spedizione...",
-    "no_options": "Nessuna opzione di spedizione disponibile per questo venditore."
+    "no_options": "Nessuna opzione di spedizione disponibile per questo venditore.",
+    "delete_confirm": "Remove this shipping option? This cannot be undone."
   },
   "listing_location": {
     "location_title": "Posizione",

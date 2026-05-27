@@ -16,6 +16,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { FocusScope } from '@react-aria/focus';
 import { motion, AnimatePresence } from '@/lib/motion';
 
 import X from 'lucide-react/icons/x';
@@ -499,6 +500,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
   // Delete story
   const handleDeleteStory = async () => {
     if (!currentStory || !isOwner) return;
+    if (!window.confirm(t('viewer.delete_story_confirm'))) return;
     try {
       await api.delete(`/v2/stories/${currentStory.id}`);
       setShowMenu(false);
@@ -1056,15 +1058,23 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
 
       {/* Viewers Modal */}
       {showViewers && (
-        <div
-          className="absolute inset-0 z-50 flex items-end md:items-center justify-center"
-          onClick={() => { setShowViewers(false); setIsPaused(false); }}
-        >
+        <FocusScope contain restoreFocus autoFocus>
+        <div className="absolute inset-0 z-50 flex items-end md:items-center justify-center">
+          {/* Accessible backdrop */}
+          <button
+            type="button"
+            className="absolute inset-0 w-full h-full cursor-default bg-transparent"
+            onClick={() => { setShowViewers(false); setIsPaused(false); }}
+            aria-label={t('viewer.viewers_close')}
+          />
           <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label={t('viewer.viewers_title_count', { count: viewers.length })}
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
-            className="w-full md:w-[400px] max-h-[60vh] bg-gray-900 rounded-t-2xl md:rounded-2xl overflow-hidden"
+            className="relative w-full md:w-[400px] max-h-[60vh] bg-gray-900 rounded-t-2xl md:rounded-2xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
@@ -1101,6 +1111,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
             </div>
           </motion.div>
         </div>
+        </FocusScope>
       )}
 
       {/* Close menu on outside click */}

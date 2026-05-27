@@ -426,5 +426,9 @@
     "actions": "Akcje wyzwania"
   },
   "loading": "Loading...",
-  "tabs_filter_aria": "Filter challenges"
+  "tabs_filter_aria": "Filter challenges",
+  "confirm": {
+    "delete_task": "Delete this task? This cannot be undone.",
+    "delete_message": "Delete this message? This cannot be undone."
+  }
 }

@@ -669,7 +669,8 @@
     "local_pickup_subtitle": "Persoonlijk ophalen",
     "recommended": "Aanbevolen",
     "loading": "Verzendopties laden...",
-    "no_options": "Geen verzendopties beschikbaar voor deze verkoper."
+    "no_options": "Geen verzendopties beschikbaar voor deze verkoper.",
+    "delete_confirm": "Remove this shipping option? This cannot be undone."
   },
   "listing_location": {
     "location_title": "Locatie",

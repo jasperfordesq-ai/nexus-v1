@@ -670,7 +670,8 @@
     "local_pickup_subtitle": "Collect in person",
     "recommended": "Recommended",
     "loading": "Loading shipping options...",
-    "no_options": "No shipping options available for this seller."
+    "no_options": "No shipping options available for this seller.",
+    "delete_confirm": "Remove this shipping option? This cannot be undone."
   },
   "listing_location": {
     "location_title": "Location",

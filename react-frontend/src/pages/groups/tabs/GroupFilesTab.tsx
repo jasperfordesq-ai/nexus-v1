@@ -205,6 +205,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
   };
 
   const handleDelete = async (fileId: number) => {
+    if (!window.confirm(t('files.delete_confirm'))) return;
     setDeleting(fileId);
     try {
       await api.delete(`/v2/groups/${groupId}/files/${fileId}`);

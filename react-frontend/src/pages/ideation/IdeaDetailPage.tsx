@@ -267,6 +267,7 @@ export function IdeaDetailPage() {
   };
 
   const handleDeleteComment = async (commentId: number) => {
+    if (!window.confirm(tRef.current('comments.delete_confirm'))) return;
     setDeletingCommentId(commentId);
     try {
       await api.delete(`/v2/ideation-comments/${commentId}`);

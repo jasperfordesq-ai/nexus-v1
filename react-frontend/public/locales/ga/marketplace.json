@@ -669,7 +669,8 @@
     "local_pickup_subtitle": "Bailigh go pearsanta",
     "recommended": "Molta",
     "loading": "Roghanna loingseoireachta á luchtú...",
-    "no_options": "Níl aon roghanna loingseoireachta ar fáil don díoltóir seo."
+    "no_options": "Níl aon roghanna loingseoireachta ar fáil don díoltóir seo.",
+    "delete_confirm": "Remove this shipping option? This cannot be undone."
   },
   "listing_location": {
     "location_title": "Suíomh",

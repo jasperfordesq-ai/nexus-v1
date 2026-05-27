@@ -655,6 +655,7 @@ export function FeedPage() {
 
   const handleDeletePost = useCallback(async (item: FeedItem) => {
     if (item.type !== 'post') return;
+    if (!window.confirm(tRef.current('confirm.delete_post'))) return;
     try {
       await api.delete(`/v2/feed/posts/${item.id}`);
       setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
@@ -666,6 +667,7 @@ export function FeedPage() {
   }, []);
 
   const handleAdminDeletePost = useCallback(async (item: FeedItem) => {
+    if (!window.confirm(tRef.current('confirm.delete_post'))) return;
     try {
       const sourceType = item.type || 'post';
       await api.delete(`/v2/admin/feed/posts/${item.id}?type=${encodeURIComponent(sourceType)}`);

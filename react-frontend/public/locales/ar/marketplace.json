@@ -669,7 +669,8 @@
     "local_pickup_subtitle": "جمع شخصيًا",
     "recommended": "موصى به",
     "loading": "جارٍ تحميل خيارات الشحن...",
-    "no_options": "لا توجد خيارات شحن متاحة لهذا البائع."
+    "no_options": "لا توجد خيارات شحن متاحة لهذا البائع.",
+    "delete_confirm": "Remove this shipping option? This cannot be undone."
   },
   "listing_location": {
     "location_title": "الموقع",

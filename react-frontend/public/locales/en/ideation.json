@@ -426,5 +426,9 @@
   },
   "challenge_detail": {
     "actions": "Challenge actions"
+  },
+  "confirm": {
+    "delete_task": "Delete this task? This cannot be undone.",
+    "delete_message": "Delete this message? This cannot be undone."
   }
 }

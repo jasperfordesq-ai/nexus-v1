@@ -413,7 +413,8 @@
     "next": "Volgende",
     "video_player": "Videospeler",
     "fullsize_alt": "Afbeelding op volledige grootte",
-    "delete": "Verwijderen"
+    "delete": "Verwijderen",
+    "delete_confirm": "Delete this media item? This cannot be undone."
   },
   "webhooks": {
     "load_failed": "Webhooks konden niet worden geladen",
@@ -440,7 +441,8 @@
     "secret_label": "Geheim (optioneel)",
     "secret_placeholder": "Ondertekeningsgeheim voor payload-verificatie",
     "cancel": "Annuleren",
-    "create_btn": "Webhook maken"
+    "create_btn": "Webhook maken",
+    "delete_confirm": "Delete this webhook? This cannot be undone."
   },
   "toast": {
     "left": "Verliet de groep",

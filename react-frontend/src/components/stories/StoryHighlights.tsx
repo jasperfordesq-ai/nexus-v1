@@ -170,6 +170,7 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
 
   const handleDeleteHighlight = async (highlightId: number, e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!window.confirm(t('highlights.delete_confirm'))) return;
     try {
       const response = await api.delete(`/v2/stories/highlights/${highlightId}`);
       if (response.success) {

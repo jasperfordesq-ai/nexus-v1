@@ -669,7 +669,8 @@
     "local_pickup_subtitle": "Coletar pessoalmente",
     "recommended": "Recomendado",
     "loading": "Carregando opções de envio...",
-    "no_options": "Nenhuma opção de envio disponível para este vendedor."
+    "no_options": "Nenhuma opção de envio disponível para este vendedor.",
+    "delete_confirm": "Remove this shipping option? This cannot be undone."
   },
   "listing_location": {
     "location_title": "Localização",

@@ -413,7 +413,8 @@
     "next": "次へ",
     "video_player": "動画プレーヤー",
     "fullsize_alt": "フルサイズの画像",
-    "delete": "削除"
+    "delete": "削除",
+    "delete_confirm": "Delete this media item? This cannot be undone."
   },
   "webhooks": {
     "load_failed": "Webhook の読み込みに失敗しました",
@@ -440,7 +441,8 @@
     "secret_label": "シークレット (任意)",
     "secret_placeholder": "ペイロード検証用の署名シークレット",
     "cancel": "キャンセル",
-    "create_btn": "Webhook を作成"
+    "create_btn": "Webhook を作成",
+    "delete_confirm": "Delete this webhook? This cannot be undone."
   },
   "toast": {
     "left": "グループを脱退",

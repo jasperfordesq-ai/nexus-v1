@@ -669,7 +669,8 @@
     "local_pickup_subtitle": "Recoger en persona",
     "recommended": "Recomendado",
     "loading": "Cargando opciones de envío...",
-    "no_options": "No hay opciones de envío disponibles para este vendedor."
+    "no_options": "No hay opciones de envío disponibles para este vendedor.",
+    "delete_confirm": "Remove this shipping option? This cannot be undone."
   },
   "listing_location": {
     "location_title": "Ubicación",

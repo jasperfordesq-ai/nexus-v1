@@ -307,6 +307,7 @@ export function KBArticleForm() {
 
   async function deleteAttachment(attachmentId: number) {
     if (!id) return;
+    if (!window.confirm(t('resources.attachment_delete_confirm'))) return;
     try {
       const res = await api.delete(`/v2/kb/${id}/attachments/${attachmentId}`);
       if (res.success !== false) {
@@ -544,6 +545,7 @@ export function KBArticleForm() {
                   accept={ACCEPTED_FILE_TYPES}
                   onChange={handleFileSelect}
                   className="hidden"
+                  aria-hidden="true"
                 />
               </div>
             )}

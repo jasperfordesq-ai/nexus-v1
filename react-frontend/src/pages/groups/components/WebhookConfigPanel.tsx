@@ -128,6 +128,7 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
   };
 
   const handleDelete = async (webhookId: number) => {
+    if (!window.confirm(t('webhooks.delete_confirm'))) return;
     try {
       const res = await api.delete(`/v2/groups/${groupId}/webhooks/${webhookId}`);
       if (res.success) {

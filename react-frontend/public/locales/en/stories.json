@@ -131,7 +131,8 @@
     "story_options": "Story options",
     "reply_placeholder_generic": "Reply to story...",
     "react_with": "React with {{type}}",
-    "viewers_title_count": "Viewers ({{count}})"
+    "viewers_title_count": "Viewers ({{count}})",
+    "delete_story_confirm": "Delete this story? This cannot be undone."
   },
   "highlights": {
     "no_stories": "This highlight has no stories",
@@ -159,6 +160,7 @@
     "stories_in_highlight": "Stories in this highlight",
     "story_type_image": "Image story",
     "story_type_text": "Text story",
-    "story_type_poll": "Poll story"
+    "story_type_poll": "Poll story",
+    "delete_confirm": "Delete this highlight? This cannot be undone."
   }
 }

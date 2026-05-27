@@ -128,7 +128,8 @@
     "story_options": "ストーリーオプション",
     "reply_placeholder_generic": "ストーリーに返信...",
     "react_with": "{{type}}でリアクション",
-    "viewers_title_count": "視聴者 ({{count}})"
+    "viewers_title_count": "視聴者 ({{count}})",
+    "delete_story_confirm": "Delete this story? This cannot be undone."
   },
   "empty": {
     "no_stories": "ストーリーはありません"
@@ -159,6 +160,7 @@
     "stories_in_highlight": "このハイライトのストーリー",
     "story_type_image": "画像ストーリー",
     "story_type_text": "テキストストーリー",
-    "story_type_poll": "投票ストーリー"
+    "story_type_poll": "投票ストーリー",
+    "delete_confirm": "Delete this highlight? This cannot be undone."
   }
 }

@@ -7406,7 +7406,8 @@
     "resources_admin_actions": "Actions",
     "resources_admin_empty": "No resources found",
     "resources_admin_delete_title": "Delete Resource",
-    "resources_admin_delete_message": "Are you sure you want to delete \"{{title}}\"? This action cannot be undone."
+    "resources_admin_delete_message": "Are you sure you want to delete \"{{title}}\"? This action cannot be undone.",
+    "attachment_delete_confirm": "Delete this attachment? This cannot be undone."
   },
   "review": "Recenzja",
   "safeguarding": {
@@ -8811,7 +8812,8 @@
       "note_desc": "Wewnętrzna notatka, która pomoże Ci zapamiętać, do czego służy to poświadczenie",
       "require_email_tooltip": "To ustawienie mogą zmieniać tylko superadministratorzy platformy",
       "total_codes_count": "Łączna liczba kodów: {{count}}",
-      "webhook_desc": "Służy do weryfikowania autentyczności przychodzących ładunków elementu webhook"
+      "webhook_desc": "Służy do weryfikowania autentyczności przychodzących ładunków elementu webhook",
+      "credentials_remove_confirm": "Remove these credentials? This cannot be undone."
     },
     "registration_policy_saved_successfully": "Zasady rejestracji zostały pomyślnie zapisane",
     "registration_policy_settings_title": "Registration Policy Settings",
@@ -12795,7 +12797,8 @@
       "placeholders": {
         "description": "Opcjonalna uwaga do wykorzystania w przyszłości – np. „Używane do corocznej prezentacji na Walnym Zgromadzeniu”",
         "name": "np. Raport kantonu za III kwartał 2025 r. dla darczyńców"
-      }
+      },
+      "delete_confirm": "Delete template \"{{name}}\"? This cannot be undone."
     },
     "about": {
       "body_1_after_chf": "wartość godzin x mnożnik zapobiegania).",

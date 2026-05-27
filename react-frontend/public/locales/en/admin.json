@@ -1595,7 +1595,8 @@
         "canton": "Canton",
         "cooperative": "Cooperative",
         "foundation": "Foundation"
-      }
+      },
+      "delete_confirm": "Delete template \"{{name}}\"? This cannot be undone."
     },
     "narrative": {
       "in_export": "In export",
@@ -11354,7 +11355,8 @@
     "resources_admin_actions": "Actions",
     "resources_admin_empty": "No resources found",
     "resources_admin_delete_title": "Delete Resource",
-    "resources_admin_delete_message": "Are you sure you want to delete \"{{title}}\"? This action cannot be undone."
+    "resources_admin_delete_message": "Are you sure you want to delete \"{{title}}\"? This action cannot be undone.",
+    "attachment_delete_confirm": "Delete this attachment? This cannot be undone."
   },
   "review": "Review",
   "safeguarding": {
@@ -12900,7 +12902,8 @@
       "verification_settings_desc": "Configure identity verification requirements for new member registrations",
       "waitlist_info": "Members on the waitlist are approved manually by an admin",
       "webhook_desc": "Used to verify the authenticity of incoming webhook payloads",
-      "your_community": "Your Community"
+      "your_community": "Your Community",
+      "credentials_remove_confirm": "Remove these credentials? This cannot be undone."
     },
     "registration_policy_saved_successfully": "Registration policy saved successfully",
     "registration_policy_settings_title": "Registration & Identity Verification",

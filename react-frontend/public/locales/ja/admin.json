@@ -7406,7 +7406,8 @@
     "resources_admin_actions": "Actions",
     "resources_admin_empty": "No resources found",
     "resources_admin_delete_title": "Delete Resource",
-    "resources_admin_delete_message": "Are you sure you want to delete \"{{title}}\"? This action cannot be undone."
+    "resources_admin_delete_message": "Are you sure you want to delete \"{{title}}\"? This action cannot be undone.",
+    "attachment_delete_confirm": "Delete this attachment? This cannot be undone."
   },
   "review": "レビュー",
   "safeguarding": {
@@ -8811,7 +8812,8 @@
       "note_desc": "この資格情報の目的を思い出すのに役立つ内部メモ",
       "require_email_tooltip": "この設定を変更できるのはプラットフォームのスーパー管理者のみです",
       "total_codes_count": "合計コード: {{count}}",
-      "webhook_desc": "受信した Webhook ペイロードの信頼性を検証するために使用されます"
+      "webhook_desc": "受信した Webhook ペイロードの信頼性を検証するために使用されます",
+      "credentials_remove_confirm": "Remove these credentials? This cannot be undone."
     },
     "registration_policy_saved_successfully": "登録ポリシーが正常に保存されました",
     "registration_policy_settings_title": "Registration Policy Settings",
@@ -12795,7 +12797,8 @@
       "placeholders": {
         "description": "将来の参照のためのオプションのメモ - 例: 「年次総会プレゼンテーションに使用」",
         "name": "例えば2025 年第 3 四半期資金提供者向けカントンレポート"
-      }
+      },
+      "delete_confirm": "Delete template \"{{name}}\"? This cannot be undone."
     },
     "about": {
       "body_1_after_chf": "時間の値 x 予防乗数)。",

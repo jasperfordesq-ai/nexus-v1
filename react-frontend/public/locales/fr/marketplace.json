@@ -669,7 +669,8 @@
     "local_pickup_subtitle": "Collecte en personne",
     "recommended": "Recommandé",
     "loading": "Chargement des options d'expédition...",
-    "no_options": "Aucune option d'expédition disponible pour ce vendeur."
+    "no_options": "Aucune option d'expédition disponible pour ce vendeur.",
+    "delete_confirm": "Remove this shipping option? This cannot be undone."
   },
   "listing_location": {
     "location_title": "Localisation",

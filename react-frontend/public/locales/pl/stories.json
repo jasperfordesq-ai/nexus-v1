@@ -131,7 +131,8 @@
     "story_options": "Opcje historii",
     "reply_placeholder_generic": "Odpowiedz na historię...",
     "react_with": "Zareaguj z {{type}}",
-    "viewers_title_count": "Widzowie ({{count}})"
+    "viewers_title_count": "Widzowie ({{count}})",
+    "delete_story_confirm": "Delete this story? This cannot be undone."
   },
   "highlights": {
     "no_stories": "Ten wyróżnienie nie ma historii",
@@ -159,6 +160,7 @@
     "stories_in_highlight": "Historie w tym wyróżnieniu",
     "story_type_image": "Historia ze zdjęciem",
     "story_type_text": "Historia tekstowa",
-    "story_type_poll": "Historia z ankietą"
+    "story_type_poll": "Historia z ankietą",
+    "delete_confirm": "Delete this highlight? This cannot be undone."
   }
 }

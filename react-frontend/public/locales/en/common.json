@@ -1861,6 +1861,7 @@
       "slot_created": "Pickup slot created",
       "slot_create_failed": "Failed to create slot",
       "slot_deleted": "Slot deleted",
+      "slot_delete_confirm": "Delete this pickup slot? This cannot be undone.",
       "capacity": "Capacity",
       "recurring": "Recurring",
       "recurring_weekly": "Repeat weekly",

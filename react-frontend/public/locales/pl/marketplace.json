@@ -669,7 +669,8 @@
     "local_pickup_subtitle": "Odbierz osobiście",
     "recommended": "Polecane",
     "loading": "Ładowanie opcji wysyłki...",
-    "no_options": "Brak dostępnych opcji wysyłki dla tego sprzedawcy."
+    "no_options": "Brak dostępnych opcji wysyłki dla tego sprzedawcy.",
+    "delete_confirm": "Remove this shipping option? This cannot be undone."
   },
   "listing_location": {
     "location_title": "Lokalizacja",

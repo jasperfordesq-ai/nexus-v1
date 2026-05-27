@@ -7406,7 +7406,8 @@
     "resources_admin_actions": "Actions",
     "resources_admin_empty": "No resources found",
     "resources_admin_delete_title": "Delete Resource",
-    "resources_admin_delete_message": "Are you sure you want to delete \"{{title}}\"? This action cannot be undone."
+    "resources_admin_delete_message": "Are you sure you want to delete \"{{title}}\"? This action cannot be undone.",
+    "attachment_delete_confirm": "Delete this attachment? This cannot be undone."
   },
   "review": "Léirmheas",
   "safeguarding": {
@@ -8811,7 +8812,8 @@
       "note_desc": "Nóta inmheánach chun cabhrú leat cuimhneamh ar cad chuige atá an dintiúir seo",
       "require_email_tooltip": "Ní féidir ach le sár-riarthóirí ardáin an socrú seo a athrú",
       "total_codes_count": "Cóid iomlána: {{count}}",
-      "webhook_desc": "Úsáidtear é chun barántúlacht na n-ualaí pálasta gréasáin isteach a fhíorú"
+      "webhook_desc": "Úsáidtear é chun barántúlacht na n-ualaí pálasta gréasáin isteach a fhíorú",
+      "credentials_remove_confirm": "Remove these credentials? This cannot be undone."
     },
     "registration_policy_saved_successfully": "D'éirigh le sábháil an pholasaí clárúcháin",
     "registration_policy_settings_title": "Registration Policy Settings",
@@ -12795,7 +12797,8 @@
       "placeholders": {
         "description": "Nóta roghnach le haghaidh tagartha sa todhchaí - e.g. 'Úsáidte le haghaidh cur i láthair bliantúil CGB'",
         "name": "e.g. R3 2025 Tuarascáil Canton do Mhaoineoirí"
-      }
+      },
+      "delete_confirm": "Delete template \"{{name}}\"? This cannot be undone."
     },
     "about": {
       "body_1_after_chf": "luach na n-uaireanta x iolraitheoir coisc).",

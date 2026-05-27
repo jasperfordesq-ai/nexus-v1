@@ -413,7 +413,8 @@
     "next": "التالي",
     "video_player": "مشغّل الفيديو",
     "fullsize_alt": "صورة بالحجم الكامل",
-    "delete": "حذف"
+    "delete": "حذف",
+    "delete_confirm": "Delete this media item? This cannot be undone."
   },
   "webhooks": {
     "load_failed": "فشل تحميل الـ Webhooks",
@@ -440,7 +441,8 @@
     "secret_label": "السر (اختياري)",
     "secret_placeholder": "سر التوقيع للتحقق من الحمولة",
     "cancel": "إلغاء",
-    "create_btn": "إنشاء Webhook"
+    "create_btn": "إنشاء Webhook",
+    "delete_confirm": "Delete this webhook? This cannot be undone."
   },
   "toast": {
     "left": "غادر المجموعة",
