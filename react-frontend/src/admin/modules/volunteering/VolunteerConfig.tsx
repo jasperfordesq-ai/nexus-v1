@@ -1398,6 +1398,7 @@ function WebhooksTab() {
             {logs.length > 0 && (
               <Input
                 placeholder={t('volunteering.filter_logs')}
+                aria-label={t('volunteering.filter_logs')}
                 value={logFilter}
                 onValueChange={setLogFilter}
                 variant="secondary"

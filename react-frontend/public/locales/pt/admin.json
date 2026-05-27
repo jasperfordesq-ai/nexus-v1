@@ -11648,7 +11648,9 @@
     "refresh": "Atualizar",
     "search": "Procurar...",
     "data_table": "Dados",
-    "total_count": "{{count}}total"
+    "total_count": "{{count}}total",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}"
   },
   "subtitle": "Legenda",
   "super_controls": {

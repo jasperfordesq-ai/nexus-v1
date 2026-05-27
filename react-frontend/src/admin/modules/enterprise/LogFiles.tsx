@@ -146,6 +146,7 @@ export function LogFiles() {
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <Input type="search" name="admin-search" autoComplete="off"
           placeholder={t('log_files_labels.search_placeholder')}
+          aria-label={t('log_files_labels.search_placeholder')}
           startContent={<Search size={16} className="text-muted" />}
           value={search}
           onValueChange={setSearch}

@@ -11648,7 +11648,9 @@
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
     "data_table": "Sonraí",
-    "total_count": "{{count}}iomlán"
+    "total_count": "{{count}}iomlán",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}"
   },
   "subtitle": "Fotheideal",
   "super_controls": {

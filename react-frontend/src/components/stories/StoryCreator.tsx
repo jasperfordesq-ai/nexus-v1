@@ -658,6 +658,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                       value={photoText}
                       onValueChange={setPhotoText}
                       placeholder={t('creator.text_overlay')}
+                      aria-label={t('creator.text_overlay')}
                       variant="secondary"
                       size="sm"
                       classNames={{

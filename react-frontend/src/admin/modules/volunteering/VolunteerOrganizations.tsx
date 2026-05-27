@@ -503,6 +503,7 @@ export function VolunteerOrganizations() {
       <Input type="search" name="admin-search" autoComplete="off"
         className="max-w-xs"
         placeholder={t('volunteering.search_organizations')}
+        aria-label={t('volunteering.search_organizations')}
         startContent={<Search size={16} className="text-muted" />}
         value={searchQuery}
         onValueChange={setSearchQuery}

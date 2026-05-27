@@ -448,6 +448,7 @@ export function GroupEdit() {
                     placeholder="#6366f1"
                     maxLength={7}
                     className="flex-1"
+                    aria-label={t('groups.edit_label_primary_color')}
                   />
                   {primaryColor && (
                     <Button
@@ -480,6 +481,7 @@ export function GroupEdit() {
                     placeholder="#8b5cf6"
                     maxLength={7}
                     className="flex-1"
+                    aria-label={t('groups.edit_label_accent_color')}
                   />
                   {accentColor && (
                     <Button

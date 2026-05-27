@@ -11648,7 +11648,9 @@
     "refresh": "ينعش",
     "search": "يبحث...",
     "data_table": "بيانات",
-    "total_count": "إجمالي{{count}}"
+    "total_count": "إجمالي{{count}}",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}"
   },
   "subtitle": "الترجمة",
   "super_controls": {

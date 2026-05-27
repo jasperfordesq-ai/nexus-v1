@@ -258,6 +258,7 @@ export function MarketplaceMapSearchPage() {
         <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_8rem] lg:grid-cols-[minmax(0,1fr)_8rem_12rem_auto]">
           <Input
             placeholder={t('map.search_placeholder')}
+            aria-label={t('map.search_placeholder')}
             value={searchQuery}
             onValueChange={setSearchQuery}
             startContent={<Search className="w-4 h-4 text-muted" />}

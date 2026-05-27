@@ -311,6 +311,7 @@ export function MarketplaceSearchPage() {
             size="sm"
             type="number"
             placeholder={t('search.price_min')}
+            aria-label={t('search.price_min')}
             min={0}
             value={priceMin}
             onValueChange={setPriceMin}
@@ -320,6 +321,7 @@ export function MarketplaceSearchPage() {
             size="sm"
             type="number"
             placeholder={t('search.price_max')}
+            aria-label={t('search.price_max')}
             min={0}
             value={priceMax}
             onValueChange={setPriceMax}
@@ -439,6 +441,7 @@ export function MarketplaceSearchPage() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
             <Input
               placeholder={t('search.search_placeholder')}
+              aria-label={t('search.search_placeholder')}
               value={searchQuery}
               onValueChange={setSearchQuery}
               startContent={<Search className="w-4 h-4 text-muted" />}

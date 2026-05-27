@@ -500,7 +500,7 @@ function CredentialsModal({
             <div>
               <label className="text-xs text-[var(--color-text-muted)] block mb-1">{t('api_partners.credentials_modal.client_id')}</label>
               <div className="flex gap-2">
-                <Input value={credentials?.client_id ?? ''} readOnly className="font-mono" />
+                <Input value={credentials?.client_id ?? ''} readOnly className="font-mono" aria-label={t('api_partners.credentials_modal.client_id')} />
                 <Button
                   isIconOnly
                   variant="tertiary"
@@ -514,7 +514,7 @@ function CredentialsModal({
             <div>
               <label className="text-xs text-[var(--color-text-muted)] block mb-1">{t('api_partners.credentials_modal.client_secret')}</label>
               <div className="flex gap-2">
-                <Input value={credentials?.client_secret ?? ''} readOnly className="font-mono" />
+                <Input value={credentials?.client_secret ?? ''} readOnly className="font-mono" aria-label={t('api_partners.credentials_modal.client_secret')} />
                 <Button
                   isIconOnly
                   variant="tertiary"

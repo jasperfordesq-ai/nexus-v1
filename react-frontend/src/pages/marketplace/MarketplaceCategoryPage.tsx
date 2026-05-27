@@ -343,6 +343,7 @@ export function MarketplaceCategoryPage() {
             size="sm"
             type="number"
             placeholder={t('category.price_min')}
+            aria-label={t('category.price_min')}
             min={0}
             value={priceMin}
             onValueChange={setPriceMin}
@@ -352,6 +353,7 @@ export function MarketplaceCategoryPage() {
             size="sm"
             type="number"
             placeholder={t('category.price_max')}
+            aria-label={t('category.price_max')}
             min={0}
             value={priceMax}
             onValueChange={setPriceMax}
@@ -482,6 +484,7 @@ export function MarketplaceCategoryPage() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
           <Input
             placeholder={t('category.search_placeholder', { name: category.name })}
+            aria-label={t('category.search_placeholder', { name: category.name })}
             value={searchQuery}
             onValueChange={setSearchQuery}
             startContent={<Search className="w-4 h-4 text-muted" />}

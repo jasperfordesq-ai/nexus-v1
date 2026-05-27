@@ -321,6 +321,7 @@ export function HourGiftPage() {
                     <>
                       <Input
                         placeholder={t('hour_gift.send.recipient_placeholder')}
+                        aria-label={t('hour_gift.send.recipient_label')}
                         value={recipientQuery}
                         onValueChange={setRecipientQuery}
                         variant="bordered"

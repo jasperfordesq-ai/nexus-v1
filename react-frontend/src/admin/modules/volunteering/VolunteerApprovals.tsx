@@ -319,6 +319,7 @@ export function VolunteerApprovals() {
           <Input type="search" name="admin-search" autoComplete="off"
             className="max-w-xs"
             placeholder={t('volunteering.search_applicants')}
+            aria-label={t('volunteering.search_applicants')}
             startContent={<Search size={16} className="text-muted" />}
             value={searchQuery}
             onValueChange={setSearchQuery}

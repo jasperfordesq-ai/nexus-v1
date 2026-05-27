@@ -996,6 +996,7 @@ export function JobKanbanPage() {
                   min={1}
                   max={10}
                   value={String(criterion.score)}
+                  aria-label={criterion.label}
                   onChange={(e) => {
                     const val = Math.min(10, Math.max(1, parseInt(e.target.value, 10) || 1));
                     setScorecardCriteria((prev) =>

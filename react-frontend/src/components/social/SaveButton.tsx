@@ -230,6 +230,7 @@ export function SaveButton({
                     size="sm"
                     variant="bordered"
                     placeholder={t('collections.name_placeholder')}
+                    aria-label={t('collections.name_placeholder')}
                     value={newName}
                     onValueChange={setNewName}
                     autoFocus

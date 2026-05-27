@@ -563,7 +563,7 @@ export function GroupInviteModal({
                   <p className="text-sm text-theme-subtle mb-2">{t('detail.invite_link_desc')}</p>
                   {inviteLink ? (
                     <div className="flex items-center gap-2">
-                      <Input value={inviteLink} readOnly size="sm" className="flex-1" />
+                      <Input value={inviteLink} readOnly size="sm" className="flex-1" aria-label={t('detail.invite_link_desc')} />
                       <Button size="sm" variant="flat" onPress={() => onCopyLink(inviteLink)}>
                         {t('detail.copy')}
                       </Button>

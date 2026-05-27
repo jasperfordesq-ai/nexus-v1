@@ -236,6 +236,7 @@ export function BuyNowButton({
           <Input
             size="sm"
             placeholder={tCommon('coupon.enter_code')}
+            aria-label={tCommon('coupon.enter_code')}
             value={couponCode}
             onValueChange={(v) => {
               setCouponCode(v);

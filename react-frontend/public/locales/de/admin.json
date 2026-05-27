@@ -11648,7 +11648,9 @@
     "refresh": "Aktualisieren",
     "search": "Suchen...",
     "data_table": "Daten",
-    "total_count": "{{count}}insgesamt"
+    "total_count": "{{count}}insgesamt",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}"
   },
   "subtitle": "Untertitel",
   "super_controls": {

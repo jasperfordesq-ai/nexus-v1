@@ -11648,7 +11648,9 @@
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
     "data_table": "Gegevens",
-    "total_count": "{{count}}totaal"
+    "total_count": "{{count}}totaal",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}"
   },
   "subtitle": "Ondertitel",
   "super_controls": {

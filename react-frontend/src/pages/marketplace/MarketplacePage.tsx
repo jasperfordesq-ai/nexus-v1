@@ -299,6 +299,7 @@ export function MarketplacePage() {
         <div className="max-w-3xl">
           <Input
             placeholder={t('hub.search_placeholder')}
+            aria-label={t('hub.search_placeholder')}
             value={searchQuery}
             onValueChange={setSearchQuery}
             startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}

@@ -11648,7 +11648,9 @@
     "refresh": "リフレッシュ",
     "search": "検索...",
     "data_table": "データ",
-    "total_count": "{{count}}合計"
+    "total_count": "{{count}}合計",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}"
   },
   "subtitle": "サブタイトル",
   "super_controls": {

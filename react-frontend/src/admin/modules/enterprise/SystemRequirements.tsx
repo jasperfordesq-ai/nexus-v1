@@ -170,6 +170,7 @@ export function SystemRequirements() {
               </div>
               <Input type="search" name="admin-search" autoComplete="off"
                 placeholder={t('enterprise.search_extensions_placeholder')}
+                aria-label={t('enterprise.search_extensions_placeholder')}
                 startContent={<Search size={14} className="text-muted" />}
                 value={extSearch}
                 onValueChange={setExtSearch}

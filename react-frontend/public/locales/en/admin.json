@@ -15488,6 +15488,8 @@
     "recent_activity": "Recent Activity",
     "refresh": "Refresh",
     "search": "Search...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
     "data_table": "Data",
     "total_count": "{{count}} total"
   },

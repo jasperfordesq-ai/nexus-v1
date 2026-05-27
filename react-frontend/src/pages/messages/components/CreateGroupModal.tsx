@@ -174,6 +174,7 @@ export function CreateGroupModal({ isOpen, onClose, onCreated }: CreateGroupModa
             <p className="text-sm font-medium text-theme-muted">{t('add_members')}</p>
             <Input
               placeholder={t('member_search_placeholder')}
+              aria-label={t('member_search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Search className="w-4 h-4 text-theme-subtle" />}

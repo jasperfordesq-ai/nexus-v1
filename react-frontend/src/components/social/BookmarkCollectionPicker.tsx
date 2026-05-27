@@ -100,6 +100,7 @@ export function BookmarkCollectionPicker({ selectedId, onSelect, onClose }: Book
             size="sm"
             variant="secondary"
             placeholder={t('bookmark.collection_name')}
+            aria-label={t('bookmark.collection_name')}
             value={newName}
             onValueChange={setNewName}
             onKeyDown={(e) => { if (e.key === 'Enter') handleCreate(); if (e.key === 'Escape') setIsCreating(false); }}

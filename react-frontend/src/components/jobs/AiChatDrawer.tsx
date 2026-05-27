@@ -98,6 +98,7 @@ export function AiChatDrawer({
             <Input
               size="sm"
               placeholder={t('ai_chat.placeholder')}
+              aria-label={t('ai_chat.placeholder')}
               value={inputValue}
               onValueChange={onInputChange}
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); onSend(); } }}

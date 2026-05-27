@@ -156,6 +156,7 @@ export default function ModuleConfiguration() {
           data-bwignore="true"
           data-1p-ignore=""
           placeholder={t('config.search_modules')}
+          aria-label={t('config.search_modules')}
           startContent={<Search size={16} className="text-muted" />}
           value={searchQuery}
           onValueChange={(val) => {

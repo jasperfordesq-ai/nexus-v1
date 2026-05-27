@@ -153,6 +153,7 @@ export function ShareViaDMModal({ isOpen, onClose, postUrl, postContent }: Share
         <ModalBody className="gap-3">
           <Input
             placeholder={t('share.dm_search_placeholder')}
+            aria-label={t('share.dm_search_placeholder')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             startContent={<Search className="w-4 h-4 text-[var(--text-subtle)]" />}

@@ -153,6 +153,7 @@ export function CreateApiKey() {
               onValueChange={setExpiresAt}
               min={new Date(Date.now() + 86400000).toISOString().split('T')[0]}
               description={t('federation.expiry_description')}
+              aria-label={t('federation.expiry_date')}
             />
           </div>
           <div className="flex justify-end gap-2 pt-2">
