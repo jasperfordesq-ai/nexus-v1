@@ -137,6 +137,20 @@ export interface MarketplaceOrderDispute {
   created_at?: string | null;
 }
 
+export interface MarketplaceDeliveryOffer {
+  id: number;
+  order_id: number;
+  deliverer_id: number;
+  time_credits: number;
+  estimated_minutes?: number | null;
+  notes?: string | null;
+  status: 'pending' | 'accepted' | 'declined' | 'completed' | 'cancelled' | string;
+  accepted_at?: string | null;
+  completed_at?: string | null;
+  created_at?: string | null;
+  deliverer?: MarketplaceUser | null;
+}
+
 export interface MarketplaceSellerProfile {
   id: number;
   user_id: number;
@@ -574,6 +588,31 @@ export function disputeMarketplaceOrder(
 
 export function getMarketplaceOrderRatings(id: number): Promise<MarketplaceDataResponse<MarketplaceOrderRating[]>> {
   return api.get<MarketplaceDataResponse<MarketplaceOrderRating[]>>(`${API_V2}/marketplace/orders/${id}/ratings`);
+}
+
+export function getMarketplaceDeliveryOffers(orderId: number): Promise<MarketplaceDataResponse<MarketplaceDeliveryOffer[]>> {
+  return api.get<MarketplaceDataResponse<MarketplaceDeliveryOffer[]>>(`${API_V2}/marketplace/orders/${orderId}/delivery-offers`);
+}
+
+export function createMarketplaceDeliveryOffer(
+  orderId: number,
+  payload: { time_credits: number; estimated_minutes?: number | null; notes?: string | null },
+): Promise<MarketplaceDataResponse<MarketplaceDeliveryOffer>> {
+  return api.post<MarketplaceDataResponse<MarketplaceDeliveryOffer>>(`${API_V2}/marketplace/orders/${orderId}/delivery-offers`, payload);
+}
+
+export function acceptMarketplaceDeliveryOffer(
+  orderId: number,
+  delivererId: number,
+): Promise<MarketplaceDataResponse<{ message: string }>> {
+  return api.put<MarketplaceDataResponse<{ message: string }>>(`${API_V2}/marketplace/orders/${orderId}/delivery-offers/${delivererId}/accept`);
+}
+
+export function confirmMarketplaceDeliveryOffer(
+  orderId: number,
+  delivererId: number,
+): Promise<MarketplaceDataResponse<{ message: string }>> {
+  return api.put<MarketplaceDataResponse<{ message: string }>>(`${API_V2}/marketplace/orders/${orderId}/delivery-offers/${delivererId}/confirm`);
 }
 
 export function createMarketplaceOrder(payload: {

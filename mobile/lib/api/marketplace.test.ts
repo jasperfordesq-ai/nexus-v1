@@ -14,8 +14,10 @@ jest.mock('@/lib/constants', () => ({
 import { api } from '@/lib/api/client';
 import {
   acceptMarketplaceCounterOffer,
+  acceptMarketplaceDeliveryOffer,
   createMarketplaceListing,
   createMarketplaceCollection,
+  createMarketplaceDeliveryOffer,
   createMarketplacePaymentIntent,
   createMarketplacePickupSlot,
   createMarketplaceShippingOption,
@@ -24,6 +26,7 @@ import {
   completeMerchantOnboarding,
   cancelMarketplaceOrder,
   confirmMarketplaceOrderDelivery,
+  confirmMarketplaceDeliveryOffer,
   deleteMarketplaceShippingOption,
   disputeMarketplaceOrder,
   getMarketplaceCategories,
@@ -36,6 +39,7 @@ import {
   getMarketplaceListings,
   getMarketplaceOrders,
   getMarketplaceOrderRatings,
+  getMarketplaceDeliveryOffers,
   getMarketplaceOffers,
   getMarketplacePickupSlots,
   getMarketplaceShippingOptions,
@@ -382,6 +386,22 @@ describe('marketplace api', () => {
 
     await getMarketplaceOrderRatings(14);
     expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/orders/14/ratings');
+
+    await getMarketplaceDeliveryOffers(14);
+    expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/orders/14/delivery-offers');
+
+    await createMarketplaceDeliveryOffer(14, { time_credits: 1.5, estimated_minutes: 45, notes: 'I can deliver after lunch' });
+    expect(api.post).toHaveBeenCalledWith('/api/v2/marketplace/orders/14/delivery-offers', {
+      time_credits: 1.5,
+      estimated_minutes: 45,
+      notes: 'I can deliver after lunch',
+    });
+
+    await acceptMarketplaceDeliveryOffer(14, 77);
+    expect(api.put).toHaveBeenCalledWith('/api/v2/marketplace/orders/14/delivery-offers/77/accept');
+
+    await confirmMarketplaceDeliveryOffer(14, 77);
+    expect(api.put).toHaveBeenCalledWith('/api/v2/marketplace/orders/14/delivery-offers/77/confirm');
   });
 
   it('wires merchant and Stripe onboarding endpoints', async () => {

@@ -219,6 +219,7 @@
     "confirmDelivery": "Confirm delivery",
     "rate": "Rate order",
     "dispute": "Open dispute",
+    "deliveryOffers": "Delivery offers",
     "cancel": "Cancel order",
     "shipTitle": "Mark order shipped",
     "shipHint": "Add tracking details so the buyer can follow the delivery.",
@@ -247,12 +248,28 @@
     "disputeDescriptionPlaceholder": "Describe what happened and what resolution you need.",
     "disputeDescriptionRequired": "Describe the issue before opening a dispute.",
     "submitDispute": "Open dispute",
+    "deliveryOffersTitle": "Community delivery",
+    "deliveryOffersLoadFailed": "Could not load delivery offers.",
+    "deliveryOffersEmpty": "No delivery offers yet",
+    "deliveryOffersEmptyHint": "Community delivery offers for this order will appear here.",
+    "deliveryUnknown": "Community member",
+    "deliveryTimeCredits": "{{count}} time credits",
+    "deliveryEstimate": "{{count}} minutes",
+    "acceptDeliveryOffer": "Accept offer",
+    "confirmDeliveryOffer": "Confirm delivery",
     "shippingMethods": {
       "standard": "Standard",
       "express": "Express",
       "tracked": "Tracked",
       "hand_delivery": "Hand delivery",
       "other": "Other"
+    },
+    "deliveryStatus": {
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "declined": "Declined",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
     },
     "disputeReasons": {
       "not_received": "Not received",

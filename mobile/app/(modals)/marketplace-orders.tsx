@@ -17,13 +17,17 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import {
   cancelMarketplaceOrder,
+  acceptMarketplaceDeliveryOffer,
   confirmMarketplaceOrderDelivery,
+  confirmMarketplaceDeliveryOffer,
   disputeMarketplaceOrder,
+  getMarketplaceDeliveryOffers,
   getMarketplaceOrders,
   marketplaceHasMore,
   marketplaceNextCursor,
   rateMarketplaceOrder,
   shipMarketplaceOrder,
+  type MarketplaceDeliveryOffer,
   type MarketplaceOrder,
 } from '@/lib/api/marketplace';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
@@ -61,6 +65,9 @@ function MarketplaceOrdersScreen() {
   const [cancelOrder, setCancelOrder] = useState<MarketplaceOrder | null>(null);
   const [rateOrder, setRateOrder] = useState<MarketplaceOrder | null>(null);
   const [disputeOrder, setDisputeOrder] = useState<MarketplaceOrder | null>(null);
+  const [deliveryOrder, setDeliveryOrder] = useState<MarketplaceOrder | null>(null);
+  const [deliveryOffers, setDeliveryOffers] = useState<MarketplaceDeliveryOffer[]>([]);
+  const [isLoadingDeliveryOffers, setIsLoadingDeliveryOffers] = useState(false);
   const [trackingNumber, setTrackingNumber] = useState('');
   const [trackingUrl, setTrackingUrl] = useState('');
   const [shippingMethod, setShippingMethod] = useState('standard');
@@ -104,6 +111,20 @@ function MarketplaceOrdersScreen() {
     setDisputeOrder(order);
     setDisputeReason('not_received');
     setDisputeDescription('');
+  }
+
+  async function openDeliveryModal(order: MarketplaceOrder) {
+    setDeliveryOrder(order);
+    setDeliveryOffers([]);
+    setIsLoadingDeliveryOffers(true);
+    try {
+      const response = await getMarketplaceDeliveryOffers(order.id);
+      setDeliveryOffers(response.data);
+    } catch (err) {
+      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('orders.deliveryOffersLoadFailed'));
+    } finally {
+      setIsLoadingDeliveryOffers(false);
+    }
   }
 
   async function submitShipment() {
@@ -197,6 +218,25 @@ function MarketplaceOrdersScreen() {
     }
   }
 
+  async function updateDeliveryOffer(offer: MarketplaceDeliveryOffer, action: 'accept' | 'confirm') {
+    if (!deliveryOrder) return;
+    setIsSubmitting(true);
+    try {
+      if (action === 'accept') {
+        await acceptMarketplaceDeliveryOffer(deliveryOrder.id, offer.deliverer_id);
+      } else {
+        await confirmMarketplaceDeliveryOffer(deliveryOrder.id, offer.deliverer_id);
+      }
+      const response = await getMarketplaceDeliveryOffers(deliveryOrder.id);
+      setDeliveryOffers(response.data);
+      orders.refresh();
+    } catch (err) {
+      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('orders.actionFailed'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-background">
       <AppTopBar title={t('orders.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
@@ -252,6 +292,7 @@ function MarketplaceOrdersScreen() {
             onCancel={() => openCancelModal(item)}
             onRate={() => openRateModal(item)}
             onDispute={() => openDisputeModal(item)}
+            onDeliveryOffers={() => void openDeliveryModal(item)}
           />
         )}
         ListEmptyComponent={
@@ -402,6 +443,39 @@ function MarketplaceOrdersScreen() {
           </Surface>
         </View>
       </Modal>
+
+      <Modal visible={Boolean(deliveryOrder)} transparent animationType="slide" onRequestClose={() => setDeliveryOrder(null)}>
+        <View className="flex-1 justify-end bg-black/40">
+          <Surface variant="default" className="max-h-[86%] rounded-t-[28px] p-4">
+            <View className="mb-4 flex-row items-center justify-between">
+              <View className="min-w-0 flex-1">
+                <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('orders.deliveryOffersTitle')}</Text>
+                <Text className="text-xs" style={{ color: theme.textSecondary }}>{deliveryOrder ? t('orders.number', { number: deliveryOrder.order_number }) : ''}</Text>
+              </View>
+              <HeroButton isIconOnly variant="secondary" onPress={() => setDeliveryOrder(null)}>
+                <Ionicons name="close-outline" size={20} color={primary} />
+              </HeroButton>
+            </View>
+            {isLoadingDeliveryOffers ? (
+              <View className="py-10"><LoadingSpinner /></View>
+            ) : deliveryOffers.length === 0 ? (
+              <EmptyState icon="car-outline" title={t('orders.deliveryOffersEmpty')} subtitle={t('orders.deliveryOffersEmptyHint')} />
+            ) : (
+              <ScrollView contentContainerStyle={{ gap: 12 }} showsVerticalScrollIndicator={false}>
+                {deliveryOffers.map((offer) => (
+                  <DeliveryOfferCard
+                    key={offer.id}
+                    offer={offer}
+                    isSubmitting={isSubmitting}
+                    onAccept={() => void updateDeliveryOffer(offer, 'accept')}
+                    onConfirm={() => void updateDeliveryOffer(offer, 'confirm')}
+                  />
+                ))}
+              </ScrollView>
+            )}
+          </Surface>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -415,6 +489,7 @@ function OrderCard({
   onCancel,
   onRate,
   onDispute,
+  onDeliveryOffers,
 }: {
   item: MarketplaceOrder;
   mode: OrderMode;
@@ -424,6 +499,7 @@ function OrderCard({
   onCancel: () => void;
   onRate: () => void;
   onDispute: () => void;
+  onDeliveryOffers: () => void;
 }) {
   const { t } = useTranslation('marketplace');
   const primary = usePrimaryColor();
@@ -480,6 +556,62 @@ function OrderCard({
             <HeroButton className="flex-1" size="sm" variant="secondary" isDisabled={isSubmitting} onPress={onDispute} style={{ minWidth: '46%' }}>
               <Ionicons name="alert-circle-outline" size={14} color={theme.error} />
               <HeroButton.Label>{t('orders.dispute')}</HeroButton.Label>
+            </HeroButton>
+          ) : null}
+          {['paid', 'processing', 'shipped', 'delivered'].includes(item.status) ? (
+            <HeroButton className="flex-1" size="sm" variant="secondary" isDisabled={isSubmitting} onPress={onDeliveryOffers} style={{ minWidth: '46%' }}>
+              <Ionicons name="people-outline" size={14} color={primary} />
+              <HeroButton.Label>{t('orders.deliveryOffers')}</HeroButton.Label>
+            </HeroButton>
+          ) : null}
+        </View>
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function DeliveryOfferCard({
+  offer,
+  isSubmitting,
+  onAccept,
+  onConfirm,
+}: {
+  offer: MarketplaceDeliveryOffer;
+  isSubmitting: boolean;
+  onAccept: () => void;
+  onConfirm: () => void;
+}) {
+  const { t } = useTranslation('marketplace');
+  const primary = usePrimaryColor();
+  const theme = useTheme();
+  const delivererName = offer.deliverer?.name?.trim() || t('orders.deliveryUnknown');
+  return (
+    <HeroCard className="rounded-panel p-0">
+      <HeroCard.Body className="gap-3 p-4">
+        <View className="flex-row items-start justify-between gap-3">
+          <View className="min-w-0 flex-1">
+            <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={1}>{delivererName}</Text>
+            <Text className="text-sm" style={{ color: theme.textSecondary }}>
+              {t('orders.deliveryTimeCredits', { count: offer.time_credits })}
+              {offer.estimated_minutes ? ` - ${t('orders.deliveryEstimate', { count: offer.estimated_minutes })}` : ''}
+            </Text>
+          </View>
+          <Chip size="sm" variant="secondary"><Chip.Label>{t(`orders.deliveryStatus.${offer.status}`, { defaultValue: offer.status })}</Chip.Label></Chip>
+        </View>
+        {offer.notes ? (
+          <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{offer.notes}</Text>
+        ) : null}
+        <View className="flex-row flex-wrap gap-2">
+          {offer.status === 'pending' ? (
+            <HeroButton className="flex-1" size="sm" variant="primary" isDisabled={isSubmitting} onPress={onAccept} style={{ minWidth: '46%', backgroundColor: primary }}>
+              <Ionicons name="checkmark-circle-outline" size={14} color="#fff" />
+              <HeroButton.Label>{t('orders.acceptDeliveryOffer')}</HeroButton.Label>
+            </HeroButton>
+          ) : null}
+          {offer.status === 'accepted' ? (
+            <HeroButton className="flex-1" size="sm" variant="primary" isDisabled={isSubmitting} onPress={onConfirm} style={{ minWidth: '46%', backgroundColor: theme.success }}>
+              <Ionicons name="flag-outline" size={14} color="#fff" />
+              <HeroButton.Label>{t('orders.confirmDeliveryOffer')}</HeroButton.Label>
             </HeroButton>
           ) : null}
         </View>
