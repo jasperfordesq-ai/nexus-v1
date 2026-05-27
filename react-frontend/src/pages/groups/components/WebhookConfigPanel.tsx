@@ -178,7 +178,7 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-8">
+        <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex items-center justify-center py-8">
           <Spinner size="md" />
         </div>
       ) : webhooks.length === 0 ? (

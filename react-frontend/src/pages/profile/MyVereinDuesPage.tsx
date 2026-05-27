@@ -145,12 +145,12 @@ export function MyVereinDuesPage() {
       </div>
 
       {isLoading && (
-        <div className="flex justify-center py-10"><Spinner size="lg" color="primary" /></div>
+        <div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-10"><Spinner size="lg" color="primary" /></div>
       )}
 
       {error && !isLoading && (
-        <div className="flex items-start gap-2 p-3 rounded-lg bg-danger-50 text-danger text-sm">
-          <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+        <div role="alert" className="flex items-start gap-2 p-3 rounded-lg bg-danger-50 text-danger text-sm">
+          <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
           <span>{error}</span>
         </div>
       )}

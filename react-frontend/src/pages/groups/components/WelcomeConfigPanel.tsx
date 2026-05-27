@@ -81,7 +81,7 @@ export function WelcomeConfigPanel({ groupId, isAdmin }: WelcomeConfigPanelProps
   if (loading) {
     return (
       <GlassCard className="p-5">
-        <div className="flex items-center justify-center py-8">
+        <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex items-center justify-center py-8">
           <Spinner size="md" />
         </div>
       </GlassCard>

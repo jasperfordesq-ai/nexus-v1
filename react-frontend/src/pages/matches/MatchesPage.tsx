@@ -245,7 +245,7 @@ export function MatchesPage() {
 
       {/* Matches list */}
       {loading ? (
-        <div role="status" aria-label={t('loading')} className="flex justify-center py-16">
+        <div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
       ) : filteredMatches.length === 0 ? (

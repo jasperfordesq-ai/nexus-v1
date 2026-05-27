@@ -262,7 +262,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
             <div>
               <p className="text-xs text-theme-subtle">{t('analytics.total_members')}</p>
               <p className="text-xl font-bold text-theme-primary">
-                {loading ? <Spinner size="sm" /> : (kpi?.total_members ?? 0)}
+                {loading ? <span role="status" aria-busy="true" aria-label={t('analytics.loading')}><Spinner size="sm" /></span> : (kpi?.total_members ?? 0)}
               </p>
             </div>
           </div>
@@ -276,7 +276,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
             <div>
               <p className="text-xs text-theme-subtle">{t('analytics.active_members')}</p>
               <p className="text-xl font-bold text-theme-primary">
-                {loading ? <Spinner size="sm" /> : (kpi?.active_members ?? 0)}
+                {loading ? <span role="status" aria-busy="true" aria-label={t('analytics.loading')}><Spinner size="sm" /></span> : (kpi?.active_members ?? 0)}
               </p>
             </div>
           </div>
@@ -290,7 +290,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
             <div>
               <p className="text-xs text-theme-subtle">{t('analytics.participation_rate')}</p>
               <p className="text-xl font-bold text-theme-primary">
-                {loading ? <Spinner size="sm" /> : `${(kpi?.participation_rate ?? 0).toFixed(1)}%`}
+                {loading ? <span role="status" aria-busy="true" aria-label={t('analytics.loading')}><Spinner size="sm" /></span> : `${(kpi?.participation_rate ?? 0).toFixed(1)}%`}
               </p>
             </div>
           </div>
@@ -304,7 +304,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
             <div>
               <p className="text-xs text-theme-subtle">{t('analytics.avg_posts_day')}</p>
               <p className="text-xl font-bold text-theme-primary">
-                {loading ? <Spinner size="sm" /> : (kpi?.avg_posts_per_day ?? 0).toFixed(1)}
+                {loading ? <span role="status" aria-busy="true" aria-label={t('analytics.loading')}><Spinner size="sm" /></span> : (kpi?.avg_posts_per_day ?? 0).toFixed(1)}
               </p>
             </div>
           </div>
@@ -320,7 +320,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
         <CardBody className="px-4 pb-4">
           <p className="sr-only">{t('analytics.member_growth_summary')}</p>
           {loading ? (
-            <div className="flex h-[300px] items-center justify-center">
+            <div role="status" aria-busy="true" aria-label={t('analytics.loading')} className="flex h-[300px] items-center justify-center">
               <Spinner />
             </div>
           ) : data && data.growth.length > 0 ? (
@@ -382,7 +382,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
         <CardBody className="px-4 pb-4">
           <p className="sr-only">{t('analytics.engagement_summary')}</p>
           {loading ? (
-            <div className="flex h-[300px] items-center justify-center">
+            <div role="status" aria-busy="true" aria-label={t('analytics.loading')} className="flex h-[300px] items-center justify-center">
               <Spinner />
             </div>
           ) : data && data.engagement.length > 0 ? (
@@ -449,7 +449,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
-              <div className="flex h-[300px] items-center justify-center">
+              <div role="status" aria-busy="true" aria-label={t('analytics.loading')} className="flex h-[300px] items-center justify-center">
                 <Spinner />
               </div>
             ) : data && data.top_contributors.length > 0 ? (
@@ -494,7 +494,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
           <CardBody className="px-4 pb-4">
             <p className="sr-only">{t('analytics.activity_breakdown_summary')}</p>
             {loading ? (
-              <div className="flex h-[300px] items-center justify-center">
+              <div role="status" aria-busy="true" aria-label={t('analytics.loading')} className="flex h-[300px] items-center justify-center">
                 <Spinner />
               </div>
             ) : data && data.activity_breakdown.length > 0 ? (
@@ -549,7 +549,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
         <CardBody className="px-4 pb-4">
           <p className="sr-only">{t('analytics.retention_summary')}</p>
           {loading ? (
-            <div className="flex h-[200px] items-center justify-center">
+            <div role="status" aria-busy="true" aria-label={t('analytics.loading')} className="flex h-[200px] items-center justify-center">
               <Spinner />
             </div>
           ) : data && data.retention.length > 0 ? (
