@@ -63,6 +63,8 @@ const MARKETPLACE: MenuItem[] = [
   { labelKey: 'marketplaceCoupons', descriptionKey: 'navDescriptions.marketplaceCoupons', icon: 'ticket-outline', route: '/(modals)/marketplace-coupons' as Href, tone: '#16a34a', featureGate: 'merchant_coupons' },
   { labelKey: 'marketplaceOffers', descriptionKey: 'navDescriptions.marketplaceOffers', icon: 'pricetag-outline', route: '/(modals)/marketplace-offers' as Href, tone: '#14b8a6', featureGate: 'marketplace' },
   { labelKey: 'marketplaceSaved', descriptionKey: 'navDescriptions.marketplaceSaved', icon: 'folder-open-outline', route: '/(modals)/marketplace-collections' as Href, tone: '#8b5cf6', featureGate: 'marketplace' },
+  { labelKey: 'marketplaceSellerCoupons', descriptionKey: 'navDescriptions.marketplaceSellerCoupons', icon: 'ticket-outline', route: { pathname: '/(modals)/marketplace-tools', params: { tab: 'coupons' } } as unknown as Href, tone: '#22c55e', featureGate: 'merchant_coupons' },
+  { labelKey: 'marketplacePickupTools', descriptionKey: 'navDescriptions.marketplacePickupTools', icon: 'calendar-number-outline', route: { pathname: '/(modals)/marketplace-tools', params: { tab: 'pickups' } } as unknown as Href, tone: '#f59e0b', featureGate: 'marketplace' },
   { labelKey: 'marketplaceTools', descriptionKey: 'navDescriptions.marketplaceTools', icon: 'construct-outline', route: '/(modals)/marketplace-tools' as Href, tone: '#64748b', featureGate: 'marketplace' },
   { labelKey: 'marketplacePayments', descriptionKey: 'navDescriptions.marketplacePayments', icon: 'card-outline', route: '/(modals)/marketplace-stripe-onboarding' as Href, tone: '#0f766e', featureGate: 'marketplace' },
 ];
@@ -197,7 +199,7 @@ function MenuSection({ title, items, onNavigate, theme }: { title: string; items
       <HeroCard className="rounded-panel p-0">
         <HeroCard.Body className="gap-2 p-2">
           {items.map((item) => (
-            <MenuRow key={String(item.route)} item={item} onPress={() => onNavigate(item.route)} theme={theme} />
+            <MenuRow key={item.labelKey} item={item} onPress={() => onNavigate(item.route)} theme={theme} />
           ))}
         </HeroCard.Body>
       </HeroCard>

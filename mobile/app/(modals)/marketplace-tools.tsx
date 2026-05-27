@@ -6,7 +6,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Alert, FlatList, Modal, ScrollView, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router, type Href } from 'expo-router';
+import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
@@ -93,6 +93,10 @@ const emptyCouponForm: CouponFormState = {
   appliesTo: 'all_listings',
 };
 
+function isToolTab(value: string | string[] | undefined): value is ToolTab {
+  return typeof value === 'string' && TABS.includes(value as ToolTab);
+}
+
 export default function MarketplaceToolsRoute() {
   return (
     <ModalErrorBoundary>
@@ -105,7 +109,13 @@ function MarketplaceToolsScreen() {
   const { t } = useTranslation(['marketplace', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const [tab, setTab] = useState<ToolTab>('collections');
+  const params = useLocalSearchParams<{ tab?: string }>();
+  const initialTab = isToolTab(params.tab) ? params.tab : 'collections';
+  const [tab, setTab] = useState<ToolTab>(initialTab);
+
+  useEffect(() => {
+    if (isToolTab(params.tab)) setTab(params.tab);
+  }, [params.tab]);
 
   return (
     <SafeAreaView className="flex-1 bg-background">

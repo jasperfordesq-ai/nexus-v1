@@ -39,6 +39,8 @@ jest.mock('react-i18next', () => ({
         'marketplaceCoupons': 'Marketplace coupons',
         'marketplaceOffers': 'Marketplace offers',
         'marketplaceSaved': 'Saved marketplace',
+        'marketplaceSellerCoupons': 'Seller coupons',
+        'marketplacePickupTools': 'Pickup tools',
         'marketplaceTools': 'Seller tools',
         'marketplacePayments': 'Seller payments',
         'signOut': 'Sign out',
@@ -84,6 +86,8 @@ jest.mock('react-i18next', () => ({
         'navDescriptions.marketplaceCoupons': 'Browse active merchant coupons and show checkout QR codes.',
         'navDescriptions.marketplaceOffers': 'Review offers you have made or received on marketplace listings.',
         'navDescriptions.marketplaceSaved': 'Open your saved marketplace collections and saved search alerts.',
+        'navDescriptions.marketplaceSellerCoupons': 'Create, edit, and review redemptions for your seller coupons.',
+        'navDescriptions.marketplacePickupTools': 'Manage pickup slots, scan pickup QR codes, and review reservations.',
         'navDescriptions.marketplaceTools': 'Manage seller tools, promotions, pickup slots, collections, searches, and coupons.',
         'navDescriptions.marketplacePayments': 'Set up or review Stripe Connect seller payments.',
         'navDescriptions.jobs': 'Browse job vacancies, applications, and your own postings.',
@@ -224,6 +228,8 @@ describe('MoreScreen (More tab)', () => {
     expect(getByText('Marketplace coupons')).toBeTruthy();
     expect(getByText('Marketplace offers')).toBeTruthy();
     expect(getByText('Saved marketplace')).toBeTruthy();
+    expect(getByText('Seller coupons')).toBeTruthy();
+    expect(getByText('Pickup tools')).toBeTruthy();
     expect(getByText('Seller tools')).toBeTruthy();
     expect(getByText('Seller payments')).toBeTruthy();
   });
