@@ -83,9 +83,10 @@ class RegistrationPolicyService
     public static function getEffectivePolicy(int $tenantId): array
     {
         $policy = self::getPolicy($tenantId);
+        $generalRegistrationMode = self::getGeneralRegistrationMode($tenantId);
 
         if ($policy) {
-            return [
+            $effectivePolicy = [
                 'registration_mode' => $policy['registration_mode'],
                 'verification_provider' => $policy['verification_provider'],
                 'verification_level' => $policy['verification_level'],
@@ -93,23 +94,42 @@ class RegistrationPolicyService
                 'fallback_mode' => $policy['fallback_mode'],
                 'require_email_verify' => (bool) ($policy['require_email_verify'] ?? false),
                 'has_policy' => true,
+                'is_closed' => false,
             ];
+
+            if ($generalRegistrationMode === 'closed') {
+                return self::closedPolicy($effectivePolicy);
+            }
+
+            if (in_array($generalRegistrationMode, ['invite', 'invite_only'], true)) {
+                return array_merge($effectivePolicy, [
+                    'registration_mode' => 'invite_only',
+                    'verification_provider' => null,
+                    'verification_level' => 'none',
+                    'post_verification' => 'activate',
+                    'fallback_mode' => 'none',
+                ]);
+            }
+
+            return $effectivePolicy;
         }
 
         // Backwards compatibility: derive policy from legacy TenantSettingsService
         $tss = app(\App\Services\TenantSettingsService::class);
         $adminApproval = $tss->requiresAdminApproval($tenantId);
-        $registrationMode = $tss->get($tenantId, 'registration_mode', 'open');
+        $registrationMode = $generalRegistrationMode ?? self::getBareRegistrationMode($tenantId) ?? 'open';
         $emailVerification = $tss->requiresEmailVerification($tenantId);
 
         $mode = 'open';
-        if ($registrationMode === 'closed' || $registrationMode === 'invite') {
+        if ($registrationMode === 'closed') {
+            $mode = 'closed';
+        } elseif (in_array($registrationMode, ['invite', 'invite_only'], true)) {
             $mode = 'invite_only';
         } elseif ($adminApproval) {
             $mode = 'open_with_approval';
         }
 
-        return [
+        $effectivePolicy = [
             'registration_mode' => $mode,
             'verification_provider' => null,
             'verification_level' => 'none',
@@ -117,7 +137,34 @@ class RegistrationPolicyService
             'fallback_mode' => 'none',
             'require_email_verify' => $emailVerification,
             'has_policy' => false,
+            'is_closed' => $mode === 'closed',
         ];
+
+        return $mode === 'closed' ? self::closedPolicy($effectivePolicy) : $effectivePolicy;
+    }
+
+    private static function getGeneralRegistrationMode(int $tenantId): ?string
+    {
+        $mode = app(\App\Services\TenantSettingsService::class)->get($tenantId, 'general.registration_mode');
+        return is_string($mode) && $mode !== '' ? $mode : null;
+    }
+
+    private static function getBareRegistrationMode(int $tenantId): ?string
+    {
+        $mode = app(\App\Services\TenantSettingsService::class)->get($tenantId, 'registration_mode');
+        return is_string($mode) && $mode !== '' ? $mode : null;
+    }
+
+    private static function closedPolicy(array $basePolicy): array
+    {
+        return array_merge($basePolicy, [
+            'registration_mode' => 'closed',
+            'verification_provider' => null,
+            'verification_level' => 'none',
+            'post_verification' => 'activate',
+            'fallback_mode' => 'none',
+            'is_closed' => true,
+        ]);
     }
 
     /**
@@ -223,7 +270,7 @@ class RegistrationPolicyService
                 $adminApproval = false; // verification replaces approval
                 break;
             case 'invite_only':
-                $registrationMode = 'closed';
+                $registrationMode = 'invite_only';
                 $adminApproval = false;
                 break;
         }

@@ -10,10 +10,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@/test/test-utils';
 
+const apiMocks = vi.hoisted(() => ({
+  get: vi.fn(),
+  post: vi.fn(),
+}));
+
 vi.mock('@/lib/api', () => ({
   api: {
-    get: vi.fn().mockResolvedValue({ success: true, data: [] }),
-    post: vi.fn().mockResolvedValue({ success: true }),
+    get: apiMocks.get,
+    post: apiMocks.post,
   },
   tokenManager: {
     getTenantId: vi.fn(),
@@ -61,7 +66,28 @@ vi.mock('@/lib/motion', () => {  const motionProps = new Set(['variants', 'initi
 import { RegisterPage } from './RegisterPage';
 
 describe('RegisterPage', () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+    apiMocks.get.mockImplementation((url: string) => {
+      if (url === '/v2/auth/registration-info') {
+        return Promise.resolve({
+          success: true,
+          data: {
+            registration_mode: 'open',
+            requires_invite_code: false,
+            is_closed: false,
+            can_register: true,
+          },
+        });
+      }
+
+      return Promise.resolve({
+        success: true,
+        data: [{ id: 2, name: 'Test Tenant', slug: 'test' }],
+      });
+    });
+    apiMocks.post.mockResolvedValue({ success: true });
+  });
 
   it('renders without crashing', () => {
     render(<RegisterPage />);
@@ -82,5 +108,32 @@ describe('RegisterPage', () => {
     expect(locationInput).toBeRequired();
     expect(phoneInput).toBeRequired();
     expect(phoneInput).not.toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('shows closed registration instructions and hides the registration submit button', async () => {
+    apiMocks.get.mockImplementation((url: string) => {
+      if (url === '/v2/auth/registration-info') {
+        return Promise.resolve({
+          success: true,
+          data: {
+            registration_mode: 'closed',
+            requires_invite_code: false,
+            is_closed: true,
+            can_register: false,
+          },
+        });
+      }
+
+      return Promise.resolve({
+        success: true,
+        data: [{ id: 2, name: 'Test Tenant', slug: 'test' }],
+      });
+    });
+
+    render(<RegisterPage />);
+
+    expect(await screen.findByText(/registration is closed/i)).toBeInTheDocument();
+    expect(screen.getByText(/not accepting new registrations/i)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /create account/i })).not.toBeInTheDocument();
   });
 });

@@ -173,6 +173,7 @@ return [
     'items_per_page_range' => 'items_per_page must be between 5 and 100',
     'maintenance_mode_boolean' => 'maintenance_mode must be a boolean value',
     'registration_mode_invalid' => 'registration_mode must be one of: open, closed, invite_only',
+    'registration_closed' => 'As inscrições estão fechadas para esta comunidade. Entre em contato com um administrador da comunidade se precisar de uma conta ou se recebeu um convite.',
     'no_recognized_settings' => 'No recognized settings provided. Unknown keys: :keys',
     'no_recognized_ai_settings' => 'No recognized AI settings provided',
     'invalid_ai_provider' => 'Invalid AI provider. Must be one of: :providers',

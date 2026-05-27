@@ -17,7 +17,7 @@
                     'register-invite-required', 'register-invite-invalid',
                     'register-location-unverified', 'register-email-disposable',
                     'register-email-domain-invalid', 'register-daily-limit',
-                    'register-tenant-paused', 'register-validation',
+                    'register-tenant-paused', 'register-closed', 'register-validation',
                 ];
             @endphp
             @if (in_array($status ?? '', $errorStatuses, true))
@@ -34,6 +34,7 @@
                         'register-email-domain-invalid' => __('govuk_alpha.auth.register_email_domain_invalid'),
                         'register-daily-limit'       => __('govuk_alpha.auth.register_daily_limit'),
                         'register-tenant-paused'     => __('govuk_alpha.auth.register_tenant_paused'),
+                        'register-closed'            => __('govuk_alpha.auth.register_closed'),
                         'register-validation'        => __('govuk_alpha.auth.register_validation'),
                         default                      => __('govuk_alpha.auth.register_failed'),
                     };
@@ -46,6 +47,7 @@
                         'register-location-unverified' => '#location',
                         'register-email-disposable',
                         'register-email-domain-invalid' => '#email',
+                        'register-closed'              => '#main-content',
                         default                       => '#first_name',
                     };
                 @endphp
@@ -61,6 +63,19 @@
                 </div>
             @endif
 
+            @if ($registrationClosed ?? false)
+                <div class="govuk-notification-banner" role="region" aria-labelledby="registration-closed-title" data-module="govuk-notification-banner">
+                    <div class="govuk-notification-banner__header">
+                        <h2 class="govuk-notification-banner__title" id="registration-closed-title">{{ __('govuk_alpha.auth.registration_closed_title') }}</h2>
+                    </div>
+                    <div class="govuk-notification-banner__content">
+                        <p class="govuk-body">{{ __('govuk_alpha.auth.registration_closed_body') }}</p>
+                        <p class="govuk-body">
+                            <a class="govuk-link" href="{{ route('govuk-alpha.login', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.auth.registration_closed_login') }}</a>
+                        </p>
+                    </div>
+                </div>
+            @else
             <form method="post" action="{{ route('govuk-alpha.register.store', ['tenantSlug' => $tenantSlug]) }}" novalidate
                   data-requires-invite-code="{{ ($requiresInviteCode ?? false) ? '1' : '0' }}"
                   data-geocoding-provider="{{ $geocodingProvider ?? 'google' }}"
@@ -214,6 +229,7 @@
 
                 <button class="govuk-button" data-module="govuk-button" type="submit">{{ __('govuk_alpha.auth.register_action') }}</button>
             </form>
+            @endif
 
             <p class="govuk-body">
                 <a class="govuk-link" href="{{ route('govuk-alpha.login', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.auth.have_account') }}</a>

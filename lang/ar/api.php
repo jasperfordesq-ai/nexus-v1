@@ -173,6 +173,7 @@ return [
     'items_per_page_range' => 'items_per_page must be between 5 and 100',
     'maintenance_mode_boolean' => 'maintenance_mode must be a boolean value',
     'registration_mode_invalid' => 'registration_mode must be one of: open, closed, invite_only',
+    'registration_closed' => 'التسجيل مغلق لهذا المجتمع. تواصل مع مسؤول المجتمع إذا كنت بحاجة إلى حساب أو إذا تلقيت دعوة.',
     'default_currency_invalid' => 'default_currency must be a 3-letter ISO 4217 currency code (e.g. eur, usd, gbp)',
     'map_provider_invalid' => 'يجب أن يكون map_provider واحدًا من: google، openstreetmap',
     'geocoding_provider_invalid' => 'يجب أن يكون geocoding_provider واحدًا من: google، nominatim',

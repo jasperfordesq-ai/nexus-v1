@@ -2350,6 +2350,8 @@ Route::middleware('throttle:30,1')->group(function () {
     Route::post('/webauthn/auth-verify', [\App\Http\Controllers\Api\WebAuthnController::class, 'authVerify']);
 });
 // TOTP verify — strict throttle (5/min) to prevent 6-digit code brute-force during 2FA login
+Route::get('/v2/auth/registration-info', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'getRegistrationInfo'])->middleware('throttle:30,1');
+Route::post('/v2/auth/validate-invite', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'validateInviteCode'])->middleware('throttle:10,1');
 Route::post('/totp/verify', [\App\Http\Controllers\Api\TotpController::class, 'verify'])->middleware('throttle:5,1');
 // Password reset endpoints — stricter throttle to mitigate email enumeration/spam (5/min per IP)
 Route::middleware('throttle:5,1')->group(function () {
@@ -2453,8 +2455,6 @@ Route::get('/v2/identity/status', [\App\Http\Controllers\Api\OptionalIdentityVer
 Route::post('/v2/identity/start', [\App\Http\Controllers\Api\OptionalIdentityVerificationController::class, 'startVerification'])->middleware('throttle:5,1');
 Route::post('/v2/identity/save-dob', [\App\Http\Controllers\Api\OptionalIdentityVerificationController::class, 'saveDob'])->middleware('throttle:10,1');
 Route::post('/v2/identity/create-payment', [\App\Http\Controllers\Api\OptionalIdentityVerificationController::class, 'createPaymentIntent'])->middleware('throttle:5,1');
-Route::post('/v2/auth/validate-invite', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'validateInviteCode'])->middleware('throttle:10,1');
-Route::get('/v2/auth/registration-info', [\App\Http\Controllers\Api\RegistrationPolicyController::class, 'getRegistrationInfo']);
 // NOTE: identity webhook route moved to public webhook section (below auth group)
 // NOTE: /docs, /auth/forgot-password, /auth/reset-password, /auth/verify-email,
 // /auth/resend-verification, /auth/resend-verification-by-email are public routes (registered above auth group)

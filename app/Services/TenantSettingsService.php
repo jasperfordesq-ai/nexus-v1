@@ -165,11 +165,16 @@ class TenantSettingsService
     /**
      * Check if registration is open for a tenant.
      *
-     * Reads the `registration_mode` setting. Defaults to 'open' if not set.
+     * Reads the admin `general.registration_mode` kill switch first, then the
+     * legacy bare key. Defaults to 'open' if neither is set.
      */
     public function isRegistrationOpen(int $tenantId): bool
     {
-        $mode = $this->get($tenantId, 'registration_mode', 'open');
+        $mode = $this->get($tenantId, 'general.registration_mode');
+        if ($mode === null) {
+            $mode = $this->get($tenantId, 'registration_mode', 'open');
+        }
+
         return $mode === 'open';
     }
 

@@ -173,6 +173,7 @@ return [
     'items_per_page_range' => 'items_per_page must be between 5 and 100',
     'maintenance_mode_boolean' => 'maintenance_mode must be a boolean value',
     'registration_mode_invalid' => 'registration_mode must be one of: open, closed, invite_only',
+    'registration_closed' => 'Tá clárú dúnta don phobal seo. Déan teagmháil le riarthóir pobail má theastaíonn cuntas uait nó má fuair tú cuireadh.',
     'no_recognized_settings' => 'No recognized settings provided. Unknown keys: :keys',
     'no_recognized_ai_settings' => 'No recognized AI settings provided',
     'invalid_ai_provider' => 'Invalid AI provider. Must be one of: :providers',

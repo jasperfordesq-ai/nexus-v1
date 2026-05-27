@@ -255,6 +255,7 @@ class ApiErrorCodes
             self::RESOURCE_FORBIDDEN,
             self::FORBIDDEN,
             self::TENANT_MISMATCH,
+            self::REGISTRATION_CLOSED,
             self::SUPER_PANEL_ACCESS_DENIED => 403,
 
             // 404 Not Found

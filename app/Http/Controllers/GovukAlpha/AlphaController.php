@@ -228,7 +228,9 @@ class AlphaController extends Controller
 
         $tenantId = TenantContext::getId();
         $policy = \App\Services\Identity\RegistrationPolicyService::getEffectivePolicy($tenantId);
-        $requiresInviteCode = ($policy['registration_mode'] ?? 'open') === 'invite_only';
+        $registrationMode = (string) ($policy['registration_mode'] ?? 'open');
+        $registrationClosed = $registrationMode === 'closed';
+        $requiresInviteCode = $registrationMode === 'invite_only';
 
         // Resolve maps config to drive the Google Places autocomplete on the
         // location field. Mirrors MapsConfigController's gating: no API key
@@ -247,6 +249,7 @@ class AlphaController extends Controller
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'register',
             'status' => self::asStr($request->query('status')) ?: null,
+            'registrationClosed' => $registrationClosed,
             'requiresInviteCode' => $requiresInviteCode,
             'googleMapsApiKey' => $googleApiKey,
             'geocodingProvider' => $geocodingProvider,
@@ -314,6 +317,7 @@ class AlphaController extends Controller
                 $code === 'EMAIL_DOMAIN_INVALID'  => 'register-email-domain-invalid',
                 $code === 'REGISTRATION_DAILY_LIMIT' => 'register-daily-limit',
                 $code === 'REGISTRATION_TENANT_PAUSED' => 'register-tenant-paused',
+                $code === 'REGISTRATION_CLOSED'    => 'register-closed',
                 $code === 'VALIDATION_ERROR'      => 'register-validation',
                 default                            => 'register-failed',
             };

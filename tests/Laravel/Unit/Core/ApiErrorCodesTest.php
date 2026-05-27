@@ -100,10 +100,9 @@ class ApiErrorCodesTest extends TestCase
         $this->assertSame(401, ApiErrorCodes::getHttpStatus(ApiErrorCodes::AUTH_WEBAUTHN_CHALLENGE_EXPIRED));
     }
 
-    public function test_getHttpStatus_registration_closed_returns_400(): void
+    public function test_getHttpStatus_registration_closed_returns_403(): void
     {
-        // REGISTRATION_CLOSED hits the default branch
-        $this->assertSame(400, ApiErrorCodes::getHttpStatus(ApiErrorCodes::REGISTRATION_CLOSED));
+        $this->assertSame(403, ApiErrorCodes::getHttpStatus(ApiErrorCodes::REGISTRATION_CLOSED));
     }
 
     // -------------------------------------------------------

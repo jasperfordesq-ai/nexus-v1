@@ -8,6 +8,7 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use Tests\Laravel\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use App\Models\User;
 
@@ -64,35 +65,60 @@ class RegistrationPolicyControllerTest extends TestCase
     }
 
     // ------------------------------------------------------------------
-    //  POST /v2/auth/validate-invite (auth required)
+    //  POST /v2/auth/validate-invite (public pre-registration)
     // ------------------------------------------------------------------
 
-    public function test_validate_invite_requires_auth(): void
+    public function test_validate_invite_is_public_and_validates_input(): void
     {
         $response = $this->apiPost('/v2/auth/validate-invite', [
-            'code' => 'INVITE123',
+            'code' => '',
         ]);
 
-        $response->assertStatus(401);
+        $response->assertStatus(400);
     }
 
     // ------------------------------------------------------------------
-    //  GET /v2/auth/registration-info (auth required)
+    //  GET /v2/auth/registration-info (public pre-registration)
     // ------------------------------------------------------------------
 
-    public function test_registration_info_requires_auth(): void
+    public function test_registration_info_is_public_and_returns_data(): void
     {
-        $response = $this->apiGet('/v2/auth/registration-info');
-
-        $response->assertStatus(401);
-    }
-
-    public function test_registration_info_returns_data(): void
-    {
-        $this->authenticatedUser();
-
         $response = $this->apiGet('/v2/auth/registration-info');
 
         $response->assertStatus(200);
+    }
+
+    public function test_registration_info_reports_admin_closed_mode_even_when_policy_is_open(): void
+    {
+        DB::table('tenant_registration_policies')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId],
+            [
+                'registration_mode' => 'open',
+                'verification_level' => 'none',
+                'post_verification' => 'activate',
+                'fallback_mode' => 'none',
+                'require_email_verify' => 1,
+                'is_active' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+        DB::table('tenant_settings')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId, 'setting_key' => 'general.registration_mode'],
+            [
+                'setting_value' => 'closed',
+                'setting_type' => 'string',
+                'updated_at' => now(),
+            ]
+        );
+        app(\App\Services\TenantSettingsService::class)->clearCacheForTenant($this->testTenantId);
+
+        $response = $this->apiGet('/v2/auth/registration-info');
+
+        $response->assertOk();
+        $response->assertJsonPath('data.registration_mode', 'closed');
+        $response->assertJsonPath('data.is_closed', true);
+        $response->assertJsonPath('data.can_register', false);
+        $response->assertJsonPath('data.requires_invite_code', false);
     }
 }

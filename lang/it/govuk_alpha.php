@@ -236,6 +236,10 @@ return [
         'register_email_domain_invalid' => 'The email address is not deliverable — the domain has no mail servers configured. Check for typos in the domain name and try again.',
         'register_daily_limit' => 'Too many accounts have been created from this location in the last 24 hours. Please try again tomorrow, or contact a community administrator if you need help.',
         'register_tenant_paused' => 'Account creation is temporarily paused for this community while we review unusually high signup activity. Please try again later, or contact a community administrator if you need to register urgently.',
+        'register_closed' => 'La registrazione è chiusa per questa community. Contatta un amministratore della community se hai bisogno di un account o hai ricevuto un invito.',
+        'registration_closed_title' => 'La registrazione è chiusa',
+        'registration_closed_body' => 'Questa community al momento non accetta nuove registrazioni. Contatta un amministratore della community se hai bisogno di un account o hai ricevuto un invito.',
+        'registration_closed_login' => 'Accedi se hai già un account.',
     ],
     'feed' => [
         'title' => 'Feed',

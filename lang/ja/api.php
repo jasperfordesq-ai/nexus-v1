@@ -173,6 +173,7 @@ return [
     'items_per_page_range' => 'items_per_page must be between 5 and 100',
     'maintenance_mode_boolean' => 'maintenance_mode must be a boolean value',
     'registration_mode_invalid' => 'registration_mode must be one of: open, closed, invite_only',
+    'registration_closed' => 'このコミュニティでは登録を受け付けていません。アカウントが必要な場合、または招待を受けている場合は、コミュニティ管理者にお問い合わせください。',
     'default_currency_invalid' => 'default_currency must be a 3-letter ISO 4217 currency code (e.g. eur, usd, gbp)',
     'map_provider_invalid' => 'map_provider は次のいずれかである必要があります: google、openstreetmap',
     'geocoding_provider_invalid' => 'geocoding_provider は次のいずれかである必要があります: google、nominatim',

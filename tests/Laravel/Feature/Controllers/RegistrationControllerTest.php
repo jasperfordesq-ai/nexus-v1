@@ -8,6 +8,7 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use Tests\Laravel\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
 
 /**
@@ -127,6 +128,55 @@ class RegistrationControllerTest extends TestCase
         ]);
 
         $this->assertContains($response->getStatusCode(), [200, 201], 'Response body: ' . $response->getContent());
+    }
+
+    public function test_register_is_blocked_when_admin_registration_mode_is_closed(): void
+    {
+        DB::table('tenant_registration_policies')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId],
+            [
+                'registration_mode' => 'open',
+                'verification_level' => 'none',
+                'post_verification' => 'activate',
+                'fallback_mode' => 'none',
+                'require_email_verify' => 1,
+                'is_active' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+        DB::table('tenant_settings')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId, 'setting_key' => 'general.registration_mode'],
+            [
+                'setting_value' => 'closed',
+                'setting_type' => 'string',
+                'updated_at' => now(),
+            ]
+        );
+        app(\App\Services\TenantSettingsService::class)->clearCacheForTenant($this->testTenantId);
+
+        $email = 'closed-registration-' . uniqid() . '@gmail.com';
+        $response = $this->apiPost('/v2/auth/register', [
+            'first_name' => 'Closed',
+            'last_name' => 'Tenant',
+            'email' => $email,
+            'location' => 'Toronto, Canada',
+            'phone' => '+15551234567',
+            'password' => 'CoffeeMugSundayMorningPhpUnitTest2026',
+            'password_confirmation' => 'CoffeeMugSundayMorningPhpUnitTest2026',
+            'terms_accepted' => true,
+            'form_started_at' => (int) (microtime(true) * 1000) - 6000,
+            'latitude' => 43.6532,
+            'longitude' => -79.3832,
+        ]);
+
+        $response->assertStatus(403);
+        $body = json_decode((string) $response->getContent(), true);
+        $this->assertSame(\App\Core\ApiErrorCodes::REGISTRATION_CLOSED, $body['errors'][0]['code'] ?? null);
+        $this->assertDatabaseMissing('users', [
+            'tenant_id' => $this->testTenantId,
+            'email' => $email,
+        ]);
     }
 
     public function test_register_rejects_missing_terms_acceptance(): void

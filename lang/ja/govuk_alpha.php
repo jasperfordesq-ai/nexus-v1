@@ -236,6 +236,10 @@ return [
         'register_email_domain_invalid' => 'The email address is not deliverable — the domain has no mail servers configured. Check for typos in the domain name and try again.',
         'register_daily_limit' => 'Too many accounts have been created from this location in the last 24 hours. Please try again tomorrow, or contact a community administrator if you need help.',
         'register_tenant_paused' => 'Account creation is temporarily paused for this community while we review unusually high signup activity. Please try again later, or contact a community administrator if you need to register urgently.',
+        'register_closed' => 'このコミュニティでは登録を受け付けていません。アカウントが必要な場合、または招待を受けている場合は、コミュニティ管理者にお問い合わせください。',
+        'registration_closed_title' => '登録は閉鎖されています',
+        'registration_closed_body' => '現在、このコミュニティでは新規登録を受け付けていません。アカウントが必要な場合、または招待を受けている場合は、コミュニティ管理者にお問い合わせください。',
+        'registration_closed_login' => 'すでにアカウントをお持ちの場合はログインしてください。',
     ],
     'feed' => [
         'title' => 'Feed',

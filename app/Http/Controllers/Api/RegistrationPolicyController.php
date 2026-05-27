@@ -392,12 +392,16 @@ class RegistrationPolicyController extends BaseApiController
 
         $tenantId = $this->getTenantId();
         $policy = $this->registrationPolicyService->getEffectivePolicy($tenantId);
+        $mode = (string) ($policy['registration_mode'] ?? 'open');
 
         return $this->respondWithData([
-            'registration_mode' => $policy['registration_mode'],
-            'requires_invite_code' => $policy['registration_mode'] === 'invite_only',
-            'requires_verification' => in_array($policy['registration_mode'], ['verified_identity', 'government_id'], true),
-            'is_waitlist' => $policy['registration_mode'] === 'waitlist',
+            'registration_mode' => $mode,
+            'requires_invite_code' => $mode === 'invite_only',
+            'requires_verification' => in_array($mode, ['verified_identity', 'government_id'], true),
+            'is_waitlist' => $mode === 'waitlist',
+            'is_closed' => $mode === 'closed',
+            'can_register' => $mode !== 'closed',
+            'message' => $mode === 'closed' ? __('api.registration_closed') : null,
         ]);
     }
 }

@@ -173,6 +173,7 @@ return [
     'items_per_page_range' => 'items_per_page must be between 5 and 100',
     'maintenance_mode_boolean' => 'maintenance_mode must be a boolean value',
     'registration_mode_invalid' => 'registration_mode must be one of: open, closed, invite_only',
+    'registration_closed' => 'Rejestracja w tej społeczności jest zamknięta. Skontaktuj się z administratorem społeczności, jeśli potrzebujesz konta lub otrzymałeś zaproszenie.',
     'default_currency_invalid' => 'default_currency must be a 3-letter ISO 4217 currency code (e.g. eur, usd, gbp)',
     'map_provider_invalid' => 'map_provider musi być jednym z: google, openstreetmap',
     'geocoding_provider_invalid' => 'geocoding_provider musi być jednym z: google, nominatim',

@@ -63,6 +63,16 @@ interface Tenant {
   logo_url?: string;
 }
 
+interface RegistrationInfo {
+  registration_mode: string;
+  requires_invite_code: boolean;
+  requires_verification?: boolean;
+  is_waitlist?: boolean;
+  is_closed?: boolean;
+  can_register?: boolean;
+  message?: string | null;
+}
+
 type ProfileType = 'individual' | 'organisation';
 
 const STEP_KEYS = ['community', 'details', 'account', 'terms'] as const;
@@ -145,6 +155,7 @@ export function RegisterPage() {
   const [inviteCodeValid, setInviteCodeValid] = useState<boolean | null>(null);
   const [inviteCodeChecking, setInviteCodeChecking] = useState(false);
   const [requiresInviteCode, setRequiresInviteCode] = useState(false);
+  const [registrationClosed, setRegistrationClosed] = useState(false);
 
   // Post-registration pending state (verification/approval required)
   const [pendingResult, setPendingResult] = useState<RegisterResult | null>(null);
@@ -206,11 +217,19 @@ export function RegisterPage() {
 
     let cancelled = false;
     const fetchRegInfo = async () => {
+      setRequiresInviteCode(false);
+      setInviteCodeValid(null);
+      setRegistrationClosed(false);
       try {
-        const res = await api.get<{ registration_mode: string; requires_invite_code: boolean }>('/v2/auth/registration-info', { skipAuth: true });
+        const res = await api.get<RegistrationInfo>('/v2/auth/registration-info', { skipAuth: true });
         if (cancelled) return;
         if (res.success && res.data) {
           setRequiresInviteCode(res.data.requires_invite_code);
+          setRegistrationClosed(
+            res.data.is_closed === true ||
+            res.data.registration_mode === 'closed' ||
+            res.data.can_register === false
+          );
         }
       } catch {
         // Non-critical — default to no invite code required
@@ -278,7 +297,7 @@ export function RegisterPage() {
   // Validation for each step
   // tenant?.id means TenantContext already resolved the tenant (custom domain or slug route)
   const tenantSelected = !!tenant?.id || tenants.length === 0 || tenants.length === 1 || !!selectedTenantId;
-  const isStep1Valid = tenantSelected && (!requiresInviteCode || inviteCodeValid === true);
+  const isStep1Valid = !registrationClosed && tenantSelected && (!requiresInviteCode || inviteCodeValid === true);
   // Verified-location is encouraged but NOT a hard client-side gate. If
   // Google Places fails to load (ad-blocker, slow network, maps disabled
   // for tenant) lat/lng stay undefined — we still let the user submit and
@@ -328,6 +347,10 @@ export function RegisterPage() {
 
   const handleSubmit = useCallback(async (e: FormEvent) => {
     e.preventDefault();
+
+    if (registrationClosed) {
+      return;
+    }
 
     // Bot protection — only the legacy `website` honeypot is checked here.
     // The decoy fields (`confirm_email`, `address_line_2`, `referral_code`)
@@ -401,6 +424,7 @@ export function RegisterPage() {
     tenant?.id, register, firstName, lastName, email, profileType, organizationName,
     location, latitude, longitude, phone, termsAccepted, newsletterOptIn,
     requiresInviteCode, inviteCode, navigate, tenantPath, passwordCheck.isAcceptable,
+    registrationClosed,
   ]);
 
   const passwordValid = passwordCheck.isAcceptable;
@@ -422,7 +446,8 @@ export function RegisterPage() {
     phone.trim() &&
     isPhoneValid(phone) &&
     (tenants.length === 0 || !!selectedTenantId || !!tenant?.id) &&
-    (!requiresInviteCode || inviteCodeValid === true);
+    (!requiresInviteCode || inviteCodeValid === true) &&
+    !registrationClosed;
 
   // Step progress percentage
   const progressPercent = (currentStep / STEPS.length) * 100;
@@ -867,6 +892,27 @@ export function RegisterPage() {
     }
   };
 
+  const renderClosedRegistrationNotice = () => (
+    <div
+      role="alert"
+      className="rounded-xl border border-amber-300/70 bg-amber-50 p-4 text-left text-amber-950 dark:border-amber-400/30 dark:bg-amber-500/10 dark:text-amber-100"
+    >
+      <div className="flex items-start gap-3">
+        <Lock className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-300" aria-hidden="true" />
+        <div className="space-y-2">
+          <h2 className="text-base font-semibold">{t('register.registration_closed_title')}</h2>
+          <p className="text-sm leading-6">{t('register.registration_closed_body')}</p>
+          <Link
+            to={tenantPath('/login')}
+            className="inline-flex text-sm font-medium text-amber-800 underline underline-offset-4 hover:text-amber-900 dark:text-amber-200 dark:hover:text-amber-100"
+          >
+            {t('register.registration_closed_login')}
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+
   // Desktop: Show all fields at once
   // Mobile: Show step-by-step
   const renderForm = () => {
@@ -1173,7 +1219,7 @@ export function RegisterPage() {
           )}
 
           {/* Form */}
-          {renderForm()}
+          {registrationClosed ? renderClosedRegistrationNotice() : renderForm()}
 
           {/* Divider */}
           <Separator className="my-6 bg-theme-elevated" />

@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\ApiErrorCodes;
 use App\Core\EmailTemplate;
 use App\Core\TenantContext;
 use App\Core\Validator as NexusValidator;
@@ -59,6 +60,20 @@ class RegistrationService
         // (Chrome especially) autofill semantic field names like
         // `confirm_email` and `address_line_2` regardless of autocomplete=off,
         // which silently blocked legitimate users.
+        $policy = RegistrationPolicyService::getEffectivePolicy($tenantId);
+        if (($policy['registration_mode'] ?? 'open') === 'closed') {
+            Log::warning('registration.closed_blocked', [
+                'tenant_id' => $tenantId,
+                'ip' => request()?->ip(),
+            ]);
+
+            return [
+                'error' => __('api.registration_closed'),
+                'code' => ApiErrorCodes::REGISTRATION_CLOSED,
+                'status' => 403,
+            ];
+        }
+
         $honeypotFields = ['honeypot', 'website'];
         foreach ($honeypotFields as $field) {
             if (!empty($data[$field])) {
@@ -329,7 +344,6 @@ class RegistrationService
         // is `invite_only`, the submission MUST carry a valid, unused,
         // non-expired invite code. Validated here (before user creation) so
         // we don't insert a half-registered user when the code is bad.
-        $policy = RegistrationPolicyService::getEffectivePolicy($tenantId);
         $inviteRequired = ($policy['registration_mode'] ?? 'open') === 'invite_only';
         $inviteCode = isset($data['invite_code']) ? strtoupper(trim((string) $data['invite_code'])) : '';
         if ($inviteRequired) {

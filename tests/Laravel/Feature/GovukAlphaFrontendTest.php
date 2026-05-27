@@ -52,6 +52,40 @@ class GovukAlphaFrontendTest extends TestCase
         }
     }
 
+    public function test_register_page_shows_closed_registration_message_and_hides_form(): void
+    {
+        DB::table('tenant_registration_policies')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId],
+            [
+                'registration_mode' => 'open',
+                'verification_level' => 'none',
+                'post_verification' => 'activate',
+                'fallback_mode' => 'none',
+                'require_email_verify' => 1,
+                'is_active' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+        DB::table('tenant_settings')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId, 'setting_key' => 'general.registration_mode'],
+            [
+                'setting_value' => 'closed',
+                'setting_type' => 'string',
+                'updated_at' => now(),
+            ]
+        );
+        app(\App\Services\TenantSettingsService::class)->clearCacheForTenant($this->testTenantId);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/register");
+
+        $response->assertOk();
+        $response->assertSee(__('govuk_alpha.auth.registration_closed_title'));
+        $response->assertSee(__('govuk_alpha.auth.registration_closed_body'));
+        $response->assertDontSee('name="first_name"', false);
+        $response->assertDontSee('type="submit"', false);
+    }
+
     public function test_contact_page_renders_govuk_alpha_form_and_feedback_link_targets_it(): void
     {
         $response = $this->get("/{$this->testTenantSlug}/alpha/contact");
