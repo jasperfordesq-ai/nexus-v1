@@ -133,7 +133,9 @@
     "join_meeting_aria": "الانضمام إلى اجتماع {{title}}",
     "join_waitlist_aria": "الانضمام إلى قائمة انتظار هذه الفعالية",
     "leave_waitlist_aria": "مغادرة قائمة انتظار هذه الفعالية",
-    "tabs_aria": "Event detail sections"
+    "tabs_aria": "Event detail sections",
+    "checkin_progress_chart_aria": "Check-in progress: {{percent}}% of capacity",
+    "cancel_reason_label": "Reason for cancellation"
   },
   "card": {
     "cancelled": "تم الإلغاء",
@@ -296,5 +298,6 @@
   "active_filters": "مرشحات نشطة",
   "active_search": "البحث: {{query}}",
   "active_near_me": "ضمن {{radius}} كم",
-  "clear_filters": "مسح المرشحات"
+  "clear_filters": "مسح المرشحات",
+  "loading_more_aria": "Loading more events"
 }

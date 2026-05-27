@@ -127,7 +127,7 @@ function IdentityVerificationCTA({ userId, tenantPath, onClose }: { userId: numb
       onPress={() => { onClose(); setTimeout(() => navigate(tenantPath('/verify-identity-optional')), 150); }}
       className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-3.5 min-h-[48px] rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-base font-semibold hover:bg-emerald-500/20 min-h-9 min-w-0"
     >
-      <Fingerprint className="w-5 h-5 shrink-0" />
+      <Fingerprint className="w-5 h-5 shrink-0" aria-hidden="true" />
       <span className="min-w-0 truncate">{t('nav.verify_identity')}</span>
     </Button>
   );

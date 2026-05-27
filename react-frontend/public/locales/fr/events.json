@@ -133,7 +133,9 @@
     "join_meeting_aria": "Rejoindre la réunion pour {{title}}",
     "join_waitlist_aria": "Rejoindre la liste d'attente de cet événement",
     "leave_waitlist_aria": "Quitter la liste d'attente de cet événement",
-    "tabs_aria": "Event detail sections"
+    "tabs_aria": "Event detail sections",
+    "checkin_progress_chart_aria": "Check-in progress: {{percent}}% of capacity",
+    "cancel_reason_label": "Reason for cancellation"
   },
   "card": {
     "cancelled": "Annulé",
@@ -296,5 +298,6 @@
   "active_filters": "Filtres actifs",
   "active_search": "Rechercher : {{query}}",
   "active_near_me": "Dans un rayon de {{radius}} km",
-  "clear_filters": "Effacer les filtres"
+  "clear_filters": "Effacer les filtres",
+  "loading_more_aria": "Loading more events"
 }

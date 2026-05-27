@@ -9,6 +9,7 @@ import {
   CloseButton,
   type ChipProps as HeroUIChipProps,
 } from '@heroui/react';
+import { useTranslation } from 'react-i18next';
 
 type V2ChipColor =
   | 'default'
@@ -132,6 +133,7 @@ export function Chip({
   variant,
   ...props
 }: ChipProps) {
+  const { t } = useTranslation('common');
   const isDot = variant === 'dot';
 
   const content = (
@@ -147,6 +149,7 @@ export function Chip({
         <CloseButton
           className={classNames?.closeButton}
           onPress={onClose}
+          aria-label={t('aria.remove')}
         />
       ) : null}
     </>

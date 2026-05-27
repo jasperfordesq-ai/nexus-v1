@@ -133,7 +133,9 @@
     "join_meeting_aria": "{{title}} のミーティングに参加",
     "join_waitlist_aria": "このイベントのキャンセル待ちに参加",
     "leave_waitlist_aria": "このイベントのキャンセル待ちから外れる",
-    "tabs_aria": "Event detail sections"
+    "tabs_aria": "Event detail sections",
+    "checkin_progress_chart_aria": "Check-in progress: {{percent}}% of capacity",
+    "cancel_reason_label": "Reason for cancellation"
   },
   "card": {
     "cancelled": "キャンセル",
@@ -296,5 +298,6 @@
   "active_filters": "アクティブフィルター",
   "active_search": "検索: {{query}}",
   "active_near_me": "{{radius}} キロ以内",
-  "clear_filters": "フィルターをクリアする"
+  "clear_filters": "フィルターをクリアする",
+  "loading_more_aria": "Loading more events"
 }

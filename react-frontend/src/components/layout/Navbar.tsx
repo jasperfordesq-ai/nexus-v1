@@ -434,9 +434,10 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   size="sm"
                   className="text-theme-muted hover:text-theme-primary h-7 min-w-0 px-2 gap-1 text-xs shrink-0"
                   onPress={() => navigate(tenantPath('/dashboard'))}
+                  aria-label={t('nav.dashboard')}
                 >
                   <LayoutDashboard className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-                  <span className="hidden md:inline">{t('nav.dashboard')}</span>
+                  <span className="hidden md:inline" aria-hidden="true">{t('nav.dashboard')}</span>
                 </Button>
               )}
               {/* Federation Hub — authenticated users with federation feature */}
@@ -446,9 +447,10 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   size="sm"
                   className="text-theme-muted hover:text-theme-primary h-7 min-w-0 px-2 gap-1 text-xs shrink-0"
                   onPress={() => navigate(tenantPath('/federation'))}
+                  aria-label={t('nav.partner_communities')}
                 >
                   <Globe className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-                  <span className="hidden md:inline">{t('nav.partner_communities')}</span>
+                  <span className="hidden md:inline" aria-hidden="true">{t('nav.partner_communities')}</span>
                 </Button>
               )}
               {/* Identity verification status */}
@@ -456,9 +458,9 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 <>
                   <span className="text-[var(--border-default)] text-xs select-none shrink-0">|</span>
                   {isIdVerified ? (
-                    <div className="flex items-center gap-1 px-2 h-7 text-xs text-emerald-600 dark:text-emerald-400 shrink-0">
+                    <div className="flex items-center gap-1 px-2 h-7 text-xs text-emerald-600 dark:text-emerald-400 shrink-0" aria-label={t('verified')}>
                       <ShieldCheck className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-                      <span className="hidden md:inline">{t('verified')}</span>
+                      <span className="hidden md:inline" aria-hidden="true">{t('verified')}</span>
                     </div>
                   ) : (
                     <Button
@@ -466,9 +468,10 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                       size="sm"
                       className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 h-7 min-w-0 px-2 gap-1 text-xs shrink-0 font-semibold"
                       onPress={() => navigate(tenantPath('/verify-identity-optional'))}
+                      aria-label={t('verify_identity')}
                     >
                       <Fingerprint className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-                      <span className="hidden md:inline">{t('verify_identity')}</span>
+                      <span className="hidden md:inline" aria-hidden="true">{t('verify_identity')}</span>
                     </Button>
                   )}
                 </>

@@ -57,10 +57,11 @@ export function AdminHeader({ sidebarCollapsed, onSidebarToggle }: AdminHeaderPr
           variant="tertiary"
           size="sm"
           onPress={() => navigate(tenantPath('/dashboard'))}
-          startContent={<ArrowLeft size={16} />}
+          startContent={<ArrowLeft size={16} aria-hidden="true" />}
+          aria-label={t('back_to_site')}
           className="min-w-0 bg-surface-secondary/70 px-2 text-muted hover:bg-surface-tertiary/70 sm:px-3"
         >
-          <span className="hidden sm:inline">{t('back_to_site_header')}</span>
+          <span className="hidden sm:inline" aria-hidden="true">{t('back_to_site_header')}</span>
         </Button>
         {tenant?.name && (
           <span className="min-w-0 max-w-[9rem] truncate text-sm font-medium text-muted sm:max-w-[18rem]">

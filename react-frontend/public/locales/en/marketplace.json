@@ -183,6 +183,7 @@
   },
   "search": {
     "page_title": "Search Marketplace",
+    "page_heading": "Search Marketplace",
     "meta_description": "Search and filter items in the community marketplace.",
     "breadcrumb_search": "Search",
     "search_placeholder": "Search marketplace...",

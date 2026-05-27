@@ -220,7 +220,8 @@
     "price_from": "{{min}} 以上",
     "price_up_to": "{{max}} 以下",
     "last_days_one": "過去 {{count}} 日間",
-    "last_days_other": "過去 {{count}} 日間"
+    "last_days_other": "過去 {{count}} 日間",
+    "page_heading": "Search Marketplace"
   },
   "seller": {
     "page_title": "セラープロフィール",

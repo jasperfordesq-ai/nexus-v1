@@ -983,7 +983,8 @@
     "status_pass": "Passar",
     "status_warning": "Aviso",
     "sync_search_hint_prefix": "Correr",
-    "sync_search_hint_suffix": "após o início do Meilisearch."
+    "sync_search_hint_suffix": "após o início do Meilisearch.",
+    "loading": "Loading"
   },
   "alerts": {
     "pending_approvals": "Aprovações pendentes",
@@ -2823,7 +2824,8 @@
     "option_choice_default_visibility_private": "Privado",
     "option_choice_jobs_default_currency_eur": "EUR",
     "option_choice_jobs_default_currency_gbp": "GBP",
-    "option_choice_jobs_default_currency_usd": "USD"
+    "option_choice_jobs_default_currency_usd": "USD",
+    "filter_modules": "Filter modules"
   },
   "content": {
     "about_section": "Sobre a seção",
@@ -9579,7 +9581,8 @@
       "remove_badge": "Remover selo: {{name}}",
       "toggle_global_super_admin": "Alternar superadministrador global",
       "toggle_municipal_announcer": "Alternar função de locutor municipal",
-      "toggle_tenant_super_admin": "Alternar superadministrador de locatário"
+      "toggle_tenant_super_admin": "Alternar superadministrador de locatário",
+      "edit_user_form": "Edit user"
     },
     "consents": {
       "consented": "Consentido",
@@ -15156,7 +15159,8 @@
       "hours_axis": "Horas",
       "title": "Tendência nacional de 12 meses",
       "total_hours_all": "Total de horas (todas as cooperativas)"
-    }
+    },
+    "loading": "Loading"
   },
   "success_stories_admin": {
     "about": {

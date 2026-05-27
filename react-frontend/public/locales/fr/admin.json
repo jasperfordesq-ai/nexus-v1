@@ -983,7 +983,8 @@
     "status_pass": "Passer",
     "status_warning": "Avertissement",
     "sync_search_hint_prefix": "Courir",
-    "sync_search_hint_suffix": "après le démarrage de Meilisearch."
+    "sync_search_hint_suffix": "après le démarrage de Meilisearch.",
+    "loading": "Loading"
   },
   "alerts": {
     "pending_approvals": "Approbations en attente",
@@ -2823,7 +2824,8 @@
     "option_choice_default_visibility_private": "Privé",
     "option_choice_jobs_default_currency_eur": "EUR",
     "option_choice_jobs_default_currency_gbp": "EUR",
-    "option_choice_jobs_default_currency_usd": "USD"
+    "option_choice_jobs_default_currency_usd": "USD",
+    "filter_modules": "Filter modules"
   },
   "content": {
     "about_section": "À propos de la section",
@@ -9579,7 +9581,8 @@
       "remove_badge": "Supprimer le badge: {{name}}",
       "toggle_global_super_admin": "Activer/désactiver le super-administrateur global",
       "toggle_municipal_announcer": "Basculer le rôle d'annonceur municipal",
-      "toggle_tenant_super_admin": "Activer/désactiver le super-administrateur locataire"
+      "toggle_tenant_super_admin": "Activer/désactiver le super-administrateur locataire",
+      "edit_user_form": "Edit user"
     },
     "consents": {
       "consented": "Consentement",
@@ -15156,7 +15159,8 @@
       "hours_axis": "Heures",
       "title": "Tendance nationale sur 12 mois",
       "total_hours_all": "Heures totales (toutes les coopératives)"
-    }
+    },
+    "loading": "Loading"
   },
   "success_stories_admin": {
     "about": {

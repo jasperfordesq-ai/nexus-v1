@@ -983,7 +983,8 @@
     "status_pass": "Doorgang",
     "status_warning": "Waarschuwing",
     "sync_search_hint_prefix": "Loop",
-    "sync_search_hint_suffix": "nadat Meilisearch is gestart."
+    "sync_search_hint_suffix": "nadat Meilisearch is gestart.",
+    "loading": "Loading"
   },
   "alerts": {
     "pending_approvals": "In afwachting van goedkeuringen",
@@ -2823,7 +2824,8 @@
     "option_choice_default_visibility_private": "Privé",
     "option_choice_jobs_default_currency_eur": "EUR",
     "option_choice_jobs_default_currency_gbp": "GBP",
-    "option_choice_jobs_default_currency_usd": "USD"
+    "option_choice_jobs_default_currency_usd": "USD",
+    "filter_modules": "Filter modules"
   },
   "content": {
     "about_section": "Over Sectie",
@@ -9579,7 +9581,8 @@
       "remove_badge": "Badge verwijderen: {{name}}",
       "toggle_global_super_admin": "Schakel globale superbeheerder in",
       "toggle_municipal_announcer": "Schakel de rol van gemeentelijke omroeper in",
-      "toggle_tenant_super_admin": "Schakel tenant-superbeheerder in of uit"
+      "toggle_tenant_super_admin": "Schakel tenant-superbeheerder in of uit",
+      "edit_user_form": "Edit user"
     },
     "consents": {
       "consented": "Toegestemd",
@@ -15156,7 +15159,8 @@
       "hours_axis": "Uur",
       "title": "Nationale trend over 12 maanden",
       "total_hours_all": "Totaal aantal uren (alle coöperaties)"
-    }
+    },
+    "loading": "Loading"
   },
   "success_stories_admin": {
     "about": {

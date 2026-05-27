@@ -610,5 +610,6 @@
     "back": "Torna al Feed",
     "not_found": "Elemento non trovato",
     "load_failed": "Impossibile caricare l'elemento"
-  }
+  },
+  "controls_region_label": "Feed controls"
 }

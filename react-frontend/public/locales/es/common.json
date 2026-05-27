@@ -788,7 +788,8 @@
     "search_skills": "Buscar habilidades",
     "user_menu_trigger": "User menu for {{name}}",
     "feed_sidebar": "Community sidebar",
-    "filter_panel": "Filter panel"
+    "filter_panel": "Filter panel",
+    "remove": "Remove"
   },
   "skills": {
     "browse_title": "Directorio de Habilidades de la Comunidad",

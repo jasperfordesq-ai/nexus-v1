@@ -338,5 +338,7 @@
   "listing_image_alt": "Imagem da listagem",
   "open_listing_aria": "Abrir anúncio: {{title}}",
   "distance_meters": "{{distance}} m",
-  "distance_kilometers": "{{distance}}km"
+  "distance_kilometers": "{{distance}}km",
+  "loading_progress": "Loading listings",
+  "filter_form_label": "Filter listings"
 }

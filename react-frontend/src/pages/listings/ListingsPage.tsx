@@ -435,7 +435,7 @@ export function ListingsPage() {
         </div>
 
         {/* Row 1: Search + primary filters */}
-        <form onSubmit={handleSearch} className="flex flex-col gap-3 xl:flex-row">
+        <form onSubmit={handleSearch} aria-label={t('filter_form_label')} className="flex flex-col gap-3 xl:flex-row">
           <div className="flex min-w-0 flex-1 gap-2">
             <Input
               size="lg"
@@ -801,7 +801,14 @@ export function ListingsPage() {
                     <span>{listings.length.toLocaleString()} / {totalItems.toLocaleString()}</span>
                     <span className="font-medium text-theme-secondary">{Math.round((listings.length / totalItems) * 100)}%</span>
                   </div>
-                  <div className="h-1.5 rounded-full bg-theme-elevated overflow-hidden">
+                  <div
+                    className="h-1.5 rounded-full bg-theme-elevated overflow-hidden"
+                    role="progressbar"
+                    aria-label={t('loading_progress')}
+                    aria-valuenow={Math.round((listings.length / totalItems) * 100)}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                  >
                     <motion.div
                       className="h-full rounded-full bg-emerald-500"
                       initial={{ width: '0%' }}

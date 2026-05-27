@@ -110,7 +110,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             <GlassCard className="p-8">
               <div className="text-center">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 mb-6">
-                  <AlertTriangle className="w-8 h-8 text-red-400" />
+                  <AlertTriangle className="w-8 h-8 text-red-400" aria-hidden="true" />
                 </div>
 
                 <h1 className="text-2xl font-bold text-theme-primary mb-2">
@@ -144,7 +144,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                   <Button
                     onPress={this.handleTryAgain}
                     className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                    startContent={<RefreshCw className="w-4 h-4" />}
+                    startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
                   >
                     {i18n.t('error_boundary.try_again', { ns: 'common' })}
                   </Button>
@@ -153,7 +153,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                     onPress={this.handleGoHome}
                     variant="flat"
                     className="flex-1 bg-theme-elevated text-theme-muted"
-                    startContent={<Home className="w-4 h-4" />}
+                    startContent={<Home className="w-4 h-4" aria-hidden="true" />}
                   >
                     {i18n.t('error_boundary.go_home', { ns: 'common' })}
                   </Button>

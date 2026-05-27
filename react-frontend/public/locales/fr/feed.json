@@ -610,5 +610,6 @@
     "back": "Retour au fil",
     "not_found": "Élément introuvable",
     "load_failed": "Impossible de charger l'élément"
-  }
+  },
+  "controls_region_label": "Feed controls"
 }

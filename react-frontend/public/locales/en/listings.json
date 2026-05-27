@@ -284,6 +284,8 @@
   "clear_filters": "Clear filters",
   "results_count": "{{count}} listings found",
   "results_loading": "Finding listings",
+  "loading_progress": "Loading listings",
+  "filter_form_label": "Filter listings",
   "radius_5": "5 km",
   "radius_10": "10 km",
   "radius_25": "25 km",

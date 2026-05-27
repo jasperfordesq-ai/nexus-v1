@@ -287,7 +287,7 @@ export function MarketplacePage() {
                 to={tenantPath('/marketplace/sell')}
 
                 className="shrink-0"
-                startContent={<Plus className="w-4 h-4" />}
+                startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
               >
                 {t('hub.sell_something')}
               </Button>
@@ -328,7 +328,7 @@ export function MarketplacePage() {
             {featuredListings.length > 0 && !debouncedQuery && selectedCategoryId == null && (
               <div className="mb-8">
                 <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
-                  <Star className="w-5 h-5 text-warning" />
+                  <Star className="w-5 h-5 text-warning" aria-hidden="true" />
                   {t('hub.featured_listings')}
                 </h2>
                 <MarketplaceListingGrid
@@ -344,7 +344,7 @@ export function MarketplacePage() {
               <MarketplaceListingGridSkeleton />
             ) : error ? (
               <GlassCard className="p-8 text-center">
-                <p className="text-danger mb-4">{error}</p>
+                <p role="alert" className="text-danger mb-4">{error}</p>
                 <Button variant="tertiary" onPress={() => loadListings()}>
                   {t('common.try_again')}
                 </Button>
@@ -367,7 +367,7 @@ export function MarketplacePage() {
             ) : (
               <>
                 <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
-                  <Grid3X3 className="w-5 h-5 text-muted" />
+                  <Grid3X3 className="w-5 h-5 text-muted" aria-hidden="true" />
                   {debouncedQuery || selectedCategoryId != null ? t('hub.search_results') : t('hub.latest_listings')}
                 </h2>
                 <MarketplaceListingGrid
@@ -398,7 +398,7 @@ export function MarketplacePage() {
             {/* Sell CTA */}
             {isAuthenticated && (
               <GlassCard className="p-5 text-center space-y-3">
-                <ShoppingBag className="w-10 h-10 text-accent mx-auto" />
+                <ShoppingBag className="w-10 h-10 text-accent mx-auto" aria-hidden="true" />
                 <h3 className="font-semibold text-theme-primary">{t('hub.sidebar_cta_title')}</h3>
                 <p className="text-sm text-theme-muted">
                   {t('hub.sidebar_cta_description')}
@@ -408,7 +408,7 @@ export function MarketplacePage() {
                   to={tenantPath('/marketplace/sell')}
 
                   fullWidth
-                  startContent={<Plus className="w-4 h-4" />}
+                  startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
                 >
                   {t('hub.sell_something')}
                 </Button>
@@ -423,7 +423,7 @@ export function MarketplacePage() {
                   to={tenantPath('/marketplace/search')}
                   className="flex items-center gap-2 text-sm text-muted hover:text-accent transition-colors"
                 >
-                  <Search className="w-4 h-4" />
+                  <Search className="w-4 h-4" aria-hidden="true" />
                   {t('hub.advanced_search')}
                 </Link>
                 {isAuthenticated && (
@@ -432,28 +432,28 @@ export function MarketplacePage() {
                       to={tenantPath('/marketplace/my-listings')}
                       className="flex items-center gap-2 text-sm text-muted hover:text-accent transition-colors"
                     >
-                      <Package className="w-4 h-4" />
+                      <Package className="w-4 h-4" aria-hidden="true" />
                       {t('hub.my_listings')}
                     </Link>
                     <Link
                       to={tenantPath('/marketplace/my-offers')}
                       className="flex items-center gap-2 text-sm text-muted hover:text-accent transition-colors"
                     >
-                      <HandCoins className="w-4 h-4" />
+                      <HandCoins className="w-4 h-4" aria-hidden="true" />
                       {t('hub.my_offers')}
                     </Link>
                     <Link
                       to={tenantPath('/marketplace/orders')}
                       className="flex items-center gap-2 text-sm text-muted hover:text-accent transition-colors"
                     >
-                      <ShoppingBag className="w-4 h-4" />
+                      <ShoppingBag className="w-4 h-4" aria-hidden="true" />
                       {t('hub.my_orders')}
                     </Link>
                     <Link
                       to={tenantPath('/marketplace/collections')}
                       className="flex items-center gap-2 text-sm text-muted hover:text-accent transition-colors"
                     >
-                      <Heart className="w-4 h-4" />
+                      <Heart className="w-4 h-4" aria-hidden="true" />
                       {t('hub.saved_items')}
                     </Link>
                   </>

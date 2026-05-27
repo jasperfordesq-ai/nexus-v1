@@ -391,7 +391,7 @@ export function NationalKissDashboardPage() {
         </CardHeader>
         <CardBody>
           {loading ? (
-            <div className="flex h-72 items-center justify-center">
+            <div role="status" aria-busy="true" aria-label={t('national_kiss_dashboard.loading')} className="flex h-72 items-center justify-center">
               <Spinner />
             </div>
           ) : trend.length === 0 ? (
@@ -447,7 +447,7 @@ export function NationalKissDashboardPage() {
         </CardHeader>
         <CardBody>
           {loading ? (
-            <div className="flex h-32 items-center justify-center">
+            <div role="status" aria-busy="true" aria-label={t('national_kiss_dashboard.loading')} className="flex h-32 items-center justify-center">
               <Spinner />
             </div>
           ) : sortedRows.length === 0 ? (

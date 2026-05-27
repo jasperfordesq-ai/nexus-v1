@@ -338,5 +338,7 @@
   "listing_image_alt": "صورة القائمة",
   "open_listing_aria": "فتح الإعلان: {{title}}",
   "distance_meters": "{{distance}} م",
-  "distance_kilometers": "{{distance}} كم"
+  "distance_kilometers": "{{distance}} كم",
+  "loading_progress": "Loading listings",
+  "filter_form_label": "Filter listings"
 }

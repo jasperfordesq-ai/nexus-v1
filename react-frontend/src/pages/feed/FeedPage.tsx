@@ -897,7 +897,7 @@ export function FeedPage() {
       </section>
 
       {/* Feed controls */}
-      <section data-testid="feed-controls" className="w-full min-w-0 max-w-full space-y-3 overflow-hidden rounded-xl border border-theme-default bg-[var(--surface-base)]/95 px-3 py-3 shadow-sm sm:px-4">
+      <section data-testid="feed-controls" aria-label={t('controls_region_label')} className="w-full min-w-0 max-w-full space-y-3 overflow-hidden rounded-xl border border-theme-default bg-[var(--surface-base)]/95 px-3 py-3 shadow-sm sm:px-4">
         <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <FeedModeToggle mode={feedMode} onModeChange={(mode) => { localStorage.setItem(FEED_MODE_KEY, mode); setFeedMode(mode); syncToUrl({ mode }); }} />
           {hasActiveFeedView && (

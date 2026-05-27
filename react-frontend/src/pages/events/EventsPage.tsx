@@ -346,27 +346,27 @@ export function EventsPage() {
         )}
       </GlassCard>
 
-      {/* Category Filter Chips */}
+      {/* Category Filter Buttons */}
       <div className="flex flex-wrap gap-2" role="group" aria-label={t('category_aria')}>
         {EVENT_CATEGORIES.map((cat) => {
           const isSelected = selectedCategory === cat.id;
           const IconComp = cat.icon;
           return (
-            <Chip
+            <Button
               key={cat.id}
-              variant={isSelected ? 'solid' : 'flat'}
-              color={isSelected ? 'primary' : 'default'}
+              variant="flat"
+              size="sm"
               className={
                 isSelected
-                  ? 'bg-linear-to-r from-indigo-500 to-purple-600 text-white cursor-pointer'
-                  : 'bg-theme-elevated text-theme-muted cursor-pointer hover:bg-theme-hover'
+                  ? 'bg-linear-to-r from-indigo-500 to-purple-600 text-white'
+                  : 'bg-theme-elevated text-theme-muted hover:bg-theme-hover'
               }
               startContent={<IconComp className="w-3.5 h-3.5" aria-hidden="true" />}
-              onClick={() => setSelectedCategory(cat.id)}
+              onPress={() => setSelectedCategory(cat.id)}
               aria-pressed={isSelected}
             >
               {cat.name}
-            </Chip>
+            </Button>
           );
         })}
       </div>
@@ -459,7 +459,14 @@ export function EventsPage() {
               {hasMore && (
                 <div className="space-y-3 pt-4">
                   {totalCount != null && totalCount > 0 && (
-                    <div className="space-y-1.5">
+                    <div
+                      className="space-y-1.5"
+                      role="progressbar"
+                      aria-valuenow={Math.round((events.length / totalCount) * 100)}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-label={t('loading_more_aria')}
+                    >
                       <div className="flex justify-between text-xs text-theme-muted px-1">
                         <span>{events.length.toLocaleString()} / {totalCount.toLocaleString()}</span>
                         <span className="font-medium text-theme-secondary">{Math.round((events.length / totalCount) * 100)}%</span>

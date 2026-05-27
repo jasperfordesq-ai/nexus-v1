@@ -494,7 +494,7 @@ export function UserEdit() {
 
       <div className="flex flex-col gap-6 max-w-2xl">
         {/* User Details Form */}
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} aria-label={t('aria.edit_user_form')}>
           <Card>
             <CardHeader className="px-6 pt-5 pb-0">
               <div className="flex items-center gap-4">
@@ -1023,7 +1023,7 @@ export function UserEdit() {
         size="sm">
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <Coins size={20} className="text-accent" />
+            <Coins size={20} className="text-accent" aria-hidden="true" />
             {t('modals.adjust_balance.title')}
           </ModalHeader>
           <ModalBody className="gap-4">
@@ -1056,7 +1056,7 @@ export function UserEdit() {
         size="sm">
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <KeyRound size={20} className="text-accent" />
+            <KeyRound size={20} className="text-accent" aria-hidden="true" />
             {t('modals.set_password.title')}
           </ModalHeader>
           <ModalBody className="gap-4">

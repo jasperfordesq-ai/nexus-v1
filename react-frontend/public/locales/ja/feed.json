@@ -610,5 +610,6 @@
     "back": "フィードに戻る",
     "not_found": "アイテムが見つかりません",
     "load_failed": "アイテムの読み込みに失敗しました"
-  }
+  },
+  "controls_region_label": "Feed controls"
 }

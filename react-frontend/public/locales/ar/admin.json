@@ -983,7 +983,8 @@
     "status_pass": "يمر",
     "status_warning": "تحذير",
     "sync_search_hint_prefix": "يجري",
-    "sync_search_hint_suffix": "بعد بدء Meilisearch."
+    "sync_search_hint_suffix": "بعد بدء Meilisearch.",
+    "loading": "Loading"
   },
   "alerts": {
     "pending_approvals": "الموافقات المعلقة",
@@ -2823,7 +2824,8 @@
     "option_choice_default_visibility_private": "خاص",
     "option_choice_jobs_default_currency_eur": "يورو",
     "option_choice_jobs_default_currency_gbp": "GBP",
-    "option_choice_jobs_default_currency_usd": "دولار أمريكي"
+    "option_choice_jobs_default_currency_usd": "دولار أمريكي",
+    "filter_modules": "Filter modules"
   },
   "content": {
     "about_section": "حول القسم",
@@ -9579,7 +9581,8 @@
       "remove_badge": "إزالة الشارة: {{name}}",
       "toggle_global_super_admin": "تبديل المشرف العالمي المتميز",
       "toggle_municipal_announcer": "تبديل دور مذيع البلدية",
-      "toggle_tenant_super_admin": "تبديل المشرف المتميز للمستأجر"
+      "toggle_tenant_super_admin": "تبديل المشرف المتميز للمستأجر",
+      "edit_user_form": "Edit user"
     },
     "consents": {
       "consented": "تمت الموافقة",
@@ -15156,7 +15159,8 @@
       "hours_axis": "ساعات",
       "title": "الاتجاه الوطني لمدة 12 شهرا",
       "total_hours_all": "إجمالي الساعات (جميع التعاونيات)"
-    }
+    },
+    "loading": "Loading"
   },
   "success_stories_admin": {
     "about": {

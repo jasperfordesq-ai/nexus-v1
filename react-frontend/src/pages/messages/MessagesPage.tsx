@@ -416,7 +416,7 @@ export function MessagesPage() {
       <PageMeta title={t('page_meta.list.title')} description={t('page_subtitle')} noIndex />
       {/* Messaging Disabled Notice (feature flag) */}
       {!isDirectMessagingEnabled && (
-        <GlassCard className="p-4 border-l-4 border-amber-500 bg-amber-500/10">
+        <GlassCard role="status" className="p-4 border-l-4 border-amber-500 bg-amber-500/10">
           <div className="flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-[var(--color-warning)] flex-shrink-0 mt-0.5" aria-hidden="true" />
             <div className="flex-1">
@@ -569,10 +569,10 @@ export function MessagesPage() {
             />
 
             {/* Search Results */}
-            <div className="mt-4 space-y-2 max-h-64 overflow-y-auto">
+            <div className="mt-4 space-y-2 max-h-64 overflow-y-auto" aria-live="polite" aria-relevant="additions removals">
               {userSearchError ? (
                 <div className="text-center py-4">
-                  <p className="text-[var(--color-error)] text-sm">{userSearchError}</p>
+                  <p role="alert" className="text-[var(--color-error)] text-sm">{userSearchError}</p>
                   <Button
                     size="sm"
                     variant="secondary"

@@ -133,7 +133,9 @@
     "join_meeting_aria": "Deelnemen aan vergadering voor {{title}}",
     "join_waitlist_aria": "Op de wachtlijst voor dit evenement",
     "leave_waitlist_aria": "Wachtlijst voor dit evenement verlaten",
-    "tabs_aria": "Event detail sections"
+    "tabs_aria": "Event detail sections",
+    "checkin_progress_chart_aria": "Check-in progress: {{percent}}% of capacity",
+    "cancel_reason_label": "Reason for cancellation"
   },
   "card": {
     "cancelled": "Geannuleerd",
@@ -296,5 +298,6 @@
   "active_filters": "Actieve filters",
   "active_search": "Zoek: {{query}}",
   "active_near_me": "Binnen {{radius}} km",
-  "clear_filters": "Filters wissen"
+  "clear_filters": "Filters wissen",
+  "loading_more_aria": "Loading more events"
 }

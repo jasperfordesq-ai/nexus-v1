@@ -761,12 +761,13 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
       <Tooltip key={section.key} content={section.label} placement="right" delay={250}>
         <Link
           to={tenantPath(href)}
+          aria-label={section.label}
           aria-current={active ? 'page' : undefined}
           className={`flex items-center justify-center rounded-lg px-2 py-2 transition-colors ${
             active ? 'bg-accent/10 text-accent' : 'text-muted hover:bg-surface-secondary hover:text-foreground'
           }`}
         >
-          <Icon size={18} />
+          <Icon size={18} aria-hidden="true" />
         </Link>
       </Tooltip>
     );

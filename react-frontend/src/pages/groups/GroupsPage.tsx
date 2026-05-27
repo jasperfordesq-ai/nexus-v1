@@ -233,7 +233,7 @@ export function GroupsPage() {
       />
 
       {/* Quick Filters */}
-      <div className="flex flex-wrap items-center gap-2" aria-label={t('filters_aria')}>
+      <div role="group" className="flex flex-wrap items-center gap-2" aria-label={t('filters_aria')}>
         <Button
           size="sm"
           variant={filter === 'all' ? 'solid' : 'flat'}

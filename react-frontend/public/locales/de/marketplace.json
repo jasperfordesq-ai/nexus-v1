@@ -220,7 +220,8 @@
     "price_from": "Ab {{min}}",
     "price_up_to": "Bis zu {{max}}",
     "last_days_one": "Letzter {{count}} Tag",
-    "last_days_other": "Letzte {{count}} Tage"
+    "last_days_other": "Letzte {{count}} Tage",
+    "page_heading": "Search Marketplace"
   },
   "seller": {
     "page_title": "Verkäuferprofil",

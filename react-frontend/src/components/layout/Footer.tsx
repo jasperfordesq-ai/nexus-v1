@@ -150,7 +150,7 @@ export function Footer({ children, copyright }: FooterProps) {
               </div>
 
               {/* Platform */}
-              <div>
+              <nav aria-label={t('footer.platform')}>
                 <h3 className="text-sm font-semibold text-theme-primary mb-3">{t('footer.platform')}</h3>
                 <ul className="space-y-2">
                   <li><FooterLink href={tenantPath('/listings')}>{t('nav.listings')}</FooterLink></li>
@@ -158,10 +158,10 @@ export function Footer({ children, copyright }: FooterProps) {
                   {hasEvents && <li><FooterLink href={tenantPath('/events')}>{t('nav.events')}</FooterLink></li>}
                   {hasBlog && <li><FooterLink href={tenantPath('/blog')}>{t('nav.blog')}</FooterLink></li>}
                 </ul>
-              </div>
+              </nav>
 
               {/* Support */}
-              <div>
+              <nav aria-label={t('footer.support')}>
                 <h3 className="text-sm font-semibold text-theme-primary mb-3">{t('footer.support')}</h3>
                 <ul className="space-y-2">
                   <li><FooterLink href={tenantPath('/help')}>{t('footer.help_center')}</FooterLink></li>
@@ -181,10 +181,10 @@ export function Footer({ children, copyright }: FooterProps) {
                     </a>
                   </li>
                 </ul>
-              </div>
+              </nav>
 
               {/* Legal */}
-              <div>
+              <nav aria-label={t('footer.legal')}>
                 <h3 className="text-sm font-semibold text-theme-primary mb-3">{t('footer.legal')}</h3>
                 <ul className="space-y-2">
                   <li><FooterLink href={tenantPath('/legal')}>{t('legal.legal_hub')}</FooterLink></li>
@@ -195,7 +195,7 @@ export function Footer({ children, copyright }: FooterProps) {
                   <li><FooterLink href={tenantPath('/cookies')}>{t('legal.cookie_policy')}</FooterLink></li>
                   <li><FooterLink href={tenantPath('/accessibility')}>{t('legal.accessibility')}</FooterLink></li>
                 </ul>
-              </div>
+              </nav>
             </div>
 
             {/* Dynamic footer pages from admin CMS */}

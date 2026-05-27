@@ -220,7 +220,8 @@
     "price_from": "من {{min}}",
     "price_up_to": "حتى {{max}}",
     "last_days_one": "آخر {{count}} يوم",
-    "last_days_other": "آخر {{count}} أيام"
+    "last_days_other": "آخر {{count}} أيام",
+    "page_heading": "Search Marketplace"
   },
   "seller": {
     "page_title": "ملف البائع",

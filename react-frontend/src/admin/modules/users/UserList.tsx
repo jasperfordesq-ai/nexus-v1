@@ -535,7 +535,7 @@ export function UserList() {
       <Modal isOpen={importOpen} onClose={resetImportModal} size="lg">
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <FileUp size={20} />
+            <FileUp size={20} aria-hidden="true" />
             {t('users.import_title')}
           </ModalHeader>
           <ModalBody>

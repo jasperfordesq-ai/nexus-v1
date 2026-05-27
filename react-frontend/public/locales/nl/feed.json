@@ -610,5 +610,6 @@
     "back": "Terug naar feed",
     "not_found": "Item niet gevonden",
     "load_failed": "Item laden mislukt"
-  }
+  },
+  "controls_region_label": "Feed controls"
 }

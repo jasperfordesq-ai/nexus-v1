@@ -1688,6 +1688,7 @@
     "view_all": "View All"
   },
   "advanced": {
+    "loading": "Loading",
     "404_entry_dismissed": "404 entry dismissed",
     "a_i_settings_saved_successfully": "AI Settings Saved Successfully",
     "active_provider": "Active Provider",
@@ -4207,6 +4208,7 @@
     }
   },
   "national_kiss_dashboard": {
+    "loading": "Loading",
     "meta": {
       "page_title": "Fondation KISS - National Dashboard",
       "title": "Fondation KISS - National Dashboard",
@@ -6034,6 +6036,7 @@
     "filter_all": "All",
     "filter_core": "Core",
     "filter_features": "Features",
+    "filter_modules": "Filter modules",
     "core_modules": "Core Modules",
     "optional_features": "Optional Features",
     "no_modules_match": "No modules match your search",
@@ -13417,6 +13420,7 @@
       "set_password": "Set Password"
     },
     "aria": {
+      "edit_user_form": "Edit user",
       "remove_badge": "Remove badge: {{name}}",
       "toggle_global_super_admin": "Toggle global super admin",
       "toggle_municipal_announcer": "Toggle municipal announcer role",

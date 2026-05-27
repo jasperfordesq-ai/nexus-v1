@@ -610,5 +610,6 @@
     "back": "العودة إلى الخلاصة",
     "not_found": "العنصر غير موجود",
     "load_failed": "فشل في تحميل العنصر"
-  }
+  },
+  "controls_region_label": "Feed controls"
 }

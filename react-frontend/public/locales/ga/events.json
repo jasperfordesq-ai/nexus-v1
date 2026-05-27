@@ -133,7 +133,9 @@
     "join_meeting_aria": "Glac páirt sa chruinniú do {{title}}",
     "join_waitlist_aria": "Téigh ar liosta feithimh an imeachta seo",
     "leave_waitlist_aria": "Fág liosta feithimh an imeachta seo",
-    "tabs_aria": "Event detail sections"
+    "tabs_aria": "Event detail sections",
+    "checkin_progress_chart_aria": "Check-in progress: {{percent}}% of capacity",
+    "cancel_reason_label": "Reason for cancellation"
   },
   "card": {
     "cancelled": "Cealaithe",
@@ -296,5 +298,6 @@
   "active_filters": "Scagairí gníomhacha",
   "active_search": "Cuardaigh: {{query}}",
   "active_near_me": "Laistigh de {{radius}} km",
-  "clear_filters": "Glan na scagairí"
+  "clear_filters": "Glan na scagairí",
+  "loading_more_aria": "Loading more events"
 }

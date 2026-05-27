@@ -983,7 +983,8 @@
     "status_pass": "合格",
     "status_warning": "警告",
     "sync_search_hint_prefix": "走る",
-    "sync_search_hint_suffix": "メイリサーチ開始後。"
+    "sync_search_hint_suffix": "メイリサーチ開始後。",
+    "loading": "Loading"
   },
   "alerts": {
     "pending_approvals": "承認待ち",
@@ -2823,7 +2824,8 @@
     "option_choice_default_visibility_private": "プライベート",
     "option_choice_jobs_default_currency_eur": "ユーロ",
     "option_choice_jobs_default_currency_gbp": "英ポンド",
-    "option_choice_jobs_default_currency_usd": "米ドル"
+    "option_choice_jobs_default_currency_usd": "米ドル",
+    "filter_modules": "Filter modules"
   },
   "content": {
     "about_section": "「概要」セクション",
@@ -9579,7 +9581,8 @@
       "remove_badge": "バッジを削除: {{name}}",
       "toggle_global_super_admin": "グローバルスーパー管理者の切り替え",
       "toggle_municipal_announcer": "市アナウンサーの役割を切り替えます",
-      "toggle_tenant_super_admin": "テナントのスーパー管理者の切り替え"
+      "toggle_tenant_super_admin": "テナントのスーパー管理者の切り替え",
+      "edit_user_form": "Edit user"
     },
     "consents": {
       "consented": "同意済み",
@@ -15156,7 +15159,8 @@
       "hours_axis": "営業時間",
       "title": "全国の 12 か月の傾向",
       "total_hours_all": "合計時間（すべての協同組合）"
-    }
+    },
+    "loading": "Loading"
   },
   "success_stories_admin": {
     "about": {

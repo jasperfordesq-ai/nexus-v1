@@ -343,6 +343,7 @@ export function NotificationsPage() {
           variant={filter === 'all' ? 'solid' : 'flat'}
           className={filter === 'all' ? 'bg-theme-hover text-theme-primary' : 'bg-theme-elevated text-theme-muted'}
           onPress={() => setFilter('all')}
+          aria-pressed={filter === 'all'}
         >
           {t('filter_all')}
         </Button>
@@ -351,25 +352,28 @@ export function NotificationsPage() {
           variant={filter === 'unread' ? 'solid' : 'flat'}
           className={filter === 'unread' ? 'bg-theme-hover text-theme-primary' : 'bg-theme-elevated text-theme-muted'}
           onPress={() => setFilter('unread')}
+          aria-pressed={filter === 'unread'}
         >
           {t('filter_unread', { count: unreadCount })}
         </Button>
       </div>
 
-      {/* Undo delete banner */}
-      {lastDeletedNotification && (
-        <div className="flex items-center justify-between p-3 rounded-xl bg-theme-elevated border border-theme-default text-sm">
-          <span className="text-theme-muted">{t('toast.deleted')}</span>
-          <Button
-            size="sm"
-            variant="flat"
-            className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
-            onPress={handleUndoDelete}
-          >
-            {t('undo')}
-          </Button>
-        </div>
-      )}
+      {/* Undo delete banner — always present in DOM so screen readers hear it when it appears */}
+      <div role="status" aria-live="polite" aria-atomic="true">
+        {lastDeletedNotification && (
+          <div className="flex items-center justify-between p-3 rounded-xl bg-theme-elevated border border-theme-default text-sm">
+            <span className="text-theme-muted">{t('toast.deleted')}</span>
+            <Button
+              size="sm"
+              variant="flat"
+              className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+              onPress={handleUndoDelete}
+            >
+              {t('undo')}
+            </Button>
+          </div>
+        )}
+      </div>
 
       {/* Load Error */}
       {loadError && !isLoading && (

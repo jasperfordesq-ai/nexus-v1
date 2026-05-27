@@ -349,7 +349,7 @@ export function LoginPage() {
                       animate={{ scale: 1 }}
                       className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4"
                     >
-                      <Mail className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
+                      <Mail className="w-8 h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
                     </motion.div>
                     <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">{t('login.title')}</h1>
                     <p className="text-theme-muted mt-2">
@@ -388,7 +388,7 @@ export function LoginPage() {
                               onPress={handleResendVerification}
                               isLoading={isResendingVerification}
                               className="bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20"
-                              startContent={!isResendingVerification ? <Mail className="w-3 h-3" /> : undefined}
+                              startContent={!isResendingVerification ? <Mail className="w-3 h-3" aria-hidden="true" /> : undefined}
                             >
                               {t('login.resend_verification')}
                             </Button>
@@ -397,7 +397,7 @@ export function LoginPage() {
                       )}
                       {loginErrorCode === 'AUTH_PENDING_VERIFICATION' && (
                         <div className="mt-3 flex items-start gap-2">
-                          <ShieldAlert className="w-4 h-4 text-[var(--color-warning)] mt-0.5 flex-shrink-0" />
+                          <ShieldAlert className="w-4 h-4 text-[var(--color-warning)] mt-0.5 flex-shrink-0" aria-hidden="true" />
                           <div>
                             <p className="text-amber-600 dark:text-amber-400 text-xs">
                               {t('login.pending_verification')}
@@ -408,7 +408,7 @@ export function LoginPage() {
                               as={Link}
                               to={tenantPath('/verify-identity')}
                               className="mt-2 bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20"
-                              startContent={<ShieldAlert className="w-3 h-3" />}
+                              startContent={<ShieldAlert className="w-3 h-3" aria-hidden="true" />}
                             >
                               {t('login.continue_verification')}
                             </Button>
@@ -417,7 +417,7 @@ export function LoginPage() {
                       )}
                       {loginErrorCode === 'AUTH_VERIFICATION_FAILED' && (
                         <div className="mt-3 flex items-start gap-2">
-                          <ShieldX className="w-4 h-4 text-[var(--color-error)] mt-0.5 flex-shrink-0" />
+                          <ShieldX className="w-4 h-4 text-[var(--color-error)] mt-0.5 flex-shrink-0" aria-hidden="true" />
                           <div>
                             <p className="text-red-600 dark:text-red-400 text-xs">
                               {t('login.verification_failed')}
@@ -428,7 +428,7 @@ export function LoginPage() {
                               as={Link}
                               to={tenantPath('/verify-identity')}
                               className="mt-2 bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20"
-                              startContent={<ShieldX className="w-3 h-3" />}
+                              startContent={<ShieldX className="w-3 h-3" aria-hidden="true" />}
                             >
                               {t('login.retry_verification')}
                             </Button>
@@ -602,7 +602,7 @@ export function LoginPage() {
                         size="lg"
                         startContent={
                           !biometricLoading ? (
-                            <Fingerprint className="w-5 h-5 text-indigo-500" />
+                            <Fingerprint className="w-5 h-5 text-indigo-500" aria-hidden="true" />
                           ) : undefined
                         }
                         spinner={<Loader2 className="w-4 h-4 animate-spin" />}
@@ -644,7 +644,7 @@ export function LoginPage() {
                       animate={{ scale: 1 }}
                       className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4"
                     >
-                      <Shield className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
+                      <Shield className="w-8 h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
                     </motion.div>
                     <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">
                       {t('login.twofa_title')}
@@ -757,7 +757,7 @@ export function LoginPage() {
               to={tenantPath('/')}
               className="inline-flex items-center gap-2 text-theme-subtle hover:text-theme-secondary text-sm transition-colors"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-4 h-4" aria-hidden="true" />
               {t('login.back_to_home')}
             </Link>
           </motion.div>

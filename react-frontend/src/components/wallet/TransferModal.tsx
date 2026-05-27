@@ -288,9 +288,6 @@ export function TransferModal({
 
               {/* Recipient Search */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-theme-muted">
-                  {t('recipient')} <span className="text-[var(--color-error)]">*</span>
-                </label>
 
                 {formData.recipient ? (
                   // Selected recipient display
@@ -408,12 +405,10 @@ export function TransferModal({
 
               {/* Amount Input */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-theme-muted">
-                  {t('amount_hours')} <span className="text-[var(--color-error)]">*</span>
-                </label>
                 <Input
                   type="number"
                   placeholder="0"
+                  label={t('amount_hours')}
                   aria-label={t('amount_in_hours')}
                   min="0.25"
                   step="0.25"
@@ -444,10 +439,8 @@ export function TransferModal({
 
               {/* Description Input */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-theme-muted">
-                  {t('csv.description')} <span className="text-theme-subtle">({t('optional')})</span>
-                </label>
                 <Textarea
+                  label={t('csv.description')}
                   placeholder={t('description_placeholder')}
                   value={formData.description}
                   onValueChange={(value) =>
@@ -467,12 +460,14 @@ export function TransferModal({
               </div>
 
               {/* Error Message */}
-              {error && (
-                <div className="bg-red-500/20 border border-red-500/40 rounded-lg p-3 flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 text-[var(--color-error)] flex-shrink-0" aria-hidden="true" />
-                  <p className="text-[var(--color-error)] text-sm">{error}</p>
-                </div>
-              )}
+              <div role="alert" aria-live="assertive" aria-atomic="true">
+                {error && (
+                  <div className="bg-red-500/20 border border-red-500/40 rounded-lg p-3 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-[var(--color-error)] flex-shrink-0" aria-hidden="true" />
+                    <p className="text-[var(--color-error)] text-sm">{error}</p>
+                  </div>
+                )}
+              </div>
 
               {/* Transfer Summary */}
               {formData.recipient && parsedAmount > 0 && !isOverBalance && (

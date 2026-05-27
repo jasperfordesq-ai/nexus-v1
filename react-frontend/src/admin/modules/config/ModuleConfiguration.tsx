@@ -168,7 +168,7 @@ export default function ModuleConfiguration() {
           isClearable
           onClear={() => setSearchQuery('')}
         />
-        <ButtonGroup size="sm" variant="tertiary">
+        <ButtonGroup size="sm" variant="tertiary" role="group" aria-label={t('config.filter_modules')}>
           <Button
             color={filterType === 'all' ? 'primary' : 'default'}
             onPress={() => setFilterType('all')}

@@ -220,7 +220,8 @@
     "price_from": "Van {{min}}",
     "price_up_to": "Tot {{max}}",
     "last_days_one": "Laatste {{count}} dag",
-    "last_days_other": "Laatste {{count}} dagen"
+    "last_days_other": "Laatste {{count}} dagen",
+    "page_heading": "Search Marketplace"
   },
   "seller": {
     "page_title": "Verkoper profiel",

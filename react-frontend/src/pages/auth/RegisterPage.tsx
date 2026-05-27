@@ -1045,11 +1045,11 @@ export function RegisterPage() {
                 className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-success/15"
               >
                 {pendingResult.requiresWaitlist ? (
-                  <Users className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
+                  <Users className="w-8 h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
                 ) : pendingResult.requiresVerification ? (
-                  <MailCheck className="w-8 h-8 text-emerald-500 dark:text-emerald-400" />
+                  <MailCheck className="w-8 h-8 text-emerald-500 dark:text-emerald-400" aria-hidden="true" />
                 ) : (
-                  <ShieldCheck className="w-8 h-8 text-emerald-500 dark:text-emerald-400" />
+                  <ShieldCheck className="w-8 h-8 text-emerald-500 dark:text-emerald-400" aria-hidden="true" />
                 )}
               </motion.div>
 

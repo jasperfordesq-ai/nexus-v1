@@ -8,6 +8,7 @@ import {
   Spinner as HeroUISpinner,
   type SpinnerProps as HeroUISpinnerProps,
 } from '@heroui/react';
+import { useTranslation } from 'react-i18next';
 
 type V2SpinnerColor =
   | 'default'
@@ -71,9 +72,12 @@ export function Spinner({
   variant: _variant,
   ...props
 }: SpinnerProps) {
+  const { t } = useTranslation('common');
+  const resolvedAriaLabel = ariaLabel ?? (label ? String(label) : t('loading'));
+
   const spinner = (
     <HeroUISpinner
-      aria-label={ariaLabel ?? (label ? String(label) : undefined)}
+      aria-label={resolvedAriaLabel}
       className={combineClasses(classNames?.wrapper, classNames?.circle1, classNames?.circle2, className)}
       color={mapColor(color)}
       {...props}
@@ -81,11 +85,15 @@ export function Spinner({
   );
 
   if (!label) {
-    return spinner;
+    return (
+      <span role="status">
+        {spinner}
+      </span>
+    );
   }
 
   return (
-    <span className={combineClasses('inline-flex flex-col items-center gap-2', classNames?.base)}>
+    <span role="status" className={combineClasses('inline-flex flex-col items-center gap-2', classNames?.base)}>
       {spinner}
       <span className={combineClasses('text-sm text-current', classNames?.label)} style={{ color: labelColor ? undefined : undefined }}>
         {label}

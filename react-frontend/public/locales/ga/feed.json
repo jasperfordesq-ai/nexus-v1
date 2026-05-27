@@ -610,5 +610,6 @@
     "back": "Ar ais go dtí an Fotha",
     "not_found": "Mír gan fáil",
     "load_failed": "Theip ar mhír a luchtú"
-  }
+  },
+  "controls_region_label": "Feed controls"
 }

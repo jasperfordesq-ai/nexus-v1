@@ -592,11 +592,11 @@ export function MembersPage() {
               {(debouncedQuery || totalCount !== null) && (
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   {debouncedQuery && totalCount !== null ? (
-                    <p className="text-sm text-theme-muted">
+                    <p role="status" className="text-sm text-theme-muted">
                       {t('members.results_matching', { shown: members.length.toLocaleString(), total: totalCount.toLocaleString(), query: debouncedQuery })}
                     </p>
                   ) : (
-                    <p className="text-sm text-theme-muted">
+                    <p role="status" className="text-sm text-theme-muted">
                       {t('members.results_count', { count: members.length })}
                     </p>
                   )}

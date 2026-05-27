@@ -596,7 +596,7 @@ export function ProfilePage() {
                 className="w-24 h-24 sm:w-32 sm:h-32 ring-4 ring-theme-default shadow-lg"
               />
               {hasGamification && profile.level && (
-                <div className="absolute -bottom-2 -right-2 px-2 py-1 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary,var(--color-primary))] text-white text-xs font-bold">
+                <div aria-hidden="true" className="absolute -bottom-2 -right-2 px-2 py-1 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary,var(--color-primary))] text-white text-xs font-bold">
                   {t('level', { level: profile.level })}
                 </div>
               )}
@@ -1011,24 +1011,24 @@ export function ProfilePage() {
                       </div>
                     ))}
                     {profile.skills.length > 8 && !showAllSkills && (
-                      <Chip
-                        variant="flat"
+                      <Button
+                        variant="light"
                         size="sm"
-                        className="bg-theme-elevated text-theme-muted cursor-pointer hover:bg-theme-hover"
-                        onClick={() => setShowAllSkills(true)}
+                        className="bg-theme-elevated text-theme-muted hover:bg-theme-hover h-auto min-h-0 px-2 py-0.5 rounded-full text-xs"
+                        onPress={() => setShowAllSkills(true)}
                       >
                         {t('show_more_skills', { count: profile.skills.length - 8 })}
-                      </Chip>
+                      </Button>
                     )}
                     {showAllSkills && profile.skills.length > 8 && (
-                      <Chip
-                        variant="flat"
+                      <Button
+                        variant="light"
                         size="sm"
-                        className="bg-theme-elevated text-theme-muted cursor-pointer hover:bg-theme-hover"
-                        onClick={() => setShowAllSkills(false)}
+                        className="bg-theme-elevated text-theme-muted hover:bg-theme-hover h-auto min-h-0 px-2 py-0.5 rounded-full text-xs"
+                        onPress={() => setShowAllSkills(false)}
                       >
                         {t('show_less')}
-                      </Chip>
+                      </Button>
                     )}
                   </div>
                 ) : (
@@ -1431,8 +1431,8 @@ function ProfileStatCard({ icon, label, value, color }: ProfileStatCardProps) {
       <div className={`inline-flex p-2 rounded-lg bg-gradient-to-br ${colorClasses[color]} mb-2`}>
         {icon}
       </div>
-      <dd className="text-xl font-bold text-theme-primary">{value}</dd>
       <dt className="text-xs text-theme-subtle">{label}</dt>
+      <dd className="text-xl font-bold text-theme-primary">{value}</dd>
     </GlassCard>
   );
 }

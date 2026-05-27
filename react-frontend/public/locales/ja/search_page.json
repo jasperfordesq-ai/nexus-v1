@@ -86,5 +86,6 @@
   "saved_result_count_other": "({{count}} 件の結果)",
   "listing_image_alt": "Listing image",
   "tabs_aria": "Search result type filter",
-  "results_count_announcement": "{{count}} results found"
+  "results_count_announcement": "{{count}} results found",
+  "form_aria": "Search"
 }

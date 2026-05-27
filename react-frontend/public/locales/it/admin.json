@@ -983,7 +983,8 @@
     "status_pass": "Passaggio",
     "status_warning": "Avvertimento",
     "sync_search_hint_prefix": "Correre",
-    "sync_search_hint_suffix": "dopo l'avvio di Meilisearch."
+    "sync_search_hint_suffix": "dopo l'avvio di Meilisearch.",
+    "loading": "Loading"
   },
   "alerts": {
     "pending_approvals": "Approvazioni in sospeso",
@@ -2823,7 +2824,8 @@
     "option_choice_default_visibility_private": "Privato",
     "option_choice_jobs_default_currency_eur": "euro",
     "option_choice_jobs_default_currency_gbp": "Sterlina inglese",
-    "option_choice_jobs_default_currency_usd": "Dollaro statunitense"
+    "option_choice_jobs_default_currency_usd": "Dollaro statunitense",
+    "filter_modules": "Filter modules"
   },
   "content": {
     "about_section": "Informazioni sulla sezione",
@@ -9579,7 +9581,8 @@
       "remove_badge": "Rimuovi badge: {{name}}",
       "toggle_global_super_admin": "Attiva/disattiva il super amministratore globale",
       "toggle_municipal_announcer": "Attiva/disattiva il ruolo di annunciatore municipale",
-      "toggle_tenant_super_admin": "Attiva/disattiva il super amministratore del tenant"
+      "toggle_tenant_super_admin": "Attiva/disattiva il super amministratore del tenant",
+      "edit_user_form": "Edit user"
     },
     "consents": {
       "consented": "Consentito",
@@ -15156,7 +15159,8 @@
       "hours_axis": "Ore",
       "title": "Andamento nazionale sui 12 mesi",
       "total_hours_all": "Ore totali (tutte le cooperative)"
-    }
+    },
+    "loading": "Loading"
   },
   "success_stories_admin": {
     "about": {

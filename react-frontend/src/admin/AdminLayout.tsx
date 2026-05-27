@@ -64,8 +64,10 @@ function AdminLayoutShell() {
 
       {/* Mobile sidebar overlay */}
       {mobileDrawerOpen && (
-        <div
-          className="fixed inset-0 z-30 bg-black/50 md:hidden"
+        <button
+          type="button"
+          aria-label={t('close_sidebar')}
+          className="fixed inset-0 z-30 w-full cursor-default bg-black/50 md:hidden"
           onClick={() => setMobileDrawerOpen(false)}
         />
       )}

@@ -1133,7 +1133,7 @@ export function EventDetailPage() {
                     </p>
                   </div>
                   <div className="w-16 h-16 relative">
-                    <svg className="w-16 h-16 -rotate-90" viewBox="0 0 64 64">
+                    <svg className="w-16 h-16 -rotate-90" viewBox="0 0 64 64" role="img" aria-label={t('detail.checkin_progress_chart_aria', { percent: checkInPercent })}>
                       <circle
                         cx="32" cy="32" r="28"
                         fill="none"
@@ -1490,6 +1490,7 @@ export function EventDetailPage() {
               {t('detail.cancel_confirm', { title: event.title })}
             </p>
             <Textarea
+              label={t('detail.cancel_reason_label')}
               placeholder={t('detail.cancel_reason_placeholder')}
               value={cancelReason}
               onValueChange={setCancelReason}

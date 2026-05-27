@@ -247,7 +247,7 @@ export function SearchPage() {
 
       {/* Search Form */}
       <GlassCard className="p-4">
-        <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
+        <form onSubmit={handleSearch} aria-label={t('form_aria')} className="flex flex-col sm:flex-row gap-3">
           <Input
             placeholder={t('search_placeholder')}
             value={query}

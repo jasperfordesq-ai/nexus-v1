@@ -285,8 +285,8 @@ export function MarketplaceSearchPage() {
     <div className="space-y-5">
       {/* Category */}
       <div>
-        <label className="text-sm font-medium text-foreground mb-2 block">{t('search.category_label')}</label>
         <Select
+          label={t('search.category_label')}
           placeholder={t('search.all_categories')}
           selectedKeys={categoryId ? [categoryId] : []}
           onSelectionChange={(keys) => {
@@ -331,8 +331,8 @@ export function MarketplaceSearchPage() {
 
       {/* Condition */}
       <div>
-        <label className="text-sm font-medium text-foreground mb-2 block">{t('search.condition_label')}</label>
         <CheckboxGroup
+          label={t('search.condition_label')}
           value={selectedConditions}
           onValueChange={setSelectedConditions}
           size="sm"
@@ -347,8 +347,8 @@ export function MarketplaceSearchPage() {
 
       {/* Seller type */}
       <div>
-        <label className="text-sm font-medium text-foreground mb-2 block">{t('search.seller_type_label')}</label>
         <Select
+          label={t('search.seller_type_label')}
           placeholder={t('search.all_sellers')}
           selectedKeys={sellerType ? [sellerType] : []}
           onSelectionChange={(keys) => {
@@ -364,8 +364,8 @@ export function MarketplaceSearchPage() {
 
       {/* Delivery method */}
       <div>
-        <label className="text-sm font-medium text-foreground mb-2 block">{t('search.delivery_label')}</label>
         <Select
+          label={t('search.delivery_label')}
           placeholder={t('search.any_delivery')}
           selectedKeys={deliveryMethod ? [deliveryMethod] : []}
           onSelectionChange={(keys) => {
@@ -382,8 +382,8 @@ export function MarketplaceSearchPage() {
 
       {/* Posted within */}
       <div>
-        <label className="text-sm font-medium text-foreground mb-2 block">{t('search.posted_within')}</label>
         <Select
+          label={t('search.posted_within')}
           placeholder={t('search.any_time')}
           selectedKeys={postedWithin ? [postedWithin] : []}
           onSelectionChange={(keys) => {
@@ -405,7 +405,7 @@ export function MarketplaceSearchPage() {
 
           fullWidth
           size="sm"
-          startContent={<RotateCcw className="w-3.5 h-3.5" />}
+          startContent={<RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />}
           onPress={resetFilters}
         >
           {t('search.reset_filters', { count: activeFilterCount })}
@@ -422,6 +422,7 @@ export function MarketplaceSearchPage() {
       />
 
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+        <h1 className="sr-only">{t('search.page_heading')}</h1>
         {/* Header */}
         <div className="space-y-4">
           <div className="flex items-center gap-3">
@@ -472,7 +473,7 @@ export function MarketplaceSearchPage() {
               variant="secondary"
               size="lg"
               className="w-full shrink-0 sm:w-auto lg:hidden"
-              startContent={<SlidersHorizontal className="w-4 h-4" />}
+              startContent={<SlidersHorizontal className="w-4 h-4" aria-hidden="true" />}
               onPress={() => setShowFilters(!showFilters)}
             >
               {t('search.filters')}
