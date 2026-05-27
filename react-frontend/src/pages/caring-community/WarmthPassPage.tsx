@@ -121,7 +121,7 @@ export function WarmthPassPage() {
 
         {/* Loading skeleton */}
         {isLoading && (
-          <GlassCard role="status" aria-busy="true" className="space-y-4 p-6">
+          <GlassCard role="status" aria-busy="true" aria-label={t('loading')} className="space-y-4 p-6">
             <Skeleton className="h-6 w-1/3 rounded-lg" />
             <Skeleton className="h-4 w-2/3 rounded-lg" />
             <Skeleton className="h-32 w-full rounded-xl" />

@@ -63,6 +63,7 @@ function formatValue(v: number | null, unit: string): string {
 
 export function SuccessStoriesPage() {
   const { t } = useTranslation('success_stories');
+  const { t: tCommon } = useTranslation('common');
   const { hasFeature, tenantPath } = useTenant();
   const navigate = useNavigate();
   usePageTitle(t('page_title'));
@@ -104,7 +105,7 @@ export function SuccessStoriesPage() {
 
         {/* Loading */}
         {isLoading && (
-          <div role="status" aria-busy="true" className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div role="status" aria-busy="true" aria-label={tCommon('loading')} className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {[0, 1, 2].map((i) => (
               <GlassCard key={i} className="space-y-3 p-5">
                 <Skeleton className="h-5 w-2/3 rounded-lg" />

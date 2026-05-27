@@ -115,6 +115,7 @@ export function VideoPlayer({ media, className = '' }: VideoPlayerProps) {
       <div
         className={`relative overflow-hidden rounded-xl bg-theme-elevated border border-theme-default flex flex-col items-center justify-center py-10 px-4 text-center ${className}`}
         role="status"
+        aria-label={t('video.unavailable')}
       >
         <VideoOff className="w-8 h-8 text-theme-muted mb-2" aria-hidden="true" />
         <p className="text-sm font-medium text-theme-primary">{t('video.unavailable')}</p>

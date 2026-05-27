@@ -129,7 +129,7 @@ export function LoyaltyHistoryPage() {
       </p>
 
       {loading && (
-        <div role="status" aria-busy="true" className="space-y-3">
+        <div role="status" aria-busy="true" aria-label={t('loading')} className="space-y-3">
           {[1, 2, 3].map((i) => (
             <Skeleton key={i} className="h-20 w-full rounded-xl" />
           ))}

@@ -108,7 +108,7 @@ export function VerifyEmailPage() {
           className="w-full max-w-md"
         >
           <GlassCard className="p-8 text-center">
-            <div role="status" className="w-16 h-16 mx-auto mb-6 rounded-full bg-indigo-500/20 flex items-center justify-center">
+            <div role="status" aria-busy="true" aria-label={t('verify_email.loading_title')} className="w-16 h-16 mx-auto mb-6 rounded-full bg-indigo-500/20 flex items-center justify-center">
               <Loader2 aria-hidden="true" className="w-8 h-8 text-indigo-400 animate-spin" />
             </div>
             <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('verify_email.loading_title')}</h1>

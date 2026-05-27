@@ -611,5 +611,6 @@
     "not_found": "Nie znaleziono elementu",
     "load_failed": "Nie udało się załadować elementu"
   },
-  "controls_region_label": "Feed controls"
+  "controls_region_label": "Feed controls",
+  "new_posts_available": "New posts available"
 }

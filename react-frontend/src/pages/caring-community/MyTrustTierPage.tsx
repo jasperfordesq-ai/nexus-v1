@@ -154,7 +154,7 @@ export function MyTrustTierPage() {
 
         {/* Loading skeleton */}
         {isLoading && (
-          <GlassCard role="status" aria-busy="true" className="p-6 space-y-4">
+          <GlassCard role="status" aria-busy="true" aria-label={t('loading')} className="p-6 space-y-4">
             <Skeleton className="h-6 w-1/3 rounded-lg" />
             <Skeleton className="h-4 w-2/3 rounded-lg" />
             <Skeleton className="h-3 w-full rounded-lg" />

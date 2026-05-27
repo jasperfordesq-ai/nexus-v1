@@ -1059,6 +1059,7 @@ export function FeedPage() {
             className="fixed top-20 left-1/2 -translate-x-1/2 z-50"
             role="status"
             aria-live="polite"
+            aria-label={t('new_posts_available')}
           >
             <Chip
               as="button"

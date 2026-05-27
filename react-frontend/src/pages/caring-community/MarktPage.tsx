@@ -408,6 +408,7 @@ export function MarktPage() {
             role="status"
             className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
             aria-busy="true"
+            aria-label={t('loading')}
           >
             {Array.from({ length: 8 }, (_, i) => (
               <MarktCardSkeleton key={i} />

@@ -31,6 +31,7 @@ export function LoadingScreen({ message }: LoadingScreenProps) {
       role="status"
       aria-live="polite"
       aria-busy="true"
+      aria-label={displayMessage}
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}

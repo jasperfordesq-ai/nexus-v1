@@ -86,14 +86,14 @@ export function Spinner({
 
   if (!label) {
     return (
-      <span role="status">
+      <span role="status" aria-label={resolvedAriaLabel}>
         {spinner}
       </span>
     );
   }
 
   return (
-    <span role="status" className={combineClasses('inline-flex flex-col items-center gap-2', classNames?.base)}>
+    <span role="status" aria-label={resolvedAriaLabel} className={combineClasses('inline-flex flex-col items-center gap-2', classNames?.base)}>
       {spinner}
       <span className={combineClasses('text-sm text-current', classNames?.label)} style={{ color: labelColor ? undefined : undefined }}>
         {label}
