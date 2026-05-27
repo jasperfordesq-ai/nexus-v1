@@ -31,6 +31,9 @@ interface MenuItem {
 
 const MY_SPACE: MenuItem[] = [
   { labelKey: 'myProfile', descriptionKey: 'navDescriptions.myProfile', icon: 'person-outline', route: '/(modals)/member-profile', tone: '#3b82f6' },
+  { labelKey: 'wallet', descriptionKey: 'navDescriptions.wallet', icon: 'wallet-outline', route: '/(modals)/wallet', tone: '#f59e0b' },
+  { labelKey: 'messages', descriptionKey: 'navDescriptions.messages', icon: 'chatbubble-outline', route: '/(tabs)/messages', tone: '#0ea5e9' },
+  { labelKey: 'notifications', descriptionKey: 'navDescriptions.notifications', icon: 'notifications-outline', route: '/(modals)/notifications', tone: '#ef4444' },
   { labelKey: 'achievements', descriptionKey: 'navDescriptions.achievements', icon: 'trophy-outline', route: '/(modals)/gamification', tone: '#f59e0b' },
   { labelKey: 'myGoals', descriptionKey: 'navDescriptions.myGoals', icon: 'flag-outline', route: '/(modals)/goals', tone: '#8b5cf6' },
   { labelKey: 'groups', descriptionKey: 'navDescriptions.groups', icon: 'people-outline', route: '/(modals)/groups', tone: '#06b6d4' },
@@ -38,6 +41,7 @@ const MY_SPACE: MenuItem[] = [
 
 const DISCOVER: MenuItem[] = [
   { labelKey: 'search', descriptionKey: 'navDescriptions.search', icon: 'search-outline', route: '/(modals)/search', tone: '#64748b' },
+  { labelKey: 'listings', descriptionKey: 'navDescriptions.listings', icon: 'storefront-outline', route: '/(tabs)/exchanges', tone: '#0f766e' },
   { labelKey: 'jobs', descriptionKey: 'navDescriptions.jobs', icon: 'briefcase-outline', route: '/(modals)/jobs', tone: '#2563eb', featureGate: 'job_vacancies' },
   { labelKey: 'events', descriptionKey: 'navDescriptions.events', icon: 'calendar-outline', route: '/(tabs)/events', tone: '#f43f5e' },
   { labelKey: 'browseMembers', descriptionKey: 'navDescriptions.browseMembers', icon: 'people-outline', route: '/(modals)/members', tone: '#14b8a6' },

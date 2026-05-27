@@ -25,6 +25,10 @@ jest.mock('react-i18next', () => ({
         'editProfile': 'Edit profile',
         'browseMembers': 'Browse Members',
         'settings': 'Settings',
+        'wallet': 'Wallet',
+        'messages': 'Messages',
+        'notifications': 'Notifications',
+        'listings': 'Listings',
         'signOut': 'Sign out',
         'signOutConfirmTitle': 'Sign out',
         'signOutConfirmMessage': 'Are you sure you want to sign out?',
@@ -51,10 +55,14 @@ jest.mock('react-i18next', () => ({
         'quickStats.active': 'Active',
         'quickStats.ready': 'Ready',
         'navDescriptions.myProfile': 'View your public profile and federation visibility.',
+        'navDescriptions.wallet': 'Review your balance, transactions, and time credit history.',
+        'navDescriptions.messages': 'Open conversations and federation messages.',
+        'navDescriptions.notifications': 'Review recent alerts and mark updates as read.',
         'navDescriptions.achievements': 'Badges, levels, streaks, and community progress.',
         'navDescriptions.myGoals': 'Track personal goals and timebank milestones.',
         'navDescriptions.groups': 'Your community spaces and group conversations.',
         'navDescriptions.search': 'Search listings, members, events, groups, and posts.',
+        'navDescriptions.listings': 'Browse offers, requests, and timebank exchanges.',
         'navDescriptions.jobs': 'Browse job vacancies, applications, and your own postings.',
         'navDescriptions.events': 'Browse workshops, meetups, and community gatherings.',
         'navDescriptions.browseMembers': 'Find neighbours by name, profile, or shared interests.',
@@ -159,6 +167,9 @@ describe('MoreScreen (More tab)', () => {
     const { getByText } = render(<MoreScreen />);
     expect(getByText('My Space')).toBeTruthy();
     expect(getByText('My Profile')).toBeTruthy();
+    expect(getByText('Wallet')).toBeTruthy();
+    expect(getByText('Messages')).toBeTruthy();
+    expect(getByText('Notifications')).toBeTruthy();
     expect(getByText('Achievements')).toBeTruthy();
     expect(getByText('My Goals')).toBeTruthy();
     expect(getByText('Groups')).toBeTruthy();
@@ -168,6 +179,7 @@ describe('MoreScreen (More tab)', () => {
     const { getByText } = render(<MoreScreen />);
     expect(getByText('Discover')).toBeTruthy();
     expect(getByText('Search')).toBeTruthy();
+    expect(getByText('Listings')).toBeTruthy();
     expect(getByText('Jobs')).toBeTruthy();
     expect(getByText('Events')).toBeTruthy();
     expect(getByText('Browse Members')).toBeTruthy();
