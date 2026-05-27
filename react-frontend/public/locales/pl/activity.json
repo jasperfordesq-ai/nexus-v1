@@ -24,7 +24,8 @@
     "given": "Oddane",
     "received": "Otrzymane",
     "monthly_activity": "Miesięczna Aktywność",
-    "no_data": "Brak dostępnych danych do wykresu"
+    "no_data": "Brak dostępnych danych do wykresu",
+    "monthly_activity_aria": "Bar chart showing monthly hours given and received"
   },
   "recent_activity": "Ostatnia Aktywność",
   "empty_title": "Brak ostatniej aktywności",

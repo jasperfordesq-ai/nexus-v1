@@ -51,7 +51,8 @@
     "empty_filtered": "لا توجد تحديات تتطابق مع الفلتر المحدد.",
     "create": "إنشاء تحدي",
     "load_error": "غير قادر على تحميل التحديات",
-    "load_more": "تحميل المزيد"
+    "load_more": "تحميل المزيد",
+    "loading": "Loading challenge..."
   },
   "ideas": {
     "title": "الأفكار",
@@ -83,7 +84,8 @@
     "draft_updated": "تم تحديث {{date}}",
     "draft_created": "تم إنشاء {{date}}",
     "new_idea": "فكرة جديدة",
-    "sort_label": "ترتيب الأفكار"
+    "sort_label": "ترتيب الأفكار",
+    "loading": "Loading ideas..."
   },
   "idea_detail": {
     "page_title": "تفاصيل الفكرة",
@@ -101,7 +103,9 @@
     "delete": "حذف",
     "delete_confirm": "هل أنت متأكد أنك تريد حذف هذا التعليق؟",
     "load_more": "تحميل المزيد من التعليقات",
-    "load_error": "غير قادر على تحميل التعليقات"
+    "load_error": "غير قادر على تحميل التعليقات",
+    "add_label": "Add a comment",
+    "loading": "Loading comments..."
   },
   "form": {
     "title_label": "العنوان",

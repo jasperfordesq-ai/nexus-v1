@@ -984,7 +984,8 @@
     "status_warning": "Waarschuwing",
     "sync_search_hint_prefix": "Loop",
     "sync_search_hint_suffix": "nadat Meilisearch is gestart.",
-    "loading": "Loading"
+    "loading": "Loading",
+    "health_loading": "Loading algorithm health..."
   },
   "alerts": {
     "pending_approvals": "In afwachting van goedkeuringen",

@@ -671,7 +671,7 @@ export function ChallengeDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-12">
+      <div className="flex justify-center py-12" role="status" aria-label={t('challenges.loading')} aria-busy="true">
         <Spinner size="lg" />
       </div>
     );
@@ -941,28 +941,28 @@ export function ChallengeDetailPage() {
         {/* Meta info */}
         <div className="flex flex-wrap items-center gap-4 text-sm text-[var(--color-text-tertiary)]">
           <span className="flex items-center gap-1.5">
-            <Eye className="w-4 h-4" />
+            <Eye className="w-4 h-4" aria-hidden="true" />
             {challenge.views_count} {t('views')}
           </span>
           <span className="flex items-center gap-1.5">
-            <Heart className="w-4 h-4" />
+            <Heart className="w-4 h-4" aria-hidden="true" />
             {challenge.favorites_count}
           </span>
           {challenge.submission_deadline && (
             <span className="flex items-center gap-1.5">
-              <Calendar className="w-4 h-4" />
+              <Calendar className="w-4 h-4" aria-hidden="true" />
               {t('challenge.submission_deadline', { date: formatDate(challenge.submission_deadline) })}
             </span>
           )}
           {challenge.voting_deadline && (
             <span className="flex items-center gap-1.5">
-              <Calendar className="w-4 h-4" />
+              <Calendar className="w-4 h-4" aria-hidden="true" />
               {t('challenge.voting_deadline', { date: formatDate(challenge.voting_deadline) })}
             </span>
           )}
           {challenge.max_ideas_per_user && (
             <span className="flex items-center gap-1.5">
-              <Lightbulb className="w-4 h-4" />
+              <Lightbulb className="w-4 h-4" aria-hidden="true" />
               {t('challenge.max_ideas', { count: challenge.max_ideas_per_user })}
             </span>
           )}
@@ -1112,7 +1112,7 @@ export function ChallengeDetailPage() {
 
       {/* Ideas Loading */}
       {isLoadingIdeas && (
-        <div className="flex justify-center py-8">
+        <div className="flex justify-center py-8" role="status" aria-label={t('ideas.loading')} aria-busy="true">
           <Spinner size="md" />
         </div>
       )}
@@ -1229,7 +1229,7 @@ export function ChallengeDetailPage() {
                                 key={m.id}
                                 className="w-16 h-16 rounded-lg border border-[var(--color-border)] flex items-center justify-center bg-[var(--color-surface-hover)]"
                               >
-                                <MIcon className="w-5 h-5 text-[var(--color-text-tertiary)]" />
+                                <MIcon className="w-5 h-5 text-[var(--color-text-tertiary)]" aria-hidden="true" />
                               </div>
                             );
                           })}
@@ -1255,12 +1255,12 @@ export function ChallengeDetailPage() {
                         {idea.creator.name}
                       </span>
                       <span className="flex items-center gap-1">
-                        <MessageCircle className="w-3.5 h-3.5" />
+                        <MessageCircle className="w-3.5 h-3.5" aria-hidden="true" />
                         {t('ideas.comments', { count: idea.comments_count })}
                       </span>
                       {MediaIconComponent && (
                         <span className="flex items-center gap-1">
-                          <MediaIconComponent className="w-3.5 h-3.5" />
+                          <MediaIconComponent className="w-3.5 h-3.5" aria-hidden="true" />
                           {idea.media?.length}
                         </span>
                       )}

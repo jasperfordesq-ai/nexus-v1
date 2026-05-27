@@ -130,12 +130,14 @@ export function GoalDetailPage() {
       <div className="space-y-6">
         <PageMeta title={t('page_meta.goals.title')} noIndex />
         {backButton}
-        <GlassCard className="p-6 space-y-4">
-          <Skeleton className="h-7 rounded-lg w-1/2" />
-          <Skeleton className="h-3 rounded-lg w-full" />
-          <Skeleton className="h-2 rounded-lg w-full" />
-          <Skeleton className="h-3 rounded-lg w-1/3" />
-        </GlassCard>
+        <div role="status" aria-label={t('goals.loading')} aria-busy="true">
+          <GlassCard className="p-6 space-y-4">
+            <Skeleton className="h-7 rounded-lg w-1/2" />
+            <Skeleton className="h-3 rounded-lg w-full" />
+            <Skeleton className="h-2 rounded-lg w-full" />
+            <Skeleton className="h-3 rounded-lg w-1/3" />
+          </GlassCard>
+        </div>
       </div>
     );
   }
@@ -173,7 +175,7 @@ export function GoalDetailPage() {
       <div className="space-y-6">
         <PageMeta title={t('page_meta.goals.title')} noIndex />
         {backButton}
-        <GlassCard className="p-8 text-center">
+        <GlassCard className="p-8 text-center" role="alert">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('goals.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error ?? t('goals.load_error')}</p>
@@ -222,19 +224,19 @@ export function GoalDetailPage() {
           </h1>
           <div className="flex items-center gap-2 flex-wrap">
             {isCompleted ? (
-              <Chip size="sm" color="success" variant="flat" startContent={<CheckCircle className="w-3 h-3" />}>
+              <Chip size="sm" color="success" variant="flat" startContent={<CheckCircle className="w-3 h-3" aria-hidden="true" />}>
                 {t('goals.status.completed')}
               </Chip>
             ) : (
               <Chip size="sm" color="primary" variant="flat">{t('goals.status.active')}</Chip>
             )}
             {goal.is_public ? (
-              <Chip size="sm" variant="flat" className="text-theme-subtle" startContent={<Globe className="w-3 h-3" />}>
+              <Chip size="sm" variant="flat" className="text-theme-subtle" startContent={<Globe className="w-3 h-3" aria-hidden="true" />}>
                 {t('goals.visibility.public')}
               </Chip>
             ) : (
               showPrivateFields && (
-                <Chip size="sm" variant="flat" className="text-theme-subtle" startContent={<Lock className="w-3 h-3" />}>
+                <Chip size="sm" variant="flat" className="text-theme-subtle" startContent={<Lock className="w-3 h-3" aria-hidden="true" />}>
                   {t('goals.visibility.private')}
                 </Chip>
               )

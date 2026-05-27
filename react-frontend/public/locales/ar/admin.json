@@ -984,7 +984,8 @@
     "status_warning": "تحذير",
     "sync_search_hint_prefix": "يجري",
     "sync_search_hint_suffix": "بعد بدء Meilisearch.",
-    "loading": "Loading"
+    "loading": "Loading",
+    "health_loading": "Loading algorithm health..."
   },
   "alerts": {
     "pending_approvals": "الموافقات المعلقة",

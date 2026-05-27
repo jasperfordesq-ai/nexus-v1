@@ -24,7 +24,8 @@
     "given": "提供済み",
     "received": "受け取り済み",
     "monthly_activity": "月間アクティビティ",
-    "no_data": "チャートデータは利用できません"
+    "no_data": "チャートデータは利用できません",
+    "monthly_activity_aria": "Bar chart showing monthly hours given and received"
   },
   "recent_activity": "最近のアクティビティ",
   "empty_title": "最近のアクティビティはありません",

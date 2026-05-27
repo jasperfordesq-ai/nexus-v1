@@ -51,7 +51,8 @@
     "empty_filtered": "Brak wyzwań pasujących do wybranego filtra.",
     "create": "Utwórz Wyzwanie",
     "load_error": "Nie można załadować wyzwań",
-    "load_more": "Załaduj Więcej"
+    "load_more": "Załaduj Więcej",
+    "loading": "Loading challenge..."
   },
   "ideas": {
     "title": "Pomysły",
@@ -83,7 +84,8 @@
     "draft_updated": "Zaktualizowano {{date}}",
     "draft_created": "Utworzono {{date}}",
     "new_idea": "Nowy Pomysł",
-    "sort_label": "Sortuj pomysły"
+    "sort_label": "Sortuj pomysły",
+    "loading": "Loading ideas..."
   },
   "idea_detail": {
     "page_title": "Szczegóły Pomysłu",
@@ -101,7 +103,9 @@
     "delete": "Usuń",
     "delete_confirm": "Czy na pewno chcesz usunąć ten komentarz?",
     "load_more": "Załaduj Więcej Komentarzy",
-    "load_error": "Nie można załadować komentarzy"
+    "load_error": "Nie można załadować komentarzy",
+    "add_label": "Add a comment",
+    "loading": "Loading comments..."
   },
   "form": {
     "title_label": "Tytuł",

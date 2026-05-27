@@ -24,7 +24,8 @@
     "given": "Gegeven",
     "received": "Ontvangen",
     "monthly_activity": "Maandelijkse Activiteit",
-    "no_data": "Geen grafiekgegevens beschikbaar"
+    "no_data": "Geen grafiekgegevens beschikbaar",
+    "monthly_activity_aria": "Bar chart showing monthly hours given and received"
   },
   "recent_activity": "Recente Activiteit",
   "empty_title": "Geen recente activiteit",

@@ -984,7 +984,8 @@
     "status_warning": "Avertissement",
     "sync_search_hint_prefix": "Courir",
     "sync_search_hint_suffix": "après le démarrage de Meilisearch.",
-    "loading": "Loading"
+    "loading": "Loading",
+    "health_loading": "Loading algorithm health..."
   },
   "alerts": {
     "pending_approvals": "Approbations en attente",

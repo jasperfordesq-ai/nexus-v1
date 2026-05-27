@@ -51,7 +51,8 @@
     "empty_filtered": "Geen uitdagingen passen bij de geselecteerde filter.",
     "create": "Uitdaging maken",
     "load_error": "Kan uitdagingen niet laden",
-    "load_more": "Meer laden"
+    "load_more": "Meer laden",
+    "loading": "Loading challenge..."
   },
   "ideas": {
     "title": "Ideeën",
@@ -83,7 +84,8 @@
     "draft_updated": "Bijgewerkt {{date}}",
     "draft_created": "Aangemaakt {{date}}",
     "new_idea": "Nieuw Idee",
-    "sort_label": "Ideeën sorteren"
+    "sort_label": "Ideeën sorteren",
+    "loading": "Loading ideas..."
   },
   "idea_detail": {
     "page_title": "Idee Details",
@@ -101,7 +103,9 @@
     "delete": "Verwijderen",
     "delete_confirm": "Weet je zeker dat je deze reactie wilt verwijderen?",
     "load_more": "Laad Meer Reacties",
-    "load_error": "Kan reacties niet laden"
+    "load_error": "Kan reacties niet laden",
+    "add_label": "Add a comment",
+    "loading": "Loading comments..."
   },
   "form": {
     "title_label": "Titel",

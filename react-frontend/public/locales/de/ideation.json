@@ -51,7 +51,8 @@
     "empty_filtered": "Keine Wettbewerbe entsprechen dem ausgewählten Filter.",
     "create": "Wettbewerb erstellen",
     "load_error": "Wettbewerbe konnten nicht geladen werden",
-    "load_more": "Mehr laden"
+    "load_more": "Mehr laden",
+    "loading": "Loading challenge..."
   },
   "ideas": {
     "title": "Ideen",
@@ -83,7 +84,8 @@
     "draft_updated": "Aktualisiert {{date}}",
     "draft_created": "Erstellt {{date}}",
     "new_idea": "Neue Idee",
-    "sort_label": "Ideen sortieren"
+    "sort_label": "Ideen sortieren",
+    "loading": "Loading ideas..."
   },
   "idea_detail": {
     "page_title": "Ideendetails",
@@ -101,7 +103,9 @@
     "delete": "Löschen",
     "delete_confirm": "Möchten Sie diesen Kommentar wirklich löschen?",
     "load_more": "Mehr Kommentare laden",
-    "load_error": "Kommentare konnten nicht geladen werden"
+    "load_error": "Kommentare konnten nicht geladen werden",
+    "add_label": "Add a comment",
+    "loading": "Loading comments..."
   },
   "form": {
     "title_label": "Titel",

@@ -246,7 +246,7 @@ export function AlgorithmSettings() {
 
   if (loading) {
     return (
-      <div className="flex h-64 items-center justify-center">
+      <div className="flex h-64 items-center justify-center" role="status" aria-label={t('loading')} aria-busy="true">
         <Spinner size="lg" />
       </div>
     );
@@ -266,7 +266,7 @@ export function AlgorithmSettings() {
           <Card key={areaData.area} >
             <CardHeader className="flex flex-col items-start justify-between gap-4 sm:flex-row">
               <div className="flex items-center gap-3">
-                <Cpu size={20} className="text-accent shrink-0" />
+                <Cpu size={20} className="text-accent shrink-0" aria-hidden="true" />
                 <div>
                   <h3 className="text-base font-semibold">{t(areaData.labelKey)}</h3>
                   <p className="text-sm text-foreground-500">{t(areaData.descriptionKey)}</p>
@@ -313,7 +313,7 @@ export function AlgorithmSettings() {
                 <div className="flex justify-end">
                   <Button
                     size="sm"
-                    startContent={<Save size={14} />}
+                    startContent={<Save size={14} aria-hidden="true" />}
                     onPress={() => handleSave(areaData)}
                     isLoading={saving === areaData.area}
                     isDisabled={saving === areaData.area}
@@ -332,7 +332,7 @@ export function AlgorithmSettings() {
                 <div className="flex justify-end mt-3">
                   <Button
                     size="sm"
-                    startContent={<Save size={14} />}
+                    startContent={<Save size={14} aria-hidden="true" />}
                     onPress={() => handleSave(areaData)}
                     isLoading={saving === areaData.area}
                     isDisabled={saving === areaData.area}
@@ -349,7 +349,7 @@ export function AlgorithmSettings() {
         <Card >
           <CardHeader className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Activity size={20} className="text-accent" />
+              <Activity size={20} className="text-accent" aria-hidden="true" />
               <div>
                 <h3 className="text-base font-semibold">{t('algorithm_health_title')}</h3>
                 <p className="text-sm text-foreground-500">
@@ -360,7 +360,7 @@ export function AlgorithmSettings() {
             <Button
               size="sm"
               variant="tertiary"
-              startContent={<RefreshCw size={14} className={healthLoading ? 'animate-spin' : ''} />}
+              startContent={<RefreshCw size={14} className={healthLoading ? 'animate-spin' : ''} aria-hidden="true" />}
               onPress={loadHealth}
               isDisabled={healthLoading}
             >
@@ -370,7 +370,7 @@ export function AlgorithmSettings() {
 
           <CardBody className="gap-4">
             {healthLoading && !health && (
-              <div className="flex justify-center py-4"><Spinner size="sm" /></div>
+              <div className="flex justify-center py-4" role="status" aria-label={t('health_loading')} aria-busy="true"><Spinner size="sm" /></div>
             )}
 
             {health && (
@@ -378,7 +378,7 @@ export function AlgorithmSettings() {
                 {/* FULLTEXT */}
                 <div>
                   <p className="text-sm font-semibold mb-2 flex items-center gap-2">
-                    <Database size={14} /> {t('fulltext_indexes_title')}
+                    <Database size={14} aria-hidden="true" /> {t('fulltext_indexes_title')}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {([
@@ -391,7 +391,7 @@ export function AlgorithmSettings() {
                         size="sm"
                         color={ok ? 'success' : 'danger'}
                         variant="soft"
-                        startContent={ok ? <CheckCircle size={12} /> : <XCircle size={12} />}
+                        startContent={ok ? <CheckCircle size={12} aria-hidden="true" /> : <XCircle size={12} aria-hidden="true" />}
                       >
                         {table}
                       </Chip>
@@ -409,7 +409,7 @@ export function AlgorithmSettings() {
                 {/* Collaborative Filtering */}
                 <div>
                   <p className="text-sm font-semibold mb-2 flex items-center gap-2">
-                    <Settings size={14} /> {t('collaborative_filtering_title')}
+                    <Settings size={14} aria-hidden="true" /> {t('collaborative_filtering_title')}
                   </p>
                   <div className="flex flex-wrap gap-3 text-sm">
                     <span>
@@ -433,7 +433,7 @@ export function AlgorithmSettings() {
                 {/* Embeddings */}
                 <div>
                   <p className="text-sm font-semibold mb-2 flex items-center gap-2">
-                    <Cpu size={14} /> {t('semantic_embeddings_title')}
+                    <Cpu size={14} aria-hidden="true" /> {t('semantic_embeddings_title')}
                   </p>
                   <div className="flex flex-wrap gap-3 text-sm">
                     <span>
@@ -464,14 +464,14 @@ export function AlgorithmSettings() {
                     <Separator />
                     <div>
                       <p className="text-sm font-semibold mb-2 flex items-center gap-2">
-                        <Search size={14} /> {t('search_engine_title')}
+                        <Search size={14} aria-hidden="true" /> {t('search_engine_title')}
                       </p>
                       <div className="flex flex-wrap gap-2">
                         <Chip
                           size="sm"
                           color={health.search.meilisearch_available ? 'success' : 'warning'}
                           variant="soft"
-                          startContent={health.search.meilisearch_available ? <CheckCircle size={12} /> : <XCircle size={12} />}
+                          startContent={health.search.meilisearch_available ? <CheckCircle size={12} aria-hidden="true" /> : <XCircle size={12} aria-hidden="true" />}
                         >
                           {health.search.meilisearch_available ? t('meilisearch_online') : t('meilisearch_offline')}
                         </Chip>

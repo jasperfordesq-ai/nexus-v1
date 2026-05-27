@@ -984,7 +984,8 @@
     "status_warning": "警告",
     "sync_search_hint_prefix": "走る",
     "sync_search_hint_suffix": "メイリサーチ開始後。",
-    "loading": "Loading"
+    "loading": "Loading",
+    "health_loading": "Loading algorithm health..."
   },
   "alerts": {
     "pending_approvals": "承認待ち",

@@ -24,7 +24,8 @@
     "given": "Dadas",
     "received": "Recibidas",
     "monthly_activity": "Actividad Mensual",
-    "no_data": "No hay datos de gráfico disponibles"
+    "no_data": "No hay datos de gráfico disponibles",
+    "monthly_activity_aria": "Bar chart showing monthly hours given and received"
   },
   "recent_activity": "Actividad Reciente",
   "empty_title": "Sin actividad reciente",

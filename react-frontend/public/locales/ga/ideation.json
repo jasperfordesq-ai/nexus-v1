@@ -50,7 +50,8 @@
     "empty_filtered": "Nil aon dushshlan ag freagairt don scagaire roghnaithe.",
     "create": "Cruthaigh Dushshlan",
     "load_error": "Ni feidir dushshlain a luchtú",
-    "load_more": "Luchtaigh Tuilleadh"
+    "load_more": "Luchtaigh Tuilleadh",
+    "loading": "Loading challenge..."
   },
   "ideas": {
     "title": "Smaointe",
@@ -82,7 +83,8 @@
     "draft_updated": "Nuashonraithe {{date}}",
     "draft_created": "Cruthaithe {{date}}",
     "new_idea": "Smaoineamh Nua",
-    "sort_label": "Sórtáil smaointe"
+    "sort_label": "Sórtáil smaointe",
+    "loading": "Loading ideas..."
   },
   "idea_detail": {
     "page_title": "Sonrai an Smaoineamh",
@@ -100,7 +102,9 @@
     "delete": "Scrios",
     "delete_confirm": "An bhfuil tu cinnte gur mhaith leat an tracht seo a scriosadh?",
     "load_more": "Luchtaigh Tuilleadh Trachtanna",
-    "load_error": "Ni feidir trachtanna a luchtú"
+    "load_error": "Ni feidir trachtanna a luchtú",
+    "add_label": "Add a comment",
+    "loading": "Loading comments..."
   },
   "form": {
     "title_label": "Teideal",

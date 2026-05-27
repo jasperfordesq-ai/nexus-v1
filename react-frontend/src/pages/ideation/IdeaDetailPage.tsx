@@ -339,7 +339,7 @@ export function IdeaDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-12">
+      <div className="flex justify-center py-12" role="status" aria-label={t('ideas.loading')} aria-busy="true">
         <Spinner size="lg" />
       </div>
     );
@@ -537,6 +537,7 @@ export function IdeaDetailPage() {
             />
             <div className="flex-1">
               <Textarea
+                label={t('comments.add_label')}
                 placeholder={t('comments.add_placeholder')}
                 value={newComment}
                 onValueChange={setNewComment}
@@ -563,7 +564,7 @@ export function IdeaDetailPage() {
 
       {/* Comments Loading */}
       {isLoadingComments && (
-        <div className="flex justify-center py-8">
+        <div className="flex justify-center py-8" role="status" aria-label={t('comments.loading')} aria-busy="true">
           <Spinner size="md" />
         </div>
       )}

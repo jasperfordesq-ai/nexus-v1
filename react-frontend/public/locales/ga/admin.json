@@ -984,7 +984,8 @@
     "status_warning": "Rabhadh",
     "sync_search_hint_prefix": "Rith",
     "sync_search_hint_suffix": "tar éis tosú Meilisearch.",
-    "loading": "Loading"
+    "loading": "Loading",
+    "health_loading": "Loading algorithm health..."
   },
   "alerts": {
     "pending_approvals": "Ceaduithe ar Feitheamh",

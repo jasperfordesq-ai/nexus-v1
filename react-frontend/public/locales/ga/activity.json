@@ -24,7 +24,8 @@
     "given": "Tugtha",
     "received": "Faighte",
     "monthly_activity": "Gníomhaíocht Mhíosúil",
-    "no_data": "Níl sonraí chairte ar fáil"
+    "no_data": "Níl sonraí chairte ar fáil",
+    "monthly_activity_aria": "Bar chart showing monthly hours given and received"
   },
   "recent_activity": "Gníomhaíocht Le Déanaí",
   "empty_title": "Níl gníomhaíocht le déanaí",

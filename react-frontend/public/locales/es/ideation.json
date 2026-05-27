@@ -51,7 +51,8 @@
     "empty_filtered": "Ningún reto coincide con el filtro seleccionado.",
     "create": "Crear Reto",
     "load_error": "No se pudieron cargar los retos",
-    "load_more": "Cargar Más"
+    "load_more": "Cargar Más",
+    "loading": "Loading challenge..."
   },
   "ideas": {
     "title": "Ideas",
@@ -83,7 +84,8 @@
     "draft_updated": "Actualizado {{date}}",
     "draft_created": "Creado {{date}}",
     "new_idea": "Nueva Idea",
-    "sort_label": "Ordenar ideas"
+    "sort_label": "Ordenar ideas",
+    "loading": "Loading ideas..."
   },
   "idea_detail": {
     "page_title": "Detalles de la Idea",
@@ -101,7 +103,9 @@
     "delete": "Eliminar",
     "delete_confirm": "¿Estás seguro de que quieres eliminar este comentario?",
     "load_more": "Cargar Más Comentarios",
-    "load_error": "No se pudieron cargar los comentarios"
+    "load_error": "No se pudieron cargar los comentarios",
+    "add_label": "Add a comment",
+    "loading": "Loading comments..."
   },
   "form": {
     "title_label": "Título",

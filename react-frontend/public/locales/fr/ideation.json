@@ -51,7 +51,8 @@
     "empty_filtered": "Aucun defi ne correspond au filtre selectionne.",
     "create": "Creer un defi",
     "load_error": "Impossible de charger les defis",
-    "load_more": "Charger plus"
+    "load_more": "Charger plus",
+    "loading": "Loading challenge..."
   },
   "ideas": {
     "title": "Idees",
@@ -83,7 +84,8 @@
     "draft_updated": "Mis a jour le {{date}}",
     "draft_created": "Cree le {{date}}",
     "new_idea": "Nouvelle idee",
-    "sort_label": "Trier les idées"
+    "sort_label": "Trier les idées",
+    "loading": "Loading ideas..."
   },
   "idea_detail": {
     "page_title": "Details de l'idee",
@@ -101,7 +103,9 @@
     "delete": "Supprimer",
     "delete_confirm": "Etes-vous sur de vouloir supprimer ce commentaire ?",
     "load_more": "Charger plus de commentaires",
-    "load_error": "Impossible de charger les commentaires"
+    "load_error": "Impossible de charger les commentaires",
+    "add_label": "Add a comment",
+    "loading": "Loading comments..."
   },
   "form": {
     "title_label": "Titre",

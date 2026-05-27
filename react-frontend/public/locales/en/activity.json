@@ -24,6 +24,7 @@
     "given": "Given",
     "received": "Received",
     "monthly_activity": "Monthly Activity",
+    "monthly_activity_aria": "Bar chart showing monthly hours given and received",
     "no_data": "No chart data available"
   },
   "recent_activity": "Recent Activity",

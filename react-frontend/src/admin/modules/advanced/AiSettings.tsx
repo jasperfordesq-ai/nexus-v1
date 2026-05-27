@@ -269,7 +269,7 @@ export function AiSettings() {
 
   if (loading) {
     return (
-      <div className="flex h-64 items-center justify-center">
+      <div className="flex h-64 items-center justify-center" role="status" aria-label={t('loading')} aria-busy="true">
         <Spinner size="lg" />
       </div>
     );
@@ -285,7 +285,7 @@ export function AiSettings() {
         <Card >
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Bot size={20} /> {t('ai_integration_heading')}
+              <Bot size={20} aria-hidden="true" /> {t('ai_integration_heading')}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
@@ -323,7 +323,7 @@ export function AiSettings() {
         <Card >
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Key size={20} /> {t('provider_configuration_heading')}
+              <Key size={20} aria-hidden="true" /> {t('provider_configuration_heading')}
             </h3>
           </CardHeader>
           <CardBody className="gap-6">
@@ -396,7 +396,7 @@ export function AiSettings() {
         <Card >
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Cpu size={20} /> {t('ai_features_heading')}
+              <Cpu size={20} aria-hidden="true" /> {t('ai_features_heading')}
             </h3>
           </CardHeader>
           <CardBody className="space-y-3">
@@ -422,7 +422,7 @@ export function AiSettings() {
         <Card  className="border border-warning-200/60 bg-warning-50/70 dark:border-warning-900/40 dark:bg-warning-950/20">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Sliders size={20} /> {t('usage_limits_heading')}
+              <Sliders size={20} aria-hidden="true" /> {t('usage_limits_heading')}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
@@ -451,7 +451,7 @@ export function AiSettings() {
         <Card >
           <CardBody>
             <div className="flex items-start gap-3">
-              <Shield size={20} className="text-muted mt-0.5 shrink-0" />
+              <Shield size={20} className="text-muted mt-0.5 shrink-0" aria-hidden="true" />
               <div>
                 <p className="text-sm font-medium">{t('security_heading')}</p>
                 <p className="text-xs text-muted">
@@ -465,7 +465,7 @@ export function AiSettings() {
         {/* Save Button */}
         <div className="flex justify-end">
           <Button
-            startContent={<Save size={16} />}
+            startContent={<Save size={16} aria-hidden="true" />}
             onPress={handleSave}
             isLoading={saving}
             isDisabled={saving}

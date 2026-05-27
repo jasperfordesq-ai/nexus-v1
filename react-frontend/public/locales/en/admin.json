@@ -1689,6 +1689,7 @@
   },
   "advanced": {
     "loading": "Loading",
+    "health_loading": "Loading algorithm health...",
     "404_entry_dismissed": "404 entry dismissed",
     "a_i_settings_saved_successfully": "AI Settings Saved Successfully",
     "active_provider": "Active Provider",

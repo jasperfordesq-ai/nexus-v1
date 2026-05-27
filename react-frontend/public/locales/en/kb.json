@@ -49,5 +49,11 @@
   "all_categories": "All",
   "author_by": "by {{name}}",
   "attachments": "Attachments",
-  "category_tabs_aria": "Knowledge base categories"
+  "category_tabs_aria": "Knowledge base categories",
+  "loading": "Loading knowledge base...",
+  "article_count_one": "{{count}} article",
+  "article_count_other": "{{count}} articles",
+  "category_count_one": "{{count}} category",
+  "category_count_other": "{{count}} categories",
+  "search_results": "{{count}} results for \"{{query}}\""
 }

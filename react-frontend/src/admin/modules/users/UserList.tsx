@@ -268,32 +268,32 @@ export function UserList() {
     type ActionKey = 'edit' | 'approve' | 'suspend' | 'ban' | 'reactivate' | 'reset2fa' | 'permissions' | 'impersonate' | 'delete';
 
     const items: { key: ActionKey; label: string; icon: React.ReactNode; color?: 'success' | 'warning' | 'danger'; className?: string }[] = [
-      { key: 'edit', label: t('users.action_edit'), icon: <Edit size={14} /> },
+      { key: 'edit', label: t('users.action_edit'), icon: <Edit size={14} aria-hidden="true" /> },
     ];
 
     if (user.status === 'pending') {
-      items.push({ key: 'approve', label: t('users.action_approve'), icon: <UserCheck size={14} />, color: 'success', className: 'text-success' });
+      items.push({ key: 'approve', label: t('users.action_approve'), icon: <UserCheck size={14} aria-hidden="true" />, color: 'success', className: 'text-success' });
     }
     if (user.status === 'active') {
-      items.push({ key: 'suspend', label: t('users.action_suspend'), icon: <UserX size={14} />, color: 'warning', className: 'text-warning' });
+      items.push({ key: 'suspend', label: t('users.action_suspend'), icon: <UserX size={14} aria-hidden="true" />, color: 'warning', className: 'text-warning' });
     }
     if (user.status !== 'banned') {
-      items.push({ key: 'ban', label: t('users.action_ban'), icon: <Ban size={14} />, color: 'danger', className: 'text-danger' });
+      items.push({ key: 'ban', label: t('users.action_ban'), icon: <Ban size={14} aria-hidden="true" />, color: 'danger', className: 'text-danger' });
     }
     if (user.status === 'suspended' || user.status === 'banned') {
-      items.push({ key: 'reactivate', label: t('users.action_reactivate'), icon: <RotateCcw size={14} />, color: 'success', className: 'text-success' });
+      items.push({ key: 'reactivate', label: t('users.action_reactivate'), icon: <RotateCcw size={14} aria-hidden="true" />, color: 'success', className: 'text-success' });
     }
     if (user.has_2fa_enabled) {
-      items.push({ key: 'reset2fa', label: t('users.action_reset_2fa'), icon: <KeyRound size={14} /> });
+      items.push({ key: 'reset2fa', label: t('users.action_reset_2fa'), icon: <KeyRound size={14} aria-hidden="true" /> });
     }
-    items.push({ key: 'permissions', label: t('users.action_permissions'), icon: <Shield size={14} /> });
+    items.push({ key: 'permissions', label: t('users.action_permissions'), icon: <Shield size={14} aria-hidden="true" /> });
     // Super admins can impersonate other users (but not other super admins)
     if (isSuperAdmin && !user.is_super_admin && user.id !== currentUser?.id) {
-      items.push({ key: 'impersonate', label: t('users.action_impersonate'), icon: <LogIn size={14} /> });
+      items.push({ key: 'impersonate', label: t('users.action_impersonate'), icon: <LogIn size={14} aria-hidden="true" /> });
     }
     // Delete (only if not current user)
     if (user.id !== currentUser?.id) {
-      items.push({ key: 'delete', label: t('users.action_delete'), icon: <Trash2 size={14} />, color: 'danger', className: 'text-danger' });
+      items.push({ key: 'delete', label: t('users.action_delete'), icon: <Trash2 size={14} aria-hidden="true" />, color: 'danger', className: 'text-danger' });
     }
 
     const handleMenuAction = (key: React.Key) => {
@@ -313,7 +313,7 @@ export function UserList() {
       <Dropdown>
         <DropdownTrigger>
           <Button isIconOnly size="sm" variant="tertiary" aria-label={t('users.actions_menu')} className="bg-surface-secondary/70">
-            <MoreVertical size={16} />
+            <MoreVertical size={16} aria-hidden="true" />
           </Button>
         </DropdownTrigger>
         <DropdownMenu aria-label={t('users.actions_menu')} onAction={handleMenuAction}>
@@ -371,7 +371,7 @@ export function UserList() {
             {user.role}
           </Chip>
           {user.is_super_admin && (
-            <Chip size="sm" variant="soft" color="warning" startContent={<Shield size={10} />}>
+            <Chip size="sm" variant="soft" color="warning" startContent={<Shield size={10} aria-hidden="true" />}>
               SA
             </Chip>
           )}
@@ -588,12 +588,12 @@ export function UserList() {
               <div className="flex flex-col gap-3">
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2 text-success">
-                    <CheckCircle2 size={18} />
+                    <CheckCircle2 size={18} aria-hidden="true" />
                     <span className="font-medium">{t('users.import_imported')}</span>
                   </div>
                   {importResults.skipped > 0 && (
                     <div className="flex items-center gap-2 text-warning">
-                      <AlertCircle size={18} />
+                      <AlertCircle size={18} aria-hidden="true" />
                       <span className="font-medium">{t('users.import_skipped')}</span>
                     </div>
                   )}

@@ -108,14 +108,14 @@ interface DashboardData {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const activityIcons: Record<string, { icon: React.ReactNode; color: string }> = {
-  exchange: { icon: <ArrowUpRight className="w-4 h-4" />, color: 'text-emerald-500 bg-emerald-500/10' },
-  listing: { icon: <ListTodo className="w-4 h-4" />, color: 'text-indigo-500 bg-indigo-500/10' },
-  connection: { icon: <Users className="w-4 h-4" />, color: 'text-[var(--color-info)] bg-blue-500/10' },
-  event: { icon: <CalendarCheck className="w-4 h-4" />, color: 'text-purple-500 bg-purple-500/10' },
-  message: { icon: <MessageSquare className="w-4 h-4" />, color: 'text-cyan-500 bg-cyan-500/10' },
-  review: { icon: <Star className="w-4 h-4" />, color: 'text-[var(--color-warning)] bg-amber-500/10' },
-  post: { icon: <Activity className="w-4 h-4" />, color: 'text-rose-500 bg-rose-500/10' },
-  default: { icon: <Activity className="w-4 h-4" />, color: 'text-theme-subtle bg-theme-elevated' },
+  exchange: { icon: <ArrowUpRight className="w-4 h-4" aria-hidden="true" />, color: 'text-emerald-500 bg-emerald-500/10' },
+  listing: { icon: <ListTodo className="w-4 h-4" aria-hidden="true" />, color: 'text-indigo-500 bg-indigo-500/10' },
+  connection: { icon: <Users className="w-4 h-4" aria-hidden="true" />, color: 'text-[var(--color-info)] bg-blue-500/10' },
+  event: { icon: <CalendarCheck className="w-4 h-4" aria-hidden="true" />, color: 'text-purple-500 bg-purple-500/10' },
+  message: { icon: <MessageSquare className="w-4 h-4" aria-hidden="true" />, color: 'text-cyan-500 bg-cyan-500/10' },
+  review: { icon: <Star className="w-4 h-4" aria-hidden="true" />, color: 'text-[var(--color-warning)] bg-amber-500/10' },
+  post: { icon: <Activity className="w-4 h-4" aria-hidden="true" />, color: 'text-rose-500 bg-rose-500/10' },
+  default: { icon: <Activity className="w-4 h-4" aria-hidden="true" />, color: 'text-theme-subtle bg-theme-elevated' },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -246,7 +246,7 @@ export function ActivityDashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-16">
+      <div className="flex justify-center py-16" role="status" aria-label={t('loading')} aria-busy="true">
         <Spinner size="lg" />
       </div>
     );
@@ -255,7 +255,7 @@ export function ActivityDashboardPage() {
   if (error) {
     return (
       <div className="max-w-4xl mx-auto">
-        <GlassCard className="p-8 text-center">
+        <GlassCard className="p-8 text-center" role="alert">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
@@ -342,7 +342,9 @@ export function ActivityDashboardPage() {
                 <BarChart3 className="w-5 h-5 text-indigo-500" aria-hidden="true" />
                 <h3 className="font-semibold text-theme-primary">{t('chart.monthly_activity')}</h3>
               </div>
-              <SimpleBarChart data={monthly_hours} givenLabel={t('chart.given')} receivedLabel={t('chart.received')} />
+              <div role="img" aria-label={t('chart.monthly_activity_aria')}>
+                <SimpleBarChart data={monthly_hours} givenLabel={t('chart.given')} receivedLabel={t('chart.received')} />
+              </div>
             </GlassCard>
           )}
 

@@ -51,7 +51,8 @@
     "empty_filtered": "選択したフィルターに一致するチャレンジはありません。",
     "create": "チャレンジを作成",
     "load_error": "チャレンジを読み込めません",
-    "load_more": "もっと読み込む"
+    "load_more": "もっと読み込む",
+    "loading": "Loading challenge..."
   },
   "ideas": {
     "title": "アイデア",
@@ -83,7 +84,8 @@
     "draft_updated": "更新された {{date}}",
     "draft_created": "作成された {{date}}",
     "new_idea": "新しいアイデア",
-    "sort_label": "アイデアを並べ替え"
+    "sort_label": "アイデアを並べ替え",
+    "loading": "Loading ideas..."
   },
   "idea_detail": {
     "page_title": "アイデアの詳細",
@@ -101,7 +103,9 @@
     "delete": "削除",
     "delete_confirm": "このコメントを削除してもよろしいですか？",
     "load_more": "さらにコメントを読み込む",
-    "load_error": "コメントを読み込めません"
+    "load_error": "コメントを読み込めません",
+    "add_label": "Add a comment",
+    "loading": "Loading comments..."
   },
   "form": {
     "title_label": "タイトル",
