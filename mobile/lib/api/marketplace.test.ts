@@ -13,6 +13,7 @@ jest.mock('@/lib/constants', () => ({
 
 import { api } from '@/lib/api/client';
 import {
+  acceptMarketplaceCounterOffer,
   createMarketplaceListing,
   createMarketplaceCollection,
   createMarketplacePaymentIntent,
@@ -42,6 +43,7 @@ import {
   marketplaceHasMore,
   marketplaceNextCursor,
   promoteMarketplaceListing,
+  counterMarketplaceOffer,
   removeMarketplaceCollectionItem,
   reserveMarketplacePickup,
   scanMarketplacePickup,
@@ -139,6 +141,7 @@ describe('marketplace api', () => {
 
   it('creates and loads offers', async () => {
     (api.post as jest.Mock).mockResolvedValue({ data: { id: 1 } });
+    (api.put as jest.Mock).mockResolvedValue({ data: { id: 1 } });
     (api.get as jest.Mock).mockResolvedValue({ data: [], meta: { cursor: null, has_more: false } });
 
     await makeMarketplaceOffer(8, { amount: 12, message: 'Can collect today' });
@@ -152,6 +155,15 @@ describe('marketplace api', () => {
       cursor: 'next',
       per_page: '20',
     });
+
+    await counterMarketplaceOffer(8, { amount: 18, message: 'Can include delivery' });
+    expect(api.put).toHaveBeenCalledWith('/api/v2/marketplace/offers/8/counter', {
+      amount: 18,
+      message: 'Can include delivery',
+    });
+
+    await acceptMarketplaceCounterOffer(8);
+    expect(api.put).toHaveBeenCalledWith('/api/v2/marketplace/offers/8/accept-counter');
   });
 
   it('normalises pagination metadata variants', () => {

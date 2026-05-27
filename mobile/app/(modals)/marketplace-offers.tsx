@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState } from 'react';
-import { Alert, FlatList, View } from 'react-native';
+import { Alert, FlatList, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,6 +17,8 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import {
   acceptMarketplaceOffer,
+  acceptMarketplaceCounterOffer,
+  counterMarketplaceOffer,
   declineMarketplaceOffer,
   getMarketplaceOffers,
   marketplaceHasMore,
@@ -54,14 +56,24 @@ function MarketplaceOffersScreen() {
     [mode],
   );
 
-  async function action(kind: 'accept' | 'decline' | 'withdraw', offer: MarketplaceOffer) {
+  async function action(kind: 'accept' | 'decline' | 'withdraw' | 'acceptCounter', offer: MarketplaceOffer) {
     try {
       if (kind === 'accept') await acceptMarketplaceOffer(offer.id);
       if (kind === 'decline') await declineMarketplaceOffer(offer.id);
       if (kind === 'withdraw') await withdrawMarketplaceOffer(offer.id);
+      if (kind === 'acceptCounter') await acceptMarketplaceCounterOffer(offer.id);
       offers.refresh();
     } catch (err) {
       Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('offers.actionFailed'));
+    }
+  }
+
+  async function counter(offer: MarketplaceOffer, amount: number, message?: string | null) {
+    try {
+      await counterMarketplaceOffer(offer.id, { amount, message });
+      offers.refresh();
+    } catch (err) {
+      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('offers.counterFailed'));
     }
   }
 
@@ -98,7 +110,7 @@ function MarketplaceOffersScreen() {
           </HeroCard>
         }
         renderItem={({ item }) => (
-          <OfferCard offer={item} mode={mode} onAction={action} />
+          <OfferCard offer={item} mode={mode} onAction={action} onCounter={counter} />
         )}
         ListEmptyComponent={
           offers.isLoading ? (
@@ -125,12 +137,38 @@ function MarketplaceOffersScreen() {
   );
 }
 
-function OfferCard({ offer, mode, onAction }: { offer: MarketplaceOffer; mode: OfferMode; onAction: (kind: 'accept' | 'decline' | 'withdraw', offer: MarketplaceOffer) => void }) {
+function OfferCard({
+  offer,
+  mode,
+  onAction,
+  onCounter,
+}: {
+  offer: MarketplaceOffer;
+  mode: OfferMode;
+  onAction: (kind: 'accept' | 'decline' | 'withdraw' | 'acceptCounter', offer: MarketplaceOffer) => void;
+  onCounter: (offer: MarketplaceOffer, amount: number, message?: string | null) => void;
+}) {
   const { t } = useTranslation('marketplace');
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const [isCountering, setIsCountering] = useState(false);
+  const [counterAmount, setCounterAmount] = useState('');
+  const [counterMessage, setCounterMessage] = useState('');
   const listingId = offer.listing?.id;
   const amount = `${offer.currency || 'EUR'} ${Number(offer.amount).toLocaleString()}`;
+
+  function submitCounter() {
+    const value = Number(counterAmount);
+    if (!Number.isFinite(value) || value <= 0) {
+      Alert.alert(t('offers.amountRequired'), t('offers.amountRequired'));
+      return;
+    }
+    onCounter(offer, value, counterMessage.trim() || null);
+    setIsCountering(false);
+    setCounterAmount('');
+    setCounterMessage('');
+  }
+
   return (
     <HeroCard className="mb-3 rounded-panel p-0">
       <HeroCard.Body className="gap-3 p-4">
@@ -144,27 +182,85 @@ function OfferCard({ offer, mode, onAction }: { offer: MarketplaceOffer; mode: O
           </Chip>
         </View>
         {offer.message ? <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{offer.message}</Text> : null}
-        <View className="flex-row gap-2">
+        {offer.status === 'countered' && offer.counter_amount ? (
+          <Surface variant="secondary" className="gap-1 rounded-panel-inner p-3">
+            <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('offers.countered')}</Text>
+            <Text className="text-base font-bold" style={{ color: theme.text }}>
+              {offer.currency || 'EUR'} {Number(offer.counter_amount).toLocaleString()}
+            </Text>
+            {offer.counter_message ? <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{offer.counter_message}</Text> : null}
+          </Surface>
+        ) : null}
+        {isCountering ? (
+          <Surface variant="secondary" className="gap-3 rounded-panel-inner p-3">
+            <View className="gap-2">
+              <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('offers.counterAmount')}</Text>
+              <TextInput
+                className="min-h-12 rounded-panel-inner border px-3 text-sm"
+                style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg }}
+                placeholder={t('offers.amountPlaceholder')}
+                placeholderTextColor={theme.textMuted}
+                keyboardType="decimal-pad"
+                value={counterAmount}
+                onChangeText={setCounterAmount}
+              />
+            </View>
+            <View className="gap-2">
+              <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('offers.counterMessage')}</Text>
+              <TextInput
+                className="min-h-20 rounded-panel-inner border px-3 py-2 text-sm"
+                style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg, textAlignVertical: 'top' }}
+                placeholder={t('offers.counterMessagePlaceholder')}
+                placeholderTextColor={theme.textMuted}
+                multiline
+                value={counterMessage}
+                onChangeText={setCounterMessage}
+              />
+            </View>
+            <View className="flex-row gap-2">
+              <HeroButton className="flex-1" size="sm" variant="secondary" onPress={() => setIsCountering(false)}>
+                <HeroButton.Label>{t('offers.cancelCounter')}</HeroButton.Label>
+              </HeroButton>
+              <HeroButton className="flex-1" size="sm" variant="primary" onPress={submitCounter} style={{ backgroundColor: primary }}>
+                <HeroButton.Label>{t('offers.sendCounter')}</HeroButton.Label>
+              </HeroButton>
+            </View>
+          </Surface>
+        ) : null}
+        <View className="flex-row flex-wrap gap-2">
           {listingId ? (
-            <HeroButton className="flex-1" size="sm" variant="secondary" onPress={() => router.push({ pathname: '/(modals)/marketplace-detail', params: { id: String(listingId) } } as unknown as Href)}>
+            <HeroButton className="flex-1" size="sm" variant="secondary" onPress={() => router.push({ pathname: '/(modals)/marketplace-detail', params: { id: String(listingId) } } as unknown as Href)} style={{ minWidth: '46%' }}>
               <Ionicons name="open-outline" size={14} color={primary} />
               <HeroButton.Label>{t('actions.view')}</HeroButton.Label>
             </HeroButton>
           ) : null}
           {mode === 'received' && offer.status === 'pending' ? (
             <>
-              <HeroButton className="flex-1" size="sm" variant="primary" onPress={() => onAction('accept', offer)} style={{ backgroundColor: theme.success }}>
+              <HeroButton className="flex-1" size="sm" variant="primary" onPress={() => onAction('accept', offer)} style={{ minWidth: '46%', backgroundColor: theme.success }}>
                 <HeroButton.Label>{t('offers.accept')}</HeroButton.Label>
               </HeroButton>
-              <HeroButton className="flex-1" size="sm" variant="danger" onPress={() => onAction('decline', offer)}>
+              <HeroButton className="flex-1" size="sm" variant="danger" onPress={() => onAction('decline', offer)} style={{ minWidth: '46%' }}>
                 <HeroButton.Label>{t('offers.decline')}</HeroButton.Label>
+              </HeroButton>
+              <HeroButton className="flex-1" size="sm" variant="secondary" onPress={() => setIsCountering(true)} style={{ minWidth: '46%' }}>
+                <HeroButton.Label>{t('offers.counter')}</HeroButton.Label>
               </HeroButton>
             </>
           ) : null}
           {mode === 'sent' && offer.status === 'pending' ? (
-            <HeroButton className="flex-1" size="sm" variant="danger" onPress={() => onAction('withdraw', offer)}>
+            <HeroButton className="flex-1" size="sm" variant="danger" onPress={() => onAction('withdraw', offer)} style={{ minWidth: '46%' }}>
               <HeroButton.Label>{t('offers.withdraw')}</HeroButton.Label>
             </HeroButton>
+          ) : null}
+          {mode === 'sent' && offer.status === 'countered' ? (
+            <>
+              <HeroButton className="flex-1" size="sm" variant="primary" onPress={() => onAction('acceptCounter', offer)} style={{ minWidth: '46%', backgroundColor: theme.success }}>
+                <HeroButton.Label>{t('offers.acceptCounter')}</HeroButton.Label>
+              </HeroButton>
+              <HeroButton className="flex-1" size="sm" variant="danger" onPress={() => onAction('decline', offer)} style={{ minWidth: '46%' }}>
+                <HeroButton.Label>{t('offers.decline')}</HeroButton.Label>
+              </HeroButton>
+            </>
           ) : null}
         </View>
       </HeroCard.Body>

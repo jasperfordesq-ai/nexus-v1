@@ -478,6 +478,17 @@ export function acceptMarketplaceOffer(id: number): Promise<MarketplaceDataRespo
   return api.put<MarketplaceDataResponse<MarketplaceOffer>>(`${API_V2}/marketplace/offers/${id}/accept`);
 }
 
+export function counterMarketplaceOffer(
+  id: number,
+  payload: { amount: number; message?: string | null },
+): Promise<MarketplaceDataResponse<MarketplaceOffer>> {
+  return api.put<MarketplaceDataResponse<MarketplaceOffer>>(`${API_V2}/marketplace/offers/${id}/counter`, payload);
+}
+
+export function acceptMarketplaceCounterOffer(id: number): Promise<MarketplaceDataResponse<MarketplaceOffer>> {
+  return api.put<MarketplaceDataResponse<MarketplaceOffer>>(`${API_V2}/marketplace/offers/${id}/accept-counter`);
+}
+
 export function declineMarketplaceOffer(id: number): Promise<MarketplaceDataResponse<MarketplaceOffer>> {
   return api.put<MarketplaceDataResponse<MarketplaceOffer>>(`${API_V2}/marketplace/offers/${id}/decline`);
 }
