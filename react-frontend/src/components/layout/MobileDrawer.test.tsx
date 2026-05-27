@@ -67,6 +67,7 @@ const i18nMap: Record<string, string> = {
   'nav.federated_events': 'Federated Events',
   'auth.log_in': 'Log In', 'auth.sign_up': 'Sign Up',
   'account.settings': 'Settings', 'account.log_out': 'Log Out',
+  'report_problem.trigger': 'Report a problem',
   // Admin tool keys used by MobileDrawer (user_menu namespace)
   'user_menu.admin_panel': 'Admin Panel',
   'user_menu.legacy_admin': 'Legacy Admin',
@@ -126,6 +127,12 @@ vi.mock('@/components/LanguageSwitcher', () => ({
 vi.mock('@/components/navigation', () => ({
   DesktopMenuItems: () => null,
   MobileMenuItems: () => null,
+}));
+
+vi.mock('@/components/feedback/ReportProblemButton', () => ({
+  ReportProblemButton: ({ className }: { className?: string }) => (
+    <button type="button" className={className}>Report a problem</button>
+  ),
 }));
 
 vi.mock('@/lib/helpers', () => ({
@@ -343,6 +350,11 @@ describe('MobileDrawer', () => {
     it('shows Log Out button when authenticated', () => {
       render(<MobileDrawer {...defaultProps} />);
       expect(screen.getByText('Log Out')).toBeInTheDocument();
+    });
+
+    it('shows a report problem action in mobile support navigation', () => {
+      render(<MobileDrawer {...defaultProps} />);
+      expect(screen.getByRole('button', { name: 'Report a problem' })).toBeInTheDocument();
     });
 
     it('shows Dashboard link when authenticated and module enabled', () => {

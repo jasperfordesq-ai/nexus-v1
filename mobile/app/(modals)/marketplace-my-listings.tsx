@@ -185,10 +185,26 @@ function DashboardCard({ stats, primary }: { stats: MarketplaceDashboard; primar
             <HeroButton.Label>{t('myListings.payments')}</HeroButton.Label>
           </HeroButton>
         </View>
-        <HeroButton variant="secondary" onPress={() => router.push('/(modals)/marketplace-shipping-options' as Href)}>
-          <Ionicons name="car-outline" size={16} color={primary} />
-          <HeroButton.Label>{t('myListings.shipping')}</HeroButton.Label>
-        </HeroButton>
+        <View className="flex-row gap-2">
+          <HeroButton className="flex-1" variant="secondary" onPress={() => router.push({ pathname: '/(modals)/marketplace-orders', params: { mode: 'sales' } } as unknown as Href)}>
+            <Ionicons name="receipt-outline" size={16} color={primary} />
+            <HeroButton.Label>{t('myListings.salesOrders')}</HeroButton.Label>
+          </HeroButton>
+          <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-offers' as Href)}>
+            <Ionicons name="chatbubbles-outline" size={16} color={primary} />
+            <HeroButton.Label>{t('myListings.offersCta')}</HeroButton.Label>
+          </HeroButton>
+        </View>
+        <View className="flex-row gap-2">
+          <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-tools' as Href)}>
+            <Ionicons name="construct-outline" size={16} color={primary} />
+            <HeroButton.Label>{t('myListings.sellerTools')}</HeroButton.Label>
+          </HeroButton>
+          <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-shipping-options' as Href)}>
+            <Ionicons name="car-outline" size={16} color={primary} />
+            <HeroButton.Label>{t('myListings.shipping')}</HeroButton.Label>
+          </HeroButton>
+        </View>
       </HeroCard.Body>
     </HeroCard>
   );

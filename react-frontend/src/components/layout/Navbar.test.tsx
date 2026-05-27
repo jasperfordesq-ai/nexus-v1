@@ -79,6 +79,12 @@ vi.mock('@/components/navigation', () => ({
   MobileMenuItems: () => null,
 }));
 
+vi.mock('@/components/feedback/ReportProblemButton', () => ({
+  ReportProblemButton: ({ className }: { className?: string }) => (
+    <button type="button" className={className}>Report a problem</button>
+  ),
+}));
+
 const i18nMap: Record<string, string> = {
   'nav.dashboard': 'Dashboard',
   'nav.feed': 'Feed',
@@ -107,6 +113,7 @@ const i18nMap: Record<string, string> = {
   'create.new_listing': 'New Listing',
   'create.new_event': 'New Event',
   'create.new_post': 'New Post',
+  'report_problem.trigger': 'Report a problem',
   'user_menu.log_out': 'Log Out',
   'flyout.bell_aria': 'Notifications',
 };
@@ -217,6 +224,27 @@ describe('Navbar', () => {
       render(<Navbar />);
       // The Hexagon icon is inside a motion.div, the brand name should still appear
       expect(screen.getByText('Test Community')).toBeInTheDocument();
+    });
+  });
+
+  describe('support reporting', () => {
+    it('shows a report problem action in authenticated profile navigation', () => {
+      setupDefaultMocks({
+        auth: {
+          user: {
+            id: 42,
+            first_name: 'Ada',
+            last_name: 'Lovelace',
+            email: 'ada@example.test',
+            role: 'member',
+          },
+          isAuthenticated: true,
+        },
+      });
+
+      render(<Navbar />);
+
+      expect(screen.getByRole('button', { name: 'Report a problem' })).toBeInTheDocument();
     });
   });
 

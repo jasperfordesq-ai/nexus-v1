@@ -3,10 +3,10 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert, FlatList, Linking, Modal, ScrollView, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router, type Href } from 'expo-router';
+import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
@@ -60,7 +60,9 @@ function MarketplaceOrdersScreen() {
   const { t } = useTranslation(['marketplace', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const [mode, setMode] = useState<OrderMode>('purchases');
+  const params = useLocalSearchParams<{ mode?: string }>();
+  const initialMode: OrderMode = params.mode === 'sales' ? 'sales' : 'purchases';
+  const [mode, setMode] = useState<OrderMode>(initialMode);
   const [statusTab, setStatusTab] = useState<OrderStatusTab>('all');
   const [shipOrder, setShipOrder] = useState<MarketplaceOrder | null>(null);
   const [cancelOrder, setCancelOrder] = useState<MarketplaceOrder | null>(null);
@@ -88,6 +90,10 @@ function MarketplaceOrdersScreen() {
     }),
     [mode, statusTab],
   );
+
+  useEffect(() => {
+    setMode(params.mode === 'sales' ? 'sales' : 'purchases');
+  }, [params.mode]);
 
   function openShipModal(order: MarketplaceOrder) {
     setShipOrder(order);

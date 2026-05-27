@@ -176,6 +176,9 @@
     "offers": "{{count}} offers",
     "onboarding": "Seller setup",
     "payments": "Payments",
+    "salesOrders": "Sales orders",
+    "offersCta": "Offers",
+    "sellerTools": "Seller tools",
     "shipping": "Shipping options",
     "empty": "No marketplace listings yet",
     "emptyHint": "Create a listing to start selling in your community."

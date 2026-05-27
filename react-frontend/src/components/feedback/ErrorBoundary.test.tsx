@@ -26,6 +26,10 @@ vi.mock('@/lib/logger', () => ({
   logError: vi.fn(),
 }));
 
+vi.mock('@/components/feedback/ReportProblemButton', () => ({
+  ReportProblemButton: () => <button type="button">Report a problem</button>,
+}));
+
 // A component that always throws
 function ThrowingComponent() {
   throw new Error('Test error');
@@ -89,5 +93,15 @@ describe('ErrorBoundary', () => {
     );
     expect(screen.getByText('Try Again')).toBeInTheDocument();
     expect(screen.getByText('Go Home')).toBeInTheDocument();
+  });
+
+  it('shows a report problem action in the fallback UI', () => {
+    render(
+      <ErrorBoundary>
+        <ThrowingComponent />
+      </ErrorBoundary>
+    );
+
+    expect(screen.getByRole('button', { name: 'Report a problem' })).toBeInTheDocument();
   });
 });
