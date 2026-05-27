@@ -219,6 +219,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({
         >
           {startContent ? <span className="shrink-0">{startContent}</span> : null}
           <HeroUIInput
+            aria-invalid={isInvalid || undefined}
             className={decoratedInputClass(classNames?.input)}
             disabled={isDisabled}
             fullWidth={fullWidth}
@@ -236,6 +237,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({
 
     return (
       <HeroUIInput
+        aria-invalid={isInvalid || undefined}
         className={combineClasses(
           classNames?.base,
           classNames?.inputWrapper,

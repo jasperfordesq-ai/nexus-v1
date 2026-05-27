@@ -4,7 +4,6 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import {
-  type ComponentType,
   forwardRef,
   type ElementType,
   type HTMLAttributes,
@@ -12,9 +11,10 @@ import {
   type ReactNode,
 } from 'react';
 import { Card as HeroUICard, type CardProps as HeroUICardProps } from '@heroui/react';
-import { cardVariants } from '@heroui/styles';
 
-const HeroUICardRoot = HeroUICard as ComponentType<any>;
+function heroCardBaseClass(variant?: string): string {
+  return `card card--${variant ?? 'default'}`;
+}
 
 type V2CardShadow = 'none' | 'sm' | 'md' | 'lg';
 type V2CardRadius = 'none' | 'sm' | 'md' | 'lg';
@@ -155,13 +155,11 @@ export const Card = forwardRef<HTMLElement, CardProps>(
     };
 
     if (Component) {
-      const slots = cardVariants({ variant });
-
       return (
         <Component
           ref={ref}
           {...props}
-          className={combineClasses(slots.base(), rootClassName)}
+          className={combineClasses(heroCardBaseClass(variant), rootClassName)}
           aria-disabled={isDisabled || undefined}
           onClick={onClick || onPress ? handleClick : undefined}
         >
@@ -171,9 +169,9 @@ export const Card = forwardRef<HTMLElement, CardProps>(
     }
 
     return (
-      <HeroUICardRoot ref={ref} {...sharedProps}>
+      <HeroUICard ref={ref} {...(sharedProps as HeroUICardProps)}>
         {children}
-      </HeroUICardRoot>
+      </HeroUICard>
     );
   },
 );

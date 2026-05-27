@@ -10,7 +10,20 @@ import {
   Spinner as HeroUISpinner,
   type ButtonProps as HeroUIButtonProps,
 } from '@heroui/react';
-import { buttonVariants } from '@heroui/styles';
+
+function heroButtonClasses(opts: {
+  variant?: string;
+  size?: string;
+  fullWidth?: boolean;
+  isIconOnly?: boolean;
+}): string {
+  const v = opts.variant ?? 'primary';
+  const s = opts.size ?? 'md';
+  const classes = [`button`, `button--${v}`, `button--${s}`];
+  if (opts.fullWidth) classes.push('button--full-width');
+  if (opts.isIconOnly) classes.push('button--icon-only');
+  return classes.join(' ');
+}
 
 type V2ButtonColor =
   | 'default'
@@ -191,7 +204,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           } as never)
         : content;
       const directClassName = combineClasses(
-        buttonVariants({
+        heroButtonClasses({
           fullWidth,
           isIconOnly,
           size,
