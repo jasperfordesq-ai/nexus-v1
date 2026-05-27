@@ -15,8 +15,12 @@ import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import AppTopBar from '@/components/ui/AppTopBar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import {
+  getMarketplaceSellerBalance,
+  getMarketplaceSellerPayouts,
   getMarketplaceStripeOnboardingStatus,
   startMarketplaceStripeOnboarding,
+  type MarketplaceSellerBalance,
+  type MarketplaceSellerPayout,
   type MarketplaceStripeOnboardingStatus,
 } from '@/lib/api/marketplace';
 import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
@@ -37,16 +41,26 @@ function MarketplaceStripeOnboardingScreen() {
   const primary = usePrimaryColor();
   const theme = useTheme();
   const [status, setStatus] = useState<MarketplaceStripeOnboardingStatus | null>(null);
+  const [balance, setBalance] = useState<MarketplaceSellerBalance | null>(null);
+  const [payouts, setPayouts] = useState<MarketplaceSellerPayout[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isStarting, setIsStarting] = useState(false);
 
   async function load() {
     setIsLoading(true);
     try {
-      const response = await getMarketplaceStripeOnboardingStatus();
-      setStatus(response.data);
+      const [statusResponse, balanceResponse, payoutsResponse] = await Promise.all([
+        getMarketplaceStripeOnboardingStatus(),
+        getMarketplaceSellerBalance(),
+        getMarketplaceSellerPayouts(1, 5),
+      ]);
+      setStatus(statusResponse.data);
+      setBalance(balanceResponse.data);
+      setPayouts(payoutsResponse.data);
     } catch {
       setStatus(null);
+      setBalance(null);
+      setPayouts([]);
     } finally {
       setIsLoading(false);
     }
@@ -125,6 +139,46 @@ function MarketplaceStripeOnboardingScreen() {
           </HeroCard.Body>
         </HeroCard>
 
+        <HeroCard className="mb-3 rounded-panel p-0">
+          <HeroCard.Body className="gap-3 p-4">
+            <View className="flex-row items-center justify-between gap-3">
+              <View className="min-w-0 flex-1">
+                <Text className="text-base font-bold" style={{ color: theme.text }}>{t('stripeOnboarding.balanceTitle')}</Text>
+                <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('stripeOnboarding.balanceSubtitle')}</Text>
+              </View>
+              <Ionicons name="wallet-outline" size={22} color={primary} />
+            </View>
+            <View className="flex-row flex-wrap gap-2">
+              <BalanceTile label={t('stripeOnboarding.pending')} value={formatMoney(balance?.pending, balance?.currency)} tone={theme.warning} />
+              <BalanceTile label={t('stripeOnboarding.available')} value={formatMoney(balance?.available, balance?.currency)} tone={theme.success} />
+              <BalanceTile label={t('stripeOnboarding.totalEarned')} value={formatMoney(balance?.total_earned, balance?.currency)} tone={primary} />
+            </View>
+          </HeroCard.Body>
+        </HeroCard>
+
+        <HeroCard className="mb-3 rounded-panel p-0">
+          <HeroCard.Body className="gap-3 p-4">
+            <View className="flex-row items-center justify-between gap-3">
+              <View className="min-w-0 flex-1">
+                <Text className="text-base font-bold" style={{ color: theme.text }}>{t('stripeOnboarding.payoutHistory')}</Text>
+                <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('stripeOnboarding.payoutHistoryHint')}</Text>
+              </View>
+              <Ionicons name="receipt-outline" size={22} color={primary} />
+            </View>
+            {payouts.length === 0 ? (
+              <Surface variant="secondary" className="rounded-panel-inner p-3">
+                <Text className="text-sm" style={{ color: theme.textSecondary }}>{t('stripeOnboarding.noPayouts')}</Text>
+              </Surface>
+            ) : (
+              <View className="gap-2">
+                {payouts.map((payout) => (
+                  <PayoutRow key={payout.id} payout={payout} />
+                ))}
+              </View>
+            )}
+          </HeroCard.Body>
+        </HeroCard>
+
         <HeroCard className="rounded-panel p-0">
           <HeroCard.Body className="gap-3 p-4">
             <HeroButton variant="primary" onPress={() => void start()} isDisabled={isStarting || complete} style={{ backgroundColor: complete ? theme.success : primary }}>
@@ -146,6 +200,11 @@ function MarketplaceStripeOnboardingScreen() {
   );
 }
 
+function formatMoney(value?: number | null, currency?: string | null) {
+  const amount = Number(value ?? 0);
+  return `${(currency || 'EUR').toUpperCase()} ${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
 function StatusChip({ label, enabled }: { label: string; enabled: boolean }) {
   const theme = useTheme();
   return (
@@ -153,6 +212,39 @@ function StatusChip({ label, enabled }: { label: string; enabled: boolean }) {
       <Ionicons name={enabled ? 'checkmark-circle-outline' : 'ellipse-outline'} size={12} color={enabled ? theme.success : theme.textMuted} />
       <Chip.Label>{label}</Chip.Label>
     </Chip>
+  );
+}
+
+function BalanceTile({ label, value, tone }: { label: string; value: string; tone: string }) {
+  const theme = useTheme();
+  return (
+    <Surface variant="secondary" className="min-w-[46%] flex-1 rounded-panel-inner p-3">
+      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{label}</Text>
+      <Text className="mt-1 text-lg font-bold" style={{ color: tone }}>{value}</Text>
+    </Surface>
+  );
+}
+
+function PayoutRow({ payout }: { payout: MarketplaceSellerPayout }) {
+  const { t } = useTranslation('marketplace');
+  const theme = useTheme();
+  return (
+    <Surface variant="secondary" className="rounded-panel-inner p-3">
+      <View className="flex-row items-start justify-between gap-3">
+        <View className="min-w-0 flex-1">
+          <Text className="text-sm font-bold" style={{ color: theme.text }}>
+            {t('stripeOnboarding.payoutOrder', { order: payout.order_id })}
+          </Text>
+          <Text className="mt-1 text-xs" style={{ color: theme.textSecondary }}>
+            {payout.created_at ? new Date(payout.created_at).toLocaleDateString() : t('stripeOnboarding.dateUnknown')}
+          </Text>
+        </View>
+        <View className="items-end">
+          <Text className="text-sm font-bold" style={{ color: theme.text }}>{formatMoney(payout.seller_payout, payout.currency)}</Text>
+          <Chip size="sm" variant="secondary"><Chip.Label>{t(`stripeOnboarding.payoutStatus.${payout.payout_status}`, { defaultValue: payout.payout_status })}</Chip.Label></Chip>
+        </View>
+      </View>
+    </Surface>
   );
 }
 

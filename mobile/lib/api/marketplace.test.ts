@@ -44,6 +44,8 @@ import {
   getMarketplacePickupSlots,
   getMarketplaceShippingOptions,
   getMarketplaceSavedSearches,
+  getMarketplaceSellerBalance,
+  getMarketplaceSellerPayouts,
   getMarketplaceStripeOnboardingStatus,
   getMerchantOnboardingStatus,
   getNearbyMarketplaceListings,
@@ -459,6 +461,15 @@ describe('marketplace api', () => {
 
     await getMarketplaceStripeOnboardingStatus();
     expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/seller/onboard/status');
+
+    await getMarketplaceSellerBalance();
+    expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/seller/balance');
+
+    await getMarketplaceSellerPayouts(2, 10);
+    expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/seller/payouts', {
+      page: '2',
+      limit: '10',
+    });
 
     await startMarketplaceStripeOnboarding();
     expect(api.post).toHaveBeenCalledWith('/api/v2/marketplace/seller/onboard', {});

@@ -629,7 +629,24 @@
     "completeButton": "Setup complete",
     "checkStatus": "Check status",
     "goListings": "Back to listings",
-    "startFailed": "Could not start Stripe onboarding."
+    "startFailed": "Could not start Stripe onboarding.",
+    "balanceTitle": "Seller balance",
+    "balanceSubtitle": "Track marketplace funds from completed Stripe payments.",
+    "pending": "Pending",
+    "available": "Available",
+    "totalEarned": "Total earned",
+    "payoutHistory": "Payout history",
+    "payoutHistoryHint": "Recent marketplace payments and payout status.",
+    "noPayouts": "No payout records yet.",
+    "payoutOrder": "Order {{order}}",
+    "dateUnknown": "Date unavailable",
+    "payoutStatus": {
+      "pending": "Pending",
+      "scheduled": "Scheduled",
+      "paid": "Paid",
+      "failed": "Failed",
+      "cancelled": "Cancelled"
+    }
   },
   "hub": {
     "unable_to_load": "Could not load marketplace listings.",

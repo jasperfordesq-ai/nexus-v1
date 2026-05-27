@@ -314,6 +314,27 @@ export interface MarketplaceStripeOnboardingStatus {
   details_submitted?: boolean;
 }
 
+export interface MarketplaceSellerBalance {
+  pending: number;
+  available: number;
+  currency: string;
+  total_earned: number;
+}
+
+export interface MarketplaceSellerPayout {
+  id: number;
+  order_id: number;
+  amount: number;
+  platform_fee: number;
+  seller_payout: number;
+  currency: string;
+  status: string;
+  payout_status: string;
+  payout_id?: string | null;
+  paid_out_at?: string | null;
+  created_at?: string | null;
+}
+
 export interface MerchantCoupon {
   id: number;
   code: string;
@@ -696,6 +717,17 @@ export function completeMerchantOnboarding(): Promise<MarketplaceDataResponse<Me
 
 export function getMarketplaceStripeOnboardingStatus(): Promise<MarketplaceDataResponse<MarketplaceStripeOnboardingStatus>> {
   return api.get<MarketplaceDataResponse<MarketplaceStripeOnboardingStatus>>(`${API_V2}/marketplace/seller/onboard/status`);
+}
+
+export function getMarketplaceSellerBalance(): Promise<MarketplaceDataResponse<MarketplaceSellerBalance>> {
+  return api.get<MarketplaceDataResponse<MarketplaceSellerBalance>>(`${API_V2}/marketplace/seller/balance`);
+}
+
+export function getMarketplaceSellerPayouts(page = 1, limit = 20): Promise<MarketplaceCollectionResponse<MarketplaceSellerPayout>> {
+  const query: Record<string, string> = {};
+  addQueryValue(query, 'page', page);
+  addQueryValue(query, 'limit', limit);
+  return api.get<MarketplaceCollectionResponse<MarketplaceSellerPayout>>(`${API_V2}/marketplace/seller/payouts`, query);
 }
 
 export function startMarketplaceStripeOnboarding(): Promise<MarketplaceDataResponse<{ account_id?: string; onboarding_url?: string; url?: string }>> {
