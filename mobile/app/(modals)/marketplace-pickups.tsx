@@ -16,6 +16,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import { getMyMarketplacePickups, type MarketplacePickupReservation } from '@/lib/api/marketplace';
 import { useApi } from '@/lib/hooks/useApi';
+import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
@@ -29,19 +30,49 @@ export default function MarketplacePickupsRoute() {
 }
 
 function MarketplacePickupsScreen() {
-  const { t } = useTranslation(['marketplace', 'common']);
+  const { t } = useTranslation(['marketplace', 'common', 'auth']);
   const { hasFeature } = useTenant();
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const reservations = useApi(() => getMyMarketplacePickups(), [], { enabled: hasFeature('marketplace') });
+  const marketplaceEnabled = hasFeature('marketplace');
+  const reservations = useApi(() => getMyMarketplacePickups(), [], { enabled: marketplaceEnabled && !isAuthLoading && isAuthenticated });
   const items = reservations.data?.data ?? [];
 
-  if (!hasFeature('marketplace')) {
+  if (!marketplaceEnabled) {
     return (
       <SafeAreaView className="flex-1 bg-background">
         <AppTopBar title={t('pickup.myTitle')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
         <View className="flex-1 justify-center px-4">
           <EmptyState icon="bag-handle-outline" title={t('featureGate.title')} subtitle={t('featureGate.description')} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (isAuthLoading) {
+    return (
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('pickup.myTitle')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
+        <View className="py-16">
+          <LoadingSpinner />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('pickup.myTitle')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
+        <View className="flex-1 justify-center px-4">
+          <EmptyState
+            icon="bag-check-outline"
+            title={t('pickup.signInTitle')}
+            subtitle={t('pickup.signInHint')}
+            actionLabel={t('auth:login.submit')}
+            onAction={() => router.push('/(auth)/login' as Href)}
+          />
         </View>
       </SafeAreaView>
     );

@@ -448,6 +448,8 @@
     "myEyebrow": "Click-and-collect",
     "myTitle": "My pickups",
     "mySubtitle": "Show pickup reservations and QR codes for marketplace orders.",
+    "signInTitle": "Sign in to view pickup reservations",
+    "signInHint": "Pickup windows and collection QR codes are available after you sign in.",
     "openOrders": "Open marketplace orders",
     "noPickups": "No pickup reservations yet",
     "noPickupsHint": "Pickup reservations from marketplace checkout will appear here.",
