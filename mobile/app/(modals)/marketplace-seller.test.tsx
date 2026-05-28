@@ -7,6 +7,7 @@ import React from 'react';
 import { fireEvent, render } from '@testing-library/react-native';
 
 const mockRouterPush = jest.fn();
+const mockResolveImageUrl = jest.fn((value?: string | null) => value ? `resolved:${value}` : null);
 const mockUsePaginatedApi = jest.fn((_fetchFn?: unknown, _extractor?: unknown, _deps?: unknown, _options?: unknown) => ({
   items: [
     {
@@ -28,6 +29,27 @@ let mockAuthState = {
   isAuthenticated: true,
   user: { id: 42 } as { id: number } | null,
 };
+let mockSellerProfile = {
+  id: 5,
+  user_id: 8,
+  display_name: 'Nexus Goods',
+  bio: 'Reuse and repair seller',
+  avatar_url: null,
+  cover_image_url: null as string | null,
+  location: 'Dublin',
+  marketplace_partner_badge_at: '2026-04-29T10:00:00Z',
+  seller_type: 'business',
+  business_verified: true,
+  is_community_endorsed: false,
+  community_trust_score: 80,
+  avg_rating: 4.5,
+  total_ratings: 3,
+  total_sales: 12,
+  response_time_avg: '2 hours',
+  active_listings: 4,
+  member_since: '2024-05-01T00:00:00Z',
+  joined_marketplace_at: '2026-04-01T00:00:00Z',
+};
 
 jest.mock('expo-router', () => ({
   router: { push: (...args: unknown[]) => mockRouterPush(...args), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
@@ -41,6 +63,7 @@ jest.mock('react-i18next', () => ({
         'common:back': 'Back',
         'seller.eyebrow': 'Seller profile',
         'seller.title': 'Seller profile',
+        'seller.coverAlt': `Cover image for ${String(opts?.name ?? '')}`,
         'seller.notFound': 'Seller not found',
         'seller.notFoundHint': 'This seller profile is not available.',
         'seller.verified': 'Verified',
@@ -114,33 +137,14 @@ jest.mock('@/lib/api/marketplace', () => ({
   marketplaceHasMore: jest.fn(() => false),
   marketplaceNextCursor: jest.fn(() => null),
 }));
+jest.mock('@/lib/utils/resolveImageUrl', () => ({
+  resolveImageUrl: (value?: string | null) => mockResolveImageUrl(value),
+}));
 jest.mock('@/lib/hooks/useApi', () => ({
   useApi: () => ({
     isLoading: false,
     error: null,
-    data: {
-      data: {
-        id: 5,
-        user_id: 8,
-        display_name: 'Nexus Goods',
-        bio: 'Reuse and repair seller',
-        avatar_url: null,
-        cover_image_url: null,
-        location: 'Dublin',
-        marketplace_partner_badge_at: '2026-04-29T10:00:00Z',
-        seller_type: 'business',
-        business_verified: true,
-        is_community_endorsed: false,
-        community_trust_score: 80,
-        avg_rating: 4.5,
-        total_ratings: 3,
-        total_sales: 12,
-        response_time_avg: '2 hours',
-        active_listings: 4,
-        member_since: '2024-05-01T00:00:00Z',
-        joined_marketplace_at: '2026-04-01T00:00:00Z',
-      },
-    },
+    data: { data: mockSellerProfile },
   }),
 }));
 jest.mock('@/lib/hooks/usePaginatedApi', () => ({
@@ -158,6 +162,8 @@ describe('MarketplaceSellerRoute', () => {
       isAuthenticated: true,
       user: { id: 42 },
     };
+    mockSellerProfile = { ...mockSellerProfile, cover_image_url: null };
+    mockResolveImageUrl.mockClear();
   });
 
   it('shows listing and reviews tabs on seller profiles', () => {
@@ -213,5 +219,15 @@ describe('MarketplaceSellerRoute', () => {
 
     expect(getByText('Seller not found')).toBeTruthy();
     expect(mockUsePaginatedApi).toHaveBeenCalledWith(expect.any(Function), expect.any(Function), [0], { enabled: false });
+  });
+
+  it('resolves relative seller cover image URLs before rendering', () => {
+    mockSellerProfile = { ...mockSellerProfile, cover_image_url: '/uploads/sellers/cover.jpg' };
+
+    const { getByLabelText } = render(<MarketplaceSellerRoute />);
+    const cover = getByLabelText('Cover image for Nexus Goods');
+
+    expect(mockResolveImageUrl).toHaveBeenCalledWith('/uploads/sellers/cover.jpg');
+    expect(cover.props.source).toEqual({ uri: 'resolved:/uploads/sellers/cover.jpg' });
   });
 });

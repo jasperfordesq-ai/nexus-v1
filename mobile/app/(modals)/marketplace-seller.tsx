@@ -31,6 +31,7 @@ import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
+import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 
 type SellerTab = 'listings' | 'reviews';
 
@@ -166,10 +167,11 @@ function SellerHeader({ profile, canMessage }: { profile: MarketplaceSellerProfi
   const memberSince = profile.member_since ? new Date(profile.member_since).toLocaleDateString(undefined, { month: 'short', year: 'numeric' }) : null;
   const joinedMarketplace = profile.joined_marketplace_at ? new Date(profile.joined_marketplace_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' }) : null;
   const trustScore = typeof profile.community_trust_score === 'number' ? Math.max(0, Math.min(100, profile.community_trust_score)) : null;
+  const coverImageUrl = resolveImageUrl(profile.cover_image_url);
   return (
     <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
-      {profile.cover_image_url ? (
-        <Image source={{ uri: profile.cover_image_url }} className="h-32 w-full" resizeMode="cover" accessibilityLabel={t('seller.coverAlt', { name: profile.display_name })} />
+      {coverImageUrl ? (
+        <Image source={{ uri: coverImageUrl }} className="h-32 w-full" resizeMode="cover" accessibilityLabel={t('seller.coverAlt', { name: profile.display_name })} />
       ) : (
         <View className="h-1.5" style={{ backgroundColor: primary }} />
       )}
