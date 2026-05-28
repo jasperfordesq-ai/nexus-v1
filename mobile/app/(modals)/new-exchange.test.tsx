@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
+import { Alert } from 'react-native';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 const mockUseApi = jest.fn();
@@ -14,6 +15,7 @@ const mockSetExchangeTags = jest.fn();
 const mockUploadExchangeImage = jest.fn();
 const mockGenerateExchangeDescription = jest.fn();
 const mockLaunchImageLibraryAsync = jest.fn();
+const mockAlert = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
 
 jest.mock('expo-router', () => ({
   router: {
@@ -31,6 +33,8 @@ jest.mock('react-i18next', () => ({
       'detail.cancel': 'Cancel',
       'detail.actionFailedTitle': 'Action failed',
       'detail.aiGenerateFailed': 'AI failed',
+      'detail.imageUploadFailedTitle': 'Listing saved',
+      'detail.imageUploadFailedMessage': 'Image upload failed',
       titleLabel: 'Title',
       description: 'Description',
       category: 'Category',
@@ -165,6 +169,7 @@ beforeEach(() => {
   mockUploadExchangeImage.mockReset().mockResolvedValue({ data: { image_url: '/uploads/listing.jpg' } });
   mockGenerateExchangeDescription.mockReset().mockResolvedValue({ data: { description: 'Generated listing body' } });
   mockLaunchImageLibraryAsync.mockReset().mockResolvedValue({ canceled: false, assets: [{ uri: 'file:///tmp/listing.jpg' }] });
+  mockAlert.mockClear();
 });
 
 describe('NewExchangeModal', () => {
@@ -234,6 +239,21 @@ describe('NewExchangeModal', () => {
     })));
     expect(mockSetExchangeTags).toHaveBeenCalledWith(9, ['gardening', 'pruning']);
     expect(mockUploadExchangeImage).toHaveBeenCalledWith(9, 'file:///tmp/listing.jpg');
+    expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/exchange-detail', params: { id: '9' } });
+  });
+
+  it('warns when the listing is saved but the image upload fails', async () => {
+    mockUploadExchangeImage.mockRejectedValue(new Error('Upload failed'));
+    const { getByPlaceholderText, getByText } = render(<NewExchangeModal />);
+    fireEvent.changeText(getByPlaceholderText('What are you offering?'), 'Gardening help');
+    fireEvent.changeText(getByPlaceholderText('Add more details...'), 'I can help with weeding and pruning.');
+    fireEvent.press(getByText('Teaching'));
+    fireEvent.press(getByText('Add image'));
+    await waitFor(() => expect(mockLaunchImageLibraryAsync).toHaveBeenCalled());
+    fireEvent.press(getByText('Post Offer'));
+
+    await waitFor(() => expect(mockUploadExchangeImage).toHaveBeenCalledWith(9, 'file:///tmp/listing.jpg'));
+    expect(mockAlert).toHaveBeenCalledWith('Listing saved', 'Image upload failed');
     expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/exchange-detail', params: { id: '9' } });
   });
 

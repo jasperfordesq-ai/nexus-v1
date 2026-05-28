@@ -261,6 +261,8 @@
     "editLoadFailed": "We couldn't load this listing for editing.",
     "editSaveFailed": "We couldn't save your changes.",
     "imagePickFailed": "We couldn't open your image library.",
+    "imageUploadFailedTitle": "Listing saved",
+    "imageUploadFailedMessage": "The listing was saved, but the image could not be uploaded.",
     "aiGenerateFailed": "We couldn't generate a description right now.",
     "editSavedTitle": "Listing updated",
     "editSavedMessage": "Your changes have been saved.",

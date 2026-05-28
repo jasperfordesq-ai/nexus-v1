@@ -201,7 +201,11 @@ function NewExchangeModalInner() {
       if (listingId) {
         await setExchangeTags(listingId, tags).catch(() => null);
         if (selectedImageUri) {
-          await uploadExchangeImage(listingId, selectedImageUri).catch(() => null);
+          try {
+            await uploadExchangeImage(listingId, selectedImageUri);
+          } catch {
+            Alert.alert(t('detail.imageUploadFailedTitle'), t('detail.imageUploadFailedMessage'));
+          }
         }
       }
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
