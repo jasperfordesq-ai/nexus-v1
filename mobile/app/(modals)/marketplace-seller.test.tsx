@@ -7,6 +7,23 @@ import React from 'react';
 import { fireEvent, render } from '@testing-library/react-native';
 
 const mockRouterPush = jest.fn();
+const mockUsePaginatedApi = jest.fn((_fetchFn?: unknown, _extractor?: unknown, _deps?: unknown, _options?: unknown) => ({
+  items: [
+    {
+      id: 91,
+      title: 'Repaired table',
+      price: 25,
+      price_currency: 'EUR',
+      price_type: 'fixed',
+      image: null,
+    },
+  ],
+  isLoading: false,
+  error: null,
+  hasMore: false,
+  loadMore: jest.fn(),
+}));
+let mockParams: Record<string, string> = { id: '5' };
 let mockAuthState = {
   isAuthenticated: true,
   user: { id: 42 } as { id: number } | null,
@@ -14,7 +31,7 @@ let mockAuthState = {
 
 jest.mock('expo-router', () => ({
   router: { push: (...args: unknown[]) => mockRouterPush(...args), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
-  useLocalSearchParams: () => ({ id: '5' }),
+  useLocalSearchParams: () => mockParams,
 }));
 
 jest.mock('react-i18next', () => ({
@@ -24,6 +41,8 @@ jest.mock('react-i18next', () => ({
         'common:back': 'Back',
         'seller.eyebrow': 'Seller profile',
         'seller.title': 'Seller profile',
+        'seller.notFound': 'Seller not found',
+        'seller.notFoundHint': 'This seller profile is not available.',
         'seller.verified': 'Verified',
         'seller.partnerBadge': 'Marketplace Partner',
         'seller.sellerType.business': 'Business seller',
@@ -117,7 +136,7 @@ jest.mock('@/lib/hooks/useApi', () => ({
         total_ratings: 3,
         total_sales: 12,
         response_time_avg: '2 hours',
-        active_listings: 1,
+        active_listings: 4,
         member_since: '2024-05-01T00:00:00Z',
         joined_marketplace_at: '2026-04-01T00:00:00Z',
       },
@@ -125,22 +144,7 @@ jest.mock('@/lib/hooks/useApi', () => ({
   }),
 }));
 jest.mock('@/lib/hooks/usePaginatedApi', () => ({
-  usePaginatedApi: () => ({
-    items: [
-      {
-        id: 91,
-        title: 'Repaired table',
-        price: 25,
-        price_currency: 'EUR',
-        price_type: 'fixed',
-        image: null,
-      },
-    ],
-    isLoading: false,
-    error: null,
-    hasMore: false,
-    loadMore: jest.fn(),
-  }),
+  usePaginatedApi: (fetchFn: unknown, extractor: unknown, deps: unknown, options: unknown) => mockUsePaginatedApi(fetchFn, extractor, deps, options),
 }));
 
 import MarketplaceSellerRoute from './marketplace-seller';
@@ -148,6 +152,8 @@ import MarketplaceSellerRoute from './marketplace-seller';
 describe('MarketplaceSellerRoute', () => {
   beforeEach(() => {
     mockRouterPush.mockClear();
+    mockUsePaginatedApi.mockClear();
+    mockParams = { id: '5' };
     mockAuthState = {
       isAuthenticated: true,
       user: { id: 42 },
@@ -155,13 +161,14 @@ describe('MarketplaceSellerRoute', () => {
   });
 
   it('shows listing and reviews tabs on seller profiles', () => {
-    const { getByText, queryByText } = render(<MarketplaceSellerRoute />);
+    const { getAllByText, getByText, queryByText } = render(<MarketplaceSellerRoute />);
 
     expect(getByText('Nexus Goods')).toBeTruthy();
     expect(getByText('Repaired table')).toBeTruthy();
     expect(getByText('Marketplace Partner')).toBeTruthy();
     expect(getByText('Location: Dublin')).toBeTruthy();
     expect(getByText('Listings')).toBeTruthy();
+    expect(getAllByText('4').length).toBeGreaterThanOrEqual(2);
     fireEvent.press(getByText('Reviews'));
 
     expect(getByText('Reviews are coming soon')).toBeTruthy();
@@ -197,5 +204,14 @@ describe('MarketplaceSellerRoute', () => {
 
     const owner = render(<MarketplaceSellerRoute />);
     expect(owner.queryByText('Message seller')).toBeNull();
+  });
+
+  it('does not fetch seller listings when the route id is invalid', () => {
+    mockParams = { id: 'not-a-number' };
+
+    const { getByText } = render(<MarketplaceSellerRoute />);
+
+    expect(getByText('Seller not found')).toBeTruthy();
+    expect(mockUsePaginatedApi).toHaveBeenCalledWith(expect.any(Function), expect.any(Function), [0], { enabled: false });
   });
 });

@@ -58,6 +58,7 @@ function MarketplaceSellerScreen() {
       hasMore: marketplaceHasMore(response),
     }),
     [safeId],
+    { enabled: safeId > 0 },
   );
   const profile = seller.data?.data ?? null;
 
@@ -85,7 +86,7 @@ function MarketplaceSellerScreen() {
               <SellerHeader profile={profile} canMessage={isAuthenticated && user?.id !== profile.user_id} />
               <SellerTabs
                 selected={tab}
-                listingsCount={listings.items.length}
+                listingsCount={profile.active_listings ?? listings.items.length}
                 reviewsCount={profile.total_ratings ?? 0}
                 onSelect={setTab}
               />
