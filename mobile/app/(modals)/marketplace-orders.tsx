@@ -787,12 +787,23 @@ function DeliveryOfferCard({
   const primary = usePrimaryColor();
   const theme = useTheme();
   const delivererName = offer.deliverer?.name?.trim() || t('orders.deliveryUnknown');
+  const avatarUri = offer.deliverer?.avatar_url ?? null;
+  const isVerified = Boolean(offer.deliverer?.is_verified);
   return (
     <HeroCard className="rounded-panel p-0">
       <HeroCard.Body className="gap-3 p-4">
-        <View className="flex-row items-start justify-between gap-3">
+        <View className="flex-row items-start gap-3">
+          <Avatar uri={avatarUri} name={delivererName} size={40} />
           <View className="min-w-0 flex-1">
-            <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={1}>{delivererName}</Text>
+            <View className="flex-row flex-wrap items-center gap-2">
+              <Text className="min-w-0 flex-1 text-base font-bold" style={{ color: theme.text }} numberOfLines={1}>{delivererName}</Text>
+              {isVerified ? (
+                <Chip size="sm" variant="secondary" style={{ backgroundColor: withAlpha(theme.success, 0.14) }}>
+                  <Ionicons name="shield-checkmark-outline" size={12} color={theme.success} />
+                  <Chip.Label style={{ color: theme.success }}>{t('orders.deliveryVerified')}</Chip.Label>
+                </Chip>
+              ) : null}
+            </View>
             <Text className="text-sm" style={{ color: theme.textSecondary }}>
               {t('orders.deliveryTimeCredits', { count: offer.time_credits })}
               {offer.estimated_minutes ? ` - ${t('orders.deliveryEstimate', { count: offer.estimated_minutes })}` : ''}

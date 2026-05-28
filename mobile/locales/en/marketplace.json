@@ -377,6 +377,7 @@
     "deliveryOffersEmpty": "No delivery offers yet",
     "deliveryOffersEmptyHint": "Community delivery offers for this order will appear here.",
     "deliveryUnknown": "Community member",
+    "deliveryVerified": "Verified",
     "deliveryTimeCredits": "{{count}} time credits",
     "deliveryEstimate": "{{count}} minutes",
     "acceptDeliveryOffer": "Accept offer",

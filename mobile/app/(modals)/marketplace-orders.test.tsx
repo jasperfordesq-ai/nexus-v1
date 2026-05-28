@@ -42,9 +42,13 @@ jest.mock('react-i18next', () => ({
         'orders.deliveryOffers': 'Delivery offers',
         'orders.waitingShipment': 'Waiting for shipment',
         'orders.continuePayment': 'Continue payment',
+        'orders.deliveryOffersTitle': 'Community delivery',
+        'orders.deliveryVerified': 'Verified',
+        'orders.acceptDeliveryOffer': 'Accept offer',
         'orders.status.paid': 'Paid',
         'orders.status.pending_payment': 'Pending payment',
         'orders.status.unknown': 'Unknown status',
+        'orders.deliveryStatus.pending': 'Pending',
         'orders.statusHint.purchases.pending_payment': 'Payment is not complete yet. Continue checkout to keep this purchase moving.',
         'orders.statusHint.purchases.paid': 'Payment is complete. The seller can now prepare the order.',
         'orders.statusHint.sales.paid': 'Payment is complete. Mark the order shipped when it is ready.',
@@ -54,6 +58,8 @@ jest.mock('react-i18next', () => ({
       };
       if (key === 'orders.number') return `Order ${String(opts?.number ?? '')}`;
       if (key === 'orders.date') return String(opts?.date ?? '');
+      if (key === 'orders.deliveryTimeCredits') return `${String(opts?.count ?? '')} time credits`;
+      if (key === 'orders.deliveryEstimate') return `${String(opts?.count ?? '')} minutes`;
       return map[key] ?? key;
     },
     i18n: { language: 'en' },
@@ -105,7 +111,7 @@ jest.mock('@/lib/api/marketplace', () => ({
 }));
 
 import MarketplaceOrdersRoute from './marketplace-orders';
-import { getMarketplaceOrders } from '@/lib/api/marketplace';
+import { getMarketplaceDeliveryOffers, getMarketplaceOrders } from '@/lib/api/marketplace';
 
 describe('MarketplaceOrdersRoute', () => {
   beforeEach(() => {
@@ -118,6 +124,7 @@ describe('MarketplaceOrdersRoute', () => {
       data: [],
       meta: { cursor: null, has_more: false },
     });
+    (getMarketplaceDeliveryOffers as jest.Mock).mockResolvedValue({ data: [] });
   });
 
   it('includes pending-payment recovery states in the active orders filter', async () => {
@@ -269,6 +276,68 @@ describe('MarketplaceOrdersRoute', () => {
     });
 
     expect(getAllByText('Delivery offers')).toHaveLength(1);
+    unmount();
+  });
+
+  it('shows community delivery offer identity and verification details', async () => {
+    (getMarketplaceOrders as jest.Mock).mockResolvedValueOnce({
+      data: [
+        {
+          id: 32,
+          order_number: 'MKT-000032',
+          quantity: 1,
+          unit_price: 30,
+          total_price: 30,
+          currency: 'EUR',
+          status: 'paid',
+          created_at: '2026-05-21T10:00:00Z',
+          listing: {
+            id: 62,
+            title: 'Community vase',
+            image: null,
+            delivery_method: 'community_delivery',
+          },
+          seller: { id: 3, name: 'Sam Seller', avatar_url: null },
+        },
+      ],
+      meta: { cursor: null, has_more: false },
+    });
+    (getMarketplaceDeliveryOffers as jest.Mock).mockResolvedValueOnce({
+      data: [
+        {
+          id: 91,
+          order_id: 32,
+          deliverer_id: 77,
+          time_credits: 1.5,
+          estimated_minutes: 45,
+          notes: 'I can deliver after lunch.',
+          status: 'pending',
+          deliverer: {
+            id: 77,
+            name: 'Dana Deliverer',
+            avatar_url: null,
+            is_verified: true,
+          },
+        },
+      ],
+    });
+
+    const { getByText, unmount } = render(<MarketplaceOrdersRoute />);
+
+    await waitFor(() => {
+      expect(getByText('Community vase')).toBeTruthy();
+    });
+
+    fireEvent.press(getByText('Delivery offers'));
+
+    await waitFor(() => {
+      expect(getMarketplaceDeliveryOffers).toHaveBeenCalledWith(32);
+      expect(getByText('Dana Deliverer')).toBeTruthy();
+    });
+    expect(getByText('Verified')).toBeTruthy();
+    expect(getByText('1.5 time credits - 45 minutes')).toBeTruthy();
+    expect(getByText('I can deliver after lunch.')).toBeTruthy();
+    expect(getByText('Accept offer')).toBeTruthy();
     unmount();
   });
 
