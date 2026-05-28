@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, Image, Pressable, RefreshControl, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
@@ -1315,6 +1315,15 @@ export default function FederationDirectoryScreen({ mode }: { mode: DirectoryMod
   const { hasFeature } = useTenant();
   const theme = useTheme();
   const meta = modeMeta[mode];
+
+  useEffect(() => {
+    setSearch(params.q ?? '');
+    setSelectedPartner(params.partner_id ? String(params.partner_id) : '');
+    setActiveThreadKey(null);
+    setActiveListing(null);
+    setActiveGroup(null);
+    setActiveEvent(null);
+  }, [mode, params.partner_id, params.q]);
 
   const queryParams = useMemo(() => {
     const result: Record<string, string> = { per_page: '30' };

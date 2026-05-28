@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { fireEvent, render } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 const mockLoadMore = jest.fn();
 const mockRefresh = jest.fn();
@@ -54,6 +54,7 @@ jest.mock('react-i18next', () => ({
 }));
 
 jest.mock('@/lib/hooks/useTenant', () => ({
+  useTenant: () => ({ hasFeature: () => true }),
   usePrimaryColor: () => '#6366f1',
 }));
 
@@ -199,6 +200,21 @@ describe('FederationListingsScreen', () => {
     await fetchPage(null);
 
     expect(getFederationListings).toHaveBeenCalledWith({ per_page: '30', partner_id: 'ext-2' });
+  });
+
+  it('resyncs partner and search filters when a reused route receives new params', async () => {
+    (getFederationListings as jest.Mock).mockResolvedValue({ data: [], meta: { cursor: null, has_more: false } });
+    const screen = render(<FederationListingsScreen />);
+
+    mockSearchParams = { partner_id: 'ext-9', q: 'drill' };
+    screen.rerender(<FederationListingsScreen />);
+
+    await waitFor(() => {
+      const latestCall = mockUsePaginatedApi.mock.calls[mockUsePaginatedApi.mock.calls.length - 1];
+      const fetchPage = latestCall[0] as (cursor: string | null) => Promise<unknown>;
+      void fetchPage(null);
+      expect(getFederationListings).toHaveBeenCalledWith({ per_page: '30', partner_id: 'ext-9', q: 'drill' });
+    });
   });
 
   it('routes external listing author actions through external federation identifiers', () => {
