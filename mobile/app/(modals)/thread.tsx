@@ -60,7 +60,7 @@ export default function ThreadScreen() {
 }
 
 function ThreadScreenInner() {
-  const { t } = useTranslation('messages');
+  const { t } = useTranslation(['messages', 'common']);
   const { id, recipientId, name, listing, context_type, context_id } = useLocalSearchParams<{
     id?: string | string[];
     recipientId?: string | string[];

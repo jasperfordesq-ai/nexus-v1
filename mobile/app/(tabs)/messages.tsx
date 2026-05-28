@@ -34,7 +34,7 @@ type TFunction = (key: string, options?: Record<string, unknown>) => string;
 type MessagesTab = 'inbox' | 'archived';
 
 export default function MessagesScreen() {
-  const { t } = useTranslation('messages');
+  const { t } = useTranslation(['messages', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
   const unknownMemberLabel = t('unknownMember');
