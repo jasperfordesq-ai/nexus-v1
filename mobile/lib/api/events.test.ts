@@ -81,6 +81,16 @@ describe('getEvents', () => {
     expect(api.get).toHaveBeenCalledWith('/api/v2/events', { when: 'all', per_page: '10' });
   });
 
+  it('includes a group filter when requested', async () => {
+    (api.get as jest.Mock).mockResolvedValue(mockEventsResponse);
+    await getEvents('upcoming', null, 20, { groupId: 90036 });
+    expect(api.get).toHaveBeenCalledWith('/api/v2/events', {
+      when: 'upcoming',
+      per_page: '20',
+      group_id: '90036',
+    });
+  });
+
   it('omits cursor when not provided', async () => {
     (api.get as jest.Mock).mockResolvedValue(mockEventsResponse);
     await getEvents('upcoming');

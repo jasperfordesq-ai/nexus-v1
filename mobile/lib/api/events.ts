@@ -59,6 +59,7 @@ export interface CreateEventPayload {
   description: string;
   start_time: string;
   end_time?: string | null;
+  group_id?: number | null;
   location?: string | null;
   category_name?: string | null;
   is_online?: boolean;
@@ -75,12 +76,14 @@ export function getEvents(
   when: 'upcoming' | 'past' | 'all' = 'upcoming',
   cursor?: string | null,
   perPage = 20,
+  filters: { groupId?: number | null } = {},
 ): Promise<EventsResponse> {
   const params: Record<string, string> = {
     when,
     per_page: String(perPage),
   };
   if (cursor) params['cursor'] = cursor;
+  if (filters.groupId) params['group_id'] = String(filters.groupId);
   return api.get<EventsResponse>(`${API_V2}/events`, params);
 }
 

@@ -23,6 +23,10 @@ import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 
 import {
+  getEvents,
+  type Event,
+} from '@/lib/api/events';
+import {
   createGroupDiscussion,
   getGroup,
   getGroupAnnouncements,
@@ -60,7 +64,7 @@ const WEB_URL = 'https://app.project-nexus.ie';
 const CARD_MIN_HEIGHT = 118;
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
-type TabKey = 'overview' | 'discussion' | 'members' | 'announcements' | 'marketplace';
+type TabKey = 'overview' | 'discussion' | 'members' | 'events' | 'announcements' | 'marketplace';
 type ApiGroupDetail = GroupDetail & {
   viewer_membership?: { status?: string; role?: string; is_admin?: boolean } | null;
   avatar_url?: string | null;
@@ -86,6 +90,23 @@ function formatDate(value?: string | null) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return null;
   return new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short', year: 'numeric' }).format(date);
+}
+
+function formatTime(value?: string | null) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(date);
+}
+
+function formatDateParts(value?: string | null) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return {
+    day: new Intl.DateTimeFormat(undefined, { day: 'numeric' }).format(date),
+    month: new Intl.DateTimeFormat(undefined, { month: 'short' }).format(date),
+  };
 }
 
 function StatusChip({ icon, label, color }: { icon: IoniconName; label: string; color: string }) {
@@ -224,10 +245,14 @@ function GroupDetailScreenInner() {
   const announcementsApi = useApi(() => getGroupAnnouncements(safeGroupId), [safeGroupId, currentIsMember], {
     enabled: safeGroupId > 0 && currentIsMember,
   });
+  const eventsApi = useApi(() => getEvents('upcoming', null, 20, { groupId: safeGroupId }), [safeGroupId], {
+    enabled: safeGroupId > 0,
+  });
 
   const members = useMemo<GroupMemberListItem[]>(() => membersApi.data?.data ?? [], [membersApi.data]);
   const discussions = useMemo<GroupDiscussion[]>(() => discussionsApi.data?.data ?? [], [discussionsApi.data]);
   const announcements = useMemo<GroupAnnouncement[]>(() => announcementsApi.data?.data?.items ?? [], [announcementsApi.data]);
+  const events = useMemo<Event[]>(() => eventsApi.data?.data ?? [], [eventsApi.data]);
 
   const handleRefresh = useCallback(() => {
     setRefreshing(true);
@@ -235,13 +260,14 @@ function GroupDetailScreenInner() {
     membersApi.refresh();
     discussionsApi.refresh();
     announcementsApi.refresh();
-  }, [announcementsApi, discussionsApi, membersApi, refresh]);
+    eventsApi.refresh();
+  }, [announcementsApi, discussionsApi, eventsApi, membersApi, refresh]);
 
   useEffect(() => {
-    if (!isLoading && !membersApi.isLoading && !discussionsApi.isLoading && !announcementsApi.isLoading) {
+    if (!isLoading && !membersApi.isLoading && !discussionsApi.isLoading && !announcementsApi.isLoading && !eventsApi.isLoading) {
       setRefreshing(false);
     }
-  }, [announcementsApi.isLoading, discussionsApi.isLoading, isLoading, membersApi.isLoading]);
+  }, [announcementsApi.isLoading, discussionsApi.isLoading, eventsApi.isLoading, isLoading, membersApi.isLoading]);
 
   async function handleShare() {
     if (!group) return;
@@ -294,6 +320,7 @@ function GroupDetailScreenInner() {
       membersApi.refresh();
       discussionsApi.refresh();
       announcementsApi.refresh();
+      eventsApi.refresh();
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       setIsMember(prevIsMember);
@@ -362,6 +389,7 @@ function GroupDetailScreenInner() {
     { key: 'overview', label: t('detail.tabs.overview'), icon: 'newspaper-outline' },
     { key: 'discussion', label: t('detail.tabs.discussion'), icon: 'chatbubble-ellipses-outline' },
     { key: 'members', label: t('detail.tabs.members'), icon: 'people-outline' },
+    { key: 'events', label: t('detail.tabs.events'), icon: 'calendar-outline' },
     { key: 'announcements', label: t('detail.tabs.announcements'), icon: 'megaphone-outline' },
   ];
   if (hasFeature('marketplace')) {
@@ -673,6 +701,10 @@ function GroupDetailScreenInner() {
           </View>
         ) : null}
 
+        {activeTab === 'events' ? (
+          <GroupEventsPanel groupId={loadedGroup.id} events={events} isLoading={eventsApi.isLoading} canCreate={userCanSeeMemberContent} />
+        ) : null}
+
         {activeTab === 'announcements' ? (
           <View className="gap-3">
             {!userCanSeeMemberContent ? (
@@ -717,6 +749,117 @@ function GroupDetailScreenInner() {
         ) : null}
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+function GroupEventsPanel({
+  groupId,
+  events,
+  isLoading,
+  canCreate,
+}: {
+  groupId: number;
+  events: Event[];
+  isLoading: boolean;
+  canCreate: boolean;
+}) {
+  const { t } = useTranslation(['groups', 'common']);
+  const primary = usePrimaryColor();
+  const theme = useTheme();
+
+  function openEvent(eventId: number) {
+    router.push({ pathname: '/(modals)/event-detail', params: { id: String(eventId) } } as never);
+  }
+
+  function createGroupEvent() {
+    router.push({ pathname: '/(modals)/new-event', params: { group_id: String(groupId) } } as never);
+  }
+
+  return (
+    <View className="gap-3">
+      <HeroCard className="rounded-panel p-0">
+        <HeroCard.Body className="gap-4 p-4">
+          <View className="flex-row items-start gap-3">
+            <View className="size-12 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha('#f59e0b', 0.16) }}>
+              <Ionicons name="calendar-outline" size={23} color="#f59e0b" />
+            </View>
+            <View className="min-w-0 flex-1">
+              <Text className="text-base font-semibold" style={{ color: theme.text }}>
+                {t('detail.eventsHeading')}
+              </Text>
+              <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+                {t('detail.eventsSubtitle')}
+              </Text>
+            </View>
+          </View>
+
+          {canCreate ? (
+            <HeroButton variant="secondary" onPress={createGroupEvent}>
+              <Ionicons name="add-outline" size={16} color={primary} />
+              <HeroButton.Label>{t('detail.createEvent')}</HeroButton.Label>
+            </HeroButton>
+          ) : null}
+        </HeroCard.Body>
+      </HeroCard>
+
+      {isLoading ? (
+        <HeroCard className="rounded-panel p-0">
+          <HeroCard.Body className="min-h-[140px] items-center justify-center">
+            <Spinner size="md" />
+          </HeroCard.Body>
+        </HeroCard>
+      ) : events.length === 0 ? (
+        <EmptyCard icon="calendar-outline" message={t('detail.emptyEvents')} />
+      ) : (
+        events.map((event) => {
+          const eventDate = formatDate(event.start_date) ?? t('detail.eventDateFallback');
+          const eventDateParts = formatDateParts(event.start_date);
+          const eventTime = formatTime(event.start_date);
+          const eventLocation = event.is_online ? t('detail.eventOnline') : event.location;
+          const attendeeCount = event.attendees_count ?? event.rsvp_counts?.going ?? 0;
+          return (
+            <Pressable key={event.id} onPress={() => openEvent(event.id)} accessibilityRole="button">
+              <HeroCard className="rounded-panel p-0">
+                <HeroCard.Body className="gap-3 p-4">
+                  <View className="flex-row items-start gap-3">
+                    <View
+                      className="w-16 items-center rounded-3xl border px-2 py-3"
+                      style={{ backgroundColor: withAlpha('#f59e0b', 0.1), borderColor: withAlpha('#f59e0b', 0.25) }}
+                    >
+                      <Text className="text-center text-[11px] font-semibold uppercase" style={{ color: '#f59e0b' }} numberOfLines={1}>
+                        {eventDateParts?.month ?? eventDate}
+                      </Text>
+                      <Text className="text-center text-xl font-bold" style={{ color: theme.text }} numberOfLines={1}>
+                        {eventDateParts?.day ?? '-'}
+                      </Text>
+                    </View>
+                    <View className="min-w-0 flex-1 gap-2">
+                      <View className="flex-row items-start justify-between gap-2">
+                        <View className="min-w-0 flex-1">
+                          <Text className="text-base font-semibold" style={{ color: theme.text }} numberOfLines={2}>
+                            {event.title}
+                          </Text>
+                          <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>
+                            {stripHtml(event.description)}
+                          </Text>
+                        </View>
+                        <Ionicons name="chevron-forward" size={18} color={theme.textMuted} />
+                      </View>
+
+                      <View className="flex-row flex-wrap gap-2">
+                        {eventTime ? <StatusChip icon="time-outline" label={eventTime} color="#f59e0b" /> : null}
+                        {eventLocation ? <StatusChip icon={event.is_online ? 'videocam-outline' : 'location-outline'} label={eventLocation} color={primary} /> : null}
+                        <StatusChip icon="people-outline" label={t('detail.eventAttending', { count: attendeeCount })} color={theme.textMuted} />
+                      </View>
+                    </View>
+                  </View>
+                </HeroCard.Body>
+              </HeroCard>
+            </Pressable>
+          );
+        })
+      )}
+    </View>
   );
 }
 

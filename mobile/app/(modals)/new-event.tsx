@@ -6,7 +6,7 @@
 import { useState } from 'react';
 import { Alert, ScrollView, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Text } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
@@ -45,8 +45,11 @@ export default function NewEventRoute() {
 
 function NewEventScreen() {
   const { t } = useTranslation(['events', 'common']);
+  const params = useLocalSearchParams<{ group_id?: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const parsedGroupId = Number(params.group_id);
+  const groupId = Number.isFinite(parsedGroupId) && parsedGroupId > 0 ? parsedGroupId : null;
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [startTime, setStartTime] = useState(tomorrowLocalValue());
@@ -74,6 +77,7 @@ function NewEventScreen() {
         description: description.trim(),
         start_time: start,
         end_time: end,
+        group_id: groupId,
         location: location.trim() || null,
         category_name: category || null,
         is_online: allowRemoteAttendance,
@@ -97,7 +101,11 @@ function NewEventScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <AppTopBar title={t('create.title')} backLabel={t('common:back')} fallbackHref="/(tabs)/events" />
+      <AppTopBar
+        title={t('create.title')}
+        backLabel={t('common:back')}
+        fallbackHref={groupId ? ({ pathname: '/(modals)/group-detail', params: { id: String(groupId) } } as unknown as Href) : '/(tabs)/events'}
+      />
       <ScrollView className="flex-1" contentContainerStyle={{ padding: 16, paddingBottom: 120 }}>
         <HeroCard className="mb-4 overflow-hidden rounded-panel p-0">
           <View className="h-1.5" style={{ backgroundColor: '#f59e0b' }} />
