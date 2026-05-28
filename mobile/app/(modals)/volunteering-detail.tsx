@@ -377,6 +377,12 @@ function VolunteeringDetailScreenInner() {
                   <Chip.Label>{t('interestSent')}</Chip.Label>
                 </Chip>
               ) : null}
+              {opportunity.is_owner ? (
+                <Chip size="sm" variant="secondary" color="default">
+                  <Ionicons name="briefcase-outline" size={12} color={theme.textSecondary} />
+                  <Chip.Label>{t('yourOpportunity')}</Chip.Label>
+                </Chip>
+              ) : null}
             </View>
           </HeroCard.Body>
         </HeroCard>
@@ -452,44 +458,57 @@ function VolunteeringDetailScreenInner() {
           </HeroCard>
         ) : null}
 
-        <HeroCard className="rounded-panel p-0">
-          <HeroCard.Body className="gap-4 p-4">
-            <View>
+        {opportunity.is_owner ? (
+          <HeroCard className="rounded-panel p-0">
+            <HeroCard.Body className="gap-2 p-4">
               <Text className="text-base font-semibold" style={{ color: theme.text }}>
-                {hasApplied ? t('applicationSubmitted') : t('applyToVolunteer')}
+                {t('ownerOpportunityTitle')}
               </Text>
-              <Text className="mt-1 text-sm" style={{ color: theme.textSecondary }}>
-                {hasApplied ? t('applicationSubmittedHint') : t('coverMessageHint')}
+              <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+                {t('ownerOpportunityHint')}
               </Text>
-            </View>
-            {!hasApplied ? (
-              <TextInput
-                value={applyMessage}
-                onChangeText={setApplyMessage}
-                placeholder={t('coverMessagePlaceholder')}
-                placeholderTextColor={theme.textMuted}
-                multiline
-                className="min-h-[104px] rounded-panel-inner px-4 py-3 text-base"
-                style={{ backgroundColor: theme.surface, color: theme.text, borderColor: theme.border, borderWidth: 1, textAlignVertical: 'top' }}
-              />
-            ) : null}
-            <HeroButton
-              isDisabled={!open || hasApplied || interestLoading}
-              onPress={() => void handleApply()}
-            >
-              {interestLoading ? (
-                <Spinner size="sm" />
-              ) : (
-                <>
-                  <Ionicons name={hasApplied ? 'checkmark-circle-outline' : 'send-outline'} size={18} color="#fff" />
-                  <HeroButton.Label>
-                    {hasApplied ? t('interestSent') : open ? t('expressInterest') : t('status.closed')}
-                  </HeroButton.Label>
-                </>
-              )}
-            </HeroButton>
-          </HeroCard.Body>
-        </HeroCard>
+            </HeroCard.Body>
+          </HeroCard>
+        ) : (
+          <HeroCard className="rounded-panel p-0">
+            <HeroCard.Body className="gap-4 p-4">
+              <View>
+                <Text className="text-base font-semibold" style={{ color: theme.text }}>
+                  {hasApplied ? t('applicationSubmitted') : t('applyToVolunteer')}
+                </Text>
+                <Text className="mt-1 text-sm" style={{ color: theme.textSecondary }}>
+                  {hasApplied ? t('applicationSubmittedHint') : t('coverMessageHint')}
+                </Text>
+              </View>
+              {!hasApplied ? (
+                <TextInput
+                  value={applyMessage}
+                  onChangeText={setApplyMessage}
+                  placeholder={t('coverMessagePlaceholder')}
+                  placeholderTextColor={theme.textMuted}
+                  multiline
+                  className="min-h-[104px] rounded-panel-inner px-4 py-3 text-base"
+                  style={{ backgroundColor: theme.surface, color: theme.text, borderColor: theme.border, borderWidth: 1, textAlignVertical: 'top' }}
+                />
+              ) : null}
+              <HeroButton
+                isDisabled={!open || hasApplied || interestLoading}
+                onPress={() => void handleApply()}
+              >
+                {interestLoading ? (
+                  <Spinner size="sm" />
+                ) : (
+                  <>
+                    <Ionicons name={hasApplied ? 'checkmark-circle-outline' : 'send-outline'} size={18} color="#fff" />
+                    <HeroButton.Label>
+                      {hasApplied ? t('interestSent') : open ? t('expressInterest') : t('status.closed')}
+                    </HeroButton.Label>
+                  </>
+                )}
+              </HeroButton>
+            </HeroCard.Body>
+          </HeroCard>
+        )}
       </ScrollView>
     </SafeAreaView>
   );

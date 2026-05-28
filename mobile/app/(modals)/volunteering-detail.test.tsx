@@ -33,6 +33,9 @@ jest.mock('react-i18next', () => ({
         'interestError': 'Failed to send interest.',
         'share': 'Share',
         'opportunityEyebrow': 'Volunteer opportunity',
+        'yourOpportunity': 'Your opportunity',
+        'ownerOpportunityTitle': 'Owner view',
+        'ownerOpportunityHint': 'Applications are handled from organiser tools.',
         'applyToVolunteer': 'Apply to volunteer',
         'coverMessageHint': 'Add a note.',
         'coverMessagePlaceholder': 'Tell the organiser…',
@@ -215,6 +218,20 @@ describe('VolunteeringDetailScreen', () => {
 
     const { getByText } = render(<VolunteeringDetailScreen />);
     expect(getByText('Express Interest')).toBeTruthy();
+  });
+
+  it('does not show the apply action for owner-managed opportunities', () => {
+    mockUseApi.mockReturnValueOnce({
+      data: { data: { ...mockOpportunity, is_owner: true } },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByText, queryByText } = render(<VolunteeringDetailScreen />);
+
+    expect(getByText('Your opportunity')).toBeTruthy();
+    expect(queryByText('Express Interest')).toBeNull();
   });
 
   it('renders the not found state when data is null after loading', () => {
