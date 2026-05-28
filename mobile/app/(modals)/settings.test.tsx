@@ -8,6 +8,8 @@ import { render, fireEvent } from '@testing-library/react-native';
 
 // --- Mocks ---
 
+const mockUseApi = jest.fn();
+
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }),
   router: { push: jest.fn(), replace: jest.fn(), back: jest.fn() },
@@ -23,6 +25,16 @@ jest.mock('react-i18next', () => ({
         'account': 'Account',
         'accountHint': 'Account settings.',
         'notifications': 'Notifications',
+        'privacy.title': 'Privacy',
+        'privacy.hint': 'Control who can find, view, and contact you.',
+        'privacy.profileVisibility': 'Profile visibility',
+        'privacy.changeVisibility': 'Change',
+        'privacy.searchIndexing': 'Appear in member search',
+        'privacy.contactPermission': 'Allow member contact',
+        'privacy.saveError': 'Could not save privacy settings. Please try again.',
+        'privacy.visibility.public': 'Visible publicly',
+        'privacy.visibility.members': 'Visible to signed-in members',
+        'privacy.visibility.connections': 'Visible to your connections',
         'editProfile': 'Edit profile',
         'editProfileHint': 'Edit profile details.',
         'pushNotifications': 'Push Notifications',
@@ -71,22 +83,7 @@ jest.mock('@/lib/hooks/useTheme', () => ({
 }));
 
 jest.mock('@/lib/hooks/useApi', () => ({
-  useApi: () => ({
-    data: {
-      data: {
-        email_messages: true,
-        email_connections: true,
-        email_transactions: false,
-        email_reviews: true,
-        push_messages: true,
-        push_transactions: true,
-        push_social: false,
-      },
-    },
-    isLoading: false,
-    error: null,
-    refresh: jest.fn(),
-  }),
+  useApi: (...args: unknown[]) => mockUseApi(...args),
 }));
 
 jest.mock('@expo/vector-icons', () => ({
@@ -113,6 +110,48 @@ jest.mock('expo-constants', () => ({
 // --- Tests ---
 
 import SettingsScreen from './settings';
+import { api } from '@/lib/api/client';
+
+const notificationState = {
+  data: {
+    data: {
+      email_messages: true,
+      email_connections: true,
+      email_transactions: false,
+      email_reviews: true,
+      push_messages: true,
+      push_transactions: true,
+      push_social: false,
+    },
+  },
+  isLoading: false,
+  error: null,
+  refresh: jest.fn(),
+};
+
+const preferencesState = {
+  data: {
+    data: {
+      privacy: {
+        privacy_profile: 'members',
+        privacy_search: true,
+        privacy_contact: false,
+      },
+    },
+  },
+  isLoading: false,
+  error: null,
+  refresh: jest.fn(),
+};
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  let call = 0;
+  mockUseApi.mockImplementation(() => {
+    call += 1;
+    return call % 2 === 1 ? notificationState : preferencesState;
+  });
+});
 
 describe('SettingsScreen', () => {
   it('renders without crashing', () => {
@@ -147,6 +186,27 @@ describe('SettingsScreen', () => {
     expect(getAllByText('Account').length).toBeGreaterThan(0);
     expect(getByText('Change Password')).toBeTruthy();
     expect(getByText('Verify Identity')).toBeTruthy();
+  });
+
+  it('renders privacy controls from user preferences', () => {
+    const { getByText } = render(<SettingsScreen />);
+    expect(getByText('Privacy')).toBeTruthy();
+    expect(getByText('Profile visibility')).toBeTruthy();
+    expect(getByText('Visible to signed-in members')).toBeTruthy();
+    expect(getByText('Appear in member search')).toBeTruthy();
+    expect(getByText('Allow member contact')).toBeTruthy();
+  });
+
+  it('cycles and saves profile visibility privacy preference', () => {
+    const { getByText } = render(<SettingsScreen />);
+    fireEvent.press(getByText('Change'));
+    expect(api.put).toHaveBeenCalledWith('/api/v2/users/me/preferences', {
+      privacy: {
+        privacy_profile: 'connections',
+        privacy_search: true,
+        privacy_contact: false,
+      },
+    });
   });
 
   it('navigates to change-password when Change Password is pressed', () => {

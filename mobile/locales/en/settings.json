@@ -98,5 +98,19 @@
   "notifications": "Notifications",
   "editProfile": "Edit profile",
   "editProfileHint": "Update your public profile, contact details, and avatar.",
-  "changePasswordHint": "Change the password used to sign in."
+  "changePasswordHint": "Change the password used to sign in.",
+  "privacy": {
+    "title": "Privacy",
+    "hint": "Control who can find, view, and contact you.",
+    "profileVisibility": "Profile visibility",
+    "changeVisibility": "Change",
+    "searchIndexing": "Appear in member search",
+    "contactPermission": "Allow member contact",
+    "saveError": "Could not save privacy settings. Please try again.",
+    "visibility": {
+      "public": "Visible publicly",
+      "members": "Visible to signed-in members",
+      "connections": "Visible to your connections"
+    }
+  }
 }

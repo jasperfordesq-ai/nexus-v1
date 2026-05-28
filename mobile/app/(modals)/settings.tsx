@@ -16,7 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from '@/lib/haptics';
 import Constants from 'expo-constants';
 import { useTranslation } from 'react-i18next';
-import { Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
 
 import { api } from '@/lib/api/client';
 import { useApi } from '@/lib/hooks/useApi';
@@ -38,6 +38,18 @@ interface NotificationPrefs {
   push_social: boolean;
 }
 
+type PrivacyVisibility = 'public' | 'members' | 'connections';
+
+interface PrivacyPrefs {
+  privacy_profile: PrivacyVisibility;
+  privacy_search: boolean;
+  privacy_contact: boolean;
+}
+
+interface PreferencesResponse {
+  privacy: PrivacyPrefs;
+}
+
 function getPrefs(): Promise<{ data: NotificationPrefs }> {
   return api.get<{ data: NotificationPrefs }>(`${API_V2}/users/me/notifications`);
 }
@@ -46,19 +58,31 @@ function savePrefs(prefs: Partial<NotificationPrefs>): Promise<void> {
   return api.put<void>(`${API_V2}/users/me/notifications`, prefs);
 }
 
+function getPreferences(): Promise<{ data: PreferencesResponse }> {
+  return api.get<{ data: PreferencesResponse }>(`${API_V2}/users/me/preferences`);
+}
+
+function savePrivacyPrefs(prefs: PrivacyPrefs): Promise<void> {
+  return api.put<void>(`${API_V2}/users/me/preferences`, { privacy: prefs });
+}
+
 export default function SettingsScreen() {
   const { t } = useTranslation('settings');
   const primary = usePrimaryColor();
   const theme = useTheme();
 
   const { data, isLoading } = useApi(() => getPrefs());
+  const { data: preferencesData, isLoading: isLoadingPreferences } = useApi(() => getPreferences());
   const [prefs, setPrefs] = useState<NotificationPrefs | null>(null);
+  const [privacyPrefs, setPrivacyPrefs] = useState<PrivacyPrefs | null>(null);
   const [saving, setSaving] = useState(false);
+  const [savingPrivacy, setSavingPrivacy] = useState(false);
   const constants = Constants as typeof Constants & { default?: typeof Constants };
   const appVersion = Constants.expoConfig?.version ?? constants.default?.expoConfig?.version ?? t('unknownVersion');
 
   // Use server data as initial state once loaded
   const current = prefs ?? data?.data ?? null;
+  const currentPrivacy = privacyPrefs ?? preferencesData?.data?.privacy ?? null;
 
   async function toggle(key: keyof NotificationPrefs) {
     if (!current) return;
@@ -75,6 +99,31 @@ export default function SettingsScreen() {
     } finally {
       setSaving(false);
     }
+  }
+
+  async function updatePrivacy(nextPrefs: PrivacyPrefs) {
+    if (!currentPrivacy) return;
+    setPrivacyPrefs(nextPrefs);
+    setSavingPrivacy(true);
+    try {
+      await savePrivacyPrefs(nextPrefs);
+    } catch {
+      setPrivacyPrefs(currentPrivacy);
+      Alert.alert(t('common:errors.generic'), t('privacy.saveError'));
+    } finally {
+      setSavingPrivacy(false);
+    }
+  }
+
+  function cycleVisibility() {
+    if (!currentPrivacy) return;
+    const nextVisibility: PrivacyVisibility =
+      currentPrivacy.privacy_profile === 'members'
+        ? 'connections'
+        : currentPrivacy.privacy_profile === 'connections'
+          ? 'public'
+          : 'members';
+    void updatePrivacy({ ...currentPrivacy, privacy_profile: nextVisibility });
   }
 
   return (
@@ -151,6 +200,41 @@ export default function SettingsScreen() {
                 router.push('/(modals)/change-password');
               }}
               theme={theme}
+            />
+          </Section>
+
+          <Section
+            title={t('privacy.title')}
+            subtitle={t('privacy.hint')}
+            icon="lock-closed-outline"
+            primary={primary}
+            theme={theme}
+          >
+            <PrivacyVisibilityRow
+              label={t('privacy.profileVisibility')}
+              value={currentPrivacy?.privacy_profile ?? 'members'}
+              disabled={isLoadingPreferences || savingPrivacy || !currentPrivacy}
+              onPress={cycleVisibility}
+              theme={theme}
+              t={t}
+            />
+            <SettingRow
+              label={t('privacy.searchIndexing')}
+              value={currentPrivacy?.privacy_search ?? true}
+              onToggle={() => {
+                if (!currentPrivacy) return;
+                void updatePrivacy({ ...currentPrivacy, privacy_search: !currentPrivacy.privacy_search });
+              }}
+              disabled={isLoadingPreferences || savingPrivacy || !currentPrivacy}
+            />
+            <SettingRow
+              label={t('privacy.contactPermission')}
+              value={currentPrivacy?.privacy_contact ?? true}
+              onToggle={() => {
+                if (!currentPrivacy) return;
+                void updatePrivacy({ ...currentPrivacy, privacy_contact: !currentPrivacy.privacy_contact });
+              }}
+              disabled={isLoadingPreferences || savingPrivacy || !currentPrivacy}
             />
           </Section>
 
@@ -326,6 +410,36 @@ function ActionRow({
         </View>
       </Surface>
     </Pressable>
+  );
+}
+
+function PrivacyVisibilityRow({
+  label,
+  value,
+  disabled,
+  onPress,
+  theme,
+  t,
+}: {
+  label: string;
+  value: PrivacyVisibility;
+  disabled: boolean;
+  onPress: () => void;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+}) {
+  return (
+    <Surface variant="secondary" className="rounded-panel-inner px-3 py-3">
+      <View className="flex-row items-center justify-between gap-3">
+        <View className="min-w-0 flex-1">
+          <Text className="text-sm font-semibold" style={{ color: theme.text }}>{label}</Text>
+          <Text className="text-xs leading-4" style={{ color: theme.textSecondary }}>{t(`privacy.visibility.${value}`)}</Text>
+        </View>
+        <HeroButton size="sm" variant="secondary" onPress={onPress} isDisabled={disabled}>
+          <HeroButton.Label>{t('privacy.changeVisibility')}</HeroButton.Label>
+        </HeroButton>
+      </View>
+    </Surface>
   );
 }
 
