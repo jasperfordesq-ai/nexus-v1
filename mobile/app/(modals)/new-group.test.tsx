@@ -46,6 +46,12 @@ jest.mock('react-i18next', () => ({
         'create.imageUploadFailedDescription': 'The group was saved, but the image could not be uploaded.',
         'create.locationLabel': 'Location',
         'create.locationPlaceholder': 'Optional place or area',
+        'create.coordinatesLabel': 'Map coordinates',
+        'create.coordinatesHint': 'Optional coordinates help maps and nearby group discovery place this group accurately.',
+        'create.latitudeLabel': 'Latitude',
+        'create.latitudePlaceholder': '51.5007',
+        'create.longitudeLabel': 'Longitude',
+        'create.longitudePlaceholder': '-0.1246',
         'create.templateLabel': 'Group template',
         'create.visibilityLabel': 'Visibility',
         'create.federated': 'List in federation',
@@ -58,6 +64,7 @@ jest.mock('react-i18next', () => ({
         'create.validationRequired': 'Add a group name and description before continuing.',
         'create.validationNameLength': 'Use 3 to 100 characters for the group name.',
         'create.validationDescriptionLength': 'Use 20 to 2000 characters for the group description.',
+        'create.invalidCoordinates': 'Enter both latitude and longitude using valid coordinate ranges.',
         public: 'Public',
         private: 'Private',
         'common:back': 'Back',
@@ -191,6 +198,9 @@ describe('NewGroupRoute', () => {
 
     fireEvent.changeText(getByPlaceholderText('Name your group'), 'Repair club');
     fireEvent.changeText(getByPlaceholderText('What is this group for?'), 'A group for sharing repair skills and local mending sessions.');
+    fireEvent.changeText(getByPlaceholderText('Optional place or area'), 'Community hall');
+    fireEvent.changeText(getByPlaceholderText('51.5007'), '51.501');
+    fireEvent.changeText(getByPlaceholderText('-0.1246'), '-0.125');
     fireEvent.press(getByText('Private'));
     fireEvent.press(getByText('List in federation'));
     fireEvent.press(getByText('Create group'));
@@ -200,6 +210,9 @@ describe('NewGroupRoute', () => {
         name: 'Repair club',
         description: 'A group for sharing repair skills and local mending sessions.',
         visibility: 'private',
+        location: 'Community hall',
+        latitude: 51.501,
+        longitude: -0.125,
         federated_visibility: 'listed',
       }));
     });
@@ -228,6 +241,20 @@ describe('NewGroupRoute', () => {
     });
   });
 
+  it('requires paired valid coordinates when coordinates are provided', async () => {
+    const { getByPlaceholderText, getByText } = render(<NewGroupRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('Name your group'), 'Repair club');
+    fireEvent.changeText(getByPlaceholderText('What is this group for?'), 'A group for sharing repair skills and local mending sessions.');
+    fireEvent.changeText(getByPlaceholderText('51.5007'), '51.501');
+    fireEvent.press(getByText('Create group'));
+
+    await waitFor(() => {
+      expect(Alert.alert).toHaveBeenCalledWith('Check group details', 'Enter both latitude and longitude using valid coordinate ranges.');
+    });
+    expect(mockCreateGroup).not.toHaveBeenCalled();
+  });
+
   it('uploads a selected group image after creating the group', async () => {
     const { getByPlaceholderText, getByText } = render(<NewGroupRoute />);
 
@@ -253,6 +280,8 @@ describe('NewGroupRoute', () => {
         description: 'A group for coordinating seasonal planting and shared gardening days.',
         visibility: 'private',
         location: 'Community garden',
+        latitude: 52.1,
+        longitude: -6.3,
         federated_visibility: 'listed',
         image_url: '/uploads/groups/existing.jpg',
       },
@@ -268,6 +297,8 @@ describe('NewGroupRoute', () => {
     expect(mockGetGroupTemplates).not.toHaveBeenCalled();
     expect(getByDisplayValue('A group for coordinating seasonal planting and shared gardening days.')).toBeTruthy();
     expect(getByDisplayValue('Community garden')).toBeTruthy();
+    expect(getByDisplayValue('52.1')).toBeTruthy();
+    expect(getByDisplayValue('-6.3')).toBeTruthy();
 
     fireEvent.changeText(getByPlaceholderText('Name your group'), 'Garden exchange');
     fireEvent.changeText(getByPlaceholderText('What is this group for?'), 'A group for coordinating tool swaps, planting help, and shared gardening days.');
@@ -281,6 +312,8 @@ describe('NewGroupRoute', () => {
         description: 'A group for coordinating tool swaps, planting help, and shared gardening days.',
         visibility: 'public',
         location: 'Community garden',
+        latitude: 52.1,
+        longitude: -6.3,
         federated_visibility: 'none',
       }));
     });

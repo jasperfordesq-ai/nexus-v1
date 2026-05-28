@@ -30,6 +30,13 @@ const GROUP_DESCRIPTION_MAX_LENGTH = 2000;
 const MAX_GROUP_IMAGE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_GROUP_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
+function toNumber(value: string): number | null {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const parsed = Number(trimmed);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
 export default function NewGroupRoute() {
   return (
     <ModalErrorBoundary>
@@ -48,6 +55,8 @@ function NewGroupScreen() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
   const [visibility, setVisibility] = useState<'public' | 'private'>('public');
   const [isFederated, setIsFederated] = useState(false);
   const [templates, setTemplates] = useState<GroupTemplate[]>([]);
@@ -103,6 +112,8 @@ function NewGroupScreen() {
     setName(group.name ?? '');
     setDescription(group.description ?? '');
     setLocation(group.location ?? '');
+    setLatitude(group.latitude !== null && group.latitude !== undefined ? String(group.latitude) : '');
+    setLongitude(group.longitude !== null && group.longitude !== undefined ? String(group.longitude) : '');
     setVisibility(group.visibility === 'private' ? 'private' : 'public');
     setIsFederated(group.federated_visibility === 'listed' || group.federated_visibility === 'joinable');
     setExistingImage(group.image_url ?? group.cover_image ?? null);
@@ -162,12 +173,27 @@ function NewGroupScreen() {
       return;
     }
 
+    const hasLatitude = latitude.trim().length > 0;
+    const hasLongitude = longitude.trim().length > 0;
+    const latitudeValue = toNumber(latitude);
+    const longitudeValue = toNumber(longitude);
+    if (
+      hasLatitude !== hasLongitude
+      || (hasLatitude && (latitudeValue === null || latitudeValue < -90 || latitudeValue > 90))
+      || (hasLongitude && (longitudeValue === null || longitudeValue < -180 || longitudeValue > 180))
+    ) {
+      Alert.alert(t('create.validationTitle'), t('create.invalidCoordinates'));
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const payload = {
         name: trimmedName,
         description: trimmedDescription,
         location: location.trim() || null,
+        latitude: latitudeValue,
+        longitude: longitudeValue,
         visibility,
         federated_visibility: isFederated ? 'listed' : 'none',
       } as const;
@@ -262,6 +288,25 @@ function NewGroupScreen() {
               )}
             </View>
             <FormField label={t('create.locationLabel')} value={location} onChangeText={setLocation} placeholder={t('create.locationPlaceholder')} theme={theme} />
+            <View className="gap-3 rounded-panel-inner border p-3" style={{ borderColor: theme.border, backgroundColor: withAlpha(primary, 0.06) }}>
+              <View className="flex-row items-start gap-3">
+                <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+                  <Ionicons name="navigate-outline" size={18} color={primary} />
+                </View>
+                <View className="min-w-0 flex-1">
+                  <Text className="text-sm font-bold" style={{ color: theme.text }}>{t('create.coordinatesLabel')}</Text>
+                  <Text className="text-xs leading-5" style={{ color: theme.textSecondary }}>{t('create.coordinatesHint')}</Text>
+                </View>
+              </View>
+              <View className="flex-row gap-3">
+                <View className="min-w-0 flex-1">
+                  <FormField label={t('create.latitudeLabel')} value={latitude} onChangeText={setLatitude} placeholder={t('create.latitudePlaceholder')} theme={theme} keyboardType="decimal-pad" />
+                </View>
+                <View className="min-w-0 flex-1">
+                  <FormField label={t('create.longitudeLabel')} value={longitude} onChangeText={setLongitude} placeholder={t('create.longitudePlaceholder')} theme={theme} keyboardType="decimal-pad" />
+                </View>
+              </View>
+            </View>
 
             {!isEditing && templates.length > 0 ? (
               <View className="gap-2">
@@ -323,6 +368,7 @@ function FormField({
   placeholder,
   theme,
   multiline = false,
+  keyboardType,
 }: {
   label: string;
   value: string;
@@ -330,6 +376,7 @@ function FormField({
   placeholder: string;
   theme: ReturnType<typeof useTheme>;
   multiline?: boolean;
+  keyboardType?: 'default' | 'decimal-pad';
 }) {
   return (
     <View className="gap-2">
@@ -342,6 +389,7 @@ function FormField({
         value={value}
         onChangeText={onChangeText}
         multiline={multiline}
+        keyboardType={keyboardType}
       />
     </View>
   );

@@ -29,6 +29,8 @@ export interface Event {
   title: string;
   description: string | null;
   location: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   is_online: boolean;
   online_link?: string | null;
   online_url: string | null;
@@ -65,6 +67,8 @@ export interface CreateEventPayload {
   end_time?: string | null;
   group_id?: number | null;
   location?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   category_name?: string | null;
   is_online?: boolean;
   online_link?: string | null;

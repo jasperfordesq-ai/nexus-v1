@@ -47,6 +47,13 @@ function toDateInputValue(value: string | null | undefined) {
   return date.toISOString().slice(0, 16);
 }
 
+function toNumber(value: string): number | null {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const parsed = Number(trimmed);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
 function resolveEventCategory(event: Event): EventCategoryId | '' {
   const raw = event.category?.name?.trim().toLowerCase();
   if (!raw) return '';
@@ -76,6 +83,8 @@ function NewEventScreen() {
   const [endTime, setEndTime] = useState('');
   const [category, setCategory] = useState<EventCategoryId | ''>('');
   const [location, setLocation] = useState('');
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
   const [maxAttendees, setMaxAttendees] = useState('');
   const [allowRemoteAttendance, setAllowRemoteAttendance] = useState(false);
@@ -117,6 +126,8 @@ function NewEventScreen() {
     setEndTime(toDateInputValue(event.end_date));
     setCategory(resolveEventCategory(event));
     setLocation(event.location ?? '');
+    setLatitude(event.latitude !== null && event.latitude !== undefined ? String(event.latitude) : '');
+    setLongitude(event.longitude !== null && event.longitude !== undefined ? String(event.longitude) : '');
     setVideoUrl(getEventOnlineLink(event) ?? '');
     setMaxAttendees(event.max_attendees !== null && event.max_attendees !== undefined ? String(event.max_attendees) : '');
     setAllowRemoteAttendance(Boolean(event.is_online));
@@ -175,6 +186,19 @@ function NewEventScreen() {
       return;
     }
 
+    const hasLatitude = latitude.trim().length > 0;
+    const hasLongitude = longitude.trim().length > 0;
+    const latitudeValue = toNumber(latitude);
+    const longitudeValue = toNumber(longitude);
+    if (
+      hasLatitude !== hasLongitude
+      || (hasLatitude && (latitudeValue === null || latitudeValue < -90 || latitudeValue > 90))
+      || (hasLongitude && (longitudeValue === null || longitudeValue < -180 || longitudeValue > 180))
+    ) {
+      Alert.alert(t('create.validationTitle'), t('create.invalidCoordinates'));
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const payload: CreateEventPayload = {
@@ -184,6 +208,8 @@ function NewEventScreen() {
         end_time: end,
         group_id: isEditing ? undefined : groupId,
         location: location.trim() || null,
+        latitude: latitudeValue,
+        longitude: longitudeValue,
         category_name: category || null,
         is_online: allowRemoteAttendance,
         online_link: allowRemoteAttendance && videoUrl.trim() ? videoUrl.trim() : null,
@@ -296,6 +322,25 @@ function NewEventScreen() {
             <FormField label={t('create.startLabel')} value={startTime} onChangeText={setStartTime} placeholder={t('create.datePlaceholder')} theme={theme} />
             <FormField label={t('create.endLabel')} value={endTime} onChangeText={setEndTime} placeholder={t('create.optionalDatePlaceholder')} theme={theme} />
             <FormField label={t('create.locationLabel')} value={location} onChangeText={setLocation} placeholder={t('create.locationPlaceholder')} theme={theme} />
+            <View className="gap-3 rounded-panel-inner border p-3" style={{ borderColor: theme.border, backgroundColor: withAlpha(primary, 0.06) }}>
+              <View className="flex-row items-start gap-3">
+                <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+                  <Ionicons name="navigate-outline" size={18} color={primary} />
+                </View>
+                <View className="min-w-0 flex-1">
+                  <Text className="text-sm font-bold" style={{ color: theme.text }}>{t('create.coordinatesLabel')}</Text>
+                  <Text className="text-xs leading-5" style={{ color: theme.textSecondary }}>{t('create.coordinatesHint')}</Text>
+                </View>
+              </View>
+              <View className="flex-row gap-3">
+                <View className="min-w-0 flex-1">
+                  <FormField label={t('create.latitudeLabel')} value={latitude} onChangeText={setLatitude} placeholder={t('create.latitudePlaceholder')} theme={theme} keyboardType="decimal-pad" />
+                </View>
+                <View className="min-w-0 flex-1">
+                  <FormField label={t('create.longitudeLabel')} value={longitude} onChangeText={setLongitude} placeholder={t('create.longitudePlaceholder')} theme={theme} keyboardType="decimal-pad" />
+                </View>
+              </View>
+            </View>
             <ToggleChip label={t('create.remoteAttendance')} selected={allowRemoteAttendance} onPress={() => setAllowRemoteAttendance((value) => !value)} primary={primary} />
             {allowRemoteAttendance ? (
               <FormField label={t('create.videoUrlLabel')} value={videoUrl} onChangeText={setVideoUrl} placeholder={t('create.videoUrlPlaceholder')} theme={theme} />
@@ -336,7 +381,7 @@ function FormField({
   placeholder: string;
   theme: ReturnType<typeof useTheme>;
   multiline?: boolean;
-  keyboardType?: 'default' | 'number-pad';
+  keyboardType?: 'default' | 'number-pad' | 'decimal-pad';
 }) {
   return (
     <View className="gap-2">

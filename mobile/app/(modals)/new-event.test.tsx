@@ -50,6 +50,12 @@ jest.mock('react-i18next', () => ({
         'create.optionalDatePlaceholder': 'Optional end time',
         'create.locationLabel': 'Location',
         'create.locationPlaceholder': 'Venue, town, or meeting place',
+        'create.coordinatesLabel': 'Map coordinates',
+        'create.coordinatesHint': 'Optional coordinates help maps and nearby event discovery place this event accurately.',
+        'create.latitudeLabel': 'Latitude',
+        'create.latitudePlaceholder': '51.5007',
+        'create.longitudeLabel': 'Longitude',
+        'create.longitudePlaceholder': '-0.1246',
         'create.remoteAttendance': 'Allow remote attendance',
         'create.videoUrlLabel': 'Video link',
         'create.videoUrlPlaceholder': 'https://...',
@@ -66,6 +72,7 @@ jest.mock('react-i18next', () => ({
         'create.validationStartFuture': 'Choose a future start time.',
         'create.validationEndAfterStart': 'End time must be after the start time.',
         'create.validationCapacity': 'Capacity must be between 1 and 10,000.',
+        'create.invalidCoordinates': 'Enter both latitude and longitude using valid coordinate ranges.',
         'create.loadFailed': 'Could not load event.',
         'category.workshop': 'Workshop',
         'category.social': 'Social',
@@ -214,11 +221,29 @@ describe('NewEventRoute', () => {
     expect(mockCreateEvent).not.toHaveBeenCalled();
   });
 
+  it('requires paired valid coordinates when coordinates are provided', async () => {
+    const { getByPlaceholderText, getByText } = render(<NewEventRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('What is happening?'), 'Repair workshop');
+    fireEvent.changeText(getByPlaceholderText('Tell members what to expect.'), 'Bring something small to mend together.');
+    fireEvent.changeText(getByPlaceholderText('51.5007'), '91');
+    fireEvent.changeText(getByPlaceholderText('-0.1246'), '-0.1246');
+    fireEvent.press(getByText('Create event'));
+
+    await waitFor(() => {
+      expect(alertSpy).toHaveBeenCalledWith('Check event details', 'Enter both latitude and longitude using valid coordinate ranges.');
+    });
+    expect(mockCreateEvent).not.toHaveBeenCalled();
+  });
+
   it('submits category and remote attendance fields using the event API contract', async () => {
     const { getByPlaceholderText, getByText } = render(<NewEventRoute />);
 
     fireEvent.changeText(getByPlaceholderText('What is happening?'), 'Repair workshop');
     fireEvent.changeText(getByPlaceholderText('Tell members what to expect.'), 'Bring something small to mend.');
+    fireEvent.changeText(getByPlaceholderText('Venue, town, or meeting place'), 'Community hall');
+    fireEvent.changeText(getByPlaceholderText('51.5007'), '51.501');
+    fireEvent.changeText(getByPlaceholderText('-0.1246'), '-0.125');
     fireEvent.press(getByText('Workshop'));
     fireEvent.press(getByText('Allow remote attendance'));
     fireEvent.changeText(getByPlaceholderText('https://...'), 'https://meet.example/workshop');
@@ -227,6 +252,9 @@ describe('NewEventRoute', () => {
     await waitFor(() => {
       expect(mockCreateEvent).toHaveBeenCalledWith(expect.objectContaining({
         category_name: 'workshop',
+        location: 'Community hall',
+        latitude: 51.501,
+        longitude: -0.125,
         is_online: true,
         online_link: 'https://meet.example/workshop',
       }));
@@ -260,6 +288,8 @@ describe('NewEventRoute', () => {
         start_date: '2099-01-02T12:00:00.000Z',
         end_date: '2099-01-02T13:00:00.000Z',
         location: 'Old hall',
+        latitude: 51.5,
+        longitude: -0.12,
         is_online: true,
         online_url: null,
         online_link: 'https://meet.example/old',
@@ -288,6 +318,8 @@ describe('NewEventRoute', () => {
         title: 'Updated workshop',
         description: 'Existing details for attendees.',
         location: 'Old hall',
+        latitude: 51.5,
+        longitude: -0.12,
         category_name: 'workshop',
         is_online: true,
         online_link: 'https://meet.example/old',
