@@ -7,6 +7,7 @@ import { useEffect, useState, type ComponentProps } from 'react';
 import { Alert, Image, Linking, Modal, ScrollView, Share, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
+import { ResizeMode, Video } from 'expo-av';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
@@ -152,6 +153,7 @@ function MarketplaceDetailScreen() {
 
   const images = listing.images?.length ? listing.images : listing.image ? [listing.image] : [];
   const activeImageUrl = resolveImageUrl(images[activeImage]?.url ?? images[activeImage]?.thumbnail_url);
+  const videoUrl = resolveImageUrl(listing.video_url);
   const accent = listing.price_type === 'free' ? theme.success : listing.is_promoted ? theme.warning : primary;
   const priceLabel = formatMarketplacePrice(listing.price, listing.price_type, listing.price_currency, t('common.free'));
   const isOwner = Boolean(listing.is_own || (user?.id && listing.user?.id === user.id));
@@ -329,16 +331,31 @@ function MarketplaceDetailScreen() {
         <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
           <View className="h-1.5" style={{ backgroundColor: accent }} />
           <HeroCard.Body className="gap-4 p-4">
-            <Surface variant="secondary" className="aspect-[4/3] items-center justify-center overflow-hidden rounded-panel-inner p-0">
-              {activeImageUrl ? (
-                <Image source={{ uri: activeImageUrl }} className="h-full w-full" resizeMode="cover" />
-              ) : (
-                <View className="items-center gap-2">
-                  <Ionicons name="bag-handle-outline" size={44} color={accent} />
-                  <Text className="text-sm" style={{ color: theme.textSecondary }}>{t('detail.noImages')}</Text>
-                </View>
-              )}
-            </Surface>
+            {videoUrl ? (
+              <Surface variant="secondary" className="aspect-video overflow-hidden rounded-panel-inner bg-black p-0">
+                <Video
+                  accessibilityLabel={t('detail.video')}
+                  resizeMode={ResizeMode.CONTAIN}
+                  shouldPlay={false}
+                  source={{ uri: videoUrl }}
+                  style={{ width: '100%', height: '100%' }}
+                  useNativeControls
+                />
+              </Surface>
+            ) : null}
+
+            {activeImageUrl || !videoUrl ? (
+              <Surface variant="secondary" className="aspect-[4/3] items-center justify-center overflow-hidden rounded-panel-inner p-0">
+                {activeImageUrl ? (
+                  <Image source={{ uri: activeImageUrl }} className="h-full w-full" resizeMode="cover" />
+                ) : (
+                  <View className="items-center gap-2">
+                    <Ionicons name="bag-handle-outline" size={44} color={accent} />
+                    <Text className="text-sm" style={{ color: theme.textSecondary }}>{t('detail.noImages')}</Text>
+                  </View>
+                )}
+              </Surface>
+            ) : null}
 
             {images.length > 1 ? (
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>

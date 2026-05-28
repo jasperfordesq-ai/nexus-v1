@@ -23,6 +23,7 @@ jest.mock('react-i18next', () => ({
         'detail.title': 'Listing details',
         'detail.noImages': 'No images yet',
         'detail.seller': 'Seller',
+        'detail.video': 'Listing video',
         'detail.communitySeller': 'Community seller',
         'detail.viewSeller': 'View seller profile',
         'detail.description': 'Description',
@@ -83,6 +84,13 @@ jest.mock('@/lib/hooks/useAuth', () => ({
 }));
 
 jest.mock('@expo/vector-icons', () => ({ Ionicons: 'View' }));
+jest.mock('expo-av', () => {
+  const { Text } = require('react-native');
+  return {
+    ResizeMode: { CONTAIN: 'contain' },
+    Video: ({ accessibilityLabel }: { accessibilityLabel?: string }) => <Text>{accessibilityLabel}</Text>,
+  };
+});
 jest.mock('@/lib/haptics', () => ({
   impactAsync: jest.fn(),
   notificationAsync: jest.fn(),
@@ -173,6 +181,24 @@ describe('MarketplaceDetailRoute', () => {
       expect(getByText('Material')).toBeTruthy();
       expect(getByText('Oak')).toBeTruthy();
     });
+  });
+
+  it('renders listing video media without showing the empty image state', async () => {
+    (getMarketplaceListing as jest.Mock).mockResolvedValueOnce({
+      data: {
+        ...mockListing,
+        images: [],
+        image: null,
+        video_url: '/uploads/marketplace/demo.mp4',
+      },
+    });
+
+    const { getByText, queryByText } = render(<MarketplaceDetailRoute />);
+
+    await waitFor(() => {
+      expect(getByText('Listing video')).toBeTruthy();
+    });
+    expect(queryByText('No images yet')).toBeNull();
   });
 
   it('shows pending-payment recovery when checkout fails after order creation', async () => {
