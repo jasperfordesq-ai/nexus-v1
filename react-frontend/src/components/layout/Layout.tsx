@@ -157,15 +157,6 @@ export function Layout({
       {/* Offline indicator */}
       <OfflineIndicator />
 
-      {/* AG70 — Emergency/safety alert banner (caring community tenants only) */}
-      <EmergencyAlertBanner />
-
-      {/* AG42 — Swiss FADP consent banner (fadp_compliance feature tenants only) */}
-      <FadpConsentBanner />
-
-      {/* PWA install banner — one-time, dismissible, hidden when installed */}
-      <InstallBanner />
-
       {/* Global install-instructions modal host — survives when triggers unmount */}
       <InstallModalHost />
 
@@ -193,10 +184,19 @@ export function Layout({
           withNavbarPadding && showNavbar
             ? isUtilityBarVisible
               ? 'pt-[calc(var(--safe-area-top)+5rem)] sm:pt-[calc(var(--safe-area-top)+7.5rem)]'
-              : 'pt-[calc(var(--safe-area-top)+4rem)] sm:pt-[calc(var(--safe-area-top)+5.5rem)]'
+              : 'pt-[calc(var(--safe-area-top)+5rem)] sm:pt-[calc(var(--safe-area-top)+5.5rem)]'
             : ''
         }`}
       >
+        {/* AG70 — Emergency/safety alert banner (caring community tenants only) */}
+        <EmergencyAlertBanner />
+
+        {/* AG42 — Swiss FADP consent banner (fadp_compliance feature tenants only) */}
+        <FadpConsentBanner />
+
+        {/* PWA install banner — one-time, dismissible, hidden when installed */}
+        <InstallBanner />
+
         <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8 min-w-0">
           <Outlet />
         </div>
