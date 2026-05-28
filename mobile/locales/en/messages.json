@@ -17,6 +17,7 @@
   "unreadCount": "{{count}} unread",
   "clearSearch": "Clear search",
   "readStatus": "No unread messages",
+  "unknownMember": "Community member",
   "openThread": "Open",
   "archive": "Archive",
   "archiveConversation": "Archive conversation",

@@ -13,14 +13,14 @@ export function displayName(user: {
   first_name?: string | null;
   last_name?: string | null;
   organization_name?: string | null;
-} | null | undefined): string {
-  if (!user) return 'Unknown';
+} | null | undefined, fallback = 'Unknown'): string {
+  if (!user) return fallback;
   if (user.name) return user.name;
   if (user.organization_name) return user.organization_name;
   const first = user.first_name ?? '';
   const last = user.last_name ?? '';
   const full = `${first} ${last}`.trim();
-  return full || 'Unknown';
+  return full || fallback;
 }
 
 export interface ConversationOtherUser {

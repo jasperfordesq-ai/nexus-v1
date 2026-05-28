@@ -37,6 +37,7 @@ export default function MessagesScreen() {
   const { t } = useTranslation('messages');
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const unknownMemberLabel = t('unknownMember');
   const navigation = useRouter();
   const params = useLocalSearchParams<{
     to?: string | string[];
@@ -79,12 +80,12 @@ export default function MessagesScreen() {
     const query = searchQuery.trim().toLowerCase();
     if (!query) return activeConversations;
     return activeConversations.filter((conversation) => {
-      const otherName = displayName(conversation.other_user).toLowerCase();
+      const otherName = displayName(conversation.other_user, unknownMemberLabel).toLowerCase();
       const lastMsg = conversation.last_message;
       const lastMsgBody = (lastMsg?.body ?? lastMsg?.content ?? '').toLowerCase();
       return otherName.includes(query) || lastMsgBody.includes(query);
     });
-  }, [activeConversations, searchQuery]);
+  }, [activeConversations, searchQuery, unknownMemberLabel]);
 
   const hasSearchQuery = searchQuery.trim().length > 0;
 
@@ -134,7 +135,7 @@ export default function MessagesScreen() {
   function handleArchiveConversation(conversation: Conversation) {
     Alert.alert(
       t('archiveConversation'),
-      t('archiveConfirm', { name: displayName(conversation.other_user) }),
+      t('archiveConfirm', { name: displayName(conversation.other_user, unknownMemberLabel) }),
       [
         { text: t('common:buttons.cancel'), style: 'cancel' },
         {
@@ -171,6 +172,7 @@ export default function MessagesScreen() {
           primary={primary}
           theme={theme}
           t={t}
+          unknownMemberLabel={unknownMemberLabel}
           onRestore={handleRestoreConversation}
         />
       );
@@ -182,9 +184,10 @@ export default function MessagesScreen() {
         primary={primary}
         theme={theme}
         t={t}
+        unknownMemberLabel={unknownMemberLabel}
         onArchive={handleArchiveConversation}
         onOpen={(conversation) => {
-          const otherName = displayName(conversation.other_user);
+          const otherName = displayName(conversation.other_user, unknownMemberLabel);
           void navigation.push({
             pathname: '/(modals)/thread',
             params: { recipientId: String(conversation.other_user.id), name: otherName },
@@ -449,6 +452,7 @@ function ConversationCard({
   primary,
   theme,
   t,
+  unknownMemberLabel,
   onArchive,
   onOpen,
 }: {
@@ -456,11 +460,12 @@ function ConversationCard({
   primary: string;
   theme: Theme;
   t: TFunction;
+  unknownMemberLabel: string;
   onArchive: (conversation: Conversation) => void;
   onOpen: (conversation: Conversation) => void;
 }) {
   const lastMsg = conversation.last_message;
-  const otherName = displayName(conversation.other_user);
+  const otherName = displayName(conversation.other_user, unknownMemberLabel);
   const lastMsgBody = lastMsg?.body ?? lastMsg?.content ?? '';
   const lastMsgIsOwn = lastMsg?.is_own ?? (lastMsg?.sender_id != null && lastMsg.sender_id === conversation.other_user?.id ? false : true);
   const unreadCount = conversation.unread_count ?? 0;
@@ -575,16 +580,18 @@ function ArchivedConversationCard({
   primary,
   theme,
   t,
+  unknownMemberLabel,
   onRestore,
 }: {
   conversation: Conversation;
   primary: string;
   theme: Theme;
   t: TFunction;
+  unknownMemberLabel: string;
   onRestore: (conversation: Conversation) => void;
 }) {
   const lastMsg = conversation.last_message;
-  const otherName = displayName(conversation.other_user);
+  const otherName = displayName(conversation.other_user, unknownMemberLabel);
   const lastMsgBody = lastMsg?.body ?? lastMsg?.content ?? '';
 
   return (

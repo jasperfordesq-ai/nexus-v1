@@ -74,6 +74,7 @@ function ThreadScreenInner() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const { subscribeToMessages } = useRealtimeContext();
+  const unknownMemberLabel = t('unknownMember');
 
   const rawRecipientId = firstParam(recipientId);
   const rawConversationId = firstParam(id);
@@ -289,7 +290,7 @@ function ThreadScreenInner() {
           ref={flatListRef}
           data={messages}
           keyExtractor={(item) => String(item.id)}
-          renderItem={({ item }) => <MessageBubble item={item} primary={primary} theme={theme} t={t} onReact={handleReaction} />}
+          renderItem={({ item }) => <MessageBubble item={item} primary={primary} theme={theme} t={t} unknownMemberLabel={unknownMemberLabel} onReact={handleReaction} />}
           contentContainerStyle={{
             flexGrow: 1,
             justifyContent: messages.length ? 'flex-start' : 'center',
@@ -398,16 +399,18 @@ function MessageBubble({
   primary,
   theme,
   t,
+  unknownMemberLabel,
   onReact,
 }: {
   item: Message;
   primary: string;
   theme: ReturnType<typeof useTheme>;
   t: (key: string, options?: Record<string, unknown>) => string;
+  unknownMemberLabel: string;
   onReact: (messageId: number, emoji: string) => void;
 }) {
   const isOwn = item.is_own;
-  const senderName = displayName(item.sender);
+  const senderName = displayName(item.sender, unknownMemberLabel);
   const reactions = item.reactions ?? {};
   const hasReactions = Object.keys(reactions).length > 0;
 

@@ -42,6 +42,7 @@ jest.mock('react-i18next', () => ({
         'thread.sendFailed': 'Message not sent.',
         'thread.goBack': 'Go back',
         'thread.messageCount': '2 messages',
+        'unknownMember': 'Community member',
         'thread.reactWith': `React with ${String(options?.emoji ?? '')}`,
         'thread.toggleReaction': `Toggle ${String(options?.emoji ?? '')} reaction`,
         'context.regarding': 'Regarding',
@@ -105,7 +106,7 @@ jest.mock('@/lib/api/messages', () => ({
   sendMessage: jest.fn().mockResolvedValue({ data: { id: 99 } }),
   toggleMessageReaction: (...args: unknown[]) => mockToggleMessageReaction(...args),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  displayName: (user: any) => user?.name ?? 'Unknown',
+  displayName: (user: any, fallback = 'Unknown') => user?.name ?? fallback,
 }));
 
 jest.mock('expo-haptics', () => ({
@@ -118,7 +119,11 @@ jest.mock('@/lib/hooks/useAuth', () => ({
 }));
 
 jest.mock('@expo/vector-icons', () => ({ Ionicons: 'View' }));
-jest.mock('@/components/ui/Avatar', () => 'View');
+jest.mock('@/components/ui/Avatar', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return ({ name }: { name: string }) => React.createElement(View, { accessibilityLabel: `${name} avatar` });
+});
 jest.mock('@/components/ui/LoadingSpinner', () => () => null);
 jest.mock('@/components/OfflineBanner', () => () => null);
 jest.mock('@/components/VoiceMessageBubble', () => 'View');
@@ -201,6 +206,24 @@ describe('ThreadScreen', () => {
     const { getByText } = render(<ThreadScreen />);
     expect(getByText('Hello there!')).toBeTruthy();
     expect(getByText('Hi back!')).toBeTruthy();
+  });
+
+  it('uses the translated member fallback for unnamed inbound senders', () => {
+    mockUseApi.mockReturnValue({
+      data: {
+        data: [{
+          ...mockMessages[0],
+          sender: { id: 5, name: null, first_name: null, last_name: null, organization_name: null, avatar_url: null },
+        }],
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByLabelText } = render(<ThreadScreen />);
+
+    expect(getByLabelText('Community member avatar')).toBeTruthy();
   });
 
   it('renders loading state without crashing', () => {

@@ -49,6 +49,7 @@ jest.mock('react-i18next', () => ({
         'empty.archivedSubtitle': 'Archived conversations will appear here.',
         'thread.you': 'You',
         'thread.noMessages': 'No messages yet. Say hello!',
+        'unknownMember': 'Community member',
         'common:buttons.retry': 'Retry',
       };
       return map[key] ?? key;
@@ -111,7 +112,7 @@ jest.mock('@/lib/api/messages', () => ({
   archiveConversation: jest.fn().mockResolvedValue(undefined),
   restoreConversation: jest.fn().mockResolvedValue({ data: { success: true } }),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  displayName: (user: any) => user?.name ?? 'Unknown',
+  displayName: (user: any, fallback = 'Unknown') => user?.name ?? fallback,
 }));
 
 jest.mock('@/lib/utils/formatRelativeTime', () => ({
@@ -188,6 +189,26 @@ describe('MessagesScreen', () => {
     const { getByText } = render(<MessagesScreen />);
     expect(getByText('Bob Builder')).toBeTruthy();
     expect(getByText('Can you help with plumbing?')).toBeTruthy();
+  });
+
+  it('uses the translated member fallback when conversation user names are missing', () => {
+    mockUsePaginatedApi.mockReturnValue({
+      ...defaultPaginatedState,
+      items: [{
+        ...mockConversation,
+        other_user: { id: 2, name: null, first_name: null, last_name: null, organization_name: null, avatar_url: null },
+      }],
+    });
+
+    const { getByText, getByLabelText } = render(<MessagesScreen />);
+
+    expect(getByText('Community member')).toBeTruthy();
+    fireEvent.press(getByLabelText('Community member, Can you help with plumbing?'));
+
+    expect(mockRouterPush).toHaveBeenCalledWith({
+      pathname: '/(modals)/thread',
+      params: { recipientId: '2', name: 'Community member' },
+    });
   });
 
   it('shows unread badge on conversation with unread messages', () => {
