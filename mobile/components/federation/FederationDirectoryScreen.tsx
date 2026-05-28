@@ -160,6 +160,22 @@ function buildMessageThreads(messages: FederatedMessage[]): FederatedThread[] {
     .sort((a, b) => new Date(b.lastMessage.created_at).getTime() - new Date(a.lastMessage.created_at).getTime());
 }
 
+function getThreadKeyForMessage(message: FederatedMessage): string | null {
+  const partner = getMessagePartner(message);
+  if (!partner?.id || !partner.tenant_id) return null;
+  return `${partner.id}-${partner.tenant_id}`;
+}
+
+function mergeFederationMessages(remoteMessages: FederatedMessage[], localMessages: FederatedMessage[]): FederatedMessage[] {
+  const seen = new Set<string>();
+  return [...remoteMessages, ...localMessages].filter((message) => {
+    const id = String(message.id);
+    if (seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
+}
+
 function HeaderCard({
   mode,
   count,
@@ -825,7 +841,7 @@ function MessageThreadView({
   theme: ReturnType<typeof useTheme>;
   primary: string;
   onBack: () => void;
-  onSent: () => void;
+  onSent: (message?: FederatedMessage) => void;
 }) {
   const [reply, setReply] = useState('');
   const [isSending, setIsSending] = useState(false);
@@ -835,7 +851,7 @@ function MessageThreadView({
     if (!reply.trim()) return;
     setIsSending(true);
     try {
-      await sendFederationMessage({
+      const response = await sendFederationMessage({
         receiver_id: thread.partner.id,
         receiver_tenant_id: thread.partner.tenant_id ?? '',
         subject: thread.lastMessage.subject ?? '',
@@ -843,7 +859,7 @@ function MessageThreadView({
         reference_message_id: thread.lastMessage.id,
       });
       setReply('');
-      onSent();
+      onSent(response.data);
     } catch {
       Alert.alert(t('directory.messages.sendFailedTitle'), t('directory.messages.sendFailedDescription'));
     } finally {
@@ -938,7 +954,7 @@ function FederationComposeCard({
   theme: ReturnType<typeof useTheme>;
   primary: string;
   t: (key: string, opts?: Record<string, unknown>) => string;
-  onSent: () => void;
+  onSent: (message?: FederatedMessage) => void;
 }) {
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
@@ -959,7 +975,7 @@ function FederationComposeCard({
     if (!toUser || !toTenant || !body.trim()) return;
     setIsSending(true);
     try {
-      await sendFederationMessage({
+      const response = await sendFederationMessage({
         receiver_id: toUser,
         receiver_tenant_id: toTenant,
         subject: subject.trim(),
@@ -968,7 +984,7 @@ function FederationComposeCard({
       setSubject('');
       setBody('');
       Alert.alert(t('directory.messages.sentTitle'), t('directory.messages.sentDescription', { name: recipientName }));
-      onSent();
+      onSent(response.data);
     } catch {
       Alert.alert(t('directory.messages.sendFailedTitle'), t('directory.messages.sendFailedDescription'));
     } finally {
@@ -1129,6 +1145,7 @@ export default function FederationDirectoryScreen({ mode }: { mode: DirectoryMod
   const [activeListing, setActiveListing] = useState<FederatedListing | null>(null);
   const [activeGroup, setActiveGroup] = useState<FederatedGroup | null>(null);
   const [activeEvent, setActiveEvent] = useState<FederatedEvent | null>(null);
+  const [localFederationMessages, setLocalFederationMessages] = useState<FederatedMessage[]>([]);
   const primary = usePrimaryColor();
   const theme = useTheme();
   const meta = modeMeta[mode];
@@ -1178,9 +1195,12 @@ export default function FederationDirectoryScreen({ mode }: { mode: DirectoryMod
     { enabled: mode === 'messages' },
   );
 
-  const items = mode === 'messages'
+  const remoteItems = mode === 'messages'
     ? unwrapArray<DirectoryItem>(messageData as { data?: DirectoryItem[] } | DirectoryItem[] | null)
     : directoryPage.items;
+  const items = mode === 'messages'
+    ? mergeFederationMessages(remoteItems as FederatedMessage[], localFederationMessages) as DirectoryItem[]
+    : remoteItems;
   const isLoading = mode === 'messages' ? isLoadingMessages : directoryPage.isLoading;
   const error = mode === 'messages' ? messageError : directoryPage.error;
   const refresh = mode === 'messages' ? refreshMessages : directoryPage.refresh;
@@ -1200,6 +1220,19 @@ export default function FederationDirectoryScreen({ mode }: { mode: DirectoryMod
     await Promise.all(unreadIds.map((id) => markFederationMessageRead(id).catch(() => null)));
     if (unreadIds.length > 0) refresh();
   }
+
+  const handleFederationMessageSent = useCallback((message?: FederatedMessage) => {
+    const key = message ? getThreadKeyForMessage(message) : null;
+    if (message && key) {
+      setLocalFederationMessages((current) => (
+        current.some((existing) => String(existing.id) === String(message.id))
+          ? current
+          : [...current, message]
+      ));
+      setActiveThreadKey(key);
+    }
+    refresh();
+  }, [refresh]);
 
   function openListing(listing: FederatedListing) {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -1234,7 +1267,7 @@ export default function FederationDirectoryScreen({ mode }: { mode: DirectoryMod
               theme={theme}
               primary={primary}
               t={t}
-              onSent={refresh}
+              onSent={handleFederationMessageSent}
             />
           ) : null}
 
@@ -1343,7 +1376,7 @@ export default function FederationDirectoryScreen({ mode }: { mode: DirectoryMod
               theme={theme}
               primary={primary}
               onBack={() => setActiveThreadKey(null)}
-              onSent={refresh}
+              onSent={handleFederationMessageSent}
             />
           ) : isLoading ? (
             <View className="items-center py-8"><Spinner size="lg" /></View>

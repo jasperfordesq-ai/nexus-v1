@@ -11,10 +11,11 @@ const mockUsePaginatedApi = jest.fn();
 const mockRefresh = jest.fn();
 const mockMarkRead = jest.fn().mockResolvedValue({});
 const mockSendFederationMessage = jest.fn().mockResolvedValue({ data: { id: 202 } });
+let mockSearchParams: Record<string, string> = {};
 
 jest.mock('expo-router', () => ({
   router: { push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
-  useLocalSearchParams: () => ({}),
+  useLocalSearchParams: () => mockSearchParams,
 }));
 
 jest.mock('react-i18next', () => ({
@@ -32,6 +33,17 @@ jest.mock('react-i18next', () => ({
         'directory.messages.reply': 'Reply',
         'directory.messages.replyPlaceholder': 'Write a federated reply...',
         'directory.messages.sendReply': 'Send reply',
+        'directory.messages.composeEyebrow': 'New federated message',
+        'directory.messages.loadingRecipient': 'Loading recipient...',
+        'directory.messages.recipientFallback': 'Federated member',
+        'directory.messages.noRecipient': 'Choose a federated member before sending a message.',
+        'directory.messages.subject': 'Subject',
+        'directory.messages.subjectPlaceholder': 'Add a short subject',
+        'directory.messages.body': 'Message',
+        'directory.messages.bodyPlaceholder': 'Write your message...',
+        'directory.messages.send': 'Send message',
+        'directory.messages.sentTitle': 'Message sent',
+        'directory.messages.sentDescription': `Your message to ${String(opts?.name ?? '')} has been delivered.`,
         'directory.messages.sendFailedTitle': 'Message not sent',
         'directory.messages.sendFailedDescription': 'Please try again.',
         'directory.messages.federated': 'Federated',
@@ -158,9 +170,11 @@ const message = {
 };
 
 beforeEach(() => {
+  mockSearchParams = {};
   mockRefresh.mockClear();
   mockMarkRead.mockClear();
   mockSendFederationMessage.mockClear();
+  mockSendFederationMessage.mockResolvedValue({ data: { id: 202 } });
   mockUseApi.mockReturnValue({
     data: { data: [message] },
     isLoading: false,
@@ -203,6 +217,65 @@ describe('FederationMessagesScreen', () => {
         reference_message_id: 101,
       });
     });
+    expect(mockRefresh).toHaveBeenCalled();
+  });
+
+  it('opens a sent compose deep link as a federated thread', async () => {
+    mockSearchParams = { compose: 'true', to_user: '272', to_tenant: '5', name: 'Katherine' };
+    const sentMessage = {
+      ...message,
+      id: 202,
+      subject: 'Shared project',
+      body: 'Let us coordinate this.',
+      direction: 'outbound' as const,
+      status: 'delivered' as const,
+      sender: message.receiver,
+      receiver: message.sender,
+    };
+    mockSendFederationMessage.mockResolvedValueOnce({ data: sentMessage });
+    mockUseApi.mockImplementation((_fetcher: unknown, deps?: unknown[]) => {
+      if (Array.isArray(deps) && deps[0] === '272') {
+        return {
+          data: {
+            data: {
+              id: 272,
+              name: 'Katherine',
+              avatar: null,
+              tenant_id: 5,
+              tenant_name: 'Cork Timebank',
+            },
+          },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        };
+      }
+      return {
+        data: { data: [] },
+        isLoading: false,
+        error: null,
+        refresh: mockRefresh,
+      };
+    });
+
+    const { getByPlaceholderText, getByText } = render(<FederationMessagesScreen />);
+
+    expect(getByText('New federated message')).toBeTruthy();
+
+    fireEvent.changeText(getByPlaceholderText('Add a short subject'), 'Shared project');
+    fireEvent.changeText(getByPlaceholderText('Write your message...'), 'Let us coordinate this.');
+    fireEvent.press(getByText('Send message'));
+
+    await waitFor(() => {
+      expect(mockSendFederationMessage).toHaveBeenCalledWith({
+        receiver_id: '272',
+        receiver_tenant_id: '5',
+        subject: 'Shared project',
+        body: 'Let us coordinate this.',
+      });
+    });
+    expect(getByText('Federated conversation')).toBeTruthy();
+    expect(getByText('Let us coordinate this.')).toBeTruthy();
     expect(mockRefresh).toHaveBeenCalled();
   });
 });
