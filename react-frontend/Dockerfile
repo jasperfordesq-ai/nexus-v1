@@ -1,10 +1,10 @@
 # =============================================================================
 # Project NEXUS - React Frontend Dockerfile
 # =============================================================================
-# Node 20 with Vite dev server for development
+# Node 22 with Vite dev server for development
 # =============================================================================
 
-FROM node:20-alpine
+FROM node:22-alpine
 
 # Build arguments
 ARG NODE_ENV=development

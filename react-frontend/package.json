@@ -9,10 +9,10 @@
     "dev": "vite",
     "copy-locales": "node scripts/copy-locales.mjs",
     "copy-changelog": "node scripts/copy-changelog.mjs",
-    "i18n:status": "npx i18next-cli status",
-    "i18n:sync": "npx i18next-cli sync",
-    "i18n:lint": "npx i18next-cli lint",
-    "i18n:types": "npx i18next-cli types",
+    "i18n:status": "i18next-cli status",
+    "i18n:sync": "i18next-cli sync",
+    "i18n:lint": "i18next-cli lint",
+    "i18n:types": "i18next-cli types",
     "prebuild": "npm run copy-locales && npm run copy-changelog",
     "build": "vite build",
     "postbuild": "node scripts/prerender.mjs",
@@ -106,6 +106,8 @@
     "eslint": "^9.39.4",
     "eslint-plugin-i18next": "^6.1.4",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "heroui-cli": "^3.0.2",
+    "i18next-cli": "^1.56.11",
     "jsdom": "^25.0.0",
     "sharp": "^0.34.5",
     "svgo": "^4.0.1",
@@ -120,5 +122,9 @@
   },
   "optionalDependencies": {
     "@esbuild/win32-x64": "^0.27.7"
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10"
   }
 }
