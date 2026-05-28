@@ -18,6 +18,7 @@ import ShieldOff from 'lucide-react/icons/shield-off';
 import Copy from 'lucide-react/icons/copy';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import { GlassCard, Button, Chip, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { InputOTP, Label, Description } from '@heroui/react';
 import { BiometricSettings } from '@/components/security/BiometricSettings';
 import { useTranslation } from 'react-i18next';
 
@@ -564,15 +565,27 @@ export function SecurityTab({
                   </p>
                 </div>
 
-                <Input
-                  label={t('twofa_verification_code')}
-                  placeholder={t('twofa_enter_code')}
-                  value={twoFactorVerifyCode}
-                  onChange={(e) => onTwoFactorVerifyCodeChange(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  maxLength={6}
-                  classNames={inputClassNames}
-                  description={t('twofa_code_description')}
-                />
+                <div className="flex flex-col gap-2 items-center">
+                  <Label className="self-start text-sm">{t('twofa_verification_code')}</Label>
+                  <InputOTP
+                    maxLength={6}
+                    value={twoFactorVerifyCode}
+                    onChange={(val) => onTwoFactorVerifyCodeChange(val.replace(/\D/g, '').slice(0, 6))}
+                  >
+                    <InputOTP.Group>
+                      <InputOTP.Slot index={0} />
+                      <InputOTP.Slot index={1} />
+                      <InputOTP.Slot index={2} />
+                    </InputOTP.Group>
+                    <InputOTP.Separator />
+                    <InputOTP.Group>
+                      <InputOTP.Slot index={3} />
+                      <InputOTP.Slot index={4} />
+                      <InputOTP.Slot index={5} />
+                    </InputOTP.Group>
+                  </InputOTP>
+                  <Description className="self-start text-xs">{t('twofa_code_description')}</Description>
+                </div>
               </div>
             )}
           </ModalBody>
