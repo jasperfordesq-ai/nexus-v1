@@ -30,6 +30,7 @@ import {
   deleteMarketplaceShippingOption,
   disputeMarketplaceOrder,
   getMarketplaceCategories,
+  getMarketplaceCategoryTemplate,
   getMarketplaceCollectionItems,
   getMarketplaceCollections,
   getGroupMarketplaceListings,
@@ -173,6 +174,9 @@ describe('marketplace api', () => {
 
     await getMarketplaceListing(9);
     expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/listings/9');
+
+    await getMarketplaceCategoryTemplate(3);
+    expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/categories/3/template');
   });
 
   it('creates and updates listings with marketplace payloads', async () => {
@@ -188,6 +192,7 @@ describe('marketplace api', () => {
       low_stock_threshold: 1,
       is_oversold_protected: true,
       delivery_method: 'pickup' as const,
+      template_data: { frame_size: 'Medium' },
     };
 
     await createMarketplaceListing(payload);

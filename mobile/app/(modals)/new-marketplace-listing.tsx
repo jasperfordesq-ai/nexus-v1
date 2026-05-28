@@ -19,10 +19,12 @@ import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import {
   createMarketplaceListing,
   getMarketplaceCategories,
+  getMarketplaceCategoryTemplate,
   getMarketplaceListing,
   updateMarketplaceListing,
   uploadMarketplaceImages,
   type MarketplaceCategory,
+  type MarketplaceCategoryTemplateField,
   type MarketplaceCondition,
   type MarketplaceDeliveryMethod,
   type MarketplaceListingPayload,
@@ -66,6 +68,9 @@ export function MarketplaceListingForm() {
   const [priceType, setPriceType] = useState<MarketplacePriceType>(initialPriceType);
   const [condition, setCondition] = useState<MarketplaceCondition>('good');
   const [categoryId, setCategoryId] = useState<number | null>(null);
+  const [categoryTemplate, setCategoryTemplate] = useState<MarketplaceCategoryTemplateField[]>([]);
+  const [templateFields, setTemplateFields] = useState<Record<string, string>>({});
+  const [isLoadingTemplate, setIsLoadingTemplate] = useState(false);
   const [quantity, setQuantity] = useState('1');
   const [inventoryUnlimited, setInventoryUnlimited] = useState(true);
   const [inventoryCount, setInventoryCount] = useState('0');
@@ -107,6 +112,15 @@ export function MarketplaceListingForm() {
         setPriceType(listing.price_type ?? 'fixed');
         setCondition(listing.condition ?? 'good');
         setCategoryId(listing.category?.id ?? null);
+        if (listing.template_data && typeof listing.template_data === 'object') {
+          const fields: Record<string, string> = {};
+          Object.entries(listing.template_data).forEach(([key, value]) => {
+            fields[key] = String(value ?? '');
+          });
+          setTemplateFields(fields);
+        } else {
+          setTemplateFields({});
+        }
         setQuantity(String(listing.quantity ?? 1));
         if (listing.inventory_count === null || listing.inventory_count === undefined) {
           setInventoryUnlimited(true);
@@ -128,6 +142,42 @@ export function MarketplaceListingForm() {
     };
   }, [hydrated, isEditing, listingId, t]);
 
+  useEffect(() => {
+    if (!categoryId) {
+      setCategoryTemplate([]);
+      setTemplateFields({});
+      return;
+    }
+
+    let mounted = true;
+    setIsLoadingTemplate(true);
+    getMarketplaceCategoryTemplate(categoryId)
+      .then((response) => {
+        if (!mounted) return;
+        const fields = response.data.fields ?? [];
+        setCategoryTemplate(fields);
+        setTemplateFields((current) => {
+          const next: Record<string, string> = {};
+          fields.forEach((field) => {
+            next[field.key] = current[field.key] ?? '';
+          });
+          return next;
+        });
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setCategoryTemplate([]);
+        setTemplateFields({});
+      })
+      .finally(() => {
+        if (mounted) setIsLoadingTemplate(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [categoryId]);
+
   async function submit() {
     if (!title.trim() || !description.trim()) {
       Alert.alert(t('forms.validation'), t('forms.required'));
@@ -136,6 +186,9 @@ export function MarketplaceListingForm() {
 
     setIsSubmitting(true);
     try {
+      const filledTemplateFields = Object.fromEntries(
+        Object.entries(templateFields).filter(([, value]) => value.trim() !== ''),
+      );
       const payload: MarketplaceListingPayload = {
         title: title.trim(),
         tagline: tagline.trim() || null,
@@ -157,6 +210,9 @@ export function MarketplaceListingForm() {
         seller_type: sellerType,
         status: 'active',
       };
+      if (Object.keys(filledTemplateFields).length > 0) {
+        payload.template_data = filledTemplateFields;
+      }
       const response = isEditing
         ? await updateMarketplaceListing(listingId, payload)
         : await createMarketplaceListing(payload);
@@ -221,6 +277,13 @@ export function MarketplaceListingForm() {
             <FormField label={t('forms.timeCredits')} value={timeCredits} onChangeText={setTimeCredits} placeholder={t('forms.timeCreditsPlaceholder')} keyboardType="decimal-pad" />
             <ButtonGroup label={t('forms.condition')} values={CONDITIONS} selected={condition} onSelect={setCondition} labelFor={(value) => t(`condition.${value}`)} primary={primary} />
             <CategoryGroup categories={categories} selected={categoryId} onSelect={setCategoryId} primary={primary} />
+            <TemplateFieldsSection
+              fields={categoryTemplate}
+              values={templateFields}
+              isLoading={isLoadingTemplate}
+              onChange={(key, value) => setTemplateFields((current) => ({ ...current, [key]: value }))}
+              primary={primary}
+            />
             <FormField label={t('forms.quantity')} value={quantity} onChangeText={setQuantity} placeholder={t('forms.quantityPlaceholder')} keyboardType="decimal-pad" />
             <View className="gap-3 rounded-panel-inner border p-3" style={{ borderColor: theme.border, backgroundColor: withAlpha(primary, 0.06) }}>
               <View className="flex-row items-start gap-3">
@@ -342,6 +405,113 @@ function CategoryGroup({ categories, selected, onSelect, primary }: { categories
         {categories.map((category) => (
           <HeroButton key={category.id} size="sm" variant={selected === category.id ? 'primary' : 'secondary'} onPress={() => onSelect(category.id)} style={selected === category.id ? { backgroundColor: primary } : undefined}>
             <HeroButton.Label>{category.name}</HeroButton.Label>
+          </HeroButton>
+        ))}
+      </ScrollView>
+    </View>
+  );
+}
+
+function TemplateFieldsSection({
+  fields,
+  values,
+  isLoading,
+  onChange,
+  primary,
+}: {
+  fields: MarketplaceCategoryTemplateField[];
+  values: Record<string, string>;
+  isLoading: boolean;
+  onChange: (key: string, value: string) => void;
+  primary: string;
+}) {
+  const { t } = useTranslation('marketplace');
+  const theme = useTheme();
+
+  if (isLoading) {
+    return (
+      <View className="min-h-12 flex-row items-center gap-3 rounded-panel-inner border px-3" style={{ borderColor: theme.border, backgroundColor: withAlpha(primary, 0.05) }}>
+        <Ionicons name="options-outline" size={18} color={primary} />
+        <Text className="text-sm font-semibold" style={{ color: theme.text }}>{t('forms.loadingCategoryFields')}</Text>
+      </View>
+    );
+  }
+
+  if (fields.length === 0) return null;
+
+  return (
+    <View className="gap-3 rounded-panel-inner border p-3" style={{ borderColor: theme.border, backgroundColor: withAlpha(primary, 0.06) }}>
+      <View className="flex-row items-start gap-3">
+        <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+          <Ionicons name="options-outline" size={18} color={primary} />
+        </View>
+        <View className="min-w-0 flex-1">
+          <Text className="text-sm font-bold" style={{ color: theme.text }}>{t('forms.categorySpecificDetails')}</Text>
+          <Text className="text-xs leading-5" style={{ color: theme.textSecondary }}>{t('forms.categorySpecificHint')}</Text>
+        </View>
+      </View>
+      {fields.map((field) => {
+        const label = field.required ? `${field.label} *` : field.label;
+        if (field.type === 'select' && field.options?.length) {
+          return (
+            <TemplateSelectField
+              key={field.key}
+              field={{ ...field, label }}
+              value={values[field.key] ?? ''}
+              onChange={(value) => onChange(field.key, value)}
+              primary={primary}
+            />
+          );
+        }
+
+        return (
+          <FormField
+            key={field.key}
+            label={label}
+            value={values[field.key] ?? ''}
+            onChangeText={(value) => onChange(field.key, value)}
+            placeholder={t('forms.templateFieldPlaceholder', { field: field.label.toLowerCase() })}
+            keyboardType={field.type === 'number' ? 'decimal-pad' : undefined}
+          />
+        );
+      })}
+    </View>
+  );
+}
+
+function TemplateSelectField({
+  field,
+  value,
+  onChange,
+  primary,
+}: {
+  field: MarketplaceCategoryTemplateField;
+  value: string;
+  onChange: (value: string) => void;
+  primary: string;
+}) {
+  const { t } = useTranslation('marketplace');
+  const theme = useTheme();
+  const options = field.options ?? [];
+
+  return (
+    <View className="gap-2">
+      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{field.label}</Text>
+      {!value ? (
+        <Text className="text-xs leading-5" style={{ color: theme.textMuted }}>
+          {t('forms.templateSelectPlaceholder', { field: field.label.replace(/\s+\*$/, '').toLowerCase() })}
+        </Text>
+      ) : null}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+        {options.map((option) => (
+          <HeroButton
+            key={option}
+            size="sm"
+            variant={value === option ? 'primary' : 'secondary'}
+            onPress={() => onChange(value === option ? '' : option)}
+            style={value === option ? { backgroundColor: primary } : undefined}
+          >
+            <HeroButton.Label>{option}</HeroButton.Label>
           </HeroButton>
         ))}
       </ScrollView>

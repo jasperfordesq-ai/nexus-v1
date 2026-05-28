@@ -20,6 +20,21 @@ export interface MarketplaceCategory {
   listing_count: number;
 }
 
+export interface MarketplaceCategoryTemplateField {
+  key: string;
+  label: string;
+  type: 'text' | 'number' | 'select';
+  options?: string[];
+  required?: boolean;
+}
+
+export interface MarketplaceCategoryTemplate {
+  id?: number | null;
+  category_id: number;
+  name?: string | null;
+  fields: MarketplaceCategoryTemplateField[];
+}
+
 export interface MarketplaceUser {
   id: number;
   name: string;
@@ -85,6 +100,7 @@ export interface MarketplaceListingDetail extends MarketplaceListingItem {
   local_pickup: boolean;
   images: MarketplaceImage[];
   saves_count: number;
+  template_data?: Record<string, unknown> | null;
 }
 
 export interface MarketplaceOffer {
@@ -465,6 +481,7 @@ export interface MarketplaceListingPayload {
   delivery_method?: MarketplaceDeliveryMethod;
   seller_type?: 'private' | 'business';
   status?: 'draft' | 'active';
+  template_data?: Record<string, string> | null;
 }
 
 function addQueryValue(query: Record<string, string>, key: string, value: unknown): void {
@@ -525,6 +542,10 @@ export function getFreeMarketplaceListings(
 
 export function getMarketplaceCategories(): Promise<MarketplaceDataResponse<MarketplaceCategory[]>> {
   return api.get<MarketplaceDataResponse<MarketplaceCategory[]>>(`${API_V2}/marketplace/categories`);
+}
+
+export function getMarketplaceCategoryTemplate(id: number): Promise<MarketplaceDataResponse<MarketplaceCategoryTemplate>> {
+  return api.get<MarketplaceDataResponse<MarketplaceCategoryTemplate>>(`${API_V2}/marketplace/categories/${id}/template`);
 }
 
 export function getMarketplaceListing(id: number): Promise<MarketplaceDataResponse<MarketplaceListingDetail>> {
