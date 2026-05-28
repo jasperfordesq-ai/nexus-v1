@@ -13,7 +13,7 @@ import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
 
-import { getEvent, removeRsvp, rsvpEvent } from '@/lib/api/events';
+import { getEvent, getEventOnlineLink, removeRsvp, rsvpEvent } from '@/lib/api/events';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -91,6 +91,7 @@ function EventDetailScreenInner() {
   const accent = event.category?.color ?? '#F59E0B';
   const coverImage = resolveImageUrl(event.cover_image);
   const isOrganizer = user?.id === event.organizer?.id;
+  const onlineLink = getEventOnlineLink(event);
 
   async function handleShare() {
     if (!event) return;
@@ -206,9 +207,9 @@ function EventDetailScreenInner() {
         {event.is_online ? (
           <HeroCard variant="secondary">
             <HeroCard.Body className="gap-3 px-4 py-4">
-              <SectionTitle icon="videocam-outline" title={event.online_url ? t('onlineTapToJoin') : t('onlineEvent')} primary={primary} theme={theme} />
-              {event.online_url ? (
-                <HeroButton variant="secondary" onPress={() => void Linking.openURL(event.online_url!)}>
+              <SectionTitle icon="videocam-outline" title={onlineLink ? t('onlineTapToJoin') : t('onlineEvent')} primary={primary} theme={theme} />
+              {onlineLink ? (
+                <HeroButton variant="secondary" onPress={() => void Linking.openURL(onlineLink)}>
                   <Ionicons name="open-outline" size={18} color={primary} />
                   <HeroButton.Label>{t('detail.joinOnline')}</HeroButton.Label>
                 </HeroButton>

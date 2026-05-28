@@ -14,7 +14,7 @@ import { Button as HeroButton, Card as HeroCard, Text } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 
-import { createEvent, getEvent, updateEvent, uploadEventImage, type CreateEventPayload, type Event } from '@/lib/api/events';
+import { createEvent, getEvent, getEventOnlineLink, updateEvent, uploadEventImage, type CreateEventPayload, type Event } from '@/lib/api/events';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
@@ -117,7 +117,7 @@ function NewEventScreen() {
     setEndTime(toDateInputValue(event.end_date));
     setCategory(resolveEventCategory(event));
     setLocation(event.location ?? '');
-    setVideoUrl(event.online_url ?? '');
+    setVideoUrl(getEventOnlineLink(event) ?? '');
     setMaxAttendees(event.max_attendees !== null && event.max_attendees !== undefined ? String(event.max_attendees) : '');
     setAllowRemoteAttendance(Boolean(event.is_online));
     setIsFederated(event.federated_visibility === 'listed' || event.federated_visibility === 'bookable');

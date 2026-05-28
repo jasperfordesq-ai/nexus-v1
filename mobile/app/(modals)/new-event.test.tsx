@@ -101,6 +101,8 @@ jest.mock('@/lib/hooks/useTheme', () => ({
 jest.mock('@/lib/api/events', () => ({
   createEvent: (...args: unknown[]) => mockCreateEvent(...args),
   getEvent: (...args: unknown[]) => mockGetEvent(...args),
+  getEventOnlineLink: (event: { online_link?: string | null; online_url?: string | null; video_url?: string | null }) =>
+    event.online_link ?? event.online_url ?? event.video_url ?? null,
   updateEvent: (...args: unknown[]) => mockUpdateEvent(...args),
   uploadEventImage: (...args: unknown[]) => mockUploadEventImage(...args),
 }));
@@ -259,7 +261,8 @@ describe('NewEventRoute', () => {
         end_date: '2099-01-02T13:00:00.000Z',
         location: 'Old hall',
         is_online: true,
-        online_url: 'https://meet.example/old',
+        online_url: null,
+        online_link: 'https://meet.example/old',
         max_attendees: 25,
         organizer: { id: 3, name: 'Jane Organizer', avatar: null },
         category: { id: 2, name: 'workshop', color: '#f59e0b' },

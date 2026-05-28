@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import { Linking } from 'react-native';
 
 // --- Mocks ---
 
@@ -33,6 +34,7 @@ jest.mock('react-i18next', () => ({
         'interested': 'Interested',
         'onlineEvent': 'Online Event',
         'onlineTapToJoin': 'Tap to Join',
+        'detail.joinOnline': 'Join online',
         'full': 'Full',
         'rsvpError': 'Failed to update RSVP.',
         'common:errors.alertTitle': 'Error',
@@ -91,6 +93,8 @@ jest.mock('@expo/vector-icons', () => ({
 
 jest.mock('@/lib/api/events', () => ({
   getEvent: jest.fn(),
+  getEventOnlineLink: (event: { online_link?: string | null; online_url?: string | null; video_url?: string | null }) =>
+    event.online_link ?? event.online_url ?? event.video_url ?? null,
   rsvpEvent: jest.fn().mockResolvedValue({ data: { rsvp: 'going', rsvp_counts: { going: 1, interested: 0 } } }),
   removeRsvp: jest.fn().mockResolvedValue(undefined),
 }));
@@ -183,6 +187,34 @@ describe('EventDetailScreen', () => {
     fireEvent.press(getByText('Edit'));
 
     expect(mockRouterPush).toHaveBeenCalledWith({ pathname: '/(modals)/edit-event', params: { id: '7' } });
+  });
+
+  it('uses backend online_link when opening an online event', async () => {
+    const openUrlSpy = jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
+    mockUseApi.mockReturnValue({
+      data: {
+        data: {
+          ...mockEvent,
+          is_online: true,
+          online_url: null,
+          online_link: 'https://meet.example/live',
+          location: null,
+        },
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByText } = render(<EventDetailScreen />);
+
+    expect(getByText('Tap to Join')).toBeTruthy();
+    fireEvent.press(getByText('Join online'));
+
+    await waitFor(() => {
+      expect(openUrlSpy).toHaveBeenCalledWith('https://meet.example/live');
+    });
+    openUrlSpy.mockRestore();
   });
 });
 

@@ -30,7 +30,9 @@ export interface Event {
   description: string | null;
   location: string | null;
   is_online: boolean;
+  online_link?: string | null;
   online_url: string | null;
+  video_url?: string | null;
   start_date: string;
   end_date: string | null;
   cover_image: string | null;
@@ -71,6 +73,10 @@ export interface CreateEventPayload {
 }
 
 export type UpdateEventPayload = CreateEventPayload;
+
+export function getEventOnlineLink(event: Pick<Event, 'online_link' | 'online_url' | 'video_url'>): string | null {
+  return event.online_link ?? event.online_url ?? event.video_url ?? null;
+}
 
 /**
  * GET /api/v2/events — list upcoming events for the current tenant.
