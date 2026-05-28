@@ -31,6 +31,20 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 const WEB_URL = 'https://app.project-nexus.ie';
+const TRANSLATABLE_STATUSES = new Set(['approved', 'active', 'pending', 'declined']);
+
+function getStatusLabel(status: string | null | undefined, t: (key: string) => string): string | null {
+  if (!status) {
+    return null;
+  }
+
+  const normalized = status.toLowerCase();
+  if (!TRANSLATABLE_STATUSES.has(normalized)) {
+    return status;
+  }
+
+  return t(`status.${normalized}`);
+}
 
 export default function OrganisationDetailScreen() {
   const { t } = useTranslation('organisations');
@@ -116,6 +130,7 @@ export default function OrganisationDetailScreen() {
   const listingsCount = organisation.listings_count ?? 0;
   const opportunityCount = organisation.opportunity_count ?? 0;
   const totalHours = organisation.total_hours ?? 0;
+  const statusLabel = getStatusLabel(organisation.status, t);
 
   return (
     <ModalErrorBoundary>
@@ -149,9 +164,9 @@ export default function OrganisationDetailScreen() {
                         <Chip.Label>{t('verified')}</Chip.Label>
                       </Chip>
                     ) : null}
-                    {organisation.status ? (
+                    {statusLabel ? (
                       <Chip size="sm" variant="secondary">
-                        <Chip.Label>{organisation.status}</Chip.Label>
+                        <Chip.Label>{statusLabel}</Chip.Label>
                       </Chip>
                     ) : null}
                   </View>

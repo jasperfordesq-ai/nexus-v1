@@ -5,6 +5,12 @@
   "searchPlaceholder": "Buscar organizaciones…",
   "empty": "No se encontraron organizaciones.",
   "verified": "Verificada",
+  "status": {
+    "approved": "Aprobada",
+    "active": "Activa",
+    "pending": "Pendiente de revision",
+    "declined": "Rechazada"
+  },
   "members": "{{count}} miembro",
   "members_other": "{{count}} miembros",
   "listings": "{{count}} anuncio",

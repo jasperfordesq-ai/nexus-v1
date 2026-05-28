@@ -11,6 +11,12 @@
   "tryDifferentSearch": "Try a different search.",
   "noDescription": "Community partner profile.",
   "verified": "Verified",
+  "status": {
+    "approved": "Approved",
+    "active": "Active",
+    "pending": "Pending review",
+    "declined": "Declined"
+  },
   "viewOrganisation": "View organisation",
   "registerButton": "Register Organisation",
   "members": "{{count}} member",

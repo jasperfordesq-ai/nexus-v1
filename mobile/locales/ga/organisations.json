@@ -5,6 +5,12 @@
   "searchPlaceholder": "Cuardach eagraíochtaí…",
   "empty": "Níor aimsíodh aon eagraíocht.",
   "verified": "Fíoraithe",
+  "status": {
+    "approved": "Faofa",
+    "active": "Gniomhach",
+    "pending": "A athbhreithniu",
+    "declined": "Diultaithe"
+  },
   "members": "{{count}} comhalta",
   "members_other": "{{count}} comhalta",
   "listings": "{{count}} fógra",

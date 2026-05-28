@@ -29,6 +29,10 @@ jest.mock('react-i18next', () => ({
         'detail.browseOrganisations': 'Browse organisations',
         'detail.goBack': 'Go Back',
         'verified': 'Verified',
+        'status.approved': 'Approved',
+        'status.active': 'Active',
+        'status.pending': 'Pending review',
+        'status.declined': 'Declined',
         'website': 'Visit Website',
         'members': opts ? `${String(opts.count ?? 0)} members` : '0 members',
         'listings': opts ? `${String(opts.count ?? 0)} listings` : '0 listings',
@@ -140,6 +144,19 @@ describe('OrganisationDetailScreen', () => {
 
     const { getAllByText } = render(<OrganisationDetailScreen />);
     expect(getAllByText('A vibrant hub for community services in Dublin.').length).toBeGreaterThan(0);
+  });
+
+  it('renders translated backend organisation statuses', () => {
+    mockUseApi.mockReturnValue({
+      data: { data: { ...mockOrg, verified: false, status: 'pending' } },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByText, queryByText } = render(<OrganisationDetailScreen />);
+    expect(getByText('Pending review')).toBeTruthy();
+    expect(queryByText('pending')).toBeNull();
   });
 
   it('renders loading state without crashing', () => {
