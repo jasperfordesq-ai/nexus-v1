@@ -8,6 +8,15 @@ import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 let mockParams: Record<string, string> = {};
 const mockHasFeature = jest.fn(() => true);
+let mockAuthState: {
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  user: { id: number } | null;
+} = {
+  isAuthenticated: true,
+  isLoading: false,
+  user: { id: 9 },
+};
 const mockT = (key: string, opts?: Record<string, unknown>) => {
   const map: Record<string, string> = {
     'common:back': 'Back',
@@ -20,6 +29,8 @@ const mockT = (key: string, opts?: Record<string, unknown>) => {
     'tools.payments': 'Payments',
     'tools.shipping': 'Shipping options',
     'tools.delete': 'Delete',
+    'tools.signInTitle': 'Sign in to use marketplace tools',
+    'tools.signInHint': 'Saved searches, collections, promotions, pickup slots, and seller coupons are available after you sign in.',
     'tools.tabs.collections': 'Collections',
     'tools.tabs.savedSearches': 'Saved searches',
     'tools.tabs.promotions': 'Promotions',
@@ -111,6 +122,7 @@ const mockT = (key: string, opts?: Record<string, unknown>) => {
     'tools.coupons.applies.all_listings': 'All listings',
     'tools.coupons.applies.listing_ids': 'Specific listings',
     'tools.coupons.applies.category_ids': 'Specific categories',
+    'auth:login.submit': 'Sign in',
   };
   return map[key] ?? key;
 };
@@ -145,7 +157,7 @@ jest.mock('@/components/ui/LoadingSpinner', () => {
 });
 
 jest.mock('@/lib/hooks/useAuth', () => ({
-  useAuth: () => ({ user: { id: 9 } }),
+  useAuth: () => mockAuthState,
 }));
 
 jest.mock('@/lib/hooks/useTenant', () => ({
@@ -197,6 +209,7 @@ import {
   createMarketplacePickupSlot,
   createMarketplaceSavedSearch,
   getMarketplacePickupSlots,
+  getMarketplaceCollections,
   getMarketplaceSavedSearches,
   getMerchantCoupons,
   getMerchantCouponRedemptions,
@@ -226,6 +239,12 @@ describe('MarketplaceToolsRoute', () => {
     jest.clearAllMocks();
     mockParams = {};
     mockHasFeature.mockReturnValue(true);
+    mockAuthState = {
+      isAuthenticated: true,
+      isLoading: false,
+      user: { id: 9 },
+    };
+    jest.mocked(getMarketplaceCollections).mockResolvedValue({ data: [] } as never);
     jest.mocked(getMarketplacePickupSlots).mockResolvedValue({ data: [] } as never);
     jest.mocked(getMyMarketplacePickups).mockResolvedValue({ data: [] } as never);
     jest.mocked(createMarketplacePickupSlot).mockResolvedValue({ data: { id: 32 } } as never);
@@ -256,6 +275,18 @@ describe('MarketplaceToolsRoute', () => {
 
     expect(await findByText('Editing coupon')).toBeTruthy();
     expect(await findByText('Update coupon')).toBeTruthy();
+  });
+
+  it('shows the sign-in state without calling protected seller tool APIs when unauthenticated', () => {
+    mockAuthState = { isAuthenticated: false, isLoading: false, user: null };
+
+    const { getByText } = render(<MarketplaceToolsRoute />);
+
+    expect(getByText('Sign in to use marketplace tools')).toBeTruthy();
+    expect(getMarketplaceCollections).not.toHaveBeenCalled();
+    expect(getMarketplaceSavedSearches).not.toHaveBeenCalled();
+    expect(getMarketplacePickupSlots).not.toHaveBeenCalled();
+    expect(getMerchantCoupons).not.toHaveBeenCalled();
   });
 
   it('creates saved searches with selected alert preferences', async () => {

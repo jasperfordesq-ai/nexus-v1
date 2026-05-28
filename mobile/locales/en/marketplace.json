@@ -612,6 +612,8 @@
     "payments": "Payments",
     "shipping": "Shipping options",
     "delete": "Delete",
+    "signInTitle": "Sign in to use marketplace tools",
+    "signInHint": "Saved searches, collections, promotions, pickup slots, and seller coupons are available after you sign in.",
     "tabs": {
       "collections": "Collections",
       "savedSearches": "Saved searches",

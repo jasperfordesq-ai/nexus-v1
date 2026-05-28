@@ -126,16 +126,18 @@ export default function MarketplaceToolsRoute() {
 }
 
 function MarketplaceToolsScreen() {
-  const { t } = useTranslation(['marketplace', 'common']);
+  const { t } = useTranslation(['marketplace', 'common', 'auth']);
   const { hasFeature } = useTenant();
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const params = useLocalSearchParams<{ tab?: string }>();
   const initialTab = isToolTab(params.tab) ? params.tab : 'collections';
   const [tab, setTab] = useState<ToolTab>(initialTab);
+  const marketplaceEnabled = hasFeature('marketplace');
   const availableTabs = useMemo(
-    () => TABS.filter((item) => item !== 'coupons' || hasFeature('merchant_coupons')),
-    [hasFeature],
+    () => marketplaceEnabled ? TABS.filter((item) => item !== 'coupons' || hasFeature('merchant_coupons')) : [],
+    [hasFeature, marketplaceEnabled],
   );
 
   useEffect(() => {
@@ -147,6 +149,45 @@ function MarketplaceToolsScreen() {
       setTab(availableTabs[0] ?? 'collections');
     }
   }, [availableTabs, tab]);
+
+  if (!marketplaceEnabled) {
+    return (
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('tools.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
+        <View className="flex-1 justify-center px-4">
+          <EmptyState icon="construct-outline" title={t('featureGate.title')} subtitle={t('featureGate.description')} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (isAuthLoading) {
+    return (
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('tools.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
+        <View className="py-16">
+          <LoadingSpinner />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('tools.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
+        <View className="flex-1 justify-center px-4">
+          <EmptyState
+            icon="construct-outline"
+            title={t('tools.signInTitle')}
+            subtitle={t('tools.signInHint')}
+            actionLabel={t('auth:login.submit')}
+            onAction={() => router.push('/(auth)/login' as Href)}
+          />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-background">
