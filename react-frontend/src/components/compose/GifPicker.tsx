@@ -11,11 +11,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
 import Film from 'lucide-react/icons/film';
-import Search from 'lucide-react/icons/search';
 import { useTranslation } from 'react-i18next';
 
 import { featured, searchGifs, type TenorGif } from '@/lib/tenor';
-import { Button, Input, Skeleton } from '@/components/ui';
+import { Button, SearchField, Skeleton } from '@/components/ui';
 
 interface GifPickerProps {
   onSelect: (gifUrl: string) => void;
@@ -104,12 +103,11 @@ export function GifPicker({ onSelect }: GifPickerProps) {
       </PopoverTrigger>
       <PopoverContent className="w-80 p-2 bg-[var(--surface-dropdown)] border border-[var(--border-default)]">
         {/* Search input */}
-        <Input
+        <SearchField
           size="sm"
           placeholder={t('gif.search_placeholder')}
           value={query}
           onValueChange={handleQueryChange}
-          startContent={<Search className="w-3.5 h-3.5 text-[var(--text-muted)]" aria-hidden="true" />}
           className="mb-2"
           aria-label={t('gif.search_placeholder')}
         />

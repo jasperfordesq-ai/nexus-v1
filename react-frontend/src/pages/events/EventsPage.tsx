@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Input, Skeleton } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, SearchField, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,7 +12,6 @@ import { useState, useEffect, useCallback, useRef, memo, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from '@/lib/motion';
 
-import Search from 'lucide-react/icons/search';
 import Calendar from 'lucide-react/icons/calendar';
 import MapPin from 'lucide-react/icons/map-pin';
 import Users from 'lucide-react/icons/users';
@@ -285,12 +284,11 @@ export function EventsPage() {
       <GlassCard className="p-4 sm:p-5">
         <div className="grid gap-3 lg:grid-cols-[minmax(260px,1fr)_auto_auto_auto_auto] lg:items-center">
           <div className="flex-1">
-            <Input
+            <SearchField
               placeholder={t('search_placeholder')}
               aria-label={t('search_aria')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
               classNames={{
                 input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
                 inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',

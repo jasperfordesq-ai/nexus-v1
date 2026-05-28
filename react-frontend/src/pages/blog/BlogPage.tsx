@@ -19,10 +19,9 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Calendar from 'lucide-react/icons/calendar';
 import Clock from 'lucide-react/icons/clock';
 import Eye from 'lucide-react/icons/eye';
-import Search from 'lucide-react/icons/search';
 import User from 'lucide-react/icons/user';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Input, Avatar, Skeleton } from '@/components/ui';
+import { GlassCard, Button, Chip, SearchField, Avatar, Skeleton } from '@/components/ui';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
@@ -195,11 +194,10 @@ export function BlogPage() {
       {/* Search & Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1 max-w-md">
-          <Input
+          <SearchField
             placeholder={t('search_placeholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
             aria-label={t('search_placeholder')}
             classNames={{
               input: 'bg-transparent text-theme-primary',

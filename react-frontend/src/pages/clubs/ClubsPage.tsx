@@ -16,13 +16,12 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from '@/lib/motion';
 
 import Users from 'lucide-react/icons/users';
-import Search from 'lucide-react/icons/search';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Calendar from 'lucide-react/icons/calendar';
 import Globe from 'lucide-react/icons/globe';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Input, Avatar, CardRowsSkeleton } from '@/components/ui';
+import { GlassCard, Button, SearchField, Avatar, CardRowsSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';
 import { PageMeta } from '@/components/seo/PageMeta';
@@ -155,11 +154,10 @@ export function ClubsPage() {
 
       {/* Search */}
       <div className="w-full sm:max-w-md">
-        <Input
+        <SearchField
           placeholder={t('clubs.search_placeholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
           aria-label={t('clubs.search_placeholder')}
           classNames={{
             input: 'bg-transparent text-theme-primary',

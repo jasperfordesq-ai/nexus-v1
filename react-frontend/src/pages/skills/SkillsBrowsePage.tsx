@@ -12,7 +12,6 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from '@/lib/motion';
 
 import Sparkles from 'lucide-react/icons/sparkles';
-import Search from 'lucide-react/icons/search';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import Users from 'lucide-react/icons/users';
@@ -26,7 +25,7 @@ import Settings from 'lucide-react/icons/settings';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Spinner, Input, Avatar, CardRowsSkeleton } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner, SearchField, Avatar, CardRowsSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
@@ -313,7 +312,7 @@ export function SkillsBrowsePage() {
 
       {/* ── Search ───────────────────────────────────────────────────────── */}
       <GlassCard className="p-4">
-        <Input
+        <SearchField
           placeholder={t('skills.search_placeholder')}
           value={searchQuery}
           onChange={(e) => {
@@ -321,7 +320,6 @@ export function SkillsBrowsePage() {
             setExpandedCategory(null);
             setSelectedSkill(null);
           }}
-          startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
           aria-label={t('skills.search_placeholder')}
           endContent={
             searchQuery ? (

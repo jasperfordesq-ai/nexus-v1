@@ -17,14 +17,13 @@ import Wallet from 'lucide-react/icons/wallet';
 import Handshake from 'lucide-react/icons/handshake';
 import Trophy from 'lucide-react/icons/trophy';
 import ShieldCheck from 'lucide-react/icons/shield-check';
-import Search from 'lucide-react/icons/search';
 import HelpCircle from 'lucide-react/icons/circle-help';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
-import { GlassCard, Accordion, AccordionItem, Input } from '@/components/ui';
+import { GlassCard, Accordion, AccordionItem, SearchField } from '@/components/ui';
 
 interface FaqItem {
   question: string;
@@ -401,11 +400,10 @@ export function FaqPage() {
             </p>
 
             {/* Search */}
-            <Input
+            <SearchField
               placeholder={t('faq.search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
               aria-label={t('faq.search_placeholder')}
               classNames={{
                 input: 'bg-transparent text-theme-primary',

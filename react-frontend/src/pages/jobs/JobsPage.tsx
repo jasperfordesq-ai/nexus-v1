@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Input, Switch, Tabs, Tab, CardRowsSkeleton } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, SearchField, Switch, Tabs, Tab, CardRowsSkeleton } from '@/components/ui';
 import { Chip as HeroChip, ToggleButton, ToggleButtonGroup } from '@heroui/react';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -29,7 +29,6 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from '@/lib/motion';
 
 import Briefcase from 'lucide-react/icons/briefcase';
-import Search from 'lucide-react/icons/search';
 import Plus from 'lucide-react/icons/plus';
 import MapPin from 'lucide-react/icons/map-pin';
 import Clock from 'lucide-react/icons/clock';
@@ -437,12 +436,11 @@ export function JobsPage() {
         <>
           {/* Search */}
           <GlassCard className="p-4">
-            <Input
+            <SearchField
               placeholder={t('search_placeholder')}
               aria-label={t('search_aria')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
               classNames={{
                 input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
                 inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',

@@ -1,4 +1,4 @@
-import { CardBody, Card, Button, Chip, Input, Tab, Tabs, Skeleton } from '@/components/ui';
+import { CardBody, Card, Button, Chip, SearchField, Tab, Tabs, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,7 +11,6 @@ import AlertCircle from 'lucide-react/icons/alert-circle';
 import Building2 from 'lucide-react/icons/building-2';
 import Mail from 'lucide-react/icons/mail';
 import Phone from 'lucide-react/icons/phone';
-import Search from 'lucide-react/icons/search';
 import Globe from 'lucide-react/icons/globe';
 import Heart from 'lucide-react/icons/heart';
 import { useTranslation } from 'react-i18next';
@@ -261,12 +260,11 @@ export default function CareProviderDirectoryPage() {
 
         {/* Search + sub-region filter */}
         <div className="flex flex-col gap-3">
-          <Input
+          <SearchField
             aria-label={t('providers.search_placeholder')}
             placeholder={t('providers.search_placeholder')}
             value={search}
             onValueChange={setSearch}
-            startContent={<Search className="h-4 w-4 text-muted" aria-hidden="true" />}
             variant="bordered"
             classNames={{ inputWrapper: 'max-w-md' }}
             isClearable

@@ -18,7 +18,6 @@ import { Link } from 'react-router-dom';
 import { motion } from '@/lib/motion';
 
 import BookOpen from 'lucide-react/icons/book-open';
-import Search from 'lucide-react/icons/search';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import ChevronRight from 'lucide-react/icons/chevron-right';
@@ -27,7 +26,7 @@ import Clock from 'lucide-react/icons/clock';
 import Eye from 'lucide-react/icons/eye';
 import Folder from 'lucide-react/icons/folder';
 import File from 'lucide-react/icons/file';
-import { GlassCard, Button, Chip, Spinner, Input, Tabs, Tab, CardRowsSkeleton } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner, SearchField, Tabs, Tab, CardRowsSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
@@ -210,11 +209,10 @@ export function KnowledgeBasePage() {
 
       {/* Search */}
       <div className="max-w-xl mx-auto">
-        <Input
+        <SearchField
           placeholder={t('search_placeholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
           aria-label={t('search_placeholder')}
           endContent={isSearching ? <span role="status" aria-label={t('searching')}><Spinner size="sm" /></span> : undefined}
           classNames={{

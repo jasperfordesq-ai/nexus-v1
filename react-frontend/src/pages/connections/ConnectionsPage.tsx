@@ -1,4 +1,4 @@
-import { Button, Input, Card, CardBody, Chip, Avatar, Tabs, Tab, Skeleton } from '@/components/ui';
+import { Button, SearchField, Card, CardBody, Chip, Avatar, Tabs, Tab, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -22,7 +22,6 @@ import UserCheck from 'lucide-react/icons/user-check';
 import UserX from 'lucide-react/icons/user-x';
 import UserMinus from 'lucide-react/icons/user-minus';
 import MessageSquare from 'lucide-react/icons/message-square';
-import Search from 'lucide-react/icons/search';
 import UserPlus from 'lucide-react/icons/user-plus';
 import Clock from 'lucide-react/icons/clock';
 import Send from 'lucide-react/icons/send';
@@ -586,11 +585,10 @@ export default function ConnectionsPage() {
 
         {/* Search */}
         <div className="mb-4">
-          <Input
+          <SearchField
             placeholder={t('search_placeholder')}
             value={searchQuery}
             onValueChange={setSearchQuery}
-            startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
             aria-label={t('search_placeholder')}
             variant="bordered"
             classNames={{

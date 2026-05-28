@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, AlgorithmLabel, ListingSkeleton, ImagePlaceholder, Button, Input, Avatar } from '@/components/ui';
+import { Select, SelectItem, GlassCard, AlgorithmLabel, ListingSkeleton, ImagePlaceholder, Button, SearchField, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -437,12 +437,11 @@ export function ListingsPage() {
         {/* Row 1: Search + primary filters */}
         <form onSubmit={handleSearch} aria-label={t('filter_form_label')} className="flex flex-col gap-3 xl:flex-row">
           <div className="flex min-w-0 flex-1 gap-2">
-            <Input
+            <SearchField
               size="lg"
               placeholder={t('search_placeholder')}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              startContent={<Search className="w-4 h-4 text-theme-subtle" />}
               aria-label={t('search_label')}
               classNames={{
                 input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',

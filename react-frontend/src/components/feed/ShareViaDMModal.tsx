@@ -10,7 +10,6 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-import Search from 'lucide-react/icons/search';
 import Send from 'lucide-react/icons/send';
 import Check from 'lucide-react/icons/check';
 import { useTranslation } from 'react-i18next';
@@ -18,7 +17,7 @@ import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
-import { Button, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
+import { Button, Spinner, SearchField, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 
 interface ShareViaDMModalProps {
   isOpen: boolean;
@@ -151,12 +150,11 @@ export function ShareViaDMModal({ isOpen, onClose, postUrl, postContent }: Share
           {t('share.dm_title')}
         </ModalHeader>
         <ModalBody className="gap-3">
-          <Input
+          <SearchField
             placeholder={t('share.dm_search_placeholder')}
             aria-label={t('share.dm_search_placeholder')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            startContent={<Search className="w-4 h-4 text-[var(--text-subtle)]" />}
             size="sm"
             classNames={{
               input: 'bg-transparent text-[var(--text-primary)]',

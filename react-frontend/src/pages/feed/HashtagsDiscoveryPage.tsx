@@ -14,12 +14,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from '@/lib/motion';import Hash from 'lucide-react/icons/hash';
-import Search from 'lucide-react/icons/search';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
-import { GlassCard, Button, Spinner, Input } from '@/components/ui';
+import { GlassCard, Button, Spinner, SearchField } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { EmptyState } from '@/components/feedback';
 import { useTranslation } from 'react-i18next';
@@ -142,11 +141,10 @@ export function HashtagsDiscoveryPage() {
 
       {/* Search */}
       <GlassCard className="p-4">
-        <Input
+        <SearchField
           placeholder={t('hashtags.search_placeholder')}
           value={searchQuery}
           onChange={(e) => handleSearch(e.target.value)}
-          startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
           aria-label={t('hashtags.search_placeholder')}
           endContent={isSearching ? <span role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })}><Spinner size="sm" /></span> : undefined}
           classNames={{

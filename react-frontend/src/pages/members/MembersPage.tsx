@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, MemberCardSkeleton, AlgorithmLabel, useAlgorithmInfo, Button, Chip, Input, Avatar, Tooltip } from '@/components/ui';
+import { Select, SelectItem, GlassCard, MemberCardSkeleton, AlgorithmLabel, useAlgorithmInfo, Button, Chip, SearchField, Avatar, Tooltip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,7 +12,6 @@ import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from '@/lib/motion';
 
-import Search from 'lucide-react/icons/search';
 import Users from 'lucide-react/icons/users';
 import MapPin from 'lucide-react/icons/map-pin';
 import Star from 'lucide-react/icons/star';
@@ -401,13 +400,12 @@ export function MembersPage() {
       <GlassCard className="p-4">
         <div className="flex flex-col gap-4 xl:flex-row">
           <div className="min-w-0 flex-1">
-            <Input
+            <SearchField
               placeholder={t('members.search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               isClearable
               onClear={resetSearch}
-              startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
               aria-label={t('members.search_placeholder')}
               classNames={{
                 input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',

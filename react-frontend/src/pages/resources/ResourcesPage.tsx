@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure, GlassCard, Progress, Button, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, CardRowsSkeleton } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, GlassCard, Progress, Button, Chip, Input, SearchField, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, CardRowsSkeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -17,7 +17,6 @@ import { motion } from '@/lib/motion';
 import FolderOpen from 'lucide-react/icons/folder-open';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
-import Search from 'lucide-react/icons/search';
 import Download from 'lucide-react/icons/download';
 import FileText from 'lucide-react/icons/file-text';
 import FileSpreadsheet from 'lucide-react/icons/file-spreadsheet';
@@ -553,11 +552,10 @@ export function ResourcesPage() {
       {/* Search & Admin Controls */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1 max-w-md">
-          <Input
+          <SearchField
             placeholder={t('resources.search_placeholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
             aria-label={t('resources.search_placeholder')}
             classNames={{
               input: 'bg-transparent text-theme-primary',

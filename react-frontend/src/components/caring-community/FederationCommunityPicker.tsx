@@ -1,4 +1,4 @@
-import { CardBody, Card, Button, Spinner, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, RadioGroup } from '@/components/ui';
+import { CardBody, Card, Button, Spinner, SearchField, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, RadioGroup } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,7 +6,6 @@ import { CardBody, Card, Button, Spinner, Input, Modal, ModalBody, ModalContent,
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import Search from 'lucide-react/icons/search';
 import Globe from 'lucide-react/icons/globe';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
@@ -93,11 +92,10 @@ export function FederationCommunityPicker({ isOpen, onClose, onSelect }: Props) 
           <span>{t('federation_picker.title')}</span>
         </ModalHeader>
         <ModalBody className="gap-4">
-          <Input
+          <SearchField
             placeholder={t('federation_picker.search_placeholder')}
             value={query}
             onValueChange={setQuery}
-            startContent={<Search className="h-4 w-4 text-muted" aria-hidden="true" />}
             variant="bordered"
             aria-label={t('federation_picker.search_placeholder')}
           />

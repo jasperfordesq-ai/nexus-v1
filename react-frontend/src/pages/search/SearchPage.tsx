@@ -20,7 +20,7 @@ import Clock from 'lucide-react/icons/clock';
 import MapPin from 'lucide-react/icons/map-pin';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, AlgorithmLabel, Button, Input, Avatar, Tabs, Tab, Skeleton } from '@/components/ui';
+import { GlassCard, AlgorithmLabel, Button, SearchField, Avatar, Tabs, Tab, Skeleton } from '@/components/ui';
 import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
 import { SavedSearches } from '@/components/search/SavedSearches';
@@ -248,11 +248,10 @@ export function SearchPage() {
       {/* Search Form */}
       <GlassCard className="p-4">
         <form onSubmit={handleSearch} aria-label={t('form_aria')} className="flex flex-col sm:flex-row gap-3">
-          <Input
+          <SearchField
             placeholder={t('search_placeholder')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            startContent={<Search className="w-5 h-5 text-theme-subtle" aria-hidden="true" />}
             aria-label={t('search_placeholder')}
             size="lg"
             classNames={{

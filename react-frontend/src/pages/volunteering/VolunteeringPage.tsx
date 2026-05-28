@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure, GlassCard, Progress, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, CardRowsSkeleton } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, GlassCard, Progress, Button, Chip, Spinner, SearchField, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, CardRowsSkeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -21,7 +21,6 @@ import MapPin from 'lucide-react/icons/map-pin';
 import Calendar from 'lucide-react/icons/calendar';
 import Clock from 'lucide-react/icons/clock';
 import Building2 from 'lucide-react/icons/building-2';
-import Search from 'lucide-react/icons/search';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import Send from 'lucide-react/icons/send';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
@@ -512,11 +511,10 @@ function OpportunitiesTab() {
       {/* Search + Proximity */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex-1 min-w-[200px] max-w-md">
-          <Input
+          <SearchField
             placeholder={t('search_placeholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
             aria-label={t('search_placeholder')}
             classNames={{
               input: 'bg-transparent text-theme-primary',

@@ -16,13 +16,12 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from '@/lib/motion';import { SafeHtml } from '@/components/ui/SafeHtml';
 import HelpCircle from 'lucide-react/icons/circle-help';
-import Search from 'lucide-react/icons/search';
 import MessageSquare from 'lucide-react/icons/message-square';
 import BookOpen from 'lucide-react/icons/book-open';
 import Wallet from 'lucide-react/icons/wallet';
 import Calendar from 'lucide-react/icons/calendar';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Accordion, AccordionItem, Button, Spinner, Input } from '@/components/ui';
+import { GlassCard, Accordion, AccordionItem, Button, Spinner, SearchField } from '@/components/ui';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { useTenant, useFeature, useModule } from '@/contexts';
@@ -126,11 +125,10 @@ export function HelpCenterPage() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         {/* Search */}
         <div className="max-w-md mx-auto mb-8">
-          <Input
+          <SearchField
             placeholder={t('help.search_placeholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
             aria-label={t('help.search_placeholder')}
             size="lg"
             classNames={{

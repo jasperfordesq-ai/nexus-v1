@@ -25,7 +25,7 @@ import Heart from 'lucide-react/icons/heart';
 import Package from 'lucide-react/icons/package';
 import HandCoins from 'lucide-react/icons/hand-coins';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Input } from '@/components/ui';
+import { GlassCard, Button, SearchField } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
 import {
@@ -297,12 +297,11 @@ export function MarketplacePage() {
 
         {/* Search bar */}
         <div className="max-w-3xl">
-          <Input
+          <SearchField
             placeholder={t('hub.search_placeholder')}
             aria-label={t('hub.search_placeholder')}
             value={searchQuery}
             onValueChange={setSearchQuery}
-            startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
             size="lg"
             variant="secondary"
             classNames={{ inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover', input: 'text-theme-primary placeholder:text-theme-subtle' }}
