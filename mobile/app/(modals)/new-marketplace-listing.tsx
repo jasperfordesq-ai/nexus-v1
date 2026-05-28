@@ -18,6 +18,7 @@ import FormActionFooter from '@/components/ui/FormActionFooter';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import {
   createMarketplaceListing,
+  deleteMarketplaceListingImage,
   generateMarketplaceDescription,
   getMarketplaceCategories,
   getMarketplaceCategoryTemplate,
@@ -30,6 +31,7 @@ import {
   type MarketplaceCategoryTemplateField,
   type MarketplaceCondition,
   type MarketplaceDeliveryMethod,
+  type MarketplaceImage,
   type MarketplaceListingPayload,
   type MarketplacePriceType,
   type MarketplaceVideoUpload,
@@ -43,6 +45,7 @@ const CURRENCIES = ['EUR', 'GBP', 'USD', 'CAD', 'AUD', 'NZD', 'CHF', 'SEK', 'NOK
 const CONDITIONS: MarketplaceCondition[] = ['new', 'like_new', 'good', 'fair', 'poor'];
 const DELIVERY: MarketplaceDeliveryMethod[] = ['pickup', 'shipping', 'both', 'community_delivery'];
 const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime'];
+const MAX_IMAGES = 8;
 const MAX_VIDEO_SIZE = 50 * 1024 * 1024;
 type MarketplaceCurrency = typeof CURRENCIES[number];
 
@@ -100,6 +103,8 @@ export function MarketplaceListingForm() {
   const [longitude, setLongitude] = useState('');
   const [deliveryMethod, setDeliveryMethod] = useState<MarketplaceDeliveryMethod>('pickup');
   const [sellerType, setSellerType] = useState<'private' | 'business'>('private');
+  const [existingImages, setExistingImages] = useState<MarketplaceImage[]>([]);
+  const [removedImageIds, setRemovedImageIds] = useState<number[]>([]);
   const [imageUris, setImageUris] = useState<string[]>([]);
   const [videoAsset, setVideoAsset] = useState<MarketplaceVideoUpload | null>(null);
   const [existingVideoUrl, setExistingVideoUrl] = useState<string | null>(null);
@@ -162,6 +167,9 @@ export function MarketplaceListingForm() {
         setLongitude(listing.longitude !== null && listing.longitude !== undefined ? String(listing.longitude) : '');
         setDeliveryMethod((listing.delivery_method as MarketplaceDeliveryMethod) ?? 'pickup');
         setSellerType(listing.seller_type === 'business' ? 'business' : 'private');
+        setExistingImages(listing.images ?? []);
+        setRemovedImageIds([]);
+        setImageUris([]);
         setExistingVideoUrl(listing.video_url ?? null);
         setVideoAsset(null);
         setRemoveExistingVideo(false);
@@ -261,6 +269,9 @@ export function MarketplaceListingForm() {
       const response = isEditing
         ? await updateMarketplaceListing(listingId, payload)
         : await createMarketplaceListing(payload);
+      if (isEditing && removedImageIds.length > 0) {
+        await Promise.all(removedImageIds.map((imageId) => deleteMarketplaceListingImage(response.data.id, imageId)));
+      }
       if (imageUris.length > 0) {
         await uploadMarketplaceImages(response.data.id, imageUris);
       }
@@ -304,6 +315,11 @@ export function MarketplaceListingForm() {
   }
 
   async function pickImages() {
+    const availableSlots = Math.max(0, MAX_IMAGES - existingImages.length - imageUris.length);
+    if (availableSlots <= 0) {
+      Alert.alert(t('forms.validation'), t('forms.maxImagesReached', { max: MAX_IMAGES }));
+      return;
+    }
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
       Alert.alert(t('forms.permissionTitle'), t('forms.permissionMessage'));
@@ -313,11 +329,11 @@ export function MarketplaceListingForm() {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsMultipleSelection: true,
       quality: 0.82,
-      selectionLimit: 8,
+      selectionLimit: availableSlots,
     });
     if (result.canceled) return;
     const nextUris = result.assets.map((asset) => asset.uri).filter(Boolean);
-    setImageUris((current) => [...current, ...nextUris].slice(0, 8));
+    setImageUris((current) => [...current, ...nextUris].slice(0, current.length + availableSlots));
   }
 
   async function pickVideo() {
@@ -363,6 +379,15 @@ export function MarketplaceListingForm() {
       setRemoveExistingVideo(true);
     }
   }
+
+  function removeExistingImage(image: MarketplaceImage) {
+    if (image.id) {
+      setRemovedImageIds((current) => [...current, image.id!]);
+    }
+    setExistingImages((current) => current.filter((item) => item !== image));
+  }
+
+  const totalImageCount = existingImages.length + imageUris.length;
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -457,20 +482,61 @@ export function MarketplaceListingForm() {
             <ButtonGroup label={t('forms.delivery')} values={DELIVERY} selected={deliveryMethod} onSelect={setDeliveryMethod} labelFor={(value) => t(`delivery_method.${value}`)} primary={primary} />
             <ButtonGroup label={t('forms.sellerType')} values={['private', 'business'] as const} selected={sellerType} onSelect={setSellerType} labelFor={(value) => t(`sellerType.${value}`)} primary={primary} />
             <View className="gap-3">
-              <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('forms.media')}</Text>
+              <View className="flex-row items-center justify-between gap-3">
+                <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('forms.media')}</Text>
+                <Text className="text-xs font-semibold" style={{ color: theme.textMuted }}>
+                  {t('forms.photosCount', { current: totalImageCount, max: MAX_IMAGES })}
+                </Text>
+              </View>
               <HeroButton variant="secondary" onPress={pickImages}>
                 <Ionicons name="images-outline" size={16} color={primary} />
                 <HeroButton.Label>{t('forms.addImages')}</HeroButton.Label>
               </HeroButton>
-              {imageUris.length > 0 ? (
+              {totalImageCount > 0 ? (
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
-                  {imageUris.map((uri, index) => (
-                    <View key={`${uri}-${index}`} className="relative">
-                      <Image source={{ uri }} className="size-20 rounded-panel-inner" resizeMode="cover" />
+                  {existingImages.map((image, index) => (
+                    <View key={`existing-${image.id ?? image.url}-${index}`} className="relative">
+                      <Image
+                        source={{ uri: image.thumbnail_url || image.url }}
+                        accessibilityLabel={t('forms.imageAlt', { number: index + 1 })}
+                        className="size-20 rounded-panel-inner"
+                        resizeMode="cover"
+                      />
+                      {index === 0 ? (
+                        <View className="absolute bottom-1 left-1 rounded-full px-2 py-0.5" style={{ backgroundColor: withAlpha(primary, 0.92) }}>
+                          <Text className="text-[10px] font-bold text-white">{t('forms.coverImage')}</Text>
+                        </View>
+                      ) : null}
                       <HeroButton
                         isIconOnly
                         size="sm"
                         variant="danger"
+                        accessibilityLabel={t('forms.removeImage')}
+                        className="absolute right-1 top-1"
+                        onPress={() => removeExistingImage(image)}
+                      >
+                        <Ionicons name="close-outline" size={14} color="#fff" />
+                      </HeroButton>
+                    </View>
+                  ))}
+                  {imageUris.map((uri, index) => (
+                    <View key={`${uri}-${index}`} className="relative">
+                      <Image
+                        source={{ uri }}
+                        accessibilityLabel={t('forms.imageAlt', { number: existingImages.length + index + 1 })}
+                        className="size-20 rounded-panel-inner"
+                        resizeMode="cover"
+                      />
+                      {existingImages.length === 0 && index === 0 ? (
+                        <View className="absolute bottom-1 left-1 rounded-full px-2 py-0.5" style={{ backgroundColor: withAlpha(primary, 0.92) }}>
+                          <Text className="text-[10px] font-bold text-white">{t('forms.coverImage')}</Text>
+                        </View>
+                      ) : null}
+                      <HeroButton
+                        isIconOnly
+                        size="sm"
+                        variant="danger"
+                        accessibilityLabel={t('forms.removeImage')}
                         className="absolute right-1 top-1"
                         onPress={() => setImageUris((current) => current.filter((_, itemIndex) => itemIndex !== index))}
                       >

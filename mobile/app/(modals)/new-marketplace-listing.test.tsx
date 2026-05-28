@@ -7,9 +7,11 @@ import React from 'react';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import * as ImagePicker from 'expo-image-picker';
 
+let mockParams: Record<string, string> = {};
+
 jest.mock('expo-router', () => ({
   router: { push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
-  useLocalSearchParams: () => ({}),
+  useLocalSearchParams: () => mockParams,
 }));
 
 jest.mock('react-i18next', () => ({
@@ -18,6 +20,7 @@ jest.mock('react-i18next', () => ({
       const map: Record<string, string> = {
         'common:back': 'Back',
         'forms.createTitle': 'Sell an item',
+        'forms.editTitle': 'Edit listing',
         'forms.eyebrow': 'New marketplace listing',
         'forms.subtitle': 'Use complete details.',
         'forms.title': 'Title',
@@ -52,15 +55,24 @@ jest.mock('react-i18next', () => ({
         'forms.sellerType': 'Seller type',
         'forms.media': 'Media',
         'forms.addImages': 'Add images',
+        'forms.photosCount': 'Photos',
+        'forms.imageAlt': 'Listing photo',
+        'forms.coverImage': 'Cover',
+        'forms.removeImage': 'Remove image',
+        'forms.maxImagesReached': 'You can add up to 8 images.',
         'forms.video': 'Video',
         'forms.addVideo': 'Add video',
+        'forms.changeVideo': 'Change video',
+        'forms.videoHint': 'Add a video.',
         'forms.removeVideo': 'Remove video',
         'forms.videoSelected': 'Selected video',
         'forms.currentVideo': 'Current video',
         'forms.mediaHint': 'Add up to 8 images and one optional video.',
         'forms.footerCreateTitle': 'Review listing',
+        'forms.footerEditTitle': 'Review changes',
         'forms.footerSubtitle': 'Publish when ready.',
         'forms.publish': 'Publish',
+        'forms.update': 'Update',
         'filters.noCategory': 'No category',
         'inventory.section_title': 'Inventory',
         'inventory.section_subtitle': 'Track stock.',
@@ -124,16 +136,27 @@ jest.mock('@/lib/api/marketplace', () => ({
   getMarketplaceCategoryTemplate: jest.fn().mockResolvedValue({ data: { fields: [] } }),
   getMarketplaceListing: jest.fn(),
   updateMarketplaceListing: jest.fn(),
+  deleteMarketplaceListingImage: jest.fn(),
+  deleteMarketplaceVideo: jest.fn(),
   uploadMarketplaceImages: jest.fn(),
   uploadMarketplaceVideo: jest.fn(),
 }));
 
 import NewMarketplaceListingRoute from './new-marketplace-listing';
-import { createMarketplaceListing, generateMarketplaceDescription, uploadMarketplaceVideo } from '@/lib/api/marketplace';
+import {
+  createMarketplaceListing,
+  deleteMarketplaceListingImage,
+  generateMarketplaceDescription,
+  getMarketplaceListing,
+  updateMarketplaceListing,
+  uploadMarketplaceImages,
+  uploadMarketplaceVideo,
+} from '@/lib/api/marketplace';
 
 describe('NewMarketplaceListingRoute', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockParams = {};
   });
 
   it('renders optional coordinate fields for nearby search parity', async () => {
@@ -216,5 +239,124 @@ describe('NewMarketplaceListingRoute', () => {
         mimeType: 'video/mp4',
       }));
     });
+  });
+
+  it('keeps existing edit photos visible and deletes removed server images', async () => {
+    mockParams = { id: '42' };
+    jest.mocked(getMarketplaceListing).mockResolvedValue({
+      data: {
+        id: 42,
+        title: 'Garden shears',
+        tagline: null,
+        description: 'Lightly used shears with clean blades.',
+        price: 12.5,
+        price_currency: 'EUR',
+        price_type: 'fixed',
+        time_credit_price: null,
+        condition: 'good',
+        quantity: 1,
+        location: null,
+        delivery_method: 'pickup',
+        seller_type: 'private',
+        status: 'active',
+        image: null,
+        image_count: 1,
+        images: [{ id: 5, url: 'https://example.test/shears.jpg', thumbnail_url: null }],
+        video_url: null,
+        category: null,
+        user: null,
+        is_saved: false,
+        is_own: true,
+        is_promoted: false,
+        views_count: 0,
+        saves_count: 0,
+        created_at: '2026-05-01T00:00:00Z',
+        latitude: null,
+        longitude: null,
+        shipping_available: false,
+        local_pickup: true,
+        template_data: null,
+      },
+    } as never);
+    jest.mocked(updateMarketplaceListing).mockResolvedValue({ data: { id: 42 } } as never);
+
+    const { getByDisplayValue, getByLabelText, getByText } = render(<NewMarketplaceListingRoute />);
+
+    await waitFor(() => {
+      expect(getByDisplayValue('Garden shears')).toBeTruthy();
+      expect(getByText('Cover')).toBeTruthy();
+    });
+
+    fireEvent.press(getByLabelText('Remove image'));
+    fireEvent.press(getByText('Update'));
+
+    await waitFor(() => {
+      expect(deleteMarketplaceListingImage).toHaveBeenCalledWith(42, 5);
+    });
+  });
+
+  it('adds new photos to an edited listing without dropping existing media', async () => {
+    mockParams = { id: '43' };
+    jest.mocked(ImagePicker.requestMediaLibraryPermissionsAsync).mockResolvedValue({ granted: true } as never);
+    jest.mocked(ImagePicker.launchImageLibraryAsync).mockResolvedValue({
+      canceled: false,
+      assets: [{ uri: 'file:///tmp/new-photo.jpg' }],
+    } as never);
+    jest.mocked(getMarketplaceListing).mockResolvedValue({
+      data: {
+        id: 43,
+        title: 'Garden shears',
+        tagline: null,
+        description: 'Lightly used shears with clean blades.',
+        price: 12.5,
+        price_currency: 'EUR',
+        price_type: 'fixed',
+        time_credit_price: null,
+        condition: 'good',
+        quantity: 1,
+        location: null,
+        delivery_method: 'pickup',
+        seller_type: 'private',
+        status: 'active',
+        image: null,
+        image_count: 1,
+        images: [{ id: 7, url: 'https://example.test/current.jpg', thumbnail_url: null }],
+        video_url: null,
+        category: null,
+        user: null,
+        is_saved: false,
+        is_own: true,
+        is_promoted: false,
+        views_count: 0,
+        saves_count: 0,
+        created_at: '2026-05-01T00:00:00Z',
+        latitude: null,
+        longitude: null,
+        shipping_available: false,
+        local_pickup: true,
+        template_data: null,
+      },
+    } as never);
+    jest.mocked(updateMarketplaceListing).mockResolvedValue({ data: { id: 43 } } as never);
+    jest.mocked(uploadMarketplaceImages).mockResolvedValue({ data: [] } as never);
+
+    const { getByText } = render(<NewMarketplaceListingRoute />);
+
+    await waitFor(() => expect(getByText('Cover')).toBeTruthy());
+    fireEvent.press(getByText('Add images'));
+
+    await waitFor(() => {
+      expect(ImagePicker.launchImageLibraryAsync).toHaveBeenCalledWith(expect.objectContaining({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        selectionLimit: 7,
+      }));
+    });
+
+    fireEvent.press(getByText('Update'));
+
+    await waitFor(() => {
+      expect(uploadMarketplaceImages).toHaveBeenCalledWith(43, ['file:///tmp/new-photo.jpg']);
+    });
+    expect(deleteMarketplaceListingImage).not.toHaveBeenCalled();
   });
 });

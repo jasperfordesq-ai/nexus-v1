@@ -641,6 +641,10 @@ export async function uploadMarketplaceImages(id: number, uris: string[]): Promi
   return api.upload<MarketplaceDataResponse<MarketplaceImage[]>>(`${API_V2}/marketplace/listings/${id}/images`, formData);
 }
 
+export function deleteMarketplaceListingImage(id: number, imageId: number): Promise<void> {
+  return api.delete<void>(`${API_V2}/marketplace/listings/${id}/images/${imageId}`);
+}
+
 export async function uploadMarketplaceVideo(id: number, asset: MarketplaceVideoUpload): Promise<MarketplaceDataResponse<{ video_url: string }>> {
   const formData = new FormData();
   await appendMarketplaceVideoFile(formData, asset);
