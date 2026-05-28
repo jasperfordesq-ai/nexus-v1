@@ -20,7 +20,7 @@ jest.mock('@/lib/constants', () => ({
 }));
 
 import { api } from '@/lib/api/client';
-import { getEvents, rsvpEvent, removeRsvp, getEvent } from './events';
+import { getEvents, rsvpEvent, removeRsvp, getEvent, updateEvent } from './events';
 import type { EventsResponse, Event } from './events';
 
 const mockEvent: Event = {
@@ -111,6 +111,31 @@ describe('getEvent', () => {
     (api.get as jest.Mock).mockResolvedValue({ data: mockEvent });
     const result = await getEvent(10);
     expect(api.get).toHaveBeenCalledWith('/api/v2/events/10');
+    expect(result.data.title).toBe('Community Cleanup');
+  });
+});
+
+describe('updateEvent', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('sends PUT to the event endpoint with the update payload', async () => {
+    (api.put as jest.Mock).mockResolvedValue({ data: mockEvent });
+    const payload = {
+      title: 'Updated cleanup',
+      description: 'Updated details for attendees',
+      start_time: '2026-04-02T10:00:00.000Z',
+      end_time: null,
+      location: 'Updated hall',
+      category_name: 'workshop',
+      is_online: false,
+      online_link: null,
+      max_attendees: 40,
+      federated_visibility: 'none' as const,
+    };
+
+    const result = await updateEvent(10, payload);
+
+    expect(api.put).toHaveBeenCalledWith('/api/v2/events/10', payload);
     expect(result.data.title).toBe('Community Cleanup');
   });
 });

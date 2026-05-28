@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert, ScrollView, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
@@ -12,7 +12,7 @@ import { Button as HeroButton, Card as HeroCard, Text } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 
-import { createEvent } from '@/lib/api/events';
+import { createEvent, getEvent, updateEvent, type CreateEventPayload, type Event } from '@/lib/api/events';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
@@ -35,6 +35,19 @@ function toApiDate(value: string) {
   return date.toISOString();
 }
 
+function toDateInputValue(value: string | null | undefined) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toISOString().slice(0, 16);
+}
+
+function resolveEventCategory(event: Event): EventCategoryId | '' {
+  const raw = event.category?.name?.trim().toLowerCase();
+  if (!raw) return '';
+  return eventCategoryIds.includes(raw as EventCategoryId) ? (raw as EventCategoryId) : '';
+}
+
 export default function NewEventRoute() {
   return (
     <ModalErrorBoundary>
@@ -45,11 +58,13 @@ export default function NewEventRoute() {
 
 function NewEventScreen() {
   const { t } = useTranslation(['events', 'common']);
-  const params = useLocalSearchParams<{ group_id?: string }>();
+  const params = useLocalSearchParams<{ group_id?: string; id?: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const parsedGroupId = Number(params.group_id);
   const groupId = Number.isFinite(parsedGroupId) && parsedGroupId > 0 ? parsedGroupId : null;
+  const eventId = Number(params.id);
+  const isEditing = Number.isFinite(eventId) && eventId > 0;
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [startTime, setStartTime] = useState(tomorrowLocalValue());
@@ -61,6 +76,44 @@ function NewEventScreen() {
   const [allowRemoteAttendance, setAllowRemoteAttendance] = useState(false);
   const [isFederated, setIsFederated] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasHydratedEdit, setHasHydratedEdit] = useState(false);
+  const fallbackHref = isEditing
+    ? ({ pathname: '/(modals)/event-detail', params: { id: String(eventId) } } as unknown as Href)
+    : groupId
+      ? ({ pathname: '/(modals)/group-detail', params: { id: String(groupId) } } as unknown as Href)
+      : '/(tabs)/events';
+
+  useEffect(() => {
+    if (!isEditing || hasHydratedEdit) return;
+
+    let isMounted = true;
+    getEvent(eventId)
+      .then((response) => {
+        if (!isMounted) return;
+        hydrateFromEvent(response.data);
+        setHasHydratedEdit(true);
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        Alert.alert(t('create.failedTitle'), t('create.loadFailed'));
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [eventId, hasHydratedEdit, isEditing, t]);
+
+  function hydrateFromEvent(event: Event) {
+    setTitle(event.title ?? '');
+    setDescription(event.description ?? '');
+    setStartTime(toDateInputValue(event.start_date) || tomorrowLocalValue());
+    setEndTime(toDateInputValue(event.end_date));
+    setCategory(resolveEventCategory(event));
+    setLocation(event.location ?? '');
+    setVideoUrl(event.online_url ?? '');
+    setMaxAttendees(event.max_attendees !== null && event.max_attendees !== undefined ? String(event.max_attendees) : '');
+    setAllowRemoteAttendance(Boolean(event.is_online));
+  }
 
   async function submit() {
     const start = toApiDate(startTime);
@@ -89,21 +142,22 @@ function NewEventScreen() {
 
     setIsSubmitting(true);
     try {
-      const result = await createEvent({
+      const payload: CreateEventPayload = {
         title: title.trim(),
         description: description.trim(),
         start_time: start,
         end_time: end,
-        group_id: groupId,
+        group_id: isEditing ? undefined : groupId,
         location: location.trim() || null,
         category_name: category || null,
         is_online: allowRemoteAttendance,
         online_link: allowRemoteAttendance && videoUrl.trim() ? videoUrl.trim() : null,
         max_attendees: parsedMaxAttendees,
         federated_visibility: isFederated ? 'listed' : 'none',
-      });
+      };
+      const result = isEditing ? await updateEvent(eventId, payload) : await createEvent(payload);
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      const id = result.data?.id;
+      const id = result.data?.id ?? eventId;
       if (id) {
         router.replace({ pathname: '/(modals)/event-detail', params: { id: String(id) } });
       } else {
@@ -119,9 +173,9 @@ function NewEventScreen() {
   return (
     <SafeAreaView className="flex-1 bg-background">
       <AppTopBar
-        title={t('create.title')}
+        title={isEditing ? t('create.editTitle') : t('create.title')}
         backLabel={t('common:back')}
-        fallbackHref={groupId ? ({ pathname: '/(modals)/group-detail', params: { id: String(groupId) } } as unknown as Href) : '/(tabs)/events'}
+        fallbackHref={fallbackHref}
       />
       <ScrollView className="flex-1" contentContainerStyle={{ padding: 16, paddingBottom: 120 }}>
         <HeroCard className="mb-4 overflow-hidden rounded-panel p-0">
@@ -133,7 +187,7 @@ function NewEventScreen() {
               </View>
               <View className="min-w-0 flex-1">
                 <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('create.eyebrow')}</Text>
-                <Text className="text-2xl font-bold" style={{ color: theme.text }}>{t('create.title')}</Text>
+                <Text className="text-2xl font-bold" style={{ color: theme.text }}>{isEditing ? t('create.editTitle') : t('create.title')}</Text>
                 <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('create.subtitle')}</Text>
               </View>
             </View>
@@ -177,9 +231,9 @@ function NewEventScreen() {
         </HeroCard>
       </ScrollView>
       <FormActionFooter
-        title={t('create.reviewTitle')}
-        subtitle={t('create.reviewSubtitle')}
-        submitLabel={t('create.submit')}
+        title={isEditing ? t('create.editReviewTitle') : t('create.reviewTitle')}
+        subtitle={isEditing ? t('create.editReviewSubtitle') : t('create.reviewSubtitle')}
+        submitLabel={isEditing ? t('create.updateSubmit') : t('create.submit')}
         primary={primary}
         isSubmitting={isSubmitting}
         onSubmit={submit}

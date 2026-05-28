@@ -157,6 +157,10 @@ function RootNavigator() {
         options={{ ...modalOptions, headerShown: false, title: t('events:create.title') }}
       />
       <Stack.Screen
+        name="(modals)/edit-event"
+        options={{ ...modalOptions, headerShown: false, title: t('events:create.editTitle') }}
+      />
+      <Stack.Screen
         name="(modals)/new-group"
         options={{ ...modalOptions, headerShown: false, title: t('groups:create.title') }}
       />

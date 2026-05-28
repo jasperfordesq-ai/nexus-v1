@@ -8,9 +8,11 @@ import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 // --- Mocks ---
 
+const mockRouterPush = jest.fn();
+
 jest.mock('expo-router', () => ({
-  useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }),
-  router: { push: jest.fn(), replace: jest.fn(), back: jest.fn() },
+  useRouter: () => ({ push: mockRouterPush, replace: jest.fn(), back: jest.fn() }),
+  router: { push: (...args: unknown[]) => mockRouterPush(...args), replace: jest.fn(), back: jest.fn() },
   useLocalSearchParams: () => ({ id: '7' }),
   useNavigation: () => ({ setOptions: jest.fn() }),
 }));
@@ -22,6 +24,8 @@ jest.mock('react-i18next', () => ({
         'detail.title': 'Event Details',
         'detail.about': 'About this Event',
         'detail.organizer': 'Organizer',
+        'detail.ownerTools': 'Event tools',
+        'detail.edit': 'Edit',
         'detail.invalidId': 'Invalid event ID.',
         'detail.notFound': 'Event not found.',
         'detail.goBack': 'Go Back',
@@ -67,6 +71,10 @@ jest.mock('@/lib/hooks/useTheme', () => ({
   }),
 }));
 
+jest.mock('@/lib/hooks/useAuth', () => ({
+  useAuth: () => ({ user: { id: 3, name: 'Current User' } }),
+}));
+
 const mockUseApi = jest.fn();
 jest.mock('@/lib/hooks/useApi', () => ({
   useApi: (...args: unknown[]) => mockUseApi(...args),
@@ -99,6 +107,7 @@ const defaultApiState = { data: null, isLoading: false, error: null, refresh: je
 
 beforeEach(() => {
   mockUseApi.mockReturnValue(defaultApiState);
+  mockRouterPush.mockClear();
 });
 
 const mockEvent = {
@@ -164,6 +173,16 @@ describe('EventDetailScreen', () => {
       expect(rsvpEvent).toHaveBeenCalledWith(7, 'going');
       expect(getByText(/1 going.*0 interested/)).toBeTruthy();
     });
+  });
+
+  it('opens the edit event route for the organizer', () => {
+    mockUseApi.mockReturnValue({ data: { data: mockEvent }, isLoading: false, error: null, refresh: jest.fn() });
+
+    const { getByText } = render(<EventDetailScreen />);
+
+    fireEvent.press(getByText('Edit'));
+
+    expect(mockRouterPush).toHaveBeenCalledWith({ pathname: '/(modals)/edit-event', params: { id: '7' } });
   });
 });
 

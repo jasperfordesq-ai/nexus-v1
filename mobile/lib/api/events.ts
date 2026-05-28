@@ -68,6 +68,8 @@ export interface CreateEventPayload {
   federated_visibility?: 'none' | 'listed' | 'bookable';
 }
 
+export type UpdateEventPayload = CreateEventPayload;
+
 /**
  * GET /api/v2/events — list upcoming events for the current tenant.
  * Supports cursor-based pagination.
@@ -122,4 +124,11 @@ export function getEvent(eventId: number): Promise<{ data: Event }> {
  */
 export function createEvent(payload: CreateEventPayload): Promise<{ data: Event }> {
   return api.post<{ data: Event }>(`${API_V2}/events`, payload);
+}
+
+/**
+ * PUT /api/v2/events/{id} — update a community event.
+ */
+export function updateEvent(id: number, payload: UpdateEventPayload): Promise<{ data: Event }> {
+  return api.put<{ data: Event }>(`${API_V2}/events/${id}`, payload);
 }

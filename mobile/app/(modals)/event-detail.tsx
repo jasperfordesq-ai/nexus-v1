@@ -7,13 +7,14 @@ import { useState } from 'react';
 import { Alert, Linking, RefreshControl, ScrollView, Share, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
 
 import { getEvent, removeRsvp, rsvpEvent } from '@/lib/api/events';
+import { useAuth } from '@/lib/hooks/useAuth';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
@@ -38,6 +39,7 @@ export default function EventDetailScreen() {
 function EventDetailScreenInner() {
   const { t } = useTranslation('events');
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { user } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
 
@@ -88,6 +90,7 @@ function EventDetailScreenInner() {
     : '-';
   const accent = event.category?.color ?? '#F59E0B';
   const coverImage = resolveImageUrl(event.cover_image);
+  const isOrganizer = user?.id === event.organizer?.id;
 
   async function handleShare() {
     if (!event) return;
@@ -141,6 +144,11 @@ function EventDetailScreenInner() {
     } finally {
       setUpdating(false);
     }
+  }
+
+  function openEditEvent() {
+    if (!event) return;
+    router.push({ pathname: '/(modals)/edit-event', params: { id: String(event.id) } } as unknown as Href);
   }
 
   return (
@@ -233,6 +241,18 @@ function EventDetailScreenInner() {
                 <Avatar uri={event.organizer.avatar ?? undefined} name={event.organizer.name ?? '?'} size={44} />
                 <Text className="text-sm font-semibold" style={{ color: theme.text }}>{event.organizer.name ?? t('common:unknown')}</Text>
               </View>
+            </HeroCard.Body>
+          </HeroCard>
+        ) : null}
+
+        {isOrganizer ? (
+          <HeroCard variant="secondary">
+            <HeroCard.Body className="gap-3 px-4 py-4">
+              <SectionTitle icon="settings-outline" title={t('detail.ownerTools')} primary={primary} theme={theme} />
+              <HeroButton variant="secondary" onPress={openEditEvent}>
+                <Ionicons name="create-outline" size={18} color={primary} />
+                <HeroButton.Label>{t('detail.edit')}</HeroButton.Label>
+              </HeroButton>
             </HeroCard.Body>
           </HeroCard>
         ) : null}

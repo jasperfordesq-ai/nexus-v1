@@ -8,11 +8,14 @@ import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import { Alert } from 'react-native';
 
 const mockCreateEvent = jest.fn().mockResolvedValue({ data: { id: 6 } });
+const mockGetEvent = jest.fn();
+const mockUpdateEvent = jest.fn().mockResolvedValue({ data: { id: 7 } });
 const mockReplace = jest.fn();
+let mockSearchParams: Record<string, string> = {};
 
 jest.mock('expo-router', () => ({
   router: { replace: (...args: unknown[]) => mockReplace(...args), back: jest.fn() },
-  useLocalSearchParams: () => ({}),
+  useLocalSearchParams: () => mockSearchParams,
 }));
 
 jest.mock('react-i18next', () => ({
@@ -21,6 +24,7 @@ jest.mock('react-i18next', () => ({
       const map: Record<string, string> = {
         'create.eyebrow': 'New event',
         'create.title': 'Create Event',
+        'create.editTitle': 'Edit Event',
         'create.subtitle': 'Add a gathering.',
         'create.titleLabel': 'Title',
         'create.titlePlaceholder': 'What is happening?',
@@ -41,11 +45,15 @@ jest.mock('react-i18next', () => ({
         'create.federated': 'Share with federation',
         'create.reviewTitle': 'Ready to publish?',
         'create.reviewSubtitle': 'Review first.',
+        'create.editReviewTitle': 'Ready to update?',
+        'create.editReviewSubtitle': 'Save your changes.',
         'create.submit': 'Create event',
+        'create.updateSubmit': 'Update event',
         'create.validationTitle': 'Check event details',
         'create.validationStartFuture': 'Choose a future start time.',
         'create.validationEndAfterStart': 'End time must be after the start time.',
         'create.validationCapacity': 'Capacity must be between 1 and 10,000.',
+        'create.loadFailed': 'Could not load event.',
         'category.workshop': 'Workshop',
         'category.social': 'Social',
         'category.outdoor': 'Outdoor',
@@ -79,6 +87,8 @@ jest.mock('@/lib/hooks/useTheme', () => ({
 
 jest.mock('@/lib/api/events', () => ({
   createEvent: (...args: unknown[]) => mockCreateEvent(...args),
+  getEvent: (...args: unknown[]) => mockGetEvent(...args),
+  updateEvent: (...args: unknown[]) => mockUpdateEvent(...args),
 }));
 
 jest.mock('@/lib/haptics', () => ({
@@ -124,7 +134,10 @@ describe('NewEventRoute', () => {
 
   beforeEach(() => {
     alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+    mockSearchParams = {};
     mockCreateEvent.mockClear();
+    mockGetEvent.mockReset();
+    mockUpdateEvent.mockClear();
     mockReplace.mockClear();
   });
 
@@ -193,5 +206,51 @@ describe('NewEventRoute', () => {
       }));
     });
     expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/event-detail', params: { id: '6' } });
+  });
+
+  it('hydrates an existing event and updates it in edit mode', async () => {
+    mockSearchParams = { id: '7' };
+    mockGetEvent.mockResolvedValueOnce({
+      data: {
+        id: 7,
+        title: 'Existing workshop',
+        description: 'Existing details for attendees.',
+        start_date: '2099-01-02T12:00:00.000Z',
+        end_date: '2099-01-02T13:00:00.000Z',
+        location: 'Old hall',
+        is_online: true,
+        online_url: 'https://meet.example/old',
+        max_attendees: 25,
+        organizer: { id: 3, name: 'Jane Organizer', avatar: null },
+        category: { id: 2, name: 'workshop', color: '#f59e0b' },
+        rsvp_counts: { going: 0, interested: 0 },
+        attendees_count: 0,
+        spots_left: 25,
+        is_full: false,
+        status: 'published',
+        user_rsvp: null,
+        cover_image: null,
+      },
+    });
+
+    const { getByDisplayValue, getByText } = render(<NewEventRoute />);
+
+    await waitFor(() => expect(getByDisplayValue('Existing workshop')).toBeTruthy());
+    fireEvent.changeText(getByDisplayValue('Existing workshop'), 'Updated workshop');
+    fireEvent.press(getByText('Update event'));
+
+    await waitFor(() => {
+      expect(mockUpdateEvent).toHaveBeenCalledWith(7, expect.objectContaining({
+        title: 'Updated workshop',
+        description: 'Existing details for attendees.',
+        location: 'Old hall',
+        category_name: 'workshop',
+        is_online: true,
+        online_link: 'https://meet.example/old',
+        max_attendees: 25,
+      }));
+    });
+    expect(mockCreateEvent).not.toHaveBeenCalled();
+    expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/event-detail', params: { id: '7' } });
   });
 });

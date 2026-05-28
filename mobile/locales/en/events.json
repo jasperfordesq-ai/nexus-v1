@@ -30,6 +30,7 @@
   "create": {
     "eyebrow": "New event",
     "title": "Create Event",
+    "editTitle": "Edit Event",
     "subtitle": "Add a workshop, meetup, online session, or local gathering to the community calendar.",
     "titleLabel": "Title",
     "titlePlaceholder": "What is happening?",
@@ -50,13 +51,17 @@
     "federated": "Share with federation",
     "reviewTitle": "Ready to publish?",
     "reviewSubtitle": "Review the details, date, location, and capacity before adding this event.",
+    "editReviewTitle": "Ready to update?",
+    "editReviewSubtitle": "Save your changes so attendees see the latest details.",
     "submit": "Create event",
+    "updateSubmit": "Update event",
     "validationTitle": "Check event details",
     "validationRequired": "Add a title, description, and valid future start time.",
     "validationStartFuture": "Choose a future start time.",
     "validationEndAfterStart": "End time must be after the start time.",
     "validationCapacity": "Capacity must be between 1 and 10,000.",
     "failedTitle": "Event not created",
+    "loadFailed": "We could not load this event for editing.",
     "failedDescription": "We could not create the event. Please try again."
   },
   "category": {
@@ -78,6 +83,8 @@
     "time": "Time",
     "location": "Location",
     "attendees": "Attendees",
+    "ownerTools": "Event tools",
+    "edit": "Edit",
     "joinOnline": "Join online",
     "shareMessage": "{{title}} — {{url}}"
   }
