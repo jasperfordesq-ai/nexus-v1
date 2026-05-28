@@ -333,6 +333,10 @@ function RootNavigator() {
         options={{ ...modalOptions, headerShown: false, title: t('marketplace:tools.pickups.title') }}
       />
       <Stack.Screen
+        name="(modals)/marketplace-pickup-scan"
+        options={{ ...modalOptions, headerShown: false, title: t('marketplace:tools.pickups.scan') }}
+      />
+      <Stack.Screen
         name="(modals)/marketplace-tools"
         options={{ ...modalOptions, headerShown: false, title: t('marketplace:tools.title') }}
       />
@@ -361,8 +365,20 @@ function RootNavigator() {
         options={{ ...modalOptions, headerShown: false, title: t('marketplace:merchantOnboarding.title') }}
       />
       <Stack.Screen
+        name="(modals)/marketplace-seller-onboarding"
+        options={{ ...modalOptions, headerShown: false, title: t('marketplace:merchantOnboarding.title') }}
+      />
+      <Stack.Screen
+        name="(modals)/marketplace-become-partner"
+        options={{ ...modalOptions, headerShown: false, title: t('marketplace:merchantOnboarding.title') }}
+      />
+      <Stack.Screen
         name="(modals)/marketplace-stripe-onboarding"
         options={{ ...modalOptions, headerShown: false, title: t('marketplace:stripeOnboarding.title') }}
+      />
+      <Stack.Screen
+        name="(modals)/marketplace-sales-orders"
+        options={{ ...modalOptions, headerShown: false, title: t('marketplace:orders.sales') }}
       />
       <Stack.Screen
         name="(modals)/job-detail"

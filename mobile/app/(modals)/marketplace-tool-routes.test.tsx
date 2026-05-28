@@ -18,8 +18,11 @@ jest.mock('react-i18next', () => ({
       const map: Record<string, string> = {
         'common:back': 'Back',
         'collections.savedTab': 'Saved searches',
+        'merchantOnboarding.title': 'Seller setup',
+        'orders.sales': 'Sales',
         'tools.tabs.promotions': 'Promotions',
         'tools.pickups.title': 'Pickups',
+        'tools.pickups.scan': 'Mark pickup complete',
       };
       return map[key] ?? key;
     },
@@ -39,6 +42,10 @@ jest.mock('@/components/ui/LoadingSpinner', () => {
 import MarketplaceSavedSearchesRoute from './marketplace-saved-searches';
 import MarketplacePromotionsRoute from './marketplace-promotions';
 import MarketplacePickupSlotsRoute from './marketplace-pickup-slots';
+import MarketplacePickupScanRoute from './marketplace-pickup-scan';
+import MarketplaceSellerOnboardingRoute from './marketplace-seller-onboarding';
+import MarketplaceBecomePartnerRoute from './marketplace-become-partner';
+import MarketplaceSalesOrdersRoute from './marketplace-sales-orders';
 
 describe('marketplace seller tool action routes', () => {
   beforeEach(() => {
@@ -77,6 +84,48 @@ describe('marketplace seller tool action routes', () => {
       expect(mockReplace).toHaveBeenCalledWith({
         pathname: '/(modals)/marketplace-tools',
         params: { tab: 'pickups' },
+      });
+    });
+  });
+
+  it('redirects pickup scanning to the seller tools pickups tab', async () => {
+    const { getByText } = render(<MarketplacePickupScanRoute />);
+
+    expect(getByText('Mark pickup complete')).toBeTruthy();
+    await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalledWith({
+        pathname: '/(modals)/marketplace-tools',
+        params: { tab: 'pickups' },
+      });
+    });
+  });
+
+  it('redirects seller onboarding aliases to merchant onboarding', async () => {
+    const first = render(<MarketplaceSellerOnboardingRoute />);
+
+    expect(first.getByText('Seller setup')).toBeTruthy();
+    await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalledWith('/(modals)/marketplace-merchant-onboarding');
+    });
+    first.unmount();
+    mockReplace.mockClear();
+
+    const second = render(<MarketplaceBecomePartnerRoute />);
+    expect(second.getByText('Seller setup')).toBeTruthy();
+    await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalledWith('/(modals)/marketplace-merchant-onboarding');
+    });
+    second.unmount();
+  });
+
+  it('redirects seller order deep links to the sales order mode', async () => {
+    const { getByText } = render(<MarketplaceSalesOrdersRoute />);
+
+    expect(getByText('Sales')).toBeTruthy();
+    await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalledWith({
+        pathname: '/(modals)/marketplace-orders',
+        params: { mode: 'sales' },
       });
     });
   });
