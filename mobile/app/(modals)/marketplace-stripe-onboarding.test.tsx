@@ -5,9 +5,13 @@
 
 import React from 'react';
 import { render, waitFor } from '@testing-library/react-native';
+import { Alert } from 'react-native';
+
+let mockParams: Record<string, string> = {};
 
 jest.mock('expo-router', () => ({
   router: { push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
+  useLocalSearchParams: () => mockParams,
 }));
 
 jest.mock('react-i18next', () => ({
@@ -19,6 +23,8 @@ jest.mock('react-i18next', () => ({
         'stripeOnboarding.title': 'Payment setup',
         'stripeOnboarding.eyebrow': 'Stripe Connect',
         'stripeOnboarding.subtitle': 'Connect Stripe so marketplace buyers can pay securely.',
+        'stripeOnboarding.completeTitle': 'Payments ready',
+        'stripeOnboarding.completeSubtitle': 'Stripe has confirmed that payments and payouts are available.',
         'stripeOnboarding.incompleteTitle': 'Finish Stripe setup',
         'stripeOnboarding.incompleteSubtitle': 'Your Stripe account exists, but charges or payouts are not enabled yet.',
         'stripeOnboarding.charges': 'Charges',
@@ -35,6 +41,11 @@ jest.mock('react-i18next', () => ({
         'stripeOnboarding.secure': 'Secure handoff',
         'stripeOnboarding.secureHint': 'The mobile app opens Stripe onboarding in the browser and returns here for status checks.',
         'stripeOnboarding.continue': 'Continue Stripe setup',
+        'stripeOnboarding.completeButton': 'Setup complete',
+        'stripeOnboarding.returnCompleteTitle': 'Stripe setup complete',
+        'stripeOnboarding.returnCompleteMessage': 'Your Stripe account is ready for marketplace payments.',
+        'stripeOnboarding.returnIncompleteTitle': 'Finish Stripe setup',
+        'stripeOnboarding.returnIncompleteMessage': 'Stripe still needs one or more checks before payments and payouts are fully enabled.',
         'stripeOnboarding.checkStatus': 'Check status',
         'stripeOnboarding.goListings': 'Back to listings',
         'stripeOnboarding.balanceTitle': 'Seller balance',
@@ -91,6 +102,7 @@ import {
 describe('MarketplaceStripeOnboardingRoute', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockParams = {};
     (getMarketplaceStripeOnboardingStatus as jest.Mock).mockResolvedValue({
       data: {
         stripe_account_id: 'acct_123',
@@ -123,6 +135,30 @@ describe('MarketplaceStripeOnboardingRoute', () => {
     expect(getByText('Payouts not ready')).toBeTruthy();
     expect(getByText('Continue Stripe setup')).toBeTruthy();
     expect(queryByText('Connect Stripe so marketplace buyers can pay securely.')).toBeNull();
+    unmount();
+  });
+
+  it('acknowledges a completed Stripe return link', async () => {
+    mockParams = { complete: '1' };
+    (getMarketplaceStripeOnboardingStatus as jest.Mock).mockResolvedValueOnce({
+      data: {
+        stripe_account_id: 'acct_123',
+        stripe_onboarding_complete: true,
+        details_submitted: true,
+        charges_enabled: true,
+        payouts_enabled: true,
+      },
+    });
+    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+
+    const { getByText, unmount } = render(<MarketplaceStripeOnboardingRoute />);
+
+    await waitFor(() => {
+      expect(getByText('Payments ready')).toBeTruthy();
+      expect(alertSpy).toHaveBeenCalledWith('Stripe setup complete', 'Your Stripe account is ready for marketplace payments.');
+    });
+
+    alertSpy.mockRestore();
     unmount();
   });
 });

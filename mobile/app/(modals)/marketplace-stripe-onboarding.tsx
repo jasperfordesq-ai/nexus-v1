@@ -3,10 +3,10 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Alert, Linking, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router, type Href } from 'expo-router';
+import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
@@ -38,8 +38,10 @@ export default function MarketplaceStripeOnboardingRoute() {
 function MarketplaceStripeOnboardingScreen() {
   const { t } = useTranslation(['marketplace', 'common']);
   const { hasFeature } = useTenant();
+  const params = useLocalSearchParams<{ return?: string; complete?: string; refresh?: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const handledReturnKeyRef = useRef('');
   const [status, setStatus] = useState<MarketplaceStripeOnboardingStatus | null>(null);
   const [balance, setBalance] = useState<MarketplaceSellerBalance | null>(null);
   const [payouts, setPayouts] = useState<MarketplaceSellerPayout[]>([]);
@@ -69,6 +71,18 @@ function MarketplaceStripeOnboardingScreen() {
   useEffect(() => {
     void load();
   }, []);
+
+  useEffect(() => {
+    const returnKey = `${params.return ?? ''}-${params.complete ?? ''}-${params.refresh ?? ''}`;
+    const isReturn = params.return === '1' || params.complete === '1' || params.refresh === '1';
+    if (!isReturn || isLoading || !status || handledReturnKeyRef.current === returnKey) return;
+    handledReturnKeyRef.current = returnKey;
+    if (status.stripe_onboarding_complete) {
+      Alert.alert(t('stripeOnboarding.returnCompleteTitle'), t('stripeOnboarding.returnCompleteMessage'));
+    } else {
+      Alert.alert(t('stripeOnboarding.returnIncompleteTitle'), t('stripeOnboarding.returnIncompleteMessage'));
+    }
+  }, [isLoading, params.complete, params.refresh, params.return, status, t]);
 
   async function start() {
     setIsStarting(true);
