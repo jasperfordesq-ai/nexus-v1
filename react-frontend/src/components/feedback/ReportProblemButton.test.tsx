@@ -95,4 +95,15 @@ describe('ReportProblemButton', () => {
     }));
     expect(await screen.findByText('Reference NXR-260527-ABC123 has been created.')).toBeInTheDocument();
   });
+
+  it('uses viewport-constrained scrollable modal layout', async () => {
+    const user = userEvent.setup();
+    render(<ReportProblemButton />);
+
+    await user.click(screen.getByRole('button', { name: 'Report a problem' }));
+
+    expect(screen.getByTestId('report-problem-form')).toHaveClass('max-h-full', 'min-h-0', 'flex-col');
+    expect(screen.getByTestId('report-problem-body')).toHaveClass('min-h-0', 'overflow-y-auto');
+    expect(screen.getByTestId('report-problem-footer')).toHaveClass('shrink-0', 'items-stretch');
+  });
 });

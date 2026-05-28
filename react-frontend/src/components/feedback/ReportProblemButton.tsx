@@ -137,11 +137,24 @@ export function ReportProblemButton({ className, mode = 'button' }: ReportProble
         {t('report_problem.trigger')}
       </Button>
 
-      <Modal isOpen={isOpen} onClose={close} size="lg" scrollBehavior="inside">
+      <Modal
+        isOpen={isOpen}
+        onClose={close}
+        size="lg"
+        placement="center"
+        scrollBehavior="inside"
+        classNames={{
+          wrapper: 'items-stretch p-3 sm:items-center sm:p-6',
+          base: 'max-h-[calc(100dvh-1.5rem)] w-[calc(100vw-1.5rem)] overflow-hidden rounded-lg p-0 sm:max-h-[min(760px,calc(100dvh-3rem))]',
+          header: 'shrink-0 px-4 py-4 pr-12 sm:px-6',
+          body: 'min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3 sm:px-6',
+          footer: 'shrink-0 flex-col-reverse items-stretch gap-2 px-4 py-4 sm:flex-row sm:items-center sm:px-6',
+        }}
+      >
         <ModalContent>
-          <form onSubmit={submit}>
+          <form data-testid="report-problem-form" className="flex max-h-full min-h-0 flex-col" onSubmit={submit}>
             <ModalHeader>{t('report_problem.title')}</ModalHeader>
-            <ModalBody className="space-y-4">
+            <ModalBody data-testid="report-problem-body" className="space-y-4">
               {!isAuthenticated ? (
                 <Alert color="warning" title={t('report_problem.auth_title')} description={t('report_problem.auth_description')} />
               ) : null}
@@ -191,7 +204,7 @@ export function ReportProblemButton({ className, mode = 'button' }: ReportProble
                 {t('report_problem.include_diagnostics')}
               </Checkbox>
             </ModalBody>
-            <ModalFooter>
+            <ModalFooter data-testid="report-problem-footer">
               <Button type="button" variant="tertiary" onPress={close}>
                 {t('report_problem.cancel')}
               </Button>

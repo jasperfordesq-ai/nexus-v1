@@ -7,7 +7,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\SupportReport;
+use App\Models\User;
 use App\Services\SupportReportNotificationService;
+use App\Services\SupportReportSentryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -88,6 +90,25 @@ class SupportReportController extends BaseApiController
             'user_agent' => $this->nullableString($request->userAgent(), 512),
             'ip_hash' => $this->hashIpAddress($request->ip()),
         ]);
+
+        try {
+            $sentryEventId = app(SupportReportSentryService::class)->captureCreated(
+                $report,
+                User::query()->find($userId),
+                $this->nullableString($validated['sentry_event_id'] ?? null, 191),
+            );
+
+            if ($sentryEventId !== null) {
+                $report->sentry_event_id = $sentryEventId;
+                $report->save();
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[SupportReportController] support report Sentry capture failed', [
+                'report_id' => $report->id,
+                'tenant_id' => $tenantId,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         try {
             SupportReportNotificationService::notifyCreated($report);

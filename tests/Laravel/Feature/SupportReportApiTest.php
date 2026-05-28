@@ -8,6 +8,7 @@ namespace Tests\Laravel\Feature;
 
 use App\Models\User;
 use App\Services\EmailDispatchService;
+use App\Services\SupportReportSentryService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
@@ -90,6 +91,39 @@ class SupportReportApiTest extends TestCase
 
         $this->assertNotNull($row);
         $this->assertNull($row->diagnostics);
+    }
+
+    public function test_support_report_captures_backend_sentry_event_when_frontend_event_is_missing(): void
+    {
+        $member = User::factory()->forTenant($this->testTenantId)->create();
+        $this->fakeSupportReportMailer();
+        $sentry = new SupportReportSuccessfulSentryService('backend-event-456');
+        app()->instance(SupportReportSentryService::class, $sentry);
+        Sanctum::actingAs($member, ['*']);
+
+        $response = $this->apiPost('/v2/support/reports', [
+            'summary' => 'Profile page crashes',
+            'description' => 'The profile page closes as soon as I press save.',
+            'impact' => 'blocked',
+            'route' => '/hour-timebank/profile',
+            'include_diagnostics' => true,
+            'diagnostics' => [
+                'console' => [['level' => 'error', 'message' => 'Save failed']],
+            ],
+        ]);
+
+        $response->assertCreated();
+
+        $row = DB::table('support_reports')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $member->id)
+            ->first();
+
+        $this->assertNotNull($row);
+        $this->assertSame('backend-event-456', $row->sentry_event_id);
+        $this->assertCount(1, $sentry->calls);
+        $this->assertSame((int) $row->id, $sentry->calls[0]['report_id']);
+        $this->assertSame($member->id, $sentry->calls[0]['user_id']);
     }
 
     public function test_support_report_requires_authentication(): void
@@ -320,5 +354,25 @@ class SupportReportSuccessfulEmailDispatchService extends EmailDispatchService
         $this->calls[] = compact('to', 'subject', 'body', 'options');
 
         return true;
+    }
+}
+
+class SupportReportSuccessfulSentryService extends SupportReportSentryService
+{
+    public array $calls = [];
+
+    public function __construct(private readonly ?string $eventId)
+    {
+    }
+
+    public function captureCreated(\App\Models\SupportReport $report, ?User $user, ?string $frontendEventId = null): ?string
+    {
+        $this->calls[] = [
+            'report_id' => $report->id,
+            'user_id' => $user?->id,
+            'frontend_event_id' => $frontendEventId,
+        ];
+
+        return $this->eventId;
     }
 }
