@@ -31,7 +31,7 @@ import MapPin from 'lucide-react/icons/map-pin';
 import Flag from 'lucide-react/icons/flag';
 import { ErrorBoundary } from '@/components/feedback';
 import type { Group } from '@/types/api';
-import { Button, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@/components/ui';
+import { Button, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Avatar } from '@/components/ui';
 
 const RichTextEditor = lazy(() => import('@/admin/components/RichTextEditor'));
 
@@ -273,7 +273,7 @@ export function GroupSettingsModal({
                     {t('detail.settings_image_label')}
                   </p>
                   {group?.image_url && (
-                    <img src={group.image_url} alt={t('detail.image_alt_group')} className="w-12 h-12 rounded-full object-cover mb-2" width={48} height={48} loading="lazy" />
+                    <Avatar src={group.image_url} alt={t('detail.image_alt_group')} name={group.name} size="lg" className="mb-2" />
                   )}
                   <Button
                     as="label"

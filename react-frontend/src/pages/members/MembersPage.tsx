@@ -622,7 +622,12 @@ export function MembersPage() {
                     <div className="p-2 max-w-[200px]">
                       <div className="flex items-center gap-2">
                         {(m.avatar || m.avatar_url) && (
-                          <img src={resolveAvatarUrl(m.avatar ?? m.avatar_url) || undefined} alt={t('members.avatar_alt', { name: m.name || `${m.first_name || ''} ${m.last_name || ''}`.trim() || t('members.fallback_name') })} className="w-8 h-8 rounded-full" width={32} height={32} loading="lazy" />
+                          <Avatar
+                            src={resolveAvatarUrl(m.avatar ?? m.avatar_url)}
+                            alt={t('members.avatar_alt', { name: m.name || `${m.first_name || ''} ${m.last_name || ''}`.trim() || t('members.fallback_name') })}
+                            name={m.name || `${m.first_name || ''} ${m.last_name || ''}`.trim() || t('members.fallback_name')}
+                            size="sm"
+                          />
                         )}
                         <div>
                           <h4 className="font-semibold text-sm text-theme-primary">

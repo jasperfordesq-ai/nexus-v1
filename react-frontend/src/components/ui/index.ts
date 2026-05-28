@@ -27,6 +27,7 @@ export { Button, type ButtonProps } from './Button';
 export { ButtonGroup, type ButtonGroupProps } from './ButtonGroup';
 export { Badge, type BadgeProps } from './Badge';
 export { Chip, type ChipProps } from './Chip';
+export { TagGroup, Tag, type TagGroupProps, type TagProps } from './TagGroup';
 export { Spinner, type SpinnerProps } from './Spinner';
 export { Skeleton, type SkeletonProps } from './Skeleton';
 export { Kbd, type KbdProps } from './Kbd';

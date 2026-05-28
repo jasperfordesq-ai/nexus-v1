@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Input, Checkbox, CheckboxGroup } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Input, Checkbox, CheckboxGroup, TagGroup, Tag } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,7 +15,7 @@ import { Select, SelectItem, GlassCard, Button, Chip, Input, Checkbox, CheckboxG
  * - Results grid with cursor pagination (shared MarketplaceListingGrid)
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, type Key } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from '@/lib/motion';
 
@@ -72,14 +72,6 @@ const POSTED_WITHIN_OPTIONS = [
   { value: '7', tKey: 'filters.posted_last_days', count: 7 },
   { value: '30', tKey: 'filters.posted_last_days', count: 30 },
 ];
-
-const CONDITION_COLORS: Record<string, 'success' | 'primary' | 'warning' | 'danger' | 'default'> = {
-  new: 'success',
-  like_new: 'primary',
-  good: 'warning',
-  fair: 'danger',
-  poor: 'default',
-};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Main Component
@@ -232,6 +224,24 @@ export function MarketplaceSearchPage() {
     deliveryMethod,
     postedWithin,
   ].filter(Boolean).length;
+
+  const handleRemoveFilterTag = (keys: Set<Key>) => {
+    keys.forEach((key) => {
+      const tagKey = String(key);
+      if (tagKey === 'category') setCategoryId('');
+      if (tagKey === 'price') {
+        setPriceMin('');
+        setPriceMax('');
+      }
+      if (tagKey.startsWith('condition:')) {
+        const condition = tagKey.replace('condition:', '');
+        setSelectedConditions((prev) => prev.filter((x) => x !== condition));
+      }
+      if (tagKey === 'seller') setSellerType('');
+      if (tagKey === 'delivery') setDeliveryMethod('');
+      if (tagKey === 'posted') setPostedWithin('');
+    });
+  };
 
   // Reset filters
   const resetFilters = () => {
@@ -487,53 +497,45 @@ export function MarketplaceSearchPage() {
 
           {/* Active filter chips */}
           {activeFilterCount > 0 && (
-            <div className="flex gap-2 flex-wrap">
+            <TagGroup aria-label={t('search.filters')} size="sm" variant="surface" onRemove={handleRemoveFilterTag}>
+              <TagGroup.List className="flex flex-wrap gap-2">
               {categoryId && (
-                <Chip
-                  onClose={() => setCategoryId('')}
-                  variant="soft"
-                  size="sm"
-                >
+                <Tag id="category" textValue={categories.find((c) => String(c.id) === categoryId)?.name || t('filters.category')}>
                   {categories.find((c) => String(c.id) === categoryId)?.name || t('filters.category')}
-                </Chip>
+                </Tag>
               )}
               {(priceMin || priceMax) && (
-                <Chip
-                  onClose={() => { setPriceMin(''); setPriceMax(''); }}
-                  variant="soft"
-                  size="sm"
-                >
+                <Tag id="price" textValue={priceMin && priceMax ? `${priceMin} - ${priceMax}` : priceMin ? t('search.price_from', { min: priceMin }) : t('search.price_up_to', { max: priceMax })}>
                   {priceMin && priceMax ? `${priceMin} - ${priceMax}` :
                     priceMin ? t('search.price_from', { min: priceMin }) : t('search.price_up_to', { max: priceMax })}
-                </Chip>
+                </Tag>
               )}
               {selectedConditions.map((c) => (
-                <Chip
+                <Tag
                   key={c}
-                  onClose={() => setSelectedConditions((prev) => prev.filter((x) => x !== c))}
-                  variant="soft"
-                  size="sm"
-                  color={CONDITION_COLORS[c] || 'default'}
+                  id={`condition:${c}`}
+                  textValue={t(`condition.${c}`)}
                 >
                   {t(`condition.${c}`)}
-                </Chip>
+                </Tag>
               ))}
               {sellerType && (
-                <Chip onClose={() => setSellerType('')} variant="soft" size="sm">
+                <Tag id="seller" textValue={sellerType === 'business' ? t('search.business') : t('search.private')}>
                   {sellerType === 'business' ? t('search.business') : t('search.private')}
-                </Chip>
+                </Tag>
               )}
               {deliveryMethod && (
-                <Chip onClose={() => setDeliveryMethod('')} variant="soft" size="sm">
+                <Tag id="delivery" textValue={t(`delivery_method.${deliveryMethod}`)}>
                   {t(`delivery_method.${deliveryMethod}`)}
-                </Chip>
+                </Tag>
               )}
               {postedWithin && (
-                <Chip onClose={() => setPostedWithin('')} variant="soft" size="sm">
+                <Tag id="posted" textValue={getPostedWithinLabel(postedWithin)}>
                   {getPostedWithinLabel(postedWithin)}
-                </Chip>
+                </Tag>
               )}
-            </div>
+              </TagGroup.List>
+            </TagGroup>
           )}
         </div>
 

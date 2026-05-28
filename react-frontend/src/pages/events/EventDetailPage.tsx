@@ -1,4 +1,4 @@
-import { Button, Chip, Card, CardBody, Textarea, GlassCard, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, AvatarGroup, Tabs, Tab, Skeleton } from '@/components/ui';
+import { Button, Chip, Card, CardBody, Textarea, GlassCard, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, AvatarGroup, Badge, Tabs, Tab, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -742,14 +742,14 @@ export function EventDetailPage() {
         <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-lg border border-theme-default bg-theme-elevated p-4">
             <div className="mb-2 flex items-center gap-2 text-sm text-theme-muted">
-              <div className="h-2.5 w-2.5 rounded-full bg-emerald-500" aria-hidden="true" />
+              <Badge isDot color="success" size="sm" />
               <span>{t('detail.going_count')}</span>
             </div>
             <span className="text-theme-primary font-medium">{goingCount}</span>
           </div>
           <div className="rounded-lg border border-theme-default bg-theme-elevated p-4">
             <div className="mb-2 flex items-center gap-2 text-sm text-theme-muted">
-              <div className="h-2.5 w-2.5 rounded-full bg-amber-500" aria-hidden="true" />
+              <Badge isDot color="warning" size="sm" />
               <span>{t('detail.interested_count')}</span>
             </div>
             <span className="text-theme-primary font-medium">{interestedCount}</span>

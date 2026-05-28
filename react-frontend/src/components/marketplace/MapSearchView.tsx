@@ -20,7 +20,7 @@ import MapPinOff from 'lucide-react/icons/map-pin-off';
 import Navigation from 'lucide-react/icons/navigation';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Spinner, Skeleton } from '@/components/ui';
+import { GlassCard, Badge, Button, Skeleton } from '@/components/ui';
 import { LocationMap, type MapMarker } from '@/components/location';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { PriceBadge } from './PriceBadge';
@@ -235,15 +235,15 @@ export function MapSearchView({
       <div className="absolute top-4 right-4 z-10">
         <div className="bg-background/90 backdrop-blur-sm rounded-lg p-2 shadow-md space-y-1">
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-green-500" />
+            <Badge isDot color="success" size="sm" />
             <span className="text-xs text-muted">{t('price_type.free')}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
+            <Badge isDot color="accent" size="sm" />
             <span className="text-xs text-muted">{t('price_type.fixed')}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
+            <Badge isDot color="warning" size="sm" />
             <span className="text-xs text-muted">{t('price_type.negotiable')}</span>
           </div>
         </div>
