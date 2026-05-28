@@ -234,6 +234,14 @@ describe('VolunteeringDetailScreen', () => {
     expect(queryByText('Express Interest')).toBeNull();
   });
 
+  it('does not show shift sign-up before the application is approved', () => {
+    mockUseApi.mockReturnValueOnce({ data: { data: mockOpportunity }, isLoading: false, error: null, refresh: jest.fn() });
+
+    const { queryByText } = render(<VolunteeringDetailScreen />);
+
+    expect(queryByText('Sign up for shift')).toBeNull();
+  });
+
   it('renders the not found state when data is null after loading', () => {
     mockUseApi.mockReturnValueOnce({ data: null, isLoading: false, error: null, refresh: jest.fn() });
 
@@ -257,7 +265,18 @@ describe('VolunteeringDetailScreen', () => {
   });
 
   it('signs up for a shift from the detail page', async () => {
-    mockUseApi.mockReturnValue({ data: { data: mockOpportunity }, isLoading: false, error: null, refresh: jest.fn() });
+    mockUseApi.mockReturnValue({
+      data: {
+        data: {
+          ...mockOpportunity,
+          has_applied: true,
+          application: { id: 44, status: 'approved' },
+        },
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
 
     const { getByText } = render(<VolunteeringDetailScreen />);
 

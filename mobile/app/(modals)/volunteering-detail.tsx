@@ -147,10 +147,12 @@ function ShiftCard({
   shift,
   onSignUp,
   signingUp,
+  canSignUp,
 }: {
   shift: VolunteerShift;
   onSignUp: () => void;
   signingUp: boolean;
+  canSignUp: boolean;
 }) {
   const { t } = useTranslation('volunteering');
   const theme = useTheme();
@@ -180,9 +182,11 @@ function ShiftCard({
             </Text>
           </View>
         </View>
-        <HeroButton size="sm" variant="secondary" isDisabled={signingUp} onPress={onSignUp}>
-          {signingUp ? <Spinner size="sm" /> : <HeroButton.Label>{t('signUpForShift')}</HeroButton.Label>}
-        </HeroButton>
+        {canSignUp ? (
+          <HeroButton size="sm" variant="secondary" isDisabled={signingUp} onPress={onSignUp}>
+            {signingUp ? <Spinner size="sm" /> : <HeroButton.Label>{t('signUpForShift')}</HeroButton.Label>}
+          </HeroButton>
+        ) : null}
       </HeroCard.Body>
     </HeroCard>
   );
@@ -229,6 +233,7 @@ function VolunteeringDetailScreenInner() {
   const shifts = opportunity?.shifts ?? [];
   const hasApplied = interestSent || Boolean(opportunity?.has_applied || opportunity?.application);
   const open = opportunity ? isOpenOpportunity(opportunity) : false;
+  const canSignUpForShifts = Boolean(opportunity?.application?.status === 'approved' && !opportunity.is_owner);
 
   async function handleShare() {
     if (!opportunity) return;
@@ -451,6 +456,7 @@ function VolunteeringDetailScreenInner() {
                   key={shift.id}
                   shift={shift}
                   signingUp={signingShiftId === shift.id}
+                  canSignUp={canSignUpForShifts}
                   onSignUp={() => void handleSignUpForShift(shift.id)}
                 />
               ))}
