@@ -173,6 +173,7 @@ describe('FederationListingsScreen', () => {
   });
 
   it('opens listing detail content from a card press', () => {
+    const { router } = require('expo-router');
     const { getByLabelText, getByText } = render(<FederationListingsScreen />);
 
     fireEvent.press(getByLabelText('Open details for Shared drill'));
@@ -180,6 +181,12 @@ describe('FederationListingsScreen', () => {
     expect(getByText('Listing details')).toBeTruthy();
     expect(getByText('Posted by')).toBeTruthy();
     expect(getByText('Message author')).toBeTruthy();
+
+    fireEvent.press(getByText('View profile'));
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/(modals)/federation-member',
+      params: { id: '272', tenant_id: '5' },
+    });
   });
 
   it('passes partner route filters to the listing API fetcher', async () => {

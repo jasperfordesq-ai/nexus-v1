@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { fireEvent, render } from '@testing-library/react-native';
 
 jest.mock('expo-router', () => ({
   router: { push: jest.fn(), back: jest.fn(), replace: jest.fn(), canGoBack: jest.fn(() => false) },
@@ -101,9 +101,14 @@ describe('FederationConnectionsRoute', () => {
 
   it('renders federation connection cards', () => {
     mockUseApi.mockReturnValueOnce({ data: { data: [connection] }, isLoading: false, error: null, refresh: jest.fn() });
+    const { router } = require('expo-router');
     const { getByText, getByLabelText } = render(<FederationConnectionsRoute />);
     expect(getByText('Katherine')).toBeTruthy();
     expect(getByText('Partner Timebank')).toBeTruthy();
-    expect(getByLabelText('View profile for Katherine')).toBeTruthy();
+    fireEvent.press(getByLabelText('View profile for Katherine'));
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/(modals)/federation-member',
+      params: { id: '272', tenant_id: '5' },
+    });
   });
 });

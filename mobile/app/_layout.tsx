@@ -373,6 +373,10 @@ function RootNavigator() {
           options={{ ...modalOptions, headerShown: false, title: t('federation:directory.members.title') }}
         />
         <Stack.Screen
+          name="(modals)/federation-member"
+          options={{ ...modalOptions, headerShown: false, title: t('federation:directory.members.title') }}
+        />
+        <Stack.Screen
           name="(modals)/federation-connections"
           options={{ ...modalOptions, headerShown: false, title: t('federation:directory.connections.title') }}
         />

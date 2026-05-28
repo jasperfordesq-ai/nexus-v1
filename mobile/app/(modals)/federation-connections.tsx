@@ -171,7 +171,7 @@ function ConnectionCard({
   onAction: (action: 'accept' | 'reject' | 'remove') => void;
 }) {
   function openProfile() {
-    router.push({ pathname: '/(modals)/member-profile', params: { id: String(connection.user_id), tenant_id: String(connection.tenant_id) } } as unknown as Href);
+    router.push({ pathname: '/(modals)/federation-member', params: { id: String(connection.user_id), tenant_id: String(connection.tenant_id) } } as unknown as Href);
   }
 
   function openMessage() {

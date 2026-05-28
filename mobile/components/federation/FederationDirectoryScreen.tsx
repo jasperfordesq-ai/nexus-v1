@@ -342,7 +342,7 @@ function MemberCard({ member, t, theme, primary }: { member: FederatedMember; t:
         ) : null}
         <View className="flex-row gap-2">
           {!member.is_external ? (
-            <HeroButton size="sm" variant="secondary" onPress={() => router.push({ pathname: '/(modals)/member-profile', params: { id: String(member.id), tenant_id: tenantId ? String(tenantId) : undefined } })}>
+            <HeroButton size="sm" variant="secondary" onPress={() => router.push({ pathname: '/(modals)/federation-member', params: { id: String(member.id), tenant_id: tenantId ? String(tenantId) : undefined } } as unknown as Href)}>
               <Ionicons name="person-outline" size={14} color={primary} />
               <HeroButton.Label>{t('directory.members.viewProfile')}</HeroButton.Label>
             </HeroButton>
@@ -453,7 +453,7 @@ function ListingDetailView({
 
   function openAuthorProfile() {
     if (!listing.author?.id || !tenantId) return;
-    router.push({ pathname: '/(modals)/member-profile', params: { id: String(listing.author.id), tenant_id: String(tenantId) } } as unknown as Href);
+    router.push({ pathname: '/(modals)/federation-member', params: { id: String(listing.author.id), tenant_id: String(tenantId) } } as unknown as Href);
   }
 
   function messageAuthor() {
