@@ -335,7 +335,7 @@ function ThreadScreenInner() {
             style={{ backgroundColor: primary }}
             onPress={handleSend}
             isDisabled={isSending || !inputText.trim()}
-            accessibilityLabel={t('messages:send')}
+            accessibilityLabel={t('thread.send')}
           >
             {isSending ? <Spinner size="sm" /> : <Ionicons name="send" size={18} color="#fff" />}
           </HeroButton>

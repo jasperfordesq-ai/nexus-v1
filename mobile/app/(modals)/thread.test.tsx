@@ -52,7 +52,6 @@ jest.mock('react-i18next', () => ({
         'context.type.event': 'Event',
         'context.type.job': 'Job',
         'context.type.volunteering': 'Volunteering',
-        'messages:send': 'Send',
         'errors.sendFailed': 'Send failed',
         'errors.reactionFailedTitle': 'Reaction failed',
         'errors.reactionFailed': 'Could not update that reaction.',
