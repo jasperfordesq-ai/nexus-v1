@@ -5,7 +5,7 @@
 
 import { useEffect, useRef } from 'react';
 import { Animated, View } from 'react-native';
-import { Tabs, usePathname } from 'expo-router';
+import { Tabs, router, type Href, usePathname } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -54,12 +54,13 @@ interface TabConfig {
   i18nKey: string;
   icon: IoniconName;
   iconFocused: IoniconName;
+  quickCreate?: boolean;
 }
 
 const TABS_CONFIG: TabConfig[] = [
   { name: 'home',      i18nKey: 'common:tabs.home',      icon: 'home-outline',    iconFocused: 'home' },
   { name: 'exchanges', i18nKey: 'common:tabs.listings',   icon: 'storefront-outline', iconFocused: 'storefront' },
-  { name: 'groups',    i18nKey: 'common:tabs.groups',     icon: 'people-outline', iconFocused: 'people' },
+  { name: 'create',    i18nKey: 'common:tabs.create',     icon: 'add-circle-outline', iconFocused: 'add-circle', quickCreate: true },
   { name: 'messages',  i18nKey: 'common:tabs.messages',   icon: 'chatbubble-outline', iconFocused: 'chatbubble' },
   { name: 'profile',   i18nKey: 'common:tabs.more',       icon: 'menu-outline',    iconFocused: 'menu' },
 ];
@@ -107,10 +108,16 @@ export default function TabsLayout() {
         },
       }}
     >
-      {TABS_CONFIG.map(({ name, i18nKey, icon, iconFocused }) => (
+      {TABS_CONFIG.map(({ name, i18nKey, icon, iconFocused, quickCreate }) => (
         <Tabs.Screen
           key={name}
           name={name}
+          listeners={quickCreate ? {
+            tabPress: (event) => {
+              event.preventDefault();
+              router.push('/(modals)/quick-create' as Href);
+            },
+          } : undefined}
           options={{
             title: t(i18nKey),
             tabBarIcon: ({ focused, color, size }) => (
@@ -129,6 +136,7 @@ export default function TabsLayout() {
         />
       ))}
       {/* Hide auxiliary tabs from the tab bar — navigated to programmatically */}
+      <Tabs.Screen name="groups" options={{ href: null }} />
       <Tabs.Screen name="members" options={{ href: null }} />
       <Tabs.Screen name="events" options={{ href: null }} />
       <Tabs.Screen name="search" options={{ href: null }} />

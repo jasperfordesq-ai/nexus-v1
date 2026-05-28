@@ -8,7 +8,23 @@
     "groups": "Groups",
     "messages": "Messages",
     "profile": "Profile",
+    "create": "Create",
     "more": "More"
+  },
+  "quickCreate": {
+    "title": "Create",
+    "eyebrow": "Quick actions",
+    "subtitle": "Choose what to add to your community.",
+    "newExchange": "New exchange",
+    "newExchangeDescription": "Post an offer or request for timebank exchanges.",
+    "newEvent": "New event",
+    "newEventDescription": "Create a community gathering, workshop, or meetup.",
+    "newGroup": "New group",
+    "newGroupDescription": "Start a space for members with shared interests.",
+    "newGoal": "New goal",
+    "newGoalDescription": "Track a personal timebank milestone.",
+    "emptyTitle": "No create actions available",
+    "emptySubtitle": "Enabled modules will appear here."
   },
   "buttons": {
     "save": "Save",

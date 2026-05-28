@@ -145,6 +145,10 @@ function RootNavigator() {
         options={{ ...modalOptions, headerShown: false, title: t('exchanges:newTitle') }}
       />
       <Stack.Screen
+        name="(modals)/quick-create"
+        options={{ ...modalOptions, headerShown: false, title: t('common:quickCreate.title') }}
+      />
+      <Stack.Screen
         name="(modals)/edit-exchange"
         options={{ ...modalOptions, headerShown: false, title: t('exchanges:editTitle') }}
       />
