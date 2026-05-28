@@ -59,7 +59,7 @@ interface TabConfig {
 
 const TABS_CONFIG: TabConfig[] = [
   { name: 'home',      i18nKey: 'common:tabs.home',      icon: 'home-outline',    iconFocused: 'home' },
-  { name: 'exchanges', i18nKey: 'common:tabs.listings',   icon: 'storefront-outline', iconFocused: 'storefront' },
+  { name: 'search',    i18nKey: 'common:tabs.discover',   icon: 'compass-outline', iconFocused: 'compass' },
   { name: 'create',    i18nKey: 'common:tabs.create',     icon: 'add-circle-outline', iconFocused: 'add-circle', quickCreate: true },
   { name: 'messages',  i18nKey: 'common:tabs.messages',   icon: 'chatbubble-outline', iconFocused: 'chatbubble' },
   { name: 'profile',   i18nKey: 'common:tabs.more',       icon: 'menu-outline',    iconFocused: 'menu' },
@@ -136,10 +136,10 @@ export default function TabsLayout() {
         />
       ))}
       {/* Hide auxiliary tabs from the tab bar — navigated to programmatically */}
+      <Tabs.Screen name="exchanges" options={{ href: null }} />
       <Tabs.Screen name="groups" options={{ href: null }} />
       <Tabs.Screen name="members" options={{ href: null }} />
       <Tabs.Screen name="events" options={{ href: null }} />
-      <Tabs.Screen name="search" options={{ href: null }} />
     </Tabs>
   );
 }
