@@ -47,6 +47,8 @@ jest.mock('react-i18next', () => ({
         'marketplaceSaved': 'Saved marketplace',
         'marketplaceSellerCoupons': 'Seller coupons',
         'marketplacePickupTools': 'Pickup tools',
+        'marketplacePromotions': 'Promotions',
+        'marketplaceSavedSearches': 'Saved searches',
         'marketplaceTools': 'Seller tools',
         'marketplacePayments': 'Seller payments',
         'signOut': 'Sign out',
@@ -100,6 +102,8 @@ jest.mock('react-i18next', () => ({
         'navDescriptions.marketplaceSaved': 'Open your saved marketplace collections and saved search alerts.',
         'navDescriptions.marketplaceSellerCoupons': 'Create, edit, and review redemptions for your seller coupons.',
         'navDescriptions.marketplacePickupTools': 'Manage pickup slots, scan pickup QR codes, and review reservations.',
+        'navDescriptions.marketplacePromotions': 'Promote active listings and review marketplace campaign metrics.',
+        'navDescriptions.marketplaceSavedSearches': 'Create saved marketplace searches and manage alert preferences.',
         'navDescriptions.marketplaceTools': 'Manage seller tools, promotions, pickup slots, collections, searches, and coupons.',
         'navDescriptions.marketplacePayments': 'Set up or review Stripe Connect seller payments.',
         'navDescriptions.jobs': 'Browse job vacancies, applications, and your own postings.',
@@ -249,6 +253,8 @@ describe('MoreScreen (More tab)', () => {
     expect(getByText('Saved marketplace')).toBeTruthy();
     expect(getByText('Seller coupons')).toBeTruthy();
     expect(getByText('Pickup tools')).toBeTruthy();
+    expect(getByText('Promotions')).toBeTruthy();
+    expect(getByText('Saved searches')).toBeTruthy();
     expect(getByText('Seller tools')).toBeTruthy();
     expect(getByText('Seller payments')).toBeTruthy();
   });
@@ -261,6 +267,28 @@ describe('MoreScreen (More tab)', () => {
     expect(router.push).toHaveBeenCalledWith({
       pathname: '/(modals)/marketplace-orders',
       params: { mode: 'sales' },
+    });
+  });
+
+  it('opens seller promotion tools from Marketplace shortcuts', () => {
+    const { getByLabelText } = render(<MoreScreen />);
+
+    fireEvent.press(getByLabelText('Promotions'));
+
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/(modals)/marketplace-tools',
+      params: { tab: 'promotions' },
+    });
+  });
+
+  it('opens saved search tools from Marketplace shortcuts', () => {
+    const { getByLabelText } = render(<MoreScreen />);
+
+    fireEvent.press(getByLabelText('Saved searches'));
+
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/(modals)/marketplace-tools',
+      params: { tab: 'savedSearches' },
     });
   });
 
