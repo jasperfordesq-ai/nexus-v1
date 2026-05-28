@@ -680,6 +680,21 @@ class TenantHierarchyService
                 'updated_at'  => now(),
             ]);
         }
+
+        // 4. Seed AI module docs (out-of-the-box AI training for the assistant).
+        //    Covers platform fundamentals, every feature/module, account/privacy,
+        //    accessibility, mobile and troubleshooting. Admins can edit or add
+        //    their own custom docs afterwards. Idempotent — won't overwrite
+        //    existing docs sharing the same slug. Failure is non-fatal (the
+        //    chat falls back to its built-in defaults).
+        try {
+            (new \App\Services\AI\AiModuleDocsService())->seedDefaultsForTenant($tenantId);
+        } catch (\Throwable $e) {
+            Log::warning('TenantHierarchyService: seedDefaultsForTenant (AI module docs) failed', [
+                'tenant_id' => $tenantId,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**

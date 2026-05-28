@@ -1587,7 +1587,8 @@
     "email_deliverability": "Email Deliverability",
     "metrics": "Metrics",
     "module_docs": "Module Docs",
-    "prerender": "Prerender"
+    "prerender": "Prerender",
+    "support_reports": "Support Reports"
   },
   "broker": {
     "a_reason_is_required": "Wymagany jest powód",
@@ -14436,9 +14437,9 @@
         "seed_defaults": "Domyślne ustawienia nasion"
       },
       "about": {
-        "body": "Jeśli wiadomość na czacie członka zawiera którekolwiek ze słów kluczowych dokumentu, treść tego dokumentu jest dodawana do zachęty systemowej AI. Na turę wstrzykiwane są maksymalnie 3 leki. Napisz prostym językiem: co robi dana funkcja, jak z niej korzystać i co nie jest możliwe.",
-        "tip_label": "Wskazówka:",
-        "tip_body": "Kliknij opcję Zainicjuj ustawienia domyślne, aby rozpocząć od 10 gotowych dokumentów obejmujących podstawowe moduły. Nie zastąpią niczego, co dostosowałeś."
+        "body": "When a member's chat message contains any of a doc's keywords, that doc's body is appended to the AI's system prompt as canonical grounding. Up to 4 docs are injected per turn, ranked by keyword match strength. Write in plain language: what the feature does, how to use it, and what is not possible. Add your community's specific terminology, policies, and FAQs.",
+        "tip_label": "Tip:",
+        "tip_body": "New tenants are auto-seeded with a comprehensive 38-doc starter pack covering the platform overview, timebanking philosophy, every module/feature, account security, privacy, accessibility, mobile, and troubleshooting. Click \"Seed defaults\" to top up missing docs — your custom edits are never overwritten."
       },
       "columns": {
         "actions": "Działania",
@@ -17026,5 +17027,92 @@
     "never_run": "Never run",
     "no_jobs": "No background jobs configured",
     "loading": "Loading"
+  },
+  "support_reports": {
+    "meta_title": "Support Reports",
+    "title": "Support Reports",
+    "subtitle": "Review member-submitted bug reports with page diagnostics, Sentry event IDs, and triage notes.",
+    "loading": "Loading support reports...",
+    "empty": "No support reports match these filters.",
+    "empty_value": "-",
+    "unassigned": "Unassigned",
+    "actions": {
+      "refresh": "Refresh",
+      "search": "Search",
+      "clear": "Clear",
+      "review": "Review",
+      "open_page": "Open page",
+      "open_sentry": "Open Sentry",
+      "copy_diagnostics": "Copy diagnostics",
+      "copy_handoff": "Copy engineering handoff",
+      "close": "Close",
+      "save": "Save triage"
+    },
+    "stats": {
+      "open": "Open",
+      "triaged": "Triaged",
+      "blocked": "Blocked",
+      "unassigned": "Unassigned"
+    },
+    "filters": {
+      "search": "Search reference, route, reporter, or summary",
+      "status": "Status",
+      "impact": "Impact"
+    },
+    "status": {
+      "all": "All statuses",
+      "open": "Open",
+      "triaged": "Triaged",
+      "resolved": "Resolved",
+      "closed": "Closed"
+    },
+    "impact": {
+      "all": "All impacts",
+      "blocked": "Blocked",
+      "major": "Major",
+      "minor": "Minor",
+      "cosmetic": "Cosmetic"
+    },
+    "table": {
+      "aria": "Support reports",
+      "reference": "Reference",
+      "summary": "Summary",
+      "impact": "Impact",
+      "status": "Status",
+      "reporter": "Reporter",
+      "assignee": "Assignee",
+      "created": "Created",
+      "actions": "Actions"
+    },
+    "detail": {
+      "title": "Report {{reference}}",
+      "loading": "Loading report...",
+      "summary": "Summary",
+      "description": "Description",
+      "reporter": "Reporter",
+      "page": "Page",
+      "created": "Created",
+      "user_agent": "User agent",
+      "sentry_event": "Sentry event",
+      "diagnostics": "Diagnostics"
+    },
+    "fields": {
+      "status": "Status",
+      "assignee": "Assignee",
+      "sentry_issue_url": "Sentry issue URL",
+      "triage_notes": "Triage notes"
+    },
+    "messages": {
+      "saved": "Support report updated.",
+      "copied": "Diagnostics copied.",
+      "handoff_copied": "Engineering handoff copied."
+    },
+    "errors": {
+      "load": "Failed to load support reports.",
+      "load_detail": "Failed to load the support report.",
+      "save": "Failed to save the support report.",
+      "copy": "Could not copy diagnostics.",
+      "copy_handoff": "Could not copy the engineering handoff."
+    }
   }
 }

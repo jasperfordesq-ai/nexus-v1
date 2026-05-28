@@ -442,9 +442,9 @@
         "seed_defaults": "Seed defaults"
       },
       "about": {
-        "body": "When a member's chat message contains any of a doc's keywords, that doc's body is appended to the AI's system prompt. Up to 3 docs are injected per turn. Write in plain language: what the feature does, how to use it, and what is not possible.",
+        "body": "When a member's chat message contains any of a doc's keywords, that doc's body is appended to the AI's system prompt as canonical grounding. Up to 4 docs are injected per turn, ranked by keyword match strength. Write in plain language: what the feature does, how to use it, and what is not possible. Add your community's specific terminology, policies, and FAQs.",
         "tip_label": "Tip:",
-        "tip_body": "Click Seed defaults to start with 10 pre-written docs covering the core modules. They will not overwrite anything you have customised."
+        "tip_body": "New tenants are auto-seeded with a comprehensive 38-doc starter pack covering the platform overview, timebanking philosophy, every module/feature, account security, privacy, accessibility, mobile, and troubleshooting. Click \"Seed defaults\" to top up missing docs — your custom edits are never overwritten."
       },
       "columns": {
         "actions": "Actions",
