@@ -32,16 +32,23 @@ import { withAlpha } from '@/lib/utils/color';
 
 type Step = 1 | 2 | 3 | 4;
 type SellerType = 'private' | 'business';
+type DayKey = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
+type DayHours = { open: string; close: string };
 
-const DEFAULT_HOURS = {
-  mon: { open: '09:00', close: '18:00' },
-  tue: { open: '09:00', close: '18:00' },
-  wed: { open: '09:00', close: '18:00' },
-  thu: { open: '09:00', close: '18:00' },
-  fri: { open: '09:00', close: '18:00' },
-  sat: null,
-  sun: null,
-};
+const DAYS: DayKey[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+const DEFAULT_DAY_HOURS: DayHours = { open: '09:00', close: '18:00' };
+
+function defaultOpeningHours(): Record<DayKey, DayHours | null> {
+  return {
+    mon: { ...DEFAULT_DAY_HOURS },
+    tue: { ...DEFAULT_DAY_HOURS },
+    wed: { ...DEFAULT_DAY_HOURS },
+    thu: { ...DEFAULT_DAY_HOURS },
+    fri: { ...DEFAULT_DAY_HOURS },
+    sat: null,
+    sun: null,
+  };
+}
 
 export default function MarketplaceMerchantOnboardingRoute() {
   return (
@@ -71,6 +78,7 @@ function MarketplaceMerchantOnboardingScreen() {
   const [city, setCity] = useState('');
   const [postalCode, setPostalCode] = useState('');
   const [country, setCountry] = useState('');
+  const [openingHours, setOpeningHours] = useState<Record<DayKey, DayHours | null>>(() => defaultOpeningHours());
   const [avatarUrl, setAvatarUrl] = useState(user?.avatar_url ?? '');
   const [coverImageUrl, setCoverImageUrl] = useState('');
 
@@ -113,6 +121,7 @@ function MarketplaceMerchantOnboardingScreen() {
     setCity(address.city ?? '');
     setPostalCode(address.postal_code ?? '');
     setCountry(address.country ?? '');
+    setOpeningHours(parseOpeningHours(profile.opening_hours));
   }
 
   async function pickAvatar() {
@@ -165,7 +174,7 @@ function MarketplaceMerchantOnboardingScreen() {
             postal_code: postalCode.trim(),
             country: country.trim(),
           },
-          opening_hours: DEFAULT_HOURS,
+          opening_hours: openingHours,
         });
         setStep(3);
       } else if (step === 3) {
@@ -188,6 +197,26 @@ function MarketplaceMerchantOnboardingScreen() {
     } finally {
       setIsSaving(false);
     }
+  }
+
+  function toggleDay(day: DayKey) {
+    setOpeningHours((current) => ({
+      ...current,
+      [day]: current[day] ? null : { ...DEFAULT_DAY_HOURS },
+    }));
+  }
+
+  function setDayTime(day: DayKey, field: keyof DayHours, value: string) {
+    setOpeningHours((current) => {
+      const existing = current[day] ?? { ...DEFAULT_DAY_HOURS };
+      return {
+        ...current,
+        [day]: {
+          ...existing,
+          [field]: value,
+        },
+      };
+    });
   }
 
   if (!hasFeature('marketplace')) {
@@ -280,6 +309,18 @@ function MarketplaceMerchantOnboardingScreen() {
                   <Surface variant="secondary" className="rounded-panel-inner p-3">
                     <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('merchantOnboarding.hoursHint')}</Text>
                   </Surface>
+                  <View className="gap-3">
+                    <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('merchantOnboarding.openingHours')}</Text>
+                    {DAYS.map((day) => (
+                      <OpeningHoursRow
+                        key={day}
+                        day={day}
+                        hours={openingHours[day]}
+                        onToggle={() => toggleDay(day)}
+                        onChange={(field, value) => setDayTime(day, field, value)}
+                      />
+                    ))}
+                  </View>
                 </>
               ) : null}
 
@@ -341,6 +382,40 @@ function parseRecord(value: MerchantSellerProfile['business_address']): Record<s
   }
 }
 
+function parseOpeningHours(value: MerchantSellerProfile['opening_hours']): Record<DayKey, DayHours | null> {
+  if (!value) return defaultOpeningHours();
+
+  let parsed: unknown = value;
+  if (typeof value === 'string') {
+    try {
+      parsed = JSON.parse(value);
+    } catch {
+      return defaultOpeningHours();
+    }
+  }
+
+  if (!isUnknownRecord(parsed)) return defaultOpeningHours();
+
+  const fallback = defaultOpeningHours();
+  return DAYS.reduce<Record<DayKey, DayHours | null>>((hours, day) => {
+    const dayValue = parsed[day];
+    if (dayValue === null) {
+      hours[day] = null;
+      return hours;
+    }
+    if (isUnknownRecord(dayValue) && typeof dayValue.open === 'string' && typeof dayValue.close === 'string') {
+      hours[day] = { open: dayValue.open, close: dayValue.close };
+      return hours;
+    }
+    hours[day] = fallback[day];
+    return hours;
+  }, {} as Record<DayKey, DayHours | null>);
+}
+
+function isUnknownRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
 function getUserBio(user: unknown): string {
   const candidate = user as { bio?: string | null } | null;
   return candidate?.bio ?? '';
@@ -396,6 +471,56 @@ function FormInput({
         multiline={multiline}
       />
     </View>
+  );
+}
+
+function OpeningHoursRow({
+  day,
+  hours,
+  onToggle,
+  onChange,
+}: {
+  day: DayKey;
+  hours: DayHours | null;
+  onToggle: () => void;
+  onChange: (field: keyof DayHours, value: string) => void;
+}) {
+  const { t } = useTranslation('marketplace');
+  const primary = usePrimaryColor();
+  const theme = useTheme();
+  const isOpen = hours !== null;
+
+  return (
+    <Surface variant="secondary" className="gap-3 rounded-panel-inner p-3">
+      <View className="flex-row items-center justify-between gap-3">
+        <View className="min-w-0 flex-1">
+          <Text className="text-base font-semibold" style={{ color: theme.text }}>{t(`merchantOnboarding.days.${day}`)}</Text>
+        </View>
+        <HeroButton variant={isOpen ? 'primary' : 'secondary'} onPress={onToggle} style={isOpen ? { backgroundColor: primary } : undefined}>
+          <HeroButton.Label>{isOpen ? t('merchantOnboarding.open') : t('merchantOnboarding.closed')}</HeroButton.Label>
+        </HeroButton>
+      </View>
+      {isOpen ? (
+        <View className="flex-row gap-3">
+          <View className="flex-1">
+            <FormInput
+              label={t('merchantOnboarding.openTime')}
+              value={hours.open}
+              onChangeText={(value) => onChange('open', value)}
+              placeholder={t('merchantOnboarding.openTimePlaceholder')}
+            />
+          </View>
+          <View className="flex-1">
+            <FormInput
+              label={t('merchantOnboarding.closeTime')}
+              value={hours.close}
+              onChangeText={(value) => onChange('close', value)}
+              placeholder={t('merchantOnboarding.closeTimePlaceholder')}
+            />
+          </View>
+        </View>
+      ) : null}
+    </Surface>
   );
 }
 
