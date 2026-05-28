@@ -59,7 +59,7 @@ jest.mock('react-i18next', () => ({
         'forms.imageAlt': 'Listing photo',
         'forms.coverImage': 'Cover',
         'forms.removeImage': 'Remove image',
-        'forms.maxImagesReached': 'You can add up to 8 images.',
+        'forms.maxImagesReached': 'You can add up to 20 images.',
         'forms.video': 'Video',
         'forms.addVideo': 'Add video',
         'forms.changeVideo': 'Change video',
@@ -67,7 +67,7 @@ jest.mock('react-i18next', () => ({
         'forms.removeVideo': 'Remove video',
         'forms.videoSelected': 'Selected video',
         'forms.currentVideo': 'Current video',
-        'forms.mediaHint': 'Add up to 8 images and one optional video.',
+        'forms.mediaHint': 'Add up to 20 images and one optional video.',
         'forms.footerCreateTitle': 'Review listing',
         'forms.footerEditTitle': 'Review changes',
         'forms.footerSubtitle': 'Publish when ready.',
@@ -348,7 +348,7 @@ describe('NewMarketplaceListingRoute', () => {
     await waitFor(() => {
       expect(ImagePicker.launchImageLibraryAsync).toHaveBeenCalledWith(expect.objectContaining({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        selectionLimit: 7,
+        selectionLimit: 19,
       }));
     });
 

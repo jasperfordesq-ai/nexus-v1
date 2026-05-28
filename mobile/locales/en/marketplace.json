@@ -181,7 +181,7 @@
     "currentVideo": "Current video",
     "videoTypeError": "Use an MP4, WebM, or MOV video file.",
     "videoSizeError": "Choose a video smaller than 50 MB.",
-    "mediaHint": "Add up to 8 images and one optional video.",
+    "mediaHint": "Add up to 20 images and one optional video.",
     "permissionTitle": "Permission needed",
     "permissionMessage": "Please allow access to your photo library to add marketplace media.",
     "footerCreateTitle": "Review listing",

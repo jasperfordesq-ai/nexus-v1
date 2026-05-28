@@ -45,7 +45,7 @@ const CURRENCIES = ['EUR', 'GBP', 'USD', 'CAD', 'AUD', 'NZD', 'CHF', 'SEK', 'NOK
 const CONDITIONS: MarketplaceCondition[] = ['new', 'like_new', 'good', 'fair', 'poor'];
 const DELIVERY: MarketplaceDeliveryMethod[] = ['pickup', 'shipping', 'both', 'community_delivery'];
 const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime'];
-const MAX_IMAGES = 8;
+const MAX_IMAGES = 20;
 const MAX_VIDEO_SIZE = 50 * 1024 * 1024;
 type MarketplaceCurrency = typeof CURRENCIES[number];
 
