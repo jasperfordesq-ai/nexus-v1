@@ -21,8 +21,16 @@ import AppTopBar from '@/components/ui/AppTopBar';
 import FormActionFooter from '@/components/ui/FormActionFooter';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
-function unwrapOrgs(response: { data?: VolunteeringOrganisation[] } | null | undefined): VolunteeringOrganisation[] {
-  return Array.isArray(response?.data) ? response.data : [];
+function unwrapOrgs(response: { data?: VolunteeringOrganisation[]; items?: VolunteeringOrganisation[] } | null | undefined): VolunteeringOrganisation[] {
+  if (Array.isArray(response?.data)) {
+    return response.data;
+  }
+
+  return Array.isArray(response?.items) ? response.items : [];
+}
+
+function canPostForOrganisation(org: VolunteeringOrganisation): boolean {
+  return ['approved', 'active'].includes(org.status ?? '') && ['owner', 'admin'].includes(org.member_role ?? '');
 }
 
 function parseDateOnly(value: string): number | null {
@@ -60,7 +68,7 @@ function NewVolunteeringScreen() {
   const opportunityId = Number(params.id);
   const isEditing = Number.isFinite(opportunityId) && opportunityId > 0;
   const orgQuery = useApi(() => getMyOrganisations(), []);
-  const organisations = useMemo(() => unwrapOrgs(orgQuery.data), [orgQuery.data]);
+  const organisations = useMemo(() => unwrapOrgs(orgQuery.data).filter(canPostForOrganisation), [orgQuery.data]);
   const [organisationId, setOrganisationId] = useState<number | null>(null);
   const selectedOrg = organisations.find((org) => org.id === organisationId) ?? null;
   const [title, setTitle] = useState('');
@@ -91,6 +99,14 @@ function NewVolunteeringScreen() {
       isMounted = false;
     };
   }, [hasHydratedEdit, isEditing, opportunityId, t]);
+
+  useEffect(() => {
+    if (isEditing || organisationId || organisations.length !== 1) {
+      return;
+    }
+
+    setOrganisationId(organisations[0]?.id ?? null);
+  }, [isEditing, organisationId, organisations]);
 
   function hydrateFromOpportunity(opportunity: VolunteerOpportunity) {
     setOrganisationId(opportunity.organisation?.id ?? opportunity.organization?.id ?? null);

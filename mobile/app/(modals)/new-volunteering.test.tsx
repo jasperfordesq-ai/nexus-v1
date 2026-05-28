@@ -169,6 +169,43 @@ describe('NewVolunteeringRoute', () => {
     expect(mockCreateOpportunity).not.toHaveBeenCalled();
   });
 
+  it('auto-selects the only approved organisation the member can manage', async () => {
+    const { getByPlaceholderText, getByText } = render(<NewVolunteeringRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('What help do you need?'), 'Food bank help');
+    fireEvent.changeText(getByPlaceholderText('Describe the role, support, and expected impact.'), 'Help pack and deliver food parcels for local families.');
+    fireEvent.press(getByText('Create opportunity'));
+
+    await waitFor(() => {
+      expect(mockCreateOpportunity).toHaveBeenCalledWith(expect.objectContaining({
+        organization_id: 7,
+        title: 'Food bank help',
+      }));
+    });
+  });
+
+  it('only offers approved owner or admin organisations for new opportunities', () => {
+    mockUseApi.mockReturnValue({
+      data: {
+        data: [
+          { id: 7, name: 'Helping Hands', status: 'approved', member_role: 'owner' },
+          { id: 8, name: 'Pending Helpers', status: 'pending', member_role: 'owner' },
+          { id: 9, name: 'Volunteer Friends', status: 'approved', member_role: 'member' },
+          { id: 10, name: 'Active Admins', status: 'active', member_role: 'admin' },
+        ],
+      },
+      isLoading: false,
+      error: null,
+    });
+
+    const { getByText, queryByText } = render(<NewVolunteeringRoute />);
+
+    expect(getByText('Helping Hands')).toBeTruthy();
+    expect(getByText('Active Admins')).toBeTruthy();
+    expect(queryByText('Pending Helpers')).toBeNull();
+    expect(queryByText('Volunteer Friends')).toBeNull();
+  });
+
   it('requires the opportunity description to meet the React length limit', async () => {
     const { getByPlaceholderText, getByText } = render(<NewVolunteeringRoute />);
 
