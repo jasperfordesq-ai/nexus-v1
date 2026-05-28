@@ -25,6 +25,25 @@ function unwrapOrgs(response: { data?: VolunteeringOrganisation[] } | null | und
   return Array.isArray(response?.data) ? response.data : [];
 }
 
+function parseDateOnly(value: string): number | null {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.trim());
+  if (!match) {
+    return null;
+  }
+
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const timestamp = Date.UTC(year, month - 1, day);
+  const date = new Date(timestamp);
+
+  if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) {
+    return null;
+  }
+
+  return timestamp;
+}
+
 export default function NewVolunteeringRoute() {
   return (
     <ModalErrorBoundary>
@@ -51,8 +70,31 @@ function NewVolunteeringScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function submit() {
-    if (!organisationId || !title.trim() || !description.trim()) {
+    const trimmedTitle = title.trim();
+    const trimmedDescription = description.trim();
+    const trimmedStartDate = startDate.trim();
+    const trimmedEndDate = endDate.trim();
+
+    if (!organisationId || !trimmedTitle || !trimmedDescription) {
       Alert.alert(t('create.validationTitle'), t('create.validationRequired'));
+      return;
+    }
+
+    if (trimmedTitle.length < 5) {
+      Alert.alert(t('create.validationTitle'), t('create.validationTitleMinLength'));
+      return;
+    }
+
+    if (trimmedDescription.length < 20) {
+      Alert.alert(t('create.validationTitle'), t('create.validationDescriptionMinLength'));
+      return;
+    }
+
+    const parsedStartDate = trimmedStartDate ? parseDateOnly(trimmedStartDate) : null;
+    const parsedEndDate = trimmedEndDate ? parseDateOnly(trimmedEndDate) : null;
+
+    if (parsedStartDate !== null && parsedEndDate !== null && parsedEndDate <= parsedStartDate) {
+      Alert.alert(t('create.validationTitle'), t('create.validationEndAfterStart'));
       return;
     }
 
@@ -60,13 +102,13 @@ function NewVolunteeringScreen() {
     try {
       const result = await createOpportunity({
         organization_id: organisationId,
-        title: title.trim(),
-        description: description.trim(),
+        title: trimmedTitle,
+        description: trimmedDescription,
         location: location.trim() || null,
         is_remote: isRemote,
         skills_needed: skills.trim(),
-        start_date: startDate.trim() || null,
-        end_date: endDate.trim() || null,
+        start_date: trimmedStartDate || null,
+        end_date: trimmedEndDate || null,
       });
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       const id = result.data?.id;

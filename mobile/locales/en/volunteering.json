@@ -123,6 +123,9 @@
     "submit": "Create opportunity",
     "validationTitle": "Check opportunity details",
     "validationRequired": "Choose an organisation and add a title and description.",
+    "validationTitleMinLength": "Use at least 5 characters for the title.",
+    "validationDescriptionMinLength": "Use at least 20 characters for the description.",
+    "validationEndAfterStart": "Use an end date after the start date.",
     "failedTitle": "Opportunity not created",
     "failedDescription": "We could not create the opportunity. Please try again."
   }
