@@ -50,6 +50,15 @@ const ORDER_STATUS_FILTERS: Record<OrderStatusTab, string | null> = {
   cancelled: 'cancelled,refunded',
 };
 
+function formatOrderTotal(value: number, currency: string): string {
+  return new Intl.NumberFormat(undefined, {
+    style: 'currency',
+    currency: currency || 'EUR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
 export default function MarketplaceOrdersRoute() {
   return (
     <ModalErrorBoundary>
@@ -535,10 +544,11 @@ function OrderCard({
   const { t } = useTranslation('marketplace');
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const total = `${item.currency || 'EUR'} ${Number(item.total_price).toLocaleString()}`;
+  const total = formatOrderTotal(Number(item.total_price), item.currency || 'EUR');
   const imageUrl = resolveImageUrl(item.listing?.image?.url);
   const counterparty = mode === 'purchases' ? item.seller : item.buyer;
   const counterpartyLabel = mode === 'purchases' ? t('orders.sellerLabel') : t('orders.buyerLabel');
+  const orderDate = item.created_at ? new Date(item.created_at).toLocaleDateString() : null;
   return (
     <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
       <HeroCard.Body className="gap-3 p-4">
@@ -569,14 +579,25 @@ function OrderCard({
             ) : null}
           </View>
         </View>
-        <Text className="text-xs" style={{ color: theme.textMuted }}>{t('orders.number', { number: item.order_number })}</Text>
+        <View className="flex-row flex-wrap items-center gap-2">
+          <Text className="text-xs" style={{ color: theme.textMuted }}>{t('orders.number', { number: item.order_number })}</Text>
+          {orderDate ? <Text className="text-xs" style={{ color: theme.textMuted }}>{t('orders.date', { date: orderDate })}</Text> : null}
+        </View>
         {item.quantity > 1 ? (
           <Text className="text-xs" style={{ color: theme.textSecondary }}>{t('orders.quantity', { count: item.quantity })}</Text>
         ) : null}
         {item.tracking_number ? (
-          <Text className="text-xs" style={{ color: theme.textSecondary }}>
-            {t('orders.tracking', { number: item.tracking_number })}
-          </Text>
+          <View className="flex-row flex-wrap items-center gap-2">
+            <Text className="text-xs" style={{ color: theme.textSecondary }}>
+              {t('orders.tracking', { number: item.tracking_number })}
+            </Text>
+            {item.tracking_url ? (
+              <HeroButton size="sm" variant="secondary" onPress={() => void Linking.openURL(item.tracking_url ?? '')}>
+                <Ionicons name="open-outline" size={14} color={primary} />
+                <HeroButton.Label>{t('orders.track')}</HeroButton.Label>
+              </HeroButton>
+            ) : null}
+          </View>
         ) : null}
         {item.listing?.id ? (
           <HeroButton size="sm" variant="secondary" onPress={() => router.push({ pathname: '/(modals)/marketplace-detail', params: { id: String(item.listing?.id) } } as unknown as Href)}>
