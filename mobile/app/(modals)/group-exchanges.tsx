@@ -4,8 +4,9 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useMemo, useState } from 'react';
-import { RefreshControl, ScrollView, Text, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
@@ -125,15 +126,19 @@ function GroupExchangesScreenInner() {
   function GroupExchangeCard({ exchange }: { exchange: GroupExchange }) {
     const tone = statusTones[exchange.status] ?? primary;
     return (
-      <HeroCard className="rounded-panel p-0">
-        <HeroCard.Body className="gap-3 p-4">
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => router.push({ pathname: '/(modals)/group-exchange-detail', params: { id: String(exchange.id) } } as unknown as Href)}
+      >
+        <HeroCard className="rounded-panel p-0">
+          <HeroCard.Body className="gap-3 p-4">
           <View className="flex-row items-start gap-3">
             <Avatar uri={exchange.organizer_avatar ?? null} name={exchange.organizer_name ?? t('groupExchanges.unknownOrganizer')} size={48} />
             <View className="min-w-0 flex-1 gap-1">
               <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={2}>{exchange.title}</Text>
-              <Text className="text-xs" style={{ color: theme.textSecondary }} numberOfLines={1}>
-                {exchange.organizer_name ?? t('groupExchanges.unknownOrganizer')}
-              </Text>
+              {exchange.organizer_name ? (
+                <Text className="text-xs" style={{ color: theme.textSecondary }} numberOfLines={1}>{exchange.organizer_name}</Text>
+              ) : null}
             </View>
             <Chip size="sm" variant="secondary">
               <Chip.Label>{t(`groupExchanges.status.${exchange.status}`)}</Chip.Label>
@@ -143,10 +148,12 @@ function GroupExchangesScreenInner() {
             <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>{exchange.description}</Text>
           ) : null}
           <View className="flex-row flex-wrap gap-2">
-            <Chip size="sm" variant="secondary">
-              <Ionicons name="people-outline" size={12} color={tone} />
-              <Chip.Label>{t('groupExchanges.participants', { count: exchange.participant_count })}</Chip.Label>
-            </Chip>
+            {typeof exchange.participant_count === 'number' ? (
+              <Chip size="sm" variant="secondary">
+                <Ionicons name="people-outline" size={12} color={tone} />
+                <Chip.Label>{t('groupExchanges.participants', { count: exchange.participant_count })}</Chip.Label>
+              </Chip>
+            ) : null}
             <Chip size="sm" variant="secondary">
               <Ionicons name="time-outline" size={12} color={tone} />
               <Chip.Label>{t('groupExchanges.hours', { count: Number(exchange.total_hours) })}</Chip.Label>
@@ -160,8 +167,9 @@ function GroupExchangesScreenInner() {
               <Chip.Label>{formatDate(exchange.created_at)}</Chip.Label>
             </Chip>
           </View>
-        </HeroCard.Body>
-      </HeroCard>
+          </HeroCard.Body>
+        </HeroCard>
+      </Pressable>
     );
   }
 }

@@ -31,6 +31,37 @@
     "hours": "{{count}} hour",
     "hours_other": "{{count}} hours",
     "unknownOrganizer": "Community member",
+    "detail": {
+      "title": "Group Exchange",
+      "created": "Created {{date}}",
+      "unknownDate": "recently",
+      "invalidTitle": "Group exchange not available",
+      "invalidDescription": "This group exchange link is missing a valid identifier.",
+      "notFoundTitle": "Group exchange not found",
+      "notFoundDescription": "You may not have access to this group exchange, or it may have been removed.",
+      "participants": "Participants",
+      "noParticipants": "No participants have been added yet.",
+      "splitPreview": "Split preview",
+      "splitFrom": "From member #{{id}}",
+      "splitTo": "To member #{{id}}: {{hours}} hours",
+      "confirmed": "Confirmed",
+      "unconfirmed": "Not confirmed",
+      "roles": {
+        "provider": "Provider",
+        "receiver": "Receiver"
+      },
+      "actions": {
+        "title": "Available actions",
+        "confirm": "Confirm hours",
+        "complete": "Complete exchange",
+        "cancel": "Cancel exchange",
+        "cancelTitle": "Cancel group exchange?",
+        "cancelDescription": "This will cancel the group exchange for all participants.",
+        "confirmFailed": "We could not confirm your hours. Please try again.",
+        "completeFailed": "We could not complete this exchange. Please try again.",
+        "cancelFailed": "We could not cancel this exchange. Please try again."
+      }
+    },
     "emptyTitle": "No group exchanges found",
     "emptyAll": "Group exchanges you organise or join will appear here.",
     "emptyFiltered": "No group exchanges match this status yet.",

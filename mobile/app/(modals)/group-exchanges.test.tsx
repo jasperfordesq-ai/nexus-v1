@@ -9,6 +9,7 @@ import { fireEvent, render } from '@testing-library/react-native';
 const mockUseApi = jest.fn();
 const mockRefresh = jest.fn();
 const mockGetGroupExchanges = jest.fn();
+const mockRouterPush = jest.fn();
 
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -64,6 +65,9 @@ jest.mock('@/lib/api/groupExchanges', () => ({
 }));
 
 jest.mock('@expo/vector-icons', () => ({ Ionicons: 'View' }));
+jest.mock('expo-router', () => ({
+  router: { push: (...args: unknown[]) => mockRouterPush(...args) },
+}));
 jest.mock('@/components/ui/AppTopBar', () => 'View');
 jest.mock('@/components/ui/Avatar', () => 'View');
 jest.mock('@/components/ui/EmptyState', () => {
@@ -101,6 +105,7 @@ beforeEach(() => {
     refresh: mockRefresh,
   });
   mockGetGroupExchanges.mockReset();
+  mockRouterPush.mockReset();
 });
 
 describe('GroupExchangesScreen', () => {
@@ -123,5 +128,16 @@ describe('GroupExchangesScreen', () => {
 
     const latestCall = mockUseApi.mock.calls[mockUseApi.mock.calls.length - 1];
     expect(latestCall[1]).toEqual(['pending_confirmation']);
+  });
+
+  it('opens a backend-supported detail route', () => {
+    const { getByText } = render(<GroupExchangesScreen />);
+
+    fireEvent.press(getByText('Community garden shift'));
+
+    expect(mockRouterPush).toHaveBeenCalledWith({
+      pathname: '/(modals)/group-exchange-detail',
+      params: { id: '10' },
+    });
   });
 });
