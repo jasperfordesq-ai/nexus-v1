@@ -158,7 +158,7 @@ describe('FederationMembersScreen', () => {
     fireEvent.press(getByText('View profile'));
     expect(router.push).toHaveBeenCalledWith({
       pathname: '/(modals)/federation-member',
-      params: { id: 'ext-7-123', tenant_id: 'ext-7' },
+      params: { id: 'ext-7-123', tenant_id: 'ext-7', name: 'External Sam' },
     });
 
     router.push.mockClear();

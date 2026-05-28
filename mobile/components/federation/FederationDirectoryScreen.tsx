@@ -380,7 +380,16 @@ function MemberCard({ member, t, theme, primary }: { member: FederatedMember; t:
         ) : null}
         <View className="flex-row gap-2">
           {tenantId ? (
-            <HeroButton size="sm" variant="secondary" onPress={() => router.push({ pathname: '/(modals)/federation-member', params: { id: String(member.id), tenant_id: tenantId ? String(tenantId) : undefined } } as unknown as Href)}>
+            <HeroButton
+              size="sm"
+              variant="secondary"
+              onPress={() => router.push({
+                pathname: '/(modals)/federation-member',
+                params: member.is_external
+                  ? { id: String(member.id), tenant_id: String(tenantId), name }
+                  : { id: String(member.id), tenant_id: String(tenantId) },
+              } as unknown as Href)}
+            >
               <Ionicons name="person-outline" size={14} color={primary} />
               <HeroButton.Label>{t('directory.members.viewProfile')}</HeroButton.Label>
             </HeroButton>
