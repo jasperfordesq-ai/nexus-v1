@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, FlatList, Pressable, RefreshControl, View } from 'react-native';
+import { Alert, FlatList, Modal, Pressable, RefreshControl, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,6 +17,7 @@ import AppTopBar from '@/components/ui/AppTopBar';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import {
+  createMarketplaceCollection,
   deleteMarketplaceSavedSearch,
   getMarketplaceCollectionItems,
   getMarketplaceCollections,
@@ -50,6 +51,11 @@ function MarketplaceCollectionsScreen() {
   const [savedSearches, setSavedSearches] = useState<MarketplaceSavedSearch[]>([]);
   const [selectedCollection, setSelectedCollection] = useState<MarketplaceCollection | null>(null);
   const [items, setItems] = useState<MarketplaceCollectionItem[]>([]);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newDescription, setNewDescription] = useState('');
+  const [newIsPublic, setNewIsPublic] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoadingItems, setIsLoadingItems] = useState(false);
@@ -107,16 +113,63 @@ function MarketplaceCollectionsScreen() {
   }
 
   async function deleteSavedSearch(search: MarketplaceSavedSearch) {
+    Alert.alert(
+      t('savedSearches.deleteTitle'),
+      t('savedSearches.deleteMessage', { name: search.name }),
+      [
+        { text: t('common:buttons.cancel'), style: 'cancel' },
+        {
+          text: t('tools.delete'),
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteMarketplaceSavedSearch(search.id);
+              setSavedSearches((current) => current.filter((entry) => entry.id !== search.id));
+            } catch {
+              Alert.alert(t('common:errors.alertTitle'), t('savedSearches.deleteFailed'));
+            }
+          },
+        },
+      ],
+    );
+  }
+
+  async function createCollection() {
+    const name = newName.trim();
+    if (!name) {
+      Alert.alert(t('common:errors.alertTitle'), t('collections.nameRequired'));
+      return;
+    }
+    setIsCreating(true);
     try {
-      await deleteMarketplaceSavedSearch(search.id);
-      setSavedSearches((current) => current.filter((entry) => entry.id !== search.id));
+      const response = await createMarketplaceCollection({
+        name,
+        description: newDescription.trim() || null,
+        is_public: newIsPublic,
+      });
+      setCollections((current) => [response.data, ...current]);
+      setNewName('');
+      setNewDescription('');
+      setNewIsPublic(false);
+      setIsCreateOpen(false);
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('savedSearches.deleteFailed'));
+      Alert.alert(t('common:errors.alertTitle'), t('collections.createFailed'));
+    } finally {
+      setIsCreating(false);
     }
   }
 
   function runSavedSearch(search: MarketplaceSavedSearch) {
-    router.push({ pathname: '/(modals)/marketplace', params: { q: search.search_query ?? '' } } as unknown as Href);
+    const params: Record<string, string> = {};
+    if (search.search_query) params.q = search.search_query;
+    if (search.filters) {
+      Object.entries(search.filters).forEach(([key, value]) => {
+        if (value !== null && value !== undefined && value !== '') {
+          params[key] = Array.isArray(value) ? value.join(',') : String(value);
+        }
+      });
+    }
+    router.push({ pathname: '/(modals)/marketplace-search', params } as unknown as Href);
   }
 
   if (!hasFeature('marketplace')) {
@@ -203,8 +256,12 @@ function MarketplaceCollectionsScreen() {
                     <HeroButton.Label>{t('collections.savedTab')}</HeroButton.Label>
                   </HeroButton>
                 </View>
+                <HeroButton variant="primary" onPress={() => setIsCreateOpen(true)} style={{ backgroundColor: primary }}>
+                  <Ionicons name="add-outline" size={16} color="#fff" />
+                  <HeroButton.Label>{t('collections.create')}</HeroButton.Label>
+                </HeroButton>
                 <HeroButton variant="secondary" onPress={() => router.push('/(modals)/marketplace-tools' as Href)}>
-                  <Ionicons name="add-outline" size={16} color={primary} />
+                  <Ionicons name="construct-outline" size={16} color={primary} />
                   <HeroButton.Label>{t('collections.manage')}</HeroButton.Label>
                 </HeroButton>
               </HeroCard.Body>
@@ -231,11 +288,24 @@ function MarketplaceCollectionsScreen() {
               icon="folder-open-outline"
               title={error ?? t('collections.empty')}
               subtitle={t('collections.emptyHint')}
-              actionLabel={error ? t('common:buttons.retry') : t('collections.manage')}
-              onAction={error ? () => void load() : () => router.push('/(modals)/marketplace-tools' as Href)}
+              actionLabel={error ? t('common:buttons.retry') : t('collections.create')}
+              onAction={error ? () => void load() : () => setIsCreateOpen(true)}
             />
           ) : null
         }
+      />
+
+      <CreateCollectionModal
+        visible={isCreateOpen}
+        name={newName}
+        description={newDescription}
+        isPublic={newIsPublic}
+        isCreating={isCreating}
+        onNameChange={setNewName}
+        onDescriptionChange={setNewDescription}
+        onPublicChange={setNewIsPublic}
+        onClose={() => setIsCreateOpen(false)}
+        onCreate={() => void createCollection()}
       />
     </SafeAreaView>
   );
@@ -305,5 +375,97 @@ function SavedSearchRow({
         </View>
       </HeroCard.Body>
     </HeroCard>
+  );
+}
+
+function CreateCollectionModal({
+  visible,
+  name,
+  description,
+  isPublic,
+  isCreating,
+  onNameChange,
+  onDescriptionChange,
+  onPublicChange,
+  onClose,
+  onCreate,
+}: {
+  visible: boolean;
+  name: string;
+  description: string;
+  isPublic: boolean;
+  isCreating: boolean;
+  onNameChange: (value: string) => void;
+  onDescriptionChange: (value: string) => void;
+  onPublicChange: (value: boolean) => void;
+  onClose: () => void;
+  onCreate: () => void;
+}) {
+  const { t } = useTranslation(['marketplace', 'common']);
+  const primary = usePrimaryColor();
+  const theme = useTheme();
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <View className="flex-1 justify-end bg-black/40">
+        <Surface variant="default" className="gap-4 rounded-t-[28px] p-4">
+          <View className="flex-row items-center justify-between gap-3">
+            <View className="min-w-0 flex-1">
+              <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('collections.createTitle')}</Text>
+              <Text className="text-sm" style={{ color: theme.textSecondary }}>{t('collections.createSubtitle')}</Text>
+            </View>
+            <HeroButton isIconOnly variant="secondary" onPress={onClose}>
+              <Ionicons name="close-outline" size={20} color={primary} />
+            </HeroButton>
+          </View>
+
+          <FormInput label={t('collections.name')} value={name} onChangeText={onNameChange} placeholder={t('collections.namePlaceholder')} />
+          <FormInput label={t('collections.description')} value={description} onChangeText={onDescriptionChange} placeholder={t('collections.descriptionPlaceholder')} multiline />
+
+          <HeroButton variant={isPublic ? 'primary' : 'secondary'} onPress={() => onPublicChange(!isPublic)} style={isPublic ? { backgroundColor: primary } : undefined}>
+            <Ionicons name={isPublic ? 'globe-outline' : 'lock-closed-outline'} size={16} color={isPublic ? '#fff' : primary} />
+            <HeroButton.Label>{isPublic ? t('collections.public') : t('collections.private')}</HeroButton.Label>
+          </HeroButton>
+
+          <View className="flex-row gap-2">
+            <HeroButton className="flex-1" variant="secondary" onPress={onClose}>
+              <HeroButton.Label>{t('common:buttons.cancel')}</HeroButton.Label>
+            </HeroButton>
+            <HeroButton className="flex-1" variant="primary" onPress={onCreate} isDisabled={isCreating || !name.trim()} style={{ backgroundColor: primary }}>
+              <HeroButton.Label>{t('collections.create')}</HeroButton.Label>
+            </HeroButton>
+          </View>
+        </Surface>
+      </View>
+    </Modal>
+  );
+}
+
+function FormInput({
+  label,
+  value,
+  onChangeText,
+  placeholder,
+  multiline = false,
+}: {
+  label: string;
+  value: string;
+  onChangeText: (value: string) => void;
+  placeholder: string;
+  multiline?: boolean;
+}) {
+  const theme = useTheme();
+  return (
+    <View className="gap-2">
+      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{label}</Text>
+      <TextInput
+        className="rounded-panel-inner border px-3 py-3 text-sm"
+        style={{ minHeight: multiline ? 92 : 48, borderColor: theme.border, color: theme.text, backgroundColor: theme.bg, textAlignVertical: multiline ? 'top' : 'center' }}
+        placeholder={placeholder}
+        placeholderTextColor={theme.textMuted}
+        value={value}
+        onChangeText={onChangeText}
+        multiline={multiline}
+      />
+    </View>
   );
 }
