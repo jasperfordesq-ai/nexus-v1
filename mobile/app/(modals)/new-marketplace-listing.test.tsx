@@ -317,6 +317,52 @@ describe('NewMarketplaceListingRoute', () => {
     });
   });
 
+  it('resolves relative existing image URLs in the edit preview', async () => {
+    mockParams = { id: '44' };
+    jest.mocked(getMarketplaceListing).mockResolvedValue({
+      data: {
+        id: 44,
+        title: 'Garden shears',
+        tagline: null,
+        description: 'Lightly used shears with clean blades.',
+        price: 12.5,
+        price_currency: 'EUR',
+        price_type: 'fixed',
+        time_credit_price: null,
+        condition: 'good',
+        quantity: 1,
+        location: null,
+        delivery_method: 'pickup',
+        seller_type: 'private',
+        status: 'active',
+        image: null,
+        image_count: 1,
+        images: [{ id: 8, url: '/uploads/marketplace/shears.jpg', thumbnail_url: null }],
+        video_url: null,
+        category: null,
+        user: null,
+        is_saved: false,
+        is_own: true,
+        is_promoted: false,
+        views_count: 0,
+        saves_count: 0,
+        created_at: '2026-05-01T00:00:00Z',
+        latitude: null,
+        longitude: null,
+        shipping_available: false,
+        local_pickup: true,
+        template_data: null,
+      },
+    } as never);
+
+    const { getByLabelText } = render(<NewMarketplaceListingRoute />);
+
+    await waitFor(() => {
+      const image = getByLabelText('Listing photo');
+      expect(image.props.source.uri).toBe('https://api.project-nexus.ie/uploads/marketplace/shears.jpg');
+    });
+  });
+
   it('adds new photos to an edited listing without dropping existing media', async () => {
     mockParams = { id: '43' };
     jest.mocked(ImagePicker.requestMediaLibraryPermissionsAsync).mockResolvedValue({ granted: true } as never);

@@ -39,6 +39,7 @@ import {
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
+import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 
 const PRICE_TYPES: MarketplacePriceType[] = ['fixed', 'negotiable', 'free', 'contact'];
 const CURRENCIES = ['EUR', 'GBP', 'USD', 'CAD', 'AUD', 'NZD', 'CHF', 'SEK', 'NOK', 'DKK', 'PLN', 'JPY'] as const;
@@ -503,7 +504,7 @@ export function MarketplaceListingForm() {
                   {existingImages.map((image, index) => (
                     <View key={`existing-${image.id ?? image.url}-${index}`} className="relative">
                       <Image
-                        source={{ uri: image.thumbnail_url || image.url }}
+                        source={{ uri: resolveImageUrl(image.thumbnail_url || image.url) ?? image.url }}
                         accessibilityLabel={t('forms.imageAlt', { number: index + 1 })}
                         className="size-20 rounded-panel-inner"
                         resizeMode="cover"
