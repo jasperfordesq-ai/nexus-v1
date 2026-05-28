@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { fireEvent, render } from '@testing-library/react-native';
 
 // --- Mocks ---
 
@@ -37,6 +37,7 @@ jest.mock('react-i18next', () => ({
         'requesting': 'Requesting',
         'common:errors.alertTitle': 'Error',
         'common:buttons.cancel': 'Cancel',
+        'detail.imageThumbnail': opts ? `Show listing image ${String(opts.number ?? '')}` : 'Show listing image',
         'detail.hours': opts ? `${String(opts.count ?? 0)} hrs` : '0 hrs',
       };
       return map[key] ?? key;
@@ -125,6 +126,7 @@ const mockExchange = {
   description: 'I will teach you how to bake sourdough bread at home.',
   type: 'offer' as const,
   hours_estimate: 2,
+  image_url: null,
   user: {
     id: 42,
     name: 'Alice Baker',
@@ -167,5 +169,28 @@ describe('ExchangeDetailModal', () => {
     const { getByText } = render(<ExchangeDetailModal />);
     // type is 'offer', so badge text is 'Offering'
     expect(getByText('Offering')).toBeTruthy();
+  });
+
+  it('renders backend listing image galleries from detail responses', () => {
+    mockUseApi.mockReturnValue({
+      data: {
+        data: {
+          ...mockExchange,
+          images: [
+            { id: 10, url: '/uploads/listings/first.jpg', sort_order: 0, alt_text: 'Fresh bread on a table' },
+            { id: 11, url: '/uploads/listings/second.jpg', sort_order: 1, alt_text: null },
+          ],
+        },
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByLabelText } = render(<ExchangeDetailModal />);
+
+    fireEvent.press(getByLabelText('Show listing image 2'));
+    expect(getByLabelText('Show listing image 1')).toBeTruthy();
+    expect(getByLabelText('Show listing image 2')).toBeTruthy();
   });
 });

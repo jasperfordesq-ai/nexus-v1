@@ -182,6 +182,7 @@
     "requestService": "Request this service",
     "offerHelp": "Offer to help",
     "location": "Location",
+    "imageThumbnail": "Show listing image {{number}}",
     "onlineOrFlexible": "Flexible",
     "flexible": "Flexible",
     "aboutListing": "About this listing",

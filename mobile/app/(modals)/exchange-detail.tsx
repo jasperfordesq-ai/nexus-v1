@@ -117,6 +117,7 @@ function ExchangeDetailModalInner() {
   const [isReported, setIsReported] = useState(false);
   const [reportReason, setReportReason] = useState('safety_concern');
   const [reportDetails, setReportDetails] = useState('');
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   const exchangeId = Number(id);
   const safeExchangeId = isNaN(exchangeId) || exchangeId <= 0 ? 0 : exchangeId;
@@ -168,6 +169,7 @@ function ExchangeDetailModalInner() {
       setIsReported(Boolean(exchange.is_reported));
       setComments([]);
       setCommentsLoaded(false);
+      setActiveImageIndex(0);
     }
   }, [exchange?.id, exchange?.is_favorited, exchange?.is_liked, exchange?.likes_count, exchange?.comments_count, exchange?.is_reported]);
 
@@ -229,7 +231,19 @@ function ExchangeDetailModalInner() {
     || t('detail.communityMember');
   const exchangeUserAvatar = exchangeUser.avatar_url ?? exchangeUser.avatar ?? listing.author_avatar ?? null;
   const isOwner = currentUser?.id === (listing.user_id ?? exchangeUser.id);
-  const imageUrl = resolveImageUrl(listing.image_url);
+  const listingImages = [
+    ...(listing.images ?? [])
+      .map((image) => ({
+        id: image.id,
+        url: resolveImageUrl(image.url),
+        altText: image.alt_text ?? null,
+      }))
+      .filter((image): image is { id: number; url: string; altText: string | null } => typeof image.url === 'string' && image.url.length > 0),
+    ...(listing.image_url ? [{ id: 0, url: resolveImageUrl(listing.image_url), altText: null }] : []),
+  ]
+    .filter((image): image is { id: number; url: string; altText: string | null } => typeof image.url === 'string' && image.url.length > 0)
+    .filter((image, index, images) => images.findIndex((candidate) => candidate.url === image.url) === index);
+  const activeImage = listingImages[Math.min(activeImageIndex, Math.max(listingImages.length - 1, 0))] ?? null;
   const accent = listing.type === 'offer' ? theme.success : theme.warning;
   const categoryLabel = listing.category_name ?? t('category');
   const locationLabel = listing.location ?? t('detail.onlineOrFlexible');
@@ -457,8 +471,28 @@ function ExchangeDetailModalInner() {
       >
         <HeroCard variant="default" className="overflow-hidden">
           <View className="h-1 w-full" style={{ backgroundColor: accent }} />
-          {imageUrl ? (
-            <Image source={{ uri: imageUrl }} style={{ width: '100%', height: 180 }} contentFit="cover" />
+          {activeImage ? (
+            <View className="gap-2">
+              <Image source={{ uri: activeImage.url }} style={{ width: '100%', height: 180 }} contentFit="cover" accessibilityLabel={activeImage.altText ?? listing.title} />
+              {listingImages.length > 1 ? (
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 12, paddingBottom: 10 }}>
+                  {listingImages.map((image, index) => {
+                    const isActive = image.url === activeImage.url;
+                    return (
+                      <Pressable
+                        key={`${image.id}-${image.url}`}
+                        accessibilityRole="button"
+                        accessibilityLabel={t('detail.imageThumbnail', { number: index + 1 })}
+                        onPress={() => setActiveImageIndex(index)}
+                        className={`overflow-hidden rounded-2xl border ${isActive ? 'border-primary' : 'border-border'}`}
+                      >
+                        <Image source={{ uri: image.url }} style={{ width: 58, height: 58 }} contentFit="cover" />
+                      </Pressable>
+                    );
+                  })}
+                </ScrollView>
+              ) : null}
+            </View>
           ) : null}
           <HeroCard.Body className="gap-4 px-4 py-4">
             <View className="flex-row flex-wrap gap-2">

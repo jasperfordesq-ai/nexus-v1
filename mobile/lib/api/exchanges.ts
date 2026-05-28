@@ -22,6 +22,13 @@ export interface ExchangeCategory {
   name: string;
 }
 
+export interface ExchangeImage {
+  id: number;
+  url: string;
+  sort_order?: number | null;
+  alt_text?: string | null;
+}
+
 export interface Exchange {
   id: number;
   title: string;
@@ -34,6 +41,7 @@ export interface Exchange {
   category_color: string | null;
   category_id?: number | null;
   image_url: string | null;
+  images?: ExchangeImage[];
   location: string | null;
   service_type?: 'physical_only' | 'remote_only' | 'hybrid' | 'location_dependent' | null;
   skill_tags?: string[];
