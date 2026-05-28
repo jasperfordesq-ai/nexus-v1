@@ -143,10 +143,12 @@ function MarketplaceMyListingsScreen() {
                 <Ionicons name="create-outline" size={14} color={primary} />
                 <HeroButton.Label>{t('owner.edit')}</HeroButton.Label>
               </HeroButton>
-              <HeroButton className="flex-1" size="sm" variant="secondary" onPress={() => void renew(item)}>
-                <Ionicons name="refresh-outline" size={14} color={primary} />
-                <HeroButton.Label>{t('owner.renew')}</HeroButton.Label>
-              </HeroButton>
+              {activeTab === 'expired' ? (
+                <HeroButton className="flex-1" size="sm" variant="secondary" onPress={() => void renew(item)}>
+                  <Ionicons name="refresh-outline" size={14} color={primary} />
+                  <HeroButton.Label>{t('owner.renew')}</HeroButton.Label>
+                </HeroButton>
+              ) : null}
               <HeroButton className="flex-1" size="sm" variant="danger" onPress={() => void removeListing(item)}>
                 <Ionicons name="trash-outline" size={14} color="#fff" />
                 <HeroButton.Label>{t('owner.delete')}</HeroButton.Label>
