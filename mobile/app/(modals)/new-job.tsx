@@ -126,6 +126,28 @@ function NewJobScreen() {
       return;
     }
 
+    const normalizedDeadline = deadline.trim();
+    if (normalizedDeadline) {
+      const deadlineDate = new Date(`${normalizedDeadline}T00:00:00`);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (!Number.isNaN(deadlineDate.getTime()) && deadlineDate < today) {
+        Alert.alert(t('create.validationTitle'), t('create.deadlinePast'));
+        return;
+      }
+    }
+
+    const parsedSalaryMin = optionalNumber(salaryMin);
+    const parsedSalaryMax = optionalNumber(salaryMax);
+    if (parsedSalaryMin !== null && parsedSalaryMax !== null && parsedSalaryMin > parsedSalaryMax) {
+      Alert.alert(t('create.validationTitle'), t('create.salaryRangeInvalid'));
+      return;
+    }
+    if (type === 'paid' && !salaryNegotiable && parsedSalaryMin === null && parsedSalaryMax === null) {
+      Alert.alert(t('create.validationTitle'), t('create.salaryRequired'));
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const payload: CreateJobPayload = {
@@ -141,11 +163,11 @@ function NewJobScreen() {
         time_credits: optionalNumber(credits),
         contact_email: contactEmail.trim() || null,
         contact_phone: contactPhone.trim() || null,
-        salary_min: optionalNumber(salaryMin),
-        salary_max: optionalNumber(salaryMax),
+        salary_min: parsedSalaryMin,
+        salary_max: parsedSalaryMax,
         salary_currency: salaryCurrency.trim() || null,
         salary_type: type === 'paid' ? salaryType : null,
-        deadline: deadline.trim() || null,
+        deadline: normalizedDeadline || null,
         salary_negotiable: salaryNegotiable,
         blind_hiring: blindHiring,
         tagline: tagline.trim() || null,

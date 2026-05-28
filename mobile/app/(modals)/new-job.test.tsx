@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import { Alert } from 'react-native';
 
 const mockCreateJob = jest.fn().mockResolvedValue({ data: { id: 301 } });
 const mockGetJobDetail = jest.fn();
@@ -70,6 +71,10 @@ jest.mock('react-i18next', () => ({
         'create.editReviewSubtitle': 'Save your changes.',
         'create.submit': 'Create job',
         'create.updateSubmit': 'Update job',
+        'create.validationTitle': 'Check job details',
+        'create.deadlinePast': 'Deadline must be a future date.',
+        'create.salaryRangeInvalid': 'Minimum salary cannot exceed maximum salary.',
+        'create.salaryRequired': 'Salary range required. You may mark salary negotiable to omit it.',
         'create.loadFailed': 'Could not load job.',
         'filters.type.paid': 'Paid',
         'filters.type.volunteer': 'Volunteer',
@@ -138,12 +143,83 @@ import NewJobRoute from './new-job';
 import { updateJob } from '@/lib/api/jobs';
 
 describe('NewJobRoute', () => {
+  let alertSpy: jest.SpyInstance;
+
   beforeEach(() => {
+    alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
     mockSearchParams = {};
     mockCreateJob.mockClear();
     mockGetJobDetail.mockReset();
     (updateJob as jest.Mock).mockClear();
     mockReplace.mockClear();
+  });
+
+  afterEach(() => {
+    alertSpy.mockRestore();
+  });
+
+  it('blocks paid roles without salary transparency unless negotiable', async () => {
+    const { getByPlaceholderText, getByText } = render(<NewJobRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('Role title'), 'Community coordinator');
+    fireEvent.changeText(getByPlaceholderText('Describe the role, expectations, and next steps.'), 'Coordinate local sessions and support volunteers.');
+    fireEvent.press(getByText('Paid'));
+    fireEvent.press(getByText('Create job'));
+
+    await waitFor(() => {
+      expect(alertSpy).toHaveBeenCalledWith('Check job details', 'Salary range required. You may mark salary negotiable to omit it.');
+    });
+    expect(mockCreateJob).not.toHaveBeenCalled();
+  });
+
+  it('allows paid roles without salary values when salary is negotiable', async () => {
+    const { getByPlaceholderText, getByText } = render(<NewJobRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('Role title'), 'Community coordinator');
+    fireEvent.changeText(getByPlaceholderText('Describe the role, expectations, and next steps.'), 'Coordinate local sessions and support volunteers.');
+    fireEvent.press(getByText('Paid'));
+    fireEvent.press(getByText('Salary negotiable'));
+    fireEvent.press(getByText('Create job'));
+
+    await waitFor(() => {
+      expect(mockCreateJob).toHaveBeenCalledWith(expect.objectContaining({
+        type: 'paid',
+        salary_min: null,
+        salary_max: null,
+        salary_negotiable: true,
+      }));
+    });
+  });
+
+  it('blocks salary ranges where minimum exceeds maximum', async () => {
+    const { getAllByPlaceholderText, getByPlaceholderText, getByText } = render(<NewJobRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('Role title'), 'Community coordinator');
+    fireEvent.changeText(getByPlaceholderText('Describe the role, expectations, and next steps.'), 'Coordinate local sessions and support volunteers.');
+    fireEvent.press(getByText('Paid'));
+    const salaryInputs = getAllByPlaceholderText('Optional amount');
+    fireEvent.changeText(salaryInputs[0], '55000');
+    fireEvent.changeText(salaryInputs[1], '42000');
+    fireEvent.press(getByText('Create job'));
+
+    await waitFor(() => {
+      expect(alertSpy).toHaveBeenCalledWith('Check job details', 'Minimum salary cannot exceed maximum salary.');
+    });
+    expect(mockCreateJob).not.toHaveBeenCalled();
+  });
+
+  it('blocks deadlines in the past', async () => {
+    const { getByPlaceholderText, getByText } = render(<NewJobRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('Role title'), 'Community coordinator');
+    fireEvent.changeText(getByPlaceholderText('Describe the role, expectations, and next steps.'), 'Coordinate local sessions and support volunteers.');
+    fireEvent.changeText(getByPlaceholderText('YYYY-MM-DD'), '2000-01-01');
+    fireEvent.press(getByText('Create job'));
+
+    await waitFor(() => {
+      expect(alertSpy).toHaveBeenCalledWith('Check job details', 'Deadline must be a future date.');
+    });
+    expect(mockCreateJob).not.toHaveBeenCalled();
   });
 
   it('submits contact, salary transparency, hiring, and branding fields for paid roles', async () => {

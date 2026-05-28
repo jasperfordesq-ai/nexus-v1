@@ -264,6 +264,9 @@
     "updateSubmit": "Update job",
     "validationTitle": "Check job details",
     "validationRequired": "Add a title and description before continuing.",
+    "deadlinePast": "Deadline must be a future date.",
+    "salaryRangeInvalid": "Minimum salary cannot exceed maximum salary.",
+    "salaryRequired": "Salary range required. You may mark salary negotiable to omit it.",
     "failedTitle": "Job not created",
     "loadFailed": "We could not load this job for editing.",
     "failedDescription": "We could not create the job. Please try again."
