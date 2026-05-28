@@ -91,7 +91,7 @@ const emptyCouponForm: CouponFormState = {
   maxUsesPerMember: '1',
   validFrom: '',
   validUntil: '',
-  status: 'active',
+  status: 'draft',
   appliesTo: 'all_listings',
 };
 
@@ -564,12 +564,23 @@ function CouponsPanel() {
   }
 
   async function remove(item: MerchantCoupon) {
-    try {
-      await deleteMerchantCoupon(item.id);
-      coupons.refresh();
-    } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.coupons.deleteFailed'));
-    }
+    Alert.alert(t('tools.coupons.deleteTitle'), t('tools.coupons.deleteMessage', { code: item.code }), [
+      { text: t('common:cancel'), style: 'cancel' },
+      {
+        text: t('tools.delete'),
+        style: 'destructive',
+        onPress: () => {
+          void (async () => {
+            try {
+              await deleteMerchantCoupon(item.id);
+              coupons.refresh();
+            } catch (err) {
+              Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.coupons.deleteFailed'));
+            }
+          })();
+        },
+      },
+    ]);
   }
 
   async function openRedemptions(item: MerchantCoupon) {
@@ -742,7 +753,7 @@ function CouponToolCard({
           <View className="flex-row flex-wrap items-center gap-2">
             <Text className="min-w-0 flex-1 text-sm font-bold" style={{ color: theme.text }} numberOfLines={1}>{item.title}</Text>
             <Chip size="sm" variant="secondary" style={{ backgroundColor: withAlpha(theme.success, 0.15) }}>
-              <Chip.Label style={{ color: theme.success }}>{couponDiscountLabel(item)}</Chip.Label>
+              <Chip.Label style={{ color: theme.success }}>{couponDiscountLabel(item, t)}</Chip.Label>
             </Chip>
           </View>
           <Text className="font-mono text-xs font-semibold" style={{ color: primary }}>{item.code}</Text>
@@ -795,10 +806,14 @@ function couponPayload(form: CouponFormState) {
   };
 }
 
-function couponDiscountLabel(coupon: MerchantCoupon): string {
-  if (coupon.discount_type === 'percent') return `${coupon.discount_value ?? 0}%`;
-  if (coupon.discount_type === 'fixed') return `€${((coupon.discount_value ?? 0) / 100).toFixed(2)}`;
-  return 'BOGO';
+function couponDiscountLabel(coupon: MerchantCoupon, t: (key: string, options?: Record<string, unknown>) => string): string {
+  if (coupon.discount_type === 'percent') {
+    return t('tools.coupons.percentValue', { value: coupon.discount_value ?? 0 });
+  }
+  if (coupon.discount_type === 'fixed') {
+    return t('publicCoupons.fixedValue', { value: ((coupon.discount_value ?? 0) / 100).toFixed(2) });
+  }
+  return t('publicCoupons.bogo');
 }
 
 function PanelCard({
