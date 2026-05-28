@@ -9,7 +9,20 @@
     "today": "Aujourd'hui",
     "yesterday": "Hier",
     "messagingRestrictedTitle": "Messages en pause",
-    "messagingRestrictedContact": "Veuillez contacter votre equipe communautaire avant d'envoyer d'autres messages."
+    "messagingRestrictedContact": "Veuillez contacter votre equipe communautaire avant d'envoyer d'autres messages.",
+    "messageOptions": "Options du message",
+    "edit": "Modifier",
+    "editing": "Modification du message",
+    "saveEdit": "Enregistrer",
+    "cancelEdit": "Annuler la modification",
+    "edited": "Modifie",
+    "delete": "Supprimer",
+    "deleteTitle": "Supprimer le message",
+    "deleteForMe": "Supprimer pour moi",
+    "deleteForEveryone": "Supprimer pour tout le monde",
+    "deleteSelfConfirm": "Retirer ce message de votre vue ?",
+    "deleteEveryoneConfirm": "Supprimer ce message pour tout le monde ?",
+    "deletedMessage": "Ce message a ete supprime."
   },
   "voice": {
     "label": "Message vocal",
@@ -25,6 +38,10 @@
   "deleteConfirm": "Supprimer la conversation avec {{name}} ?",
   "errors": {
     "sendFailed": "Échec de l'envoi. Appuyez pour réessayer.",
-    "loadFailed": "Impossible de charger les messages."
+    "loadFailed": "Impossible de charger les messages.",
+    "editFailedTitle": "Modification impossible",
+    "editFailed": "Impossible de mettre a jour ce message.",
+    "deleteFailedTitle": "Suppression impossible",
+    "deleteFailed": "Impossible de supprimer ce message."
   }
 }

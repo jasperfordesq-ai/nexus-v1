@@ -44,6 +44,19 @@
     "messageCount_other": "{{count}} messages",
     "messagingRestrictedTitle": "Messaging paused",
     "messagingRestrictedContact": "Please contact your community team before sending more messages.",
+    "messageOptions": "Message options",
+    "edit": "Edit",
+    "editing": "Editing message",
+    "saveEdit": "Save edit",
+    "cancelEdit": "Cancel edit",
+    "edited": "Edited",
+    "delete": "Delete",
+    "deleteTitle": "Delete message",
+    "deleteForMe": "Delete for me",
+    "deleteForEveryone": "Delete for everyone",
+    "deleteSelfConfirm": "Remove this message from your view?",
+    "deleteEveryoneConfirm": "Delete this message for everyone?",
+    "deletedMessage": "This message was deleted.",
     "reactWith": "React with {{emoji}}",
     "toggleReaction": "Toggle {{emoji}} reaction"
   },
@@ -86,6 +99,10 @@
     "restoreFailedTitle": "Restore failed",
     "restoreFailed": "Could not restore this conversation.",
     "reactionFailedTitle": "Reaction failed",
-    "reactionFailed": "Could not update that reaction."
+    "reactionFailed": "Could not update that reaction.",
+    "editFailedTitle": "Edit failed",
+    "editFailed": "Could not update this message.",
+    "deleteFailedTitle": "Delete failed",
+    "deleteFailed": "Could not delete this message."
   }
 }

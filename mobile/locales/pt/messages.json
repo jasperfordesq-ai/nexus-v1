@@ -9,7 +9,20 @@
     "today": "Hoje",
     "yesterday": "Ontem",
     "messagingRestrictedTitle": "Mensagens em pausa",
-    "messagingRestrictedContact": "Contacte a sua equipa da comunidade antes de enviar mais mensagens."
+    "messagingRestrictedContact": "Contacte a sua equipa da comunidade antes de enviar mais mensagens.",
+    "messageOptions": "Opcoes da mensagem",
+    "edit": "Editar",
+    "editing": "A editar mensagem",
+    "saveEdit": "Guardar edicao",
+    "cancelEdit": "Cancelar edicao",
+    "edited": "Editada",
+    "delete": "Eliminar",
+    "deleteTitle": "Eliminar mensagem",
+    "deleteForMe": "Eliminar para mim",
+    "deleteForEveryone": "Eliminar para todos",
+    "deleteSelfConfirm": "Remover esta mensagem da sua vista?",
+    "deleteEveryoneConfirm": "Eliminar esta mensagem para todos?",
+    "deletedMessage": "Esta mensagem foi eliminada."
   },
   "voice": {
     "label": "Mensagem de voz",
@@ -25,6 +38,10 @@
   "deleteConfirm": "Eliminar conversa com {{name}}?",
   "errors": {
     "sendFailed": "Falha ao enviar. Toque para tentar novamente.",
-    "loadFailed": "Não foi possível carregar as mensagens."
+    "loadFailed": "Não foi possível carregar as mensagens.",
+    "editFailedTitle": "Falha ao editar",
+    "editFailed": "Nao foi possivel atualizar esta mensagem.",
+    "deleteFailedTitle": "Falha ao eliminar",
+    "deleteFailed": "Nao foi possivel eliminar esta mensagem."
   }
 }

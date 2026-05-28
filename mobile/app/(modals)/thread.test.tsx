@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
+import { Alert } from 'react-native';
 
 // --- Mocks ---
 
@@ -44,6 +45,19 @@ jest.mock('react-i18next', () => ({
         'thread.messageCount': '2 messages',
         'thread.messagingRestrictedTitle': 'Messaging paused',
         'thread.messagingRestrictedContact': 'Please contact your community team before sending more messages.',
+        'thread.messageOptions': 'Message options',
+        'thread.edit': 'Edit',
+        'thread.editing': 'Editing message',
+        'thread.saveEdit': 'Save edit',
+        'thread.cancelEdit': 'Cancel edit',
+        'thread.edited': 'Edited',
+        'thread.delete': 'Delete',
+        'thread.deleteTitle': 'Delete message',
+        'thread.deleteForMe': 'Delete for me',
+        'thread.deleteForEveryone': 'Delete for everyone',
+        'thread.deleteSelfConfirm': 'Remove this message from your view?',
+        'thread.deleteEveryoneConfirm': 'Delete this message for everyone?',
+        'thread.deletedMessage': 'This message was deleted.',
         'unknownMember': 'Community member',
         'thread.reactWith': `React with ${String(options?.emoji ?? '')}`,
         'thread.toggleReaction': `Toggle ${String(options?.emoji ?? '')} reaction`,
@@ -55,6 +69,10 @@ jest.mock('react-i18next', () => ({
         'context.type.job': 'Job',
         'context.type.volunteering': 'Volunteering',
         'errors.sendFailed': 'Send failed',
+        'errors.editFailedTitle': 'Edit failed',
+        'errors.editFailed': 'Could not update this message.',
+        'errors.deleteFailedTitle': 'Delete failed',
+        'errors.deleteFailed': 'Could not delete this message.',
         'errors.reactionFailedTitle': 'Reaction failed',
         'errors.reactionFailed': 'Could not update that reaction.',
         'common:buttons.retry': 'Retry',
@@ -102,6 +120,8 @@ const mockToggleMessageReaction = jest.fn().mockResolvedValue({ data: { action: 
 const mockGetMessagingRestrictionStatus = jest.fn().mockResolvedValue({
   data: { messaging_disabled: false, under_monitoring: false, restriction_reason: null },
 });
+const mockUpdateMessage = jest.fn().mockResolvedValue({ data: { id: 2, body: 'Edited reply', is_edited: true } });
+const mockDeleteMessage = jest.fn().mockResolvedValue({ data: { success: true } });
 
 jest.mock('@/lib/api/messages', () => ({
   getThread: jest.fn(),
@@ -110,6 +130,8 @@ jest.mock('@/lib/api/messages', () => ({
   markConversationRead: (...args: unknown[]) => mockMarkConversationRead(...args),
   sendMessage: jest.fn().mockResolvedValue({ data: { id: 99 } }),
   toggleMessageReaction: (...args: unknown[]) => mockToggleMessageReaction(...args),
+  updateMessage: (...args: unknown[]) => mockUpdateMessage(...args),
+  deleteMessage: (...args: unknown[]) => mockDeleteMessage(...args),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   displayName: (user: any, fallback = 'Unknown') => user?.name ?? fallback,
 }));
@@ -170,12 +192,17 @@ beforeEach(() => {
   mockMarkConversationRead.mockClear();
   mockToggleMessageReaction.mockClear();
   mockGetMessagingRestrictionStatus.mockClear();
+  mockUpdateMessage.mockClear();
+  mockDeleteMessage.mockClear();
   mockGetMessagingRestrictionStatus.mockResolvedValue({
     data: { messaging_disabled: false, under_monitoring: false, restriction_reason: null },
   });
+  mockUpdateMessage.mockResolvedValue({ data: { id: 2, body: 'Edited reply', is_edited: true } });
+  mockDeleteMessage.mockResolvedValue({ data: { success: true } });
   mockToggleMessageReaction.mockResolvedValue({ data: { action: 'added', emoji: '👍', message_id: 1 } });
   (sendMessage as jest.Mock).mockClear();
   mockUseApi.mockReturnValue({ data: null, isLoading: false, error: null, refresh: jest.fn() });
+  jest.restoreAllMocks();
 });
 
 describe('ThreadScreen', () => {
@@ -332,6 +359,61 @@ describe('ThreadScreen', () => {
     fireEvent.press(getByLabelText('Send'));
 
     expect(sendMessage).not.toHaveBeenCalled();
+  });
+
+  it('edits an own text message through message options', async () => {
+    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
+    mockUseApi.mockReturnValue({
+      data: { data: mockMessages },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getAllByLabelText, getByDisplayValue, getByLabelText, getByText } = render(<ThreadScreen />);
+
+    fireEvent.press(getAllByLabelText('Message options')[1]);
+    const optionButtons = alertSpy.mock.calls[0]?.[2] as Array<{ text: string; onPress?: () => void }>;
+    act(() => {
+      optionButtons.find((button) => button.text === 'Edit')?.onPress?.();
+    });
+
+    expect(getByText('Editing message')).toBeTruthy();
+    fireEvent.changeText(getByDisplayValue('Hi back!'), 'Edited reply');
+    fireEvent.press(getByLabelText('Save edit'));
+
+    await waitFor(() => {
+      expect(mockUpdateMessage).toHaveBeenCalledWith(2, 'Edited reply');
+      expect(getByText('Edited reply')).toBeTruthy();
+      expect(getByText('Edited')).toBeTruthy();
+    });
+  });
+
+  it('deletes a message for the current user through message options', async () => {
+    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
+    mockUseApi.mockReturnValue({
+      data: { data: mockMessages },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getAllByLabelText, queryByText } = render(<ThreadScreen />);
+
+    fireEvent.press(getAllByLabelText('Message options')[0]);
+    const optionButtons = alertSpy.mock.calls[0]?.[2] as Array<{ text: string; onPress?: () => void }>;
+    act(() => {
+      optionButtons.find((button) => button.text === 'Delete for me')?.onPress?.();
+    });
+    const confirmButtons = alertSpy.mock.calls[1]?.[2] as Array<{ text: string; onPress?: () => void }>;
+    await act(async () => {
+      await confirmButtons.find((button) => button.text === 'Delete')?.onPress?.();
+    });
+
+    await waitFor(() => {
+      expect(mockDeleteMessage).toHaveBeenCalledWith(1, 'self');
+      expect(queryByText('Hello there!')).toBeNull();
+    });
   });
 
   it('shows supported context cards that open native detail routes', () => {

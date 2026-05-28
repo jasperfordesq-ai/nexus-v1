@@ -63,6 +63,7 @@ export interface MessageSender {
 export interface Message {
   id: number;
   body: string;
+  content?: string;
   sender: MessageSender;
   sender_id?: number;
   receiver_id?: number;
@@ -73,6 +74,8 @@ export interface Message {
   audio_url: string | null;
   reactions: Record<string, number>;
   is_read: boolean;
+  is_edited?: boolean;
+  is_deleted?: boolean;
   listing_id?: number | null;
   context_type?: string | null;
   context_id?: number | null;
@@ -169,6 +172,14 @@ export function getMessagingRestrictionStatus(): Promise<{ data: MessagingRestri
 
 export function toggleMessageReaction(messageId: number, emoji: string): Promise<{ data?: { action?: 'added' | 'removed'; emoji?: string; message_id?: number } }> {
   return api.post(`${API_V2}/messages/${messageId}/reactions`, { emoji });
+}
+
+export function updateMessage(messageId: number, body: string): Promise<{ data: Message }> {
+  return api.put<{ data: Message }>(`${API_V2}/messages/${messageId}`, { body });
+}
+
+export function deleteMessage(messageId: number, scope: 'self' | 'everyone' = 'self'): Promise<{ data?: { success?: boolean } }> {
+  return api.delete(`${API_V2}/messages/${messageId}?scope=${scope}`);
 }
 
 /** POST /api/v2/messages — send a message to a recipient */

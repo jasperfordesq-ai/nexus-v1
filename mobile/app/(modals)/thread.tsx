@@ -23,7 +23,7 @@ import * as Haptics from '@/lib/haptics';
 import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
 
 import { useTranslation } from 'react-i18next';
-import { displayName, getMessagingRestrictionStatus, getOrCreateThread, getThread, markConversationRead, sendMessage, toggleMessageReaction, type Message, type MessagingRestrictionStatus, type SendMessageOptions } from '@/lib/api/messages';
+import { deleteMessage, displayName, getMessagingRestrictionStatus, getOrCreateThread, getThread, markConversationRead, sendMessage, toggleMessageReaction, updateMessage, type Message, type MessagingRestrictionStatus, type SendMessageOptions } from '@/lib/api/messages';
 import { useApi } from '@/lib/hooks/useApi';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -106,6 +106,7 @@ function ThreadScreenInner() {
   const [inputText, setInputText] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [messagingRestriction, setMessagingRestriction] = useState<MessagingRestrictionStatus | null>(null);
+  const [editingMessage, setEditingMessage] = useState<Message | null>(null);
   const flatListRef = useRef<FlatList<Message>>(null);
   const inputTextRef = useRef(inputText);
   inputTextRef.current = inputText;
@@ -198,6 +199,27 @@ function ThreadScreenInner() {
       return;
     }
 
+    if (editingMessage) {
+      setIsSending(true);
+      try {
+        const response = await updateMessage(editingMessage.id, body);
+        setMessages((prev) => prev.map((message) => (
+          message.id === editingMessage.id
+            ? { ...message, ...(response.data ?? {}), body, is_edited: true }
+            : message
+        )));
+        setEditingMessage(null);
+        setInputText('');
+        void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      } catch {
+        void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        Alert.alert(t('errors.editFailedTitle'), t('errors.editFailed'));
+      } finally {
+        setIsSending(false);
+      }
+      return;
+    }
+
     const optimistic: Message = {
       id: Date.now(),
       body,
@@ -234,7 +256,63 @@ function ThreadScreenInner() {
     } finally {
       setIsSending(false);
     }
-  }, [isSending, messagingRestriction?.messaging_disabled, newConversationOptions, resolvedRecipientId, t]);
+  }, [editingMessage, isSending, messagingRestriction?.messaging_disabled, newConversationOptions, resolvedRecipientId, t]);
+
+  const startEditingMessage = useCallback((message: Message) => {
+    if (!message.is_own || message.is_voice || message.is_deleted) return;
+    setEditingMessage(message);
+    setInputText(message.body || message.content || '');
+  }, []);
+
+  const cancelEditingMessage = useCallback(() => {
+    setEditingMessage(null);
+    setInputText('');
+  }, []);
+
+  const handleDeleteMessage = useCallback((message: Message, scope: 'self' | 'everyone') => {
+    Alert.alert(
+      t('thread.deleteTitle'),
+      scope === 'everyone' ? t('thread.deleteEveryoneConfirm') : t('thread.deleteSelfConfirm'),
+      [
+        { text: t('common:buttons.cancel'), style: 'cancel' },
+        {
+          text: t('thread.delete'),
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteMessage(message.id, scope);
+              setMessages((prev) => {
+                if (scope === 'self') {
+                  return prev.filter((item) => item.id !== message.id);
+                }
+                return prev.map((item) => (
+                  item.id === message.id
+                    ? { ...item, body: t('thread.deletedMessage'), is_deleted: true }
+                    : item
+                ));
+              });
+            } catch {
+              Alert.alert(t('errors.deleteFailedTitle'), t('errors.deleteFailed'));
+            }
+          },
+        },
+      ],
+    );
+  }, [t]);
+
+  const openMessageOptions = useCallback((message: Message) => {
+    if (message.is_deleted || message.is_voice) return;
+    const options: Array<{ text: string; style?: 'cancel' | 'destructive'; onPress?: () => void }> = [];
+    if (message.is_own) {
+      options.push({ text: t('thread.edit'), onPress: () => startEditingMessage(message) });
+    }
+    options.push(
+      { text: t('thread.deleteForMe'), style: 'destructive', onPress: () => handleDeleteMessage(message, 'self') },
+      { text: t('thread.deleteForEveryone'), style: 'destructive', onPress: () => handleDeleteMessage(message, 'everyone') },
+      { text: t('common:buttons.cancel'), style: 'cancel' },
+    );
+    Alert.alert(t('thread.messageOptions'), undefined, options);
+  }, [handleDeleteMessage, startEditingMessage, t]);
 
   const handleReaction = useCallback(async (messageId: number, emoji: string) => {
     try {
@@ -323,7 +401,7 @@ function ThreadScreenInner() {
           ref={flatListRef}
           data={messages}
           keyExtractor={(item) => String(item.id)}
-          renderItem={({ item }) => <MessageBubble item={item} primary={primary} theme={theme} t={t} unknownMemberLabel={unknownMemberLabel} onReact={handleReaction} />}
+          renderItem={({ item }) => <MessageBubble item={item} primary={primary} theme={theme} t={t} unknownMemberLabel={unknownMemberLabel} onReact={handleReaction} onOptions={openMessageOptions} />}
           contentContainerStyle={{
             flexGrow: 1,
             justifyContent: messages.length ? 'flex-start' : 'center',
@@ -343,6 +421,19 @@ function ThreadScreenInner() {
         />
 
         <TypingIndicator visible={false} />
+
+        {editingMessage ? (
+          <Surface variant="secondary" className="mx-3 mb-2 flex-row items-center gap-3 rounded-panel-inner px-3 py-2">
+            <Ionicons name="pencil-outline" size={16} color={primary} />
+            <View className="min-w-0 flex-1">
+              <Text className="text-xs font-semibold" style={{ color: theme.text }}>{t('thread.editing')}</Text>
+              <Text className="text-xs" style={{ color: theme.textMuted }} numberOfLines={1}>{editingMessage.body || editingMessage.content}</Text>
+            </View>
+            <HeroButton isIconOnly size="sm" variant="ghost" accessibilityLabel={t('thread.cancelEdit')} onPress={cancelEditingMessage}>
+              <Ionicons name="close-circle-outline" size={18} color={theme.textMuted} />
+            </HeroButton>
+          </Surface>
+        ) : null}
 
         <Surface
           variant="default"
@@ -368,9 +459,9 @@ function ThreadScreenInner() {
             style={{ backgroundColor: primary }}
             onPress={handleSend}
             isDisabled={isSending || !inputText.trim() || messagingRestriction?.messaging_disabled}
-            accessibilityLabel={t('thread.send')}
+            accessibilityLabel={editingMessage ? t('thread.saveEdit') : t('thread.send')}
           >
-            {isSending ? <Spinner size="sm" /> : <Ionicons name="send" size={18} color="#fff" />}
+            {isSending ? <Spinner size="sm" /> : <Ionicons name={editingMessage ? 'checkmark' : 'send'} size={18} color="#fff" />}
           </HeroButton>
         </Surface>
       </KeyboardAvoidingView>
@@ -464,6 +555,7 @@ function MessageBubble({
   t,
   unknownMemberLabel,
   onReact,
+  onOptions,
 }: {
   item: Message;
   primary: string;
@@ -471,11 +563,13 @@ function MessageBubble({
   t: (key: string, options?: Record<string, unknown>) => string;
   unknownMemberLabel: string;
   onReact: (messageId: number, emoji: string) => void;
+  onOptions: (message: Message) => void;
 }) {
   const isOwn = item.is_own;
   const senderName = displayName(item.sender, unknownMemberLabel);
   const reactions = item.reactions ?? {};
   const hasReactions = Object.keys(reactions).length > 0;
+  const body = item.body || item.content || '';
 
   return (
     <View className={`my-1.5 flex-row items-end gap-2 ${isOwn ? 'justify-end pl-12' : 'justify-start pr-12'}`}>
@@ -487,7 +581,11 @@ function MessageBubble({
             ? { backgroundColor: primary, borderBottomRightRadius: 4 }
             : { backgroundColor: theme.surface, borderBottomLeftRadius: 4, borderColor: theme.borderSubtle, borderWidth: 1 }}
         >
-          {item.is_voice && item.audio_url ? (
+          {item.is_deleted ? (
+            <Text className={`text-[14px] italic ${isOwn ? 'text-white/80' : 'text-foreground'}`}>
+              {t('thread.deletedMessage')}
+            </Text>
+          ) : item.is_voice && item.audio_url ? (
             <VoiceMessageBubble
               audioUrl={item.audio_url}
               isOwn={isOwn}
@@ -504,9 +602,14 @@ function MessageBubble({
             </View>
           ) : (
             <Text className={`text-[15px] leading-6 ${isOwn ? 'text-white' : 'text-foreground'}`}>
-              {item.body}
+              {body}
             </Text>
           )}
+          {item.is_edited && !item.is_deleted ? (
+            <Text className="mt-0.5 text-[10px]" style={{ color: isOwn ? 'rgba(255,255,255,0.6)' : theme.textMuted }}>
+              {t('thread.edited')}
+            </Text>
+          ) : null}
           <Text
             className="mt-1 text-[10px]"
             style={isOwn
@@ -532,19 +635,31 @@ function MessageBubble({
             ))}
           </View>
         ) : null}
-        <View className="flex-row flex-wrap gap-1">
-          {REACTION_EMOJIS.slice(0, 3).map((emoji) => (
-            <Pressable
-              key={emoji}
-              accessibilityRole="button"
-              accessibilityLabel={t('thread.reactWith', { emoji })}
-              className="h-8 w-8 items-center justify-center rounded-full bg-surface"
-              onPress={() => onReact(item.id, emoji)}
-            >
-              <Text className="text-sm">{emoji}</Text>
-            </Pressable>
-          ))}
-        </View>
+        {!item.is_deleted ? (
+          <View className="flex-row flex-wrap gap-1">
+            {REACTION_EMOJIS.slice(0, 3).map((emoji) => (
+              <Pressable
+                key={emoji}
+                accessibilityRole="button"
+                accessibilityLabel={t('thread.reactWith', { emoji })}
+                className="h-8 w-8 items-center justify-center rounded-full bg-surface"
+                onPress={() => onReact(item.id, emoji)}
+              >
+                <Text className="text-sm">{emoji}</Text>
+              </Pressable>
+            ))}
+            {!item.is_voice ? (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={t('thread.messageOptions')}
+                className="h-8 w-8 items-center justify-center rounded-full bg-surface"
+                onPress={() => onOptions(item)}
+              >
+                <Ionicons name="ellipsis-horizontal" size={16} color={theme.textSecondary} />
+              </Pressable>
+            ) : null}
+          </View>
+        ) : null}
       </View>
     </View>
   );

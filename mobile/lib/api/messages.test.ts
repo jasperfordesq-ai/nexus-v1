@@ -28,6 +28,8 @@ import {
   archiveConversation,
   restoreConversation,
   getMessagingRestrictionStatus,
+  updateMessage,
+  deleteMessage,
 } from './messages';
 import type { ConversationListResponse, MessageListResponse, Message } from './messages';
 
@@ -211,5 +213,37 @@ describe('sendMessage', () => {
   it('propagates errors from the API', async () => {
     (api.post as jest.Mock).mockRejectedValue(new Error('Forbidden'));
     await expect(sendMessage(2, 'Hi')).rejects.toThrow('Forbidden');
+  });
+});
+
+describe('updateMessage', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('updates a message body', async () => {
+    (api.put as jest.Mock).mockResolvedValue({ data: { ...mockMessage, body: 'Edited body' } });
+
+    await updateMessage(100, 'Edited body');
+
+    expect(api.put).toHaveBeenCalledWith('/api/v2/messages/100', { body: 'Edited body' });
+  });
+});
+
+describe('deleteMessage', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('deletes a message for the current user by default', async () => {
+    (api.delete as jest.Mock).mockResolvedValue({ data: { success: true } });
+
+    await deleteMessage(100);
+
+    expect(api.delete).toHaveBeenCalledWith('/api/v2/messages/100?scope=self');
+  });
+
+  it('can delete a message for everyone', async () => {
+    (api.delete as jest.Mock).mockResolvedValue({ data: { success: true } });
+
+    await deleteMessage(100, 'everyone');
+
+    expect(api.delete).toHaveBeenCalledWith('/api/v2/messages/100?scope=everyone');
   });
 });
