@@ -73,6 +73,14 @@ export interface GroupAnnouncement {
   expires_at: string | null;
 }
 
+export interface GroupTemplate {
+  id: number;
+  name: string;
+  description?: string | null;
+  icon?: string | null;
+  default_visibility?: 'public' | 'private' | string | null;
+}
+
 export interface GroupsResponse {
   data: Group[];
   meta: {
@@ -139,6 +147,10 @@ export function createGroup(payload: CreateGroupPayload): Promise<{ data: GroupD
 
 export function updateGroup(id: number, payload: CreateGroupPayload): Promise<{ data: GroupDetail }> {
   return api.put<{ data: GroupDetail }>(`${API_V2}/groups/${id}`, payload);
+}
+
+export function getGroupTemplates(): Promise<{ data: GroupTemplate[] } | GroupTemplate[]> {
+  return api.get<{ data: GroupTemplate[] } | GroupTemplate[]>(`${API_V2}/group-templates`);
 }
 
 type UploadGroupImageResponse = {

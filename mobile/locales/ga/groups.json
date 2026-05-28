@@ -27,6 +27,9 @@
     "invalidId": "Aitheantas grúpa neamhbhailí.",
     "goBack": "Ar ais"
   },
+  "create": {
+    "templateLabel": "Teimpléad grúpa"
+  },
   "filter": {
     "all": "Gach ceann",
     "public": "Poiblí",

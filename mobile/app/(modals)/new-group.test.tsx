@@ -9,6 +9,7 @@ import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 const mockCreateGroup = jest.fn().mockResolvedValue({ data: { id: 484 } });
 const mockGetGroup = jest.fn();
+const mockGetGroupTemplates = jest.fn();
 const mockUpdateGroup = jest.fn();
 const mockUploadGroupImage = jest.fn();
 const mockLaunchImageLibraryAsync = jest.fn();
@@ -45,6 +46,7 @@ jest.mock('react-i18next', () => ({
         'create.imageUploadFailedDescription': 'The group was saved, but the image could not be uploaded.',
         'create.locationLabel': 'Location',
         'create.locationPlaceholder': 'Optional place or area',
+        'create.templateLabel': 'Group template',
         'create.visibilityLabel': 'Visibility',
         'create.federated': 'List in federation',
         'create.reviewTitle': 'Ready to publish?',
@@ -81,6 +83,7 @@ jest.mock('@/lib/hooks/useTheme', () => ({
 jest.mock('@/lib/api/groups', () => ({
   createGroup: (...args: unknown[]) => mockCreateGroup(...args),
   getGroup: (...args: unknown[]) => mockGetGroup(...args),
+  getGroupTemplates: (...args: unknown[]) => mockGetGroupTemplates(...args),
   updateGroup: (...args: unknown[]) => mockUpdateGroup(...args),
   uploadGroupImage: (...args: unknown[]) => mockUploadGroupImage(...args),
 }));
@@ -128,6 +131,7 @@ describe('NewGroupRoute', () => {
   beforeEach(() => {
     mockCreateGroup.mockClear();
     mockGetGroup.mockReset();
+    mockGetGroupTemplates.mockReset().mockResolvedValue({ data: [] });
     mockUpdateGroup.mockReset();
     mockUpdateGroup.mockResolvedValue({ data: { id: 484 } });
     mockUploadGroupImage.mockReset().mockResolvedValue({ data: { image_url: '/uploads/groups/group.jpg' } });
@@ -202,6 +206,28 @@ describe('NewGroupRoute', () => {
     expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/group-detail', params: { id: '484' } });
   });
 
+  it('loads group templates for new groups and applies default visibility', async () => {
+    mockGetGroupTemplates.mockResolvedValueOnce({
+      data: [
+        { id: 12, name: 'Private circle', icon: 'lock', default_visibility: 'private' },
+      ],
+    });
+
+    const { getByPlaceholderText, getByText } = render(<NewGroupRoute />);
+
+    await waitFor(() => expect(getByText('Private circle')).toBeTruthy());
+    fireEvent.press(getByText('Private circle'));
+    fireEvent.changeText(getByPlaceholderText('Name your group'), 'Repair club');
+    fireEvent.changeText(getByPlaceholderText('What is this group for?'), 'A group for sharing repair skills and local mending sessions.');
+    fireEvent.press(getByText('Create group'));
+
+    await waitFor(() => {
+      expect(mockCreateGroup).toHaveBeenCalledWith(expect.objectContaining({
+        visibility: 'private',
+      }));
+    });
+  });
+
   it('uploads a selected group image after creating the group', async () => {
     const { getByPlaceholderText, getByText } = render(<NewGroupRoute />);
 
@@ -239,6 +265,7 @@ describe('NewGroupRoute', () => {
       expect(getByDisplayValue('Garden crew')).toBeTruthy();
     });
 
+    expect(mockGetGroupTemplates).not.toHaveBeenCalled();
     expect(getByDisplayValue('A group for coordinating seasonal planting and shared gardening days.')).toBeTruthy();
     expect(getByDisplayValue('Community garden')).toBeTruthy();
 

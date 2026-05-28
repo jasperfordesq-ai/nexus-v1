@@ -27,6 +27,9 @@
     "invalidId": "Identifiant de groupe invalide.",
     "goBack": "Retour"
   },
+  "create": {
+    "templateLabel": "Modele de groupe"
+  },
   "filter": {
     "all": "Tous",
     "public": "Public",

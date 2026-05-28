@@ -20,7 +20,7 @@ jest.mock('@/lib/constants', () => ({
 }));
 
 import { api } from '@/lib/api/client';
-import { getGroups, getGroup, joinGroup, leaveGroup, updateGroup } from './groups';
+import { getGroups, getGroup, getGroupTemplates, joinGroup, leaveGroup, updateGroup } from './groups';
 import type { GroupsResponse, GroupDetail } from './groups';
 
 const mockGroupsResponse: GroupsResponse = {
@@ -116,6 +116,19 @@ describe('getGroup', () => {
     expect(api.get).toHaveBeenCalledWith('/api/v2/groups/42');
     expect(result.data.id).toBe(1);
     expect(result.data.admin.name).toBe('Admin User');
+  });
+});
+
+describe('getGroupTemplates', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('calls the group templates endpoint', async () => {
+    (api.get as jest.Mock).mockResolvedValue({ data: [{ id: 1, name: 'Club', default_visibility: 'private' }] });
+
+    const result = await getGroupTemplates();
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/group-templates');
+    expect(Array.isArray('data' in result ? result.data : result)).toBe(true);
   });
 });
 

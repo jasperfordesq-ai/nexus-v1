@@ -14,7 +14,7 @@ import { Button as HeroButton, Card as HeroCard, Text } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 
-import { createGroup, getGroup, updateGroup, uploadGroupImage, type GroupDetail } from '@/lib/api/groups';
+import { createGroup, getGroup, getGroupTemplates, updateGroup, uploadGroupImage, type GroupDetail, type GroupTemplate } from '@/lib/api/groups';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
@@ -50,6 +50,8 @@ function NewGroupScreen() {
   const [location, setLocation] = useState('');
   const [visibility, setVisibility] = useState<'public' | 'private'>('public');
   const [isFederated, setIsFederated] = useState(false);
+  const [templates, setTemplates] = useState<GroupTemplate[]>([]);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null);
   const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
   const [existingImage, setExistingImage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -78,6 +80,25 @@ function NewGroupScreen() {
     };
   }, [groupId, hasHydratedEdit, isEditing, t]);
 
+  useEffect(() => {
+    if (isEditing) return;
+
+    let isMounted = true;
+    getGroupTemplates()
+      .then((response) => {
+        if (!isMounted) return;
+        const items = Array.isArray(response) ? response : response.data;
+        setTemplates(Array.isArray(items) ? items : []);
+      })
+      .catch(() => {
+        if (isMounted) setTemplates([]);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isEditing]);
+
   function hydrateFromGroup(group: GroupDetail) {
     setName(group.name ?? '');
     setDescription(group.description ?? '');
@@ -86,6 +107,15 @@ function NewGroupScreen() {
     setIsFederated(group.federated_visibility === 'listed' || group.federated_visibility === 'joinable');
     setExistingImage(group.image_url ?? group.cover_image ?? null);
     setSelectedImageUri(null);
+  }
+
+  function applyTemplate(template: GroupTemplate) {
+    setSelectedTemplateId(template.id);
+    if (template.default_visibility === 'private') {
+      setVisibility('private');
+    } else if (template.default_visibility === 'public') {
+      setVisibility('public');
+    }
   }
 
   async function pickGroupImage() {
@@ -232,6 +262,25 @@ function NewGroupScreen() {
               )}
             </View>
             <FormField label={t('create.locationLabel')} value={location} onChangeText={setLocation} placeholder={t('create.locationPlaceholder')} theme={theme} />
+
+            {!isEditing && templates.length > 0 ? (
+              <View className="gap-2">
+                <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('create.templateLabel')}</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+                  {templates.map((template) => (
+                    <HeroButton
+                      key={template.id}
+                      size="sm"
+                      variant={selectedTemplateId === template.id ? 'primary' : 'secondary'}
+                      onPress={() => applyTemplate(template)}
+                      style={selectedTemplateId === template.id ? { backgroundColor: primary } : undefined}
+                    >
+                      <HeroButton.Label>{template.name}</HeroButton.Label>
+                    </HeroButton>
+                  ))}
+                </ScrollView>
+              </View>
+            ) : null}
 
             <View className="gap-2">
               <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('create.visibilityLabel')}</Text>

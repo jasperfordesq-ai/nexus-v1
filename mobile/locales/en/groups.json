@@ -122,6 +122,7 @@
     "imageUploadFailedDescription": "The group was saved, but the image could not be uploaded.",
     "locationLabel": "Location",
     "locationPlaceholder": "Optional place or area",
+    "templateLabel": "Group template",
     "visibilityLabel": "Visibility",
     "federated": "List in federation",
     "reviewTitle": "Ready to publish?",

@@ -27,6 +27,9 @@
     "invalidId": "Ungültige Gruppen-ID.",
     "goBack": "Zurück"
   },
+  "create": {
+    "templateLabel": "Gruppenvorlage"
+  },
   "filter": {
     "all": "Alle",
     "public": "Öffentlich",
