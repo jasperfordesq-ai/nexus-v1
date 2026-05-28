@@ -18,6 +18,7 @@ import FormActionFooter from '@/components/ui/FormActionFooter';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import {
   createMarketplaceListing,
+  generateMarketplaceDescription,
   getMarketplaceCategories,
   getMarketplaceCategoryTemplate,
   getMarketplaceListing,
@@ -83,6 +84,7 @@ export function MarketplaceListingForm() {
   const [sellerType, setSellerType] = useState<'private' | 'business'>('private');
   const [imageUris, setImageUris] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
@@ -246,6 +248,30 @@ export function MarketplaceListingForm() {
     }
   }
 
+  async function generateDescription() {
+    const cleanTitle = title.trim();
+    if (!cleanTitle) {
+      Alert.alert(t('forms.validation'), t('forms.generateTitleRequired'));
+      return;
+    }
+
+    setIsGeneratingDescription(true);
+    try {
+      const selectedCategory = categories.find((category) => category.id === categoryId);
+      const response = await generateMarketplaceDescription({
+        title: cleanTitle,
+        category: selectedCategory?.name,
+        condition,
+      });
+      setDescription(response.data.description);
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch (err) {
+      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('forms.generateDescriptionFailed'));
+    } finally {
+      setIsGeneratingDescription(false);
+    }
+  }
+
   async function pickImages() {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
@@ -288,6 +314,10 @@ export function MarketplaceListingForm() {
             <FormField label={t('forms.title')} value={title} onChangeText={setTitle} placeholder={t('forms.titlePlaceholder')} />
             <FormField label={t('forms.tagline')} value={tagline} onChangeText={setTagline} placeholder={t('forms.taglinePlaceholder')} />
             <FormField label={t('forms.description')} value={description} onChangeText={setDescription} placeholder={t('forms.descriptionPlaceholder')} multiline />
+            <HeroButton variant="secondary" onPress={() => void generateDescription()} isDisabled={isGeneratingDescription || !title.trim()}>
+              <Ionicons name="sparkles-outline" size={16} color={primary} />
+              <HeroButton.Label>{isGeneratingDescription ? t('forms.generatingDescription') : t('forms.generateDescription')}</HeroButton.Label>
+            </HeroButton>
             <ButtonGroup label={t('forms.priceType')} values={PRICE_TYPES} selected={priceType} onSelect={setPriceType} labelFor={(value) => t(`priceType.${value}`)} primary={primary} />
             {priceType !== 'free' && priceType !== 'contact' ? (
               <FormField label={t('forms.price')} value={price} onChangeText={setPrice} placeholder={t('forms.pricePlaceholder')} keyboardType="decimal-pad" />

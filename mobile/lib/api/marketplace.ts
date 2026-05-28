@@ -569,6 +569,14 @@ export function updateMarketplaceListing(
   return api.put<MarketplaceDataResponse<MarketplaceListingDetail>>(`${API_V2}/marketplace/listings/${id}`, payload);
 }
 
+export function generateMarketplaceDescription(payload: {
+  title: string;
+  category?: string;
+  condition?: string;
+}): Promise<MarketplaceDataResponse<{ description: string }>> {
+  return api.post<MarketplaceDataResponse<{ description: string }>>(`${API_V2}/marketplace/listings/generate-description`, payload);
+}
+
 export function deleteMarketplaceListing(id: number): Promise<void> {
   return api.delete<void>(`${API_V2}/marketplace/listings/${id}`);
 }

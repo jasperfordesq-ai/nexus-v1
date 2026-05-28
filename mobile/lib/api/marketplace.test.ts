@@ -71,6 +71,7 @@ import {
   saveMerchantOnboardingStep3,
   startMarketplaceStripeOnboarding,
   generatePublicMerchantCouponQr,
+  generateMarketplaceDescription,
   shipMarketplaceOrder,
   updateMarketplaceShippingOption,
   updateMarketplaceListing,
@@ -202,6 +203,13 @@ describe('marketplace api', () => {
 
     await updateMarketplaceListing(1, { title: 'Updated', inventory_count: null });
     expect(api.put).toHaveBeenCalledWith('/api/v2/marketplace/listings/1', { title: 'Updated', inventory_count: null });
+
+    await generateMarketplaceDescription({ title: 'Garden table', category: 'Furniture', condition: 'good' });
+    expect(api.post).toHaveBeenCalledWith('/api/v2/marketplace/listings/generate-description', {
+      title: 'Garden table',
+      category: 'Furniture',
+      condition: 'good',
+    });
   });
 
   it('creates and loads offers', async () => {

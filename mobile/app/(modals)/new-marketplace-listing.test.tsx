@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render, waitFor } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 jest.mock('expo-router', () => ({
   router: { push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
@@ -25,6 +25,10 @@ jest.mock('react-i18next', () => ({
         'forms.taglinePlaceholder': 'A quick summary',
         'forms.description': 'Description',
         'forms.descriptionPlaceholder': 'Details',
+        'forms.generateDescription': 'Generate with AI',
+        'forms.generatingDescription': 'Generating description',
+        'forms.generateTitleRequired': 'Add a title before generating a description.',
+        'forms.generateDescriptionFailed': 'Could not generate a description.',
         'forms.priceType': 'Price type',
         'forms.price': 'Price',
         'forms.pricePlaceholder': '0.00',
@@ -108,6 +112,7 @@ jest.mock('@/components/ui/LoadingSpinner', () => () => null);
 
 jest.mock('@/lib/api/marketplace', () => ({
   createMarketplaceListing: jest.fn(),
+  generateMarketplaceDescription: jest.fn(),
   getMarketplaceCategories: jest.fn().mockResolvedValue({ data: [] }),
   getMarketplaceCategoryTemplate: jest.fn().mockResolvedValue({ data: { fields: [] } }),
   getMarketplaceListing: jest.fn(),
@@ -116,6 +121,7 @@ jest.mock('@/lib/api/marketplace', () => ({
 }));
 
 import NewMarketplaceListingRoute from './new-marketplace-listing';
+import { generateMarketplaceDescription } from '@/lib/api/marketplace';
 
 describe('NewMarketplaceListingRoute', () => {
   it('renders optional coordinate fields for nearby search parity', async () => {
@@ -126,5 +132,25 @@ describe('NewMarketplaceListingRoute', () => {
       expect(getByText('Latitude')).toBeTruthy();
       expect(getByText('Longitude')).toBeTruthy();
     });
+  });
+
+  it('generates a marketplace description from the backend AI endpoint', async () => {
+    jest.mocked(generateMarketplaceDescription).mockResolvedValue({
+      data: { description: 'Generated mobile marketplace description.' },
+    } as never);
+
+    const { findByDisplayValue, getByPlaceholderText, getByText } = render(<NewMarketplaceListingRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('What are you selling?'), 'Garden shears');
+    fireEvent.press(getByText('Generate with AI'));
+
+    await waitFor(() => {
+      expect(generateMarketplaceDescription).toHaveBeenCalledWith({
+        title: 'Garden shears',
+        category: undefined,
+        condition: 'good',
+      });
+    });
+    expect(await findByDisplayValue('Generated mobile marketplace description.')).toBeTruthy();
   });
 });
