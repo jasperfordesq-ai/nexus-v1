@@ -325,8 +325,9 @@ describe('marketplace api', () => {
       status: 'active',
     });
 
-    await updateMerchantCoupon(5, { title: 'July discount', status: 'paused', max_uses: 20 });
+    await updateMerchantCoupon(5, { code: 'JULY20', title: 'July discount', status: 'paused', max_uses: 20 });
     expect(api.put).toHaveBeenCalledWith('/api/v2/marketplace/seller/coupons/5', {
+      code: 'JULY20',
       title: 'July discount',
       status: 'paused',
       max_uses: 20,

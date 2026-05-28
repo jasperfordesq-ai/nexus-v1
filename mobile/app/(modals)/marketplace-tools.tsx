@@ -644,29 +644,13 @@ function CouponsPanel() {
         items={coupons.data?.data.items ?? []}
         emptyTitle={t('tools.coupons.empty')}
         renderItem={(item: MerchantCoupon) => (
-          <ToolRow
+          <CouponToolCard
             key={item.id}
-            icon="ticket-outline"
-            title={item.title}
-            subtitle={t('tools.coupons.discount', { value: couponDiscountLabel(item), status: t(`tools.coupons.statuses.${item.status}`, { defaultValue: item.status }), count: item.usage_count ?? item.used_count ?? 0 })}
-            trailing={t('tools.coupons.edit')}
-            onPress={() => openEdit(item)}
+            item={item}
+            onEdit={() => openEdit(item)}
+            onRedemptions={() => void openRedemptions(item)}
+            onDelete={() => void remove(item)}
           />
-        )}
-      />
-      <PanelList
-        isLoading={false}
-        items={coupons.data?.data.items ?? []}
-        emptyTitle={t('tools.coupons.empty')}
-        renderItem={(item: MerchantCoupon) => (
-          <View key={`actions-${item.id}`} className="flex-row gap-2">
-            <HeroButton className="flex-1" size="sm" variant="secondary" onPress={() => void openRedemptions(item)}>
-              <HeroButton.Label>{t('tools.coupons.redemptions')}</HeroButton.Label>
-            </HeroButton>
-            <HeroButton className="flex-1" size="sm" variant="danger-soft" onPress={() => void remove(item)}>
-              <HeroButton.Label>{t('tools.delete')}</HeroButton.Label>
-            </HeroButton>
-          </View>
         )}
       />
 
@@ -705,6 +689,70 @@ function CouponsPanel() {
         </View>
       </Modal>
     </PanelCard>
+  );
+}
+
+function CouponToolCard({
+  item,
+  onEdit,
+  onRedemptions,
+  onDelete,
+}: {
+  item: MerchantCoupon;
+  onEdit: () => void;
+  onRedemptions: () => void;
+  onDelete: () => void;
+}) {
+  const { t } = useTranslation('marketplace');
+  const primary = usePrimaryColor();
+  const theme = useTheme();
+  const usageCount = item.usage_count ?? item.used_count ?? 0;
+  const statusLabel = t(`tools.coupons.statuses.${item.status}`, { defaultValue: item.status });
+  const appliesLabel = t(`tools.coupons.applies.${item.applies_to ?? 'all_listings'}`, { defaultValue: item.applies_to ?? '' });
+
+  return (
+    <Surface variant="secondary" className="gap-3 rounded-panel-inner p-3">
+      <View className="flex-row items-start gap-3">
+        <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+          <Ionicons name="ticket-outline" size={18} color={primary} />
+        </View>
+        <View className="min-w-0 flex-1 gap-1">
+          <View className="flex-row flex-wrap items-center gap-2">
+            <Text className="min-w-0 flex-1 text-sm font-bold" style={{ color: theme.text }} numberOfLines={1}>{item.title}</Text>
+            <Chip size="sm" variant="secondary" style={{ backgroundColor: withAlpha(theme.success, 0.15) }}>
+              <Chip.Label style={{ color: theme.success }}>{couponDiscountLabel(item)}</Chip.Label>
+            </Chip>
+          </View>
+          <Text className="font-mono text-xs font-semibold" style={{ color: primary }}>{item.code}</Text>
+          {item.description ? <Text className="text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>{item.description}</Text> : null}
+        </View>
+      </View>
+      <View className="flex-row flex-wrap gap-2">
+        <Chip size="sm" variant="secondary">
+          <Chip.Label>{statusLabel}</Chip.Label>
+        </Chip>
+        <Chip size="sm" variant="secondary">
+          <Chip.Label>{t('tools.coupons.usageCount', { count: usageCount })}</Chip.Label>
+        </Chip>
+        <Chip size="sm" variant="secondary">
+          <Chip.Label>{item.valid_until ? t('tools.coupons.validUntilShort', { date: new Date(item.valid_until).toLocaleDateString() }) : t('tools.coupons.noExpiry')}</Chip.Label>
+        </Chip>
+        <Chip size="sm" variant="secondary">
+          <Chip.Label>{t('tools.coupons.appliesLabel', { scope: appliesLabel })}</Chip.Label>
+        </Chip>
+      </View>
+      <View className="flex-row gap-2">
+        <HeroButton className="flex-1" size="sm" variant="secondary" onPress={onEdit}>
+          <HeroButton.Label>{t('tools.coupons.edit')}</HeroButton.Label>
+        </HeroButton>
+        <HeroButton className="flex-1" size="sm" variant="secondary" onPress={onRedemptions}>
+          <HeroButton.Label>{t('tools.coupons.redemptions')}</HeroButton.Label>
+        </HeroButton>
+        <HeroButton isIconOnly size="sm" variant="danger-soft" onPress={onDelete}>
+          <Ionicons name="trash-outline" size={16} color={theme.error} />
+        </HeroButton>
+      </View>
+    </Surface>
   );
 }
 

@@ -71,6 +71,8 @@
   "marketplace_offer.withdrawn": "Offer withdrawn successfully.",
   "marketplace_report.feature_disabled": "The marketplace feature is not enabled for this community.",
   "marketplace_report.report_submitted": "Your report has been submitted. We will review it within 24 hours as required by the Digital Services Act.",
+  "merchant_coupon.code_required": "Coupon code is required.",
+  "merchant_coupon.code_in_use": "Coupon code already in use for this tenant.",
   "member_availability.slot_deleted": "Slot deleted",
   "menu.cache_cleared": "Menu cache cleared successfully",
   "newsletter.already_unsubscribed": "You are already unsubscribed.",

@@ -971,6 +971,7 @@ export function createMerchantCoupon(payload: {
 export function updateMerchantCoupon(
   id: number,
   payload: Partial<{
+    code: string | null;
     title: string;
     description: string | null;
     discount_type: 'percent' | 'fixed' | 'bogo';

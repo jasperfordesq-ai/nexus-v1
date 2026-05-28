@@ -115,6 +115,7 @@ class MerchantCouponSellerController extends BaseApiController
         $coupon = $this->ownCouponOrFail($id, $profile->id);
 
         $data = request()->validate([
+            'code' => 'nullable|string|max:64',
             'title' => 'nullable|string|max:200',
             'description' => 'nullable|string|max:2000',
             'discount_type' => 'nullable|in:percent,fixed,bogo',
@@ -129,8 +130,12 @@ class MerchantCouponSellerController extends BaseApiController
             'applies_to_ids' => 'nullable|array',
         ]);
 
-        $coupon = MerchantCouponService::updateCoupon($coupon, $data);
-        return $this->respondWithData(MerchantCouponService::format($coupon));
+        try {
+            $coupon = MerchantCouponService::updateCoupon($coupon, $data);
+            return $this->respondWithData(MerchantCouponService::format($coupon));
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        }
     }
 
     /**

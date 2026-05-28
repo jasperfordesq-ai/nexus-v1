@@ -37,7 +37,7 @@ class MerchantCouponService
 
         $code = strtoupper(trim($data['code'] ?? self::generateCode()));
         if ($code === '') {
-            throw new \InvalidArgumentException('Coupon code is required.');
+            throw new \InvalidArgumentException(__('api_controllers_2.merchant_coupon.code_required'));
         }
 
         // Enforce unique-per-tenant
@@ -45,7 +45,7 @@ class MerchantCouponService
             ->where('code', $code)
             ->exists();
         if ($exists) {
-            throw new \InvalidArgumentException('Coupon code already in use for this tenant.');
+            throw new \InvalidArgumentException(__('api_controllers_2.merchant_coupon.code_in_use'));
         }
 
         $coupon = new MerchantCoupon();
@@ -72,6 +72,22 @@ class MerchantCouponService
 
     public static function updateCoupon(MerchantCoupon $coupon, array $data): MerchantCoupon
     {
+        if (array_key_exists('code', $data)) {
+            $code = strtoupper(trim((string) ($data['code'] ?? '')));
+            if ($code === '') {
+                throw new \InvalidArgumentException(__('api_controllers_2.merchant_coupon.code_required'));
+            }
+            $exists = MerchantCoupon::where('tenant_id', $coupon->tenant_id)
+                ->where('code', $code)
+                ->where('id', '!=', $coupon->id)
+                ->exists();
+            if ($exists) {
+                throw new \InvalidArgumentException(__('api_controllers_2.merchant_coupon.code_in_use'));
+            }
+            $coupon->code = $code;
+            unset($data['code']);
+        }
+
         $allowed = [
             'title', 'description', 'discount_type', 'discount_value',
             'min_order_cents', 'max_uses', 'max_uses_per_member',
