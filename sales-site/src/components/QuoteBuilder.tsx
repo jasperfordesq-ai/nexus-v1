@@ -10,6 +10,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   communityOnboardingPackages,
   communityTimebankPlans,
+  deploymentModes,
   maintenancePlans,
   onboardingPackages,
   oneOffServices,
@@ -17,10 +18,12 @@ import {
   supportTiers,
   type BillingCycle,
   type CommunityTimebankPlan,
+  type DeploymentMode,
   type ProductLine,
 } from '../data/pricing';
 import { estimateQuote, formatCurrency, formatQuoteAmount, type QuoteEstimate, type QuoteInput } from '../lib/pricingEngine';
 import OrderForm from './OrderForm';
+import { cx } from './SalesPrimitives';
 
 interface QuoteBuilderProps {
   onQuoteChange: (quote: QuoteEstimate) => void;
@@ -30,6 +33,7 @@ const defaultInput: QuoteInput = {
   productLine: 'community-timebanking',
   activeMembers: 150,
   billingCycle: 'annual',
+  deploymentModeId: 'shared-platform',
   communityPlanId: 'community-edition',
   supportTierId: 'standard',
   maintenancePlanId: 'track-latest',
@@ -76,6 +80,19 @@ const supportChoices = [
     id: 'mission-critical',
     title: 'Critical incident cover',
     plainEnglish: 'For high-stakes services that need agreed escalation windows and incident follow-up.',
+  },
+];
+
+const deploymentChoices: { id: DeploymentMode; title: string; plainEnglish: string }[] = [
+  {
+    id: 'shared-platform',
+    title: 'Main managed platform',
+    plainEnglish: 'The best-value route: your tenant runs on the main Project NEXUS managed platform with isolation, monitoring, backups, and upgrades included.',
+  },
+  {
+    id: 'dedicated-managed-server',
+    title: 'Dedicated managed server',
+    plainEnglish: 'Starts from EUR650/month for entry-level dedicated hosting. Larger or more complex workloads receive a tailored infrastructure quote.',
   },
 ];
 
@@ -149,6 +166,9 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
   const isCommunity = quote.productLine === 'community-timebanking';
   const isCustomQuote = quote.pricingMode === 'custom';
   const communityPlan = isCommunityPlan(quote.hostingPlan) ? quote.hostingPlan : communityTimebankPlans[0];
+  const deploymentMode = deploymentModes.find((mode) => mode.id === (input.deploymentModeId ?? 'shared-platform')) ?? deploymentModes[0];
+  const isDedicatedCustomQuote = !isCommunity && deploymentMode.requiresCustomQuote === true;
+  const isEnterpriseCustomQuote = quote.hostingPlan.id === 'enterprise-custom';
 
   useEffect(() => {
     onQuoteChange(quote);
@@ -168,7 +188,7 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
               The entry offer is deliberately cheaper and deliberately narrower. Full platform hosting still prices by capacity, operations, support, and launch work.
             </p>
 
-            <Card className="mt-8 border border-white/10 bg-white/[0.06] p-5">
+            <Card className="nexus-surface nexus-surface--raised mt-8 p-5">
               <div className="flex flex-wrap items-center gap-2">
                 <Chip color={isCommunity ? 'success' : 'accent'} variant="soft">
                   {quote.productLineLabel}
@@ -176,6 +196,11 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
                 <Chip color="warning" variant="soft">
                   {quote.billingCycle === 'annual' ? 'Annual billing' : 'Monthly billing'}
                 </Chip>
+                {!isCommunity ? (
+                  <Chip color={deploymentMode.id === 'dedicated-managed-server' ? 'warning' : 'accent'} variant="soft">
+                    {deploymentMode.shortLabel}
+                  </Chip>
+                ) : null}
               </div>
               <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
                 <div>
@@ -199,14 +224,18 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
                   {isCommunity ? <LockKeyhole className="size-4" /> : <Server className="size-4" />}
                   {isCommunity
                     ? 'Feature-limited on purpose.'
-                    : isCustomQuote
+                    : isDedicatedCustomQuote
+                      ? 'Dedicated infrastructure needs sizing.'
+                      : isCustomQuote
                       ? 'Enterprise scale needs discovery before pricing.'
                       : 'All stable modules are included on full platform hosting.'}
                 </p>
                 <p className="mt-2 text-sm leading-6 text-white/58">
                   {isCommunity
                     ? 'Community Timebanking is the credible low-price option: core timebanking stays on, expensive platform features stay off.'
-                    : isCustomQuote
+                    : isDedicatedCustomQuote
+                      ? 'Dedicated server hosting starts from €650/month for entry-level needs. Final pricing depends on traffic, users, storage, redundancy, security, management, and whether you need one server or a clustered setup.'
+                      : isCustomQuote
                       ? 'Published pricing stops at 100,000 active members. Above that, traffic, storage, email, SLA, migration, and tenancy design need a bespoke quote.'
                       : 'The estimate changes with capacity and service level, not with artificial feature gates.'}
                 </p>
@@ -216,7 +245,7 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
         </div>
 
         <div className="space-y-5">
-          <Card className="border border-white/10 bg-white/[0.055] p-5">
+          <Card className="nexus-surface p-5">
             <h3 className="text-xl font-black text-white">1. What are you buying?</h3>
             <p className="mt-1 text-sm leading-6 text-white/55">
               Pick the lean timebanking offer for affordability, or the full platform when you need the whole NEXUS stack.
@@ -241,7 +270,7 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
 
           {isCommunity ? (
             <>
-              <Card className="border border-white/10 bg-white/[0.055] p-5">
+              <Card className="nexus-surface p-5">
                 <h3 className="text-xl font-black text-white">2. Pick the Community Timebanking plan.</h3>
                 <p className="mt-1 text-sm leading-6 text-white/55">
                   The entry tier is cheaper because the feature set is intentionally smaller.
@@ -264,7 +293,7 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
                 </div>
               </Card>
 
-              <Card className="border border-white/10 bg-white/[0.055] p-5">
+              <Card className="nexus-surface p-5">
                 <h3 className="text-xl font-black text-white">3. What stays on and what stays off?</h3>
                 <div className="mt-5 grid gap-4 lg:grid-cols-2">
                   <FeatureList title="Included" items={communityPlan.included} tone="include" />
@@ -283,7 +312,7 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
                 </div>
               </Card>
 
-              <Card className="border border-white/10 bg-white/[0.055] p-5">
+              <Card className="nexus-surface p-5">
                 <h3 className="text-xl font-black text-white">4. How would you like to buy it?</h3>
                 <p className="mt-1 text-sm leading-6 text-white/55">
                   Annual billing makes the entry price visibly sharper without making the product feel throwaway.
@@ -318,7 +347,7 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
             </>
           ) : (
             <>
-              <Card className="border border-white/10 bg-white/[0.055] p-5">
+              <Card className="nexus-surface p-5">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
                     <h3 className="text-xl font-black text-white">2. How many active members do you expect?</h3>
@@ -374,12 +403,26 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
                 </div>
               </Card>
 
-              {isCustomQuote ? (
+              {isEnterpriseCustomQuote ? (
                 <EnterpriseCustomSection />
               ) : (
                 <>
-                  <Card className="border border-white/10 bg-white/[0.055] p-5">
-                    <h3 className="text-xl font-black text-white">3. How would you like to buy it?</h3>
+                  <ChoiceCardSection
+                    title="3. Where should it run?"
+                    description="Choose the lower-cost main managed platform, or ask us to size a dedicated server setup when procurement, isolation, traffic, or performance expectations justify it."
+                    choices={deploymentChoices}
+                    options={deploymentModes}
+                    cadence="monthly"
+                    selectedId={input.deploymentModeId ?? 'shared-platform'}
+                    onSelect={(deploymentModeId) =>
+                      setInput((value) => ({ ...value, deploymentModeId: deploymentModeId as DeploymentMode }))
+                    }
+                  />
+
+                  <DedicatedServerPricingNote />
+
+                  <Card className="nexus-surface p-5">
+                    <h3 className="text-xl font-black text-white">4. How would you like to buy it?</h3>
                     <p className="mt-1 text-sm leading-6 text-white/55">Annual billing is usually the cleanest procurement route and includes two months free.</p>
                     <div className="mt-5 grid gap-4 sm:grid-cols-2">
                       <BillingButton active={input.billingCycle === 'annual'} label="Annual" detail="Two months free" onPress={() => updateBilling(setInput, 'annual')} />
@@ -388,7 +431,7 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
                   </Card>
 
                   <ChoiceCardSection
-                    title="4. What support do you want us to provide?"
+                    title="5. What support do you want us to provide?"
                     description="Support changes how quickly and closely we help after launch."
                     choices={supportChoices}
                     options={supportTiers}
@@ -398,7 +441,7 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
                   />
 
                   <ChoiceCardSection
-                    title="5. How should upgrades be handled?"
+                    title="6. How should upgrades be handled?"
                     description="Choose whether you want to stay current, hold a release, or maintain a bespoke fork."
                     choices={maintenanceChoices}
                     options={maintenancePlans}
@@ -408,7 +451,7 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
                   />
 
                   <ChoiceCardSection
-                    title="6. How much launch help do you need?"
+                    title="7. How much launch help do you need?"
                     description="This covers setup, migration, training, and go-live support before the service opens."
                     choices={launchChoices}
                     options={onboardingPackages}
@@ -475,9 +518,11 @@ function ProductLineButton({
   return (
     <button
       type="button"
-      className={`rounded-2xl border p-5 text-left transition ${
-        active ? 'border-[color:var(--color-accent)] bg-[color:var(--color-accent)]/12 shadow-lg shadow-[var(--glow-accent-subtle)]' : 'border-white/10 bg-black/18 hover:border-white/24'
-      }`}
+      aria-pressed={active}
+      className={cx(
+        'nexus-choice nexus-focus-ring rounded-2xl border p-5 text-left',
+        active ? 'nexus-choice--selected border-[color:var(--color-accent)] bg-[color:var(--color-accent)]/12 shadow-lg shadow-[var(--glow-accent-subtle)]' : 'border-white/10 bg-black/18 hover:border-white/24',
+      )}
       onClick={onPress}
     >
       <span className="flex items-start gap-3">
@@ -510,9 +555,11 @@ function CommunityPlanCard({
   return (
     <button
       type="button"
-      className={`flex h-full flex-col rounded-2xl border p-4 text-left transition ${
-        selected ? 'border-[color:var(--color-accent)] bg-[color:var(--color-accent)]/12 shadow-lg shadow-[var(--glow-accent-subtle)]' : 'border-white/10 bg-black/18 hover:border-white/24'
-      }`}
+      aria-pressed={selected}
+      className={cx(
+        'nexus-choice nexus-focus-ring flex h-full flex-col rounded-2xl border p-4 text-left',
+        selected ? 'nexus-choice--selected border-[color:var(--color-accent)] bg-[color:var(--color-accent)]/12 shadow-lg shadow-[var(--glow-accent-subtle)]' : 'border-white/10 bg-black/18 hover:border-white/24',
+      )}
       onClick={onPress}
     >
       <span className="flex items-start justify-between gap-3">
@@ -581,9 +628,11 @@ function CapacityPreset({
   return (
     <button
       type="button"
-      className={`min-h-36 rounded-2xl border p-4 text-left transition ${
-        active ? 'border-[color:var(--color-accent)] bg-[color:var(--color-accent)]/12 shadow-lg shadow-[var(--glow-accent-subtle)]' : 'border-white/10 bg-black/18 hover:border-white/24'
-      }`}
+      aria-pressed={active}
+      className={cx(
+        'nexus-choice nexus-focus-ring min-h-36 rounded-2xl border p-4 text-left',
+        active ? 'nexus-choice--selected border-[color:var(--color-accent)] bg-[color:var(--color-accent)]/12 shadow-lg shadow-[var(--glow-accent-subtle)]' : 'border-white/10 bg-black/18 hover:border-white/24',
+      )}
       onClick={onPress}
     >
       <span className="block text-sm font-black text-white">{label}</span>
@@ -596,7 +645,7 @@ function CapacityPreset({
 
 function EnterpriseCustomSection() {
   return (
-    <section className="rounded-2xl border border-[color:var(--color-accent)]/28 bg-[color:var(--color-accent)]/8 p-5">
+    <section className="nexus-surface nexus-surface--accent p-5">
       <p className="flex items-center gap-2 text-sm font-bold tracking-[0.16em] text-[var(--color-accent)] uppercase">
         <Sparkles className="size-4" />
         Enterprise custom
@@ -622,6 +671,37 @@ function EnterpriseCustomSection() {
   );
 }
 
+function DedicatedServerPricingNote() {
+  return (
+    <section className="nexus-surface nexus-surface--accent p-5">
+      <p className="text-sm font-bold tracking-[0.16em] text-[var(--color-accent)] uppercase">Dedicated Server Pricing</p>
+      <h3 className="mt-2 text-2xl font-black text-white">Dedicated server solutions start from €650/month.</h3>
+      <p className="mt-3 text-sm leading-6 text-white/62">
+        This starting point is suitable for smaller projects or entry-level dedicated hosting needs. Final pricing depends on server size, traffic levels, storage, bandwidth, redundancy, security, management, and whether your project requires a single server or a clustered infrastructure setup.
+      </p>
+      <p className="mt-3 text-sm leading-6 text-white/62">
+        For larger platforms, high-traffic websites, SaaS applications, gaming communities, membership sites, enterprise systems, or projects expecting thousands to hundreds of thousands of users, pricing is tailored around the infrastructure required.
+      </p>
+      <div className="mt-5 grid gap-3 sm:grid-cols-2">
+        {[
+          'Around 100, 1,000, 10,000, 100,000, or 500,000+ users',
+          'A single dedicated server, multiple dedicated servers, or a high-availability cluster',
+          'Load balancing, database separation, storage scaling, backups, monitoring, and security hardening',
+          'Custom infrastructure for heavy traffic, apps, platforms, communities, SaaS products, or enterprise workloads',
+        ].map((item) => (
+          <p key={item} className="grid grid-cols-[auto_1fr] gap-2 rounded-xl border border-white/10 bg-black/18 p-3 text-sm leading-6 text-white/62">
+            <CheckCircle2 className="mt-1 size-4 text-[var(--color-accent)]" />
+            <span>{item}</span>
+          </p>
+        ))}
+      </div>
+      <p className="mt-5 rounded-xl border border-[color:var(--color-primary)]/25 bg-[color:var(--color-primary)]/10 p-4 text-sm font-semibold leading-6 text-white">
+        Tell us what you are building, how many users you expect, what type of application or community you run, and what level of performance you need. We will recommend the right dedicated server setup and provide a clear quote.
+      </p>
+    </section>
+  );
+}
+
 function ChoiceCardSection({
   title,
   description,
@@ -634,28 +714,31 @@ function ChoiceCardSection({
   title: string;
   description: string;
   choices: { id: string; title: string; plainEnglish: string }[];
-  options: { id: string; label: string; description: string; monthlyEur?: number; fixedEur?: number }[];
+  options: { id: string; label: string; description: string; monthlyEur?: number; fixedEur?: number; priceLabel?: string }[];
   cadence: 'monthly' | 'one-off';
   selectedId: string;
   onSelect: (id: string) => void;
 }) {
   return (
-    <Card className="border border-white/10 bg-white/[0.055] p-5">
+    <Card className="nexus-surface p-5">
       <h3 className="text-xl font-black text-white">{title}</h3>
       <p className="mt-1 text-sm leading-6 text-white/55">{description}</p>
       <div className="mt-5 grid gap-3">
         {choices.map((choice) => {
           const option = options.find((item) => item.id === choice.id);
           const amount = cadence === 'monthly' ? option?.monthlyEur ?? 0 : option?.fixedEur ?? 0;
+          const priceLabel = option?.priceLabel;
           const selected = selectedId === choice.id;
 
           return (
             <button
               key={choice.id}
               type="button"
-              className={`grid gap-4 rounded-2xl border p-4 text-left transition md:grid-cols-[1fr_auto] md:items-center ${
-                selected ? 'border-[color:var(--color-accent)] bg-[color:var(--color-accent)]/12 shadow-lg shadow-[var(--glow-accent-subtle)]' : 'border-white/10 bg-black/18 hover:border-white/24'
-              }`}
+              aria-pressed={selected}
+              className={cx(
+                'nexus-choice nexus-focus-ring grid gap-4 rounded-2xl border p-4 text-left md:grid-cols-[1fr_auto] md:items-center',
+                selected ? 'nexus-choice--selected border-[color:var(--color-accent)] bg-[color:var(--color-accent)]/12 shadow-lg shadow-[var(--glow-accent-subtle)]' : 'border-white/10 bg-black/18 hover:border-white/24',
+              )}
               onClick={() => onSelect(choice.id)}
             >
               <span className="flex gap-3">
@@ -673,7 +756,7 @@ function ChoiceCardSection({
                 </span>
               </span>
               <span className="rounded-full border border-white/10 bg-black/24 px-3 py-2 text-sm font-black text-[var(--color-primary)]">
-                {amount === 0 ? 'Included' : `${formatCurrency(amount)}${cadence === 'monthly' ? '/mo' : ''}`}
+                {priceLabel ?? (amount === 0 ? 'Included' : `${formatCurrency(amount)}${cadence === 'monthly' ? '/mo' : ''}`)}
               </span>
             </button>
           );
@@ -697,7 +780,7 @@ function OptionCounterSection({
   onChange: (id: string, quantity: number) => void;
 }) {
   return (
-    <section className="glass-panel rounded-2xl p-5">
+    <section className="nexus-surface nexus-surface--raised p-5">
       <h3 className="text-xl font-black text-white">{title}</h3>
       <div className="mt-5 grid gap-3">
         {options.map((option) => {
@@ -745,6 +828,7 @@ function switchProductLine(setInput: React.Dispatch<React.SetStateAction<QuoteIn
     productLine,
     activeMembers: productLine === 'community-timebanking' ? 150 : 1000,
     billingCycle: 'annual',
+    deploymentModeId: 'shared-platform',
     communityPlanId: productLine === 'community-timebanking' ? 'community-edition' : value.communityPlanId,
     onboardingPackageId: productLine === 'community-timebanking' ? 'community-assisted-launch' : 'quick-start',
   }));

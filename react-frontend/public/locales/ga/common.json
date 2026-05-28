@@ -131,7 +131,8 @@
     "marketplace": "Ceannaigh & díol i do phobal",
     "premium": "Leibhéil bhallraíochta préimhe",
     "accessibility_alpha": "Oscail an aghaidh alfa ina bhfuil tús áite ag inrochtaineacht",
-    "features": "Gach rud a dhéanann Project NEXUS, le lipéid aibíochta macánta"
+    "features": "Gach rud a dhéanann Project NEXUS, le lipéid aibíochta macánta",
+    "dashboard": "Your personalised home overview"
   },
   "user_menu": {
     "my_profile": "Mo Phróifíl",
@@ -2231,5 +2232,14 @@
   "level_progress_aria": "Dul chun cinn leibhéal {{level}}: {{percentage}}%",
   "user_fallback": "User",
   "release_stage": "Generally Available (v1.5.1)",
-  "confirm": "Confirm"
+  "confirm": "Confirm",
+  "theme_picker": {
+    "title": "Appearance",
+    "subtitle": "Tune color scheme, accent, and density.",
+    "open_label": "Open theme picker",
+    "color_scheme": "Color scheme",
+    "scheme_light": "Light",
+    "scheme_dark": "Dark",
+    "scheme_system": "System"
+  }
 }

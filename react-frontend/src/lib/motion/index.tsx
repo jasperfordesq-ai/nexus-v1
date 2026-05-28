@@ -571,7 +571,14 @@ type MotionProxy = {
 const motionCache = new Map<string, ReturnType<typeof createMotionComponent>>();
 
 export const motion = new Proxy({} as MotionProxy, {
-  get(_target, prop: string) {
+  get(target, prop: string | symbol, receiver) {
+    if (typeof prop === 'symbol') {
+      return Reflect.get(target, prop, receiver);
+    }
+    if (prop in Object.prototype) {
+      const value = Reflect.get(target, prop, receiver);
+      return typeof value === 'function' ? value.bind(target) : value;
+    }
     if (!motionCache.has(prop)) motionCache.set(prop, createMotionComponent(prop));
     return motionCache.get(prop);
   },

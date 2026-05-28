@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Button, Card, Chip } from '@heroui/react';
+import { Button, Chip } from '@heroui/react';
 import {
   ArrowRight,
   CalendarDays,
@@ -20,6 +20,7 @@ import {
 
 import { communityTimebankPlans, hostingPlans } from '../data/pricing';
 import { formatCurrency } from '../lib/pricingEngine';
+import { MetricTile, SectionHeader, SurfaceCard } from './SalesPrimitives';
 
 interface HomePageProps {
   onNavigate: (href: string) => void;
@@ -120,7 +121,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
             </div>
           </div>
 
-          <div className="rounded-[1.25rem] border border-white/10 bg-[var(--surface-base)]/72 p-5 shadow-2xl shadow-black/30 backdrop-blur-xl">
+          <SurfaceCard tone="raised" className="p-5">
             <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
               <div>
                 <p className="text-xs font-black tracking-[0.16em] text-[var(--color-accent)] uppercase">Pricing snapshot</p>
@@ -133,82 +134,59 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               <HeroPriceRow label={plusPlan.name} value={`${formatCurrency(plusPlan.annualMonthlyEur)}/mo`} note="reports and donations" />
               <HeroPriceRow label={`${fullPlan.name} full platform`} value={`${formatCurrency(fullPlan.monthlyEur)}/mo`} note="all stable modules" />
             </div>
-          </div>
+          </SurfaceCard>
         </div>
       </section>
 
-      <section className="border-b border-white/10 bg-white/[0.025]">
+      <section className="nexus-section-shell">
         <div className="mx-auto grid max-w-7xl metric-grid gap-3 px-5 py-5">
-          {highlights.map((item) => {
-            const Icon = item.icon;
-            return (
-              <div key={item.label} className="grid grid-cols-[auto_1fr] items-center gap-3 rounded-xl border border-white/10 bg-black/20 p-4">
-                <Icon className="size-5 text-[var(--color-primary)]" />
-                <div>
-                  <p className="text-xl font-black text-white">{item.value}</p>
-                  <p className="text-xs font-semibold text-white/52 uppercase">{item.label}</p>
-                </div>
-              </div>
-            );
-          })}
+          {highlights.map((item) => (
+            <MetricTile key={item.label} icon={item.icon} label={item.label} value={item.value} />
+          ))}
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-16">
-        <div className="mb-9 grid gap-6 lg:grid-cols-[0.78fr_1.22fr]">
-          <div>
-            <p className="text-sm font-bold tracking-[0.16em] text-[var(--color-accent)] uppercase">Commercial shape</p>
-            <h2 className="mt-3 text-3xl font-black text-white md:text-5xl">A grown-up price ladder for communities at different stages.</h2>
-          </div>
-          <p className="text-base leading-8 text-white/64">
-            The entry plan stays affordable because it is focused. The full platform stays credible because serious infrastructure, support, migration, and operations are priced properly.
-          </p>
-        </div>
+        <SectionHeader eyebrow="Commercial shape" title="A grown-up price ladder for communities at different stages.">
+          The entry plan stays affordable because it is focused. The full platform stays credible because serious infrastructure, support, migration, and operations are priced properly.
+        </SectionHeader>
         <div className="grid gap-5 lg:grid-cols-3">
           {buyingLanes.map((lane) => {
             const Icon = lane.icon;
             return (
-              <Card key={lane.title} className="min-h-[19rem] border border-white/10 bg-white/[0.055] p-6">
+              <SurfaceCard key={lane.title} interactive className="min-h-[19rem] p-6">
                 <div className="flex items-start justify-between gap-4">
                   <Icon className="size-8 text-[var(--color-accent)]" />
                   <span className="rounded-full border border-white/10 bg-black/20 px-3 py-1 text-xs font-black text-[var(--color-primary)] uppercase">
                     {lane.eyebrow}
                   </span>
                 </div>
-                <Card.Header className="px-0">
-                  <Card.Title className="text-2xl font-black text-white">{lane.title}</Card.Title>
-                  <Card.Description className="text-base leading-7 text-white/62">{lane.body}</Card.Description>
-                </Card.Header>
-              </Card>
+                <h3 className="mt-6 text-2xl font-black text-white">{lane.title}</h3>
+                <p className="mt-3 text-base leading-7 text-white/62">{lane.body}</p>
+              </SurfaceCard>
             );
           })}
         </div>
       </section>
 
-      <section className="border-y border-white/10 bg-white/[0.035]">
+      <section className="nexus-section-shell">
         <div className="mx-auto max-w-7xl px-5 py-16">
-          <div className="mb-9 grid gap-6 lg:grid-cols-[0.78fr_1.22fr]">
-            <div>
-              <p className="text-sm font-bold tracking-[0.16em] text-[var(--color-primary)] uppercase">Product system</p>
-              <h2 className="mt-3 text-3xl font-black text-white md:text-5xl">The front door now matches the actual platform underneath.</h2>
-            </div>
-            <p className="text-base leading-8 text-white/64">
-              NEXUS is not a landing-page promise. It is a production React and Laravel system with real communities, real modules, and a quote flow that can grow into proper ordering.
-            </p>
-          </div>
+          <SectionHeader accent="primary" eyebrow="Product system" title="The front door now matches the actual platform underneath.">
+            NEXUS is not a landing-page promise. It is a production React and Laravel system with real communities, real modules, and a quote flow that can grow into proper ordering.
+          </SectionHeader>
           <div className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="overflow-hidden rounded-[1.25rem] border border-white/10 bg-black/20">
+            <SurfaceCard tone="raised" className="p-0">
               <img
                 src="/images/nexus-banner.png"
                 alt="Project NEXUS platform map showing timebanking, members, events, jobs, marketplace, volunteering, polls, goals, messaging, and community tools"
                 className="aspect-[16/9] w-full object-cover"
               />
-            </div>
+            </SurfaceCard>
             <div className="grid gap-3">
               {productSystem.map((item) => {
                 const Icon = item.icon;
                 return (
-                  <article key={item.label} className="grid grid-cols-[auto_1fr] gap-4 rounded-2xl border border-white/10 bg-black/18 p-4">
+                  <SurfaceCard key={item.label} tone="subtle" className="grid grid-cols-[auto_1fr] gap-4 p-4">
                     <span className="grid size-11 place-items-center rounded-xl border border-white/10 bg-white/[0.05]">
                       <Icon className="size-5 text-[var(--color-accent)]" />
                     </span>
@@ -216,7 +194,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                       <h3 className="font-black text-white">{item.label}</h3>
                       <p className="mt-1 text-sm leading-6 text-white/58">{item.body}</p>
                     </div>
-                  </article>
+                  </SurfaceCard>
                 );
               })}
             </div>
@@ -244,9 +222,9 @@ export default function HomePage({ onNavigate }: HomePageProps) {
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             {stackItems.map((item) => (
-              <div key={item} className="rounded-xl border border-white/10 bg-white/[0.045] px-4 py-3 text-sm font-bold text-white/76">
+              <SurfaceCard key={item} tone="subtle" className="px-4 py-3 text-sm font-bold text-white/76">
                 {item}
-              </div>
+              </SurfaceCard>
             ))}
           </div>
         </div>

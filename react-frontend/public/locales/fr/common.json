@@ -131,7 +131,8 @@
     "marketplace": "Achetez et vendez dans votre communauté",
     "premium": "Niveaux d’abonnement premium",
     "accessibility_alpha": "Ouvrir l’interface alpha axée sur l’accessibilité",
-    "features": "Tout ce que fait Project NEXUS, avec des étiquettes de maturité honnêtes"
+    "features": "Tout ce que fait Project NEXUS, avec des étiquettes de maturité honnêtes",
+    "dashboard": "Your personalised home overview"
   },
   "user_menu": {
     "my_profile": "Mon profil",
@@ -2231,5 +2232,14 @@
   "level_progress_aria": "Progression du niveau {{level}} : {{percentage}} %",
   "user_fallback": "User",
   "release_stage": "Generally Available (v1.5.1)",
-  "confirm": "Confirm"
+  "confirm": "Confirm",
+  "theme_picker": {
+    "title": "Appearance",
+    "subtitle": "Tune color scheme, accent, and density.",
+    "open_label": "Open theme picker",
+    "color_scheme": "Color scheme",
+    "scheme_light": "Light",
+    "scheme_dark": "Dark",
+    "scheme_system": "System"
+  }
 }

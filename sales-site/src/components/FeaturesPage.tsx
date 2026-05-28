@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Button, Card } from '@heroui/react';
+import { Button } from '@heroui/react';
 import {
   ArrowRight,
   BadgeCheck,
@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 
 import { nexusModuleGroups, nexusModules } from '../data/modules';
+import { MetricTile, SectionHeader, SurfaceCard } from './SalesPrimitives';
 
 interface FeaturesPageProps {
   onNavigate: (href: string) => void;
@@ -151,58 +152,39 @@ export default function FeaturesPage({ onNavigate }: FeaturesPageProps) {
           </div>
 
           <div className="mt-12 grid metric-grid gap-3">
-            {platformStats.map((stat) => {
-              const Icon = stat.icon;
-              return (
-                <div key={stat.label} className="rounded-xl border border-white/10 bg-white/[0.055] p-5">
-                  <Icon className="mb-3 size-5 text-[var(--color-primary)]" />
-                  <p className="text-2xl font-black text-white">{stat.value}</p>
-                  <p className="text-xs font-semibold text-white/45 uppercase">{stat.label}</p>
-                </div>
-              );
-            })}
+            {platformStats.map((stat) => (
+              <MetricTile key={stat.label} icon={stat.icon} label={stat.label} value={stat.value} />
+            ))}
           </div>
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-16">
-        <div className="mb-9 max-w-3xl">
-          <p className="text-sm font-bold tracking-[0.16em] text-[var(--color-accent)] uppercase">What is Project NEXUS?</p>
-          <h2 className="mt-3 text-3xl font-black text-white md:text-5xl">A complete ecosystem for connected communities.</h2>
-          <p className="mt-5 text-base leading-7 text-white/62">
-            The platform combines member exchange, civic participation, content, safety, analytics, AI, and network federation in one auditable open-source codebase.
-          </p>
-        </div>
+        <SectionHeader compact eyebrow="What is Project NEXUS?" title="A complete ecosystem for connected communities.">
+          The platform combines member exchange, civic participation, content, safety, analytics, AI, and network federation in one auditable open-source codebase.
+        </SectionHeader>
         <div className="grid gap-5 lg:grid-cols-3">
           {pillars.map((pillar) => {
             const Icon = pillar.icon;
             return (
-              <Card key={pillar.title} className="min-h-[18rem] border border-white/10 bg-white/[0.055] p-6">
+              <SurfaceCard key={pillar.title} interactive className="min-h-[18rem] p-6">
                 <Icon className="size-8 text-[var(--color-accent)]" />
-                <Card.Header className="px-0">
-                  <Card.Title className="text-2xl font-black text-white">{pillar.title}</Card.Title>
-                  <Card.Description className="text-base leading-7 text-white/62">{pillar.body}</Card.Description>
-                </Card.Header>
-              </Card>
+                <h3 className="mt-6 text-2xl font-black text-white">{pillar.title}</h3>
+                <p className="mt-3 text-base leading-7 text-white/62">{pillar.body}</p>
+              </SurfaceCard>
             );
           })}
         </div>
       </section>
 
-      <section className="border-y border-white/10 bg-white/[0.035]">
+      <section className="nexus-section-shell">
         <div className="mx-auto max-w-7xl px-5 py-16">
-          <div className="mb-10 grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-            <div>
-              <p className="text-sm font-bold tracking-[0.16em] text-[var(--color-primary)] uppercase">Buyer feature map</p>
-              <h2 className="mt-3 text-3xl font-black text-white md:text-5xl">Community Edition is not the whole product.</h2>
-            </div>
-            <p className="text-base leading-8 text-white/64">
-              That is the point. The cheaper entry plan is for timebanking basics. The full platform is where the broader community, civic, federation, AI, and operational modules belong.
-            </p>
-          </div>
+          <SectionHeader accent="primary" eyebrow="Buyer feature map" title="Community Edition is not the whole product.">
+            That is the point. The cheaper entry plan is for timebanking basics. The full platform is where the broader community, civic, federation, AI, and operational modules belong.
+          </SectionHeader>
           <div className="grid gap-4">
             {buyerFeatureMap.map((row) => (
-              <article key={row.buyerQuestion} className="grid gap-4 rounded-2xl border border-white/10 bg-black/18 p-5 lg:grid-cols-[0.7fr_1fr_1fr]">
+              <SurfaceCard key={row.buyerQuestion} tone="subtle" className="grid gap-4 p-5 lg:grid-cols-[0.7fr_1fr_1fr]">
                 <div>
                   <p className="text-xs font-black tracking-[0.16em] text-[var(--color-accent)] uppercase">Buyer question</p>
                   <h3 className="mt-2 text-xl font-black text-white">{row.buyerQuestion}</h3>
@@ -215,30 +197,24 @@ export default function FeaturesPage({ onNavigate }: FeaturesPageProps) {
                   <p className="mb-2 text-sm font-black text-[var(--color-accent)]">Full platform</p>
                   <p className="text-sm leading-6 text-white/62">{row.fullPlatform}</p>
                 </div>
-              </article>
+              </SurfaceCard>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="module-catalogue" className="border-y border-white/10 bg-white/[0.03]">
+      <section id="module-catalogue" className="nexus-section-shell">
         <div className="mx-auto max-w-7xl px-5 py-16">
-          <div className="mb-10 grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-            <div>
-              <p className="text-sm font-bold tracking-[0.16em] text-[var(--color-primary)] uppercase">Everything Inside V1.5</p>
-              <h2 className="mt-3 text-3xl font-black text-white md:text-5xl">60+ production-ready modules.</h2>
-            </div>
-            <p className="text-base leading-8 text-white/64">
-              All open source. All Dockerized. Full platform hosted plans change capacity, uptime, support, and infrastructure; the entry Community Edition is a narrower timebanking package.
-            </p>
-          </div>
+          <SectionHeader accent="primary" eyebrow="Everything Inside V1.5" title="60+ production-ready modules.">
+            All open source. All Dockerized. Full platform hosted plans change capacity, uptime, support, and infrastructure; the entry Community Edition is a narrower timebanking package.
+          </SectionHeader>
 
           <div className="module-category-stack grid gap-5">
             {nexusModuleGroups.map((group) => {
               const modules = nexusModules.filter((module) => module.group === group);
 
               return (
-                <section key={group} className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.045]">
+                <SurfaceCard key={group} className="p-0">
                   <div className="grid gap-4 border-b border-white/10 bg-black/18 p-5 lg:grid-cols-[18rem_1fr] lg:items-center">
                     <div>
                       <p className="text-xs font-black tracking-[0.16em] text-[var(--color-primary)] uppercase">{modules.length} modules</p>
@@ -259,7 +235,7 @@ export default function FeaturesPage({ onNavigate }: FeaturesPageProps) {
                       </article>
                     ))}
                   </div>
-                </section>
+                </SurfaceCard>
               );
             })}
           </div>
@@ -267,7 +243,7 @@ export default function FeaturesPage({ onNavigate }: FeaturesPageProps) {
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-16">
-        <div className="glass-panel rounded-[1.25rem] p-6 md:p-8">
+        <SurfaceCard tone="raised" className="p-6 md:p-8">
           <p className="mb-3 flex items-center gap-2 text-sm font-bold tracking-[0.16em] text-[var(--color-accent)] uppercase">
             <Network className="size-4" />
             Live in V1.5
@@ -278,16 +254,16 @@ export default function FeaturesPage({ onNavigate }: FeaturesPageProps) {
           </p>
           <div className="mt-8 grid comparison-grid gap-4">
             {federationItems.map(([title, body]) => (
-              <div key={title} className="rounded-xl border border-white/10 bg-black/18 p-4">
+              <div key={title} className="nexus-surface nexus-surface--subtle p-4">
                 <p className="font-black text-white">{title}</p>
                 <p className="mt-2 text-sm leading-6 text-white/56">{body}</p>
               </div>
             ))}
           </div>
-        </div>
+        </SurfaceCard>
       </section>
 
-      <section className="border-y border-white/10 bg-white/[0.035]">
+      <section className="nexus-section-shell">
         <div className="mx-auto grid max-w-7xl gap-8 px-5 py-16 lg:grid-cols-[0.82fr_1.18fr]">
           <div>
             <p className="text-sm font-bold tracking-[0.16em] text-[var(--color-primary)] uppercase">Live communities</p>
@@ -295,7 +271,7 @@ export default function FeaturesPage({ onNavigate }: FeaturesPageProps) {
           </div>
           <div className="grid gap-4">
             {communities.map((community) => (
-              <a key={community.url} href={community.url} target="_blank" rel="noopener noreferrer" className="glass-panel rounded-2xl p-5 transition hover:border-[color:var(--color-accent)]/60">
+              <a key={community.url} href={community.url} target="_blank" rel="noopener noreferrer" className="nexus-surface nexus-surface--interactive nexus-focus-ring block p-5">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <p className="text-xl font-black text-white">{community.name}</p>
@@ -311,7 +287,7 @@ export default function FeaturesPage({ onNavigate }: FeaturesPageProps) {
 
       <section className="mx-auto max-w-7xl px-5 py-16">
         <div className="grid gap-8 lg:grid-cols-[1fr_1fr]">
-          <div className="glass-panel rounded-2xl p-6">
+          <SurfaceCard tone="raised" className="p-6">
             <p className="text-sm font-bold tracking-[0.16em] text-[var(--color-accent)] uppercase">Modern tech stack</p>
             <h2 className="mt-3 text-3xl font-black text-white">Production-ready from day one.</h2>
             <div className="mt-6 flex flex-wrap gap-2">
@@ -321,9 +297,9 @@ export default function FeaturesPage({ onNavigate }: FeaturesPageProps) {
                 </span>
               ))}
             </div>
-          </div>
+          </SurfaceCard>
 
-          <div className="glass-panel rounded-2xl p-6">
+          <SurfaceCard tone="raised" className="p-6">
             <p className="text-sm font-bold tracking-[0.16em] text-[var(--color-primary)] uppercase">Why open source?</p>
             <h2 className="mt-3 text-3xl font-black text-white">Free forever, transparent, auditable.</h2>
             <div className="mt-5 grid gap-4">
@@ -331,11 +307,11 @@ export default function FeaturesPage({ onNavigate }: FeaturesPageProps) {
               <Value title="Transparent & Auditable" body="Every line of code is visible so communities can verify security and data handling." icon={BookOpen} />
               <Value title="Community-Driven" body="Roadmap, features, bug fixes, and federation protocol work can be shaped in public." icon={BadgeCheck} />
             </div>
-          </div>
+          </SurfaceCard>
         </div>
       </section>
 
-      <section className="border-t border-white/10 bg-white/[0.035]">
+      <section className="nexus-section-shell border-b-0">
         <div className="mx-auto grid max-w-7xl gap-8 px-5 py-14 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
             <p className="text-sm font-bold tracking-[0.16em] text-[var(--color-accent)] uppercase">Get started today</p>

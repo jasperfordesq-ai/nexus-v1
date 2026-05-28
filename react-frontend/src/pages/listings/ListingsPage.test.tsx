@@ -55,7 +55,9 @@ vi.mock('@/lib/logger', () => ({
 }));
 
 vi.mock('@/lib/helpers', () => ({
+  cn: vi.fn((...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' ')),
   resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
+  resolveAssetUrl: vi.fn((url) => url),
   formatRelativeTime: vi.fn(() => '2 hours ago'),
 }));
 

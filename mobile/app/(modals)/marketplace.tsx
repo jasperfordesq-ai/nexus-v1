@@ -6,7 +6,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, FlatList, RefreshControl, ScrollView, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router, type Href } from 'expo-router';
+import { router, type Href, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
@@ -46,12 +46,23 @@ export default function MarketplaceRoute() {
 function MarketplaceScreen() {
   const { t } = useTranslation(['marketplace', 'common']);
   const { hasFeature } = useTenant();
+  const params = useLocalSearchParams<{
+    q?: string | string[];
+    category?: string | string[];
+    category_id?: string | string[];
+    price_type?: string | string[];
+  }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const [query, setQuery] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<number | undefined>(undefined);
-  const [priceType, setPriceType] = useState<MarketplacePriceType | ''>('');
+  const initialQuery = firstParam(params.q) ?? '';
+  const initialCategory = Number(firstParam(params.category_id) ?? firstParam(params.category));
+  const initialPriceType = normalizePriceType(firstParam(params.price_type));
+  const [query, setQuery] = useState(initialQuery);
+  const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
+  const [selectedCategory, setSelectedCategory] = useState<number | undefined>(
+    Number.isFinite(initialCategory) && initialCategory > 0 ? initialCategory : undefined,
+  );
+  const [priceType, setPriceType] = useState<MarketplacePriceType | ''>(initialPriceType);
   const [listings, setListings] = useState<MarketplaceListingItem[]>([]);
   const [featured, setFeatured] = useState<MarketplaceListingItem[]>([]);
   const [categories, setCategories] = useState<MarketplaceCategory[]>([]);
@@ -380,4 +391,14 @@ function MarketplaceScreen() {
       />
     </SafeAreaView>
   );
+}
+
+function firstParam(value?: string | string[]): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function normalizePriceType(value?: string): MarketplacePriceType | '' {
+  return value === 'fixed' || value === 'negotiable' || value === 'free' || value === 'auction' || value === 'contact'
+    ? value
+    : '';
 }

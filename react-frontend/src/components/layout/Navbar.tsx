@@ -77,6 +77,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { DesktopMenuItems } from '@/components/navigation';
 import { SearchOverlay } from '@/components/layout/SearchOverlay';
 import { MegaMenu } from '@/components/layout/MegaMenu';
+import { ThemePicker } from '@/components/layout/ThemePicker';
 import { NotificationFlyout } from '@/components/layout/NotificationFlyout';
 import { TenantLogo } from '@/components/branding';
 import { PresenceIndicator,
@@ -106,14 +107,15 @@ export interface CommunityNavItem {
   path: string;
   href: string;
   icon: typeof Users;
-  feature: keyof TenantFeatures;
+  /** Optional feature gate. Items without a feature are always visible (auth/module gates handled at build time). */
+  feature?: keyof TenantFeatures;
 }
 
 export function getVisibleCommunityItems(
   items: CommunityNavItem[],
   hasFeature: (feature: keyof TenantFeatures) => boolean,
 ): CommunityNavItem[] {
-  return items.filter(item => hasFeature(item.feature));
+  return items.filter(item => !item.feature || hasFeature(item.feature));
 }
 
 export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChange, isMobileMenuOpen }: NavbarProps) {
@@ -274,20 +276,34 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     return true;
   }), [t, tenantPath, hasFeature, hasModule]);
 
-  const communityItems = useMemo<CommunityNavItem[]>(() => [
-    { label: t('nav.caring_community'), desc: t('nav_desc.caring_community'), path: CARING_COMMUNITY_ROUTE.href, href: tenantPath(CARING_COMMUNITY_ROUTE.href), icon: Heart, feature: CARING_COMMUNITY_ROUTE.feature },
-    { label: t('nav.members'), desc: t('nav_desc.members'), path: '/members', href: tenantPath('/members'), icon: Users, feature: 'connections' as const },
-    { label: t('nav.connections'), desc: t('nav_desc.connections'), path: '/connections', href: tenantPath('/connections'), icon: Users2, feature: 'connections' as const },
-    { label: t('nav.events'), desc: t('nav_desc.events'), path: '/events', href: tenantPath('/events'), icon: Calendar, feature: 'events' as const },
-    { label: t('nav.groups'), desc: t('nav_desc.groups'), path: '/groups', href: tenantPath('/groups'), icon: Users, feature: 'groups' as const },
-    { label: t('nav.volunteering'), desc: t('nav_desc.volunteering'), path: '/volunteering', href: tenantPath('/volunteering'), icon: Heart, feature: 'volunteering' as const },
-    { label: t('nav.resources'), desc: t('nav_desc.resources'), path: '/resources', href: tenantPath('/resources'), icon: FolderOpen, feature: 'resources' as const },
-    { label: t('nav.jobs'), desc: t('nav_desc.jobs'), path: '/jobs', href: tenantPath('/jobs'), icon: Briefcase, feature: 'job_vacancies' as const },
-    { label: t('nav.marketplace'), desc: t('nav_desc.marketplace'), path: '/marketplace', href: tenantPath('/marketplace'), icon: ShoppingBag, feature: 'marketplace' as const },
-    { label: t('nav.premium'), desc: t('nav_desc.premium'), path: '/premium', href: tenantPath('/premium'), icon: Crown, feature: 'member_premium' as const },
-  ], [t, tenantPath]);
+  const communityItems = useMemo<CommunityNavItem[]>(() => {
+    const items: CommunityNavItem[] = [];
+    // Dashboard — authenticated users with the dashboard module (sits at the top of the dropdown)
+    if (isAuthenticated && hasModule('dashboard')) {
+      items.push({ label: t('nav.dashboard'), desc: t('nav_desc.dashboard'), path: '/dashboard', href: tenantPath('/dashboard'), icon: LayoutDashboard });
+    }
+    items.push(
+      { label: t('nav.caring_community'), desc: t('nav_desc.caring_community'), path: CARING_COMMUNITY_ROUTE.href, href: tenantPath(CARING_COMMUNITY_ROUTE.href), icon: Heart, feature: CARING_COMMUNITY_ROUTE.feature },
+      { label: t('nav.members'), desc: t('nav_desc.members'), path: '/members', href: tenantPath('/members'), icon: Users, feature: 'connections' as const },
+      { label: t('nav.connections'), desc: t('nav_desc.connections'), path: '/connections', href: tenantPath('/connections'), icon: Users2, feature: 'connections' as const },
+      { label: t('nav.events'), desc: t('nav_desc.events'), path: '/events', href: tenantPath('/events'), icon: Calendar, feature: 'events' as const },
+      { label: t('nav.groups'), desc: t('nav_desc.groups'), path: '/groups', href: tenantPath('/groups'), icon: Users, feature: 'groups' as const },
+      { label: t('nav.volunteering'), desc: t('nav_desc.volunteering'), path: '/volunteering', href: tenantPath('/volunteering'), icon: Heart, feature: 'volunteering' as const },
+    );
+    // Partner Communities — authenticated users with federation; sits directly below Volunteering
+    if (isAuthenticated && hasFeature('federation')) {
+      items.push({ label: t('nav.partner_communities'), desc: t('nav_desc.partner_communities'), path: '/federation/partners', href: tenantPath('/federation/partners'), icon: Building2, feature: 'federation' as const });
+    }
+    items.push(
+      { label: t('nav.resources'), desc: t('nav_desc.resources'), path: '/resources', href: tenantPath('/resources'), icon: FolderOpen, feature: 'resources' as const },
+      { label: t('nav.jobs'), desc: t('nav_desc.jobs'), path: '/jobs', href: tenantPath('/jobs'), icon: Briefcase, feature: 'job_vacancies' as const },
+      { label: t('nav.marketplace'), desc: t('nav_desc.marketplace'), path: '/marketplace', href: tenantPath('/marketplace'), icon: ShoppingBag, feature: 'marketplace' as const },
+      { label: t('nav.premium'), desc: t('nav_desc.premium'), path: '/premium', href: tenantPath('/premium'), icon: Crown, feature: 'member_premium' as const },
+    );
+    return items;
+  }, [t, tenantPath, isAuthenticated, hasModule, hasFeature]);
   const visibleCommunityItems = useMemo(
-    () => getVisibleCommunityItems(communityItems, hasFeature),
+    () => communityItems.filter(item => !item.feature || hasFeature(item.feature)),
     [communityItems, hasFeature],
   );
 
@@ -358,7 +374,6 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
       defaultExpanded: false,
       items: [
         { label: t('nav.federation_hub'), desc: t('nav_desc.federation_hub'), href: tenantPath('/federation'), icon: Globe },
-        { label: t('nav.partner_communities'), desc: t('nav_desc.partner_communities'), href: tenantPath('/federation/partners'), icon: Building2 },
         { label: t('nav.federated_members'), desc: t('nav_desc.federated_members'), href: tenantPath('/federation/members'), icon: Users },
         { label: t('nav.federated_messages'), desc: t('nav_desc.federated_messages'), href: tenantPath('/federation/messages'), icon: MessageSquare },
         { label: t('nav.federated_listings'), desc: t('nav_desc.federated_listings'), href: tenantPath('/federation/listings'), icon: ListTodo },
@@ -427,32 +442,6 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
         >
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-end gap-1 h-8 flex-nowrap overflow-x-auto">
-              {/* Dashboard — authenticated users */}
-              {isAuthenticated && hasModule('dashboard') && (
-                <Button
-                  variant="light"
-                  size="sm"
-                  className="text-theme-muted hover:text-theme-primary h-7 min-w-0 px-2 gap-1 text-xs shrink-0"
-                  onPress={() => navigate(tenantPath('/dashboard'))}
-                  aria-label={t('nav.dashboard')}
-                >
-                  <LayoutDashboard className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-                  <span className="hidden md:inline" aria-hidden="true">{t('nav.dashboard')}</span>
-                </Button>
-              )}
-              {/* Federation Hub — authenticated users with federation feature */}
-              {isAuthenticated && hasFeature('federation') && (
-                <Button
-                  variant="light"
-                  size="sm"
-                  className="text-theme-muted hover:text-theme-primary h-7 min-w-0 px-2 gap-1 text-xs shrink-0"
-                  onPress={() => navigate(tenantPath('/federation'))}
-                  aria-label={t('nav.partner_communities')}
-                >
-                  <Globe className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-                  <span className="hidden md:inline" aria-hidden="true">{t('nav.partner_communities')}</span>
-                </Button>
-              )}
               {/* Identity verification status */}
               {isAuthenticated && idVerifiedLoaded && (
                 <>
@@ -509,20 +498,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 </Tooltip>
               )}
               <LanguageSwitcher />
-              <Button
-                isIconOnly
-                variant="light"
-                size="sm"
-                className="text-theme-muted hover:text-theme-primary w-7 h-7 min-w-7 shrink-0"
-                onPress={toggleTheme}
-                aria-label={resolvedTheme === 'dark' ? t('accessibility.switch_to_light') : t('accessibility.switch_to_dark')}
-              >
-                {resolvedTheme === 'dark' ? (
-                  <Sun className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
-                ) : (
-                  <Moon className="w-3.5 h-3.5 text-accent" aria-hidden="true" />
-                )}
-              </Button>
+              <ThemePicker triggerSize="sm" placement="bottom-end" />
               <span className="text-[var(--border-default)] text-xs select-none shrink-0">|</span>
               {/* Search — in utility bar on desktop */}
               <Button
@@ -797,37 +773,40 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   </div>
 
                   {/* User Dropdown */}
-                  <Dropdown placement="bottom-end" isOpen={userOpen} onOpenChange={handleUserOpenChange} shouldBlockScroll={false}>
-                    <DropdownTrigger>
-                      <button
-                        type="button"
-                        aria-label={t('aria.user_menu_trigger', { name: user?.first_name || '' })}
-                        className="relative cursor-pointer rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-                      >
-                        <Avatar
-                          name={`${user?.first_name} ${user?.last_name}`}
-                          src={resolveAvatarUrl(user?.avatar_url || user?.avatar)}
+                  <div className="relative h-10 w-10 shrink-0">
+                    <Dropdown placement="bottom-end" isOpen={userOpen} onOpenChange={handleUserOpenChange} shouldBlockScroll={false}>
+                      <DropdownTrigger>
+                        <Button
+                          isIconOnly
+                          type="button"
+                          variant="light"
                           size="sm"
-                          className="cursor-pointer ring-2 ring-transparent hover:ring-accent/50 transition-all w-8 h-8 sm:w-9 sm:h-9"
-                          showFallback
-                        />
-                        {user?.id && <PresenceIndicator userId={user.id} size="lg" showOffline />}
-                      </button>
-                    </DropdownTrigger>
-                    <DropdownMenu
-                      aria-label={t('aria.user_actions')}
-                      classNames={{
-                        base: 'bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-xl min-w-[220px] max-h-[70vh] overflow-y-auto',
-                      }}
-                      onAction={(key) => {
-                        const k = String(key);
-                        if (k === 'theme') { toggleTheme(); closeAllDropdowns(); return; }
-                        if (k === 'install') { handleInstallClick(); return; }
-                        if (k === 'logout') { handleLogout(); return; }
-                        if (k === 'profile-header') return;
-                        dropdownNavigate(k);
-                      }}
-                    >
+                          aria-label={t('aria.user_menu_trigger', { name: user?.first_name || '' })}
+                          className="group h-10 w-10 min-w-10 overflow-visible rounded-full bg-transparent p-0 text-theme-primary hover:bg-theme-hover focus-visible:ring-2 focus-visible:ring-accent"
+                        >
+                          <Avatar
+                            name={`${user?.first_name} ${user?.last_name}`}
+                            src={resolveAvatarUrl(user?.avatar_url || user?.avatar)}
+                            size="sm"
+                            className="pointer-events-none size-9 ring-2 ring-transparent transition-all group-hover:ring-accent/50"
+                            showFallback
+                          />
+                        </Button>
+                      </DropdownTrigger>
+                      <DropdownMenu
+                        aria-label={t('aria.user_actions')}
+                        classNames={{
+                          base: 'bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-xl min-w-[220px] max-h-[70vh] overflow-y-auto',
+                        }}
+                        onAction={(key) => {
+                          const k = String(key);
+                          if (k === 'theme') { toggleTheme(); closeAllDropdowns(); return; }
+                          if (k === 'install') { handleInstallClick(); return; }
+                          if (k === 'logout') { handleLogout(); return; }
+                          if (k === 'profile-header') return;
+                          dropdownNavigate(k);
+                        }}
+                      >
                       <DropdownSection showDivider>
                         <DropdownItem
                           key="profile-header" id="profile-header"
@@ -906,27 +885,16 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                           {t('user_menu.log_out')}
                         </DropdownItem>
                       </DropdownSection>
-                    </DropdownMenu>
-                  </Dropdown>
+                      </DropdownMenu>
+                    </Dropdown>
+                    {user?.id && <PresenceIndicator userId={user.id} size="lg" showOffline className="pointer-events-none" />}
+                  </div>
                 </>
               ) : (
                 <>
-                  {/* Theme Toggle + Language Switcher — mobile only (desktop uses utility bar) */}
+                  {/* Theme Picker + Language Switcher — mobile only (desktop uses utility bar) */}
                   <div className="hidden min-[390px]:flex items-center gap-1 sm:hidden">
-                    <Button
-                      isIconOnly
-                      variant="light"
-                      size="sm"
-                      className="text-theme-muted hover:text-theme-primary"
-                      onPress={toggleTheme}
-                      aria-label={resolvedTheme === 'dark' ? t('accessibility.switch_to_light') : t('accessibility.switch_to_dark')}
-                    >
-                      {resolvedTheme === 'dark' ? (
-                        <Sun className="w-4 h-4 text-amber-400" aria-hidden="true" />
-                      ) : (
-                        <Moon className="w-4 h-4 text-accent" aria-hidden="true" />
-                      )}
-                    </Button>
+                    <ThemePicker triggerSize="sm" placement="bottom-end" />
                     <LanguageSwitcher />
                   </div>
 

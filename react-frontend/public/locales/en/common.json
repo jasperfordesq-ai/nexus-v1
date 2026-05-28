@@ -131,7 +131,8 @@
     "marketplace": "Buy & sell in your community",
     "premium": "Premium membership tiers",
     "accessibility_alpha": "Open the WCAG 2.2 AA accessible version",
-    "features": "Everything Project NEXUS does, with honest maturity labels"
+    "features": "Everything Project NEXUS does, with honest maturity labels",
+    "dashboard": "Your personalised home overview"
   },
   "user_menu": {
     "my_profile": "My Profile",
@@ -2231,5 +2232,14 @@
   "xp_progress": "{{current}} / {{required}} XP",
   "level_progress_aria": "Level {{level}} progress: {{percentage}}%",
   "user_fallback": "User",
-  "release_stage": "Generally Available (v1.5.1)"
+  "release_stage": "Generally Available (v1.5.1)",
+  "theme_picker": {
+    "title": "Appearance",
+    "subtitle": "Tune color scheme, accent, and density.",
+    "open_label": "Open theme picker",
+    "color_scheme": "Color scheme",
+    "scheme_light": "Light",
+    "scheme_dark": "Dark",
+    "scheme_system": "System"
+  }
 }

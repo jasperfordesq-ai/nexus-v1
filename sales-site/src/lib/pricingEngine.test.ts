@@ -113,6 +113,26 @@ describe('pricingEngine', () => {
     expect(quote.lineItems.some((item) => item.label === 'Priority support')).toBe(true);
   });
 
+  it('routes dedicated managed server enquiries to custom pricing with a starting-from signal', () => {
+    const quote = estimateQuote({
+      activeMembers: 750,
+      billingCycle: 'monthly',
+      deploymentModeId: 'dedicated-managed-server',
+      supportTierId: 'standard',
+      maintenancePlanId: 'track-latest',
+      onboardingPackageId: 'none',
+      addOns: {},
+      oneOffServices: {},
+    });
+
+    expect(quote.hostingPlan.id).toBe('community');
+    expect(quote.pricingMode).toBe('custom');
+    expect(quote.monthlyRecurring).toBe(299);
+    expect(quote.oneOffTotal).toBe(250);
+    expect(quote.lineItems.map((item) => item.label).join(' ')).toContain('Dedicated managed infrastructure discovery');
+    expect(quote.lineItems.find((item) => item.id === 'dedicated-managed-server')?.priceLabel).toBe('Starts from €650/mo');
+  });
+
   it('formats EUR currency consistently for the public calculator', () => {
     expect(formatCurrency(4499)).toBe('€4,499');
     expect(formatCurrency(8999)).toBe('€8,999');

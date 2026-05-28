@@ -52,8 +52,6 @@ import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import Lightbulb from 'lucide-react/icons/lightbulb';
 import GraduationCap from 'lucide-react/icons/graduation-cap';
 import Activity from 'lucide-react/icons/activity';
-import Sun from 'lucide-react/icons/sun';
-import Moon from 'lucide-react/icons/moon';
 import Fingerprint from 'lucide-react/icons/fingerprint';
 import Bookmark from 'lucide-react/icons/bookmark';
 import BadgeCheck from 'lucide-react/icons/badge-check';
@@ -68,13 +66,13 @@ import { useTranslation } from 'react-i18next';
 import { useAuth,
   useTenant,
   useNotifications,
-  useCookieConsent,
-  useTheme } from '@/contexts';
+  useCookieConsent } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { buildAccessibleFrontendUrl } from '@/lib/accessible-frontend';
 import type { TenantFeatures,
   TenantModules } from '@/types/api';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { ThemePicker } from '@/components/layout/ThemePicker';
 import { useMenuContext } from '@/contexts';
 import { MobileMenuItems } from '@/components/navigation';
 
@@ -148,7 +146,6 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
   const { tenant, hasFeature, hasModule, tenantPath } = useTenant();
   const { unreadCount, counts } = useNotifications();
   const { resetConsent } = useCookieConsent();
-  const { resolvedTheme, toggleTheme } = useTheme();
   const { mobileMenus, headerMenus, hasCustomMenus } = useMenuContext();
   const year = new Date().getFullYear();
   const accessibleFrontendUrl = buildAccessibleFrontendUrl(tenant?.slug);
@@ -614,20 +611,11 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                 {/* Right: Language + Theme */}
                 <div className="flex items-center gap-1 shrink-0">
                   <LanguageSwitcher />
-                  <Button
-                    isIconOnly
-                    variant="light"
-                    size="sm"
-                    className="text-theme-muted hover:text-theme-primary min-w-[44px] min-h-[44px]"
-                    onPress={toggleTheme}
-                    aria-label={t(resolvedTheme === 'dark' ? 'accessibility.switch_to_light' : 'accessibility.switch_to_dark')}
-                  >
-                    {resolvedTheme === 'dark' ? (
-                      <Sun className="w-4 h-4 text-amber-400" aria-hidden="true" />
-                    ) : (
-                      <Moon className="w-4 h-4 text-indigo-500" aria-hidden="true" />
-                    )}
-                  </Button>
+                  <ThemePicker
+                    triggerSize="md"
+                    placement="top-end"
+                    triggerClassName="text-theme-muted hover:text-theme-primary min-w-[44px] min-h-[44px]"
+                  />
                 </div>
               </div>
             </div>

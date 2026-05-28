@@ -14,6 +14,7 @@ const publicSalesFiles = [
   'src/components/HostingPage.tsx',
   'src/components/QuoteBuilder.tsx',
   'src/components/LegalPage.tsx',
+  'src/components/SalesPrimitives.tsx',
   'src/data/pricing.ts',
   'src/data/legal.ts',
 ].map((path) => resolve(__dirname, '..', '..', path));
@@ -84,7 +85,7 @@ describe('sales-site public content policy', () => {
     const homePage = readFileSync(resolve(__dirname, '..', 'components', 'HomePage.tsx'), 'utf8');
     const styles = readFileSync(resolve(__dirname, '..', 'styles.css'), 'utf8');
     const heroStart = homePage.indexOf('<section className="sales-hero border-b border-white/10">');
-    const heroEnd = homePage.indexOf('<section className="border-b border-white/10 bg-white/[0.025]">');
+    const heroEnd = homePage.indexOf('<section className="nexus-section-shell">');
     const heroMarkup = homePage.slice(heroStart, heroEnd);
 
     expect(heroStart).toBeGreaterThan(-1);
@@ -115,6 +116,18 @@ describe('sales-site public content policy', () => {
     expect(hostingPage).not.toContain('Community Timebanks benchmark');
     expect(hostingPage).not.toContain('GBP');
     expect(hostingPage).toContain('Community Edition details');
+  });
+
+  it('shows a prominent launch pricing note before buyers reach the calculator', () => {
+    const hostingPage = readFileSync(resolve(__dirname, '..', 'components', 'HostingPage.tsx'), 'utf8');
+    const noteIndex = hostingPage.indexOf('Launch pricing note');
+    const builderButtonIndex = hostingPage.indexOf('Build quote');
+
+    expect(noteIndex).toBeGreaterThan(-1);
+    expect(builderButtonIndex).toBeGreaterThan(noteIndex);
+    expect(hostingPage).toContain('early published prices for a new managed hosting service');
+    expect(hostingPage).toContain('continuing market research, infrastructure modelling, and support-cost analysis');
+    expect(hostingPage).toContain('Accepted written quotes are handled through their own order terms.');
   });
 
   it('uses a guided hosting calculator instead of cryptic dropdowns and a raw range slider', () => {
@@ -152,5 +165,67 @@ describe('sales-site public content policy', () => {
     expect(hostingPage).toContain('Published pricing has a hard ceiling.');
     expect(quoteBuilder).toContain('Published pricing stops at 100,000 active members.');
     expect(quoteBuilder).toContain('Anything over the public cap');
+  });
+
+  it('lets full-platform buyers choose shared hosting or a dedicated managed server', () => {
+    const pricing = readFileSync(resolve(__dirname, '..', 'data', 'pricing.ts'), 'utf8');
+    const quoteBuilder = readFileSync(resolve(__dirname, '..', 'components', 'QuoteBuilder.tsx'), 'utf8');
+
+    expect(pricing).toContain("id: 'shared-platform'");
+    expect(pricing).toContain("id: 'dedicated-managed-server'");
+    expect(pricing).toContain('startsFromMonthlyEur: 650');
+    expect(pricing).toContain('requiresCustomQuote: true');
+    expect(pricing).toContain('single dedicated server, multiple servers, load balancing, database separation, storage scaling, backup systems, security hardening, monitoring, or a full server cluster');
+    expect(quoteBuilder).toContain('Where should it run?');
+    expect(quoteBuilder).toContain('Main managed platform');
+    expect(quoteBuilder).toContain('Dedicated managed server');
+    expect(quoteBuilder).toContain('Tell us what you are building');
+    expect(quoteBuilder).toContain('deploymentModeId');
+  });
+
+  it('uses shared sales polish primitives for app-grade surfaces and section rhythm', () => {
+    const primitives = readFileSync(resolve(__dirname, '..', 'components', 'SalesPrimitives.tsx'), 'utf8');
+    const homePage = readFileSync(resolve(__dirname, '..', 'components', 'HomePage.tsx'), 'utf8');
+    const featuresPage = readFileSync(resolve(__dirname, '..', 'components', 'FeaturesPage.tsx'), 'utf8');
+    const hostingPage = readFileSync(resolve(__dirname, '..', 'components', 'HostingPage.tsx'), 'utf8');
+    const legalPage = readFileSync(resolve(__dirname, '..', 'components', 'LegalPage.tsx'), 'utf8');
+    const siteShell = readFileSync(resolve(__dirname, '..', 'components', 'SiteShell.tsx'), 'utf8');
+    const styles = readFileSync(resolve(__dirname, '..', 'styles.css'), 'utf8');
+
+    expect(primitives).toContain('export function SectionHeader');
+    expect(primitives).toContain('export function SurfaceCard');
+    expect(primitives).toContain('export function MetricTile');
+    expect(primitives).toContain('export function ProcessSteps');
+    expect(styles).toContain('.nexus-section-shell');
+    expect(styles).toContain('.nexus-surface');
+    expect(styles).toContain('.nexus-focus-ring');
+    expect(styles).toContain('--nexus-surface-raised');
+    expect(homePage).toContain('SectionHeader');
+    expect(homePage).toContain('MetricTile');
+    expect(featuresPage).toContain('SectionHeader');
+    expect(hostingPage).toContain('SurfaceCard');
+    expect(legalPage).toContain('SurfaceCard');
+    expect(siteShell).toContain("aria-current={isActive ? 'page' : undefined}");
+    expect(siteShell).toContain('footer-link');
+  });
+
+  it('adds final interaction polish for navigation, footer, and selectable quote controls', () => {
+    const siteShell = readFileSync(resolve(__dirname, '..', 'components', 'SiteShell.tsx'), 'utf8');
+    const quoteBuilder = readFileSync(resolve(__dirname, '..', 'components', 'QuoteBuilder.tsx'), 'utf8');
+    const styles = readFileSync(resolve(__dirname, '..', 'styles.css'), 'utf8');
+
+    expect(siteShell).toContain('href="#main-content"');
+    expect(siteShell).toContain('id="main-content"');
+    expect(siteShell).toContain('nexus-header');
+    expect(siteShell).toContain('nexus-nav-link');
+    expect(siteShell).toContain('footer-card');
+    expect(styles).toContain('.skip-link');
+    expect(styles).toContain('.nexus-header');
+    expect(styles).toContain('.nexus-nav-link');
+    expect(styles).toContain('.footer-card');
+    expect(quoteBuilder).toContain('aria-pressed={active}');
+    expect(quoteBuilder).toContain('aria-pressed={selected}');
+    expect(quoteBuilder).toContain('nexus-choice');
+    expect(quoteBuilder).toContain('nexus-choice--selected');
   });
 });

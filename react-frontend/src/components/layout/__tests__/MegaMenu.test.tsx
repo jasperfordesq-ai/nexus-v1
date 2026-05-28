@@ -186,6 +186,32 @@ describe('MegaMenu', () => {
       });
       expect(screen.getByText('Help your community')).toBeTruthy();
     });
+
+    it('lets described items grow instead of clipping into neighbouring rows', () => {
+      renderMegaMenu({
+        leftSections: [{
+          key: 'test',
+          title: 'Test',
+          items: [
+            {
+              label: 'Timebanking Guide',
+              desc: 'How timebanking works',
+              href: '/timebanking-guide',
+              icon: StubIcon,
+            },
+          ],
+        }],
+      });
+
+      const itemButton = screen.getByText('Timebanking Guide').closest('button');
+      const label = screen.getByText('Timebanking Guide');
+      const description = screen.getByText('How timebanking works');
+
+      expect(itemButton?.className).toContain('!h-auto');
+      expect(itemButton?.className).toContain('overflow-hidden');
+      expect(label.className).toContain('truncate');
+      expect(description.className).toContain('truncate');
+    });
   });
 
   describe('Navigation', () => {

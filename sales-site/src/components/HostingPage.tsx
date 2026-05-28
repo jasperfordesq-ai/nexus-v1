@@ -3,8 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Button, Card, Chip } from '@heroui/react';
-import { ArrowDown, BadgeEuro, Boxes, CheckCircle2, Layers3, Scale, ShieldCheck, Sparkles } from 'lucide-react';
+import { Button, Chip } from '@heroui/react';
+import { ArrowDown, BadgeEuro, Boxes, CheckCircle2, Layers3, Server, ShieldCheck, Sparkles } from 'lucide-react';
 import { useCallback } from 'react';
 
 import {
@@ -13,6 +13,7 @@ import {
 } from '../data/pricing';
 import { formatCurrency } from '../lib/pricingEngine';
 import QuoteBuilder from './QuoteBuilder';
+import { MetricTile, SectionHeader, SurfaceCard } from './SalesPrimitives';
 
 interface HostingPageProps {
   onNavigate: (href: string) => void;
@@ -21,8 +22,8 @@ interface HostingPageProps {
 const proofPoints = [
   { label: 'Community entry', value: 'EUR29/mo', icon: BadgeEuro },
   { label: 'Published cap', value: '100k', icon: Boxes },
+  { label: 'Deployment', value: 'Shared/dedicated', icon: Server },
   { label: 'Enterprise layer', value: '>100k', icon: Layers3 },
-  { label: 'Licence', value: 'AGPL', icon: Scale },
 ];
 
 const pricingPrinciples = [
@@ -37,6 +38,10 @@ const pricingPrinciples = [
   {
     title: 'Keep procurement honest',
     body: 'Full NEXUS hosting has published capacity tiers up to 100,000 active members, then moves into bespoke enterprise pricing before high-scale usage can distort the model.',
+  },
+  {
+    title: 'Separate hosting from architecture',
+    body: 'Most buyers should stay on the main managed platform for value, while organisations with stronger assurance or performance needs can price a dedicated managed server explicitly.',
   },
 ];
 
@@ -57,6 +62,15 @@ export default function HostingPage({ onNavigate }: HostingPageProps) {
             <p className="mt-7 max-w-2xl text-lg leading-8 text-white/68">
               Project NEXUS now has two commercial lanes: a lean Community Timebanking offer from EUR29/month when billed annually, and a full managed platform offer for serious civic networks.
             </p>
+            <SurfaceCard tone="accent" className="mt-7 max-w-3xl p-5 shadow-[inset_4px_0_0_var(--color-accent)]">
+              <p className="text-sm font-black tracking-[0.16em] text-[color:var(--color-accent)] uppercase">Launch pricing note</p>
+              <p className="mt-3 text-base font-semibold leading-7 text-white">
+                These are early published prices for a new managed hosting service, and they may change as the offer matures.
+              </p>
+              <p className="mt-2 text-sm leading-7 text-white/64">
+                We are continuing market research, infrastructure modelling, and support-cost analysis so Project NEXUS can stay genuinely competitive without underpricing the reliability, maintenance, backups, security, and professional support that serious community platforms need. Accepted written quotes are handled through their own order terms.
+              </p>
+            </SurfaceCard>
             <div className="mt-9 flex flex-wrap gap-3">
               <Button size="lg" onPress={() => document.getElementById('quote-builder')?.scrollIntoView({ behavior: 'smooth' })}>
                 Build quote
@@ -69,7 +83,7 @@ export default function HostingPage({ onNavigate }: HostingPageProps) {
           </div>
 
           <div className="flex items-center">
-            <div className="glass-panel w-full rounded-[1.25rem] p-5">
+            <SurfaceCard tone="raised" className="w-full p-5">
               <div className="flex items-center gap-3 border-b border-white/10 pb-5">
                 <ShieldCheck className="size-9 text-[var(--color-accent)]" />
                 <div>
@@ -78,53 +92,39 @@ export default function HostingPage({ onNavigate }: HostingPageProps) {
                 </div>
               </div>
               <div className="mt-5 grid metric-grid gap-3">
-                {proofPoints.map((point) => {
-                  const Icon = point.icon;
-                  return (
-                    <div key={point.label} className="rounded-xl border border-white/10 bg-black/20 p-4">
-                      <Icon className="mb-3 size-5 text-[var(--color-primary)]" />
-                      <p className="text-2xl font-black text-white">{point.value}</p>
-                      <p className="text-xs font-semibold text-white/45 uppercase">{point.label}</p>
-                    </div>
-                  );
-                })}
+                {proofPoints.map((point) => (
+                  <MetricTile key={point.label} icon={point.icon} label={point.label} value={point.value} />
+                ))}
               </div>
               <div className="mt-5 grid gap-2">
                 {communityTimebankPlans.map((plan) => (
-                  <div key={plan.id} className="grid grid-cols-[1fr_auto] rounded-xl border border-white/10 bg-white/[0.035] p-3 text-sm">
+                  <div key={plan.id} className="nexus-surface nexus-surface--subtle grid grid-cols-[1fr_auto] p-3 text-sm">
                     <span className="font-bold text-white">{plan.name}</span>
                     <span className="text-white/58">{formatCurrency(plan.annualMonthlyEur)}/mo annual</span>
                   </div>
                 ))}
                 {hostingPlans.map((plan) => (
-                  <div key={plan.id} className="grid grid-cols-[1fr_auto] rounded-xl border border-white/10 bg-black/14 p-3 text-sm">
+                  <div key={plan.id} className="nexus-surface nexus-surface--subtle grid grid-cols-[1fr_auto] p-3 text-sm">
                     <span className="font-bold text-white">{plan.name} full platform</span>
                     <span className="text-right text-white/58">{plan.isCustom ? 'Bespoke quote' : `${formatCurrency(plan.monthlyEur)}/mo`}</span>
                   </div>
                 ))}
               </div>
-            </div>
+            </SurfaceCard>
           </div>
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-16">
-        <div className="mb-9 grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-          <div>
-            <p className="text-sm font-bold tracking-[0.16em] text-[var(--color-primary)] uppercase">Full platform capacity</p>
-            <h2 className="mt-3 text-3xl font-black text-white md:text-5xl">Published pricing has a hard ceiling.</h2>
-          </div>
-          <p className="text-base leading-8 text-white/64">
-            The public calculator prices realistic managed hosting up to 100,000 active members. Above that, NEXUS switches to Enterprise Custom so a high-growth or million-user platform is priced against real traffic, support, storage, and architecture.
-          </p>
-        </div>
+        <SectionHeader accent="primary" eyebrow="Full platform capacity" title="Published pricing has a hard ceiling.">
+          The public calculator prices realistic managed hosting up to 100,000 active members. Above that, NEXUS switches to Enterprise Custom so a high-growth or million-user platform is priced against real traffic, support, storage, and architecture.
+        </SectionHeader>
         <div className="grid gap-3">
           {hostingPlans.map((plan) => (
-            <div
+            <SurfaceCard
               key={plan.id}
-              className={`grid gap-4 rounded-2xl border p-5 md:grid-cols-[0.75fr_1fr_auto] md:items-center ${
-                plan.isCustom ? 'border-[color:var(--color-accent)]/30 bg-[color:var(--color-accent)]/8' : 'border-white/10 bg-black/18'
-              }`}
+              tone={plan.isCustom ? 'accent' : 'subtle'}
+              className="grid gap-4 p-5 md:grid-cols-[0.75fr_1fr_auto] md:items-center"
             >
               <div>
                 <p className="text-xl font-black text-white">{plan.name}</p>
@@ -134,57 +134,41 @@ export default function HostingPage({ onNavigate }: HostingPageProps) {
               <p className="text-left text-2xl font-black text-[var(--color-primary)] md:text-right">
                 {plan.isCustom ? 'Bespoke quote' : `${formatCurrency(plan.monthlyEur)}/mo`}
               </p>
-            </div>
+            </SurfaceCard>
           ))}
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-16">
-        <div className="mb-9 grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-          <div>
-            <p className="text-sm font-bold tracking-[0.16em] text-[var(--color-primary)] uppercase">Pricing position</p>
-            <h2 className="mt-3 text-3xl font-black text-white md:text-5xl">The entry plan is cheaper because it is narrower.</h2>
-          </div>
-          <p className="text-base leading-8 text-white/64">
-            The right entry offer is a dedicated timebanking package, not the whole civic platform squeezed into an unrealistic price. NEXUS starts smaller, then gives buyers a clean upgrade path when the work becomes bigger.
-          </p>
-        </div>
-        <div className="grid gap-5 lg:grid-cols-3">
+        <SectionHeader accent="primary" eyebrow="Pricing position" title="The entry plan is cheaper because it is narrower.">
+          The right entry offer is a dedicated timebanking package, not the whole civic platform squeezed into an unrealistic price. NEXUS starts smaller, then gives buyers a clean upgrade path when the work becomes bigger.
+        </SectionHeader>
+        <div className="grid gap-5 lg:grid-cols-4">
           {pricingPrinciples.map((principle) => (
-            <Card key={principle.title} className="border border-white/10 bg-white/[0.055] p-6">
+            <SurfaceCard key={principle.title} interactive className="p-6">
               <Sparkles className="size-7 text-[var(--color-accent)]" />
-              <Card.Header className="px-0">
-                <Card.Title className="text-2xl font-black text-white">{principle.title}</Card.Title>
-                <Card.Description className="text-base leading-7 text-white/62">{principle.body}</Card.Description>
-              </Card.Header>
-            </Card>
+              <h3 className="mt-6 text-2xl font-black text-white">{principle.title}</h3>
+              <p className="mt-3 text-base leading-7 text-white/62">{principle.body}</p>
+            </SurfaceCard>
           ))}
         </div>
       </section>
 
-      <section className="border-y border-white/10 bg-white/[0.035]">
+      <section className="nexus-section-shell">
         <div className="mx-auto max-w-7xl px-5 py-16">
-          <div className="mb-10 grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-            <div>
-              <p className="text-sm font-bold tracking-[0.16em] text-[var(--color-accent)] uppercase">Community Edition details</p>
-              <h2 className="mt-3 text-3xl font-black text-white md:text-5xl">A real timebanking package with the expensive extras switched off.</h2>
-            </div>
-            <p className="text-base leading-8 text-white/64">
-              This gives small groups a way to start professionally while keeping federation, AI, multi-tenant networks, SSO, custom development, dedicated infrastructure, and heavy support in the paid upgrade path.
-            </p>
-          </div>
+          <SectionHeader eyebrow="Community Edition details" title="A real timebanking package with the expensive extras switched off.">
+            This gives small groups a way to start professionally while keeping federation, AI, multi-tenant networks, SSO, custom development, dedicated infrastructure, and heavy support in the paid upgrade path.
+          </SectionHeader>
           <div className="grid gap-5 lg:grid-cols-3">
             {communityTimebankPlans.map((plan) => (
-              <Card key={plan.id} className="border border-white/10 bg-black/18 p-6">
+              <SurfaceCard key={plan.id} interactive className="p-6">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <Chip color={plan.id === 'community-edition' ? 'success' : 'accent'} variant="soft">
                       {plan.activeMemberLabel}
                     </Chip>
-                    <Card.Header className="px-0">
-                      <Card.Title className="text-2xl font-black text-white">{plan.name}</Card.Title>
-                      <Card.Description className="text-base leading-7 text-white/62">{plan.bestFor}</Card.Description>
-                    </Card.Header>
+                    <h3 className="mt-6 text-2xl font-black text-white">{plan.name}</h3>
+                    <p className="mt-3 text-base leading-7 text-white/62">{plan.bestFor}</p>
                   </div>
                 </div>
                 <p className="text-4xl font-black text-[var(--color-primary)]">{formatCurrency(plan.annualMonthlyEur)}</p>
@@ -197,22 +181,16 @@ export default function HostingPage({ onNavigate }: HostingPageProps) {
                     </p>
                   ))}
                 </div>
-              </Card>
+              </SurfaceCard>
             ))}
           </div>
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-16">
-        <div className="mb-9 grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-          <div>
-            <p className="text-sm font-bold tracking-[0.16em] text-[var(--color-primary)] uppercase">Why the pricing holds up</p>
-            <h2 className="mt-3 text-3xl font-black text-white md:text-5xl">Affordable does not mean vague.</h2>
-          </div>
-          <p className="text-base leading-8 text-white/64">
-            The entry price is protected by clear product boundaries: one tenant, fair-use caps, standard infrastructure, limited modules, and a defined support queue. Larger needs move into the full platform lane.
-          </p>
-        </div>
+        <SectionHeader accent="primary" eyebrow="Why the pricing holds up" title="Affordable does not mean vague.">
+          The entry price is protected by clear product boundaries: one tenant, fair-use caps, standard infrastructure, limited modules, and a defined support queue. Larger needs move into the full platform lane.
+        </SectionHeader>
         <div className="grid gap-5 lg:grid-cols-4">
           {[
             ['One tenant', 'Community Edition is for one timebank, not a multi-community network.'],
@@ -220,17 +198,17 @@ export default function HostingPage({ onNavigate }: HostingPageProps) {
             ['Upgrade gates', 'Federation, AI, SSO, custom reports, payments, and bespoke modules stay in higher lanes.'],
             ['Service limits', 'Storage, email, support response, and launch help are explicit before anyone enquires.'],
           ].map(([title, body]) => (
-            <div key={title} className="rounded-2xl border border-white/10 bg-black/18 p-5">
+            <SurfaceCard key={title} tone="subtle" className="p-5">
               <p className="text-lg font-black text-white">{title}</p>
               <p className="mt-3 text-sm leading-6 text-white/58">{body}</p>
-            </div>
+            </SurfaceCard>
           ))}
         </div>
       </section>
 
       <QuoteBuilder onQuoteChange={handleQuoteChange} />
 
-      <section className="border-t border-white/10 bg-white/[0.035]">
+      <section className="nexus-section-shell border-b-0">
         <div className="mx-auto grid max-w-7xl gap-8 px-5 py-14 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
             <p className="text-sm font-bold tracking-[0.16em] text-[var(--color-accent)] uppercase">Still want the open-source path?</p>

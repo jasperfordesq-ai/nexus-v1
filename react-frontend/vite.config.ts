@@ -39,6 +39,7 @@ export default defineConfig(({ command, mode }) => {
   const apiUrl = env.VITE_API_URL || process.env.VITE_API_URL || 'http://localhost:8090'
 
   return {
+  cacheDir: path.resolve(__dirname, 'node_modules/.vite'),
   plugins: [
     react(),
     tailwindcss(),
@@ -177,8 +178,14 @@ export default defineConfig(({ command, mode }) => {
   },
   optimizeDeps: {
     // Pre-bundle heavy deps so Vite doesn't re-crawl them on every page load.
-    // lucide-react removed: imports now use individual sub-path files
-    // (lucide-react/icons/*) so the full-barrel 784 KB pre-bundle is no longer needed.
+    // lucide-react imports use individual sub-path files. Keep the Listings-only
+    // icons that Vite has trouble optimizing on Windows as direct ESM source
+    // imports; the optimized-deps layer returns 504 "Outdated Optimize Dep".
+    exclude: [
+      'lucide-react/icons/arrow-up-down',
+      'lucide-react/icons/monitor',
+      'lucide-react/icons/sliders-horizontal',
+    ],
     include: [
       '@heroui/react',
       'react',

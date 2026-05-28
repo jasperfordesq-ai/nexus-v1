@@ -143,16 +143,16 @@ export function MegaMenu({
       data-mega-item
       onPress={() => onNavigate(item.href)}
       variant="light"
-      className={`w-full flex items-start gap-3 px-3 py-2 rounded-lg text-start transition-colors motion-reduce:transition-none focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 min-h-9 justify-start ${
+      className={`w-full flex !h-auto min-h-[3.25rem] items-start gap-3 overflow-hidden px-3 py-2 rounded-lg text-start transition-colors motion-reduce:transition-none focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 justify-start ${
         location.pathname.startsWith(item.href)
           ? 'bg-theme-active text-theme-primary'
           : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
       }`}
     >
       <item.icon className="w-4 h-4 mt-0.5 shrink-0" aria-hidden="true" />
-      <div className="min-w-0">
-        <p className="text-sm font-medium leading-tight">{item.label}</p>
-        {item.desc && <p className="text-xs text-theme-subtle mt-0.5 leading-tight">{item.desc}</p>}
+      <div className="min-w-0 flex-1 overflow-hidden">
+        <p className="truncate text-sm font-medium leading-tight">{item.label}</p>
+        {item.desc && <p className="mt-0.5 truncate text-xs leading-tight text-theme-subtle">{item.desc}</p>}
       </div>
     </Button>
   );

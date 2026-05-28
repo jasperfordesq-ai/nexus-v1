@@ -7,6 +7,7 @@ import {
   BillingCycle,
   communityOnboardingPackages,
   communityTimebankPlans,
+  deploymentModes,
   hostingPlans,
   maintenancePlans,
   onboardingPackages,
@@ -15,6 +16,8 @@ import {
   recurringAddOns,
   supportTiers,
   type CommunityTimebankPlan,
+  type DeploymentMode,
+  type DeploymentModeOption,
   type HostingPlan,
 } from '../data/pricing';
 
@@ -24,6 +27,7 @@ export interface QuoteInput {
   productLine?: ProductLine;
   activeMembers: number;
   billingCycle: BillingCycle;
+  deploymentModeId?: DeploymentMode;
   communityPlanId?: string;
   supportTierId: string;
   maintenancePlanId: string;
@@ -36,6 +40,7 @@ export interface QuoteLineItem {
   id: string;
   label: string;
   amountEur: number;
+  priceLabel?: string;
   quantity: number;
   cadence: 'monthly' | 'one-off';
 }
@@ -155,6 +160,7 @@ function estimateFullPlatformQuote(input: QuoteInput): QuoteEstimate {
     return estimateEnterpriseCustomQuote(input, hostingPlan);
   }
 
+  const deploymentMode = findDeploymentMode(input.deploymentModeId);
   const support = findById(supportTiers, input.supportTierId);
   const maintenance = findById(maintenancePlans, input.maintenancePlanId);
   const onboarding = findById(onboardingPackages, input.onboardingPackageId);
@@ -182,6 +188,27 @@ function estimateFullPlatformQuote(input: QuoteInput): QuoteEstimate {
       cadence: 'monthly',
     },
   ];
+
+  if (deploymentMode.requiresCustomQuote) {
+    recurringItems.push({
+      id: deploymentMode.id,
+      label: 'Dedicated managed infrastructure discovery',
+      amountEur: 0,
+      priceLabel: deploymentMode.startsFromMonthlyEur
+        ? `Starts from ${formatCurrency(deploymentMode.startsFromMonthlyEur)}/mo`
+        : 'Custom quote',
+      quantity: 1,
+      cadence: 'monthly',
+    });
+  } else if (deploymentMode.monthlyEur !== 0) {
+    recurringItems.push({
+      id: deploymentMode.id,
+      label: deploymentMode.label,
+      amountEur: deploymentMode.monthlyEur,
+      quantity: 1,
+      cadence: 'monthly',
+    });
+  }
 
   Object.entries(input.addOns).forEach(([id, quantity]) => {
     const option = recurringAddOns.find((item) => item.id === id);
@@ -217,6 +244,16 @@ function estimateFullPlatformQuote(input: QuoteInput): QuoteEstimate {
     },
   ];
 
+  if (deploymentMode.setupEur !== 0) {
+    oneOffItems.push({
+      id: `${deploymentMode.id}-setup`,
+      label: deploymentMode.setupLabel,
+      amountEur: deploymentMode.setupEur,
+      quantity: 1,
+      cadence: 'one-off',
+    });
+  }
+
   Object.entries(input.oneOffServices).forEach(([id, quantity]) => {
     const option = oneOffServices.find((item) => item.id === id);
     const safeQuantity = Math.max(0, Math.floor(quantity));
@@ -239,19 +276,20 @@ function estimateFullPlatformQuote(input: QuoteInput): QuoteEstimate {
   const annualRecurring = input.billingCycle === 'annual' ? monthlyRecurring * 10 : annualWithoutDiscount;
   const annualSavings = annualWithoutDiscount - annualRecurring;
   const oneOffTotal = sum(oneOffItems.map((item) => item.amountEur));
+  const pricingMode = deploymentMode.requiresCustomQuote ? 'custom' : 'published';
 
   return {
     productLine: 'full-platform',
     productLineLabel: 'Full Platform Hosting',
     hostingPlan,
     billingCycle: input.billingCycle,
-    pricingMode: 'published',
+    pricingMode,
     monthlyRecurring,
     annualRecurring,
     annualSavings,
     oneOffTotal,
     firstYearTotal: annualRecurring + oneOffTotal,
-    lineItems: [...recurringItems, ...oneOffItems].filter((item) => item.amountEur !== 0),
+    lineItems: [...recurringItems, ...oneOffItems].filter((item) => item.amountEur !== 0 || item.priceLabel),
   };
 }
 
@@ -294,6 +332,10 @@ function findById<T extends { id: string }>(items: T[], id: string): T {
   }
 
   return item;
+}
+
+function findDeploymentMode(id: DeploymentMode | undefined): DeploymentModeOption {
+  return deploymentModes.find((mode) => mode.id === (id ?? 'shared-platform')) ?? deploymentModes[0];
 }
 
 function sum(values: number[]): number {

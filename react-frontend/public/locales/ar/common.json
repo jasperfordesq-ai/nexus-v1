@@ -131,7 +131,8 @@
     "marketplace": "اشترِ وبيع في مجتمعك",
     "premium": "مستويات العضوية المميزة",
     "accessibility_alpha": "افتح الواجهة التجريبية ذات الأولوية لإمكانية الوصول",
-    "features": "كل ما يفعله Project NEXUS، مع علامات نضج صادقة"
+    "features": "كل ما يفعله Project NEXUS، مع علامات نضج صادقة",
+    "dashboard": "Your personalised home overview"
   },
   "user_menu": {
     "my_profile": "ملفي الشخصي",
@@ -2231,5 +2232,14 @@
   "level_progress_aria": "تقدّم المستوى {{level}}: {{percentage}}%",
   "user_fallback": "User",
   "release_stage": "Generally Available (v1.5.1)",
-  "confirm": "Confirm"
+  "confirm": "Confirm",
+  "theme_picker": {
+    "title": "Appearance",
+    "subtitle": "Tune color scheme, accent, and density.",
+    "open_label": "Open theme picker",
+    "color_scheme": "Color scheme",
+    "scheme_light": "Light",
+    "scheme_dark": "Dark",
+    "scheme_system": "System"
+  }
 }

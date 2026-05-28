@@ -39,6 +39,27 @@ describe('salesOrderApi', () => {
     ]);
   });
 
+  it('preserves starting-from labels for custom dedicated infrastructure enquiries', () => {
+    const dedicatedQuote = {
+      ...quoteEstimate(),
+      pricingMode: 'custom',
+      lineItems: [
+        {
+          id: 'dedicated-managed-server',
+          label: 'Dedicated managed infrastructure discovery',
+          amountEur: 0,
+          priceLabel: 'Starts from €650/mo',
+          quantity: 1,
+          cadence: 'monthly',
+        },
+      ],
+    } satisfies QuoteEstimate;
+
+    const payload = buildSalesOrderPayload(formState(), dedicatedQuote);
+
+    expect(payload.quote.line_items[0].amount_label).toBe('Starts from €650/mo');
+  });
+
   it('uses the production API origin by default and respects explicit Vite API configuration', () => {
     expect(getApiBase()).toBe('https://api.project-nexus.ie/api');
 

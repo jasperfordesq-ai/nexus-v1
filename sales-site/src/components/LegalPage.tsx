@@ -3,11 +3,12 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Button, Card } from '@heroui/react';
+import { Button } from '@heroui/react';
 import { ArrowRight, BookOpenText, Building2, FileText, GitBranch, Scale, ShieldCheck } from 'lucide-react';
 import { type MouseEvent } from 'react';
 
 import { findLegalPage, legalPages, type LegalPath, type LegalPageContent } from '../data/legal';
+import { SurfaceCard } from './SalesPrimitives';
 
 interface LegalPageProps {
   path: LegalPath;
@@ -57,7 +58,7 @@ export default function LegalPage({ path, onNavigate }: LegalPageProps) {
             </div>
           </div>
 
-          <Card className="h-fit border border-white/10 bg-white/[0.055] p-5">
+          <SurfaceCard tone="raised" className="h-fit p-5">
             <p className="text-sm font-black tracking-[0.16em] text-white/45 uppercase">Legal identity map</p>
             <div className="mt-5 grid gap-4">
               <IdentityRow label="Software" value="Project NEXUS open-source code" />
@@ -67,7 +68,7 @@ export default function LegalPage({ path, onNavigate }: LegalPageProps) {
               <IdentityRow label="Reg. number" value="812763" />
               <IdentityRow label="Updated" value={page.lastUpdated} />
             </div>
-          </Card>
+          </SurfaceCard>
         </div>
       </section>
 
@@ -75,10 +76,10 @@ export default function LegalPage({ path, onNavigate }: LegalPageProps) {
         <div className="mx-auto max-w-7xl px-5 py-10">
           <div className="grid gap-4 md:grid-cols-2">
             {page.callouts.map((callout) => (
-              <Card key={callout.title} className="border border-white/10 bg-white/[0.055] p-5">
+              <SurfaceCard key={callout.title} className="p-5">
                 <h2 className="text-xl font-black text-white">{callout.title}</h2>
                 <p className="mt-3 text-sm leading-7 text-white/62">{callout.body}</p>
-              </Card>
+              </SurfaceCard>
             ))}
           </div>
         </div>
@@ -111,7 +112,7 @@ export default function LegalPage({ path, onNavigate }: LegalPageProps) {
               <LegalTableBlock key={table.title} page={page} table={table} />
             ))}
             {page.sections.map((section) => (
-              <section key={section.title} className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 md:p-6">
+              <SurfaceCard key={section.title} className="p-5 md:p-6">
                 <h2 className="text-2xl font-black text-white">{section.title}</h2>
                 {section.intro ? <p className="mt-3 text-sm leading-7 text-white/62">{section.intro}</p> : null}
                 <ul className="mt-4 grid gap-3">
@@ -122,7 +123,7 @@ export default function LegalPage({ path, onNavigate }: LegalPageProps) {
                     </li>
                   ))}
                 </ul>
-              </section>
+              </SurfaceCard>
             ))}
           </div>
         </div>
@@ -142,7 +143,7 @@ function IdentityRow({ label, value }: { label: string; value: string }) {
 
 function LegalTableBlock({ table }: { page: LegalPageContent; table: NonNullable<LegalPageContent['tables']>[number] }) {
   return (
-    <section className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]">
+    <SurfaceCard className="p-0">
       <div className="border-b border-white/10 p-5 md:p-6">
         <h2 className="text-2xl font-black text-white">{table.title}</h2>
       </div>
@@ -170,6 +171,6 @@ function LegalTableBlock({ table }: { page: LegalPageContent; table: NonNullable
           </tbody>
         </table>
       </div>
-    </section>
+    </SurfaceCard>
   );
 }

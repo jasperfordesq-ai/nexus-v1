@@ -77,9 +77,9 @@ export function buildSalesOrderPayload(form: SalesOrderFormState, quote: QuoteEs
       first_year_label: formatQuoteAmount(quote, quote.firstYearTotal),
       line_items: quote.lineItems.map((item) => ({
         label: item.label,
-        amount_label: quote.pricingMode === 'custom' && item.amountEur === 0
+        amount_label: item.priceLabel ?? (quote.pricingMode === 'custom' && item.amountEur === 0
           ? 'Custom quote'
-          : `${formatCurrency(item.amountEur)}${item.cadence === 'monthly' ? '/mo' : ''}`,
+          : `${formatCurrency(item.amountEur)}${item.cadence === 'monthly' ? '/mo' : ''}`),
         quantity: item.quantity,
         cadence: item.cadence,
       })),

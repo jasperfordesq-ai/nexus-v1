@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@/test/test-utils';
+import { render, screen, userEvent } from '@/test/test-utils';
 import React from 'react';
 
 // --- Mocks ---
@@ -108,11 +108,17 @@ const i18nMap: Record<string, string> = {
   'aria.community_navigation': 'Community navigation',
   'aria.create_actions': 'Create actions',
   'aria.user_actions': 'User actions',
+  'aria.user_menu_trigger': 'Open user menu',
   'auth.log_in': 'Log In',
   'auth.sign_up': 'Sign Up',
   'create.new_listing': 'New Listing',
   'create.new_event': 'New Event',
   'create.new_post': 'New Post',
+  'user_menu.my_profile': 'My Profile',
+  'user_menu.wallet': 'Wallet',
+  'user_menu.settings': 'Settings',
+  'user_menu.dark_mode': 'Dark Mode',
+  'user_menu.light_mode': 'Light Mode',
   'report_problem.trigger': 'Report a problem',
   'user_menu.log_out': 'Log Out',
   'flyout.bell_aria': 'Notifications',
@@ -312,6 +318,20 @@ describe('Navbar', () => {
     it('renders Create new button', () => {
       render(<Navbar />);
       expect(screen.getByLabelText('Create new')).toBeInTheDocument();
+    });
+
+    it('opens the user menu from a pressable avatar trigger', async () => {
+      const user = userEvent.setup();
+      render(<Navbar />);
+
+      const trigger = screen.getByRole('button', { name: 'Open user menu' });
+
+      expect(trigger.className).toContain('button--icon-only');
+      expect(trigger).toHaveAttribute('data-react-aria-pressable', 'true');
+
+      await user.click(trigger);
+
+      expect(trigger).toHaveAttribute('aria-expanded', 'true');
     });
 
     it('shows search button (accessible to authenticated users)', () => {

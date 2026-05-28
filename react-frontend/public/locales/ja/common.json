@@ -131,7 +131,8 @@
     "marketplace": "コミュニティで売買する",
     "premium": "プレミアム会員プラン",
     "accessibility_alpha": "アクセシビリティ重視のアルファフロントエンドを開く",
-    "features": "Project NEXUSのすべての機能と正直な成熟度ラベル"
+    "features": "Project NEXUSのすべての機能と正直な成熟度ラベル",
+    "dashboard": "Your personalised home overview"
   },
   "user_menu": {
     "my_profile": "マイプロフィール",
@@ -2231,5 +2232,14 @@
   "level_progress_aria": "レベル{{level}}の進捗：{{percentage}}%",
   "user_fallback": "User",
   "release_stage": "Generally Available (v1.5.1)",
-  "confirm": "Confirm"
+  "confirm": "Confirm",
+  "theme_picker": {
+    "title": "Appearance",
+    "subtitle": "Tune color scheme, accent, and density.",
+    "open_label": "Open theme picker",
+    "color_scheme": "Color scheme",
+    "scheme_light": "Light",
+    "scheme_dark": "Dark",
+    "scheme_system": "System"
+  }
 }

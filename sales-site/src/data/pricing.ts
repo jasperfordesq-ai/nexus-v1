@@ -5,6 +5,7 @@
 
 export type BillingCycle = 'monthly' | 'annual';
 export type ProductLine = 'community-timebanking' | 'full-platform';
+export type DeploymentMode = 'shared-platform' | 'dedicated-managed-server';
 
 export interface HostingPlan {
   id: string;
@@ -45,6 +46,50 @@ export interface OneOffOption {
   fixedEur: number;
   description: string;
 }
+
+export interface DeploymentModeOption {
+  id: DeploymentMode;
+  label: string;
+  shortLabel: string;
+  monthlyEur: number;
+  setupEur: number;
+  setupLabel: string;
+  priceLabel: string;
+  startsFromMonthlyEur?: number;
+  requiresCustomQuote?: boolean;
+  description: string;
+  bestFor: string;
+}
+
+export const deploymentModes: DeploymentModeOption[] = [
+  {
+    id: 'shared-platform',
+    label: 'Shared managed platform',
+    shortLabel: 'Shared platform',
+    monthlyEur: 0,
+    setupEur: 0,
+    setupLabel: 'Shared platform provisioning',
+    priceLabel: 'Included',
+    description:
+      'Included on published full-platform tiers: your tenant runs on the main Project NEXUS production platform with tenant isolation, monitoring, backups, patching, and managed upgrades.',
+    bestFor: 'most pilots, charities, local programmes, and funded community services that want the strongest price-to-capability ratio',
+  },
+  {
+    id: 'dedicated-managed-server',
+    label: 'Dedicated managed server',
+    shortLabel: 'Dedicated server',
+    monthlyEur: 0,
+    setupEur: 0,
+    setupLabel: 'Dedicated infrastructure discovery',
+    priceLabel: 'From €650/mo',
+    startsFromMonthlyEur: 650,
+    requiresCustomQuote: true,
+    description:
+      'Dedicated server hosting starts from €650/month for an entry-level setup. Final pricing depends on server size, traffic levels, storage, bandwidth, redundancy, security, management, and whether the project needs a single dedicated server, multiple servers, load balancing, database separation, storage scaling, backup systems, security hardening, monitoring, or a full server cluster.',
+    bestFor:
+      'projects expecting around 100, 1,000, 10,000, 100,000, or 500,000+ users, including heavy-traffic platforms, apps, SaaS products, communities, membership sites, and enterprise workloads',
+  },
+];
 
 export const communityTimebankPlans: CommunityTimebankPlan[] = [
   {

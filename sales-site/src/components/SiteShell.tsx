@@ -9,6 +9,7 @@ import { type MouseEvent, type ReactNode, useState } from 'react';
 
 import { legalPages } from '../data/legal';
 import { salesNavItems } from '../lib/routes';
+import { cx } from './SalesPrimitives';
 
 interface SiteShellProps {
   children: ReactNode;
@@ -35,7 +36,10 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
 
   return (
     <div className="min-h-screen text-[var(--nexus-ink)]">
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-[var(--surface-base)]/90 backdrop-blur-xl">
+      <a href="#main-content" className="skip-link">
+        Skip to content
+      </a>
+      <header className="nexus-header">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3">
           <a
             href="/"
@@ -64,7 +68,7 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
                     href={item.href}
                     target={item.label === 'GitHub' ? '_blank' : undefined}
                     rel={item.label === 'GitHub' ? 'noopener noreferrer' : undefined}
-                    className="rounded-full px-4 py-2 text-sm font-semibold text-white/72 transition hover:bg-white/8 hover:text-white"
+                    className="nexus-nav-link"
                   >
                     {item.label}
                   </a>
@@ -75,9 +79,8 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
                 <a
                   key={item.href}
                   href={item.href}
-                  className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                    isActive ? 'bg-white text-[var(--text-inverse)]' : 'text-white/72 hover:bg-white/8 hover:text-white'
-                  }`}
+                  aria-current={isActive ? 'page' : undefined}
+                  className="nexus-nav-link"
                   onClick={(event) => handleInternalLink(event, item.href)}
                 >
                   {item.label}
@@ -122,7 +125,11 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
                 ) : (
                   <a
                     key={item.href}
-                    className="rounded-xl px-3 py-3 text-left font-semibold text-white/78"
+                    aria-current={item.href === currentPath ? 'page' : undefined}
+                    className={cx(
+                      'rounded-xl px-3 py-3 text-left font-semibold transition',
+                      item.href === currentPath ? 'bg-white !text-[color:var(--text-inverse)]' : 'text-white/78 hover:bg-white/8 hover:text-white',
+                    )}
                     href={item.href}
                     onClick={(event) => handleInternalLink(event, item.href)}
                   >
@@ -135,11 +142,11 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
         ) : null}
       </header>
 
-      <main>{children}</main>
+      <main id="main-content">{children}</main>
 
       <footer className="border-t border-white/10 bg-[var(--surface-base)]">
         <div className="mx-auto grid max-w-7xl gap-10 px-5 py-12 lg:grid-cols-[1.35fr_1fr_1fr_1fr_1fr]">
-          <div>
+          <div className="footer-card">
             <div className="mb-4 flex items-center gap-3">
               <img src="/favicon.svg" alt="" className="size-8" />
               <span className="font-black tracking-[0.16em] uppercase">Project NEXUS</span>
@@ -210,7 +217,7 @@ function FooterColumn({
   };
 
   return (
-    <div>
+    <div className="footer-card">
       <h2 className="mb-4 text-sm font-bold tracking-[0.16em] text-white/58 uppercase">{title}</h2>
       <div className="flex flex-col gap-3 text-sm text-white/70">
         {links.map(([label, href]) =>
@@ -218,13 +225,13 @@ function FooterColumn({
             <a
               key={href}
               href={href}
-              className="text-left hover:text-white"
+              className="footer-link px-2 py-1 text-left"
               onClick={nativeInternalLinks ? undefined : (event) => handleInternalLink(event, href)}
             >
               {label}
             </a>
           ) : (
-            <a key={href} href={href} className="hover:text-white">
+            <a key={href} href={href} className="footer-link px-2 py-1">
               {label}
             </a>
           ),

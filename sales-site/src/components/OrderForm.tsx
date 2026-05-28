@@ -9,6 +9,7 @@ import { useState } from 'react';
 
 import { submitSalesOrder } from '../lib/salesOrderApi';
 import { formatCurrency, formatQuoteAmount, type QuoteEstimate } from '../lib/pricingEngine';
+import { ProcessSteps } from './SalesPrimitives';
 
 interface OrderFormProps {
   quote: QuoteEstimate;
@@ -72,7 +73,7 @@ export default function OrderForm({ quote }: OrderFormProps) {
   };
 
   return (
-    <Card className="scroll-mt-28 border border-white/10 bg-white/[0.065] p-5" id="order">
+    <Card className="nexus-surface nexus-surface--raised scroll-mt-28 p-5" id="order">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="flex items-center gap-2 text-sm font-bold tracking-[0.16em] text-[var(--color-accent)] uppercase">
@@ -93,13 +94,8 @@ export default function OrderForm({ quote }: OrderFormProps) {
         </div>
       </div>
 
-      <div className="mt-5 grid gap-3 md:grid-cols-4">
-        {['Form received', 'Discovery review', 'Written quote', 'Order agreement'].map((stage, index) => (
-          <div key={stage} className="rounded-xl border border-white/10 bg-black/18 p-3">
-            <p className="text-xs font-black text-[var(--color-primary)]">0{index + 1}</p>
-            <p className="mt-1 text-sm font-bold text-white">{stage}</p>
-          </div>
-        ))}
+      <div className="mt-5">
+        <ProcessSteps steps={['Form received', 'Discovery review', 'Written quote', 'Order agreement']} />
       </div>
 
       <div className="mt-5 grid gap-4 rounded-2xl border border-white/10 bg-black/18 p-4 lg:grid-cols-[0.9fr_1.1fr]">
@@ -123,9 +119,10 @@ export default function OrderForm({ quote }: OrderFormProps) {
                 <div key={`${item.id}-${item.cadence}`} className="grid gap-2 rounded-xl border border-white/10 bg-white/[0.035] p-3 text-sm sm:grid-cols-[1fr_auto] sm:items-center">
                   <span className="font-semibold text-white/78">{item.label}</span>
                   <span className="font-black text-[var(--color-primary)]">
-                    {quote.pricingMode === 'custom' && item.amountEur === 0
+                    {item.priceLabel ??
+                    (quote.pricingMode === 'custom' && item.amountEur === 0
                       ? 'Custom quote'
-                      : `${formatCurrency(item.amountEur)}${item.cadence === 'monthly' ? '/mo' : ''}`}
+                      : `${formatCurrency(item.amountEur)}${item.cadence === 'monthly' ? '/mo' : ''}`)}
                   </span>
                 </div>
               ))
