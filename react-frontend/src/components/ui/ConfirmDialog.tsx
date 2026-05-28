@@ -34,7 +34,8 @@ import {
   type ReactNode,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertDialog, Button } from '@heroui/react';
+import { AlertDialog } from './AlertDialog';
+import { Button } from './Button';
 
 type ConfirmStatus = 'accent' | 'success' | 'warning' | 'danger';
 

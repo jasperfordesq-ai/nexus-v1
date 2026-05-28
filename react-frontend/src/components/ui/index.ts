@@ -16,6 +16,7 @@ export { ImagePlaceholder } from './ImagePlaceholder';
 export { DynamicIcon, ICON_MAP, ICON_NAMES } from './DynamicIcon';
 export { ConfettiCelebration } from './ConfettiCelebration';
 export { Alert, type AlertProps } from './Alert';
+export { AlertDialog, type AlertDialogProps } from './AlertDialog';
 export { Link, type LinkProps } from './Link';
 export { Code, type CodeProps } from './Code';
 export { Snippet, type SnippetProps } from './Snippet';

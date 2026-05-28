@@ -15,7 +15,6 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { createPortal } from 'react-dom';
 import { FocusScope } from '@react-aria/focus';
 import { motion, AnimatePresence } from '@/lib/motion';
 
@@ -33,7 +32,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
 import type { StoryUser } from '@/components/feed/StoriesBar';
-import { Button, Avatar, useConfirm } from '@/components/ui';
+import { Button, Avatar, Modal, ModalBody, ModalContent, useConfirm } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -536,11 +535,23 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
 
   if (!currentUserStory) return null;
 
-  const storyContent = (
-    <div
-      className="fixed inset-0 z-[9999] bg-black flex items-center justify-center"
-      role="dialog"
-      aria-modal="true"
+  return (
+    <Modal
+      isOpen
+      onClose={onClose}
+      size="full"
+      backdrop="opaque"
+      hideCloseButton
+      classNames={{
+        base: 'h-dvh max-h-dvh border-0 bg-black p-0 text-white shadow-none',
+        backdrop: 'bg-black',
+        body: 'p-0',
+        wrapper: 'p-0',
+      }}
+    >
+      <ModalContent>
+        <ModalBody
+      className="relative flex h-dvh items-center justify-center overflow-hidden"
       aria-label={t('viewer.story_from', { name: currentUserStory.name })}
     >
       {/* Desktop: previous user arrow */}
@@ -1127,10 +1138,10 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
           onClick={() => { setShowMenu(false); setIsPaused(false); }}
         />
       )}
-    </div>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
   );
-
-  return createPortal(storyContent, document.body);
 }
 
 export default StoryViewer;

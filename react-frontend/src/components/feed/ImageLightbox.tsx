@@ -20,11 +20,9 @@ import ChevronLeft from 'lucide-react/icons/chevron-left';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import Download from 'lucide-react/icons/download';
 import { useTranslation } from 'react-i18next';
-import { createPortal } from 'react-dom';
-import { FocusScope } from '@react-aria/focus';
 import { resolveAssetUrl } from '@/lib/helpers';
 import type { PostMedia } from './types';
-import { Button } from '@/components/ui';
+import { Button, Modal, ModalBody, ModalContent } from '@/components/ui';
 
 interface ImageLightboxProps {
   media: PostMedia[];
@@ -129,18 +127,25 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
     }),
   };
 
-  const lightboxContent = (
-    <FocusScope contain restoreFocus autoFocus>
-    <motion.div
+  return (
+    <Modal
+      isOpen
+      onClose={onClose}
+      size="full"
+      backdrop="blur"
+      hideCloseButton
+      classNames={{
+        base: 'h-dvh max-h-dvh border-0 bg-black/90 p-0 text-white shadow-none',
+        backdrop: 'bg-black/90 backdrop-blur-lg',
+        body: 'p-0',
+        wrapper: 'p-0',
+      }}
+    >
+      <ModalContent>
+        <ModalBody
       ref={containerRef}
-      className="fixed inset-0 z-[1000] bg-black/90 backdrop-blur-lg flex items-center justify-center"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.2 }}
+      className="relative flex h-dvh items-center justify-center overflow-hidden"
       onClick={onClose}
-      role="dialog"
-      aria-modal="true"
       aria-label={t('lightbox.aria_label')}
       tabIndex={-1}
     >
@@ -308,12 +313,8 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
           })}
         </div>
       )}
-    </motion.div>
-    </FocusScope>
-  );
-
-  return createPortal(
-    <AnimatePresence>{lightboxContent}</AnimatePresence>,
-    document.body,
+        </ModalBody>
+      </ModalContent>
+    </Modal>
   );
 }

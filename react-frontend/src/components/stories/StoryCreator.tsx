@@ -13,9 +13,7 @@
  */
 
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { createPortal } from 'react-dom';
-import { FocusScope } from '@react-aria/focus';
-import { motion } from '@/lib/motion';import X from 'lucide-react/icons/x';
+import X from 'lucide-react/icons/x';
 import Camera from 'lucide-react/icons/camera';
 import Type from 'lucide-react/icons/type';
 import BarChart3 from 'lucide-react/icons/chart-column';
@@ -38,7 +36,7 @@ import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { compressImage } from '@/lib/compress-image';
-import { Button, Input, Textarea } from '@/components/ui';
+import { Button, Input, Modal, ModalBody, ModalContent, Textarea } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -528,18 +526,22 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
     onClose();
   };
 
-  const creatorContent = (
-    <FocusScope contain restoreFocus autoFocus>
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ duration: 0.2 }}
-      className="fixed inset-0 z-[9999] bg-black flex flex-col"
-      role="dialog"
-      aria-modal="true"
-      aria-label={t('creator.title')}
+  return (
+    <Modal
+      isOpen
+      onClose={onClose}
+      size="full"
+      backdrop="opaque"
+      hideCloseButton
+      classNames={{
+        base: 'h-dvh max-h-dvh border-0 bg-black p-0 text-white shadow-none',
+        backdrop: 'bg-black',
+        body: 'p-0',
+        wrapper: 'p-0',
+      }}
     >
+      <ModalContent>
+        <ModalBody className="flex h-dvh flex-col overflow-hidden" aria-label={t('creator.title')}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 z-10">
         <Button
@@ -1189,11 +1191,10 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
           </Button>
         </div>
       </div>
-    </motion.div>
-    </FocusScope>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
   );
-
-  return createPortal(creatorContent, document.body);
 }
 
 export default StoryCreator;
