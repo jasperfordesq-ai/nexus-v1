@@ -32,7 +32,7 @@ function extractExchangePage(response: ExchangeListResponse) {
 }
 
 export default function ExchangesScreen() {
-  const { t } = useTranslation('exchanges');
+  const { t } = useTranslation(['exchanges', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
   const [search, setSearch] = useState('');

@@ -97,7 +97,7 @@ function SearchResultSkeleton() {
 }
 
 export default function SearchScreen() {
-  const { t } = useTranslation('search');
+  const { t } = useTranslation(['search', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
   const [query, setQuery] = useState('');

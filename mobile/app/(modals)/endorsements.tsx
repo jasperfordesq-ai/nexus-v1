@@ -41,7 +41,7 @@ type Tab = 'skills' | 'endorsements';
 type ListItem = Skill | Endorsement;
 
 export default function EndorsementsScreen() {
-  const { t } = useTranslation('endorsements');
+  const { t } = useTranslation(['endorsements', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
   const { user } = useAuth();

@@ -45,7 +45,7 @@ function extractMembersPage(response: MemberListResponse) {
 }
 
 export default function MembersScreen() {
-  const { t } = useTranslation('members');
+  const { t } = useTranslation(['members', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
   const [search, setSearch] = useState('');

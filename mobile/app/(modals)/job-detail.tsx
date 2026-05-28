@@ -38,7 +38,7 @@ import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 const WEB_URL = 'https://app.project-nexus.ie';
 
 export default function JobDetailScreen() {
-  const { t } = useTranslation('jobs');
+  const { t } = useTranslation(['jobs', 'common']);
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();

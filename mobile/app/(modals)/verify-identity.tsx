@@ -37,7 +37,7 @@ export default function VerifyIdentityScreen() {
 }
 
 function VerifyIdentityScreenInner() {
-  const { t } = useTranslation('settings');
+  const { t } = useTranslation(['settings', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);

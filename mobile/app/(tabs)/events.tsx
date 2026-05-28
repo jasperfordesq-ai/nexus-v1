@@ -33,7 +33,7 @@ type EventTab = 'upcoming' | 'past';
 type TFunction = (key: string, options?: Record<string, unknown>) => string;
 
 export default function EventsScreen() {
-  const { t } = useTranslation('events');
+  const { t } = useTranslation(['events', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
   const [when, setWhen] = useState<EventTab>('upcoming');

@@ -37,7 +37,7 @@ import { formatRelativeTime } from '@/lib/utils/formatRelativeTime';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 export default function NotificationsScreen() {
-  const { t } = useTranslation('notifications');
+  const { t } = useTranslation(['notifications', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
   const [markingAll, setMarkingAll] = useState(false);

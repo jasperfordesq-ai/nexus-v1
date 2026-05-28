@@ -462,7 +462,7 @@ function SegmentButton({
 }
 
 export default function GamificationScreen() {
-  const { t } = useTranslation('gamification');
+  const { t } = useTranslation(['gamification', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
 

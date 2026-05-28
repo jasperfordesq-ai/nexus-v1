@@ -67,7 +67,7 @@ function savePrivacyPrefs(prefs: PrivacyPrefs): Promise<void> {
 }
 
 export default function SettingsScreen() {
-  const { t } = useTranslation('settings');
+  const { t } = useTranslation(['settings', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
 

@@ -28,7 +28,7 @@ const PIPELINE_COLUMNS = ['pending', 'screening', 'reviewed', 'shortlisted', 'in
 type PipelineStatus = (typeof PIPELINE_COLUMNS)[number];
 
 export default function JobPipelineScreen() {
-  const { t } = useTranslation('jobs');
+  const { t } = useTranslation(['jobs', 'common']);
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();

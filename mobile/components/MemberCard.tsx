@@ -21,7 +21,7 @@ interface MemberCardProps {
 }
 
 export default function MemberCard({ member }: MemberCardProps) {
-  const { t } = useTranslation('members');
+  const { t } = useTranslation(['members', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
 

@@ -32,7 +32,7 @@ import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 const WEB_URL = 'https://app.project-nexus.ie';
 
 export default function BlogPostScreen() {
-  const { t } = useTranslation('blog');
+  const { t } = useTranslation(['blog', 'common']);
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();

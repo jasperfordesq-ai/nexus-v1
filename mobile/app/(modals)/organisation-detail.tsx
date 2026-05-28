@@ -47,7 +47,7 @@ function getStatusLabel(status: string | null | undefined, t: (key: string) => s
 }
 
 export default function OrganisationDetailScreen() {
-  const { t } = useTranslation('organisations');
+  const { t } = useTranslation(['organisations', 'common']);
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();

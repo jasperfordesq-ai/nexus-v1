@@ -20,7 +20,7 @@ import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import Button from '@/components/ui/Button';
 
 export default function SelectTenantScreen() {
-  const { t } = useTranslation('auth');
+  const { t } = useTranslation(['auth', 'common']);
   const router = useRouter();
   const { isAuthenticated } = useAuthContext();
   const { setTenantSlug, tenantSlug } = useTenant();

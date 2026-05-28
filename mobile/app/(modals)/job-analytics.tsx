@@ -34,7 +34,7 @@ const APPLICATION_STATUSES = new Set([
 ]);
 
 export default function JobAnalyticsScreen() {
-  const { t } = useTranslation('jobs');
+  const { t } = useTranslation(['jobs', 'common']);
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();

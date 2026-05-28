@@ -37,7 +37,7 @@ export default function EventDetailScreen() {
 }
 
 function EventDetailScreenInner() {
-  const { t } = useTranslation('events');
+  const { t } = useTranslation(['events', 'common']);
   const { id } = useLocalSearchParams<{ id: string }>();
   const { user } = useAuth();
   const primary = usePrimaryColor();

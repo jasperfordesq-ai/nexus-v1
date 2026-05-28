@@ -40,7 +40,7 @@ function makeLoginSchema(t: (key: string) => string) {
 type LoginFormValues = { email: string; password: string };
 
 export default function LoginScreen() {
-  const { t } = useTranslation('auth');
+  const { t } = useTranslation(['auth', 'common']);
   const { login: authLogin } = useAuth();
   const router = useRouter();
   const primary = usePrimaryColor();

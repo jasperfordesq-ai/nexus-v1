@@ -43,7 +43,7 @@ interface FieldErrors {
 }
 
 export default function EditProfileScreen() {
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation(['profile', 'common']);
   const navigation = useNavigation();
   const { user, refreshUser } = useAuth();
   const primary = usePrimaryColor();

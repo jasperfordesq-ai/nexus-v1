@@ -60,7 +60,7 @@ type RegisterFormValues = {
 };
 
 export default function RegisterScreen() {
-  const { t } = useTranslation('auth');
+  const { t } = useTranslation(['auth', 'common']);
   const { setSession } = useAuth();
   const authRouter = useRouter();
   const primary = usePrimaryColor();

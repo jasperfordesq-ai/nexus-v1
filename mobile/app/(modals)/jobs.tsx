@@ -433,7 +433,7 @@ function ApplicationCard({
 // ---------------------------------------------------------------------------
 
 export default function JobsScreen() {
-  const { t } = useTranslation('jobs');
+  const { t } = useTranslation(['jobs', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
 

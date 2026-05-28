@@ -61,7 +61,7 @@ const FILTER_OPTIONS: Array<{ key: FeedFilter; icon: keyof typeof Ionicons.glyph
 const LISTING_SUBFILTERS = ['offer', 'request'] as const;
 
 export default function HomeScreen() {
-  const { t } = useTranslation('home');
+  const { t } = useTranslation(['home', 'common']);
   const { user, displayName } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();

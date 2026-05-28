@@ -29,7 +29,7 @@ import FormActionFooter from '@/components/ui/FormActionFooter';
 import OfflineBanner from '@/components/OfflineBanner';
 
 export default function ChangePasswordScreen() {
-  const { t } = useTranslation('settings');
+  const { t } = useTranslation(['settings', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
 

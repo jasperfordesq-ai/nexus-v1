@@ -76,7 +76,29 @@ export default Sentry.wrap(RootLayout);
  * Separated from RootLayout so it can consume AuthContext.
  */
 function RootNavigator() {
-  const { t } = useTranslation();
+  const { t } = useTranslation([
+    'blog',
+    'chat',
+    'common',
+    'endorsements',
+    'events',
+    'exchanges',
+    'federation',
+    'gamification',
+    'goals',
+    'groups',
+    'jobs',
+    'marketplace',
+    'members',
+    'messages',
+    'notifications',
+    'organisations',
+    'profile',
+    'search',
+    'settings',
+    'volunteering',
+    'wallet',
+  ]);
   const { isLoading, isAuthenticated } = useAuthContext();
   const pathname = usePathname();
   const isTenantSelectionPath =

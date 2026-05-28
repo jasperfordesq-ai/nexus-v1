@@ -40,7 +40,7 @@ function extractBlogPage(response: BlogListResponse) {
 }
 
 export default function BlogScreen() {
-  const { t } = useTranslation('blog');
+  const { t } = useTranslation(['blog', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
   const [search, setSearch] = useState('');
