@@ -8,10 +8,14 @@ import { Alert } from 'react-native';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 const mockCreateGroup = jest.fn().mockResolvedValue({ data: { id: 484 } });
+const mockGetGroup = jest.fn();
+const mockUpdateGroup = jest.fn();
 const mockReplace = jest.fn();
+let mockSearchParams: Record<string, string | undefined> = {};
 
 jest.mock('expo-router', () => ({
   router: { replace: (...args: unknown[]) => mockReplace(...args), back: jest.fn() },
+  useLocalSearchParams: () => mockSearchParams,
 }));
 
 jest.mock('react-i18next', () => ({
@@ -20,6 +24,7 @@ jest.mock('react-i18next', () => ({
       const map: Record<string, string> = {
         'create.eyebrow': 'New group',
         'create.title': 'Create Group',
+        'create.editTitle': 'Edit Group',
         'create.subtitle': 'Start a community space.',
         'create.nameLabel': 'Group name',
         'create.namePlaceholder': 'Name your group',
@@ -30,8 +35,10 @@ jest.mock('react-i18next', () => ({
         'create.visibilityLabel': 'Visibility',
         'create.federated': 'List in federation',
         'create.reviewTitle': 'Ready to publish?',
+        'create.editReviewTitle': 'Ready to save?',
         'create.reviewSubtitle': 'Check first.',
         'create.submit': 'Create group',
+        'create.updateSubmit': 'Update group',
         'create.validationTitle': 'Check group details',
         'create.validationRequired': 'Add a group name and description before continuing.',
         'create.validationNameLength': 'Use 3 to 100 characters for the group name.',
@@ -58,6 +65,8 @@ jest.mock('@/lib/hooks/useTheme', () => ({
 }));
 jest.mock('@/lib/api/groups', () => ({
   createGroup: (...args: unknown[]) => mockCreateGroup(...args),
+  getGroup: (...args: unknown[]) => mockGetGroup(...args),
+  updateGroup: (...args: unknown[]) => mockUpdateGroup(...args),
 }));
 jest.mock('@/lib/haptics', () => ({
   notificationAsync: jest.fn().mockResolvedValue(undefined),
@@ -97,7 +106,11 @@ import NewGroupRoute from './new-group';
 describe('NewGroupRoute', () => {
   beforeEach(() => {
     mockCreateGroup.mockClear();
+    mockGetGroup.mockReset();
+    mockUpdateGroup.mockReset();
+    mockUpdateGroup.mockResolvedValue({ data: { id: 484 } });
     mockReplace.mockClear();
+    mockSearchParams = {};
     jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
   });
 
@@ -161,5 +174,47 @@ describe('NewGroupRoute', () => {
       }));
     });
     expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/group-detail', params: { id: '484' } });
+  });
+
+  it('loads an existing group and submits updates in edit mode', async () => {
+    mockSearchParams = { id: '9' };
+    mockGetGroup.mockResolvedValue({
+      data: {
+        id: 9,
+        name: 'Garden crew',
+        description: 'A group for coordinating seasonal planting and shared gardening days.',
+        visibility: 'private',
+        location: 'Community garden',
+        federated_visibility: 'listed',
+      },
+    });
+    mockUpdateGroup.mockResolvedValue({ data: { id: 9 } });
+
+    const { getByDisplayValue, getByPlaceholderText, getByText } = render(<NewGroupRoute />);
+
+    await waitFor(() => {
+      expect(getByDisplayValue('Garden crew')).toBeTruthy();
+    });
+
+    expect(getByDisplayValue('A group for coordinating seasonal planting and shared gardening days.')).toBeTruthy();
+    expect(getByDisplayValue('Community garden')).toBeTruthy();
+
+    fireEvent.changeText(getByPlaceholderText('Name your group'), 'Garden exchange');
+    fireEvent.changeText(getByPlaceholderText('What is this group for?'), 'A group for coordinating tool swaps, planting help, and shared gardening days.');
+    fireEvent.press(getByText('Public'));
+    fireEvent.press(getByText('List in federation'));
+    fireEvent.press(getByText('Update group'));
+
+    await waitFor(() => {
+      expect(mockUpdateGroup).toHaveBeenCalledWith(9, expect.objectContaining({
+        name: 'Garden exchange',
+        description: 'A group for coordinating tool swaps, planting help, and shared gardening days.',
+        visibility: 'public',
+        location: 'Community garden',
+        federated_visibility: 'none',
+      }));
+    });
+    expect(mockCreateGroup).not.toHaveBeenCalled();
+    expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/group-detail', params: { id: '9' } });
   });
 });

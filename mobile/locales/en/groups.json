@@ -88,6 +88,8 @@
       "members": "Members",
       "posts": "Posts"
     },
+    "ownerTools": "Group tools",
+    "edit": "Edit group",
     "notFound": "Group not found.",
     "invalidId": "Invalid group ID.",
     "goBack": "Go back"
@@ -101,6 +103,7 @@
   "create": {
     "eyebrow": "New group",
     "title": "Create Group",
+    "editTitle": "Edit Group",
     "subtitle": "Start a community space for discussions, updates, and shared activity.",
     "nameLabel": "Group name",
     "namePlaceholder": "Name your group",
@@ -111,13 +114,19 @@
     "visibilityLabel": "Visibility",
     "federated": "List in federation",
     "reviewTitle": "Ready to publish?",
+    "editReviewTitle": "Ready to save?",
     "reviewSubtitle": "Check the group name, visibility, location, and federation listing before creating it.",
     "submit": "Create group",
+    "updateSubmit": "Update group",
     "validationTitle": "Check group details",
     "validationRequired": "Add a group name and description before continuing.",
     "validationNameLength": "Use 3 to 100 characters for the group name.",
     "validationDescriptionLength": "Use 20 to 2000 characters for the group description.",
     "failedTitle": "Group not created",
+    "loadFailedTitle": "Group not loaded",
+    "loadFailed": "We could not load the group details. Please try again.",
+    "saveFailedTitle": "Group not saved",
+    "saveFailedDescription": "We could not save the group. Please try again.",
     "failedDescription": "We could not create the group. Please try again."
   }
 }

@@ -3,16 +3,16 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert, ScrollView, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Text } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 
-import { createGroup } from '@/lib/api/groups';
+import { createGroup, getGroup, updateGroup, type GroupDetail } from '@/lib/api/groups';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
@@ -35,14 +35,49 @@ export default function NewGroupRoute() {
 
 function NewGroupScreen() {
   const { t } = useTranslation(['groups', 'common']);
+  const params = useLocalSearchParams<{ id?: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const groupId = Number(params.id);
+  const isEditing = Number.isFinite(groupId) && groupId > 0;
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
   const [visibility, setVisibility] = useState<'public' | 'private'>('public');
   const [isFederated, setIsFederated] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasHydratedEdit, setHasHydratedEdit] = useState(false);
+  const fallbackHref = isEditing
+    ? ({ pathname: '/(modals)/group-detail', params: { id: String(groupId) } } as unknown as Href)
+    : '/(tabs)/groups';
+
+  useEffect(() => {
+    if (!isEditing || hasHydratedEdit) return;
+
+    let isMounted = true;
+    getGroup(groupId)
+      .then((response) => {
+        if (!isMounted) return;
+        hydrateFromGroup(response.data);
+        setHasHydratedEdit(true);
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        Alert.alert(t('create.loadFailedTitle'), t('create.loadFailed'));
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [groupId, hasHydratedEdit, isEditing, t]);
+
+  function hydrateFromGroup(group: GroupDetail) {
+    setName(group.name ?? '');
+    setDescription(group.description ?? '');
+    setLocation(group.location ?? '');
+    setVisibility(group.visibility === 'private' ? 'private' : 'public');
+    setIsFederated(group.federated_visibility === 'listed' || group.federated_visibility === 'joinable');
+  }
 
   async function submit() {
     const trimmedName = name.trim();
@@ -65,22 +100,26 @@ function NewGroupScreen() {
 
     setIsSubmitting(true);
     try {
-      const result = await createGroup({
+      const payload = {
         name: trimmedName,
         description: trimmedDescription,
         location: location.trim() || null,
         visibility,
         federated_visibility: isFederated ? 'listed' : 'none',
-      });
+      } as const;
+      const result = isEditing ? await updateGroup(groupId, payload) : await createGroup(payload);
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      const id = result.data?.id;
+      const id = result.data?.id ?? groupId;
       if (id) {
         router.replace({ pathname: '/(modals)/group-detail', params: { id: String(id) } });
       } else {
         router.back();
       }
     } catch (error) {
-      Alert.alert(t('create.failedTitle'), error instanceof Error ? error.message : t('create.failedDescription'));
+      Alert.alert(
+        isEditing ? t('create.saveFailedTitle') : t('create.failedTitle'),
+        error instanceof Error ? error.message : (isEditing ? t('create.saveFailedDescription') : t('create.failedDescription')),
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -88,7 +127,11 @@ function NewGroupScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <AppTopBar title={t('create.title')} backLabel={t('common:back')} fallbackHref="/(tabs)/groups" />
+      <AppTopBar
+        title={isEditing ? t('create.editTitle') : t('create.title')}
+        backLabel={t('common:back')}
+        fallbackHref={fallbackHref}
+      />
       <ScrollView className="flex-1" contentContainerStyle={{ padding: 16, paddingBottom: 120 }}>
         <HeroCard className="mb-4 overflow-hidden rounded-panel p-0">
           <View className="h-1.5" style={{ backgroundColor: primary }} />
@@ -99,7 +142,7 @@ function NewGroupScreen() {
               </View>
               <View className="min-w-0 flex-1">
                 <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('create.eyebrow')}</Text>
-                <Text className="text-2xl font-bold" style={{ color: theme.text }}>{t('create.title')}</Text>
+                <Text className="text-2xl font-bold" style={{ color: theme.text }}>{isEditing ? t('create.editTitle') : t('create.title')}</Text>
                 <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('create.subtitle')}</Text>
               </View>
             </View>
@@ -135,9 +178,9 @@ function NewGroupScreen() {
         </HeroCard>
       </ScrollView>
       <FormActionFooter
-        title={t('create.reviewTitle')}
+        title={isEditing ? t('create.editReviewTitle') : t('create.reviewTitle')}
         subtitle={t('create.reviewSubtitle')}
-        submitLabel={t('create.submit')}
+        submitLabel={isEditing ? t('create.updateSubmit') : t('create.submit')}
         primary={primary}
         isSubmitting={isSubmitting}
         onSubmit={submit}

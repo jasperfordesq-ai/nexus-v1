@@ -16,7 +16,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, router } from 'expo-router';
+import { useLocalSearchParams, router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
@@ -306,6 +306,11 @@ function GroupDetailScreenInner() {
   const displayDescription = loadedGroup.long_description ?? loadedGroup.description;
   const image = groupImage(loadedGroup);
   const userCanSeeMemberContent = currentIsMember;
+  const canManageGroup = loadedGroup.viewer_membership?.is_admin === true;
+
+  function openEditGroup() {
+    router.push({ pathname: '/(modals)/edit-group', params: { id: String(loadedGroup.id) } } as unknown as Href);
+  }
 
   async function handleJoin() {
     const prevIsMember = isMember ?? isGroupMember(loadedGroup);
@@ -488,6 +493,16 @@ function GroupDetailScreenInner() {
                 </>
               )}
             </HeroButton>
+
+            {canManageGroup ? (
+              <Surface variant="secondary" className="gap-3 rounded-panel-inner p-4">
+                <SectionTitle title={t('detail.ownerTools')} />
+                <HeroButton variant="secondary" onPress={openEditGroup}>
+                  <Ionicons name="create-outline" size={18} color={primary} />
+                  <HeroButton.Label>{t('detail.edit')}</HeroButton.Label>
+                </HeroButton>
+              </Surface>
+            ) : null}
           </HeroCard.Body>
         </HeroCard>
 

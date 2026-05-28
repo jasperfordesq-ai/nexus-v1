@@ -8,9 +8,11 @@ import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 // --- Mocks ---
 
+const mockRouterPush = jest.fn();
+
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }),
-  router: { push: jest.fn(), replace: jest.fn(), back: jest.fn() },
+  router: { push: (...args: unknown[]) => mockRouterPush(...args), replace: jest.fn(), back: jest.fn() },
   useLocalSearchParams: () => ({ id: '1' }),
   useNavigation: () => ({ setOptions: jest.fn() }),
 }));
@@ -53,6 +55,8 @@ jest.mock('react-i18next', () => ({
         'detail.roles.member': 'Member',
         'detail.stats.members': 'Members',
         'detail.stats.posts': 'Posts',
+        'detail.ownerTools': 'Group tools',
+        'detail.edit': 'Edit group',
         'featured': 'Featured',
         'private': 'Private',
         'public': 'Public',
@@ -136,6 +140,7 @@ const defaultApiState = { data: null, isLoading: true, error: null, refresh: jes
 
 beforeEach(() => {
   mockUseApi.mockReturnValue(defaultApiState);
+  mockRouterPush.mockClear();
   jest.clearAllMocks();
 });
 
@@ -242,5 +247,26 @@ describe('GroupDetailScreen', () => {
       expect(joinGroup).toHaveBeenCalledWith(1);
       expect(getByText('Leave')).toBeTruthy();
     });
+  });
+
+  it('shows an edit action for group admins', () => {
+    mockUseApi.mockReturnValue({
+      data: {
+        data: {
+          ...mockGroupDetail,
+          is_member: true,
+          viewer_membership: { status: 'active', role: 'admin', is_admin: true },
+        },
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByText } = render(<GroupDetailScreen />);
+
+    fireEvent.press(getByText('Edit group'));
+
+    expect(mockRouterPush).toHaveBeenCalledWith({ pathname: '/(modals)/edit-group', params: { id: '1' } });
   });
 });

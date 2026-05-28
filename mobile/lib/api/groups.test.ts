@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 jest.mock('@/lib/api/client', () => ({
-  api: { get: jest.fn(), post: jest.fn(), delete: jest.fn(), patch: jest.fn() },
+  api: { get: jest.fn(), post: jest.fn(), put: jest.fn(), delete: jest.fn(), patch: jest.fn() },
   ApiResponseError: class ApiResponseError extends Error {
     status!: number;
     constructor(status: number, message: string) { super(message); this.status = status; this.name = 'ApiResponseError'; }
@@ -20,7 +20,7 @@ jest.mock('@/lib/constants', () => ({
 }));
 
 import { api } from '@/lib/api/client';
-import { getGroups, getGroup, joinGroup, leaveGroup } from './groups';
+import { getGroups, getGroup, joinGroup, leaveGroup, updateGroup } from './groups';
 import type { GroupsResponse, GroupDetail } from './groups';
 
 const mockGroupsResponse: GroupsResponse = {
@@ -116,6 +116,31 @@ describe('getGroup', () => {
     expect(api.get).toHaveBeenCalledWith('/api/v2/groups/42');
     expect(result.data.id).toBe(1);
     expect(result.data.admin.name).toBe('Admin User');
+  });
+});
+
+describe('updateGroup', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('sends PUT to the group endpoint with editable group fields', async () => {
+    (api.put as jest.Mock).mockResolvedValue({ data: { ...mockGroupDetail, name: 'Updated Group' } });
+
+    const result = await updateGroup(42, {
+      name: 'Updated Group',
+      description: 'An updated group description that meets the mobile parity rules.',
+      visibility: 'private',
+      location: 'Community hall',
+      federated_visibility: 'listed',
+    });
+
+    expect(api.put).toHaveBeenCalledWith('/api/v2/groups/42', {
+      name: 'Updated Group',
+      description: 'An updated group description that meets the mobile parity rules.',
+      visibility: 'private',
+      location: 'Community hall',
+      federated_visibility: 'listed',
+    });
+    expect(result.data.name).toBe('Updated Group');
   });
 });
 

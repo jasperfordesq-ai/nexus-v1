@@ -18,10 +18,16 @@ export interface Group {
   description: string | null;
   visibility: 'public' | 'private';
   cover_image: string | null;
+  image_url?: string | null;
   is_featured: boolean;
   member_count: number;
   posts_count: number;
   is_member: boolean;
+  owner_id?: number | null;
+  location?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  federated_visibility?: 'none' | 'listed' | 'joinable' | string | null;
   created_at: string;
   recent_members: GroupMember[];
 }
@@ -29,7 +35,13 @@ export interface Group {
 export interface GroupDetail extends Group {
   long_description?: string | null;
   admin: GroupMember;
+  creator?: GroupMember | null;
   tags?: string[];
+  viewer_membership?: {
+    status?: string | null;
+    role?: string | null;
+    is_admin?: boolean;
+  } | null;
 }
 
 export interface GroupMemberListItem extends GroupMember {
@@ -90,6 +102,8 @@ export interface CreateGroupPayload {
   description?: string;
   visibility?: 'public' | 'private';
   location?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   federated_visibility?: 'none' | 'listed' | 'joinable';
 }
 
@@ -120,6 +134,10 @@ export function getGroup(id: number): Promise<{ data: GroupDetail }> {
  */
 export function createGroup(payload: CreateGroupPayload): Promise<{ data: GroupDetail }> {
   return api.post<{ data: GroupDetail }>(`${API_V2}/groups`, payload);
+}
+
+export function updateGroup(id: number, payload: CreateGroupPayload): Promise<{ data: GroupDetail }> {
+  return api.put<{ data: GroupDetail }>(`${API_V2}/groups/${id}`, payload);
 }
 
 /**
