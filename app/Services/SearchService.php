@@ -344,7 +344,7 @@ class SearchService
             'moderation_status' => $listing->moderation_status ?? 'approved',
             'type'          => $listing->type,
             'category_id'   => $listing->category_id,
-            'category_name' => $listing->category?->name ?? '',
+            'category_name' => ($listing->relationLoaded('category') ? $listing->getRelation('category')?->name : null) ?? '',
             'author_name'   => $listing->user
                 ? trim($listing->user->first_name . ' ' . $listing->user->last_name)
                 : '',

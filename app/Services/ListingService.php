@@ -404,7 +404,10 @@ class ListingService
             'tagline'    => $user->tagline,
         ] : null;
 
-        $cat = $listing->category;
+        // The listings table has a legacy `category` timestamp column that shadows
+        // the category() BelongsTo relation via magic __get. Read the eager-loaded
+        // relation explicitly.
+        $cat = $listing->relationLoaded('category') ? $listing->getRelation('category') : null;
         $data['category_name']  = $cat?->name;
         $data['category_color'] = $cat?->color;
 
@@ -703,9 +706,10 @@ class ListingService
             $data['user'] = null;
         }
 
-        // Category
-        $data['category_name'] = $listing->category?->name;
-        $data['category_color'] = $listing->category?->color;
+        // Category — `category` column on listings shadows the relation, read it explicitly.
+        $cat = $listing->relationLoaded('category') ? $listing->getRelation('category') : null;
+        $data['category_name'] = $cat?->name;
+        $data['category_color'] = $cat?->color;
 
         // Engagement counts (wrapped in try/catch — tables may not exist during migration)
         try {
@@ -890,8 +894,9 @@ class ListingService
                 'avatar'     => $user->avatar_url,
                 'avatar_url' => $user->avatar_url,
             ] : null;
-            $data['category_name'] = $listing->category?->name;
-            $data['category_color'] = $listing->category?->color;
+            $cat = $listing->relationLoaded('category') ? $listing->getRelation('category') : null;
+            $data['category_name'] = $cat?->name;
+            $data['category_color'] = $cat?->color;
             $data['distance_km'] = round((float) $listing->distance_km, 2);
             $data['is_favorited'] = isset($savedIds[$listing->id]);
             $data['can_edit'] = $currentUserId === $listing->user_id;
@@ -944,8 +949,9 @@ class ListingService
                     ? $user->organization_name
                     : trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
                 $data['author_avatar'] = $user->avatar_url ?? null;
-                $data['category_name'] = $listing->category?->name;
-                $data['category_color'] = $listing->category?->color;
+                $cat = $listing->relationLoaded('category') ? $listing->getRelation('category') : null;
+                $data['category_name'] = $cat?->name;
+                $data['category_color'] = $cat?->color;
                 return $data;
             })
             ->all();
