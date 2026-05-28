@@ -106,7 +106,7 @@ class MarketplacePromotionController extends BaseApiController
                 'started_at' => $promotion->started_at?->toISOString(),
                 'expires_at' => $promotion->expires_at?->toISOString(),
                 'is_active' => $promotion->is_active,
-            ], 201);
+            ], null, 201);
         } catch (\InvalidArgumentException $e) {
             return $this->respondWithError('INVALID_INPUT', $e->getMessage(), null, 422);
         }

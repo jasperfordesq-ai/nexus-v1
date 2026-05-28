@@ -7,9 +7,12 @@
 namespace Tests\Laravel\Feature\Controllers;
 
 use Tests\Laravel\TestCase;
+use App\Core\TenantContext;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use App\Models\User;
+use App\Services\MarketplaceConfigurationService;
 
 /**
  * Smoke tests for MarketplacePromotionController.
@@ -59,5 +62,53 @@ class MarketplacePromotionControllerTest extends TestCase
         $this->authenticatedUser();
         $response = $this->apiGet('/v2/marketplace/promotions/mine');
         $this->assertLessThan(500, $response->status());
+    }
+
+    public function test_promote_own_listing_returns_created_response(): void
+    {
+        $user = $this->authenticatedUser();
+        $this->enableMarketplacePromotions();
+
+        $listingId = DB::table('marketplace_listings')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'title' => 'Promotion test listing',
+            'description' => 'A listing used to verify promotion creation.',
+            'price' => 10,
+            'price_currency' => 'EUR',
+            'price_type' => 'fixed',
+            'condition' => 'good',
+            'quantity' => 1,
+            'delivery_method' => 'pickup',
+            'seller_type' => 'private',
+            'status' => 'active',
+            'moderation_status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->apiPost("/v2/marketplace/listings/{$listingId}/promote", [
+            'promotion_type' => 'bump',
+        ]);
+
+        $response->assertCreated();
+        $response->assertJsonPath('data.promotion_type', 'bump');
+        $this->assertDatabaseHas('marketplace_promotions', [
+            'tenant_id' => $this->testTenantId,
+            'marketplace_listing_id' => $listingId,
+            'user_id' => $user->id,
+            'promotion_type' => 'bump',
+            'is_active' => 1,
+        ]);
+    }
+
+    private function enableMarketplacePromotions(): void
+    {
+        DB::table('tenants')
+            ->where('id', $this->testTenantId)
+            ->update(['features' => json_encode(['marketplace' => true])]);
+        TenantContext::setById($this->testTenantId);
+
+        MarketplaceConfigurationService::set(MarketplaceConfigurationService::CONFIG_PROMOTIONS_ENABLED, true);
     }
 }
