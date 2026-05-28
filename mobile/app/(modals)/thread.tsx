@@ -89,12 +89,17 @@ function ThreadScreenInner() {
   const listingId = parsePositiveInt(firstParam(listing));
   const contextType = firstParam(context_type);
   const contextId = parsePositiveInt(firstParam(context_id));
-  const threadContext = useMemo(() => resolveThreadContext(listingId, contextType, contextId), [contextId, contextType, listingId]);
 
   const { data, isLoading, error, refresh } = useApi(
     () => (isNewConversation ? getOrCreateThread(safeThreadLookupId) : getThread(safeThreadLookupId)),
     [safeThreadLookupId, isNewConversation],
     { enabled: isValidId },
+  );
+
+  const messageThreadContext = useMemo(() => resolveMessageThreadContext(data?.data), [data?.data]);
+  const threadContext = useMemo(
+    () => resolveThreadContext(listingId, contextType, contextId) ?? messageThreadContext,
+    [contextId, contextType, listingId, messageThreadContext],
   );
 
   const [messages, setMessages] = useState<Message[]>([]);
@@ -540,6 +545,17 @@ function resolveThreadContext(listingId: number | undefined, contextType: string
   return { type: contextType, id: contextId };
 }
 
+function resolveMessageThreadContext(messages: Message[] | undefined): ThreadContext | null {
+  if (!messages?.length) return null;
+  for (const message of messages) {
+    const listingId = parsePositiveIntValue(message.listing_id);
+    const contextId = parsePositiveIntValue(message.context_id);
+    const context = resolveThreadContext(listingId, message.context_type ?? undefined, contextId);
+    if (context) return context;
+  }
+  return null;
+}
+
 function isThreadContextType(value: string): value is ThreadContextType {
   return Object.prototype.hasOwnProperty.call(THREAD_CONTEXT_CONFIG, value);
 }
@@ -547,6 +563,12 @@ function isThreadContextType(value: string): value is ThreadContextType {
 function parsePositiveInt(value: string | undefined): number | undefined {
   if (!value) return undefined;
   const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
+}
+
+function parsePositiveIntValue(value: number | string | null | undefined): number | undefined {
+  if (value == null) return undefined;
+  const parsed = typeof value === 'number' ? value : Number.parseInt(value, 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
 }
 

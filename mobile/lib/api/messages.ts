@@ -73,6 +73,9 @@ export interface Message {
   audio_url: string | null;
   reactions: Record<string, number>;
   is_read: boolean;
+  listing_id?: number | null;
+  context_type?: string | null;
+  context_id?: number | null;
 }
 
 export interface ConversationListResponse {

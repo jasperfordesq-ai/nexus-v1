@@ -320,6 +320,32 @@ describe('ThreadScreen', () => {
     });
   });
 
+  it('shows context cards from loaded message metadata for existing conversations', () => {
+    mockUseApi.mockReturnValue({
+      data: {
+        data: [
+          { ...mockMessages[0], context_type: 'event', context_id: 12 },
+          mockMessages[1],
+        ],
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByLabelText, getByText } = render(<ThreadScreen />);
+
+    expect(getByText('Regarding')).toBeTruthy();
+    expect(getByText('Event #12')).toBeTruthy();
+
+    fireEvent.press(getByLabelText('Open context'));
+
+    expect(mockRouterPush).toHaveBeenCalledWith({
+      pathname: '/(modals)/event-detail',
+      params: { id: '12' },
+    });
+  });
+
   it('marks realtime inbound messages as read while the thread is open', async () => {
     mockUseApi.mockReturnValue({
       data: { data: mockMessages },
