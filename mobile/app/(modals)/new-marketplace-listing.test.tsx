@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import * as ImagePicker from 'expo-image-picker';
 
 jest.mock('expo-router', () => ({
   router: { push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
@@ -48,9 +49,14 @@ jest.mock('react-i18next', () => ({
         'forms.longitudePlaceholder': '-0.1246',
         'forms.delivery': 'Delivery',
         'forms.sellerType': 'Seller type',
-        'forms.media': 'Images',
+        'forms.media': 'Media',
         'forms.addImages': 'Add images',
-        'forms.mediaHint': 'Add up to 8 images.',
+        'forms.video': 'Video',
+        'forms.addVideo': 'Add video',
+        'forms.removeVideo': 'Remove video',
+        'forms.videoSelected': 'Selected video',
+        'forms.currentVideo': 'Current video',
+        'forms.mediaHint': 'Add up to 8 images and one optional video.',
         'forms.footerCreateTitle': 'Review listing',
         'forms.footerSubtitle': 'Publish when ready.',
         'forms.publish': 'Publish',
@@ -102,7 +108,7 @@ jest.mock('@expo/vector-icons', () => ({ Ionicons: 'View' }));
 jest.mock('expo-image-picker', () => ({
   requestMediaLibraryPermissionsAsync: jest.fn(),
   launchImageLibraryAsync: jest.fn(),
-  MediaTypeOptions: { Images: 'Images' },
+  MediaTypeOptions: { Images: 'Images', Videos: 'Videos' },
 }));
 jest.mock('@/lib/haptics', () => ({
   notificationAsync: jest.fn(),
@@ -118,12 +124,17 @@ jest.mock('@/lib/api/marketplace', () => ({
   getMarketplaceListing: jest.fn(),
   updateMarketplaceListing: jest.fn(),
   uploadMarketplaceImages: jest.fn(),
+  uploadMarketplaceVideo: jest.fn(),
 }));
 
 import NewMarketplaceListingRoute from './new-marketplace-listing';
-import { generateMarketplaceDescription } from '@/lib/api/marketplace';
+import { createMarketplaceListing, generateMarketplaceDescription, uploadMarketplaceVideo } from '@/lib/api/marketplace';
 
 describe('NewMarketplaceListingRoute', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('renders optional coordinate fields for nearby search parity', async () => {
     const { getByText } = render(<NewMarketplaceListingRoute />);
 
@@ -152,5 +163,38 @@ describe('NewMarketplaceListingRoute', () => {
       });
     });
     expect(await findByDisplayValue('Generated mobile marketplace description.')).toBeTruthy();
+  });
+
+  it('uploads a selected listing video after creating the listing', async () => {
+    jest.mocked(ImagePicker.requestMediaLibraryPermissionsAsync).mockResolvedValue({ granted: true } as never);
+    jest.mocked(ImagePicker.launchImageLibraryAsync).mockResolvedValue({
+      canceled: false,
+      assets: [{ uri: 'file:///tmp/demo.mp4', fileName: 'demo.mp4', mimeType: 'video/mp4', fileSize: 1024 }],
+    } as never);
+    jest.mocked(createMarketplaceListing).mockResolvedValue({ data: { id: 77 } } as never);
+    jest.mocked(uploadMarketplaceVideo).mockResolvedValue({ data: { video_url: '/uploads/marketplace/demo.mp4' } } as never);
+
+    const { getByPlaceholderText, getByText } = render(<NewMarketplaceListingRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('What are you selling?'), 'Garden shears');
+    fireEvent.changeText(getByPlaceholderText('Details'), 'Lightly used shears with clean blades.');
+    fireEvent.press(getByText('Add video'));
+
+    await waitFor(() => {
+      expect(ImagePicker.launchImageLibraryAsync).toHaveBeenCalledWith(expect.objectContaining({
+        mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+      }));
+    });
+    expect(getByText('demo.mp4')).toBeTruthy();
+
+    fireEvent.press(getByText('Publish'));
+
+    await waitFor(() => {
+      expect(uploadMarketplaceVideo).toHaveBeenCalledWith(77, expect.objectContaining({
+        uri: 'file:///tmp/demo.mp4',
+        fileName: 'demo.mp4',
+        mimeType: 'video/mp4',
+      }));
+    });
   });
 });

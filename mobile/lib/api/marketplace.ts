@@ -51,6 +51,12 @@ export interface MarketplaceImage {
   is_primary?: boolean;
 }
 
+export interface MarketplaceVideoUpload {
+  uri: string;
+  fileName?: string | null;
+  mimeType?: string | null;
+}
+
 export interface MarketplaceListingItem {
   id: number;
   title: string;
@@ -420,10 +426,14 @@ function getUploadFilename(uri: string): string {
 
 function getMimeType(filename: string, fallback?: string | null): string {
   if (fallback?.startsWith('image/')) return fallback;
+  if (fallback?.startsWith('video/')) return fallback;
   const extension = filename.split('.').pop()?.toLowerCase();
   if (extension === 'png') return 'image/png';
   if (extension === 'webp') return 'image/webp';
   if (extension === 'gif') return 'image/gif';
+  if (extension === 'mp4') return 'video/mp4';
+  if (extension === 'webm') return 'video/webm';
+  if (extension === 'mov') return 'video/quicktime';
   return 'image/jpeg';
 }
 
@@ -444,6 +454,25 @@ async function appendMarketplaceImageFile(formData: FormData, uri: string, index
 
   const type = getMimeType(filename);
   formData.append(`image_${index}`, { uri, name: filename, type } as unknown as Blob);
+}
+
+async function appendMarketplaceVideoFile(formData: FormData, asset: MarketplaceVideoUpload): Promise<void> {
+  const filename = asset.fileName || getUploadFilename(asset.uri);
+
+  if (Platform.OS === 'web') {
+    const response = await fetch(asset.uri);
+    const blob = await response.blob();
+    const type = getMimeType(filename, asset.mimeType ?? blob.type);
+    if (typeof File !== 'undefined') {
+      formData.append('video', new File([blob], filename, { type }));
+      return;
+    }
+    formData.append('video', blob, filename);
+    return;
+  }
+
+  const type = getMimeType(filename, asset.mimeType);
+  formData.append('video', { uri: asset.uri, name: filename, type } as unknown as Blob);
 }
 
 export interface MarketplaceListingFilters {
@@ -604,6 +633,16 @@ export async function uploadMarketplaceImages(id: number, uris: string[]): Promi
   const formData = new FormData();
   await Promise.all(uris.map((uri, index) => appendMarketplaceImageFile(formData, uri, index)));
   return api.upload<MarketplaceDataResponse<MarketplaceImage[]>>(`${API_V2}/marketplace/listings/${id}/images`, formData);
+}
+
+export async function uploadMarketplaceVideo(id: number, asset: MarketplaceVideoUpload): Promise<MarketplaceDataResponse<{ video_url: string }>> {
+  const formData = new FormData();
+  await appendMarketplaceVideoFile(formData, asset);
+  return api.upload<MarketplaceDataResponse<{ video_url: string }>>(`${API_V2}/marketplace/listings/${id}/video`, formData);
+}
+
+export function deleteMarketplaceVideo(id: number): Promise<void> {
+  return api.delete<void>(`${API_V2}/marketplace/listings/${id}/video`);
 }
 
 export function getMyMarketplaceListings(

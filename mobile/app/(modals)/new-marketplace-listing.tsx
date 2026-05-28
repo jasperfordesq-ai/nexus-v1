@@ -22,14 +22,17 @@ import {
   getMarketplaceCategories,
   getMarketplaceCategoryTemplate,
   getMarketplaceListing,
+  deleteMarketplaceVideo,
   updateMarketplaceListing,
   uploadMarketplaceImages,
+  uploadMarketplaceVideo,
   type MarketplaceCategory,
   type MarketplaceCategoryTemplateField,
   type MarketplaceCondition,
   type MarketplaceDeliveryMethod,
   type MarketplaceListingPayload,
   type MarketplacePriceType,
+  type MarketplaceVideoUpload,
 } from '@/lib/api/marketplace';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
@@ -38,10 +41,17 @@ import { withAlpha } from '@/lib/utils/color';
 const PRICE_TYPES: MarketplacePriceType[] = ['fixed', 'negotiable', 'free', 'contact'];
 const CONDITIONS: MarketplaceCondition[] = ['new', 'like_new', 'good', 'fair', 'poor'];
 const DELIVERY: MarketplaceDeliveryMethod[] = ['pickup', 'shipping', 'both', 'community_delivery'];
+const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime'];
+const MAX_VIDEO_SIZE = 50 * 1024 * 1024;
 
 function toNumber(value: string): number | null {
   const parsed = Number(value.replace(/[,\s]/g, ''));
   return Number.isFinite(parsed) && value.trim() ? parsed : null;
+}
+
+function basenameFromUri(uri: string): string {
+  const cleanUri = uri.split('?')[0] ?? uri;
+  return cleanUri.split('/').pop() || 'marketplace-video.mp4';
 }
 
 export default function NewMarketplaceListingRoute() {
@@ -83,6 +93,9 @@ export function MarketplaceListingForm() {
   const [deliveryMethod, setDeliveryMethod] = useState<MarketplaceDeliveryMethod>('pickup');
   const [sellerType, setSellerType] = useState<'private' | 'business'>('private');
   const [imageUris, setImageUris] = useState<string[]>([]);
+  const [videoAsset, setVideoAsset] = useState<MarketplaceVideoUpload | null>(null);
+  const [existingVideoUrl, setExistingVideoUrl] = useState<string | null>(null);
+  const [removeExistingVideo, setRemoveExistingVideo] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
   const [hydrated, setHydrated] = useState(false);
@@ -140,6 +153,9 @@ export function MarketplaceListingForm() {
         setLongitude(listing.longitude !== null && listing.longitude !== undefined ? String(listing.longitude) : '');
         setDeliveryMethod((listing.delivery_method as MarketplaceDeliveryMethod) ?? 'pickup');
         setSellerType(listing.seller_type === 'business' ? 'business' : 'private');
+        setExistingVideoUrl(listing.video_url ?? null);
+        setVideoAsset(null);
+        setRemoveExistingVideo(false);
         setHydrated(true);
       })
       .catch(() => Alert.alert(t('common:errors.alertTitle'), t('forms.loadFailed')));
@@ -239,6 +255,12 @@ export function MarketplaceListingForm() {
       if (imageUris.length > 0) {
         await uploadMarketplaceImages(response.data.id, imageUris);
       }
+      if (isEditing && removeExistingVideo && !videoAsset) {
+        await deleteMarketplaceVideo(response.data.id);
+      }
+      if (videoAsset) {
+        await uploadMarketplaceVideo(response.data.id, videoAsset);
+      }
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.replace({ pathname: '/(modals)/marketplace-detail', params: { id: String(response.data.id) } } as unknown as Href);
     } catch (err) {
@@ -287,6 +309,50 @@ export function MarketplaceListingForm() {
     if (result.canceled) return;
     const nextUris = result.assets.map((asset) => asset.uri).filter(Boolean);
     setImageUris((current) => [...current, ...nextUris].slice(0, 8));
+  }
+
+  async function pickVideo() {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert(t('forms.permissionTitle'), t('forms.permissionMessage'));
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+      allowsMultipleSelection: false,
+      quality: 0.82,
+    });
+    if (result.canceled) return;
+
+    const asset = result.assets[0];
+    if (!asset?.uri) return;
+
+    if (asset.mimeType && !ALLOWED_VIDEO_TYPES.includes(asset.mimeType)) {
+      Alert.alert(t('forms.validation'), t('forms.videoTypeError'));
+      return;
+    }
+    if (asset.fileSize && asset.fileSize > MAX_VIDEO_SIZE) {
+      Alert.alert(t('forms.validation'), t('forms.videoSizeError'));
+      return;
+    }
+
+    setVideoAsset({
+      uri: asset.uri,
+      fileName: asset.fileName ?? basenameFromUri(asset.uri),
+      mimeType: asset.mimeType ?? null,
+    });
+    setRemoveExistingVideo(false);
+  }
+
+  function removeVideo() {
+    if (videoAsset) {
+      setVideoAsset(null);
+      return;
+    }
+    if (existingVideoUrl) {
+      setExistingVideoUrl(null);
+      setRemoveExistingVideo(true);
+    }
   }
 
   return (
@@ -402,6 +468,34 @@ export function MarketplaceListingForm() {
                   ))}
                 </ScrollView>
               ) : null}
+              <View className="gap-2 rounded-panel-inner border p-3" style={{ borderColor: theme.border, backgroundColor: withAlpha(primary, 0.05) }}>
+                <View className="flex-row items-center justify-between gap-3">
+                  <View className="min-w-0 flex-1">
+                    <Text className="text-sm font-bold" style={{ color: theme.text }}>{t('forms.video')}</Text>
+                    <Text className="text-xs leading-5" style={{ color: theme.textSecondary }}>{t('forms.videoHint')}</Text>
+                  </View>
+                  <HeroButton size="sm" variant="secondary" onPress={pickVideo}>
+                    <Ionicons name="videocam-outline" size={15} color={primary} />
+                    <HeroButton.Label>{videoAsset || existingVideoUrl ? t('forms.changeVideo') : t('forms.addVideo')}</HeroButton.Label>
+                  </HeroButton>
+                </View>
+                {videoAsset || existingVideoUrl ? (
+                  <View className="flex-row items-center gap-3 rounded-panel-inner border px-3 py-2" style={{ borderColor: theme.border, backgroundColor: theme.bg }}>
+                    <Ionicons name="film-outline" size={18} color={primary} />
+                    <View className="min-w-0 flex-1">
+                      <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>
+                        {videoAsset ? t('forms.videoSelected') : t('forms.currentVideo')}
+                      </Text>
+                      <Text className="text-sm" style={{ color: theme.text }} numberOfLines={1}>
+                        {videoAsset?.fileName || (existingVideoUrl ? basenameFromUri(existingVideoUrl) : '')}
+                      </Text>
+                    </View>
+                    <HeroButton isIconOnly size="sm" variant="danger-soft" accessibilityLabel={t('forms.removeVideo')} onPress={removeVideo}>
+                      <Ionicons name="close-outline" size={15} color={theme.error} />
+                    </HeroButton>
+                  </View>
+                ) : null}
+              </View>
               <Text className="text-xs leading-5" style={{ color: theme.textMuted }}>{t('forms.mediaHint')}</Text>
             </View>
           </HeroCard.Body>

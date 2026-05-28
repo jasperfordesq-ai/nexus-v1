@@ -77,6 +77,8 @@ import {
   updateMarketplaceListing,
   updateMerchantCoupon,
   uploadMarketplaceImages,
+  uploadMarketplaceVideo,
+  deleteMarketplaceVideo,
   validateMarketplaceCoupon,
 } from './marketplace';
 
@@ -250,6 +252,17 @@ describe('marketplace api', () => {
     await uploadMarketplaceImages(8, ['file:///tmp/a.jpg']);
 
     expect(api.upload).toHaveBeenCalledWith('/api/v2/marketplace/listings/8/images', expect.any(FormData));
+  });
+
+  it('wires marketplace listing video upload and removal endpoints', async () => {
+    (api.upload as jest.Mock).mockResolvedValue({ data: { video_url: '/uploads/marketplace/demo.mp4' } });
+    (api.delete as jest.Mock).mockResolvedValue(undefined);
+
+    await uploadMarketplaceVideo(8, { uri: 'file:///tmp/demo.mp4', fileName: 'demo.mp4', mimeType: 'video/mp4' });
+    expect(api.upload).toHaveBeenCalledWith('/api/v2/marketplace/listings/8/video', expect.any(FormData));
+
+    await deleteMarketplaceVideo(8);
+    expect(api.delete).toHaveBeenCalledWith('/api/v2/marketplace/listings/8/video');
   });
 
   it('wires marketplace discovery collections and saved searches', async () => {
