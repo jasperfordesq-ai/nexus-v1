@@ -405,7 +405,9 @@
     "couponAppliedHint": "The coupon will be included when you buy this item.",
     "invalidCoupon": "This coupon code could not be applied.",
     "openedTitle": "Checkout started",
-    "clientSecretHint": "The order was created. Complete payment from the web checkout if the payment sheet does not open on this device."
+    "clientSecretHint": "The order was created. Complete payment from the web checkout if the payment sheet does not open on this device.",
+    "paymentRecoveryTitle": "Checkout paused",
+    "paymentRecoveryHint": "Order {{order}} was created, but payment could not start. Continue payment from Orders."
   },
   "communityDelivery": {
     "eyebrow": "Community-powered delivery",

@@ -4,7 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render, waitFor } from '@testing-library/react-native';
+import { Alert } from 'react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 jest.mock('expo-router', () => ({
   router: { push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
@@ -40,6 +41,8 @@ jest.mock('react-i18next', () => ({
         'checkout.coupon': 'Coupon code',
         'checkout.couponPlaceholder': 'COMMUNITY10',
         'checkout.apply': 'Apply',
+        'checkout.paymentRecoveryTitle': 'Checkout paused',
+        'checkout.paymentRecoveryHint': `Order ${String(opts?.order ?? '')} was created, but payment could not start. Continue payment from Orders.`,
       };
       if (key === 'detail.templateFieldLabel') return String(opts?.field ?? '');
       return map[key] ?? key;
@@ -103,7 +106,7 @@ jest.mock('@/lib/api/marketplace', () => ({
 }));
 
 import MarketplaceDetailRoute from './marketplace-detail';
-import { getMarketplaceListing } from '@/lib/api/marketplace';
+import { createMarketplaceOrder, createMarketplacePaymentIntent, getMarketplaceListing } from '@/lib/api/marketplace';
 
 const mockListing = {
   id: 9,
@@ -140,9 +143,16 @@ const mockListing = {
 };
 
 describe('MarketplaceDetailRoute', () => {
+  let alertSpy: jest.SpyInstance;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
     (getMarketplaceListing as jest.Mock).mockResolvedValue({ data: mockListing });
+  });
+
+  afterEach(() => {
+    alertSpy.mockRestore();
   });
 
   it('renders category-specific template details from the listing payload', async () => {
@@ -154,6 +164,29 @@ describe('MarketplaceDetailRoute', () => {
       expect(getByText('Medium')).toBeTruthy();
       expect(getByText('Material')).toBeTruthy();
       expect(getByText('Oak')).toBeTruthy();
+    });
+  });
+
+  it('shows pending-payment recovery when checkout fails after order creation', async () => {
+    (createMarketplaceOrder as jest.Mock).mockResolvedValue({
+      data: { id: 44, order_number: 'MKT-000044', status: 'pending_payment' },
+    });
+    (createMarketplacePaymentIntent as jest.Mock).mockRejectedValue(new Error('Seller payments are not ready'));
+
+    const { getByText } = render(<MarketplaceDetailRoute />);
+
+    await waitFor(() => {
+      expect(getByText('Buy now')).toBeTruthy();
+    });
+
+    fireEvent.press(getByText('Buy now'));
+
+    await waitFor(() => {
+      expect(createMarketplacePaymentIntent).toHaveBeenCalledWith(44);
+      expect(Alert.alert).toHaveBeenCalledWith(
+        'Checkout paused',
+        'Order MKT-000044 was created, but payment could not start. Continue payment from Orders.',
+      );
     });
   });
 });

@@ -182,10 +182,17 @@ function MarketplaceDetailScreen() {
         coupon_code: couponApplied && couponCode.trim() ? couponCode.trim().toUpperCase() : undefined,
       });
       const orderId = response.data.id;
+      const orderNumber = response.data.order_number;
       if (selectedSlotId) {
         await reserveMarketplacePickup(orderId, selectedSlotId);
       }
-      const payment = await createMarketplacePaymentIntent(orderId);
+      let payment;
+      try {
+        payment = await createMarketplacePaymentIntent(orderId);
+      } catch {
+        Alert.alert(t('checkout.paymentRecoveryTitle'), t('checkout.paymentRecoveryHint', { order: orderNumber }));
+        return;
+      }
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       if (payment.data.checkout_url) {
         await Linking.openURL(payment.data.checkout_url);
