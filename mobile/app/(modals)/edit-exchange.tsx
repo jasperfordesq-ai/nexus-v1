@@ -493,7 +493,7 @@ function EditExchangeModalInner() {
                   if (fieldErrors.hours) setFieldErrors((current) => ({ ...current, hours: undefined }));
                 }}
                 keyboardType="decimal-pad"
-                placeholder="1"
+                placeholder={t('form.hoursPlaceholder')}
                 placeholderTextColor={theme.textMuted}
                 style={inputStyle(theme, Boolean(fieldErrors.hours))}
               />

@@ -83,6 +83,7 @@ jest.mock('react-i18next', () => ({
       'form.aiGenerating': 'Writing...',
       'form.aiEnterTitleFirst': 'Enter a title first',
       'form.titleTooGenericHint': 'Use a more specific title.',
+      'form.hoursPlaceholder': 'Enter hours',
       'form.hoursHint': 'Estimate the time involved.',
       'serviceType.hybrid': 'Hybrid',
       'serviceType.physical_only': 'In person',
@@ -169,6 +170,7 @@ describe('NewExchangeModal', () => {
     expect(getAllByText('New Listing').length).toBeGreaterThan(0);
     expect(getByPlaceholderText('What are you offering?')).toBeTruthy();
     expect(getByPlaceholderText('Add more details...')).toBeTruthy();
+    expect(getByPlaceholderText('Enter hours')).toBeTruthy();
     expect(getAllByText('Category').length).toBeGreaterThan(0);
   });
 

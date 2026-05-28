@@ -78,6 +78,7 @@
     "aiHelpWrite": "Help write description",
     "aiGenerating": "Writing...",
     "aiEnterTitleFirst": "Enter a title first so the assistant has something useful to work with.",
+    "hoursPlaceholder": "Enter hours",
     "hoursHint": "Use half-hour increments when that helps describe the exchange."
   },
   "serviceType": {

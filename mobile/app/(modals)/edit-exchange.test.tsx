@@ -37,6 +37,7 @@ jest.mock('react-i18next', () => ({
       'form.aiHelpWrite': 'Help write description',
       'form.aiGenerating': 'Writing...',
       'form.aiEnterTitleFirst': 'Enter a title first',
+      'form.hoursPlaceholder': 'Enter hours',
       'validation.categoryRequired': 'Please choose a category.',
       category: 'Category',
       timeCredits: 'Time Credits',
@@ -143,12 +144,13 @@ beforeEach(() => {
 
 describe('EditExchangeModal', () => {
   it('renders the editable listing fields', () => {
-    const { getAllByText, getByDisplayValue, getByText } = render(<EditExchangeModal />);
+    const { getAllByText, getByDisplayValue, getByPlaceholderText } = render(<EditExchangeModal />);
     expect(getAllByText('Edit Listing').length).toBeGreaterThan(0);
     expect(getByDisplayValue('Edit me')).toBeTruthy();
     expect(getByDisplayValue('Listing body')).toBeTruthy();
     expect(getByDisplayValue('Dublin')).toBeTruthy();
     expect(getByDisplayValue('gardening')).toBeTruthy();
+    expect(getByPlaceholderText('Enter hours')).toBeTruthy();
     expect(getAllByText('Teaching').length).toBeGreaterThan(0);
     expect(getAllByText('Optional service details').length).toBeGreaterThan(0);
   });
