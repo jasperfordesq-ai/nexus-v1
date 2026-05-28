@@ -112,6 +112,10 @@ function orderStatusIcon(status: string): ComponentProps<typeof Ionicons>['name'
   }
 }
 
+function orderHasRating(item: MarketplaceOrder, role: 'buyer' | 'seller'): boolean {
+  return item.ratings?.some((rating) => rating.rater_role === role) ?? false;
+}
+
 export default function MarketplaceOrdersRoute() {
   return (
     <ModalErrorBoundary>
@@ -646,6 +650,8 @@ function OrderCard({
     : 'orders.statusHint.unknown';
   const canManageCommunityDelivery = item.listing?.delivery_method === 'community_delivery'
     && ['paid', 'processing', 'shipped', 'delivered'].includes(item.status);
+  const hasBuyerRating = orderHasRating(item, 'buyer');
+  const hasCurrentUserRating = orderHasRating(item, mode === 'purchases' ? 'buyer' : 'seller');
   return (
     <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
       <HeroCard.Body className="gap-3 p-4">
@@ -755,10 +761,17 @@ function OrderCard({
             </HeroButton>
           ) : null}
           {mode === 'sales' && item.status === 'completed' ? (
-            <HeroButton className="flex-1" size="sm" variant="secondary" isDisabled style={{ minWidth: '46%' }}>
-              <Ionicons name="checkmark-circle-outline" size={14} color={theme.success} />
-              <HeroButton.Label>{t('orders.saleCompleted')}</HeroButton.Label>
-            </HeroButton>
+            hasBuyerRating ? (
+              <HeroButton className="flex-1" size="sm" variant="secondary" isDisabled style={{ minWidth: '46%' }}>
+                <Ionicons name="star" size={14} color={theme.success} />
+                <HeroButton.Label>{t('orders.buyerRated')}</HeroButton.Label>
+              </HeroButton>
+            ) : (
+              <HeroButton className="flex-1" size="sm" variant="secondary" isDisabled style={{ minWidth: '46%' }}>
+                <Ionicons name="checkmark-circle-outline" size={14} color={theme.success} />
+                <HeroButton.Label>{t('orders.saleCompleted')}</HeroButton.Label>
+              </HeroButton>
+            )
           ) : null}
           {mode === 'sales' && item.status === 'disputed' ? (
             <HeroButton className="flex-1" size="sm" variant="danger-soft" isDisabled style={{ minWidth: '46%' }}>
@@ -778,10 +791,16 @@ function OrderCard({
               <HeroButton.Label>{t('orders.cancel')}</HeroButton.Label>
             </HeroButton>
           ) : null}
-          {item.status === 'completed' ? (
+          {mode === 'purchases' && ['delivered', 'completed'].includes(item.status) && !hasCurrentUserRating ? (
             <HeroButton className="flex-1" size="sm" variant="secondary" isDisabled={isSubmitting} onPress={onRate} style={{ minWidth: '46%' }}>
               <Ionicons name="star-outline" size={14} color={primary} />
               <HeroButton.Label>{t('orders.rate')}</HeroButton.Label>
+            </HeroButton>
+          ) : null}
+          {mode === 'purchases' && item.status === 'completed' && hasCurrentUserRating ? (
+            <HeroButton className="flex-1" size="sm" variant="secondary" isDisabled style={{ minWidth: '46%' }}>
+              <Ionicons name="star" size={14} color={theme.success} />
+              <HeroButton.Label>{t('orders.rated')}</HeroButton.Label>
             </HeroButton>
           ) : null}
           {mode === 'purchases' && ['paid', 'processing', 'shipped', 'delivered'].includes(item.status) ? (

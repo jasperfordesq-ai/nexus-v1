@@ -47,7 +47,10 @@ jest.mock('react-i18next', () => ({
         'orders.awaitingConfirmation': 'Awaiting buyer confirmation',
         'orders.awaitingCompletion': 'Awaiting completion',
         'orders.saleCompleted': 'Sale completed',
+        'orders.buyerRated': 'Buyer rated',
         'orders.disputeOpen': 'Dispute open',
+        'orders.rate': 'Rate order',
+        'orders.rated': 'Rated',
         'orders.deliveryOffersTitle': 'Community delivery',
         'orders.deliveryVerified': 'Verified',
         'orders.acceptDeliveryOffer': 'Accept offer',
@@ -61,6 +64,8 @@ jest.mock('react-i18next', () => ({
         'orders.deliveryStatus.pending': 'Pending',
         'orders.statusHint.purchases.pending_payment': 'Payment is not complete yet. Continue checkout to keep this purchase moving.',
         'orders.statusHint.purchases.paid': 'Payment is complete. The seller can now prepare the order.',
+        'orders.statusHint.purchases.delivered': 'Delivery is confirmed. You can rate this order now.',
+        'orders.statusHint.purchases.completed': 'This purchase is complete. You can still review the order details.',
         'orders.statusHint.sales.pending_payment': 'The buyer still needs to finish payment before you ship.',
         'orders.statusHint.sales.paid': 'Payment is complete. Mark the order shipped when it is ready.',
         'orders.statusHint.sales.shipped': 'The order is on its way. Wait for the buyer to confirm delivery.',
@@ -244,6 +249,62 @@ describe('MarketplaceOrdersRoute', () => {
     unmount();
   });
 
+  it('shows rating actions for delivered purchases until the buyer has rated', async () => {
+    (getMarketplaceOrders as jest.Mock).mockResolvedValueOnce({
+      data: [
+        {
+          id: 43,
+          order_number: 'MKT-000043',
+          quantity: 1,
+          unit_price: 20,
+          total_price: 20,
+          currency: 'EUR',
+          status: 'delivered',
+          created_at: '2026-05-23T10:00:00Z',
+          listing: {
+            id: 73,
+            title: 'Delivered basket',
+            image: null,
+            delivery_method: 'shipping',
+          },
+          seller: { id: 2, name: 'Pat Seller', avatar_url: null },
+          ratings: [],
+        },
+        {
+          id: 44,
+          order_number: 'MKT-000044',
+          quantity: 1,
+          unit_price: 22,
+          total_price: 22,
+          currency: 'EUR',
+          status: 'completed',
+          created_at: '2026-05-24T10:00:00Z',
+          listing: {
+            id: 74,
+            title: 'Rated chair',
+            image: null,
+            delivery_method: 'pickup',
+          },
+          seller: { id: 3, name: 'Sam Seller', avatar_url: null },
+          ratings: [{ id: 10, rater_role: 'buyer', rating: 5 }],
+        },
+      ],
+      meta: { cursor: null, has_more: false },
+    });
+
+    const { getByText, getAllByText, unmount } = render(<MarketplaceOrdersRoute />);
+
+    await waitFor(() => {
+      expect(getByText('Delivered basket')).toBeTruthy();
+      expect(getByText('Rated chair')).toBeTruthy();
+    });
+
+    expect(getByText('Delivery is confirmed. You can rate this order now.')).toBeTruthy();
+    expect(getAllByText('Rate order')).toHaveLength(1);
+    expect(getByText('Rated')).toBeTruthy();
+    unmount();
+  });
+
   it('shows seller-side payment and delivery status actions', async () => {
     mockParams = { mode: 'sales' };
     (getMarketplaceOrders as jest.Mock)
@@ -297,6 +358,19 @@ describe('MarketplaceOrdersRoute', () => {
             listing: { id: 94, title: 'Disputed seller sale', image: null, delivery_method: 'shipping' },
             buyer: { id: 7, name: 'Bex Buyer', avatar_url: null },
           },
+          {
+            id: 65,
+            order_number: 'MKT-000065',
+            quantity: 1,
+            unit_price: 20,
+            total_price: 20,
+            currency: 'EUR',
+            status: 'completed',
+            created_at: '2026-05-26T10:00:00Z',
+            listing: { id: 95, title: 'Rated seller sale', image: null, delivery_method: 'shipping' },
+            buyer: { id: 8, name: 'Ben Buyer', avatar_url: null },
+            ratings: [{ id: 11, rater_role: 'buyer', rating: 4 }],
+          },
         ],
         meta: { cursor: null, has_more: false },
       });
@@ -312,6 +386,7 @@ describe('MarketplaceOrdersRoute', () => {
     expect(getByText('Awaiting buyer confirmation')).toBeTruthy();
     expect(getByText('Awaiting completion')).toBeTruthy();
     expect(getByText('Dispute open')).toBeTruthy();
+    expect(getByText('Buyer rated')).toBeTruthy();
     unmount();
   });
 

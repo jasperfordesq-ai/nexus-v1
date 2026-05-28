@@ -139,6 +139,7 @@ export interface MarketplaceOrder {
   tracking_number?: string | null;
   tracking_url?: string | null;
   shipping_method?: string | null;
+  ratings?: MarketplaceOrderRating[];
   created_at: string;
 }
 
