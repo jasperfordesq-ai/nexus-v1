@@ -23,7 +23,7 @@ import * as Haptics from '@/lib/haptics';
 import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
 
 import { useTranslation } from 'react-i18next';
-import { displayName, getOrCreateThread, getThread, sendMessage, type Message, type SendMessageOptions } from '@/lib/api/messages';
+import { displayName, getOrCreateThread, getThread, markConversationRead, sendMessage, type Message, type SendMessageOptions } from '@/lib/api/messages';
 import { useApi } from '@/lib/hooks/useApi';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -133,8 +133,12 @@ function ThreadScreenInner() {
     return subscribeToMessages(safeThreadLookupId, (incoming) => {
       setMessages((prev) => {
         if (prev.some((message) => message.id === incoming.id)) return prev;
-        return [...prev, incoming].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+        const acknowledged = incoming.is_own ? incoming : { ...incoming, is_read: true };
+        return [...prev, acknowledged].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
       });
+      if (!incoming.is_own) {
+        void markConversationRead(safeThreadLookupId).catch(() => null);
+      }
     });
   }, [isValidId, safeThreadLookupId, subscribeToMessages]);
 

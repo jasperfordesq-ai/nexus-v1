@@ -4,12 +4,25 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 
 // --- Mocks ---
 
 let mockThreadSearchParams: Record<string, string> = { id: '5', name: 'Alice' };
 const mockRouterPush = jest.fn();
+type MockThreadMessage = {
+  id: number;
+  body: string;
+  sender: { id: number; name: string; avatar_url: null };
+  sender_id?: number;
+  created_at: string;
+  is_own: boolean;
+  is_voice: boolean;
+  audio_url: null;
+  reactions: Record<string, number>;
+  is_read: boolean;
+};
+let mockRealtimeCallback: ((message: MockThreadMessage) => void) | null = null;
 
 jest.mock('expo-router', () => ({
   router: { push: (...args: unknown[]) => mockRouterPush(...args), back: jest.fn() },
@@ -71,13 +84,19 @@ jest.mock('@/lib/hooks/useApi', () => ({
 
 jest.mock('@/lib/context/RealtimeContext', () => ({
   useRealtimeContext: () => ({
-    subscribeToMessages: jest.fn(() => jest.fn()),
+    subscribeToMessages: jest.fn((_threadId: number, callback: (message: MockThreadMessage) => void) => {
+      mockRealtimeCallback = callback;
+      return jest.fn();
+    }),
   }),
 }));
+
+const mockMarkConversationRead = jest.fn().mockResolvedValue({ data: { marked_read: 1 } });
 
 jest.mock('@/lib/api/messages', () => ({
   getThread: jest.fn(),
   getOrCreateThread: jest.fn(),
+  markConversationRead: (...args: unknown[]) => mockMarkConversationRead(...args),
   sendMessage: jest.fn().mockResolvedValue({ data: { id: 99 } }),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   displayName: (user: any) => user?.name ?? 'Unknown',
@@ -131,6 +150,8 @@ const mockMessages = [
 beforeEach(() => {
   mockThreadSearchParams = { id: '5', name: 'Alice' };
   mockRouterPush.mockClear();
+  mockRealtimeCallback = null;
+  mockMarkConversationRead.mockClear();
   (sendMessage as jest.Mock).mockClear();
   mockUseApi.mockReturnValue({ data: null, isLoading: false, error: null, refresh: jest.fn() });
 });
@@ -266,6 +287,38 @@ describe('ThreadScreen', () => {
     expect(mockRouterPush).toHaveBeenCalledWith({
       pathname: '/(modals)/job-detail',
       params: { id: '44' },
+    });
+  });
+
+  it('marks realtime inbound messages as read while the thread is open', async () => {
+    mockUseApi.mockReturnValue({
+      data: { data: mockMessages },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByText } = render(<ThreadScreen />);
+
+    expect(mockRealtimeCallback).toBeTruthy();
+    act(() => {
+      mockRealtimeCallback?.({
+        id: 3,
+        body: 'Fresh update',
+        sender: { id: 5, name: 'Alice', avatar_url: null },
+        sender_id: 5,
+        created_at: '2026-03-10T10:02:00Z',
+        is_own: false,
+        is_voice: false,
+        audio_url: null,
+        reactions: {},
+        is_read: false,
+      });
+    });
+
+    await waitFor(() => {
+      expect(getByText('Fresh update')).toBeTruthy();
+      expect(mockMarkConversationRead).toHaveBeenCalledWith(5);
     });
   });
 });

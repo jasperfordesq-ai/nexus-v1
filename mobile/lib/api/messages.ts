@@ -150,6 +150,10 @@ export function restoreConversation(conversationId: number): Promise<{ data?: { 
   return api.post(`${API_V2}/messages/conversations/${conversationId}/restore`, {});
 }
 
+export function markConversationRead(otherUserId: number): Promise<{ data?: { marked_read?: number } }> {
+  return api.put(`${API_V2}/messages/${otherUserId}/read`, {});
+}
+
 /** POST /api/v2/messages — send a message to a recipient */
 export function sendMessage(recipientId: number, body: string, options: SendMessageOptions = {}): Promise<{ data: Message }> {
   return api.post<{ data: Message }>(`${API_V2}/messages`, {
