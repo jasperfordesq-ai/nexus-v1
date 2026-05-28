@@ -32,6 +32,7 @@ import {
   type MarketplaceDeliveryOffer,
   type MarketplaceOrder,
 } from '@/lib/api/marketplace';
+import { useAuth } from '@/lib/hooks/useAuth';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
@@ -78,9 +79,10 @@ export default function MarketplaceOrdersRoute() {
 }
 
 function MarketplaceOrdersScreen() {
-  const { t } = useTranslation(['marketplace', 'common']);
+  const { t } = useTranslation(['marketplace', 'common', 'auth']);
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const params = useLocalSearchParams<{ mode?: string }>();
   const initialMode: OrderMode = params.mode === 'sales' ? 'sales' : 'purchases';
   const [mode, setMode] = useState<OrderMode>(initialMode);
@@ -102,6 +104,7 @@ function MarketplaceOrdersScreen() {
   const [disputeReason, setDisputeReason] = useState<DisputeReason>('not_received');
   const [disputeDescription, setDisputeDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const canLoadOrders = !isAuthLoading && isAuthenticated;
   const orders = usePaginatedApi<MarketplaceOrder, Awaited<ReturnType<typeof getMarketplaceOrders>>>(
     (cursor) => getMarketplaceOrders(mode, cursor, ORDER_STATUS_FILTERS[statusTab]),
     (response) => ({
@@ -110,6 +113,7 @@ function MarketplaceOrdersScreen() {
       hasMore: marketplaceHasMore(response),
     }),
     [mode, statusTab],
+    { enabled: canLoadOrders },
   );
 
   useEffect(() => {
@@ -282,6 +286,32 @@ function MarketplaceOrdersScreen() {
     } finally {
       setIsSubmitting(false);
     }
+  }
+
+  if (isAuthLoading) {
+    return (
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('orders.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
+        <View className="py-16">
+          <LoadingSpinner />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('orders.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
+        <EmptyState
+          icon="receipt-outline"
+          title={t('orders.signInTitle')}
+          subtitle={t('orders.signInHint')}
+          actionLabel={t('auth:login.submit')}
+          onAction={() => router.push('/(auth)/login' as Href)}
+        />
+      </SafeAreaView>
+    );
   }
 
   return (

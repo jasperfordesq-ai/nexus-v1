@@ -318,6 +318,8 @@
     "subtitle": "Track purchases and sales from marketplace checkout.",
     "purchases": "Purchases",
     "sales": "Sales",
+    "signInTitle": "Sign in to view marketplace orders",
+    "signInHint": "Purchases, sales, and payment recovery are available after you sign in.",
     "tabs": {
       "all": "All",
       "active": "Active",

@@ -6,6 +6,14 @@
 import React from 'react';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
+let mockAuthState: {
+  isAuthenticated: boolean;
+  isLoading: boolean;
+} = {
+  isAuthenticated: true,
+  isLoading: false,
+};
+
 jest.mock('expo-router', () => ({
   router: { push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
   useLocalSearchParams: () => ({}),
@@ -21,6 +29,8 @@ jest.mock('react-i18next', () => ({
         'orders.subtitle': 'Track purchases and sales from marketplace checkout.',
         'orders.purchases': 'Purchases',
         'orders.sales': 'Sales',
+        'orders.signInTitle': 'Sign in to view marketplace orders',
+        'orders.signInHint': 'Purchases, sales, and payment recovery are available after you sign in.',
         'orders.tabs.all': 'All',
         'orders.tabs.active': 'Active',
         'orders.tabs.completed': 'Completed',
@@ -34,6 +44,7 @@ jest.mock('react-i18next', () => ({
         'orders.status.paid': 'Paid',
         'orders.status.unknown': 'Unknown status',
         'actions.view': 'View',
+        'auth:login.submit': 'Sign in',
       };
       if (key === 'orders.number') return `Order ${String(opts?.number ?? '')}`;
       if (key === 'orders.date') return String(opts?.date ?? '');
@@ -45,6 +56,10 @@ jest.mock('react-i18next', () => ({
 
 jest.mock('@/lib/hooks/useTenant', () => ({
   usePrimaryColor: () => '#6366f1',
+}));
+
+jest.mock('@/lib/hooks/useAuth', () => ({
+  useAuth: () => mockAuthState,
 }));
 
 jest.mock('@/lib/hooks/useTheme', () => ({
@@ -89,6 +104,10 @@ import { getMarketplaceOrders } from '@/lib/api/marketplace';
 describe('MarketplaceOrdersRoute', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockAuthState = {
+      isAuthenticated: true,
+      isLoading: false,
+    };
     (getMarketplaceOrders as jest.Mock).mockResolvedValue({
       data: [],
       meta: { cursor: null, has_more: false },
@@ -112,6 +131,16 @@ describe('MarketplaceOrdersRoute', () => {
       );
     });
 
+    unmount();
+  });
+
+  it('shows the sign-in state without calling protected order APIs when unauthenticated', () => {
+    mockAuthState = { isAuthenticated: false, isLoading: false };
+
+    const { getByText, unmount } = render(<MarketplaceOrdersRoute />);
+
+    expect(getByText('Sign in to view marketplace orders')).toBeTruthy();
+    expect(getMarketplaceOrders).not.toHaveBeenCalled();
     unmount();
   });
 
