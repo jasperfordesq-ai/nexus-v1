@@ -757,6 +757,8 @@
     "empty": "No shipping options yet",
     "emptyHint": "Add at least one option if sellers can ship marketplace orders.",
     "validation": "Courier name and a valid price are required.",
+    "deleteTitle": "Delete shipping option",
+    "deleteMessage": "Delete {{name}} from your shipping options?",
     "saveFailed": "Could not save this shipping option.",
     "deleteFailed": "Could not delete this shipping option."
   },

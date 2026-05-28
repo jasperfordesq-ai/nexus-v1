@@ -27,7 +27,7 @@ import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 
-const CURRENCIES = ['EUR', 'GBP', 'USD', 'CAD', 'AUD', 'NZD'];
+const CURRENCIES = ['EUR', 'GBP', 'USD', 'CAD', 'AUD', 'NZD', 'CHF', 'SEK', 'NOK', 'DKK', 'PLN', 'JPY'];
 
 interface ShippingFormState {
   courierName: string;
@@ -123,6 +123,17 @@ function MarketplaceShippingOptionsScreen() {
     }
   }
 
+  function confirmRemove(option: MarketplaceShippingOption) {
+    Alert.alert(
+      t('shipping.deleteTitle'),
+      t('shipping.deleteMessage', { name: option.courier_name }),
+      [
+        { text: t('common:buttons.cancel'), style: 'cancel' },
+        { text: t('common:buttons.delete'), style: 'destructive', onPress: () => void remove(option) },
+      ],
+    );
+  }
+
   async function remove(option: MarketplaceShippingOption) {
     try {
       await deleteMarketplaceShippingOption(option.id);
@@ -206,7 +217,7 @@ function MarketplaceShippingOptionsScreen() {
           <ShippingOptionRow
             option={item}
             onEdit={() => edit(item)}
-            onDelete={() => void remove(item)}
+            onDelete={() => confirmRemove(item)}
             onDefault={() => void makeDefault(item)}
           />
         )}
