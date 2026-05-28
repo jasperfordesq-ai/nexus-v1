@@ -1007,6 +1007,8 @@ export function createMarketplacePickupSlot(payload: {
   slot_start: string;
   slot_end: string;
   capacity?: number;
+  is_recurring?: boolean;
+  recurring_pattern?: string | null;
   is_active?: boolean;
 }): Promise<MarketplaceDataResponse<MarketplacePickupSlot>> {
   return api.post<MarketplaceDataResponse<MarketplacePickupSlot>>(`${API_V2}/marketplace/seller/pickup-slots`, payload);

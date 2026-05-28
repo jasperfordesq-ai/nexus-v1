@@ -25,6 +25,21 @@ const mockT = (key: string, opts?: Record<string, unknown>) => {
     'tools.tabs.promotions': 'Promotions',
     'tools.tabs.pickups': 'Pickups',
     'tools.tabs.coupons': 'Coupons',
+    'tools.pickups.title': 'Pickups',
+    'tools.pickups.subtitle': 'Create click-and-collect slots, scan pickup QR codes, and review reservations.',
+    'tools.pickups.start': 'Slot start',
+    'tools.pickups.startPlaceholder': '2026-06-01 10:00',
+    'tools.pickups.end': 'Slot end',
+    'tools.pickups.endPlaceholder': '2026-06-01 12:00',
+    'tools.pickups.capacityLabel': 'Capacity',
+    'tools.pickups.capacityPlaceholder': '4',
+    'tools.pickups.recurringWeekly': 'Repeat weekly',
+    'tools.pickups.createSlot': 'Create pickup slot',
+    'tools.pickups.qr': 'QR code',
+    'tools.pickups.qrPlaceholder': 'Paste or scan pickup code',
+    'tools.pickups.scan': 'Mark pickup complete',
+    'tools.pickups.emptySlots': 'No pickup slots yet',
+    'tools.pickups.emptyReservations': 'No pickup reservations yet',
     'tools.savedSearches.title': 'Saved searches',
     'tools.savedSearches.subtitle': 'Save a marketplace search and keep alerts close to the mobile app.',
     'tools.savedSearches.name': 'Name',
@@ -179,10 +194,13 @@ jest.mock('@/lib/api/marketplace', () => ({
 
 import MarketplaceToolsRoute from './marketplace-tools';
 import {
+  createMarketplacePickupSlot,
   createMarketplaceSavedSearch,
+  getMarketplacePickupSlots,
   getMarketplaceSavedSearches,
   getMerchantCoupons,
   getMerchantCouponRedemptions,
+  getMyMarketplacePickups,
 } from '@/lib/api/marketplace';
 
 const coupon = {
@@ -208,6 +226,9 @@ describe('MarketplaceToolsRoute', () => {
     jest.clearAllMocks();
     mockParams = {};
     mockHasFeature.mockReturnValue(true);
+    jest.mocked(getMarketplacePickupSlots).mockResolvedValue({ data: [] } as never);
+    jest.mocked(getMyMarketplacePickups).mockResolvedValue({ data: [] } as never);
+    jest.mocked(createMarketplacePickupSlot).mockResolvedValue({ data: { id: 32 } } as never);
     jest.mocked(getMarketplaceSavedSearches).mockResolvedValue({ data: [] } as never);
     jest.mocked(createMarketplaceSavedSearch).mockResolvedValue({ data: { id: 21 } } as never);
     jest.mocked(getMerchantCoupons).mockResolvedValue({ data: { items: [coupon] } } as never);
@@ -254,6 +275,29 @@ describe('MarketplaceToolsRoute', () => {
         search_query: 'bicycle',
         alert_frequency: 'weekly',
         alert_channel: 'both',
+      });
+    });
+  });
+
+  it('creates pickup slots with selected capacity and recurrence', async () => {
+    mockParams = { tab: 'pickups' };
+
+    const { getByPlaceholderText, getByText } = render(<MarketplaceToolsRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('2026-06-01 10:00'), '2026-06-01 10:00');
+    fireEvent.changeText(getByPlaceholderText('2026-06-01 12:00'), '2026-06-01 12:00');
+    fireEvent.changeText(getByPlaceholderText('4'), '8');
+    fireEvent.press(getByText('Repeat weekly'));
+    fireEvent.press(getByText('Create pickup slot'));
+
+    await waitFor(() => {
+      expect(createMarketplacePickupSlot).toHaveBeenCalledWith({
+        slot_start: '2026-06-01 10:00',
+        slot_end: '2026-06-01 12:00',
+        capacity: 8,
+        is_recurring: true,
+        recurring_pattern: 'weekly',
+        is_active: true,
       });
     });
   });

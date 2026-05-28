@@ -84,6 +84,8 @@ const COUPON_STATUSES: CouponStatus[] = ['draft', 'active', 'paused', 'expired']
 const COUPON_APPLIES_TO: CouponAppliesTo[] = ['all_listings', 'listing_ids', 'category_ids'];
 const SAVED_SEARCH_ALERT_FREQUENCIES: SavedSearchAlertFrequency[] = ['instant', 'daily', 'weekly'];
 const SAVED_SEARCH_ALERT_CHANNELS: SavedSearchAlertChannel[] = ['push', 'email', 'both'];
+const PICKUP_DEFAULT_CAPACITY = 4;
+const PICKUP_MAX_CAPACITY = 1000;
 
 const emptyCouponForm: CouponFormState = {
   code: '',
@@ -494,12 +496,20 @@ function formatPromotionDuration(hours: number, t: (key: string, options?: Recor
   return t('tools.promotions.durationHours', { count: hours });
 }
 
+function normalizePickupCapacity(value: string): number {
+  const parsed = Number.parseInt(value.replace(/[\s,]/g, ''), 10);
+  if (!Number.isFinite(parsed)) return PICKUP_DEFAULT_CAPACITY;
+  return Math.min(PICKUP_MAX_CAPACITY, Math.max(1, parsed));
+}
+
 function PickupsPanel() {
   const { t } = useTranslation(['marketplace', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
   const [slotStart, setSlotStart] = useState('');
   const [slotEnd, setSlotEnd] = useState('');
+  const [capacity, setCapacity] = useState(String(PICKUP_DEFAULT_CAPACITY));
+  const [isRecurring, setIsRecurring] = useState(false);
   const [qrCode, setQrCode] = useState('');
   const [lastScan, setLastScan] = useState<MarketplacePickupReservation | null>(null);
   const slots = useApi(() => getMarketplacePickupSlots(), [], { enabled: true });
@@ -508,9 +518,18 @@ function PickupsPanel() {
   async function createSlot() {
     if (!slotStart.trim() || !slotEnd.trim()) return;
     try {
-      await createMarketplacePickupSlot({ slot_start: slotStart.trim(), slot_end: slotEnd.trim(), capacity: 4, is_active: true });
+      await createMarketplacePickupSlot({
+        slot_start: slotStart.trim(),
+        slot_end: slotEnd.trim(),
+        capacity: normalizePickupCapacity(capacity),
+        is_recurring: isRecurring,
+        recurring_pattern: isRecurring ? 'weekly' : null,
+        is_active: true,
+      });
       setSlotStart('');
       setSlotEnd('');
+      setCapacity(String(PICKUP_DEFAULT_CAPACITY));
+      setIsRecurring(false);
       slots.refresh();
     } catch (err) {
       Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.pickups.slotFailed'));
@@ -543,6 +562,14 @@ function PickupsPanel() {
       <View className="gap-3">
         <FormInput label={t('tools.pickups.start')} value={slotStart} onChangeText={setSlotStart} placeholder={t('tools.pickups.startPlaceholder')} />
         <FormInput label={t('tools.pickups.end')} value={slotEnd} onChangeText={setSlotEnd} placeholder={t('tools.pickups.endPlaceholder')} />
+        <FormInput label={t('tools.pickups.capacityLabel')} value={capacity} onChangeText={setCapacity} placeholder={t('tools.pickups.capacityPlaceholder')} keyboardType="decimal-pad" />
+        <HeroButton
+          variant={isRecurring ? 'primary' : 'secondary'}
+          onPress={() => setIsRecurring((current) => !current)}
+          style={isRecurring ? { backgroundColor: primary } : undefined}
+        >
+          <HeroButton.Label>{t('tools.pickups.recurringWeekly')}</HeroButton.Label>
+        </HeroButton>
         <HeroButton variant="primary" onPress={createSlot} isDisabled={!slotStart.trim() || !slotEnd.trim()}>
           <HeroButton.Label>{t('tools.pickups.createSlot')}</HeroButton.Label>
         </HeroButton>
