@@ -20,8 +20,8 @@ jest.mock('@/lib/constants', () => ({
 }));
 
 import { api } from '@/lib/api/client';
-import { getFeed, getFeedAuthor, toggleLike } from './feed';
-import type { FeedResponse, FeedItem, LikeResult } from './feed';
+import { getFeed, getFeedAuthor, toggleBookmark, toggleLike } from './feed';
+import type { FeedResponse, FeedItem } from './feed';
 
 const mockFeedItem: FeedItem = {
   id: 1,
@@ -169,5 +169,19 @@ describe('toggleLike', () => {
   it('propagates errors from the API', async () => {
     (api.post as jest.Mock).mockRejectedValue(new Error('Forbidden'));
     await expect(toggleLike('event', 7)).rejects.toThrow('Forbidden');
+  });
+});
+
+describe('toggleBookmark', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('sends POST with type and id to /api/v2/bookmarks', async () => {
+    (api.post as jest.Mock).mockResolvedValue({ data: { bookmarked: true } });
+    const result = await toggleBookmark('post', 1);
+    expect(api.post).toHaveBeenCalledWith('/api/v2/bookmarks', {
+      type: 'post',
+      id: 1,
+    });
+    expect(result.data.bookmarked).toBe(true);
   });
 });

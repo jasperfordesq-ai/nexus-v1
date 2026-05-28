@@ -10,6 +10,7 @@ export interface Skill {
   id: number;
   name: string;
   category: string | null;
+  endorsement_count?: number;
 }
 
 export interface Endorsement {
@@ -40,8 +41,75 @@ export interface UserSkillsResponse {
   };
 }
 
+interface RawUserSkill {
+  id?: number;
+  skill_name?: string | null;
+  name?: string | null;
+  category_name?: string | null;
+  category?: string | null;
+  endorsement_count?: number | string | null;
+}
+
+interface RawEndorsementGroup {
+  skill_name?: string | null;
+  count?: number | string | null;
+  endorsed_by_names?: string | null;
+  endorsed_by_ids?: string | null;
+  endorsed_by_avatars?: string | null;
+  latest_endorsement?: string | null;
+}
+
+interface RawEndorsementsResponse {
+  data?: {
+    endorsements?: RawEndorsementGroup[];
+    stats?: Record<string, unknown>;
+  } | RawEndorsementGroup[];
+  meta?: EndorsementsResponse['meta'];
+}
+
+function normalizeSkill(raw: RawUserSkill): Skill {
+  return {
+    id: raw.id ?? 0,
+    name: raw.name ?? raw.skill_name ?? '',
+    category: raw.category ?? raw.category_name ?? null,
+    endorsement_count: raw.endorsement_count != null ? Number(raw.endorsement_count) : undefined,
+  };
+}
+
+function splitCsv(value?: string | null): string[] {
+  if (!value) return [];
+  return value.split(',').map((part) => part.trim());
+}
+
+function normalizeEndorsementGroups(groups: RawEndorsementGroup[]): Endorsement[] {
+  return groups.flatMap((group, groupIndex) => {
+    const skillName = group.skill_name ?? '';
+    const names = splitCsv(group.endorsed_by_names);
+    const ids = splitCsv(group.endorsed_by_ids);
+    const avatars = splitCsv(group.endorsed_by_avatars);
+    const fallbackCount = Math.max(Number(group.count ?? 0), 1);
+    const rows = names.length > 0 ? names : Array.from({ length: fallbackCount }, () => '');
+
+    return rows.map((name, index) => ({
+      id: Number(ids[index] ?? 0) || Number(`${groupIndex + 1}${index + 1}`),
+      skill: {
+        id: groupIndex + 1,
+        name: skillName,
+        category: null,
+      },
+      endorsed_by: {
+        id: Number(ids[index] ?? 0),
+        name: name || skillName,
+        avatar: avatars[index] || null,
+      },
+      message: null,
+      created_at: group.latest_endorsement ?? '',
+    }));
+  });
+}
+
 /**
- * GET /api/v2/users/{userId}/endorsements — paginated endorsements for a user.
+ * GET /api/v2/members/{userId}/endorsements — endorsements for a user.
  */
 export function getUserEndorsements(
   userId: number,
@@ -49,27 +117,45 @@ export function getUserEndorsements(
 ): Promise<EndorsementsResponse> {
   const params: Record<string, string> = {};
   if (cursor) params['cursor'] = cursor;
-  return api.get<EndorsementsResponse>(`${API_V2}/users/${userId}/endorsements`, params);
+  return api.get<RawEndorsementsResponse>(`${API_V2}/members/${userId}/endorsements`, params)
+    .then((response) => {
+      const groups = Array.isArray(response.data) ? response.data : response.data?.endorsements ?? [];
+      const endorsements = normalizeEndorsementGroups(groups);
+      return {
+        data: endorsements,
+        meta: response.meta ?? {
+          total: endorsements.length,
+          has_more: false,
+          cursor: null,
+        },
+      };
+    });
 }
 
 /**
  * GET /api/v2/users/me/skills — current user's skills and endorsements received.
  */
 export function getMySkills(): Promise<UserSkillsResponse> {
-  return api.get<UserSkillsResponse>(`${API_V2}/users/me/skills`);
+  return api.get<{ data?: RawUserSkill[] }>(`${API_V2}/users/me/skills`)
+    .then((response) => ({
+      data: {
+        skills: (response.data ?? []).map(normalizeSkill),
+        endorsements: [],
+      },
+    }));
 }
 
 /**
- * POST /api/v2/users/{userId}/endorse — endorse a skill on another user's profile.
+ * POST /api/v2/members/{userId}/endorse — endorse a skill on another user's profile.
  */
 export function endorseSkill(
   userId: number,
   skillId: number,
   message?: string,
 ): Promise<{ data: Endorsement }> {
-  return api.post<{ data: Endorsement }>(`${API_V2}/users/${userId}/endorse`, {
+  return api.post<{ data: Endorsement }>(`${API_V2}/members/${userId}/endorse`, {
     skill_id: skillId,
-    message,
+    comment: message,
   });
 }
 
@@ -77,7 +163,13 @@ export function endorseSkill(
  * POST /api/v2/users/me/skills — add a new skill to the current user's profile.
  */
 export function addSkill(skillName: string): Promise<{ data: Skill }> {
-  return api.post<{ data: Skill }>(`${API_V2}/users/me/skills`, { name: skillName });
+  return api.post<{ data?: RawUserSkill[] }>(`${API_V2}/users/me/skills`, { skill_name: skillName })
+    .then((response) => ({
+      data: normalizeSkill((response.data ?? []).find((skill) => skill.skill_name === skillName) ?? {
+        id: 0,
+        skill_name: skillName,
+      }),
+    }));
 }
 
 /**
@@ -88,8 +180,14 @@ export function removeSkill(skillId: number): Promise<void> {
 }
 
 /**
- * GET /api/v2/skills — list all available skills for autocomplete/picker.
+ * GET /api/v2/skills/search — search available skills for autocomplete/picker.
  */
-export function getAvailableSkills(): Promise<{ data: Skill[] }> {
-  return api.get<{ data: Skill[] }>(`${API_V2}/skills`);
+export function getAvailableSkills(query = ''): Promise<{ data: Skill[] }> {
+  const trimmed = query.trim();
+  if (!trimmed) {
+    return Promise.resolve({ data: [] });
+  }
+
+  return api.get<{ data?: RawUserSkill[] }>(`${API_V2}/skills/search`, { q: trimmed })
+    .then((response) => ({ data: (response.data ?? []).map(normalizeSkill) }));
 }

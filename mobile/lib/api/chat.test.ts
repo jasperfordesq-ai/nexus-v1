@@ -12,7 +12,6 @@ jest.mock('@/lib/api/client', () => ({
   registerUnauthorizedCallback: jest.fn(),
 }));
 jest.mock('@/lib/constants', () => ({
-  API_V2: '/api/v2',
   API_BASE_URL: 'https://test.api',
   STORAGE_KEYS: { AUTH_TOKEN: 'auth_token', REFRESH_TOKEN: 'refresh_token', TENANT_SLUG: 'tenant_slug', USER_DATA: 'user_data' },
   TIMEOUTS: { API_REQUEST: 15_000 },
@@ -20,7 +19,7 @@ jest.mock('@/lib/constants', () => ({
 }));
 
 import { api } from '@/lib/api/client';
-import { sendChatMessage, getChatHistory } from './chat';
+import { sendChatMessage, getChatHistory, getChatStarters } from './chat';
 import type { ChatResponse, ChatMessage } from './chat';
 
 const mockUserMessage: ChatMessage = {
@@ -50,7 +49,7 @@ describe('sendChatMessage', () => {
   it('sends POST to the correct endpoint with message and null conversationId', async () => {
     (api.post as jest.Mock).mockResolvedValue(mockChatResponse);
     const result = await sendChatMessage('How do I earn time credits?', null);
-    expect(api.post).toHaveBeenCalledWith('/api/v2/ai/chat', {
+    expect(api.post).toHaveBeenCalledWith('/api/ai/chat', {
       message: 'How do I earn time credits?',
       conversation_id: null,
     });
@@ -60,7 +59,7 @@ describe('sendChatMessage', () => {
   it('sends POST with existing conversationId for follow-up messages', async () => {
     (api.post as jest.Mock).mockResolvedValue(mockChatResponse);
     await sendChatMessage('Tell me more', 'conv-abc-123');
-    expect(api.post).toHaveBeenCalledWith('/api/v2/ai/chat', {
+    expect(api.post).toHaveBeenCalledWith('/api/ai/chat', {
       message: 'Tell me more',
       conversation_id: 'conv-abc-123',
     });
@@ -80,7 +79,7 @@ describe('getChatHistory', () => {
   it('calls the correct endpoint with the conversationId', async () => {
     (api.get as jest.Mock).mockResolvedValue({ data: [mockUserMessage, mockAssistantMessage] });
     const result = await getChatHistory('conv-abc-123');
-    expect(api.get).toHaveBeenCalledWith('/api/v2/ai/chat/conv-abc-123');
+    expect(api.get).toHaveBeenCalledWith('/api/ai/conversations/conv-abc-123');
     expect(result.data).toHaveLength(2);
   });
 
@@ -89,5 +88,16 @@ describe('getChatHistory', () => {
     const result = await getChatHistory('conv-abc-123');
     expect(result.data[0].role).toBe('user');
     expect(result.data[1].role).toBe('assistant');
+  });
+});
+
+describe('getChatStarters', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('unwraps Laravel v2 data envelope from the supported AI route', async () => {
+    (api.get as jest.Mock).mockResolvedValue({ data: { starters: ['Offer help', 'Find events'] } });
+    const result = await getChatStarters();
+    expect(api.get).toHaveBeenCalledWith('/api/ai/chat/starters');
+    expect(result.starters).toEqual(['Offer help', 'Find events']);
   });
 });

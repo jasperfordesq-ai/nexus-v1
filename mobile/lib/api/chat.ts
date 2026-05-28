@@ -4,7 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { api } from '@/lib/api/client';
-import { API_V2 } from '@/lib/constants';
+
+const AI_API = '/api/ai';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -59,7 +60,7 @@ export interface ChatStartersResponse {
 // ─── API Functions ────────────────────────────────────────────────────────────
 
 /**
- * POST /api/v2/ai/chat
+ * POST /api/ai/chat
  * Sends a message to the AI assistant and returns the reply.
  * Pass null for conversationId to start a new conversation.
  * The response contains the new conversation_id to use for follow-up messages.
@@ -68,7 +69,7 @@ export function sendChatMessage(
   message: string,
   conversationId: string | null,
 ): Promise<ChatResponse> {
-  return api.post<RawChatResponse>(`${API_V2}/ai/chat`, {
+  return api.post<RawChatResponse>(`${AI_API}/chat`, {
     message,
     conversation_id: conversationId,
   }).then((response) => {
@@ -94,13 +95,14 @@ export function sendChatMessage(
 }
 
 /**
- * GET /api/v2/ai/chat/{conversationId}
+ * GET /api/ai/conversations/{conversationId}
  * Returns the full message history for a conversation.
  */
 export function getChatHistory(conversationId: string): Promise<{ data: ChatMessage[] }> {
-  return api.get<{ data: ChatMessage[] }>(`${API_V2}/ai/chat/${conversationId}`);
+  return api.get<{ data: ChatMessage[] }>(`${AI_API}/conversations/${conversationId}`);
 }
 
 export function getChatStarters(): Promise<ChatStartersResponse> {
-  return api.get<ChatStartersResponse>(`${API_V2}/ai/chat/starters`);
+  return api.get<{ data?: ChatStartersResponse; starters?: string[] }>(`${AI_API}/chat/starters`)
+    .then((response) => response.data ?? { starters: response.starters ?? [] });
 }

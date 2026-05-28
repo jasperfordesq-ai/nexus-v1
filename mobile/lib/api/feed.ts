@@ -201,12 +201,12 @@ export interface BookmarkResult {
 }
 
 /**
- * POST /api/v2/feed/bookmark — toggle bookmark/save on a feed item.
+ * POST /api/v2/bookmarks — toggle bookmark/save on a feed item.
  */
 export function toggleBookmark(targetType: string, targetId: number): Promise<{ data: BookmarkResult }> {
-  return api.post<{ data: BookmarkResult }>(`${API_V2}/feed/bookmark`, {
-    target_type: targetType,
-    target_id: targetId,
+  return api.post<{ data: BookmarkResult }>(`${API_V2}/bookmarks`, {
+    type: targetType,
+    id: targetId,
   });
 }
 

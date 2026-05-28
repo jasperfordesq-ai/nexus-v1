@@ -28,7 +28,7 @@ import {
   removeSkill,
   getAvailableSkills,
 } from './endorsements';
-import type { EndorsementsResponse, UserSkillsResponse, Skill, Endorsement } from './endorsements';
+import type { EndorsementsResponse, Skill, Endorsement } from './endorsements';
 
 const mockSkill: Skill = { id: 10, name: 'Gardening', category: 'Outdoors' };
 
@@ -45,8 +45,15 @@ const mockEndorsementsResponse: EndorsementsResponse = {
   meta: { total: 1, has_more: false, cursor: null },
 };
 
-const mockUserSkillsResponse: UserSkillsResponse = {
-  data: { skills: [mockSkill], endorsements: [mockEndorsement] },
+const mockRawSkillsResponse = {
+  data: [
+    {
+      id: 10,
+      skill_name: 'Gardening',
+      category_name: 'Outdoors',
+      endorsement_count: '2',
+    },
+  ],
 };
 
 describe('getUserEndorsements', () => {
@@ -55,7 +62,7 @@ describe('getUserEndorsements', () => {
   it('calls the correct endpoint with no cursor on first page', async () => {
     (api.get as jest.Mock).mockResolvedValue(mockEndorsementsResponse);
     const result = await getUserEndorsements(42);
-    expect(api.get).toHaveBeenCalledWith('/api/v2/users/42/endorsements', {});
+    expect(api.get).toHaveBeenCalledWith('/api/v2/members/42/endorsements', {});
     expect(result.data).toHaveLength(1);
     expect(result.meta.has_more).toBe(false);
   });
@@ -63,7 +70,7 @@ describe('getUserEndorsements', () => {
   it('includes cursor param when provided', async () => {
     (api.get as jest.Mock).mockResolvedValue(mockEndorsementsResponse);
     await getUserEndorsements(42, 'cursor-xyz');
-    expect(api.get).toHaveBeenCalledWith('/api/v2/users/42/endorsements', { cursor: 'cursor-xyz' });
+    expect(api.get).toHaveBeenCalledWith('/api/v2/members/42/endorsements', { cursor: 'cursor-xyz' });
   });
 
   it('omits cursor when null is passed', async () => {
@@ -83,11 +90,17 @@ describe('getMySkills', () => {
   beforeEach(() => { jest.clearAllMocks(); });
 
   it('calls /api/v2/users/me/skills and returns skills + endorsements', async () => {
-    (api.get as jest.Mock).mockResolvedValue(mockUserSkillsResponse);
+    (api.get as jest.Mock).mockResolvedValue(mockRawSkillsResponse);
     const result = await getMySkills();
     expect(api.get).toHaveBeenCalledWith('/api/v2/users/me/skills');
     expect(result.data.skills).toHaveLength(1);
-    expect(result.data.endorsements).toHaveLength(1);
+    expect(result.data.skills[0]).toEqual({
+      id: 10,
+      name: 'Gardening',
+      category: 'Outdoors',
+      endorsement_count: 2,
+    });
+    expect(result.data.endorsements).toHaveLength(0);
   });
 });
 
@@ -97,9 +110,9 @@ describe('endorseSkill', () => {
   it('sends POST with skill_id and message to the correct endpoint', async () => {
     (api.post as jest.Mock).mockResolvedValue({ data: mockEndorsement });
     const result = await endorseSkill(5, 10, 'Great help!');
-    expect(api.post).toHaveBeenCalledWith('/api/v2/users/5/endorse', {
+    expect(api.post).toHaveBeenCalledWith('/api/v2/members/5/endorse', {
       skill_id: 10,
-      message: 'Great help!',
+      comment: 'Great help!',
     });
     expect(result.data.id).toBe(1);
   });
@@ -109,7 +122,7 @@ describe('endorseSkill', () => {
     await endorseSkill(5, 10);
     const body = (api.post as jest.Mock).mock.calls[0][1] as Record<string, unknown>;
     expect(body.skill_id).toBe(10);
-    expect(body.message).toBeUndefined();
+    expect(body.comment).toBeUndefined();
   });
 });
 
@@ -117,10 +130,10 @@ describe('addSkill', () => {
   beforeEach(() => { jest.clearAllMocks(); });
 
   it('sends POST with skill name to /api/v2/users/me/skills', async () => {
-    (api.post as jest.Mock).mockResolvedValue({ data: mockSkill });
+    (api.post as jest.Mock).mockResolvedValue(mockRawSkillsResponse);
     const result = await addSkill('Cooking');
-    expect(api.post).toHaveBeenCalledWith('/api/v2/users/me/skills', { name: 'Cooking' });
-    expect(result.data.name).toBe('Gardening');
+    expect(api.post).toHaveBeenCalledWith('/api/v2/users/me/skills', { skill_name: 'Cooking' });
+    expect(result.data.name).toBe('Cooking');
   });
 });
 
@@ -142,11 +155,17 @@ describe('removeSkill', () => {
 describe('getAvailableSkills', () => {
   beforeEach(() => { jest.clearAllMocks(); });
 
-  it('calls /api/v2/skills and returns skill list', async () => {
-    (api.get as jest.Mock).mockResolvedValue({ data: [mockSkill] });
-    const result = await getAvailableSkills();
-    expect(api.get).toHaveBeenCalledWith('/api/v2/skills');
+  it('calls /api/v2/skills/search and returns skill list', async () => {
+    (api.get as jest.Mock).mockResolvedValue(mockRawSkillsResponse);
+    const result = await getAvailableSkills('garden');
+    expect(api.get).toHaveBeenCalledWith('/api/v2/skills/search', { q: 'garden' });
     expect(result.data).toHaveLength(1);
     expect(result.data[0].name).toBe('Gardening');
+  });
+
+  it('does not call the API for an empty search', async () => {
+    const result = await getAvailableSkills();
+    expect(api.get).not.toHaveBeenCalled();
+    expect(result.data).toEqual([]);
   });
 });
