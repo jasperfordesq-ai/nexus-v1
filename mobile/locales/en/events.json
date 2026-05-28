@@ -53,6 +53,9 @@
     "submit": "Create event",
     "validationTitle": "Check event details",
     "validationRequired": "Add a title, description, and valid future start time.",
+    "validationStartFuture": "Choose a future start time.",
+    "validationEndAfterStart": "End time must be after the start time.",
+    "validationCapacity": "Capacity must be between 1 and 10,000.",
     "failedTitle": "Event not created",
     "failedDescription": "We could not create the event. Please try again."
   },

@@ -70,6 +70,23 @@ function NewEventScreen() {
       return;
     }
 
+    const startDate = new Date(start);
+    if (startDate <= new Date()) {
+      Alert.alert(t('create.validationTitle'), t('create.validationStartFuture'));
+      return;
+    }
+
+    if (end && new Date(end) <= startDate) {
+      Alert.alert(t('create.validationTitle'), t('create.validationEndAfterStart'));
+      return;
+    }
+
+    const parsedMaxAttendees = maxAttendees.trim() ? Number(maxAttendees) : null;
+    if (parsedMaxAttendees !== null && (!Number.isFinite(parsedMaxAttendees) || parsedMaxAttendees < 1 || parsedMaxAttendees > 10000)) {
+      Alert.alert(t('create.validationTitle'), t('create.validationCapacity'));
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const result = await createEvent({
@@ -82,7 +99,7 @@ function NewEventScreen() {
         category_name: category || null,
         is_online: allowRemoteAttendance,
         online_link: allowRemoteAttendance && videoUrl.trim() ? videoUrl.trim() : null,
-        max_attendees: maxAttendees.trim() ? Number(maxAttendees) : null,
+        max_attendees: parsedMaxAttendees,
         federated_visibility: isFederated ? 'listed' : 'none',
       });
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);

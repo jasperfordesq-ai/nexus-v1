@@ -5,12 +5,14 @@
 
 import React from 'react';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import { Alert } from 'react-native';
 
 const mockCreateEvent = jest.fn().mockResolvedValue({ data: { id: 6 } });
 const mockReplace = jest.fn();
 
 jest.mock('expo-router', () => ({
   router: { replace: (...args: unknown[]) => mockReplace(...args), back: jest.fn() },
+  useLocalSearchParams: () => ({}),
 }));
 
 jest.mock('react-i18next', () => ({
@@ -40,6 +42,10 @@ jest.mock('react-i18next', () => ({
         'create.reviewTitle': 'Ready to publish?',
         'create.reviewSubtitle': 'Review first.',
         'create.submit': 'Create event',
+        'create.validationTitle': 'Check event details',
+        'create.validationStartFuture': 'Choose a future start time.',
+        'create.validationEndAfterStart': 'End time must be after the start time.',
+        'create.validationCapacity': 'Capacity must be between 1 and 10,000.',
         'category.workshop': 'Workshop',
         'category.social': 'Social',
         'category.outdoor': 'Outdoor',
@@ -114,9 +120,59 @@ jest.mock('heroui-native', () => {
 import NewEventRoute from './new-event';
 
 describe('NewEventRoute', () => {
+  let alertSpy: jest.SpyInstance;
+
   beforeEach(() => {
+    alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
     mockCreateEvent.mockClear();
     mockReplace.mockClear();
+  });
+
+  afterEach(() => {
+    alertSpy.mockRestore();
+  });
+
+  it('blocks event starts in the past', async () => {
+    const { getByPlaceholderText, getByText } = render(<NewEventRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('What is happening?'), 'Repair workshop');
+    fireEvent.changeText(getByPlaceholderText('Tell members what to expect.'), 'Bring something small to mend together.');
+    fireEvent.changeText(getByPlaceholderText('YYYY-MM-DDTHH:mm'), '2000-01-01T09:00');
+    fireEvent.press(getByText('Create event'));
+
+    await waitFor(() => {
+      expect(alertSpy).toHaveBeenCalledWith('Check event details', 'Choose a future start time.');
+    });
+    expect(mockCreateEvent).not.toHaveBeenCalled();
+  });
+
+  it('blocks end times before the start time', async () => {
+    const { getByPlaceholderText, getByText } = render(<NewEventRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('What is happening?'), 'Repair workshop');
+    fireEvent.changeText(getByPlaceholderText('Tell members what to expect.'), 'Bring something small to mend together.');
+    fireEvent.changeText(getByPlaceholderText('YYYY-MM-DDTHH:mm'), '2099-01-02T12:00');
+    fireEvent.changeText(getByPlaceholderText('Optional end time'), '2099-01-02T11:00');
+    fireEvent.press(getByText('Create event'));
+
+    await waitFor(() => {
+      expect(alertSpy).toHaveBeenCalledWith('Check event details', 'End time must be after the start time.');
+    });
+    expect(mockCreateEvent).not.toHaveBeenCalled();
+  });
+
+  it('blocks capacity outside the supported range', async () => {
+    const { getByPlaceholderText, getByText } = render(<NewEventRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('What is happening?'), 'Repair workshop');
+    fireEvent.changeText(getByPlaceholderText('Tell members what to expect.'), 'Bring something small to mend together.');
+    fireEvent.changeText(getByPlaceholderText('Optional attendee limit'), '0');
+    fireEvent.press(getByText('Create event'));
+
+    await waitFor(() => {
+      expect(alertSpy).toHaveBeenCalledWith('Check event details', 'Capacity must be between 1 and 10,000.');
+    });
+    expect(mockCreateEvent).not.toHaveBeenCalled();
   });
 
   it('submits category and remote attendance fields using the event API contract', async () => {
