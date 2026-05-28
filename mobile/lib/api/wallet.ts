@@ -22,6 +22,7 @@ export interface TransactionOtherUser {
  */
 export interface TransactionItem {
   id: number | string;
+  source?: 'native' | 'federation' | string;
   type: 'credit' | 'debit';
   amount: number;
   description: string | null;
@@ -34,6 +35,12 @@ export interface TransactionItem {
   status: string;
   transaction_type: string;
   category_id: number | null;
+  federation?: {
+    transaction_id?: number;
+    partner_id?: number;
+    partner_name?: string | null;
+    external_sender_name?: string | null;
+  } | null;
 }
 
 export interface WalletTransactionsResponse {

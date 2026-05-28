@@ -78,6 +78,8 @@ jest.mock('react-i18next', () => ({
         'actions.loadMoreFailedMessage': 'We could not load more transactions right now.',
         'status.completed': 'Completed',
         'status.pending': 'Pending',
+        'federation.credit': 'Federation credit',
+        'federation.partnerCredit': `${String(opts?.partner ?? '')} credit`,
       };
       return map[key] ?? key;
     },
@@ -159,6 +161,25 @@ const mockDebitTransaction = {
   status: 'completed' as const,
   created_at: '2026-02-15T12:00:00Z',
   other_user: { id: 6, name: 'Carol Jones', avatar_url: null },
+};
+
+const mockFederationTransaction = {
+  id: -12,
+  source: 'federation' as const,
+  type: 'credit' as const,
+  amount: 3,
+  description: 'Partner referral support',
+  status: 'completed' as const,
+  transaction_type: 'federation',
+  category_id: null,
+  created_at: '2026-02-16T12:00:00Z',
+  other_user: { id: 0, name: 'Maria Lopez (TimeOverflow)', avatar_url: null },
+  federation: {
+    transaction_id: 12,
+    partner_id: 4,
+    partner_name: 'TimeOverflow',
+    external_sender_name: 'Maria Lopez',
+  },
 };
 
 describe('WalletModal', () => {
@@ -271,5 +292,17 @@ describe('WalletModal', () => {
 
     await waitFor(() => expect(mockGetWalletTransactions).toHaveBeenCalledWith('next-page', 50, 'all'));
     await waitFor(() => expect(getByText('Garden help')).toBeTruthy());
+  });
+
+  it('labels federation wallet credits with the partner name', () => {
+    mockUseApi
+      .mockReset()
+      .mockReturnValueOnce({ data: { data: { balance: 12.5, total_credits: 20, total_debits: 7.5, currency: 'hours' } }, isLoading: false, error: null, refresh: jest.fn() })
+      .mockReturnValueOnce({ data: { data: [mockFederationTransaction] }, isLoading: false, error: null, refresh: jest.fn() })
+      .mockReturnValueOnce({ data: { data: { balance: 3, total_deposited: 5, total_donated: 2 } }, isLoading: false, error: null, refresh: jest.fn() });
+
+    const { getByText } = render(<WalletModal />);
+    expect(getByText('Partner referral support')).toBeTruthy();
+    expect(getByText('TimeOverflow credit')).toBeTruthy();
   });
 });

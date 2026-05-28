@@ -93,5 +93,9 @@
     "cancelled": "Cancelled",
     "disputed": "Disputed",
     "failed": "Failed"
+  },
+  "federation": {
+    "credit": "Federation credit",
+    "partnerCredit": "{{partner}} credit"
   }
 }

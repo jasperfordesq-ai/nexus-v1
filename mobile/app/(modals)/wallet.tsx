@@ -62,6 +62,11 @@ function getOtherName(transaction: TransactionItem, fallback: string) {
   return transaction.other_user?.name ?? transaction.other_party?.name ?? fallback;
 }
 
+function getStatusLabel(transaction: TransactionItem, t: (key: string, opts?: Record<string, unknown>) => string) {
+  const knownStatuses = new Set(['completed', 'pending', 'cancelled', 'disputed', 'failed']);
+  return knownStatuses.has(transaction.status) ? t(`status.${transaction.status}`) : transaction.status;
+}
+
 function normaliseAmount(value: string): number {
   return Number(value.replace(',', '.').trim());
 }
@@ -682,6 +687,8 @@ function TransactionCard({
   const signedAmount = transaction.amount < 0 ? '-' : (isCredit ? '+' : '-');
   const amount = t('signedHours', { sign: signedAmount, count: Math.abs(transaction.amount) });
   const description = transaction.description?.trim() || t('transactionFallback');
+  const isFederated = transaction.source === 'federation' || transaction.transaction_type === 'federation';
+  const partnerName = transaction.federation?.partner_name?.trim();
 
   return (
     <Pressable
@@ -710,7 +717,13 @@ function TransactionCard({
             </Chip>
             {transaction.status !== 'completed' ? (
               <Chip size="sm" variant="secondary" color="warning">
-                <Chip.Label>{t(`status.${transaction.status}`)}</Chip.Label>
+                <Chip.Label>{getStatusLabel(transaction, t)}</Chip.Label>
+              </Chip>
+            ) : null}
+            {isFederated ? (
+              <Chip size="sm" variant="secondary">
+                <Ionicons name="git-network-outline" size={12} color={primary} />
+                <Chip.Label>{partnerName ? t('federation.partnerCredit', { partner: partnerName }) : t('federation.credit')}</Chip.Label>
               </Chip>
             ) : null}
           </View>
