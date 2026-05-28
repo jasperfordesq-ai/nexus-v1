@@ -1,4 +1,4 @@
-import { Card, CardBody, CardHeader, Input, Button, Textarea, Spinner, Select, SelectItem, Switch } from '@/components/ui';
+import { Card, CardBody, CardHeader, Input, Button, Textarea, Spinner, Select, SelectItem, Switch, Chip } from '@/components/ui';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -11,6 +11,14 @@ import Plus from 'lucide-react/icons/plus';
 import Trash2 from 'lucide-react/icons/trash-2';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import Layers from 'lucide-react/icons/layers';
+import Sparkles from 'lucide-react/icons/sparkles';
+import LayoutGrid from 'lucide-react/icons/layout-grid';
+import ListChecks from 'lucide-react/icons/list-checks';
+import BarChart3 from 'lucide-react/icons/bar-chart-3';
+import Footprints from 'lucide-react/icons/footprints';
+import HeartHandshake from 'lucide-react/icons/heart-handshake';
+import Megaphone from 'lucide-react/icons/megaphone';
+import type { LucideIcon } from 'lucide-react';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminLandingPage } from '../../api/adminApi';
@@ -57,6 +65,16 @@ const SECTION_LABEL_KEYS: Record<LandingSectionType, string> = {
   how_it_works: 'content.landing_section_how_it_works',
   core_values: 'content.landing_section_core_values',
   cta: 'content.landing_section_cta',
+};
+
+const SECTION_ICONS: Record<LandingSectionType, LucideIcon> = {
+  hero: Sparkles,
+  audience_cards: LayoutGrid,
+  feature_pills: ListChecks,
+  stats: BarChart3,
+  how_it_works: Footprints,
+  core_values: HeartHandshake,
+  cta: Megaphone,
 };
 
 const ICON_OPTIONS: LandingIconId[] = [
@@ -852,6 +870,7 @@ function SectionCard({
   const sectionType = section.type as LandingSectionType;
   const labelKey = SECTION_LABEL_KEYS[sectionType];
   const label = labelKey ? t(labelKey) : sectionType;
+  const SectionIcon = SECTION_ICONS[sectionType] ?? Layers;
 
   const renderEditor = () => {
     switch (sectionType) {
@@ -910,26 +929,34 @@ function SectionCard({
   };
 
   return (
-    <Card className={`border border-border bg-surface transition-opacity ${!section.enabled ? 'opacity-60' : ''}`}>
+    <Card className={`border border-border bg-surface transition-all hover:border-primary-300 ${!section.enabled ? 'opacity-60' : ''}`}>
       <CardHeader
-        className="flex cursor-pointer items-center justify-between gap-3 px-4 py-3"
+        className="flex cursor-pointer items-center justify-between gap-3 px-4 py-3 hover:bg-surface-secondary/50 transition-colors"
         onClick={onToggleExpand}
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 min-w-0">
           <ChevronRight
             size={16}
-            className={`text-muted transition-transform ${
+            className={`text-muted transition-transform shrink-0 ${
               isExpanded ? 'rotate-90' : ''
             }`}
           />
-          <div>
-            <p className="text-sm font-semibold">{label}</p>
-            <p className="text-xs text-muted">
+          <span className="inline-flex items-center justify-center size-8 rounded-md bg-primary-50 text-primary-600 shrink-0">
+            <SectionIcon size={16} />
+          </span>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold truncate">{label}</p>
+            <Chip
+              size="sm"
+              variant="flat"
+              color={section.enabled ? 'success' : 'default'}
+              className="mt-0.5"
+            >
               {section.enabled ? t('content.landing_visible') : t('content.landing_hidden')}
-            </p>
+            </Chip>
           </div>
         </div>
-        <div role="presentation" className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+        <div role="presentation" className="flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
           <Switch
             size="sm"
             isSelected={section.enabled}
@@ -1140,7 +1167,7 @@ export function LandingPageBuilder() {
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
-        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" label={t('content.landing_loading')} /></div>
+        <div role="status" aria-busy="true" aria-label={t('content.landing_loading_aria')} className="flex justify-center py-4"><Spinner size="lg" label={t('content.landing_loading')} /></div>
       </div>
     );
   }

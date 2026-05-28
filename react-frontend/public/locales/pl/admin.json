@@ -3151,7 +3151,16 @@
     "filter_by_location": "Filter by location",
     "label_created": "Created",
     "label_no": "No",
-    "location_about": "About"
+    "location_about": "About",
+    "landing_section_hero": "Hero",
+    "landing_section_audience_cards": "Audience cards",
+    "landing_section_feature_pills": "Feature highlights",
+    "landing_section_stats": "Community stats",
+    "landing_section_how_it_works": "How it works",
+    "landing_section_core_values": "Core values",
+    "landing_section_cta": "Call to action",
+    "landing_helper_text": "Leave fields empty to use the platform defaults.",
+    "landing_loading_aria": "Loading"
   },
   "crm": {
     "action_cancel": "Anuluj",
