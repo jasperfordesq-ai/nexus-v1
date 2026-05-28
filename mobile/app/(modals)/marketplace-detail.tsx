@@ -37,7 +37,7 @@ import {
   type MarketplacePickupSlotOption,
 } from '@/lib/api/marketplace';
 import { APP_URL } from '@/lib/constants';
-import { usePrimaryColor } from '@/lib/hooks/useTenant';
+import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { withAlpha } from '@/lib/utils/color';
@@ -58,6 +58,7 @@ function MarketplaceDetailScreen() {
   const { t } = useTranslation(['marketplace', 'common']);
   const params = useLocalSearchParams<{ id?: string }>();
   const primary = usePrimaryColor();
+  const { hasFeature } = useTenant();
   const theme = useTheme();
   const { user } = useAuth();
   const listingId = Number(params.id);
@@ -158,6 +159,7 @@ function MarketplaceDetailScreen() {
   const priceLabel = formatMarketplacePrice(listing.price, listing.price_type, listing.price_currency, t('common.free'));
   const isOwner = Boolean(listing.is_own || (user?.id && listing.user?.id === user.id));
   const canBuy = !isOwner && listing.status === 'active' && listing.price_type !== 'contact' && listing.price_type !== 'auction';
+  const couponsEnabled = hasFeature('merchant_coupons');
   const templateEntries = getListingTemplateEntries(listing.template_data);
 
   async function handleToggleSave() {
@@ -507,14 +509,16 @@ function MarketplaceDetailScreen() {
                   </ScrollView>
                 </View>
               ) : null}
-              <View className="flex-row gap-2">
-                <View className="min-w-0 flex-1">
-                  <FormInput label={t('checkout.coupon')} value={couponCode} onChangeText={(value) => { setCouponCode(value); setCouponApplied(false); }} placeholder={t('checkout.couponPlaceholder')} />
+              {couponsEnabled ? (
+                <View className="flex-row gap-2">
+                  <View className="min-w-0 flex-1">
+                    <FormInput label={t('checkout.coupon')} value={couponCode} onChangeText={(value) => { setCouponCode(value); setCouponApplied(false); }} placeholder={t('checkout.couponPlaceholder')} />
+                  </View>
+                  <HeroButton className="self-end" variant={couponApplied ? 'primary' : 'secondary'} onPress={() => void applyCoupon()} isDisabled={isActionLoading || !couponCode.trim()} style={couponApplied ? { backgroundColor: theme.success } : undefined}>
+                    <HeroButton.Label>{couponApplied ? t('checkout.applied') : t('checkout.apply')}</HeroButton.Label>
+                  </HeroButton>
                 </View>
-                <HeroButton className="self-end" variant={couponApplied ? 'primary' : 'secondary'} onPress={() => void applyCoupon()} isDisabled={isActionLoading || !couponCode.trim()} style={couponApplied ? { backgroundColor: theme.success } : undefined}>
-                  <HeroButton.Label>{couponApplied ? t('checkout.applied') : t('checkout.apply')}</HeroButton.Label>
-                </HeroButton>
-              </View>
+              ) : null}
             </HeroCard.Body>
           </HeroCard>
         ) : null}

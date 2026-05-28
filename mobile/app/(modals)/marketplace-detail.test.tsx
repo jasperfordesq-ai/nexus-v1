@@ -7,6 +7,8 @@ import React from 'react';
 import { Alert } from 'react-native';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
+let mockFeatures = new Set(['merchant_coupons']);
+
 jest.mock('expo-router', () => ({
   router: { push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
   useLocalSearchParams: () => ({ id: '9' }),
@@ -62,6 +64,7 @@ jest.mock('react-i18next', () => ({
 
 jest.mock('@/lib/hooks/useTenant', () => ({
   usePrimaryColor: () => '#6366f1',
+  useTenant: () => ({ hasFeature: (feature: string) => mockFeatures.has(feature) }),
 }));
 
 jest.mock('@/lib/hooks/useTheme', () => ({
@@ -163,6 +166,7 @@ describe('MarketplaceDetailRoute', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockFeatures = new Set(['merchant_coupons']);
     alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
     (getMarketplaceListing as jest.Mock).mockResolvedValue({ data: mockListing });
   });
@@ -222,6 +226,19 @@ describe('MarketplaceDetailRoute', () => {
         'Order MKT-000044 was created, but payment could not start. Continue payment from Orders.',
       );
     });
+  });
+
+  it('hides coupon checkout controls when merchant coupons are disabled', async () => {
+    mockFeatures = new Set();
+
+    const { getByText, queryByText } = render(<MarketplaceDetailRoute />);
+
+    await waitFor(() => {
+      expect(getByText('Checkout')).toBeTruthy();
+    });
+
+    expect(queryByText('Coupon code')).toBeNull();
+    expect(queryByText('Apply')).toBeNull();
   });
 
   it('shows only the valid order-based community delivery surface on listing detail', async () => {
