@@ -3,8 +3,34 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { router } from 'expo-router';
+import { router, type Href } from 'expo-router';
 import * as Sentry from '@sentry/react-native';
+
+const knownSections = new Set([
+  'exchanges',
+  'listings',
+  'events',
+  'members',
+  'messages',
+  'blog',
+  'blog-post',
+  'groups',
+  'jobs',
+  'job',
+  'organisations',
+  'organizations',
+  'organisation',
+  'organization',
+  'volunteering',
+  'goals',
+  'endorsements',
+  'gamification',
+  'federation',
+  'wallet',
+  'notifications',
+  'chat',
+  'search',
+]);
 
 /**
  * Maps a web-format deep-link (e.g. /exchanges/123) to the appropriate
@@ -12,9 +38,10 @@ import * as Sentry from '@sentry/react-native';
  */
 export function navigateToLink(link: string | null): void {
   if (!link) return;
-  const match = link.match(/^\/([^/]+)(?:\/([^/]+))?/);
-  if (!match) return;
-  const [, section, id] = match;
+  const parsed = parseLink(link);
+  if (!parsed) return;
+  const { section, segments, params } = parsed;
+  const [id] = segments;
   switch (section) {
     case 'exchanges':
     case 'listings':
@@ -74,8 +101,7 @@ export function navigateToLink(link: string | null): void {
       router.push('/(modals)/gamification');
       break;
     case 'federation':
-      if (id) router.push({ pathname: '/(modals)/federation-partner', params: { id } });
-      else router.push('/(modals)/federation');
+      navigateFederation(segments, params);
       break;
     case 'wallet':
       router.push('/(modals)/wallet');
@@ -92,5 +118,86 @@ export function navigateToLink(link: string | null): void {
     default:
       Sentry.captureMessage(`[DeepLink] Unhandled link: ${link}`, 'warning');
       break;
+  }
+}
+
+function parseLink(link: string): { section: string; segments: string[]; params: Record<string, string> } | null {
+  let url: URL;
+  try {
+    url = new URL(link, 'https://app.project-nexus.ie');
+  } catch {
+    return null;
+  }
+
+  const pathSegments = url.pathname.split('/').filter(Boolean).map(decodeURIComponent);
+  if (pathSegments.length === 0) return null;
+
+  let [section, ...segments] = pathSegments;
+  if (!knownSections.has(section) && pathSegments[1] && knownSections.has(pathSegments[1])) {
+    section = pathSegments[1];
+    segments = pathSegments.slice(2);
+  }
+
+  return {
+    section,
+    segments,
+    params: Object.fromEntries(url.searchParams.entries()),
+  };
+}
+
+function navigateFederation(segments: string[], queryParams: Record<string, string>): void {
+  const [branch, detailId] = segments;
+  if (!branch) {
+    router.push('/(modals)/federation');
+    return;
+  }
+
+  switch (branch) {
+    case 'partners':
+      if (detailId) {
+        router.push({ pathname: '/(modals)/federation-partner', params: { id: detailId } });
+      } else {
+        pushWithOptionalParams('/(modals)/federation-partners', queryParams);
+      }
+      break;
+    case 'members':
+      if (detailId) {
+        router.push({ pathname: '/(modals)/member-profile', params: { id: detailId, ...queryParams } });
+      } else {
+        pushWithOptionalParams('/(modals)/federation-members', queryParams);
+      }
+      break;
+    case 'messages':
+      pushWithOptionalParams('/(modals)/federation-messages', queryParams);
+      break;
+    case 'listings':
+      pushWithOptionalParams('/(modals)/federation-listings', queryParams);
+      break;
+    case 'groups':
+      pushWithOptionalParams('/(modals)/federation-groups', queryParams);
+      break;
+    case 'events':
+      pushWithOptionalParams('/(modals)/federation-events', queryParams);
+      break;
+    case 'settings':
+      pushWithOptionalParams('/(modals)/federation-settings', queryParams);
+      break;
+    case 'onboarding':
+      pushWithOptionalParams('/(modals)/federation-onboarding', queryParams);
+      break;
+    case 'connections':
+      pushWithOptionalParams('/(modals)/federation-connections', queryParams);
+      break;
+    default:
+      router.push({ pathname: '/(modals)/federation-partner', params: { id: branch, ...queryParams } });
+      break;
+  }
+}
+
+function pushWithOptionalParams(pathname: string, params: Record<string, string>): void {
+  if (Object.keys(params).length > 0) {
+    router.push({ pathname, params } as unknown as Href);
+  } else {
+    router.push(pathname as Href);
   }
 }
