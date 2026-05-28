@@ -624,6 +624,8 @@
       "namePlaceholder": "Bikes under 100",
       "query": "Search query",
       "queryPlaceholder": "bike, tools, sofa...",
+      "alertFrequency": "Alert frequency",
+      "alertChannel": "Alert channel",
       "create": "Save search",
       "empty": "No saved searches yet",
       "saveFailed": "Could not save this search.",
@@ -632,6 +634,11 @@
         "instant": "Instant alerts",
         "daily": "Daily alerts",
         "weekly": "Weekly alerts"
+      },
+      "channel": {
+        "email": "Email",
+        "push": "Push",
+        "both": "Email and push"
       }
     },
     "promotions": {

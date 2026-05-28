@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render, waitFor } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 let mockParams: Record<string, string> = {};
 const mockHasFeature = jest.fn(() => true);
@@ -25,6 +25,22 @@ const mockT = (key: string, opts?: Record<string, unknown>) => {
     'tools.tabs.promotions': 'Promotions',
     'tools.tabs.pickups': 'Pickups',
     'tools.tabs.coupons': 'Coupons',
+    'tools.savedSearches.title': 'Saved searches',
+    'tools.savedSearches.subtitle': 'Save a marketplace search and keep alerts close to the mobile app.',
+    'tools.savedSearches.name': 'Name',
+    'tools.savedSearches.namePlaceholder': 'Bikes under 100',
+    'tools.savedSearches.query': 'Search query',
+    'tools.savedSearches.queryPlaceholder': 'bike, tools, sofa...',
+    'tools.savedSearches.alertFrequency': 'Alert frequency',
+    'tools.savedSearches.alertChannel': 'Alert channel',
+    'tools.savedSearches.create': 'Save search',
+    'tools.savedSearches.empty': 'No saved searches yet',
+    'tools.savedSearches.frequency.instant': 'Instant alerts',
+    'tools.savedSearches.frequency.daily': 'Daily alerts',
+    'tools.savedSearches.frequency.weekly': 'Weekly alerts',
+    'tools.savedSearches.channel.email': 'Email',
+    'tools.savedSearches.channel.push': 'Push',
+    'tools.savedSearches.channel.both': 'Email and push',
     'tools.coupons.title': 'Seller coupons',
     'tools.coupons.subtitle': 'Create and manage merchant coupons for marketplace checkout.',
     'tools.coupons.code': 'Coupon code',
@@ -163,6 +179,8 @@ jest.mock('@/lib/api/marketplace', () => ({
 
 import MarketplaceToolsRoute from './marketplace-tools';
 import {
+  createMarketplaceSavedSearch,
+  getMarketplaceSavedSearches,
   getMerchantCoupons,
   getMerchantCouponRedemptions,
 } from '@/lib/api/marketplace';
@@ -190,6 +208,8 @@ describe('MarketplaceToolsRoute', () => {
     jest.clearAllMocks();
     mockParams = {};
     mockHasFeature.mockReturnValue(true);
+    jest.mocked(getMarketplaceSavedSearches).mockResolvedValue({ data: [] } as never);
+    jest.mocked(createMarketplaceSavedSearch).mockResolvedValue({ data: { id: 21 } } as never);
     jest.mocked(getMerchantCoupons).mockResolvedValue({ data: { items: [coupon] } } as never);
     jest.mocked(getMerchantCouponRedemptions).mockResolvedValue({
       data: {
@@ -215,6 +235,27 @@ describe('MarketplaceToolsRoute', () => {
 
     expect(await findByText('Editing coupon')).toBeTruthy();
     expect(await findByText('Update coupon')).toBeTruthy();
+  });
+
+  it('creates saved searches with selected alert preferences', async () => {
+    mockParams = { tab: 'savedSearches' };
+
+    const { getByPlaceholderText, getByText } = render(<MarketplaceToolsRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('Bikes under 100'), 'Weekend bikes');
+    fireEvent.changeText(getByPlaceholderText('bike, tools, sofa...'), 'bicycle');
+    fireEvent.press(getByText('Weekly alerts'));
+    fireEvent.press(getByText('Email and push'));
+    fireEvent.press(getByText('Save search'));
+
+    await waitFor(() => {
+      expect(createMarketplaceSavedSearch).toHaveBeenCalledWith({
+        name: 'Weekend bikes',
+        search_query: 'bicycle',
+        alert_frequency: 'weekly',
+        alert_channel: 'both',
+      });
+    });
   });
 
   it('opens a seller coupon redemptions sheet from route params', async () => {

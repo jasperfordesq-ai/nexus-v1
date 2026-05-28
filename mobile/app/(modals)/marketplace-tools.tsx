@@ -60,6 +60,8 @@ type CouponDiscountType = 'percent' | 'fixed' | 'bogo';
 type CouponStatus = 'draft' | 'active' | 'paused' | 'expired';
 type CouponAppliesTo = 'all_listings' | 'listing_ids' | 'category_ids';
 type CouponRouteMode = 'edit' | 'redemptions';
+type SavedSearchAlertFrequency = 'instant' | 'daily' | 'weekly';
+type SavedSearchAlertChannel = 'email' | 'push' | 'both';
 
 interface CouponFormState {
   code: string;
@@ -80,6 +82,8 @@ const TABS: ToolTab[] = ['collections', 'savedSearches', 'promotions', 'pickups'
 const COUPON_DISCOUNT_TYPES: CouponDiscountType[] = ['percent', 'fixed', 'bogo'];
 const COUPON_STATUSES: CouponStatus[] = ['draft', 'active', 'paused', 'expired'];
 const COUPON_APPLIES_TO: CouponAppliesTo[] = ['all_listings', 'listing_ids', 'category_ids'];
+const SAVED_SEARCH_ALERT_FREQUENCIES: SavedSearchAlertFrequency[] = ['instant', 'daily', 'weekly'];
+const SAVED_SEARCH_ALERT_CHANNELS: SavedSearchAlertChannel[] = ['push', 'email', 'both'];
 
 const emptyCouponForm: CouponFormState = {
   code: '',
@@ -267,12 +271,19 @@ function SavedSearchesPanel() {
   const { t } = useTranslation(['marketplace', 'common']);
   const [name, setName] = useState('');
   const [query, setQuery] = useState('');
+  const [alertFrequency, setAlertFrequency] = useState<SavedSearchAlertFrequency>('daily');
+  const [alertChannel, setAlertChannel] = useState<SavedSearchAlertChannel>('push');
   const searches = useApi(() => getMarketplaceSavedSearches(), [], { enabled: true });
 
   async function create() {
     if (!name.trim()) return;
     try {
-      await createMarketplaceSavedSearch({ name: name.trim(), search_query: query.trim() || null, alert_frequency: 'daily', alert_channel: 'push' });
+      await createMarketplaceSavedSearch({
+        name: name.trim(),
+        search_query: query.trim() || null,
+        alert_frequency: alertFrequency,
+        alert_channel: alertChannel,
+      });
       setName('');
       setQuery('');
       searches.refresh();
@@ -295,6 +306,20 @@ function SavedSearchesPanel() {
       <View className="gap-3">
         <FormInput label={t('tools.savedSearches.name')} value={name} onChangeText={setName} placeholder={t('tools.savedSearches.namePlaceholder')} />
         <FormInput label={t('tools.savedSearches.query')} value={query} onChangeText={setQuery} placeholder={t('tools.savedSearches.queryPlaceholder')} />
+        <ChoiceGroup
+          label={t('tools.savedSearches.alertFrequency')}
+          values={SAVED_SEARCH_ALERT_FREQUENCIES}
+          selected={alertFrequency}
+          onSelect={setAlertFrequency}
+          labelFor={(value) => t(`tools.savedSearches.frequency.${value}`)}
+        />
+        <ChoiceGroup
+          label={t('tools.savedSearches.alertChannel')}
+          values={SAVED_SEARCH_ALERT_CHANNELS}
+          selected={alertChannel}
+          onSelect={setAlertChannel}
+          labelFor={(value) => t(`tools.savedSearches.channel.${value}`)}
+        />
         <HeroButton variant="primary" onPress={create} isDisabled={!name.trim()}>
           <HeroButton.Label>{t('tools.savedSearches.create')}</HeroButton.Label>
         </HeroButton>
@@ -315,6 +340,41 @@ function SavedSearchesPanel() {
         )}
       />
     </PanelCard>
+  );
+}
+
+function ChoiceGroup<T extends string>({
+  label,
+  values,
+  selected,
+  onSelect,
+  labelFor,
+}: {
+  label: string;
+  values: readonly T[];
+  selected: T;
+  onSelect: (value: T) => void;
+  labelFor: (value: T) => string;
+}) {
+  const primary = usePrimaryColor();
+  const theme = useTheme();
+  return (
+    <View className="gap-2">
+      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{label}</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+        {values.map((value) => (
+          <HeroButton
+            key={value}
+            size="sm"
+            variant={selected === value ? 'primary' : 'secondary'}
+            onPress={() => onSelect(value)}
+            style={selected === value ? { backgroundColor: primary } : undefined}
+          >
+            <HeroButton.Label>{labelFor(value)}</HeroButton.Label>
+          </HeroButton>
+        ))}
+      </ScrollView>
+    </View>
   );
 }
 
