@@ -121,25 +121,27 @@ export default function MemberProfileScreen() {
 
 function MemberProfileScreenInner() {
   const { t } = useTranslation(['members', 'federation', 'common']);
-  const { id, tenant_id: tenantIdParam } = useLocalSearchParams<{ id?: string; tenant_id?: string }>();
+  const { id, tenant_id: tenantIdParam, name: nameParam } = useLocalSearchParams<{ id?: string; tenant_id?: string; name?: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const { user } = useAuth();
 
-  const routeMemberId = Number(id);
+  const rawMemberId = typeof id === 'string' ? id.trim() : '';
+  const isExternalFederatedProfile = rawMemberId.startsWith('ext-');
+  const routeMemberId = isExternalFederatedProfile ? Number.NaN : Number(rawMemberId || id);
   const authMemberId = Number(user?.id);
-  const memberId = Number.isFinite(routeMemberId) && routeMemberId > 0 ? routeMemberId : authMemberId;
+  const memberId = isExternalFederatedProfile ? 0 : (Number.isFinite(routeMemberId) && routeMemberId > 0 ? routeMemberId : authMemberId);
   const safeMemberId = Number.isFinite(memberId) && memberId > 0 ? memberId : 0;
   const routeTenantId = Number(tenantIdParam);
   const authTenantId = Number(user?.tenant_id);
   const safeTenantId = Number.isFinite(routeTenantId) && routeTenantId > 0 ? routeTenantId : null;
-  const isFederatedProfile = safeTenantId !== null && (!Number.isFinite(authTenantId) || safeTenantId !== authTenantId);
+  const isFederatedProfile = isExternalFederatedProfile || (safeTenantId !== null && (!Number.isFinite(authTenantId) || safeTenantId !== authTenantId));
   const isOwnProfile = !isFederatedProfile && user?.id === safeMemberId;
 
   const { data, isLoading, error, refresh } = useApi(
     () => loadMemberProfileData(safeMemberId, safeTenantId, isFederatedProfile),
     [safeMemberId, safeTenantId, isFederatedProfile],
-    { enabled: safeMemberId > 0 },
+    { enabled: safeMemberId > 0 && !isExternalFederatedProfile },
   );
 
   const member = useMemo(() => normalizeMember(data?.data as MemberProfile | undefined), [data]);
@@ -266,6 +268,19 @@ function MemberProfileScreenInner() {
     } catch {
       // Native share cancellation is not an error state.
     }
+  }
+
+  if (isExternalFederatedProfile && rawMemberId) {
+    return (
+      <ExternalFederatedMemberState
+        memberId={rawMemberId}
+        tenantId={externalTenantIdFromMemberId(rawMemberId) ?? tenantIdParam ?? ''}
+        displayName={typeof nameParam === 'string' && nameParam.trim() ? nameParam.trim() : t('profile.externalFederatedMember')}
+        primary={primary}
+        theme={theme}
+        t={t}
+      />
+    );
   }
 
   if (safeMemberId <= 0) {
@@ -587,6 +602,76 @@ function MemberProfileScreenInner() {
   );
 }
 
+function ExternalFederatedMemberState({
+  memberId,
+  tenantId,
+  displayName,
+  primary,
+  theme,
+  t,
+}: {
+  memberId: string;
+  tenantId: string;
+  displayName: string;
+  primary: string;
+  theme: Theme;
+  t: TFunction;
+}) {
+  const canMessage = tenantId.trim().length > 0;
+
+  function openMessage() {
+    if (!canMessage) return;
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push({
+      pathname: '/(modals)/federation-messages',
+      params: {
+        compose: 'true',
+        to_user: memberId,
+        to_tenant: tenantId,
+        name: displayName,
+      },
+    } as unknown as Href);
+  }
+
+  return (
+    <SafeAreaView className="flex-1 bg-background">
+      <AppTopBar title={t('profile.externalFederatedMember')} backLabel={t('common:buttons.back')} fallbackHref={'/(modals)/federation-members' as Href} />
+      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40 }}>
+        <HeroCard variant="default" className="overflow-hidden">
+          <View className="h-1 w-full" style={{ backgroundColor: primary }} />
+          <HeroCard.Body className="items-center gap-4 px-5 py-6">
+            <View className="size-16 items-center justify-center rounded-3xl" style={{ backgroundColor: `${primary}22` }}>
+              <Ionicons name="globe-outline" size={30} color={primary} />
+            </View>
+            <View className="items-center gap-2">
+              <Text className="text-center text-xl font-bold" style={{ color: theme.text }}>
+                {displayName}
+              </Text>
+              <Chip size="sm" variant="soft" color="accent">
+                <Ionicons name="git-network-outline" size={12} color={primary} />
+                <Chip.Label>{t('profile.externalFederatedMember')}</Chip.Label>
+              </Chip>
+              <Text className="text-center text-sm leading-5" style={{ color: theme.textSecondary }}>
+                {t('profile.externalFederatedMemberDescription')}
+              </Text>
+            </View>
+            <View className="w-full gap-3">
+              <HeroButton variant="primary" isDisabled={!canMessage} onPress={openMessage} style={{ backgroundColor: canMessage ? primary : theme.border }}>
+                <Ionicons name="chatbubble-ellipses-outline" size={18} color="#fff" />
+                <HeroButton.Label>{t('profile.sendMessage')}</HeroButton.Label>
+              </HeroButton>
+              <HeroButton variant="secondary" onPress={() => router.replace('/(modals)/federation-members' as Href)}>
+                <Ionicons name="arrow-back-outline" size={18} color={primary} />
+                <HeroButton.Label>{t('profile.backToFederatedMembers')}</HeroButton.Label>
+              </HeroButton>
+            </View>
+          </HeroCard.Body>
+        </HeroCard>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
 function FederatedTransferCard({
   member,
   displayName,
@@ -693,6 +778,13 @@ function FederatedTransferCard({
       </HeroCard.Body>
     </HeroCard>
   );
+}
+
+function externalTenantIdFromMemberId(memberId?: number | string | null): string | null {
+  const raw = String(memberId ?? '');
+  if (!raw.startsWith('ext-')) return null;
+  const parts = raw.split('-', 3);
+  return parts[1] ? `ext-${parts[1]}` : null;
 }
 
 async function loadMemberProfileData(

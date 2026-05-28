@@ -26,6 +26,9 @@ jest.mock('react-i18next', () => ({
         'profile.federatedMember': 'Federated member',
         'profile.federatedProfile': 'Federated profile',
         'profile.federatedProfileHint': opts ? `This profile is shared from ${String(opts.community ?? '')}.` : 'This profile is federated.',
+        'profile.externalFederatedMember': 'External federated member',
+        'profile.externalFederatedMemberDescription': 'This member is shared by an external federation partner.',
+        'profile.backToFederatedMembers': 'Back to federated members',
         'profile.federatedMessaging': 'Messaging enabled',
         'profile.federatedExchanges': 'Exchanges enabled',
         'profile.sendCredits': 'Send credits',
@@ -390,6 +393,29 @@ describe('MemberProfileScreen', () => {
         amount: 2,
         description: 'Repair help',
       });
+    });
+  });
+
+  it('opens external federated member deep links as messageable partner profiles', () => {
+    mockParams = { id: 'ext-7-123', name: 'External Sam' };
+    mockUseApi.mockReturnValue({ data: null, isLoading: false, error: null, refresh: jest.fn() });
+
+    const { router } = require('expo-router');
+    const { getAllByText, getByText } = render(<MemberProfileScreen />);
+
+    expect(getByText('External Sam')).toBeTruthy();
+    expect(getAllByText('External federated member').length).toBeGreaterThan(0);
+
+    fireEvent.press(getByText('Send Message'));
+
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/(modals)/federation-messages',
+      params: {
+        compose: 'true',
+        to_user: 'ext-7-123',
+        to_tenant: 'ext-7',
+        name: 'External Sam',
+      },
     });
   });
 });

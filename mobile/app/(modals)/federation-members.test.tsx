@@ -92,10 +92,21 @@ jest.mock('@/components/ui/Toggle', () => 'View');
 
 import FederationMembersScreen from './federation-members';
 
+const defaultPaginatedState = {
+  items: [],
+  isLoading: false,
+  isLoadingMore: false,
+  error: null,
+  hasMore: false,
+  loadMore: jest.fn(),
+  refresh: jest.fn(),
+};
+
 beforeEach(() => {
   jest.clearAllMocks();
   mockUseApi.mockReturnValue({ data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() });
   mockUsePaginatedApi.mockReturnValue({
+    ...defaultPaginatedState,
     items: [{
       id: 272,
       name: 'Katherine Murphy',
@@ -106,12 +117,6 @@ beforeEach(() => {
       tenant_name: 'Cork Timebank',
       timebank: { id: 5, name: 'Cork Timebank' },
     }],
-    isLoading: false,
-    isLoadingMore: false,
-    error: null,
-    hasMore: false,
-    loadMore: jest.fn(),
-    refresh: jest.fn(),
   });
 });
 
@@ -126,6 +131,38 @@ describe('FederationMembersScreen', () => {
     expect(router.push).toHaveBeenCalledWith({
       pathname: '/(modals)/federation-member',
       params: { id: '272', tenant_id: '5' },
+    });
+  });
+
+  it('routes external member profile and message actions with the external partner tenant id', () => {
+    mockUsePaginatedApi.mockReturnValueOnce({
+      ...defaultPaginatedState,
+      items: [{
+        id: 'ext-7-123',
+        name: 'External Sam',
+        bio: 'Shared by an external partner.',
+        avatar: null,
+        skills: ['Translation'],
+        tenant_id: 99,
+        tenant_name: 'Remote partner',
+        timebank: { id: 99, name: 'Remote partner' },
+        is_external: true,
+      }],
+    });
+    const { router } = require('expo-router');
+    const { getByText } = render(<FederationMembersScreen />);
+
+    fireEvent.press(getByText('View profile'));
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/(modals)/federation-member',
+      params: { id: 'ext-7-123', tenant_id: 'ext-7' },
+    });
+
+    router.push.mockClear();
+    fireEvent.press(getByText('Message'));
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/(modals)/federation-messages',
+      params: { compose: 'true', to_user: 'ext-7-123', to_tenant: 'ext-7', name: 'External Sam' },
     });
   });
 });

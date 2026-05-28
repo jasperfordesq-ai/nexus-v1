@@ -124,6 +124,13 @@ function displayMemberName(member: FederatedMember, fallback: string) {
   return member.name?.trim() || `${member.first_name ?? ''} ${member.last_name ?? ''}`.trim() || fallback;
 }
 
+function externalTenantIdFromMemberId(memberId?: number | string | null): string | null {
+  const raw = String(memberId ?? '');
+  if (!raw.startsWith('ext-')) return null;
+  const parts = raw.split('-', 3);
+  return parts[1] ? `ext-${parts[1]}` : null;
+}
+
 function isFeatureDisabledError(error: string | null) {
   return !!error && /feature disabled|disabled for this tenant|cross-tenant/i.test(error);
 }
@@ -317,7 +324,9 @@ function PartnerCard({ partner, t, theme, primary }: { partner: FederatedTenant;
 
 function MemberCard({ member, t, theme, primary }: { member: FederatedMember; t: (key: string, opts?: Record<string, unknown>) => string; theme: ReturnType<typeof useTheme>; primary: string }) {
   const name = displayMemberName(member, t('directory.members.memberFallback'));
-  const tenantId = member.tenant_id ?? member.timebank?.id;
+  const tenantId = member.is_external
+    ? externalTenantIdFromMemberId(member.id) ?? member.tenant_id ?? member.timebank?.id
+    : member.tenant_id ?? member.timebank?.id;
   return (
     <HeroCard className="mb-3 rounded-panel p-0">
       <HeroCard.Body className="gap-3 p-4">
@@ -343,7 +352,7 @@ function MemberCard({ member, t, theme, primary }: { member: FederatedMember; t:
           </View>
         ) : null}
         <View className="flex-row gap-2">
-          {!member.is_external ? (
+          {tenantId ? (
             <HeroButton size="sm" variant="secondary" onPress={() => router.push({ pathname: '/(modals)/federation-member', params: { id: String(member.id), tenant_id: tenantId ? String(tenantId) : undefined } } as unknown as Href)}>
               <Ionicons name="person-outline" size={14} color={primary} />
               <HeroButton.Label>{t('directory.members.viewProfile')}</HeroButton.Label>
