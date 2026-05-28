@@ -985,7 +985,9 @@
     "sync_search_hint_prefix": "Laufen",
     "sync_search_hint_suffix": "nach dem Start von Meilisearch.",
     "loading": "Loading",
-    "health_loading": "Loading algorithm health..."
+    "health_loading": "Loading algorithm health...",
+    "top_matches_for_user_one": "Beste{{count}}-Übereinstimmung für{{name}}",
+    "top_matches_for_user_other": "Die besten{{count}}-Übereinstimmungen für{{name}}"
   },
   "alerts": {
     "pending_approvals": "Ausstehende Genehmigungen",

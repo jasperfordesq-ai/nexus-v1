@@ -2669,7 +2669,9 @@
     "sync_search_hint_prefix": "Run",
     "sync_search_hint_suffix": "after Meilisearch starts.",
     "unable_to_load_sitemap_stats": "Unable to Load Sitemap Stats",
-    "usage_limits_heading": "Usage Limits"
+    "usage_limits_heading": "Usage Limits",
+    "top_matches_for_user_one": "Top {{count}} match for {{name}}",
+    "top_matches_for_user_other": "Top {{count}} matches for {{name}}"
   },
   "alerts": {
     "pending_approvals": "Pending Approvals",

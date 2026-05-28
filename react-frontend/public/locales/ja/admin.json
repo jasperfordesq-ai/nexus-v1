@@ -985,7 +985,9 @@
     "sync_search_hint_prefix": "走る",
     "sync_search_hint_suffix": "メイリサーチ開始後。",
     "loading": "Loading",
-    "health_loading": "Loading algorithm health..."
+    "health_loading": "Loading algorithm health...",
+    "top_matches_for_user_one": "{{name}}の上位{{count}}一致",
+    "top_matches_for_user_other": "{{name}}の上位{{count}}一致"
   },
   "alerts": {
     "pending_approvals": "承認待ち",

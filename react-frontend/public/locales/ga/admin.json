@@ -985,7 +985,9 @@
     "sync_search_hint_prefix": "Rith",
     "sync_search_hint_suffix": "tar éis tosú Meilisearch.",
     "loading": "Loading",
-    "health_loading": "Loading algorithm health..."
+    "health_loading": "Loading algorithm health...",
+    "top_matches_for_user_one": "Cluiche barr{{count}}do{{name}}",
+    "top_matches_for_user_other": "Na cluichí is fearr do{{count}}do{{name}}"
   },
   "alerts": {
     "pending_approvals": "Ceaduithe ar Feitheamh",

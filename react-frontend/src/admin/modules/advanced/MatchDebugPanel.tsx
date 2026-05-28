@@ -98,7 +98,7 @@ const SCORE_COMPONENTS: Array<{ key: keyof DebugScores; i18nKey: string }> = [
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function MatchDebugPanel() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced' });
   const { t: tNav } = useTranslation('admin_nav');
   usePageTitle(tNav('advanced'));
   const toast = useToast();

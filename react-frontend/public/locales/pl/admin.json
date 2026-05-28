@@ -985,7 +985,9 @@
     "sync_search_hint_prefix": "Uruchomić",
     "sync_search_hint_suffix": "po uruchomieniu Meilisearch.",
     "loading": "Loading",
-    "health_loading": "Loading algorithm health..."
+    "health_loading": "Loading algorithm health...",
+    "top_matches_for_user_one": "Najlepszy mecz{{count}}dla{{name}}",
+    "top_matches_for_user_other": "Najpopularniejsze mecze{{count}}dla{{name}}"
   },
   "alerts": {
     "pending_approvals": "Oczekujące zatwierdzenia",
