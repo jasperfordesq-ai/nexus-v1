@@ -74,7 +74,7 @@ class MarketplaceSellerService
      */
     public static function getPublicProfile(int $sellerId): ?array
     {
-        $profile = MarketplaceSellerProfile::with('user:id,first_name,last_name,avatar_url,is_verified,created_at')
+        $profile = MarketplaceSellerProfile::with('user:id,first_name,last_name,avatar_url,is_verified,created_at,location')
             ->find($sellerId);
 
         if (!$profile) {
@@ -95,6 +95,7 @@ class MarketplaceSellerService
             'bio' => $profile->bio,
             'avatar_url' => $profile->avatar_url ?? $profile->user->avatar_url ?? null,
             'cover_image_url' => $profile->cover_image_url,
+            'location' => $profile->user->location ?? null,
             'seller_type' => $profile->seller_type,
             'business_name' => $profile->seller_type === 'business' ? $profile->business_name : null,
             'business_verified' => $profile->business_verified,
@@ -108,6 +109,7 @@ class MarketplaceSellerService
             'active_listings' => $listingCount,
             'member_since' => $profile->user->created_at?->toISOString(),
             'joined_marketplace_at' => $profile->joined_marketplace_at?->toISOString(),
+            'marketplace_partner_badge_at' => $profile->marketplace_partner_badge_at?->toISOString(),
         ];
     }
 

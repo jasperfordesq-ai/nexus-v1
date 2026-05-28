@@ -43,6 +43,7 @@ class MarketplaceSellerProfile extends Model
         'is_community_endorsed',
         'is_suspended',
         'joined_marketplace_at',
+        'marketplace_partner_badge_at',
     ];
 
     /**
@@ -56,6 +57,7 @@ class MarketplaceSellerProfile extends Model
         'stripe_onboarding_complete' => 'boolean',
         'is_community_endorsed' => 'boolean',
         'joined_marketplace_at' => 'datetime',
+        'marketplace_partner_badge_at' => 'datetime',
         'avg_rating' => 'float',
         'community_trust_score' => 'float',
         'response_rate' => 'float',

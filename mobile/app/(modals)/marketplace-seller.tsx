@@ -186,8 +186,22 @@ function SellerHeader({ profile, canMessage }: { profile: MarketplaceSellerProfi
                   <Chip.Label style={{ color: theme.success }}>{t('seller.verified')}</Chip.Label>
                 </Chip>
               ) : null}
+              {profile.marketplace_partner_badge_at ? (
+                <Chip size="sm" variant="secondary" style={{ backgroundColor: withAlpha(primary, 0.15) }}>
+                  <Ionicons name="ribbon-outline" size={12} color={primary} />
+                  <Chip.Label style={{ color: primary }}>{t('seller.partnerBadge')}</Chip.Label>
+                </Chip>
+              ) : null}
             </View>
             {profile.bio ? <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={4}>{profile.bio}</Text> : null}
+            {profile.location ? (
+              <View className="flex-row items-center gap-1.5">
+                <Ionicons name="location-outline" size={13} color={theme.textMuted} />
+                <Text className="min-w-0 flex-1 text-xs" style={{ color: theme.textSecondary }} numberOfLines={1}>
+                  {t('seller.location', { location: profile.location })}
+                </Text>
+              </View>
+            ) : null}
             {memberSince ? (
               <Text className="text-xs" style={{ color: theme.textSecondary }}>
                 {t('seller.memberSince', { date: memberSince })}

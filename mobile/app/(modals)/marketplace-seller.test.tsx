@@ -25,7 +25,9 @@ jest.mock('react-i18next', () => ({
         'seller.eyebrow': 'Seller profile',
         'seller.title': 'Seller profile',
         'seller.verified': 'Verified',
+        'seller.partnerBadge': 'Marketplace Partner',
         'seller.sellerType.business': 'Business seller',
+        'seller.location': `Location: ${String(opts?.location ?? '')}`,
         'seller.memberSince': `Member since ${String(opts?.date ?? '')}`,
         'seller.joinedMarketplace': `Selling since ${String(opts?.date ?? '')}`,
         'seller.communityTrust': 'Community trust',
@@ -105,6 +107,8 @@ jest.mock('@/lib/hooks/useApi', () => ({
         bio: 'Reuse and repair seller',
         avatar_url: null,
         cover_image_url: null,
+        location: 'Dublin',
+        marketplace_partner_badge_at: '2026-04-29T10:00:00Z',
         seller_type: 'business',
         business_verified: true,
         is_community_endorsed: false,
@@ -155,6 +159,8 @@ describe('MarketplaceSellerRoute', () => {
 
     expect(getByText('Nexus Goods')).toBeTruthy();
     expect(getByText('Repaired table')).toBeTruthy();
+    expect(getByText('Marketplace Partner')).toBeTruthy();
+    expect(getByText('Location: Dublin')).toBeTruthy();
     expect(getByText('Listings')).toBeTruthy();
     fireEvent.press(getByText('Reviews'));
 

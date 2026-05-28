@@ -552,11 +552,13 @@
     "sales": "{{count}} sales",
     "active": "{{count}} active",
     "verified": "Verified",
+    "partnerBadge": "Marketplace Partner",
     "coverAlt": "{{name}} seller cover image",
     "sellerType": {
       "private": "Private seller",
       "business": "Business seller"
     },
+    "location": "Location: {{location}}",
     "memberSince": "Member since {{date}}",
     "joinedMarketplace": "Selling since {{date}}",
     "communityTrust": "Community trust",

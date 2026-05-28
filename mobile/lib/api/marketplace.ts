@@ -189,6 +189,8 @@ export interface MarketplaceSellerProfile {
   bio?: string | null;
   avatar_url?: string | null;
   cover_image_url?: string | null;
+  location?: string | null;
+  marketplace_partner_badge_at?: string | null;
   seller_type: string;
   business_name?: string | null;
   business_verified: boolean;
