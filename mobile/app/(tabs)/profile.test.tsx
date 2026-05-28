@@ -32,11 +32,15 @@ jest.mock('react-i18next', () => ({
         'marketplace': 'Marketplace',
         'marketplaceSection': 'Marketplace',
         'marketplaceBrowse': 'Browse marketplace',
+        'marketplaceSearch': 'Marketplace search',
+        'marketplaceNearby': 'Nearby marketplace',
+        'marketplaceFree': 'Free items',
         'marketplaceSell': 'Sell something',
         'marketplaceMyListings': 'My marketplace listings',
         'marketplaceSellerSetup': 'Seller setup',
         'marketplaceOrders': 'Marketplace orders',
         'marketplacePickups': 'Marketplace pickups',
+        'marketplaceShipping': 'Shipping options',
         'marketplaceCoupons': 'Marketplace coupons',
         'marketplaceOffers': 'Marketplace offers',
         'marketplaceSaved': 'Saved marketplace',
@@ -80,11 +84,15 @@ jest.mock('react-i18next', () => ({
         'navDescriptions.listings': 'Browse offers, requests, and timebank exchanges.',
         'navDescriptions.marketplace': 'Buy, sell, save, and manage community marketplace listings.',
         'navDescriptions.marketplaceBrowse': 'Browse all marketplace listings, categories, maps, and saved searches.',
+        'navDescriptions.marketplaceSearch': 'Search marketplace listings by keyword, category, delivery method, and price.',
+        'navDescriptions.marketplaceNearby': 'Find marketplace listings around you on the map.',
+        'navDescriptions.marketplaceFree': 'Browse free community items and giveaway listings.',
         'navDescriptions.marketplaceSell': 'Create a new marketplace listing with photos, price, delivery, and category details.',
         'navDescriptions.marketplaceMyListings': 'Review, edit, and manage the marketplace items you have listed.',
         'navDescriptions.marketplaceSellerSetup': 'Create or update the seller profile used by marketplace buyers.',
         'navDescriptions.marketplaceOrders': 'Track marketplace purchases, sales, payments, pickup, delivery, ratings, and disputes.',
         'navDescriptions.marketplacePickups': 'Show pickup reservations and QR codes for click-and-collect orders.',
+        'navDescriptions.marketplaceShipping': 'Review postage, collection, local delivery, and community delivery options.',
         'navDescriptions.marketplaceCoupons': 'Browse active merchant coupons and show checkout QR codes.',
         'navDescriptions.marketplaceOffers': 'Review offers you have made or received on marketplace listings.',
         'navDescriptions.marketplaceSaved': 'Open your saved marketplace collections and saved search alerts.',
@@ -223,11 +231,15 @@ describe('MoreScreen (More tab)', () => {
     const { getAllByText, getByText } = render(<MoreScreen />);
     expect(getAllByText('Marketplace').length).toBeGreaterThanOrEqual(2);
     expect(getByText('Browse marketplace')).toBeTruthy();
+    expect(getByText('Marketplace search')).toBeTruthy();
+    expect(getByText('Nearby marketplace')).toBeTruthy();
+    expect(getByText('Free items')).toBeTruthy();
     expect(getByText('Sell something')).toBeTruthy();
     expect(getByText('My marketplace listings')).toBeTruthy();
     expect(getByText('Seller setup')).toBeTruthy();
     expect(getByText('Marketplace orders')).toBeTruthy();
     expect(getByText('Marketplace pickups')).toBeTruthy();
+    expect(getByText('Shipping options')).toBeTruthy();
     expect(getByText('Marketplace coupons')).toBeTruthy();
     expect(getByText('Marketplace offers')).toBeTruthy();
     expect(getByText('Saved marketplace')).toBeTruthy();
