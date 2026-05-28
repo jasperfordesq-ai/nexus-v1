@@ -251,10 +251,21 @@ export function getFederationPartners(cursor?: string | null): Promise<Federatio
 }
 
 /**
- * GET /api/v2/federation/stats — aggregate stats for the current tenant's federation.
+ * GET /api/v2/federation/status — aggregate stats for the current tenant's federation.
  */
-export function getFederationStats(): Promise<{ data: FederationStats }> {
-  return api.get<{ data: FederationStats }>(`${API_V2}/federation/stats`);
+export async function getFederationStats(): Promise<{ data: FederationStats }> {
+  const response = await api.get<{ data: FederationStatus }>(`${API_V2}/federation/status`);
+  const status = response.data;
+
+  return {
+    data: {
+      partner_count: status.partnerships_count ?? 0,
+      federated_members: 0,
+      cross_community_exchanges: status.transactions_count ?? 0,
+      messages_count: status.messages_count ?? 0,
+      transactions_count: status.transactions_count ?? 0,
+    },
+  };
 }
 
 export function getFederationStatus(): Promise<{ data: FederationStatus }> {

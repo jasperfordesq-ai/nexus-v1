@@ -31,7 +31,7 @@ import {
   optOutFederation,
   sendFederationTransaction,
 } from './federation';
-import type { FederationResponse, FederatedTenant, FederationStats } from './federation';
+import type { FederationResponse, FederatedTenant } from './federation';
 
 const mockTenant: FederatedTenant = {
   id: 1,
@@ -50,10 +50,11 @@ const mockFederationResponse: FederationResponse = {
   meta: { has_more: false, cursor: null },
 };
 
-const mockStats: FederationStats = {
-  partner_count: 5,
-  federated_members: 450,
-  cross_community_exchanges: 32,
+const mockStatus = {
+  enabled: true,
+  partnerships_count: 5,
+  messages_count: 8,
+  transactions_count: 32,
 };
 
 describe('getFederationPartners', () => {
@@ -96,12 +97,13 @@ describe('getFederationPartners', () => {
 describe('getFederationStats', () => {
   beforeEach(() => { jest.clearAllMocks(); });
 
-  it('calls /api/v2/federation/stats and returns stats', async () => {
-    (api.get as jest.Mock).mockResolvedValue({ data: mockStats });
+  it('derives hub stats from the supported federation status endpoint', async () => {
+    (api.get as jest.Mock).mockResolvedValue({ data: mockStatus });
     const result = await getFederationStats();
-    expect(api.get).toHaveBeenCalledWith('/api/v2/federation/stats');
+    expect(api.get).toHaveBeenCalledWith('/api/v2/federation/status');
     expect(result.data.partner_count).toBe(5);
-    expect(result.data.federated_members).toBe(450);
+    expect(result.data.cross_community_exchanges).toBe(32);
+    expect(result.data.messages_count).toBe(8);
   });
 
   it('propagates errors from the API', async () => {
