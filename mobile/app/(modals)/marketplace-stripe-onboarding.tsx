@@ -123,6 +123,11 @@ function MarketplaceStripeOnboardingScreen() {
     : incomplete
       ? t('stripeOnboarding.continue')
       : t('stripeOnboarding.start');
+  const readinessItems = [
+    { key: 'details', label: t('stripeOnboarding.details'), ready: Boolean(status?.details_submitted) },
+    { key: 'charges', label: t('stripeOnboarding.charges'), ready: Boolean(status?.charges_enabled) },
+    { key: 'payouts', label: t('stripeOnboarding.payouts'), ready: Boolean(status?.payouts_enabled) },
+  ];
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -148,6 +153,27 @@ function MarketplaceStripeOnboardingScreen() {
             </View>
           </HeroCard.Body>
         </HeroCard>
+
+        {status?.stripe_account_id ? (
+          <HeroCard className="mb-3 rounded-panel p-0">
+            <HeroCard.Body className="gap-3 p-4">
+              <View className="flex-row items-start gap-3">
+                <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+                  <Ionicons name="shield-checkmark-outline" size={20} color={primary} />
+                </View>
+                <View className="min-w-0 flex-1">
+                  <Text className="text-base font-bold" style={{ color: theme.text }}>{t('stripeOnboarding.readinessTitle')}</Text>
+                  <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('stripeOnboarding.readinessHint')}</Text>
+                </View>
+              </View>
+              <View className="gap-2">
+                {readinessItems.map((item) => (
+                  <ReadinessRow key={item.key} label={item.label} ready={item.ready} />
+                ))}
+              </View>
+            </HeroCard.Body>
+          </HeroCard>
+        ) : null}
 
         <HeroCard className="mb-3 rounded-panel p-0">
           <HeroCard.Body className="gap-3 p-4">
@@ -215,6 +241,20 @@ function MarketplaceStripeOnboardingScreen() {
         </HeroCard>
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+function ReadinessRow({ label, ready }: { label: string; ready: boolean }) {
+  const { t } = useTranslation('marketplace');
+  const theme = useTheme();
+  const tone = ready ? theme.success : theme.warning;
+  return (
+    <Surface variant="secondary" className="flex-row items-center gap-3 rounded-panel-inner p-3">
+      <Ionicons name={ready ? 'checkmark-circle-outline' : 'alert-circle-outline'} size={18} color={tone} />
+      <Text className="text-sm font-semibold" style={{ color: theme.text }}>
+        {t(ready ? 'stripeOnboarding.requirementReady' : 'stripeOnboarding.requirementMissing', { label })}
+      </Text>
+    </Surface>
   );
 }
 

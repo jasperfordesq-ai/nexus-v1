@@ -12,7 +12,7 @@ jest.mock('expo-router', () => ({
 
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string) => {
+    t: (key: string, options?: Record<string, unknown>) => {
       const map: Record<string, string> = {
         'common:back': 'Back',
         'common:errors.alertTitle': 'Error',
@@ -24,6 +24,10 @@ jest.mock('react-i18next', () => ({
         'stripeOnboarding.charges': 'Charges',
         'stripeOnboarding.payouts': 'Payouts',
         'stripeOnboarding.details': 'Details',
+        'stripeOnboarding.readinessTitle': 'Connect readiness',
+        'stripeOnboarding.readinessHint': 'Stripe must enable all three checks before buyers can pay you.',
+        'stripeOnboarding.requirementReady': '{{label}} ready',
+        'stripeOnboarding.requirementMissing': '{{label}} not ready',
         'stripeOnboarding.needBank': 'Bank details',
         'stripeOnboarding.needBankHint': 'Stripe asks for payout details directly in its secure onboarding flow.',
         'stripeOnboarding.needIdentity': 'Identity checks',
@@ -42,7 +46,7 @@ jest.mock('react-i18next', () => ({
         'stripeOnboarding.payoutHistoryHint': 'Recent marketplace payments and payout status.',
         'stripeOnboarding.noPayouts': 'No payout records yet.',
       };
-      return map[key] ?? key;
+      return (map[key] ?? key).replace('{{label}}', String(options?.label ?? ''));
     },
     i18n: { language: 'en' },
   }),
@@ -113,6 +117,10 @@ describe('MarketplaceStripeOnboardingRoute', () => {
     });
 
     expect(getByText('Your Stripe account exists, but charges or payouts are not enabled yet.')).toBeTruthy();
+    expect(getByText('Connect readiness')).toBeTruthy();
+    expect(getByText('Details ready')).toBeTruthy();
+    expect(getByText('Charges not ready')).toBeTruthy();
+    expect(getByText('Payouts not ready')).toBeTruthy();
     expect(getByText('Continue Stripe setup')).toBeTruthy();
     expect(queryByText('Connect Stripe so marketplace buyers can pay securely.')).toBeNull();
     unmount();
