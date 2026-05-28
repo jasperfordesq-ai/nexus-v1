@@ -321,6 +321,18 @@ function RootNavigator() {
         options={{ ...modalOptions, headerShown: false, title: t('marketplace:tools.coupons.redemptionsTitle') }}
       />
       <Stack.Screen
+        name="(modals)/marketplace-saved-searches"
+        options={{ ...modalOptions, headerShown: false, title: t('marketplace:collections.savedTab') }}
+      />
+      <Stack.Screen
+        name="(modals)/marketplace-promotions"
+        options={{ ...modalOptions, headerShown: false, title: t('marketplace:tools.tabs.promotions') }}
+      />
+      <Stack.Screen
+        name="(modals)/marketplace-pickup-slots"
+        options={{ ...modalOptions, headerShown: false, title: t('marketplace:tools.pickups.title') }}
+      />
+      <Stack.Screen
         name="(modals)/marketplace-tools"
         options={{ ...modalOptions, headerShown: false, title: t('marketplace:tools.title') }}
       />
