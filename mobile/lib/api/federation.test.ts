@@ -26,6 +26,8 @@ import {
   getFederationPartner,
   getFederationMemberReviews,
   markFederationMessageRead,
+  optInFederation,
+  optOutFederation,
   sendFederationTransaction,
 } from './federation';
 import type { FederationResponse, FederatedTenant, FederationStats } from './federation';
@@ -145,6 +147,26 @@ describe('sendFederationTransaction', () => {
     await sendFederationTransaction(payload);
 
     expect(api.post).toHaveBeenCalledWith('/api/v2/federation/transactions', payload);
+  });
+});
+
+describe('federation opt-in status', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('posts to the opt-in route with an empty payload', async () => {
+    (api.post as jest.Mock).mockResolvedValue({ data: { success: true } });
+
+    await optInFederation();
+
+    expect(api.post).toHaveBeenCalledWith('/api/v2/federation/opt-in', {});
+  });
+
+  it('posts to the opt-out route with an empty payload', async () => {
+    (api.post as jest.Mock).mockResolvedValue({ data: { success: true } });
+
+    await optOutFederation();
+
+    expect(api.post).toHaveBeenCalledWith('/api/v2/federation/opt-out', {});
   });
 });
 

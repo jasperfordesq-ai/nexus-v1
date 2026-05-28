@@ -321,6 +321,14 @@ export function sendFederationTransaction(payload: FederationTransactionPayload)
   return api.post<FederationTransactionResponse>(`${API_V2}/federation/transactions`, payload);
 }
 
+export function optInFederation(): Promise<{ success?: boolean; data?: unknown }> {
+  return api.post<{ success?: boolean; data?: unknown }>(`${API_V2}/federation/opt-in`, {});
+}
+
+export function optOutFederation(): Promise<{ success?: boolean; data?: unknown }> {
+  return api.post<{ success?: boolean; data?: unknown }>(`${API_V2}/federation/opt-out`, {});
+}
+
 export function markFederationMessageRead(id: number | string): Promise<{ data?: unknown }> {
   return api.post<{ data?: unknown }>(`${API_V2}/federation/messages/${id}/mark-read`, {});
 }

@@ -349,6 +349,10 @@
       "active": "Federation active",
       "inactive": "Federation inactive",
       "statusDescription": "These controls decide what partner communities can see and use.",
+      "enable": "Enable federation",
+      "disable": "Disable federation",
+      "statusFailedTitle": "Federation status not updated",
+      "statusFailedDescription": "Please check your connection and try again.",
       "save": "Save settings",
       "reach": {
         "local_only": "Local only",

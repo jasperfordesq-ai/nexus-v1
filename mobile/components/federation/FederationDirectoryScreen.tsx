@@ -22,6 +22,8 @@ import {
   getFederationSettings,
   getFederationMember,
   markFederationMessageRead,
+  optInFederation,
+  optOutFederation,
   sendFederationMessage,
   updateFederationSettings,
   type FederatedEvent,
@@ -1066,7 +1068,10 @@ function SettingsScreen({ theme, primary, t }: { theme: ReturnType<typeof useThe
   const payload = unwrapSettings(data);
   const [draft, setDraft] = useState<FederationSettings | null>(null);
   const current = draft ?? payload.settings;
+  const [enabledOverride, setEnabledOverride] = useState<boolean | null>(null);
+  const federationEnabled = enabledOverride ?? payload.enabled;
   const [isSaving, setIsSaving] = useState(false);
+  const [isTogglingStatus, setIsTogglingStatus] = useState(false);
 
   async function save() {
     setIsSaving(true);
@@ -1079,20 +1084,51 @@ function SettingsScreen({ theme, primary, t }: { theme: ReturnType<typeof useThe
     }
   }
 
+  async function toggleFederationStatus() {
+    setIsTogglingStatus(true);
+    try {
+      if (federationEnabled) {
+        await optOutFederation();
+        setEnabledOverride(false);
+      } else {
+        await optInFederation();
+        setEnabledOverride(true);
+      }
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      refresh();
+    } catch {
+      Alert.alert(t('directory.settings.statusFailedTitle'), t('directory.settings.statusFailedDescription'));
+    } finally {
+      setIsTogglingStatus(false);
+    }
+  }
+
   if (isLoading) {
     return <View className="items-center py-8"><Spinner size="lg" /></View>;
   }
 
   return (
     <View className="gap-4">
-      <Surface variant="secondary" className="flex-row items-center gap-3 rounded-panel p-4">
-        <View className="size-11 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(payload.enabled ? '#22c55e' : '#f59e0b', 0.14) }}>
-          <Ionicons name={payload.enabled ? 'shield-checkmark-outline' : 'shield-outline'} size={22} color={payload.enabled ? '#22c55e' : '#f59e0b'} />
+      <Surface variant="secondary" className="gap-4 rounded-panel p-4">
+        <View className="flex-row items-center gap-3">
+          <View className="size-11 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(federationEnabled ? '#22c55e' : '#f59e0b', 0.14) }}>
+            <Ionicons name={federationEnabled ? 'shield-checkmark-outline' : 'shield-outline'} size={22} color={federationEnabled ? '#22c55e' : '#f59e0b'} />
+          </View>
+          <View className="min-w-0 flex-1">
+            <Text className="text-base font-bold" style={{ color: theme.text }}>{federationEnabled ? t('directory.settings.active') : t('directory.settings.inactive')}</Text>
+            <Text className="text-sm" style={{ color: theme.textSecondary }}>{t('directory.settings.statusDescription')}</Text>
+          </View>
         </View>
-        <View className="min-w-0 flex-1">
-          <Text className="text-base font-bold" style={{ color: theme.text }}>{payload.enabled ? t('directory.settings.active') : t('directory.settings.inactive')}</Text>
-          <Text className="text-sm" style={{ color: theme.textSecondary }}>{t('directory.settings.statusDescription')}</Text>
-        </View>
+        <HeroButton
+          variant={federationEnabled ? 'danger-soft' : 'primary'}
+          onPress={() => void toggleFederationStatus()}
+          isDisabled={isTogglingStatus}
+          accessibilityLabel={federationEnabled ? t('directory.settings.disable') : t('directory.settings.enable')}
+          style={!federationEnabled ? { backgroundColor: primary } : undefined}
+        >
+          {isTogglingStatus ? <Spinner size="sm" /> : <Ionicons name={federationEnabled ? 'shield-outline' : 'shield-checkmark-outline'} size={16} color={federationEnabled ? theme.error : '#fff'} />}
+          <HeroButton.Label>{federationEnabled ? t('directory.settings.disable') : t('directory.settings.enable')}</HeroButton.Label>
+        </HeroButton>
       </Surface>
 
       <HeroCard className="rounded-panel p-0">
