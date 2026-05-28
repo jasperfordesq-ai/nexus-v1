@@ -6,7 +6,7 @@
 import { useState } from 'react';
 import { Alert, FlatList, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router, type Href } from 'expo-router';
+import { router, type Href, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
@@ -27,7 +27,7 @@ import {
   type MarketplaceOffer,
 } from '@/lib/api/marketplace';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
-import { usePrimaryColor } from '@/lib/hooks/useTenant';
+import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 
@@ -43,9 +43,11 @@ export default function MarketplaceOffersRoute() {
 
 function MarketplaceOffersScreen() {
   const { t } = useTranslation(['marketplace', 'common']);
+  const params = useLocalSearchParams<{ mode?: string | string[] }>();
+  const { hasFeature } = useTenant();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const [mode, setMode] = useState<OfferMode>('received');
+  const [mode, setMode] = useState<OfferMode>(normalizeOfferMode(firstParam(params.mode)));
   const offers = usePaginatedApi<MarketplaceOffer, Awaited<ReturnType<typeof getMarketplaceOffers>>>(
     (cursor) => getMarketplaceOffers(mode, cursor),
     (response) => ({
@@ -55,6 +57,15 @@ function MarketplaceOffersScreen() {
     }),
     [mode],
   );
+
+  if (!hasFeature('marketplace')) {
+    return (
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('offers.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
+        <EmptyState icon="hand-left-outline" title={t('featureGate.title')} subtitle={t('featureGate.description')} />
+      </SafeAreaView>
+    );
+  }
 
   async function action(kind: 'accept' | 'decline' | 'withdraw' | 'acceptCounter', offer: MarketplaceOffer) {
     try {
@@ -118,7 +129,11 @@ function MarketplaceOffersScreen() {
               <LoadingSpinner />
             </View>
           ) : (
-            <EmptyState icon="hand-left-outline" title={offers.error ?? t('offers.empty')} subtitle={t('offers.emptyHint')} />
+            <EmptyState
+              icon={mode === 'sent' ? 'send-outline' : 'archive-outline'}
+              title={offers.error ?? (mode === 'sent' ? t('offers.emptySent') : t('offers.emptyReceived'))}
+              subtitle={mode === 'sent' ? t('offers.emptySentHint') : t('offers.emptyReceivedHint')}
+            />
           )
         }
         ListFooterComponent={
@@ -135,6 +150,14 @@ function MarketplaceOffersScreen() {
       />
     </SafeAreaView>
   );
+}
+
+function firstParam(value?: string | string[]): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function normalizeOfferMode(value?: string): OfferMode {
+  return value === 'received' ? 'received' : 'sent';
 }
 
 function OfferCard({
