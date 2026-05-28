@@ -20,7 +20,7 @@ jest.mock('@/lib/constants', () => ({
 }));
 
 import { api } from '@/lib/api/client';
-import { getOrganisations, getOrganisation } from './organisations';
+import { createOrganisation, getOrganisations, getOrganisation } from './organisations';
 import type { OrganisationsResponse, Organisation } from './organisations';
 
 const mockOrganisation: Organisation = {
@@ -97,5 +97,24 @@ describe('getOrganisation', () => {
     expect(api.get).toHaveBeenCalledWith('/api/v2/volunteering/organisations/5');
     expect(result.data.name).toBe('Community Care Ltd');
     expect(result.data.verified).toBe(true);
+  });
+});
+
+describe('createOrganisation', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('posts the registration payload to the organisation endpoint', async () => {
+    (api.post as jest.Mock).mockResolvedValue({ data: mockOrganisation });
+    const payload = {
+      name: 'Community Care Ltd',
+      description: 'A care-focused community organisation.',
+      contact_email: 'hello@example.org',
+      website: 'https://communitycare.example',
+    };
+
+    const result = await createOrganisation(payload);
+
+    expect(api.post).toHaveBeenCalledWith('/api/v2/volunteering/organisations', payload);
+    expect(result.data.name).toBe('Community Care Ltd');
   });
 });

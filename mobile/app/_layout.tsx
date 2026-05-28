@@ -361,6 +361,10 @@ function RootNavigator() {
         options={{ ...modalOptions, headerShown: false, title: t('organisations:title') }}
       />
       <Stack.Screen
+        name="(modals)/new-organisation"
+        options={{ ...modalOptions, headerShown: false, title: t('organisations:register.title') }}
+      />
+      <Stack.Screen
         name="(modals)/organisation-detail"
         options={{ ...modalOptions, headerShown: false, title: t('organisations:detailTitle') }}
       />

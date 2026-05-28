@@ -4,11 +4,13 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { fireEvent, render } from '@testing-library/react-native';
+
+const mockPush = jest.fn();
 
 jest.mock('expo-router', () => ({
-  useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }),
-  router: { push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
+  useRouter: () => ({ push: (...args: unknown[]) => mockPush(...args), replace: jest.fn(), back: jest.fn() }),
+  router: { push: (...args: unknown[]) => mockPush(...args), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
   useLocalSearchParams: () => ({}),
   useNavigation: () => ({ setOptions: jest.fn() }),
 }));
@@ -31,6 +33,7 @@ jest.mock('react-i18next', () => ({
         volunteers: opts ? `${String(opts.count ?? 0)} volunteers` : '0 volunteers',
         hoursLogged: opts ? `${String(opts.hours ?? 0)}h logged` : '0h logged',
         viewOrganisation: 'View organisation',
+        registerButton: 'Register organisation',
         website: 'Visit website',
         'stats.organisations': 'Partners',
         'stats.verified': 'Verified',
@@ -118,6 +121,7 @@ const defaultPaginatedState = {
 };
 
 beforeEach(() => {
+  mockPush.mockReset();
   mockUsePaginatedApi.mockReturnValue(defaultPaginatedState);
 });
 
@@ -223,5 +227,11 @@ describe('OrganisationsScreen', () => {
     const { getByText } = render(<OrganisationsScreen />);
     expect(getByText('45 volunteers')).toBeTruthy();
     expect(getByText('12 opportunities')).toBeTruthy();
+  });
+
+  it('opens the organisation registration route from the hero action', () => {
+    const { getByText } = render(<OrganisationsScreen />);
+    fireEvent.press(getByText('Register organisation'));
+    expect(mockPush).toHaveBeenCalledWith('/(modals)/new-organisation');
   });
 });

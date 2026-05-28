@@ -6,7 +6,7 @@
 import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { FlatList, Linking, Pressable, RefreshControl, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
@@ -90,11 +90,13 @@ function OrganisationsHero({
   primary,
   theme,
   t,
+  onRegister,
 }: {
   organisations: Organisation[];
   primary: string;
   theme: ReturnType<typeof useTheme>;
   t: (key: string, opts?: Record<string, unknown>) => string;
+  onRegister: () => void;
 }) {
   const verifiedCount = organisations.filter(isVerified).length;
 
@@ -123,6 +125,11 @@ function OrganisationsHero({
           <StatTile icon="business-outline" label={t('stats.organisations')} value={String(organisations.length)} tone={primary} theme={theme} />
           <StatTile icon="checkmark-circle-outline" label={t('stats.verified')} value={String(verifiedCount)} tone="#22c55e" theme={theme} />
         </View>
+
+        <HeroButton variant="primary" onPress={onRegister} style={{ backgroundColor: primary }}>
+          <Ionicons name="add-circle-outline" size={16} color="#ffffff" />
+          <HeroButton.Label>{t('registerButton')}</HeroButton.Label>
+        </HeroButton>
       </HeroCard.Body>
     </HeroCard>
   );
@@ -299,6 +306,11 @@ export default function OrganisationsScreen() {
     });
   }, []);
 
+  const openRegistration = useCallback(() => {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push('/(modals)/new-organisation' as Href);
+  }, []);
+
   return (
     <ModalErrorBoundary>
       <SafeAreaView className="flex-1 bg-background">
@@ -332,7 +344,7 @@ export default function OrganisationsScreen() {
           onEndReachedThreshold={0.3}
           ListHeaderComponent={
             <View className="gap-3 px-4 pb-3">
-              <OrganisationsHero organisations={organisations} primary={primary} theme={theme} t={t} />
+              <OrganisationsHero organisations={organisations} primary={primary} theme={theme} t={t} onRegister={openRegistration} />
 
               <Surface variant="default" className="gap-3 rounded-panel p-3">
                 <View className="flex-row items-center rounded-panel-inner border border-border bg-background px-3">

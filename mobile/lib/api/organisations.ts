@@ -34,6 +34,13 @@ export interface OrganisationsResponse {
   };
 }
 
+export interface CreateOrganisationPayload {
+  name: string;
+  description: string;
+  contact_email: string;
+  website?: string;
+}
+
 /**
  * GET /api/v2/volunteering/organisations — list organisations for the current tenant.
  * Supports cursor-based pagination and optional full-text search.
@@ -53,4 +60,11 @@ export function getOrganisations(
  */
 export function getOrganisation(id: number): Promise<{ data: Organisation }> {
   return api.get<{ data: Organisation }>(`${API_V2}/volunteering/organisations/${id}`);
+}
+
+/**
+ * POST /api/v2/volunteering/organisations — register a new volunteer organisation.
+ */
+export function createOrganisation(payload: CreateOrganisationPayload): Promise<{ data: Organisation }> {
+  return api.post<{ data: Organisation }>(`${API_V2}/volunteering/organisations`, payload);
 }
