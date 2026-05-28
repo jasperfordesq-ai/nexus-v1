@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { useState } from 'react';
 import { FlatList, Image, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
@@ -30,6 +31,8 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 
+type SellerTab = 'listings' | 'reviews';
+
 export default function MarketplaceSellerRoute() {
   return (
     <ModalErrorBoundary>
@@ -43,6 +46,7 @@ function MarketplaceSellerScreen() {
   const params = useLocalSearchParams<{ id?: string }>();
   const sellerId = Number(params.id);
   const safeId = Number.isFinite(sellerId) && sellerId > 0 ? sellerId : 0;
+  const [tab, setTab] = useState<SellerTab>('listings');
   const seller = useApi(() => getMarketplaceSeller(safeId), [safeId], { enabled: safeId > 0 });
   const listings = usePaginatedApi<MarketplaceListingItem, Awaited<ReturnType<typeof getMarketplaceSellerListings>>>(
     (cursor) => getMarketplaceSellerListings(safeId, cursor),
@@ -53,6 +57,7 @@ function MarketplaceSellerScreen() {
     }),
     [safeId],
   );
+  const profile = seller.data?.data ?? null;
 
   if (!safeId) {
     return (
@@ -67,14 +72,22 @@ function MarketplaceSellerScreen() {
     <SafeAreaView className="flex-1 bg-background">
       <AppTopBar title={t('seller.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
       <FlatList
-        data={listings.items}
+        data={tab === 'listings' ? listings.items : []}
         keyExtractor={(item) => String(item.id)}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 132 }}
         ListHeaderComponent={
           seller.isLoading ? (
             <View className="py-8"><LoadingSpinner /></View>
-          ) : seller.data?.data ? (
-            <SellerHeader profile={seller.data.data} />
+          ) : profile ? (
+            <>
+              <SellerHeader profile={profile} />
+              <SellerTabs
+                selected={tab}
+                listingsCount={listings.items.length}
+                reviewsCount={profile.total_ratings ?? 0}
+                onSelect={setTab}
+              />
+            </>
           ) : (
             <EmptyState icon="storefront-outline" title={seller.error ?? t('seller.notFound')} subtitle={t('seller.notFoundHint')} />
           )
@@ -83,16 +96,63 @@ function MarketplaceSellerScreen() {
           <MarketplaceListingCard item={item} onPress={() => router.push({ pathname: '/(modals)/marketplace-detail', params: { id: String(item.id) } } as unknown as Href)} />
         )}
         ListEmptyComponent={
-          listings.isLoading ? (
+          tab === 'reviews' ? (
+            <ReviewsPlaceholder />
+          ) : listings.isLoading ? (
             <View className="py-16"><LoadingSpinner /></View>
           ) : (
             <EmptyState icon="bag-handle-outline" title={listings.error ?? t('seller.empty')} subtitle={t('seller.emptyHint')} />
           )
         }
-        onEndReached={listings.loadMore}
+        onEndReached={tab === 'listings' ? listings.loadMore : undefined}
         onEndReachedThreshold={0.35}
       />
     </SafeAreaView>
+  );
+}
+
+function SellerTabs({
+  selected,
+  listingsCount,
+  reviewsCount,
+  onSelect,
+}: {
+  selected: SellerTab;
+  listingsCount: number;
+  reviewsCount: number;
+  onSelect: (tab: SellerTab) => void;
+}) {
+  const { t } = useTranslation('marketplace');
+  const primary = usePrimaryColor();
+
+  return (
+    <View className="mb-3 flex-row gap-2">
+      {(['listings', 'reviews'] as SellerTab[]).map((tab) => (
+        <HeroButton
+          key={tab}
+          className="flex-1"
+          variant={selected === tab ? 'primary' : 'secondary'}
+          onPress={() => onSelect(tab)}
+          style={selected === tab ? { backgroundColor: primary } : undefined}
+        >
+          <HeroButton.Label>{t(`seller.${tab}Tab`)}</HeroButton.Label>
+          <Chip size="sm" variant="secondary">
+            <Chip.Label>{String(tab === 'listings' ? listingsCount : reviewsCount)}</Chip.Label>
+          </Chip>
+        </HeroButton>
+      ))}
+    </View>
+  );
+}
+
+function ReviewsPlaceholder() {
+  const { t } = useTranslation('marketplace');
+  return (
+    <EmptyState
+      icon="star-outline"
+      title={t('seller.reviewsTitle')}
+      subtitle={t('seller.reviewsHint')}
+    />
   );
 }
 

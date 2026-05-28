@@ -518,6 +518,10 @@
     "activeListings": "Active listings",
     "na": "N/A",
     "message": "Message seller",
+    "listingsTab": "Listings",
+    "reviewsTab": "Reviews",
+    "reviewsTitle": "Reviews are coming soon",
+    "reviewsHint": "Buyer and seller reviews will appear here once rating history is available.",
     "empty": "No active listings",
     "emptyHint": "This seller does not have public listings right now."
   },
