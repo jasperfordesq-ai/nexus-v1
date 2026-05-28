@@ -10,6 +10,8 @@ import { Alert } from 'react-native';
 const mockCreateEvent = jest.fn().mockResolvedValue({ data: { id: 6 } });
 const mockGetEvent = jest.fn();
 const mockUpdateEvent = jest.fn().mockResolvedValue({ data: { id: 7 } });
+const mockUploadEventImage = jest.fn();
+const mockLaunchImageLibraryAsync = jest.fn();
 const mockReplace = jest.fn();
 let mockSearchParams: Record<string, string> = {};
 
@@ -30,6 +32,17 @@ jest.mock('react-i18next', () => ({
         'create.titlePlaceholder': 'What is happening?',
         'create.descriptionLabel': 'Description',
         'create.descriptionPlaceholder': 'Tell members what to expect.',
+        'create.coverImageLabel': 'Cover image',
+        'create.coverImageHint': 'Add a photo.',
+        'create.addImage': 'Add image',
+        'create.replaceImage': 'Replace image',
+        'create.removeImage': 'Remove',
+        'create.imageTypeError': 'Choose a JPEG, PNG, WebP, or GIF image.',
+        'create.imageSizeError': 'Choose an image under 5 MB.',
+        'create.imagePickFailedTitle': 'Image not selected',
+        'create.imagePickFailedDescription': 'We could not open your photo library.',
+        'create.imageUploadFailedTitle': 'Event saved',
+        'create.imageUploadFailedDescription': 'The event was saved, but the cover image could not be uploaded.',
         'create.categoryLabel': 'Category',
         'create.startLabel': 'Start',
         'create.endLabel': 'End',
@@ -89,6 +102,7 @@ jest.mock('@/lib/api/events', () => ({
   createEvent: (...args: unknown[]) => mockCreateEvent(...args),
   getEvent: (...args: unknown[]) => mockGetEvent(...args),
   updateEvent: (...args: unknown[]) => mockUpdateEvent(...args),
+  uploadEventImage: (...args: unknown[]) => mockUploadEventImage(...args),
 }));
 
 jest.mock('@/lib/haptics', () => ({
@@ -97,6 +111,11 @@ jest.mock('@/lib/haptics', () => ({
 }));
 
 jest.mock('@expo/vector-icons', () => ({ Ionicons: 'View' }));
+jest.mock('expo-image', () => ({ Image: 'View' }));
+jest.mock('expo-image-picker', () => ({
+  MediaTypeOptions: { Images: 'Images' },
+  launchImageLibraryAsync: (...args: unknown[]) => mockLaunchImageLibraryAsync(...args),
+}));
 jest.mock('@/components/ui/AppTopBar', () => 'View');
 
 jest.mock('@/components/ui/FormActionFooter', () => {
@@ -138,6 +157,11 @@ describe('NewEventRoute', () => {
     mockCreateEvent.mockClear();
     mockGetEvent.mockReset();
     mockUpdateEvent.mockClear();
+    mockUploadEventImage.mockReset().mockResolvedValue({ data: { image_url: '/uploads/events/cover.jpg' } });
+    mockLaunchImageLibraryAsync.mockReset().mockResolvedValue({
+      canceled: false,
+      assets: [{ uri: 'file:///tmp/event-cover.jpg', mimeType: 'image/jpeg', fileSize: 1024 }],
+    });
     mockReplace.mockClear();
   });
 
@@ -208,6 +232,22 @@ describe('NewEventRoute', () => {
     expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/event-detail', params: { id: '6' } });
   });
 
+  it('uploads a selected cover image after creating the event', async () => {
+    const { getByPlaceholderText, getByText } = render(<NewEventRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('What is happening?'), 'Repair workshop');
+    fireEvent.changeText(getByPlaceholderText('Tell members what to expect.'), 'Bring something small to mend.');
+    fireEvent.press(getByText('Add image'));
+    await waitFor(() => expect(mockLaunchImageLibraryAsync).toHaveBeenCalled());
+    fireEvent.press(getByText('Create event'));
+
+    await waitFor(() => {
+      expect(mockCreateEvent).toHaveBeenCalled();
+    });
+    expect(mockUploadEventImage).toHaveBeenCalledWith(6, 'file:///tmp/event-cover.jpg');
+    expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/event-detail', params: { id: '6' } });
+  });
+
   it('hydrates an existing event and updates it in edit mode', async () => {
     mockSearchParams = { id: '7' };
     mockGetEvent.mockResolvedValueOnce({
@@ -254,5 +294,42 @@ describe('NewEventRoute', () => {
     });
     expect(mockCreateEvent).not.toHaveBeenCalled();
     expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/event-detail', params: { id: '7' } });
+  });
+
+  it('shows an existing cover image and uploads a replacement in edit mode', async () => {
+    mockSearchParams = { id: '7' };
+    mockGetEvent.mockResolvedValueOnce({
+      data: {
+        id: 7,
+        title: 'Existing workshop',
+        description: 'Existing details for attendees.',
+        start_date: '2099-01-02T12:00:00.000Z',
+        end_date: null,
+        location: 'Old hall',
+        is_online: false,
+        online_url: null,
+        max_attendees: null,
+        organizer: { id: 3, name: 'Jane Organizer', avatar: null },
+        category: { id: 2, name: 'workshop', color: '#f59e0b' },
+        rsvp_counts: { going: 0, interested: 0 },
+        attendees_count: 0,
+        spots_left: 25,
+        is_full: false,
+        status: 'published',
+        federated_visibility: 'none',
+        user_rsvp: null,
+        cover_image: '/uploads/events/existing.jpg',
+      },
+    });
+
+    const { getByText } = render(<NewEventRoute />);
+
+    await waitFor(() => expect(getByText('Replace image')).toBeTruthy());
+    fireEvent.press(getByText('Replace image'));
+    await waitFor(() => expect(mockLaunchImageLibraryAsync).toHaveBeenCalled());
+    fireEvent.press(getByText('Update event'));
+
+    await waitFor(() => expect(mockUpdateEvent).toHaveBeenCalled());
+    expect(mockUploadEventImage).toHaveBeenCalledWith(7, 'file:///tmp/event-cover.jpg');
   });
 });

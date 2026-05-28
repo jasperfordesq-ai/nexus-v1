@@ -5,6 +5,7 @@
 
 import { api } from '@/lib/api/client';
 import { API_V2 } from '@/lib/constants';
+import { Platform } from 'react-native';
 
 export interface EventOrganizer {
   id: number;
@@ -132,4 +133,60 @@ export function createEvent(payload: CreateEventPayload): Promise<{ data: Event 
  */
 export function updateEvent(id: number, payload: UpdateEventPayload): Promise<{ data: Event }> {
   return api.put<{ data: Event }>(`${API_V2}/events/${id}`, payload);
+}
+
+type UploadEventImageResponse = {
+  data?: { image_url?: string | null } | null;
+  image_url?: string | null;
+  message?: string;
+};
+
+function getUploadFilename(uri: string): string {
+  const cleanUri = uri.split('?')[0] ?? uri;
+  const lastSegment = cleanUri.split('/').pop();
+  return lastSegment && lastSegment.includes('.') ? lastSegment : 'event.jpg';
+}
+
+function getMimeType(filename: string, fallback?: string | null): string {
+  if (fallback?.startsWith('image/')) return fallback;
+  const extension = filename.split('.').pop()?.toLowerCase();
+  if (extension === 'png') return 'image/png';
+  if (extension === 'webp') return 'image/webp';
+  if (extension === 'gif') return 'image/gif';
+  return 'image/jpeg';
+}
+
+async function appendEventImageFile(formData: FormData, uri: string): Promise<void> {
+  const filename = getUploadFilename(uri);
+
+  if (Platform.OS === 'web') {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    const type = getMimeType(filename, blob.type);
+    if (typeof File !== 'undefined') {
+      formData.append('image', new File([blob], filename, { type }));
+      return;
+    }
+    formData.append('image', blob, filename);
+    return;
+  }
+
+  const type = getMimeType(filename);
+  formData.append('image', { uri, name: filename, type } as unknown as Blob);
+}
+
+/**
+ * POST /api/v2/events/{id}/image — upload or replace an event cover image.
+ */
+export async function uploadEventImage(id: number, uri: string): Promise<{ data: { image_url: string } }> {
+  const formData = new FormData();
+  await appendEventImageFile(formData, uri);
+
+  const response = await api.upload<UploadEventImageResponse>(`${API_V2}/events/${id}/image`, formData);
+  const imageUrl = response.data?.image_url ?? response.image_url ?? null;
+  if (!imageUrl) {
+    throw new Error(response.message ?? 'Event image upload did not return an image URL.');
+  }
+
+  return { data: { image_url: imageUrl } };
 }
