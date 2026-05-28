@@ -33,7 +33,7 @@ import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 
 const CONDITIONS: MarketplaceCondition[] = ['new', 'like_new', 'good', 'fair', 'poor'];
-const DELIVERY_METHODS: Array<MarketplaceDeliveryMethod | ''> = ['', 'pickup', 'shipping', 'both'];
+const DELIVERY_METHODS: Array<MarketplaceDeliveryMethod | ''> = ['', 'pickup', 'shipping', 'both', 'community_delivery'];
 const SELLER_TYPES: Array<'private' | 'business' | ''> = ['', 'private', 'business'];
 const SORTS: Array<'newest' | 'price_asc' | 'price_desc' | 'popular'> = ['newest', 'price_asc', 'price_desc', 'popular'];
 const POSTED_WITHIN = ['', '1', '3', '7', '30'];
@@ -49,19 +49,34 @@ export default function MarketplaceSearchRoute() {
 function MarketplaceSearchScreen() {
   const { t } = useTranslation(['marketplace', 'common']);
   const { hasFeature } = useTenant();
-  const params = useLocalSearchParams<{ q?: string; category_id?: string }>();
+  const params = useLocalSearchParams<{
+    q?: string | string[];
+    category_id?: string | string[];
+    price_min?: string | string[];
+    price_max?: string | string[];
+    condition?: string | string[];
+    seller_type?: string | string[];
+    delivery_method?: string | string[];
+    sort?: string | string[];
+    posted_within?: string | string[];
+  }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const [query, setQuery] = useState(params.q ?? '');
-  const [debouncedQuery, setDebouncedQuery] = useState(params.q ?? '');
-  const [categoryId, setCategoryId] = useState(params.category_id ? Number(params.category_id) : undefined);
-  const [priceMin, setPriceMin] = useState('');
-  const [priceMax, setPriceMax] = useState('');
-  const [conditions, setConditions] = useState<MarketplaceCondition[]>([]);
-  const [sellerType, setSellerType] = useState<'private' | 'business' | ''>('');
-  const [deliveryMethod, setDeliveryMethod] = useState<MarketplaceDeliveryMethod | ''>('');
-  const [sort, setSort] = useState<'newest' | 'price_asc' | 'price_desc' | 'popular'>('newest');
-  const [postedWithin, setPostedWithin] = useState('');
+  const initialQuery = firstParam(params.q) ?? '';
+  const initialCategoryId = Number(firstParam(params.category_id));
+  const initialSellerType = normalizeSellerType(firstParam(params.seller_type));
+  const initialDeliveryMethod = normalizeDeliveryMethod(firstParam(params.delivery_method));
+  const initialSort = normalizeSort(firstParam(params.sort));
+  const [query, setQuery] = useState(initialQuery);
+  const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
+  const [categoryId, setCategoryId] = useState(Number.isFinite(initialCategoryId) && initialCategoryId > 0 ? initialCategoryId : undefined);
+  const [priceMin, setPriceMin] = useState(firstParam(params.price_min) ?? '');
+  const [priceMax, setPriceMax] = useState(firstParam(params.price_max) ?? '');
+  const [conditions, setConditions] = useState<MarketplaceCondition[]>(parseConditions(firstParam(params.condition)));
+  const [sellerType, setSellerType] = useState<'private' | 'business' | ''>(initialSellerType);
+  const [deliveryMethod, setDeliveryMethod] = useState<MarketplaceDeliveryMethod | ''>(initialDeliveryMethod);
+  const [sort, setSort] = useState<'newest' | 'price_asc' | 'price_desc' | 'popular'>(initialSort);
+  const [postedWithin, setPostedWithin] = useState(firstParam(params.posted_within) ?? '');
   const [categories, setCategories] = useState<MarketplaceCategory[]>([]);
   const [items, setItems] = useState<MarketplaceListingItem[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
@@ -355,4 +370,26 @@ function FilterButton({ active, label, onPress }: { active: boolean; label: stri
       <HeroButton.Label>{label}</HeroButton.Label>
     </HeroButton>
   );
+}
+
+function firstParam(value?: string | string[]): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function parseConditions(value?: string): MarketplaceCondition[] {
+  if (!value) return [];
+  const allowed = new Set<MarketplaceCondition>(CONDITIONS);
+  return value.split(',').filter((item): item is MarketplaceCondition => allowed.has(item as MarketplaceCondition));
+}
+
+function normalizeSellerType(value?: string): 'private' | 'business' | '' {
+  return value === 'private' || value === 'business' ? value : '';
+}
+
+function normalizeDeliveryMethod(value?: string): MarketplaceDeliveryMethod | '' {
+  return value === 'pickup' || value === 'shipping' || value === 'both' || value === 'community_delivery' ? value : '';
+}
+
+function normalizeSort(value?: string): 'newest' | 'price_asc' | 'price_desc' | 'popular' {
+  return value === 'price_asc' || value === 'price_desc' || value === 'popular' ? value : 'newest';
 }
