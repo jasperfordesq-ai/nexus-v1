@@ -1,5 +1,8 @@
 FROM node:22-alpine3.22 AS build
 
+# Pin npm to match the version that generated package-lock.json locally.
+RUN npm install -g npm@11
+
 WORKDIR /app
 
 COPY package.json package-lock.json* ./

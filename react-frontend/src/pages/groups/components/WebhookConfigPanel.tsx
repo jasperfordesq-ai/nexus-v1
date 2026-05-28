@@ -16,7 +16,7 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
-import { GlassCard, Button, Chip, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Checkbox } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Checkbox, useConfirm } from '@/components/ui';
 import { formatDateValue } from '@/lib/helpers';
 import { useTranslation } from 'react-i18next';
 
@@ -44,7 +44,8 @@ const AVAILABLE_EVENTS = [
 ] as const;
 
 export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps) {
-  const { t } = useTranslation('groups');
+  const { t } = useTranslation(['groups', 'common']);
+  const confirm = useConfirm();
   const toast = useToast();
 
   const [webhooks, setWebhooks] = useState<WebhookItem[]>([]);
@@ -128,7 +129,12 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
   };
 
   const handleDelete = async (webhookId: number) => {
-    if (!window.confirm(t('webhooks.delete_confirm'))) return;
+    const ok = await confirm({
+      title: t('webhooks.delete_confirm'),
+      status: 'danger',
+      confirmLabel: t('common:delete'),
+    });
+    if (!ok) return;
     try {
       const res = await api.delete(`/v2/groups/${groupId}/webhooks/${webhookId}`);
       if (res.success) {

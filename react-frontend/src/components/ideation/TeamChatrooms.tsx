@@ -1,4 +1,4 @@
-import { useDisclosure, Button, Chip, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tooltip } from '@/components/ui';
+import { useDisclosure, Button, Chip, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tooltip, useConfirm } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -72,7 +72,8 @@ interface TeamChatroomsProps {
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
-  const { t } = useTranslation('ideation');
+  const { t } = useTranslation(['ideation', 'common']);
+  const confirm = useConfirm();
   const { t: tGroups } = useTranslation('groups');
   const { isAuthenticated, user } = useAuth();
   const toast = useToast();
@@ -228,7 +229,12 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
   };
 
   const handleDeleteMessage = async (messageId: number) => {
-    if (!window.confirm(tRef.current('confirm.delete_message'))) return;
+    const ok = await confirm({
+      title: tRef.current('confirm.delete_message'),
+      status: 'danger',
+      confirmLabel: tRef.current('common:delete'),
+    });
+    if (!ok) return;
     try {
       await api.delete(`/v2/group-chatroom-messages/${messageId}`);
       setMessages(prev => prev.filter(m => m.id !== messageId));

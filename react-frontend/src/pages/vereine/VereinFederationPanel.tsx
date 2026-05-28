@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Select, SelectItem, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch, Tab, Tabs, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Select, SelectItem, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch, Tab, Tabs, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, useConfirm } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -67,6 +67,7 @@ const SCOPES: ReadonlyArray<'none' | 'events' | 'members' | 'both'> = ['none', '
 
 export default function VereinFederationPanel({ organizationId }: Props) {
   const { t } = useTranslation('common');
+  const confirm = useConfirm();
   const toast = useToast();
 
   const [consent, setConsent] = useState<ConsentDto | null>(null);
@@ -188,7 +189,12 @@ export default function VereinFederationPanel({ organizationId }: Props) {
   }, [shareTarget, selectedEventId, organizationId, toast, t, loadAll]);
 
   const handleWithdraw = useCallback(async (shareId: number) => {
-    if (!window.confirm(t('verein_federation.withdraw_share_confirm'))) return;
+    const ok = await confirm({
+      title: t('verein_federation.withdraw_share_confirm'),
+      status: 'warning',
+      confirmLabel: t('confirm'),
+    });
+    if (!ok) return;
     try {
       const res = await api.delete(`/v2/vereine/${organizationId}/event-shares/${shareId}`);
       if (res.success) {

@@ -5,7 +5,7 @@ import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Select, Selec
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert } from '@/components/ui';
+import { Alert, useConfirm } from '@/components/ui';
 import { Separator } from '@heroui/react';
 import Activity from 'lucide-react/icons/activity';
 import AlertTriangle from 'lucide-react/icons/alert-triangle';
@@ -141,7 +141,8 @@ const SUPPRESSION_REASONS = ['', 'bounce', 'block', 'invalid', 'spam_report', 'u
 const KNOWN_SUPPRESSION_REASONS = new Set(SUPPRESSION_REASONS.filter(Boolean));
 
 export default function EmailDeliverability() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation(['admin', 'common']);
+  const confirm = useConfirm();
   usePageTitle(t('email_deliverability.title'));
   const toast = useToast();
 
@@ -246,7 +247,12 @@ export default function EmailDeliverability() {
   useEffect(() => { loadQueues(); }, [loadQueues]);
 
   const removeSuppression = async (id: number, email: string) => {
-    if (!window.confirm(t('email_deliverability.suppressions.confirm_remove', { email }))) return;
+    const ok = await confirm({
+      title: t('email_deliverability.suppressions.confirm_remove', { email }),
+      status: 'warning',
+      confirmLabel: t('common:confirm'),
+    });
+    if (!ok) return;
     const r = await api.delete<{ removed: boolean }>(`/v2/admin/email-deliverability/suppressions/${id}`);
     if (r.success) {
       toast.success(t('email_deliverability.suppressions.removed', { email }));

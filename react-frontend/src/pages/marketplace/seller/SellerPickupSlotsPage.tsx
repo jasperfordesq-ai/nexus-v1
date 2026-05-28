@@ -13,7 +13,7 @@ import Calendar from 'lucide-react/icons/calendar';
 import Plus from 'lucide-react/icons/plus';
 import Trash2 from 'lucide-react/icons/trash-2';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, useDisclosure, Button, Chip, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@/components/ui';
+import { GlassCard, useDisclosure, Button, Chip, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, useConfirm } from '@/components/ui';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -33,6 +33,7 @@ interface PickupSlot {
 
 export function SellerPickupSlotsPage() {
   const { t } = useTranslation('common');
+  const confirm = useConfirm();
   usePageTitle(t('marketplace.pickup.slots_title'));
   const { isAuthenticated } = useAuth();
   const toast = useToast();
@@ -99,7 +100,12 @@ export function SellerPickupSlotsPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm(t('marketplace.pickup.slot_delete_confirm'))) return;
+    const ok = await confirm({
+      title: t('marketplace.pickup.slot_delete_confirm'),
+      status: 'danger',
+      confirmLabel: t('delete'),
+    });
+    if (!ok) return;
     try {
       const res = await api.delete(`/v2/marketplace/seller/pickup-slots/${id}`);
       if (res.success) {

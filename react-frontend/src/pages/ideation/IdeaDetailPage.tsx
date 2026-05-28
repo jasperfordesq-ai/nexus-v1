@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure, GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, useConfirm } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -89,7 +89,8 @@ const IDEA_STATUS_COLOR_MAP: Record<string, 'default' | 'success' | 'warning' | 
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function IdeaDetailPage() {
-  const { t } = useTranslation('ideation');
+  const { t } = useTranslation(['ideation', 'common']);
+  const confirm = useConfirm();
   const { challengeId, id } = useParams<{ challengeId: string; id: string }>();
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
@@ -267,7 +268,12 @@ export function IdeaDetailPage() {
   };
 
   const handleDeleteComment = async (commentId: number) => {
-    if (!window.confirm(tRef.current('comments.delete_confirm'))) return;
+    const ok = await confirm({
+      title: tRef.current('comments.delete_confirm'),
+      status: 'danger',
+      confirmLabel: tRef.current('common:delete'),
+    });
+    if (!ok) return;
     setDeletingCommentId(commentId);
     try {
       await api.delete(`/v2/ideation-comments/${commentId}`);

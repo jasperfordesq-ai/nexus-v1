@@ -1,4 +1,4 @@
-import { Card, CardBody, CardHeader, Button, Chip, Spinner } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Chip, Spinner, useConfirm } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Separator } from '@heroui/react';
@@ -63,6 +63,7 @@ function getStatusKey(status: string) {
 
 export function MySubscriptionPage() {
   const { t } = useTranslation('common');
+  const confirmDialog = useConfirm();
   const { tenantPath } = useTenant();
   const { showToast } = useToast();
   usePageTitle(t('premium.manage_title'));
@@ -106,7 +107,12 @@ export function MySubscriptionPage() {
   };
 
   const cancel = async () => {
-    if (!window.confirm(t('premium.cancel_confirm'))) {
+    const ok = await confirmDialog({
+      title: t('premium.cancel_confirm'),
+      status: 'warning',
+      confirmLabel: t('confirm'),
+    });
+    if (!ok) {
       return;
     }
     setActionBusy('cancel');

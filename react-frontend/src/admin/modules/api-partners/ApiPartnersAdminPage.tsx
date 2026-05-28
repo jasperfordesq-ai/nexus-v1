@@ -1,4 +1,4 @@
-import { CardBody, Card, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Tabs, Tab, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
+import { CardBody, Card, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Tabs, Tab, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, useConfirm } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -76,9 +76,10 @@ const ALL_SCOPES = [
 // ─── Component ────────────────────────────────────────────────────────────
 
 export default function ApiPartnersAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation(['admin', 'common']);
   usePageTitle(t('api_partners.meta.title'));
   const toast = useToast();
+  const confirm = useConfirm();
 
   const [partners, setPartners] = useState<ApiPartner[]>([]);
   const [loading, setLoading] = useState(true);
@@ -125,7 +126,12 @@ export default function ApiPartnersAdminPage() {
   };
 
   const handleRegenerate = async (id: number) => {
-    if (!window.confirm(t('api_partners.confirm.regenerate_credentials'))) return;
+    const ok = await confirm({
+      title: t('api_partners.confirm.regenerate_credentials'),
+      status: 'warning',
+      confirmLabel: t('common:confirm'),
+    });
+    if (!ok) return;
     try {
       const res = await api.post<{ credentials: IssuedCredentials }>(
         `/v2/admin/api-partners/${id}/regenerate-credentials`,

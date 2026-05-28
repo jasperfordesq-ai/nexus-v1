@@ -33,7 +33,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
 import type { StoryUser } from '@/components/feed/StoriesBar';
-import { Button, Avatar } from '@/components/ui';
+import { Button, Avatar, useConfirm } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -143,7 +143,8 @@ function timeAgo(dateStr: string, t: (key: string, opts?: Record<string, unknown
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryViewerProps) {
-  const { t } = useTranslation('stories');
+  const { t } = useTranslation(['stories', 'common']);
+  const confirm = useConfirm();
   const { user: currentUser } = useAuth();
   const toast = useToast();
   const [currentUserIdx, setCurrentUserIdx] = useState(initialUserIndex);
@@ -500,7 +501,12 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
   // Delete story
   const handleDeleteStory = async () => {
     if (!currentStory || !isOwner) return;
-    if (!window.confirm(t('viewer.delete_story_confirm'))) return;
+    const ok = await confirm({
+      title: t('viewer.delete_story_confirm'),
+      status: 'danger',
+      confirmLabel: t('common:delete'),
+    });
+    if (!ok) return;
     try {
       await api.delete(`/v2/stories/${currentStory.id}`);
       setShowMenu(false);

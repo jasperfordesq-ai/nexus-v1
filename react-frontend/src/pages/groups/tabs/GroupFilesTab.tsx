@@ -25,7 +25,7 @@ import FolderPlus from 'lucide-react/icons/folder-plus';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useConfirm } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -94,7 +94,8 @@ function getFileIcon(mimeType: string) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId }: GroupFilesTabProps) {
-  const { t } = useTranslation('groups');
+  const { t } = useTranslation(['groups', 'common']);
+  const confirm = useConfirm();
   const toast = useToast();
   const uploadModal = useDisclosure();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -205,7 +206,12 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
   };
 
   const handleDelete = async (fileId: number) => {
-    if (!window.confirm(t('files.delete_confirm'))) return;
+    const ok = await confirm({
+      title: t('files.delete_confirm'),
+      status: 'danger',
+      confirmLabel: t('common:delete'),
+    });
+    if (!ok) return;
     setDeleting(fileId);
     try {
       await api.delete(`/v2/groups/${groupId}/files/${fileId}`);

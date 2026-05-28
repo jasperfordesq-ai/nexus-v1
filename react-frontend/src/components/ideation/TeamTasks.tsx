@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure, GlassCard, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, GlassCard, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, useConfirm } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -79,7 +79,8 @@ const PRIORITY_COLORS: Record<string, 'default' | 'warning' | 'danger' | 'second
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProps) {
-  const { t } = useTranslation('ideation');
+  const { t } = useTranslation(['ideation', 'common']);
+  const confirm = useConfirm();
   const { user } = useAuth();
   const toast = useToast();
 
@@ -199,7 +200,12 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
   };
 
   const handleDeleteTask = async (taskId: number) => {
-    if (!window.confirm(tRef.current('confirm.delete_task'))) return;
+    const ok = await confirm({
+      title: tRef.current('confirm.delete_task'),
+      status: 'danger',
+      confirmLabel: tRef.current('common:delete'),
+    });
+    if (!ok) return;
     try {
       await api.delete(`/v2/team-tasks/${taskId}`);
       toastRef.current.success(tRef.current('toast.task_deleted'));

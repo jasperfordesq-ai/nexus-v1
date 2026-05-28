@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input, Switch } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input, Switch, useConfirm } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -179,8 +179,9 @@ function ShippingForm({ form, onChange, onSubmit, onCancel, isSubmitting, submit
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsManagerProps) {
-  const { t } = useTranslation('marketplace');
+  const { t } = useTranslation(['marketplace', 'common']);
   const toast = useToast();
+  const confirm = useConfirm();
 
   const [options, setOptions] = useState<MarketplaceShippingOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -304,7 +305,12 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
 
   // ─── Delete ────────────────────────────────────────────────────────────────
   const handleDelete = useCallback(async (id: number) => {
-    if (!window.confirm(t('shipping.delete_confirm'))) return;
+    const ok = await confirm({
+      title: t('marketplace:shipping.delete_confirm'),
+      status: 'danger',
+      confirmLabel: t('common:delete'),
+    });
+    if (!ok) return;
     try {
       await api.delete(`/v2/marketplace/seller/shipping-options/${id}`);
       setOptions((prev) => prev.filter((o) => o.id !== id));
@@ -313,7 +319,7 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
       logError('Failed to delete shipping option', err);
       toast.error(t('shipping.delete_error'));
     }
-  }, [toast, t]);
+  }, [toast, t, confirm]);
 
   // ─── Helpers ───────────────────────────────────────────────────────────────
   const updateAddForm = useCallback((field: keyof ShippingFormData, value: string | boolean) => {

@@ -1,4 +1,4 @@
-import { CardBody, Card, Button, Chip, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
+import { CardBody, Card, Button, Chip, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, useConfirm } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -35,6 +35,7 @@ interface Coupon {
 
 export default function SellerCouponsPage() {
   const { t } = useTranslation(['common', 'marketplace']);
+  const confirm = useConfirm();
   const toast = useToast();
   const { tenantPath } = useTenant();
   usePageTitle(t('coupon.seller.page_title'));
@@ -59,7 +60,12 @@ export default function SellerCouponsPage() {
   }, [load]);
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm(t('coupon.seller.delete_confirm'))) return;
+    const ok = await confirm({
+      title: t('coupon.seller.delete_confirm'),
+      status: 'danger',
+      confirmLabel: t('common:delete'),
+    });
+    if (!ok) return;
     try {
       await api.delete(`/v2/marketplace/seller/coupons/${id}`);
       toast.success(t('coupon.seller.deleted'));

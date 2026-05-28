@@ -29,7 +29,7 @@ import ArrowUp from 'lucide-react/icons/arrow-up';
 import CircleX from 'lucide-react/icons/circle-x';
 import ListFilter from 'lucide-react/icons/list-filter';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, AlgorithmLabel, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure, Button, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
+import { GlassCard, AlgorithmLabel, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure, Button, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, useConfirm } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { ComposeHub } from '@/components/compose';
 import type { ComposeTab } from '@/components/compose';
@@ -124,7 +124,8 @@ class SidebarErrorBoundary extends Component<{ children: ReactNode }, { hasError
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function FeedPage() {
-  const { t } = useTranslation('feed');
+  const { t } = useTranslation(['feed', 'common']);
+  const confirm = useConfirm();
   usePageTitle(t('page_title'));
   const { isAuthenticated, user } = useAuth();
   const toast = useToast();
@@ -655,7 +656,12 @@ export function FeedPage() {
 
   const handleDeletePost = useCallback(async (item: FeedItem) => {
     if (item.type !== 'post') return;
-    if (!window.confirm(tRef.current('confirm.delete_post'))) return;
+    const ok = await confirm({
+      title: tRef.current('confirm.delete_post'),
+      status: 'danger',
+      confirmLabel: tRef.current('common:delete'),
+    });
+    if (!ok) return;
     try {
       await api.delete(`/v2/feed/posts/${item.id}`);
       setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
@@ -667,7 +673,12 @@ export function FeedPage() {
   }, []);
 
   const handleAdminDeletePost = useCallback(async (item: FeedItem) => {
-    if (!window.confirm(tRef.current('confirm.delete_post'))) return;
+    const ok = await confirm({
+      title: tRef.current('confirm.delete_post'),
+      status: 'danger',
+      confirmLabel: tRef.current('common:delete'),
+    });
+    if (!ok) return;
     try {
       const sourceType = item.type || 'post';
       await api.delete(`/v2/admin/feed/posts/${item.id}?type=${encodeURIComponent(sourceType)}`);

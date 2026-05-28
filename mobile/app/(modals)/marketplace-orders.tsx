@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ComponentProps } from 'react';
 import { Alert, FlatList, Image, Linking, Modal, ScrollView, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
@@ -42,6 +42,7 @@ import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 type OrderMode = 'purchases' | 'sales';
 type OrderStatusTab = 'all' | 'active' | 'completed' | 'cancelled';
 type DisputeReason = 'not_received' | 'not_as_described' | 'damaged' | 'wrong_item' | 'other';
+type OrderStatusTone = 'default' | 'success' | 'warning' | 'danger' | 'accent';
 const SHIPPING_METHODS = ['standard', 'express', 'tracked', 'hand_delivery', 'other'];
 const DISPUTE_REASONS: DisputeReason[] = ['not_received', 'not_as_described', 'damaged', 'wrong_item', 'other'];
 const ORDER_STATUSES = new Set(['pending', 'pending_payment', 'paid', 'processing', 'shipped', 'delivered', 'completed', 'cancelled', 'disputed', 'refunded']);
@@ -68,6 +69,47 @@ function translatedOrderStatus(status: string, t: (key: string) => string): stri
 
 function translatedDeliveryStatus(status: string, t: (key: string) => string): string {
   return DELIVERY_STATUSES.has(status) ? t(`orders.deliveryStatus.${status}`) : t('orders.deliveryStatus.unknown');
+}
+
+function orderStatusTone(status: string): OrderStatusTone {
+  switch (status) {
+    case 'pending_payment':
+    case 'pending':
+      return 'warning';
+    case 'paid':
+    case 'processing':
+    case 'shipped':
+      return 'accent';
+    case 'delivered':
+    case 'completed':
+      return 'success';
+    case 'disputed':
+      return 'danger';
+    default:
+      return 'default';
+  }
+}
+
+function orderStatusIcon(status: string): ComponentProps<typeof Ionicons>['name'] {
+  switch (status) {
+    case 'pending_payment':
+      return 'card-outline';
+    case 'paid':
+    case 'processing':
+      return 'cube-outline';
+    case 'shipped':
+      return 'car-outline';
+    case 'delivered':
+    case 'completed':
+      return 'checkmark-circle-outline';
+    case 'disputed':
+      return 'alert-circle-outline';
+    case 'cancelled':
+    case 'refunded':
+      return 'close-circle-outline';
+    default:
+      return 'information-circle-outline';
+  }
 }
 
 export default function MarketplaceOrdersRoute() {
@@ -589,6 +631,19 @@ function OrderCard({
   const counterparty = mode === 'purchases' ? item.seller : item.buyer;
   const counterpartyLabel = mode === 'purchases' ? t('orders.sellerLabel') : t('orders.buyerLabel');
   const orderDate = item.created_at ? new Date(item.created_at).toLocaleDateString() : null;
+  const statusTone = orderStatusTone(item.status);
+  const statusColor = statusTone === 'success'
+    ? theme.success
+    : statusTone === 'warning'
+      ? theme.warning
+      : statusTone === 'danger'
+        ? theme.error
+        : statusTone === 'accent'
+          ? primary
+          : theme.textSecondary;
+  const statusHintKey = ORDER_STATUSES.has(item.status)
+    ? `orders.statusHint.${mode}.${item.status}`
+    : 'orders.statusHint.unknown';
   const canManageCommunityDelivery = item.listing?.delivery_method === 'community_delivery'
     && ['paid', 'processing', 'shipped', 'delivered'].includes(item.status);
   return (
@@ -608,7 +663,9 @@ function OrderCard({
                 <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={2}>{item.listing?.title ?? item.order_number}</Text>
                 <Text className="text-sm font-semibold" style={{ color: theme.textSecondary }}>{total}</Text>
               </View>
-              <Chip size="sm" variant="secondary"><Chip.Label>{translatedOrderStatus(item.status, t)}</Chip.Label></Chip>
+              <Chip size="sm" variant="secondary" style={{ backgroundColor: withAlpha(statusColor, 0.14) }}>
+                <Chip.Label style={{ color: statusColor }}>{translatedOrderStatus(item.status, t)}</Chip.Label>
+              </Chip>
             </View>
             {counterparty ? (
               <View className="flex-row items-center gap-2">
@@ -628,6 +685,19 @@ function OrderCard({
         {item.quantity > 1 ? (
           <Text className="text-xs" style={{ color: theme.textSecondary }}>{t('orders.quantity', { count: item.quantity })}</Text>
         ) : null}
+        <Surface variant="secondary" className="flex-row items-start gap-3 rounded-panel-inner p-3">
+          <View className="size-9 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(statusColor, 0.14) }}>
+            <Ionicons name={orderStatusIcon(item.status)} size={17} color={statusColor} />
+          </View>
+          <View className="min-w-0 flex-1 gap-1">
+            <Text className="text-xs font-bold uppercase" style={{ color: statusColor }}>
+              {translatedOrderStatus(item.status, t)}
+            </Text>
+            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+              {t(statusHintKey)}
+            </Text>
+          </View>
+        </Surface>
         {item.tracking_number ? (
           <View className="flex-row flex-wrap items-center gap-2">
             <Text className="text-xs" style={{ color: theme.textSecondary }}>

@@ -18,7 +18,7 @@ import X from 'lucide-react/icons/x';
 import ChevronLeft from 'lucide-react/icons/chevron-left';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, useDisclosure, Button, Chip, Spinner, Modal, ModalContent, ModalBody } from '@/components/ui';
+import { GlassCard, useDisclosure, Button, Chip, Spinner, Modal, ModalContent, ModalBody, useConfirm } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -65,7 +65,8 @@ const FILTER_CHIPS: { key: MediaType; labelKey: string; icon?: typeof Camera }[]
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaTabProps) {
-  const { t } = useTranslation('groups');
+  const { t } = useTranslation(['groups', 'common']);
+  const confirm = useConfirm();
   const toast = useToast();
   const lightbox = useDisclosure();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -168,7 +169,12 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
 
   const handleDelete = async (mediaId: number, e?: React.MouseEvent) => {
     e?.stopPropagation();
-    if (!window.confirm(t('media.delete_confirm'))) return;
+    const ok = await confirm({
+      title: t('media.delete_confirm'),
+      status: 'danger',
+      confirmLabel: t('common:delete'),
+    });
+    if (!ok) return;
     setDeleting(mediaId);
     try {
       await api.delete(`/v2/groups/${groupId}/media/${mediaId}`);

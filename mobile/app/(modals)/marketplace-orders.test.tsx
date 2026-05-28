@@ -41,8 +41,14 @@ jest.mock('react-i18next', () => ({
         'orders.buyerLabel': 'Buyer',
         'orders.deliveryOffers': 'Delivery offers',
         'orders.waitingShipment': 'Waiting for shipment',
+        'orders.continuePayment': 'Continue payment',
         'orders.status.paid': 'Paid',
+        'orders.status.pending_payment': 'Pending payment',
         'orders.status.unknown': 'Unknown status',
+        'orders.statusHint.purchases.pending_payment': 'Payment is not complete yet. Continue checkout to keep this purchase moving.',
+        'orders.statusHint.purchases.paid': 'Payment is complete. The seller can now prepare the order.',
+        'orders.statusHint.sales.paid': 'Payment is complete. Mark the order shipped when it is ready.',
+        'orders.statusHint.unknown': 'This order is in a status the app does not recognise yet.',
         'actions.view': 'View',
         'auth:login.submit': 'Sign in',
       };
@@ -175,6 +181,43 @@ describe('MarketplaceOrdersRoute', () => {
     });
 
     expect(getByText('Waiting for shipment')).toBeTruthy();
+    expect(getByText('Payment is complete. The seller can now prepare the order.')).toBeTruthy();
+    unmount();
+  });
+
+  it('surfaces pending-payment recovery guidance and action', async () => {
+    (getMarketplaceOrders as jest.Mock).mockResolvedValueOnce({
+      data: [
+        {
+          id: 42,
+          order_number: 'MKT-000042',
+          quantity: 1,
+          unit_price: 18,
+          total_price: 18,
+          currency: 'EUR',
+          status: 'pending_payment',
+          created_at: '2026-05-22T10:00:00Z',
+          listing: {
+            id: 72,
+            title: 'Pending payment lamp',
+            image: null,
+            delivery_method: 'pickup',
+          },
+          seller: { id: 2, name: 'Pat Seller', avatar_url: null },
+        },
+      ],
+      meta: { cursor: null, has_more: false },
+    });
+
+    const { getAllByText, getByText, unmount } = render(<MarketplaceOrdersRoute />);
+
+    await waitFor(() => {
+      expect(getByText('Pending payment lamp')).toBeTruthy();
+    });
+
+    expect(getAllByText('Pending payment').length).toBeGreaterThan(0);
+    expect(getByText('Payment is not complete yet. Continue checkout to keep this purchase moving.')).toBeTruthy();
+    expect(getByText('Continue payment')).toBeTruthy();
     unmount();
   });
 
@@ -253,11 +296,11 @@ describe('MarketplaceOrdersRoute', () => {
       meta: { cursor: null, has_more: false },
     });
 
-    const { getByText, queryByText, unmount } = render(<MarketplaceOrdersRoute />);
+    const { getAllByText, getByText, queryByText, unmount } = render(<MarketplaceOrdersRoute />);
 
     await waitFor(() => {
       expect(getByText('Review state chair')).toBeTruthy();
-      expect(getByText('Unknown status')).toBeTruthy();
+      expect(getAllByText('Unknown status').length).toBeGreaterThan(0);
     });
 
     expect(queryByText('orders.status.awaiting_seller_review')).toBeNull();

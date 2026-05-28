@@ -417,6 +417,33 @@
       "disputed": "Disputed",
       "refunded": "Refunded",
       "unknown": "Unknown status"
+    },
+    "statusHint": {
+      "purchases": {
+        "pending": "This order is waiting for checkout to start.",
+        "pending_payment": "Payment is not complete yet. Continue checkout to keep this purchase moving.",
+        "paid": "Payment is complete. The seller can now prepare the order.",
+        "processing": "The seller is preparing this order.",
+        "shipped": "The seller has marked this order as shipped. Confirm delivery once it arrives.",
+        "delivered": "Delivery is confirmed. You can rate the order when it is completed.",
+        "completed": "This purchase is complete. You can still review the order details.",
+        "cancelled": "This order was cancelled.",
+        "disputed": "A dispute is open for this order.",
+        "refunded": "This order was refunded."
+      },
+      "sales": {
+        "pending": "This sale is waiting for checkout to start.",
+        "pending_payment": "The buyer still needs to finish payment before you ship.",
+        "paid": "Payment is complete. Mark the order shipped when it is ready.",
+        "processing": "This order is being prepared.",
+        "shipped": "You marked this order as shipped. The buyer can confirm delivery.",
+        "delivered": "Delivery is confirmed. This order will complete after the review window.",
+        "completed": "This sale is complete.",
+        "cancelled": "This sale was cancelled.",
+        "disputed": "A dispute is open for this sale.",
+        "refunded": "This sale was refunded."
+      },
+      "unknown": "This order is in a status the app does not recognise yet."
     }
   },
   "checkout": {
