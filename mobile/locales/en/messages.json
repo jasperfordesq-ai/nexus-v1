@@ -79,6 +79,8 @@
     "archiveFailed": "Could not archive this conversation.",
     "sendFailed": "Message failed to send. Tap to retry.",
     "loadFailed": "Could not load messages.",
+    "threadUnavailableTitle": "Conversation unavailable",
+    "threadUnavailable": "This conversation no longer has a valid recipient. Refresh messages and try again.",
     "restoreFailedTitle": "Restore failed",
     "restoreFailed": "Could not restore this conversation.",
     "reactionFailedTitle": "Reaction failed",

@@ -188,9 +188,14 @@ export default function MessagesScreen() {
         onArchive={handleArchiveConversation}
         onOpen={(conversation) => {
           const otherName = displayName(conversation.other_user, unknownMemberLabel);
+          const recipientId = Number(conversation.other_user?.id);
+          if (!Number.isFinite(recipientId) || recipientId <= 0) {
+            Alert.alert(t('errors.threadUnavailableTitle'), t('errors.threadUnavailable'));
+            return;
+          }
           void navigation.push({
             pathname: '/(modals)/thread',
-            params: { recipientId: String(conversation.other_user.id), name: otherName },
+            params: { recipientId: String(recipientId), name: otherName },
           } as never);
         }}
       />

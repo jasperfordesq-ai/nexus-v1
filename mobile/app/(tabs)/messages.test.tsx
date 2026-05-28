@@ -44,6 +44,8 @@ jest.mock('react-i18next', () => ({
         'tabs.archived': 'Archived',
         'restore': 'Restore',
         'restoreConversation': 'Restore conversation',
+        'errors.threadUnavailableTitle': 'Conversation unavailable',
+        'errors.threadUnavailable': 'This conversation no longer has a valid recipient. Refresh messages and try again.',
         'empty.title': 'No conversations yet',
         'empty.archivedTitle': 'No archived conversations',
         'empty.archivedSubtitle': 'Archived conversations will appear here.',
@@ -268,6 +270,24 @@ describe('MessagesScreen', () => {
       pathname: '/(modals)/thread',
       params: { recipientId: '2', name: 'Bob Builder' },
     });
+  });
+
+  it('does not open stale conversation cards without a valid recipient', () => {
+    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+    mockUsePaginatedApi.mockReturnValue({
+      ...defaultPaginatedState,
+      items: [{ ...mockConversation, other_user: { ...mockConversation.other_user, id: 0 } }],
+    });
+
+    const { getByLabelText } = render(<MessagesScreen />);
+    fireEvent.press(getByLabelText('Bob Builder, Can you help with plumbing?'));
+
+    expect(mockRouterPush).not.toHaveBeenCalled();
+    expect(alertSpy).toHaveBeenCalledWith(
+      'Conversation unavailable',
+      'This conversation no longer has a valid recipient. Refresh messages and try again.',
+    );
+    alertSpy.mockRestore();
   });
 
   it('routes deep-linked recipients to the native thread composer', () => {
