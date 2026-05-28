@@ -493,6 +493,7 @@ export function getMarketplaceListings(
   addQueryValue(query, 'cursor', params.cursor);
   addQueryValue(query, 'limit', params.limit ?? 20);
   addQueryValue(query, 'user_id', params.user_id);
+  addQueryValue(query, 'status', params.status);
   return api.get<MarketplaceCollectionResponse<MarketplaceListingItem>>(`${API_V2}/marketplace/listings`, query);
 }
 

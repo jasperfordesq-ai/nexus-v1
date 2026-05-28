@@ -117,12 +117,13 @@ describe('marketplace api', () => {
     });
   });
 
-  it('loads current user listings with user_id scope', async () => {
+  it('loads current user listings with user_id and status scope', async () => {
     (api.get as jest.Mock).mockResolvedValue({ data: [] });
-    await getMyMarketplaceListings(null, 42);
+    await getMyMarketplaceListings(null, 42, 'draft');
     expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/listings', {
       limit: '20',
       sort: 'newest',
+      status: 'draft',
       user_id: '42',
     });
   });
