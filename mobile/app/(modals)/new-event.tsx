@@ -113,6 +113,7 @@ function NewEventScreen() {
     setVideoUrl(event.online_url ?? '');
     setMaxAttendees(event.max_attendees !== null && event.max_attendees !== undefined ? String(event.max_attendees) : '');
     setAllowRemoteAttendance(Boolean(event.is_online));
+    setIsFederated(event.federated_visibility === 'listed' || event.federated_visibility === 'bookable');
   }
 
   async function submit() {

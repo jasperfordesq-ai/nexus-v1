@@ -37,6 +37,7 @@ export interface Event {
   spots_left: number | null;
   is_full: boolean;
   status: string;
+  federated_visibility?: 'none' | 'listed' | 'bookable' | string | null;
   organizer: EventOrganizer;
   category: EventCategory | null;
   rsvp_counts: RsvpCounts;

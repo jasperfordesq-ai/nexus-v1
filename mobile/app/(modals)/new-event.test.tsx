@@ -228,6 +228,7 @@ describe('NewEventRoute', () => {
         spots_left: 25,
         is_full: false,
         status: 'published',
+        federated_visibility: 'listed',
         user_rsvp: null,
         cover_image: null,
       },
@@ -248,6 +249,7 @@ describe('NewEventRoute', () => {
         is_online: true,
         online_link: 'https://meet.example/old',
         max_attendees: 25,
+        federated_visibility: 'listed',
       }));
     });
     expect(mockCreateEvent).not.toHaveBeenCalled();
