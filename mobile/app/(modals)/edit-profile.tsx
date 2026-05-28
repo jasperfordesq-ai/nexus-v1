@@ -221,7 +221,7 @@ export default function EditProfileScreen() {
         last_name: lastName.trim(),
         bio: bio.trim(),
         location: location.trim(),
-        phone: phone.trim() || undefined,
+        phone: phone.trim(),
       };
 
       const response = await updateProfile(payload);
@@ -232,7 +232,7 @@ export default function EditProfileScreen() {
       setBaselineProfile({
         firstName: response.data.first_name ?? '',
         lastName: response.data.last_name ?? '',
-        bio: response.data.bio ?? '',
+        bio: decodeHtmlEntities(response.data.bio ?? ''),
         location: response.data.location ?? '',
         phone: response.data.phone ?? '',
       });

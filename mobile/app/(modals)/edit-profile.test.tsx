@@ -160,7 +160,7 @@ jest.mock('@/components/ui/Button', () => {
 // --- Tests ---
 
 import EditProfileScreen from './edit-profile';
-import { updateAvatar } from '@/lib/api/profile';
+import { updateAvatar, updateProfile } from '@/lib/api/profile';
 import { getMe } from '@/lib/api/auth';
 
 describe('EditProfileScreen', () => {
@@ -245,5 +245,28 @@ describe('EditProfileScreen', () => {
     const { getByPlaceholderText } = render(<EditProfileScreen />);
     expect(getByPlaceholderText('Tell us about yourself...')).toBeTruthy();
     expect(getByPlaceholderText('e.g. New York, USA')).toBeTruthy();
+  });
+
+  it('sends an empty phone value when the user clears their phone number', async () => {
+    (updateProfile as jest.Mock).mockResolvedValueOnce({
+      data: {
+        id: 1,
+        first_name: 'Jane',
+        last_name: 'Doe',
+        bio: 'Community builder',
+        location: 'New York',
+        phone: '',
+        avatar_url: null,
+      },
+    });
+
+    const { getByDisplayValue, getByText } = render(<EditProfileScreen />);
+
+    fireEvent.changeText(getByDisplayValue('+1 555 123 4567'), '');
+    fireEvent.press(getByText('Save Changes'));
+
+    await waitFor(() => expect(updateProfile).toHaveBeenCalledWith(expect.objectContaining({
+      phone: '',
+    })));
   });
 });
