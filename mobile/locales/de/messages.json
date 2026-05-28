@@ -7,7 +7,9 @@
     "loadingHistory": "Nachrichten werden geladen…",
     "noMessages": "Noch keine Nachrichten. Sag Hallo!",
     "today": "Heute",
-    "yesterday": "Gestern"
+    "yesterday": "Gestern",
+    "messagingRestrictedTitle": "Nachrichten pausiert",
+    "messagingRestrictedContact": "Bitte kontaktiere dein Community-Team, bevor du weitere Nachrichten sendest."
   },
   "voice": {
     "label": "Sprachnachricht",

@@ -7,7 +7,9 @@
     "loadingHistory": "Chargement des messages…",
     "noMessages": "Aucun message pour l'instant. Dites bonjour !",
     "today": "Aujourd'hui",
-    "yesterday": "Hier"
+    "yesterday": "Hier",
+    "messagingRestrictedTitle": "Messages en pause",
+    "messagingRestrictedContact": "Veuillez contacter votre equipe communautaire avant d'envoyer d'autres messages."
   },
   "voice": {
     "label": "Message vocal",

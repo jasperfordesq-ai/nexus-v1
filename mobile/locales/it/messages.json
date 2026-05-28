@@ -7,7 +7,9 @@
     "loadingHistory": "Caricamento messaggi…",
     "noMessages": "Nessun messaggio. Di' ciao!",
     "today": "Oggi",
-    "yesterday": "Ieri"
+    "yesterday": "Ieri",
+    "messagingRestrictedTitle": "Messaggi in pausa",
+    "messagingRestrictedContact": "Contatta il team della comunita prima di inviare altri messaggi."
   },
   "voice": {
     "label": "Messaggio vocale",

@@ -23,7 +23,7 @@ import * as Haptics from '@/lib/haptics';
 import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
 
 import { useTranslation } from 'react-i18next';
-import { displayName, getOrCreateThread, getThread, markConversationRead, sendMessage, toggleMessageReaction, type Message, type SendMessageOptions } from '@/lib/api/messages';
+import { displayName, getMessagingRestrictionStatus, getOrCreateThread, getThread, markConversationRead, sendMessage, toggleMessageReaction, type Message, type MessagingRestrictionStatus, type SendMessageOptions } from '@/lib/api/messages';
 import { useApi } from '@/lib/hooks/useApi';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -105,6 +105,7 @@ function ThreadScreenInner() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [messagingRestriction, setMessagingRestriction] = useState<MessagingRestrictionStatus | null>(null);
   const flatListRef = useRef<FlatList<Message>>(null);
   const inputTextRef = useRef(inputText);
   inputTextRef.current = inputText;
@@ -149,6 +150,25 @@ function ThreadScreenInner() {
     });
   }, [isValidId, safeThreadLookupId, subscribeToMessages]);
 
+  useEffect(() => {
+    if (!isValidId) return undefined;
+    let cancelled = false;
+    getMessagingRestrictionStatus()
+      .then((response) => {
+        if (!cancelled) {
+          setMessagingRestriction(response.data);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setMessagingRestriction(null);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isValidId]);
+
   const resolvedRecipientId = useMemo(() => {
     if (!isValidId) return null;
     if (isNewConversation && safeThreadLookupId > 0) return safeThreadLookupId;
@@ -173,6 +193,10 @@ function ThreadScreenInner() {
   const handleSend = useCallback(async () => {
     const body = inputTextRef.current.trim();
     if (!body || isSending || resolvedRecipientId === null) return;
+    if (messagingRestriction?.messaging_disabled) {
+      Alert.alert(t('thread.messagingRestrictedTitle'), t('thread.messagingRestrictedContact'));
+      return;
+    }
 
     const optimistic: Message = {
       id: Date.now(),
@@ -210,7 +234,7 @@ function ThreadScreenInner() {
     } finally {
       setIsSending(false);
     }
-  }, [isSending, newConversationOptions, resolvedRecipientId, t]);
+  }, [isSending, messagingRestriction?.messaging_disabled, newConversationOptions, resolvedRecipientId, t]);
 
   const handleReaction = useCallback(async (messageId: number, emoji: string) => {
     try {
@@ -291,6 +315,10 @@ function ThreadScreenInner() {
           <ThreadContextCard context={threadContext} t={t} theme={theme} primary={primary} />
         ) : null}
 
+        {messagingRestriction?.messaging_disabled ? (
+          <RestrictionNotice primary={primary} t={t} theme={theme} />
+        ) : null}
+
         <FlatList<Message>
           ref={flatListRef}
           data={messages}
@@ -339,7 +367,7 @@ function ThreadScreenInner() {
             variant="primary"
             style={{ backgroundColor: primary }}
             onPress={handleSend}
-            isDisabled={isSending || !inputText.trim()}
+            isDisabled={isSending || !inputText.trim() || messagingRestriction?.messaging_disabled}
             accessibilityLabel={t('thread.send')}
           >
             {isSending ? <Spinner size="sm" /> : <Ionicons name="send" size={18} color="#fff" />}
@@ -347,6 +375,36 @@ function ThreadScreenInner() {
         </Surface>
       </KeyboardAvoidingView>
     </SafeAreaView>
+  );
+}
+
+function RestrictionNotice({
+  primary,
+  t,
+  theme,
+}: {
+  primary: string;
+  t: (key: string, options?: Record<string, unknown>) => string;
+  theme: ReturnType<typeof useTheme>;
+}) {
+  return (
+    <HeroCard variant="secondary" className="mx-4 mb-2 overflow-hidden rounded-panel p-0">
+      <View className="h-1 w-full" style={{ backgroundColor: theme.error }} />
+      <HeroCard.Body className="flex-row items-start gap-3 px-4 py-3">
+        <View className="h-10 w-10 items-center justify-center rounded-panel-inner" style={{ backgroundColor: withAlpha(theme.error, 0.12) }}>
+          <Ionicons name="warning-outline" size={21} color={theme.error} />
+        </View>
+        <View className="min-w-0 flex-1 gap-1">
+          <Text className="text-sm font-semibold" style={{ color: theme.text }}>
+            {t('thread.messagingRestrictedTitle')}
+          </Text>
+          <Text className="text-xs leading-5" style={{ color: theme.textSecondary }}>
+            {t('thread.messagingRestrictedContact')}
+          </Text>
+        </View>
+        <Ionicons name="lock-closed-outline" size={16} color={primary} />
+      </HeroCard.Body>
+    </HeroCard>
   );
 }
 

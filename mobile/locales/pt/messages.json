@@ -7,7 +7,9 @@
     "loadingHistory": "A carregar mensagens…",
     "noMessages": "Sem mensagens ainda. Diga olá!",
     "today": "Hoje",
-    "yesterday": "Ontem"
+    "yesterday": "Ontem",
+    "messagingRestrictedTitle": "Mensagens em pausa",
+    "messagingRestrictedContact": "Contacte a sua equipa da comunidade antes de enviar mais mensagens."
   },
   "voice": {
     "label": "Mensagem de voz",

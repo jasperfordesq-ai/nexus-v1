@@ -42,6 +42,8 @@
     "goBack": "Go back",
     "messageCount": "{{count}} message",
     "messageCount_other": "{{count}} messages",
+    "messagingRestrictedTitle": "Messaging paused",
+    "messagingRestrictedContact": "Please contact your community team before sending more messages.",
     "reactWith": "React with {{emoji}}",
     "toggleReaction": "Toggle {{emoji}} reaction"
   },

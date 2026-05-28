@@ -7,7 +7,9 @@
     "loadingHistory": "Ag luchtú teachtaireachtaí…",
     "noMessages": "Gan teachtaireachtaí fós. Abair haló!",
     "today": "Inniu",
-    "yesterday": "Inné"
+    "yesterday": "Inné",
+    "messagingRestrictedTitle": "Teachtaireachtaí curtha ar sos",
+    "messagingRestrictedContact": "Déan teagmháil le d'fhoireann pobail sula seolann tú tuilleadh teachtaireachtaí."
   },
   "voice": {
     "label": "Teachtaireacht gutha",

@@ -104,6 +104,12 @@ export interface SendMessageOptions {
   context_id?: number;
 }
 
+export interface MessagingRestrictionStatus {
+  messaging_disabled: boolean;
+  under_monitoring: boolean;
+  restriction_reason: string | null;
+}
+
 export interface ConversationListOptions {
   archived?: boolean;
 }
@@ -155,6 +161,10 @@ export function restoreConversation(conversationId: number): Promise<{ data?: { 
 
 export function markConversationRead(otherUserId: number): Promise<{ data?: { marked_read?: number } }> {
   return api.put(`${API_V2}/messages/${otherUserId}/read`, {});
+}
+
+export function getMessagingRestrictionStatus(): Promise<{ data: MessagingRestrictionStatus }> {
+  return api.get<{ data: MessagingRestrictionStatus }>(`${API_V2}/messages/restriction-status`);
 }
 
 export function toggleMessageReaction(messageId: number, emoji: string): Promise<{ data?: { action?: 'added' | 'removed'; emoji?: string; message_id?: number } }> {

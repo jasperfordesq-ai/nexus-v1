@@ -27,6 +27,7 @@ import {
   sendMessage,
   archiveConversation,
   restoreConversation,
+  getMessagingRestrictionStatus,
 } from './messages';
 import type { ConversationListResponse, MessageListResponse, Message } from './messages';
 
@@ -103,6 +104,21 @@ describe('restoreConversation', () => {
     await restoreConversation(7);
 
     expect(api.post).toHaveBeenCalledWith('/api/v2/messages/conversations/7/restore', {});
+  });
+});
+
+describe('getMessagingRestrictionStatus', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('calls the backend restriction status endpoint', async () => {
+    (api.get as jest.Mock).mockResolvedValue({
+      data: { messaging_disabled: true, under_monitoring: true, restriction_reason: 'Safety review' },
+    });
+
+    const result = await getMessagingRestrictionStatus();
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/messages/restriction-status');
+    expect(result.data.messaging_disabled).toBe(true);
   });
 });
 

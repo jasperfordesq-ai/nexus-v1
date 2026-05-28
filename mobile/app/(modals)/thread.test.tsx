@@ -42,6 +42,8 @@ jest.mock('react-i18next', () => ({
         'thread.sendFailed': 'Message not sent.',
         'thread.goBack': 'Go back',
         'thread.messageCount': '2 messages',
+        'thread.messagingRestrictedTitle': 'Messaging paused',
+        'thread.messagingRestrictedContact': 'Please contact your community team before sending more messages.',
         'unknownMember': 'Community member',
         'thread.reactWith': `React with ${String(options?.emoji ?? '')}`,
         'thread.toggleReaction': `Toggle ${String(options?.emoji ?? '')} reaction`,
@@ -97,10 +99,14 @@ jest.mock('@/lib/context/RealtimeContext', () => ({
 
 const mockMarkConversationRead = jest.fn().mockResolvedValue({ data: { marked_read: 1 } });
 const mockToggleMessageReaction = jest.fn().mockResolvedValue({ data: { action: 'added', emoji: '👍', message_id: 1 } });
+const mockGetMessagingRestrictionStatus = jest.fn().mockResolvedValue({
+  data: { messaging_disabled: false, under_monitoring: false, restriction_reason: null },
+});
 
 jest.mock('@/lib/api/messages', () => ({
   getThread: jest.fn(),
   getOrCreateThread: jest.fn(),
+  getMessagingRestrictionStatus: (...args: unknown[]) => mockGetMessagingRestrictionStatus(...args),
   markConversationRead: (...args: unknown[]) => mockMarkConversationRead(...args),
   sendMessage: jest.fn().mockResolvedValue({ data: { id: 99 } }),
   toggleMessageReaction: (...args: unknown[]) => mockToggleMessageReaction(...args),
@@ -163,6 +169,10 @@ beforeEach(() => {
   mockRealtimeCallback = null;
   mockMarkConversationRead.mockClear();
   mockToggleMessageReaction.mockClear();
+  mockGetMessagingRestrictionStatus.mockClear();
+  mockGetMessagingRestrictionStatus.mockResolvedValue({
+    data: { messaging_disabled: false, under_monitoring: false, restriction_reason: null },
+  });
   mockToggleMessageReaction.mockResolvedValue({ data: { action: 'added', emoji: '👍', message_id: 1 } });
   (sendMessage as jest.Mock).mockClear();
   mockUseApi.mockReturnValue({ data: null, isLoading: false, error: null, refresh: jest.fn() });
@@ -291,6 +301,37 @@ describe('ThreadScreen', () => {
         context_id: 44,
       });
     });
+  });
+
+  it('shows messaging restriction notice and blocks sends when disabled', async () => {
+    mockGetMessagingRestrictionStatus.mockResolvedValue({
+      data: { messaging_disabled: true, under_monitoring: true, restriction_reason: 'Safety review' },
+    });
+    mockUseApi.mockReturnValue({
+      data: {
+        data: mockMessages,
+        meta: {
+          conversation: {
+            other_user: { id: 42, name: 'Alice' },
+          },
+        },
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByLabelText, getByPlaceholderText, getByText } = render(<ThreadScreen />);
+
+    await waitFor(() => {
+      expect(getByText('Messaging paused')).toBeTruthy();
+      expect(getByText('Please contact your community team before sending more messages.')).toBeTruthy();
+    });
+
+    fireEvent.changeText(getByPlaceholderText('Type a message...'), 'Can I send?');
+    fireEvent.press(getByLabelText('Send'));
+
+    expect(sendMessage).not.toHaveBeenCalled();
   });
 
   it('shows supported context cards that open native detail routes', () => {
