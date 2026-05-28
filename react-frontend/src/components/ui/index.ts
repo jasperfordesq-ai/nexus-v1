@@ -118,6 +118,7 @@ export {
   type SelectSectionProps,
 } from './Select';
 export { useDisclosure, type UseDisclosureProps } from './useDisclosure';
+export { ConfirmDialogProvider, useConfirm, type ConfirmOptions } from './ConfirmDialog';
 
 // Skeleton Components
 export {

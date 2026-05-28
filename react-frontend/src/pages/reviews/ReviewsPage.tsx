@@ -26,7 +26,7 @@ import { resolveAvatarUrl } from '@/lib/helpers';
 import { PageMeta } from '@/components/seo';
 import { ReviewModal } from '@/components/reviews/ReviewModal';
 import { SocialInteractionPanel } from '@/components/social';
-import { Button, Chip, Avatar, Tabs, Tab, Skeleton } from '@/components/ui';
+import { Button, Chip, Avatar, Tabs, Tab, Skeleton, useConfirm } from '@/components/ui';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -87,23 +87,29 @@ function ReviewCard({
   onDelete?: (id: number) => void;
   canDelete?: boolean;
 }): JSX.Element {
-  const { t } = useTranslation('reviews');
+  const { t } = useTranslation(['reviews', 'common']);
   const [deleting, setDeleting] = useState(false);
   const toast = useToast();
+  const confirm = useConfirm();
 
   const handleDelete = useCallback(async () => {
-    if (!window.confirm(t('review_card.delete_confirm'))) return;
+    const ok = await confirm({
+      title: t('reviews:review_card.delete_confirm'),
+      status: 'danger',
+      confirmLabel: t('common:delete'),
+    });
+    if (!ok) return;
     setDeleting(true);
     try {
       await api.delete(`/v2/reviews/${review.id}`);
-      toast.success(t('review_card.delete_success'));
+      toast.success(t('reviews:review_card.delete_success'));
       onDelete?.(review.id);
     } catch {
-      toast.error(t('review_card.delete_error'));
+      toast.error(t('reviews:review_card.delete_error'));
     } finally {
       setDeleting(false);
     }
-  }, [review.id, t, toast, onDelete]);
+  }, [review.id, t, toast, onDelete, confirm]);
 
   const avatarUrl = resolveAvatarUrl(review.reviewer.avatar_url ?? review.reviewer.avatar);
   const displayName = review.is_anonymous ? t('review_card.anonymous') : review.reviewer.name;

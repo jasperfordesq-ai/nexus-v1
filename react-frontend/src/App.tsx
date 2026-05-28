@@ -78,6 +78,7 @@ import { useTranslation } from 'react-i18next';
 
 // Contexts (app-wide only — tenant-scoped contexts are inside TenantShell)
 import { ToastProvider } from '@/contexts/ToastContext';
+import { ConfirmDialogProvider } from '@/components/ui';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { CookieConsentProvider } from '@/contexts/CookieConsentContext';
 import { useTenant } from '@/contexts/TenantContext';
@@ -1659,6 +1660,7 @@ function App() {
             <ScrollToTop />
             <CookieConsentProvider>
               <ToastProvider>
+                <ConfirmDialogProvider>
                 <Suspense fallback={<LoadingScreen />}>
                   <Routes>
                     {/* Single catch-all route — TenantShell detects tenant slug from
@@ -1673,6 +1675,7 @@ function App() {
                     </Route>
                   </Routes>
                 </Suspense>
+                </ConfirmDialogProvider>
               </ToastProvider>
             </CookieConsentProvider>
           </BrowserRouter>

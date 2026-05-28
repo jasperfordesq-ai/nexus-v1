@@ -911,6 +911,7 @@
   "cancel": "Cancel",
   "confirm": "Confirm",
   "save": "Save",
+  "delete": "Delete",
   "offer_favour": {
     "meta": {
       "title": "Offer a Favour",

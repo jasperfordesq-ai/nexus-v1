@@ -2241,5 +2241,6 @@
     "scheme_light": "Light",
     "scheme_dark": "Dark",
     "scheme_system": "System"
-  }
+  },
+  "delete": "Delete"
 }

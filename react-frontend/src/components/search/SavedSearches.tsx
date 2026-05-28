@@ -19,7 +19,7 @@ import { useToast, useAuth } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { SavedSearch } from '@/types/api';
-import { Button, Spinner, Input, Tooltip } from '@/components/ui';
+import { Button, Spinner, Input, Tooltip, useConfirm } from '@/components/ui';
 
 interface SavedSearchesProps {
   /** Called when a saved search is run — parent should execute the search */
@@ -34,6 +34,7 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
   const { isAuthenticated } = useAuth();
   const toast = useToast();
   const { t } = useTranslation('search_page');
+  const confirm = useConfirm();
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showSaveForm, setShowSaveForm] = useState(false);
@@ -109,7 +110,12 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm(tRef.current('delete_confirm'))) return;
+    const ok = await confirm({
+      title: tRef.current('delete_confirm'),
+      status: 'danger',
+      confirmLabel: tRef.current('delete', { defaultValue: 'Delete' }),
+    });
+    if (!ok) return;
     try {
       await api.delete(`/v2/search/saved/${id}`);
       setSavedSearches((prev) => prev.filter((s) => s.id !== id));

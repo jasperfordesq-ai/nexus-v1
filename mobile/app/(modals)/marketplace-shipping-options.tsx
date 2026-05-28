@@ -6,7 +6,7 @@
 import { useState } from 'react';
 import { Alert, FlatList, ScrollView, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { type Href } from 'expo-router';
+import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
@@ -23,6 +23,7 @@ import {
   type MarketplaceShippingOption,
 } from '@/lib/api/marketplace';
 import { useApi } from '@/lib/hooks/useApi';
+import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
@@ -54,20 +55,51 @@ export default function MarketplaceShippingOptionsRoute() {
 }
 
 function MarketplaceShippingOptionsScreen() {
-  const { t } = useTranslation(['marketplace', 'common']);
+  const { t } = useTranslation(['marketplace', 'common', 'auth']);
   const { hasFeature } = useTenant();
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const options = useApi(() => getMarketplaceShippingOptions(), [], { enabled: hasFeature('marketplace') });
+  const marketplaceEnabled = hasFeature('marketplace');
+  const canLoadOptions = marketplaceEnabled && !isAuthLoading && isAuthenticated;
+  const options = useApi(() => getMarketplaceShippingOptions(), [], { enabled: canLoadOptions });
   const [form, setForm] = useState<ShippingFormState>(EMPTY_FORM);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  if (!hasFeature('marketplace')) {
+  if (!marketplaceEnabled) {
     return (
       <SafeAreaView className="flex-1 bg-background">
         <AppTopBar title={t('shipping.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace-tools' as Href} />
         <EmptyState icon="car-outline" title={t('featureGate.title')} subtitle={t('featureGate.description')} />
+      </SafeAreaView>
+    );
+  }
+
+  if (isAuthLoading) {
+    return (
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('shipping.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace-tools' as Href} />
+        <View className="flex-1 items-center justify-center">
+          <LoadingSpinner />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('shipping.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace-tools' as Href} />
+        <View className="flex-1 justify-center px-4">
+          <EmptyState
+            icon="car-outline"
+            title={t('shipping.signInTitle')}
+            subtitle={t('shipping.signInHint')}
+            actionLabel={t('auth:login.submit')}
+            onAction={() => router.push('/(auth)/login' as Href)}
+          />
+        </View>
       </SafeAreaView>
     );
   }

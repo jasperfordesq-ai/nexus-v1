@@ -1,4 +1,4 @@
-import { useDisclosure, Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Skeleton } from '@/components/ui';
+import { useDisclosure, Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Skeleton, useConfirm } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -76,8 +76,9 @@ interface StoryHighlightsProps {
 
 export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlightsProps) {
   const { user: currentUser } = useAuth();
-  const { t } = useTranslation('stories');
+  const { t } = useTranslation(['stories', 'common']);
   const toast = useToast();
+  const confirm = useConfirm();
   const [highlights, setHighlights] = useState<Highlight[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [viewerOpen, setViewerOpen] = useState(false);
@@ -170,7 +171,12 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
 
   const handleDeleteHighlight = async (highlightId: number, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!window.confirm(t('highlights.delete_confirm'))) return;
+    const ok = await confirm({
+      title: t('highlights.delete_confirm'),
+      status: 'danger',
+      confirmLabel: t('common:delete', { defaultValue: 'Delete' }),
+    });
+    if (!ok) return;
     try {
       const response = await api.delete(`/v2/stories/highlights/${highlightId}`);
       if (response.success) {

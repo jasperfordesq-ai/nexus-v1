@@ -830,6 +830,8 @@
     "eyebrow": "Seller fulfilment",
     "title": "Shipping options",
     "subtitle": "Create the courier choices buyers can use during marketplace checkout.",
+    "signInTitle": "Sign in to manage shipping options",
+    "signInHint": "Seller shipping methods and delivery prices are available after you sign in.",
     "courierName": "Courier name",
     "courierNamePlaceholder": "Postal service or local courier",
     "price": "Price",
