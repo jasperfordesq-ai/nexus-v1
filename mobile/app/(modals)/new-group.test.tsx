@@ -10,6 +10,8 @@ import { fireEvent, render, waitFor } from '@testing-library/react-native';
 const mockCreateGroup = jest.fn().mockResolvedValue({ data: { id: 484 } });
 const mockGetGroup = jest.fn();
 const mockUpdateGroup = jest.fn();
+const mockUploadGroupImage = jest.fn();
+const mockLaunchImageLibraryAsync = jest.fn();
 const mockReplace = jest.fn();
 let mockSearchParams: Record<string, string | undefined> = {};
 
@@ -30,6 +32,17 @@ jest.mock('react-i18next', () => ({
         'create.namePlaceholder': 'Name your group',
         'create.descriptionLabel': 'Description',
         'create.descriptionPlaceholder': 'What is this group for?',
+        'create.imageLabel': 'Group image',
+        'create.imageHint': 'Add a recognisable image for this group.',
+        'create.addImage': 'Add image',
+        'create.replaceImage': 'Replace image',
+        'create.removeImage': 'Remove',
+        'create.imageTypeError': 'Choose a JPEG, PNG, WebP, or GIF image.',
+        'create.imageSizeError': 'Choose an image under 5 MB.',
+        'create.imagePickFailedTitle': 'Image not selected',
+        'create.imagePickFailedDescription': 'We could not open your photo library.',
+        'create.imageUploadFailedTitle': 'Group saved',
+        'create.imageUploadFailedDescription': 'The group was saved, but the image could not be uploaded.',
         'create.locationLabel': 'Location',
         'create.locationPlaceholder': 'Optional place or area',
         'create.visibilityLabel': 'Visibility',
@@ -61,18 +74,26 @@ jest.mock('@/lib/hooks/useTheme', () => ({
     textSecondary: '#666666',
     textMuted: '#999999',
     border: '#dddddd',
+    error: '#dc2626',
+    surface: '#f8fafc',
   }),
 }));
 jest.mock('@/lib/api/groups', () => ({
   createGroup: (...args: unknown[]) => mockCreateGroup(...args),
   getGroup: (...args: unknown[]) => mockGetGroup(...args),
   updateGroup: (...args: unknown[]) => mockUpdateGroup(...args),
+  uploadGroupImage: (...args: unknown[]) => mockUploadGroupImage(...args),
 }));
 jest.mock('@/lib/haptics', () => ({
   notificationAsync: jest.fn().mockResolvedValue(undefined),
   NotificationFeedbackType: { Success: 'success' },
 }));
 jest.mock('@expo/vector-icons', () => ({ Ionicons: 'View' }));
+jest.mock('expo-image', () => ({ Image: 'View' }));
+jest.mock('expo-image-picker', () => ({
+  MediaTypeOptions: { Images: 'Images' },
+  launchImageLibraryAsync: (...args: unknown[]) => mockLaunchImageLibraryAsync(...args),
+}));
 jest.mock('@/components/ui/AppTopBar', () => 'View');
 jest.mock('@/components/ui/FormActionFooter', () => {
   const React = require('react');
@@ -109,6 +130,11 @@ describe('NewGroupRoute', () => {
     mockGetGroup.mockReset();
     mockUpdateGroup.mockReset();
     mockUpdateGroup.mockResolvedValue({ data: { id: 484 } });
+    mockUploadGroupImage.mockReset().mockResolvedValue({ data: { image_url: '/uploads/groups/group.jpg' } });
+    mockLaunchImageLibraryAsync.mockReset().mockResolvedValue({
+      canceled: false,
+      assets: [{ uri: 'file:///tmp/group.jpg', mimeType: 'image/jpeg', fileSize: 1024 }],
+    });
     mockReplace.mockClear();
     mockSearchParams = {};
     jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
@@ -176,6 +202,22 @@ describe('NewGroupRoute', () => {
     expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/group-detail', params: { id: '484' } });
   });
 
+  it('uploads a selected group image after creating the group', async () => {
+    const { getByPlaceholderText, getByText } = render(<NewGroupRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('Name your group'), 'Repair club');
+    fireEvent.changeText(getByPlaceholderText('What is this group for?'), 'A group for sharing repair skills and local mending sessions.');
+    fireEvent.press(getByText('Add image'));
+    await waitFor(() => expect(mockLaunchImageLibraryAsync).toHaveBeenCalled());
+    fireEvent.press(getByText('Create group'));
+
+    await waitFor(() => {
+      expect(mockCreateGroup).toHaveBeenCalled();
+    });
+    expect(mockUploadGroupImage).toHaveBeenCalledWith(484, 'file:///tmp/group.jpg');
+    expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/group-detail', params: { id: '484' } });
+  });
+
   it('loads an existing group and submits updates in edit mode', async () => {
     mockSearchParams = { id: '9' };
     mockGetGroup.mockResolvedValue({
@@ -186,6 +228,7 @@ describe('NewGroupRoute', () => {
         visibility: 'private',
         location: 'Community garden',
         federated_visibility: 'listed',
+        image_url: '/uploads/groups/existing.jpg',
       },
     });
     mockUpdateGroup.mockResolvedValue({ data: { id: 9 } });
@@ -216,5 +259,31 @@ describe('NewGroupRoute', () => {
     });
     expect(mockCreateGroup).not.toHaveBeenCalled();
     expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/group-detail', params: { id: '9' } });
+  });
+
+  it('shows an existing group image and uploads a replacement in edit mode', async () => {
+    mockSearchParams = { id: '9' };
+    mockGetGroup.mockResolvedValue({
+      data: {
+        id: 9,
+        name: 'Garden crew',
+        description: 'A group for coordinating seasonal planting and shared gardening days.',
+        visibility: 'private',
+        location: 'Community garden',
+        federated_visibility: 'listed',
+        image_url: '/uploads/groups/existing.jpg',
+      },
+    });
+    mockUpdateGroup.mockResolvedValue({ data: { id: 9 } });
+
+    const { getByText } = render(<NewGroupRoute />);
+
+    await waitFor(() => expect(getByText('Replace image')).toBeTruthy());
+    fireEvent.press(getByText('Replace image'));
+    await waitFor(() => expect(mockLaunchImageLibraryAsync).toHaveBeenCalled());
+    fireEvent.press(getByText('Update group'));
+
+    await waitFor(() => expect(mockUpdateGroup).toHaveBeenCalled());
+    expect(mockUploadGroupImage).toHaveBeenCalledWith(9, 'file:///tmp/group.jpg');
   });
 });

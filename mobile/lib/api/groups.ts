@@ -5,6 +5,7 @@
 
 import { api } from '@/lib/api/client';
 import { API_V2 } from '@/lib/constants';
+import { Platform } from 'react-native';
 
 export interface GroupMember {
   id: number;
@@ -138,6 +139,62 @@ export function createGroup(payload: CreateGroupPayload): Promise<{ data: GroupD
 
 export function updateGroup(id: number, payload: CreateGroupPayload): Promise<{ data: GroupDetail }> {
   return api.put<{ data: GroupDetail }>(`${API_V2}/groups/${id}`, payload);
+}
+
+type UploadGroupImageResponse = {
+  data?: { image_url?: string | null } | null;
+  image_url?: string | null;
+  message?: string;
+};
+
+function getUploadFilename(uri: string): string {
+  const cleanUri = uri.split('?')[0] ?? uri;
+  const lastSegment = cleanUri.split('/').pop();
+  return lastSegment && lastSegment.includes('.') ? lastSegment : 'group.jpg';
+}
+
+function getMimeType(filename: string, fallback?: string | null): string {
+  if (fallback?.startsWith('image/')) return fallback;
+  const extension = filename.split('.').pop()?.toLowerCase();
+  if (extension === 'png') return 'image/png';
+  if (extension === 'webp') return 'image/webp';
+  if (extension === 'gif') return 'image/gif';
+  return 'image/jpeg';
+}
+
+async function appendGroupImageFile(formData: FormData, uri: string): Promise<void> {
+  const filename = getUploadFilename(uri);
+
+  if (Platform.OS === 'web') {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    const type = getMimeType(filename, blob.type);
+    if (typeof File !== 'undefined') {
+      formData.append('image', new File([blob], filename, { type }));
+      return;
+    }
+    formData.append('image', blob, filename);
+    return;
+  }
+
+  const type = getMimeType(filename);
+  formData.append('image', { uri, name: filename, type } as unknown as Blob);
+}
+
+/**
+ * POST /api/v2/groups/{id}/image — upload or replace a group image.
+ */
+export async function uploadGroupImage(id: number, uri: string): Promise<{ data: { image_url: string } }> {
+  const formData = new FormData();
+  await appendGroupImageFile(formData, uri);
+
+  const response = await api.upload<UploadGroupImageResponse>(`${API_V2}/groups/${id}/image`, formData);
+  const imageUrl = response.data?.image_url ?? response.image_url ?? null;
+  if (!imageUrl) {
+    throw new Error(response.message ?? 'Group image upload did not return an image URL.');
+  }
+
+  return { data: { image_url: imageUrl } };
 }
 
 /**
