@@ -105,22 +105,40 @@ function MarketplaceStripeOnboardingScreen() {
   }
 
   const complete = Boolean(status?.stripe_onboarding_complete);
+  const incomplete = Boolean(status?.stripe_account_id && !complete);
+  const statusTone = complete ? theme.success : incomplete ? theme.warning : primary;
+  const statusIcon = complete ? 'shield-checkmark-outline' : incomplete ? 'alert-circle-outline' : 'card-outline';
+  const statusTitle = complete
+    ? t('stripeOnboarding.completeTitle')
+    : incomplete
+      ? t('stripeOnboarding.incompleteTitle')
+      : t('stripeOnboarding.title');
+  const statusSubtitle = complete
+    ? t('stripeOnboarding.completeSubtitle')
+    : incomplete
+      ? t('stripeOnboarding.incompleteSubtitle')
+      : t('stripeOnboarding.subtitle');
+  const primaryActionLabel = complete
+    ? t('stripeOnboarding.completeButton')
+    : incomplete
+      ? t('stripeOnboarding.continue')
+      : t('stripeOnboarding.start');
 
   return (
     <SafeAreaView className="flex-1 bg-background">
       <AppTopBar title={t('stripeOnboarding.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace-my-listings' as Href} />
       <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 132 }}>
         <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
-          <View className="h-1.5" style={{ backgroundColor: complete ? theme.success : primary }} />
+          <View className="h-1.5" style={{ backgroundColor: statusTone }} />
           <HeroCard.Body className="gap-4 p-4">
             <View className="flex-row items-start gap-3">
-              <View className="size-13 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(complete ? theme.success : primary, 0.14) }}>
-                <Ionicons name={complete ? 'shield-checkmark-outline' : 'card-outline'} size={25} color={complete ? theme.success : primary} />
+              <View className="size-13 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(statusTone, 0.14) }}>
+                <Ionicons name={statusIcon} size={25} color={statusTone} />
               </View>
               <View className="min-w-0 flex-1 gap-1">
                 <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('stripeOnboarding.eyebrow')}</Text>
-                <Text className="text-2xl font-bold" style={{ color: theme.text }}>{complete ? t('stripeOnboarding.completeTitle') : t('stripeOnboarding.title')}</Text>
-                <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{complete ? t('stripeOnboarding.completeSubtitle') : t('stripeOnboarding.subtitle')}</Text>
+                <Text className="text-2xl font-bold" style={{ color: theme.text }}>{statusTitle}</Text>
+                <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{statusSubtitle}</Text>
               </View>
             </View>
             <View className="flex-row flex-wrap gap-2">
@@ -182,8 +200,8 @@ function MarketplaceStripeOnboardingScreen() {
         <HeroCard className="rounded-panel p-0">
           <HeroCard.Body className="gap-3 p-4">
             <HeroButton variant="primary" onPress={() => void start()} isDisabled={isStarting || complete} style={{ backgroundColor: complete ? theme.success : primary }}>
-              <Ionicons name={complete ? 'checkmark-circle-outline' : 'open-outline'} size={17} color="#fff" />
-              <HeroButton.Label>{complete ? t('stripeOnboarding.completeButton') : t('stripeOnboarding.start')}</HeroButton.Label>
+              <Ionicons name={complete ? 'checkmark-circle-outline' : incomplete ? 'refresh-outline' : 'open-outline'} size={17} color="#fff" />
+              <HeroButton.Label>{primaryActionLabel}</HeroButton.Label>
             </HeroButton>
             <HeroButton variant="secondary" onPress={() => void load()} isDisabled={isStarting}>
               <Ionicons name="refresh-outline" size={17} color={primary} />
