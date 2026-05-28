@@ -9,6 +9,7 @@ import { Alert } from 'react-native';
 
 const mockCreateJob = jest.fn().mockResolvedValue({ data: { id: 301 } });
 const mockGetJobDetail = jest.fn();
+const mockGenerateJobDescription = jest.fn();
 const mockReplace = jest.fn();
 let mockSearchParams: Record<string, string> = {};
 
@@ -30,6 +31,10 @@ jest.mock('react-i18next', () => ({
         'create.titlePlaceholder': 'Role title',
         'create.descriptionLabel': 'Description',
         'create.descriptionPlaceholder': 'Describe the role, expectations, and next steps.',
+        'create.generateDescription': 'Generate with AI',
+        'create.generatingDescription': 'Generating...',
+        'create.generateTitleRequired': 'Add a title before generating a description.',
+        'create.generateDescriptionFailed': 'Could not generate a description.',
         'create.typeLabel': 'Type',
         'create.commitmentLabel': 'Commitment',
         'create.locationLabel': 'Location',
@@ -87,6 +92,7 @@ jest.mock('react-i18next', () => ({
         'create.failedDescription': 'We could not create the job.',
         'create.editFailedTitle': 'Job not updated',
         'create.editFailedDescription': 'We could not update the job.',
+        'common:errors.alertTitle': 'Something went wrong',
         'filters.type.paid': 'Paid',
         'filters.type.volunteer': 'Volunteer',
         'filters.type.timebank': 'Timebank',
@@ -114,6 +120,7 @@ jest.mock('@/lib/hooks/useTheme', () => ({
 }));
 jest.mock('@/lib/api/jobs', () => ({
   createJob: (...args: unknown[]) => mockCreateJob(...args),
+  generateJobDescription: (...args: unknown[]) => mockGenerateJobDescription(...args),
   getJobDetail: (...args: unknown[]) => mockGetJobDetail(...args),
   updateJob: jest.fn().mockResolvedValue({ data: { id: 301 } }),
 }));
@@ -160,6 +167,8 @@ describe('NewJobRoute', () => {
     alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
     mockSearchParams = {};
     mockCreateJob.mockClear();
+    mockGenerateJobDescription.mockReset();
+    mockGenerateJobDescription.mockResolvedValue({ data: { description: 'AI generated role description.' } });
     mockGetJobDetail.mockReset();
     (updateJob as jest.Mock).mockClear();
     mockReplace.mockClear();
@@ -181,6 +190,37 @@ describe('NewJobRoute', () => {
       expect(alertSpy).toHaveBeenCalledWith('Check job details', 'Salary range required. You may mark salary negotiable to omit it.');
     });
     expect(mockCreateJob).not.toHaveBeenCalled();
+  });
+
+  it('generates a role description from the current title, skills, type, and commitment', async () => {
+    const { getByDisplayValue, getByPlaceholderText, getByText } = render(<NewJobRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('Role title'), 'Community coordinator');
+    fireEvent.press(getByText('Paid'));
+    fireEvent.press(getByText('Part Time'));
+    fireEvent.changeText(getByPlaceholderText('Comma-separated skills'), 'Planning, Support');
+    fireEvent.press(getByText('Generate with AI'));
+
+    await waitFor(() => {
+      expect(mockGenerateJobDescription).toHaveBeenCalledWith({
+        title: 'Community coordinator',
+        skills: ['Planning', 'Support'],
+        type: 'paid',
+        commitment: 'part_time',
+      });
+    });
+    expect(getByDisplayValue('AI generated role description.')).toBeTruthy();
+  });
+
+  it('requires a title before generating a role description', async () => {
+    const { getByText } = render(<NewJobRoute />);
+
+    fireEvent.press(getByText('Generate with AI'));
+
+    await waitFor(() => {
+      expect(alertSpy).toHaveBeenCalledWith('Check job details', 'Add a title before generating a description.');
+    });
+    expect(mockGenerateJobDescription).not.toHaveBeenCalled();
   });
 
   it('allows paid roles without salary values when salary is negotiable', async () => {

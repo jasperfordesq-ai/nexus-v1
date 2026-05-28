@@ -12,7 +12,7 @@ import { Button as HeroButton, Card as HeroCard, Text } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 
-import { createJob, getJobDetail, updateJob, type CreateJobPayload, type JobVacancy } from '@/lib/api/jobs';
+import { createJob, generateJobDescription, getJobDetail, updateJob, type CreateJobPayload, type JobVacancy } from '@/lib/api/jobs';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
@@ -76,6 +76,7 @@ function NewJobScreen() {
   const [deadline, setDeadline] = useState('');
   const [isRemote, setIsRemote] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
   const [hasHydratedEdit, setHasHydratedEdit] = useState(false);
 
   useEffect(() => {
@@ -198,6 +199,33 @@ function NewJobScreen() {
     }
   }
 
+  async function generateDescription() {
+    const cleanTitle = title.trim();
+    if (!cleanTitle) {
+      Alert.alert(t('create.validationTitle'), t('create.generateTitleRequired'));
+      return;
+    }
+
+    setIsGeneratingDescription(true);
+    try {
+      const response = await generateJobDescription({
+        title: cleanTitle,
+        skills: skills.split(',').map((skill) => skill.trim()).filter(Boolean),
+        type,
+        commitment,
+      });
+      setDescription(response.data.description);
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch (error) {
+      Alert.alert(
+        t('common:errors.alertTitle'),
+        error instanceof Error ? error.message : t('create.generateDescriptionFailed'),
+      );
+    } finally {
+      setIsGeneratingDescription(false);
+    }
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-background">
       <AppTopBar title={isEditing ? t('create.editTitle') : t('create.title')} backLabel={t('common:back')} fallbackHref="/(modals)/jobs" />
@@ -222,6 +250,10 @@ function NewJobScreen() {
           <HeroCard.Body className="gap-4 p-4">
             <FormField label={t('create.titleLabel')} value={title} onChangeText={setTitle} placeholder={t('create.titlePlaceholder')} theme={theme} />
             <FormField label={t('create.descriptionLabel')} value={description} onChangeText={setDescription} placeholder={t('create.descriptionPlaceholder')} theme={theme} multiline />
+            <HeroButton variant="secondary" onPress={() => void generateDescription()} isDisabled={isGeneratingDescription || !title.trim()}>
+              <Ionicons name="sparkles-outline" size={16} color={primary} />
+              <HeroButton.Label>{isGeneratingDescription ? t('create.generatingDescription') : t('create.generateDescription')}</HeroButton.Label>
+            </HeroButton>
             <ButtonGroup label={t('create.typeLabel')} values={jobTypes} selected={type} onSelect={setType} labelFor={(value) => t(`filters.type.${value}`)} primary={primary} theme={theme} />
             <ButtonGroup label={t('create.commitmentLabel')} values={commitments} selected={commitment} onSelect={setCommitment} labelFor={(value) => t(`filters.commitment.${value}`)} primary={primary} theme={theme} />
             <FormField label={t('create.locationLabel')} value={location} onChangeText={setLocation} placeholder={t('create.locationPlaceholder')} theme={theme} />

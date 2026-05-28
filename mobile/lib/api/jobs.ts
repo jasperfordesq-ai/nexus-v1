@@ -208,6 +208,15 @@ export function updateJobStatus(id: number, status: 'open' | 'closed' | 'filled'
   return api.put<{ data: JobVacancy }>(`${API_V2}/jobs/${id}`, { status });
 }
 
+export function generateJobDescription(payload: {
+  title: string;
+  skills?: string[];
+  type?: CreateJobPayload['type'];
+  commitment?: CreateJobPayload['commitment'];
+}): Promise<{ data: { description: string } }> {
+  return api.post<{ data: { description: string } }>(`${API_V2}/jobs/generate-description`, payload);
+}
+
 /**
  * GET /api/v2/jobs/recommended — recommended job vacancies for the authenticated user.
  */
