@@ -413,9 +413,12 @@ function formatPromotionDuration(hours: number, t: (key: string, options?: Recor
 
 function PickupsPanel() {
   const { t } = useTranslation(['marketplace', 'common']);
+  const primary = usePrimaryColor();
+  const theme = useTheme();
   const [slotStart, setSlotStart] = useState('');
   const [slotEnd, setSlotEnd] = useState('');
   const [qrCode, setQrCode] = useState('');
+  const [lastScan, setLastScan] = useState<MarketplacePickupReservation | null>(null);
   const slots = useApi(() => getMarketplacePickupSlots(), [], { enabled: true });
   const reservations = useApi(() => getMyMarketplacePickups(), [], { enabled: true });
 
@@ -434,7 +437,8 @@ function PickupsPanel() {
   async function scan() {
     if (!qrCode.trim()) return;
     try {
-      await scanMarketplacePickup(qrCode.trim());
+      const response = await scanMarketplacePickup(qrCode.trim());
+      setLastScan(response.data);
       setQrCode('');
       reservations.refresh();
     } catch (err) {
@@ -463,6 +467,24 @@ function PickupsPanel() {
         <HeroButton variant="secondary" onPress={scan} isDisabled={!qrCode.trim()}>
           <HeroButton.Label>{t('tools.pickups.scan')}</HeroButton.Label>
         </HeroButton>
+        {lastScan ? (
+          <Surface variant="secondary" className="rounded-panel-inner border p-3" style={{ borderColor: withAlpha(theme.success, 0.28) }}>
+            <View className="flex-row items-center gap-3">
+              <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(theme.success, 0.14) }}>
+                <Ionicons name="checkmark-circle-outline" size={20} color={theme.success} />
+              </View>
+              <View className="min-w-0 flex-1">
+                <Text className="text-sm font-bold" style={{ color: theme.success }}>{t('tools.pickups.lastScan')}</Text>
+                <Text className="text-xs leading-4" style={{ color: theme.textSecondary }}>
+                  {t('tools.pickups.lastScanDetail', { order: lastScan.order_id, status: t(`pickup.status.${lastScan.status}`, { defaultValue: lastScan.status }) })}
+                </Text>
+              </View>
+              <HeroButton isIconOnly size="sm" variant="secondary" onPress={() => setLastScan(null)}>
+                <Ionicons name="close-outline" size={16} color={primary} />
+              </HeroButton>
+            </View>
+          </Surface>
+        ) : null}
       </View>
       <PanelList
         isLoading={slots.isLoading}
@@ -484,7 +506,7 @@ function PickupsPanel() {
         items={reservations.data?.data ?? []}
         emptyTitle={t('tools.pickups.emptyReservations')}
         renderItem={(item: MarketplacePickupReservation) => (
-          <ToolRow key={item.id} icon="qr-code-outline" title={t('tools.pickups.order', { order: item.order_id })} subtitle={item.status} />
+          <ToolRow key={item.id} icon="qr-code-outline" title={t('tools.pickups.order', { order: item.order_id })} subtitle={t(`pickup.status.${item.status}`, { defaultValue: item.status })} />
         )}
       />
     </PanelCard>
