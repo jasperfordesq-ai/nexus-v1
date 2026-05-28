@@ -148,6 +148,8 @@ export interface CreateOpportunityPayload {
   category_id?: number | null;
 }
 
+export type UpdateOpportunityPayload = Omit<CreateOpportunityPayload, 'organization_id'>;
+
 /**
  * GET /api/v2/volunteering/opportunities — list volunteering opportunities for the current tenant.
  * Supports cursor-based pagination and optional full-text search.
@@ -213,6 +215,10 @@ export function getMyOrganisations(): Promise<MyOrganisationsResponse> {
 
 export function createOpportunity(payload: CreateOpportunityPayload): Promise<{ data: VolunteerOpportunity }> {
   return api.post<{ data: VolunteerOpportunity }>(`${API_V2}/volunteering/opportunities`, payload);
+}
+
+export function updateOpportunity(id: number, payload: UpdateOpportunityPayload): Promise<{ data: VolunteerOpportunity }> {
+  return api.put<{ data: VolunteerOpportunity }>(`${API_V2}/volunteering/opportunities/${id}`, payload);
 }
 
 export function logVolunteerHours(payload: {

@@ -3,16 +3,16 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Alert, ScrollView, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Spinner, Surface, Text } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 
-import { createOpportunity, getMyOrganisations, type VolunteeringOrganisation } from '@/lib/api/volunteering';
+import { createOpportunity, getMyOrganisations, getOpportunity, updateOpportunity, type VolunteerOpportunity, type VolunteeringOrganisation } from '@/lib/api/volunteering';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
@@ -54,8 +54,11 @@ export default function NewVolunteeringRoute() {
 
 function NewVolunteeringScreen() {
   const { t } = useTranslation(['volunteering', 'common']);
+  const params = useLocalSearchParams<{ id?: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const opportunityId = Number(params.id);
+  const isEditing = Number.isFinite(opportunityId) && opportunityId > 0;
   const orgQuery = useApi(() => getMyOrganisations(), []);
   const organisations = useMemo(() => unwrapOrgs(orgQuery.data), [orgQuery.data]);
   const [organisationId, setOrganisationId] = useState<number | null>(null);
@@ -68,6 +71,37 @@ function NewVolunteeringScreen() {
   const [endDate, setEndDate] = useState('');
   const [isRemote, setIsRemote] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasHydratedEdit, setHasHydratedEdit] = useState(false);
+
+  useEffect(() => {
+    if (!isEditing || hasHydratedEdit) return;
+    let isMounted = true;
+    getOpportunity(opportunityId)
+      .then((response) => {
+        if (!isMounted) return;
+        hydrateFromOpportunity(response.data);
+        setHasHydratedEdit(true);
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        Alert.alert(t('create.failedTitle'), t('create.loadFailed'));
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [hasHydratedEdit, isEditing, opportunityId, t]);
+
+  function hydrateFromOpportunity(opportunity: VolunteerOpportunity) {
+    setOrganisationId(opportunity.organisation?.id ?? opportunity.organization?.id ?? null);
+    setTitle(opportunity.title ?? '');
+    setDescription(opportunity.description ?? '');
+    setLocation(opportunity.location ?? '');
+    setSkills(Array.isArray(opportunity.skills_needed) ? opportunity.skills_needed.join(', ') : opportunity.skills_needed ?? '');
+    setStartDate(opportunity.start_date?.slice(0, 10) ?? '');
+    setEndDate(opportunity.end_date?.slice(0, 10) ?? '');
+    setIsRemote(Boolean(opportunity.is_remote));
+  }
 
   async function submit() {
     const trimmedTitle = title.trim();
@@ -75,7 +109,7 @@ function NewVolunteeringScreen() {
     const trimmedStartDate = startDate.trim();
     const trimmedEndDate = endDate.trim();
 
-    if (!organisationId || !trimmedTitle || !trimmedDescription) {
+    if ((!isEditing && !organisationId) || !trimmedTitle || !trimmedDescription) {
       Alert.alert(t('create.validationTitle'), t('create.validationRequired'));
       return;
     }
@@ -100,8 +134,7 @@ function NewVolunteeringScreen() {
 
     setIsSubmitting(true);
     try {
-      const result = await createOpportunity({
-        organization_id: organisationId,
+      const payload = {
         title: trimmedTitle,
         description: trimmedDescription,
         location: location.trim() || null,
@@ -109,16 +142,25 @@ function NewVolunteeringScreen() {
         skills_needed: skills.trim(),
         start_date: trimmedStartDate || null,
         end_date: trimmedEndDate || null,
-      });
+      };
+      const result = isEditing
+        ? await updateOpportunity(opportunityId, payload)
+        : await createOpportunity({
+          organization_id: organisationId as number,
+          ...payload,
+        });
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      const id = result.data?.id;
+      const id = result.data?.id ?? opportunityId;
       if (id) {
         router.replace({ pathname: '/(modals)/volunteering-detail', params: { id: String(id) } });
       } else {
         router.back();
       }
     } catch (error) {
-      Alert.alert(t('create.failedTitle'), error instanceof Error ? error.message : t('create.failedDescription'));
+      Alert.alert(
+        isEditing ? t('create.editFailedTitle') : t('create.failedTitle'),
+        error instanceof Error ? error.message : (isEditing ? t('create.editFailedDescription') : t('create.failedDescription')),
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -126,7 +168,7 @@ function NewVolunteeringScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <AppTopBar title={t('create.title')} backLabel={t('common:back')} fallbackHref="/(modals)/volunteering" />
+      <AppTopBar title={isEditing ? t('create.editTitle') : t('create.title')} backLabel={t('common:back')} fallbackHref="/(modals)/volunteering" />
       <ScrollView className="flex-1" contentContainerStyle={{ padding: 16, paddingBottom: 120 }}>
         <HeroCard className="mb-4 overflow-hidden rounded-panel p-0">
           <View className="h-1.5" style={{ backgroundColor: '#e11d48' }} />
@@ -137,8 +179,8 @@ function NewVolunteeringScreen() {
               </View>
               <View className="min-w-0 flex-1">
                 <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('create.eyebrow')}</Text>
-                <Text className="text-2xl font-bold" style={{ color: theme.text }}>{t('create.title')}</Text>
-                <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('create.subtitle')}</Text>
+                <Text className="text-2xl font-bold" style={{ color: theme.text }}>{isEditing ? t('create.editTitle') : t('create.title')}</Text>
+                <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{isEditing ? t('create.editSubtitle') : t('create.subtitle')}</Text>
               </View>
             </View>
           </HeroCard.Body>
@@ -162,6 +204,7 @@ function NewVolunteeringScreen() {
                 </ScrollView>
               )}
               {selectedOrg ? <Text className="text-xs" style={{ color: theme.textSecondary }}>{t('create.selectedOrganisation', { name: selectedOrg.name })}</Text> : null}
+              {isEditing ? <Text className="text-xs" style={{ color: theme.textMuted }}>{t('create.editOrganisationHint')}</Text> : null}
             </View>
 
             <FormField label={t('create.titleLabel')} value={title} onChangeText={setTitle} placeholder={t('create.titlePlaceholder')} theme={theme} />
@@ -180,9 +223,9 @@ function NewVolunteeringScreen() {
         </HeroCard>
       </ScrollView>
       <FormActionFooter
-        title={t('create.reviewTitle')}
-        subtitle={t('create.reviewSubtitle')}
-        submitLabel={t('create.submit')}
+        title={isEditing ? t('create.editReviewTitle') : t('create.reviewTitle')}
+        subtitle={isEditing ? t('create.editReviewSubtitle') : t('create.reviewSubtitle')}
+        submitLabel={isEditing ? t('create.updateSubmit') : t('create.submit')}
         primary={primary}
         isSubmitting={isSubmitting}
         isDisabled={organisations.length === 0}

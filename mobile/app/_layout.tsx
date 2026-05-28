@@ -173,6 +173,10 @@ function RootNavigator() {
         options={{ ...modalOptions, headerShown: false, title: t('volunteering:create.title') }}
       />
       <Stack.Screen
+        name="(modals)/edit-volunteering"
+        options={{ ...modalOptions, headerShown: false, title: t('volunteering:create.editTitle') }}
+      />
+      <Stack.Screen
         name="(modals)/new-job"
         options={{ ...modalOptions, headerShown: false, title: t('jobs:create.title') }}
       />

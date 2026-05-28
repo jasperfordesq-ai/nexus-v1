@@ -9,13 +9,17 @@ import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 const mockUseApi = jest.fn();
 const mockCreateOpportunity = jest.fn();
+const mockGetOpportunity = jest.fn();
+const mockUpdateOpportunity = jest.fn();
 const mockReplace = jest.fn();
+let mockSearchParams: Record<string, string> = {};
 
 jest.mock('expo-router', () => ({
   router: {
     back: jest.fn(),
     replace: (...args: unknown[]) => mockReplace(...args),
   },
+  useLocalSearchParams: () => mockSearchParams,
 }));
 
 jest.mock('react-i18next', () => ({
@@ -24,9 +28,12 @@ jest.mock('react-i18next', () => ({
       const map: Record<string, string> = {
         'create.eyebrow': 'New opportunity',
         'create.title': 'Create Opportunity',
+        'create.editTitle': 'Edit Opportunity',
         'create.subtitle': 'Publish a volunteer role.',
+        'create.editSubtitle': 'Update the volunteer role.',
         'create.organisationLabel': 'Organisation',
         'create.selectedOrganisation': `Posting for ${String(opts?.name ?? '')}`,
+        'create.editOrganisationHint': 'Organisation changes are managed by organiser tools.',
         'create.noOrganisations': 'You need an approved organisation.',
         'create.titleLabel': 'Title',
         'create.titlePlaceholder': 'What help do you need?',
@@ -42,7 +49,10 @@ jest.mock('react-i18next', () => ({
         'create.remote': 'Remote opportunity',
         'create.reviewTitle': 'Ready to publish?',
         'create.reviewSubtitle': 'Check before posting.',
+        'create.editReviewTitle': 'Ready to update?',
+        'create.editReviewSubtitle': 'Save your changes.',
         'create.submit': 'Create opportunity',
+        'create.updateSubmit': 'Update opportunity',
         'create.validationTitle': 'Check opportunity details',
         'create.validationRequired': 'Choose an organisation and add a title and description.',
         'create.validationTitleMinLength': 'Use at least 5 characters for the title.',
@@ -50,6 +60,9 @@ jest.mock('react-i18next', () => ({
         'create.validationEndAfterStart': 'Use an end date after the start date.',
         'create.failedTitle': 'Opportunity not created',
         'create.failedDescription': 'We could not create the opportunity.',
+        'create.editFailedTitle': 'Opportunity not updated',
+        'create.editFailedDescription': 'We could not update the opportunity.',
+        'create.loadFailed': 'Could not load opportunity.',
         'common:back': 'Back',
       };
       return map[key] ?? key;
@@ -78,7 +91,9 @@ jest.mock('@/lib/hooks/useTheme', () => ({
 
 jest.mock('@/lib/api/volunteering', () => ({
   createOpportunity: (...args: unknown[]) => mockCreateOpportunity(...args),
+  getOpportunity: (...args: unknown[]) => mockGetOpportunity(...args),
   getMyOrganisations: jest.fn(),
+  updateOpportunity: (...args: unknown[]) => mockUpdateOpportunity(...args),
 }));
 
 jest.mock('@/lib/haptics', () => ({
@@ -123,12 +138,15 @@ import NewVolunteeringRoute from './new-volunteering';
 
 describe('NewVolunteeringRoute', () => {
   beforeEach(() => {
+    mockSearchParams = {};
     mockUseApi.mockReset().mockReturnValue({
       data: { data: [{ id: 7, name: 'Helping Hands', status: 'approved', member_role: 'owner' }] },
       isLoading: false,
       error: null,
     });
     mockCreateOpportunity.mockReset().mockResolvedValue({ data: { id: 19 } });
+    mockGetOpportunity.mockReset();
+    mockUpdateOpportunity.mockReset().mockResolvedValue({ data: { id: 19 } });
     mockReplace.mockClear();
     jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
   });
@@ -180,5 +198,44 @@ describe('NewVolunteeringRoute', () => {
       expect(Alert.alert).toHaveBeenCalledWith('Check opportunity details', 'Use an end date after the start date.');
     });
     expect(mockCreateOpportunity).not.toHaveBeenCalled();
+  });
+
+  it('hydrates and updates an existing volunteering opportunity in edit mode', async () => {
+    mockSearchParams = { id: '19' };
+    mockGetOpportunity.mockResolvedValueOnce({
+      data: {
+        id: 19,
+        title: 'Food bank packing',
+        description: 'Help pack food parcels for local families every week.',
+        organisation: { id: 7, name: 'Helping Hands' },
+        location: 'Community hall',
+        is_remote: false,
+        skills_needed: ['Packing', 'Lifting'],
+        status: 'open',
+        spots_available: null,
+        deadline: null,
+        created_at: '2026-05-01T00:00:00Z',
+        start_date: '2026-06-01T00:00:00Z',
+        end_date: '2026-06-30T00:00:00Z',
+      },
+    });
+
+    const { getByDisplayValue, getByText } = render(<NewVolunteeringRoute />);
+
+    await waitFor(() => expect(getByDisplayValue('Food bank packing')).toBeTruthy());
+    expect(getByText('Edit Opportunity')).toBeTruthy();
+    expect(getByText('Update the volunteer role.')).toBeTruthy();
+    fireEvent.changeText(getByDisplayValue('Food bank packing'), 'Updated packing shift');
+    fireEvent.press(getByText('Update opportunity'));
+
+    await waitFor(() => {
+      expect(mockUpdateOpportunity).toHaveBeenCalledWith(19, expect.objectContaining({
+        title: 'Updated packing shift',
+        description: 'Help pack food parcels for local families every week.',
+        skills_needed: 'Packing, Lifting',
+        start_date: '2026-06-01',
+        end_date: '2026-06-30',
+      }));
+    });
   });
 });

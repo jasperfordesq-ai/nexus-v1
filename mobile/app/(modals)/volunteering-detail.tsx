@@ -594,6 +594,13 @@ function VolunteeringDetailScreenInner() {
                   {t('ownerOpportunityHint')}
                 </Text>
               </View>
+              <HeroButton
+                variant="secondary"
+                onPress={() => router.push({ pathname: '/(modals)/edit-volunteering', params: { id: String(opportunity.id) } } as never)}
+              >
+                <Ionicons name="create-outline" size={16} color={primary} />
+                <HeroButton.Label>{t('editOpportunity')}</HeroButton.Label>
+              </HeroButton>
 
               <View className="gap-3">
                 <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>

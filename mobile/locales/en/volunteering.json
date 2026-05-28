@@ -8,6 +8,7 @@
   "yourOpportunity": "Your opportunity",
   "ownerOpportunityTitle": "Owner view",
   "ownerOpportunityHint": "You manage this opportunity, so volunteer applications are handled from the organiser tools.",
+  "editOpportunity": "Edit opportunity",
   "applications": {
     "heading": "Applications",
     "emptyOwner": "No pending applications yet.",
@@ -119,7 +120,9 @@
   "create": {
     "eyebrow": "New opportunity",
     "title": "Create Opportunity",
+    "editTitle": "Edit Opportunity",
     "subtitle": "Publish a volunteer role for an organisation you manage.",
+    "editSubtitle": "Update the volunteer role details, skills, dates, and location.",
     "organisationLabel": "Organisation",
     "selectedOrganisation": "Posting for {{name}}",
     "noOrganisations": "You need an approved organisation before posting opportunities.",
@@ -137,13 +140,20 @@
     "remote": "Remote opportunity",
     "reviewTitle": "Ready to publish?",
     "reviewSubtitle": "Check the organisation, dates, location, and skills before posting.",
+    "editReviewTitle": "Ready to update?",
+    "editReviewSubtitle": "Save your changes to keep this opportunity accurate.",
     "submit": "Create opportunity",
+    "updateSubmit": "Update opportunity",
+    "editOrganisationHint": "Organisation changes are managed by organiser tools.",
     "validationTitle": "Check opportunity details",
     "validationRequired": "Choose an organisation and add a title and description.",
     "validationTitleMinLength": "Use at least 5 characters for the title.",
     "validationDescriptionMinLength": "Use at least 20 characters for the description.",
     "validationEndAfterStart": "Use an end date after the start date.",
     "failedTitle": "Opportunity not created",
-    "failedDescription": "We could not create the opportunity. Please try again."
+    "loadFailed": "We could not load this opportunity for editing.",
+    "failedDescription": "We could not create the opportunity. Please try again.",
+    "editFailedTitle": "Opportunity not updated",
+    "editFailedDescription": "We could not update the opportunity. Please try again."
   }
 }
