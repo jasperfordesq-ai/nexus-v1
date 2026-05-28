@@ -161,7 +161,7 @@ function navigateFederation(segments: string[], queryParams: Record<string, stri
       break;
     case 'members':
       if (detailId) {
-        router.push({ pathname: '/(modals)/member-profile', params: { id: detailId, ...queryParams } });
+        router.push({ pathname: '/(modals)/federation-member', params: { id: detailId, ...queryParams } } as unknown as Href);
       } else {
         pushWithOptionalParams('/(modals)/federation-members', queryParams);
       }

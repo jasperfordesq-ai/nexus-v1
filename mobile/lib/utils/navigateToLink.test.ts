@@ -49,7 +49,7 @@ describe('navigateToLink', () => {
     navigateToLink('/federation/members/272?tenant_id=5');
 
     expect(mockPush).toHaveBeenNthCalledWith(1, { pathname: '/(modals)/federation-partner', params: { id: '7' } });
-    expect(mockPush).toHaveBeenNthCalledWith(2, { pathname: '/(modals)/member-profile', params: { id: '272', tenant_id: '5' } });
+    expect(mockPush).toHaveBeenNthCalledWith(2, { pathname: '/(modals)/federation-member', params: { id: '272', tenant_id: '5' } });
   });
 
   it('maps web message compose links to the native thread composer', () => {
