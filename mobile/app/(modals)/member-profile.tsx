@@ -15,6 +15,7 @@ import { Accordion, Button as HeroButton, Card as HeroCard, Chip, Spinner, Surfa
 import {
   getFederationConnectionStatus,
   getFederationMember,
+  getFederationMemberReviews,
   sendFederationConnectionRequest,
   type FederatedConnectionStatus,
 } from '@/lib/api/federation';
@@ -561,7 +562,18 @@ async function loadMemberProfileData(
   isFederatedProfile: boolean,
 ): Promise<{ data: MemberProfile }> {
   if (isFederatedProfile) {
-    return getFederationMember(memberId, tenantId ?? undefined) as Promise<{ data: MemberProfile }>;
+    const [profileRes, reviewsRes] = await Promise.all([
+      getFederationMember(memberId, tenantId ?? undefined) as Promise<{ data: MemberProfile }>,
+      getFederationMemberReviews(memberId, tenantId ?? undefined).catch(() => ({ data: [] as MemberReview[] })),
+    ]);
+
+    return {
+      data: {
+        ...profileRes.data,
+        rating: profileRes.data.rating ?? profileRes.data.reputation_score ?? null,
+        reviews: reviewsRes.data ?? [],
+      },
+    };
   }
 
   const [profileRes, listingsRes, reviewsRes, achievementsRes, badgesRes] = await Promise.all([
@@ -1141,6 +1153,22 @@ function ReviewsSection({
                       <Text className="text-xs" numberOfLines={1} style={{ color: theme.textMuted }}>
                         {review.listing_title}
                       </Text>
+                    ) : null}
+                    {review.partner?.name || review.verified ? (
+                      <View className="flex-row flex-wrap gap-2">
+                        {review.partner?.name ? (
+                          <Chip size="sm" variant="soft" color="accent">
+                            <Ionicons name="globe-outline" size={12} color={primary} />
+                            <Chip.Label>{t('federation:reviews.fromPartner', { partner: review.partner.name })}</Chip.Label>
+                          </Chip>
+                        ) : null}
+                        {review.verified ? (
+                          <Chip size="sm" variant="soft" color="success">
+                            <Ionicons name="shield-checkmark-outline" size={12} color={theme.success} />
+                            <Chip.Label>{t('federation:reviews.verified')}</Chip.Label>
+                          </Chip>
+                        ) : null}
+                      </View>
                     ) : null}
                   </View>
                 </View>

@@ -38,9 +38,9 @@ export interface MemberListResponse {
 }
 
 export interface MemberReview {
-  id: number;
+  id: number | string;
   reviewer?: {
-    id: number;
+    id?: number | string | null;
     first_name?: string;
     last_name?: string;
     name?: string;
@@ -52,6 +52,12 @@ export interface MemberReview {
   listing_id?: number | null;
   listing_title?: string | null;
   created_at: string;
+  partner?: {
+    id?: number | string;
+    name: string;
+    slug?: string | null;
+  } | null;
+  verified?: boolean;
 }
 
 /** GET /api/v2/users — paginated member directory for the current tenant */

@@ -76,6 +76,10 @@
   "connectedSince": "Connected since {{date}}",
   "visitWebsite": "Visit website",
   "empty": "No federation partners yet.",
+  "reviews": {
+    "fromPartner": "via {{partner}}",
+    "verified": "Verified"
+  },
   "relative": {
     "today": "today",
     "daysAgo": "{{count}} day ago",

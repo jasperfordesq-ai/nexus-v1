@@ -89,6 +89,27 @@ export interface FederatedMember {
   reputation_count?: number;
 }
 
+export interface FederationMemberReview {
+  id: number | string;
+  rating: number;
+  comment?: string | null;
+  created_at: string;
+  reviewer?: {
+    id?: number | string | null;
+    name?: string;
+    first_name?: string;
+    last_name?: string;
+    avatar?: string | null;
+    avatar_url?: string | null;
+  } | null;
+  partner?: {
+    id?: number | string;
+    name: string;
+    slug?: string | null;
+  } | null;
+  verified?: boolean;
+}
+
 export interface FederatedListing {
   id: number | string;
   title: string;
@@ -243,6 +264,14 @@ export function getFederationMember(id: number | string, tenantId?: number | str
     params.tenant_id = String(tenantId);
   }
   return api.get<{ data: FederatedMember }>(`${API_V2}/federation/members/${id}`, params);
+}
+
+export function getFederationMemberReviews(id: number | string, tenantId?: number | string): Promise<{ data: FederationMemberReview[] }> {
+  const params: Record<string, string> = {};
+  if (tenantId !== undefined && tenantId !== null && String(tenantId).trim() !== '') {
+    params.tenant_id = String(tenantId);
+  }
+  return api.get<{ data: FederationMemberReview[] }>(`${API_V2}/federation/members/${id}/reviews`, params);
 }
 
 export function getFederationListings(params: Record<string, string> = {}): Promise<FederationPagedResponse<FederatedListing>> {

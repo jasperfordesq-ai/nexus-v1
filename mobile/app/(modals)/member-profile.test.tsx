@@ -54,6 +54,8 @@ jest.mock('react-i18next', () => ({
         'profile.noReviews': 'No reviews yet.',
         'profile.reviewCount': opts ? `${String(opts.count ?? '')} reviews` : 'reviews',
         'profile.anonymousReviewer': 'Community member',
+        'federation:reviews.fromPartner': opts ? `via ${String(opts.partner ?? '')}` : 'via partner',
+        'federation:reviews.verified': 'Verified',
         'profile.sendMessage': 'Send Message',
         'profile.memberSince': opts ? `Member since ${String(opts.date ?? '')}` : 'Member since',
         'federation:directory.members.title': 'Federated Members',
@@ -115,6 +117,7 @@ jest.mock('@/lib/api/members', () => ({
 
 jest.mock('@/lib/api/federation', () => ({
   getFederationMember: jest.fn(),
+  getFederationMemberReviews: jest.fn().mockResolvedValue({ data: [] }),
   getFederationConnectionStatus: jest.fn().mockResolvedValue({ data: { status: 'none', connection_id: null } }),
   sendFederationConnectionRequest: jest.fn().mockResolvedValue({ data: { connection_id: 20 } }),
 }));
@@ -145,7 +148,7 @@ jest.mock('@/components/ui/LoadingSpinner', () => () => null);
 // --- Tests ---
 
 import MemberProfileScreen from './member-profile';
-import { getFederationMember } from '@/lib/api/federation';
+import { getFederationMember, getFederationMemberReviews } from '@/lib/api/federation';
 import { getMember } from '@/lib/api/members';
 
 const defaultApiState = { data: null, isLoading: false, error: null, refresh: jest.fn() };
@@ -268,6 +271,26 @@ describe('MemberProfileScreen', () => {
 
   it('uses the federation member endpoint when a partner tenant_id is present', async () => {
     mockParams = { id: '272', tenant_id: '5' };
+    (getFederationMember as jest.Mock).mockResolvedValue({
+      data: {
+        ...mockMember,
+        id: 272,
+        tenant_id: 5,
+        timebank: { id: 5, name: 'Partner Demo' },
+        reputation_score: 4.8,
+      },
+    });
+    (getFederationMemberReviews as jest.Mock).mockResolvedValue({
+      data: [{
+        id: 'fed-91',
+        rating: 5,
+        comment: 'Trusted across our network.',
+        created_at: '2026-03-22T10:00:00Z',
+        reviewer: { name: 'Partner reviewer' },
+        partner: { id: 5, name: 'Partner Demo' },
+        verified: true,
+      }],
+    });
     mockUseApi.mockImplementation((loader: () => Promise<unknown>) => ({
       data: { data: { ...mockMember, id: 272, tenant_id: 5, timebank: { id: 5, name: 'Partner Demo' } } },
       isLoading: false,
@@ -281,6 +304,40 @@ describe('MemberProfileScreen', () => {
     await loader();
 
     expect(getFederationMember).toHaveBeenCalledWith(272, 5);
+    expect(getFederationMemberReviews).toHaveBeenCalledWith(272, 5);
     expect(getMember).not.toHaveBeenCalled();
+  });
+
+  it('renders federated reviews with partner trust context', () => {
+    mockParams = { id: '272', tenant_id: '5' };
+    mockUseApi.mockReturnValue({
+      data: {
+        data: {
+          ...mockMember,
+          id: 272,
+          tenant_id: 5,
+          timebank: { id: 5, name: 'Partner Demo' },
+          rating: 4.8,
+          reviews: [{
+            id: 'fed-91',
+            rating: 5,
+            comment: 'Trusted across our network.',
+            created_at: '2026-03-22T10:00:00Z',
+            reviewer: { name: 'Partner reviewer' },
+            partner: { id: 5, name: 'Partner Demo' },
+            verified: true,
+          }],
+        },
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByText } = render(<MemberProfileScreen />);
+
+    expect(getByText('Trusted across our network.')).toBeTruthy();
+    expect(getByText('via Partner Demo')).toBeTruthy();
+    expect(getByText('Verified')).toBeTruthy();
   });
 });

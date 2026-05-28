@@ -24,6 +24,7 @@ import {
   getFederationPartners,
   getFederationStats,
   getFederationPartner,
+  getFederationMemberReviews,
   markFederationMessageRead,
 } from './federation';
 import type { FederationResponse, FederatedTenant, FederationStats } from './federation';
@@ -113,6 +114,18 @@ describe('getFederationPartner', () => {
     const result = await getFederationPartner(1);
     expect(api.get).toHaveBeenCalledWith('/api/v2/federation/partners/1');
     expect(result.data.name).toBe('Community A');
+  });
+});
+
+describe('getFederationMemberReviews', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('calls the federated reviews endpoint with the partner tenant scope', async () => {
+    (api.get as jest.Mock).mockResolvedValue({ data: [] });
+
+    await getFederationMemberReviews(272, 5);
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/federation/members/272/reviews', { tenant_id: '5' });
   });
 });
 
