@@ -27,7 +27,7 @@ import Clock from 'lucide-react/icons/clock';
 import Eye from 'lucide-react/icons/eye';
 import Folder from 'lucide-react/icons/folder';
 import File from 'lucide-react/icons/file';
-import { GlassCard, Button, Chip, Spinner, Input, Tabs, Tab } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner, Input, Tabs, Tab, CardRowsSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
@@ -305,14 +305,7 @@ export function KnowledgeBasePage() {
           {isLoading ? (
             <div role="status" aria-label={t('loading')} aria-busy="true" className="space-y-4">
               {[1, 2, 3].map((i) => (
-                <GlassCard key={i} className="p-5 animate-pulse">
-                  <div className="h-4 bg-theme-hover rounded w-1/4 mb-4" />
-                  <div className="space-y-3">
-                    <div className="h-14 bg-theme-hover rounded" />
-                    <div className="h-14 bg-theme-hover rounded" />
-                    <div className="h-14 bg-theme-hover rounded" />
-                  </div>
-                </GlassCard>
+                <CardRowsSkeleton key={i} />
               ))}
             </div>
           ) : displayArticles.length === 0 ? (

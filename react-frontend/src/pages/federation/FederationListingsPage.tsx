@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, CardRowsSkeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -306,12 +306,7 @@ export function FederationListingsPage() {
       {isLoading && listings.length === 0 && (
         <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <GlassCard key={i} className="p-5 animate-pulse">
-              <div className="h-4 bg-theme-hover rounded w-2/3 mb-3" />
-              <div className="h-3 bg-theme-hover rounded w-full mb-2" />
-              <div className="h-3 bg-theme-hover rounded w-3/4 mb-4" />
-              <div className="h-3 bg-theme-hover rounded w-1/2" />
-            </GlassCard>
+            <CardRowsSkeleton key={i} />
           ))}
         </div>
       )}

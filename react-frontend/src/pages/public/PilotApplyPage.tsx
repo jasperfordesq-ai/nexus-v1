@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Input, Textarea, CheckboxGroup, Checkbox } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Input, Textarea, CheckboxGroup, Checkbox, Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -18,7 +18,6 @@ import Building from 'lucide-react/icons/building';
 import Globe from 'lucide-react/icons/globe';
 import CheckCircle2 from 'lucide-react/icons/check-circle-2';
 import XCircle from 'lucide-react/icons/x-circle';
-import Loader2 from 'lucide-react/icons/loader-circle';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -245,8 +244,7 @@ export function PilotApplyPage() {
             isRequired
             value={form.applicant_name}
             onValueChange={v => set('applicant_name', v)}
-            classNames={inputClasses}
-          />
+            classNames={inputClasses} />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
               type="email"
@@ -254,16 +252,14 @@ export function PilotApplyPage() {
               isRequired
               value={form.applicant_email}
               onValueChange={v => set('applicant_email', v)}
-              classNames={inputClasses}
-            />
+              classNames={inputClasses} />
             <Input
               type="tel"
               label={t('provisioning.fields.applicant_phone')}
               placeholder="+1 555 123 4567"
               value={form.applicant_phone}
               onValueChange={v => set('applicant_phone', v)}
-              classNames={inputClasses}
-            />
+              classNames={inputClasses} />
           </div>
 
           {/* Organisation */}
@@ -272,8 +268,7 @@ export function PilotApplyPage() {
             isRequired
             value={form.org_name}
             onValueChange={v => set('org_name', v)}
-            classNames={inputClasses}
-          />
+            classNames={inputClasses} />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Select
               label={t('provisioning.fields.country_code')}
@@ -291,8 +286,7 @@ export function PilotApplyPage() {
               label={t('provisioning.fields.region_or_canton')}
               value={form.region_or_canton}
               onValueChange={v => set('region_or_canton', v)}
-              classNames={inputClasses}
-            />
+              classNames={inputClasses} />
           </div>
 
           {/* Slug */}
@@ -305,12 +299,11 @@ export function PilotApplyPage() {
               onValueChange={v => set('requested_slug', v.toLowerCase())}
               classNames={inputClasses}
               endContent={
-                slugStatus.state === 'checking' ? <Loader2 className="w-4 h-4 animate-spin text-theme-muted" aria-hidden="true" /> :
+                slugStatus.state === 'checking' ? <Spinner size="sm" aria-hidden="true" /> :
                 slugStatus.state === 'available' ? <CheckCircle2 className="w-4 h-4 text-emerald-500" aria-hidden="true" /> :
                 slugStatus.state === 'unavailable' ? <XCircle className="w-4 h-4 text-rose-500" aria-hidden="true" /> :
                 null
-              }
-            />
+              } />
             {slugStatus.state === 'checking' && (
               <p className="text-xs text-theme-subtle mt-1">{t('provisioning.slug_status.checking')}</p>
             )}
@@ -329,8 +322,7 @@ export function PilotApplyPage() {
             value={form.requested_subdomain}
             onValueChange={v => set('requested_subdomain', v.toLowerCase())}
             classNames={inputClasses}
-            startContent={<Globe className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
-          />
+            startContent={<Globe className="w-4 h-4 text-theme-subtle" aria-hidden="true" />} />
 
           {/* Category */}
           <Select
@@ -397,8 +389,7 @@ export function PilotApplyPage() {
             minRows={3}
             value={form.intended_use}
             onValueChange={v => set('intended_use', v)}
-            classNames={inputClasses}
-          />
+            classNames={inputClasses} />
 
           {/* Captcha */}
           <Input
@@ -407,8 +398,7 @@ export function PilotApplyPage() {
             type="number"
             value={captchaAnswer}
             onValueChange={setCaptchaAnswer}
-            classNames={inputClasses}
-          />
+            classNames={inputClasses} />
 
           <Button
             type="submit"
@@ -416,7 +406,7 @@ export function PilotApplyPage() {
             isDisabled={!canSubmit || submitting}
             className="w-full bg-gradient-to-r from-indigo-500 to-emerald-600 text-white font-medium"
             size="lg"
-            spinner={<Loader2 className="w-4 h-4 animate-spin" />}
+            spinner={<Spinner size="sm" />}
           >
             {submitting ? t('provisioning.submitting') : t('provisioning.submit')}
           </Button>

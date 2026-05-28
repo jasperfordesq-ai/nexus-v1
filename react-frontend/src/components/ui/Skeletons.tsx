@@ -237,6 +237,50 @@ export function ProfileCardSkeleton() {
   );
 }
 
+export function CardRowsSkeleton({
+  className = 'p-5',
+  rows = ['w-1/3', 'w-2/3', 'w-1/4'],
+}: {
+  className?: string;
+  rows?: string[];
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <div role="status" aria-busy="true" aria-label={t('loading')} className={`rounded-xl bg-theme-elevated ${className}`}>
+      {rows.map((width, index) => (
+        <Skeleton
+          key={`${width}-${index}`}
+          className={`${index === 0 ? 'h-5' : 'h-3'} ${width} rounded ${index === rows.length - 1 ? '' : 'mb-3'}`}
+        />
+      ))}
+    </div>
+  );
+}
+
+export function MediaRowsSkeleton({
+  className = 'p-5',
+  mediaClassName = 'h-20 w-16',
+}: {
+  className?: string;
+  mediaClassName?: string;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <div role="status" aria-busy="true" aria-label={t('loading')} className={`rounded-xl bg-theme-elevated ${className}`}>
+      <div className="flex gap-4">
+        <Skeleton className={`${mediaClassName} shrink-0 rounded-lg`} />
+        <div className="flex-1">
+          <Skeleton className="mb-2 h-5 w-1/2 rounded" />
+          <Skeleton className="mb-3 h-4 w-3/4 rounded" />
+          <Skeleton className="h-3 w-1/4 rounded" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /**
  * Generic list of skeletons helper
  */

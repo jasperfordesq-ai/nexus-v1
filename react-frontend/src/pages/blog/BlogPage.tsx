@@ -22,7 +22,7 @@ import Eye from 'lucide-react/icons/eye';
 import Search from 'lucide-react/icons/search';
 import User from 'lucide-react/icons/user';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Input, Avatar } from '@/components/ui';
+import { GlassCard, Button, Chip, Input, Avatar, Skeleton } from '@/components/ui';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
@@ -262,14 +262,14 @@ export function BlogPage() {
           {isLoading ? (
             <div role="status" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" aria-busy="true" aria-label={t('loading_posts')}>
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <GlassCard key={i} className="overflow-hidden animate-pulse">
-                  <div className="h-48 bg-theme-hover" />
+                <GlassCard key={i} className="overflow-hidden">
+                  <Skeleton className="h-48 rounded-none" />
                   <div className="p-5">
-                    <div className="h-4 bg-theme-hover rounded w-1/4 mb-3" />
-                    <div className="h-5 bg-theme-hover rounded w-3/4 mb-2" />
-                    <div className="h-3 bg-theme-hover rounded w-full mb-1" />
-                    <div className="h-3 bg-theme-hover rounded w-2/3 mb-4" />
-                    <div className="h-3 bg-theme-hover rounded w-1/3" />
+                    <Skeleton className="mb-3 h-4 w-1/4 rounded" />
+                    <Skeleton className="mb-2 h-5 w-3/4 rounded" />
+                    <Skeleton className="mb-1 h-3 w-full rounded" />
+                    <Skeleton className="mb-4 h-3 w-2/3 rounded" />
+                    <Skeleton className="h-3 w-1/3 rounded" />
                   </div>
                 </GlassCard>
               ))}

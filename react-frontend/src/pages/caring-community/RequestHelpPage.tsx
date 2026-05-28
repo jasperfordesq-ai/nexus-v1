@@ -11,9 +11,8 @@ import CheckCircle from 'lucide-react/icons/circle-check';
 import Heart from 'lucide-react/icons/heart';
 import Mic from 'lucide-react/icons/mic';
 import Square from 'lucide-react/icons/square';
-import Loader from 'lucide-react/icons/loader-circle';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Input, Textarea, Radio, RadioGroup } from '@/components/ui';
+import { GlassCard, Button, Input, Textarea, Radio, RadioGroup, Spinner } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { useToast } from '@/contexts';
@@ -327,7 +326,7 @@ export function RequestHelpPage() {
                 isDisabled={voiceStatus === 'processing'}
                 startContent={
                   voiceStatus === 'processing' ? (
-                    <Loader className="h-5 w-5 animate-spin" aria-hidden="true" />
+                    <Spinner size="md" aria-hidden="true" />
                   ) : voiceStatus === 'recording' ? (
                     <Square className="h-5 w-5" aria-hidden="true" />
                   ) : (

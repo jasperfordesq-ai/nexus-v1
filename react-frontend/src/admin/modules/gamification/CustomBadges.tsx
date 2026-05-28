@@ -1,4 +1,4 @@
-import { CardBody, Card, Button } from '@/components/ui';
+import { CardBody, Card, Button, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -95,15 +95,15 @@ export function CustomBadges() {
           {[1, 2, 3].map((i) => (
             <Card key={i} >
               <CardBody className="p-4">
-                <div role="status" aria-busy="true" aria-label="Loading" className="animate-pulse space-y-3">
+                <div role="status" aria-busy="true" aria-label="Loading" className="space-y-3">
                   <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-xl bg-surface-secondary" />
+                    <Skeleton className="h-12 w-12 rounded-xl" />
                     <div className="flex-1 space-y-2">
-                      <div className="h-4 w-32 rounded bg-surface-secondary" />
-                      <div className="h-3 w-20 rounded bg-surface-secondary" />
+                      <Skeleton className="h-4 w-32 rounded" />
+                      <Skeleton className="h-3 w-20 rounded" />
                     </div>
                   </div>
-                  <div className="h-3 w-full rounded bg-surface-secondary" />
+                  <Skeleton className="h-3 w-full rounded" />
                 </div>
               </CardBody>
             </Card>

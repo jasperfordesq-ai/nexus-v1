@@ -26,7 +26,7 @@ import Settings from 'lucide-react/icons/settings';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Spinner, Input, Avatar } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner, Input, Avatar, CardRowsSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
@@ -366,15 +366,7 @@ export function SkillsBrowsePage() {
       {isLoading && (
         <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="space-y-3">
           {[1, 2, 3, 4, 5].map((i) => (
-            <GlassCard key={i} className="p-4 animate-pulse">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-theme-hover" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 w-40 bg-theme-hover rounded" />
-                  <div className="h-3 w-24 bg-theme-hover rounded" />
-                </div>
-              </div>
-            </GlassCard>
+            <CardRowsSkeleton key={i} className="p-4" />
           ))}
         </div>
       )}

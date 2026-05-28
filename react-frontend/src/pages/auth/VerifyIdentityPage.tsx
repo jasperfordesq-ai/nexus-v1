@@ -21,7 +21,6 @@ import ShieldX from 'lucide-react/icons/shield-x';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
 import ExternalLink from 'lucide-react/icons/external-link';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
-import Loader2 from 'lucide-react/icons/loader-circle';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Clock from 'lucide-react/icons/clock';
@@ -90,8 +89,7 @@ export function VerifyIdentityPage() {
     <PageMeta
       title={t('page_meta.verify_identity.title')}
       description={t('page_meta.verify_identity.description')}
-      noIndex
-    />
+      noIndex />
   );
 
   const stopPolling = useCallback(() => {
@@ -225,7 +223,7 @@ export function VerifyIdentityPage() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
           <GlassCard className="p-8 text-center">
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-accent/10 flex items-center justify-center">
-              <Loader2 className="w-8 h-8 text-accent animate-spin" />
+              <Spinner size="lg" />
             </div>
             <h1 className="text-2xl font-bold text-theme-primary mb-2">
               {t('verify_identity.loading_title')}
@@ -435,7 +433,7 @@ export function VerifyIdentityPage() {
                 className="w-full font-medium"
                 size="lg"
                 startContent={!isStarting ? <ShieldCheck className="w-5 h-5" /> : undefined}
-                spinner={<Loader2 className="w-4 h-4 animate-spin" />}
+                spinner={<Spinner size="sm" />}
               >
                 {t('verify_identity.start_button')}
               </Button>
@@ -461,7 +459,7 @@ export function VerifyIdentityPage() {
               )}
 
               <div className="flex items-center justify-center gap-2 text-sm text-theme-muted">
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Spinner size="sm" />
                 {t('verify_identity.waiting')}
               </div>
             </div>

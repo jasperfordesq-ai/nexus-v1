@@ -18,7 +18,6 @@ import ShieldX from 'lucide-react/icons/shield-x';
 import Fingerprint from 'lucide-react/icons/fingerprint';
 import ExternalLink from 'lucide-react/icons/external-link';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
-import Loader2 from 'lucide-react/icons/loader-circle';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import BadgeCheck from 'lucide-react/icons/badge-check';
 import CalendarDays from 'lucide-react/icons/calendar-days';
@@ -250,7 +249,7 @@ export function VerifyIdentityOptionalPage() {
         <PageMeta title={t('identity.page_title')} noIndex />
         <GlassCard className="p-8 text-center max-w-md">
           <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
-            <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" aria-hidden="true" />
+            <Spinner size="lg" aria-hidden="true" />
           </div>
           <h1 className="text-2xl font-bold text-theme-primary">{t('identity.loading_title')}</h1>
         </GlassCard>
@@ -353,8 +352,7 @@ export function VerifyIdentityOptionalPage() {
                 onChange={(e) => setDob(e.target.value)}
                 variant="secondary"
                 max={new Date().toISOString().split('T')[0]}
-                classNames={{ label: 'text-theme-primary' }}
-              />
+                classNames={{ label: 'text-theme-primary' }} />
 
               <Button
                 onPress={handleSaveDob}
@@ -424,8 +422,7 @@ export function VerifyIdentityOptionalPage() {
                 <StripePaymentForm
                   clientSecret={clientSecret}
                   onSuccess={handlePaymentSuccess}
-                  onError={handlePaymentError}
-                />
+                  onError={handlePaymentError} />
               </div>
             )}
           </GlassCard>
@@ -485,7 +482,7 @@ export function VerifyIdentityOptionalPage() {
                 className="w-full bg-gradient-to-r from-indigo-500 to-emerald-600 text-white font-medium"
                 size="lg"
                 startContent={!isStarting ? <ShieldCheck className="w-5 h-5" aria-hidden="true" /> : undefined}
-                spinner={<Loader2 className="w-4 h-4 animate-spin" />}
+                spinner={<Spinner size="sm" />}
               >
                 {t('identity.start_button')}
               </Button>
@@ -503,7 +500,7 @@ export function VerifyIdentityOptionalPage() {
               )}
 
               <div className="flex items-center justify-center gap-2 text-sm text-theme-muted">
-                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+                <Spinner size="sm" aria-hidden="true" />
                 {t('identity.waiting')}
               </div>
 

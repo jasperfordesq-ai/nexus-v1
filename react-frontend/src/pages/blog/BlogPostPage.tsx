@@ -22,7 +22,7 @@ import ArrowLeft from 'lucide-react/icons/arrow-left';
 import MessageCircle from 'lucide-react/icons/message-circle';
 import { sanitizeRichText } from '@/lib/sanitize';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Avatar } from '@/components/ui';
+import { GlassCard, Button, Chip, Avatar, Skeleton } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { Helmet } from 'react-helmet-async';
 import { PageMeta } from '@/components/seo';
@@ -177,17 +177,17 @@ export function BlogPostPage() {
     return (
       <div role="status" className="max-w-3xl mx-auto space-y-6" aria-busy="true" aria-label={t('loading_post')}>
         <PageMeta title={t('page_title')} noIndex />
-        <div className="animate-pulse">
-          <div className="h-6 bg-theme-hover rounded w-1/4 mb-4" />
-          <div className="h-64 bg-theme-hover rounded-xl mb-6" />
-          <div className="h-8 bg-theme-hover rounded w-3/4 mb-3" />
-          <div className="h-4 bg-theme-hover rounded w-1/3 mb-8" />
+        <div>
+          <Skeleton className="mb-4 h-6 w-1/4 rounded" />
+          <Skeleton className="mb-6 h-64 rounded-xl" />
+          <Skeleton className="mb-3 h-8 w-3/4 rounded" />
+          <Skeleton className="mb-8 h-4 w-1/3 rounded" />
           <div className="space-y-3">
-            <div className="h-4 bg-theme-hover rounded w-full" />
-            <div className="h-4 bg-theme-hover rounded w-full" />
-            <div className="h-4 bg-theme-hover rounded w-5/6" />
-            <div className="h-4 bg-theme-hover rounded w-full" />
-            <div className="h-4 bg-theme-hover rounded w-3/4" />
+            <Skeleton className="h-4 w-full rounded" />
+            <Skeleton className="h-4 w-full rounded" />
+            <Skeleton className="h-4 w-5/6 rounded" />
+            <Skeleton className="h-4 w-full rounded" />
+            <Skeleton className="h-4 w-3/4 rounded" />
           </div>
         </div>
       </div>

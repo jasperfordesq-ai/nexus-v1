@@ -308,6 +308,6 @@ describe('StatCard', () => {
 
   it('shows loading state', () => {
     const { container } = render(<W><StatCard label="Total Users" value={150} icon={Users} loading /></W>);
-    expect(container.querySelector('.animate-pulse')).toBeTruthy();
+    expect(container.querySelector('[role="status"]')).toBeTruthy();
   });
 });

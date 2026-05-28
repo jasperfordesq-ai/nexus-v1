@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Input, Textarea, Switch, CheckboxGroup, Checkbox } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Input, Textarea, Switch, CheckboxGroup, Checkbox, Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -27,7 +27,6 @@ import MapPin from 'lucide-react/icons/map-pin';
 import CheckCircle from 'lucide-react/icons/check-circle';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import ArrowRight from 'lucide-react/icons/arrow-right';
-import Loader2 from 'lucide-react/icons/loader-circle';
 import Star from 'lucide-react/icons/star';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -229,8 +228,7 @@ export function PilotInquiryPage() {
       <div className="max-w-xl mx-auto px-4 sm:px-6 py-12">
         <PageMeta
           title={t('meta.title')}
-          description={t('meta.description')}
-        />
+          description={t('meta.description')} />
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <GlassCard className="p-8 text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/20 mb-4">
@@ -265,8 +263,7 @@ export function PilotInquiryPage() {
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
       <PageMeta
         title={t('meta.title')}
-        description={t('meta.description')}
-      />
+        description={t('meta.description')} />
 
       {/* Hero */}
       <motion.div
@@ -308,30 +305,26 @@ export function PilotInquiryPage() {
                 isRequired
                 value={form.municipality_name}
                 onValueChange={v => set('municipality_name', v)}
-                classNames={inputClasses}
-              />
+                classNames={inputClasses} />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input
                   label={t('fields.region')}
                   value={form.region}
                   onValueChange={v => set('region', v)}
-                  classNames={inputClasses}
-                />
+                  classNames={inputClasses} />
                 <Input
                   label={t('fields.country')}
                   value={form.country}
                   onValueChange={v => set('country', v.toUpperCase().slice(0, 2))}
                   maxLength={2}
-                  classNames={inputClasses}
-                />
+                  classNames={inputClasses} />
               </div>
               <Input
                 label={t('fields.population')}
                 type="number"
                 value={form.population}
                 onValueChange={v => set('population', v)}
-                classNames={inputClasses}
-              />
+                classNames={inputClasses} />
               <div className="flex items-center justify-between p-4 rounded-xl bg-theme-elevated border border-theme-default">
                 <span className="text-sm text-theme-primary">
                   {t('fields.has_kiss')}
@@ -340,8 +333,7 @@ export function PilotInquiryPage() {
                   isSelected={form.has_kiss_cooperative}
                   onValueChange={v => set('has_kiss_cooperative', v)}
                   size="sm"
-                  color="success"
-                />
+                  color="success" />
               </div>
             </motion.div>
           )}
@@ -378,8 +370,7 @@ export function PilotInquiryPage() {
                   isSelected={form.has_existing_digital_tool}
                   onValueChange={v => set('has_existing_digital_tool', v)}
                   size="sm"
-                  color="warning"
-                />
+                  color="warning" />
               </div>
 
               {form.has_existing_digital_tool && (
@@ -387,8 +378,7 @@ export function PilotInquiryPage() {
                   label={t('fields.existing_tool')}
                   value={form.existing_tool_name}
                   onValueChange={v => set('existing_tool_name', v)}
-                  classNames={inputClasses}
-                />
+                  classNames={inputClasses} />
               )}
 
               <Select
@@ -447,30 +437,26 @@ export function PilotInquiryPage() {
                 isRequired
                 value={form.contact_name}
                 onValueChange={v => set('contact_name', v)}
-                classNames={inputClasses}
-              />
+                classNames={inputClasses} />
               <Input
                 type="email"
                 label={t('fields.contact_email')}
                 isRequired
                 value={form.contact_email}
                 onValueChange={v => set('contact_email', v)}
-                classNames={inputClasses}
-              />
+                classNames={inputClasses} />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input
                   type="tel"
                   label={t('fields.contact_phone')}
                   value={form.contact_phone}
                   onValueChange={v => set('contact_phone', v)}
-                  classNames={inputClasses}
-                />
+                  classNames={inputClasses} />
                 <Input
                   label={t('fields.contact_role')}
                   value={form.contact_role}
                   onValueChange={v => set('contact_role', v)}
-                  classNames={inputClasses}
-                />
+                  classNames={inputClasses} />
               </div>
               <Textarea
                 label={t('fields.notes')}
@@ -481,8 +467,7 @@ export function PilotInquiryPage() {
                   inputWrapper: 'bg-theme-elevated border-theme-default',
                   label: 'text-theme-muted',
                   input: 'text-theme-primary placeholder:text-theme-subtle',
-                }}
-              />
+                }} />
             </motion.div>
           )}
         </AnimatePresence>
@@ -518,7 +503,7 @@ export function PilotInquiryPage() {
               className="bg-gradient-to-r from-indigo-500 to-emerald-600 text-white font-medium"
               isLoading={submitting}
               isDisabled={!canAdvance() || submitting}
-              spinner={<Loader2 className="w-4 h-4 animate-spin" />}
+              spinner={<Spinner size="sm" />}
               onPress={handleSubmit}
             >
               {submitting ? t('submitting') : t('submit')}

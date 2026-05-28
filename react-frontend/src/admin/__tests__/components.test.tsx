@@ -245,7 +245,7 @@ describe('StatCard', () => {
         <StatCard label="Total Users" value={0} icon={Users} loading={true} />
       </>
     );
-    expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
+    expect(container.querySelector('[role="status"]')).toBeInTheDocument();
   });
 
   it('renders string value', () => {

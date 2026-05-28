@@ -14,7 +14,7 @@ import Heart from 'lucide-react/icons/heart';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button } from '@/components/ui';
+import { GlassCard, Button, CardRowsSkeleton } from '@/components/ui';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { CommunityFundBalance } from '@/types/api';
@@ -54,10 +54,7 @@ export function CommunityFundCard({ onDonateClick, compact = false }: CommunityF
 
   if (isLoading) {
     return (
-      <GlassCard role="status" aria-busy="true" aria-label="Loading" className="p-4 animate-pulse">
-        <div className="h-8 bg-theme-hover rounded w-1/3 mb-2" />
-        <div className="h-6 bg-theme-hover rounded w-1/2" />
-      </GlassCard>
+      <CardRowsSkeleton className="p-4" />
     );
   }
 

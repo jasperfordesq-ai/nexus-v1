@@ -31,6 +31,7 @@ import {
   useAdvancedMarkerRef,
   APILoadingStatus,
 } from '@vis.gl/react-google-maps';
+import { Skeleton } from '@/components/ui';
 import {
   MarkerClusterer,
   type Renderer,
@@ -556,11 +557,11 @@ export function LocationMap(props: LocationMapProps) {
     return (
       <Suspense
         fallback={
-          <div
+          <Skeleton
             role="status"
             aria-busy="true"
             aria-label="Loading"
-            className={`rounded-xl bg-theme-surface/50 animate-pulse ${props.className ?? ''}`}
+            className={`rounded-xl ${props.className ?? ''}`}
             style={{ height: props.height ?? '400px' }}
           />
         }

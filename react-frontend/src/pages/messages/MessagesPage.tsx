@@ -20,7 +20,6 @@ import Search from 'lucide-react/icons/search';
 import MessageSquare from 'lucide-react/icons/message-square';
 import Circle from 'lucide-react/icons/circle';
 import Plus from 'lucide-react/icons/plus';
-import Loader2 from 'lucide-react/icons/loader-circle';
 import Archive from 'lucide-react/icons/archive';
 import RotateCcw from 'lucide-react/icons/rotate-ccw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
@@ -28,7 +27,7 @@ import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import UsersIcon from 'lucide-react/icons/users';
 import { CreateGroupModal } from './components/CreateGroupModal';
-import { GlassCard, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, Avatar, Tabs, Tab, Skeleton } from '@/components/ui';
+import { GlassCard, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, Avatar, Tabs, Tab, Skeleton, Spinner } from '@/components/ui';
 import { PresenceIndicator } from '@/components/social';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, usePusherOptional, useToast, useTenant } from '@/contexts';
@@ -511,8 +510,7 @@ export function MessagesPage() {
                     </Chip>
                   )}
                 </div>
-              }
-            />
+              } />
             <Tab
               key="archived"
               title={
@@ -520,8 +518,7 @@ export function MessagesPage() {
                   <Archive className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
                   <span className="truncate">{t('tab_archived')}</span>
                 </div>
-              }
-            />
+              } />
           </Tabs>
         </div>
         <Input
@@ -533,8 +530,7 @@ export function MessagesPage() {
           classNames={{
             input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
             inputWrapper: 'min-h-11 bg-theme-elevated border-theme-default hover:bg-theme-hover',
-          }}
-        />
+          }} />
       </GlassCard>
 
       {/* New Message Modal */}
@@ -560,13 +556,12 @@ export function MessagesPage() {
               onChange={(e) => setUserSearchQuery(e.target.value)}
               startContent={<Search className="h-4 w-4 text-theme-subtle" aria-hidden="true" />}
               aria-label={t('member_search_placeholder')}
-              endContent={isSearchingUsers && <Loader2 className="h-4 w-4 animate-spin text-theme-subtle" aria-hidden="true" />}
+              endContent={isSearchingUsers && <Spinner size="sm" aria-hidden="true" />}
               classNames={{
                 input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
                 inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
               }}
-              autoFocus
-            />
+              autoFocus />
 
             {/* Search Results */}
             <div className="mt-4 space-y-2 max-h-64 overflow-y-auto" aria-live="polite" aria-relevant="additions removals">
@@ -594,8 +589,7 @@ export function MessagesPage() {
                       src={resolveAvatarUrl(user.avatar_url || user.avatar)}
                       name={user.name}
                       size="sm"
-                      className="ring-2 ring-theme-default"
-                    />
+                      className="ring-2 ring-theme-default" />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-theme-primary truncate">{user.name}</p>
                       {user.tagline && (
@@ -623,8 +617,7 @@ export function MessagesPage() {
         onCreated={(groupId) => {
           setIsCreateGroupOpen(false);
           navigate(tenantPath(`/messages/${groupId}`));
-        }}
-      />
+        }} />
 
       {/* Conversations List */}
       {activeTab === 'inbox' ? (
@@ -658,8 +651,7 @@ export function MessagesPage() {
               >
                 {t('new_message')}
               </Button>
-            )}
-          />
+            )} />
         ) : (
           <motion.div
             variants={containerVariants}
@@ -682,8 +674,7 @@ export function MessagesPage() {
           <EmptyState
             icon={<Archive className="w-12 h-12" />}
             title={hasSearchQuery ? t('archived_search_empty') : t('archived_empty')}
-            description={hasSearchQuery ? t('search_empty_subtitle') : t('archived_empty_subtitle')}
-          />
+            description={hasSearchQuery ? t('search_empty_subtitle') : t('archived_empty_subtitle')} />
         ) : (
           <motion.div
             variants={containerVariants}
@@ -695,8 +686,7 @@ export function MessagesPage() {
               <motion.div key={conversation.id} variants={itemVariants}>
                 <ArchivedConversationCard
                   conversation={conversation}
-                  onRestore={() => restoreConversation(conversation.id)}
-                />
+                  onRestore={() => restoreConversation(conversation.id)} />
               </motion.div>
             ))}
           </motion.div>
@@ -739,8 +729,7 @@ function ConversationCard({ conversation }: ConversationCardProps) {
                 src={resolveAvatarUrl(other_user.avatar)}
                 name={displayName}
                 size="lg"
-                className="ring-2 ring-theme-default"
-              />
+                className="ring-2 ring-theme-default" />
               <PresenceIndicator userId={other_user.id} size="md" />
             </div>
           </Badge>
@@ -793,8 +782,7 @@ function ArchivedConversationCard({ conversation, onRestore }: ArchivedConversat
           src={resolveAvatarUrl(other_user.avatar)}
           name={displayName}
           size="lg"
-          className="ring-2 ring-theme-default opacity-60"
-        />
+          className="ring-2 ring-theme-default opacity-60" />
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">

@@ -1,5 +1,5 @@
 import { Card } from '@heroui/react';
-import { Button } from '@/components/ui';
+import { Button, Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +10,6 @@ import { useSearchParams } from 'react-router-dom';
 
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
-import Loader2 from 'lucide-react/icons/loader-circle';
 import Mail from 'lucide-react/icons/mail';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
@@ -77,7 +76,7 @@ export default function NewsletterUnsubscribePage() {
 
         {state === 'loading' && (
           <div role="status" aria-busy="true" aria-label={t('newsletter.processing')}>
-            <Loader2 className="mx-auto animate-spin text-accent mb-4" size={32} aria-hidden="true" />
+            <Spinner size="lg" className="mx-auto mb-4" aria-hidden="true" />
             <h1 className="text-xl font-semibold text-foreground">{t('newsletter.processing')}</h1>
             <p className="mt-2 text-muted text-sm">{t('newsletter.removing_from_list')}</p>
           </div>

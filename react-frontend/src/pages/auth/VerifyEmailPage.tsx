@@ -15,12 +15,11 @@ import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from '@/lib/motion';import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
-import Loader2 from 'lucide-react/icons/loader-circle';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Mail from 'lucide-react/icons/mail';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button } from '@/components/ui';
+import { GlassCard, Button, Spinner } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useTenant, useAuth, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -109,7 +108,7 @@ export function VerifyEmailPage() {
         >
           <GlassCard className="p-8 text-center">
             <div role="status" aria-busy="true" aria-label={t('verify_email.loading_title')} className="w-16 h-16 mx-auto mb-6 rounded-full bg-indigo-500/20 flex items-center justify-center">
-              <Loader2 aria-hidden="true" className="w-8 h-8 text-indigo-400 animate-spin" />
+              <Spinner size="lg" aria-hidden="true" />
             </div>
             <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('verify_email.loading_title')}</h1>
             <p className="text-theme-muted">

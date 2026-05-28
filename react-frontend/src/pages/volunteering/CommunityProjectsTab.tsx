@@ -19,7 +19,7 @@ import Users from 'lucide-react/icons/users';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Lightbulb from 'lucide-react/icons/lightbulb';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, useDisclosure, Button, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { GlassCard, useDisclosure, Button, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, CardRowsSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -227,12 +227,7 @@ export function CommunityProjectsTab() {
       {!error && isLoading && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4" role="status" aria-busy="true" aria-label="Loading">
           {[1, 2, 3, 4].map((i) => (
-            <GlassCard key={i} className="p-5 animate-pulse">
-              <div className="h-5 bg-theme-hover rounded w-2/3 mb-3" />
-              <div className="h-3 bg-theme-hover rounded w-full mb-2" />
-              <div className="h-3 bg-theme-hover rounded w-1/2 mb-3" />
-              <div className="h-3 bg-theme-hover rounded w-1/4" />
-            </GlassCard>
+            <CardRowsSkeleton key={i} />
           ))}
         </div>
       )}

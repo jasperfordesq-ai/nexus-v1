@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Input, Switch, Tabs, Tab } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Input, Switch, Tabs, Tab, CardRowsSkeleton } from '@/components/ui';
 import { Chip as HeroChip, ToggleButton, ToggleButtonGroup } from '@heroui/react';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -573,15 +573,7 @@ export function JobsPage() {
               {isLoading ? (
                 <div role="status" className="space-y-4" aria-busy="true" aria-label={t('loading')}>
                   {[1, 2, 3].map((i) => (
-                    <GlassCard key={i} className="p-5 animate-pulse">
-                      <div className="flex gap-4">
-                        <div className="flex-1">
-                          <div className="h-5 bg-theme-hover rounded w-1/2 mb-2" />
-                          <div className="h-4 bg-theme-hover rounded w-3/4 mb-3" />
-                          <div className="h-3 bg-theme-hover rounded w-1/4" />
-                        </div>
-                      </div>
-                    </GlassCard>
+                    <CardRowsSkeleton key={i} rows={['w-1/2', 'w-3/4', 'w-1/4']} />
                   ))}
                 </div>
               ) : vacancies.length === 0 ? (
@@ -638,15 +630,7 @@ export function JobsPage() {
           {isLoadingSaved ? (
             <div className="space-y-4" role="status" aria-busy="true" aria-label="Loading">
               {[1, 2].map((i) => (
-                <GlassCard key={i} className="p-5 animate-pulse">
-                  <div className="flex gap-4">
-                    <div className="flex-1">
-                      <div className="h-5 bg-theme-hover rounded w-1/2 mb-2" />
-                      <div className="h-4 bg-theme-hover rounded w-3/4 mb-3" />
-                      <div className="h-3 bg-theme-hover rounded w-1/4" />
-                    </div>
-                  </div>
-                </GlassCard>
+                <CardRowsSkeleton key={i} rows={['w-1/2', 'w-3/4', 'w-1/4']} />
               ))}
             </div>
           ) : savedJobs.length === 0 ? (
@@ -689,15 +673,7 @@ export function JobsPage() {
           {isLoadingMyPostings ? (
             <div className="space-y-4" role="status" aria-busy="true" aria-label="Loading">
               {[1, 2].map((i) => (
-                <GlassCard key={i} className="p-5 animate-pulse">
-                  <div className="flex gap-4">
-                    <div className="flex-1">
-                      <div className="h-5 bg-theme-hover rounded w-1/2 mb-2" />
-                      <div className="h-4 bg-theme-hover rounded w-3/4 mb-3" />
-                      <div className="h-3 bg-theme-hover rounded w-1/4" />
-                    </div>
-                  </div>
-                </GlassCard>
+                <CardRowsSkeleton key={i} rows={['w-1/2', 'w-3/4', 'w-1/4']} />
               ))}
             </div>
           ) : myPostings.length === 0 ? (

@@ -30,7 +30,7 @@ import Star from 'lucide-react/icons/star';
 import Sparkles from 'lucide-react/icons/sparkles';
 import { useTranslation } from 'react-i18next';
 import { Chip } from '@heroui/react';
-import { GlassCard, Progress, Button, Spinner, Tooltip } from '@/components/ui';
+import { GlassCard, Progress, Button, Spinner, Tooltip, CardRowsSkeleton, Skeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTenant } from '@/contexts';
 import { api, API_BASE } from '@/lib/api';
@@ -210,13 +210,10 @@ export function JobAnalyticsPage() {
   if (isLoading) {
     return (
       <div className="space-y-6" role="status" aria-busy="true" aria-label="Loading">
-        <div className="h-8 bg-theme-hover rounded w-1/3 animate-pulse" />
+        <Skeleton className="h-8 w-1/3 rounded" />
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <GlassCard key={i} className="p-5 animate-pulse">
-              <div className="h-4 bg-theme-hover rounded w-1/2 mb-2" />
-              <div className="h-8 bg-theme-hover rounded w-3/4" />
-            </GlassCard>
+            <CardRowsSkeleton key={i} />
           ))}
         </div>
       </div>

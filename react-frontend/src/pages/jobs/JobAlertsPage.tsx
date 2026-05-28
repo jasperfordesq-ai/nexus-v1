@@ -1,5 +1,5 @@
 import { Chip } from '@heroui/react';
-import { Select, SelectItem, useDisclosure, GlassCard, Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, GlassCard, Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, CardRowsSkeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -236,10 +236,7 @@ export function JobAlertsPage() {
       {isLoading ? (
         <div className="space-y-4" role="status" aria-busy="true" aria-label="Loading">
           {[1, 2].map((i) => (
-            <GlassCard key={i} className="p-5 animate-pulse">
-              <div className="h-4 bg-theme-hover rounded w-1/2 mb-2" />
-              <div className="h-3 bg-theme-hover rounded w-3/4" />
-            </GlassCard>
+            <CardRowsSkeleton key={i} />
           ))}
         </div>
       ) : !error && alerts.length === 0 ? (

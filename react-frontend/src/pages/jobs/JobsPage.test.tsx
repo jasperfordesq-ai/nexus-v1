@@ -164,7 +164,7 @@ describe('JobsPage', () => {
   it('shows loading skeleton initially when API is pending', () => {
     vi.mocked(api.get).mockReturnValue(new Promise(() => {}));
     render(<JobsPage />);
-    expect(document.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0);
+    expect(document.querySelectorAll('[role="status"]').length).toBeGreaterThan(0);
   });
 
   it('shows empty state when no jobs returned', async () => {

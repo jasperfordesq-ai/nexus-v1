@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure, GlassCard, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, GlassCard, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, CardRowsSkeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -279,18 +279,11 @@ export function CredentialVerificationTab() {
         <div className="space-y-4" role="status" aria-busy="true" aria-label="Loading">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
-              <GlassCard key={i} className="p-5 animate-pulse">
-                <div className="h-8 bg-theme-hover rounded w-1/2 mb-2" />
-                <div className="h-3 bg-theme-hover rounded w-3/4" />
-              </GlassCard>
+              <CardRowsSkeleton key={i} />
             ))}
           </div>
           {[1, 2].map((i) => (
-            <GlassCard key={i} className="p-5 animate-pulse">
-              <div className="h-5 bg-theme-hover rounded w-1/3 mb-3" />
-              <div className="h-3 bg-theme-hover rounded w-2/3 mb-3" />
-              <div className="h-3 bg-theme-hover rounded w-1/4" />
-            </GlassCard>
+            <CardRowsSkeleton key={i} />
           ))}
         </div>
       )}

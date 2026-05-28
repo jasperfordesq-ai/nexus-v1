@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Input, Textarea } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Input, Textarea, Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,7 +15,6 @@ import { useTurnstile } from '@/hooks/useTurnstile';
 import { motion } from '@/lib/motion';
 import { Helmet } from 'react-helmet-async';import Mail from 'lucide-react/icons/mail';
 import MessageSquare from 'lucide-react/icons/message-square';
-import Loader2 from 'lucide-react/icons/loader-circle';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -164,8 +163,7 @@ export function ContactPage() {
                   inputWrapper: 'bg-theme-elevated border-theme-default',
                   label: 'text-theme-muted',
                   input: 'text-theme-primary placeholder:text-theme-subtle',
-                }}
-              />
+                }} />
 
               <Input
                 type="email"
@@ -178,8 +176,7 @@ export function ContactPage() {
                   inputWrapper: 'bg-theme-elevated border-theme-default',
                   label: 'text-theme-muted',
                   input: 'text-theme-primary placeholder:text-theme-subtle',
-                }}
-              />
+                }} />
 
               <Select
                 label={t('contact.form.subject_label')}
@@ -213,8 +210,7 @@ export function ContactPage() {
                   inputWrapper: 'bg-theme-elevated border-theme-default',
                   label: 'text-theme-muted',
                   input: 'text-theme-primary placeholder:text-theme-subtle',
-                }}
-              />
+                }} />
 
               {turnstileSiteKey && (
                 <div>
@@ -233,7 +229,7 @@ export function ContactPage() {
                 isDisabled={!formData.name.trim() || !formData.email.trim() || !formData.message.trim() || (!!turnstileSiteKey && !turnstileToken)}
                 className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium"
                 size="lg"
-                spinner={<Loader2 aria-hidden="true" className="w-4 h-4 animate-spin" />}
+                spinner={<Spinner size="sm" aria-hidden="true" />}
               >
                 {t('contact.form.submit')}
               </Button>

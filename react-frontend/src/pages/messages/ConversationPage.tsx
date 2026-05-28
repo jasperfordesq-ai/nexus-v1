@@ -20,7 +20,6 @@ import { AnimatePresence } from '@/lib/motion';
 
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Info from 'lucide-react/icons/info';
-import Loader2 from 'lucide-react/icons/loader-circle';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import Trash2 from 'lucide-react/icons/trash-2';
 import Search from 'lucide-react/icons/search';
@@ -31,7 +30,7 @@ import Languages from 'lucide-react/icons/languages';
 import MessageCircle from 'lucide-react/icons/message-circle';
 import { useToast,
   useNotifications } from '@/contexts';
-import { GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tooltip, Skeleton } from '@/components/ui';
+import { GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tooltip, Skeleton, Spinner } from '@/components/ui';
 import { LoadingScreen } from '@/components/feedback';
 import { useAuth, usePusherOptional, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -1414,14 +1413,12 @@ export function ConversationPage() {
                   src={resolveAvatarUrl(other_user.avatar_url || other_user.avatar)}
                   name={other_user.name}
                   size="md"
-                  className="ring-2 ring-white/20"
-                />
+                  className="ring-2 ring-white/20" />
                 {other_user.is_online !== undefined && (
                   <span
                     className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-[var(--color-surface)] ${other_user.is_online ? 'bg-success' : 'bg-muted'}`}
                     aria-label={statusLabel ?? undefined}
-                    role={statusLabel ? 'img' : undefined}
-                  />
+                    role={statusLabel ? 'img' : undefined} />
                 )}
               </div>
               <div className="min-w-0 flex-1">
@@ -1540,8 +1537,7 @@ export function ConversationPage() {
                   input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
                   inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
                 }}
-                autoFocus
-              />
+                autoFocus />
             </div>
             {searchResults.length > 0 && (
               <div className="flex items-center gap-2 sm:justify-end">
@@ -1671,14 +1667,12 @@ export function ConversationPage() {
       {!listing && (conversation?.meta?.context_type && conversation?.meta?.context_id) && (
         <MessageContextCard
           contextType={conversation.meta.context_type}
-          contextId={conversation.meta.context_id}
-        />
+          contextId={conversation.meta.context_id} />
       )}
       {!listing && !conversation?.meta?.context_type && contextType && contextId && (
         <MessageContextCard
           contextType={contextType}
-          contextId={contextId}
-        />
+          contextId={contextId} />
       )}
 
       {/* Messages */}
@@ -1696,7 +1690,7 @@ export function ConversationPage() {
           {isLoadingOlder && (
             <div className="flex justify-center py-2">
               <div role="status" aria-label={t('loading_older')} aria-busy="true">
-                <Loader2 className="w-5 h-5 text-theme-subtle animate-spin" aria-hidden="true" />
+                <Spinner size="md" aria-hidden="true" />
               </div>
             </div>
           )}
@@ -1722,8 +1716,7 @@ export function ConversationPage() {
                 <Avatar
                   src={resolveAvatarUrl(other_user.avatar_url || other_user.avatar)}
                   name={other_user.name}
-                  className="h-20 w-20 ring-4 ring-theme-default"
-                />
+                  className="h-20 w-20 ring-4 ring-theme-default" />
                 <span className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border border-theme-default bg-theme-card text-accent shadow-sm">
                   <MessageCircle className="h-4 w-4" aria-hidden="true" />
                 </span>
@@ -1759,8 +1752,7 @@ export function ConversationPage() {
                   onEditingTextChange={setEditingText}
                   onSaveEdit={saveEdit}
                   onCancelEdit={cancelEditing}
-                  autoTranslatedText={autoTranslations.get(message.id) ?? null}
-                />
+                  autoTranslatedText={autoTranslations.get(message.id) ?? null} />
               ))}
             </AnimatePresence>
           )}
@@ -1814,8 +1806,7 @@ export function ConversationPage() {
           fileInputRef={fileInputRef}
           onFileSelect={handleFileSelect}
           onRemoveAttachment={removeAttachment}
-          onGifSelect={handleGifSelect}
-        />
+          onGifSelect={handleGifSelect} />
       </GlassCard>
 
       {/* Archive Confirmation Modal */}

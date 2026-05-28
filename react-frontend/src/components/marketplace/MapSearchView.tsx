@@ -20,7 +20,7 @@ import MapPinOff from 'lucide-react/icons/map-pin-off';
 import Navigation from 'lucide-react/icons/navigation';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Spinner } from '@/components/ui';
+import { GlassCard, Button, Spinner, Skeleton } from '@/components/ui';
 import { LocationMap, type MapMarker } from '@/components/location';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { PriceBadge } from './PriceBadge';
@@ -165,15 +165,13 @@ export function MapSearchView({
   // ─── Loading state ────────────────────────────────────────────────────────
   if (isLoading) {
     return (
-      <div
-        className={`rounded-xl bg-surface-secondary animate-pulse flex items-center justify-center ${className}`}
+      <Skeleton
+        className={`rounded-xl flex items-center justify-center ${className}`}
         style={{ height }}
         role="status"
         aria-busy="true"
         aria-label="Loading"
-      >
-        <Spinner size="lg" color="accent" />
-      </div>
+      />
     );
   }
 

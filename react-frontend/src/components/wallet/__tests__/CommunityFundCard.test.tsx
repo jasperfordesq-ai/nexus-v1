@@ -42,7 +42,7 @@ describe('CommunityFundCard', () => {
   it('renders loading state initially', () => {
     vi.mocked(api.get).mockReturnValueOnce(new Promise(() => {}));
     const { container } = render(<CommunityFundCard />);
-    expect(container.querySelector('[class*="animate-pulse"]')).toBeInTheDocument();
+    expect(container.querySelector('[role="status"]')).toBeInTheDocument();
   });
 
   it('renders nothing when fund data is null after load', async () => {

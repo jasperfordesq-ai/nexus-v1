@@ -27,7 +27,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';import Briefcase
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, useDisclosure, Button } from '@/components/ui';
+import { GlassCard, useDisclosure, Button, CardRowsSkeleton } from '@/components/ui';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { EmptyState } from '@/components/feedback';
 import { SocialInteractionPanel } from '@/components/social';
@@ -687,12 +687,7 @@ export function JobDetailPage() {
     return (
       <div className="space-y-6" role="status" aria-busy="true" aria-label="Loading">
         <PageMeta title={t('detail.loading')} noIndex />
-        <GlassCard className="p-6 animate-pulse">
-          <div className="h-8 bg-theme-hover rounded w-1/2 mb-4" />
-          <div className="h-4 bg-theme-hover rounded w-3/4 mb-2" />
-          <div className="h-4 bg-theme-hover rounded w-1/2 mb-4" />
-          <div className="h-24 bg-theme-hover rounded mb-4" />
-        </GlassCard>
+        <CardRowsSkeleton className="p-6" />
       </div>
     );
   }

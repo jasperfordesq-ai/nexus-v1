@@ -86,7 +86,7 @@ import { useHeaderScroll } from '@/hooks/useHeaderScroll';
 import { CARING_COMMUNITY_ROUTE } from '@/pages/caring-community/config';
 import type { TenantFeatures } from '@/types/api';
 
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Avatar, Tooltip } from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Avatar, Tooltip, Kbd } from '@/components/ui';
 interface IdentityStatusResponse {
   has_id_verified_badge: boolean;
 }
@@ -510,9 +510,9 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
               >
                 <Search className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                 <span className="hidden md:inline">{t('accessibility.search')}</span>
-                <kbd className="hidden lg:inline-flex items-center gap-0.5 ms-0.5 px-1 py-0 rounded bg-theme-hover/60 text-[10px] font-medium text-theme-subtle">
+                <Kbd className="hidden lg:inline-flex items-center gap-0.5 ms-0.5 px-1 py-0 text-[10px] font-medium">
                   <span className="text-xs">{t('keyboard.command_symbol')}</span>{t('keyboard.k_key')}
-                </kbd>
+                </Kbd>
               </Button>
             </div>
           </div>

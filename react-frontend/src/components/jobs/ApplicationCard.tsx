@@ -17,7 +17,7 @@ import { formatDateTime, formatDateValue, resolveAvatarUrl } from '@/lib/helpers
 import { api } from '@/lib/api';
 import type { Application, HistoryEntry } from './JobDetailTypes';
 import { STATUS_CHIP_COLORS, STATUS_COLORS } from './JobDetailTypes';
-import { Button, Avatar } from '@/components/ui';
+import { Button, Avatar, Skeleton } from '@/components/ui';
 
 interface ApplicationCardProps {
   application: Application;
@@ -171,7 +171,7 @@ export function ApplicationCard({ application, onUpdateStatus, tenantPathFn, nav
         {showHistory && (
           <div className="mt-2 pl-4 border-l-2 border-theme-default space-y-2">
             {isLoadingHistory ? (
-              <div role="status" aria-busy="true" aria-label="Loading" className="h-4 bg-theme-hover rounded w-3/4 animate-pulse" />
+              <Skeleton role="status" aria-busy="true" aria-label="Loading" className="h-4 bg-theme-hover rounded w-3/4" />
             ) : history.length === 0 ? (
               <p className="text-xs text-theme-subtle">{t('history.empty')}</p>
             ) : (

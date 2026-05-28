@@ -18,7 +18,7 @@ import Clock from 'lucide-react/icons/clock';
 import Building2 from 'lucide-react/icons/building-2';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import QrCode from 'lucide-react/icons/qr-code';
-import { GlassCard, Button, Chip } from '@/components/ui';
+import { GlassCard, Button, Chip, CardRowsSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { api, API_BASE } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -168,11 +168,7 @@ export function CertificatesTab() {
       {!error && isLoading && (
         <div className="space-y-4" role="status" aria-busy="true" aria-label="Loading">
           {[1, 2].map((i) => (
-            <GlassCard key={i} className="p-5 animate-pulse">
-              <div className="h-5 bg-theme-hover rounded w-1/3 mb-3" />
-              <div className="h-3 bg-theme-hover rounded w-2/3 mb-3" />
-              <div className="h-3 bg-theme-hover rounded w-1/4" />
-            </GlassCard>
+            <CardRowsSkeleton key={i} />
           ))}
         </div>
       )}

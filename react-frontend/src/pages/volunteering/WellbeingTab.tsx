@@ -24,7 +24,7 @@ import TrendingDown from 'lucide-react/icons/trending-down';
 import Coffee from 'lucide-react/icons/coffee';
 import Sun from 'lucide-react/icons/sun';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Progress, useDisclosure, Button, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { GlassCard, Progress, useDisclosure, Button, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, CardRowsSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -228,16 +228,10 @@ export function WellbeingTab() {
         <div className="space-y-4" role="status" aria-busy="true" aria-label="Loading">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map((i) => (
-              <GlassCard key={i} className="p-5 animate-pulse">
-                <div className="h-8 bg-theme-hover rounded w-1/2 mb-2" />
-                <div className="h-3 bg-theme-hover rounded w-3/4" />
-              </GlassCard>
+              <CardRowsSkeleton key={i} />
             ))}
           </div>
-          <GlassCard className="p-5 animate-pulse">
-            <div className="h-4 bg-theme-hover rounded w-1/3 mb-4" />
-            <div className="h-6 bg-theme-hover rounded w-full" />
-          </GlassCard>
+          <CardRowsSkeleton />
         </div>
       )}
 

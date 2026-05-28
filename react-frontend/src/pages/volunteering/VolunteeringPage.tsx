@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure, GlassCard, Progress, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, GlassCard, Progress, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, CardRowsSkeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -549,12 +549,7 @@ function OpportunitiesTab() {
           {isLoading ? (
             <div role="status" className="space-y-4" aria-busy="true" aria-label={t('loading')}>
               {[1, 2, 3].map((i) => (
-                <GlassCard key={i} className="p-5 animate-pulse">
-                  <div className="h-5 bg-theme-hover rounded w-1/3 mb-3" />
-                  <div className="h-3 bg-theme-hover rounded w-full mb-3" />
-                  <div className="h-3 bg-theme-hover rounded w-2/3 mb-3" />
-                  <div className="h-3 bg-theme-hover rounded w-1/4" />
-                </GlassCard>
+                <CardRowsSkeleton key={i} />
               ))}
             </div>
           ) : opportunities.length === 0 ? (
@@ -903,11 +898,7 @@ function ApplicationsTab() {
           {isLoading ? (
             <div role="status" className="space-y-4" aria-busy="true" aria-label={t('loading')}>
               {[1, 2, 3].map((i) => (
-                <GlassCard key={i} className="p-5 animate-pulse">
-                  <div className="h-5 bg-theme-hover rounded w-1/3 mb-3" />
-                  <div className="h-3 bg-theme-hover rounded w-2/3 mb-3" />
-                  <div className="h-3 bg-theme-hover rounded w-1/4" />
-                </GlassCard>
+                <CardRowsSkeleton key={i} />
               ))}
             </div>
           ) : applications.length === 0 ? (
@@ -1174,10 +1165,7 @@ function HoursTab() {
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" role="status" aria-busy="true" aria-label="Loading">
               {[1, 2, 3].map((i) => (
-                <GlassCard key={i} className="p-5 animate-pulse">
-                  <div className="h-8 bg-theme-hover rounded w-1/2 mb-2" />
-                  <div className="h-3 bg-theme-hover rounded w-3/4" />
-                </GlassCard>
+                <CardRowsSkeleton key={i} />
               ))}
             </div>
           ) : summary ? (

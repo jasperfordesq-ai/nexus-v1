@@ -23,7 +23,7 @@ import Crown from 'lucide-react/icons/crown';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Hourglass from 'lucide-react/icons/hourglass';
 import XCircle from 'lucide-react/icons/circle-x';
-import { GlassCard, useDisclosure, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, AvatarGroup } from '@/components/ui';
+import { GlassCard, useDisclosure, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, AvatarGroup, CardRowsSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -300,11 +300,7 @@ export function GroupSignUpTab() {
       {!error && isLoading && (
         <div className="space-y-4" role="status" aria-busy="true" aria-label="Loading">
           {[1, 2, 3].map((i) => (
-            <GlassCard key={i} className="p-5 animate-pulse">
-              <div className="h-5 bg-theme-hover rounded w-1/3 mb-3" />
-              <div className="h-3 bg-theme-hover rounded w-2/3 mb-3" />
-              <div className="h-3 bg-theme-hover rounded w-1/4" />
-            </GlassCard>
+            <CardRowsSkeleton key={i} />
           ))}
         </div>
       )}

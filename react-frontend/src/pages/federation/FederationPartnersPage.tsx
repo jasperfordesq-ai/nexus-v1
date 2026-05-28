@@ -31,7 +31,7 @@ import Calendar from 'lucide-react/icons/calendar';
 import UserCheck from 'lucide-react/icons/user-check';
 import Handshake from 'lucide-react/icons/handshake';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
+import { GlassCard, Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, CardRowsSkeleton } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
@@ -187,16 +187,7 @@ export function FederationPartnersPage() {
       {isLoading && (
         <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="grid md:grid-cols-2 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <GlassCard key={i} className="p-6 animate-pulse">
-              <div className="flex items-start gap-4">
-                <div className="w-14 h-14 rounded-full bg-theme-hover" />
-                <div className="flex-1">
-                  <div className="h-5 bg-theme-hover rounded w-1/2 mb-2" />
-                  <div className="h-4 bg-theme-hover rounded w-3/4 mb-3" />
-                  <div className="h-3 bg-theme-hover rounded w-1/3" />
-                </div>
-              </div>
-            </GlassCard>
+            <CardRowsSkeleton key={i} className="p-6" />
           ))}
         </div>
       )}

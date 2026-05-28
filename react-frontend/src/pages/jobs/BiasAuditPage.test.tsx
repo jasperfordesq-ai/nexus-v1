@@ -194,7 +194,7 @@ describe('BiasAuditPage', () => {
   it('shows loading state when API is pending', () => {
     vi.mocked(api.get).mockReturnValue(new Promise(() => {}));
     render(<BiasAuditPage />);
-    expect(document.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0);
+    expect(document.querySelectorAll('[role="status"]').length).toBeGreaterThan(0);
   });
 
   it('renders funnel section when report data is loaded', async () => {

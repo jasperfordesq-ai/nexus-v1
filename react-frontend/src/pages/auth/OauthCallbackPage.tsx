@@ -12,10 +12,10 @@
  */
 
 import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams, Link } from 'react-router-dom';import Loader2 from 'lucide-react/icons/loader-circle';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button } from '@/components/ui';
+import { GlassCard, Button, Spinner } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { tokenManager } from '@/lib/api';
 import { useTenant } from '@/contexts';
@@ -80,7 +80,7 @@ export function OauthCallbackPage() {
       <PageMeta title={t('oauth.callback_signing_in')} noIndex />
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto text-indigo-500" aria-hidden="true" />
+          <Spinner size="lg" aria-hidden="true" />
           <p className="text-theme-muted mt-3">{t('oauth.callback_signing_in')}</p>
         </div>
       </div>

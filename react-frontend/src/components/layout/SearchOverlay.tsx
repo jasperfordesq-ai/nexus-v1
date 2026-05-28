@@ -28,7 +28,7 @@ import ArrowRight from 'lucide-react/icons/arrow-right';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useTheme } from '@/contexts';
 import { api } from '@/lib/api';
-import { Button } from '@/components/ui';
+import { Button, Kbd } from '@/components/ui';
 
 const RECENT_SEARCHES_KEY = 'nexus_recent_searches';
 
@@ -312,7 +312,9 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
               aria-label={t('accessibility.close')}
             >
               <X className="w-3.5 h-3.5" />
-              <kbd className="text-[10px]">ESC</kbd>
+              <Kbd className="text-[10px]">
+                <Kbd.Content>ESC</Kbd.Content>
+              </Kbd>
             </Button>
           </div>
 

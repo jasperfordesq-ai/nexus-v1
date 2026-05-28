@@ -170,7 +170,7 @@ describe('EntityMapView', () => {
         />
       </W>,
     );
-    expect(container.querySelector('.animate-pulse')).toBeTruthy();
+    expect(container.querySelector('[role="status"]')).toBeTruthy();
   });
 
   it('shows maps-disabled message when MAPS_ENABLED is false', () => {

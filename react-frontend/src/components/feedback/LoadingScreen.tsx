@@ -1,5 +1,5 @@
 import { Card } from '@heroui/react';
-import { Skeleton } from '@/components/ui';
+import { Skeleton, Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,7 +12,6 @@ import { Skeleton } from '@/components/ui';
 
 import { motion } from '@/lib/motion';
 
-import Loader2 from 'lucide-react/icons/loader-circle';
 import i18n from 'i18next';
 
 interface LoadingScreenProps {
@@ -46,7 +45,7 @@ export function LoadingScreen({ message }: LoadingScreenProps) {
               className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500/20 to-cyan-500/20"
               aria-hidden="true"
             >
-              <Loader2 className="h-8 w-8 text-indigo-600 dark:text-indigo-300" />
+              <Spinner size="lg" />
             </motion.div>
             <p className="text-sm font-medium text-theme-secondary">{displayMessage}</p>
             <div className="mt-5 w-full space-y-2" aria-hidden="true">

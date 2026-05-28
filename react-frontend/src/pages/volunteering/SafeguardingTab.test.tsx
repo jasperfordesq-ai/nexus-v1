@@ -148,7 +148,7 @@ describe('SafeguardingTab', () => {
     vi.mocked(api.get).mockReturnValue(new Promise(() => {}));
     render(<SafeguardingTab />);
     const cards = screen.getAllByTestId('glass-card');
-    const pulsingCards = cards.filter((c) => c.className?.includes('animate-pulse'));
+    const pulsingCards = cards.filter((c) => c.getAttribute('role') === 'status');
     expect(pulsingCards.length).toBeGreaterThan(0);
   });
 

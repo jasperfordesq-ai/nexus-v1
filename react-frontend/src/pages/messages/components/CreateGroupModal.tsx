@@ -7,14 +7,13 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import Search from 'lucide-react/icons/search';
-import Loader2 from 'lucide-react/icons/loader-circle';
 import Users from 'lucide-react/icons/users';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import type { User } from '@/types/api';
-import { Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
+import { Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Spinner } from '@/components/ui';
 
 interface CreateGroupModalProps {
   isOpen: boolean;
@@ -139,8 +138,7 @@ export function CreateGroupModal({ isOpen, onClose, onCreated }: CreateGroupModa
               input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
               inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
             }}
-            autoFocus
-          />
+            autoFocus />
 
           {/* Selected members */}
           {selectedMembers.length > 0 && (
@@ -158,8 +156,7 @@ export function CreateGroupModal({ isOpen, onClose, onCreated }: CreateGroupModa
                       <Avatar
                         src={resolveAvatarUrl(member.avatar_url || member.avatar)}
                         name={member.name}
-                        size="sm"
-                      />
+                        size="sm" />
                     }
                   >
                     {member.name}
@@ -178,12 +175,11 @@ export function CreateGroupModal({ isOpen, onClose, onCreated }: CreateGroupModa
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Search className="w-4 h-4 text-theme-subtle" />}
-              endContent={isSearching && <Loader2 className="w-4 h-4 text-theme-subtle animate-spin" />}
+              endContent={isSearching && <Spinner size="sm" />}
               classNames={{
                 input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
                 inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
-              }}
-            />
+              }} />
             {selectedMembers.length < 2 && (
               <p className="text-xs text-theme-subtle">{t('add_members_hint')}</p>
             )}
@@ -202,8 +198,7 @@ export function CreateGroupModal({ isOpen, onClose, onCreated }: CreateGroupModa
                   src={resolveAvatarUrl(user.avatar_url || user.avatar)}
                   name={user.name}
                   size="sm"
-                  className="ring-2 ring-theme-default"
-                />
+                  className="ring-2 ring-theme-default" />
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-theme-primary truncate">{user.name}</p>
                   {user.tagline && (

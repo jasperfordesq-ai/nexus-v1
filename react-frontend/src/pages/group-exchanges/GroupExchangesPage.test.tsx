@@ -138,8 +138,8 @@ describe('GroupExchangesPage', () => {
 
   it('shows loading skeleton initially', () => {
     render(<GroupExchangesPage />);
-    // The loading skeletons are GlassCard divs with animate-pulse class
-    const skeletons = document.querySelectorAll('.animate-pulse');
+    // The loading skeletons render status placeholders
+    const skeletons = document.querySelectorAll('[role="status"]');
     expect(skeletons.length).toBeGreaterThan(0);
   });
 

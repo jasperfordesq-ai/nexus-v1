@@ -22,7 +22,7 @@ import Calendar from 'lucide-react/icons/calendar';
 import Globe from 'lucide-react/icons/globe';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Input, Avatar } from '@/components/ui';
+import { GlassCard, Button, Input, Avatar, CardRowsSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';
 import { PageMeta } from '@/components/seo/PageMeta';
@@ -189,17 +189,7 @@ export function ClubsPage() {
           {isLoading ? (
             <div role="status" aria-busy="true" aria-label="Loading" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <GlassCard key={i} className="p-5 animate-pulse">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-12 h-12 bg-theme-hover rounded-xl" />
-                    <div className="flex-1">
-                      <div className="h-4 bg-theme-hover rounded w-3/4 mb-2" />
-                      <div className="h-3 bg-theme-hover rounded w-1/2" />
-                    </div>
-                  </div>
-                  <div className="h-3 bg-theme-hover rounded w-full mb-2" />
-                  <div className="h-3 bg-theme-hover rounded w-2/3" />
-                </GlassCard>
+                <CardRowsSkeleton key={i} />
               ))}
             </div>
           ) : clubs.length === 0 ? (

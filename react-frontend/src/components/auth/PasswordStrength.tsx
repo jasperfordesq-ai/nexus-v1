@@ -6,9 +6,9 @@
 import { motion } from '@/lib/motion';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import AlertCircle from 'lucide-react/icons/circle-alert';
-import Loader2 from 'lucide-react/icons/loader-circle';
 import { Info } from 'lucide-react';
 import { Trans, useTranslation } from 'react-i18next';
+import { Spinner } from '@/components/ui';
 import type { PasswordCheckState } from '@/hooks/usePasswordCheck';
 import { PASSWORD_MIN_LENGTH } from '@/hooks/usePasswordCheck';
 
@@ -45,8 +45,7 @@ export function PasswordStrength({ state }: PasswordStrengthProps) {
           ? 'bg-warning'
           : 'bg-accent';
 
-  const Icon =
-    tone === 'success' ? CheckCircle : tone === 'error' ? AlertCircle : state.isChecking ? Loader2 : Info;
+  const Icon = tone === 'success' ? CheckCircle : tone === 'error' ? AlertCircle : Info;
 
   return (
     <div className="space-y-2 text-sm" role="group" aria-label={t('register.aria.password_strength')}>
@@ -82,7 +81,7 @@ export function PasswordStrength({ state }: PasswordStrengthProps) {
         }
         aria-live="polite"
       >
-        <Icon className={`w-4 h-4 ${state.isChecking ? 'animate-spin' : ''}`} aria-hidden="true" />
+        {state.isChecking ? <Spinner size="sm" aria-hidden="true" /> : <Icon className="w-4 h-4" aria-hidden="true" />}
         <span>{message}</span>
       </p>
 

@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Progress, Button, Input, Checkbox } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Progress, Button, Input, Checkbox, Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -29,7 +29,6 @@ import Eye from 'lucide-react/icons/eye';
 import EyeOff from 'lucide-react/icons/eye-off';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import ArrowRight from 'lucide-react/icons/arrow-right';
-import Loader2 from 'lucide-react/icons/loader-circle';
 import Building2 from 'lucide-react/icons/building-2';
 import Phone from 'lucide-react/icons/phone';
 import Check from 'lucide-react/icons/check';
@@ -619,8 +618,7 @@ export function RegisterPage() {
                     'glass-card backdrop-blur-lg border-glass-border hover:border-glass-border-hover',
                   label: 'text-theme-muted',
                   input: 'text-theme-primary placeholder:text-theme-subtle',
-                }}
-              />
+                }} />
             )}
 
             {/* Invite Code - Only show for invite_only tenants */}
@@ -638,7 +636,7 @@ export function RegisterPage() {
                 startContent={<Ticket className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
                 endContent={
                   inviteCodeChecking ? (
-                    <Loader2 className="w-4 h-4 animate-spin text-theme-subtle" aria-hidden="true" />
+                    <Spinner size="sm" aria-hidden="true" />
                   ) : inviteCodeValid === true ? (
                     <Check className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                   ) : inviteCodeValid === false ? (
@@ -655,8 +653,7 @@ export function RegisterPage() {
                   label: 'text-theme-muted',
                   input: 'text-theme-primary placeholder:text-theme-subtle uppercase tracking-widest',
                   description: 'text-theme-subtle text-xs',
-                }}
-              />
+                }} />
             )}
           </div>
         );
@@ -679,8 +676,7 @@ export function RegisterPage() {
                     'glass-card backdrop-blur-lg border-glass-border hover:border-glass-border-hover',
                   label: 'text-theme-muted',
                   input: 'text-theme-primary placeholder:text-theme-subtle',
-                }}
-              />
+                }} />
 
               <Input
                 type="text"
@@ -699,8 +695,7 @@ export function RegisterPage() {
                   label: 'text-theme-muted',
                   input: 'text-theme-primary placeholder:text-theme-subtle',
                   description: 'text-theme-subtle text-xs',
-                }}
-              />
+                }} />
             </div>
 
             {/* Location */}
@@ -731,8 +726,7 @@ export function RegisterPage() {
                 inputWrapper: 'glass-card backdrop-blur-lg border-glass-border hover:border-glass-border-hover',
                 label: 'text-theme-muted',
                 input: 'text-theme-primary placeholder:text-theme-subtle',
-              }}
-            />
+              }} />
 
             {/* Phone */}
             <Input
@@ -754,8 +748,7 @@ export function RegisterPage() {
                 label: 'text-theme-muted',
                 input: 'text-theme-primary placeholder:text-theme-subtle',
                 description: 'text-theme-subtle text-xs',
-              }}
-            />
+              }} />
           </div>
         );
 
@@ -777,8 +770,7 @@ export function RegisterPage() {
                   'glass-card backdrop-blur-lg border-glass-border hover:border-glass-border-hover',
                 label: 'text-theme-muted',
                 input: 'text-theme-primary placeholder:text-theme-subtle',
-              }}
-            />
+              }} />
 
             {/* Password */}
             <div>
@@ -812,8 +804,7 @@ export function RegisterPage() {
                     'glass-card backdrop-blur-lg border-glass-border hover:border-glass-border-hover',
                   label: 'text-theme-muted',
                   input: 'text-theme-primary placeholder:text-theme-subtle',
-                }}
-              />
+                }} />
 
               {/* Password strength — NIST 800-63B aligned: length + HIBP live check */}
               <div className="mt-2">
@@ -856,8 +847,7 @@ export function RegisterPage() {
                 label: 'text-theme-muted',
                 input: 'text-theme-primary placeholder:text-theme-subtle',
                 description: 'text-emerald-600 dark:text-emerald-400',
-              }}
-            />
+              }} />
           </div>
         );
 
@@ -881,8 +871,7 @@ export function RegisterPage() {
                     components={{
                       termsLink: <Link to={tenantPath('/terms')} className="text-indigo-600 dark:text-indigo-400 hover:underline" />,
                       privacyLink: <Link to={tenantPath('/privacy')} className="text-indigo-600 dark:text-indigo-400 hover:underline" />,
-                    }}
-                  />
+                    }} />
                 </span>
               </Checkbox>
 
@@ -958,7 +947,7 @@ export function RegisterPage() {
           {isUnavailable ? (
             <ShieldCheck className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600 dark:text-red-300" aria-hidden="true" />
           ) : (
-            <Loader2 className="mt-0.5 h-5 w-5 flex-shrink-0 animate-spin text-blue-600 dark:text-blue-300" aria-hidden="true" />
+            <Spinner size="md" aria-hidden="true" />
           )}
           <p className="text-sm leading-6">
             {isUnavailable
@@ -1004,7 +993,7 @@ export function RegisterPage() {
             color="primary"
             className="w-full font-medium"
             size="lg"
-            spinner={<Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />}
+            spinner={<Spinner size="sm" aria-hidden="true" />}
           >
             {t('register.submit')}
           </Button>
@@ -1040,8 +1029,7 @@ export function RegisterPage() {
             value={progressPercent}
             color="primary"
             size="sm"
-            aria-label={t('register.progress_aria', { step: currentStep, total: STEPS.length })}
-          />
+            aria-label={t('register.progress_aria', { step: currentStep, total: STEPS.length })} />
           {/* Step dots */}
           <div className="flex justify-between mt-2">
             {STEPS.map((step) => (
@@ -1067,8 +1055,7 @@ export function RegisterPage() {
                       : step.id < currentStep
                         ? 'bg-emerald-500'
                         : 'bg-theme-elevated'
-                  }`}
-                />
+                  }`} />
                 <span className="text-[10px] leading-none">{getStepLabel(step.id)}</span>
               </Button>
             ))}
@@ -1120,7 +1107,7 @@ export function RegisterPage() {
               isDisabled={!isFormValid}
               color="primary"
               className="flex-1 font-medium"
-              spinner={<Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />}
+              spinner={<Spinner size="sm" aria-hidden="true" />}
             >
               {t('register.submit')}
             </Button>
@@ -1190,8 +1177,7 @@ export function RegisterPage() {
                             ns="auth"
                             i18nKey="register.verify_email_body"
                             values={{ email }}
-                            components={{ strong: <strong /> }}
-                          />
+                            components={{ strong: <strong /> }} />
                         </p>
                       </div>
                     </div>

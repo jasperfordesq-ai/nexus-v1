@@ -19,7 +19,7 @@ import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Siren from 'lucide-react/icons/siren';
-import { GlassCard, Button, Chip } from '@/components/ui';
+import { GlassCard, Button, Chip, CardRowsSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -170,11 +170,7 @@ export function EmergencyAlertsTab() {
       {!error && isLoading && (
         <div className="space-y-4" role="status" aria-busy="true" aria-label="Loading">
           {[1, 2].map((i) => (
-            <GlassCard key={i} className="p-5 animate-pulse">
-              <div className="h-5 bg-theme-hover rounded w-1/3 mb-3" />
-              <div className="h-3 bg-theme-hover rounded w-full mb-3" />
-              <div className="h-3 bg-theme-hover rounded w-1/4" />
-            </GlassCard>
+            <CardRowsSkeleton key={i} />
           ))}
         </div>
       )}

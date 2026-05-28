@@ -20,7 +20,7 @@ import Plus from 'lucide-react/icons/plus';
 import Banknote from 'lucide-react/icons/banknote';
 import EyeOff from 'lucide-react/icons/eye-off';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Progress, useDisclosure, Button, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, RadioGroup, Radio } from '@/components/ui';
+import { GlassCard, Progress, useDisclosure, Button, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, RadioGroup, Radio, CardRowsSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -299,11 +299,7 @@ export function DonationsTab() {
       {!error && isLoading && (
         <div className="space-y-4" role="status" aria-busy="true" aria-label="Loading">
           {[1, 2, 3].map((i) => (
-            <GlassCard key={i} className="p-5 animate-pulse">
-              <div className="h-5 bg-theme-hover rounded w-1/3 mb-3" />
-              <div className="h-3 bg-theme-hover rounded w-2/3 mb-3" />
-              <div className="h-3 bg-theme-hover rounded w-1/4" />
-            </GlassCard>
+            <CardRowsSkeleton key={i} />
           ))}
         </div>
       )}

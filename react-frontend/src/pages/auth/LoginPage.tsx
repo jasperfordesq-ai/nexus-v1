@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Input, Checkbox } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Input, Checkbox, Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -25,7 +25,6 @@ import Eye from 'lucide-react/icons/eye';
 import EyeOff from 'lucide-react/icons/eye-off';
 import Shield from 'lucide-react/icons/shield';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
-import Loader2 from 'lucide-react/icons/loader-circle';
 import Building2 from 'lucide-react/icons/building-2';
 import Fingerprint from 'lucide-react/icons/fingerprint';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
@@ -525,8 +524,7 @@ export function LoginPage() {
                         inputWrapper: 'glass-card min-h-11 backdrop-blur-lg',
                         label: 'text-theme-muted',
                         input: 'text-theme-primary placeholder:text-theme-subtle',
-                      }}
-                    />
+                      }} />
 
                     <Input
                       type={showPassword ? 'text' : 'password'}
@@ -557,8 +555,7 @@ export function LoginPage() {
                         inputWrapper: 'glass-card min-h-11 backdrop-blur-lg',
                         label: 'text-theme-muted',
                         input: 'text-theme-primary placeholder:text-theme-subtle',
-                      }}
-                    />
+                      }} />
 
                     <div className="flex items-center justify-end">
                       <Link
@@ -575,7 +572,7 @@ export function LoginPage() {
                       isDisabled={!canSubmit}
                       className="w-full font-medium"
                       size="lg"
-                      spinner={<Loader2 className="w-4 h-4 animate-spin" />}
+                      spinner={<Spinner size="sm" />}
                     >
                       {t('login.submit')}
                     </Button>
@@ -605,7 +602,7 @@ export function LoginPage() {
                             <Fingerprint className="w-5 h-5 text-indigo-500" aria-hidden="true" />
                           ) : undefined
                         }
-                        spinner={<Loader2 className="w-4 h-4 animate-spin" />}
+                        spinner={<Spinner size="sm" />}
                       >
                         {t('login.passkey_login')}
                       </Button>
@@ -682,8 +679,7 @@ export function LoginPage() {
                         inputWrapper: 'glass-card min-h-11 backdrop-blur-lg',
                         label: 'text-theme-muted',
                         input: 'text-theme-primary placeholder:text-theme-subtle text-center text-xl tracking-widest',
-                      }}
-                    />
+                      }} />
 
                     <div className="space-y-3">
                       {twoFactorMethods.includes('backup_code') && (
@@ -730,7 +726,7 @@ export function LoginPage() {
                         isLoading={isLoading}
                         isDisabled={!twoFactorCode.trim()}
                         className="flex-1 font-medium"
-                        spinner={<Loader2 className="w-4 h-4 animate-spin" />}
+                        spinner={<Spinner size="sm" />}
                       >
                         {t('login.twofa_verify')}
                       </Button>

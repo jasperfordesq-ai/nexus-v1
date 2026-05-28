@@ -24,7 +24,7 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Target from 'lucide-react/icons/target';
 import Zap from 'lucide-react/icons/zap';
 import ExternalLink from 'lucide-react/icons/external-link';
-import { GlassCard, Progress, Button, Chip } from '@/components/ui';
+import { GlassCard, Progress, Button, Chip, CardRowsSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -211,11 +211,7 @@ export function RecommendedShiftsTab() {
       {!error && isLoading && (
         <div className="space-y-4" role="status" aria-busy="true" aria-label="Loading">
           {[1, 2, 3].map((i) => (
-            <GlassCard key={i} className="p-5 animate-pulse">
-              <div className="h-5 bg-theme-hover rounded w-1/3 mb-3" />
-              <div className="h-3 bg-theme-hover rounded w-full mb-3" />
-              <div className="h-3 bg-theme-hover rounded w-2/3" />
-            </GlassCard>
+            <CardRowsSkeleton key={i} />
           ))}
         </div>
       )}

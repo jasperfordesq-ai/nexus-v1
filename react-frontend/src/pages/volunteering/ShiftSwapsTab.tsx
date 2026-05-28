@@ -21,7 +21,7 @@ import Send from 'lucide-react/icons/send';
 import Inbox from 'lucide-react/icons/inbox';
 import Ban from 'lucide-react/icons/ban';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { GlassCard, Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, CardRowsSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -283,11 +283,7 @@ export function ShiftSwapsTab() {
       {!error && isLoading && (
         <div className="space-y-4" role="status" aria-busy="true" aria-label="Loading">
           {[1, 2, 3].map((i) => (
-            <GlassCard key={i} className="p-5 animate-pulse">
-              <div className="h-5 bg-theme-hover rounded w-1/3 mb-3" />
-              <div className="h-3 bg-theme-hover rounded w-2/3 mb-3" />
-              <div className="h-3 bg-theme-hover rounded w-1/4" />
-            </GlassCard>
+            <CardRowsSkeleton key={i} />
           ))}
         </div>
       )}

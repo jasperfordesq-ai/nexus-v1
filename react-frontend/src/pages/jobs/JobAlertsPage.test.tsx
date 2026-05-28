@@ -151,7 +151,7 @@ describe('JobAlertsPage', () => {
   it('shows loading state initially when API is pending', () => {
     vi.mocked(api.get).mockReturnValue(new Promise(() => {}));
     render(<JobAlertsPage />);
-    expect(document.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0);
+    expect(document.querySelectorAll('[role="status"]').length).toBeGreaterThan(0);
   });
 
   it('shows empty state when no alerts exist', async () => {
@@ -159,7 +159,7 @@ describe('JobAlertsPage', () => {
     // Wait for loading to complete - then empty state should render since api returns []
     await waitFor(() => {
       // Either the empty-state or the alert list should be shown (not loading skeleton)
-      const noSkeleton = document.querySelectorAll('.animate-pulse').length === 0;
+      const noSkeleton = document.querySelectorAll('[role="status"]').length === 0;
       expect(noSkeleton).toBe(true);
     }, { timeout: 3000 });
     // After loading, with empty data [], empty state should appear

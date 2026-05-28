@@ -25,7 +25,7 @@ import Star from 'lucide-react/icons/star';
 import Users from 'lucide-react/icons/users';
 import Plus from 'lucide-react/icons/plus';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Input, Avatar } from '@/components/ui';
+import { GlassCard, Button, Input, Avatar, CardRowsSkeleton } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
@@ -208,17 +208,7 @@ export function OrganisationsPage() {
           {isLoading ? (
             <div role="status" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" aria-busy="true" aria-label={t('organisations.loading')}>
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <GlassCard key={i} className="p-5 animate-pulse">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-12 h-12 bg-theme-hover rounded-xl" />
-                    <div className="flex-1">
-                      <div className="h-4 bg-theme-hover rounded w-3/4 mb-2" />
-                      <div className="h-3 bg-theme-hover rounded w-1/2" />
-                    </div>
-                  </div>
-                  <div className="h-3 bg-theme-hover rounded w-full mb-2" />
-                  <div className="h-3 bg-theme-hover rounded w-2/3" />
-                </GlassCard>
+                <CardRowsSkeleton key={i} />
               ))}
             </div>
           ) : organisations.length === 0 ? (

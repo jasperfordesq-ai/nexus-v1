@@ -13,6 +13,7 @@ import MapPin from 'lucide-react/icons/map-pin';
 import MapPinOff from 'lucide-react/icons/map-pin-off';
 import { useTranslation } from 'react-i18next';
 import { LocationMap, type MapMarker } from './LocationMap';
+import { Skeleton } from '@/components/ui';
 import { MAPS_ENABLED } from '@/lib/map-config';
 
 export interface EntityMapViewProps<T> {
@@ -72,11 +73,11 @@ export function EntityMapView<T>({
 
   if (isLoading) {
     return (
-      <div
+      <Skeleton
         role="status"
         aria-busy="true"
         aria-label="Loading"
-        className={`rounded-xl bg-theme-surface/50 animate-pulse ${className}`}
+        className={`rounded-xl ${className}`}
         style={{ height }}
       />
     );

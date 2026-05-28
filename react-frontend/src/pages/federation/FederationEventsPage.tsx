@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Input, Avatar } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Input, Avatar, MediaRowsSkeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -278,16 +278,7 @@ export function FederationEventsPage() {
       {isLoading && events.length === 0 && (
         <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <GlassCard key={i} className="p-5 animate-pulse">
-              <div className="flex gap-4">
-                <div className="w-16 h-20 rounded-lg bg-theme-hover" />
-                <div className="flex-1">
-                  <div className="h-5 bg-theme-hover rounded w-1/2 mb-2" />
-                  <div className="h-4 bg-theme-hover rounded w-3/4 mb-3" />
-                  <div className="h-3 bg-theme-hover rounded w-1/4" />
-                </div>
-              </div>
-            </GlassCard>
+            <MediaRowsSkeleton key={i} />
           ))}
         </div>
       )}

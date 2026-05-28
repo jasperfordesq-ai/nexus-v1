@@ -1,5 +1,5 @@
 import { Chip, CloseButton } from '@heroui/react';
-import { Select, SelectItem, GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch, Tooltip } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch, Tooltip, CardRowsSkeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -641,14 +641,7 @@ export function CreateJobPage() {
   if (isLoading) {
     return (
       <div className="space-y-6 max-w-2xl mx-auto">
-        <GlassCard className="p-6 animate-pulse" role="status" aria-label={t('loading')}>
-          <div className="h-8 bg-theme-hover rounded w-1/2 mb-6" />
-          <div className="space-y-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-12 bg-theme-hover rounded" />
-            ))}
-          </div>
-        </GlassCard>
+        <CardRowsSkeleton className="p-6" />
       </div>
     );
   }

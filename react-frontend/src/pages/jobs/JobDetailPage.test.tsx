@@ -174,7 +174,7 @@ describe('JobDetailPage', () => {
   it('renders loading state initially', () => {
     vi.mocked(api.get).mockReturnValue(new Promise(() => {}));
     render(<JobDetailPage />);
-    expect(document.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0);
+    expect(document.querySelectorAll('[role="status"]').length).toBeGreaterThan(0);
   });
 
   it('renders not-found empty state when API returns no data', async () => {

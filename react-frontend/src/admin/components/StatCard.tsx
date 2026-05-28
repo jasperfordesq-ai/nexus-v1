@@ -1,4 +1,4 @@
-import { Card, CardBody } from '@/components/ui';
+import { Card, CardBody, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -72,7 +72,7 @@ export function StatCard({
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium text-muted">{resolvedLabel}</p>
         {loading ? (
-          <div role="status" aria-busy="true" aria-label="Loading" className="mt-1 h-7 w-20 animate-pulse rounded bg-surface-tertiary" />
+          <Skeleton role="status" aria-busy="true" aria-label="Loading" className="mt-1 h-7 w-20 rounded bg-surface-tertiary" />
         ) : (
           <p className="mt-0.5 text-2xl font-semibold text-foreground">
             {typeof value === 'number' ? value.toLocaleString() : value}

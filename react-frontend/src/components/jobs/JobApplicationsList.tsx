@@ -2,7 +2,7 @@ import Users from 'lucide-react/icons/users';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button } from '@/components/ui';
+import { GlassCard, Button, CardRowsSkeleton } from '@/components/ui';
 import { ApplicationCard } from './ApplicationCard';
 import type { Application, JobVacancy } from './JobDetailTypes';
 
@@ -51,10 +51,7 @@ export function JobApplicationsList({
             {isLoadingApps ? (
               <div role="status" aria-busy="true" aria-label="Loading" className="space-y-3">
                 {[1, 2].map((i) => (
-                  <div key={i} className="p-4 rounded-lg bg-theme-elevated animate-pulse">
-                    <div className="h-4 bg-theme-hover rounded w-1/3 mb-2" />
-                    <div className="h-3 bg-theme-hover rounded w-2/3" />
-                  </div>
+                  <CardRowsSkeleton key={i} className="p-4" rows={['w-1/3', 'w-2/3']} />
                 ))}
               </div>
             ) : applications.length === 0 ? (

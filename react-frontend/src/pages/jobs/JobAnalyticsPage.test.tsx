@@ -149,7 +149,7 @@ describe('JobAnalyticsPage', () => {
   it('renders loading state initially when API is pending', () => {
     vi.mocked(api.get).mockReturnValue(new Promise(() => {}));
     render(<JobAnalyticsPage />);
-    expect(document.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0);
+    expect(document.querySelectorAll('[role="status"]').length).toBeGreaterThan(0);
   });
 
   it('renders error empty state when API fails', async () => {

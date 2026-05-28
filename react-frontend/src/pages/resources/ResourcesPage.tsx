@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure, GlassCard, Progress, Button, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, GlassCard, Progress, Button, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, CardRowsSkeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -688,16 +688,7 @@ export function ResourcesPage() {
           {isLoading ? (
             <div role="status" className="space-y-3" aria-busy="true" aria-label={t('resources.loading')}>
               {[1, 2, 3, 4, 5].map((i) => (
-                <GlassCard key={i} className="p-4 animate-pulse">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-theme-hover" />
-                    <div className="flex-1">
-                      <div className="h-4 bg-theme-hover rounded w-1/3 mb-2" />
-                      <div className="h-3 bg-theme-hover rounded w-2/3" />
-                    </div>
-                    <div className="w-20 h-8 bg-theme-hover rounded" />
-                  </div>
-                </GlassCard>
+                <CardRowsSkeleton key={i} className="p-4" />
               ))}
             </div>
           ) : resources.length === 0 ? (

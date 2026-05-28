@@ -28,7 +28,7 @@ import Calendar from 'lucide-react/icons/calendar';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Avatar, Tabs, Tab } from '@/components/ui';
+import { GlassCard, Button, Chip, Avatar, Tabs, Tab, CardRowsSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
@@ -261,16 +261,7 @@ export function GroupExchangesPage() {
           {isLoading ? (
             <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="space-y-4">
               {[1, 2, 3, 4].map((i) => (
-                <GlassCard key={i} className="p-6 animate-pulse">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-theme-elevated" />
-                    <div className="flex-1 space-y-2">
-                      <div className="h-5 w-48 bg-theme-elevated rounded" />
-                      <div className="h-4 w-32 bg-theme-elevated rounded" />
-                    </div>
-                    <div className="h-6 w-20 bg-theme-elevated rounded-full" />
-                  </div>
-                </GlassCard>
+                <CardRowsSkeleton key={i} className="p-6" />
               ))}
             </div>
           ) : exchanges.length === 0 ? (
