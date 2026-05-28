@@ -27,6 +27,8 @@ jest.mock('react-i18next', () => ({
         'directory.messages.title': 'Federated Messages',
         'directory.messages.subtitle': 'Message members in trusted partner communities.',
         'directory.messages.unknownSender': 'Unknown sender',
+        'directory.messages.emptyForPartnerTitle': 'No messages with this partner yet',
+        'directory.messages.emptyForPartnerDescription': 'Start from a profile, or clear the filter.',
         'directory.messages.unreadCount': `${String(opts?.count ?? 0)} unread`,
         'directory.messages.delivered': 'Delivered',
         'directory.messages.threadEyebrow': 'Federated conversation',
@@ -146,7 +148,18 @@ jest.mock('heroui-native', () => {
 
 jest.mock('@/components/ui/AppTopBar', () => 'View');
 jest.mock('@/components/ui/Avatar', () => 'View');
-jest.mock('@/components/ui/EmptyState', () => 'View');
+jest.mock('@/components/ui/EmptyState', () => {
+  const React = require('react');
+  const { Text, View } = require('react-native');
+  return function EmptyState({ title, subtitle }: { title?: string; subtitle?: string }) {
+    return (
+      <View>
+        {title ? <Text>{title}</Text> : null}
+        {subtitle ? <Text>{subtitle}</Text> : null}
+      </View>
+    );
+  };
+});
 jest.mock('@/components/ui/Input', () => 'View');
 jest.mock('@/components/ui/Toggle', () => 'View');
 
@@ -176,6 +189,44 @@ const message = {
   },
 };
 
+const otherPartnerMessage = {
+  ...message,
+  id: 102,
+  body: 'Different community message',
+  sender: {
+    id: 311,
+    name: 'Brendan',
+    avatar: null,
+    tenant_id: 6,
+    tenant_name: 'Galway Timebank',
+  },
+};
+
+const partnerFilters = [
+  {
+    id: 5,
+    name: 'Cork Timebank',
+    slug: 'cork-timebank',
+    description: null,
+    logo: null,
+    member_count: 20,
+    location: 'Cork',
+    website: null,
+    connected_since: '2026-01-01T00:00:00Z',
+  },
+  {
+    id: 6,
+    name: 'Galway Timebank',
+    slug: 'galway-timebank',
+    description: null,
+    logo: null,
+    member_count: 18,
+    location: 'Galway',
+    website: null,
+    connected_since: '2026-01-01T00:00:00Z',
+  },
+];
+
 beforeEach(() => {
   mockSearchParams = {};
   mockRefresh.mockClear();
@@ -184,11 +235,21 @@ beforeEach(() => {
   mockTranslateFederationMessage.mockClear();
   mockSendFederationMessage.mockResolvedValue({ data: { id: 202 } });
   mockTranslateFederationMessage.mockResolvedValue({ data: { translated_text: 'Could we coordinate this across communities? (translated)' } });
-  mockUseApi.mockReturnValue({
-    data: { data: [message] },
-    isLoading: false,
-    error: null,
-    refresh: mockRefresh,
+  mockUseApi.mockImplementation((_fetcher: unknown, deps?: unknown[]) => {
+    if (Array.isArray(deps) && deps.length === 0) {
+      return {
+        data: { data: partnerFilters },
+        isLoading: false,
+        error: null,
+        refresh: jest.fn(),
+      };
+    }
+    return {
+      data: { data: [message] },
+      isLoading: false,
+      error: null,
+      refresh: mockRefresh,
+    };
   });
   mockUsePaginatedApi.mockReturnValue({
     items: [],
@@ -202,6 +263,40 @@ beforeEach(() => {
 });
 
 describe('FederationMessagesScreen', () => {
+  it('filters partner deep links to matching message threads', () => {
+    mockSearchParams = { partner_id: '5' };
+    mockUseApi.mockImplementation((_fetcher: unknown, deps?: unknown[]) => {
+      if (Array.isArray(deps) && deps.length === 0) {
+        return {
+          data: { data: partnerFilters },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        };
+      }
+      return {
+        data: { data: [message, otherPartnerMessage] },
+        isLoading: false,
+        error: null,
+        refresh: mockRefresh,
+      };
+    });
+
+    const { getByText, queryByText } = render(<FederationMessagesScreen />);
+
+    expect(getByText('Katherine')).toBeTruthy();
+    expect(queryByText('Brendan')).toBeNull();
+  });
+
+  it('shows a partner-specific empty state when a deep-linked inbox has no matching thread', () => {
+    mockSearchParams = { partner_id: '6' };
+
+    const { getByText } = render(<FederationMessagesScreen />);
+
+    expect(getByText('No messages with this partner yet')).toBeTruthy();
+    expect(getByText('Start from a profile, or clear the filter.')).toBeTruthy();
+  });
+
   it('opens message cards as usable federated threads and sends replies to the partner', async () => {
     const { getByLabelText, getByPlaceholderText, getByText } = render(<FederationMessagesScreen />);
 

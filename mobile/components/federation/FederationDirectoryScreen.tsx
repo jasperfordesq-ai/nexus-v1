@@ -181,6 +181,22 @@ function getThreadKeyForMessage(message: FederatedMessage): string | null {
   return `${partner.id}-${partner.tenant_id}`;
 }
 
+function threadMatchesPartner(thread: FederatedThread, partnerId: string) {
+  if (!partnerId) return true;
+  const normalized = String(partnerId);
+  const externalNumericId = normalized.startsWith('ext-') ? normalized.slice(4) : normalized;
+  const partnerTenantId = String(thread.partner.tenant_id ?? '');
+
+  if (partnerTenantId === normalized || partnerTenantId === `ext-${externalNumericId}`) {
+    return true;
+  }
+
+  return thread.messages.some((message) => {
+    const externalPartnerId = message.external_partner_id === undefined ? null : String(message.external_partner_id);
+    return externalPartnerId === externalNumericId || String(message.sender?.tenant_id ?? '') === normalized || String(message.receiver?.tenant_id ?? '') === normalized;
+  });
+}
+
 function mergeFederationMessages(remoteMessages: FederatedMessage[], localMessages: FederatedMessage[]): FederatedMessage[] {
   const seen = new Set<string>();
   return [...remoteMessages, ...localMessages].filter((message) => {
@@ -1314,7 +1330,7 @@ export default function FederationDirectoryScreen({ mode }: { mode: DirectoryMod
   const { data: partnerFilterData } = useApi<unknown>(
     () => getFederationPartners(null),
     [],
-    { enabled: mode === 'members' || mode === 'listings' || mode === 'groups' || mode === 'events' },
+    { enabled: mode === 'members' || mode === 'messages' || mode === 'listings' || mode === 'groups' || mode === 'events' },
   );
   const partnerFilters = unwrapArray<FederatedTenant>(partnerFilterData as { data?: FederatedTenant[] } | FederatedTenant[] | null);
 
@@ -1358,10 +1374,17 @@ export default function FederationDirectoryScreen({ mode }: { mode: DirectoryMod
   const isLoadingMore = mode !== 'messages' && mode !== 'settings' && directoryPage.isLoadingMore;
   const loadMore = directoryPage.loadMore;
   const messageThreads = useMemo(() => mode === 'messages' ? buildMessageThreads(items as FederatedMessage[]) : [], [items, mode]);
-  const activeThread = useMemo(() => messageThreads.find((thread) => thread.key === activeThreadKey) ?? null, [messageThreads, activeThreadKey]);
+  const visibleMessageThreads = useMemo(
+    () => (mode === 'messages' && selectedPartner
+      ? messageThreads.filter((thread) => threadMatchesPartner(thread, selectedPartner))
+      : messageThreads),
+    [messageThreads, mode, selectedPartner],
+  );
+  const activeThread = useMemo(() => visibleMessageThreads.find((thread) => thread.key === activeThreadKey) ?? null, [visibleMessageThreads, activeThreadKey]);
   const showSearch = (mode === 'members' || mode === 'listings' || mode === 'groups' || mode === 'events') && !activeListing && !activeGroup && !activeEvent;
   const disabledFeature = isFeatureDisabledError(error);
   const isComposeRequested = mode === 'messages' && params.compose === 'true';
+  const isEmpty = mode === 'messages' ? visibleMessageThreads.length === 0 : items.length === 0;
 
   async function openThread(thread: FederatedThread) {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -1407,7 +1430,7 @@ export default function FederationDirectoryScreen({ mode }: { mode: DirectoryMod
           refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refresh} tintColor={primary} colors={[primary]} />}
           contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
         >
-          <HeaderCard mode={mode} count={mode === 'settings' ? undefined : items.length} theme={theme} t={t} />
+          <HeaderCard mode={mode} count={mode === 'settings' ? undefined : (mode === 'messages' ? visibleMessageThreads.length : items.length)} theme={theme} t={t} />
 
           {isComposeRequested && !activeThread && !activeListing && !activeGroup && !activeEvent ? (
             <FederationComposeCard
@@ -1493,6 +1516,23 @@ export default function FederationDirectoryScreen({ mode }: { mode: DirectoryMod
             </Surface>
           ) : null}
 
+          {mode === 'messages' && partnerFilters.length > 0 ? (
+            <Surface variant="secondary" className="mb-4 rounded-panel p-4">
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+                <FilterChip label={t('directory.filters.allCommunities')} selected={!selectedPartner} onPress={() => setSelectedPartner('')} tone={primary} />
+                {partnerFilters.map((partner) => (
+                  <FilterChip
+                    key={String(partner.id)}
+                    label={partner.name}
+                    selected={selectedPartner === String(partner.id)}
+                    onPress={() => setSelectedPartner(String(partner.id))}
+                    tone={primary}
+                  />
+                ))}
+              </ScrollView>
+            </Surface>
+          ) : null}
+
           {mode === 'settings' ? (
             <SettingsScreen theme={theme} primary={primary} t={t} />
           ) : activeListing ? (
@@ -1539,9 +1579,13 @@ export default function FederationDirectoryScreen({ mode }: { mode: DirectoryMod
               <Text className="text-center text-sm" style={{ color: theme.text }}>{error}</Text>
               <HeroButton variant="secondary" onPress={refresh}><HeroButton.Label>{t('directory.tryAgain')}</HeroButton.Label></HeroButton>
             </Surface>
-          ) : items.length === 0 ? (
+          ) : isEmpty ? (
             <Surface variant="secondary" className="rounded-panel p-5">
-              <EmptyState icon={meta.icon} title={t(`directory.${mode}.emptyTitle`)} subtitle={t(`directory.${mode}.emptyDescription`)} />
+              <EmptyState
+                icon={meta.icon}
+                title={mode === 'messages' && selectedPartner ? t('directory.messages.emptyForPartnerTitle') : t(`directory.${mode}.emptyTitle`)}
+                subtitle={mode === 'messages' && selectedPartner ? t('directory.messages.emptyForPartnerDescription') : t(`directory.${mode}.emptyDescription`)}
+              />
             </Surface>
           ) : (
             <View>
@@ -1577,7 +1621,7 @@ export default function FederationDirectoryScreen({ mode }: { mode: DirectoryMod
                   onPress={() => openEvent(item)}
                 />
               ))}
-              {mode === 'messages' && messageThreads.map((thread) => (
+              {mode === 'messages' && visibleMessageThreads.map((thread) => (
                 <MessageCard
                   key={thread.key}
                   thread={thread}

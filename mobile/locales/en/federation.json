@@ -214,6 +214,8 @@
       "subtitle": "Review conversations with members from partner communities.",
       "emptyTitle": "No federated messages yet",
       "emptyDescription": "Messages with partner communities will appear here.",
+      "emptyForPartnerTitle": "No messages with this partner yet",
+      "emptyForPartnerDescription": "Start from a federated member profile, or clear the community filter to view every conversation.",
       "unavailableTitle": "Federated messaging is not enabled",
       "unavailableDescription": "Federation is active for this tenant, but cross-community messaging is disabled. A community administrator needs to enable federated messaging before conversations can be used.",
       "unknownSender": "Community member",

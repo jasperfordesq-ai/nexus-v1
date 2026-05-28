@@ -214,6 +214,7 @@ export interface FederatedMessage {
     tenant_name?: string;
   };
   is_external?: boolean;
+  external_partner_id?: number | string;
 }
 
 export interface FederationSettings {
