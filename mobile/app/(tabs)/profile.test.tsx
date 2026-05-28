@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { fireEvent, render } from '@testing-library/react-native';
 
 // --- Mocks ---
 
@@ -39,6 +39,7 @@ jest.mock('react-i18next', () => ({
         'marketplaceMyListings': 'My marketplace listings',
         'marketplaceSellerSetup': 'Seller setup',
         'marketplaceOrders': 'Marketplace orders',
+        'marketplaceSales': 'Sales orders',
         'marketplacePickups': 'Marketplace pickups',
         'marketplaceShipping': 'Shipping options',
         'marketplaceCoupons': 'Marketplace coupons',
@@ -91,6 +92,7 @@ jest.mock('react-i18next', () => ({
         'navDescriptions.marketplaceMyListings': 'Review, edit, and manage the marketplace items you have listed.',
         'navDescriptions.marketplaceSellerSetup': 'Create or update the seller profile used by marketplace buyers.',
         'navDescriptions.marketplaceOrders': 'Track marketplace purchases, sales, payments, pickup, delivery, ratings, and disputes.',
+        'navDescriptions.marketplaceSales': 'Manage orders placed with you, including fulfillment, pickup, delivery, and buyer updates.',
         'navDescriptions.marketplacePickups': 'Show pickup reservations and QR codes for click-and-collect orders.',
         'navDescriptions.marketplaceShipping': 'Review postage, collection, local delivery, and community delivery options.',
         'navDescriptions.marketplaceCoupons': 'Browse active merchant coupons and show checkout QR codes.',
@@ -175,6 +177,7 @@ jest.mock('@/components/ui/Skeleton', () => ({
 // --- Tests ---
 
 import MoreScreen from './profile';
+import { router } from 'expo-router';
 
 describe('MoreScreen (More tab)', () => {
   beforeEach(() => {
@@ -238,6 +241,7 @@ describe('MoreScreen (More tab)', () => {
     expect(getByText('My marketplace listings')).toBeTruthy();
     expect(getByText('Seller setup')).toBeTruthy();
     expect(getByText('Marketplace orders')).toBeTruthy();
+    expect(getByText('Sales orders')).toBeTruthy();
     expect(getByText('Marketplace pickups')).toBeTruthy();
     expect(getByText('Shipping options')).toBeTruthy();
     expect(getByText('Marketplace coupons')).toBeTruthy();
@@ -247,6 +251,17 @@ describe('MoreScreen (More tab)', () => {
     expect(getByText('Pickup tools')).toBeTruthy();
     expect(getByText('Seller tools')).toBeTruthy();
     expect(getByText('Seller payments')).toBeTruthy();
+  });
+
+  it('opens the seller sales orders view from Marketplace shortcuts', () => {
+    const { getByLabelText } = render(<MoreScreen />);
+
+    fireEvent.press(getByLabelText('Sales orders'));
+
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/(modals)/marketplace-orders',
+      params: { mode: 'sales' },
+    });
   });
 
   it('renders Settings in the Account section', () => {
