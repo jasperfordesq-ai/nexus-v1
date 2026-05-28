@@ -123,6 +123,7 @@ function MarketplaceScreen() {
     if (!selectedCategory) return t('filters.allCategories');
     return categories.find((category) => category.id === selectedCategory)?.name ?? t('filters.allCategories');
   }, [categories, selectedCategory, t]);
+  const shouldShowFeatured = featured.length > 0 && !debouncedQuery && !selectedCategory && !priceType;
 
   if (!hasFeature('marketplace')) {
     return (
@@ -287,7 +288,7 @@ function MarketplaceScreen() {
                   key={category.id}
                   size="sm"
                   variant={selectedCategory === category.id ? 'primary' : 'secondary'}
-                  onPress={() => router.push({ pathname: '/(modals)/marketplace-category', params: { id: String(category.id), name: category.name } } as unknown as Href)}
+                  onPress={() => setSelectedCategory(category.id)}
                   style={selectedCategory === category.id ? { backgroundColor: primary } : undefined}
                 >
                   <HeroButton.Label>{category.name}</HeroButton.Label>
@@ -309,7 +310,7 @@ function MarketplaceScreen() {
               ))}
             </ScrollView>
 
-            {featured.length > 0 ? (
+            {shouldShowFeatured ? (
               <HeroCard className="mb-3 rounded-panel p-0">
                 <HeroCard.Body className="gap-3 p-3">
                   <View className="flex-row items-center justify-between">
