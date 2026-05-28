@@ -736,6 +736,36 @@ function OrderCard({
               <HeroButton.Label>{t('orders.markShipped')}</HeroButton.Label>
             </HeroButton>
           ) : null}
+          {mode === 'sales' && item.status === 'pending_payment' ? (
+            <HeroButton className="flex-1" size="sm" variant="secondary" isDisabled style={{ minWidth: '46%' }}>
+              <Ionicons name="card-outline" size={14} color={theme.textMuted} />
+              <HeroButton.Label>{t('orders.awaitingPayment')}</HeroButton.Label>
+            </HeroButton>
+          ) : null}
+          {mode === 'sales' && item.status === 'shipped' ? (
+            <HeroButton className="flex-1" size="sm" variant="secondary" isDisabled style={{ minWidth: '46%' }}>
+              <Ionicons name="time-outline" size={14} color={theme.textMuted} />
+              <HeroButton.Label>{t('orders.awaitingConfirmation')}</HeroButton.Label>
+            </HeroButton>
+          ) : null}
+          {mode === 'sales' && item.status === 'delivered' ? (
+            <HeroButton className="flex-1" size="sm" variant="secondary" isDisabled style={{ minWidth: '46%' }}>
+              <Ionicons name="hourglass-outline" size={14} color={theme.textMuted} />
+              <HeroButton.Label>{t('orders.awaitingCompletion')}</HeroButton.Label>
+            </HeroButton>
+          ) : null}
+          {mode === 'sales' && item.status === 'completed' ? (
+            <HeroButton className="flex-1" size="sm" variant="secondary" isDisabled style={{ minWidth: '46%' }}>
+              <Ionicons name="checkmark-circle-outline" size={14} color={theme.success} />
+              <HeroButton.Label>{t('orders.saleCompleted')}</HeroButton.Label>
+            </HeroButton>
+          ) : null}
+          {mode === 'sales' && item.status === 'disputed' ? (
+            <HeroButton className="flex-1" size="sm" variant="danger-soft" isDisabled style={{ minWidth: '46%' }}>
+              <Ionicons name="alert-circle-outline" size={14} color={theme.error} />
+              <HeroButton.Label>{t('orders.disputeOpen')}</HeroButton.Label>
+            </HeroButton>
+          ) : null}
           {mode === 'purchases' && item.status === 'shipped' ? (
             <HeroButton className="flex-1" size="sm" variant="primary" isDisabled={isSubmitting} onPress={onConfirmDelivery} style={{ minWidth: '46%', backgroundColor: theme.success }}>
               <Ionicons name="checkmark-circle-outline" size={14} color="#fff" />

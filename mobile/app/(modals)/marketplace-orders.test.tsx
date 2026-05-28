@@ -13,10 +13,11 @@ let mockAuthState: {
   isAuthenticated: true,
   isLoading: false,
 };
+let mockParams: Record<string, string> = {};
 
 jest.mock('expo-router', () => ({
   router: { push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
-  useLocalSearchParams: () => ({}),
+  useLocalSearchParams: () => mockParams,
 }));
 
 jest.mock('react-i18next', () => ({
@@ -42,16 +43,30 @@ jest.mock('react-i18next', () => ({
         'orders.deliveryOffers': 'Delivery offers',
         'orders.waitingShipment': 'Waiting for shipment',
         'orders.continuePayment': 'Continue payment',
+        'orders.awaitingPayment': 'Awaiting payment',
+        'orders.awaitingConfirmation': 'Awaiting buyer confirmation',
+        'orders.awaitingCompletion': 'Awaiting completion',
+        'orders.saleCompleted': 'Sale completed',
+        'orders.disputeOpen': 'Dispute open',
         'orders.deliveryOffersTitle': 'Community delivery',
         'orders.deliveryVerified': 'Verified',
         'orders.acceptDeliveryOffer': 'Accept offer',
         'orders.status.paid': 'Paid',
         'orders.status.pending_payment': 'Pending payment',
+        'orders.status.shipped': 'Shipped',
+        'orders.status.delivered': 'Delivered',
+        'orders.status.completed': 'Completed',
+        'orders.status.disputed': 'Disputed',
         'orders.status.unknown': 'Unknown status',
         'orders.deliveryStatus.pending': 'Pending',
         'orders.statusHint.purchases.pending_payment': 'Payment is not complete yet. Continue checkout to keep this purchase moving.',
         'orders.statusHint.purchases.paid': 'Payment is complete. The seller can now prepare the order.',
+        'orders.statusHint.sales.pending_payment': 'The buyer still needs to finish payment before you ship.',
         'orders.statusHint.sales.paid': 'Payment is complete. Mark the order shipped when it is ready.',
+        'orders.statusHint.sales.shipped': 'The order is on its way. Wait for the buyer to confirm delivery.',
+        'orders.statusHint.sales.delivered': 'Delivery is confirmed. The order will complete after review or auto-completion.',
+        'orders.statusHint.sales.completed': 'This sale is complete.',
+        'orders.statusHint.sales.disputed': 'A dispute is open on this sale.',
         'orders.statusHint.unknown': 'This order is in a status the app does not recognise yet.',
         'actions.view': 'View',
         'auth:login.submit': 'Sign in',
@@ -120,6 +135,7 @@ describe('MarketplaceOrdersRoute', () => {
       isAuthenticated: true,
       isLoading: false,
     };
+    mockParams = {};
     (getMarketplaceOrders as jest.Mock).mockResolvedValue({
       data: [],
       meta: { cursor: null, has_more: false },
@@ -225,6 +241,77 @@ describe('MarketplaceOrdersRoute', () => {
     expect(getAllByText('Pending payment').length).toBeGreaterThan(0);
     expect(getByText('Payment is not complete yet. Continue checkout to keep this purchase moving.')).toBeTruthy();
     expect(getByText('Continue payment')).toBeTruthy();
+    unmount();
+  });
+
+  it('shows seller-side payment and delivery status actions', async () => {
+    mockParams = { mode: 'sales' };
+    (getMarketplaceOrders as jest.Mock)
+      .mockResolvedValueOnce({
+        data: [
+          {
+            id: 61,
+            order_number: 'MKT-000061',
+            quantity: 1,
+            unit_price: 12,
+            total_price: 12,
+            currency: 'EUR',
+            status: 'pending_payment',
+            created_at: '2026-05-22T10:00:00Z',
+            listing: { id: 91, title: 'Pending seller sale', image: null, delivery_method: 'pickup' },
+            buyer: { id: 4, name: 'Bea Buyer', avatar_url: null },
+          },
+          {
+            id: 62,
+            order_number: 'MKT-000062',
+            quantity: 1,
+            unit_price: 14,
+            total_price: 14,
+            currency: 'EUR',
+            status: 'shipped',
+            created_at: '2026-05-23T10:00:00Z',
+            listing: { id: 92, title: 'Shipped seller sale', image: null, delivery_method: 'shipping' },
+            buyer: { id: 5, name: 'Bo Buyer', avatar_url: null },
+          },
+          {
+            id: 63,
+            order_number: 'MKT-000063',
+            quantity: 1,
+            unit_price: 16,
+            total_price: 16,
+            currency: 'EUR',
+            status: 'delivered',
+            created_at: '2026-05-24T10:00:00Z',
+            listing: { id: 93, title: 'Delivered seller sale', image: null, delivery_method: 'shipping' },
+            buyer: { id: 6, name: 'Bay Buyer', avatar_url: null },
+          },
+          {
+            id: 64,
+            order_number: 'MKT-000064',
+            quantity: 1,
+            unit_price: 18,
+            total_price: 18,
+            currency: 'EUR',
+            status: 'disputed',
+            created_at: '2026-05-25T10:00:00Z',
+            listing: { id: 94, title: 'Disputed seller sale', image: null, delivery_method: 'shipping' },
+            buyer: { id: 7, name: 'Bex Buyer', avatar_url: null },
+          },
+        ],
+        meta: { cursor: null, has_more: false },
+      });
+
+    const { getByText, unmount } = render(<MarketplaceOrdersRoute />);
+
+    await waitFor(() => {
+      expect(getMarketplaceOrders).toHaveBeenCalledWith('sales', null, null);
+      expect(getByText('Pending seller sale')).toBeTruthy();
+    });
+
+    expect(getByText('Awaiting payment')).toBeTruthy();
+    expect(getByText('Awaiting buyer confirmation')).toBeTruthy();
+    expect(getByText('Awaiting completion')).toBeTruthy();
+    expect(getByText('Dispute open')).toBeTruthy();
     unmount();
   });
 
