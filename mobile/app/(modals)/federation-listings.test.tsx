@@ -42,6 +42,7 @@ jest.mock('react-i18next', () => ({
         'directory.resultsCount': `${String(opts?.count ?? 0)} results`,
         'directory.filters.allCommunities': 'All communities',
         'directory.unknownCommunity': 'Partner community',
+        'directory.external': 'External',
         'common:back': 'Back',
       };
       if (key === 'directory.listings.openDetails') return `Open details for ${String(opts?.title ?? '')}`;
@@ -198,5 +199,41 @@ describe('FederationListingsScreen', () => {
     await fetchPage(null);
 
     expect(getFederationListings).toHaveBeenCalledWith({ per_page: '30', partner_id: 'ext-2' });
+  });
+
+  it('routes external listing author actions through external federation identifiers', () => {
+    mockUsePaginatedApi.mockReturnValueOnce({
+      items: [{
+        ...listing,
+        id: 'ext-7-456',
+        title: 'External ladder',
+        author: { id: 123, name: 'External Sam', avatar: null },
+        timebank: { id: 99, name: 'Remote partner' },
+        is_external: true,
+      }],
+      isLoading: false,
+      isLoadingMore: false,
+      error: null,
+      hasMore: false,
+      loadMore: mockLoadMore,
+      refresh: mockRefresh,
+    });
+
+    const { router } = require('expo-router');
+    const { getByLabelText, getByText } = render(<FederationListingsScreen />);
+
+    fireEvent.press(getByLabelText('Open details for External ladder'));
+    fireEvent.press(getByText('View profile'));
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/(modals)/federation-member',
+      params: { id: 'ext-7-123', tenant_id: 'ext-7', name: 'External Sam' },
+    });
+
+    router.push.mockClear();
+    fireEvent.press(getByText('Message author'));
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/(modals)/federation-messages',
+      params: { compose: 'true', to_user: '123', to_tenant: 'ext-7', name: 'External Sam' },
+    });
   });
 });

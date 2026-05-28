@@ -124,11 +124,16 @@ function displayMemberName(member: FederatedMember, fallback: string) {
   return member.name?.trim() || `${member.first_name ?? ''} ${member.last_name ?? ''}`.trim() || fallback;
 }
 
-function externalTenantIdFromMemberId(memberId?: number | string | null): string | null {
-  const raw = String(memberId ?? '');
+function externalPartnerIdFromFederatedId(id?: number | string | null): string | null {
+  const raw = String(id ?? '');
   if (!raw.startsWith('ext-')) return null;
   const parts = raw.split('-', 3);
-  return parts[1] ? `ext-${parts[1]}` : null;
+  return parts[1] || null;
+}
+
+function externalTenantIdFromFederatedId(id?: number | string | null): string | null {
+  const partnerId = externalPartnerIdFromFederatedId(id);
+  return partnerId ? `ext-${partnerId}` : null;
 }
 
 function isFeatureDisabledError(error: string | null) {
@@ -325,7 +330,7 @@ function PartnerCard({ partner, t, theme, primary }: { partner: FederatedTenant;
 function MemberCard({ member, t, theme, primary }: { member: FederatedMember; t: (key: string, opts?: Record<string, unknown>) => string; theme: ReturnType<typeof useTheme>; primary: string }) {
   const name = displayMemberName(member, t('directory.members.memberFallback'));
   const tenantId = member.is_external
-    ? externalTenantIdFromMemberId(member.id) ?? member.tenant_id ?? member.timebank?.id
+    ? externalTenantIdFromFederatedId(member.id) ?? member.tenant_id ?? member.timebank?.id
     : member.tenant_id ?? member.timebank?.id;
   return (
     <HeroCard className="mb-3 rounded-panel p-0">
@@ -376,6 +381,15 @@ function listingCommunityName(listing: FederatedListing, t: (key: string, opts?:
 
 function listingAuthorName(listing: FederatedListing, t: (key: string, opts?: Record<string, unknown>) => string) {
   return listing.author?.name ?? t('directory.listings.anonymousUser');
+}
+
+function externalListingAuthorProfileId(listing: FederatedListing): string | number | null {
+  if (!listing.author?.id) return null;
+  if (!listing.is_external) return listing.author.id;
+  const rawAuthorId = String(listing.author.id);
+  if (rawAuthorId.startsWith('ext-')) return rawAuthorId;
+  const partnerId = externalPartnerIdFromFederatedId(listing.id);
+  return partnerId ? `ext-${partnerId}-${rawAuthorId}` : null;
 }
 
 function ListingCard({
@@ -457,14 +471,22 @@ function ListingDetailView({
 }) {
   const isOffer = listing.type === 'offer';
   const typeColor = isOffer ? '#22c55e' : '#f59e0b';
-  const tenantId = listing.timebank?.id;
+  const tenantId = listing.is_external
+    ? externalTenantIdFromFederatedId(listing.id) ?? listing.timebank?.id
+    : listing.timebank?.id;
+  const authorProfileId = externalListingAuthorProfileId(listing);
   const authorName = listingAuthorName(listing, t);
-  const canOpenAuthor = Boolean(listing.author?.id && tenantId && !listing.is_external);
+  const canOpenAuthor = Boolean(authorProfileId && tenantId);
   const canMessageAuthor = Boolean(listing.author?.id && tenantId);
 
   function openAuthorProfile() {
-    if (!listing.author?.id || !tenantId) return;
-    router.push({ pathname: '/(modals)/federation-member', params: { id: String(listing.author.id), tenant_id: String(tenantId) } } as unknown as Href);
+    if (!authorProfileId || !tenantId) return;
+    router.push({
+      pathname: '/(modals)/federation-member',
+      params: listing.is_external
+        ? { id: String(authorProfileId), tenant_id: String(tenantId), name: authorName }
+        : { id: String(authorProfileId), tenant_id: String(tenantId) },
+    } as unknown as Href);
   }
 
   function messageAuthor() {
