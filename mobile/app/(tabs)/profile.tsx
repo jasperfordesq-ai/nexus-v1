@@ -37,6 +37,7 @@ const MY_SPACE: MenuItem[] = [
   { labelKey: 'achievements', descriptionKey: 'navDescriptions.achievements', icon: 'trophy-outline', route: '/(modals)/gamification', tone: '#f59e0b' },
   { labelKey: 'myGoals', descriptionKey: 'navDescriptions.myGoals', icon: 'flag-outline', route: '/(modals)/goals', tone: '#8b5cf6' },
   { labelKey: 'groups', descriptionKey: 'navDescriptions.groups', icon: 'people-outline', route: '/(modals)/groups', tone: '#06b6d4' },
+  { labelKey: 'groupExchanges', descriptionKey: 'navDescriptions.groupExchanges', icon: 'swap-horizontal-outline', route: '/(modals)/group-exchanges' as Href, tone: '#6366f1', featureGate: 'group_exchanges' },
 ];
 
 const DISCOVER: MenuItem[] = [

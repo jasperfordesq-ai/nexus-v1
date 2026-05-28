@@ -58,6 +58,7 @@ jest.mock('react-i18next', () => ({
         'search': 'Search',
         'jobs': 'Jobs',
         'groups': 'Groups',
+        'groupExchanges': 'Group exchanges',
         'events': 'Events',
         'aiChat': 'AI Assistant',
         'achievements': 'Achievements',
@@ -93,6 +94,7 @@ jest.mock('react-i18next', () => ({
         'navDescriptions.achievements': 'Badges, levels, streaks, and community progress.',
         'navDescriptions.myGoals': 'Track personal goals and timebank milestones.',
         'navDescriptions.groups': 'Your community spaces and group conversations.',
+        'navDescriptions.groupExchanges': 'Review multi-person time exchanges, splits, confirmations, and completion status.',
         'navDescriptions.search': 'Search listings, members, events, groups, and posts.',
         'navDescriptions.listings': 'Browse offers, requests, and timebank exchanges.',
         'navDescriptions.marketplace': 'Buy, sell, save, and manage community marketplace listings.',
@@ -236,6 +238,7 @@ describe('MoreScreen (More tab)', () => {
     expect(getByText('Achievements')).toBeTruthy();
     expect(getByText('My Goals')).toBeTruthy();
     expect(getByText('Groups')).toBeTruthy();
+    expect(getByText('Group exchanges')).toBeTruthy();
   });
 
   it('renders Discover section with community navigation items', () => {
