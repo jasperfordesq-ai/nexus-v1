@@ -37,7 +37,16 @@ export default function MessagesScreen() {
   const primary = usePrimaryColor();
   const theme = useTheme();
   const navigation = useRouter();
-  const params = useLocalSearchParams<{ to?: string | string[]; to_user?: string | string[]; name?: string | string[]; listing?: string | string[] }>();
+  const params = useLocalSearchParams<{
+    to?: string | string[];
+    to_user?: string | string[];
+    user?: string | string[];
+    name?: string | string[];
+    listing?: string | string[];
+    context?: string | string[];
+    context_type?: string | string[];
+    context_id?: string | string[];
+  }>();
   const [searchQuery, setSearchQuery] = useState('');
   const handledDeepLinkRef = useRef<string | null>(null);
 
@@ -65,19 +74,23 @@ export default function MessagesScreen() {
   const hasSearchQuery = searchQuery.trim().length > 0;
 
   useEffect(() => {
-    const recipientParam = firstParam(params.to) ?? firstParam(params.to_user);
+    const recipientParam = firstParam(params.to) ?? firstParam(params.to_user) ?? firstParam(params.user);
     if (!recipientParam) return;
     const recipientId = Number(recipientParam);
     if (!Number.isFinite(recipientId) || recipientId <= 0) return;
     const recipientName = firstParam(params.name);
     const listing = firstParam(params.listing);
-    const deepLinkKey = [recipientId, recipientName ?? '', listing ?? ''].join(':');
+    const contextType = firstParam(params.context_type) ?? firstParam(params.context);
+    const contextId = firstParam(params.context_id);
+    const deepLinkKey = [recipientId, recipientName ?? '', listing ?? '', contextType ?? '', contextId ?? ''].join(':');
     if (handledDeepLinkRef.current === deepLinkKey) return;
     handledDeepLinkRef.current = deepLinkKey;
     if (Platform.OS === 'web' && typeof window !== 'undefined') {
       const threadParams = new URLSearchParams({ recipientId: String(recipientId) });
       if (recipientName) threadParams.set('name', recipientName);
       if (listing) threadParams.set('listing', listing);
+      if (contextType) threadParams.set('context_type', contextType);
+      if (contextId) threadParams.set('context_id', contextId);
       window.location.assign(`/thread?${threadParams.toString()}`);
       return;
     }
@@ -87,9 +100,11 @@ export default function MessagesScreen() {
         recipientId: String(recipientId),
         ...(recipientName ? { name: recipientName } : {}),
         ...(listing ? { listing } : {}),
+        ...(contextType ? { context_type: contextType } : {}),
+        ...(contextId ? { context_id: contextId } : {}),
       },
     } as never);
-  }, [navigation, params.listing, params.name, params.to, params.to_user]);
+  }, [navigation, params.context, params.context_id, params.context_type, params.listing, params.name, params.to, params.to_user, params.user]);
 
   const openNewMessage = useCallback(() => {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

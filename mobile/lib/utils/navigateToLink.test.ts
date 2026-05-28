@@ -51,4 +51,27 @@ describe('navigateToLink', () => {
     expect(mockPush).toHaveBeenNthCalledWith(1, { pathname: '/(modals)/federation-partner', params: { id: '7' } });
     expect(mockPush).toHaveBeenNthCalledWith(2, { pathname: '/(modals)/member-profile', params: { id: '272', tenant_id: '5' } });
   });
+
+  it('maps web message compose links to the native thread composer', () => {
+    navigateToLink('/messages/new/260?listing=90624');
+    navigateToLink('/messages?user=272&context=job&context_id=44&name=Alice');
+
+    expect(mockPush).toHaveBeenNthCalledWith(1, {
+      pathname: '/(modals)/thread',
+      params: { recipientId: '260', listing: '90624' },
+    });
+    expect(mockPush).toHaveBeenNthCalledWith(2, {
+      pathname: '/(modals)/thread',
+      params: { recipientId: '272', context_type: 'job', context_id: '44', name: 'Alice' },
+    });
+  });
+
+  it('keeps existing message thread links on the thread route', () => {
+    navigateToLink('/messages/5?context_type=event&context_id=12');
+
+    expect(mockPush).toHaveBeenCalledWith({
+      pathname: '/(modals)/thread',
+      params: { id: '5', context_type: 'event', context_id: '12' },
+    });
+  });
 });

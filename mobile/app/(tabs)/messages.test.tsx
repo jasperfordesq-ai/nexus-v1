@@ -227,6 +227,22 @@ describe('MessagesScreen', () => {
     });
   });
 
+  it('routes contextual user query links to the native thread composer', () => {
+    mockSearchParams.mockReturnValue({ user: '260', name: 'Jasper Ford', context: 'job', context_id: '44' });
+
+    render(<MessagesScreen />);
+
+    expect(mockRouterPush).toHaveBeenCalledWith({
+      pathname: '/(modals)/thread',
+      params: {
+        recipientId: '260',
+        name: 'Jasper Ford',
+        context_type: 'job',
+        context_id: '44',
+      },
+    });
+  });
+
   it('opens the new group route from the header action', () => {
     const { getByLabelText } = render(<MessagesScreen />);
 

@@ -95,6 +95,12 @@ export interface MessageListResponse {
   };
 }
 
+export interface SendMessageOptions {
+  listing_id?: number;
+  context_type?: string;
+  context_id?: number;
+}
+
 /** GET /api/v2/messages — list conversations for current user */
 export function getConversations(cursor?: string | null): Promise<ConversationListResponse> {
   const params: Record<string, string> = {};
@@ -136,6 +142,10 @@ export function deleteConversation(conversationId: number): Promise<void> {
 }
 
 /** POST /api/v2/messages — send a message to a recipient */
-export function sendMessage(recipientId: number, body: string): Promise<{ data: Message }> {
-  return api.post<{ data: Message }>(`${API_V2}/messages`, { recipient_id: recipientId, body });
+export function sendMessage(recipientId: number, body: string, options: SendMessageOptions = {}): Promise<{ data: Message }> {
+  return api.post<{ data: Message }>(`${API_V2}/messages`, {
+    recipient_id: recipientId,
+    body,
+    ...options,
+  });
 }

@@ -142,6 +142,24 @@ describe('sendMessage', () => {
     expect(result.data.body).toBe('Hello there!');
   });
 
+  it('includes contextual compose fields when provided', async () => {
+    (api.post as jest.Mock).mockResolvedValue({ data: mockMessage });
+
+    await sendMessage(2, 'I can help with this.', {
+      listing_id: 9,
+      context_type: 'job',
+      context_id: 44,
+    });
+
+    expect(api.post).toHaveBeenCalledWith('/api/v2/messages', {
+      recipient_id: 2,
+      body: 'I can help with this.',
+      listing_id: 9,
+      context_type: 'job',
+      context_id: 44,
+    });
+  });
+
   it('propagates errors from the API', async () => {
     (api.post as jest.Mock).mockRejectedValue(new Error('Forbidden'));
     await expect(sendMessage(2, 'Hi')).rejects.toThrow('Forbidden');

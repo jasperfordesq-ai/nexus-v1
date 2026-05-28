@@ -8,9 +8,11 @@ import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 // --- Mocks ---
 
+let mockThreadSearchParams: Record<string, string> = { id: '5', name: 'Alice' };
+
 jest.mock('expo-router', () => ({
   router: { push: jest.fn(), back: jest.fn() },
-  useLocalSearchParams: () => ({ id: '5', name: 'Alice' }),
+  useLocalSearchParams: () => mockThreadSearchParams,
   useNavigation: () => ({ setOptions: jest.fn() }),
 }));
 
@@ -119,6 +121,8 @@ const mockMessages = [
 ];
 
 beforeEach(() => {
+  mockThreadSearchParams = { id: '5', name: 'Alice' };
+  (sendMessage as jest.Mock).mockClear();
   mockUseApi.mockReturnValue({ data: null, isLoading: false, error: null, refresh: jest.fn() });
 });
 
@@ -197,6 +201,35 @@ describe('ThreadScreen', () => {
 
     await waitFor(() => {
       expect(sendMessage).toHaveBeenCalledWith(42, 'Thanks Alice');
+    });
+  });
+
+  it('sends contextual fields for a new conversation from deep-link params', async () => {
+    mockThreadSearchParams = {
+      recipientId: '42',
+      name: 'Alice',
+      listing: '9',
+      context_type: 'job',
+      context_id: '44',
+    };
+    mockUseApi.mockReturnValue({
+      data: { data: [] },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByLabelText, getByPlaceholderText } = render(<ThreadScreen />);
+
+    fireEvent.changeText(getByPlaceholderText('Type a message...'), 'I can help with this.');
+    fireEvent.press(getByLabelText('Send'));
+
+    await waitFor(() => {
+      expect(sendMessage).toHaveBeenCalledWith(42, 'I can help with this.', {
+        listing_id: 9,
+        context_type: 'job',
+        context_id: 44,
+      });
     });
   });
 });

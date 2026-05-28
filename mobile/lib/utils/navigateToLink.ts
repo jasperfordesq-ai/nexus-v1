@@ -57,8 +57,7 @@ export function navigateToLink(link: string | null): void {
       else router.push('/(modals)/members');
       break;
     case 'messages':
-      if (id) router.push({ pathname: '/(modals)/thread', params: { id } });
-      else router.push('/(tabs)/messages');
+      navigateMessages(segments, params);
       break;
     case 'blog':
     case 'blog-post':
@@ -192,6 +191,41 @@ function navigateFederation(segments: string[], queryParams: Record<string, stri
       router.push({ pathname: '/(modals)/federation-partner', params: { id: branch, ...queryParams } });
       break;
   }
+}
+
+function navigateMessages(segments: string[], queryParams: Record<string, string>): void {
+  const [branch, detailId] = segments;
+  const params = normalizeMessageParams(queryParams);
+  const queryRecipientId = params.user ?? params.to ?? params.to_user;
+  delete params.user;
+  delete params.to;
+  delete params.to_user;
+
+  if (branch === 'new' && detailId) {
+    router.push({ pathname: '/(modals)/thread', params: { recipientId: detailId, ...params } });
+    return;
+  }
+
+  if (queryRecipientId) {
+    router.push({ pathname: '/(modals)/thread', params: { recipientId: queryRecipientId, ...params } });
+    return;
+  }
+
+  if (branch) {
+    router.push({ pathname: '/(modals)/thread', params: { id: branch, ...params } });
+    return;
+  }
+
+  pushWithOptionalParams('/(tabs)/messages', params);
+}
+
+function normalizeMessageParams(queryParams: Record<string, string>): Record<string, string> {
+  const params = { ...queryParams };
+  if (params.context && !params.context_type) {
+    params.context_type = params.context;
+  }
+  delete params.context;
+  return params;
 }
 
 function pushWithOptionalParams(pathname: string, params: Record<string, string>): void {

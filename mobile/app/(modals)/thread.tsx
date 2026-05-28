@@ -22,7 +22,7 @@ import * as Haptics from '@/lib/haptics';
 import { Button as HeroButton, Card as HeroCard, Spinner, Surface } from 'heroui-native';
 
 import { useTranslation } from 'react-i18next';
-import { displayName, getOrCreateThread, getThread, sendMessage, type Message } from '@/lib/api/messages';
+import { displayName, getOrCreateThread, getThread, sendMessage, type Message, type SendMessageOptions } from '@/lib/api/messages';
 import { useApi } from '@/lib/hooks/useApi';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -46,20 +46,33 @@ export default function ThreadScreen() {
 
 function ThreadScreenInner() {
   const { t } = useTranslation('messages');
-  const { id, recipientId, name } = useLocalSearchParams<{ id: string; recipientId: string; name: string }>();
+  const { id, recipientId, name, listing, context_type, context_id } = useLocalSearchParams<{
+    id?: string | string[];
+    recipientId?: string | string[];
+    name?: string | string[];
+    listing?: string | string[];
+    context_type?: string | string[];
+    context_id?: string | string[];
+  }>();
   const { user: authUser } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const { subscribeToMessages } = useRealtimeContext();
 
-  const directRecipientId = Number(recipientId);
-  const conversationId = Number(id);
+  const rawRecipientId = firstParam(recipientId);
+  const rawConversationId = firstParam(id);
+  const directRecipientId = Number(rawRecipientId);
+  const conversationId = Number(rawConversationId);
   const isNewConversation = Number.isFinite(directRecipientId) && directRecipientId > 0;
   const threadLookupId = isNewConversation ? directRecipientId : conversationId;
   const isValidId = Number.isFinite(threadLookupId) && threadLookupId > 0;
   const safeThreadLookupId = isValidId ? threadLookupId : 0;
-  const threadTitle = typeof name === 'string' && name.trim() ? name.trim() : t('threadTitle');
+  const recipientName = firstParam(name);
+  const threadTitle = recipientName?.trim() ? recipientName.trim() : t('threadTitle');
+  const listingId = parsePositiveInt(firstParam(listing));
+  const contextType = firstParam(context_type);
+  const contextId = parsePositiveInt(firstParam(context_id));
 
   const { data, isLoading, error, refresh } = useApi(
     () => (isNewConversation ? getOrCreateThread(safeThreadLookupId) : getThread(safeThreadLookupId)),
@@ -120,6 +133,17 @@ function ThreadScreenInner() {
     return incoming?.sender?.id ?? incoming?.sender_id ?? null;
   }, [data, isNewConversation, isValidId, safeThreadLookupId]);
 
+  const newConversationOptions = useMemo<SendMessageOptions | undefined>(() => {
+    if (!isNewConversation) return undefined;
+    const options: SendMessageOptions = {};
+    if (listingId) options.listing_id = listingId;
+    if (contextType && contextId) {
+      options.context_type = contextType;
+      options.context_id = contextId;
+    }
+    return Object.keys(options).length > 0 ? options : undefined;
+  }, [contextId, contextType, isNewConversation, listingId]);
+
   const handleSend = useCallback(async () => {
     const body = inputTextRef.current.trim();
     if (!body || isSending || resolvedRecipientId === null) return;
@@ -142,7 +166,9 @@ function ThreadScreenInner() {
     setIsSending(true);
 
     try {
-      const res = await sendMessage(resolvedRecipientId, body);
+      const res = newConversationOptions
+        ? await sendMessage(resolvedRecipientId, body, newConversationOptions)
+        : await sendMessage(resolvedRecipientId, body);
       setMessages((prev) => {
         if (prev.some((message) => message.id === res.data.id)) {
           return prev.filter((message) => message.id !== optimistic.id);
@@ -158,7 +184,7 @@ function ThreadScreenInner() {
     } finally {
       setIsSending(false);
     }
-  }, [isSending, resolvedRecipientId, t]);
+  }, [isSending, newConversationOptions, resolvedRecipientId, t]);
 
   if (!isValidId) {
     return (
@@ -365,6 +391,17 @@ function CenteredState({
       </HeroCard.Body>
     </HeroCard>
   );
+}
+
+function firstParam(value: string | string[] | undefined): string | undefined {
+  if (Array.isArray(value)) return value[0];
+  return value;
+}
+
+function parsePositiveInt(value: string | undefined): number | undefined {
+  if (!value) return undefined;
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
 }
 
 function formatTime(iso: string): string {
