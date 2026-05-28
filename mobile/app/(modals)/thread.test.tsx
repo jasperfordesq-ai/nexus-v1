@@ -9,16 +9,17 @@ import { fireEvent, render, waitFor } from '@testing-library/react-native';
 // --- Mocks ---
 
 let mockThreadSearchParams: Record<string, string> = { id: '5', name: 'Alice' };
+const mockRouterPush = jest.fn();
 
 jest.mock('expo-router', () => ({
-  router: { push: jest.fn(), back: jest.fn() },
+  router: { push: (...args: unknown[]) => mockRouterPush(...args), back: jest.fn() },
   useLocalSearchParams: () => mockThreadSearchParams,
   useNavigation: () => ({ setOptions: jest.fn() }),
 }));
 
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string) => {
+    t: (key: string, options?: Record<string, unknown>) => {
       const map: Record<string, string> = {
         'thread.invalidConversation': 'Invalid conversation.',
         'thread.loadError': 'Failed to load messages.',
@@ -28,6 +29,13 @@ jest.mock('react-i18next', () => ({
         'thread.sendFailed': 'Message not sent.',
         'thread.goBack': 'Go back',
         'thread.messageCount': '2 messages',
+        'context.regarding': 'Regarding',
+        'context.open': 'Open context',
+        'context.title': `${String(options?.type ?? '')} #${String(options?.id ?? '')}`,
+        'context.type.listing': 'Listing',
+        'context.type.event': 'Event',
+        'context.type.job': 'Job',
+        'context.type.volunteering': 'Volunteering',
         'messages:send': 'Send',
         'errors.sendFailed': 'Send failed',
         'common:buttons.retry': 'Retry',
@@ -122,6 +130,7 @@ const mockMessages = [
 
 beforeEach(() => {
   mockThreadSearchParams = { id: '5', name: 'Alice' };
+  mockRouterPush.mockClear();
   (sendMessage as jest.Mock).mockClear();
   mockUseApi.mockReturnValue({ data: null, isLoading: false, error: null, refresh: jest.fn() });
 });
@@ -230,6 +239,33 @@ describe('ThreadScreen', () => {
         context_type: 'job',
         context_id: 44,
       });
+    });
+  });
+
+  it('shows supported context cards that open native detail routes', () => {
+    mockThreadSearchParams = {
+      recipientId: '42',
+      name: 'Alice',
+      context_type: 'job',
+      context_id: '44',
+    };
+    mockUseApi.mockReturnValue({
+      data: { data: [] },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByLabelText, getByText } = render(<ThreadScreen />);
+
+    expect(getByText('Regarding')).toBeTruthy();
+    expect(getByText('Job #44')).toBeTruthy();
+
+    fireEvent.press(getByLabelText('Open context'));
+
+    expect(mockRouterPush).toHaveBeenCalledWith({
+      pathname: '/(modals)/job-detail',
+      params: { id: '44' },
     });
   });
 });

@@ -10,16 +10,17 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   RefreshControl,
   Text,
   TextInput,
   View,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from '@/lib/haptics';
-import { Button as HeroButton, Card as HeroCard, Spinner, Surface } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
 
 import { useTranslation } from 'react-i18next';
 import { displayName, getOrCreateThread, getThread, sendMessage, type Message, type SendMessageOptions } from '@/lib/api/messages';
@@ -28,6 +29,7 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { useRealtimeContext } from '@/lib/context/RealtimeContext';
+import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -35,6 +37,18 @@ import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import OfflineBanner from '@/components/OfflineBanner';
 import TypingIndicator from '@/components/TypingIndicator';
 import VoiceMessageBubble from '@/components/VoiceMessageBubble';
+
+type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
+
+const THREAD_CONTEXT_CONFIG = {
+  listing: { icon: 'list-outline', labelKey: 'context.type.listing', pathname: '/(modals)/exchange-detail', color: '#06b6d4' },
+  event: { icon: 'calendar-outline', labelKey: 'context.type.event', pathname: '/(modals)/event-detail', color: '#6366f1' },
+  job: { icon: 'briefcase-outline', labelKey: 'context.type.job', pathname: '/(modals)/job-detail', color: '#f59e0b' },
+  volunteering: { icon: 'heart-outline', labelKey: 'context.type.volunteering', pathname: '/(modals)/volunteering-detail', color: '#ef4444' },
+} as const satisfies Record<string, { icon: IoniconName; labelKey: string; pathname: string; color: string }>;
+
+type ThreadContextType = keyof typeof THREAD_CONTEXT_CONFIG;
+type ThreadContext = { type: ThreadContextType; id: number };
 
 export default function ThreadScreen() {
   return (
@@ -73,6 +87,7 @@ function ThreadScreenInner() {
   const listingId = parsePositiveInt(firstParam(listing));
   const contextType = firstParam(context_type);
   const contextId = parsePositiveInt(firstParam(context_id));
+  const threadContext = useMemo(() => resolveThreadContext(listingId, contextType, contextId), [contextId, contextType, listingId]);
 
   const { data, isLoading, error, refresh } = useApi(
     () => (isNewConversation ? getOrCreateThread(safeThreadLookupId) : getThread(safeThreadLookupId)),
@@ -236,6 +251,10 @@ function ThreadScreenInner() {
           <Ionicons name="lock-closed-outline" size={16} color={theme.textMuted} />
         </Surface>
 
+        {threadContext ? (
+          <ThreadContextCard context={threadContext} t={t} theme={theme} primary={primary} />
+        ) : null}
+
         <FlatList<Message>
           ref={flatListRef}
           data={messages}
@@ -292,6 +311,55 @@ function ThreadScreenInner() {
         </Surface>
       </KeyboardAvoidingView>
     </SafeAreaView>
+  );
+}
+
+function ThreadContextCard({
+  context,
+  t,
+  theme,
+  primary,
+}: {
+  context: ThreadContext;
+  t: (key: string, options?: Record<string, unknown>) => string;
+  theme: ReturnType<typeof useTheme>;
+  primary: string;
+}) {
+  const config = THREAD_CONTEXT_CONFIG[context.type];
+  const typeLabel = t(config.labelKey);
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={t('context.open')}
+      className="mx-4 mb-2"
+      onPress={() => {
+        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        router.push({ pathname: config.pathname, params: { id: String(context.id) } } as never);
+      }}
+    >
+      <HeroCard variant="secondary" className="overflow-hidden rounded-panel p-0">
+        <HeroCard.Body className="flex-row items-center gap-3 px-4 py-3">
+          <View className="h-11 w-11 items-center justify-center rounded-panel-inner" style={{ backgroundColor: withAlpha(config.color, 0.14) }}>
+            <Ionicons name={config.icon} size={22} color={config.color} />
+          </View>
+          <View className="min-w-0 flex-1 gap-1">
+            <View className="flex-row flex-wrap items-center gap-2">
+              <Text className="text-xs font-semibold uppercase" style={{ color: theme.textMuted }}>
+                {t('context.regarding')}
+              </Text>
+              <Chip size="sm" variant="secondary">
+                <Chip.Label>{typeLabel}</Chip.Label>
+              </Chip>
+            </View>
+            <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+              {t('context.title', { type: typeLabel, id: context.id })}
+            </Text>
+          </View>
+          <Ionicons name="open-outline" size={18} color={primary} />
+        </HeroCard.Body>
+      </HeroCard>
+    </Pressable>
   );
 }
 
@@ -396,6 +464,16 @@ function CenteredState({
 function firstParam(value: string | string[] | undefined): string | undefined {
   if (Array.isArray(value)) return value[0];
   return value;
+}
+
+function resolveThreadContext(listingId: number | undefined, contextType: string | undefined, contextId: number | undefined): ThreadContext | null {
+  if (listingId) return { type: 'listing', id: listingId };
+  if (!contextType || !contextId || !isThreadContextType(contextType)) return null;
+  return { type: contextType, id: contextId };
+}
+
+function isThreadContextType(value: string): value is ThreadContextType {
+  return Object.prototype.hasOwnProperty.call(THREAD_CONTEXT_CONFIG, value);
 }
 
 function parsePositiveInt(value: string | undefined): number | undefined {

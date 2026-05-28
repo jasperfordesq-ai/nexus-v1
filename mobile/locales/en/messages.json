@@ -30,6 +30,17 @@
     "messageCount": "{{count}} message",
     "messageCount_other": "{{count}} messages"
   },
+  "context": {
+    "regarding": "Regarding",
+    "open": "Open related item",
+    "title": "{{type}} #{{id}}",
+    "type": {
+      "listing": "Listing",
+      "event": "Event",
+      "job": "Job",
+      "volunteering": "Volunteering"
+    }
+  },
   "voice": {
     "label": "Voice",
     "failed": "Failed",
