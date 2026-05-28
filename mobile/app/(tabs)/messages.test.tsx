@@ -234,6 +234,21 @@ describe('MessagesScreen', () => {
     expect(getByText('2h ago')).toBeTruthy();
   });
 
+  it('opens conversation cards by other user id instead of conversation id', () => {
+    mockUsePaginatedApi.mockReturnValue({
+      ...defaultPaginatedState,
+      items: [mockConversation],
+    });
+
+    const { getByLabelText } = render(<MessagesScreen />);
+    fireEvent.press(getByLabelText('Bob Builder, Can you help with plumbing?'));
+
+    expect(mockRouterPush).toHaveBeenCalledWith({
+      pathname: '/(modals)/thread',
+      params: { recipientId: '2', name: 'Bob Builder' },
+    });
+  });
+
   it('routes deep-linked recipients to the native thread composer', () => {
     mockSearchParams.mockReturnValue({ to: '260', name: 'Jasper Ford', listing: '90624' });
 

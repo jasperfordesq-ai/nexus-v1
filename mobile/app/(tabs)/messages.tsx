@@ -6,7 +6,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, FlatList, Platform, Pressable, RefreshControl, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router, useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Swipeable } from 'react-native-gesture-handler';
 import * as Haptics from '@/lib/haptics';
@@ -183,6 +183,13 @@ export default function MessagesScreen() {
         theme={theme}
         t={t}
         onArchive={handleArchiveConversation}
+        onOpen={(conversation) => {
+          const otherName = displayName(conversation.other_user);
+          void navigation.push({
+            pathname: '/(modals)/thread',
+            params: { recipientId: String(conversation.other_user.id), name: otherName },
+          } as never);
+        }}
       />
     );
   }
@@ -443,12 +450,14 @@ function ConversationCard({
   theme,
   t,
   onArchive,
+  onOpen,
 }: {
   conversation: Conversation;
   primary: string;
   theme: Theme;
   t: TFunction;
   onArchive: (conversation: Conversation) => void;
+  onOpen: (conversation: Conversation) => void;
 }) {
   const lastMsg = conversation.last_message;
   const otherName = displayName(conversation.other_user);
@@ -482,10 +491,7 @@ function ConversationCard({
         accessibilityRole="button"
         onPress={() => {
           void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          router.push({
-            pathname: '/(modals)/thread',
-            params: { id: String(conversation.id), name: otherName },
-          });
+          onOpen(conversation);
         }}
       >
         <HeroCard variant={isUnread ? 'default' : 'secondary'} className="w-full overflow-hidden">
