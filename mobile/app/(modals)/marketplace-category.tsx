@@ -63,7 +63,7 @@ function MarketplaceCategoryScreen() {
   const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
   const [priceMin, setPriceMin] = useState(firstParam(params.price_min) ?? '');
   const [priceMax, setPriceMax] = useState(firstParam(params.price_max) ?? '');
-  const [condition, setCondition] = useState<MarketplaceCondition | ''>(normalizeCondition(firstParam(params.condition)));
+  const [conditions, setConditions] = useState<MarketplaceCondition[]>(parseConditions(firstParam(params.condition)));
   const [sort, setSort] = useState<'newest' | 'price_asc' | 'price_desc' | 'popular'>(normalizeSort(firstParam(params.sort)));
   const [listings, setListings] = useState<MarketplaceListingItem[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
@@ -90,7 +90,7 @@ function MarketplaceCategoryScreen() {
         category_id: safeCategoryId,
         price_min: priceMin,
         price_max: priceMax,
-        condition,
+        condition: conditions.join(','),
         cursor: append ? cursor : null,
         limit: 20,
         sort,
@@ -109,24 +109,24 @@ function MarketplaceCategoryScreen() {
       setIsRefreshing(false);
       setIsLoadingMore(false);
     }
-  }, [condition, cursor, debouncedQuery, hasFeature, priceMax, priceMin, safeCategoryId, sort, t]);
+  }, [conditions, cursor, debouncedQuery, hasFeature, priceMax, priceMin, safeCategoryId, sort, t]);
 
   useEffect(() => {
     void fetchListings(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedQuery, condition, priceMin, priceMax, safeCategoryId, sort]);
+  }, [debouncedQuery, conditions.join(','), priceMin, priceMax, safeCategoryId, sort]);
 
   const activeFilterCount = [
     priceMin,
     priceMax,
-    condition,
+    conditions.length ? 'conditions' : '',
     sort !== 'newest' ? sort : '',
   ].filter(Boolean).length;
 
   function resetFilters() {
     setPriceMin('');
     setPriceMax('');
-    setCondition('');
+    setConditions([]);
     setSort('newest');
   }
 
@@ -140,6 +140,12 @@ function MarketplaceCategoryScreen() {
       setListings((current) => current.map((listing) => listing.id === item.id ? item : listing));
       Alert.alert(t('common:errors.alertTitle'), t('common.save_failed'));
     }
+  }
+
+  function toggleCondition(value: MarketplaceCondition) {
+    setConditions((current) => current.includes(value)
+      ? current.filter((item) => item !== value)
+      : [...current, value]);
   }
 
   if (!hasFeature('marketplace') || !safeCategoryId) {
@@ -203,9 +209,9 @@ function MarketplaceCategoryScreen() {
                 <HeroButton
                   key={value || 'all'}
                   size="sm"
-                  variant={condition === value ? 'primary' : 'secondary'}
-                  onPress={() => setCondition(value)}
-                  style={condition === value ? { backgroundColor: primary } : undefined}
+                  variant={(value ? conditions.includes(value) : conditions.length === 0) ? 'primary' : 'secondary'}
+                  onPress={() => value ? toggleCondition(value) : setConditions([])}
+                  style={(value ? conditions.includes(value) : conditions.length === 0) ? { backgroundColor: primary } : undefined}
                 >
                   <HeroButton.Label>{value ? t(`condition.${value}`) : t('category.allConditions')}</HeroButton.Label>
                 </HeroButton>
@@ -304,8 +310,10 @@ function firstParam(value?: string | string[]): string | undefined {
   return Array.isArray(value) ? value[0] : value;
 }
 
-function normalizeCondition(value?: string): MarketplaceCondition | '' {
-  return value === 'new' || value === 'like_new' || value === 'good' || value === 'fair' || value === 'poor' ? value : '';
+function parseConditions(value?: string): MarketplaceCondition[] {
+  if (!value) return [];
+  const allowed = new Set<MarketplaceCondition>(CONDITION_FILTERS.filter(Boolean) as MarketplaceCondition[]);
+  return value.split(',').filter((item): item is MarketplaceCondition => allowed.has(item as MarketplaceCondition));
 }
 
 function normalizeSort(value?: string): 'newest' | 'price_asc' | 'price_desc' | 'popular' {
