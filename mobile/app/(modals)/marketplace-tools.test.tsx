@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
+import { Alert } from 'react-native';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 let mockParams: Record<string, string> = {};
@@ -75,6 +76,22 @@ const mockT = (key: string, opts?: Record<string, unknown>) => {
     'tools.savedSearches.channel.email': 'Email',
     'tools.savedSearches.channel.push': 'Push',
     'tools.savedSearches.channel.both': 'Email and push',
+    'tools.promotions.title': 'Promotions',
+    'tools.promotions.subtitle': 'Promote your listings and review active promotion metrics.',
+    'tools.promotions.promote': 'Promote listing',
+    'tools.promotions.empty': 'No active promotions',
+    'tools.promotions.noListings': 'No active listings to promote',
+    'tools.promotions.noListingsHint': 'Publish a marketplace listing before creating a promotion.',
+    'tools.promotions.noProducts': 'Promotions unavailable',
+    'tools.promotions.noProductsHint': 'Promotion products will appear here when this marketplace enables them.',
+    'tools.promotions.free': 'Free',
+    'tools.promotions.durationHours': `${String(opts?.count ?? '')} hours`,
+    'tools.promotions.durationDays': `${String(opts?.count ?? '')} days`,
+    'tools.promotions.productMeta': `${String(opts?.price ?? '')} - ${String(opts?.duration ?? '')}`,
+    'tools.promotions.failed': 'Could not promote this listing.',
+    'tools.promotions.successTitle': 'Promotion created',
+    'tools.promotions.successHint': 'Your listing promotion is now active.',
+    'tools.promotions.metrics': `${String(opts?.impressions ?? '')} impressions - ${String(opts?.clicks ?? '')} clicks`,
     'tools.coupons.title': 'Seller coupons',
     'tools.coupons.subtitle': 'Create and manage merchant coupons for marketplace checkout.',
     'tools.coupons.code': 'Coupon code',
@@ -165,7 +182,12 @@ jest.mock('@/components/ui/AppTopBar', () => {
 });
 jest.mock('@/components/ui/EmptyState', () => {
   const { Text } = require('react-native');
-  return ({ title }: { title: string }) => <Text>{title}</Text>;
+  return ({ title, subtitle }: { title: string; subtitle?: string }) => (
+    <>
+      <Text>{title}</Text>
+      {subtitle ? <Text>{subtitle}</Text> : null}
+    </>
+  );
 });
 jest.mock('@/components/ui/LoadingSpinner', () => {
   const { Text } = require('react-native');
@@ -226,12 +248,16 @@ import MarketplaceToolsRoute from './marketplace-tools';
 import {
   createMarketplacePickupSlot,
   createMarketplaceSavedSearch,
-  getMarketplacePickupSlots,
   getMarketplaceCollections,
+  getMarketplacePickupSlots,
+  getMarketplacePromotionProducts,
   getMarketplaceSavedSearches,
   getMerchantCoupons,
   getMerchantCouponRedemptions,
+  getMyMarketplaceListings,
   getMyMarketplacePickups,
+  getMyMarketplacePromotions,
+  promoteMarketplaceListing,
   redeemPublicMerchantCouponQr,
   updateMarketplacePickupSlot,
 } from '@/lib/api/marketplace';
@@ -271,6 +297,10 @@ describe('MarketplaceToolsRoute', () => {
     jest.mocked(updateMarketplacePickupSlot).mockResolvedValue({ data: { id: 32 } } as never);
     jest.mocked(getMarketplaceSavedSearches).mockResolvedValue({ data: [] } as never);
     jest.mocked(createMarketplaceSavedSearch).mockResolvedValue({ data: { id: 21 } } as never);
+    jest.mocked(getMarketplacePromotionProducts).mockResolvedValue({ data: [] } as never);
+    jest.mocked(getMyMarketplaceListings).mockResolvedValue({ data: [], meta: { cursor: null, has_more: false } } as never);
+    jest.mocked(getMyMarketplacePromotions).mockResolvedValue({ data: [] } as never);
+    jest.mocked(promoteMarketplaceListing).mockResolvedValue({ data: { id: 99 } } as never);
     jest.mocked(getMerchantCoupons).mockResolvedValue({ data: { items: [coupon] } } as never);
     jest.mocked(getMerchantCouponRedemptions).mockResolvedValue({
       data: {
@@ -336,6 +366,43 @@ describe('MarketplaceToolsRoute', () => {
         alert_channel: 'both',
       });
     });
+  });
+
+  it('shows a clear promotions empty state when there are no active listings', async () => {
+    mockParams = { tab: 'promotions' };
+    jest.mocked(getMarketplacePromotionProducts).mockResolvedValue({
+      data: [{ type: 'bump', label: 'Bump', description: 'Move up search results', price: 5, currency: 'EUR', duration_hours: 24 }],
+    } as never);
+
+    const { findByText } = render(<MarketplaceToolsRoute />);
+
+    expect(await findByText('No active listings to promote')).toBeTruthy();
+    expect(await findByText('Publish a marketplace listing before creating a promotion.')).toBeTruthy();
+  });
+
+  it('creates promotions for the selected active listing and product', async () => {
+    mockParams = { tab: 'promotions' };
+    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
+    jest.mocked(getMyMarketplaceListings).mockResolvedValue({
+      data: [{ id: 42, title: 'Promotable lamp', price: 12, price_currency: 'EUR', price_type: 'fixed', image: null }],
+      meta: { cursor: null, has_more: false },
+    } as never);
+    jest.mocked(getMarketplacePromotionProducts).mockResolvedValue({
+      data: [{ type: 'featured', label: 'Featured', description: 'Highlight this listing', price: 10, currency: 'EUR', duration_hours: 168 }],
+    } as never);
+
+    const { findByText, getByText } = render(<MarketplaceToolsRoute />);
+
+    expect(await findByText('Promotable lamp')).toBeTruthy();
+    expect(await findByText('Featured')).toBeTruthy();
+    fireEvent.press(getByText('Promote listing'));
+
+    await waitFor(() => {
+      expect(promoteMarketplaceListing).toHaveBeenCalledWith(42, 'featured');
+      expect(Alert.alert).toHaveBeenCalledWith('Promotion created', 'Your listing promotion is now active.');
+      expect(getMyMarketplacePromotions).toHaveBeenCalledTimes(2);
+    });
+    alertSpy.mockRestore();
   });
 
   it('creates pickup slots with selected capacity and recurrence', async () => {

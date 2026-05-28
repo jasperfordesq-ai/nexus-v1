@@ -429,6 +429,7 @@ function PromotionsPanel() {
   const { user } = useAuth();
   const [selectedListing, setSelectedListing] = useState<number | null>(null);
   const [promotionType, setPromotionType] = useState<MarketplacePromotionProduct['type'] | null>(null);
+  const [isPromoting, setIsPromoting] = useState(false);
   const products = useApi(() => getMarketplacePromotionProducts(), [], { enabled: true });
   const promotions = useApi(() => getMyMarketplacePromotions(), [], { enabled: true });
   const listings = usePaginatedApi<MarketplaceListingItem, Awaited<ReturnType<typeof getMyMarketplaceListings>>>(
@@ -448,23 +449,33 @@ function PromotionsPanel() {
 
   async function promote() {
     if (!selectedListing || !promotionType) return;
+    setIsPromoting(true);
     try {
       await promoteMarketplaceListing(selectedListing, promotionType);
+      Alert.alert(t('tools.promotions.successTitle'), t('tools.promotions.successHint'));
       promotions.refresh();
     } catch (err) {
       Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.promotions.failed'));
+    } finally {
+      setIsPromoting(false);
     }
   }
 
   return (
     <PanelCard icon="megaphone-outline" title={t('tools.promotions.title')} subtitle={t('tools.promotions.subtitle')}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
-        {listings.items.map((listing) => (
-          <HeroButton key={listing.id} size="sm" variant={selectedListing === listing.id ? 'primary' : 'secondary'} onPress={() => setSelectedListing(listing.id)}>
-            <HeroButton.Label>{listing.title}</HeroButton.Label>
-          </HeroButton>
-        ))}
-      </ScrollView>
+      {listings.isLoading ? (
+        <LoadingSpinner />
+      ) : listings.items.length === 0 ? (
+        <EmptyState icon="bag-handle-outline" title={t('tools.promotions.noListings')} subtitle={t('tools.promotions.noListingsHint')} />
+      ) : (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+          {listings.items.map((listing) => (
+            <HeroButton key={listing.id} size="sm" variant={selectedListing === listing.id ? 'primary' : 'secondary'} onPress={() => setSelectedListing(listing.id)}>
+              <HeroButton.Label>{listing.title}</HeroButton.Label>
+            </HeroButton>
+          ))}
+        </ScrollView>
+      )}
       {products.isLoading ? (
         <LoadingSpinner />
       ) : promotionProducts.length === 0 ? (
@@ -481,7 +492,7 @@ function PromotionsPanel() {
           ))}
         </View>
       )}
-      <HeroButton variant="primary" onPress={promote} isDisabled={!selectedListing || !promotionType || promotionProducts.length === 0}>
+      <HeroButton variant="primary" onPress={promote} isDisabled={isPromoting || !selectedListing || !promotionType || promotionProducts.length === 0}>
         <HeroButton.Label>{t('tools.promotions.promote')}</HeroButton.Label>
       </HeroButton>
       <PanelList
