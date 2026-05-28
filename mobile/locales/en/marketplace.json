@@ -88,6 +88,7 @@
     "verifiedSeller": "Verified seller",
     "communitySeller": "Community seller",
     "viewSeller": "View seller profile",
+    "moreFromSeller": "More from {{name}}",
     "description": "Description",
     "additionalDetails": "Additional details",
     "templateFieldLabel": "{{field}}",

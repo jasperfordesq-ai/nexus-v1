@@ -24,6 +24,7 @@ import {
   createMarketplaceOrder,
   createMarketplacePaymentIntent,
   getMarketplaceListingPickupSlots,
+  getMarketplaceSellerListings,
   getMarketplaceCollections,
   getMarketplaceListing,
   makeMarketplaceOffer,
@@ -34,6 +35,7 @@ import {
   validateMarketplaceCoupon,
   type MarketplaceCollection,
   type MarketplaceListingDetail,
+  type MarketplaceListingItem,
   type MarketplacePickupSlotOption,
 } from '@/lib/api/marketplace';
 import { APP_URL } from '@/lib/constants';
@@ -73,6 +75,7 @@ function MarketplaceDetailScreen() {
   const [collections, setCollections] = useState<MarketplaceCollection[]>([]);
   const [isCollectionLoading, setIsCollectionLoading] = useState(false);
   const [pickupSlots, setPickupSlots] = useState<MarketplacePickupSlotOption[]>([]);
+  const [sellerListings, setSellerListings] = useState<MarketplaceListingItem[]>([]);
   const [selectedSlotId, setSelectedSlotId] = useState<number | null>(null);
   const [couponCode, setCouponCode] = useState('');
   const [couponApplied, setCouponApplied] = useState(false);
@@ -100,6 +103,26 @@ function MarketplaceDetailScreen() {
       mounted = false;
     };
   }, [listing, user?.id]);
+
+  useEffect(() => {
+    const sellerId = listing?.user?.id;
+    if (!listing || !sellerId) {
+      setSellerListings([]);
+      return undefined;
+    }
+
+    let mounted = true;
+    getMarketplaceSellerListings(sellerId, null, 4)
+      .then((response) => {
+        if (mounted) setSellerListings(response.data.filter((item) => item.id !== listing.id).slice(0, 3));
+      })
+      .catch(() => {
+        if (mounted) setSellerListings([]);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, [listing]);
 
   async function loadListing() {
     if (!safeId) {
@@ -469,6 +492,15 @@ function MarketplaceDetailScreen() {
           <CommunityDeliveryInfoCard primary={primary} theme={theme} />
         ) : null}
 
+        {sellerListings.length > 0 ? (
+          <MoreFromSellerCard
+            listings={sellerListings}
+            sellerName={listing.user?.name ?? t('common.seller')}
+            primary={primary}
+            theme={theme}
+          />
+        ) : null}
+
         {isOwner ? (
           <HeroCard className="rounded-panel p-0">
             <HeroCard.Body className="gap-3 p-4">
@@ -694,6 +726,45 @@ function CommunityDeliveryInfoCard({ primary, theme }: { primary: string; theme:
         <Text className="text-xs leading-5" style={{ color: theme.textMuted }}>
           {t('communityDelivery.orderManagedHint')}
         </Text>
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function MoreFromSellerCard({
+  listings,
+  sellerName,
+  primary,
+  theme,
+}: {
+  listings: MarketplaceListingItem[];
+  sellerName: string;
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+}) {
+  const { t } = useTranslation('marketplace');
+  return (
+    <HeroCard className="mb-3 rounded-panel p-0">
+      <HeroCard.Body className="gap-3 p-4">
+        <View className="flex-row items-center justify-between gap-3">
+          <Text className="min-w-0 flex-1 text-base font-bold" style={{ color: theme.text }} numberOfLines={2}>
+            {t('detail.moreFromSeller', { name: sellerName })}
+          </Text>
+          <Ionicons name="storefront-outline" size={18} color={primary} />
+        </View>
+        <View className="gap-2">
+          {listings.map((item) => (
+            <HeroButton
+              key={item.id}
+              className="justify-start"
+              variant="secondary"
+              onPress={() => router.push({ pathname: '/(modals)/marketplace-detail', params: { id: String(item.id) } } as unknown as Href)}
+            >
+              <Ionicons name="bag-handle-outline" size={16} color={primary} />
+              <HeroButton.Label>{item.title}</HeroButton.Label>
+            </HeroButton>
+          ))}
+        </View>
       </HeroCard.Body>
     </HeroCard>
   );

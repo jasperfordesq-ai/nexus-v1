@@ -41,6 +41,7 @@ jest.mock('react-i18next', () => ({
         'detail.makeOffer': 'Make offer',
         'detail.buyNow': 'Buy now',
         'detail.reportListing': 'Report listing',
+        'detail.moreFromSeller': `More from ${String(opts?.name ?? 'this seller')}`,
         'communityDelivery.eyebrow': 'Community-powered delivery',
         'communityDelivery.title': 'Community delivery',
         'communityDelivery.description': 'A trusted member can offer to deliver this order for time credits after checkout.',
@@ -114,6 +115,7 @@ jest.mock('@/lib/api/marketplace', () => ({
   createMarketplaceOrder: jest.fn(),
   createMarketplacePaymentIntent: jest.fn(),
   getMarketplaceListingPickupSlots: jest.fn().mockResolvedValue({ data: [] }),
+  getMarketplaceSellerListings: jest.fn().mockResolvedValue({ data: [] }),
   getMarketplaceCollections: jest.fn().mockResolvedValue({ data: [] }),
   getMarketplaceListing: jest.fn(),
   makeMarketplaceOffer: jest.fn(),
@@ -125,7 +127,7 @@ jest.mock('@/lib/api/marketplace', () => ({
 }));
 
 import MarketplaceDetailRoute from './marketplace-detail';
-import { createMarketplaceOrder, createMarketplacePaymentIntent, getMarketplaceListing } from '@/lib/api/marketplace';
+import { createMarketplaceOrder, createMarketplacePaymentIntent, getMarketplaceListing, getMarketplaceSellerListings } from '@/lib/api/marketplace';
 
 const mockListing = {
   id: 9,
@@ -169,6 +171,7 @@ describe('MarketplaceDetailRoute', () => {
     mockFeatures = new Set(['merchant_coupons']);
     alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
     (getMarketplaceListing as jest.Mock).mockResolvedValue({ data: mockListing });
+    (getMarketplaceSellerListings as jest.Mock).mockResolvedValue({ data: [] });
   });
 
   afterEach(() => {
@@ -185,6 +188,24 @@ describe('MarketplaceDetailRoute', () => {
       expect(getByText('Material')).toBeTruthy();
       expect(getByText('Oak')).toBeTruthy();
     });
+  });
+
+  it('loads more listings from the same seller and excludes the current listing', async () => {
+    (getMarketplaceSellerListings as jest.Mock).mockResolvedValueOnce({
+      data: [
+        { ...mockListing, id: 9, title: 'Oak dining table' },
+        { ...mockListing, id: 10, title: 'Matching chair' },
+      ],
+    });
+
+    const { getByText, queryAllByText } = render(<MarketplaceDetailRoute />);
+
+    await waitFor(() => {
+      expect(getMarketplaceSellerListings).toHaveBeenCalledWith(22, null, 4);
+      expect(getByText('More from Sam Seller')).toBeTruthy();
+      expect(getByText('Matching chair')).toBeTruthy();
+    });
+    expect(queryAllByText('Oak dining table')).toHaveLength(1);
   });
 
   it('renders listing video media without showing the empty image state', async () => {

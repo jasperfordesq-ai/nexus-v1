@@ -868,10 +868,11 @@ export function getMarketplaceSeller(id: number): Promise<MarketplaceDataRespons
 export function getMarketplaceSellerListings(
   id: number,
   cursor?: string | null,
+  perPage = 20,
 ): Promise<MarketplaceCollectionResponse<MarketplaceListingItem>> {
   const query: Record<string, string> = {};
   addQueryValue(query, 'cursor', cursor);
-  addQueryValue(query, 'per_page', 20);
+  addQueryValue(query, 'per_page', perPage);
   return api.get<MarketplaceCollectionResponse<MarketplaceListingItem>>(`${API_V2}/marketplace/sellers/${id}/listings`, query);
 }
 
