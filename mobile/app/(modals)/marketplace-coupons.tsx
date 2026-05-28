@@ -97,6 +97,7 @@ function CouponCard({ item }: { item: PublicMerchantCoupon }) {
   const { t } = useTranslation('marketplace');
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const terms = couponTerms(item, t);
   return (
     <HeroCard className="mb-3 rounded-panel p-0">
       <HeroCard.Body className="gap-3 p-4">
@@ -117,6 +118,15 @@ function CouponCard({ item }: { item: PublicMerchantCoupon }) {
             {t('publicCoupons.validUntil', { date: new Date(item.valid_until).toLocaleDateString() })}
           </Text>
         ) : null}
+        {terms.length > 0 ? (
+          <View className="flex-row flex-wrap gap-2">
+            {terms.map((term) => (
+              <Chip key={term} size="sm" variant="secondary">
+                <Chip.Label>{term}</Chip.Label>
+              </Chip>
+            ))}
+          </View>
+        ) : null}
         <HeroButton variant="primary" onPress={() => router.push({ pathname: '/(modals)/marketplace-coupon-detail', params: { id: String(item.id) } } as unknown as Href)} style={{ backgroundColor: primary }}>
           <HeroButton.Label>{t('publicCoupons.details')}</HeroButton.Label>
         </HeroButton>
@@ -129,4 +139,18 @@ function couponDiscountLabel(coupon: PublicMerchantCoupon, t: (key: string, opti
   if (coupon.discount_type === 'percent') return `${coupon.discount_value ?? 0}${t('publicCoupons.percentSuffix')}`;
   if (coupon.discount_type === 'fixed') return t('publicCoupons.fixedValue', { value: ((coupon.discount_value ?? 0) / 100).toFixed(2) });
   return t('publicCoupons.bogo');
+}
+
+function couponTerms(coupon: PublicMerchantCoupon, t: (key: string, options?: Record<string, unknown>) => string): string[] {
+  const terms: string[] = [];
+  if (coupon.min_order_cents && coupon.min_order_cents > 0) {
+    terms.push(t('publicCoupons.minOrder', { value: (coupon.min_order_cents / 100).toFixed(2) }));
+  }
+  if (coupon.max_uses) {
+    terms.push(t('publicCoupons.usage', { used: coupon.usage_count ?? coupon.used_count ?? 0, max: coupon.max_uses }));
+  }
+  if (coupon.max_uses_per_member) {
+    terms.push(t('publicCoupons.perMember', { count: coupon.max_uses_per_member }));
+  }
+  return terms;
 }

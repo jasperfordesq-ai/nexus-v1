@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Image, Modal, Share, View } from 'react-native';
+import { Alert, Image, Modal, Share, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -60,6 +60,8 @@ function MarketplaceCouponDetailScreen() {
       const response = await generatePublicMerchantCouponQr(safeCouponId);
       setQr(response.data);
       setIsQrOpen(true);
+    } catch {
+      Alert.alert(t('common:errors.alertTitle'), t('publicCoupons.qrFailed'));
     } finally {
       setIsQrLoading(false);
     }
@@ -143,6 +145,7 @@ function CouponDetailCard({
   const { t } = useTranslation('marketplace');
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const terms = couponTerms(item, t);
   return (
     <HeroCard className="overflow-hidden rounded-panel p-0">
       <View className="h-1.5" style={{ backgroundColor: primary }} />
@@ -168,6 +171,15 @@ function CouponDetailCard({
             {t('publicCoupons.validUntil', { date: new Date(item.valid_until).toLocaleDateString() })}
           </Text>
         ) : null}
+        {terms.length > 0 ? (
+          <View className="flex-row flex-wrap gap-2">
+            {terms.map((term) => (
+              <Chip key={term} size="sm" variant="secondary">
+                <Chip.Label>{term}</Chip.Label>
+              </Chip>
+            ))}
+          </View>
+        ) : null}
         <View className="flex-row gap-2">
           <HeroButton className="flex-1" variant="primary" onPress={onShare} style={{ backgroundColor: primary }}>
             <Ionicons name="copy-outline" size={16} color="#fff" />
@@ -187,6 +199,23 @@ function couponDiscountLabel(coupon: PublicMerchantCoupon, t: (key: string, opti
   if (coupon.discount_type === 'percent') return `${coupon.discount_value ?? 0}${t('publicCoupons.percentSuffix')}`;
   if (coupon.discount_type === 'fixed') return t('publicCoupons.fixedValue', { value: ((coupon.discount_value ?? 0) / 100).toFixed(2) });
   return t('publicCoupons.bogo');
+}
+
+function couponTerms(coupon: PublicMerchantCoupon, t: (key: string, options?: Record<string, unknown>) => string): string[] {
+  const terms: string[] = [t(`publicCoupons.status.${coupon.status}`)];
+  if (coupon.min_order_cents && coupon.min_order_cents > 0) {
+    terms.push(t('publicCoupons.minOrder', { value: (coupon.min_order_cents / 100).toFixed(2) }));
+  }
+  if (coupon.max_uses) {
+    terms.push(t('publicCoupons.usage', { used: coupon.usage_count ?? coupon.used_count ?? 0, max: coupon.max_uses }));
+  }
+  if (coupon.max_uses_per_member) {
+    terms.push(t('publicCoupons.perMember', { count: coupon.max_uses_per_member }));
+  }
+  if (coupon.applies_to) {
+    terms.push(t(`publicCoupons.appliesTo.${coupon.applies_to}`));
+  }
+  return terms;
 }
 
 function qrImageUrl(token: string): string {

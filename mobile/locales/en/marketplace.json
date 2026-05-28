@@ -435,9 +435,24 @@
     "qrAlt": "Coupon QR code",
     "scanAtCheckout": "Ask the seller to scan this QR code at checkout.",
     "qrExpires": "Expires at {{time}}",
+    "qrFailed": "Could not generate the coupon QR code. Please try again.",
+    "minOrder": "Minimum spend EUR {{value}}",
+    "usage": "{{used}} of {{max}} used",
+    "perMember": "{{count}} per member",
     "percentSuffix": "%",
     "fixedValue": "EUR {{value}} off",
-    "bogo": "BOGO"
+    "bogo": "BOGO",
+    "status": {
+      "draft": "Draft",
+      "active": "Active",
+      "paused": "Paused",
+      "expired": "Expired"
+    },
+    "appliesTo": {
+      "all_listings": "All listings",
+      "listing_ids": "Selected listings",
+      "category_ids": "Selected categories"
+    }
   },
   "seller": {
     "eyebrow": "Seller profile",
