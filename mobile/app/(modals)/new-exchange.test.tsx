@@ -90,9 +90,12 @@ jest.mock('react-i18next', () => ({
       'serviceType.remote_only': 'Remote',
       'serviceType.location_dependent': 'Location dependent',
       'validation.titleRequired': 'Title is required.',
+      'validation.titleMinLength': 'Use at least 5 characters for the title.',
       'validation.descriptionRequired': 'Description is required.',
+      'validation.descriptionMinLength': 'Use at least 20 characters for the description.',
       'validation.categoryRequired': 'Please choose a category.',
       'validation.invalidCredits': 'Enter a valid number of credits.',
+      'validation.creditsRange': 'Enter between 0.5 and 100 credits.',
     }[key] ?? key),
   }),
 }));
@@ -181,6 +184,32 @@ describe('NewExchangeModal', () => {
     await waitFor(() => expect(getByText('Title is required.')).toBeTruthy());
     expect(getByText('Description is required.')).toBeTruthy();
     expect(getByText('Please choose a category.')).toBeTruthy();
+    expect(mockCreateExchange).not.toHaveBeenCalled();
+  });
+
+  it('requires title and description to meet listing length limits', async () => {
+    const { getByPlaceholderText, getByText } = render(<NewExchangeModal />);
+
+    fireEvent.changeText(getByPlaceholderText('What are you offering?'), 'Help');
+    fireEvent.changeText(getByPlaceholderText('Add more details...'), 'Too short');
+    fireEvent.press(getByText('Gardening'));
+    fireEvent.press(getByText('Post Offer'));
+
+    await waitFor(() => expect(getByText('Use at least 5 characters for the title.')).toBeTruthy());
+    expect(getByText('Use at least 20 characters for the description.')).toBeTruthy();
+    expect(mockCreateExchange).not.toHaveBeenCalled();
+  });
+
+  it('requires time credits to stay within the listing range', async () => {
+    const { getByPlaceholderText, getByText } = render(<NewExchangeModal />);
+
+    fireEvent.changeText(getByPlaceholderText('What are you offering?'), 'Gardening help');
+    fireEvent.changeText(getByPlaceholderText('Add more details...'), 'I can help with weeding and pruning.');
+    fireEvent.changeText(getByPlaceholderText('Enter hours'), '0.25');
+    fireEvent.press(getByText('Gardening'));
+    fireEvent.press(getByText('Post Offer'));
+
+    await waitFor(() => expect(getByText('Enter between 0.5 and 100 credits.')).toBeTruthy());
     expect(mockCreateExchange).not.toHaveBeenCalled();
   });
 

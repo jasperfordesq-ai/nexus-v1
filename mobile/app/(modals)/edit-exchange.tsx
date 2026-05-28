@@ -39,6 +39,10 @@ import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 type ServiceType = 'physical_only' | 'remote_only' | 'hybrid' | 'location_dependent';
 
 const serviceTypes: ServiceType[] = ['hybrid', 'physical_only', 'remote_only', 'location_dependent'];
+const MIN_LISTING_TITLE_LENGTH = 5;
+const MIN_LISTING_DESCRIPTION_LENGTH = 20;
+const MIN_LISTING_HOURS = 0.5;
+const MAX_LISTING_HOURS = 100;
 
 interface FieldErrors {
   title?: string;
@@ -157,26 +161,36 @@ function EditExchangeModalInner() {
     const trimmedTitle = title.trim();
     const trimmedDescription = description.trim();
     const parsedHours = Number(hours);
+    const nextErrors: FieldErrors = {};
+
     if (!trimmedTitle) {
-      setFieldErrors({ title: t('validation.titleRequired') });
-      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      return;
+      nextErrors.title = t('validation.titleRequired');
+    } else if (trimmedTitle.length < MIN_LISTING_TITLE_LENGTH) {
+      nextErrors.title = t('validation.titleMinLength');
     }
+
     if (!trimmedDescription) {
-      setFieldErrors({ description: t('validation.descriptionRequired') });
-      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      return;
+      nextErrors.description = t('validation.descriptionRequired');
+    } else if (trimmedDescription.length < MIN_LISTING_DESCRIPTION_LENGTH) {
+      nextErrors.description = t('validation.descriptionMinLength');
     }
+
     if (categories.length > 0 && !categoryId && !listing?.category_id) {
-      setFieldErrors({ category: t('validation.categoryRequired') });
+      nextErrors.category = t('validation.categoryRequired');
+    }
+
+    if (!Number.isFinite(parsedHours)) {
+      nextErrors.hours = t('validation.invalidCredits');
+    } else if (parsedHours < MIN_LISTING_HOURS || parsedHours > MAX_LISTING_HOURS) {
+      nextErrors.hours = t('validation.creditsRange');
+    }
+
+    if (Object.keys(nextErrors).length > 0) {
+      setFieldErrors(nextErrors);
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       return;
     }
-    if (!Number.isFinite(parsedHours) || parsedHours <= 0) {
-      setFieldErrors({ hours: t('validation.invalidCredits') });
-      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      return;
-    }
+
     setFieldErrors({});
     setSaving(true);
     try {

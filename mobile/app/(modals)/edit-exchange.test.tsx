@@ -38,7 +38,10 @@ jest.mock('react-i18next', () => ({
       'form.aiGenerating': 'Writing...',
       'form.aiEnterTitleFirst': 'Enter a title first',
       'form.hoursPlaceholder': 'Enter hours',
+      'validation.titleMinLength': 'Use at least 5 characters for the title.',
+      'validation.descriptionMinLength': 'Use at least 20 characters for the description.',
       'validation.categoryRequired': 'Please choose a category.',
+      'validation.creditsRange': 'Enter between 0.5 and 100 credits.',
       category: 'Category',
       timeCredits: 'Time Credits',
       offer: 'Offer',
@@ -115,7 +118,7 @@ beforeEach(() => {
   const listingData = {
     id: 5,
     title: 'Edit me',
-    description: 'Listing body',
+    description: 'Listing body with enough detail.',
     type: 'offer',
     hours_estimate: 2,
     get category_id() { return mockListingCategoryId; },
@@ -147,7 +150,7 @@ describe('EditExchangeModal', () => {
     const { getAllByText, getByDisplayValue, getByPlaceholderText } = render(<EditExchangeModal />);
     expect(getAllByText('Edit Listing').length).toBeGreaterThan(0);
     expect(getByDisplayValue('Edit me')).toBeTruthy();
-    expect(getByDisplayValue('Listing body')).toBeTruthy();
+    expect(getByDisplayValue('Listing body with enough detail.')).toBeTruthy();
     expect(getByDisplayValue('Dublin')).toBeTruthy();
     expect(getByDisplayValue('gardening')).toBeTruthy();
     expect(getByPlaceholderText('Enter hours')).toBeTruthy();
@@ -163,7 +166,7 @@ describe('EditExchangeModal', () => {
 
     await waitFor(() => expect(mockUpdateExchange).toHaveBeenCalledWith(5, expect.objectContaining({
       title: 'Updated title',
-      description: 'Listing body',
+      description: 'Listing body with enough detail.',
       type: 'offer',
       hours_estimate: 2,
       category_id: 2,
@@ -171,6 +174,28 @@ describe('EditExchangeModal', () => {
       service_type: 'hybrid',
     })));
     expect(mockSetExchangeTags).toHaveBeenCalledWith(5, ['gardening', 'mentoring']);
+  });
+
+  it('requires title and description to meet listing length limits', async () => {
+    const { getByDisplayValue, getByText } = render(<EditExchangeModal />);
+
+    fireEvent.changeText(getByDisplayValue('Edit me'), 'Help');
+    fireEvent.changeText(getByDisplayValue('Listing body with enough detail.'), 'Too short');
+    fireEvent.press(getByText('Save changes'));
+
+    await waitFor(() => expect(getByText('Use at least 5 characters for the title.')).toBeTruthy());
+    expect(getByText('Use at least 20 characters for the description.')).toBeTruthy();
+    expect(mockUpdateExchange).not.toHaveBeenCalled();
+  });
+
+  it('requires time credits to stay within the listing range', async () => {
+    const { getByDisplayValue, getByText } = render(<EditExchangeModal />);
+
+    fireEvent.changeText(getByDisplayValue('2'), '101');
+    fireEvent.press(getByText('Save changes'));
+
+    await waitFor(() => expect(getByText('Enter between 0.5 and 100 credits.')).toBeTruthy());
+    expect(mockUpdateExchange).not.toHaveBeenCalled();
   });
 
   it('generates a replacement description from the listing context', async () => {
@@ -181,7 +206,7 @@ describe('EditExchangeModal', () => {
       title: 'Edit me',
       category: 'Teaching',
       type: 'offer',
-      notes: 'Listing body',
+      notes: 'Listing body with enough detail.',
     }));
     expect(getByDisplayValue('Generated listing body')).toBeTruthy();
   });

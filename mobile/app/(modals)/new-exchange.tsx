@@ -47,6 +47,10 @@ interface FieldErrors {
 const serviceTypes: ServiceType[] = ['hybrid', 'physical_only', 'remote_only', 'location_dependent'];
 const experienceOptions = ['beginner_friendly', 'some_experience', 'experienced', 'professional'] as const;
 const equipmentOptions = ['provided', 'partial', 'bring_own', 'not_applicable'] as const;
+const MIN_LISTING_TITLE_LENGTH = 5;
+const MIN_LISTING_DESCRIPTION_LENGTH = 20;
+const MIN_LISTING_HOURS = 0.5;
+const MAX_LISTING_HOURS = 100;
 const experienceLabelKeys: Record<ExperienceOption, string> = {
   beginner_friendly: 'experienceBeginner',
   some_experience: 'experienceSome',
@@ -145,10 +149,22 @@ function NewExchangeModalInner() {
     const parsedHours = Number(hours);
     const nextErrors: FieldErrors = {};
 
-    if (!trimmedTitle) nextErrors.title = t('validation.titleRequired');
-    if (!trimmedDescription) nextErrors.description = t('validation.descriptionRequired');
+    if (!trimmedTitle) {
+      nextErrors.title = t('validation.titleRequired');
+    } else if (trimmedTitle.length < MIN_LISTING_TITLE_LENGTH) {
+      nextErrors.title = t('validation.titleMinLength');
+    }
+    if (!trimmedDescription) {
+      nextErrors.description = t('validation.descriptionRequired');
+    } else if (trimmedDescription.length < MIN_LISTING_DESCRIPTION_LENGTH) {
+      nextErrors.description = t('validation.descriptionMinLength');
+    }
     if (!categoryId) nextErrors.category = t('validation.categoryRequired');
-    if (!Number.isFinite(parsedHours) || parsedHours <= 0) nextErrors.hours = t('validation.invalidCredits');
+    if (!Number.isFinite(parsedHours)) {
+      nextErrors.hours = t('validation.invalidCredits');
+    } else if (parsedHours < MIN_LISTING_HOURS || parsedHours > MAX_LISTING_HOURS) {
+      nextErrors.hours = t('validation.creditsRange');
+    }
 
     if (Object.keys(nextErrors).length > 0) {
       setFieldErrors(nextErrors);

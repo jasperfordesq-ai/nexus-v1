@@ -89,9 +89,12 @@
   },
   "validation": {
     "titleRequired": "Please enter a title.",
+    "titleMinLength": "Use at least 5 characters for the title.",
     "descriptionRequired": "Please enter a description.",
+    "descriptionMinLength": "Use at least 20 characters for the description.",
     "categoryRequired": "Please choose a category.",
-    "invalidCredits": "Please enter a valid number of time credits."
+    "invalidCredits": "Please enter a valid number of time credits.",
+    "creditsRange": "Enter between 0.5 and 100 credits."
   },
   "typeLabel": "{{type}} type",
   "categoryLabel": "{{name}} category",
