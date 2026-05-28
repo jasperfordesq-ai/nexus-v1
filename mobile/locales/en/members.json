@@ -46,6 +46,7 @@
     "federatedProfileHint": "This profile is shared from {{community}} through the federation network.",
     "externalFederatedMember": "External federated member",
     "externalFederatedMemberDescription": "This member is shared by an external federation partner. You can start a federated message, but the full profile remains on the partner system.",
+    "externalFederatedTrustHint": "Partner-provided reviews appear here when the federation partner shares them.",
     "backToFederatedMembers": "Back to federated members",
     "federatedMessaging": "Messaging enabled",
     "federatedExchanges": "Exchanges enabled",

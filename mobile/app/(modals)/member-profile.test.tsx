@@ -28,6 +28,7 @@ jest.mock('react-i18next', () => ({
         'profile.federatedProfileHint': opts ? `This profile is shared from ${String(opts.community ?? '')}.` : 'This profile is federated.',
         'profile.externalFederatedMember': 'External federated member',
         'profile.externalFederatedMemberDescription': 'This member is shared by an external federation partner.',
+        'profile.externalFederatedTrustHint': 'Partner-provided reviews appear here.',
         'profile.backToFederatedMembers': 'Back to federated members',
         'profile.federatedMessaging': 'Messaging enabled',
         'profile.federatedExchanges': 'Exchanges enabled',
@@ -417,5 +418,36 @@ describe('MemberProfileScreen', () => {
         name: 'External Sam',
       },
     });
+  });
+
+  it('loads backend-supported reviews for external federated member deep links', async () => {
+    mockParams = { id: 'ext-7-123', name: 'External Sam' };
+    mockUseApi
+      .mockReturnValueOnce({ data: null, isLoading: false, error: null, refresh: jest.fn() })
+      .mockReturnValueOnce({
+        data: {
+          data: [{
+            id: 'external-review-1',
+            rating: 5,
+            comment: 'Reliable cross-network helper.',
+            created_at: '2026-03-22T10:00:00Z',
+            reviewer: { name: 'Partner reviewer' },
+            partner: { id: 'ext-7', name: 'Remote partner' },
+            verified: true,
+          }],
+        },
+        isLoading: false,
+        error: null,
+        refresh: jest.fn(),
+      });
+
+    const { getByText } = render(<MemberProfileScreen />);
+    const reviewsLoader = mockUseApi.mock.calls[1][0] as () => Promise<unknown>;
+    await reviewsLoader();
+
+    expect(getFederationMemberReviews).toHaveBeenCalledWith('ext-7-123', 'ext-7');
+    expect(getByText('Partner-provided reviews appear here.')).toBeTruthy();
+    expect(getByText('Reliable cross-network helper.')).toBeTruthy();
+    expect(getByText('via Remote partner')).toBeTruthy();
   });
 });

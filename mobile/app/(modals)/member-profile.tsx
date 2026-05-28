@@ -618,6 +618,24 @@ function ExternalFederatedMemberState({
   t: TFunction;
 }) {
   const canMessage = tenantId.trim().length > 0;
+  const {
+    data: reviewsResponse,
+    isLoading: reviewsLoading,
+    refresh: refreshReviews,
+  } = useApi(
+    () => getFederationMemberReviews(memberId, tenantId),
+    [memberId, tenantId],
+    { enabled: memberId.trim().length > 0 },
+  );
+  const reviews = useMemo(
+    () => Array.isArray(reviewsResponse?.data) ? reviewsResponse.data : [],
+    [reviewsResponse],
+  );
+  const averageRating = useMemo(() => {
+    if (reviews.length === 0) return null;
+    const total = reviews.reduce((sum, review) => sum + Number(review.rating || 0), 0);
+    return total > 0 ? total / reviews.length : null;
+  }, [reviews]);
 
   function openMessage() {
     if (!canMessage) return;
@@ -636,7 +654,10 @@ function ExternalFederatedMemberState({
   return (
     <SafeAreaView className="flex-1 bg-background">
       <AppTopBar title={t('profile.externalFederatedMember')} backLabel={t('common:buttons.back')} fallbackHref={'/(modals)/federation-members' as Href} />
-      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40 }}>
+      <ScrollView
+        refreshControl={<RefreshControl refreshing={reviewsLoading} onRefresh={() => void refreshReviews()} tintColor={primary} colors={[primary]} />}
+        contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
+      >
         <HeroCard variant="default" className="overflow-hidden">
           <View className="h-1 w-full" style={{ backgroundColor: primary }} />
           <HeroCard.Body className="items-center gap-4 px-5 py-6">
@@ -667,6 +688,20 @@ function ExternalFederatedMemberState({
             </View>
           </HeroCard.Body>
         </HeroCard>
+
+        <Surface variant="secondary" className="mt-3 gap-3 rounded-panel px-4 py-4">
+          <SectionTitle icon="shield-checkmark-outline" title={t('profile.trustStatus')} primary={primary} theme={theme} />
+          <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+            {t('profile.externalFederatedTrustHint')}
+          </Text>
+          {reviewsLoading ? (
+            <Surface variant="secondary" className="items-center rounded-panel-inner px-3 py-4">
+              <Spinner size="sm" />
+            </Surface>
+          ) : (
+            <ReviewsSection reviews={reviews} rating={averageRating} primary={primary} theme={theme} t={t} />
+          )}
+        </Surface>
       </ScrollView>
     </SafeAreaView>
   );
