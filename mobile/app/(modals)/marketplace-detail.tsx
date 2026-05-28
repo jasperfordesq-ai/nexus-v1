@@ -156,6 +156,7 @@ function MarketplaceDetailScreen() {
   const priceLabel = formatMarketplacePrice(listing.price, listing.price_type, listing.price_currency, t('common.free'));
   const isOwner = Boolean(listing.is_own || (user?.id && listing.user?.id === user.id));
   const canBuy = !isOwner && listing.status === 'active' && listing.price_type !== 'contact' && listing.price_type !== 'auction';
+  const templateEntries = getListingTemplateEntries(listing.template_data);
 
   async function handleToggleSave() {
     if (!listing) return;
@@ -400,6 +401,21 @@ function MarketplaceDetailScreen() {
           <HeroCard.Body className="gap-3 p-4">
             <Text className="text-base font-bold" style={{ color: theme.text }}>{t('detail.description')}</Text>
             <Text className="text-sm leading-6" style={{ color: theme.textSecondary }}>{listing.description}</Text>
+            {templateEntries.length > 0 ? (
+              <View className="gap-3 border-t pt-3" style={{ borderColor: theme.border }}>
+                <Text className="text-sm font-bold" style={{ color: theme.text }}>{t('detail.additionalDetails')}</Text>
+                <View className="gap-2">
+                  {templateEntries.map((entry) => (
+                    <Surface key={entry.key} variant="secondary" className="gap-1 rounded-panel-inner p-3">
+                      <Text className="text-[11px] font-bold uppercase" style={{ color: theme.textMuted }}>
+                        {t('detail.templateFieldLabel', { field: entry.label })}
+                      </Text>
+                      <Text className="text-sm font-semibold" style={{ color: theme.text }}>{entry.value}</Text>
+                    </Surface>
+                  ))}
+                </View>
+              </View>
+            ) : null}
             <View className="flex-row flex-wrap gap-2">
               {listing.location ? (
                 <Chip size="sm" variant="secondary">
@@ -663,6 +679,24 @@ function formatPickupSlot(slot: MarketplacePickupSlotOption, fallback: string) {
   } catch {
     return fallback;
   }
+}
+
+function getListingTemplateEntries(templateData?: Record<string, unknown> | null): Array<{ key: string; label: string; value: string }> {
+  if (!templateData) return [];
+  return Object.entries(templateData).flatMap(([key, value]) => {
+    if (value === null || value === undefined) return [];
+    const text = Array.isArray(value) ? value.map((item) => String(item)).join(', ') : String(value);
+    if (!text.trim()) return [];
+    return [{ key, label: formatTemplateFieldLabel(key), value: text }];
+  });
+}
+
+function formatTemplateFieldLabel(key: string): string {
+  const label = key
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return label ? label.charAt(0).toUpperCase() + label.slice(1) : key;
 }
 
 function FormInput({

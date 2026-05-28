@@ -88,6 +88,8 @@
     "communitySeller": "Community seller",
     "viewSeller": "View seller profile",
     "description": "Description",
+    "additionalDetails": "Additional details",
+    "templateFieldLabel": "{{field}}",
     "quantity": "{{count}} available",
     "views": "{{count}} views",
     "save": "Save",
