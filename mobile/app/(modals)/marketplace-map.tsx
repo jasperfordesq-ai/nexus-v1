@@ -3,8 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState } from 'react';
-import { Alert, FlatList, TextInput, View } from 'react-native';
+import { type ReactNode, useState } from 'react';
+import { Alert, FlatList, ScrollView, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -24,6 +24,8 @@ import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 
+const RADIUS_OPTIONS = ['5', '10', '25', '50', '100'];
+
 export default function MarketplaceMapRoute() {
   return (
     <ModalErrorBoundary>
@@ -34,24 +36,30 @@ export default function MarketplaceMapRoute() {
 
 function MarketplaceMapScreen() {
   const { t } = useTranslation(['marketplace', 'common']);
-  const params = useLocalSearchParams<{ latitude?: string; longitude?: string; radius?: string }>();
+  const params = useLocalSearchParams<{
+    latitude?: string | string[];
+    longitude?: string | string[];
+    lat?: string | string[];
+    lng?: string | string[];
+    radius?: string | string[];
+  }>();
   const { hasFeature } = useTenant();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const [latitude, setLatitude] = useState(params.latitude ?? '');
-  const [longitude, setLongitude] = useState(params.longitude ?? '');
-  const [radius, setRadius] = useState(params.radius ?? '25');
+  const [latitude, setLatitude] = useState(firstParam(params.latitude) ?? firstParam(params.lat) ?? '');
+  const [longitude, setLongitude] = useState(firstParam(params.longitude) ?? firstParam(params.lng) ?? '');
+  const [radius, setRadius] = useState(normalizeRadius(firstParam(params.radius)));
   const [items, setItems] = useState<MarketplaceNearbyListing[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function search() {
-    const lat = Number(latitude);
-    const lng = Number(longitude);
+    const lat = parseCoordinate(latitude);
+    const lng = parseCoordinate(longitude);
     const radiusKm = Number(radius) || 25;
 
-    if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+    if (lat === null || lng === null || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
       Alert.alert(t('common:errors.alertTitle'), t('map.invalidCoordinates'));
       return;
     }
@@ -111,19 +119,30 @@ function MarketplaceMapScreen() {
                     <CoordinateInput label={t('map.latitude')} value={latitude} onChangeText={setLatitude} placeholder={t('map.latitudePlaceholder')} />
                     <CoordinateInput label={t('map.longitude')} value={longitude} onChangeText={setLongitude} placeholder={t('map.longitudePlaceholder')} />
                   </View>
-                  <CoordinateInput label={t('map.radius')} value={radius} onChangeText={setRadius} placeholder={t('map.radiusPlaceholder')} />
+                  <FilterStrip label={t('map.radius')}>
+                    {RADIUS_OPTIONS.map((option) => (
+                      <FilterButton
+                        key={option}
+                        active={radius === option}
+                        label={t('map.radiusOption', { radius: option })}
+                        onPress={() => setRadius(option)}
+                      />
+                    ))}
+                  </FilterStrip>
                   <HeroButton variant="primary" onPress={() => void search()} isDisabled={isLoading} style={{ backgroundColor: primary }}>
                     <Ionicons name="locate-outline" size={16} color="#fff" />
                     <HeroButton.Label>{t('map.search')}</HeroButton.Label>
                   </HeroButton>
                 </Surface>
-                <Text className="text-xs leading-4" style={{ color: theme.textMuted }}>{t('map.helper')}</Text>
               </HeroCard.Body>
             </HeroCard>
             {items.length > 0 ? (
-              <View className="mb-2 flex-row items-center justify-between">
+              <View className="mb-2 gap-2">
                 <Text className="text-sm font-bold" style={{ color: theme.text }}>{t('map.results', { count: items.length })}</Text>
-                <Chip size="sm" variant="secondary"><Chip.Label>{t('map.radiusLabel', { radius })}</Chip.Label></Chip>
+                <View className="flex-row flex-wrap gap-2">
+                  <Chip size="sm" variant="secondary"><Chip.Label>{t('map.radiusLabel', { radius })}</Chip.Label></Chip>
+                  <Chip size="sm" variant="secondary"><Chip.Label>{t('map.coordinatesLabel', { latitude, longitude })}</Chip.Label></Chip>
+                </View>
               </View>
             ) : null}
           </View>
@@ -158,6 +177,27 @@ function MarketplaceMapScreen() {
   );
 }
 
+function FilterStrip({ label, children }: { label: string; children: ReactNode }) {
+  const theme = useTheme();
+  return (
+    <View className="gap-2">
+      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{label}</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+        {children}
+      </ScrollView>
+    </View>
+  );
+}
+
+function FilterButton({ active, label, onPress }: { active: boolean; label: string; onPress: () => void }) {
+  const primary = usePrimaryColor();
+  return (
+    <HeroButton size="sm" variant={active ? 'primary' : 'secondary'} onPress={onPress} style={active ? { backgroundColor: primary } : undefined}>
+      <HeroButton.Label>{label}</HeroButton.Label>
+    </HeroButton>
+  );
+}
+
 function CoordinateInput({
   label,
   value,
@@ -184,4 +224,21 @@ function CoordinateInput({
       />
     </View>
   );
+}
+
+function firstParam(value?: string | string[]): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function normalizeRadius(value?: string): string {
+  if (!value) return '25';
+  const radius = Number(value);
+  if (!Number.isFinite(radius)) return '25';
+  return String(Math.max(1, Math.min(200, Math.round(radius))));
+}
+
+function parseCoordinate(value: string): number | null {
+  if (!value.trim()) return null;
+  const coordinate = Number(value);
+  return Number.isFinite(coordinate) ? coordinate : null;
 }
