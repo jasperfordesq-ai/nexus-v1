@@ -107,10 +107,10 @@ jest.mock('@/components/ModalErrorBoundary', () => ({ children }: { children: Re
 jest.mock('@/components/ui/FormActionFooter', () => {
   const React = require('react');
   const { Pressable, Text, View } = require('react-native');
-  return function MockFormActionFooter({ submitLabel, onSubmit }: { submitLabel: string; onSubmit: () => void }) {
+  return function MockFormActionFooter({ submitLabel, onSubmit, isDisabled }: { submitLabel: string; onSubmit: () => void; isDisabled?: boolean }) {
     return (
       <View>
-        <Pressable accessibilityRole="button" onPress={onSubmit}>
+        <Pressable accessibilityRole="button" disabled={isDisabled} onPress={onSubmit}>
           <Text>{submitLabel}</Text>
         </Pressable>
       </View>
@@ -235,6 +235,45 @@ describe('NewVolunteeringRoute', () => {
         skills_needed: 'Packing, Lifting',
         start_date: '2026-06-01',
         end_date: '2026-06-30',
+      }));
+    });
+  });
+
+  it('allows editing an existing opportunity when the organisation list is empty', async () => {
+    mockSearchParams = { id: '19' };
+    mockUseApi.mockReturnValue({
+      data: { data: [] },
+      isLoading: false,
+      error: null,
+    });
+    mockGetOpportunity.mockResolvedValueOnce({
+      data: {
+        id: 19,
+        title: 'Food bank packing',
+        description: 'Help pack food parcels for local families every week.',
+        organisation: { id: 7, name: 'Helping Hands' },
+        location: 'Community hall',
+        is_remote: false,
+        skills_needed: ['Packing'],
+        status: 'open',
+        spots_available: null,
+        deadline: null,
+        created_at: '2026-05-01T00:00:00Z',
+        start_date: null,
+        end_date: null,
+      },
+    });
+
+    const { getByDisplayValue, getByText } = render(<NewVolunteeringRoute />);
+
+    await waitFor(() => expect(getByDisplayValue('Food bank packing')).toBeTruthy());
+    fireEvent.changeText(getByDisplayValue('Food bank packing'), 'Updated packing shift');
+    fireEvent.press(getByText('Update opportunity'));
+
+    await waitFor(() => {
+      expect(mockUpdateOpportunity).toHaveBeenCalledWith(19, expect.objectContaining({
+        title: 'Updated packing shift',
+        location: 'Community hall',
       }));
     });
   });

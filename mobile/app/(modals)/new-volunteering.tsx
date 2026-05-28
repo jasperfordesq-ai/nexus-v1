@@ -228,7 +228,7 @@ function NewVolunteeringScreen() {
         submitLabel={isEditing ? t('create.updateSubmit') : t('create.submit')}
         primary={primary}
         isSubmitting={isSubmitting}
-        isDisabled={organisations.length === 0}
+        isDisabled={!isEditing && organisations.length === 0}
         onSubmit={submit}
       />
     </SafeAreaView>
