@@ -210,8 +210,14 @@ export function SelectItem({
       variant={danger ? 'danger' : 'default'}
     >
       {startContent}
-      {renderLabel(children)}
-      {description && <Description>{description}</Description>}
+      {description ? (
+        <div className="flex flex-col">
+          {renderLabel(children)}
+          <Description className={classNames?.description}>{description}</Description>
+        </div>
+      ) : (
+        renderLabel(children)
+      )}
       {endContent}
       <ListBox.ItemIndicator />
     </ListBox.Item>
