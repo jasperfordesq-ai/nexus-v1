@@ -27,6 +27,7 @@ import {
   type MarketplaceCollectionItem,
   type MarketplaceSavedSearch,
 } from '@/lib/api/marketplace';
+import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
@@ -46,8 +47,9 @@ export default function MarketplaceCollectionsRoute() {
 }
 
 function MarketplaceCollectionsScreen() {
-  const { t } = useTranslation(['marketplace', 'common']);
+  const { t } = useTranslation(['marketplace', 'common', 'auth']);
   const { hasFeature } = useTenant();
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const params = useLocalSearchParams<{ tab?: string }>();
@@ -68,7 +70,7 @@ function MarketplaceCollectionsScreen() {
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    if (!hasFeature('marketplace')) return;
+    if (!hasFeature('marketplace') || !isAuthenticated) return;
     setIsLoading(true);
     setError(null);
     try {
@@ -84,11 +86,11 @@ function MarketplaceCollectionsScreen() {
       setIsLoading(false);
       setIsRefreshing(false);
     }
-  }, [hasFeature, t]);
+  }, [hasFeature, isAuthenticated, t]);
 
   useEffect(() => {
-    void load();
-  }, [load]);
+    if (!isAuthLoading) void load();
+  }, [isAuthLoading, load]);
 
   useEffect(() => {
     if (params.tab !== undefined) {
@@ -196,6 +198,30 @@ function MarketplaceCollectionsScreen() {
       <SafeAreaView className="flex-1 bg-background">
         <AppTopBar title={t('collections.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
         <EmptyState icon="folder-open-outline" title={t('featureGate.title')} subtitle={t('featureGate.description')} />
+      </SafeAreaView>
+    );
+  }
+
+  if (isAuthLoading) {
+    return (
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('collections.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
+        <View className="py-16"><LoadingSpinner /></View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('collections.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
+        <EmptyState
+          icon="folder-open-outline"
+          title={t('collections.signInTitle')}
+          subtitle={t('collections.signInHint')}
+          actionLabel={t('auth:login.submit')}
+          onAction={() => router.push('/(auth)/login' as Href)}
+        />
       </SafeAreaView>
     );
   }

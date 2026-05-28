@@ -9,6 +9,7 @@ import { render } from '@testing-library/react-native';
 let mockParams: Record<string, string> = {};
 let mockEmptyStateAction: (() => void) | undefined;
 const mockHasFeature = jest.fn(() => true);
+let mockAuthState = { isAuthenticated: true, isLoading: false };
 const mockT = (key: string, opts?: Record<string, unknown>) => {
   const map: Record<string, string> = {
     'common:back': 'Back',
@@ -22,6 +23,8 @@ const mockT = (key: string, opts?: Record<string, unknown>) => {
     'collections.savedTab': 'Saved searches',
     'collections.create': 'Create collection',
     'collections.manage': 'Manage in tools',
+    'collections.signInTitle': 'Sign in to view saved marketplace',
+    'collections.signInHint': 'Collections and saved searches are available after you sign in.',
     'collections.empty': 'No collections yet',
     'collections.emptyHint': 'Create collections from marketplace tools, then add listings as you browse.',
     'collections.count': `${String(opts?.count ?? 0)} listings`,
@@ -32,6 +35,7 @@ const mockT = (key: string, opts?: Record<string, unknown>) => {
     'savedSearches.anything': 'Any marketplace listing',
     'savedSearches.run': 'Run search',
     'tools.delete': 'Delete',
+    'auth:login.submit': 'Sign in',
     'featureGate.title': 'Marketplace is not available',
     'featureGate.description': 'This community has not enabled marketplace listings.',
   };
@@ -95,6 +99,10 @@ jest.mock('@/lib/hooks/useTenant', () => ({
   useTenant: () => ({ hasFeature: mockHasFeature }),
 }));
 
+jest.mock('@/lib/hooks/useAuth', () => ({
+  useAuth: () => mockAuthState,
+}));
+
 jest.mock('@/lib/hooks/useTheme', () => ({
   useTheme: () => ({
     bg: '#ffffff',
@@ -129,6 +137,7 @@ describe('MarketplaceCollectionsRoute', () => {
     mockParams = {};
     mockEmptyStateAction = undefined;
     mockHasFeature.mockReturnValue(true);
+    mockAuthState = { isAuthenticated: true, isLoading: false };
     jest.mocked(getMarketplaceCollections).mockResolvedValue({
       data: [
         {
@@ -177,5 +186,15 @@ describe('MarketplaceCollectionsRoute', () => {
       pathname: '/(modals)/marketplace-tools',
       params: { tab: 'savedSearches' },
     });
+  });
+
+  it('shows the sign-in state without calling protected collection APIs when unauthenticated', async () => {
+    mockAuthState = { isAuthenticated: false, isLoading: false };
+
+    const { findByText } = render(<MarketplaceCollectionsRoute />);
+
+    expect(await findByText('Sign in to view saved marketplace')).toBeTruthy();
+    expect(getMarketplaceCollections).not.toHaveBeenCalled();
+    expect(getMarketplaceSavedSearches).not.toHaveBeenCalled();
   });
 });

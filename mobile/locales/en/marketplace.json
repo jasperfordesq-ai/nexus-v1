@@ -559,6 +559,8 @@
     "collectionsTab": "Collections",
     "savedTab": "Saved searches",
     "manage": "Manage in tools",
+    "signInTitle": "Sign in to view saved marketplace",
+    "signInHint": "Collections and saved searches are available after you sign in.",
     "create": "Create collection",
     "createTitle": "Create collection",
     "createSubtitle": "Group saved marketplace listings for projects, wishes, or public recommendations.",
