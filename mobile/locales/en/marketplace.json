@@ -317,6 +317,7 @@
     "paymentStartedHint": "Open checkout to finish paying for this order.",
     "paymentClientSecretHint": "The payment is ready. Complete checkout from the secure payment sheet or web checkout.",
     "paymentFailed": "Could not restart checkout for this order.",
+    "waitingShipment": "Waiting for shipment",
     "markShipped": "Mark shipped",
     "confirmDelivery": "Confirm delivery",
     "rate": "Rate order",

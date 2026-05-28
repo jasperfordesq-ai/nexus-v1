@@ -608,6 +608,12 @@ function OrderCard({
           </HeroButton>
         ) : null}
         <View className="flex-row flex-wrap gap-2">
+          {mode === 'purchases' && item.status === 'paid' ? (
+            <HeroButton className="flex-1" size="sm" variant="secondary" isDisabled style={{ minWidth: '46%' }}>
+              <Ionicons name="cube-outline" size={14} color={theme.textMuted} />
+              <HeroButton.Label>{t('orders.waitingShipment')}</HeroButton.Label>
+            </HeroButton>
+          ) : null}
           {mode === 'purchases' && item.status === 'pending_payment' ? (
             <HeroButton className="flex-1" size="sm" variant="primary" isDisabled={isSubmitting} onPress={onContinuePayment} style={{ minWidth: '46%', backgroundColor: primary }}>
               <Ionicons name="card-outline" size={14} color="#fff" />

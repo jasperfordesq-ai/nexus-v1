@@ -30,6 +30,7 @@ jest.mock('react-i18next', () => ({
         'orders.sellerLabel': 'Seller',
         'orders.buyerLabel': 'Buyer',
         'orders.deliveryOffers': 'Delivery offers',
+        'orders.waitingShipment': 'Waiting for shipment',
         'orders.status.paid': 'Paid',
         'actions.view': 'View',
       };
@@ -110,6 +111,40 @@ describe('MarketplaceOrdersRoute', () => {
       );
     });
 
+    unmount();
+  });
+
+  it('shows the waiting-for-shipment state for paid purchase orders', async () => {
+    (getMarketplaceOrders as jest.Mock).mockResolvedValueOnce({
+      data: [
+        {
+          id: 41,
+          order_number: 'MKT-000041',
+          quantity: 1,
+          unit_price: 18,
+          total_price: 18,
+          currency: 'EUR',
+          status: 'paid',
+          created_at: '2026-05-22T10:00:00Z',
+          listing: {
+            id: 71,
+            title: 'Paid order lamp',
+            image: null,
+            delivery_method: 'pickup',
+          },
+          seller: { id: 2, name: 'Pat Seller', avatar_url: null },
+        },
+      ],
+      meta: { cursor: null, has_more: false },
+    });
+
+    const { getByText, unmount } = render(<MarketplaceOrdersRoute />);
+
+    await waitFor(() => {
+      expect(getByText('Paid order lamp')).toBeTruthy();
+    });
+
+    expect(getByText('Waiting for shipment')).toBeTruthy();
     unmount();
   });
 
