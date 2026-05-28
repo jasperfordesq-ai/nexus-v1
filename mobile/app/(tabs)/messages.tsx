@@ -13,7 +13,7 @@ import * as Haptics from '@/lib/haptics';
 import { Button as HeroButton, Card as HeroCard, Chip, Separator, Spinner, Surface } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
-import { getConversations, deleteConversation, displayName, type Conversation, type ConversationListResponse } from '@/lib/api/messages';
+import { getConversations, deleteConversation, restoreConversation, displayName, type Conversation, type ConversationListResponse } from '@/lib/api/messages';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
@@ -31,6 +31,7 @@ function extractConversationsPage(response: ConversationListResponse) {
 }
 
 type TFunction = (key: string, options?: Record<string, unknown>) => string;
+type MessagesTab = 'inbox' | 'archived';
 
 export default function MessagesScreen() {
   const { t } = useTranslation('messages');
@@ -48,12 +49,26 @@ export default function MessagesScreen() {
     context_id?: string | string[];
   }>();
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<MessagesTab>('inbox');
   const handledDeepLinkRef = useRef<string | null>(null);
 
-  const fetchConversations = useCallback((cursor: string | null) => getConversations(cursor), []);
+  const fetchInboxConversations = useCallback((cursor: string | null) => getConversations(cursor), []);
+  const fetchArchivedConversations = useCallback((cursor: string | null) => getConversations(cursor, { archived: true }), []);
 
-  const { items: conversations, isLoading, isLoadingMore, error, hasMore, loadMore, refresh } =
-    usePaginatedApi<Conversation, ConversationListResponse>(fetchConversations, extractConversationsPage);
+  const inboxPage = usePaginatedApi<Conversation, ConversationListResponse>(fetchInboxConversations, extractConversationsPage);
+  const archivedPage = usePaginatedApi<Conversation, ConversationListResponse>(fetchArchivedConversations, extractConversationsPage);
+  const activePage = activeTab === 'archived' ? archivedPage : inboxPage;
+  const { items: conversations } = inboxPage;
+  const { items: archivedConversations } = archivedPage;
+  const {
+    items: activeConversations,
+    isLoading,
+    isLoadingMore,
+    error,
+    hasMore,
+    loadMore,
+    refresh,
+  } = activePage;
 
   const totalUnread = useMemo(
     () => conversations.reduce((sum, conversation) => sum + (conversation.unread_count ?? 0), 0),
@@ -62,14 +77,14 @@ export default function MessagesScreen() {
 
   const filteredConversations = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
-    if (!query) return conversations;
-    return conversations.filter((conversation) => {
+    if (!query) return activeConversations;
+    return activeConversations.filter((conversation) => {
       const otherName = displayName(conversation.other_user).toLowerCase();
       const lastMsg = conversation.last_message;
       const lastMsgBody = (lastMsg?.body ?? lastMsg?.content ?? '').toLowerCase();
       return otherName.includes(query) || lastMsgBody.includes(query);
     });
-  }, [conversations, searchQuery]);
+  }, [activeConversations, searchQuery]);
 
   const hasSearchQuery = searchQuery.trim().length > 0;
 
@@ -123,22 +138,44 @@ export default function MessagesScreen() {
       [
         { text: t('common:buttons.cancel'), style: 'cancel' },
         {
-          text: t('common:buttons.delete'),
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteConversation(conversation.id);
-              void refresh();
-            } catch {
-              Alert.alert(t('common:error'), t('common:errors.generic'));
-            }
-          },
+            text: t('common:buttons.delete'),
+            style: 'destructive',
+            onPress: async () => {
+              try {
+                await deleteConversation(conversation.id);
+                void inboxPage.refresh();
+              } catch {
+                Alert.alert(t('common:error'), t('common:errors.generic'));
+              }
+            },
         },
       ],
     );
   }
 
+  async function handleRestoreConversation(conversation: Conversation) {
+    try {
+      await restoreConversation(conversation.id);
+      void inboxPage.refresh();
+      void archivedPage.refresh();
+    } catch {
+      Alert.alert(t('errors.restoreFailedTitle'), t('errors.restoreFailed'));
+    }
+  }
+
   function renderConversation({ item }: { item: Conversation }) {
+    if (activeTab === 'archived') {
+      return (
+        <ArchivedConversationCard
+          conversation={item}
+          primary={primary}
+          theme={theme}
+          t={t}
+          onRestore={handleRestoreConversation}
+        />
+      );
+    }
+
     return (
       <ConversationCard
         conversation={item}
@@ -164,6 +201,9 @@ export default function MessagesScreen() {
             totalCount={conversations.length}
             visibleCount={filteredConversations.length}
             totalUnread={totalUnread}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            archivedCount={archivedConversations.length}
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             isLoading={isLoading}
@@ -173,7 +213,7 @@ export default function MessagesScreen() {
         }
         refreshControl={
           <RefreshControl
-            refreshing={isLoading && conversations.length > 0}
+            refreshing={isLoading && activeConversations.length > 0}
             onRefresh={refresh}
             tintColor={primary}
             colors={[primary]}
@@ -182,7 +222,7 @@ export default function MessagesScreen() {
         onEndReached={() => { if (hasMore) void loadMore(); }}
         onEndReachedThreshold={0.5}
         ListEmptyComponent={
-          isLoading && conversations.length === 0 ? (
+          isLoading && activeConversations.length === 0 ? (
             <><ConversationSkeleton /><ConversationSkeleton /><ConversationSkeleton /><ConversationSkeleton /></>
           ) : error ? (
             <HeroCard variant="secondary" className="mx-4 my-8">
@@ -199,10 +239,14 @@ export default function MessagesScreen() {
               <HeroCard.Body className="items-center gap-3">
                 <Ionicons name={hasSearchQuery ? 'search-outline' : 'chatbubbles-outline'} size={34} color={primary} />
                 <Text className="text-center text-[17px] font-semibold" style={{ color: theme.text }}>
-                  {hasSearchQuery ? t('empty.searchTitle') : t('empty.title')}
+                  {activeTab === 'archived'
+                    ? hasSearchQuery ? t('empty.searchTitle') : t('empty.archivedTitle')
+                    : hasSearchQuery ? t('empty.searchTitle') : t('empty.title')}
                 </Text>
                 <Text className="text-center text-sm leading-5" style={{ color: theme.textSecondary }}>
-                  {hasSearchQuery ? t('empty.searchSubtitle') : t('empty.subtitle')}
+                  {activeTab === 'archived'
+                    ? hasSearchQuery ? t('empty.searchSubtitle') : t('empty.archivedSubtitle')
+                    : hasSearchQuery ? t('empty.searchSubtitle') : t('empty.subtitle')}
                 </Text>
                 {hasSearchQuery ? (
                   <HeroButton variant="secondary" size="sm" onPress={() => setSearchQuery('')}>
@@ -210,10 +254,12 @@ export default function MessagesScreen() {
                     <HeroButton.Label>{t('clearSearch')}</HeroButton.Label>
                   </HeroButton>
                 ) : (
-                  <HeroButton variant="primary" size="sm" onPress={openNewMessage} style={{ backgroundColor: primary }}>
+                  activeTab === 'inbox' ? (
+                    <HeroButton variant="primary" size="sm" onPress={openNewMessage} style={{ backgroundColor: primary }}>
                     <Ionicons name="create-outline" size={16} color="#fff" />
                     <HeroButton.Label>{t('newMessage')}</HeroButton.Label>
-                  </HeroButton>
+                    </HeroButton>
+                  ) : null
                 )}
               </HeroCard.Body>
             </HeroCard>
@@ -246,6 +292,9 @@ function MessagesHeader({
   totalCount,
   visibleCount,
   totalUnread,
+  activeTab,
+  setActiveTab,
+  archivedCount,
   searchQuery,
   setSearchQuery,
   isLoading,
@@ -258,6 +307,9 @@ function MessagesHeader({
   totalCount: number;
   visibleCount: number;
   totalUnread: number;
+  activeTab: MessagesTab;
+  setActiveTab: (tab: MessagesTab) => void;
+  archivedCount: number;
   searchQuery: string;
   setSearchQuery: (value: string) => void;
   isLoading: boolean;
@@ -321,17 +373,44 @@ function MessagesHeader({
       </HeroCard>
 
       <Surface variant="default" className="mx-4 gap-3 rounded-panel-inner p-3">
+        <View className="flex-row gap-2">
+          <HeroButton
+            className="flex-1"
+            size="sm"
+            variant={activeTab === 'inbox' ? 'primary' : 'secondary'}
+            accessibilityState={{ selected: activeTab === 'inbox' }}
+            onPress={() => setActiveTab('inbox')}
+          >
+            <Ionicons name="mail-outline" size={15} color={activeTab === 'inbox' ? '#fff' : primary} />
+            <HeroButton.Label>{t('tabs.inbox')}</HeroButton.Label>
+          </HeroButton>
+          <HeroButton
+            className="flex-1"
+            size="sm"
+            variant={activeTab === 'archived' ? 'primary' : 'secondary'}
+            accessibilityState={{ selected: activeTab === 'archived' }}
+            onPress={() => setActiveTab('archived')}
+          >
+            <Ionicons name="archive-outline" size={15} color={activeTab === 'archived' ? '#fff' : primary} />
+            <HeroButton.Label>{t('tabs.archived')}</HeroButton.Label>
+          </HeroButton>
+        </View>
+
         <View className="flex-row items-center justify-between gap-3">
           <View className="min-w-0 flex-1">
             <Text className="text-base font-semibold" style={{ color: theme.text }}>
-              {t('inbox')}
+              {activeTab === 'archived' ? t('tabs.archived') : t('inbox')}
             </Text>
             <Text className="mt-0.5 text-sm" style={{ color: theme.textSecondary }} numberOfLines={2}>
               {t('filtersIntro')}
             </Text>
           </View>
           <Chip size="sm" variant="soft" color="default">
-            <Chip.Label>{t('visibleCount', { count: visibleCount })}</Chip.Label>
+            <Chip.Label>
+              {activeTab === 'archived'
+                ? t('archivedCount', { count: archivedCount })
+                : t('visibleCount', { count: visibleCount })}
+            </Chip.Label>
           </Chip>
         </View>
 
@@ -475,6 +554,66 @@ function ConversationCard({
         </HeroCard>
       </Pressable>
     </Swipeable>
+  );
+}
+
+function ArchivedConversationCard({
+  conversation,
+  primary,
+  theme,
+  t,
+  onRestore,
+}: {
+  conversation: Conversation;
+  primary: string;
+  theme: Theme;
+  t: TFunction;
+  onRestore: (conversation: Conversation) => void;
+}) {
+  const lastMsg = conversation.last_message;
+  const otherName = displayName(conversation.other_user);
+  const lastMsgBody = lastMsg?.body ?? lastMsg?.content ?? '';
+
+  return (
+    <HeroCard variant="secondary" className="mx-4 my-2 overflow-hidden rounded-panel p-0">
+      <HeroCard.Body className="flex-row items-center gap-3 px-4 py-4">
+        <Avatar
+          uri={conversation.other_user?.avatar_url ?? null}
+          name={otherName}
+          size={50}
+        />
+        <View className="min-w-0 flex-1 gap-1">
+          <View className="flex-row items-center justify-between gap-3">
+            <Text className="min-w-0 flex-1 text-base font-semibold" style={{ color: theme.textSecondary }} numberOfLines={1}>
+              {otherName}
+            </Text>
+            {lastMsg ? (
+              <Text className="max-w-[86px] text-right text-xs" style={{ color: theme.textMuted }} numberOfLines={1}>
+                {formatRelativeTime(lastMsg.created_at, true)}
+              </Text>
+            ) : null}
+          </View>
+          {lastMsgBody ? (
+            <Text className="text-sm leading-5" style={{ color: theme.textMuted }} numberOfLines={2}>
+              {lastMsgBody}
+            </Text>
+          ) : (
+            <Text className="text-sm leading-5" style={{ color: theme.textMuted }} numberOfLines={2}>
+              {t('thread.noMessages')}
+            </Text>
+          )}
+        </View>
+        <HeroButton
+          isIconOnly
+          size="sm"
+          variant="secondary"
+          accessibilityLabel={t('restoreConversationWithName', { name: otherName })}
+          onPress={() => onRestore(conversation)}
+        >
+          <Ionicons name="refresh-outline" size={17} color={primary} />
+        </HeroButton>
+      </HeroCard.Body>
+    </HeroCard>
   );
 }
 

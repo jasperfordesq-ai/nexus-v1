@@ -101,10 +101,15 @@ export interface SendMessageOptions {
   context_id?: number;
 }
 
+export interface ConversationListOptions {
+  archived?: boolean;
+}
+
 /** GET /api/v2/messages — list conversations for current user */
-export function getConversations(cursor?: string | null): Promise<ConversationListResponse> {
+export function getConversations(cursor?: string | null, options: ConversationListOptions = {}): Promise<ConversationListResponse> {
   const params: Record<string, string> = {};
   if (cursor) params.cursor = cursor;
+  if (options.archived) params.archived = 'true';
   return api.get<ConversationListResponse>(`${API_V2}/messages`, params);
 }
 
@@ -139,6 +144,10 @@ export async function getOrCreateThread(otherUserId: number): Promise<MessageLis
 /** DELETE /api/v2/messages/conversations/:conversationId — delete a conversation */
 export function deleteConversation(conversationId: number): Promise<void> {
   return api.delete(`${API_V2}/messages/conversations/${conversationId}`);
+}
+
+export function restoreConversation(conversationId: number): Promise<{ data?: { success?: boolean; restored_count?: number } }> {
+  return api.post(`${API_V2}/messages/conversations/${conversationId}/restore`, {});
 }
 
 /** POST /api/v2/messages — send a message to a recipient */

@@ -3,16 +3,24 @@
   "heroEyebrow": "Private messages",
   "subtitle": "Keep track of your conversations with members across the timebank.",
   "inbox": "Inbox",
+  "tabs": {
+    "inbox": "Inbox",
+    "archived": "Archived"
+  },
   "filtersIntro": "Search conversations by member or recent message.",
   "searchPlaceholder": "Search messages",
   "resultsLoading": "Loading",
   "conversationCount": "{{count}} conversation",
   "conversationCount_other": "{{count}} conversations",
   "visibleCount": "{{count}} shown",
+  "archivedCount": "{{count}} archived",
   "unreadCount": "{{count}} unread",
   "clearSearch": "Clear search",
   "readStatus": "No unread messages",
   "openThread": "Open",
+  "restore": "Restore",
+  "restoreConversation": "Restore conversation",
+  "restoreConversationWithName": "Restore conversation with {{name}}",
   "threadTitle": "Conversation",
   "thread": {
     "inputPlaceholder": "Type a message…",
@@ -55,11 +63,15 @@
   "empty": {
     "title": "No conversations yet",
     "subtitle": "Connect with members to start messaging",
+    "archivedTitle": "No archived conversations",
+    "archivedSubtitle": "Archived conversations will appear here.",
     "searchTitle": "No matching conversations",
     "searchSubtitle": "Try a different member name or message keyword."
   },
   "errors": {
     "sendFailed": "Message failed to send. Tap to retry.",
-    "loadFailed": "Could not load messages."
+    "loadFailed": "Could not load messages.",
+    "restoreFailedTitle": "Restore failed",
+    "restoreFailed": "Could not restore this conversation."
   }
 }

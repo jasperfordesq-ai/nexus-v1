@@ -25,6 +25,7 @@ import {
   getThread,
   getOrCreateThread,
   sendMessage,
+  restoreConversation,
 } from './messages';
 import type { ConversationListResponse, MessageListResponse, Message } from './messages';
 
@@ -80,9 +81,27 @@ describe('getConversations', () => {
     expect(params).not.toHaveProperty('cursor');
   });
 
+  it('includes archived param when requesting archived conversations', async () => {
+    (api.get as jest.Mock).mockResolvedValue(mockConversationListResponse);
+    await getConversations(null, { archived: true });
+    expect(api.get).toHaveBeenCalledWith('/api/v2/messages', { archived: 'true' });
+  });
+
   it('propagates errors from the API', async () => {
     (api.get as jest.Mock).mockRejectedValue(new Error('Unauthorized'));
     await expect(getConversations()).rejects.toThrow('Unauthorized');
+  });
+});
+
+describe('restoreConversation', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('posts to the restore endpoint for a conversation', async () => {
+    (api.post as jest.Mock).mockResolvedValue({ data: { success: true, restored_count: 1 } });
+
+    await restoreConversation(7);
+
+    expect(api.post).toHaveBeenCalledWith('/api/v2/messages/conversations/7/restore', {});
   });
 });
 

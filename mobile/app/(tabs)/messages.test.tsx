@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
+import { render, fireEvent, waitFor } from '@testing-library/react-native';
 
 // --- Mocks ---
 
@@ -28,7 +28,14 @@ jest.mock('react-i18next', () => ({
         'title': 'Messages',
         'newMessage': 'New message',
         'newGroup': 'New group',
+        'tabs.inbox': 'Inbox',
+        'tabs.archived': 'Archived',
+        'restore': 'Restore',
+        'restoreConversation': 'Restore conversation',
+        'restoreConversationWithName': 'Restore conversation with Bob Builder',
         'empty.title': 'No conversations yet',
+        'empty.archivedTitle': 'No archived conversations',
+        'empty.archivedSubtitle': 'Archived conversations will appear here.',
         'thread.you': 'You',
         'thread.noMessages': 'No messages yet. Say hello!',
         'common:buttons.retry': 'Retry',
@@ -89,6 +96,7 @@ jest.mock('@expo/vector-icons', () => ({
 jest.mock('@/lib/api/messages', () => ({
   getConversations: jest.fn(),
   deleteConversation: jest.fn().mockResolvedValue(undefined),
+  restoreConversation: jest.fn().mockResolvedValue({ data: { success: true } }),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   displayName: (user: any) => user?.name ?? 'Unknown',
 }));
@@ -107,6 +115,7 @@ jest.mock('@/components/ui/Skeleton', () => ({
 // --- Tests ---
 
 import MessagesScreen from './messages';
+import { restoreConversation } from '@/lib/api/messages';
 
 const defaultPaginatedState = {
   items: [],
@@ -249,5 +258,30 @@ describe('MessagesScreen', () => {
     fireEvent.press(getByLabelText('New group'));
 
     expect(mockRouterPush).toHaveBeenCalledWith({ pathname: '/(modals)/new-group' });
+  });
+
+  it('shows archived conversations and restores them from the Archived tab', async () => {
+    const inboxRefresh = jest.fn();
+    const archivedRefresh = jest.fn();
+    mockUsePaginatedApi.mockImplementation(() => (
+      mockUsePaginatedApi.mock.calls.length % 2 === 1
+        ? { ...defaultPaginatedState, refresh: inboxRefresh }
+        : { ...defaultPaginatedState, items: [mockConversation], refresh: archivedRefresh }
+    ));
+
+    const { getByText, getByLabelText } = render(<MessagesScreen />);
+
+    fireEvent.press(getByText('Archived'));
+
+    expect(getByText('Bob Builder')).toBeTruthy();
+    expect(getByText('Can you help with plumbing?')).toBeTruthy();
+
+    fireEvent.press(getByLabelText('Restore conversation with Bob Builder'));
+
+    await waitFor(() => {
+      expect(restoreConversation).toHaveBeenCalledWith(7);
+    });
+    expect(inboxRefresh).toHaveBeenCalled();
+    expect(archivedRefresh).toHaveBeenCalled();
   });
 });
