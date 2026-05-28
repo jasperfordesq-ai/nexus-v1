@@ -13,6 +13,7 @@ const mockMarkRead = jest.fn().mockResolvedValue({});
 const mockMarkReadBatch = jest.fn().mockResolvedValue({ data: { updated: 1 } });
 const mockSendFederationMessage = jest.fn().mockResolvedValue({ data: { id: 202 } });
 const mockTranslateFederationMessage = jest.fn().mockResolvedValue({ data: { translated_text: 'Could we coordinate this across communities? (translated)' } });
+const mockGetFederationMembers = jest.fn();
 let mockSearchParams: Record<string, string> = {};
 
 jest.mock('expo-router', () => ({
@@ -45,6 +46,11 @@ jest.mock('react-i18next', () => ({
         'directory.messages.loadingRecipient': 'Loading recipient...',
         'directory.messages.recipientFallback': 'Federated member',
         'directory.messages.noRecipient': 'Choose a federated member before sending a message.',
+        'directory.messages.recipientSearch': 'Find a recipient',
+        'directory.messages.recipientSearchPlaceholder': 'Search federated members...',
+        'directory.messages.selectRecipient': `Message ${String(opts?.name ?? '')}`,
+        'directory.messages.changeRecipient': 'Change recipient',
+        'directory.messages.noRecipientsFound': 'No federated members found.',
         'directory.messages.subject': 'Subject',
         'directory.messages.subjectPlaceholder': 'Add a short subject',
         'directory.messages.body': 'Message',
@@ -96,7 +102,7 @@ jest.mock('@/lib/api/federation', () => ({
   getFederationEvents: jest.fn(),
   getFederationGroups: jest.fn(),
   getFederationListings: jest.fn(),
-  getFederationMembers: jest.fn(),
+  getFederationMembers: (...args: unknown[]) => mockGetFederationMembers(...args),
   getFederationMessages: jest.fn(),
   getFederationPartners: jest.fn(),
   getFederationSettings: jest.fn(),
@@ -236,8 +242,10 @@ beforeEach(() => {
   mockMarkReadBatch.mockClear();
   mockSendFederationMessage.mockClear();
   mockTranslateFederationMessage.mockClear();
+  mockGetFederationMembers.mockReset();
   mockSendFederationMessage.mockResolvedValue({ data: { id: 202 } });
   mockTranslateFederationMessage.mockResolvedValue({ data: { translated_text: 'Could we coordinate this across communities? (translated)' } });
+  mockGetFederationMembers.mockResolvedValue({ data: [] });
   mockUseApi.mockImplementation((_fetcher: unknown, deps?: unknown[]) => {
     if (Array.isArray(deps) && deps.length === 0) {
       return {
@@ -439,6 +447,60 @@ describe('FederationMessagesScreen', () => {
     expect(getByText('Federated conversation')).toBeTruthy();
     expect(getByText('Let us coordinate this.')).toBeTruthy();
     expect(mockRefresh).toHaveBeenCalled();
+  });
+
+  it('searches federated members when composing without a deep-linked recipient', async () => {
+    mockSearchParams = { compose: 'true' };
+    const sentMessage = {
+      ...message,
+      id: 203,
+      subject: 'Shared project',
+      body: 'Could we coordinate?',
+      direction: 'outbound' as const,
+      status: 'delivered' as const,
+      sender: message.receiver,
+      receiver: message.sender,
+    };
+    mockSendFederationMessage.mockResolvedValueOnce({ data: sentMessage });
+    mockGetFederationMembers.mockResolvedValueOnce({
+      data: [{
+        id: 272,
+        name: 'Katherine',
+        avatar: null,
+        tenant_id: 5,
+        tenant_name: 'Cork Timebank',
+      }],
+    });
+    mockUseApi.mockImplementation(() => ({
+      data: { data: [] },
+      isLoading: false,
+      error: null,
+      refresh: mockRefresh,
+    }));
+
+    const { getByLabelText, getByPlaceholderText, getByText } = render(<FederationMessagesScreen />);
+
+    fireEvent.changeText(getByPlaceholderText('Search federated members...'), 'Kath');
+
+    await waitFor(() => {
+      expect(mockGetFederationMembers).toHaveBeenCalledWith({ q: 'Kath', limit: '8' });
+      expect(getByText('Katherine')).toBeTruthy();
+    });
+
+    fireEvent.press(getByLabelText('Message Katherine'));
+    fireEvent.changeText(getByPlaceholderText('Add a short subject'), 'Shared project');
+    fireEvent.changeText(getByPlaceholderText('Write your message...'), 'Could we coordinate?');
+    fireEvent.press(getByText('Send message'));
+
+    await waitFor(() => {
+      expect(mockSendFederationMessage).toHaveBeenCalledWith({
+        receiver_id: 272,
+        receiver_tenant_id: 5,
+        subject: 'Shared project',
+        body: 'Could we coordinate?',
+      });
+    });
+    expect(getByText('Federated conversation')).toBeTruthy();
   });
 
   it('uses compose deep-link community metadata when recipient lookup is skipped', () => {

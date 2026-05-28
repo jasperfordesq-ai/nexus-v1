@@ -1108,26 +1108,61 @@ function FederationComposeCard({
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [isSending, setIsSending] = useState(false);
-  const hasTarget = !!toUser && !!toTenant;
-  const shouldLookupRecipient = hasTarget && !String(toTenant).startsWith('ext-');
+  const [selectedRecipient, setSelectedRecipient] = useState<FederatedMember | null>(null);
+  const [recipientQuery, setRecipientQuery] = useState('');
+  const [recipientResults, setRecipientResults] = useState<FederatedMember[]>([]);
+  const [isSearchingRecipients, setIsSearchingRecipients] = useState(false);
+  const selectedRecipientTenantId = selectedRecipient?.tenant_id ?? selectedRecipient?.timebank?.id;
+  const effectiveToUser = selectedRecipient?.id ?? toUser;
+  const effectiveToTenant = selectedRecipientTenantId ?? toTenant;
+  const hasTarget = !!effectiveToUser && !!effectiveToTenant;
+  const shouldLookupRecipient = !!toUser && !!toTenant && !selectedRecipient && !String(toTenant).startsWith('ext-');
 
   const { data: recipientData, isLoading: isLoadingRecipient } = useApi(
     () => getFederationMember(toUser as string, toTenant as string),
     [toUser, toTenant],
     { enabled: shouldLookupRecipient },
   );
-  const recipient = shouldLookupRecipient ? recipientData?.data as FederatedMember | undefined : undefined;
+  const recipient = selectedRecipient ?? (shouldLookupRecipient ? recipientData?.data as FederatedMember | undefined : undefined);
   const recipientName = displayMemberName(recipient ?? { id: toUser ?? '', name: initialName }, t('directory.messages.recipientFallback'));
   const recipientCommunity = (recipient?.timebank?.name ?? recipient?.tenant_name ?? initialCommunity?.trim()) || t('directory.unknownCommunity');
   const canSend = hasTarget && body.trim().length > 0 && !isSending;
 
+  useEffect(() => {
+    if (hasTarget || !recipientQuery.trim()) {
+      setRecipientResults([]);
+      setIsSearchingRecipients(false);
+      return;
+    }
+
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      setIsSearchingRecipients(true);
+      try {
+        const response = await getFederationMembers({ q: recipientQuery.trim(), limit: '8' });
+        if (!cancelled) {
+          setRecipientResults(unwrapArray<FederatedMember>(response));
+        }
+      } catch {
+        if (!cancelled) setRecipientResults([]);
+      } finally {
+        if (!cancelled) setIsSearchingRecipients(false);
+      }
+    }, 250);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [hasTarget, recipientQuery]);
+
   async function handleSend() {
-    if (!toUser || !toTenant || !body.trim()) return;
+    if (!effectiveToUser || !effectiveToTenant || !body.trim()) return;
     setIsSending(true);
     try {
       const response = await sendFederationMessage({
-        receiver_id: toUser,
-        receiver_tenant_id: toTenant,
+        receiver_id: effectiveToUser,
+        receiver_tenant_id: effectiveToTenant,
         subject: subject.trim(),
         body: body.trim(),
       });
@@ -1169,11 +1204,75 @@ function FederationComposeCard({
         </View>
 
         {!hasTarget ? (
-          <Surface variant="secondary" className="rounded-panel-inner p-3">
-            <Text className="text-sm" style={{ color: theme.textSecondary }}>
-              {t('directory.messages.noRecipient')}
-            </Text>
-          </Surface>
+          <View className="gap-3">
+            <Surface variant="secondary" className="rounded-panel-inner p-3">
+              <Text className="text-sm" style={{ color: theme.textSecondary }}>
+                {t('directory.messages.noRecipient')}
+              </Text>
+            </Surface>
+            <View className="gap-2">
+              <Text className="text-sm font-semibold" style={{ color: theme.text }}>{t('directory.messages.recipientSearch')}</Text>
+              <TextInput
+                value={recipientQuery}
+                onChangeText={setRecipientQuery}
+                placeholder={t('directory.messages.recipientSearchPlaceholder')}
+                placeholderTextColor={theme.textMuted}
+                className="rounded-panel-inner border border-border bg-surface px-4 py-3 text-base"
+                style={{ color: theme.text }}
+              />
+            </View>
+            {isSearchingRecipients ? (
+              <Surface variant="secondary" className="items-center rounded-panel-inner p-3">
+                <Spinner size="sm" />
+              </Surface>
+            ) : recipientResults.length > 0 ? (
+              <View className="gap-2">
+                {recipientResults.map((candidate) => {
+                  const candidateTenantId = candidate.tenant_id ?? candidate.timebank?.id;
+                  const candidateName = displayMemberName(candidate, t('directory.messages.recipientFallback'));
+                  const candidateCommunity = candidate.timebank?.name ?? candidate.tenant_name ?? t('directory.unknownCommunity');
+                  return (
+                    <HeroButton
+                      key={`${candidateTenantId ?? 'tenant'}-${candidate.id}`}
+                      variant="secondary"
+                      onPress={() => {
+                        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        setSelectedRecipient(candidate);
+                        setRecipientQuery('');
+                        setRecipientResults([]);
+                      }}
+                      accessibilityLabel={t('directory.messages.selectRecipient', { name: candidateName })}
+                    >
+                      <Avatar uri={candidate.avatar ?? null} name={candidateName} size={32} />
+                      <View className="min-w-0 flex-1 items-start">
+                        <HeroButton.Label>{candidateName}</HeroButton.Label>
+                        <Text className="text-xs" style={{ color: theme.textSecondary }} numberOfLines={1}>
+                          {candidateCommunity}
+                        </Text>
+                      </View>
+                    </HeroButton>
+                  );
+                })}
+              </View>
+            ) : recipientQuery.trim() ? (
+              <Text className="text-sm" style={{ color: theme.textSecondary }}>
+                {t('directory.messages.noRecipientsFound')}
+              </Text>
+            ) : null}
+          </View>
+        ) : selectedRecipient ? (
+          <HeroButton
+            variant="secondary"
+            onPress={() => {
+              setSelectedRecipient(null);
+              setRecipientQuery('');
+              setRecipientResults([]);
+            }}
+            accessibilityLabel={t('directory.messages.changeRecipient')}
+          >
+            <Ionicons name="swap-horizontal-outline" size={16} color={primary} />
+            <HeroButton.Label>{t('directory.messages.changeRecipient')}</HeroButton.Label>
+          </HeroButton>
         ) : null}
 
         <View className="gap-2">
