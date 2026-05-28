@@ -125,6 +125,10 @@ function displayMemberName(member: FederatedMember, fallback: string) {
   return member.name?.trim() || `${member.first_name ?? ''} ${member.last_name ?? ''}`.trim() || fallback;
 }
 
+function displayFederationPartnerName(partner: FederatedThread['partner'], fallback: string) {
+  return partner.name?.trim() || fallback;
+}
+
 function externalPartnerIdFromFederatedId(id?: number | string | null): string | null {
   const raw = String(id ?? '');
   if (!raw.startsWith('ext-')) return null;
@@ -870,14 +874,15 @@ function MessageCard({
   onPress: () => void;
 }) {
   const { partner, lastMessage: message } = thread;
+  const partnerName = displayFederationPartnerName(partner, t('directory.messages.unknownSender'));
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={t('directory.messages.openThread', { name: partner.name ?? t('directory.messages.unknownSender') })} onPress={onPress}>
+    <Pressable accessibilityRole="button" accessibilityLabel={t('directory.messages.openThread', { name: partnerName })} onPress={onPress}>
       <HeroCard className="mb-3 rounded-panel p-0">
         <HeroCard.Body className="gap-3 p-4">
           <View className="flex-row items-start gap-3">
-            <Avatar uri={partner.avatar ?? null} name={partner.name ?? t('directory.messages.unknownSender')} size={48} />
+            <Avatar uri={partner.avatar ?? null} name={partnerName} size={48} />
             <View className="min-w-0 flex-1 gap-1">
-              <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={1}>{partner.name ?? t('directory.messages.unknownSender')}</Text>
+              <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={1}>{partnerName}</Text>
               <Text className="text-xs" style={{ color: theme.textSecondary }} numberOfLines={1}>{partner.tenant_name ?? t('directory.unknownCommunity')}</Text>
             </View>
             <View className="items-end gap-2">
@@ -921,6 +926,7 @@ function MessageThreadView({
   onSent: (message?: FederatedMessage) => void;
 }) {
   const { i18n } = useTranslation();
+  const partnerName = displayFederationPartnerName(thread.partner, t('directory.messages.unknownSender'));
   const [reply, setReply] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [translations, setTranslations] = useState<Record<string, string>>({});
@@ -978,13 +984,13 @@ function MessageThreadView({
         <View className="h-1.5" style={{ backgroundColor: modeMeta.messages.tone }} />
         <HeroCard.Body className="gap-4 p-4">
           <View className="flex-row items-start gap-3">
-            <Avatar uri={thread.partner.avatar ?? null} name={thread.partner.name} size={52} />
+            <Avatar uri={thread.partner.avatar ?? null} name={partnerName} size={52} />
             <View className="min-w-0 flex-1 gap-1">
               <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>
                 {t('directory.messages.threadEyebrow')}
               </Text>
               <Text className="text-xl font-bold" style={{ color: theme.text }} numberOfLines={2}>
-                {thread.partner.name ?? t('directory.messages.unknownSender')}
+                {partnerName}
               </Text>
               <Text className="text-sm" style={{ color: theme.textSecondary }} numberOfLines={1}>
                 {thread.partner.tenant_name ?? t('directory.unknownCommunity')}

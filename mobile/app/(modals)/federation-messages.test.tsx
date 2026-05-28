@@ -327,6 +327,42 @@ describe('FederationMessagesScreen', () => {
     expect(mockRefresh).toHaveBeenCalled();
   });
 
+  it('uses a translated fallback when a federated message partner has a blank name', () => {
+    const blankNameMessage = {
+      ...message,
+      sender: {
+        ...message.sender,
+        name: '   ',
+      },
+    };
+    mockUseApi.mockImplementation((_fetcher: unknown, deps?: unknown[]) => {
+      if (Array.isArray(deps) && deps.length === 0) {
+        return {
+          data: { data: partnerFilters },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        };
+      }
+      return {
+        data: { data: [blankNameMessage] },
+        isLoading: false,
+        error: null,
+        refresh: mockRefresh,
+      };
+    });
+
+    const { getByLabelText, getByText } = render(<FederationMessagesScreen />);
+
+    expect(getByLabelText('Open thread with Unknown sender')).toBeTruthy();
+    expect(getByText('Unknown sender')).toBeTruthy();
+
+    fireEvent.press(getByLabelText('Open thread with Unknown sender'));
+
+    expect(getByText('Federated conversation')).toBeTruthy();
+    expect(getByText('Unknown sender')).toBeTruthy();
+  });
+
   it('translates inbound federated messages and can restore the original', async () => {
     const { getByLabelText, getByText, queryByText } = render(<FederationMessagesScreen />);
 
