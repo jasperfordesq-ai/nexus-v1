@@ -139,6 +139,7 @@
     "condition": "Condition",
     "category": "Category",
     "quantity": "Quantity",
+    "quantityPlaceholder": "1",
     "location": "Location",
     "locationPlaceholder": "Where can buyers collect or view it?",
     "delivery": "Delivery",
@@ -170,6 +171,14 @@
     "renewFailed": "Could not renew this listing."
   },
   "inventory": {
+    "section_title": "Inventory",
+    "section_subtitle": "Track stock and prevent over-selling.",
+    "unlimited": "Unlimited stock",
+    "stockCount": "Stock count",
+    "countPlaceholder": "0",
+    "low_stock_threshold": "Low-stock alert at",
+    "lowStockPlaceholder": "5",
+    "oversold_protected": "Reject orders that would oversell",
     "soldOut": "Sold out",
     "low": "Low stock: {{count}}",
     "count": "Stock: {{count}}"

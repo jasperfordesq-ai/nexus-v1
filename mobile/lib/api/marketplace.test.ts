@@ -183,14 +183,17 @@ describe('marketplace api', () => {
       price_type: 'fixed' as const,
       price: 25,
       condition: 'good' as const,
+      inventory_count: 4,
+      low_stock_threshold: 1,
+      is_oversold_protected: true,
       delivery_method: 'pickup' as const,
     };
 
     await createMarketplaceListing(payload);
     expect(api.post).toHaveBeenCalledWith('/api/v2/marketplace/listings', payload);
 
-    await updateMarketplaceListing(1, { title: 'Updated' });
-    expect(api.put).toHaveBeenCalledWith('/api/v2/marketplace/listings/1', { title: 'Updated' });
+    await updateMarketplaceListing(1, { title: 'Updated', inventory_count: null });
+    expect(api.put).toHaveBeenCalledWith('/api/v2/marketplace/listings/1', { title: 'Updated', inventory_count: null });
   });
 
   it('creates and loads offers', async () => {

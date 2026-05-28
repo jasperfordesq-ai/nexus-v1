@@ -452,6 +452,9 @@ export interface MarketplaceListingPayload {
   category_id?: number | null;
   condition?: MarketplaceCondition | null;
   quantity?: number | null;
+  inventory_count?: number | null;
+  low_stock_threshold?: number | null;
+  is_oversold_protected?: boolean;
   location?: string | null;
   shipping_available?: boolean;
   local_pickup?: boolean;

@@ -8,7 +8,7 @@ import { Alert, Image, ScrollView, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Button as HeroButton, Card as HeroCard, Text } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Switch, Text } from 'heroui-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useTranslation } from 'react-i18next';
 import * as Haptics from '@/lib/haptics';
@@ -67,6 +67,10 @@ export function MarketplaceListingForm() {
   const [condition, setCondition] = useState<MarketplaceCondition>('good');
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [quantity, setQuantity] = useState('1');
+  const [inventoryUnlimited, setInventoryUnlimited] = useState(true);
+  const [inventoryCount, setInventoryCount] = useState('0');
+  const [lowStockThreshold, setLowStockThreshold] = useState('5');
+  const [oversoldProtected, setOversoldProtected] = useState(true);
   const [location, setLocation] = useState('');
   const [deliveryMethod, setDeliveryMethod] = useState<MarketplaceDeliveryMethod>('pickup');
   const [sellerType, setSellerType] = useState<'private' | 'business'>('private');
@@ -104,6 +108,15 @@ export function MarketplaceListingForm() {
         setCondition(listing.condition ?? 'good');
         setCategoryId(listing.category?.id ?? null);
         setQuantity(String(listing.quantity ?? 1));
+        if (listing.inventory_count === null || listing.inventory_count === undefined) {
+          setInventoryUnlimited(true);
+          setInventoryCount('0');
+        } else {
+          setInventoryUnlimited(false);
+          setInventoryCount(String(listing.inventory_count));
+        }
+        setLowStockThreshold(String(listing.low_stock_threshold ?? 5));
+        setOversoldProtected(listing.is_oversold_protected ?? true);
         setLocation(listing.location ?? '');
         setDeliveryMethod((listing.delivery_method as MarketplaceDeliveryMethod) ?? 'pickup');
         setSellerType(listing.seller_type === 'business' ? 'business' : 'private');
@@ -134,6 +147,9 @@ export function MarketplaceListingForm() {
         category_id: categoryId,
         condition,
         quantity: toNumber(quantity) ?? 1,
+        inventory_count: inventoryUnlimited ? null : Math.max(0, toNumber(inventoryCount) ?? 0),
+        low_stock_threshold: Math.max(0, toNumber(lowStockThreshold) ?? 0),
+        is_oversold_protected: oversoldProtected,
         location: location.trim() || null,
         delivery_method: deliveryMethod,
         shipping_available: deliveryMethod === 'shipping' || deliveryMethod === 'both',
@@ -205,7 +221,30 @@ export function MarketplaceListingForm() {
             <FormField label={t('forms.timeCredits')} value={timeCredits} onChangeText={setTimeCredits} placeholder={t('forms.timeCreditsPlaceholder')} keyboardType="decimal-pad" />
             <ButtonGroup label={t('forms.condition')} values={CONDITIONS} selected={condition} onSelect={setCondition} labelFor={(value) => t(`condition.${value}`)} primary={primary} />
             <CategoryGroup categories={categories} selected={categoryId} onSelect={setCategoryId} primary={primary} />
-            <FormField label={t('forms.quantity')} value={quantity} onChangeText={setQuantity} placeholder="1" keyboardType="decimal-pad" />
+            <FormField label={t('forms.quantity')} value={quantity} onChangeText={setQuantity} placeholder={t('forms.quantityPlaceholder')} keyboardType="decimal-pad" />
+            <View className="gap-3 rounded-panel-inner border p-3" style={{ borderColor: theme.border, backgroundColor: withAlpha(primary, 0.06) }}>
+              <View className="flex-row items-start gap-3">
+                <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+                  <Ionicons name="cube-outline" size={18} color={primary} />
+                </View>
+                <View className="min-w-0 flex-1">
+                  <Text className="text-sm font-bold" style={{ color: theme.text }}>{t('inventory.section_title')}</Text>
+                  <Text className="text-xs leading-5" style={{ color: theme.textSecondary }}>{t('inventory.section_subtitle')}</Text>
+                </View>
+              </View>
+              <SwitchRow label={t('inventory.unlimited')} value={inventoryUnlimited} onValueChange={setInventoryUnlimited} />
+              {!inventoryUnlimited ? (
+                <View className="flex-row gap-3">
+                  <View className="flex-1">
+                    <FormField label={t('inventory.stockCount')} value={inventoryCount} onChangeText={setInventoryCount} placeholder={t('inventory.countPlaceholder')} keyboardType="decimal-pad" />
+                  </View>
+                  <View className="flex-1">
+                    <FormField label={t('inventory.low_stock_threshold')} value={lowStockThreshold} onChangeText={setLowStockThreshold} placeholder={t('inventory.lowStockPlaceholder')} keyboardType="decimal-pad" />
+                  </View>
+                </View>
+              ) : null}
+              <SwitchRow label={t('inventory.oversold_protected')} value={oversoldProtected} onValueChange={setOversoldProtected} />
+            </View>
             <FormField label={t('forms.location')} value={location} onChangeText={setLocation} placeholder={t('forms.locationPlaceholder')} />
             <ButtonGroup label={t('forms.delivery')} values={DELIVERY} selected={deliveryMethod} onSelect={setDeliveryMethod} labelFor={(value) => t(`delivery_method.${value}`)} primary={primary} />
             <ButtonGroup label={t('forms.sellerType')} values={['private', 'business'] as const} selected={sellerType} onSelect={setSellerType} labelFor={(value) => t(`sellerType.${value}`)} primary={primary} />
@@ -276,6 +315,16 @@ function ButtonGroup<T extends string>({
           </HeroButton>
         ))}
       </ScrollView>
+    </View>
+  );
+}
+
+function SwitchRow({ label, value, onValueChange }: { label: string; value: boolean; onValueChange: (value: boolean) => void }) {
+  const theme = useTheme();
+  return (
+    <View className="min-h-11 flex-row items-center justify-between gap-3">
+      <Text className="flex-1 text-sm font-semibold" style={{ color: theme.text }}>{label}</Text>
+      <Switch isSelected={value} onSelectedChange={onValueChange} />
     </View>
   );
 }
