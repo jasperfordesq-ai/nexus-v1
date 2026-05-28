@@ -18,7 +18,7 @@ import ChevronDown from 'lucide-react/icons/chevron-down';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import { useTenant } from '@/contexts';
 
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, ScrollShadow } from '@/components/ui';
 interface GroupTabNavProps {
   activeTab: string;
   userIsAdmin: boolean;
@@ -65,7 +65,9 @@ export function GroupTabNav({
   const activeSecondaryTab = secondaryTabs.find((tab) => tab.key === activeTab);
 
   return (
-    <div
+    <ScrollShadow
+      orientation="horizontal"
+      hideScrollBar
       className="sticky top-2 z-20 -mx-1 flex items-center gap-1 overflow-x-auto rounded-xl border border-theme-default bg-surface/95 p-1 shadow-sm backdrop-blur scrollbar-hide sm:mx-0"
       role="tablist"
       aria-label={t('detail.tab_nav_aria')}
@@ -145,6 +147,6 @@ export function GroupTabNav({
         </DropdownMenu>
       </Dropdown>
       )}
-    </div>
+    </ScrollShadow>
   );
 }

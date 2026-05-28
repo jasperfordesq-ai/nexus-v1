@@ -40,7 +40,7 @@ import { lazy, Suspense } from 'react';
 const MarkdownRenderer = lazy(() =>
   import('@/components/content/MarkdownRenderer').then((m) => ({ default: m.MarkdownRenderer })),
 );
-import { GlassCard, Button, Chip, Spinner } from '@/components/ui';
+import { GlassCard, Breadcrumbs, Button, Chip, Spinner } from '@/components/ui';
 import { useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
@@ -260,34 +260,21 @@ export function KBArticlePage() {
         </script>
       </Helmet>
       {/* Breadcrumb */}
-      <nav aria-label={t('breadcrumb')} className="flex items-center gap-2 text-sm text-theme-muted flex-wrap">
-        <Link
-          to={tenantPath('/kb')}
-          className="hover:text-theme-primary transition-colors flex items-center gap-1"
-        >
+      <Breadcrumbs aria-label={t('breadcrumb')} className="flex-wrap text-sm text-theme-muted">
+        <Breadcrumbs.Item href={tenantPath('/kb')} className="hover:text-theme-primary transition-colors">
           <BookOpen className="w-3.5 h-3.5" aria-hidden="true" />
           {t("title")}
-        </Link>
+        </Breadcrumbs.Item>
         {article.category_name && (
-          <>
-            <ChevronRight className="w-3 h-3 text-theme-subtle" aria-hidden="true" />
-            <span className="text-theme-subtle">{article.category_name}</span>
-          </>
+          <Breadcrumbs.Item>{article.category_name}</Breadcrumbs.Item>
         )}
         {article.parent_article_id && article.parent_title && (
-          <>
-            <ChevronRight className="w-3 h-3 text-theme-subtle" aria-hidden="true" />
-            <Link
-              to={tenantPath(`/kb/${article.parent_article_id}`)}
-              className="hover:text-theme-primary transition-colors"
-            >
-              {article.parent_title}
-            </Link>
-          </>
+          <Breadcrumbs.Item href={tenantPath(`/kb/${article.parent_article_id}`)}>
+            {article.parent_title}
+          </Breadcrumbs.Item>
         )}
-        <ChevronRight className="w-3 h-3 text-theme-subtle" aria-hidden="true" />
-        <span className="text-theme-primary font-medium truncate">{article.title}</span>
-      </nav>
+        <Breadcrumbs.Item className="text-theme-primary font-medium">{article.title}</Breadcrumbs.Item>
+      </Breadcrumbs>
 
       {/* Article Header */}
       <motion.div

@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure, GlassCard, Progress, Button, Chip, Spinner, SearchField, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, CardRowsSkeleton } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, GlassCard, Progress, Button, Chip, Spinner, SearchField, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, CardRowsSkeleton, ToggleButtonGroup, ToggleButton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -8,7 +8,7 @@ import { Select, SelectItem, useDisclosure, GlassCard, Progress, Button, Chip, S
  * Volunteering Page - Browse opportunities, track hours, manage applications
  */
 
-import React, { useState, useEffect, useCallback, useRef, Suspense } from 'react';
+import React, { useState, useEffect, useCallback, useRef, Suspense, type Key } from 'react';
 import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from '@/lib/motion';
@@ -338,26 +338,32 @@ export function VolunteeringPage() {
                 description={t('no_tabs_available_desc')}
               />
             )}
-            <div className="flex gap-2 flex-wrap" role="tablist" aria-label={t('aria.volunteering_sections')}>
+            <ToggleButtonGroup
+              isDetached
+              selectionMode="single"
+              selectedKeys={activeTab ? new Set([activeTab]) : new Set()}
+              onSelectionChange={(keys) => {
+                const [nextTab] = Array.from(keys as Set<Key>);
+                if (nextTab) setTab(String(nextTab));
+              }}
+              className="flex flex-wrap gap-2"
+              aria-label={t('aria.volunteering_sections')}
+            >
               {visibleTabs.map(({ key, icon: Icon, label }) => (
-                <Button
+                <ToggleButton
                   key={key}
-                  role="tab"
-                  id={`vol-tab-${key}`}
-                  aria-controls={`vol-panel-${key}`}
-                  aria-selected={activeTab === key}
-                  variant={activeTab === key ? 'solid' : 'flat'}
+                  id={key}
+                  aria-label={label}
                   className={activeTab === key ? VOL_GRADIENT : 'bg-theme-elevated text-theme-muted'}
-                  onPress={() => setTab(key)}
-                  startContent={<Icon className="w-4 h-4" aria-hidden="true" />}
                 >
+                  <Icon className="w-4 h-4" aria-hidden="true" />
                   {label}
-                </Button>
+                </ToggleButton>
               ))}
-            </div>
+            </ToggleButtonGroup>
 
             {/* Tab Content */}
-            {activeTab && <div role="tabpanel" id={`vol-panel-${activeTab}`} aria-labelledby={`vol-tab-${activeTab}`}>
+            {activeTab && <div>
               {activeTab === 'opportunities' && isTabEnabled('opportunities') && <OpportunitiesTab />}
               {activeTab === 'applications' && isTabEnabled('applications') && <ApplicationsTab />}
               {activeTab === 'hours' && isTabEnabled('hours') && <HoursTab />}

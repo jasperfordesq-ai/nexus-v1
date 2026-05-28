@@ -18,6 +18,7 @@ export { ConfettiCelebration } from './ConfettiCelebration';
 export { Alert, type AlertProps } from './Alert';
 export { AlertDialog, type AlertDialogProps } from './AlertDialog';
 export { Link, type LinkProps } from './Link';
+export { Breadcrumbs, type BreadcrumbsProps } from './Breadcrumbs';
 export { Code, type CodeProps } from './Code';
 export { Snippet, type SnippetProps } from './Snippet';
 export { Progress, type ProgressProps } from './Progress';
@@ -25,6 +26,7 @@ export { TimeInput, type TimeInputProps, type TimeInputValue } from './TimeInput
 export { DatePicker, type DatePickerProps, type DateInputValue } from './DatePicker';
 export { Button, type ButtonProps } from './Button';
 export { ButtonGroup, type ButtonGroupProps } from './ButtonGroup';
+export { ToggleButtonGroup, ToggleButton, type ToggleButtonGroupProps, type ToggleButtonProps } from './ToggleButtonGroup';
 export { Badge, type BadgeProps } from './Badge';
 export { Chip, type ChipProps } from './Chip';
 export { TagGroup, Tag, type TagGroupProps, type TagProps } from './TagGroup';
