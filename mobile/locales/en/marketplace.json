@@ -463,6 +463,21 @@
     "sales": "{{count}} sales",
     "active": "{{count}} active",
     "verified": "Verified",
+    "coverAlt": "{{name}} seller cover image",
+    "sellerType": {
+      "private": "Private seller",
+      "business": "Business seller"
+    },
+    "memberSince": "Member since {{date}}",
+    "joinedMarketplace": "Selling since {{date}}",
+    "communityTrust": "Community trust",
+    "trustScore": "{{score}}%",
+    "totalSales": "Total sales",
+    "avgRating": "Avg rating",
+    "responseTime": "Response time",
+    "activeListings": "Active listings",
+    "na": "N/A",
+    "message": "Message seller",
     "empty": "No active listings",
     "emptyHint": "This seller does not have public listings right now."
   },

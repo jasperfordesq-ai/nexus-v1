@@ -3,11 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { FlatList, View } from 'react-native';
+import { FlatList, Image, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Card as HeroCard, Chip, Text } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import MarketplaceListingCard from '@/components/marketplace/MarketplaceListingCard';
@@ -100,25 +100,87 @@ function SellerHeader({ profile }: { profile: MarketplaceSellerProfile }) {
   const { t } = useTranslation('marketplace');
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const memberSince = profile.member_since ? new Date(profile.member_since).toLocaleDateString(undefined, { month: 'short', year: 'numeric' }) : null;
+  const joinedMarketplace = profile.joined_marketplace_at ? new Date(profile.joined_marketplace_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' }) : null;
+  const trustScore = typeof profile.community_trust_score === 'number' ? Math.max(0, Math.min(100, profile.community_trust_score)) : null;
   return (
     <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
-      <View className="h-1.5" style={{ backgroundColor: primary }} />
+      {profile.cover_image_url ? (
+        <Image source={{ uri: profile.cover_image_url }} className="h-32 w-full" resizeMode="cover" accessibilityLabel={t('seller.coverAlt', { name: profile.display_name })} />
+      ) : (
+        <View className="h-1.5" style={{ backgroundColor: primary }} />
+      )}
       <HeroCard.Body className="gap-4 p-4">
         <View className="flex-row items-start gap-4">
           <Avatar uri={profile.avatar_url} name={profile.display_name} size={72} />
           <View className="min-w-0 flex-1 gap-2">
             <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('seller.eyebrow')}</Text>
             <Text className="text-2xl font-bold leading-8" style={{ color: theme.text }} numberOfLines={2}>{profile.display_name}</Text>
+            <View className="flex-row flex-wrap gap-2">
+              <Chip size="sm" variant="secondary"><Chip.Label>{t(`seller.sellerType.${profile.seller_type}`, { defaultValue: profile.seller_type })}</Chip.Label></Chip>
+              {profile.business_verified || profile.is_community_endorsed ? (
+                <Chip size="sm" variant="secondary" style={{ backgroundColor: withAlpha(theme.success, 0.15) }}>
+                  <Ionicons name="shield-checkmark-outline" size={12} color={theme.success} />
+                  <Chip.Label style={{ color: theme.success }}>{t('seller.verified')}</Chip.Label>
+                </Chip>
+              ) : null}
+            </View>
             {profile.bio ? <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={4}>{profile.bio}</Text> : null}
+            {memberSince ? (
+              <Text className="text-xs" style={{ color: theme.textSecondary }}>
+                {t('seller.memberSince', { date: memberSince })}
+              </Text>
+            ) : null}
           </View>
         </View>
+
+        {trustScore !== null && trustScore > 0 ? (
+          <Surface variant="secondary" className="rounded-panel-inner p-3">
+            <View className="flex-row items-center justify-between gap-3">
+              <View className="min-w-0 flex-1">
+                <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>{t('seller.communityTrust')}</Text>
+                <View className="mt-1 flex-row items-center gap-1">
+                  {[1, 2, 3, 4, 5].map((level) => (
+                    <Ionicons key={level} name={level <= Math.round(trustScore / 20) ? 'star' : 'star-outline'} size={16} color={theme.warning} />
+                  ))}
+                </View>
+              </View>
+              <Text className="text-xl font-bold" style={{ color: theme.text }}>{t('seller.trustScore', { score: trustScore })}</Text>
+            </View>
+          </Surface>
+        ) : null}
+
         <View className="flex-row flex-wrap gap-2">
-          <Chip size="sm" variant="secondary"><Ionicons name="star-outline" size={12} color={theme.warning} /><Chip.Label>{t('seller.rating', { rating: profile.avg_rating ?? 0 })}</Chip.Label></Chip>
-          <Chip size="sm" variant="secondary"><Ionicons name="bag-check-outline" size={12} color={primary} /><Chip.Label>{t('seller.sales', { count: profile.total_sales ?? 0 })}</Chip.Label></Chip>
-          <Chip size="sm" variant="secondary"><Ionicons name="storefront-outline" size={12} color={primary} /><Chip.Label>{t('seller.active', { count: profile.active_listings ?? 0 })}</Chip.Label></Chip>
-          {profile.business_verified ? <Chip size="sm" variant="secondary"><Ionicons name="shield-checkmark-outline" size={12} color={theme.success} /><Chip.Label>{t('seller.verified')}</Chip.Label></Chip> : null}
+          <SellerStat icon="bag-check-outline" label={t('seller.totalSales')} value={String(profile.total_sales ?? 0)} tone={primary} />
+          <SellerStat icon="star-outline" label={t('seller.avgRating')} value={profile.avg_rating !== null && profile.avg_rating !== undefined ? profile.avg_rating.toFixed(1) : t('seller.na')} tone={theme.warning} />
+          <SellerStat icon="time-outline" label={t('seller.responseTime')} value={profile.response_time_avg || t('seller.na')} tone="#14b8a6" />
+          <SellerStat icon="storefront-outline" label={t('seller.activeListings')} value={String(profile.active_listings ?? 0)} tone="#8b5cf6" />
         </View>
+
+        {joinedMarketplace ? (
+          <Text className="text-xs" style={{ color: theme.textSecondary }}>
+            {t('seller.joinedMarketplace', { date: joinedMarketplace })}
+          </Text>
+        ) : null}
+
+        <HeroButton variant="primary" onPress={() => router.push({ pathname: '/(tabs)/messages', params: { to: String(profile.user_id), name: profile.display_name } } as unknown as Href)} style={{ backgroundColor: primary }}>
+          <Ionicons name="chatbubble-outline" size={17} color="#fff" />
+          <HeroButton.Label>{t('seller.message')}</HeroButton.Label>
+        </HeroButton>
       </HeroCard.Body>
     </HeroCard>
+  );
+}
+
+function SellerStat({ icon, label, value, tone }: { icon: React.ComponentProps<typeof Ionicons>['name']; label: string; value: string; tone: string }) {
+  const theme = useTheme();
+  return (
+    <Surface variant="secondary" className="w-[48%] rounded-panel-inner p-3">
+      <View className="mb-2 size-8 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(tone, 0.14) }}>
+        <Ionicons name={icon} size={16} color={tone} />
+      </View>
+      <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={1}>{value}</Text>
+      <Text className="text-xs" style={{ color: theme.textSecondary }} numberOfLines={2}>{label}</Text>
+    </Surface>
   );
 }

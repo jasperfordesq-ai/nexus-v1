@@ -163,6 +163,7 @@ export interface MarketplaceSellerProfile {
   display_name: string;
   bio?: string | null;
   avatar_url?: string | null;
+  cover_image_url?: string | null;
   seller_type: string;
   business_name?: string | null;
   business_verified: boolean;
@@ -171,8 +172,11 @@ export interface MarketplaceSellerProfile {
   avg_rating?: number | null;
   total_ratings: number;
   total_sales: number;
+  response_time_avg?: string | null;
+  response_rate?: number | null;
   active_listings: number;
   member_since?: string | null;
+  joined_marketplace_at?: string | null;
 }
 
 export interface MarketplaceDashboard {
