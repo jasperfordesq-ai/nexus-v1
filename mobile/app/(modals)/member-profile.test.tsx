@@ -32,6 +32,12 @@ jest.mock('react-i18next', () => ({
         'profile.backToFederatedMembers': 'Back to federated members',
         'profile.federatedMessaging': 'Messaging enabled',
         'profile.federatedExchanges': 'Exchanges enabled',
+        'profile.pendingReceived': 'Connection request',
+        'profile.accept': 'Accept',
+        'profile.decline': 'Decline',
+        'profile.connected': 'Connected',
+        'profile.disconnect': 'Disconnect',
+        'profile.connectionError': 'Connection could not be updated.',
         'profile.sendCredits': 'Send credits',
         'profile.sendCreditsTo': opts ? `Send credits to ${String(opts.name ?? '')}` : 'Send credits',
         'profile.amountHours': 'Amount (hours)',
@@ -137,9 +143,12 @@ jest.mock('@/lib/api/members', () => ({
 }));
 
 jest.mock('@/lib/api/federation', () => ({
+  acceptFederationConnection: jest.fn().mockResolvedValue({}),
   getFederationMember: jest.fn(),
   getFederationMemberReviews: jest.fn().mockResolvedValue({ data: [] }),
   getFederationConnectionStatus: jest.fn().mockResolvedValue({ data: { status: 'none', connection_id: null } }),
+  rejectFederationConnection: jest.fn().mockResolvedValue({}),
+  removeFederationConnection: jest.fn().mockResolvedValue({}),
   sendFederationTransaction: jest.fn().mockResolvedValue({ data: { transaction_id: 44, status: 'completed' } }),
   sendFederationConnectionRequest: jest.fn().mockResolvedValue({ data: { connection_id: 20 } }),
 }));
@@ -170,7 +179,13 @@ jest.mock('@/components/ui/LoadingSpinner', () => () => null);
 // --- Tests ---
 
 import MemberProfileScreen from './member-profile';
-import { getFederationMember, getFederationMemberReviews, sendFederationTransaction } from '@/lib/api/federation';
+import {
+  acceptFederationConnection,
+  getFederationMember,
+  getFederationMemberReviews,
+  rejectFederationConnection,
+  sendFederationTransaction,
+} from '@/lib/api/federation';
 import { getMember } from '@/lib/api/members';
 
 const defaultApiState = { data: null, isLoading: false, error: null, refresh: jest.fn() };
@@ -361,6 +376,60 @@ describe('MemberProfileScreen', () => {
     expect(getByText('Trusted across our network.')).toBeTruthy();
     expect(getByText('via Partner Demo')).toBeTruthy();
     expect(getByText('Verified')).toBeTruthy();
+  });
+
+  it('accepts incoming federated connection requests through the federation API', async () => {
+    mockParams = { id: '272', tenant_id: '5' };
+    mockUseApi.mockReturnValue({
+      data: {
+        data: {
+          ...mockMember,
+          id: 272,
+          tenant_id: 5,
+          timebank: { id: 5, name: 'Partner Demo' },
+          connection_status: { status: 'pending', direction: 'incoming', connection_id: 77 },
+        },
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByText } = render(<MemberProfileScreen />);
+
+    await waitFor(() => expect(getByText('Accept')).toBeTruthy());
+    fireEvent.press(getByText('Accept'));
+
+    await waitFor(() => {
+      expect(acceptFederationConnection).toHaveBeenCalledWith(77);
+    });
+  });
+
+  it('declines incoming federated connection requests through the federation API', async () => {
+    mockParams = { id: '272', tenant_id: '5' };
+    mockUseApi.mockReturnValue({
+      data: {
+        data: {
+          ...mockMember,
+          id: 272,
+          tenant_id: 5,
+          timebank: { id: 5, name: 'Partner Demo' },
+          connection_status: { status: 'pending', direction: 'incoming', connection_id: 78 },
+        },
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByText } = render(<MemberProfileScreen />);
+
+    await waitFor(() => expect(getByText('Decline')).toBeTruthy());
+    fireEvent.press(getByText('Decline'));
+
+    await waitFor(() => {
+      expect(rejectFederationConnection).toHaveBeenCalledWith(78);
+    });
   });
 
   it('sends federated time credits from a partner member profile', async () => {

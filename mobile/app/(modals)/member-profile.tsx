@@ -13,9 +13,12 @@ import * as Haptics from '@/lib/haptics';
 import { Accordion, Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
 
 import {
+  acceptFederationConnection,
   getFederationConnectionStatus,
   getFederationMember,
   getFederationMemberReviews,
+  rejectFederationConnection,
+  removeFederationConnection,
   sendFederationTransaction,
   sendFederationConnectionRequest,
   type FederatedConnectionStatus,
@@ -206,7 +209,11 @@ function MemberProfileScreenInner() {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setConnActionLoading(true);
     try {
-      await acceptConnection(connId);
+      if (isFederatedProfile) {
+        await acceptFederationConnection(connId);
+      } else {
+        await acceptConnection(connId);
+      }
       setConnStatus('connected');
     } catch {
       Alert.alert(t('profile.connectionError'));
@@ -220,7 +227,11 @@ function MemberProfileScreenInner() {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setConnActionLoading(true);
     try {
-      await removeConnection(connId);
+      if (isFederatedProfile) {
+        await rejectFederationConnection(connId);
+      } else {
+        await removeConnection(connId);
+      }
       setConnStatus('none');
       setConnId(null);
     } catch {
@@ -244,7 +255,11 @@ function MemberProfileScreenInner() {
             if (!connId) return;
             setConnActionLoading(true);
             try {
-              await removeConnection(connId);
+              if (isFederatedProfile) {
+                await removeFederationConnection(connId);
+              } else {
+                await removeConnection(connId);
+              }
               setConnStatus('none');
               setConnId(null);
             } catch {
