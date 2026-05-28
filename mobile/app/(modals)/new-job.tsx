@@ -184,7 +184,10 @@ function NewJobScreen() {
         router.back();
       }
     } catch (error) {
-      Alert.alert(t('create.failedTitle'), error instanceof Error ? error.message : t('create.failedDescription'));
+      Alert.alert(
+        isEditing ? t('create.editFailedTitle') : t('create.failedTitle'),
+        error instanceof Error ? error.message : (isEditing ? t('create.editFailedDescription') : t('create.failedDescription')),
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -192,7 +195,7 @@ function NewJobScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <AppTopBar title={t('create.title')} backLabel={t('common:back')} fallbackHref="/(modals)/jobs" />
+      <AppTopBar title={isEditing ? t('create.editTitle') : t('create.title')} backLabel={t('common:back')} fallbackHref="/(modals)/jobs" />
       <ScrollView className="flex-1" contentContainerStyle={{ padding: 16, paddingBottom: 120 }}>
         <HeroCard className="mb-4 overflow-hidden rounded-panel p-0">
           <View className="h-1.5" style={{ backgroundColor: '#06b6d4' }} />
@@ -203,8 +206,8 @@ function NewJobScreen() {
               </View>
               <View className="min-w-0 flex-1">
                 <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('create.eyebrow')}</Text>
-                <Text className="text-2xl font-bold" style={{ color: theme.text }}>{t('create.title')}</Text>
-                <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('create.subtitle')}</Text>
+                <Text className="text-2xl font-bold" style={{ color: theme.text }}>{isEditing ? t('create.editTitle') : t('create.title')}</Text>
+                <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{isEditing ? t('create.editSubtitle') : t('create.subtitle')}</Text>
               </View>
             </View>
           </HeroCard.Body>

@@ -25,6 +25,7 @@ jest.mock('react-i18next', () => ({
         'create.title': 'Create Job',
         'create.editTitle': 'Edit Job',
         'create.subtitle': 'Post a role.',
+        'create.editSubtitle': 'Update the role details.',
         'create.titleLabel': 'Title',
         'create.titlePlaceholder': 'Role title',
         'create.descriptionLabel': 'Description',
@@ -76,6 +77,10 @@ jest.mock('react-i18next', () => ({
         'create.salaryRangeInvalid': 'Minimum salary cannot exceed maximum salary.',
         'create.salaryRequired': 'Salary range required. You may mark salary negotiable to omit it.',
         'create.loadFailed': 'Could not load job.',
+        'create.failedTitle': 'Job not created',
+        'create.failedDescription': 'We could not create the job.',
+        'create.editFailedTitle': 'Job not updated',
+        'create.editFailedDescription': 'We could not update the job.',
         'filters.type.paid': 'Paid',
         'filters.type.volunteer': 'Volunteer',
         'filters.type.timebank': 'Timebank',
@@ -293,6 +298,8 @@ describe('NewJobRoute', () => {
     const { getByDisplayValue, getByText } = render(<NewJobRoute />);
 
     await waitFor(() => expect(getByDisplayValue('Existing role')).toBeTruthy());
+    expect(getByText('Edit Job')).toBeTruthy();
+    expect(getByText('Update the role details.')).toBeTruthy();
     fireEvent.changeText(getByDisplayValue('Existing role'), 'Updated role');
     fireEvent.press(getByText('Update job'));
 

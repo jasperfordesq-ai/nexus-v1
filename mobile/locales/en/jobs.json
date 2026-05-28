@@ -214,6 +214,7 @@
     "title": "Create Job",
     "editTitle": "Edit Job",
     "subtitle": "Post a paid, volunteer, or time-credit role for members to discover.",
+    "editSubtitle": "Update the role details, salary transparency, and application settings.",
     "titleLabel": "Title",
     "titlePlaceholder": "Role title",
     "descriptionLabel": "Description",
@@ -269,6 +270,8 @@
     "salaryRequired": "Salary range required. You may mark salary negotiable to omit it.",
     "failedTitle": "Job not created",
     "loadFailed": "We could not load this job for editing.",
-    "failedDescription": "We could not create the job. Please try again."
+    "failedDescription": "We could not create the job. Please try again.",
+    "editFailedTitle": "Job not updated",
+    "editFailedDescription": "We could not update the job. Please try again."
   }
 }
