@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
 use App\Models\MarketplaceShippingOption;
+use App\Services\MarketplacePaymentService;
 use App\Services\MarketplaceSellerService;
 use App\Services\MarketplaceShippingOptionService;
 use Illuminate\Http\JsonResponse;
@@ -161,10 +162,14 @@ class MarketplaceSellerController extends BaseApiController
         $userId = $this->requireAuth();
 
         $profile = MarketplaceSellerService::getOrCreateProfile($userId);
+        $stripeStatus = MarketplacePaymentService::checkOnboardingStatus($userId);
 
         return $this->respondWithData([
             'stripe_account_id' => $profile->stripe_account_id,
-            'stripe_onboarding_complete' => (bool) $profile->stripe_onboarding_complete,
+            'stripe_onboarding_complete' => (bool) $stripeStatus['onboarded'],
+            'details_submitted' => (bool) $stripeStatus['details_submitted'],
+            'charges_enabled' => (bool) $stripeStatus['charges_enabled'],
+            'payouts_enabled' => (bool) $stripeStatus['payouts_enabled'],
         ]);
     }
 

@@ -7,7 +7,9 @@
 namespace Tests\Laravel\Feature\Controllers;
 
 use Tests\Laravel\TestCase;
+use App\Core\TenantContext;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use App\Models\User;
 
@@ -28,6 +30,19 @@ class MarketplaceSellerControllerTest extends TestCase
         return $user;
     }
 
+    private function enableMarketplaceFeature(): void
+    {
+        $tenant = DB::table('tenants')->where('id', $this->testTenantId)->first(['features']);
+        $features = json_decode((string) ($tenant->features ?? '{}'), true) ?: [];
+        $features['marketplace'] = true;
+
+        DB::table('tenants')
+            ->where('id', $this->testTenantId)
+            ->update(['features' => json_encode($features)]);
+
+        TenantContext::setById($this->testTenantId);
+    }
+
     public function test_dashboard_requires_auth(): void
     {
         $response = $this->apiGet('/v2/marketplace/seller/dashboard');
@@ -44,6 +59,20 @@ class MarketplaceSellerControllerTest extends TestCase
     {
         $response = $this->apiGet('/v2/marketplace/seller/shipping-options');
         $this->assertContains($response->status(), [401, 403]);
+    }
+
+    public function test_onboard_status_returns_connect_capability_flags(): void
+    {
+        $this->enableMarketplaceFeature();
+        $this->authenticatedUser();
+
+        $response = $this->apiGet('/v2/marketplace/seller/onboard/status');
+
+        $response->assertSuccessful();
+        $response->assertJsonPath('data.stripe_onboarding_complete', false);
+        $response->assertJsonPath('data.details_submitted', false);
+        $response->assertJsonPath('data.charges_enabled', false);
+        $response->assertJsonPath('data.payouts_enabled', false);
     }
 
     public function test_dashboard_authenticated_smoke(): void
