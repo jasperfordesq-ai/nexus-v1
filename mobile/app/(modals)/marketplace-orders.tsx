@@ -43,6 +43,8 @@ type OrderStatusTab = 'all' | 'active' | 'completed' | 'cancelled';
 type DisputeReason = 'not_received' | 'not_as_described' | 'damaged' | 'wrong_item' | 'other';
 const SHIPPING_METHODS = ['standard', 'express', 'tracked', 'hand_delivery', 'other'];
 const DISPUTE_REASONS: DisputeReason[] = ['not_received', 'not_as_described', 'damaged', 'wrong_item', 'other'];
+const ORDER_STATUSES = new Set(['pending', 'pending_payment', 'paid', 'processing', 'shipped', 'delivered', 'completed', 'cancelled', 'disputed', 'refunded']);
+const DELIVERY_STATUSES = new Set(['pending', 'accepted', 'declined', 'completed', 'cancelled']);
 const ORDER_STATUS_FILTERS: Record<OrderStatusTab, string | null> = {
   all: null,
   active: 'pending_payment,paid,processing,shipped',
@@ -57,6 +59,14 @@ function formatOrderTotal(value: number, currency: string): string {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   }).format(value);
+}
+
+function translatedOrderStatus(status: string, t: (key: string) => string): string {
+  return ORDER_STATUSES.has(status) ? t(`orders.status.${status}`) : t('orders.status.unknown');
+}
+
+function translatedDeliveryStatus(status: string, t: (key: string) => string): string {
+  return DELIVERY_STATUSES.has(status) ? t(`orders.deliveryStatus.${status}`) : t('orders.deliveryStatus.unknown');
 }
 
 export default function MarketplaceOrdersRoute() {
@@ -568,7 +578,7 @@ function OrderCard({
                 <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={2}>{item.listing?.title ?? item.order_number}</Text>
                 <Text className="text-sm font-semibold" style={{ color: theme.textSecondary }}>{total}</Text>
               </View>
-              <Chip size="sm" variant="secondary"><Chip.Label>{t(`orders.status.${item.status}`, { defaultValue: item.status })}</Chip.Label></Chip>
+              <Chip size="sm" variant="secondary"><Chip.Label>{translatedOrderStatus(item.status, t)}</Chip.Label></Chip>
             </View>
             {counterparty ? (
               <View className="flex-row items-center gap-2">
@@ -688,7 +698,7 @@ function DeliveryOfferCard({
               {offer.estimated_minutes ? ` - ${t('orders.deliveryEstimate', { count: offer.estimated_minutes })}` : ''}
             </Text>
           </View>
-          <Chip size="sm" variant="secondary"><Chip.Label>{t(`orders.deliveryStatus.${offer.status}`, { defaultValue: offer.status })}</Chip.Label></Chip>
+          <Chip size="sm" variant="secondary"><Chip.Label>{translatedDeliveryStatus(offer.status, t)}</Chip.Label></Chip>
         </View>
         {offer.notes ? (
           <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{offer.notes}</Text>

@@ -385,7 +385,8 @@
       "accepted": "Accepted",
       "declined": "Declined",
       "completed": "Completed",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "unknown": "Unknown delivery status"
     },
     "disputeReasons": {
       "not_received": "Not received",
@@ -406,7 +407,8 @@
       "completed": "Completed",
       "cancelled": "Cancelled",
       "disputed": "Disputed",
-      "refunded": "Refunded"
+      "refunded": "Refunded",
+      "unknown": "Unknown status"
     }
   },
   "checkout": {

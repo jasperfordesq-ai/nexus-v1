@@ -32,6 +32,7 @@ jest.mock('react-i18next', () => ({
         'orders.deliveryOffers': 'Delivery offers',
         'orders.waitingShipment': 'Waiting for shipment',
         'orders.status.paid': 'Paid',
+        'orders.status.unknown': 'Unknown status',
         'actions.view': 'View',
       };
       if (key === 'orders.number') return `Order ${String(opts?.number ?? '')}`;
@@ -196,6 +197,42 @@ describe('MarketplaceOrdersRoute', () => {
     });
 
     expect(getAllByText('Delivery offers')).toHaveLength(1);
+    unmount();
+  });
+
+  it('uses a translated fallback for unknown order statuses', async () => {
+    (getMarketplaceOrders as jest.Mock).mockResolvedValueOnce({
+      data: [
+        {
+          id: 51,
+          order_number: 'MKT-000051',
+          quantity: 1,
+          unit_price: 12,
+          total_price: 12,
+          currency: 'EUR',
+          status: 'awaiting_seller_review',
+          created_at: '2026-05-24T10:00:00Z',
+          listing: {
+            id: 81,
+            title: 'Review state chair',
+            image: null,
+            delivery_method: 'pickup',
+          },
+          seller: { id: 2, name: 'Pat Seller', avatar_url: null },
+        },
+      ],
+      meta: { cursor: null, has_more: false },
+    });
+
+    const { getByText, queryByText, unmount } = render(<MarketplaceOrdersRoute />);
+
+    await waitFor(() => {
+      expect(getByText('Review state chair')).toBeTruthy();
+      expect(getByText('Unknown status')).toBeTruthy();
+    });
+
+    expect(queryByText('orders.status.awaiting_seller_review')).toBeNull();
+    expect(queryByText('awaiting_seller_review')).toBeNull();
     unmount();
   });
 });
