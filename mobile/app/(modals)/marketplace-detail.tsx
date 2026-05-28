@@ -211,7 +211,11 @@ function MarketplaceDetailScreen() {
       const orderId = response.data.id;
       const orderNumber = response.data.order_number;
       if (selectedSlotId) {
-        await reserveMarketplacePickup(orderId, selectedSlotId);
+        try {
+          await reserveMarketplacePickup(orderId, selectedSlotId);
+        } catch {
+          setSelectedSlotId(null);
+        }
       }
       let payment;
       try {
@@ -254,6 +258,10 @@ function MarketplaceDetailScreen() {
     } finally {
       setIsActionLoading(false);
     }
+  }
+
+  function togglePickupSlot(slotId: number) {
+    setSelectedSlotId((current) => current === slotId ? null : slotId);
   }
 
   async function handleSubmitOffer() {
@@ -532,10 +540,13 @@ function MarketplaceDetailScreen() {
                         key={slot.id}
                         size="sm"
                         variant={selectedSlotId === slot.id ? 'primary' : 'secondary'}
-                        onPress={() => setSelectedSlotId(selectedSlotId === slot.id ? null : slot.id)}
+                        onPress={() => togglePickupSlot(slot.id)}
+                        accessibilityLabel={formatPickupSlot(slot, t('pickup.slotFallback', { id: slot.id }))}
+                        accessibilityState={{ selected: selectedSlotId === slot.id }}
+                        testID={`marketplace-pickup-slot-${slot.id}`}
                         style={selectedSlotId === slot.id ? { backgroundColor: primary } : undefined}
                       >
-                        <HeroButton.Label>{formatPickupSlot(slot, t('pickup.slotFallback', { id: slot.id }))}</HeroButton.Label>
+                        <HeroButton.Label onPress={() => togglePickupSlot(slot.id)}>{formatPickupSlot(slot, t('pickup.slotFallback', { id: slot.id }))}</HeroButton.Label>
                       </HeroButton>
                     ))}
                   </ScrollView>

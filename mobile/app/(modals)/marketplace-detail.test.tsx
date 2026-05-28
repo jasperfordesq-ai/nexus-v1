@@ -53,6 +53,11 @@ jest.mock('react-i18next', () => ({
         'checkout.coupon': 'Coupon code',
         'checkout.couponPlaceholder': 'COMMUNITY10',
         'checkout.apply': 'Apply',
+        'checkout.applied': 'Applied',
+        'pickup.chooseSlot': 'Pickup slot',
+        'pickup.slotFallback': `Slot ${String(opts?.id ?? '')}`,
+        'checkout.openedTitle': 'Checkout started',
+        'checkout.clientSecretHint': 'The order was created. Complete payment from the web checkout if the payment sheet does not open on this device.',
         'checkout.paymentRecoveryTitle': 'Checkout paused',
         'checkout.paymentRecoveryHint': `Order ${String(opts?.order ?? '')} was created, but payment could not start. Continue payment from Orders.`,
       };
@@ -127,7 +132,14 @@ jest.mock('@/lib/api/marketplace', () => ({
 }));
 
 import MarketplaceDetailRoute from './marketplace-detail';
-import { createMarketplaceOrder, createMarketplacePaymentIntent, getMarketplaceListing, getMarketplaceSellerListings } from '@/lib/api/marketplace';
+import {
+  createMarketplaceOrder,
+  createMarketplacePaymentIntent,
+  getMarketplaceListing,
+  getMarketplaceListingPickupSlots,
+  getMarketplaceSellerListings,
+  reserveMarketplacePickup,
+} from '@/lib/api/marketplace';
 
 const mockListing = {
   id: 9,
@@ -171,6 +183,7 @@ describe('MarketplaceDetailRoute', () => {
     mockFeatures = new Set(['merchant_coupons']);
     alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
     (getMarketplaceListing as jest.Mock).mockResolvedValue({ data: mockListing });
+    (getMarketplaceListingPickupSlots as jest.Mock).mockResolvedValue({ data: [] });
     (getMarketplaceSellerListings as jest.Mock).mockResolvedValue({ data: [] });
   });
 
@@ -238,13 +251,54 @@ describe('MarketplaceDetailRoute', () => {
       expect(getByText('Buy now')).toBeTruthy();
     });
 
-    fireEvent.press(getByText('Buy now'));
+    const buyNow = await waitFor(() => getByText('Buy now'));
+    fireEvent.press(buyNow);
 
     await waitFor(() => {
       expect(createMarketplacePaymentIntent).toHaveBeenCalledWith(44);
       expect(Alert.alert).toHaveBeenCalledWith(
         'Checkout paused',
         'Order MKT-000044 was created, but payment could not start. Continue payment from Orders.',
+      );
+    });
+  });
+
+  it('continues checkout when pickup reservation fails after order creation', async () => {
+    (getMarketplaceListingPickupSlots as jest.Mock).mockResolvedValueOnce({
+      data: [
+        {
+          id: 12,
+          slot_start: '2026-06-01T10:00:00Z',
+          slot_end: '2026-06-01T12:00:00Z',
+          remaining: 2,
+        },
+      ],
+    });
+    (createMarketplaceOrder as jest.Mock).mockResolvedValue({
+      data: { id: 45, order_number: 'MKT-000045', status: 'pending_payment' },
+    });
+    (reserveMarketplacePickup as jest.Mock).mockRejectedValue(new Error('Slot is full'));
+    (createMarketplacePaymentIntent as jest.Mock).mockResolvedValue({
+      data: { client_secret: 'pi_secret' },
+    });
+
+    const { getByText, findByText, findByTestId } = render(<MarketplaceDetailRoute />);
+
+    const slot = await findByText(/2026/);
+    fireEvent.press(slot);
+    await waitFor(async () => {
+      const slotButton = await findByTestId('marketplace-pickup-slot-12');
+      expect(slotButton.props.accessibilityState).toEqual(expect.objectContaining({ selected: true }));
+    });
+    const buyNow = await waitFor(() => getByText('Buy now'));
+    fireEvent.press(buyNow);
+
+    await waitFor(() => {
+      expect(reserveMarketplacePickup).toHaveBeenCalledWith(45, 12);
+      expect(createMarketplacePaymentIntent).toHaveBeenCalledWith(45);
+      expect(Alert.alert).toHaveBeenCalledWith(
+        'Checkout started',
+        'The order was created. Complete payment from the web checkout if the payment sheet does not open on this device.',
       );
     });
   });
