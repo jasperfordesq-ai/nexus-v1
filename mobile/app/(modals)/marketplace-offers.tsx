@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState } from 'react';
-import { Alert, FlatList, TextInput, View } from 'react-native';
+import { Alert, FlatList, Image, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,6 +12,7 @@ import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'her
 import { useTranslation } from 'react-i18next';
 
 import AppTopBar from '@/components/ui/AppTopBar';
+import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
@@ -30,6 +31,7 @@ import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
+import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 
 type OfferMode = 'sent' | 'received';
 
@@ -160,6 +162,28 @@ function normalizeOfferMode(value?: string): OfferMode {
   return value === 'received' ? 'received' : 'sent';
 }
 
+function formatOfferAmount(amount: number, currency: string): string {
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: 'currency',
+      currency: currency || 'EUR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  } catch {
+    return `${currency || 'EUR'} ${Number(amount).toLocaleString()}`;
+  }
+}
+
+function formatOfferDate(value?: string | null): string | null {
+  if (!value) return null;
+  try {
+    return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(new Date(value));
+  } catch {
+    return value;
+  }
+}
+
 function OfferCard({
   offer,
   mode,
@@ -178,7 +202,12 @@ function OfferCard({
   const [counterAmount, setCounterAmount] = useState('');
   const [counterMessage, setCounterMessage] = useState('');
   const listingId = offer.listing?.id;
-  const amount = `${offer.currency || 'EUR'} ${Number(offer.amount).toLocaleString()}`;
+  const amount = formatOfferAmount(Number(offer.amount), offer.currency || 'EUR');
+  const counterAmountLabel = offer.counter_amount ? formatOfferAmount(Number(offer.counter_amount), offer.currency || 'EUR') : null;
+  const counterparty = mode === 'sent' ? offer.seller : offer.buyer;
+  const counterpartyLabel = mode === 'sent' ? t('offers.sellerLabel') : t('offers.buyerLabel');
+  const offerDate = formatOfferDate(offer.created_at);
+  const imageUrl = resolveImageUrl(offer.listing?.image?.thumbnail_url || offer.listing?.image?.url);
 
   function submitCounter() {
     const value = Number(counterAmount);
@@ -195,22 +224,43 @@ function OfferCard({
   return (
     <HeroCard className="mb-3 rounded-panel p-0">
       <HeroCard.Body className="gap-3 p-4">
-        <View className="flex-row items-start justify-between gap-3">
-          <View className="min-w-0 flex-1">
-            <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={2}>{offer.listing?.title ?? t('offers.listing')}</Text>
-            <Text className="text-sm" style={{ color: theme.textSecondary }}>{amount}</Text>
+        <View className="flex-row items-start gap-3">
+          <View className="h-16 w-16 items-center justify-center overflow-hidden rounded-panel-inner" style={{ backgroundColor: withAlpha(primary, 0.12) }}>
+            {imageUrl ? (
+              <Image source={{ uri: imageUrl }} className="h-full w-full" resizeMode="cover" />
+            ) : (
+              <Ionicons name="pricetag-outline" size={24} color={primary} />
+            )}
           </View>
-          <Chip size="sm" variant="secondary">
-            <Chip.Label>{t(`offers.status.${offer.status}`)}</Chip.Label>
-          </Chip>
+          <View className="min-w-0 flex-1 gap-2">
+            <View className="flex-row items-start justify-between gap-3">
+              <View className="min-w-0 flex-1">
+                <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={2}>{offer.listing?.title ?? t('offers.listing')}</Text>
+                <Text className="text-sm font-semibold" style={{ color: theme.textSecondary }}>{amount}</Text>
+              </View>
+              <Chip size="sm" variant="secondary">
+                <Chip.Label>{t(`offers.status.${offer.status}`)}</Chip.Label>
+              </Chip>
+            </View>
+            {counterparty ? (
+              <View className="flex-row items-center gap-2">
+                <Avatar uri={counterparty.avatar_url ?? null} name={counterparty.name} size={28} />
+                <View className="min-w-0 flex-1">
+                  <Text className="text-[11px] font-bold uppercase" style={{ color: theme.textMuted }}>{counterpartyLabel}</Text>
+                  <Text className="text-xs font-semibold" style={{ color: theme.text }} numberOfLines={1}>{counterparty.name}</Text>
+                </View>
+              </View>
+            ) : null}
+          </View>
         </View>
+        {offerDate ? (
+          <Text className="text-xs" style={{ color: theme.textMuted }}>{t('offers.date', { date: offerDate })}</Text>
+        ) : null}
         {offer.message ? <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{offer.message}</Text> : null}
-        {offer.status === 'countered' && offer.counter_amount ? (
+        {offer.status === 'countered' && counterAmountLabel ? (
           <Surface variant="secondary" className="gap-1 rounded-panel-inner p-3">
             <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('offers.countered')}</Text>
-            <Text className="text-base font-bold" style={{ color: theme.text }}>
-              {offer.currency || 'EUR'} {Number(offer.counter_amount).toLocaleString()}
-            </Text>
+            <Text className="text-base font-bold" style={{ color: theme.text }}>{counterAmountLabel}</Text>
             {offer.counter_message ? <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{offer.counter_message}</Text> : null}
           </Surface>
         ) : null}
@@ -280,8 +330,8 @@ function OfferCard({
               <HeroButton className="flex-1" size="sm" variant="primary" onPress={() => onAction('acceptCounter', offer)} style={{ minWidth: '46%', backgroundColor: theme.success }}>
                 <HeroButton.Label>{t('offers.acceptCounter')}</HeroButton.Label>
               </HeroButton>
-              <HeroButton className="flex-1" size="sm" variant="danger" onPress={() => onAction('decline', offer)} style={{ minWidth: '46%' }}>
-                <HeroButton.Label>{t('offers.decline')}</HeroButton.Label>
+              <HeroButton className="flex-1" size="sm" variant="danger" onPress={() => onAction('withdraw', offer)} style={{ minWidth: '46%' }}>
+                <HeroButton.Label>{t('offers.withdraw')}</HeroButton.Label>
               </HeroButton>
             </>
           ) : null}

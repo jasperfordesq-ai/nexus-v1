@@ -1,0 +1,121 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import React from 'react';
+import { render, waitFor } from '@testing-library/react-native';
+
+jest.mock('expo-router', () => ({
+  router: { push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
+  useLocalSearchParams: () => ({ mode: 'sent' }),
+}));
+
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string, opts?: Record<string, unknown>) => {
+      const map: Record<string, string> = {
+        'common:back': 'Back',
+        'common:errors.alertTitle': 'Error',
+        'offers.eyebrow': 'Negotiations',
+        'offers.title': 'Marketplace offers',
+        'offers.subtitle': 'Review received offers and track offers you have made.',
+        'offers.received': 'Received',
+        'offers.sentTab': 'Sent',
+        'offers.listing': 'Listing',
+        'offers.sellerLabel': 'Seller',
+        'offers.buyerLabel': 'Buyer',
+        'offers.acceptCounter': 'Accept counter',
+        'offers.withdraw': 'Withdraw',
+        'offers.decline': 'Decline',
+        'offers.countered': 'Countered',
+        'offers.emptySent': 'No sent offers',
+        'offers.emptySentHint': 'Offers you make on marketplace listings will appear here.',
+        'offers.status.countered': 'Countered',
+        'actions.view': 'View',
+      };
+      if (key === 'offers.date') return `Sent ${String(opts?.date ?? '')}`;
+      return map[key] ?? key;
+    },
+    i18n: { language: 'en' },
+  }),
+}));
+
+jest.mock('@/lib/hooks/useTenant', () => ({
+  usePrimaryColor: () => '#6366f1',
+  useTenant: () => ({ hasFeature: () => true }),
+}));
+
+jest.mock('@/lib/hooks/useTheme', () => ({
+  useTheme: () => ({
+    bg: '#ffffff',
+    surface: '#f8f9fa',
+    text: '#111827',
+    textSecondary: '#4b5563',
+    textMuted: '#6b7280',
+    border: '#d1d5db',
+    error: '#dc2626',
+    success: '#16a34a',
+  }),
+}));
+
+jest.mock('@expo/vector-icons', () => ({ Ionicons: 'View' }));
+jest.mock('@/components/ui/Avatar', () => 'View');
+jest.mock('@/components/ui/LoadingSpinner', () => () => null);
+jest.mock('@/lib/utils/resolveImageUrl', () => ({
+  resolveImageUrl: (value?: string | null) => value ?? null,
+}));
+
+jest.mock('@/lib/api/marketplace', () => ({
+  acceptMarketplaceOffer: jest.fn(),
+  acceptMarketplaceCounterOffer: jest.fn(),
+  counterMarketplaceOffer: jest.fn(),
+  declineMarketplaceOffer: jest.fn(),
+  getMarketplaceOffers: jest.fn(),
+  marketplaceHasMore: jest.fn(() => false),
+  marketplaceNextCursor: jest.fn(() => null),
+  withdrawMarketplaceOffer: jest.fn(),
+}));
+
+import MarketplaceOffersRoute from './marketplace-offers';
+import { getMarketplaceOffers } from '@/lib/api/marketplace';
+
+describe('MarketplaceOffersRoute', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (getMarketplaceOffers as jest.Mock).mockResolvedValue({
+      data: [
+        {
+          id: 8,
+          amount: 40,
+          currency: 'EUR',
+          message: 'Can collect today',
+          status: 'countered',
+          counter_amount: 45,
+          counter_message: 'I can include delivery',
+          created_at: '2026-05-15T10:30:00Z',
+          listing: {
+            id: 12,
+            title: 'Cordless drill',
+            image: { url: '/uploads/marketplace/drill.jpg', thumbnail_url: '/uploads/marketplace/drill-thumb.jpg' },
+          },
+          seller: { id: 4, name: 'Jordan Seller', avatar_url: '/uploads/avatars/jordan.jpg' },
+        },
+      ],
+      meta: { cursor: null, has_more: false },
+    });
+  });
+
+  it('shows seller context and buyer-safe actions for sent counter-offers', async () => {
+    const { getByText, queryByText, unmount } = render(<MarketplaceOffersRoute />);
+
+    await waitFor(() => {
+      expect(getByText('Jordan Seller')).toBeTruthy();
+      expect(getByText('Seller')).toBeTruthy();
+    });
+
+    expect(getByText('Withdraw')).toBeTruthy();
+    expect(queryByText('Decline')).toBeNull();
+    unmount();
+  });
+});
