@@ -16,6 +16,10 @@ const mockUploadExchangeImage = jest.fn();
 const mockDeleteExchangeImage = jest.fn();
 const mockGenerateExchangeDescription = jest.fn();
 let mockListingCategoryId: number | null = 2;
+let mockListingDescription = 'Listing body with enough detail.';
+let mockExperienceLabel = 'Experience';
+let mockEquipmentLabel = 'Equipment';
+let mockAccessibilityLabel = 'Accessibility';
 
 jest.mock('expo-router', () => ({
   router: { back: (...args: unknown[]) => mockBack(...args), replace: (...args: unknown[]) => mockReplace(...args), canGoBack: jest.fn(() => false) },
@@ -34,6 +38,11 @@ jest.mock('react-i18next', () => ({
       'form.locationFromProfile': 'From your profile',
       'form.skills': 'Skills',
       'form.serviceDetailsToggle': 'Optional service details',
+      'form.experienceLabel': mockExperienceLabel,
+      'form.equipmentLabel': mockEquipmentLabel,
+      'form.accessibilityLabel': mockAccessibilityLabel,
+      'form.experienceBeginner': 'Beginner-friendly',
+      'form.equipmentProvidedOption': "I'll provide everything needed",
       'form.aiHelpWrite': 'Help write description',
       'form.aiGenerating': 'Writing...',
       'form.aiEnterTitleFirst': 'Enter a title first',
@@ -115,10 +124,14 @@ beforeEach(() => {
   mockDeleteExchangeImage.mockReset().mockResolvedValue(undefined);
   mockGenerateExchangeDescription.mockReset().mockResolvedValue({ data: { description: 'Generated listing body' } });
   mockListingCategoryId = 2;
+  mockListingDescription = 'Listing body with enough detail.';
+  mockExperienceLabel = 'Experience';
+  mockEquipmentLabel = 'Equipment';
+  mockAccessibilityLabel = 'Accessibility';
   const listingData = {
     id: 5,
     title: 'Edit me',
-    description: 'Listing body with enough detail.',
+    get description() { return mockListingDescription; },
     type: 'offer',
     hours_estimate: 2,
     get category_id() { return mockListingCategoryId; },
@@ -209,6 +222,34 @@ describe('EditExchangeModal', () => {
       notes: 'Listing body with enough detail.',
     }));
     expect(getByDisplayValue('Generated listing body')).toBeTruthy();
+  });
+
+  it('preserves localized service details when saving an edited listing', async () => {
+    mockExperienceLabel = 'Taith';
+    mockEquipmentLabel = 'Offer';
+    mockAccessibilityLabel = 'Mynediad';
+    mockListingDescription = [
+      'Listing body with enough detail.',
+      '',
+      '---',
+      'Taith: Beginner-friendly',
+      "Offer: I'll provide everything needed",
+      'Mynediad: Ground floor room',
+    ].join('\n');
+
+    const { getByText } = render(<EditExchangeModal />);
+    fireEvent.press(getByText('Save changes'));
+
+    await waitFor(() => expect(mockUpdateExchange).toHaveBeenCalledWith(5, expect.objectContaining({
+      description: [
+        'Listing body with enough detail.',
+        '',
+        '---',
+        'Taith: Beginner-friendly',
+        "Offer: I'll provide everything needed",
+        'Mynediad: Ground floor room',
+      ].join('\n'),
+    })));
   });
 
   it('goes back when cancel is pressed', () => {

@@ -103,7 +103,7 @@ function EditExchangeModalInner() {
 
   useEffect(() => {
     if (!listing) return;
-    const parsedDescription = parseEnrichedDescription(listing.description ?? '');
+    const parsedDescription = parseEnrichedDescription(listing.description ?? '', t);
     setTitle(listing.title ?? '');
     setDescription(parsedDescription.description);
     setExperienceLevel(parsedDescription.experience);
@@ -656,26 +656,40 @@ function inputStyle(theme: ReturnType<typeof useTheme>, invalid = false) {
 }
 
 function stripHtml(value: string): string {
-  return value.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+  return value
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>\s*<p[^>]*>/gi, '\n\n')
+    .replace(/<\/(?:div|p|li|h[1-6])>/gi, '\n')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/[ \t]+/g, ' ')
+    .replace(/\n[ \t]+/g, '\n')
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 }
 
-function parseEnrichedDescription(value: string) {
+function parseEnrichedDescription(value: string, t: (key: string) => string) {
   const plain = stripHtml(value);
   const [main, detailsBlock = ''] = plain.split(/\n\s*---\s*\n/);
   const details = detailsBlock.split('\n').map((line) => line.trim()).filter(Boolean);
   return {
     description: main.trim(),
-    experience: findDetail(details, 'Experience'),
-    equipment: findDetail(details, 'Equipment'),
-    accessibility: findDetail(details, 'Accessibility'),
+    experience: findDetail(details, [t('form.experienceLabel'), 'Experience']),
+    equipment: findDetail(details, [t('form.equipmentLabel'), 'Equipment']),
+    accessibility: findDetail(details, [t('form.accessibilityLabel'), 'Accessibility']),
   };
 }
 
-function findDetail(lines: string[], label: string): string {
-  const prefix = `${label}:`;
-  const value = lines.find((line) => line.toLowerCase().startsWith(prefix.toLowerCase()))
-    ?.slice(prefix.length)
-    .trim() ?? '';
+function findDetail(lines: string[], labels: string[]): string {
+  const value = labels
+    .map((label) => {
+      const prefix = `${label}:`;
+      return lines.find((line) => line.toLowerCase().startsWith(prefix.toLowerCase()))
+        ?.slice(prefix.length)
+        .trim() ?? '';
+    })
+    .find(Boolean) ?? '';
   return normalizeServiceDetailValue(value);
 }
 
