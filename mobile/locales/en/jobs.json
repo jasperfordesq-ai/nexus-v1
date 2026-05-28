@@ -252,6 +252,14 @@
     "taglinePlaceholder": "What makes this team a good place to work?",
     "videoUrlLabel": "Culture video URL",
     "videoUrlPlaceholder": "https://example.org/video",
+    "companySizeLabel": "Company size",
+    "companySize": {
+      "1-10": "1-10",
+      "11-50": "11-50",
+      "51-200": "51-200",
+      "201-500": "201-500",
+      "500+": "500+"
+    },
     "benefitsLabel": "Benefits and perks",
     "benefitsPlaceholder": "Comma-separated benefits",
     "deadlineLabel": "Deadline",

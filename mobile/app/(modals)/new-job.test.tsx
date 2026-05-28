@@ -63,6 +63,12 @@ jest.mock('react-i18next', () => ({
         'create.taglinePlaceholder': 'What makes this team a good place to work?',
         'create.videoUrlLabel': 'Culture video URL',
         'create.videoUrlPlaceholder': 'https://example.org/video',
+        'create.companySizeLabel': 'Company size',
+        'create.companySize.1-10': '1-10',
+        'create.companySize.11-50': '11-50',
+        'create.companySize.51-200': '51-200',
+        'create.companySize.201-500': '201-500',
+        'create.companySize.500+': '500+',
         'create.benefitsLabel': 'Benefits and perks',
         'create.benefitsPlaceholder': 'Comma-separated benefits',
         'create.remote': 'Remote role',
@@ -243,6 +249,7 @@ describe('NewJobRoute', () => {
     fireEvent.press(getByText('Enable blind hiring'));
     fireEvent.changeText(getByPlaceholderText('What makes this team a good place to work?'), 'Community-first team');
     fireEvent.changeText(getByPlaceholderText('https://example.org/video'), 'https://example.org/culture');
+    fireEvent.press(getByText('11-50'));
     fireEvent.changeText(getByPlaceholderText('Comma-separated benefits'), 'Mentoring, Flexible hours');
     fireEvent.press(getByText('Create job'));
 
@@ -259,6 +266,7 @@ describe('NewJobRoute', () => {
         blind_hiring: true,
         tagline: 'Community-first team',
         video_url: 'https://example.org/culture',
+        company_size: '11-50',
         benefits: ['Mentoring', 'Flexible hours'],
       }));
     });
@@ -290,6 +298,7 @@ describe('NewJobRoute', () => {
         blind_hiring: false,
         tagline: 'Helpful team',
         video_url: '',
+        company_size: '51-200',
         benefits: ['Mentoring'],
         deadline: '2026-07-01T00:00:00Z',
       },
@@ -309,6 +318,7 @@ describe('NewJobRoute', () => {
         description: 'Existing description',
         type: 'timebank',
         commitment: 'part_time',
+        company_size: '51-200',
         skills_required: ['Planning', 'Support'],
       }));
     });

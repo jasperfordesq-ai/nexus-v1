@@ -13,6 +13,7 @@ export interface JobVacancy {
   description: string;
   tagline?: string | null;
   video_url?: string | null;
+  company_size?: string | null;
   benefits?: string[];
   location: string | null;
   is_remote: boolean;
@@ -169,6 +170,7 @@ export interface CreateJobPayload {
   blind_hiring?: boolean;
   tagline?: string | null;
   video_url?: string | null;
+  company_size?: string | null;
   benefits?: string[];
 }
 

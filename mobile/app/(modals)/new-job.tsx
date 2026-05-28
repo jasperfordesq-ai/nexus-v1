@@ -23,10 +23,12 @@ import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 type JobType = CreateJobPayload['type'];
 type Commitment = CreateJobPayload['commitment'];
 type SalaryType = 'hourly' | 'monthly' | 'annual';
+type CompanySize = '1-10' | '11-50' | '51-200' | '201-500' | '500+';
 
 const jobTypes: JobType[] = ['volunteer', 'timebank', 'paid'];
 const commitments: Commitment[] = ['flexible', 'part_time', 'full_time', 'one_off'];
 const salaryTypes: SalaryType[] = ['hourly', 'monthly', 'annual'];
+const companySizes: CompanySize[] = ['1-10', '11-50', '51-200', '201-500', '500+'];
 
 function optionalNumber(value: string): number | null {
   const normalized = value.replace(/[,\s]/g, '').trim();
@@ -69,6 +71,7 @@ function NewJobScreen() {
   const [blindHiring, setBlindHiring] = useState(false);
   const [tagline, setTagline] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
+  const [companySize, setCompanySize] = useState<CompanySize | ''>('');
   const [benefits, setBenefits] = useState('');
   const [deadline, setDeadline] = useState('');
   const [isRemote, setIsRemote] = useState(false);
@@ -115,6 +118,7 @@ function NewJobScreen() {
     setBlindHiring(Boolean(job.blind_hiring));
     setTagline(job.tagline ?? '');
     setVideoUrl(job.video_url ?? '');
+    setCompanySize(companySizes.includes(job.company_size as CompanySize) ? job.company_size as CompanySize : '');
     setBenefits((job.benefits ?? []).join(', '));
     setDeadline(job.deadline ? job.deadline.slice(0, 10) : '');
     setIsRemote(Boolean(job.is_remote));
@@ -172,6 +176,7 @@ function NewJobScreen() {
         blind_hiring: blindHiring,
         tagline: tagline.trim() || null,
         video_url: videoUrl.trim() || null,
+        company_size: companySize || null,
         benefits: benefits.split(',').map((benefit) => benefit.trim()).filter(Boolean),
         status: 'open',
       };
@@ -262,6 +267,7 @@ function NewJobScreen() {
 
             <FormField label={t('create.taglineLabel')} value={tagline} onChangeText={setTagline} placeholder={t('create.taglinePlaceholder')} theme={theme} />
             <FormField label={t('create.videoUrlLabel')} value={videoUrl} onChangeText={setVideoUrl} placeholder={t('create.videoUrlPlaceholder')} theme={theme} keyboardType="url" />
+            <ButtonGroup label={t('create.companySizeLabel')} values={companySizes} selected={companySize} onSelect={setCompanySize} labelFor={(value) => t(`create.companySize.${value}`)} primary={primary} theme={theme} />
             <FormField label={t('create.benefitsLabel')} value={benefits} onChangeText={setBenefits} placeholder={t('create.benefitsPlaceholder')} theme={theme} />
           </HeroCard.Body>
         </HeroCard>
@@ -289,7 +295,7 @@ function ButtonGroup<T extends string>({
 }: {
   label: string;
   values: T[];
-  selected: T;
+  selected: T | '';
   onSelect: (value: T) => void;
   labelFor: (value: T) => string;
   primary: string;
