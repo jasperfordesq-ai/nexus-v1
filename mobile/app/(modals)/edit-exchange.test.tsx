@@ -151,7 +151,7 @@ describe('EditExchangeModal', () => {
     expect(getAllByText('Edit Listing').length).toBeGreaterThan(0);
     expect(getByDisplayValue('Edit me')).toBeTruthy();
     expect(getByDisplayValue('Listing body with enough detail.')).toBeTruthy();
-    expect(getByDisplayValue('Dublin')).toBeTruthy();
+    expect(getByDisplayValue('Skibbereen')).toBeTruthy();
     expect(getByDisplayValue('gardening')).toBeTruthy();
     expect(getByPlaceholderText('Enter hours')).toBeTruthy();
     expect(getAllByText('Teaching').length).toBeGreaterThan(0);
@@ -170,7 +170,7 @@ describe('EditExchangeModal', () => {
       type: 'offer',
       hours_estimate: 2,
       category_id: 2,
-      location: 'Dublin',
+      location: 'Skibbereen',
       service_type: 'hybrid',
     })));
     expect(mockSetExchangeTags).toHaveBeenCalledWith(5, ['gardening', 'mentoring']);

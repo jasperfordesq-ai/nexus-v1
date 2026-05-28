@@ -73,6 +73,7 @@ function EditExchangeModalInner() {
   const [type, setType] = useState<ExchangeType>('offer');
   const [hours, setHours] = useState('1');
   const [serviceType, setServiceType] = useState<ServiceType>('hybrid');
+  const [listingLocation, setListingLocation] = useState('');
   const [skillTags, setSkillTags] = useState('');
   const [experienceLevel, setExperienceLevel] = useState('');
   const [equipmentProvided, setEquipmentProvided] = useState('');
@@ -111,11 +112,12 @@ function EditExchangeModalInner() {
     setType(listing.type ?? 'offer');
     setHours(String(listing.hours_estimate ?? listing.estimated_hours ?? 1));
     setServiceType((listing.service_type ?? 'hybrid') as ServiceType);
+    setListingLocation(listing.location ?? profileLocation);
     setSkillTags((listing.skill_tags ?? []).join(', '));
     setCategoryId(listing.category_id ?? null);
     setSelectedImageUri(null);
     setRemoveExistingImage(false);
-  }, [listing]);
+  }, [listing, profileLocation]);
 
   async function handlePickImage() {
     try {
@@ -204,7 +206,7 @@ function EditExchangeModalInner() {
         type,
         hours_estimate: parsedHours,
         category_id: categoryId ?? listing?.category_id ?? 1,
-        location: profileLocation,
+        location: listingLocation,
         service_type: serviceType,
       });
       const tags = skillTags.split(',').map((tag) => tag.trim()).filter(Boolean);
@@ -369,7 +371,7 @@ function EditExchangeModalInner() {
 
               <FieldLabel label={t('form.location')} theme={theme} />
               <TextInput
-                value={profileLocation}
+                value={listingLocation}
                 editable={false}
                 placeholder={t('form.locationPlaceholder')}
                 placeholderTextColor={theme.textMuted}
