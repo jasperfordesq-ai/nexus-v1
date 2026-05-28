@@ -36,6 +36,7 @@ import {
   marketplaceHasMore,
   marketplaceNextCursor,
   promoteMarketplaceListing,
+  redeemPublicMerchantCouponQr,
   scanMarketplacePickup,
   updateMerchantCoupon,
   type MarketplaceCollection,
@@ -46,6 +47,7 @@ import {
   type MarketplacePromotionProduct,
   type MarketplaceSavedSearch,
   type MerchantCoupon,
+  type MerchantCouponQrRedemptionResult,
   type MerchantCouponRedemption,
 } from '@/lib/api/marketplace';
 import { useApi } from '@/lib/hooks/useApi';
@@ -675,8 +677,11 @@ function CouponsPanel() {
   const [editingCoupon, setEditingCoupon] = useState<MerchantCoupon | null>(null);
   const [redemptionCoupon, setRedemptionCoupon] = useState<MerchantCoupon | null>(null);
   const [redemptions, setRedemptions] = useState<MerchantCouponRedemption[]>([]);
+  const [redeemToken, setRedeemToken] = useState('');
+  const [lastQrRedemption, setLastQrRedemption] = useState<MerchantCouponQrRedemptionResult | null>(null);
   const [isLoadingRedemptions, setIsLoadingRedemptions] = useState(false);
   const [isSavingCoupon, setIsSavingCoupon] = useState(false);
+  const [isRedeemingQr, setIsRedeemingQr] = useState(false);
   const [handledRouteCouponKey, setHandledRouteCouponKey] = useState<string | null>(null);
   const coupons = useApi(() => getMerchantCoupons(), [], { enabled: true });
 
@@ -755,6 +760,25 @@ function CouponsPanel() {
       setIsLoadingRedemptions(false);
     }
   }, [t]);
+
+  async function redeemQr() {
+    const token = redeemToken.trim();
+    if (!token) return;
+    setIsRedeemingQr(true);
+    try {
+      const response = await redeemPublicMerchantCouponQr(token);
+      setLastQrRedemption(response.data);
+      setRedeemToken('');
+      coupons.refresh();
+      if (redemptionCoupon) {
+        void openRedemptions(redemptionCoupon);
+      }
+    } catch (err) {
+      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.coupons.qrRedeemFailed'));
+    } finally {
+      setIsRedeemingQr(false);
+    }
+  }
 
   useEffect(() => {
     if (!targetCouponId || !targetCouponMode) return;
@@ -864,6 +888,43 @@ function CouponsPanel() {
           </HeroButton>
         ) : null}
       </View>
+      <Surface variant="secondary" className="gap-3 rounded-panel-inner p-3">
+        <View className="flex-row items-start gap-3">
+          <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+            <Ionicons name="qr-code-outline" size={18} color={primary} />
+          </View>
+          <View className="min-w-0 flex-1">
+            <Text className="text-sm font-bold" style={{ color: theme.text }}>{t('tools.coupons.qrRedeemTitle')}</Text>
+            <Text className="text-xs leading-4" style={{ color: theme.textSecondary }}>{t('tools.coupons.qrRedeemHint')}</Text>
+          </View>
+        </View>
+        <FormInput label={t('tools.coupons.qrToken')} value={redeemToken} onChangeText={setRedeemToken} placeholder={t('tools.coupons.qrTokenPlaceholder')} />
+        <HeroButton variant="secondary" onPress={redeemQr} isDisabled={isRedeemingQr || !redeemToken.trim()}>
+          {isRedeemingQr ? <Spinner size="sm" /> : null}
+          <HeroButton.Label>{isRedeemingQr ? t('tools.coupons.redeemingQr') : t('tools.coupons.redeemQr')}</HeroButton.Label>
+        </HeroButton>
+        {lastQrRedemption ? (
+          <Surface variant="default" className="rounded-panel-inner border p-3" style={{ borderColor: withAlpha(theme.success, 0.28) }}>
+            <View className="flex-row items-center gap-3">
+              <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(theme.success, 0.14) }}>
+                <Ionicons name="checkmark-circle-outline" size={20} color={theme.success} />
+              </View>
+              <View className="min-w-0 flex-1">
+                <Text className="text-sm font-bold" style={{ color: theme.success }}>{t('tools.coupons.qrRedeemed')}</Text>
+                <Text className="text-xs leading-4" style={{ color: theme.textSecondary }}>
+                  {t('tools.coupons.qrRedeemedDetail', {
+                    coupon: lastQrRedemption.coupon_id,
+                    date: lastQrRedemption.redeemed_at ? new Date(lastQrRedemption.redeemed_at).toLocaleString() : t('tools.coupons.dateUnknown'),
+                  })}
+                </Text>
+              </View>
+              <HeroButton isIconOnly size="sm" variant="secondary" onPress={() => setLastQrRedemption(null)}>
+                <Ionicons name="close-outline" size={16} color={primary} />
+              </HeroButton>
+            </View>
+          </Surface>
+        ) : null}
+      </Surface>
       <PanelList
         isLoading={coupons.isLoading}
         items={coupons.data?.data.items ?? []}

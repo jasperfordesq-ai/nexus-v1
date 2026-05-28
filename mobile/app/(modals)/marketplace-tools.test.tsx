@@ -99,6 +99,14 @@ const mockT = (key: string, opts?: Record<string, unknown>) => {
     'tools.coupons.redemptions': 'Redemptions',
     'tools.coupons.redemptionsTitle': 'Coupon redemptions',
     'tools.coupons.noRedemptions': 'No redemptions yet',
+    'tools.coupons.qrRedeemTitle': 'Redeem customer QR',
+    'tools.coupons.qrRedeemHint': 'Paste the token shown on a member coupon QR to mark it redeemed.',
+    'tools.coupons.qrToken': 'QR token',
+    'tools.coupons.qrTokenPlaceholder': 'Paste coupon token',
+    'tools.coupons.redeemQr': 'Redeem coupon QR',
+    'tools.coupons.redeemingQr': 'Redeeming QR',
+    'tools.coupons.qrRedeemed': 'Coupon QR redeemed',
+    'tools.coupons.qrRedeemedDetail': `Coupon #${String(opts?.coupon ?? '')} was redeemed at ${String(opts?.date ?? '')}.`,
     'tools.coupons.empty': 'No seller coupons yet',
     'tools.coupons.usageCount': `${String(opts?.count ?? 0)} uses`,
     'tools.coupons.validUntilShort': `Until ${String(opts?.date ?? '')}`,
@@ -200,6 +208,7 @@ jest.mock('@/lib/api/marketplace', () => ({
   marketplaceHasMore: jest.fn(() => false),
   marketplaceNextCursor: jest.fn(() => null),
   promoteMarketplaceListing: jest.fn(),
+  redeemPublicMerchantCouponQr: jest.fn(),
   scanMarketplacePickup: jest.fn(),
   updateMerchantCoupon: jest.fn(),
 }));
@@ -214,6 +223,7 @@ import {
   getMerchantCoupons,
   getMerchantCouponRedemptions,
   getMyMarketplacePickups,
+  redeemPublicMerchantCouponQr,
 } from '@/lib/api/marketplace';
 
 const coupon = {
@@ -264,6 +274,13 @@ describe('MarketplaceToolsRoute', () => {
             redemption_method: 'qr',
           },
         ],
+      },
+    } as never);
+    jest.mocked(redeemPublicMerchantCouponQr).mockResolvedValue({
+      data: {
+        redemption_id: 91,
+        coupon_id: 7,
+        redeemed_at: '2026-06-05T13:00:00Z',
       },
     } as never);
   });
@@ -343,5 +360,20 @@ describe('MarketplaceToolsRoute', () => {
       expect(getMerchantCouponRedemptions).toHaveBeenCalledWith(7);
     });
     expect(await findByText('Order 44')).toBeTruthy();
+  });
+
+  it('redeems a customer coupon QR token from seller tools', async () => {
+    mockParams = { tab: 'coupons' };
+
+    const { getByPlaceholderText, getByText, findByText } = render(<MarketplaceToolsRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('Paste coupon token'), 'qr-token-123');
+    fireEvent.press(getByText('Redeem coupon QR'));
+
+    await waitFor(() => {
+      expect(redeemPublicMerchantCouponQr).toHaveBeenCalledWith('qr-token-123');
+    });
+    expect(await findByText('Coupon QR redeemed')).toBeTruthy();
+    expect(getMerchantCoupons).toHaveBeenCalledTimes(2);
   });
 });

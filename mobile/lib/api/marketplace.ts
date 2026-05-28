@@ -408,6 +408,12 @@ export interface MerchantCouponRedemption {
   redemption_method?: string | null;
 }
 
+export interface MerchantCouponQrRedemptionResult {
+  redemption_id: number;
+  coupon_id: number;
+  redeemed_at?: string | null;
+}
+
 export interface MarketplaceCollectionResponse<T> {
   data: T[];
   meta?: { cursor?: string | null; next_cursor?: string | null; has_more?: boolean };
@@ -1085,6 +1091,10 @@ export function getPublicMerchantCoupon(id: number): Promise<MarketplaceDataResp
 
 export function generatePublicMerchantCouponQr(id: number): Promise<MarketplaceDataResponse<MerchantCouponQrPayload>> {
   return api.post<MarketplaceDataResponse<MerchantCouponQrPayload>>(`${API_V2}/coupons/${id}/qr`, {});
+}
+
+export function redeemPublicMerchantCouponQr(token: string): Promise<MarketplaceDataResponse<MerchantCouponQrRedemptionResult>> {
+  return api.post<MarketplaceDataResponse<MerchantCouponQrRedemptionResult>>(`${API_V2}/coupons/redeem-qr`, { token });
 }
 
 export function marketplaceNextCursor<T>(response: MarketplaceCollectionResponse<T>): string | null {
