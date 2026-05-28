@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
+import { Alert } from 'react-native';
 import { render, fireEvent } from '@testing-library/react-native';
 
 // --- Mocks ---
@@ -35,11 +36,15 @@ jest.mock('react-i18next', () => ({
         'addSkill': 'Add Skill',
         'removeSkill': 'Remove',
         'skillPlaceholder': 'Enter skill name…',
+        'addSkillErrorTitle': 'Skill not added',
         'addSkillError': 'Failed to save skill.',
+        'removeSkillTitle': 'Remove skill',
         'removeSkillConfirm': 'Remove this skill?',
         'endorsedBy': opts ? `Endorsed by ${String(opts.count ?? 0)}` : 'Endorsed by 0',
         'common:cancel': 'Cancel',
+        'skillRemovedTitle': 'Skill removed',
         'skillRemoved': 'Skill removed.',
+        'removeSkillErrorTitle': 'Skill not removed',
         'removeSkillError': 'Could not remove skill.',
       };
       return map[key] ?? key;
@@ -78,7 +83,9 @@ jest.mock('@/lib/hooks/useApi', () => ({
 
 jest.mock('expo-haptics', () => ({
   impactAsync: jest.fn().mockResolvedValue(undefined),
+  notificationAsync: jest.fn().mockResolvedValue(undefined),
   ImpactFeedbackStyle: { Light: 'light', Medium: 'medium' },
+  NotificationFeedbackType: { Success: 'success', Error: 'error' },
 }));
 
 jest.mock('@expo/vector-icons', () => ({
@@ -98,11 +105,18 @@ jest.mock('@/components/ui/LoadingSpinner', () => () => null);
 // --- Tests ---
 
 import EndorsementsScreen from './endorsements';
+import { removeSkill } from '@/lib/api/endorsements';
 
 const defaultApiState = { data: null, isLoading: false, error: null, refresh: jest.fn() };
 
 beforeEach(() => {
   mockUseApi.mockReturnValue(defaultApiState);
+  jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
+  (removeSkill as jest.Mock).mockClear();
+});
+
+afterEach(() => {
+  jest.restoreAllMocks();
 });
 
 const mockSkill = {
@@ -171,5 +185,29 @@ describe('EndorsementsScreen', () => {
     const { getByText } = render(<EndorsementsScreen />);
     fireEvent.press(getByText('Endorsements'));
     expect(getByText('No endorsements yet.')).toBeTruthy();
+  });
+
+  it('uses translated titles when confirming and completing skill removal', async () => {
+    const refresh = jest.fn();
+    mockUseApi
+      .mockReturnValueOnce({ data: { data: { skills: [mockSkill] } }, isLoading: false, error: null, refresh })
+      .mockReturnValueOnce({ data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() });
+
+    const { getByLabelText } = render(<EndorsementsScreen />);
+    fireEvent.press(getByLabelText('Remove'));
+
+    expect(Alert.alert).toHaveBeenCalledWith(
+      'Remove skill',
+      'Remove this skill?',
+      expect.arrayContaining([
+        expect.objectContaining({ text: 'Remove' }),
+      ]),
+    );
+
+    const removeButton = (Alert.alert as jest.Mock).mock.calls[0][2][1];
+    await removeButton.onPress();
+
+    expect(removeSkill).toHaveBeenCalledWith(1);
+    expect(Alert.alert).toHaveBeenLastCalledWith('Skill removed', 'Skill removed.');
   });
 });

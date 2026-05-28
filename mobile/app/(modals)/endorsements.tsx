@@ -87,14 +87,14 @@ export default function EndorsementsScreen() {
       setAddingSkill(false);
       refreshSkills();
     } catch {
-      Alert.alert('', t('addSkillError'));
+      Alert.alert(t('addSkillErrorTitle'), t('addSkillError'));
     } finally {
       setSubmitting(false);
     }
   }
 
   async function handleRemoveSkill(skillId: number) {
-    Alert.alert('', t('removeSkillConfirm'), [
+    Alert.alert(t('removeSkillTitle'), t('removeSkillConfirm'), [
       { text: t('common:cancel'), style: 'cancel' },
       {
         text: t('removeSkill'),
@@ -104,10 +104,10 @@ export default function EndorsementsScreen() {
           try {
             await removeSkill(skillId);
             void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            Alert.alert('', t('skillRemoved'));
+            Alert.alert(t('skillRemovedTitle'), t('skillRemoved'));
             refreshSkills();
           } catch {
-            Alert.alert('', t('removeSkillError'));
+            Alert.alert(t('removeSkillErrorTitle'), t('removeSkillError'));
           }
         },
       },
