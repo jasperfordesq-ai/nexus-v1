@@ -51,7 +51,7 @@ import {
 import { useApi } from '@/lib/hooks/useApi';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { useAuth } from '@/lib/hooks/useAuth';
-import { usePrimaryColor } from '@/lib/hooks/useTenant';
+import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 
@@ -109,15 +109,26 @@ export default function MarketplaceToolsRoute() {
 
 function MarketplaceToolsScreen() {
   const { t } = useTranslation(['marketplace', 'common']);
+  const { hasFeature } = useTenant();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const params = useLocalSearchParams<{ tab?: string }>();
   const initialTab = isToolTab(params.tab) ? params.tab : 'collections';
   const [tab, setTab] = useState<ToolTab>(initialTab);
+  const availableTabs = useMemo(
+    () => TABS.filter((item) => item !== 'coupons' || hasFeature('merchant_coupons')),
+    [hasFeature],
+  );
 
   useEffect(() => {
     if (isToolTab(params.tab)) setTab(params.tab);
   }, [params.tab]);
+
+  useEffect(() => {
+    if (!availableTabs.includes(tab)) {
+      setTab(availableTabs[0] ?? 'collections');
+    }
+  }, [availableTabs, tab]);
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -159,7 +170,7 @@ function MarketplaceToolsScreen() {
             </HeroCard>
 
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingBottom: 12 }}>
-              {TABS.map((item) => (
+              {availableTabs.map((item) => (
                 <HeroButton key={item} size="sm" variant={tab === item ? 'primary' : 'secondary'} onPress={() => setTab(item)} style={tab === item ? { backgroundColor: primary } : undefined}>
                   <HeroButton.Label>{t(`tools.tabs.${item}`)}</HeroButton.Label>
                 </HeroButton>
