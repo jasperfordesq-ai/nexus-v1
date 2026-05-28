@@ -46,6 +46,14 @@ const mockT = (key: string, opts?: Record<string, unknown>) => {
     'tools.pickups.capacityPlaceholder': '4',
     'tools.pickups.recurringWeekly': 'Repeat weekly',
     'tools.pickups.createSlot': 'Create pickup slot',
+    'tools.pickups.updateSlot': 'Update pickup slot',
+    'tools.pickups.editingTitle': 'Editing pickup slot',
+    'tools.pickups.cancelEdit': 'Cancel editing',
+    'tools.pickups.edit': 'Edit',
+    'tools.pickups.active': 'Active',
+    'tools.pickups.inactive': 'Paused',
+    'tools.pickups.pause': 'Pause',
+    'tools.pickups.activate': 'Activate',
     'tools.pickups.qr': 'QR code',
     'tools.pickups.qrPlaceholder': 'Paste or scan pickup code',
     'tools.pickups.scan': 'Mark pickup complete',
@@ -211,6 +219,7 @@ jest.mock('@/lib/api/marketplace', () => ({
   redeemPublicMerchantCouponQr: jest.fn(),
   scanMarketplacePickup: jest.fn(),
   updateMerchantCoupon: jest.fn(),
+  updateMarketplacePickupSlot: jest.fn(),
 }));
 
 import MarketplaceToolsRoute from './marketplace-tools';
@@ -224,6 +233,7 @@ import {
   getMerchantCouponRedemptions,
   getMyMarketplacePickups,
   redeemPublicMerchantCouponQr,
+  updateMarketplacePickupSlot,
 } from '@/lib/api/marketplace';
 
 const coupon = {
@@ -258,6 +268,7 @@ describe('MarketplaceToolsRoute', () => {
     jest.mocked(getMarketplacePickupSlots).mockResolvedValue({ data: [] } as never);
     jest.mocked(getMyMarketplacePickups).mockResolvedValue({ data: [] } as never);
     jest.mocked(createMarketplacePickupSlot).mockResolvedValue({ data: { id: 32 } } as never);
+    jest.mocked(updateMarketplacePickupSlot).mockResolvedValue({ data: { id: 32 } } as never);
     jest.mocked(getMarketplaceSavedSearches).mockResolvedValue({ data: [] } as never);
     jest.mocked(createMarketplaceSavedSearch).mockResolvedValue({ data: { id: 21 } } as never);
     jest.mocked(getMerchantCoupons).mockResolvedValue({ data: { items: [coupon] } } as never);
@@ -347,6 +358,49 @@ describe('MarketplaceToolsRoute', () => {
         recurring_pattern: 'weekly',
         is_active: true,
       });
+    });
+  });
+
+  it('updates and pauses existing pickup slots from seller tools', async () => {
+    mockParams = { tab: 'pickups' };
+    jest.mocked(getMarketplacePickupSlots).mockResolvedValue({
+      data: [
+        {
+          id: 32,
+          slot_start: '2026-06-01T10:00:00Z',
+          slot_end: '2026-06-01T12:00:00Z',
+          capacity: 4,
+          booked_count: 1,
+          is_recurring: false,
+          recurring_pattern: null,
+          is_active: true,
+        },
+      ],
+    } as never);
+
+    const { findByText, getByPlaceholderText, getByText } = render(<MarketplaceToolsRoute />);
+
+    fireEvent.press(await findByText('Edit'));
+    expect(getByText('Editing pickup slot')).toBeTruthy();
+
+    fireEvent.changeText(getByPlaceholderText('4'), '6');
+    fireEvent.press(getByText('Update pickup slot'));
+
+    await waitFor(() => {
+      expect(updateMarketplacePickupSlot).toHaveBeenCalledWith(32, {
+        slot_start: '2026-06-01T10:00:00Z',
+        slot_end: '2026-06-01T12:00:00Z',
+        capacity: 6,
+        is_recurring: false,
+        recurring_pattern: null,
+        is_active: true,
+      });
+    });
+
+    fireEvent.press(getByText('Pause'));
+
+    await waitFor(() => {
+      expect(updateMarketplacePickupSlot).toHaveBeenCalledWith(32, { is_active: false });
     });
   });
 

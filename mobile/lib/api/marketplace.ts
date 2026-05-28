@@ -1020,6 +1020,20 @@ export function createMarketplacePickupSlot(payload: {
   return api.post<MarketplaceDataResponse<MarketplacePickupSlot>>(`${API_V2}/marketplace/seller/pickup-slots`, payload);
 }
 
+export function updateMarketplacePickupSlot(
+  id: number,
+  payload: Partial<{
+    slot_start: string;
+    slot_end: string;
+    capacity: number;
+    is_recurring: boolean;
+    recurring_pattern: string | null;
+    is_active: boolean;
+  }>,
+): Promise<MarketplaceDataResponse<MarketplacePickupSlot>> {
+  return api.put<MarketplaceDataResponse<MarketplacePickupSlot>>(`${API_V2}/marketplace/seller/pickup-slots/${id}`, payload);
+}
+
 export function deleteMarketplacePickupSlot(id: number): Promise<MarketplaceDataResponse<{ deleted: boolean }>> {
   return api.delete<MarketplaceDataResponse<{ deleted: boolean }>>(`${API_V2}/marketplace/seller/pickup-slots/${id}`);
 }

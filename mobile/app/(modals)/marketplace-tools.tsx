@@ -39,6 +39,7 @@ import {
   redeemPublicMerchantCouponQr,
   scanMarketplacePickup,
   updateMerchantCoupon,
+  updateMarketplacePickupSlot,
   type MarketplaceCollection,
   type MarketplaceListingItem,
   type MarketplacePickupReservation,
@@ -553,29 +554,48 @@ function PickupsPanel() {
   const [slotEnd, setSlotEnd] = useState('');
   const [capacity, setCapacity] = useState(String(PICKUP_DEFAULT_CAPACITY));
   const [isRecurring, setIsRecurring] = useState(false);
+  const [editingSlot, setEditingSlot] = useState<MarketplacePickupSlot | null>(null);
   const [qrCode, setQrCode] = useState('');
   const [lastScan, setLastScan] = useState<MarketplacePickupReservation | null>(null);
   const slots = useApi(() => getMarketplacePickupSlots(), [], { enabled: true });
   const reservations = useApi(() => getMyMarketplacePickups(), [], { enabled: true });
 
-  async function createSlot() {
+  function resetSlotForm() {
+    setSlotStart('');
+    setSlotEnd('');
+    setCapacity(String(PICKUP_DEFAULT_CAPACITY));
+    setIsRecurring(false);
+    setEditingSlot(null);
+  }
+
+  function openSlotEditor(slot: MarketplacePickupSlot) {
+    setEditingSlot(slot);
+    setSlotStart(slot.slot_start ?? '');
+    setSlotEnd(slot.slot_end ?? '');
+    setCapacity(String(slot.capacity ?? PICKUP_DEFAULT_CAPACITY));
+    setIsRecurring(Boolean(slot.is_recurring));
+  }
+
+  async function saveSlot() {
     if (!slotStart.trim() || !slotEnd.trim()) return;
+    const payload = {
+      slot_start: slotStart.trim(),
+      slot_end: slotEnd.trim(),
+      capacity: normalizePickupCapacity(capacity),
+      is_recurring: isRecurring,
+      recurring_pattern: isRecurring ? 'weekly' : null,
+      is_active: editingSlot?.is_active ?? true,
+    };
     try {
-      await createMarketplacePickupSlot({
-        slot_start: slotStart.trim(),
-        slot_end: slotEnd.trim(),
-        capacity: normalizePickupCapacity(capacity),
-        is_recurring: isRecurring,
-        recurring_pattern: isRecurring ? 'weekly' : null,
-        is_active: true,
-      });
-      setSlotStart('');
-      setSlotEnd('');
-      setCapacity(String(PICKUP_DEFAULT_CAPACITY));
-      setIsRecurring(false);
+      if (editingSlot) {
+        await updateMarketplacePickupSlot(editingSlot.id, payload);
+      } else {
+        await createMarketplacePickupSlot(payload);
+      }
+      resetSlotForm();
       slots.refresh();
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.pickups.slotFailed'));
+      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t(editingSlot ? 'tools.pickups.updateFailed' : 'tools.pickups.slotFailed'));
     }
   }
 
@@ -594,15 +614,39 @@ function PickupsPanel() {
   async function remove(slot: MarketplacePickupSlot) {
     try {
       await deleteMarketplacePickupSlot(slot.id);
+      if (editingSlot?.id === slot.id) resetSlotForm();
       slots.refresh();
     } catch (err) {
       Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.pickups.deleteFailed'));
     }
   }
 
+  async function toggleSlot(slot: MarketplacePickupSlot) {
+    try {
+      await updateMarketplacePickupSlot(slot.id, { is_active: !slot.is_active });
+      if (editingSlot?.id === slot.id) {
+        setEditingSlot({ ...slot, is_active: !slot.is_active });
+      }
+      slots.refresh();
+    } catch (err) {
+      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.pickups.updateFailed'));
+    }
+  }
+
   return (
     <PanelCard icon="calendar-number-outline" title={t('tools.pickups.title')} subtitle={t('tools.pickups.subtitle')}>
       <View className="gap-3">
+        {editingSlot ? (
+          <Surface variant="secondary" className="flex-row items-center gap-3 rounded-panel-inner p-3">
+            <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+              <Ionicons name="create-outline" size={18} color={primary} />
+            </View>
+            <View className="min-w-0 flex-1">
+              <Text className="text-sm font-bold" style={{ color: theme.text }}>{t('tools.pickups.editingTitle')}</Text>
+              <Text className="text-xs" style={{ color: theme.textSecondary }}>{formatDateTime(editingSlot.slot_start)}</Text>
+            </View>
+          </Surface>
+        ) : null}
         <FormInput label={t('tools.pickups.start')} value={slotStart} onChangeText={setSlotStart} placeholder={t('tools.pickups.startPlaceholder')} />
         <FormInput label={t('tools.pickups.end')} value={slotEnd} onChangeText={setSlotEnd} placeholder={t('tools.pickups.endPlaceholder')} />
         <FormInput label={t('tools.pickups.capacityLabel')} value={capacity} onChangeText={setCapacity} placeholder={t('tools.pickups.capacityPlaceholder')} keyboardType="decimal-pad" />
@@ -613,9 +657,14 @@ function PickupsPanel() {
         >
           <HeroButton.Label>{t('tools.pickups.recurringWeekly')}</HeroButton.Label>
         </HeroButton>
-        <HeroButton variant="primary" onPress={createSlot} isDisabled={!slotStart.trim() || !slotEnd.trim()}>
-          <HeroButton.Label>{t('tools.pickups.createSlot')}</HeroButton.Label>
+        <HeroButton variant="primary" onPress={saveSlot} isDisabled={!slotStart.trim() || !slotEnd.trim()}>
+          <HeroButton.Label>{editingSlot ? t('tools.pickups.updateSlot') : t('tools.pickups.createSlot')}</HeroButton.Label>
         </HeroButton>
+        {editingSlot ? (
+          <HeroButton variant="secondary" onPress={resetSlotForm}>
+            <HeroButton.Label>{t('tools.pickups.cancelEdit')}</HeroButton.Label>
+          </HeroButton>
+        ) : null}
         <FormInput label={t('tools.pickups.qr')} value={qrCode} onChangeText={setQrCode} placeholder={t('tools.pickups.qrPlaceholder')} />
         <HeroButton variant="secondary" onPress={scan} isDisabled={!qrCode.trim()}>
           <HeroButton.Label>{t('tools.pickups.scan')}</HeroButton.Label>
@@ -644,13 +693,12 @@ function PickupsPanel() {
         items={slots.data?.data ?? []}
         emptyTitle={t('tools.pickups.emptySlots')}
         renderItem={(item: MarketplacePickupSlot) => (
-          <ToolRow
+          <PickupSlotToolCard
             key={item.id}
-            icon="time-outline"
-            title={formatDateTime(item.slot_start)}
-            subtitle={t('tools.pickups.capacity', { booked: item.booked_count, capacity: item.capacity })}
-            trailing={t('tools.delete')}
-            onPress={() => void remove(item)}
+            item={item}
+            onEdit={() => openSlotEditor(item)}
+            onToggle={() => void toggleSlot(item)}
+            onDelete={() => void remove(item)}
           />
         )}
       />
@@ -663,6 +711,53 @@ function PickupsPanel() {
         )}
       />
     </PanelCard>
+  );
+}
+
+function PickupSlotToolCard({
+  item,
+  onEdit,
+  onToggle,
+  onDelete,
+}: {
+  item: MarketplacePickupSlot;
+  onEdit: () => void;
+  onToggle: () => void;
+  onDelete: () => void;
+}) {
+  const { t } = useTranslation('marketplace');
+  const primary = usePrimaryColor();
+  const theme = useTheme();
+  const statusLabel = item.is_active ? t('tools.pickups.active') : t('tools.pickups.inactive');
+
+  return (
+    <Surface variant="secondary" className="gap-3 rounded-panel-inner p-3">
+      <View className="flex-row items-start gap-3">
+        <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+          <Ionicons name="time-outline" size={18} color={primary} />
+        </View>
+        <View className="min-w-0 flex-1 gap-1">
+          <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={1}>{formatDateTime(item.slot_start)}</Text>
+          <Text className="text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>
+            {t('tools.pickups.capacity', { booked: item.booked_count, capacity: item.capacity })}
+          </Text>
+        </View>
+        <Chip size="sm" variant="secondary" color={item.is_active ? 'success' : 'default'}>
+          <Chip.Label>{statusLabel}</Chip.Label>
+        </Chip>
+      </View>
+      <View className="flex-row flex-wrap gap-2">
+        <HeroButton className="flex-1" size="sm" variant="secondary" onPress={onEdit}>
+          <HeroButton.Label>{t('tools.pickups.edit')}</HeroButton.Label>
+        </HeroButton>
+        <HeroButton className="flex-1" size="sm" variant="secondary" onPress={onToggle}>
+          <HeroButton.Label>{item.is_active ? t('tools.pickups.pause') : t('tools.pickups.activate')}</HeroButton.Label>
+        </HeroButton>
+        <HeroButton isIconOnly size="sm" variant="danger-soft" onPress={onDelete}>
+          <Ionicons name="trash-outline" size={16} color={theme.error} />
+        </HeroButton>
+      </View>
+    </Surface>
   );
 }
 
