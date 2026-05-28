@@ -96,6 +96,8 @@ export interface MarketplaceNearbyListing extends MarketplaceListingItem {
 export interface MarketplaceListingDetail extends MarketplaceListingItem {
   description: string;
   quantity: number;
+  latitude?: number | null;
+  longitude?: number | null;
   shipping_available: boolean;
   local_pickup: boolean;
   images: MarketplaceImage[];
@@ -476,6 +478,8 @@ export interface MarketplaceListingPayload {
   low_stock_threshold?: number | null;
   is_oversold_protected?: boolean;
   location?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   shipping_available?: boolean;
   local_pickup?: boolean;
   delivery_method?: MarketplaceDeliveryMethod;

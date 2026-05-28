@@ -77,6 +77,8 @@ export function MarketplaceListingForm() {
   const [lowStockThreshold, setLowStockThreshold] = useState('5');
   const [oversoldProtected, setOversoldProtected] = useState(true);
   const [location, setLocation] = useState('');
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
   const [deliveryMethod, setDeliveryMethod] = useState<MarketplaceDeliveryMethod>('pickup');
   const [sellerType, setSellerType] = useState<'private' | 'business'>('private');
   const [imageUris, setImageUris] = useState<string[]>([]);
@@ -132,6 +134,8 @@ export function MarketplaceListingForm() {
         setLowStockThreshold(String(listing.low_stock_threshold ?? 5));
         setOversoldProtected(listing.is_oversold_protected ?? true);
         setLocation(listing.location ?? '');
+        setLatitude(listing.latitude !== null && listing.latitude !== undefined ? String(listing.latitude) : '');
+        setLongitude(listing.longitude !== null && listing.longitude !== undefined ? String(listing.longitude) : '');
         setDeliveryMethod((listing.delivery_method as MarketplaceDeliveryMethod) ?? 'pickup');
         setSellerType(listing.seller_type === 'business' ? 'business' : 'private');
         setHydrated(true);
@@ -186,6 +190,18 @@ export function MarketplaceListingForm() {
 
     setIsSubmitting(true);
     try {
+      const hasLatitude = latitude.trim().length > 0;
+      const hasLongitude = longitude.trim().length > 0;
+      const latitudeValue = toNumber(latitude);
+      const longitudeValue = toNumber(longitude);
+      if (
+        hasLatitude !== hasLongitude
+        || (hasLatitude && (latitudeValue === null || latitudeValue < -90 || latitudeValue > 90))
+        || (hasLongitude && (longitudeValue === null || longitudeValue < -180 || longitudeValue > 180))
+      ) {
+        Alert.alert(t('forms.validation'), t('forms.invalidCoordinates'));
+        return;
+      }
       const filledTemplateFields = Object.fromEntries(
         Object.entries(templateFields).filter(([, value]) => value.trim() !== ''),
       );
@@ -204,6 +220,8 @@ export function MarketplaceListingForm() {
         low_stock_threshold: Math.max(0, toNumber(lowStockThreshold) ?? 0),
         is_oversold_protected: oversoldProtected,
         location: location.trim() || null,
+        latitude: latitudeValue,
+        longitude: longitudeValue,
         delivery_method: deliveryMethod,
         shipping_available: deliveryMethod === 'shipping' || deliveryMethod === 'both',
         local_pickup: deliveryMethod === 'pickup' || deliveryMethod === 'both' || deliveryMethod === 'community_delivery',
@@ -309,6 +327,25 @@ export function MarketplaceListingForm() {
               <SwitchRow label={t('inventory.oversold_protected')} value={oversoldProtected} onValueChange={setOversoldProtected} />
             </View>
             <FormField label={t('forms.location')} value={location} onChangeText={setLocation} placeholder={t('forms.locationPlaceholder')} />
+            <View className="gap-3 rounded-panel-inner border p-3" style={{ borderColor: theme.border, backgroundColor: withAlpha(primary, 0.06) }}>
+              <View className="flex-row items-start gap-3">
+                <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+                  <Ionicons name="navigate-outline" size={18} color={primary} />
+                </View>
+                <View className="min-w-0 flex-1">
+                  <Text className="text-sm font-bold" style={{ color: theme.text }}>{t('forms.coordinates')}</Text>
+                  <Text className="text-xs leading-5" style={{ color: theme.textSecondary }}>{t('forms.coordinatesHint')}</Text>
+                </View>
+              </View>
+              <View className="flex-row gap-3">
+                <View className="min-w-0 flex-1">
+                  <FormField label={t('forms.latitude')} value={latitude} onChangeText={setLatitude} placeholder={t('forms.latitudePlaceholder')} keyboardType="decimal-pad" />
+                </View>
+                <View className="min-w-0 flex-1">
+                  <FormField label={t('forms.longitude')} value={longitude} onChangeText={setLongitude} placeholder={t('forms.longitudePlaceholder')} keyboardType="decimal-pad" />
+                </View>
+              </View>
+            </View>
             <ButtonGroup label={t('forms.delivery')} values={DELIVERY} selected={deliveryMethod} onSelect={setDeliveryMethod} labelFor={(value) => t(`delivery_method.${value}`)} primary={primary} />
             <ButtonGroup label={t('forms.sellerType')} values={['private', 'business'] as const} selected={sellerType} onSelect={setSellerType} labelFor={(value) => t(`sellerType.${value}`)} primary={primary} />
             <View className="gap-3">

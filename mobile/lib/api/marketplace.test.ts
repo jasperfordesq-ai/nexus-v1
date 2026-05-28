@@ -191,6 +191,8 @@ describe('marketplace api', () => {
       inventory_count: 4,
       low_stock_threshold: 1,
       is_oversold_protected: true,
+      latitude: 51.5007,
+      longitude: -0.1246,
       delivery_method: 'pickup' as const,
       template_data: { frame_size: 'Medium' },
     };
