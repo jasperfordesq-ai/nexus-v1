@@ -45,7 +45,7 @@ const SHIPPING_METHODS = ['standard', 'express', 'tracked', 'hand_delivery', 'ot
 const DISPUTE_REASONS: DisputeReason[] = ['not_received', 'not_as_described', 'damaged', 'wrong_item', 'other'];
 const ORDER_STATUS_FILTERS: Record<OrderStatusTab, string | null> = {
   all: null,
-  active: 'paid,shipped',
+  active: 'pending_payment,paid,processing,shipped',
   completed: 'delivered,completed',
   cancelled: 'cancelled,refunded',
 };
