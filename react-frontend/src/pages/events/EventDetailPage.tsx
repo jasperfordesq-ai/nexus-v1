@@ -1,4 +1,4 @@
-import { Button, Chip, Card, CardBody, Textarea, GlassCard, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, AvatarGroup, Badge, Tabs, Tab, Skeleton } from '@/components/ui';
+import { Button, Chip, Card, CardBody, Textarea, GlassCard, Surface, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, AvatarGroup, Badge, Tabs, Tab, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -740,22 +740,22 @@ export function EventDetailPage() {
 
         {/* Attendee Count Breakdown with Capacity Info (E2) */}
         <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-lg border border-theme-default bg-theme-elevated p-4">
+          <Surface variant="secondary" className="rounded-lg border border-theme-default p-4">
             <div className="mb-2 flex items-center gap-2 text-sm text-theme-muted">
               <Badge isDot color="success" size="sm" />
               <span>{t('detail.going_count')}</span>
             </div>
             <span className="text-theme-primary font-medium">{goingCount}</span>
-          </div>
-          <div className="rounded-lg border border-theme-default bg-theme-elevated p-4">
+          </Surface>
+          <Surface variant="secondary" className="rounded-lg border border-theme-default p-4">
             <div className="mb-2 flex items-center gap-2 text-sm text-theme-muted">
               <Badge isDot color="warning" size="sm" />
               <span>{t('detail.interested_count')}</span>
             </div>
             <span className="text-theme-primary font-medium">{interestedCount}</span>
-          </div>
+          </Surface>
           {event.max_attendees != null && (
-            <div className="rounded-lg border border-theme-default bg-theme-elevated p-4">
+            <Surface variant="secondary" className="rounded-lg border border-theme-default p-4">
               <div className="mb-2 flex items-center gap-2 text-sm text-theme-muted">
                 <Users className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>{t('detail.capacity_label')}</span>
@@ -771,16 +771,16 @@ export function EventDetailPage() {
                   {t('detail.spots_left', { count: event.spots_left })}
                 </Chip>
               )}
-            </div>
+            </Surface>
           )}
           {(event.waitlist_count ?? 0) > 0 && (
-            <div className="rounded-lg border border-theme-default bg-theme-elevated p-4">
+            <Surface variant="secondary" className="rounded-lg border border-theme-default p-4">
               <div className="mb-2 flex items-center gap-2 text-sm text-theme-muted">
                 <ListOrdered className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>{t('detail.waitlist_label')}</span>
               </div>
               <span className="text-theme-primary font-medium">{t('detail.waitlist_count', { count: event.waitlist_count })}</span>
-            </div>
+            </Surface>
           )}
         </div>
 

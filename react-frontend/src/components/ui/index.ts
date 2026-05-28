@@ -7,6 +7,8 @@
 export { GlassCard, type GlassCardProps } from './GlassCard';
 export { GlassButton, type GlassButtonProps } from './GlassButton';
 export { GlassInput, type GlassInputProps } from './GlassInput';
+export { Surface, type SurfaceProps } from './Surface';
+export { Typography, type TypographyProps } from './Typography';
 
 // UX Components
 export { BottomSheet, type BottomSheetProps } from './BottomSheet';
