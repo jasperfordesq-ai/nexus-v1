@@ -13,7 +13,7 @@ import * as Haptics from '@/lib/haptics';
 import { Button as HeroButton, Card as HeroCard, Chip, Separator, Spinner, Surface } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
-import { getConversations, deleteConversation, restoreConversation, displayName, type Conversation, type ConversationListResponse } from '@/lib/api/messages';
+import { archiveConversation, getConversations, restoreConversation, displayName, type Conversation, type ConversationListResponse } from '@/lib/api/messages';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
@@ -131,23 +131,23 @@ export default function MessagesScreen() {
     navigation.push({ pathname: '/(modals)/new-group' } as never);
   }, [navigation]);
 
-  function handleDeleteConversation(conversation: Conversation) {
+  function handleArchiveConversation(conversation: Conversation) {
     Alert.alert(
-      t('common:buttons.delete'),
-      t('deleteConfirm', { name: displayName(conversation.other_user) }),
+      t('archiveConversation'),
+      t('archiveConfirm', { name: displayName(conversation.other_user) }),
       [
         { text: t('common:buttons.cancel'), style: 'cancel' },
         {
-            text: t('common:buttons.delete'),
-            style: 'destructive',
-            onPress: async () => {
-              try {
-                await deleteConversation(conversation.id);
-                void inboxPage.refresh();
-              } catch {
-                Alert.alert(t('common:error'), t('common:errors.generic'));
-              }
-            },
+          text: t('archive'),
+          onPress: async () => {
+            try {
+              await archiveConversation(conversation.id);
+              void inboxPage.refresh();
+              void archivedPage.refresh();
+            } catch {
+              Alert.alert(t('errors.archiveFailedTitle'), t('errors.archiveFailed'));
+            }
+          },
         },
       ],
     );
@@ -182,7 +182,7 @@ export default function MessagesScreen() {
         primary={primary}
         theme={theme}
         t={t}
-        onDelete={handleDeleteConversation}
+        onArchive={handleArchiveConversation}
       />
     );
   }
@@ -442,13 +442,13 @@ function ConversationCard({
   primary,
   theme,
   t,
-  onDelete,
+  onArchive,
 }: {
   conversation: Conversation;
   primary: string;
   theme: Theme;
   t: TFunction;
-  onDelete: (conversation: Conversation) => void;
+  onArchive: (conversation: Conversation) => void;
 }) {
   const lastMsg = conversation.last_message;
   const otherName = displayName(conversation.other_user);
@@ -461,13 +461,20 @@ function ConversationCard({
   return (
     <Swipeable
       renderRightActions={() => (
-        <View className="my-2 mr-4 w-[76px] items-center justify-center rounded-2xl bg-danger">
-          <Ionicons name="trash-outline" size={22} color="#fff" />
-        </View>
+        <Pressable
+          className="my-2 mr-4 w-[92px] items-center justify-center gap-1 rounded-2xl px-2"
+          style={{ backgroundColor: primary }}
+          accessibilityRole="button"
+          accessibilityLabel={t('archiveConversationWithName', { name: otherName })}
+          onPress={() => onArchive(conversation)}
+        >
+          <Ionicons name="archive-outline" size={21} color="#fff" />
+          <Text className="text-xs font-semibold text-white" numberOfLines={1}>{t('archive')}</Text>
+        </Pressable>
       )}
       overshootRight={false}
       onSwipeableWillOpen={() => void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}
-      onSwipeableOpen={() => onDelete(conversation)}
+      onSwipeableOpen={() => onArchive(conversation)}
     >
       <Pressable
         className="mx-4 my-2 p-0"

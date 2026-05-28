@@ -141,8 +141,8 @@ export async function getOrCreateThread(otherUserId: number): Promise<MessageLis
   }
 }
 
-/** DELETE /api/v2/messages/conversations/:conversationId — delete a conversation */
-export function deleteConversation(conversationId: number): Promise<void> {
+/** DELETE /api/v2/messages/conversations/:conversationId — archive a conversation for the current user */
+export function archiveConversation(conversationId: number): Promise<void> {
   return api.delete(`${API_V2}/messages/conversations/${conversationId}`);
 }
 

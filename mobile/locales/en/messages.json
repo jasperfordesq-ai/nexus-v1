@@ -18,6 +18,10 @@
   "clearSearch": "Clear search",
   "readStatus": "No unread messages",
   "openThread": "Open",
+  "archive": "Archive",
+  "archiveConversation": "Archive conversation",
+  "archiveConversationWithName": "Archive conversation with {{name}}",
+  "archiveConfirm": "Archive conversation with {{name}}? You can restore it from Archived.",
   "restore": "Restore",
   "restoreConversation": "Restore conversation",
   "restoreConversationWithName": "Restore conversation with {{name}}",
@@ -59,7 +63,6 @@
   },
   "newMessage": "New message",
   "newGroup": "New group",
-  "deleteConfirm": "Delete conversation with {{name}}?",
   "empty": {
     "title": "No conversations yet",
     "subtitle": "Connect with members to start messaging",
@@ -69,6 +72,8 @@
     "searchSubtitle": "Try a different member name or message keyword."
   },
   "errors": {
+    "archiveFailedTitle": "Archive failed",
+    "archiveFailed": "Could not archive this conversation.",
     "sendFailed": "Message failed to send. Tap to retry.",
     "loadFailed": "Could not load messages.",
     "restoreFailedTitle": "Restore failed",

@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
+import { Alert } from 'react-native';
 
 // --- Mocks ---
 
@@ -23,16 +24,26 @@ jest.mock('expo-router', () => ({
 
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string) => {
+    t: (key: string, options?: Record<string, unknown>) => {
+      if (key === 'archiveConfirm') {
+        return `Archive conversation with ${String(options?.name ?? 'this member')}? You can restore it from Archived.`;
+      }
+      if (key === 'archiveConversationWithName') {
+        return `Archive conversation with ${String(options?.name ?? 'this member')}`;
+      }
+      if (key === 'restoreConversationWithName') {
+        return `Restore conversation with ${String(options?.name ?? 'this member')}`;
+      }
       const map: Record<string, string> = {
         'title': 'Messages',
         'newMessage': 'New message',
         'newGroup': 'New group',
+        'archive': 'Archive',
+        'archiveConversation': 'Archive conversation',
         'tabs.inbox': 'Inbox',
         'tabs.archived': 'Archived',
         'restore': 'Restore',
         'restoreConversation': 'Restore conversation',
-        'restoreConversationWithName': 'Restore conversation with Bob Builder',
         'empty.title': 'No conversations yet',
         'empty.archivedTitle': 'No archived conversations',
         'empty.archivedSubtitle': 'Archived conversations will appear here.',
@@ -82,7 +93,9 @@ jest.mock('react-native-gesture-handler', () => {
   const React = require('react');
   const { View } = require('react-native');
   return {
-    Swipeable: ({ children }: { children: React.ReactNode }) => React.createElement(View, null, children),
+    Swipeable: ({ children, renderRightActions }: { children: React.ReactNode; renderRightActions?: () => React.ReactNode }) => (
+      React.createElement(View, null, children, renderRightActions?.())
+    ),
     GestureHandlerRootView: ({ children }: { children: React.ReactNode }) => React.createElement(View, null, children),
     PanGestureHandler: ({ children }: { children: React.ReactNode }) => React.createElement(View, null, children),
     State: {},
@@ -95,7 +108,7 @@ jest.mock('@expo/vector-icons', () => ({
 
 jest.mock('@/lib/api/messages', () => ({
   getConversations: jest.fn(),
-  deleteConversation: jest.fn().mockResolvedValue(undefined),
+  archiveConversation: jest.fn().mockResolvedValue(undefined),
   restoreConversation: jest.fn().mockResolvedValue({ data: { success: true } }),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   displayName: (user: any) => user?.name ?? 'Unknown',
@@ -115,7 +128,7 @@ jest.mock('@/components/ui/Skeleton', () => ({
 // --- Tests ---
 
 import MessagesScreen from './messages';
-import { restoreConversation } from '@/lib/api/messages';
+import { archiveConversation, restoreConversation } from '@/lib/api/messages';
 
 const defaultPaginatedState = {
   items: [],
@@ -258,6 +271,29 @@ describe('MessagesScreen', () => {
     fireEvent.press(getByLabelText('New group'));
 
     expect(mockRouterPush).toHaveBeenCalledWith({ pathname: '/(modals)/new-group' });
+  });
+
+  it('archives conversations with source-of-truth archive copy', async () => {
+    mockUsePaginatedApi.mockReturnValue({
+      ...defaultPaginatedState,
+      items: [mockConversation],
+    });
+    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation((title, message, buttons) => {
+      expect(title).toBe('Archive conversation');
+      expect(message).toBe('Archive conversation with Bob Builder? You can restore it from Archived.');
+      const archiveAction = buttons?.find((button) => button.text === 'Archive');
+      expect(archiveAction).toBeTruthy();
+      void archiveAction?.onPress?.();
+    });
+
+    const { getByLabelText } = render(<MessagesScreen />);
+
+    fireEvent.press(getByLabelText('Archive conversation with Bob Builder'));
+
+    await waitFor(() => {
+      expect(archiveConversation).toHaveBeenCalledWith(7);
+    });
+    alertSpy.mockRestore();
   });
 
   it('shows archived conversations and restores them from the Archived tab', async () => {

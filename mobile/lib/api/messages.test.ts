@@ -25,6 +25,7 @@ import {
   getThread,
   getOrCreateThread,
   sendMessage,
+  archiveConversation,
   restoreConversation,
 } from './messages';
 import type { ConversationListResponse, MessageListResponse, Message } from './messages';
@@ -102,6 +103,18 @@ describe('restoreConversation', () => {
     await restoreConversation(7);
 
     expect(api.post).toHaveBeenCalledWith('/api/v2/messages/conversations/7/restore', {});
+  });
+});
+
+describe('archiveConversation', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('deletes via the archive endpoint for a conversation', async () => {
+    (api.delete as jest.Mock).mockResolvedValue(undefined);
+
+    await archiveConversation(7);
+
+    expect(api.delete).toHaveBeenCalledWith('/api/v2/messages/conversations/7');
   });
 });
 
