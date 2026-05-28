@@ -1,0 +1,181 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import React from 'react';
+import { render } from '@testing-library/react-native';
+
+let mockParams: Record<string, string> = {};
+let mockEmptyStateAction: (() => void) | undefined;
+const mockHasFeature = jest.fn(() => true);
+const mockT = (key: string, opts?: Record<string, unknown>) => {
+  const map: Record<string, string> = {
+    'common:back': 'Back',
+    'common:buttons.cancel': 'Cancel',
+    'common:buttons.retry': 'Retry',
+    'common:errors.alertTitle': 'Error',
+    'collections.title': 'Collections',
+    'collections.eyebrow': 'Saved marketplace',
+    'collections.subtitle': 'Review saved marketplace collections and run saved searches.',
+    'collections.collectionsTab': 'Collections',
+    'collections.savedTab': 'Saved searches',
+    'collections.create': 'Create collection',
+    'collections.manage': 'Manage in tools',
+    'collections.empty': 'No collections yet',
+    'collections.emptyHint': 'Create collections from marketplace tools, then add listings as you browse.',
+    'collections.count': `${String(opts?.count ?? 0)} listings`,
+    'collections.public': 'Public',
+    'collections.private': 'Private',
+    'savedSearches.empty': 'No saved searches yet',
+    'savedSearches.emptyHint': 'Save marketplace searches from tools to run them again quickly.',
+    'savedSearches.anything': 'Any marketplace listing',
+    'savedSearches.run': 'Run search',
+    'tools.delete': 'Delete',
+    'featureGate.title': 'Marketplace is not available',
+    'featureGate.description': 'This community has not enabled marketplace listings.',
+  };
+  return map[key] ?? key;
+};
+
+jest.mock('expo-router', () => ({
+  router: { push: jest.fn() },
+  useLocalSearchParams: () => mockParams,
+}));
+
+jest.mock('@expo/vector-icons', () => ({
+  Ionicons: 'View',
+}));
+
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: mockT,
+  }),
+}));
+
+jest.mock('@/components/ModalErrorBoundary', () => ({ children }: { children: React.ReactNode }) => children);
+jest.mock('@/components/ui/AppTopBar', () => {
+  const { Text } = require('react-native');
+  return ({ title }: { title: string }) => <Text>{title}</Text>;
+});
+jest.mock('@/components/ui/LoadingSpinner', () => {
+  const { Text } = require('react-native');
+  return () => <Text>Loading</Text>;
+});
+jest.mock('@/components/marketplace/MarketplaceListingCard', () => {
+  const { Text } = require('react-native');
+  return () => <Text>Listing card</Text>;
+});
+jest.mock('@/components/ui/EmptyState', () => ({
+  __esModule: true,
+  default: (props: {
+    title: string;
+    subtitle?: string;
+    actionLabel?: string;
+    onAction?: () => void;
+  }) => {
+    const { Pressable, Text, View } = require('react-native');
+    mockEmptyStateAction = props.onAction;
+    return (
+      <View>
+        <Text>{props.title}</Text>
+        {props.subtitle ? <Text>{props.subtitle}</Text> : null}
+        {props.actionLabel ? (
+          <Pressable accessibilityRole="button" accessibilityLabel={`${props.actionLabel} empty state`} onPress={props.onAction}>
+            <Text>{props.actionLabel}</Text>
+          </Pressable>
+        ) : null}
+      </View>
+    );
+  },
+}));
+
+jest.mock('@/lib/hooks/useTenant', () => ({
+  usePrimaryColor: () => '#006FEE',
+  useTenant: () => ({ hasFeature: mockHasFeature }),
+}));
+
+jest.mock('@/lib/hooks/useTheme', () => ({
+  useTheme: () => ({
+    bg: '#ffffff',
+    surface: '#f8f9fa',
+    text: '#000000',
+    textSecondary: '#666666',
+    textMuted: '#999999',
+    border: '#dddddd',
+    error: '#dc2626',
+  }),
+}));
+
+jest.mock('@/lib/api/marketplace', () => ({
+  createMarketplaceCollection: jest.fn(),
+  deleteMarketplaceSavedSearch: jest.fn(),
+  getMarketplaceCollectionItems: jest.fn(),
+  getMarketplaceCollections: jest.fn(),
+  getMarketplaceSavedSearches: jest.fn(),
+  removeMarketplaceCollectionItem: jest.fn(),
+}));
+
+import MarketplaceCollectionsRoute from './marketplace-collections';
+import { router } from 'expo-router';
+import {
+  getMarketplaceCollections,
+  getMarketplaceSavedSearches,
+} from '@/lib/api/marketplace';
+
+describe('MarketplaceCollectionsRoute', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockParams = {};
+    mockEmptyStateAction = undefined;
+    mockHasFeature.mockReturnValue(true);
+    jest.mocked(getMarketplaceCollections).mockResolvedValue({
+      data: [
+        {
+          id: 1,
+          name: 'Garden kit',
+          description: 'Weekend projects',
+          item_count: 2,
+          is_public: false,
+        },
+      ],
+    } as never);
+    jest.mocked(getMarketplaceSavedSearches).mockResolvedValue({
+      data: [
+        {
+          id: 2,
+          name: 'Drills under 50',
+          search_query: 'drill',
+          filters: null,
+          alert_frequency: 'daily',
+        },
+      ],
+    } as never);
+  });
+
+  it('opens the saved searches tab from the web-compatible searches route param', async () => {
+    mockParams = { tab: 'searches' };
+
+    const { findByText, queryByText } = render(<MarketplaceCollectionsRoute />);
+
+    expect(await findByText('Drills under 50')).toBeTruthy();
+    expect(queryByText('Garden kit')).toBeNull();
+  });
+
+  it('opens saved-search management from the saved-search empty state', async () => {
+    mockParams = { tab: 'saved' };
+    jest.mocked(getMarketplaceSavedSearches).mockResolvedValue({ data: [] } as never);
+
+    const { findByLabelText } = render(<MarketplaceCollectionsRoute />);
+
+    const action = await findByLabelText('Manage in tools empty state');
+    expect(action).toBeTruthy();
+    expect(mockEmptyStateAction).toEqual(expect.any(Function));
+    mockEmptyStateAction?.();
+
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/(modals)/marketplace-tools',
+      params: { tab: 'savedSearches' },
+    });
+  });
+});

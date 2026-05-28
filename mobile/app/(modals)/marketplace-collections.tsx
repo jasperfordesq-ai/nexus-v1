@@ -6,7 +6,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, FlatList, Modal, Pressable, RefreshControl, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router, type Href } from 'expo-router';
+import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
@@ -33,6 +33,10 @@ import { withAlpha } from '@/lib/utils/color';
 
 type TabKey = 'collections' | 'saved';
 
+function routeTab(value: string | string[] | undefined): TabKey {
+  return value === 'saved' || value === 'searches' ? 'saved' : 'collections';
+}
+
 export default function MarketplaceCollectionsRoute() {
   return (
     <ModalErrorBoundary>
@@ -46,7 +50,9 @@ function MarketplaceCollectionsScreen() {
   const { hasFeature } = useTenant();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const [tab, setTab] = useState<TabKey>('collections');
+  const params = useLocalSearchParams<{ tab?: string }>();
+  const currentRouteTab = routeTab(params.tab);
+  const [tab, setTab] = useState<TabKey>(currentRouteTab);
   const [collections, setCollections] = useState<MarketplaceCollection[]>([]);
   const [savedSearches, setSavedSearches] = useState<MarketplaceSavedSearch[]>([]);
   const [selectedCollection, setSelectedCollection] = useState<MarketplaceCollection | null>(null);
@@ -83,6 +89,19 @@ function MarketplaceCollectionsScreen() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    if (params.tab !== undefined) {
+      setTab(currentRouteTab);
+    }
+  }, [currentRouteTab, params.tab]);
+
+  function openManageTools(targetTab: TabKey = tab) {
+    router.push({
+      pathname: '/(modals)/marketplace-tools',
+      params: { tab: targetTab === 'saved' ? 'savedSearches' : 'collections' },
+    } as unknown as Href);
+  }
 
   async function openCollection(collection: MarketplaceCollection) {
     setSelectedCollection(collection);
@@ -260,7 +279,7 @@ function MarketplaceCollectionsScreen() {
                   <Ionicons name="add-outline" size={16} color="#fff" />
                   <HeroButton.Label>{t('collections.create')}</HeroButton.Label>
                 </HeroButton>
-                <HeroButton variant="secondary" onPress={() => router.push('/(modals)/marketplace-tools' as Href)}>
+                <HeroButton variant="secondary" onPress={() => openManageTools()}>
                   <Ionicons name="construct-outline" size={16} color={primary} />
                   <HeroButton.Label>{t('collections.manage')}</HeroButton.Label>
                 </HeroButton>
@@ -273,7 +292,7 @@ function MarketplaceCollectionsScreen() {
                   <SavedSearchRow key={search.id} search={search} onRun={() => runSavedSearch(search)} onDelete={() => void deleteSavedSearch(search)} />
                 ))}
                 {!isLoading && savedSearches.length === 0 ? (
-                  <EmptyState icon="search-outline" title={t('savedSearches.empty')} subtitle={t('savedSearches.emptyHint')} actionLabel={t('collections.manage')} onAction={() => router.push('/(modals)/marketplace-tools' as Href)} />
+                  <EmptyState icon="search-outline" title={t('savedSearches.empty')} subtitle={t('savedSearches.emptyHint')} actionLabel={t('collections.manage')} onAction={() => openManageTools('saved')} />
                 ) : null}
               </View>
             ) : null}
