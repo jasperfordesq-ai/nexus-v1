@@ -249,7 +249,7 @@ describe('FederationListingsScreen', () => {
     fireEvent.press(getByText('Message author'));
     expect(router.push).toHaveBeenCalledWith({
       pathname: '/(modals)/federation-messages',
-      params: { compose: 'true', to_user: '123', to_tenant: 'ext-7', name: 'External Sam' },
+      params: { compose: 'true', to_user: '123', to_tenant: 'ext-7', name: 'External Sam', community: 'Remote partner' },
     });
   });
 });

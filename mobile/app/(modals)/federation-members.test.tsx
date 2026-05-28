@@ -42,7 +42,10 @@ jest.mock('react-i18next', () => ({
   }),
 }));
 
-jest.mock('@/lib/hooks/useTenant', () => ({ usePrimaryColor: () => '#6366f1' }));
+jest.mock('@/lib/hooks/useTenant', () => ({
+  usePrimaryColor: () => '#6366f1',
+  useTenant: () => ({ hasFeature: () => true }),
+}));
 jest.mock('@/lib/hooks/useTheme', () => ({
   useTheme: () => ({
     bg: '#ffffff',
@@ -162,7 +165,7 @@ describe('FederationMembersScreen', () => {
     fireEvent.press(getByText('Message'));
     expect(router.push).toHaveBeenCalledWith({
       pathname: '/(modals)/federation-messages',
-      params: { compose: 'true', to_user: 'ext-7-123', to_tenant: 'ext-7', name: 'External Sam' },
+      params: { compose: 'true', to_user: 'ext-7-123', to_tenant: 'ext-7', name: 'External Sam', community: 'Remote partner' },
     });
   });
 });

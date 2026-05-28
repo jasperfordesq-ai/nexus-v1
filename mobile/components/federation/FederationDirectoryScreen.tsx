@@ -350,6 +350,7 @@ function PartnerCard({ partner, t, theme, primary }: { partner: FederatedTenant;
 
 function MemberCard({ member, t, theme, primary }: { member: FederatedMember; t: (key: string, opts?: Record<string, unknown>) => string; theme: ReturnType<typeof useTheme>; primary: string }) {
   const name = displayMemberName(member, t('directory.members.memberFallback'));
+  const communityName = member.timebank?.name ?? member.tenant_name ?? t('directory.unknownCommunity');
   const tenantId = member.is_external
     ? externalTenantIdFromFederatedId(member.id) ?? member.tenant_id ?? member.timebank?.id
     : member.tenant_id ?? member.timebank?.id;
@@ -363,7 +364,7 @@ function MemberCard({ member, t, theme, primary }: { member: FederatedMember; t:
             <View className="flex-row flex-wrap gap-2">
               <Chip size="sm" variant="secondary">
                 <Ionicons name="globe-outline" size={12} color={primary} />
-                <Chip.Label>{member.timebank?.name ?? member.tenant_name ?? t('directory.unknownCommunity')}</Chip.Label>
+                <Chip.Label>{communityName}</Chip.Label>
               </Chip>
               {member.is_external ? <Chip size="sm" variant="secondary" color="warning"><Chip.Label>{t('directory.external')}</Chip.Label></Chip> : null}
             </View>
@@ -385,7 +386,7 @@ function MemberCard({ member, t, theme, primary }: { member: FederatedMember; t:
             </HeroButton>
           ) : null}
           {tenantId ? (
-            <HeroButton size="sm" variant="secondary" onPress={() => router.push({ pathname: '/(modals)/federation-messages', params: { compose: 'true', to_user: String(member.id), to_tenant: String(tenantId), name } } as unknown as Href)}>
+            <HeroButton size="sm" variant="secondary" onPress={() => router.push({ pathname: '/(modals)/federation-messages', params: { compose: 'true', to_user: String(member.id), to_tenant: String(tenantId), name, community: communityName } } as unknown as Href)}>
               <Ionicons name="chatbubble-ellipses-outline" size={14} color={primary} />
               <HeroButton.Label>{t('directory.members.message')}</HeroButton.Label>
             </HeroButton>
@@ -514,7 +515,7 @@ function ListingDetailView({
     if (!listing.author?.id || !tenantId) return;
     router.push({
       pathname: '/(modals)/federation-messages',
-      params: { compose: 'true', to_user: String(listing.author.id), to_tenant: String(tenantId), name: authorName },
+      params: { compose: 'true', to_user: String(listing.author.id), to_tenant: String(tenantId), name: authorName, community: listingCommunityName(listing, t) },
     } as unknown as Href);
   }
 
@@ -1080,6 +1081,7 @@ function FederationComposeCard({
   toUser,
   toTenant,
   initialName,
+  initialCommunity,
   theme,
   primary,
   t,
@@ -1088,6 +1090,7 @@ function FederationComposeCard({
   toUser?: string;
   toTenant?: string;
   initialName?: string;
+  initialCommunity?: string;
   theme: ReturnType<typeof useTheme>;
   primary: string;
   t: (key: string, opts?: Record<string, unknown>) => string;
@@ -1097,15 +1100,16 @@ function FederationComposeCard({
   const [body, setBody] = useState('');
   const [isSending, setIsSending] = useState(false);
   const hasTarget = !!toUser && !!toTenant;
+  const shouldLookupRecipient = hasTarget && !String(toTenant).startsWith('ext-');
 
   const { data: recipientData, isLoading: isLoadingRecipient } = useApi(
     () => getFederationMember(toUser as string, toTenant as string),
     [toUser, toTenant],
-    { enabled: hasTarget && !String(toTenant).startsWith('ext-') },
+    { enabled: shouldLookupRecipient },
   );
-  const recipient = recipientData?.data as FederatedMember | undefined;
+  const recipient = shouldLookupRecipient ? recipientData?.data as FederatedMember | undefined : undefined;
   const recipientName = displayMemberName(recipient ?? { id: toUser ?? '', name: initialName }, t('directory.messages.recipientFallback'));
-  const recipientCommunity = recipient?.timebank?.name ?? recipient?.tenant_name ?? t('directory.unknownCommunity');
+  const recipientCommunity = (recipient?.timebank?.name ?? recipient?.tenant_name ?? initialCommunity?.trim()) || t('directory.unknownCommunity');
   const canSend = hasTarget && body.trim().length > 0 && !isSending;
 
   async function handleSend() {
@@ -1305,7 +1309,7 @@ function SettingsScreen({ theme, primary, t }: { theme: ReturnType<typeof useThe
 
 export default function FederationDirectoryScreen({ mode }: { mode: DirectoryMode }) {
   const { t } = useTranslation(['federation', 'common']);
-  const params = useLocalSearchParams<{ partner_id?: string; q?: string; compose?: string; to_user?: string; to_tenant?: string; name?: string }>();
+  const params = useLocalSearchParams<{ partner_id?: string; q?: string; compose?: string; to_user?: string; to_tenant?: string; name?: string; community?: string }>();
   const [search, setSearch] = useState(params.q ?? '');
   const [selectedPartner, setSelectedPartner] = useState(params.partner_id ? String(params.partner_id) : '');
   const [serviceReach, setServiceReach] = useState<ServiceReachFilter>('all');
@@ -1454,6 +1458,7 @@ export default function FederationDirectoryScreen({ mode }: { mode: DirectoryMod
               toUser={params.to_user ? String(params.to_user) : undefined}
               toTenant={params.to_tenant ? String(params.to_tenant) : undefined}
               initialName={params.name ? String(params.name) : undefined}
+              initialCommunity={params.community ? String(params.community) : undefined}
               theme={theme}
               primary={primary}
               t={t}

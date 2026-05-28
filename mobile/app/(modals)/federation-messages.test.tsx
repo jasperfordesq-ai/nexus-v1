@@ -440,4 +440,30 @@ describe('FederationMessagesScreen', () => {
     expect(getByText('Let us coordinate this.')).toBeTruthy();
     expect(mockRefresh).toHaveBeenCalled();
   });
+
+  it('uses compose deep-link community metadata when recipient lookup is skipped', () => {
+    mockSearchParams = { compose: 'true', to_user: 'ext-7-123', to_tenant: 'ext-7', name: 'External Sam', community: 'Remote partner' };
+    mockUseApi.mockImplementation((_fetcher: unknown, deps?: unknown[]) => {
+      if (Array.isArray(deps) && deps.length === 0) {
+        return {
+          data: { data: partnerFilters },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        };
+      }
+      return {
+        data: { data: [] },
+        isLoading: false,
+        error: null,
+        refresh: mockRefresh,
+      };
+    });
+
+    const { getByText } = render(<FederationMessagesScreen />);
+
+    expect(getByText('External Sam')).toBeTruthy();
+    expect(getByText('Remote partner')).toBeTruthy();
+    expect(mockUseApi).toHaveBeenCalledWith(expect.any(Function), ['ext-7-123', 'ext-7'], { enabled: false });
+  });
 });
