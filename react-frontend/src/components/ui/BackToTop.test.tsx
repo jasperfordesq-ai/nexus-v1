@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@/test/test-utils';
+import { fireEvent, render, screen } from '@/test/test-utils';
 import { BackToTop } from './BackToTop';
 
 // Mock framer-motion
@@ -43,5 +43,18 @@ describe('BackToTop', () => {
     render(<BackToTop />);
     // Button should not be visible since scrollY < 400
     expect(screen.queryByLabelText('Scroll to top')).not.toBeInTheDocument();
+  });
+
+  it('positions the scroll button above the floating report button', () => {
+    render(<BackToTop />);
+
+    Object.defineProperty(window, 'scrollY', { value: 500, configurable: true });
+    fireEvent.scroll(window);
+
+    const button = screen.getByLabelText('Scroll to top');
+    const wrapper = button.closest('.fixed');
+
+    expect(wrapper?.className).toContain('bottom-[calc(var(--safe-area-bottom)+8.75rem)]');
+    expect(wrapper?.className).toContain('md:bottom-24');
   });
 });
