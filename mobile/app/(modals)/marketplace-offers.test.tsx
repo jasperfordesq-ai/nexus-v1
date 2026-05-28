@@ -6,6 +6,14 @@
 import React from 'react';
 import { render, waitFor } from '@testing-library/react-native';
 
+let mockAuthState: {
+  isAuthenticated: boolean;
+  isLoading: boolean;
+} = {
+  isAuthenticated: true,
+  isLoading: false,
+};
+
 jest.mock('expo-router', () => ({
   router: { push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
   useLocalSearchParams: () => ({ mode: 'sent' }),
@@ -22,6 +30,8 @@ jest.mock('react-i18next', () => ({
         'offers.subtitle': 'Review received offers and track offers you have made.',
         'offers.received': 'Received',
         'offers.sentTab': 'Sent',
+        'offers.signInTitle': 'Sign in to view marketplace offers',
+        'offers.signInHint': 'Offers you send or receive are available after you sign in.',
         'offers.listing': 'Listing',
         'offers.sellerLabel': 'Seller',
         'offers.buyerLabel': 'Buyer',
@@ -33,6 +43,7 @@ jest.mock('react-i18next', () => ({
         'offers.emptySentHint': 'Offers you make on marketplace listings will appear here.',
         'offers.status.countered': 'Countered',
         'actions.view': 'View',
+        'auth:login.submit': 'Sign in',
       };
       if (key === 'offers.date') return `Sent ${String(opts?.date ?? '')}`;
       return map[key] ?? key;
@@ -44,6 +55,10 @@ jest.mock('react-i18next', () => ({
 jest.mock('@/lib/hooks/useTenant', () => ({
   usePrimaryColor: () => '#6366f1',
   useTenant: () => ({ hasFeature: () => true }),
+}));
+
+jest.mock('@/lib/hooks/useAuth', () => ({
+  useAuth: () => mockAuthState,
 }));
 
 jest.mock('@/lib/hooks/useTheme', () => ({
@@ -83,6 +98,10 @@ import { getMarketplaceOffers } from '@/lib/api/marketplace';
 describe('MarketplaceOffersRoute', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockAuthState = {
+      isAuthenticated: true,
+      isLoading: false,
+    };
     (getMarketplaceOffers as jest.Mock).mockResolvedValue({
       data: [
         {
@@ -116,6 +135,16 @@ describe('MarketplaceOffersRoute', () => {
 
     expect(getByText('Withdraw')).toBeTruthy();
     expect(queryByText('Decline')).toBeNull();
+    unmount();
+  });
+
+  it('shows the sign-in state without calling protected offer APIs when unauthenticated', async () => {
+    mockAuthState = { isAuthenticated: false, isLoading: false };
+
+    const { getByText, unmount } = render(<MarketplaceOffersRoute />);
+
+    expect(getByText('Sign in to view marketplace offers')).toBeTruthy();
+    expect(getMarketplaceOffers).not.toHaveBeenCalled();
     unmount();
   });
 });

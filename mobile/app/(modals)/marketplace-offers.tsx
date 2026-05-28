@@ -27,6 +27,7 @@ import {
   withdrawMarketplaceOffer,
   type MarketplaceOffer,
 } from '@/lib/api/marketplace';
+import { useAuth } from '@/lib/hooks/useAuth';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
@@ -44,12 +45,14 @@ export default function MarketplaceOffersRoute() {
 }
 
 function MarketplaceOffersScreen() {
-  const { t } = useTranslation(['marketplace', 'common']);
+  const { t } = useTranslation(['marketplace', 'common', 'auth']);
   const params = useLocalSearchParams<{ mode?: string | string[] }>();
   const { hasFeature } = useTenant();
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const [mode, setMode] = useState<OfferMode>(normalizeOfferMode(firstParam(params.mode)));
+  const canLoadOffers = !isAuthLoading && isAuthenticated;
   const offers = usePaginatedApi<MarketplaceOffer, Awaited<ReturnType<typeof getMarketplaceOffers>>>(
     (cursor) => getMarketplaceOffers(mode, cursor),
     (response) => ({
@@ -58,6 +61,7 @@ function MarketplaceOffersScreen() {
       hasMore: marketplaceHasMore(response),
     }),
     [mode],
+    { enabled: canLoadOffers },
   );
 
   if (!hasFeature('marketplace')) {
@@ -65,6 +69,32 @@ function MarketplaceOffersScreen() {
       <SafeAreaView className="flex-1 bg-background">
         <AppTopBar title={t('offers.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
         <EmptyState icon="hand-left-outline" title={t('featureGate.title')} subtitle={t('featureGate.description')} />
+      </SafeAreaView>
+    );
+  }
+
+  if (isAuthLoading) {
+    return (
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('offers.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
+        <View className="py-16">
+          <LoadingSpinner />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('offers.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
+        <EmptyState
+          icon="hand-left-outline"
+          title={t('offers.signInTitle')}
+          subtitle={t('offers.signInHint')}
+          actionLabel={t('auth:login.submit')}
+          onAction={() => router.push('/(auth)/login' as Href)}
+        />
       </SafeAreaView>
     );
   }
