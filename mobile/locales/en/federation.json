@@ -236,6 +236,10 @@
       "unreadCount": "{{count}} unread",
       "threadEyebrow": "Federated conversation",
       "backToInbox": "Back to inbox",
+      "translate": "Translate",
+      "showOriginal": "Show original",
+      "translatedLabel": "Translated",
+      "translateFailed": "Translation is unavailable right now.",
       "reply": "Reply",
       "replyPlaceholder": "Write a reply...",
       "sendReply": "Send reply"

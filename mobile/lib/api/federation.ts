@@ -333,6 +333,12 @@ export function markFederationMessageRead(id: number | string): Promise<{ data?:
   return api.post<{ data?: unknown }>(`${API_V2}/federation/messages/${id}/mark-read`, {});
 }
 
+export function translateFederationMessage(id: number | string, targetLanguage: string): Promise<{ data?: { translated_text?: string } } | { translated_text?: string }> {
+  return api.post<{ data?: { translated_text?: string } } | { translated_text?: string }>(`${API_V2}/federation/messages/${id}/translate`, {
+    target_language: targetLanguage,
+  });
+}
+
 export function getFederationSettings(): Promise<{ data: { settings: FederationSettings; enabled: boolean } } | { settings: FederationSettings; enabled: boolean }> {
   return api.get<{ data: { settings: FederationSettings; enabled: boolean } } | { settings: FederationSettings; enabled: boolean }>(`${API_V2}/federation/settings`);
 }

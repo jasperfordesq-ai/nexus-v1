@@ -25,6 +25,7 @@ import {
   optInFederation,
   optOutFederation,
   sendFederationMessage,
+  translateFederationMessage,
   updateFederationSettings,
   type FederatedEvent,
   type FederatedGroup,
@@ -36,7 +37,7 @@ import {
 } from '@/lib/api/federation';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
-import { usePrimaryColor } from '@/lib/hooks/useTenant';
+import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
@@ -891,6 +892,7 @@ function MessageThreadView({
   t,
   theme,
   primary,
+  canTranslate,
   onBack,
   onSent,
 }: {
@@ -898,12 +900,19 @@ function MessageThreadView({
   t: (key: string, opts?: Record<string, unknown>) => string;
   theme: ReturnType<typeof useTheme>;
   primary: string;
+  canTranslate: boolean;
   onBack: () => void;
   onSent: (message?: FederatedMessage) => void;
 }) {
+  const { i18n } = useTranslation();
   const [reply, setReply] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [translations, setTranslations] = useState<Record<string, string>>({});
+  const [translationErrors, setTranslationErrors] = useState<Record<string, boolean>>({});
+  const [translatingIds, setTranslatingIds] = useState<Record<string, boolean>>({});
+  const [showOriginalIds, setShowOriginalIds] = useState<Record<string, boolean>>({});
   const canSend = reply.trim().length > 0 && !isSending;
+  const targetLanguage = (i18n.language || 'en').split('-')[0] || 'en';
 
   async function sendReply() {
     if (!reply.trim()) return;
@@ -922,6 +931,28 @@ function MessageThreadView({
       Alert.alert(t('directory.messages.sendFailedTitle'), t('directory.messages.sendFailedDescription'));
     } finally {
       setIsSending(false);
+    }
+  }
+
+  async function translateMessage(message: FederatedMessage) {
+    const key = String(message.id);
+    if (translations[key]) {
+      setShowOriginalIds((current) => ({ ...current, [key]: !current[key] }));
+      return;
+    }
+    setTranslatingIds((current) => ({ ...current, [key]: true }));
+    setTranslationErrors((current) => ({ ...current, [key]: false }));
+    try {
+      const response = await translateFederationMessage(message.id, targetLanguage);
+      const payload = (response as { data?: { translated_text?: string } }).data ?? (response as { translated_text?: string });
+      const translated = payload?.translated_text?.trim();
+      if (!translated) throw new Error('No translated text returned');
+      setTranslations((current) => ({ ...current, [key]: translated }));
+      setShowOriginalIds((current) => ({ ...current, [key]: false }));
+    } catch {
+      setTranslationErrors((current) => ({ ...current, [key]: true }));
+    } finally {
+      setTranslatingIds((current) => ({ ...current, [key]: false }));
     }
   }
 
@@ -954,6 +985,9 @@ function MessageThreadView({
       <View className="gap-3">
         {thread.messages.map((message) => {
           const outbound = message.direction === 'outbound';
+          const key = String(message.id);
+          const translated = translations[key];
+          const showOriginal = showOriginalIds[key] === true;
           return (
             <View key={String(message.id)} className={outbound ? 'items-end' : 'items-start'}>
               <Surface
@@ -964,7 +998,30 @@ function MessageThreadView({
                 {message.subject ? (
                   <Text className="mb-1 text-sm font-semibold" style={{ color: theme.text }}>{message.subject}</Text>
                 ) : null}
-                <Text className="text-sm leading-5" style={{ color: theme.text }}>{message.body}</Text>
+                <Text className="text-sm leading-5" style={{ color: theme.text }}>{translated && !showOriginal ? translated : message.body}</Text>
+                {translated && !showOriginal ? (
+                  <Chip size="sm" variant="secondary" className="mt-2 self-start">
+                    <Ionicons name="language-outline" size={12} color={primary} />
+                    <Chip.Label>{t('directory.messages.translatedLabel')}</Chip.Label>
+                  </Chip>
+                ) : null}
+                {!outbound && canTranslate ? (
+                  <View className="mt-2 gap-1">
+                    <HeroButton
+                      size="sm"
+                      variant="secondary"
+                      isDisabled={translatingIds[key]}
+                      onPress={() => void translateMessage(message)}
+                      accessibilityLabel={translated && !showOriginal ? t('directory.messages.showOriginal') : t('directory.messages.translate')}
+                    >
+                      {translatingIds[key] ? <Spinner size="sm" /> : <Ionicons name="language-outline" size={14} color={primary} />}
+                      <HeroButton.Label>{translated && !showOriginal ? t('directory.messages.showOriginal') : t('directory.messages.translate')}</HeroButton.Label>
+                    </HeroButton>
+                    {translationErrors[key] ? (
+                      <Text className="text-xs" style={{ color: theme.error }}>{t('directory.messages.translateFailed')}</Text>
+                    ) : null}
+                  </View>
+                ) : null}
                 <Text className="mt-2 text-[11px]" style={{ color: theme.textMuted }}>
                   {formatDate(message.created_at)}
                 </Text>
@@ -1239,6 +1296,7 @@ export default function FederationDirectoryScreen({ mode }: { mode: DirectoryMod
   const [activeEvent, setActiveEvent] = useState<FederatedEvent | null>(null);
   const [localFederationMessages, setLocalFederationMessages] = useState<FederatedMessage[]>([]);
   const primary = usePrimaryColor();
+  const { hasFeature } = useTenant();
   const theme = useTheme();
   const meta = modeMeta[mode];
 
@@ -1467,6 +1525,7 @@ export default function FederationDirectoryScreen({ mode }: { mode: DirectoryMod
               t={t}
               theme={theme}
               primary={primary}
+              canTranslate={hasFeature('message_translation')}
               onBack={() => setActiveThreadKey(null)}
               onSent={handleFederationMessageSent}
             />

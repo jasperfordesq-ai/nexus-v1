@@ -11,6 +11,7 @@ const mockUsePaginatedApi = jest.fn();
 const mockRefresh = jest.fn();
 const mockMarkRead = jest.fn().mockResolvedValue({});
 const mockSendFederationMessage = jest.fn().mockResolvedValue({ data: { id: 202 } });
+const mockTranslateFederationMessage = jest.fn().mockResolvedValue({ data: { translated_text: 'Could we coordinate this across communities? (translated)' } });
 let mockSearchParams: Record<string, string> = {};
 
 jest.mock('expo-router', () => ({
@@ -30,6 +31,10 @@ jest.mock('react-i18next', () => ({
         'directory.messages.delivered': 'Delivered',
         'directory.messages.threadEyebrow': 'Federated conversation',
         'directory.messages.backToInbox': 'Back to inbox',
+        'directory.messages.translate': 'Translate',
+        'directory.messages.showOriginal': 'Show original',
+        'directory.messages.translatedLabel': 'Translated',
+        'directory.messages.translateFailed': 'Translation is unavailable right now.',
         'directory.messages.reply': 'Reply',
         'directory.messages.replyPlaceholder': 'Write a federated reply...',
         'directory.messages.sendReply': 'Send reply',
@@ -60,6 +65,7 @@ jest.mock('react-i18next', () => ({
 
 jest.mock('@/lib/hooks/useTenant', () => ({
   usePrimaryColor: () => '#6366f1',
+  useTenant: () => ({ hasFeature: (feature: string) => feature === 'message_translation' }),
 }));
 
 jest.mock('@/lib/hooks/useTheme', () => ({
@@ -94,6 +100,7 @@ jest.mock('@/lib/api/federation', () => ({
   getFederationMember: jest.fn(),
   markFederationMessageRead: (...args: unknown[]) => mockMarkRead(...args),
   sendFederationMessage: (...args: unknown[]) => mockSendFederationMessage(...args),
+  translateFederationMessage: (...args: unknown[]) => mockTranslateFederationMessage(...args),
   updateFederationSettings: jest.fn(),
 }));
 
@@ -174,7 +181,9 @@ beforeEach(() => {
   mockRefresh.mockClear();
   mockMarkRead.mockClear();
   mockSendFederationMessage.mockClear();
+  mockTranslateFederationMessage.mockClear();
   mockSendFederationMessage.mockResolvedValue({ data: { id: 202 } });
+  mockTranslateFederationMessage.mockResolvedValue({ data: { translated_text: 'Could we coordinate this across communities? (translated)' } });
   mockUseApi.mockReturnValue({
     data: { data: [message] },
     isLoading: false,
@@ -218,6 +227,25 @@ describe('FederationMessagesScreen', () => {
       });
     });
     expect(mockRefresh).toHaveBeenCalled();
+  });
+
+  it('translates inbound federated messages and can restore the original', async () => {
+    const { getByLabelText, getByText, queryByText } = render(<FederationMessagesScreen />);
+
+    fireEvent.press(getByLabelText('Open thread with Katherine'));
+    fireEvent.press(getByText('Translate'));
+
+    await waitFor(() => {
+      expect(mockTranslateFederationMessage).toHaveBeenCalledWith(101, 'en');
+      expect(getByText('Could we coordinate this across communities? (translated)')).toBeTruthy();
+    });
+
+    expect(getByText('Translated')).toBeTruthy();
+
+    fireEvent.press(getByText('Show original'));
+
+    expect(getByText('Could we coordinate this across communities?')).toBeTruthy();
+    expect(queryByText('Could we coordinate this across communities? (translated)')).toBeNull();
   });
 
   it('opens a sent compose deep link as a federated thread', async () => {
