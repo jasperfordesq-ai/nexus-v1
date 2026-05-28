@@ -49,6 +49,18 @@ describe('usePaginatedApi', () => {
     expect(result.current.error).toBeNull();
   });
 
+  it('skips the initial fetch when disabled', async () => {
+    const fetchFn = jest.fn().mockResolvedValue(makeResponse(['a', 'b'], null, false));
+    const { result } = renderHook(() => usePaginatedApi(fetchFn, extractor, [], { enabled: false }));
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    expect(fetchFn).not.toHaveBeenCalled();
+    expect(result.current.items).toEqual([]);
+    expect(result.current.hasMore).toBe(false);
+    expect(result.current.error).toBeNull();
+  });
+
   it('sets hasMore from the extractor response', async () => {
     const fetchFn = jest.fn().mockResolvedValue(makeResponse(['a'], 'cursor_1', true));
     const { result } = renderHook(() => usePaginatedApi(fetchFn, extractor));

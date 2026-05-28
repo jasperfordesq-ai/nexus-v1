@@ -49,14 +49,15 @@ export default function MarketplaceMyListingsRoute() {
 }
 
 function MarketplaceMyListingsScreen() {
-  const { t } = useTranslation(['marketplace', 'common']);
+  const { t } = useTranslation(['marketplace', 'common', 'auth']);
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const { user } = useAuth();
+  const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const [activeTab, setActiveTab] = useState<ListingTab>('active');
   const [onboardingDismissed, setOnboardingDismissed] = useState(true);
-  const dashboard = useApi(() => getMarketplaceDashboard(), [], { enabled: true });
-  const onboarding = useApi(() => getMerchantOnboardingStatus(), [], { enabled: true });
+  const canLoadSellerData = isAuthenticated && Boolean(user?.id);
+  const dashboard = useApi(() => getMarketplaceDashboard(), [], { enabled: canLoadSellerData });
+  const onboarding = useApi(() => getMerchantOnboardingStatus(), [], { enabled: canLoadSellerData });
   const list = usePaginatedApi<MarketplaceListingItem, Awaited<ReturnType<typeof getMyMarketplaceListings>>>(
     (cursor) => getMyMarketplaceListings(cursor, user?.id, activeTab),
     (response) => ({
@@ -65,6 +66,7 @@ function MarketplaceMyListingsScreen() {
       hasMore: marketplaceHasMore(response),
     }),
     [user?.id, activeTab],
+    { enabled: canLoadSellerData },
   );
 
   const stats = dashboard.data?.data ?? {};
@@ -110,6 +112,32 @@ function MarketplaceMyListingsScreen() {
     } catch (err) {
       Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('owner.renewFailed'));
     }
+  }
+
+  if (isAuthLoading) {
+    return (
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('myListings.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
+        <View className="py-16">
+          <LoadingSpinner />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('myListings.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
+        <EmptyState
+          icon="storefront-outline"
+          title={t('myListings.signInTitle')}
+          subtitle={t('myListings.signInHint')}
+          actionLabel={t('auth:login.submit')}
+          onAction={() => router.push('/(auth)/login' as Href)}
+        />
+      </SafeAreaView>
+    );
   }
 
   return (

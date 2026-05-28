@@ -232,9 +232,11 @@
     "salesOrders": "Sales orders",
     "offersCta": "Offers",
     "sellerTools": "Seller tools",
-    "shipping": "Shipping options",
-    "empty": "No marketplace listings yet",
-    "emptyHint": "Create a listing to start selling in your community.",
+      "shipping": "Shipping options",
+      "signInTitle": "Sign in to manage marketplace listings",
+      "signInHint": "Your listings, seller stats, and marketplace setup are available after you sign in.",
+      "empty": "No marketplace listings yet",
+      "emptyHint": "Create a listing to start selling in your community.",
     "emptyState": {
       "active": {
         "title": "No active listings",

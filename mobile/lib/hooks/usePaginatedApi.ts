@@ -22,6 +22,11 @@ export interface PaginatedApiState<TItem> {
   refresh: () => void;
 }
 
+interface UsePaginatedApiOptions {
+  /** When false, the initial fetch and later refresh/load-more calls are skipped. Defaults to true. */
+  enabled?: boolean;
+}
+
 /**
  * Generic hook for paginated/infinite-scroll API calls.
  *
@@ -67,9 +72,11 @@ export function usePaginatedApi<TItem, TResponse>(
     hasMore: boolean;
   },
   deps?: DependencyList,
+  options?: UsePaginatedApiOptions,
 ): PaginatedApiState<TItem> {
+  const enabled = options?.enabled ?? true;
   const [items, setItems] = useState<TItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(enabled);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
@@ -177,6 +184,21 @@ export function usePaginatedApi<TItem, TResponse>(
   useEffect(() => {
     cursorRef.current = null;
     retryCountRef.current = 0;
+
+    if (!enabled) {
+      if (retryTimerRef.current) {
+        clearTimeout(retryTimerRef.current);
+        retryTimerRef.current = null;
+      }
+      isFetchingRef.current = false;
+      setItems([]);
+      setIsLoading(false);
+      setIsLoadingMore(false);
+      setError(null);
+      setHasMore(false);
+      return;
+    }
+
     void fetchPage(null, true);
 
     return () => {
@@ -187,16 +209,17 @@ export function usePaginatedApi<TItem, TResponse>(
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps ?? []);
+  }, deps ? [...deps, enabled] : [enabled]);
 
   /** Append the next page to the list. No-op if already fetching, still loading, or no more pages. */
   const loadMore = useCallback(() => {
-    if (!hasMore || isFetchingRef.current || isLoadingMore || isLoading) return;
+    if (!enabled || !hasMore || isFetchingRef.current || isLoadingMore || isLoading) return;
     void fetchPage(cursorRef.current, false);
-  }, [hasMore, isLoadingMore, isLoading, fetchPage]);
+  }, [enabled, hasMore, isLoadingMore, isLoading, fetchPage]);
 
   /** Reset to the first page and replace the item list. */
   const refresh = useCallback(() => {
+    if (!enabled) return;
     cursorRef.current = null;
     retryCountRef.current = 0; // allow retry again on manual refresh
     // Allow refresh to proceed even if a previous fetch is in-flight
@@ -206,7 +229,7 @@ export function usePaginatedApi<TItem, TResponse>(
       retryTimerRef.current = null;
     }
     void fetchPage(null, true);
-  }, [fetchPage]);
+  }, [enabled, fetchPage]);
 
   return { items, isLoading, isLoadingMore, error, hasMore, loadMore, refresh };
 }

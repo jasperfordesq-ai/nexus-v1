@@ -168,8 +168,14 @@ export function DropdownItem({
     >
       {isSelectable && <HeroDropdown.ItemIndicator />}
       {startContent}
-      {renderLabel(children)}
-      {description && <Description>{description}</Description>}
+      {description ? (
+        <div className="flex flex-col">
+          {renderLabel(children)}
+          <Description>{description}</Description>
+        </div>
+      ) : (
+        renderLabel(children)
+      )}
       {endContent}
       {shortcut && (
         <Kbd className="ms-auto" slot="keyboard" variant="light">
