@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, Pressable, RefreshControl, ScrollView, Share, Text, View } from 'react-native';
+import { Alert, Pressable, RefreshControl, ScrollView, Share, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -16,6 +16,7 @@ import {
   getFederationConnectionStatus,
   getFederationMember,
   getFederationMemberReviews,
+  sendFederationTransaction,
   sendFederationConnectionRequest,
   type FederatedConnectionStatus,
 } from '@/lib/api/federation';
@@ -146,6 +147,7 @@ function MemberProfileScreenInner() {
   const [connId, setConnId] = useState<number | null>(null);
   const [connLoading, setConnLoading] = useState(false);
   const [connActionLoading, setConnActionLoading] = useState(false);
+  const [showFederationTransfer, setShowFederationTransfer] = useState(false);
 
   const loadConnectionStatus = useCallback(async () => {
     if (!safeMemberId || isOwnProfile) return;
@@ -428,6 +430,21 @@ function MemberProfileScreenInner() {
             </HeroCard>
           ) : null}
 
+          {showFederationTransfer && isFederatedProfile && member.transactions_enabled ? (
+            <FederatedTransferCard
+              member={member}
+              displayName={displayName}
+              primary={primary}
+              theme={theme}
+              t={t}
+              onCancel={() => setShowFederationTransfer(false)}
+              onComplete={() => {
+                setShowFederationTransfer(false);
+                refresh();
+              }}
+            />
+          ) : null}
+
           <View className="mt-3 gap-3">
             <View className="flex-row gap-3">
               <StatCard value={Math.round(totalGiven)} label={t('profile.hoursGiven')} icon="arrow-up-outline" primary={primary} theme={theme} />
@@ -509,7 +526,7 @@ function MemberProfileScreenInner() {
       </ScrollView>
 
       <Surface variant="default" className="absolute bottom-0 left-0 right-0 border-t border-border p-4">
-        <View className="flex-row items-center gap-3">
+        <View className="flex-row flex-wrap items-center gap-3">
           {isOwnProfile ? (
             <HeroButton
               className="flex-1"
@@ -522,15 +539,29 @@ function MemberProfileScreenInner() {
               <HeroButton.Label>{t('profile.editProfile')}</HeroButton.Label>
             </HeroButton>
           ) : null}
-          {!isOwnProfile && connStatus !== 'connected' && connStatus !== 'pending_sent' ? (
-            <HeroButton variant="secondary" isDisabled={connActionLoading} accessibilityLabel={t('profile.connect')} onPress={() => void handleConnect()}>
+          {!isOwnProfile && connStatus === 'none' ? (
+            <HeroButton className="min-w-[30%] flex-1" variant="secondary" isDisabled={connActionLoading} accessibilityLabel={t('profile.connect')} onPress={() => void handleConnect()}>
               {connActionLoading ? <Spinner size="sm" /> : <Ionicons name="person-add-outline" size={18} color={primary} />}
               <HeroButton.Label>{t('profile.connect')}</HeroButton.Label>
             </HeroButton>
           ) : null}
+          {isFederatedProfile && member.transactions_enabled ? (
+            <HeroButton
+              className="min-w-[30%] flex-1"
+              variant="secondary"
+              accessibilityLabel={t('profile.sendCredits')}
+              onPress={() => {
+                void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                setShowFederationTransfer((current) => !current);
+              }}
+            >
+              <Ionicons name="wallet-outline" size={18} color={primary} />
+              <HeroButton.Label>{t('profile.sendCredits')}</HeroButton.Label>
+            </HeroButton>
+          ) : null}
           {!isOwnProfile ? (
             <HeroButton
-              className="flex-1"
+              className="min-w-[30%] flex-1"
               variant="primary"
               style={{ backgroundColor: primary }}
               accessibilityLabel={t('profile.sendMessage')}
@@ -553,6 +584,114 @@ function MemberProfileScreenInner() {
         </View>
       </Surface>
     </SafeAreaView>
+  );
+}
+
+function FederatedTransferCard({
+  member,
+  displayName,
+  primary,
+  theme,
+  t,
+  onCancel,
+  onComplete,
+}: {
+  member: MemberProfile;
+  displayName: string;
+  primary: string;
+  theme: Theme;
+  t: TFunction;
+  onCancel: () => void;
+  onComplete: () => void;
+}) {
+  const [amount, setAmount] = useState('');
+  const [description, setDescription] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const tenantId = member.timebank?.id ?? member.tenant_id;
+
+  async function submit() {
+    const parsedAmount = Number(amount.replace(',', '.').trim());
+    if (!Number.isInteger(parsedAmount) || parsedAmount < 1 || parsedAmount > 100) {
+      Alert.alert(t('profile.transferValidationTitle'), t('profile.transferAmountRequired'));
+      return;
+    }
+    if (!description.trim()) {
+      Alert.alert(t('profile.transferValidationTitle'), t('profile.transferDescriptionRequired'));
+      return;
+    }
+    if (!tenantId) {
+      Alert.alert(t('profile.transferFailedTitle'), t('profile.transferFailedMessage'));
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await sendFederationTransaction({
+        receiver_id: member.id,
+        receiver_tenant_id: tenantId,
+        amount: parsedAmount,
+        description: description.trim(),
+      });
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      Alert.alert(t('profile.transferSuccessTitle'), t('profile.transferSuccessMessage', { amount: parsedAmount, name: displayName }));
+      setAmount('');
+      setDescription('');
+      onComplete();
+    } catch {
+      Alert.alert(t('profile.transferFailedTitle'), t('profile.transferFailedMessage'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  return (
+    <HeroCard variant="secondary" className="mt-3 overflow-hidden">
+      <View className="h-1" style={{ backgroundColor: theme.warning }} />
+      <HeroCard.Body className="gap-4 px-4 py-4">
+        <View className="flex-row items-start justify-between gap-3">
+          <View className="min-w-0 flex-1">
+            <SectionTitle icon="wallet-outline" title={t('profile.sendCreditsTo', { name: displayName })} primary={primary} theme={theme} />
+            <Text className="mt-2 text-sm leading-5" style={{ color: theme.textSecondary }}>
+              {t('profile.transferSummary', { amount: amount || '0', name: displayName })}
+            </Text>
+          </View>
+          <HeroButton size="sm" variant="secondary" isIconOnly onPress={onCancel} accessibilityLabel={t('profile.cancelTransfer')}>
+            <Ionicons name="close-outline" size={18} color={primary} />
+          </HeroButton>
+        </View>
+
+        <View className="gap-2">
+          <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>{t('profile.amountHours')}</Text>
+          <TextInput
+            className="min-h-12 rounded-panel-inner border px-3 text-sm"
+            style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg }}
+            placeholder={t('profile.amountPlaceholder')}
+            placeholderTextColor={theme.textMuted}
+            value={amount}
+            onChangeText={setAmount}
+            keyboardType="number-pad"
+          />
+        </View>
+
+        <View className="gap-2">
+          <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>{t('profile.transferDescription')}</Text>
+          <TextInput
+            className="min-h-20 rounded-panel-inner border px-3 py-3 text-sm"
+            style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg, textAlignVertical: 'top' }}
+            placeholder={t('profile.transferDescriptionPlaceholder')}
+            placeholderTextColor={theme.textMuted}
+            value={description}
+            onChangeText={setDescription}
+            multiline
+          />
+        </View>
+
+        <HeroButton variant="primary" isDisabled={isSubmitting} onPress={() => void submit()} style={{ backgroundColor: primary }}>
+          {isSubmitting ? <Spinner size="sm" /> : <Ionicons name="send-outline" size={16} color="#fff" />}
+          <HeroButton.Label>{t('profile.sendCredits')}</HeroButton.Label>
+        </HeroButton>
+      </HeroCard.Body>
+    </HeroCard>
   );
 }
 

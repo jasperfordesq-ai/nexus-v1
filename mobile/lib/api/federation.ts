@@ -110,6 +110,23 @@ export interface FederationMemberReview {
   verified?: boolean;
 }
 
+export interface FederationTransactionPayload {
+  receiver_id: number | string;
+  receiver_tenant_id: number | string;
+  amount: number;
+  description: string;
+}
+
+export interface FederationTransactionResponse {
+  data?: {
+    transaction_id?: number | string;
+    status?: string;
+    amount?: number;
+  };
+  success?: boolean;
+  message?: string;
+}
+
 export interface FederatedListing {
   id: number | string;
   title: string;
@@ -298,6 +315,10 @@ export function sendFederationMessage(payload: {
   reference_message_id?: number | string | null;
 }): Promise<{ data: FederatedMessage }> {
   return api.post<{ data: FederatedMessage }>(`${API_V2}/federation/messages`, payload);
+}
+
+export function sendFederationTransaction(payload: FederationTransactionPayload): Promise<FederationTransactionResponse> {
+  return api.post<FederationTransactionResponse>(`${API_V2}/federation/transactions`, payload);
 }
 
 export function markFederationMessageRead(id: number | string): Promise<{ data?: unknown }> {

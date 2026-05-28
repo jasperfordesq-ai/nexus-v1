@@ -26,6 +26,7 @@ import {
   getFederationPartner,
   getFederationMemberReviews,
   markFederationMessageRead,
+  sendFederationTransaction,
 } from './federation';
 import type { FederationResponse, FederatedTenant, FederationStats } from './federation';
 
@@ -126,6 +127,24 @@ describe('getFederationMemberReviews', () => {
     await getFederationMemberReviews(272, 5);
 
     expect(api.get).toHaveBeenCalledWith('/api/v2/federation/members/272/reviews', { tenant_id: '5' });
+  });
+});
+
+describe('sendFederationTransaction', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('posts a cross-community time credit transfer payload', async () => {
+    const payload = {
+      receiver_id: 272,
+      receiver_tenant_id: 5,
+      amount: 2,
+      description: 'Repair help',
+    };
+    (api.post as jest.Mock).mockResolvedValue({ data: { transaction_id: 9, status: 'completed' } });
+
+    await sendFederationTransaction(payload);
+
+    expect(api.post).toHaveBeenCalledWith('/api/v2/federation/transactions', payload);
   });
 });
 

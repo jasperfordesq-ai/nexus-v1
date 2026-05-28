@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 // --- Mocks ---
 
@@ -26,6 +26,23 @@ jest.mock('react-i18next', () => ({
         'profile.federatedMember': 'Federated member',
         'profile.federatedProfile': 'Federated profile',
         'profile.federatedProfileHint': opts ? `This profile is shared from ${String(opts.community ?? '')}.` : 'This profile is federated.',
+        'profile.federatedMessaging': 'Messaging enabled',
+        'profile.federatedExchanges': 'Exchanges enabled',
+        'profile.sendCredits': 'Send credits',
+        'profile.sendCreditsTo': opts ? `Send credits to ${String(opts.name ?? '')}` : 'Send credits',
+        'profile.amountHours': 'Amount (hours)',
+        'profile.amountPlaceholder': '1-100',
+        'profile.transferDescription': 'Description',
+        'profile.transferDescriptionPlaceholder': 'What are these credits for?',
+        'profile.transferSummary': opts ? `Sending ${String(opts.amount ?? '')} hour(s) to ${String(opts.name ?? '')}.` : 'Sending credits.',
+        'profile.transferValidationTitle': 'Check transfer details',
+        'profile.transferAmountRequired': 'Enter a whole-hour amount between 1 and 100.',
+        'profile.transferDescriptionRequired': 'Add a description for this transfer.',
+        'profile.transferSuccessTitle': 'Credits sent',
+        'profile.transferSuccessMessage': opts ? `${String(opts.amount ?? '')} hour(s) sent to ${String(opts.name ?? '')}.` : 'Credits sent.',
+        'profile.transferFailedTitle': 'Could not send credits',
+        'profile.transferFailedMessage': 'Please check federation exchanges are enabled and try again.',
+        'profile.cancelTransfer': 'Cancel transfer',
         'profile.hoursGiven': 'Hours Given',
         'profile.hoursReceived': 'Hours Received',
         'profile.totalHours': 'Total Hours',
@@ -119,6 +136,7 @@ jest.mock('@/lib/api/federation', () => ({
   getFederationMember: jest.fn(),
   getFederationMemberReviews: jest.fn().mockResolvedValue({ data: [] }),
   getFederationConnectionStatus: jest.fn().mockResolvedValue({ data: { status: 'none', connection_id: null } }),
+  sendFederationTransaction: jest.fn().mockResolvedValue({ data: { transaction_id: 44, status: 'completed' } }),
   sendFederationConnectionRequest: jest.fn().mockResolvedValue({ data: { connection_id: 20 } }),
 }));
 
@@ -148,7 +166,7 @@ jest.mock('@/components/ui/LoadingSpinner', () => () => null);
 // --- Tests ---
 
 import MemberProfileScreen from './member-profile';
-import { getFederationMember, getFederationMemberReviews } from '@/lib/api/federation';
+import { getFederationMember, getFederationMemberReviews, sendFederationTransaction } from '@/lib/api/federation';
 import { getMember } from '@/lib/api/members';
 
 const defaultApiState = { data: null, isLoading: false, error: null, refresh: jest.fn() };
@@ -339,5 +357,39 @@ describe('MemberProfileScreen', () => {
     expect(getByText('Trusted across our network.')).toBeTruthy();
     expect(getByText('via Partner Demo')).toBeTruthy();
     expect(getByText('Verified')).toBeTruthy();
+  });
+
+  it('sends federated time credits from a partner member profile', async () => {
+    mockParams = { id: '272', tenant_id: '5' };
+    mockUseApi.mockReturnValue({
+      data: {
+        data: {
+          ...mockMember,
+          id: 272,
+          tenant_id: 5,
+          timebank: { id: 5, name: 'Partner Demo' },
+          transactions_enabled: true,
+        },
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getAllByText, getByPlaceholderText } = render(<MemberProfileScreen />);
+
+    fireEvent.press(getAllByText('Send credits')[0]);
+    fireEvent.changeText(getByPlaceholderText('1-100'), '2');
+    fireEvent.changeText(getByPlaceholderText('What are these credits for?'), 'Repair help');
+    fireEvent.press(getAllByText('Send credits')[0]);
+
+    await waitFor(() => {
+      expect(sendFederationTransaction).toHaveBeenCalledWith({
+        receiver_id: 272,
+        receiver_tenant_id: 5,
+        amount: 2,
+        description: 'Repair help',
+      });
+    });
   });
 });
