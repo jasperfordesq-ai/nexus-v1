@@ -154,6 +154,10 @@ export function markConversationRead(otherUserId: number): Promise<{ data?: { ma
   return api.put(`${API_V2}/messages/${otherUserId}/read`, {});
 }
 
+export function toggleMessageReaction(messageId: number, emoji: string): Promise<{ data?: { action?: 'added' | 'removed'; emoji?: string; message_id?: number } }> {
+  return api.post(`${API_V2}/messages/${messageId}/reactions`, { emoji });
+}
+
 /** POST /api/v2/messages — send a message to a recipient */
 export function sendMessage(recipientId: number, body: string, options: SendMessageOptions = {}): Promise<{ data: Message }> {
   return api.post<{ data: Message }>(`${API_V2}/messages`, {

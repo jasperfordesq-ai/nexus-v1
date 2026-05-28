@@ -42,6 +42,8 @@ jest.mock('react-i18next', () => ({
         'thread.sendFailed': 'Message not sent.',
         'thread.goBack': 'Go back',
         'thread.messageCount': '2 messages',
+        'thread.reactWith': `React with ${String(options?.emoji ?? '')}`,
+        'thread.toggleReaction': `Toggle ${String(options?.emoji ?? '')} reaction`,
         'context.regarding': 'Regarding',
         'context.open': 'Open context',
         'context.title': `${String(options?.type ?? '')} #${String(options?.id ?? '')}`,
@@ -51,6 +53,8 @@ jest.mock('react-i18next', () => ({
         'context.type.volunteering': 'Volunteering',
         'messages:send': 'Send',
         'errors.sendFailed': 'Send failed',
+        'errors.reactionFailedTitle': 'Reaction failed',
+        'errors.reactionFailed': 'Could not update that reaction.',
         'common:buttons.retry': 'Retry',
         'common:labels.you': 'You',
       };
@@ -92,12 +96,14 @@ jest.mock('@/lib/context/RealtimeContext', () => ({
 }));
 
 const mockMarkConversationRead = jest.fn().mockResolvedValue({ data: { marked_read: 1 } });
+const mockToggleMessageReaction = jest.fn().mockResolvedValue({ data: { action: 'added', emoji: '👍', message_id: 1 } });
 
 jest.mock('@/lib/api/messages', () => ({
   getThread: jest.fn(),
   getOrCreateThread: jest.fn(),
   markConversationRead: (...args: unknown[]) => mockMarkConversationRead(...args),
   sendMessage: jest.fn().mockResolvedValue({ data: { id: 99 } }),
+  toggleMessageReaction: (...args: unknown[]) => mockToggleMessageReaction(...args),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   displayName: (user: any) => user?.name ?? 'Unknown',
 }));
@@ -152,6 +158,8 @@ beforeEach(() => {
   mockRouterPush.mockClear();
   mockRealtimeCallback = null;
   mockMarkConversationRead.mockClear();
+  mockToggleMessageReaction.mockClear();
+  mockToggleMessageReaction.mockResolvedValue({ data: { action: 'added', emoji: '👍', message_id: 1 } });
   (sendMessage as jest.Mock).mockClear();
   mockUseApi.mockReturnValue({ data: null, isLoading: false, error: null, refresh: jest.fn() });
 });
@@ -319,6 +327,24 @@ describe('ThreadScreen', () => {
     await waitFor(() => {
       expect(getByText('Fresh update')).toBeTruthy();
       expect(mockMarkConversationRead).toHaveBeenCalledWith(5);
+    });
+  });
+
+  it('toggles message reactions and updates the visible count', async () => {
+    mockUseApi.mockReturnValue({
+      data: { data: mockMessages },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getAllByLabelText, getByText } = render(<ThreadScreen />);
+
+    fireEvent.press(getAllByLabelText('React with 👍')[0]);
+
+    await waitFor(() => {
+      expect(mockToggleMessageReaction).toHaveBeenCalledWith(1, '👍');
+      expect(getByText('1')).toBeTruthy();
     });
   });
 });

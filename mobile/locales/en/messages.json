@@ -40,7 +40,9 @@
     "you": "You: ",
     "goBack": "Go back",
     "messageCount": "{{count}} message",
-    "messageCount_other": "{{count}} messages"
+    "messageCount_other": "{{count}} messages",
+    "reactWith": "React with {{emoji}}",
+    "toggleReaction": "Toggle {{emoji}} reaction"
   },
   "context": {
     "regarding": "Regarding",
@@ -77,6 +79,8 @@
     "sendFailed": "Message failed to send. Tap to retry.",
     "loadFailed": "Could not load messages.",
     "restoreFailedTitle": "Restore failed",
-    "restoreFailed": "Could not restore this conversation."
+    "restoreFailed": "Could not restore this conversation.",
+    "reactionFailedTitle": "Reaction failed",
+    "reactionFailed": "Could not update that reaction."
   }
 }

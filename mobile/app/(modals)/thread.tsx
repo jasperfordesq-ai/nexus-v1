@@ -23,7 +23,7 @@ import * as Haptics from '@/lib/haptics';
 import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
 
 import { useTranslation } from 'react-i18next';
-import { displayName, getOrCreateThread, getThread, markConversationRead, sendMessage, type Message, type SendMessageOptions } from '@/lib/api/messages';
+import { displayName, getOrCreateThread, getThread, markConversationRead, sendMessage, toggleMessageReaction, type Message, type SendMessageOptions } from '@/lib/api/messages';
 import { useApi } from '@/lib/hooks/useApi';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -39,6 +39,7 @@ import TypingIndicator from '@/components/TypingIndicator';
 import VoiceMessageBubble from '@/components/VoiceMessageBubble';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
+const REACTION_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
 
 const THREAD_CONTEXT_CONFIG = {
   listing: { icon: 'list-outline', labelKey: 'context.type.listing', pathname: '/(modals)/exchange-detail', color: '#06b6d4' },
@@ -205,6 +206,31 @@ function ThreadScreenInner() {
     }
   }, [isSending, newConversationOptions, resolvedRecipientId, t]);
 
+  const handleReaction = useCallback(async (messageId: number, emoji: string) => {
+    try {
+      const response = await toggleMessageReaction(messageId, emoji);
+      const action = response.data?.action ?? 'added';
+      setMessages((prev) => prev.map((message) => {
+        if (message.id !== messageId) return message;
+        const reactions = { ...(message.reactions ?? {}) };
+        const current = reactions[emoji] ?? 0;
+        if (action === 'removed') {
+          if (current <= 1) {
+            delete reactions[emoji];
+          } else {
+            reactions[emoji] = current - 1;
+          }
+        } else {
+          reactions[emoji] = current + 1;
+        }
+        return { ...message, reactions };
+      }));
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    } catch {
+      Alert.alert(t('errors.reactionFailedTitle'), t('errors.reactionFailed'));
+    }
+  }, [t]);
+
   if (!isValidId) {
     return (
       <ThreadShell title={t('threadTitle')} backLabel={t('thread.goBack')}>
@@ -263,7 +289,7 @@ function ThreadScreenInner() {
           ref={flatListRef}
           data={messages}
           keyExtractor={(item) => String(item.id)}
-          renderItem={({ item }) => <MessageBubble item={item} primary={primary} theme={theme} t={t} />}
+          renderItem={({ item }) => <MessageBubble item={item} primary={primary} theme={theme} t={t} onReact={handleReaction} />}
           contentContainerStyle={{
             flexGrow: 1,
             justifyContent: messages.length ? 'flex-start' : 'center',
@@ -372,52 +398,87 @@ function MessageBubble({
   primary,
   theme,
   t,
+  onReact,
 }: {
   item: Message;
   primary: string;
   theme: ReturnType<typeof useTheme>;
-  t: (key: string) => string;
+  t: (key: string, options?: Record<string, unknown>) => string;
+  onReact: (messageId: number, emoji: string) => void;
 }) {
   const isOwn = item.is_own;
   const senderName = displayName(item.sender);
+  const reactions = item.reactions ?? {};
+  const hasReactions = Object.keys(reactions).length > 0;
 
   return (
     <View className={`my-1.5 flex-row items-end gap-2 ${isOwn ? 'justify-end pl-12' : 'justify-start pr-12'}`}>
       {!isOwn ? <Avatar uri={item.sender?.avatar_url ?? null} name={senderName} size={32} /> : null}
-      <View
-        className="max-w-[82%] rounded-[20px] px-4 pb-2.5 pt-3 shadow-sm"
-        style={isOwn
-          ? { backgroundColor: primary, borderBottomRightRadius: 4 }
-          : { backgroundColor: theme.surface, borderBottomLeftRadius: 4, borderColor: theme.borderSubtle, borderWidth: 1 }}
-      >
-        {item.is_voice && item.audio_url ? (
-          <VoiceMessageBubble
-            audioUrl={item.audio_url}
-            isOwn={isOwn}
-            primaryColor={primary}
-            textColor={theme.text}
-            textColorSecondary={theme.textSecondary}
-          />
-        ) : item.is_voice ? (
-          <View className="flex-row items-center gap-1.5">
-            <Ionicons name="mic" size={16} color={isOwn ? 'rgba(255,255,255,0.9)' : theme.textSecondary} />
-            <Text className={`text-[14px] italic ${isOwn ? 'text-white' : 'text-foreground'}`}>
-              {t('thread.voiceMessage')}
-            </Text>
-          </View>
-        ) : (
-          <Text className={`text-[15px] leading-6 ${isOwn ? 'text-white' : 'text-foreground'}`}>
-            {item.body}
-          </Text>
-        )}
-        <Text
-          className="mt-1 text-[10px]"
+      <View className={`max-w-[82%] gap-1.5 ${isOwn ? 'items-end' : 'items-start'}`}>
+        <View
+          className="rounded-[20px] px-4 pb-2.5 pt-3 shadow-sm"
           style={isOwn
-            ? { color: 'rgba(255,255,255,0.75)', textAlign: 'right' }
-            : { color: theme.textMuted, textAlign: 'right' }}
+            ? { backgroundColor: primary, borderBottomRightRadius: 4 }
+            : { backgroundColor: theme.surface, borderBottomLeftRadius: 4, borderColor: theme.borderSubtle, borderWidth: 1 }}
         >
-          {formatTime(item.created_at)}
-        </Text>
+          {item.is_voice && item.audio_url ? (
+            <VoiceMessageBubble
+              audioUrl={item.audio_url}
+              isOwn={isOwn}
+              primaryColor={primary}
+              textColor={theme.text}
+              textColorSecondary={theme.textSecondary}
+            />
+          ) : item.is_voice ? (
+            <View className="flex-row items-center gap-1.5">
+              <Ionicons name="mic" size={16} color={isOwn ? 'rgba(255,255,255,0.9)' : theme.textSecondary} />
+              <Text className={`text-[14px] italic ${isOwn ? 'text-white' : 'text-foreground'}`}>
+                {t('thread.voiceMessage')}
+              </Text>
+            </View>
+          ) : (
+            <Text className={`text-[15px] leading-6 ${isOwn ? 'text-white' : 'text-foreground'}`}>
+              {item.body}
+            </Text>
+          )}
+          <Text
+            className="mt-1 text-[10px]"
+            style={isOwn
+              ? { color: 'rgba(255,255,255,0.75)', textAlign: 'right' }
+              : { color: theme.textMuted, textAlign: 'right' }}
+          >
+            {formatTime(item.created_at)}
+          </Text>
+        </View>
+        {hasReactions ? (
+          <View className="flex-row flex-wrap gap-1.5">
+            {Object.entries(reactions).map(([emoji, count]) => (
+              <Pressable
+                key={emoji}
+                accessibilityRole="button"
+                accessibilityLabel={t('thread.toggleReaction', { emoji })}
+                className="flex-row items-center gap-1 rounded-full border border-border bg-surface px-2 py-1"
+                onPress={() => onReact(item.id, emoji)}
+              >
+                <Text className="text-xs">{emoji}</Text>
+                <Text className="text-[11px] font-semibold" style={{ color: theme.textSecondary }}>{count}</Text>
+              </Pressable>
+            ))}
+          </View>
+        ) : null}
+        <View className="flex-row flex-wrap gap-1">
+          {REACTION_EMOJIS.slice(0, 3).map((emoji) => (
+            <Pressable
+              key={emoji}
+              accessibilityRole="button"
+              accessibilityLabel={t('thread.reactWith', { emoji })}
+              className="h-8 w-8 items-center justify-center rounded-full bg-surface"
+              onPress={() => onReact(item.id, emoji)}
+            >
+              <Text className="text-sm">{emoji}</Text>
+            </Pressable>
+          ))}
+        </View>
       </View>
     </View>
   );
