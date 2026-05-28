@@ -26,6 +26,7 @@ import {
   getFederationPartner,
   getFederationMemberReviews,
   markFederationMessageRead,
+  markFederationMessagesReadBatch,
   optInFederation,
   optOutFederation,
   sendFederationTransaction,
@@ -179,5 +180,17 @@ describe('markFederationMessageRead', () => {
     await markFederationMessageRead(230);
 
     expect(api.post).toHaveBeenCalledWith('/api/v2/federation/messages/230/mark-read', {});
+  });
+});
+
+describe('markFederationMessagesReadBatch', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('uses the backend batch mark-read route for federated messages', async () => {
+    (api.post as jest.Mock).mockResolvedValue({ data: { updated: 2 } });
+
+    await markFederationMessagesReadBatch([230, '231']);
+
+    expect(api.post).toHaveBeenCalledWith('/api/v2/federation/messages/mark-read-batch', { ids: [230, '231'] });
   });
 });

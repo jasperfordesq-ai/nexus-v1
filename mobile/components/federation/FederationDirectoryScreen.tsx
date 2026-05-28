@@ -21,7 +21,7 @@ import {
   getFederationPartners,
   getFederationSettings,
   getFederationMember,
-  markFederationMessageRead,
+  markFederationMessagesReadBatch,
   optInFederation,
   optOutFederation,
   sendFederationMessage,
@@ -1399,8 +1399,10 @@ export default function FederationDirectoryScreen({ mode }: { mode: DirectoryMod
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setActiveThreadKey(thread.key);
     const unreadIds = thread.messages.filter((message) => message.direction === 'inbound' && message.status === 'unread').map((message) => message.id);
-    await Promise.all(unreadIds.map((id) => markFederationMessageRead(id).catch(() => null)));
-    if (unreadIds.length > 0) refresh();
+    if (unreadIds.length > 0) {
+      await markFederationMessagesReadBatch(unreadIds).catch(() => null);
+      refresh();
+    }
   }
 
   const handleFederationMessageSent = useCallback((message?: FederatedMessage) => {

@@ -10,6 +10,7 @@ const mockUseApi = jest.fn();
 const mockUsePaginatedApi = jest.fn();
 const mockRefresh = jest.fn();
 const mockMarkRead = jest.fn().mockResolvedValue({});
+const mockMarkReadBatch = jest.fn().mockResolvedValue({ data: { updated: 1 } });
 const mockSendFederationMessage = jest.fn().mockResolvedValue({ data: { id: 202 } });
 const mockTranslateFederationMessage = jest.fn().mockResolvedValue({ data: { translated_text: 'Could we coordinate this across communities? (translated)' } });
 let mockSearchParams: Record<string, string> = {};
@@ -101,6 +102,7 @@ jest.mock('@/lib/api/federation', () => ({
   getFederationSettings: jest.fn(),
   getFederationMember: jest.fn(),
   markFederationMessageRead: (...args: unknown[]) => mockMarkRead(...args),
+  markFederationMessagesReadBatch: (...args: unknown[]) => mockMarkReadBatch(...args),
   sendFederationMessage: (...args: unknown[]) => mockSendFederationMessage(...args),
   translateFederationMessage: (...args: unknown[]) => mockTranslateFederationMessage(...args),
   updateFederationSettings: jest.fn(),
@@ -231,6 +233,7 @@ beforeEach(() => {
   mockSearchParams = {};
   mockRefresh.mockClear();
   mockMarkRead.mockClear();
+  mockMarkReadBatch.mockClear();
   mockSendFederationMessage.mockClear();
   mockTranslateFederationMessage.mockClear();
   mockSendFederationMessage.mockResolvedValue({ data: { id: 202 } });
@@ -306,7 +309,7 @@ describe('FederationMessagesScreen', () => {
     expect(getByText('Could we coordinate this across communities?')).toBeTruthy();
 
     await waitFor(() => {
-      expect(mockMarkRead).toHaveBeenCalledWith(101);
+      expect(mockMarkReadBatch).toHaveBeenCalledWith([101]);
     });
 
     fireEvent.changeText(getByPlaceholderText('Write a federated reply...'), 'Yes, let us coordinate.');
