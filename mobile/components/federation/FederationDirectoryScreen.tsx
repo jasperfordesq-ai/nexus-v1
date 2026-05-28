@@ -715,6 +715,7 @@ function EventCard({
   onPress: () => void;
 }) {
   const startDate = formatDate(event.start_date);
+  const organizerName = event.organizer?.name?.trim() || t('directory.events.organizerFallback');
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={t('directory.events.openDetails', { title: event.title })} onPress={onPress}>
       <HeroCard className="mb-3 rounded-panel p-0">
@@ -730,6 +731,17 @@ function EventCard({
               {event.description ? <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>{event.description}</Text> : null}
             </View>
             <Ionicons name="chevron-forward-outline" size={18} color={primary} />
+          </View>
+          <View className="flex-row items-center gap-2">
+            <Avatar uri={event.organizer?.avatar ?? null} name={organizerName} size={30} />
+            <View className="min-w-0 flex-1">
+              <Text className="text-[11px] font-semibold uppercase" style={{ color: theme.textMuted }} numberOfLines={1}>
+                {t('directory.events.organizer')}
+              </Text>
+              <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+                {organizerName}
+              </Text>
+            </View>
           </View>
           <View className="flex-row flex-wrap gap-2">
             {event.is_online ? <Chip size="sm" variant="secondary" color="success"><Chip.Label>{t('directory.events.online')}</Chip.Label></Chip> : null}
@@ -756,6 +768,7 @@ function EventDetailView({
   onBack: () => void;
 }) {
   const community = event.timebank?.name ?? t('directory.unknownCommunity');
+  const organizerName = event.organizer?.name?.trim() || t('directory.events.organizerFallback');
   return (
     <View className="gap-4">
       <HeroButton variant="secondary" onPress={onBack}>
@@ -778,6 +791,18 @@ function EventDetailView({
               </Text>
             </View>
           </View>
+
+          <Surface variant="secondary" className="flex-row items-center gap-3 rounded-panel-inner p-3">
+            <Avatar uri={event.organizer?.avatar ?? null} name={organizerName} size={42} />
+            <View className="min-w-0 flex-1">
+              <Text className="text-xs font-bold uppercase" style={{ color: theme.textMuted }} numberOfLines={1}>
+                {t('directory.events.organizer')}
+              </Text>
+              <Text className="text-base font-semibold" style={{ color: theme.text }} numberOfLines={2}>
+                {organizerName}
+              </Text>
+            </View>
+          </Surface>
 
           <View className="flex-row flex-wrap gap-2">
             <Chip size="sm" variant="secondary">

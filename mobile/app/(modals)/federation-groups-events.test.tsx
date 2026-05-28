@@ -39,6 +39,8 @@ jest.mock('react-i18next', () => ({
         'directory.events.detailEyebrow': 'Federated event',
         'directory.events.noDescription': 'This shared event does not have a description yet.',
         'directory.events.online': 'Online',
+        'directory.events.organizer': 'Hosted by',
+        'directory.events.organizerFallback': 'Event organizer',
         'directory.resultsCount': `${String(opts?.count ?? 0)} results`,
         'directory.filters.allCommunities': 'All communities',
         'directory.unknownCommunity': 'Partner community',
@@ -174,6 +176,7 @@ describe('Federation group and event directory actions', () => {
         location: 'Town Hall',
         is_online: false,
         attendees_count: 18,
+        organizer: { id: 11, name: 'Pat Organizer', avatar: null },
         timebank: { id: 5, name: 'Cork Timebank' },
       }],
       isLoading: false,
@@ -185,9 +188,13 @@ describe('Federation group and event directory actions', () => {
     });
 
     const { getByLabelText, getByText } = render(<FederationEventsScreen />);
+
+    expect(getByText('Pat Organizer')).toBeTruthy();
     fireEvent.press(getByLabelText('Open details for Partner meetup'));
 
     expect(getByText('Federated event')).toBeTruthy();
+    expect(getByText('Hosted by')).toBeTruthy();
+    expect(getByText('Pat Organizer')).toBeTruthy();
     expect(getByText('Back to events')).toBeTruthy();
   });
 

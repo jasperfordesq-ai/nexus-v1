@@ -306,6 +306,8 @@
       "backToEvents": "Back to events",
       "detailEyebrow": "Federated event",
       "noDescription": "This shared event does not have a description yet.",
+      "organizer": "Hosted by",
+      "organizerFallback": "Event organizer",
       "ends": "Ends {{date}}",
       "attendeeCount": "{{count}} attendee",
       "attendeeCount_other": "{{count}} attendees"
