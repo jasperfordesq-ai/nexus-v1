@@ -25,6 +25,7 @@ import { FadpConsentBanner } from '@/components/legal/FadpConsentBanner';
 import { SessionExpiredModal } from '@/components/feedback/SessionExpiredModal';
 import { SessionTimeoutWarning } from '@/components/feedback/SessionTimeoutWarning';
 import { AppUpdateModal } from '@/components/feedback/AppUpdateModal';
+import { FloatingReportProblemButton } from '@/components/feedback/FloatingReportProblemButton';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { SeoHead } from '@/components/seo/SeoHead';
 import { useApiErrorHandler } from '@/hooks/useApiErrorHandler';
@@ -206,6 +207,9 @@ export function Layout({
 
       {/* Mobile bottom tab bar */}
       {showNavbar && <MobileTabBar onMenuOpen={handleMobileMenuOpen} isMenuOpen={isMobileMenuOpen} />}
+
+      {/* Same-page support capture */}
+      {showNavbar && <FloatingReportProblemButton />}
 
       {/* Back to top button */}
       <BackToTop />

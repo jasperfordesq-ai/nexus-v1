@@ -37,6 +37,9 @@ vi.mock('./MobileTabBar', () => ({
 vi.mock('./Footer', () => ({
   Footer: () => <footer data-testid="footer">Footer Mock</footer>,
 }));
+vi.mock('@/components/feedback/FloatingReportProblemButton', () => ({
+  FloatingReportProblemButton: () => <button type="button">Report a problem</button>,
+}));
 vi.mock('@/components/ui/BackToTop', () => ({
   BackToTop: () => <div data-testid="back-to-top">BackToTop Mock</div>,
 }));
@@ -119,6 +122,11 @@ describe('Layout', () => {
     expect(screen.getByTestId('mobile-tab-bar')).toBeInTheDocument();
   });
 
+  it('renders a floating report problem action on normal app pages', () => {
+    render(<Layout />);
+    expect(screen.getByRole('button', { name: 'Report a problem' })).toBeInTheDocument();
+  });
+
   it('renders BackToTop', () => {
     render(<Layout />);
     expect(screen.getByTestId('back-to-top')).toBeInTheDocument();
@@ -147,6 +155,11 @@ describe('Layout', () => {
   it('hides MobileTabBar when showNavbar is false', () => {
     render(<Layout showNavbar={false} />);
     expect(screen.queryByTestId('mobile-tab-bar')).not.toBeInTheDocument();
+  });
+
+  it('hides floating report problem action when navigation is hidden', () => {
+    render(<Layout showNavbar={false} />);
+    expect(screen.queryByRole('button', { name: 'Report a problem' })).not.toBeInTheDocument();
   });
 
   it('adds padding class when showNavbar and withNavbarPadding are true', () => {

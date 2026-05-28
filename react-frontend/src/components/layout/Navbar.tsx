@@ -78,7 +78,6 @@ import { DesktopMenuItems } from '@/components/navigation';
 import { SearchOverlay } from '@/components/layout/SearchOverlay';
 import { MegaMenu } from '@/components/layout/MegaMenu';
 import { NotificationFlyout } from '@/components/layout/NotificationFlyout';
-import { ReportProblemButton } from '@/components/feedback/ReportProblemButton';
 import { TenantLogo } from '@/components/branding';
 import { PresenceIndicator,
   StatusSelector } from '@/components/social';
@@ -791,8 +790,6 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
 
                   {/* Notification Flyout — rich popover instead of simple navigate */}
                   <NotificationFlyout />
-
-                  <ReportProblemButton className="hidden xl:inline-flex h-9 px-3" />
 
                   {/* Status Selector (small dot button) */}
                   <div className="hidden min-[390px]:block">

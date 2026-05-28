@@ -229,7 +229,7 @@ describe('Navbar', () => {
   });
 
   describe('support reporting', () => {
-    it('shows a report problem action in authenticated profile navigation', () => {
+    it('does not render the global report problem action in the crowded header', () => {
       setupDefaultMocks({
         auth: {
           user: {
@@ -245,7 +245,7 @@ describe('Navbar', () => {
 
       render(<Navbar />);
 
-      expect(screen.getByRole('button', { name: 'Report a problem' })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Report a problem' })).not.toBeInTheDocument();
     });
   });
 
