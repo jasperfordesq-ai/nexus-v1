@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
+import { Alert } from 'react-native';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 let mockAuthState: {
@@ -43,7 +44,13 @@ jest.mock('react-i18next', () => ({
         'orders.deliveryOffers': 'Delivery offers',
         'orders.waitingShipment': 'Waiting for shipment',
         'orders.continuePayment': 'Continue payment',
+        'orders.paymentMerchantDisplayName': 'Project NEXUS marketplace',
+        'orders.paymentCompleteTitle': 'Payment complete',
+        'orders.paymentCompleteHint': 'Your order is paid. The seller can now prepare it.',
         'orders.awaitingPayment': 'Awaiting payment',
+        'orders.paymentStartedTitle': 'Payment started',
+        'orders.paymentClientSecretHint': 'The payment is ready. Complete checkout from the secure payment sheet or web checkout.',
+        'orders.paymentSheetFailed': 'The secure payment sheet could not be opened. Try again from Orders.',
         'orders.awaitingConfirmation': 'Awaiting buyer confirmation',
         'orders.awaitingCompletion': 'Awaiting completion',
         'orders.saleCompleted': 'Sale completed',
@@ -118,6 +125,7 @@ jest.mock('@/lib/utils/resolveImageUrl', () => ({
 jest.mock('@/lib/api/marketplace', () => ({
   acceptMarketplaceDeliveryOffer: jest.fn(),
   cancelMarketplaceOrder: jest.fn(),
+  confirmMarketplacePayment: jest.fn(),
   confirmMarketplaceDeliveryOffer: jest.fn(),
   confirmMarketplaceOrderDelivery: jest.fn(),
   createMarketplacePaymentIntent: jest.fn(),
@@ -129,13 +137,25 @@ jest.mock('@/lib/api/marketplace', () => ({
   rateMarketplaceOrder: jest.fn(),
   shipMarketplaceOrder: jest.fn(),
 }));
+jest.mock('@/lib/payments/marketplacePayment', () => ({
+  presentMarketplacePayment: jest.fn().mockResolvedValue({ status: 'redirected' }),
+}));
 
 import MarketplaceOrdersRoute from './marketplace-orders';
-import { getMarketplaceDeliveryOffers, getMarketplaceOrders } from '@/lib/api/marketplace';
+import {
+  confirmMarketplacePayment,
+  createMarketplacePaymentIntent,
+  getMarketplaceDeliveryOffers,
+  getMarketplaceOrders,
+} from '@/lib/api/marketplace';
+import { presentMarketplacePayment } from '@/lib/payments/marketplacePayment';
 
 describe('MarketplaceOrdersRoute', () => {
+  let alertSpy: jest.SpyInstance;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
     mockAuthState = {
       isAuthenticated: true,
       isLoading: false,
@@ -146,6 +166,13 @@ describe('MarketplaceOrdersRoute', () => {
       meta: { cursor: null, has_more: false },
     });
     (getMarketplaceDeliveryOffers as jest.Mock).mockResolvedValue({ data: [] });
+    (createMarketplacePaymentIntent as jest.Mock).mockResolvedValue({
+      data: { client_secret: 'pi_secret', payment_intent_id: 'pi_42' },
+    });
+  });
+
+  afterEach(() => {
+    alertSpy.mockRestore();
   });
 
   it('includes pending-payment recovery states in the active orders filter', async () => {
@@ -246,6 +273,57 @@ describe('MarketplaceOrdersRoute', () => {
     expect(getAllByText('Pending payment').length).toBeGreaterThan(0);
     expect(getByText('Payment is not complete yet. Continue checkout to keep this purchase moving.')).toBeTruthy();
     expect(getByText('Continue payment')).toBeTruthy();
+    unmount();
+  });
+
+  it('restarts and confirms pending marketplace payments with the native payment sheet', async () => {
+    (getMarketplaceOrders as jest.Mock).mockResolvedValueOnce({
+      data: [
+        {
+          id: 42,
+          order_number: 'MKT-000042',
+          quantity: 1,
+          unit_price: 18,
+          total_price: 18,
+          currency: 'EUR',
+          status: 'pending_payment',
+          created_at: '2026-05-22T10:00:00Z',
+          listing: {
+            id: 72,
+            title: 'Pending payment lamp',
+            image: null,
+            delivery_method: 'pickup',
+          },
+          seller: { id: 2, name: 'Pat Seller', avatar_url: null },
+        },
+      ],
+      meta: { cursor: null, has_more: false },
+    });
+    (presentMarketplacePayment as jest.Mock).mockResolvedValueOnce({ status: 'completed' });
+    (confirmMarketplacePayment as jest.Mock).mockResolvedValueOnce({
+      data: { payment_id: 15, status: 'succeeded', amount: 18, currency: 'EUR', order_id: 42 },
+    });
+
+    const { getByText, unmount } = render(<MarketplaceOrdersRoute />);
+
+    await waitFor(() => {
+      expect(getByText('Pending payment lamp')).toBeTruthy();
+    });
+
+    fireEvent.press(getByText('Continue payment'));
+
+    await waitFor(() => {
+      expect(createMarketplacePaymentIntent).toHaveBeenCalledWith(42);
+      expect(presentMarketplacePayment).toHaveBeenCalledWith({
+        clientSecret: 'pi_secret',
+        merchantDisplayName: 'Project NEXUS marketplace',
+      });
+      expect(confirmMarketplacePayment).toHaveBeenCalledWith('pi_42');
+      expect(Alert.alert).toHaveBeenCalledWith(
+        'Payment complete',
+        'Your order is paid. The seller can now prepare it.',
+      );
+    });
     unmount();
   });
 

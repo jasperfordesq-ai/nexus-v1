@@ -323,6 +323,7 @@ export interface MarketplaceShippingOption {
 export interface MarketplacePaymentIntent {
   checkout_url?: string;
   client_secret?: string;
+  payment_intent_id?: string;
 }
 
 export interface MerchantSellerProfile {
@@ -789,6 +790,24 @@ export function createMarketplaceOrder(payload: {
 export function createMarketplacePaymentIntent(orderId: number): Promise<MarketplaceDataResponse<MarketplacePaymentIntent>> {
   return api.post<MarketplaceDataResponse<MarketplacePaymentIntent>>(`${API_V2}/marketplace/payments/create-intent`, {
     order_id: orderId,
+  });
+}
+
+export function confirmMarketplacePayment(paymentIntentId: string): Promise<MarketplaceDataResponse<{
+  payment_id: number;
+  status: string;
+  amount: number;
+  currency: string;
+  order_id: number;
+}>> {
+  return api.post<MarketplaceDataResponse<{
+    payment_id: number;
+    status: string;
+    amount: number;
+    currency: string;
+    order_id: number;
+  }>>(`${API_V2}/marketplace/payments/confirm`, {
+    payment_intent_id: paymentIntentId,
   });
 }
 

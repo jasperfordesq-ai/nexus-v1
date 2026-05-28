@@ -54,10 +54,14 @@ jest.mock('react-i18next', () => ({
         'checkout.couponPlaceholder': 'COMMUNITY10',
         'checkout.apply': 'Apply',
         'checkout.applied': 'Applied',
+        'checkout.merchantDisplayName': 'Project NEXUS marketplace',
         'pickup.chooseSlot': 'Pickup slot',
         'pickup.slotFallback': `Slot ${String(opts?.id ?? '')}`,
         'checkout.openedTitle': 'Checkout started',
         'checkout.clientSecretHint': 'The order was created. Complete payment from the web checkout if the payment sheet does not open on this device.',
+        'checkout.paymentCompleteTitle': 'Payment complete',
+        'checkout.paymentCompleteHint': 'Your order is paid. You can track it from Orders.',
+        'checkout.paymentSheetFailed': 'The secure payment sheet could not be opened. Continue payment from Orders.',
         'checkout.paymentRecoveryTitle': 'Checkout paused',
         'checkout.paymentRecoveryHint': `Order ${String(opts?.order ?? '')} was created, but payment could not start. Continue payment from Orders.`,
       };
@@ -117,6 +121,7 @@ jest.mock('@/lib/utils/resolveImageUrl', () => ({
 
 jest.mock('@/lib/api/marketplace', () => ({
   addMarketplaceCollectionItem: jest.fn(),
+  confirmMarketplacePayment: jest.fn(),
   createMarketplaceOrder: jest.fn(),
   createMarketplacePaymentIntent: jest.fn(),
   getMarketplaceListingPickupSlots: jest.fn().mockResolvedValue({ data: [] }),
@@ -130,9 +135,13 @@ jest.mock('@/lib/api/marketplace', () => ({
   unsaveMarketplaceListing: jest.fn(),
   validateMarketplaceCoupon: jest.fn(),
 }));
+jest.mock('@/lib/payments/marketplacePayment', () => ({
+  presentMarketplacePayment: jest.fn().mockResolvedValue({ status: 'redirected' }),
+}));
 
 import MarketplaceDetailRoute from './marketplace-detail';
 import {
+  confirmMarketplacePayment,
   createMarketplaceOrder,
   createMarketplacePaymentIntent,
   getMarketplaceListing,
@@ -140,6 +149,7 @@ import {
   getMarketplaceSellerListings,
   reserveMarketplacePickup,
 } from '@/lib/api/marketplace';
+import { presentMarketplacePayment } from '@/lib/payments/marketplacePayment';
 
 const mockListing = {
   id: 9,
@@ -279,7 +289,7 @@ describe('MarketplaceDetailRoute', () => {
     });
     (reserveMarketplacePickup as jest.Mock).mockRejectedValue(new Error('Slot is full'));
     (createMarketplacePaymentIntent as jest.Mock).mockResolvedValue({
-      data: { client_secret: 'pi_secret' },
+      data: { client_secret: 'pi_secret', payment_intent_id: 'pi_45' },
     });
 
     const { getByText, findByText, findByTestId } = render(<MarketplaceDetailRoute />);
@@ -296,9 +306,39 @@ describe('MarketplaceDetailRoute', () => {
     await waitFor(() => {
       expect(reserveMarketplacePickup).toHaveBeenCalledWith(45, 12);
       expect(createMarketplacePaymentIntent).toHaveBeenCalledWith(45);
+      expect(presentMarketplacePayment).toHaveBeenCalledWith({
+        clientSecret: 'pi_secret',
+        merchantDisplayName: 'Project NEXUS marketplace',
+      });
       expect(Alert.alert).toHaveBeenCalledWith(
         'Checkout started',
         'The order was created. Complete payment from the web checkout if the payment sheet does not open on this device.',
+      );
+    });
+  });
+
+  it('confirms marketplace payment after the native payment sheet completes', async () => {
+    (createMarketplaceOrder as jest.Mock).mockResolvedValue({
+      data: { id: 46, order_number: 'MKT-000046', status: 'pending_payment' },
+    });
+    (createMarketplacePaymentIntent as jest.Mock).mockResolvedValue({
+      data: { client_secret: 'pi_secret_complete', payment_intent_id: 'pi_46' },
+    });
+    (presentMarketplacePayment as jest.Mock).mockResolvedValueOnce({ status: 'completed' });
+    (confirmMarketplacePayment as jest.Mock).mockResolvedValueOnce({
+      data: { payment_id: 12, status: 'succeeded', amount: 25, currency: 'EUR', order_id: 46 },
+    });
+
+    const { getByText } = render(<MarketplaceDetailRoute />);
+
+    const buyNow = await waitFor(() => getByText('Buy now'));
+    fireEvent.press(buyNow);
+
+    await waitFor(() => {
+      expect(confirmMarketplacePayment).toHaveBeenCalledWith('pi_46');
+      expect(Alert.alert).toHaveBeenCalledWith(
+        'Payment complete',
+        'Your order is paid. You can track it from Orders.',
       );
     });
   });

@@ -21,6 +21,7 @@ import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import { formatMarketplacePrice } from '@/components/marketplace/MarketplaceListingCard';
 import {
   addMarketplaceCollectionItem,
+  confirmMarketplacePayment,
   createMarketplaceOrder,
   createMarketplacePaymentIntent,
   getMarketplaceListingPickupSlots,
@@ -42,6 +43,7 @@ import { APP_URL } from '@/lib/constants';
 import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { useAuth } from '@/lib/hooks/useAuth';
+import { presentMarketplacePayment } from '@/lib/payments/marketplacePayment';
 import { withAlpha } from '@/lib/utils/color';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 
@@ -230,6 +232,20 @@ function MarketplaceDetailScreen() {
         return;
       }
       if (payment.data.client_secret) {
+        const paymentResult = await presentMarketplacePayment({
+          clientSecret: payment.data.client_secret,
+          merchantDisplayName: t('checkout.merchantDisplayName'),
+        });
+        if (paymentResult.status === 'completed' && payment.data.payment_intent_id) {
+          await confirmMarketplacePayment(payment.data.payment_intent_id);
+          Alert.alert(t('checkout.paymentCompleteTitle'), t('checkout.paymentCompleteHint'));
+          router.push({ pathname: '/(modals)/marketplace-orders', params: { mode: 'purchases' } } as unknown as Href);
+          return;
+        }
+        if (paymentResult.status === 'failed') {
+          Alert.alert(t('common:errors.alertTitle'), paymentResult.message || t('checkout.paymentSheetFailed'));
+          return;
+        }
         Alert.alert(t('checkout.openedTitle'), t('checkout.clientSecretHint'));
         return;
       }

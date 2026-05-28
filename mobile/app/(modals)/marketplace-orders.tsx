@@ -19,6 +19,7 @@ import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import {
   cancelMarketplaceOrder,
   acceptMarketplaceDeliveryOffer,
+  confirmMarketplacePayment,
   confirmMarketplaceOrderDelivery,
   confirmMarketplaceDeliveryOffer,
   createMarketplacePaymentIntent,
@@ -36,6 +37,7 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
+import { presentMarketplacePayment } from '@/lib/payments/marketplacePayment';
 import { withAlpha } from '@/lib/utils/color';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 
@@ -242,6 +244,20 @@ function MarketplaceOrdersScreen() {
       if (payment.data.checkout_url) {
         await Linking.openURL(payment.data.checkout_url);
       } else if (payment.data.client_secret) {
+        const paymentResult = await presentMarketplacePayment({
+          clientSecret: payment.data.client_secret,
+          merchantDisplayName: t('orders.paymentMerchantDisplayName'),
+        });
+        if (paymentResult.status === 'completed' && payment.data.payment_intent_id) {
+          await confirmMarketplacePayment(payment.data.payment_intent_id);
+          Alert.alert(t('orders.paymentCompleteTitle'), t('orders.paymentCompleteHint'));
+          orders.refresh();
+          return;
+        }
+        if (paymentResult.status === 'failed') {
+          Alert.alert(t('common:errors.alertTitle'), paymentResult.message || t('orders.paymentSheetFailed'));
+          return;
+        }
         Alert.alert(t('orders.paymentStartedTitle'), t('orders.paymentClientSecretHint'));
       } else {
         Alert.alert(t('orders.paymentStartedTitle'), t('orders.paymentStartedHint'));

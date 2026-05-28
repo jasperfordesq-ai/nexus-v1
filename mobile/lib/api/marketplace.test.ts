@@ -25,6 +25,7 @@ import {
   createMerchantCoupon,
   completeMerchantOnboarding,
   cancelMarketplaceOrder,
+  confirmMarketplacePayment,
   confirmMarketplaceOrderDelivery,
   confirmMarketplaceDeliveryOffer,
   deleteMarketplaceShippingOption,
@@ -390,6 +391,11 @@ describe('marketplace api', () => {
     await createMarketplacePaymentIntent(14);
     expect(api.post).toHaveBeenCalledWith('/api/v2/marketplace/payments/create-intent', {
       order_id: 14,
+    });
+
+    await confirmMarketplacePayment('pi_14');
+    expect(api.post).toHaveBeenCalledWith('/api/v2/marketplace/payments/confirm', {
+      payment_intent_id: 'pi_14',
     });
 
     await validateMarketplaceCoupon({ code: 'SAVE10', order_total_cents: 2500, listing_id: 9 });
