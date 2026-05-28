@@ -313,6 +313,14 @@ function RootNavigator() {
         options={{ ...modalOptions, headerShown: false, title: t('marketplace:publicCoupons.details') }}
       />
       <Stack.Screen
+        name="(modals)/marketplace-coupon-edit"
+        options={{ ...modalOptions, headerShown: false, title: t('marketplace:tools.coupons.edit') }}
+      />
+      <Stack.Screen
+        name="(modals)/marketplace-coupon-redemptions"
+        options={{ ...modalOptions, headerShown: false, title: t('marketplace:tools.coupons.redemptionsTitle') }}
+      />
+      <Stack.Screen
         name="(modals)/marketplace-tools"
         options={{ ...modalOptions, headerShown: false, title: t('marketplace:tools.title') }}
       />
