@@ -25,6 +25,7 @@ import {
   type MarketplaceListingItem,
   type MarketplaceSellerProfile,
 } from '@/lib/api/marketplace';
+import { useAuth } from '@/lib/hooks/useAuth';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -47,6 +48,7 @@ function MarketplaceSellerScreen() {
   const sellerId = Number(params.id);
   const safeId = Number.isFinite(sellerId) && sellerId > 0 ? sellerId : 0;
   const [tab, setTab] = useState<SellerTab>('listings');
+  const { isAuthenticated, user } = useAuth();
   const seller = useApi(() => getMarketplaceSeller(safeId), [safeId], { enabled: safeId > 0 });
   const listings = usePaginatedApi<MarketplaceListingItem, Awaited<ReturnType<typeof getMarketplaceSellerListings>>>(
     (cursor) => getMarketplaceSellerListings(safeId, cursor),
@@ -80,7 +82,7 @@ function MarketplaceSellerScreen() {
             <View className="py-8"><LoadingSpinner /></View>
           ) : profile ? (
             <>
-              <SellerHeader profile={profile} />
+              <SellerHeader profile={profile} canMessage={isAuthenticated && user?.id !== profile.user_id} />
               <SellerTabs
                 selected={tab}
                 listingsCount={listings.items.length}
@@ -156,7 +158,7 @@ function ReviewsPlaceholder() {
   );
 }
 
-function SellerHeader({ profile }: { profile: MarketplaceSellerProfile }) {
+function SellerHeader({ profile, canMessage }: { profile: MarketplaceSellerProfile; canMessage: boolean }) {
   const { t } = useTranslation('marketplace');
   const primary = usePrimaryColor();
   const theme = useTheme();
@@ -223,10 +225,12 @@ function SellerHeader({ profile }: { profile: MarketplaceSellerProfile }) {
           </Text>
         ) : null}
 
-        <HeroButton variant="primary" onPress={() => router.push({ pathname: '/(tabs)/messages', params: { to: String(profile.user_id), name: profile.display_name } } as unknown as Href)} style={{ backgroundColor: primary }}>
-          <Ionicons name="chatbubble-outline" size={17} color="#fff" />
-          <HeroButton.Label>{t('seller.message')}</HeroButton.Label>
-        </HeroButton>
+        {canMessage ? (
+          <HeroButton variant="primary" onPress={() => router.push({ pathname: '/(modals)/thread', params: { recipientId: String(profile.user_id), name: profile.display_name } } as unknown as Href)} style={{ backgroundColor: primary }}>
+            <Ionicons name="chatbubble-outline" size={17} color="#fff" />
+            <HeroButton.Label>{t('seller.message')}</HeroButton.Label>
+          </HeroButton>
+        ) : null}
       </HeroCard.Body>
     </HeroCard>
   );

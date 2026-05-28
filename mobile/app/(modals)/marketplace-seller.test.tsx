@@ -6,8 +6,14 @@
 import React from 'react';
 import { fireEvent, render } from '@testing-library/react-native';
 
+const mockRouterPush = jest.fn();
+let mockAuthState = {
+  isAuthenticated: true,
+  user: { id: 42 } as { id: number } | null,
+};
+
 jest.mock('expo-router', () => ({
-  router: { push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
+  router: { push: (...args: unknown[]) => mockRouterPush(...args), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
   useLocalSearchParams: () => ({ id: '5' }),
 }));
 
@@ -64,6 +70,9 @@ jest.mock('@/components/marketplace/MarketplaceListingCard', () => {
 });
 jest.mock('@/lib/hooks/useTenant', () => ({
   usePrimaryColor: () => '#6366f1',
+}));
+jest.mock('@/lib/hooks/useAuth', () => ({
+  useAuth: () => mockAuthState,
 }));
 jest.mock('@/lib/hooks/useTheme', () => ({
   useTheme: () => ({
@@ -133,6 +142,14 @@ jest.mock('@/lib/hooks/usePaginatedApi', () => ({
 import MarketplaceSellerRoute from './marketplace-seller';
 
 describe('MarketplaceSellerRoute', () => {
+  beforeEach(() => {
+    mockRouterPush.mockClear();
+    mockAuthState = {
+      isAuthenticated: true,
+      user: { id: 42 },
+    };
+  });
+
   it('shows listing and reviews tabs on seller profiles', () => {
     const { getByText, queryByText } = render(<MarketplaceSellerRoute />);
 
@@ -144,5 +161,35 @@ describe('MarketplaceSellerRoute', () => {
     expect(getByText('Reviews are coming soon')).toBeTruthy();
     expect(getByText('Buyer and seller reviews will appear here once rating history is available.')).toBeTruthy();
     expect(queryByText('Repaired table')).toBeNull();
+  });
+
+  it('opens a direct message thread for authenticated buyers', () => {
+    const { getByText } = render(<MarketplaceSellerRoute />);
+
+    fireEvent.press(getByText('Message seller'));
+
+    expect(mockRouterPush).toHaveBeenCalledWith({
+      pathname: '/(modals)/thread',
+      params: { recipientId: '8', name: 'Nexus Goods' },
+    });
+  });
+
+  it('hides the seller message action from guests and the seller themself', () => {
+    mockAuthState = {
+      isAuthenticated: false,
+      user: null,
+    };
+
+    const guest = render(<MarketplaceSellerRoute />);
+    expect(guest.queryByText('Message seller')).toBeNull();
+    guest.unmount();
+
+    mockAuthState = {
+      isAuthenticated: true,
+      user: { id: 8 },
+    };
+
+    const owner = render(<MarketplaceSellerRoute />);
+    expect(owner.queryByText('Message seller')).toBeNull();
   });
 });
