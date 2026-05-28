@@ -124,7 +124,7 @@ export interface MarketplaceOrder {
   order_number: string;
   buyer?: MarketplaceUser;
   seller?: MarketplaceUser;
-  listing?: { id: number; title: string; image?: { url: string } | null };
+  listing?: { id: number; title: string; image?: { url: string } | null; delivery_method?: MarketplaceDeliveryMethod | string | null };
   quantity: number;
   unit_price: number;
   total_price: number;

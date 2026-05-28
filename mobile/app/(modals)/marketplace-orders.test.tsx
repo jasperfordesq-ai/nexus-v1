@@ -13,7 +13,7 @@ jest.mock('expo-router', () => ({
 
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string) => {
+    t: (key: string, opts?: Record<string, unknown>) => {
       const map: Record<string, string> = {
         'common:back': 'Back',
         'orders.eyebrow': 'Marketplace orders',
@@ -27,7 +27,14 @@ jest.mock('react-i18next', () => ({
         'orders.tabs.cancelled': 'Closed',
         'orders.empty': 'No orders yet',
         'orders.emptyHint': 'Marketplace purchases and sales will appear here.',
+        'orders.sellerLabel': 'Seller',
+        'orders.buyerLabel': 'Buyer',
+        'orders.deliveryOffers': 'Delivery offers',
+        'orders.status.paid': 'Paid',
+        'actions.view': 'View',
       };
+      if (key === 'orders.number') return `Order ${String(opts?.number ?? '')}`;
+      if (key === 'orders.date') return String(opts?.date ?? '');
       return map[key] ?? key;
     },
     i18n: { language: 'en' },
@@ -103,6 +110,57 @@ describe('MarketplaceOrdersRoute', () => {
       );
     });
 
+    unmount();
+  });
+
+  it('shows delivery-offer actions only for community-delivery orders', async () => {
+    (getMarketplaceOrders as jest.Mock).mockResolvedValueOnce({
+      data: [
+        {
+          id: 31,
+          order_number: 'MKT-000031',
+          quantity: 1,
+          unit_price: 25,
+          total_price: 25,
+          currency: 'EUR',
+          status: 'paid',
+          created_at: '2026-05-20T10:00:00Z',
+          listing: {
+            id: 61,
+            title: 'Pickup-only lamp',
+            image: null,
+            delivery_method: 'pickup',
+          },
+          seller: { id: 2, name: 'Pat Seller', avatar_url: null },
+        },
+        {
+          id: 32,
+          order_number: 'MKT-000032',
+          quantity: 1,
+          unit_price: 30,
+          total_price: 30,
+          currency: 'EUR',
+          status: 'paid',
+          created_at: '2026-05-21T10:00:00Z',
+          listing: {
+            id: 62,
+            title: 'Community vase',
+            image: null,
+            delivery_method: 'community_delivery',
+          },
+          seller: { id: 3, name: 'Sam Seller', avatar_url: null },
+        },
+      ],
+      meta: { cursor: null, has_more: false },
+    });
+
+    const { getByText, getAllByText, unmount } = render(<MarketplaceOrdersRoute />);
+
+    await waitFor(() => {
+      expect(getByText('Community vase')).toBeTruthy();
+    });
+
+    expect(getAllByText('Delivery offers')).toHaveLength(1);
     unmount();
   });
 });

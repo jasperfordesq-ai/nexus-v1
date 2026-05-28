@@ -500,7 +500,7 @@ class MarketplaceOrderService
     public static function getBuyerOrders(int $userId, ?string $status, int $limit = 20, ?string $cursor = null): array
     {
         $query = MarketplaceOrder::with([
-            'listing:id,title,price,price_currency,status',
+            'listing:id,title,price,price_currency,status,delivery_method',
             'listing.images' => fn ($q) => $q->where('is_primary', true)->limit(1),
             'seller:id,first_name,last_name,avatar_url',
         ])
@@ -538,7 +538,7 @@ class MarketplaceOrderService
     public static function getSellerOrders(int $userId, ?string $status, int $limit = 20, ?string $cursor = null): array
     {
         $query = MarketplaceOrder::with([
-            'listing:id,title,price,price_currency,status',
+            'listing:id,title,price,price_currency,status,delivery_method',
             'listing.images' => fn ($q) => $q->where('is_primary', true)->limit(1),
             'buyer:id,first_name,last_name,avatar_url',
         ])
@@ -576,7 +576,7 @@ class MarketplaceOrderService
     public static function getById(int $id): ?MarketplaceOrder
     {
         return MarketplaceOrder::with([
-            'listing:id,title,price,price_currency,status',
+            'listing:id,title,price,price_currency,status,delivery_method',
             'listing.images' => fn ($q) => $q->where('is_primary', true)->limit(1),
             'buyer:id,first_name,last_name,avatar_url',
             'seller:id,first_name,last_name,avatar_url',
@@ -918,6 +918,7 @@ class MarketplaceOrderService
                 'price' => $listing->price,
                 'price_currency' => $listing->price_currency,
                 'status' => $listing->status,
+                'delivery_method' => $listing->delivery_method,
                 'image' => $primaryImage ? [
                     'url' => $primaryImage->image_url,
                     'thumbnail_url' => $primaryImage->thumbnail_url,

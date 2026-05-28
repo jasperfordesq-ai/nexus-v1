@@ -549,6 +549,8 @@ function OrderCard({
   const counterparty = mode === 'purchases' ? item.seller : item.buyer;
   const counterpartyLabel = mode === 'purchases' ? t('orders.sellerLabel') : t('orders.buyerLabel');
   const orderDate = item.created_at ? new Date(item.created_at).toLocaleDateString() : null;
+  const canManageCommunityDelivery = item.listing?.delivery_method === 'community_delivery'
+    && ['paid', 'processing', 'shipped', 'delivered'].includes(item.status);
   return (
     <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
       <HeroCard.Body className="gap-3 p-4">
@@ -642,7 +644,7 @@ function OrderCard({
               <HeroButton.Label>{t('orders.dispute')}</HeroButton.Label>
             </HeroButton>
           ) : null}
-          {['paid', 'processing', 'shipped', 'delivered'].includes(item.status) ? (
+          {canManageCommunityDelivery ? (
             <HeroButton className="flex-1" size="sm" variant="secondary" isDisabled={isSubmitting} onPress={onDeliveryOffers} style={{ minWidth: '46%' }}>
               <Ionicons name="people-outline" size={14} color={primary} />
               <HeroButton.Label>{t('orders.deliveryOffers')}</HeroButton.Label>

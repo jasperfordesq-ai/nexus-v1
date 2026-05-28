@@ -207,6 +207,34 @@ class MarketplaceOrderServiceTest extends TestCase
         MarketplaceOrderService::complete($order);
     }
 
+    public function test_formatOrder_includesListingDeliveryMethod(): void
+    {
+        $order = new MarketplaceOrder([
+            'order_number' => 'MKT-000123',
+            'status' => 'paid',
+            'quantity' => 1,
+            'unit_price' => 10.00,
+            'total_price' => 10.00,
+            'currency' => 'EUR',
+        ]);
+        $order->id = 123;
+
+        $listing = new MarketplaceListing([
+            'title' => 'Community vase',
+            'price' => 10.00,
+            'price_currency' => 'EUR',
+            'status' => 'sold',
+            'delivery_method' => 'community_delivery',
+        ]);
+        $listing->id = 456;
+
+        $order->setRelation('listing', $listing);
+
+        $formatted = MarketplaceOrderService::formatOrder($order);
+
+        $this->assertSame('community_delivery', $formatted['listing']['delivery_method']);
+    }
+
     // -----------------------------------------------------------------
     //  generateOrderNumber
     // -----------------------------------------------------------------
