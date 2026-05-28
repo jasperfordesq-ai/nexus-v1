@@ -17,6 +17,7 @@ vi.mock('@sentry/react', () => ({
   captureMessage: vi.fn(),
   startInactiveSpan: vi.fn(),
   browserTracingIntegration: vi.fn(() => ({})),
+  feedbackIntegration: vi.fn(() => ({ name: 'Feedback' })),
   replayIntegration: vi.fn(() => ({ name: 'Replay' })),
   ErrorBoundary: vi.fn(),
   withProfiler: vi.fn((fn) => fn),
@@ -143,6 +144,27 @@ describe('sentry analytics consent checks', () => {
     expect(Sentry.captureMessage).toHaveBeenCalledWith('Support report submitted', expect.objectContaining({
       level: 'info',
       contexts: { additional: { route: '/messages' } },
+    }));
+  });
+
+  it('registers Sentry user feedback without auto-injecting the Sentry widget', async () => {
+    vi.resetModules();
+    vi.stubEnv('VITE_SENTRY_DSN', 'https://public@example.sentry.io/1');
+    mockReadStoredConsent.mockReturnValue({ analytics: true });
+    const Sentry = await import('@sentry/react');
+
+    const { initSentry } = await import('./sentry');
+    initSentry();
+
+    expect(Sentry.feedbackIntegration).toHaveBeenCalledWith(expect.objectContaining({
+      colorScheme: 'system',
+      autoInject: false,
+    }));
+    expect(Sentry.init).toHaveBeenCalledWith(expect.objectContaining({
+      sendDefaultPii: false,
+      integrations: expect.arrayContaining([
+        expect.objectContaining({ name: 'Feedback' }),
+      ]),
     }));
   });
 

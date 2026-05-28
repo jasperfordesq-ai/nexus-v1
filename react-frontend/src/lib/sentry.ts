@@ -65,6 +65,10 @@ export function initSentry(): void {
     : 0;
   const integrations = [
     Sentry.browserTracingIntegration(),
+    Sentry.feedbackIntegration({
+      colorScheme: 'system',
+      autoInject: false,
+    }),
   ];
 
   if (replayOnErrorSampleRate > 0) {
