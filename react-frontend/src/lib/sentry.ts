@@ -11,6 +11,7 @@
  */
 
 import * as Sentry from '@sentry/react';
+import type { Integration } from '@sentry/react';
 import { createElement } from 'react';
 import { readStoredConsent } from '@/contexts/CookieConsentContext';
 import type { User } from '@/types';
@@ -63,7 +64,7 @@ export function initSentry(): void {
   const replayOnErrorSampleRate = Number.isFinite(REPLAY_ON_ERROR_SAMPLE_RATE)
     ? Math.max(0, Math.min(1, REPLAY_ON_ERROR_SAMPLE_RATE))
     : 0;
-  const integrations = [
+  const integrations: Integration[] = [
     Sentry.browserTracingIntegration(),
     Sentry.feedbackIntegration({
       colorScheme: 'system',
