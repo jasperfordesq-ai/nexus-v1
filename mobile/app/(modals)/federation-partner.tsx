@@ -246,7 +246,7 @@ export default function FederationPartnerScreen() {
   async function handleShare() {
     if (!partner) return;
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    const url = `${WEB_URL}/federation/${partner.id}`;
+    const url = `${WEB_URL}/federation/partners/${partner.id}`;
     try {
       await Share.share({ message: t('detail.shareMessage', { name: partner.name, url }) });
     } catch {

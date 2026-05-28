@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
+import { Share } from 'react-native';
 import { fireEvent, render } from '@testing-library/react-native';
 
 // --- Mocks ---
@@ -205,6 +206,25 @@ describe('FederationPartnerScreen', () => {
 
     fireEvent.press(getByText('Federation settings'));
     expect(router.push).toHaveBeenCalledWith('/(modals)/federation-settings');
+  });
+
+  it('shares the React partner detail route for deep links', () => {
+    const shareSpy = jest.spyOn(Share, 'share').mockResolvedValue({ action: Share.sharedAction });
+    mockUseApi.mockReturnValue({
+      data: { data: mockPartner },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByText } = render(<FederationPartnerScreen />);
+
+    fireEvent.press(getByText('Share partner'));
+
+    expect(shareSpy).toHaveBeenCalledWith({
+      message: 'TimeOverflow Local — https://app.project-nexus.ie/federation/partners/ext-2',
+    });
+    shareSpy.mockRestore();
   });
 
   it('renders loading state without crashing', () => {
