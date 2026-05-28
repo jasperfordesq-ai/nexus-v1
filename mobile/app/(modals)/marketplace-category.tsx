@@ -29,7 +29,8 @@ import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 
-const CONDITION_FILTERS: Array<MarketplaceCondition | ''> = ['', 'new', 'like_new', 'good', 'fair'];
+const CONDITION_FILTERS: Array<MarketplaceCondition | ''> = ['', 'new', 'like_new', 'good', 'fair', 'poor'];
+const SORTS: Array<'newest' | 'price_asc' | 'price_desc' | 'popular'> = ['newest', 'price_asc', 'price_desc', 'popular'];
 
 export default function MarketplaceCategoryRoute() {
   return (
@@ -42,15 +43,28 @@ export default function MarketplaceCategoryRoute() {
 function MarketplaceCategoryScreen() {
   const { t } = useTranslation(['marketplace', 'common']);
   const { hasFeature } = useTenant();
-  const params = useLocalSearchParams<{ id?: string; name?: string }>();
+  const params = useLocalSearchParams<{
+    id?: string | string[];
+    name?: string | string[];
+    q?: string | string[];
+    price_min?: string | string[];
+    price_max?: string | string[];
+    condition?: string | string[];
+    sort?: string | string[];
+  }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const categoryId = Number(params.id);
+  const categoryId = Number(firstParam(params.id));
   const safeCategoryId = Number.isFinite(categoryId) && categoryId > 0 ? categoryId : 0;
-  const categoryName = typeof params.name === 'string' && params.name.trim() ? params.name : t('category.title');
-  const [query, setQuery] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [condition, setCondition] = useState<MarketplaceCondition | ''>('');
+  const paramName = firstParam(params.name);
+  const categoryName = paramName && paramName.trim() ? paramName : t('category.title');
+  const initialQuery = firstParam(params.q) ?? '';
+  const [query, setQuery] = useState(initialQuery);
+  const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
+  const [priceMin, setPriceMin] = useState(firstParam(params.price_min) ?? '');
+  const [priceMax, setPriceMax] = useState(firstParam(params.price_max) ?? '');
+  const [condition, setCondition] = useState<MarketplaceCondition | ''>(normalizeCondition(firstParam(params.condition)));
+  const [sort, setSort] = useState<'newest' | 'price_asc' | 'price_desc' | 'popular'>(normalizeSort(firstParam(params.sort)));
   const [listings, setListings] = useState<MarketplaceListingItem[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
@@ -74,10 +88,12 @@ function MarketplaceCategoryScreen() {
       const response = await getMarketplaceListings({
         q: debouncedQuery,
         category_id: safeCategoryId,
+        price_min: priceMin,
+        price_max: priceMax,
         condition,
         cursor: append ? cursor : null,
         limit: 20,
-        sort: 'newest',
+        sort,
       });
       setCursor(marketplaceNextCursor(response));
       setHasMore(marketplaceHasMore(response));
@@ -93,12 +109,26 @@ function MarketplaceCategoryScreen() {
       setIsRefreshing(false);
       setIsLoadingMore(false);
     }
-  }, [condition, cursor, debouncedQuery, hasFeature, safeCategoryId, t]);
+  }, [condition, cursor, debouncedQuery, hasFeature, priceMax, priceMin, safeCategoryId, sort, t]);
 
   useEffect(() => {
     void fetchListings(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedQuery, condition, safeCategoryId]);
+  }, [debouncedQuery, condition, priceMin, priceMax, safeCategoryId, sort]);
+
+  const activeFilterCount = [
+    priceMin,
+    priceMax,
+    condition,
+    sort !== 'newest' ? sort : '',
+  ].filter(Boolean).length;
+
+  function resetFilters() {
+    setPriceMin('');
+    setPriceMax('');
+    setCondition('');
+    setSort('newest');
+  }
 
   async function toggleSave(item: MarketplaceListingItem) {
     const nextSaved = !item.is_saved;
@@ -163,6 +193,11 @@ function MarketplaceCategoryScreen() {
               </View>
             </Surface>
 
+            <View className="mb-3 flex-row gap-2">
+              <FilterInput label={t('category.priceMin')} value={priceMin} onChangeText={setPriceMin} placeholder={t('category.minPlaceholder')} />
+              <FilterInput label={t('category.priceMax')} value={priceMax} onChangeText={setPriceMax} placeholder={t('category.maxPlaceholder')} />
+            </View>
+
             <View className="mb-3 flex-row flex-wrap gap-2">
               {CONDITION_FILTERS.map((value) => (
                 <HeroButton
@@ -176,6 +211,27 @@ function MarketplaceCategoryScreen() {
                 </HeroButton>
               ))}
             </View>
+
+            <View className="mb-3 flex-row flex-wrap gap-2">
+              {SORTS.map((value) => (
+                <HeroButton
+                  key={value}
+                  size="sm"
+                  variant={sort === value ? 'primary' : 'secondary'}
+                  onPress={() => setSort(value)}
+                  style={sort === value ? { backgroundColor: primary } : undefined}
+                >
+                  <HeroButton.Label>{t(`advancedSearch.sortOptions.${value}`)}</HeroButton.Label>
+                </HeroButton>
+              ))}
+            </View>
+
+            {activeFilterCount > 0 ? (
+              <HeroButton className="mb-3" variant="secondary" onPress={resetFilters}>
+                <Ionicons name="refresh-outline" size={16} color={primary} />
+                <HeroButton.Label>{t('category.reset', { count: activeFilterCount })}</HeroButton.Label>
+              </HeroButton>
+            ) : null}
           </View>
         }
         renderItem={({ item }) => (
@@ -214,4 +270,44 @@ function MarketplaceCategoryScreen() {
       />
     </SafeAreaView>
   );
+}
+
+function FilterInput({
+  label,
+  value,
+  onChangeText,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChangeText: (value: string) => void;
+  placeholder: string;
+}) {
+  const theme = useTheme();
+  return (
+    <View className="min-w-0 flex-1 gap-2">
+      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{label}</Text>
+      <TextInput
+        className="min-h-12 rounded-panel-inner border px-3 text-sm"
+        style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg }}
+        placeholder={placeholder}
+        placeholderTextColor={theme.textMuted}
+        value={value}
+        onChangeText={onChangeText}
+        keyboardType="decimal-pad"
+      />
+    </View>
+  );
+}
+
+function firstParam(value?: string | string[]): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function normalizeCondition(value?: string): MarketplaceCondition | '' {
+  return value === 'new' || value === 'like_new' || value === 'good' || value === 'fair' || value === 'poor' ? value : '';
+}
+
+function normalizeSort(value?: string): 'newest' | 'price_asc' | 'price_desc' | 'popular' {
+  return value === 'price_asc' || value === 'price_desc' || value === 'popular' ? value : 'newest';
 }
