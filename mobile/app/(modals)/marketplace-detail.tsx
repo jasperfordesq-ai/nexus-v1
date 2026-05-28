@@ -671,7 +671,7 @@ function CommunityDeliveryInfoCard({ primary, theme }: { primary: string; theme:
           ))}
         </View>
         <Text className="text-xs leading-5" style={{ color: theme.textMuted }}>
-          {t('communityDelivery.orderHint')}
+          {t('communityDelivery.orderManagedHint')}
         </Text>
       </HeroCard.Body>
     </HeroCard>

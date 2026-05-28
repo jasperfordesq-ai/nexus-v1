@@ -32,11 +32,19 @@ jest.mock('react-i18next', () => ({
         'priceType.fixed': 'Fixed price',
         'condition.good': 'Good',
         'delivery_method.pickup': 'Local pickup',
+        'delivery_method.community_delivery': 'Community delivery',
         'detail.save': 'Save',
         'detail.addToCollection': 'Add to collection',
         'detail.makeOffer': 'Make offer',
         'detail.buyNow': 'Buy now',
         'detail.reportListing': 'Report listing',
+        'communityDelivery.eyebrow': 'Community-powered delivery',
+        'communityDelivery.title': 'Community delivery',
+        'communityDelivery.description': 'A trusted member can offer to deliver this order for time credits after checkout.',
+        'communityDelivery.step1': 'The buyer creates an order for this community-delivery listing.',
+        'communityDelivery.step2': 'Eligible community members can offer delivery time and requested credits.',
+        'communityDelivery.step3': 'The buyer or seller accepts an offer, then confirms delivery when the item arrives.',
+        'communityDelivery.orderManagedHint': 'Delivery offers are managed from Marketplace orders after checkout.',
         'checkout.title': 'Checkout',
         'checkout.coupon': 'Coupon code',
         'checkout.couponPlaceholder': 'COMMUNITY10',
@@ -188,5 +196,24 @@ describe('MarketplaceDetailRoute', () => {
         'Order MKT-000044 was created, but payment could not start. Continue payment from Orders.',
       );
     });
+  });
+
+  it('shows only the valid order-based community delivery surface on listing detail', async () => {
+    (getMarketplaceListing as jest.Mock).mockResolvedValueOnce({
+      data: {
+        ...mockListing,
+        delivery_method: 'community_delivery',
+      },
+    });
+
+    const { getAllByText, getByText, queryByText } = render(<MarketplaceDetailRoute />);
+
+    await waitFor(() => {
+      expect(getAllByText('Community delivery').length).toBeGreaterThan(0);
+      expect(getByText('Delivery offers are managed from Marketplace orders after checkout.')).toBeTruthy();
+    });
+
+    expect(queryByText(/Mobile can manage/i)).toBeNull();
+    expect(queryByText('Offer to deliver')).toBeNull();
   });
 });

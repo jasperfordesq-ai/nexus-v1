@@ -430,7 +430,7 @@
     "step1": "The buyer creates an order for this community-delivery listing.",
     "step2": "Eligible community members can offer delivery time and requested credits.",
     "step3": "The buyer or seller accepts an offer, then confirms delivery when the item arrives.",
-    "orderHint": "Mobile can manage delivery offers from Marketplace orders once an order exists. A public delivery discovery route is not available from the backend yet."
+    "orderManagedHint": "Delivery offers are managed from Marketplace orders after checkout."
   },
   "pickup": {
     "chooseSlot": "Pickup slot",
