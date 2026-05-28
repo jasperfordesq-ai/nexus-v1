@@ -22,8 +22,11 @@ import { useTranslation } from 'react-i18next';
 
 import {
   expressInterest,
+  getOpportunityApplications,
   getOpportunity,
   getOpportunities,
+  handleVolunteerApplication,
+  type OpportunityApplication,
   signUpForShift,
   type VolunteerOpportunity,
   type VolunteerShift,
@@ -192,6 +195,96 @@ function ShiftCard({
   );
 }
 
+function opportunityApplicationItems(data: unknown): OpportunityApplication[] {
+  const response = data as { data?: { items?: OpportunityApplication[] } } | null;
+  return Array.isArray(response?.data?.items) ? response.data.items : [];
+}
+
+function applicationStatusLabelKey(status: OpportunityApplication['status']) {
+  return status === 'pending' || status === 'approved' || status === 'declined'
+    ? `applicationStatus.${status}`
+    : 'applicationStatus.unknown';
+}
+
+function ApplicationCard({
+  application,
+  actionId,
+  onAction,
+}: {
+  application: OpportunityApplication;
+  actionId: number | null;
+  onAction: (applicationId: number, action: 'approve' | 'decline') => void;
+}) {
+  const { t } = useTranslation('volunteering');
+  const theme = useTheme();
+  const primary = usePrimaryColor();
+  const isPending = application.status === 'pending';
+  const isActing = actionId === application.id;
+  const statusKey = applicationStatusLabelKey(application.status);
+
+  return (
+    <HeroCard className="rounded-panel p-0">
+      <HeroCard.Body className="gap-3 p-4">
+        <View className="flex-row items-start gap-3">
+          <Avatar uri={application.user.avatar_url ?? undefined} name={application.user.name} size={42} />
+          <View className="min-w-0 flex-1">
+            <View className="flex-row items-start justify-between gap-2">
+              <Text className="min-w-0 flex-1 text-sm font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+                {application.user.name}
+              </Text>
+              <Chip size="sm" variant="secondary" color={isPending ? 'warning' : 'default'}>
+                <Chip.Label>{t(statusKey)}</Chip.Label>
+              </Chip>
+            </View>
+            {application.message ? (
+              <Text className="mt-2 text-sm leading-5" style={{ color: theme.textSecondary }}>
+                {application.message}
+              </Text>
+            ) : (
+              <Text className="mt-2 text-sm italic" style={{ color: theme.textMuted }}>
+                {t('applications.messageFallback')}
+              </Text>
+            )}
+          </View>
+        </View>
+
+        {application.shift ? (
+          <Surface variant="secondary" className="flex-row items-center gap-2 rounded-panel-inner px-3 py-2">
+            <Ionicons name="calendar-outline" size={16} color={primary} />
+            <Text className="min-w-0 flex-1 text-xs font-medium" style={{ color: theme.textSecondary }} numberOfLines={1}>
+              {[formatDate(application.shift.start_time, 'short'), formatTime(application.shift.start_time), formatTime(application.shift.end_time)]
+                .filter(Boolean)
+                .join(' - ')}
+            </Text>
+          </Surface>
+        ) : null}
+
+        {isPending ? (
+          <View className="flex-row gap-2">
+            <HeroButton
+              className="flex-1"
+              size="sm"
+              variant="secondary"
+              isDisabled={isActing}
+              onPress={() => onAction(application.id, 'decline')}
+            >
+              {isActing ? <Spinner size="sm" /> : <HeroButton.Label>{t('applications.decline')}</HeroButton.Label>}
+            </HeroButton>
+            <HeroButton
+              className="flex-1"
+              size="sm"
+              isDisabled={isActing}
+              onPress={() => onAction(application.id, 'approve')}
+            >
+              {isActing ? <Spinner size="sm" /> : <HeroButton.Label>{t('applications.approve')}</HeroButton.Label>}
+            </HeroButton>
+          </View>
+        ) : null}
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
 export default function VolunteeringDetailScreen() {
   return (
     <ModalErrorBoundary>
@@ -210,6 +303,7 @@ function VolunteeringDetailScreenInner() {
   const [interestLoading, setInterestLoading] = useState(false);
   const [applyMessage, setApplyMessage] = useState('');
   const [signingShiftId, setSigningShiftId] = useState<number | null>(null);
+  const [applicationActionId, setApplicationActionId] = useState<number | null>(null);
 
   const opportunityId = Number(id);
   const safeId = Number.isFinite(opportunityId) && opportunityId > 0 ? opportunityId : 0;
@@ -227,6 +321,13 @@ function VolunteeringDetailScreenInner() {
   );
 
   const opportunity = (data?.data ?? fallbackList.data?.data?.find((item) => item.id === safeId) ?? null) as ApiOpportunity | null;
+
+  const ownerApplicationsApi = useApi(
+    () => getOpportunityApplications(safeId, 'pending'),
+    [safeId, Boolean(opportunity?.is_owner)],
+    { enabled: safeId > 0 && Boolean(opportunity?.is_owner) },
+  );
+  const ownerApplications = opportunityApplicationItems(ownerApplicationsApi.data);
 
   const org = opportunity ? organizationFor(opportunity) : null;
   const skills = useMemo(() => normalizedSkills(opportunity?.skills_needed ?? null), [opportunity?.skills_needed]);
@@ -287,6 +388,24 @@ function VolunteeringDetailScreenInner() {
       Alert.alert(t('common:errors.alertTitle'), t('shiftSignupError'));
     } finally {
       setSigningShiftId(null);
+    }
+  }
+
+  async function handleApplicationAction(applicationId: number, action: 'approve' | 'decline') {
+    setApplicationActionId(applicationId);
+    try {
+      await handleVolunteerApplication(applicationId, action);
+      ownerApplicationsApi.refresh();
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      Alert.alert(
+        t(action === 'approve' ? 'applications.approvedTitle' : 'applications.declinedTitle'),
+        t(action === 'approve' ? 'applications.approvedMessage' : 'applications.declinedMessage'),
+      );
+    } catch {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(t('common:errors.alertTitle'), t('applications.actionFailed'));
+    } finally {
+      setApplicationActionId(null);
     }
   }
 
@@ -466,13 +585,50 @@ function VolunteeringDetailScreenInner() {
 
         {opportunity.is_owner ? (
           <HeroCard className="rounded-panel p-0">
-            <HeroCard.Body className="gap-2 p-4">
-              <Text className="text-base font-semibold" style={{ color: theme.text }}>
-                {t('ownerOpportunityTitle')}
-              </Text>
-              <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
-                {t('ownerOpportunityHint')}
-              </Text>
+            <HeroCard.Body className="gap-4 p-4">
+              <View className="gap-2">
+                <Text className="text-base font-semibold" style={{ color: theme.text }}>
+                  {t('ownerOpportunityTitle')}
+                </Text>
+                <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+                  {t('ownerOpportunityHint')}
+                </Text>
+              </View>
+
+              <View className="gap-3">
+                <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>
+                  {t('applications.heading')}
+                </Text>
+                {ownerApplicationsApi.isLoading ? (
+                  <View className="items-center py-4">
+                    <Spinner size="sm" />
+                  </View>
+                ) : ownerApplicationsApi.error ? (
+                  <Surface variant="secondary" className="gap-3 rounded-panel-inner p-4">
+                    <Text className="text-sm" style={{ color: theme.textSecondary }}>
+                      {t('applications.loadFailed')}
+                    </Text>
+                    <HeroButton size="sm" variant="secondary" onPress={ownerApplicationsApi.refresh}>
+                      <HeroButton.Label>{t('tryAgain')}</HeroButton.Label>
+                    </HeroButton>
+                  </Surface>
+                ) : ownerApplications.length > 0 ? (
+                  ownerApplications.map((application) => (
+                    <ApplicationCard
+                      key={application.id}
+                      application={application}
+                      actionId={applicationActionId}
+                      onAction={(applicationId, action) => void handleApplicationAction(applicationId, action)}
+                    />
+                  ))
+                ) : (
+                  <Surface variant="secondary" className="rounded-panel-inner p-4">
+                    <Text className="text-sm" style={{ color: theme.textSecondary }}>
+                      {t('applications.emptyOwner')}
+                    </Text>
+                  </Surface>
+                )}
+              </View>
             </HeroCard.Body>
           </HeroCard>
         ) : (

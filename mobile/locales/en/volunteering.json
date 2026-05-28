@@ -8,6 +8,19 @@
   "yourOpportunity": "Your opportunity",
   "ownerOpportunityTitle": "Owner view",
   "ownerOpportunityHint": "You manage this opportunity, so volunteer applications are handled from the organiser tools.",
+  "applications": {
+    "heading": "Applications",
+    "emptyOwner": "No pending applications yet.",
+    "loadFailed": "Could not load applications.",
+    "approve": "Approve",
+    "decline": "Decline",
+    "approvedTitle": "Application approved",
+    "approvedMessage": "The volunteer has been approved.",
+    "declinedTitle": "Application declined",
+    "declinedMessage": "The volunteer has been declined.",
+    "actionFailed": "Could not update this application.",
+    "messageFallback": "No message added."
+  },
   "searchPlaceholder": "Search opportunities…",
   "clearSearch": "Clear search",
   "empty": "No opportunities found.",
@@ -73,7 +86,8 @@
   "applicationStatus": {
     "pending": "Pending",
     "approved": "Approved",
-    "declined": "Declined"
+    "declined": "Declined",
+    "unknown": "Unknown"
   },
   "hoursStats": {
     "verified": "Verified",

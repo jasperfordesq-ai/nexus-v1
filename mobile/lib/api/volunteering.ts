@@ -85,11 +85,38 @@ export interface VolunteerApplication {
   created_at: string;
 }
 
+export interface OpportunityApplication {
+  id: number;
+  status: 'pending' | 'approved' | 'declined' | string;
+  message?: string | null;
+  org_note?: string | null;
+  user: {
+    id: number;
+    name: string;
+    email?: string | null;
+    avatar_url?: string | null;
+  };
+  shift?: {
+    id?: number;
+    start_time: string;
+    end_time: string;
+  } | null;
+  created_at: string;
+}
+
 export interface VolunteerApplicationsResponse {
   data: VolunteerApplication[];
   meta: {
     has_more: boolean;
     cursor: string | null;
+  };
+}
+
+export interface OpportunityApplicationsResponse {
+  data: {
+    items: OpportunityApplication[];
+    cursor: string | null;
+    has_more: boolean;
   };
 }
 
@@ -150,6 +177,26 @@ export function getMyApplications(status?: string): Promise<VolunteerApplication
     per_page: '20',
     ...(status ? { status } : {}),
   });
+}
+
+export function getOpportunityApplications(
+  opportunityId: number,
+  status?: string,
+): Promise<OpportunityApplicationsResponse> {
+  return api.get<OpportunityApplicationsResponse>(
+    `${API_V2}/volunteering/opportunities/${opportunityId}/applications`,
+    {
+      per_page: '20',
+      ...(status ? { status } : {}),
+    },
+  );
+}
+
+export function handleVolunteerApplication(
+  id: number,
+  action: 'approve' | 'decline',
+): Promise<{ data: unknown }> {
+  return api.put<{ data: unknown }>(`${API_V2}/volunteering/applications/${id}`, { action });
 }
 
 export function withdrawApplication(id: number): Promise<void> {

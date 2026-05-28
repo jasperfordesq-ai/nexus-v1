@@ -37,6 +37,11 @@ jest.mock('react-i18next', () => ({
         'ownerOpportunityTitle': 'Owner view',
         'ownerOpportunityHint': 'Applications are handled from organiser tools.',
         'applyToVolunteer': 'Apply to volunteer',
+        'applications.heading': 'Applications',
+        'applications.approve': 'Approve',
+        'applications.decline': 'Decline',
+        'applications.approvedTitle': 'Application approved',
+        'applications.approvedMessage': 'The volunteer has been approved.',
         'coverMessageHint': 'Add a note.',
         'coverMessagePlaceholder': 'Tell the organiser…',
         'applicationSubmitted': 'Application submitted',
@@ -100,6 +105,7 @@ jest.mock('@/lib/hooks/useAuth', () => ({
 }));
 
 const mockUseApi = jest.fn();
+const mockHandleVolunteerApplication = jest.fn();
 jest.mock('@/lib/hooks/useApi', () => ({
   useApi: (...args: unknown[]) => mockUseApi(...args),
 }));
@@ -123,6 +129,8 @@ jest.mock('@expo/vector-icons', () => ({
 jest.mock('@/lib/api/volunteering', () => ({
   getOpportunity: jest.fn(),
   expressInterest: jest.fn().mockResolvedValue(undefined),
+  getOpportunityApplications: jest.fn(),
+  handleVolunteerApplication: (...args: unknown[]) => mockHandleVolunteerApplication(...args),
   signUpForShift: jest.fn().mockResolvedValue({ data: {} }),
 }));
 
@@ -138,6 +146,7 @@ const defaultApiState = { data: null, isLoading: false, error: null, refresh: je
 
 beforeEach(() => {
   mockUseApi.mockReturnValue(defaultApiState);
+  mockHandleVolunteerApplication.mockResolvedValue({ data: {} });
   jest.clearAllMocks();
   jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
 });
@@ -232,6 +241,47 @@ describe('VolunteeringDetailScreen', () => {
 
     expect(getByText('Your opportunity')).toBeTruthy();
     expect(queryByText('Express Interest')).toBeNull();
+  });
+
+  it('allows owners to approve pending applications', async () => {
+    const ownerOpportunity = { ...mockOpportunity, is_owner: true };
+    const applicationsApiRefresh = jest.fn();
+    mockUseApi
+      .mockReturnValueOnce({ data: { data: ownerOpportunity }, isLoading: false, error: null, refresh: jest.fn() })
+      .mockReturnValueOnce(defaultApiState)
+      .mockReturnValueOnce({
+        data: {
+          data: {
+            items: [
+              {
+                id: 55,
+                status: 'pending',
+                message: 'I can help every Saturday.',
+                user: { id: 12, name: 'Maya Patel', email: 'maya@example.test', avatar_url: null },
+                shift: null,
+                created_at: '2026-06-01T10:00:00Z',
+              },
+            ],
+            cursor: null,
+            has_more: false,
+          },
+        },
+        isLoading: false,
+        error: null,
+        refresh: applicationsApiRefresh,
+      });
+
+    const { getByText } = render(<VolunteeringDetailScreen />);
+
+    expect(getByText('Applications')).toBeTruthy();
+    expect(getByText('Maya Patel')).toBeTruthy();
+    fireEvent.press(getByText('Approve'));
+
+    await waitFor(() => {
+      expect(mockHandleVolunteerApplication).toHaveBeenCalledWith(55, 'approve');
+      expect(applicationsApiRefresh).toHaveBeenCalled();
+      expect(Alert.alert).toHaveBeenCalledWith('Application approved', 'The volunteer has been approved.');
+    });
   });
 
   it('does not show shift sign-up before the application is approved', () => {
