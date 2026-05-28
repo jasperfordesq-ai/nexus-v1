@@ -20,6 +20,11 @@ import AppTopBar from '@/components/ui/AppTopBar';
 import FormActionFooter from '@/components/ui/FormActionFooter';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
+const GROUP_NAME_MIN_LENGTH = 3;
+const GROUP_NAME_MAX_LENGTH = 100;
+const GROUP_DESCRIPTION_MIN_LENGTH = 20;
+const GROUP_DESCRIPTION_MAX_LENGTH = 2000;
+
 export default function NewGroupRoute() {
   return (
     <ModalErrorBoundary>
@@ -40,16 +45,29 @@ function NewGroupScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function submit() {
-    if (!name.trim() || !description.trim()) {
+    const trimmedName = name.trim();
+    const trimmedDescription = description.trim();
+
+    if (!trimmedName || !trimmedDescription) {
       Alert.alert(t('create.validationTitle'), t('create.validationRequired'));
+      return;
+    }
+
+    if (trimmedName.length < GROUP_NAME_MIN_LENGTH || trimmedName.length > GROUP_NAME_MAX_LENGTH) {
+      Alert.alert(t('create.validationTitle'), t('create.validationNameLength'));
+      return;
+    }
+
+    if (trimmedDescription.length < GROUP_DESCRIPTION_MIN_LENGTH || trimmedDescription.length > GROUP_DESCRIPTION_MAX_LENGTH) {
+      Alert.alert(t('create.validationTitle'), t('create.validationDescriptionLength'));
       return;
     }
 
     setIsSubmitting(true);
     try {
       const result = await createGroup({
-        name: name.trim(),
-        description: description.trim(),
+        name: trimmedName,
+        description: trimmedDescription,
         location: location.trim() || null,
         visibility,
         federated_visibility: isFederated ? 'listed' : 'none',

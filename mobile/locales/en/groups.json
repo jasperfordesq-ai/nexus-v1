@@ -115,6 +115,8 @@
     "submit": "Create group",
     "validationTitle": "Check group details",
     "validationRequired": "Add a group name and description before continuing.",
+    "validationNameLength": "Use 3 to 100 characters for the group name.",
+    "validationDescriptionLength": "Use 20 to 2000 characters for the group description.",
     "failedTitle": "Group not created",
     "failedDescription": "We could not create the group. Please try again."
   }

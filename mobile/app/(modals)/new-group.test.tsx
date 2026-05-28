@@ -34,6 +34,8 @@ jest.mock('react-i18next', () => ({
         'create.submit': 'Create group',
         'create.validationTitle': 'Check group details',
         'create.validationRequired': 'Add a group name and description before continuing.',
+        'create.validationNameLength': 'Use 3 to 100 characters for the group name.',
+        'create.validationDescriptionLength': 'Use 20 to 2000 characters for the group description.',
         public: 'Public',
         private: 'Private',
         'common:back': 'Back',
@@ -111,6 +113,32 @@ describe('NewGroupRoute', () => {
 
     await waitFor(() => {
       expect(Alert.alert).toHaveBeenCalledWith('Check group details', 'Add a group name and description before continuing.');
+    });
+    expect(mockCreateGroup).not.toHaveBeenCalled();
+  });
+
+  it('requires the group name to meet the frontend length limits', async () => {
+    const { getByPlaceholderText, getByText } = render(<NewGroupRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('Name your group'), 'Go');
+    fireEvent.changeText(getByPlaceholderText('What is this group for?'), 'A group for sharing repair skills and local mending sessions.');
+    fireEvent.press(getByText('Create group'));
+
+    await waitFor(() => {
+      expect(Alert.alert).toHaveBeenCalledWith('Check group details', 'Use 3 to 100 characters for the group name.');
+    });
+    expect(mockCreateGroup).not.toHaveBeenCalled();
+  });
+
+  it('requires the group description to meet the frontend length limits', async () => {
+    const { getByPlaceholderText, getByText } = render(<NewGroupRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('Name your group'), 'Repair club');
+    fireEvent.changeText(getByPlaceholderText('What is this group for?'), 'Too short.');
+    fireEvent.press(getByText('Create group'));
+
+    await waitFor(() => {
+      expect(Alert.alert).toHaveBeenCalledWith('Check group details', 'Use 20 to 2000 characters for the group description.');
     });
     expect(mockCreateGroup).not.toHaveBeenCalled();
   });
