@@ -542,6 +542,12 @@
       "subtitle": "Promote your listings and review active promotion metrics.",
       "promote": "Promote listing",
       "empty": "No active promotions",
+      "noProducts": "Promotions unavailable",
+      "noProductsHint": "Promotion products will appear here when this marketplace enables them.",
+      "free": "Free",
+      "durationHours": "{{count}} hours",
+      "durationDays": "{{count}} days",
+      "productMeta": "{{price}} · {{duration}}",
       "failed": "Could not promote this listing.",
       "metrics": "{{impressions}} impressions · {{clicks}} clicks",
       "types": {

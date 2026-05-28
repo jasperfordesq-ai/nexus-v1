@@ -26,6 +26,7 @@ import {
   deleteMerchantCoupon,
   getMarketplaceCollections,
   getMarketplacePickupSlots,
+  getMarketplacePromotionProducts,
   getMarketplaceSavedSearches,
   getMerchantCoupons,
   getMerchantCouponRedemptions,
@@ -42,6 +43,7 @@ import {
   type MarketplacePickupReservation,
   type MarketplacePickupSlot,
   type MarketplacePromotion,
+  type MarketplacePromotionProduct,
   type MarketplaceSavedSearch,
   type MerchantCoupon,
   type MerchantCouponRedemption,
@@ -297,20 +299,26 @@ function PromotionsPanel() {
   const { t } = useTranslation(['marketplace', 'common']);
   const { user } = useAuth();
   const [selectedListing, setSelectedListing] = useState<number | null>(null);
-  const [promotionType, setPromotionType] = useState<'bump' | 'featured' | 'top_of_category' | 'homepage_carousel'>('featured');
+  const [promotionType, setPromotionType] = useState<MarketplacePromotionProduct['type'] | null>(null);
+  const products = useApi(() => getMarketplacePromotionProducts(), [], { enabled: true });
   const promotions = useApi(() => getMyMarketplacePromotions(), [], { enabled: true });
   const listings = usePaginatedApi<MarketplaceListingItem, Awaited<ReturnType<typeof getMyMarketplaceListings>>>(
-    (cursor) => getMyMarketplaceListings(cursor, user?.id),
+    (cursor) => getMyMarketplaceListings(cursor, user?.id, 'active'),
     (response) => ({ items: response.data, cursor: marketplaceNextCursor(response), hasMore: marketplaceHasMore(response) }),
     [user?.id],
   );
+  const promotionProducts = products.data?.data ?? [];
 
   useEffect(() => {
     if (!selectedListing && listings.items[0]) setSelectedListing(listings.items[0].id);
   }, [listings.items, selectedListing]);
 
+  useEffect(() => {
+    if (!promotionType && promotionProducts[0]) setPromotionType(promotionProducts[0].type);
+  }, [promotionProducts, promotionType]);
+
   async function promote() {
-    if (!selectedListing) return;
+    if (!selectedListing || !promotionType) return;
     try {
       await promoteMarketplaceListing(selectedListing, promotionType);
       promotions.refresh();
@@ -328,14 +336,23 @@ function PromotionsPanel() {
           </HeroButton>
         ))}
       </ScrollView>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
-        {(['bump', 'featured', 'top_of_category', 'homepage_carousel'] as const).map((type) => (
-          <HeroButton key={type} size="sm" variant={promotionType === type ? 'primary' : 'secondary'} onPress={() => setPromotionType(type)}>
-            <HeroButton.Label>{t(`tools.promotions.types.${type}`)}</HeroButton.Label>
-          </HeroButton>
-        ))}
-      </ScrollView>
-      <HeroButton variant="primary" onPress={promote} isDisabled={!selectedListing}>
+      {products.isLoading ? (
+        <LoadingSpinner />
+      ) : promotionProducts.length === 0 ? (
+        <EmptyState icon="megaphone-outline" title={products.error ?? t('tools.promotions.noProducts')} subtitle={t('tools.promotions.noProductsHint')} />
+      ) : (
+        <View className="gap-2">
+          {promotionProducts.map((product) => (
+            <PromotionProductRow
+              key={product.type}
+              product={product}
+              selected={promotionType === product.type}
+              onPress={() => setPromotionType(product.type)}
+            />
+          ))}
+        </View>
+      )}
+      <HeroButton variant="primary" onPress={promote} isDisabled={!selectedListing || !promotionType || promotionProducts.length === 0}>
         <HeroButton.Label>{t('tools.promotions.promote')}</HeroButton.Label>
       </HeroButton>
       <PanelList
@@ -353,6 +370,45 @@ function PromotionsPanel() {
       />
     </PanelCard>
   );
+}
+
+function PromotionProductRow({
+  product,
+  selected,
+  onPress,
+}: {
+  product: MarketplacePromotionProduct;
+  selected: boolean;
+  onPress: () => void;
+}) {
+  const { t } = useTranslation('marketplace');
+  const primary = usePrimaryColor();
+  const theme = useTheme();
+  const price = product.price > 0
+    ? `${product.currency} ${Number(product.price).toFixed(2)}`
+    : t('tools.promotions.free');
+  return (
+    <HeroButton
+      variant={selected ? 'primary' : 'secondary'}
+      onPress={onPress}
+      style={selected ? { backgroundColor: primary } : undefined}
+    >
+      <View className="min-w-0 flex-1 items-start">
+        <Text className="text-sm font-bold" style={{ color: selected ? '#fff' : theme.text }} numberOfLines={1}>{product.label}</Text>
+        <Text className="text-xs" style={{ color: selected ? '#fff' : theme.textSecondary }} numberOfLines={2}>
+          {product.description}
+        </Text>
+        <Text className="text-xs font-semibold" style={{ color: selected ? '#fff' : theme.textSecondary }}>
+          {t('tools.promotions.productMeta', { price, duration: formatPromotionDuration(product.duration_hours, t) })}
+        </Text>
+      </View>
+    </HeroButton>
+  );
+}
+
+function formatPromotionDuration(hours: number, t: (key: string, options?: Record<string, unknown>) => string): string {
+  if (hours >= 24) return t('tools.promotions.durationDays', { count: Math.round(hours / 24) });
+  return t('tools.promotions.durationHours', { count: hours });
 }
 
 function PickupsPanel() {
