@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
+import { Alert } from 'react-native';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -33,10 +34,13 @@ jest.mock('react-i18next', () => ({
         'forms.generatingDescription': 'Generating description',
         'forms.generateTitleRequired': 'Add a title before generating a description.',
         'forms.generateDescriptionFailed': 'Could not generate a description.',
+        'forms.validation': 'Validation',
+        'forms.required': 'Title and description are required.',
         'forms.priceType': 'Price type',
         'forms.price': 'Price',
         'forms.currency': 'Currency',
         'forms.pricePlaceholder': '0.00',
+        'forms.priceRequired': 'Enter a price greater than zero for paid listings.',
         'forms.timeCredits': 'Time credits',
         'forms.timeCreditsPlaceholder': 'Optional',
         'forms.condition': 'Condition',
@@ -208,6 +212,23 @@ describe('NewMarketplaceListingRoute', () => {
     });
   });
 
+  it('blocks paid listings without a positive price before calling the API', async () => {
+    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
+
+    const { getByPlaceholderText, getByText } = render(<NewMarketplaceListingRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('What are you selling?'), 'Garden shears');
+    fireEvent.changeText(getByPlaceholderText('Details'), 'Lightly used shears with clean blades.');
+    fireEvent.press(getByText('Publish'));
+
+    await waitFor(() => {
+      expect(Alert.alert).toHaveBeenCalledWith('Validation', 'Enter a price greater than zero for paid listings.');
+    });
+    expect(createMarketplaceListing).not.toHaveBeenCalled();
+
+    alertSpy.mockRestore();
+  });
+
   it('uploads a selected listing video after creating the listing', async () => {
     jest.mocked(ImagePicker.requestMediaLibraryPermissionsAsync).mockResolvedValue({ granted: true } as never);
     jest.mocked(ImagePicker.launchImageLibraryAsync).mockResolvedValue({
@@ -221,6 +242,7 @@ describe('NewMarketplaceListingRoute', () => {
 
     fireEvent.changeText(getByPlaceholderText('What are you selling?'), 'Garden shears');
     fireEvent.changeText(getByPlaceholderText('Details'), 'Lightly used shears with clean blades.');
+    fireEvent.changeText(getByPlaceholderText('0.00'), '12.50');
     fireEvent.press(getByText('Add video'));
 
     await waitFor(() => {

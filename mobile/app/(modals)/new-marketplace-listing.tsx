@@ -223,6 +223,12 @@ export function MarketplaceListingForm() {
       return;
     }
 
+    const priceValue = priceType === 'free' ? 0 : toNumber(price);
+    if (priceType !== 'free' && priceType !== 'contact' && (priceValue === null || priceValue <= 0)) {
+      Alert.alert(t('forms.validation'), t('forms.priceRequired'));
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const hasLatitude = latitude.trim().length > 0;
@@ -244,7 +250,7 @@ export function MarketplaceListingForm() {
         title: title.trim(),
         tagline: tagline.trim() || null,
         description: description.trim(),
-        price: priceType === 'free' ? 0 : toNumber(price),
+        price: priceType === 'contact' ? null : priceValue,
         price_currency: currency,
         price_type: priceType,
         time_credit_price: toNumber(timeCredits),

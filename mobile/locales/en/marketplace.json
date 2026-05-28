@@ -143,6 +143,7 @@
     "price": "Price",
     "currency": "Currency",
     "pricePlaceholder": "0.00",
+    "priceRequired": "Enter a price greater than zero for paid listings.",
     "timeCredits": "Time credits",
     "timeCreditsPlaceholder": "Optional time-credit value",
     "condition": "Condition",
