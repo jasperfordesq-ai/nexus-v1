@@ -27,7 +27,7 @@ jest.mock('react-i18next', () => ({
         'edit.aboutYou': 'About You',
         'edit.aboutPlaceholder': 'Tell us about yourself...',
         'edit.location': 'Location',
-        'edit.locationPlaceholder': 'e.g. Dublin, Ireland',
+        'edit.locationPlaceholder': 'e.g. New York, USA',
         'edit.phoneOptional': 'Phone (Optional)',
         'edit.phonePlaceholder': '+1 555 123 4567',
         'edit.saveChanges': 'Save Changes',
@@ -80,8 +80,8 @@ jest.mock('@/lib/hooks/useAuth', () => ({
       first_name: 'Jane',
       last_name: 'Doe',
       bio: 'Community builder',
-      location: 'Dublin',
-      phone: '+353 87 123 4567',
+      location: 'New York',
+      phone: '+1 555 123 4567',
       avatar_url: null,
     },
     refreshUser: mockRefreshUser,
@@ -108,8 +108,8 @@ jest.mock('@/lib/api/auth', () => ({
       first_name: 'Jane',
       last_name: 'Doe',
       bio: 'Community builder',
-      location: 'Dublin',
-      phone: '+353 87 123 4567',
+      location: 'New York',
+      phone: '+1 555 123 4567',
       avatar_url: null,
     },
   }),
@@ -217,8 +217,8 @@ describe('EditProfileScreen', () => {
           first_name: 'Jane',
           last_name: 'Doe',
           bio: 'Community builder',
-          location: 'Dublin',
-          phone: '+353 87 123 4567',
+          location: 'New York',
+          phone: '+1 555 123 4567',
           avatar_url: null,
         },
       });
@@ -238,12 +238,12 @@ describe('EditProfileScreen', () => {
     expect(getByDisplayValue('Jane')).toBeTruthy();
     expect(getByDisplayValue('Doe')).toBeTruthy();
     expect(getByDisplayValue('Community builder')).toBeTruthy();
-    expect(getByDisplayValue('Dublin')).toBeTruthy();
+    expect(getByDisplayValue('New York')).toBeTruthy();
   });
 
   it('renders placeholders on inputs', () => {
     const { getByPlaceholderText } = render(<EditProfileScreen />);
     expect(getByPlaceholderText('Tell us about yourself...')).toBeTruthy();
-    expect(getByPlaceholderText('e.g. Dublin, Ireland')).toBeTruthy();
+    expect(getByPlaceholderText('e.g. New York, USA')).toBeTruthy();
   });
 });
