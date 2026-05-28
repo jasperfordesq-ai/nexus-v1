@@ -17,6 +17,7 @@ import { listTenants, type TenantListItem } from '@/lib/api/tenant';
 import { useAuthContext } from '@/lib/context/AuthContext';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
+import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 import Button from '@/components/ui/Button';
 
 export default function SelectTenantScreen() {
@@ -105,7 +106,7 @@ export default function SelectTenantScreen() {
                   <View className="flex-row items-center gap-3">
                     {item.logo_url ? (
                       <Image
-                        source={{ uri: item.logo_url }}
+                        source={{ uri: resolveImageUrl(item.logo_url) ?? item.logo_url }}
                         style={{ width: 48, height: 48, borderRadius: 16 }}
                         contentFit="contain"
                       />

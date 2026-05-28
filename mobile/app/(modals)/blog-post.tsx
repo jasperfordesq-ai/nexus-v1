@@ -23,6 +23,7 @@ import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
+import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
@@ -126,7 +127,7 @@ export default function BlogPostScreen() {
           <HeroCard className="mb-4 overflow-hidden rounded-panel p-0">
             {post.cover_image ? (
               <Image
-                source={{ uri: post.cover_image }}
+                source={{ uri: resolveImageUrl(post.cover_image) ?? post.cover_image }}
                 className="h-[220px] w-full"
                 resizeMode="cover"
                 accessibilityLabel={post.title}

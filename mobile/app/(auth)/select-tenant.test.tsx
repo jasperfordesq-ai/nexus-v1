@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import { Image as ExpoImage } from 'expo-image';
 
 const mockReplace = jest.fn();
 const mockSetTenantSlug = jest.fn().mockResolvedValue(undefined);
@@ -16,10 +17,10 @@ let mockApiState: {
   error: string | null;
 } = {
   data: {
-    data: [
-      { id: 1, slug: 'hour-timebank', name: 'hOUR Timebank', logo_url: null },
-      { id: 2, slug: 'west-cork', name: 'West Cork Timebank', logo_url: null },
-    ],
+      data: [
+        { id: 1, slug: 'hour-timebank', name: 'hOUR Timebank', logo_url: null },
+        { id: 2, slug: 'west-cork', name: 'West Cork Timebank', logo_url: '/uploads/tenants/west-cork.png' },
+      ],
   },
   isLoading: false,
   error: null,
@@ -27,6 +28,10 @@ let mockApiState: {
 
 jest.mock('expo-router', () => ({
   useRouter: () => ({ replace: mockReplace }),
+}));
+
+jest.mock('expo-image', () => ({
+  Image: 'Image',
 }));
 
 jest.mock('@/lib/hooks/useApi', () => ({
@@ -59,7 +64,7 @@ describe('SelectTenantScreen', () => {
       data: {
         data: [
           { id: 1, slug: 'hour-timebank', name: 'hOUR Timebank', logo_url: null },
-          { id: 2, slug: 'west-cork', name: 'West Cork Timebank', logo_url: null },
+          { id: 2, slug: 'west-cork', name: 'West Cork Timebank', logo_url: '/uploads/tenants/west-cork.png' },
         ],
       },
       isLoading: false,
@@ -105,5 +110,13 @@ describe('SelectTenantScreen', () => {
 
     fireEvent.press(getByText('Retry'));
     expect(mockRefresh).toHaveBeenCalled();
+  });
+
+  it('resolves relative tenant logo URLs', () => {
+    const { UNSAFE_getAllByType } = render(<SelectTenantScreen />);
+
+    expect(UNSAFE_getAllByType(ExpoImage)[0].props.source.uri).toBe(
+      'https://api.project-nexus.ie/uploads/tenants/west-cork.png',
+    );
   });
 });

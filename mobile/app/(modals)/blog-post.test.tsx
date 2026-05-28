@@ -142,6 +142,20 @@ describe('BlogPostScreen', () => {
     expect(getByText('Full content here. Timebanking is a reciprocal service exchange...')).toBeTruthy();
   });
 
+  it('resolves relative cover image URLs', () => {
+    mockUseApi.mockReturnValue({
+      data: { data: { ...mockPost, cover_image: '/uploads/blog/community.jpg' } },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByLabelText } = render(<BlogPostScreen />);
+    expect(getByLabelText('Building Community Through Timebanking').props.source.uri).toBe(
+      'https://api.project-nexus.ie/uploads/blog/community.jpg',
+    );
+  });
+
   it('renders loading state without crashing', () => {
     mockUseApi.mockReturnValue({ data: null, isLoading: true, error: null, refresh: jest.fn() });
 

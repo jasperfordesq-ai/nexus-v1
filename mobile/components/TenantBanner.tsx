@@ -8,6 +8,7 @@ import { Surface } from 'heroui-native';
 
 import { useTranslation } from 'react-i18next';
 import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
+import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 
 export default function TenantBanner() {
   const { t } = useTranslation('home');
@@ -20,7 +21,7 @@ export default function TenantBanner() {
     <Surface variant="default" className="mx-4 mt-3 flex-row items-center gap-3 rounded-panel-inner p-3">
       {tenant.branding.logo_url ? (
         <Image
-          source={{ uri: tenant.branding.logo_url }}
+          source={{ uri: resolveImageUrl(tenant.branding.logo_url) ?? tenant.branding.logo_url }}
           style={{ width: 38, height: 38 }}
           resizeMode="contain"
           accessibilityLabel={t('tenant.logoLabel', { name: tenant.name })}
