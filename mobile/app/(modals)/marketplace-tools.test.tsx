@@ -1,0 +1,231 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import React from 'react';
+import { render, waitFor } from '@testing-library/react-native';
+
+let mockParams: Record<string, string> = {};
+const mockHasFeature = jest.fn(() => true);
+const mockT = (key: string, opts?: Record<string, unknown>) => {
+  const map: Record<string, string> = {
+    'common:back': 'Back',
+    'common:cancel': 'Cancel',
+    'common:errors.alertTitle': 'Error',
+    'tools.eyebrow': 'Seller and discovery tools',
+    'tools.title': 'Marketplace tools',
+    'tools.subtitle': 'Manage saved searches, collections, promotions, pickup slots, and seller coupons.',
+    'tools.onboarding': 'Seller setup',
+    'tools.payments': 'Payments',
+    'tools.shipping': 'Shipping options',
+    'tools.delete': 'Delete',
+    'tools.tabs.collections': 'Collections',
+    'tools.tabs.savedSearches': 'Saved searches',
+    'tools.tabs.promotions': 'Promotions',
+    'tools.tabs.pickups': 'Pickups',
+    'tools.tabs.coupons': 'Coupons',
+    'tools.coupons.title': 'Seller coupons',
+    'tools.coupons.subtitle': 'Create and manage merchant coupons for marketplace checkout.',
+    'tools.coupons.code': 'Coupon code',
+    'tools.coupons.codePlaceholder': 'COMMUNITY10',
+    'tools.coupons.name': 'Coupon title',
+    'tools.coupons.namePlaceholder': 'June community discount',
+    'tools.coupons.description': 'Description',
+    'tools.coupons.descriptionPlaceholder': 'Optional customer-facing note',
+    'tools.coupons.discountType': 'Discount type',
+    'tools.coupons.value': 'Discount percent',
+    'tools.coupons.valuePlaceholder': '10',
+    'tools.coupons.valueFixed': 'Discount amount (cents)',
+    'tools.coupons.valueFixedPlaceholder': '500',
+    'tools.coupons.minOrder': 'Minimum order (cents)',
+    'tools.coupons.minOrderPlaceholder': '2500',
+    'tools.coupons.maxUses': 'Max uses',
+    'tools.coupons.maxUsesPlaceholder': '100',
+    'tools.coupons.perMember': 'Per member',
+    'tools.coupons.perMemberPlaceholder': '1',
+    'tools.coupons.validFrom': 'Valid from',
+    'tools.coupons.validUntil': 'Valid until',
+    'tools.coupons.datePlaceholder': '2026-06-01 10:00',
+    'tools.coupons.status': 'Status',
+    'tools.coupons.appliesTo': 'Applies to',
+    'tools.coupons.create': 'Create coupon',
+    'tools.coupons.update': 'Update coupon',
+    'tools.coupons.edit': 'Edit',
+    'tools.coupons.editingTitle': 'Editing coupon',
+    'tools.coupons.cancelEdit': 'Cancel editing',
+    'tools.coupons.redemptions': 'Redemptions',
+    'tools.coupons.redemptionsTitle': 'Coupon redemptions',
+    'tools.coupons.noRedemptions': 'No redemptions yet',
+    'tools.coupons.empty': 'No seller coupons yet',
+    'tools.coupons.usageCount': `${String(opts?.count ?? 0)} uses`,
+    'tools.coupons.validUntilShort': `Until ${String(opts?.date ?? '')}`,
+    'tools.coupons.noExpiry': 'No expiry',
+    'tools.coupons.appliesLabel': `Applies: ${String(opts?.scope ?? '')}`,
+    'tools.coupons.percentValue': `${String(opts?.value ?? 0)}%`,
+    'tools.coupons.redemptionOrder': `Order ${String(opts?.order ?? '')}`,
+    'tools.coupons.redemptionValue': `Discount ${String(opts?.value ?? '')} - ${String(opts?.date ?? '')}`,
+    'tools.coupons.redemptionMember': `Member #${String(opts?.member ?? '')}`,
+    'tools.coupons.redemptionMethod': `Method: ${String(opts?.method ?? '')}`,
+    'tools.coupons.dateUnknown': 'Date unavailable',
+    'publicCoupons.fixedValue': `EUR ${String(opts?.value ?? '')} off`,
+    'publicCoupons.bogo': 'BOGO',
+    'tools.coupons.discountTypes.percent': 'Percent',
+    'tools.coupons.discountTypes.fixed': 'Fixed',
+    'tools.coupons.discountTypes.bogo': 'BOGO',
+    'tools.coupons.statuses.draft': 'Draft',
+    'tools.coupons.statuses.active': 'Active',
+    'tools.coupons.statuses.paused': 'Paused',
+    'tools.coupons.statuses.expired': 'Expired',
+    'tools.coupons.applies.all_listings': 'All listings',
+    'tools.coupons.applies.listing_ids': 'Specific listings',
+    'tools.coupons.applies.category_ids': 'Specific categories',
+  };
+  return map[key] ?? key;
+};
+
+jest.mock('expo-router', () => ({
+  router: { push: jest.fn() },
+  useLocalSearchParams: () => mockParams,
+}));
+
+jest.mock('@expo/vector-icons', () => ({
+  Ionicons: 'View',
+}));
+
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: mockT,
+  }),
+}));
+
+jest.mock('@/components/ModalErrorBoundary', () => ({ children }: { children: React.ReactNode }) => children);
+jest.mock('@/components/ui/AppTopBar', () => {
+  const { Text } = require('react-native');
+  return ({ title }: { title: string }) => <Text>{title}</Text>;
+});
+jest.mock('@/components/ui/EmptyState', () => {
+  const { Text } = require('react-native');
+  return ({ title }: { title: string }) => <Text>{title}</Text>;
+});
+jest.mock('@/components/ui/LoadingSpinner', () => {
+  const { Text } = require('react-native');
+  return () => <Text>Loading</Text>;
+});
+
+jest.mock('@/lib/hooks/useAuth', () => ({
+  useAuth: () => ({ user: { id: 9 } }),
+}));
+
+jest.mock('@/lib/hooks/useTenant', () => ({
+  usePrimaryColor: () => '#006FEE',
+  useTenant: () => ({ hasFeature: mockHasFeature }),
+}));
+
+jest.mock('@/lib/hooks/useTheme', () => ({
+  useTheme: () => ({
+    bg: '#ffffff',
+    surface: '#f8f9fa',
+    text: '#000000',
+    textSecondary: '#666666',
+    textMuted: '#999999',
+    border: '#dddddd',
+    error: '#dc2626',
+    success: '#16a34a',
+    warning: '#f59e0b',
+  }),
+}));
+
+jest.mock('@/lib/api/marketplace', () => ({
+  createMarketplaceCollection: jest.fn(),
+  createMarketplacePickupSlot: jest.fn(),
+  createMarketplaceSavedSearch: jest.fn(),
+  createMerchantCoupon: jest.fn(),
+  deleteMarketplaceCollection: jest.fn(),
+  deleteMarketplacePickupSlot: jest.fn(),
+  deleteMarketplaceSavedSearch: jest.fn(),
+  deleteMerchantCoupon: jest.fn(),
+  getMarketplaceCollections: jest.fn(),
+  getMarketplacePickupSlots: jest.fn(),
+  getMarketplacePromotionProducts: jest.fn(),
+  getMarketplaceSavedSearches: jest.fn(),
+  getMerchantCoupons: jest.fn(),
+  getMerchantCouponRedemptions: jest.fn(),
+  getMyMarketplaceListings: jest.fn(),
+  getMyMarketplacePickups: jest.fn(),
+  getMyMarketplacePromotions: jest.fn(),
+  marketplaceHasMore: jest.fn(() => false),
+  marketplaceNextCursor: jest.fn(() => null),
+  promoteMarketplaceListing: jest.fn(),
+  scanMarketplacePickup: jest.fn(),
+  updateMerchantCoupon: jest.fn(),
+}));
+
+import MarketplaceToolsRoute from './marketplace-tools';
+import {
+  getMerchantCoupons,
+  getMerchantCouponRedemptions,
+} from '@/lib/api/marketplace';
+
+const coupon = {
+  id: 7,
+  code: 'SAVE10',
+  title: 'June seller discount',
+  description: 'Ten percent for community members',
+  discount_type: 'percent',
+  discount_value: 10,
+  min_order_cents: 2500,
+  max_uses: 100,
+  max_uses_per_member: 1,
+  used_count: 3,
+  usage_count: 3,
+  valid_from: '2026-06-01T10:00:00Z',
+  valid_until: '2026-06-30T22:00:00Z',
+  status: 'active',
+  applies_to: 'all_listings',
+};
+
+describe('MarketplaceToolsRoute', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockParams = {};
+    mockHasFeature.mockReturnValue(true);
+    jest.mocked(getMerchantCoupons).mockResolvedValue({ data: { items: [coupon] } } as never);
+    jest.mocked(getMerchantCouponRedemptions).mockResolvedValue({
+      data: {
+        items: [
+          {
+            id: 31,
+            coupon_id: 7,
+            user_id: 42,
+            order_id: 44,
+            discount_applied_cents: 500,
+            redeemed_at: '2026-06-05T12:30:00Z',
+            redemption_method: 'qr',
+          },
+        ],
+      },
+    } as never);
+  });
+
+  it('opens a seller coupon in edit mode from route params', async () => {
+    mockParams = { tab: 'coupons', couponId: '7', couponMode: 'edit' };
+
+    const { findByText } = render(<MarketplaceToolsRoute />);
+
+    expect(await findByText('Editing coupon')).toBeTruthy();
+    expect(await findByText('Update coupon')).toBeTruthy();
+  });
+
+  it('opens a seller coupon redemptions sheet from route params', async () => {
+    mockParams = { tab: 'coupons', couponId: '7', couponMode: 'redemptions' };
+
+    const { findByText } = render(<MarketplaceToolsRoute />);
+
+    expect(await findByText('Coupon redemptions')).toBeTruthy();
+    await waitFor(() => {
+      expect(getMerchantCouponRedemptions).toHaveBeenCalledWith(7);
+    });
+    expect(await findByText('Order 44')).toBeTruthy();
+  });
+});

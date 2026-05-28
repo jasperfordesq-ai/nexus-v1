@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, FlatList, Modal, ScrollView, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
@@ -59,6 +59,7 @@ type ToolTab = 'collections' | 'savedSearches' | 'promotions' | 'pickups' | 'cou
 type CouponDiscountType = 'percent' | 'fixed' | 'bogo';
 type CouponStatus = 'draft' | 'active' | 'paused' | 'expired';
 type CouponAppliesTo = 'all_listings' | 'listing_ids' | 'category_ids';
+type CouponRouteMode = 'edit' | 'redemptions';
 
 interface CouponFormState {
   code: string;
@@ -97,6 +98,17 @@ const emptyCouponForm: CouponFormState = {
 
 function isToolTab(value: string | string[] | undefined): value is ToolTab {
   return typeof value === 'string' && TABS.includes(value as ToolTab);
+}
+
+function couponRouteMode(value: string | string[] | undefined): CouponRouteMode | null {
+  if (value === 'edit' || value === 'redemptions') return value;
+  return null;
+}
+
+function routeCouponId(value: string | string[] | undefined): number | null {
+  if (typeof value !== 'string') return null;
+  const id = Number(value);
+  return Number.isFinite(id) && id > 0 ? id : null;
 }
 
 export default function MarketplaceToolsRoute() {
@@ -528,19 +540,23 @@ function CouponsPanel() {
   const { t } = useTranslation(['marketplace', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const params = useLocalSearchParams<{ couponId?: string; couponMode?: string }>();
+  const targetCouponId = routeCouponId(params.couponId);
+  const targetCouponMode = couponRouteMode(params.couponMode);
   const [form, setForm] = useState<CouponFormState>(emptyCouponForm);
   const [editingCoupon, setEditingCoupon] = useState<MerchantCoupon | null>(null);
   const [redemptionCoupon, setRedemptionCoupon] = useState<MerchantCoupon | null>(null);
   const [redemptions, setRedemptions] = useState<MerchantCouponRedemption[]>([]);
   const [isLoadingRedemptions, setIsLoadingRedemptions] = useState(false);
   const [isSavingCoupon, setIsSavingCoupon] = useState(false);
+  const [handledRouteCouponKey, setHandledRouteCouponKey] = useState<string | null>(null);
   const coupons = useApi(() => getMerchantCoupons(), [], { enabled: true });
 
   function updateForm(key: keyof CouponFormState, value: string) {
     setForm((current) => ({ ...current, [key]: value }));
   }
 
-  function openEdit(coupon?: MerchantCoupon) {
+  const openEdit = useCallback((coupon?: MerchantCoupon) => {
     setEditingCoupon(coupon ?? null);
     setForm(coupon ? {
       code: coupon.code ?? '',
@@ -556,7 +572,7 @@ function CouponsPanel() {
       status: coupon.status ?? 'active',
       appliesTo: coupon.applies_to ?? 'all_listings',
     } : emptyCouponForm);
-  }
+  }, []);
 
   async function save() {
     if (!form.title.trim()) return;
@@ -598,7 +614,7 @@ function CouponsPanel() {
     ]);
   }
 
-  async function openRedemptions(item: MerchantCoupon) {
+  const openRedemptions = useCallback(async (item: MerchantCoupon) => {
     setRedemptionCoupon(item);
     setRedemptions([]);
     setIsLoadingRedemptions(true);
@@ -610,7 +626,24 @@ function CouponsPanel() {
     } finally {
       setIsLoadingRedemptions(false);
     }
-  }
+  }, [t]);
+
+  useEffect(() => {
+    if (!targetCouponId || !targetCouponMode) return;
+    const routeKey = `${targetCouponMode}:${targetCouponId}`;
+    if (handledRouteCouponKey === routeKey) return;
+
+    const targetCoupon = (coupons.data?.data.items ?? []).find((item) => item.id === targetCouponId);
+    if (!targetCoupon) return;
+
+    setHandledRouteCouponKey(routeKey);
+    if (targetCouponMode === 'edit') {
+      setRedemptionCoupon(null);
+      openEdit(targetCoupon);
+      return;
+    }
+    void openRedemptions(targetCoupon);
+  }, [coupons.data?.data.items, handledRouteCouponKey, openEdit, openRedemptions, targetCouponId, targetCouponMode]);
 
   return (
     <PanelCard icon="ticket-outline" title={t('tools.coupons.title')} subtitle={t('tools.coupons.subtitle')}>
