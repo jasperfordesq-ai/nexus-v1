@@ -1,4 +1,4 @@
-import { Card, CardBody, CardHeader, Button, Spinner, Chip, Input, Select, SelectItem, useDisclosure, Accordion, AccordionItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Tooltip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Spinner, Chip, Input, Select, SelectItem, useDisclosure, Accordion, AccordionItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Tooltip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, useConfirm } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -96,7 +96,8 @@ const REGISTRATION_MODE_COLORS: Record<string, 'success' | 'primary' | 'secondar
 };
 
 export function RegistrationPolicySettings() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation(['admin', 'common']);
+  const confirm = useConfirm();
   usePageTitle(t('system.page_title'));
   const toast = useToast();
   const { user } = useAuth();
@@ -244,7 +245,12 @@ export function RegistrationPolicySettings() {
   };
 
   const handleDeleteCredentials = async (slug: string) => {
-    if (!window.confirm(t('system.reg.credentials_remove_confirm'))) return;
+    const ok = await confirm({
+      title: t('system.reg.credentials_remove_confirm'),
+      status: 'danger',
+      confirmLabel: t('common:delete'),
+    });
+    if (!ok) return;
     try {
       await api.delete(`/v2/admin/identity/provider-credentials/${slug}`);
       toast.success(t('system.reg.credentials_removed'));

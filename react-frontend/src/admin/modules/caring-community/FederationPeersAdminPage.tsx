@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Select, SelectItem, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Select, SelectItem, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, useConfirm } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -54,7 +54,8 @@ const STATUS_COLOR: Record<PeerStatus, 'default' | 'success' | 'warning' | 'dang
 };
 
 export default function FederationPeersAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation(['admin', 'common']);
+  const confirm = useConfirm();
   usePageTitle(t('federation_peers_admin.meta.page_title'));
   const { showToast } = useToast();
 
@@ -147,9 +148,12 @@ export default function FederationPeersAdminPage() {
   }
 
   async function handleRotate(peer: Peer) {
-    if (!window.confirm(
-      t('federation_peers_admin.confirm_rotate', { name: peer.display_name }),
-    )) {
+    const ok = await confirm({
+      title: t('federation_peers_admin.confirm_rotate', { name: peer.display_name }),
+      status: 'warning',
+      confirmLabel: t('common:confirm'),
+    });
+    if (!ok) {
       return;
     }
     try {
@@ -171,7 +175,12 @@ export default function FederationPeersAdminPage() {
   }
 
   async function handleDelete(peer: Peer) {
-    if (!window.confirm(t('federation_peers_admin.confirm_delete', { name: peer.display_name }))) {
+    const ok = await confirm({
+      title: t('federation_peers_admin.confirm_delete', { name: peer.display_name }),
+      status: 'danger',
+      confirmLabel: t('common:delete'),
+    });
+    if (!ok) {
       return;
     }
     try {

@@ -1,4 +1,4 @@
-import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Input, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
+import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Input, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, useConfirm } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -110,7 +110,8 @@ function postalCodesPreview(codes: string[] | null): string {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function SubRegionsAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation(['admin', 'common']);
+  const confirm = useConfirm();
   usePageTitle(t('sub_regions.meta.page_title'));
   const { showToast } = useToast();
 
@@ -252,9 +253,12 @@ export default function SubRegionsAdminPage() {
   // ── Delete ───────────────────────────────────────────────────────────────
 
   async function handleDelete(region: SubRegion) {
-    if (!window.confirm(
-      t('sub_regions.confirm_mark_inactive', { name: region.name })
-    )) {
+    const ok = await confirm({
+      title: t('sub_regions.confirm_mark_inactive', { name: region.name }),
+      status: 'warning',
+      confirmLabel: t('common:confirm'),
+    });
+    if (!ok) {
       return;
     }
     try {

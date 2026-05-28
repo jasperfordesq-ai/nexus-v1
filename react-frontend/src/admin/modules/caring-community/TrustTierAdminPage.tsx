@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, CardHeader, Input, Spinner, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Input, Spinner, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, useConfirm } from '@/components/ui';
 import { useState } from 'react';
 
 import { Separator } from '@heroui/react';
@@ -83,7 +83,8 @@ function TierRow({ tierName, criteria, onChange }: TierRowProps) {
 }
 
 export function TrustTierAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation(['admin', 'common']);
+  const confirm = useConfirm();
   usePageTitle(t('panel.sidebar.items.trust_tier'));
   useAdminPageMeta({
     title: t('admin.trust_tier.meta.title'),
@@ -131,7 +132,12 @@ export function TrustTierAdminPage() {
   }
 
   async function handleRecompute() {
-    if (!window.confirm(t('admin.trust_tier.recompute_confirm'))) return;
+    const ok = await confirm({
+      title: t('admin.trust_tier.recompute_confirm'),
+      status: 'warning',
+      confirmLabel: t('common:confirm'),
+    });
+    if (!ok) return;
     setRecomputing(true);
     try {
       const result = await api.post<{ updated: number }>(

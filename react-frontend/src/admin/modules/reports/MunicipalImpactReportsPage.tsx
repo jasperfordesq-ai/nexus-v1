@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Select, SelectItem, useDisclosure, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Select, SelectItem, useDisclosure, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch, useConfirm } from '@/components/ui';
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -185,9 +185,10 @@ async function downloadMunicipalExport(format: 'csv' | 'pdf', filename: string, 
 }
 
 export default function MunicipalImpactReportsPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation(['admin', 'common']);
   const { tenantPath } = useTenant();
   const toast = useToast();
+  const confirm = useConfirm();
   const { isOpen, onOpen, onClose } = useDisclosure();
   usePageTitle(t('municipal_reports.meta.title'));
   const [summary, setSummary] = useState<MunicipalImpactSummary | null>(null);
@@ -327,7 +328,12 @@ export default function MunicipalImpactReportsPage() {
   };
 
   const deleteTemplate = async (templateId: number, templateName?: string) => {
-    if (!window.confirm(t('municipal_reports.templates.delete_confirm', { name: templateName ?? '' }))) return;
+    const ok = await confirm({
+      title: t('municipal_reports.templates.delete_confirm', { name: templateName ?? '' }),
+      status: 'danger',
+      confirmLabel: t('common:delete'),
+    });
+    if (!ok) return;
     setDeletingTemplateId(templateId);
     try {
       await api.delete(`/v2/admin/reports/municipal-impact/templates/${templateId}`);

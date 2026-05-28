@@ -1,4 +1,4 @@
-import { CardBody, Card, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
+import { CardBody, Card, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, useConfirm } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -62,7 +62,8 @@ function inputToCents(v: string): number {
 }
 
 export function MemberPremiumAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation(['admin', 'common']);
+  const confirm = useConfirm();
   usePageTitle(t('member_premium_admin.meta.title'));
   const toast = useToast();
   const { tenantPath } = useTenant();
@@ -166,7 +167,12 @@ export function MemberPremiumAdminPage() {
   };
 
   const deleteTier = async (tier: MemberPremiumTier) => {
-    if (!window.confirm(t('member_premium_admin.confirm_delete', { name: tier.name }))) return;
+    const ok = await confirm({
+      title: t('member_premium_admin.confirm_delete', { name: tier.name }),
+      status: 'danger',
+      confirmLabel: t('common:delete'),
+    });
+    if (!ok) return;
     setDeleting(tier.id);
     try {
       await memberPremiumAdminApi.deleteTier(tier.id);

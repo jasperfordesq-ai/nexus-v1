@@ -670,7 +670,7 @@ export function FeedPage() {
       logError('Failed to delete post', err);
       toastRef.current.error(tRef.current('toast.delete_failed'));
     }
-  }, []);
+  }, [confirm]);
 
   const handleAdminDeletePost = useCallback(async (item: FeedItem) => {
     const ok = await confirm({
@@ -688,7 +688,7 @@ export function FeedPage() {
       logError('Failed to admin-delete post', err);
       toastRef.current.error(tRef.current('toast.delete_failed'));
     }
-  }, []);
+  }, [confirm]);
 
   /* ───────── Edit Post ───────── */
 

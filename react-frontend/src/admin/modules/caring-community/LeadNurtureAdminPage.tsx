@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Select, SelectItem, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Select, SelectItem, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, useConfirm } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Separator } from '@heroui/react';
@@ -68,7 +68,8 @@ const STAGE_COLOR: Record<Stage, 'default' | 'primary' | 'warning' | 'success' |
 };
 
 export default function LeadNurtureAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation(['admin', 'common']);
+  const confirm = useConfirm();
   usePageTitle(t('lead_nurture.meta.page_title'));
   const { showToast } = useToast();
 
@@ -141,7 +142,12 @@ export default function LeadNurtureAdminPage() {
   };
 
   const unsubscribe = async (contact: Contact) => {
-    if (!window.confirm(t('lead_nurture.confirm_unsubscribe', { email: contact.email }))) return;
+    const ok = await confirm({
+      title: t('lead_nurture.confirm_unsubscribe', { email: contact.email }),
+      status: 'warning',
+      confirmLabel: t('common:confirm'),
+    });
+    if (!ok) return;
     try {
       await api.post(`/v2/admin/caring-community/leads/${contact.id}/unsubscribe`);
       showToast(t('lead_nurture.toasts.unsubscribed'), 'success');

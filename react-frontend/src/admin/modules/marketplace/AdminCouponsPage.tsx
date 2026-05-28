@@ -1,4 +1,4 @@
-import { CardBody, Card, Button, Chip, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
+import { CardBody, Card, Button, Chip, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, useConfirm } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -32,7 +32,8 @@ interface AdminCoupon {
 }
 
 export default function AdminCouponsPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation(['admin', 'common']);
+  const confirm = useConfirm();
   usePageTitle(t('marketplace.coupons.page_title'));
   const toast = useToast();
   const [items, setItems] = useState<AdminCoupon[]>([]);
@@ -55,7 +56,12 @@ export default function AdminCouponsPage() {
   }, [load]);
 
   const handleSuspend = async (id: number) => {
-    if (!window.confirm(t('marketplace.coupons.confirm_suspend'))) return;
+    const ok = await confirm({
+      title: t('marketplace.coupons.confirm_suspend'),
+      status: 'warning',
+      confirmLabel: t('common:confirm'),
+    });
+    if (!ok) return;
     try {
       await api.post(`/v2/admin/marketplace/coupons/${id}/suspend`, {});
       toast.success(t('marketplace.coupons.suspended'));
@@ -66,7 +72,12 @@ export default function AdminCouponsPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm(t('marketplace.coupons.confirm_delete'))) return;
+    const ok = await confirm({
+      title: t('marketplace.coupons.confirm_delete'),
+      status: 'danger',
+      confirmLabel: t('common:delete'),
+    });
+    if (!ok) return;
     try {
       await api.delete(`/v2/admin/marketplace/coupons/${id}`);
       toast.success(t('marketplace.coupons.deleted'));

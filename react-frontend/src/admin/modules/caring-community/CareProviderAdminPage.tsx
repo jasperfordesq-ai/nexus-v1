@@ -1,4 +1,4 @@
-import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Input, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
+import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Input, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, useConfirm } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -123,7 +123,8 @@ function typeColor(type: ProviderType): ChipColor {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function CareProviderAdminPage() {
-  const { t } = useTranslation('caring_community');
+  const { t } = useTranslation(['caring_community', 'common']);
+  const confirm = useConfirm();
   usePageTitle(t('admin.providers.meta_title'));
   const { showToast } = useToast();
 
@@ -249,7 +250,12 @@ export default function CareProviderAdminPage() {
   // ── Delete ───────────────────────────────────────────────────────────────
 
   async function handleDelete(provider: CareProvider) {
-    if (!window.confirm(t('admin.providers.confirm_delete', { name: provider.name }))) {
+    const ok = await confirm({
+      title: t('admin.providers.confirm_delete', { name: provider.name }),
+      status: 'danger',
+      confirmLabel: t('common:delete'),
+    });
+    if (!ok) {
       return;
     }
     try {
@@ -284,7 +290,12 @@ export default function CareProviderAdminPage() {
   }
 
   async function handleDeactivateProvider(providerId: number, providerName: string) {
-    if (!window.confirm(t('admin.providers.confirm_deactivate', { name: providerName }))) {
+    const ok = await confirm({
+      title: t('admin.providers.confirm_deactivate', { name: providerName }),
+      status: 'warning',
+      confirmLabel: t('common:confirm'),
+    });
+    if (!ok) {
       return;
     }
     try {

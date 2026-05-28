@@ -1,4 +1,4 @@
-import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Input, Textarea, Switch, Tabs, Tab } from '@/components/ui';
+import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Input, Textarea, Switch, Tabs, Tab, useConfirm } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -88,7 +88,8 @@ function resolveAttachmentUrl(fileUrl: string): string {
 }
 
 export function KBArticleForm() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation(['admin', 'common']);
+  const confirm = useConfirm();
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
   const { tenantPath } = useTenant();
@@ -307,7 +308,12 @@ export function KBArticleForm() {
 
   async function deleteAttachment(attachmentId: number) {
     if (!id) return;
-    if (!window.confirm(t('resources.attachment_delete_confirm'))) return;
+    const ok = await confirm({
+      title: t('resources.attachment_delete_confirm'),
+      status: 'danger',
+      confirmLabel: t('common:delete'),
+    });
+    if (!ok) return;
     try {
       const res = await api.delete(`/v2/kb/${id}/attachments/${attachmentId}`);
       if (res.success !== false) {
