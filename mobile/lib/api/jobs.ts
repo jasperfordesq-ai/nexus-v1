@@ -200,7 +200,7 @@ export function createJob(payload: CreateJobPayload): Promise<{ data: JobVacancy
   return api.post<{ data: JobVacancy }>(`${API_V2}/jobs`, payload);
 }
 
-export function updateJob(id: number, payload: CreateJobPayload): Promise<{ data: JobVacancy }> {
+export function updateJob(id: number, payload: UpdateJobPayload): Promise<{ data: JobVacancy }> {
   return api.put<{ data: JobVacancy }>(`${API_V2}/jobs/${id}`, payload);
 }
 

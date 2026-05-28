@@ -341,6 +341,7 @@ describe('NewJobRoute', () => {
         company_size: '51-200',
         benefits: ['Mentoring'],
         deadline: '2026-07-01T00:00:00Z',
+        status: 'closed',
       },
     });
 
@@ -361,6 +362,7 @@ describe('NewJobRoute', () => {
         company_size: '51-200',
         skills_required: ['Planning', 'Support'],
       }));
+      expect((updateJob as jest.Mock).mock.calls[0]?.[1]).not.toHaveProperty('status');
     });
   });
 });

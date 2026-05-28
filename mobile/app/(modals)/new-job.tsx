@@ -155,7 +155,7 @@ function NewJobScreen() {
 
     setIsSubmitting(true);
     try {
-      const payload: CreateJobPayload = {
+      const payload: Omit<CreateJobPayload, 'status'> = {
         title: title.trim(),
         description: description.trim(),
         type,
@@ -179,9 +179,8 @@ function NewJobScreen() {
         video_url: videoUrl.trim() || null,
         company_size: companySize || null,
         benefits: benefits.split(',').map((benefit) => benefit.trim()).filter(Boolean),
-        status: 'open',
       };
-      const result = isEditing ? await updateJob(jobId, payload) : await createJob(payload);
+      const result = isEditing ? await updateJob(jobId, payload) : await createJob({ ...payload, status: 'open' });
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       const id = result.data?.id ?? jobId;
       if (id) {
