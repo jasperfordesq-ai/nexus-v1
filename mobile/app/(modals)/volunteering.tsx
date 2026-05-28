@@ -72,6 +72,35 @@ function normalizeSkills(skills: unknown): string[] {
   return [];
 }
 
+function getLoggableOrganisations(
+  organisations: VolunteeringOrganisation[],
+  applications: VolunteerApplication[],
+): VolunteeringOrganisation[] {
+  const byId = new Map<number, VolunteeringOrganisation>();
+
+  organisations.forEach((organisation) => {
+    if (organisation.id) {
+      byId.set(organisation.id, organisation);
+    }
+  });
+
+  applications.forEach((application) => {
+    if (application.status !== 'approved' || !application.organization?.id) {
+      return;
+    }
+
+    byId.set(application.organization.id, {
+      id: application.organization.id,
+      name: application.organization.name,
+      logo_url: application.organization.logo_url ?? null,
+      status: 'approved',
+      member_role: 'volunteer',
+    });
+  });
+
+  return Array.from(byId.values());
+}
+
 function statusLabelKey(status: VolunteerOpportunity['status'] | string) {
   return ['open', 'closed', 'filled'].includes(status) ? `status.${status}` : 'status.open';
 }
@@ -546,6 +575,10 @@ function VolunteeringScreenInner() {
   const applications = applicationsApi.data?.data ?? [];
   const summary = hoursApi.data?.data ?? null;
   const organisations = organisationsApi.data?.data ?? [];
+  const loggableOrganisations = useMemo(
+    () => getLoggableOrganisations(organisations, applications),
+    [applications, organisations],
+  );
   const verifiedHours = summary?.total_verified ?? 0;
 
   async function handleApply(item: VolunteerOpportunity) {
@@ -685,9 +718,10 @@ function VolunteeringScreenInner() {
             {activeTab === 'hours' ? (
               <HoursPanel
                 summary={summary}
-                organisations={organisations}
+                organisations={loggableOrganisations}
                 isLoading={hoursApi.isLoading || organisationsApi.isLoading}
                 onRefresh={() => {
+                  applicationsApi.refresh();
                   hoursApi.refresh();
                   organisationsApi.refresh();
                 }}

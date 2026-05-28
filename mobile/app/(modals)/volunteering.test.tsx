@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { fireEvent, render } from '@testing-library/react-native';
 
 // --- Mocks ---
 
@@ -229,5 +229,50 @@ describe('VolunteeringScreen', () => {
 
     const { getByText } = render(<VolunteeringScreen />);
     expect(getByText('Open')).toBeTruthy();
+  });
+
+  it('lets approved volunteers log hours for application organisations', () => {
+    let apiCall = 0;
+    mockUseApi.mockImplementation(() => {
+      const responses = [
+        {
+          data: {
+            data: [{
+              id: 21,
+              status: 'approved',
+              message: null,
+              opportunity: { id: 10, title: 'Garden Helper' },
+              organization: { id: 5, name: 'Green Spaces', logo_url: null },
+              created_at: '2026-05-01T00:00:00Z',
+            }],
+          },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+        {
+          data: { data: { total_verified: 0, total_pending: 0, total_declined: 0, by_organization: [], by_month: [] } },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+        {
+          data: { data: [] },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+      ];
+      const response = responses[apiCall % responses.length];
+      apiCall += 1;
+      return response;
+    });
+
+    const { getByText } = render(<VolunteeringScreen />);
+
+    fireEvent.press(getByText('My Hours'));
+
+    expect(getByText('Green Spaces')).toBeTruthy();
+    expect(getByText('Log your hours.')).toBeTruthy();
   });
 });
