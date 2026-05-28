@@ -39,10 +39,12 @@ import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 
 const PRICE_TYPES: MarketplacePriceType[] = ['fixed', 'negotiable', 'free', 'contact'];
+const CURRENCIES = ['EUR', 'GBP', 'USD', 'CAD', 'AUD', 'NZD', 'CHF', 'SEK', 'NOK', 'DKK', 'PLN', 'JPY'] as const;
 const CONDITIONS: MarketplaceCondition[] = ['new', 'like_new', 'good', 'fair', 'poor'];
 const DELIVERY: MarketplaceDeliveryMethod[] = ['pickup', 'shipping', 'both', 'community_delivery'];
 const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime'];
 const MAX_VIDEO_SIZE = 50 * 1024 * 1024;
+type MarketplaceCurrency = typeof CURRENCIES[number];
 
 function toNumber(value: string): number | null {
   const parsed = Number(value.replace(/[,\s]/g, ''));
@@ -52,6 +54,11 @@ function toNumber(value: string): number | null {
 function basenameFromUri(uri: string): string {
   const cleanUri = uri.split('?')[0] ?? uri;
   return cleanUri.split('/').pop() || 'marketplace-video.mp4';
+}
+
+function normalizeCurrency(value?: string | null): MarketplaceCurrency {
+  const candidate = (value ?? '').toUpperCase() as MarketplaceCurrency;
+  return CURRENCIES.includes(candidate) ? candidate : 'EUR';
 }
 
 export default function NewMarketplaceListingRoute() {
@@ -77,6 +84,7 @@ export function MarketplaceListingForm() {
   const [timeCredits, setTimeCredits] = useState('');
   const initialPriceType = PRICE_TYPES.includes(params.price_type as MarketplacePriceType) ? params.price_type as MarketplacePriceType : 'fixed';
   const [priceType, setPriceType] = useState<MarketplacePriceType>(initialPriceType);
+  const [currency, setCurrency] = useState<MarketplaceCurrency>('EUR');
   const [condition, setCondition] = useState<MarketplaceCondition>('good');
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [categoryTemplate, setCategoryTemplate] = useState<MarketplaceCategoryTemplateField[]>([]);
@@ -125,6 +133,7 @@ export function MarketplaceListingForm() {
         setTagline(listing.tagline ?? '');
         setDescription(listing.description ?? '');
         setPrice(listing.price !== null && listing.price !== undefined ? String(listing.price) : '');
+        setCurrency(normalizeCurrency(listing.price_currency));
         setTimeCredits(listing.time_credit_price !== null && listing.time_credit_price !== undefined ? String(listing.time_credit_price) : '');
         setPriceType(listing.price_type ?? 'fixed');
         setCondition(listing.condition ?? 'good');
@@ -228,7 +237,7 @@ export function MarketplaceListingForm() {
         tagline: tagline.trim() || null,
         description: description.trim(),
         price: priceType === 'free' ? 0 : toNumber(price),
-        price_currency: 'EUR',
+        price_currency: currency,
         price_type: priceType,
         time_credit_price: toNumber(timeCredits),
         category_id: categoryId,
@@ -386,7 +395,10 @@ export function MarketplaceListingForm() {
             </HeroButton>
             <ButtonGroup label={t('forms.priceType')} values={PRICE_TYPES} selected={priceType} onSelect={setPriceType} labelFor={(value) => t(`priceType.${value}`)} primary={primary} />
             {priceType !== 'free' && priceType !== 'contact' ? (
-              <FormField label={t('forms.price')} value={price} onChangeText={setPrice} placeholder={t('forms.pricePlaceholder')} keyboardType="decimal-pad" />
+              <>
+                <FormField label={t('forms.price')} value={price} onChangeText={setPrice} placeholder={t('forms.pricePlaceholder')} keyboardType="decimal-pad" />
+                <ButtonGroup label={t('forms.currency')} values={CURRENCIES} selected={currency} onSelect={setCurrency} labelFor={(value) => value} primary={primary} />
+              </>
             ) : null}
             <FormField label={t('forms.timeCredits')} value={timeCredits} onChangeText={setTimeCredits} placeholder={t('forms.timeCreditsPlaceholder')} keyboardType="decimal-pad" />
             <ButtonGroup label={t('forms.condition')} values={CONDITIONS} selected={condition} onSelect={setCondition} labelFor={(value) => t(`condition.${value}`)} primary={primary} />

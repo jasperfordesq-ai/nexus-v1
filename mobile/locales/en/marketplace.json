@@ -139,6 +139,7 @@
     "generateDescriptionFailed": "Could not generate a description.",
     "priceType": "Price type",
     "price": "Price",
+    "currency": "Currency",
     "pricePlaceholder": "0.00",
     "timeCredits": "Time credits",
     "timeCreditsPlaceholder": "Optional time-credit value",

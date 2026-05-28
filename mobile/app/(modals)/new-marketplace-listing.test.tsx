@@ -32,6 +32,7 @@ jest.mock('react-i18next', () => ({
         'forms.generateDescriptionFailed': 'Could not generate a description.',
         'forms.priceType': 'Price type',
         'forms.price': 'Price',
+        'forms.currency': 'Currency',
         'forms.pricePlaceholder': '0.00',
         'forms.timeCredits': 'Time credits',
         'forms.timeCreditsPlaceholder': 'Optional',
@@ -163,6 +164,25 @@ describe('NewMarketplaceListingRoute', () => {
       });
     });
     expect(await findByDisplayValue('Generated mobile marketplace description.')).toBeTruthy();
+  });
+
+  it('sends the selected marketplace currency when creating a listing', async () => {
+    jest.mocked(createMarketplaceListing).mockResolvedValue({ data: { id: 88 } } as never);
+
+    const { getByPlaceholderText, getByText } = render(<NewMarketplaceListingRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('What are you selling?'), 'Garden shears');
+    fireEvent.changeText(getByPlaceholderText('Details'), 'Lightly used shears with clean blades.');
+    fireEvent.changeText(getByPlaceholderText('0.00'), '12.50');
+    fireEvent.press(getByText('USD'));
+    fireEvent.press(getByText('Publish'));
+
+    await waitFor(() => {
+      expect(createMarketplaceListing).toHaveBeenCalledWith(expect.objectContaining({
+        price: 12.5,
+        price_currency: 'USD',
+      }));
+    });
   });
 
   it('uploads a selected listing video after creating the listing', async () => {
