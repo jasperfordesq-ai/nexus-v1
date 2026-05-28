@@ -8,7 +8,7 @@ import { Alert, FlatList, Modal, ScrollView, TextInput, View } from 'react-nativ
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import AppTopBar from '@/components/ui/AppTopBar';
@@ -533,6 +533,7 @@ function CouponsPanel() {
   const [redemptionCoupon, setRedemptionCoupon] = useState<MerchantCoupon | null>(null);
   const [redemptions, setRedemptions] = useState<MerchantCouponRedemption[]>([]);
   const [isLoadingRedemptions, setIsLoadingRedemptions] = useState(false);
+  const [isSavingCoupon, setIsSavingCoupon] = useState(false);
   const coupons = useApi(() => getMerchantCoupons(), [], { enabled: true });
 
   function updateForm(key: keyof CouponFormState, value: string) {
@@ -560,6 +561,7 @@ function CouponsPanel() {
   async function save() {
     if (!form.title.trim()) return;
     const payload = couponPayload(form);
+    setIsSavingCoupon(true);
     try {
       if (editingCoupon) {
         await updateMerchantCoupon(editingCoupon.id, payload);
@@ -571,6 +573,8 @@ function CouponsPanel() {
       coupons.refresh();
     } catch (err) {
       Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.coupons.saveFailed'));
+    } finally {
+      setIsSavingCoupon(false);
     }
   }
 
@@ -611,6 +615,21 @@ function CouponsPanel() {
   return (
     <PanelCard icon="ticket-outline" title={t('tools.coupons.title')} subtitle={t('tools.coupons.subtitle')}>
       <View className="gap-3">
+        {editingCoupon ? (
+          <Surface variant="secondary" className="flex-row items-center gap-3 rounded-panel-inner p-3">
+            <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+              <Ionicons name="create-outline" size={18} color={primary} />
+            </View>
+            <View className="min-w-0 flex-1">
+              <Text className="text-sm font-bold" style={{ color: theme.text }} numberOfLines={1}>
+                {t('tools.coupons.editingTitle')}
+              </Text>
+              <Text className="font-mono text-xs" style={{ color: theme.textSecondary }} numberOfLines={1}>
+                {editingCoupon.code}
+              </Text>
+            </View>
+          </Surface>
+        ) : null}
         <FormInput label={t('tools.coupons.code')} value={form.code} onChangeText={(value) => updateForm('code', value.toUpperCase())} placeholder={t('tools.coupons.codePlaceholder')} />
         <FormInput label={t('tools.coupons.name')} value={form.title} onChangeText={(value) => updateForm('title', value)} placeholder={t('tools.coupons.namePlaceholder')} />
         <FormInput label={t('tools.coupons.description')} value={form.description} onChangeText={(value) => updateForm('description', value)} placeholder={t('tools.coupons.descriptionPlaceholder')} multiline />
@@ -674,8 +693,9 @@ function CouponsPanel() {
             ))}
           </ScrollView>
         </View>
-        <HeroButton variant="primary" onPress={save} isDisabled={!form.title.trim()}>
-          <HeroButton.Label>{editingCoupon ? t('tools.coupons.update') : t('tools.coupons.create')}</HeroButton.Label>
+        <HeroButton variant="primary" onPress={save} isDisabled={isSavingCoupon || !form.title.trim()} style={{ backgroundColor: primary }}>
+          {isSavingCoupon ? <Spinner size="sm" /> : null}
+          <HeroButton.Label>{isSavingCoupon ? t('tools.coupons.saving') : editingCoupon ? t('tools.coupons.update') : t('tools.coupons.create')}</HeroButton.Label>
         </HeroButton>
         {editingCoupon ? (
           <HeroButton variant="secondary" onPress={() => openEdit()}>
@@ -717,15 +737,7 @@ function CouponsPanel() {
             ) : (
               <ScrollView contentContainerStyle={{ gap: 10 }}>
                 {redemptions.map((redemption) => (
-                  <ToolRow
-                    key={redemption.id}
-                    icon="receipt-outline"
-                    title={t('tools.coupons.redemptionOrder', { order: redemption.order_id ?? '-' })}
-                    subtitle={t('tools.coupons.redemptionValue', {
-                      value: (redemption.discount_applied_cents / 100).toFixed(2),
-                      date: redemption.redeemed_at ? new Date(redemption.redeemed_at).toLocaleDateString() : t('tools.coupons.dateUnknown'),
-                    })}
-                  />
+                  <RedemptionRow key={redemption.id} redemption={redemption} />
                 ))}
               </ScrollView>
             )}
@@ -733,6 +745,44 @@ function CouponsPanel() {
         </View>
       </Modal>
     </PanelCard>
+  );
+}
+
+function RedemptionRow({ redemption }: { redemption: MerchantCouponRedemption }) {
+  const { t } = useTranslation('marketplace');
+  const theme = useTheme();
+  const primary = usePrimaryColor();
+  const redeemedAt = redemption.redeemed_at ? new Date(redemption.redeemed_at).toLocaleString() : t('tools.coupons.dateUnknown');
+
+  return (
+    <Surface variant="secondary" className="gap-3 rounded-panel-inner p-3">
+      <View className="flex-row items-start gap-3">
+        <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+          <Ionicons name="receipt-outline" size={18} color={primary} />
+        </View>
+        <View className="min-w-0 flex-1 gap-1">
+          <Text className="text-sm font-bold" style={{ color: theme.text }} numberOfLines={1}>
+            {t('tools.coupons.redemptionOrder', { order: redemption.order_id ?? '-' })}
+          </Text>
+          <Text className="text-xs leading-4" style={{ color: theme.textSecondary }}>
+            {t('tools.coupons.redemptionValue', {
+              value: (redemption.discount_applied_cents / 100).toFixed(2),
+              date: redeemedAt,
+            })}
+          </Text>
+        </View>
+      </View>
+      <View className="flex-row flex-wrap gap-2">
+        <Chip size="sm" variant="secondary">
+          <Chip.Label>{t('tools.coupons.redemptionMember', { member: redemption.user_id })}</Chip.Label>
+        </Chip>
+        {redemption.redemption_method ? (
+          <Chip size="sm" variant="secondary">
+            <Chip.Label>{t('tools.coupons.redemptionMethod', { method: redemption.redemption_method })}</Chip.Label>
+          </Chip>
+        ) : null}
+      </View>
+    </Surface>
   );
 }
 
