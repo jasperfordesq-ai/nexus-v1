@@ -175,7 +175,16 @@ function ConnectionCard({
   }
 
   function openMessage() {
-    router.push({ pathname: '/(modals)/federation-messages', params: { compose: 'true', to_user: String(connection.user_id), to_tenant: String(connection.tenant_id), name: connection.name } } as unknown as Href);
+    router.push({
+      pathname: '/(modals)/federation-messages',
+      params: {
+        compose: 'true',
+        to_user: String(connection.user_id),
+        to_tenant: String(connection.tenant_id),
+        name: connection.name,
+        community: connection.tenant_name,
+      },
+    } as unknown as Href);
   }
 
   return (

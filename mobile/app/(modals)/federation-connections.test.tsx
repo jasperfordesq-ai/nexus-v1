@@ -110,5 +110,12 @@ describe('FederationConnectionsRoute', () => {
       pathname: '/(modals)/federation-member',
       params: { id: '272', tenant_id: '5' },
     });
+
+    router.push.mockClear();
+    fireEvent.press(getByText('Message'));
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/(modals)/federation-messages',
+      params: { compose: 'true', to_user: '272', to_tenant: '5', name: 'Katherine', community: 'Partner Timebank' },
+    });
   });
 });
