@@ -77,6 +77,18 @@ const MARKETPLACE: MenuItem[] = [
   { labelKey: 'marketplacePayments', descriptionKey: 'navDescriptions.marketplacePayments', icon: 'card-outline', route: '/(modals)/marketplace-stripe-onboarding' as Href, tone: '#0f766e', featureGate: 'marketplace' },
 ];
 
+const FEDERATION: MenuItem[] = [
+  { labelKey: 'federationHub', descriptionKey: 'navDescriptions.federationHub', icon: 'git-network-outline', route: '/(modals)/federation' as Href, tone: '#0ea5e9', featureGate: 'federation' },
+  { labelKey: 'federationPartners', descriptionKey: 'navDescriptions.federationPartners', icon: 'globe-outline', route: '/(modals)/federation-partners' as Href, tone: '#6366f1', featureGate: 'federation' },
+  { labelKey: 'federationMembers', descriptionKey: 'navDescriptions.federationMembers', icon: 'people-outline', route: '/(modals)/federation-members' as Href, tone: '#a855f7', featureGate: 'federation' },
+  { labelKey: 'federationConnections', descriptionKey: 'navDescriptions.federationConnections', icon: 'person-add-outline', route: '/(modals)/federation-connections' as Href, tone: '#14b8a6', featureGate: 'federation' },
+  { labelKey: 'federationMessages', descriptionKey: 'navDescriptions.federationMessages', icon: 'chatbubbles-outline', route: '/(modals)/federation-messages' as Href, tone: '#06b6d4', featureGate: 'federation' },
+  { labelKey: 'federationListings', descriptionKey: 'navDescriptions.federationListings', icon: 'list-outline', route: '/(modals)/federation-listings' as Href, tone: '#f59e0b', featureGate: 'federation' },
+  { labelKey: 'federationGroups', descriptionKey: 'navDescriptions.federationGroups', icon: 'people-circle-outline', route: '/(modals)/federation-groups' as Href, tone: '#8b5cf6', featureGate: 'federation' },
+  { labelKey: 'federationEvents', descriptionKey: 'navDescriptions.federationEvents', icon: 'calendar-outline', route: '/(modals)/federation-events' as Href, tone: '#f43f5e', featureGate: 'federation' },
+  { labelKey: 'federationSettings', descriptionKey: 'navDescriptions.federationSettings', icon: 'settings-outline', route: '/(modals)/federation-settings' as Href, tone: '#64748b', featureGate: 'federation' },
+];
+
 const ACCOUNT: MenuItem[] = [
   { labelKey: 'settings', descriptionKey: 'navDescriptions.settings', icon: 'settings-outline', route: '/(modals)/settings', tone: '#64748b' },
 ];
@@ -92,6 +104,7 @@ export default function MoreScreen() {
   const balance = typeof rawBalance === 'number' && Number.isFinite(rawBalance) ? rawBalance : null;
   const visibleDiscover = DISCOVER.filter((item) => !item.featureGate || hasFeature(item.featureGate));
   const visibleMarketplace = MARKETPLACE.filter((item) => !item.featureGate || hasFeature(item.featureGate));
+  const visibleFederation = FEDERATION.filter((item) => !item.featureGate || hasFeature(item.featureGate));
 
   function navigate(route: Href) {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -166,6 +179,7 @@ export default function MoreScreen() {
 
         <MenuSection title={t('discover')} items={visibleDiscover} onNavigate={navigate} theme={theme} />
         <MenuSection title={t('marketplaceSection')} items={visibleMarketplace} onNavigate={navigate} theme={theme} />
+        <MenuSection title={t('federationSection')} items={visibleFederation} onNavigate={navigate} theme={theme} />
         <MenuSection title={t('mySpace')} items={MY_SPACE} onNavigate={navigate} theme={theme} />
         <MenuSection title={t('account')} items={ACCOUNT} onNavigate={navigate} theme={theme} />
 

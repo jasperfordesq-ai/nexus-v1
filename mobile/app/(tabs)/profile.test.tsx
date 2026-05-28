@@ -67,6 +67,16 @@ jest.mock('react-i18next', () => ({
         'blog': 'Blog',
         'skills': 'Skills & Endorsements',
         'federation': 'Federation',
+        'federationSection': 'Partner communities',
+        'federationHub': 'Federation hub',
+        'federationPartners': 'Partner communities',
+        'federationMembers': 'Federated members',
+        'federationConnections': 'Federation connections',
+        'federationMessages': 'Federated messages',
+        'federationListings': 'Federated listings',
+        'federationGroups': 'Federated groups',
+        'federationEvents': 'Federated events',
+        'federationSettings': 'Federation settings',
         'myProfile': 'My Profile',
         'mySpace': 'My Space',
         'discover': 'Discover',
@@ -115,6 +125,15 @@ jest.mock('react-i18next', () => ({
         'navDescriptions.skills': 'Manage your skills and member endorsements.',
         'navDescriptions.aiChat': 'Ask the assistant for help finding your way around.',
         'navDescriptions.federation': 'Explore partner communities and cross-timebank tools.',
+        'navDescriptions.federationHub': 'Review federation status, partners, activity, and quick links.',
+        'navDescriptions.federationPartners': 'Browse partner communities connected to your timebank.',
+        'navDescriptions.federationMembers': 'Find members across connected communities.',
+        'navDescriptions.federationConnections': 'Manage cross-community connection requests.',
+        'navDescriptions.federationMessages': 'Open conversations with members in partner communities.',
+        'navDescriptions.federationListings': 'Browse federated offers and requests.',
+        'navDescriptions.federationGroups': 'Explore groups shared by partner communities.',
+        'navDescriptions.federationEvents': 'Discover events from connected communities.',
+        'navDescriptions.federationSettings': 'Review federation visibility and sharing preferences.',
         'navDescriptions.settings': 'Security, notifications, preferences, and account controls.',
         'common:buttons.cancel': 'Cancel',
         'common:attribution': 'Project NEXUS is open-source software licensed under AGPL-3.0-or-later.',
@@ -257,6 +276,28 @@ describe('MoreScreen (More tab)', () => {
     expect(getByText('Saved searches')).toBeTruthy();
     expect(getByText('Seller tools')).toBeTruthy();
     expect(getByText('Seller payments')).toBeTruthy();
+  });
+
+  it('renders direct federation shortcuts in the partner communities section', () => {
+    const { getAllByText, getByText } = render(<MoreScreen />);
+
+    expect(getAllByText('Partner communities').length).toBeGreaterThanOrEqual(2);
+    expect(getByText('Federation hub')).toBeTruthy();
+    expect(getByText('Federated members')).toBeTruthy();
+    expect(getByText('Federation connections')).toBeTruthy();
+    expect(getByText('Federated messages')).toBeTruthy();
+    expect(getByText('Federated listings')).toBeTruthy();
+    expect(getByText('Federated groups')).toBeTruthy();
+    expect(getByText('Federated events')).toBeTruthy();
+    expect(getByText('Federation settings')).toBeTruthy();
+  });
+
+  it('opens federated members directly from the partner communities shortcuts', () => {
+    const { getByLabelText } = render(<MoreScreen />);
+
+    fireEvent.press(getByLabelText('Federated members'));
+
+    expect(router.push).toHaveBeenCalledWith('/(modals)/federation-members');
   });
 
   it('opens the seller sales orders view from Marketplace shortcuts', () => {
