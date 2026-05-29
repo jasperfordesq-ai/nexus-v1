@@ -52,7 +52,7 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
             </span>
             <span>
               <span className="block text-sm font-black tracking-[0.18em] text-white uppercase">Project NEXUS</span>
-              <span className="block text-xs text-[var(--nexus-muted)]">Open-source community infrastructure</span>
+              <span className="block text-xs text-[var(--nexus-muted)]">Community infrastructure OS</span>
             </span>
           </a>
 
@@ -152,7 +152,7 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
               <span className="font-black tracking-[0.16em] uppercase">Project NEXUS</span>
             </div>
             <p className="max-w-md text-sm leading-7 text-white/62">
-              Community timebanking from EUR29/month, plus full managed platform hosting for volunteering, civic participation, federation, and multi-community networks.
+              Community Timebanking from EUR29/month, plus full managed platform hosting for volunteering, civic participation, federation, accessibility, and multi-community networks.
             </p>
             <p className="mt-4 max-w-md text-xs leading-6 text-white/52">
               Managed hosting in association with PROJECT NEXUS PLATFORM IRELAND LTD, hosting partner. Reg. Number 812763.

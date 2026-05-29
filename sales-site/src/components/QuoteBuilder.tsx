@@ -183,9 +183,9 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
               <Calculator className="size-4" />
               Quote builder
             </p>
-            <h2 className="text-3xl font-black text-white md:text-5xl">Choose the right commercial lane.</h2>
+            <h2 className="mt-3 text-3xl font-black text-white md:text-5xl">Build a credible procurement estimate.</h2>
             <p className="mt-5 max-w-xl text-base leading-7 text-white/64">
-              The entry offer is deliberately cheaper and deliberately narrower. Full platform hosting still prices by capacity, operations, support, and launch work.
+              The workbench keeps the quote honest: choose the lane, size the audience, select support cover, and add launch services without hiding the open-source path.
             </p>
 
             <Card className="nexus-surface nexus-surface--raised mt-8 p-5">
