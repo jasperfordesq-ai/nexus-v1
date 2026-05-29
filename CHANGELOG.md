@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **"Report a problem" is now logged-in only, and de-duplicated.** The floating problem-reporter (bottom-right) no longer renders for anonymous visitors, and the duplicate "Report a problem" link in the desktop footer was removed since the floating reporter already covers desktop. This stops logged-out traffic from cluttering support reports / Sentry. (Submissions were already auth-gated server-side via `requireAuth` and rate-limited at 10/min; this closes the visible entry point too.)
+
 - **Proprietary brand names removed from the Caring Community module.** All visible mentions of "KISS", "AGORIS/Agoris", "Age-Stiftung", and "Koordination und Innovation für Soziales" have been replaced with "Caring Community" throughout the frontend, admin panel, and all 11 language files. The Agoris node option was removed from the pilot inquiry form. Database table and column names, the `agoris` tenant slug, and internal service class names are unchanged.
 
 - **React upgraded from 18 to 19.** Full production upgrade including React 19 concurrent features, updated type definitions (`@types/react` 19.x), and Vitest/testing-library compatibility fixes. All 223 usages of deprecated APIs resolved. Build, type-check, and smoke tests pass.

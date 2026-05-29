@@ -15,7 +15,6 @@ import Sparkles from 'lucide-react/icons/sparkles';
 import { RELEASE_STATUS } from '@/config/releaseStatus';
 import { SourceRepositoryLink } from './SourceRepositoryLink';
 import { Button } from '@/components/ui';
-import { ReportProblemButton } from '@/components/feedback/ReportProblemButton';
 
 
 export interface FooterProps {
@@ -169,12 +168,11 @@ export function Footer({ children, copyright }: FooterProps) {
                   <li><FooterLink href={tenantPath('/trust-and-safety')}>{t('footer.trust_safety')}</FooterLink></li>
                   <li><FooterLink href={tenantPath('/contact')}>{t('footer.contact_us')}</FooterLink></li>
                   <li><FooterLink href={tenantPath('/about')}>{t('footer.about')}</FooterLink></li>
-                  <li>
-                    <ReportProblemButton
-                      mode="footer-link"
-                      className="inline-flex min-h-0 min-w-0 gap-1.5 px-0 py-0 text-sm text-theme-muted hover:text-theme-primary"
-                    />
-                  </li>
+                  {/*
+                    "Report a problem" intentionally removed from the footer: it is desktop-only
+                    here, and the floating reporter (bottom-right, logged-in users only) already
+                    covers desktop. Keeping both duplicated the entry point.
+                  */}
                 </ul>
               </nav>
 

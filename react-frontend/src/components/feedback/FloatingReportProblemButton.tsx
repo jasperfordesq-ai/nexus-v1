@@ -4,8 +4,16 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { ReportProblemButton } from '@/components/feedback/ReportProblemButton';
+import { useAuth } from '@/contexts';
 
 export function FloatingReportProblemButton() {
+  const { isAuthenticated } = useAuth();
+
+  // Logged-in users only — keeps anonymous traffic from spamming support reports / Sentry.
+  if (!isAuthenticated) {
+    return null;
+  }
+
   return (
     <div
       className="fixed bottom-[calc(var(--safe-area-bottom)+5.25rem)] right-3 z-280 md:bottom-6 md:right-6"
