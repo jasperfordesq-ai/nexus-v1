@@ -47,8 +47,10 @@ export interface Event {
   category: EventCategory | null;
   rsvp_counts: RsvpCounts;
   attendees_count: number;
+  waitlist_count?: number | null;
   /** Present when the request was authenticated. */
   user_rsvp: 'going' | 'interested' | 'not_going' | null;
+  user_waitlist_position?: number | null;
 }
 
 export interface EventsResponse {
@@ -106,6 +108,106 @@ export interface RsvpResponse {
   rsvp_counts: RsvpCounts;
 }
 
+export interface EventReminder {
+  remind_before_minutes: number;
+  reminder_type: 'platform' | 'email' | 'both';
+  status: 'pending' | 'sent' | 'cancelled' | string;
+  scheduled_for: string;
+}
+
+export interface EventAttendee {
+  id: number;
+  name: string;
+  first_name?: string | null;
+  last_name?: string | null;
+  avatar?: string | null;
+  avatar_url?: string | null;
+  rsvp_status?: 'going' | 'interested' | 'invited' | 'attended' | string | null;
+  status?: string | null;
+  checked_in?: boolean;
+  rsvp_at?: string | null;
+}
+
+export interface EventAttendeesResponse {
+  data: EventAttendee[];
+  meta: {
+    per_page: number;
+    has_more: boolean;
+    cursor: string | null;
+  };
+}
+
+export interface CheckInEventAttendeeResponse {
+  data: {
+    checked_in: boolean;
+    attendee_id: number;
+    event_id: number;
+    hours_credited?: number | null;
+  };
+}
+
+export interface EventWaitlistEntry {
+  id: number;
+  user_id?: number | null;
+  name: string;
+  first_name?: string | null;
+  last_name?: string | null;
+  avatar?: string | null;
+  avatar_url?: string | null;
+  position: number;
+  status?: string | null;
+}
+
+export interface EventWaitlistResponse {
+  data: EventWaitlistEntry[];
+  meta: {
+    has_more: boolean;
+    user_position: number | null;
+  };
+}
+
+export interface JoinEventWaitlistResponse {
+  data: {
+    waitlisted: boolean;
+    position: number | null;
+  };
+}
+
+export interface EventPollOption {
+  id: number;
+  text?: string | null;
+  label?: string | null;
+  vote_count?: number;
+  percentage?: number;
+}
+
+export interface EventPoll {
+  id: number;
+  question: string;
+  description?: string | null;
+  status?: 'open' | 'closed' | string;
+  is_active?: boolean;
+  total_votes?: number;
+  has_voted?: boolean;
+  voted_option_id?: number | null;
+  user_vote_option_id?: number | null;
+  options: EventPollOption[];
+}
+
+export interface EventPollsResponse {
+  data: EventPoll[];
+  meta?: {
+    per_page?: number;
+    has_more?: boolean;
+    cursor?: string | null;
+  };
+}
+
+export interface UpdateEventReminderInput {
+  minutes: 60 | 1440 | 10080;
+  type?: 'platform' | 'email' | 'both';
+}
+
 /**
  * POST /api/v2/events/{id}/rsvp — set or update RSVP status.
  * status: 'going' | 'interested' | 'not_going'
@@ -122,6 +224,84 @@ export function rsvpEvent(
  */
 export function removeRsvp(eventId: number): Promise<void> {
   return api.delete<void>(`${API_V2}/events/${eventId}/rsvp`);
+}
+
+/**
+ * GET /api/v2/events/{id}/reminders — get reminders for the authenticated user.
+ */
+export function getEventReminders(eventId: number): Promise<{ data: EventReminder[] }> {
+  return api.get<{ data: EventReminder[] }>(`${API_V2}/events/${eventId}/reminders`);
+}
+
+/**
+ * PUT /api/v2/events/{id}/reminders — replace reminders for the authenticated user.
+ */
+export function updateEventReminders(
+  eventId: number,
+  reminders: UpdateEventReminderInput[],
+): Promise<{ data: EventReminder[] }> {
+  return api.put<{ data: EventReminder[] }>(`${API_V2}/events/${eventId}/reminders`, { reminders });
+}
+
+/**
+ * GET /api/v2/events/{id}/attendees — list event RSVPs for organizer workflows.
+ */
+export function getEventAttendees(
+  eventId: number,
+  options: { perPage?: number; status?: 'going' | 'interested' | 'invited' | 'attended' | 'all'; cursor?: string | null } = {},
+): Promise<EventAttendeesResponse> {
+  const params: Record<string, string> = {
+    per_page: String(options.perPage ?? 50),
+    status: options.status ?? 'all',
+  };
+  if (options.cursor) params['cursor'] = options.cursor;
+  return api.get<EventAttendeesResponse>(`${API_V2}/events/${eventId}/attendees`, params);
+}
+
+/**
+ * POST /api/v2/events/{id}/attendees/{attendeeId}/check-in — organizer attendee check-in.
+ */
+export function checkInEventAttendee(eventId: number, attendeeId: number): Promise<CheckInEventAttendeeResponse> {
+  return api.post<CheckInEventAttendeeResponse>(`${API_V2}/events/${eventId}/attendees/${attendeeId}/check-in`);
+}
+
+/**
+ * GET /api/v2/events/{id}/waitlist — load waitlist state for the authenticated user.
+ */
+export function getEventWaitlist(eventId: number, perPage = 20): Promise<EventWaitlistResponse> {
+  return api.get<EventWaitlistResponse>(`${API_V2}/events/${eventId}/waitlist`, { per_page: String(perPage) });
+}
+
+/**
+ * POST /api/v2/events/{id}/waitlist — join an event waitlist.
+ */
+export function joinEventWaitlist(eventId: number): Promise<JoinEventWaitlistResponse> {
+  return api.post<JoinEventWaitlistResponse>(`${API_V2}/events/${eventId}/waitlist`);
+}
+
+/**
+ * DELETE /api/v2/events/{id}/waitlist — leave an event waitlist.
+ */
+export function leaveEventWaitlist(eventId: number): Promise<void> {
+  return api.delete<void>(`${API_V2}/events/${eventId}/waitlist`);
+}
+
+/**
+ * GET /api/v2/polls?event_id={id} — load polls linked to an event.
+ */
+export function getEventPolls(eventId: number): Promise<EventPollsResponse> {
+  return api.get<EventPollsResponse>(`${API_V2}/polls`, {
+    event_id: String(eventId),
+    status: 'all',
+    per_page: '50',
+  });
+}
+
+/**
+ * POST /api/v2/polls/{id}/vote — vote on an event-linked poll.
+ */
+export function voteEventPoll(pollId: number, optionId: number): Promise<{ data: EventPoll }> {
+  return api.post<{ data: EventPoll }>(`${API_V2}/polls/${pollId}/vote`, { option_id: optionId });
 }
 
 /**

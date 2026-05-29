@@ -1,10 +1,24 @@
 {
   "title": "Chat IA",
-  "placeholder": "Chiedi qualsiasi cosa sulla banca del tempo…",
+  "placeholder": "Chiedi qualsiasi cosa sulla banca del tempoâ€¦",
   "send": "Invia",
   "empty": "Inizia una conversazione con l'assistente IA.",
   "error": "Impossibile inviare il messaggio.",
-  "thinking": "Sto pensando…",
+  "thinking": "Sto pensandoâ€¦",
   "timeout": "La risposta sta impiegando troppo tempo. Riprova.",
-  "disclaimer": "Le risposte dell'IA potrebbero non essere sempre accurate."
+  "disclaimer": "Le risposte dell'IA potrebbero non essere sempre accurate.",
+  "tool_results": {
+    "label": "Results",
+    "fallbackTitle": "Result",
+    "open": "Open {{title}}",
+    "type": {
+      "listing": "Listing",
+      "member": "Member",
+      "event": "Event",
+      "job": "Job",
+      "marketplace": "Marketplace",
+      "kb": "Knowledge base",
+      "wallet": "Wallet"
+    }
+  }
 }

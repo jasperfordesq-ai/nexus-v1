@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useMemo, useState } from 'react';
-import { FlatList, Image, Pressable, RefreshControl, Text, View } from 'react-native';
+import { FlatList, Image, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -192,10 +192,11 @@ function GroupCard({
   const visibilityIcon: IoniconName = item.visibility === 'private' ? 'lock-closed-outline' : 'globe-outline';
 
   return (
-    <Pressable
+    <HeroButton
       className="mx-4 my-2"
+      variant="ghost"
+      feedbackVariant="scale"
       onPress={onPress}
-      accessibilityRole="button"
       accessibilityLabel={item.name ?? ''}
     >
       <HeroCard className="min-h-[148px] w-full rounded-panel p-0">
@@ -252,7 +253,7 @@ function GroupCard({
           </View>
         </HeroCard.Body>
       </HeroCard>
-    </Pressable>
+    </HeroButton>
   );
 }
 

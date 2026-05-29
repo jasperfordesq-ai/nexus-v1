@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, Pressable, RefreshControl, ScrollView, Share, Text, View } from 'react-native';
+import { Alert, RefreshControl, ScrollView, Share, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -1312,11 +1312,13 @@ function ListingsSection({
           listings.map((listing) => {
             const isOffer = listing.type === 'offer';
             return (
-              <Pressable
+              <HeroButton
                 key={String(listing.id)}
-                accessibilityRole={isFederatedProfile ? undefined : 'button'}
+                variant="ghost"
+                feedbackVariant="scale"
+                className="w-full p-0"
                 accessibilityLabel={t('profile.viewListing', { title: listing.title })}
-                disabled={isFederatedProfile}
+                isDisabled={isFederatedProfile}
                 onPress={
                   isFederatedProfile
                     ? undefined
@@ -1358,7 +1360,7 @@ function ListingsSection({
                   {!isFederatedProfile ? <Ionicons name="chevron-forward" size={18} color={primary} /> : null}
                 </View>
                 </Surface>
-              </Pressable>
+              </HeroButton>
             );
           })
         ) : (

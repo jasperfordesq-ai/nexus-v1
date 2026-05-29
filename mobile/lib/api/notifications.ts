@@ -67,3 +67,8 @@ export function markRead(id: number): Promise<void> {
 export function markAllRead(): Promise<void> {
   return api.post<void>(`${API_V2}/notifications/read-all`);
 }
+
+/** DELETE /api/v2/notifications/{id} */
+export function deleteNotification(id: number): Promise<void> {
+  return api.delete<void>(`${API_V2}/notifications/${id}`);
+}

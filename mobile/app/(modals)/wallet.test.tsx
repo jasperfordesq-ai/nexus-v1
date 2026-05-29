@@ -133,6 +133,7 @@ jest.mock('@/components/ui/AppTopBar', () => 'View');
 // --- Tests ---
 
 import WalletModal from './wallet';
+import { searchWalletUsers } from '@/lib/api/wallet';
 
 const defaultApiState = { data: null, isLoading: false, error: null, refresh: jest.fn() };
 
@@ -287,6 +288,39 @@ describe('WalletModal', () => {
 
     expect(getByDisplayValue('2')).toBeTruthy();
     expect(getByDisplayValue('Garden help')).toBeTruthy();
+  });
+
+  it('selects transfer recipients from HeroUI Native-backed search result rows', async () => {
+    const walletState = { data: { data: { balance: 12.5, total_credits: 20, total_debits: 7.5, currency: 'hours' } }, isLoading: false, error: null, refresh: jest.fn() };
+    const transactionsState = { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
+    const fundState = { data: { data: { balance: 3, total_deposited: 5, total_donated: 2 } }, isLoading: false, error: null, refresh: jest.fn() };
+    let apiCall = 0;
+    jest.mocked(searchWalletUsers).mockResolvedValueOnce({
+      data: {
+        users: [
+          { id: 42, name: 'Alice Smith', avatar_url: null, email: 'alice@example.test' },
+        ],
+      },
+    } as never);
+    mockUseApi
+      .mockReset()
+      .mockImplementation(() => {
+        const states = [walletState, transactionsState, fundState];
+        const state = states[apiCall % states.length];
+        apiCall += 1;
+        return state;
+      });
+
+    const { findByText, getByPlaceholderText, getByText } = render(<WalletModal />);
+
+    fireEvent.press(getByText('Send credits'));
+    fireEvent.changeText(getByPlaceholderText('Search by name or email'), 'Alice');
+    fireEvent.press(getByText('Search members'));
+
+    fireEvent.press(await findByText('Alice Smith'));
+
+    expect(await findByText('Selected recipient')).toBeTruthy();
+    expect(searchWalletUsers).toHaveBeenCalledWith('Alice', 10);
   });
 
   it('loads the next transaction page when more history is available', async () => {

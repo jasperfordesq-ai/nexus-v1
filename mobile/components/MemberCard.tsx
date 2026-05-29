@@ -3,11 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from '@/lib/haptics';
-import { Card as HeroCard, Chip, Separator, Surface } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, Separator, Surface } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import { type Member } from '@/lib/api/members';
@@ -31,13 +31,14 @@ export default function MemberCard({ member }: MemberCardProps) {
   const totalExchanged = (member.total_hours_given ?? 0) + (member.total_hours_received ?? 0);
 
   return (
-    <Pressable
+    <HeroButton
+      variant="ghost"
+      feedbackVariant="scale"
       className="mx-4 my-2"
       onPress={() => {
         void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         router.push({ pathname: '/(modals)/member-profile', params: { id: String(member.id) } });
       }}
-      accessibilityRole="button"
       accessibilityLabel={t('memberCard.accessibilityLabel', { name: displayName })}
     >
       <HeroCard variant="default" className="w-full overflow-hidden">
@@ -102,6 +103,6 @@ export default function MemberCard({ member }: MemberCardProps) {
           <Ionicons name="arrow-forward" size={17} color={primary} />
         </HeroCard.Footer>
       </HeroCard>
-    </Pressable>
+    </HeroButton>
   );
 }

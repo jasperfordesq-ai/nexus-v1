@@ -13,6 +13,20 @@
     "loading": "A carregar feed…",
     "emptySubtitle": "Começa a ligar-te à tua comunidade para ver publicações aqui."
   },
+  "activity": {
+    "title": "Activity",
+    "subtitle": "Your recent timebanking and community activity.",
+    "hoursGiven": "Hours given",
+    "hoursReceived": "Hours received",
+    "netBalance": "{{count}}h net",
+    "connections": "Connections",
+    "groupsJoined": "Groups joined",
+    "posts": "Posts",
+    "skills": "Skills",
+    "recent": "Recent activity",
+    "emptyTitle": "No activity yet",
+    "emptySubtitle": "Your activity will appear here after you take part."
+  },
   "listings": {
     "title": "Anúncios",
     "offer": "Ofertas",
@@ -35,5 +49,40 @@
   },
   "likePost": "Gostar desta publicação",
   "unlikePost": "Deixar de gostar desta publicação",
-  "readMore": "Ler mais"
+  "readMore": "Ler mais",
+  "composer": {
+    "hashtags": "Hashtags"
+  },
+  "dashboard": {
+    "balance": "Saldo",
+    "hours": "{{count}} horas",
+    "upcomingEvents": "Eventos futuros",
+    "openRequests": "Pedidos abertos",
+    "notifications": "Notificacoes",
+    "unavailable": "-",
+    "openCard": "Abrir {{label}}"
+  },
+  "hashtags": {
+    "title": "Hashtags",
+    "eyebrow": "Descobrir",
+    "subtitle": "Encontra topicos ativos e conversas no teu feed.",
+    "searchPlaceholder": "Pesquisar hashtags",
+    "postCount": "{{count}} publicacoes",
+    "open": "Abrir",
+    "openTag": "Abrir #{{tag}}",
+    "loadFailed": "Nao foi possivel carregar hashtags.",
+    "unableToLoad": "Nao foi possivel carregar hashtags",
+    "emptyTitle": "Nenhuma hashtag encontrada",
+    "emptySubtitle": "Os topicos em tendencia aparecem aqui quando membros etiquetam publicacoes.",
+    "noMatch": "Nenhuma hashtag corresponde a \"{{query}}\"."
+  },
+  "hashtag": {
+    "title": "Hashtag",
+    "subtitle": "Publicacoes etiquetadas",
+    "postCount": "{{count}} publicacoes",
+    "loadFailed": "Nao foi possivel carregar publicacoes desta hashtag.",
+    "unableToLoad": "Nao foi possivel carregar esta hashtag",
+    "emptyTitle": "Ainda nao ha publicacoes",
+    "emptySubtitle": "Ainda nao ha publicacoes etiquetadas com #{{tag}}."
+  }
 }

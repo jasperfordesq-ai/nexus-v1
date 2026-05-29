@@ -102,8 +102,12 @@ describe('GroupEventsTab', () => {
 
   it('shows loading spinner when eventsLoading is true', () => {
     render(<GroupEventsTab groupId={1} events={[]} eventsLoading={true} isMember={false} />);
-    // Spinner should be present
-    expect(document.querySelector('[class*="spinner"]') || document.querySelector('svg')).toBeTruthy();
+    // Spinner should be present (Spinner stub renders role="status")
+    expect(
+      document.querySelector('[role="status"]') ||
+        document.querySelector('[class*="spinner"]') ||
+        document.querySelector('svg')
+    ).toBeTruthy();
   });
 
   it('renders event location', () => {

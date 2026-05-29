@@ -11,5 +11,8 @@
   "justNow": "Proprio ora",
   "minutesAgo": "{{count}} min fa",
   "hoursAgo": "{{count}} ore fa",
-  "daysAgo": "{{count}} g fa"
+  "daysAgo": "{{count}} g fa",
+  "markRead": "Mark read",
+  "delete": "Delete",
+  "deleteError": "Could not delete notification."
 }

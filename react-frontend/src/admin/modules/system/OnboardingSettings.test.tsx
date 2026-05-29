@@ -149,9 +149,10 @@ describe('OnboardingSettings', () => {
     mockGet.mockReturnValue(new Promise(() => {}));
     render(<OnboardingSettings />);
 
-    // The component renders a Spinner while loading — detect via role="progressbar"
-    // or the HeroUI spinner class
-    const spinner = document.querySelector('[role="progressbar"]') ||
+    // The component renders a Spinner while loading. The mocked Spinner exposes
+    // role="status"; the real one uses role="progressbar" or the spinner class.
+    const spinner = document.querySelector('[role="status"]') ||
+                    document.querySelector('[role="progressbar"]') ||
                     document.querySelector('.animate-spinner-ease-spin');
     expect(spinner).toBeTruthy();
 

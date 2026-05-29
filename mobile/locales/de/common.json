@@ -49,6 +49,7 @@
   "endOfList": "Du hast das Ende erreicht",
   "aria": {
     "actionButton": "Aktionsschaltfläche",
+    "carouselImage": "Bild {{current}} von {{total}}",
     "verification_badges": "Verifizierungslabels"
   },
   "verification": {

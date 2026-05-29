@@ -72,6 +72,7 @@ import { useAuth,
   useTheme,
   useMenuContext } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { hasAdminPanelAccess, hasBrokerPanelAccess } from '@/lib/access';
 import { buildAccessibleFrontendUrl } from '@/lib/accessible-frontend';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { DesktopMenuItems } from '@/components/navigation';
@@ -121,7 +122,7 @@ export function getVisibleCommunityItems(
 export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChange, isMobileMenuOpen }: NavbarProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { t } = useTranslation('common');
+  const { t } = useTranslation(['common', 'broker']);
   const { user, isAuthenticated, logout } = useAuth();
   const { tenant, hasFeature, hasModule, tenantPath } = useTenant();
   const { counts } = useNotifications();
@@ -153,8 +154,9 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     return () => observer.disconnect();
   }, []);
 
-  // Compute admin status once
-  const isAdmin = Boolean(user?.role === 'admin' || user?.role === 'tenant_admin' || user?.role === 'super_admin' || user?.is_admin || user?.is_super_admin || user?.is_tenant_super_admin);
+  // Compute privileged panel access once.
+  const isAdmin = hasAdminPanelAccess(user);
+  const isBroker = !isAdmin && hasBrokerPanelAccess(user);
 
   // Search state — can be controlled externally
   const [internalSearchOpen, setInternalSearchOpen] = useState(false);
@@ -466,18 +468,20 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 </>
               )}
               {/* Admin links — admin users only */}
-              {isAuthenticated && isAdmin && (
+              {isAuthenticated && (isAdmin || isBroker) && (
                 <>
                   <span className="text-[var(--border-default)] text-xs select-none shrink-0">|</span>
                   <Button
                     variant="light"
                     size="sm"
                     className="text-theme-muted hover:text-theme-primary h-7 min-w-0 px-2 gap-1 text-xs shrink-0"
-                    onPress={() => navigate(tenantPath('/admin'))}
-                    aria-label={t('user_menu.admin_panel')}
+                    onPress={() => navigate(tenantPath(isBroker ? '/broker' : '/admin'))}
+                    aria-label={isBroker ? t('broker:sidebar.title') : t('user_menu.admin_panel')}
                   >
                     <Shield className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-                    <span className="hidden md:inline">{t('user_menu.admin_panel')}</span>
+                    <span className="hidden md:inline">
+                      {isBroker ? t('broker:sidebar.title') : t('user_menu.admin_panel')}
+                    </span>
                   </Button>
                 </>
               )}

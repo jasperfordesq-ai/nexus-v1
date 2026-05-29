@@ -25,6 +25,7 @@ import {
   getNotificationCounts,
   markRead,
   markAllRead,
+  deleteNotification,
 } from './notifications';
 import type { NotificationListResponse, NotificationCounts } from './notifications';
 
@@ -136,5 +137,15 @@ describe('markAllRead', () => {
     (api.post as jest.Mock).mockResolvedValue(undefined);
     await markAllRead();
     expect(api.post).toHaveBeenCalledWith('/api/v2/notifications/read-all');
+  });
+});
+
+describe('deleteNotification', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('sends DELETE to /api/v2/notifications/{id}', async () => {
+    (api.delete as jest.Mock).mockResolvedValue(undefined);
+    await deleteNotification(7);
+    expect(api.delete).toHaveBeenCalledWith('/api/v2/notifications/7');
   });
 });

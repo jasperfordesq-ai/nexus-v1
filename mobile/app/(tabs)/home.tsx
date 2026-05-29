@@ -13,6 +13,9 @@ import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface, Tabs } 
 import * as Sentry from '@sentry/react-native';
 import { useTranslation } from 'react-i18next';
 import { getFeed, getFeedAuthor, type FeedFilter, type FeedItem as FeedItemType, type FeedMode, type FeedResponse } from '@/lib/api/feed';
+import { getWalletBalance } from '@/lib/api/wallet';
+import { getEvents } from '@/lib/api/events';
+import { getExchanges } from '@/lib/api/exchanges';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -60,6 +63,12 @@ const FILTER_OPTIONS: Array<{ key: FeedFilter; icon: keyof typeof Ionicons.glyph
 
 const LISTING_SUBFILTERS = ['offer', 'request'] as const;
 
+interface DashboardSummary {
+  balance: number | null;
+  upcomingEvents: number | null;
+  openRequests: number | null;
+}
+
 export default function HomeScreen() {
   const { t } = useTranslation(['home', 'common']);
   const { user, displayName } = useAuth();
@@ -68,6 +77,11 @@ export default function HomeScreen() {
   const [feedMode, setFeedMode] = useState<FeedMode>('ranking');
   const [filter, setFilter] = useState<FeedFilter>('all');
   const [subFilter, setSubFilter] = useState<string | null>(null);
+  const [summary, setSummary] = useState<DashboardSummary>({
+    balance: null,
+    upcomingEvents: null,
+    openRequests: null,
+  });
 
   const fetchFeed = useCallback(
     (cursor: string | null) => getFeed(1, cursor, { filter, mode: feedMode, subtype: subFilter }),
@@ -80,11 +94,48 @@ export default function HomeScreen() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const wasRefreshingRef = useRef(false);
 
+  const loadDashboardSummary = useCallback(async () => {
+    const [walletResult, eventsResult, requestsResult] = await Promise.allSettled([
+      getWalletBalance(),
+      getEvents('upcoming', null, 5),
+      getExchanges(null, { type: 'request', per_page: '5' }),
+    ]);
+
+    setSummary({
+      balance: walletResult.status === 'fulfilled' ? walletResult.value.data.balance : null,
+      upcomingEvents: eventsResult.status === 'fulfilled' ? eventsResult.value.data.length : null,
+      openRequests: requestsResult.status === 'fulfilled' ? requestsResult.value.data.length : null,
+    });
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    const load = async () => {
+      const [walletResult, eventsResult, requestsResult] = await Promise.allSettled([
+        getWalletBalance(),
+        getEvents('upcoming', null, 5),
+        getExchanges(null, { type: 'request', per_page: '5' }),
+      ]);
+
+      if (!isMounted) return;
+      setSummary({
+        balance: walletResult.status === 'fulfilled' ? walletResult.value.data.balance : null,
+        upcomingEvents: eventsResult.status === 'fulfilled' ? eventsResult.value.data.length : null,
+        openRequests: requestsResult.status === 'fulfilled' ? requestsResult.value.data.length : null,
+      });
+    };
+    void load();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const handleRefresh = useCallback(() => {
     setIsRefreshing(true);
     wasRefreshingRef.current = true;
     refresh();
-  }, [refresh]);
+    void loadDashboardSummary();
+  }, [loadDashboardSummary, refresh]);
 
   useEffect(() => {
     if (wasRefreshingRef.current && !isLoading) {
@@ -126,6 +177,40 @@ export default function HomeScreen() {
       setSubFilter(null);
     }
   }, []);
+
+  const summaryCards = useMemo(
+    () => [
+      {
+        key: 'balance',
+        icon: 'wallet-outline' as const,
+        label: t('dashboard.balance'),
+        value: summary.balance === null ? t('dashboard.unavailable') : t('dashboard.hours', { count: summary.balance }),
+        route: '/(modals)/wallet' as const,
+      },
+      {
+        key: 'events',
+        icon: 'calendar-outline' as const,
+        label: t('dashboard.upcomingEvents'),
+        value: summary.upcomingEvents === null ? t('dashboard.unavailable') : String(summary.upcomingEvents),
+        route: '/(tabs)/events' as const,
+      },
+      {
+        key: 'requests',
+        icon: 'help-buoy-outline' as const,
+        label: t('dashboard.openRequests'),
+        value: summary.openRequests === null ? t('dashboard.unavailable') : String(summary.openRequests),
+        route: '/(tabs)/exchanges' as const,
+      },
+      {
+        key: 'notifications',
+        icon: 'notifications-outline' as const,
+        label: t('dashboard.notifications'),
+        value: unreadNotifications > 99 ? '99+' : String(unreadNotifications),
+        route: '/(modals)/notifications' as const,
+      },
+    ],
+    [summary.balance, summary.openRequests, summary.upcomingEvents, t, unreadNotifications],
+  );
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -181,6 +266,23 @@ export default function HomeScreen() {
                 </View>
               </HeroCard.Body>
             </HeroCard>
+            <View className="mx-4 flex-row flex-wrap gap-2">
+              {summaryCards.map((card) => (
+                <HeroButton
+                  key={card.key}
+                  variant="secondary"
+                  className="min-h-[74px] min-w-[47%] flex-1 items-start justify-center px-3 py-3"
+                  accessibilityLabel={t('dashboard.openCard', { label: card.label })}
+                  onPress={() => router.push(card.route as never)}
+                >
+                  <View className="flex-row items-center gap-2">
+                    <Ionicons name={card.icon} size={16} color={primary} />
+                    <HeroButton.Label className="text-xs font-semibold">{card.label}</HeroButton.Label>
+                  </View>
+                  <HeroButton.Label className="mt-1 text-base font-bold">{card.value}</HeroButton.Label>
+                </HeroButton>
+              ))}
+            </View>
             <Surface variant="default" className="mx-4 gap-3 rounded-panel-inner p-3">
               <View className="flex-row items-center justify-between gap-3">
                 <Tabs value={feedMode} onValueChange={(value) => setFeedMode(value as FeedMode)} variant="secondary" className="flex-1">
@@ -269,6 +371,10 @@ export default function HomeScreen() {
                   <HeroButton size="sm" variant="secondary" onPress={() => setFilter('polls')}>
                     <Ionicons name="stats-chart-outline" size={16} color={primary} />
                     <HeroButton.Label>{t('composer.polls')}</HeroButton.Label>
+                  </HeroButton>
+                  <HeroButton size="sm" variant="ghost" onPress={() => router.push('/(modals)/feed-hashtags' as never)}>
+                    <Ionicons name="pricetag-outline" size={16} color={primary} />
+                    <HeroButton.Label>{t('composer.hashtags')}</HeroButton.Label>
                   </HeroButton>
                 </View>
               </HeroCard.Body>

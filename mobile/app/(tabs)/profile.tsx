@@ -3,13 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Alert, Pressable, ScrollView, View } from 'react-native';
+import { Alert, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
-import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, Text } from 'heroui-native';
 
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useTenant, usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -34,6 +34,9 @@ const MY_SPACE: MenuItem[] = [
   { labelKey: 'wallet', descriptionKey: 'navDescriptions.wallet', icon: 'wallet-outline', route: '/(modals)/wallet', tone: '#f59e0b' },
   { labelKey: 'messages', descriptionKey: 'navDescriptions.messages', icon: 'chatbubble-outline', route: '/(tabs)/messages', tone: '#0ea5e9' },
   { labelKey: 'notifications', descriptionKey: 'navDescriptions.notifications', icon: 'notifications-outline', route: '/(modals)/notifications', tone: '#ef4444' },
+  { labelKey: 'activity', descriptionKey: 'navDescriptions.activity', icon: 'pulse-outline', route: '/(modals)/activity' as Href, tone: '#22c55e' },
+  { labelKey: 'matches', descriptionKey: 'navDescriptions.matches', icon: 'sparkles-outline', route: '/(modals)/matches' as Href, tone: '#a855f7' },
+  { labelKey: 'reviews', descriptionKey: 'navDescriptions.reviews', icon: 'star-outline', route: '/(modals)/reviews' as Href, tone: '#f59e0b', featureGate: 'reviews' },
   { labelKey: 'achievements', descriptionKey: 'navDescriptions.achievements', icon: 'trophy-outline', route: '/(modals)/gamification', tone: '#f59e0b' },
   { labelKey: 'myGoals', descriptionKey: 'navDescriptions.myGoals', icon: 'flag-outline', route: '/(modals)/goals', tone: '#8b5cf6' },
   { labelKey: 'groups', descriptionKey: 'navDescriptions.groups', icon: 'people-outline', route: '/(modals)/groups', tone: '#06b6d4' },
@@ -47,13 +50,14 @@ const DISCOVER: MenuItem[] = [
   { labelKey: 'jobs', descriptionKey: 'navDescriptions.jobs', icon: 'briefcase-outline', route: '/(modals)/jobs', tone: '#2563eb', featureGate: 'job_vacancies' },
   { labelKey: 'events', descriptionKey: 'navDescriptions.events', icon: 'calendar-outline', route: '/(tabs)/events', tone: '#f43f5e' },
   { labelKey: 'polls', descriptionKey: 'navDescriptions.polls', icon: 'stats-chart-outline', route: '/(modals)/polls' as Href, tone: '#7c3aed', featureGate: 'polls' },
+  { labelKey: 'ideation', descriptionKey: 'navDescriptions.ideation', icon: 'bulb-outline', route: '/(modals)/ideation' as Href, tone: '#f59e0b', featureGate: 'ideation_challenges' },
   { labelKey: 'browseMembers', descriptionKey: 'navDescriptions.browseMembers', icon: 'people-outline', route: '/(modals)/members', tone: '#14b8a6' },
   { labelKey: 'connections', descriptionKey: 'navDescriptions.connections', icon: 'person-add-outline', route: '/(modals)/connections' as Href, tone: '#6366f1' },
   { labelKey: 'volunteering', descriptionKey: 'navDescriptions.volunteering', icon: 'heart-outline', route: '/(modals)/volunteering', tone: '#e11d48' },
   { labelKey: 'organisations', descriptionKey: 'navDescriptions.organisations', icon: 'business-outline', route: '/(modals)/organisations', tone: '#6366f1' },
   { labelKey: 'blog', descriptionKey: 'navDescriptions.blog', icon: 'newspaper-outline', route: '/(modals)/blog', tone: '#f97316' },
   { labelKey: 'support', descriptionKey: 'navDescriptions.support', icon: 'help-circle-outline', route: '/(modals)/support' as Href, tone: '#0ea5e9' },
-  { labelKey: 'skills', descriptionKey: 'navDescriptions.skills', icon: 'ribbon-outline', route: '/(modals)/endorsements', tone: '#10b981' },
+  { labelKey: 'skills', descriptionKey: 'navDescriptions.skills', icon: 'ribbon-outline', route: '/(modals)/skills' as Href, tone: '#10b981' },
   { labelKey: 'aiChat', descriptionKey: 'navDescriptions.aiChat', icon: 'sparkles-outline', route: '/(modals)/chat', tone: '#a855f7' },
   { labelKey: 'federation', descriptionKey: 'navDescriptions.federation', icon: 'globe-outline', route: '/(modals)/federation', tone: '#0ea5e9', featureGate: 'federation' },
 ];
@@ -107,6 +111,7 @@ export default function MoreScreen() {
   const rawBalance = user && 'balance' in user ? (user.balance as number | null) : null;
   const balance = typeof rawBalance === 'number' && Number.isFinite(rawBalance) ? rawBalance : null;
   const visibleDiscover = DISCOVER.filter((item) => !item.featureGate || hasFeature(item.featureGate));
+  const visibleMySpace = MY_SPACE.filter((item) => !item.featureGate || hasFeature(item.featureGate));
   const visibleMarketplace = MARKETPLACE.filter((item) => !item.featureGate || hasFeature(item.featureGate));
   const visibleFederation = FEDERATION.filter((item) => !item.featureGate || hasFeature(item.featureGate));
 
@@ -184,7 +189,7 @@ export default function MoreScreen() {
         <MenuSection title={t('discover')} items={visibleDiscover} onNavigate={navigate} theme={theme} />
         <MenuSection title={t('marketplaceSection')} items={visibleMarketplace} onNavigate={navigate} theme={theme} />
         <MenuSection title={t('federationSection')} items={visibleFederation} onNavigate={navigate} theme={theme} />
-        <MenuSection title={t('mySpace')} items={MY_SPACE} onNavigate={navigate} theme={theme} />
+        <MenuSection title={t('mySpace')} items={visibleMySpace} onNavigate={navigate} theme={theme} />
         <MenuSection title={t('account')} items={ACCOUNT} onNavigate={navigate} theme={theme} />
 
         <HeroButton variant="danger" onPress={confirmLogout} className="mt-1">
@@ -237,8 +242,13 @@ function MenuRow({ item, onPress, theme }: { item: MenuItem; onPress: () => void
   const { t } = useTranslation('profile');
 
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={t(item.labelKey)} onPress={onPress}>
-      <Surface variant="secondary" className="flex-row items-center gap-3 rounded-panel-inner px-3 py-3">
+    <HeroButton
+      variant="secondary"
+      accessibilityLabel={t(item.labelKey)}
+      onPress={onPress}
+      className="w-full justify-start rounded-panel-inner px-3 py-3"
+    >
+      <View className="flex-row items-center gap-3">
         <View className="size-11 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(item.tone, 0.14) }}>
           <Ionicons name={item.icon} size={20} color={item.tone} />
         </View>
@@ -251,7 +261,7 @@ function MenuRow({ item, onPress, theme }: { item: MenuItem; onPress: () => void
           </Text>
         </View>
         <Ionicons name="chevron-forward-outline" size={18} color={theme.textSecondary} />
-      </Surface>
-    </Pressable>
+      </View>
+    </HeroButton>
   );
 }

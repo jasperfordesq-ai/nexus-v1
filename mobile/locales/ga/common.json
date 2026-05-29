@@ -49,6 +49,7 @@
   "endOfList": "Tá tú ag an deireadh",
   "aria": {
     "actionButton": "Cnaipe gnímh",
+    "carouselImage": "Iomha {{current}} as {{total}}",
     "verification_badges": "Lip?id f?oraithe"
   },
   "verification": {

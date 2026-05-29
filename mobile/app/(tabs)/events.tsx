@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useState } from 'react';
-import { FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
+import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { router, type Href } from 'expo-router';
@@ -240,13 +240,14 @@ function EventCard({
   const isCancelled = event.status === 'cancelled';
 
   return (
-    <Pressable
+    <HeroButton
       className="mx-4 my-2"
+      variant="ghost"
+      feedbackVariant="scale"
       onPress={() => {
         void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         onPress();
       }}
-      accessibilityRole="button"
       accessibilityLabel={event.title ?? ''}
     >
       <HeroCard variant="default" className="w-full overflow-hidden">
@@ -326,6 +327,6 @@ function EventCard({
           <Ionicons name="arrow-forward" size={17} color={primary} />
         </HeroCard.Footer>
       </HeroCard>
-    </Pressable>
+    </HeroButton>
   );
 }

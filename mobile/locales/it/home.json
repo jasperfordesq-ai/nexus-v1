@@ -13,6 +13,20 @@
     "loading": "Caricamento feed…",
     "emptySubtitle": "Inizia a connetterti con la tua comunità per vedere i post qui."
   },
+  "activity": {
+    "title": "Activity",
+    "subtitle": "Your recent timebanking and community activity.",
+    "hoursGiven": "Hours given",
+    "hoursReceived": "Hours received",
+    "netBalance": "{{count}}h net",
+    "connections": "Connections",
+    "groupsJoined": "Groups joined",
+    "posts": "Posts",
+    "skills": "Skills",
+    "recent": "Recent activity",
+    "emptyTitle": "No activity yet",
+    "emptySubtitle": "Your activity will appear here after you take part."
+  },
   "listings": {
     "title": "Annunci",
     "offer": "Offerte",
@@ -35,5 +49,40 @@
   },
   "likePost": "Mi piace questo post",
   "unlikePost": "Non mi piace più questo post",
-  "readMore": "Leggi di più"
+  "readMore": "Leggi di più",
+  "composer": {
+    "hashtags": "Hashtags"
+  },
+  "dashboard": {
+    "balance": "Saldo",
+    "hours": "{{count}} ore",
+    "upcomingEvents": "Eventi in arrivo",
+    "openRequests": "Richieste aperte",
+    "notifications": "Notifiche",
+    "unavailable": "-",
+    "openCard": "Apri {{label}}"
+  },
+  "hashtags": {
+    "title": "Hashtags",
+    "eyebrow": "Scopri",
+    "subtitle": "Trova argomenti attivi e conversazioni nel tuo feed.",
+    "searchPlaceholder": "Cerca hashtag",
+    "postCount": "{{count}} post",
+    "open": "Apri",
+    "openTag": "Apri #{{tag}}",
+    "loadFailed": "Impossibile caricare gli hashtag.",
+    "unableToLoad": "Impossibile caricare gli hashtag",
+    "emptyTitle": "Nessun hashtag trovato",
+    "emptySubtitle": "Gli argomenti di tendenza appariranno qui quando i membri taggano i post.",
+    "noMatch": "Nessun hashtag corrisponde a \"{{query}}\"."
+  },
+  "hashtag": {
+    "title": "Hashtag",
+    "subtitle": "Post taggati",
+    "postCount": "{{count}} post",
+    "loadFailed": "Impossibile caricare i post per questo hashtag.",
+    "unableToLoad": "Impossibile caricare questo hashtag",
+    "emptyTitle": "Ancora nessun post",
+    "emptySubtitle": "Nessun post del feed e ancora taggato #{{tag}}."
+  }
 }

@@ -99,12 +99,12 @@ describe('CreateGroupExchangePage', () => {
 
   it('renders title input on step 1', () => {
     render(<CreateGroupExchangePage />);
-    expect(screen.getByRole('textbox', { name: /title/i })).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('e.g., Community Garden Workday')).toBeInTheDocument();
   });
 
   it('renders total hours input on step 1', () => {
     render(<CreateGroupExchangePage />);
-    expect(screen.getByRole('spinbutton', { name: /total hours/i })).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('e.g., 10')).toBeInTheDocument();
   });
 
   it('renders next button to advance to step 2', () => {

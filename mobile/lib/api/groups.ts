@@ -73,6 +73,21 @@ export interface GroupAnnouncement {
   expires_at: string | null;
 }
 
+export interface GroupFileItem {
+  id: number;
+  group_id: number;
+  file_name: string;
+  file_path?: string | null;
+  file_type: string;
+  file_size: number;
+  uploaded_by: number;
+  uploader_name?: string | null;
+  uploader_avatar?: string | null;
+  folder?: string | null;
+  description?: string | null;
+  created_at: string | null;
+}
+
 export interface GroupTemplate {
   id: number;
   name: string;
@@ -104,6 +119,20 @@ export interface GroupAnnouncementsResponse {
     cursor: string | null;
     has_more: boolean;
   };
+}
+
+export interface GroupFilesResponse {
+  data: {
+    items: GroupFileItem[];
+    cursor: string | null;
+    has_more: boolean;
+  };
+}
+
+export interface CreateGroupAnnouncementPayload {
+  title: string;
+  content: string;
+  is_pinned?: boolean;
 }
 
 export interface CreateGroupPayload {
@@ -246,6 +275,18 @@ export function getGroupAnnouncements(
 }
 
 /**
+ * GET /api/v2/groups/{id}/files — list member-only group files.
+ */
+export function getGroupFiles(
+  id: number,
+  cursor: string | null = null,
+): Promise<GroupFilesResponse> {
+  const query: Record<string, string> = { per_page: '20' };
+  if (cursor) query['cursor'] = cursor;
+  return api.get<GroupFilesResponse>(`${API_V2}/groups/${id}/files`, query);
+}
+
+/**
  * POST /api/v2/groups/{id}/discussions — start a new member discussion.
  */
 export function createGroupDiscussion(
@@ -253,6 +294,34 @@ export function createGroupDiscussion(
   payload: { title: string; content: string },
 ): Promise<{ data: GroupDiscussion }> {
   return api.post<{ data: GroupDiscussion }>(`${API_V2}/groups/${id}/discussions`, payload);
+}
+
+/**
+ * POST /api/v2/groups/{id}/announcements — create an admin announcement.
+ */
+export function createGroupAnnouncement(
+  id: number,
+  payload: CreateGroupAnnouncementPayload,
+): Promise<{ data: GroupAnnouncement }> {
+  return api.post<{ data: GroupAnnouncement }>(`${API_V2}/groups/${id}/announcements`, payload);
+}
+
+/**
+ * PUT /api/v2/groups/{id}/announcements/{announcementId} — update announcement fields.
+ */
+export function updateGroupAnnouncement(
+  id: number,
+  announcementId: number,
+  payload: Partial<CreateGroupAnnouncementPayload>,
+): Promise<{ data: GroupAnnouncement }> {
+  return api.put<{ data: GroupAnnouncement }>(`${API_V2}/groups/${id}/announcements/${announcementId}`, payload);
+}
+
+/**
+ * DELETE /api/v2/groups/{id}/announcements/{announcementId} — delete an admin announcement.
+ */
+export function deleteGroupAnnouncement(id: number, announcementId: number): Promise<{ data: { deleted: boolean } }> {
+  return api.delete<{ data: { deleted: boolean } }>(`${API_V2}/groups/${id}/announcements/${announcementId}`);
 }
 
 /**

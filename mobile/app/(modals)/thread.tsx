@@ -10,7 +10,6 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   RefreshControl,
   Text,
   View,
@@ -515,8 +514,9 @@ function ThreadContextCard({
   const typeLabel = t(config.labelKey);
 
   return (
-    <Pressable
-      accessibilityRole="button"
+    <HeroButton
+      variant="ghost"
+      feedbackVariant="scale"
       accessibilityLabel={t('context.open')}
       className="mx-4 mb-2"
       onPress={() => {
@@ -545,7 +545,7 @@ function ThreadContextCard({
           <Ionicons name="open-outline" size={18} color={primary} />
         </HeroCard.Body>
       </HeroCard>
-    </Pressable>
+    </HeroButton>
   );
 }
 

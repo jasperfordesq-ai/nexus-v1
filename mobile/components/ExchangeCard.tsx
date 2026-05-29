@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -38,13 +38,14 @@ export default function ExchangeCard({ exchange }: ExchangeCardProps) {
   const accentSoft = isOffer ? 'rgba(16, 185, 129, 0.14)' : 'rgba(245, 158, 11, 0.14)';
 
   return (
-    <Pressable
+    <HeroButton
+      variant="ghost"
+      feedbackVariant="scale"
       className="mx-4 my-2"
       onPress={openDetail}
-      accessibilityRole="button"
       accessibilityLabel={exchange.title ?? ''}
     >
-      <HeroCard variant="default" className="overflow-hidden">
+      <HeroCard variant="default" className="w-full overflow-hidden">
         <View className="h-1 w-full" style={{ backgroundColor: accent }} />
         {imageUrl ? (
           <Image source={{ uri: imageUrl }} style={{ width: '100%', height: 150 }} contentFit="cover" />
@@ -67,9 +68,9 @@ export default function ExchangeCard({ exchange }: ExchangeCardProps) {
               {exchange.title ?? ''}
             </Text>
           </View>
-          <HeroButton isIconOnly size="sm" variant="ghost" onPress={openDetail} accessibilityLabel={t('viewDetails')}>
+          <Surface variant="secondary" className="size-9 items-center justify-center rounded-full">
             <Ionicons name="arrow-forward" size={18} color={primary} />
-          </HeroButton>
+          </Surface>
         </HeroCard.Header>
 
         <HeroCard.Body className="gap-3 px-4 pb-4 pt-0">
@@ -113,11 +114,14 @@ export default function ExchangeCard({ exchange }: ExchangeCardProps) {
               {formatRelativeTime(exchange.created_at)}
             </Text>
           </View>
-          <HeroButton size="sm" variant="secondary" onPress={openDetail}>
-            <HeroButton.Label>{t('viewDetails')}</HeroButton.Label>
-          </HeroButton>
+          <Surface variant="secondary" className="flex-row items-center gap-2 rounded-full px-3 py-1.5">
+            <Text className="text-xs font-semibold" style={{ color: primary }}>
+              {t('viewDetails')}
+            </Text>
+            <Ionicons name="chevron-forward-outline" size={14} color={primary} />
+          </Surface>
         </HeroCard.Footer>
       </HeroCard>
-    </Pressable>
+    </HeroButton>
   );
 }

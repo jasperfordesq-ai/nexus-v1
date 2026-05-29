@@ -135,12 +135,12 @@ describe('VisibilityRulesEditor', () => {
 
   it('renders role options in the select', () => {
     const onChange = vi.fn();
-    const { container } = render(
+    render(
       <W><VisibilityRulesEditor value={null} onChange={onChange} /></W>
     );
-    // The Select component should contain role options
-    // HeroUI renders the select as a trigger button, not a native select
-    const selects = container.querySelectorAll('[data-slot="trigger"]');
-    expect(selects.length).toBeGreaterThanOrEqual(2); // min_role + requires_feature
+    // Two Select components are rendered: min_role + requires_feature.
+    // Their labels confirm both selects (with their role/feature options) exist.
+    expect(screen.getAllByText('Min Role').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Requires Feature').length).toBeGreaterThanOrEqual(1);
   });
 });

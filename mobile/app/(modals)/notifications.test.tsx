@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }),
@@ -24,8 +24,11 @@ jest.mock('react-i18next', () => ({
         'unreadCount': opts ? `${String(opts.count ?? 0)} unread` : '0 unread',
         'unreadSummary': opts ? `You have ${String(opts.count ?? 0)} unread notifications.` : 'You have unread notifications.',
         'markAllRead': 'Mark all read',
+        'markRead': 'Mark read',
+        'delete': 'Delete',
         'marking': 'Marking...',
         'markError': 'Failed to mark as read.',
+        'deleteError': 'Could not delete notification.',
         'justNow': 'Just now',
         'itemHint': 'Tap to view',
         'unreadItem': opts ? `Unread: ${String(opts.label ?? '')}` : 'Unread',
@@ -90,6 +93,7 @@ jest.mock('@/lib/api/notifications', () => ({
   getNotifications: jest.fn(),
   markAllRead: jest.fn().mockResolvedValue(undefined),
   markRead: jest.fn().mockResolvedValue(undefined),
+  deleteNotification: jest.fn().mockResolvedValue(undefined),
 }));
 
 jest.mock('@/components/ui/Avatar', () => 'View');
@@ -104,6 +108,8 @@ jest.mock('@/lib/utils/formatRelativeTime', () => ({
 }));
 
 import NotificationsScreen from './notifications';
+import { deleteNotification, markRead } from '@/lib/api/notifications';
+import { navigateToLink } from '@/lib/utils/navigateToLink';
 
 const defaultApiState = { data: null, isLoading: false, error: null, refresh: jest.fn() };
 
@@ -161,6 +167,54 @@ describe('NotificationsScreen', () => {
     const { getByText } = render(<NotificationsScreen />);
     expect(getByText('New message from Alice')).toBeTruthy();
     expect(getByText('Alice sent you a message about your listing.')).toBeTruthy();
+  });
+
+  it('marks a single notification as read from the card action', async () => {
+    const refresh = jest.fn();
+    mockUseApi.mockReturnValueOnce({
+      data: { data: [mockNotification] },
+      isLoading: false,
+      error: null,
+      refresh,
+    });
+
+    const { getByText } = render(<NotificationsScreen />);
+    fireEvent.press(getByText('Mark read'));
+
+    await waitFor(() => expect(markRead).toHaveBeenCalledWith(1));
+    expect(refresh).toHaveBeenCalled();
+  });
+
+  it('deletes a notification from the card action', async () => {
+    const refresh = jest.fn();
+    mockUseApi.mockReturnValueOnce({
+      data: { data: [mockNotification] },
+      isLoading: false,
+      error: null,
+      refresh,
+    });
+
+    const { getByText } = render(<NotificationsScreen />);
+    fireEvent.press(getByText('Delete'));
+
+    await waitFor(() => expect(deleteNotification).toHaveBeenCalledWith(1));
+    expect(refresh).toHaveBeenCalled();
+  });
+
+  it('opens a notification link and marks it read when the card body is pressed', async () => {
+    const refresh = jest.fn();
+    mockUseApi.mockReturnValueOnce({
+      data: { data: [mockNotification] },
+      isLoading: false,
+      error: null,
+      refresh,
+    });
+
+    const { getByLabelText } = render(<NotificationsScreen />);
+    fireEvent.press(getByLabelText('Unread: New message from Alice. Alice sent you a message about your listing.'));
+
+    await waitFor(() => expect(markRead).toHaveBeenCalledWith(1));
+    expect(navigateToLink).toHaveBeenCalledWith('/messages/1');
   });
 
   it('renders the "Mark all read" button when unread notifications exist', () => {

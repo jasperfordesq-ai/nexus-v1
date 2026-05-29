@@ -49,6 +49,7 @@
   "endOfList": "Você chegou ao final",
   "aria": {
     "actionButton": "Botão de ação",
+    "carouselImage": "Imagem {{current}} de {{total}}",
     "verification_badges": "Etiquetas de verifica??o"
   },
   "verification": {

@@ -1,0 +1,22 @@
+{
+  "title": "Resources",
+  "subtitle": "Browse shared files and knowledge base articles.",
+  "articleTitle": "Article",
+  "tabs": {
+    "resources": "Files",
+    "kb": "Knowledge"
+  },
+  "searchLabel": "Search",
+  "searchPlaceholder": "Search resources",
+  "allCategories": "All",
+  "download": "Open resource",
+  "readArticle": "Read article",
+  "downloads": "{{count}} downloads",
+  "views": "{{count}} views",
+  "helpful": "{{yes}} helpful",
+  "emptyTitle": "Nothing found",
+  "emptySubtitle": "Try another search or category.",
+  "errorTitle": "Could not load resources",
+  "categoryCount": "{{count}} items",
+  "uncategorized": "General"
+}

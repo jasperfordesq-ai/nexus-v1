@@ -4,7 +4,8 @@
   "tabs": {
     "browse": "Durchsuchen",
     "myApplications": "Meine Bewerbungen",
-    "myPostings": "Meine Anzeigen"
+    "myPostings": "Meine Anzeigen",
+    "alerts": "Alerts"
   },
   "search": {
     "placeholder": "Stellen suchen..."
@@ -128,6 +129,7 @@
     "emptyHint": "Bewerben Sie sich auf Stellen, um sie hier zu sehen",
     "appliedOn": "Beworben am {{date}}",
     "status": {
+      "applied": "Applied",
       "pending": "Ausstehend",
       "screening": "Sichtung",
       "reviewed": "Geprüft",
@@ -137,7 +139,17 @@
       "accepted": "Angenommen",
       "rejected": "Abgelehnt",
       "withdrawn": "Zurückgezogen"
-    }
+    },
+    "showMessage": "Show cover message",
+    "hideMessage": "Hide cover message",
+    "history": "History",
+    "historyEmpty": "No status history yet.",
+    "historyStart": "Started",
+    "historyTransition": "{{from}} to {{to}}",
+    "historyError": "Could not load application history.",
+    "withdraw": "Withdraw",
+    "withdrawSuccess": "Application withdrawn.",
+    "withdrawError": "Could not withdraw this application."
   },
   "postings": {
     "empty": "Noch keine Anzeigen",
@@ -149,7 +161,12 @@
     "noApplicants": "Noch keine Bewerber.",
     "openToolError": "Dieses Werkzeug konnte nicht geöffnet werden.",
     "statusUpdateError": "Der Stellenstatus konnte nicht aktualisiert werden.",
-    "status": { "open": "Offen", "closed": "Geschlossen", "filled": "Besetzt", "draft": "Entwurf" },
+    "status": {
+      "open": "Offen",
+      "closed": "Geschlossen",
+      "filled": "Besetzt",
+      "draft": "Entwurf"
+    },
     "applicationsTitle": "Bewerbungen",
     "applicationsSubtitle": "Prüfen Sie Kandidaten und verwalten Sie den Ablauf.",
     "applicationsCount": "{{count}} Bewerbungen",
@@ -202,7 +219,11 @@
     "salaryMaxLabel": "Höchstgehalt",
     "salaryPlaceholder": "Optionaler Betrag",
     "salaryTypeLabel": "Zahlungsart",
-    "salaryType": { "hourly": "Stündlich", "monthly": "Monatlich", "annual": "Jährlich" },
+    "salaryType": {
+      "hourly": "Stündlich",
+      "monthly": "Monatlich",
+      "annual": "Jährlich"
+    },
     "salaryCurrencyLabel": "Währung",
     "salaryCurrencyPlaceholder": "EUR",
     "salaryNegotiable": "Gehalt verhandelbar",
@@ -227,5 +248,40 @@
     "failedTitle": "Job nicht gespeichert",
     "loadFailed": "Dieser Job konnte nicht zum Bearbeiten geladen werden.",
     "failedDescription": "Der Job konnte nicht gespeichert werden. Bitte versuchen Sie es erneut."
+  },
+  "alerts": {
+    "title": "Job alerts",
+    "subtitle": "Save searches and get notified when matching roles appear.",
+    "create": "Create alert",
+    "creating": "Creating...",
+    "active": "Active",
+    "paused": "Paused",
+    "pause": "Pause",
+    "resume": "Resume",
+    "delete": "Delete",
+    "loadError": "Could not load job alerts",
+    "emptyTitle": "No job alerts yet",
+    "emptyDescription": "Create an alert to keep new matching roles close to the app.",
+    "keywordsLabel": "Keywords",
+    "keywordsPlaceholder": "Role, skill, or employer",
+    "categoriesLabel": "Categories",
+    "categoriesPlaceholder": "Community, care, digital",
+    "locationLabel": "Location",
+    "locationPlaceholder": "City, region, or remote",
+    "typeLabel": "Role type",
+    "commitmentLabel": "Commitment",
+    "remoteOnly": "Remote roles only",
+    "remoteOnlyShort": "Remote",
+    "anyMatch": "Any matching role",
+    "createdDate": "Created {{date}}",
+    "lastNotified": "Last notified {{date}}",
+    "never": "Never",
+    "createSuccess": "Job alert created.",
+    "createError": "Could not create this job alert.",
+    "pauseSuccess": "Job alert paused.",
+    "resumeSuccess": "Job alert resumed.",
+    "toggleError": "Could not update this job alert.",
+    "deleteSuccess": "Job alert deleted.",
+    "deleteError": "Could not delete this job alert."
   }
 }

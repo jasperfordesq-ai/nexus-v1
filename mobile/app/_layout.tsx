@@ -87,6 +87,7 @@ function RootNavigator() {
     'gamification',
     'goals',
     'groups',
+    'ideation',
     'jobs',
     'marketplace',
     'members',
@@ -94,6 +95,7 @@ function RootNavigator() {
     'notifications',
     'organisations',
     'profile',
+    'resources',
     'search',
     'settings',
     'volunteering',
@@ -108,6 +110,12 @@ function RootNavigator() {
     pathname.startsWith('/login/') ||
     pathname === '/register' ||
     pathname.startsWith('/register/') ||
+    pathname === '/forgot-password' ||
+    pathname.startsWith('/forgot-password/') ||
+    pathname === '/reset-password' ||
+    pathname.startsWith('/reset-password/') ||
+    pathname === '/verify-email' ||
+    pathname.startsWith('/verify-email/') ||
     isTenantSelectionPath;
 
   // Queue deep link from push notification taps — only navigate once auth resolves.
@@ -275,12 +283,44 @@ function RootNavigator() {
         options={{ ...modalOptions, headerShown: false, title: t('blog:postTitle') }}
       />
       <Stack.Screen
+        name="(modals)/resources"
+        options={{ ...modalOptions, headerShown: false, title: t('resources:title') }}
+      />
+      <Stack.Screen
+        name="(modals)/kb-article"
+        options={{ ...modalOptions, headerShown: false, title: t('resources:articleTitle') }}
+      />
+      <Stack.Screen
+        name="(modals)/ideation"
+        options={{ ...modalOptions, headerShown: false, title: t('ideation:title') }}
+      />
+      <Stack.Screen
+        name="(modals)/ideation-detail"
+        options={{ ...modalOptions, headerShown: false, title: t('ideation:challengeTitle') }}
+      />
+      <Stack.Screen
+        name="(modals)/activity"
+        options={{ ...modalOptions, headerShown: false, title: t('home:activity.title') }}
+      />
+      <Stack.Screen
+        name="(modals)/matches"
+        options={{ ...modalOptions, headerShown: false, title: t('profile:matches.title') }}
+      />
+      <Stack.Screen
+        name="(modals)/reviews"
+        options={{ ...modalOptions, headerShown: false, title: t('profile:reviews.title') }}
+      />
+      <Stack.Screen
         name="(modals)/gamification"
         options={{ ...modalOptions, headerShown: false, title: t('gamification:title') }}
       />
       <Stack.Screen
         name="(modals)/goals"
         options={{ ...modalOptions, headerShown: false, title: t('goals:title') }}
+      />
+      <Stack.Screen
+        name="(modals)/goal-detail"
+        options={{ ...modalOptions, headerShown: false, title: t('goals:detail.title') }}
       />
       <Stack.Screen
         name="(modals)/chat"
@@ -440,6 +480,10 @@ function RootNavigator() {
       />
       <Stack.Screen
         name="(modals)/endorsements"
+        options={{ ...modalOptions, headerShown: false, title: t('endorsements:title') }}
+      />
+      <Stack.Screen
+        name="(modals)/skills"
         options={{ ...modalOptions, headerShown: false, title: t('endorsements:title') }}
       />
       <Stack.Screen

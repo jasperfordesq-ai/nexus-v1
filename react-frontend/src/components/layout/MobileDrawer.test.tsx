@@ -70,6 +70,7 @@ const i18nMap: Record<string, string> = {
   'report_problem.trigger': 'Report a problem',
   // Admin tool keys used by MobileDrawer (user_menu namespace)
   'user_menu.admin_panel': 'Admin Panel',
+  'broker:sidebar.title': 'Broker Panel',
   'user_menu.legacy_admin': 'Legacy Admin',
   'user_menu.help_center': 'Help Center',
   'sections.main': 'Main',
@@ -182,6 +183,27 @@ describe('MobileDrawer', () => {
     onSearchOpen: vi.fn(),
   };
 
+  // Locate an accordion section header by accessible name and expand it.
+  // The real component renders a HeroUI Accordion trigger button; under the
+  // shared UI mock the AccordionItem title may render without a
+  // data-slot="trigger" attribute, so fall back to the section header text and
+  // click its nearest clickable ancestor. Returns the element used as trigger.
+  function expandSection(name: RegExp): HTMLElement {
+    const buttons = screen.queryAllByRole('button', { name });
+    const trigger =
+      buttons.find((btn) => btn.getAttribute('data-slot') === 'trigger') ??
+      buttons[0];
+    if (trigger) {
+      fireEvent.click(trigger);
+      return trigger;
+    }
+    // No matching button — fall back to the header text node and click it.
+    const header = screen.getAllByText(name)[0] as HTMLElement;
+    const clickable = (header.closest('button') as HTMLElement | null) ?? header;
+    fireEvent.click(clickable);
+    return clickable;
+  }
+
   beforeEach(() => {
     vi.clearAllMocks();
     setupDefaultMocks();
@@ -227,15 +249,9 @@ describe('MobileDrawer', () => {
 
     it('renders About section with universal items', () => {
       render(<MobileDrawer {...defaultProps} />);
-      // The 'About' accordion section is collapsed by default — expand the trigger first.
-      // The trigger button is accessible by name "About" (from the AccordionItem title).
-      const aboutButtons = screen.getAllByRole('button', { name: /^about$/i });
-      // Pick the trigger button (data-slot="trigger") to expand the section
-      const aboutTrigger = aboutButtons.find(
-        (btn) => btn.getAttribute('data-slot') === 'trigger'
-      );
+      // The 'About' accordion section header renders its title; expand it then verify items.
+      const aboutTrigger = expandSection(/^about$/i);
       expect(aboutTrigger).toBeDefined();
-      fireEvent.click(aboutTrigger!);
       expect(screen.getByText('FAQ')).toBeInTheDocument();
       expect(screen.getByText('Timebanking Guide')).toBeInTheDocument();
     });
@@ -264,12 +280,8 @@ describe('MobileDrawer', () => {
     it('renders Legal section', () => {
       render(<MobileDrawer {...defaultProps} />);
       // Legal section is collapsed by default — expand the trigger first.
-      const legalButtons = screen.getAllByRole('button', { name: /^legal$/i });
-      const legalTrigger = legalButtons.find(
-        (btn) => btn.getAttribute('data-slot') === 'trigger'
-      );
+      const legalTrigger = expandSection(/^legal$/i);
       expect(legalTrigger).toBeDefined();
-      fireEvent.click(legalTrigger!);
       expect(screen.getByText('Terms of Service')).toBeInTheDocument();
       expect(screen.getByText('Privacy Policy')).toBeInTheDocument();
       expect(screen.getByText('Accessibility')).toBeInTheDocument();
@@ -403,6 +415,27 @@ describe('MobileDrawer', () => {
       expect(screen.queryByText('Admin Panel')).not.toBeInTheDocument();
       expect(screen.queryByText('Legacy Admin')).not.toBeInTheDocument();
     });
+
+    it('shows Broker Panel instead of Admin Panel for broker users with stale admin flags', () => {
+      setupDefaultMocks({
+        auth: {
+          user: {
+            id: 1,
+            first_name: 'Broker',
+            last_name: 'User',
+            email: 'broker@example.com',
+            role: 'broker',
+            is_admin: true,
+          },
+          isAuthenticated: true,
+        },
+      });
+
+      render(<MobileDrawer {...defaultProps} />);
+
+      expect(screen.getByText('Broker Panel')).toBeInTheDocument();
+      expect(screen.queryByText('Admin Panel')).not.toBeInTheDocument();
+    });
   });
 
   describe('Tenant-specific about items', () => {
@@ -416,12 +449,8 @@ describe('MobileDrawer', () => {
       });
       render(<MobileDrawer {...defaultProps} />);
       // hOUR Timebank items are in the 'About' accordion section (collapsed by default).
-      const aboutButtons = screen.getAllByRole('button', { name: /^about$/i });
-      const aboutTrigger = aboutButtons.find(
-        (btn) => btn.getAttribute('data-slot') === 'trigger'
-      );
+      const aboutTrigger = expandSection(/^about$/i);
       expect(aboutTrigger).toBeDefined();
-      fireEvent.click(aboutTrigger!);
       expect(screen.getByText('Partner With Us')).toBeInTheDocument();
       expect(screen.getByText('Social Prescribing')).toBeInTheDocument();
       expect(screen.getByText('Our Impact')).toBeInTheDocument();
@@ -439,12 +468,8 @@ describe('MobileDrawer', () => {
       });
       render(<MobileDrawer {...defaultProps} />);
       // Open the About accordion to confirm the items are truly absent
-      const aboutButtons = screen.getAllByRole('button', { name: /^about$/i });
-      const aboutTrigger = aboutButtons.find(
-        (btn) => btn.getAttribute('data-slot') === 'trigger'
-      );
+      const aboutTrigger = expandSection(/^about$/i);
       expect(aboutTrigger).toBeDefined();
-      fireEvent.click(aboutTrigger!);
       expect(screen.queryByText('Partner With Us')).not.toBeInTheDocument();
       expect(screen.queryByText('Social Prescribing')).not.toBeInTheDocument();
       expect(screen.queryByText('Our Impact')).not.toBeInTheDocument();
@@ -461,12 +486,8 @@ describe('MobileDrawer', () => {
       });
       render(<MobileDrawer {...defaultProps} />);
       // Events is in the 'Community' accordion section (collapsed by default) — open it first.
-      const communityButtons = screen.getAllByRole('button', { name: /^community$/i });
-      const communityTrigger = communityButtons.find(
-        (btn) => btn.getAttribute('data-slot') === 'trigger'
-      );
+      const communityTrigger = expandSection(/^community$/i);
       expect(communityTrigger).toBeDefined();
-      fireEvent.click(communityTrigger!);
       expect(screen.getByText('Events')).toBeInTheDocument();
     });
 
@@ -492,12 +513,8 @@ describe('MobileDrawer', () => {
       });
       render(<MobileDrawer {...defaultProps} />);
       // Achievements/Leaderboard are in the 'Explore' accordion section — open it first.
-      const exploreButtons = screen.getAllByRole('button', { name: /^explore$/i });
-      const exploreTrigger = exploreButtons.find(
-        (btn) => btn.getAttribute('data-slot') === 'trigger'
-      );
+      const exploreTrigger = expandSection(/^explore$/i);
       expect(exploreTrigger).toBeDefined();
-      fireEvent.click(exploreTrigger!);
       expect(screen.getByText('Achievements')).toBeInTheDocument();
       expect(screen.getByText('Leaderboard')).toBeInTheDocument();
     });

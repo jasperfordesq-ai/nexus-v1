@@ -70,6 +70,41 @@ export interface RegisterPayload {
   password_confirmation: string;
 }
 
+export interface ForgotPasswordResponse {
+  success?: boolean;
+  message?: string;
+  error?: string;
+  code?: string;
+}
+
+export interface ResetPasswordPayload {
+  token: string;
+  password: string;
+  password_confirmation: string;
+}
+
+export interface ResetPasswordResponse {
+  success?: boolean;
+  message?: string;
+  error?: string;
+  code?: string;
+  data?: {
+    verified?: boolean;
+    message?: string;
+  };
+}
+
+export interface VerifyEmailResponse {
+  success?: boolean;
+  message?: string;
+  error?: string;
+  code?: string;
+  data?: {
+    verified?: boolean;
+    message?: string;
+  };
+}
+
 /** POST /api/auth/login — token-based auth (Bearer, mobile-safe, 1-year token) */
 export function login(payload: LoginPayload): Promise<AuthResponse> {
   return api.post<AuthResponse>('/api/auth/login', {
@@ -82,6 +117,21 @@ export function login(payload: LoginPayload): Promise<AuthResponse> {
 /** POST /api/v2/auth/register — V2 registration (returns token immediately) */
 export function register(payload: RegisterPayload): Promise<AuthResponse> {
   return api.post<AuthResponse>(`${API_V2}/auth/register`, payload);
+}
+
+/** POST /api/auth/forgot-password â€” request a password reset email. */
+export function forgotPassword(email: string): Promise<ForgotPasswordResponse> {
+  return api.post<ForgotPasswordResponse>('/api/auth/forgot-password', { email });
+}
+
+/** POST /api/auth/reset-password — set a new password from an email reset token. */
+export function resetPassword(payload: ResetPasswordPayload): Promise<ResetPasswordResponse> {
+  return api.post<ResetPasswordResponse>('/api/auth/reset-password', payload);
+}
+
+/** POST /api/auth/verify-email — verify an email address from a deep-link token. */
+export function verifyEmail(token: string): Promise<VerifyEmailResponse> {
+  return api.post<VerifyEmailResponse>('/api/auth/verify-email', { token });
 }
 
 /** POST /api/auth/logout */

@@ -76,6 +76,7 @@
   "endOfList": "You've reached the end",
   "aria": {
     "actionButton": "Action button",
+    "carouselImage": "Image {{current}} of {{total}}",
     "verification_badges": "Verification badges"
   },
   "verification": {

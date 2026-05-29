@@ -151,6 +151,14 @@ describe('LoginScreen', () => {
     expect(mockRouterPush).toHaveBeenCalledWith('/register');
   });
 
+  it('opens the native forgot-password route', () => {
+    const { getByText } = render(<LoginScreen />);
+
+    fireEvent.press(getByText('Forgot password?'));
+
+    expect(mockRouterPush).toHaveBeenCalledWith('/forgot-password');
+  });
+
   it('opens the community switcher from the switch community action', () => {
     const { getByLabelText } = render(<LoginScreen />);
 

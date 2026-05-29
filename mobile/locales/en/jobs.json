@@ -7,7 +7,8 @@
   "tabs": {
     "browse": "Browse",
     "myApplications": "My Applications",
-    "myPostings": "My Postings"
+    "myPostings": "My Postings",
+    "alerts": "Alerts"
   },
   "search": {
     "placeholder": "Search jobs...",
@@ -138,6 +139,7 @@
     "emptyHint": "Apply to jobs to see them here",
     "appliedOn": "Applied {{date}}",
     "status": {
+      "applied": "Applied",
       "pending": "Pending",
       "screening": "Screening",
       "reviewed": "Reviewed",
@@ -155,7 +157,17 @@
     "offer_received": "You received a job offer!",
     "accept_offer": "Accept Offer",
     "decline_offer": "Decline",
-    "offer_accepted": "Offer Accepted"
+    "offer_accepted": "Offer Accepted",
+    "showMessage": "Show cover message",
+    "hideMessage": "Hide cover message",
+    "history": "History",
+    "historyEmpty": "No status history yet.",
+    "historyStart": "Started",
+    "historyTransition": "{{from}} to {{to}}",
+    "historyError": "Could not load application history.",
+    "withdraw": "Withdraw",
+    "withdrawSuccess": "Application withdrawn.",
+    "withdrawError": "Could not withdraw this application."
   },
   "owner": {
     "toolsTitle": "Owner tools",
@@ -285,5 +297,40 @@
     "failedDescription": "We could not create the job. Please try again.",
     "editFailedTitle": "Job not updated",
     "editFailedDescription": "We could not update the job. Please try again."
+  },
+  "alerts": {
+    "title": "Job alerts",
+    "subtitle": "Save searches and get notified when matching roles appear.",
+    "create": "Create alert",
+    "creating": "Creating...",
+    "active": "Active",
+    "paused": "Paused",
+    "pause": "Pause",
+    "resume": "Resume",
+    "delete": "Delete",
+    "loadError": "Could not load job alerts",
+    "emptyTitle": "No job alerts yet",
+    "emptyDescription": "Create an alert to keep new matching roles close to the app.",
+    "keywordsLabel": "Keywords",
+    "keywordsPlaceholder": "Role, skill, or employer",
+    "categoriesLabel": "Categories",
+    "categoriesPlaceholder": "Community, care, digital",
+    "locationLabel": "Location",
+    "locationPlaceholder": "City, region, or remote",
+    "typeLabel": "Role type",
+    "commitmentLabel": "Commitment",
+    "remoteOnly": "Remote roles only",
+    "remoteOnlyShort": "Remote",
+    "anyMatch": "Any matching role",
+    "createdDate": "Created {{date}}",
+    "lastNotified": "Last notified {{date}}",
+    "never": "Never",
+    "createSuccess": "Job alert created.",
+    "createError": "Could not create this job alert.",
+    "pauseSuccess": "Job alert paused.",
+    "resumeSuccess": "Job alert resumed.",
+    "toggleError": "Could not update this job alert.",
+    "deleteSuccess": "Job alert deleted.",
+    "deleteError": "Could not delete this job alert."
   }
 }

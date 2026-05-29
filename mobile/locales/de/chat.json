@@ -1,10 +1,24 @@
 {
   "title": "KI-Chat",
-  "placeholder": "Frag mich alles über die Zeitbank…",
+  "placeholder": "Frag mich alles Ã¼ber die Zeitbankâ€¦",
   "send": "Senden",
   "empty": "Starte eine Unterhaltung mit dem KI-Assistenten.",
   "error": "Nachricht konnte nicht gesendet werden.",
-  "thinking": "Denkt nach…",
+  "thinking": "Denkt nachâ€¦",
   "timeout": "Die Antwort dauert zu lange. Bitte versuche es erneut.",
-  "disclaimer": "KI-Antworten sind möglicherweise nicht immer korrekt."
+  "disclaimer": "KI-Antworten sind mÃ¶glicherweise nicht immer korrekt.",
+  "tool_results": {
+    "label": "Results",
+    "fallbackTitle": "Result",
+    "open": "Open {{title}}",
+    "type": {
+      "listing": "Listing",
+      "member": "Member",
+      "event": "Event",
+      "job": "Job",
+      "marketplace": "Marketplace",
+      "kb": "Knowledge base",
+      "wallet": "Wallet"
+    }
+  }
 }

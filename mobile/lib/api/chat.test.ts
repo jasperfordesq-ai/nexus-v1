@@ -71,6 +71,28 @@ describe('sendChatMessage', () => {
     expect(result.data.message.role).toBe('assistant');
     expect(result.data.message.content).toContain('time credits');
   });
+
+  it('preserves top-level tool invocations on the assistant message', async () => {
+    (api.post as jest.Mock).mockResolvedValue({
+      message: mockAssistantMessage,
+      conversation_id: 'conv-tools',
+      tool_invocations: [
+        {
+          name: 'search_listings',
+          arguments: { q: 'garden' },
+          ok: true,
+          summary: 'Found listings',
+          card_type: 'listing',
+          results: [{ id: 12, title: 'Garden help' }],
+        },
+      ],
+    });
+
+    const result = await sendChatMessage('Find gardening offers', null);
+
+    expect(result.data.message.tool_invocations?.[0]?.card_type).toBe('listing');
+    expect(result.data.message.tool_invocations?.[0]?.results[0]?.title).toBe('Garden help');
+  });
 });
 
 describe('getChatHistory', () => {

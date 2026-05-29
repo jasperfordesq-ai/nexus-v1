@@ -11,5 +11,8 @@
   "justNow": "Díreach anois",
   "minutesAgo": "{{count}} nóim. ó shin",
   "hoursAgo": "{{count}} u. ó shin",
-  "daysAgo": "{{count}} lá ó shin"
+  "daysAgo": "{{count}} lá ó shin",
+  "markRead": "Mark read",
+  "delete": "Delete",
+  "deleteError": "Could not delete notification."
 }

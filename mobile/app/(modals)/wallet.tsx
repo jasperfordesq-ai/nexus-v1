@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useMemo, useState } from 'react';
-import { Alert, Platform, Pressable, RefreshControl, ScrollView, Share, View } from 'react-native';
+import { Alert, Platform, RefreshControl, ScrollView, Share, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -452,7 +452,14 @@ function WalletActionPanel({
             {results.length > 0 ? (
               <View className="gap-2">
                 {results.map((user) => (
-                  <Pressable key={String(user.id)} accessibilityRole="button" onPress={() => setSelectedUser(user)}>
+                  <HeroButton
+                    key={String(user.id)}
+                    variant="ghost"
+                    feedbackVariant="scale"
+                    className="w-full p-0"
+                    accessibilityLabel={user.name}
+                    onPress={() => setSelectedUser(user)}
+                  >
                     <Surface variant="secondary" className="flex-row items-center gap-3 rounded-panel-inner p-3">
                       <Avatar uri={user.avatar_url ?? null} name={user.name} size={36} />
                       <View className="min-w-0 flex-1">
@@ -461,7 +468,7 @@ function WalletActionPanel({
                       </View>
                       <Ionicons name={selectedUser?.id === user.id ? 'checkmark-circle' : 'chevron-forward'} size={18} color={primary} />
                     </Surface>
-                  </Pressable>
+                  </HeroButton>
                 ))}
               </View>
             ) : null}
@@ -687,8 +694,9 @@ function TransactionCard({
   const partnerName = transaction.federation?.partner_name?.trim();
 
   return (
-    <Pressable
-      accessibilityRole="button"
+    <HeroButton
+      variant="ghost"
+      feedbackVariant="scale"
       accessibilityLabel={t('transactionLabel', { name, amount })}
       onPress={() => void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
     >
@@ -725,7 +733,7 @@ function TransactionCard({
           </View>
         </View>
       </Surface>
-    </Pressable>
+    </HeroButton>
   );
 }
 

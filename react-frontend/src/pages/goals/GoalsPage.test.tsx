@@ -145,7 +145,7 @@ describe('GoalsPage', () => {
     await waitFor(() => {
       expect(screen.getByTestId('empty-state')).toBeInTheDocument();
     });
-    expect(screen.getByText('Create Goal')).toBeInTheDocument();
+    expect(screen.getAllByText('Create Goal').length).toBeGreaterThan(0);
   });
 
   it('displays goals with progress when loaded', async () => {

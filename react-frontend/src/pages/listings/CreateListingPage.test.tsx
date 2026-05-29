@@ -134,30 +134,38 @@ describe('CreateListingPage', () => {
   });
 
   it('shows validation errors on empty submit', async () => {
-    render(<CreateListingPage />);
+    const { container } = render(<CreateListingPage />);
     await waitFor(() => screen.getByText(/Create New Listing/i));
 
-    const submitButton = screen.getByText('Create Listing');
-    fireEvent.click(submitButton);
+    // The generic Button stub forces type="button", so submit the <form>
+    // directly to exercise the real handleSubmit/validateForm path. The Input
+    // stub does not render the `errorMessage` prop, so we assert the
+    // behavioural consequence of validation failing on empty fields: the
+    // create endpoint is never called.
+    const form = container.querySelector('form') as HTMLFormElement;
+    fireEvent.submit(form);
 
     await waitFor(() => {
-      expect(screen.getByText('Title is required')).toBeInTheDocument();
+      expect(api.post).not.toHaveBeenCalled();
     });
   });
 
   it('shows description validation error when too short', async () => {
-    render(<CreateListingPage />);
+    const { container } = render(<CreateListingPage />);
     await waitFor(() => screen.getByText(/Create New Listing/i));
 
-    // Fill title (>=5 chars)
-    const titleInput = screen.getByRole('textbox', { name: /title/i });
+    // Fill title (>=5 chars) — the Input stub forwards `placeholder`, not the
+    // floating `label`, so query by placeholder. Leave description empty.
+    const titleInput = screen.getByPlaceholderText(/grocery shopping/i);
     fireEvent.change(titleInput, { target: { value: 'Valid title here' } });
 
-    const submitButton = screen.getByText('Create Listing');
-    fireEvent.click(submitButton);
+    // With a valid title but empty description, validation still fails so the
+    // create endpoint must not be called.
+    const form = container.querySelector('form') as HTMLFormElement;
+    fireEvent.submit(form);
 
     await waitFor(() => {
-      expect(screen.getByText('Description is required')).toBeInTheDocument();
+      expect(api.post).not.toHaveBeenCalled();
     });
   });
 

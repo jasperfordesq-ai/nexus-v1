@@ -165,7 +165,7 @@ Route::delete('/v2/events/{id}/rsvp', [\App\Http\Controllers\Api\EventsControlle
 Route::get('/v2/events/{id}/attendees', [\App\Http\Controllers\Api\EventsController::class, 'attendees'])->withoutMiddleware('auth:sanctum');
 Route::post('/v2/events/{id}/attendees/{attendeeId}/check-in', [\App\Http\Controllers\Api\EventsController::class, 'checkIn']);
 Route::post('/v2/events/{id}/cancel', [\App\Http\Controllers\Api\EventsController::class, 'cancel']);
-Route::post('/v2/events/{id}/waitlist', [\App\Http\Controllers\Api\EventsController::class, 'waitlist']);
+Route::post('/v2/events/{id}/waitlist', [\App\Http\Controllers\Api\EventsController::class, 'joinWaitlist']);
 Route::delete('/v2/events/{id}/waitlist', [\App\Http\Controllers\Api\EventsController::class, 'leaveWaitlist']);
 Route::post('/v2/events/{id}/image', [\App\Http\Controllers\Api\EventsController::class, 'uploadImage'])->middleware('throttle:20,1');
 

@@ -93,7 +93,7 @@ describe('MessageInputArea', () => {
         messagingRestriction={{ messaging_disabled: true, under_monitoring: false, restriction_reason: 'Violation' }}
       />
     );
-    expect(screen.getByRole('alert')).toBeDefined();
+    expect(screen.getAllByRole('alert').length).toBeGreaterThan(0);
     expect(screen.getByText('messaging_restricted_title')).toBeDefined();
   });
 

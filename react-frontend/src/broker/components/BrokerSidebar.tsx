@@ -15,6 +15,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { useAuth, useTenant } from '@/contexts';
+import { hasAdminPanelAccess } from '@/lib/access';
 import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
 import Users from 'lucide-react/icons/users';
 import UserPlus from 'lucide-react/icons/user-plus';
@@ -70,16 +71,8 @@ export function BrokerSidebar({ collapsed, onToggle, badges }: BrokerSidebarProp
   const { tenantPath, tenant } = useTenant();
   const { user } = useAuth();
 
-  // Check if user also has admin access for the "Full Admin" link
-  const role = (user?.role as string) || '';
-  const userRecord = user as Record<string, unknown> | null;
-  const hasAdminAccess =
-    role === 'admin' ||
-    role === 'tenant_admin' ||
-    role === 'super_admin' ||
-    userRecord?.is_admin === true ||
-    userRecord?.is_super_admin === true ||
-    userRecord?.is_tenant_super_admin === true;
+  // Check if user also has admin access for the "Full Admin" link.
+  const hasAdminAccess = hasAdminPanelAccess(user);
 
   const sections: NavSection[] = [
     {

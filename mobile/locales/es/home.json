@@ -13,6 +13,20 @@
     "loading": "Cargando feed…",
     "emptySubtitle": "Empieza a conectarte con tu comunidad para ver publicaciones aquí."
   },
+  "activity": {
+    "title": "Activity",
+    "subtitle": "Your recent timebanking and community activity.",
+    "hoursGiven": "Hours given",
+    "hoursReceived": "Hours received",
+    "netBalance": "{{count}}h net",
+    "connections": "Connections",
+    "groupsJoined": "Groups joined",
+    "posts": "Posts",
+    "skills": "Skills",
+    "recent": "Recent activity",
+    "emptyTitle": "No activity yet",
+    "emptySubtitle": "Your activity will appear here after you take part."
+  },
   "listings": {
     "title": "Anuncios",
     "offer": "Ofertas",
@@ -35,5 +49,40 @@
   },
   "likePost": "Me gusta esta publicación",
   "unlikePost": "Ya no me gusta esta publicación",
-  "readMore": "Leer más"
+  "readMore": "Leer más",
+  "composer": {
+    "hashtags": "Hashtags"
+  },
+  "dashboard": {
+    "balance": "Saldo",
+    "hours": "{{count}} horas",
+    "upcomingEvents": "Eventos proximos",
+    "openRequests": "Solicitudes abiertas",
+    "notifications": "Notificaciones",
+    "unavailable": "-",
+    "openCard": "Abrir {{label}}"
+  },
+  "hashtags": {
+    "title": "Hashtags",
+    "eyebrow": "Descubrir",
+    "subtitle": "Encuentra temas activos y conversaciones en tu feed.",
+    "searchPlaceholder": "Buscar hashtags",
+    "postCount": "{{count}} publicaciones",
+    "open": "Abrir",
+    "openTag": "Abrir #{{tag}}",
+    "loadFailed": "No se pudieron cargar los hashtags.",
+    "unableToLoad": "No se pudieron cargar los hashtags",
+    "emptyTitle": "No se encontraron hashtags",
+    "emptySubtitle": "Los temas populares apareceran aqui cuando los miembros etiqueten publicaciones.",
+    "noMatch": "Ningun hashtag coincide con \"{{query}}\"."
+  },
+  "hashtag": {
+    "title": "Hashtag",
+    "subtitle": "Publicaciones etiquetadas",
+    "postCount": "{{count}} publicaciones",
+    "loadFailed": "No se pudieron cargar las publicaciones de este hashtag.",
+    "unableToLoad": "No se pudo cargar este hashtag",
+    "emptyTitle": "Aun no hay publicaciones",
+    "emptySubtitle": "Aun no hay publicaciones etiquetadas con #{{tag}}."
+  }
 }

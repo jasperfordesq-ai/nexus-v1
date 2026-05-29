@@ -3,7 +3,7 @@
   "eyebrow": "Activity inbox",
   "confirmMarkAllRead": "Mark all notifications as read?",
   "markAllRead": "Mark all read",
-  "marking": "Marking\u2026",
+  "marking": "Marking…",
   "markError": "Could not mark notifications as read.",
   "allCaughtUp": "You're all caught up!",
   "allCaughtUpSub": "You have no new notifications.",
@@ -27,5 +27,8 @@
     "connection": "Connection",
     "mention": "Mention",
     "other": "Notification"
-  }
+  },
+  "markRead": "Mark read",
+  "delete": "Delete",
+  "deleteError": "Could not delete notification."
 }

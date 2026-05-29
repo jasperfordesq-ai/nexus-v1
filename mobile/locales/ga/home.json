@@ -13,6 +13,20 @@
     "loading": "Ag luchtú sruth…",
     "emptySubtitle": "Tosaigh ag nascadh le do phobal chun postálacha a fheiceáil anseo."
   },
+  "activity": {
+    "title": "Activity",
+    "subtitle": "Your recent timebanking and community activity.",
+    "hoursGiven": "Hours given",
+    "hoursReceived": "Hours received",
+    "netBalance": "{{count}}h net",
+    "connections": "Connections",
+    "groupsJoined": "Groups joined",
+    "posts": "Posts",
+    "skills": "Skills",
+    "recent": "Recent activity",
+    "emptyTitle": "No activity yet",
+    "emptySubtitle": "Your activity will appear here after you take part."
+  },
   "listings": {
     "title": "Liostaí",
     "offer": "Tairiscintí",
@@ -35,5 +49,40 @@
   },
   "likePost": "Is maith liom an phostáil seo",
   "unlikePost": "Ní maith liom an phostáil seo a thuilleadh",
-  "readMore": "Léigh tuilleadh"
+  "readMore": "Léigh tuilleadh",
+  "composer": {
+    "hashtags": "Hashtags"
+  },
+  "dashboard": {
+    "balance": "Iarmheid",
+    "hours": "{{count}} uair",
+    "upcomingEvents": "Imeachtai le teacht",
+    "openRequests": "Iarratais oscailte",
+    "notifications": "Fogra",
+    "unavailable": "-",
+    "openCard": "Oscail {{label}}"
+  },
+  "hashtags": {
+    "title": "Hashtags",
+    "eyebrow": "Aimsigh",
+    "subtitle": "Aimsigh topaici gniomhacha agus comhra i do shruth.",
+    "searchPlaceholder": "Cuardaigh hashtags",
+    "postCount": "{{count}} postail",
+    "open": "Oscail",
+    "openTag": "Oscail #{{tag}}",
+    "loadFailed": "Niorbh fheider hashtags a luchtu.",
+    "unableToLoad": "Niorbh fheider hashtags a luchtu",
+    "emptyTitle": "Ni bhfuarthas hashtags",
+    "emptySubtitle": "Beidh topaici treochta anseo nuair a chuireann baill clibeanna ar phostail.",
+    "noMatch": "Ni mheaitsealaionn aon hashtag \"{{query}}\"."
+  },
+  "hashtag": {
+    "title": "Hashtag",
+    "subtitle": "Postail chlibeailte",
+    "postCount": "{{count}} postail",
+    "loadFailed": "Niorbh fheider postail don hashtag seo a luchtu.",
+    "unableToLoad": "Niorbh fheider an hashtag seo a luchtu",
+    "emptyTitle": "Gan phostail fos",
+    "emptySubtitle": "Nil aon phostail srutha clibeailte #{{tag}} fos."
+  }
 }

@@ -116,7 +116,7 @@ describe('HashtagPage', () => {
     render(<HashtagPage />);
 
     await waitFor(() => {
-      const backButton = screen.getByRole('button');
+      const backButton = screen.getByRole('button', { name: 'Back to feed' });
       expect(backButton).toBeInTheDocument();
     });
   });

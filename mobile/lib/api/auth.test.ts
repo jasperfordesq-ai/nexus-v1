@@ -25,7 +25,8 @@ jest.mock('@/lib/constants', () => ({
   DEFAULT_TENANT: 'test-tenant',
 }));
 
-import { extractToken, buildDisplayName } from './auth';
+import { api } from '@/lib/api/client';
+import { buildDisplayName, extractToken, resetPassword, verifyEmail } from './auth';
 import type { AuthResponse, LoginUser } from './auth';
 
 const baseResponse: AuthResponse = {
@@ -98,5 +99,33 @@ describe('buildDisplayName', () => {
 
   it('returns "Member" when both names are null', () => {
     expect(buildDisplayName({ ...base, first_name: null, last_name: null })).toBe('Member');
+  });
+});
+
+describe('resetPassword', () => {
+  it('posts the reset token and password confirmation to the auth endpoint', async () => {
+    (api.post as jest.Mock).mockResolvedValue({ success: true });
+
+    await resetPassword({
+      token: 'reset-token',
+      password: 'NewPassw0rd!',
+      password_confirmation: 'NewPassw0rd!',
+    });
+
+    expect(api.post).toHaveBeenCalledWith('/api/auth/reset-password', {
+      token: 'reset-token',
+      password: 'NewPassw0rd!',
+      password_confirmation: 'NewPassw0rd!',
+    });
+  });
+});
+
+describe('verifyEmail', () => {
+  it('posts the email verification token to the auth endpoint', async () => {
+    (api.post as jest.Mock).mockResolvedValue({ success: true, data: { verified: true } });
+
+    await verifyEmail('verify-token');
+
+    expect(api.post).toHaveBeenCalledWith('/api/auth/verify-email', { token: 'verify-token' });
   });
 });

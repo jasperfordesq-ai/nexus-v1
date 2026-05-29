@@ -8,11 +8,13 @@ import { render, fireEvent } from '@testing-library/react-native';
 
 // --- Mocks ---
 
+const mockRouterPush = jest.fn();
+
 jest.mock('expo-router', () => {
   return {
     useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }),
     useSegments: () => ['(tabs)'],
-    router: { push: jest.fn(), replace: jest.fn(), back: jest.fn() },
+    router: { push: (...args: unknown[]) => mockRouterPush(...args), replace: jest.fn(), back: jest.fn() },
     useLocalSearchParams: () => ({}),
     useNavigation: () => ({ setOptions: jest.fn() }),
   };
@@ -118,6 +120,7 @@ const defaultPaginatedState = {
 };
 
 beforeEach(() => {
+  mockRouterPush.mockReset();
   mockUsePaginatedApi.mockReturnValue(defaultPaginatedState);
 });
 
@@ -155,6 +158,26 @@ describe('GroupsScreen', () => {
 
     const { getByText } = render(<GroupsScreen />);
     expect(getByText('Garden Club')).toBeTruthy();
+  });
+
+  it('opens group details from HeroUI Native-backed group cards', () => {
+    mockUsePaginatedApi.mockReturnValueOnce({
+      items: [mockGroup],
+      isLoading: false,
+      isLoadingMore: false,
+      error: null,
+      hasMore: false,
+      loadMore: jest.fn(),
+      refresh: jest.fn(),
+    });
+
+    const { getByText } = render(<GroupsScreen />);
+    fireEvent.press(getByText('Garden Club'));
+
+    expect(mockRouterPush).toHaveBeenCalledWith({
+      pathname: '/(modals)/group-detail',
+      params: { id: '1' },
+    });
   });
 
   it('renders filter pills for All, Public, and Private', () => {

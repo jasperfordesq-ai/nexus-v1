@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback } from 'react';
-import { FlatList, Pressable, Text, View } from 'react-native';
+import { FlatList, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -94,9 +94,11 @@ export default function SelectTenantScreen() {
           const isActive = item.slug === tenantSlug;
 
           return (
-            <Pressable
+            <HeroButton
+              variant="ghost"
+              feedbackVariant="scale"
+              className="w-full p-0"
               onPress={() => void handleSelect(item)}
-              accessibilityRole="button"
               accessibilityLabel={item.name}
               accessibilityState={{ selected: isActive }}
             >
@@ -144,7 +146,7 @@ export default function SelectTenantScreen() {
                   </View>
                 </HeroCard.Body>
               </HeroCard>
-            </Pressable>
+            </HeroButton>
           );
         }}
         ListEmptyComponent={

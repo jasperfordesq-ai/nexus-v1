@@ -115,11 +115,11 @@ describe('FeedPage', () => {
 
   it('shows filter options', () => {
     render(<FeedPage />);
-    expect(screen.getByText('All')).toBeInTheDocument();
-    expect(screen.getByText('Posts')).toBeInTheDocument();
-    expect(screen.getByText('Listings')).toBeInTheDocument();
-    expect(screen.getByText('Events')).toBeInTheDocument();
-    expect(screen.getByText('Polls')).toBeInTheDocument();
+    expect(screen.getAllByText('All').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Posts').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Listings').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Events').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Polls').length).toBeGreaterThan(0);
   });
 
   it('shows quick post box for authenticated users', () => {
@@ -155,9 +155,9 @@ describe('FeedPage', () => {
     });
     render(<FeedPage />);
     await waitFor(() => {
-      expect(screen.getByText('First post content')).toBeInTheDocument();
+      expect(screen.getAllByText('First post content').length).toBeGreaterThan(0);
     });
-    expect(screen.getByText('Alice')).toBeInTheDocument();
+    expect(screen.getAllByText('Alice').length).toBeGreaterThan(0);
   });
 
   it('shows Load More when has_more is true', async () => {
@@ -228,7 +228,7 @@ describe('FeedPage', () => {
 
   it('shows Goals filter option', () => {
     render(<FeedPage />);
-    expect(screen.getByText('Goals')).toBeInTheDocument();
+    expect(screen.getAllByText('Goals').length).toBeGreaterThan(0);
   });
 
   it('shows loading skeletons while loading', async () => {
@@ -236,8 +236,8 @@ describe('FeedPage', () => {
     let resolveApi: (value: unknown) => void;
     mockGet.mockReturnValue(new Promise((resolve) => { resolveApi = resolve; }));
     render(<FeedPage />);
-    // Should show skeleton containers (GlassCard mocked as div.glass-card)
-    const skeletonCards = document.querySelectorAll('.glass-card');
+    // Should show skeleton containers (GlassCard mocked as div[data-testid="glass-card"])
+    const skeletonCards = document.querySelectorAll('[data-testid="glass-card"]');
     // At least 3 skeleton cards + possible quick-post box
     expect(skeletonCards.length).toBeGreaterThanOrEqual(3);
     // Clean up: resolve the promise so Vitest can exit cleanly

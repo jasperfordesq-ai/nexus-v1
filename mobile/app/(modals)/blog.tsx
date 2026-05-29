@@ -7,7 +7,6 @@ import { useCallback, useState } from 'react';
 import {
   FlatList,
   Image,
-  Pressable,
   RefreshControl,
   Text,
   View,
@@ -133,10 +132,11 @@ export default function BlogScreen() {
       : null;
 
     return (
-      <Pressable
+      <HeroButton
+        variant="ghost"
+        feedbackVariant="scale"
         className="mx-4 mb-3"
         onPress={() => openPost(item)}
-        accessibilityRole="button"
         accessibilityLabel={item.title}
       >
         <HeroCard className="overflow-hidden rounded-panel p-0">
@@ -188,7 +188,7 @@ export default function BlogScreen() {
             </View>
           </HeroCard.Body>
         </HeroCard>
-      </Pressable>
+      </HeroButton>
     );
   }
 

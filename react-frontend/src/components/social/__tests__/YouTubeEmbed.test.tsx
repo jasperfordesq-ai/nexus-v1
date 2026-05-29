@@ -139,9 +139,11 @@ describe('YouTubeEmbed', () => {
     // iframe should now be present with autoplay=1
     const iframe = screen.getByTitle('Test Video');
     expect(iframe).toBeInTheDocument();
+    // The component appends cc_load_policy=1 to force captions on (WCAG 1.2.2);
+    // assert autoplay/rel are present rather than an exact match that omits it.
     expect(iframe).toHaveAttribute(
       'src',
-      `${YOUTUBE_EMBED_URL}?autoplay=1&rel=0`,
+      `${YOUTUBE_EMBED_URL}?autoplay=1&rel=0&cc_load_policy=1`,
     );
   });
 

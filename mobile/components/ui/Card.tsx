@@ -4,8 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { Pressable, type StyleProp, type ViewStyle } from 'react-native';
-import { Card as HeroCard } from 'heroui-native';
+import { type StyleProp, type ViewStyle } from 'react-native';
+import { Button as HeroButton, Card as HeroCard } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 
 type CardVariant = 'elevated' | 'outlined' | 'flat';
@@ -43,17 +43,11 @@ export default function Card({
 
   if (pressable) {
     return (
-      <Pressable onPress={handlePress} accessibilityRole="button">
-        {({ pressed }) => (
-          <HeroCard
-            variant={heroVariant}
-            style={[{ opacity: pressed ? 0.85 : 1 }, style]}
-            className={className}
-          >
-            <HeroCard.Body>{children}</HeroCard.Body>
-          </HeroCard>
-        )}
-      </Pressable>
+      <HeroButton variant="ghost" feedbackVariant="scale" className="p-0" onPress={handlePress}>
+        <HeroCard variant={heroVariant} style={style} className={className}>
+          <HeroCard.Body>{children}</HeroCard.Body>
+        </HeroCard>
+      </HeroButton>
     );
   }
 

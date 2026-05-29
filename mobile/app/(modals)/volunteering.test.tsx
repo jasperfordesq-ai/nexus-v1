@@ -30,7 +30,74 @@ jest.mock('react-i18next', () => ({
         'stats.hours': 'Verified hours',
         'tabs.opportunities': 'Opportunities',
         'tabs.applications': 'My Applications',
+        'tabs.shifts': 'My Shifts',
         'tabs.hours': 'My Hours',
+        'tabs.certificates': 'Certificates',
+        'tabs.expenses': 'Expenses',
+        'tabs.donations': 'Donations',
+        'myShifts.empty': 'No confirmed shifts yet.',
+        'myShifts.date': opts ? String(opts.date ?? '') : 'Date',
+        'myShifts.dateUnknown': 'Date unavailable',
+        'myShifts.timeRange': opts ? `${String(opts.start ?? '')}-${String(opts.end ?? '')}` : 'Time',
+        'myShifts.confirmed': 'Confirmed',
+        'myShifts.cancel': 'Cancel shift',
+        'myShifts.cancelError': 'Could not cancel this shift.',
+        'myShifts.openOpportunityLabel': opts ? `Open opportunity for ${String(opts.title ?? '')}` : 'Open opportunity',
+        'myShifts.cancelLabel': opts ? `Cancel shift for ${String(opts.title ?? '')}` : 'Cancel shift',
+        'certificates.title': 'Volunteer certificates',
+        'certificates.description': 'Generate verified certificates.',
+        'certificates.generate': 'Generate certificate',
+        'certificates.generateError': 'Could not generate.',
+        'certificates.emptyTitle': 'No certificates yet',
+        'certificates.verifiedHours': opts ? `${String(opts.count ?? 0)} verified hours` : '0 verified hours',
+        'certificates.dateRange': opts ? `${String(opts.start ?? '')} - ${String(opts.end ?? '')}` : 'Date range',
+        'certificates.dateUnknown': 'Date unavailable',
+        'certificates.organizationHours': opts ? `${String(opts.name ?? '')}: ${String(opts.hours ?? 0)}h` : 'Org hours',
+        'certificates.open': 'Open certificate',
+        'certificates.openLabel': opts ? `Open certificate ${String(opts.code ?? '')}` : 'Open certificate',
+        'expenses.submit': 'Submit expense',
+        'expenses.submitHint': 'Submit a reimbursement request.',
+        'expenses.noOrganisations': 'No organisations.',
+        'expenses.validation': 'Enter expense details.',
+        'expenses.submitError': 'Could not submit this expense.',
+        'expenses.emptyTitle': 'No expenses yet',
+        'expenses.amountPlaceholder': 'Amount',
+        'expenses.currencyPlaceholder': 'EUR',
+        'expenses.descriptionPlaceholder': 'Description',
+        'expenses.dateUnknown': 'Date unavailable',
+        'expenses.stats.claimed': 'Claimed',
+        'expenses.stats.approved': 'Approved',
+        'expenses.types.travel': 'Travel',
+        'expenses.types.meals': 'Meals',
+        'expenses.types.supplies': 'Supplies',
+        'expenses.types.equipment': 'Equipment',
+        'expenses.types.parking': 'Parking',
+        'expenses.types.other': 'Other',
+        'expenses.status.pending': 'Pending',
+        'expenses.status.approved': 'Approved',
+        'expenses.status.rejected': 'Rejected',
+        'expenses.status.paid': 'Paid',
+        'donations.activeGivingDays': 'Active giving days',
+        'donations.makeDonation': 'Make a donation',
+        'donations.makeDonationHint': 'Record a pledge or offline donation.',
+        'donations.amountPlaceholder': 'Amount',
+        'donations.messagePlaceholder': 'Optional message',
+        'donations.anonymousOn': 'Anonymous',
+        'donations.anonymousOff': 'Show my name',
+        'donations.submit': 'Submit donation',
+        'donations.validation': 'Enter a valid donation amount.',
+        'donations.submitError': 'Could not submit this donation.',
+        'donations.emptyTitle': 'No donations yet',
+        'donations.progress': opts ? `${String(opts.percent ?? 0)}%` : '0%',
+        'donations.raisedOfGoal': opts ? `${String(opts.raised ?? '')} raised of ${String(opts.goal ?? '')}` : 'Raised',
+        'donations.selectCampaign': 'Choose campaign',
+        'donations.selected': 'Selected',
+        'donations.stats.raised': 'Raised',
+        'donations.stats.donors': 'Donors',
+        'donations.status.pending': 'Pending',
+        'donations.status.completed': 'Completed',
+        'donations.status.failed': 'Failed',
+        'donations.status.refunded': 'Refunded',
         'browseOrganisations': 'Browse organisations',
         'viewOpportunity': 'View',
         'apply': 'Apply',
@@ -122,9 +189,18 @@ jest.mock('@expo/vector-icons', () => ({
 jest.mock('@/lib/api/volunteering', () => ({
   getOpportunities: jest.fn(),
   getMyApplications: jest.fn(),
+  getMyShifts: jest.fn(),
   getHoursSummary: jest.fn(),
   getMyOrganisations: jest.fn(),
+  getVolunteerCertificates: jest.fn(),
+  generateVolunteerCertificate: jest.fn().mockResolvedValue({ data: {} }),
+  getVolunteerExpenses: jest.fn(),
+  submitVolunteerExpense: jest.fn().mockResolvedValue({ data: {} }),
+  getVolunteerGivingDays: jest.fn(),
+  getVolunteerDonations: jest.fn(),
+  submitVolunteerDonation: jest.fn().mockResolvedValue({ data: {} }),
   expressInterest: jest.fn().mockResolvedValue({}),
+  cancelShiftSignup: jest.fn().mockResolvedValue(undefined),
   withdrawApplication: jest.fn().mockResolvedValue({}),
   logVolunteerHours: jest.fn().mockResolvedValue({ data: {} }),
 }));
@@ -251,6 +327,12 @@ describe('VolunteeringScreen', () => {
           refresh: jest.fn(),
         },
         {
+          data: { data: { items: [], cursor: null, has_more: false } },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+        {
           data: { data: { total_verified: 0, total_pending: 0, total_declined: 0, by_organization: [], by_month: [] } },
           isLoading: false,
           error: null,
@@ -258,6 +340,30 @@ describe('VolunteeringScreen', () => {
         },
         {
           data: { data: [] },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+        {
+          data: { data: { items: [], cursor: null, has_more: false } },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+        {
+          data: { data: { items: [], expenses: [], stats: {}, cursor: null, has_more: false } },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+        {
+          data: { data: [] },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+        {
+          data: { data: { items: [], next_cursor: null } },
           isLoading: false,
           error: null,
           refresh: jest.fn(),
@@ -274,5 +380,284 @@ describe('VolunteeringScreen', () => {
 
     expect(getByText('Green Spaces')).toBeTruthy();
     expect(getByText('Log your hours.')).toBeTruthy();
+  });
+
+  it('renders confirmed volunteer shifts and cancel actions', () => {
+    let apiCall = 0;
+    mockUseApi.mockImplementation(() => {
+      const responses = [
+        {
+          data: { data: [] },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+        {
+          data: {
+            data: {
+              items: [{
+                id: 42,
+                opportunity_id: 10,
+                opportunity_title: 'Garden Helper',
+                location: 'Dublin',
+                application_id: 21,
+                start_time: '2026-06-01T10:00:00Z',
+                end_time: '2026-06-01T12:00:00Z',
+                capacity: 8,
+                signup_count: 3,
+                spots_available: 5,
+              }],
+              cursor: null,
+              has_more: false,
+            },
+          },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+        {
+          data: { data: { total_verified: 0, total_pending: 0, total_declined: 0, by_organization: [], by_month: [] } },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+        {
+          data: { data: [] },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+        {
+          data: { data: { items: [], cursor: null, has_more: false } },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+        {
+          data: { data: { items: [], expenses: [], stats: {}, cursor: null, has_more: false } },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+        {
+          data: { data: [] },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+        {
+          data: { data: { items: [], next_cursor: null } },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+      ];
+      const response = responses[apiCall % responses.length];
+      apiCall += 1;
+      return response;
+    });
+
+    const { getByText } = render(<VolunteeringScreen />);
+
+    fireEvent.press(getByText('My Shifts'));
+
+    expect(getByText('Garden Helper')).toBeTruthy();
+    expect(getByText('Confirmed')).toBeTruthy();
+    expect(getByText('Cancel shift')).toBeTruthy();
+  });
+
+  it('renders volunteer certificates in the native certificates tab', () => {
+    let apiCall = 0;
+    mockUseApi.mockImplementation(() => {
+      const responses = [
+        {
+          data: { data: [] },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+        {
+          data: { data: { items: [], cursor: null, has_more: false } },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+        {
+          data: { data: { total_verified: 0, total_pending: 0, total_declined: 0, by_organization: [], by_month: [] } },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+        {
+          data: { data: [] },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+        {
+          data: {
+            data: {
+              items: [{
+                id: 9,
+                verification_code: 'ABC123',
+                verification_url: 'https://api.test/verify/ABC123',
+                total_hours: 12,
+                date_range: { start: '2026-05-01', end: '2026-05-31' },
+                organizations: [{ name: 'Green Spaces', hours: 12 }],
+                generated_at: '2026-06-01T00:00:00Z',
+                downloaded_at: null,
+              }],
+              cursor: null,
+              has_more: false,
+            },
+          },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+        {
+          data: { data: { items: [], expenses: [], stats: {}, cursor: null, has_more: false } },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+        {
+          data: { data: [] },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+        {
+          data: { data: { items: [], next_cursor: null } },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+      ];
+      const response = responses[apiCall % responses.length];
+      apiCall += 1;
+      return response;
+    });
+
+    const { getByText } = render(<VolunteeringScreen />);
+
+    fireEvent.press(getByText('Certificates'));
+
+    expect(getByText('Volunteer certificates')).toBeTruthy();
+    expect(getByText('12 verified hours')).toBeTruthy();
+    expect(getByText('ABC123')).toBeTruthy();
+  });
+
+  it('renders volunteer expenses in the native expenses tab', () => {
+    let apiCall = 0;
+    mockUseApi.mockImplementation(() => {
+      const responses = [
+        { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() },
+        { data: { data: { items: [], cursor: null, has_more: false } }, isLoading: false, error: null, refresh: jest.fn() },
+        { data: { data: { total_verified: 0, total_pending: 0, total_declined: 0, by_organization: [], by_month: [] } }, isLoading: false, error: null, refresh: jest.fn() },
+        { data: { data: [{ id: 5, name: 'Green Spaces', status: 'approved', member_role: 'volunteer' }] }, isLoading: false, error: null, refresh: jest.fn() },
+        { data: { data: { items: [], cursor: null, has_more: false } }, isLoading: false, error: null, refresh: jest.fn() },
+        {
+          data: {
+            data: {
+              items: [{
+                id: 7,
+                expense_type: 'travel',
+                amount: '12.50',
+                currency: 'EUR',
+                description: 'Bus ticket',
+                status: 'pending',
+                submitted_at: '2026-06-01T00:00:00Z',
+              }],
+              expenses: [],
+              stats: {},
+              cursor: null,
+              has_more: false,
+            },
+          },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+        { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() },
+        { data: { data: { items: [], next_cursor: null } }, isLoading: false, error: null, refresh: jest.fn() },
+      ];
+      const response = responses[apiCall % responses.length];
+      apiCall += 1;
+      return response;
+    });
+
+    const { getAllByText, getByText } = render(<VolunteeringScreen />);
+
+    fireEvent.press(getByText('Expenses'));
+
+    expect(getAllByText('Submit expense').length).toBeGreaterThan(0);
+    expect(getByText('Bus ticket')).toBeTruthy();
+    expect(getByText('Pending')).toBeTruthy();
+  });
+
+  it('renders volunteer giving days and donation history in the native donations tab', () => {
+    let apiCall = 0;
+    mockUseApi.mockImplementation(() => {
+      const responses = [
+        { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() },
+        { data: { data: { items: [], cursor: null, has_more: false } }, isLoading: false, error: null, refresh: jest.fn() },
+        { data: { data: { total_verified: 0, total_pending: 0, total_declined: 0, by_organization: [], by_month: [] } }, isLoading: false, error: null, refresh: jest.fn() },
+        { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() },
+        { data: { data: { items: [], cursor: null, has_more: false } }, isLoading: false, error: null, refresh: jest.fn() },
+        { data: { data: { items: [], expenses: [], stats: {}, cursor: null, has_more: false } }, isLoading: false, error: null, refresh: jest.fn() },
+        {
+          data: {
+            data: [{
+              id: 8,
+              title: 'Spring Giving Day',
+              description: 'Support volunteer projects.',
+              goal_amount: '500.00',
+              raised_amount: '125.00',
+              donor_count: 4,
+              start_date: '2026-06-01',
+              end_date: '2026-06-30',
+              is_active: true,
+            }],
+          },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+        {
+          data: {
+            data: {
+              items: [{
+                id: 11,
+                amount: '25.00',
+                currency: 'EUR',
+                payment_method: 'bank_transfer',
+                message: 'For the campaign',
+                is_anonymous: false,
+                status: 'completed',
+                giving_day_id: 8,
+                created_at: '2026-06-02T00:00:00Z',
+              }],
+              next_cursor: null,
+            },
+          },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+      ];
+      const response = responses[apiCall % responses.length];
+      apiCall += 1;
+      return response;
+    });
+
+    const { getAllByText, getByText } = render(<VolunteeringScreen />);
+
+    fireEvent.press(getByText('Donations'));
+
+    expect(getByText('Spring Giving Day')).toBeTruthy();
+    expect(getByText('For the campaign')).toBeTruthy();
+    expect(getByText('Completed')).toBeTruthy();
+    expect(getAllByText('Submit donation').length).toBeGreaterThan(0);
   });
 });

@@ -24,7 +24,7 @@ const NAMESPACES = [
   'common', 'auth', 'messages', 'home', 'members', 'exchanges', 'events',
   'notifications', 'settings', 'wallet', 'profile', 'search', 'blog',
   'groups', 'gamification', 'goals', 'chat', 'volunteering', 'organisations',
-  'endorsements', 'federation', 'jobs', 'marketplace',
+  'endorsements', 'federation', 'jobs', 'marketplace', 'resources', 'ideation',
 ] as const;
 
 // Each loader is a function — require() calls inside are only evaluated when
@@ -55,6 +55,8 @@ const languageLoaders: Record<string, LanguageLoader> = {
     federation: require('../locales/en/federation.json'),
     jobs: require('../locales/en/jobs.json'),
     marketplace: require('../locales/en/marketplace.json'),
+    resources: require('../locales/en/resources.json'),
+    ideation: require('../locales/en/ideation.json'),
   }),
   ga: () => ({
     common: require('../locales/ga/common.json'),
@@ -80,6 +82,8 @@ const languageLoaders: Record<string, LanguageLoader> = {
     federation: require('../locales/ga/federation.json'),
     jobs: require('../locales/ga/jobs.json'),
     marketplace: require('../locales/ga/marketplace.json'),
+    resources: require('../locales/ga/resources.json'),
+    ideation: require('../locales/ga/ideation.json'),
   }),
   de: () => ({
     common: require('../locales/de/common.json'),
@@ -105,6 +109,8 @@ const languageLoaders: Record<string, LanguageLoader> = {
     federation: require('../locales/de/federation.json'),
     jobs: require('../locales/de/jobs.json'),
     marketplace: require('../locales/de/marketplace.json'),
+    resources: require('../locales/de/resources.json'),
+    ideation: require('../locales/de/ideation.json'),
   }),
   fr: () => ({
     common: require('../locales/fr/common.json'),
@@ -130,6 +136,8 @@ const languageLoaders: Record<string, LanguageLoader> = {
     federation: require('../locales/fr/federation.json'),
     jobs: require('../locales/fr/jobs.json'),
     marketplace: require('../locales/fr/marketplace.json'),
+    resources: require('../locales/fr/resources.json'),
+    ideation: require('../locales/fr/ideation.json'),
   }),
   it: () => ({
     common: require('../locales/it/common.json'),
@@ -155,6 +163,8 @@ const languageLoaders: Record<string, LanguageLoader> = {
     federation: require('../locales/it/federation.json'),
     jobs: require('../locales/it/jobs.json'),
     marketplace: require('../locales/it/marketplace.json'),
+    resources: require('../locales/it/resources.json'),
+    ideation: require('../locales/it/ideation.json'),
   }),
   pt: () => ({
     common: require('../locales/pt/common.json'),
@@ -180,6 +190,8 @@ const languageLoaders: Record<string, LanguageLoader> = {
     federation: require('../locales/pt/federation.json'),
     jobs: require('../locales/pt/jobs.json'),
     marketplace: require('../locales/pt/marketplace.json'),
+    resources: require('../locales/pt/resources.json'),
+    ideation: require('../locales/pt/ideation.json'),
   }),
   es: () => ({
     common: require('../locales/es/common.json'),
@@ -205,6 +217,8 @@ const languageLoaders: Record<string, LanguageLoader> = {
     federation: require('../locales/es/federation.json'),
     jobs: require('../locales/es/jobs.json'),
     marketplace: require('../locales/es/marketplace.json'),
+    resources: require('../locales/es/resources.json'),
+    ideation: require('../locales/es/ideation.json'),
   }),
 };
 

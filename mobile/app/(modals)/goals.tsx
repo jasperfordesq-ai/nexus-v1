@@ -14,6 +14,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
@@ -232,6 +233,9 @@ function GoalCard({
   const dueDateStr = dueDate
     ? new Date(dueDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
     : null;
+  const openDetail = () => {
+    router.push({ pathname: '/(modals)/goal-detail', params: { id: String(goal.id) } } as unknown as Href);
+  };
 
   function handleAbandon() {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -314,12 +318,23 @@ function GoalCard({
               <Ionicons name="checkmark-outline" size={15} color={theme.success} />
               <HeroButton.Label>{t('complete')}</HeroButton.Label>
             </HeroButton>
+            <HeroButton className="flex-1" size="sm" variant="secondary" onPress={openDetail}>
+              <Ionicons name="open-outline" size={15} color={primary} />
+              <HeroButton.Label>{t('details')}</HeroButton.Label>
+            </HeroButton>
             <HeroButton className="flex-1" size="sm" variant="tertiary" onPress={handleAbandon}>
               <Ionicons name="close-outline" size={15} color={theme.textMuted} />
               <HeroButton.Label>{t('abandon')}</HeroButton.Label>
             </HeroButton>
           </HeroCard.Footer>
-        ) : null}
+        ) : (
+          <HeroCard.Footer className="p-0 pt-1">
+            <HeroButton className="flex-1" size="sm" variant="secondary" onPress={openDetail}>
+              <Ionicons name="open-outline" size={15} color={primary} />
+              <HeroButton.Label>{t('details')}</HeroButton.Label>
+            </HeroButton>
+          </HeroCard.Footer>
+        )}
       </HeroCard.Body>
     </HeroCard>
   );

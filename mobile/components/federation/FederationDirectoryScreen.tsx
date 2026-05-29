@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, Image, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { Alert, Image, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -309,15 +309,17 @@ function FeatureUnavailableCard({
 
 function PartnerCard({ partner, t, theme, primary }: { partner: FederatedTenant; t: (key: string, opts?: Record<string, unknown>) => string; theme: ReturnType<typeof useTheme>; primary: string }) {
   return (
-    <Pressable
+    <HeroButton
+      variant="ghost"
+      feedbackVariant="scale"
+      className="mb-3"
       onPress={() => {
         void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         router.push({ pathname: '/(modals)/federation-partner', params: { id: String(partner.id) } });
       }}
-      accessibilityRole="button"
       accessibilityLabel={partner.name}
     >
-      <HeroCard className="mb-3 rounded-panel p-0">
+      <HeroCard className="rounded-panel p-0">
         <HeroCard.Body className="gap-4 p-4">
           <View className="flex-row items-start gap-3">
             <Avatar uri={partner.logo} name={partner.name} size={56} />
@@ -344,7 +346,7 @@ function PartnerCard({ partner, t, theme, primary }: { partner: FederatedTenant;
           </View>
         </HeroCard.Body>
       </HeroCard>
-    </Pressable>
+    </HeroButton>
   );
 }
 
@@ -439,51 +441,54 @@ function ListingCard({
   const isOffer = listing.type === 'offer';
   const typeColor = isOffer ? '#22c55e' : '#f59e0b';
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={t('directory.listings.openDetails', { title: listing.title })} onPress={onPress}>
-      <HeroCard className="mb-3 rounded-panel p-0">
-        <HeroCard.Body className="gap-3 p-4">
-          {resolvedMediaUrl(listing.image_url) ? (
-            <Image source={{ uri: resolvedMediaUrl(listing.image_url)! }} className="h-36 w-full rounded-panel-inner bg-surface" resizeMode="cover" />
-          ) : (
-            <Surface variant="secondary" className="h-24 items-center justify-center rounded-panel-inner" style={{ backgroundColor: withAlpha(typeColor, 0.14) }}>
-              <Ionicons name={isOffer ? 'hand-left-outline' : 'search-outline'} size={32} color={typeColor} />
-            </Surface>
-          )}
-          <View className="flex-row flex-wrap gap-2">
-            <Chip size="sm" variant="secondary" color={isOffer ? 'success' : 'warning'}>
-              <Chip.Label>{isOffer ? t('directory.listings.offer') : t('directory.listings.request')}</Chip.Label>
-            </Chip>
-            {listing.category_name ? <Chip size="sm" variant="secondary"><Chip.Label>{listing.category_name}</Chip.Label></Chip> : null}
-            {listing.is_external ? <Chip size="sm" variant="secondary"><Chip.Label>{t('directory.external')}</Chip.Label></Chip> : null}
+    <HeroCard className="mb-3 rounded-panel p-0">
+      <HeroCard.Body className="gap-3 p-4">
+        {resolvedMediaUrl(listing.image_url) ? (
+          <Image source={{ uri: resolvedMediaUrl(listing.image_url)! }} className="h-36 w-full rounded-panel-inner bg-surface" resizeMode="cover" />
+        ) : (
+          <Surface variant="secondary" className="h-24 items-center justify-center rounded-panel-inner" style={{ backgroundColor: withAlpha(typeColor, 0.14) }}>
+            <Ionicons name={isOffer ? 'hand-left-outline' : 'search-outline'} size={32} color={typeColor} />
+          </Surface>
+        )}
+        <View className="flex-row flex-wrap gap-2">
+          <Chip size="sm" variant="secondary" color={isOffer ? 'success' : 'warning'}>
+            <Chip.Label>{isOffer ? t('directory.listings.offer') : t('directory.listings.request')}</Chip.Label>
+          </Chip>
+          {listing.category_name ? <Chip size="sm" variant="secondary"><Chip.Label>{listing.category_name}</Chip.Label></Chip> : null}
+          {listing.is_external ? <Chip size="sm" variant="secondary"><Chip.Label>{t('directory.external')}</Chip.Label></Chip> : null}
+        </View>
+        <View className="flex-row items-start gap-3">
+          <View className="min-w-0 flex-1">
+            <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={2}>{listing.title}</Text>
+            <Text className="text-xs" style={{ color: theme.textMuted }} numberOfLines={1}>{listingAuthorName(listing, t)}</Text>
           </View>
-          <View className="flex-row items-start gap-3">
-            <View className="min-w-0 flex-1">
-              <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={2}>{listing.title}</Text>
-              <Text className="text-xs" style={{ color: theme.textMuted }} numberOfLines={1}>{listingAuthorName(listing, t)}</Text>
-            </View>
-            <Ionicons name="chevron-forward-outline" size={18} color={primary} />
-          </View>
-          {listing.description ? <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>{listing.description}</Text> : null}
-          <View className="flex-row flex-wrap gap-2">
+          <Ionicons name="chevron-forward-outline" size={18} color={primary} />
+        </View>
+        {listing.description ? <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>{listing.description}</Text> : null}
+        <View className="flex-row flex-wrap gap-2">
+          <Chip size="sm" variant="secondary">
+            <Ionicons name="globe-outline" size={12} color={primary} />
+            <Chip.Label>{listingCommunityName(listing, t)}</Chip.Label>
+          </Chip>
+          {listing.location ? (
             <Chip size="sm" variant="secondary">
-              <Ionicons name="globe-outline" size={12} color={primary} />
-              <Chip.Label>{listingCommunityName(listing, t)}</Chip.Label>
+              <Ionicons name="location-outline" size={12} color={primary} />
+              <Chip.Label>{listing.location}</Chip.Label>
             </Chip>
-            {listing.location ? (
-              <Chip size="sm" variant="secondary">
-                <Ionicons name="location-outline" size={12} color={primary} />
-                <Chip.Label>{listing.location}</Chip.Label>
-              </Chip>
-            ) : null}
-            {listing.estimated_hours ? <Chip size="sm" variant="secondary"><Chip.Label>{t('directory.listings.hours', { hours: listing.estimated_hours })}</Chip.Label></Chip> : null}
-          </View>
-          <HeroButton size="sm" variant="secondary" onPress={onPress}>
-            <Ionicons name="open-outline" size={14} color={primary} />
-            <HeroButton.Label>{t('directory.listings.viewDetails')}</HeroButton.Label>
-          </HeroButton>
-        </HeroCard.Body>
-      </HeroCard>
-    </Pressable>
+          ) : null}
+          {listing.estimated_hours ? <Chip size="sm" variant="secondary"><Chip.Label>{t('directory.listings.hours', { hours: listing.estimated_hours })}</Chip.Label></Chip> : null}
+        </View>
+        <HeroButton
+          size="sm"
+          variant="secondary"
+          onPress={onPress}
+          accessibilityLabel={t('directory.listings.openDetails', { title: listing.title })}
+        >
+          <Ionicons name="open-outline" size={14} color={primary} />
+          <HeroButton.Label>{t('directory.listings.viewDetails')}</HeroButton.Label>
+        </HeroButton>
+      </HeroCard.Body>
+    </HeroCard>
   );
 }
 
@@ -634,8 +639,8 @@ function GroupCard({
 }) {
   const community = group.timebank?.name ?? group.partner_name ?? t('directory.unknownCommunity');
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={t('directory.groups.openDetails', { name: group.name })} onPress={onPress}>
-      <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
+    <HeroButton variant="ghost" feedbackVariant="scale" className="mb-3" accessibilityLabel={t('directory.groups.openDetails', { name: group.name })} onPress={onPress}>
+      <HeroCard className="overflow-hidden rounded-panel p-0">
         {resolvedMediaUrl(group.cover_image) ? <Image source={{ uri: resolvedMediaUrl(group.cover_image)! }} className="h-32 w-full bg-surface" resizeMode="cover" /> : <View className="h-1.5" style={{ backgroundColor: '#8b5cf6' }} />}
         <HeroCard.Body className="gap-3 p-4">
           <View className="flex-row items-start gap-3">
@@ -662,7 +667,7 @@ function GroupCard({
           </View>
         </HeroCard.Body>
       </HeroCard>
-    </Pressable>
+    </HeroButton>
   );
 }
 
@@ -748,8 +753,8 @@ function EventCard({
   const startDate = formatDate(event.start_date);
   const organizerName = event.organizer?.name?.trim() || t('directory.events.organizerFallback');
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={t('directory.events.openDetails', { title: event.title })} onPress={onPress}>
-      <HeroCard className="mb-3 rounded-panel p-0">
+    <HeroButton variant="ghost" feedbackVariant="scale" className="mb-3" accessibilityLabel={t('directory.events.openDetails', { title: event.title })} onPress={onPress}>
+      <HeroCard className="rounded-panel p-0">
         <HeroCard.Body className="gap-3 p-4">
           {resolvedMediaUrl(event.cover_image) ? <Image source={{ uri: resolvedMediaUrl(event.cover_image)! }} className="h-36 w-full rounded-panel-inner bg-surface" resizeMode="cover" /> : null}
           <View className="flex-row items-start gap-3">
@@ -781,7 +786,7 @@ function EventCard({
           </View>
         </HeroCard.Body>
       </HeroCard>
-    </Pressable>
+    </HeroButton>
   );
 }
 
@@ -886,8 +891,8 @@ function MessageCard({
   const { partner, lastMessage: message } = thread;
   const partnerName = displayFederationPartnerName(partner, t('directory.messages.unknownSender'));
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={t('directory.messages.openThread', { name: partnerName })} onPress={onPress}>
-      <HeroCard className="mb-3 rounded-panel p-0">
+    <HeroButton variant="ghost" feedbackVariant="scale" className="mb-3" accessibilityLabel={t('directory.messages.openThread', { name: partnerName })} onPress={onPress}>
+      <HeroCard className="rounded-panel p-0">
         <HeroCard.Body className="gap-3 p-4">
           <View className="flex-row items-start gap-3">
             <Avatar uri={partner.avatar ?? null} name={partnerName} size={48} />
@@ -914,7 +919,7 @@ function MessageCard({
           </View>
         </HeroCard.Body>
       </HeroCard>
-    </Pressable>
+    </HeroButton>
   );
 }
 

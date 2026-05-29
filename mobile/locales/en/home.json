@@ -46,7 +46,31 @@
     "title": "Share something with your community",
     "subtitle": "Create an exchange, browse polls, or add to the feed.",
     "exchange": "New exchange",
-    "polls": "Polls"
+    "polls": "Polls",
+    "hashtags": "Hashtags"
+  },
+  "dashboard": {
+    "balance": "Balance",
+    "hours": "{{count}} hours",
+    "upcomingEvents": "Upcoming events",
+    "openRequests": "Open requests",
+    "notifications": "Notifications",
+    "unavailable": "—",
+    "openCard": "Open {{label}}"
+  },
+  "activity": {
+    "title": "Activity",
+    "subtitle": "Your recent timebanking and community activity.",
+    "hoursGiven": "Hours given",
+    "hoursReceived": "Hours received",
+    "netBalance": "{{count}}h net",
+    "connections": "Connections",
+    "groupsJoined": "Groups joined",
+    "posts": "Posts",
+    "skills": "Skills",
+    "recent": "Recent activity",
+    "emptyTitle": "No activity yet",
+    "emptySubtitle": "Your activity will appear here after you take part."
   },
   "listings": {
     "title": "Listings",
@@ -142,6 +166,7 @@
   "comment": "Comment",
   "official": "Official",
   "detail": {
+    "post": "View post",
     "listing": "View exchange",
     "event": "View event",
     "job": "View job",
@@ -165,5 +190,28 @@
   "media": {
     "video": "Video",
     "videoDescription": "Open this item to view the video."
+  },
+  "hashtags": {
+    "title": "Hashtags",
+    "eyebrow": "Discovery",
+    "subtitle": "Find active topics and open conversations across your feed.",
+    "searchPlaceholder": "Search hashtags",
+    "postCount": "{{count}} posts",
+    "open": "Open",
+    "openTag": "Open #{{tag}}",
+    "loadFailed": "Could not load hashtags.",
+    "unableToLoad": "Could not load hashtags",
+    "emptyTitle": "No hashtags found",
+    "emptySubtitle": "Trending topics will appear here when members tag feed posts.",
+    "noMatch": "No hashtags match \"{{query}}\"."
+  },
+  "hashtag": {
+    "title": "Hashtag",
+    "subtitle": "Tagged feed posts",
+    "postCount": "{{count}} posts",
+    "loadFailed": "Could not load posts for this hashtag.",
+    "unableToLoad": "Could not load this hashtag",
+    "emptyTitle": "No posts yet",
+    "emptySubtitle": "No feed posts are tagged #{{tag}} yet."
   }
 }

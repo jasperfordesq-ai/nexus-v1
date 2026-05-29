@@ -248,8 +248,9 @@ describe('VerificationAuditLog', () => {
       expect(screen.getByText('No audit events found.')).toBeTruthy();
     });
 
-    // The Select component with "All events" placeholder
-    const selectTrigger = document.querySelector('[data-slot="trigger"]');
+    // The filter Select is identified by its accessible (aria) label.
+    const selectTrigger = document.querySelector('[data-slot="trigger"]') ||
+                          screen.getByLabelText('Filter verification events');
     expect(selectTrigger).toBeTruthy();
   });
 

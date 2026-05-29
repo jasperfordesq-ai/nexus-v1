@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Image, Pressable, View } from 'react-native';
+import { Image, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
@@ -60,85 +60,92 @@ export default function MarketplaceListingCard({
   const inventory = inventoryChip(item);
 
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={item.title} onPress={onPress}>
-      <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
-        <View className="h-1.5" style={{ backgroundColor: accent }} />
-        <HeroCard.Body className="gap-3 p-3">
-          <View className="flex-row gap-3">
-            <Surface variant="secondary" className="h-24 w-24 items-center justify-center overflow-hidden rounded-panel-inner p-0">
-              {imageUrl ? (
-                <Image source={{ uri: imageUrl }} className="h-full w-full" resizeMode="cover" />
-              ) : (
-                <Ionicons name="bag-handle-outline" size={30} color={accent} />
-              )}
-            </Surface>
+    <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
+      <View className="h-1.5" style={{ backgroundColor: accent }} />
+      <HeroCard.Body className="gap-3 p-3">
+        <View className="flex-row gap-3">
+          <Surface variant="secondary" className="h-24 w-24 items-center justify-center overflow-hidden rounded-panel-inner p-0">
+            {imageUrl ? (
+              <Image source={{ uri: imageUrl }} className="h-full w-full" resizeMode="cover" />
+            ) : (
+              <Ionicons name="bag-handle-outline" size={30} color={accent} />
+            )}
+          </Surface>
 
-            <View className="min-w-0 flex-1 gap-2">
-              <View className="flex-row items-start gap-2">
-                <View className="min-w-0 flex-1">
-                  <Text className="text-base font-bold leading-5" style={{ color: theme.text }} numberOfLines={2}>
-                    {item.title}
+          <View className="min-w-0 flex-1 gap-2">
+            <View className="flex-row items-start gap-2">
+              <View className="min-w-0 flex-1">
+                <Text className="text-base font-bold leading-5" style={{ color: theme.text }} numberOfLines={2}>
+                  {item.title}
+                </Text>
+                {item.tagline ? (
+                  <Text className="mt-0.5 text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>
+                    {item.tagline}
                   </Text>
-                  {item.tagline ? (
-                    <Text className="mt-0.5 text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>
-                      {item.tagline}
-                    </Text>
-                  ) : null}
-                </View>
-                {onSavePress ? (
-                  <HeroButton
-                    isIconOnly
-                    size="sm"
-                    variant="secondary"
-                    accessibilityLabel={item.is_saved ? t('detail.unsave') : t('detail.save')}
-                    onPress={onSavePress}
-                    style={{ backgroundColor: withAlpha(primary, 0.12) }}
-                  >
-                    <Ionicons name={item.is_saved ? 'heart' : 'heart-outline'} size={18} color={primary} />
-                  </HeroButton>
                 ) : null}
               </View>
+              {onSavePress ? (
+                <HeroButton
+                  isIconOnly
+                  size="sm"
+                  variant="secondary"
+                  accessibilityLabel={item.is_saved ? t('detail.unsave') : t('detail.save')}
+                  onPress={onSavePress}
+                  style={{ backgroundColor: withAlpha(primary, 0.12) }}
+                >
+                  <Ionicons name={item.is_saved ? 'heart' : 'heart-outline'} size={18} color={primary} />
+                </HeroButton>
+              ) : null}
+            </View>
 
-              <View className="flex-row flex-wrap gap-1.5">
+            <View className="flex-row flex-wrap gap-1.5">
+              <Chip size="sm" variant="secondary">
+                <Ionicons name={item.price_type === 'free' ? 'gift-outline' : 'pricetag-outline'} size={12} color={accent} />
+                <Chip.Label>{price}</Chip.Label>
+              </Chip>
+              {item.condition ? (
                 <Chip size="sm" variant="secondary">
-                  <Ionicons name={item.price_type === 'free' ? 'gift-outline' : 'pricetag-outline'} size={12} color={accent} />
-                  <Chip.Label>{price}</Chip.Label>
+                  <Chip.Label>{t(`condition.${item.condition}`)}</Chip.Label>
                 </Chip>
-                {item.condition ? (
-                  <Chip size="sm" variant="secondary">
-                    <Chip.Label>{t(`condition.${item.condition}`)}</Chip.Label>
-                  </Chip>
-                ) : null}
-                {item.category?.name ? (
-                  <Chip size="sm" variant="secondary">
-                    <Chip.Label>{item.category.name}</Chip.Label>
-                  </Chip>
-                ) : null}
-                {inventory ? (
-                  <Chip size="sm" variant="secondary">
-                    <Ionicons name={inventory.icon} size={12} color={inventory.tone} />
-                    <Chip.Label style={{ color: inventory.tone }}>{t(inventory.labelKey, inventory.params)}</Chip.Label>
-                  </Chip>
-                ) : null}
-              </View>
+              ) : null}
+              {item.category?.name ? (
+                <Chip size="sm" variant="secondary">
+                  <Chip.Label>{item.category.name}</Chip.Label>
+                </Chip>
+              ) : null}
+              {inventory ? (
+                <Chip size="sm" variant="secondary">
+                  <Ionicons name={inventory.icon} size={12} color={inventory.tone} />
+                  <Chip.Label style={{ color: inventory.tone }}>{t(inventory.labelKey, inventory.params)}</Chip.Label>
+                </Chip>
+              ) : null}
+            </View>
 
-              <View className="flex-row items-center gap-2">
-                <Avatar uri={item.user?.avatar_url} name={item.user?.name} size={28} />
-                <View className="min-w-0 flex-1">
-                  <Text className="text-xs font-semibold" style={{ color: theme.text }} numberOfLines={1}>
-                    {item.user?.name ?? t('common.seller')}
-                  </Text>
-                  <Text className="text-[11px]" style={{ color: theme.textMuted }} numberOfLines={1}>
-                    {item.location || t(`delivery_method.${item.delivery_method || 'other'}`)}
-                  </Text>
-                </View>
-                {item.user?.is_verified ? <Ionicons name="shield-checkmark-outline" size={16} color={theme.success} /> : null}
+            <View className="flex-row items-center gap-2">
+              <Avatar uri={item.user?.avatar_url} name={item.user?.name} size={28} />
+              <View className="min-w-0 flex-1">
+                <Text className="text-xs font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+                  {item.user?.name ?? t('common.seller')}
+                </Text>
+                <Text className="text-[11px]" style={{ color: theme.textMuted }} numberOfLines={1}>
+                  {item.location || t(`delivery_method.${item.delivery_method || 'other'}`)}
+                </Text>
               </View>
+              {item.user?.is_verified ? <Ionicons name="shield-checkmark-outline" size={16} color={theme.success} /> : null}
             </View>
           </View>
-        </HeroCard.Body>
-      </HeroCard>
-    </Pressable>
+        </View>
+        <HeroButton
+          size="sm"
+          variant="secondary"
+          className="self-start"
+          accessibilityLabel={t('actions.viewListing', { title: item.title })}
+          onPress={onPress}
+        >
+          <HeroButton.Label>{t('actions.view')}</HeroButton.Label>
+        </HeroButton>
+      </HeroCard.Body>
+    </HeroCard>
   );
 }
 

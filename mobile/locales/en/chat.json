@@ -28,5 +28,19 @@
   "limits_left_today": "{{count}} left today",
   "messages_region": "Messages",
   "you": "You",
-  "sources_label": "Sources"
+  "sources_label": "Sources",
+  "tool_results": {
+    "label": "Results",
+    "fallbackTitle": "Result",
+    "open": "Open {{title}}",
+    "type": {
+      "listing": "Listing",
+      "member": "Member",
+      "event": "Event",
+      "job": "Job",
+      "marketplace": "Marketplace",
+      "kb": "Knowledge base",
+      "wallet": "Wallet"
+    }
+  }
 }

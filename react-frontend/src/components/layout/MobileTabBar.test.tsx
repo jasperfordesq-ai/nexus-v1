@@ -257,10 +257,13 @@ describe('MobileTabBar', () => {
       });
       render(<MobileTabBar />);
       // HeroUI Badge renders the element with data-invisible="true" when count is 0
-      // so it's still in the DOM but visually hidden — check the attribute instead
+      // so it's still in the DOM but visually hidden — check the attribute instead.
+      // The "0" text lives inside the nested Badge.Label; the data-invisible flag
+      // sits on the badge root ancestor ([data-slot="badge"]), so assert there.
       const badge = screen.queryByText('0');
       if (badge) {
-        expect(badge).toHaveAttribute('data-invisible', 'true');
+        const root = (badge.closest('[data-slot="badge"]') as HTMLElement | null) ?? badge;
+        expect(root).toHaveAttribute('data-invisible', 'true');
       }
     });
 

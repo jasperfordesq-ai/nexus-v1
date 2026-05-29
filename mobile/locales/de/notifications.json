@@ -11,5 +11,8 @@
   "justNow": "Gerade eben",
   "minutesAgo": "vor {{count}} Min.",
   "hoursAgo": "vor {{count}} Std.",
-  "daysAgo": "vor {{count}} T."
+  "daysAgo": "vor {{count}} T.",
+  "markRead": "Mark read",
+  "delete": "Delete",
+  "deleteError": "Could not delete notification."
 }

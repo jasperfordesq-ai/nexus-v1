@@ -1,5 +1,49 @@
 {
   "detailTitle": "Sonraí an imeachta",
   "confirmCancelRsvp": "Do RSVP don imeacht seo a chealú?",
-  "share": "Roinn imeacht"
+  "share": "Roinn imeacht",
+  "detail": {
+    "organizerAttendance": "Organizer attendance",
+    "loadingAttendees": "Loading attendees",
+    "attendeesLoadError": "Could not load attendees.",
+    "noAttendees": "No attendees yet.",
+    "moreAttendees": "+{{count}} more",
+    "waitlistCount": "{{count}} on the waitlist",
+    "onWaitlistPosition": "You are on the waitlist: #{{position}}",
+    "checkInProgress": "{{checked}} / {{total}} checked in",
+    "attendanceLoadError": "Could not load attendance.",
+    "noCheckInAttendeesTitle": "No check-ins yet",
+    "noCheckInAttendees": "No attendees are ready to check in yet.",
+    "attendeeGoing": "Going",
+    "attendeeInterested": "Interested",
+    "attendeeCheckedIn": "Checked in",
+    "checkIn": "Check in",
+    "checkingIn": "Checking in",
+    "checkInError": "Could not check in attendee.",
+    "checkInAttendeeLabel": "Check in {{name}}",
+    "joinWaitlist": "Join waitlist",
+    "leaveWaitlist": "Leave waitlist",
+    "joinWaitlistError": "Could not join the waitlist.",
+    "leaveWaitlistError": "Could not leave the waitlist.",
+    "eventPolls": "Event polls",
+    "loadingPolls": "Loading polls",
+    "pollsLoadError": "Could not load event polls.",
+    "pollVoteError": "Could not submit your vote.",
+    "pollOptionFallback": "Poll option",
+    "pollOptionResult": "{{label}} - {{percent}}%",
+    "pollTotalVotes": "{{count}} votes",
+    "communityMember": "Community member"
+  },
+  "reminders": {
+    "title": "Reminders",
+    "subtitle": "Choose when Project NEXUS should remind you about this event.",
+    "loadError": "Could not load event reminders.",
+    "saved": "Reminders updated.",
+    "error": "Could not update event reminders.",
+    "option": {
+      "60": "1 hour before",
+      "1440": "1 day before",
+      "10080": "1 week before"
+    }
+  }
 }

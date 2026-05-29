@@ -6,10 +6,12 @@
 import React from 'react';
 import { fireEvent, render } from '@testing-library/react-native';
 
+const mockRouterPush = jest.fn();
+
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) }),
   useSegments: () => ['(tabs)'],
-  router: { push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
+  router: { push: (...args: unknown[]) => mockRouterPush(...args), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
   useLocalSearchParams: () => ({}),
 }));
 
@@ -100,6 +102,7 @@ const defaultPaginatedState = {
 };
 
 beforeEach(() => {
+  mockRouterPush.mockReset();
   mockUsePaginatedApi.mockReturnValue(defaultPaginatedState);
 });
 
@@ -155,6 +158,21 @@ describe('SearchScreen', () => {
     const { getByText } = render(<SearchScreen />);
     expect(getByText('Jane Doe')).toBeTruthy();
     expect(getByText('Timebanker')).toBeTruthy();
+  });
+
+  it('opens result detail routes from HeroUI Native-backed result rows', () => {
+    mockUsePaginatedApi.mockReturnValueOnce({
+      ...defaultPaginatedState,
+      items: [mockSearchResult],
+    });
+
+    const { getByText } = render(<SearchScreen />);
+    fireEvent.press(getByText('Jane Doe'));
+
+    expect(mockRouterPush).toHaveBeenCalledWith({
+      pathname: '/(modals)/member-profile',
+      params: { id: '42' },
+    });
   });
 
   it('renders the initial empty state when no query has been entered', () => {

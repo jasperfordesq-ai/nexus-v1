@@ -24,6 +24,13 @@ jest.mock('react-i18next', () => ({
         'feed.subtitle': "Here's what's happening in your timebank",
         'feed.emptyTitle': 'No activity yet. Say hello to your community!',
         'notifications.title': 'Notifications',
+        'dashboard.balance': 'Balance',
+        'dashboard.hours': `${String(opts?.count ?? 0)} hours`,
+        'dashboard.upcomingEvents': 'Upcoming events',
+        'dashboard.openRequests': 'Open requests',
+        'dashboard.notifications': 'Notifications',
+        'dashboard.unavailable': '-',
+        'dashboard.openCard': `Open ${String(opts?.label ?? '')}`,
         'common:labels.friend': 'Friend',
         'common:buttons.retry': 'Retry',
       };
@@ -89,6 +96,18 @@ jest.mock('@/lib/api/feed', () => ({
   }),
 }));
 
+jest.mock('@/lib/api/wallet', () => ({
+  getWalletBalance: jest.fn(() => Promise.resolve({ data: { balance: 12 } })),
+}));
+
+jest.mock('@/lib/api/events', () => ({
+  getEvents: jest.fn(() => Promise.resolve({ data: [{ id: 1 }, { id: 2 }], meta: { per_page: 5, has_more: false, cursor: null } })),
+}));
+
+jest.mock('@/lib/api/exchanges', () => ({
+  getExchanges: jest.fn(() => Promise.resolve({ data: [{ id: 1 }, { id: 2 }, { id: 3 }], meta: { per_page: 5, has_more: false, cursor: null } })),
+}));
+
 jest.mock('@/components/FeedItem', () => {
   const MockFeedItem = ({ item }: { item: { id: number; content?: string } }) => {
     const { Text } = require('react-native');
@@ -148,6 +167,17 @@ describe('HomeScreen', () => {
     expect(getByText("Here's what's happening in your timebank")).toBeTruthy();
   });
 
+  it('renders dashboard summary cards from existing mobile APIs', async () => {
+    const { findByText, getByText } = render(<HomeScreen />);
+
+    expect(getByText('Balance')).toBeTruthy();
+    expect(await findByText('12 hours')).toBeTruthy();
+    expect(getByText('Upcoming events')).toBeTruthy();
+    expect(await findByText('2')).toBeTruthy();
+    expect(getByText('Open requests')).toBeTruthy();
+    expect(await findByText('3')).toBeTruthy();
+  });
+
   it('renders empty state when feed has no items and is not loading', () => {
     const { getByText } = render(<HomeScreen />);
     expect(getByText('No activity yet. Say hello to your community!')).toBeTruthy();
@@ -202,21 +232,21 @@ describe('HomeScreen', () => {
   it('shows unread notification badge when there are unread notifications', () => {
     mockRealtimeContext.unreadNotifications = 3;
 
-    const { getByText } = render(<HomeScreen />);
-    expect(getByText('3')).toBeTruthy();
+    const { getAllByText } = render(<HomeScreen />);
+    expect(getAllByText('3').length).toBeGreaterThan(0);
   });
 
   it('shows the unread count when notification count is two digits', () => {
     mockRealtimeContext.unreadNotifications = 14;
 
-    const { getByText } = render(<HomeScreen />);
-    expect(getByText('14')).toBeTruthy();
+    const { getAllByText } = render(<HomeScreen />);
+    expect(getAllByText('14').length).toBeGreaterThan(0);
   });
 
   it('caps the unread notification badge at 99+', () => {
     mockRealtimeContext.unreadNotifications = 124;
 
-    const { getByText } = render(<HomeScreen />);
-    expect(getByText('99+')).toBeTruthy();
+    const { getAllByText } = render(<HomeScreen />);
+    expect(getAllByText('99+').length).toBeGreaterThan(0);
   });
 });

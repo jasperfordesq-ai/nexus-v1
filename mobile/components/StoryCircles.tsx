@@ -3,9 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Surface } from 'heroui-native';
+import { Button as HeroButton, Surface } from 'heroui-native';
 
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -31,11 +31,12 @@ export default function StoryCircles({ members, onPress }: StoryCirclesProps) {
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-3 px-4 py-1">
       {user ? (
-        <Pressable
+        <HeroButton
           className="w-16 items-center"
+          variant="ghost"
+          feedbackVariant="scale"
           onPress={() => onPress(user.id)}
           accessibilityLabel={t('stories.you')}
-          accessibilityRole="button"
         >
           <Surface variant="default" className="relative h-16 w-16 items-center justify-center rounded-full p-1">
             <Avatar uri={user.avatar_url ?? null} name={displayName || null} size={56} />
@@ -49,16 +50,17 @@ export default function StoryCircles({ members, onPress }: StoryCirclesProps) {
           <Text className="mt-1 max-w-[60px] text-center text-[11px] text-muted-foreground" numberOfLines={1}>
             {t('stories.you')}
           </Text>
-        </Pressable>
+        </HeroButton>
       ) : null}
 
       {members.map((member) => (
-        <Pressable
+        <HeroButton
           key={member.id}
           className="w-16 items-center"
+          variant="ghost"
+          feedbackVariant="scale"
           onPress={() => onPress(member.id)}
           accessibilityLabel={member.name || t('stories.member')}
-          accessibilityRole="button"
         >
           <Surface variant="default" className="h-16 w-16 items-center justify-center rounded-full p-1">
             <Avatar uri={member.avatar ?? null} name={member.name || null} size={56} />
@@ -66,7 +68,7 @@ export default function StoryCircles({ members, onPress }: StoryCirclesProps) {
           <Text className="mt-1 max-w-[60px] text-center text-[11px] text-muted-foreground" numberOfLines={1}>
             {(member.name || '').split(' ')[0] || t('stories.memberInitial')}
           </Text>
-        </Pressable>
+        </HeroButton>
       ))}
     </ScrollView>
   );

@@ -1,10 +1,24 @@
 {
   "title": "Chat IA",
-  "placeholder": "Pergunta qualquer coisa sobre o banco de tempo…",
+  "placeholder": "Pergunta qualquer coisa sobre o banco de tempoâ€¦",
   "send": "Enviar",
   "empty": "Inicia uma conversa com o assistente IA.",
-  "error": "Não foi possível enviar a mensagem.",
-  "thinking": "A pensar…",
-  "timeout": "A resposta está a demorar demasiado. Por favor, tente novamente.",
-  "disclaimer": "As respostas da IA podem não ser sempre precisas."
+  "error": "NÃ£o foi possÃ­vel enviar a mensagem.",
+  "thinking": "A pensarâ€¦",
+  "timeout": "A resposta estÃ¡ a demorar demasiado. Por favor, tente novamente.",
+  "disclaimer": "As respostas da IA podem nÃ£o ser sempre precisas.",
+  "tool_results": {
+    "label": "Results",
+    "fallbackTitle": "Result",
+    "open": "Open {{title}}",
+    "type": {
+      "listing": "Listing",
+      "member": "Member",
+      "event": "Event",
+      "job": "Job",
+      "marketplace": "Marketplace",
+      "kb": "Knowledge base",
+      "wallet": "Wallet"
+    }
+  }
 }

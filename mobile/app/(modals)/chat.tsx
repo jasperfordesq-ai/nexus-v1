@@ -3,12 +3,12 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ComponentProps } from 'react';
 import {
   FlatList,
   KeyboardAvoidingView,
+  Linking,
   Platform,
-  Pressable,
   Text,
   View,
 } from 'react-native';
@@ -22,6 +22,7 @@ import {
   sendChatMessage,
   type ChatMessage,
   type ChatSource,
+  type ToolInvocation,
 } from '@/lib/api/chat';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -83,6 +84,112 @@ function SourceChips({
   );
 }
 
+function getResultTitle(item: Record<string, unknown>) {
+  return String(item.title ?? item.name ?? item.summary ?? item.label ?? '');
+}
+
+function getResultSubtitle(item: Record<string, unknown>) {
+  const parts = [
+    item.tagline,
+    item.location,
+    item.excerpt,
+    item.salary,
+    item.price,
+    item.condition,
+  ]
+    .filter((value) => typeof value === 'string' && value.trim().length > 0)
+    .map(String);
+  return parts[0] ?? '';
+}
+
+function getResultIcon(cardType: string): ComponentProps<typeof Ionicons>['name'] {
+  switch (cardType) {
+    case 'listing':
+      return 'pricetag-outline';
+    case 'member':
+      return 'person-outline';
+    case 'event':
+      return 'calendar-outline';
+    case 'job':
+      return 'briefcase-outline';
+    case 'marketplace':
+      return 'bag-handle-outline';
+    case 'kb':
+      return 'book-outline';
+    case 'wallet':
+      return 'wallet-outline';
+    default:
+      return 'sparkles-outline';
+  }
+}
+
+function ToolResultCards({
+  invocations,
+  primary,
+  theme,
+  t,
+}: {
+  invocations: ToolInvocation[];
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+}) {
+  const renderableInvocations = invocations.filter((invocation) => invocation.ok && Array.isArray(invocation.results) && invocation.results.length > 0);
+  if (renderableInvocations.length === 0) return null;
+
+  return (
+    <View className="mt-2 gap-2">
+      <Text className="px-1 text-[11px] font-semibold uppercase" style={{ color: theme.textSecondary }}>
+        {t('tool_results.label')}
+      </Text>
+      {renderableInvocations.map((invocation, invocationIndex) => (
+        <View key={`${invocation.name}-${invocationIndex}`} className="gap-2">
+          {invocation.results.slice(0, 6).map((item, resultIndex) => {
+            const title = getResultTitle(item) || t('tool_results.fallbackTitle');
+            const subtitle = getResultSubtitle(item);
+            const url = typeof item.url === 'string' && item.url.trim() ? item.url : null;
+            return (
+              <HeroButton
+                key={`${invocation.card_type}-${String(item.id ?? resultIndex)}`}
+                variant="ghost"
+                feedbackVariant="scale"
+                className="w-full"
+                isDisabled={!url}
+                accessibilityLabel={t('tool_results.open', { title })}
+                onPress={() => {
+                  if (url) void Linking.openURL(url);
+                }}
+              >
+                <Surface variant="secondary" className="w-full flex-row items-start gap-3 rounded-panel-inner p-3">
+                  <View className="size-9 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+                    <Ionicons name={getResultIcon(invocation.card_type)} size={17} color={primary} />
+                  </View>
+                  <View className="min-w-0 flex-1 gap-1">
+                    <View className="flex-row items-start gap-2">
+                      <Text className="min-w-0 flex-1 text-sm font-semibold" style={{ color: theme.text }} numberOfLines={2}>
+                        {title}
+                      </Text>
+                      {url ? <Ionicons name="open-outline" size={14} color={theme.textSecondary} /> : null}
+                    </View>
+                    {subtitle ? (
+                      <Text className="text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>
+                        {subtitle}
+                      </Text>
+                    ) : null}
+                    <Chip size="sm" variant="secondary">
+                      <Chip.Label>{t(`tool_results.type.${invocation.card_type}`, { defaultValue: invocation.card_type })}</Chip.Label>
+                    </Chip>
+                  </View>
+                </Surface>
+              </HeroButton>
+            );
+          })}
+        </View>
+      ))}
+    </View>
+  );
+}
+
 function MessageBubble({
   message,
   primary,
@@ -102,6 +209,7 @@ function MessageBubble({
   const isThinking = message.role === 'thinking';
   const isError = 'is_error' in message && message.is_error === true;
   const sources = 'sources' in message && message.sources ? message.sources : [];
+  const toolInvocations = 'tool_invocations' in message && message.tool_invocations ? message.tool_invocations : [];
 
   return (
     <View className={`mb-4 flex-row items-end gap-2 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
@@ -149,6 +257,7 @@ function MessageBubble({
             {messageTime(message.created_at)}
           </Text>
         ) : null}
+        {!isUser && !isThinking ? <ToolResultCards invocations={toolInvocations} primary={primary} theme={theme} t={t} /> : null}
         {!isUser && !isThinking ? <SourceChips sources={sources} theme={theme} /> : null}
       </View>
     </View>

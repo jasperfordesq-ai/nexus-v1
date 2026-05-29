@@ -140,6 +140,7 @@ jest.mock('@/lib/api/marketplace', () => ({
 import MarketplaceCollectionsRoute from './marketplace-collections';
 import { router } from 'expo-router';
 import {
+  getMarketplaceCollectionItems,
   getMarketplaceCollections,
   getMarketplaceSavedSearches,
 } from '@/lib/api/marketplace';
@@ -173,6 +174,7 @@ describe('MarketplaceCollectionsRoute', () => {
         },
       ],
     } as never);
+    jest.mocked(getMarketplaceCollectionItems).mockResolvedValue({ data: [] } as never);
   });
 
   it('opens the saved searches tab from the web-compatible searches route param', async () => {
@@ -218,5 +220,13 @@ describe('MarketplaceCollectionsRoute', () => {
 
     expect(getByPlaceholderText('Weekend projects')).toBeTruthy();
     expect(getByPlaceholderText('Optional note')).toBeTruthy();
+  });
+
+  it('opens collection rows from HeroUI Native-backed collection cards', async () => {
+    const { findByText } = render(<MarketplaceCollectionsRoute />);
+
+    fireEvent.press(await findByText('Garden kit'));
+
+    expect(getMarketplaceCollectionItems).toHaveBeenCalledWith(1, null, 50);
   });
 });

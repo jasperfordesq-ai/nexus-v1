@@ -7,7 +7,6 @@ import { useState } from 'react';
 import {
   Alert,
   FlatList,
-  Pressable,
   RefreshControl,
   Text,
   View,
@@ -19,6 +18,7 @@ import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 
 import {
+  deleteNotification,
   getNotifications,
   markAllRead,
   markRead,
@@ -41,6 +41,7 @@ export default function NotificationsScreen() {
   const primary = usePrimaryColor();
   const theme = useTheme();
   const [markingAll, setMarkingAll] = useState(false);
+  const [actingId, setActingId] = useState<number | null>(null);
 
   const { data, isLoading, error, refresh } = useApi(() => getNotifications());
   const notifications = data?.data ?? [];
@@ -75,6 +76,32 @@ export default function NotificationsScreen() {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     void markRead(item.id).then(() => refresh()).catch(console.warn);
     navigateToLink(item.link ?? null);
+  }
+
+  async function handleMarkRead(item: Notification) {
+    setActingId(item.id);
+    try {
+      await markRead(item.id);
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      refresh();
+    } catch {
+      Alert.alert(t('common:errors.alertTitle'), t('markError'));
+    } finally {
+      setActingId(null);
+    }
+  }
+
+  async function handleDelete(item: Notification) {
+    setActingId(item.id);
+    try {
+      await deleteNotification(item.id);
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      refresh();
+    } catch {
+      Alert.alert(t('common:errors.alertTitle'), t('deleteError'));
+    } finally {
+      setActingId(null);
+    }
   }
 
   function renderHeader() {
@@ -128,61 +155,89 @@ export default function NotificationsScreen() {
     const categoryTint = categoryColor(item.category, theme.textMuted, theme);
 
     return (
-      <Pressable
-        className="mx-4 mb-3"
-        onPress={() => handleNotificationPress(item)}
-        accessibilityLabel={item.is_read ? label : t('unreadItem', { label })}
-        accessibilityRole="button"
-        accessibilityHint={t('itemHint')}
-      >
+      <View className="mx-4 mb-3">
         <HeroCard className={`overflow-hidden rounded-panel p-0 ${!item.is_read ? 'border border-primary/30' : ''}`}>
           {!item.is_read ? <View className="h-1.5" style={{ backgroundColor: primary }} /> : null}
           <HeroCard.Body className="gap-3 p-4">
-            <View className="flex-row items-start gap-3">
-              <View className="relative">
-                <Avatar uri={item.actor?.avatar_url ?? null} name={item.actor?.name ?? '?'} size={44} />
-                <View
-                  className="absolute bottom-0 right-0 size-3 rounded-full border-[1.5px]"
-                  style={{ backgroundColor: categoryTint, borderColor: theme.surface }}
-                />
-              </View>
+            <HeroButton
+              variant="ghost"
+              feedbackVariant="scale"
+              className="w-full p-0"
+              onPress={() => handleNotificationPress(item)}
+              accessibilityLabel={item.is_read ? label : t('unreadItem', { label })}
+              accessibilityHint={t('itemHint')}
+            >
+              <View className="flex-row items-start gap-3">
+                <View className="relative">
+                  <Avatar uri={item.actor?.avatar_url ?? null} name={item.actor?.name ?? '?'} size={44} />
+                  <View
+                    className="absolute bottom-0 right-0 size-3 rounded-full border-[1.5px]"
+                    style={{ backgroundColor: categoryTint, borderColor: theme.surface }}
+                  />
+                </View>
 
-              <View className="min-w-0 flex-1 gap-2">
-                <View className="flex-row items-start gap-2">
-                  <View className="min-w-0 flex-1">
-                    {item.title ? (
-                      <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={2}>
-                        {item.title}
+                <View className="min-w-0 flex-1 gap-2">
+                  <View className="flex-row items-start gap-2">
+                    <View className="min-w-0 flex-1">
+                      {item.title ? (
+                        <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={2}>
+                          {item.title}
+                        </Text>
+                      ) : null}
+                      <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>
+                        {item.message}
                       </Text>
+                    </View>
+                    {!item.is_read ? (
+                      <View className="mt-1 size-2.5 rounded-full" style={{ backgroundColor: primary }} />
                     ) : null}
-                    <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>
-                      {item.message}
-                    </Text>
                   </View>
-                  {!item.is_read ? (
-                    <View className="mt-1 size-2.5 rounded-full" style={{ backgroundColor: primary }} />
-                  ) : null}
-                </View>
 
-                <View className="flex-row flex-wrap items-center gap-2">
-                  <Chip size="sm" variant="secondary">
-                    <Ionicons name={categoryIcon(item.category)} size={12} color={categoryTint} />
-                    <Chip.Label>{categoryLabel(item.category, t)}</Chip.Label>
-                  </Chip>
-                  <Chip size="sm" variant="secondary">
-                    <Ionicons name="time-outline" size={12} color={theme.textSecondary} />
-                    <Chip.Label>
-                      {(Date.now() - new Date(item.created_at).getTime()) < 60_000
-                        ? t('justNow')
-                        : formatRelativeTime(item.created_at)}
-                    </Chip.Label>
-                  </Chip>
+                  <View className="flex-row flex-wrap items-center gap-2">
+                    <Chip size="sm" variant="secondary">
+                      <Ionicons name={categoryIcon(item.category)} size={12} color={categoryTint} />
+                      <Chip.Label>{categoryLabel(item.category, t)}</Chip.Label>
+                    </Chip>
+                    <Chip size="sm" variant="secondary">
+                      <Ionicons name="time-outline" size={12} color={theme.textSecondary} />
+                      <Chip.Label>
+                        {(Date.now() - new Date(item.created_at).getTime()) < 60_000
+                          ? t('justNow')
+                          : formatRelativeTime(item.created_at)}
+                      </Chip.Label>
+                    </Chip>
+                  </View>
                 </View>
               </View>
+            </HeroButton>
+
+            <View className="flex-row flex-wrap gap-2 border-t border-border pt-2">
+              {!item.is_read ? (
+                <HeroButton
+                  size="sm"
+                  variant="secondary"
+                  isDisabled={actingId === item.id}
+                  onPress={() => void handleMarkRead(item)}
+                  accessibilityLabel={t('markRead')}
+                >
+                  <Ionicons name="checkmark-outline" size={15} color={primary} />
+                  <HeroButton.Label>{t('markRead')}</HeroButton.Label>
+                </HeroButton>
+              ) : null}
+              <HeroButton
+                size="sm"
+                variant="danger"
+                isDisabled={actingId === item.id}
+                onPress={() => void handleDelete(item)}
+                accessibilityLabel={t('delete')}
+              >
+                <Ionicons name="trash-outline" size={15} color="#fff" />
+                <HeroButton.Label>{t('delete')}</HeroButton.Label>
+              </HeroButton>
             </View>
           </HeroCard.Body>
         </HeroCard>
-      </Pressable>
+      </View>
     );
   }
 

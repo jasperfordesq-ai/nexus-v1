@@ -11,5 +11,8 @@
   "justNow": "À l'instant",
   "minutesAgo": "il y a {{count}} min",
   "hoursAgo": "il y a {{count}} h",
-  "daysAgo": "il y a {{count}} j"
+  "daysAgo": "il y a {{count}} j",
+  "markRead": "Mark read",
+  "delete": "Delete",
+  "deleteError": "Could not delete notification."
 }

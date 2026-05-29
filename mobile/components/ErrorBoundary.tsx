@@ -4,9 +4,10 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import * as Sentry from '@sentry/react-native';
 import i18n from 'i18next';
+import Button from '@/components/ui/Button';
 
 interface Props {
   children: React.ReactNode;
@@ -48,19 +49,14 @@ function ErrorFallback({ onReset }: { onReset: () => void }) {
       >
         {title}
       </Text>
-      <Pressable
-        style={{
-          paddingVertical: 10,
-          paddingHorizontal: 24,
-          backgroundColor: '#006FEE',
-          borderRadius: 8,
-        }}
+      <Button
+        size="md"
         onPress={onReset}
-        accessibilityRole="button"
         accessibilityLabel={retry}
+        style={{ minWidth: 120 }}
       >
-        <Text style={{ fontSize: 14, fontWeight: '600', color: '#fff' }}>{retry}</Text>
-      </Pressable>
+        {retry}
+      </Button>
     </View>
   );
 }

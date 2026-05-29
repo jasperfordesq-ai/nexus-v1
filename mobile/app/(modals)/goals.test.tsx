@@ -61,6 +61,7 @@ jest.mock('react-i18next', () => ({
         'create.error': 'Failed to create goal.',
         'goals:complete': 'Mark complete',
         complete: 'Mark complete',
+        details: 'Details',
         'goals:abandon': 'Abandon',
         abandon: 'Abandon',
         'goals:updateError': 'Failed to update goal.',
@@ -193,6 +194,7 @@ describe('GoalsScreen', () => {
 
     const { getByText } = render(<GoalsScreen />);
     expect(getByText('Mark complete')).toBeTruthy();
+    expect(getByText('Details')).toBeTruthy();
     expect(getByText('Abandon')).toBeTruthy();
   });
 
@@ -203,5 +205,19 @@ describe('GoalsScreen', () => {
     expect(getAllByText('Completed').length).toBeGreaterThan(0);
     expect(queryByText('Mark complete')).toBeNull();
     expect(queryByText('Abandon')).toBeNull();
+    expect(queryByText('Details')).toBeTruthy();
+  });
+
+  it('opens the goal detail modal from a goal card', () => {
+    const { router } = require('expo-router');
+    mockUseApi.mockReturnValue({ data: { data: [mockGoal] }, isLoading: false, error: null, refresh: jest.fn() });
+
+    const { getByText } = render(<GoalsScreen />);
+    fireEvent.press(getByText('Details'));
+
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/(modals)/goal-detail',
+      params: { id: '1' },
+    });
   });
 });

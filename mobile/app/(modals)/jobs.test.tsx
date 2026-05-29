@@ -4,13 +4,15 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
+import { render, fireEvent, waitFor } from '@testing-library/react-native';
 
 // --- Mocks ---
 
+const mockRouterPush = jest.fn();
+
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }),
-  router: { push: jest.fn(), replace: jest.fn(), back: jest.fn() },
+  router: { push: (...args: unknown[]) => mockRouterPush(...args), replace: jest.fn(), back: jest.fn() },
   useLocalSearchParams: () => ({}),
   useNavigation: () => ({ setOptions: jest.fn() }),
 }));
@@ -25,14 +27,54 @@ jest.mock('react-i18next', () => ({
         'tabs.browse': 'Browse',
         'tabs.myApplications': 'My Applications',
         'tabs.myPostings': 'My Postings',
+        'tabs.alerts': 'Alerts',
         'search.placeholder': 'Search jobs...',
         'common:actions.clear': 'Clear search',
         'empty': 'No jobs found',
         'emptyHint': 'Try adjusting your filters or check back later',
         'applications.empty': 'No applications yet',
         'applications.emptyHint': 'Apply to jobs to see them here',
+        'applications.appliedOn': opts ? `Applied ${String(opts.date ?? '')}` : 'Applied',
+        'applications.showMessage': 'Show cover message',
+        'applications.hideMessage': 'Hide cover message',
+        'applications.history': 'History',
+        'applications.historyEmpty': 'No status history yet.',
+        'applications.historyStart': 'Started',
+        'applications.historyTransition': opts ? `${String(opts.from ?? '')} to ${String(opts.to ?? '')}` : 'transition',
+        'applications.withdraw': 'Withdraw',
+        'applications.withdrawSuccess': 'Application withdrawn.',
+        'applications.status.applied': 'Applied',
+        'applications.status.pending': 'Pending',
         'postings.empty': 'No postings yet',
         'postings.emptyHint': 'Create a job to manage your roles here.',
+        'alerts.title': 'Job alerts',
+        'alerts.subtitle': 'Save searches and get notified when matching roles appear.',
+        'alerts.create': 'Create alert',
+        'alerts.creating': 'Creating...',
+        'alerts.active': 'Active',
+        'alerts.paused': 'Paused',
+        'alerts.pause': 'Pause',
+        'alerts.resume': 'Resume',
+        'alerts.delete': 'Delete',
+        'alerts.emptyTitle': 'No job alerts yet',
+        'alerts.emptyDescription': 'Create an alert to keep new matching roles close to the app.',
+        'alerts.keywordsLabel': 'Keywords',
+        'alerts.keywordsPlaceholder': 'Role, skill, or employer',
+        'alerts.categoriesLabel': 'Categories',
+        'alerts.categoriesPlaceholder': 'Community, care, digital',
+        'alerts.locationLabel': 'Location',
+        'alerts.locationPlaceholder': 'City, region, or remote',
+        'alerts.typeLabel': 'Role type',
+        'alerts.commitmentLabel': 'Commitment',
+        'alerts.remoteOnly': 'Remote roles only',
+        'alerts.remoteOnlyShort': 'Remote',
+        'alerts.anyMatch': 'Any matching role',
+        'alerts.createdDate': opts ? `Created ${String(opts.date ?? '')}` : 'Created',
+        'alerts.lastNotified': opts ? `Last notified ${String(opts.date ?? '')}` : 'Last notified',
+        'alerts.never': 'Never',
+        'alerts.createSuccess': 'Job alert created.',
+        'alerts.pauseSuccess': 'Job alert paused.',
+        'alerts.deleteSuccess': 'Job alert deleted.',
         'card.remote': 'Remote',
         'card.featured': 'Featured',
         'card.applications': opts ? `${String(opts.count ?? 0)} applications` : '0 applications',
@@ -81,6 +123,11 @@ jest.mock('@/lib/hooks/usePaginatedApi', () => ({
   usePaginatedApi: (...args: unknown[]) => mockUsePaginatedApi(...args),
 }));
 
+const mockUseApi = jest.fn();
+jest.mock('@/lib/hooks/useApi', () => ({
+  useApi: (...args: unknown[]) => mockUseApi(...args),
+}));
+
 jest.mock('expo-haptics', () => ({
   impactAsync: jest.fn().mockResolvedValue(undefined),
   ImpactFeedbackStyle: { Light: 'light' },
@@ -94,6 +141,15 @@ jest.mock('@/lib/api/jobs', () => ({
   getJobs: jest.fn(),
   getMyApplications: jest.fn(),
   getMyPostings: jest.fn(),
+  getJobAlerts: jest.fn(),
+  createJobAlert: jest.fn().mockResolvedValue({ data: { id: 99, message: 'ok' } }),
+  deleteJobAlert: jest.fn().mockResolvedValue(undefined),
+  pauseJobAlert: jest.fn().mockResolvedValue({ data: { message: 'paused' } }),
+  resumeJobAlert: jest.fn().mockResolvedValue({ data: { message: 'resumed' } }),
+  getJobApplicationHistory: jest.fn().mockResolvedValue({
+    data: [{ id: 1, application_id: 10, from_status: null, to_status: 'pending', notes: null, changed_by: null, changed_by_name: null, changed_at: '2026-03-10T00:00:00Z' }],
+  }),
+  withdrawJobApplication: jest.fn().mockResolvedValue({ data: { message: 'withdrawn' } }),
 }));
 
 jest.mock('@/components/ui/LoadingSpinner', () => () => null);
@@ -101,7 +157,8 @@ jest.mock('@/components/ui/LoadingSpinner', () => () => null);
 // --- Tests ---
 
 import JobsScreen from './jobs';
-import type { JobVacancy, JobApplication } from '@/lib/api/jobs';
+import { createJobAlert, deleteJobAlert, getJobApplicationHistory, pauseJobAlert, withdrawJobApplication } from '@/lib/api/jobs';
+import type { JobVacancy, JobApplication, JobAlert } from '@/lib/api/jobs';
 
 const defaultPaginatedState = {
   items: [],
@@ -115,6 +172,14 @@ const defaultPaginatedState = {
 
 beforeEach(() => {
   mockUsePaginatedApi.mockReturnValue(defaultPaginatedState);
+  mockUseApi.mockReturnValue({
+    data: { data: [] },
+    isLoading: false,
+    error: null,
+    refresh: jest.fn(),
+  });
+  jest.clearAllMocks();
+  mockRouterPush.mockReset();
 });
 
 const mockJob: JobVacancy = {
@@ -157,6 +222,20 @@ const mockApplication: JobApplication = {
   updated_at: '2026-03-10T00:00:00Z',
 };
 
+const mockAlert: JobAlert = {
+  id: 77,
+  user_id: 1,
+  keywords: 'coordinator',
+  categories: 'Community',
+  type: 'paid',
+  commitment: 'full_time',
+  location: 'Remote',
+  is_remote_only: true,
+  is_active: true,
+  last_notified_at: null,
+  created_at: '2026-03-12T00:00:00Z',
+};
+
 describe('JobsScreen', () => {
   it('renders without crashing', () => {
     const { toJSON } = render(<JobsScreen />);
@@ -179,6 +258,7 @@ describe('JobsScreen', () => {
     expect(getByText('Browse')).toBeTruthy();
     expect(getByText('My Applications')).toBeTruthy();
     expect(getByText('My Postings')).toBeTruthy();
+    expect(getByText('Alerts')).toBeTruthy();
   });
 
   it('renders empty state when no jobs and not loading', () => {
@@ -207,6 +287,33 @@ describe('JobsScreen', () => {
     const { getByText } = render(<JobsScreen />);
     expect(getByText('Community Coordinator')).toBeTruthy();
     expect(getByText('Dublin Community Hub')).toBeTruthy();
+  });
+
+  it('opens job details from HeroUI Native-backed job cards', () => {
+    let callCount = 0;
+    mockUsePaginatedApi.mockImplementation(() => {
+      callCount += 1;
+      if ((callCount - 1) % 3 === 0) {
+        return {
+          items: [mockJob],
+          isLoading: false,
+          isLoadingMore: false,
+          error: null,
+          hasMore: false,
+          loadMore: jest.fn(),
+          refresh: jest.fn(),
+        };
+      }
+      return defaultPaginatedState;
+    });
+
+    const { getByText } = render(<JobsScreen />);
+    fireEvent.press(getByText('Community Coordinator'));
+
+    expect(mockRouterPush).toHaveBeenCalledWith({
+      pathname: '/(modals)/job-detail',
+      params: { id: '1' },
+    });
   });
 
   it('does not render empty state when loading', () => {
@@ -272,6 +379,30 @@ describe('JobsScreen', () => {
     expect(getByText('Community Coordinator')).toBeTruthy();
   });
 
+  it('shows application cover message, history, and withdraw action', async () => {
+    let callCount = 0;
+    const refresh = jest.fn();
+    mockUsePaginatedApi.mockImplementation(() => {
+      callCount += 1;
+      if ((callCount - 2) % 3 === 0) {
+        return { items: [mockApplication], isLoading: false, isLoadingMore: false, error: null, hasMore: false, loadMore: jest.fn(), refresh };
+      }
+      return { items: [], isLoading: false, isLoadingMore: false, error: null, hasMore: false, loadMore: jest.fn(), refresh: jest.fn() };
+    });
+
+    const { getByText } = render(<JobsScreen />);
+    fireEvent.press(getByText('My Applications'));
+    fireEvent.press(getByText('Show cover message'));
+    expect(getByText('I am a great fit.')).toBeTruthy();
+
+    fireEvent.press(getByText('History'));
+    await waitFor(() => expect(getJobApplicationHistory).toHaveBeenCalledWith(10));
+
+    fireEvent.press(getByText('Withdraw'));
+    await waitFor(() => expect(withdrawJobApplication).toHaveBeenCalledWith(10));
+    expect(refresh).toHaveBeenCalled();
+  });
+
   it('renders owner postings in My Postings tab', () => {
     let callCount = 0;
     mockUsePaginatedApi.mockImplementation(() => {
@@ -287,5 +418,62 @@ describe('JobsScreen', () => {
 
     expect(getByText('Community Coordinator')).toBeTruthy();
     expect(getByText('Dublin Community Hub')).toBeTruthy();
+  });
+
+  it('renders job alerts tab and creates an alert', async () => {
+    const refresh = jest.fn();
+    mockUseApi.mockReturnValue({
+      data: { data: [] },
+      isLoading: false,
+      error: null,
+      refresh,
+    });
+
+    const { getByText, getByPlaceholderText } = render(<JobsScreen />);
+    fireEvent.press(getByText('Alerts'));
+    fireEvent.changeText(getByPlaceholderText('Role, skill, or employer'), 'coordinator');
+    fireEvent.changeText(getByPlaceholderText('City, region, or remote'), 'Remote');
+    fireEvent.press(getByText('Paid'));
+    fireEvent.press(getByText('Create alert'));
+
+    expect(createJobAlert).toHaveBeenCalledWith({
+      keywords: 'coordinator',
+      location: 'Remote',
+      type: 'paid',
+    });
+    await waitFor(() => expect(refresh).toHaveBeenCalled());
+  });
+
+  it('renders and pauses existing job alerts', () => {
+    mockUseApi.mockReturnValue({
+      data: { data: [mockAlert] },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByText } = render(<JobsScreen />);
+    fireEvent.press(getByText('Alerts'));
+
+    expect(getByText('coordinator')).toBeTruthy();
+    expect(getByText('Active')).toBeTruthy();
+
+    fireEvent.press(getByText('Pause'));
+    expect(pauseJobAlert).toHaveBeenCalledWith(77);
+  });
+
+  it('deletes existing job alerts', async () => {
+    mockUseApi.mockReturnValue({
+      data: { data: [mockAlert] },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByText } = render(<JobsScreen />);
+    fireEvent.press(getByText('Alerts'));
+
+    fireEvent.press(getByText('Delete'));
+    await waitFor(() => expect(deleteJobAlert).toHaveBeenCalledWith(77));
   });
 });

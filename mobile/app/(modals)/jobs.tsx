@@ -8,7 +8,6 @@ import {
   FlatList,
   View,
   Text,
-  Pressable,
   RefreshControl,
   ScrollView,
 } from 'react-native';
@@ -23,15 +22,26 @@ import {
   getJobs,
   getMyApplications,
   getMyPostings,
+  getJobAlerts,
+  createJobAlert,
+  deleteJobAlert,
+  pauseJobAlert,
+  resumeJobAlert,
+  getJobApplicationHistory,
+  withdrawJobApplication,
   acceptInterview,
   declineInterview,
   acceptOffer,
   rejectOffer,
   type JobVacancy,
   type JobApplication,
+  type JobAlert,
+  type JobApplicationHistoryEntry,
   type JobsResponse,
   type ApplicationsResponse,
+  type CreateJobAlertPayload,
 } from '@/lib/api/jobs';
+import { useApi } from '@/lib/hooks/useApi';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
@@ -41,14 +51,17 @@ import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
+import Toggle from '@/components/ui/Toggle';
 
 // ---------------------------------------------------------------------------
 // Type filter options
 // ---------------------------------------------------------------------------
 
 const JOB_TYPES = ['', 'paid', 'volunteer', 'timebank'] as const;
+const ALERT_JOB_TYPES = ['paid', 'volunteer', 'timebank'] as const;
 const COMMITMENT_TYPES = ['', 'full_time', 'part_time', 'flexible', 'one_off'] as const;
-type JobsTab = 'browse' | 'myApplications' | 'myPostings';
+const ALERT_COMMITMENT_TYPES = ['full_time', 'part_time', 'flexible', 'one_off'] as const;
+type JobsTab = 'browse' | 'myApplications' | 'myPostings' | 'alerts';
 
 // ---------------------------------------------------------------------------
 // Job card component
@@ -107,9 +120,11 @@ function JobCard({
   const visibleSkills = (item.skills_required ?? []).slice(0, 3);
 
   return (
-    <Pressable
+    <HeroButton
+      variant="ghost"
+      feedbackVariant="scale"
+      className="w-full p-0"
       onPress={onPress}
-      accessibilityRole="button"
       accessibilityLabel={item.title}
     >
       <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
@@ -190,7 +205,7 @@ function JobCard({
           ) : null}
         </HeroCard.Body>
       </HeroCard>
-    </Pressable>
+    </HeroButton>
   );
 }
 
@@ -257,6 +272,7 @@ function ApplicationCard({
   theme,
   t,
   primary,
+  onApplicationChanged,
   onInterviewAccepted,
   onInterviewDeclined,
   onOfferAccepted,
@@ -266,12 +282,18 @@ function ApplicationCard({
   theme: ReturnType<typeof useTheme>;
   t: (key: string, opts?: Record<string, unknown>) => string;
   primary: string;
+  onApplicationChanged: () => void;
   onInterviewAccepted: (interviewId: number) => void;
   onInterviewDeclined: (interviewId: number) => void;
   onOfferAccepted: (offerId: number) => void;
   onOfferRejected: (offerId: number) => void;
 }) {
   const [actionLoading, setActionLoading] = useState(false);
+  const [messageExpanded, setMessageExpanded] = useState(false);
+  const [historyExpanded, setHistoryExpanded] = useState(false);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [history, setHistory] = useState<JobApplicationHistoryEntry[]>([]);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   const statusColor: Record<JobApplication['status'], string> = {
     pending: theme.warning,
@@ -298,6 +320,37 @@ function ApplicationCard({
 
   const interview = item.interview ?? null;
   const offer = item.offer ?? null;
+  const isActive = ['pending', 'screening', 'reviewed', 'interview', 'offer'].includes(item.status);
+
+  const handleToggleHistory = async () => {
+    const nextOpen = !historyExpanded;
+    setHistoryExpanded(nextOpen);
+    if (!nextOpen || history.length > 0) return;
+
+    setHistoryLoading(true);
+    try {
+      const response = await getJobApplicationHistory(item.id);
+      setHistory(Array.isArray(response.data) ? response.data : []);
+    } catch {
+      setStatusMessage(t('applications.historyError'));
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  const handleWithdraw = async () => {
+    setActionLoading(true);
+    setStatusMessage(null);
+    try {
+      await withdrawJobApplication(item.id);
+      setStatusMessage(t('applications.withdrawSuccess'));
+      onApplicationChanged();
+    } catch {
+      setStatusMessage(t('applications.withdrawError'));
+    } finally {
+      setActionLoading(false);
+    }
+  };
 
   return (
     <View className="bg-surface rounded-2xl p-4 mb-3 border border-border/50 gap-2">
@@ -320,6 +373,26 @@ function ApplicationCard({
         <Ionicons name="calendar-outline" size={13} color={theme.textMuted} />
         <Text className="text-[11px] text-muted-foreground">{appliedStr}</Text>
       </View>
+
+      {item.message ? (
+        <View className="gap-2">
+          <HeroButton
+            size="sm"
+            variant="ghost"
+            className="self-start rounded-lg"
+            onPress={() => setMessageExpanded((value) => !value)}
+            accessibilityLabel={messageExpanded ? t('applications.hideMessage') : t('applications.showMessage')}
+          >
+            <Ionicons name={messageExpanded ? 'chevron-up-outline' : 'chevron-down-outline'} size={15} color={theme.textSecondary} />
+            <HeroButton.Label>{messageExpanded ? t('applications.hideMessage') : t('applications.showMessage')}</HeroButton.Label>
+          </HeroButton>
+          {messageExpanded ? (
+            <Surface variant="secondary" className="rounded-panel-inner p-3">
+              <Text className="text-sm leading-5 text-foreground">{item.message}</Text>
+            </Surface>
+          ) : null}
+        </View>
+      ) : null}
 
       {/* Interview actions */}
       {interview?.status === 'proposed' ? (
@@ -420,7 +493,394 @@ function ApplicationCard({
           </View>
         </View>
       ) : null}
+
+      {statusMessage ? (
+        <Text className="text-xs text-muted-foreground" accessibilityLiveRegion="polite">{statusMessage}</Text>
+      ) : null}
+
+      <View className="mt-1 flex-row flex-wrap gap-2 border-t border-border pt-2.5">
+        <HeroButton
+          size="sm"
+          variant="secondary"
+          className="rounded-lg"
+          onPress={handleToggleHistory}
+          accessibilityLabel={t('applications.history')}
+        >
+          <Ionicons name="time-outline" size={15} color={theme.textSecondary} />
+          <HeroButton.Label>{t('applications.history')}</HeroButton.Label>
+        </HeroButton>
+        {isActive ? (
+          <HeroButton
+            size="sm"
+            variant="danger"
+            className="rounded-lg"
+            isDisabled={actionLoading}
+            onPress={handleWithdraw}
+            accessibilityLabel={t('applications.withdraw')}
+          >
+            <Ionicons name="close-circle-outline" size={15} color="#fff" />
+            <HeroButton.Label>{t('applications.withdraw')}</HeroButton.Label>
+          </HeroButton>
+        ) : null}
+      </View>
+
+      {historyExpanded ? (
+        <Surface variant="secondary" className="mt-1 rounded-panel-inner p-3">
+          <Text className="mb-2 text-xs font-bold uppercase text-muted-foreground">{t('applications.history')}</Text>
+          {historyLoading ? (
+            <LoadingSpinner />
+          ) : history.length === 0 ? (
+            <Text className="text-xs text-muted-foreground">{t('applications.historyEmpty')}</Text>
+          ) : (
+            <View className="gap-2">
+              {history.map((entry) => (
+                <View key={entry.id} className="gap-0.5 border-l-2 border-border pl-3">
+                  <Text className="text-sm font-semibold text-foreground">
+                    {t('applications.historyTransition', {
+                      from: entry.from_status ? t(`applications.status.${entry.from_status}`) : t('applications.historyStart'),
+                      to: t(`applications.status.${entry.to_status}`),
+                    })}
+                  </Text>
+                  <Text className="text-[11px] text-muted-foreground">
+                    {new Date(entry.changed_at).toLocaleDateString('default', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          )}
+        </Surface>
+      ) : null}
     </View>
+  );
+}
+
+function JobAlertCard({
+  alert,
+  theme,
+  t,
+  onToggle,
+  onDelete,
+  isBusy,
+}: {
+  alert: JobAlert;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+  onToggle: (alert: JobAlert) => void;
+  onDelete: (id: number) => void;
+  isBusy: boolean;
+}) {
+  const created = t('alerts.createdDate', {
+    date: new Date(alert.created_at).toLocaleDateString('default', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }),
+  });
+  const notified = t('alerts.lastNotified', {
+    date: alert.last_notified_at
+      ? new Date(alert.last_notified_at).toLocaleDateString('default', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        })
+      : t('alerts.never'),
+  });
+
+  return (
+    <HeroCard className="mb-3 rounded-panel p-0">
+      <HeroCard.Body className="gap-3 p-4">
+        <View className="flex-row items-start gap-3">
+          <View className="size-11 items-center justify-center rounded-3xl bg-primary/10">
+            <Ionicons name="notifications-outline" size={21} color={alert.is_active ? theme.success : theme.textMuted} />
+          </View>
+          <View className="min-w-0 flex-1 gap-2">
+            <View className="flex-row flex-wrap gap-2">
+              <Chip size="sm" variant="secondary" color={alert.is_active ? 'success' : 'warning'}>
+                <Chip.Label>{alert.is_active ? t('alerts.active') : t('alerts.paused')}</Chip.Label>
+              </Chip>
+              {alert.type ? (
+                <Chip size="sm" variant="secondary">
+                  <Chip.Label>{t(`filters.type.${alert.type}`)}</Chip.Label>
+                </Chip>
+              ) : null}
+              {alert.commitment ? (
+                <Chip size="sm" variant="secondary">
+                  <Chip.Label>{t(`filters.commitment.${alert.commitment}`)}</Chip.Label>
+                </Chip>
+              ) : null}
+              {alert.is_remote_only ? (
+                <Chip size="sm" variant="secondary">
+                  <Ionicons name="wifi-outline" size={12} color={theme.textSecondary} />
+                  <Chip.Label>{t('alerts.remoteOnlyShort')}</Chip.Label>
+                </Chip>
+              ) : null}
+            </View>
+
+            <View className="gap-1">
+              {alert.keywords ? (
+                <Text className="text-sm font-semibold text-foreground">{alert.keywords}</Text>
+              ) : null}
+              {alert.categories ? (
+                <Text className="text-xs text-muted-foreground">{alert.categories}</Text>
+              ) : null}
+              {alert.location ? (
+                <Text className="text-xs text-muted-foreground">{alert.location}</Text>
+              ) : null}
+              {!alert.keywords && !alert.categories && !alert.location ? (
+                <Text className="text-sm font-semibold text-foreground">{t('alerts.anyMatch')}</Text>
+              ) : null}
+            </View>
+
+            <Text className="text-[11px] text-muted-foreground">{created} - {notified}</Text>
+          </View>
+        </View>
+
+        <View className="flex-row gap-2">
+          <HeroButton
+            size="sm"
+            variant="secondary"
+            isDisabled={isBusy}
+            onPress={() => onToggle(alert)}
+            accessibilityLabel={alert.is_active ? t('alerts.pause') : t('alerts.resume')}
+          >
+            <Ionicons name={alert.is_active ? 'pause-outline' : 'play-outline'} size={15} color={theme.textSecondary} />
+            <HeroButton.Label>{alert.is_active ? t('alerts.pause') : t('alerts.resume')}</HeroButton.Label>
+          </HeroButton>
+          <HeroButton
+            size="sm"
+            variant="danger"
+            isDisabled={isBusy}
+            onPress={() => onDelete(alert.id)}
+            accessibilityLabel={t('alerts.delete')}
+          >
+            <Ionicons name="trash-outline" size={15} color="#fff" />
+            <HeroButton.Label>{t('alerts.delete')}</HeroButton.Label>
+          </HeroButton>
+        </View>
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function JobAlertsPanel({
+  alerts,
+  isLoading,
+  error,
+  onRefresh,
+  theme,
+  primary,
+  t,
+}: {
+  alerts: JobAlert[];
+  isLoading: boolean;
+  error: string | null;
+  onRefresh: () => void;
+  theme: ReturnType<typeof useTheme>;
+  primary: string;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+}) {
+  const [keywords, setKeywords] = useState('');
+  const [categories, setCategories] = useState('');
+  const [location, setLocation] = useState('');
+  const [alertType, setAlertType] = useState<JobAlert['type']>(null);
+  const [alertCommitment, setAlertCommitment] = useState<JobAlert['commitment']>(null);
+  const [remoteOnly, setRemoteOnly] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [busyKey, setBusyKey] = useState<string | null>(null);
+
+  const resetForm = () => {
+    setKeywords('');
+    setCategories('');
+    setLocation('');
+    setAlertType(null);
+    setAlertCommitment(null);
+    setRemoteOnly(false);
+  };
+
+  const handleCreate = async () => {
+    const payload: CreateJobAlertPayload = {};
+    if (keywords.trim()) payload.keywords = keywords.trim();
+    if (categories.trim()) payload.categories = categories.trim();
+    if (location.trim()) payload.location = location.trim();
+    if (alertType) payload.type = alertType;
+    if (alertCommitment) payload.commitment = alertCommitment;
+    if (remoteOnly) payload.is_remote_only = true;
+
+    setBusyKey('create');
+    setStatusMessage(null);
+    try {
+      await createJobAlert(payload);
+      resetForm();
+      setStatusMessage(t('alerts.createSuccess'));
+      onRefresh();
+    } catch {
+      setStatusMessage(t('alerts.createError'));
+    } finally {
+      setBusyKey(null);
+    }
+  };
+
+  const handleToggle = async (alert: JobAlert) => {
+    setBusyKey(`toggle-${alert.id}`);
+    setStatusMessage(null);
+    try {
+      if (alert.is_active) {
+        await pauseJobAlert(alert.id);
+        setStatusMessage(t('alerts.pauseSuccess'));
+      } else {
+        await resumeJobAlert(alert.id);
+        setStatusMessage(t('alerts.resumeSuccess'));
+      }
+      onRefresh();
+    } catch {
+      setStatusMessage(t('alerts.toggleError'));
+    } finally {
+      setBusyKey(null);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    setBusyKey(`delete-${id}`);
+    setStatusMessage(null);
+    try {
+      await deleteJobAlert(id);
+      setStatusMessage(t('alerts.deleteSuccess'));
+      onRefresh();
+    } catch {
+      setStatusMessage(t('alerts.deleteError'));
+    } finally {
+      setBusyKey(null);
+    }
+  };
+
+  return (
+    <FlatList<JobAlert>
+      data={alerts}
+      keyExtractor={(item) => String(item.id)}
+      onRefresh={onRefresh}
+      refreshing={isLoading && alerts.length > 0}
+      renderItem={({ item }) => (
+        <JobAlertCard
+          alert={item}
+          theme={theme}
+          t={t}
+          isBusy={busyKey === `toggle-${item.id}` || busyKey === `delete-${item.id}`}
+          onToggle={handleToggle}
+          onDelete={handleDelete}
+        />
+      )}
+      ListHeaderComponent={(
+        <View className="gap-3 pb-3">
+          <HeroCard className="rounded-panel p-0">
+            <HeroCard.Body className="gap-4 p-4">
+              <View className="flex-row items-start gap-3">
+                <View className="size-11 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+                  <Ionicons name="notifications-outline" size={21} color={primary} />
+                </View>
+                <View className="min-w-0 flex-1">
+                  <Text className="text-base font-bold text-foreground">{t('alerts.title')}</Text>
+                  <Text className="text-sm text-muted-foreground">{t('alerts.subtitle')}</Text>
+                </View>
+              </View>
+
+              <Input
+                label={t('alerts.keywordsLabel')}
+                placeholder={t('alerts.keywordsPlaceholder')}
+                value={keywords}
+                onChangeText={setKeywords}
+                autoCorrect={false}
+                autoCapitalize="none"
+              />
+              <Input
+                label={t('alerts.categoriesLabel')}
+                placeholder={t('alerts.categoriesPlaceholder')}
+                value={categories}
+                onChangeText={setCategories}
+                autoCorrect={false}
+              />
+              <Input
+                label={t('alerts.locationLabel')}
+                placeholder={t('alerts.locationPlaceholder')}
+                value={location}
+                onChangeText={setLocation}
+                autoCorrect={false}
+              />
+
+              <View className="gap-2">
+                <Text className="text-xs font-bold uppercase text-muted-foreground">{t('alerts.typeLabel')}</Text>
+                <View className="flex-row flex-wrap gap-2">
+                  {ALERT_JOB_TYPES.map((type) => (
+                    <FilterPill
+                      key={type}
+                      label={t(`filters.type.${type}`)}
+                      selected={alertType === type}
+                      onPress={() => setAlertType(alertType === type ? null : type)}
+                      primary={primary}
+                      theme={theme}
+                    />
+                  ))}
+                </View>
+              </View>
+
+              <View className="gap-2">
+                <Text className="text-xs font-bold uppercase text-muted-foreground">{t('alerts.commitmentLabel')}</Text>
+                <View className="flex-row flex-wrap gap-2">
+                  {ALERT_COMMITMENT_TYPES.map((commitment) => (
+                    <FilterPill
+                      key={commitment}
+                      label={t(`filters.commitment.${commitment}`)}
+                      selected={alertCommitment === commitment}
+                      onPress={() => setAlertCommitment(alertCommitment === commitment ? null : commitment)}
+                      primary={primary}
+                      theme={theme}
+                    />
+                  ))}
+                </View>
+              </View>
+
+              <Toggle value={remoteOnly} onValueChange={setRemoteOnly} label={t('alerts.remoteOnly')} />
+
+              {statusMessage ? (
+                <Text className="text-sm text-muted-foreground" accessibilityLiveRegion="polite">{statusMessage}</Text>
+              ) : null}
+
+              <HeroButton
+                variant="primary"
+                onPress={handleCreate}
+                isDisabled={busyKey === 'create'}
+                style={{ backgroundColor: primary }}
+                accessibilityLabel={t('alerts.create')}
+              >
+                <Ionicons name="add-outline" size={17} color="#fff" />
+                <HeroButton.Label>{busyKey === 'create' ? t('alerts.creating') : t('alerts.create')}</HeroButton.Label>
+              </HeroButton>
+            </HeroCard.Body>
+          </HeroCard>
+
+          {error ? (
+            <EmptyState
+              icon="warning-outline"
+              title={t('alerts.loadError')}
+              subtitle={error}
+              actionLabel={t('retry')}
+              onAction={onRefresh}
+            />
+          ) : null}
+        </View>
+      )}
+      ListEmptyComponent={
+        isLoading ? (
+          <LoadingSpinner />
+        ) : error ? null : (
+          <EmptyState
+            icon="notifications-outline"
+            title={t('alerts.emptyTitle')}
+            subtitle={t('alerts.emptyDescription')}
+          />
+        )
+      }
+      contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: 32, paddingTop: 4 }}
+    />
   );
 }
 
@@ -537,6 +997,9 @@ export default function JobsScreen() {
     refresh: refreshPostings,
   } = usePaginatedApi<JobVacancy, JobsResponse>(postingsFetchFn, jobExtractor, []);
 
+  const alertsApi = useApi(() => getJobAlerts(), []);
+  const alerts = alertsApi.data?.data ?? [];
+
   const renderJob = useCallback(
     ({ item }: { item: JobVacancy }) => (
       <JobCard
@@ -585,6 +1048,7 @@ export default function JobsScreen() {
         theme={theme}
         t={t}
         primary={primary}
+        onApplicationChanged={refreshApps}
         onInterviewAccepted={handleInterviewAccepted}
         onInterviewDeclined={handleInterviewDeclined}
         onOfferAccepted={handleOfferAccepted}
@@ -615,7 +1079,7 @@ export default function JobsScreen() {
       <Surface variant="secondary" className="mx-4 mb-3 rounded-panel-inner p-1">
         {/* Tab bar */}
         <View className="min-w-0 flex-row gap-1">
-          {(['browse', 'myApplications', 'myPostings'] as const).map((tab) => {
+          {(['browse', 'myApplications', 'myPostings', 'alerts'] as const).map((tab) => {
             const selected = activeTab === tab;
             return (
               <HeroButton
@@ -786,7 +1250,7 @@ export default function JobsScreen() {
           }
           contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: 32, paddingTop: 4 }}
         />
-      ) : (
+      ) : activeTab === 'myPostings' ? (
         <FlatList<JobVacancy>
           data={postings}
           keyExtractor={(item) => String(item.id)}
@@ -826,6 +1290,16 @@ export default function JobsScreen() {
             ) : null
           }
           contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: 32, paddingTop: 4 }}
+        />
+      ) : (
+        <JobAlertsPanel
+          alerts={alerts}
+          isLoading={alertsApi.isLoading}
+          error={alertsApi.error}
+          onRefresh={alertsApi.refresh}
+          theme={theme}
+          primary={primary}
+          t={t}
         />
       )}
     </SafeAreaView>

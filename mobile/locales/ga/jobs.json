@@ -4,7 +4,8 @@
   "tabs": {
     "browse": "Brabhsáil",
     "myApplications": "Mo iarratais",
-    "myPostings": "Mo fhógraí"
+    "myPostings": "Mo fhógraí",
+    "alerts": "Alerts"
   },
   "search": {
     "placeholder": "Cuardaigh poist..."
@@ -128,6 +129,7 @@
     "emptyHint": "Déan iarratas ar phoist chun iad a fheiceáil anseo",
     "appliedOn": "Iarratas ar {{date}}",
     "status": {
+      "applied": "Applied",
       "pending": "Ar feitheamh",
       "screening": "Scagadh",
       "reviewed": "Athbhreithnithe",
@@ -137,7 +139,17 @@
       "accepted": "Glactha",
       "rejected": "Diúltaithe",
       "withdrawn": "Tarraingthe siar"
-    }
+    },
+    "showMessage": "Show cover message",
+    "hideMessage": "Hide cover message",
+    "history": "History",
+    "historyEmpty": "No status history yet.",
+    "historyStart": "Started",
+    "historyTransition": "{{from}} to {{to}}",
+    "historyError": "Could not load application history.",
+    "withdraw": "Withdraw",
+    "withdrawSuccess": "Application withdrawn.",
+    "withdrawError": "Could not withdraw this application."
   },
   "postings": {
     "empty": "Níl aon fhógraí fós",
@@ -149,7 +161,12 @@
     "noApplicants": "Níl aon iarrthóirí fós.",
     "openToolError": "Níorbh fhéidir an uirlis seo a oscailt.",
     "statusUpdateError": "Níorbh fhéidir stádas an phoist seo a nuashonrú.",
-    "status": { "open": "Oscailte", "closed": "Dúnta", "filled": "Líonta", "draft": "Dréacht" },
+    "status": {
+      "open": "Oscailte",
+      "closed": "Dúnta",
+      "filled": "Líonta",
+      "draft": "Dréacht"
+    },
     "applicationsTitle": "Iarratais",
     "applicationsSubtitle": "Déan athbhreithniú ar iarrthóirí agus bog tríd an sreabhadh iad.",
     "applicationsCount": "{{count}} iarratas",
@@ -202,7 +219,11 @@
     "salaryMaxLabel": "Uasphá",
     "salaryPlaceholder": "Méid roghnach",
     "salaryTypeLabel": "Cineál pá",
-    "salaryType": { "hourly": "In aghaidh na huaire", "monthly": "Míosúil", "annual": "Bliantúil" },
+    "salaryType": {
+      "hourly": "In aghaidh na huaire",
+      "monthly": "Míosúil",
+      "annual": "Bliantúil"
+    },
     "salaryCurrencyLabel": "Airgeadra",
     "salaryCurrencyPlaceholder": "EUR",
     "salaryNegotiable": "Pá soshannta",
@@ -227,5 +248,40 @@
     "failedTitle": "Níor sábháladh an post",
     "loadFailed": "Níorbh fhéidir an post seo a luchtú lena chur in eagar.",
     "failedDescription": "Níorbh fhéidir an post a shábháil. Bain triail eile as."
+  },
+  "alerts": {
+    "title": "Job alerts",
+    "subtitle": "Save searches and get notified when matching roles appear.",
+    "create": "Create alert",
+    "creating": "Creating...",
+    "active": "Active",
+    "paused": "Paused",
+    "pause": "Pause",
+    "resume": "Resume",
+    "delete": "Delete",
+    "loadError": "Could not load job alerts",
+    "emptyTitle": "No job alerts yet",
+    "emptyDescription": "Create an alert to keep new matching roles close to the app.",
+    "keywordsLabel": "Keywords",
+    "keywordsPlaceholder": "Role, skill, or employer",
+    "categoriesLabel": "Categories",
+    "categoriesPlaceholder": "Community, care, digital",
+    "locationLabel": "Location",
+    "locationPlaceholder": "City, region, or remote",
+    "typeLabel": "Role type",
+    "commitmentLabel": "Commitment",
+    "remoteOnly": "Remote roles only",
+    "remoteOnlyShort": "Remote",
+    "anyMatch": "Any matching role",
+    "createdDate": "Created {{date}}",
+    "lastNotified": "Last notified {{date}}",
+    "never": "Never",
+    "createSuccess": "Job alert created.",
+    "createError": "Could not create this job alert.",
+    "pauseSuccess": "Job alert paused.",
+    "resumeSuccess": "Job alert resumed.",
+    "toggleError": "Could not update this job alert.",
+    "deleteSuccess": "Job alert deleted.",
+    "deleteError": "Could not delete this job alert."
   }
 }

@@ -10,7 +10,6 @@ import {
   ScrollView,
   RefreshControl,
   Share,
-  Pressable,
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -479,15 +478,18 @@ function ExchangeDetailModalInner() {
                   {listingImages.map((image, index) => {
                     const isActive = image.url === activeImage.url;
                     return (
-                      <Pressable
+                      <HeroButton
                         key={`${image.id}-${image.url}`}
+                        isIconOnly
+                        variant="ghost"
                         accessibilityRole="button"
                         accessibilityLabel={t('detail.imageThumbnail', { number: index + 1 })}
                         onPress={() => setActiveImageIndex(index)}
-                        className={`overflow-hidden rounded-2xl border ${isActive ? 'border-primary' : 'border-border'}`}
+                        className={`h-[62px] w-[62px] overflow-hidden rounded-2xl border p-0 ${isActive ? 'border-primary' : 'border-border'}`}
+                        accessibilityState={{ selected: isActive }}
                       >
                         <Image source={{ uri: image.url }} style={{ width: 58, height: 58 }} contentFit="cover" />
-                      </Pressable>
+                      </HeroButton>
                     );
                   })}
                 </ScrollView>
@@ -562,22 +564,22 @@ function ExchangeDetailModalInner() {
           </HeroCard>
         ) : null}
 
-        <Pressable
+        <HeroButton
+          variant="ghost"
+          feedbackVariant="scale"
+          className="w-full p-0"
           onPress={() => {
             void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             if (exchangeUser.id > 0) {
               router.push({ pathname: '/(modals)/member-profile', params: { id: String(exchangeUser.id) } });
             }
           }}
-          accessibilityRole="button"
           accessibilityLabel={exchangeUserName}
         >
-          {({ pressed }) => (
-            <Surface
-              variant="secondary"
-              className="rounded-panel-inner p-4"
-              style={{ opacity: pressed ? 0.86 : 1 }}
-            >
+          <Surface
+            variant="secondary"
+            className="rounded-panel-inner p-4"
+          >
               <View className="flex-row items-start justify-between gap-3">
                 <View className="min-w-0 flex-1 flex-row items-start gap-3">
                   <Avatar uri={exchangeUserAvatar} name={exchangeUserName} size={48} />
@@ -612,9 +614,8 @@ function ExchangeDetailModalInner() {
                   ) : null}
                 </View>
               ) : null}
-            </Surface>
-          )}
-        </Pressable>
+          </Surface>
+        </HeroButton>
 
         {exchange.created_at ? (
           <HeroCard variant="secondary">

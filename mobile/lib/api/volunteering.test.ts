@@ -20,7 +20,20 @@ jest.mock('@/lib/constants', () => ({
 }));
 
 import { api } from '@/lib/api/client';
-import { getOpportunities, getOpportunity, expressInterest } from './volunteering';
+import {
+  cancelShiftSignup,
+  expressInterest,
+  generateVolunteerCertificate,
+  getMyShifts,
+  getOpportunities,
+  getOpportunity,
+  getVolunteerCertificates,
+  getVolunteerExpenses,
+  getVolunteerDonations,
+  getVolunteerGivingDays,
+  submitVolunteerExpense,
+  submitVolunteerDonation,
+} from './volunteering';
 import type { VolunteeringResponse, VolunteerOpportunity } from './volunteering';
 
 const mockOpportunity: VolunteerOpportunity = {
@@ -111,5 +124,102 @@ describe('expressInterest', () => {
     const result = await expressInterest(3);
     expect(api.post).toHaveBeenCalledWith('/api/v2/volunteering/opportunities/3/apply', {});
     expect(result.message).toBe('Interest registered');
+  });
+});
+
+describe('shift helpers', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('loads the authenticated volunteer shift schedule', async () => {
+    const response = { data: { items: [], cursor: null, has_more: false } };
+    (api.get as jest.Mock).mockResolvedValue(response);
+    const result = await getMyShifts();
+    expect(api.get).toHaveBeenCalledWith('/api/v2/volunteering/shifts', { per_page: '20' });
+    expect(result.data.items).toEqual([]);
+  });
+
+  it('cancels a shift signup', async () => {
+    (api.delete as jest.Mock).mockResolvedValue(undefined);
+    await cancelShiftSignup(42);
+    expect(api.delete).toHaveBeenCalledWith('/api/v2/volunteering/shifts/42/signup');
+  });
+});
+
+describe('certificate helpers', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('loads volunteer certificates', async () => {
+    const response = { data: { items: [], cursor: null, has_more: false } };
+    (api.get as jest.Mock).mockResolvedValue(response);
+    const result = await getVolunteerCertificates();
+    expect(api.get).toHaveBeenCalledWith('/api/v2/volunteering/certificates', { per_page: '20' });
+    expect(result.data.items).toEqual([]);
+  });
+
+  it('generates a volunteer certificate', async () => {
+    const response = { data: { id: 9, verification_code: 'ABC123' } };
+    (api.post as jest.Mock).mockResolvedValue(response);
+    const result = await generateVolunteerCertificate();
+    expect(api.post).toHaveBeenCalledWith('/api/v2/volunteering/certificates', {});
+    expect(result.data.verification_code).toBe('ABC123');
+  });
+});
+
+describe('expense helpers', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('loads volunteer expenses', async () => {
+    const response = { data: { expenses: [], items: [], stats: {}, cursor: null, has_more: false } };
+    (api.get as jest.Mock).mockResolvedValue(response);
+    const result = await getVolunteerExpenses();
+    expect(api.get).toHaveBeenCalledWith('/api/v2/volunteering/expenses', { per_page: '20' });
+    expect(result.data.items).toEqual([]);
+  });
+
+  it('submits a volunteer expense payload', async () => {
+    const payload = {
+      organization_id: 5,
+      expense_type: 'travel' as const,
+      amount: 12.5,
+      currency: 'EUR',
+      description: 'Bus ticket',
+    };
+    (api.post as jest.Mock).mockResolvedValue({ data: { id: 3 } });
+    await submitVolunteerExpense(payload);
+    expect(api.post).toHaveBeenCalledWith('/api/v2/volunteering/expenses', payload);
+  });
+});
+
+describe('donation helpers', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('loads active volunteer giving days', async () => {
+    const response = { data: [] };
+    (api.get as jest.Mock).mockResolvedValue(response);
+    const result = await getVolunteerGivingDays();
+    expect(api.get).toHaveBeenCalledWith('/api/v2/volunteering/giving-days', {});
+    expect(result.data).toEqual([]);
+  });
+
+  it('loads volunteer donations', async () => {
+    const response = { data: { items: [], next_cursor: null } };
+    (api.get as jest.Mock).mockResolvedValue(response);
+    const result = await getVolunteerDonations();
+    expect(api.get).toHaveBeenCalledWith('/api/v2/volunteering/donations', { per_page: '20' });
+    expect(result.data.items).toEqual([]);
+  });
+
+  it('submits a volunteer donation payload', async () => {
+    const payload = {
+      giving_day_id: 8,
+      amount: 25,
+      currency: 'EUR',
+      payment_method: 'bank_transfer',
+      message: 'For the campaign',
+      is_anonymous: true,
+    };
+    (api.post as jest.Mock).mockResolvedValue({ data: { id: 4 } });
+    await submitVolunteerDonation(payload);
+    expect(api.post).toHaveBeenCalledWith('/api/v2/volunteering/donations', payload);
   });
 });

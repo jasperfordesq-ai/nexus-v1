@@ -20,7 +20,8 @@
     "nearby": "Nearby marketplace",
     "search": "Advanced search",
     "browse": "Browse marketplace",
-    "view": "View"
+    "view": "View",
+    "viewListing": "View details for {{title}}"
   },
   "search": {
     "placeholder": "Search marketplace...",

@@ -6,6 +6,7 @@
 import type { ComponentProps } from 'react';
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Linking from 'expo-linking';
 import { useTranslation } from 'react-i18next';
@@ -18,12 +19,13 @@ import { useTheme } from '@/lib/hooks/useTheme';
 type SupportItem = {
   key: string;
   icon: ComponentProps<typeof Ionicons>['name'];
-  url: string;
+  url?: string;
+  route?: Href;
 };
 
 const SUPPORT_ITEMS: SupportItem[] = [
   { key: 'help', icon: 'help-circle-outline', url: 'https://app.project-nexus.ie/help' },
-  { key: 'resources', icon: 'library-outline', url: 'https://app.project-nexus.ie/resources' },
+  { key: 'resources', icon: 'library-outline', route: '/(modals)/resources' as Href },
   { key: 'about', icon: 'information-circle-outline', url: 'https://app.project-nexus.ie/about' },
   { key: 'contact', icon: 'mail-outline', url: 'https://app.project-nexus.ie/contact' },
   { key: 'terms', icon: 'document-text-outline', url: 'https://app.project-nexus.ie/terms' },
@@ -83,9 +85,9 @@ function SupportScreen() {
                     </Text>
                   </View>
                 </View>
-                <HeroButton variant="secondary" onPress={() => void Linking.openURL(item.url)}>
+                <HeroButton variant="secondary" onPress={() => item.route ? router.push(item.route) : void Linking.openURL(item.url ?? '')}>
                   <HeroButton.Label>{t('support.open')}</HeroButton.Label>
-                  <Ionicons name="open-outline" size={16} color={theme.info} />
+                  <Ionicons name={item.route ? 'chevron-forward-outline' : 'open-outline'} size={16} color={theme.info} />
                 </HeroButton>
               </HeroCard.Body>
             </HeroCard>

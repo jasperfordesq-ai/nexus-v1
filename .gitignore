@@ -277,3 +277,6 @@ DPO_Confidentiality_Agreement_*.docx
 .bluegreen-latest-log
 # heroui-agents-md
 .heroui-docs/
+
+# Agent brainstorm / tooling state
+.superpowers/

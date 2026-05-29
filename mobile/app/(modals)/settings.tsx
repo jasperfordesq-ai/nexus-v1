@@ -7,7 +7,6 @@ import { useState } from 'react';
 import {
   View,
   ScrollView,
-  Pressable,
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -236,6 +235,48 @@ export default function SettingsScreen() {
               }}
               disabled={isLoadingPreferences || savingPrivacy || !currentPrivacy}
             />
+            <ActionRow
+              label={t('blockedUsers.title')}
+              subtitle={t('blockedUsers.settingsHint')}
+              icon="shield-outline"
+              tone={theme.error}
+              onPress={() => {
+                void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push('/(modals)/settings-blocked-users' as Href);
+              }}
+              theme={theme}
+            />
+            <ActionRow
+              label={t('dataExport.title')}
+              subtitle={t('dataExport.settingsHint')}
+              icon="download-outline"
+              tone={primary}
+              onPress={() => {
+                void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push('/(modals)/settings-data-export' as Href);
+              }}
+              theme={theme}
+            />
+          </Section>
+
+          <Section
+            title={t('translation.preferencesTitle')}
+            subtitle={t('translation.preferencesHint')}
+            icon="language-outline"
+            primary={primary}
+            theme={theme}
+          >
+            <ActionRow
+              label={t('translation.title')}
+              subtitle={t('translation.settingsHint')}
+              icon="sparkles-outline"
+              tone={primary}
+              onPress={() => {
+                void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push('/(modals)/settings-translation' as Href);
+              }}
+              theme={theme}
+            />
           </Section>
 
           <Section
@@ -390,10 +431,12 @@ function ActionRow({
   theme: ReturnType<typeof useTheme>;
 }) {
   return (
-    <Pressable
+    <HeroButton
+      variant="ghost"
+      feedbackVariant="scale"
+      className="w-full p-0"
       onPress={onPress}
       accessibilityLabel={label}
-      accessibilityRole="button"
     >
       <Surface variant="secondary" className="rounded-panel-inner px-3 py-3">
         <View className="flex-row items-center justify-between gap-3">
@@ -409,7 +452,7 @@ function ActionRow({
           <Ionicons name="chevron-forward" size={18} color={theme.textMuted} />
         </View>
       </Surface>
-    </Pressable>
+    </HeroButton>
   );
 }
 

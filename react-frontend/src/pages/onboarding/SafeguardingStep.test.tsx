@@ -224,26 +224,25 @@ describe('SafeguardingStep', () => {
       expect(screen.getByText('I consider myself a vulnerable adult')).toBeInTheDocument();
     });
 
-    // Find the first checkbox
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    expect(checkboxes.length).toBeGreaterThanOrEqual(1);
-    const firstCheckbox = checkboxes[0] as HTMLInputElement;
+    // The Checkbox stub does not render a real <input type="checkbox">, but the
+    // option row is a native <div onClick={toggleOption}>. Clicking the option
+    // label toggles selection; the observable consequence is the action button
+    // label flipping between "Next" (nothing selected) and "Save & Continue"
+    // (at least one selected).
+    expect(screen.getByText('Next')).toBeInTheDocument();
 
-    // Initially unchecked
-    expect(firstCheckbox.checked).toBe(false);
+    const optionLabel = screen.getByText('I consider myself a vulnerable adult');
+    await user.click(optionLabel);
 
-    const optionCheckbox = screen.getByRole('checkbox', { name: 'I consider myself a vulnerable adult' });
-    await user.click(optionCheckbox);
-
-    // Should now be checked
+    // Selecting an option flips the button to "Save & Continue".
     await waitFor(() => {
-      expect(firstCheckbox.checked).toBe(true);
+      expect(screen.getByText('Save & Continue')).toBeInTheDocument();
     });
 
-    // Click again to deselect
-    await user.click(optionCheckbox);
+    // Click again to deselect — button reverts to "Next".
+    await user.click(optionLabel);
     await waitFor(() => {
-      expect(firstCheckbox.checked).toBe(false);
+      expect(screen.getByText('Next')).toBeInTheDocument();
     });
   });
 
@@ -309,9 +308,9 @@ describe('SafeguardingStep', () => {
       expect(screen.getByText('I consider myself a vulnerable adult')).toBeInTheDocument();
     });
 
-    // Select the first option
-    const optionCheckbox = screen.getByRole('checkbox', { name: 'I consider myself a vulnerable adult' });
-    await user.click(optionCheckbox);
+    // Select the first option by clicking its row (the Checkbox stub renders no
+    // real checkbox input; the option row is a native <div onClick={toggleOption}>).
+    await user.click(screen.getByText('I consider myself a vulnerable adult'));
 
     // Button label should change to "Save & Continue" when something is selected
     await waitFor(() => {

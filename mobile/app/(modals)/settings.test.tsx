@@ -35,6 +35,14 @@ jest.mock('react-i18next', () => ({
         'privacy.visibility.public': 'Visible publicly',
         'privacy.visibility.members': 'Visible to signed-in members',
         'privacy.visibility.connections': 'Visible to your connections',
+        'blockedUsers.title': 'Blocked users',
+        'blockedUsers.settingsHint': 'Review blocked users.',
+        'dataExport.title': 'Data export',
+        'dataExport.settingsHint': 'Request your data.',
+        'translation.preferencesTitle': 'Content preferences',
+        'translation.preferencesHint': 'Language and feed ordering.',
+        'translation.title': 'Translation preferences',
+        'translation.settingsHint': 'Control translation.',
         'editProfile': 'Edit profile',
         'editProfileHint': 'Edit profile details.',
         'pushNotifications': 'Push Notifications',
@@ -221,5 +229,19 @@ describe('SettingsScreen', () => {
     const { getByText } = render(<SettingsScreen />);
     fireEvent.press(getByText('Verify Identity'));
     expect(router.push).toHaveBeenCalledWith('/(modals)/verify-identity');
+  });
+
+  it('navigates to advanced settings screens', () => {
+    const { router } = require('expo-router');
+    const { getByText } = render(<SettingsScreen />);
+
+    fireEvent.press(getByText('Blocked users'));
+    expect(router.push).toHaveBeenCalledWith('/(modals)/settings-blocked-users');
+
+    fireEvent.press(getByText('Data export'));
+    expect(router.push).toHaveBeenCalledWith('/(modals)/settings-data-export');
+
+    fireEvent.press(getByText('Translation preferences'));
+    expect(router.push).toHaveBeenCalledWith('/(modals)/settings-translation');
   });
 });

@@ -25,6 +25,7 @@ import { formatRelativeTime } from '@/lib/utils/formatRelativeTime';
 
 interface FeedItemProps {
   item: FeedItemType;
+  disableDetailNavigation?: boolean;
 }
 
 type ChipColor = 'accent' | 'default' | 'success' | 'warning' | 'danger';
@@ -157,12 +158,20 @@ function getDetailTarget(item: FeedItemType) {
       return item.receiver ? { pathname: '/(modals)/member-profile', params: { id: String(item.receiver.id) }, labelKey: 'detail.profile' } : null;
     case 'blog':
       return item.slug ? { pathname: '/(modals)/blog-post', params: { id: item.slug }, labelKey: 'detail.blog' } : null;
+    case 'post':
+    case 'poll':
+    case 'challenge':
+    case 'discussion':
+    case 'resource':
+    case 'badge_earned':
+    case 'level_up':
+      return { pathname: '/(modals)/feed-item-detail', params: { id: String(item.id), type: item.type }, labelKey: 'detail.post' };
     default:
       return null;
   }
 }
 
-export default function FeedItem({ item }: FeedItemProps) {
+export default function FeedItem({ item, disableDetailNavigation = false }: FeedItemProps) {
   const { t } = useTranslation('home');
   const primary = usePrimaryColor();
   const theme = useTheme();
@@ -232,6 +241,7 @@ export default function FeedItem({ item }: FeedItemProps) {
   }
 
   function navigateToDetail() {
+    if (disableDetailNavigation) return;
     const detailTarget = getDetailTarget(item);
     if (detailTarget) {
       router.push({ pathname: detailTarget.pathname as never, params: detailTarget.params });
@@ -295,7 +305,7 @@ export default function FeedItem({ item }: FeedItemProps) {
   const imageUrl = resolveImageUrl(item.image_url);
   const author = getFeedAuthor(item, t('stories.member'));
   const authorName = author.name;
-  const detailTarget = getDetailTarget(item);
+  const detailTarget = disableDetailNavigation ? null : getDetailTarget(item);
   const isCommentable = COMMENTABLE_TYPES.has(item.type);
   const canBookmark = BOOKMARKABLE_TYPES.has(item.type);
   const reactionTotal = item.reactions?.total ?? likesCount;
@@ -379,11 +389,18 @@ export default function FeedItem({ item }: FeedItemProps) {
                   {item.content}
                 </Text>
                 {item.content.length > 150 || item.content_truncated ? (
-                  <Pressable onPress={navigateToDetail} disabled={!detailTarget}>
-                    <Text className="text-sm font-semibold" style={{ color: detailTarget ? primary : theme.textMuted }}>
+                  <HeroButton
+                    size="sm"
+                    variant="ghost"
+                    isDisabled={!detailTarget}
+                    className="self-start px-0"
+                    onPress={navigateToDetail}
+                    accessibilityLabel={t('readMore')}
+                  >
+                    <HeroButton.Label style={{ color: detailTarget ? primary : theme.textMuted }}>
                       {t('readMore')}
-                    </Text>
-                  </Pressable>
+                    </HeroButton.Label>
+                  </HeroButton>
                 ) : null}
               </View>
             ) : null}

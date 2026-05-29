@@ -27,5 +27,44 @@
     "submit": "Ziel erstellen",
     "error": "Ziel konnte nicht erstellt werden."
   },
-  "updateError": "Ziel konnte nicht aktualisiert werden."
+  "updateError": "Ziel konnte nicht aktualisiert werden.",
+  "details": "Details",
+  "detail": {
+    "title": "Goal detail",
+    "loadError": "Could not load this goal. Please try again.",
+    "notFound": "Goal not found",
+    "notFoundHint": "This goal may have been removed or is no longer available.",
+    "insights": "Insights",
+    "progressUpdate": "Update progress",
+    "progressIncrement": "Progress to add",
+    "progressPlaceholder": "e.g. 1.5",
+    "saveProgress": "Save progress",
+    "saving": "Saving...",
+    "progressError": "Could not update progress. Please try again.",
+    "reminder": "Reminder",
+    "reminderOn": "Reminder is enabled for this goal.",
+    "reminderOff": "No reminder is set for this goal.",
+    "enableReminder": "Enable",
+    "disableReminder": "Disable",
+    "reminderError": "Could not update the reminder. Please try again.",
+    "nextReminder": "Next reminder {{date}}",
+    "milestones": "Milestones",
+    "noMilestones": "No milestones have been generated yet.",
+    "completedOn": "Completed {{date}}",
+    "pendingMilestone": "Pending",
+    "history": "Progress history",
+    "noHistory": "No progress history yet.",
+    "summary": {
+      "progress": "Progress",
+      "checkins": "Check-ins",
+      "streak": "Streak",
+      "milestones": "Milestones"
+    },
+    "frequency": {
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "biweekly": "Every 2 weeks",
+      "monthly": "Monthly"
+    }
+  }
 }

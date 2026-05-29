@@ -1,0 +1,56 @@
+{
+  "title": "Ideas",
+  "subtitle": "Browse challenges, submit ideas, and vote on proposals.",
+  "challengeTitle": "Challenge",
+  "disabledTitle": "Ideas are not enabled",
+  "disabledSubtitle": "This workspace has not enabled ideation challenges.",
+  "searchLabel": "Search",
+  "searchPlaceholder": "Search challenges",
+  "allCategories": "All",
+  "categoryCount": "{{count}} challenges",
+  "emptyTitle": "No challenges found",
+  "emptySubtitle": "Try another search, category, or status.",
+  "errorTitle": "Could not load ideas",
+  "ideasCount": "{{count}} ideas",
+  "votesCount": "{{count}} votes",
+  "viewChallenge": "View challenge",
+  "submitIdea": "Submit idea",
+  "ideaTitleLabel": "Idea title",
+  "ideaTitlePlaceholder": "Name your idea",
+  "ideaDescriptionLabel": "Idea description",
+  "ideaDescriptionPlaceholder": "Describe what should happen and why it helps",
+  "submitting": "Submitting...",
+  "submitSuccess": "Idea submitted.",
+  "submitFailed": "Could not submit the idea.",
+  "vote": "Vote",
+  "voted": "Voted",
+  "voteFailed": "Could not update the vote.",
+  "noIdeasTitle": "No ideas yet",
+  "noIdeasSubtitle": "Be the first to submit a proposal.",
+  "filters": {
+    "all": "All",
+    "open": "Open",
+    "voting": "Voting",
+    "evaluating": "Evaluating",
+    "closed": "Closed"
+  },
+  "status": {
+    "draft": "Draft",
+    "open": "Open",
+    "voting": "Voting",
+    "evaluating": "Evaluating",
+    "closed": "Closed",
+    "archived": "Archived"
+  },
+  "ideaStatus": {
+    "draft": "Draft",
+    "submitted": "Submitted",
+    "shortlisted": "Shortlisted",
+    "winner": "Winner",
+    "withdrawn": "Withdrawn"
+  },
+  "sort": {
+    "votes": "Top voted",
+    "newest": "Newest"
+  }
+}

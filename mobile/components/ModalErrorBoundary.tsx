@@ -4,9 +4,10 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { Appearance, Pressable, Text, View } from 'react-native';
+import { Appearance, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import i18n from 'i18next';
+import Button from '@/components/ui/Button';
 
 interface Props {
   children: React.ReactNode;
@@ -26,8 +27,6 @@ function getErrorColors() {
   return {
     bg: isDark ? '#0F0F0F' : '#FFFFFF',
     text: isDark ? '#F2F2F7' : '#1a1a1a',
-    buttonBg: '#006FEE',
-    buttonText: '#FFFFFF',
   };
 }
 
@@ -76,19 +75,14 @@ export default class ModalErrorBoundary extends React.Component<Props, State> {
           >
             {title}
           </Text>
-          <Pressable
-            style={{
-              paddingVertical: 10,
-              paddingHorizontal: 24,
-              backgroundColor: colors.buttonBg,
-              borderRadius: 8,
-            }}
+          <Button
+            size="md"
             onPress={() => router.back()}
-            accessibilityRole="button"
             accessibilityLabel={goBack}
+            style={{ minWidth: 120 }}
           >
-            <Text style={{ fontSize: 14, fontWeight: '600', color: colors.buttonText }}>{goBack}</Text>
-          </Pressable>
+            {goBack}
+          </Button>
         </View>
       );
     }

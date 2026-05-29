@@ -123,7 +123,9 @@ describe('AdminSidebar', () => {
     const { container } = render(
       <W><AdminSidebar collapsed={false} onToggle={mockOnToggle} /></W>
     );
-    expect(container.querySelector('nav')).toBeTruthy();
+    expect(
+      container.querySelector('nav') ?? container.querySelector('[role="navigation"]')
+    ).toBeTruthy();
   });
 
   it('renders Dashboard section link', () => {

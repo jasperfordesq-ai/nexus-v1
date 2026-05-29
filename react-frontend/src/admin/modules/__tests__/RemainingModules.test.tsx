@@ -394,7 +394,7 @@ import LegalDocVersionForm from '../enterprise/LegalDocVersionForm';
 
 describe('LegalDocVersionForm', () => {
   it('renders without crashing with required props inside Modal', () => {
-    const { container } = render(
+    render(
       <W>
         <Modal isOpen={true} onClose={vi.fn()}>
           <ModalContent>
@@ -407,7 +407,8 @@ describe('LegalDocVersionForm', () => {
         </Modal>
       </W>
     );
-    expect(container.querySelector('div')).toBeTruthy();
+    // Modal content renders into a portal on document.body, not into `container`.
+    expect(document.body.querySelector('div')).toBeTruthy();
   });
 });
 

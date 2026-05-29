@@ -13,6 +13,20 @@
     "loading": "Feed wird geladen…",
     "emptySubtitle": "Verbinde dich mit deiner Community, um hier Beiträge zu sehen."
   },
+  "activity": {
+    "title": "Activity",
+    "subtitle": "Your recent timebanking and community activity.",
+    "hoursGiven": "Hours given",
+    "hoursReceived": "Hours received",
+    "netBalance": "{{count}}h net",
+    "connections": "Connections",
+    "groupsJoined": "Groups joined",
+    "posts": "Posts",
+    "skills": "Skills",
+    "recent": "Recent activity",
+    "emptyTitle": "No activity yet",
+    "emptySubtitle": "Your activity will appear here after you take part."
+  },
   "listings": {
     "title": "Angebote",
     "offer": "Angebote",
@@ -35,5 +49,40 @@
   },
   "likePost": "Diesen Beitrag liken",
   "unlikePost": "Like entfernen",
-  "readMore": "Mehr lesen"
+  "readMore": "Mehr lesen",
+  "composer": {
+    "hashtags": "Hashtags"
+  },
+  "dashboard": {
+    "balance": "Saldo",
+    "hours": "{{count}} Stunden",
+    "upcomingEvents": "Kommende Termine",
+    "openRequests": "Offene Gesuche",
+    "notifications": "Benachrichtigungen",
+    "unavailable": "-",
+    "openCard": "{{label}} offnen"
+  },
+  "hashtags": {
+    "title": "Hashtags",
+    "eyebrow": "Entdecken",
+    "subtitle": "Finde aktive Themen und Gesprache in deinem Feed.",
+    "searchPlaceholder": "Hashtags suchen",
+    "postCount": "{{count}} Beitrage",
+    "open": "Offnen",
+    "openTag": "#{{tag}} offnen",
+    "loadFailed": "Hashtags konnten nicht geladen werden.",
+    "unableToLoad": "Hashtags konnten nicht geladen werden",
+    "emptyTitle": "Keine Hashtags gefunden",
+    "emptySubtitle": "Trendthemen erscheinen hier, wenn Mitglieder Feed-Beitrage taggen.",
+    "noMatch": "Keine Hashtags passen zu \"{{query}}\"."
+  },
+  "hashtag": {
+    "title": "Hashtag",
+    "subtitle": "Getaggte Feed-Beitrage",
+    "postCount": "{{count}} Beitrage",
+    "loadFailed": "Beitrage fur dieses Hashtag konnten nicht geladen werden.",
+    "unableToLoad": "Dieses Hashtag konnte nicht geladen werden",
+    "emptyTitle": "Noch keine Beitrage",
+    "emptySubtitle": "Noch keine Feed-Beitrage sind mit #{{tag}} getaggt."
+  }
 }

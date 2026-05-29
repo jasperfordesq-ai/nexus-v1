@@ -16,6 +16,7 @@ export interface ChatMessage {
   created_at: string;
   is_error?: boolean;
   sources?: ChatSource[];
+  tool_invocations?: ToolInvocation[];
   trace_id?: number | null;
   message_id?: number | null;
 }
@@ -39,6 +40,15 @@ export interface ChatResponse {
   };
 }
 
+export interface ToolInvocation {
+  name: string;
+  arguments: Record<string, unknown>;
+  ok: boolean;
+  summary: string;
+  card_type: string;
+  results: Array<Record<string, unknown>>;
+}
+
 interface RawChatResponse {
   data?: {
     message?: ChatMessage;
@@ -49,6 +59,7 @@ interface RawChatResponse {
   conversation_id?: string | number;
   limits?: ChatResponse['data']['limits'];
   sources?: ChatSource[];
+  tool_invocations?: ToolInvocation[];
   trace_id?: number | null;
   error?: string;
 }
@@ -85,6 +96,7 @@ export function sendChatMessage(
           ...reply,
           id: String(reply.id),
           sources: reply.sources ?? response.sources,
+          tool_invocations: reply.tool_invocations ?? response.tool_invocations,
           trace_id: reply.trace_id ?? response.trace_id ?? null,
         },
         conversation_id: String(body.conversation_id ?? ''),

@@ -152,6 +152,36 @@ export interface FeedResponse {
   };
 }
 
+export interface HashtagItem {
+  tag: string;
+  post_count: number;
+  trend_direction?: 'up' | 'down' | 'stable';
+}
+
+export interface HashtagFeedResponse {
+  data: FeedItem[];
+  meta?: {
+    has_more?: boolean;
+    cursor?: string | null;
+    total_items?: number;
+  };
+}
+
+const POLYMORPHIC_FEED_TYPES = new Set<FeedItemType>([
+  'post',
+  'listing',
+  'event',
+  'poll',
+  'goal',
+  'job',
+  'challenge',
+  'volunteer',
+  'review',
+  'blog',
+  'discussion',
+  'resource',
+]);
+
 /**
  * GET /api/v2/feed — personalised activity feed for the current tenant.
  *
@@ -177,6 +207,37 @@ export function getFeed(page = 1, cursor?: string | null, options: Omit<FeedQuer
     params['cursor'] = cursor;
   }
   return api.get<FeedResponse>(`${API_V2}/feed`, params);
+}
+
+export function getFeedItem(type: FeedItemType, id: number): Promise<{ data: FeedItem }> {
+  const safeType = POLYMORPHIC_FEED_TYPES.has(type) ? type : 'post';
+  const path = safeType === 'post'
+    ? `${API_V2}/feed/posts/${id}`
+    : `${API_V2}/feed/items/${safeType}/${id}`;
+
+  return api.get<{ data: FeedItem }>(path);
+}
+
+export function getTrendingHashtags(limit = 50): Promise<{ data?: HashtagItem[] } | HashtagItem[]> {
+  return api.get<{ data?: HashtagItem[] } | HashtagItem[]>(`${API_V2}/feed/hashtags/trending`, {
+    limit: String(limit),
+  });
+}
+
+export function searchHashtags(query: string): Promise<{ data?: HashtagItem[] } | HashtagItem[]> {
+  return api.get<{ data?: HashtagItem[] } | HashtagItem[]>(`${API_V2}/feed/hashtags/search`, {
+    q: query,
+  });
+}
+
+export function getHashtagFeed(tag: string, cursor?: string | null, perPage = 20): Promise<HashtagFeedResponse> {
+  const params: Record<string, string> = {
+    per_page: String(perPage),
+  };
+  if (cursor) {
+    params.cursor = cursor;
+  }
+  return api.get<HashtagFeedResponse>(`${API_V2}/feed/hashtags/${encodeURIComponent(tag)}`, params);
 }
 
 export interface LikeResult {

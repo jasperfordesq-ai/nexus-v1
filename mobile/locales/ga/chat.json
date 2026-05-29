@@ -1,10 +1,24 @@
 {
-  "title": "Comhrá AI",
-  "placeholder": "Cuir ceist ar bith faoin mbanc ama…",
+  "title": "ComhrÃ¡ AI",
+  "placeholder": "Cuir ceist ar bith faoin mbanc amaâ€¦",
   "send": "Seol",
-  "empty": "Tosaigh comhrá leis an gcúntóir AI.",
-  "error": "Níorbh fhéidir an teachtaireacht a sheoladh.",
-  "thinking": "Ag smaoineamh…",
-  "timeout": "Tá an freagra ag tógáil an iomarca ama. Bain triail as arís.",
-  "disclaimer": "Ní bhíonn freagraí AI cruinn i gcónaí."
+  "empty": "Tosaigh comhrÃ¡ leis an gcÃºntÃ³ir AI.",
+  "error": "NÃ­orbh fhÃ©idir an teachtaireacht a sheoladh.",
+  "thinking": "Ag smaoineamhâ€¦",
+  "timeout": "TÃ¡ an freagra ag tÃ³gÃ¡il an iomarca ama. Bain triail as arÃ­s.",
+  "disclaimer": "NÃ­ bhÃ­onn freagraÃ­ AI cruinn i gcÃ³naÃ­.",
+  "tool_results": {
+    "label": "Results",
+    "fallbackTitle": "Result",
+    "open": "Open {{title}}",
+    "type": {
+      "listing": "Listing",
+      "member": "Member",
+      "event": "Event",
+      "job": "Job",
+      "marketplace": "Marketplace",
+      "kb": "Knowledge base",
+      "wallet": "Wallet"
+    }
+  }
 }

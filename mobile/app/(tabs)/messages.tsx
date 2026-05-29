@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, FlatList, Platform, Pressable, RefreshControl, Text, View } from 'react-native';
+import { Alert, FlatList, Platform, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -493,8 +493,9 @@ function ConversationCard({
       onSwipeableWillOpen={() => void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}
       onSwipeableOpen={() => onArchive(conversation)}
     >
-      <Pressable
+      <HeroButton
         className="mx-4 my-2 p-0"
+        variant="ghost"
         accessibilityLabel={`${otherName}${lastMsgBody ? `, ${lastMsgBody}` : ''}`}
         accessibilityRole="button"
         onPress={() => {
@@ -573,7 +574,7 @@ function ConversationCard({
             </View>
           </HeroCard.Footer>
         </HeroCard>
-      </Pressable>
+      </HeroButton>
     </Swipeable>
   );
 }

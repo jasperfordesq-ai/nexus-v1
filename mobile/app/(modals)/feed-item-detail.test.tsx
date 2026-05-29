@@ -1,0 +1,109 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import React from 'react';
+import { render, waitFor } from '@testing-library/react-native';
+
+const mockGetFeedItem = jest.fn();
+const mockUseLocalSearchParams = jest.fn();
+const mockHasModule = jest.fn();
+const mockT = (key: string) => {
+  const map: Record<string, string> = {
+    'feedTypes.post': 'Post',
+    'feed.emptySubtitle': 'Start connecting with your community to see posts here.',
+    'common:buttons.back': 'Back',
+    'common:buttons.retry': 'Retry',
+    'common:errors.generic': 'Something went wrong. Please try again.',
+    'common:errors.notFound': 'Not found.',
+  };
+  return map[key] ?? key;
+};
+
+jest.mock('expo-router', () => ({
+  router: { back: jest.fn(), canGoBack: jest.fn(() => false), push: jest.fn() },
+  useLocalSearchParams: () => mockUseLocalSearchParams(),
+}));
+
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: mockT,
+  }),
+}));
+
+jest.mock('@/lib/hooks/useTenant', () => ({
+  usePrimaryColor: () => '#006FEE',
+  useTenant: () => ({ hasModule: mockHasModule }),
+}));
+
+jest.mock('@/lib/api/feed', () => ({
+  getFeedItem: (...args: unknown[]) => mockGetFeedItem(...args),
+}));
+
+jest.mock('@/components/FeedItem', () => {
+  const { Text } = require('react-native');
+  return ({ item, disableDetailNavigation }: { item: { title: string }; disableDetailNavigation?: boolean }) => (
+    <Text>{disableDetailNavigation ? `Detail: ${item.title}` : item.title}</Text>
+  );
+});
+
+jest.mock('@/components/ui/AppTopBar', () => {
+  const { Text } = require('react-native');
+  return ({ title }: { title: string }) => <Text>{title}</Text>;
+});
+
+jest.mock('@/components/ui/LoadingSpinner', () => {
+  const { Text } = require('react-native');
+  return () => <Text>Loading</Text>;
+});
+
+jest.mock('@/components/ModalErrorBoundary', () => ({ children }: { children: React.ReactNode }) => children);
+
+import FeedItemDetailScreen from './feed-item-detail';
+
+describe('FeedItemDetailScreen', () => {
+  beforeEach(() => {
+    mockGetFeedItem.mockReset();
+    mockUseLocalSearchParams.mockReset();
+    mockHasModule.mockReset().mockReturnValue(true);
+    mockUseLocalSearchParams.mockReturnValue({ id: '42', type: 'post' });
+  });
+
+  it('loads and renders a native post detail card', async () => {
+    mockGetFeedItem.mockResolvedValue({
+      data: {
+        id: 42,
+        type: 'post',
+        title: 'Garden update',
+        content: 'Seeds are sprouting.',
+        image_url: null,
+        likes_count: 0,
+        comments_count: 0,
+        created_at: '2026-05-29T09:00:00Z',
+        location: null,
+        rating: null,
+        start_date: null,
+        job_type: null,
+        commitment: null,
+        submission_deadline: null,
+        receiver: null,
+      },
+    });
+
+    const { getByText } = render(<FeedItemDetailScreen />);
+
+    await waitFor(() => expect(mockGetFeedItem).toHaveBeenCalledWith('post', 42));
+    expect(getByText('Garden update')).toBeTruthy();
+    expect(getByText('Detail: Garden update')).toBeTruthy();
+  });
+
+  it('falls back when the feed module is unavailable', async () => {
+    mockHasModule.mockReturnValue(false);
+
+    const { getByText } = render(<FeedItemDetailScreen />);
+
+    await waitFor(() => expect(mockGetFeedItem).not.toHaveBeenCalled());
+    expect(getByText('Not found.')).toBeTruthy();
+  });
+});

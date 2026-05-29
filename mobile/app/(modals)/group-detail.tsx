@@ -7,7 +7,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Alert,
   Image,
-  Pressable,
+  Linking,
   RefreshControl,
   ScrollView,
   Share,
@@ -26,16 +26,22 @@ import {
   type Event,
 } from '@/lib/api/events';
 import {
+  createGroupAnnouncement,
   createGroupDiscussion,
+  deleteGroupAnnouncement,
   getGroup,
   getGroupAnnouncements,
   getGroupDiscussions,
+  getGroupFiles,
   getGroupMembers,
   joinGroup,
   leaveGroup,
+  updateGroupAnnouncement,
   type GroupAnnouncement,
   type GroupDetail,
   type GroupDiscussion,
+  type GroupFileItem,
+  type GroupFilesResponse,
   type GroupMemberListItem,
 } from '@/lib/api/groups';
 import {
@@ -53,6 +59,7 @@ import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
+import { API_BASE_URL, API_V2 } from '@/lib/constants';
 import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
 import Input from '@/components/ui/Input';
@@ -64,7 +71,7 @@ const WEB_URL = 'https://app.project-nexus.ie';
 const CARD_MIN_HEIGHT = 118;
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
-type TabKey = 'overview' | 'discussion' | 'members' | 'events' | 'announcements' | 'marketplace';
+type TabKey = 'overview' | 'discussion' | 'members' | 'events' | 'announcements' | 'files' | 'marketplace';
 type ApiGroupDetail = GroupDetail & {
   viewer_membership?: { status?: string; role?: string; is_admin?: boolean } | null;
   avatar_url?: string | null;
@@ -107,6 +114,15 @@ function formatDateParts(value?: string | null) {
     day: new Intl.DateTimeFormat(undefined, { day: 'numeric' }).format(date),
     month: new Intl.DateTimeFormat(undefined, { month: 'short' }).format(date),
   };
+}
+
+function formatFileSize(bytes?: number | null) {
+  const value = Number(bytes ?? 0);
+  if (!Number.isFinite(value) || value <= 0) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB'];
+  const index = Math.min(units.length - 1, Math.floor(Math.log(value) / Math.log(1024)));
+  const amount = value / Math.pow(1024, index);
+  return `${amount.toFixed(index === 0 ? 0 : 1)} ${units[index]}`;
 }
 
 function StatusChip({ icon, label, color }: { icon: IoniconName; label: string; color: string }) {
@@ -227,6 +243,12 @@ function GroupDetailScreenInner() {
   const [discussionTitle, setDiscussionTitle] = useState('');
   const [discussionContent, setDiscussionContent] = useState('');
   const [creatingDiscussion, setCreatingDiscussion] = useState(false);
+  const [showAnnouncementComposer, setShowAnnouncementComposer] = useState(false);
+  const [announcementTitle, setAnnouncementTitle] = useState('');
+  const [announcementContent, setAnnouncementContent] = useState('');
+  const [announcementPinned, setAnnouncementPinned] = useState(false);
+  const [creatingAnnouncement, setCreatingAnnouncement] = useState(false);
+  const [updatingAnnouncementId, setUpdatingAnnouncementId] = useState<number | null>(null);
 
   useEffect(() => {
     if (group) {
@@ -245,6 +267,9 @@ function GroupDetailScreenInner() {
   const announcementsApi = useApi(() => getGroupAnnouncements(safeGroupId), [safeGroupId, currentIsMember], {
     enabled: safeGroupId > 0 && currentIsMember,
   });
+  const filesApi = useApi<GroupFilesResponse>(() => getGroupFiles(safeGroupId), [safeGroupId, currentIsMember], {
+    enabled: safeGroupId > 0 && currentIsMember,
+  });
   const eventsApi = useApi(() => getEvents('upcoming', null, 20, { groupId: safeGroupId }), [safeGroupId], {
     enabled: safeGroupId > 0,
   });
@@ -252,6 +277,7 @@ function GroupDetailScreenInner() {
   const members = useMemo<GroupMemberListItem[]>(() => membersApi.data?.data ?? [], [membersApi.data]);
   const discussions = useMemo<GroupDiscussion[]>(() => discussionsApi.data?.data ?? [], [discussionsApi.data]);
   const announcements = useMemo<GroupAnnouncement[]>(() => announcementsApi.data?.data?.items ?? [], [announcementsApi.data]);
+  const files = useMemo<GroupFileItem[]>(() => filesApi.data?.data.items ?? [], [filesApi.data]);
   const events = useMemo<Event[]>(() => eventsApi.data?.data ?? [], [eventsApi.data]);
 
   const handleRefresh = useCallback(() => {
@@ -260,14 +286,15 @@ function GroupDetailScreenInner() {
     membersApi.refresh();
     discussionsApi.refresh();
     announcementsApi.refresh();
+    filesApi.refresh();
     eventsApi.refresh();
-  }, [announcementsApi, discussionsApi, eventsApi, membersApi, refresh]);
+  }, [announcementsApi, discussionsApi, eventsApi, filesApi, membersApi, refresh]);
 
   useEffect(() => {
-    if (!isLoading && !membersApi.isLoading && !discussionsApi.isLoading && !announcementsApi.isLoading && !eventsApi.isLoading) {
+    if (!isLoading && !membersApi.isLoading && !discussionsApi.isLoading && !announcementsApi.isLoading && !filesApi.isLoading && !eventsApi.isLoading) {
       setRefreshing(false);
     }
-  }, [announcementsApi.isLoading, discussionsApi.isLoading, eventsApi.isLoading, isLoading, membersApi.isLoading]);
+  }, [announcementsApi.isLoading, discussionsApi.isLoading, eventsApi.isLoading, filesApi.isLoading, isLoading, membersApi.isLoading]);
 
   async function handleShare() {
     if (!group) return;
@@ -325,6 +352,7 @@ function GroupDetailScreenInner() {
       membersApi.refresh();
       discussionsApi.refresh();
       announcementsApi.refresh();
+      filesApi.refresh();
       eventsApi.refresh();
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
@@ -390,12 +418,81 @@ function GroupDetailScreenInner() {
     }
   }
 
+  async function handleCreateAnnouncement() {
+    const title = announcementTitle.trim();
+    const content = announcementContent.trim();
+    if (!title || !content) {
+      Alert.alert(t('common:errors.alertTitle'), t('detail.announcementRequired'));
+      return;
+    }
+
+    setCreatingAnnouncement(true);
+    try {
+      await createGroupAnnouncement(loadedGroup.id, {
+        title,
+        content,
+        is_pinned: announcementPinned,
+      });
+      setAnnouncementTitle('');
+      setAnnouncementContent('');
+      setAnnouncementPinned(false);
+      setShowAnnouncementComposer(false);
+      announcementsApi.refresh();
+      refresh();
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(t('common:errors.alertTitle'), t('detail.announcementCreateError'));
+    } finally {
+      setCreatingAnnouncement(false);
+    }
+  }
+
+  async function handleToggleAnnouncementPin(announcement: GroupAnnouncement) {
+    setUpdatingAnnouncementId(announcement.id);
+    try {
+      await updateGroupAnnouncement(loadedGroup.id, announcement.id, { is_pinned: !announcement.is_pinned });
+      announcementsApi.refresh();
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(t('common:errors.alertTitle'), t('detail.announcementUpdateError'));
+    } finally {
+      setUpdatingAnnouncementId(null);
+    }
+  }
+
+  function handleDeleteAnnouncement(announcement: GroupAnnouncement) {
+    Alert.alert(t('detail.deleteAnnouncementTitle'), t('detail.deleteAnnouncementMessage'), [
+      { text: t('common:buttons.cancel'), style: 'cancel' },
+      {
+        text: t('detail.deleteAnnouncement'),
+        style: 'destructive',
+        onPress: async () => {
+          setUpdatingAnnouncementId(announcement.id);
+          try {
+            await deleteGroupAnnouncement(loadedGroup.id, announcement.id);
+            announcementsApi.refresh();
+            refresh();
+            void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          } catch {
+            void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+            Alert.alert(t('common:errors.alertTitle'), t('detail.announcementDeleteError'));
+          } finally {
+            setUpdatingAnnouncementId(null);
+          }
+        },
+      },
+    ]);
+  }
+
   const tabs: Array<{ key: TabKey; label: string; icon: IoniconName }> = [
     { key: 'overview', label: t('detail.tabs.overview'), icon: 'newspaper-outline' },
     { key: 'discussion', label: t('detail.tabs.discussion'), icon: 'chatbubble-ellipses-outline' },
     { key: 'members', label: t('detail.tabs.members'), icon: 'people-outline' },
     { key: 'events', label: t('detail.tabs.events'), icon: 'calendar-outline' },
     { key: 'announcements', label: t('detail.tabs.announcements'), icon: 'megaphone-outline' },
+    { key: 'files', label: t('detail.tabs.files'), icon: 'folder-open-outline' },
   ];
   if (hasFeature('marketplace')) {
     tabs.push({ key: 'marketplace', label: t('detail.tabs.marketplace'), icon: 'bag-handle-outline' });
@@ -728,16 +825,79 @@ function GroupDetailScreenInner() {
           <View className="gap-3">
             {!userCanSeeMemberContent ? (
               <EmptyCard icon="lock-closed-outline" message={t('detail.joinToSeeAnnouncements')} />
-            ) : announcementsApi.isLoading ? (
-              <HeroCard className="rounded-panel p-0">
-                <HeroCard.Body className="min-h-[140px] items-center justify-center">
-                  <Spinner size="md" />
-                </HeroCard.Body>
-              </HeroCard>
-            ) : announcements.length === 0 ? (
-              <EmptyCard icon="megaphone-outline" message={t('detail.emptyAnnouncements')} />
             ) : (
-              announcements.map((announcement) => (
+              <>
+                {canManageGroup ? (
+                  <HeroCard className="rounded-panel p-0">
+                    <HeroCard.Body className="gap-3 p-4">
+                      <View className="flex-row items-center justify-between gap-3">
+                        <View className="min-w-0 flex-1">
+                          <Text className="text-base font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+                            {t('detail.newAnnouncement')}
+                          </Text>
+                          <Text className="mt-1 text-xs" style={{ color: theme.textSecondary }} numberOfLines={2}>
+                            {t('detail.newAnnouncementHint')}
+                          </Text>
+                        </View>
+                        <HeroButton
+                          size="sm"
+                          variant={showAnnouncementComposer ? 'secondary' : 'primary'}
+                          onPress={() => setShowAnnouncementComposer((value) => !value)}
+                        >
+                          <HeroButton.Label>
+                            {showAnnouncementComposer ? t('common:buttons.cancel') : t('detail.createAnnouncement')}
+                          </HeroButton.Label>
+                        </HeroButton>
+                      </View>
+
+                      {showAnnouncementComposer ? (
+                        <View className="gap-3">
+                          <Input
+                            value={announcementTitle}
+                            onChangeText={setAnnouncementTitle}
+                            placeholder={t('detail.announcementTitlePlaceholder')}
+                            placeholderTextColor={theme.textMuted}
+                            className="text-base"
+                            style={{ color: theme.text }}
+                            accessibilityLabel={t('detail.announcementTitlePlaceholder')}
+                          />
+                          <Input
+                            value={announcementContent}
+                            onChangeText={setAnnouncementContent}
+                            placeholder={t('detail.announcementContentPlaceholder')}
+                            placeholderTextColor={theme.textMuted}
+                            multiline
+                            className="min-h-[104px] text-base"
+                            style={{ color: theme.text, textAlignVertical: 'top' }}
+                            accessibilityLabel={t('detail.announcementContentPlaceholder')}
+                          />
+                          <HeroButton
+                            size="sm"
+                            variant={announcementPinned ? 'primary' : 'secondary'}
+                            onPress={() => setAnnouncementPinned((value) => !value)}
+                          >
+                            <Ionicons name="pin-outline" size={16} color={announcementPinned ? '#fff' : primary} />
+                            <HeroButton.Label>{announcementPinned ? t('detail.pinned') : t('detail.pinAnnouncement')}</HeroButton.Label>
+                          </HeroButton>
+                          <HeroButton isDisabled={creatingAnnouncement} onPress={() => void handleCreateAnnouncement()}>
+                            {creatingAnnouncement ? <Spinner size="sm" /> : <HeroButton.Label>{t('detail.publishAnnouncement')}</HeroButton.Label>}
+                          </HeroButton>
+                        </View>
+                      ) : null}
+                    </HeroCard.Body>
+                  </HeroCard>
+                ) : null}
+
+                {announcementsApi.isLoading ? (
+                  <HeroCard className="rounded-panel p-0">
+                    <HeroCard.Body className="min-h-[140px] items-center justify-center">
+                      <Spinner size="md" />
+                    </HeroCard.Body>
+                  </HeroCard>
+                ) : announcements.length === 0 ? (
+                  <EmptyCard icon="megaphone-outline" message={t('detail.emptyAnnouncements')} />
+                ) : (
+                  announcements.map((announcement) => (
                 <HeroCard key={announcement.id} className="rounded-panel p-0">
                   <HeroCard.Body className="gap-3 p-4" style={{ minHeight: CARD_MIN_HEIGHT }}>
                     <View className="flex-row items-start justify-between gap-3">
@@ -756,11 +916,44 @@ function GroupDetailScreenInner() {
                     <Text className="text-xs" style={{ color: theme.textMuted }} numberOfLines={1}>
                       {[announcement.author?.name, formatDate(announcement.created_at)].filter(Boolean).join(' • ')}
                     </Text>
+                    {canManageGroup ? (
+                      <View className="flex-row flex-wrap gap-2">
+                        <HeroButton
+                          size="sm"
+                          variant="secondary"
+                          isDisabled={updatingAnnouncementId === announcement.id}
+                          onPress={() => void handleToggleAnnouncementPin(announcement)}
+                        >
+                          {updatingAnnouncementId === announcement.id ? <Spinner size="sm" /> : <Ionicons name="pin-outline" size={16} color={primary} />}
+                          <HeroButton.Label>{announcement.is_pinned ? t('detail.unpinAnnouncement') : t('detail.pinAnnouncement')}</HeroButton.Label>
+                        </HeroButton>
+                        <HeroButton
+                          size="sm"
+                          variant="danger-soft"
+                          isDisabled={updatingAnnouncementId === announcement.id}
+                          onPress={() => handleDeleteAnnouncement(announcement)}
+                        >
+                          <Ionicons name="trash-outline" size={16} color={theme.error} />
+                          <HeroButton.Label>{t('detail.deleteAnnouncement')}</HeroButton.Label>
+                        </HeroButton>
+                      </View>
+                    ) : null}
                   </HeroCard.Body>
                 </HeroCard>
-              ))
+                  ))
+                )}
+              </>
             )}
           </View>
+        ) : null}
+
+        {activeTab === 'files' ? (
+          <GroupFilesPanel
+            groupId={loadedGroup.id}
+            files={files}
+            isLoading={filesApi.isLoading}
+            canView={userCanSeeMemberContent}
+          />
         ) : null}
 
         {activeTab === 'marketplace' ? (
@@ -837,7 +1030,14 @@ function GroupEventsPanel({
           const eventLocation = event.is_online ? t('detail.eventOnline') : event.location;
           const attendeeCount = event.attendees_count ?? event.rsvp_counts?.going ?? 0;
           return (
-            <Pressable key={event.id} onPress={() => openEvent(event.id)} accessibilityRole="button">
+            <HeroButton
+              key={event.id}
+              variant="ghost"
+              feedbackVariant="scale"
+              className="w-full p-0"
+              accessibilityLabel={event.title}
+              onPress={() => openEvent(event.id)}
+            >
               <HeroCard className="rounded-panel p-0">
                 <HeroCard.Body className="gap-3 p-4">
                   <View className="flex-row items-start gap-3">
@@ -874,9 +1074,100 @@ function GroupEventsPanel({
                   </View>
                 </HeroCard.Body>
               </HeroCard>
-            </Pressable>
+            </HeroButton>
           );
         })
+      )}
+    </View>
+  );
+}
+
+function GroupFilesPanel({
+  groupId,
+  files,
+  isLoading,
+  canView,
+}: {
+  groupId: number;
+  files: GroupFileItem[];
+  isLoading: boolean;
+  canView: boolean;
+}) {
+  const { t } = useTranslation(['groups', 'common']);
+  const primary = usePrimaryColor();
+  const theme = useTheme();
+
+  function openDownload(fileId: number) {
+    const url = `${API_BASE_URL}${API_V2}/groups/${groupId}/files/${fileId}/download`;
+    void Linking.openURL(url);
+  }
+
+  if (!canView) {
+    return <EmptyCard icon="lock-closed-outline" message={t('detail.files.joinToView')} />;
+  }
+
+  return (
+    <View className="gap-3">
+      <HeroCard className="rounded-panel p-0">
+        <HeroCard.Body className="gap-3 p-4">
+          <View className="flex-row items-start gap-3">
+            <View className="size-12 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+              <Ionicons name="folder-open-outline" size={22} color={primary} />
+            </View>
+            <View className="min-w-0 flex-1">
+              <Text className="text-base font-semibold" style={{ color: theme.text }}>
+                {t('detail.files.title')}
+              </Text>
+              <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+                {t('detail.files.subtitle')}
+              </Text>
+            </View>
+          </View>
+        </HeroCard.Body>
+      </HeroCard>
+
+      {isLoading ? (
+        <HeroCard className="rounded-panel p-0">
+          <HeroCard.Body className="min-h-[140px] items-center justify-center">
+            <Spinner size="md" />
+          </HeroCard.Body>
+        </HeroCard>
+      ) : files.length === 0 ? (
+        <EmptyCard icon="folder-open-outline" message={t('detail.files.empty')} />
+      ) : (
+        files.map((file) => (
+          <HeroCard key={file.id} className="rounded-panel p-0">
+            <HeroCard.Body className="gap-3 p-4">
+              <View className="flex-row items-start gap-3">
+                <View className="size-10 items-center justify-center rounded-panel-inner" style={{ backgroundColor: withAlpha(primary, 0.12) }}>
+                  <Ionicons name="document-text-outline" size={19} color={primary} />
+                </View>
+                <View className="min-w-0 flex-1">
+                  <Text className="text-base font-semibold" style={{ color: theme.text }} numberOfLines={2}>
+                    {file.file_name}
+                  </Text>
+                  {file.description ? (
+                    <Text className="mt-1 text-sm" style={{ color: theme.textSecondary }} numberOfLines={2}>
+                      {file.description}
+                    </Text>
+                  ) : null}
+                  <Text className="mt-1 text-xs" style={{ color: theme.textMuted }} numberOfLines={1}>
+                    {[formatFileSize(file.file_size), file.folder, file.uploader_name, formatDate(file.created_at)].filter(Boolean).join(' - ')}
+                  </Text>
+                </View>
+              </View>
+              <HeroButton
+                size="sm"
+                variant="secondary"
+                onPress={() => openDownload(file.id)}
+                accessibilityLabel={t('detail.files.downloadLabel', { name: file.file_name })}
+              >
+                <Ionicons name="download-outline" size={16} color={primary} />
+                <HeroButton.Label>{t('detail.files.download')}</HeroButton.Label>
+              </HeroButton>
+            </HeroCard.Body>
+          </HeroCard>
+        ))
       )}
     </View>
   );

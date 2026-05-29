@@ -20,6 +20,15 @@ export interface Goal {
   deadline?: string | null;
   due_date: string | null;
   created_at: string;
+  is_public?: boolean;
+  is_owner?: boolean;
+  is_buddy?: boolean;
+  buddy_name?: string | null;
+  streak_count?: number | null;
+  best_streak_count?: number | null;
+  progress_percentage?: number | string | null;
+  checkin_frequency?: string | null;
+  last_checkin_at?: string | null;
 }
 
 export interface GoalsResponse {
@@ -28,6 +37,65 @@ export interface GoalsResponse {
     has_more: boolean;
     cursor: string | null;
   };
+}
+
+export interface GoalHistoryEntry {
+  id: number;
+  goal_id: number;
+  event_type: string;
+  type?: string;
+  description: string;
+  data?: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface GoalHistoryResponse {
+  data: GoalHistoryEntry[];
+  meta: {
+    has_more: boolean;
+    cursor: string | null;
+  };
+}
+
+export interface GoalMilestone {
+  id: number;
+  title: string;
+  target_percent?: number | string | null;
+  target_value?: number | string | null;
+  completed_at?: string | null;
+}
+
+export interface GoalBuddyNote {
+  id: number;
+  type: string;
+  message: string | null;
+  buddy_name?: string | null;
+  created_at: string;
+}
+
+export interface GoalInsights {
+  checkin_count?: number;
+  last_checkin_at?: string | null;
+  checkin_frequency?: string | null;
+  next_checkin_due_at?: string | null;
+  is_checkin_due?: boolean;
+  streak_count?: number;
+  best_streak_count?: number;
+  milestones?: GoalMilestone[];
+  completed_milestones?: number;
+  milestone_count?: number;
+  buddy_notes?: GoalBuddyNote[];
+}
+
+export type GoalReminderFrequency = 'daily' | 'weekly' | 'biweekly' | 'monthly';
+
+export interface GoalReminder {
+  id?: number;
+  goal_id?: number;
+  frequency: GoalReminderFrequency;
+  enabled: boolean | number;
+  next_reminder_at?: string | null;
+  last_sent_at?: string | null;
 }
 
 // ─── API Functions ────────────────────────────────────────────────────────────
@@ -42,6 +110,10 @@ export function getGoals(cursor: string | null): Promise<GoalsResponse> {
   const params: Record<string, string> = {};
   if (cursor) params['cursor'] = cursor;
   return api.get<GoalsResponse>(`${API_V2}/goals`, params);
+}
+
+export function getGoal(id: number): Promise<{ data: Goal }> {
+  return api.get<{ data: Goal }>(`${API_V2}/goals/${id}`);
 }
 
 /**
@@ -68,4 +140,28 @@ export function updateGoalStatus(
   status: 'completed' | 'abandoned',
 ): Promise<{ data: Goal }> {
   return api.put<{ data: Goal }>(`${API_V2}/goals/${id}`, { status });
+}
+
+export function updateGoalProgress(id: number, increment: number): Promise<{ data: Goal }> {
+  return api.post<{ data: Goal }>(`${API_V2}/goals/${id}/progress`, { increment });
+}
+
+export function getGoalHistory(id: number): Promise<GoalHistoryResponse> {
+  return api.get<GoalHistoryResponse>(`${API_V2}/goals/${id}/history`);
+}
+
+export function getGoalInsights(id: number): Promise<{ data: GoalInsights }> {
+  return api.get<{ data: GoalInsights }>(`${API_V2}/goals/${id}/insights`);
+}
+
+export function getGoalReminder(id: number): Promise<{ data: GoalReminder | null }> {
+  return api.get<{ data: GoalReminder | null }>(`${API_V2}/goals/${id}/reminder`);
+}
+
+export function setGoalReminder(id: number, reminder: Pick<GoalReminder, 'frequency' | 'enabled'>): Promise<{ data: GoalReminder }> {
+  return api.put<{ data: GoalReminder }>(`${API_V2}/goals/${id}/reminder`, reminder);
+}
+
+export function deleteGoalReminder(id: number): Promise<void> {
+  return api.delete<void>(`${API_V2}/goals/${id}/reminder`);
 }

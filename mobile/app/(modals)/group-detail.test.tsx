@@ -37,6 +37,21 @@ jest.mock('react-i18next', () => ({
         'detail.joinToSeeMembers': 'Join to see members.',
         'detail.joinToSeeAnnouncements': 'Join to see announcements.',
         'detail.pinned': 'Pinned',
+        'detail.newAnnouncement': 'New announcement',
+        'detail.newAnnouncementHint': 'Post an update.',
+        'detail.createAnnouncement': 'Create',
+        'detail.announcementTitlePlaceholder': 'Announcement title',
+        'detail.announcementContentPlaceholder': 'Write the announcement...',
+        'detail.pinAnnouncement': 'Pin announcement',
+        'detail.unpinAnnouncement': 'Unpin',
+        'detail.publishAnnouncement': 'Publish announcement',
+        'detail.announcementRequired': 'Add a title and message.',
+        'detail.announcementCreateError': 'Could not create announcement.',
+        'detail.announcementUpdateError': 'Could not update announcement.',
+        'detail.announcementDeleteError': 'Could not delete announcement.',
+        'detail.deleteAnnouncement': 'Delete',
+        'detail.deleteAnnouncementTitle': 'Delete announcement',
+        'detail.deleteAnnouncementMessage': 'Delete this announcement?',
         'detail.startDiscussion': 'Start a discussion',
         'detail.startDiscussionHint': 'Ask a question.',
         'detail.newDiscussion': 'New',
@@ -49,7 +64,20 @@ jest.mock('react-i18next', () => ({
         'detail.tabs.overview': 'Overview',
         'detail.tabs.discussion': 'Discussions',
         'detail.tabs.members': 'Members',
+        'detail.tabs.events': 'Events',
         'detail.tabs.announcements': 'Announcements',
+        'detail.tabs.files': 'Files',
+        'detail.files.title': 'Group files',
+        'detail.files.subtitle': 'Documents and resources.',
+        'detail.files.empty': 'No files yet.',
+        'detail.files.joinToView': 'Join to view files.',
+        'detail.files.download': 'Download',
+        'detail.files.downloadLabel': opts ? `Download ${String(opts.name ?? '')}` : 'Download file',
+        'detail.eventsHeading': 'Group events',
+        'detail.eventsSubtitle': 'Events connected to this group.',
+        'detail.emptyEvents': 'No events yet.',
+        'detail.eventAttending': opts ? `${String(opts.count ?? 0)} going` : '0 going',
+        'detail.eventOnline': 'Online',
         'detail.roles.owner': 'Owner',
         'detail.roles.admin': 'Admin',
         'detail.roles.member': 'Member',
@@ -124,6 +152,10 @@ jest.mock('@/lib/api/groups', () => ({
   getGroupMembers: jest.fn(),
   getGroupDiscussions: jest.fn(),
   getGroupAnnouncements: jest.fn(),
+  getGroupFiles: jest.fn(),
+  createGroupAnnouncement: jest.fn().mockResolvedValue({ data: {} }),
+  updateGroupAnnouncement: jest.fn().mockResolvedValue({ data: {} }),
+  deleteGroupAnnouncement: jest.fn().mockResolvedValue({ data: { deleted: true } }),
   joinGroup: jest.fn().mockResolvedValue({}),
   leaveGroup: jest.fn().mockResolvedValue({}),
 }));
@@ -134,7 +166,7 @@ jest.mock('@/components/ui/LoadingSpinner', () => () => null);
 // --- Tests ---
 
 import GroupDetailScreen from './group-detail';
-import { joinGroup } from '@/lib/api/groups';
+import { createGroupAnnouncement, joinGroup, updateGroupAnnouncement } from '@/lib/api/groups';
 
 const defaultApiState = { data: null, isLoading: true, error: null, refresh: jest.fn() };
 
@@ -268,5 +300,156 @@ describe('GroupDetailScreen', () => {
     fireEvent.press(getByText('Edit group'));
 
     expect(mockRouterPush).toHaveBeenCalledWith({ pathname: '/(modals)/edit-group', params: { id: '1' } });
+  });
+
+  it('opens group event details from HeroUI Native-backed event cards', () => {
+    const groupState = {
+      data: { data: { ...mockGroupDetail, is_member: true } },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    };
+    const emptyListState = { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
+    const emptyAnnouncementsState = { data: { data: { items: [] } }, isLoading: false, error: null, refresh: jest.fn() };
+    const eventsState = {
+      data: {
+        data: [
+          {
+            id: 77,
+            title: 'Seed swap',
+            description: 'Bring seeds to share.',
+            start_date: '2026-06-01T12:00:00Z',
+            location: 'Community hall',
+            is_online: false,
+            attendees_count: 4,
+          },
+        ],
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    };
+    let apiCall = 0;
+    mockUseApi.mockImplementation(() => {
+      const states = [groupState, emptyListState, emptyListState, emptyAnnouncementsState, eventsState];
+      const state = states[apiCall % states.length];
+      apiCall += 1;
+      return state;
+    });
+
+    const { getByText } = render(<GroupDetailScreen />);
+
+    fireEvent.press(getByText('Events'));
+    fireEvent.press(getByText('Seed swap'));
+
+    expect(mockRouterPush).toHaveBeenCalledWith({
+      pathname: '/(modals)/event-detail',
+      params: { id: '77' },
+    });
+  });
+
+  it('lets group admins create announcements from the native announcements tab', async () => {
+    const refreshAnnouncements = jest.fn();
+    const groupState = {
+      data: {
+        data: {
+          ...mockGroupDetail,
+          is_member: true,
+          viewer_membership: { status: 'active', role: 'admin', is_admin: true },
+        },
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    };
+    const emptyListState = { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
+    const announcementsState = {
+      data: { data: { items: [], cursor: null, has_more: false } },
+      isLoading: false,
+      error: null,
+      refresh: refreshAnnouncements,
+    };
+    const eventsState = { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
+    let apiCall = 0;
+    mockUseApi.mockImplementation(() => {
+      const states = [groupState, emptyListState, emptyListState, announcementsState, eventsState];
+      const state = states[apiCall % states.length];
+      apiCall += 1;
+      return state;
+    });
+
+    const { getByPlaceholderText, getByText } = render(<GroupDetailScreen />);
+
+    fireEvent.press(getByText('Announcements'));
+    fireEvent.press(getByText('Create'));
+    fireEvent.changeText(getByPlaceholderText('Announcement title'), 'Spring update');
+    fireEvent.changeText(getByPlaceholderText('Write the announcement...'), 'Seeds arrive Friday.');
+    fireEvent.press(getByText('Pin announcement'));
+    fireEvent.press(getByText('Publish announcement'));
+
+    await waitFor(() => {
+      expect(createGroupAnnouncement).toHaveBeenCalledWith(1, {
+        title: 'Spring update',
+        content: 'Seeds arrive Friday.',
+        is_pinned: true,
+      });
+      expect(refreshAnnouncements).toHaveBeenCalled();
+    });
+  });
+
+  it('lets group admins toggle announcement pinning', async () => {
+    const groupState = {
+      data: {
+        data: {
+          ...mockGroupDetail,
+          is_member: true,
+          viewer_membership: { status: 'active', role: 'admin', is_admin: true },
+        },
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    };
+    const emptyListState = { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
+    const announcementsState = {
+      data: {
+        data: {
+          items: [{
+            id: 22,
+            title: 'Pinned note',
+            content: 'Remember the meet-up.',
+            is_pinned: true,
+            priority: 0,
+            is_expired: false,
+            author: { id: 10, name: 'Alice Admin', avatar_url: null },
+            created_at: '2026-06-01T00:00:00Z',
+            updated_at: null,
+            expires_at: null,
+          }],
+          cursor: null,
+          has_more: false,
+        },
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    };
+    const eventsState = { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
+    let apiCall = 0;
+    mockUseApi.mockImplementation(() => {
+      const states = [groupState, emptyListState, emptyListState, announcementsState, eventsState];
+      const state = states[apiCall % states.length];
+      apiCall += 1;
+      return state;
+    });
+
+    const { getByText } = render(<GroupDetailScreen />);
+
+    fireEvent.press(getByText('Announcements'));
+    fireEvent.press(getByText('Unpin'));
+
+    await waitFor(() => {
+      expect(updateGroupAnnouncement).toHaveBeenCalledWith(1, 22, { is_pinned: false });
+    });
   });
 });

@@ -7,13 +7,14 @@ import React, { useCallback, useRef, useState } from 'react';
 import {
   Dimensions,
   FlatList,
-  Pressable,
   Text,
   View,
   type ViewToken,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
+import { Button as HeroButton } from 'heroui-native';
+import { useTranslation } from 'react-i18next';
 
 interface CarouselImage {
   uri: string;
@@ -32,6 +33,7 @@ const CARD_PADDING = 16;
 const IMAGE_WIDTH = screenWidth - HORIZONTAL_MARGIN * 2 - CARD_PADDING * 2;
 
 export default function ImageCarousel({ images, height = 250, onImagePress }: ImageCarouselProps) {
+  const { t } = useTranslation('common');
   const [activeIndex, setActiveIndex] = useState(0);
 
   const onViewableItemsChanged = useRef(
@@ -60,9 +62,11 @@ export default function ImageCarousel({ images, height = 250, onImagePress }: Im
 
   const renderItem = useCallback(
     ({ item, index }: { item: CarouselImage; index: number }) => (
-      <Pressable
+      <HeroButton
+        variant="ghost"
+        className="p-0"
         onPress={() => handleImagePress(index)}
-        accessibilityLabel={item.alt ?? `Image ${index + 1} of ${images.length}`}
+        accessibilityLabel={item.alt ?? t('aria.carouselImage', { current: index + 1, total: images.length })}
         accessibilityRole="imagebutton"
       >
         <Image
@@ -70,9 +74,9 @@ export default function ImageCarousel({ images, height = 250, onImagePress }: Im
           style={{ width: IMAGE_WIDTH, height, borderRadius: 10 }}
           contentFit="cover"
         />
-      </Pressable>
+      </HeroButton>
     ),
-    [handleImagePress, height, images.length],
+    [handleImagePress, height, images.length, t],
   );
 
   const keyExtractor = useCallback((_: CarouselImage, index: number) => `carousel-${index}`, []);

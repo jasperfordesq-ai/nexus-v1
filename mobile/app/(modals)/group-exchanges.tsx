@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useMemo, useState } from 'react';
-import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -126,8 +126,11 @@ function GroupExchangesScreenInner() {
   function GroupExchangeCard({ exchange }: { exchange: GroupExchange }) {
     const tone = statusTones[exchange.status] ?? primary;
     return (
-      <Pressable
-        accessibilityRole="button"
+      <HeroButton
+        variant="ghost"
+        feedbackVariant="scale"
+        className="w-full p-0"
+        accessibilityLabel={exchange.title}
         onPress={() => router.push({ pathname: '/(modals)/group-exchange-detail', params: { id: String(exchange.id) } } as unknown as Href)}
       >
         <HeroCard className="rounded-panel p-0">
@@ -169,7 +172,7 @@ function GroupExchangesScreenInner() {
           </View>
           </HeroCard.Body>
         </HeroCard>
-      </Pressable>
+      </HeroButton>
     );
   }
 }

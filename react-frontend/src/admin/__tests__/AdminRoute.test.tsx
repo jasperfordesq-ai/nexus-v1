@@ -154,4 +154,16 @@ describe('AdminRoute', () => {
     renderWithRouter();
     expect(screen.getByTestId('admin-content')).toBeInTheDocument();
   });
+
+  it('redirects broker users even when a stale admin flag is present', () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: 1, role: 'broker', is_admin: true },
+      isAuthenticated: true,
+      isLoading: false,
+      status: 'authenticated',
+    });
+
+    renderWithRouter();
+    expect(screen.queryByTestId('admin-content')).not.toBeInTheDocument();
+  });
 });

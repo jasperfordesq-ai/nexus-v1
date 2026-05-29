@@ -9,7 +9,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
   KeyboardAvoidingView,
-  Linking,
   Platform,
   ScrollView,
   Text,
@@ -23,7 +22,6 @@ import { Button as HeroButton, Card as HeroCard } from 'heroui-native';
 
 import * as Haptics from '@/lib/haptics';
 import { ApiResponseError } from '@/lib/api/client';
-import { FORGOT_PASSWORD_URL } from '@/lib/constants';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import Button from '@/components/ui/Button';
@@ -184,10 +182,7 @@ export default function LoginScreen() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onPress={async () => {
-                    const supported = await Linking.canOpenURL(FORGOT_PASSWORD_URL);
-                    if (supported) await Linking.openURL(FORGOT_PASSWORD_URL);
-                  }}
+                  onPress={() => router.push('/forgot-password' as never)}
                   className="self-center mt-3.5"
                 >
                   {t('login.forgotPassword')}

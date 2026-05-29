@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }),
@@ -41,6 +41,10 @@ jest.mock('react-i18next', () => ({
         limits_left_today: opts ? `${String(opts.count ?? 0)} left today` : '0 left today',
         messages_region: 'Messages',
         you: 'You',
+        'tool_results.label': 'Results',
+        'tool_results.fallbackTitle': 'Result',
+        'tool_results.open': opts ? `Open ${String(opts.title ?? '')}` : 'Open result',
+        'tool_results.type.listing': 'Listing',
         'common:back': 'Back',
       };
       return map[key] ?? key;
@@ -123,7 +127,30 @@ jest.mock('@/lib/api/chat', () => ({
   sendChatMessage: jest.fn().mockResolvedValue({
     data: {
       conversation_id: 'conv-1',
-      message: { id: 'msg-2', role: 'assistant', content: 'Hello!', created_at: new Date().toISOString() },
+      message: {
+        id: 'msg-2',
+        role: 'assistant',
+        content: 'Hello!',
+        created_at: new Date().toISOString(),
+        tool_invocations: [
+          {
+            name: 'search_listings',
+            arguments: {},
+            ok: true,
+            summary: 'Found listings',
+            card_type: 'listing',
+            results: [
+              {
+                id: 12,
+                title: 'Garden help',
+                location: 'Community garden',
+                excerpt: 'Help with raised beds.',
+                url: 'https://app.project-nexus.ie/exchanges/12',
+              },
+            ],
+          },
+        ],
+      },
     },
   }),
 }));
@@ -161,5 +188,18 @@ describe('ChatScreen', () => {
     expect(getByText('Ask me anything about timebanking, your account, or this community.')).toBeTruthy();
     expect(getByText('Try asking...')).toBeTruthy();
     expect(getByText('How does timebanking work?')).toBeTruthy();
+  });
+
+  it('renders AI tool result cards from assistant responses', async () => {
+    const { getByLabelText, getByPlaceholderText, findByText } = render(<ChatScreen />);
+
+    fireEvent.changeText(getByPlaceholderText('Ask me anything...'), 'Find gardening offers');
+    fireEvent.press(getByLabelText('Send message'));
+
+    expect(await findByText('Garden help')).toBeTruthy();
+    expect(await findByText('Community garden')).toBeTruthy();
+    await waitFor(() => {
+      expect(getByLabelText('Open Garden help')).toBeTruthy();
+    });
   });
 });

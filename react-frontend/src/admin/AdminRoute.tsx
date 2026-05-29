@@ -12,6 +12,7 @@
 import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuth, useTenant } from '@/contexts';
 import { LoadingScreen } from '@/components/feedback';
+import { hasAdminPanelAccess } from '@/lib/access';
 
 export function AdminRoute() {
   const { user, isAuthenticated, isLoading, status } = useAuth();
@@ -26,18 +27,7 @@ export function AdminRoute() {
     return <Navigate to={tenantPath('/login')} state={{ from: tenantPath(location.pathname) }} replace />;
   }
 
-  // The User type only defines role as 'member' | 'admin' | 'moderator',
-  // but the backend may return 'tenant_admin' or 'super_admin' at runtime.
-  // We cast to string for safe comparison.
-  const role = (user?.role as string) || '';
-  const userRecord = user as Record<string, unknown> | null;
-  const isAdmin =
-    role === 'admin' ||
-    role === 'tenant_admin' ||
-    role === 'super_admin' ||
-    userRecord?.is_admin === true ||
-    userRecord?.is_super_admin === true ||
-    userRecord?.is_tenant_super_admin === true;
+  const isAdmin = hasAdminPanelAccess(user);
 
   if (!isAdmin) {
     return <Navigate to={tenantPath('/dashboard')} replace />;

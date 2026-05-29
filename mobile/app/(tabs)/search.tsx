@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useCallback } from 'react';
-import { FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
+import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -136,13 +136,14 @@ export default function SearchScreen() {
     const typeLabel = t(`types.${item.type}`);
     const tone = TYPE_TONES[item.type];
     return (
-      <Pressable
+      <HeroButton
         className="mx-4 my-2"
+        variant="ghost"
+        feedbackVariant="scale"
         onPress={() => {
           void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           navigateToResult(item);
         }}
-        accessibilityRole="button"
         accessibilityLabel={item.title}
       >
         <HeroCard variant="default" className="overflow-hidden rounded-panel p-0">
@@ -172,7 +173,7 @@ export default function SearchScreen() {
             </View>
           </HeroCard.Body>
         </HeroCard>
-      </Pressable>
+      </HeroButton>
     );
   }
 

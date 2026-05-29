@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useMemo, type ReactNode } from 'react';
-import { FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
+import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -172,10 +172,11 @@ function QuickLinksSection({
       </Text>
       <View className="flex-row flex-wrap gap-3">
         {quickLinks.map((link) => (
-          <Pressable
+          <HeroButton
             key={link.key}
+            variant="ghost"
+            feedbackVariant="scale"
             className="min-w-[46%] flex-1"
-            accessibilityRole="button"
             accessibilityLabel={t(`hub.quick.${link.key}.title`)}
             onPress={() => {
               void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -196,7 +197,7 @@ function QuickLinksSection({
                 {t(`hub.quick.${link.key}.description`)}
               </Text>
             </Surface>
-          </Pressable>
+          </HeroButton>
         ))}
       </View>
     </View>
@@ -217,13 +218,14 @@ function PartnerCard({
   const connectedDate = formatDate(item.connected_since ?? item.partnership_since);
 
   return (
-    <Pressable
+    <HeroButton
       className="mx-4 my-2"
+      variant="ghost"
+      feedbackVariant="scale"
       onPress={() => {
         void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         router.push({ pathname: '/(modals)/federation-partner', params: { id: String(item.id) } });
       }}
-      accessibilityRole="button"
       accessibilityLabel={item.name}
     >
       <HeroCard className="min-h-[156px] rounded-panel p-0">
@@ -268,13 +270,15 @@ function PartnerCard({
             ) : null}
           </View>
 
-          <HeroButton size="sm" variant="secondary" onPress={() => router.push({ pathname: '/(modals)/federation-partner', params: { id: String(item.id) } })}>
-            <HeroButton.Label>{t('hub.viewCommunity')}</HeroButton.Label>
+          <Surface variant="secondary" className="flex-row items-center justify-center gap-2 rounded-panel-inner px-3 py-2">
+            <Text className="text-sm font-semibold" style={{ color: primary }}>
+              {t('hub.viewCommunity')}
+            </Text>
             <Ionicons name="chevron-forward-outline" size={15} color={primary} />
-          </HeroButton>
+          </Surface>
         </HeroCard.Body>
       </HeroCard>
-    </Pressable>
+    </HeroButton>
   );
 }
 

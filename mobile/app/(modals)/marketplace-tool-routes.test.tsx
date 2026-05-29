@@ -7,9 +7,11 @@ import React from 'react';
 import { render, waitFor } from '@testing-library/react-native';
 
 const mockReplace = jest.fn();
+let mockSearchParams: Record<string, string | undefined> = {};
 
 jest.mock('expo-router', () => ({
   router: { replace: (...args: unknown[]) => mockReplace(...args), back: jest.fn(), canGoBack: jest.fn(() => false) },
+  useLocalSearchParams: () => mockSearchParams,
 }));
 
 jest.mock('react-i18next', () => ({
@@ -23,6 +25,8 @@ jest.mock('react-i18next', () => ({
         'tools.tabs.promotions': 'Promotions',
         'tools.pickups.title': 'Pickups',
         'tools.pickups.scan': 'Mark pickup complete',
+        'tools.coupons.edit': 'Edit coupon',
+        'tools.coupons.redemptionsTitle': 'Coupon redemptions',
       };
       return map[key] ?? key;
     },
@@ -46,10 +50,13 @@ import MarketplacePickupScanRoute from './marketplace-pickup-scan';
 import MarketplaceSellerOnboardingRoute from './marketplace-seller-onboarding';
 import MarketplaceBecomePartnerRoute from './marketplace-become-partner';
 import MarketplaceSalesOrdersRoute from './marketplace-sales-orders';
+import MarketplaceCouponEditRoute from './marketplace-coupon-edit';
+import MarketplaceCouponRedemptionsRoute from './marketplace-coupon-redemptions';
 
 describe('marketplace seller tool action routes', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockSearchParams = {};
   });
 
   it('redirects saved searches to the saved marketplace collection tab', async () => {
@@ -126,6 +133,55 @@ describe('marketplace seller tool action routes', () => {
       expect(mockReplace).toHaveBeenCalledWith({
         pathname: '/(modals)/marketplace-orders',
         params: { mode: 'sales' },
+      });
+    });
+  });
+
+  it('redirects coupon edit deep links to the coupon editor mode', async () => {
+    mockSearchParams = { id: '44' };
+    const { getByText } = render(<MarketplaceCouponEditRoute />);
+
+    expect(getByText('Edit coupon')).toBeTruthy();
+    await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalledWith({
+        pathname: '/(modals)/marketplace-tools',
+        params: { tab: 'coupons', couponId: '44', couponMode: 'edit' },
+      });
+    });
+  });
+
+  it('redirects coupon redemptions deep links to the coupon redemptions mode', async () => {
+    mockSearchParams = { id: '51' };
+    const { getByText } = render(<MarketplaceCouponRedemptionsRoute />);
+
+    expect(getByText('Coupon redemptions')).toBeTruthy();
+    await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalledWith({
+        pathname: '/(modals)/marketplace-tools',
+        params: { tab: 'coupons', couponId: '51', couponMode: 'redemptions' },
+      });
+    });
+  });
+
+  it('falls back to the coupons tab when coupon helper routes receive invalid ids', async () => {
+    mockSearchParams = { id: 'not-a-number' };
+    const first = render(<MarketplaceCouponEditRoute />);
+
+    await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalledWith({
+        pathname: '/(modals)/marketplace-tools',
+        params: { tab: 'coupons' },
+      });
+    });
+    first.unmount();
+    mockReplace.mockClear();
+
+    mockSearchParams = { id: '0' };
+    render(<MarketplaceCouponRedemptionsRoute />);
+    await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalledWith({
+        pathname: '/(modals)/marketplace-tools',
+        params: { tab: 'coupons' },
       });
     });
   });

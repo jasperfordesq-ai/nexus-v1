@@ -20,7 +20,19 @@ jest.mock('@/lib/constants', () => ({
 }));
 
 import { api } from '@/lib/api/client';
-import { getGroups, getGroup, getGroupTemplates, joinGroup, leaveGroup, updateGroup } from './groups';
+import {
+  createGroupAnnouncement,
+  deleteGroupAnnouncement,
+  getGroups,
+  getGroup,
+  getGroupAnnouncements,
+  getGroupFiles,
+  getGroupTemplates,
+  joinGroup,
+  leaveGroup,
+  updateGroup,
+  updateGroupAnnouncement,
+} from './groups';
 import type { GroupsResponse, GroupDetail } from './groups';
 
 const mockGroupsResponse: GroupsResponse = {
@@ -154,6 +166,59 @@ describe('updateGroup', () => {
       federated_visibility: 'listed',
     });
     expect(result.data.name).toBe('Updated Group');
+  });
+});
+
+describe('group announcement helpers', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('loads group announcements with the mobile page limit', async () => {
+    const response = { data: { items: [], cursor: null, has_more: false } };
+    (api.get as jest.Mock).mockResolvedValue(response);
+
+    const result = await getGroupAnnouncements(7);
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/groups/7/announcements', { limit: '20' });
+    expect(result.data.items).toEqual([]);
+  });
+
+  it('creates a group announcement', async () => {
+    const payload = { title: 'Spring update', content: 'Seeds arrive Friday.', is_pinned: true };
+    (api.post as jest.Mock).mockResolvedValue({ data: { id: 9, ...payload } });
+
+    await createGroupAnnouncement(7, payload);
+
+    expect(api.post).toHaveBeenCalledWith('/api/v2/groups/7/announcements', payload);
+  });
+
+  it('updates a group announcement', async () => {
+    (api.put as jest.Mock).mockResolvedValue({ data: { id: 9, is_pinned: false } });
+
+    await updateGroupAnnouncement(7, 9, { is_pinned: false });
+
+    expect(api.put).toHaveBeenCalledWith('/api/v2/groups/7/announcements/9', { is_pinned: false });
+  });
+
+  it('deletes a group announcement', async () => {
+    (api.delete as jest.Mock).mockResolvedValue({ data: { deleted: true } });
+
+    await deleteGroupAnnouncement(7, 9);
+
+    expect(api.delete).toHaveBeenCalledWith('/api/v2/groups/7/announcements/9');
+  });
+});
+
+describe('group file helpers', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('loads group files with the mobile page size', async () => {
+    const response = { data: { items: [], cursor: null, has_more: false } };
+    (api.get as jest.Mock).mockResolvedValue(response);
+
+    const result = await getGroupFiles(7);
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/groups/7/files', { per_page: '20' });
+    expect(result.data.items).toEqual([]);
   });
 });
 

@@ -13,6 +13,7 @@ import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant } from '@/contexts';
 import { LoadingScreen } from '@/components/feedback';
+import { hasBrokerPanelAccess } from '@/lib/access';
 
 export function BrokerRoute() {
   const { t } = useTranslation('broker');
@@ -28,26 +29,7 @@ export function BrokerRoute() {
     return <Navigate to={tenantPath('/login')} state={{ from: tenantPath(location.pathname) }} replace />;
   }
 
-  const role = (user?.role as string) || '';
-  const userRecord = user as Record<string, unknown> | null;
-  // Mirrors backend EnsureIsBrokerOrAdmin / requireBrokerOrAdmin — kept
-  // in sync so route-level gate, controller helper, and frontend guard
-  // agree. 'coordinator' is an operational role included in many
-  // notification-recipient queries; without granting them broker-panel
-  // access, every /broker/* deep-link from those bells bounces them.
-  const hasBrokerAccess =
-    role === 'broker' ||
-    role === 'coordinator' ||
-    role === 'admin' ||
-    role === 'tenant_admin' ||
-    role === 'super_admin' ||
-    role === 'god' ||
-    userRecord?.is_admin === true ||
-    userRecord?.is_super_admin === true ||
-    userRecord?.is_tenant_super_admin === true ||
-    userRecord?.is_god === true;
-
-  if (!hasBrokerAccess || !hasFeature('exchange_workflow')) {
+  if (!hasBrokerPanelAccess(user) || !hasFeature('exchange_workflow')) {
     return <Navigate to={tenantPath('/dashboard')} replace />;
   }
 

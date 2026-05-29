@@ -13,6 +13,20 @@
     "loading": "Chargement du fil…",
     "emptySubtitle": "Commencez à vous connecter avec votre communauté pour voir des publications ici."
   },
+  "activity": {
+    "title": "Activity",
+    "subtitle": "Your recent timebanking and community activity.",
+    "hoursGiven": "Hours given",
+    "hoursReceived": "Hours received",
+    "netBalance": "{{count}}h net",
+    "connections": "Connections",
+    "groupsJoined": "Groups joined",
+    "posts": "Posts",
+    "skills": "Skills",
+    "recent": "Recent activity",
+    "emptyTitle": "No activity yet",
+    "emptySubtitle": "Your activity will appear here after you take part."
+  },
   "listings": {
     "title": "Annonces",
     "offer": "Offres",
@@ -35,5 +49,40 @@
   },
   "likePost": "Aimer cette publication",
   "unlikePost": "Ne plus aimer cette publication",
-  "readMore": "Lire la suite"
+  "readMore": "Lire la suite",
+  "composer": {
+    "hashtags": "Hashtags"
+  },
+  "dashboard": {
+    "balance": "Solde",
+    "hours": "{{count}} heures",
+    "upcomingEvents": "Evenements a venir",
+    "openRequests": "Demandes ouvertes",
+    "notifications": "Notifications",
+    "unavailable": "-",
+    "openCard": "Ouvrir {{label}}"
+  },
+  "hashtags": {
+    "title": "Hashtags",
+    "eyebrow": "Decouverte",
+    "subtitle": "Trouvez les sujets actifs et les conversations de votre fil.",
+    "searchPlaceholder": "Rechercher des hashtags",
+    "postCount": "{{count}} publications",
+    "open": "Ouvrir",
+    "openTag": "Ouvrir #{{tag}}",
+    "loadFailed": "Impossible de charger les hashtags.",
+    "unableToLoad": "Impossible de charger les hashtags",
+    "emptyTitle": "Aucun hashtag trouve",
+    "emptySubtitle": "Les sujets tendance apparaitront ici lorsque les membres taguent des publications.",
+    "noMatch": "Aucun hashtag ne correspond a \"{{query}}\"."
+  },
+  "hashtag": {
+    "title": "Hashtag",
+    "subtitle": "Publications taguees",
+    "postCount": "{{count}} publications",
+    "loadFailed": "Impossible de charger les publications de ce hashtag.",
+    "unableToLoad": "Impossible de charger ce hashtag",
+    "emptyTitle": "Aucune publication pour le moment",
+    "emptySubtitle": "Aucune publication du fil n'est encore taguee #{{tag}}."
+  }
 }

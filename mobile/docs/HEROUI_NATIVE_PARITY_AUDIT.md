@@ -11,7 +11,7 @@ Date: 2026-05-29
 
 Scope: `mobile/` Expo app compared with the maintained web React frontend in `react-frontend/`.
 
-Out of scope by owner instruction: React admin, broker/admin panels, caring-community workflows, legacy PHP views, production deployment tooling, and web-only marketing/admin operations.
+Out of scope by owner instruction: React admin, broker/admin panels, legacy PHP views, production deployment tooling, and web-only marketing/admin operations. Product workflows remain in scope when they are useful on native mobile.
 
 ## Executive Status
 
@@ -20,10 +20,10 @@ Out of scope by owner instruction: React admin, broker/admin panels, caring-comm
 | HeroUI Native package | Complete | `heroui-native` updated from `^1.0.3` to `^1.0.4`, the latest npm version checked during the audit. | Keep current during future Expo upgrades. |
 | Provider setup | Complete | `app/_layout.tsx` imports `global.css`, wraps with `GestureHandlerRootView`, and mounts `HeroUINativeProvider`. | None. |
 | Styling setup | Complete | `global.css` imports Tailwind CSS, Uniwind, HeroUI Native styles, and sources HeroUI Native library classes. Current official HeroUI Native theme sources use OKLCH variables, so the existing OKLCH brand overrides match upstream. | Continue moving screen code from manual theme colors to semantic class names. |
-| Shared UI wrappers | Partial | Button loading now uses HeroUI Native `Spinner`; Input now uses `TextField`, `Label`, `Input`, and `FieldError`; FAB now uses HeroUI Native `Button`; bottom-sheet style job and marketplace action modals now use the HeroUI Native-backed `BottomSheet`; marketplace listing inventory switches use `Toggle`; marketplace listing-card save controls and auth password visibility toggles use HeroUI Native icon buttons; organisation registration terms uses `Checkbox`; `ActionSheet` action rows, jobs tabs/retry/application actions, group-detail tabs, message reaction/action controls, volunteering tabs/hours organisation selector chips, poll answer choices, exchange report reason chips/related listing pills, and login forgot-password action use HeroUI Native-backed buttons; exchange/federation message/member profile transfer/profile-edit/group/blog/messages/global-search/organisation/jobs/detail application/identity verification/marketplace hub/category/advanced search/map coordinate/offer counter/detail/order/tool/listing form/shipping option/collection/seller onboarding fields, wallet action fields, goals create fields, volunteering browse/hours/detail application fields, endorsements skill entry, chat/thread composers, change-password fields, exchange detail request/comment/report fields, group detail discussion fields, and exchange/group/job/event/volunteering/organisation create/edit forms now use the shared Input wrapper. The native connections route uses HeroUI Native Card/Tabs/Chip/Button/Spinner/Surface primitives. | Continue migrating remaining low-level Pressable actions where they are not card/list-row or gesture surfaces. |
+| Shared UI wrappers | Partial | Button loading now uses HeroUI Native `Spinner`; Input now uses `TextField`, `Label`, `Input`, and `FieldError`; FAB and pressable Card compatibility now use HeroUI Native `Button`; app and modal error-boundary recovery actions now use the shared HeroUI Native-backed `Button`; bottom-sheet style job and marketplace action modals now use the HeroUI Native-backed `BottomSheet`; marketplace listing inventory switches use `Toggle`; marketplace listing-card save/detail controls, auth password visibility toggles, the voice-message playback control, the shared image carousel image button, the exchange gallery thumbnail selector, and the volunteering search clear control use HeroUI Native icon buttons/buttons; organisation registration terms uses `Checkbox`; `ActionSheet` action rows, jobs tabs/retry/application actions, job browse cards, exchange list cards, notification body taps, wallet recipient search rows/transaction rows, federation hub quick-link/partner cards, federation directory partner/group/event/message/listing detail actions, story circles, thread context cards, member-profile listing rows, exchange author cards, group-detail tabs/event cards, group-exchange list cards, global search result cards, events list cards, groups list cards, marketplace collection/listing cards, message inbox rows/reaction/action controls, the messages swipe archive action, feed read-more action, volunteering opportunity actions/tabs/hours organisation selector chips, poll answer choices, exchange report reason chips/related listing pills, profile hub menu rows, member-card navigation wrappers, select-tenant option rows, blog-post list cards, settings action rows, organisation directory cards, and login forgot-password action use HeroUI Native-backed buttons; exchange/federation message/member profile transfer/profile-edit/group/blog/messages/global-search/organisation/jobs/detail application/identity verification/marketplace hub/category/advanced search/map coordinate/offer counter/detail/order/tool/listing form/shipping option/collection/seller onboarding fields, wallet action fields, goals create fields, volunteering browse/hours/detail application fields, endorsements skill entry, chat/thread composers, change-password fields, exchange detail request/comment/report fields, group detail discussion fields, and exchange/group/job/event/volunteering/organisation create/edit forms now use the shared Input wrapper. The native connections route uses HeroUI Native Card/Tabs/Chip/Button/Spinner/Surface primitives. | Continue migrating remaining low-level Pressable actions where they are not gesture/media surfaces; avoid wrapping cards that already contain nested action buttons. |
 | Route-level HeroUI use | Partial | Most functional screens use HeroUI Native directly or through local UI wrappers. Redirect/re-export routes intentionally contain no UI. The entry loading state now uses HeroUI Native `Spinner`. Visible route-screen `TextInput` controls have been migrated to the shared HeroUI Native-backed `Input`; bottom-sheet style route modals have been migrated off React Native `Modal`; only type-only refs remain for keyboard flow. Several complex screens still use raw `Pressable` and manual color styling where a larger refactor is needed. | Incrementally migrate by feature area with tests. |
-| Web parity | Partial | Core timebanking/social/mobile commerce workflows exist. Web-only/admin/caring areas are excluded. Several web features remain missing or intentionally deferred for native. | Use the matrix below as the implementation queue. |
-| Verification | Complete for this pass | `npm run type-check` and full `npm test -- --runInBand` passed after dependency and wrapper changes. | Keep warning cleanup as a separate Jest/Uniwind task. |
+| Web parity | Partial | Core timebanking/social/mobile commerce workflows exist. Web-only/admin/broker panels are excluded. Several web features remain missing or intentionally deferred for native. | Use the matrix below as the implementation queue. |
+| Verification | Complete for this pass | Focused route suites and `npm run type-check` pass after the wrapper changes. The latest full Jest run reported all 139 suites and 874 tests passed, then hit the command timeout during Jest shutdown, matching the known open-handle behavior seen in focused route tests. | Keep warning/open-handle cleanup as a separate Jest/Uniwind task. |
 
 ## HeroUI Native Documentation Checked
 
@@ -36,6 +36,7 @@ Official docs checked on 2026-05-29:
 - Components index: https://heroui.com/docs/native/components
 - Button: https://heroui.com/docs/native/components/button
 - Card: https://heroui.com/docs/native/components/card
+- Tabs: installed HeroUI Native component docs
 - TextField/Input: https://heroui.com/docs/native/components/text-field and installed `input.md`
 - Dialog: https://heroui.com/docs/native/components/dialog
 - Chip: https://heroui.com/docs/native/components/chip
@@ -47,40 +48,40 @@ Official docs checked on 2026-05-29:
 
 | Web area | Web route/page | Mobile route/screen | Status | HeroUI Native status | Notes | Next action |
 | --- | --- | --- | --- | --- | --- | --- |
-| Auth | `/login`, `/register` | `(auth)/login`, `(auth)/register`, `(auth)/select-tenant` | Complete | Partial | Uses HeroUI Card/Input/Button wrappers. Forgot/reset/verify email are not native screens yet. | Add forgot/reset email flows if product wants password recovery in-app. |
-| Dashboard | `/dashboard` | `(tabs)/home` | Partial | Partial | Home acts as the mobile dashboard/feed hub. Web dashboard-specific panels are not all represented. | Add dashboard summary cards for wallet, upcoming events, open requests, and community health. |
-| Feed | `/feed`, `/feed/posts/:id`, hashtags | `(tabs)/home`, `FeedItem` | Partial | Partial | Feed list is present; dedicated post detail and hashtag discovery routes are missing. | Add post detail and hashtag modal routes. |
-| Listings | `/listings`, `/listings/:id`, create/edit | `(tabs)/exchanges`, `(modals)/exchange-detail`, create/edit exchange | Partial | Partial | Mobile models listings through timebank exchanges. Direct listing terminology/routes are absent. | Keep exchange-first mobile language unless separate marketplace/listings UX is required. |
-| Exchanges | `/exchanges`, `/exchanges/:id`, request | `(tabs)/exchanges`, `(modals)/new-exchange`, `(modals)/edit-exchange`, `(modals)/exchange-detail` | Complete | Partial | Core exchange browse/detail/create/edit/request workflows exist; browse, create/edit, detail request, comment, and report fields use the shared HeroUI Native-backed Input wrapper, and report reason chips plus related listing pills now use HeroUI Native buttons. | Continue non-input detail/action cleanup. |
-| Messages | `/messages`, `/messages/:id` | `(tabs)/messages`, `(modals)/thread`, `(modals)/chat` | Complete | Partial | Threads, unread badges, realtime context, and AI chat route exist; inbox search plus thread and AI chat composers now use the shared HeroUI Native-backed Input wrapper, and message reaction/action controls now use HeroUI Native buttons. | Continue standardizing attachment/action sheets. |
-| Wallet | `/wallet`, regional points | `(modals)/wallet` | Partial | Partial | Wallet balance/history/transfer/donation exist, and transfer/donation action fields now use the shared HeroUI Native-backed Input wrapper; regional points are not implemented. | Add regional points only if enabled for non-caring tenants. |
-| Members | `/members`, `/profile/:id`, connections | `(tabs)/members`, `(modals)/member-profile`, `(modals)/connections`, federation connections | Complete core | Partial | Member directory, profile, direct member connections, and federation connections now exist. The direct connections route supports accepted, incoming, and sent workflows with profile/message routing; federation transfer fields now use the shared HeroUI Native-backed Input wrapper. | Continue deeper profile add-ons only if enabled for mobile tenants. |
+| Auth | `/login`, `/register`, `/password/forgot`, `/password/reset`, `/verify-email` | `(auth)/login`, `(auth)/register`, `(auth)/select-tenant`, `(auth)/forgot-password`, `(auth)/reset-password`, `(auth)/verify-email` | Complete core | Partial | Uses HeroUI Card/Input/Button wrappers. Forgot-password, reset-password, and verify-email now use native HeroUI Native flows backed by `/api/auth/forgot-password`, `/api/auth/reset-password`, and `/api/auth/verify-email`. | Add OAuth callback/account-link handling only after mobile OAuth deep links are configured. |
+| Dashboard | `/dashboard` | `(tabs)/home` | Complete core | Partial | Home acts as the mobile dashboard/feed hub and now includes HeroUI Native summary cards for wallet balance, upcoming events, open requests, and unread notifications. Web dashboard-specific analytics panels are not all represented. | Add deeper community health/analytics panels only if they become mobile-first workflows. |
+| Feed | `/feed`, `/feed/posts/:id`, `/feed/hashtags`, `/feed/hashtag/:tag` | `(tabs)/home`, `(modals)/feed-item-detail`, `(modals)/feed-hashtags`, `(modals)/feed-hashtag`, `FeedItem` | Complete core | Partial | Feed list, native post/polymorphic item detail, hashtag discovery, and tagged-post hashtag detail routes are present; feed read-more/action controls use HeroUI Native buttons, and image carousel fallback accessibility labels are translated. | Continue advanced web-only feed moderation/report parity only where useful on mobile. |
+| Listings | `/listings`, `/listings/:id`, create/edit | `(tabs)/exchanges`, `(modals)/exchange-detail`, create/edit exchange | Partial | Partial | Mobile models listings through timebank exchanges. Exchange detail author navigation now uses HeroUI Native-backed buttons. Direct listing terminology/routes are absent. | Keep exchange-first mobile language unless separate marketplace/listings UX is required. |
+| Exchanges | `/exchanges`, `/exchanges/:id`, request | `(tabs)/exchanges`, `(modals)/new-exchange`, `(modals)/edit-exchange`, `(modals)/exchange-detail` | Complete | Partial | Core exchange browse/detail/create/edit/request workflows exist; browse, create/edit, detail request, comment, and report fields use the shared HeroUI Native-backed Input wrapper; exchange list cards, report reason chips, related listing pills, and author cards now use HeroUI Native buttons. | Continue media thumbnail cleanup only where it improves native behavior. |
+| Messages | `/messages`, `/messages/:id` | `(tabs)/messages`, `(modals)/thread`, `(modals)/chat` | Complete | Partial | Threads, unread badges, realtime context, and AI chat route exist; inbox search plus thread and AI chat composers now use the shared HeroUI Native-backed Input wrapper, and thread context cards, message reaction/action controls, swipe archive, and voice-message playback now use HeroUI Native buttons. | Continue standardizing attachment/action sheets. |
+| Wallet | `/wallet`, regional points | `(modals)/wallet` | Partial | Partial | Wallet balance/history/transfer/donation exist, transfer/donation action fields now use the shared HeroUI Native-backed Input wrapper, and recipient search result rows plus transaction rows use HeroUI Native-backed buttons; regional points are not implemented. | Add regional points only if enabled for non-caring tenants. |
+| Members | `/members`, `/profile/:id`, connections | `(tabs)/members`, `(modals)/member-profile`, `(modals)/connections`, federation connections | Complete core | Partial | Member directory, profile, direct member connections, and federation connections now exist. The direct connections route supports accepted, incoming, and sent workflows with profile/message routing; member-profile listing navigation and federation transfer fields now use HeroUI Native-backed wrappers. | Continue deeper profile add-ons only if enabled for mobile tenants. |
 | Profile | `/profile/:id`, collections, appreciation wall | `(tabs)/profile`, `(modals)/edit-profile`, `(modals)/member-profile` | Partial | Partial | Profile/edit basics exist, and edit-profile fields now use the shared HeroUI Native-backed Input wrapper. Collections/appreciation/Verein profile add-ons are absent. | Defer add-ons unless enabled for mobile tenants. |
-| Settings | `/settings`, security/privacy/notifications/skills/translation | `(modals)/settings`, `(modals)/change-password`, `(modals)/verify-identity` | Partial | Partial | Core settings, password, and identity verification exist; change-password and identity DOB fields now use the shared HeroUI Native-backed Input wrapper. Data export, blocked users, connected accounts, translation are not full parity. | Add settings sub-routes as discrete modal screens. |
-| Notifications | `/notifications` | `(modals)/notifications` | Complete | Partial | Notification list exists. | Confirm mark-read/delete parity during API QA. |
-| Search | `/search`, explore | `(tabs)/search`, `(modals)/search` | Partial | Partial | Search exists and now uses the shared HeroUI Native-backed Input wrapper; explore is represented through profile discovery shortcuts rather than a standalone route. | Add richer filters if API supports them on mobile. |
-| Events | `/events`, `/events/:id`, create/edit/reminders | `(tabs)/events`, `(modals)/event-detail`, `(modals)/new-event`, `(modals)/edit-event` | Partial | Partial | Core events exist, and create/edit form fields now use the shared HeroUI Native-backed Input wrapper; reminder settings are missing. | Add reminder settings only after mobile notification UX is finalized. |
-| Groups | `/groups`, `/groups/:id`, create/edit, rich tabs | `(tabs)/groups`, `(modals)/groups`, `(modals)/group-detail`, `(modals)/new-group`, `(modals)/edit-group` | Partial | Partial | Browse/detail/create exist, create/edit plus detail discussion fields now use the shared HeroUI Native-backed Input wrapper, and group-detail tabs now use HeroUI Native buttons. Web tabs for files, wiki, tasks, QA, analytics, media, etc. are not full parity. | Prioritize announcements, tasks, and files if needed for mobile. |
-| Group exchanges | `/group-exchanges`, create/detail | `(modals)/group-exchanges`, `(modals)/group-exchange-detail` | Partial | Partial | List/detail exist; create is represented through exchange creation paths. | Add dedicated create group exchange route if usage requires it. |
-| Goals | `/goals`, `/goals/:id` | `(modals)/goals` | Partial | Partial | Goals overview/create exists, and create-goal fields now use the shared HeroUI Native-backed Input wrapper; detail/history/insights/reminders/templates are not full parity. | Add detail route and reminder toggle. |
+| Settings | `/settings`, security/privacy/notifications/skills/translation | `(modals)/settings`, `(modals)/change-password`, `(modals)/verify-identity`, `(modals)/settings-blocked-users`, `(modals)/settings-data-export`, `(modals)/settings-translation` | Partial | Partial | Core settings, password, privacy, notification, blocked-user management, data export request/history, translation/content preferences, and identity verification exist; change-password and identity DOB fields now use the shared HeroUI Native-backed Input wrapper. Connected accounts and skills are not full parity. | Add connected accounts only after mobile OAuth/deep-link support is required; add skills if profile skill management becomes mobile priority. |
+| Notifications | `/notifications` | `(modals)/notifications` | Complete | Partial | Notification list exists with native tap-through, mark-all-read, explicit mark-read, and delete actions backed by the V2 notification APIs. Notification body taps and card actions use HeroUI Native buttons. | Consider grouped-notification parity only if grouped inbox behavior becomes important on mobile. |
+| Search | `/search`, explore | `(tabs)/search`, `(modals)/search` | Partial | Partial | Search exists and now uses the shared HeroUI Native-backed Input wrapper plus HeroUI Native-backed result-card navigation; explore is represented through profile discovery shortcuts rather than a standalone route. | Add richer filters if API supports them on mobile. |
+| Events | `/events`, `/events/:id`, create/edit/reminders/check-in/waitlist/polls | `(tabs)/events`, `(modals)/event-detail`, `(modals)/new-event`, `(modals)/edit-event` | Complete core | Partial | Core events exist, list-card navigation uses HeroUI Native-backed buttons, create/edit form fields use the shared HeroUI Native-backed Input wrapper, and event detail now supports attendee previews, event-linked poll voting, per-event reminder settings, waitlist join/leave, and organizer attendance/check-in backed by `/v2/events/{id}/attendees`, `/v2/polls?event_id=...`, `/v2/events/{id}/reminders`, `/v2/events/{id}/waitlist`, and `/v2/events/{id}/attendees/{attendeeId}/check-in`. The shared Laravel POST waitlist route was corrected to call `joinWaitlist`. Global reminder preferences remain a web placeholder and are not implemented natively. | Add richer mobile event operations such as attendee messaging only if native organizers need it. |
+| Groups | `/groups`, `/groups/:id`, create/edit, rich tabs | `(tabs)/groups`, `(modals)/groups`, `(modals)/group-detail`, `(modals)/new-group`, `(modals)/edit-group` | Partial | Partial | Browse/detail/create exist, browse list-card navigation uses HeroUI Native-backed buttons, create/edit plus detail discussion/announcement fields now use the shared HeroUI Native-backed Input wrapper, and group-detail tabs/event cards/announcement admin actions now use HeroUI Native buttons. Native group announcements now support list, create, pin/unpin, and delete via `/v2/groups/{id}/announcements`. Web tabs for files, wiki, tasks, QA, analytics, media, etc. are not full parity. | Prioritize files, QA, and wiki if mobile group collaboration needs more depth. |
+| Group exchanges | `/group-exchanges`, create/detail | `(modals)/group-exchanges`, `(modals)/group-exchange-detail` | Partial | Partial | List/detail exist, with list-card navigation migrated to HeroUI Native-backed buttons; create is represented through exchange creation paths. | Add dedicated create group exchange route if usage requires it. |
+| Goals | `/goals`, `/goals/:id` | `(modals)/goals`, `(modals)/goal-detail` | Complete core / partial templates | Partial | Goals overview/create plus native detail now exist. The detail route loads goal detail, progress history, insights, milestones, and reminders from the V2 goals APIs; owner progress updates use the shared HeroUI Native-backed Input wrapper. Goal templates/discovery/mentoring are not full parity. | Add templates/discovery/mentoring if mobile goal coaching becomes a priority. |
 | Gamification | `/leaderboard`, `/achievements`, `/nexus-score` | `(modals)/gamification` | Partial | Partial | Gamification hub covers badges/leaderboard; separate achievements/nexus score routes absent. | Split into dedicated screens if navigation depth becomes crowded. |
 | Polls | `/polls` | `(modals)/polls`, `PollCard` | Partial | Partial | Native polls route now lists feed-backed polls with inline voting via `PollCard`; unvoted answer choices now use HeroUI Native buttons while result rows keep custom animated native views. Advanced web features such as ranked polls, creation, export, and deletion remain deferred. | Add poll creation and ranked-poll support if those workflows become important on mobile. |
-| Jobs | `/jobs`, detail, create/edit, analytics, alerts, applications, kanban, employer, talent, bias | `(modals)/jobs`, `job-detail`, `new-job`, `edit-job`, `job-analytics`, `job-pipeline` | Partial | Partial | Core jobs and management routes exist; browse search, detail application, and create/edit form fields now use the shared HeroUI Native-backed Input wrapper, the apply sheet now uses the shared BottomSheet wrapper, and tabs plus retry/interview/offer application actions now use HeroUI Native buttons. Alerts, applications, employer brand, talent search, bias audit are missing. | Add alerts and applications first; defer employer/talent/bias if desktop-heavy. |
-| Marketplace | Marketplace browse/detail/create/edit/orders/offers/pickups/coupons/seller/tools/search/map | Broad `(modals)/marketplace-*` coverage | Complete core / partial advanced | Partial | Strong native coverage exists, including tools, coupons, pickups, seller onboarding, orders, offers, map, search, collections. Hub, category, advanced search, map coordinate, offer counter, detail, order, tool, listing form, shipping option, collection creation, and seller onboarding fields now use the shared HeroUI Native-backed Input wrapper; detail/order/tool/collection/coupon action sheets now use the shared BottomSheet wrapper; listing inventory switches now use the shared Toggle wrapper; listing-card save controls now use HeroUI Native icon buttons. | Continue tests for smaller redirect routes and non-input action cleanup. |
+| Jobs | `/jobs`, detail, create/edit, analytics, alerts, applications, kanban, employer, talent, bias | `(modals)/jobs`, `job-detail`, `new-job`, `edit-job`, `job-analytics`, `job-pipeline` | Complete core / partial advanced | Partial | Core jobs and management routes exist. Browse, my applications, my postings, applicant history/withdraw, owner pipeline/analytics, and saved job-alert workflows are native; browse search, detail application, job alert creation fields, and create/edit form fields now use the shared HeroUI Native-backed Input wrapper. The apply sheet uses the shared BottomSheet wrapper, and browse cards plus tabs/retry/interview/offer/application/alert actions use HeroUI Native buttons. Employer brand, talent search, and bias audit remain desktop-heavy gaps. | Defer employer/talent/bias unless mobile-first; add richer applicant messaging only when native message deep-link context is finalized. |
+| Marketplace | Marketplace browse/detail/create/edit/orders/offers/pickups/coupons/seller/tools/search/map | Broad `(modals)/marketplace-*` coverage | Complete core / partial advanced | Partial | Strong native coverage exists, including tools, coupons, pickups, seller onboarding, orders, offers, map, search, collections. Hub, category, advanced search, map coordinate, offer counter, detail, order, tool, listing form, shipping option, collection creation, and seller onboarding fields now use the shared HeroUI Native-backed Input wrapper; detail/order/tool/collection/coupon action sheets now use the shared BottomSheet wrapper; listing inventory switches now use the shared Toggle wrapper; listing-card save/detail controls and collection-card navigation now use HeroUI Native-backed buttons. | Continue tests for smaller redirect routes and non-input action cleanup. |
 | Blog | `/blog`, `/blog/:slug` | `(modals)/blog`, `(modals)/blog-post` | Complete | Partial | Browse/detail exist; search now uses the shared HeroUI Native-backed Input wrapper. | None beyond remaining card/action cleanup. |
-| Resources | `/resources`, `/kb`, `/kb/:slug`, `/help` | `(modals)/support` | Partial | Complete for hub | Support hub links to help, resources, about, contact, and legal pages on the web app. Native KB article browsing is not implemented. | Add native resource/KB API screens if offline/in-app reading becomes a priority. |
+| Resources | `/resources`, `/kb`, `/kb/:slug`, `/help` | `(modals)/support`, `(modals)/resources`, `(modals)/kb-article` | Complete core | Partial | Support hub links to help/about/contact/legal web pages and routes resources into a native HeroUI Native resource/knowledge screen. Native resources browse/search/category filtering and KB article detail are backed by `/v2/resources`, `/v2/resources/categories`, `/v2/kb`, and `/v2/kb/{id}`. | Keep upload/admin/resource-management actions on web; add offline article/resource caching only if mobile usage needs it. |
 | Organisations | `/organisations`, detail, register | `(modals)/organisations`, `organisation-detail`, `new-organisation` | Complete | Partial | Core organisation flows exist; directory search and registration form fields now use the shared HeroUI Native-backed Input wrapper. | Continue detail/action cleanup. |
-| Volunteering | `/volunteering`, create/detail, org dashboard, applications, donations, expenses, certificates, safeguarding, shifts | `(modals)/volunteering`, `volunteering-detail`, `new-volunteering`, `edit-volunteering` | Partial | Partial | Core opportunity and application flows exist, and browse search, hours logging, detail application, and create/edit opportunity form fields now use the shared HeroUI Native-backed Input wrapper; workflow tabs and hours organisation selector chips now use HeroUI Native buttons. Web org-dashboard and advanced tabs are absent. | Add my organisations/org dashboard only if tenant usage needs native management. |
-| Federation | `/federation/*` | `(modals)/federation*`, shared directory screen | Complete core | Partial | Hub, partners, members, listings, groups, events, messages, settings, onboarding, connections exist; message reply and compose fields now use the shared HeroUI Native-backed Input wrapper. | Keep re-export route tests documented and continue non-input action cleanup. |
-| AI chat | `/chat` | `(modals)/chat` | Complete | Partial | Native chat route exists. | Confirm mobile tool-result cards parity later. |
-| Ideation | `/ideation/*` | None | Missing | Not applicable yet | No mobile implementation. | Defer unless tenants need native challenge participation. |
-| Skills | `/skills` | None | Missing | Not applicable yet | No mobile route. | Add only if profile/settings skill management becomes mobile priority. |
-| Activity | `/activity` | Home/feed signals only | Missing | Not applicable yet | No dedicated activity dashboard. | Add as dashboard sub-screen if needed. |
-| Matches/reviews | `/matches`, `/reviews` | Exchange/member detail surfaces | Partial | Partial | Dedicated route absent; related actions appear in context. | Add if reviews/matches need first-class mobile navigation. |
+| Volunteering | `/volunteering`, create/detail, org dashboard, applications, donations, expenses, certificates, safeguarding, shifts | `(modals)/volunteering`, `volunteering-detail`, `new-volunteering`, `edit-volunteering` | Partial | Partial | Core opportunity, application, shift schedule, certificates, expenses, donations/giving-days, and hours flows exist. Browse search, hours logging, expense/donation submission, detail application, and create/edit opportunity form fields now use the shared HeroUI Native-backed Input wrapper; opportunity card actions, workflow tabs, confirmed shift cards/cancel actions, certificate cards/generate/open actions, expense cards/type selectors/submit actions, donation campaign selectors/history cards/submit actions, search clear, and hours organisation selector chips now use HeroUI Native buttons. Web org-dashboard and safeguarding tabs are absent; Stripe/payment-sheet donation checkout remains deferred in favor of the existing pledge/offline donation API path. | Add my organisations/org dashboard only if tenant usage needs native management; add mobile payment-sheet depth only if app-store donation/payment requirements need it. |
+| Federation | `/federation/*` | `(modals)/federation*`, shared directory screen | Complete core | Partial | Hub, partners, members, listings, groups, events, messages, settings, onboarding, connections exist; message reply and compose fields use the shared HeroUI Native-backed Input wrapper, and hub quick-link/partner cards plus directory partner/group/event/message cards now use HeroUI Native-backed buttons. | Keep re-export route tests documented; leave listing cards with nested actions/media as native touch surfaces until a larger detail-card refactor is worthwhile. |
+| AI chat | `/chat` | `(modals)/chat` | Complete | Partial | Native chat route exists with starters, message limits, source chips, and HeroUI Native tool-result cards for structured AI tool invocations. | Add feedback voting only if the mobile API/client flow needs trace-based response rating. |
+| Ideation | `/ideation/*` | `(modals)/ideation`, `(modals)/ideation-detail` | Complete core / partial management | Partial | Native challenge browse/detail now exists behind the `ideation_challenges` feature gate, with status/category/search filtering, idea list sorting, idea submission, and idea voting backed by `/v2/ideation-challenges`, `/v2/ideation-categories`, `/v2/ideation-challenges/{id}/ideas`, and `/v2/ideation-ideas/{id}/vote`. Admin challenge creation/editing, campaigns, outcomes, templates, and rich media management remain web workflows. | Keep admin/campaign/outcome management on web unless challenge facilitation becomes a mobile workflow. |
+| Skills | `/skills` | `(modals)/skills`, `(modals)/endorsements` | Partial | Partial | Mobile now has a first-class skills route that reuses the native HeroUI Native skills and endorsements management surface backed by `/v2/users/me/skills`; the profile shortcut routes to it. Web category browsing and members-by-skill discovery remain deeper parity gaps. | Add native category/member skill browsing if `/skills` becomes a mobile discovery workflow. |
+| Activity | `/activity` | `(modals)/activity`, home/feed signals | Partial | Partial | Native activity dashboard now exists, backed by `/v2/users/me/activity/dashboard`, with HeroUI Native summary cards for hours, connections, posts, skills, and a recent timeline. The home feed still provides the ambient activity stream. Web monthly chart depth is intentionally compacted for mobile. | Add richer charting only if mobile users need analytics-depth review. |
+| Matches/reviews | `/matches`, `/reviews` | `(modals)/matches`, `(modals)/reviews`, exchange/member detail surfaces | Complete core | Partial | Native matches route is backed by `/v2/matches/all`, with type tabs, summary cards, source routing, and listing dismiss actions. Native reviews route is backed by `/v2/reviews/user/{id}`, `/v2/reviews/pending`, `/v2/reviews`, and `/v2/reviews/{id}` for received/given/pending workflows, write-review form, and own-review deletion. | Keep deeper social interaction panels contextual unless likes/comments on reviews become a mobile-first workflow. |
 | Public/legal | `/about`, `/contact`, `/terms`, `/privacy`, `/cookies`, accessibility, trust/safety, legal hub | `(modals)/support` | Partial | Complete for hub | Support hub links to the canonical web support and legal pages. Full native legal document rendering is deferred. | Add native legal document rendering if offline or app-store review requirements demand it. |
 | Premium/advertising/developer | `/premium`, `/advertise`, `/developers` | None | Not applicable | Not applicable | Desktop/web commercial and developer flows are intentionally not in mobile for now. | Keep out of scope unless mobile business requirement is added. |
 | Admin/broker | `/admin/*`, `/broker/*` | None | Not applicable | Not applicable | Excluded by owner instruction. | Do not implement in mobile. |
-| Caring community | `/caring-community/*`, `/caring/*` | None | Not applicable | Not applicable | Excluded by owner instruction. | Do not implement in mobile. |
+| Caring/workflows | `/caring-community/*`, `/caring/*`, workflow-oriented surfaces | None | Deferred pending product fit | Not applicable yet | Owner clarified to focus on workflows rather than the caring-community label. No native route has been added in this pass. | Reassess concrete workflow screens against tenant needs before implementation. |
 
 ## Route Files Without Dedicated UI
 
@@ -108,10 +109,10 @@ These files are redirects or re-exports and intentionally do not need HeroUI Nat
 
 1. Keep visible route-screen text entry on `components/ui/Input`; current non-doc `rg` findings for `TextInput` are the shared `Input` wrapper itself plus type-only refs in `endorsements.tsx` and `new-exchange.tsx` used for keyboard focus.
 2. Keep bottom-sheet/dialog style flows on `components/ui/BottomSheet` or a future `Dialog` wrapper; direct React Native `Modal` use is no longer present in non-test route code.
-3. Replace low-level `Pressable` controls that act as buttons/chips with `Button`, `Chip`, `ControlField`, `Toggle`, or `Checkbox`; keep navigation cards, list rows, image/media controls, and gesture surfaces as native press targets unless a wrapper improves behavior.
+3. Replace low-level `Pressable` controls that act as buttons/chips with `Button`, `Chip`, `ControlField`, `Toggle`, or `Checkbox`; keep image/media controls and gesture surfaces as native press targets unless a wrapper improves behavior. Current production `Pressable` usage is limited to feed double-tap/media composition; remaining test-only `Pressable` mocks are not product UI.
 4. Move manual `theme.text`/`theme.surface` styling to semantic Uniwind classes where it does not need tenant-specific runtime color.
 5. Keep tenant primary color overrides only for brand-critical accents and document each exception locally.
-6. Add route-level tests for marketplace redirect/helper routes that currently rely on broader tool-route tests.
+6. Keep marketplace redirect/helper route tests current when adding new seller-tool aliases; saved searches, promotions, pickup slots/scan, seller onboarding aliases, sales orders, and coupon edit/redemption helpers now have focused route coverage.
 
 ## Verification Log
 
@@ -183,8 +184,137 @@ npm test -- group-detail.test.tsx --runInBand
 npm run type-check
 npm test -- thread.test.tsx messages.test.tsx --runInBand
 npm run type-check
+npm test -- volunteering.test.tsx volunteering-detail.test.tsx --runInBand
+npm run type-check
+npm test -- messages.test.tsx --runInBand
+npm run type-check
+npm test -- home.test.tsx polls.test.tsx --runInBand
+npm run type-check
+node -e "const fs=require('fs'); for (const f of fs.readdirSync('locales').map(l=>'locales/'+l+'/common.json')) JSON.parse(fs.readFileSync(f,'utf8')); console.log('common locale JSON ok')"
+npm test -- home.test.tsx polls.test.tsx --runInBand
+npm run type-check
+npm test -- components/ui/ImageCarousel.test.tsx --runInBand
+npm run type-check
+npm test -- --runInBand
+npm test -- feed-item-detail.test.tsx --runInBand
+npm run type-check
+npm test -- home.test.tsx polls.test.tsx --runInBand
+node -e "const fs=require('fs'); for (const f of ['locales/en/home.json','locales/en/common.json']) JSON.parse(fs.readFileSync(f,'utf8')); console.log('changed locale JSON ok')"
+npm run type-check
+node -e "const fs=require('fs'); for (const l of fs.readdirSync('locales')) { JSON.parse(fs.readFileSync('locales/'+l+'/home.json','utf8')); } console.log('home locale JSON ok')"
+npm test -- feed-hashtags.test.tsx feed-hashtag.test.tsx feed-item-detail.test.tsx --runInBand
+npm run type-check
+node -e "const fs=require('fs'); for (const l of fs.readdirSync('locales')) { JSON.parse(fs.readFileSync('locales/'+l+'/auth.json','utf8')); } console.log('auth locale JSON ok')"
+npm test -- login.test.tsx forgot-password.test.tsx --runInBand
+npm run type-check
+npm test -- --runInBand
+npm run type-check
+node -e "const fs=require('fs'); for (const l of fs.readdirSync('locales')) { JSON.parse(fs.readFileSync('locales/'+l+'/home.json','utf8')); } console.log('home locale JSON ok')"
+npm test -- home.test.tsx --runInBand
 npm test -- jobs.test.tsx --runInBand
 npm test -- --runInBand
+npm run type-check
+npm test -- settings.test.tsx settings-blocked-users.test.tsx settings-data-export.test.tsx --runInBand
+npm test -- --runInBand
+npm test -- settings.test.tsx settings-translation.test.tsx --runInBand
+npm test -- --runInBand
+npm test -- goals.test.tsx goal-detail.test.tsx --runInBand
+npm test -- --runInBand --silent
+npm run type-check
+node -e "const fs=require('fs'); for (const l of fs.readdirSync('locales')) JSON.parse(fs.readFileSync('locales/'+l+'/jobs.json','utf8')); console.log('jobs locale JSON ok')"
+npm test -- jobs.test.tsx --runInBand --silent
+npm test -- --runInBand --silent
+npm run type-check
+node -e "const fs=require('fs'); for (const l of fs.readdirSync('locales')) JSON.parse(fs.readFileSync('locales/'+l+'/jobs.json','utf8')); console.log('jobs locale JSON ok')"
+npm test -- jobs.test.tsx --runInBand --silent
+npm test -- --runInBand --silent
+npm run type-check
+node -e "const fs=require('fs'); for (const l of fs.readdirSync('locales')) JSON.parse(fs.readFileSync('locales/'+l+'/events.json','utf8')); console.log('events locale JSON ok')"
+npm test -- event-detail.test.tsx events.test.ts --runInBand --silent
+npm run type-check
+node -e "const fs=require('fs'); for (const l of fs.readdirSync('locales')) { for (const f of fs.readdirSync('locales/'+l).filter(f=>f.endsWith('.json'))) JSON.parse(fs.readFileSync('locales/'+l+'/'+f,'utf8')); } console.log('all locale JSON ok')"
+git diff --check -- mobile
+npm test -- --runInBand --silent
+npm run type-check
+node -e "const fs=require('fs'); for (const l of fs.readdirSync('locales')) JSON.parse(fs.readFileSync('locales/'+l+'/notifications.json','utf8')); console.log('notifications locale JSON ok')"
+npm test -- notifications.test.tsx notifications.test.ts --runInBand --silent
+npm run type-check
+node -e "const fs=require('fs'); for (const l of fs.readdirSync('locales')) { for (const f of fs.readdirSync('locales/'+l).filter(f=>f.endsWith('.json'))) JSON.parse(fs.readFileSync('locales/'+l+'/'+f,'utf8')); } console.log('all locale JSON ok')"
+git diff --check -- mobile
+npm test -- --runInBand --silent
+npm run type-check
+npm test -- skills.test.tsx profile.test.tsx --runInBand --silent
+npm run type-check
+node -e "const fs=require('fs'); for (const l of fs.readdirSync('locales')) { JSON.parse(fs.readFileSync('locales/'+l+'/home.json','utf8')); JSON.parse(fs.readFileSync('locales/'+l+'/profile.json','utf8')); } console.log('home/profile locale JSON ok')"
+npm test -- activity.test.ts activity.test.tsx profile.test.tsx --runInBand --silent
+npm run type-check
+node -e "const fs=require('fs'); for (const l of fs.readdirSync('locales')) { for (const f of fs.readdirSync('locales/'+l).filter(f=>f.endsWith('.json'))) JSON.parse(fs.readFileSync('locales/'+l+'/'+f,'utf8')); } console.log('all locale JSON ok')"
+git diff --check -- mobile
+npm run type-check
+npm test -- --runInBand --silent
+npm test -- matches.test.ts matches.test.tsx profile.test.tsx --runInBand --silent
+npm run type-check
+node -e "const fs=require('fs'); for (const l of fs.readdirSync('locales')) { for (const f of fs.readdirSync('locales/'+l).filter(f=>f.endsWith('.json'))) JSON.parse(fs.readFileSync('locales/'+l+'/'+f,'utf8')); } console.log('locale JSON ok')"
+git diff --check -- mobile
+npm test -- --runInBand --silent
+npm test -- reviews.test.ts reviews.test.tsx profile.test.tsx --runInBand --silent
+npm run type-check
+node -e "const fs=require('fs'); for (const l of fs.readdirSync('locales')) JSON.parse(fs.readFileSync('locales/'+l+'/profile.json','utf8')); console.log('profile locale JSON ok')"
+node -e "const fs=require('fs'); for (const l of fs.readdirSync('locales')) { for (const f of fs.readdirSync('locales/'+l).filter(f=>f.endsWith('.json'))) JSON.parse(fs.readFileSync('locales/'+l+'/'+f,'utf8')); } console.log('locale JSON ok')"
+git diff --check -- mobile
+npm test -- --runInBand --silent
+npm test -- auth.test.ts reset-password.test.tsx forgot-password.test.tsx --runInBand --silent
+npm run type-check
+node -e "const fs=require('fs'); for (const l of fs.readdirSync('locales')) JSON.parse(fs.readFileSync('locales/'+l+'/auth.json','utf8')); console.log('auth locale JSON ok')"
+node -e "const fs=require('fs'); for (const l of fs.readdirSync('locales')) { for (const f of fs.readdirSync('locales/'+l).filter(f=>f.endsWith('.json'))) JSON.parse(fs.readFileSync('locales/'+l+'/'+f,'utf8')); } console.log('locale JSON ok')"
+git diff --check -- mobile
+npm test -- --runInBand --silent
+npm test -- auth.test.ts verify-email.test.tsx reset-password.test.tsx --runInBand --silent
+npm run type-check
+node -e "const fs=require('fs'); for (const l of fs.readdirSync('locales')) JSON.parse(fs.readFileSync('locales/'+l+'/auth.json','utf8')); console.log('auth locale JSON ok')"
+node -e "const fs=require('fs'); for (const l of fs.readdirSync('locales')) { for (const f of fs.readdirSync('locales/'+l).filter(f=>f.endsWith('.json'))) JSON.parse(fs.readFileSync('locales/'+l+'/'+f,'utf8')); } console.log('locale JSON ok')"
+git diff --check -- mobile
+npm test -- --runInBand --silent
+npm test -- resources.test.ts resources.test.tsx kb-article.test.tsx support.test.tsx --runInBand --silent
+npm test -- ideation.test.ts ideation.test.tsx ideation-detail.test.tsx profile.test.tsx --runInBand --silent
+npm run type-check
+node -e "const fs=require('fs'); for (const l of fs.readdirSync('locales')) { for (const f of fs.readdirSync('locales/'+l).filter(f=>f.endsWith('.json'))) JSON.parse(fs.readFileSync('locales/'+l+'/'+f,'utf8')); } console.log('locale JSON ok')"
+npm test -- profile.test.tsx --runInBand --silent
+npm run type-check
+npm test -- members.test.tsx member-profile.test.tsx profile.test.tsx --runInBand --silent
+npm run type-check
+npm test -- select-tenant.test.tsx login.test.tsx register.test.tsx --runInBand --silent
+npm run type-check
+npm test -- blog.test.tsx --runInBand --silent
+npm run type-check
+npm test -- settings.test.tsx settings-blocked-users.test.tsx settings-data-export.test.tsx settings-translation.test.tsx --runInBand --silent
+npm run type-check
+npm test -- organisations.test.tsx organisation-detail.test.tsx new-organisation.test.tsx --runInBand --silent
+npm run type-check
+npm test -- group-exchanges.test.tsx group-exchange-detail.test.tsx --runInBand --silent
+npm run type-check
+npm test -- search.test.tsx --runInBand --silent
+npm run type-check
+npm test -- events.test.tsx groups.test.tsx --runInBand --silent
+npm run type-check
+npm test -- marketplace-collections.test.tsx --runInBand --silent
+npm run type-check
+npm test -- jobs.test.tsx --runInBand --silent
+npm run type-check
+npm test -- notifications.test.tsx --runInBand --silent
+npm run type-check
+npm test -- --runInBand --silent
+node -e "const fs=require('fs'); for (const l of fs.readdirSync('locales')) { for (const f of fs.readdirSync('locales/'+l).filter(f=>f.endsWith('.json'))) JSON.parse(fs.readFileSync('locales/'+l+'/'+f,'utf8')); } console.log('locale JSON ok')"
+git diff --check -- mobile
+npm test -- wallet.test.tsx --runInBand --silent
+npm run type-check
+npm test -- group-detail.test.tsx --runInBand --silent
+npm run type-check
+npm test -- thread.test.tsx chat.test.tsx --runInBand --silent
+npm run type-check
+npm test -- member-profile.test.tsx --runInBand --silent
+npm run type-check
+npm test -- exchange-detail.test.tsx --runInBand --silent
 npm run type-check
 ```
 
@@ -244,5 +374,172 @@ Observed status:
 - Focused marketplace hub/category/search tests covering listing-card save controls: passed.
 - Focused login/register auth tests covering password visibility icon buttons: passed. The combined login/register/select-tenant run reported all suites passed but hit the shell timeout during Jest shutdown, so login/register were rerun separately with a clean exit.
 - Focused group-detail tests covering the tab strip: passed.
-- Focused thread/messages tests covering reaction and message action controls: passed.
+- Focused thread/messages tests covering reaction, message action, voice playback, and inbox archive controls: passed.
+- Focused volunteering tests covering tabs, hours organisation selector chips, and search clear controls: passed.
+- Focused home/feed and polls tests covering the feed read-more action and poll cards: passed.
+- Common locale JSON parse check after adding `aria.carouselImage`: passed.
+- Focused ImageCarousel tests covering translated fallback labels and explicit alt text: passed.
+- Full `npm test -- --runInBand` after the latest feed/carousel/i18n changes: passed with the known HeroUI Native/Uniwind/colorKit/act warning noise.
+- Focused feed-item detail tests covering native post detail rendering and feed module gating: passed.
+- Focused home/feed and polls tests after post/poll detail routing: passed.
+- Home locale JSON parse across all mobile locales after hashtag additions: passed.
+- Focused feed hashtag discovery/detail tests covering trending hashtags, route navigation, tagged feed posts, and feed module gating: passed.
+- Auth locale JSON parse across all mobile locales after forgot-password additions: passed.
+- Focused login/forgot-password tests covering native forgot-password routing, reset-link request, validation, success, and login return navigation: passed.
+- Full `npm test -- --runInBand` after native forgot-password and feed hashtag additions: passed with the known HeroUI Native/Uniwind/colorKit/act warning noise.
+- Focused home tests covering the new dashboard summary cards: passed with the known HeroUI Native/Uniwind/colorKit/act warning noise.
+- Focused settings tests covering blocked-user management, data export request/history, and settings navigation: passed with the known HeroUI Native/Uniwind warning noise.
+- Full `npm test -- --runInBand` after settings blocked-user and data-export additions: passed with the known HeroUI Native/Uniwind/colorKit/act warning noise.
+- Focused settings translation tests covering feed ordering, auto-translation target locale, save payload, and local language switch: passed with the known HeroUI Native/Uniwind warning noise.
+- Full `npm test -- --runInBand` after settings translation additions: passed with the known HeroUI Native/Uniwind/colorKit/act warning noise.
+- Focused goals tests covering native goal detail, progress history, insights, milestones, reminder enable/disable, progress updates, and list-to-detail navigation: passed with the known HeroUI Native/Uniwind warning noise.
+- Full `npm test -- --runInBand --silent` after native goal detail additions: passed, 124 suites and 821 tests.
+- Focused jobs tests covering the native job-alert workflow, alert creation payloads, pause/delete actions, and the existing jobs tabs: passed.
+- Jobs locale JSON parse across all mobile locales after alert additions: passed.
+- Full `npm test -- --runInBand --silent` after native job-alert additions: passed, 124 suites and 824 tests.
+- Focused jobs tests covering applicant cover-message expansion, application history loading, withdraw actions, job alerts, and existing jobs tabs: passed.
+- Full `npm test -- --runInBand --silent` after applicant-side jobs parity additions: passed, 115 suites and 805 tests.
+- Focused event detail/API tests covering native per-event reminder loading and update payloads: passed.
+- Events locale JSON parse across all mobile locales after reminder additions: passed.
+- Full `npm test -- --runInBand --silent` after native event reminder additions: passed, 124 suites and 828 tests.
+- Focused notification screen/API tests covering explicit mark-read, delete, tap-through read, and V2 delete helper: passed.
+- Notifications locale JSON parse across all mobile locales after action additions: passed.
+- Full `npm test -- --runInBand --silent` after native notification action additions: passed, 124 suites and 832 tests.
+- `npm run type-check` after app/modal error-boundary recovery actions moved to the shared HeroUI Native-backed Button wrapper: passed.
+- Focused skills/profile tests covering the native first-class skills route alias and profile shortcut: passed, 4 suites and 37 tests.
+- `npm run type-check` after adding the first-class skills route: passed.
+- Home/profile locale JSON parse checks after adding activity labels: passed.
+- Focused activity API/screen/profile tests covering the native activity dashboard route and profile shortcut: passed, 5 suites and 38 tests.
+- `npm run type-check` after adding the native activity dashboard: passed.
+- All locale JSON parse checks after activity additions: passed.
+- `git diff --check -- mobile` after activity additions: passed with LF-to-CRLF warnings only.
+- Full `npm test -- --runInBand --silent` after skills/activity additions: passed, 127 suites and 835 tests.
+- Focused matches API/screen/profile tests covering the native matches route, type tabs, source navigation, dismiss payloads, empty/error states, and profile shortcut: passed, 5 suites and 41 tests.
+- `npm run type-check` after adding the native matches route: passed.
+- All locale JSON parse checks after matches additions: passed.
+- `git diff --check -- mobile` after matches additions: passed with LF-to-CRLF warnings only.
+- Full `npm test -- --runInBand --silent` after matches additions: passed, 129 suites and 840 tests.
+- Focused reviews API/screen/profile tests covering the native reviews route, received/given/pending tabs, write-review payloads, own-review delete action, and profile shortcut: passed, 5 suites and 42 tests.
+- `npm run type-check` after adding the native reviews route: passed.
+- Profile locale JSON parse checks after reviews additions: passed.
+- All locale JSON parse checks after reviews additions: passed.
+- `git diff --check -- mobile` after reviews additions: passed with LF-to-CRLF warnings only.
+- Full `npm test -- --runInBand --silent` after reviews additions: passed, 131 suites and 846 tests.
+- Focused auth API/forgot-password/reset-password tests covering reset token payloads, form validation, success state, and invalid-link state: passed, 3 suites and 15 tests, with the existing Jest open-handle shutdown warning.
+- `npm run type-check` after adding the native reset-password route: passed.
+- Auth locale JSON parse checks after reset-password additions: passed.
+- All locale JSON parse checks after reset-password additions: passed.
+- `git diff --check -- mobile` after reset-password additions: passed with LF-to-CRLF warnings only.
+- Full `npm test -- --runInBand --silent` after reset-password additions: passed, 132 suites and 850 tests.
+- Focused auth API/verify-email/reset-password tests covering email verification token payloads, success, invalid-link, and failed verification states: passed, 3 suites and 16 tests, with the existing Jest open-handle shutdown warning.
+- `npm run type-check` after adding the native verify-email route: passed.
+- Auth locale JSON parse checks after verify-email additions: passed.
+- All locale JSON parse checks after verify-email additions: passed.
+- `git diff --check -- mobile` after verify-email additions: passed with LF-to-CRLF warnings only.
+- Full `npm test -- --runInBand --silent` after verify-email additions: passed, 133 suites and 854 tests.
+- Focused resources/KB API, native resources screen, native KB article detail, and support-hub routing tests: passed, 4 suites and 9 tests, with the existing Jest open-handle shutdown warning.
+- `npm run type-check` after native resources/KB additions: passed.
+- All locale JSON parse checks after adding the `resources` namespace: passed.
+- `git diff --check -- mobile` after native resources/KB additions: passed with LF-to-CRLF warnings only.
+- Full `npm test -- --runInBand --silent` after native resources/KB additions: passed, 136 suites and 861 tests.
+- Focused ideation API, challenge browse, challenge detail, idea submission/voting, and profile shortcut tests: passed, 6 suites and 40 tests.
+- `npm run type-check` after native ideation additions: passed on rerun; a first invocation exited without diagnostics, and both `npx tsc --noEmit --pretty false` plus a second `npm run type-check` passed.
+- All locale JSON parse checks after adding the `ideation` namespace and profile shortcut keys: passed.
+- `git diff --check -- mobile` after native ideation additions: passed with LF-to-CRLF warnings only.
+- Full `npm test -- --runInBand --silent` after native ideation additions: passed, 139 suites and 865 tests.
+- Focused profile hub tests after migrating menu rows from raw `Pressable` to HeroUI Native `Button`: passed, 3 suites and 36 tests.
+- `npm run type-check` after profile menu row migration: passed.
+- Focused members/member-profile/profile tests after migrating `MemberCard` navigation from raw `Pressable` to HeroUI Native `Button`: passed, 6 suites and 50 tests, with the existing Jest open-handle shutdown warning.
+- `npm run type-check` after `MemberCard` wrapper migration: passed.
+- Focused select-tenant/login/register tests after migrating tenant option rows from raw `Pressable` to HeroUI Native `Button`: passed, 3 suites and 23 tests.
+- `npm run type-check` after select-tenant row migration: passed.
+- Focused blog route tests after migrating blog list cards from raw `Pressable` to HeroUI Native `Button`: passed, 1 suite and 7 tests.
+- `npm run type-check` after blog card migration: passed.
+- Focused settings route tests after migrating settings action rows from raw `Pressable` to HeroUI Native `Button`: passed, 5 suites and 18 tests.
+- `npm run type-check` after settings action row migration: passed.
+- Focused organisations/detail/register tests after migrating organisation directory cards from raw `Pressable` to HeroUI Native `Button`: passed, 3 suites and 20 tests.
+- `npm run type-check` after organisation directory card migration: passed.
+- Focused group-exchanges/detail tests after migrating group-exchange list cards from raw `Pressable` to HeroUI Native `Button`: passed, 2 suites and 6 tests.
+- `npm run type-check` after group-exchange list-card migration: passed.
+- Focused search route tests after migrating global search result cards from raw `Pressable` to HeroUI Native `Button`: passed, 2 suites and 9 tests because the Jest pattern also matched marketplace search.
+- `npm run type-check` after global search result-card migration: passed.
+- Focused events/groups route tests after migrating event and group list cards from raw `Pressable` to HeroUI Native `Button`: passed, 3 suites and 20 tests because the Jest pattern also matched federation groups/events.
+- `npm run type-check` after event/group list-card migration: passed.
+- Focused marketplace collections tests after migrating collection rows from raw `Pressable` to HeroUI Native `Button`: passed, 1 suite and 5 tests.
+- `npm run type-check` after marketplace collection-row migration: passed.
+- Focused jobs route tests after migrating browse job cards from raw `Pressable` to HeroUI Native `Button`: passed, 1 suite and 16 tests.
+- `npm run type-check` after job-card migration: passed.
+- Focused notifications route tests after migrating notification body taps from raw `Pressable` to HeroUI Native `Button`: passed, 1 suite and 11 tests.
+- `npm run type-check` after notification body-tap migration: passed.
+- Full `npm test -- --runInBand --silent` after the latest HeroUI Native button-wrapper pass: reported 139 suites and 874 tests passed, then hit the command timeout during Jest shutdown; this matches the known open-handle shutdown behavior seen in focused route tests.
+- Latest all-locale JSON parse after the wrapper pass: passed.
+- Latest `git diff --check -- mobile` after the wrapper pass: passed with LF-to-CRLF warnings only.
+- Focused wallet route tests after migrating recipient search rows and transaction rows from raw `Pressable` to HeroUI Native `Button`: passed, 1 suite and 12 tests.
+- `npm run type-check` after wallet recipient/transaction-row migration: passed.
+- Focused group-detail tests after migrating group event cards from raw `Pressable` to HeroUI Native `Button`: passed, 1 suite and 9 tests, with the existing Jest open-handle shutdown warning.
+- `npm run type-check` after group event-card migration: passed.
+- Focused thread/chat tests after migrating thread context cards from raw `Pressable` to HeroUI Native `Button` and removing an unused chat `Pressable` import: passed, 2 suites and 20 tests.
+- `npm run type-check` after thread context-card migration: passed.
+- Focused member-profile tests after migrating member listing rows from raw `Pressable` to HeroUI Native `Button`: passed, 1 suite and 14 tests.
+- `npm run type-check` after member-profile listing-row migration: passed.
+- Focused exchange-detail tests after migrating author cards from raw `Pressable` to HeroUI Native `Button`: passed, 2 suites and 10 tests because the Jest pattern also matched group-exchange detail.
+- `npm run type-check` after exchange author-card migration: passed.
+- Focused federation hub/groups-events/messages tests after migrating hub quick-link/partner cards and directory group/event/message cards from raw `Pressable` to HeroUI Native `Button`: passed, 3 suites and 18 tests.
+- Focused federation members/listings tests after migrating directory partner cards and preserving nested listing-card touch behavior: passed, 2 suites and 7 tests.
+- `npm run type-check` after the federation and wallet row migrations: passed.
+- Latest all-locale JSON parse after the federation/wallet/story row migrations: passed.
+- Latest `git diff --check -- mobile` after the federation/wallet/story row migrations: passed with LF-to-CRLF warnings only.
+- Focused StoryCircles component test after migrating story targets from raw `Pressable` to HeroUI Native `Button`: passed, 1 suite and 1 test.
+- `npm run type-check` after the StoryCircles migration: passed.
+- Focused ExchangeCard component test after migrating exchange list cards from raw `Pressable` to HeroUI Native `Button`: passed, 1 suite and 1 test.
+- `npm run type-check` after the ExchangeCard migration: passed.
+- Focused marketplace helper-route, ExchangeCard, and StoryCircles tests after adding coupon edit/redemption redirect coverage: passed, 3 suites and 11 tests.
+- `npm run type-check` after the marketplace helper-route coverage update: passed.
+- `mobile/README.md` was refreshed to document Expo SDK 54, HeroUI Native `^1.0.4`, Uniwind/Tailwind 4 setup, local native API URLs on port 8088, wrapper policy, and verification commands.
+- `git diff --check -- mobile` after the README refresh and latest code/docs updates: passed with LF-to-CRLF warnings only.
+- `npm run type-check` after the README refresh: passed.
+- Focused marketplace helper-route, ExchangeCard, and StoryCircles tests after the README refresh: passed, 3 suites and 11 tests.
+- Focused chat screen/API tests after adding native AI tool-result cards: passed, 2 suites and 13 tests.
+- Chat locale JSON parse after adding tool-result labels: passed.
+- `npm run type-check` after adding native AI tool-result cards: passed.
+- Focused event API/detail tests after adding attendee previews and organizer attendance/check-in management: passed, 4 suites and 41 tests because the Jest pattern also matched events/federation event route tests.
+- Events locale JSON parse across all mobile locales after adding attendee preview/check-in labels: passed.
+- `npm run type-check` after adding attendee previews and organizer attendance/check-in management: passed.
+- Focused event API/detail tests after adding waitlist join/leave controls and the shared waitlist route correction: passed, 4 suites and 45 tests because the Jest pattern also matched events/federation event route tests.
+- Events locale JSON parse across all mobile locales after adding waitlist labels: passed.
+- `npm run type-check` after adding event waitlist controls: passed.
+- Focused event API/detail tests after adding event-linked poll loading and voting: passed, 4 suites and 48 tests because the Jest pattern also matched events/federation event route tests.
+- Events locale JSON parse across all mobile locales after adding event poll labels: passed.
+- `npm run type-check` after adding event-linked polls: passed.
+- Focused volunteering tests after removing the raw `Pressable` opportunity-card wrapper and keeping opportunity actions on HeroUI Native buttons: passed, 2 suites and 14 tests because the Jest pattern also matched new-volunteering.
+- Volunteering locale JSON parse across all mobile locales after adding opportunity action accessibility labels: passed.
+- `npm run type-check` after the volunteering opportunity-card action migration: passed.
+- Focused exchange detail tests after migrating listing image gallery thumbnails from raw `Pressable` to HeroUI Native icon buttons: passed, 2 suites and 10 tests because the Jest pattern also matched group-exchange detail.
+- `npm run type-check` after the exchange gallery thumbnail migration: passed.
+- Focused messages tests after migrating inbox rows from raw `Pressable` to HeroUI Native buttons while preserving swipe archive actions: passed, 2 suites and 25 tests because the Jest pattern also matched federation messages.
+- `npm run type-check` after the messages inbox-row migration: passed.
+- Focused shared image carousel and home feed tests after migrating carousel image buttons from raw `Pressable` to HeroUI Native buttons: passed, 2 suites and 12 tests, with the known Jest open-handle shutdown warning.
+- `npm run type-check` after the shared image carousel migration: passed.
+- Focused federation listings tests after removing the raw outer `Pressable` wrapper from listing cards and keeping detail navigation on a HeroUI Native button: passed, 1 suite and 5 tests.
+- `npm run type-check` after the federation listing-card action migration: passed.
+- Focused marketplace browse/category/search/map/my-listings tests after removing the raw outer `Pressable` from marketplace listing cards and adding an explicit HeroUI Native detail button: passed, 5 suites and 9 tests.
+- Marketplace locale JSON parse after adding the listing detail accessibility label: passed.
+- Focused shared UI wrapper tests after migrating the compatibility Card pressable mode to a HeroUI Native button: passed, 3 suites and 9 tests.
+- `npm run type-check` after marketplace listing-card and Card wrapper migrations: passed.
+- Focused volunteering screen/API tests after adding the native My Shifts tab and shift cancel helper: passed, 3 suites and 25 tests because the Jest pattern also matched new-volunteering.
+- Volunteering locale JSON parse across all mobile locales after adding shift labels: passed.
+- `npm run type-check` after the native volunteering shifts workflow: passed.
+- Focused volunteering screen/API tests after adding the native Certificates tab and certificate list/generate helpers: passed, 3 suites and 28 tests because the Jest pattern also matched new-volunteering.
+- Volunteering locale JSON parse across all mobile locales after adding certificate labels: passed.
+- `npm run type-check` after the native volunteering certificates workflow: passed.
+- Focused volunteering screen/API tests after adding the native Expenses tab and expense list/submit helpers: passed, 3 suites and 31 tests because the Jest pattern also matched new-volunteering.
+- Volunteering locale JSON parse across all mobile locales after adding expense labels: passed.
+- `npm run type-check` after the native volunteering expenses workflow: passed.
+- Focused volunteering screen/API tests after adding the native Donations tab, giving-day cards, donation history, and donation submit helpers: passed, 3 suites and 35 tests because the Jest pattern also matched new-volunteering.
+- All mobile locale JSON parse checks after adding donation labels across locale files: passed.
+- `npm run type-check` after the native volunteering donations workflow: passed.
+- Focused group detail/API tests after adding native group announcement create, pin/unpin, and delete helpers: passed, 3 suites and 33 tests because the Jest pattern also matched the groups tab route; Jest printed the known open-handle shutdown warning after completion.
+- All mobile locale JSON parse checks after adding group announcement management labels: passed.
+- `npm run type-check` after the native group announcement workflow: passed.
+- Checkpoint commit is currently blocked by local `.git` ACLs: `git add -- mobile` fails with `fatal: Unable to create 'C:/platforms/htdocs/staging/.git/index.lock': Permission denied`.
 - `npm install`: completed and reported 24 audit findings. They were not force-fixed because that would be a separate dependency/security remediation with possible breaking changes.

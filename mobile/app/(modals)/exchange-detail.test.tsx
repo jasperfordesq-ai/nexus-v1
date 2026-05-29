@@ -171,6 +171,19 @@ describe('ExchangeDetailModal', () => {
     expect(getByText('Offering')).toBeTruthy();
   });
 
+  it('opens author profiles from HeroUI Native-backed author cards', () => {
+    mockUseApi.mockReturnValue({ data: { data: mockExchange }, isLoading: false, error: null, refresh: jest.fn() });
+    const { router } = require('expo-router');
+
+    const { getByLabelText } = render(<ExchangeDetailModal />);
+    fireEvent.press(getByLabelText('Alice Baker'));
+
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/(modals)/member-profile',
+      params: { id: '42' },
+    });
+  });
+
   it('renders backend listing image galleries from detail responses', () => {
     mockUseApi.mockReturnValue({
       data: {

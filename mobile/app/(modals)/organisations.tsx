@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useMemo, useState, type ReactNode } from 'react';
-import { FlatList, Linking, Pressable, RefreshControl, Text, View } from 'react-native';
+import { FlatList, Linking, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -183,7 +183,13 @@ function OrganisationCard({
   }
 
   return (
-    <Pressable className="mx-4 my-2" onPress={onPress} accessibilityRole="button" accessibilityLabel={item.name}>
+    <HeroButton
+      variant="ghost"
+      feedbackVariant="scale"
+      className="mx-4 my-2 w-full p-0"
+      onPress={onPress}
+      accessibilityLabel={item.name}
+    >
       <HeroCard className="min-h-[188px] w-full rounded-panel p-0">
         <HeroCard.Body className="gap-4 p-4">
           <View className="flex-row items-start gap-3">
@@ -260,7 +266,7 @@ function OrganisationCard({
           </View>
         </HeroCard.Body>
       </HeroCard>
-    </Pressable>
+    </HeroButton>
   );
 }
 

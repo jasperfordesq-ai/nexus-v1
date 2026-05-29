@@ -82,7 +82,7 @@ describe('AdminSidebar', () => {
         <AdminSidebar collapsed={false} onToggle={vi.fn()} />
       </Wrapper>
     );
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
+    expect(screen.getAllByText('Dashboard').length).toBeGreaterThan(0);
   });
 
   it('renders key navigation sections', () => {

@@ -1,10 +1,24 @@
 {
   "title": "Chat IA",
-  "placeholder": "Pose toutes tes questions sur la banque de temps…",
+  "placeholder": "Pose toutes tes questions sur la banque de tempsâ€¦",
   "send": "Envoyer",
-  "empty": "Démarre une discussion avec l'assistant IA.",
+  "empty": "DÃ©marre une discussion avec l'assistant IA.",
   "error": "Impossible d'envoyer le message.",
-  "thinking": "Réflexion en cours…",
-  "timeout": "La réponse prend trop de temps. Veuillez réessayer.",
-  "disclaimer": "Les réponses de l'IA peuvent ne pas toujours être exactes."
+  "thinking": "RÃ©flexion en coursâ€¦",
+  "timeout": "La rÃ©ponse prend trop de temps. Veuillez rÃ©essayer.",
+  "disclaimer": "Les rÃ©ponses de l'IA peuvent ne pas toujours Ãªtre exactes.",
+  "tool_results": {
+    "label": "Results",
+    "fallbackTitle": "Result",
+    "open": "Open {{title}}",
+    "type": {
+      "listing": "Listing",
+      "member": "Member",
+      "event": "Event",
+      "job": "Job",
+      "marketplace": "Marketplace",
+      "kb": "Knowledge base",
+      "wallet": "Wallet"
+    }
+  }
 }

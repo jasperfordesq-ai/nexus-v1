@@ -15,10 +15,11 @@ import { render, screen, waitFor } from '@/test/test-utils';
 vi.mock('@/lib/api', () => ({
   api: {
     get: vi.fn().mockImplementation((url: string) => {
-      if (url.includes('/seasons')) {
-        return Promise.resolve({ success: true, data: null, meta: {} });
+      if (url.includes('/leaderboard')) {
+        return Promise.resolve({ success: true, data: [], meta: {} });
       }
-      return Promise.resolve({ success: true, data: [], meta: {} });
+      // seasons, community-dashboard, etc. — non-array endpoints return null
+      return Promise.resolve({ success: true, data: null, meta: {} });
     }),
     post: vi.fn().mockResolvedValue({ success: true }),
   },
@@ -110,8 +111,8 @@ describe('LeaderboardPage', () => {
 
   it('shows loading skeleton initially', () => {
     render(<LeaderboardPage />);
-    // HeroUI Skeleton does not use animate-pulse; check for aria-busy loading containers instead
-    const loadingContainers = document.querySelectorAll('[aria-busy="true"]');
+    // HeroUI Skeleton does not use animate-pulse; the loading GlassCards expose role="status"
+    const loadingContainers = document.querySelectorAll('[role="status"]');
     expect(loadingContainers.length).toBeGreaterThan(0);
   });
 
@@ -119,10 +120,14 @@ describe('LeaderboardPage', () => {
     // Default mock already returns [] for leaderboard and null for seasons
     render(<LeaderboardPage />);
 
+    // Other tabs (e.g. Member Spotlight) also render EmptyState in the eager
+    // test mock, so scope the assertion to the leaderboard's own empty state.
     await waitFor(() => {
-      expect(screen.getByTestId('empty-state')).toBeInTheDocument();
+      expect(screen.getByText('No rankings yet')).toBeInTheDocument();
     });
-    expect(screen.getByText('No rankings yet')).toBeInTheDocument();
+    expect(
+      screen.getAllByTestId('empty-state').length,
+    ).toBeGreaterThan(0);
   });
 
   it('displays leaderboard entries when loaded', async () => {
@@ -155,19 +160,19 @@ describe('LeaderboardPage', () => {
     ];
 
     vi.mocked(api.get).mockImplementation((url: string) => {
-      if (url.includes('/seasons')) {
-        return Promise.resolve({ success: true, data: null, meta: {} });
+      if (url.includes('/leaderboard')) {
+        return Promise.resolve({
+          success: true,
+          data: mockEntries,
+          meta: {
+            period: 'all',
+            type: 'xp',
+            your_position: 2,
+            total_entries: 50,
+          },
+        });
       }
-      return Promise.resolve({
-        success: true,
-        data: mockEntries,
-        meta: {
-          period: 'all',
-          type: 'xp',
-          your_position: 2,
-          total_entries: 50,
-        },
-      });
+      return Promise.resolve({ success: true, data: null, meta: {} });
     });
 
     render(<LeaderboardPage />);
@@ -199,19 +204,19 @@ describe('LeaderboardPage', () => {
     ];
 
     vi.mocked(api.get).mockImplementation((url: string) => {
-      if (url.includes('/seasons')) {
-        return Promise.resolve({ success: true, data: null, meta: {} });
+      if (url.includes('/leaderboard')) {
+        return Promise.resolve({
+          success: true,
+          data: mockEntries,
+          meta: {
+            period: 'all',
+            type: 'xp',
+            your_position: 1,
+            total_entries: 50,
+          },
+        });
       }
-      return Promise.resolve({
-        success: true,
-        data: mockEntries,
-        meta: {
-          period: 'all',
-          type: 'xp',
-          your_position: 1,
-          total_entries: 50,
-        },
-      });
+      return Promise.resolve({ success: true, data: null, meta: {} });
     });
 
     render(<LeaderboardPage />);

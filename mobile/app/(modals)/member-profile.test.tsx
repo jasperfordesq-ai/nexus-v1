@@ -306,6 +306,19 @@ describe('MemberProfileScreen', () => {
     expect(getByText('Lovely exchange.')).toBeTruthy();
   });
 
+  it('opens member listings from HeroUI Native-backed listing rows', () => {
+    mockUseApi.mockReturnValue({ data: { data: mockMember }, isLoading: false, error: null, refresh: jest.fn() });
+    const { router } = require('expo-router');
+
+    const { getByLabelText } = render(<MemberProfileScreen />);
+    fireEvent.press(getByLabelText('View Garden help'));
+
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/(modals)/exchange-detail',
+      params: { id: '55' },
+    });
+  });
+
   it('uses the federation member endpoint when a partner tenant_id is present', async () => {
     mockParams = { id: '272', tenant_id: '5' };
     (getFederationMember as jest.Mock).mockResolvedValue({

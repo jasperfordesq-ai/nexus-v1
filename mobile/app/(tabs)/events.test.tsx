@@ -8,10 +8,12 @@ import { render, fireEvent } from '@testing-library/react-native';
 
 // --- Mocks ---
 
+const mockRouterPush = jest.fn();
+
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }),
   useSegments: () => ['(tabs)'],
-  router: { push: jest.fn(), replace: jest.fn(), back: jest.fn() },
+  router: { push: (...args: unknown[]) => mockRouterPush(...args), replace: jest.fn(), back: jest.fn() },
   useLocalSearchParams: () => ({}),
   useNavigation: () => ({ setOptions: jest.fn() }),
 }));
@@ -96,6 +98,7 @@ const defaultPaginatedState = {
 };
 
 beforeEach(() => {
+  mockRouterPush.mockReset();
   mockUsePaginatedApi.mockReturnValue(defaultPaginatedState);
 });
 
@@ -151,6 +154,26 @@ describe('EventsScreen', () => {
 
     const { getByText } = render(<EventsScreen />);
     expect(getByText('Community Bake Sale')).toBeTruthy();
+  });
+
+  it('opens event details from HeroUI Native-backed event cards', () => {
+    mockUsePaginatedApi.mockReturnValueOnce({
+      items: [mockEvent],
+      isLoading: false,
+      isLoadingMore: false,
+      error: null,
+      hasMore: false,
+      loadMore: jest.fn(),
+      refresh: jest.fn(),
+    });
+
+    const { getByText } = render(<EventsScreen />);
+    fireEvent.press(getByText('Community Bake Sale'));
+
+    expect(mockRouterPush).toHaveBeenCalledWith({
+      pathname: '/(modals)/event-detail',
+      params: { id: '10' },
+    });
   });
 
   it('shows RSVP going badge on an event the user has RSVPed to', () => {

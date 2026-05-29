@@ -117,6 +117,8 @@ const i18nMap: Record<string, string> = {
   'user_menu.my_profile': 'My Profile',
   'user_menu.wallet': 'Wallet',
   'user_menu.settings': 'Settings',
+  'user_menu.admin_panel': 'Admin Panel',
+  'broker:sidebar.title': 'Broker Panel',
   'user_menu.dark_mode': 'Dark Mode',
   'user_menu.light_mode': 'Light Mode',
   'report_problem.trigger': 'Report a problem',
@@ -312,9 +314,13 @@ describe('Navbar', () => {
       expect(bells.length).toBeGreaterThanOrEqual(1);
     });
 
-    it('renders theme toggle button', () => {
+    it('renders theme toggle button', async () => {
+      const user = userEvent.setup();
       render(<Navbar />);
-      expect(screen.getByLabelText('Switch to dark mode')).toBeInTheDocument();
+      // The theme toggle lives inside the user menu dropdown (closed by default).
+      // Open it, then verify the theme item is present (shows "Dark Mode" in light mode).
+      await user.click(screen.getByRole('button', { name: 'Open user menu' }));
+      expect(screen.getByText('Dark Mode')).toBeInTheDocument();
     });
 
     it('renders Create new button', () => {
@@ -343,23 +349,52 @@ describe('Navbar', () => {
     });
   });
 
+  describe('privileged panel links', () => {
+    it('shows Broker Panel instead of Admin Panel for broker users with stale admin flags', () => {
+      setupDefaultMocks({
+        auth: {
+          user: {
+            id: 9,
+            first_name: 'Bridge',
+            last_name: 'Builder',
+            email: 'broker@example.com',
+            role: 'broker',
+            is_admin: true,
+          },
+          isAuthenticated: true,
+        },
+      });
+
+      render(<Navbar />);
+
+      expect(screen.getByRole('button', { name: 'Broker Panel' })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Admin Panel' })).not.toBeInTheDocument();
+    });
+  });
+
   describe('Theme toggle', () => {
-    it('shows moon icon in light mode', () => {
+    it('shows moon icon in light mode', async () => {
+      const user = userEvent.setup();
       setupDefaultMocks({
         auth: { user: { id: 1, first_name: 'A', last_name: 'B', email: 'a@b.com', role: 'member' }, isAuthenticated: true },
         theme: { resolvedTheme: 'light' },
       });
       render(<Navbar />);
-      expect(screen.getByLabelText('Switch to dark mode')).toBeInTheDocument();
+      // Open the user menu; in light mode the theme item offers to switch to Dark Mode.
+      await user.click(screen.getByRole('button', { name: 'Open user menu' }));
+      expect(screen.getByText('Dark Mode')).toBeInTheDocument();
     });
 
-    it('shows sun icon in dark mode', () => {
+    it('shows sun icon in dark mode', async () => {
+      const user = userEvent.setup();
       setupDefaultMocks({
         auth: { user: { id: 1, first_name: 'A', last_name: 'B', email: 'a@b.com', role: 'member' }, isAuthenticated: true },
         theme: { resolvedTheme: 'dark' },
       });
       render(<Navbar />);
-      expect(screen.getByLabelText('Switch to light mode')).toBeInTheDocument();
+      // Open the user menu; in dark mode the theme item offers to switch to Light Mode.
+      await user.click(screen.getByRole('button', { name: 'Open user menu' }));
+      expect(screen.getByText('Light Mode')).toBeInTheDocument();
     });
   });
 
@@ -388,7 +423,8 @@ describe('Navbar', () => {
       expect(screen.queryByRole('link', { name: 'Open Accessibility (alpha) in a new tab' })).not.toBeInTheDocument();
     });
 
-    it('renders Dashboard link when module is enabled', () => {
+    it('renders Dashboard link when module is enabled', async () => {
+      const user = userEvent.setup();
       setupDefaultMocks({
         auth: { user: { id: 1, first_name: 'A', last_name: 'B', email: 'a@b.com', role: 'member' }, isAuthenticated: true },
         tenant: {
@@ -396,6 +432,9 @@ describe('Navbar', () => {
         },
       });
       render(<Navbar />);
+      // Dashboard sits at the top of the Community dropdown (closed by default).
+      // Open the Community trigger, then verify the Dashboard item appears.
+      await user.click(screen.getByRole('button', { name: /community/i }));
       expect(screen.getByText('Dashboard')).toBeInTheDocument();
     });
 

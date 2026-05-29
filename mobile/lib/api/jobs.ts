@@ -84,6 +84,32 @@ export interface JobApplication {
   offer?: JobOffer | null;
 }
 
+export interface JobApplicationHistoryEntry {
+  id: number;
+  application_id: number;
+  from_status: string | null;
+  to_status: string;
+  notes: string | null;
+  changed_by: number | null;
+  changed_by_name: string | null;
+  changed_at: string;
+}
+
+export interface JobAlert {
+  id: number;
+  user_id: number;
+  tenant_id?: number;
+  keywords: string | null;
+  categories: string | null;
+  type: 'paid' | 'volunteer' | 'timebank' | null;
+  commitment: 'full_time' | 'part_time' | 'flexible' | 'one_off' | null;
+  location: string | null;
+  is_remote_only: boolean;
+  is_active: boolean;
+  last_notified_at: string | null;
+  created_at: string;
+}
+
 export interface JobOwnerApplication {
   id: number;
   vacancy_id: number;
@@ -147,6 +173,10 @@ export interface ApplicationsResponse {
   meta: { has_more: boolean; cursor: string | null };
 }
 
+export interface JobAlertsResponse {
+  data: JobAlert[];
+}
+
 export interface CreateJobPayload {
   title: string;
   description: string;
@@ -177,6 +207,15 @@ export interface CreateJobPayload {
 export type UpdateJobPayload = Partial<Omit<CreateJobPayload, 'status'>> & {
   status?: 'open' | 'closed' | 'filled' | 'draft';
 };
+
+export interface CreateJobAlertPayload {
+  keywords?: string;
+  categories?: string;
+  type?: JobAlert['type'];
+  commitment?: JobAlert['commitment'];
+  location?: string;
+  is_remote_only?: boolean;
+}
 
 /**
  * GET /api/v2/jobs — list job vacancies for the current tenant.
@@ -250,6 +289,14 @@ export function updateJobApplication(
   return api.put<{ data: { message: string } }>(`${API_V2}/jobs/applications/${applicationId}`, payload);
 }
 
+export function getJobApplicationHistory(applicationId: number): Promise<{ data: JobApplicationHistoryEntry[] }> {
+  return api.get<{ data: JobApplicationHistoryEntry[] }>(`${API_V2}/jobs/applications/${applicationId}/history`);
+}
+
+export function withdrawJobApplication(applicationId: number): Promise<{ data: { message: string } }> {
+  return api.put<{ data: { message: string } }>(`${API_V2}/jobs/applications/${applicationId}`, { status: 'withdrawn' });
+}
+
 /**
  * POST /api/v2/jobs/{id}/apply — submit an application for a job vacancy.
  */
@@ -296,6 +343,41 @@ export function getMyPostings(params: {
   const query: Record<string, string> = {};
   if (params.cursor) query.cursor = params.cursor;
   return api.get<JobsResponse>(`${API_V2}/jobs/my-postings`, query);
+}
+
+/**
+ * GET /api/v2/jobs/alerts — list the authenticated user's job alerts.
+ */
+export function getJobAlerts(): Promise<JobAlertsResponse> {
+  return api.get<JobAlertsResponse>(`${API_V2}/jobs/alerts`);
+}
+
+/**
+ * POST /api/v2/jobs/alerts — create a saved job alert.
+ */
+export function createJobAlert(payload: CreateJobAlertPayload): Promise<{ data: { id: number; message: string } }> {
+  return api.post<{ data: { id: number; message: string } }>(`${API_V2}/jobs/alerts`, payload);
+}
+
+/**
+ * DELETE /api/v2/jobs/alerts/{id} — permanently delete a saved job alert.
+ */
+export function deleteJobAlert(id: number): Promise<void> {
+  return api.delete<void>(`${API_V2}/jobs/alerts/${id}`);
+}
+
+/**
+ * PUT /api/v2/jobs/alerts/{id}/unsubscribe — pause a saved job alert.
+ */
+export function pauseJobAlert(id: number): Promise<{ data: { message: string } }> {
+  return api.put<{ data: { message: string } }>(`${API_V2}/jobs/alerts/${id}/unsubscribe`);
+}
+
+/**
+ * PUT /api/v2/jobs/alerts/{id}/resubscribe — resume a saved job alert.
+ */
+export function resumeJobAlert(id: number): Promise<{ data: { message: string } }> {
+  return api.put<{ data: { message: string } }>(`${API_V2}/jobs/alerts/${id}/resubscribe`);
 }
 
 /**

@@ -103,12 +103,12 @@ describe('CreateGroupPage', () => {
 
   it('renders group name input', () => {
     render(<CreateGroupPage />);
-    expect(screen.getByRole('textbox', { name: /Group Name/i })).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('e.g., Gardening Enthusiasts, Tech Help...')).toBeInTheDocument();
   });
 
   it('renders group description textarea', () => {
     render(<CreateGroupPage />);
-    expect(screen.getByRole('textbox', { name: /Description/i })).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Describe what your group is about...')).toBeInTheDocument();
   });
 
   it('renders private group toggle switch', () => {

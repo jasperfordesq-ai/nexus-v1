@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, FlatList, Pressable, RefreshControl, View } from 'react-native';
+import { Alert, FlatList, RefreshControl, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -363,7 +363,7 @@ function CollectionRow({ collection, onPress }: { collection: MarketplaceCollect
   const primary = usePrimaryColor();
   const theme = useTheme();
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={collection.name} onPress={onPress}>
+    <HeroButton variant="ghost" feedbackVariant="scale" className="w-full p-0" accessibilityLabel={collection.name} onPress={onPress}>
       <HeroCard className="mb-3 rounded-panel p-0">
         <HeroCard.Body className="gap-2 p-4">
           <View className="flex-row items-center gap-3">
@@ -382,7 +382,7 @@ function CollectionRow({ collection, onPress }: { collection: MarketplaceCollect
           </View>
         </HeroCard.Body>
       </HeroCard>
-    </Pressable>
+    </HeroButton>
   );
 }
 

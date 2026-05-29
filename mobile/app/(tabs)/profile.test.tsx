@@ -28,6 +28,8 @@ jest.mock('react-i18next', () => ({
         'wallet': 'Wallet',
         'messages': 'Messages',
         'notifications': 'Notifications',
+        'matches': 'Matches',
+        'reviews': 'Reviews',
         'listings': 'Listings',
         'marketplace': 'Marketplace',
         'marketplaceSection': 'Marketplace',
@@ -91,6 +93,8 @@ jest.mock('react-i18next', () => ({
         'navDescriptions.wallet': 'Review your balance, transactions, and time credit history.',
         'navDescriptions.messages': 'Open conversations and federation messages.',
         'navDescriptions.notifications': 'Review recent alerts and mark updates as read.',
+        'navDescriptions.matches': 'Review recommended listings, jobs, volunteering, and groups.',
+        'navDescriptions.reviews': 'Review feedback you have received and exchanges waiting for a review.',
         'navDescriptions.achievements': 'Badges, levels, streaks, and community progress.',
         'navDescriptions.myGoals': 'Track personal goals and timebank milestones.',
         'navDescriptions.groups': 'Your community spaces and group conversations.',
@@ -235,6 +239,7 @@ describe('MoreScreen (More tab)', () => {
     expect(getByText('Wallet')).toBeTruthy();
     expect(getByText('Messages')).toBeTruthy();
     expect(getByText('Notifications')).toBeTruthy();
+    expect(getByText('Reviews')).toBeTruthy();
     expect(getByText('Achievements')).toBeTruthy();
     expect(getByText('My Goals')).toBeTruthy();
     expect(getByText('Groups')).toBeTruthy();

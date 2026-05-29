@@ -68,6 +68,7 @@ import { useAuth,
   useNotifications,
   useCookieConsent } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { hasAdminPanelAccess, hasBrokerPanelAccess } from '@/lib/access';
 import { buildAccessibleFrontendUrl } from '@/lib/accessible-frontend';
 import type { TenantFeatures,
   TenantModules } from '@/types/api';
@@ -99,7 +100,7 @@ function writeCachedVerified(userId: number, value: boolean): void {
 function IdentityVerificationCTA({ userId, tenantPath, onClose }: { userId: number; tenantPath: (p: string) => string; onClose: () => void }) {
   const [isVerified, setIsVerified] = useState<boolean | null>(() => readCachedVerified(userId));
   const navigate = useNavigate();
-  const { t } = useTranslation('common');
+  const { t } = useTranslation(['common', 'broker']);
 
   useEffect(() => {
     if (!userId) return;
@@ -150,7 +151,8 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
   const year = new Date().getFullYear();
   const accessibleFrontendUrl = buildAccessibleFrontendUrl(tenant?.slug);
 
-  const isAdmin = Boolean(user?.role === 'admin' || user?.role === 'tenant_admin' || user?.role === 'super_admin' || user?.is_admin || user?.is_super_admin || user?.is_tenant_super_admin);
+  const isAdmin = hasAdminPanelAccess(user);
+  const isBroker = !isAdmin && hasBrokerPanelAccess(user);
 
   // Match this to the drawer's exit animation; lets the drawer slide closed before route changes.
   const DRAWER_CLOSE_MS = 150;
@@ -593,16 +595,16 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                       {t('support.contact')}
                     </Button>
                   )}
-                  {isAuthenticated && isAdmin && (
+                  {isAuthenticated && (isAdmin || isBroker) && (
                     <>
                       <Button
                         variant="light"
                         size="sm"
                         className="text-theme-muted hover:text-theme-primary h-11 min-h-[44px] min-w-0 px-3 gap-2 text-sm"
-                        onPress={() => navigateAndClose('/admin')}
+                        onPress={() => navigateAndClose(isBroker ? '/broker' : '/admin')}
                       >
                         <Shield className="w-4 h-4" aria-hidden="true" />
-                        {t('user_menu.admin_panel')}
+                        {isBroker ? t('broker:sidebar.title') : t('user_menu.admin_panel')}
                       </Button>
                     </>
                   )}
