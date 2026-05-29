@@ -109,5 +109,7 @@
     "transaction_description": "Darowizna: :message",
     "no_message": "(brak)",
     "community_fund": "Fundusz Społeczny"
-  }
+  },
+  "course.enrolled": "You are now enrolled in {{title}}.",
+  "course.completed": "You completed {{title}}! Well done."
 }

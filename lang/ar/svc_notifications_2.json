@@ -109,5 +109,7 @@
     "transaction_description": "التبرع: :message",
     "no_message": "(?? ????)",
     "community_fund": "صندوق المجتمع"
-  }
+  },
+  "course.enrolled": "You are now enrolled in {{title}}.",
+  "course.completed": "You completed {{title}}! Well done."
 }

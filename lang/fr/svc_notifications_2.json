@@ -109,5 +109,7 @@
     "transaction_description": "Don : :message",
     "no_message": "(aucun)",
     "community_fund": "Fonds communautaire"
-  }
+  },
+  "course.enrolled": "You are now enrolled in {{title}}.",
+  "course.completed": "You completed {{title}}! Well done."
 }

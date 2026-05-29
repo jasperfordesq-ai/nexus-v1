@@ -108,6 +108,13 @@ class CourseProgressService
             Log::warning('[CourseProgress] certificate issue failed', ['error' => $e->getMessage()]);
         }
 
+        // Completion notification (in-app + email), rendered in the learner's locale.
+        try {
+            CourseNotificationService::completed($enrollment->course_id, $userId);
+        } catch (\Throwable $e) {
+            Log::warning('[CourseProgress] completion notification failed', ['error' => $e->getMessage()]);
+        }
+
         // Gamification: award XP + a course-completion badge. Guarded so a
         // gamification outage never blocks the learner's progress.
         try {

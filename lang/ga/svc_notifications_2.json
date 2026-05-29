@@ -109,5 +109,7 @@
     "transaction_description": "Síntiús: :message",
     "no_message": "(faic)",
     "community_fund": "Ciste Pobail"
-  }
+  },
+  "course.enrolled": "You are now enrolled in {{title}}.",
+  "course.completed": "You completed {{title}}! Well done."
 }

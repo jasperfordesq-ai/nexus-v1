@@ -52,6 +52,8 @@ class CourseEnrollmentService
 
         Course::where('id', $courseId)->increment('enrollment_count');
 
+        CourseNotificationService::enrolled($courseId, $userId);
+
         return $enrollment;
     }
 

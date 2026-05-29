@@ -109,5 +109,7 @@
     "transaction_description": "Spende: :message",
     "no_message": "(keine)",
     "community_fund": "Gemeinschaftsfonds"
-  }
+  },
+  "course.enrolled": "You are now enrolled in {{title}}.",
+  "course.completed": "You completed {{title}}! Well done."
 }

@@ -109,5 +109,7 @@
     "transaction_description": "Donazione: :message",
     "no_message": "(nessuno)",
     "community_fund": "Fondo comunitario"
-  }
+  },
+  "course.enrolled": "You are now enrolled in {{title}}.",
+  "course.completed": "You completed {{title}}! Well done."
 }

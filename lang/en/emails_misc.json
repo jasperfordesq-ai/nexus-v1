@@ -675,5 +675,11 @@
     "html_completed": "has successfully completed",
     "html_date": "Date",
     "html_serial": "Certificate ID"
+  },
+  "course_completed": {
+    "subject": "You completed {{title}}!",
+    "title": "Congratulations!",
+    "body": "You have successfully completed {{title}}. Your certificate is ready.",
+    "cta": "View your course"
   }
 }

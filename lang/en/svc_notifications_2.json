@@ -103,5 +103,7 @@
   "credit_donation.community_fund": "Community Fund",
   "federation": {
     "notify_partnership_reactivated": "Partnership reactivated with {{partner}}."
-  }
+  },
+  "course.enrolled": "You are now enrolled in {{title}}.",
+  "course.completed": "You completed {{title}}! Well done."
 }
