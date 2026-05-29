@@ -3,9 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { View, ActivityIndicator } from 'react-native';
+import { View } from 'react-native';
+import { Spinner } from 'heroui-native';
 import { useTheme } from '@/lib/hooks/useTheme';
-import { usePrimaryColor } from '@/lib/hooks/useTenant';
 
 /**
  * Entry point — renders a loading spinner while the root layout's
@@ -13,11 +13,10 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
  */
 export default function Index() {
   const theme = useTheme();
-  const primary = usePrimaryColor();
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.bg }}>
-      <ActivityIndicator size="large" color={primary} />
+      <Spinner size="lg" />
     </View>
   );
 }

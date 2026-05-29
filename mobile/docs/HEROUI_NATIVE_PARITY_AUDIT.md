@@ -21,7 +21,7 @@ Out of scope by owner instruction: React admin, broker/admin panels, caring-comm
 | Provider setup | Complete | `app/_layout.tsx` imports `global.css`, wraps with `GestureHandlerRootView`, and mounts `HeroUINativeProvider`. | None. |
 | Styling setup | Complete | `global.css` imports Tailwind CSS, Uniwind, HeroUI Native styles, and sources HeroUI Native library classes. Current official HeroUI Native theme sources use OKLCH variables, so the existing OKLCH brand overrides match upstream. | Continue moving screen code from manual theme colors to semantic class names. |
 | Shared UI wrappers | Partial | Button loading now uses HeroUI Native `Spinner`; Input now uses `TextField`, `Label`, `Input`, and `FieldError`; FAB now uses HeroUI Native `Button`; exchange/member/group/blog/messages/global-search fields, change-password fields, and exchange create/edit forms now use the shared Input wrapper. The native connections route uses HeroUI Native Card/Tabs/Chip/Button/Spinner/Surface primitives. | Continue migrating complex form fields to shared wrappers. |
-| Route-level HeroUI use | Partial | Most functional screens use HeroUI Native directly or through local UI wrappers. Redirect/re-export routes intentionally contain no UI. Several complex screens still use raw `TextInput`, `Pressable`, and manual color styling where a larger refactor is needed. | Incrementally migrate by feature area with tests. |
+| Route-level HeroUI use | Partial | Most functional screens use HeroUI Native directly or through local UI wrappers. Redirect/re-export routes intentionally contain no UI. The entry loading state now uses HeroUI Native `Spinner`. Several complex screens still use raw `TextInput`, `Pressable`, and manual color styling where a larger refactor is needed. | Incrementally migrate by feature area with tests. |
 | Web parity | Partial | Core timebanking/social/mobile commerce workflows exist. Web-only/admin/caring areas are excluded. Several web features remain missing or intentionally deferred for native. | Use the matrix below as the implementation queue. |
 | Verification | Complete for this pass | `npm run type-check` and full `npm test -- --runInBand` passed after dependency and wrapper changes. | Keep warning cleanup as a separate Jest/Uniwind task. |
 
@@ -129,6 +129,7 @@ npm test -- blog.test.tsx components/ui/Input.test.tsx --runInBand
 npm test -- messages.test.tsx components/ui/Input.test.tsx --runInBand
 npm test -- search.test.tsx components/ui/Input.test.tsx --runInBand
 npm test -- change-password.test.tsx components/ui/Input.test.tsx --runInBand
+npm test -- index.test.tsx --runInBand
 npm test -- --runInBand
 npm run type-check
 ```
@@ -148,4 +149,5 @@ Observed status:
 - Focused messages and Input wrapper tests: passed.
 - Focused global search and Input wrapper tests: passed.
 - Focused change-password and Input wrapper tests: passed.
+- Focused entry route Spinner test: passed.
 - `npm install`: completed and reported 24 audit findings. They were not force-fixed because that would be a separate dependency/security remediation with possible breaking changes.

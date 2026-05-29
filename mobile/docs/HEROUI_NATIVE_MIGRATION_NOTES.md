@@ -41,6 +41,7 @@ Keep raw React Native primitives for layout and native capabilities: `View`, `Te
 
 - Upgraded `heroui-native` from `^1.0.3` to `^1.0.4`.
 - Replaced the local Button loading `ActivityIndicator` with HeroUI Native `Spinner`.
+- Replaced the app entry route `ActivityIndicator` with HeroUI Native `Spinner`.
 - Reworked the local Input wrapper to use HeroUI Native `TextField`, `Label`, `Input`, and `FieldError`.
 - Reworked the local FAB wrapper to use HeroUI Native `Button` instead of a custom animated `Pressable`.
 - Added a mobile Support & Legal hub for help, resources, about, contact, terms, privacy, cookies, and accessibility web parity links.
