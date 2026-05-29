@@ -103,6 +103,28 @@ class CourseEnrollmentController extends BaseApiController
         ]);
     }
 
+    /** GET /v2/courses/{id}/certificate — completion certificate (enrolled + completed). */
+    public function certificate(int $id): JsonResponse
+    {
+        $this->ensureCoursesFeature();
+        $userId = $this->requireAuth();
+
+        $enrollment = CourseEnrollmentService::find($id, $userId);
+        if (!$enrollment) {
+            return $this->respondWithError('NOT_ENROLLED', __('api_controllers_2.courses.not_enrolled'), null, 404);
+        }
+        if ($enrollment->status !== 'completed') {
+            return $this->respondWithError('COURSE_NOT_COMPLETED', __('api_controllers_2.courses.certificate_requires_completion'), null, 403);
+        }
+
+        $cert = \App\Services\CourseCertificateService::issue($id, $userId);
+
+        return $this->respondWithData([
+            'certificate' => $cert->toArray(),
+            'html' => \App\Services\CourseCertificateService::generateHtml($cert),
+        ]);
+    }
+
     /** DELETE /v2/courses/{id}/enroll — drop a course. */
     public function drop(int $id): JsonResponse
     {

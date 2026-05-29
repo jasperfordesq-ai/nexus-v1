@@ -100,6 +100,14 @@ class CourseProgressService
             Log::warning('[CourseProgress] completion_count increment failed', ['error' => $e->getMessage()]);
         }
 
+        // Issue a completion certificate (idempotent). Guarded so a certificate
+        // failure never blocks the learner's progress.
+        try {
+            CourseCertificateService::issue($enrollment->course_id, $userId);
+        } catch (\Throwable $e) {
+            Log::warning('[CourseProgress] certificate issue failed', ['error' => $e->getMessage()]);
+        }
+
         // Gamification: award XP + a course-completion badge. Guarded so a
         // gamification outage never blocks the learner's progress.
         try {

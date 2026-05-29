@@ -33,49 +33,6 @@
   "messages": "Messages",
   "notifications": "Notifications",
   "activity": "Activity",
-  "matches": "Matches",
-  "reviews": "Reviews",
-  "events": "Events",
-  "ideation": "Ideas",
-  "browseMembers": "Browse Members",
-  "volunteering": "Volunteering",
-  "organisations": "Organisations",
-  "blog": "Blog",
-  "skills": "Skills & Endorsements",
-  "aiChat": "AI Assistant",
-  "federation": "Federation",
-  "navDescriptions": {
-    "search": "Search listings, members, events, groups, and posts.",
-    "listings": "Browse offers, requests, and timebank exchanges.",
-    "marketplace": "Buy, sell, save, and manage community marketplace listings.",
-    "marketplaceBrowse": "Browse all marketplace listings, categories, maps, and saved searches.",
-    "marketplaceSell": "Create a new marketplace listing with photos, price, delivery, and category details.",
-    "marketplaceMyListings": "Review, edit, and manage the marketplace items you have listed.",
-    "marketplaceOrders": "Track marketplace purchases, sales, payments, pickup, delivery, ratings, and disputes.",
-    "marketplaceSales": "Manage orders placed with you, including fulfillment, pickup, delivery, and buyer updates.",
-    "marketplaceOffers": "Review offers you have made or received on marketplace listings.",
-    "marketplaceSaved": "Open your saved marketplace collections and saved search alerts.",
-    "marketplacePromotions": "Promote active listings and review marketplace campaign metrics.",
-    "marketplaceSavedSearches": "Create saved marketplace searches and manage alert preferences.",
-    "marketplaceTools": "Manage seller tools, promotions, pickup slots, collections, searches, and coupons.",
-    "marketplacePayments": "Set up or review Stripe Connect seller payments.",
-    "jobs": "Browse job vacancies, applications, and your own postings.",
-    "wallet": "Review your balance, transactions, and time credit history.",
-    "messages": "Open conversations and federation messages.",
-    "notifications": "Review recent alerts and mark updates as read.",
-    "activity": "Review your recent hours, connections, posts, skills, and timeline.",
-    "matches": "Review recommended listings, jobs, volunteering, and groups.",
-    "reviews": "Review feedback you have received and exchanges waiting for a review.",
-    "events": "Browse workshops, meetups, and community gatherings.",
-    "ideation": "Browse challenges, submit ideas, and vote on member proposals.",
-    "browseMembers": "Find neighbours by name, profile, or shared interests.",
-    "volunteering": "Discover opportunities, hours, and applications.",
-    "organisations": "Browse local partners and community organisations.",
-    "blog": "Read community news, stories, and platform updates.",
-    "skills": "Manage your skills and member endorsements.",
-    "aiChat": "Ask the assistant for help finding your way around.",
-    "federation": "Explore partner communities and cross-timebank tools."
-  },
   "matches": {
     "title": "Matches",
     "subtitle": "Recommended opportunities across your timebank.",
@@ -128,5 +85,165 @@
     "ratingLabel": "{{rating}} out of 5",
     "rateStar": "Rate {{star}} stars",
     "forExchange": "For {{title}}"
+  },
+  "events": "Events",
+  "ideation": "Ideas",
+  "browseMembers": "Browse Members",
+  "volunteering": "Volunteering",
+  "organisations": "Organisations",
+  "blog": "Blog",
+  "skills": "Skills & Endorsements",
+  "aiChat": "AI Assistant",
+  "federation": "Federation",
+  "navDescriptions": {
+    "search": "Search listings, members, events, groups, and posts.",
+    "listings": "Browse offers, requests, and timebank exchanges.",
+    "marketplace": "Buy, sell, save, and manage community marketplace listings.",
+    "marketplaceBrowse": "Browse all marketplace listings, categories, maps, and saved searches.",
+    "marketplaceSell": "Create a new marketplace listing with photos, price, delivery, and category details.",
+    "marketplaceMyListings": "Review, edit, and manage the marketplace items you have listed.",
+    "marketplaceOrders": "Track marketplace purchases, sales, payments, pickup, delivery, ratings, and disputes.",
+    "marketplaceSales": "Manage orders placed with you, including fulfillment, pickup, delivery, and buyer updates.",
+    "marketplaceOffers": "Review offers you have made or received on marketplace listings.",
+    "marketplaceSaved": "Open your saved marketplace collections and saved search alerts.",
+    "marketplacePromotions": "Promote active listings and review marketplace campaign metrics.",
+    "marketplaceSavedSearches": "Create saved marketplace searches and manage alert preferences.",
+    "marketplaceTools": "Manage seller tools, promotions, pickup slots, collections, searches, and coupons.",
+    "marketplacePayments": "Set up or review Stripe Connect seller payments.",
+    "jobs": "Browse job vacancies, applications, and your own postings.",
+    "wallet": "Review your balance, transactions, and time credit history.",
+    "messages": "Open conversations and federation messages.",
+    "notifications": "Review recent alerts and mark updates as read.",
+    "activity": "Review your recent hours, connections, posts, skills, and timeline.",
+    "matches": "Review recommended listings, jobs, volunteering, and groups.",
+    "reviews": "Review feedback you have received and exchanges waiting for a review.",
+    "events": "Browse workshops, meetups, and community gatherings.",
+    "ideation": "Browse challenges, submit ideas, and vote on member proposals.",
+    "browseMembers": "Find neighbours by name, profile, or shared interests.",
+    "volunteering": "Discover opportunities, hours, and applications.",
+    "organisations": "Browse local partners and community organisations.",
+    "blog": "Read community news, stories, and platform updates.",
+    "skills": "Manage your skills and member endorsements.",
+    "aiChat": "Ask the assistant for help finding your way around.",
+    "federation": "Explore partner communities and cross-timebank tools."
+  },
+  "support": {
+    "title": "Support & legal",
+    "heading": "Help, resources, and policies",
+    "description": "Read key policy summaries in the app or open the canonical web pages for the full current text.",
+    "open": "Open page",
+    "openWeb": "Open web",
+    "readInApp": "Read in app",
+    "closeDocument": "Back to support",
+    "items": {
+      "help": {
+        "title": "Help center",
+        "description": "Guides and answers for common platform tasks."
+      },
+      "resources": {
+        "title": "Resources",
+        "description": "Community documents, links, and useful reference materials."
+      },
+      "about": {
+        "title": "About Project NEXUS",
+        "description": "Learn about the platform, mission, and open-source project."
+      },
+      "contact": {
+        "title": "Contact",
+        "description": "Find the right support route for questions and feedback."
+      },
+      "terms": {
+        "title": "Terms",
+        "description": "Read the terms that apply to platform use."
+      },
+      "privacy": {
+        "title": "Privacy",
+        "description": "Review how personal data is handled."
+      },
+      "cookies": {
+        "title": "Cookies",
+        "description": "Understand cookie and local storage use."
+      },
+      "accessibility": {
+        "title": "Accessibility",
+        "description": "Review accessibility commitments and support options."
+      },
+      "trust": {
+        "title": "Trust & safety",
+        "description": "Review safety, moderation, and community protection guidance."
+      }
+    },
+    "docs": {
+      "about": {
+        "title": "About Project NEXUS",
+        "summary": "Project NEXUS is an open-source multi-tenant platform for community workflows, timebanking, and mutual support.",
+        "section1Title": "What it does",
+        "section1Body": "The platform helps members share time, skills, opportunities, resources, events, messages, groups, and community marketplace activity.",
+        "section2Title": "Open source",
+        "section2Body": "Project NEXUS is released under the AGPL-3.0-or-later license with attribution and source-code availability requirements.",
+        "section3Title": "Native app scope",
+        "section3Body": "The mobile app focuses on member workflows. Administrative, broker, and developer operations remain on the web where larger screens fit the work better."
+      },
+      "contact": {
+        "title": "Contact and support",
+        "summary": "Use the support routes that match your question, account issue, or tenant/community request.",
+        "section1Title": "Account help",
+        "section1Body": "For sign-in, profile, notification, privacy, or safety issues, include enough detail for the support team to identify the affected account and tenant.",
+        "section2Title": "Community requests",
+        "section2Body": "Community organisers should use the canonical contact page for tenant-level questions, feature requests, and operational support.",
+        "section3Title": "Urgent concerns",
+        "section3Body": "If a concern involves immediate harm or unlawful activity, contact the relevant local emergency or legal authority first, then report it through the platform."
+      },
+      "terms": {
+        "title": "Terms of use summary",
+        "summary": "These points summarise expected platform use. The web terms remain the canonical legal text.",
+        "section1Title": "Use the platform responsibly",
+        "section1Body": "Members are expected to provide accurate information, respect other users, and use timebanking, marketplace, messaging, and group tools lawfully.",
+        "section2Title": "Community rules",
+        "section2Body": "Tenant and group rules may add workflow-specific expectations, especially for exchanges, volunteering, events, safeguarding, and marketplace activity.",
+        "section3Title": "Canonical terms",
+        "section3Body": "Open the web version for the full, current terms, including legal notices, attribution, liability, and licence information."
+      },
+      "privacy": {
+        "title": "Privacy summary",
+        "summary": "Project NEXUS processes account, community, workflow, and security data to provide the service.",
+        "section1Title": "Data you provide",
+        "section1Body": "Profile details, messages, listings, events, applications, transactions, and settings are used to operate the features you choose to use.",
+        "section2Title": "Controls",
+        "section2Body": "Mobile settings include privacy, notification, blocked-user, translation, and data export workflows where supported by the account and tenant.",
+        "section3Title": "Full policy",
+        "section3Body": "Open the web privacy policy for the complete legal basis, retention, processor, rights, and contact information."
+      },
+      "cookies": {
+        "title": "Cookies and storage summary",
+        "summary": "The mobile app uses local device storage and secure tokens rather than browser cookies for most signed-in workflows.",
+        "section1Title": "App storage",
+        "section1Body": "The app may store authentication state, preferences, cached API data, theme choices, and language settings on the device.",
+        "section2Title": "Web pages",
+        "section2Body": "When you open canonical web pages, browser cookies and similar technologies may apply according to the web cookie policy.",
+        "section3Title": "Your choices",
+        "section3Body": "You can sign out, adjust settings, clear app storage through your device, or open the web cookie policy for the full current text."
+      },
+      "accessibility": {
+        "title": "Accessibility summary",
+        "summary": "The platform aims to support accessible member workflows across web and mobile experiences.",
+        "section1Title": "Native app support",
+        "section1Body": "Mobile screens use translated labels, accessible buttons, visible loading/error states, safe areas, and platform assistive technologies where practical.",
+        "section2Title": "Alternative frontend",
+        "section2Body": "An accessible HTML-first frontend exists for users who benefit from a simpler, highly structured web experience.",
+        "section3Title": "Feedback",
+        "section3Body": "Report barriers through the contact route so accessibility issues can be triaged and fixed with enough device and workflow detail."
+      },
+      "trust": {
+        "title": "Trust and safety summary",
+        "summary": "Trust and safety workflows help protect members while keeping community exchange practical and respectful.",
+        "section1Title": "Member protection",
+        "section1Body": "Profiles, reviews, reports, blocks, identity checks, and moderation workflows support safer exchanges and communication.",
+        "section2Title": "Reporting",
+        "section2Body": "Use report, block, or contact routes when content, messages, listings, events, or member behaviour appear unsafe or inappropriate.",
+        "section3Title": "Limits",
+        "section3Body": "Platform tools do not replace emergency services, legal advice, or safeguarding authorities when immediate or statutory action is needed."
+      }
+    }
   }
 }

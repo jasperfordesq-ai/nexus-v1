@@ -1048,6 +1048,7 @@ Route::delete('/v2/courses/{id}/enroll', [\App\Http\Controllers\Api\CourseEnroll
 Route::get('/v2/courses/{id}/progress', [\App\Http\Controllers\Api\CourseEnrollmentController::class, 'progress'])->where('id', '[0-9]+');
 Route::post('/v2/courses/{id}/lessons/{lessonId}/complete', [\App\Http\Controllers\Api\CourseEnrollmentController::class, 'completeLesson'])->where(['id' => '[0-9]+', 'lessonId' => '[0-9]+']);
 Route::post('/v2/courses/{id}/reviews', [\App\Http\Controllers\Api\CourseEnrollmentController::class, 'review'])->where('id', '[0-9]+');
+Route::get('/v2/courses/{id}/certificate', [\App\Http\Controllers\Api\CourseEnrollmentController::class, 'certificate'])->where('id', '[0-9]+');
 
 // Learner — quizzes
 Route::get('/v2/courses/quizzes/{quizId}', [\App\Http\Controllers\Api\CourseQuizController::class, 'show'])->where('quizId', '[0-9]+');

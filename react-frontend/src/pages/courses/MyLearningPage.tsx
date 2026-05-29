@@ -81,25 +81,46 @@ function EnrollmentCard({ enrollment, tenantPath }: { enrollment: CourseEnrollme
   const { t } = useTranslation('courses');
   const pct = Number(enrollment.progress_percent) || 0;
   const course = enrollment.course;
+  const isCompleted = enrollment.status === 'completed';
+
+  const downloadCertificate = async () => {
+    const res = await coursesApi.certificate(enrollment.course_id);
+    if (res.success && res.data?.html) {
+      const win = window.open('', '_blank');
+      if (win) {
+        win.document.write(res.data.html);
+        win.document.close();
+        win.focus();
+        win.print();
+      }
+    }
+  };
 
   return (
     <Card>
       <CardBody className="p-4 flex flex-col gap-2">
         <div className="flex items-center justify-between gap-2">
           <h3 className="font-semibold text-sm line-clamp-1">{course?.title ?? `#${enrollment.course_id}`}</h3>
-          {enrollment.status === 'completed' ? <Chip size="sm" color="success" variant="soft">{t('my_learning.completed')}</Chip> : null}
+          {isCompleted ? <Chip size="sm" color="success" variant="soft">{t('my_learning.completed')}</Chip> : null}
         </div>
         <Progress value={pct} aria-label={t('player.course_progress')} />
         <div className="flex items-center justify-between mt-1">
           <span className="text-xs text-muted">{Math.round(pct)}%</span>
-          <Button
-            as={Link}
-            to={tenantPath(`/courses/${enrollment.course_id}/learn`)}
-            size="sm"
-            variant="tertiary"
-          >
-            {t('detail.continue')}
-          </Button>
+          <div className="flex items-center gap-2">
+            {isCompleted ? (
+              <Button size="sm" variant="secondary" onPress={downloadCertificate}>
+                {t('certificate.download')}
+              </Button>
+            ) : null}
+            <Button
+              as={Link}
+              to={tenantPath(`/courses/${enrollment.course_id}/learn`)}
+              size="sm"
+              variant="tertiary"
+            >
+              {t('detail.continue')}
+            </Button>
+          </div>
         </div>
       </CardBody>
     </Card>

@@ -37,6 +37,7 @@ describe('SupportRoute', () => {
     expect(getByText('Resources')).toBeTruthy();
     expect(getByText('Privacy')).toBeTruthy();
     expect(getByText('Accessibility')).toBeTruthy();
+    expect(getByText('Trust & safety')).toBeTruthy();
   });
 
   it('opens selected web support pages externally', () => {
@@ -45,5 +46,18 @@ describe('SupportRoute', () => {
     fireEvent.press(getAllByText('Open page')[0]);
 
     expect(Linking.openURL).toHaveBeenCalledWith('https://app.project-nexus.ie/help');
+  });
+
+  it('renders native legal summaries and keeps canonical web links available', () => {
+    const { getAllByText, getByText } = render(<SupportRoute />);
+
+    fireEvent.press(getAllByText('Read in app')[3]);
+
+    expect(getByText('Privacy summary')).toBeTruthy();
+    expect(getByText('Data you provide')).toBeTruthy();
+
+    fireEvent.press(getAllByText('Open web')[0]);
+
+    expect(Linking.openURL).toHaveBeenCalledWith('https://app.project-nexus.ie/privacy');
   });
 });

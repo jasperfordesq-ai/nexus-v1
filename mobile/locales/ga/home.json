@@ -84,5 +84,25 @@
     "unableToLoad": "Niorbh fheider an hashtag seo a luchtu",
     "emptyTitle": "Gan phostail fos",
     "emptySubtitle": "Nil aon phostail srutha clibeailte #{{tag}} fos."
+  },
+  "pollsScreen": {
+    "createPoll": "Create poll",
+    "createTitle": "Create a poll",
+    "questionLabel": "Question",
+    "questionPlaceholder": "Ask a question",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Add context for voters",
+    "optionsLabel": "Options",
+    "optionPlaceholder": "Option {{number}}",
+    "addOption": "Add option",
+    "removeOption": "Remove option {{number}}",
+    "submitPoll": "Publish poll",
+    "creating": "Publishing",
+    "createMissingTitle": "Poll not ready",
+    "createQuestionRequired": "Add a question.",
+    "createOptionsRequired": "Add at least two options.",
+    "createdTitle": "Poll created",
+    "createdMessage": "Your poll is now open.",
+    "createError": "Could not create poll."
   }
 }

@@ -668,5 +668,12 @@
     "plan_assigned_body": "Your platform plan has been updated to <strong>:plan</strong>. The effective price is <strong>:price</strong>. Expiry: :expiry.:notes",
     "plan_assigned_cta": "View Billing",
     "plan_assigned_no_expiry": "No expiry set"
+  },
+  "course_certificate": {
+    "html_title": "Certificate of Completion",
+    "html_awarded_to": "This certifies that",
+    "html_completed": "has successfully completed",
+    "html_date": "Date",
+    "html_serial": "Certificate ID"
   }
 }

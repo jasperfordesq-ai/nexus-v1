@@ -197,5 +197,6 @@
     "courses.rating_required": "Please provide a rating between 1 and 5.",
     "courses.max_attempts_reached": "You have reached the maximum number of attempts for this quiz.",
     "courses.invalid_moderation_action": "Invalid moderation action.",
-    "courses.user_id_required": "A user ID is required."
+    "courses.user_id_required": "A user ID is required.",
+    "courses.certificate_requires_completion": "Complete the course to access your certificate."
 }

@@ -56,7 +56,7 @@ const DISCOVER: MenuItem[] = [
   { labelKey: 'volunteering', descriptionKey: 'navDescriptions.volunteering', icon: 'heart-outline', route: '/(modals)/volunteering', tone: '#e11d48' },
   { labelKey: 'organisations', descriptionKey: 'navDescriptions.organisations', icon: 'business-outline', route: '/(modals)/organisations', tone: '#6366f1' },
   { labelKey: 'blog', descriptionKey: 'navDescriptions.blog', icon: 'newspaper-outline', route: '/(modals)/blog', tone: '#f97316' },
-  { labelKey: 'support', descriptionKey: 'navDescriptions.support', icon: 'help-circle-outline', route: '/(modals)/support' as Href, tone: '#0ea5e9' },
+  { labelKey: 'support.title', descriptionKey: 'navDescriptions.support', icon: 'help-circle-outline', route: '/(modals)/support' as Href, tone: '#0ea5e9' },
   { labelKey: 'skills', descriptionKey: 'navDescriptions.skills', icon: 'ribbon-outline', route: '/(modals)/skills' as Href, tone: '#10b981' },
   { labelKey: 'aiChat', descriptionKey: 'navDescriptions.aiChat', icon: 'sparkles-outline', route: '/(modals)/chat', tone: '#a855f7' },
   { labelKey: 'federation', descriptionKey: 'navDescriptions.federation', icon: 'globe-outline', route: '/(modals)/federation', tone: '#0ea5e9', featureGate: 'federation' },

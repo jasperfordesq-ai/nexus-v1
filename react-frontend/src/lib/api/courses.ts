@@ -157,6 +157,10 @@ export const coursesApi = {
     ),
   review: (courseId: number, rating: number, body: string) =>
     api.post(`/v2/courses/${courseId}/reviews`, { rating, body }),
+  certificate: (courseId: number) =>
+    api.get<{ certificate: { id: number; serial: string; issued_at: string | null }; html: string }>(
+      `/v2/courses/${courseId}/certificate`,
+    ),
 
   // Quizzes (learner)
   getQuiz: (quizId: number) => api.get<Quiz>(`/v2/courses/quizzes/${quizId}`),

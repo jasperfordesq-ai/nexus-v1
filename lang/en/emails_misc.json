@@ -373,23 +373,19 @@
     "welcome_created_info_password": "Temporary Password",
     "welcome_created_body_change_pass": "We recommend changing your password after your first login.",
     "welcome_created_cta": "Log In Now",
-
     "suspension_subject": "Your account has been suspended — {{community}}",
     "suspension_greeting": "Important notice, {{name}}",
     "suspension_body": "Your account on <strong>{{community}}</strong> has been suspended.",
     "suspension_help": "If you believe this is an error, please contact your community administrator for assistance.",
     "suspension_bell": "Your account has been suspended. Contact support if you believe this is an error.",
-
     "ban_subject": "Your account has been banned — {{community}}",
     "ban_greeting": "Important notice, {{name}}",
     "ban_body": "Your account on <strong>{{community}}</strong> has been permanently banned.",
     "ban_help": "If you believe this is an error, please contact your community administrator.",
-
     "deletion_subject": "Your account has been scheduled for deletion — {{community}}",
     "deletion_greeting": "Important notice, {{name}}",
     "deletion_body": "Your account on <strong>{{community}}</strong> has been scheduled for deletion.",
     "deletion_help": "If you believe this is an error, please contact your community administrator as soon as possible.",
-
     "reset_2fa_subject": "Your two-factor authentication has been reset — {{community}}",
     "reset_2fa_title": "Two-Factor Authentication Reset",
     "reset_2fa_preview": "Your 2FA has been reset by an administrator.",
@@ -399,28 +395,24 @@
     "reset_2fa_body_contact": "If you did not request this change, please contact your community administrator immediately.",
     "reset_2fa_cta": "Log In & Secure Your Account",
     "reset_2fa_bell": "Your two-factor authentication has been reset by an administrator. If you did not request this, please contact support immediately.",
-
     "set_password_subject": "Your password has been reset — {{community}}",
     "set_password_greeting": "Security notice, {{name}}",
     "set_password_body": "Your password on <strong>{{community}}</strong> has been reset by an administrator.",
     "set_password_body_old_pass": "Your previous password will no longer work. Please use the new password provided to you by your administrator to log in.",
     "set_password_body_contact": "If you did not expect this change, please contact your community administrator immediately.",
     "set_password_cta": "Log In Now",
-
     "password_reset_subject": "Password Reset — {{community}}",
     "password_reset_title": "Password Reset",
     "password_reset_subtitle": "Reset your password for {{community}}",
     "password_reset_greeting": "Hello {{name}},",
     "password_reset_body": "An administrator has requested a password reset for your account. Click the button below to set a new password. This link expires in 1 hour.",
     "password_reset_cta": "Reset Password",
-
     "welcome_resend_subject": "Welcome to {{community}}",
     "welcome_resend_title": "Welcome!",
     "welcome_resend_subtitle": "You are a member of {{community}}",
     "welcome_resend_greeting": "Hello {{name}},",
     "welcome_resend_body": "Welcome to <strong>{{community}}</strong>! Your account is ready to use. Log in to start connecting with your community, browse available services, and offer your own skills.",
     "welcome_resend_cta": "Login & Get Started",
-
     "approval_subject_credits": "Welcome to {{community}} — {{credits}} time credits are waiting for you!",
     "approval_subject_approved": "Welcome to {{community}} — your account is approved!",
     "approval_title": "Welcome to the Community!",
@@ -436,13 +428,11 @@
     "approval_cta": "Get Started",
     "approval_bell": "Your account has been approved! Welcome to {{community}}.",
     "approval_bell_credits": "Your account has been approved! Welcome to {{community}}. You've received {{credits}} welcome time credit{{plural}} to get started.",
-
     "reactivation_subject": "Your account has been reactivated — {{community}}",
     "reactivation_greeting": "Welcome back, {{name}}!",
     "reactivation_body": "Your account on <strong>{{community}}</strong> has been reactivated by an administrator.",
     "reactivation_body_access": "You can now log in and access the platform again.",
     "reactivation_cta": "Log In Now",
-
     "self_deletion_subject": "Your account has been deleted — {{community}}",
     "self_deletion_title": "Account Deleted",
     "self_deletion_greeting": "Hi {{name}},",
@@ -678,5 +668,12 @@
     "plan_assigned_body": "Your platform plan has been updated to <strong>:plan</strong>. The effective price is <strong>:price</strong>. Expiry: :expiry.:notes",
     "plan_assigned_cta": "View Billing",
     "plan_assigned_no_expiry": "No expiry set"
+  },
+  "course_certificate": {
+    "html_title": "Certificate of Completion",
+    "html_awarded_to": "This certifies that",
+    "html_completed": "has successfully completed",
+    "html_date": "Date",
+    "html_serial": "Certificate ID"
   }
 }

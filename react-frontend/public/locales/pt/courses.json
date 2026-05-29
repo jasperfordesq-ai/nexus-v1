@@ -98,6 +98,10 @@
   "nav": {
     "courses": "Courses"
   },
+  "certificate": {
+    "download": "Certificate",
+    "title": "Certificate of completion"
+  },
   "admin": {
     "title": "Courses",
     "subtitle": "Moderate courses, manage instructors and categories",
