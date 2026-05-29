@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useMemo, useState, type ReactNode } from 'react';
-import { FlatList, Linking, Pressable, RefreshControl, Text, TextInput, View } from 'react-native';
+import { FlatList, Linking, Pressable, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -25,6 +25,7 @@ import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
+import Input from '@/components/ui/Input';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
@@ -347,26 +348,23 @@ export default function OrganisationsScreen() {
               <OrganisationsHero organisations={organisations} primary={primary} theme={theme} t={t} onRegister={openRegistration} />
 
               <Surface variant="default" className="gap-3 rounded-panel p-3">
-                <View className="flex-row items-center rounded-panel-inner border border-border bg-background px-3">
-                  <Ionicons name="search-outline" size={18} color={theme.textMuted} />
-                  <TextInput
-                    className="min-w-0 flex-1 px-2 py-3 text-base"
-                    style={{ color: theme.text }}
-                    placeholder={t('searchPlaceholder')}
-                    placeholderTextColor={theme.textMuted}
-                    value={search}
-                    onChangeText={setSearch}
-                    returnKeyType="search"
-                    clearButtonMode="while-editing"
-                    autoCorrect={false}
-                    accessibilityLabel={t('searchPlaceholder')}
-                  />
-                  {search.length > 0 ? (
-                    <Pressable onPress={() => setSearch('')} accessibilityRole="button" accessibilityLabel={t('clearSearch')}>
+                <Input
+                  style={{ color: theme.text }}
+                  placeholder={t('searchPlaceholder')}
+                  placeholderTextColor={theme.textMuted}
+                  value={search}
+                  onChangeText={setSearch}
+                  returnKeyType="search"
+                  clearButtonMode="while-editing"
+                  autoCorrect={false}
+                  accessibilityLabel={t('searchPlaceholder')}
+                  leftIcon={<Ionicons name="search-outline" size={18} color={theme.textMuted} />}
+                  rightIcon={search.length > 0 ? (
+                    <HeroButton isIconOnly size="sm" variant="ghost" accessibilityLabel={t('clearSearch')} onPress={() => setSearch('')}>
                       <Ionicons name="close-circle" size={18} color={theme.textMuted} />
-                    </Pressable>
+                    </HeroButton>
                   ) : null}
-                </View>
+                />
               </Surface>
             </View>
           }

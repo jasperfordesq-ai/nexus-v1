@@ -23,6 +23,7 @@ jest.mock('react-i18next', () => ({
         subtitle: 'Discover volunteer organisations in your community.',
         heroEyebrow: 'Trusted local partners',
         searchPlaceholder: 'Search organisations...',
+        clearSearch: 'Clear search',
         emptyTitle: 'No organisations found',
         empty: 'No organisations found.',
         noDescription: 'Community partner profile.',
@@ -81,8 +82,16 @@ jest.mock('heroui-native', () => {
   const React = require('react');
   const { Text, View } = require('react-native');
 
-  const Button = ({ children, onPress }: { children: React.ReactNode; onPress?: () => void }) => (
-    <Text onPress={onPress}>{children}</Text>
+  const Button = ({
+    accessibilityLabel,
+    children,
+    onPress,
+  }: {
+    accessibilityLabel?: string;
+    children: React.ReactNode;
+    onPress?: () => void;
+  }) => (
+    <Text accessibilityLabel={accessibilityLabel} onPress={onPress}>{children}</Text>
   );
   Button.Label = ({ children }: { children: React.ReactNode }) => <Text>{children}</Text>;
 
@@ -92,12 +101,24 @@ jest.mock('heroui-native', () => {
   const Chip = ({ children }: { children: React.ReactNode }) => <View>{children}</View>;
   Chip.Label = ({ children }: { children: React.ReactNode }) => <Text>{children}</Text>;
 
+  const TextField = ({ children }: { children: React.ReactNode }) => <View>{children}</View>;
+  const Input = (props: Record<string, unknown>) => {
+    const { TextInput } = require('react-native');
+    return <TextInput {...props} />;
+  };
+  const Label = ({ children }: { children: React.ReactNode }) => <Text>{children}</Text>;
+  const FieldError = ({ children }: { children: React.ReactNode }) => <Text>{children}</Text>;
+
   return {
     Button,
     Card,
     Chip,
+    FieldError,
+    Input,
+    Label,
     Spinner: () => null,
     Surface: ({ children }: { children?: React.ReactNode }) => <View>{children}</View>,
+    TextField,
   };
 });
 
@@ -170,6 +191,12 @@ describe('OrganisationsScreen', () => {
   it('renders the search input', () => {
     const { getByPlaceholderText } = render(<OrganisationsScreen />);
     expect(getByPlaceholderText('Search organisations...')).toBeTruthy();
+  });
+
+  it('shows clear action after typing in the shared input-backed search field', () => {
+    const { getByPlaceholderText, getByLabelText } = render(<OrganisationsScreen />);
+    fireEvent.changeText(getByPlaceholderText('Search organisations...'), 'green');
+    expect(getByLabelText('Clear search')).toBeTruthy();
   });
 
   it('renders the empty state when there are no organisations', () => {
