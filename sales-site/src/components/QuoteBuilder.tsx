@@ -84,6 +84,13 @@ const supportChoices = [
   },
 ];
 
+const dedicatedDeploymentMode = deploymentModes.find((mode) => mode.id === 'dedicated-managed-server');
+const dedicatedServerStartPrice =
+  dedicatedDeploymentMode?.startsFromMonthlyEur != null
+    ? `${formatCurrency(dedicatedDeploymentMode.startsFromMonthlyEur)}/month`
+    : (dedicatedDeploymentMode?.priceLabel.replace(/^From\s+/i, '') ?? 'a tailored monthly quote');
+const dedicatedServerPricingCopy = `Dedicated server hosting starts from ${dedicatedServerStartPrice} for entry-level needs. Final pricing depends on traffic, users, storage, redundancy, security, management, and whether you need one server or a clustered setup.`;
+
 const deploymentChoices: { id: DeploymentMode; title: string; plainEnglish: string }[] = [
   {
     id: 'shared-platform',
@@ -93,7 +100,7 @@ const deploymentChoices: { id: DeploymentMode; title: string; plainEnglish: stri
   {
     id: 'dedicated-managed-server',
     title: 'Dedicated managed server',
-    plainEnglish: 'Starts from EUR650/month for entry-level dedicated hosting. Larger or more complex workloads receive a tailored infrastructure quote.',
+    plainEnglish: `Starts from ${dedicatedServerStartPrice} for entry-level dedicated hosting. Larger or more complex workloads receive a tailored infrastructure quote.`,
   },
 ];
 
@@ -237,7 +244,7 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
                   {isCommunity
                     ? 'Community Timebanking is the credible low-price option: core timebanking stays on, expensive platform features stay off.'
                     : isDedicatedCustomQuote
-                      ? 'Dedicated server hosting starts from €650/month for entry-level needs. Final pricing depends on traffic, users, storage, redundancy, security, management, and whether you need one server or a clustered setup.'
+                      ? dedicatedServerPricingCopy
                       : isCustomQuote
                       ? 'Published pricing stops at 100,000 active members. Above that, traffic, storage, email, SLA, migration, and tenancy design need a bespoke quote.'
                       : 'The estimate changes with capacity and service level, not with artificial feature gates.'}
@@ -678,7 +685,7 @@ function DedicatedServerPricingNote() {
   return (
     <section className="nexus-surface nexus-surface--accent p-5">
       <p className="text-sm font-bold tracking-[0.16em] text-[var(--color-accent)] uppercase">Dedicated Server Pricing</p>
-      <h3 className="mt-2 text-2xl font-black text-white">Dedicated server solutions start from €650/month.</h3>
+      <h3 className="mt-2 text-2xl font-black text-white">Dedicated server solutions start from {dedicatedServerStartPrice}.</h3>
       <p className="mt-3 text-sm leading-6 text-white/62">
         This starting point is suitable for smaller projects or entry-level dedicated hosting needs. Final pricing depends on server size, traffic levels, storage, bandwidth, redundancy, security, management, and whether your project requires a single server or a clustered infrastructure setup.
       </p>
