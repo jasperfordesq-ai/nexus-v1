@@ -193,6 +193,7 @@ export const coursesApi = {
     return api.get<Course[]>(`/v2/courses${suffix}`);
   },
   categories: () => api.get<CourseCategory[]>('/v2/courses/categories'),
+  forGroup: (groupId: number) => api.get<Course[]>(`/v2/groups/${groupId}/courses`),
   show: (idOrSlug: string | number) => api.get<Course>(`/v2/courses/${idOrSlug}`),
   reviews: (courseId: number) => api.get<CourseReview[]>(`/v2/courses/${courseId}/reviews`),
 

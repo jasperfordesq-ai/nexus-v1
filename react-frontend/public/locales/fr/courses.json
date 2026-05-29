@@ -124,6 +124,9 @@
   "nav": {
     "courses": "Courses"
   },
+  "group": {
+    "recommended_courses": "Recommended courses"
+  },
   "certificate": {
     "download": "Certificate",
     "title": "Certificate of completion"

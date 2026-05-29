@@ -1075,6 +1075,12 @@ Route::post('/v2/courses/{courseId}/lessons', [\App\Http\Controllers\Api\CourseC
 Route::put('/v2/courses/{courseId}/lessons/{lessonId}', [\App\Http\Controllers\Api\CourseContentController::class, 'updateLesson'])->where(['courseId' => '[0-9]+', 'lessonId' => '[0-9]+']);
 Route::delete('/v2/courses/{courseId}/lessons/{lessonId}', [\App\Http\Controllers\Api\CourseContentController::class, 'deleteLesson'])->where(['courseId' => '[0-9]+', 'lessonId' => '[0-9]+']);
 
+// Group linkage
+Route::get('/v2/groups/{groupId}/courses', [\App\Http\Controllers\Api\CourseGroupController::class, 'forGroup'])->where('groupId', '[0-9]+');
+Route::get('/v2/courses/{courseId}/groups', [\App\Http\Controllers\Api\CourseGroupController::class, 'groupsForCourse'])->where('courseId', '[0-9]+');
+Route::post('/v2/courses/{courseId}/groups/{groupId}', [\App\Http\Controllers\Api\CourseGroupController::class, 'attach'])->where(['courseId' => '[0-9]+', 'groupId' => '[0-9]+']);
+Route::delete('/v2/courses/{courseId}/groups/{groupId}', [\App\Http\Controllers\Api\CourseGroupController::class, 'detach'])->where(['courseId' => '[0-9]+', 'groupId' => '[0-9]+']);
+
 // Grading (instructor/admin)
 Route::get('/v2/courses/{courseId}/grading', [\App\Http\Controllers\Api\CourseQuizController::class, 'gradingQueue'])->where('courseId', '[0-9]+');
 Route::post('/v2/courses/attempts/{attemptId}/grade', [\App\Http\Controllers\Api\CourseQuizController::class, 'gradeAttempt'])->where('attemptId', '[0-9]+');

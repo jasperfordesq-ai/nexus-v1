@@ -40,6 +40,7 @@ import { GroupTabNav } from './components/GroupTabNav';
 import { GroupTabContent } from './components/GroupTabContent';
 import { PinnedAnnouncementsBanner } from './components/PinnedAnnouncementsBanner';
 import { GroupNotificationPrefs } from './components/GroupNotificationPrefs';
+import { CourseGroupRecommendations } from '@/components/courses/CourseGroupRecommendations';
 import {
   NewDiscussionModal,
   GroupSettingsModal,
@@ -1121,6 +1122,9 @@ export function GroupDetailPage() {
 
       {/* Pinned Announcements Banner */}
       <PinnedAnnouncementsBanner groupId={group.id} isMember={userIsMember} />
+
+      {/* Recommended courses (Courses module, alpha) — renders nothing when none linked */}
+      <CourseGroupRecommendations groupId={group.id} />
 
       {/* Tab Navigation */}
       <GroupTabNav
