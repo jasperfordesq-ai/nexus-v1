@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useMemo, useState } from 'react';
-import { Alert, Platform, Pressable, RefreshControl, ScrollView, Share, TextInput, View } from 'react-native';
+import { Alert, Platform, Pressable, RefreshControl, ScrollView, Share, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -31,6 +31,7 @@ import {
 import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
+import Input from '@/components/ui/Input';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
@@ -421,9 +422,8 @@ function WalletActionPanel({
           <View className="gap-3">
             <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>{t('actions.recipientSearch')}</Text>
             <View className="flex-row gap-2">
-              <TextInput
-                className="min-h-12 flex-1 rounded-panel-inner border px-3 text-sm"
-                style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg }}
+              <Input
+                style={{ color: theme.text }}
                 placeholder={t('actions.recipientSearchPlaceholder')}
                 placeholderTextColor={theme.textMuted}
                 value={query}
@@ -433,6 +433,7 @@ function WalletActionPanel({
                 }}
                 returnKeyType="search"
                 onSubmitEditing={runSearch}
+                leftIcon={<Ionicons name="search-outline" size={18} color={theme.textMuted} />}
               />
               <HeroButton variant="secondary" onPress={runSearch} isDisabled={query.trim().length < 2 || isSearching}>
                 {isSearching ? <Spinner size="sm" /> : <Ionicons name="search-outline" size={16} color={primary} />}
@@ -468,12 +469,9 @@ function WalletActionPanel({
         ) : null}
 
         <View className="gap-2">
-          <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>{t('actions.amount')}</Text>
-          <TextInput
-            className="min-h-12 rounded-panel-inner border px-3 text-sm"
-            style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg }}
+          <Input
+            label={t('actions.amount')}
             placeholder={t('actions.amountPlaceholder')}
-            placeholderTextColor={theme.textMuted}
             value={amount}
             onChangeText={setAmount}
             keyboardType="decimal-pad"
@@ -481,12 +479,10 @@ function WalletActionPanel({
         </View>
 
         <View className="gap-2">
-          <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>{t(action === 'transfer' ? 'actions.description' : 'actions.message')}</Text>
-          <TextInput
-            className="min-h-20 rounded-panel-inner border px-3 py-3 text-sm"
-            style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg, textAlignVertical: 'top' }}
+          <Input
+            label={t(action === 'transfer' ? 'actions.description' : 'actions.message')}
+            style={{ minHeight: 80, textAlignVertical: 'top' }}
             placeholder={t(action === 'transfer' ? 'actions.descriptionPlaceholder' : 'actions.messagePlaceholder')}
-            placeholderTextColor={theme.textMuted}
             value={note}
             onChangeText={setNote}
             multiline

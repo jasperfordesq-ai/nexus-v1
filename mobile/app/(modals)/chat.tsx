@@ -10,7 +10,6 @@ import {
   Platform,
   Pressable,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -30,6 +29,7 @@ import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
+import Input from '@/components/ui/Input';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 type DisplayMessage = ChatMessage | { id: string; role: 'thinking'; content: string; created_at: string };
@@ -435,8 +435,9 @@ function ChatScreenInner() {
           <HeroCard className="rounded-panel p-0">
             <HeroCard.Body className="p-2">
               <View className="flex-row items-end gap-2">
-                <TextInput
-                  className="min-h-[42px] flex-1 px-3 py-2 text-sm"
+                <Input
+                  containerClassName="mb-0 flex-1"
+                  inputClassName="min-h-[42px] flex-1 px-3 py-2 text-sm"
                   style={{ maxHeight: 126, color: theme.text }}
                   placeholder={t('input_placeholder')}
                   placeholderTextColor={theme.textMuted}

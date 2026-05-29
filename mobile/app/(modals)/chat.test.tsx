@@ -80,7 +80,7 @@ jest.mock('@expo/vector-icons', () => ({
 
 jest.mock('heroui-native', () => {
   const React = require('react');
-  const { Text, View } = require('react-native');
+  const { Text, TextInput, View } = require('react-native');
 
   const Button = ({
     accessibilityLabel,
@@ -101,12 +101,20 @@ jest.mock('heroui-native', () => {
   const Chip = ({ children }: { children: React.ReactNode }) => <View>{children}</View>;
   Chip.Label = ({ children }: { children: React.ReactNode }) => <Text>{children}</Text>;
 
+  const HeroInput = React.forwardRef((props: Record<string, unknown>, ref: React.Ref<unknown>) => (
+    <TextInput ref={ref} {...props} />
+  ));
+
   return {
     Button,
     Card,
     Chip,
+    FieldError: ({ children }: { children?: React.ReactNode }) => <Text>{children}</Text>,
+    Input: HeroInput,
+    Label: ({ children }: { children?: React.ReactNode }) => <Text>{children}</Text>,
     Spinner: () => null,
     Surface: ({ children }: { children?: React.ReactNode }) => <View>{children}</View>,
+    TextField: ({ children }: { children?: React.ReactNode }) => <View>{children}</View>,
   };
 });
 

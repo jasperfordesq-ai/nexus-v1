@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render, waitFor } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 let mockParams: Record<string, string | string[] | undefined> = {};
 
@@ -35,6 +35,7 @@ jest.mock('react-i18next', () => ({
         'actions.nearby': 'Nearby marketplace',
         'actions.offers': 'Offers',
         'search.placeholder': 'Search marketplace...',
+        'search.clear': 'Clear marketplace search',
         'filters.allCategories': 'All categories',
         'filters.priceType.all': 'All prices',
         'filters.priceType.free': 'Free',
@@ -145,5 +146,16 @@ describe('MarketplaceRoute', () => {
         price_type: 'free',
       }));
     });
+  });
+
+  it('shows clear action after typing in the shared input-backed search field', async () => {
+    const { getByLabelText, getByPlaceholderText } = render(<MarketplaceRoute />);
+
+    await waitFor(() => {
+      expect(getByPlaceholderText('Search marketplace...')).toBeTruthy();
+    });
+
+    fireEvent.changeText(getByPlaceholderText('Search marketplace...'), 'bike');
+    expect(getByLabelText('Clear marketplace search')).toBeTruthy();
   });
 });

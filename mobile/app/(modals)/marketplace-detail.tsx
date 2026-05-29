@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useState, type ComponentProps } from 'react';
-import { Alert, Image, Linking, Modal, ScrollView, Share, TextInput, View } from 'react-native';
+import { Alert, Image, Linking, ScrollView, Share, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { ResizeMode, Video } from 'expo-av';
@@ -15,7 +15,9 @@ import * as Haptics from '@/lib/haptics';
 
 import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
+import BottomSheet from '@/components/ui/BottomSheet';
 import EmptyState from '@/components/ui/EmptyState';
+import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import { formatMarketplacePrice } from '@/components/marketplace/MarketplaceListingCard';
@@ -616,9 +618,8 @@ function MarketplaceDetailScreen() {
         </Surface>
       ) : null}
 
-      <Modal visible={collectionOpen} transparent animationType="slide" onRequestClose={() => setCollectionOpen(false)}>
-        <View className="flex-1 justify-end bg-black/40">
-          <Surface variant="default" className="max-h-[72%] rounded-t-[28px] p-4">
+      <BottomSheet visible={collectionOpen} onClose={() => setCollectionOpen(false)} snapPoints={[520]}>
+        <Surface variant="default" className="max-h-[72%] rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('collections.addTitle')}</Text>
               <HeroButton isIconOnly variant="secondary" onPress={() => setCollectionOpen(false)}>
@@ -645,13 +646,11 @@ function MarketplaceDetailScreen() {
                 ))}
               </ScrollView>
             )}
-          </Surface>
-        </View>
-      </Modal>
+        </Surface>
+      </BottomSheet>
 
-      <Modal visible={offerOpen} transparent animationType="slide" onRequestClose={() => setOfferOpen(false)}>
-        <View className="flex-1 justify-end bg-black/40">
-          <Surface variant="default" className="rounded-t-[28px] p-4">
+      <BottomSheet visible={offerOpen} onClose={() => setOfferOpen(false)} snapPoints={[460]}>
+        <Surface variant="default" className="rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('offers.makeTitle')}</Text>
               <HeroButton isIconOnly variant="secondary" onPress={() => setOfferOpen(false)}>
@@ -666,13 +665,11 @@ function MarketplaceDetailScreen() {
                 <HeroButton.Label>{t('offers.submit')}</HeroButton.Label>
               </HeroButton>
             </View>
-          </Surface>
-        </View>
-      </Modal>
+        </Surface>
+      </BottomSheet>
 
-      <Modal visible={reportOpen} transparent animationType="slide" onRequestClose={() => setReportOpen(false)}>
-        <View className="flex-1 justify-end bg-black/40">
-          <Surface variant="default" className="max-h-[86%] rounded-t-[28px] p-4">
+      <BottomSheet visible={reportOpen} onClose={() => setReportOpen(false)} snapPoints={[640]}>
+        <Surface variant="default" className="max-h-[86%] rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('detail.reportTitle')}</Text>
               <HeroButton isIconOnly variant="secondary" onPress={() => setReportOpen(false)}>
@@ -703,9 +700,8 @@ function MarketplaceDetailScreen() {
                 <HeroButton.Label>{t('detail.reportSubmit')}</HeroButton.Label>
               </HeroButton>
             </ScrollView>
-          </Surface>
-        </View>
-      </Modal>
+        </Surface>
+      </BottomSheet>
     </SafeAreaView>
   );
 }
@@ -844,15 +840,16 @@ function FormInput({
   return (
     <View className="gap-2">
       <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{label}</Text>
-      <TextInput
-        className={`${multiline ? 'min-h-24 py-3' : 'min-h-12'} rounded-panel-inner border px-3 text-sm`}
-        style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg, textAlignVertical: multiline ? 'top' : 'center' }}
+      <Input
+        className={`${multiline ? 'min-h-24' : 'min-h-12'} text-sm`}
+        style={{ color: theme.text, textAlignVertical: multiline ? 'top' : 'center' }}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
         placeholderTextColor={theme.textMuted}
         keyboardType={keyboardType}
         multiline={multiline}
+        accessibilityLabel={label}
       />
     </View>
   );

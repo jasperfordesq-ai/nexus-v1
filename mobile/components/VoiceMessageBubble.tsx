@@ -4,9 +4,9 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Spinner } from 'heroui-native';
+import { Button as HeroButton, Spinner } from 'heroui-native';
 // TODO: Migrate from expo-av to expo-audio when SDK 55+ is adopted.
 // expo-av is deprecated but expo-audio's API differs significantly (useAudioPlayer hook-based).
 // The deprecation warning is suppressed via LogBox in _layout.tsx.
@@ -113,9 +113,12 @@ export default function VoiceMessageBubble({
 
   return (
     <View className="flex-row items-center gap-1.5 min-w-[180px]">
-      <Pressable
+      <HeroButton
+        isIconOnly
+        variant="ghost"
+        size="sm"
         onPress={handlePlayPause}
-        disabled={isLoading}
+        isDisabled={isLoading}
         style={{ borderColor: iconColor }}
         className="w-8 h-8 rounded-full border-[1.5px] items-center justify-center"
         accessibilityLabel={isPlaying ? t('voice.pause') : t('voice.play')}
@@ -129,7 +132,7 @@ export default function VoiceMessageBubble({
             color={iconColor}
           />
         )}
-      </Pressable>
+      </HeroButton>
 
       <View className="flex-1 flex-row items-center gap-0.5">
         {/* Simple waveform bar visualization */}

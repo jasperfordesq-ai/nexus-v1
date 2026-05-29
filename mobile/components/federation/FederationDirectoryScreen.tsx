@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, Image, Pressable, RefreshControl, ScrollView, Text, TextInput, View } from 'react-native';
+import { Alert, Image, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -1066,14 +1066,15 @@ function MessageThreadView({
       <HeroCard className="rounded-panel p-0">
         <HeroCard.Body className="gap-3 p-4">
           <Text className="text-sm font-semibold" style={{ color: theme.text }}>{t('directory.messages.reply')}</Text>
-          <TextInput
+          <Input
             value={reply}
             onChangeText={setReply}
             placeholder={t('directory.messages.replyPlaceholder')}
             placeholderTextColor={theme.textMuted}
             multiline
             textAlignVertical="top"
-            className="min-h-28 rounded-panel-inner border border-border bg-surface px-4 py-3 text-base"
+            containerClassName="mb-0"
+            inputClassName="min-h-28 rounded-panel-inner border border-border bg-surface px-4 py-3 text-base"
             style={{ color: theme.text }}
           />
           <HeroButton variant="primary" isDisabled={!canSend} onPress={() => void sendReply()} style={{ backgroundColor: canSend ? primary : theme.border }}>
@@ -1212,12 +1213,13 @@ function FederationComposeCard({
             </Surface>
             <View className="gap-2">
               <Text className="text-sm font-semibold" style={{ color: theme.text }}>{t('directory.messages.recipientSearch')}</Text>
-              <TextInput
+              <Input
                 value={recipientQuery}
                 onChangeText={setRecipientQuery}
                 placeholder={t('directory.messages.recipientSearchPlaceholder')}
                 placeholderTextColor={theme.textMuted}
-                className="rounded-panel-inner border border-border bg-surface px-4 py-3 text-base"
+                containerClassName="mb-0"
+                inputClassName="rounded-panel-inner border border-border bg-surface px-4 py-3 text-base"
                 style={{ color: theme.text }}
               />
             </View>
@@ -1277,26 +1279,28 @@ function FederationComposeCard({
 
         <View className="gap-2">
           <Text className="text-sm font-semibold" style={{ color: theme.text }}>{t('directory.messages.subject')}</Text>
-          <TextInput
+          <Input
             value={subject}
             onChangeText={setSubject}
             placeholder={t('directory.messages.subjectPlaceholder')}
             placeholderTextColor={theme.textMuted}
-            className="rounded-panel-inner border border-border bg-surface px-4 py-3 text-base"
+            containerClassName="mb-0"
+            inputClassName="rounded-panel-inner border border-border bg-surface px-4 py-3 text-base"
             style={{ color: theme.text }}
           />
         </View>
 
         <View className="gap-2">
           <Text className="text-sm font-semibold" style={{ color: theme.text }}>{t('directory.messages.body')}</Text>
-          <TextInput
+          <Input
             value={body}
             onChangeText={setBody}
             placeholder={t('directory.messages.bodyPlaceholder')}
             placeholderTextColor={theme.textMuted}
             multiline
             textAlignVertical="top"
-            className="min-h-32 rounded-panel-inner border border-border bg-surface px-4 py-3 text-base"
+            containerClassName="mb-0"
+            inputClassName="min-h-32 rounded-panel-inner border border-border bg-surface px-4 py-3 text-base"
             style={{ color: theme.text }}
           />
         </View>

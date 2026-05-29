@@ -10,7 +10,6 @@ import {
   ScrollView,
   Share,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -39,6 +38,7 @@ import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
+import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
@@ -650,14 +650,15 @@ function VolunteeringDetailScreenInner() {
                 </Text>
               </View>
               {!hasApplied ? (
-                <TextInput
+                <Input
                   value={applyMessage}
                   onChangeText={setApplyMessage}
                   placeholder={t('coverMessagePlaceholder')}
                   placeholderTextColor={theme.textMuted}
                   multiline
-                  className="min-h-[104px] rounded-panel-inner px-4 py-3 text-base"
-                  style={{ backgroundColor: theme.surface, color: theme.text, borderColor: theme.border, borderWidth: 1, textAlignVertical: 'top' }}
+                  className="min-h-[104px] text-base"
+                  style={{ color: theme.text, textAlignVertical: 'top' }}
+                  accessibilityLabel={t('coverMessagePlaceholder')}
                 />
               ) : null}
               <HeroButton

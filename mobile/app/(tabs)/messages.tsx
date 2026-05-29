@@ -478,16 +478,16 @@ function ConversationCard({
   return (
     <Swipeable
       renderRightActions={() => (
-        <Pressable
+        <HeroButton
+          variant="primary"
           className="my-2 mr-4 w-[92px] items-center justify-center gap-1 rounded-2xl px-2"
           style={{ backgroundColor: primary }}
-          accessibilityRole="button"
           accessibilityLabel={t('archiveConversationWithName', { name: otherName })}
           onPress={() => onArchive(conversation)}
         >
           <Ionicons name="archive-outline" size={21} color="#fff" />
-          <Text className="text-xs font-semibold text-white" numberOfLines={1}>{t('archive')}</Text>
-        </Pressable>
+          <HeroButton.Label className="text-xs font-semibold text-white" numberOfLines={1}>{t('archive')}</HeroButton.Label>
+        </HeroButton>
       )}
       overshootRight={false}
       onSwipeableWillOpen={() => void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}

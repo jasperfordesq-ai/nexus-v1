@@ -168,7 +168,13 @@ jest.mock('@/components/ui/EmptyState', () => {
     );
   };
 });
-jest.mock('@/components/ui/Input', () => 'View');
+jest.mock('@/components/ui/Input', () => {
+  const React = require('react');
+  const { TextInput } = require('react-native');
+  return React.forwardRef((props: Record<string, unknown>, ref: React.Ref<unknown>) => (
+    <TextInput ref={ref} {...props} />
+  ));
+});
 jest.mock('@/components/ui/Toggle', () => 'View');
 
 import FederationMessagesScreen from './federation-messages';

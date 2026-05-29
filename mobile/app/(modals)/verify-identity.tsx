@@ -4,13 +4,14 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, Linking, RefreshControl, ScrollView, TextInput, View } from 'react-native';
+import { Alert, Linking, RefreshControl, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface, Text } from 'heroui-native';
 
 import AppTopBar from '@/components/ui/AppTopBar';
+import Input from '@/components/ui/Input';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import {
   createIdentityVerificationPayment,
@@ -234,14 +235,15 @@ function VerifyIdentityScreenInner() {
             <HeroCard.Body className="gap-4 p-4">
               <Text className="text-base font-bold" style={{ color: theme.text }}>{t('identity.dob_title')}</Text>
               <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('identity.dob_body')}</Text>
-              <TextInput
+              <Input
                 value={dob}
                 onChangeText={setDob}
                 placeholder={t('identity.dob_placeholder')}
                 placeholderTextColor={theme.textMuted}
                 autoCapitalize="none"
-                className="rounded-panel-inner border px-4 py-3 text-base"
-                style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.surface }}
+                className="text-base"
+                style={{ color: theme.text }}
+                accessibilityLabel={t('identity.dob_title')}
               />
               <HeroButton variant="primary" onPress={() => void handleSaveDob()} isDisabled={isSavingDob} style={{ backgroundColor: primary }}>
                 {isSavingDob ? <Spinner size="sm" /> : <Ionicons name="calendar-outline" size={17} color="#fff" />}

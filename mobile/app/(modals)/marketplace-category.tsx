@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, FlatList, RefreshControl, TextInput, View } from 'react-native';
+import { Alert, FlatList, RefreshControl, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,6 +15,7 @@ import MarketplaceListingCard from '@/components/marketplace/MarketplaceListingC
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import AppTopBar from '@/components/ui/AppTopBar';
 import EmptyState from '@/components/ui/EmptyState';
+import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import {
   getMarketplaceListings,
@@ -185,18 +186,21 @@ function MarketplaceCategoryScreen() {
             </HeroCard>
 
             <Surface variant="secondary" className="mb-3 rounded-panel px-3 py-3">
-              <View className="flex-row items-center gap-2">
-                <Ionicons name="search-outline" size={18} color={theme.textMuted} />
-                <TextInput
-                  className="min-h-10 flex-1 text-sm"
-                  style={{ color: theme.text }}
-                  placeholder={t('search.placeholder')}
-                  placeholderTextColor={theme.textMuted}
-                  value={query}
-                  onChangeText={setQuery}
-                  returnKeyType="search"
-                />
-              </View>
+              <Input
+                style={{ color: theme.text }}
+                placeholder={t('search.placeholder')}
+                placeholderTextColor={theme.textMuted}
+                value={query}
+                onChangeText={setQuery}
+                returnKeyType="search"
+                accessibilityLabel={t('search.placeholder')}
+                leftIcon={<Ionicons name="search-outline" size={18} color={theme.textMuted} />}
+                rightIcon={query.length > 0 ? (
+                  <HeroButton isIconOnly size="sm" variant="ghost" accessibilityLabel={t('search.clear')} onPress={() => setQuery('')}>
+                    <Ionicons name="close-circle" size={18} color={theme.textMuted} />
+                  </HeroButton>
+                ) : null}
+              />
             </Surface>
 
             <View className="mb-3 flex-row gap-2">
@@ -289,15 +293,11 @@ function FilterInput({
   onChangeText: (value: string) => void;
   placeholder: string;
 }) {
-  const theme = useTheme();
   return (
-    <View className="min-w-0 flex-1 gap-2">
-      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{label}</Text>
-      <TextInput
-        className="min-h-12 rounded-panel-inner border px-3 text-sm"
-        style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg }}
+    <View className="min-w-0 flex-1">
+      <Input
+        label={label}
         placeholder={placeholder}
-        placeholderTextColor={theme.textMuted}
         value={value}
         onChangeText={onChangeText}
         keyboardType="decimal-pad"

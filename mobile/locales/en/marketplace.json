@@ -23,7 +23,8 @@
     "view": "View"
   },
   "search": {
-    "placeholder": "Search marketplace..."
+    "placeholder": "Search marketplace...",
+    "clear": "Clear marketplace search"
   },
   "featured": {
     "title": "Featured listings",

@@ -9,8 +9,6 @@ import {
   Text,
   ScrollView,
   Alert,
-  Modal,
-  TextInput,
   KeyboardAvoidingView,
   Platform,
   Share,
@@ -31,7 +29,9 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
+import BottomSheet from '@/components/ui/BottomSheet';
 import EmptyState from '@/components/ui/EmptyState';
+import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
@@ -459,18 +459,13 @@ export default function JobDetailScreen() {
         </HeroButton>
       </Surface>
 
-      {/* Apply Modal */}
-      <Modal
-        visible={applyModalVisible}
-        animationType="slide"
-        presentationStyle="pageSheet"
-        onRequestClose={handleCloseModal}
-      >
+      {/* Apply sheet */}
+      <BottomSheet visible={applyModalVisible} onClose={handleCloseModal} snapPoints={[720]}>
         <KeyboardAvoidingView
-          style={{ flex: 1, backgroundColor: theme.bg }}
+          style={{ maxHeight: 700, backgroundColor: theme.bg }}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
-          <SafeAreaView className="flex-1">
+          <View>
             <View className="flex-row items-center justify-between px-5 py-3 border-b border-border/50">
               <HeroButton isIconOnly variant="secondary" onPress={handleCloseModal} accessibilityLabel={t('common:close')}>
                 <Ionicons name="close" size={24} color={theme.text} />
@@ -482,7 +477,7 @@ export default function JobDetailScreen() {
             </View>
 
             {applySuccess ? (
-              <View className="flex-1 items-center justify-center p-10">
+              <View className="items-center justify-center p-10">
                 <Ionicons name="checkmark-circle" size={64} color={successColor} />
                 <Text className="text-xl font-bold text-foreground mt-5">{t('apply.success')}</Text>
                 <Text className="text-sm text-muted-foreground text-center mt-2">{t('apply.successMessage')}</Text>
@@ -497,7 +492,7 @@ export default function JobDetailScreen() {
               </View>
             ) : (
               <ScrollView
-                contentContainerStyle={{ padding: 20, paddingBottom: 48 }}
+                contentContainerStyle={{ padding: 20, paddingBottom: 32 }}
                 keyboardShouldPersistTaps="handled"
               >
                 {/* Saved profile one-click apply */}
@@ -519,9 +514,9 @@ export default function JobDetailScreen() {
                 <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
                   {t('apply.messageLabel')}
                 </Text>
-                <TextInput
-                  style={{ color: theme.text, borderColor: theme.border, backgroundColor: theme.surface }}
-                  className="border rounded-xl p-3 text-sm min-h-[140px] mt-2"
+                <Input
+                  style={{ color: theme.text, textAlignVertical: 'top' }}
+                  className="min-h-[140px] text-sm"
                   placeholder={t('apply.messagePlaceholder')}
                   placeholderTextColor={theme.textMuted}
                   value={coverMessage}
@@ -530,6 +525,7 @@ export default function JobDetailScreen() {
                   numberOfLines={6}
                   textAlignVertical="top"
                   autoFocus
+                  accessibilityLabel={t('apply.messageLabel')}
                 />
 
                 <HeroButton
@@ -552,9 +548,9 @@ export default function JobDetailScreen() {
                 </HeroButton>
               </ScrollView>
             )}
-          </SafeAreaView>
+          </View>
         </KeyboardAvoidingView>
-      </Modal>
+      </BottomSheet>
     </SafeAreaView>
     </ModalErrorBoundary>
   );

@@ -11,7 +11,6 @@ import {
   RefreshControl,
   ScrollView,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -46,6 +45,7 @@ import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
+import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
@@ -451,36 +451,39 @@ function HoursPanel({
                 {organisations.map((org) => {
                   const selected = selectedOrgId === org.id;
                   return (
-                    <Pressable
+                    <HeroButton
                       key={org.id}
+                      size="sm"
+                      variant={selected ? 'primary' : 'secondary'}
                       onPress={() => setSelectedOrgId(org.id)}
-                      className="rounded-full px-4 py-2"
-                      style={{ backgroundColor: selected ? withAlpha(primary, 0.18) : theme.surface }}
+                      style={selected ? { backgroundColor: withAlpha(primary, 0.18) } : undefined}
                     >
-                      <Text className="text-sm font-semibold" style={{ color: selected ? primary : theme.textSecondary }}>
+                      <HeroButton.Label style={{ color: selected ? primary : theme.textSecondary }}>
                         {org.name}
-                      </Text>
-                    </Pressable>
+                      </HeroButton.Label>
+                    </HeroButton>
                   );
                 })}
               </ScrollView>
-              <TextInput
+              <Input
                 value={hours}
                 onChangeText={setHours}
                 placeholder={t('hoursPlaceholder')}
                 placeholderTextColor={theme.textMuted}
                 keyboardType="decimal-pad"
-                className="rounded-panel-inner px-4 py-3 text-base"
-                style={{ backgroundColor: theme.surface, color: theme.text, borderColor: theme.border, borderWidth: 1 }}
+                className="text-base"
+                style={{ color: theme.text }}
+                accessibilityLabel={t('hoursPlaceholder')}
               />
-              <TextInput
+              <Input
                 value={description}
                 onChangeText={setDescription}
                 placeholder={t('hoursDescriptionPlaceholder')}
                 placeholderTextColor={theme.textMuted}
                 multiline
-                className="min-h-[92px] rounded-panel-inner px-4 py-3 text-base"
-                style={{ backgroundColor: theme.surface, color: theme.text, borderColor: theme.border, borderWidth: 1, textAlignVertical: 'top' }}
+                className="min-h-[92px] text-base"
+                style={{ color: theme.text, textAlignVertical: 'top' }}
+                accessibilityLabel={t('hoursDescriptionPlaceholder')}
               />
               <HeroButton isDisabled={logging} onPress={() => void handleLogHours()}>
                 {logging ? <Spinner size="sm" /> : <HeroButton.Label>{t('submitHours')}</HeroButton.Label>}
@@ -659,52 +662,53 @@ function VolunteeringScreenInner() {
                 {visibleTabs.map((tab) => {
                   const selected = activeTab === tab.key;
                   return (
-                    <Pressable
+                    <HeroButton
                       key={tab.key}
+                      size="sm"
+                      variant={selected ? 'primary' : 'ghost'}
                       onPress={() => {
                         void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                         setActiveTab(tab.key);
                       }}
-                      className="h-11 min-w-[132px] flex-row items-center justify-center gap-2 rounded-panel-inner px-4"
+                      className="h-11 min-w-[132px] rounded-panel-inner"
                       style={{ backgroundColor: selected ? withAlpha(primary, 0.18) : 'transparent' }}
                     >
                       <Ionicons name={tab.icon} size={16} color={selected ? primary : theme.textSecondary} />
-                      <Text className="text-sm font-semibold" style={{ color: selected ? primary : theme.textSecondary }} numberOfLines={1}>
+                      <HeroButton.Label style={{ color: selected ? primary : theme.textSecondary }}>
                         {tab.label}
-                      </Text>
-                    </Pressable>
+                      </HeroButton.Label>
+                    </HeroButton>
                   );
                 })}
               </ScrollView>
             </Surface>
 
             {activeTab === 'opportunities' ? (
-              <View className="flex-row items-center px-3 h-[48px] rounded-panel gap-2" style={{ backgroundColor: theme.surface }}>
-                <Ionicons name="search-outline" size={18} color={theme.textMuted} />
-                <TextInput
-                  className="flex-1 text-sm py-0"
-                  style={{ color: theme.text }}
-                  placeholder={t('searchPlaceholder')}
-                  placeholderTextColor={theme.textMuted}
-                  value={search}
-                  onChangeText={handleSearchChange}
-                  returnKeyType="search"
-                  clearButtonMode="never"
-                  autoCorrect={false}
-                  autoCapitalize="none"
-                  accessibilityLabel={t('searchPlaceholder')}
-                />
-                {search.length > 0 ? (
-                  <Pressable
+              <Input
+                className="text-sm"
+                style={{ color: theme.text }}
+                placeholder={t('searchPlaceholder')}
+                placeholderTextColor={theme.textMuted}
+                value={search}
+                onChangeText={handleSearchChange}
+                returnKeyType="search"
+                clearButtonMode="never"
+                autoCorrect={false}
+                autoCapitalize="none"
+                accessibilityLabel={t('searchPlaceholder')}
+                leftIcon={<Ionicons name="search-outline" size={18} color={theme.textMuted} />}
+                rightIcon={search.length > 0 ? (
+                  <HeroButton
+                    isIconOnly
+                    size="sm"
+                    variant="ghost"
                     onPress={handleClear}
-                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                     accessibilityLabel={t('clearSearch')}
-                    accessibilityRole="button"
                   >
                     <Ionicons name="close-circle" size={18} color={theme.textMuted} />
-                  </Pressable>
+                  </HeroButton>
                 ) : null}
-              </View>
+              />
             ) : null}
 
             {activeTab === 'applications' ? (

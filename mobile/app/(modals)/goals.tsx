@@ -11,7 +11,6 @@ import {
   Platform,
   RefreshControl,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -32,6 +31,7 @@ import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
 import EmptyState from '@/components/ui/EmptyState';
+import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
@@ -377,11 +377,10 @@ function CreateGoalForm({
           </View>
         </View>
 
-        <View className="gap-2">
-          <Text className="text-xs font-semibold uppercase text-muted-foreground">{t('create.titleLabel')}</Text>
-          <TextInput
-            className="rounded-panel-inner border px-3 py-3 text-sm"
-            style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg }}
+        <View>
+          <Input
+            label={t('create.titleLabel')}
+            style={{ color: theme.text }}
             placeholder={t('create.titlePlaceholder')}
             placeholderTextColor={theme.textMuted}
             value={title}
@@ -391,11 +390,10 @@ function CreateGoalForm({
           />
         </View>
 
-        <View className="gap-2">
-          <Text className="text-xs font-semibold uppercase text-muted-foreground">{t('create.descriptionLabel')}</Text>
-          <TextInput
-            className="min-h-[82px] rounded-panel-inner border px-3 py-3 text-sm"
-            style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg, textAlignVertical: 'top' }}
+        <View>
+          <Input
+            label={t('create.descriptionLabel')}
+            style={{ color: theme.text, minHeight: 82, textAlignVertical: 'top' }}
             placeholder={t('create.descriptionPlaceholder')}
             placeholderTextColor={theme.textMuted}
             value={description}
@@ -404,11 +402,10 @@ function CreateGoalForm({
           />
         </View>
 
-        <View className="gap-2">
-          <Text className="text-xs font-semibold uppercase text-muted-foreground">{t('create.targetHoursLabel')}</Text>
-          <TextInput
-            className="rounded-panel-inner border px-3 py-3 text-sm"
-            style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg }}
+        <View>
+          <Input
+            label={t('create.targetHoursLabel')}
+            style={{ color: theme.text }}
             placeholder={t('create.targetPlaceholder')}
             placeholderTextColor={theme.textMuted}
             value={targetValue}

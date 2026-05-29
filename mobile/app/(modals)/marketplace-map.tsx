@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { type ReactNode, useState } from 'react';
-import { Alert, FlatList, ScrollView, TextInput, View } from 'react-native';
+import { Alert, FlatList, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import MarketplaceListingCard from '@/components/marketplace/MarketplaceListingCard';
 import AppTopBar from '@/components/ui/AppTopBar';
 import EmptyState from '@/components/ui/EmptyState';
+import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import {
@@ -209,15 +210,11 @@ function CoordinateInput({
   onChangeText: (value: string) => void;
   placeholder: string;
 }) {
-  const theme = useTheme();
   return (
-    <View className="min-w-0 flex-1 gap-2">
-      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{label}</Text>
-      <TextInput
-        className="min-h-12 rounded-panel-inner border px-3 text-sm"
-        style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg }}
+    <View className="min-w-0 flex-1">
+      <Input
+        label={label}
         placeholder={placeholder}
-        placeholderTextColor={theme.textMuted}
         value={value}
         onChangeText={onChangeText}
         keyboardType="decimal-pad"

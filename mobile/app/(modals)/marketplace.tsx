@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, FlatList, RefreshControl, ScrollView, TextInput, View } from 'react-native';
+import { Alert, FlatList, RefreshControl, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,6 +14,7 @@ import * as Haptics from '@/lib/haptics';
 
 import MarketplaceListingCard from '@/components/marketplace/MarketplaceListingCard';
 import EmptyState from '@/components/ui/EmptyState';
+import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import AppTopBar from '@/components/ui/AppTopBar';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
@@ -271,18 +272,21 @@ function MarketplaceScreen() {
             </HeroCard>
 
             <Surface variant="secondary" className="mb-3 rounded-panel px-3 py-3">
-              <View className="flex-row items-center gap-2">
-                <Ionicons name="search-outline" size={18} color={theme.textMuted} />
-                <TextInput
-                  className="min-h-10 flex-1 text-sm"
+                <Input
                   style={{ color: theme.text }}
                   placeholder={t('search.placeholder')}
                   placeholderTextColor={theme.textMuted}
                   value={query}
                   onChangeText={setQuery}
                   returnKeyType="search"
+                  accessibilityLabel={t('search.placeholder')}
+                  leftIcon={<Ionicons name="search-outline" size={18} color={theme.textMuted} />}
+                  rightIcon={query.length > 0 ? (
+                    <HeroButton isIconOnly size="sm" variant="ghost" accessibilityLabel={t('search.clear')} onPress={() => setQuery('')}>
+                      <Ionicons name="close-circle" size={18} color={theme.textMuted} />
+                    </HeroButton>
+                  ) : null}
                 />
-              </View>
             </Surface>
 
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingBottom: 12 }}>

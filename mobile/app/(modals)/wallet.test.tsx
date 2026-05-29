@@ -69,6 +69,9 @@ jest.mock('react-i18next', () => ({
         'actions.closeAction': 'Close wallet action',
         'actions.selectedRecipient': 'Selected recipient',
         'actions.memberFallback': 'Community member',
+        'actions.recipientSearch': 'Recipient search',
+        'actions.recipientSearchPlaceholder': 'Search by name or email',
+        'actions.searchMembers': 'Search members',
         'actions.amount': 'Amount',
         'actions.amountPlaceholder': 'Hours to send',
         'actions.description': 'Description',
@@ -267,6 +270,23 @@ describe('WalletModal', () => {
     const { getByText } = render(<WalletModal />);
     expect(getByText('Jasper Ford')).toBeTruthy();
     expect(getByText('Selected recipient')).toBeTruthy();
+  });
+
+  it('accepts transfer amount and description through shared input fields', () => {
+    mockSearchParams.mockReturnValue({ to: '260', name: 'Jasper Ford' });
+    mockUseApi
+      .mockReset()
+      .mockReturnValueOnce({ data: { data: { balance: 12.5, total_credits: 20, total_debits: 7.5, currency: 'hours' } }, isLoading: false, error: null, refresh: jest.fn() })
+      .mockReturnValueOnce({ data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() })
+      .mockReturnValueOnce({ data: { data: { balance: 3, total_deposited: 5, total_donated: 2 } }, isLoading: false, error: null, refresh: jest.fn() });
+
+    const { getByDisplayValue, getByPlaceholderText } = render(<WalletModal />);
+
+    fireEvent.changeText(getByPlaceholderText('Hours to send'), '2');
+    fireEvent.changeText(getByPlaceholderText('What is this transfer for?'), 'Garden help');
+
+    expect(getByDisplayValue('2')).toBeTruthy();
+    expect(getByDisplayValue('Garden help')).toBeTruthy();
   });
 
   it('loads the next transaction page when more history is available', async () => {

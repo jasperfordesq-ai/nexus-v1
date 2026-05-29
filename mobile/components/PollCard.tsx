@@ -4,8 +4,9 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { View, Text, Pressable, Animated } from 'react-native';
+import { View, Text, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Button as HeroButton } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 
@@ -178,14 +179,15 @@ function PollOptionRow({ option, showResults, isUserVote, primary, onPress, disa
   }
 
   return (
-    <Pressable
-      className="rounded-xl border border-border min-h-[44px] justify-center px-3 py-2.5"
+    <HeroButton
+      variant="outline"
+      className="min-h-[44px] w-full justify-center rounded-xl"
       onPress={onPress}
-      disabled={disabled}
+      isDisabled={disabled}
       accessibilityRole="button"
       accessibilityLabel={option.text}
     >
-      <Text className="text-sm text-foreground">{option.text}</Text>
-    </Pressable>
+      <HeroButton.Label>{option.text}</HeroButton.Label>
+    </HeroButton>
   );
 }

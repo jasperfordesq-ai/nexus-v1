@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { render, waitFor } from '@testing-library/react-native';
 
 let mockAuthState: {
   isAuthenticated: boolean;
@@ -23,6 +23,19 @@ const mockT = (key: string) => {
     'shipping.title': 'Shipping options',
     'shipping.signInTitle': 'Sign in to manage shipping options',
     'shipping.signInHint': 'Seller shipping methods and delivery prices are available after you sign in.',
+    'shipping.eyebrow': 'Seller fulfilment',
+    'shipping.subtitle': 'Create shipping choices buyers can use at checkout.',
+    'shipping.courierName': 'Courier name',
+    'shipping.courierNamePlaceholder': 'Postal service or local courier',
+    'shipping.price': 'Price',
+    'shipping.pricePlaceholder': '6.50',
+    'shipping.currency': 'Currency',
+    'shipping.estimatedDays': 'Estimated days',
+    'shipping.estimatedDaysPlaceholder': '3',
+    'shipping.defaultToggle': 'Set as default option',
+    'shipping.create': 'Create option',
+    'shipping.empty': 'No shipping options yet',
+    'shipping.emptyHint': 'Add at least one option if sellers can ship marketplace orders.',
     'featureGate.title': 'Marketplace is not available',
     'featureGate.description': 'This community has not enabled marketplace listings.',
   };
@@ -117,5 +130,15 @@ describe('MarketplaceShippingOptionsRoute', () => {
 
     expect(getByText('Sign in to manage shipping options')).toBeTruthy();
     expect(getMarketplaceShippingOptions).not.toHaveBeenCalled();
+  });
+
+  it('renders shared input-backed shipping option fields when authenticated', async () => {
+    const { getByPlaceholderText } = render(<MarketplaceShippingOptionsRoute />);
+
+    await waitFor(() => {
+      expect(getByPlaceholderText('Postal service or local courier')).toBeTruthy();
+    });
+    expect(getByPlaceholderText('6.50')).toBeTruthy();
+    expect(getByPlaceholderText('3')).toBeTruthy();
   });
 });

@@ -4,11 +4,11 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import * as Haptics from '@/lib/haptics';
 
 import BottomSheet from '@/components/ui/BottomSheet';
+import Button from '@/components/ui/Button';
 
 interface Action {
   label: string;
@@ -28,7 +28,6 @@ export default function ActionSheet({ visible, onClose, title, actions }: Action
   const snapHeight = Math.min((title ? 50 : 18) + actions.length * 56 + 24, 400);
 
   const handleAction = (action: Action) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
     onClose();
     setTimeout(() => action.onPress(), 200);
   };
@@ -37,26 +36,28 @@ export default function ActionSheet({ visible, onClose, title, actions }: Action
     <BottomSheet visible={visible} onClose={onClose} snapPoints={[snapHeight]} title={title}>
       <View className="pt-1">
         {actions.map((action, index) => (
-          <Pressable
+          <Button
             key={index}
-            className={`flex-row items-center py-4${index < actions.length - 1 ? ' border-b border-black/10' : ''}`}
+            variant="ghost"
+            className={`w-full justify-start rounded-none py-4${index < actions.length - 1 ? ' border-b border-black/10' : ''}`}
             onPress={() => handleAction(action)}
             accessibilityLabel={action.label}
-            accessibilityRole="button"
           >
-            {action.icon ? (
-              <Ionicons
-                name={action.icon as keyof typeof Ionicons.glyphMap}
-                size={22}
-                className={action.destructive ? 'text-danger mr-3.5' : 'text-foreground mr-3.5'}
-              />
-            ) : null}
-            <Text
-              className={`text-base font-medium${action.destructive ? ' text-danger' : ' text-foreground'}`}
-            >
-              {action.label}
-            </Text>
-          </Pressable>
+            <View className="flex-row items-center">
+              {action.icon ? (
+                <Ionicons
+                  name={action.icon as keyof typeof Ionicons.glyphMap}
+                  size={22}
+                  className={action.destructive ? 'mr-3.5 text-danger' : 'mr-3.5 text-foreground'}
+                />
+              ) : null}
+              <Text
+                className={`text-base font-medium${action.destructive ? ' text-danger' : ' text-foreground'}`}
+              >
+                {action.label}
+              </Text>
+            </View>
+          </Button>
         ))}
       </View>
     </BottomSheet>

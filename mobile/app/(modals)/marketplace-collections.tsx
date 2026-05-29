@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, FlatList, Modal, Pressable, RefreshControl, TextInput, View } from 'react-native';
+import { Alert, FlatList, Pressable, RefreshControl, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,7 +14,9 @@ import { useTranslation } from 'react-i18next';
 import MarketplaceListingCard from '@/components/marketplace/MarketplaceListingCard';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import AppTopBar from '@/components/ui/AppTopBar';
+import BottomSheet from '@/components/ui/BottomSheet';
 import EmptyState from '@/components/ui/EmptyState';
+import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import {
   createMarketplaceCollection,
@@ -450,9 +452,8 @@ function CreateCollectionModal({
   const primary = usePrimaryColor();
   const theme = useTheme();
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <View className="flex-1 justify-end bg-black/40">
-        <Surface variant="default" className="gap-4 rounded-t-[28px] p-4">
+    <BottomSheet visible={visible} onClose={onClose} snapPoints={[440]}>
+      <Surface variant="default" className="gap-4 rounded-panel p-4">
           <View className="flex-row items-center justify-between gap-3">
             <View className="min-w-0 flex-1">
               <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('collections.createTitle')}</Text>
@@ -479,9 +480,8 @@ function CreateCollectionModal({
               <HeroButton.Label>{t('collections.create')}</HeroButton.Label>
             </HeroButton>
           </View>
-        </Surface>
-      </View>
-    </Modal>
+      </Surface>
+    </BottomSheet>
   );
 }
 
@@ -500,11 +500,10 @@ function FormInput({
 }) {
   const theme = useTheme();
   return (
-    <View className="gap-2">
-      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{label}</Text>
-      <TextInput
-        className="rounded-panel-inner border px-3 py-3 text-sm"
-        style={{ minHeight: multiline ? 92 : 48, borderColor: theme.border, color: theme.text, backgroundColor: theme.bg, textAlignVertical: multiline ? 'top' : 'center' }}
+    <View>
+      <Input
+        label={label}
+        style={{ color: theme.text, minHeight: multiline ? 92 : 48, textAlignVertical: multiline ? 'top' : 'center' }}
         placeholder={placeholder}
         placeholderTextColor={theme.textMuted}
         value={value}

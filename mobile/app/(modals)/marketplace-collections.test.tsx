@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { fireEvent, render } from '@testing-library/react-native';
 
 let mockParams: Record<string, string> = {};
 let mockEmptyStateAction: (() => void) | undefined;
@@ -22,6 +22,12 @@ const mockT = (key: string, opts?: Record<string, unknown>) => {
     'collections.collectionsTab': 'Collections',
     'collections.savedTab': 'Saved searches',
     'collections.create': 'Create collection',
+    'collections.createTitle': 'Create collection',
+    'collections.createSubtitle': 'Group saved listings into a reusable set.',
+    'collections.name': 'Name',
+    'collections.namePlaceholder': 'Weekend projects',
+    'collections.description': 'Description',
+    'collections.descriptionPlaceholder': 'Optional note',
     'collections.manage': 'Manage in tools',
     'collections.signInTitle': 'Sign in to view saved marketplace',
     'collections.signInHint': 'Collections and saved searches are available after you sign in.',
@@ -66,6 +72,13 @@ jest.mock('@/components/ui/LoadingSpinner', () => {
   const { Text } = require('react-native');
   return () => <Text>Loading</Text>;
 });
+jest.mock('@/components/ui/BottomSheet', () => ({
+  __esModule: true,
+  default: ({ visible, children }: { visible: boolean; children: React.ReactNode }) => {
+    const { View } = require('react-native');
+    return visible ? <View>{children}</View> : null;
+  },
+}));
 jest.mock('@/components/marketplace/MarketplaceListingCard', () => {
   const { Text } = require('react-native');
   return () => <Text>Listing card</Text>;
@@ -196,5 +209,14 @@ describe('MarketplaceCollectionsRoute', () => {
     expect(await findByText('Sign in to view saved marketplace')).toBeTruthy();
     expect(getMarketplaceCollections).not.toHaveBeenCalled();
     expect(getMarketplaceSavedSearches).not.toHaveBeenCalled();
+  });
+
+  it('opens shared input-backed collection creation fields', async () => {
+    const { findByText, getByPlaceholderText } = render(<MarketplaceCollectionsRoute />);
+
+    fireEvent.press(await findByText('Create collection'));
+
+    expect(getByPlaceholderText('Weekend projects')).toBeTruthy();
+    expect(getByPlaceholderText('Optional note')).toBeTruthy();
   });
 });

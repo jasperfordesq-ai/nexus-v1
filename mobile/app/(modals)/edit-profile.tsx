@@ -11,7 +11,6 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useNavigation } from 'expo-router';
@@ -32,6 +31,7 @@ import { STORAGE_KEYS } from '@/lib/constants';
 import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
 import FormActionFooter from '@/components/ui/FormActionFooter';
+import Input from '@/components/ui/Input';
 import OfflineBanner from '@/components/OfflineBanner';
 
 // E.164-ish: optional + then digits, spaces, dashes — at least 7 digits total
@@ -407,7 +407,7 @@ function withImageVersion(url: string): string {
   return `${url}${separator}v=${Date.now()}`;
 }
 
-type ProfileFieldProps = React.ComponentProps<typeof TextInput> & {
+type ProfileFieldProps = React.ComponentProps<typeof Input> & {
   label: string;
   value: string;
   error?: string;
@@ -431,23 +431,20 @@ function ProfileField({
   return (
     <View className={`gap-1.5 ${className ?? ''}`}>
       <Text className="text-xs font-semibold uppercase text-muted-foreground">{label}</Text>
-      <TextInput
+      <Input
         {...inputProps}
+        error={error}
         value={value}
         multiline={multiline}
-        className={`min-h-[46px] rounded-2xl border px-4 py-3 text-sm ${inputClassName ?? ''}`}
+        className={`min-h-[46px] ${inputClassName ?? ''}`}
         style={{
           color: theme.text,
-          backgroundColor: theme.bg,
-          borderColor: error ? theme.error : theme.border,
           textAlignVertical: multiline ? 'top' : 'center',
         }}
         placeholderTextColor={theme.textMuted}
         accessibilityLabel={label}
       />
-      {error ? (
-        <Text className="text-xs font-medium" style={{ color: theme.error }}>{error}</Text>
-      ) : helper ? (
+      {!error && helper ? (
         <Text className="text-xs" style={{ color: theme.textMuted }}>{helper}</Text>
       ) : null}
     </View>

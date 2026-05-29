@@ -120,7 +120,7 @@ jest.mock('@/components/ui/FormActionFooter', () => {
 
 jest.mock('heroui-native', () => {
   const React = require('react');
-  const { Pressable, Text, View } = require('react-native');
+  const { Pressable, Text, TextInput, View } = require('react-native');
   const Button = ({ children, onPress }: { children: React.ReactNode; onPress?: () => void }) => (
     <Pressable onPress={onPress}>
       <View>{children}</View>
@@ -131,7 +131,17 @@ jest.mock('heroui-native', () => {
   Card.Body = ({ children }: { children: React.ReactNode }) => <View>{children}</View>;
   const Surface = ({ children }: { children: React.ReactNode }) => <View>{children}</View>;
   const Spinner = () => <View />;
-  return { Button, Card, Spinner, Surface, Text };
+  return {
+    Button,
+    Card,
+    Spinner,
+    Surface,
+    Text,
+    TextField: ({ children }: { children: React.ReactNode }) => <View>{children}</View>,
+    Label: ({ children }: { children: React.ReactNode }) => <Text>{children}</Text>,
+    Input: React.forwardRef((props: Record<string, unknown>, ref: React.Ref<unknown>) => <TextInput ref={ref} {...props} />),
+    FieldError: ({ children }: { children: React.ReactNode }) => <Text>{children}</Text>,
+  };
 });
 
 import NewVolunteeringRoute from './new-volunteering';

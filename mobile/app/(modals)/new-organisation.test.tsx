@@ -84,7 +84,7 @@ jest.mock('@expo/vector-icons', () => ({
 
 jest.mock('heroui-native', () => {
   const React = require('react');
-  const { Text, View } = require('react-native');
+  const { Text, TextInput, View } = require('react-native');
 
   const Button = ({ children, onPress, isDisabled }: { children: React.ReactNode; onPress?: () => void; isDisabled?: boolean }) => (
     <Text onPress={isDisabled ? undefined : onPress}>{children}</Text>
@@ -93,10 +93,18 @@ jest.mock('heroui-native', () => {
 
   const Card = ({ children }: { children: React.ReactNode }) => <View>{children}</View>;
   Card.Body = ({ children }: { children: React.ReactNode }) => <View>{children}</View>;
+  const Checkbox = ({ children, onSelectedChange, isSelected }: { children?: React.ReactNode; onSelectedChange?: (value: boolean) => void; isSelected?: boolean }) => (
+    <Text onPress={() => onSelectedChange?.(!isSelected)}>{children}</Text>
+  );
 
   return {
     Button,
     Card,
+    Checkbox,
+    TextField: ({ children }: { children: React.ReactNode }) => <View>{children}</View>,
+    Label: ({ children }: { children: React.ReactNode }) => <Text>{children}</Text>,
+    Input: React.forwardRef((props: Record<string, unknown>, ref: React.Ref<unknown>) => <TextInput ref={ref} {...props} />),
+    FieldError: ({ children }: { children: React.ReactNode }) => <Text>{children}</Text>,
     Spinner: () => null,
     Surface: ({ children }: { children?: React.ReactNode }) => <View>{children}</View>,
     Text,
@@ -109,6 +117,7 @@ jest.mock('@/lib/api/organisations', () => ({
 
 jest.mock('@/lib/haptics', () => ({
   notificationAsync: jest.fn(() => Promise.resolve()),
+  selectionAsync: jest.fn(() => Promise.resolve()),
   NotificationFeedbackType: { Success: 'success' },
 }));
 

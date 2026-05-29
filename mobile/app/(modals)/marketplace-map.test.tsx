@@ -121,4 +121,23 @@ describe('MarketplaceMapRoute', () => {
 
     unmount();
   });
+
+  it('sends coordinates entered through shared input fields', async () => {
+    const { getByPlaceholderText, getByText, unmount } = render(<MarketplaceMapRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('40.7128'), '51.5074');
+    fireEvent.changeText(getByPlaceholderText('-74.0060'), '-0.1278');
+    fireEvent.press(getByText('Search nearby'));
+
+    await waitFor(() => {
+      expect(getNearbyMarketplaceListings).toHaveBeenCalledWith(
+        expect.objectContaining({
+          latitude: 51.5074,
+          longitude: -0.1278,
+        }),
+      );
+    });
+
+    unmount();
+  });
 });

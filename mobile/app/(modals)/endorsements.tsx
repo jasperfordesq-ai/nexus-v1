@@ -9,7 +9,7 @@ import {
   FlatList,
   RefreshControl,
   Text,
-  TextInput,
+  type TextInput,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -34,6 +34,7 @@ import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
+import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
@@ -340,9 +341,10 @@ function EndorsementsHeader({
             <>
               <View className="flex-row items-center gap-2 rounded-panel-inner border px-3 py-2" style={{ borderColor: withAlpha(primary, 0.34), backgroundColor: theme.surface }}>
                 <Ionicons name="add-circle-outline" size={18} color={primary} />
-                <TextInput
+                <Input
                   ref={skillInputRef}
-                  className="min-h-10 flex-1 text-sm"
+                  containerClassName="mb-0 flex-1"
+                  inputClassName="min-h-10 flex-1 text-sm"
                   style={{ color: theme.text }}
                   placeholder={t('skillPlaceholder')}
                   placeholderTextColor={theme.textMuted}

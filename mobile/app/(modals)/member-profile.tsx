@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, Pressable, RefreshControl, ScrollView, Share, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable, RefreshControl, ScrollView, Share, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -35,6 +35,7 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
+import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import AppTopBar from '@/components/ui/AppTopBar';
@@ -797,27 +798,29 @@ function FederatedTransferCard({
 
         <View className="gap-2">
           <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>{t('profile.amountHours')}</Text>
-          <TextInput
-            className="min-h-12 rounded-panel-inner border px-3 text-sm"
-            style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg }}
+          <Input
+            className="min-h-12 text-sm"
+            style={{ color: theme.text }}
             placeholder={t('profile.amountPlaceholder')}
             placeholderTextColor={theme.textMuted}
             value={amount}
             onChangeText={setAmount}
             keyboardType="number-pad"
+            accessibilityLabel={t('profile.amountHours')}
           />
         </View>
 
         <View className="gap-2">
           <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>{t('profile.transferDescription')}</Text>
-          <TextInput
-            className="min-h-20 rounded-panel-inner border px-3 py-3 text-sm"
-            style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg, textAlignVertical: 'top' }}
+          <Input
+            className="min-h-20 text-sm"
+            style={{ color: theme.text, textAlignVertical: 'top' }}
             placeholder={t('profile.transferDescriptionPlaceholder')}
             placeholderTextColor={theme.textMuted}
             value={description}
             onChangeText={setDescription}
             multiline
+            accessibilityLabel={t('profile.transferDescription')}
           />
         </View>
 

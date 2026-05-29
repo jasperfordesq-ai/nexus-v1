@@ -11,7 +11,6 @@ import {
   KeyboardAvoidingView,
   Linking,
   Platform,
-  Pressable,
   ScrollView,
   Text,
   View,
@@ -20,7 +19,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import { Card as HeroCard } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard } from 'heroui-native';
 
 import * as Haptics from '@/lib/haptics';
 import { ApiResponseError } from '@/lib/api/client';
@@ -158,18 +157,19 @@ export default function LoginScreen() {
                       returnKeyType="done"
                       onSubmitEditing={handleSubmit(onSubmit)}
                       rightIcon={
-                        <Pressable
+                        <HeroButton
+                          isIconOnly
+                          size="sm"
+                          variant="ghost"
                           onPress={() => setShowPassword((p) => !p)}
                           accessibilityLabel={t('login.togglePassword')}
-                          accessibilityRole="button"
-                          hitSlop={8}
                         >
                           <Ionicons
                             name={showPassword ? 'eye-off-outline' : 'eye-outline'}
                             size={20}
                             className="text-muted-foreground"
                           />
-                        </Pressable>
+                        </HeroButton>
                       }
                     />
                   )}
@@ -181,17 +181,17 @@ export default function LoginScreen() {
                   </Button>
                 </View>
 
-                <Pressable
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onPress={async () => {
                     const supported = await Linking.canOpenURL(FORGOT_PASSWORD_URL);
                     if (supported) await Linking.openURL(FORGOT_PASSWORD_URL);
                   }}
                   className="self-center mt-3.5"
                 >
-                  <Text className="text-muted-foreground text-[13px] font-medium">
-                    {t('login.forgotPassword')}
-                  </Text>
-                </Pressable>
+                  {t('login.forgotPassword')}
+                </Button>
               </View>
             </HeroCard.Body>
 

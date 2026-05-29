@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useMemo, useState } from 'react';
-import { Alert, Pressable, ScrollView, TextInput, View } from 'react-native';
+import { Alert, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,6 +17,8 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
+import Checkbox from '@/components/ui/Checkbox';
+import Input from '@/components/ui/Input';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 type FormField = 'name' | 'description' | 'contact_email' | 'website' | 'terms';
@@ -260,14 +262,12 @@ function FormInput({
   autoCorrect?: boolean;
 }) {
   return (
-    <View className="gap-2">
-      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{label}</Text>
-      <TextInput
-        className="rounded-panel-inner border px-3 py-3 text-sm"
+    <View>
+      <Input
+        label={label}
+        error={error}
         style={{
-          borderColor: error ? theme.error : theme.border,
           color: theme.text,
-          backgroundColor: theme.bg,
           minHeight: minHeight ?? 48,
           textAlignVertical: multiline ? 'top' : 'center',
         }}
@@ -280,7 +280,6 @@ function FormInput({
         autoCapitalize={autoCapitalize}
         autoCorrect={autoCorrect}
       />
-      {error ? <Text className="text-xs" style={{ color: theme.error }}>{error}</Text> : null}
     </View>
   );
 }
@@ -307,17 +306,7 @@ function TermsCard({
         <Text className="text-sm font-bold" style={{ color: theme.text }}>{t('register.termsTitle')}</Text>
       </View>
       <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('register.termsSummary')}</Text>
-      <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: agreedTerms }} onPress={onToggle}>
-        <View className="flex-row items-start gap-3">
-          <View
-            className="mt-0.5 size-5 items-center justify-center rounded-md border"
-            style={{ borderColor: agreedTerms ? primary : theme.border, backgroundColor: agreedTerms ? primary : 'transparent' }}
-          >
-            {agreedTerms ? <Ionicons name="checkmark" size={14} color="#ffffff" /> : null}
-          </View>
-          <Text className="min-w-0 flex-1 text-sm leading-5" style={{ color: theme.text }}>{t('register.termsAgreement')}</Text>
-        </View>
-      </Pressable>
+      <Checkbox checked={agreedTerms} onPress={onToggle} label={t('register.termsAgreement')} />
       {error ? <Text className="text-xs" style={{ color: theme.error }}>{error}</Text> : null}
     </Surface>
   );

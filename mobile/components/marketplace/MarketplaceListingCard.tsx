@@ -5,7 +5,7 @@
 
 import { Image, Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import type { MarketplaceListingItem } from '@/lib/api/marketplace';
@@ -86,11 +86,16 @@ export default function MarketplaceListingCard({
                   ) : null}
                 </View>
                 {onSavePress ? (
-                  <Pressable accessibilityRole="button" accessibilityLabel={item.is_saved ? t('detail.unsave') : t('detail.save')} onPress={onSavePress}>
-                    <View className="size-9 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.12) }}>
-                      <Ionicons name={item.is_saved ? 'heart' : 'heart-outline'} size={18} color={primary} />
-                    </View>
-                  </Pressable>
+                  <HeroButton
+                    isIconOnly
+                    size="sm"
+                    variant="secondary"
+                    accessibilityLabel={item.is_saved ? t('detail.unsave') : t('detail.save')}
+                    onPress={onSavePress}
+                    style={{ backgroundColor: withAlpha(primary, 0.12) }}
+                  >
+                    <Ionicons name={item.is_saved ? 'heart' : 'heart-outline'} size={18} color={primary} />
+                  </HeroButton>
                 ) : null}
               </View>
 

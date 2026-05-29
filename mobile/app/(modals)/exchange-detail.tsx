@@ -12,7 +12,6 @@ import {
   Share,
   Pressable,
   Alert,
-  TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router, type Href } from 'expo-router';
@@ -48,6 +47,7 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { APP_URL } from '@/lib/constants';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 import Avatar from '@/components/ui/Avatar';
+import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import AppTopBar from '@/components/ui/AppTopBar';
@@ -699,13 +699,15 @@ function ExchangeDetailModalInner() {
             {showComments ? (
               <View className="gap-3 border-t border-border pt-3">
                 <View className="flex-row items-end gap-2">
-                  <TextInput
+                  <Input
                     value={commentText}
                     onChangeText={setCommentText}
                     placeholder={t('detail.commentPlaceholder')}
                     placeholderTextColor={theme.textMuted}
                     multiline
-                    className="min-h-12 flex-1 rounded-button border border-border bg-background px-4 py-3 text-foreground"
+                    className="min-h-12 text-sm"
+                    style={{ color: theme.text, textAlignVertical: 'top' }}
+                    accessibilityLabel={t('detail.commentPlaceholder')}
                   />
                   <HeroButton isIconOnly variant="primary" isDisabled={isCommenting || !commentText.trim()} style={{ backgroundColor: primary }} onPress={() => void handleSubmitComment()}>
                     {isCommenting ? <Spinner size="sm" /> : <Ionicons name="send-outline" size={18} color="#fff" />}
@@ -731,31 +733,31 @@ function ExchangeDetailModalInner() {
               <View className="gap-3 border-t border-border pt-3">
                 <Text className="text-sm font-semibold text-foreground">{t('detail.reportTitle')}</Text>
                 <View className="flex-row flex-wrap gap-2">
-                  {reportReasons.map((reason) => (
-                    <Pressable
-                      key={reason}
-                      onPress={() => setReportReason(reason)}
-                      accessibilityRole="button"
-                      accessibilityState={{ selected: reportReason === reason }}
-                    >
-                      <Chip
-                        color="default"
+                  {reportReasons.map((reason) => {
+                    const selected = reportReason === reason;
+                    return (
+                      <HeroButton
+                        key={reason}
                         size="sm"
-                        variant="soft"
+                        variant={selected ? 'secondary' : 'outline'}
+                        onPress={() => setReportReason(reason)}
+                        accessibilityState={{ selected }}
                       >
-                        <Chip.Label>{t(`detail.reportReason.${reason}`)}</Chip.Label>
-                      </Chip>
-                    </Pressable>
-                  ))}
+                        <HeroButton.Label>{t(`detail.reportReason.${reason}`)}</HeroButton.Label>
+                      </HeroButton>
+                    );
+                  })}
                 </View>
-                <TextInput
+                <Input
                   value={reportDetails}
                   onChangeText={setReportDetails}
                   placeholder={t('detail.reportDetailsPlaceholder')}
                   placeholderTextColor={theme.textMuted}
                   multiline
                   textAlignVertical="top"
-                  className="min-h-20 rounded-button border border-border bg-background px-4 py-3 text-foreground"
+                  className="min-h-20 text-sm"
+                  style={{ color: theme.text, textAlignVertical: 'top' }}
+                  accessibilityLabel={t('detail.reportDetailsPlaceholder')}
                 />
                 <HeroButton variant="danger-soft" isDisabled={isReporting} onPress={() => void handleReportSubmit()}>
                   {isReporting ? <Spinner size="sm" /> : <Ionicons name="flag-outline" size={18} color={theme.error} />}
@@ -806,22 +808,25 @@ function ExchangeDetailModalInner() {
           <HeroCard variant="secondary">
             <HeroCard.Body className="gap-3 px-4 py-4">
               <SectionTitle icon="repeat-outline" title={t('detail.requestExchange')} primary={primary} theme={theme} />
-              <TextInput
+              <Input
                 value={requestHours}
                 onChangeText={setRequestHours}
                 keyboardType="decimal-pad"
                 placeholder={t('detail.requestHoursPlaceholder')}
                 placeholderTextColor={theme.textMuted}
-                className="rounded-button border border-border bg-background px-4 py-3 text-foreground"
+                style={{ color: theme.text }}
+                accessibilityLabel={t('detail.requestHoursPlaceholder')}
               />
-              <TextInput
+              <Input
                 value={requestMessage}
                 onChangeText={setRequestMessage}
                 placeholder={t('detail.requestMessagePlaceholder')}
                 placeholderTextColor={theme.textMuted}
                 multiline
                 textAlignVertical="top"
-                className="min-h-24 rounded-button border border-border bg-background px-4 py-3 text-foreground"
+                className="min-h-24 text-sm"
+                style={{ color: theme.text, textAlignVertical: 'top' }}
+                accessibilityLabel={t('detail.requestMessagePlaceholder')}
               />
               <HeroButton variant="primary" isDisabled={isSubmitting} style={{ backgroundColor: primary }} onPress={() => void handleRequestExchange()}>
                 {isSubmitting ? <Spinner size="sm" /> : <Ionicons name="send-outline" size={18} color="#fff" />}
@@ -914,25 +919,24 @@ function RelatedListingGroup({ title, listings, primary, theme }: { title: strin
       <Text className="text-xs font-semibold uppercase text-muted-foreground">{title}</Text>
       <View className="flex-row flex-wrap gap-2">
         {listings.slice(0, 6).map((item) => (
-          <Pressable
+          <HeroButton
             key={item.id}
+            size="sm"
+            variant="outline"
+            className="rounded-button px-3 py-2"
+            style={{ borderColor: primary }}
             onPress={() => router.push({ pathname: '/(modals)/exchange-detail', params: { id: String(item.id) } })}
-            accessibilityRole="button"
             accessibilityLabel={item.title}
           >
-            <Surface
-              variant="default"
-              className="rounded-button border border-border px-3 py-2"
-              style={{ borderColor: primary }}
-            >
+            <View className="max-w-56 items-start">
               <Text className="max-w-56 text-xs font-semibold" style={{ color: theme.text }} numberOfLines={1}>
                 {item.title}
               </Text>
               {(item.hours_estimate ?? 0) > 0 ? (
                 <Text className="text-[11px]" style={{ color: theme.textMuted }}>{item.hours_estimate}h</Text>
               ) : null}
-            </Surface>
-          </Pressable>
+            </View>
+          </HeroButton>
         ))}
       </View>
     </View>

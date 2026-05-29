@@ -12,7 +12,6 @@ import {
   ScrollView,
   Share,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -56,6 +55,7 @@ import { withAlpha } from '@/lib/utils/color';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
+import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import MarketplaceListingCard from '@/components/marketplace/MarketplaceListingCard';
@@ -511,20 +511,22 @@ function GroupDetailScreenInner() {
             {tabs.map((tab) => {
               const selected = activeTab === tab.key;
               return (
-                <Pressable
+                <HeroButton
                   key={tab.key}
+                  size="sm"
+                  variant={selected ? 'primary' : 'ghost'}
                   onPress={() => {
                     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     setActiveTab(tab.key);
                   }}
-                  className="h-11 min-w-[120px] flex-row items-center justify-center gap-2 rounded-panel-inner px-4"
+                  className="h-11 min-w-[120px] rounded-panel-inner"
                   style={{ backgroundColor: selected ? withAlpha(primary, 0.18) : 'transparent' }}
                 >
                   <Ionicons name={tab.icon} size={16} color={selected ? primary : theme.textSecondary} />
-                  <Text className="text-sm font-semibold" style={{ color: selected ? primary : theme.textSecondary }} numberOfLines={1}>
+                  <HeroButton.Label style={{ color: selected ? primary : theme.textSecondary }}>
                     {tab.label}
-                  </Text>
-                </Pressable>
+                  </HeroButton.Label>
+                </HeroButton>
               );
             })}
           </ScrollView>
@@ -611,22 +613,24 @@ function GroupDetailScreenInner() {
 
                     {showDiscussionComposer ? (
                       <View className="gap-3">
-                        <TextInput
+                        <Input
                           value={discussionTitle}
                           onChangeText={setDiscussionTitle}
                           placeholder={t('detail.discussionTitlePlaceholder')}
                           placeholderTextColor={theme.textMuted}
-                          className="rounded-panel-inner px-4 py-3 text-base"
-                          style={{ backgroundColor: theme.surface, color: theme.text, borderColor: theme.border, borderWidth: 1 }}
+                          className="text-base"
+                          style={{ color: theme.text }}
+                          accessibilityLabel={t('detail.discussionTitlePlaceholder')}
                         />
-                        <TextInput
+                        <Input
                           value={discussionContent}
                           onChangeText={setDiscussionContent}
                           placeholder={t('detail.discussionContentPlaceholder')}
                           placeholderTextColor={theme.textMuted}
                           multiline
-                          className="min-h-[104px] rounded-panel-inner px-4 py-3 text-base"
-                          style={{ backgroundColor: theme.surface, color: theme.text, borderColor: theme.border, borderWidth: 1, textAlignVertical: 'top' }}
+                          className="min-h-[104px] text-base"
+                          style={{ color: theme.text, textAlignVertical: 'top' }}
+                          accessibilityLabel={t('detail.discussionContentPlaceholder')}
                         />
                         <HeroButton isDisabled={creatingDiscussion} onPress={() => void handleCreateDiscussion()}>
                           {creatingDiscussion ? <Spinner size="sm" /> : <HeroButton.Label>{t('detail.publishDiscussion')}</HeroButton.Label>}

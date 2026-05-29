@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, FlatList, Modal, ScrollView, TextInput, View } from 'react-native';
+import { Alert, FlatList, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,7 +12,9 @@ import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface, Text } 
 import { useTranslation } from 'react-i18next';
 
 import AppTopBar from '@/components/ui/AppTopBar';
+import BottomSheet from '@/components/ui/BottomSheet';
 import EmptyState from '@/components/ui/EmptyState';
+import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import {
@@ -1046,9 +1048,8 @@ function CouponsPanel() {
         )}
       />
 
-      <Modal visible={Boolean(redemptionCoupon)} transparent animationType="slide" onRequestClose={() => setRedemptionCoupon(null)}>
-        <View className="flex-1 justify-end bg-black/40">
-          <Surface variant="default" className="max-h-[78%] rounded-t-[28px] p-4">
+      <BottomSheet visible={Boolean(redemptionCoupon)} onClose={() => setRedemptionCoupon(null)} snapPoints={[620]}>
+        <Surface variant="default" className="max-h-[78%] rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <View className="min-w-0 flex-1">
                 <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('tools.coupons.redemptionsTitle')}</Text>
@@ -1069,9 +1070,8 @@ function CouponsPanel() {
                 ))}
               </ScrollView>
             )}
-          </Surface>
-        </View>
-      </Modal>
+        </Surface>
+      </BottomSheet>
     </PanelCard>
   );
 }
@@ -1308,15 +1308,16 @@ function FormInput({
   return (
     <View className="gap-2">
       <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{label}</Text>
-      <TextInput
-        className={`${multiline ? 'min-h-24 py-3' : 'min-h-12'} rounded-panel-inner border px-3 text-sm`}
-        style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg, textAlignVertical: multiline ? 'top' : 'center' }}
+      <Input
+        className={`${multiline ? 'min-h-24' : 'min-h-12'} text-sm`}
+        style={{ color: theme.text, textAlignVertical: multiline ? 'top' : 'center' }}
         placeholder={placeholder}
         placeholderTextColor={theme.textMuted}
         value={value}
         onChangeText={onChangeText}
         keyboardType={keyboardType}
         multiline={multiline}
+        accessibilityLabel={label}
       />
     </View>
   );

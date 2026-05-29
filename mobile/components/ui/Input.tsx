@@ -12,6 +12,8 @@ interface InputProps extends TextInputProps {
   error?: string;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
+  containerClassName?: string;
+  inputClassName?: string;
 }
 
 const Input = forwardRef<TextInput, InputProps>(function Input(
@@ -20,6 +22,8 @@ const Input = forwardRef<TextInput, InputProps>(function Input(
     error,
     leftIcon,
     rightIcon,
+    containerClassName,
+    inputClassName,
     style,
     editable,
     ...rest
@@ -29,7 +33,7 @@ const Input = forwardRef<TextInput, InputProps>(function Input(
   const isDisabled = editable === false;
 
   return (
-    <TextField isInvalid={!!error} isDisabled={isDisabled} className="mb-3">
+    <TextField isInvalid={!!error} isDisabled={isDisabled} className={containerClassName ?? 'mb-3'}>
       {label ? (
         <Label className="mb-1.5 text-sm font-semibold">{label}</Label>
       ) : null}
@@ -42,7 +46,7 @@ const Input = forwardRef<TextInput, InputProps>(function Input(
           isInvalid={!!error}
           isDisabled={isDisabled}
           style={[leftIcon ? { paddingLeft: 40 } : undefined, rightIcon ? { paddingRight: 40 } : undefined, style]}
-          className="flex-1"
+          className={inputClassName ?? 'flex-1'}
           {...rest}
         />
         {rightIcon ? (

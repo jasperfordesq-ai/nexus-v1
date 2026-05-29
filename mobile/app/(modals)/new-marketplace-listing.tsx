@@ -4,17 +4,19 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useState } from 'react';
-import { Alert, Image, ScrollView, TextInput, View } from 'react-native';
+import { Alert, Image, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Button as HeroButton, Card as HeroCard, Switch, Text } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Text } from 'heroui-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useTranslation } from 'react-i18next';
 import * as Haptics from '@/lib/haptics';
 
 import AppTopBar from '@/components/ui/AppTopBar';
 import FormActionFooter from '@/components/ui/FormActionFooter';
+import Input from '@/components/ui/Input';
+import Toggle from '@/components/ui/Toggle';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import {
   createMarketplaceListing,
@@ -633,7 +635,7 @@ function SwitchRow({ label, value, onValueChange }: { label: string; value: bool
   return (
     <View className="min-h-11 flex-row items-center justify-between gap-3">
       <Text className="flex-1 text-sm font-semibold" style={{ color: theme.text }}>{label}</Text>
-      <Switch isSelected={value} onSelectedChange={onValueChange} />
+      <Toggle value={value} onValueChange={onValueChange} />
     </View>
   );
 }
@@ -784,15 +786,16 @@ function FormField({
   return (
     <View className="gap-2">
       <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{label}</Text>
-      <TextInput
-        className={`${multiline ? 'min-h-28 py-3' : 'min-h-12'} rounded-panel-inner border px-3 text-sm`}
-        style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg, textAlignVertical: multiline ? 'top' : 'center' }}
+      <Input
+        className={`${multiline ? 'min-h-28' : 'min-h-12'} text-sm`}
+        style={{ color: theme.text, textAlignVertical: multiline ? 'top' : 'center' }}
         placeholder={placeholder}
         placeholderTextColor={theme.textMuted}
         value={value}
         onChangeText={onChangeText}
         multiline={multiline}
         keyboardType={keyboardType}
+        accessibilityLabel={label}
       />
     </View>
   );

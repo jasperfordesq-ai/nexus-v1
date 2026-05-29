@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Alert, Image, Modal, Share, View } from 'react-native';
+import { Alert, Image, Share, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppTopBar from '@/components/ui/AppTopBar';
+import BottomSheet from '@/components/ui/BottomSheet';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
@@ -100,9 +101,8 @@ function MarketplaceCouponDetailScreen() {
         </View>
       )}
 
-      <Modal visible={isQrOpen} transparent animationType="slide" onRequestClose={() => setIsQrOpen(false)}>
-        <View className="flex-1 justify-end bg-black/40">
-          <Surface variant="default" className="rounded-t-[28px] p-4">
+      <BottomSheet visible={isQrOpen} onClose={() => setIsQrOpen(false)} snapPoints={[500]}>
+        <Surface variant="default" className="rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <View className="min-w-0 flex-1">
                 <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('publicCoupons.showQr')}</Text>
@@ -124,9 +124,8 @@ function MarketplaceCouponDetailScreen() {
                 </Surface>
               </View>
             ) : null}
-          </Surface>
-        </View>
-      </Modal>
+        </Surface>
+      </BottomSheet>
     </SafeAreaView>
   );
 }

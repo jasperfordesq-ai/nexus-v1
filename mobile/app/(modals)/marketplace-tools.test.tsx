@@ -193,6 +193,13 @@ jest.mock('@/components/ui/LoadingSpinner', () => {
   const { Text } = require('react-native');
   return () => <Text>Loading</Text>;
 });
+jest.mock('@/components/ui/BottomSheet', () => ({
+  __esModule: true,
+  default: ({ visible, children }: { visible: boolean; children: React.ReactNode }) => {
+    const { View } = require('react-native');
+    return visible ? <View>{children}</View> : null;
+  },
+}));
 
 jest.mock('@/lib/hooks/useAuth', () => ({
   useAuth: () => mockAuthState,

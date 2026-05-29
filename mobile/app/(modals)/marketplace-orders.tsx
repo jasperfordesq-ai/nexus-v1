@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useState, type ComponentProps } from 'react';
-import { Alert, FlatList, Image, Linking, Modal, ScrollView, TextInput, View } from 'react-native';
+import { Alert, FlatList, Image, Linking, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -13,7 +13,9 @@ import { useTranslation } from 'react-i18next';
 
 import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
+import BottomSheet from '@/components/ui/BottomSheet';
 import EmptyState from '@/components/ui/EmptyState';
+import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import {
@@ -455,9 +457,8 @@ function MarketplaceOrdersScreen() {
         onEndReachedThreshold={0.35}
       />
 
-      <Modal visible={Boolean(shipOrder)} transparent animationType="slide" onRequestClose={() => setShipOrder(null)}>
-        <View className="flex-1 justify-end bg-black/40">
-          <Surface variant="default" className="rounded-t-[28px] p-4">
+      <BottomSheet visible={Boolean(shipOrder)} onClose={() => setShipOrder(null)} snapPoints={[520]}>
+        <Surface variant="default" className="rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('orders.shipTitle')}</Text>
               <HeroButton isIconOnly variant="secondary" onPress={() => setShipOrder(null)}>
@@ -483,13 +484,11 @@ function MarketplaceOrdersScreen() {
                 <HeroButton.Label>{t('orders.confirmShipped')}</HeroButton.Label>
               </HeroButton>
             </View>
-          </Surface>
-        </View>
-      </Modal>
+        </Surface>
+      </BottomSheet>
 
-      <Modal visible={Boolean(cancelOrder)} transparent animationType="slide" onRequestClose={() => setCancelOrder(null)}>
-        <View className="flex-1 justify-end bg-black/40">
-          <Surface variant="default" className="rounded-t-[28px] p-4">
+      <BottomSheet visible={Boolean(cancelOrder)} onClose={() => setCancelOrder(null)} snapPoints={[360]}>
+        <Surface variant="default" className="rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('orders.cancelTitle')}</Text>
               <HeroButton isIconOnly variant="secondary" onPress={() => setCancelOrder(null)}>
@@ -503,13 +502,11 @@ function MarketplaceOrdersScreen() {
                 <HeroButton.Label>{t('orders.confirmCancel')}</HeroButton.Label>
               </HeroButton>
             </View>
-          </Surface>
-        </View>
-      </Modal>
+        </Surface>
+      </BottomSheet>
 
-      <Modal visible={Boolean(rateOrder)} transparent animationType="slide" onRequestClose={() => setRateOrder(null)}>
-        <View className="flex-1 justify-end bg-black/40">
-          <Surface variant="default" className="rounded-t-[28px] p-4">
+      <BottomSheet visible={Boolean(rateOrder)} onClose={() => setRateOrder(null)} snapPoints={[520]}>
+        <Surface variant="default" className="rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('orders.rateTitle')}</Text>
               <HeroButton isIconOnly variant="secondary" onPress={() => setRateOrder(null)}>
@@ -544,13 +541,11 @@ function MarketplaceOrdersScreen() {
                 <HeroButton.Label>{t('orders.submitRating')}</HeroButton.Label>
               </HeroButton>
             </View>
-          </Surface>
-        </View>
-      </Modal>
+        </Surface>
+      </BottomSheet>
 
-      <Modal visible={Boolean(disputeOrder)} transparent animationType="slide" onRequestClose={() => setDisputeOrder(null)}>
-        <View className="flex-1 justify-end bg-black/40">
-          <Surface variant="default" className="max-h-[86%] rounded-t-[28px] p-4">
+      <BottomSheet visible={Boolean(disputeOrder)} onClose={() => setDisputeOrder(null)} snapPoints={[640]}>
+        <Surface variant="default" className="max-h-[86%] rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('orders.disputeTitle')}</Text>
               <HeroButton isIconOnly variant="secondary" onPress={() => setDisputeOrder(null)}>
@@ -580,13 +575,11 @@ function MarketplaceOrdersScreen() {
                 <HeroButton.Label>{t('orders.submitDispute')}</HeroButton.Label>
               </HeroButton>
             </ScrollView>
-          </Surface>
-        </View>
-      </Modal>
+        </Surface>
+      </BottomSheet>
 
-      <Modal visible={Boolean(deliveryOrder)} transparent animationType="slide" onRequestClose={() => setDeliveryOrder(null)}>
-        <View className="flex-1 justify-end bg-black/40">
-          <Surface variant="default" className="max-h-[86%] rounded-t-[28px] p-4">
+      <BottomSheet visible={Boolean(deliveryOrder)} onClose={() => setDeliveryOrder(null)} snapPoints={[640]}>
+        <Surface variant="default" className="max-h-[86%] rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <View className="min-w-0 flex-1">
                 <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('orders.deliveryOffersTitle')}</Text>
@@ -613,9 +606,8 @@ function MarketplaceOrdersScreen() {
                 ))}
               </ScrollView>
             )}
-          </Surface>
-        </View>
-      </Modal>
+        </Surface>
+      </BottomSheet>
     </SafeAreaView>
   );
 }
@@ -915,14 +907,15 @@ function OrderInput({
   return (
     <View className="gap-2">
       <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{label}</Text>
-      <TextInput
-        className={`${multiline ? 'min-h-24 py-3' : 'min-h-12'} rounded-panel-inner border px-3 text-sm`}
-        style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg, textAlignVertical: multiline ? 'top' : 'center' }}
+      <Input
+        className={`${multiline ? 'min-h-24' : 'min-h-12'} text-sm`}
+        style={{ color: theme.text, textAlignVertical: multiline ? 'top' : 'center' }}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
         placeholderTextColor={theme.textMuted}
         multiline={multiline}
+        accessibilityLabel={label}
       />
     </View>
   );

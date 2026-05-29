@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, FlatList, RefreshControl, ScrollView, TextInput, View } from 'react-native';
+import { Alert, FlatList, RefreshControl, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import MarketplaceListingCard from '@/components/marketplace/MarketplaceListingCard';
 import AppTopBar from '@/components/ui/AppTopBar';
 import EmptyState from '@/components/ui/EmptyState';
+import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import {
@@ -215,18 +216,21 @@ function MarketplaceSearchScreen() {
                 </View>
 
                 <Surface variant="secondary" className="rounded-panel-inner px-3 py-3">
-                  <View className="flex-row items-center gap-2">
-                    <Ionicons name="search-outline" size={18} color={theme.textMuted} />
-                    <TextInput
-                      className="min-h-10 flex-1 text-sm"
-                      style={{ color: theme.text }}
-                      placeholder={t('advancedSearch.placeholder')}
-                      placeholderTextColor={theme.textMuted}
-                      value={query}
-                      onChangeText={setQuery}
-                      returnKeyType="search"
-                    />
-                  </View>
+                  <Input
+                    style={{ color: theme.text }}
+                    placeholder={t('advancedSearch.placeholder')}
+                    placeholderTextColor={theme.textMuted}
+                    value={query}
+                    onChangeText={setQuery}
+                    returnKeyType="search"
+                    accessibilityLabel={t('advancedSearch.placeholder')}
+                    leftIcon={<Ionicons name="search-outline" size={18} color={theme.textMuted} />}
+                    rightIcon={query.length > 0 ? (
+                      <HeroButton isIconOnly size="sm" variant="ghost" accessibilityLabel={t('search.clear')} onPress={() => setQuery('')}>
+                        <Ionicons name="close-circle" size={18} color={theme.textMuted} />
+                      </HeroButton>
+                    ) : null}
+                  />
                 </Surface>
 
                 <View className="flex-row gap-2">
@@ -334,15 +338,11 @@ function FilterInput({
   onChangeText: (value: string) => void;
   placeholder: string;
 }) {
-  const theme = useTheme();
   return (
-    <View className="min-w-0 flex-1 gap-2">
-      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{label}</Text>
-      <TextInput
-        className="min-h-12 rounded-panel-inner border px-3 text-sm"
-        style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg }}
+    <View className="min-w-0 flex-1">
+      <Input
+        label={label}
         placeholder={placeholder}
-        placeholderTextColor={theme.textMuted}
         value={value}
         onChangeText={onChangeText}
         keyboardType="decimal-pad"

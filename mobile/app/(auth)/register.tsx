@@ -10,7 +10,6 @@ import { z } from 'zod';
 import {
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   Text,
   View,
@@ -19,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { router, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Card as HeroCard } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 
 import { extractToken, register as apiRegister } from '@/lib/api/auth';
@@ -118,18 +117,19 @@ export default function RegisterScreen() {
   }
 
   const EyeToggle = ({ show, onToggle }: { show: boolean; onToggle: () => void }) => (
-    <Pressable
+    <HeroButton
+      isIconOnly
+      size="sm"
+      variant="ghost"
       onPress={onToggle}
       accessibilityLabel={t('register.togglePassword')}
-      accessibilityRole="button"
-      hitSlop={8}
     >
       <Ionicons
         name={show ? 'eye-off-outline' : 'eye-outline'}
         size={20}
         className="text-muted-foreground"
       />
-    </Pressable>
+    </HeroButton>
   );
 
   return (

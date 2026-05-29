@@ -13,7 +13,6 @@ import {
   Pressable,
   RefreshControl,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -32,6 +31,7 @@ import { useRealtimeContext } from '@/lib/context/RealtimeContext';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
+import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import OfflineBanner from '@/components/OfflineBanner';
@@ -440,8 +440,9 @@ function ThreadScreenInner() {
           className="flex-row items-end gap-2 border-t border-border/50 px-3 py-2.5"
           style={{ paddingBottom: Math.max(10, insets.bottom) }}
         >
-          <TextInput
-            className="min-h-[44px] max-h-[120px] flex-1 rounded-[22px] border border-border px-4 pb-2.5 pt-2.5 text-[15px]"
+          <Input
+            containerClassName="mb-0 flex-1"
+            inputClassName="min-h-[44px] max-h-[120px] flex-1 rounded-[22px] border border-border px-4 pb-2.5 pt-2.5 text-[15px]"
             style={{ color: theme.text, backgroundColor: theme.bg }}
             value={inputText}
             onChangeText={setInputText}
@@ -622,41 +623,49 @@ function MessageBubble({
         {hasReactions ? (
           <View className="flex-row flex-wrap gap-1.5">
             {Object.entries(reactions).map(([emoji, count]) => (
-              <Pressable
+              <HeroButton
                 key={emoji}
+                size="sm"
+                variant="outline"
                 accessibilityRole="button"
                 accessibilityLabel={t('thread.toggleReaction', { emoji })}
-                className="flex-row items-center gap-1 rounded-full border border-border bg-surface px-2 py-1"
+                className="rounded-full px-2 py-1"
                 onPress={() => onReact(item.id, emoji)}
               >
                 <Text className="text-xs">{emoji}</Text>
                 <Text className="text-[11px] font-semibold" style={{ color: theme.textSecondary }}>{count}</Text>
-              </Pressable>
+              </HeroButton>
             ))}
           </View>
         ) : null}
         {!item.is_deleted ? (
           <View className="flex-row flex-wrap gap-1">
             {REACTION_EMOJIS.slice(0, 3).map((emoji) => (
-              <Pressable
+              <HeroButton
                 key={emoji}
+                isIconOnly
+                size="sm"
+                variant="secondary"
                 accessibilityRole="button"
                 accessibilityLabel={t('thread.reactWith', { emoji })}
-                className="h-8 w-8 items-center justify-center rounded-full bg-surface"
+                className="h-8 w-8 rounded-full"
                 onPress={() => onReact(item.id, emoji)}
               >
                 <Text className="text-sm">{emoji}</Text>
-              </Pressable>
+              </HeroButton>
             ))}
             {!item.is_voice ? (
-              <Pressable
+              <HeroButton
+                isIconOnly
+                size="sm"
+                variant="secondary"
                 accessibilityRole="button"
                 accessibilityLabel={t('thread.messageOptions')}
-                className="h-8 w-8 items-center justify-center rounded-full bg-surface"
+                className="h-8 w-8 rounded-full"
                 onPress={() => onOptions(item)}
               >
                 <Ionicons name="ellipsis-horizontal" size={16} color={theme.textSecondary} />
-              </Pressable>
+              </HeroButton>
             ) : null}
           </View>
         ) : null}

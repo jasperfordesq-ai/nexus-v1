@@ -118,6 +118,13 @@ jest.mock('@/lib/hooks/useTheme', () => ({
 jest.mock('@expo/vector-icons', () => ({ Ionicons: 'View' }));
 jest.mock('@/components/ui/Avatar', () => 'View');
 jest.mock('@/components/ui/LoadingSpinner', () => () => null);
+jest.mock('@/components/ui/BottomSheet', () => ({
+  __esModule: true,
+  default: ({ visible, children }: { visible: boolean; children: React.ReactNode }) => {
+    const { View } = require('react-native');
+    return visible ? <View>{children}</View> : null;
+  },
+}));
 jest.mock('@/lib/utils/resolveImageUrl', () => ({
   resolveImageUrl: (value?: string | null) => value ?? null,
 }));

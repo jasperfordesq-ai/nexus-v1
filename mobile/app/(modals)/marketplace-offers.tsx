@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState } from 'react';
-import { Alert, FlatList, Image, TextInput, View } from 'react-native';
+import { Alert, FlatList, Image, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
+import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import {
@@ -298,26 +299,28 @@ function OfferCard({
           <Surface variant="secondary" className="gap-3 rounded-panel-inner p-3">
             <View className="gap-2">
               <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('offers.counterAmount')}</Text>
-              <TextInput
-                className="min-h-12 rounded-panel-inner border px-3 text-sm"
-                style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg }}
+              <Input
+                className="min-h-12 text-sm"
+                style={{ color: theme.text }}
                 placeholder={t('offers.amountPlaceholder')}
                 placeholderTextColor={theme.textMuted}
                 keyboardType="decimal-pad"
                 value={counterAmount}
                 onChangeText={setCounterAmount}
+                accessibilityLabel={t('offers.counterAmount')}
               />
             </View>
             <View className="gap-2">
               <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('offers.counterMessage')}</Text>
-              <TextInput
-                className="min-h-20 rounded-panel-inner border px-3 py-2 text-sm"
-                style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg, textAlignVertical: 'top' }}
+              <Input
+                className="min-h-20 text-sm"
+                style={{ color: theme.text, textAlignVertical: 'top' }}
                 placeholder={t('offers.counterMessagePlaceholder')}
                 placeholderTextColor={theme.textMuted}
                 multiline
                 value={counterMessage}
                 onChangeText={setCounterMessage}
+                accessibilityLabel={t('offers.counterMessage')}
               />
             </View>
             <View className="flex-row gap-2">

@@ -328,39 +328,37 @@ function ApplicationCard({
             {t('applications.interview_proposed')}
           </Text>
           <View className="flex-row gap-2">
-            <Pressable
-              className="px-3 py-1.5 rounded-lg"
+            <HeroButton
+              size="sm"
+              variant="primary"
+              className="rounded-lg"
               style={{ backgroundColor: primary }}
-              disabled={actionLoading}
+              isDisabled={actionLoading}
               onPress={async () => {
                 setActionLoading(true);
                 const ok = await acceptInterview(interview.id);
                 setActionLoading(false);
                 if (ok) onInterviewAccepted(interview.id);
               }}
-              accessibilityRole="button"
               accessibilityLabel={t('applications.accept_interview')}
             >
-              <Text className="text-[13px] font-semibold text-white">{/* contrast on primary */}
-                {t('applications.accept_interview')}
-              </Text>
-            </Pressable>
-            <Pressable
-              className="px-3 py-1.5 rounded-lg bg-surface border border-border"
-              disabled={actionLoading}
+              <HeroButton.Label>{t('applications.accept_interview')}</HeroButton.Label>
+            </HeroButton>
+            <HeroButton
+              size="sm"
+              variant="danger"
+              className="rounded-lg"
+              isDisabled={actionLoading}
               onPress={async () => {
                 setActionLoading(true);
                 const ok = await declineInterview(interview.id);
                 setActionLoading(false);
                 if (ok) onInterviewDeclined(interview.id);
               }}
-              accessibilityRole="button"
               accessibilityLabel={t('applications.decline_interview')}
             >
-              <Text className="text-[13px] font-semibold text-danger">
-                {t('applications.decline_interview')}
-              </Text>
-            </Pressable>
+              <HeroButton.Label>{t('applications.decline_interview')}</HeroButton.Label>
+            </HeroButton>
           </View>
         </View>
       ) : interview?.status === 'accepted' ? (
@@ -380,39 +378,37 @@ function ApplicationCard({
             {t('applications.offer_received')}
           </Text>
           <View className="flex-row gap-2">
-            <Pressable
-              className="px-3 py-1.5 rounded-lg"
+            <HeroButton
+              size="sm"
+              variant="primary"
+              className="rounded-lg"
               style={{ backgroundColor: theme.success }}
-              disabled={actionLoading}
+              isDisabled={actionLoading}
               onPress={async () => {
                 setActionLoading(true);
                 const ok = await acceptOffer(offer.id);
                 setActionLoading(false);
                 if (ok) onOfferAccepted(offer.id);
               }}
-              accessibilityRole="button"
               accessibilityLabel={t('applications.accept_offer')}
             >
-              <Text className="text-[13px] font-semibold text-white">{/* contrast on primary */}
-                {t('applications.accept_offer')}
-              </Text>
-            </Pressable>
-            <Pressable
-              className="px-3 py-1.5 rounded-lg bg-surface border border-border"
-              disabled={actionLoading}
+              <HeroButton.Label>{t('applications.accept_offer')}</HeroButton.Label>
+            </HeroButton>
+            <HeroButton
+              size="sm"
+              variant="danger"
+              className="rounded-lg"
+              isDisabled={actionLoading}
               onPress={async () => {
                 setActionLoading(true);
                 const ok = await rejectOffer(offer.id);
                 setActionLoading(false);
                 if (ok) onOfferRejected(offer.id);
               }}
-              accessibilityRole="button"
               accessibilityLabel={t('applications.decline_offer')}
             >
-              <Text className="text-[13px] font-semibold text-danger">
-                {t('applications.decline_offer')}
-              </Text>
-            </Pressable>
+              <HeroButton.Label>{t('applications.decline_offer')}</HeroButton.Label>
+            </HeroButton>
           </View>
         </View>
       ) : offer?.status === 'accepted' ? (
@@ -618,53 +614,30 @@ export default function JobsScreen() {
 
       <Surface variant="secondary" className="mx-4 mb-3 rounded-panel-inner p-1">
         {/* Tab bar */}
-        <View className="min-w-0 flex-row">
-        <Pressable
-          className="flex-1 items-center rounded-panel-inner py-2.5"
-          style={{ backgroundColor: activeTab === 'browse' ? primary : 'transparent' }}
-          onPress={() => setActiveTab('browse')}
-          accessibilityRole="tab"
-          accessibilityState={{ selected: activeTab === 'browse' }}
-          accessibilityLabel={t('tabs.browse')}
-        >
-          <Text
-            className="text-sm font-semibold"
-            style={{ color: activeTab === 'browse' ? '#fff' : theme.textSecondary }}
-          >
-            {t('tabs.browse')}
-          </Text>
-        </Pressable>
-        <Pressable
-          className="flex-1 items-center rounded-panel-inner py-2.5"
-          style={{ backgroundColor: activeTab === 'myApplications' ? primary : 'transparent' }}
-          onPress={() => setActiveTab('myApplications')}
-          accessibilityRole="tab"
-          accessibilityState={{ selected: activeTab === 'myApplications' }}
-          accessibilityLabel={t('tabs.myApplications')}
-        >
-          <Text
-            className="text-sm font-semibold"
-            style={{ color: activeTab === 'myApplications' ? '#fff' : theme.textSecondary }}
-          >
-            {t('tabs.myApplications')}
-          </Text>
-        </Pressable>
-        <Pressable
-          className="flex-1 items-center rounded-panel-inner py-2.5"
-          style={{ backgroundColor: activeTab === 'myPostings' ? primary : 'transparent' }}
-          onPress={() => setActiveTab('myPostings')}
-          accessibilityRole="tab"
-          accessibilityState={{ selected: activeTab === 'myPostings' }}
-          accessibilityLabel={t('tabs.myPostings')}
-        >
-          <Text
-            className="text-sm font-semibold"
-            style={{ color: activeTab === 'myPostings' ? '#fff' : theme.textSecondary }}
-            numberOfLines={1}
-          >
-            {t('tabs.myPostings')}
-          </Text>
-        </Pressable>
+        <View className="min-w-0 flex-row gap-1">
+          {(['browse', 'myApplications', 'myPostings'] as const).map((tab) => {
+            const selected = activeTab === tab;
+            return (
+              <HeroButton
+                key={tab}
+                size="sm"
+                variant={selected ? 'primary' : 'ghost'}
+                className="min-w-0 flex-1 rounded-panel-inner"
+                style={{ backgroundColor: selected ? primary : 'transparent' }}
+                onPress={() => setActiveTab(tab)}
+                accessibilityRole="tab"
+                accessibilityState={{ selected }}
+                accessibilityLabel={t(`tabs.${tab}`)}
+              >
+                <HeroButton.Label
+                  style={{ color: selected ? '#fff' : theme.textSecondary }}
+                  numberOfLines={1}
+                >
+                  {t(`tabs.${tab}`)}
+                </HeroButton.Label>
+              </HeroButton>
+            );
+          })}
         </View>
       </Surface>
 
@@ -750,9 +723,9 @@ export default function JobsScreen() {
               ) : jobsError ? (
                 <View className="flex-1 justify-center items-center p-10">
                   <Text className="text-sm text-danger text-center">{jobsError}</Text>
-                  <Pressable onPress={refreshJobs} className="mt-3">
-                    <Text style={{ color: primary }} className="text-sm font-semibold">{t('retry', 'Retry')}</Text>
-                  </Pressable>
+                  <HeroButton variant="secondary" size="sm" onPress={refreshJobs} className="mt-3">
+                    <HeroButton.Label>{t('retry')}</HeroButton.Label>
+                  </HeroButton>
                 </View>
               ) : (
                 <EmptyState
@@ -792,9 +765,9 @@ export default function JobsScreen() {
             ) : appsError ? (
               <View className="flex-1 justify-center items-center p-10">
                 <Text className="text-sm text-danger text-center">{appsError}</Text>
-                <Pressable onPress={refreshApps} className="mt-3">
-                  <Text style={{ color: primary }} className="text-sm font-semibold">{t('retry', 'Retry')}</Text>
-                </Pressable>
+                <HeroButton variant="secondary" size="sm" onPress={refreshApps} className="mt-3">
+                  <HeroButton.Label>{t('retry')}</HeroButton.Label>
+                </HeroButton>
               </View>
             ) : (
               <EmptyState
@@ -833,9 +806,9 @@ export default function JobsScreen() {
             ) : postingsError ? (
               <View className="flex-1 justify-center items-center p-10">
                 <Text className="text-sm text-danger text-center">{postingsError}</Text>
-                <Pressable onPress={refreshPostings} className="mt-3">
-                  <Text style={{ color: primary }} className="text-sm font-semibold">{t('retry', 'Retry')}</Text>
-                </Pressable>
+                <HeroButton variant="secondary" size="sm" onPress={refreshPostings} className="mt-3">
+                  <HeroButton.Label>{t('retry')}</HeroButton.Label>
+                </HeroButton>
               </View>
             ) : (
               <EmptyState

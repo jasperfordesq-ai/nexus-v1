@@ -35,6 +35,7 @@ jest.mock('react-i18next', () => ({
         'category.emptyTitle': 'No listings in this category',
         'category.emptySubtitle': 'Try another search or browse the full marketplace.',
         'search.placeholder': 'Search marketplace...',
+        'search.clear': 'Clear marketplace search',
         'actions.browse': 'Browse marketplace',
         'condition.new': 'New',
         'condition.like_new': 'Like new',
@@ -123,6 +124,20 @@ describe('MarketplaceCategoryRoute', () => {
       expect(getMarketplaceListings).toHaveBeenLastCalledWith(expect.objectContaining({
         category_id: 12,
         condition: 'new,good',
+      }));
+    });
+  });
+
+  it('sends shared input-backed search and price filters', async () => {
+    const { getByPlaceholderText } = render(<MarketplaceCategoryRoute />);
+
+    fireEvent.changeText(getByPlaceholderText('Search marketplace...'), 'drill');
+    fireEvent.changeText(getByPlaceholderText('0'), '5');
+
+    await waitFor(() => {
+      expect(getMarketplaceListings).toHaveBeenLastCalledWith(expect.objectContaining({
+        q: 'drill',
+        price_min: '5',
       }));
     });
   });
