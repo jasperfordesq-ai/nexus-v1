@@ -64,22 +64,22 @@ const supportChoices = [
   {
     id: 'standard',
     title: 'Included support',
-    plainEnglish: 'Best when you have someone technical who can wait for normal response times.',
+    plainEnglish: 'Solo-led by default, best when you can work through normal async response times.',
   },
   {
     id: 'priority',
-    title: 'Priority helpdesk',
-    plainEnglish: 'A better fit when staff need quicker answers during business hours.',
+    title: 'Priority async support',
+    plainEnglish: 'A better fit when staff need a shared channel, clearer routing, and planned business-hours help.',
   },
   {
     id: 'managed',
-    title: 'Managed operations',
-    plainEnglish: 'For organisations that want a named technical lead and regular operational reviews.',
+    title: 'Managed support retainer',
+    plainEnglish: 'For organisations that want a named technical lead, release planning, and regular operational reviews.',
   },
   {
     id: 'mission-critical',
-    title: 'Critical incident cover',
-    plainEnglish: 'For high-stakes services that need agreed escalation windows and incident follow-up.',
+    title: 'Major-client support retainer',
+    plainEnglish: 'For high-stakes services where the contract funds escalation windows and external incident partner capacity.',
   },
 ];
 
@@ -432,7 +432,7 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
 
                   <ChoiceCardSection
                     title="5. What support do you want us to provide?"
-                    description="Support changes how quickly and closely we help after launch."
+                    description="Support is solo-led by default. Higher commitments require a paid retainer, agreed cover windows, and contract-funded support cover."
                     choices={supportChoices}
                     options={supportTiers}
                     cadence="monthly"

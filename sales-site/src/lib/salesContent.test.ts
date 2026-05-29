@@ -104,18 +104,38 @@ describe('sales-site public content policy', () => {
     expect(featuresPage).not.toContain('className="grid module-grid gap-4"');
   });
 
-  it('keeps the hosting page focused on pricing and order flow, not public competitor comparison cards', () => {
+  it('shows concise public market positioning without turning the page into a research appendix', () => {
     const hostingPage = readFileSync(resolve(__dirname, '..', 'components', 'HostingPage.tsx'), 'utf8');
+    const pricing = readFileSync(resolve(__dirname, '..', 'data', 'pricing.ts'), 'utf8');
+    const publicCopy = `${hostingPage}\n${pricing}`;
 
+    expect(pricing).toContain('export const competitorBenchmarks');
+    expect(hostingPage).toContain('Market position');
+    expect(publicCopy).toContain('cheap-to-middle');
+    expect(publicCopy).toContain('Timebanking tools');
+    expect(publicCopy).toContain('Volunteer management');
+    expect(publicCopy).toContain('Made Open');
+    expect(publicCopy).toContain('Circle');
+    expect(publicCopy).toContain('BetterMode');
     expect(hostingPage).not.toContain('ComparisonWorkbench');
     expect(hostingPage).not.toContain('ModuleMatrix');
     expect(hostingPage).not.toContain('SourceDrawer');
     expect(hostingPage).not.toContain('selectedCompetitorId');
-    expect(hostingPage).not.toContain('Compare competitors');
-    expect(hostingPage).not.toContain('Made Open');
-    expect(hostingPage).not.toContain('Community Timebanks benchmark');
-    expect(hostingPage).not.toContain('GBP');
-    expect(hostingPage).toContain('Community Edition details');
+  });
+
+  it('keeps support commitments realistic for a solo-led service unless cover is contract-funded', () => {
+    const pricing = readFileSync(resolve(__dirname, '..', 'data', 'pricing.ts'), 'utf8');
+    const hostingPage = readFileSync(resolve(__dirname, '..', 'components', 'HostingPage.tsx'), 'utf8');
+    const quoteBuilder = readFileSync(resolve(__dirname, '..', 'components', 'QuoteBuilder.tsx'), 'utf8');
+    const publicCopy = `${pricing}\n${hostingPage}\n${quoteBuilder}`;
+
+    expect(publicCopy).not.toContain('30-minute P1 response');
+    expect(publicCopy).not.toContain('1 business hour / 4 hours out of hours');
+    expect(publicCopy).not.toContain('2-hour business response');
+    expect(publicCopy).toContain('Solo-led by default');
+    expect(publicCopy).toContain('contract-funded support cover');
+    expect(publicCopy).toContain('external incident partner');
+    expect(publicCopy).toContain('Major-client support retainer');
   });
 
   it('shows a prominent launch pricing note before buyers reach the calculator', () => {
@@ -150,7 +170,6 @@ describe('sales-site public content policy', () => {
     expect(pricing).toContain("id: 'community-edition'");
     expect(pricing).toContain('annualMonthlyEur: 29');
     expect(pricing).not.toContain('comparisonMonthlyGbp');
-    expect(`${pricing}\n${hostingPage}\n${quoteBuilder}`).not.toContain('Made Open');
     expect(hostingPage).toContain('A cheaper way in, without cheapening the platform.');
     expect(quoteBuilder).toContain('Feature-limited on purpose.');
   });

@@ -108,9 +108,9 @@ describe('pricingEngine', () => {
     });
 
     expect(quote.hostingPlan.id).toBe('spark');
-    expect(quote.monthlyRecurring).toBe(99 + 299 + 199 + 50 + 199);
+    expect(quote.monthlyRecurring).toBe(99 + 399 + 199 + 50 + 199);
     expect(quote.oneOffTotal).toBe(750 + 950 + 3000);
-    expect(quote.lineItems.some((item) => item.label === 'Priority support')).toBe(true);
+    expect(quote.lineItems.some((item) => item.label === 'Priority async support')).toBe(true);
   });
 
   it('routes dedicated managed server enquiries to custom pricing with a starting-from signal', () => {

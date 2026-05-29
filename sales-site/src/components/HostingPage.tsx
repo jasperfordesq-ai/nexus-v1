@@ -9,6 +9,7 @@ import { useCallback } from 'react';
 
 import {
   communityTimebankPlans,
+  competitorBenchmarks,
   hostingPlans,
 } from '../data/pricing';
 import { formatCurrency } from '../lib/pricingEngine';
@@ -156,6 +157,31 @@ export default function HostingPage({ onNavigate }: HostingPageProps) {
 
       <section className="nexus-section-shell">
         <div className="mx-auto max-w-7xl px-5 py-16">
+          <SectionHeader eyebrow="Market position" title="Cheap-to-middle by category; strongest value on breadth.">
+            Against free timebanking tools, NEXUS is not the cheapest possible route. Against managed community platforms, volunteer systems, and B2B community suites, the published pricing is cheap-to-middle because most full-platform features are not locked behind custom enterprise-only pricing.
+          </SectionHeader>
+          <div className="grid gap-4 lg:grid-cols-2">
+            {competitorBenchmarks.map((benchmark) => (
+              <SurfaceCard key={benchmark.segment} tone="subtle" className="p-5">
+                <div className="flex flex-wrap items-center gap-3">
+                  <Chip color="accent" variant="soft">
+                    {benchmark.segment}
+                  </Chip>
+                  <span className="text-xs font-semibold text-white/42 uppercase">{benchmark.typicalPricing}</span>
+                </div>
+                <p className="mt-4 text-sm font-black text-white">{benchmark.examples}</p>
+                <p className="mt-3 text-sm leading-6 text-white/56">{benchmark.featurePattern}</p>
+                <p className="mt-4 rounded-xl border border-[color:var(--color-accent)]/20 bg-[color:var(--color-accent)]/8 p-4 text-sm font-semibold leading-6 text-white/74">
+                  {benchmark.nexusPosition}
+                </p>
+              </SurfaceCard>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="nexus-section-shell">
+        <div className="mx-auto max-w-7xl px-5 py-16">
           <SectionHeader eyebrow="Community Edition details" title="A real timebanking package with the expensive extras switched off.">
             This gives small groups a way to start professionally while keeping federation, AI, multi-tenant networks, SSO, custom development, dedicated infrastructure, and heavy support in the paid upgrade path.
           </SectionHeader>
@@ -203,6 +229,34 @@ export default function HostingPage({ onNavigate }: HostingPageProps) {
               <p className="mt-3 text-sm leading-6 text-white/58">{body}</p>
             </SurfaceCard>
           ))}
+        </div>
+      </section>
+
+      <section className="nexus-section-shell">
+        <div className="mx-auto max-w-7xl px-5 py-16">
+          <SectionHeader eyebrow="Support model" title="Support commitments should be commercially funded.">
+            Solo-led by default means standard support is deliberately modest: async help, clear upgrade paths, and realistic response targets. Faster or broader cover is a paid operating model, not a casual promise.
+          </SectionHeader>
+          <div className="grid gap-5 lg:grid-cols-3">
+            <SurfaceCard tone="subtle" className="p-5">
+              <p className="text-lg font-black text-white">Standard support</p>
+              <p className="mt-3 text-sm leading-6 text-white/58">
+                Included support is best-effort and async. It suits small teams that can tolerate normal response times and do not need formal incident cover.
+              </p>
+            </SurfaceCard>
+            <SurfaceCard tone="subtle" className="p-5">
+              <p className="text-lg font-black text-white">Retained support</p>
+              <p className="mt-3 text-sm leading-6 text-white/58">
+                Priority and managed plans buy more attention, a clearer route into the queue, operational reviews, and contract-funded support cover where the client size justifies it.
+              </p>
+            </SurfaceCard>
+            <SurfaceCard tone="accent" className="p-5">
+              <p className="text-lg font-black text-white">Major-client support retainer</p>
+              <p className="mt-3 text-sm leading-6 text-white/64">
+                Critical services need agreed cover windows, escalation terms, and budget for an external incident partner when the contract requires capacity beyond a solo developer.
+              </p>
+            </SurfaceCard>
+          </div>
         </div>
       </section>
 

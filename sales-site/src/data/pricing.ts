@@ -61,6 +61,14 @@ export interface DeploymentModeOption {
   bestFor: string;
 }
 
+export interface CompetitorBenchmark {
+  segment: string;
+  examples: string;
+  typicalPricing: string;
+  featurePattern: string;
+  nexusPosition: string;
+}
+
 export const deploymentModes: DeploymentModeOption[] = [
   {
     id: 'shared-platform',
@@ -105,7 +113,7 @@ export const communityTimebankPlans: CommunityTimebankPlan[] = [
     tenants: '1 timebank tenant',
     storage: '2 GB',
     email: '1k emails/month',
-    p1Response: '3 business days',
+    p1Response: 'Best-effort triage within 3 business days',
     bestFor: 'new timebanks, unfunded pilots, mutual aid groups, and small neighbourhood projects',
     summary: 'A deliberately lean timebank: exchange, members, groups, events, messaging, admin basics, PWA, backups, and upgrades.',
     included: [
@@ -138,7 +146,7 @@ export const communityTimebankPlans: CommunityTimebankPlan[] = [
     tenants: '1 timebank tenant',
     storage: '10 GB',
     email: '5k emails/month',
-    p1Response: '2 business days',
+    p1Response: 'Best-effort triage within 2 business days',
     bestFor: 'funded local timebanks that need reporting, donations, and stronger launch support',
     summary: 'Everything in Community Edition plus practical reporting and the features most funded community teams ask for first.',
     included: [
@@ -169,7 +177,7 @@ export const communityTimebankPlans: CommunityTimebankPlan[] = [
     tenants: '1 tenant plus public landing space',
     storage: '25 GB',
     email: '20k emails/month',
-    p1Response: '1 business day',
+    p1Response: 'Best-effort triage within 1 business day',
     bestFor: 'larger timebanks that want a serious public presence without buying the full civic platform',
     summary: 'The strongest timebank-only package before a buyer should graduate into the full Project NEXUS platform.',
     included: [
@@ -200,7 +208,7 @@ export const hostingPlans: HostingPlan[] = [
     tenants: '1 tenant',
     storage: '5 GB',
     email: '5k emails/month',
-    p1Response: 'Next business day',
+    p1Response: 'Best-effort first reply by next business day',
     bestFor: 'small full-platform pilots that need the whole NEXUS module set',
   },
   {
@@ -214,7 +222,7 @@ export const hostingPlans: HostingPlan[] = [
     tenants: 'Up to 3 tenants',
     storage: '25 GB',
     email: '50k emails/month',
-    p1Response: '8 business hours',
+    p1Response: 'Target first reply within 1 business day',
     bestFor: 'funded local communities and established nonprofit networks',
   },
   {
@@ -228,7 +236,7 @@ export const hostingPlans: HostingPlan[] = [
     tenants: 'Up to 10 tenants',
     storage: '100 GB',
     email: '250k emails/month',
-    p1Response: '4 business hours',
+    p1Response: 'Target first reply within 1 business day during agreed business hours',
     bestFor: 'county, city, regional, and multi-programme deployments',
   },
   {
@@ -242,7 +250,7 @@ export const hostingPlans: HostingPlan[] = [
     tenants: 'Up to 25 tenants',
     storage: '500 GB',
     email: '1M emails/month',
-    p1Response: '1 business hour / 4 hours out of hours',
+    p1Response: 'Contracted incident window required for same-day cover',
     bestFor: 'public-sector, civic, and larger multi-community programmes',
   },
   {
@@ -256,7 +264,7 @@ export const hostingPlans: HostingPlan[] = [
     tenants: 'Up to 100 tenants',
     storage: '2 TB',
     email: '5M emails/month',
-    p1Response: '30-minute P1 response',
+    p1Response: 'Major-client support retainer required for P1 cover',
     bestFor: 'national networks, consortia, and serious institutional programmes',
   },
   {
@@ -271,7 +279,7 @@ export const hostingPlans: HostingPlan[] = [
     tenants: 'Custom',
     storage: 'Custom',
     email: 'Custom',
-    p1Response: 'Custom SLA',
+    p1Response: 'Custom SLA with contract-funded support cover',
     bestFor: 'national operators, unusually large communities, million-user scenarios, and high-traffic federation networks',
   },
 ];
@@ -281,25 +289,56 @@ export const supportTiers: RecurringOption[] = [
     id: 'standard',
     label: 'Standard support',
     monthlyEur: 0,
-    description: 'Email and GitHub issues with response time set by hosting tier.',
+    description: 'Async email and GitHub issue support. Solo-led by default; response targets are best-effort unless written order terms say otherwise.',
   },
   {
     id: 'priority',
-    label: 'Priority support',
-    monthlyEur: 299,
-    description: 'Shared Slack or Teams channel, 2-hour business response, monthly health review.',
+    label: 'Priority async support',
+    monthlyEur: 399,
+    description: 'Priority queue, shared channel, monthly office-hours review, and planned-business-day responses during agreed hours.',
   },
   {
     id: 'managed',
-    label: 'Managed support',
-    monthlyEur: 899,
-    description: 'Named technical lead, weekly ops call, proactive monitoring alerts, roadmap session.',
+    label: 'Managed support retainer',
+    monthlyEur: 1499,
+    description: 'Named technical lead, regular ops review, release planning, proactive checks, and room to contract specialist help for larger clients.',
   },
   {
     id: 'mission-critical',
-    label: 'Critical incident support',
-    monthlyEur: 2499,
-    description: 'Critical incident response, paging, escalation, and post-incident review during agreed cover windows.',
+    label: 'Major-client support retainer',
+    monthlyEur: 4999,
+    description: 'Contract-funded support cover for critical services, including agreed escalation windows and external incident partner capacity where required.',
+  },
+];
+
+export const competitorBenchmarks: CompetitorBenchmark[] = [
+  {
+    segment: 'Timebanking tools',
+    examples: 'hOurworld, TimeOverflow, TOL2, Komunitin',
+    typicalPricing: 'Free, community-supported, or association/service-fee funded',
+    featurePattern: 'Strong timebanking core, but usually narrower hosting, governance, federation, support, AI, and civic module coverage.',
+    nexusPosition: 'Community Edition is not the cheapest possible path; it is a low-cost managed path with backups, upgrades, admin basics, and a clean upgrade route.',
+  },
+  {
+    segment: 'Volunteer management',
+    examples: 'Timecounts, GivePulse, VolunteerLocal, Better Impact',
+    typicalPricing: 'Free to a few hundred per month, with advanced features and enterprise support commonly gated.',
+    featurePattern: 'Good for volunteer scheduling and forms; less complete for time credits, multi-community exchange, federation, civic content, and member social tools.',
+    nexusPosition: 'Community Plus and Pro are competitive for timebank-first organisations; the full platform costs more because it includes a much wider civic stack.',
+  },
+  {
+    segment: 'Managed civic/community platforms',
+    examples: 'Made Open and bespoke community-platform providers',
+    typicalPricing: 'Often several thousand per year to five figures or custom procurement.',
+    featurePattern: 'Higher-touch implementation and support, but pricing usually moves quickly into quote-led territory.',
+    nexusPosition: 'NEXUS is cheap-to-middle here: transparent entry prices, full platform tiers from EUR99/mo, and custom pricing only when scale or support cover needs discovery.',
+  },
+  {
+    segment: 'Creator and B2B communities',
+    examples: 'Circle, Mighty Networks, BetterMode, Hivebrite',
+    typicalPricing: 'Common public tiers around low hundreds per month; B2B and enterprise community plans move into high monthly or custom pricing.',
+    featurePattern: 'Community spaces, content, and memberships are strong; enterprise features such as SSO, APIs, branded apps, analytics, and premium support are often higher-tier gates.',
+    nexusPosition: 'NEXUS is not trying to be a creator community tool. It is cheaper than many B2B community platforms for multi-tenant civic infrastructure and far broader for timebanking.',
   },
 ];
 
