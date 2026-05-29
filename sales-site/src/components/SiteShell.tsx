@@ -8,6 +8,8 @@ import { GitBranch, Menu, X } from 'lucide-react';
 import { type MouseEvent, type ReactNode, useState } from 'react';
 
 import { legalPages } from '../data/legal';
+import { communityTimebankPlans } from '../data/pricing';
+import { formatCurrency } from '../lib/pricingEngine';
 import { salesNavItems } from '../lib/routes';
 import { cx } from './SalesPrimitives';
 
@@ -16,6 +18,8 @@ interface SiteShellProps {
   currentPath: string;
   onNavigate: (href: string) => void;
 }
+
+const communityTimebankingStartPrice = formatCurrency(communityTimebankPlans[0].annualMonthlyEur);
 
 export default function SiteShell({ children, currentPath, onNavigate }: SiteShellProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -152,7 +156,7 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
               <span className="font-black tracking-[0.16em] uppercase">Project NEXUS</span>
             </div>
             <p className="max-w-md text-sm leading-7 text-white/62">
-              Community Timebanking from EUR29/month, plus full managed platform hosting for volunteering, civic participation, federation, accessibility, and multi-community networks.
+              Community Timebanking from {communityTimebankingStartPrice}/month, plus full managed platform hosting for volunteering, civic participation, federation, accessibility, and multi-community networks.
             </p>
             <p className="mt-4 max-w-md text-xs leading-6 text-white/52">
               Managed hosting in association with PROJECT NEXUS PLATFORM IRELAND LTD, hosting partner. Reg. Number 812763.

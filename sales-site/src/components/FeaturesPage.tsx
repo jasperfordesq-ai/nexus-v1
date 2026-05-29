@@ -106,7 +106,7 @@ const communities = [
   {
     name: 'NexusCivic',
     url: 'https://nexuscivic.ie',
-    body: 'Civic engagement deployment track for community participation, organisations, and local programmes.',
+    body: 'Reference deployment track for civic participation, organisations, and local programme design.',
   },
 ];
 
@@ -263,8 +263,8 @@ export default function FeaturesPage({ onNavigate }: FeaturesPageProps) {
       <section className="nexus-section-shell">
         <div className="mx-auto grid max-w-7xl gap-8 px-5 py-16 lg:grid-cols-[0.82fr_1.18fr]">
           <div>
-            <p className="text-sm font-bold tracking-[0.16em] text-[var(--color-primary)] uppercase">Live communities</p>
-            <h2 className="mt-3 text-3xl font-black text-white md:text-5xl">Real deployments, not just roadmap slides.</h2>
+            <p className="text-sm font-bold tracking-[0.16em] text-[var(--color-primary)] uppercase">Live and reference communities</p>
+            <h2 className="mt-3 text-3xl font-black text-white md:text-5xl">Production proof and reference tracks, not just roadmap slides.</h2>
           </div>
           <div className="grid gap-4">
             {communities.map((community) => (

@@ -331,7 +331,7 @@ export const competitorBenchmarks: CompetitorBenchmark[] = [
     examples: 'Made Open and bespoke community-platform providers',
     typicalPricing: 'Often several thousand per year to five figures or custom procurement.',
     featurePattern: 'Higher-touch implementation and support, but pricing usually moves quickly into quote-led territory.',
-    nexusPosition: 'NEXUS is cheap-to-middle here: transparent entry prices, full platform tiers from EUR99/mo, and custom pricing only when scale or support cover needs discovery.',
+    nexusPosition: `NEXUS is cheap-to-middle here: transparent entry prices, full platform tiers from EUR${hostingPlans[0].monthlyEur}/mo, and custom pricing only when scale or support cover needs discovery.`,
   },
   {
     segment: 'Creator and B2B communities',
