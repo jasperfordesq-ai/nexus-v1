@@ -112,6 +112,17 @@
     "delete": "Delete",
     "empty": "No comments yet. Start the conversation."
   },
+  "reviews": {
+    "title": "Reviews",
+    "write": "Share your experience (optional)",
+    "your_rating": "Your rating",
+    "submit": "Submit review",
+    "empty": "No reviews yet.",
+    "count": "{{count}} review",
+    "count_plural": "{{count}} reviews",
+    "rating_required": "Please choose a star rating.",
+    "thanks": "Thanks for your review!"
+  },
   "admin": {
     "title": "Courses",
     "subtitle": "Moderate courses, manage instructors and categories",

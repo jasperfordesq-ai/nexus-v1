@@ -119,6 +119,17 @@ export interface Quiz {
   questions: QuizQuestion[];
 }
 
+export interface CourseReview {
+  id: number;
+  course_id: number;
+  user_id: number;
+  rating: number;
+  body?: string | null;
+  status: string;
+  created_at?: string | null;
+  user?: { id: number; name: string; avatar_url?: string | null };
+}
+
 export interface CourseDiscussion {
   id: number;
   course_id: number;
@@ -155,7 +166,7 @@ export const coursesApi = {
   },
   categories: () => api.get<CourseCategory[]>('/v2/courses/categories'),
   show: (idOrSlug: string | number) => api.get<Course>(`/v2/courses/${idOrSlug}`),
-  reviews: (courseId: number) => api.get(`/v2/courses/${courseId}/reviews`),
+  reviews: (courseId: number) => api.get<CourseReview[]>(`/v2/courses/${courseId}/reviews`),
 
   // Learner
   enroll: (courseId: number) => api.post<CourseEnrollment>(`/v2/courses/${courseId}/enroll`, {}),

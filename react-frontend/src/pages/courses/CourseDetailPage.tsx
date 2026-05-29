@@ -16,6 +16,7 @@ import PlayCircle from 'lucide-react/icons/play-circle';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { coursesApi, type Course } from '@/lib/api/courses';
+import { CourseReviews } from '@/components/courses/CourseReviews';
 
 export default function CourseDetailPage() {
   const { t } = useTranslation('courses');
@@ -113,6 +114,13 @@ export default function CourseDetailPage() {
               ))}
             </div>
           )}
+
+          <CourseReviews
+            courseId={course.id}
+            ratingAvg={Number(course.rating_avg) || 0}
+            ratingCount={course.rating_count || 0}
+            canReview={Boolean(course.is_enrolled)}
+          />
         </div>
 
         <aside className="md:w-72 flex-shrink-0">
