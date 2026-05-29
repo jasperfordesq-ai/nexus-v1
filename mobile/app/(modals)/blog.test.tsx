@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { fireEvent, render } from '@testing-library/react-native';
 
 // --- Mocks ---
 
@@ -121,6 +121,12 @@ describe('BlogScreen', () => {
   it('renders empty state when no posts and not loading', () => {
     const { getByText } = render(<BlogScreen />);
     expect(getByText('No posts yet.')).toBeTruthy();
+  });
+
+  it('renders the shared input-backed search field', () => {
+    const { getByPlaceholderText, getByLabelText } = render(<BlogScreen />);
+    fireEvent.changeText(getByPlaceholderText('Search articles...'), 'repair');
+    expect(getByLabelText('Clear search')).toBeTruthy();
   });
 
   it('does not render empty state while loading', () => {

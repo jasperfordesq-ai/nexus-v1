@@ -10,7 +10,6 @@ import {
   Pressable,
   RefreshControl,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -23,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { getBlogPosts, type BlogPost, type BlogListResponse } from '@/lib/api/blog';
 import AppTopBar from '@/components/ui/AppTopBar';
 import EmptyState from '@/components/ui/EmptyState';
+import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -98,27 +98,29 @@ export default function BlogScreen() {
           </HeroCard.Body>
         </HeroCard>
 
-        <Surface variant="secondary" className="mb-3 flex-row items-center gap-2 rounded-panel-inner px-3 py-2.5">
-          <Ionicons name="search-outline" size={18} color={theme.textMuted} />
-          <TextInput
-            className="min-w-0 flex-1 py-0 text-sm"
-            style={{ color: theme.text }}
-            placeholder={t('searchPlaceholder')}
-            placeholderTextColor={theme.textMuted}
-            value={search}
-            onChangeText={setSearch}
-            onSubmitEditing={submitSearch}
-            returnKeyType="search"
-          />
-          {search.length > 0 ? (
-            <HeroButton isIconOnly size="sm" variant="ghost" accessibilityLabel={t('clearSearch')} onPress={clearSearch}>
-              <Ionicons name="close-circle-outline" size={18} color={theme.textMuted} />
-            </HeroButton>
-          ) : null}
+        <View className="mb-3 flex-row items-start gap-2">
+          <View className="min-w-0 flex-1">
+            <Input
+              style={{ color: theme.text }}
+              placeholder={t('searchPlaceholder')}
+              placeholderTextColor={theme.textMuted}
+              value={search}
+              onChangeText={setSearch}
+              onSubmitEditing={submitSearch}
+              returnKeyType="search"
+              accessibilityLabel={t('searchPlaceholder')}
+              leftIcon={<Ionicons name="search-outline" size={18} color={theme.textMuted} />}
+              rightIcon={search.length > 0 ? (
+                <HeroButton isIconOnly size="sm" variant="ghost" accessibilityLabel={t('clearSearch')} onPress={clearSearch}>
+                  <Ionicons name="close-circle-outline" size={18} color={theme.textMuted} />
+                </HeroButton>
+              ) : null}
+            />
+          </View>
           <HeroButton size="sm" variant="primary" style={{ backgroundColor: primary }} onPress={submitSearch} accessibilityLabel={t('searchAction')}>
             <HeroButton.Label>{t('searchAction')}</HeroButton.Label>
           </HeroButton>
-        </Surface>
+        </View>
       </View>
     );
   }
