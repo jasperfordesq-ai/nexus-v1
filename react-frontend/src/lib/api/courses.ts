@@ -125,6 +125,13 @@ export interface Quiz {
   questions: QuizQuestion[];
 }
 
+export interface CoursePrerequisite {
+  id: number;
+  title: string;
+  slug: string;
+  completed: boolean;
+}
+
 export interface CourseReview {
   id: number;
   course_id: number;
@@ -196,6 +203,7 @@ export const coursesApi = {
   forGroup: (groupId: number) => api.get<Course[]>(`/v2/groups/${groupId}/courses`),
   show: (idOrSlug: string | number) => api.get<Course>(`/v2/courses/${idOrSlug}`),
   reviews: (courseId: number) => api.get<CourseReview[]>(`/v2/courses/${courseId}/reviews`),
+  prerequisites: (courseId: number) => api.get<CoursePrerequisite[]>(`/v2/courses/${courseId}/prerequisites`),
 
   // Learner
   enroll: (courseId: number) => api.post<CourseEnrollment>(`/v2/courses/${courseId}/enroll`, {}),

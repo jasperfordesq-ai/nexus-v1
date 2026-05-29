@@ -1,0 +1,77 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+namespace App\Services;
+
+use App\Models\Course;
+use App\Models\CourseEnrollment;
+
+/**
+ * CoursePrerequisiteService — resolves a course's prerequisite courses and
+ * whether a learner has satisfied them (a prerequisite is "met" when the learner
+ * has a completed enrollment in it). Tenant-scoped via the models.
+ */
+class CoursePrerequisiteService
+{
+    /**
+     * Prerequisite courses for a course, each annotated with the learner's
+     * completion state.
+     *
+     * @return array<int,array{id:int,title:string,slug:string,completed:bool}>
+     */
+    public static function statusFor(Course $course, ?int $userId): array
+    {
+        $ids = self::prerequisiteIds($course);
+        if (!$ids) {
+            return [];
+        }
+
+        $completedIds = $userId
+            ? CourseEnrollment::where('user_id', $userId)
+                ->where('status', 'completed')
+                ->whereIn('course_id', $ids)
+                ->pluck('course_id')
+                ->map(fn ($v) => (int) $v)
+                ->all()
+            : [];
+
+        return Course::whereIn('id', $ids)
+            ->get(['id', 'title', 'slug'])
+            ->map(fn ($c) => [
+                'id' => (int) $c->id,
+                'title' => $c->title,
+                'slug' => $c->slug,
+                'completed' => in_array((int) $c->id, $completedIds, true),
+            ])
+            ->all();
+    }
+
+    /**
+     * Prerequisite course ids the learner has NOT completed.
+     *
+     * @return array<int,int>
+     */
+    public static function unmetIds(Course $course, int $userId): array
+    {
+        $status = self::statusFor($course, $userId);
+        return array_values(array_map(
+            fn ($p) => $p['id'],
+            array_filter($status, fn ($p) => !$p['completed'])
+        ));
+    }
+
+    /**
+     * @return array<int,int>
+     */
+    private static function prerequisiteIds(Course $course): array
+    {
+        $raw = $course->prerequisites;
+        if (!is_array($raw)) {
+            return [];
+        }
+        return array_values(array_filter(array_map('intval', $raw)));
+    }
+}

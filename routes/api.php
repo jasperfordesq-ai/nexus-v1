@@ -1049,6 +1049,12 @@ Route::get('/v2/courses/{id}/progress', [\App\Http\Controllers\Api\CourseEnrollm
 Route::post('/v2/courses/{id}/lessons/{lessonId}/complete', [\App\Http\Controllers\Api\CourseEnrollmentController::class, 'completeLesson'])->where(['id' => '[0-9]+', 'lessonId' => '[0-9]+']);
 Route::post('/v2/courses/{id}/reviews', [\App\Http\Controllers\Api\CourseEnrollmentController::class, 'review'])->where('id', '[0-9]+');
 Route::get('/v2/courses/{id}/certificate', [\App\Http\Controllers\Api\CourseEnrollmentController::class, 'certificate'])->where('id', '[0-9]+');
+Route::get('/v2/courses/{id}/prerequisites', [\App\Http\Controllers\Api\CourseEnrollmentController::class, 'prerequisites'])->where('id', '[0-9]+');
+
+// Cohorts
+Route::get('/v2/courses/{courseId}/cohorts', [\App\Http\Controllers\Api\CourseCohortController::class, 'index'])->where('courseId', '[0-9]+');
+Route::post('/v2/courses/{courseId}/cohorts', [\App\Http\Controllers\Api\CourseCohortController::class, 'store'])->where('courseId', '[0-9]+');
+Route::delete('/v2/courses/{courseId}/cohorts/{cohortId}', [\App\Http\Controllers\Api\CourseCohortController::class, 'destroy'])->where(['courseId' => '[0-9]+', 'cohortId' => '[0-9]+']);
 
 // Per-lesson discussions
 Route::get('/v2/courses/{courseId}/lessons/{lessonId}/discussions', [\App\Http\Controllers\Api\CourseDiscussionController::class, 'index'])->where(['courseId' => '[0-9]+', 'lessonId' => '[0-9]+']);

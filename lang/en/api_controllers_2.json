@@ -14,6 +14,8 @@
   "courses.comment_required": "A comment cannot be empty.",
   "courses.lesson_locked": "This lesson isn't available yet.",
   "courses.insufficient_credits": "You don't have enough time credits to enrol in this course.",
+  "courses.prerequisites_not_met": "Complete the required prerequisite courses before enrolling.",
+  "courses.cohort_name_required": "A cohort name is required.",
   "help.feedback_recorded": "Feedback recorded",
   "help.missing_article_slug": "Missing article_slug",
   "help.article_not_found": "Article not found",

@@ -15,8 +15,10 @@ import BookOpen from 'lucide-react/icons/book-open';
 import PlayCircle from 'lucide-react/icons/play-circle';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useTenant, useToast } from '@/contexts';
-import { coursesApi, type Course } from '@/lib/api/courses';
+import { coursesApi, type Course, type CoursePrerequisite } from '@/lib/api/courses';
 import { CourseReviews } from '@/components/courses/CourseReviews';
+import CircleCheck from 'lucide-react/icons/circle-check';
+import Lock from 'lucide-react/icons/lock';
 
 export default function CourseDetailPage() {
   const { t } = useTranslation('courses');
@@ -27,6 +29,7 @@ export default function CourseDetailPage() {
   const toast = useToast();
 
   const [course, setCourse] = useState<Course | null>(null);
+  const [prereqs, setPrereqs] = useState<CoursePrerequisite[]>([]);
   const [loading, setLoading] = useState(true);
   const [enrolling, setEnrolling] = useState(false);
 
@@ -36,9 +39,19 @@ export default function CourseDetailPage() {
     if (!idOrSlug) return;
     setLoading(true);
     coursesApi.show(idOrSlug)
-      .then((res) => setCourse(res.success && res.data ? res.data : null))
+      .then((res) => {
+        const c = res.success && res.data ? res.data : null;
+        setCourse(c);
+        if (c) {
+          coursesApi.prerequisites(c.id).then((pr) => {
+            if (pr.success && pr.data) setPrereqs(pr.data);
+          });
+        }
+      })
       .finally(() => setLoading(false));
   }, [idOrSlug]);
+
+  const hasUnmetPrereqs = prereqs.some((p) => !p.completed);
 
   const handleEnroll = async () => {
     if (!course) return;
@@ -117,6 +130,22 @@ export default function CourseDetailPage() {
             </div>
           )}
 
+          {prereqs.length > 0 ? (
+            <section className="mt-6">
+              <h2 className="text-lg font-semibold mb-3">{t('detail.prerequisites')}</h2>
+              <ul className="flex flex-col gap-1">
+                {prereqs.map((p) => (
+                  <li key={p.id} className="flex items-center gap-2 text-sm">
+                    {p.completed
+                      ? <CircleCheck size={16} className="text-success" aria-hidden="true" />
+                      : <Lock size={16} className="text-muted" aria-hidden="true" />}
+                    {p.title}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+
           <CourseReviews
             courseId={course.id}
             ratingAvg={Number(course.rating_avg) || 0}
@@ -141,9 +170,14 @@ export default function CourseDetailPage() {
                   {t('detail.continue')}
                 </Button>
               ) : (
-                <Button color="primary" isLoading={enrolling} onPress={handleEnroll}>
-                  {enrolling ? t('detail.enrolling') : t('detail.enroll')}
-                </Button>
+                <>
+                  <Button color="primary" isLoading={enrolling} isDisabled={hasUnmetPrereqs} onPress={handleEnroll}>
+                    {enrolling ? t('detail.enrolling') : t('detail.enroll')}
+                  </Button>
+                  {hasUnmetPrereqs ? (
+                    <p className="text-xs text-muted">{t('detail.prerequisites_required')}</p>
+                  ) : null}
+                </>
               )}
               {course.author?.name ? (
                 <div className="text-xs text-muted">{t('card.by_author', { name: course.author.name })}</div>

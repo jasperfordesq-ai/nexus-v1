@@ -42,6 +42,12 @@ class CourseEnrollmentController extends BaseApiController
             return $this->respondWithData(CourseEnrollmentService::find($id, $userId), null, 200);
         }
 
+        // Prerequisites: block enrolment until required courses are completed.
+        $unmet = \App\Services\CoursePrerequisiteService::unmetIds($course, $userId);
+        if ($unmet) {
+            return $this->respondWithError('PREREQUISITES_NOT_MET', __('api_controllers_2.courses.prerequisites_not_met'), null, 422);
+        }
+
         // Paid course: charge the learner (credits transfer to the author) before enrolling.
         $charged = 0.0;
         if ((float) $course->credit_cost > 0) {
@@ -52,13 +58,27 @@ class CourseEnrollmentController extends BaseApiController
             $charged = $result['amount'];
         }
 
-        $enrollment = CourseEnrollmentService::enroll($id, $userId);
+        $cohortId = $this->inputInt('cohort_id', null, 1);
+        $enrollment = CourseEnrollmentService::enroll($id, $userId, $cohortId);
         if ($charged > 0) {
             $enrollment->credits_paid = $charged;
             $enrollment->save();
         }
 
         return $this->respondWithData($enrollment, null, 201);
+    }
+
+    /** GET /v2/courses/{id}/prerequisites — prerequisite courses + completion state. */
+    public function prerequisites(int $id): JsonResponse
+    {
+        $this->ensureCoursesFeature();
+        $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
+
+        $course = $this->findCourseOrFail($id);
+
+        return $this->respondWithData(
+            \App\Services\CoursePrerequisiteService::statusFor($course, $userId)
+        );
     }
 
     /** GET /v2/me/courses — courses the caller is enrolled in. */
