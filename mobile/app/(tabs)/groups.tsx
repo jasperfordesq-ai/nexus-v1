@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useMemo, useState } from 'react';
-import { FlatList, Image, Pressable, RefreshControl, Text, TextInput, View } from 'react-native';
+import { FlatList, Image, Pressable, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -22,6 +22,7 @@ import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 import AppTopBar from '@/components/ui/AppTopBar';
 import OfflineBanner from '@/components/OfflineBanner';
 import EmptyState from '@/components/ui/EmptyState';
+import Input from '@/components/ui/Input';
 import { SkeletonBox } from '@/components/ui/Skeleton';
 
 type FilterValue = 'all' | 'public' | 'private';
@@ -303,20 +304,17 @@ export default function GroupsScreen() {
         <GroupsHero groups={groups} primary={primary} theme={theme} t={t} />
 
         <Surface variant="default" className="gap-3 rounded-panel p-3">
-          <View className="flex-row items-center rounded-panel-inner border border-border bg-background px-3">
-            <Ionicons name="search-outline" size={18} color={theme.textMuted} />
-            <TextInput
-              className="min-w-0 flex-1 px-2 py-3 text-base"
-              style={{ color: theme.text }}
-              value={search}
-              onChangeText={setSearch}
-              placeholder={t('searchPlaceholder')}
-              placeholderTextColor={theme.textMuted}
-              returnKeyType="search"
-              clearButtonMode="while-editing"
-              accessibilityLabel={t('searchPlaceholder')}
-            />
-          </View>
+          <Input
+            value={search}
+            onChangeText={setSearch}
+            placeholder={t('searchPlaceholder')}
+            placeholderTextColor={theme.textMuted}
+            returnKeyType="search"
+            clearButtonMode="while-editing"
+            accessibilityLabel={t('searchPlaceholder')}
+            style={{ color: theme.text }}
+            leftIcon={<Ionicons name="search-outline" size={18} color={theme.textMuted} />}
+          />
 
           <View className="flex-row gap-2">
             {filterOptions.map((option) => (

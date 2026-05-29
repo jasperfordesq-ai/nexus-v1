@@ -116,6 +116,18 @@
     "closed": "Poll closed",
     "vote": "Vote"
   },
+  "pollsScreen": {
+    "title": "Polls",
+    "heroEyebrow": "Community voice",
+    "subtitle": "Vote on open questions and see what your community thinks.",
+    "emptyTitle": "No polls yet",
+    "emptySubtitle": "When members create polls, they will appear here.",
+    "errorTitle": "Could not load polls",
+    "feedItemTitle": "{{title}}",
+    "statusOpen": "Open",
+    "statusClosed": "Closed",
+    "totalVotes": "{{count}} votes"
+  },
   "imageViewer": {
     "close": "Close",
     "share": "Share image"

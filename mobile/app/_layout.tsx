@@ -495,6 +495,10 @@ function RootNavigator() {
         options={{ ...modalOptions, headerShown: false, title: t('profile:support.title') }}
       />
       <Stack.Screen
+        name="(modals)/polls"
+        options={{ ...modalOptions, headerShown: false, title: t('home:pollsScreen.title') }}
+      />
+      <Stack.Screen
         name="(modals)/search"
         options={{ ...modalOptions, headerShown: false, title: t('search:title') }}
       />

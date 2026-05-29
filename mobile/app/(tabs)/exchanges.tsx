@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { FlatList, RefreshControl, Text, TextInput, View } from 'react-native';
+import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,6 +19,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import ExchangeCard from '@/components/ExchangeCard';
 import OfflineBanner from '@/components/OfflineBanner';
+import Input from '@/components/ui/Input';
 import { ExchangeCardSkeleton } from '@/components/ui/Skeleton';
 
 function extractExchangePage(response: ExchangeListResponse) {
@@ -136,25 +137,22 @@ export default function ExchangesScreen() {
                 </Chip>
               </View>
 
-              <View className="flex-row items-center rounded-2xl border border-border px-3" style={{ backgroundColor: theme.surface }}>
-                <Ionicons name="search-outline" size={18} color={theme.textMuted} />
-                <TextInput
-                  className="flex-1 py-3 pl-2 text-base"
-                  style={{ color: theme.text }}
-                  value={search}
-                  onChangeText={setSearch}
-                  placeholder={t('searchPlaceholder')}
-                  placeholderTextColor={theme.textMuted}
-                  returnKeyType="search"
-                  clearButtonMode="while-editing"
-                  accessibilityLabel={t('searchPlaceholder')}
-                />
-                {search ? (
+              <Input
+                value={search}
+                onChangeText={setSearch}
+                placeholder={t('searchPlaceholder')}
+                placeholderTextColor={theme.textMuted}
+                returnKeyType="search"
+                clearButtonMode="while-editing"
+                accessibilityLabel={t('searchPlaceholder')}
+                style={{ color: theme.text }}
+                leftIcon={<Ionicons name="search-outline" size={18} color={theme.textMuted} />}
+                rightIcon={search ? (
                   <HeroButton isIconOnly size="sm" variant="ghost" onPress={() => setSearch('')} accessibilityLabel={t('clearSearch')}>
                     <Ionicons name="close-circle-outline" size={18} color={theme.textMuted} />
                   </HeroButton>
                 ) : null}
-              </View>
+              />
 
               <Tabs value={typeFilter} onValueChange={(value) => setTypeFilter(value as 'all' | ExchangeType)} variant="secondary">
                 <Tabs.List>
