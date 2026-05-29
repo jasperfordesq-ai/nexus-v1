@@ -40,6 +40,8 @@ jest.mock('react-i18next', () => ({
         'newGroup': 'New group',
         'archive': 'Archive',
         'archiveConversation': 'Archive conversation',
+        'searchPlaceholder': 'Search conversations...',
+        'clearSearch': 'Clear search',
         'tabs.inbox': 'Inbox',
         'tabs.archived': 'Archived',
         'restore': 'Restore',
@@ -191,6 +193,28 @@ describe('MessagesScreen', () => {
     const { getByText } = render(<MessagesScreen />);
     expect(getByText('Bob Builder')).toBeTruthy();
     expect(getByText('Can you help with plumbing?')).toBeTruthy();
+  });
+
+  it('filters conversations through the shared input-backed search field', () => {
+    mockUsePaginatedApi.mockReturnValue({
+      ...defaultPaginatedState,
+      items: [
+        mockConversation,
+        {
+          ...mockConversation,
+          id: 8,
+          other_user: { id: 3, name: 'Alice Artist', avatar_url: null },
+          last_message: { body: 'Mural planning', created_at: '2026-03-21T09:00:00Z', is_own: false },
+        },
+      ],
+    });
+
+    const { getByPlaceholderText, getByLabelText, queryByText } = render(<MessagesScreen />);
+    fireEvent.changeText(getByPlaceholderText('Search conversations...'), 'alice');
+
+    expect(queryByText('Bob Builder')).toBeNull();
+    expect(queryByText('Alice Artist')).toBeTruthy();
+    expect(getByLabelText('Clear search')).toBeTruthy();
   });
 
   it('uses the translated member fallback when conversation user names are missing', () => {

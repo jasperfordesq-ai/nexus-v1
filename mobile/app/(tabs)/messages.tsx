@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, FlatList, Platform, Pressable, RefreshControl, Text, TextInput, View } from 'react-native';
+import { Alert, FlatList, Platform, Pressable, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,6 +19,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import Avatar from '@/components/ui/Avatar';
+import Input from '@/components/ui/Input';
 import { ConversationSkeleton } from '@/components/ui/Skeleton';
 import { formatRelativeTime } from '@/lib/utils/formatRelativeTime';
 
@@ -429,24 +430,21 @@ function MessagesHeader({
           </Chip>
         </View>
 
-        <Surface variant="secondary" className="flex-row items-center gap-2 rounded-full px-3 py-2">
-          <Ionicons name="search-outline" size={18} color={theme.textMuted} />
-          <TextInput
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholder={t('searchPlaceholder')}
-            placeholderTextColor={theme.textMuted}
-            className="min-h-[34px] flex-1 text-sm"
-            style={{ color: theme.text }}
-            returnKeyType="search"
-            accessibilityLabel={t('searchPlaceholder')}
-          />
-          {searchQuery ? (
+        <Input
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          placeholder={t('searchPlaceholder')}
+          placeholderTextColor={theme.textMuted}
+          style={{ color: theme.text }}
+          returnKeyType="search"
+          accessibilityLabel={t('searchPlaceholder')}
+          leftIcon={<Ionicons name="search-outline" size={18} color={theme.textMuted} />}
+          rightIcon={searchQuery ? (
             <HeroButton isIconOnly size="sm" variant="ghost" accessibilityLabel={t('clearSearch')} onPress={() => setSearchQuery('')}>
               <Ionicons name="close-circle" size={18} color={theme.textMuted} />
             </HeroButton>
           ) : null}
-        </Surface>
+        />
       </Surface>
     </View>
   );

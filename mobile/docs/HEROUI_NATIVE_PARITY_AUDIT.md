@@ -20,7 +20,7 @@ Out of scope by owner instruction: React admin, broker/admin panels, caring-comm
 | HeroUI Native package | Complete | `heroui-native` updated from `^1.0.3` to `^1.0.4`, the latest npm version checked during the audit. | Keep current during future Expo upgrades. |
 | Provider setup | Complete | `app/_layout.tsx` imports `global.css`, wraps with `GestureHandlerRootView`, and mounts `HeroUINativeProvider`. | None. |
 | Styling setup | Complete | `global.css` imports Tailwind CSS, Uniwind, HeroUI Native styles, and sources HeroUI Native library classes. Current official HeroUI Native theme sources use OKLCH variables, so the existing OKLCH brand overrides match upstream. | Continue moving screen code from manual theme colors to semantic class names. |
-| Shared UI wrappers | Partial | Button loading now uses HeroUI Native `Spinner`; Input now uses `TextField`, `Label`, `Input`, and `FieldError`; FAB now uses HeroUI Native `Button`; exchange/member/group/blog search fields and exchange create/edit forms now use the shared Input wrapper. The native connections route uses HeroUI Native Card/Tabs/Chip/Button/Spinner/Surface primitives. | Continue migrating complex form fields to shared wrappers. |
+| Shared UI wrappers | Partial | Button loading now uses HeroUI Native `Spinner`; Input now uses `TextField`, `Label`, `Input`, and `FieldError`; FAB now uses HeroUI Native `Button`; exchange/member/group/blog/messages search fields and exchange create/edit forms now use the shared Input wrapper. The native connections route uses HeroUI Native Card/Tabs/Chip/Button/Spinner/Surface primitives. | Continue migrating complex form fields to shared wrappers. |
 | Route-level HeroUI use | Partial | Most functional screens use HeroUI Native directly or through local UI wrappers. Redirect/re-export routes intentionally contain no UI. Several complex screens still use raw `TextInput`, `Pressable`, and manual color styling where a larger refactor is needed. | Incrementally migrate by feature area with tests. |
 | Web parity | Partial | Core timebanking/social/mobile commerce workflows exist. Web-only/admin/caring areas are excluded. Several web features remain missing or intentionally deferred for native. | Use the matrix below as the implementation queue. |
 | Verification | Complete for this pass | `npm run type-check` and full `npm test -- --runInBand` passed after dependency and wrapper changes. | Keep warning cleanup as a separate Jest/Uniwind task. |
@@ -52,7 +52,7 @@ Official docs checked on 2026-05-29:
 | Feed | `/feed`, `/feed/posts/:id`, hashtags | `(tabs)/home`, `FeedItem` | Partial | Partial | Feed list is present; dedicated post detail and hashtag discovery routes are missing. | Add post detail and hashtag modal routes. |
 | Listings | `/listings`, `/listings/:id`, create/edit | `(tabs)/exchanges`, `(modals)/exchange-detail`, create/edit exchange | Partial | Partial | Mobile models listings through timebank exchanges. Direct listing terminology/routes are absent. | Keep exchange-first mobile language unless separate marketplace/listings UX is required. |
 | Exchanges | `/exchanges`, `/exchanges/:id`, request | `(tabs)/exchanges`, `(modals)/new-exchange`, `(modals)/edit-exchange`, `(modals)/exchange-detail` | Complete | Partial | Core exchange browse/detail/create/edit/request workflows exist; browse and create/edit text fields use the shared HeroUI Native-backed Input wrapper. | Continue detail/request form cleanup. |
-| Messages | `/messages`, `/messages/:id` | `(tabs)/messages`, `(modals)/thread`, `(modals)/chat` | Complete | Partial | Threads, unread badges, realtime context, and AI chat route exist. | Continue standardizing composer controls and attachment/action sheets. |
+| Messages | `/messages`, `/messages/:id` | `(tabs)/messages`, `(modals)/thread`, `(modals)/chat` | Complete | Partial | Threads, unread badges, realtime context, and AI chat route exist; inbox search now uses the shared HeroUI Native-backed Input wrapper. | Continue standardizing composer controls and attachment/action sheets. |
 | Wallet | `/wallet`, regional points | `(modals)/wallet` | Partial | Partial | Wallet balance/history/transfer/donation exist; regional points are not implemented. | Add regional points only if enabled for non-caring tenants. |
 | Members | `/members`, `/profile/:id`, connections | `(tabs)/members`, `(modals)/member-profile`, `(modals)/connections`, federation connections | Complete core | Partial | Member directory, profile, direct member connections, and federation connections now exist. The direct connections route supports accepted, incoming, and sent workflows with profile/message routing. | Continue deeper profile add-ons only if enabled for mobile tenants. |
 | Profile | `/profile/:id`, collections, appreciation wall | `(tabs)/profile`, `(modals)/edit-profile`, `(modals)/member-profile` | Partial | Partial | Profile/edit basics exist; collections/appreciation/Verein profile add-ons are absent. | Defer add-ons unless enabled for mobile tenants. |
@@ -106,7 +106,7 @@ These files are redirects or re-exports and intentionally do not need HeroUI Nat
 
 ## Remaining HeroUI Native Cleanup Queue
 
-1. Continue replacing per-screen raw `TextInput` form helpers with `components/ui/Input`; exchange/member/group/blog search fields and exchange create/edit forms are complete.
+1. Continue replacing per-screen raw `TextInput` form helpers with `components/ui/Input`; exchange/member/group/blog/messages search fields and exchange create/edit forms are complete.
 2. Replace low-level `Pressable` controls that act as buttons/chips with `Button`, `Chip`, `ControlField`, `Switch`, or `Checkbox`.
 3. Move manual `theme.text`/`theme.surface` styling to semantic Uniwind classes where it does not need tenant-specific runtime color.
 4. Keep tenant primary color overrides only for brand-critical accents and document each exception locally.
@@ -126,6 +126,7 @@ npm test -- polls.test.tsx exchanges.test.tsx members.test.tsx groups.test.tsx -
 npm test -- new-exchange.test.tsx edit-exchange.test.tsx components/ui/Input.test.tsx --runInBand
 npm test -- connections.test.ts connections.test.tsx --runInBand
 npm test -- blog.test.tsx components/ui/Input.test.tsx --runInBand
+npm test -- messages.test.tsx components/ui/Input.test.tsx --runInBand
 npm test -- --runInBand
 npm run type-check
 ```
@@ -142,4 +143,5 @@ Observed status:
 - Focused new/edit exchange and Input wrapper tests: passed.
 - Focused direct connections API/screen tests: passed.
 - Focused blog and Input wrapper tests: passed.
+- Focused messages and Input wrapper tests: passed.
 - `npm install`: completed and reported 24 audit findings. They were not force-fixed because that would be a separate dependency/security remediation with possible breaking changes.
