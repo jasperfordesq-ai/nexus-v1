@@ -42,7 +42,9 @@
     "course_completed_title": "Congratulations!",
     "course_completed_body": "You've completed this course.",
     "take_quiz": "Take quiz",
-    "back_to_course": "Back to course"
+    "back_to_course": "Back to course",
+    "locked": "This lesson isn't available yet.",
+    "locked_until": "Available from {{date}}"
   },
   "quiz": {
     "title": "Quiz",

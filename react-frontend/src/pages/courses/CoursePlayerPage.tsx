@@ -13,9 +13,10 @@ import { useTranslation } from 'react-i18next';
 import { Button, Card, CardBody, Spinner, Progress } from '@/components/ui';
 import CheckCircle from 'lucide-react/icons/circle-check';
 import PlayCircle from 'lucide-react/icons/play-circle';
+import Lock from 'lucide-react/icons/lock';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
-import { coursesApi, type Course, type CourseLesson, type LessonProgress } from '@/lib/api/courses';
+import { coursesApi, type Course, type CourseLesson, type LessonProgress, type LessonAvailability } from '@/lib/api/courses';
 import { LessonDiscussion } from '@/components/courses/LessonDiscussion';
 
 export default function CoursePlayerPage() {
@@ -28,6 +29,7 @@ export default function CoursePlayerPage() {
 
   const [course, setCourse] = useState<Course | null>(null);
   const [progress, setProgress] = useState<Record<number, LessonProgress>>({});
+  const [availability, setAvailability] = useState<Record<number, LessonAvailability>>({});
   const [percent, setPercent] = useState(0);
   const [activeLessonId, setActiveLessonId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -49,6 +51,9 @@ export default function CoursePlayerPage() {
           const map: Record<number, LessonProgress> = {};
           progRes.data.lessons.forEach((lp) => { map[lp.lesson_id] = lp; });
           setProgress(map);
+          const availMap: Record<number, LessonAvailability> = {};
+          (progRes.data.availability ?? []).forEach((a) => { availMap[a.lesson_id] = a; });
+          setAvailability(availMap);
           setPercent(Number(progRes.data.enrollment.progress_percent) || 0);
         }
       })
@@ -104,6 +109,7 @@ export default function CoursePlayerPage() {
         <nav className="flex flex-col gap-1">
           {lessons.map((lesson) => {
             const done = progress[lesson.id]?.status === 'completed';
+            const locked = availability[lesson.id]?.available === false;
             const active = lesson.id === activeLessonId;
             return (
               <button
@@ -114,7 +120,11 @@ export default function CoursePlayerPage() {
                   active ? 'bg-accent-soft text-accent' : 'hover:bg-[var(--color-surface-2)]'
                 }`}
               >
-                {done ? <CheckCircle size={16} className="text-success" aria-hidden="true" /> : <PlayCircle size={16} aria-hidden="true" />}
+                {done
+                  ? <CheckCircle size={16} className="text-success" aria-hidden="true" />
+                  : locked
+                    ? <Lock size={16} className="text-muted" aria-hidden="true" />
+                    : <PlayCircle size={16} aria-hidden="true" />}
                 <span className="line-clamp-1">{lesson.title}</span>
               </button>
             );
@@ -131,19 +141,32 @@ export default function CoursePlayerPage() {
           <Card>
             <CardBody className="p-5">
               <h1 className="text-xl font-bold mb-4">{activeLesson.title}</h1>
-              <LessonContent lesson={activeLesson} />
-              <div className="mt-6 flex items-center gap-3">
-                {progress[activeLesson.id]?.status === 'completed' ? (
-                  <span className="inline-flex items-center gap-1 text-success text-sm">
-                    <CheckCircle size={16} aria-hidden="true" /> {t('player.completed')}
-                  </span>
-                ) : (
-                  <Button color="primary" onPress={() => markComplete(activeLesson)}>
-                    {t('player.mark_complete')}
-                  </Button>
-                )}
-              </div>
-              <LessonDiscussion courseId={course.id} lessonId={activeLesson.id} />
+              {availability[activeLesson.id]?.available === false ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center text-muted gap-2">
+                  <Lock size={32} aria-hidden="true" />
+                  <p className="text-sm">
+                    {availability[activeLesson.id]?.unlock_at
+                      ? t('player.locked_until', { date: new Date(availability[activeLesson.id]!.unlock_at as string).toLocaleDateString() })
+                      : t('player.locked')}
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <LessonContent lesson={activeLesson} />
+                  <div className="mt-6 flex items-center gap-3">
+                    {progress[activeLesson.id]?.status === 'completed' ? (
+                      <span className="inline-flex items-center gap-1 text-success text-sm">
+                        <CheckCircle size={16} aria-hidden="true" /> {t('player.completed')}
+                      </span>
+                    ) : (
+                      <Button color="primary" onPress={() => markComplete(activeLesson)}>
+                        {t('player.mark_complete')}
+                      </Button>
+                    )}
+                  </div>
+                  <LessonDiscussion courseId={course.id} lessonId={activeLesson.id} />
+                </>
+              )}
             </CardBody>
           </Card>
         ) : (

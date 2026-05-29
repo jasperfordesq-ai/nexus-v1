@@ -11,6 +11,7 @@ use App\Models\CourseLesson;
 use App\Models\CourseLessonProgress;
 use App\Models\CourseReview;
 use App\Services\CourseEnrollmentService;
+use App\Services\CourseLessonService;
 use App\Services\CourseProgressService;
 use Illuminate\Http\JsonResponse;
 
@@ -71,9 +72,19 @@ class CourseEnrollmentController extends BaseApiController
             ->get(['lesson_id', 'status', 'watch_percent', 'completed_at'])
             ->toArray();
 
+        // Drip availability per lesson (relative to enrolment date).
+        $availability = [];
+        foreach (CourseLesson::where('course_id', $id)->get() as $lesson) {
+            $availability[] = array_merge(
+                ['lesson_id' => $lesson->id],
+                CourseLessonService::availability($lesson, $enrollment->enrolled_at)
+            );
+        }
+
         return $this->respondWithData([
             'enrollment' => $enrollment->toArray(),
             'lessons' => $lessonProgress,
+            'availability' => $availability,
         ]);
     }
 
@@ -89,9 +100,15 @@ class CourseEnrollmentController extends BaseApiController
         }
 
         // Lesson must belong to this course.
-        $lessonValid = CourseLesson::where('id', $lessonId)->where('course_id', $id)->exists();
-        if (!$lessonValid) {
+        $lesson = CourseLesson::where('id', $lessonId)->where('course_id', $id)->first();
+        if (!$lesson) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.courses.not_found'), null, 404);
+        }
+
+        // Drip gate: a locked lesson cannot be completed yet.
+        $availability = \App\Services\CourseLessonService::availability($lesson, $enrollment->enrolled_at);
+        if (!$availability['available']) {
+            return $this->respondWithError('LESSON_LOCKED', __('api_controllers_2.courses.lesson_locked'), null, 403);
         }
 
         $watchPercent = $this->inputInt('watch_percent', 100, 0, 100);

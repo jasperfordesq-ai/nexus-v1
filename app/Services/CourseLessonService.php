@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Models\CourseLesson;
+use Carbon\Carbon;
 
 /**
  * CourseLessonService — tenant-scoped lesson CRUD for the course builder.
@@ -73,6 +74,40 @@ class CourseLessonService
     public static function countForCourse(int $courseId): int
     {
         return CourseLesson::where('course_id', $courseId)->count();
+    }
+
+    /**
+     * Compute drip availability of a lesson for an enrollment.
+     *
+     * @param CourseLesson $lesson
+     * @param string|\DateTimeInterface|null $enrolledAt  When the learner enrolled.
+     * @return array{available:bool,unlock_at:?string}
+     */
+    public static function availability(CourseLesson $lesson, $enrolledAt): array
+    {
+        $type = $lesson->drip_type ?? 'none';
+
+        if ($type === 'none' || !$enrolledAt) {
+            return ['available' => true, 'unlock_at' => null];
+        }
+
+        $now = Carbon::now();
+
+        if ($type === 'days_after_enroll') {
+            $days = (int) ($lesson->drip_offset_days ?? 0);
+            $unlock = Carbon::parse($enrolledAt)->addDays($days);
+            return ['available' => $now->gte($unlock), 'unlock_at' => $unlock->toIso8601String()];
+        }
+
+        if ($type === 'fixed_date') {
+            if (!$lesson->drip_date) {
+                return ['available' => true, 'unlock_at' => null];
+            }
+            $unlock = Carbon::parse($lesson->drip_date);
+            return ['available' => $now->gte($unlock), 'unlock_at' => $unlock->toIso8601String()];
+        }
+
+        return ['available' => true, 'unlock_at' => null];
     }
 
     private static function nextPosition(int $courseId): int

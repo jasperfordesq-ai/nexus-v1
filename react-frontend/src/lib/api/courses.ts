@@ -98,6 +98,12 @@ export interface LessonProgress {
   completed_at?: string | null;
 }
 
+export interface LessonAvailability {
+  lesson_id: number;
+  available: boolean;
+  unlock_at: string | null;
+}
+
 export interface QuizQuestion {
   id: number;
   type: 'mcq' | 'multi' | 'truefalse' | 'short' | 'essay';
@@ -173,7 +179,9 @@ export const coursesApi = {
   drop: (courseId: number) => api.delete(`/v2/courses/${courseId}/enroll`),
   myCourses: () => api.get<CourseEnrollment[]>('/v2/me/courses'),
   progress: (courseId: number) =>
-    api.get<{ enrollment: CourseEnrollment; lessons: LessonProgress[] }>(`/v2/courses/${courseId}/progress`),
+    api.get<{ enrollment: CourseEnrollment; lessons: LessonProgress[]; availability: LessonAvailability[] }>(
+      `/v2/courses/${courseId}/progress`,
+    ),
   completeLesson: (courseId: number, lessonId: number, watchPercent = 100) =>
     api.post<{ progress_percent: number; course_completed: boolean }>(
       `/v2/courses/${courseId}/lessons/${lessonId}/complete`,
