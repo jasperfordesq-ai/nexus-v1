@@ -110,7 +110,7 @@
     "no_message": "(faic)",
     "community_fund": "Ciste Pobail"
   },
-  "course.enrolled": "You are now enrolled in {{title}}.",
-  "course.completed": "You completed {{title}}! Well done.",
-  "course.enrolment_payment": "Course enrolment: {{title}}"
+  "course.enrolled": "Tá tú cláraithe ar {{title}} anois.",
+  "course.completed": "Chríochnaigh tú {{title}}! Maith thú.",
+  "course.enrolment_payment": "Clárú an chúrsa: {{title}}"
 }

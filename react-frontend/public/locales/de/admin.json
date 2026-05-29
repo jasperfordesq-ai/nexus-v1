@@ -2831,7 +2831,9 @@
     "option_choice_jobs_default_currency_usd": "USD",
     "filter_modules": "Filter modules",
     "stage_alpha": "Alpha",
-    "stage_beta": "Beta"
+    "stage_beta": "Beta",
+    "module_name_courses": "Kurse",
+    "module_desc_courses": "Community-Lernen – Kurse, Lektionen, Tests, Einschreibung und Zertifikate"
   },
   "content": {
     "about_section": "Über Abschnitt",

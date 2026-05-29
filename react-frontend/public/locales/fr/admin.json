@@ -2831,7 +2831,9 @@
     "option_choice_jobs_default_currency_usd": "USD",
     "filter_modules": "Filter modules",
     "stage_alpha": "Alpha",
-    "stage_beta": "Bêta"
+    "stage_beta": "Bêta",
+    "module_name_courses": "Cours",
+    "module_desc_courses": "Apprentissage communautaire – cours, leçons, quiz, inscription et certificats"
   },
   "content": {
     "about_section": "À propos de la section",

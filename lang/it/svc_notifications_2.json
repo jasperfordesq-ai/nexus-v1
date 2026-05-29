@@ -110,7 +110,7 @@
     "no_message": "(nessuno)",
     "community_fund": "Fondo comunitario"
   },
-  "course.enrolled": "You are now enrolled in {{title}}.",
-  "course.completed": "You completed {{title}}! Well done.",
-  "course.enrolment_payment": "Course enrolment: {{title}}"
+  "course.enrolled": "Ora sei iscritto a {{title}}.",
+  "course.completed": "Hai completato {{title}}! Ben fatto.",
+  "course.enrolment_payment": "Iscrizione al corso: {{title}}"
 }

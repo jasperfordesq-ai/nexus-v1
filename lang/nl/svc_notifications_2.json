@@ -110,7 +110,7 @@
     "no_message": "(geen)",
     "community_fund": "Gemeenschapsfonds"
   },
-  "course.enrolled": "You are now enrolled in {{title}}.",
-  "course.completed": "You completed {{title}}! Well done.",
-  "course.enrolment_payment": "Course enrolment: {{title}}"
+  "course.enrolled": "Je bent nu ingeschreven bij {{title}}.",
+  "course.completed": "Je hebt {{title}} voltooid! Goed gedaan.",
+  "course.enrolment_payment": "Cursusinschrijving: {{title}}"
 }

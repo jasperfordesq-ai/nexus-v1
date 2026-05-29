@@ -70,7 +70,7 @@
     "accessibility_alpha": "Accessibilité (alpha)",
     "features": "Fonctionnalités",
     "accessibility_alpha_tooltip": "Enhanced accessible version — WCAG 2.2 AA compliant. Opens in a new tab.",
-    "courses": "Courses"
+    "courses": "Cours"
   },
   "landing_links": {
     "title": "Explorez cette communauté",
@@ -134,7 +134,7 @@
     "accessibility_alpha": "Ouvrir l’interface alpha axée sur l’accessibilité",
     "features": "Tout ce que fait Project NEXUS, avec des étiquettes de maturité honnêtes",
     "dashboard": "Your personalised home overview",
-    "courses": "Learn new skills with your community"
+    "courses": "Apprenez de nouvelles compétences avec votre communauté"
   },
   "user_menu": {
     "my_profile": "Mon profil",

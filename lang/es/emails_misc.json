@@ -670,16 +670,16 @@
     "plan_assigned_no_expiry": "No expiry set"
   },
   "course_certificate": {
-    "html_title": "Certificate of Completion",
-    "html_awarded_to": "This certifies that",
-    "html_completed": "has successfully completed",
-    "html_date": "Date",
-    "html_serial": "Certificate ID"
+    "html_title": "Certificado de finalización",
+    "html_awarded_to": "Esto certifica que",
+    "html_completed": "ha completado exitosamente",
+    "html_date": "Fecha",
+    "html_serial": "ID de certificado"
   },
   "course_completed": {
-    "subject": "You completed {{title}}!",
-    "title": "Congratulations!",
-    "body": "You have successfully completed {{title}}. Your certificate is ready.",
-    "cta": "View your course"
+    "subject": "¡Has completado {{title}}!",
+    "title": "¡Felicidades!",
+    "body": "Ha completado con éxito {{title}}. Su certificado está listo.",
+    "cta": "Ver tu curso"
   }
 }

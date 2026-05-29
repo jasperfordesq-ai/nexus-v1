@@ -2831,7 +2831,9 @@
     "option_choice_jobs_default_currency_usd": "米ドル",
     "filter_modules": "Filter modules",
     "stage_alpha": "アルファ",
-    "stage_beta": "ベータ"
+    "stage_beta": "ベータ",
+    "module_name_courses": "コース",
+    "module_desc_courses": "コミュニティ学習 — コース、レッスン、クイズ、登録、証明書"
   },
   "content": {
     "about_section": "「概要」セクション",

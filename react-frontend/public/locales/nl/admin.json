@@ -2831,7 +2831,9 @@
     "option_choice_jobs_default_currency_usd": "USD",
     "filter_modules": "Filter modules",
     "stage_alpha": "Alpha",
-    "stage_beta": "Bèta"
+    "stage_beta": "Bèta",
+    "module_name_courses": "Cursussen",
+    "module_desc_courses": "Gemeenschapsleren: cursussen, lessen, quizzen, inschrijving en certificaten"
   },
   "content": {
     "about_section": "Over Sectie",

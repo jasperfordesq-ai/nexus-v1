@@ -670,16 +670,16 @@
     "plan_assigned_no_expiry": "No expiry set"
   },
   "course_certificate": {
-    "html_title": "Certificate of Completion",
-    "html_awarded_to": "This certifies that",
-    "html_completed": "has successfully completed",
-    "html_date": "Date",
-    "html_serial": "Certificate ID"
+    "html_title": "修了証明書",
+    "html_awarded_to": "これは次のことを証明します",
+    "html_completed": "無事に完了しました",
+    "html_date": "日付",
+    "html_serial": "証明書ID"
   },
   "course_completed": {
-    "subject": "You completed {{title}}!",
-    "title": "Congratulations!",
-    "body": "You have successfully completed {{title}}. Your certificate is ready.",
-    "cta": "View your course"
+    "subject": "{{title}} を完了しました!",
+    "title": "おめでとう！",
+    "body": "{{title}} が正常に完了しました。証明書の準備ができました。",
+    "cta": "コースを見る"
   }
 }

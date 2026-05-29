@@ -110,7 +110,7 @@
     "no_message": "(brak)",
     "community_fund": "Fundusz Społeczny"
   },
-  "course.enrolled": "You are now enrolled in {{title}}.",
-  "course.completed": "You completed {{title}}! Well done.",
-  "course.enrolment_payment": "Course enrolment: {{title}}"
+  "course.enrolled": "Jesteś teraz zarejestrowany w {{title}}.",
+  "course.completed": "Ukończyłeś {{title}}! Dobrze zrobiony.",
+  "course.enrolment_payment": "Zapisy na kurs: {{title}}"
 }

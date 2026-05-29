@@ -2831,7 +2831,9 @@
     "option_choice_jobs_default_currency_usd": "USD",
     "filter_modules": "Filter modules",
     "stage_alpha": "Alfa",
-    "stage_beta": "Beta"
+    "stage_beta": "Beta",
+    "module_name_courses": "Kursy",
+    "module_desc_courses": "Społeczne uczenie się — kursy, lekcje, quizy, zapisy i certyfikaty"
   },
   "content": {
     "about_section": "O Sekcji",

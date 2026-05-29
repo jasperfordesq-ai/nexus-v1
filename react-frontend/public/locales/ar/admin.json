@@ -2831,7 +2831,9 @@
     "option_choice_jobs_default_currency_usd": "دولار أمريكي",
     "filter_modules": "Filter modules",
     "stage_alpha": "ألفا",
-    "stage_beta": "بيتا"
+    "stage_beta": "بيتا",
+    "module_name_courses": "الدورات",
+    "module_desc_courses": "التعلم المجتمعي - الدورات والدروس والاختبارات والتسجيل والشهادات"
   },
   "content": {
     "about_section": "حول القسم",

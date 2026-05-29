@@ -110,7 +110,7 @@
     "no_message": "(?? ????)",
     "community_fund": "صندوق المجتمع"
   },
-  "course.enrolled": "You are now enrolled in {{title}}.",
-  "course.completed": "You completed {{title}}! Well done.",
-  "course.enrolment_payment": "Course enrolment: {{title}}"
+  "course.enrolled": "أنت الآن مسجل في {{title}}.",
+  "course.completed": "لقد أكملت {{title}}! أحسنت.",
+  "course.enrolment_payment": "التسجيل في الدورة: {{title}}"
 }

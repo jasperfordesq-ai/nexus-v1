@@ -2831,7 +2831,9 @@
     "option_choice_jobs_default_currency_usd": "Dólar estadounidense",
     "filter_modules": "Filter modules",
     "stage_alpha": "Alfa",
-    "stage_beta": "Beta"
+    "stage_beta": "Beta",
+    "module_name_courses": "Cursos",
+    "module_desc_courses": "Aprendizaje comunitario: cursos, lecciones, cuestionarios, inscripciones y certificados"
   },
   "content": {
     "about_section": "Acerca de la sección",
