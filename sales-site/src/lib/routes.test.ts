@@ -17,6 +17,11 @@ describe('sales routes', () => {
     expect(salesNavItems.slice(0, 3).map((item) => item.label)).toEqual(['Platform', 'Features', 'Pricing']);
   });
 
+  it('keeps the primary header navigation free of duplicated repository links', () => {
+    expect(salesNavItems.map((item) => item.label)).not.toContain('GitHub');
+    expect(new Set(salesNavItems.map((item) => item.href)).size).toBe(salesNavItems.length);
+  });
+
   it('routes legal policy pages directly instead of falling back to the front page', () => {
     expect(normaliseSalesPath('/legal/terms')).toBe('/legal/terms');
     expect(normaliseSalesPath('/legal/privacy?ref=footer')).toBe('/legal/privacy');

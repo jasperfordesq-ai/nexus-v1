@@ -17,7 +17,6 @@ export const salesNavItems: SalesNavItem[] = [
   { href: '/features', label: 'Features' },
   { href: '/hosting', label: 'Pricing' },
   { href: 'https://hour-timebank.ie', label: 'Live App' },
-  { href: 'https://github.com/jasperfordesq-ai/nexus-v1', label: 'GitHub' },
 ];
 
 export function normaliseSalesPath(path: string): SalesPath {

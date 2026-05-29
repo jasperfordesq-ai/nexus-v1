@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { Button } from '@heroui/react';
-import { GitBranch, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { type MouseEvent, type ReactNode, useState } from 'react';
 
 import { legalPages } from '../data/legal';
@@ -27,6 +27,21 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
   const handleInternalNav = (href: string) => {
     setIsOpen(false);
     onNavigate(href);
+  };
+
+  const scrollToQuoteBuilder = () => {
+    setIsOpen(false);
+    if (currentPath !== '/hosting') {
+      onNavigate('/hosting');
+    }
+
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        document.getElementById('quote-builder')?.scrollIntoView({
+          behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        });
+      });
+    });
   };
 
   const handleInternalLink = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -70,8 +85,8 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
                   <a
                     key={item.href}
                     href={item.href}
-                    target={item.label === 'GitHub' ? '_blank' : undefined}
-                    rel={item.label === 'GitHub' ? 'noopener noreferrer' : undefined}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="nexus-nav-link"
                   >
                     {item.label}
@@ -94,16 +109,8 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
           </nav>
 
           <div className="hidden items-center gap-3 lg:flex">
-            <Button
-              size="sm"
-              variant="outline"
-              onPress={() => window.open('https://github.com/jasperfordesq-ai/nexus-v1', '_blank', 'noopener,noreferrer')}
-            >
-              <GitBranch className="size-4" />
-              Source
-            </Button>
-            <Button size="sm" onPress={() => handleInternalNav('/hosting')}>
-              Pricing
+            <Button size="sm" onPress={scrollToQuoteBuilder}>
+              Start quote
             </Button>
           </div>
 
@@ -123,7 +130,7 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
             <nav className="flex flex-col gap-2" aria-label="Mobile navigation">
               {salesNavItems.map((item) =>
                 item.href.startsWith('http') ? (
-                  <a key={item.href} href={item.href} className="rounded-xl px-3 py-3 font-semibold text-white/78">
+                  <a key={item.href} href={item.href} target="_blank" rel="noopener noreferrer" className="rounded-xl px-3 py-3 font-semibold text-white/78">
                     {item.label}
                   </a>
                 ) : (
