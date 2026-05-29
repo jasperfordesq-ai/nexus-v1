@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect } from 'vitest';
-import { CHART_COLORS, CHART_COLOR_MAP } from './chartColors';
+import { CHART_COLORS, CHART_COLOR_MAP, CHART_TOKEN_COLORS, chartTokenColor } from './chartColors';
 
 describe('CHART_COLORS', () => {
   it('is a non-empty array', () => {
@@ -53,5 +53,26 @@ describe('CHART_COLOR_MAP', () => {
 
   it('danger color is red', () => {
     expect(CHART_COLOR_MAP.danger).toBe('#ef4444');
+  });
+});
+
+describe('CHART_TOKEN_COLORS', () => {
+  it('contains all required theme token keys', () => {
+    const requiredKeys = ['primary', 'secondary', 'accent', 'success', 'warning', 'danger', 'foreground', 'surface', 'border'];
+    for (const key of requiredKeys) {
+      expect(CHART_TOKEN_COLORS).toHaveProperty(key);
+    }
+  });
+
+  it('uses project-owned CSS tokens instead of legacy HeroUI variables', () => {
+    for (const value of Object.values(CHART_TOKEN_COLORS)) {
+      expect(value).toContain('var(--');
+      expect(value).not.toContain('--heroui');
+    }
+  });
+
+  it('resolves token colors by name', () => {
+    expect(chartTokenColor('primary')).toBe(CHART_TOKEN_COLORS.primary);
+    expect(chartTokenColor('border')).toBe(CHART_TOKEN_COLORS.border);
   });
 });

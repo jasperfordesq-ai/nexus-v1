@@ -24,6 +24,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { usePageTitle } from '@/hooks';
+import { CHART_TOKEN_COLORS } from '@/lib/chartColors';
 import { adminNewsletters } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
 import { useTranslation } from 'react-i18next';
@@ -308,8 +309,8 @@ export function NewsletterAnalytics() {
                 <Tooltip
                   contentStyle={{
                     borderRadius: 12,
-                    border: '1px solid var(--border)',
-                    background: 'var(--surface)',
+                    border: `1px solid ${CHART_TOKEN_COLORS.border}`,
+                    background: CHART_TOKEN_COLORS.surface,
                   }}
                   formatter={(value, name) => {
                     const v = value as number;
@@ -331,9 +332,9 @@ export function NewsletterAnalytics() {
                     return labels[value] ?? value;
                   }}
                 />
-                <Bar yAxisId="left" dataKey="sent" fill="var(--accent)" radius={[4, 4, 0, 0]} />
-                <Bar yAxisId="left" dataKey="opens" fill="hsl(var(--heroui-warning, 37 91% 55%))" radius={[4, 4, 0, 0]} />
-                <Bar yAxisId="left" dataKey="clicks" fill="hsl(var(--heroui-success, 142 71% 45%))" radius={[4, 4, 0, 0]} />
+                <Bar yAxisId="left" dataKey="sent" fill={CHART_TOKEN_COLORS.accent} radius={[4, 4, 0, 0]} />
+                <Bar yAxisId="left" dataKey="opens" fill={CHART_TOKEN_COLORS.warning} radius={[4, 4, 0, 0]} />
+                <Bar yAxisId="left" dataKey="clicks" fill={CHART_TOKEN_COLORS.success} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
 

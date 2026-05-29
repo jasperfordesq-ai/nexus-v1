@@ -531,7 +531,7 @@
 
 /* @mention highlighting in group discussions/posts */
 .mention-highlight {
-  color: var(--heroui-primary);
+  color: var(--color-primary);
   font-weight: 500;
   cursor: pointer;
 }

@@ -20,6 +20,7 @@ import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
 import { DataTable, PageHeader, StatCard, EmptyState, type Column } from '../../components';
 import { useTranslation } from 'react-i18next';
+import { CHART_TOKEN_COLORS } from '@/lib/chartColors';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -403,13 +404,13 @@ export default function VolunteerGivingDays() {
                   <Bar
                     dataKey="raised_amount"
                     name={t('volunteering.raised_amount')}
-                    fill="var(--accent)"
+                    fill={CHART_TOKEN_COLORS.accent}
                     radius={[4, 4, 0, 0]}
                   />
                   <Bar
                     dataKey="donor_count"
                     name={t('volunteering.donor_count')}
-                    fill="hsl(var(--heroui-success))"
+                    fill={CHART_TOKEN_COLORS.success}
                     radius={[4, 4, 0, 0]}
                   />
                 </BarChart>
@@ -587,16 +588,16 @@ export default function VolunteerGivingDays() {
                           type="monotone"
                           dataKey="cumulative"
                           name={t('volunteering.cumulative_amount')}
-                          stroke="hsl(var(--heroui-success))"
-                          fill="hsl(var(--heroui-success))"
+                          stroke={CHART_TOKEN_COLORS.success}
+                          fill={CHART_TOKEN_COLORS.success}
                           fillOpacity={0.2}
                         />
                         <Area
                           type="monotone"
                           dataKey="amount"
                           name={t('volunteering.daily_amount')}
-                          stroke="var(--accent)"
-                          fill="var(--accent)"
+                          stroke={CHART_TOKEN_COLORS.accent}
+                          fill={CHART_TOKEN_COLORS.accent}
                           fillOpacity={0.1}
                         />
                       </AreaChart>

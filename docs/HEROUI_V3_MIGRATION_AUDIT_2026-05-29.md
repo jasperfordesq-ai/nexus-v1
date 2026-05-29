@@ -32,6 +32,7 @@
   - `text-foreground-500` / `text-foreground-600` -> `text-theme-muted`
   - `bg-content2` -> `bg-surface-secondary`
   - `bg-primary-50 text-primary-600` -> `bg-accent/10 text-accent`
+- Centralized the remaining semantic chart colors on `CHART_TOKEN_COLORS`, removed the old HeroUI v2 CSS-variable bridge from `tokens.css`, and moved the affected chart tooltips/series to project theme tokens.
 - Fixed adjacent TypeScript verification blockers discovered during the HeroUI pass:
   - Sentry integration typing now imports the current SDK `Integration` type from `@sentry/core`.
   - Volunteering tabs now guard the string cast against the known tab list.
@@ -42,12 +43,13 @@
 - `@heroui/react` value imports outside `react-frontend/src/components/ui` are effectively gone.
 - Remaining non-wrapper source references are type-only `Key` imports and comments.
 - The frontend now has a fuller local v3 primitive surface, so future component work can start from project wrappers instead of raw HeroUI imports.
+- Runtime source no longer depends on legacy HeroUI CSS variables for chart colors or mention highlighting.
 - TypeScript verification passes with `npx tsc --noEmit --pretty false`.
+- Production build passes with the existing Vite chunk/dynamic-import warnings.
 
 ## Intentional Compatibility Shims Left
 
 - Existing v2-shaped wrappers remain for broad compatibility: `Button`, `Card`, `Chip`, `Input`, `Textarea`, `Modal`, `Drawer`, `Select`, `Dropdown`, `Tabs`, `Table`, and related families.
-- The chart bridge variables in `tokens.css` and chart call sites using `--heroui-*` remain intentional until chart color helpers are centralized.
 - `Code` and `Snippet` local wrappers remain as app-local replacements for removed HeroUI v2 components.
 
 ## Remaining Work
@@ -59,8 +61,6 @@
   - `Select` / `Dropdown` legacy slot props and item aliases.
   - `Tabs` old variant aliases.
   - `Table` slot compatibility.
-- Replace chart `hsl(var(--heroui-*))` reads with a typed chart token helper that reads project tokens once per theme.
 - Continue opportunistic conversion of large form sections to native v3 `Form`, `Fieldset`, `TextField`, `Label`, `Description`, and `FieldError` composition.
 - Consider introducing `DisclosureGroup` once a concrete admin/public accordion-like section needs grouped disclosure semantics.
 - Browser spot-check authenticated admin/job/broker routes after login fixtures are available; static type migration is clean, but dense operational surfaces should still be visually sampled.
-

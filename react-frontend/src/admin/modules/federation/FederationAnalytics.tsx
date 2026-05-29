@@ -25,6 +25,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts/ToastContext';
+import { CHART_TOKEN_COLORS } from '@/lib/chartColors';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
 // Copyright © 2024–2026 Jasper Ford
@@ -217,7 +218,7 @@ export function FederationAnalytics() {
                   <Line
                     type="monotone"
                     dataKey="count"
-                    stroke="hsl(var(--heroui-primary))"
+                    stroke={CHART_TOKEN_COLORS.primary}
                     strokeWidth={2}
                     dot={false}
                   />
@@ -248,7 +249,7 @@ export function FederationAnalytics() {
                       width={120}
                     />
                     <ReTooltip />
-                    <Bar dataKey="activity" fill="hsl(var(--heroui-primary))" />
+                    <Bar dataKey="activity" fill={CHART_TOKEN_COLORS.primary} />
                   </BarChart>
                 </ResponsiveContainer>
               ) : (

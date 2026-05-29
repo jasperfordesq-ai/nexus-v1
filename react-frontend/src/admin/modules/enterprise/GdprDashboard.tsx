@@ -22,6 +22,7 @@ import Plus from 'lucide-react/icons/plus';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useTenant } from '@/contexts';
+import { CHART_TOKEN_COLORS } from '@/lib/chartColors';
 import { adminEnterprise } from '../../api/adminApi';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { StatCard, PageHeader } from '../../components';
@@ -33,7 +34,7 @@ function ComplianceScoreRing({ score, size = 120, scoreLabel }: { score: number;
   const circumference = 2 * Math.PI * radius;
   const progress = (score / 100) * circumference;
   const color = score >= 80 ? 'text-success' : score >= 50 ? 'text-warning' : 'text-danger';
-  const strokeColor = score >= 80 ? 'hsl(var(--heroui-success))' : score >= 50 ? 'hsl(var(--heroui-warning))' : 'hsl(var(--heroui-danger))';
+  const strokeColor = score >= 80 ? CHART_TOKEN_COLORS.success : score >= 50 ? CHART_TOKEN_COLORS.warning : CHART_TOKEN_COLORS.danger;
 
   return (
     <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
@@ -228,12 +229,12 @@ export function GdprDashboard() {
             <p className="text-sm font-semibold text-foreground mb-4">{t('enterprise.gdpr_requests_breaches_chart')}</p>
             <ResponsiveContainer width="100%" height={250}>
               <AreaChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-divider, #e5e7eb)" />
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_TOKEN_COLORS.border} />
                 <XAxis dataKey="month" tick={{ fontSize: 12 }} />
                 <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
                 <Tooltip />
-                <Area type="monotone" dataKey="requests" stackId="1" stroke="hsl(var(--heroui-primary))" fill="hsl(var(--heroui-primary))" fillOpacity={0.2} name={t('enterprise.gdpr_chart_requests')} />
-                <Area type="monotone" dataKey="breaches" stackId="2" stroke="hsl(var(--heroui-danger))" fill="hsl(var(--heroui-danger))" fillOpacity={0.2} name={t('enterprise.gdpr_chart_breaches')} />
+                <Area type="monotone" dataKey="requests" stackId="1" stroke={CHART_TOKEN_COLORS.primary} fill={CHART_TOKEN_COLORS.primary} fillOpacity={0.2} name={t('enterprise.gdpr_chart_requests')} />
+                <Area type="monotone" dataKey="breaches" stackId="2" stroke={CHART_TOKEN_COLORS.danger} fill={CHART_TOKEN_COLORS.danger} fillOpacity={0.2} name={t('enterprise.gdpr_chart_breaches')} />
               </AreaChart>
             </ResponsiveContainer>
           </CardBody>

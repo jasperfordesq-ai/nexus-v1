@@ -28,7 +28,7 @@ import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api, tokenManager } from '@/lib/api';
-import { CHART_COLORS, CHART_COLOR_MAP } from '@/lib/chartColors';
+import { CHART_COLORS, CHART_COLOR_MAP, CHART_TOKEN_COLORS } from '@/lib/chartColors';
 import { StatCard, PageHeader } from '../../components';
 import { useTranslation } from 'react-i18next';
 // Copyright © 2024–2026 Jasper Ford
@@ -101,9 +101,9 @@ interface HoursSummary {
 
 const tooltipStyle = {
   borderRadius: '8px',
-  border: '1px solid var(--color-border)',
-  backgroundColor: 'var(--color-surface)',
-  color: 'hsl(var(--heroui-foreground))',
+  border: `1px solid ${CHART_TOKEN_COLORS.border}`,
+  backgroundColor: CHART_TOKEN_COLORS.surface,
+  color: CHART_TOKEN_COLORS.foreground,
 };
 
 const PIE_COLORS = CHART_COLORS;

@@ -25,6 +25,7 @@ import {
 } from 'recharts';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
+import { CHART_TOKEN_COLORS } from '@/lib/chartColors';
 import { adminNewsletters } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
 import { NewsletterResend } from './NewsletterResend';
@@ -141,10 +142,10 @@ interface StatsData {
 // ─── Constants ──────────────────────────────────────────────────────────────
 
 const DEVICE_COLORS: Record<string, string> = {
-  desktop: 'hsl(var(--heroui-primary))',
-  mobile: 'hsl(var(--heroui-success))',
-  tablet: 'hsl(var(--heroui-warning))',
-  unknown: 'hsl(var(--heroui-default-400))',
+  desktop: CHART_TOKEN_COLORS.primary,
+  mobile: CHART_TOKEN_COLORS.success,
+  tablet: CHART_TOKEN_COLORS.warning,
+  unknown: CHART_TOKEN_COLORS.muted,
 };
 
 const DEVICE_ICONS: Record<string, typeof Monitor> = {
@@ -601,8 +602,8 @@ export function NewsletterStats() {
                     <YAxis fontSize={12} className="fill-default-500" />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: 'var(--color-surface)',
-                        borderColor: 'hsl(var(--heroui-divider))',
+                        backgroundColor: CHART_TOKEN_COLORS.surface,
+                        borderColor: CHART_TOKEN_COLORS.border,
                         borderRadius: '8px',
                         fontSize: '13px',
                       }}
@@ -613,7 +614,7 @@ export function NewsletterStats() {
                       type="monotone"
                       dataKey="opens"
                       name={t('newsletters.chart_opens')}
-                      stroke="hsl(var(--heroui-primary))"
+                      stroke={CHART_TOKEN_COLORS.primary}
                       strokeWidth={2}
                       dot={false}
                       activeDot={{ r: 4 }}
@@ -622,7 +623,7 @@ export function NewsletterStats() {
                       type="monotone"
                       dataKey="clicks"
                       name={t('newsletters.chart_clicks')}
-                      stroke="hsl(var(--heroui-success))"
+                      stroke={CHART_TOKEN_COLORS.success}
                       strokeWidth={2}
                       dot={false}
                       activeDot={{ r: 4 }}

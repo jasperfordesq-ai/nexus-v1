@@ -44,6 +44,7 @@ import {
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
+import { CHART_TOKEN_COLORS } from '@/lib/chartColors';
 import { MemberSearchPicker, PageHeader, StatCard, type MemberSearchMember } from '../../components';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -487,7 +488,7 @@ function ForecastMiniChart({ title, series, valueSuffix, t }: { title: string; s
       <div className="mt-3 h-40 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-divider)" />
+            <CartesianGrid strokeDasharray="3 3" stroke={CHART_TOKEN_COLORS.border} />
             <XAxis dataKey="month" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip
@@ -503,14 +504,15 @@ function ForecastMiniChart({ title, series, valueSuffix, t }: { title: string; s
               type="monotone"
               dataKey="band"
               stroke="none"
-              fill="hsl(var(--heroui-primary) / 0.15)"
+              fill={CHART_TOKEN_COLORS.primary}
+              fillOpacity={0.15}
               connectNulls
               isAnimationActive={false}
             />
             <Line
               type="monotone"
               dataKey="history"
-              stroke="hsl(var(--heroui-primary))"
+              stroke={CHART_TOKEN_COLORS.primary}
               strokeWidth={2}
               dot={{ r: 2 }}
               connectNulls={false}
@@ -520,7 +522,7 @@ function ForecastMiniChart({ title, series, valueSuffix, t }: { title: string; s
             <Line
               type="monotone"
               dataKey="predicted"
-              stroke="hsl(var(--heroui-primary))"
+              stroke={CHART_TOKEN_COLORS.primary}
               strokeDasharray="4 4"
               strokeWidth={2}
               dot={{ r: 2 }}

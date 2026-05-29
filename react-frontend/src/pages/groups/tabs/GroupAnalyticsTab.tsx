@@ -24,7 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
 import { logError } from '@/lib/logger';
-import { CHART_COLORS, CHART_COLOR_MAP } from '@/lib/chartColors';
+import { CHART_COLORS, CHART_COLOR_MAP, CHART_TOKEN_COLORS } from '@/lib/chartColors';
 import { resolveAvatarUrl } from '@/lib/helpers';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -111,9 +111,9 @@ interface GroupAnalyticsTabProps {
 
 const tooltipStyle = {
   borderRadius: '8px',
-  border: '1px solid hsl(var(--heroui-default-200))',
-  backgroundColor: 'hsl(var(--heroui-content1))',
-  color: 'hsl(var(--heroui-foreground))',
+  border: `1px solid ${CHART_TOKEN_COLORS.border}`,
+  backgroundColor: CHART_TOKEN_COLORS.surface,
+  color: CHART_TOKEN_COLORS.foreground,
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

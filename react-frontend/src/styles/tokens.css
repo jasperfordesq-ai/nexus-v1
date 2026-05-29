@@ -89,14 +89,6 @@
   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
   --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
 
-  /* HERO UI OVERRIDES (Dark) */
-  --heroui-background: 240 10% 4%;
-  --heroui-foreground: 0 0% 93%;
-  --heroui-content1: 240 10% 8%;
-  --heroui-content2: 240 10% 12%;
-  --heroui-content3: 240 10% 16%;
-  --heroui-content4: 240 10% 20%;
-
   /* Card/surface colors */
   --card-bg: rgba(255, 255, 255, 0.03);
   --card-border: rgba(255, 255, 255, 0.08);
@@ -193,14 +185,6 @@
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
   --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.20);
-
-  /* HERO UI OVERRIDES (Light) */
-  --heroui-background: 210 40% 98%;
-  --heroui-foreground: 222 47% 11%;
-  --heroui-content1: 0 0% 100%;
-  --heroui-content2: 210 40% 97%;
-  --heroui-content3: 210 30% 94%;
-  --heroui-content4: 210 25% 91%;
 
   /* Card/surface colors */
   --card-bg: rgba(255, 255, 255, 0.8);
