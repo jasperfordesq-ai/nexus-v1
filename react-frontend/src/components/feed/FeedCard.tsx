@@ -1506,41 +1506,53 @@ const FeedCard = React.memo(function FeedCard({
         <div className="flex flex-wrap items-center justify-between gap-1 -mx-1">
           <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1">
             {/*
-              ReactionPicker is shown for reactable feed item types only.
-              Notification-style cards (level_up, badge_earned) are not user-authored
-              content and have no entity to react against — they get the simple Like
-              button instead (which is no-op for them but keeps the UI consistent).
-              REACTABLE_TYPES MUST stay in sync with ReactionService::VALID_TARGET_TYPES.
+              ReactionPicker is shown for reactable feed item types when an
+              onReact handler is supplied; otherwise likeable cards fall back to
+              a simple Like button.
+
+              Notification-style cards (level_up, badge_earned) are NOT
+              user-authored content — there is no entity to like or react
+              against, and the backend like API (SocialController::likeV2)
+              rejects those target_types with a 400. Rendering an interactive
+              Like button on them produced the "Failed to like" error users hit
+              (Sentry NEXUS-PHP-1Y), so milestone cards now get no like/react
+              control at all.
+
+              REACTABLE_FEED_TYPES MUST stay in sync with
+              ReactionService::VALID_TARGET_TYPES and
+              SocialController::VALID_LIKE_TARGETS.
             */}
-            {onReact && REACTABLE_FEED_TYPES.has(item.type) ? (
-              <ReactionPicker
-                userReaction={(item.reactions?.user_reaction as ReactionType | null) ?? null}
-                onReact={(type) => onReact(item, type)}
-                isAuthenticated={isAuthenticated}
-                size="sm"
-              />
-            ) : (
-              <Tooltip content={item.is_liked ? t('card.unlike') : t('card.like_action')} delay={400} closeDelay={0} size="sm">
-                <Button
+            {REACTABLE_FEED_TYPES.has(item.type) ? (
+              onReact ? (
+                <ReactionPicker
+                  userReaction={(item.reactions?.user_reaction as ReactionType | null) ?? null}
+                  onReact={(type) => onReact(item, type)}
+                  isAuthenticated={isAuthenticated}
                   size="sm"
-                  variant="light"
-                  className={`transition-all ${item.is_liked
-                    ? 'text-rose-500 font-medium bg-rose-500/5'
-                    : 'text-theme-muted hover:text-rose-500 hover:bg-rose-500/5'
-                  }`}
-                  startContent={
-                    <Heart
-                      className={`w-[18px] h-[18px] transition-all ${item.is_liked ? 'fill-rose-500 text-rose-500 scale-110' : ''}`}
-                      aria-hidden="true"
-                    />
-                  }
-                  onPress={isAuthenticated ? () => onToggleLike(item) : undefined}
-                  isDisabled={!isAuthenticated}
-                >
-                  {t('card.like_action')}
-                </Button>
-              </Tooltip>
-            )}
+                />
+              ) : (
+                <Tooltip content={item.is_liked ? t('card.unlike') : t('card.like_action')} delay={400} closeDelay={0} size="sm">
+                  <Button
+                    size="sm"
+                    variant="light"
+                    className={`transition-all ${item.is_liked
+                      ? 'text-rose-500 font-medium bg-rose-500/5'
+                      : 'text-theme-muted hover:text-rose-500 hover:bg-rose-500/5'
+                    }`}
+                    startContent={
+                      <Heart
+                        className={`w-[18px] h-[18px] transition-all ${item.is_liked ? 'fill-rose-500 text-rose-500 scale-110' : ''}`}
+                        aria-hidden="true"
+                      />
+                    }
+                    onPress={isAuthenticated ? () => onToggleLike(item) : undefined}
+                    isDisabled={!isAuthenticated}
+                  >
+                    {t('card.like_action')}
+                  </Button>
+                </Tooltip>
+              )
+            ) : null}
 
             {isCommentable && (
               <Tooltip content={t('card.view_comments')} delay={400} closeDelay={0} size="sm">

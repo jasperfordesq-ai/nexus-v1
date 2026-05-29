@@ -44,7 +44,7 @@ class WalletController extends BaseApiController
         $this->requireAuth();
         $this->rateLimit('wallet_config', 60, 60);
 
-        $maxTransfer = $this->tenantSettingsService->get('wallet.max_transfer', null);
+        $maxTransfer = $this->tenantSettingsService->get($this->getTenantId(), 'wallet.max_transfer', null);
 
         return $this->respondWithData([
             'max_transfer' => $maxTransfer !== null ? (int) $maxTransfer : null,

@@ -199,6 +199,12 @@ RUN mkdir -p /var/www/html/storage/app/public \
     && chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
+# setgid on storage/cache dirs so files created by any process (incl. the
+# root-run queue/scheduler containers with umask 0002) inherit the www-data
+# group and stay group-writable — prevents the cross-container "Permission
+# denied" on the daily log file regardless of which container writes it first.
+RUN find /var/www/html/storage /var/www/html/bootstrap/cache -type d -exec chmod 2775 {} +
+
 # Run package:discover so that auto-discovered service providers (Horizon,
 # Sanctum, etc.) are written into bootstrap/cache/packages.php inside the
 # image. Without this, --no-scripts skips discovery and Horizon commands

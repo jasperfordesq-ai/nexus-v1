@@ -247,7 +247,7 @@ services:
       context: .
       dockerfile: Dockerfile.prod
     container_name: nexus-php-queue
-    command: sh -c "php artisan optimize && php artisan horizon"
+    command: sh -c "umask 0002; php artisan optimize && php artisan horizon"
     restart: unless-stopped
     stop_grace_period: 120s
     healthcheck:
@@ -307,7 +307,7 @@ services:
       context: .
       dockerfile: Dockerfile.prod
     container_name: nexus-php-scheduler
-    command: sh -c "php artisan optimize && while true; do php artisan schedule:run --no-interaction; sleep 60; done"
+    command: sh -c "umask 0002; php artisan optimize && while true; do php artisan schedule:run --no-interaction; sleep 60; done"
     restart: unless-stopped
     stop_grace_period: 90s
     healthcheck:

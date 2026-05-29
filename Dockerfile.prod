@@ -239,8 +239,13 @@ RUN mkdir -p /var/www/html/httpdocs/uploads /var/www/html/public/uploads/posts \
 # (artisan storage:link targets /public/ but our document root is /httpdocs/)
 RUN ln -sf /var/www/html/storage/app/public /var/www/html/httpdocs/storage
 
-# Ensure Laravel storage and bootstrap/cache are writable by www-data
-RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+# Ensure Laravel storage and bootstrap/cache are writable by www-data.
+# setgid on dirs so files created by any process (incl. root-run queue/
+# scheduler with umask 0002) inherit the www-data group and stay
+# group-writable — prevents cross-container "Permission denied" on the daily
+# log file regardless of which container writes it first.
+RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache \
+    && find /var/www/html/storage /var/www/html/bootstrap/cache -type d -exec chmod 2775 {} +
 
 # =============================================================================
 # Expose Port
