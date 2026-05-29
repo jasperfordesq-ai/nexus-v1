@@ -2,7 +2,7 @@ import { Card, CardBody, CardHeader, Spinner, Button, Input, Select, SelectItem,
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import {
   AreaChart,
   Area,

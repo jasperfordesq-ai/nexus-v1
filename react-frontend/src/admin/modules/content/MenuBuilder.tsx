@@ -1,7 +1,7 @@
 import { Card, CardBody, CardHeader, Input, Button, Spinner, Chip, Select, SelectItem, DynamicIcon, Switch } from '@/components/ui';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import Menu from 'lucide-react/icons/menu';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';

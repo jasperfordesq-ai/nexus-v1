@@ -2,7 +2,7 @@ import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Table, TableB
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import AlertTriangle from 'lucide-react/icons/alert-triangle';
 import Clock from 'lucide-react/icons/clock';
 import Heart from 'lucide-react/icons/heart';

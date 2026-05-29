@@ -1,7 +1,7 @@
 import { Card, CardBody, CardHeader, Input, Button, Spinner, Chip, Textarea, Switch } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import Save from 'lucide-react/icons/save';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import ExternalLink from 'lucide-react/icons/external-link';

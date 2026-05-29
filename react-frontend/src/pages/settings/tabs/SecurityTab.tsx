@@ -18,7 +18,7 @@ import ShieldOff from 'lucide-react/icons/shield-off';
 import Copy from 'lucide-react/icons/copy';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import { GlassCard, Button, Chip, Spinner, Input, InputOTP, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
-import { Label, Description } from '@heroui/react';
+import { Description, Label } from '@/components/ui';
 import { BiometricSettings } from '@/components/security/BiometricSettings';
 import { useTranslation } from 'react-i18next';
 

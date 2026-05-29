@@ -1,4 +1,4 @@
-import { Chip } from '@heroui/react';
+import { Chip } from '@/components/ui';
 import { Select, SelectItem, useDisclosure, GlassCard, Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, CardRowsSkeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later

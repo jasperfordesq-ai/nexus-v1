@@ -18,6 +18,7 @@ import { motion } from '@/lib/motion';import { SafeHtml } from '@/components/ui/
 import HelpCircle from 'lucide-react/icons/circle-help';
 import MessageSquare from 'lucide-react/icons/message-square';
 import BookOpen from 'lucide-react/icons/book-open';
+import Search from 'lucide-react/icons/search';
 import Wallet from 'lucide-react/icons/wallet';
 import Calendar from 'lucide-react/icons/calendar';
 import { useTranslation } from 'react-i18next';

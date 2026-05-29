@@ -11,7 +11,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from '@/lib/motion';
-import { Chip } from '@heroui/react';
+import { Chip } from '@/components/ui';
 import { Slider } from '@/components/ui';
 import Briefcase from 'lucide-react/icons/briefcase';
 import MapPin from 'lucide-react/icons/map-pin';

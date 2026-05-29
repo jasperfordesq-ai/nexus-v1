@@ -31,7 +31,7 @@ import HelpCircle from 'lucide-react/icons/circle-help';
 import PanelLeftClose from 'lucide-react/icons/panel-left-close';
 import PanelLeft from 'lucide-react/icons/panel-left';
 import Settings from 'lucide-react/icons/settings';
-import { Chip } from '@heroui/react';
+import { Chip } from '@/components/ui';
 import { Button, Tooltip } from '@/components/ui';
 
 export interface BrokerBadgeCounts {

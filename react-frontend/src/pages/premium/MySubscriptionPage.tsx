@@ -1,7 +1,7 @@
 import { Card, CardBody, CardHeader, Button, Chip, Spinner, useConfirm } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import Crown from 'lucide-react/icons/crown';
 import ExternalLink from 'lucide-react/icons/external-link';
 import { useTranslation } from 'react-i18next';

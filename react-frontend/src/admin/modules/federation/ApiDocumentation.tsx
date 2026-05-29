@@ -10,7 +10,7 @@
 
 import { useState } from 'react';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import BookOpen from 'lucide-react/icons/book-open';
 import Code from 'lucide-react/icons/code';

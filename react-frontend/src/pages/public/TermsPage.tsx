@@ -13,7 +13,7 @@
 
 import { Link } from 'react-router-dom';
 import { motion } from '@/lib/motion';
-import { Chip, Separator } from '@heroui/react';
+import { Chip, Separator } from '@/components/ui';
 import FileText from 'lucide-react/icons/file-text';
 import Clock from 'lucide-react/icons/clock';
 import Users from 'lucide-react/icons/users';

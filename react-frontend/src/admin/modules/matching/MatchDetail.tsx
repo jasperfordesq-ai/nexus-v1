@@ -6,7 +6,7 @@ import {
 import { useNavigate,
   useParams } from 'react-router-dom';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';

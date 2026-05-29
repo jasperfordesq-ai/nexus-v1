@@ -27,7 +27,7 @@ import Copy from 'lucide-react/icons/copy';
 import Send from 'lucide-react/icons/send';
 import Share2 from 'lucide-react/icons/share-2';
 import { useTranslation } from 'react-i18next';
-import { Chip } from '@heroui/react';
+import { Chip } from '@/components/ui';
 import { GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Avatar, Tooltip } from '@/components/ui';
 import { formatDateValue, resolveAvatarUrl } from '@/lib/helpers';
 import { MatchBadge } from './MatchBadge';

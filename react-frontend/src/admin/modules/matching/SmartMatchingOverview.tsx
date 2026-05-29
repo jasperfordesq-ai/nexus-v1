@@ -4,7 +4,7 @@ import {
   useCallback,
   useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import Settings from 'lucide-react/icons/settings';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import Trash2 from 'lucide-react/icons/trash-2';

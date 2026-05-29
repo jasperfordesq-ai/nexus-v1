@@ -10,7 +10,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import Rss from 'lucide-react/icons/rss';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';

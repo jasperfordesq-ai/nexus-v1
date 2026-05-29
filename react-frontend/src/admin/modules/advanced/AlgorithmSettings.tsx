@@ -1,7 +1,7 @@
 import { Card, CardBody, CardHeader, Button, Spinner, Chip, Switch } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 import { Slider } from '@/components/ui';
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import Settings from 'lucide-react/icons/settings';
 import Save from 'lucide-react/icons/save';
 import Activity from 'lucide-react/icons/activity';
@@ -269,7 +269,7 @@ export function AlgorithmSettings() {
                 <Cpu size={20} className="text-accent shrink-0" aria-hidden="true" />
                 <div>
                   <h3 className="text-base font-semibold">{t(areaData.labelKey)}</h3>
-                  <p className="text-sm text-foreground-500">{t(areaData.descriptionKey)}</p>
+                  <p className="text-sm text-theme-muted">{t(areaData.descriptionKey)}</p>
                 </div>
               </div>
               <Switch
@@ -293,7 +293,7 @@ export function AlgorithmSettings() {
                           {(areaData.weights[param.key] ?? param.min).toFixed(param.step < 1 ? 2 : 0)}
                         </Chip>
                       </div>
-                      <p className="text-xs text-foreground-500 mb-2">{t(param.descriptionKey)}</p>
+                      <p className="text-xs text-theme-muted mb-2">{t(param.descriptionKey)}</p>
                       <Slider
                         minValue={param.min}
                         maxValue={param.max}
@@ -326,7 +326,7 @@ export function AlgorithmSettings() {
 
             {!areaData.enabled && (
               <CardBody>
-                <p className="text-sm text-foreground-400 italic">
+                <p className="text-sm text-theme-subtle italic">
                   {t('algorithm_disabled_msg')}
                 </p>
                 <div className="flex justify-end mt-3">
@@ -352,7 +352,7 @@ export function AlgorithmSettings() {
               <Activity size={20} className="text-accent" aria-hidden="true" />
               <div>
                 <h3 className="text-base font-semibold">{t('algorithm_health_title')}</h3>
-                <p className="text-sm text-foreground-500">
+                <p className="text-sm text-theme-muted">
                   {t('algorithm_health_desc')}
                 </p>
               </div>
@@ -414,15 +414,15 @@ export function AlgorithmSettings() {
                   <div className="flex flex-wrap gap-3 text-sm">
                     <span>
                       <span className="font-medium">{health.collaborative_filtering.listing_interactions.toLocaleString()}</span>
-                      <span className="text-foreground-500 ml-1">{t('listing_saves')}</span>
+                      <span className="text-theme-muted ml-1">{t('listing_saves')}</span>
                     </span>
                     <span>
                       <span className="font-medium">{health.collaborative_filtering.member_interactions.toLocaleString()}</span>
-                      <span className="text-foreground-500 ml-1">{t('member_transactions')}</span>
+                      <span className="text-theme-muted ml-1">{t('member_transactions')}</span>
                     </span>
                   </div>
                   {health.collaborative_filtering.listing_interactions < 10 && (
-                    <p className="text-xs text-foreground-400 mt-1">
+                    <p className="text-xs text-theme-subtle mt-1">
                       {t('cf_min_hint')}
                     </p>
                   )}
@@ -438,11 +438,11 @@ export function AlgorithmSettings() {
                   <div className="flex flex-wrap gap-3 text-sm">
                     <span>
                       <span className="font-medium">{health.embeddings.listing_count.toLocaleString()}</span>
-                      <span className="text-foreground-500 ml-1">{t('label_listings')}</span>
+                      <span className="text-theme-muted ml-1">{t('label_listings')}</span>
                     </span>
                     <span>
                       <span className="font-medium">{health.embeddings.user_count.toLocaleString()}</span>
-                      <span className="text-foreground-500 ml-1">{t('label_users')}</span>
+                      <span className="text-theme-muted ml-1">{t('label_users')}</span>
                     </span>
                     <Chip
                       size="sm"
@@ -453,7 +453,7 @@ export function AlgorithmSettings() {
                     </Chip>
                   </div>
                   {health.embeddings.total === 0 && (
-                    <p className="text-xs text-foreground-400 mt-2">
+                    <p className="text-xs text-theme-subtle mt-2">
                       {t('generate_embeddings_hint_prefix')} <code className="bg-surface-secondary px-1 rounded">php scripts/backfill_embeddings.php --tenant=&lt;id&gt;</code> {t('generate_embeddings_hint_suffix')}
                     </p>
                   )}
@@ -477,7 +477,7 @@ export function AlgorithmSettings() {
                         </Chip>
                       </div>
                       {!health.search.meilisearch_available && (
-                        <p className="text-xs text-foreground-400 mt-2">
+                        <p className="text-xs text-theme-subtle mt-2">
                           {t('sync_search_hint_prefix')} <code className="bg-surface-secondary px-1 rounded">php scripts/sync_search_index.php --all-tenants</code> {t('sync_search_hint_suffix')}
                         </p>
                       )}
@@ -488,7 +488,7 @@ export function AlgorithmSettings() {
             )}
 
             {!health && !healthLoading && (
-              <p className="text-sm text-foreground-400">{t('health_unavailable')}</p>
+              <p className="text-sm text-theme-subtle">{t('health_unavailable')}</p>
             )}
           </CardBody>
         </Card>

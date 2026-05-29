@@ -24,7 +24,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from '@/lib/motion';
 import { sanitizeRichText } from '@/lib/sanitize';
-import { Chip } from '@heroui/react';
+import { Chip } from '@/components/ui';
 import History from 'lucide-react/icons/history';
 import CalendarDays from 'lucide-react/icons/calendar-days';
 import ChevronDown from 'lucide-react/icons/chevron-down';

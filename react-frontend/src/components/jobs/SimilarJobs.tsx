@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { Link } from 'react-router-dom';
-import { Chip } from '@heroui/react';
+import { Chip } from '@/components/ui';
 import Briefcase from 'lucide-react/icons/briefcase';
 import MapPin from 'lucide-react/icons/map-pin';
 import DollarSign from 'lucide-react/icons/dollar-sign';

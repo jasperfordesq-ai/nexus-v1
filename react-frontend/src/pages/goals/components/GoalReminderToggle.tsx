@@ -16,7 +16,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui';
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import Bell from 'lucide-react/icons/bell';
 import BellOff from 'lucide-react/icons/bell-off';
 import BellRing from 'lucide-react/icons/bell-ring';

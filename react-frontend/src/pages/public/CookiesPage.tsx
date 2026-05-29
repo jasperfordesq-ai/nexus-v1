@@ -12,7 +12,7 @@
 
 import { Link } from 'react-router-dom';
 import { motion } from '@/lib/motion';
-import { Chip, Separator } from '@heroui/react';
+import { Chip, Separator } from '@/components/ui';
 import Cookie from 'lucide-react/icons/cookie';
 import Shield from 'lucide-react/icons/shield';
 import Settings from 'lucide-react/icons/settings';

@@ -1,4 +1,4 @@
-import { Card, Chip } from '@heroui/react';
+import { Card, Chip } from '@/components/ui';
 import { Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -71,10 +71,10 @@ export function ChangelogPage() {
             {t('release_stage')}
           </Chip>
         </div>
-        <p className="text-sm text-foreground-600">
+        <p className="text-sm text-theme-muted">
           {t('changelog_page.subheading')}
         </p>
-        <p className="text-xs text-foreground-500">
+        <p className="text-xs text-theme-muted">
           <a
             href="https://github.com/jasperfordesq-ai/nexus-v1/blob/main/CHANGELOG.md"
             target="_blank"
@@ -91,7 +91,7 @@ export function ChangelogPage() {
       <Card>
         <Card.Content className="py-6 px-4 sm:px-6">
           {state.status === 'loading' && (
-            <div role="status" aria-busy="true" aria-label={t('changelog_page.loading')} className="flex items-center justify-center py-12 gap-3 text-foreground-500">
+            <div role="status" aria-busy="true" aria-label={t('changelog_page.loading')} className="flex items-center justify-center py-12 gap-3 text-theme-muted">
               <Spinner size="sm" />
               <span className="text-sm">
                 {t('changelog_page.loading')}
@@ -101,7 +101,7 @@ export function ChangelogPage() {
           {state.status === 'error' && (
             <div role="alert" className="py-8 text-center text-sm text-danger">
               {t('changelog_page.error')}
-              <p className="mt-2 text-xs text-foreground-500 font-mono">{state.message}</p>
+              <p className="mt-2 text-xs text-theme-muted font-mono">{state.message}</p>
             </div>
           )}
           {state.status === 'ok' && <MarkdownRenderer content={state.content} />}

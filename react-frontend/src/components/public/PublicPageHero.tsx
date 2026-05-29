@@ -5,7 +5,7 @@
 
 import type { ReactNode } from 'react';
 import Sparkles from 'lucide-react/icons/sparkles';
-import { Chip } from '@heroui/react';
+import { Chip } from '@/components/ui';
 
 interface PublicPageHeroStat {
   label: string;

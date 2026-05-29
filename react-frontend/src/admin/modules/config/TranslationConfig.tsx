@@ -1,7 +1,7 @@
 import { Card, CardBody, CardHeader, Spinner, Button, Input, Select, SelectItem, Switch, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import Settings from 'lucide-react/icons/settings';
 import BookOpen from 'lucide-react/icons/book-open';
 import Trash2 from 'lucide-react/icons/trash-2';

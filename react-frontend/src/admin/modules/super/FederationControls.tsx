@@ -6,7 +6,7 @@ import {
   useRef } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import Globe from 'lucide-react/icons/globe';
 import Shield from 'lucide-react/icons/shield';
 import Lock from 'lucide-react/icons/lock';

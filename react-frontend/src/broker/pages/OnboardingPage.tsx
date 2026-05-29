@@ -1,5 +1,5 @@
 import { Card, CardBody, CardHeader, Button, Spinner, Progress, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui';
-import { Chip } from '@heroui/react';
+import { Chip } from '@/components/ui';
 import {
   useEffect,
   useState,

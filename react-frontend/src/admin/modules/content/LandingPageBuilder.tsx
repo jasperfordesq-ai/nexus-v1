@@ -2,7 +2,7 @@ import { Card, CardBody, CardHeader, Input, Button, Textarea, Spinner, Select, S
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import ChevronUp from 'lucide-react/icons/chevron-up';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import Save from 'lucide-react/icons/save';
@@ -941,7 +941,7 @@ function SectionCard({
               isExpanded ? 'rotate-90' : ''
             }`}
           />
-          <span className="inline-flex items-center justify-center size-8 rounded-md bg-primary-50 text-primary-600 shrink-0">
+          <span className="inline-flex items-center justify-center size-8 rounded-md bg-accent/10 text-accent shrink-0">
             <SectionIcon size={16} />
           </span>
           <div className="min-w-0">

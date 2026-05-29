@@ -1,7 +1,7 @@
 import { Button, Card, CardBody, CardHeader, Input, Spinner, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, useConfirm } from '@/components/ui';
 import { useState } from 'react';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Save from 'lucide-react/icons/save';
@@ -47,7 +47,7 @@ function TierRow({ tierName, criteria, onChange }: TierRowProps) {
     <div className="space-y-3">
       <div>
         <p className="font-semibold text-sm">{t(`admin.trust_tier.tiers.${tierName}.label`)}</p>
-        <p className="text-xs text-foreground-500">{t(`admin.trust_tier.tiers.${tierName}.description`)}</p>
+        <p className="text-xs text-theme-muted">{t(`admin.trust_tier.tiers.${tierName}.description`)}</p>
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <Input
@@ -172,7 +172,7 @@ export function TrustTierAdminPage() {
               >
                 {t('admin.trust_tier.actions.recompute')}
               </Button>
-              <p className="max-w-xs text-right text-xs text-foreground-400">
+              <p className="max-w-xs text-right text-xs text-theme-subtle">
                 {t('admin.trust_tier.recompute_hint')}
               </p>
             </div>
@@ -255,9 +255,9 @@ export function TrustTierAdminPage() {
                 <TableRow key={level}>
                   <TableCell className="font-mono text-xs">{level}</TableCell>
                   <TableCell className="font-medium">{t(`admin.trust_tier.reference.rows.${level}.name`)}</TableCell>
-                  <TableCell className="text-foreground-500">{t(`admin.trust_tier.reference.rows.${level}.color`)}</TableCell>
-                  <TableCell className="text-foreground-500">{t(`admin.trust_tier.reference.rows.${level}.description`)}</TableCell>
-                  <TableCell className="text-foreground-500">{t(`admin.trust_tier.reference.rows.${level}.unlocks`)}</TableCell>
+                  <TableCell className="text-theme-muted">{t(`admin.trust_tier.reference.rows.${level}.color`)}</TableCell>
+                  <TableCell className="text-theme-muted">{t(`admin.trust_tier.reference.rows.${level}.description`)}</TableCell>
+                  <TableCell className="text-theme-muted">{t(`admin.trust_tier.reference.rows.${level}.unlocks`)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

@@ -12,7 +12,7 @@ import { Card, CardHeader, CardBody, Button, Input, Spinner, Switch } from '@/co
 
 import { useState, useEffect, useCallback } from 'react';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
 import { Link } from 'react-router-dom';

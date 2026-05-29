@@ -17,7 +17,7 @@
 
 import FileText from 'lucide-react/icons/file-text';
 import ExternalLink from 'lucide-react/icons/external-link';
-import { Chip } from '@heroui/react';
+import { Chip } from '@/components/ui';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { PendingDocument } from '@/hooks/useLegalGate';
@@ -67,7 +67,7 @@ export function LegalAcceptanceGate({
             <FileText className="w-5 h-5 text-warning shrink-0" aria-hidden="true" />
             <span>{t('gate.title')}</span>
           </div>
-          <p className="text-sm font-normal text-foreground-500">
+          <p className="text-sm font-normal text-theme-muted">
             {pendingDocs.length === 1
               ? t('gate.subtitle_one')
               : t('gate.subtitle_other', { count: pendingDocs.length })}
@@ -85,7 +85,7 @@ export function LegalAcceptanceGate({
                 className="flex items-center justify-between gap-3 p-3 rounded-lg bg-surface-secondary"
               >
                 <div className="flex items-center gap-2 min-w-0">
-                  <FileText className="w-4 h-4 text-foreground-400 shrink-0" aria-hidden="true" />
+                  <FileText className="w-4 h-4 text-theme-subtle shrink-0" aria-hidden="true" />
                   <span className="text-sm font-medium truncate">{label}</span>
                   {doc.acceptance_status === 'outdated' && (
                     <Chip color="warning" variant="tertiary" size="sm" className="shrink-0">
@@ -108,7 +108,7 @@ export function LegalAcceptanceGate({
         </ModalBody>
 
         <ModalFooter>
-          <p className="text-xs text-foreground-400 flex-1">
+          <p className="text-xs text-theme-subtle flex-1">
             {t('gate.consent_text')}
           </p>
           <Button

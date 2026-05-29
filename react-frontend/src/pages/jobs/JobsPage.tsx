@@ -1,5 +1,5 @@
 import { Select, SelectItem, GlassCard, Button, SearchField, Switch, Tabs, Tab, CardRowsSkeleton } from '@/components/ui';
-import { Chip as HeroChip, ToggleButton, ToggleButtonGroup } from '@heroui/react';
+import { Chip as HeroChip, ToggleButton, ToggleButtonGroup } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford

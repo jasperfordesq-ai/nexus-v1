@@ -10,7 +10,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import Activity from 'lucide-react/icons/activity';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Calendar from 'lucide-react/icons/calendar';

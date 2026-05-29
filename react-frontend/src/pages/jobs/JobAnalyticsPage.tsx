@@ -29,7 +29,7 @@ import Share2 from 'lucide-react/icons/share-2';
 import Star from 'lucide-react/icons/star';
 import Sparkles from 'lucide-react/icons/sparkles';
 import { useTranslation } from 'react-i18next';
-import { Chip } from '@heroui/react';
+import { Chip } from '@/components/ui';
 import { GlassCard, Progress, Button, Spinner, Tooltip, CardRowsSkeleton, Skeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTenant } from '@/contexts';

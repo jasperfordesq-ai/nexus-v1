@@ -4,7 +4,7 @@ import {
   useCallback,
   useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import Target from 'lucide-react/icons/target';

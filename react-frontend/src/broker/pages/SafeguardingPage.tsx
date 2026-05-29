@@ -27,7 +27,7 @@ import { api } from '@/lib/api';
 import { formatServerDate } from '@/lib/serverTime';
 import { PageHeader, DataTable, StatCard, EmptyState } from '@/admin/components';
 import type { Column } from '@/admin/components';
-import { Chip } from '@heroui/react';
+import { Chip } from '@/components/ui';
 import { Button, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -2,7 +2,7 @@ import { Card, CardBody, CardHeader, Input, Button, Spinner, Switch, Table, Tabl
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Slider } from '@/components/ui';
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
 import Trash2 from 'lucide-react/icons/trash-2';

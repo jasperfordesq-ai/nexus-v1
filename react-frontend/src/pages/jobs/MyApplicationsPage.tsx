@@ -22,7 +22,7 @@ import Video from 'lucide-react/icons/video';
 import Download from 'lucide-react/icons/download';
 import FileDown from 'lucide-react/icons/file-down';
 import ExternalLink from 'lucide-react/icons/external-link';
-import { Chip } from '@heroui/react';
+import { Chip } from '@/components/ui';
 import { GlassCard, useDisclosure, Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab, Skeleton } from '@/components/ui';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';

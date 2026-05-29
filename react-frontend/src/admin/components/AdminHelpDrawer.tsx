@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { FocusScope } from '@react-aria/focus';
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import { Link } from 'react-router-dom';
 import X from 'lucide-react/icons/x';
 import LightbulbIcon from 'lucide-react/icons/lightbulb';

@@ -12,7 +12,7 @@
 
 import { Card, CardBody, CardHeader, Spinner, Button } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import { useTranslation } from 'react-i18next';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Trash2 from 'lucide-react/icons/trash-2';

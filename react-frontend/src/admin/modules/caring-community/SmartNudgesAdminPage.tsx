@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis, } from 'recharts';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import Bell from 'lucide-react/icons/bell';
 import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';

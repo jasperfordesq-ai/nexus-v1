@@ -20,7 +20,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from '@/lib/motion';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import Search from 'lucide-react/icons/search';
 import SlidersHorizontal from 'lucide-react/icons/sliders-horizontal';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';

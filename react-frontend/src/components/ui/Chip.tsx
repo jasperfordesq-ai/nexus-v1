@@ -118,7 +118,7 @@ function combineClasses(...classes: Array<string | false | undefined>): string |
   return className || undefined;
 }
 
-export function Chip({
+function ChipRoot({
   as: Component,
   avatar,
   children,
@@ -191,3 +191,8 @@ export function Chip({
     </HeroUIChip>
   );
 }
+
+export const Chip = Object.assign(ChipRoot, {
+  Label: HeroUIChip.Label,
+});
+export const ChipLabel = HeroUIChip.Label;

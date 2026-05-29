@@ -1,6 +1,6 @@
 import Target from 'lucide-react/icons/target';
 import { useTranslation } from 'react-i18next';
-import { Chip } from '@heroui/react';
+import { Chip } from '@/components/ui';
 import type { MatchResult } from './JobDetailTypes';
 
 interface MatchBadgeProps {

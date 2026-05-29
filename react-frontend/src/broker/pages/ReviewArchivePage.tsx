@@ -23,7 +23,7 @@ import { formatServerDate } from '@/lib/serverTime';
 import { adminBroker } from '@/admin/api/adminApi';
 import { DataTable, PageHeader, type Column } from '@/admin/components';
 import type { BrokerArchive } from '@/admin/api/types';
-import { Chip } from '@heroui/react';
+import { Chip } from '@/components/ui';
 import { Button, Input, Tabs, Tab } from '@/components/ui';
 
 export function ReviewArchive() {

@@ -34,7 +34,7 @@ import { $isLinkNode } from '@lexical/link';
 import { $getNearestNodeOfType } from '@lexical/utils';
 import { $isListNode, ListNode as ListNodeClass } from '@lexical/list';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import Bold from 'lucide-react/icons/bold';
 import Italic from 'lucide-react/icons/italic';
 import Underline from 'lucide-react/icons/underline';

@@ -6,7 +6,7 @@ import XCircle from 'lucide-react/icons/circle-x';
 import Video from 'lucide-react/icons/video';
 import CalendarPlus from 'lucide-react/icons/calendar-plus';
 import { useTranslation } from 'react-i18next';
-import { Chip } from '@heroui/react';
+import { Chip } from '@/components/ui';
 import { GlassCard, Button } from '@/components/ui';
 import { API_BASE } from '@/lib/api';
 import type { InlineInterview } from './JobDetailTypes';

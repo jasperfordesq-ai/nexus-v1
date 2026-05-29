@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState } from 'react';
-import { Chip } from '@heroui/react';
+import { Chip } from '@/components/ui';
 import Target from 'lucide-react/icons/target';
 import Sparkles from 'lucide-react/icons/sparkles';
 import Building2 from 'lucide-react/icons/building-2';

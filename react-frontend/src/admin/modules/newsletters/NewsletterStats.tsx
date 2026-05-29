@@ -2,7 +2,7 @@ import { Card, CardBody, CardHeader, Button, Chip, Progress, Skeleton, Table, Ta
 import { useState, useCallback, useEffect, useMemo, type CSSProperties } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Eye from 'lucide-react/icons/eye';

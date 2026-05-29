@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure, GlassCard, Progress, Button, Chip, Spinner, SearchField, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, CardRowsSkeleton, ToggleButtonGroup, ToggleButton } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, GlassCard, Progress, Button, Chip, Spinner, SearchField, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, CardRowsSkeleton, ToggleButtonGroup, ToggleButton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -344,7 +344,10 @@ export function VolunteeringPage() {
               selectedKeys={activeTab ? new Set([activeTab]) : new Set()}
               onSelectionChange={(keys) => {
                 const [nextTab] = Array.from(keys as Set<Key>);
-                if (nextTab) setTab(String(nextTab));
+                const nextVolunteerTab = String(nextTab) as VolunteerTab;
+                if (nextTab && VOLUNTEER_TABS.includes(nextVolunteerTab)) {
+                  setTab(nextVolunteerTab);
+                }
               }}
               className="flex flex-wrap gap-2"
               aria-label={t('aria.volunteering_sections')}

@@ -8,7 +8,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import Inbox from 'lucide-react/icons/inbox';
 import Download from 'lucide-react/icons/download';
 import Info from 'lucide-react/icons/info';

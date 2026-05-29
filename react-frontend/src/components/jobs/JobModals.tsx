@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useRef } from 'react';
-import { Chip } from '@heroui/react';
+import { Chip } from '@/components/ui';
 
 import Target from 'lucide-react/icons/target';
 import CheckCircle from 'lucide-react/icons/circle-check-big';

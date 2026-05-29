@@ -1,5 +1,5 @@
 import { Select, SelectItem, Button, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Tabs, Tab } from '@/components/ui';
-import { Chip } from '@heroui/react';
+import { Chip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford

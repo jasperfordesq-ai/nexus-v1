@@ -14,7 +14,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router-dom';
 
-import { Chip } from '@heroui/react';
+import { Chip } from '@/components/ui';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import ShieldAlert from 'lucide-react/icons/shield-alert';

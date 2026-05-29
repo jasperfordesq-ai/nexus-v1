@@ -1,7 +1,7 @@
 import { Card, CardBody, CardHeader, Input, Button, Spinner, Chip, Select, SelectItem, Switch } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import Bot from 'lucide-react/icons/bot';
 import Save from 'lucide-react/icons/save';
 import Key from 'lucide-react/icons/key';

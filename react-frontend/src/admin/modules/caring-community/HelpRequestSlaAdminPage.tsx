@@ -2,7 +2,7 @@ import { Button, Card, CardBody, CardHeader, Chip, Spinner, Tab, Tabs, Tooltip, 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import AlarmClock from 'lucide-react/icons/alarm-clock';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import Info from 'lucide-react/icons/info';

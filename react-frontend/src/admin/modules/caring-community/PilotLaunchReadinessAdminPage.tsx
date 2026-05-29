@@ -5,7 +5,7 @@ import {
   useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import ShieldAlert from 'lucide-react/icons/shield-alert';

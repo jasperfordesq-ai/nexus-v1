@@ -11,7 +11,7 @@
  */
 
 import * as Sentry from '@sentry/react';
-import type { Integration } from '@sentry/types';
+import type { Integration } from '@sentry/core';
 import { createElement } from 'react';
 import { readStoredConsent } from '@/contexts/CookieConsentContext';
 import type { User } from '@/types';

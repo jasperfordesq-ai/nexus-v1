@@ -1,4 +1,4 @@
-import { Chip, CloseButton } from '@heroui/react';
+import { Chip, CloseButton } from '@/components/ui';
 import { Select, SelectItem, GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch, Tooltip, CardRowsSkeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later

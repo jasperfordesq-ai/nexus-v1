@@ -7,7 +7,7 @@ import {
 import { useParams,
   useNavigate } from 'react-router-dom';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import MessageSquarePlus from 'lucide-react/icons/message-square-plus';
 import UserPlus from 'lucide-react/icons/user-plus';

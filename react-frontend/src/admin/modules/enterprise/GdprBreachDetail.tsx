@@ -6,7 +6,7 @@ import {
   useMemo } from 'react';
 import { useParams,
   useNavigate } from 'react-router-dom';
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';

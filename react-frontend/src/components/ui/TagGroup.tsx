@@ -7,11 +7,11 @@ import {
   Tag as HeroUITag,
   TagGroup as HeroUITagGroup,
   type TagGroupProps as HeroUITagGroupProps,
-  type TagProps as HeroUITagProps,
 } from '@heroui/react';
+import type { ComponentProps } from 'react';
 
 export type TagGroupProps = HeroUITagGroupProps;
-export type TagProps = HeroUITagProps;
+export type TagProps = ComponentProps<typeof HeroUITag>;
 
 export const TagGroup = HeroUITagGroup;
 export const Tag = HeroUITag;

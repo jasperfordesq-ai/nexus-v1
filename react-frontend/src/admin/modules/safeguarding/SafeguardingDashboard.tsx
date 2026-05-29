@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import Shield from 'lucide-react/icons/shield';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
 import ShieldCheck from 'lucide-react/icons/shield-check';

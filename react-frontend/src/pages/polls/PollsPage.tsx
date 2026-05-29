@@ -21,7 +21,7 @@ import type { DateInputValue } from '@/components/ui';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from '@/lib/motion';
 import { DatePicker } from '@/components/ui';
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import Plus from 'lucide-react/icons/plus';
 import Clock from 'lucide-react/icons/clock';

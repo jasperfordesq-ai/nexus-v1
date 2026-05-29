@@ -524,7 +524,7 @@ export default function SupportReportsPage() {
                 {selectedReport.diagnostics ? (
                   <section>
                     <p className="mb-2 text-xs font-semibold uppercase text-muted">{t('support_reports.detail.diagnostics')}</p>
-                    <pre className="max-h-80 overflow-auto rounded-md border border-divider bg-content2 p-3 text-xs leading-5 text-foreground">
+                    <pre className="max-h-80 overflow-auto rounded-md border border-divider bg-surface-secondary p-3 text-xs leading-5 text-foreground">
                       {JSON.stringify(selectedReport.diagnostics, null, 2)}
                     </pre>
                   </section>

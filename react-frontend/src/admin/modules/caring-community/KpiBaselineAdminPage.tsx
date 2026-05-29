@@ -2,7 +2,7 @@ import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Mod
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import BarChart2 from 'lucide-react/icons/bar-chart-2';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import Database from 'lucide-react/icons/database';

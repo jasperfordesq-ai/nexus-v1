@@ -10,7 +10,7 @@
  * inline form. Used by BookmarkButton on long-press (mobile) or secondary click.
  */
 
-import { useState, useCallback } from 'react';import { Separator } from '@heroui/react';
+import { useState, useCallback } from 'react';import { Separator } from '@/components/ui';
 import Plus from 'lucide-react/icons/plus';
 import FolderOpen from 'lucide-react/icons/folder-open';
 import Check from 'lucide-react/icons/check';

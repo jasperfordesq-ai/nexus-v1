@@ -5,8 +5,8 @@
 
 import {
   DateRangePicker as HeroUIDateRangePicker,
-  type DateRangePickerProps as HeroUIDateRangePickerProps,
+  type DateRangePicker as HeroUIDateRangePickerTypes,
 } from '@heroui/react';
 
-export type DateRangePickerProps = HeroUIDateRangePickerProps;
+export type DateRangePickerProps = HeroUIDateRangePickerTypes['Props'];
 export const DateRangePicker = HeroUIDateRangePicker;

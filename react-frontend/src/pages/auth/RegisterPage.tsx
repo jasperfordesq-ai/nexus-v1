@@ -19,7 +19,7 @@ import { Select, SelectItem, GlassCard, Progress, Button, Input, Checkbox, Spinn
 import { useState, useEffect, useRef, useCallback, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import { motion,
   AnimatePresence } from '@/lib/motion';
 import User from 'lucide-react/icons/user';

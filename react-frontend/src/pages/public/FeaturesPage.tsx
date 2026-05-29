@@ -1,6 +1,6 @@
-import { Card, Chip } from '@heroui/react';
+import { Card, Chip } from '@/components/ui';
 import { type ReactNode } from 'react';
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
@@ -79,9 +79,9 @@ function FeatureList({ groupKey, items }: { groupKey: string; items: FeatureItem
             <div className="text-sm">
               <span className="font-semibold text-foreground">{t(`${copyKey}.title`)}</span>
               <MaturityChip level={item.maturity ?? 'ga'} />
-              <span className="text-foreground-600"> {t(`${copyKey}.description`)}</span>
+              <span className="text-theme-muted"> {t(`${copyKey}.description`)}</span>
               {note && (
-                <p className="text-xs text-foreground-500 mt-1 italic">{note}</p>
+                <p className="text-xs text-theme-muted mt-1 italic">{note}</p>
               )}
             </div>
           </li>
@@ -116,7 +116,7 @@ function FeatureSection({
       </Card.Header>
       <Separator />
       <Card.Content className="space-y-3">
-        {intro && <p className="text-sm text-foreground-600">{intro}</p>}
+        {intro && <p className="text-sm text-theme-muted">{intro}</p>}
         <FeatureList groupKey={group.key} items={group.items} />
       </Card.Content>
     </Card>
@@ -457,7 +457,7 @@ export function FeaturesPage() {
             {t('release_stage')}
           </Chip>
         </div>
-        <p className="text-sm sm:text-base text-foreground-600">
+        <p className="text-sm sm:text-base text-theme-muted">
           {t('features_page.subheading')}
         </p>
       </div>
@@ -471,7 +471,7 @@ export function FeaturesPage() {
           <ul className="space-y-1.5 list-none">
             <li className="flex items-start gap-2">
               <Chip color="success" variant="tertiary" size="sm" className="shrink-0">GA</Chip>
-              <span className="text-foreground-600">
+              <span className="text-theme-muted">
                 {t('features_page.maturity_ga')}
               </span>
             </li>
@@ -479,7 +479,7 @@ export function FeaturesPage() {
               <Chip color="warning" variant="tertiary" size="sm" className="shrink-0">
                 {t('features_page.chips.beta')}
               </Chip>
-              <span className="text-foreground-600">
+              <span className="text-theme-muted">
                 {t('features_page.maturity_beta')}
               </span>
             </li>
@@ -487,7 +487,7 @@ export function FeaturesPage() {
               <Chip color="accent" variant="tertiary" size="sm" className="shrink-0">
                 {t('features_page.chips.preview')}
               </Chip>
-              <span className="text-foreground-600">
+              <span className="text-theme-muted">
                 {t('features_page.maturity_preview')}
               </span>
             </li>
@@ -518,7 +518,7 @@ export function FeaturesPage() {
           </h2>
         </Card.Header>
         <Separator />
-        <Card.Content className="text-sm text-foreground-600">
+        <Card.Content className="text-sm text-theme-muted">
           <ul className="grid sm:grid-cols-2 gap-y-1.5 gap-x-6 list-none">
             <li><strong>{t('features_page.tech_stack.frontend_label')}:</strong> {t('features_page.tech_stack.frontend_value')}</li>
             <li><strong>{t('features_page.tech_stack.backend_label')}:</strong> {t('features_page.tech_stack.backend_value')}</li>
@@ -541,7 +541,7 @@ export function FeaturesPage() {
           </h2>
         </Card.Header>
         <Separator />
-        <Card.Content className="text-sm text-foreground-600 space-y-3">
+        <Card.Content className="text-sm text-theme-muted space-y-3">
           <p>
             {t('features_page.open_source_body')}
           </p>
@@ -591,7 +591,7 @@ export function FeaturesPage() {
           </h2>
         </Card.Header>
         <Separator />
-        <Card.Content className="text-sm text-foreground-600">
+        <Card.Content className="text-sm text-theme-muted">
           <p>
             {t('features_page.security_body_before')}
             <a

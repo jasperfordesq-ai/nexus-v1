@@ -14,6 +14,7 @@ type V3Variant = NonNullable<HeroUISearchFieldProps['variant']>;
 
 export type SearchFieldProps = Omit<HeroUISearchFieldProps, 'children' | 'onChange' | 'variant'> & {
   classNames?: {
+    base?: string;
     input?: string;
     inputWrapper?: string;
   };
@@ -65,6 +66,7 @@ export function SearchField({
   return (
     <HeroUISearchField
       {...props}
+      className={classNames?.base}
       variant={mapVariant(variant)}
       onChange={(value) => {
         onValueChange?.(value);

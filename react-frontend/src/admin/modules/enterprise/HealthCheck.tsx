@@ -2,7 +2,7 @@ import { Card, CardBody, CardHeader, Button, Spinner, Chip, Table, TableHeader, 
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
 import RefreshCw from 'lucide-react/icons/refresh-cw';

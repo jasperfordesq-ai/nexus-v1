@@ -5,8 +5,8 @@
 
 import {
   DateField as HeroUIDateField,
-  type DateFieldProps as HeroUIDateFieldProps,
+  type DateField as HeroUIDateFieldTypes,
 } from '@heroui/react';
 
-export type DateFieldProps = HeroUIDateFieldProps;
+export type DateFieldProps = HeroUIDateFieldTypes['Props'];
 export const DateField = HeroUIDateField;

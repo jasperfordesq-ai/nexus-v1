@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Chip } from '@heroui/react';
+import { Chip } from '@/components/ui';
 
 interface ConditionBadgeProps {
   condition: string | null;

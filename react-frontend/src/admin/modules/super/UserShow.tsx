@@ -2,7 +2,7 @@ import { Card, CardBody, CardHeader, Button, Chip, Spinner, Select, SelectItem, 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Edit from 'lucide-react/icons/square-pen';
 import Shield from 'lucide-react/icons/shield';

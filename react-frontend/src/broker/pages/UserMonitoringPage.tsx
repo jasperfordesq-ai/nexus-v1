@@ -13,7 +13,7 @@ import { Select, SelectItem, Button, Spinner, Input, Textarea, Modal, ModalConte
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Chip } from '@heroui/react';
+import { Chip } from '@/components/ui';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Eye from 'lucide-react/icons/eye';
 import MessageCircleOff from 'lucide-react/icons/message-circle-off';

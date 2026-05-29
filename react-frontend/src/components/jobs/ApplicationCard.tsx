@@ -5,7 +5,7 @@
 
 import { useState } from 'react';
 import { motion } from '@/lib/motion';
-import { Chip } from '@heroui/react';
+import { Chip } from '@/components/ui';
 
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';

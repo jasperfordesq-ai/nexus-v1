@@ -2,7 +2,7 @@ import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Mod
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import Building2 from 'lucide-react/icons/building-2';
 import CalendarClock from 'lucide-react/icons/calendar-clock';
 import Camera from 'lucide-react/icons/camera';

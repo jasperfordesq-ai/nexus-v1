@@ -101,7 +101,7 @@ function shadowClass(shadow?: V2CardShadow): string | undefined {
   }
 }
 
-export const Card = forwardRef<HTMLElement, CardProps>(
+const CardRoot = forwardRef<HTMLElement, CardProps>(
   (
     {
       as: Component,
@@ -176,7 +176,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(
   },
 );
 
-Card.displayName = 'Card';
+CardRoot.displayName = 'Card';
 
 export function CardHeader({ as: Component, children, className, ...props }: CardHeaderProps) {
   if (Component) {
@@ -249,3 +249,10 @@ export function CardFooter({ as: Component, children, className, ...props }: Car
     </HeroUICard.Footer>
   );
 }
+
+export const Card = Object.assign(CardRoot, {
+  Header: CardHeader,
+  Body: CardBody,
+  Content: CardBody,
+  Footer: CardFooter,
+});

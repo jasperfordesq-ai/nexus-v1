@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks/usePageTitle';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import BarChart3 from 'lucide-react/icons/bar-chart-3';
 import Bell from 'lucide-react/icons/bell';
 import CheckCircle from 'lucide-react/icons/check-circle';

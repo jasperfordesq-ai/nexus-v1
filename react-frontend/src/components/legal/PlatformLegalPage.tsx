@@ -17,7 +17,7 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from '@/lib/motion';import Hexagon from 'lucide-react/icons/hexagon';
-import { Chip } from '@heroui/react';
+import { Chip } from '@/components/ui';
 import CalendarDays from 'lucide-react/icons/calendar-days';
 import ExternalLink from 'lucide-react/icons/external-link';
 import ArrowRight from 'lucide-react/icons/arrow-right';

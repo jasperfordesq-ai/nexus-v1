@@ -2,7 +2,7 @@ import { Button, Card, CardBody, CardHeader, Chip, Spinner, Textarea, Modal, Mod
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import Check from 'lucide-react/icons/check';
 import Inbox from 'lucide-react/icons/inbox';

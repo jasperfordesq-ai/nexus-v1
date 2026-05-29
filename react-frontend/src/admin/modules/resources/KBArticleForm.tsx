@@ -18,7 +18,7 @@ import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Input, Texta
 import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 const RichTextEditor = lazy(() =>
   import('../../components/RichTextEditor').then((m) => ({ default: m.RichTextEditor })),
 );

@@ -14,7 +14,7 @@
  */
 
 
-import { Separator } from '@heroui/react';
+import { Separator } from '@/components/ui';
 import { GlassCard, Skeleton } from '@/components/ui';
 
 type SkeletonVariant =

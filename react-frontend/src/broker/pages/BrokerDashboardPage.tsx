@@ -2,7 +2,7 @@ import { Card, CardBody, CardHeader, Button, Spinner } from '@/components/ui';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Chip, Separator } from '@heroui/react';
+import { Chip, Separator } from '@/components/ui';
 import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
 import MessageSquareWarning from 'lucide-react/icons/message-square-warning';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
