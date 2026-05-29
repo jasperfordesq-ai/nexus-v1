@@ -37,6 +37,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Accessibility
 
+- **Federation search boxes upgraded to HeroUI v3 `SearchField`.** The five federation browse pages (listings, groups, events, members, messages) now use the v3 `SearchField` primitive instead of a generic text input with a search icon, adding a built-in clear (×) button, `role="searchbox"` semantics, and the "Search" key on mobile keyboards.
+
 - **Platform-wide WCAG 2.1 AA audit (four rounds).** A multi-round accessibility campaign brought the React frontend and admin panel toward WCAG 2.1 AA: colour-contrast fixes, semantic landmarks and `role` attributes (e.g. feed cards as `article`), ARIA labels on all `Tabs` and `Input` elements, accessible names on icon-only controls, `aria-expanded` on menus, `aria-live`/live regions for chat and search results, `aria-busy` on skeletons, keyboard support for sortable table-column headers, focus indicators, and `usePageTitle` on pages that were missing a browser/screen-reader title. Round 4 alone covered 24 pages and 10 admin modules. The accessible-frontend link was relabelled to reference "WCAG 2.2 AA" across all 11 languages.
 
 ### Security

@@ -31,7 +31,7 @@ import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Languages from 'lucide-react/icons/languages';
 
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tooltip } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner, Input, SearchField, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tooltip } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
@@ -863,11 +863,10 @@ export function FederationMessagesPage() {
           >
             {/* Search */}
             <div className="p-3 border-b border-theme-default">
-              <Input
+              <SearchField
                 placeholder={t('messages.search_placeholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
                 aria-label={t('messages.search_placeholder')}
                 classNames={{
                   input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',

@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input, Avatar } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input, SearchField, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,7 +15,6 @@ import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from '@/lib/motion';
 
-import Search from 'lucide-react/icons/search';
 import Globe from 'lucide-react/icons/globe';
 import MapPin from 'lucide-react/icons/map-pin';
 import MessageSquare from 'lucide-react/icons/message-square';
@@ -305,11 +304,10 @@ export function FederationMembersPage() {
           {/* Row 1: Search + Partner dropdown */}
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1">
-              <Input
+              <SearchField
                 placeholder={t('members.search_placeholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
                 aria-label={t('members.aria_search')}
                 classNames={{
                   input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',

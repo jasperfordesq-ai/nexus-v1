@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Input, CardRowsSkeleton } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, SearchField, CardRowsSkeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -17,7 +17,7 @@ import { Select, SelectItem, GlassCard, Button, Chip, Input, CardRowsSkeleton } 
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { motion } from '@/lib/motion';import Search from 'lucide-react/icons/search';
+import { motion } from '@/lib/motion';
 import Globe from 'lucide-react/icons/globe';
 import Users from 'lucide-react/icons/users';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
@@ -210,12 +210,11 @@ export function FederationGroupsPage() {
         <div className="flex flex-col lg:flex-row gap-4">
           {/* Search */}
           <div className="flex-1">
-            <Input
+            <SearchField
               placeholder={t('groups.search_placeholder')}
               aria-label={t('groups.search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
               classNames={{
                 input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
                 inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
