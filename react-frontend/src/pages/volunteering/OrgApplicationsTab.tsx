@@ -9,12 +9,11 @@ import { useTranslation } from 'react-i18next';
 import ClipboardList from 'lucide-react/icons/clipboard-list';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
-import Search from 'lucide-react/icons/search';
 import MessageSquare from 'lucide-react/icons/message-square';
 import Clock from 'lucide-react/icons/clock';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import Users from 'lucide-react/icons/users';
-import { GlassCard, Button, Chip, Spinner, Input, Avatar, Checkbox } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner, SearchField, Avatar, Checkbox } from '@/components/ui';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { formatDateValue, resolveAvatarUrl } from '@/lib/helpers';
@@ -270,12 +269,11 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
       </div>
 
       {/* Search by name */}
-      <Input
+      <SearchField
         size="sm"
         placeholder={t('applications.search_placeholder')}
         value={nameSearch}
         onValueChange={setNameSearch}
-        startContent={<Search className="w-3.5 h-3.5 text-theme-subtle" />}
         aria-label={t('applications.aria_search_volunteers')}
         classNames={{ base: 'w-full sm:max-w-xs', inputWrapper: 'bg-theme-elevated' }}
       />

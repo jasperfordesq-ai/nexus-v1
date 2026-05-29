@@ -15,7 +15,6 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from '@/lib/motion';
 import { Chip, CloseButton } from '@/components/ui';
 
-import Search from 'lucide-react/icons/search';
 import MapPin from 'lucide-react/icons/map-pin';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Clock from 'lucide-react/icons/clock';
@@ -24,7 +23,7 @@ import Filter from 'lucide-react/icons/filter';
 import X from 'lucide-react/icons/x';
 import UserSearch from 'lucide-react/icons/user-search';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Spinner, Input, Avatar } from '@/components/ui';
+import { GlassCard, Button, Spinner, Input, SearchField, Avatar } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -220,11 +219,10 @@ export function TalentSearchPage() {
         {/* Search bar */}
         <div className="mt-4 space-y-3">
           <div className="flex gap-2">
-            <Input
+            <SearchField
               placeholder={t('talent_search.search_placeholder')}
               value={keywords}
               onChange={(e) => setKeywords(e.target.value)}
-              startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
               className="flex-1"
               classNames={{
                 input: 'bg-transparent text-theme-primary',

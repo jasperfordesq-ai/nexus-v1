@@ -30,7 +30,7 @@ import Languages from 'lucide-react/icons/languages';
 import MessageCircle from 'lucide-react/icons/message-circle';
 import { useToast,
   useNotifications } from '@/contexts';
-import { GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tooltip, Skeleton, Spinner } from '@/components/ui';
+import { GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, SearchField, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tooltip, Skeleton, Spinner } from '@/components/ui';
 import { LoadingScreen } from '@/components/feedback';
 import { useAuth, usePusherOptional, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -1527,11 +1527,10 @@ export function ConversationPage() {
         <GlassCard className="shrink-0 p-3">
           <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center" role="search">
             <div className="relative min-w-0 flex-1">
-              <Input
+              <SearchField
                 placeholder={t('conversation_search_placeholder')}
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
-                startContent={<Search className="w-4 h-4 text-theme-subtle" />}
                 aria-label={t('conversation_search_placeholder')}
                 classNames={{
                   input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',

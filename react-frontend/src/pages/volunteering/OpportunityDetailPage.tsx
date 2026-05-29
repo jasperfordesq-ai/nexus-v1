@@ -1,4 +1,4 @@
-import { Card, GlassCard, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Checkbox } from '@/components/ui';
+import { Card, GlassCard, useDisclosure, Button, Chip, Spinner, SearchField, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Checkbox } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -26,7 +26,6 @@ import Tag from 'lucide-react/icons/tag';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
-import Search from 'lucide-react/icons/search';
 import Send from 'lucide-react/icons/send';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
@@ -450,12 +449,11 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
           ))}
         </div>
 
-        <Input
+        <SearchField
           size="sm"
           placeholder={t('opportunity.search_placeholder')}
           value={nameSearch}
           onValueChange={setNameSearch}
-          startContent={<Search className="w-3.5 h-3.5 text-theme-subtle" aria-hidden="true" />}
           aria-label={t('applications.aria_search_volunteers')}
           classNames={{ base: 'w-full sm:max-w-xs', inputWrapper: 'bg-theme-elevated' }}
         />

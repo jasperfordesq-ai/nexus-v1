@@ -17,9 +17,8 @@ import Check from 'lucide-react/icons/check';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import MessageSquare from 'lucide-react/icons/message-square';
 import Plus from 'lucide-react/icons/plus';
-import Search from 'lucide-react/icons/search';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tab, Tabs } from '@/components/ui';
+import { GlassCard, useDisclosure, Button, Chip, Spinner, Input, SearchField, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tab, Tabs } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
@@ -436,11 +435,10 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
     <div className="space-y-4">
       {/* Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <Input
+        <SearchField
           placeholder={t('qa.search_placeholder')}
           value={search}
           onValueChange={setSearch}
-          startContent={<Search className="w-4 h-4 text-muted" aria-hidden="true" />}
           className="flex-1"
           size="sm"
           aria-label={t('qa.search_aria')}

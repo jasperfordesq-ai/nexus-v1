@@ -20,12 +20,11 @@ import FileImage from 'lucide-react/icons/file-image';
 import FileVideo from 'lucide-react/icons/file-video';
 import FileAudio from 'lucide-react/icons/file-audio';
 import FileArchive from 'lucide-react/icons/file-archive';
-import Search from 'lucide-react/icons/search';
 import FolderPlus from 'lucide-react/icons/folder-plus';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useConfirm } from '@/components/ui';
+import { GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure, Button, Chip, Spinner, Input, SearchField, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useConfirm } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -254,11 +253,10 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
     <div className="space-y-4">
       {/* Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <Input
+        <SearchField
           placeholder={t('files.search_placeholder')}
           value={search}
           onValueChange={setSearch}
-          startContent={<Search className="w-4 h-4 text-muted" aria-hidden="true" />}
           className="flex-1"
           size="sm"
           aria-label={t('files.search_aria')}

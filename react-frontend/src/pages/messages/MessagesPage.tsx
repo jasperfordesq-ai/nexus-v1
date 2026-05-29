@@ -27,7 +27,7 @@ import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import UsersIcon from 'lucide-react/icons/users';
 import { CreateGroupModal } from './components/CreateGroupModal';
-import { GlassCard, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, Avatar, Tabs, Tab, Skeleton, Spinner } from '@/components/ui';
+import { GlassCard, Button, Chip, Input, SearchField, Modal, ModalContent, ModalHeader, ModalBody, Avatar, Tabs, Tab, Skeleton, Spinner } from '@/components/ui';
 import { PresenceIndicator } from '@/components/social';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, usePusherOptional, useToast, useTenant } from '@/contexts';
@@ -521,11 +521,10 @@ export function MessagesPage() {
               } />
           </Tabs>
         </div>
-        <Input
+        <SearchField
           placeholder={t('search_placeholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          startContent={<Search className="h-4 w-4 text-theme-subtle" aria-hidden="true" />}
           aria-label={t('search_placeholder')}
           classNames={{
             input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
