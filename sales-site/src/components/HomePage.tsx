@@ -63,9 +63,12 @@ const platformPillars = [
 ] as const;
 
 const communityOutcomes = [
-  ['Time becomes visible', 'People can see the hours, care, coordination, and practical help already moving through a community.'],
-  ['Programmes can grow', 'Small timebanks can mature into funded volunteering, participation, and civic delivery without changing systems.'],
-  ['Networks can connect', 'Separate groups can keep local identity while sharing infrastructure, governance, data, and federation paths.'],
+  ['Time becomes visible', 'Members can log, exchange, and review hours in a transparent shared ledger.'],
+  [
+    'Programmes can grow',
+    'Volunteering, organisations, groups, events, and resources sit beside timebanking instead of in separate tools.',
+  ],
+  ['Networks can connect', 'Federation and tenant hierarchy let local communities become regional or national infrastructure.'],
 ] as const;
 
 export default function HomePage({ onNavigate }: HomePageProps) {
@@ -75,7 +78,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
   return (
     <>
       <section className="sales-hero sales-hero--product border-b border-white/10">
-        <div className="relative z-10 mx-auto grid max-w-7xl gap-10 px-5 py-14 lg:grid-cols-[minmax(0,0.95fr)_minmax(24rem,0.72fr)] lg:items-center lg:py-20">
+        <div className="relative z-10 mx-auto grid max-w-7xl gap-10 px-5 py-14 lg:grid-cols-[minmax(0,0.92fr)_minmax(24rem,0.78fr)] lg:items-center lg:py-20">
           <div className="max-w-4xl">
             <div className="mb-6 flex flex-wrap gap-2">
               <Chip color="accent" variant="soft">
@@ -92,25 +95,25 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               Community infrastructure, from local timebanks to civic networks.
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-white/72">
-              Project NEXUS brings time credits, volunteering, events, messaging, governance, federation, accessibility, and managed hosting into one open-source platform for real community work.
+              Project NEXUS brings time credits, volunteering, events, messaging, governance, federation, accessibility, and managed hosting into one serious platform for communities that need to grow.
             </p>
             <div className="mt-9 grid gap-4 lg:grid-cols-2">
               <PathwayCard
-                eyebrow="Community lane"
+                eyebrow="Start"
                 title="Start a timebank"
-                description="A managed entry path for local exchange, offers, requests, member coordination, and day-one operations."
+                description="A focused managed timebanking lane for local groups, pilots, mutual aid projects, and small community organisations."
                 price={`from ${formatCurrency(entryPlan.annualMonthlyEur)}/mo`}
-                bullets={['Time credits and member basics', 'Groups, events, and messaging', 'Managed backups and upgrades']}
+                bullets={['Offers and requests', 'Time credit wallet', 'Members, groups, events, and messaging']}
                 ctaLabel="Price community lane"
                 icon={HandCoins}
                 onPress={() => onNavigate('/hosting')}
               />
               <PathwayCard
-                eyebrow="Network lane"
+                eyebrow="Scale"
                 title="Run a civic network"
-                description="The full platform for multi-module community programmes, tenant operations, federation, and growth."
+                description="The full NEXUS platform for public-sector programmes, funded networks, and multi-community civic infrastructure."
                 price={`from ${formatCurrency(fullPlan.monthlyEur)}/mo`}
-                bullets={['60+ production modules', 'Governance and operational tooling', 'Room for federation and scale']}
+                bullets={['Multi-tenancy and federation', 'Volunteering and governance', 'Accessibility, support, and scale']}
                 ctaLabel="Explore full platform"
                 icon={Network}
                 tone="network"
@@ -135,11 +138,11 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         <SectionHeader eyebrow="Hybrid proof" title="A serious platform with a human reason to exist.">
           Product UI proves the platform is real. Community outcomes prove why it matters.
         </SectionHeader>
-        <div className="grid gap-5 lg:grid-cols-[0.95fr_1.05fr] lg:items-stretch">
+        <div className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch">
           <ProductCockpit compact />
           <SurfaceCard tone="raised" className="p-6">
-            <p className="nexus-kicker text-[color:var(--color-accent)]">Community outcomes</p>
-            <h3 className="mt-3 text-3xl font-black text-white">Infrastructure should make mutual support easier to organise.</h3>
+            <p className="text-sm font-black tracking-[0.16em] text-[var(--color-accent)] uppercase">Community outcomes</p>
+            <h3 className="mt-3 text-3xl font-black text-white">Built for trust, participation, and visible local impact.</h3>
             <div className="mt-6 grid gap-3">
               {communityOutcomes.map(([title, body]) => (
                 <div key={title} className="rounded-2xl border border-white/10 bg-white/[0.045] p-4">
@@ -154,12 +157,12 @@ export default function HomePage({ onNavigate }: HomePageProps) {
 
       <section className="nexus-section-shell">
         <div className="mx-auto max-w-7xl px-5 py-16">
-          <SectionHeader eyebrow="Product system" title="One platform for community exchange, participation, and operations.">
-            NEXUS combines the practical mechanics of timebanking with the governance, programme, accessibility, and federation layers needed for larger civic networks.
+          <SectionHeader accent="primary" eyebrow="Product system" title="One platform for community exchange, participation, and operations.">
+            NEXUS is not a landing-page promise. It is a production React and Laravel system with real modules, live communities, and a commercial hosting path.
           </SectionHeader>
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-4 lg:grid-cols-4">
             {platformPillars.map(([title, body, Icon]) => (
-              <SurfaceCard key={title} interactive className="p-5">
+              <SurfaceCard key={title} tone="subtle" className="p-5">
                 <span className="grid size-12 place-items-center rounded-2xl border border-white/10 bg-white/[0.06]">
                   <Icon className="size-6 text-[var(--color-accent)]" />
                 </span>
@@ -172,34 +175,28 @@ export default function HomePage({ onNavigate }: HomePageProps) {
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-16">
-        <SurfaceCard tone="accent" className="p-6 md:p-8">
-          <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
-            <div>
-              <p className="nexus-kicker text-[color:var(--color-primary)]">Procurement path</p>
-              <h2 className="mt-3 text-3xl font-black leading-tight text-white md:text-5xl">
-                Start small or procure the full platform.
-              </h2>
-              <p className="mt-4 max-w-3xl text-base leading-8 text-white/64">
-                Choose the managed community lane for a focused timebank, or explore the full hosting ladder for serious civic infrastructure.
-              </p>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-3 lg:min-w-[33rem]">
-              <Button className="w-full" onPress={() => onNavigate('/hosting')}>
-                Start with pricing
-                <ArrowRight className="size-4" />
-              </Button>
-              <Button className="w-full" variant="outline" onPress={() => onNavigate('/features')}>
-                Explore features
-              </Button>
-              <Button
-                className="w-full"
-                variant="outline"
-                onPress={() => window.open('https://github.com/jasperfordesq-ai/nexus-v1', '_blank', 'noopener,noreferrer')}
-              >
-                <GitBranch className="size-4" />
-                View source
-              </Button>
-            </div>
+        <SurfaceCard tone="accent" className="grid gap-8 p-6 md:p-8 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div>
+            <p className="nexus-kicker text-[color:var(--color-primary)]">Choose your path</p>
+            <h2 className="mt-3 text-3xl font-black leading-tight text-white md:text-5xl">
+              Start small or procure the full platform.
+            </h2>
+            <p className="mt-4 max-w-3xl text-base leading-8 text-white/64">
+              The same open-source foundation supports both the grassroots entry lane and serious civic networks.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Button onPress={() => onNavigate('/hosting')}>
+              Start with pricing
+              <ArrowRight className="size-4" />
+            </Button>
+            <Button variant="outline" onPress={() => onNavigate('/features')}>
+              Explore features
+            </Button>
+            <Button variant="outline" onPress={() => window.open('https://github.com/jasperfordesq-ai/nexus-v1', '_blank', 'noopener,noreferrer')}>
+              <GitBranch className="size-4" />
+              View source
+            </Button>
           </div>
         </SurfaceCard>
       </section>

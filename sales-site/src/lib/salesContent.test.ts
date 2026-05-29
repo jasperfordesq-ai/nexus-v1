@@ -84,16 +84,12 @@ describe('sales-site public content policy', () => {
   it('uses an immersive product hero and keeps the detailed platform map visible', () => {
     const homePage = readFileSync(resolve(__dirname, '..', 'components', 'HomePage.tsx'), 'utf8');
     const styles = readFileSync(resolve(__dirname, '..', 'styles.css'), 'utf8');
-    const heroStart = homePage.indexOf('<section className="sales-hero border-b border-white/10">');
-    const heroEnd = homePage.indexOf('<section className="nexus-section-shell">');
-    const heroMarkup = homePage.slice(heroStart, heroEnd);
 
-    expect(heroStart).toBeGreaterThan(-1);
-    expect(heroEnd).toBeGreaterThan(heroStart);
-    expect(heroMarkup).toContain('src="/images/nexus-logo.png"');
-    expect(homePage).toContain('src="/images/nexus-banner.png"');
+    expect(homePage).toContain('sales-hero sales-hero--product border-b border-white/10');
+    expect(homePage).toContain('ProductCockpit');
+    expect(homePage).toContain('PathwayCard');
+    expect(homePage).toContain('ProofMetric');
     expect(styles).toContain('.sales-hero');
-    expect(styles).toContain('.sales-hero__image');
   });
 
   it('uses stacked feature catalogue sections instead of uneven module category cards', () => {
@@ -220,7 +216,8 @@ describe('sales-site public content policy', () => {
     expect(styles).toContain('.nexus-focus-ring');
     expect(styles).toContain('--nexus-surface-raised');
     expect(homePage).toContain('SectionHeader');
-    expect(homePage).toContain('MetricTile');
+    expect(homePage).toContain('ProductCockpit');
+    expect(homePage).toContain('ProofMetric');
     expect(featuresPage).toContain('SectionHeader');
     expect(hostingPage).toContain('SurfaceCard');
     expect(legalPage).toContain('SurfaceCard');
