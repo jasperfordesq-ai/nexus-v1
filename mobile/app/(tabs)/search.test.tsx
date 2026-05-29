@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { fireEvent, render } from '@testing-library/react-native';
 
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) }),
@@ -122,6 +122,12 @@ describe('SearchScreen', () => {
   it('renders the search input', () => {
     const { getByPlaceholderText } = render(<SearchScreen />);
     expect(getByPlaceholderText('Search for people, listings...')).toBeTruthy();
+  });
+
+  it('shows clear action after typing in the shared input-backed search field', () => {
+    const { getByPlaceholderText, getByLabelText } = render(<SearchScreen />);
+    fireEvent.changeText(getByPlaceholderText('Search for people, listings...'), 'gardening');
+    expect(getByLabelText('Clear search')).toBeTruthy();
   });
 
   it('renders the initial search prompt when query is empty', () => {

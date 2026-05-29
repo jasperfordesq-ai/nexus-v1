@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useCallback } from 'react';
-import { FlatList, Pressable, RefreshControl, Text, TextInput, View } from 'react-native';
+import { FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,6 +21,7 @@ import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
+import Input from '@/components/ui/Input';
 import { SkeletonBox } from '@/components/ui/Skeleton';
 import OfflineBanner from '@/components/OfflineBanner';
 
@@ -327,26 +328,23 @@ function SearchHeader({
       </HeroCard>
 
       <Surface variant="default" className="mx-4 gap-3 rounded-panel-inner p-3">
-        <View className="flex-row items-center gap-2 rounded-panel-inner border px-3 py-2" style={{ borderColor: withAlpha(primary, 0.30), backgroundColor: theme.surface }}>
-          <Ionicons name="search-outline" size={18} color={theme.textMuted} />
-          <TextInput
-            className="min-h-10 flex-1 text-base"
-            style={{ color: theme.text }}
-            value={query}
-            onChangeText={setQuery}
-            placeholder={t('placeholder')}
-            placeholderTextColor={theme.textMuted}
-            returnKeyType="search"
-            clearButtonMode="while-editing"
-            autoCorrect={false}
-            accessibilityLabel={t('placeholder')}
-          />
-          {query.trim().length > 0 ? (
+        <Input
+          style={{ color: theme.text }}
+          value={query}
+          onChangeText={setQuery}
+          placeholder={t('placeholder')}
+          placeholderTextColor={theme.textMuted}
+          returnKeyType="search"
+          clearButtonMode="while-editing"
+          autoCorrect={false}
+          accessibilityLabel={t('placeholder')}
+          leftIcon={<Ionicons name="search-outline" size={18} color={theme.textMuted} />}
+          rightIcon={query.trim().length > 0 ? (
             <HeroButton isIconOnly variant="ghost" accessibilityLabel={t('clearSearch')} onPress={() => setQuery('')}>
               <Ionicons name={isLoading ? 'sync-outline' : 'close-outline'} size={18} color={theme.textMuted} />
             </HeroButton>
           ) : null}
-        </View>
+        />
 
         <Tabs value={activeFilter} onValueChange={(value) => {
           void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
