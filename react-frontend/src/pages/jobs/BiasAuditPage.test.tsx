@@ -86,6 +86,22 @@ vi.mock('@/components/ui', () => ({
   NotificationSkeleton: () => null,
   ProfileHeaderSkeleton: () => null,
   SkeletonList: () => null,
+  CardRowsSkeleton: () => <div role="status" aria-busy="true" />,
+  Chip: ({ children }: { children?: ReactNode }) => <span>{children}</span>,
+  Button: ({ children, onPress }: { children?: ReactNode; onPress?: () => void }) => (
+    <button type="button" onClick={onPress}>{children}</button>
+  ),
+  Input: () => <input />,
+  Autocomplete: ({ children, label, placeholder }: { children?: ReactNode; label?: ReactNode; placeholder?: ReactNode }) => (
+    <div>{label}{placeholder}{children}</div>
+  ),
+  AutocompleteItem: ({ children }: { children?: ReactNode }) => <div>{children}</div>,
+  Table: ({ children }: { children?: ReactNode }) => <table>{children}</table>,
+  TableHeader: ({ children }: { children?: ReactNode }) => <thead>{children}</thead>,
+  TableBody: ({ children }: { children?: ReactNode }) => <tbody>{children}</tbody>,
+  TableColumn: ({ children }: { children?: ReactNode }) => <th>{children}</th>,
+  TableRow: ({ children }: { children?: ReactNode }) => <tr>{children}</tr>,
+  TableCell: ({ children }: { children?: ReactNode }) => <td>{children}</td>,
 }));
 
 vi.mock('@/components/feedback', () => ({

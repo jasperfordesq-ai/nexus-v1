@@ -80,6 +80,7 @@ vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: (url: string | null) => url ?? '',
   resolveAssetUrl: (url: string | null) => url ?? '',
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
 }));
 
 import { FederationEventsPage } from './FederationEventsPage';
