@@ -1,4 +1,4 @@
-import { CardBody, Card, Progress, Button, Chip, Input, Avatar, Tabs, Tab, Skeleton } from '@/components/ui';
+import { CardBody, Card, Progress, Button, Chip, SearchField, Avatar, Tabs, Tab, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -563,18 +563,17 @@ export default function ExplorePage() {
           onSubmit={(e) => { e.preventDefault(); handleSearch(); }}
           className="max-w-2xl mx-auto mb-4 flex gap-2"
         >
-          <Input
+          <SearchField
             size="lg"
             variant="secondary"
             placeholder={t('search_placeholder')}
+            aria-label={t('search_placeholder')}
             value={searchQuery}
             onValueChange={setSearchQuery}
-            startContent={<Search className="w-5 h-5 text-[var(--text-muted)]" aria-hidden="true" />}
+            onSubmit={() => handleSearch()}
+            className="flex-1"
             classNames={{
               inputWrapper: 'bg-[var(--glass-bg)] border-[var(--glass-border)] backdrop-blur-md',
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleSearch();
             }}
           />
           <Button
