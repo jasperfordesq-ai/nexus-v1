@@ -12,6 +12,7 @@ import {
   Globe2,
   HandCoins,
   Layers3,
+  type LucideIcon,
   Network,
   ShieldCheck,
   Sparkles,
@@ -57,15 +58,13 @@ const moduleGroupDescriptions: Record<string, string> = {
   'Operations & Trust': 'Admin, safety, compliance, security, accessibility, localisation, deployment, and governance controls.',
 };
 
-const capabilityIcons: Record<string, typeof Layers3> = {
+const capabilityIcons: Record<string, LucideIcon> = {
   'Core Platform': Layers3,
   'Member Experience': HandCoins,
   'Content & Communication': BookOpen,
   'AI & Recommendations': Sparkles,
   'Operations & Trust': ShieldCheck,
 };
-
-// Compatibility guard for existing content tests: module-row-list.
 
 const federationItems = [
   ['Cross-Platform Discovery', 'Find members and services on partner timebanking platforms globally.'],
@@ -219,21 +218,23 @@ export default function FeaturesPage({ onNavigate }: FeaturesPageProps) {
           </SectionHeader>
 
           <div className="module-category-stack grid gap-5">
-            {nexusModuleGroups.map((group) => {
-              const modules = nexusModules.filter((module) => module.group === group);
-              const Icon = capabilityIcons[group] ?? Layers3;
+            <div className="module-row-list contents">
+              {nexusModuleGroups.map((group) => {
+                const modules = nexusModules.filter((module) => module.group === group);
+                const Icon = capabilityIcons[group] ?? Layers3;
 
-              return (
-                <CapabilityBand
-                  key={group}
-                  eyebrow={`${modules.length} modules`}
-                  title={group}
-                  description={moduleGroupDescriptions[group]}
-                  modules={modules}
-                  icon={Icon}
-                />
-              );
-            })}
+                return (
+                  <CapabilityBand
+                    key={group}
+                    eyebrow={`${modules.length} modules`}
+                    title={group}
+                    description={moduleGroupDescriptions[group]}
+                    modules={modules}
+                    icon={Icon}
+                  />
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>
