@@ -17,13 +17,13 @@ import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input, SearchFiel
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from '@/lib/motion';
 
 import { Separator } from '@/components/ui';
 import SlidersHorizontal from 'lucide-react/icons/sliders-horizontal';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
-import ChevronRight from 'lucide-react/icons/chevron-right';
+import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
 import Tag from 'lucide-react/icons/tag';
 import RotateCcw from 'lucide-react/icons/rotate-ccw';
 import { useTranslation } from 'react-i18next';
@@ -446,16 +446,13 @@ export function MarketplaceCategoryPage() {
 
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
         {/* Breadcrumbs */}
-        <nav aria-label={t('breadcrumb')} className="flex items-center gap-2 text-sm flex-wrap">
-          <Link
-            to={tenantPath('/marketplace')}
-            className="text-muted hover:text-accent transition-colors"
-          >
-            {t('category.marketplace')}
-          </Link>
-          <ChevronRight className="w-3.5 h-3.5 text-muted" />
-          <span className="text-foreground font-medium">{category.name}</span>
-        </nav>
+        <Breadcrumbs
+          showHome={false}
+          items={[
+            { label: t('category.marketplace'), href: '/marketplace' },
+            { label: category.name },
+          ]}
+        />
 
         {/* Category header */}
         <GlassCard className="p-6">
