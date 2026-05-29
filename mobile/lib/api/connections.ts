@@ -7,11 +7,51 @@ import { api } from '@/lib/api/client';
 import { API_V2 } from '@/lib/constants';
 
 export type ConnectionStatusType = 'none' | 'connected' | 'pending_sent' | 'pending_received';
+export type ConnectionListStatus = 'accepted' | 'pending_received' | 'pending_sent';
+
+export interface ConnectionUser {
+  id: number;
+  name?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
+  avatar_url?: string | null;
+  location?: string | null;
+  bio?: string | null;
+}
+
+export interface Connection {
+  id?: number;
+  connection_id?: number;
+  user: ConnectionUser;
+  status: ConnectionListStatus | string;
+  created_at?: string | null;
+  message?: string | null;
+}
+
+export interface ConnectionListResponse {
+  data: Connection[];
+  meta?: {
+    per_page?: number;
+    has_more?: boolean;
+    cursor?: string | null;
+    base_url?: string;
+  };
+}
 
 export interface ConnectionStatus {
   status: ConnectionStatusType;
   connection_id: number | null;
   direction: 'sent' | 'received' | null;
+}
+
+/** GET /api/v2/connections — list accepted/pending connections */
+export function getConnections(status: ConnectionListStatus, cursor?: string | null): Promise<ConnectionListResponse> {
+  const params: Record<string, string> = {
+    status,
+    per_page: '20',
+  };
+  if (cursor) params.cursor = cursor;
+  return api.get<ConnectionListResponse>(`${API_V2}/connections`, params);
 }
 
 /** GET /api/v2/connections/status/{userId} */

@@ -243,6 +243,10 @@ function RootNavigator() {
         options={{ ...modalOptions, headerShown: false, title: t('members:title') }}
       />
       <Stack.Screen
+        name="(modals)/connections"
+        options={{ ...modalOptions, headerShown: false, title: t('members:connections.title') }}
+      />
+      <Stack.Screen
         name="(modals)/change-password"
         options={{ ...modalOptions, headerShown: false, title: t('settings:changePasswordTitle') }}
       />

@@ -20,7 +20,7 @@ Out of scope by owner instruction: React admin, broker/admin panels, caring-comm
 | HeroUI Native package | Complete | `heroui-native` updated from `^1.0.3` to `^1.0.4`, the latest npm version checked during the audit. | Keep current during future Expo upgrades. |
 | Provider setup | Complete | `app/_layout.tsx` imports `global.css`, wraps with `GestureHandlerRootView`, and mounts `HeroUINativeProvider`. | None. |
 | Styling setup | Complete | `global.css` imports Tailwind CSS, Uniwind, HeroUI Native styles, and sources HeroUI Native library classes. Current official HeroUI Native theme sources use OKLCH variables, so the existing OKLCH brand overrides match upstream. | Continue moving screen code from manual theme colors to semantic class names. |
-| Shared UI wrappers | Partial | Button loading now uses HeroUI Native `Spinner`; Input now uses `TextField`, `Label`, `Input`, and `FieldError`; FAB now uses HeroUI Native `Button`; exchange/member/group search fields and exchange create/edit forms now use the shared Input wrapper. | Continue migrating complex form fields to shared wrappers. |
+| Shared UI wrappers | Partial | Button loading now uses HeroUI Native `Spinner`; Input now uses `TextField`, `Label`, `Input`, and `FieldError`; FAB now uses HeroUI Native `Button`; exchange/member/group search fields and exchange create/edit forms now use the shared Input wrapper. The native connections route uses HeroUI Native Card/Tabs/Chip/Button/Spinner/Surface primitives. | Continue migrating complex form fields to shared wrappers. |
 | Route-level HeroUI use | Partial | Most functional screens use HeroUI Native directly or through local UI wrappers. Redirect/re-export routes intentionally contain no UI. Several complex screens still use raw `TextInput`, `Pressable`, and manual color styling where a larger refactor is needed. | Incrementally migrate by feature area with tests. |
 | Web parity | Partial | Core timebanking/social/mobile commerce workflows exist. Web-only/admin/caring areas are excluded. Several web features remain missing or intentionally deferred for native. | Use the matrix below as the implementation queue. |
 | Verification | Complete for this pass | `npm run type-check` and full `npm test -- --runInBand` passed after dependency and wrapper changes. | Keep warning cleanup as a separate Jest/Uniwind task. |
@@ -54,7 +54,7 @@ Official docs checked on 2026-05-29:
 | Exchanges | `/exchanges`, `/exchanges/:id`, request | `(tabs)/exchanges`, `(modals)/new-exchange`, `(modals)/edit-exchange`, `(modals)/exchange-detail` | Complete | Partial | Core exchange browse/detail/create/edit/request workflows exist; browse and create/edit text fields use the shared HeroUI Native-backed Input wrapper. | Continue detail/request form cleanup. |
 | Messages | `/messages`, `/messages/:id` | `(tabs)/messages`, `(modals)/thread`, `(modals)/chat` | Complete | Partial | Threads, unread badges, realtime context, and AI chat route exist. | Continue standardizing composer controls and attachment/action sheets. |
 | Wallet | `/wallet`, regional points | `(modals)/wallet` | Partial | Partial | Wallet balance/history/transfer/donation exist; regional points are not implemented. | Add regional points only if enabled for non-caring tenants. |
-| Members | `/members`, `/profile/:id`, connections | `(tabs)/members`, `(modals)/member-profile`, federation connections | Partial | Partial | Member directory and profile exist. Dedicated connections page is missing outside federation. | Add connections route or surface it from profile. |
+| Members | `/members`, `/profile/:id`, connections | `(tabs)/members`, `(modals)/member-profile`, `(modals)/connections`, federation connections | Complete core | Partial | Member directory, profile, direct member connections, and federation connections now exist. The direct connections route supports accepted, incoming, and sent workflows with profile/message routing. | Continue deeper profile add-ons only if enabled for mobile tenants. |
 | Profile | `/profile/:id`, collections, appreciation wall | `(tabs)/profile`, `(modals)/edit-profile`, `(modals)/member-profile` | Partial | Partial | Profile/edit basics exist; collections/appreciation/Verein profile add-ons are absent. | Defer add-ons unless enabled for mobile tenants. |
 | Settings | `/settings`, security/privacy/notifications/skills/translation | `(modals)/settings`, `(modals)/change-password`, `(modals)/verify-identity` | Partial | Partial | Core settings, password, and identity verification exist; data export, blocked users, connected accounts, translation are not full parity. | Add settings sub-routes as discrete modal screens. |
 | Notifications | `/notifications` | `(modals)/notifications` | Complete | Partial | Notification list exists. | Confirm mark-read/delete parity during API QA. |
@@ -124,6 +124,7 @@ npm test -- support.test.tsx --runInBand
 npm test -- polls.test.tsx --runInBand
 npm test -- polls.test.tsx exchanges.test.tsx members.test.tsx groups.test.tsx --runInBand
 npm test -- new-exchange.test.tsx edit-exchange.test.tsx components/ui/Input.test.tsx --runInBand
+npm test -- connections.test.ts connections.test.tsx --runInBand
 npm test -- --runInBand
 npm run type-check
 ```
@@ -138,4 +139,5 @@ Observed status:
 - `polls.test.tsx`: passed.
 - Focused polls/exchanges/members/groups route tests: passed.
 - Focused new/edit exchange and Input wrapper tests: passed.
+- Focused direct connections API/screen tests: passed.
 - `npm install`: completed and reported 24 audit findings. They were not force-fixed because that would be a separate dependency/security remediation with possible breaking changes.

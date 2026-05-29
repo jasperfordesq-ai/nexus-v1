@@ -14,6 +14,46 @@
   "back": "Back",
   "share": "Share profile",
   "profileTitle": "Member Profile",
+  "connections": {
+    "title": "Connections",
+    "eyebrow": "Member workflows",
+    "subtitle": "Manage your member connections, pending requests, and direct-message routes.",
+    "tabs": {
+      "accepted": "Connected",
+      "pending_received": "Received",
+      "pending_sent": "Sent"
+    },
+    "empty": {
+      "accepted": {
+        "title": "No connections yet",
+        "description": "Find members and send connection requests."
+      },
+      "pending_received": {
+        "title": "No requests to review",
+        "description": "Incoming connection requests will appear here."
+      },
+      "pending_sent": {
+        "title": "No sent requests",
+        "description": "Connection requests you send will appear here until they are accepted."
+      }
+    },
+    "status": {
+      "accepted": "Connected",
+      "pending_received": "Received",
+      "pending_sent": "Sent"
+    },
+    "browseMembers": "Browse members",
+    "viewProfile": "View profile for {{name}}",
+    "connectedSince": "Connected {{date}}",
+    "message": "Message",
+    "remove": "Remove",
+    "accept": "Accept",
+    "decline": "Decline",
+    "cancel": "Cancel request",
+    "unknownMember": "Unknown member",
+    "actionFailedTitle": "Connection update failed",
+    "actionFailedDescription": "Please try again."
+  },
   "search": {
     "placeholder": "Search members…"
   },
