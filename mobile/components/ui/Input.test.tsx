@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { Text } from 'react-native';
+import { Text, TextInput } from 'react-native';
 import { render } from '@testing-library/react-native';
 
 import Input from './Input';
@@ -33,5 +33,13 @@ describe('Input component', () => {
     expect(getByPlaceholderText('Search members')).toBeTruthy();
     expect(getByText('L')).toBeTruthy();
     expect(getByText('R')).toBeTruthy();
+  });
+
+  it('forwards refs to the underlying native input', () => {
+    const ref = React.createRef<TextInput>();
+
+    render(<Input ref={ref} value="" placeholder="Focusable" />);
+
+    expect(ref.current).toBeTruthy();
   });
 });

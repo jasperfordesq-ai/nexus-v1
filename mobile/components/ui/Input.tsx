@@ -3,8 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import React from 'react';
-import { View, type TextInputProps } from 'react-native';
+import React, { forwardRef } from 'react';
+import { TextInput, View, type TextInputProps } from 'react-native';
 import { FieldError, Input as HeroInput, Label, TextField } from 'heroui-native';
 
 interface InputProps extends TextInputProps {
@@ -14,15 +14,18 @@ interface InputProps extends TextInputProps {
   rightIcon?: React.ReactNode;
 }
 
-export default function Input({
-  label,
-  error,
-  leftIcon,
-  rightIcon,
-  style,
-  editable,
-  ...rest
-}: InputProps) {
+const Input = forwardRef<TextInput, InputProps>(function Input(
+  {
+    label,
+    error,
+    leftIcon,
+    rightIcon,
+    style,
+    editable,
+    ...rest
+  },
+  ref,
+) {
   const isDisabled = editable === false;
 
   return (
@@ -35,6 +38,7 @@ export default function Input({
           <View className="pl-3 absolute left-0 z-10">{leftIcon}</View>
         ) : null}
         <HeroInput
+          ref={ref}
           isInvalid={!!error}
           isDisabled={isDisabled}
           style={[leftIcon ? { paddingLeft: 40 } : undefined, rightIcon ? { paddingRight: 40 } : undefined, style]}
@@ -50,4 +54,6 @@ export default function Input({
       ) : null}
     </TextField>
   );
-}
+});
+
+export default Input;

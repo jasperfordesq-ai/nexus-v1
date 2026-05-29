@@ -46,6 +46,7 @@ Keep raw React Native primitives for layout and native capabilities: `View`, `Te
 - Added a mobile Support & Legal hub for help, resources, about, contact, terms, privacy, cookies, and accessibility web parity links.
 - Added a native Polls route backed by the feed polls query and inline `PollCard` voting.
 - Migrated exchange, member, and group search fields from raw `TextInput` controls to the shared HeroUI Native-backed `Input` wrapper.
+- Migrated new/edit exchange form fields to the shared `Input` wrapper and added explicit ref forwarding to keep keyboard flow intact.
 - Added the parity audit and migration queue in `mobile/docs/HEROUI_NATIVE_PARITY_AUDIT.md`.
 
 ## Practical Exceptions

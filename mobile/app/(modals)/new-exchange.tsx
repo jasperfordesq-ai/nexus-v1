@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useRef, useState, type ReactNode } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, type TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -32,6 +32,7 @@ import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
 import OfflineBanner from '@/components/OfflineBanner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
+import Input from '@/components/ui/Input';
 
 type ServiceType = 'physical_only' | 'remote_only' | 'hybrid' | 'location_dependent';
 type ExperienceOption = (typeof experienceOptions)[number];
@@ -273,7 +274,7 @@ function NewExchangeModalInner() {
             </View>
 
             <FieldLabel label={t('titleLabel')} theme={theme} />
-            <TextInput
+            <Input
               value={title}
               onChangeText={(value) => {
                 setTitle(value);
@@ -295,7 +296,7 @@ function NewExchangeModalInner() {
             ) : null}
 
             <FieldLabel label={t('description')} theme={theme} />
-            <TextInput
+            <Input
               ref={descriptionRef}
               value={description}
               onChangeText={(value) => {
@@ -335,7 +336,7 @@ function NewExchangeModalInner() {
             />
 
             <FieldLabel label={t('form.location')} theme={theme} />
-            <TextInput
+            <Input
               value={profileLocation}
               editable={false}
               placeholder={t('form.locationPlaceholder')}
@@ -345,7 +346,7 @@ function NewExchangeModalInner() {
             <Text style={{ color: theme.textMuted }} className="-mt-2 text-xs leading-5">{t('form.locationFromProfile')}</Text>
 
             <FieldLabel label={t('form.skills')} theme={theme} />
-            <TextInput
+            <Input
               value={skillTags}
               onChangeText={setSkillTags}
               placeholder={t('form.skillsPlaceholder')}
@@ -381,7 +382,7 @@ function NewExchangeModalInner() {
                   theme={theme}
                 />
                 <FieldLabel label={t('form.accessibilityLabel')} theme={theme} />
-                <TextInput
+                <Input
                   value={accessibilityNotes}
                   onChangeText={setAccessibilityNotes}
                   placeholder={t('form.accessibilityPlaceholder')}
@@ -449,7 +450,7 @@ function NewExchangeModalInner() {
             ) : null}
 
             <FieldLabel label={t('timeCredits')} theme={theme} />
-            <TextInput
+            <Input
               ref={hoursRef}
               value={hours}
               onChangeText={(value) => {

@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useState, type ReactNode } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -35,6 +35,7 @@ import * as Haptics from '@/lib/haptics';
 import AppTopBar from '@/components/ui/AppTopBar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
+import Input from '@/components/ui/Input';
 
 type ServiceType = 'physical_only' | 'remote_only' | 'hybrid' | 'location_dependent';
 
@@ -304,7 +305,7 @@ function EditExchangeModalInner() {
               </View>
 
               <FieldLabel label={t('titleLabel')} theme={theme} />
-              <TextInput
+              <Input
                 value={title}
                 onChangeText={(value) => {
                   setTitle(value);
@@ -322,7 +323,7 @@ function EditExchangeModalInner() {
               ) : null}
 
               <FieldLabel label={t('description')} theme={theme} />
-              <TextInput
+              <Input
                 value={description}
                 onChangeText={(value) => {
                   setDescription(value);
@@ -370,7 +371,7 @@ function EditExchangeModalInner() {
               </View>
 
               <FieldLabel label={t('form.location')} theme={theme} />
-              <TextInput
+              <Input
                 value={listingLocation}
                 editable={false}
                 placeholder={t('form.locationPlaceholder')}
@@ -382,7 +383,7 @@ function EditExchangeModalInner() {
               </Text>
 
               <FieldLabel label={t('form.skills')} theme={theme} />
-              <TextInput
+              <Input
                 value={skillTags}
                 onChangeText={setSkillTags}
                 placeholder={t('form.skillsPlaceholder')}
@@ -422,7 +423,7 @@ function EditExchangeModalInner() {
                   />
 
                   <FieldLabel label={t('form.accessibilityLabel')} theme={theme} />
-                  <TextInput
+                  <Input
                     value={accessibilityNotes}
                     onChangeText={setAccessibilityNotes}
                     placeholder={t('form.accessibilityPlaceholder')}
@@ -502,7 +503,7 @@ function EditExchangeModalInner() {
               ) : null}
 
               <FieldLabel label={t('timeCredits')} theme={theme} />
-              <TextInput
+              <Input
                 value={hours}
                 onChangeText={(value) => {
                   setHours(value);
