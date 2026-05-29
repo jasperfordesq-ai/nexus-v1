@@ -95,12 +95,12 @@ const deploymentChoices: { id: DeploymentMode; title: string; plainEnglish: stri
   {
     id: 'shared-platform',
     title: 'Main managed platform',
-    plainEnglish: 'The best-value route: your tenant runs on the main Project NEXUS managed platform with isolation, monitoring, backups, and upgrades included.',
+    plainEnglish: 'Recommended for most customers: your tenant runs on the main Project NEXUS EU platform with isolation, monitoring, backups, security patches, and stable upgrades included.',
   },
   {
     id: 'dedicated-managed-server',
     title: 'Dedicated managed server',
-    plainEnglish: `Starts from ${dedicatedServerStartPrice} for entry-level dedicated hosting. Larger or more complex workloads receive a tailored infrastructure quote.`,
+    plainEnglish: `Only choose this for isolation, procurement, unusual traffic, custom architecture, or version-lock needs. Starts from ${dedicatedServerStartPrice}.`,
   },
 ];
 
@@ -179,6 +179,7 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
   const isEnterpriseCustomQuote = quote.hostingPlan.id === 'enterprise-custom';
   const communityStartPrice = `from ${formatCurrency(communityTimebankPlans[0].annualMonthlyEur)}/mo`;
   const fullPlatformStartPrice = `from ${formatCurrency(hostingPlans[0].monthlyEur)}/mo`;
+  const launchStepTitle = `${isDedicatedCustomQuote ? '7' : '6'}. How much launch help do you need?`;
 
   useEffect(() => {
     onQuoteChange(quote);
@@ -419,17 +420,25 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
                 <>
                   <ChoiceCardSection
                     title="3. Where should it run?"
-                    description="Choose the lower-cost main managed platform, or ask us to size a dedicated server setup when procurement, isolation, traffic, or performance expectations justify it."
+                    description="Most customers should use the main EU managed platform. Dedicated infrastructure is only for buyers with a clear procurement, isolation, traffic, or versioning reason."
                     choices={deploymentChoices}
                     options={deploymentModes}
                     cadence="monthly"
                     selectedId={input.deploymentModeId ?? 'shared-platform'}
                     onSelect={(deploymentModeId) =>
-                      setInput((value) => ({ ...value, deploymentModeId: deploymentModeId as DeploymentMode }))
+                      setInput((value) => ({
+                        ...value,
+                        deploymentModeId: deploymentModeId as DeploymentMode,
+                        maintenancePlanId: deploymentModeId === 'dedicated-managed-server' ? value.maintenancePlanId : 'track-latest',
+                      }))
                     }
                   />
 
-                  <DedicatedServerPricingNote />
+                  {isDedicatedCustomQuote ? (
+                    <DedicatedServerPricingNote />
+                  ) : (
+                    <MainManagedPlatformNote />
+                  )}
 
                   <Card className="nexus-surface p-5">
                     <h3 className="text-xl font-black text-white">4. How would you like to buy it?</h3>
@@ -450,18 +459,20 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
                     onSelect={(supportTierId) => setInput((value) => ({ ...value, supportTierId }))}
                   />
 
-                  <ChoiceCardSection
-                    title="6. How should upgrades be handled?"
-                    description="Choose whether you want to stay current, hold a release, or maintain a bespoke fork."
-                    choices={maintenanceChoices}
-                    options={maintenancePlans}
-                    cadence="monthly"
-                    selectedId={input.maintenancePlanId}
-                    onSelect={(maintenancePlanId) => setInput((value) => ({ ...value, maintenancePlanId }))}
-                  />
+                  {isDedicatedCustomQuote ? (
+                    <ChoiceCardSection
+                      title="6. How should upgrades be handled?"
+                      description="This only applies when you are not on the main managed platform. Choose whether the dedicated deployment tracks stable releases, pins a version, or carries a bespoke fork."
+                      choices={maintenanceChoices}
+                      options={maintenancePlans}
+                      cadence="monthly"
+                      selectedId={input.maintenancePlanId}
+                      onSelect={(maintenancePlanId) => setInput((value) => ({ ...value, maintenancePlanId }))}
+                    />
+                  ) : null}
 
                   <ChoiceCardSection
-                    title="7. How much launch help do you need?"
+                    title={launchStepTitle}
                     description="This covers setup, migration, training, and go-live support before the service opens."
                     choices={launchChoices}
                     options={onboardingPackages}
@@ -677,6 +688,30 @@ function EnterpriseCustomSection() {
           </div>
         ))}
       </dl>
+    </section>
+  );
+}
+
+function MainManagedPlatformNote() {
+  return (
+    <section className="nexus-surface p-5">
+      <p className="text-sm font-bold tracking-[0.16em] text-[var(--color-accent)] uppercase">Managed platform operations</p>
+      <h3 className="mt-2 text-2xl font-black text-white">Most customers run on the main EU managed Project NEXUS platform.</h3>
+      <p className="mt-3 text-sm leading-6 text-white/62">
+        Stable upgrades, security patches, backups, monitoring, and platform operations are included. You do not need to choose a release track, version lock, or fork-maintenance plan unless you are buying dedicated or bespoke infrastructure.
+      </p>
+      <div className="mt-5 grid gap-3 sm:grid-cols-3">
+        {[
+          ['Best value', 'Shared platform operations keep the managed service affordable without stripping out the main NEXUS modules.'],
+          ['EU hosted', 'The default managed environment is the sensible route for most charities, funders, and public-sector pilots.'],
+          ['No version admin', 'We handle stable release upgrades; you focus on community launch, adoption, and governance.'],
+        ].map(([term, description]) => (
+          <div key={term} className="rounded-xl border border-white/10 bg-black/18 p-4">
+            <p className="font-black text-white">{term}</p>
+            <p className="mt-2 text-sm leading-6 text-white/56">{description}</p>
+          </div>
+        ))}
+      </div>
     </section>
   );
 }

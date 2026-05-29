@@ -164,6 +164,7 @@ function estimateFullPlatformQuote(input: QuoteInput): QuoteEstimate {
   const support = findById(supportTiers, input.supportTierId);
   const maintenance = findById(maintenancePlans, input.maintenancePlanId);
   const onboarding = findById(onboardingPackages, input.onboardingPackageId);
+  const chargesMaintenancePlan = deploymentMode.requiresCustomQuote === true;
 
   const recurringItems: QuoteLineItem[] = [
     {
@@ -180,14 +181,17 @@ function estimateFullPlatformQuote(input: QuoteInput): QuoteEstimate {
       quantity: 1,
       cadence: 'monthly',
     },
-    {
+  ];
+
+  if (chargesMaintenancePlan) {
+    recurringItems.push({
       id: maintenance.id,
       label: maintenance.label,
       amountEur: maintenance.monthlyEur,
       quantity: 1,
       cadence: 'monthly',
-    },
-  ];
+    });
+  }
 
   if (deploymentMode.requiresCustomQuote) {
     recurringItems.push({

@@ -202,6 +202,17 @@ describe('sales-site public content policy', () => {
     expect(quoteBuilder).toContain('deploymentModeId');
   });
 
+  it('keeps release and fork maintenance choices behind dedicated infrastructure selection', () => {
+    const quoteBuilder = readFileSync(resolve(__dirname, '..', 'components', 'QuoteBuilder.tsx'), 'utf8');
+    const dedicatedGateIndex = quoteBuilder.indexOf('{isDedicatedCustomQuote ? (');
+    const upgradesIndex = quoteBuilder.indexOf('How should upgrades be handled?');
+
+    expect(dedicatedGateIndex).toBeGreaterThan(-1);
+    expect(upgradesIndex).toBeGreaterThan(dedicatedGateIndex);
+    expect(quoteBuilder).toContain('Most customers run on the main EU managed Project NEXUS platform.');
+    expect(quoteBuilder).toContain('Stable upgrades, security patches, backups, monitoring, and platform operations are included.');
+  });
+
   it('uses shared sales polish primitives for app-grade surfaces and section rhythm', () => {
     const primitives = readFileSync(resolve(__dirname, '..', 'components', 'SalesPrimitives.tsx'), 'utf8');
     const homePage = readFileSync(resolve(__dirname, '..', 'components', 'HomePage.tsx'), 'utf8');

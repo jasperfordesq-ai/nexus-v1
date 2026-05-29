@@ -94,6 +94,7 @@ describe('pricingEngine', () => {
     const quote = estimateQuote({
       activeMembers: 75,
       billingCycle: 'monthly',
+      deploymentModeId: 'dedicated-managed-server',
       supportTierId: 'priority',
       maintenancePlanId: 'pinned-release',
       onboardingPackageId: 'quick-start',
@@ -131,6 +132,24 @@ describe('pricingEngine', () => {
     expect(quote.oneOffTotal).toBe(250);
     expect(quote.lineItems.map((item) => item.label).join(' ')).toContain('Dedicated managed infrastructure discovery');
     expect(quote.lineItems.find((item) => item.id === 'dedicated-managed-server')?.priceLabel).toBe('Starts from €650/mo');
+  });
+
+  it('ignores paid release maintenance choices on the main managed platform', () => {
+    const quote = estimateQuote({
+      activeMembers: 75,
+      billingCycle: 'monthly',
+      deploymentModeId: 'shared-platform',
+      supportTierId: 'standard',
+      maintenancePlanId: 'custom-fork',
+      onboardingPackageId: 'none',
+      addOns: {},
+      oneOffServices: {},
+    });
+
+    expect(quote.pricingMode).toBe('published');
+    expect(quote.monthlyRecurring).toBe(99);
+    expect(quote.lineItems.map((item) => item.id)).not.toContain('custom-fork');
+    expect(quote.lineItems.map((item) => item.label).join(' ')).not.toContain('Custom Fork maintenance');
   });
 
   it('formats EUR currency consistently for the public calculator', () => {
