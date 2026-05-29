@@ -38,10 +38,8 @@ STATE_FILE="${NEXUS_BLUEGREEN_STATE_FILE:-$DEPLOY_DIR/.bluegreen-active}"
 
 BLUE_API_PORT="${NEXUS_BLUE_API_PORT:-8090}"
 BLUE_FRONTEND_PORT="${NEXUS_BLUE_FRONTEND_PORT:-3000}"
-BLUE_SALES_PORT="${NEXUS_BLUE_SALES_PORT:-3003}"
 GREEN_API_PORT="${NEXUS_GREEN_API_PORT:-8190}"
 GREEN_FRONTEND_PORT="${NEXUS_GREEN_FRONTEND_PORT:-3100}"
-GREEN_SALES_PORT="${NEXUS_GREEN_SALES_PORT:-3103}"
 
 # ---------------------------------------------------------------------------
 log_step "=== Project NEXUS — Blue-Green Apache Setup ==="
@@ -69,7 +67,7 @@ if [ -z "${ACTIVE_COLOR:-}" ]; then
         # The server has never had a blue-green deployment.  We cannot point
         # the routes file at blue-green containers that don't exist yet, but
         # we CAN create the file now pointing at the legacy blue ports (8090 /
-        # 3000 / 3003).  Once the Plesk vhost includes are in place and Apache
+        # 3000).  Once the Plesk vhost includes are in place and Apache
         # is reloaded, bluegreen-deploy.sh will build the green containers,
         # verify them on ports 8190/3100/3103, then atomically switch Apache.
         log_warn "Bootstrap mode: only the legacy nexus-php-app container is running."
@@ -87,17 +85,15 @@ fi
 if [ "$ACTIVE_COLOR" = "blue" ]; then
     API_PORT="$BLUE_API_PORT"
     FRONTEND_PORT="$BLUE_FRONTEND_PORT"
-    SALES_PORT="$BLUE_SALES_PORT"
 else
     API_PORT="$GREEN_API_PORT"
     FRONTEND_PORT="$GREEN_FRONTEND_PORT"
-    SALES_PORT="$GREEN_SALES_PORT"
 fi
 
 if [ "$BOOTSTRAP_MODE" = "1" ]; then
-    log_ok "Bootstrap: routes file will use blue ports (API=$API_PORT frontend=$FRONTEND_PORT sales=$SALES_PORT)"
+    log_ok "Bootstrap: routes file will use blue ports (API=$API_PORT frontend=$FRONTEND_PORT)"
 else
-    log_ok "Active color: $ACTIVE_COLOR (API=$API_PORT frontend=$FRONTEND_PORT sales=$SALES_PORT)"
+    log_ok "Active color: $ACTIVE_COLOR (API=$API_PORT frontend=$FRONTEND_PORT)"
 fi
 
 # ── 2. Write the routes file ────────────────────────────────────────────────
@@ -113,7 +109,6 @@ cat > "$ROUTES_FILE" <<ROUTES
 # Active color: $ACTIVE_COLOR
 Define NEXUS_API_PORT $API_PORT
 Define NEXUS_FRONTEND_PORT $FRONTEND_PORT
-Define NEXUS_SALES_PORT $SALES_PORT
 ROUTES
 
 log_ok "Written: $ROUTES_FILE"
@@ -148,7 +143,7 @@ else
     echo "  ACTION REQUIRED — Plesk vhost configuration"
     echo "════════════════════════════════════════════════════════════════"
     echo ""
-    echo "  In Plesk admin panel, for EACH of the three domains, go to:"
+    echo "  In Plesk admin panel, for the API and app domains, go to:"
     echo "  Websites & Domains → [domain] → Apache & nginx Settings"
     echo "  → 'Additional Apache directives for HTTP' AND 'for HTTPS'"
     echo "  and add the appropriate block below."
@@ -168,10 +163,8 @@ else
     echo "  ProxyPassReverse / http://127.0.0.1:\${NEXUS_FRONTEND_PORT}/"
     echo ""
     echo "  ── project-nexus.ie ────────────────────────────────────────"
-    echo "  Include /etc/apache2/conf-enabled/nexus-active-upstreams.conf"
-    echo "  ProxyPass /.well-known/acme-challenge/ !"
-    echo "  ProxyPass / http://127.0.0.1:\${NEXUS_SALES_PORT}/ retry=0"
-    echo "  ProxyPassReverse / http://127.0.0.1:\${NEXUS_SALES_PORT}/"
+    echo "  project-nexus.ie is owned by the private sales-site repository and uses"
+    echo "  its own Apache route include."
     echo ""
     echo "  After saving in Plesk, run:"
     echo "    apachectl configtest && systemctl reload apache2"
@@ -209,12 +202,6 @@ if echo "$FRONTEND_HTML" | grep -q 'id="root"'; then
 else
     log_err "React frontend not serving on port $FRONTEND_PORT"
     SMOKE_FAILED=1
-fi
-
-if curl -sf "http://127.0.0.1:$SALES_PORT/" >/dev/null 2>&1; then
-    log_ok "Sales site serving on port $SALES_PORT"
-else
-    log_warn "Sales site not responding on port $SALES_PORT (non-critical)"
 fi
 
 # ── 6. Reload Apache ─────────────────────────────────────────────────────────

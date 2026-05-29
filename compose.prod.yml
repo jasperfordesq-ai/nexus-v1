@@ -7,7 +7,7 @@
 #   - api.project-nexus.ie  -> PHP API (port 8090)
 #   - accessible.project-nexus.ie -> Laravel-rendered accessible frontend (PHP API upstream)
 #   - app.project-nexus.ie  -> React Frontend (port 3000)
-#   - project-nexus.ie      -> Sales Site (port 3001)
+#   - project-nexus.ie      -> Private commercial sales site (deployed from its own repository)
 #
 # Usage:
 #   docker compose -f compose.prod.yml up -d
@@ -355,31 +355,6 @@ services:
           memory: 384M
         reservations:
           memory: 128M
-
-  # ---------------------------------------------------------------------------
-  # Sales Site (project-nexus.ie) - Marketing/Landing Page
-  # ---------------------------------------------------------------------------
-  sales:
-    build:
-      context: ./sales-site
-      dockerfile: Dockerfile
-    container_name: nexus-sales-site
-    restart: unless-stopped
-    ports:
-      - "3003:80"
-    networks:
-      - nexus-php-internal
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-        reservations:
-          memory: 64M
 
 # =============================================================================
 # Networks

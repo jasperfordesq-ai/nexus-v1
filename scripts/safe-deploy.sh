@@ -208,7 +208,7 @@ if [ "$MODE" = "auto" ]; then
     echo "  Auto-detecting deploy mode..." | tee -a "$LOG_FILE"
     git fetch origin main --quiet 2>&1 | tee -a "$LOG_FILE"
     CHANGED=$(git diff HEAD origin/main --name-only 2>/dev/null || echo "")
-    FULL_TRIGGERS="composer.json composer.lock package.json package-lock.json Dockerfile Dockerfile.prod react-frontend/Dockerfile.prod react-frontend/package.json react-frontend/package-lock.json sales-site/package.json sales-site/package-lock.json"
+    FULL_TRIGGERS="composer.json composer.lock package.json package-lock.json Dockerfile Dockerfile.prod react-frontend/Dockerfile.prod react-frontend/package.json react-frontend/package-lock.json"
     NEEDS_FULL=0
     for trigger in $FULL_TRIGGERS; do
         if echo "$CHANGED" | grep -qF "$trigger"; then

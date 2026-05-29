@@ -60,10 +60,8 @@ CURRENT_COMMIT=""
 
 BLUE_API_PORT="${NEXUS_BLUE_API_PORT:-8090}"
 BLUE_FRONTEND_PORT="${NEXUS_BLUE_FRONTEND_PORT:-3000}"
-BLUE_SALES_PORT="${NEXUS_BLUE_SALES_PORT:-3003}"
 GREEN_API_PORT="${NEXUS_GREEN_API_PORT:-8190}"
 GREEN_FRONTEND_PORT="${NEXUS_GREEN_FRONTEND_PORT:-3400}"
-GREEN_SALES_PORT="${NEXUS_GREEN_SALES_PORT:-3103}"
 
 usage() {
     cat <<'USAGE'
@@ -248,16 +246,16 @@ inactive_color() {
 ports_for_color() {
     local color="$1"
     if [ "$color" = "blue" ]; then
-        echo "$BLUE_API_PORT $BLUE_FRONTEND_PORT $BLUE_SALES_PORT"
+        echo "$BLUE_API_PORT $BLUE_FRONTEND_PORT"
     else
-        echo "$GREEN_API_PORT $GREEN_FRONTEND_PORT $GREEN_SALES_PORT"
+        echo "$GREEN_API_PORT $GREEN_FRONTEND_PORT"
     fi
 }
 
 require_route_switching() {
     if [ -z "$APACHE_ROUTES_FILE" ]; then
         log_err "NEXUS_APACHE_ROUTES_FILE is not set."
-        log_info "Set it to the Apache/Plesk include that controls app/api/sales upstream ports."
+        log_info "Set it to the Apache/Plesk include that controls app/API upstream ports."
         exit 2
     fi
 }
@@ -278,7 +276,6 @@ container_name() {
     case "$service" in
         app) echo "nexus-$color-php-app" ;;
         frontend) echo "nexus-$color-react" ;;
-        sales) echo "nexus-$color-sales" ;;
         queue) echo "nexus-$color-php-queue" ;;
         scheduler) echo "nexus-$color-php-scheduler" ;;
         *)
@@ -331,7 +328,6 @@ wait_for_color() {
     local color="$1"
     wait_for_container_health "$(container_name "$color" app)"
     wait_for_container_health "$(container_name "$color" frontend)"
-    wait_for_container_health "$(container_name "$color" sales)"
 }
 
 prepare_release() {
@@ -526,7 +522,7 @@ free_target_color_ports() {
     if [ "$color" = "blue" ]; then
         # First-generation production containers used the blue ports without
         # color names. Once green is active, stop them so blue can be rebuilt.
-        docker stop nexus-php-app nexus-react-prod nexus-sales-site >/dev/null 2>&1 || true
+        docker stop nexus-php-app nexus-react-prod >/dev/null 2>&1 || true
     fi
 
     log_ok "Inactive $color ports are available"
@@ -534,8 +530,8 @@ free_target_color_ports() {
 
 write_apache_routes() {
     local color="$1"
-    local api_port frontend_port sales_port tmp_file backup_file
-    read -r api_port frontend_port sales_port < <(ports_for_color "$color")
+    local api_port frontend_port tmp_file backup_file
+    read -r api_port frontend_port < <(ports_for_color "$color")
     tmp_file="$(mktemp)"
     backup_file="$(mktemp)"
 
@@ -544,7 +540,6 @@ write_apache_routes() {
 # Active color: $color
 Define NEXUS_API_PORT $api_port
 Define NEXUS_FRONTEND_PORT $frontend_port
-Define NEXUS_SALES_PORT $sales_port
 ROUTES
 
     if [ -f "$APACHE_ROUTES_FILE" ]; then
@@ -584,13 +579,13 @@ ROUTES
     rm -f "$backup_file"
 
     echo "$color" > "$STATE_FILE"
-    log_ok "Traffic switched to $color ($api_port/$frontend_port/$sales_port)"
+    log_ok "Traffic switched to $color ($api_port/$frontend_port)"
 }
 
 smoke_color() {
     local color="$1"
-    local api_port frontend_port sales_port html bootstrap
-    read -r api_port frontend_port sales_port < <(ports_for_color "$color")
+    local api_port frontend_port html bootstrap
+    read -r api_port frontend_port < <(ports_for_color "$color")
 
     log_step "=== Candidate Smoke Tests ($color) ==="
     write_deploy_status "running" "Candidate Smoke Tests ($color)" "${CURRENT_ACTIVE:-}" "$color" "${CURRENT_COMMIT:-}"
@@ -626,25 +621,22 @@ smoke_color() {
     fi
     log_ok "Frontend passed on $frontend_port"
 
-    curl -sf "http://127.0.0.1:$sales_port/" >/dev/null
-    log_ok "Sales site passed on $sales_port"
 }
 
 deploy_candidate() {
     local color="$1"
     local release_dir="$2"
     local commit="$3"
-    local api_port frontend_port sales_port
-    read -r api_port frontend_port sales_port < <(ports_for_color "$color")
+    local api_port frontend_port
+    read -r api_port frontend_port < <(ports_for_color "$color")
 
     phase "Build Candidate ($color)" "${CURRENT_ACTIVE:-}" "$color" "$commit"
     log_info "Release: ${commit:0:12}"
-    log_info "Inactive ports: API=$api_port frontend=$frontend_port sales=$sales_port"
+    log_info "Inactive ports: API=$api_port frontend=$frontend_port"
 
     export NEXUS_COLOR="$color"
     export NEXUS_API_PORT="$api_port"
     export NEXUS_FRONTEND_PORT="$frontend_port"
-    export NEXUS_SALES_PORT="$sales_port"
     export NEXUS_ENV_FILE="$DEPLOY_DIR/.env"
     export BUILD_COMMIT="${commit:0:12}"
 
@@ -659,8 +651,8 @@ deploy_candidate() {
         log_info "Staged CHANGELOG.md into react-frontend/ for in-app /changelog"
     fi
 
-    compose_for_release "$release_dir" build --no-cache app frontend sales
-    compose_for_release "$release_dir" up -d --no-build app frontend sales
+    compose_for_release "$release_dir" build --no-cache app frontend
+    compose_for_release "$release_dir" up -d --no-build app frontend
     wait_for_color "$color"
     optimize_candidate_laravel "$color"
     verify_candidate_images "$color"
@@ -704,8 +696,8 @@ check_candidate_migration_safety() {
 # where the right image was tagged but a stale layer was reused.
 verify_candidate_build_version() {
     local color="$1"
-    local api_port _ _2
-    read -r api_port _ _2 < <(ports_for_color "$color")
+    local api_port _
+    read -r api_port _ < <(ports_for_color "$color")
     phase "Verify Candidate Build Version ($color)" "${CURRENT_ACTIVE:-}" "$color" "${CURRENT_COMMIT:-}"
     local response served_commit
     response="$(curl -sf "http://127.0.0.1:$api_port/version.php" 2>/dev/null || true)"
@@ -749,13 +741,12 @@ start_worker_services_for_color() {
     local commit="$3"
     shift 3
     local services=("$@")
-    local api_port frontend_port sales_port
-    read -r api_port frontend_port sales_port < <(ports_for_color "$color")
+    local api_port frontend_port
+    read -r api_port frontend_port < <(ports_for_color "$color")
 
     export NEXUS_COLOR="$color"
     export NEXUS_API_PORT="$api_port"
     export NEXUS_FRONTEND_PORT="$frontend_port"
-    export NEXUS_SALES_PORT="$sales_port"
     export NEXUS_ENV_FILE="$DEPLOY_DIR/.env"
     export BUILD_COMMIT="${commit:0:12}"
 
@@ -923,9 +914,6 @@ post_cutover_smoke() {
 
     curl -sf https://app.project-nexus.ie/ >/dev/null
     log_ok "Public React frontend passed"
-
-    curl -sf https://project-nexus.ie/ >/dev/null
-    log_ok "Public sales site passed"
 }
 
 run_prerender_for_color() {
@@ -994,11 +982,11 @@ schedule_followup_health_check() {
 }
 
 cmd_status() {
-    local active api_port frontend_port sales_port
+    local active api_port frontend_port
     active="$(read_active_color)"
-    read -r api_port frontend_port sales_port < <(ports_for_color "$active")
+    read -r api_port frontend_port < <(ports_for_color "$active")
     log_info "Active color: $active"
-    log_info "Active ports: API=$api_port frontend=$frontend_port sales=$sales_port"
+    log_info "Active ports: API=$api_port frontend=$frontend_port"
     if [ -f "$STATUS_FILE" ]; then
         log_info "Latest deployment status:"
         sed -n '1,20p' "$STATUS_FILE"

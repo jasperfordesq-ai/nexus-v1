@@ -53,7 +53,7 @@ else
 fi
 MEM_THRESHOLD_PCT="${MEM_THRESHOLD_PCT:-90}"   # percent of limit → WARN/FAIL
 OOM_LOOKBACK="${OOM_LOOKBACK:-1h}"             # docker events window
-CONTAINER_NAME_RE='nexus-php-app|nexus-php-db|nexus-php-redis|nexus-react-prod|nexus-sales-site|nexus-meilisearch|nexus-(blue|green)-(php-app|react|frontend|sales|php-queue|php-scheduler|queue|scheduler)'
+CONTAINER_NAME_RE='nexus-php-app|nexus-php-db|nexus-php-redis|nexus-react-prod|nexus-meilisearch|nexus-(blue|green)-(php-app|react|frontend|php-queue|php-scheduler|queue|scheduler)'
 
 # --- Colors ---
 if [ -t 1 ]; then

@@ -42,23 +42,6 @@ IMAGES = {
         "title": "Project NEXUS App Icon 512×512",
         "description": "PWA / home-screen icon for the Project NEXUS community platform.",
     },
-    # sales-site
-    "sales-site/public/images/nexus-banner.png": {
-        "title": "Project NEXUS Banner",
-        "description": "Marketing banner for the Project NEXUS open-source community platform.",
-    },
-    "sales-site/public/images/nexus-logo.png": {
-        "title": "Project NEXUS Logo",
-        "description": "Official Project NEXUS wordmark and icon logo.",
-    },
-    "sales-site/public/images/Projext-NEXUS-Logo.png": {
-        "title": "Project NEXUS Logo",
-        "description": "Official Project NEXUS wordmark and icon logo.",
-    },
-    "sales-site/public/og-image.png": {
-        "title": "Project NEXUS – Open Graph Image",
-        "description": "Social sharing / Open Graph image for the Project NEXUS community platform.",
-    },
 }
 
 # Shared fields applied to every NEXUS image

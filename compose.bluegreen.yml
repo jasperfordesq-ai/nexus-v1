@@ -100,31 +100,6 @@ services:
       retries: 12
       start_period: 10s
 
-  sales:
-    build:
-      context: ./sales-site
-      dockerfile: Dockerfile
-    image: nexus-sales-site:${BUILD_COMMIT:-candidate}
-    container_name: nexus-${NEXUS_COLOR:-green}-sales
-    restart: unless-stopped
-    stop_grace_period: 30s
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-        reservations:
-          memory: 64M
-    ports:
-      - "${NEXUS_SALES_PORT:-3103}:80"
-    networks:
-      - nexus-php-internal
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1/"]
-      interval: 10s
-      timeout: 5s
-      retries: 12
-      start_period: 10s
-
   queue:
     image: nexus-php-app:${BUILD_COMMIT:-candidate}
     container_name: nexus-${NEXUS_COLOR:-green}-php-queue

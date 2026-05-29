@@ -326,8 +326,8 @@ get_tenants() {
     DB_PASS=$(grep "^DB_PASS=" "$PRERENDER_CONFIG_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || true)
     DB_NAME=$(grep "^DB_NAME=" "$PRERENDER_CONFIG_DIR/.env" 2>/dev/null | cut -d'=' -f2 | tr -d '"' || echo "nexus")
 
-    # Tenant 1 is the platform/sales root. project-nexus.ie is served by the
-    # sales-site container, not the React tenant frontend.
+    # Tenant 1 is the platform root. project-nexus.ie is served by the private
+    # commercial sales-site repository, not the React tenant frontend.
     # parent_domain: parent's domain when this tenant has no own domain but its
     # parent does — used for sub-tenant path routing (timebanking.uk/cardiff).
     QUERY="SELECT t.id, t.slug, COALESCE(t.domain, '') as domain, COALESCE(p.domain, '') as parent_domain FROM tenants t LEFT JOIN tenants p ON p.id = t.parent_id AND p.is_active = 1 WHERE t.is_active = 1 AND t.id <> 1"

@@ -81,14 +81,9 @@ deploy_quick() {
         exit 1
     fi
 
-    # Rebuild sales site
-    log_info "Rebuilding sales site${BUILD_FLAGS:+ ($BUILD_FLAGS)}..."
-    build_with_keepalive docker compose build $BUILD_FLAGS sales
-    log_ok "Sales site rebuilt"
-
-    # Recreate frontend + sales containers with new images, restart PHP for OPCache
+    # Recreate frontend with new image, restart PHP for OPCache
     log_info "Starting updated containers..."
-    docker compose up -d --force-recreate frontend sales
+    docker compose up -d --force-recreate frontend
     log_info "Restarting PHP container (OPCache clear)..."
     docker restart nexus-php-app
     log_ok "All containers updated"

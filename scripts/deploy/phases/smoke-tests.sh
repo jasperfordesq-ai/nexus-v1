@@ -57,13 +57,6 @@ run_smoke_tests() {
         TESTS_FAILED=1
     fi
 
-    # Test sales site
-    if curl -sf http://127.0.0.1:3003/ > /dev/null 2>&1; then
-        log_ok "Sales site health check passed"
-    else
-        log_warn "Sales site health check failed (non-critical)"
-    fi
-
     # Check database connectivity (read password from .env)
     DB_PASS=$(grep "^DB_PASS=" "$DEPLOY_DIR/.env" 2>/dev/null | sed 's/^DB_PASS=//' | tr -d "\"'")
     if docker exec -e MYSQL_PWD="$DB_PASS" nexus-php-db mysqladmin ping -h localhost -unexus > /dev/null 2>&1; then
@@ -79,16 +72,13 @@ run_smoke_tests() {
         nexus-php-db
         nexus-php-redis
         nexus-react-prod
-        nexus-sales-site
         nexus-meilisearch
         nexus-blue-php-app
         nexus-blue-react
-        nexus-blue-sales
         nexus-blue-php-queue
         nexus-blue-php-scheduler
         nexus-green-php-app
         nexus-green-react
-        nexus-green-sales
         nexus-green-php-queue
         nexus-green-php-scheduler
     )
