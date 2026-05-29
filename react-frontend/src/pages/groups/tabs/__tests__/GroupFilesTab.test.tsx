@@ -45,6 +45,8 @@ vi.mock('@/lib/helpers', () => ({
   cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
 }));
 
+vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
+
 import { GroupFilesTab } from '../GroupFilesTab';
 
 describe('GroupFilesTab', () => {

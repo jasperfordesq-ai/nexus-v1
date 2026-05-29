@@ -65,6 +65,8 @@ vi.mock('@/lib/logger', () => ({
   logError: vi.fn(),
 }));
 
+vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
+
 import { SavedSearches } from '../SavedSearches';
 
 function W({ children }: { children: React.ReactNode }) {

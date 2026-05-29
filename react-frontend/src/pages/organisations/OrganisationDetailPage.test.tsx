@@ -23,6 +23,7 @@ vi.mock('react-i18next', () => ({
     t: (key: string, opts?: Record<string, unknown>) =>
       (opts?.fallbackValue as string | undefined) ?? key,
   }),
+  initReactI18next: { type: '3rdParty', init: () => {} },
 }));
 
 vi.mock('react-router-dom', async () => {
@@ -78,7 +79,7 @@ vi.mock('@/contexts', () => ({
 
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
-vi.mock('@/lib/helpers', () => ({ resolveAvatarUrl: (url: string | null) => url ?? '' }));
+vi.mock('@/lib/helpers', () => ({ resolveAvatarUrl: (url: string | null) => url ?? '', cn: (...classes: unknown[]) => classes.filter(Boolean).join(' ') }));
 
 import { OrganisationDetailPage } from './OrganisationDetailPage';
 

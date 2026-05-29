@@ -17,6 +17,7 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (k: string, o?: { fallbackValue?: string }) => o?.fallbackValue ?? k,
   }),
+  initReactI18next: { type: '3rdParty', init: () => {} },
 }));
 
 const mockUseTenant = vi.fn(() => ({

@@ -20,6 +20,7 @@ vi.mock('@/lib/motion', () => ({
 }));
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({
     t: (key: string, opts?: Record<string, unknown>) =>
       (opts?.fallbackValue as string | undefined) ?? key,

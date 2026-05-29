@@ -35,6 +35,7 @@ vi.mock('react-i18next', () => ({
 
 vi.mock('@/lib/helpers', () => ({
   resolveAssetUrl: (url: string | null) => url || '',
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
 }));
 
 vi.mock('@/lib/motion', () => ({

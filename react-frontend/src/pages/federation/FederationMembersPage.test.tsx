@@ -19,6 +19,7 @@ vi.mock('@/lib/motion', () => ({
 }));
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({
     t: (key: string, opts?: Record<string, unknown>) =>
       (opts?.fallbackValue as string | undefined) ?? key,
@@ -75,6 +76,7 @@ vi.mock('@/contexts', () => ({
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
   resolveAvatarUrl: (url: string | null) => url ?? '',
 }));
 

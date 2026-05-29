@@ -69,6 +69,7 @@ vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: vi.fn((url) => url || '/default.png'),
   formatRelativeTime: vi.fn(() => '2 hours ago'),
   resolveAssetUrl: vi.fn((url) => url || ''),
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
 }));
 
 vi.mock('@/components/seo', () => ({

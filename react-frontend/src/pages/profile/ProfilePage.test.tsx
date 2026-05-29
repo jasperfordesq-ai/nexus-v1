@@ -117,10 +117,12 @@ vi.mock('@/contexts', () => ({
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
   resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
   resolveAssetUrl: vi.fn((url) => url || ''),
   formatRelativeTime: vi.fn(() => '2 hours ago'),
 }));
+vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
 vi.mock('@/components/feedback', () => ({
   LoadingScreen: () => <div data-testid="loading-screen">Loading...</div>,
   EmptyState: ({ title, action }: { title: string; action?: unknown }) => (

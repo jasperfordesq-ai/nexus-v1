@@ -23,6 +23,7 @@ vi.mock('react-i18next', () => ({
     t: (key: string, opts?: Record<string, unknown>) =>
       (opts?.fallbackValue as string | undefined) ?? key,
   }),
+  initReactI18next: { type: '3rdParty', init: () => {} },
 }));
 
 vi.mock('react-router-dom', async () => {

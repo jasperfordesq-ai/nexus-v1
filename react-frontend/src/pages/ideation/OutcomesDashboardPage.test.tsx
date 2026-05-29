@@ -19,6 +19,7 @@ vi.mock('@/lib/motion', () => ({
 }));
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({
     t: (key: string, opts?: string | Record<string, unknown>) =>
       typeof opts === 'string'

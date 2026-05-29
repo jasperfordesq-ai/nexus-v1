@@ -64,15 +64,19 @@ vi.mock('react-i18next', () => ({
   initReactI18next: { type: '3rdParty', init: () => {} },
 }));
 
-vi.mock('i18next', () => ({
-  default: {
+vi.mock('i18next', () => {
+  const i18nMock: Record<string, unknown> = {
     t: (key: string, opts?: Record<string, unknown>) =>
       (opts as { fallbackValue?: string } | undefined)?.fallbackValue ?? key,
     language: 'en',
     changeLanguage: () => Promise.resolve(),
-  },
-  __esModule: true,
-}));
+    use: () => i18nMock,
+    init: () => Promise.resolve(),
+    on: () => i18nMock,
+    off: () => i18nMock,
+  };
+  return { default: i18nMock, __esModule: true };
+});
 
 vi.mock('@/contexts', () => ({
   useTenant: () => ({

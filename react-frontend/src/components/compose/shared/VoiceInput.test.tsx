@@ -24,6 +24,7 @@ vi.mock('react-i18next', () => ({
     },
     i18n: { language: 'en' },
   }),
+  initReactI18next: { type: '3rdParty', init: () => {} },
 }));
 
 // Helper to create a mock SpeechRecognition constructor

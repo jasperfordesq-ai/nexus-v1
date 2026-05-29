@@ -28,6 +28,7 @@ const stableT = (key: string, opts?: string | Record<string, unknown>) =>
 const stableTranslation = { t: stableT };
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => stableTranslation,
 }));
 

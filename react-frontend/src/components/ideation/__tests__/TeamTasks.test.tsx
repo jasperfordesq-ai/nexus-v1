@@ -65,6 +65,8 @@ vi.mock('@/lib/logger', () => ({
   logError: vi.fn(),
 }));
 
+vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
+
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: vi.fn((url: string | null) => url || '/default-avatar.png'),
   cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),

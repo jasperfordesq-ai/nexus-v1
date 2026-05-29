@@ -15,6 +15,7 @@ vi.mock('react-i18next', () => ({
     },
     i18n: { changeLanguage: vi.fn() },
   }),
+  initReactI18next: { type: '3rdParty', init: () => {} },
 }));
 
 vi.mock('@/components/security/BiometricSettings', () => ({

@@ -25,6 +25,7 @@ vi.mock('@/lib/logger', () => ({
 }));
 
 vi.mock('@/lib/helpers', () => ({
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
   formatRelativeTime: (date: string) => `relative-${date}`,
 }));
 

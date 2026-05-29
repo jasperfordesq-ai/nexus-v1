@@ -48,6 +48,8 @@ vi.mock('@/lib/logger', () => ({
   logError: vi.fn(),
 }));
 
+vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
+
 vi.mock('@/lib/helpers', () => ({
   resolveAssetUrl: (url: string) => url || '/default.png',
   cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),

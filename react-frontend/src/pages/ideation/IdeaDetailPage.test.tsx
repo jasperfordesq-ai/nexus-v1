@@ -19,6 +19,7 @@ vi.mock('@/lib/motion', () => ({
 }));
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({
     t: (key: string, opts?: Record<string, unknown>) => {
       const translations: Record<string, string> = {
@@ -87,6 +88,8 @@ vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: (url: string | null) => url ?? '',
   formatRelativeTime: (d: string) => d,
 }));
+
+vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
 
 import { IdeaDetailPage } from './IdeaDetailPage';
 
