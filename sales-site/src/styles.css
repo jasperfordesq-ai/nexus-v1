@@ -366,6 +366,24 @@ textarea {
   color: var(--nexus-ink);
 }
 
+.pathway-card {
+  min-height: 100%;
+}
+
+.product-cockpit {
+  transform: translateZ(0);
+}
+
+.product-cockpit--compact {
+  max-width: 40rem;
+}
+
+.proof-metric,
+.capability-band,
+.pricing-ladder {
+  min-width: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
