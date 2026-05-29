@@ -11,6 +11,7 @@ import {
   communityOnboardingPackages,
   communityTimebankPlans,
   deploymentModes,
+  hostingPlans,
   maintenancePlans,
   onboardingPackages,
   oneOffServices,
@@ -169,6 +170,8 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
   const deploymentMode = deploymentModes.find((mode) => mode.id === (input.deploymentModeId ?? 'shared-platform')) ?? deploymentModes[0];
   const isDedicatedCustomQuote = !isCommunity && deploymentMode.requiresCustomQuote === true;
   const isEnterpriseCustomQuote = quote.hostingPlan.id === 'enterprise-custom';
+  const communityStartPrice = `from ${formatCurrency(communityTimebankPlans[0].annualMonthlyEur)}/mo`;
+  const fullPlatformStartPrice = `from ${formatCurrency(hostingPlans[0].monthlyEur)}/mo`;
 
   useEffect(() => {
     onQuoteChange(quote);
@@ -254,14 +257,14 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
               <ProductLineButton
                 active={input.productLine === 'community-timebanking'}
                 title="Community Timebanking"
-                price="from EUR29/mo"
+                price={communityStartPrice}
                 detail="Core timebanking only, built for small communities that need a lower-cost managed start."
                 onPress={() => switchProductLine(setInput, 'community-timebanking')}
               />
               <ProductLineButton
                 active={input.productLine === 'full-platform'}
                 title="Full Platform Hosting"
-                price="from EUR99/mo"
+                price={fullPlatformStartPrice}
                 detail="All stable NEXUS modules with published tiers up to 100k active members and custom enterprise pricing above that."
                 onPress={() => switchProductLine(setInput, 'full-platform')}
               />

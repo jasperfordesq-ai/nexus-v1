@@ -205,10 +205,10 @@ export function ProductCockpit({ compact = false }: { compact?: boolean }) {
       <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
         <div>
           <p className="text-xs font-black tracking-[0.16em] text-[var(--color-accent)] uppercase">NEXUS cockpit</p>
-          <p className="mt-1 text-xl font-black text-white">Live community operating view</p>
+          <p className="mt-1 text-xl font-black text-white">Example community operating view</p>
         </div>
-        <Chip color="success" variant="soft">
-          Production
+        <Chip color="accent" variant="soft">
+          Demo data
         </Chip>
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
