@@ -39,7 +39,7 @@ vi.mock('@/contexts', () => ({
   useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
   useCookieConsent: () => ({ showBanner: false, openPreferences: vi.fn(), resetConsent: vi.fn() }),
 
-  useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
+  useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn(), accentColor: '#3b82f6', setAccentColor: vi.fn() }),
   usePusher: () => ({ channel: null, isConnected: false }),
   usePusherOptional: () => null,
   readStoredConsent: () => null,

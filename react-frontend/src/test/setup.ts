@@ -17,6 +17,19 @@ import { expect, vi, beforeAll, afterAll, afterEach } from 'vitest';
 import { cleanup } from '@testing-library/react';
 expect.extend(axeMatchers);
 
+// jsdom lacks the Web Animations API that HeroUI v3 / React Aria touch during
+// layout effects (e.g. exit transitions). Without these, components that read
+// `element.getAnimations()` throw "getAnimations is not a function" in tests.
+if (typeof Element !== 'undefined') {
+  if (!Element.prototype.getAnimations) {
+    Element.prototype.getAnimations = () => [];
+  }
+  if (!Element.prototype.animate) {
+    Element.prototype.animate = () =>
+      ({ cancel() {}, finish() {}, play() {}, pause() {}, finished: Promise.resolve(), onfinish: null }) as unknown as Animation;
+  }
+}
+
 // Ensure DOM is cleaned up after every test so renders from one test never
 // bleed into the next — critical for singleFork mode where jsdom is shared.
 afterEach(() => {

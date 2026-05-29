@@ -46,7 +46,11 @@ function textBits(props: AnyProps): ReactNode[] {
     .filter((v) => v != null) as ReactNode[];
 }
 
-function makeStub(name: string) {
+const stubCache = new Map<string, unknown>();
+
+function makeStub(name: string): unknown {
+  const cached = stubCache.get(name);
+  if (cached) return cached;
   const lower = name.toLowerCase();
   const isInputLike = /input|textarea|searchfield|textfield|numberfield|datefield|timeinput|datepicker|daterangepicker|colorfield/.test(lower);
   const isStatus = /skeleton|spinner|loading/.test(lower);
@@ -91,7 +95,19 @@ function makeStub(name: string) {
     return React.createElement('div', extra, ...textBits(props));
   });
   Stub.displayName = `UiMock(${name})`;
-  return Stub;
+  // Wrap so compound sub-components (Card.Content, Chip.Label, NumberField.Group,
+  // Breadcrumbs.Item, SearchField.Input, …) resolve to nested stubs instead of
+  // undefined — otherwise React throws "Element type is invalid".
+  const wrapped = new Proxy(Stub, {
+    get(target, prop, receiver) {
+      if (typeof prop === 'string' && /^[A-Z]/.test(prop) && !(prop in target)) {
+        return makeStub(`${name}.${prop}`);
+      }
+      return Reflect.get(target, prop, receiver);
+    },
+  });
+  stubCache.set(name, wrapped);
+  return wrapped;
 }
 
 // Cache one stub per name so identity is stable across renders.

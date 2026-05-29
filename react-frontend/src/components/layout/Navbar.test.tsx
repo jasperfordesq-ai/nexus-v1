@@ -181,6 +181,8 @@ function setupDefaultMocks(overrides: {
     theme: 'light',
     toggleTheme: vi.fn(),
     setTheme: vi.fn(),
+    accentColor: '#3b82f6',
+    setAccentColor: vi.fn(),
     ...overrides.theme,
   });
 }
