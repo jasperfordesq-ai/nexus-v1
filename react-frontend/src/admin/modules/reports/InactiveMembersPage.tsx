@@ -1,4 +1,4 @@
-import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Avatar, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Checkbox, Pagination } from '@/components/ui';
+import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Avatar, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -134,7 +134,7 @@ export function InactiveMembersPage() {
   ];
 
   const FLAG_TYPE_OPTIONS = [
-    { key: '', label: t('reports.flag_all_types') },
+    { key: 'all', label: t('reports.flag_all_types') },
     { key: 'inactive', label: t('reports.flag_inactive') },
     { key: 'dormant', label: t('reports.flag_dormant') },
     { key: 'at_risk', label: t('reports.flag_at_risk') },
@@ -146,7 +146,7 @@ export function InactiveMembersPage() {
   const [stats, setStats] = useState<InactivityStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [days, setDays] = useState('90');
-  const [flagType, setFlagType] = useState('');
+  const [flagType, setFlagType] = useState('all');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
@@ -161,7 +161,7 @@ export function InactiveMembersPage() {
         page: String(page),
         limit: '20',
       });
-      if (flagType) params.append('flag_type', flagType);
+      if (flagType && flagType !== 'all') params.append('flag_type', flagType);
 
       const res = await api.get(`/v2/admin/members/inactive?${params}`);
       if (res.data) {
@@ -233,24 +233,12 @@ export function InactiveMembersPage() {
     }
   };
 
-  // Selection toggles
-  const toggleSelect = (userId: number) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(userId)) {
-        next.delete(userId);
-      } else {
-        next.add(userId);
-      }
-      return next;
-    });
-  };
-
-  const toggleSelectAll = () => {
-    if (selectedIds.size === members.length) {
-      setSelectedIds(new Set());
-    } else {
+  // React Aria Table selection → local Set<number>
+  const handleSelectionChange = (keys: 'all' | Set<string | number>) => {
+    if (keys === 'all') {
       setSelectedIds(new Set(members.map((m) => m.user_id)));
+    } else {
+      setSelectedIds(new Set(Array.from(keys).map((k) => Number(k))));
     }
   };
 
@@ -280,7 +268,7 @@ export function InactiveMembersPage() {
               selectedKeys={[flagType]}
               onSelectionChange={(keys) => {
                 const v = Array.from(keys)[0];
-                setFlagType(v !== undefined ? String(v) : '');
+                setFlagType(v !== undefined ? String(v) : 'all');
               }}
               className="w-32"
               aria-label={t('reports.label_flag_type')}
@@ -411,16 +399,13 @@ export function InactiveMembersPage() {
       )}
 
       {/* Members Table */}
-      <Table aria-label={t('reports.label_inactive_members')} >
+      <Table
+        aria-label={t('reports.label_inactive_members')}
+        selectionMode="multiple"
+        selectedKeys={selectedIds as unknown as Set<string | number>}
+        onSelectionChange={handleSelectionChange as unknown as (keys: unknown) => void}
+      >
         <TableHeader>
-          <TableColumn width={40}>
-            <Checkbox
-              isSelected={selectedIds.size === members.length && members.length > 0}
-              isIndeterminate={selectedIds.size > 0 && selectedIds.size < members.length}
-              onValueChange={toggleSelectAll}
-              aria-label={t('reports.label_select_all')}
-            />
-          </TableColumn>
           <TableColumn>{t('reports.col_member')}</TableColumn>
           <TableColumn>{t('reports.col_flag_type')}</TableColumn>
           <TableColumn>{t('reports.col_days_inactive')}</TableColumn>
@@ -434,14 +419,7 @@ export function InactiveMembersPage() {
           loadingContent={<Spinner />}
         >
           {members.map((m) => (
-            <TableRow key={m.id}>
-              <TableCell>
-                <Checkbox
-                  isSelected={selectedIds.has(m.user_id)}
-                  onValueChange={() => toggleSelect(m.user_id)}
-                  aria-label={t('reports.select_member_aria', { name: m.name })}
-                />
-              </TableCell>
+            <TableRow key={m.user_id} id={m.user_id}>
               <TableCell>
                 <div className="flex items-center gap-2">
                   <Avatar size="sm" src={resolveAvatarUrl(m.avatar_url) || undefined} name={m.name} />
