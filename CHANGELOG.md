@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **"Powered By" / partner-logo image removal and freshness in admin settings now work.** Removing a "Powered By" light/dark image (the × button) is now persisted on Save instead of silently reverting with "no changes saved" — the image fields are tracked in the save diff and the remove button no longer pre-clears the baseline the diff compares against. Uploading or replacing a "Powered By" or partner-logo image now also busts the cached tenant bootstrap server-side, so the footer shows the new image immediately instead of the old one until the 10-minute cache expired. (Uploads already persisted to the database; removal had no working code path, and uploads left a stale bootstrap cache.)
+
 - **Footer branding now updates immediately after saving admin settings.** Saving footer text, the "Powered By" label/URL, or the partner logo on the admin System Settings page now refreshes the live tenant context, so the footer reflects the new values right away instead of falling back to the default NEXUS branding until a hard page reload. (The backend already persisted the change and busted its cache; the SPA simply wasn't re-fetching its in-memory tenant bootstrap after the save.)
 
 ### Changed

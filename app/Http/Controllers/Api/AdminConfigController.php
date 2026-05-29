@@ -805,6 +805,11 @@ class AdminConfigController extends BaseApiController
                 ['setting_value' => $imageUrl, 'updated_at' => now()]
             );
 
+            // Bust the cached bootstrap payload so the footer picks up the new
+            // logo immediately instead of serving stale cached config (10-min TTL).
+            $this->redisCache->delete('tenant_bootstrap', $tenantId);
+            $this->tenantSettingsService->clearCacheForTenant($tenantId);
+
             return $this->respondWithData(['url' => $imageUrl]);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Partner logo upload failed', ['error' => $e->getMessage(), 'tenant_id' => $tenantId]);
@@ -865,6 +870,12 @@ class AdminConfigController extends BaseApiController
                 ['tenant_id' => $tenantId, 'setting_key' => $settingKey],
                 ['setting_value' => $imageUrl, 'updated_at' => now()]
             );
+
+            // Bust the cached bootstrap payload so the footer (and the SPA's
+            // refreshTenant()) pick up the new image immediately instead of
+            // serving the stale cached config for up to the 10-minute TTL.
+            $this->redisCache->delete('tenant_bootstrap', $tenantId);
+            $this->tenantSettingsService->clearCacheForTenant($tenantId);
 
             return $this->respondWithData(['url' => $imageUrl]);
         } catch (\Exception $e) {

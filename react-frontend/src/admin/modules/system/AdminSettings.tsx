@@ -175,6 +175,12 @@ export function AdminSettings() {
       if (form.partner_logo_link_url !== originalForm.partner_logo_link_url) changes.partner_logo_link_url = form.partner_logo_link_url;
       if (isPlatformGod && form.powered_by_label !== originalForm.powered_by_label) changes.powered_by_label = form.powered_by_label;
       if (isPlatformGod && form.powered_by_url !== originalForm.powered_by_url) changes.powered_by_url = form.powered_by_url;
+      // Powered-by images are uploaded via dedicated endpoints (which persist
+      // immediately), but REMOVAL has no delete endpoint — clearing the field
+      // is persisted here as an empty value. Track the diff so "remove + save"
+      // actually clears it instead of reporting "no changes".
+      if (isPlatformGod && form.powered_by_image_light !== originalForm.powered_by_image_light) changes.powered_by_image_light = form.powered_by_image_light;
+      if (isPlatformGod && form.powered_by_image_dark !== originalForm.powered_by_image_dark) changes.powered_by_image_dark = form.powered_by_image_dark;
       if (form.default_currency !== originalForm.default_currency) changes.default_currency = form.default_currency;
 
       if (Object.keys(changes).length === 0) {
@@ -454,8 +460,9 @@ export function AdminSettings() {
                       isIconOnly size="sm" variant="danger"
                       aria-label={t('admin_settings.remove_light_image')}
                       onPress={() => {
+                        // Only clear the form value — leaving originalForm intact so
+                        // handleSave detects the removal and persists the empty value.
                         setForm(prev => ({ ...prev, powered_by_image_light: '' }));
-                        setOriginalForm(prev => ({ ...prev, powered_by_image_light: '' }));
                       }}
                     >
                       <X size={14} />
@@ -495,8 +502,9 @@ export function AdminSettings() {
                       isIconOnly size="sm" variant="danger"
                       aria-label={t('admin_settings.remove_dark_image')}
                       onPress={() => {
+                        // Only clear the form value — leaving originalForm intact so
+                        // handleSave detects the removal and persists the empty value.
                         setForm(prev => ({ ...prev, powered_by_image_dark: '' }));
-                        setOriginalForm(prev => ({ ...prev, powered_by_image_dark: '' }));
                       }}
                     >
                       <X size={14} />
