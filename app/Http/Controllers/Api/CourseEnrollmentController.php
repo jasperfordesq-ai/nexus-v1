@@ -37,13 +37,26 @@ class CourseEnrollmentController extends BaseApiController
             return $this->respondWithError('COURSE_NOT_AVAILABLE', __('api_controllers_2.courses.not_available'), null, 422);
         }
 
-        // Phase 1: free + members-only. Credit-cost enrollment (CourseCreditService)
-        // arrives in Phase 3; reject paid courses cleanly until then.
+        // Already enrolled? Return the existing enrollment without charging again.
+        if (CourseEnrollmentService::isEnrolled($id, $userId)) {
+            return $this->respondWithData(CourseEnrollmentService::find($id, $userId), null, 200);
+        }
+
+        // Paid course: charge the learner (credits transfer to the author) before enrolling.
+        $charged = 0.0;
         if ((float) $course->credit_cost > 0) {
-            return $this->respondWithError('NOT_IMPLEMENTED', __('api_controllers_2.courses.paid_not_available'), null, 422);
+            $result = \App\Services\CourseCreditService::chargeEnrollment($course, $userId);
+            if (!$result['charged']) {
+                return $this->respondWithError('INSUFFICIENT_CREDITS', __('api_controllers_2.courses.insufficient_credits'), null, 422);
+            }
+            $charged = $result['amount'];
         }
 
         $enrollment = CourseEnrollmentService::enroll($id, $userId);
+        if ($charged > 0) {
+            $enrollment->credits_paid = $charged;
+            $enrollment->save();
+        }
 
         return $this->respondWithData($enrollment, null, 201);
     }

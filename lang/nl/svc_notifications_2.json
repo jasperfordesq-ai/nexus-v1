@@ -111,5 +111,6 @@
     "community_fund": "Gemeenschapsfonds"
   },
   "course.enrolled": "You are now enrolled in {{title}}.",
-  "course.completed": "You completed {{title}}! Well done."
+  "course.completed": "You completed {{title}}! Well done.",
+  "course.enrolment_payment": "Course enrolment: {{title}}"
 }

@@ -52,6 +52,8 @@ export default function CourseDetailPage() {
     if (res.success) {
       toast.success(t('detail.enroll_success'));
       navigate(tenantPath(`/courses/${course.id}/learn`));
+    } else if (res.code === 'INSUFFICIENT_CREDITS') {
+      toast.error(t('detail.insufficient_credits'));
     } else {
       toast.error(t('detail.enroll_error'));
     }
@@ -126,7 +128,11 @@ export default function CourseDetailPage() {
         <aside className="md:w-72 flex-shrink-0">
           <Card>
             <CardBody className="p-4 flex flex-col gap-3">
-              <div className="text-2xl font-bold">{t('detail.free')}</div>
+              <div className="text-2xl font-bold">
+                {Number(course.credit_cost) > 0
+                  ? t('detail.cost', { credits: Number(course.credit_cost) })
+                  : t('detail.free')}
+              </div>
               <div className="text-sm text-muted">
                 {lessonCount === 1 ? t('card.lessons', { count: lessonCount }) : t('card.lessons_plural', { count: lessonCount })}
               </div>

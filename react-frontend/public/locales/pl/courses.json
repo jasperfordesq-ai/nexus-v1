@@ -30,7 +30,9 @@
     "free": "Free",
     "no_lessons": "No lessons have been added yet.",
     "enroll_success": "You're enrolled! Time to start learning.",
-    "enroll_error": "Could not enroll. Please try again."
+    "enroll_error": "Could not enroll. Please try again.",
+    "cost": "{{credits}} credits",
+    "insufficient_credits": "You don't have enough time credits to enrol."
   },
   "player": {
     "mark_complete": "Mark as complete",

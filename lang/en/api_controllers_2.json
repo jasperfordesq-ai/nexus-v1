@@ -13,6 +13,7 @@
   "courses.certificate_requires_completion": "Complete the course to access your certificate.",
   "courses.comment_required": "A comment cannot be empty.",
   "courses.lesson_locked": "This lesson isn't available yet.",
+  "courses.insufficient_credits": "You don't have enough time credits to enrol in this course.",
   "help.feedback_recorded": "Feedback recorded",
   "help.missing_article_slug": "Missing article_slug",
   "help.article_not_found": "Article not found",
