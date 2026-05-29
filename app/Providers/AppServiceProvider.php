@@ -1096,6 +1096,7 @@ class AppServiceProvider extends ServiceProvider
         Group::observe(GroupObserver::class);
         JobVacancy::observe(JobVacancyObserver::class);
         MarketplaceListing::observe(MarketplaceListingObserver::class);
+        \App\Models\Course::observe(\App\Observers\CourseObserver::class);
         FeedPost::observe(FeedPostObserver::class);
         \App\Models\Comment::observe(CommentObserver::class);
 

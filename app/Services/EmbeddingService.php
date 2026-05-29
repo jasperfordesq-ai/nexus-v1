@@ -87,6 +87,14 @@ class EmbeddingService
         $this->store((int) $item['tenant_id'], 'marketplace', (int) $item['id'], $text);
     }
 
+    public function generateForCourse(array $course): void
+    {
+        $text = implode('. ', array_filter([
+            $course['title'] ?? '', $course['summary'] ?? '', $course['description'] ?? '',
+        ]));
+        $this->store((int) $course['tenant_id'], 'course', (int) $course['id'], $text);
+    }
+
     public function generateForKbArticle(array $article): void
     {
         $body = trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags((string) ($article['content'] ?? '')))) ?? '');
@@ -107,6 +115,7 @@ class EmbeddingService
             'group' => $this->generateForGroup($row),
             'job' => $this->generateForJob($row),
             'marketplace' => $this->generateForMarketplace($row),
+            'course' => $this->generateForCourse($row),
             'kb_article' => $this->generateForKbArticle($row),
             default => null,
         };

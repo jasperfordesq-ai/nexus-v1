@@ -62,6 +62,7 @@ class ReindexEmbeddingJob implements ShouldQueue
             'group' => ['groups', ['id', 'name', 'description']],
             'job' => ['job_vacancies', ['id', 'title', 'tagline', 'description', 'location', 'skills_required']],
             'marketplace' => ['marketplace_listings', ['id', 'title', 'tagline', 'description', 'condition', 'location']],
+            'course' => ['courses', ['id', 'title', 'summary', 'description']],
             'kb_article' => ['knowledge_base_articles', ['id', 'title', 'content']],
         ];
 
