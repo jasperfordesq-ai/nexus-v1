@@ -88,6 +88,7 @@
   "volunteering": "Volunteering",
   "organisations": "Organisations",
   "blog": "Blog",
+  "support": "Support & legal",
   "skills": "Skills & Endorsements",
   "federation": "Federation",
   "federationSection": "Partner communities",
@@ -150,6 +151,7 @@
     "volunteering": "Discover opportunities, hours, and applications.",
     "organisations": "Browse local partners and community organisations.",
     "blog": "Read community news, stories, and platform updates.",
+    "support": "Open help, resources, contact, and legal pages.",
     "skills": "Manage your skills and member endorsements.",
     "aiChat": "Ask the assistant for help finding your way around.",
     "federation": "Explore partner communities and cross-timebank tools.",
@@ -163,5 +165,45 @@
     "federationEvents": "Discover events from connected communities.",
     "federationSettings": "Review federation visibility and sharing preferences.",
     "settings": "Security, notifications, preferences, and account controls."
+  },
+  "support": {
+    "title": "Support & legal",
+    "heading": "Help, resources, and policies",
+    "description": "Open the web versions of support and legal pages when you need reference material, policies, or contact routes.",
+    "open": "Open page",
+    "items": {
+      "help": {
+        "title": "Help center",
+        "description": "Guides and answers for common platform tasks."
+      },
+      "resources": {
+        "title": "Resources",
+        "description": "Community documents, links, and useful reference materials."
+      },
+      "about": {
+        "title": "About Project NEXUS",
+        "description": "Learn about the platform, mission, and open-source project."
+      },
+      "contact": {
+        "title": "Contact",
+        "description": "Find the right support route for questions and feedback."
+      },
+      "terms": {
+        "title": "Terms",
+        "description": "Read the terms that apply to platform use."
+      },
+      "privacy": {
+        "title": "Privacy",
+        "description": "Review how personal data is handled."
+      },
+      "cookies": {
+        "title": "Cookies",
+        "description": "Understand cookie and local storage use."
+      },
+      "accessibility": {
+        "title": "Accessibility",
+        "description": "Review accessibility commitments and support options."
+      }
+    }
   }
 }

@@ -1,0 +1,49 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import React from 'react';
+import { fireEvent, render } from '@testing-library/react-native';
+import * as Linking from 'expo-linking';
+
+import SupportRoute from './support';
+
+jest.mock('@expo/vector-icons', () => {
+  const { Text } = require('react-native');
+  return {
+    Ionicons: ({ name }: { name: string }) => <Text>{name}</Text>,
+  };
+});
+
+jest.mock('expo-linking', () => ({
+  openURL: jest.fn().mockResolvedValue(undefined),
+}));
+
+jest.mock('@/components/ModalErrorBoundary', () => ({ children }: { children: React.ReactNode }) => children);
+jest.mock('@/components/ui/AppTopBar', () => {
+  const { Text } = require('react-native');
+  return function MockAppTopBar({ title }: { title: string }) {
+    return <Text>{title}</Text>;
+  };
+});
+
+describe('SupportRoute', () => {
+  it('renders support and legal destinations', () => {
+    const { getByText } = render(<SupportRoute />);
+
+    expect(getByText('Support & legal')).toBeTruthy();
+    expect(getByText('Help center')).toBeTruthy();
+    expect(getByText('Resources')).toBeTruthy();
+    expect(getByText('Privacy')).toBeTruthy();
+    expect(getByText('Accessibility')).toBeTruthy();
+  });
+
+  it('opens selected web support pages externally', () => {
+    const { getAllByText } = render(<SupportRoute />);
+
+    fireEvent.press(getAllByText('Open page')[0]);
+
+    expect(Linking.openURL).toHaveBeenCalledWith('https://app.project-nexus.ie/help');
+  });
+});

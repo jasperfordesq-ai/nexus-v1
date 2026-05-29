@@ -4,8 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { ActivityIndicator, View, type ViewStyle, type StyleProp } from 'react-native';
-import { Button as HeroButton } from 'heroui-native';
+import { View, type ViewStyle, type StyleProp } from 'react-native';
+import { Button as HeroButton, Spinner } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 
 // Legacy variant names kept for backwards compatibility with 32 importing screens.
@@ -75,7 +75,7 @@ export default function Button({
     >
       {isLoading ? (
         <View className="flex-row items-center gap-2">
-          <ActivityIndicator color={variant === 'solid' ? '#fff' : color ?? '#818cf8'} />
+          <Spinner size="sm" color={variant === 'solid' ? '#fff' : color ?? 'default'} />
         </View>
       ) : typeof children === 'string' ? (
         <HeroButton.Label>{children}</HeroButton.Label>

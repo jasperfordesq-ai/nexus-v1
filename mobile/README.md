@@ -77,9 +77,10 @@ The default tenant (`EXPO_PUBLIC_DEFAULT_TENANT`) is `hour-timebank` — change 
 
 | Concern | Solution |
 |---------|----------|
-| Framework | Expo SDK 52 (managed workflow) |
+| Framework | Expo SDK 54 (managed workflow) |
 | Language | TypeScript strict |
 | Navigation | Expo Router (file-based, like Next.js) |
+| UI | HeroUI Native + Uniwind + Tailwind CSS 4 |
 | Auth storage | `expo-secure-store` (encrypted at rest) |
 | HTTP | Native `fetch` with typed wrapper (`lib/api/client.ts`) |
 | State | React Context + hooks (no external state library) |

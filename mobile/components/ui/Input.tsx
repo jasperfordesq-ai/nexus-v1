@@ -4,8 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { View, Text, type TextInputProps } from 'react-native';
-import { Input as HeroInput } from 'heroui-native';
+import { View, type TextInputProps } from 'react-native';
+import { FieldError, Input as HeroInput, Label, TextField } from 'heroui-native';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -26,9 +26,9 @@ export default function Input({
   const isDisabled = editable === false;
 
   return (
-    <View className="mb-3">
+    <TextField isInvalid={!!error} isDisabled={isDisabled} className="mb-3">
       {label ? (
-        <Text className="text-sm font-semibold text-foreground mb-1.5">{label}</Text>
+        <Label className="mb-1.5 text-sm font-semibold">{label}</Label>
       ) : null}
       <View className="flex-row items-center">
         {leftIcon ? (
@@ -46,8 +46,8 @@ export default function Input({
         ) : null}
       </View>
       {error ? (
-        <Text className="text-xs text-danger mt-1">{error}</Text>
+        <FieldError className="mt-1 text-xs">{error}</FieldError>
       ) : null}
-    </View>
+    </TextField>
   );
 }
