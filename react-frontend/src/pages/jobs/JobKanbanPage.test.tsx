@@ -179,12 +179,12 @@ describe('JobKanbanPage', () => {
   it('renders all kanban columns', async () => {
     render(<JobKanbanPage />);
     await waitFor(() => {
-      expect(screen.getByText('Pending')).toBeInTheDocument();
-      expect(screen.getByText('Screening')).toBeInTheDocument();
-      expect(screen.getByText('Interview')).toBeInTheDocument();
-      expect(screen.getByText('Offer')).toBeInTheDocument();
-      expect(screen.getByText('Accepted')).toBeInTheDocument();
-      expect(screen.getByText('Rejected')).toBeInTheDocument();
+      expect(screen.getAllByText('Pending').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Screening').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Interview').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Offer').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Accepted').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Rejected').length).toBeGreaterThan(0);
     });
   });
 

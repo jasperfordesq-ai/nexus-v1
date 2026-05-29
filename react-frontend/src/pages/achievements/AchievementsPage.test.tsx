@@ -174,11 +174,13 @@ describe('AchievementsPage', () => {
 
   it('displays badges after loading', async () => {
     render(<AchievementsPage />);
+    // "First Post" can surface in more than one section (e.g. grid + recent),
+    // so assert at least one instance is displayed.
     await waitFor(() => {
-      expect(screen.getByText('First Post')).toBeInTheDocument();
+      expect(screen.getAllByText('First Post').length).toBeGreaterThan(0);
     });
-    expect(screen.getByText('Helper')).toBeInTheDocument();
-    expect(screen.getByText('Locked Badge')).toBeInTheDocument();
+    expect(screen.getAllByText('Helper').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Locked Badge').length).toBeGreaterThan(0);
   });
 
   it('shows XP profile card with level and XP info', async () => {

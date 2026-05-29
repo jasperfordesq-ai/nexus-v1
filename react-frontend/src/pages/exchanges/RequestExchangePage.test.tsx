@@ -141,8 +141,12 @@ describe('RequestExchangePage', () => {
 
   it('renders proposed hours input', async () => {
     render(<RequestExchangePage />);
+    // The UI mock does not associate the Input's label as the field's accessible
+    // name, so locate the proposed-hours number field by its unique placeholder.
     await waitFor(() => {
-      expect(screen.getByRole('spinbutton', { name: /Proposed Hours/i })).toBeInTheDocument();
+      const input = screen.getByPlaceholderText('How many hours do you need?');
+      expect(input).toBeInTheDocument();
+      expect(input).toHaveAttribute('type', 'number');
     });
   });
 
@@ -187,8 +191,10 @@ describe('RequestExchangePage', () => {
 
   it('pre-fills proposed hours with listing estimate', async () => {
     render(<RequestExchangePage />);
+    // Locate the proposed-hours number field by its unique placeholder (the mock
+    // does not wire the Input label as the accessible name).
     await waitFor(() => {
-      const hoursInput = screen.getByRole('spinbutton', { name: /Proposed Hours/i }) as HTMLInputElement;
+      const hoursInput = screen.getByPlaceholderText('How many hours do you need?') as HTMLInputElement;
       expect(hoursInput.value).toBe('2');
     });
   });

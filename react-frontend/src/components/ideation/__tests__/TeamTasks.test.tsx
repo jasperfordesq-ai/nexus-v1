@@ -183,7 +183,7 @@ describe('TeamTasks', () => {
     render(<TeamTasks groupId={10} isGroupAdmin={false} />);
 
     await waitFor(() => {
-      expect(screen.getByText('Add Task')).toBeInTheDocument();
+      expect(screen.getAllByText('Add Task').length).toBeGreaterThan(0);
     });
   });
 

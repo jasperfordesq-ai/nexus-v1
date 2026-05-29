@@ -135,7 +135,7 @@ describe('CreateJobPage', () => {
     it('shows validation error when description is empty on submit', async () => {
       const { userEvent } = await import('@/test/test-utils');
       render(<CreateJobPage />);
-      const titleInput = screen.getByLabelText(/form.title_label/i);
+      const titleInput = screen.getByPlaceholderText('form.title_placeholder');
       await userEvent.type(titleInput, 'Some Title');
       const submitBtn = screen.getByText('form.submit_create');
       await userEvent.click(submitBtn);

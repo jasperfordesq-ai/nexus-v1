@@ -38,12 +38,16 @@ describe('LoadingScreen', () => {
 
   it('has accessible status role', () => {
     render(<LoadingScreen />);
-    expect(screen.getByRole('status')).toBeInTheDocument();
+    // The ambient ToastProvider also renders status regions, so scope to
+    // LoadingScreen's own status (the one marked aria-busy).
+    const status = screen.getAllByRole('status').find((el) => el.getAttribute('aria-busy') === 'true');
+    expect(status).toBeInTheDocument();
   });
 
   it('has aria-busy attribute', () => {
     render(<LoadingScreen />);
-    expect(screen.getByRole('status')).toHaveAttribute('aria-busy', 'true');
+    const status = screen.getAllByRole('status').find((el) => el.getAttribute('aria-busy') === 'true');
+    expect(status).toHaveAttribute('aria-busy', 'true');
   });
 
   it('includes screen reader text', () => {

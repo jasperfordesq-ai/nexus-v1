@@ -157,9 +157,9 @@ describe('KnowledgeBasePage', () => {
   it('shows loading skeleton while data is being fetched', () => {
     vi.mocked(api.get).mockReturnValue(new Promise(() => {}));
     render(<KnowledgeBasePage />);
-    const cards = screen.getAllByTestId('glass-card');
-    const pulsingCards = cards.filter((c) => c.getAttribute('role') === 'status');
-    expect(pulsingCards.length).toBeGreaterThan(0);
+    // Loading skeleton renders inside a role="status" / aria-busy container
+    const loadingRegions = document.querySelectorAll('[role="status"][aria-busy="true"]');
+    expect(loadingRegions.length).toBeGreaterThan(0);
   });
 
   it('displays articles grouped by category when loaded', async () => {

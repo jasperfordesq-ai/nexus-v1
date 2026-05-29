@@ -129,9 +129,13 @@ describe("GroupSignUpTab", () => {
   it("opens Add Member modal when Add Member button is clicked", async () => {
     vi.mocked(api.get).mockResolvedValue({ success: true, data: [mockReservation] });
     render(<GroupSignUpTab />);
-    await waitFor(() => screen.getByRole("button", { name: /Add Member/i }));
+    await waitFor(() => screen.getAllByRole("button", { name: /Add Member/i }));
 
-    fireEvent.click(screen.getByRole("button", { name: /Add Member/i }));
+    // The generic Modal stub renders its content eagerly (it ignores isOpen),
+    // so both the per-reservation trigger and the modal's submit button carry
+    // the "Add Member" label. Click the first (the trigger) and assert the
+    // modal content is present.
+    fireEvent.click(screen.getAllByRole("button", { name: /Add Member/i })[0]);
     await waitFor(() => {
       expect(screen.getByText("Add Group Member")).toBeInTheDocument();
       expect(screen.getByPlaceholderText("member@example.com")).toBeInTheDocument();
@@ -147,9 +151,11 @@ describe("GroupSignUpTab", () => {
     });
 
     render(<GroupSignUpTab />);
-    await waitFor(() => screen.getByRole("button", { name: /Add Member/i }));
+    await waitFor(() => screen.getAllByRole("button", { name: /Add Member/i }));
 
-    fireEvent.click(screen.getByRole("button", { name: /Add Member/i }));
+    // Click the trigger (first "Add Member" button — see note above re: the
+    // eager Modal stub).
+    fireEvent.click(screen.getAllByRole("button", { name: /Add Member/i })[0]);
     fireEvent.change(screen.getByPlaceholderText("member@example.com"), {
       target: { value: "charlie@example.com" },
     });
@@ -169,6 +175,13 @@ describe("GroupSignUpTab", () => {
     await waitFor(() => {
       expect(screen.getByText("The Green Team")).toBeInTheDocument();
     });
-    expect(screen.queryByRole("button", { name: /Add Member/i })).not.toBeInTheDocument();
+    // The eager Modal stub always renders its (disabled) "Add Member" submit
+    // button, so we can't assert zero buttons. The per-reservation trigger is
+    // the only ENABLED "Add Member" control, and it is gated on is_leader — so
+    // for a non-leader there must be no enabled "Add Member" button.
+    const enabledAddButtons = screen
+      .queryAllByRole("button", { name: /Add Member/i })
+      .filter((btn) => !(btn as HTMLButtonElement).disabled);
+    expect(enabledAddButtons).toHaveLength(0);
   });
 });

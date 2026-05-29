@@ -100,7 +100,45 @@ vi.mock('@/hooks/useOnboardingConfig', () => ({
 }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
-vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
+// Extend the shared UI mock with an interactive Chip. The generic stub does
+// not forward a direct `onClick`/`onKeyDown` (only `onPress`) nor `aria-pressed`,
+// so the interest chips render as inert. This override forwards the interaction
+// props the interest selector relies on, modelling a real clickable chip.
+vi.mock('@/components/ui', async () => {
+  const { uiMock } = await import('@/test/uiMock');
+  return new Proxy(uiMock, {
+    get(target, prop: string | symbol) {
+      if (prop === 'Chip') {
+        return ({
+          children,
+          onClick,
+          onKeyDown,
+          role,
+          tabIndex,
+          ['aria-pressed']: ariaPressed,
+        }: {
+          children?: React.ReactNode;
+          onClick?: React.MouseEventHandler;
+          onKeyDown?: React.KeyboardEventHandler;
+          role?: string;
+          tabIndex?: number;
+          'aria-pressed'?: boolean;
+        }) => (
+          <span
+            role={role}
+            tabIndex={tabIndex}
+            aria-pressed={ariaPressed}
+            onClick={onClick}
+            onKeyDown={onKeyDown}
+          >
+            {children}
+          </span>
+        );
+      }
+      return Reflect.get(target, prop);
+    },
+  });
+});
 
 vi.mock('@/lib/motion', () => {  const motionProps = new Set(['variants', 'initial', 'animate', 'layout', 'transition', 'exit', 'whileHover', 'whileTap', 'whileInView', 'viewport', 'custom']);  const filterMotion = (props: Record<string, unknown>) => {    const filtered: Record<string, unknown> = {};    for (const [k, v] of Object.entries(props)) {      if (!motionProps.has(k)) filtered[k] = v;    }    return filtered;  };  return {    motion: {      div: ({ children, ...props }: Record<string, unknown>) => <div {...filterMotion(props)}>{children}</div>,    },    AnimatePresence: ({ children }: { children: React.ReactNode }) => children,    useReducedMotion: () => false,  };});
 
@@ -462,8 +500,10 @@ describe('OnboardingPage', () => {
       expect(chip).toHaveAttribute('aria-pressed', 'true');
     });
 
-    // Click again to deselect
-    await user.click(gardeningChip);
+    // Click again to deselect — re-query the chip (the previous reference can
+    // be stale after the re-render that followed selection).
+    const selectedChip = screen.getByText('Gardening').closest('[role="button"]') || screen.getByText('Gardening');
+    await user.click(selectedChip);
 
     await waitFor(() => {
       const chip = screen.getByText('Gardening').closest('[role="button"]');

@@ -149,8 +149,10 @@ describe('OpportunityDetailPage', () => {
   it('shows loading screen initially', () => {
     vi.mocked(api.get).mockReturnValue(new Promise(() => {}));
     render(<OpportunityDetailPage />);
-    // LoadingScreen renders during data fetch — document should be in loading state
-    expect(screen.getByRole('status')).toHaveAttribute('aria-busy', 'true');
+    // LoadingScreen renders during data fetch — at least one status region
+    // should be in the loading (aria-busy) state.
+    const statusRegions = screen.getAllByRole('status');
+    expect(statusRegions.some((el) => el.getAttribute('aria-busy') === 'true')).toBe(true);
   });
 
   it('renders opportunity title and organisation on success', async () => {

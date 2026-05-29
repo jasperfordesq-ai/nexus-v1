@@ -134,7 +134,10 @@ describe('EventDetailPage', () => {
   it('shows loading screen initially', () => {
     api.get.mockImplementation(() => new Promise(() => {}));
     render(<EventDetailPage />);
-    expect(screen.getByRole('status')).toHaveAttribute('aria-busy', 'true');
+    // The loading screen may render more than one role="status" region; assert at
+    // least one carries aria-busy="true".
+    const statuses = screen.getAllByRole('status');
+    expect(statuses.some((el) => el.getAttribute('aria-busy') === 'true')).toBe(true);
   });
 
   it('renders event title after load', async () => {

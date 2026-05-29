@@ -162,7 +162,10 @@ describe('ExchangesPage', () => {
 
   it('shows loading skeletons initially', () => {
     render(<ExchangesPage />);
-    const skeletons = screen.getAllByTestId('exchange-skeleton');
+    // The loading region renders 4 ExchangeCardSkeleton placeholders (each a
+    // role="status" element) inside the aria-busy loading container.
+    const loading = screen.getByLabelText('Loading exchanges...');
+    const skeletons = loading.querySelectorAll('[role="status"]');
     expect(skeletons.length).toBe(4);
   });
 

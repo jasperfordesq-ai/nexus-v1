@@ -206,8 +206,10 @@ describe('LoginPage — Passkey/WebAuthn functionality', () => {
       expect(screen.getByText('Sign in with a passkey')).toBeDefined();
     });
 
-    // Set email value via fireEvent.change to avoid per-keystroke re-render issues
-    const emailInput = document.querySelector('input[autocomplete="username webauthn"]') as HTMLInputElement;
+    // Set email value via fireEvent.change to avoid per-keystroke re-render issues.
+    // The UI mock does not forward the autoComplete attribute, so locate the email
+    // field by its type instead.
+    const emailInput = document.querySelector('input[type="email"]') as HTMLInputElement;
     expect(emailInput).not.toBeNull();
     const { fireEvent } = await import('@testing-library/react');
     fireEvent.change(emailInput, { target: { value: 'alice@example.com' } });

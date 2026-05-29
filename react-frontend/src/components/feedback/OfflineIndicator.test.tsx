@@ -46,7 +46,10 @@ describe('OfflineIndicator', () => {
   it('banner has alert role when offline', () => {
     Object.defineProperty(navigator, 'onLine', { value: false, writable: true });
     render(<OfflineIndicator />);
-    expect(screen.getByRole('alert')).toBeInTheDocument();
+    // The ambient ToastProvider also renders an alert region, so scope to
+    // OfflineIndicator's own alert banner (marked data-nosnippet).
+    const alert = screen.getAllByRole('alert').find((el) => el.hasAttribute('data-nosnippet'));
+    expect(alert).toBeInTheDocument();
     Object.defineProperty(navigator, 'onLine', { value: true, writable: true });
   });
 });

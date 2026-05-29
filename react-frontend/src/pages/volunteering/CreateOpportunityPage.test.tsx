@@ -212,13 +212,20 @@ describe("CreateOpportunityPage", () => {
     render(<CreateOpportunityPage />);
     await waitFor(() => expect(screen.getByDisplayValue("Helping Hands")).toBeInTheDocument());
 
-    fireEvent.change(screen.getByLabelText("Title"), { target: { value: "Help at the food bank" } });
-    fireEvent.change(screen.getByLabelText("Description"), {
+    // The generic Input/Textarea stub forwards `placeholder` (not the floating
+    // `label`), so target the fields by their placeholder text.
+    fireEvent.change(screen.getByPlaceholderText("Opportunity title"), {
+      target: { value: "Help at the food bank" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Describe the opportunity and requirements"), {
       target: { value: "Help sort donations and prepare food parcels for local families." },
     });
 
+    // The Button stub renders type="button" without wiring the form submit, so
+    // submit the <form> directly to exercise the real handleSubmit path.
     const submitBtn = screen.getByRole("button", { name: /Publish Opportunity|Submit|Save/i });
-    fireEvent.click(submitBtn);
+    const form = submitBtn.closest("form") as HTMLFormElement;
+    fireEvent.submit(form);
     await waitFor(() => {
       expect(api.post).toHaveBeenCalledWith(
         "/v2/volunteering/opportunities",

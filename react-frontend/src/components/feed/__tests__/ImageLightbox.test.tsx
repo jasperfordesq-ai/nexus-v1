@@ -110,9 +110,11 @@ describe('ImageLightbox', () => {
     const media = makeMedia(1);
     render(<ImageLightbox media={media} onClose={onClose} />);
 
+    // HeroUI v3 renders the modal as a <section role="dialog" data-slot="modal-dialog">;
+    // it does not set aria-modal on that element. Assert the modal dialog landmark.
     const dialog = screen.getByRole('dialog');
     expect(dialog).toBeInTheDocument();
-    expect(dialog).toHaveAttribute('aria-modal', 'true');
+    expect(dialog).toHaveAttribute('data-slot', 'modal-dialog');
 
     const img = screen.getByRole('img');
     expect(img).toHaveAttribute('src', '/uploads/img1.jpg');
@@ -235,8 +237,10 @@ describe('ImageLightbox', () => {
     const media = makeMedia(1);
     render(<ImageLightbox media={media} onClose={onClose} />);
 
-    const dialog = screen.getByRole('dialog');
-    fireEvent.click(dialog);
+    // The close-on-click handler sits on the ModalBody backdrop, which carries
+    // the lightbox aria-label (not on the dialog landmark element itself).
+    const backdrop = screen.getByLabelText('Image viewer');
+    fireEvent.click(backdrop);
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

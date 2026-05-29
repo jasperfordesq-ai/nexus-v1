@@ -131,7 +131,8 @@ describe('ConnectionsPage', () => {
     setupMockApiGet();
     render(<ConnectionsPage />);
     await waitFor(() => {
-      const inputs = screen.getAllByRole('textbox');
+      // HeroUI SearchField renders type="search" → role "searchbox", not "textbox".
+      const inputs = screen.getAllByRole('searchbox');
       expect(inputs.length).toBeGreaterThan(0);
     });
   });
@@ -171,7 +172,8 @@ describe('ConnectionsPage', () => {
       expect(screen.getByText('Alice Smith')).toBeInTheDocument();
     });
 
-    const searchInput = screen.getAllByRole('textbox')[0];
+    // HeroUI SearchField renders type="search" → role "searchbox", not "textbox".
+    const searchInput = screen.getAllByRole('searchbox')[0];
     fireEvent.change(searchInput, { target: { value: 'Alice' } });
 
     // Alice should still be visible

@@ -84,7 +84,29 @@ vi.mock("@/contexts", () => ({
   useTenant: () => ({ tenant: { id: 2, name: 'Test', slug: 'test', tagline: null }, branding: { name: 'Test', logo_url: null }, tenantSlug: 'test', tenantPath: (p) => '/test' + p, isLoading: false, hasFeature: vi.fn(() => true), hasModule: vi.fn(() => true) }),
 }));
 
-vi.mock("@/components/ui", async () => (await import("@/test/uiMock")).uiMock);
+// Extend the shared UI mock with a Modal/ModalContent that honours `isOpen`
+// and the render-prop `children` API. The generic stub renders children
+// eagerly and does NOT invoke function children, so the render-prop modal body
+// (the leave-confirmation text + footer buttons) never appears under it. These
+// targeted overrides model the real HeroUI behaviour so the confirmation flow
+// can be exercised.
+vi.mock("@/components/ui", async () => {
+  const { uiMock } = await import("@/test/uiMock");
+  return new Proxy(uiMock, {
+    get(target, prop: string | symbol) {
+      if (prop === "Modal") {
+        return ({ isOpen, children }: { isOpen?: boolean; children?: React.ReactNode }) =>
+          isOpen ? <div data-testid="modal">{children}</div> : null;
+      }
+      if (prop === "ModalContent") {
+        return ({ children }: { children: React.ReactNode | ((onClose: () => void) => React.ReactNode) }) => (
+          <div>{typeof children === "function" ? children(() => {}) : children}</div>
+        );
+      }
+      return Reflect.get(target, prop);
+    },
+  });
+});
 
 vi.mock("@/components/feedback", () => ({
   EmptyState: ({ title, description }: { title: string; description?: string }) => (

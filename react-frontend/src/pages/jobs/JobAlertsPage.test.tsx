@@ -136,8 +136,9 @@ describe('JobAlertsPage', () => {
     render(<JobAlertsPage />);
     // Wait for loading to complete - then empty state should render since api returns []
     await waitFor(() => {
-      // Either the empty-state or the alert list should be shown (not loading skeleton)
-      const noSkeleton = document.querySelectorAll('[role="status"]').length === 0;
+      // Loading skeleton uses aria-busy="true"; the toast region also has role="status"
+      // (aria-live), so target the skeleton specifically to detect loading completion.
+      const noSkeleton = document.querySelectorAll('[aria-busy="true"]').length === 0;
       expect(noSkeleton).toBe(true);
     }, { timeout: 3000 });
     // After loading, with empty data [], empty state should appear
