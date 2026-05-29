@@ -247,4 +247,46 @@ describe('sales-site public content policy', () => {
     expect(quoteBuilder).toContain('nexus-choice');
     expect(quoteBuilder).toContain('nexus-choice--selected');
   });
+
+  it('presents the homepage as a premium dual-front-door sales experience', () => {
+    const homePage = readFileSync(resolve(__dirname, '..', 'components', 'HomePage.tsx'), 'utf8');
+    const primitives = readFileSync(resolve(__dirname, '..', 'components', 'SalesPrimitives.tsx'), 'utf8');
+
+    expect(homePage).toContain('Community infrastructure, from local timebanks to civic networks.');
+    expect(homePage).toContain('Start a timebank');
+    expect(homePage).toContain('Run a civic network');
+    expect(homePage).toContain('Hybrid proof');
+    expect(homePage).toContain('ProductCockpit');
+    expect(homePage).toContain('PathwayCard');
+    expect(primitives).toContain('export function ProductCockpit');
+    expect(primitives).toContain('export function PathwayCard');
+  });
+
+  it('keeps the redesign focused on a hybrid product and community proof system', () => {
+    const homePage = readFileSync(resolve(__dirname, '..', 'components', 'HomePage.tsx'), 'utf8');
+    const primitives = readFileSync(resolve(__dirname, '..', 'components', 'SalesPrimitives.tsx'), 'utf8');
+
+    expect(homePage).toContain('A serious platform with a human reason to exist.');
+    expect(homePage).toContain('Product UI proves the platform is real');
+    expect(homePage).toContain('Community outcomes prove why it matters');
+    expect(primitives).toContain('time credits');
+    expect(primitives).toContain('federation');
+    expect(primitives).toContain('volunteer hours');
+    expect(primitives).toContain('support cover');
+  });
+
+  it('uses premium pricing and capability components for redesigned commercial pages', () => {
+    const hostingPage = readFileSync(resolve(__dirname, '..', 'components', 'HostingPage.tsx'), 'utf8');
+    const featuresPage = readFileSync(resolve(__dirname, '..', 'components', 'FeaturesPage.tsx'), 'utf8');
+    const primitives = readFileSync(resolve(__dirname, '..', 'components', 'SalesPrimitives.tsx'), 'utf8');
+
+    expect(hostingPage).toContain('Two ways to start.');
+    expect(hostingPage).toContain('PricingLadder');
+    expect(hostingPage).toContain('SupportModelSection');
+    expect(featuresPage).toContain('CapabilityBand');
+    expect(featuresPage).toContain('Product map');
+    expect(primitives).toContain('export function PricingLadder');
+    expect(primitives).toContain('export function CapabilityBand');
+    expect(primitives).toContain('export function SupportModelSection');
+  });
 });
