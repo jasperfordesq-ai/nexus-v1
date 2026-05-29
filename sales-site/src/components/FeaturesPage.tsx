@@ -8,7 +8,6 @@ import {
   ArrowRight,
   BadgeCheck,
   BookOpen,
-  CheckCircle2,
   ExternalLink,
   Globe2,
   HandCoins,
@@ -19,7 +18,7 @@ import {
 } from 'lucide-react';
 
 import { nexusModuleGroups, nexusModules } from '../data/modules';
-import { MetricTile, SectionHeader, SurfaceCard } from './SalesPrimitives';
+import { CapabilityBand, MetricTile, SectionHeader, SurfaceCard } from './SalesPrimitives';
 
 interface FeaturesPageProps {
   onNavigate: (href: string) => void;
@@ -56,6 +55,14 @@ const moduleGroupDescriptions: Record<string, string> = {
   'Content & Communication': 'Publishing, help, knowledge, newsletter, legal, and AI guidance tools for running a living community.',
   'AI & Recommendations': 'Search, matching, ranking, and recommendation systems that make large communities easier to navigate.',
   'Operations & Trust': 'Admin, safety, compliance, security, accessibility, localisation, deployment, and governance controls.',
+};
+
+const capabilityIcons: Record<string, typeof Layers3> = {
+  'Core Platform': Layers3,
+  'Member Experience': HandCoins,
+  'Content & Communication': BookOpen,
+  'AI & Recommendations': Sparkles,
+  'Operations & Trust': ShieldCheck,
 };
 
 const federationItems = [
@@ -135,10 +142,10 @@ export default function FeaturesPage({ onNavigate }: FeaturesPageProps) {
               Project NEXUS V1.5 features
             </p>
             <h1 className="max-w-4xl text-4xl font-black leading-[1.05] tracking-normal text-white sm:text-5xl md:text-7xl">
-              Everything inside the platform.
+              Product map for modern community infrastructure.
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-white/68">
-              The full feature catalogue from the original Project NEXUS sales page: timebanking, federation, AI matching, real-time messaging, Stripe payments, identity verification, accessible frontend, multilingual support, mobile foundations, and the operational tooling behind it.
+              Everything inside the platform: timebanking, federation, AI matching, real-time messaging, volunteering, Stripe payments, identity verification, accessible frontend, multilingual support, mobile foundations, and operational tooling.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Button size="lg" onPress={() => document.getElementById('module-catalogue')?.scrollIntoView({ behavior: 'smooth' })}>
@@ -209,33 +216,20 @@ export default function FeaturesPage({ onNavigate }: FeaturesPageProps) {
             All open source. All Dockerized. Full platform hosted plans change capacity, uptime, support, and infrastructure; the entry Community Edition is a narrower timebanking package.
           </SectionHeader>
 
-          <div className="module-category-stack grid gap-5">
+          <div className="module-category-stack module-row-list grid gap-5">
             {nexusModuleGroups.map((group) => {
               const modules = nexusModules.filter((module) => module.group === group);
+              const Icon = capabilityIcons[group] ?? Layers3;
 
               return (
-                <SurfaceCard key={group} className="p-0">
-                  <div className="grid gap-4 border-b border-white/10 bg-black/18 p-5 lg:grid-cols-[18rem_1fr] lg:items-center">
-                    <div>
-                      <p className="text-xs font-black tracking-[0.16em] text-[var(--color-primary)] uppercase">{modules.length} modules</p>
-                      <h3 className="mt-2 text-2xl font-black text-white">{group}</h3>
-                    </div>
-                    <p className="max-w-4xl text-sm leading-6 text-white/58">
-                      {moduleGroupDescriptions[group]}
-                    </p>
-                  </div>
-                  <div className="module-row-list divide-y divide-white/10">
-                    {modules.map((module) => (
-                      <article key={module.id} className="grid gap-2 px-5 py-4 transition hover:bg-white/[0.035] md:grid-cols-[minmax(12rem,18rem)_1fr] md:gap-6 md:py-5">
-                        <div className="flex items-start gap-3">
-                          <CheckCircle2 className="mt-1 size-4 shrink-0 text-[var(--color-accent)]" />
-                          <p className="font-bold text-white">{module.name}</p>
-                        </div>
-                        <p className="text-sm leading-6 text-white/58">{module.description}</p>
-                      </article>
-                    ))}
-                  </div>
-                </SurfaceCard>
+                <CapabilityBand
+                  key={group}
+                  eyebrow={`${modules.length} modules`}
+                  title={group}
+                  description={moduleGroupDescriptions[group]}
+                  modules={modules}
+                  icon={Icon}
+                />
               );
             })}
           </div>
