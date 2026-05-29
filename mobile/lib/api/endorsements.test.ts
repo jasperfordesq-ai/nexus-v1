@@ -27,6 +27,9 @@ import {
   addSkill,
   removeSkill,
   getAvailableSkills,
+  getMembersWithSkill,
+  getSkillCategory,
+  getSkillCategories,
 } from './endorsements';
 import type { EndorsementsResponse, Skill, Endorsement } from './endorsements';
 
@@ -167,5 +170,57 @@ describe('getAvailableSkills', () => {
     const result = await getAvailableSkills();
     expect(api.get).not.toHaveBeenCalled();
     expect(result.data).toEqual([]);
+  });
+});
+
+describe('getSkillCategories', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('loads the public skill category tree', async () => {
+    const response = {
+      data: [{ id: 1, name: 'Home & Garden', skills_count: 5, children: [] }],
+    };
+    (api.get as jest.Mock).mockResolvedValue(response);
+
+    const result = await getSkillCategories();
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/skills/categories');
+    expect(result.data[0].name).toBe('Home & Garden');
+  });
+});
+
+describe('getSkillCategory', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('loads category detail with skill breakdown', async () => {
+    const response = {
+      data: {
+        id: 1,
+        name: 'Home & Garden',
+        skills: [{ skill_name: 'Gardening', user_count: 4, offering_count: 3, requesting_count: 1 }],
+      },
+    };
+    (api.get as jest.Mock).mockResolvedValue(response);
+
+    const result = await getSkillCategory(1);
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/skills/categories/1');
+    expect(result.data.skills[0].skill_name).toBe('Gardening');
+  });
+});
+
+describe('getMembersWithSkill', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('loads members who have a selected skill', async () => {
+    const response = {
+      data: [{ id: 2, first_name: 'Alice', last_name: 'Member', proficiency_level: 'advanced' }],
+    };
+    (api.get as jest.Mock).mockResolvedValue(response);
+
+    const result = await getMembersWithSkill('Gardening', 12);
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/skills/members', { skill: 'Gardening', limit: '12' });
+    expect(result.data[0].first_name).toBe('Alice');
   });
 });

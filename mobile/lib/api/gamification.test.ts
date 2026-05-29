@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 jest.mock('@/lib/api/client', () => ({
-  api: { get: jest.fn(), post: jest.fn(), delete: jest.fn(), patch: jest.fn() },
+  api: { get: jest.fn(), post: jest.fn(), put: jest.fn(), delete: jest.fn(), patch: jest.fn() },
   ApiResponseError: class ApiResponseError extends Error {
     status!: number;
     constructor(status: number, message: string) { super(message); this.status = status; this.name = 'ApiResponseError'; }
@@ -20,8 +20,8 @@ jest.mock('@/lib/constants', () => ({
 }));
 
 import { api } from '@/lib/api/client';
-import { getGamificationProfile, getBadges, getLeaderboard } from './gamification';
-import type { GamificationProfile, Badge, LeaderboardResponse } from './gamification';
+import { claimChallengeReward, claimDailyReward, getBadgeCollections, getChallenges, getDailyRewardStatus, getGamificationProfile, getBadges, getLeaderboard, getNexusScore, getShopItems, purchaseShopItem, updateBadgeShowcase } from './gamification';
+import type { BadgeCollection, Challenge, DailyRewardStatus, GamificationProfile, Badge, LeaderboardResponse, NexusScoreData, ShopItem } from './gamification';
 
 const mockBadge: Badge = {
   id: 1,
@@ -52,6 +52,60 @@ const mockLeaderboardResponse: LeaderboardResponse = {
     },
   ],
   meta: { total: 50, user_rank: 12 },
+};
+
+const mockNexusScore: NexusScoreData = {
+  total_score: 620,
+  max_score: 1000,
+  percentage: 62,
+  percentile: 78,
+  tier: { name: 'Advanced' },
+  breakdown: [{ key: 'engagement', label: 'Engagement', score: 120, max: 200, percentage: 60 }],
+  insights: ['Keep exchanging to grow your score.'],
+};
+
+const mockDailyReward: DailyRewardStatus = {
+  claimed_today: false,
+  reward_xp: 20,
+  next_reward_xp: 25,
+  current_streak: 3,
+};
+
+const mockChallenge: Challenge = {
+  id: 10,
+  title: 'Complete three exchanges',
+  description: 'Finish three exchanges this month.',
+  reward_xp: 50,
+  user_progress: 2,
+  target_count: 3,
+  end_date: null,
+  is_completed: false,
+  reward_claimed: false,
+};
+
+const mockCollection: BadgeCollection = {
+  id: 7,
+  name: 'Exchange Starter',
+  description: 'Complete your first exchange journey.',
+  badges: [{ badge_key: 'first_exchange', name: 'First Exchange', icon: 'swap-horizontal', earned: true }],
+  earned_count: 1,
+  total_count: 3,
+  reward_xp: 100,
+  completed: false,
+};
+
+const mockShopItem: ShopItem = {
+  id: 12,
+  name: 'Profile Sparkle',
+  description: 'Add sparkle to your profile.',
+  cost_xp: 75,
+  xp_cost: 75,
+  item_type: 'theme',
+  icon: null,
+  can_purchase: true,
+  user_purchases: 0,
+  stock_limit: 4,
+  is_active: true,
 };
 
 describe('getGamificationProfile', () => {
@@ -119,5 +173,117 @@ describe('getLeaderboard', () => {
     (api.get as jest.Mock).mockResolvedValue(mockLeaderboardResponse);
     await getLeaderboard('all_time');
     expect(api.get).toHaveBeenCalledWith('/api/v2/gamification/leaderboard', { period: 'all' });
+  });
+});
+
+describe('getNexusScore', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('loads the current user Nexus Score breakdown', async () => {
+    (api.get as jest.Mock).mockResolvedValue({ data: mockNexusScore });
+
+    const result = await getNexusScore();
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/gamification/nexus-score');
+    expect(result.data.total_score).toBe(620);
+    expect(result.data.breakdown[0].key).toBe('engagement');
+  });
+
+  it('passes force refresh when requested', async () => {
+    (api.get as jest.Mock).mockResolvedValue({ data: mockNexusScore });
+
+    await getNexusScore(true);
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/gamification/nexus-score', { force: 'true' });
+  });
+});
+
+describe('daily rewards', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('loads daily reward status', async () => {
+    (api.get as jest.Mock).mockResolvedValue({ data: mockDailyReward });
+
+    const result = await getDailyRewardStatus();
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/gamification/daily-reward');
+    expect(result.data.reward_xp).toBe(20);
+  });
+
+  it('claims the daily reward', async () => {
+    (api.post as jest.Mock).mockResolvedValue({ data: { claimed: true, reward: { xp_earned: 20, streak_day: 4 } } });
+
+    const result = await claimDailyReward();
+
+    expect(api.post).toHaveBeenCalledWith('/api/v2/gamification/daily-reward');
+    expect(result.data.reward?.streak_day).toBe(4);
+  });
+});
+
+describe('challenges', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('loads gamification challenges', async () => {
+    (api.get as jest.Mock).mockResolvedValue({ data: [mockChallenge] });
+
+    const result = await getChallenges();
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/gamification/challenges');
+    expect(result.data[0].title).toBe('Complete three exchanges');
+  });
+
+  it('claims a completed challenge reward', async () => {
+    (api.post as jest.Mock).mockResolvedValue({ data: {} });
+
+    await claimChallengeReward(10);
+
+    expect(api.post).toHaveBeenCalledWith('/api/v2/gamification/challenges/10/claim');
+  });
+});
+
+describe('getBadgeCollections', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('loads badge collections and progress data', async () => {
+    (api.get as jest.Mock).mockResolvedValue({ data: [mockCollection] });
+
+    const result = await getBadgeCollections();
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/gamification/collections');
+    expect(result.data[0].badges[0].badge_key).toBe('first_exchange');
+  });
+});
+
+describe('XP shop', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('loads shop items and XP balance metadata', async () => {
+    (api.get as jest.Mock).mockResolvedValue({ data: [mockShopItem], meta: { user_xp: 250 } });
+
+    const result = await getShopItems();
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/gamification/shop');
+    expect(result.data[0].name).toBe('Profile Sparkle');
+    expect(result.meta?.user_xp).toBe(250);
+  });
+
+  it('purchases a shop item', async () => {
+    (api.post as jest.Mock).mockResolvedValue({ data: {} });
+
+    await purchaseShopItem(12);
+
+    expect(api.post).toHaveBeenCalledWith('/api/v2/gamification/shop/purchase', { item_id: 12 });
+  });
+});
+
+describe('updateBadgeShowcase', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('saves showcased badge keys', async () => {
+    (api.put as jest.Mock).mockResolvedValue({ data: {} });
+
+    await updateBadgeShowcase(['first_exchange', 'welcome']);
+
+    expect(api.put).toHaveBeenCalledWith('/api/v2/gamification/showcase', { badge_keys: ['first_exchange', 'welcome'] });
   });
 });

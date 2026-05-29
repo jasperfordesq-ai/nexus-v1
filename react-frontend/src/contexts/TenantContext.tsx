@@ -114,6 +114,8 @@ const defaultFeatures: TenantFeatures = {
   merchant_coupons: false,
   regional_analytics: false,
   maps: true,
+  // Courses (alpha) — opt-in per tenant. Synced with PHP TenantFeatureConfig.
+  courses: false,
 };
 
 // Default modules (all enabled)

@@ -77,7 +77,70 @@ vi.mock('@/contexts', () => ({
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
-vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
+vi.mock('@/components/ui', async () => {
+  const React = await import('react');
+  const { uiMock } = await import('@/test/uiMock');
+
+  // The salary fields use HeroUI's NumberField compound API:
+  //   <NumberField value onChange><Label/><NumberField.Group><NumberField.Input aria-label/></NumberField.Group></NumberField>
+  // The generic uiMock collapses this to a leaf input that drops both the
+  // <Label> child (breaks getByText) and the input's aria-label (breaks
+  // getByLabelText). Provide a faithful compound stub: the root supplies
+  // value/onChange via context, renders its children, and NumberField.Input
+  // renders a real labeled <input type="number"> that forwards onChange as a
+  // parsed number — matching the component's `onChange={(n) => ...}` contract.
+  const NumberFieldCtx = React.createContext<{
+    value?: number;
+    onChange?: (n: number | undefined) => void;
+    isDisabled?: boolean;
+  }>({});
+
+  function NumberFieldRoot(props: Record<string, unknown>) {
+    const { value, onChange, isDisabled, children } = props as {
+      value?: number;
+      onChange?: (n: number | undefined) => void;
+      isDisabled?: boolean;
+      children?: React.ReactNode;
+    };
+    return React.createElement(
+      NumberFieldCtx.Provider,
+      { value: { value, onChange, isDisabled } },
+      React.createElement('div', null, children),
+    );
+  }
+  function NumberFieldGroup(props: Record<string, unknown>) {
+    return React.createElement('div', null, props.children as React.ReactNode);
+  }
+  function NumberFieldInput(props: Record<string, unknown>) {
+    const ctx = React.useContext(NumberFieldCtx);
+    return React.createElement('input', {
+      type: 'number',
+      'aria-label': props['aria-label'] as string | undefined,
+      className: props.className as string | undefined,
+      value: ctx.value ?? '',
+      disabled: ctx.isDisabled || undefined,
+      onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (typeof ctx.onChange === 'function') {
+          const raw = e.target.value;
+          ctx.onChange(raw === '' ? undefined : Number(raw));
+        }
+      },
+    });
+  }
+  const NumberFieldStub = Object.assign(NumberFieldRoot, {
+    Group: NumberFieldGroup,
+    Input: NumberFieldInput,
+    DecrementButton: () => null,
+    IncrementButton: () => null,
+  });
+
+  return new Proxy(uiMock, {
+    get(target, prop) {
+      if (prop === 'NumberField') return NumberFieldStub;
+      return Reflect.get(target, prop);
+    },
+  });
+});
 
 vi.mock('@/components/feedback', () => ({
   EmptyState: ({ title, description }: { title: string; description?: string }) => (

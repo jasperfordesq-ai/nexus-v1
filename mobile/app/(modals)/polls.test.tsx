@@ -4,7 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { Alert } from 'react-native';
+import { fireEvent, render } from '@testing-library/react-native';
 
 jest.mock('expo-router', () => ({
   router: { back: jest.fn(), canGoBack: jest.fn(() => false), push: jest.fn() },
@@ -24,7 +25,27 @@ jest.mock('react-i18next', () => ({
         'pollsScreen.statusOpen': 'Open',
         'pollsScreen.statusClosed': 'Closed',
         'pollsScreen.totalVotes': opts ? `${String(opts.count ?? 0)} votes` : '0 votes',
+        'pollsScreen.createPoll': 'Create poll',
+        'pollsScreen.createTitle': 'Create a poll',
+        'pollsScreen.questionLabel': 'Question',
+        'pollsScreen.questionPlaceholder': 'Ask a question',
+        'pollsScreen.descriptionLabel': 'Description',
+        'pollsScreen.descriptionPlaceholder': 'Add context',
+        'pollsScreen.optionsLabel': 'Options',
+        'pollsScreen.optionPlaceholder': opts ? `Option ${String(opts.number ?? 1)}` : 'Option',
+        'pollsScreen.addOption': 'Add option',
+        'pollsScreen.removeOption': opts ? `Remove option ${String(opts.number ?? 1)}` : 'Remove option',
+        'pollsScreen.submitPoll': 'Publish poll',
+        'pollsScreen.creating': 'Publishing',
+        'pollsScreen.createMissingTitle': 'Poll not ready',
+        'pollsScreen.createQuestionRequired': 'Add a question.',
+        'pollsScreen.createOptionsRequired': 'Add at least two options.',
+        'pollsScreen.createdTitle': 'Poll created',
+        'pollsScreen.createdMessage': 'Your poll is now open.',
+        'pollsScreen.createError': 'Could not create poll.',
         'common:buttons.retry': 'Retry',
+        'common:cancel': 'Cancel',
+        'common:errors.alertTitle': 'Something went wrong',
         'common:endOfList': 'End of list',
       };
       return map[key] ?? key;
@@ -44,6 +65,9 @@ jest.mock('@/lib/hooks/useTheme', () => ({
   useTheme: () => ({
     text: '#111827',
     textSecondary: '#4b5563',
+    onPrimary: '#ffffff',
+    border: '#d1d5db',
+    error: '#dc2626',
   }),
 }));
 
@@ -69,7 +93,12 @@ jest.mock('@/lib/api/feed', () => ({
   getFeedAuthor: () => ({ id: 4, name: 'Poll Author', avatar: null }),
 }));
 
+jest.mock('@/lib/api/polls', () => ({
+  createPoll: jest.fn().mockResolvedValue({ data: { id: 99 } }),
+}));
+
 import PollsScreen from './polls';
+import { createPoll } from '@/lib/api/polls';
 
 const defaultState = {
   items: [],
@@ -85,6 +114,8 @@ describe('PollsScreen', () => {
   beforeEach(() => {
     mockUsePaginatedApi.mockReset();
     mockUsePaginatedApi.mockReturnValue(defaultState);
+    jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
+    (createPoll as jest.Mock).mockClear();
   });
 
   it('renders the translated polls empty state', () => {
@@ -124,5 +155,29 @@ describe('PollsScreen', () => {
     expect(getByText('Lunch choice')).toBeTruthy();
     expect(getByText('Which lunch should we host?')).toBeTruthy();
     expect(getByText('4 votes')).toBeTruthy();
+  });
+
+  it('creates a standard poll from the native create form', async () => {
+    const refresh = jest.fn();
+    mockUsePaginatedApi.mockReturnValue({ ...defaultState, refresh });
+
+    const { getByPlaceholderText, getByText } = render(<PollsScreen />);
+
+    fireEvent.press(getByText('Create poll'));
+    fireEvent.changeText(getByPlaceholderText('Ask a question'), 'Which lunch should we host?');
+    fireEvent.changeText(getByPlaceholderText('Option 1'), 'Soup');
+    fireEvent.changeText(getByPlaceholderText('Option 2'), 'Sandwiches');
+    fireEvent.press(getByText('Publish poll'));
+
+    expect(createPoll).toHaveBeenCalledWith({
+      question: 'Which lunch should we host?',
+      description: undefined,
+      options: ['Soup', 'Sandwiches'],
+      poll_type: 'standard',
+      is_anonymous: false,
+    });
+    await Promise.resolve();
+    expect(Alert.alert).toHaveBeenCalledWith('Poll created', 'Your poll is now open.');
+    expect(refresh).toHaveBeenCalled();
   });
 });

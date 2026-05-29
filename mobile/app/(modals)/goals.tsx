@@ -22,9 +22,13 @@ import { useTranslation } from 'react-i18next';
 
 import {
   createGoal,
+  createGoalFromTemplate,
+  getGoalTemplateCategories,
+  getGoalTemplates,
   getGoals,
   updateGoalStatus,
   type Goal,
+  type GoalTemplate,
 } from '@/lib/api/goals';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -72,6 +76,10 @@ function getGoalProgressPercent(goal: ApiGoal) {
 
 function getGoalDueDate(goal: ApiGoal) {
   return goal.due_date ?? goal.deadline ?? null;
+}
+
+function getTemplateTarget(template: GoalTemplate) {
+  return numberOrFallback(template.target_value, numberOrFallback(template.default_target_value, 0));
 }
 
 function statusTone(goal: ApiGoal, primary: string, theme: ReturnType<typeof useTheme>) {
@@ -448,12 +456,190 @@ function CreateGoalForm({
   );
 }
 
+function GoalTemplatesPanel({
+  primary,
+  theme,
+  t,
+  onCreated,
+}: {
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+  onCreated: (goal: Goal) => void;
+}) {
+  const [templates, setTemplates] = useState<GoalTemplate[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [creatingFromId, setCreatingFromId] = useState<number | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadTemplates() {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const [templatesResponse, categoriesResponse] = await Promise.all([
+          getGoalTemplates(),
+          getGoalTemplateCategories(),
+        ]);
+        if (!mounted) return;
+        setTemplates(templatesResponse.data ?? []);
+        setCategories(categoriesResponse.data ?? []);
+      } catch {
+        if (mounted) setError(t('templates.loadError'));
+      } finally {
+        if (mounted) setIsLoading(false);
+      }
+    }
+
+    void loadTemplates();
+    return () => {
+      mounted = false;
+    };
+    // Keep the template load tied to panel mount. Test/runtime i18n functions can change identity between renders.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const visibleTemplates = selectedCategory
+    ? templates.filter((template) => template.category === selectedCategory)
+    : templates;
+
+  async function useTemplate(template: GoalTemplate) {
+    setCreatingFromId(template.id);
+    try {
+      const result = await createGoalFromTemplate(template.id);
+      onCreated(result.data);
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(t('common:errors.alertTitle'), t('templates.createError'));
+    } finally {
+      setCreatingFromId(null);
+    }
+  }
+
+  return (
+    <HeroCard className="rounded-panel p-0">
+      <HeroCard.Body className="gap-4 p-4">
+        <View className="flex-row items-start gap-3">
+          <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+            <Ionicons name="sparkles-outline" size={20} color={primary} />
+          </View>
+          <View className="min-w-0 flex-1">
+            <Text className="text-base font-bold text-foreground">{t('templates.title')}</Text>
+            <Text className="text-xs text-muted-foreground">{t('templates.subtitle')}</Text>
+          </View>
+        </View>
+
+        {isLoading ? (
+          <View className="min-h-[120px] items-center justify-center">
+            <Spinner size="md" />
+          </View>
+        ) : error ? (
+          <Surface variant="secondary" className="items-center gap-3 rounded-panel-inner p-4">
+            <Ionicons name="alert-circle-outline" size={24} color={theme.error} />
+            <Text className="text-center text-sm" style={{ color: theme.textSecondary }}>{error}</Text>
+          </Surface>
+        ) : templates.length === 0 ? (
+          <Surface variant="secondary" className="items-center gap-3 rounded-panel-inner p-4">
+            <Ionicons name="layers-outline" size={24} color={theme.textMuted} />
+            <Text className="text-center text-sm" style={{ color: theme.textSecondary }}>{t('templates.empty')}</Text>
+          </Surface>
+        ) : (
+          <>
+            <View className="flex-row flex-wrap gap-2">
+              <HeroButton
+                size="sm"
+                variant={selectedCategory === null ? 'primary' : 'secondary'}
+                onPress={() => setSelectedCategory(null)}
+              >
+                <HeroButton.Label>{t('templates.allCategories')}</HeroButton.Label>
+              </HeroButton>
+              {categories.map((category) => (
+                <HeroButton
+                  key={category}
+                  size="sm"
+                  variant={selectedCategory === category ? 'primary' : 'secondary'}
+                  onPress={() => setSelectedCategory(category)}
+                >
+                  <HeroButton.Label>{category}</HeroButton.Label>
+                </HeroButton>
+              ))}
+            </View>
+
+            {visibleTemplates.length === 0 ? (
+              <Text className="text-center text-sm" style={{ color: theme.textSecondary }}>
+                {t('templates.emptyCategory')}
+              </Text>
+            ) : (
+              <View className="gap-3">
+                {visibleTemplates.map((template) => {
+                  const target = getTemplateTarget(template);
+                  const duration = numberOrFallback(template.duration_days, 0);
+                  return (
+                    <Surface key={template.id} variant="secondary" className="gap-3 rounded-panel-inner p-3">
+                      <View className="flex-row items-start justify-between gap-3">
+                        <View className="min-w-0 flex-1 gap-1">
+                          <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={2}>
+                            {template.title}
+                          </Text>
+                          {template.description ? (
+                            <Text className="text-xs leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>
+                              {template.description}
+                            </Text>
+                          ) : null}
+                        </View>
+                        <HeroButton
+                          size="sm"
+                          variant="primary"
+                          isDisabled={creatingFromId !== null}
+                          onPress={() => void useTemplate(template)}
+                          accessibilityLabel={t('templates.useLabel', { title: template.title })}
+                        >
+                          {creatingFromId === template.id ? <Spinner size="sm" /> : <HeroButton.Label>{t('templates.use')}</HeroButton.Label>}
+                        </HeroButton>
+                      </View>
+
+                      <View className="flex-row flex-wrap gap-2">
+                        {target > 0 ? (
+                          <Chip size="sm" variant="secondary" color="default">
+                            <Ionicons name="flag-outline" size={12} color={theme.textMuted} />
+                            <Chip.Label>{t('templates.target', { value: target })}</Chip.Label>
+                          </Chip>
+                        ) : null}
+                        {template.category ? (
+                          <Chip size="sm" variant="secondary" color="default">
+                            <Chip.Label>{template.category}</Chip.Label>
+                          </Chip>
+                        ) : null}
+                        {duration > 0 ? (
+                          <Chip size="sm" variant="secondary" color="default">
+                            <Chip.Label>{t('templates.duration', { days: duration })}</Chip.Label>
+                          </Chip>
+                        ) : null}
+                      </View>
+                    </Surface>
+                  );
+                })}
+              </View>
+            )}
+          </>
+        )}
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
 export default function GoalsScreen() {
   const { t } = useTranslation(['goals', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
 
   const [showForm, setShowForm] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(false);
   const [goals, setGoals] = useState<ApiGoal[]>([]);
   const [initialized, setInitialized] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -490,6 +676,7 @@ export default function GoalsScreen() {
   function handleGoalCreated(goal: Goal) {
     setGoals((prev) => [goal as ApiGoal, ...prev]);
     setShowForm(false);
+    setShowTemplates(false);
   }
 
   const topAction = {
@@ -527,12 +714,50 @@ export default function GoalsScreen() {
               ListHeaderComponent={
                 <View className="gap-4">
                   <GoalsHero goals={goals} primary={primary} theme={theme} t={t} />
+                  <HeroCard className="rounded-panel p-0">
+                    <HeroCard.Body className="gap-3 p-4">
+                      <View className="flex-row flex-wrap gap-2">
+                        <HeroButton
+                          className="flex-1"
+                          variant={showForm ? 'primary' : 'secondary'}
+                          onPress={() => {
+                            void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                            setShowTemplates(false);
+                            setShowForm((visible) => !visible);
+                          }}
+                        >
+                          <Ionicons name="add-outline" size={16} color={showForm ? '#fff' : primary} />
+                          <HeroButton.Label>{t('addGoal')}</HeroButton.Label>
+                        </HeroButton>
+                        <HeroButton
+                          className="flex-1"
+                          variant={showTemplates ? 'primary' : 'secondary'}
+                          onPress={() => {
+                            void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                            setShowForm(false);
+                            setShowTemplates((visible) => !visible);
+                          }}
+                        >
+                          <Ionicons name="sparkles-outline" size={16} color={showTemplates ? '#fff' : primary} />
+                          <HeroButton.Label>{t('templates.open')}</HeroButton.Label>
+                        </HeroButton>
+                      </View>
+                    </HeroCard.Body>
+                  </HeroCard>
                   {showForm ? (
                     <CreateGoalForm
                       theme={theme}
                       t={t}
                       onCreated={handleGoalCreated}
                       onCancel={() => setShowForm(false)}
+                    />
+                  ) : null}
+                  {showTemplates ? (
+                    <GoalTemplatesPanel
+                      primary={primary}
+                      theme={theme}
+                      t={t}
+                      onCreated={handleGoalCreated}
                     />
                   ) : null}
                 </View>

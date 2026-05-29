@@ -1149,6 +1149,8 @@ export interface TenantFeatures {
   merchant_coupons: boolean;
   regional_analytics: boolean;
   maps: boolean;
+  /** Courses / learning module (alpha) — opt-in per tenant. */
+  courses: boolean;
 }
 
 export interface TenantModules {

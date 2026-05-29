@@ -1,0 +1,60 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * CourseCard — compact course summary card for browse grids.
+ */
+
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Card, CardBody, Chip } from '@/components/ui';
+import { useTenant } from '@/contexts';
+import GraduationCap from 'lucide-react/icons/graduation-cap';
+import Users from 'lucide-react/icons/users';
+import type { Course } from '@/lib/api/courses';
+
+interface CourseCardProps {
+  course: Course;
+}
+
+export function CourseCard({ course }: CourseCardProps) {
+  const { t } = useTranslation('courses');
+  const { tenantPath } = useTenant();
+
+  return (
+    <Card className="h-full overflow-hidden transition-shadow hover:shadow-md">
+      <Link to={tenantPath(`/courses/${course.slug}`)} className="block">
+        <div className="aspect-video w-full bg-[var(--color-surface-2)] flex items-center justify-center overflow-hidden">
+          {course.cover_image ? (
+            <img src={course.cover_image} alt={course.title} className="w-full h-full object-cover" />
+          ) : (
+            <GraduationCap size={40} className="text-muted" aria-hidden="true" />
+          )}
+        </div>
+        <CardBody className="p-4 flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <Chip size="sm" variant="soft">{t(`level.${course.level}`)}</Chip>
+            {course.category?.name ? (
+              <Chip size="sm" variant="soft" color="secondary">{course.category.name}</Chip>
+            ) : null}
+          </div>
+          <h3 className="text-sm font-semibold line-clamp-2">{course.title}</h3>
+          {course.summary ? (
+            <p className="text-xs text-muted line-clamp-2">{course.summary}</p>
+          ) : null}
+          <div className="flex items-center justify-between mt-1 text-xs text-muted">
+            {course.author?.name ? <span>{t('card.by_author', { name: course.author.name })}</span> : <span />}
+            <span className="inline-flex items-center gap-1">
+              <Users size={12} aria-hidden="true" />
+              {t('card.enrolled', { count: course.enrollment_count })}
+            </span>
+          </div>
+        </CardBody>
+      </Link>
+    </Card>
+  );
+}
+
+export default CourseCard;

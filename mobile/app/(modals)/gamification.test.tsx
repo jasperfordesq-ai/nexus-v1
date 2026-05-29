@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
+import { Alert } from 'react-native';
 import { render, fireEvent } from '@testing-library/react-native';
 
 // --- Mocks ---
@@ -12,6 +13,7 @@ jest.mock('expo-router', () => ({
   useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }),
   router: { push: jest.fn(), replace: jest.fn(), back: jest.fn() },
   useLocalSearchParams: () => ({}),
+  usePathname: () => '/(modals)/gamification',
   useNavigation: () => ({ setOptions: jest.fn() }),
 }));
 
@@ -63,6 +65,70 @@ jest.mock('react-i18next', () => ({
         'gamification:leaderboard.you': 'You',
         'leaderboard.you': 'You',
         'leaderboard.badgesCount': opts ? `${String(opts.count ?? 0)} badges` : '0 badges',
+        'nexusScore.title': 'Nexus Score',
+        'nexusScore.eyebrow': 'Reputation score',
+        'nexusScore.subtitle': 'See your reputation breakdown.',
+        'nexusScore.total': 'Total score',
+        'nexusScore.scoreValue': opts ? `${String(opts.score ?? 0)} / ${String(opts.max ?? 0)}` : '0 / 0',
+        'nexusScore.percentile': opts ? `Top ${String(opts.percentile ?? 0)} percentile` : 'Top 0 percentile',
+        'nexusScore.categoryScore': opts ? `${String(opts.score ?? 0)} of ${String(opts.max ?? 0)}` : '0 of 0',
+        'nexusScore.percent': opts ? `${String(opts.percent ?? 0)}%` : '0%',
+        'nexusScore.insights': 'Insights',
+        'nexusScore.empty': 'No Nexus Score yet.',
+        'nexusScore.tierFallback': 'Starter',
+        'dailyReward.title': 'Daily reward',
+        'dailyReward.claimToday': opts ? `Claim ${String(opts.xp ?? 0)} XP today` : 'Claim XP today',
+        'dailyReward.comeBackTomorrow': opts ? `Come back tomorrow for ${String(opts.xp ?? 0)} XP` : 'Come back tomorrow',
+        'dailyReward.streak': opts ? `${String(opts.count ?? 0)} day streak` : '0 day streak',
+        'dailyReward.claimReward': 'Claim reward',
+        'dailyReward.claiming': 'Claiming',
+        'dailyReward.claimed': 'Claimed',
+        'dailyReward.claimedTitle': 'Reward claimed',
+        'dailyReward.claimedMessage': opts ? `You earned ${String(opts.xp ?? 0)} XP.` : 'Reward claimed.',
+        'dailyReward.claimError': 'Could not claim reward.',
+        'challenges.title': 'Challenges',
+        'challenges.empty': 'No challenges yet.',
+        'challenges.active': 'Active challenges',
+        'challenges.completed': 'Completed challenges',
+        'challenges.xpReward': opts ? `${String(opts.xp ?? 0)} XP` : '0 XP',
+        'challenges.progress': opts ? `${String(opts.current ?? 0)} / ${String(opts.target ?? 0)}` : '0 / 0',
+        'challenges.claimXp': opts ? `Claim ${String(opts.xp ?? 0)} XP` : 'Claim XP',
+        'challenges.claimed': 'Claimed',
+        'challenges.claimedTitle': 'Challenge claimed',
+        'challenges.claimedMessage': 'Challenge reward claimed.',
+        'challenges.claimError': 'Could not claim challenge.',
+        'journeys.title': 'Journeys',
+        'journeys.empty': 'No journeys yet.',
+        'journeys.complete': 'Complete',
+        'journeys.xpReward': opts ? `${String(opts.xp ?? 0)} XP` : '0 XP',
+        'journeys.badgesCollected': opts ? `${String(opts.earned ?? 0)} of ${String(opts.total ?? 0)} badges` : '0 of 0 badges',
+        'shop.title': 'Shop',
+        'shop.yourBalance': opts ? `Balance: ${String(opts.xp ?? 0)} XP` : 'Balance: 0 XP',
+        'shop.empty': 'No shop items yet.',
+        'shop.xpCost': opts ? `${String(opts.xp ?? 0)} XP` : '0 XP',
+        'shop.stockLeft': opts ? `${String(opts.count ?? 0)} left` : '0 left',
+        'shop.owned': 'Owned',
+        'shop.unavailable': 'Unavailable',
+        'shop.purchase': 'Purchase',
+        'shop.buying': 'Buying',
+        'shop.purchaseItem': opts ? `Purchase ${String(opts.name ?? '')}` : 'Purchase item',
+        'shop.purchaseComplete': 'Purchase complete',
+        'shop.purchaseCompleteDescription': opts ? `${String(opts.name ?? '')} is yours.` : 'Purchased.',
+        'shop.notEnoughXp': 'Not enough XP',
+        'shop.notEnoughXpDescription': opts ? `You need ${String(opts.xp ?? 0)} more XP.` : 'You need more XP.',
+        'shop.purchaseError': 'Could not purchase item.',
+        'showcase.title': 'Profile showcase',
+        'showcase.selectedCount': opts ? `${String(opts.count ?? 0)} selected` : '0 selected',
+        'showcase.save': 'Save',
+        'showcase.saving': 'Saving',
+        'showcase.noBadgesEarned': 'No badges earned yet.',
+        'showcase.toggleBadge': opts ? `Toggle ${String(opts.name ?? '')}` : 'Toggle badge',
+        'showcase.selected': 'Selected',
+        'showcase.select': 'Select',
+        'showcase.updated': 'Showcase updated',
+        'showcase.updatedDescription': 'Your profile showcase was updated.',
+        'showcase.saveError': 'Could not save showcase.',
+        'common:errors.alertTitle': 'Something went wrong',
       };
       return map[key] ?? key;
     },
@@ -104,8 +170,17 @@ jest.mock('@expo/vector-icons', () => ({
 
 jest.mock('@/lib/api/gamification', () => ({
   getGamificationProfile: jest.fn(),
+  claimDailyReward: jest.fn().mockResolvedValue({ data: { claimed: true, reward: { xp_earned: 20, streak_day: 4 } } }),
+  claimChallengeReward: jest.fn().mockResolvedValue({ data: {} }),
   getBadges: jest.fn(),
+  getBadgeCollections: jest.fn(),
+  getChallenges: jest.fn(),
+  getDailyRewardStatus: jest.fn(),
   getLeaderboard: jest.fn(),
+  getNexusScore: jest.fn(),
+  getShopItems: jest.fn(),
+  purchaseShopItem: jest.fn().mockResolvedValue({ data: {} }),
+  updateBadgeShowcase: jest.fn().mockResolvedValue({ data: {} }),
 }));
 
 jest.mock('@/components/ui/Avatar', () => 'View');
@@ -114,12 +189,18 @@ jest.mock('@/components/ui/LoadingSpinner', () => () => null);
 // --- Tests ---
 
 import GamificationScreen from './gamification';
+import { claimChallengeReward, claimDailyReward, purchaseShopItem, updateBadgeShowcase } from '@/lib/api/gamification';
 
 const defaultLoadingState = { data: null, isLoading: true, error: null, refresh: jest.fn() };
 
 beforeEach(() => {
   // Default: all loading so LoadingSpinner is rendered
   mockUseApi.mockReturnValue(defaultLoadingState);
+  jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
+  (claimDailyReward as jest.Mock).mockClear();
+  (claimChallengeReward as jest.Mock).mockClear();
+  (purchaseShopItem as jest.Mock).mockClear();
+  (updateBadgeShowcase as jest.Mock).mockClear();
 });
 
 const mockProfile = {
@@ -133,10 +214,153 @@ const mockProfile = {
 const mockBadge = {
   id: 1,
   name: 'First Exchange',
+  description: 'Completed your first exchange.',
   icon: 'ribbon-outline',
+  badge_key: 'first_exchange',
   is_earned: true,
+  is_showcased: false,
   earned_at: '2026-01-15T10:00:00Z',
 };
+
+const mockNexusScore = {
+  total_score: 620,
+  max_score: 1000,
+  percentage: 62,
+  percentile: 78,
+  tier: { name: 'Advanced' },
+  breakdown: [{ key: 'engagement', label: 'Engagement', score: 120, max: 200, percentage: 60 }],
+  insights: ['Keep exchanging to grow your score.'],
+};
+
+const mockDailyReward = {
+  claimed_today: false,
+  reward_xp: 20,
+  next_reward_xp: 25,
+  current_streak: 3,
+};
+
+const mockChallenges = [
+  {
+    id: 10,
+    title: 'Complete three exchanges',
+    description: 'Finish three exchanges this month.',
+    reward_xp: 50,
+    user_progress: 2,
+    target_count: 3,
+    end_date: '2026-06-01T00:00:00Z',
+    is_completed: false,
+    reward_claimed: false,
+  },
+  {
+    id: 11,
+    title: 'Welcome helper',
+    description: 'Help a new member get started.',
+    reward_xp: 25,
+    user_progress: 1,
+    target_count: 1,
+    end_date: null,
+    is_completed: true,
+    reward_claimed: false,
+  },
+];
+
+const mockCollections = [
+  {
+    id: 7,
+    name: 'Exchange Starter',
+    description: 'Complete your first exchange journey.',
+    badges: [{ badge_key: 'first_exchange', name: 'First Exchange', icon: 'swap-horizontal', earned: true }],
+    earned_count: 1,
+    total_count: 3,
+    reward_xp: 100,
+    completed: false,
+  },
+  {
+    id: 8,
+    name: 'Community Builder',
+    description: 'Collect core community badges.',
+    badges: [{ badge_key: 'welcome', name: 'Welcome', icon: 'heart', earned: true }],
+    earned_count: 3,
+    total_count: 3,
+    reward_xp: 0,
+    completed: true,
+  },
+];
+
+const mockShopItems = [
+  {
+    id: 12,
+    name: 'Profile Sparkle',
+    description: 'Add sparkle to your profile.',
+    cost_xp: 75,
+    xp_cost: 75,
+    item_type: 'theme',
+    icon: null,
+    can_purchase: true,
+    user_purchases: 0,
+    stock_limit: 4,
+    is_active: true,
+  },
+  {
+    id: 13,
+    name: 'Founding Badge',
+    description: 'A badge you already own.',
+    cost_xp: 10,
+    xp_cost: 10,
+    item_type: 'badge',
+    icon: null,
+    can_purchase: false,
+    user_purchases: 1,
+    stock_limit: null,
+    is_active: true,
+  },
+];
+
+function mockLoadedGamification({
+  badges = [],
+  leaderboard = [],
+  score = mockNexusScore,
+  reward = mockDailyReward,
+  challenges = [],
+  collections = [],
+  shopItems = [],
+  shopXp = 250,
+}: {
+  badges?: unknown[];
+  leaderboard?: unknown[];
+  score?: unknown;
+  reward?: unknown;
+  challenges?: unknown[];
+  collections?: unknown[];
+  shopItems?: unknown[];
+  shopXp?: number;
+} = {}) {
+  mockUseApi.mockImplementation((loader: unknown) => {
+    const source = String(loader);
+    if (source.includes('getGamificationProfile')) {
+      return { data: { data: mockProfile }, isLoading: false, error: null, refresh: jest.fn() };
+    }
+    if (source.includes('getBadges')) {
+      return { data: { data: badges }, isLoading: false, error: null, refresh: jest.fn() };
+    }
+    if (source.includes('getLeaderboard')) {
+      return { data: { data: leaderboard, meta: { user_rank: null } }, isLoading: false, error: null, refresh: jest.fn() };
+    }
+    if (source.includes('getNexusScore')) {
+      return { data: { data: score }, isLoading: false, error: null, refresh: jest.fn() };
+    }
+    if (source.includes('getChallenges')) {
+      return { data: { data: challenges }, isLoading: false, error: null, refresh: jest.fn() };
+    }
+    if (source.includes('getBadgeCollections')) {
+      return { data: { data: collections }, isLoading: false, error: null, refresh: jest.fn() };
+    }
+    if (source.includes('getShopItems')) {
+      return { data: { data: shopItems, meta: { user_xp: shopXp } }, isLoading: false, error: null, refresh: jest.fn() };
+    }
+    return { data: { data: reward }, isLoading: false, error: null, refresh: jest.fn() };
+  });
+}
 
 describe('GamificationScreen', () => {
   it('renders loading state (no content visible) when APIs are loading', () => {
@@ -148,44 +372,57 @@ describe('GamificationScreen', () => {
   });
 
   it('renders tab buttons when profile and badges data are loaded', () => {
-    mockUseApi
-      .mockReturnValueOnce({ data: { data: mockProfile }, isLoading: false, error: null, refresh: jest.fn() })
-      .mockReturnValueOnce({ data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() })
-      .mockReturnValueOnce({ data: { data: [], meta: { user_rank: null } }, isLoading: false, error: null, refresh: jest.fn() });
+    mockLoadedGamification();
 
     const { getByText } = render(<GamificationScreen />);
     expect(getByText('Badges')).toBeTruthy();
     expect(getByText('Leaderboard')).toBeTruthy();
+    expect(getByText('Nexus Score')).toBeTruthy();
   });
 
   it('renders profile XP when loaded', () => {
-    mockUseApi
-      .mockReturnValueOnce({ data: { data: mockProfile }, isLoading: false, error: null, refresh: jest.fn() })
-      .mockReturnValueOnce({ data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() })
-      .mockReturnValueOnce({ data: { data: [], meta: { user_rank: null } }, isLoading: false, error: null, refresh: jest.fn() });
+    mockLoadedGamification();
 
     const { getByText } = render(<GamificationScreen />);
     expect(getByText('750 XP')).toBeTruthy();
   });
 
   it('renders badge cards when badges are loaded', () => {
-    mockUseApi
-      .mockReturnValueOnce({ data: { data: mockProfile }, isLoading: false, error: null, refresh: jest.fn() })
-      .mockReturnValueOnce({ data: { data: [mockBadge] }, isLoading: false, error: null, refresh: jest.fn() })
-      .mockReturnValueOnce({ data: { data: [], meta: { user_rank: null } }, isLoading: false, error: null, refresh: jest.fn() });
+    mockLoadedGamification({ badges: [mockBadge] });
 
-    const { getByText } = render(<GamificationScreen />);
-    expect(getByText('First Exchange')).toBeTruthy();
+    const { getAllByText } = render(<GamificationScreen />);
+    expect(getAllByText('First Exchange').length).toBeGreaterThan(0);
+  });
+
+  it('selects and saves profile showcase badges', async () => {
+    mockLoadedGamification({ badges: [mockBadge] });
+
+    const { getByLabelText, getByText } = render(<GamificationScreen />);
+
+    expect(getByText('Profile showcase')).toBeTruthy();
+    expect(getByText('0 selected')).toBeTruthy();
+    fireEvent.press(getByLabelText('Toggle First Exchange'));
+    expect(getByText('1 selected')).toBeTruthy();
+    fireEvent.press(getByText('Save'));
+
+    expect(updateBadgeShowcase).toHaveBeenCalledWith(['first_exchange']);
+    await Promise.resolve();
+    expect(Alert.alert).toHaveBeenCalledWith('Showcase updated', 'Your profile showcase was updated.');
   });
 
   it('switches to leaderboard tab when tapped', () => {
     let callCount = 0;
     mockUseApi.mockImplementation(() => {
       callCount += 1;
-      const pos = ((callCount - 1) % 3) + 1;
+      const pos = ((callCount - 1) % 8) + 1;
       if (pos === 1) return { data: { data: mockProfile }, isLoading: false, error: null, refresh: jest.fn() };
       if (pos === 2) return { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
-      return { data: { data: [], meta: { user_rank: null } }, isLoading: false, error: null, refresh: jest.fn() };
+      if (pos === 3) return { data: { data: [], meta: { user_rank: null } }, isLoading: false, error: null, refresh: jest.fn() };
+      if (pos === 4) return { data: { data: mockNexusScore }, isLoading: false, error: null, refresh: jest.fn() };
+      if (pos === 5) return { data: { data: mockDailyReward }, isLoading: false, error: null, refresh: jest.fn() };
+      if (pos === 6) return { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
+      if (pos === 7) return { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
+      return { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
     });
 
     const { getByText } = render(<GamificationScreen />);
@@ -197,12 +434,96 @@ describe('GamificationScreen', () => {
   });
 
   it('renders empty badges message when badge list is empty', () => {
-    mockUseApi
-      .mockReturnValueOnce({ data: { data: mockProfile }, isLoading: false, error: null, refresh: jest.fn() })
-      .mockReturnValueOnce({ data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() })
-      .mockReturnValueOnce({ data: { data: [], meta: { user_rank: null } }, isLoading: false, error: null, refresh: jest.fn() });
+    mockLoadedGamification();
 
     const { getByText } = render(<GamificationScreen />);
     expect(getByText('No badges yet.')).toBeTruthy();
+  });
+
+  it('renders Nexus Score breakdown when the score tab is selected', () => {
+    mockLoadedGamification();
+
+    const { getByText } = render(<GamificationScreen />);
+    fireEvent.press(getByText('Nexus Score'));
+
+    expect(getByText('620 / 1000')).toBeTruthy();
+    expect(getByText('Advanced')).toBeTruthy();
+    expect(getByText('Engagement')).toBeTruthy();
+    expect(getByText('120 of 200')).toBeTruthy();
+    expect(getByText('Keep exchanging to grow your score.')).toBeTruthy();
+  });
+
+  it('claims the daily reward and shows a translated confirmation', async () => {
+    mockLoadedGamification();
+
+    const { getByText } = render(<GamificationScreen />);
+    fireEvent.press(getByText('Claim reward'));
+
+    expect(claimDailyReward).toHaveBeenCalled();
+    await Promise.resolve();
+    expect(Alert.alert).toHaveBeenCalledWith('Reward claimed', 'You earned 20 XP.');
+  });
+
+  it('renders challenges and claims a completed challenge reward', async () => {
+    mockLoadedGamification({ challenges: mockChallenges });
+
+    const { getByText } = render(<GamificationScreen />);
+    fireEvent.press(getByText('Challenges'));
+
+    expect(getByText('Active challenges')).toBeTruthy();
+    expect(getByText('Complete three exchanges')).toBeTruthy();
+    expect(getByText('2 / 3')).toBeTruthy();
+    expect(getByText('Completed challenges')).toBeTruthy();
+    expect(getByText('Welcome helper')).toBeTruthy();
+
+    fireEvent.press(getByText('Claim 25 XP'));
+
+    expect(claimChallengeReward).toHaveBeenCalledWith(11);
+    await Promise.resolve();
+    expect(Alert.alert).toHaveBeenCalledWith('Challenge claimed', 'Challenge reward claimed.');
+  });
+
+  it('renders badge collection journeys with progress and completion state', () => {
+    mockLoadedGamification({ collections: mockCollections });
+
+    const { getByText } = render(<GamificationScreen />);
+    fireEvent.press(getByText('Journeys'));
+
+    expect(getByText('Exchange Starter')).toBeTruthy();
+    expect(getByText('Complete your first exchange journey.')).toBeTruthy();
+    expect(getByText('1 of 3 badges')).toBeTruthy();
+    expect(getByText('100 XP')).toBeTruthy();
+    expect(getByText('Community Builder')).toBeTruthy();
+    expect(getByText('Complete')).toBeTruthy();
+  });
+
+  it('renders XP shop items and purchases an affordable item', async () => {
+    mockLoadedGamification({ shopItems: mockShopItems, shopXp: 250 });
+
+    const { getByText } = render(<GamificationScreen />);
+    fireEvent.press(getByText('Shop'));
+
+    expect(getByText('Balance: 250 XP')).toBeTruthy();
+    expect(getByText('Profile Sparkle')).toBeTruthy();
+    expect(getByText('Add sparkle to your profile.')).toBeTruthy();
+    expect(getByText('4 left')).toBeTruthy();
+    expect(getByText('Founding Badge')).toBeTruthy();
+    expect(getByText('Owned')).toBeTruthy();
+
+    fireEvent.press(getByText('Purchase'));
+
+    expect(purchaseShopItem).toHaveBeenCalledWith(12);
+    await Promise.resolve();
+    expect(Alert.alert).toHaveBeenCalledWith('Purchase complete', 'Profile Sparkle is yours.');
+  });
+
+  it('disables XP shop purchase when balance is too low', () => {
+    mockLoadedGamification({ shopItems: mockShopItems, shopXp: 20 });
+
+    const { getByLabelText, getByText } = render(<GamificationScreen />);
+    fireEvent.press(getByText('Shop'));
+
+    expect(getByLabelText('Purchase Profile Sparkle').props.accessibilityState).toMatchObject({ disabled: true });
+    expect(purchaseShopItem).not.toHaveBeenCalled();
   });
 });

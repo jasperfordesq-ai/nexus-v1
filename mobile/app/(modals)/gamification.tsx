@@ -5,6 +5,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import {
+  Alert,
   RefreshControl,
   ScrollView,
   Text,
@@ -18,12 +19,28 @@ import { useTranslation } from 'react-i18next';
 
 import {
   getGamificationProfile,
+  claimDailyReward,
+  claimChallengeReward,
   getBadges,
+  getBadgeCollections,
+  getChallenges,
+  getDailyRewardStatus,
   getLeaderboard,
+  getNexusScore,
+  getShopItems,
+  purchaseShopItem,
+  updateBadgeShowcase,
   type Badge,
+  type BadgeCollection,
+  type Challenge,
+  type DailyRewardStatus,
   type GamificationProfile,
   type LeaderboardEntry,
+  type NexusScoreCategory,
+  type NexusScoreData,
+  type ShopItem,
 } from '@/lib/api/gamification';
+import { useLocalSearchParams, usePathname } from 'expo-router';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
@@ -33,12 +50,13 @@ import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
-type Tab = 'badges' | 'leaderboard';
+type Tab = 'badges' | 'challenges' | 'journeys' | 'leaderboard' | 'score' | 'shop';
 type LeaderboardPeriod = 'weekly' | 'monthly' | 'all_time';
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 type ApiBadge = Badge & {
   badge_key?: string;
   earned?: boolean;
+  is_showcased?: boolean;
 };
 type ApiProfile = GamificationProfile & {
   level_progress?: {
@@ -58,6 +76,9 @@ type ApiLeaderboardEntry = LeaderboardEntry & {
   user: LeaderboardEntry['user'] & {
     avatar_url?: string | null;
   };
+};
+type ApiNexusScore = NexusScoreData & {
+  tier?: NexusScoreData['tier'] | null;
 };
 
 const BADGE_ICON_MAP: Record<string, IoniconName> = {
@@ -167,8 +188,33 @@ function getBadgeKey(badge: ApiBadge) {
   return String(badge.id ?? badge.badge_key ?? badge.name);
 }
 
+function getBadgeShowcaseKey(badge: ApiBadge) {
+  return String(badge.badge_key ?? badge.id ?? badge.name);
+}
+
 function getLeaderboardRank(entry: ApiLeaderboardEntry) {
   return numberOrFallback(entry.rank, numberOrFallback(entry.position));
+}
+
+function getInitialTab(pathname: string, tab?: string | string[]): Tab {
+  const requested = Array.isArray(tab) ? tab[0] : tab;
+  if (requested === 'leaderboard' || pathname.includes('leaderboard')) return 'leaderboard';
+  if (requested === 'score' || requested === 'nexus-score' || pathname.includes('nexus-score')) return 'score';
+  if (requested === 'challenges') return 'challenges';
+  if (requested === 'journeys' || requested === 'collections') return 'journeys';
+  if (requested === 'shop') return 'shop';
+  return 'badges';
+}
+
+function getScoreCategoryIcon(category: NexusScoreCategory): IoniconName {
+  const key = category.key.toLowerCase();
+  if (key.includes('engagement')) return 'people-outline';
+  if (key.includes('quality')) return 'star-outline';
+  if (key.includes('volunteer')) return 'time-outline';
+  if (key.includes('activity')) return 'trending-up-outline';
+  if (key.includes('badge')) return 'medal-outline';
+  if (key.includes('impact')) return 'heart-outline';
+  return 'analytics-outline';
 }
 
 function XpBar({
@@ -322,6 +368,73 @@ function ProfileSection({
   );
 }
 
+function DailyRewardCard({
+  status,
+  isClaiming,
+  onClaim,
+  primary,
+  theme,
+  t,
+}: {
+  status: DailyRewardStatus | null;
+  isClaiming: boolean;
+  onClaim: () => Promise<void>;
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+}) {
+  if (!status) return null;
+
+  const streak = numberOrFallback(status.current_streak);
+
+  return (
+    <HeroCard className="overflow-hidden rounded-panel p-0">
+      <View className="h-1.5 bg-warning" />
+      <HeroCard.Body className="gap-3 p-4">
+        <View className="flex-row items-center gap-3">
+          <View className="size-12 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha('#f59e0b', 0.16) }}>
+            <Ionicons name="gift-outline" size={24} color="#f59e0b" />
+          </View>
+          <View className="min-w-0 flex-1">
+            <Text className="text-base font-semibold" style={{ color: theme.text }}>{t('dailyReward.title')}</Text>
+            <Text className="text-sm text-muted-foreground">
+              {status.claimed_today
+                ? t('dailyReward.comeBackTomorrow', { xp: status.next_reward_xp })
+                : t('dailyReward.claimToday', { xp: status.reward_xp })}
+            </Text>
+          </View>
+        </View>
+        <View className="flex-row flex-wrap items-center gap-2">
+          {streak > 0 ? (
+            <Chip size="sm" variant="secondary" color="warning">
+              <Ionicons name="flame-outline" size={12} color="#f59e0b" />
+              <Chip.Label>{t('dailyReward.streak', { count: streak })}</Chip.Label>
+            </Chip>
+          ) : null}
+          {status.claimed_today ? (
+            <Chip size="sm" variant="secondary" color="success">
+              <Ionicons name="checkmark-circle-outline" size={12} color={theme.success ?? primary} />
+              <Chip.Label>{t('dailyReward.claimed')}</Chip.Label>
+            </Chip>
+          ) : (
+            <HeroButton
+              size="sm"
+              variant="primary"
+              isDisabled={isClaiming}
+              onPress={() => void onClaim()}
+              accessibilityLabel={t('dailyReward.claimReward')}
+              style={{ backgroundColor: isClaiming ? theme.border : primary }}
+            >
+              {isClaiming ? <LoadingSpinner /> : <Ionicons name="sparkles-outline" size={16} color={theme.onPrimary} />}
+              <HeroButton.Label>{isClaiming ? t('dailyReward.claiming') : t('dailyReward.claimReward')}</HeroButton.Label>
+            </HeroButton>
+          )}
+        </View>
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
 function BadgeCard({
   badge,
   primary,
@@ -372,6 +485,442 @@ function BadgeCard({
   );
 }
 
+function ShowcaseManager({
+  badges,
+  selectedKeys,
+  saving,
+  onToggle,
+  onSave,
+  primary,
+  theme,
+  t,
+}: {
+  badges: ApiBadge[];
+  selectedKeys: Set<string>;
+  saving: boolean;
+  onToggle: (badge: ApiBadge) => void;
+  onSave: () => Promise<void>;
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+}) {
+  const earnedBadges = badges.filter((badge) => isBadgeEarned(badge));
+
+  return (
+    <HeroCard className="rounded-panel p-0">
+      <HeroCard.Body className="gap-3 p-4">
+        <View className="flex-row items-start gap-3">
+          <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+            <Ionicons name="star-outline" size={20} color={primary} />
+          </View>
+          <View className="min-w-0 flex-1">
+            <Text className="text-base font-semibold" style={{ color: theme.text }}>{t('showcase.title')}</Text>
+            <Text className="text-sm text-muted-foreground">{t('showcase.selectedCount', { count: selectedKeys.size })}</Text>
+          </View>
+          <HeroButton
+            size="sm"
+            variant="primary"
+            isDisabled={saving}
+            onPress={() => void onSave()}
+            accessibilityLabel={t('showcase.save')}
+            style={{ backgroundColor: saving ? theme.border : primary }}
+          >
+            {saving ? <LoadingSpinner /> : <Ionicons name="save-outline" size={16} color={theme.onPrimary} />}
+            <HeroButton.Label>{saving ? t('showcase.saving') : t('showcase.save')}</HeroButton.Label>
+          </HeroButton>
+        </View>
+        {earnedBadges.length === 0 ? (
+          <Text className="text-sm text-muted-foreground">{t('showcase.noBadgesEarned')}</Text>
+        ) : (
+          <View className="gap-2">
+            {earnedBadges.map((badge) => {
+              const badgeKeyValue = getBadgeShowcaseKey(badge);
+              const selected = selectedKeys.has(badgeKeyValue);
+              const disabled = !selected && selectedKeys.size >= 5;
+              return (
+                <HeroButton
+                  key={badgeKeyValue}
+                  variant={selected ? 'secondary' : 'ghost'}
+                  className="justify-start rounded-panel-inner p-0"
+                  isDisabled={disabled}
+                  onPress={() => onToggle(badge)}
+                  accessibilityLabel={t('showcase.toggleBadge', { name: badge.name })}
+                  accessibilityState={{ selected, disabled }}
+                >
+                  <Surface variant="secondary" className="w-full flex-row items-center gap-3 rounded-panel-inner p-3">
+                    <View className="size-9 items-center justify-center rounded-full" style={{ backgroundColor: selected ? withAlpha(primary, 0.14) : theme.surface }}>
+                      <Ionicons name={selected ? 'star' : normalizeBadgeIcon(badge.icon)} size={17} color={selected ? primary : theme.textSecondary} />
+                    </View>
+                    <View className="min-w-0 flex-1">
+                      <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={1}>{badge.name}</Text>
+                      {badge.description ? (
+                        <Text className="text-xs text-muted-foreground" numberOfLines={1}>{badge.description}</Text>
+                      ) : null}
+                    </View>
+                    <Chip size="sm" variant="secondary" color={selected ? 'warning' : 'default'}>
+                      <Chip.Label>{selected ? t('showcase.selected') : t('showcase.select')}</Chip.Label>
+                    </Chip>
+                  </Surface>
+                </HeroButton>
+              );
+            })}
+          </View>
+        )}
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function getChallengeProgress(challenge: Challenge) {
+  if (typeof challenge.progress_percent === 'number' && Number.isFinite(challenge.progress_percent)) {
+    return Math.min(100, Math.max(0, Math.round(challenge.progress_percent)));
+  }
+  return challenge.target_count > 0 ? Math.min(100, Math.round((challenge.user_progress / challenge.target_count) * 100)) : 0;
+}
+
+function ChallengeCard({
+  challenge,
+  claimingId,
+  onClaim,
+  primary,
+  theme,
+  t,
+}: {
+  challenge: Challenge;
+  claimingId: number | null;
+  onClaim: (challengeId: number) => Promise<void>;
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+}) {
+  const progress = getChallengeProgress(challenge);
+  const canClaim = challenge.is_completed && !challenge.reward_claimed;
+  const endDate = challenge.end_date ? new Date(challenge.end_date).toLocaleDateString() : null;
+
+  return (
+    <HeroCard className="rounded-panel-inner p-0">
+      <HeroCard.Body className="gap-3 p-4">
+        <View className="flex-row items-start gap-3">
+          <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(canClaim ? '#22c55e' : primary, 0.14) }}>
+            <Ionicons name={challenge.is_completed ? 'checkmark-circle-outline' : 'flag-outline'} size={20} color={canClaim ? '#22c55e' : primary} />
+          </View>
+          <View className="min-w-0 flex-1 gap-1">
+            <View className="flex-row items-start justify-between gap-2">
+              <Text className="min-w-0 flex-1 text-sm font-semibold" style={{ color: theme.text }} numberOfLines={2}>
+                {challenge.title}
+              </Text>
+              <Chip size="sm" variant="secondary" color="warning">
+                <Chip.Label>{t('challenges.xpReward', { xp: challenge.reward_xp })}</Chip.Label>
+              </Chip>
+            </View>
+            <Text className="text-sm text-muted-foreground" numberOfLines={3}>{challenge.description}</Text>
+          </View>
+        </View>
+        <View className="gap-2">
+          <XpBar xp={progress} nextLevelXp={100} primary={primary} />
+          <View className="flex-row items-center justify-between gap-3">
+            <Text className="text-xs text-muted-foreground">
+              {t('challenges.progress', { current: challenge.user_progress, target: challenge.target_count })}
+            </Text>
+            {endDate ? (
+              <Text className="text-xs text-muted-foreground">{endDate}</Text>
+            ) : null}
+          </View>
+        </View>
+        {canClaim ? (
+          <HeroButton
+            size="sm"
+            variant="primary"
+            isDisabled={claimingId === challenge.id}
+            onPress={() => void onClaim(challenge.id)}
+            accessibilityLabel={t('challenges.claimXp', { xp: challenge.reward_xp })}
+            style={{ backgroundColor: claimingId === challenge.id ? theme.border : primary }}
+          >
+            {claimingId === challenge.id ? <LoadingSpinner /> : <Ionicons name="gift-outline" size={16} color={theme.onPrimary} />}
+            <HeroButton.Label>{t('challenges.claimXp', { xp: challenge.reward_xp })}</HeroButton.Label>
+          </HeroButton>
+        ) : challenge.reward_claimed ? (
+          <Chip size="sm" variant="secondary" color="success">
+            <Ionicons name="checkmark-circle-outline" size={12} color={theme.success ?? primary} />
+            <Chip.Label>{t('challenges.claimed')}</Chip.Label>
+          </Chip>
+        ) : null}
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function ChallengesSection({
+  challenges,
+  claimingId,
+  onClaim,
+  primary,
+  theme,
+  t,
+}: {
+  challenges: Challenge[];
+  claimingId: number | null;
+  onClaim: (challengeId: number) => Promise<void>;
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+}) {
+  if (challenges.length === 0) {
+    return <EmptyState icon="flag-outline" message={t('challenges.empty')} primary={primary} />;
+  }
+
+  const active = challenges.filter((challenge) => !challenge.is_completed && !challenge.reward_claimed);
+  const completed = challenges.filter((challenge) => challenge.is_completed || challenge.reward_claimed);
+
+  return (
+    <View className="gap-4">
+      {active.length > 0 ? (
+        <View className="gap-3">
+          <Text className="text-base font-semibold" style={{ color: theme.text }}>{t('challenges.active')}</Text>
+          {active.map((challenge) => (
+            <ChallengeCard key={challenge.id} challenge={challenge} claimingId={claimingId} onClaim={onClaim} primary={primary} theme={theme} t={t} />
+          ))}
+        </View>
+      ) : null}
+      {completed.length > 0 ? (
+        <View className="gap-3">
+          <Text className="text-base font-semibold" style={{ color: theme.text }}>{t('challenges.completed')}</Text>
+          {completed.map((challenge) => (
+            <ChallengeCard key={challenge.id} challenge={challenge} claimingId={claimingId} onClaim={onClaim} primary={primary} theme={theme} t={t} />
+          ))}
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
+function CollectionBadgeDot({
+  badge,
+  primary,
+  theme,
+}: {
+  badge: BadgeCollection['badges'][number];
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+}) {
+  const iconName = badge.earned ? normalizeBadgeIcon(badge.icon) : 'lock-closed-outline';
+  return (
+    <View
+      accessibilityLabel={badge.name}
+      className="size-9 items-center justify-center rounded-full"
+      style={{ backgroundColor: badge.earned ? withAlpha(primary, 0.14) : theme.surface, opacity: badge.earned ? 1 : 0.62 }}
+    >
+      <Ionicons name={iconName} size={16} color={badge.earned ? primary : theme.textMuted} />
+    </View>
+  );
+}
+
+function CollectionCard({
+  collection,
+  primary,
+  theme,
+  t,
+}: {
+  collection: BadgeCollection;
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+}) {
+  const progress = collection.total_count > 0
+    ? Math.min(100, Math.round((collection.earned_count / collection.total_count) * 100))
+    : 0;
+
+  return (
+    <HeroCard
+      className="rounded-panel-inner p-0"
+      style={collection.completed ? { borderColor: withAlpha('#22c55e', 0.45), borderWidth: 1 } : undefined}
+    >
+      <HeroCard.Body className="gap-3 p-4">
+        <View className="flex-row items-start gap-3">
+          <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(collection.completed ? '#22c55e' : primary, 0.14) }}>
+            <Ionicons name="layers-outline" size={20} color={collection.completed ? '#22c55e' : primary} />
+          </View>
+          <View className="min-w-0 flex-1 gap-1">
+            <View className="flex-row items-start justify-between gap-2">
+              <Text className="min-w-0 flex-1 text-sm font-semibold" style={{ color: theme.text }} numberOfLines={2}>
+                {collection.name}
+              </Text>
+              {collection.completed ? (
+                <Chip size="sm" variant="secondary" color="success">
+                  <Chip.Label>{t('journeys.complete')}</Chip.Label>
+                </Chip>
+              ) : collection.reward_xp > 0 ? (
+                <Chip size="sm" variant="secondary" color="warning">
+                  <Chip.Label>{t('journeys.xpReward', { xp: collection.reward_xp })}</Chip.Label>
+                </Chip>
+              ) : null}
+            </View>
+            <Text className="text-sm text-muted-foreground" numberOfLines={3}>{collection.description}</Text>
+          </View>
+        </View>
+        <View className="gap-2">
+          <XpBar xp={progress} nextLevelXp={100} primary={collection.completed ? '#22c55e' : primary} />
+          <Text className="text-xs text-muted-foreground">
+            {t('journeys.badgesCollected', { earned: collection.earned_count, total: collection.total_count })}
+          </Text>
+        </View>
+        {collection.badges.length > 0 ? (
+          <View className="flex-row flex-wrap gap-2">
+            {collection.badges.map((badge) => (
+              <CollectionBadgeDot key={badge.badge_key} badge={badge} primary={primary} theme={theme} />
+            ))}
+          </View>
+        ) : null}
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function JourneysSection({
+  collections,
+  primary,
+  theme,
+  t,
+}: {
+  collections: BadgeCollection[];
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+}) {
+  if (collections.length === 0) {
+    return <EmptyState icon="layers-outline" message={t('journeys.empty')} primary={primary} />;
+  }
+
+  return (
+    <View className="gap-3">
+      {collections.map((collection) => (
+        <CollectionCard key={collection.id} collection={collection} primary={primary} theme={theme} t={t} />
+      ))}
+    </View>
+  );
+}
+
+function getShopItemCost(item: ShopItem) {
+  return numberOrFallback(item.cost_xp, numberOrFallback(item.xp_cost));
+}
+
+function getShopIcon(item: ShopItem): IoniconName {
+  if (item.item_type === 'badge') return 'medal-outline';
+  if (item.item_type === 'title') return 'ribbon-outline';
+  if (item.item_type === 'theme') return 'sparkles-outline';
+  return 'bag-handle-outline';
+}
+
+function ShopItemCard({
+  item,
+  balance,
+  purchasingId,
+  onPurchase,
+  primary,
+  theme,
+  t,
+}: {
+  item: ShopItem;
+  balance: number;
+  purchasingId: number | null;
+  onPurchase: (item: ShopItem) => Promise<void>;
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+}) {
+  const cost = getShopItemCost(item);
+  const isOwned = numberOrFallback(item.user_purchases) > 0;
+  const canAfford = balance >= cost;
+  const isAvailable = item.can_purchase && item.is_active !== false && !isOwned;
+
+  return (
+    <HeroCard className="rounded-panel-inner p-0" style={isOwned ? { opacity: 0.76 } : undefined}>
+      <HeroCard.Body className="items-center gap-3 p-4">
+        <View className="size-14 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+          {item.icon ? (
+            <Text className="text-2xl">{item.icon}</Text>
+          ) : (
+            <Ionicons name={getShopIcon(item)} size={27} color={primary} />
+          )}
+        </View>
+        <View className="w-full gap-1">
+          <Text className="text-center text-sm font-semibold" style={{ color: theme.text }} numberOfLines={2}>{item.name}</Text>
+          <Text className="text-center text-xs text-muted-foreground" numberOfLines={3}>{item.description}</Text>
+        </View>
+        <Chip size="sm" variant="secondary" color={canAfford ? 'accent' : 'danger'}>
+          <Chip.Label>{t('shop.xpCost', { xp: cost })}</Chip.Label>
+        </Chip>
+        {item.stock_limit != null && !isOwned ? (
+          <Text className="text-xs text-muted-foreground">{t('shop.stockLeft', { count: item.stock_limit })}</Text>
+        ) : null}
+        {isOwned ? (
+          <Chip size="sm" variant="secondary" color="success">
+            <Chip.Label>{t('shop.owned')}</Chip.Label>
+          </Chip>
+        ) : !isAvailable ? (
+          <Chip size="sm" variant="secondary" color="default">
+            <Chip.Label>{t('shop.unavailable')}</Chip.Label>
+          </Chip>
+        ) : (
+          <HeroButton
+            size="sm"
+            variant="primary"
+            isDisabled={!canAfford || purchasingId === item.id}
+            onPress={() => void onPurchase(item)}
+            accessibilityLabel={t('shop.purchaseItem', { name: item.name })}
+            style={{ backgroundColor: !canAfford || purchasingId === item.id ? theme.border : primary }}
+          >
+            {purchasingId === item.id ? <LoadingSpinner /> : <Ionicons name="bag-add-outline" size={16} color={theme.onPrimary} />}
+            <HeroButton.Label>{purchasingId === item.id ? t('shop.buying') : t('shop.purchase')}</HeroButton.Label>
+          </HeroButton>
+        )}
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function ShopSection({
+  items,
+  balance,
+  purchasingId,
+  onPurchase,
+  primary,
+  theme,
+  t,
+}: {
+  items: ShopItem[];
+  balance: number;
+  purchasingId: number | null;
+  onPurchase: (item: ShopItem) => Promise<void>;
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+}) {
+  return (
+    <View className="gap-3">
+      <Surface variant="secondary" className="flex-row items-center gap-3 rounded-panel-inner p-3">
+        <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+          <Ionicons name="diamond-outline" size={20} color={primary} />
+        </View>
+        <Text className="flex-1 text-sm font-semibold" style={{ color: theme.text }}>
+          {t('shop.yourBalance', { xp: balance })}
+        </Text>
+      </Surface>
+      {items.length === 0 ? (
+        <EmptyState icon="bag-handle-outline" message={t('shop.empty')} primary={primary} />
+      ) : (
+        <View className="flex-row flex-wrap gap-3">
+          {items.map((item) => (
+            <View key={item.id} className="min-w-[47%] flex-1">
+              <ShopItemCard item={item} balance={balance} purchasingId={purchasingId} onPurchase={onPurchase} primary={primary} theme={theme} t={t} />
+            </View>
+          ))}
+        </View>
+      )}
+    </View>
+  );
+}
+
 function LeaderboardRow({
   entry,
   isCurrentUser,
@@ -416,6 +965,98 @@ function LeaderboardRow({
         </Text>
       </HeroCard.Body>
     </HeroCard>
+  );
+}
+
+function NexusScoreSection({
+  score,
+  primary,
+  theme,
+  t,
+}: {
+  score: ApiNexusScore | null;
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+}) {
+  if (!score) {
+    return <EmptyState icon="analytics-outline" message={t('nexusScore.empty')} primary={primary} />;
+  }
+
+  const total = numberOrFallback(score.total_score);
+  const max = numberOrFallback(score.max_score, 1000);
+  const percentage = numberOrFallback(score.percentage, max > 0 ? Math.round((total / max) * 100) : 0);
+  const percentile = numberOrFallback(score.percentile);
+  const tierName = score.tier?.name ?? t('nexusScore.tierFallback');
+
+  return (
+    <View className="gap-3">
+      <HeroCard className="overflow-hidden rounded-panel p-0">
+        <View className="h-1.5" style={{ backgroundColor: primary }} />
+        <HeroCard.Body className="gap-4 p-4">
+          <View className="flex-row items-start gap-3">
+            <View className="size-12 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+              <Ionicons name="analytics-outline" size={24} color={primary} />
+            </View>
+            <View className="min-w-0 flex-1">
+              <Text className="text-xs font-semibold uppercase text-muted-foreground">{t('nexusScore.eyebrow')}</Text>
+              <Text className="text-2xl font-bold text-foreground">{t('nexusScore.title')}</Text>
+              <Text className="text-sm text-muted-foreground">{t('nexusScore.subtitle')}</Text>
+            </View>
+          </View>
+          <View className="flex-row items-end justify-between gap-3">
+            <View>
+              <Text className="text-[11px] font-semibold uppercase text-muted-foreground">{t('nexusScore.total')}</Text>
+              <Text className="text-[34px] font-bold" style={{ color: primary }}>{t('nexusScore.scoreValue', { score: total, max })}</Text>
+            </View>
+            <Chip size="md" variant="secondary" color="accent">
+              <Chip.Label>{tierName}</Chip.Label>
+            </Chip>
+          </View>
+          <XpBar xp={percentage} nextLevelXp={100} primary={primary} />
+          <Text className="text-xs text-muted-foreground">
+            {t('nexusScore.percentile', { percentile })}
+          </Text>
+        </HeroCard.Body>
+      </HeroCard>
+
+      {score.breakdown.map((category) => (
+        <Surface key={category.key} variant="secondary" className="gap-3 rounded-panel-inner p-3">
+          <View className="flex-row items-center gap-3">
+            <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.12) }}>
+              <Ionicons name={getScoreCategoryIcon(category)} size={19} color={primary} />
+            </View>
+            <View className="min-w-0 flex-1">
+              <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>{category.label}</Text>
+              <Text className="text-xs text-muted-foreground">
+                {t('nexusScore.categoryScore', { score: category.score, max: category.max })}
+              </Text>
+            </View>
+            <Text className="text-sm font-bold" style={{ color: theme.text }}>
+              {t('nexusScore.percent', { percent: Math.round(category.percentage) })}
+            </Text>
+          </View>
+          <XpBar xp={numberOrFallback(category.percentage)} nextLevelXp={100} primary={primary} />
+        </Surface>
+      ))}
+
+      {score.insights.length > 0 ? (
+        <HeroCard className="rounded-panel p-0">
+          <HeroCard.Body className="gap-3 p-4">
+            <Text className="text-base font-semibold text-foreground">{t('nexusScore.insights')}</Text>
+            {score.insights.map((insight, index) => {
+              const text = typeof insight === 'string' ? insight : Object.values(insight).filter(Boolean).join(' ');
+              return (
+                <View key={`${index}-${text}`} className="flex-row gap-2">
+                  <Ionicons name="bulb-outline" size={16} color={primary} />
+                  <Text className="min-w-0 flex-1 text-sm text-muted-foreground">{text}</Text>
+                </View>
+              );
+            })}
+          </HeroCard.Body>
+        </HeroCard>
+      ) : null}
+    </View>
   );
 }
 
@@ -465,10 +1106,21 @@ export default function GamificationScreen() {
   const { t } = useTranslation(['gamification', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const pathname = usePathname();
+  const params = useLocalSearchParams<{ tab?: string }>();
 
-  const [activeTab, setActiveTab] = useState<Tab>('badges');
+  const [activeTab, setActiveTab] = useState<Tab>(() => getInitialTab(pathname, params.tab));
   const [period, setPeriod] = useState<LeaderboardPeriod>('monthly');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [dailyRewardOverride, setDailyRewardOverride] = useState<DailyRewardStatus | null>(null);
+  const [isClaimingReward, setIsClaimingReward] = useState(false);
+  const [challengeOverrides, setChallengeOverrides] = useState<Record<number, Partial<Challenge>>>({});
+  const [claimingChallengeId, setClaimingChallengeId] = useState<number | null>(null);
+  const [shopBalanceOverride, setShopBalanceOverride] = useState<number | null>(null);
+  const [shopItemOverrides, setShopItemOverrides] = useState<Record<number, Partial<ShopItem>>>({});
+  const [purchasingShopItemId, setPurchasingShopItemId] = useState<number | null>(null);
+  const [showcaseKeysOverride, setShowcaseKeysOverride] = useState<Set<string> | null>(null);
+  const [isSavingShowcase, setIsSavingShowcase] = useState(false);
 
   const { data: profileData, isLoading: profileLoading, refresh: refreshProfile } = useApi(
     () => getGamificationProfile(),
@@ -482,18 +1134,43 @@ export default function GamificationScreen() {
     () => getLeaderboard(period),
     [period],
   );
+  const { data: nexusScoreData, isLoading: scoreLoading, refresh: refreshScore } = useApi(
+    () => getNexusScore(),
+    [],
+  );
+  const { data: dailyRewardData, isLoading: rewardLoading, refresh: refreshReward } = useApi(
+    () => getDailyRewardStatus(),
+    [],
+  );
+  const { data: challengesData, isLoading: challengesLoading, refresh: refreshChallenges } = useApi(
+    () => getChallenges(),
+    [],
+  );
+  const { data: collectionsData, isLoading: collectionsLoading, refresh: refreshCollections } = useApi(
+    () => getBadgeCollections(),
+    [],
+  );
+  const { data: shopData, isLoading: shopLoading, refresh: refreshShop } = useApi(
+    () => getShopItems(),
+    [],
+  );
 
   useEffect(() => {
-    if (isRefreshing && !profileLoading && !badgesLoading && !lbLoading) {
+    if (isRefreshing && !profileLoading && !badgesLoading && !lbLoading && !scoreLoading && !rewardLoading && !challengesLoading && !collectionsLoading && !shopLoading) {
       setIsRefreshing(false);
     }
-  }, [isRefreshing, profileLoading, badgesLoading, lbLoading]);
+  }, [isRefreshing, profileLoading, badgesLoading, lbLoading, scoreLoading, rewardLoading, challengesLoading, collectionsLoading, shopLoading]);
 
   function handleRefresh() {
     setIsRefreshing(true);
     refreshProfile();
     refreshBadges();
     refreshLb();
+    refreshScore();
+    refreshReward();
+    refreshChallenges();
+    refreshCollections();
+    refreshShop();
   }
 
   function selectTab(tab: Tab) {
@@ -506,12 +1183,126 @@ export default function GamificationScreen() {
     setPeriod(nextPeriod);
   }
 
+  async function handleClaimDailyReward() {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setIsClaimingReward(true);
+    try {
+      const response = await claimDailyReward();
+      const reward = response.data.reward;
+      const current = dailyRewardOverride ?? dailyRewardData?.data ?? null;
+      setDailyRewardOverride({
+        claimed_today: true,
+        reward_xp: current?.reward_xp ?? reward?.xp_earned ?? 0,
+        next_reward_xp: current?.next_reward_xp ?? reward?.xp_earned ?? 0,
+        current_streak: reward?.streak_day ?? (current?.current_streak ?? 0) + 1,
+      });
+      Alert.alert(t('dailyReward.claimedTitle'), t('dailyReward.claimedMessage', { xp: reward?.xp_earned ?? current?.reward_xp ?? 0 }));
+      refreshProfile();
+      refreshBadges();
+      refreshReward();
+    } catch {
+      Alert.alert(t('common:errors.alertTitle'), t('dailyReward.claimError'));
+    } finally {
+      setIsClaimingReward(false);
+    }
+  }
+
+  async function handleClaimChallengeReward(challengeId: number) {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setClaimingChallengeId(challengeId);
+    try {
+      await claimChallengeReward(challengeId);
+      setChallengeOverrides((current) => ({
+        ...current,
+        [challengeId]: { reward_claimed: true, is_completed: true },
+      }));
+      Alert.alert(t('challenges.claimedTitle'), t('challenges.claimedMessage'));
+      refreshProfile();
+      refreshChallenges();
+    } catch {
+      Alert.alert(t('common:errors.alertTitle'), t('challenges.claimError'));
+    } finally {
+      setClaimingChallengeId(null);
+    }
+  }
+
+  async function handlePurchaseShopItem(item: ShopItem) {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const cost = getShopItemCost(item);
+    const currentBalance = shopBalanceOverride ?? shopData?.meta?.user_xp ?? getProfileXp((profileData?.data ?? {}) as ApiProfile);
+    if (currentBalance < cost) {
+      Alert.alert(t('shop.notEnoughXp'), t('shop.notEnoughXpDescription', { xp: cost - currentBalance }));
+      return;
+    }
+
+    setPurchasingShopItemId(item.id);
+    try {
+      await purchaseShopItem(item.id);
+      setShopItemOverrides((current) => ({
+        ...current,
+        [item.id]: { user_purchases: numberOrFallback(item.user_purchases) + 1, can_purchase: false },
+      }));
+      setShopBalanceOverride(currentBalance - cost);
+      Alert.alert(t('shop.purchaseComplete'), t('shop.purchaseCompleteDescription', { name: item.name }));
+      refreshProfile();
+      refreshShop();
+    } catch {
+      Alert.alert(t('common:errors.alertTitle'), t('shop.purchaseError'));
+    } finally {
+      setPurchasingShopItemId(null);
+    }
+  }
+
+  function getSelectedShowcaseKeys(currentBadges: ApiBadge[]) {
+    return showcaseKeysOverride ?? new Set(currentBadges.filter((badge) => badge.is_showcased).map(getBadgeShowcaseKey));
+  }
+
+  function handleToggleShowcaseBadge(badge: ApiBadge) {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const key = getBadgeShowcaseKey(badge);
+    const next = new Set(getSelectedShowcaseKeys(badges));
+    if (next.has(key)) {
+      next.delete(key);
+    } else if (next.size < 5) {
+      next.add(key);
+    }
+    setShowcaseKeysOverride(next);
+  }
+
+  async function handleSaveShowcase() {
+    const selectedKeys = Array.from(getSelectedShowcaseKeys(badges));
+    setIsSavingShowcase(true);
+    try {
+      await updateBadgeShowcase(selectedKeys);
+      setShowcaseKeysOverride(new Set(selectedKeys));
+      Alert.alert(t('showcase.updated'), t('showcase.updatedDescription'));
+      refreshBadges();
+    } catch {
+      Alert.alert(t('common:errors.alertTitle'), t('showcase.saveError'));
+    } finally {
+      setIsSavingShowcase(false);
+    }
+  }
+
   const profile = (profileData?.data ?? null) as ApiProfile | null;
   const badges = (badgesData?.data ?? []) as ApiBadge[];
   const leaderboardEntries = (leaderboardData?.data ?? []) as ApiLeaderboardEntry[];
-  const userRank = leaderboardData?.meta.user_rank ?? leaderboardData?.meta.your_position ?? null;
+  const nexusScore = (nexusScoreData?.data ?? null) as ApiNexusScore | null;
+  const dailyReward = dailyRewardOverride ?? dailyRewardData?.data ?? null;
+  const challenges = ((challengesData?.data ?? []) as Challenge[]).map((challenge) => ({
+    ...challenge,
+    ...(challengeOverrides[challenge.id] ?? {}),
+  }));
+  const collections = (collectionsData?.data ?? []) as BadgeCollection[];
+  const shopItems = ((shopData?.data ?? []) as ShopItem[]).map((item) => ({
+    ...item,
+    ...(shopItemOverrides[item.id] ?? {}),
+  }));
+  const shopBalance = shopBalanceOverride ?? shopData?.meta?.user_xp ?? (profile ? getProfileXp(profile) : 0);
+  const userRank = leaderboardData?.meta?.user_rank ?? leaderboardData?.meta?.your_position ?? null;
   const earnedCount = useMemo(() => badges.filter((badge) => isBadgeEarned(badge)).length, [badges]);
   const lockedCount = Math.max(0, badges.length - earnedCount);
+  const selectedShowcaseKeys = getSelectedShowcaseKeys(badges);
 
   const periods: { key: LeaderboardPeriod; label: string }[] = [
     { key: 'weekly', label: t('leaderboard.weekly') },
@@ -519,7 +1310,7 @@ export default function GamificationScreen() {
     { key: 'all_time', label: t('leaderboard.allTime') },
   ];
 
-  const isLoading = profileLoading || badgesLoading;
+  const isLoading = profileLoading || badgesLoading || scoreLoading || rewardLoading || challengesLoading || collectionsLoading || shopLoading;
 
   return (
     <ModalErrorBoundary>
@@ -555,6 +1346,15 @@ export default function GamificationScreen() {
               />
             ) : null}
 
+            <DailyRewardCard
+              status={dailyReward}
+              isClaiming={isClaimingReward}
+              onClaim={handleClaimDailyReward}
+              primary={primary}
+              theme={theme}
+              t={t}
+            />
+
             <Surface variant="default" className="gap-3 rounded-panel p-3">
               <View className="flex-row gap-2">
                 <SegmentButton
@@ -563,9 +1363,29 @@ export default function GamificationScreen() {
                   onPress={() => selectTab('badges')}
                 />
                 <SegmentButton
+                  label={t('challenges.title')}
+                  isSelected={activeTab === 'challenges'}
+                  onPress={() => selectTab('challenges')}
+                />
+                <SegmentButton
+                  label={t('journeys.title')}
+                  isSelected={activeTab === 'journeys'}
+                  onPress={() => selectTab('journeys')}
+                />
+                <SegmentButton
                   label={t('leaderboard.title')}
                   isSelected={activeTab === 'leaderboard'}
                   onPress={() => selectTab('leaderboard')}
+                />
+                <SegmentButton
+                  label={t('nexusScore.title')}
+                  isSelected={activeTab === 'score'}
+                  onPress={() => selectTab('score')}
+                />
+                <SegmentButton
+                  label={t('shop.title')}
+                  isSelected={activeTab === 'shop'}
+                  onPress={() => selectTab('shop')}
                 />
               </View>
 
@@ -587,12 +1407,32 @@ export default function GamificationScreen() {
               ) : null}
             </Surface>
 
-            {activeTab === 'badges' ? (
+            {activeTab === 'score' ? (
+              <NexusScoreSection score={nexusScore} primary={primary} theme={theme} t={t} />
+            ) : activeTab === 'challenges' ? (
+              <ChallengesSection challenges={challenges} claimingId={claimingChallengeId} onClaim={handleClaimChallengeReward} primary={primary} theme={theme} t={t} />
+            ) : activeTab === 'journeys' ? (
+              <JourneysSection collections={collections} primary={primary} theme={theme} t={t} />
+            ) : activeTab === 'shop' ? (
+              <ShopSection items={shopItems} balance={shopBalance} purchasingId={purchasingShopItemId} onPurchase={handlePurchaseShopItem} primary={primary} theme={theme} t={t} />
+            ) : activeTab === 'badges' ? (
               badges.length > 0 ? (
-                <View className="flex-row flex-wrap gap-3">
-                  {badges.map((badge) => (
-                    <BadgeCard key={getBadgeKey(badge)} badge={badge} primary={primary} theme={theme} t={t} />
-                  ))}
+                <View className="gap-3">
+                  <ShowcaseManager
+                    badges={badges}
+                    selectedKeys={selectedShowcaseKeys}
+                    saving={isSavingShowcase}
+                    onToggle={handleToggleShowcaseBadge}
+                    onSave={handleSaveShowcase}
+                    primary={primary}
+                    theme={theme}
+                    t={t}
+                  />
+                  <View className="flex-row flex-wrap gap-3">
+                    {badges.map((badge) => (
+                      <BadgeCard key={getBadgeKey(badge)} badge={badge} primary={primary} theme={theme} t={t} />
+                    ))}
+                  </View>
                 </View>
               ) : (
                 <EmptyState icon="ribbon-outline" message={t('badges.empty')} primary={primary} />

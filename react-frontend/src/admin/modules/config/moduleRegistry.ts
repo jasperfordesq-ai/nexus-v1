@@ -41,6 +41,7 @@ import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import Mail from 'lucide-react/icons/mail';
 import Languages from 'lucide-react/icons/languages';
+import GraduationCap from 'lucide-react/icons/graduation-cap';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -674,6 +675,24 @@ const FEATURE_MODULES: ModuleDefinition[] = [
     type: 'feature',
     configSource: 'tenant_features',
     configOptions: [],
+  },
+  {
+    id: 'courses',
+    name: 'Courses',
+    description: 'Community learning — courses, lessons, quizzes, enrollment, and certificates.',
+    icon: GraduationCap,
+    type: 'feature',
+    configSource: 'tenant_features',
+    detailPageUrl: '/admin/courses',
+    stage: 'alpha',
+    configOptions: [
+      { key: 'courses.allow_member_authoring', label: 'Member Authoring', description: 'Allow any member to create courses (on by default). Turn off to restrict authoring to granted instructors and admins.', type: 'boolean', defaultValue: true, category: 'Authoring' },
+      { key: 'courses.moderation_enabled', label: 'Require Moderation', description: 'New courses must be approved by an admin before publishing', type: 'boolean', defaultValue: false, category: 'Moderation' },
+      { key: 'courses.learner_credit_reward', label: 'Learn-to-Earn Credits', description: 'Default time credits awarded to a learner on course completion (Phase 3)', type: 'number', defaultValue: 0, category: 'Time Credits', comingSoon: true, min: 0, max: 100 },
+      { key: 'courses.instructor_credit_reward', label: 'Teach-to-Earn Credits', description: 'Default time credits awarded to an instructor per completion (Phase 3)', type: 'number', defaultValue: 0, category: 'Time Credits', comingSoon: true, min: 0, max: 100 },
+      { key: 'courses.award_xp', label: 'Award XP & Badges', description: 'Award gamification XP and a graduate badge on course completion', type: 'boolean', defaultValue: true, category: 'Gamification' },
+      { key: 'courses.post_completions_to_feed', label: 'Post Completions to Feed', description: 'Celebrate course completions in the community activity feed (Phase 3)', type: 'boolean', defaultValue: true, category: 'Social', comingSoon: true },
+    ],
   },
 ];
 

@@ -44,7 +44,35 @@ vi.mock('@/contexts', () => ({
   useTenant: () => ({ tenant: { id: 2, name: 'Test', slug: 'test', tagline: null }, branding: { name: 'Test', logo_url: null }, tenantSlug: 'test', tenantPath: (p: string) => '/test' + p, isLoading: false, hasFeature: vi.fn(() => true), hasModule: vi.fn(() => true) }),
 }));
 
-vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
+// The component opens the create-announcement form inside a <Modal isOpen>
+// gated by useDisclosure(). The shared uiMock's useDisclosure is a static
+// { isOpen: false } stub that never flips, so clicking "New Announcement"
+// (onPress={onOpen}) never opens the modal and the Post button never mounts.
+// Compose the shared uiMock via a Proxy and override ONLY useDisclosure with a
+// real stateful hook; the uiMock Modal already honors isOpen and invokes
+// render-prop children, so the real handleCreate/onChange wiring runs.
+vi.mock('@/components/ui', async () => {
+  const React = await import('react');
+  const { uiMock } = await import('@/test/uiMock');
+
+  function useDisclosureStub(defaultOpen = false) {
+    const [isOpen, setIsOpen] = React.useState(defaultOpen);
+    return {
+      isOpen,
+      onOpen: () => setIsOpen(true),
+      onClose: () => setIsOpen(false),
+      onOpenChange: (open?: boolean) => setIsOpen((prev) => (typeof open === 'boolean' ? open : !prev)),
+      onToggle: () => setIsOpen((prev) => !prev),
+    };
+  }
+
+  return new Proxy(uiMock, {
+    get(target, prop) {
+      if (prop === 'useDisclosure') return useDisclosureStub;
+      return Reflect.get(target, prop);
+    },
+  });
+});
 
 vi.mock('@/components/feedback', () => ({
   EmptyState: ({ title, description }: { title: string; description?: string }) => (

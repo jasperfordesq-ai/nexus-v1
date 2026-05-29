@@ -27,6 +27,20 @@
     "submit": "Cruthaigh sprioc",
     "error": "Níorbh fhéidir an sprioc a chruthú."
   },
+  "templates": {
+    "open": "Use template",
+    "title": "Goal templates",
+    "subtitle": "Start from a proven structure and adjust it as you progress.",
+    "loadError": "Could not load goal templates.",
+    "empty": "No templates are available yet.",
+    "emptyCategory": "No templates are available in this category.",
+    "allCategories": "All",
+    "use": "Use",
+    "useLabel": "Use {{title}}",
+    "target": "{{value}} target",
+    "duration": "{{days}} days",
+    "createError": "Could not create a goal from this template."
+  },
   "updateError": "Níorbh fhéidir an sprioc a nuashonrú.",
   "details": "Details",
   "detail": {

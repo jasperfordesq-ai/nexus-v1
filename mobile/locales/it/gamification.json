@@ -21,5 +21,91 @@
     "empty": "Nessuna classifica ancora.",
     "badgesCount": "{{count}} distintivo",
     "badgesCount_other": "{{count}} distintivi"
+  },
+  "subtitle": "Track your level, badges, streak, and community standing.",
+  "heroEyebrow": "Community progress",
+  "streakNone": "No active streak",
+  "stats": {
+    "totalXp": "Total XP",
+    "earnedBadges": "Earned badges",
+    "lockedBadges": "Locked badges",
+    "rank": "Current rank",
+    "streak": "Streak"
+  },
+  "nexusScore": {
+    "title": "Nexus Score",
+    "eyebrow": "Reputation score",
+    "subtitle": "See the signals that shape your community reputation.",
+    "total": "Total score",
+    "scoreValue": "{{score}} / {{max}}",
+    "percentile": "Top {{percentile}} percentile",
+    "categoryScore": "{{score}} of {{max}}",
+    "percent": "{{percent}}%",
+    "insights": "Insights",
+    "empty": "No Nexus Score yet.",
+    "tierFallback": "Starter"
+  },
+  "dailyReward": {
+    "title": "Daily reward",
+    "claimToday": "Claim {{xp}} XP today",
+    "comeBackTomorrow": "Come back tomorrow for {{xp}} XP",
+    "streak": "{{count}} day streak",
+    "streak_other": "{{count}} day streak",
+    "claimReward": "Claim reward",
+    "claiming": "Claiming",
+    "claimed": "Claimed",
+    "claimedTitle": "Reward claimed",
+    "claimedMessage": "You earned {{xp}} XP.",
+    "claimError": "Could not claim reward."
+  },
+  "challenges": {
+    "title": "Challenges",
+    "empty": "No challenges yet.",
+    "active": "Active challenges",
+    "completed": "Completed challenges",
+    "xpReward": "{{xp}} XP",
+    "progress": "{{current}} / {{target}}",
+    "claimXp": "Claim {{xp}} XP",
+    "claimed": "Claimed",
+    "claimedTitle": "Challenge claimed",
+    "claimedMessage": "Challenge reward claimed.",
+    "claimError": "Could not claim challenge."
+  },
+  "journeys": {
+    "title": "Journeys",
+    "empty": "No journeys yet.",
+    "complete": "Complete",
+    "xpReward": "{{xp}} XP",
+    "badgesCollected": "{{earned}} of {{total}} badges"
+  },
+  "shop": {
+    "title": "Shop",
+    "yourBalance": "Balance: {{xp}} XP",
+    "empty": "No shop items yet.",
+    "xpCost": "{{xp}} XP",
+    "stockLeft": "{{count}} left",
+    "owned": "Owned",
+    "unavailable": "Unavailable",
+    "purchase": "Purchase",
+    "buying": "Buying",
+    "purchaseItem": "Purchase {{name}}",
+    "purchaseComplete": "Purchase complete",
+    "purchaseCompleteDescription": "{{name}} is yours.",
+    "notEnoughXp": "Not enough XP",
+    "notEnoughXpDescription": "You need {{xp}} more XP.",
+    "purchaseError": "Could not purchase item."
+  },
+  "showcase": {
+    "title": "Profile showcase",
+    "selectedCount": "{{count}} selected",
+    "save": "Save",
+    "saving": "Saving",
+    "noBadgesEarned": "No badges earned yet.",
+    "toggleBadge": "Toggle {{name}}",
+    "selected": "Selected",
+    "select": "Select",
+    "updated": "Showcase updated",
+    "updatedDescription": "Your profile showcase was updated.",
+    "saveError": "Could not save showcase."
   }
 }

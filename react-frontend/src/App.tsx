@@ -279,6 +279,14 @@ const SellerPickupSlotsPage = lazyWithRetry(() => import('./pages/marketplace/se
 const SellerPickupScanPage = lazyWithRetry(() => import('./pages/marketplace/seller/SellerPickupScanPage'));
 const MyPickupsPage = lazyWithRetry(() => import('./pages/marketplace/MyPickupsPage'));
 
+// Courses Pages (alpha)
+const CoursesPage = lazyWithRetry(() => import('./pages/courses/CoursesPage'));
+const CourseDetailPage = lazyWithRetry(() => import('./pages/courses/CourseDetailPage'));
+const CoursePlayerPage = lazyWithRetry(() => import('./pages/courses/CoursePlayerPage'));
+const MyLearningPage = lazyWithRetry(() => import('./pages/courses/MyLearningPage'));
+const InstructorDashboardPage = lazyWithRetry(() => import('./pages/courses/InstructorDashboardPage'));
+const CreateCoursePage = lazyWithRetry(() => import('./pages/courses/CreateCoursePage'));
+
 // Static Pages
 const FeaturesPage = lazyWithRetry(() => import('@/pages/public/FeaturesPage'));
 const ChangelogPage = lazyWithRetry(() => import('@/pages/public/ChangelogPage'));
@@ -488,6 +496,67 @@ function AppRoutes() {
           <FeatureGate feature="job_vacancies" redirect="/">
             <FeatureErrorBoundary featureName="Job Vacancies">
               <JobDetailPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* Courses Module (alpha) — feature-gated */}
+        <Route path="courses" element={
+          <FeatureGate feature="courses" redirect="/">
+            <FeatureErrorBoundary featureName="Courses">
+              <CoursesPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="courses/my-learning" element={
+          <ProtectedRoute>
+            <FeatureGate feature="courses" redirect="/">
+              <FeatureErrorBoundary featureName="Courses">
+                <MyLearningPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          </ProtectedRoute>
+        } />
+        <Route path="courses/instructor" element={
+          <ProtectedRoute>
+            <FeatureGate feature="courses" redirect="/">
+              <FeatureErrorBoundary featureName="Courses">
+                <InstructorDashboardPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          </ProtectedRoute>
+        } />
+        <Route path="courses/instructor/new" element={
+          <ProtectedRoute>
+            <FeatureGate feature="courses" redirect="/">
+              <FeatureErrorBoundary featureName="Courses">
+                <CreateCoursePage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          </ProtectedRoute>
+        } />
+        <Route path="courses/instructor/:id/edit" element={
+          <ProtectedRoute>
+            <FeatureGate feature="courses" redirect="/">
+              <FeatureErrorBoundary featureName="Courses">
+                <CreateCoursePage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          </ProtectedRoute>
+        } />
+        <Route path="courses/:id/learn" element={
+          <ProtectedRoute>
+            <FeatureGate feature="courses" redirect="/">
+              <FeatureErrorBoundary featureName="Courses">
+                <CoursePlayerPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          </ProtectedRoute>
+        } />
+        <Route path="courses/:idOrSlug" element={
+          <FeatureGate feature="courses" redirect="/">
+            <FeatureErrorBoundary featureName="Courses">
+              <CourseDetailPage />
             </FeatureErrorBoundary>
           </FeatureGate>
         } />

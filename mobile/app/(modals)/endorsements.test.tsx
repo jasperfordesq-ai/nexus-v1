@@ -5,7 +5,8 @@
 
 import React from 'react';
 import { Alert } from 'react-native';
-import { render, fireEvent } from '@testing-library/react-native';
+import { render, fireEvent, waitFor } from '@testing-library/react-native';
+import { router } from 'expo-router';
 
 // --- Mocks ---
 
@@ -26,6 +27,29 @@ jest.mock('react-i18next', () => ({
         'mySkills': 'My Skills',
         'skillsIntro': 'Keep your profile skills current.',
         'endorsementsIntro': 'Endorsements from other members.',
+        'discover.title': 'Discover',
+        'discover.subtitle': 'Browse skill categories shared by members.',
+        'discover.empty': 'No skill categories yet.',
+        'discover.emptyHint': 'Skill categories will appear here.',
+        'discover.skillsCount': opts ? `${String(opts.count ?? 0)} skills` : '0 skills',
+        'discover.subcategoriesCount': opts ? `${String(opts.count ?? 0)} subcategories` : '0 subcategories',
+        'discover.viewSkills': 'View skills',
+        'discover.skillsInCategory': opts ? `Skills in ${String(opts.category ?? '')}` : 'Skills in category',
+        'discover.noSkillsInCategory': 'No skills in this category yet.',
+        'discover.memberCount': opts ? `${String(opts.count ?? 0)} members` : '0 members',
+        'discover.offeringCount': opts ? `${String(opts.count ?? 0)} offering` : '0 offering',
+        'discover.requestingCount': opts ? `${String(opts.count ?? 0)} requesting` : '0 requesting',
+        'discover.viewMembers': 'View members',
+        'discover.membersWith': opts ? `Members with ${String(opts.skill ?? '')}` : 'Members with skill',
+        'discover.noMembers': 'No members found.',
+        'discover.profile': 'Profile',
+        'discover.offers': 'Offers',
+        'discover.wants': 'Wants',
+        'discover.memberFallback': 'Member',
+        'discover.openMember': opts ? `Open ${String(opts.name ?? 'Member')}` : 'Open member',
+        'discover.proficiency': opts ? `${String(opts.level ?? '')} proficiency` : 'Proficiency',
+        'discover.loadSkillsError': 'Could not load skills.',
+        'discover.loadMembersError': 'Could not load members.',
         'skillsCount': opts ? `${String(opts.count ?? 0)} skills` : '0 skills',
         'endorsementsCount': opts ? `${String(opts.count ?? 0)} endorsements` : '0 endorsements',
         'endorsements': 'Endorsements',
@@ -94,6 +118,17 @@ jest.mock('@expo/vector-icons', () => ({
 
 jest.mock('@/lib/api/endorsements', () => ({
   addSkill: jest.fn().mockResolvedValue(undefined),
+  getSkillCategories: jest.fn(),
+  getSkillCategory: jest.fn().mockResolvedValue({
+    data: {
+      id: 4,
+      name: 'Home & Garden',
+      skills: [{ skill_name: 'Gardening', user_count: 4, offering_count: 3, requesting_count: 1 }],
+    },
+  }),
+  getMembersWithSkill: jest.fn().mockResolvedValue({
+    data: [{ id: 7, first_name: 'Alice', last_name: 'Gardener', avatar: null, proficiency_level: 'advanced', is_offering: 1, is_requesting: 0 }],
+  }),
   getMySkills: jest.fn(),
   getUserEndorsements: jest.fn(),
   removeSkill: jest.fn().mockResolvedValue(undefined),
@@ -105,7 +140,7 @@ jest.mock('@/components/ui/LoadingSpinner', () => () => null);
 // --- Tests ---
 
 import EndorsementsScreen from './endorsements';
-import { removeSkill } from '@/lib/api/endorsements';
+import { getMembersWithSkill, getSkillCategory, removeSkill } from '@/lib/api/endorsements';
 
 const defaultApiState = { data: null, isLoading: false, error: null, refresh: jest.fn() };
 
@@ -113,6 +148,9 @@ beforeEach(() => {
   mockUseApi.mockReturnValue(defaultApiState);
   jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
   (removeSkill as jest.Mock).mockClear();
+  (getSkillCategory as jest.Mock).mockClear();
+  (getMembersWithSkill as jest.Mock).mockClear();
+  (router.push as jest.Mock).mockClear();
 });
 
 afterEach(() => {
@@ -133,6 +171,14 @@ const mockEndorsement = {
   created_at: '2026-01-20T10:00:00Z',
 };
 
+const mockSkillCategory = {
+  id: 4,
+  name: 'Home & Garden',
+  description: 'Practical home, repair, and gardening skills.',
+  skills_count: 5,
+  children: [{ id: 5, name: 'Gardening', skills_count: 3, children: [] }],
+};
+
 describe('EndorsementsScreen', () => {
   it('renders without crashing', () => {
     const { toJSON } = render(<EndorsementsScreen />);
@@ -143,6 +189,7 @@ describe('EndorsementsScreen', () => {
     const { getByText } = render(<EndorsementsScreen />);
     expect(getByText('My Skills')).toBeTruthy();
     expect(getByText('Endorsements')).toBeTruthy();
+    expect(getByText('Discover')).toBeTruthy();
   });
 
   it('renders the empty skills state on the Skills tab', () => {
@@ -166,13 +213,15 @@ describe('EndorsementsScreen', () => {
   });
 
   it('switches to the Endorsements tab and renders endorsement cards', () => {
-    let callCount = 0;
-    mockUseApi.mockImplementation(() => {
-      callCount += 1;
-      if (callCount % 2 === 1) {
+    mockUseApi.mockImplementation((loader: unknown) => {
+      const source = String(loader);
+      if (source.includes('getMySkills')) {
         return { data: { data: { skills: [] } }, isLoading: false, error: null, refresh: jest.fn() };
       }
-      return { data: { data: [mockEndorsement] }, isLoading: false, error: null, refresh: jest.fn() };
+      if (source.includes('getUserEndorsements')) {
+        return { data: { data: [mockEndorsement] }, isLoading: false, error: null, refresh: jest.fn() };
+      }
+      return { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
     });
 
     const { getByText } = render(<EndorsementsScreen />);
@@ -185,6 +234,60 @@ describe('EndorsementsScreen', () => {
     const { getByText } = render(<EndorsementsScreen />);
     fireEvent.press(getByText('Endorsements'));
     expect(getByText('No endorsements yet.')).toBeTruthy();
+  });
+
+  it('switches to Discover and renders skill category cards', () => {
+    mockUseApi.mockImplementation((loader: unknown) => {
+      const source = String(loader);
+      if (source.includes('getMySkills')) {
+        return { data: { data: { skills: [] } }, isLoading: false, error: null, refresh: jest.fn() };
+      }
+      if (source.includes('getUserEndorsements')) {
+        return { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
+      }
+      return { data: { data: [mockSkillCategory] }, isLoading: false, error: null, refresh: jest.fn() };
+    });
+
+    const { getByText } = render(<EndorsementsScreen />);
+    fireEvent.press(getByText('Discover'));
+
+    expect(getByText('Home & Garden')).toBeTruthy();
+    expect(getByText('Practical home, repair, and gardening skills.')).toBeTruthy();
+    expect(getByText('5 skills')).toBeTruthy();
+    expect(getByText('1 subcategories')).toBeTruthy();
+  });
+
+  it('opens a category, lists its skills, and opens members with that skill', async () => {
+    mockUseApi.mockImplementation((loader: unknown) => {
+      const source = String(loader);
+      if (source.includes('getMySkills')) {
+        return { data: { data: { skills: [] } }, isLoading: false, error: null, refresh: jest.fn() };
+      }
+      if (source.includes('getUserEndorsements')) {
+        return { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
+      }
+      return { data: { data: [mockSkillCategory] }, isLoading: false, error: null, refresh: jest.fn() };
+    });
+
+    const { findByText, getByLabelText, getByText } = render(<EndorsementsScreen />);
+    fireEvent.press(getByText('Discover'));
+    fireEvent.press(getByText('View skills'));
+
+    expect(getSkillCategory).toHaveBeenCalledWith(4);
+    expect(await findByText('Gardening')).toBeTruthy();
+    expect(getByText('4 members')).toBeTruthy();
+    expect(getByText('3 offering')).toBeTruthy();
+    expect(getByText('1 requesting')).toBeTruthy();
+
+    fireEvent.press(getByText('View members'));
+
+    await waitFor(() => expect(getMembersWithSkill).toHaveBeenCalledWith('Gardening'));
+    expect(await findByText('Alice Gardener')).toBeTruthy();
+    expect(getByText('advanced proficiency')).toBeTruthy();
+    expect(getByText('Offers')).toBeTruthy();
+
+    fireEvent.press(getByLabelText('Open Alice Gardener'));
+    expect(router.push).toHaveBeenCalledWith({ pathname: '/(modals)/member-profile', params: { id: '7' } });
   });
 
   it('uses translated titles when confirming and completing skill removal', async () => {

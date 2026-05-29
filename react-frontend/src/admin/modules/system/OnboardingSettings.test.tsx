@@ -56,6 +56,54 @@ vi.mock('@/contexts/ToastContext', () => ({
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
+// The component renders the real HeroUI Switch, which places its label text as
+// a SIBLING of the checkbox input (not inside a wrapping <label>). The test
+// locates the toggle via getByText('Onboarding Enabled').closest('label')
+//   .querySelector('input[type="checkbox"]'), which needs the label and the
+// checkbox to share a <label> ancestor. Override ONLY Switch with a faithful
+// stub that renders <label>{children}<input/></label> and forwards
+// onValueChange(checked); everything else (Modal, useDisclosure, Button, Input,
+// …) delegates to the REAL @/components/ui so the preset-modal tests, which
+// depend on the real useDisclosure + Modal open/close behaviour, keep working.
+//   <Switch isSelected={config.enabled} onValueChange={(v) => updateConfig('enabled', v)}>…</Switch>
+vi.mock('@/components/ui', async () => {
+  const React = await import('react');
+  const actual = await vi.importActual<Record<string, unknown>>('@/components/ui');
+
+  function SwitchStub(props: Record<string, unknown>) {
+    const { isSelected, onValueChange, isDisabled, label, children, 'aria-label': ariaLabel } =
+      props as {
+        isSelected?: boolean;
+        onValueChange?: (v: boolean) => void;
+        isDisabled?: boolean;
+        label?: React.ReactNode;
+        children?: React.ReactNode;
+        'aria-label'?: string;
+      };
+    return React.createElement(
+      'label',
+      null,
+      React.createElement('input', {
+        type: 'checkbox',
+        checked: Boolean(isSelected),
+        disabled: isDisabled || undefined,
+        'aria-label': ariaLabel,
+        onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+          if (typeof onValueChange === 'function') onValueChange(e.target.checked);
+        },
+      }),
+      (label ?? children) as React.ReactNode,
+    );
+  }
+
+  return new Proxy(actual, {
+    get(target, prop) {
+      if (prop === 'Switch') return SwitchStub;
+      return Reflect.get(target, prop);
+    },
+  });
+});
+
 // Mock the admin PageHeader component
 vi.mock('../../components', () => ({
   PageHeader: ({ title, description }: { title: string; description: string }) => (

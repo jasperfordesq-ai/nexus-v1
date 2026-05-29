@@ -300,6 +300,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
       { label: t('nav.resources'), desc: t('nav_desc.resources'), path: '/resources', href: tenantPath('/resources'), icon: FolderOpen, feature: 'resources' as const },
       { label: t('nav.jobs'), desc: t('nav_desc.jobs'), path: '/jobs', href: tenantPath('/jobs'), icon: Briefcase, feature: 'job_vacancies' as const },
       { label: t('nav.marketplace'), desc: t('nav_desc.marketplace'), path: '/marketplace', href: tenantPath('/marketplace'), icon: ShoppingBag, feature: 'marketplace' as const },
+      { label: t('nav.courses'), desc: t('nav_desc.courses'), path: '/courses', href: tenantPath('/courses'), icon: GraduationCap, feature: 'courses' as const },
       { label: t('nav.premium'), desc: t('nav_desc.premium'), path: '/premium', href: tenantPath('/premium'), icon: Crown, feature: 'member_premium' as const },
     );
     return items;

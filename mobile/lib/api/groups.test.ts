@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 jest.mock('@/lib/api/client', () => ({
-  api: { get: jest.fn(), post: jest.fn(), put: jest.fn(), delete: jest.fn(), patch: jest.fn() },
+  api: { get: jest.fn(), post: jest.fn(), put: jest.fn(), delete: jest.fn(), patch: jest.fn(), upload: jest.fn() },
   ApiResponseError: class ApiResponseError extends Error {
     status!: number;
     constructor(status: number, message: string) { super(message); this.status = status; this.name = 'ApiResponseError'; }
@@ -22,20 +22,40 @@ jest.mock('@/lib/constants', () => ({
 import { api } from '@/lib/api/client';
 import {
   createGroupAnnouncement,
+  acceptGroupAnswer,
   answerGroupQuestion,
+  createGroupTask,
+  createGroupWikiPage,
+  deleteGroupFile,
+  deleteGroupMedia,
+  deleteGroupTask,
   deleteGroupAnnouncement,
+  deleteGroupWikiPage,
   createGroupQuestion,
   getGroups,
   getGroup,
+  getGroupAnalytics,
+  getGroupAnalyticsComparative,
+  getGroupAnalyticsRetention,
   getGroupAnnouncements,
   getGroupFiles,
   getGroupQuestion,
   getGroupQuestions,
+  getGroupMedia,
+  getGroupTasks,
+  getGroupTaskStats,
   getGroupTemplates,
+  getGroupWikiPage,
+  getGroupWikiPages,
+  getGroupWikiRevisions,
   joinGroup,
   leaveGroup,
   updateGroup,
   updateGroupAnnouncement,
+  updateGroupTask,
+  updateGroupWikiPage,
+  uploadGroupMedia,
+  voteGroupQA,
 } from './groups';
 import type { GroupsResponse, GroupDetail } from './groups';
 
@@ -224,6 +244,102 @@ describe('group file helpers', () => {
     expect(api.get).toHaveBeenCalledWith('/api/v2/groups/7/files', { per_page: '20' });
     expect(result.data.items).toEqual([]);
   });
+
+  it('deletes a group file', async () => {
+    (api.delete as jest.Mock).mockResolvedValue({ data: { message: 'Deleted' } });
+
+    await deleteGroupFile(7, 31);
+
+    expect(api.delete).toHaveBeenCalledWith('/api/v2/groups/7/files/31');
+  });
+});
+
+describe('group media helpers', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('loads group media with default page size', async () => {
+    const response = { data: { items: [], cursor: null, has_more: false } };
+    (api.get as jest.Mock).mockResolvedValue(response);
+
+    const result = await getGroupMedia(7);
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/groups/7/media', { per_page: '20' });
+    expect(result.data.items).toEqual([]);
+  });
+
+  it('loads group media with a type filter', async () => {
+    (api.get as jest.Mock).mockResolvedValue({ data: { items: [], cursor: null, has_more: false } });
+
+    await getGroupMedia(7, { type: 'video' });
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/groups/7/media', { per_page: '20', type: 'video' });
+  });
+
+  it('deletes a group media item', async () => {
+    (api.delete as jest.Mock).mockResolvedValue({ data: { message: 'Deleted' } });
+
+    await deleteGroupMedia(7, 81);
+
+    expect(api.delete).toHaveBeenCalledWith('/api/v2/groups/7/media/81');
+  });
+
+  it('uploads group media as multipart form data', async () => {
+    (api.upload as jest.Mock).mockResolvedValue({
+      data: { id: 82, url: '/uploads/groups/media.jpg', type: 'image', uploaded_by: 10, created_at: '2026-06-01T00:00:00Z' },
+    });
+
+    const result = await uploadGroupMedia(7, {
+      uri: 'file:///tmp/group-media.jpg',
+      fileName: 'group-media.jpg',
+      mimeType: 'image/jpeg',
+    });
+
+    expect(api.upload).toHaveBeenCalledWith('/api/v2/groups/7/media', expect.any(FormData));
+    expect(result.data.id).toBe(82);
+  });
+});
+
+describe('group analytics helpers', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('loads the group analytics dashboard with a day window', async () => {
+    const response = {
+      data: {
+        overview: { total_members: 12 },
+        member_growth: [],
+        engagement: { timeline: [], summary: { active_members: 6 } },
+        top_contributors: [],
+        content_performance: [],
+        activity_breakdown: { total: 0 },
+      },
+    };
+    (api.get as jest.Mock).mockResolvedValue(response);
+
+    const result = await getGroupAnalytics(7, 90);
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/groups/7/analytics', { days: '90' });
+    expect(result.data.overview.total_members).toBe(12);
+  });
+
+  it('loads group retention analytics with a month window', async () => {
+    const response = { data: [{ month: '2026-06', joined: 4, still_active: 3, retention_rate: 75 }] };
+    (api.get as jest.Mock).mockResolvedValue(response);
+
+    const result = await getGroupAnalyticsRetention(7, 12);
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/groups/7/analytics/retention', { months: '12' });
+    expect(result.data[0].retention_rate).toBe(75);
+  });
+
+  it('loads group comparative analytics', async () => {
+    const response = { data: { group_members: 12, avg_members: 8, percentile: 80, total_groups: 5, rank: 2 } };
+    (api.get as jest.Mock).mockResolvedValue(response);
+
+    const result = await getGroupAnalyticsComparative(7);
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/groups/7/analytics/comparative');
+    expect(result.data.rank).toBe(2);
+  });
 });
 
 describe('group Q&A helpers', () => {
@@ -258,6 +374,23 @@ describe('group Q&A helpers', () => {
     expect(api.post).toHaveBeenCalledWith('/api/v2/groups/7/questions', payload);
   });
 
+  it('votes on a group question or answer', async () => {
+    const payload = { type: 'question' as const, target_id: 4, vote: 'up' as const };
+    (api.post as jest.Mock).mockResolvedValue({ data: { message: 'Vote recorded' } });
+
+    await voteGroupQA(7, payload);
+
+    expect(api.post).toHaveBeenCalledWith('/api/v2/groups/7/qa/vote', payload);
+  });
+
+  it('accepts a group answer', async () => {
+    (api.post as jest.Mock).mockResolvedValue({ data: { message: 'Accepted' } });
+
+    await acceptGroupAnswer(7, 50);
+
+    expect(api.post).toHaveBeenCalledWith('/api/v2/groups/7/answers/50/accept', {});
+  });
+
   it('answers a group question', async () => {
     const payload = { body: 'Use a lidded outdoor bin.' };
     (api.post as jest.Mock).mockResolvedValue({ data: { id: 5, question_id: 4 } });
@@ -265,6 +398,123 @@ describe('group Q&A helpers', () => {
     await answerGroupQuestion(7, 4, payload);
 
     expect(api.post).toHaveBeenCalledWith('/api/v2/groups/7/questions/4/answers', payload);
+  });
+});
+
+describe('group wiki helpers', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('loads group wiki pages', async () => {
+    const response = { data: [{ id: 12, title: 'Compost guide', slug: 'compost-guide' }] };
+    (api.get as jest.Mock).mockResolvedValue(response);
+
+    const result = await getGroupWikiPages(7);
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/groups/7/wiki');
+    expect(result.data[0].slug).toBe('compost-guide');
+  });
+
+  it('loads one group wiki page by slug', async () => {
+    const response = { data: { id: 12, title: 'Compost guide', slug: 'compost-guide', content: 'Use a lidded bin.' } };
+    (api.get as jest.Mock).mockResolvedValue(response);
+
+    const result = await getGroupWikiPage(7, 'compost-guide');
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/groups/7/wiki/compost-guide');
+    expect(result.data.content).toBe('Use a lidded bin.');
+  });
+
+  it('creates a group wiki page', async () => {
+    const payload = { title: 'Tool care', content: 'Clean tools after use.' };
+    (api.post as jest.Mock).mockResolvedValue({ data: { id: 13, ...payload } });
+
+    await createGroupWikiPage(7, payload);
+
+    expect(api.post).toHaveBeenCalledWith('/api/v2/groups/7/wiki', payload);
+  });
+
+  it('updates a group wiki page', async () => {
+    const payload = { title: 'Tool care', content: 'Keep tools dry.', change_summary: 'Clarified storage.' };
+    (api.put as jest.Mock).mockResolvedValue({ data: { id: 13, ...payload } });
+
+    await updateGroupWikiPage(7, 13, payload);
+
+    expect(api.put).toHaveBeenCalledWith('/api/v2/groups/7/wiki/13', payload);
+  });
+
+  it('loads group wiki revisions', async () => {
+    const response = { data: [{ id: 99, content: 'Old copy', change_summary: 'Initial', editor: { id: 10, name: 'Alice' } }] };
+    (api.get as jest.Mock).mockResolvedValue(response);
+
+    const result = await getGroupWikiRevisions(7, 13);
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/groups/7/wiki/13/revisions');
+    expect(result.data[0].content).toBe('Old copy');
+  });
+
+  it('deletes a group wiki page', async () => {
+    (api.delete as jest.Mock).mockResolvedValue({ data: { message: 'Deleted' } });
+
+    await deleteGroupWikiPage(7, 13);
+
+    expect(api.delete).toHaveBeenCalledWith('/api/v2/groups/7/wiki/13');
+  });
+});
+
+describe('group task helpers', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('loads group tasks with default page size', async () => {
+    const response = { data: [], meta: { cursor: null, has_more: false } };
+    (api.get as jest.Mock).mockResolvedValue(response);
+
+    const result = await getGroupTasks(7);
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/groups/7/tasks', { per_page: '50' });
+    expect(result.data).toEqual([]);
+  });
+
+  it('loads group tasks with a status filter', async () => {
+    (api.get as jest.Mock).mockResolvedValue({ data: [], meta: { cursor: null, has_more: false } });
+
+    await getGroupTasks(7, { status: 'in_progress' });
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/groups/7/tasks', { per_page: '50', status: 'in_progress' });
+  });
+
+  it('loads group task stats', async () => {
+    const response = { data: { total: 2, todo: 1, in_progress: 1, done: 0, overdue: 0 } };
+    (api.get as jest.Mock).mockResolvedValue(response);
+
+    const result = await getGroupTaskStats(7);
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/groups/7/task-stats');
+    expect(result.data.total).toBe(2);
+  });
+
+  it('creates a group task', async () => {
+    const payload = { title: 'Water seedlings', description: 'Use the small greenhouse cans.', priority: 'high' as const };
+    (api.post as jest.Mock).mockResolvedValue({ data: { id: 70, ...payload } });
+
+    await createGroupTask(7, payload);
+
+    expect(api.post).toHaveBeenCalledWith('/api/v2/groups/7/tasks', payload);
+  });
+
+  it('updates a group task', async () => {
+    (api.put as jest.Mock).mockResolvedValue({ data: { id: 70, status: 'done' } });
+
+    await updateGroupTask(70, { status: 'done' });
+
+    expect(api.put).toHaveBeenCalledWith('/api/v2/team-tasks/70', { status: 'done' });
+  });
+
+  it('deletes a group task', async () => {
+    (api.delete as jest.Mock).mockResolvedValue(undefined);
+
+    await deleteGroupTask(70);
+
+    expect(api.delete).toHaveBeenCalledWith('/api/v2/team-tasks/70');
   });
 });
 

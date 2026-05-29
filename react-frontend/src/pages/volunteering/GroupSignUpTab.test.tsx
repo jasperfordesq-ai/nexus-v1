@@ -39,7 +39,35 @@ vi.mock("@/lib/api", () => ({
   },
 }));
 
-vi.mock("@/components/ui", async () => (await import("@/test/uiMock")).uiMock);
+// The Add Member modal is gated by useDisclosure() + <Modal isOpen>. The shared
+// uiMock's useDisclosure is a static { isOpen: false } stub that never flips, and
+// the uiMock Modal now honors isOpen — so the modal content stays hidden until
+// the trigger is clicked. Compose the shared uiMock via a Proxy and override ONLY
+// useDisclosure with a real stateful hook so clicking "Add Member" opens the
+// modal and the real handleAddMember/search wiring runs.
+vi.mock("@/components/ui", async () => {
+  const ReactMod = await import("react");
+  const { uiMock } = await import("@/test/uiMock");
+
+  function useDisclosureStub(defaultOpen = false) {
+    const [isOpen, setIsOpen] = ReactMod.useState(defaultOpen);
+    return {
+      isOpen,
+      onOpen: () => setIsOpen(true),
+      onClose: () => setIsOpen(false),
+      onOpenChange: (open?: boolean) =>
+        setIsOpen((prev) => (typeof open === "boolean" ? open : !prev)),
+      onToggle: () => setIsOpen((prev) => !prev),
+    };
+  }
+
+  return new Proxy(uiMock, {
+    get(target, prop) {
+      if (prop === "useDisclosure") return useDisclosureStub;
+      return Reflect.get(target, prop);
+    },
+  });
+});
 
 vi.mock("@/components/feedback", () => ({
   EmptyState: ({ title, description }: { title: string; description?: string }) => (

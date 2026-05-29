@@ -208,6 +208,7 @@ const TranslationConfig = lazy(() => import('./modules/config/TranslationConfig'
 
 // Marketplace module
 const MarketplaceAdmin = lazy(() => import('./modules/marketplace/MarketplaceAdmin'));
+const CoursesAdmin = lazy(() => import('./modules/courses/CoursesAdmin'));
 const MarketplaceModerationPage = lazy(() => import('./modules/marketplace/MarketplaceModerationPage'));
 const MarketplaceSellerAdmin = lazy(() => import('./modules/marketplace/MarketplaceSellerAdmin'));
 const AdminCouponsPage = lazy(() => import('./modules/marketplace/AdminCouponsPage'));
@@ -707,6 +708,9 @@ export function AdminRoutes() {
       <Route path="jobs/bias-audit" element={<Lazy><JobBiasAudit /></Lazy>} />
       <Route path="jobs/pipeline" element={<Lazy><JobPipelineOverview /></Lazy>} />
       <Route path="jobs/templates" element={<Lazy><JobTemplatesAdmin /></Lazy>} />
+
+      {/* ─── COURSES (ALPHA) ─── */}
+      <Route path="courses" element={<Lazy><CoursesAdmin /></Lazy>} />
 
       {/* ─── MARKETPLACE ─── */}
       <Route path="marketplace" element={<Lazy><MarketplaceAdmin /></Lazy>} />

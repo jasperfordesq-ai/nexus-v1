@@ -13,6 +13,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from '@/lib/haptics';
 import { Button as HeroButton, Card as HeroCard, Chip, Surface, Tabs } from 'heroui-native';
@@ -20,11 +21,17 @@ import { useTranslation } from 'react-i18next';
 
 import {
   addSkill,
+  getMembersWithSkill,
   getMySkills,
+  getSkillCategory,
+  getSkillCategories,
   getUserEndorsements,
   removeSkill,
+  type CategorySkill,
   type Endorsement,
   type Skill,
+  type SkillCategory,
+  type SkillMember,
 } from '@/lib/api/endorsements';
 import { useApi } from '@/lib/hooks/useApi';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -38,8 +45,21 @@ import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
-type Tab = 'skills' | 'endorsements';
+type Tab = 'skills' | 'endorsements' | 'discover';
 type ListItem = Skill | Endorsement;
+
+function getSkillMemberName(member: SkillMember, fallback: string) {
+  return member.name ?? ([member.first_name, member.last_name].filter(Boolean).join(' ') || fallback);
+}
+
+function asCount(value: number | string | null | undefined) {
+  const count = typeof value === 'number' ? value : Number(value ?? 0);
+  return Number.isFinite(count) ? count : 0;
+}
+
+function isEnabledFlag(value: boolean | number | null | undefined) {
+  return value === true || value === 1;
+}
 
 export default function EndorsementsScreen() {
   const { t } = useTranslation(['endorsements', 'common']);
@@ -50,6 +70,12 @@ export default function EndorsementsScreen() {
   const [activeTab, setActiveTab] = useState<Tab>('skills');
   const [addingSkill, setAddingSkill] = useState(false);
   const [skillInput, setSkillInput] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<SkillCategory | null>(null);
+  const [categorySkills, setCategorySkills] = useState<CategorySkill[]>([]);
+  const [loadingCategoryId, setLoadingCategoryId] = useState<number | null>(null);
+  const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
+  const [skillMembers, setSkillMembers] = useState<SkillMember[]>([]);
+  const [loadingSkill, setLoadingSkill] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const skillInputRef = useRef<TextInput>(null);
@@ -67,6 +93,10 @@ export default function EndorsementsScreen() {
     isLoading: endorsementsLoading,
     refresh: refreshEndorsements,
   } = useApi(() => getUserEndorsements(userId), [userId], { enabled: userId > 0 });
+  const {
+    data: categoriesData,
+    isLoading: categoriesLoading,
+  } = useApi(() => getSkillCategories(), []);
 
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -76,6 +106,7 @@ export default function EndorsementsScreen() {
 
   const skills: Skill[] = skillsData?.data?.skills ?? [];
   const endorsements: Endorsement[] = endorsementsData?.data ?? [];
+  const categories: SkillCategory[] = categoriesData?.data ?? [];
 
   async function handleAddSkill() {
     const name = skillInput.trim();
@@ -92,6 +123,42 @@ export default function EndorsementsScreen() {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  async function handleOpenCategory(category: SkillCategory) {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setSelectedCategory(category);
+    setCategorySkills([]);
+    setSelectedSkill(null);
+    setSkillMembers([]);
+    setLoadingCategoryId(category.id);
+    try {
+      const response = await getSkillCategory(category.id);
+      setCategorySkills(response.data.skills ?? []);
+    } catch {
+      Alert.alert(t('common:errors.alertTitle'), t('discover.loadSkillsError'));
+    } finally {
+      setLoadingCategoryId(null);
+    }
+  }
+
+  async function handleOpenMembers(skillName: string) {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setSelectedSkill(skillName);
+    setSkillMembers([]);
+    setLoadingSkill(skillName);
+    try {
+      const response = await getMembersWithSkill(skillName);
+      setSkillMembers(response.data ?? []);
+    } catch {
+      Alert.alert(t('common:errors.alertTitle'), t('discover.loadMembersError'));
+    } finally {
+      setLoadingSkill(null);
+    }
+  }
+
+  function openMemberProfile(memberId: number) {
+    router.push({ pathname: '/(modals)/member-profile', params: { id: String(memberId) } } as unknown as Href);
   }
 
   async function handleRemoveSkill(skillId: number) {
@@ -187,8 +254,8 @@ export default function EndorsementsScreen() {
     [primary, theme.text, theme.textMuted, theme.textSecondary],
   );
 
-  const isLoading = activeTab === 'skills' ? skillsLoading : endorsementsLoading;
-  const listData: ListItem[] = activeTab === 'skills' ? skills : endorsements;
+  const isLoading = activeTab === 'skills' ? skillsLoading : activeTab === 'endorsements' ? endorsementsLoading : categoriesLoading;
+  const listData: ListItem[] = activeTab === 'skills' ? skills : activeTab === 'endorsements' ? endorsements : [];
 
   return (
     <ModalErrorBoundary>
@@ -224,12 +291,24 @@ export default function EndorsementsScreen() {
               handleAddSkill={handleAddSkill}
               skillsCount={skills.length}
               endorsementsCount={endorsements.length}
+              categories={categories}
+              categoriesLoading={categoriesLoading}
+              selectedCategory={selectedCategory}
+              categorySkills={categorySkills}
+              loadingCategoryId={loadingCategoryId}
+              selectedSkill={selectedSkill}
+              skillMembers={skillMembers}
+              loadingSkill={loadingSkill}
+              onOpenCategory={handleOpenCategory}
+              onOpenMembers={handleOpenMembers}
+              onOpenMemberProfile={openMemberProfile}
               primary={primary}
               theme={theme}
               t={t}
             />
           }
           ListEmptyComponent={
+            activeTab === 'discover' && categories.length > 0 ? null :
             isLoading ? (
               <View className="items-center justify-center py-14">
                 <LoadingSpinner />
@@ -237,9 +316,9 @@ export default function EndorsementsScreen() {
             ) : (
               <View className="px-4 py-8">
                 <EmptyState
-                  icon={activeTab === 'skills' ? 'construct-outline' : 'ribbon-outline'}
-                  title={activeTab === 'skills' ? t('noSkills') : t('noEndorsements')}
-                  subtitle={activeTab === 'skills' ? t('noSkillsHint') : t('noEndorsementsHint')}
+                  icon={activeTab === 'skills' ? 'construct-outline' : activeTab === 'endorsements' ? 'ribbon-outline' : 'folder-open-outline'}
+                  title={activeTab === 'skills' ? t('noSkills') : activeTab === 'endorsements' ? t('noEndorsements') : t('discover.empty')}
+                  subtitle={activeTab === 'skills' ? t('noSkillsHint') : activeTab === 'endorsements' ? t('noEndorsementsHint') : t('discover.emptyHint')}
                 />
               </View>
             )
@@ -262,6 +341,17 @@ function EndorsementsHeader({
   handleAddSkill,
   skillsCount,
   endorsementsCount,
+  categories,
+  categoriesLoading,
+  selectedCategory,
+  categorySkills,
+  loadingCategoryId,
+  selectedSkill,
+  skillMembers,
+  loadingSkill,
+  onOpenCategory,
+  onOpenMembers,
+  onOpenMemberProfile,
   primary,
   theme,
   t,
@@ -277,6 +367,17 @@ function EndorsementsHeader({
   handleAddSkill: () => Promise<void>;
   skillsCount: number;
   endorsementsCount: number;
+  categories: SkillCategory[];
+  categoriesLoading: boolean;
+  selectedCategory: SkillCategory | null;
+  categorySkills: CategorySkill[];
+  loadingCategoryId: number | null;
+  selectedSkill: string | null;
+  skillMembers: SkillMember[];
+  loadingSkill: string | null;
+  onOpenCategory: (category: SkillCategory) => Promise<void>;
+  onOpenMembers: (skillName: string) => Promise<void>;
+  onOpenMemberProfile: (memberId: number) => void;
   primary: string;
   theme: ReturnType<typeof useTheme>;
   t: (key: string, options?: Record<string, unknown>) => string;
@@ -328,10 +429,14 @@ function EndorsementsHeader({
               <Ionicons name="ribbon-outline" size={15} color={activeTab === 'endorsements' ? primary : theme.textMuted} />
               <Tabs.Label>{t('endorsements')}</Tabs.Label>
             </Tabs.Trigger>
+            <Tabs.Trigger value="discover">
+              <Ionicons name="folder-open-outline" size={15} color={activeTab === 'discover' ? primary : theme.textMuted} />
+              <Tabs.Label>{t('discover.title')}</Tabs.Label>
+            </Tabs.Trigger>
           </Tabs.List>
         </Tabs>
         <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
-          {activeTab === 'skills' ? t('skillsIntro') : t('endorsementsIntro')}
+          {activeTab === 'skills' ? t('skillsIntro') : activeTab === 'endorsements' ? t('endorsementsIntro') : t('discover.subtitle')}
         </Text>
       </Surface>
 
@@ -387,6 +492,158 @@ function EndorsementsHeader({
             </HeroButton>
           )}
         </Surface>
+      ) : null}
+      {activeTab === 'discover' ? (
+        <View className="mx-4 gap-3">
+          {categoriesLoading ? (
+            <Surface variant="secondary" className="min-h-[120px] items-center justify-center rounded-panel-inner p-4">
+              <LoadingSpinner />
+            </Surface>
+          ) : categories.length === 0 ? null : (
+            <>
+              {categories.map((category) => (
+                <HeroCard key={category.id} className="rounded-panel p-0">
+                  <HeroCard.Body className="gap-3 p-4">
+                    <View className="flex-row items-start gap-3">
+                      <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+                        <Ionicons name="folder-open-outline" size={19} color={primary} />
+                      </View>
+                      <View className="min-w-0 flex-1 gap-1">
+                        <Text className="text-base font-semibold" style={{ color: theme.text }} numberOfLines={2}>
+                          {category.name}
+                        </Text>
+                        {category.description ? (
+                          <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>
+                            {category.description}
+                          </Text>
+                        ) : null}
+                      </View>
+                    </View>
+                    <View className="flex-row flex-wrap gap-2">
+                        <Chip size="sm" variant="secondary" color="default">
+                          <Chip.Label>{t('discover.skillsCount', { count: asCount(category.skills_count) })}</Chip.Label>
+                      </Chip>
+                      {category.children && category.children.length > 0 ? (
+                        <Chip size="sm" variant="secondary" color="default">
+                          <Chip.Label>{t('discover.subcategoriesCount', { count: category.children.length })}</Chip.Label>
+                        </Chip>
+                      ) : null}
+                    </View>
+                    <HeroButton
+                      size="sm"
+                      variant="secondary"
+                      isDisabled={loadingCategoryId === category.id}
+                      onPress={() => void onOpenCategory(category)}
+                    >
+                      {loadingCategoryId === category.id ? <LoadingSpinner /> : <HeroButton.Label>{t('discover.viewSkills')}</HeroButton.Label>}
+                    </HeroButton>
+                  </HeroCard.Body>
+                </HeroCard>
+              ))}
+
+              {selectedCategory ? (
+                <HeroCard className="rounded-panel p-0">
+                  <HeroCard.Body className="gap-3 p-4">
+                    <Text className="text-base font-semibold" style={{ color: theme.text }}>
+                      {t('discover.skillsInCategory', { category: selectedCategory.name })}
+                    </Text>
+                    {loadingCategoryId === selectedCategory.id ? (
+                      <View className="items-center justify-center py-4">
+                        <LoadingSpinner />
+                      </View>
+                    ) : categorySkills.length === 0 ? (
+                      <Text className="text-sm" style={{ color: theme.textSecondary }}>{t('discover.noSkillsInCategory')}</Text>
+                    ) : (
+                      categorySkills.map((skill) => (
+                        <Surface key={skill.skill_name} variant="secondary" className="gap-3 rounded-panel-inner p-3">
+                          <View className="flex-row items-start justify-between gap-3">
+                            <View className="min-w-0 flex-1">
+                              <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={2}>
+                                {skill.skill_name}
+                              </Text>
+                              <Text className="text-xs" style={{ color: theme.textSecondary }}>
+                                {t('discover.memberCount', { count: asCount(skill.user_count) })}
+                              </Text>
+                            </View>
+                            <HeroButton
+                              size="sm"
+                              variant="secondary"
+                              isDisabled={loadingSkill === skill.skill_name}
+                              onPress={() => void onOpenMembers(skill.skill_name)}
+                            >
+                              {loadingSkill === skill.skill_name ? <LoadingSpinner /> : <HeroButton.Label>{t('discover.viewMembers')}</HeroButton.Label>}
+                            </HeroButton>
+                          </View>
+                          <View className="flex-row flex-wrap gap-2">
+                            <Chip size="sm" variant="secondary" color="success">
+                              <Chip.Label>{t('discover.offeringCount', { count: asCount(skill.offering_count) })}</Chip.Label>
+                            </Chip>
+                            <Chip size="sm" variant="secondary" color="default">
+                              <Chip.Label>{t('discover.requestingCount', { count: asCount(skill.requesting_count) })}</Chip.Label>
+                            </Chip>
+                          </View>
+                        </Surface>
+                      ))
+                    )}
+                  </HeroCard.Body>
+                </HeroCard>
+              ) : null}
+
+              {selectedSkill ? (
+                <HeroCard className="rounded-panel p-0">
+                  <HeroCard.Body className="gap-3 p-4">
+                    <Text className="text-base font-semibold" style={{ color: theme.text }}>
+                      {t('discover.membersWith', { skill: selectedSkill })}
+                    </Text>
+                    {loadingSkill === selectedSkill ? (
+                      <View className="items-center justify-center py-4">
+                        <LoadingSpinner />
+                      </View>
+                    ) : skillMembers.length === 0 ? (
+                      <Text className="text-sm" style={{ color: theme.textSecondary }}>{t('discover.noMembers')}</Text>
+                    ) : (
+                      skillMembers.map((member) => {
+                        const name = getSkillMemberName(member, t('discover.memberFallback'));
+                        return (
+                          <HeroButton
+                            key={member.id}
+                            variant="ghost"
+                            className="w-full justify-start rounded-panel-inner p-0"
+                            onPress={() => onOpenMemberProfile(member.id)}
+                            accessibilityLabel={t('discover.openMember', { name })}
+                          >
+                            <Surface variant="secondary" className="w-full flex-row items-center gap-3 rounded-panel-inner p-3">
+                              <Avatar uri={member.avatar ?? undefined} name={name} size={38} />
+                              <View className="min-w-0 flex-1">
+                                <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+                                  {name}
+                                </Text>
+                                {member.proficiency_level ? (
+                                  <Text className="text-xs" style={{ color: theme.textSecondary }}>
+                                    {t('discover.proficiency', { level: member.proficiency_level })}
+                                  </Text>
+                                ) : null}
+                              </View>
+                              {isEnabledFlag(member.is_offering) ? (
+                                <Chip size="sm" variant="secondary" color="success">
+                                  <Chip.Label>{t('discover.offers')}</Chip.Label>
+                                </Chip>
+                              ) : isEnabledFlag(member.is_requesting) ? (
+                                <Chip size="sm" variant="secondary" color="default">
+                                  <Chip.Label>{t('discover.wants')}</Chip.Label>
+                                </Chip>
+                              ) : null}
+                            </Surface>
+                          </HeroButton>
+                        );
+                      })
+                    )}
+                  </HeroCard.Body>
+                </HeroCard>
+              ) : null}
+            </>
+          )}
+        </View>
       ) : null}
     </View>
   );

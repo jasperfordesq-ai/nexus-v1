@@ -41,6 +41,38 @@ export interface UserSkillsResponse {
   };
 }
 
+export interface SkillCategory {
+  id: number;
+  name: string;
+  slug?: string | null;
+  description?: string | null;
+  icon?: string | null;
+  skills_count?: number | string | null;
+  children?: SkillCategory[];
+}
+
+export interface CategorySkill {
+  skill_name: string;
+  user_count: number | string;
+  offering_count?: number | string | null;
+  requesting_count?: number | string | null;
+}
+
+export interface SkillCategoryDetail extends SkillCategory {
+  skills: CategorySkill[];
+}
+
+export interface SkillMember {
+  id: number;
+  first_name?: string | null;
+  last_name?: string | null;
+  name?: string | null;
+  avatar?: string | null;
+  proficiency_level?: string | null;
+  is_offering?: boolean | number | null;
+  is_requesting?: boolean | number | null;
+}
+
 interface RawUserSkill {
   id?: number;
   skill_name?: string | null;
@@ -190,4 +222,19 @@ export function getAvailableSkills(query = ''): Promise<{ data: Skill[] }> {
 
   return api.get<{ data?: RawUserSkill[] }>(`${API_V2}/skills/search`, { q: trimmed })
     .then((response) => ({ data: (response.data ?? []).map(normalizeSkill) }));
+}
+
+export function getSkillCategories(): Promise<{ data: SkillCategory[] }> {
+  return api.get<{ data: SkillCategory[] }>(`${API_V2}/skills/categories`);
+}
+
+export function getSkillCategory(id: number): Promise<{ data: SkillCategoryDetail }> {
+  return api.get<{ data: SkillCategoryDetail }>(`${API_V2}/skills/categories/${id}`);
+}
+
+export function getMembersWithSkill(skillName: string, limit = 30): Promise<{ data: SkillMember[] }> {
+  return api.get<{ data: SkillMember[] }>(`${API_V2}/skills/members`, {
+    skill: skillName,
+    limit: String(limit),
+  });
 }

@@ -194,6 +194,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     { label: t('nav.resources'), href: '/resources', icon: FolderOpen, feature: 'resources' as const },
     { label: t('nav.jobs'), href: '/jobs', icon: Briefcase, feature: 'job_vacancies' as const },
     { label: t('nav.marketplace'), href: '/marketplace', icon: ShoppingBag, feature: 'marketplace' as const },
+    { label: t('nav.courses'), href: '/courses', icon: GraduationCap, feature: 'courses' as const },
   ];
 
   const engageNavItems = [

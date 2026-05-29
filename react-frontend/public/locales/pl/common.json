@@ -69,7 +69,8 @@
     "verify_identity": "Zweryfikuj swoją tożsamość",
     "accessibility_alpha": "Dostępność (alfa)",
     "features": "Funkcje",
-    "accessibility_alpha_tooltip": "Enhanced accessible version — WCAG 2.2 AA compliant. Opens in a new tab."
+    "accessibility_alpha_tooltip": "Enhanced accessible version — WCAG 2.2 AA compliant. Opens in a new tab.",
+    "courses": "Courses"
   },
   "landing_links": {
     "title": "Poznaj tę społeczność",
@@ -132,7 +133,8 @@
     "premium": "Poziomy członkostwa premium",
     "accessibility_alpha": "Otwórz interfejs alfa z naciskiem na dostępność",
     "features": "Wszystko, co robi Project NEXUS, z uczciwymi etykietami dojrzałości",
-    "dashboard": "Your personalised home overview"
+    "dashboard": "Your personalised home overview",
+    "courses": "Learn new skills with your community"
   },
   "user_menu": {
     "my_profile": "Mój profil",
@@ -2245,5 +2247,6 @@
     "scheme_dark": "Dark",
     "scheme_system": "System"
   },
-  "delete": "Delete"
+  "delete": "Delete",
+  "alpha_badge": "Alpha"
 }

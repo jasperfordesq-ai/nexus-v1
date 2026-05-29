@@ -70,7 +70,59 @@ vi.mock('@/contexts', () => ({
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
-vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
+vi.mock('@/components/ui', async () => {
+  const React = await import('react');
+  const { uiMock } = await import('@/test/uiMock');
+
+  // The filter chips use HeroUI's ToggleButtonGroup compound API:
+  //   <ToggleButtonGroup onSelectionChange={(keys) => ...}>
+  //     <ToggleButton id="paid">…</ToggleButton>
+  //   </ToggleButtonGroup>
+  // The generic uiMock renders each ToggleButton as an independent <button>
+  // with no wiring to the group's onSelectionChange, so clicking a chip never
+  // updates the active filter. Provide a faithful compound stub: the group
+  // shares its onSelectionChange via context; clicking a ToggleButton fires
+  // onSelectionChange(new Set([id])) — matching the real Set-based contract.
+  const ToggleGroupCtx = React.createContext<{
+    onSelectionChange?: (keys: Set<unknown>) => void;
+  }>({});
+
+  function ToggleButtonGroupStub(props: Record<string, unknown>) {
+    const { onSelectionChange, children } = props as {
+      onSelectionChange?: (keys: Set<unknown>) => void;
+      children?: React.ReactNode;
+    };
+    return React.createElement(
+      ToggleGroupCtx.Provider,
+      { value: { onSelectionChange } },
+      React.createElement('div', null, children),
+    );
+  }
+  function ToggleButtonStub(props: Record<string, unknown>) {
+    const ctx = React.useContext(ToggleGroupCtx);
+    const { id, children } = props as { id?: unknown; children?: React.ReactNode };
+    return React.createElement(
+      'button',
+      {
+        type: 'button',
+        onClick: () => {
+          if (typeof ctx.onSelectionChange === 'function') {
+            ctx.onSelectionChange(new Set([id]));
+          }
+        },
+      },
+      children,
+    );
+  }
+
+  return new Proxy(uiMock, {
+    get(target, prop) {
+      if (prop === 'ToggleButtonGroup') return ToggleButtonGroupStub;
+      if (prop === 'ToggleButton') return ToggleButtonStub;
+      return Reflect.get(target, prop);
+    },
+  });
+});
 
 vi.mock('@/components/feedback', () => ({
   EmptyState: ({ title, description }: { title: string; description?: string }) => (

@@ -20,7 +20,14 @@ jest.mock('@/lib/constants', () => ({
 }));
 
 import { api } from '@/lib/api/client';
-import { getGoals, createGoal, updateGoalStatus } from './goals';
+import {
+  createGoal,
+  createGoalFromTemplate,
+  getGoalTemplateCategories,
+  getGoalTemplates,
+  getGoals,
+  updateGoalStatus,
+} from './goals';
 import type { GoalsResponse, Goal } from './goals';
 
 const mockGoal: Goal = {
@@ -95,6 +102,49 @@ describe('createGoal', () => {
       target_hours: 20,
       due_date: '2026-03-31',
     });
+  });
+});
+
+describe('goal templates', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('loads goal templates with the default page size', async () => {
+    const response = {
+      data: [{ id: 4, title: 'Volunteer starter', default_target_value: 10, category: 'community' }],
+      meta: { has_more: false, cursor: null },
+    };
+    (api.get as jest.Mock).mockResolvedValue(response);
+
+    const result = await getGoalTemplates();
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/goals/templates', { per_page: '50' });
+    expect(result.data[0].title).toBe('Volunteer starter');
+  });
+
+  it('loads goal templates filtered by category', async () => {
+    (api.get as jest.Mock).mockResolvedValue({ data: [], meta: { has_more: false, cursor: null } });
+
+    await getGoalTemplates('community');
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/goals/templates', { per_page: '50', category: 'community' });
+  });
+
+  it('loads goal template categories', async () => {
+    (api.get as jest.Mock).mockResolvedValue({ data: ['community', 'learning'] });
+
+    const result = await getGoalTemplateCategories();
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/goals/templates/categories');
+    expect(result.data).toContain('community');
+  });
+
+  it('creates a goal from a template', async () => {
+    (api.post as jest.Mock).mockResolvedValue({ data: mockGoal });
+
+    const result = await createGoalFromTemplate(4);
+
+    expect(api.post).toHaveBeenCalledWith('/api/v2/goals/from-template/4', {});
+    expect(result.data.id).toBe(mockGoal.id);
   });
 });
 

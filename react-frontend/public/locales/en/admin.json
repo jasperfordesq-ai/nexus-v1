@@ -6264,6 +6264,8 @@
     "module_desc_ai_chat": "AI-powered chat assistant for members",
     "module_name_marketplace": "Marketplace",
     "module_desc_marketplace": "Commercial buy/sell marketplace for physical goods and paid services",
+    "module_name_courses": "Courses",
+    "module_desc_courses": "Community learning — courses, lessons, quizzes, enrollment, and certificates",
     "module_name_identity_verification": "Identity Verification",
     "module_desc_identity_verification": "Stripe Identity verification with ID Verified badge, document + selfie matching, and configurable fee",
     "module_name_members": "Members",

@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { FlatList, RefreshControl, Text, View } from 'react-native';
+import { Alert, FlatList, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
@@ -12,10 +12,12 @@ import { useTranslation } from 'react-i18next';
 
 import AppTopBar from '@/components/ui/AppTopBar';
 import EmptyState from '@/components/ui/EmptyState';
+import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import PollCard from '@/components/PollCard';
 import { getFeed, getFeedAuthor, type FeedItem, type FeedResponse } from '@/lib/api/feed';
+import { createPoll } from '@/lib/api/polls';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
@@ -45,6 +47,11 @@ export default function PollsScreen() {
   const primary = usePrimaryColor();
   const theme = useTheme();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showCreate, setShowCreate] = useState(false);
+  const [question, setQuestion] = useState('');
+  const [description, setDescription] = useState('');
+  const [options, setOptions] = useState(['', '']);
+  const [isCreating, setIsCreating] = useState(false);
   const wasRefreshingRef = useRef(false);
 
   const fetchPolls = useCallback(
@@ -68,6 +75,53 @@ export default function PollsScreen() {
     }
   }, [isLoading, isRefreshing]);
 
+  async function handleCreatePoll() {
+    const trimmedQuestion = question.trim();
+    const validOptions = options.map((option) => option.trim()).filter(Boolean);
+
+    if (!trimmedQuestion) {
+      Alert.alert(t('pollsScreen.createMissingTitle'), t('pollsScreen.createQuestionRequired'));
+      return;
+    }
+    if (validOptions.length < 2) {
+      Alert.alert(t('pollsScreen.createMissingTitle'), t('pollsScreen.createOptionsRequired'));
+      return;
+    }
+
+    setIsCreating(true);
+    try {
+      await createPoll({
+        question: trimmedQuestion,
+        description: description.trim() || undefined,
+        options: validOptions,
+        poll_type: 'standard',
+        is_anonymous: false,
+      });
+      setQuestion('');
+      setDescription('');
+      setOptions(['', '']);
+      setShowCreate(false);
+      Alert.alert(t('pollsScreen.createdTitle'), t('pollsScreen.createdMessage'));
+      refresh();
+    } catch {
+      Alert.alert(t('common:errors.alertTitle'), t('pollsScreen.createError'));
+    } finally {
+      setIsCreating(false);
+    }
+  }
+
+  function updateOption(index: number, value: string) {
+    setOptions((current) => current.map((option, optionIndex) => (optionIndex === index ? value : option)));
+  }
+
+  function addOption() {
+    setOptions((current) => (current.length >= 6 ? current : [...current, '']));
+  }
+
+  function removeOption(index: number) {
+    setOptions((current) => (current.length <= 2 ? current : current.filter((_, optionIndex) => optionIndex !== index)));
+  }
+
   const renderItem = useCallback(
     ({ item }: { item: FeedItem }) => (
       <PollFeedCard item={item} primary={primary} theme={theme} t={t} />
@@ -90,7 +144,7 @@ export default function PollsScreen() {
           onEndReached={loadMore}
           onEndReachedThreshold={0.3}
           ListHeaderComponent={
-            <View className="px-4 pb-3">
+            <View className="gap-3 px-4 pb-3">
               <HeroCard className="overflow-hidden rounded-panel p-0">
                 <View className="h-1.5" style={{ backgroundColor: primary }} />
                 <HeroCard.Body className="gap-3 p-4">
@@ -110,8 +164,79 @@ export default function PollsScreen() {
                   <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
                     {t('pollsScreen.subtitle')}
                   </Text>
+                  <HeroButton
+                    variant="primary"
+                    onPress={() => setShowCreate((value) => !value)}
+                    accessibilityLabel={t('pollsScreen.createPoll')}
+                    style={{ backgroundColor: primary }}
+                  >
+                    <Ionicons name={showCreate ? 'close-outline' : 'add-circle-outline'} size={18} color={theme.onPrimary} />
+                    <HeroButton.Label>{showCreate ? t('common:cancel') : t('pollsScreen.createPoll')}</HeroButton.Label>
+                  </HeroButton>
                 </HeroCard.Body>
               </HeroCard>
+              {showCreate ? (
+                <HeroCard className="rounded-panel p-0">
+                  <HeroCard.Body className="gap-3 p-4">
+                    <Text className="text-base font-semibold" style={{ color: theme.text }}>
+                      {t('pollsScreen.createTitle')}
+                    </Text>
+                    <Input
+                      label={t('pollsScreen.questionLabel')}
+                      value={question}
+                      onChangeText={setQuestion}
+                      placeholder={t('pollsScreen.questionPlaceholder')}
+                    />
+                    <Input
+                      label={t('pollsScreen.descriptionLabel')}
+                      value={description}
+                      onChangeText={setDescription}
+                      placeholder={t('pollsScreen.descriptionPlaceholder')}
+                      multiline
+                    />
+                    <View className="gap-2">
+                      <Text className="text-sm font-semibold" style={{ color: theme.text }}>{t('pollsScreen.optionsLabel')}</Text>
+                      {options.map((option, index) => (
+                        <View key={`option-${index}`} className="flex-row items-center gap-2">
+                          <Input
+                            containerClassName="mb-0 flex-1"
+                            value={option}
+                            onChangeText={(value) => updateOption(index, value)}
+                            placeholder={t('pollsScreen.optionPlaceholder', { number: index + 1 })}
+                          />
+                          {options.length > 2 ? (
+                            <HeroButton
+                              size="sm"
+                              variant="danger-soft"
+                              onPress={() => removeOption(index)}
+                              accessibilityLabel={t('pollsScreen.removeOption', { number: index + 1 })}
+                            >
+                              <Ionicons name="trash-outline" size={16} color={theme.error} />
+                            </HeroButton>
+                          ) : null}
+                        </View>
+                      ))}
+                    </View>
+                    <View className="flex-row gap-2">
+                      <HeroButton className="flex-1" variant="secondary" isDisabled={options.length >= 6} onPress={addOption}>
+                        <Ionicons name="add-outline" size={16} color={primary} />
+                        <HeroButton.Label>{t('pollsScreen.addOption')}</HeroButton.Label>
+                      </HeroButton>
+                      <HeroButton
+                        className="flex-1"
+                        variant="primary"
+                        isDisabled={isCreating}
+                        onPress={() => void handleCreatePoll()}
+                        accessibilityLabel={t('pollsScreen.submitPoll')}
+                        style={{ backgroundColor: isCreating ? theme.border : primary }}
+                      >
+                        {isCreating ? <LoadingSpinner /> : <Ionicons name="checkmark-outline" size={16} color={theme.onPrimary} />}
+                        <HeroButton.Label>{isCreating ? t('pollsScreen.creating') : t('pollsScreen.submitPoll')}</HeroButton.Label>
+                      </HeroButton>
+                    </View>
+                  </HeroCard.Body>
+                </HeroCard>
+              ) : null}
             </View>
           }
           ListEmptyComponent={

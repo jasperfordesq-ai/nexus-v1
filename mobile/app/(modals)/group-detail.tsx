@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router, type Href } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
@@ -26,30 +27,62 @@ import {
   type Event,
 } from '@/lib/api/events';
 import {
+  acceptGroupAnswer,
   answerGroupQuestion,
   createGroupAnnouncement,
   createGroupDiscussion,
   createGroupQuestion,
+  createGroupTask,
+  createGroupWikiPage,
+  deleteGroupFile,
+  deleteGroupMedia,
+  deleteGroupTask,
   deleteGroupAnnouncement,
+  deleteGroupWikiPage,
   getGroup,
+  getGroupAnalytics,
+  getGroupAnalyticsComparative,
+  getGroupAnalyticsRetention,
   getGroupAnnouncements,
   getGroupDiscussions,
   getGroupFiles,
   getGroupMembers,
+  getGroupMedia,
   getGroupQuestion,
   getGroupQuestions,
+  getGroupTasks,
+  getGroupTaskStats,
+  getGroupWikiPage,
+  getGroupWikiPages,
+  getGroupWikiRevisions,
   joinGroup,
   leaveGroup,
   updateGroupAnnouncement,
+  updateGroupTask,
+  updateGroupWikiPage,
+  uploadGroupMedia,
+  voteGroupQA,
   type GroupAnnouncement,
+  type GroupAnalyticsComparative,
+  type GroupAnalyticsDashboard,
+  type GroupAnalyticsRetentionCohort,
   type GroupDetail,
   type GroupDiscussion,
   type GroupFileItem,
   type GroupFilesResponse,
   type GroupMemberListItem,
+  type GroupMediaItem,
+  type GroupMediaType,
   type GroupQuestion,
   type GroupQuestionDetail,
   type GroupQuestionsResponse,
+  type GroupTask,
+  type GroupTaskPriority,
+  type GroupTaskStats,
+  type GroupTaskStatus,
+  type GroupWikiPage,
+  type GroupWikiPageDetail,
+  type GroupWikiRevision,
 } from '@/lib/api/groups';
 import {
   getGroupMarketplaceListings,
@@ -62,6 +95,7 @@ import {
   type MarketplaceListingItem,
 } from '@/lib/api/marketplace';
 import { useApi } from '@/lib/hooks/useApi';
+import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
@@ -78,7 +112,7 @@ const WEB_URL = 'https://app.project-nexus.ie';
 const CARD_MIN_HEIGHT = 118;
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
-type TabKey = 'overview' | 'discussion' | 'members' | 'events' | 'announcements' | 'files' | 'qa' | 'marketplace';
+type TabKey = 'overview' | 'discussion' | 'members' | 'events' | 'announcements' | 'files' | 'media' | 'qa' | 'wiki' | 'tasks' | 'analytics' | 'marketplace';
 type ApiGroupDetail = GroupDetail & {
   viewer_membership?: { status?: string; role?: string; is_admin?: boolean } | null;
   avatar_url?: string | null;
@@ -130,6 +164,11 @@ function formatFileSize(bytes?: number | null) {
   const index = Math.min(units.length - 1, Math.floor(Math.log(value) / Math.log(1024)));
   const amount = value / Math.pow(1024, index);
   return `${amount.toFixed(index === 0 ? 0 : 1)} ${units[index]}`;
+}
+
+function formatMetric(value?: number | null, options?: Intl.NumberFormatOptions) {
+  const amount = Number(value ?? 0);
+  return new Intl.NumberFormat(undefined, options).format(Number.isFinite(amount) ? amount : 0);
 }
 
 function StatusChip({ icon, label, color }: { icon: IoniconName; label: string; color: string }) {
@@ -225,6 +264,7 @@ export default function GroupDetailScreen() {
 
 function GroupDetailScreenInner() {
   const { t } = useTranslation(['groups', 'common', 'marketplace']);
+  const { user } = useAuth();
   const { hasFeature } = useTenant();
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
@@ -534,8 +574,14 @@ function GroupDetailScreenInner() {
     { key: 'events', label: t('detail.tabs.events'), icon: 'calendar-outline' },
     { key: 'announcements', label: t('detail.tabs.announcements'), icon: 'megaphone-outline' },
     { key: 'files', label: t('detail.tabs.files'), icon: 'folder-open-outline' },
+    { key: 'media', label: t('detail.tabs.media'), icon: 'images-outline' },
     { key: 'qa', label: t('detail.tabs.qa'), icon: 'help-circle-outline' },
+    { key: 'wiki', label: t('detail.tabs.wiki'), icon: 'book-outline' },
+    { key: 'tasks', label: t('detail.tabs.tasks'), icon: 'checkbox-outline' },
   ];
+  if (canManageGroup) {
+    tabs.push({ key: 'analytics', label: t('detail.tabs.analytics'), icon: 'analytics-outline' });
+  }
   if (hasFeature('marketplace')) {
     tabs.push({ key: 'marketplace', label: t('detail.tabs.marketplace'), icon: 'bag-handle-outline' });
   }
@@ -995,6 +1041,16 @@ function GroupDetailScreenInner() {
             files={files}
             isLoading={filesApi.isLoading}
             canView={userCanSeeMemberContent}
+            canManage={canManageGroup}
+            onRefresh={filesApi.refresh}
+          />
+        ) : null}
+
+        {activeTab === 'media' ? (
+          <GroupMediaPanel
+            groupId={loadedGroup.id}
+            canView={userCanSeeMemberContent}
+            canManage={canManageGroup}
           />
         ) : null}
 
@@ -1004,6 +1060,8 @@ function GroupDetailScreenInner() {
             questions={questions}
             isLoading={questionsApi.isLoading}
             canView={userCanSeeMemberContent}
+            canManage={canManageGroup}
+            currentUserId={user?.id ?? null}
             showComposer={showQuestionComposer}
             setShowComposer={setShowQuestionComposer}
             title={questionTitle}
@@ -1014,6 +1072,28 @@ function GroupDetailScreenInner() {
             onCreate={() => void handleCreateQuestion()}
             onRefresh={questionsApi.refresh}
           />
+        ) : null}
+
+        {activeTab === 'wiki' ? (
+          <GroupWikiPanel
+            groupId={loadedGroup.id}
+            canView={userCanSeeMemberContent}
+            canEdit={userCanSeeMemberContent}
+            canManage={canManageGroup}
+          />
+        ) : null}
+
+        {activeTab === 'tasks' ? (
+          <GroupTasksPanel
+            groupId={loadedGroup.id}
+            canView={userCanSeeMemberContent}
+            canManage={canManageGroup}
+            members={members}
+          />
+        ) : null}
+
+        {activeTab === 'analytics' ? (
+          <GroupAnalyticsPanel groupId={loadedGroup.id} canView={canManageGroup} />
         ) : null}
 
         {activeTab === 'marketplace' ? (
@@ -1147,19 +1227,49 @@ function GroupFilesPanel({
   files,
   isLoading,
   canView,
+  canManage,
+  onRefresh,
 }: {
   groupId: number;
   files: GroupFileItem[];
   isLoading: boolean;
   canView: boolean;
+  canManage: boolean;
+  onRefresh: () => void;
 }) {
   const { t } = useTranslation(['groups', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   function openDownload(fileId: number) {
     const url = `${API_BASE_URL}${API_V2}/groups/${groupId}/files/${fileId}/download`;
     void Linking.openURL(url);
+  }
+
+  function confirmDelete(file: GroupFileItem) {
+    Alert.alert(t('detail.files.deleteTitle'), t('detail.files.deleteMessage', { name: file.file_name }), [
+      { text: t('common:buttons.cancel'), style: 'cancel' },
+      {
+        text: t('detail.files.delete'),
+        style: 'destructive',
+        onPress: () => {
+          void (async () => {
+            setDeletingId(file.id);
+            try {
+              await deleteGroupFile(groupId, file.id);
+              onRefresh();
+              void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            } catch {
+              void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+              Alert.alert(t('common:errors.alertTitle'), t('detail.files.deleteError'));
+            } finally {
+              setDeletingId(null);
+            }
+          })();
+        },
+      },
+    ]);
   }
 
   if (!canView) {
@@ -1216,18 +1326,225 @@ function GroupFilesPanel({
                   </Text>
                 </View>
               </View>
-              <HeroButton
-                size="sm"
-                variant="secondary"
-                onPress={() => openDownload(file.id)}
-                accessibilityLabel={t('detail.files.downloadLabel', { name: file.file_name })}
-              >
-                <Ionicons name="download-outline" size={16} color={primary} />
-                <HeroButton.Label>{t('detail.files.download')}</HeroButton.Label>
-              </HeroButton>
+              <View className="flex-row flex-wrap gap-2">
+                <HeroButton
+                  size="sm"
+                  variant="secondary"
+                  onPress={() => openDownload(file.id)}
+                  accessibilityLabel={t('detail.files.downloadLabel', { name: file.file_name })}
+                >
+                  <Ionicons name="download-outline" size={16} color={primary} />
+                  <HeroButton.Label>{t('detail.files.download')}</HeroButton.Label>
+                </HeroButton>
+                {canManage ? (
+                  <HeroButton
+                    size="sm"
+                    variant="danger-soft"
+                    isDisabled={deletingId === file.id}
+                    onPress={() => confirmDelete(file)}
+                    accessibilityLabel={t('detail.files.deleteLabel', { name: file.file_name })}
+                  >
+                    {deletingId === file.id ? <Spinner size="sm" /> : <HeroButton.Label>{t('detail.files.delete')}</HeroButton.Label>}
+                  </HeroButton>
+                ) : null}
+              </View>
             </HeroCard.Body>
           </HeroCard>
         ))
+      )}
+    </View>
+  );
+}
+
+function GroupMediaPanel({
+  groupId,
+  canView,
+  canManage,
+}: {
+  groupId: number;
+  canView: boolean;
+  canManage: boolean;
+}) {
+  const { t } = useTranslation(['groups', 'common']);
+  const primary = usePrimaryColor();
+  const theme = useTheme();
+  const [filter, setFilter] = useState<GroupMediaType | 'all'>('all');
+  const [items, setItems] = useState<GroupMediaItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [uploadingMediaType, setUploadingMediaType] = useState<GroupMediaType | null>(null);
+
+  const loadMedia = useCallback(async () => {
+    if (!canView) return;
+    setIsLoading(true);
+    try {
+      const response = await getGroupMedia(groupId, { type: filter });
+      setItems(response.data.items ?? []);
+    } catch {
+      Alert.alert(t('common:errors.alertTitle'), t('detail.media.loadError'));
+    } finally {
+      setIsLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canView, groupId, filter]);
+
+  useEffect(() => {
+    void loadMedia();
+  }, [loadMedia]);
+
+  function openMedia(item: GroupMediaItem) {
+    const url = item.url ?? item.thumbnail_url;
+    if (url) void Linking.openURL(resolveImageUrl(url) ?? url);
+  }
+
+  function confirmDelete(item: GroupMediaItem) {
+    Alert.alert(t('detail.media.deleteTitle'), t('detail.media.deleteMessage'), [
+      { text: t('common:buttons.cancel'), style: 'cancel' },
+      {
+        text: t('detail.media.delete'),
+        style: 'destructive',
+        onPress: () => {
+          void (async () => {
+            setDeletingId(item.id);
+            try {
+              await deleteGroupMedia(groupId, item.id);
+              await loadMedia();
+              void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            } catch {
+              void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+              Alert.alert(t('common:errors.alertTitle'), t('detail.media.deleteError'));
+            } finally {
+              setDeletingId(null);
+            }
+          })();
+        },
+      },
+    ]);
+  }
+
+  async function pickMedia(type: GroupMediaType) {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert(t('detail.media.permissionTitle'), t('detail.media.permissionMessage'));
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: type === 'video' ? ImagePicker.MediaTypeOptions.Videos : ImagePicker.MediaTypeOptions.Images,
+      allowsMultipleSelection: false,
+      quality: 0.82,
+    });
+    if (result.canceled) return;
+
+    const asset = result.assets[0];
+    if (!asset?.uri) return;
+
+    setUploadingMediaType(type);
+    try {
+      await uploadGroupMedia(groupId, {
+        uri: asset.uri,
+        fileName: asset.fileName,
+        mimeType: asset.mimeType,
+      });
+      await loadMedia();
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(t('common:errors.alertTitle'), t('detail.media.uploadError'));
+    } finally {
+      setUploadingMediaType(null);
+    }
+  }
+
+  if (!canView) {
+    return <EmptyCard icon="lock-closed-outline" message={t('detail.media.joinToView')} />;
+  }
+
+  return (
+    <View className="gap-3">
+      <HeroCard className="rounded-panel p-0">
+        <HeroCard.Body className="gap-3 p-4">
+          <View className="flex-row items-start gap-3">
+            <View className="size-12 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+              <Ionicons name="images-outline" size={22} color={primary} />
+            </View>
+            <View className="min-w-0 flex-1">
+              <Text className="text-base font-semibold" style={{ color: theme.text }}>
+                {t('detail.media.title')}
+              </Text>
+              <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+                {t('detail.media.subtitle')}
+              </Text>
+            </View>
+          </View>
+          <View className="flex-row flex-wrap gap-2">
+            {(['all', 'image', 'video'] as const).map((value) => (
+              <HeroButton
+                key={value}
+                size="sm"
+                variant={filter === value ? 'primary' : 'secondary'}
+                onPress={() => setFilter(value)}
+              >
+                <HeroButton.Label>{t(`detail.media.filters.${value}`)}</HeroButton.Label>
+              </HeroButton>
+            ))}
+          </View>
+          <View className="flex-row flex-wrap gap-2">
+            <HeroButton size="sm" variant="secondary" isDisabled={uploadingMediaType !== null} onPress={() => void pickMedia('image')}>
+              {uploadingMediaType === 'image' ? <Spinner size="sm" /> : <Ionicons name="image-outline" size={16} color={primary} />}
+              <HeroButton.Label>{t('detail.media.uploadPhoto')}</HeroButton.Label>
+            </HeroButton>
+            <HeroButton size="sm" variant="secondary" isDisabled={uploadingMediaType !== null} onPress={() => void pickMedia('video')}>
+              {uploadingMediaType === 'video' ? <Spinner size="sm" /> : <Ionicons name="film-outline" size={16} color={primary} />}
+              <HeroButton.Label>{t('detail.media.uploadVideo')}</HeroButton.Label>
+            </HeroButton>
+          </View>
+        </HeroCard.Body>
+      </HeroCard>
+
+      {isLoading ? (
+        <HeroCard className="rounded-panel p-0">
+          <HeroCard.Body className="min-h-[140px] items-center justify-center">
+            <Spinner size="md" />
+          </HeroCard.Body>
+        </HeroCard>
+      ) : items.length === 0 ? (
+        <EmptyCard icon="images-outline" message={t('detail.media.empty')} />
+      ) : (
+        <View className="flex-row flex-wrap gap-3">
+          {items.map((item) => {
+            const sourceUrl = resolveImageUrl(item.thumbnail_url ?? item.url ?? null);
+            return (
+              <HeroCard key={item.id} className="w-[47%] rounded-panel p-0">
+                <HeroCard.Body className="gap-2 p-3">
+                  {item.type === 'image' && sourceUrl ? (
+                    <Image source={{ uri: sourceUrl }} className="h-28 w-full rounded-panel-inner" resizeMode="cover" />
+                  ) : (
+                    <View className="h-28 w-full items-center justify-center rounded-panel-inner" style={{ backgroundColor: withAlpha(primary, 0.12) }}>
+                      <Ionicons name={item.type === 'video' ? 'film-outline' : 'image-outline'} size={28} color={primary} />
+                    </View>
+                  )}
+                  <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={2}>
+                    {item.caption || t(`detail.media.type.${item.type}`)}
+                  </Text>
+                  <Text className="text-xs" style={{ color: theme.textMuted }} numberOfLines={1}>
+                    {[item.uploader_name, formatDate(item.created_at)].filter(Boolean).join(' - ')}
+                  </Text>
+                  <View className="flex-row flex-wrap gap-2">
+                    <HeroButton size="sm" variant="secondary" onPress={() => openMedia(item)} accessibilityLabel={t('detail.media.openLabel')}>
+                      <HeroButton.Label>{t('detail.media.open')}</HeroButton.Label>
+                    </HeroButton>
+                    {canManage ? (
+                      <HeroButton size="sm" variant="danger-soft" isDisabled={deletingId === item.id} onPress={() => confirmDelete(item)}>
+                        {deletingId === item.id ? <Spinner size="sm" /> : <HeroButton.Label>{t('detail.media.delete')}</HeroButton.Label>}
+                      </HeroButton>
+                    ) : null}
+                  </View>
+                </HeroCard.Body>
+              </HeroCard>
+            );
+          })}
+        </View>
       )}
     </View>
   );
@@ -1238,6 +1555,8 @@ function GroupQAPanel({
   questions,
   isLoading,
   canView,
+  canManage,
+  currentUserId,
   showComposer,
   setShowComposer,
   title,
@@ -1252,6 +1571,8 @@ function GroupQAPanel({
   questions: GroupQuestion[];
   isLoading: boolean;
   canView: boolean;
+  canManage: boolean;
+  currentUserId: number | null;
   showComposer: boolean;
   setShowComposer: React.Dispatch<React.SetStateAction<boolean>>;
   title: string;
@@ -1270,6 +1591,8 @@ function GroupQAPanel({
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [answerBody, setAnswerBody] = useState('');
   const [answering, setAnswering] = useState(false);
+  const [votingTarget, setVotingTarget] = useState<string | null>(null);
+  const [acceptingAnswerId, setAcceptingAnswerId] = useState<number | null>(null);
 
   async function toggleQuestion(questionId: number) {
     if (expandedId === questionId) {
@@ -1313,6 +1636,43 @@ function GroupQAPanel({
       Alert.alert(t('common:errors.alertTitle'), t('detail.qa.answerError'));
     } finally {
       setAnswering(false);
+    }
+  }
+
+  async function refreshExpandedQuestion() {
+    if (!expandedId) return;
+    const response = await getGroupQuestion(groupId, expandedId);
+    setDetail(response.data);
+  }
+
+  async function voteTarget(type: 'question' | 'answer', targetId: number, vote: 'up' | 'down') {
+    const targetKey = `${type}:${targetId}:${vote}`;
+    setVotingTarget(targetKey);
+    try {
+      await voteGroupQA(groupId, { type, target_id: targetId, vote });
+      onRefresh();
+      if (expandedId) await refreshExpandedQuestion();
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(t('common:errors.alertTitle'), t('detail.qa.voteError'));
+    } finally {
+      setVotingTarget(null);
+    }
+  }
+
+  async function acceptAnswer(answerId: number) {
+    setAcceptingAnswerId(answerId);
+    try {
+      await acceptGroupAnswer(groupId, answerId);
+      onRefresh();
+      await refreshExpandedQuestion();
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(t('common:errors.alertTitle'), t('detail.qa.acceptError'));
+    } finally {
+      setAcceptingAnswerId(null);
     }
   }
 
@@ -1379,6 +1739,8 @@ function GroupQAPanel({
         questions.map((question) => {
           const expanded = expandedId === question.id;
           const answers = expanded && detail?.id === question.id ? detail.answers : [];
+          const questionAuthorId = detail?.id === question.id ? detail.author?.id : question.author?.id;
+          const canAcceptAnswers = canManage || (currentUserId !== null && questionAuthorId === currentUserId);
           return (
             <HeroCard key={question.id} className="rounded-panel p-0">
               <HeroCard.Body className="gap-3 p-4">
@@ -1414,6 +1776,29 @@ function GroupQAPanel({
                   </View>
                 </HeroButton>
 
+                <View className="flex-row flex-wrap gap-2">
+                  <HeroButton
+                    size="sm"
+                    variant={question.user_vote === 1 ? 'primary' : 'secondary'}
+                    isDisabled={votingTarget === `question:${question.id}:up`}
+                    onPress={() => void voteTarget('question', question.id, 'up')}
+                    accessibilityLabel={t('detail.qa.upvoteQuestion')}
+                  >
+                    {votingTarget === `question:${question.id}:up` ? <Spinner size="sm" /> : <Ionicons name="arrow-up-outline" size={15} color={question.user_vote === 1 ? '#fff' : primary} />}
+                    <HeroButton.Label>{t('detail.qa.upvote')}</HeroButton.Label>
+                  </HeroButton>
+                  <HeroButton
+                    size="sm"
+                    variant={question.user_vote === -1 ? 'primary' : 'secondary'}
+                    isDisabled={votingTarget === `question:${question.id}:down`}
+                    onPress={() => void voteTarget('question', question.id, 'down')}
+                    accessibilityLabel={t('detail.qa.downvoteQuestion')}
+                  >
+                    {votingTarget === `question:${question.id}:down` ? <Spinner size="sm" /> : <Ionicons name="arrow-down-outline" size={15} color={question.user_vote === -1 ? '#fff' : primary} />}
+                    <HeroButton.Label>{t('detail.qa.downvote')}</HeroButton.Label>
+                  </HeroButton>
+                </View>
+
                 {expanded ? (
                   <View className="gap-3 border-t pt-3" style={{ borderColor: theme.borderSubtle }}>
                     {loadingDetail ? (
@@ -1440,6 +1825,39 @@ function GroupQAPanel({
                           <Text className="text-xs" style={{ color: theme.textMuted }}>
                             {[answer.author?.name, formatDate(answer.created_at)].filter(Boolean).join(' - ')}
                           </Text>
+                          <View className="flex-row flex-wrap gap-2">
+                            <HeroButton
+                              size="sm"
+                              variant={answer.user_vote === 1 ? 'primary' : 'secondary'}
+                              isDisabled={votingTarget === `answer:${answer.id}:up`}
+                              onPress={() => void voteTarget('answer', answer.id, 'up')}
+                              accessibilityLabel={t('detail.qa.upvoteAnswer')}
+                            >
+                              {votingTarget === `answer:${answer.id}:up` ? <Spinner size="sm" /> : <Ionicons name="arrow-up-outline" size={15} color={answer.user_vote === 1 ? '#fff' : primary} />}
+                              <HeroButton.Label>{t('detail.qa.upvote')}</HeroButton.Label>
+                            </HeroButton>
+                            <HeroButton
+                              size="sm"
+                              variant={answer.user_vote === -1 ? 'primary' : 'secondary'}
+                              isDisabled={votingTarget === `answer:${answer.id}:down`}
+                              onPress={() => void voteTarget('answer', answer.id, 'down')}
+                              accessibilityLabel={t('detail.qa.downvoteAnswer')}
+                            >
+                              {votingTarget === `answer:${answer.id}:down` ? <Spinner size="sm" /> : <Ionicons name="arrow-down-outline" size={15} color={answer.user_vote === -1 ? '#fff' : primary} />}
+                              <HeroButton.Label>{t('detail.qa.downvote')}</HeroButton.Label>
+                            </HeroButton>
+                            {canAcceptAnswers && !answer.is_accepted ? (
+                              <HeroButton
+                                size="sm"
+                                variant="secondary"
+                                isDisabled={acceptingAnswerId === answer.id}
+                                onPress={() => void acceptAnswer(answer.id)}
+                              >
+                                {acceptingAnswerId === answer.id ? <Spinner size="sm" /> : <Ionicons name="checkmark-circle-outline" size={15} color={primary} />}
+                                <HeroButton.Label>{t('detail.qa.acceptAnswer')}</HeroButton.Label>
+                              </HeroButton>
+                            ) : null}
+                          </View>
                         </Surface>
                       ))
                     )}
@@ -1462,6 +1880,961 @@ function GroupQAPanel({
             </HeroCard>
           );
         })
+      )}
+    </View>
+  );
+}
+
+function GroupWikiPanel({
+  groupId,
+  canView,
+  canEdit,
+  canManage,
+}: {
+  groupId: number;
+  canView: boolean;
+  canEdit: boolean;
+  canManage: boolean;
+}) {
+  const { t } = useTranslation(['groups', 'common']);
+  const theme = useTheme();
+  const [pages, setPages] = useState<GroupWikiPage[]>([]);
+  const [selectedPage, setSelectedPage] = useState<GroupWikiPageDetail | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [pageLoading, setPageLoading] = useState(false);
+  const [showComposer, setShowComposer] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [newContent, setNewContent] = useState('');
+  const [creating, setCreating] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editContent, setEditContent] = useState('');
+  const [changeSummary, setChangeSummary] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [revisions, setRevisions] = useState<GroupWikiRevision[]>([]);
+  const [showRevisions, setShowRevisions] = useState(false);
+  const [revisionsLoading, setRevisionsLoading] = useState(false);
+  const [deletingPage, setDeletingPage] = useState(false);
+
+  async function loadPage(slug: string) {
+    setPageLoading(true);
+    setEditing(false);
+    setShowRevisions(false);
+    setRevisions([]);
+    try {
+      const response = await getGroupWikiPage(groupId, slug);
+      setSelectedPage(response.data);
+      setEditContent(response.data.content ?? '');
+      setChangeSummary('');
+    } catch {
+      Alert.alert(t('common:errors.alertTitle'), t('detail.wiki.pageLoadError'));
+    } finally {
+      setPageLoading(false);
+    }
+  }
+
+  async function loadPages(openFirst = false) {
+    setIsLoading(true);
+    try {
+      const response = await getGroupWikiPages(groupId);
+      const items = Array.isArray(response.data) ? response.data : [];
+      setPages(items);
+      if (openFirst && items.length > 0) {
+        await loadPage(items[0].slug);
+      } else if (selectedPage && !items.some((page) => page.id === selectedPage.id)) {
+        setSelectedPage(null);
+      }
+    } catch {
+      Alert.alert(t('common:errors.alertTitle'), t('detail.wiki.loadError'));
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (canView) void loadPages(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canView, groupId]);
+
+  async function createPage() {
+    const title = newTitle.trim();
+    const content = newContent.trim();
+    if (!title || !content) {
+      Alert.alert(t('common:errors.alertTitle'), t('detail.wiki.validation'));
+      return;
+    }
+
+    setCreating(true);
+    try {
+      const response = await createGroupWikiPage(groupId, { title, content });
+      setNewTitle('');
+      setNewContent('');
+      setShowComposer(false);
+      setSelectedPage(response.data);
+      await loadPages(false);
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(t('common:errors.alertTitle'), t('detail.wiki.createError'));
+    } finally {
+      setCreating(false);
+    }
+  }
+
+  async function savePage() {
+    if (!selectedPage || !editContent.trim()) {
+      Alert.alert(t('common:errors.alertTitle'), t('detail.wiki.validation'));
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const response = await updateGroupWikiPage(groupId, selectedPage.id, {
+        title: selectedPage.title,
+        content: editContent.trim(),
+        change_summary: changeSummary.trim() || undefined,
+      });
+      setSelectedPage(response.data);
+      setEditing(false);
+      setChangeSummary('');
+      await loadPages(false);
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(t('common:errors.alertTitle'), t('detail.wiki.saveError'));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function loadRevisions() {
+    if (!selectedPage) return;
+    setRevisionsLoading(true);
+    try {
+      const response = await getGroupWikiRevisions(groupId, selectedPage.id);
+      setRevisions(response.data ?? []);
+      setShowRevisions(true);
+    } catch {
+      Alert.alert(t('common:errors.alertTitle'), t('detail.wiki.revisionsError'));
+    } finally {
+      setRevisionsLoading(false);
+    }
+  }
+
+  function confirmDeletePage() {
+    if (!selectedPage) return;
+    Alert.alert(t('detail.wiki.deleteTitle'), t('detail.wiki.deleteMessage', { title: selectedPage.title }), [
+      { text: t('common:buttons.cancel'), style: 'cancel' },
+      {
+        text: t('detail.wiki.delete'),
+        style: 'destructive',
+        onPress: () => {
+          void (async () => {
+            if (!selectedPage) return;
+            setDeletingPage(true);
+            try {
+              await deleteGroupWikiPage(groupId, selectedPage.id);
+              setSelectedPage(null);
+              setRevisions([]);
+              setShowRevisions(false);
+              await loadPages(false);
+              void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            } catch {
+              void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+              Alert.alert(t('common:errors.alertTitle'), t('detail.wiki.deleteError'));
+            } finally {
+              setDeletingPage(false);
+            }
+          })();
+        },
+      },
+    ]);
+  }
+
+  if (!canView) {
+    return <EmptyCard icon="lock-closed-outline" message={t('detail.wiki.joinToView')} />;
+  }
+
+  return (
+    <View className="gap-3">
+      <HeroCard className="rounded-panel p-0">
+        <HeroCard.Body className="gap-3 p-4">
+          <View className="flex-row items-start justify-between gap-3">
+            <View className="min-w-0 flex-1">
+              <Text className="text-base font-semibold" style={{ color: theme.text }}>
+                {t('detail.wiki.title')}
+              </Text>
+              <Text className="mt-1 text-sm leading-5" style={{ color: theme.textSecondary }}>
+                {t('detail.wiki.subtitle')}
+              </Text>
+            </View>
+            {canEdit ? (
+              <HeroButton size="sm" variant={showComposer ? 'secondary' : 'primary'} onPress={() => setShowComposer((value) => !value)}>
+                <HeroButton.Label>{showComposer ? t('common:buttons.cancel') : t('detail.wiki.newPage')}</HeroButton.Label>
+              </HeroButton>
+            ) : null}
+          </View>
+
+          {showComposer ? (
+            <View className="gap-3">
+              <Input
+                value={newTitle}
+                onChangeText={setNewTitle}
+                placeholder={t('detail.wiki.titlePlaceholder')}
+                placeholderTextColor={theme.textMuted}
+                className="text-base"
+                style={{ color: theme.text }}
+                accessibilityLabel={t('detail.wiki.titlePlaceholder')}
+              />
+              <Input
+                value={newContent}
+                onChangeText={setNewContent}
+                placeholder={t('detail.wiki.contentPlaceholder')}
+                placeholderTextColor={theme.textMuted}
+                multiline
+                className="min-h-[120px] text-base"
+                style={{ color: theme.text, textAlignVertical: 'top' }}
+                accessibilityLabel={t('detail.wiki.contentPlaceholder')}
+              />
+              <HeroButton isDisabled={creating} onPress={() => void createPage()}>
+                {creating ? <Spinner size="sm" /> : <HeroButton.Label>{t('detail.wiki.create')}</HeroButton.Label>}
+              </HeroButton>
+            </View>
+          ) : null}
+        </HeroCard.Body>
+      </HeroCard>
+
+      {isLoading && pages.length === 0 ? (
+        <HeroCard className="rounded-panel p-0">
+          <HeroCard.Body className="min-h-[140px] items-center justify-center">
+            <Spinner size="md" />
+          </HeroCard.Body>
+        </HeroCard>
+      ) : pages.length === 0 ? (
+        <EmptyCard icon="book-outline" message={t('detail.wiki.empty')} />
+      ) : (
+        <View className="gap-2">
+          {pages.map((page) => (
+            <HeroButton
+              key={page.id}
+              variant={selectedPage?.id === page.id ? 'secondary' : 'ghost'}
+              feedbackVariant="scale"
+              className="w-full justify-start rounded-panel"
+              onPress={() => void loadPage(page.slug)}
+              accessibilityLabel={page.title}
+            >
+              <View className="w-full flex-row items-center gap-3">
+                <Ionicons name="document-text-outline" size={18} color={theme.textSecondary} />
+                <View className="min-w-0 flex-1">
+                  <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+                    {page.title}
+                  </Text>
+                  <Text className="text-xs" style={{ color: theme.textMuted }} numberOfLines={1}>
+                    {[page.author?.name, formatDate(page.updated_at)].filter(Boolean).join(' - ')}
+                  </Text>
+                </View>
+                {!page.is_published ? (
+                  <Chip size="sm" variant="secondary" color="warning">
+                    <Chip.Label>{t('detail.wiki.draft')}</Chip.Label>
+                  </Chip>
+                ) : null}
+              </View>
+            </HeroButton>
+          ))}
+        </View>
+      )}
+
+      {pageLoading ? (
+        <HeroCard className="rounded-panel p-0">
+          <HeroCard.Body className="items-center justify-center py-8">
+            <Spinner size="sm" />
+          </HeroCard.Body>
+        </HeroCard>
+      ) : selectedPage ? (
+        <HeroCard className="rounded-panel p-0">
+          <HeroCard.Body className="gap-3 p-4">
+            <View className="flex-row items-start justify-between gap-3">
+              <View className="min-w-0 flex-1">
+                <Text className="text-lg font-semibold" style={{ color: theme.text }}>
+                  {selectedPage.title}
+                </Text>
+                <Text className="mt-1 text-xs" style={{ color: theme.textMuted }}>
+                  {[selectedPage.author?.name, formatDate(selectedPage.updated_at)].filter(Boolean).join(' - ')}
+                </Text>
+              </View>
+              {canEdit ? (
+                <View className="flex-row flex-wrap gap-2">
+                  <HeroButton size="sm" variant="secondary" onPress={() => setEditing((value) => !value)}>
+                    <HeroButton.Label>{editing ? t('common:buttons.cancel') : t('detail.wiki.edit')}</HeroButton.Label>
+                  </HeroButton>
+                  <HeroButton size="sm" variant="secondary" isDisabled={revisionsLoading} onPress={() => void (showRevisions ? setShowRevisions(false) : loadRevisions())}>
+                    {revisionsLoading ? <Spinner size="sm" /> : <Ionicons name="time-outline" size={15} color={theme.textSecondary} />}
+                    <HeroButton.Label>{showRevisions ? t('detail.wiki.hideRevisions') : t('detail.wiki.revisions')}</HeroButton.Label>
+                  </HeroButton>
+                  {canManage ? (
+                    <HeroButton size="sm" variant="danger-soft" isDisabled={deletingPage} onPress={confirmDeletePage}>
+                      {deletingPage ? <Spinner size="sm" /> : <Ionicons name="trash-outline" size={15} color={theme.error} />}
+                      <HeroButton.Label>{t('detail.wiki.delete')}</HeroButton.Label>
+                    </HeroButton>
+                  ) : null}
+                </View>
+              ) : null}
+            </View>
+
+            {editing ? (
+              <View className="gap-3">
+                <Input
+                  value={editContent}
+                  onChangeText={setEditContent}
+                  placeholder={t('detail.wiki.contentPlaceholder')}
+                  placeholderTextColor={theme.textMuted}
+                  multiline
+                  className="min-h-[160px] text-base"
+                  style={{ color: theme.text, textAlignVertical: 'top' }}
+                  accessibilityLabel={t('detail.wiki.editContentLabel')}
+                />
+                <Input
+                  value={changeSummary}
+                  onChangeText={setChangeSummary}
+                  placeholder={t('detail.wiki.changeSummaryPlaceholder')}
+                  placeholderTextColor={theme.textMuted}
+                  className="text-base"
+                  style={{ color: theme.text }}
+                  accessibilityLabel={t('detail.wiki.changeSummaryPlaceholder')}
+                />
+                <HeroButton isDisabled={saving} onPress={() => void savePage()}>
+                  {saving ? <Spinner size="sm" /> : <HeroButton.Label>{t('detail.wiki.save')}</HeroButton.Label>}
+                </HeroButton>
+              </View>
+            ) : (
+              <Text className="text-sm leading-6" style={{ color: theme.textSecondary }}>
+                {stripHtml(selectedPage.content) || t('detail.wiki.emptyContent')}
+              </Text>
+            )}
+
+            {showRevisions ? (
+              <View className="gap-2 border-t pt-3" style={{ borderColor: theme.borderSubtle }}>
+                <SectionTitle title={t('detail.wiki.revisions')} />
+                {revisions.length === 0 ? (
+                  <Text className="text-sm" style={{ color: theme.textSecondary }}>{t('detail.wiki.noRevisions')}</Text>
+                ) : (
+                  revisions.map((revision) => (
+                    <Surface key={revision.id} variant="secondary" className="gap-2 rounded-panel-inner p-3">
+                      <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+                        {[revision.editor?.name, formatDate(revision.created_at)].filter(Boolean).join(' - ') || t('detail.wiki.revisionFallback')}
+                      </Text>
+                      {revision.change_summary ? (
+                        <Text className="text-xs" style={{ color: theme.textSecondary }} numberOfLines={2}>
+                          {revision.change_summary}
+                        </Text>
+                      ) : null}
+                      <Text className="text-xs leading-5" style={{ color: theme.textMuted }} numberOfLines={3}>
+                        {stripHtml(revision.content) || t('detail.wiki.emptyContent')}
+                      </Text>
+                    </Surface>
+                  ))
+                )}
+              </View>
+            ) : null}
+          </HeroCard.Body>
+        </HeroCard>
+      ) : null}
+    </View>
+  );
+}
+
+function GroupTasksPanel({
+  groupId,
+  canView,
+  canManage,
+  members,
+}: {
+  groupId: number;
+  canView: boolean;
+  canManage: boolean;
+  members: GroupMemberListItem[];
+}) {
+  const { t } = useTranslation(['groups', 'common']);
+  const theme = useTheme();
+  const [statusFilter, setStatusFilter] = useState<GroupTaskStatus | 'all'>('all');
+  const [tasks, setTasks] = useState<GroupTask[]>([]);
+  const [stats, setStats] = useState<GroupTaskStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showComposer, setShowComposer] = useState(false);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [priority, setPriority] = useState<GroupTaskPriority>('medium');
+  const [assignedTo, setAssignedTo] = useState<number | null>(null);
+  const [dueDate, setDueDate] = useState('');
+  const [creating, setCreating] = useState(false);
+  const [updatingTaskId, setUpdatingTaskId] = useState<number | null>(null);
+
+  const loadTasks = useCallback(async () => {
+    if (!canView) return;
+    setIsLoading(true);
+    try {
+      const [taskResponse, statsResponse] = await Promise.all([
+        getGroupTasks(groupId, { status: statusFilter }),
+        getGroupTaskStats(groupId),
+      ]);
+      setTasks(taskResponse.data ?? []);
+      setStats(statsResponse.data);
+    } catch {
+      Alert.alert(t('common:errors.alertTitle'), t('detail.tasks.loadError'));
+    } finally {
+      setIsLoading(false);
+    }
+  // Keep loading tied to data inputs. The i18n function can change identity during test/runtime renders.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canView, groupId, statusFilter]);
+
+  useEffect(() => {
+    void loadTasks();
+  }, [loadTasks]);
+
+  const cycleStatus = async (task: GroupTask) => {
+    const nextStatus: GroupTaskStatus = task.status === 'todo' ? 'in_progress' : task.status === 'in_progress' ? 'done' : 'todo';
+    setUpdatingTaskId(task.id);
+    try {
+      await updateGroupTask(task.id, { status: nextStatus });
+      await loadTasks();
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(t('common:errors.alertTitle'), t('detail.tasks.updateError'));
+    } finally {
+      setUpdatingTaskId(null);
+    }
+  };
+
+  const updateTaskFields = async (
+    task: GroupTask,
+    payload: Partial<Pick<GroupTask, 'assigned_to' | 'priority'>>,
+  ) => {
+    setUpdatingTaskId(task.id);
+    try {
+      await updateGroupTask(task.id, payload);
+      await loadTasks();
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(t('common:errors.alertTitle'), t('detail.tasks.updateError'));
+    } finally {
+      setUpdatingTaskId(null);
+    }
+  };
+
+  const createTask = async () => {
+    const cleanTitle = title.trim();
+    if (!cleanTitle) {
+      Alert.alert(t('common:errors.alertTitle'), t('detail.tasks.validation'));
+      return;
+    }
+
+    setCreating(true);
+    try {
+      await createGroupTask(groupId, {
+        title: cleanTitle,
+        description: description.trim() || null,
+        status: 'todo',
+        priority,
+        assigned_to: assignedTo,
+        due_date: dueDate.trim() || null,
+      });
+      setTitle('');
+      setDescription('');
+      setPriority('medium');
+      setAssignedTo(null);
+      setDueDate('');
+      setShowComposer(false);
+      await loadTasks();
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(t('common:errors.alertTitle'), t('detail.tasks.createError'));
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const confirmDelete = (task: GroupTask) => {
+    Alert.alert(t('detail.tasks.deleteTitle'), t('detail.tasks.deleteMessage', { title: task.title }), [
+      { text: t('common:buttons.cancel'), style: 'cancel' },
+      {
+        text: t('detail.tasks.delete'),
+        style: 'destructive',
+        onPress: () => {
+          void (async () => {
+            setUpdatingTaskId(task.id);
+            try {
+              await deleteGroupTask(task.id);
+              await loadTasks();
+              void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            } catch {
+              void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+              Alert.alert(t('common:errors.alertTitle'), t('detail.tasks.deleteError'));
+            } finally {
+              setUpdatingTaskId(null);
+            }
+          })();
+        },
+      },
+    ]);
+  };
+
+  if (!canView) {
+    return <EmptyCard icon="lock-closed-outline" message={t('detail.tasks.joinToView')} />;
+  }
+
+  return (
+    <View className="gap-3">
+      <HeroCard className="rounded-panel p-0">
+        <HeroCard.Body className="gap-3 p-4">
+          <View className="flex-row items-start justify-between gap-3">
+            <View className="min-w-0 flex-1">
+              <Text className="text-base font-semibold" style={{ color: theme.text }}>
+                {t('detail.tasks.title')}
+              </Text>
+              <Text className="mt-1 text-sm leading-5" style={{ color: theme.textSecondary }}>
+                {t('detail.tasks.subtitle')}
+              </Text>
+            </View>
+            <HeroButton size="sm" variant={showComposer ? 'secondary' : 'primary'} onPress={() => setShowComposer((value) => !value)}>
+              <HeroButton.Label>{showComposer ? t('common:buttons.cancel') : t('detail.tasks.newTask')}</HeroButton.Label>
+            </HeroButton>
+          </View>
+
+          {stats ? (
+            <View className="flex-row flex-wrap gap-2">
+              {(['total', 'todo', 'in_progress', 'done', 'overdue'] as const).map((key) => (
+                <Chip key={key} size="sm" variant="secondary" color={key === 'overdue' && stats.overdue > 0 ? 'danger' : key === 'done' ? 'success' : 'default'}>
+                  <Chip.Label>{t(`detail.tasks.stats.${key}`, { count: stats[key] })}</Chip.Label>
+                </Chip>
+              ))}
+            </View>
+          ) : null}
+
+          <View className="flex-row flex-wrap gap-2">
+            {(['all', 'todo', 'in_progress', 'done'] as const).map((status) => (
+              <HeroButton
+                key={status}
+                size="sm"
+                variant={statusFilter === status ? 'primary' : 'secondary'}
+                onPress={() => setStatusFilter(status)}
+              >
+                <HeroButton.Label>{t(`detail.tasks.filters.${status}`)}</HeroButton.Label>
+              </HeroButton>
+            ))}
+          </View>
+
+          {showComposer ? (
+            <View className="gap-3">
+              <Input
+                value={title}
+                onChangeText={setTitle}
+                placeholder={t('detail.tasks.titlePlaceholder')}
+                placeholderTextColor={theme.textMuted}
+                className="text-base"
+                style={{ color: theme.text }}
+                accessibilityLabel={t('detail.tasks.titlePlaceholder')}
+              />
+              <Input
+                value={description}
+                onChangeText={setDescription}
+                placeholder={t('detail.tasks.descriptionPlaceholder')}
+                placeholderTextColor={theme.textMuted}
+                multiline
+                className="min-h-[88px] text-base"
+                style={{ color: theme.text, textAlignVertical: 'top' }}
+                accessibilityLabel={t('detail.tasks.descriptionPlaceholder')}
+              />
+              <Input
+                value={dueDate}
+                onChangeText={setDueDate}
+                placeholder={t('detail.tasks.dueDatePlaceholder')}
+                placeholderTextColor={theme.textMuted}
+                className="text-base"
+                style={{ color: theme.text }}
+                accessibilityLabel={t('detail.tasks.dueDatePlaceholder')}
+              />
+              <View className="gap-2">
+                <Text className="text-xs font-semibold uppercase" style={{ color: theme.textMuted }}>
+                  {t('detail.tasks.priorityLabel')}
+                </Text>
+                <View className="flex-row flex-wrap gap-2">
+                  {(['low', 'medium', 'high', 'urgent'] as GroupTaskPriority[]).map((value) => (
+                    <HeroButton key={value} size="sm" variant={priority === value ? 'primary' : 'secondary'} onPress={() => setPriority(value)}>
+                      <HeroButton.Label>{t(`detail.tasks.priority.${value}`)}</HeroButton.Label>
+                    </HeroButton>
+                  ))}
+                </View>
+              </View>
+              {members.length > 0 ? (
+                <View className="gap-2">
+                  <Text className="text-xs font-semibold uppercase" style={{ color: theme.textMuted }}>
+                    {t('detail.tasks.assigneeLabel')}
+                  </Text>
+                  <View className="flex-row flex-wrap gap-2">
+                    <HeroButton size="sm" variant={assignedTo === null ? 'primary' : 'secondary'} onPress={() => setAssignedTo(null)}>
+                      <HeroButton.Label>{t('detail.tasks.unassigned')}</HeroButton.Label>
+                    </HeroButton>
+                    {members.slice(0, 8).map((member) => (
+                      <HeroButton
+                        key={member.id}
+                        size="sm"
+                        variant={assignedTo === member.id ? 'primary' : 'secondary'}
+                        onPress={() => setAssignedTo(member.id)}
+                      >
+                        <HeroButton.Label>{member.name}</HeroButton.Label>
+                      </HeroButton>
+                    ))}
+                  </View>
+                </View>
+              ) : null}
+              <HeroButton isDisabled={creating} onPress={() => void createTask()}>
+                {creating ? <Spinner size="sm" /> : <HeroButton.Label>{t('detail.tasks.create')}</HeroButton.Label>}
+              </HeroButton>
+            </View>
+          ) : null}
+        </HeroCard.Body>
+      </HeroCard>
+
+      {isLoading ? (
+        <HeroCard className="rounded-panel p-0">
+          <HeroCard.Body className="min-h-[140px] items-center justify-center">
+            <Spinner size="md" />
+          </HeroCard.Body>
+        </HeroCard>
+      ) : tasks.length === 0 ? (
+        <EmptyCard icon="checkbox-outline" message={t('detail.tasks.empty')} />
+      ) : (
+        tasks.map((task) => (
+          <HeroCard key={task.id} className="rounded-panel p-0">
+            <HeroCard.Body className="gap-3 p-4">
+              <View className="flex-row items-start gap-3">
+                <HeroButton
+                  size="sm"
+                  variant={task.status === 'done' ? 'primary' : 'secondary'}
+                  isDisabled={updatingTaskId === task.id}
+                  onPress={() => void cycleStatus(task)}
+                  accessibilityLabel={t(`detail.tasks.status.${task.status}`)}
+                >
+                  {updatingTaskId === task.id ? <Spinner size="sm" /> : <Ionicons name={task.status === 'done' ? 'checkmark-outline' : task.status === 'in_progress' ? 'time-outline' : 'ellipse-outline'} size={16} color={theme.text} />}
+                </HeroButton>
+                <View className="min-w-0 flex-1 gap-2">
+                  <View className="flex-row flex-wrap items-center gap-2">
+                    <Text className="min-w-0 flex-1 text-base font-semibold" style={{ color: task.status === 'done' ? theme.textMuted : theme.text }}>
+                      {task.title}
+                    </Text>
+                    <Chip size="sm" variant="secondary" color={task.priority === 'urgent' ? 'danger' : task.priority === 'high' ? 'warning' : 'default'}>
+                      <Chip.Label>{t(`detail.tasks.priority.${task.priority}`)}</Chip.Label>
+                    </Chip>
+                  </View>
+                  {task.description ? (
+                    <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>
+                      {task.description}
+                    </Text>
+                  ) : null}
+                  <Text className="text-xs" style={{ color: theme.textMuted }} numberOfLines={1}>
+                    {[
+                      t(`detail.tasks.status.${task.status}`),
+                      task.assignee?.name,
+                      task.due_date ? t('detail.tasks.dueDate', { date: formatDate(task.due_date) ?? task.due_date }) : null,
+                    ].filter(Boolean).join(' - ')}
+                  </Text>
+                </View>
+                {canManage ? (
+                  <HeroButton size="sm" variant="danger-soft" isDisabled={updatingTaskId === task.id} onPress={() => confirmDelete(task)}>
+                    <HeroButton.Label>{t('detail.tasks.delete')}</HeroButton.Label>
+                  </HeroButton>
+                ) : null}
+              </View>
+              {canManage ? (
+                <Surface variant="secondary" className="gap-3 rounded-panel-inner p-3">
+                  <View className="gap-2">
+                    <Text className="text-xs font-semibold uppercase" style={{ color: theme.textMuted }}>
+                      {t('detail.tasks.quickPriority')}
+                    </Text>
+                    <View className="flex-row flex-wrap gap-2">
+                      {(['low', 'medium', 'high', 'urgent'] as GroupTaskPriority[]).map((value) => (
+                        <HeroButton
+                          key={value}
+                          size="sm"
+                          variant={task.priority === value ? 'primary' : 'secondary'}
+                          isDisabled={updatingTaskId === task.id}
+                          onPress={() => void updateTaskFields(task, { priority: value })}
+                        >
+                          <HeroButton.Label>{t(`detail.tasks.priority.${value}`)}</HeroButton.Label>
+                        </HeroButton>
+                      ))}
+                    </View>
+                  </View>
+                  {members.length > 0 ? (
+                    <View className="gap-2">
+                      <Text className="text-xs font-semibold uppercase" style={{ color: theme.textMuted }}>
+                        {t('detail.tasks.quickAssignee')}
+                      </Text>
+                      <View className="flex-row flex-wrap gap-2">
+                        <HeroButton
+                          size="sm"
+                          variant={task.assigned_to === null ? 'primary' : 'secondary'}
+                          isDisabled={updatingTaskId === task.id}
+                          onPress={() => void updateTaskFields(task, { assigned_to: null })}
+                        >
+                          <HeroButton.Label>{t('detail.tasks.unassigned')}</HeroButton.Label>
+                        </HeroButton>
+                        {members.slice(0, 8).map((member) => (
+                          <HeroButton
+                            key={member.id}
+                            size="sm"
+                            variant={task.assigned_to === member.id ? 'primary' : 'secondary'}
+                            isDisabled={updatingTaskId === task.id}
+                            onPress={() => void updateTaskFields(task, { assigned_to: member.id })}
+                          >
+                            <HeroButton.Label>{member.name}</HeroButton.Label>
+                          </HeroButton>
+                        ))}
+                      </View>
+                    </View>
+                  ) : null}
+                </Surface>
+              ) : null}
+            </HeroCard.Body>
+          </HeroCard>
+        ))
+      )}
+    </View>
+  );
+}
+
+function GroupAnalyticsPanel({ groupId, canView }: { groupId: number; canView: boolean }) {
+  const { t } = useTranslation(['groups', 'common']);
+  const primary = usePrimaryColor();
+  const theme = useTheme();
+  const [days, setDays] = useState(30);
+  const [dashboard, setDashboard] = useState<GroupAnalyticsDashboard | null>(null);
+  const [retention, setRetention] = useState<GroupAnalyticsRetentionCohort[]>([]);
+  const [comparative, setComparative] = useState<GroupAnalyticsComparative | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const loadAnalytics = useCallback(async () => {
+    if (!canView) return;
+    setIsLoading(true);
+    try {
+      const [response, retentionResponse, comparativeResponse] = await Promise.all([
+        getGroupAnalytics(groupId, days),
+        getGroupAnalyticsRetention(groupId, 6),
+        getGroupAnalyticsComparative(groupId),
+      ]);
+      setDashboard(response.data);
+      setRetention(retentionResponse.data);
+      setComparative(comparativeResponse.data);
+    } catch {
+      Alert.alert(t('common:errors.alertTitle'), t('detail.analytics.loadError'));
+    } finally {
+      setIsLoading(false);
+    }
+    // Keep loading tied to data inputs. The i18n function can change identity during test/runtime renders.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canView, days, groupId]);
+
+  useEffect(() => {
+    void loadAnalytics();
+  }, [loadAnalytics]);
+
+  if (!canView) {
+    return <EmptyCard icon="lock-closed-outline" message={t('detail.analytics.adminOnly')} />;
+  }
+
+  const overview = dashboard?.overview;
+  const engagement = dashboard?.engagement.summary;
+  const latestGrowth = dashboard?.member_growth.at(-1);
+  const latestEngagement = dashboard?.engagement.timeline.at(-1);
+  const activity = dashboard?.activity_breakdown;
+  const latestRetention = retention.at(-1);
+
+  return (
+    <View className="gap-3">
+      <HeroCard className="rounded-panel p-0">
+        <HeroCard.Body className="gap-4 p-4">
+          <View className="flex-row items-start gap-3">
+            <View className="size-12 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+              <Ionicons name="analytics-outline" size={23} color={primary} />
+            </View>
+            <View className="min-w-0 flex-1">
+              <Text className="text-base font-semibold" style={{ color: theme.text }}>
+                {t('detail.analytics.title')}
+              </Text>
+              <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+                {t('detail.analytics.subtitle')}
+              </Text>
+            </View>
+          </View>
+
+          <View className="flex-row flex-wrap gap-2">
+            {[7, 30, 90].map((value) => (
+              <HeroButton key={value} size="sm" variant={days === value ? 'primary' : 'secondary'} onPress={() => setDays(value)}>
+                <HeroButton.Label>{t(`detail.analytics.days.${value}`)}</HeroButton.Label>
+              </HeroButton>
+            ))}
+          </View>
+        </HeroCard.Body>
+      </HeroCard>
+
+      {isLoading ? (
+        <HeroCard className="rounded-panel p-0">
+          <HeroCard.Body className="min-h-[140px] items-center justify-center">
+            <Spinner size="md" />
+          </HeroCard.Body>
+        </HeroCard>
+      ) : !dashboard ? (
+        <EmptyCard icon="analytics-outline" message={t('detail.analytics.empty')} />
+      ) : (
+        <>
+          <View className="flex-row flex-wrap gap-3">
+            <StatTile label={t('detail.analytics.metrics.members')} value={formatMetric(overview?.total_members)} tone={primary} theme={theme} />
+            <StatTile label={t('detail.analytics.metrics.activeMembers')} value={formatMetric(engagement?.active_members)} tone={theme.success} theme={theme} />
+            <StatTile
+              label={t('detail.analytics.metrics.participation')}
+              value={formatMetric((engagement?.participation_rate ?? 0) / 100, { style: 'percent', maximumFractionDigits: 0 })}
+              tone="#f59e0b"
+              theme={theme}
+            />
+            <StatTile label={t('detail.analytics.metrics.postsPerDay')} value={formatMetric(engagement?.avg_posts_per_day, { maximumFractionDigits: 1 })} tone="#0ea5e9" theme={theme} />
+          </View>
+
+          <HeroCard className="rounded-panel p-0">
+            <HeroCard.Body className="gap-3 p-4">
+              <SectionTitle title={t('detail.analytics.activity')} />
+              <View className="flex-row flex-wrap gap-2">
+                {(['discussions', 'posts', 'events', 'files', 'member_joins'] as const).map((key) => (
+                  <Chip key={key} size="sm" variant="secondary" color="default">
+                    <Chip.Label>{t(`detail.analytics.breakdown.${key}`, { count: activity?.[key] ?? 0 })}</Chip.Label>
+                  </Chip>
+                ))}
+              </View>
+              <View className="gap-2">
+                <Text className="text-sm" style={{ color: theme.textSecondary }}>
+                  {t('detail.analytics.latestGrowth', {
+                    count: latestGrowth?.new_members ?? 0,
+                    total: latestGrowth?.total_members ?? overview?.total_members ?? 0,
+                  })}
+                </Text>
+                <Text className="text-sm" style={{ color: theme.textSecondary }}>
+                  {t('detail.analytics.latestEngagement', {
+                    posts: latestEngagement?.posts ?? 0,
+                    discussions: latestEngagement?.discussions ?? 0,
+                    active: latestEngagement?.active_members ?? 0,
+                  })}
+                </Text>
+              </View>
+            </HeroCard.Body>
+          </HeroCard>
+
+          <View className="flex-row flex-wrap gap-3">
+            <StatTile
+              label={t('detail.analytics.metrics.retention')}
+              value={formatMetric((latestRetention?.retention_rate ?? 0) / 100, { style: 'percent', maximumFractionDigits: 0 })}
+              tone="#14b8a6"
+              theme={theme}
+            />
+            <StatTile
+              label={t('detail.analytics.metrics.rank')}
+              value={comparative ? t('detail.analytics.rankValue', { rank: comparative.rank, total: comparative.total_groups }) : '-'}
+              tone="#a855f7"
+              theme={theme}
+            />
+          </View>
+
+          <HeroCard className="rounded-panel p-0">
+            <HeroCard.Body className="gap-3 p-4">
+              <SectionTitle title={t('detail.analytics.retention')} />
+              {retention.length === 0 ? (
+                <Text className="text-sm" style={{ color: theme.textSecondary }}>{t('detail.analytics.noRetention')}</Text>
+              ) : (
+                retention.slice(-6).map((cohort) => (
+                  <Surface key={cohort.month} variant="secondary" className="gap-2 rounded-panel-inner p-3">
+                    <View className="flex-row items-center justify-between gap-3">
+                      <Text className="text-sm font-semibold" style={{ color: theme.text }}>{cohort.month}</Text>
+                      <Text className="text-sm font-semibold" style={{ color: primary }}>
+                        {formatMetric((cohort.retention_rate ?? 0) / 100, { style: 'percent', maximumFractionDigits: 0 })}
+                      </Text>
+                    </View>
+                    <Text className="text-xs" style={{ color: theme.textSecondary }}>
+                      {t('detail.analytics.retentionDetail', { joined: cohort.joined, active: cohort.still_active })}
+                    </Text>
+                  </Surface>
+                ))
+              )}
+            </HeroCard.Body>
+          </HeroCard>
+
+          {comparative ? (
+            <HeroCard className="rounded-panel p-0">
+              <HeroCard.Body className="gap-3 p-4">
+                <SectionTitle title={t('detail.analytics.comparative')} />
+                <View className="flex-row flex-wrap gap-2">
+                  <Chip size="sm" variant="secondary" color="default">
+                    <Chip.Label>{t('detail.analytics.comparison.members', { count: comparative.group_members })}</Chip.Label>
+                  </Chip>
+                  <Chip size="sm" variant="secondary" color="default">
+                    <Chip.Label>{t('detail.analytics.comparison.average', { count: comparative.avg_members })}</Chip.Label>
+                  </Chip>
+                  <Chip size="sm" variant="secondary" color="default">
+                    <Chip.Label>{t('detail.analytics.comparison.percentile', { count: comparative.percentile })}</Chip.Label>
+                  </Chip>
+                </View>
+              </HeroCard.Body>
+            </HeroCard>
+          ) : null}
+
+          <HeroCard className="rounded-panel p-0">
+            <HeroCard.Body className="gap-3 p-4">
+              <SectionTitle title={t('detail.analytics.contributors')} />
+              {dashboard.top_contributors.length === 0 ? (
+                <Text className="text-sm" style={{ color: theme.textSecondary }}>{t('detail.analytics.noContributors')}</Text>
+              ) : (
+                dashboard.top_contributors.slice(0, 5).map((contributor) => (
+                  <View key={contributor.user_id} className="flex-row items-center gap-3">
+                    <Avatar uri={contributor.avatar_url ?? undefined} name={contributor.name} size={38} />
+                    <View className="min-w-0 flex-1">
+                      <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+                        {contributor.name}
+                      </Text>
+                      <Text className="text-xs" style={{ color: theme.textSecondary }}>
+                        {t('detail.analytics.postCount', { count: contributor.post_count })}
+                      </Text>
+                    </View>
+                  </View>
+                ))
+              )}
+            </HeroCard.Body>
+          </HeroCard>
+
+          <HeroCard className="rounded-panel p-0">
+            <HeroCard.Body className="gap-3 p-4">
+              <SectionTitle title={t('detail.analytics.content')} />
+              {dashboard.content_performance.length === 0 ? (
+                <Text className="text-sm" style={{ color: theme.textSecondary }}>{t('detail.analytics.noContent')}</Text>
+              ) : (
+                dashboard.content_performance.slice(0, 5).map((item) => (
+                  <Surface key={item.id} variant="secondary" className="gap-2 rounded-panel-inner p-3">
+                    <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={2}>
+                      {item.title}
+                    </Text>
+                    <Text className="text-xs" style={{ color: theme.textMuted }} numberOfLines={1}>
+                      {[
+                        item.author_name,
+                        formatDate(item.created_at),
+                        t('detail.analytics.replies', { count: item.reply_count }),
+                        t('detail.analytics.participants', { count: item.unique_participants }),
+                      ].filter(Boolean).join(' - ')}
+                    </Text>
+                  </Surface>
+                ))
+              )}
+            </HeroCard.Body>
+          </HeroCard>
+        </>
       )}
     </View>
   );

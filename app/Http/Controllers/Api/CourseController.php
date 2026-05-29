@@ -1,0 +1,206 @@
+<?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Api\Concerns\InteractsWithCourses;
+use App\Models\Course;
+use App\Models\CourseReview;
+use App\Services\CourseCategoryService;
+use App\Services\CourseEnrollmentService;
+use App\Services\CourseInstructorService;
+use App\Services\CourseService;
+use Illuminate\Http\JsonResponse;
+
+/**
+ * CourseController — Courses module (alpha) course endpoints.
+ *
+ * Public: browse, show, categories, reviews.
+ * Instructor/admin: create, update, publish/unpublish, delete, authored list.
+ *
+ * Self-contained module; gated by the per-tenant `courses` feature flag.
+ */
+class CourseController extends BaseApiController
+{
+    use InteractsWithCourses;
+
+    protected bool $isV2Api = true;
+
+    // =====================================================================
+    //  Public browse / discovery
+    // =====================================================================
+
+    /** GET /v2/courses — browse published courses. */
+    public function index(): JsonResponse
+    {
+        $this->ensureCoursesFeature();
+        $this->rateLimit('courses_browse', 60, 60);
+
+        $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
+
+        $filters = [
+            'page' => $this->queryInt('page', 1, 1),
+            'per_page' => $this->queryInt('per_page', 12, 1, 50),
+            // Logged-in members may see members-only courses in the catalogue.
+            'include_member_only' => $userId !== null,
+        ];
+        if ($this->query('q')) {
+            $filters['search'] = $this->query('q');
+        }
+        if ($this->query('category_id')) {
+            $filters['category_id'] = $this->queryInt('category_id');
+        }
+        if ($this->query('level')) {
+            $filters['level'] = $this->query('level');
+        }
+
+        $result = CourseService::browse($filters);
+
+        return $this->respondWithPaginatedCollection(
+            $result['items'],
+            $result['total'],
+            $result['page'],
+            $result['per_page'],
+        );
+    }
+
+    /** GET /v2/courses/categories — list course categories. */
+    public function categories(): JsonResponse
+    {
+        $this->ensureCoursesFeature();
+
+        return $this->respondWithData(CourseCategoryService::all());
+    }
+
+    /** GET /v2/courses/{idOrSlug} — course detail (syllabus). */
+    public function show(string $idOrSlug): JsonResponse
+    {
+        $this->ensureCoursesFeature();
+
+        $course = ctype_digit($idOrSlug)
+            ? CourseService::findById((int) $idOrSlug)
+            : CourseService::findBySlug($idOrSlug);
+
+        if (!$course) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.courses.not_found'), null, 404);
+        }
+
+        // Drafts/archived are only visible to the author or an admin.
+        if ($course->status !== 'published' || $course->moderation_status !== 'approved') {
+            $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
+            if ($userId === null || ((int) $course->author_user_id !== $userId && !CourseInstructorService::isInstructor($userId))) {
+                return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.courses.not_found'), null, 404);
+            }
+        }
+
+        $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
+        $data = $course->toArray();
+        $data['is_enrolled'] = $userId !== null && CourseEnrollmentService::isEnrolled($course->id, $userId);
+
+        return $this->respondWithData($data);
+    }
+
+    /** GET /v2/courses/{id}/reviews — approved reviews for a course. */
+    public function reviews(int $id): JsonResponse
+    {
+        $this->ensureCoursesFeature();
+
+        $reviews = CourseReview::where('course_id', $id)
+            ->where('status', 'approved')
+            ->with('user:id,name,avatar_url')
+            ->orderByDesc('created_at')
+            ->limit(100)
+            ->get()
+            ->toArray();
+
+        return $this->respondWithData($reviews);
+    }
+
+    // =====================================================================
+    //  Authoring (instructor or admin)
+    // =====================================================================
+
+    /** GET /v2/courses/mine — courses authored by the caller. */
+    public function authored(): JsonResponse
+    {
+        $this->ensureCoursesFeature();
+        $userId = $this->requireInstructorOrAdmin();
+
+        return $this->respondWithData(CourseService::authoredBy($userId));
+    }
+
+    /** POST /v2/courses — create a draft course. */
+    public function store(): JsonResponse
+    {
+        $this->ensureCoursesFeature();
+        $userId = $this->requireInstructorOrAdmin();
+
+        $title = trim((string) $this->input('title', ''));
+        if ($title === '') {
+            return $this->respondWithError('VALIDATION_FAILED', __('api_controllers_2.courses.title_required'), 'title', 422);
+        }
+
+        $course = CourseService::create($userId, $this->getAllInput());
+
+        return $this->respondWithData($course, null, 201);
+    }
+
+    /** PUT /v2/courses/{id} — update a course. */
+    public function update(int $id): JsonResponse
+    {
+        $this->ensureCoursesFeature();
+        $userId = $this->requireInstructorOrAdmin();
+
+        $course = $this->findCourseOrFail($id);
+        $this->ensureCourseOwnerOrAdmin($course, $userId);
+
+        $course = CourseService::update($course, $this->getAllInput());
+
+        return $this->respondWithData($course);
+    }
+
+    /** POST /v2/courses/{id}/publish — publish a course. */
+    public function publish(int $id): JsonResponse
+    {
+        $this->ensureCoursesFeature();
+        $userId = $this->requireInstructorOrAdmin();
+
+        $course = $this->findCourseOrFail($id);
+        $this->ensureCourseOwnerOrAdmin($course, $userId);
+
+        $course = CourseService::publish($course, true);
+
+        return $this->respondWithData($course);
+    }
+
+    /** POST /v2/courses/{id}/unpublish — revert a course to draft. */
+    public function unpublish(int $id): JsonResponse
+    {
+        $this->ensureCoursesFeature();
+        $userId = $this->requireInstructorOrAdmin();
+
+        $course = $this->findCourseOrFail($id);
+        $this->ensureCourseOwnerOrAdmin($course, $userId);
+
+        $course = CourseService::unpublish($course);
+
+        return $this->respondWithData($course);
+    }
+
+    /** DELETE /v2/courses/{id} — delete a course. */
+    public function destroy(int $id): JsonResponse
+    {
+        $this->ensureCoursesFeature();
+        $userId = $this->requireInstructorOrAdmin();
+
+        $course = $this->findCourseOrFail($id);
+        $this->ensureCourseOwnerOrAdmin($course, $userId);
+
+        CourseService::delete($course);
+
+        return $this->respondWithData(['deleted' => true]);
+    }
+}

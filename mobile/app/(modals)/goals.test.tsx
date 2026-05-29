@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
+import { render, fireEvent, waitFor } from '@testing-library/react-native';
 
 // --- Mocks ---
 
@@ -25,6 +25,18 @@ jest.mock('react-i18next', () => ({
         heroEyebrow: 'Personal progress',
         'goals:addGoal': 'Add Goal',
         addGoal: 'Add Goal',
+        'templates.open': 'Use template',
+        'templates.title': 'Goal templates',
+        'templates.subtitle': 'Start from a proven goal structure.',
+        'templates.loadError': 'Could not load goal templates.',
+        'templates.empty': 'No templates available yet.',
+        'templates.emptyCategory': 'No templates in this category.',
+        'templates.allCategories': 'All',
+        'templates.use': 'Use',
+        'templates.useLabel': opts ? `Use ${String(opts.title ?? '')}` : 'Use template',
+        'templates.target': opts ? `${String(opts.value ?? 0)} target` : '0 target',
+        'templates.duration': opts ? `${String(opts.days ?? 0)} days` : '0 days',
+        'templates.createError': 'Could not create goal from template.',
         'goals:empty': 'No goals yet. Add one to get started!',
         'goals:noGoals': 'No goals yet',
         noGoals: 'No goals yet',
@@ -122,6 +134,21 @@ jest.mock('@expo/vector-icons', () => ({
 jest.mock('@/lib/api/goals', () => ({
   getGoals: jest.fn(),
   createGoal: jest.fn().mockResolvedValue({ data: { id: 99, title: 'Learn React Native', status: 'active', progress_hours: 0, target_hours: 10, due_date: null } }),
+  getGoalTemplates: jest.fn().mockResolvedValue({
+    data: [{
+      id: 4,
+      title: 'Volunteer starter',
+      description: 'Build a steady helping habit.',
+      category: 'community',
+      default_target_value: 10,
+      duration_days: 30,
+    }],
+    meta: { has_more: false, cursor: null },
+  }),
+  getGoalTemplateCategories: jest.fn().mockResolvedValue({ data: ['community'] }),
+  createGoalFromTemplate: jest.fn().mockResolvedValue({
+    data: { id: 100, title: 'Volunteer starter', status: 'active', progress_hours: 0, target_hours: null, target_value: 10, due_date: null, created_at: '2026-01-01T00:00:00Z' },
+  }),
   updateGoalStatus: jest.fn().mockResolvedValue({ data: {} }),
 }));
 
@@ -130,11 +157,13 @@ jest.mock('@/components/ui/LoadingSpinner', () => () => null);
 // --- Tests ---
 
 import GoalsScreen from './goals';
+import { createGoalFromTemplate, getGoalTemplateCategories, getGoalTemplates } from '@/lib/api/goals';
 
 const defaultApiState = { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
 
 beforeEach(() => {
   mockUseApi.mockReturnValue(defaultApiState);
+  jest.clearAllMocks();
 });
 
 const mockGoal = {
@@ -218,6 +247,33 @@ describe('GoalsScreen', () => {
     expect(router.push).toHaveBeenCalledWith({
       pathname: '/(modals)/goal-detail',
       params: { id: '1' },
+    });
+  });
+
+  it('loads and renders native goal templates', async () => {
+    const { findByText, getAllByText, getByText } = render(<GoalsScreen />);
+
+    fireEvent.press(getByText('Use template'));
+
+    expect(await findByText('Goal templates')).toBeTruthy();
+    expect(await findByText('Volunteer starter')).toBeTruthy();
+    expect(getAllByText('community').length).toBeGreaterThan(0);
+    expect(getByText('10 target')).toBeTruthy();
+    expect(getByText('30 days')).toBeTruthy();
+    expect(getGoalTemplates).toHaveBeenCalled();
+    expect(getGoalTemplateCategories).toHaveBeenCalled();
+  });
+
+  it('creates a goal from a native template', async () => {
+    const { findByText, getByText } = render(<GoalsScreen />);
+
+    fireEvent.press(getByText('Use template'));
+    expect(await findByText('Volunteer starter')).toBeTruthy();
+    fireEvent.press(getByText('Use'));
+
+    await waitFor(() => {
+      expect(createGoalFromTemplate).toHaveBeenCalledWith(4);
+      expect(getByText('Volunteer starter')).toBeTruthy();
     });
   });
 });

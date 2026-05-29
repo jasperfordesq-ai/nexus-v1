@@ -69,7 +69,8 @@
     "verify_identity": "本人確認をする",
     "accessibility_alpha": "アクセシビリティ（アルファ）",
     "features": "機能",
-    "accessibility_alpha_tooltip": "Enhanced accessible version — WCAG 2.2 AA compliant. Opens in a new tab."
+    "accessibility_alpha_tooltip": "Enhanced accessible version — WCAG 2.2 AA compliant. Opens in a new tab.",
+    "courses": "Courses"
   },
   "landing_links": {
     "title": "このコミュニティを探索",
@@ -132,7 +133,8 @@
     "premium": "プレミアム会員プラン",
     "accessibility_alpha": "アクセシビリティ重視のアルファフロントエンドを開く",
     "features": "Project NEXUSのすべての機能と正直な成熟度ラベル",
-    "dashboard": "Your personalised home overview"
+    "dashboard": "Your personalised home overview",
+    "courses": "Learn new skills with your community"
   },
   "user_menu": {
     "my_profile": "マイプロフィール",
@@ -2245,5 +2247,6 @@
     "scheme_dark": "Dark",
     "scheme_system": "System"
   },
-  "delete": "Delete"
+  "delete": "Delete",
+  "alpha_badge": "Alpha"
 }

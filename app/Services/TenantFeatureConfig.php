@@ -45,6 +45,9 @@ class TenantFeatureConfig
         'regional_analytics' => false,
         'newsletter' => true,
         'maps' => true,
+        // Courses (alpha) — opt-in per tenant. Ships marked stage:'alpha' in the
+        // React module registry. Default OFF like marketplace / caring_community.
+        'courses' => false,
     ];
 
     /**

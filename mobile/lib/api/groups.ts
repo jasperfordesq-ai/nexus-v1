@@ -124,6 +124,165 @@ export interface GroupQuestionDetail extends GroupQuestion {
   answers: GroupAnswer[];
 }
 
+export interface GroupWikiAuthor {
+  id: number | null;
+  name: string | null;
+}
+
+export interface GroupWikiPage {
+  id: number;
+  title: string;
+  slug: string;
+  parent_id: number | null;
+  sort_order: number;
+  is_published: boolean;
+  author?: GroupWikiAuthor | null;
+  created_at?: string | null;
+  updated_at: string | null;
+}
+
+export interface GroupWikiPageDetail extends GroupWikiPage {
+  content: string;
+}
+
+export interface GroupWikiRevision {
+  id: number;
+  content: string;
+  change_summary?: string | null;
+  created_at?: string | null;
+  editor?: {
+    id: number | null;
+    name: string | null;
+  } | null;
+}
+
+export type GroupTaskStatus = 'todo' | 'in_progress' | 'done';
+export type GroupTaskPriority = 'low' | 'medium' | 'high' | 'urgent';
+
+export interface GroupTask {
+  id: number;
+  group_id: number;
+  title: string;
+  description: string | null;
+  status: GroupTaskStatus;
+  priority: GroupTaskPriority;
+  assigned_to: number | null;
+  due_date: string | null;
+  created_at: string | null;
+  updated_at?: string | null;
+  assignee?: {
+    id: number;
+    name: string;
+    avatar_url?: string | null;
+  } | null;
+}
+
+export interface GroupTaskStats {
+  total: number;
+  todo: number;
+  in_progress: number;
+  done: number;
+  overdue: number;
+}
+
+export type GroupMediaType = 'image' | 'video';
+
+export interface GroupMediaItem {
+  id: number;
+  file_path?: string | null;
+  url: string | null;
+  type: GroupMediaType;
+  thumbnail_url?: string | null;
+  caption?: string | null;
+  file_size?: number | null;
+  uploaded_by: number | null;
+  uploader_name?: string | null;
+  created_at: string | null;
+}
+
+export interface GroupAnalyticsOverview {
+  total_members: number;
+  total_discussions: number;
+  total_posts: number;
+  total_events: number;
+  total_files: number;
+  pending_requests: number;
+  created_at?: string | null;
+  visibility?: string | null;
+}
+
+export interface GroupAnalyticsGrowthPoint {
+  date: string;
+  new_members: number;
+  total_members: number;
+}
+
+export interface GroupAnalyticsEngagementPoint {
+  date: string;
+  posts: number;
+  discussions: number;
+  active_members: number;
+}
+
+export interface GroupAnalyticsEngagement {
+  timeline: GroupAnalyticsEngagementPoint[];
+  summary: {
+    total_members: number;
+    active_members: number;
+    participation_rate: number;
+    avg_posts_per_day: number;
+  };
+}
+
+export interface GroupAnalyticsContributor {
+  user_id: number;
+  name: string;
+  avatar_url?: string | null;
+  post_count: number;
+}
+
+export interface GroupAnalyticsContentItem {
+  id: number;
+  title: string;
+  created_at?: string | null;
+  author_name?: string | null;
+  reply_count: number;
+  unique_participants: number;
+}
+
+export interface GroupAnalyticsActivityBreakdown {
+  discussions: number;
+  posts: number;
+  events: number;
+  files: number;
+  member_joins: number;
+  total: number;
+}
+
+export interface GroupAnalyticsRetentionCohort {
+  month: string;
+  joined: number;
+  still_active: number;
+  retention_rate: number;
+}
+
+export interface GroupAnalyticsComparative {
+  group_members: number;
+  avg_members: number;
+  percentile: number;
+  total_groups: number;
+  rank: number;
+}
+
+export interface GroupAnalyticsDashboard {
+  overview: GroupAnalyticsOverview;
+  member_growth: GroupAnalyticsGrowthPoint[];
+  engagement: GroupAnalyticsEngagement;
+  top_contributors: GroupAnalyticsContributor[];
+  content_performance: GroupAnalyticsContentItem[];
+  activity_breakdown: GroupAnalyticsActivityBreakdown;
+}
+
 export interface GroupTemplate {
   id: number;
   name: string;
@@ -168,6 +327,20 @@ export interface GroupFilesResponse {
 export interface GroupQuestionsResponse {
   data: {
     items: GroupQuestion[];
+    cursor: string | null;
+    has_more: boolean;
+  };
+}
+
+export interface GroupWikiPagesResponse {
+  data: GroupWikiPage[];
+}
+
+export type GroupTasksResponse = GroupCollectionResponse<GroupTask>;
+
+export interface GroupMediaResponse {
+  data: {
+    items: GroupMediaItem[];
     cursor: string | null;
     has_more: boolean;
   };
@@ -232,18 +405,33 @@ type UploadGroupImageResponse = {
   message?: string;
 };
 
-function getUploadFilename(uri: string): string {
+type UploadGroupMediaResponse = {
+  data?: GroupMediaItem | null;
+  message?: string;
+};
+
+export interface GroupMediaUploadAsset {
+  uri: string;
+  fileName?: string | null;
+  mimeType?: string | null;
+}
+
+function getUploadFilename(uri: string, fallback = 'group.jpg'): string {
   const cleanUri = uri.split('?')[0] ?? uri;
   const lastSegment = cleanUri.split('/').pop();
-  return lastSegment && lastSegment.includes('.') ? lastSegment : 'group.jpg';
+  return lastSegment && lastSegment.includes('.') ? lastSegment : fallback;
 }
 
 function getMimeType(filename: string, fallback?: string | null): string {
-  if (fallback?.startsWith('image/')) return fallback;
+  if (fallback?.startsWith('image/') || fallback?.startsWith('video/')) return fallback;
   const extension = filename.split('.').pop()?.toLowerCase();
   if (extension === 'png') return 'image/png';
   if (extension === 'webp') return 'image/webp';
   if (extension === 'gif') return 'image/gif';
+  if (extension === 'mp4') return 'video/mp4';
+  if (extension === 'webm') return 'video/webm';
+  if (extension === 'mov') return 'video/quicktime';
+  if (extension === 'avi') return 'video/x-msvideo';
   return 'image/jpeg';
 }
 
@@ -264,6 +452,26 @@ async function appendGroupImageFile(formData: FormData, uri: string): Promise<vo
 
   const type = getMimeType(filename);
   formData.append('image', { uri, name: filename, type } as unknown as Blob);
+}
+
+async function appendGroupMediaFile(formData: FormData, asset: GroupMediaUploadAsset): Promise<void> {
+  const fallbackName = asset.mimeType?.startsWith('video/') ? 'group-video.mp4' : 'group-media.jpg';
+  const filename = asset.fileName || getUploadFilename(asset.uri, fallbackName);
+
+  if (Platform.OS === 'web') {
+    const response = await fetch(asset.uri);
+    const blob = await response.blob();
+    const type = getMimeType(filename, asset.mimeType ?? blob.type);
+    if (typeof File !== 'undefined') {
+      formData.append('file', new File([blob], filename, { type }));
+      return;
+    }
+    formData.append('file', blob, filename);
+    return;
+  }
+
+  const type = getMimeType(filename, asset.mimeType);
+  formData.append('file', { uri: asset.uri, name: filename, type } as unknown as Blob);
 }
 
 /**
@@ -330,6 +538,56 @@ export function getGroupFiles(
   return api.get<GroupFilesResponse>(`${API_V2}/groups/${id}/files`, query);
 }
 
+export function deleteGroupFile(id: number, fileId: number): Promise<{ data: { message: string } }> {
+  return api.delete<{ data: { message: string } }>(`${API_V2}/groups/${id}/files/${fileId}`);
+}
+
+/**
+ * GET /api/v2/groups/{id}/media — list group gallery media.
+ */
+export function getGroupMedia(
+  id: number,
+  params: { type?: GroupMediaType | 'all'; cursor?: string | null } = {},
+): Promise<GroupMediaResponse> {
+  const query: Record<string, string> = { per_page: '20' };
+  if (params.type && params.type !== 'all') query['type'] = params.type;
+  if (params.cursor) query['cursor'] = params.cursor;
+  return api.get<GroupMediaResponse>(`${API_V2}/groups/${id}/media`, query);
+}
+
+export function deleteGroupMedia(id: number, mediaId: number): Promise<{ data: { message: string } }> {
+  return api.delete<{ data: { message: string } }>(`${API_V2}/groups/${id}/media/${mediaId}`);
+}
+
+export async function uploadGroupMedia(id: number, asset: GroupMediaUploadAsset): Promise<{ data: GroupMediaItem }> {
+  const formData = new FormData();
+  await appendGroupMediaFile(formData, asset);
+  const response = await api.upload<UploadGroupMediaResponse>(`${API_V2}/groups/${id}/media`, formData);
+  if (!response.data) {
+    throw new Error(response.message ?? 'Group media upload did not return a media item.');
+  }
+  return { data: response.data };
+}
+
+/**
+ * GET /api/v2/groups/{id}/analytics — group admin dashboard metrics.
+ */
+export function getGroupAnalytics(id: number, days = 30): Promise<{ data: GroupAnalyticsDashboard }> {
+  return api.get<{ data: GroupAnalyticsDashboard }>(`${API_V2}/groups/${id}/analytics`, {
+    days: String(days),
+  });
+}
+
+export function getGroupAnalyticsRetention(id: number, months = 6): Promise<{ data: GroupAnalyticsRetentionCohort[] }> {
+  return api.get<{ data: GroupAnalyticsRetentionCohort[] }>(`${API_V2}/groups/${id}/analytics/retention`, {
+    months: String(months),
+  });
+}
+
+export function getGroupAnalyticsComparative(id: number): Promise<{ data: GroupAnalyticsComparative }> {
+  return api.get<{ data: GroupAnalyticsComparative }>(`${API_V2}/groups/${id}/analytics/comparative`);
+}
+
 /**
  * GET /api/v2/groups/{id}/questions — list member-only group Q&A questions.
  */
@@ -363,6 +621,93 @@ export function answerGroupQuestion(
     `${API_V2}/groups/${id}/questions/${questionId}/answers`,
     payload,
   );
+}
+
+export function voteGroupQA(
+  id: number,
+  payload: { type: 'question' | 'answer'; target_id: number; vote: 'up' | 'down' },
+): Promise<{ data: { message: string } }> {
+  return api.post<{ data: { message: string } }>(`${API_V2}/groups/${id}/qa/vote`, payload);
+}
+
+export function acceptGroupAnswer(id: number, answerId: number): Promise<{ data: { message: string } }> {
+  return api.post<{ data: { message: string } }>(`${API_V2}/groups/${id}/answers/${answerId}/accept`, {});
+}
+
+/**
+ * GET /api/v2/groups/{id}/wiki — list member-viewable group wiki pages.
+ */
+export function getGroupWikiPages(id: number): Promise<GroupWikiPagesResponse> {
+  return api.get<GroupWikiPagesResponse>(`${API_V2}/groups/${id}/wiki`);
+}
+
+export function getGroupWikiPage(id: number, slug: string): Promise<{ data: GroupWikiPageDetail }> {
+  return api.get<{ data: GroupWikiPageDetail }>(`${API_V2}/groups/${id}/wiki/${encodeURIComponent(slug)}`);
+}
+
+export function createGroupWikiPage(
+  id: number,
+  payload: { title: string; content: string; parent_id?: number | null },
+): Promise<{ data: GroupWikiPageDetail }> {
+  return api.post<{ data: GroupWikiPageDetail }>(`${API_V2}/groups/${id}/wiki`, payload);
+}
+
+export function updateGroupWikiPage(
+  id: number,
+  pageId: number,
+  payload: { title?: string; content: string; change_summary?: string },
+): Promise<{ data: GroupWikiPageDetail }> {
+  return api.put<{ data: GroupWikiPageDetail }>(`${API_V2}/groups/${id}/wiki/${pageId}`, payload);
+}
+
+export function deleteGroupWikiPage(id: number, pageId: number): Promise<{ data: { message: string } }> {
+  return api.delete<{ data: { message: string } }>(`${API_V2}/groups/${id}/wiki/${pageId}`);
+}
+
+export function getGroupWikiRevisions(id: number, pageId: number): Promise<{ data: GroupWikiRevision[] }> {
+  return api.get<{ data: GroupWikiRevision[] }>(`${API_V2}/groups/${id}/wiki/${pageId}/revisions`);
+}
+
+/**
+ * GET /api/v2/groups/{id}/tasks — list member-viewable group team tasks.
+ */
+export function getGroupTasks(
+  id: number,
+  params: { status?: GroupTaskStatus | 'all'; cursor?: string | null } = {},
+): Promise<GroupTasksResponse> {
+  const query: Record<string, string> = { per_page: '50' };
+  if (params.status && params.status !== 'all') query['status'] = params.status;
+  if (params.cursor) query['cursor'] = params.cursor;
+  return api.get<GroupTasksResponse>(`${API_V2}/groups/${id}/tasks`, query);
+}
+
+export function getGroupTaskStats(id: number): Promise<{ data: GroupTaskStats }> {
+  return api.get<{ data: GroupTaskStats }>(`${API_V2}/groups/${id}/task-stats`);
+}
+
+export function createGroupTask(
+  id: number,
+  payload: {
+    title: string;
+    description?: string | null;
+    status?: GroupTaskStatus;
+    priority?: GroupTaskPriority;
+    assigned_to?: number | null;
+    due_date?: string | null;
+  },
+): Promise<{ data: GroupTask }> {
+  return api.post<{ data: GroupTask }>(`${API_V2}/groups/${id}/tasks`, payload);
+}
+
+export function updateGroupTask(
+  taskId: number,
+  payload: Partial<Pick<GroupTask, 'title' | 'description' | 'assigned_to' | 'status' | 'priority' | 'due_date'>>,
+): Promise<{ data: GroupTask }> {
+  return api.put<{ data: GroupTask }>(`${API_V2}/team-tasks/${taskId}`, payload);
+}
+
+export function deleteGroupTask(taskId: number): Promise<void> {
+  return api.delete<void>(`${API_V2}/team-tasks/${taskId}`);
 }
 
 /**

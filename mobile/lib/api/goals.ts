@@ -98,6 +98,25 @@ export interface GoalReminder {
   last_sent_at?: string | null;
 }
 
+export interface GoalTemplate {
+  id: number;
+  title: string;
+  description?: string | null;
+  category?: string | null;
+  target_value?: number | string | null;
+  default_target_value?: number | string | null;
+  duration_days?: number | string | null;
+  is_public?: boolean | number;
+}
+
+export interface GoalTemplatesResponse {
+  data: GoalTemplate[];
+  meta: {
+    has_more: boolean;
+    cursor: string | null;
+  };
+}
+
 // ─── API Functions ────────────────────────────────────────────────────────────
 
 /**
@@ -129,6 +148,20 @@ export function createGoal(data: {
   deadline?: string;
 }): Promise<{ data: Goal }> {
   return api.post<{ data: Goal }>(`${API_V2}/goals`, data);
+}
+
+export function getGoalTemplates(category?: string | null): Promise<GoalTemplatesResponse> {
+  const params: Record<string, string> = { per_page: '50' };
+  if (category) params['category'] = category;
+  return api.get<GoalTemplatesResponse>(`${API_V2}/goals/templates`, params);
+}
+
+export function getGoalTemplateCategories(): Promise<{ data: string[] }> {
+  return api.get<{ data: string[] }>(`${API_V2}/goals/templates/categories`);
+}
+
+export function createGoalFromTemplate(templateId: number): Promise<{ data: Goal }> {
+  return api.post<{ data: Goal }>(`${API_V2}/goals/from-template/${templateId}`, {});
 }
 
 /**

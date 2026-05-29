@@ -1035,7 +1035,53 @@ Route::delete('/v2/auth/oauth/{provider}/unlink', [\App\Http\Controllers\Auth\So
     ->where('provider', 'google|apple|facebook');
 Route::get('/v2/auth/oauth/me/identities', [\App\Http\Controllers\Auth\SocialAuthController::class, 'identities']);
 
+// ============================================
+// Courses Module (ALPHA) — Authenticated routes
+// Self-contained learning module; gated by the per-tenant `courses` feature.
+// ============================================
+
+// Learner — enrollment, progress, reviews
+Route::get('/v2/me/courses', [\App\Http\Controllers\Api\CourseEnrollmentController::class, 'myCourses']);
+Route::get('/v2/courses/mine', [\App\Http\Controllers\Api\CourseController::class, 'authored']);
+Route::post('/v2/courses/{id}/enroll', [\App\Http\Controllers\Api\CourseEnrollmentController::class, 'enroll'])->where('id', '[0-9]+');
+Route::delete('/v2/courses/{id}/enroll', [\App\Http\Controllers\Api\CourseEnrollmentController::class, 'drop'])->where('id', '[0-9]+');
+Route::get('/v2/courses/{id}/progress', [\App\Http\Controllers\Api\CourseEnrollmentController::class, 'progress'])->where('id', '[0-9]+');
+Route::post('/v2/courses/{id}/lessons/{lessonId}/complete', [\App\Http\Controllers\Api\CourseEnrollmentController::class, 'completeLesson'])->where(['id' => '[0-9]+', 'lessonId' => '[0-9]+']);
+Route::post('/v2/courses/{id}/reviews', [\App\Http\Controllers\Api\CourseEnrollmentController::class, 'review'])->where('id', '[0-9]+');
+
+// Learner — quizzes
+Route::get('/v2/courses/quizzes/{quizId}', [\App\Http\Controllers\Api\CourseQuizController::class, 'show'])->where('quizId', '[0-9]+');
+Route::post('/v2/courses/quizzes/{quizId}/attempt', [\App\Http\Controllers\Api\CourseQuizController::class, 'attempt'])->where('quizId', '[0-9]+');
+
+// Authoring — course CRUD (instructor or admin)
+Route::post('/v2/courses', [\App\Http\Controllers\Api\CourseController::class, 'store']);
+Route::put('/v2/courses/{id}', [\App\Http\Controllers\Api\CourseController::class, 'update'])->where('id', '[0-9]+');
+Route::delete('/v2/courses/{id}', [\App\Http\Controllers\Api\CourseController::class, 'destroy'])->where('id', '[0-9]+');
+Route::post('/v2/courses/{id}/publish', [\App\Http\Controllers\Api\CourseController::class, 'publish'])->where('id', '[0-9]+');
+Route::post('/v2/courses/{id}/unpublish', [\App\Http\Controllers\Api\CourseController::class, 'unpublish'])->where('id', '[0-9]+');
+
+// Authoring — sections & lessons builder
+Route::post('/v2/courses/{courseId}/sections', [\App\Http\Controllers\Api\CourseContentController::class, 'storeSection'])->where('courseId', '[0-9]+');
+Route::put('/v2/courses/{courseId}/sections/{sectionId}', [\App\Http\Controllers\Api\CourseContentController::class, 'updateSection'])->where(['courseId' => '[0-9]+', 'sectionId' => '[0-9]+']);
+Route::delete('/v2/courses/{courseId}/sections/{sectionId}', [\App\Http\Controllers\Api\CourseContentController::class, 'deleteSection'])->where(['courseId' => '[0-9]+', 'sectionId' => '[0-9]+']);
+Route::post('/v2/courses/{courseId}/lessons', [\App\Http\Controllers\Api\CourseContentController::class, 'storeLesson'])->where('courseId', '[0-9]+');
+Route::put('/v2/courses/{courseId}/lessons/{lessonId}', [\App\Http\Controllers\Api\CourseContentController::class, 'updateLesson'])->where(['courseId' => '[0-9]+', 'lessonId' => '[0-9]+']);
+Route::delete('/v2/courses/{courseId}/lessons/{lessonId}', [\App\Http\Controllers\Api\CourseContentController::class, 'deleteLesson'])->where(['courseId' => '[0-9]+', 'lessonId' => '[0-9]+']);
+
+// Authoring — quizzes & questions
+Route::post('/v2/courses/{courseId}/quizzes', [\App\Http\Controllers\Api\CourseQuizController::class, 'storeQuiz'])->where('courseId', '[0-9]+');
+Route::post('/v2/courses/{courseId}/quizzes/{quizId}/questions', [\App\Http\Controllers\Api\CourseQuizController::class, 'storeQuestion'])->where(['courseId' => '[0-9]+', 'quizId' => '[0-9]+']);
+Route::delete('/v2/courses/{courseId}/quizzes/{quizId}/questions/{questionId}', [\App\Http\Controllers\Api\CourseQuizController::class, 'deleteQuestion'])->where(['courseId' => '[0-9]+', 'quizId' => '[0-9]+', 'questionId' => '[0-9]+']);
+
 }); // End Route::middleware('auth:sanctum')
+
+// ============================================
+// Courses Module (ALPHA) — Public routes (no auth required)
+// ============================================
+Route::get('/v2/courses', [\App\Http\Controllers\Api\CourseController::class, 'index']);
+Route::get('/v2/courses/categories', [\App\Http\Controllers\Api\CourseController::class, 'categories']);
+Route::get('/v2/courses/{id}/reviews', [\App\Http\Controllers\Api\CourseController::class, 'reviews'])->where('id', '[0-9]+');
+Route::get('/v2/courses/{idOrSlug}', [\App\Http\Controllers\Api\CourseController::class, 'show']);
 
 // ============================================
 // Marketplace Module — Public routes (no auth required)
@@ -2019,6 +2065,17 @@ Route::put('/v2/admin/marketplace/reports/{id}/resolve', [\App\Http\Controllers\
 Route::get('/v2/admin/marketplace/transparency', [\App\Http\Controllers\Api\AdminMarketplaceController::class, 'transparencyStats']);
 // Marketplace Admin — DSA Reports for a specific listing
 Route::get('/v2/admin/marketplace/listings/{id}/reports', [\App\Http\Controllers\Api\MarketplaceReportController::class, 'index']);
+
+// Courses Module (ALPHA) — Admin (moderation, instructors, categories, analytics)
+Route::get('/v2/admin/courses', [\App\Http\Controllers\Api\AdminCourseController::class, 'index']);
+Route::get('/v2/admin/courses/analytics', [\App\Http\Controllers\Api\AdminCourseController::class, 'analytics']);
+Route::post('/v2/admin/courses/{id}/moderate', [\App\Http\Controllers\Api\AdminCourseController::class, 'moderate'])->where('id', '[0-9]+');
+Route::get('/v2/admin/courses/instructors', [\App\Http\Controllers\Api\AdminCourseController::class, 'listInstructors']);
+Route::post('/v2/admin/courses/instructors', [\App\Http\Controllers\Api\AdminCourseController::class, 'grantInstructor']);
+Route::delete('/v2/admin/courses/instructors/{userId}', [\App\Http\Controllers\Api\AdminCourseController::class, 'revokeInstructor'])->where('userId', '[0-9]+');
+Route::post('/v2/admin/courses/categories', [\App\Http\Controllers\Api\AdminCourseController::class, 'storeCategory']);
+Route::put('/v2/admin/courses/categories/{id}', [\App\Http\Controllers\Api\AdminCourseController::class, 'updateCategory'])->where('id', '[0-9]+');
+Route::delete('/v2/admin/courses/categories/{id}', [\App\Http\Controllers\Api\AdminCourseController::class, 'deleteCategory'])->where('id', '[0-9]+');
 
 Route::get('/v2/admin/ideation', [\App\Http\Controllers\Api\AdminIdeationController::class, 'index']);
 Route::get('/v2/admin/ideation/{id}', [\App\Http\Controllers\Api\AdminIdeationController::class, 'show']);
