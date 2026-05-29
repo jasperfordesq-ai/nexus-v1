@@ -178,7 +178,8 @@
     "created_success": "Annonce créée avec succès !",
     "created_error": "Échec de la création de l'annonce",
     "created_error_retry": "Échec de la création de l'annonce. Veuillez réessayer.",
-    "draft_saved": "Brouillon enregistré"
+    "draft_saved": "Brouillon enregistré",
+    "currency_search": "Search currency"
   },
   "search": {
     "page_title": "Rechercher sur le marché",

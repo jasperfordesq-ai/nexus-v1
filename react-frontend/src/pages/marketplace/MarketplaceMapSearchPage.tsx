@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Spinner, SearchField } from '@/components/ui';
+import { Select, SelectItem, Autocomplete, AutocompleteItem, GlassCard, Button, Chip, Spinner, SearchField } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -286,23 +286,22 @@ export function MarketplaceMapSearchPage() {
             ))}
           </Select>
 
-          <Select
-            placeholder={t('search.all_categories')}
-            selectedKeys={categoryId ? [categoryId] : []}
-            onSelectionChange={(keys) => {
-              const selected = Array.from(keys)[0];
-              setCategoryId(selected ? String(selected) : '');
-            }}
-            size="lg"
-            className="hidden min-w-0 lg:block"
+          <Autocomplete
             aria-label={t('search.category_label')}
+            placeholder={t('search.all_categories')}
+            searchPlaceholder={t('search.category_search')}
+            value={categoryId || null}
+            onChange={(key) => {
+              setCategoryId(key && !Array.isArray(key) ? String(key) : '');
+            }}
+            className="hidden min-w-0 lg:block"
           >
             {categories.map((cat) => (
-              <SelectItem key={String(cat.id)} id={String(cat.id)}>
+              <AutocompleteItem key={String(cat.id)} id={String(cat.id)} textValue={cat.name}>
                 {cat.name} ({cat.listing_count})
-              </SelectItem>
+              </AutocompleteItem>
             ))}
-          </Select>
+          </Autocomplete>
 
           {/* Mobile view toggle */}
           <div className="flex gap-1 lg:hidden">

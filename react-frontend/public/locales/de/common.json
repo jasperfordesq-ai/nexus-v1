@@ -571,7 +571,9 @@
       "confirm_title": "{{hours}} Stunden an {{name}} schenken?",
       "confirm_body": "Deine Stunden werden jetzt abgebucht und gutgeschrieben, sobald die Person das Geschenk annimmt.",
       "confirm_button": "Ja, Stunden schenken",
-      "cancel": "Abbrechen"
+      "cancel": "Abbrechen",
+      "recipient_hint": "Type at least 2 letters to search",
+      "recipient_no_results": "No members found"
     },
     "inbox": {
       "empty": "Aktuell keine Geschenke zur Annahme.",

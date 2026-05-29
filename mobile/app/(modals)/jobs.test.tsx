@@ -26,6 +26,7 @@ jest.mock('react-i18next', () => ({
         'tabs.myApplications': 'My Applications',
         'tabs.myPostings': 'My Postings',
         'search.placeholder': 'Search jobs...',
+        'common:actions.clear': 'Clear search',
         'empty': 'No jobs found',
         'emptyHint': 'Try adjusting your filters or check back later',
         'applications.empty': 'No applications yet',
@@ -165,6 +166,12 @@ describe('JobsScreen', () => {
   it('renders the search input', () => {
     const { getByPlaceholderText } = render(<JobsScreen />);
     expect(getByPlaceholderText('Search jobs...')).toBeTruthy();
+  });
+
+  it('shows clear action after typing in the shared input-backed search field', () => {
+    const { getByPlaceholderText, getByLabelText } = render(<JobsScreen />);
+    fireEvent.changeText(getByPlaceholderText('Search jobs...'), 'coordinator');
+    expect(getByLabelText('Clear search')).toBeTruthy();
   });
 
   it('renders Browse, My Applications, and My Postings tabs', () => {

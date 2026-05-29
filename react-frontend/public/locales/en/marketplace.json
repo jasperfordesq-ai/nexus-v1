@@ -167,6 +167,7 @@
     "price_type_label": "Price Type",
     "price_label": "Price",
     "currency_label": "Currency",
+    "currency_search": "Search currency",
     "location_delivery": "Location & Delivery",
     "location_label": "Location",
     "location_placeholder": "City, town, or area",

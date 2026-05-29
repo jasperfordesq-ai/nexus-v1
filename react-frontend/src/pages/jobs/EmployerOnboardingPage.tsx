@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Progress, Button, Input, Textarea, Switch } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Progress, Button, Input, Textarea, Switch, NumberField, Label } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -572,26 +572,32 @@ function StepPostJob({ state, errors, isSubmitting, onChange, onSubmit, onBack }
           </div>
           <p className="text-xs text-theme-muted">{t('onboarding.salary_hint')}</p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <Input
-              label={t('form.salary_min_label')}
-              type="number"
-              value={state.jobSalaryMin}
-              onValueChange={(v) => onChange({ jobSalaryMin: v })}
-              classNames={{
-                input: 'bg-transparent text-theme-primary',
-                inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
-              }}
-            />
-            <Input
-              label={t('form.salary_max_label')}
-              type="number"
-              value={state.jobSalaryMax}
-              onValueChange={(v) => onChange({ jobSalaryMax: v })}
-              classNames={{
-                input: 'bg-transparent text-theme-primary',
-                inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
-              }}
-            />
+            <NumberField
+              fullWidth
+              minValue={0}
+              value={state.jobSalaryMin ? Number(state.jobSalaryMin) : undefined}
+              onChange={(v) => onChange({ jobSalaryMin: v === undefined ? '' : String(v) })}
+            >
+              <Label className="text-theme-primary">{t('form.salary_min_label')}</Label>
+              <NumberField.Group className="bg-theme-elevated border-theme-default hover:bg-theme-hover">
+                <NumberField.DecrementButton />
+                <NumberField.Input className="bg-transparent text-theme-primary" />
+                <NumberField.IncrementButton />
+              </NumberField.Group>
+            </NumberField>
+            <NumberField
+              fullWidth
+              minValue={0}
+              value={state.jobSalaryMax ? Number(state.jobSalaryMax) : undefined}
+              onChange={(v) => onChange({ jobSalaryMax: v === undefined ? '' : String(v) })}
+            >
+              <Label className="text-theme-primary">{t('form.salary_max_label')}</Label>
+              <NumberField.Group className="bg-theme-elevated border-theme-default hover:bg-theme-hover">
+                <NumberField.DecrementButton />
+                <NumberField.Input className="bg-transparent text-theme-primary" />
+                <NumberField.IncrementButton />
+              </NumberField.Group>
+            </NumberField>
             <Input
               label={t('form.salary_currency_label')}
               placeholder={t('form.salary_currency_placeholder')}

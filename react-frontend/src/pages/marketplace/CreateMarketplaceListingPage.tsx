@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input, Textarea, RadioGroup, Radio } from '@/components/ui';
+import { Select, SelectItem, Autocomplete, AutocompleteItem, GlassCard, Button, Chip, Spinner, Input, Textarea, RadioGroup, Radio } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -740,28 +740,28 @@ export function CreateMarketplaceListingPage() {
                   <span className="text-muted text-sm">{currency}</span>
                 }
               />
-              <Select
+              <Autocomplete
                 label={t('create.currency_label')}
-                selectedKeys={[currency]}
-                onSelectionChange={(keys) => {
-                  const selected = Array.from(keys)[0];
-                  if (selected) setCurrency(String(selected));
+                searchPlaceholder={t('create.currency_search')}
+                value={currency}
+                onChange={(key) => {
+                  if (key && !Array.isArray(key)) setCurrency(String(key));
                 }}
                 className="w-full sm:w-32"
               >
-                <SelectItem key="EUR" id="EUR">EUR</SelectItem>
-                <SelectItem key="GBP" id="GBP">GBP</SelectItem>
-                <SelectItem key="USD" id="USD">USD</SelectItem>
-                <SelectItem key="CAD" id="CAD">CAD</SelectItem>
-                <SelectItem key="AUD" id="AUD">AUD</SelectItem>
-                <SelectItem key="NZD" id="NZD">NZD</SelectItem>
-                <SelectItem key="CHF" id="CHF">CHF</SelectItem>
-                <SelectItem key="SEK" id="SEK">SEK</SelectItem>
-                <SelectItem key="NOK" id="NOK">NOK</SelectItem>
-                <SelectItem key="DKK" id="DKK">DKK</SelectItem>
-                <SelectItem key="PLN" id="PLN">PLN</SelectItem>
-                <SelectItem key="JPY" id="JPY">JPY</SelectItem>
-              </Select>
+                <AutocompleteItem id="EUR">EUR</AutocompleteItem>
+                <AutocompleteItem id="GBP">GBP</AutocompleteItem>
+                <AutocompleteItem id="USD">USD</AutocompleteItem>
+                <AutocompleteItem id="CAD">CAD</AutocompleteItem>
+                <AutocompleteItem id="AUD">AUD</AutocompleteItem>
+                <AutocompleteItem id="NZD">NZD</AutocompleteItem>
+                <AutocompleteItem id="CHF">CHF</AutocompleteItem>
+                <AutocompleteItem id="SEK">SEK</AutocompleteItem>
+                <AutocompleteItem id="NOK">NOK</AutocompleteItem>
+                <AutocompleteItem id="DKK">DKK</AutocompleteItem>
+                <AutocompleteItem id="PLN">PLN</AutocompleteItem>
+                <AutocompleteItem id="JPY">JPY</AutocompleteItem>
+              </Autocomplete>
             </div>
           )}
         </GlassCard>

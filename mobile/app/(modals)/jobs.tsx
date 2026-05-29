@@ -8,7 +8,6 @@ import {
   FlatList,
   View,
   Text,
-  TextInput,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -39,6 +38,7 @@ import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
 import EmptyState from '@/components/ui/EmptyState';
+import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
@@ -671,10 +671,8 @@ export default function JobsScreen() {
       {activeTab === 'browse' ? (
         <>
           {/* Search bar */}
-          <Surface variant="secondary" className="mx-4 mb-3 flex-row items-center gap-2 rounded-panel-inner px-3 py-2.5">
-            <Ionicons name="search-outline" size={18} color={theme.textMuted} />
-            <TextInput
-              className="flex-1 text-sm text-foreground py-0"
+          <Surface variant="secondary" className="mx-4 mb-3 rounded-panel-inner px-3 pt-3">
+            <Input
               style={{ color: theme.text }}
               placeholder={t('search.placeholder')}
               placeholderTextColor={theme.textMuted}
@@ -685,17 +683,19 @@ export default function JobsScreen() {
               autoCorrect={false}
               autoCapitalize="none"
               accessibilityLabel={t('search.placeholder')}
+              leftIcon={<Ionicons name="search-outline" size={18} color={theme.textMuted} />}
+              rightIcon={search.length > 0 ? (
+                <HeroButton
+                  isIconOnly
+                  size="sm"
+                  variant="ghost"
+                  accessibilityLabel={t('common:actions.clear', 'Clear search')}
+                  onPress={handleClear}
+                >
+                  <Ionicons name="close-circle" size={18} color={theme.textMuted} />
+                </HeroButton>
+              ) : null}
             />
-            {search.length > 0 && (
-              <Pressable
-                onPress={handleClear}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                accessibilityLabel={t('common:actions.clear', 'Clear search')}
-                accessibilityRole="button"
-              >
-                <Ionicons name="close-circle" size={18} color={theme.textMuted} />
-              </Pressable>
-            )}
           </Surface>
 
           {/* Filter row */}

@@ -178,7 +178,8 @@
     "created_success": "Anúncio criado com sucesso!",
     "created_error": "Falha ao criar anúncio",
     "created_error_retry": "Falha ao criar anúncio. Por favor, tente novamente.",
-    "draft_saved": "Rascunho guardado"
+    "draft_saved": "Rascunho guardado",
+    "currency_search": "Search currency"
   },
   "search": {
     "page_title": "Pesquisar Mercado",

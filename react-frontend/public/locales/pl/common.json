@@ -571,7 +571,9 @@
       "confirm_title": "Podarować {{hours}} godz. dla {{name}}?",
       "confirm_body": "Twoje godziny zostaną teraz pobrane i dopisane odbiorcy, gdy zaakceptuje.",
       "confirm_button": "Tak, podaruj godziny",
-      "cancel": "Anuluj"
+      "cancel": "Anuluj",
+      "recipient_hint": "Type at least 2 letters to search",
+      "recipient_no_results": "No members found"
     },
     "inbox": {
       "empty": "Brak prezentów do zaakceptowania.",

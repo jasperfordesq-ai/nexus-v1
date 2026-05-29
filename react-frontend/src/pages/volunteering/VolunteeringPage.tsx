@@ -864,25 +864,36 @@ function ApplicationsTab() {
   return (
     <>
       {/* Status Filter */}
-      <div className="flex gap-2 flex-wrap" role="group" aria-label={t('filter_by_status')}>
-        {['', 'pending', 'approved', 'declined'].map((s) => (
-          <Button
-            key={s}
-            size="sm"
-            variant={statusFilter === s ? 'solid' : 'flat'}
-            className={statusFilter === s ? VOL_GRADIENT : 'bg-theme-elevated text-theme-muted'}
-            onPress={() => setStatusFilter(s)}
+      <ToggleButtonGroup
+        isDetached
+        selectionMode="single"
+        disallowEmptySelection
+        size="sm"
+        selectedKeys={new Set([statusFilter || 'all'])}
+        onSelectionChange={(keys) => {
+          const [next] = Array.from(keys as Set<Key>);
+          if (next != null) {
+            setStatusFilter(String(next) === 'all' ? '' : String(next));
+          }
+        }}
+        className="flex gap-2 flex-wrap"
+        aria-label={t('filter_by_status')}
+      >
+        {[
+          { id: 'all', label: t('filter_all') },
+          { id: 'pending', label: t('status_pending') },
+          { id: 'approved', label: t('status_approved') },
+          { id: 'declined', label: t('status_declined') },
+        ].map(({ id, label }) => (
+          <ToggleButton
+            key={id}
+            id={id}
+            className={(statusFilter || 'all') === id ? VOL_GRADIENT : 'bg-theme-elevated text-theme-muted'}
           >
-            {s === 'pending'
-              ? t('status_pending')
-              : s === 'approved'
-                ? t('status_approved')
-                : s === 'declined'
-                  ? t('status_declined')
-                  : t('filter_all')}
-          </Button>
+            {label}
+          </ToggleButton>
         ))}
-      </div>
+      </ToggleButtonGroup>
 
       {/* Error */}
       {error && !isLoading && (

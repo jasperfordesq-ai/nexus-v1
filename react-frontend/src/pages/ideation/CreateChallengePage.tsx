@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure, GlassCard, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, GlassCard, Button, Chip, Spinner, Input, NumberField, Label, Description, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -607,16 +607,24 @@ export function CreateChallengePage() {
           </div>
 
           {/* Max Ideas Per User */}
-          <Input
-            type="number"
-            label={t('form.max_ideas_label')}
-            placeholder={t('form.max_ideas_placeholder')}
-            description={t('form.max_ideas_helper')}
-            value={form.max_ideas_per_user}
-            onValueChange={(val) => updateField('max_ideas_per_user', val)}
-            variant="bordered"
-            min={1}
-          />
+          <NumberField
+            minValue={1}
+            value={form.max_ideas_per_user === '' ? undefined : Number(form.max_ideas_per_user)}
+            onChange={(val) =>
+              updateField(
+                'max_ideas_per_user',
+                val === undefined || Number.isNaN(val) ? '' : String(val),
+              )
+            }
+          >
+            <Label>{t('form.max_ideas_label')}</Label>
+            <NumberField.Group>
+              <NumberField.DecrementButton />
+              <NumberField.Input placeholder={t('form.max_ideas_placeholder')} />
+              <NumberField.IncrementButton />
+            </NumberField.Group>
+            <Description>{t('form.max_ideas_helper')}</Description>
+          </NumberField>
 
           {/* Status (only for create) */}
           {!isEdit && (

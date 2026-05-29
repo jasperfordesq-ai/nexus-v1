@@ -571,7 +571,9 @@
       "confirm_title": "Gift {{hours}} hours to {{name}}?",
       "confirm_body": "Your hours will be debited now and credited to them once they accept.",
       "confirm_button": "Yes, gift hours",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "recipient_hint": "Type at least 2 letters to search",
+      "recipient_no_results": "No members found"
     },
     "inbox": {
       "empty": "No gifts to accept right now.",

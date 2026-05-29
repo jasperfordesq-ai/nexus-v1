@@ -571,7 +571,9 @@
       "confirm_title": "Regalare {{hours}} ore a {{name}}?",
       "confirm_body": "Le tue ore verranno addebitate ora e accreditate alla persona quando le accetterà.",
       "confirm_button": "Sì, regala le ore",
-      "cancel": "Annulla"
+      "cancel": "Annulla",
+      "recipient_hint": "Type at least 2 letters to search",
+      "recipient_no_results": "No members found"
     },
     "inbox": {
       "empty": "Nessun regalo da accettare al momento.",

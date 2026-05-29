@@ -1,4 +1,4 @@
-import { Card, GlassCard, useDisclosure, Button, Chip, Spinner, SearchField, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Checkbox } from '@/components/ui';
+import { Card, GlassCard, useDisclosure, Button, Chip, Spinner, SearchField, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Checkbox, ToggleButton, ToggleButtonGroup } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -432,22 +432,31 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
           )}
         </div>
 
-        <div className="flex flex-wrap gap-2" role="group" aria-label={t('applications.filter_label')}>
+        <ToggleButtonGroup
+          selectionMode="single"
+          disallowEmptySelection
+          selectedKeys={[statusFilter]}
+          onSelectionChange={(keys) => {
+            const nextFilter = Array.from(keys)[0];
+            if (nextFilter) {
+              setStatusFilter(String(nextFilter) as AppStatusFilter);
+            }
+          }}
+          isDetached
+          size="sm"
+          className="flex flex-wrap gap-2"
+          aria-label={t('applications.filter_label')}
+        >
           {filters.map((f) => (
-            <Button
+            <ToggleButton
               key={f.key}
-              size="sm"
-              variant={statusFilter === f.key ? 'solid' : 'flat'}
-              className={statusFilter === f.key
-                ? 'bg-gradient-to-r from-indigo-500 to-violet-600 text-white'
-                : 'bg-theme-elevated text-theme-muted'
-              }
-              onPress={() => setStatusFilter(f.key)}
+              id={f.key}
+              className="bg-theme-elevated text-theme-muted data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-indigo-500 data-[selected=true]:to-violet-600 data-[selected=true]:text-white"
             >
               {f.label}
-            </Button>
+            </ToggleButton>
           ))}
-        </div>
+        </ToggleButtonGroup>
 
         <SearchField
           size="sm"

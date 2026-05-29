@@ -178,7 +178,8 @@
     "created_success": "Inserat erfolgreich erstellt!",
     "created_error": "Inserat konnte nicht erstellt werden",
     "created_error_retry": "Inserat konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
-    "draft_saved": "Entwurf gespeichert"
+    "draft_saved": "Entwurf gespeichert",
+    "currency_search": "Search currency"
   },
   "search": {
     "page_title": "Marktplatz durchsuchen",

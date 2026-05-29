@@ -11,7 +11,7 @@ import Gift from 'lucide-react/icons/gift';
 import HeartHandshake from 'lucide-react/icons/heart-handshake';
 import Search from 'lucide-react/icons/search';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Spinner, Input, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Avatar, Tab, Tabs } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner, Input, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Avatar, Tab, Tabs, ComboBox, ComboBoxItem } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -318,44 +318,49 @@ export function HourGiftPage() {
                       </Button>
                     </div>
                   ) : (
-                    <>
-                      <Input
-                        placeholder={t('hour_gift.send.recipient_placeholder')}
-                        aria-label={t('hour_gift.send.recipient_label')}
-                        value={recipientQuery}
-                        onValueChange={setRecipientQuery}
-                        variant="bordered"
-                        startContent={<Search className="h-4 w-4 text-muted" aria-hidden="true" />}
-                      />
-                      {searching && <span role="status" aria-busy="true" aria-label={t('loading')}><Spinner size="sm" className="mt-2" /></span>}
-                      {recipientResults.length > 0 && (
-                        <ul className="mt-2 divide-y divide-border overflow-hidden rounded-lg border border-border">
-                          {recipientResults.map((m) => (
-                            <li key={m.id}>
-                              <Button
-                                type="button"
-                                variant="tertiary"
-                                className="min-h-12 w-full justify-start rounded-none px-3 py-2 text-left"
-                                startContent={
-                                  <Avatar
-                                    src={m.profile_photo ?? m.avatar_url ?? undefined}
-                                    name={m.name}
-                                    size="sm"
-                                  />
-                                }
-                                onPress={() => {
-                                  setRecipient(m);
-                                  setRecipientResults([]);
-                                  setRecipientQuery('');
-                                }}
-                              >
-                                <span className="min-w-0 truncate text-sm">{m.name}</span>
-                              </Button>
-                            </li>
-                          ))}
-                        </ul>
+                    <ComboBox
+                      aria-label={t('hour_gift.send.recipient_label')}
+                      placeholder={t('hour_gift.send.recipient_placeholder')}
+                      items={recipientResults}
+                      inputValue={recipientQuery}
+                      onInputChange={setRecipientQuery}
+                      menuTrigger="input"
+                      allowsEmptyCollection
+                      startContent={<Search className="h-4 w-4 text-muted" aria-hidden="true" />}
+                      onSelectionChange={(key) => {
+                        if (key == null) return;
+                        const member = recipientResults.find((m) => String(m.id) === String(key));
+                        if (member) {
+                          setRecipient(member);
+                          setRecipientResults([]);
+                          setRecipientQuery('');
+                        }
+                      }}
+                      renderEmptyState={() =>
+                        searching ? (
+                          <div role="status" aria-busy="true" className="flex items-center gap-2 px-3 py-2 text-sm text-muted">
+                            <Spinner size="sm" /> {t('loading')}
+                          </div>
+                        ) : recipientQuery.trim().length < 2 ? (
+                          <div className="px-3 py-2 text-sm text-muted">{t('hour_gift.send.recipient_hint')}</div>
+                        ) : (
+                          <div className="px-3 py-2 text-sm text-muted">{t('hour_gift.send.recipient_no_results')}</div>
+                        )
+                      }
+                    >
+                      {(member: MemberSearchResult) => (
+                        <ComboBoxItem id={member.id} textValue={member.name}>
+                          <div className="flex items-center gap-2">
+                            <Avatar
+                              src={member.profile_photo ?? member.avatar_url ?? undefined}
+                              name={member.name}
+                              size="sm"
+                            />
+                            <span className="min-w-0 truncate text-sm">{member.name}</span>
+                          </div>
+                        </ComboBoxItem>
                       )}
-                    </>
+                    </ComboBox>
                   )}
                 </div>
 

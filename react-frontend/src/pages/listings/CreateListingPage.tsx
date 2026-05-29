@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Input, Textarea, Radio, RadioGroup } from '@/components/ui';
+import { Select, SelectItem, Autocomplete, AutocompleteItem, GlassCard, Button, Chip, Input, Textarea, Radio, RadioGroup } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -690,36 +690,29 @@ export function CreateListingPage() {
             <div className="grid gap-5 md:grid-cols-2">
           {/* Category */}
           <div>
-            <Select
+            <Autocomplete
               label={t('form.category_label')}
               placeholder={t('form.category_placeholder')}
-              selectedKeys={formData.category_id ? [formData.category_id] : []}
-              onChange={(e) => updateField('category_id', e.target.value)}
+              searchPlaceholder={t('form.category_search')}
+              value={formData.category_id || null}
+              onChange={(key) => updateField('category_id', key != null && !Array.isArray(key) ? String(key) : '')}
               isRequired
               isInvalid={!!errors.category_id}
               errorMessage={errors.category_id}
               startContent={<Tag className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
-              popoverProps={{
-                placement: 'bottom',
-                shouldFlip: false,
-                shouldBlockScroll: true,
-                offset: 4,
-                containerPadding: 8,
-              }}
-              listboxProps={{
-                className: 'max-h-60 overflow-y-auto',
-              }}
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default',
                 value: 'text-theme-primary',
-                label: 'text-theme-muted',
-                popoverContent: 'bg-theme-elevated border border-theme-default shadow-lg',
+                popover: 'bg-theme-elevated border border-theme-default shadow-lg',
+                listbox: 'max-h-60 overflow-y-auto',
               }}
             >
               {categories.map((cat) => (
-                <SelectItem key={cat.id.toString()} id={cat.id.toString()}>{cat.name}</SelectItem>
+                <AutocompleteItem key={cat.id.toString()} id={cat.id.toString()} textValue={cat.name}>
+                  {cat.name}
+                </AutocompleteItem>
               ))}
-            </Select>
+            </Autocomplete>
           </div>
 
           {/* Skill Tags */}

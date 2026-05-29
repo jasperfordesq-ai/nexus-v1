@@ -178,7 +178,8 @@
     "created_success": "Ogłoszenie utworzone pomyślnie!",
     "created_error": "Nie udało się utworzyć ogłoszenia",
     "created_error_retry": "Nie udało się utworzyć ogłoszenia. Spróbuj ponownie.",
-    "draft_saved": "Wersja robocza zapisana"
+    "draft_saved": "Wersja robocza zapisana",
+    "currency_search": "Search currency"
   },
   "search": {
     "page_title": "Przeszukaj marketplace",

@@ -178,7 +178,8 @@
     "created_success": "リスティングを作成しました!",
     "created_error": "リスティングの作成に失敗しました",
     "created_error_retry": "リスティングの作成に失敗しました。もう一度お試しください。",
-    "draft_saved": "下書きを保存しました"
+    "draft_saved": "下書きを保存しました",
+    "currency_search": "Search currency"
   },
   "search": {
     "page_title": "マーケットプレイスを検索",

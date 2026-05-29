@@ -178,7 +178,8 @@
     "created_success": "D'éirigh le cruthú an liosta!",
     "created_error": "Theip ar chruthú an liosta",
     "created_error_retry": "Theip ar chruthú an liosta. Bain triail eile as.",
-    "draft_saved": "Dréacht sábháilte"
+    "draft_saved": "Dréacht sábháilte",
+    "currency_search": "Search currency"
   },
   "search": {
     "page_title": "Cuardaigh an Margadh",

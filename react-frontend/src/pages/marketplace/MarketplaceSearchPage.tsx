@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Input, SearchField, Checkbox, CheckboxGroup, TagGroup, Tag } from '@/components/ui';
+import { Select, SelectItem, Autocomplete, AutocompleteItem, GlassCard, Button, Chip, Input, SearchField, Checkbox, CheckboxGroup, TagGroup, Tag } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -295,22 +295,22 @@ export function MarketplaceSearchPage() {
     <div className="space-y-5">
       {/* Category */}
       <div>
-        <Select
+        <Autocomplete
           label={t('search.category_label')}
           placeholder={t('search.all_categories')}
-          selectedKeys={categoryId ? [categoryId] : []}
-          onSelectionChange={(keys) => {
-            const selected = Array.from(keys)[0];
-            setCategoryId(selected ? String(selected) : '');
+          searchPlaceholder={t('search.category_search')}
+          value={categoryId || null}
+          onChange={(key) => {
+            setCategoryId(key && !Array.isArray(key) ? String(key) : '');
           }}
-          size="sm"
+          variant="secondary"
         >
           {categories.map((cat) => (
-            <SelectItem key={String(cat.id)} id={String(cat.id)}>
+            <AutocompleteItem key={String(cat.id)} id={String(cat.id)} textValue={cat.name}>
               {cat.name} ({cat.listing_count})
-            </SelectItem>
+            </AutocompleteItem>
           ))}
-        </Select>
+        </Autocomplete>
       </div>
 
       {/* Price range */}

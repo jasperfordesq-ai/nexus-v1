@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { Button, Input, Textarea } from '@/components/ui';
+import { Button, NumberField, Label, Textarea } from '@/components/ui';
 
 interface MakeOfferFormProps {
   listingId: number;
@@ -84,20 +84,28 @@ export function MakeOfferForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Offer amount */}
-      <Input
-        label={t('offer.your_offer')}
-        type="number"
-        min={0}
-        step="0.01"
-        value={amount}
-        onValueChange={setAmount}
-        startContent={
-          <span className="text-sm text-theme-muted">{currency}</span>
+      <NumberField
+        minValue={0}
+        step={0.01}
+        formatOptions={{ maximumFractionDigits: 2 }}
+        value={amount === '' ? undefined : parseFloat(amount)}
+        onChange={(val) =>
+          setAmount(val === undefined || isNaN(val) ? '' : String(val))
         }
         variant="secondary"
         isRequired
         autoFocus
-      />
+      >
+        <Label>{t('offer.your_offer')}</Label>
+        <NumberField.Group>
+          <NumberField.DecrementButton />
+          <span className="pl-3 text-sm text-theme-muted" aria-hidden="true">
+            {currency}
+          </span>
+          <NumberField.Input aria-label={t('offer.your_offer')} />
+          <NumberField.IncrementButton />
+        </NumberField.Group>
+      </NumberField>
 
       {/* Price comparison */}
       {listingPrice != null && isValidAmount && comparisonPercent != null && (

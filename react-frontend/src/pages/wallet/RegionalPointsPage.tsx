@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Label, NumberField, Spinner, Textarea, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -275,16 +275,23 @@ export default function RegionalPointsPage() {
                 value={recipientId}
                 onValueChange={setRecipientId}
               />
-              <Input
-                label={t('regional_points.transfer.amount')}
-                placeholder={t('regional_points.transfer.amount_placeholder')}
-                type="number"
-                step="0.01"
-                min="0"
-                value={points}
-                onValueChange={setPoints}
-                endContent={<span className="text-muted text-xs">{symbol}</span>}
-              />
+              <NumberField
+                minValue={0}
+                step={0.01}
+                value={points === '' ? undefined : parseFloat(points)}
+                onChange={(value) =>
+                  setPoints(value === undefined || Number.isNaN(value) ? '' : String(value))
+                }
+                fullWidth
+              >
+                <Label>{t('regional_points.transfer.amount')}</Label>
+                <NumberField.Group>
+                  <NumberField.DecrementButton />
+                  <NumberField.Input placeholder={t('regional_points.transfer.amount_placeholder')} />
+                  <span className="px-2 text-xs text-muted">{symbol}</span>
+                  <NumberField.IncrementButton />
+                </NumberField.Group>
+              </NumberField>
             </div>
             <Textarea
               label={t('regional_points.transfer.message')}

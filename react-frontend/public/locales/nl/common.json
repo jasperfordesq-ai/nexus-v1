@@ -571,7 +571,9 @@
       "confirm_title": "{{hours}} uur schenken aan {{name}}?",
       "confirm_body": "Je uren worden nu afgeboekt en gecrediteerd aan de ontvanger zodra die accepteert.",
       "confirm_button": "Ja, uren schenken",
-      "cancel": "Annuleren"
+      "cancel": "Annuleren",
+      "recipient_hint": "Type at least 2 letters to search",
+      "recipient_no_results": "No members found"
     },
     "inbox": {
       "empty": "Op dit moment geen cadeaus te accepteren.",

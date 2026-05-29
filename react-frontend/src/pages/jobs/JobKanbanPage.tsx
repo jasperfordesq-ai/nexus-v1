@@ -1,5 +1,5 @@
 import { Chip } from '@/components/ui';
-import { Select, SelectItem, GlassCard, Button, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab, Tooltip, Checkbox } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Spinner, Input, Textarea, NumberField, Label, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab, Tooltip, Checkbox } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -287,7 +287,7 @@ function AppKanbanCard({ application, onDragStart, onStageChange, onDownloadCv, 
             }}
           >
             {COLUMNS.map((col) => (
-              <SelectItem key={col.status} textValue={getApplicationStatusLabel(t, col.status)}>
+              <SelectItem key={col.status} id={col.status} textValue={getApplicationStatusLabel(t, col.status)}>
                 {getApplicationStatusLabel(t, col.status)}
               </SelectItem>
             ))}
@@ -1052,24 +1052,26 @@ export function JobKanbanPage() {
             {scorecardCriteria.map((criterion, idx) => (
               <div key={idx} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
                 <span className="text-sm text-theme-secondary sm:w-36 sm:flex-shrink-0">{criterion.label}</span>
-                <Input
-                  type="number"
-                  min={1}
-                  max={10}
-                  value={String(criterion.score)}
+                <NumberField
                   aria-label={criterion.label}
-                  onChange={(e) => {
-                    const val = Math.min(10, Math.max(1, parseInt(e.target.value, 10) || 1));
+                  minValue={1}
+                  maxValue={10}
+                  step={1}
+                  value={criterion.score}
+                  onChange={(val) => {
+                    const next = Math.min(10, Math.max(1, val ?? 1));
                     setScorecardCriteria((prev) =>
-                      prev.map((c, i) => (i === idx ? { ...c, score: val } : c))
+                      prev.map((c, i) => (i === idx ? { ...c, score: next } : c))
                     );
                   }}
                   className="w-full sm:w-24"
-                  classNames={{
-                    input: 'bg-transparent text-theme-primary',
-                    inputWrapper: 'bg-theme-elevated border-theme-default',
-                  }}
-                />
+                >
+                  <NumberField.Group>
+                    <NumberField.DecrementButton />
+                    <NumberField.Input />
+                    <NumberField.IncrementButton />
+                  </NumberField.Group>
+                </NumberField>
                 <span className="text-xs text-theme-subtle">{t('scorecard.max_score_suffix')}</span>
               </div>
             ))}
@@ -1101,13 +1103,20 @@ export function JobKanbanPage() {
         <ModalContent>
           <ModalHeader>{t('offer.modal_title')} — {offerModalApp?.applicant.name}</ModalHeader>
           <ModalBody className="space-y-4">
-            <Input
-              type="number"
-              label={t('offer.salary')}
-              placeholder={t('kanban.offer_salary_placeholder')}
-              value={offerForm.salary_offered}
-              onChange={(e) => setOfferForm((f) => ({ ...f, salary_offered: e.target.value }))}
-            />
+            <NumberField
+              minValue={0}
+              value={offerForm.salary_offered === '' ? undefined : Number(offerForm.salary_offered)}
+              onChange={(val) =>
+                setOfferForm((f) => ({ ...f, salary_offered: val == null || Number.isNaN(val) ? '' : String(val) }))
+              }
+            >
+              <Label>{t('offer.salary')}</Label>
+              <NumberField.Group>
+                <NumberField.DecrementButton />
+                <NumberField.Input placeholder={t('kanban.offer_salary_placeholder')} />
+                <NumberField.IncrementButton />
+              </NumberField.Group>
+            </NumberField>
             <Select
               label={t('salary.form_currency_label')}
               selectedKeys={[offerForm.salary_currency]}

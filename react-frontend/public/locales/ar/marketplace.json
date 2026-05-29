@@ -178,7 +178,8 @@
     "created_success": "تم إنشاء القائمة بنجاح!",
     "created_error": "فشل في إنشاء القائمة",
     "created_error_retry": "فشل في إنشاء القائمة. يرجى المحاولة مرة أخرى.",
-    "draft_saved": "تم حفظ المسودة"
+    "draft_saved": "تم حفظ المسودة",
+    "currency_search": "Search currency"
   },
   "search": {
     "page_title": "ابحث في السوق",

@@ -571,7 +571,9 @@
       "confirm_title": "هل تريد إهداء {{hours}} ساعة إلى {{name}}؟",
       "confirm_body": "ستُخصم ساعاتك الآن وتُضاف إليه عند قبوله.",
       "confirm_button": "نعم، أهدِ الساعات",
-      "cancel": "إلغاء"
+      "cancel": "إلغاء",
+      "recipient_hint": "Type at least 2 letters to search",
+      "recipient_no_results": "No members found"
     },
     "inbox": {
       "empty": "لا توجد هدايا لقبولها الآن.",

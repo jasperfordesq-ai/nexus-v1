@@ -1,0 +1,109 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { type ComponentProps, type ReactNode } from 'react';
+import {
+  Autocomplete as HeroAutocomplete,
+  Description,
+  FieldError,
+  Label,
+  ListBox as HeroListBox,
+  SearchField,
+  useFilter,
+} from '@heroui/react';
+import { cn } from '@/lib/helpers';
+
+type HeroAutocompleteProps = ComponentProps<typeof HeroAutocomplete>;
+type HeroListBoxProps = ComponentProps<typeof HeroListBox>;
+type V3Variant = 'primary' | 'secondary';
+type LegacyVariant = 'flat' | 'bordered' | 'underlined' | 'faded';
+
+export interface AutocompleteProps<T extends object = object>
+  extends Omit<HeroAutocompleteProps, 'children' | 'className' | 'variant'> {
+  children?: ReactNode | ((item: T) => ReactNode);
+  className?: string;
+  classNames?: {
+    base?: string;
+    trigger?: string;
+    value?: string;
+    popover?: string;
+    listbox?: string;
+    searchInput?: string;
+  };
+  description?: ReactNode;
+  errorMessage?: ReactNode;
+  /** Custom filter; defaults to a locale-aware case-insensitive "contains" match. */
+  filter?: (textValue: string, inputValue: string) => boolean;
+  items?: Iterable<T>;
+  label?: ReactNode;
+  /** Placeholder shown in the (closed) trigger. */
+  placeholder?: string;
+  /** Placeholder + aria-label for the search input inside the popover. */
+  searchPlaceholder?: string;
+  startContent?: ReactNode;
+  variant?: V3Variant | LegacyVariant;
+}
+
+/**
+ * A select with built-in type-to-filter search, built on HeroUI v3 Autocomplete.
+ * Compose options with the shared `ListBoxItem` / `ListBoxSection` parts (exported
+ * from the barrel as `AutocompleteItem` / `AutocompleteSection`).
+ */
+export function Autocomplete<T extends object = object>({
+  children,
+  className,
+  classNames,
+  description,
+  errorMessage,
+  filter,
+  items,
+  label,
+  placeholder,
+  searchPlaceholder,
+  startContent,
+  variant,
+  ...props
+}: AutocompleteProps<T>) {
+  const { contains } = useFilter({ sensitivity: 'base' });
+  const filterFn = filter ?? contains;
+
+  return (
+    <HeroAutocomplete
+      {...props}
+      className={cn(classNames?.base, className)}
+      placeholder={placeholder}
+      variant={mapVariant(variant)}
+    >
+      {label != null && <Label>{label}</Label>}
+      <HeroAutocomplete.Trigger className={classNames?.trigger}>
+        {startContent}
+        <HeroAutocomplete.Value className={classNames?.value} />
+        <HeroAutocomplete.ClearButton />
+        <HeroAutocomplete.Indicator />
+      </HeroAutocomplete.Trigger>
+      {description != null && <Description>{description}</Description>}
+      <HeroAutocomplete.Popover className={classNames?.popover}>
+        <HeroAutocomplete.Filter filter={filterFn}>
+          <SearchField aria-label={searchPlaceholder ?? 'Search'}>
+            <SearchField.Group>
+              <SearchField.SearchIcon />
+              <SearchField.Input className={classNames?.searchInput} placeholder={searchPlaceholder} />
+            </SearchField.Group>
+          </SearchField>
+          <HeroListBox className={classNames?.listbox} items={items as HeroListBoxProps['items']}>
+            {children as HeroListBoxProps['children']}
+          </HeroListBox>
+        </HeroAutocomplete.Filter>
+      </HeroAutocomplete.Popover>
+      {errorMessage != null && <FieldError>{errorMessage}</FieldError>}
+    </HeroAutocomplete>
+  );
+}
+
+function mapVariant(variant?: V3Variant | LegacyVariant): V3Variant {
+  return variant === 'bordered' || variant === 'underlined' || variant === 'faded' || variant === 'secondary'
+    ? 'secondary'
+    : 'primary';
+}

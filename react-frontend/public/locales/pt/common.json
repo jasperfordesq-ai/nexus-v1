@@ -571,7 +571,9 @@
       "confirm_title": "Oferecer {{hours}} horas a {{name}}?",
       "confirm_body": "As tuas horas vão ser debitadas agora e creditadas à pessoa quando ela aceitar.",
       "confirm_button": "Sim, oferecer horas",
-      "cancel": "Cancelar"
+      "cancel": "Cancelar",
+      "recipient_hint": "Type at least 2 letters to search",
+      "recipient_no_results": "No members found"
     },
     "inbox": {
       "empty": "Sem ofertas para aceitar agora.",

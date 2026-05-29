@@ -1,5 +1,5 @@
 import { Chip, CloseButton } from '@/components/ui';
-import { Select, SelectItem, GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch, Tooltip, CardRowsSkeleton } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch, Tooltip, CardRowsSkeleton, NumberField, Label } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -905,35 +905,37 @@ export function CreateJobPage() {
           </div>
 
           {/* Hours per Week */}
-          <Input
-            type="number"
-            label={t('form.hours_label')}
-            placeholder={t('form.hours_placeholder')}
-            value={form.hours_per_week}
-            onChange={(e) => updateField('hours_per_week', e.target.value)}
-            min="0"
-            step="0.5"
-            classNames={{
-              input: 'bg-transparent text-theme-primary',
-              inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
-            }}
-          />
+          <NumberField
+            value={form.hours_per_week ? Number(form.hours_per_week) : undefined}
+            onChange={(n) => updateField('hours_per_week', n != null && !Number.isNaN(n) ? String(n) : '')}
+            minValue={0}
+            step={0.5}
+            fullWidth
+          >
+            <Label className="text-theme-primary">{t('form.hours_label')}</Label>
+            <NumberField.Group className="bg-theme-elevated border-theme-default hover:bg-theme-hover">
+              <NumberField.DecrementButton />
+              <NumberField.Input className="bg-transparent text-theme-primary" aria-label={t('form.hours_label')} />
+              <NumberField.IncrementButton />
+            </NumberField.Group>
+          </NumberField>
 
           {/* Time Credits (only for timebank type) */}
           {form.type === 'timebank' && (
-            <Input
-              type="number"
-              label={t('form.time_credits_label')}
-              placeholder={t('form.time_credits_placeholder')}
-              value={form.time_credits}
-              onChange={(e) => updateField('time_credits', e.target.value)}
-              min="0"
-              step="0.5"
-              classNames={{
-                input: 'bg-transparent text-theme-primary',
-                inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
-              }}
-            />
+            <NumberField
+              value={form.time_credits ? Number(form.time_credits) : undefined}
+              onChange={(n) => updateField('time_credits', n != null && !Number.isNaN(n) ? String(n) : '')}
+              minValue={0}
+              step={0.5}
+              fullWidth
+            >
+              <Label className="text-theme-primary">{t('form.time_credits_label')}</Label>
+              <NumberField.Group className="bg-theme-elevated border-theme-default hover:bg-theme-hover">
+                <NumberField.DecrementButton />
+                <NumberField.Input className="bg-transparent text-theme-primary" aria-label={t('form.time_credits_label')} />
+                <NumberField.IncrementButton />
+              </NumberField.Group>
+            </NumberField>
           )}
 
           {/* Contact info */}
@@ -1003,34 +1005,38 @@ export function CreateJobPage() {
               {/* Salary range fields — required when NOT negotiable */}
               <div className="space-y-2">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Input
-                    type="number"
-                    label={`${t('form.salary_min_label')}${!form.salary_negotiable ? ' *' : ''}`}
-                    value={form.salary_min}
-                    onChange={(e) => updateField('salary_min', e.target.value)}
-                    min="0"
-                    step="100"
+                  <NumberField
+                    value={form.salary_min ? Number(form.salary_min) : undefined}
+                    onChange={(n) => updateField('salary_min', n != null && !Number.isNaN(n) ? String(n) : '')}
+                    minValue={0}
+                    step={100}
                     isInvalid={!!errors.salary_range && !form.salary_negotiable}
                     isDisabled={form.salary_negotiable}
-                    classNames={{
-                      input: 'bg-transparent text-theme-primary',
-                      inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
-                    }}
-                  />
-                  <Input
-                    type="number"
-                    label={`${t('form.salary_max_label')}${!form.salary_negotiable ? ' *' : ''}`}
-                    value={form.salary_max}
-                    onChange={(e) => updateField('salary_max', e.target.value)}
-                    min="0"
-                    step="100"
+                    fullWidth
+                  >
+                    <Label className="text-theme-primary">{`${t('form.salary_min_label')}${!form.salary_negotiable ? ' *' : ''}`}</Label>
+                    <NumberField.Group className="bg-theme-elevated border-theme-default hover:bg-theme-hover">
+                      <NumberField.DecrementButton />
+                      <NumberField.Input className="bg-transparent text-theme-primary" aria-label={t('form.salary_min_label')} />
+                      <NumberField.IncrementButton />
+                    </NumberField.Group>
+                  </NumberField>
+                  <NumberField
+                    value={form.salary_max ? Number(form.salary_max) : undefined}
+                    onChange={(n) => updateField('salary_max', n != null && !Number.isNaN(n) ? String(n) : '')}
+                    minValue={0}
+                    step={100}
                     isInvalid={!!errors.salary_range && !form.salary_negotiable}
                     isDisabled={form.salary_negotiable}
-                    classNames={{
-                      input: 'bg-transparent text-theme-primary',
-                      inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
-                    }}
-                  />
+                    fullWidth
+                  >
+                    <Label className="text-theme-primary">{`${t('form.salary_max_label')}${!form.salary_negotiable ? ' *' : ''}`}</Label>
+                    <NumberField.Group className="bg-theme-elevated border-theme-default hover:bg-theme-hover">
+                      <NumberField.DecrementButton />
+                      <NumberField.Input className="bg-transparent text-theme-primary" aria-label={t('form.salary_max_label')} />
+                      <NumberField.IncrementButton />
+                    </NumberField.Group>
+                  </NumberField>
                 </div>
                 {errors.salary_range && (
                   <p className="text-xs text-danger" role="alert">{errors.salary_range}</p>

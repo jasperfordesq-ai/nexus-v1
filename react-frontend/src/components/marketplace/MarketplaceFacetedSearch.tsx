@@ -1,4 +1,4 @@
-import { Select, SelectItem, Accordion, AccordionItem, Button, Input, CheckboxGroup, Checkbox, RadioGroup, Radio } from '@/components/ui';
+import { Select, SelectItem, Accordion, AccordionItem, Button, NumberField, Label, CheckboxGroup, Checkbox, RadioGroup, Radio } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -99,26 +99,34 @@ export function MarketplaceFacetedSearch({
           {t('filters.price_range')}
         </legend>
         <div className="flex gap-2">
-          <Input
-            type="number"
-            aria-label={t('filters.min')}
-            placeholder={t('filters.min')}
-            size="sm"
+          <NumberField
+            className="flex-1"
             variant="secondary"
-            min={0}
-            value={localFilters.price_min != null ? String(localFilters.price_min) : ''}
-            onValueChange={(v) => updateFilter('price_min', v ? Number(v) : undefined)}
-          />
-          <Input
-            type="number"
-            aria-label={t('filters.max')}
-            placeholder={t('filters.max')}
-            size="sm"
+            minValue={0}
+            value={localFilters.price_min ?? undefined}
+            onChange={(v) => updateFilter('price_min', v)}
+          >
+            <Label>{t('filters.min')}</Label>
+            <NumberField.Group>
+              <NumberField.DecrementButton />
+              <NumberField.Input className="w-full" />
+              <NumberField.IncrementButton />
+            </NumberField.Group>
+          </NumberField>
+          <NumberField
+            className="flex-1"
             variant="secondary"
-            min={0}
-            value={localFilters.price_max != null ? String(localFilters.price_max) : ''}
-            onValueChange={(v) => updateFilter('price_max', v ? Number(v) : undefined)}
-          />
+            minValue={0}
+            value={localFilters.price_max ?? undefined}
+            onChange={(v) => updateFilter('price_max', v)}
+          >
+            <Label>{t('filters.max')}</Label>
+            <NumberField.Group>
+              <NumberField.DecrementButton />
+              <NumberField.Input className="w-full" />
+              <NumberField.IncrementButton />
+            </NumberField.Group>
+          </NumberField>
         </div>
       </fieldset>
 

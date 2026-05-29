@@ -178,7 +178,8 @@
     "created_success": "Advertentie succesvol aangemaakt!",
     "created_error": "Mislukt om advertentie aan te maken",
     "created_error_retry": "Mislukt om advertentie aan te maken. Probeer het opnieuw.",
-    "draft_saved": "Concept opgeslagen"
+    "draft_saved": "Concept opgeslagen",
+    "currency_search": "Search currency"
   },
   "search": {
     "page_title": "Zoek Marktplaats",

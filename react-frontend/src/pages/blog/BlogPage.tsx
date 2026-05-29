@@ -21,7 +21,7 @@ import Clock from 'lucide-react/icons/clock';
 import Eye from 'lucide-react/icons/eye';
 import User from 'lucide-react/icons/user';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, SearchField, Avatar, Skeleton } from '@/components/ui';
+import { GlassCard, Button, Chip, SearchField, Avatar, Skeleton, ToggleButtonGroup, ToggleButton } from '@/components/ui';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
@@ -207,34 +207,38 @@ export function BlogPage() {
         </div>
 
         {categories.length > 0 && (
-          <div className="flex gap-2 flex-wrap" role="group" aria-label={t('filter_by_category')}>
-            <Button
-              size="sm"
-              variant={!selectedCategory ? 'solid' : 'flat'}
-              className={!selectedCategory ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white' : 'bg-theme-elevated text-theme-muted'}
-              onPress={() => setSelectedCategory(null)}
+          <ToggleButtonGroup
+            selectionMode="single"
+            disallowEmptySelection
+            selectedKeys={[selectedCategory === null ? 'all' : String(selectedCategory)]}
+            onSelectionChange={(keys) => {
+              const next = Array.from(keys)[0];
+              setSelectedCategory(next && next !== 'all' ? Number(next) : null);
+            }}
+            isDetached
+            size="sm"
+            className="flex gap-2 flex-wrap"
+            aria-label={t('filter_by_category')}
+          >
+            <ToggleButton
+              id="all"
+              className="bg-theme-elevated text-theme-muted data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-blue-500 data-[selected=true]:to-indigo-600 data-[selected=true]:text-white"
             >
               {t('filter_all')}
-            </Button>
+            </ToggleButton>
             {categories.map((cat) => (
-              <Button
+              <ToggleButton
                 key={cat.id}
-                size="sm"
-                variant={selectedCategory === cat.id ? 'solid' : 'flat'}
-                className={
-                  selectedCategory === cat.id
-                    ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white'
-                    : 'bg-theme-elevated text-theme-muted'
-                }
-                onPress={() => setSelectedCategory(cat.id)}
+                id={String(cat.id)}
+                className="bg-theme-elevated text-theme-muted data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-blue-500 data-[selected=true]:to-indigo-600 data-[selected=true]:text-white"
               >
                 {cat.name}
                 {cat.post_count > 0 && (
                   <span className="ml-1 opacity-70">({cat.post_count})</span>
                 )}
-              </Button>
+              </ToggleButton>
             ))}
-          </div>
+          </ToggleButtonGroup>
         )}
       </div>
 

@@ -177,6 +177,24 @@ export {
   type SelectItemProps,
   type SelectSectionProps,
 } from './Select';
+export {
+  ListBox,
+  ListBoxItem,
+  ListBoxSection,
+  type ListBoxProps,
+  type ListBoxItemProps,
+  type ListBoxSectionProps,
+  type Selection as ListBoxSelection,
+} from './ListBox';
+export { Autocomplete, type AutocompleteProps } from './Autocomplete';
+export { ComboBox, type ComboBoxProps } from './ComboBox';
+// Ergonomic aliases — the same collection parts compose inside Autocomplete & ComboBox.
+export {
+  ListBoxItem as AutocompleteItem,
+  ListBoxSection as AutocompleteSection,
+  ListBoxItem as ComboBoxItem,
+  ListBoxSection as ComboBoxSection,
+} from './ListBox';
 export { useDisclosure, type UseDisclosureProps } from './useDisclosure';
 export { ConfirmDialogProvider, useConfirm, type ConfirmOptions } from './ConfirmDialog';
 
