@@ -826,7 +826,8 @@
     "no_data": "Nessun dato di candidatura disponibile per il periodo selezionato",
     "access_denied": "Accesso negato",
     "load_error": "Impossibile caricare il report dell'audit sui pregiudizi",
-    "note_privacy": "Questo report analizza solo metriche di processo. Nessun dato demografico viene raccolto o utilizzato."
+    "note_privacy": "Questo report analizza solo metriche di processo. Nessun dato demografico viene raccolto o utilizzato.",
+    "search_jobs": "Search jobs"
   },
   "self_scheduling": {
     "title": "Slot per Colloqui",

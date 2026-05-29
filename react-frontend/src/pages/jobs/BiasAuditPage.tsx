@@ -1,5 +1,5 @@
 import { Chip } from '@/components/ui';
-import { Select, SelectItem, GlassCard, Button, Input, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, CardRowsSkeleton } from '@/components/ui';
+import { Autocomplete, AutocompleteItem, GlassCard, Button, Input, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, CardRowsSkeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -257,27 +257,21 @@ export function BiasAuditPage() {
             variant="bordered"
             classNames={{ base: 'max-w-[180px]' }}
           />
-          <Select
+          <Autocomplete
             label={t('bias_audit.filter_by_job')}
-            selectedKeys={selectedJobId ? [selectedJobId] : []}
-            onSelectionChange={(keys) => {
-              const selected = Array.from(keys)[0];
-              setSelectedJobId(selected ? String(selected) : '');
-            }}
-            variant="bordered"
+            placeholder={t('bias_audit.all_jobs')}
+            searchPlaceholder={t('bias_audit.search_jobs')}
+            value={selectedJobId || null}
+            onChange={(key) => setSelectedJobId(key && !Array.isArray(key) ? String(key) : '')}
+            variant="secondary"
             classNames={{ base: 'max-w-[250px]' }}
           >
-            {[
-              <SelectItem key="" id="" textValue={t('bias_audit.all_jobs')}>
-                {t('bias_audit.all_jobs')}
-              </SelectItem>,
-              ...jobs.map((job) => (
-                <SelectItem key={String(job.id)} id={String(job.id)} textValue={job.title}>
-                  {job.title}
-                </SelectItem>
-              )),
-            ]}
-          </Select>
+            {jobs.map((job) => (
+              <AutocompleteItem key={String(job.id)} id={String(job.id)} textValue={job.title}>
+                {job.title}
+              </AutocompleteItem>
+            ))}
+          </Autocomplete>
           <Button
             color="primary"
             onPress={loadReport}

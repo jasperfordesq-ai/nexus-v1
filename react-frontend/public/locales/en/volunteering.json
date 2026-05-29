@@ -97,6 +97,7 @@
   "create_opportunity_subtitle": "Create a new volunteering opportunity for your organisation",
   "form_org_label": "Organisation",
   "form_org_placeholder": "Select your organisation",
+  "search_organisations": "Search organisations",
   "form_org_required": "Please select an organisation",
   "form_title_label": "Opportunity Title",
   "form_title_placeholder": "e.g., Community Garden Helper, Event Coordinator",

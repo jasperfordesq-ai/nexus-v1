@@ -826,7 +826,8 @@
     "no_data": "Brak danych aplikacyjnych dostępnych za wybrany okres",
     "access_denied": "Odmowa dostępu",
     "load_error": "Nie udało się załadować raportu audytu stronniczości",
-    "note_privacy": "Ten raport analizuje tylko metryki procesu. Żadne dane demograficzne nie są zbierane ani używane."
+    "note_privacy": "Ten raport analizuje tylko metryki procesu. Żadne dane demograficzne nie są zbierane ani używane.",
+    "search_jobs": "Search jobs"
   },
   "self_scheduling": {
     "title": "Sloty Rozmów Kwalifikacyjnych",

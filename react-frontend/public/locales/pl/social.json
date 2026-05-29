@@ -149,7 +149,8 @@
     "cancel": "Anuluj",
     "save": "Zapisz",
     "create": "Utwórz",
-    "loading": "Loading bookmarks..."
+    "loading": "Loading bookmarks...",
+    "collection_search": "Search collections"
   },
   "verified": "Zweryfikowany",
   "hover_card": {

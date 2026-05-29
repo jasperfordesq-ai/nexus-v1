@@ -149,7 +149,8 @@
     "external_profile_title": "Extern lid",
     "external_profile_message": "Dit lid bevindt zich op een extern partnerplatform. Directe profielweergave is niet beschikbaar.",
     "external_member": "Extern lid",
-    "member_fallback": "Lid"
+    "member_fallback": "Lid",
+    "search_communities": "Search communities"
   },
   "messages": {
     "page_title": "Federatie berichten",
@@ -247,7 +248,8 @@
     "hours_estimated": "~{{hours}}h",
     "view_profile": "Bekijk profiel",
     "contact_author": "Contact",
-    "close": "Dichtbij"
+    "close": "Dichtbij",
+    "search_communities": "Search communities"
   },
   "settings": {
     "page_title": "Federatie-instellingen",
@@ -327,7 +329,8 @@
     "online": "Online",
     "date_at_time": "{{date}} om {{time}}",
     "attendees_going_one": "{{count}} gaat",
-    "attendees_going_other": "{{count}} gaan"
+    "attendees_going_other": "{{count}} gaan",
+    "search_communities": "Search communities"
   },
   "groups": {
     "page_title": "Federatie groepen",
@@ -347,7 +350,8 @@
     "load_more_error": "Kan niet meer groepen laden.",
     "member_count": "{{count}} lid",
     "member_count_plural": "{{count}} leden",
-    "private": "Privé"
+    "private": "Privé",
+    "search_communities": "Search communities"
   },
   "connections": {
     "page_title": "Federatieverbindingen",

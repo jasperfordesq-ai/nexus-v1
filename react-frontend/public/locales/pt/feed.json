@@ -230,7 +230,8 @@
     "listing_preview_alt": "Pr?-visualiza??o do an?ncio",
     "image_preview_alt": "Pr?-visualiza??o do envio",
     "listing_type_label": "Listing type",
-    "type_tabs_aria": "Compose content type"
+    "type_tabs_aria": "Compose content type",
+    "group_search": "Search groups"
   },
   "moderation": {
     "unauthorized": "Não tem permissão para realizar esta ação."

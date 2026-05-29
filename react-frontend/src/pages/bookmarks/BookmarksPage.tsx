@@ -1,4 +1,4 @@
-import { Button, Chip, Card, CardBody, Input, Spinner, Select, SelectItem, useDisclosure, GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab } from '@/components/ui';
+import { Button, Chip, Card, CardBody, Input, Spinner, Autocomplete, AutocompleteItem, useDisclosure, GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,7 +9,7 @@ import { Button, Chip, Card, CardBody, Input, Spinner, Select, SelectItem, useDi
  * Tabs for content types, collection management, grid/list view.
  */
 
-import { Fragment, useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 
 import Bookmark from 'lucide-react/icons/bookmark';
@@ -268,26 +268,21 @@ export default function BookmarksPage() {
       {/* Collections Bar */}
       {collections.length > 0 && (
         <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center">
-          <Select
+          <Autocomplete
             label={t('bookmarks.collection_filter_label')}
             aria-label={t('bookmarks.collection_filter_label')}
-            selectedKeys={new Set([selectedCollection === null ? 'all' : String(selectedCollection)])}
-            onSelectionChange={(keys) => {
-              const key = Array.from(keys as Set<string>)[0];
-              setSelectedCollection(key === 'all' ? null : Number(key));
-            }}
+            placeholder={t('bookmarks.all_items')}
+            searchPlaceholder={t('bookmarks.collection_search')}
+            value={selectedCollection === null ? null : String(selectedCollection)}
+            onChange={(key) => setSelectedCollection(key && !Array.isArray(key) ? Number(key) : null)}
             className="w-full sm:max-w-xs"
-            size="sm"
           >
-            <Fragment>
-              <SelectItem key="all" id="all">{t('bookmarks.all_items')}</SelectItem>
-              {collections.map((coll) => (
-                <SelectItem key={String(coll.id)} id={String(coll.id)}>
-                  {coll.name} {coll.bookmarks_count != null && `(${coll.bookmarks_count})`}
-                </SelectItem>
-              ))}
-            </Fragment>
-          </Select>
+            {collections.map((coll) => (
+              <AutocompleteItem key={String(coll.id)} id={String(coll.id)} textValue={coll.name}>
+                {coll.name} {coll.bookmarks_count != null && `(${coll.bookmarks_count})`}
+              </AutocompleteItem>
+            ))}
+          </Autocomplete>
           {collections.map((coll) => (
             <div key={coll.id} className="flex items-center gap-1 shrink-0">
               <Dropdown placement="bottom-end">

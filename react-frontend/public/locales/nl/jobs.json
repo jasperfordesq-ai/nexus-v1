@@ -826,7 +826,8 @@
     "no_data": "Geen aanvraaggegevens beschikbaar voor de geselecteerde periode",
     "access_denied": "Toegang geweigerd",
     "load_error": "Kon het bias audit rapport niet laden",
-    "note_privacy": "Dit rapport analyseert alleen processtatistieken. Er worden geen demografische gegevens verzameld of gebruikt."
+    "note_privacy": "Dit rapport analyseert alleen processtatistieken. Er worden geen demografische gegevens verzameld of gebruikt.",
+    "search_jobs": "Search jobs"
   },
   "self_scheduling": {
     "title": "Interviewslots",

@@ -826,7 +826,8 @@
     "no_data": "No hay datos de solicitudes disponibles para el período seleccionado",
     "access_denied": "Acceso denegado",
     "load_error": "No se pudo cargar el informe de auditoría de sesgo",
-    "note_privacy": "Este informe solo analiza métricas de proceso. No se recopilan ni utilizan datos demográficos."
+    "note_privacy": "Este informe solo analiza métricas de proceso. No se recopilan ni utilizan datos demográficos.",
+    "search_jobs": "Search jobs"
   },
   "self_scheduling": {
     "title": "Horarios de Entrevista",

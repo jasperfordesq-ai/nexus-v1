@@ -1983,7 +1983,8 @@
       "today": "Inniu",
       "from_label": "Ó",
       "load_failed": "Níorbh fhéidir an féilire a luchtú."
-    }
+    },
+    "invite_target_search": "Search clubs"
   },
   "oauth": {
     "continue_with_google": "Lean ar aghaidh le Google",

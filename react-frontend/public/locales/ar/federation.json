@@ -149,7 +149,8 @@
     "external_profile_title": "عضو خارجي",
     "external_profile_message": "هذا العضو موجود على منصة شريك خارجي. عرض الملف الشخصي المباشر غير متاح.",
     "external_member": "عضو خارجي",
-    "member_fallback": "عضو"
+    "member_fallback": "عضو",
+    "search_communities": "Search communities"
   },
   "messages": {
     "page_title": "رسائل الاتحاد",
@@ -247,7 +248,8 @@
     "hours_estimated": "~{{hours}}ح",
     "view_profile": "عرض الملف الشخصي",
     "contact_author": "اتصال",
-    "close": "يغلق"
+    "close": "يغلق",
+    "search_communities": "Search communities"
   },
   "settings": {
     "page_title": "إعدادات الاتحاد",
@@ -327,7 +329,8 @@
     "online": "متصل",
     "date_at_time": "{{date}} ?? {{time}}",
     "attendees_going_one": "{{count}} ?????",
-    "attendees_going_other": "{{count}} ???????"
+    "attendees_going_other": "{{count}} ???????",
+    "search_communities": "Search communities"
   },
   "groups": {
     "page_title": "مجموعات الاتحاد",
@@ -347,7 +350,8 @@
     "load_more_error": "تعذر تحميل المزيد من المجموعات.",
     "member_count": "عضو {{count}}",
     "member_count_plural": "أعضاء {{count}}",
-    "private": "خاص"
+    "private": "خاص",
+    "search_communities": "Search communities"
   },
   "connections": {
     "page_title": "اتصالات الاتحاد",

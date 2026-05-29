@@ -1,4 +1,4 @@
-import { Select, SelectItem, Button, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@/components/ui';
+import { Autocomplete, AutocompleteItem, Button, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -139,17 +139,18 @@ export default function VereinCrossInvitationButton({ userId }: Props) {
                 </span>
               </ModalHeader>
               <ModalBody>
-                <Select
+                <Autocomplete
                   label={t('verein_federation.invite_target_label')}
-                  selectedKeys={targetOrgId ? [targetOrgId] : []}
-                  onChange={(e) => handleSelectTarget(e.target.value)}
+                  searchPlaceholder={t('verein_federation.invite_target_search')}
+                  value={targetOrgId || null}
+                  onChange={(key) => handleSelectTarget(key && !Array.isArray(key) ? String(key) : '')}
                 >
                   {allTargets.map((tg) => (
-                    <SelectItem key={String(tg.targetOrgId)} id={String(tg.targetOrgId)} textValue={tg.targetName}>
+                    <AutocompleteItem key={String(tg.targetOrgId)} id={String(tg.targetOrgId)} textValue={tg.targetName}>
                       {tg.targetName}
-                    </SelectItem>
+                    </AutocompleteItem>
                   ))}
-                </Select>
+                </Autocomplete>
 
                 <Textarea
                   label={t('verein_federation.invite_message_label')}

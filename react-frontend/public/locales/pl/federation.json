@@ -149,7 +149,8 @@
     "external_profile_title": "Członek zewnętrzny",
     "external_profile_message": "Ten członek znajduje się na platformie partnerów zewnętrznych. Bezpośrednie przeglądanie profilu nie jest dostępne.",
     "external_member": "Członek zewnętrzny",
-    "member_fallback": "Członek"
+    "member_fallback": "Członek",
+    "search_communities": "Search communities"
   },
   "messages": {
     "page_title": "Wiadomości Federacji",
@@ -247,7 +248,8 @@
     "hours_estimated": "~{{hours}}godz",
     "view_profile": "Zobacz profil",
     "contact_author": "Kontakt",
-    "close": "Zamknąć"
+    "close": "Zamknąć",
+    "search_communities": "Search communities"
   },
   "settings": {
     "page_title": "Ustawienia Federacji",
@@ -327,7 +329,8 @@
     "online": "W Internecie",
     "date_at_time": "{{date}} o {{time}}",
     "attendees_going_one": "{{count}} uczestnik",
-    "attendees_going_other": "{{count}} uczestnik?w"
+    "attendees_going_other": "{{count}} uczestnik?w",
+    "search_communities": "Search communities"
   },
   "groups": {
     "page_title": "Grupy Federacji",
@@ -347,7 +350,8 @@
     "load_more_error": "Nie można załadować więcej grup.",
     "member_count": "Członek {{count}}",
     "member_count_plural": "Członkowie {{count}}",
-    "private": "Prywatny"
+    "private": "Prywatny",
+    "search_communities": "Search communities"
   },
   "connections": {
     "page_title": "Połączenia Federacji",

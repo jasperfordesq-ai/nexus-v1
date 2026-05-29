@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Input, Textarea } from '@/components/ui';
+import { Autocomplete, AutocompleteItem, GlassCard, Button, Input, Textarea } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -239,26 +239,26 @@ export default function CreateOpportunityPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Organisation Selector */}
           {approvedOrgs.length > 1 ? (
-            <Select
+            <Autocomplete
               label={t('form_org_label')}
               placeholder={t('form_org_placeholder')}
-              selectedKeys={formData.organization_id ? new Set([formData.organization_id]) : new Set()}
-              onSelectionChange={(keys) => { const val = Array.from(keys)[0] as string; if (val) updateField('organization_id', val); }}
+              searchPlaceholder={t('search_organisations')}
+              value={formData.organization_id || null}
+              onChange={(key) => updateField('organization_id', key && !Array.isArray(key) ? String(key) : '')}
               isInvalid={!!errors.organization_id}
               errorMessage={errors.organization_id}
               startContent={<Building2 className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default',
-                label: 'text-theme-muted',
                 value: 'text-theme-primary',
               }}
             >
               {approvedOrgs.map((org) => (
-                <SelectItem key={org.id.toString()} id={org.id.toString()}>
+                <AutocompleteItem key={org.id.toString()} id={org.id.toString()} textValue={org.name}>
                   {org.name}
-                </SelectItem>
+                </AutocompleteItem>
               ))}
-            </Select>
+            </Autocomplete>
           ) : (
             <Input
               label={t('form_org_label')}

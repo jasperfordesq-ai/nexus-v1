@@ -149,7 +149,8 @@
     "external_profile_title": "Externes Mitglied",
     "external_profile_message": "Dieses Mitglied befindet sich auf einer externen Partnerplattform. Eine direkte Profilansicht ist nicht verfügbar.",
     "external_member": "Externes Mitglied",
-    "member_fallback": "Mitglied"
+    "member_fallback": "Mitglied",
+    "search_communities": "Search communities"
   },
   "messages": {
     "page_title": "Föderationsnachrichten",
@@ -247,7 +248,8 @@
     "hours_estimated": "~{{hours}}h",
     "view_profile": "Profil anzeigen",
     "contact_author": "Kontakt",
-    "close": "Schließen"
+    "close": "Schließen",
+    "search_communities": "Search communities"
   },
   "settings": {
     "page_title": "Föderationseinstellungen",
@@ -327,7 +329,8 @@
     "online": "Online",
     "date_at_time": "{{date}} um {{time}}",
     "attendees_going_one": "{{count}} nimmt teil",
-    "attendees_going_other": "{{count}} nehmen teil"
+    "attendees_going_other": "{{count}} nehmen teil",
+    "search_communities": "Search communities"
   },
   "groups": {
     "page_title": "Föderationsgruppen",
@@ -347,7 +350,8 @@
     "load_more_error": "Es konnten keine weiteren Gruppen geladen werden.",
     "member_count": "{{count}}-Mitglied",
     "member_count_plural": "{{count}}-Mitglieder",
-    "private": "Privat"
+    "private": "Privat",
+    "search_communities": "Search communities"
   },
   "connections": {
     "page_title": "Föderationsverbindungen",

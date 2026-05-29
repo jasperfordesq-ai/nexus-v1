@@ -1983,7 +1983,8 @@
       "today": "Vandaag",
       "from_label": "Van",
       "load_failed": "Kon kalender niet laden."
-    }
+    },
+    "invite_target_search": "Search clubs"
   },
   "oauth": {
     "continue_with_google": "Doorgaan met Google",

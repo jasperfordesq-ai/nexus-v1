@@ -230,7 +230,8 @@
     "listing_preview_alt": "R?amhamharc liost?la",
     "image_preview_alt": "R?amhamharc uasl?d?la",
     "listing_type_label": "Listing type",
-    "type_tabs_aria": "Compose content type"
+    "type_tabs_aria": "Compose content type",
+    "group_search": "Search groups"
   },
   "moderation": {
     "unauthorized": "Níl cead agat an gníomh seo a dhéanamh."

@@ -822,6 +822,7 @@
     "date_to": "To",
     "filter_by_job": "Filter by Job",
     "all_jobs": "All Jobs",
+    "search_jobs": "Search jobs",
     "generate": "Generate Report",
     "loading": "Generating report...",
     "no_data": "No application data available for the selected period",

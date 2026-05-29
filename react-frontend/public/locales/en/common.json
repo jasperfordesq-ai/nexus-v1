@@ -1953,6 +1953,7 @@
     "invite_modal_title": "Cross-club invitation",
     "invite_modal_subtitle": "Invite this person to also join one of the federated clubs.",
     "invite_target_label": "Choose a club",
+    "invite_target_search": "Search clubs",
     "invite_message_label": "Personal message (optional)",
     "invite_message_placeholder": "Hi! Thought you'd enjoy this club too.",
     "invite_send": "Send invitation",

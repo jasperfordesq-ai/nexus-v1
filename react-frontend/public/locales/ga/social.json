@@ -149,7 +149,8 @@
     "cancel": "Cealaigh",
     "save": "Sábháil",
     "create": "Cruthaigh",
-    "loading": "Loading bookmarks..."
+    "loading": "Loading bookmarks...",
+    "collection_search": "Search collections"
   },
   "verified": "Fíoraithe",
   "hover_card": {

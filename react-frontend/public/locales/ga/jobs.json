@@ -826,7 +826,8 @@
     "no_data": "Níl sonraí iarratais ar fáil don tréimhse roghnaithe",
     "access_denied": "Rochtain diúltaithe",
     "load_error": "Theip ar thuairisc iniúchta laofachta a lódáil",
-    "note_privacy": "Déanann an tuairisc seo anailís ar mhéadrachtaí próisis amháin. Ní bhailítear ná ní úsáidtear sonraí déimeagrafacha."
+    "note_privacy": "Déanann an tuairisc seo anailís ar mhéadrachtaí próisis amháin. Ní bhailítear ná ní úsáidtear sonraí déimeagrafacha.",
+    "search_jobs": "Search jobs"
   },
   "self_scheduling": {
     "title": "Sliotáin Agallaimh",

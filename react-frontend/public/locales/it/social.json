@@ -149,7 +149,8 @@
     "cancel": "Annulla",
     "save": "Salva",
     "create": "Crea",
-    "loading": "Loading bookmarks..."
+    "loading": "Loading bookmarks...",
+    "collection_search": "Search collections"
   },
   "verified": "Verificato",
   "hover_card": {

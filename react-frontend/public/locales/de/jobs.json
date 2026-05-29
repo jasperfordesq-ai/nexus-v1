@@ -826,7 +826,8 @@
     "no_data": "Keine Bewerbungsdaten für den ausgewählten Zeitraum verfügbar",
     "access_denied": "Zugriff verweigert",
     "load_error": "Vorurteils-Audit-Bericht konnte nicht geladen werden",
-    "note_privacy": "Dieser Bericht analysiert nur Prozesskennzahlen. Es werden keine demographischen Daten erhoben oder verwendet."
+    "note_privacy": "Dieser Bericht analysiert nur Prozesskennzahlen. Es werden keine demographischen Daten erhoben oder verwendet.",
+    "search_jobs": "Search jobs"
   },
   "self_scheduling": {
     "title": "Gesprächszeitfenster",

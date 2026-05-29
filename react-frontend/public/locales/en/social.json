@@ -119,6 +119,7 @@
     "new_collection": "New Collection",
     "all_items": "All",
     "collection_filter_label": "Collection",
+    "collection_search": "Search collections",
     "tab_all": "All",
     "count": "{{count}} saved items",
     "remove": "Remove from saved",

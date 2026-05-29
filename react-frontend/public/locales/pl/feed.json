@@ -230,7 +230,8 @@
     "listing_preview_alt": "Podgl?d og?oszenia",
     "image_preview_alt": "Podgl?d przesy?ania",
     "listing_type_label": "Listing type",
-    "type_tabs_aria": "Compose content type"
+    "type_tabs_aria": "Compose content type",
+    "group_search": "Search groups"
   },
   "moderation": {
     "unauthorized": "Nie masz uprawnień do wykonania tej czynności."

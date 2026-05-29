@@ -149,7 +149,8 @@
     "cancel": "Annuleren",
     "save": "Opslaan",
     "create": "Aanmaken",
-    "loading": "Loading bookmarks..."
+    "loading": "Loading bookmarks...",
+    "collection_search": "Search collections"
   },
   "verified": "Geverifieerd",
   "hover_card": {

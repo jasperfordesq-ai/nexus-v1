@@ -826,7 +826,8 @@
     "no_data": "Sem dados de candidaturas disponíveis para o período selecionado",
     "access_denied": "Acesso negado",
     "load_error": "Falha ao carregar relatório de auditoria de enviesamento",
-    "note_privacy": "Este relatório analisa apenas métricas de processo. Nenhum dado demográfico é recolhido ou utilizado."
+    "note_privacy": "Este relatório analisa apenas métricas de processo. Nenhum dado demográfico é recolhido ou utilizado.",
+    "search_jobs": "Search jobs"
   },
   "self_scheduling": {
     "title": "Horários de Entrevista",

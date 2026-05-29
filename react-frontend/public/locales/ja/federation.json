@@ -149,7 +149,8 @@
     "external_profile_title": "外部会員",
     "external_profile_message": "このメンバーは外部パートナー プラットフォーム上にいます。プロフィールを直接表示することはできません。",
     "external_member": "外部会員",
-    "member_fallback": "メンバー"
+    "member_fallback": "メンバー",
+    "search_communities": "Search communities"
   },
   "messages": {
     "page_title": "フェデレーションメッセージ",
@@ -247,7 +248,8 @@
     "hours_estimated": "~{{hours}}h",
     "view_profile": "プロフィールを見る",
     "contact_author": "接触",
-    "close": "近い"
+    "close": "近い",
+    "search_communities": "Search communities"
   },
   "settings": {
     "page_title": "フェデレーション設定",
@@ -327,7 +329,8 @@
     "online": "オンライン",
     "date_at_time": "{{date}} {{time}}",
     "attendees_going_one": "{{count}}??????",
-    "attendees_going_other": "{{count}}??????"
+    "attendees_going_other": "{{count}}??????",
+    "search_communities": "Search communities"
   },
   "groups": {
     "page_title": "フェデレーショングループ",
@@ -347,7 +350,8 @@
     "load_more_error": "これ以上グループをロードできませんでした。",
     "member_count": "{{count}}メンバー",
     "member_count_plural": "{{count}} メンバー",
-    "private": "プライベート"
+    "private": "プライベート",
+    "search_communities": "Search communities"
   },
   "connections": {
     "page_title": "フェデレーション接続",

@@ -826,7 +826,8 @@
     "no_data": "Aucune donnée de candidature disponible pour la période sélectionnée",
     "access_denied": "Accès refusé",
     "load_error": "Échec du chargement du rapport d'audit des biais",
-    "note_privacy": "Ce rapport analyse uniquement les métriques de processus. Aucune donnée démographique n'est collectée ou utilisée."
+    "note_privacy": "Ce rapport analyse uniquement les métriques de processus. Aucune donnée démographique n'est collectée ou utilisée.",
+    "search_jobs": "Search jobs"
   },
   "self_scheduling": {
     "title": "Créneaux d'entretien",

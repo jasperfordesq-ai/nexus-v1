@@ -230,7 +230,8 @@
     "listing_preview_alt": "Vorschau des Eintrags",
     "image_preview_alt": "Upload-Vorschau",
     "listing_type_label": "Listing type",
-    "type_tabs_aria": "Compose content type"
+    "type_tabs_aria": "Compose content type",
+    "group_search": "Search groups"
   },
   "moderation": {
     "unauthorized": "Sie sind nicht berechtigt, diese Aktion auszuführen."

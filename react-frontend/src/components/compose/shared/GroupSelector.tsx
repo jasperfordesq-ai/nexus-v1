@@ -1,4 +1,4 @@
-import { Select, SelectItem, Skeleton } from '@/components/ui';
+import { Autocomplete, AutocompleteItem, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -75,14 +75,12 @@ export function GroupSelector({ value, onChange }: GroupSelectorProps) {
   }
 
   return (
-    <Select
+    <Autocomplete
       label={t('compose.group_label')}
       placeholder={t('compose.group_placeholder')}
-      selectedKeys={value ? [String(value)] : []}
-      onSelectionChange={(keys) => {
-        const selected = Array.from(keys)[0];
-        onChange(selected ? Number(selected) : null);
-      }}
+      searchPlaceholder={t('compose.group_search')}
+      value={value ? String(value) : null}
+      onChange={(key) => onChange(key && !Array.isArray(key) ? Number(key) : null)}
       startContent={<Users className="w-4 h-4 text-[var(--text-muted)]" />}
       classNames={{
         trigger: 'bg-[var(--surface-elevated)] border-[var(--border-default)] min-h-11',
@@ -90,7 +88,7 @@ export function GroupSelector({ value, onChange }: GroupSelectorProps) {
       }}
     >
       {groups.map((g) => (
-        <SelectItem key={String(g.id)} id={String(g.id)} textValue={g.name}>
+        <AutocompleteItem key={String(g.id)} id={String(g.id)} textValue={g.name}>
           <div className="flex items-center gap-2">
             <span className="text-sm">{g.name}</span>
             {g.member_count != null && (
@@ -99,8 +97,8 @@ export function GroupSelector({ value, onChange }: GroupSelectorProps) {
               </span>
             )}
           </div>
-        </SelectItem>
+        </AutocompleteItem>
       ))}
-    </Select>
+    </Autocomplete>
   );
 }

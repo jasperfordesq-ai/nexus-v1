@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Progress, Button, Input, Checkbox, Spinner } from '@/components/ui';
+import { Select, SelectItem, Autocomplete, AutocompleteItem, GlassCard, Progress, Button, Input, Checkbox, Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -489,24 +489,24 @@ export function RegisterPage() {
           <div className="space-y-4">
             {/* Tenant Selector - Only show if multiple tenants AND tenant not already known from context */}
             {!tenantsLoading && tenants.length > 1 && !tenant?.id && (
-              <Select
+              <Autocomplete
                 label={t('register.community_label')}
                 placeholder={t('register.community_placeholder')}
-                selectedKeys={selectedTenantId ? new Set([selectedTenantId]) : new Set()}
-                onSelectionChange={handleTenantChange}
+                searchPlaceholder={t('register.community_search')}
+                value={selectedTenantId || null}
+                onChange={(key) => handleTenantChange(key && !Array.isArray(key) ? new Set([String(key)]) : new Set<string>())}
                 startContent={<Building2 className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
                 isRequired
                 classNames={{
                   trigger:
                     'bg-white/90 dark:bg-white/10 backdrop-blur-xl border border-gray-200 dark:border-white/10',
-                  label: 'text-theme-muted',
                   value: 'text-theme-primary',
-                  popoverContent:
+                  popover:
                     'bg-surface border border-theme-default',
                 }}
               >
                 {tenants.map((t) => (
-                  <SelectItem
+                  <AutocompleteItem
                     key={String(t.id)} id={String(t.id)}
                     textValue={t.name}
                     classNames={{
@@ -521,9 +521,9 @@ export function RegisterPage() {
                         </span>
                       )}
                     </div>
-                  </SelectItem>
+                  </AutocompleteItem>
                 ))}
-              </Select>
+              </Autocomplete>
             )}
 
             {/* Show auto-detected community (custom domain or context-resolved tenant) */}

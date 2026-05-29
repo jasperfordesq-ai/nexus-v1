@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, SearchField, Avatar, MediaRowsSkeleton } from '@/components/ui';
+import { Autocomplete, AutocompleteItem, GlassCard, Button, Chip, SearchField, Avatar, MediaRowsSkeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -233,11 +233,12 @@ export function FederationEventsPage() {
           </div>
 
           {/* Partner filter */}
-          <Select
+          <Autocomplete
             placeholder={t('events.all_communities')}
+            searchPlaceholder={t('events.search_communities')}
             aria-label={t('events.filter_by_community')}
-            selectedKeys={selectedPartner ? [selectedPartner] : []}
-            onChange={(e) => setSelectedPartner(e.target.value)}
+            value={selectedPartner || null}
+            onChange={(key) => setSelectedPartner(key && !Array.isArray(key) ? String(key) : '')}
             className="w-full lg:w-52"
             classNames={{
               trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
@@ -245,13 +246,15 @@ export function FederationEventsPage() {
             }}
             startContent={<Globe className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
           >
-            {[
-              { id: '', name: t('events.all_communities') },
-              ...partners.map((p) => ({ id: String(p.id), name: p.name })),
-            ].map((item) => (
-              <SelectItem key={item.id} id={item.id}>{item.name}</SelectItem>
-            ))}
-          </Select>
+            {partners.map((partner) => {
+              const label = partner.is_external ? `${partner.name} (${t('external')})` : partner.name;
+              return (
+                <AutocompleteItem key={String(partner.id)} id={String(partner.id)} textValue={label}>
+                  {label}
+                </AutocompleteItem>
+              );
+            })}
+          </Autocomplete>
 
           {/* Upcoming toggle */}
           <Chip

@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Input, Checkbox, Spinner } from '@/components/ui';
+import { Autocomplete, AutocompleteItem, GlassCard, Button, Input, Checkbox, Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -463,22 +463,22 @@ export function LoginPage() {
 
                     {/* Multi-tenant dropdown — only when tenant not resolved from URL */}
                     {showTenantDropdown && (
-                      <Select
+                      <Autocomplete
                         label={t('login.community_label')}
                         placeholder={t('login.community_placeholder')}
-                        selectedKeys={selectedTenantId ? new Set([selectedTenantId]) : new Set()}
-                        onSelectionChange={handleTenantChange}
+                        searchPlaceholder={t('login.community_search')}
+                        value={selectedTenantId || null}
+                        onChange={(key) => handleTenantChange(key && !Array.isArray(key) ? new Set([String(key)]) : new Set<string>())}
                         startContent={<Building2 className="w-4 h-4 text-theme-subtle" />}
                         isRequired
                         classNames={{
                           trigger: 'bg-white/90 dark:bg-white/10 backdrop-blur-xl border border-gray-200 dark:border-white/10',
-                          label: 'text-theme-muted',
                           value: 'text-theme-primary',
-                          popoverContent: 'bg-overlay border border-theme-default',
+                          popover: 'bg-overlay border border-theme-default',
                         }}
                       >
                         {tenants.map((t) => (
-                          <SelectItem
+                          <AutocompleteItem
                             key={String(t.id)} id={String(t.id)}
                             textValue={t.name}
                             classNames={{
@@ -491,9 +491,9 @@ export function LoginPage() {
                                 <span className="text-gray-500 dark:text-gray-400 text-xs">{t.tagline}</span>
                               )}
                             </div>
-                          </SelectItem>
+                          </AutocompleteItem>
                         ))}
-                      </Select>
+                      </Autocomplete>
                     )}
 
                     {/* Single tenant card */}

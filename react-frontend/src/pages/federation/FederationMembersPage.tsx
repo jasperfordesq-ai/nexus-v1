@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input, SearchField, Avatar } from '@/components/ui';
+import { Autocomplete, AutocompleteItem, GlassCard, Button, Chip, Spinner, Input, SearchField, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -316,10 +316,11 @@ export function FederationMembersPage() {
               />
             </div>
 
-            <Select
+            <Autocomplete
               placeholder={t('members.all_communities')}
-              selectedKeys={selectedPartner ? [selectedPartner] : []}
-              onChange={(e) => setSelectedPartner(e.target.value)}
+              searchPlaceholder={t('members.search_communities')}
+              value={selectedPartner || null}
+              onChange={(key) => setSelectedPartner(key && !Array.isArray(key) ? String(key) : '')}
               className="w-full lg:w-56"
               aria-label={t('members.aria_filter_community')}
               classNames={{
@@ -328,12 +329,15 @@ export function FederationMembersPage() {
               }}
               startContent={<Globe className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
             >
-              {partners.map((partner) => (
-                <SelectItem key={String(partner.id)} id={String(partner.id)}>
-                  {partner.is_external ? `${partner.name} (${t('external')})` : partner.name}
-                </SelectItem>
-              ))}
-            </Select>
+              {partners.map((partner) => {
+                const label = partner.is_external ? `${partner.name} (${t('external')})` : partner.name;
+                return (
+                  <AutocompleteItem key={String(partner.id)} id={String(partner.id)} textValue={label}>
+                    {label}
+                  </AutocompleteItem>
+                );
+              })}
+            </Autocomplete>
           </div>
 
           {/* Row 2: Service reach chips + Skills filter */}

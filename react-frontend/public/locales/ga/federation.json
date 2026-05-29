@@ -149,7 +149,8 @@
     "external_profile_title": "Ball Seachtrach",
     "external_profile_message": "Tá an comhalta seo ar ardán comhpháirtíochta seachtrach. Níl féachaint ar phróifíl dhíreach ar fáil.",
     "external_member": "Ball Seachtrach",
-    "member_fallback": "Ball"
+    "member_fallback": "Ball",
+    "search_communities": "Search communities"
   },
   "messages": {
     "page_title": "Teachtaireachtaí Cónaidhme",
@@ -247,7 +248,8 @@
     "hours_estimated": "~{{hours}}h",
     "view_profile": "Próifíl Amharc",
     "contact_author": "Teagmháil",
-    "close": "Dún"
+    "close": "Dún",
+    "search_communities": "Search communities"
   },
   "settings": {
     "page_title": "Socruithe Cónaidhme",
@@ -327,7 +329,8 @@
     "online": "Ar líne",
     "date_at_time": "{{date}} ag {{time}}",
     "attendees_going_one": "{{count}} ag dul",
-    "attendees_going_other": "{{count}} ag dul"
+    "attendees_going_other": "{{count}} ag dul",
+    "search_communities": "Search communities"
   },
   "groups": {
     "page_title": "Grúpaí Cónaidhme",
@@ -347,7 +350,8 @@
     "load_more_error": "Níorbh fhéidir níos mó grúpaí a lódáil.",
     "member_count": "ball {{count}}",
     "member_count_plural": "baill {{count}}",
-    "private": "Príobháideach"
+    "private": "Príobháideach",
+    "search_communities": "Search communities"
   },
   "connections": {
     "page_title": "Cónaidhm Naisc",

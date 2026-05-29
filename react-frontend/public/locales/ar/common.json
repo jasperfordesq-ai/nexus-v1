@@ -1983,7 +1983,8 @@
       "today": "اليوم",
       "from_label": "من",
       "load_failed": "تعذّر تحميل التقويم."
-    }
+    },
+    "invite_target_search": "Search clubs"
   },
   "oauth": {
     "continue_with_google": "المتابعة باستخدام Google",

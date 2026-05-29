@@ -1983,7 +1983,8 @@
       "today": "Heute",
       "from_label": "Von",
       "load_failed": "Kalender konnte nicht geladen werden."
-    }
+    },
+    "invite_target_search": "Search clubs"
   },
   "oauth": {
     "continue_with_google": "Mit Google fortfahren",

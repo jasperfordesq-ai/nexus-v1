@@ -142,6 +142,7 @@
                     "image_remove_aria":  "Remove image",
                     "group_label":  "Post to",
                     "group_placeholder":  "Public Feed",
+                    "group_search":  "Search groups",
                     "group_members":  "{{count}} members",
                     "ai_title_required":  "Enter a title first so AI can generate a description",
                     "ai_generated":  "AI description generated!",
