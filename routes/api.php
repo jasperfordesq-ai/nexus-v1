@@ -1063,6 +1063,7 @@ Route::post('/v2/courses/quizzes/{quizId}/attempt', [\App\Http\Controllers\Api\C
 Route::post('/v2/courses', [\App\Http\Controllers\Api\CourseController::class, 'store']);
 Route::put('/v2/courses/{id}', [\App\Http\Controllers\Api\CourseController::class, 'update'])->where('id', '[0-9]+');
 Route::delete('/v2/courses/{id}', [\App\Http\Controllers\Api\CourseController::class, 'destroy'])->where('id', '[0-9]+');
+Route::get('/v2/courses/{id}/analytics', [\App\Http\Controllers\Api\CourseController::class, 'analytics'])->where('id', '[0-9]+');
 Route::post('/v2/courses/{id}/publish', [\App\Http\Controllers\Api\CourseController::class, 'publish'])->where('id', '[0-9]+');
 Route::post('/v2/courses/{id}/unpublish', [\App\Http\Controllers\Api\CourseController::class, 'unpublish'])->where('id', '[0-9]+');
 

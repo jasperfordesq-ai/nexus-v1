@@ -162,6 +162,61 @@ class CourseController extends BaseApiController
         return $this->respondWithData($course);
     }
 
+    /** GET /v2/courses/{id}/analytics — per-course analytics (owner or admin). */
+    public function analytics(int $id): JsonResponse
+    {
+        $this->ensureCoursesFeature();
+        $userId = $this->requireCourseAuthor();
+
+        $course = $this->findCourseOrFail($id);
+        $this->ensureCourseOwnerOrAdmin($course, $userId);
+
+        $enrollments = \App\Models\CourseEnrollment::where('course_id', $id);
+        $total = (clone $enrollments)->count();
+        $completed = (clone $enrollments)->where('status', 'completed')->count();
+        $active = (clone $enrollments)->where('status', 'active')->count();
+        $dropped = (clone $enrollments)->where('status', 'dropped')->count();
+        $avgProgress = (float) (clone $enrollments)->avg('progress_percent');
+
+        // Per-lesson completion (drop-off curve).
+        $lessons = \App\Models\CourseLesson::where('course_id', $id)
+            ->orderBy('position')
+            ->get(['id', 'title']);
+        $perLesson = $lessons->map(function ($lesson) {
+            return [
+                'lesson_id' => $lesson->id,
+                'title' => $lesson->title,
+                'completed' => \App\Models\CourseLessonProgress::where('lesson_id', $lesson->id)
+                    ->where('status', 'completed')
+                    ->count(),
+            ];
+        })->all();
+
+        // Average quiz score across the course's quizzes.
+        $quizIds = \App\Models\CourseQuiz::where('course_id', $id)->pluck('id')->all();
+        $avgQuizScore = $quizIds
+            ? (float) \App\Models\CourseQuizAttempt::whereIn('quiz_id', $quizIds)->avg('score_percent')
+            : 0.0;
+        $quizAttempts = $quizIds
+            ? \App\Models\CourseQuizAttempt::whereIn('quiz_id', $quizIds)->count()
+            : 0;
+
+        return $this->respondWithData([
+            'course' => ['id' => $course->id, 'title' => $course->title],
+            'enrollments' => [
+                'total' => $total,
+                'active' => $active,
+                'completed' => $completed,
+                'dropped' => $dropped,
+            ],
+            'completion_rate' => $total > 0 ? round(($completed / $total) * 100, 1) : 0.0,
+            'avg_progress' => round($avgProgress, 1),
+            'avg_quiz_score' => round($avgQuizScore, 1),
+            'quiz_attempts' => $quizAttempts,
+            'per_lesson' => $perLesson,
+        ]);
+    }
+
     /** POST /v2/courses/{id}/publish — publish a course. */
     public function publish(int $id): JsonResponse
     {

@@ -149,6 +149,16 @@ export interface CourseDiscussion {
   replies?: CourseDiscussion[];
 }
 
+export interface CourseAnalytics {
+  course: { id: number; title: string };
+  enrollments: { total: number; active: number; completed: number; dropped: number };
+  completion_rate: number;
+  avg_progress: number;
+  avg_quiz_score: number;
+  quiz_attempts: number;
+  per_lesson: Array<{ lesson_id: number; title: string; completed: number }>;
+}
+
 export interface BrowseResult {
   items: Course[];
   total: number;
@@ -214,6 +224,7 @@ export const coursesApi = {
 
   // Authoring (instructor/admin)
   authored: () => api.get<Course[]>('/v2/courses/mine'),
+  analytics: (id: number) => api.get<CourseAnalytics>(`/v2/courses/${id}/analytics`),
   create: (data: Partial<Course>) => api.post<Course>('/v2/courses', data),
   update: (id: number, data: Partial<Course>) => api.put<Course>(`/v2/courses/${id}`, data),
   publish: (id: number) => api.post<Course>(`/v2/courses/${id}/publish`, {}),
