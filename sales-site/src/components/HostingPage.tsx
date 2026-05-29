@@ -62,6 +62,8 @@ export default function HostingPage({ onNavigate }: HostingPageProps) {
     bestFor: plan.bestFor,
     details: [plan.tenants, plan.storage, plan.p1Response],
   }));
+  const communityStartPrice = `from ${formatCurrency(communityTimebankPlans[0].annualMonthlyEur)}/mo`;
+  const fullPlatformStartPrice = `from ${formatCurrency(hostingPlans[0].monthlyEur)}/mo`;
 
   return (
     <>
@@ -83,7 +85,7 @@ export default function HostingPage({ onNavigate }: HostingPageProps) {
             <PathwayCard
               eyebrow="Community"
               title="Start a timebank"
-              price="from EUR29/mo"
+              price={communityStartPrice}
               description="A narrower lane for offers, requests, time credits, members, groups, events, messaging, admin basics, backups, and upgrades."
               bullets={['One timebank tenant', 'Low-cost annual entry', 'Clear upgrade path']}
               ctaLabel="Build community quote"
@@ -93,7 +95,7 @@ export default function HostingPage({ onNavigate }: HostingPageProps) {
             <PathwayCard
               eyebrow="Platform"
               title="Run a civic network"
-              price="from EUR99/mo"
+              price={fullPlatformStartPrice}
               description="All stable NEXUS modules with published capacity tiers, support retainers, maintenance choices, launch work, and custom enterprise options."
               bullets={['Multi-tenant platform', 'Federation and governance', 'Procurement-ready support model']}
               ctaLabel="Price full platform"
