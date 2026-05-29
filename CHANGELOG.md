@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Mobile app migrated to HeroUI Native v3 + NativeWind.** The Expo/Capacitor mobile app was rebuilt on HeroUI Native v3 with NativeWind across its UI primitives, auth screens, tab screens, and modal screens, with deep-link, image, offline-detection, and "More" menu fixes and updated EAS build configuration.
 
+### Fixed
+
+- **Footer branding now updates immediately after saving admin settings.** Saving footer text, the "Powered By" label/URL, or the partner logo on the admin System Settings page now refreshes the live tenant context, so the footer reflects the new values right away instead of falling back to the default NEXUS branding until a hard page reload. (The backend already persisted the change and busted its cache; the SPA simply wasn't re-fetching its in-memory tenant bootstrap after the save.)
+
 ### Changed
 
 - **"Report a problem" is now logged-in only, and de-duplicated.** The floating problem-reporter (bottom-right) no longer renders for anonymous visitors, and the duplicate "Report a problem" link in the desktop footer was removed since the floating reporter already covers desktop. This stops logged-out traffic from cluttering support reports / Sentry. (Submissions were already auth-gated server-side via `requireAuth` and rate-limited at 10/min; this closes the visible entry point too.)

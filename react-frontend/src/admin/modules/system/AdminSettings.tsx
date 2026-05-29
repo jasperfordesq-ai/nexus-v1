@@ -188,6 +188,11 @@ export function AdminSettings() {
         toast.success(t('system.settings_saved'));
         // Reload settings to confirm persistence
         fetchSettings();
+        // Refresh the tenant bootstrap context so live surfaces (footer
+        // powered-by label/URL, footer text, partner logo) reflect the new
+        // values immediately — mirrors the powered-by image upload handler.
+        // Without this, saved text/URL changes only appear after a hard reload.
+        refreshTenant();
       } else {
         const error = (res as { error?: string }).error || t('system.save_failed');
         toast.error(error);
