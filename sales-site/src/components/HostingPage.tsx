@@ -68,7 +68,7 @@ export default function HostingPage({ onNavigate }: HostingPageProps) {
   return (
     <>
       <section className="sales-hero sales-hero--product border-b border-white/10">
-        <div className="mx-auto max-w-7xl px-5 py-16 lg:py-24">
+        <div className="relative z-10 mx-auto max-w-7xl px-5 py-16 lg:py-24">
           <div className="max-w-4xl">
             <p className="nexus-kicker text-[var(--color-accent)]">Partner pricing and order workbench</p>
             <h1 className="mt-5 text-4xl font-black leading-[1.05] tracking-normal text-white sm:text-5xl md:text-7xl">
