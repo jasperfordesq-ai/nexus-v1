@@ -115,6 +115,59 @@ class CourseQuizService
     }
 
     /**
+     * Attempts awaiting instructor review for a course (subjective questions).
+     *
+     * @return array<int,array<string,mixed>>
+     */
+    public static function pendingReviewForCourse(int $courseId): array
+    {
+        $quizIds = CourseQuiz::where('course_id', $courseId)->pluck('id')->all();
+        if (!$quizIds) {
+            return [];
+        }
+
+        return CourseQuizAttempt::whereIn('quiz_id', $quizIds)
+            ->where('grading_status', 'pending_review')
+            ->with(['quiz:id,title', 'user:id,name,avatar_url'])
+            ->orderBy('submitted_at')
+            ->get()
+            ->toArray();
+    }
+
+    /**
+     * Apply an instructor grade to an attempt.
+     */
+    public static function gradeAttempt(int $attemptId, float $scorePercent, bool $passed, ?string $feedback, int $gradedBy): ?CourseQuizAttempt
+    {
+        $attempt = CourseQuizAttempt::find($attemptId);
+        if (!$attempt) {
+            return null;
+        }
+
+        $attempt->score_percent = max(0, min(100, $scorePercent));
+        $attempt->passed = $passed;
+        $attempt->feedback = $feedback;
+        $attempt->grading_status = 'graded';
+        $attempt->graded_by = $gradedBy;
+        $attempt->save();
+
+        return $attempt;
+    }
+
+    /**
+     * The course id that owns a given attempt (via its quiz), or null.
+     */
+    public static function courseIdForAttempt(int $attemptId): ?int
+    {
+        $attempt = CourseQuizAttempt::find($attemptId);
+        if (!$attempt) {
+            return null;
+        }
+        $quiz = CourseQuiz::find($attempt->quiz_id);
+        return $quiz?->course_id;
+    }
+
+    /**
      * Compare a learner's answer against the stored correct answer(s).
      * Handles single (mcq/truefalse) and multi-select (order-independent).
      */

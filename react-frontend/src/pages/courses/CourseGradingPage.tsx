@@ -1,0 +1,128 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * CourseGradingPage — instructor grading queue for quiz attempts that contain
+ * subjective (short-answer / essay) questions awaiting manual review.
+ */
+
+import { useEffect, useState, useCallback } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Avatar, Button, Card, CardBody, Input, Spinner, Switch, Textarea } from '@/components/ui';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import { usePageTitle } from '@/hooks';
+import { useTenant, useToast } from '@/contexts';
+import { coursesApi, type PendingAttempt } from '@/lib/api/courses';
+
+export default function CourseGradingPage() {
+  const { t } = useTranslation('courses');
+  const { id } = useParams<{ id: string }>();
+  const courseId = Number(id);
+  const { tenantPath } = useTenant();
+
+  const [attempts, setAttempts] = useState<PendingAttempt[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  usePageTitle(t('grading.title'));
+
+  const load = useCallback(() => {
+    setLoading(true);
+    coursesApi.gradingQueue(courseId)
+      .then((res) => setAttempts(res.success && res.data ? res.data : []))
+      .finally(() => setLoading(false));
+  }, [courseId]);
+
+  useEffect(load, [load]);
+
+  if (loading) {
+    return <div className="flex justify-center py-20" role="status" aria-busy="true"><Spinner size="lg" /></div>;
+  }
+
+  return (
+    <div className="max-w-3xl mx-auto px-4 py-6">
+      <Button as={Link} to={tenantPath('/courses/instructor')} variant="tertiary" size="sm" startContent={<ArrowLeft size={16} />} className="mb-4">
+        {t('instructor.dashboard')}
+      </Button>
+      <h1 className="text-2xl font-bold mb-6">{t('grading.title')}</h1>
+
+      {attempts.length === 0 ? (
+        <p className="text-sm text-muted">{t('grading.empty')}</p>
+      ) : (
+        <div className="flex flex-col gap-4">
+          {attempts.map((a) => (
+            <GradeCard key={a.id} attempt={a} onGraded={load} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function GradeCard({ attempt, onGraded }: { attempt: PendingAttempt; onGraded: () => void }) {
+  const { t } = useTranslation('courses');
+  const toast = useToast();
+  const [score, setScore] = useState('70');
+  const [passed, setPassed] = useState(true);
+  const [feedback, setFeedback] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const submit = async () => {
+    setSaving(true);
+    const res = await coursesApi.gradeAttempt(attempt.id, Number(score) || 0, passed, feedback.trim());
+    setSaving(false);
+    if (res.success) {
+      toast.success(t('grading.graded'));
+      onGraded();
+    } else {
+      toast.error(t('grading.error'));
+    }
+  };
+
+  return (
+    <Card>
+      <CardBody className="p-4 flex flex-col gap-3">
+        <div className="flex items-center gap-2">
+          <Avatar size="sm" src={attempt.user?.avatar_url ?? undefined} name={attempt.user?.name ?? '?'} />
+          <div>
+            <div className="text-sm font-semibold">{attempt.user?.name ?? `#${attempt.user_id}`}</div>
+            <div className="text-xs text-muted">{attempt.quiz?.title}</div>
+          </div>
+        </div>
+
+        {attempt.answers ? (
+          <pre className="text-xs bg-[var(--color-surface-2)] rounded-md p-3 whitespace-pre-wrap overflow-x-auto">
+            {JSON.stringify(attempt.answers, null, 2)}
+          </pre>
+        ) : null}
+
+        <div className="flex items-end gap-3 flex-wrap">
+          <Input
+            size="sm"
+            type="number"
+            label={t('grading.score')}
+            value={score}
+            onValueChange={setScore}
+            className="w-28"
+          />
+          <div className="flex items-center gap-2">
+            <Switch isSelected={passed} onValueChange={setPassed} aria-label={t('grading.passed')} />
+            <span className="text-sm">{t('grading.passed')}</span>
+          </div>
+        </div>
+        <Textarea
+          aria-label={t('grading.feedback')}
+          placeholder={t('grading.feedback')}
+          value={feedback}
+          onValueChange={setFeedback}
+          rows={2}
+        />
+        <div>
+          <Button color="primary" size="sm" isLoading={saving} onPress={submit}>{t('grading.submit')}</Button>
+        </div>
+      </CardBody>
+    </Card>
+  );
+}

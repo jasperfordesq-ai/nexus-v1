@@ -82,6 +82,9 @@ export default function InstructorDashboardPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
+                  <Button as={Link} to={tenantPath(`/courses/instructor/${course.id}/grading`)} size="sm" variant="tertiary">
+                    {t('grading.title')}
+                  </Button>
                   <Button as={Link} to={tenantPath(`/courses/instructor/${course.id}/analytics`)} size="sm" variant="tertiary">
                     {t('analytics.title')}
                   </Button>

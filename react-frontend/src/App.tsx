@@ -287,6 +287,7 @@ const MyLearningPage = lazyWithRetry(() => import('./pages/courses/MyLearningPag
 const InstructorDashboardPage = lazyWithRetry(() => import('./pages/courses/InstructorDashboardPage'));
 const CreateCoursePage = lazyWithRetry(() => import('./pages/courses/CreateCoursePage'));
 const CourseAnalyticsPage = lazyWithRetry(() => import('./pages/courses/CourseAnalyticsPage'));
+const CourseGradingPage = lazyWithRetry(() => import('./pages/courses/CourseGradingPage'));
 
 // Static Pages
 const FeaturesPage = lazyWithRetry(() => import('@/pages/public/FeaturesPage'));
@@ -550,6 +551,15 @@ function AppRoutes() {
             <FeatureGate feature="courses" redirect="/">
               <FeatureErrorBoundary featureName="Courses">
                 <CourseAnalyticsPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          </ProtectedRoute>
+        } />
+        <Route path="courses/instructor/:id/grading" element={
+          <ProtectedRoute>
+            <FeatureGate feature="courses" redirect="/">
+              <FeatureErrorBoundary featureName="Courses">
+                <CourseGradingPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           </ProtectedRoute>

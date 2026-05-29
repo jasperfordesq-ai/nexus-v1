@@ -94,6 +94,16 @@
     "section_title": "Section title",
     "create_error": "Could not save. Please try again."
   },
+  "grading": {
+    "title": "Grading",
+    "empty": "Nothing to grade right now.",
+    "score": "Score (%)",
+    "passed": "Passed",
+    "feedback": "Feedback (optional)",
+    "submit": "Submit grade",
+    "graded": "Grade saved",
+    "error": "Could not save the grade."
+  },
   "analytics": {
     "title": "Analytics",
     "unavailable": "Analytics are not available for this course.",

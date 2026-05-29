@@ -45,4 +45,9 @@ class CourseQuizAttempt extends Model
     {
         return $this->belongsTo(CourseQuiz::class, 'quiz_id');
     }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }

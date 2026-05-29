@@ -74,6 +74,42 @@ class CourseQuizController extends BaseApiController
         ], null, 201);
     }
 
+    // ----- Grading (instructor/admin) -----
+
+    /** GET /v2/courses/{courseId}/grading — attempts pending instructor review. */
+    public function gradingQueue(int $courseId): JsonResponse
+    {
+        $this->guardCourse($courseId);
+
+        return $this->respondWithData(CourseQuizService::pendingReviewForCourse($courseId));
+    }
+
+    /** POST /v2/courses/attempts/{attemptId}/grade — grade a pending attempt. */
+    public function gradeAttempt(int $attemptId): JsonResponse
+    {
+        $this->ensureCoursesFeature();
+        $userId = $this->requireCourseAuthor();
+
+        $courseId = CourseQuizService::courseIdForAttempt($attemptId);
+        if (!$courseId) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.courses.not_found'), null, 404);
+        }
+        // Authorise against the owning course.
+        $course = $this->findCourseOrFail($courseId);
+        $this->ensureCourseOwnerOrAdmin($course, $userId);
+
+        $score = (float) $this->inputInt('score_percent', 0, 0, 100);
+        $passed = $this->inputBool('passed', $score >= 50);
+        $feedback = $this->input('feedback');
+
+        $attempt = CourseQuizService::gradeAttempt($attemptId, $score, $passed, $feedback, $userId);
+        if (!$attempt) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.courses.not_found'), null, 404);
+        }
+
+        return $this->respondWithData($attempt);
+    }
+
     // ----- Authoring (instructor/admin) -----
 
     /** POST /v2/courses/{courseId}/quizzes */

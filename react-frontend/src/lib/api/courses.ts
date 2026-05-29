@@ -149,6 +149,18 @@ export interface CourseDiscussion {
   replies?: CourseDiscussion[];
 }
 
+export interface PendingAttempt {
+  id: number;
+  quiz_id: number;
+  user_id: number;
+  answers: Record<string, unknown> | null;
+  score_percent: string | number;
+  grading_status: string;
+  submitted_at?: string | null;
+  quiz?: { id: number; title: string };
+  user?: { id: number; name: string; avatar_url?: string | null };
+}
+
 export interface CourseAnalytics {
   course: { id: number; title: string };
   enrollments: { total: number; active: number; completed: number; dropped: number };
@@ -225,6 +237,9 @@ export const coursesApi = {
   // Authoring (instructor/admin)
   authored: () => api.get<Course[]>('/v2/courses/mine'),
   analytics: (id: number) => api.get<CourseAnalytics>(`/v2/courses/${id}/analytics`),
+  gradingQueue: (courseId: number) => api.get<PendingAttempt[]>(`/v2/courses/${courseId}/grading`),
+  gradeAttempt: (attemptId: number, scorePercent: number, passed: boolean, feedback: string) =>
+    api.post(`/v2/courses/attempts/${attemptId}/grade`, { score_percent: scorePercent, passed, feedback }),
   create: (data: Partial<Course>) => api.post<Course>('/v2/courses', data),
   update: (id: number, data: Partial<Course>) => api.put<Course>(`/v2/courses/${id}`, data),
   publish: (id: number) => api.post<Course>(`/v2/courses/${id}/publish`, {}),
