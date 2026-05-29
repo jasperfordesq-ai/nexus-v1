@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { Button, Chip } from '@heroui/react';
-import { ArrowDown, BadgeEuro, Boxes, CheckCircle2, Layers3, Server, ShieldCheck, Sparkles } from 'lucide-react';
+import { BadgeEuro, CheckCircle2, Layers3, Sparkles } from 'lucide-react';
 import { useCallback } from 'react';
 
 import {
@@ -14,18 +14,11 @@ import {
 } from '../data/pricing';
 import { formatCurrency } from '../lib/pricingEngine';
 import QuoteBuilder from './QuoteBuilder';
-import { MetricTile, SectionHeader, SurfaceCard } from './SalesPrimitives';
+import { PathwayCard, PricingLadder, SectionHeader, SupportModelSection, SurfaceCard } from './SalesPrimitives';
 
 interface HostingPageProps {
   onNavigate: (href: string) => void;
 }
-
-const proofPoints = [
-  { label: 'Community entry', value: 'EUR29/mo', icon: BadgeEuro },
-  { label: 'Published cap', value: '100k', icon: Boxes },
-  { label: 'Deployment', value: 'Shared/dedicated', icon: Server },
-  { label: 'Enterprise layer', value: '>100k', icon: Layers3 },
-];
 
 const pricingPrinciples = [
   {
@@ -48,95 +41,103 @@ const pricingPrinciples = [
 
 export default function HostingPage({ onNavigate }: HostingPageProps) {
   const handleQuoteChange = useCallback(() => undefined, []);
+  const scrollToQuoteBuilder = useCallback(() => {
+    document.getElementById('quote-builder')?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
+
+  const communityPlanSummaries = communityTimebankPlans.map((plan) => ({
+    id: plan.id,
+    name: plan.name,
+    price: `${formatCurrency(plan.annualMonthlyEur)}/mo annual`,
+    meta: plan.activeMemberLabel,
+    bestFor: plan.bestFor,
+    details: [plan.tenants, plan.storage, plan.email],
+  }));
+
+  const fullPlanSummaries = hostingPlans.map((plan) => ({
+    id: plan.id,
+    name: plan.name,
+    price: plan.isCustom ? 'Bespoke quote' : `${formatCurrency(plan.monthlyEur)}/mo`,
+    meta: plan.activeMemberLabel,
+    bestFor: plan.bestFor,
+    details: [plan.tenants, plan.storage, plan.p1Response],
+  }));
 
   return (
     <>
-      <section className="overflow-hidden border-b border-white/10">
-        <div className="mx-auto grid max-w-7xl gap-12 px-5 py-16 lg:grid-cols-[1fr_0.95fr] lg:py-24">
-          <div className="flex flex-col justify-center">
-            <p className="mb-5 w-fit rounded-full border border-[color:var(--color-accent)]/30 bg-[color:var(--color-accent)]/10 px-4 py-2 text-xs font-black tracking-[0.16em] text-[var(--color-accent)] uppercase">
-              Partner pricing and order workbench
-            </p>
-            <h1 className="max-w-4xl text-4xl font-black leading-[1.05] tracking-normal text-white sm:text-5xl md:text-7xl">
-              A cheaper way in, without cheapening the platform.
+      <section className="sales-hero sales-hero--product border-b border-white/10">
+        <div className="mx-auto max-w-7xl px-5 py-16 lg:py-24">
+          <div className="max-w-4xl">
+            <p className="nexus-kicker text-[var(--color-accent)]">Partner pricing and order workbench</p>
+            <h1 className="mt-5 text-4xl font-black leading-[1.05] tracking-normal text-white sm:text-5xl md:text-7xl">
+              Two ways to start.
             </h1>
-            <p className="mt-7 max-w-2xl text-lg leading-8 text-white/68">
-              Project NEXUS now has two commercial lanes: a lean Community Timebanking offer from EUR29/month when billed annually, and a full managed platform offer for serious civic networks.
+            <p className="mt-7 max-w-3xl text-lg leading-8 text-white/68">
+              Start with a focused Community Timebanking package, or price the full managed platform for civic networks, funders, and public-sector programmes.
             </p>
-            <SurfaceCard tone="accent" className="mt-7 max-w-3xl p-5 shadow-[inset_4px_0_0_var(--color-accent)]">
-              <p className="text-sm font-black tracking-[0.16em] text-[color:var(--color-accent)] uppercase">Launch pricing note</p>
-              <p className="mt-3 text-base font-semibold leading-7 text-white">
-                These are early published prices for a new managed hosting service, and they may change as the offer matures.
-              </p>
-              <p className="mt-2 text-sm leading-7 text-white/64">
-                We are continuing market research, infrastructure modelling, and support-cost analysis so Project NEXUS can stay genuinely competitive without underpricing the reliability, maintenance, backups, security, and professional support that serious community platforms need. Accepted written quotes are handled through their own order terms.
-              </p>
-            </SurfaceCard>
-            <div className="mt-9 flex flex-wrap gap-3">
-              <Button size="lg" onPress={() => document.getElementById('quote-builder')?.scrollIntoView({ behavior: 'smooth' })}>
-                Build quote
-                <ArrowDown className="size-5" />
-              </Button>
-              <Button size="lg" variant="outline" onPress={() => onNavigate('/features')}>
-                Review features
-              </Button>
-            </div>
+            <p className="mt-4 max-w-3xl text-sm font-semibold leading-6 text-white/50">
+              A cheaper way in, without cheapening the platform.
+            </p>
           </div>
-
-          <div className="flex items-center">
-            <SurfaceCard tone="raised" className="w-full p-5">
-              <div className="flex items-center gap-3 border-b border-white/10 pb-5">
-                <ShieldCheck className="size-9 text-[var(--color-accent)]" />
-                <div>
-                  <p className="text-sm font-bold tracking-[0.14em] text-white/45 uppercase">NEXUS managed hosting</p>
-                  <p className="text-2xl font-black text-white">Feature-limited entry. Full-stack upgrade path.</p>
-                </div>
-              </div>
-              <div className="mt-5 grid metric-grid gap-3">
-                {proofPoints.map((point) => (
-                  <MetricTile key={point.label} icon={point.icon} label={point.label} value={point.value} />
-                ))}
-              </div>
-              <div className="mt-5 grid gap-2">
-                {communityTimebankPlans.map((plan) => (
-                  <div key={plan.id} className="nexus-surface nexus-surface--subtle grid grid-cols-[1fr_auto] p-3 text-sm">
-                    <span className="font-bold text-white">{plan.name}</span>
-                    <span className="text-white/58">{formatCurrency(plan.annualMonthlyEur)}/mo annual</span>
-                  </div>
-                ))}
-                {hostingPlans.map((plan) => (
-                  <div key={plan.id} className="nexus-surface nexus-surface--subtle grid grid-cols-[1fr_auto] p-3 text-sm">
-                    <span className="font-bold text-white">{plan.name} full platform</span>
-                    <span className="text-right text-white/58">{plan.isCustom ? 'Bespoke quote' : `${formatCurrency(plan.monthlyEur)}/mo`}</span>
-                  </div>
-                ))}
-              </div>
-            </SurfaceCard>
+          <div className="mt-10 grid gap-5 lg:grid-cols-2">
+            <PathwayCard
+              eyebrow="Community"
+              title="Start a timebank"
+              price="from EUR29/mo"
+              description="A narrower lane for offers, requests, time credits, members, groups, events, messaging, admin basics, backups, and upgrades."
+              bullets={['One timebank tenant', 'Low-cost annual entry', 'Clear upgrade path']}
+              ctaLabel="Build community quote"
+              icon={BadgeEuro}
+              onPress={scrollToQuoteBuilder}
+            />
+            <PathwayCard
+              eyebrow="Platform"
+              title="Run a civic network"
+              price="from EUR99/mo"
+              description="All stable NEXUS modules with published capacity tiers, support retainers, maintenance choices, launch work, and custom enterprise options."
+              bullets={['Multi-tenant platform', 'Federation and governance', 'Procurement-ready support model']}
+              ctaLabel="Price full platform"
+              icon={Layers3}
+              tone="network"
+              onPress={scrollToQuoteBuilder}
+            />
+          </div>
+          <SurfaceCard tone="accent" className="mt-8 max-w-4xl p-5 shadow-[inset_4px_0_0_var(--color-accent)]">
+            <p className="text-sm font-black tracking-[0.16em] text-[color:var(--color-accent)] uppercase">Launch pricing note</p>
+            <p className="mt-3 text-base font-semibold leading-7 text-white">
+              These are early published prices for a new managed hosting service, and they may change as the offer matures.
+            </p>
+            <p className="mt-2 text-sm leading-7 text-white/64">
+              We are continuing market research, infrastructure modelling, and support-cost analysis so Project NEXUS can stay genuinely competitive without underpricing the reliability, maintenance, backups, security, and professional support that serious community platforms need. Accepted written quotes are handled through their own order terms.
+            </p>
+          </SurfaceCard>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Button size="lg" onPress={scrollToQuoteBuilder}>
+              Build quote
+            </Button>
+            <Button size="lg" variant="outline" onPress={() => onNavigate('/features')}>
+              Review features
+            </Button>
           </div>
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-16">
-        <SectionHeader accent="primary" eyebrow="Full platform capacity" title="Published pricing has a hard ceiling.">
-          The public calculator prices realistic managed hosting up to 100,000 active members. Above that, NEXUS switches to Enterprise Custom so a high-growth or million-user platform is priced against real traffic, support, storage, and architecture.
+        <SectionHeader accent="primary" eyebrow="Pricing ladder" title="A low-cost entry lane and a serious platform lane.">
+          Community Timebanking stays affordable by limiting scope. Full Platform Hosting changes mostly by capacity, infrastructure, support, and procurement needs.
         </SectionHeader>
-        <div className="grid gap-3">
-          {hostingPlans.map((plan) => (
-            <SurfaceCard
-              key={plan.id}
-              tone={plan.isCustom ? 'accent' : 'subtle'}
-              className="grid gap-4 p-5 md:grid-cols-[0.75fr_1fr_auto] md:items-center"
-            >
-              <div>
-                <p className="text-xl font-black text-white">{plan.name}</p>
-                <p className="mt-1 text-sm font-semibold text-white/45 uppercase">{plan.activeMemberLabel}</p>
-              </div>
-              <p className="text-sm leading-6 text-white/58">{plan.bestFor}</p>
-              <p className="text-left text-2xl font-black text-[var(--color-primary)] md:text-right">
-                {plan.isCustom ? 'Bespoke quote' : `${formatCurrency(plan.monthlyEur)}/mo`}
-              </p>
-            </SurfaceCard>
-          ))}
+        <p className="mb-6 max-w-3xl text-sm font-semibold leading-6 text-white/52">
+          Published pricing has a hard ceiling. Above 100,000 active members, NEXUS switches to Enterprise Custom so a high-growth or million-user platform is priced against real traffic, support, storage, and architecture.
+        </p>
+        <div className="grid gap-8 lg:grid-cols-2">
+          <div>
+            <h3 className="mb-4 text-2xl font-black text-white">Community Timebanking</h3>
+            <PricingLadder plans={communityPlanSummaries} />
+          </div>
+          <div>
+            <h3 className="mb-4 text-2xl font-black text-white">Full Platform Hosting</h3>
+            <PricingLadder plans={fullPlanSummaries} />
+          </div>
         </div>
       </section>
 
@@ -232,33 +233,7 @@ export default function HostingPage({ onNavigate }: HostingPageProps) {
         </div>
       </section>
 
-      <section className="nexus-section-shell">
-        <div className="mx-auto max-w-7xl px-5 py-16">
-          <SectionHeader eyebrow="Support model" title="Support commitments should be commercially funded.">
-            Solo-led by default means standard support is deliberately modest: async help, clear upgrade paths, and realistic response targets. Faster or broader cover is a paid operating model, not a casual promise.
-          </SectionHeader>
-          <div className="grid gap-5 lg:grid-cols-3">
-            <SurfaceCard tone="subtle" className="p-5">
-              <p className="text-lg font-black text-white">Standard support</p>
-              <p className="mt-3 text-sm leading-6 text-white/58">
-                Included support is best-effort and async. It suits small teams that can tolerate normal response times and do not need formal incident cover.
-              </p>
-            </SurfaceCard>
-            <SurfaceCard tone="subtle" className="p-5">
-              <p className="text-lg font-black text-white">Retained support</p>
-              <p className="mt-3 text-sm leading-6 text-white/58">
-                Priority and managed plans buy more attention, a clearer route into the queue, operational reviews, and contract-funded support cover where the client size justifies it.
-              </p>
-            </SurfaceCard>
-            <SurfaceCard tone="accent" className="p-5">
-              <p className="text-lg font-black text-white">Major-client support retainer</p>
-              <p className="mt-3 text-sm leading-6 text-white/64">
-                Critical services need agreed cover windows, escalation terms, and budget for an external incident partner when the contract requires capacity beyond a solo developer.
-              </p>
-            </SurfaceCard>
-          </div>
-        </div>
-      </section>
+      <SupportModelSection />
 
       <QuoteBuilder onQuoteChange={handleQuoteChange} />
 
