@@ -169,7 +169,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
 
   const fieldStyle = style as CSSProperties | undefined;
 
-  if (!label && !description && !errorMessage && !isInvalid && !isRequired && !validate) {
+  if (!label && !description && !errorMessage && !isInvalid && !isRequired && !validate && !startContent && !endContent) {
     return (
       <HeroUITextArea
         className={combineClasses(

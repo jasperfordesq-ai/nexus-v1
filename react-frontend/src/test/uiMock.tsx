@@ -46,18 +46,62 @@ function textBits(props: AnyProps): ReactNode[] {
     .filter((v) => v != null) as ReactNode[];
 }
 
+/** Invoke render-prop children — e.g. `<ModalContent>{(onClose) => …}</ModalContent>`. */
+function resolveChildren(children: unknown): ReactNode {
+  if (typeof children === 'function') {
+    try {
+      return (children as (arg: unknown) => ReactNode)(() => {});
+    } catch {
+      return null;
+    }
+  }
+  return children as ReactNode;
+}
+
 const stubCache = new Map<string, unknown>();
 
 function makeStub(name: string): unknown {
   const cached = stubCache.get(name);
   if (cached) return cached;
-  const lower = name.toLowerCase();
-  const isInputLike = /input|textarea|searchfield|textfield|numberfield|datefield|timeinput|datepicker|daterangepicker|colorfield/.test(lower);
-  const isStatus = /skeleton|spinner|loading/.test(lower);
-  const isButton = /^(button|glassbutton|closebutton|togglebutton)/.test(lower) || lower === 'iconbutton';
+  const leaf = name.split('.').pop()!.toLowerCase();
+  const isContainerPart = /group|section|item|trigger|popover|content|indicator|icon|value|label|description|error|heading|panel|list|menu/.test(leaf);
+  const isButton = /button/.test(leaf);
+  const isCheckable = !isButton && /^(switch|checkbox|radio)$/.test(leaf);
+  const isInputLike =
+    !isButton && !isCheckable && !isContainerPart &&
+    /input|textarea|searchfield|textfield|numberfield|datefield|timeinput|timefield|datepicker|daterangepicker|colorfield|combobox|autocomplete/.test(leaf);
+  const isStatus = /skeleton|spinner|loading/.test(leaf);
+  // Overlay roots (not their compound sub-parts) honor an explicit closed state.
+  const isOverlayRoot = /^(modal|drawer|alertdialog|dialog)$/.test(leaf);
 
   const Stub = React.forwardRef<HTMLElement, AnyProps>((props, ref) => {
-    const { children, onPress, onChange, onValueChange } = props;
+    const { onPress, onChange, onValueChange, onClick, onKeyDown } = props as Record<string, unknown>;
+    const children = resolveChildren(props.children);
+    const label = props.label as ReactNode;
+    const errorMessage = props.errorMessage as ReactNode;
+    const description = props.description as ReactNode;
+
+    // Honor a controlled closed overlay so "does not render when isOpen=false" works.
+    // Only acts when isOpen is explicitly false — uncontrolled usage still renders.
+    if (isOverlayRoot && props.isOpen === false) return null;
+
+    if (isCheckable) {
+      const handle = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (typeof onChange === 'function') (onChange as (ev: unknown) => void)(e);
+        if (typeof onValueChange === 'function') (onValueChange as (v: boolean) => void)(e.target.checked);
+      };
+      const hasHandler = typeof onChange === 'function' || typeof onValueChange === 'function';
+      const input = React.createElement('input', {
+        ref: ref as React.Ref<HTMLInputElement>,
+        type: leaf === 'radio' ? 'radio' : 'checkbox',
+        ...domSafe(props),
+        checked: (props.isSelected as boolean) ?? (props.isChecked as boolean) ?? undefined,
+        onChange: hasHandler ? handle : undefined,
+        readOnly: !hasHandler ? true : undefined,
+      });
+      const checkLabel = label ?? children;
+      return checkLabel != null ? React.createElement('label', null, input, checkLabel) : input;
+    }
 
     if (isInputLike) {
       const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,12 +109,21 @@ function makeStub(name: string): unknown {
         if (typeof onValueChange === 'function') (onValueChange as (v: string) => void)(e.target.value);
       };
       const hasHandler = typeof onChange === 'function' || typeof onValueChange === 'function';
-      return React.createElement('input', {
+      const input = React.createElement('input', {
         ref: ref as React.Ref<HTMLInputElement>,
         ...domSafe(props),
         onChange: hasHandler ? handleChange : undefined,
         readOnly: props.readOnly === true || !hasHandler ? true : undefined,
       });
+      if (label == null && errorMessage == null && description == null) return input;
+      // Wrap so the label is an accessible name (getByLabelText) and validation text shows.
+      return React.createElement(
+        React.Fragment,
+        null,
+        label != null ? React.createElement('label', null, label, input) : input,
+        description != null ? React.createElement('span', null, description) : null,
+        errorMessage != null ? React.createElement('span', null, errorMessage) : null,
+      );
     }
 
     if (isButton) {
@@ -80,7 +133,8 @@ function makeStub(name: string): unknown {
           ref: ref as React.Ref<HTMLButtonElement>,
           type: 'button',
           ...domSafe(props),
-          onClick: typeof onPress === 'function' ? (onPress as () => void) : undefined,
+          onClick: (typeof onPress === 'function' ? onPress : onClick) as (() => void) | undefined,
+          onKeyDown: onKeyDown as ((e: unknown) => void) | undefined,
           disabled: props.isDisabled === true || props.disabled === true || undefined,
         },
         children as ReactNode,
@@ -91,8 +145,13 @@ function makeStub(name: string): unknown {
     if (isStatus && extra.role == null) extra.role = 'status';
     if (name === 'GlassCard' && extra['data-testid'] == null) extra['data-testid'] = 'glass-card';
     if (typeof onPress === 'function') extra.onClick = onPress;
+    else if (typeof onClick === 'function') extra.onClick = onClick;
+    if (typeof onKeyDown === 'function') extra.onKeyDown = onKeyDown;
+    if (errorMessage != null) {
+      return React.createElement('div', extra, ...textBits({ ...props, children }), React.createElement('span', { key: '__err' }, errorMessage));
+    }
 
-    return React.createElement('div', extra, ...textBits(props));
+    return React.createElement('div', extra, ...textBits({ ...props, children }));
   });
   Stub.displayName = `UiMock(${name})`;
   // Wrap so compound sub-components (Card.Content, Chip.Label, NumberField.Group,
