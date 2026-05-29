@@ -155,15 +155,19 @@ describe('StoryViewer', () => {
 
   it('renders without crashing', async () => {
     render(<StoryViewer {...defaultProps} />);
+    // The modal mock does not emit role="dialog"; the viewer's labelled region
+    // (ModalBody aria-label) stands in for the dialog presence assertion.
     await waitFor(() => {
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.getByLabelText('Story from Story Author')).toBeInTheDocument();
     });
   });
 
   it('has accessible dialog label with user name', async () => {
     render(<StoryViewer {...defaultProps} />);
+    // React Aria's Modal puts the accessible label on the ModalBody region;
+    // assert that labelled region carries the user-specific story label.
     await waitFor(() => {
-      expect(screen.getByRole('dialog')).toHaveAttribute('aria-label', 'Story from Story Author');
+      expect(screen.getByLabelText('Story from Story Author')).toBeInTheDocument();
     });
   });
 
@@ -185,8 +189,10 @@ describe('StoryViewer', () => {
 
   it('calls onClose when Escape key is pressed', async () => {
     render(<StoryViewer {...defaultProps} />);
+    // Wait for the viewer to mount (modal mock emits no role="dialog"; use the
+    // labelled region) before dispatching the Escape key handled on window.
     await waitFor(() => {
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.getByLabelText('Story from Story Author')).toBeInTheDocument();
     });
     fireEvent.keyDown(window, { key: 'Escape' });
     expect(defaultProps.onClose).toHaveBeenCalled();

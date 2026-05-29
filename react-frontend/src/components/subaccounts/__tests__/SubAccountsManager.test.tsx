@@ -147,7 +147,9 @@ describe('SubAccountsManager', () => {
     vi.mocked(api.get).mockImplementation(() => new Promise(() => {}));
 
     render(<SubAccountsManager />);
-    expect(screen.getByLabelText('Loading')).toBeInTheDocument();
+    // The Spinner stub exposes its "Loading" label both as aria-label and text,
+    // so match all and assert at least one loading indicator is present.
+    expect(screen.getAllByLabelText('Loading').length).toBeGreaterThan(0);
   });
 
   it('renders header with title and add button', async () => {

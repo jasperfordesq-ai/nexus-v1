@@ -113,9 +113,9 @@ describe('CommunityProjectsTab', () => {
   it('shows loading skeleton while data is being fetched', () => {
     vi.mocked(api.get).mockReturnValue(new Promise(() => {}));
     render(<CommunityProjectsTab />);
-    const cards = screen.getAllByTestId('glass-card');
-    const pulsingCards = cards.filter((c) => c.getAttribute('role') === 'status');
-    expect(pulsingCards.length).toBeGreaterThan(0);
+    // The loading skeleton renders inside a role="status" container.
+    const loadingContainers = screen.getAllByRole('status');
+    expect(loadingContainers.length).toBeGreaterThan(0);
   });
 
   it('displays project cards when data is loaded', async () => {

@@ -115,7 +115,9 @@ describe('NotificationsTab', () => {
   it('renders match digest section', () => {
     render(<NotificationsTab {...defaultProps} />);
     expect(screen.getByText('notification_sections.match_digest')).toBeDefined();
-    expect(screen.getByText('match_digest.frequency')).toBeDefined();
+    // The frequency label appears more than once (label + control), so assert
+    // at least one rendering.
+    expect(screen.getAllByText('match_digest.frequency').length).toBeGreaterThan(0);
   });
 
   it('calls onSave when save button is clicked', async () => {

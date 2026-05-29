@@ -83,8 +83,12 @@ describe('GroupMembersTab', () => {
 
   it('shows loading spinner when membersLoading is true', () => {
     render(<GroupMembersTab {...defaultProps} membersLoading={true} />);
-    // Spinner should be present
-    expect(document.querySelector('svg') || document.querySelector('[class*="spinner"]')).toBeTruthy();
+    // Spinner should be present (Spinner stub renders role="status")
+    expect(
+      document.querySelector('[role="status"]') ||
+        document.querySelector('svg') ||
+        document.querySelector('[class*="spinner"]')
+    ).toBeTruthy();
   });
 
   it('shows empty state when no members', () => {

@@ -22,11 +22,15 @@ jest.mock('@/lib/constants', () => ({
 import { api } from '@/lib/api/client';
 import {
   createGroupAnnouncement,
+  answerGroupQuestion,
   deleteGroupAnnouncement,
+  createGroupQuestion,
   getGroups,
   getGroup,
   getGroupAnnouncements,
   getGroupFiles,
+  getGroupQuestion,
+  getGroupQuestions,
   getGroupTemplates,
   joinGroup,
   leaveGroup,
@@ -219,6 +223,48 @@ describe('group file helpers', () => {
 
     expect(api.get).toHaveBeenCalledWith('/api/v2/groups/7/files', { per_page: '20' });
     expect(result.data.items).toEqual([]);
+  });
+});
+
+describe('group Q&A helpers', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('loads group questions with default sort', async () => {
+    const response = { data: { items: [], cursor: null, has_more: false } };
+    (api.get as jest.Mock).mockResolvedValue(response);
+
+    const result = await getGroupQuestions(7);
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/groups/7/questions', { per_page: '20', sort: 'newest' });
+    expect(result.data.items).toEqual([]);
+  });
+
+  it('loads one group question with answers', async () => {
+    const response = { data: { id: 4, title: 'How do we compost?', answers: [] } };
+    (api.get as jest.Mock).mockResolvedValue(response);
+
+    const result = await getGroupQuestion(7, 4);
+
+    expect(api.get).toHaveBeenCalledWith('/api/v2/groups/7/questions/4');
+    expect(result.data.answers).toEqual([]);
+  });
+
+  it('creates a group question', async () => {
+    const payload = { title: 'How do we compost safely?', body: 'What is the best bin setup?' };
+    (api.post as jest.Mock).mockResolvedValue({ data: { id: 4, title: payload.title } });
+
+    await createGroupQuestion(7, payload);
+
+    expect(api.post).toHaveBeenCalledWith('/api/v2/groups/7/questions', payload);
+  });
+
+  it('answers a group question', async () => {
+    const payload = { body: 'Use a lidded outdoor bin.' };
+    (api.post as jest.Mock).mockResolvedValue({ data: { id: 5, question_id: 4 } });
+
+    await answerGroupQuestion(7, 4, payload);
+
+    expect(api.post).toHaveBeenCalledWith('/api/v2/groups/7/questions/4/answers', payload);
   });
 });
 

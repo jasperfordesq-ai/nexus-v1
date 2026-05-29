@@ -183,8 +183,10 @@ describe('ProfilePage', () => {
   it('shows profile name after loading', async () => {
     render(<ProfilePage />);
 
+    // The name appears in more than one place (heading + avatar/meta), so
+    // assert at least one rendering of the loaded profile name.
     await waitFor(() => {
-      expect(screen.getByText('John Doe')).toBeInTheDocument();
+      expect(screen.getAllByText('John Doe').length).toBeGreaterThan(0);
     });
   });
 

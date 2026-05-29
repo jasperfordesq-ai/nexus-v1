@@ -187,9 +187,9 @@ describe('IdeaDetailPage', () => {
     await waitFor(() => {
       expect(screen.getByText('Reusable Shopping Bags')).toBeInTheDocument();
     });
-    // Creator name appears in the "submitted by" translation key and Avatar aria-label
+    // Creator name appears in the "submitted by" translation key and the Avatar's name prop
     expect(screen.getByText('idea_detail.submitted_by')).toBeInTheDocument();
-    expect(screen.getByLabelText('Alice Member')).toBeInTheDocument();
+    expect(document.querySelector('[name="Alice Member"]')).toBeInTheDocument();
   });
 
   it('shows admin controls for admin users', async () => {

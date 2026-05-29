@@ -26,14 +26,18 @@ import {
   type Event,
 } from '@/lib/api/events';
 import {
+  answerGroupQuestion,
   createGroupAnnouncement,
   createGroupDiscussion,
+  createGroupQuestion,
   deleteGroupAnnouncement,
   getGroup,
   getGroupAnnouncements,
   getGroupDiscussions,
   getGroupFiles,
   getGroupMembers,
+  getGroupQuestion,
+  getGroupQuestions,
   joinGroup,
   leaveGroup,
   updateGroupAnnouncement,
@@ -43,6 +47,9 @@ import {
   type GroupFileItem,
   type GroupFilesResponse,
   type GroupMemberListItem,
+  type GroupQuestion,
+  type GroupQuestionDetail,
+  type GroupQuestionsResponse,
 } from '@/lib/api/groups';
 import {
   getGroupMarketplaceListings,
@@ -71,7 +78,7 @@ const WEB_URL = 'https://app.project-nexus.ie';
 const CARD_MIN_HEIGHT = 118;
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
-type TabKey = 'overview' | 'discussion' | 'members' | 'events' | 'announcements' | 'files' | 'marketplace';
+type TabKey = 'overview' | 'discussion' | 'members' | 'events' | 'announcements' | 'files' | 'qa' | 'marketplace';
 type ApiGroupDetail = GroupDetail & {
   viewer_membership?: { status?: string; role?: string; is_admin?: boolean } | null;
   avatar_url?: string | null;
@@ -249,6 +256,10 @@ function GroupDetailScreenInner() {
   const [announcementPinned, setAnnouncementPinned] = useState(false);
   const [creatingAnnouncement, setCreatingAnnouncement] = useState(false);
   const [updatingAnnouncementId, setUpdatingAnnouncementId] = useState<number | null>(null);
+  const [showQuestionComposer, setShowQuestionComposer] = useState(false);
+  const [questionTitle, setQuestionTitle] = useState('');
+  const [questionBody, setQuestionBody] = useState('');
+  const [creatingQuestion, setCreatingQuestion] = useState(false);
 
   useEffect(() => {
     if (group) {
@@ -270,6 +281,9 @@ function GroupDetailScreenInner() {
   const filesApi = useApi<GroupFilesResponse>(() => getGroupFiles(safeGroupId), [safeGroupId, currentIsMember], {
     enabled: safeGroupId > 0 && currentIsMember,
   });
+  const questionsApi = useApi<GroupQuestionsResponse>(() => getGroupQuestions(safeGroupId), [safeGroupId, currentIsMember], {
+    enabled: safeGroupId > 0 && currentIsMember,
+  });
   const eventsApi = useApi(() => getEvents('upcoming', null, 20, { groupId: safeGroupId }), [safeGroupId], {
     enabled: safeGroupId > 0,
   });
@@ -278,6 +292,7 @@ function GroupDetailScreenInner() {
   const discussions = useMemo<GroupDiscussion[]>(() => discussionsApi.data?.data ?? [], [discussionsApi.data]);
   const announcements = useMemo<GroupAnnouncement[]>(() => announcementsApi.data?.data?.items ?? [], [announcementsApi.data]);
   const files = useMemo<GroupFileItem[]>(() => filesApi.data?.data.items ?? [], [filesApi.data]);
+  const questions = useMemo<GroupQuestion[]>(() => questionsApi.data?.data.items ?? [], [questionsApi.data]);
   const events = useMemo<Event[]>(() => eventsApi.data?.data ?? [], [eventsApi.data]);
 
   const handleRefresh = useCallback(() => {
@@ -287,14 +302,15 @@ function GroupDetailScreenInner() {
     discussionsApi.refresh();
     announcementsApi.refresh();
     filesApi.refresh();
+    questionsApi.refresh();
     eventsApi.refresh();
-  }, [announcementsApi, discussionsApi, eventsApi, filesApi, membersApi, refresh]);
+  }, [announcementsApi, discussionsApi, eventsApi, filesApi, membersApi, questionsApi, refresh]);
 
   useEffect(() => {
-    if (!isLoading && !membersApi.isLoading && !discussionsApi.isLoading && !announcementsApi.isLoading && !filesApi.isLoading && !eventsApi.isLoading) {
+    if (!isLoading && !membersApi.isLoading && !discussionsApi.isLoading && !announcementsApi.isLoading && !filesApi.isLoading && !questionsApi.isLoading && !eventsApi.isLoading) {
       setRefreshing(false);
     }
-  }, [announcementsApi.isLoading, discussionsApi.isLoading, eventsApi.isLoading, filesApi.isLoading, isLoading, membersApi.isLoading]);
+  }, [announcementsApi.isLoading, discussionsApi.isLoading, eventsApi.isLoading, filesApi.isLoading, isLoading, membersApi.isLoading, questionsApi.isLoading]);
 
   async function handleShare() {
     if (!group) return;
@@ -353,6 +369,7 @@ function GroupDetailScreenInner() {
       discussionsApi.refresh();
       announcementsApi.refresh();
       filesApi.refresh();
+      questionsApi.refresh();
       eventsApi.refresh();
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
@@ -486,6 +503,30 @@ function GroupDetailScreenInner() {
     ]);
   }
 
+  async function handleCreateQuestion() {
+    const title = questionTitle.trim();
+    const body = questionBody.trim();
+    if (!title || !body) {
+      Alert.alert(t('common:errors.alertTitle'), t('detail.qa.validation'));
+      return;
+    }
+
+    setCreatingQuestion(true);
+    try {
+      await createGroupQuestion(loadedGroup.id, { title, body });
+      setQuestionTitle('');
+      setQuestionBody('');
+      setShowQuestionComposer(false);
+      questionsApi.refresh();
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(t('common:errors.alertTitle'), t('detail.qa.createError'));
+    } finally {
+      setCreatingQuestion(false);
+    }
+  }
+
   const tabs: Array<{ key: TabKey; label: string; icon: IoniconName }> = [
     { key: 'overview', label: t('detail.tabs.overview'), icon: 'newspaper-outline' },
     { key: 'discussion', label: t('detail.tabs.discussion'), icon: 'chatbubble-ellipses-outline' },
@@ -493,6 +534,7 @@ function GroupDetailScreenInner() {
     { key: 'events', label: t('detail.tabs.events'), icon: 'calendar-outline' },
     { key: 'announcements', label: t('detail.tabs.announcements'), icon: 'megaphone-outline' },
     { key: 'files', label: t('detail.tabs.files'), icon: 'folder-open-outline' },
+    { key: 'qa', label: t('detail.tabs.qa'), icon: 'help-circle-outline' },
   ];
   if (hasFeature('marketplace')) {
     tabs.push({ key: 'marketplace', label: t('detail.tabs.marketplace'), icon: 'bag-handle-outline' });
@@ -956,6 +998,24 @@ function GroupDetailScreenInner() {
           />
         ) : null}
 
+        {activeTab === 'qa' ? (
+          <GroupQAPanel
+            groupId={loadedGroup.id}
+            questions={questions}
+            isLoading={questionsApi.isLoading}
+            canView={userCanSeeMemberContent}
+            showComposer={showQuestionComposer}
+            setShowComposer={setShowQuestionComposer}
+            title={questionTitle}
+            setTitle={setQuestionTitle}
+            body={questionBody}
+            setBody={setQuestionBody}
+            creating={creatingQuestion}
+            onCreate={() => void handleCreateQuestion()}
+            onRefresh={questionsApi.refresh}
+          />
+        ) : null}
+
         {activeTab === 'marketplace' ? (
           <GroupMarketplacePanel groupId={loadedGroup.id} canView={userCanSeeMemberContent} />
         ) : null}
@@ -1168,6 +1228,240 @@ function GroupFilesPanel({
             </HeroCard.Body>
           </HeroCard>
         ))
+      )}
+    </View>
+  );
+}
+
+function GroupQAPanel({
+  groupId,
+  questions,
+  isLoading,
+  canView,
+  showComposer,
+  setShowComposer,
+  title,
+  setTitle,
+  body,
+  setBody,
+  creating,
+  onCreate,
+  onRefresh,
+}: {
+  groupId: number;
+  questions: GroupQuestion[];
+  isLoading: boolean;
+  canView: boolean;
+  showComposer: boolean;
+  setShowComposer: React.Dispatch<React.SetStateAction<boolean>>;
+  title: string;
+  setTitle: (value: string) => void;
+  body: string;
+  setBody: (value: string) => void;
+  creating: boolean;
+  onCreate: () => void;
+  onRefresh: () => void;
+}) {
+  const { t } = useTranslation(['groups', 'common']);
+  const primary = usePrimaryColor();
+  const theme = useTheme();
+  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [detail, setDetail] = useState<GroupQuestionDetail | null>(null);
+  const [loadingDetail, setLoadingDetail] = useState(false);
+  const [answerBody, setAnswerBody] = useState('');
+  const [answering, setAnswering] = useState(false);
+
+  async function toggleQuestion(questionId: number) {
+    if (expandedId === questionId) {
+      setExpandedId(null);
+      setDetail(null);
+      setAnswerBody('');
+      return;
+    }
+
+    setExpandedId(questionId);
+    setDetail(null);
+    setLoadingDetail(true);
+    try {
+      const response = await getGroupQuestion(groupId, questionId);
+      setDetail(response.data);
+    } catch {
+      Alert.alert(t('common:errors.alertTitle'), t('detail.qa.loadError'));
+      setExpandedId(null);
+    } finally {
+      setLoadingDetail(false);
+    }
+  }
+
+  async function submitAnswer() {
+    const content = answerBody.trim();
+    if (!expandedId || !content) {
+      Alert.alert(t('common:errors.alertTitle'), t('detail.qa.answerValidation'));
+      return;
+    }
+
+    setAnswering(true);
+    try {
+      await answerGroupQuestion(groupId, expandedId, { body: content });
+      setAnswerBody('');
+      const response = await getGroupQuestion(groupId, expandedId);
+      setDetail(response.data);
+      onRefresh();
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(t('common:errors.alertTitle'), t('detail.qa.answerError'));
+    } finally {
+      setAnswering(false);
+    }
+  }
+
+  if (!canView) {
+    return <EmptyCard icon="lock-closed-outline" message={t('detail.qa.joinToView')} />;
+  }
+
+  return (
+    <View className="gap-3">
+      <HeroCard className="rounded-panel p-0">
+        <HeroCard.Body className="gap-3 p-4">
+          <View className="flex-row items-start justify-between gap-3">
+            <View className="min-w-0 flex-1">
+              <Text className="text-base font-semibold" style={{ color: theme.text }}>
+                {t('detail.qa.title')}
+              </Text>
+              <Text className="mt-1 text-sm leading-5" style={{ color: theme.textSecondary }}>
+                {t('detail.qa.subtitle')}
+              </Text>
+            </View>
+            <HeroButton size="sm" variant={showComposer ? 'secondary' : 'primary'} onPress={() => setShowComposer((value) => !value)}>
+              <HeroButton.Label>{showComposer ? t('common:buttons.cancel') : t('detail.qa.ask')}</HeroButton.Label>
+            </HeroButton>
+          </View>
+
+          {showComposer ? (
+            <View className="gap-3">
+              <Input
+                value={title}
+                onChangeText={setTitle}
+                placeholder={t('detail.qa.titlePlaceholder')}
+                placeholderTextColor={theme.textMuted}
+                className="text-base"
+                style={{ color: theme.text }}
+                accessibilityLabel={t('detail.qa.titlePlaceholder')}
+              />
+              <Input
+                value={body}
+                onChangeText={setBody}
+                placeholder={t('detail.qa.bodyPlaceholder')}
+                placeholderTextColor={theme.textMuted}
+                multiline
+                className="min-h-[104px] text-base"
+                style={{ color: theme.text, textAlignVertical: 'top' }}
+                accessibilityLabel={t('detail.qa.bodyPlaceholder')}
+              />
+              <HeroButton isDisabled={creating} onPress={onCreate}>
+                {creating ? <Spinner size="sm" /> : <HeroButton.Label>{t('detail.qa.publish')}</HeroButton.Label>}
+              </HeroButton>
+            </View>
+          ) : null}
+        </HeroCard.Body>
+      </HeroCard>
+
+      {isLoading ? (
+        <HeroCard className="rounded-panel p-0">
+          <HeroCard.Body className="min-h-[140px] items-center justify-center">
+            <Spinner size="md" />
+          </HeroCard.Body>
+        </HeroCard>
+      ) : questions.length === 0 ? (
+        <EmptyCard icon="help-circle-outline" message={t('detail.qa.empty')} />
+      ) : (
+        questions.map((question) => {
+          const expanded = expandedId === question.id;
+          const answers = expanded && detail?.id === question.id ? detail.answers : [];
+          return (
+            <HeroCard key={question.id} className="rounded-panel p-0">
+              <HeroCard.Body className="gap-3 p-4">
+                <HeroButton
+                  variant="ghost"
+                  feedbackVariant="scale"
+                  className="w-full justify-start p-0"
+                  onPress={() => void toggleQuestion(question.id)}
+                  accessibilityLabel={question.title}
+                >
+                  <View className="w-full gap-2">
+                    <View className="flex-row items-start justify-between gap-3">
+                      <Text className="min-w-0 flex-1 text-base font-semibold" style={{ color: theme.text }} numberOfLines={2}>
+                        {question.title}
+                      </Text>
+                      {question.has_accepted_answer ? (
+                        <Chip size="sm" variant="secondary" color="success">
+                          <Chip.Label>{t('detail.qa.answered')}</Chip.Label>
+                        </Chip>
+                      ) : null}
+                    </View>
+                    <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>
+                      {stripHtml(question.body)}
+                    </Text>
+                    <Text className="text-xs" style={{ color: theme.textMuted }} numberOfLines={1}>
+                      {[
+                        t('detail.qa.answers', { count: question.answer_count ?? 0 }),
+                        t('detail.qa.votes', { count: question.vote_count ?? 0 }),
+                        question.author?.name,
+                        formatDate(question.created_at),
+                      ].filter(Boolean).join(' - ')}
+                    </Text>
+                  </View>
+                </HeroButton>
+
+                {expanded ? (
+                  <View className="gap-3 border-t pt-3" style={{ borderColor: theme.borderSubtle }}>
+                    {loadingDetail ? (
+                      <View className="items-center py-4">
+                        <Spinner size="sm" />
+                      </View>
+                    ) : answers.length === 0 ? (
+                      <Text className="text-sm" style={{ color: theme.textSecondary }}>
+                        {t('detail.qa.noAnswers')}
+                      </Text>
+                    ) : (
+                      answers.map((answer) => (
+                        <Surface key={answer.id} variant="secondary" className="gap-2 rounded-panel-inner p-3">
+                          <View className="flex-row items-start justify-between gap-2">
+                            <Text className="min-w-0 flex-1 text-sm leading-5" style={{ color: theme.text }}>
+                              {stripHtml(answer.body)}
+                            </Text>
+                            {answer.is_accepted ? (
+                              <Chip size="sm" variant="secondary" color="success">
+                                <Chip.Label>{t('detail.qa.accepted')}</Chip.Label>
+                              </Chip>
+                            ) : null}
+                          </View>
+                          <Text className="text-xs" style={{ color: theme.textMuted }}>
+                            {[answer.author?.name, formatDate(answer.created_at)].filter(Boolean).join(' - ')}
+                          </Text>
+                        </Surface>
+                      ))
+                    )}
+                    <Input
+                      value={answerBody}
+                      onChangeText={setAnswerBody}
+                      placeholder={t('detail.qa.answerPlaceholder')}
+                      placeholderTextColor={theme.textMuted}
+                      multiline
+                      className="min-h-[86px] text-base"
+                      style={{ color: theme.text, textAlignVertical: 'top' }}
+                      accessibilityLabel={t('detail.qa.answerPlaceholder')}
+                    />
+                    <HeroButton isDisabled={answering} onPress={() => void submitAnswer()}>
+                      {answering ? <Spinner size="sm" /> : <HeroButton.Label>{t('detail.qa.postAnswer')}</HeroButton.Label>}
+                    </HeroButton>
+                  </View>
+                ) : null}
+              </HeroCard.Body>
+            </HeroCard>
+          );
+        })
       )}
     </View>
   );

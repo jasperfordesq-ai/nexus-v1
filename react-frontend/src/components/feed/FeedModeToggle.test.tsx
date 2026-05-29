@@ -48,33 +48,34 @@ describe('FeedModeToggle', () => {
 
   it('renders the tabs container with aria-label', () => {
     render(<FeedModeToggle mode="ranking" onModeChange={mockOnModeChange} />);
-    expect(screen.getByRole('tablist', { name: 'Feed mode' })).toBeInTheDocument();
+    // ToggleButtonGroup (single-selection) renders as a radiogroup.
+    expect(screen.getByRole('radiogroup', { name: 'Feed mode' })).toBeInTheDocument();
   });
 
   it('renders both tab options', () => {
     render(<FeedModeToggle mode="ranking" onModeChange={mockOnModeChange} />);
-    const tabs = screen.getAllByRole('tab');
+    const tabs = screen.getAllByRole('radio');
     expect(tabs).toHaveLength(2);
   });
 
   it('has "ranking" tab selected when mode is ranking', () => {
     render(<FeedModeToggle mode="ranking" onModeChange={mockOnModeChange} />);
-    const tabs = screen.getAllByRole('tab');
+    const tabs = screen.getAllByRole('radio');
     const rankingTab = tabs.find(tab => tab.textContent?.includes('For You'));
-    expect(rankingTab).toHaveAttribute('aria-selected', 'true');
+    expect(rankingTab).toHaveAttribute('aria-checked', 'true');
   });
 
   it('has "recent" tab selected when mode is recent', () => {
     render(<FeedModeToggle mode="recent" onModeChange={mockOnModeChange} />);
-    const tabs = screen.getAllByRole('tab');
+    const tabs = screen.getAllByRole('radio');
     const recentTab = tabs.find(tab => tab.textContent?.includes('Recent'));
-    expect(recentTab).toHaveAttribute('aria-selected', 'true');
+    expect(recentTab).toHaveAttribute('aria-checked', 'true');
   });
 
   it('calls onModeChange when a tab is clicked', async () => {
     const user = userEvent.setup();
     render(<FeedModeToggle mode="ranking" onModeChange={mockOnModeChange} />);
-    const recentTab = screen.getByText('Recent').closest('[role="tab"]')!;
+    const recentTab = screen.getByText('Recent').closest('[role="radio"]')!;
     await user.click(recentTab);
     expect(mockOnModeChange).toHaveBeenCalledWith('recent');
   });

@@ -88,6 +88,42 @@ export interface GroupFileItem {
   created_at: string | null;
 }
 
+export interface GroupQuestionAuthor {
+  id: number;
+  name: string;
+  avatar?: string | null;
+  avatar_url?: string | null;
+}
+
+export interface GroupQuestion {
+  id: number;
+  group_id?: number;
+  title: string;
+  body: string | null;
+  vote_count: number;
+  user_vote: 1 | -1 | 0;
+  answer_count: number;
+  has_accepted_answer: boolean;
+  is_closed?: boolean;
+  author: GroupQuestionAuthor;
+  created_at: string | null;
+}
+
+export interface GroupAnswer {
+  id: number;
+  question_id: number;
+  body: string;
+  vote_count: number;
+  user_vote: 1 | -1 | 0;
+  is_accepted: boolean;
+  author: GroupQuestionAuthor;
+  created_at: string | null;
+}
+
+export interface GroupQuestionDetail extends GroupQuestion {
+  answers: GroupAnswer[];
+}
+
 export interface GroupTemplate {
   id: number;
   name: string;
@@ -124,6 +160,14 @@ export interface GroupAnnouncementsResponse {
 export interface GroupFilesResponse {
   data: {
     items: GroupFileItem[];
+    cursor: string | null;
+    has_more: boolean;
+  };
+}
+
+export interface GroupQuestionsResponse {
+  data: {
+    items: GroupQuestion[];
     cursor: string | null;
     has_more: boolean;
   };
@@ -284,6 +328,41 @@ export function getGroupFiles(
   const query: Record<string, string> = { per_page: '20' };
   if (cursor) query['cursor'] = cursor;
   return api.get<GroupFilesResponse>(`${API_V2}/groups/${id}/files`, query);
+}
+
+/**
+ * GET /api/v2/groups/{id}/questions — list member-only group Q&A questions.
+ */
+export function getGroupQuestions(
+  id: number,
+  cursor: string | null = null,
+  sort: 'newest' | 'votes' | 'unanswered' = 'newest',
+): Promise<GroupQuestionsResponse> {
+  const query: Record<string, string> = { per_page: '20', sort };
+  if (cursor) query['cursor'] = cursor;
+  return api.get<GroupQuestionsResponse>(`${API_V2}/groups/${id}/questions`, query);
+}
+
+export function getGroupQuestion(id: number, questionId: number): Promise<{ data: GroupQuestionDetail }> {
+  return api.get<{ data: GroupQuestionDetail }>(`${API_V2}/groups/${id}/questions/${questionId}`);
+}
+
+export function createGroupQuestion(
+  id: number,
+  payload: { title: string; body: string },
+): Promise<{ data: { id: number; title: string } }> {
+  return api.post<{ data: { id: number; title: string } }>(`${API_V2}/groups/${id}/questions`, payload);
+}
+
+export function answerGroupQuestion(
+  id: number,
+  questionId: number,
+  payload: { body: string },
+): Promise<{ data: { id: number; question_id: number } }> {
+  return api.post<{ data: { id: number; question_id: number } }>(
+    `${API_V2}/groups/${id}/questions/${questionId}/answers`,
+    payload,
+  );
 }
 
 /**

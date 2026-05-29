@@ -102,8 +102,9 @@ describe('GroupSelector', () => {
 
     render(<GroupSelector value={null} onChange={vi.fn()} />);
     await waitFor(() => {
-      // The HeroUI Select renders a listbox trigger
-      const trigger = screen.queryByRole('button') ?? screen.queryByRole('combobox');
+      // The HeroUI Select renders a listbox trigger (the mock may emit more
+      // than one button, e.g. inner Select sub-parts).
+      const trigger = screen.queryAllByRole('button')[0] ?? screen.queryByRole('combobox');
       expect(trigger).toBeTruthy();
     });
   });

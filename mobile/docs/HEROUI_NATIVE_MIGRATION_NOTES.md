@@ -76,6 +76,7 @@ Keep raw React Native primitives for layout and native capabilities: `View`, `Te
 - Migrated wallet recipient search result rows and transaction rows from raw React Native `Pressable` wrappers to HeroUI Native `Button` wrappers while preserving selection state and haptic feedback.
 - Migrated group-detail event cards from raw React Native `Pressable` wrappers to HeroUI Native `Button` wrappers while preserving event detail routing.
 - Added native group announcement management for group admins, backed by `/v2/groups/{id}/announcements`, with HeroUI Native composer controls, pin/unpin actions, and delete actions.
+- Added a native group Files tab backed by `/v2/groups/{id}/files`, with HeroUI Native file cards and download actions for shared member resources.
 - Migrated thread context cards from raw React Native `Pressable` wrappers to HeroUI Native `Button` wrappers while preserving contextual deep links; removed an unused chat `Pressable` import.
 - Migrated member-profile listing rows from raw React Native `Pressable` wrappers to HeroUI Native `Button` wrappers while preserving listing detail navigation.
 - Migrated exchange-detail author cards from raw React Native `Pressable` wrappers to HeroUI Native `Button` wrappers while leaving image thumbnail controls native.

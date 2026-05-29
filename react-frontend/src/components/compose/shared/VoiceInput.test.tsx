@@ -72,9 +72,15 @@ describe('VoiceInput', () => {
     delete (window as unknown as Record<string, unknown>).webkitSpeechRecognition;
 
     render(<VoiceInput onTranscript={onTranscript} />);
-    // Component returns null, so no button should be rendered
+    // Component returns null, so no button should be rendered.
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    // VoiceInput's own status region wraps the mic button; with the component
+    // returning null no such region exists. (The ambient ToastProvider also
+    // renders empty status regions, so scope to one containing a button.)
+    const statusWithButton = screen
+      .queryAllByRole('status')
+      .find((el) => el.querySelector('button'));
+    expect(statusWithButton).toBeUndefined();
   });
 
   it('renders microphone button when SpeechRecognition is available', () => {
@@ -99,7 +105,12 @@ describe('VoiceInput', () => {
     (window as unknown as Record<string, unknown>).SpeechRecognition = MockCtor;
 
     render(<VoiceInput onTranscript={onTranscript} />);
-    const statusRegion = screen.getByRole('status');
+    // Scope to VoiceInput's status region (the one wrapping the mic button) —
+    // the ambient ToastProvider renders its own status regions too.
+    const statusRegion = screen
+      .getAllByRole('status')
+      .find((el) => el.querySelector('button'));
+    expect(statusRegion).toBeDefined();
     expect(statusRegion).toHaveAttribute('aria-live', 'polite');
   });
 

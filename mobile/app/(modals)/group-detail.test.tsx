@@ -67,12 +67,33 @@ jest.mock('react-i18next', () => ({
         'detail.tabs.events': 'Events',
         'detail.tabs.announcements': 'Announcements',
         'detail.tabs.files': 'Files',
+        'detail.tabs.qa': 'Q&A',
         'detail.files.title': 'Group files',
         'detail.files.subtitle': 'Documents and resources.',
         'detail.files.empty': 'No files yet.',
         'detail.files.joinToView': 'Join to view files.',
         'detail.files.download': 'Download',
         'detail.files.downloadLabel': opts ? `Download ${String(opts.name ?? '')}` : 'Download file',
+        'detail.qa.title': 'Group Q&A',
+        'detail.qa.subtitle': 'Ask practical questions.',
+        'detail.qa.ask': 'Ask',
+        'detail.qa.titlePlaceholder': 'Question title',
+        'detail.qa.bodyPlaceholder': 'Add context...',
+        'detail.qa.publish': 'Publish question',
+        'detail.qa.validation': 'Add a question title and details.',
+        'detail.qa.createError': 'Could not create question.',
+        'detail.qa.loadError': 'Could not load question.',
+        'detail.qa.answerPlaceholder': 'Write an answer...',
+        'detail.qa.postAnswer': 'Post answer',
+        'detail.qa.answerValidation': 'Write an answer.',
+        'detail.qa.answerError': 'Could not post answer.',
+        'detail.qa.empty': 'No questions yet.',
+        'detail.qa.joinToView': 'Join to view Q&A.',
+        'detail.qa.answered': 'Answered',
+        'detail.qa.accepted': 'Accepted',
+        'detail.qa.noAnswers': 'No answers yet.',
+        'detail.qa.answers': opts ? `${String(opts.count ?? 0)} answers` : '0 answers',
+        'detail.qa.votes': opts ? `${String(opts.count ?? 0)} votes` : '0 votes',
         'detail.eventsHeading': 'Group events',
         'detail.eventsSubtitle': 'Events connected to this group.',
         'detail.emptyEvents': 'No events yet.',
@@ -153,6 +174,10 @@ jest.mock('@/lib/api/groups', () => ({
   getGroupDiscussions: jest.fn(),
   getGroupAnnouncements: jest.fn(),
   getGroupFiles: jest.fn(),
+  getGroupQuestions: jest.fn(),
+  getGroupQuestion: jest.fn().mockResolvedValue({ data: { id: 44, title: 'How should we compost?', answers: [] } }),
+  createGroupQuestion: jest.fn().mockResolvedValue({ data: { id: 44, title: 'How should we compost?' } }),
+  answerGroupQuestion: jest.fn().mockResolvedValue({ data: { id: 55, question_id: 44 } }),
   createGroupAnnouncement: jest.fn().mockResolvedValue({ data: {} }),
   updateGroupAnnouncement: jest.fn().mockResolvedValue({ data: {} }),
   deleteGroupAnnouncement: jest.fn().mockResolvedValue({ data: { deleted: true } }),
@@ -166,7 +191,7 @@ jest.mock('@/components/ui/LoadingSpinner', () => () => null);
 // --- Tests ---
 
 import GroupDetailScreen from './group-detail';
-import { createGroupAnnouncement, joinGroup, updateGroupAnnouncement } from '@/lib/api/groups';
+import { answerGroupQuestion, createGroupAnnouncement, createGroupQuestion, joinGroup, updateGroupAnnouncement } from '@/lib/api/groups';
 
 const defaultApiState = { data: null, isLoading: true, error: null, refresh: jest.fn() };
 
@@ -331,7 +356,8 @@ describe('GroupDetailScreen', () => {
     };
     let apiCall = 0;
     mockUseApi.mockImplementation(() => {
-      const states = [groupState, emptyListState, emptyListState, emptyAnnouncementsState, eventsState];
+      const emptyFilesState = { data: { data: { items: [], cursor: null, has_more: false } }, isLoading: false, error: null, refresh: jest.fn() };
+      const states = [groupState, emptyListState, emptyListState, emptyAnnouncementsState, emptyFilesState, eventsState];
       const state = states[apiCall % states.length];
       apiCall += 1;
       return state;
@@ -372,7 +398,8 @@ describe('GroupDetailScreen', () => {
     const eventsState = { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
     let apiCall = 0;
     mockUseApi.mockImplementation(() => {
-      const states = [groupState, emptyListState, emptyListState, announcementsState, eventsState];
+      const emptyFilesState = { data: { data: { items: [], cursor: null, has_more: false } }, isLoading: false, error: null, refresh: jest.fn() };
+      const states = [groupState, emptyListState, emptyListState, announcementsState, emptyFilesState, eventsState];
       const state = states[apiCall % states.length];
       apiCall += 1;
       return state;
@@ -437,7 +464,8 @@ describe('GroupDetailScreen', () => {
     const eventsState = { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
     let apiCall = 0;
     mockUseApi.mockImplementation(() => {
-      const states = [groupState, emptyListState, emptyListState, announcementsState, eventsState];
+      const emptyFilesState = { data: { data: { items: [], cursor: null, has_more: false } }, isLoading: false, error: null, refresh: jest.fn() };
+      const states = [groupState, emptyListState, emptyListState, announcementsState, emptyFilesState, eventsState];
       const state = states[apiCall % states.length];
       apiCall += 1;
       return state;
@@ -451,5 +479,57 @@ describe('GroupDetailScreen', () => {
     await waitFor(() => {
       expect(updateGroupAnnouncement).toHaveBeenCalledWith(1, 22, { is_pinned: false });
     });
+  });
+
+  it('renders group files in the native files tab', () => {
+    const groupState = {
+      data: { data: { ...mockGroupDetail, is_member: true } },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    };
+    const emptyListState = { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
+    const emptyAnnouncementsState = { data: { data: { items: [], cursor: null, has_more: false } }, isLoading: false, error: null, refresh: jest.fn() };
+    const filesState = {
+      data: {
+        data: {
+          items: [{
+            id: 31,
+            group_id: 1,
+            file_name: 'Planting guide.pdf',
+            file_type: 'application/pdf',
+            file_size: 2048,
+            uploaded_by: 10,
+            uploader_name: 'Alice Admin',
+            uploader_avatar: null,
+            folder: 'Guides',
+            description: 'Spring planting checklist.',
+            created_at: '2026-06-01T00:00:00Z',
+          }],
+          cursor: null,
+          has_more: false,
+        },
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    };
+    const eventsState = { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
+    let apiCall = 0;
+    mockUseApi.mockImplementation(() => {
+      const states = [groupState, emptyListState, emptyListState, emptyAnnouncementsState, filesState, eventsState];
+      const state = states[apiCall % states.length];
+      apiCall += 1;
+      return state;
+    });
+
+    const { getByText } = render(<GroupDetailScreen />);
+
+    fireEvent.press(getByText('Files'));
+
+    expect(getByText('Group files')).toBeTruthy();
+    expect(getByText('Planting guide.pdf')).toBeTruthy();
+    expect(getByText('Spring planting checklist.')).toBeTruthy();
+    expect(getByText('Download')).toBeTruthy();
   });
 });

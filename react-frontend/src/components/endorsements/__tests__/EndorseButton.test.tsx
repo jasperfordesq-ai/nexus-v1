@@ -200,8 +200,10 @@ describe('EndorseButton — compact mode', () => {
         compact
       />
     );
-    // In compact mode it renders a button with an aria-label
-    const btn = screen.getByRole('button');
+    // In compact mode it renders a button with an aria-label. The mock may emit
+    // additional buttons (e.g. tooltip/wrapper sub-parts), so pick the one that
+    // actually carries the aria-label.
+    const btn = screen.getAllByRole('button').find((b) => b.hasAttribute('aria-label'));
     expect(btn).toBeInTheDocument();
     expect(btn).toHaveAttribute('aria-label');
   });
