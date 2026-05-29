@@ -81,13 +81,17 @@ describe('sales-site public content policy', () => {
     expect(siteShell).not.toContain('<button key={href} type="button" className="text-left hover:text-white" onClick={() => onNavigate(href)}>');
   });
 
-  it('uses an immersive product hero and keeps the detailed platform map visible', () => {
+  it('uses a product-cockpit hero and keeps the pathway cards visible', () => {
     const homePage = readFileSync(resolve(__dirname, '..', 'components', 'HomePage.tsx'), 'utf8');
     const styles = readFileSync(resolve(__dirname, '..', 'styles.css'), 'utf8');
+    const heroStart = homePage.indexOf('<section className="sales-hero sales-hero--product border-b border-white/10">');
+    const heroEnd = homePage.indexOf('<section className="nexus-section-shell">');
+    const heroMarkup = homePage.slice(heroStart, heroEnd);
 
-    expect(homePage).toContain('sales-hero sales-hero--product border-b border-white/10');
-    expect(homePage).toContain('ProductCockpit');
-    expect(homePage).toContain('PathwayCard');
+    expect(heroStart).toBeGreaterThan(-1);
+    expect(heroEnd).toBeGreaterThan(heroStart);
+    expect(heroMarkup).toContain('ProductCockpit');
+    expect(heroMarkup).toContain('PathwayCard');
     expect(homePage).toContain('ProofMetric');
     expect(styles).toContain('.sales-hero');
   });

@@ -24,37 +24,6 @@ interface HomePageProps {
   onNavigate: (href: string) => void;
 }
 
-const proofMetrics = [
-  {
-    label: 'Entry lane',
-    value: 'EUR29/mo',
-    detail: 'Managed Community Timebanking for small groups.',
-    icon: HandCoins,
-    accent: 'primary' as const,
-  },
-  {
-    label: 'Production modules',
-    value: '60+',
-    detail: 'Community, participation, operations, and federation tools.',
-    icon: Sparkles,
-    accent: 'accent' as const,
-  },
-  {
-    label: 'Languages',
-    value: '11',
-    detail: 'Multilingual foundation including Arabic RTL.',
-    icon: Globe2,
-    accent: 'success' as const,
-  },
-  {
-    label: 'Licence',
-    value: 'AGPL',
-    detail: 'Auditable open-source code with managed hosting available.',
-    icon: ShieldCheck,
-    accent: 'warning' as const,
-  },
-];
-
 const platformPillars = [
   ['Time credits', 'Equal-time exchange, wallets, exchange logs, reviews, and broker controls.', HandCoins],
   ['Community life', 'Members, groups, events, messages, resources, public pages, and social participation.', UsersRound],
@@ -74,6 +43,36 @@ const communityOutcomes = [
 export default function HomePage({ onNavigate }: HomePageProps) {
   const entryPlan = communityTimebankPlans[0];
   const fullPlan = hostingPlans[0];
+  const proofMetrics = [
+    {
+      label: 'Entry lane',
+      value: `${formatCurrency(entryPlan.annualMonthlyEur).replace(/^€/, 'EUR')}/mo`,
+      detail: 'Managed Community Timebanking for small groups.',
+      icon: HandCoins,
+      accent: 'primary' as const,
+    },
+    {
+      label: 'Production modules',
+      value: '60+',
+      detail: 'Community, participation, operations, and federation tools.',
+      icon: Sparkles,
+      accent: 'accent' as const,
+    },
+    {
+      label: 'Languages',
+      value: '11',
+      detail: 'Multilingual foundation including Arabic RTL.',
+      icon: Globe2,
+      accent: 'success' as const,
+    },
+    {
+      label: 'Licence',
+      value: 'AGPL',
+      detail: 'Auditable open-source code with managed hosting available.',
+      icon: ShieldCheck,
+      accent: 'warning' as const,
+    },
+  ];
 
   return (
     <>
