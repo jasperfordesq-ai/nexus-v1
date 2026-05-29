@@ -12,7 +12,8 @@ import type { ReactNode } from 'react';
 type LegacyVariant = 'flat' | 'bordered' | 'underlined' | 'faded';
 type V3Variant = NonNullable<HeroUISearchFieldProps['variant']>;
 
-export type SearchFieldProps = Omit<HeroUISearchFieldProps, 'children' | 'onChange' | 'variant'> & {
+export type SearchFieldProps = Omit<HeroUISearchFieldProps, 'children' | 'onChange' | 'variant' | 'className'> & {
+  className?: string;
   classNames?: {
     base?: string;
     input?: string;
@@ -52,6 +53,7 @@ function sizeClass(size?: SearchFieldProps['size']): string | undefined {
 }
 
 export function SearchField({
+  className,
   classNames,
   endContent,
   isClearable: _isClearable,
@@ -66,7 +68,7 @@ export function SearchField({
   return (
     <HeroUISearchField
       {...props}
-      className={classNames?.base}
+      className={combineClasses(className, classNames?.base)}
       variant={mapVariant(variant)}
       onChange={(value) => {
         onValueChange?.(value);

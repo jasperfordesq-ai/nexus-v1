@@ -11,7 +11,6 @@ import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from '@/lib/motion';
 
-import Search from 'lucide-react/icons/search';
 import Users from 'lucide-react/icons/users';
 import Plus from 'lucide-react/icons/plus';
 import Lock from 'lucide-react/icons/lock';
@@ -21,7 +20,7 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Star from 'lucide-react/icons/star';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, GroupCardSkeleton, Button, Input, Avatar, AvatarGroup, Tooltip } from '@/components/ui';
+import { GlassCard, GroupCardSkeleton, Button, SearchField, Avatar, AvatarGroup, Tooltip } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
@@ -283,14 +282,13 @@ export function GroupsPage() {
       <GlassCard className="p-4">
         <div className="flex flex-col gap-3">
           <div className="flex-1">
-            <Input
+            <SearchField
               placeholder={t('search_placeholder')}
               aria-label={t('search_placeholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               isClearable
               onClear={resetSearch}
-              startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
               classNames={{
                 input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
                 inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',

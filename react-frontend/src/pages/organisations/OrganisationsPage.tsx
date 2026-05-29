@@ -14,7 +14,6 @@ import { Link } from 'react-router-dom';
 import { motion } from '@/lib/motion';
 
 import Building2 from 'lucide-react/icons/building-2';
-import Search from 'lucide-react/icons/search';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import MapPin from 'lucide-react/icons/map-pin';
@@ -25,7 +24,7 @@ import Star from 'lucide-react/icons/star';
 import Users from 'lucide-react/icons/users';
 import Plus from 'lucide-react/icons/plus';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Input, Avatar, CardRowsSkeleton } from '@/components/ui';
+import { GlassCard, Button, SearchField, Avatar, CardRowsSkeleton } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
@@ -173,11 +172,10 @@ export function OrganisationsPage() {
 
       {/* Search */}
       <div className="w-full sm:max-w-md">
-        <Input
+        <SearchField
           placeholder={t('organisations.search_placeholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
           aria-label={t('organisations.search_placeholder')}
           classNames={{
             input: 'bg-transparent text-theme-primary',

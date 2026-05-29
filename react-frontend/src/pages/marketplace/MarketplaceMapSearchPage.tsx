@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Spinner, SearchField } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -258,12 +258,11 @@ export function MarketplaceMapSearchPage() {
 
         {/* Search bar + controls */}
         <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_8rem] lg:grid-cols-[minmax(0,1fr)_8rem_12rem_auto]">
-          <Input
+          <SearchField
             placeholder={t('map.search_placeholder')}
             aria-label={t('map.search_placeholder')}
             value={searchQuery}
             onValueChange={setSearchQuery}
-            startContent={<Search className="w-4 h-4 text-muted" />}
             size="lg"
             variant="secondary"
             classNames={{ inputWrapper: 'bg-background' }}

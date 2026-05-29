@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input, Tabs, Tab } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Spinner, SearchField, Tabs, Tab } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -36,8 +36,6 @@ import Eye from 'lucide-react/icons/eye';
 import Star from 'lucide-react/icons/star';
 import Layers from 'lucide-react/icons/layers';
 import BarChart3 from 'lucide-react/icons/chart-column';
-import Search from 'lucide-react/icons/search';
-import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { EmptyState } from '@/components/feedback';
@@ -409,24 +407,11 @@ export function IdeationPage() {
       {/* Search + Tag Filters */}
       <div className="space-y-3 mb-6">
         {/* Search Bar */}
-        <Input
+        <SearchField
           placeholder={t('search.placeholder')}
           value={searchQuery}
           onValueChange={setSearchQuery}
           aria-label={t('search.placeholder')}
-          startContent={<Search className="w-4 h-4 text-[var(--color-text-tertiary)]" />}
-          endContent={searchQuery ? (
-            <Button
-              isIconOnly
-              size="sm"
-              variant="tertiary"
-              onPress={() => setSearchQuery('')}
-              className="min-h-8 min-w-8 rounded p-0.5 hover:bg-[var(--color-surface-hover)]"
-              aria-label={t('search.clear')}
-            >
-              <X className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
-            </Button>
-          ) : null}
           variant="bordered"
           size="sm"
           className="max-w-md"

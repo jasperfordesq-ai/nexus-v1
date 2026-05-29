@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input, Checkbox, CheckboxGroup } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input, SearchField, Checkbox, CheckboxGroup } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -21,7 +21,6 @@ import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { motion } from '@/lib/motion';
 
 import { Separator } from '@/components/ui';
-import Search from 'lucide-react/icons/search';
 import SlidersHorizontal from 'lucide-react/icons/sliders-horizontal';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import ChevronRight from 'lucide-react/icons/chevron-right';
@@ -482,12 +481,11 @@ export function MarketplaceCategoryPage() {
 
         {/* Search + Sort */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-          <Input
+          <SearchField
             placeholder={t('category.search_placeholder', { name: category.name })}
             aria-label={t('category.search_placeholder', { name: category.name })}
             value={searchQuery}
             onValueChange={setSearchQuery}
-            startContent={<Search className="w-4 h-4 text-muted" />}
             size="lg"
             variant="secondary"
             classNames={{ inputWrapper: 'bg-background' }}

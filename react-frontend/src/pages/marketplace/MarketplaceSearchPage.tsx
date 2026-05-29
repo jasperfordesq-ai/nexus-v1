@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Input, Checkbox, CheckboxGroup, TagGroup, Tag } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Input, SearchField, Checkbox, CheckboxGroup, TagGroup, Tag } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -450,12 +450,11 @@ export function MarketplaceSearchPage() {
 
           {/* Search bar + sort */}
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-            <Input
+            <SearchField
               placeholder={t('search.search_placeholder')}
               aria-label={t('search.search_placeholder')}
               value={searchQuery}
               onValueChange={setSearchQuery}
-              startContent={<Search className="w-4 h-4 text-muted" />}
               size="lg"
               variant="secondary"
               classNames={{ inputWrapper: 'bg-background' }}
