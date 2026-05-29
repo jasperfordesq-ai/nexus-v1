@@ -11,6 +11,7 @@
   "courses.invalid_moderation_action": "Invalid moderation action.",
   "courses.user_id_required": "A user ID is required.",
   "courses.certificate_requires_completion": "Complete the course to access your certificate.",
+  "courses.comment_required": "A comment cannot be empty.",
   "help.feedback_recorded": "Feedback recorded",
   "help.missing_article_slug": "Missing article_slug",
   "help.article_not_found": "Article not found",

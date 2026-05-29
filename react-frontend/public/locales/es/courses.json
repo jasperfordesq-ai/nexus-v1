@@ -102,6 +102,16 @@
     "download": "Certificate",
     "title": "Certificate of completion"
   },
+  "discussion": {
+    "title": "Discussion",
+    "placeholder": "Ask a question or share a thought…",
+    "post": "Post",
+    "reply": "Reply",
+    "replying": "Replying…",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "empty": "No comments yet. Start the conversation."
+  },
   "admin": {
     "title": "Courses",
     "subtitle": "Moderate courses, manage instructors and categories",

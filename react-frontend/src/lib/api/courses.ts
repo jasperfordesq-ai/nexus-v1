@@ -119,6 +119,19 @@ export interface Quiz {
   questions: QuizQuestion[];
 }
 
+export interface CourseDiscussion {
+  id: number;
+  course_id: number;
+  lesson_id: number | null;
+  user_id: number;
+  parent_id: number | null;
+  body: string;
+  status: string;
+  created_at?: string | null;
+  user?: { id: number; name: string; avatar_url?: string | null };
+  replies?: CourseDiscussion[];
+}
+
 export interface BrowseResult {
   items: Course[];
   total: number;
@@ -161,6 +174,16 @@ export const coursesApi = {
     api.get<{ certificate: { id: number; serial: string; issued_at: string | null }; html: string }>(
       `/v2/courses/${courseId}/certificate`,
     ),
+
+  // Per-lesson discussions
+  listDiscussions: (courseId: number, lessonId: number) =>
+    api.get<CourseDiscussion[]>(`/v2/courses/${courseId}/lessons/${lessonId}/discussions`),
+  postDiscussion: (courseId: number, lessonId: number, body: string, parentId?: number) =>
+    api.post<CourseDiscussion>(`/v2/courses/${courseId}/lessons/${lessonId}/discussions`, {
+      body,
+      parent_id: parentId,
+    }),
+  deleteDiscussion: (id: number) => api.delete(`/v2/courses/discussions/${id}`),
 
   // Quizzes (learner)
   getQuiz: (quizId: number) => api.get<Quiz>(`/v2/courses/quizzes/${quizId}`),

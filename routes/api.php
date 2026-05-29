@@ -1050,6 +1050,11 @@ Route::post('/v2/courses/{id}/lessons/{lessonId}/complete', [\App\Http\Controlle
 Route::post('/v2/courses/{id}/reviews', [\App\Http\Controllers\Api\CourseEnrollmentController::class, 'review'])->where('id', '[0-9]+');
 Route::get('/v2/courses/{id}/certificate', [\App\Http\Controllers\Api\CourseEnrollmentController::class, 'certificate'])->where('id', '[0-9]+');
 
+// Per-lesson discussions
+Route::get('/v2/courses/{courseId}/lessons/{lessonId}/discussions', [\App\Http\Controllers\Api\CourseDiscussionController::class, 'index'])->where(['courseId' => '[0-9]+', 'lessonId' => '[0-9]+']);
+Route::post('/v2/courses/{courseId}/lessons/{lessonId}/discussions', [\App\Http\Controllers\Api\CourseDiscussionController::class, 'store'])->where(['courseId' => '[0-9]+', 'lessonId' => '[0-9]+']);
+Route::delete('/v2/courses/discussions/{id}', [\App\Http\Controllers\Api\CourseDiscussionController::class, 'destroy'])->where('id', '[0-9]+');
+
 // Learner — quizzes
 Route::get('/v2/courses/quizzes/{quizId}', [\App\Http\Controllers\Api\CourseQuizController::class, 'show'])->where('quizId', '[0-9]+');
 Route::post('/v2/courses/quizzes/{quizId}/attempt', [\App\Http\Controllers\Api\CourseQuizController::class, 'attempt'])->where('quizId', '[0-9]+');
@@ -2077,6 +2082,7 @@ Route::delete('/v2/admin/courses/instructors/{userId}', [\App\Http\Controllers\A
 Route::post('/v2/admin/courses/categories', [\App\Http\Controllers\Api\AdminCourseController::class, 'storeCategory']);
 Route::put('/v2/admin/courses/categories/{id}', [\App\Http\Controllers\Api\AdminCourseController::class, 'updateCategory'])->where('id', '[0-9]+');
 Route::delete('/v2/admin/courses/categories/{id}', [\App\Http\Controllers\Api\AdminCourseController::class, 'deleteCategory'])->where('id', '[0-9]+');
+Route::post('/v2/admin/courses/discussions/{id}/hide', [\App\Http\Controllers\Api\CourseDiscussionController::class, 'hide'])->where('id', '[0-9]+');
 
 Route::get('/v2/admin/ideation', [\App\Http\Controllers\Api\AdminIdeationController::class, 'index']);
 Route::get('/v2/admin/ideation/{id}', [\App\Http\Controllers\Api\AdminIdeationController::class, 'show']);

@@ -16,6 +16,7 @@ import PlayCircle from 'lucide-react/icons/play-circle';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { coursesApi, type Course, type CourseLesson, type LessonProgress } from '@/lib/api/courses';
+import { LessonDiscussion } from '@/components/courses/LessonDiscussion';
 
 export default function CoursePlayerPage() {
   const { t } = useTranslation('courses');
@@ -142,6 +143,7 @@ export default function CoursePlayerPage() {
                   </Button>
                 )}
               </div>
+              <LessonDiscussion courseId={course.id} lessonId={activeLesson.id} />
             </CardBody>
           </Card>
         ) : (
