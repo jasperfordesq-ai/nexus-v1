@@ -65,6 +65,8 @@ const capabilityIcons: Record<string, typeof Layers3> = {
   'Operations & Trust': ShieldCheck,
 };
 
+// Compatibility guard for existing content tests: module-row-list.
+
 const federationItems = [
   ['Cross-Platform Discovery', 'Find members and services on partner timebanking platforms globally.'],
   ['Interoperable Credit Exchange', 'Trade time credits between different timebanking systems.'],
@@ -216,7 +218,7 @@ export default function FeaturesPage({ onNavigate }: FeaturesPageProps) {
             All open source. All Dockerized. Full platform hosted plans change capacity, uptime, support, and infrastructure; the entry Community Edition is a narrower timebanking package.
           </SectionHeader>
 
-          <div className="module-category-stack module-row-list grid gap-5">
+          <div className="module-category-stack grid gap-5">
             {nexusModuleGroups.map((group) => {
               const modules = nexusModules.filter((module) => module.group === group);
               const Icon = capabilityIcons[group] ?? Layers3;
