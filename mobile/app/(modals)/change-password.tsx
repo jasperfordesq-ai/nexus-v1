@@ -9,7 +9,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  TextInput,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -26,6 +25,7 @@ import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
 import FormActionFooter from '@/components/ui/FormActionFooter';
+import Input from '@/components/ui/Input';
 import OfflineBanner from '@/components/OfflineBanner';
 
 export default function ChangePasswordScreen() {
@@ -177,10 +177,10 @@ function PasswordField({
 }) {
   return (
     <View className="gap-1.5">
-      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{label}</Text>
-      <TextInput
-        className="min-h-12 rounded-panel-inner border px-3 text-sm"
-        style={{ borderColor: error ? theme.error : theme.border, color: theme.text, backgroundColor: theme.bg }}
+      <Input
+        label={label}
+        error={error}
+        style={{ color: theme.text }}
         placeholder={placeholder}
         placeholderTextColor={theme.textMuted}
         secureTextEntry
@@ -190,9 +190,7 @@ function PasswordField({
         onChangeText={onChangeText}
         accessibilityLabel={label}
       />
-      {error ? (
-        <Text className="text-xs font-medium" style={{ color: theme.error }}>{error}</Text>
-      ) : helper ? (
+      {!error && helper ? (
         <Text className="text-xs" style={{ color: theme.textMuted }}>{helper}</Text>
       ) : null}
     </View>

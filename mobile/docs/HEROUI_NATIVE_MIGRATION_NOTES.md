@@ -48,6 +48,7 @@ Keep raw React Native primitives for layout and native capabilities: `View`, `Te
 - Added a native direct Connections workflow route for accepted, incoming, and sent member connection requests.
 - Migrated exchange, member, group, blog, messages, and global search fields from raw `TextInput` controls to the shared HeroUI Native-backed `Input` wrapper.
 - Migrated new/edit exchange form fields to the shared `Input` wrapper and added explicit ref forwarding to keep keyboard flow intact.
+- Migrated change-password form fields to the shared `Input` wrapper while preserving secure text entry and validation errors.
 - Added the parity audit and migration queue in `mobile/docs/HEROUI_NATIVE_PARITY_AUDIT.md`.
 
 ## Practical Exceptions
