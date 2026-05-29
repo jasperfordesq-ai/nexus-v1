@@ -60,6 +60,7 @@ vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: vi.fn(() => null),
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
   resolveAssetUrl: vi.fn((url: string) => url),
 }));
 

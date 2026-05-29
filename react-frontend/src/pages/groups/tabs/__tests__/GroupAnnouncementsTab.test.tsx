@@ -44,30 +44,7 @@ vi.mock('@/contexts', () => ({
   useTenant: () => ({ tenant: { id: 2, name: 'Test', slug: 'test', tagline: null }, branding: { name: 'Test', logo_url: null }, tenantSlug: 'test', tenantPath: (p: string) => '/test' + p, isLoading: false, hasFeature: vi.fn(() => true), hasModule: vi.fn(() => true) }),
 }));
 
-vi.mock('@/components/ui', () => ({
-  GlassCard: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div data-testid="glass-card" className={className}>{children}</div>
-  ),
-
-  GlassButton: ({ children }: Record<string, unknown>) => children as never,
-  GlassInput: () => null,
-  BackToTop: () => null,
-  AlgorithmLabel: () => null,
-  ImagePlaceholder: () => null,
-  DynamicIcon: () => null,
-  ICON_MAP: {},
-  ICON_NAMES: [],
-  ListingSkeleton: () => null,
-  MemberCardSkeleton: () => null,
-  StatCardSkeleton: () => null,
-  EventCardSkeleton: () => null,
-  GroupCardSkeleton: () => null,
-  ConversationSkeleton: () => null,
-  ExchangeCardSkeleton: () => null,
-  NotificationSkeleton: () => null,
-  ProfileHeaderSkeleton: () => null,
-  SkeletonList: () => null,
-}));
+vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
 
 vi.mock('@/components/feedback', () => ({
   EmptyState: ({ title, description }: { title: string; description?: string }) => (
@@ -84,6 +61,7 @@ vi.mock('@/lib/logger', () => ({
 
 vi.mock('@/lib/helpers', () => ({
   formatRelativeTime: (date: string) => `relative-${date}`,
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
 }));
 
 import { GroupAnnouncementsTab } from '../GroupAnnouncementsTab';

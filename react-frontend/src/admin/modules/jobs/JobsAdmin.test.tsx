@@ -59,6 +59,7 @@ vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: vi.fn((url: unknown) => url || '/default-avatar.png'),
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
 }));
 
 vi.mock('@/lib/motion', () => ({
@@ -81,32 +82,7 @@ vi.mock('@/components/feedback', () => ({
   ),
 }));
 
-vi.mock('@/components/ui', () => ({
-  GlassCard: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div data-testid='glass-card' className={className}>{children}</div>
-  ),
-  GlassButton: ({ children, ...props }: { children: React.ReactNode; [k: string]: unknown }) => (
-    <button data-testid='glass-button' {...(props as object)}>{children}</button>
-  ),
-
-  GlassInput: () => null,
-  BackToTop: () => null,
-  AlgorithmLabel: () => null,
-  ImagePlaceholder: () => null,
-  DynamicIcon: () => null,
-  ICON_MAP: {},
-  ICON_NAMES: [],
-  ListingSkeleton: () => null,
-  MemberCardSkeleton: () => null,
-  StatCardSkeleton: () => null,
-  EventCardSkeleton: () => null,
-  GroupCardSkeleton: () => null,
-  ConversationSkeleton: () => null,
-  ExchangeCardSkeleton: () => null,
-  NotificationSkeleton: () => null,
-  ProfileHeaderSkeleton: () => null,
-  SkeletonList: () => null,
-}));
+vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');

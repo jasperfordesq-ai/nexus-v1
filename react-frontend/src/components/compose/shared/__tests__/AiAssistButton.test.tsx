@@ -21,6 +21,8 @@ vi.mock('@/lib/api', () => ({
   },
 }));
 
+vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
+
 const mockToast = {
   success: vi.fn(),
   error: vi.fn(),

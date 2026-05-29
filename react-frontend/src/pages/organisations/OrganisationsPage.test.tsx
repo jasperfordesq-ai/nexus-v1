@@ -55,30 +55,7 @@ vi.mock('@/lib/logger', () => ({
   logError: vi.fn(),
 }));
 
-vi.mock('@/components/ui', () => ({
-  GlassCard: ({ children, className, hoverable: _hoverable }: { children: React.ReactNode; className?: string; hoverable?: boolean }) => (
-    <div data-testid="glass-card" className={className}>{children}</div>
-  ),
-
-  GlassButton: ({ children }: Record<string, unknown>) => children as never,
-  GlassInput: () => null,
-  BackToTop: () => null,
-  AlgorithmLabel: () => null,
-  ImagePlaceholder: () => null,
-  DynamicIcon: () => null,
-  ICON_MAP: {},
-  ICON_NAMES: [],
-  ListingSkeleton: () => null,
-  MemberCardSkeleton: () => null,
-  StatCardSkeleton: () => null,
-  EventCardSkeleton: () => null,
-  GroupCardSkeleton: () => null,
-  ConversationSkeleton: () => null,
-  ExchangeCardSkeleton: () => null,
-  NotificationSkeleton: () => null,
-  ProfileHeaderSkeleton: () => null,
-  SkeletonList: () => null,
-}));
+vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
 
 vi.mock('@/components/feedback', () => ({
   EmptyState: ({ title, description }: { title: string; description?: string }) => (

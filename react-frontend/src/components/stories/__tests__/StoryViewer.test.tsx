@@ -44,6 +44,7 @@ vi.mock('@/lib/logger', () => ({
 
 vi.mock('@/lib/helpers', () => ({
   resolveAssetUrl: (url: string) => url || '/default.png',
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
   resolveAvatarUrl: (url: string | null) => url || '/default-avatar.png',
   tenantPath: (p: string) => '/test' + p,
 }));

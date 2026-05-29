@@ -106,33 +106,7 @@ vi.mock('@/lib/api', () => ({
 }));
 
 // ── Mock UI dependencies ────────────────────────────────────────────────────
-vi.mock('@/components/ui', async () => {
-  const React = await import('react');
-  return {
-    GlassCard: ({ children, className }: { children: ReactNode; className?: string }) => {
-      return React.createElement('div', { 'data-testid': 'glass-card', className }, children);
-    },
-
-    GlassButton: ({ children }: Record<string, unknown>) => children as never,
-  GlassInput: () => null,
-  BackToTop: () => null,
-  AlgorithmLabel: () => null,
-  ImagePlaceholder: () => null,
-  DynamicIcon: () => null,
-  ICON_MAP: {},
-  ICON_NAMES: [],
-  ListingSkeleton: () => null,
-  MemberCardSkeleton: () => null,
-  StatCardSkeleton: () => null,
-  EventCardSkeleton: () => null,
-  GroupCardSkeleton: () => null,
-  ConversationSkeleton: () => null,
-  ExchangeCardSkeleton: () => null,
-  NotificationSkeleton: () => null,
-  ProfileHeaderSkeleton: () => null,
-  SkeletonList: () => null,
-  };
-});
+vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
 
 vi.mock('@/components/seo', () => ({ PageMeta: () => null }));
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
@@ -150,52 +124,6 @@ vi.mock('@/lib/motion', async () => {
     motion: new Proxy({} as Record<string, never>, handler),
     AnimatePresence: ({ children }: { children: ReactNode }) => children,
   };
-});
-
-// ── Mock HeroUI components ──────────────────────────────────────────────────
-vi.mock('@/components/ui', async () => {
-  const React = await import('react');
-  return {
-    GlassCard: ({ children, className }: { children: ReactNode; className?: string }) =>
-      React.createElement('div', { 'data-testid': 'glass-card', className }, children),
-    Button: ({ children, onPress, isDisabled, isLoading, type, ...props }: Record<string, unknown>) =>
-      React.createElement(
-        'button',
-        {
-          onClick: onPress as (() => void) | undefined,
-          disabled: isDisabled || isLoading,
-          type: type || 'button',
-          'data-testid': props['data-testid'],
-        },
-        isLoading ? 'Loading...' : children as ReactNode,
-      ),
-    Input: ({ label, value, onChange, placeholder, type, autoComplete }: Record<string, unknown>) =>
-      React.createElement('input', {
-        'aria-label': label as string,
-        value: value as string,
-        onChange: onChange as React.ChangeEventHandler<HTMLInputElement>,
-        placeholder: placeholder as string,
-        type: type as string,
-        autoComplete: autoComplete as string,
-      }),
-    Checkbox: ({ children, isSelected, onValueChange }: Record<string, unknown>) =>
-      React.createElement(
-        'label',
-        null,
-        React.createElement('input', {
-          type: 'checkbox',
-          checked: isSelected as boolean,
-          onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-            (onValueChange as (v: boolean) => void)?.(e.target.checked),
-        }),
-        children as ReactNode,
-      ),
-    Divider: () => React.createElement('hr'),
-    Select: ({ children }: Record<string, unknown>) =>
-      React.createElement('div', { 'data-testid': 'select' }, children as ReactNode),
-    SelectItem: ({ children }: Record<string, unknown>) =>
-      React.createElement('div', null, children as ReactNode),
-      };
 });
 
 // ── Mock lucide-react icons ─────────────────────────────────────────────────

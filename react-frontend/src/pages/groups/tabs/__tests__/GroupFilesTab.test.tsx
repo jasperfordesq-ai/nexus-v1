@@ -42,6 +42,7 @@ vi.mock('@/contexts', () => ({
 
 vi.mock('@/lib/helpers', () => ({
   formatRelativeTime: () => 'just now',
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
 }));
 
 import { GroupFilesTab } from '../GroupFilesTab';

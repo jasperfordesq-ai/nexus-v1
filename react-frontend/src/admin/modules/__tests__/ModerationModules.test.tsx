@@ -94,6 +94,7 @@ vi.mock('@/contexts/TenantContext', () => ({
 
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: vi.fn((url: string) => url || '/default.png'),
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
   formatRelativeTime: vi.fn(() => '2 hours ago'),
   resolveAssetUrl: vi.fn((url: string) => url || ''),
 }));

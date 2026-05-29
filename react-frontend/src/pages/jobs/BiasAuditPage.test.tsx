@@ -8,6 +8,7 @@ import { render, screen, waitFor } from '@/test/test-utils';
 import type { ReactNode } from 'react';
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({
     t: (key: string, opts?: Record<string, unknown>) =>
       (opts?.fallbackValue as string | undefined) ?? key,

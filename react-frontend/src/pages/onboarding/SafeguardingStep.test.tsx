@@ -48,9 +48,7 @@ vi.mock('@/contexts/ToastContext', () => ({
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
-vi.mock('@/components/ui', () => ({
-  GlassCard: ({ children, ...props }: Record<string, unknown>) => <div {...props}>{children}</div>,
-}));
+vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
 
 vi.mock('@/lib/motion', () => {
   return {

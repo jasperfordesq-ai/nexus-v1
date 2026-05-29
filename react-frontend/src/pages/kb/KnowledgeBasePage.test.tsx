@@ -44,6 +44,7 @@ vi.mock('@/hooks', () => ({
 }));
 
 vi.mock('@/lib/helpers', () => ({
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
   formatRelativeTime: vi.fn(() => '2 hours ago'),
 }));
 
@@ -72,29 +73,7 @@ vi.mock('@/contexts/TenantContext', () => ({
   TenantProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-vi.mock('@/components/ui', () => ({
-  GlassCard: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div data-testid="glass-card" className={className}>{children}</div>
-  ),
-  GlassButton: ({ children }: Record<string, unknown>) => children as never,
-  GlassInput: () => null,
-  BackToTop: () => null,
-  AlgorithmLabel: () => null,
-  ImagePlaceholder: () => null,
-  DynamicIcon: () => null,
-  ICON_MAP: {},
-  ICON_NAMES: [],
-  ListingSkeleton: () => null,
-  MemberCardSkeleton: () => null,
-  StatCardSkeleton: () => null,
-  EventCardSkeleton: () => null,
-  GroupCardSkeleton: () => null,
-  ConversationSkeleton: () => null,
-  ExchangeCardSkeleton: () => null,
-  NotificationSkeleton: () => null,
-  ProfileHeaderSkeleton: () => null,
-  SkeletonList: () => null,
-}));
+vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
 
 vi.mock('@/components/feedback', () => ({
   EmptyState: ({ title, description, action }: { title: string; description?: string; action?: React.ReactNode }) => (

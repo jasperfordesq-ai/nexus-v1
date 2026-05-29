@@ -46,23 +46,7 @@ vi.mock('@/contexts', () => ({
 
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
-// Mock the DynamicIcon and ICON_MAP/ICON_NAMES from @/components/ui
-// vi.mock is hoisted, so we cannot reference top-level variables. Define everything inline.
-vi.mock('@/components/ui', () => {
-  const IconStub = (props: Record<string, unknown>) => <span data-testid="mock-icon" {...props} />;
-  return {
-    ICON_MAP: {
-      Home: IconStub,
-      Users: IconStub,
-      Settings: IconStub,
-      Search: IconStub,
-    } as Record<string, typeof IconStub>,
-    ICON_NAMES: ['Home', 'Users', 'Settings', 'Search'],
-    DynamicIcon: ({ name, ...props }: { name: string } & Record<string, unknown>) => (
-      <span data-testid={`dynamic-icon-${name}`} {...props} />
-    ),
-  };
-});
+vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
 
 import { IconPicker } from '../IconPicker';
 

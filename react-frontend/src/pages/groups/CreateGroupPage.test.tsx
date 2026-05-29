@@ -51,6 +51,7 @@ vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({
   resolveAssetUrl: vi.fn((url) => url || null),
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
 }));
 
 vi.mock('react-router-dom', async () => {
@@ -67,30 +68,7 @@ vi.mock('@/lib/motion', async () => {
   return framerMotionMock;
 });
 
-vi.mock('@/components/ui', () => ({
-  GlassCard: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div className={className}>{children}</div>
-  ),
-
-  GlassButton: ({ children }: Record<string, unknown>) => children as never,
-  GlassInput: () => null,
-  BackToTop: () => null,
-  AlgorithmLabel: () => null,
-  ImagePlaceholder: () => null,
-  DynamicIcon: () => null,
-  ICON_MAP: {},
-  ICON_NAMES: [],
-  ListingSkeleton: () => null,
-  MemberCardSkeleton: () => null,
-  StatCardSkeleton: () => null,
-  EventCardSkeleton: () => null,
-  GroupCardSkeleton: () => null,
-  ConversationSkeleton: () => null,
-  ExchangeCardSkeleton: () => null,
-  NotificationSkeleton: () => null,
-  ProfileHeaderSkeleton: () => null,
-  SkeletonList: () => null,
-}));
+vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
 
 vi.mock('@/components/navigation', () => ({
   Breadcrumbs: ({ items }: { items: { label: string }[] }) => (

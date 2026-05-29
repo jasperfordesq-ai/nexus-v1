@@ -73,6 +73,7 @@ vi.mock('@/lib/api', () => ({
 
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: (url: string | null | undefined) => url || '/default-avatar.png',
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
 }));
 
 import { ReviewModal } from '../ReviewModal';

@@ -88,6 +88,7 @@ vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: (url: string | null) => url ?? '',
   formatRelativeTime: (d: string) => d,
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
 }));
 
 import { FederationMessagesPage } from './FederationMessagesPage';

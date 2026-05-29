@@ -26,6 +26,7 @@ vi.mock('@/lib/helpers', () => ({
   formatRelativeTime: vi.fn(() => '2 hours ago'),
   resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
   resolveAssetUrl: vi.fn((url) => url || ''),
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
 }));
 
 vi.mock('@/components/feedback', () => ({
@@ -49,30 +50,7 @@ vi.mock('@/lib/motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-vi.mock('@/components/ui', () => ({
-  GlassCard: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div className={className}>{children}</div>
-  ),
-
-  GlassButton: ({ children }: Record<string, unknown>) => children as never,
-  GlassInput: () => null,
-  BackToTop: () => null,
-  AlgorithmLabel: () => null,
-  ImagePlaceholder: () => null,
-  DynamicIcon: () => null,
-  ICON_MAP: {},
-  ICON_NAMES: [],
-  ListingSkeleton: () => null,
-  MemberCardSkeleton: () => null,
-  StatCardSkeleton: () => null,
-  EventCardSkeleton: () => null,
-  GroupCardSkeleton: () => null,
-  ConversationSkeleton: () => null,
-  ExchangeCardSkeleton: () => null,
-  NotificationSkeleton: () => null,
-  ProfileHeaderSkeleton: () => null,
-  SkeletonList: () => null,
-}));
+vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
 
 import { ActivityDashboardPage } from './ActivityDashboardPage';
 import { api } from '@/lib/api';

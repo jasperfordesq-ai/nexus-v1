@@ -66,38 +66,14 @@ vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
   resolveAssetUrl: vi.fn((url) => url || ''),
   formatRelativeTime: vi.fn(() => '2 hours ago'),
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
 }));
 
 vi.mock('@/components/seo', () => ({
   PageMeta: () => null,
 }));
 
-vi.mock('@/components/ui', () => ({
-  GlassCard: ({ children, className, ...props }: Record<string, unknown>) => (
-    <div className={`glass-card ${className || ''}`} {...props}>{children as React.ReactNode}</div>
-  ),
-
-  GlassButton: ({ children }: Record<string, unknown>) => children as never,
-  GlassInput: () => null,
-  BackToTop: () => null,
-  AlgorithmLabel: () => null,
-  ImagePlaceholder: () => null,
-  DynamicIcon: () => null,
-  ICON_MAP: {},
-  ICON_NAMES: [],
-  ListingSkeleton: () => null,
-  MemberCardSkeleton: () => null,
-  StatCardSkeleton: () => null,
-  EventCardSkeleton: () => null,
-  GroupCardSkeleton: () => null,
-  ConversationSkeleton: () => null,
-  ExchangeCardSkeleton: () => null,
-  NotificationSkeleton: () => null,
-  ProfileHeaderSkeleton: () => null,
-  SkeletonList: () => null,
-  ConfettiCelebration: () => null,
-  BottomSheet: () => null,
-}));
+vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
 
 vi.mock('@/lib/motion', () => {  const motionProps = new Set(['variants', 'initial', 'animate', 'layout', 'transition', 'exit', 'whileHover', 'whileTap', 'whileInView', 'viewport']);  const filterMotion = (props: Record<string, unknown>) => {    const filtered: Record<string, unknown> = {};    for (const [k, v] of Object.entries(props)) {      if (!motionProps.has(k)) filtered[k] = v;    }    return filtered;  };  return {    motion: {      div: ({ children, ...props }: Record<string, unknown>) => <div {...filterMotion(props)}>{children}</div>,    },    AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,  };});
 

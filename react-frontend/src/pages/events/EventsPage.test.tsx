@@ -55,6 +55,7 @@ vi.mock('@/lib/helpers', () => ({
   formatDateTime: vi.fn(() => '10:00'),
   formatDateValue: vi.fn(() => 'April 24, 2026'),
   formatMonthShort: vi.fn(() => 'Apr'),
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
 }));
 vi.mock('@/lib/map-config', () => ({ MAPS_ENABLED: false }));
 vi.mock('@/components/seo', () => ({ PageMeta: () => null }));

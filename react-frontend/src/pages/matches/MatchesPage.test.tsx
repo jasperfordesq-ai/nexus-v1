@@ -24,6 +24,7 @@ vi.mock('@/lib/api', () => ({
 
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
   resolveAvatarUrl: (url: string | null) => url || '/default-avatar.png',
   formatRelativeTime: (d: string) => d,
 }));
@@ -66,29 +67,7 @@ vi.mock('@/components/feedback', () => ({
     </div>
   ),
 }));
-vi.mock('@/components/ui', () => ({
-  GlassCard: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div data-testid="glass-card" className={className}>{children}</div>
-  ),
-  AlgorithmLabel: () => <span data-testid="algorithm-label" />,
-  GlassButton: ({ children }: Record<string, unknown>) => children as never,
-  GlassInput: () => null,
-  BackToTop: () => null,
-  ImagePlaceholder: () => null,
-  DynamicIcon: () => null,
-  ICON_MAP: {},
-  ICON_NAMES: [],
-  ListingSkeleton: () => null,
-  MemberCardSkeleton: () => null,
-  StatCardSkeleton: () => null,
-  EventCardSkeleton: () => null,
-  GroupCardSkeleton: () => null,
-  ConversationSkeleton: () => null,
-  ExchangeCardSkeleton: () => null,
-  NotificationSkeleton: () => null,
-  ProfileHeaderSkeleton: () => null,
-  SkeletonList: () => null,
-}));
+vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
 
 vi.mock('@/lib/motion', () => {
   const motionProps = new Set(['variants', 'initial', 'animate', 'layout', 'transition', 'exit', 'whileHover', 'whileTap', 'whileInView', 'viewport']);

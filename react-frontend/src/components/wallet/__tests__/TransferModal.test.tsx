@@ -50,6 +50,7 @@ vi.mock('@/lib/logger', () => ({
 
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: vi.fn((url: string | null) => url || ''),
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
 }));
 
 vi.mock('../CategorySelect', () => ({

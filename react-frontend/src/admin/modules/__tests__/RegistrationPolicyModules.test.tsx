@@ -34,6 +34,8 @@ vi.mock('@/lib/api', () => ({
   tokenManager: { getTenantId: vi.fn(), getAccessToken: vi.fn() },
 }));
 
+vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
+
 vi.mock('@/contexts', () => ({
   useAuth: vi.fn(() => ({
     user: { id: 1, first_name: 'Admin', last_name: 'User', name: 'Admin User', role: 'admin', is_super_admin: true, tenant_id: 2 },

@@ -45,6 +45,7 @@ vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({
   formatRelativeTime: vi.fn(() => '2 hours ago'),
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
 }));
 vi.mock('@/components/feedback', () => ({
   EmptyState: ({ title }: { title: string }) => <div data-testid="empty-state">{title}</div>,

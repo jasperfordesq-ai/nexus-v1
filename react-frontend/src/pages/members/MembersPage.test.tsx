@@ -52,6 +52,7 @@ vi.mock('@/contexts', () => ({
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
   resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
 }));
 vi.mock('@/lib/map-config', () => ({ MAPS_ENABLED: false }));

@@ -53,6 +53,7 @@ vi.mock("react-i18next", () => ({
       return template.replace(/\{\{(\w+)\}\}/g, (_: string, k: string) => String(opts?.[k] ?? ""));
     },
   }),
+  initReactI18next: { type: '3rdParty', init: () => {} },
 }));
 
 vi.mock("@/lib/api", () => ({
@@ -83,30 +84,7 @@ vi.mock("@/contexts", () => ({
   useTenant: () => ({ tenant: { id: 2, name: 'Test', slug: 'test', tagline: null }, branding: { name: 'Test', logo_url: null }, tenantSlug: 'test', tenantPath: (p) => '/test' + p, isLoading: false, hasFeature: vi.fn(() => true), hasModule: vi.fn(() => true) }),
 }));
 
-vi.mock("@/components/ui", () => ({
-  GlassCard: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div data-testid="glass-card" className={className}>{children}</div>
-  ),
-
-  GlassButton: ({ children }: Record<string, unknown>) => children as never,
-  GlassInput: () => null,
-  BackToTop: () => null,
-  AlgorithmLabel: () => null,
-  ImagePlaceholder: () => null,
-  DynamicIcon: () => null,
-  ICON_MAP: {},
-  ICON_NAMES: [],
-  ListingSkeleton: () => null,
-  MemberCardSkeleton: () => null,
-  StatCardSkeleton: () => null,
-  EventCardSkeleton: () => null,
-  GroupCardSkeleton: () => null,
-  ConversationSkeleton: () => null,
-  ExchangeCardSkeleton: () => null,
-  NotificationSkeleton: () => null,
-  ProfileHeaderSkeleton: () => null,
-  SkeletonList: () => null,
-}));
+vi.mock("@/components/ui", async () => (await import("@/test/uiMock")).uiMock);
 
 vi.mock("@/components/feedback", () => ({
   EmptyState: ({ title, description }: { title: string; description?: string }) => (

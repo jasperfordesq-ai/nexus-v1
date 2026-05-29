@@ -32,6 +32,7 @@ vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
 vi.mock('@/lib/helpers', () => ({
   resolveAssetUrl: vi.fn((url) => url || ''),
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
 }));
 
 vi.mock('@/components/seo', () => ({ PageMeta: () => null }));
@@ -42,30 +43,7 @@ vi.mock('./RelatedPages', () => ({
   RelatedPages: () => <div data-testid="related-pages" />,
 }));
 
-vi.mock('@/components/ui', () => ({
-  GlassCard: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div className={className}>{children}</div>
-  ),
-
-  GlassButton: ({ children }: Record<string, unknown>) => children as never,
-  GlassInput: () => null,
-  BackToTop: () => null,
-  AlgorithmLabel: () => null,
-  ImagePlaceholder: () => null,
-  DynamicIcon: () => null,
-  ICON_MAP: {},
-  ICON_NAMES: [],
-  ListingSkeleton: () => null,
-  MemberCardSkeleton: () => null,
-  StatCardSkeleton: () => null,
-  EventCardSkeleton: () => null,
-  GroupCardSkeleton: () => null,
-  ConversationSkeleton: () => null,
-  ExchangeCardSkeleton: () => null,
-  NotificationSkeleton: () => null,
-  ProfileHeaderSkeleton: () => null,
-  SkeletonList: () => null,
-}));
+vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');

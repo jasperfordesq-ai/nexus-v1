@@ -13,6 +13,7 @@ vi.mock('react-i18next', () => ({
     t: (key: string) => key,
     i18n: { changeLanguage: vi.fn() },
   }),
+  initReactI18next: { type: '3rdParty', init: () => {} },
 }));
 
 vi.mock('@/contexts', () => ({
@@ -33,6 +34,7 @@ vi.mock('@/contexts', () => ({
 
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: (url: string | null) => url ?? '',
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
 }));
 
 vi.mock('@/components/location', () => ({

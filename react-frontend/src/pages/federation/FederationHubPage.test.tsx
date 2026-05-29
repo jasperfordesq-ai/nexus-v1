@@ -66,30 +66,10 @@ vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
   formatRelativeTime: vi.fn(() => '2 hours ago'),
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
 }));
 
-vi.mock('@/components/ui', () => ({
-  GlassCard: ({ children, ...props }: Record<string, unknown>) => <div {...props}>{children}</div>,
-
-  GlassButton: ({ children }: Record<string, unknown>) => children as never,
-  GlassInput: () => null,
-  BackToTop: () => null,
-  AlgorithmLabel: () => null,
-  ImagePlaceholder: () => null,
-  DynamicIcon: () => null,
-  ICON_MAP: {},
-  ICON_NAMES: [],
-  ListingSkeleton: () => null,
-  MemberCardSkeleton: () => null,
-  StatCardSkeleton: () => null,
-  EventCardSkeleton: () => null,
-  GroupCardSkeleton: () => null,
-  ConversationSkeleton: () => null,
-  ExchangeCardSkeleton: () => null,
-  NotificationSkeleton: () => null,
-  ProfileHeaderSkeleton: () => null,
-  SkeletonList: () => null,
-}));
+vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
 
 vi.mock('@/components/navigation', () => ({
   Breadcrumbs: ({ items }: { items: { label: string }[] }) => (
