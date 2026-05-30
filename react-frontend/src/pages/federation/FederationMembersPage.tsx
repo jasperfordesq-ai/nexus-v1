@@ -1,4 +1,4 @@
-import { Autocomplete, AutocompleteItem, GlassCard, Button, Chip, Spinner, Input, SearchField, Avatar } from '@/components/ui';
+import { Autocomplete, AutocompleteItem, GlassCard, Button, ToggleButton, ToggleButtonGroup, Chip, Spinner, Input, SearchField, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -342,31 +342,31 @@ export function FederationMembersPage() {
 
           {/* Row 2: Service reach chips + Skills filter */}
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-            <div className="flex flex-wrap gap-2" role="group" aria-label={t('members.service_reach_filter')}>
+            <ToggleButtonGroup
+              aria-label={t('members.service_reach_filter')}
+              selectionMode="single"
+              disallowEmptySelection
+              isDetached
+              size="sm"
+              selectedKeys={new Set([serviceReach])}
+              onSelectionChange={(keys) => { const [k] = Array.from(keys); if (k) setServiceReach(k as ServiceReachFilter); }}
+              className="flex flex-wrap gap-2"
+            >
               {SERVICE_REACH_OPTIONS.map((option) => {
-                const isSelected = serviceReach === option.key;
                 const Icon = option.icon;
                 return (
-                  <Chip
+                  <ToggleButton
                     key={option.key}
-                    variant={isSelected ? 'solid' : 'flat'}
-                    className={
-                      isSelected
-                        ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white cursor-pointer'
-                        : 'bg-theme-elevated text-theme-muted cursor-pointer hover:bg-theme-hover'
-                    }
-                    startContent={<Icon className="w-3.5 h-3.5" aria-hidden="true" />}
-                    onClick={() => setServiceReach(option.key)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setServiceReach(option.key); } }}
-                    aria-pressed={isSelected}
+                    id={option.key}
+                    variant="ghost"
+                    className="bg-theme-elevated text-theme-muted hover:bg-theme-hover data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-indigo-500 data-[selected=true]:to-purple-600 data-[selected=true]:text-white"
                   >
+                    <Icon className="w-3.5 h-3.5" aria-hidden="true" />
                     {t(`members.reach_${option.key}`)}
-                  </Chip>
+                  </ToggleButton>
                 );
               })}
-            </div>
+            </ToggleButtonGroup>
 
             <div className="flex-1 w-full sm:w-auto">
               <Input

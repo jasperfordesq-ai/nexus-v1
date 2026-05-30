@@ -1,4 +1,4 @@
-import { Autocomplete, AutocompleteItem, GlassCard, Button, Chip, SearchField, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, CardRowsSkeleton } from '@/components/ui';
+import { Autocomplete, AutocompleteItem, GlassCard, Button, ToggleButton, ToggleButtonGroup, Chip, SearchField, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, CardRowsSkeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -274,34 +274,32 @@ export function FederationListingsPage() {
           </Autocomplete>
         </div>
 
-        {/* Type Chips */}
-        <div className="flex flex-wrap gap-2 mt-3" role="group" aria-label={t('listings.filter_by_type')}>
+        {/* Type filter — single-select ToggleButtonGroup */}
+        <ToggleButtonGroup
+          aria-label={t('listings.filter_by_type')}
+          selectionMode="single"
+          disallowEmptySelection
+          isDetached
+          size="sm"
+          selectedKeys={new Set([selectedType])}
+          onSelectionChange={(keys) => { const [k] = Array.from(keys); if (k) setSelectedType(k as typeof selectedType); }}
+          className="flex flex-wrap gap-2 mt-3"
+        >
           {[
             { key: 'all' as const, label: t('listings.type_all') },
             { key: 'offer' as const, label: t('listings.type_offers') },
             { key: 'request' as const, label: t('listings.type_requests') },
-          ].map((item) => {
-            const isActive = selectedType === item.key;
-            return (
-              <Chip
-                key={item.key}
-                variant={isActive ? 'solid' : 'flat'}
-                className={
-                  isActive
-                    ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white cursor-pointer'
-                    : 'bg-theme-elevated text-theme-muted cursor-pointer hover:bg-theme-hover'
-                }
-                onClick={() => setSelectedType(item.key)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedType(item.key); } }}
-                aria-pressed={isActive}
-              >
-                {item.label}
-              </Chip>
-            );
-          })}
-        </div>
+          ].map((item) => (
+            <ToggleButton
+              key={item.key}
+              id={item.key}
+              variant="ghost"
+              className="bg-theme-elevated text-theme-muted hover:bg-theme-hover data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-indigo-500 data-[selected=true]:to-purple-600 data-[selected=true]:text-white"
+            >
+              {item.label}
+            </ToggleButton>
+          ))}
+        </ToggleButtonGroup>
       </GlassCard>
 
       {/* Loading State */}
@@ -603,11 +601,8 @@ function FederatedListingCard({ listing, onViewDetails }: FederatedListingCardPr
 
   return (
     <GlassCard
-      role="button"
-      tabIndex={0}
       className="p-5 md:hover:scale-[1.02] transition-transform h-full flex flex-col cursor-pointer"
       onClick={onViewDetails}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onViewDetails(); } }}
     >
       {/* Image or Type Icon */}
       {imageSrc ? (

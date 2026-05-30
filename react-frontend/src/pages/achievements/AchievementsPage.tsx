@@ -1745,15 +1745,7 @@ export function AchievementsPage() {
                             className={`flex h-full min-h-[180px] flex-col p-4 text-center transition-transform motion-safe:hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-accent/40 cursor-pointer ${
                               !badge.earned_at && badge.earned === false ? 'opacity-40' : ''
                             }`}
-                            role="button"
-                            tabIndex={0}
                             onClick={() => setSelectedBadgeKey(badge.badge_key)}
-                            onKeyDown={(e: React.KeyboardEvent) => {
-                              if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                                setSelectedBadgeKey(badge.badge_key);
-                              }
-                            }}
                             aria-label={badge.name}
                           >
                             <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center text-2xl">
