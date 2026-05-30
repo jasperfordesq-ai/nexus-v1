@@ -181,5 +181,36 @@
     "error": "Algo deu errado. Por favor, tente novamente.",
     "no_courses": "Ainda não há cursos.",
     "no_instructors": "Nenhum instrutor concedido ainda."
+  },
+  "builder": {
+    "add_section": "Adicionar seção",
+    "add_lesson": "Adicionar lição",
+    "new_section": "Nova seção",
+    "new_lesson": "Nova lição",
+    "section_name": "Título da seção",
+    "lesson_name": "Título da lição",
+    "content_type": "Tipo de conteúdo",
+    "body": "Conteúdo da lição",
+    "video_url": "URL do vídeo",
+    "embed_url": "URL incorporado",
+    "attachment_url": "PDF / URL do arquivo",
+    "free_preview": "Aula prévia gratuita",
+    "save_lesson": "Salvar lição",
+    "lesson_saved": "Lição salva",
+    "save_error": "Não foi possível salvar. Por favor, tente novamente.",
+    "delete_section": "Excluir seção",
+    "delete_lesson": "Excluir lição",
+    "move_up": "Subir",
+    "move_down": "Mover para baixo",
+    "untitled_lesson": "Lição sem título",
+    "empty": "Nenhuma seção ainda. Adicione sua primeira seção para começar a construir o currículo.",
+    "done": "Feito",
+    "preview_course": "Visualização"
+  },
+  "lesson_content": {
+    "text": "Texto",
+    "video": "Vídeo",
+    "pdf": "PDF",
+    "embed": "Incorporar"
   }
 }

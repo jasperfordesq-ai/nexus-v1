@@ -181,5 +181,36 @@
     "error": "Quelque chose s'est mal passé. Veuillez réessayer.",
     "no_courses": "Pas encore de cours.",
     "no_instructors": "Aucun instructeur n'est encore accordé."
+  },
+  "builder": {
+    "add_section": "Ajouter une rubrique",
+    "add_lesson": "Ajouter une leçon",
+    "new_section": "Nouvelle rubrique",
+    "new_lesson": "Nouvelle leçon",
+    "section_name": "Titre de la section",
+    "lesson_name": "Titre de la leçon",
+    "content_type": "Type de contenu",
+    "body": "Contenu de la leçon",
+    "video_url": "URL de la vidéo",
+    "embed_url": "Intégrer l'URL",
+    "attachment_url": "PDF / URL du fichier",
+    "free_preview": "Leçon d'avant-première gratuite",
+    "save_lesson": "Enregistrer la leçon",
+    "lesson_saved": "Leçon enregistrée",
+    "save_error": "Impossible d'enregistrer. Veuillez réessayer.",
+    "delete_section": "Supprimer la rubrique",
+    "delete_lesson": "Supprimer la leçon",
+    "move_up": "Monter",
+    "move_down": "Descendre",
+    "untitled_lesson": "Leçon sans titre",
+    "empty": "Aucune section pour l'instant. Ajoutez votre première section pour commencer à construire le programme.",
+    "done": "Fait",
+    "preview_course": "Aperçu"
+  },
+  "lesson_content": {
+    "text": "Texte",
+    "video": "Vidéo",
+    "pdf": "PDF",
+    "embed": "Intégrer"
   }
 }

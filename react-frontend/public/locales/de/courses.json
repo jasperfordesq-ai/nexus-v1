@@ -181,5 +181,36 @@
     "error": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut.",
     "no_courses": "Noch keine Kurse.",
     "no_instructors": "Noch keine Lehrkräfte vergeben."
+  },
+  "builder": {
+    "add_section": "Abschnitt hinzufügen",
+    "add_lesson": "Lektion hinzufügen",
+    "new_section": "Neuer Abschnitt",
+    "new_lesson": "Neue Lektion",
+    "section_name": "Abschnittstitel",
+    "lesson_name": "Titel der Lektion",
+    "content_type": "Inhaltstyp",
+    "body": "Unterrichtsinhalte",
+    "video_url": "Video-URL",
+    "embed_url": "URL einbetten",
+    "attachment_url": "PDF / Datei-URL",
+    "free_preview": "Kostenlose Vorschaustunde",
+    "save_lesson": "Lektion speichern",
+    "lesson_saved": "Lektion gespeichert",
+    "save_error": "Konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+    "delete_section": "Abschnitt löschen",
+    "delete_lesson": "Lektion löschen",
+    "move_up": "Bewegen Sie sich nach oben",
+    "move_down": "Bewegen Sie sich nach unten",
+    "untitled_lesson": "Lektion ohne Titel",
+    "empty": "Noch keine Abschnitte. Fügen Sie Ihren ersten Abschnitt hinzu, um mit der Erstellung des Lehrplans zu beginnen.",
+    "done": "Erledigt",
+    "preview_course": "Vorschau"
+  },
+  "lesson_content": {
+    "text": "Text",
+    "video": "Video",
+    "pdf": "PDF",
+    "embed": "Einbetten"
   }
 }

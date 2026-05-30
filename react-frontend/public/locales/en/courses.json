@@ -181,5 +181,36 @@
     "error": "Something went wrong. Please try again.",
     "no_courses": "No courses yet.",
     "no_instructors": "No instructors granted yet."
+  },
+  "builder": {
+    "add_section": "Add section",
+    "add_lesson": "Add lesson",
+    "new_section": "New section",
+    "new_lesson": "New lesson",
+    "section_name": "Section title",
+    "lesson_name": "Lesson title",
+    "content_type": "Content type",
+    "body": "Lesson content",
+    "video_url": "Video URL",
+    "embed_url": "Embed URL",
+    "attachment_url": "PDF / file URL",
+    "free_preview": "Free preview lesson",
+    "save_lesson": "Save lesson",
+    "lesson_saved": "Lesson saved",
+    "save_error": "Could not save. Please try again.",
+    "delete_section": "Delete section",
+    "delete_lesson": "Delete lesson",
+    "move_up": "Move up",
+    "move_down": "Move down",
+    "untitled_lesson": "Untitled lesson",
+    "empty": "No sections yet. Add your first section to start building the curriculum.",
+    "done": "Done",
+    "preview_course": "Preview"
+  },
+  "lesson_content": {
+    "text": "Text",
+    "video": "Video",
+    "pdf": "PDF",
+    "embed": "Embed"
   }
 }

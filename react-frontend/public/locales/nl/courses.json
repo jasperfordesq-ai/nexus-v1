@@ -181,5 +181,36 @@
     "error": "Er is iets misgegaan. Probeer het opnieuw.",
     "no_courses": "Nog geen cursussen.",
     "no_instructors": "Nog geen instructeurs toegekend."
+  },
+  "builder": {
+    "add_section": "Sectie toevoegen",
+    "add_lesson": "Les toevoegen",
+    "new_section": "Nieuwe sectie",
+    "new_lesson": "Nieuwe les",
+    "section_name": "Sectietitel",
+    "lesson_name": "Titel van de les",
+    "content_type": "Inhoudstype",
+    "body": "Inhoud van de les",
+    "video_url": "Video-URL",
+    "embed_url": "URL insluiten",
+    "attachment_url": "PDF / Bestands-URL",
+    "free_preview": "Gratis proefles",
+    "save_lesson": "Les opslaan",
+    "lesson_saved": "Les opgeslagen",
+    "save_error": "Kan niet opslaan. Probeer het opnieuw.",
+    "delete_section": "Sectie verwijderen",
+    "delete_lesson": "Les verwijderen",
+    "move_up": "Ga omhoog",
+    "move_down": "Ga naar beneden",
+    "untitled_lesson": "Naamloze les",
+    "empty": "Nog geen secties. Voeg uw eerste sectie toe om te beginnen met het samenstellen van het leerplan.",
+    "done": "Klaar",
+    "preview_course": "Voorbeeld"
+  },
+  "lesson_content": {
+    "text": "Tekst",
+    "video": "Video",
+    "pdf": "PDF",
+    "embed": "Insluiten"
   }
 }

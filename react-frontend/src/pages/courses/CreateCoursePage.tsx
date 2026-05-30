@@ -10,14 +10,13 @@
  */
 
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button, Card, CardBody, Input, Textarea, Select, SelectItem, Spinner } from '@/components/ui';
-import Plus from 'lucide-react/icons/plus';
-import Trash2 from 'lucide-react/icons/trash-2';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { coursesApi, type Course, type CourseCategory, type CourseSection } from '@/lib/api/courses';
+import { CourseBuilder } from '@/components/courses/CourseBuilder';
 
 const LEVELS = ['beginner', 'intermediate', 'advanced'] as const;
 const VISIBILITIES = ['public', 'members'] as const;
@@ -98,23 +97,6 @@ export default function CreateCoursePage() {
     }
   };
 
-  const addSection = async () => {
-    const res = await coursesApi.createSection(courseId, { title: t('instructor.section_title') });
-    if (res.success && res.data) setSections((s) => [...s, { ...res.data!, lessons: [] }]);
-  };
-
-  const addLesson = async (sectionId: number) => {
-    const res = await coursesApi.createLesson(courseId, { section_id: sectionId, title: t('instructor.lesson_title'), content_type: 'text' });
-    if (res.success && res.data) {
-      setSections((prev) => prev.map((s) => s.id === sectionId ? { ...s, lessons: [...(s.lessons ?? []), res.data!] } : s));
-    }
-  };
-
-  const deleteSection = async (sectionId: number) => {
-    await coursesApi.deleteSection(courseId, sectionId);
-    setSections((prev) => prev.filter((s) => s.id !== sectionId));
-  };
-
   if (loading) {
     return <div className="flex justify-center py-20" role="status" aria-busy="true"><Spinner size="lg" /></div>;
   }
@@ -147,34 +129,17 @@ export default function CreateCoursePage() {
       </Card>
 
       {isEdit && (
-        <section>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold">{t('instructor.builder')}</h2>
-            <Button size="sm" variant="tertiary" startContent={<Plus size={14} />} onPress={addSection}>{t('instructor.add_section')}</Button>
+        <>
+          <CourseBuilder courseId={courseId} initialSections={sections} />
+          <div className="mt-6 flex items-center gap-2">
+            <Button as={Link} to={tenantPath('/courses/instructor')} variant="secondary" size="sm">
+              {t('builder.done')}
+            </Button>
+            <Button as={Link} to={tenantPath(`/courses/${courseId}/learn`)} variant="tertiary" size="sm">
+              {t('builder.preview_course')}
+            </Button>
           </div>
-          <div className="flex flex-col gap-3">
-            {sections.map((section) => (
-              <Card key={section.id}>
-                <CardBody className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-semibold text-sm">{section.title}</h3>
-                    <Button isIconOnly size="sm" variant="tertiary" aria-label={t('instructor.section_title')} onPress={() => deleteSection(section.id)}>
-                      <Trash2 size={14} />
-                    </Button>
-                  </div>
-                  <ul className="flex flex-col gap-1 mb-2">
-                    {(section.lessons ?? []).map((lesson) => (
-                      <li key={lesson.id} className="text-sm text-muted">• {lesson.title}</li>
-                    ))}
-                  </ul>
-                  <Button size="sm" variant="tertiary" startContent={<Plus size={14} />} onPress={() => addLesson(section.id)}>
-                    {t('instructor.add_lesson')}
-                  </Button>
-                </CardBody>
-              </Card>
-            ))}
-          </div>
-        </section>
+        </>
       )}
     </div>
   );

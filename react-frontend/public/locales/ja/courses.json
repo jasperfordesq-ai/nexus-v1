@@ -181,5 +181,36 @@
     "error": "何か問題が発生しました。もう一度試してください。",
     "no_courses": "まだコースはありません。",
     "no_instructors": "まだ講師は決まっていません。"
+  },
+  "builder": {
+    "add_section": "セクションを追加",
+    "add_lesson": "レッスンを追加",
+    "new_section": "新しいセクション",
+    "new_lesson": "新しいレッスン",
+    "section_name": "セクションのタイトル",
+    "lesson_name": "レッスンタイトル",
+    "content_type": "コンテンツタイプ",
+    "body": "レッスン内容",
+    "video_url": "動画のURL",
+    "embed_url": "URLを埋め込む",
+    "attachment_url": "PDF / ファイルURL",
+    "free_preview": "無料プレビューレッスン",
+    "save_lesson": "レッスンを保存する",
+    "lesson_saved": "レッスンが保存されました",
+    "save_error": "保存できませんでした。もう一度試してください。",
+    "delete_section": "セクションの削除",
+    "delete_lesson": "レッスンを削除する",
+    "move_up": "上に移動",
+    "move_down": "下に移動",
+    "untitled_lesson": "無題のレッスン",
+    "empty": "まだセクションはありません。最初のセクションを追加して、カリキュラムの作成を開始します。",
+    "done": "終わり",
+    "preview_course": "プレビュー"
+  },
+  "lesson_content": {
+    "text": "文章",
+    "video": "ビデオ",
+    "pdf": "PDF",
+    "embed": "埋め込む"
   }
 }

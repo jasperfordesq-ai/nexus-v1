@@ -181,5 +181,36 @@
     "error": "Algo salió mal. Por favor inténtalo de nuevo.",
     "no_courses": "Aún no hay cursos.",
     "no_instructors": "Aún no se han concedido instructores."
+  },
+  "builder": {
+    "add_section": "Agregar sección",
+    "add_lesson": "Agregar lección",
+    "new_section": "Nueva sección",
+    "new_lesson": "Nueva lección",
+    "section_name": "Título de la sección",
+    "lesson_name": "Título de la lección",
+    "content_type": "tipo de contenido",
+    "body": "Contenido de la lección",
+    "video_url": "URL del vídeo",
+    "embed_url": "Insertar URL",
+    "attachment_url": "PDF / URL del archivo",
+    "free_preview": "Lección previa gratuita",
+    "save_lesson": "guardar lección",
+    "lesson_saved": "Lección guardada",
+    "save_error": "No se pudo guardar. Por favor inténtalo de nuevo.",
+    "delete_section": "Eliminar sección",
+    "delete_lesson": "Eliminar lección",
+    "move_up": "Subir",
+    "move_down": "Bajar",
+    "untitled_lesson": "Lección sin título",
+    "empty": "Aún no hay secciones. Agregue su primera sección para comenzar a construir el plan de estudios.",
+    "done": "Hecho",
+    "preview_course": "Avance"
+  },
+  "lesson_content": {
+    "text": "Texto",
+    "video": "Video",
+    "pdf": "PDF",
+    "embed": "Empotrar"
   }
 }

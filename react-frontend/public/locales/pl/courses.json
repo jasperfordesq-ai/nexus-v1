@@ -181,5 +181,36 @@
     "error": "Coś poszło nie tak. Spróbuj ponownie.",
     "no_courses": "Nie ma jeszcze żadnych kursów.",
     "no_instructors": "Nie przyznano jeszcze żadnych instruktorów."
+  },
+  "builder": {
+    "add_section": "Dodaj sekcję",
+    "add_lesson": "Dodaj lekcję",
+    "new_section": "Nowa sekcja",
+    "new_lesson": "Nowa lekcja",
+    "section_name": "Tytuł sekcji",
+    "lesson_name": "Tytuł lekcji",
+    "content_type": "Typ treści",
+    "body": "Treść lekcji",
+    "video_url": "Adres URL filmu",
+    "embed_url": "Osadź adres URL",
+    "attachment_url": "PDF / Adres URL pliku",
+    "free_preview": "Bezpłatna lekcja poglądowa",
+    "save_lesson": "Zapisz lekcję",
+    "lesson_saved": "Lekcja zapisana",
+    "save_error": "Nie udało się zapisać. Spróbuj ponownie.",
+    "delete_section": "Usuń sekcję",
+    "delete_lesson": "Usuń lekcję",
+    "move_up": "Podnieść",
+    "move_down": "Opuszczać",
+    "untitled_lesson": "Lekcja bez tytułu",
+    "empty": "Nie ma jeszcze sekcji. Dodaj pierwszą sekcję, aby rozpocząć tworzenie programu nauczania.",
+    "done": "Zrobione",
+    "preview_course": "Zapowiedź"
+  },
+  "lesson_content": {
+    "text": "Tekst",
+    "video": "Wideo",
+    "pdf": "PDF",
+    "embed": "Osadzać"
   }
 }

@@ -181,5 +181,36 @@
     "error": "Qualcosa è andato storto. Per favore riprova.",
     "no_courses": "Nessun corso ancora.",
     "no_instructors": "Nessun istruttore assegnato ancora."
+  },
+  "builder": {
+    "add_section": "Aggiungi sezione",
+    "add_lesson": "Aggiungi lezione",
+    "new_section": "Nuova sezione",
+    "new_lesson": "Nuova lezione",
+    "section_name": "Titolo della sezione",
+    "lesson_name": "Titolo della lezione",
+    "content_type": "Tipo di contenuto",
+    "body": "Contenuto della lezione",
+    "video_url": "URL del video",
+    "embed_url": "Incorpora l'URL",
+    "attachment_url": "PDF / URL del file",
+    "free_preview": "Lezione in anteprima gratuita",
+    "save_lesson": "Salva lezione",
+    "lesson_saved": "Lezione salvata",
+    "save_error": "Impossibile salvare. Per favore riprova.",
+    "delete_section": "Elimina sezione",
+    "delete_lesson": "Elimina lezione",
+    "move_up": "Vai su",
+    "move_down": "Spostati giù",
+    "untitled_lesson": "Lezione senza titolo",
+    "empty": "Nessuna sezione ancora. Aggiungi la tua prima sezione per iniziare a costruire il curriculum.",
+    "done": "Fatto",
+    "preview_course": "Anteprima"
+  },
+  "lesson_content": {
+    "text": "Testo",
+    "video": "Video",
+    "pdf": "PDF",
+    "embed": "Incorpora"
   }
 }

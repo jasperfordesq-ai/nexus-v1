@@ -181,5 +181,36 @@
     "error": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
     "no_courses": "لا توجد دورات بعد.",
     "no_instructors": "لم يتم منح أي مدربين حتى الآن."
+  },
+  "builder": {
+    "add_section": "إضافة قسم",
+    "add_lesson": "أضف الدرس",
+    "new_section": "قسم جديد",
+    "new_lesson": "درس جديد",
+    "section_name": "عنوان القسم",
+    "lesson_name": "عنوان الدرس",
+    "content_type": "نوع المحتوى",
+    "body": "محتوى الدرس",
+    "video_url": "عنوان URL للفيديو",
+    "embed_url": "تضمين عنوان URL",
+    "attachment_url": "PDF / عنوان URL للملف",
+    "free_preview": "درس معاينة مجاني",
+    "save_lesson": "حفظ الدرس",
+    "lesson_saved": "تم حفظ الدرس",
+    "save_error": "لا يمكن الحفظ. يرجى المحاولة مرة أخرى.",
+    "delete_section": "حذف القسم",
+    "delete_lesson": "حذف الدرس",
+    "move_down": "تحرك للأسفل",
+    "untitled_lesson": "درس بدون عنوان",
+    "empty": "لا توجد أقسام بعد. أضف القسم الأول للبدء في بناء المنهج.",
+    "done": "منتهي",
+    "preview_course": "معاينة",
+    "move_up": "تحرك للأعلى"
+  },
+  "lesson_content": {
+    "text": "نص",
+    "video": "فيديو",
+    "pdf": "PDF",
+    "embed": "تضمين"
   }
 }

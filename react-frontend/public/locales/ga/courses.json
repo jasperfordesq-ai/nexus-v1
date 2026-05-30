@@ -181,5 +181,36 @@
     "error": "Chuaigh rud éigin mícheart. Bain triail eile as.",
     "no_courses": "Níl cúrsaí ar bith fós.",
     "no_instructors": "Níl aon teagascóirí ceadaithe go fóill."
+  },
+  "builder": {
+    "add_section": "Cuir alt leis",
+    "add_lesson": "Cuir ceacht leis",
+    "new_section": "Alt nua",
+    "new_lesson": "Ceacht nua",
+    "section_name": "Teideal ailt",
+    "lesson_name": "Teideal an cheachta",
+    "content_type": "Cineál ábhair",
+    "body": "Ábhar an cheachta",
+    "video_url": "URL físeán",
+    "embed_url": "URL a leabú",
+    "attachment_url": "PDF / URL an chomhaid",
+    "free_preview": "Teagaisc réamhamhairc saor in aisce,",
+    "save_lesson": "Sábháil ceacht",
+    "lesson_saved": "Ceacht a shábháil",
+    "save_error": "Níorbh fhéidir a shábháil. Bain triail eile as.",
+    "delete_section": "Scrios alt",
+    "delete_lesson": "Scrios ceacht",
+    "move_up": "Bog suas",
+    "move_down": "Bog síos",
+    "untitled_lesson": "Ceacht gan teideal",
+    "empty": "Níl aon rannóg fós. Cuir do chéad chuid leis le tosú ar an gcuraclam a thógáil.",
+    "done": "Déanta",
+    "preview_course": "Réamhamharc"
+  },
+  "lesson_content": {
+    "text": "Téacs",
+    "video": "Físeán",
+    "pdf": "PDF",
+    "embed": "Leabú"
   }
 }
