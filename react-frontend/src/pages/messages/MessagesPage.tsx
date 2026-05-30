@@ -27,7 +27,7 @@ import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import UsersIcon from 'lucide-react/icons/users';
 import { CreateGroupModal } from './components/CreateGroupModal';
-import { GlassCard, Button, Chip, Input, SearchField, Modal, ModalContent, ModalHeader, ModalBody, Avatar, Tabs, Tab, Skeleton, Spinner } from '@/components/ui';
+import { GlassCard, Button, Chip, SearchField, Modal, ModalContent, ModalHeader, ModalBody, Avatar, Tabs, Tab, Skeleton, Spinner } from '@/components/ui';
 import { PresenceIndicator } from '@/components/social';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, usePusherOptional, useToast, useTenant } from '@/contexts';
@@ -549,13 +549,13 @@ export function MessagesPage() {
         <ModalContent>
           <ModalHeader className="text-theme-primary">{t('new_message')}</ModalHeader>
           <ModalBody>
-            <Input
+            <SearchField
               placeholder={t('member_search_placeholder')}
               value={userSearchQuery}
-              onChange={(e) => setUserSearchQuery(e.target.value)}
+              onValueChange={setUserSearchQuery}
               startContent={<Search className="h-4 w-4 text-theme-subtle" aria-hidden="true" />}
               aria-label={t('member_search_placeholder')}
-              endContent={isSearchingUsers && <Spinner size="sm" aria-hidden="true" />}
+              endContent={isSearchingUsers ? <Spinner size="sm" aria-hidden="true" /> : null}
               classNames={{
                 input: 'bg-transparent text-theme-primary placeholder:text-theme-subtle',
                 inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',

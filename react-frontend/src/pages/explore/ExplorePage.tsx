@@ -1030,14 +1030,14 @@ export default function ExplorePage() {
                           {group.description}
                         </p>
                       )}
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        className="w-full"
-                        aria-label={t('active_groups.view_group_named', { name: group.name })}
+                      {/* Visual CTA only — the whole card is already a <Link>, so this
+                          must not be an interactive <button> nested inside the anchor. */}
+                      <span
+                        aria-hidden="true"
+                        className="inline-flex w-full items-center justify-center rounded-lg border border-[var(--border-default)] bg-[var(--surface-elevated)] px-3 py-1.5 text-sm font-medium text-[var(--text-primary)]"
                       >
                         {t('active_groups.view_group')}
-                      </Button>
+                      </span>
                     </CardBody>
                   </Card>
                 </Link>
@@ -1441,9 +1441,14 @@ export default function ExplorePage() {
                         <span>{t('polls.closes', { date: formatDate(poll.closes_at) })}</span>
                       )}
                     </div>
-                    <Button size="sm" variant="secondary" className="w-full" aria-label={t('polls.vote_now_for', { question: poll.question })}>
+                    {/* Visual CTA only — the whole card is already a <Link>, so this
+                        must not be an interactive <button> nested inside the anchor. */}
+                    <span
+                      aria-hidden="true"
+                      className="inline-flex w-full items-center justify-center rounded-lg border border-[var(--border-default)] bg-[var(--surface-elevated)] px-3 py-1.5 text-sm font-medium text-[var(--text-primary)]"
+                    >
                       {t('polls.vote_now')}
-                    </Button>
+                    </span>
                   </CardBody>
                 </Card>
               </Link>

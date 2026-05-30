@@ -32,7 +32,7 @@ import X from 'lucide-react/icons/x';
 import UserPlus from 'lucide-react/icons/user-plus';
 import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Progress, Button, Chip, Spinner, Input, Textarea, Avatar, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
+import { GlassCard, Progress, Button, Chip, Spinner, Input, Textarea, Avatar, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, NumberField, RadioGroup, Radio, SearchField, Separator, Label } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
@@ -110,7 +110,8 @@ export function CreateGroupExchangePage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [splitType, setSplitType] = useState<SplitType>('equal');
-  const [totalHours, setTotalHours] = useState('');
+  // NumberField works in numbers; NaN represents the empty state.
+  const [totalHours, setTotalHours] = useState<number>(NaN);
 
   // Step 2: Participants
   const [participants, setParticipants] = useState<Participant[]>([]);
@@ -137,7 +138,7 @@ export function CreateGroupExchangePage() {
   // Step 1 validation
   // ─────────────────────────────────────────────────────────────────────────
 
-  const canProceedStep1 = title.trim().length > 0 && parseFloat(totalHours) > 0;
+  const canProceedStep1 = title.trim().length > 0 && totalHours > 0;
 
   // ─────────────────────────────────────────────────────────────────────────
   // Step 2: Member search
@@ -224,7 +225,7 @@ export function CreateGroupExchangePage() {
   // ─────────────────────────────────────────────────────────────────────────
 
   function calculateSplitPreview(): { providerId: number; providerName: string; receiverId: number; receiverName: string; amount: number }[] {
-    const total = parseFloat(totalHours) || 0;
+    const total = totalHours || 0;
     if (total <= 0 || providers.length === 0 || receivers.length === 0) return [];
 
     const splits: { providerId: number; providerName: string; receiverId: number; receiverName: string; amount: number }[] = [];
@@ -302,7 +303,7 @@ export function CreateGroupExchangePage() {
         title: title.trim(),
         description: description.trim() || null,
         split_type: splitType,
-        total_hours: parseFloat(totalHours),
+        total_hours: totalHours,
         participants: participants.map((p) => ({
           user_id: p.user_id,
           role: p.role,
@@ -496,18 +497,23 @@ export function CreateGroupExchangePage() {
                     }}
                   />
 
-                  <Input
-                    type="number"
-                    label={t('create.total_hours_label')}
-                    placeholder={t('create.total_hours_placeholder')}
+                  <NumberField
                     value={totalHours}
-                    onChange={(e) => setTotalHours(e.target.value)}
-                    min="0.25"
-                    step="0.25"
+                    onChange={setTotalHours}
+                    minValue={0.25}
+                    step={0.25}
                     isRequired
-                    endContent={<span className="text-theme-subtle text-sm">{t('create.hours_unit')}</span>}
-                    classNames={inputClassNames}
-                  />
+                    formatOptions={{ maximumFractionDigits: 2 }}
+                    className="w-full"
+                  >
+                    <Label className={inputClassNames.label}>{t('create.total_hours_label')}</Label>
+                    <NumberField.Group className={inputClassNames.inputWrapper}>
+                      <NumberField.DecrementButton />
+                      <NumberField.Input className={inputClassNames.input} placeholder={t('create.total_hours_placeholder')} />
+                      <span className="px-2 text-sm text-theme-subtle">{t('create.hours_unit')}</span>
+                      <NumberField.IncrementButton />
+                    </NumberField.Group>
+                  </NumberField>
                 </div>
               </GlassCard>
 
@@ -521,32 +527,34 @@ export function CreateGroupExchangePage() {
                   {t('create.split_type_desc')}
                 </p>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <RadioGroup
+                  aria-label={t('create.split_type_heading')}
+                  value={splitType}
+                  onChange={(v) => setSplitType(v as SplitType)}
+                  className="grid grid-cols-1 sm:grid-cols-3 gap-3"
+                >
                   {SPLIT_TYPE_CARDS.map((card) => (
-                    <Button
+                    <Radio
                       key={card.value}
-                      variant="flat"
-                      onPress={() => setSplitType(card.value)}
-                      className={`
-                        p-4 rounded-xl border-2 text-center transition-all cursor-pointer min-h-9 min-w-0 flex-col
-                        ${splitType === card.value
-                          ? 'border-indigo-500 bg-indigo-500/10'
-                          : 'border-theme-default bg-theme-elevated hover:border-indigo-500/30 hover:bg-theme-hover'}
-                      `}
-                      aria-pressed={splitType === card.value}
+                      value={card.value}
+                      className="cursor-pointer rounded-xl border-2 border-theme-default bg-theme-elevated p-4 text-center transition-all hover:border-indigo-500/30 hover:bg-theme-hover data-[selected=true]:border-indigo-500 data-[selected=true]:bg-indigo-500/10"
                     >
-                      <div className="flex justify-center mb-3" aria-hidden="true">
-                        {card.icon}
-                      </div>
-                      <h3 className="font-semibold text-theme-primary text-sm mb-1">
-                        {t('create.split_' + card.value + '_title')}
-                      </h3>
-                      <p className="text-xs text-theme-subtle leading-relaxed">
-                        {t('create.split_' + card.value + '_desc')}
-                      </p>
-                    </Button>
+                      {() => (
+                        <div>
+                          <div className="flex justify-center mb-3" aria-hidden="true">
+                            {card.icon}
+                          </div>
+                          <h3 className="font-semibold text-theme-primary text-sm mb-1">
+                            {t('create.split_' + card.value + '_title')}
+                          </h3>
+                          <p className="text-xs text-theme-subtle leading-relaxed">
+                            {t('create.split_' + card.value + '_desc')}
+                          </p>
+                        </div>
+                      )}
+                    </Radio>
                   ))}
-                </div>
+                </RadioGroup>
               </GlassCard>
 
               {/* Navigation */}
@@ -577,10 +585,10 @@ export function CreateGroupExchangePage() {
                 </p>
 
                 <div className="relative">
-                  <Input
+                  <SearchField
                     placeholder={t('detail.search_members_placeholder')}
                     value={searchQuery}
-                    onChange={(e) => handleSearchChange(e.target.value)}
+                    onValueChange={handleSearchChange}
                     startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
                     endContent={isSearching ? <span role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })}><Spinner size="sm" /></span> : null}
                     classNames={inputClassNames}
@@ -741,7 +749,7 @@ export function CreateGroupExchangePage() {
                   </div>
                   <div className="bg-theme-elevated rounded-xl p-3 sm:p-4 text-center">
                     <p className="text-xs sm:text-sm text-theme-muted">{t('detail.total_hours')}</p>
-                    <p className="text-xl sm:text-2xl font-bold text-theme-primary">{totalHours}</p>
+                    <p className="text-xl sm:text-2xl font-bold text-theme-primary">{Number.isNaN(totalHours) ? '—' : totalHours}</p>
                   </div>
                   <div className="bg-theme-elevated rounded-xl p-3 sm:p-4 text-center">
                     <p className="text-xs sm:text-sm text-theme-muted">{t('detail.receivers')}</p>
@@ -860,7 +868,7 @@ export function CreateGroupExchangePage() {
                     </div>
                   )}
 
-                  <div className="border-t border-theme-default" />
+                  <Separator />
 
                   {/* Split & Hours */}
                   <div className="grid grid-cols-3 gap-4">
@@ -878,7 +886,7 @@ export function CreateGroupExchangePage() {
                     </div>
                   </div>
 
-                  <div className="border-t border-theme-default" />
+                  <Separator />
 
                   {/* Participants summary */}
                   <div>
@@ -970,36 +978,38 @@ function ParticipantRow({ participant, splitType, onRemove, onHoursChange, onWei
 
       {/* Custom hours input */}
       {splitType === 'custom' && (
-        <Input
-          type="number"
-          size="sm"
-          placeholder={t('create.hours_placeholder')}
-          value={participant.hours > 0 ? participant.hours.toString() : ''}
-          onChange={(e) => onHoursChange(parseFloat(e.target.value) || 0)}
-          min="0"
-          step="0.25"
-          className="w-24 shrink-0"
-          classNames={inputClassNames}
+        <NumberField
+          value={participant.hours > 0 ? participant.hours : NaN}
+          onChange={(v) => onHoursChange(Number.isNaN(v) ? 0 : v)}
+          minValue={0}
+          step={0.25}
+          formatOptions={{ maximumFractionDigits: 2 }}
+          className="w-28 shrink-0"
           aria-label={t('create.hours_for', { name: participant.name })}
-          endContent={<span className="text-theme-subtle text-xs">{t('create.hours_suffix')}</span>}
-        />
+        >
+          <NumberField.Group className={inputClassNames.inputWrapper}>
+            <NumberField.Input className={inputClassNames.input} placeholder={t('create.hours_placeholder')} />
+            <span className="pr-2 text-theme-subtle text-xs">{t('create.hours_suffix')}</span>
+          </NumberField.Group>
+        </NumberField>
       )}
 
       {/* Weighted input */}
       {splitType === 'weighted' && (
-        <Input
-          type="number"
-          size="sm"
-          placeholder={t('create.weight_placeholder')}
-          value={participant.weight > 0 ? participant.weight.toString() : ''}
-          onChange={(e) => onWeightChange(parseFloat(e.target.value) || 0)}
-          min="0.1"
-          step="0.1"
-          className="w-24 shrink-0"
-          classNames={inputClassNames}
+        <NumberField
+          value={participant.weight > 0 ? participant.weight : NaN}
+          onChange={(v) => onWeightChange(Number.isNaN(v) ? 0 : v)}
+          minValue={0.1}
+          step={0.1}
+          formatOptions={{ maximumFractionDigits: 2 }}
+          className="w-28 shrink-0"
           aria-label={t('create.weight_for', { name: participant.name })}
-          endContent={<span className="text-theme-subtle text-xs">{t('create.weight_suffix')}</span>}
-        />
+        >
+          <NumberField.Group className={inputClassNames.inputWrapper}>
+            <NumberField.Input className={inputClassNames.input} placeholder={t('create.weight_placeholder')} />
+            <span className="pr-2 text-theme-subtle text-xs">{t('create.weight_suffix')}</span>
+          </NumberField.Group>
+        </NumberField>
       )}
 
       <Button

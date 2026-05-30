@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, AlgorithmLabel, ListingSkeleton, ImagePlaceholder, Button, SearchField, Avatar } from '@/components/ui';
+import { Select, SelectItem, GlassCard, AlgorithmLabel, ListingSkeleton, ImagePlaceholder, Button, ToggleButton, ToggleButtonGroup, Progress, Chip, SearchField, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -8,7 +8,7 @@ import { Select, SelectItem, GlassCard, AlgorithmLabel, ListingSkeleton, ImagePl
  * Listings Page - Browse all listings
  */
 
-import { useState, useEffect, useCallback, memo, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, memo, useRef, useMemo, type ReactNode } from 'react';
 
 const listingContainerVariants = {
   hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.05 } }, };
@@ -541,40 +541,48 @@ export function ListingsPage() {
               )}
             </Button>
 
-            <div className="flex overflow-hidden rounded-xl border border-theme-default bg-theme-elevated" role="group" aria-label={t('aria.view_mode')}>
-              <Button
+            {/* Mutually-exclusive view mode — idiomatic HeroUI v3 single-select toggle group. */}
+            <ToggleButtonGroup
+              aria-label={t('aria.view_mode')}
+              selectionMode="single"
+              disallowEmptySelection
+              selectedKeys={new Set([viewMode])}
+              onSelectionChange={(keys) => {
+                const [key] = Array.from(keys);
+                if (key) setViewMode(key as ViewMode);
+              }}
+              className="gap-0 overflow-hidden rounded-xl border border-theme-default bg-theme-elevated"
+            >
+              <ToggleButton
+                id="grid"
                 isIconOnly
-                variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
-                className={`min-h-[44px] min-w-[44px] rounded-none transition-colors ${viewMode === 'grid' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300' : 'text-theme-muted'}`}
+                variant="ghost"
                 aria-label={t('aria_grid_view')}
-                aria-pressed={viewMode === 'grid'}
-                onPress={() => setViewMode('grid')}
+                className="min-h-[44px] min-w-[44px] rounded-none text-theme-muted transition-colors data-[selected=true]:bg-emerald-500/15 data-[selected=true]:text-emerald-600 dark:data-[selected=true]:text-emerald-300"
               >
                 <Grid className="w-4 h-4" aria-hidden="true" />
-              </Button>
-              <Button
+              </ToggleButton>
+              <ToggleButton
+                id="list"
                 isIconOnly
-                variant={viewMode === 'list' ? 'secondary' : 'ghost'}
-                className={`min-h-[44px] min-w-[44px] rounded-none ${!MAPS_ENABLED ? 'rounded-r-xl' : ''} transition-colors ${viewMode === 'list' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300' : 'text-theme-muted'}`}
+                variant="ghost"
                 aria-label={t('aria_list_view')}
-                aria-pressed={viewMode === 'list'}
-                onPress={() => setViewMode('list')}
+                className="min-h-[44px] min-w-[44px] rounded-none text-theme-muted transition-colors data-[selected=true]:bg-emerald-500/15 data-[selected=true]:text-emerald-600 dark:data-[selected=true]:text-emerald-300"
               >
                 <List className="w-4 h-4" aria-hidden="true" />
-              </Button>
+              </ToggleButton>
               {MAPS_ENABLED && (
-                <Button
+                <ToggleButton
+                  id="map"
                   isIconOnly
-                  variant={viewMode === 'map' ? 'secondary' : 'ghost'}
-                  className={`min-h-[44px] min-w-[44px] rounded-none rounded-r-xl transition-colors ${viewMode === 'map' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300' : 'text-theme-muted'}`}
+                  variant="ghost"
                   aria-label={t('aria_map_view')}
-                  aria-pressed={viewMode === 'map'}
-                  onPress={() => setViewMode('map')}
+                  className="min-h-[44px] min-w-[44px] rounded-none text-theme-muted transition-colors data-[selected=true]:bg-emerald-500/15 data-[selected=true]:text-emerald-600 dark:data-[selected=true]:text-emerald-300"
                 >
                   <MapIcon className="w-4 h-4" aria-hidden="true" />
-                </Button>
+                </ToggleButton>
               )}
-            </div>
+            </ToggleButtonGroup>
           </div>
         </form>
 
@@ -801,21 +809,12 @@ export function ListingsPage() {
                     <span>{listings.length.toLocaleString()} / {totalItems.toLocaleString()}</span>
                     <span className="font-medium text-theme-secondary">{Math.round((listings.length / totalItems) * 100)}%</span>
                   </div>
-                  <div
-                    className="h-1.5 rounded-full bg-theme-elevated overflow-hidden"
-                    role="progressbar"
+                  <Progress
                     aria-label={t('loading_progress')}
-                    aria-valuenow={Math.round((listings.length / totalItems) * 100)}
-                    aria-valuemin={0}
-                    aria-valuemax={100}
-                  >
-                    <motion.div
-                      className="h-full rounded-full bg-emerald-500"
-                      initial={{ width: '0%' }}
-                      animate={{ width: `${Math.round((listings.length / totalItems) * 100)}%` }}
-                      transition={{ duration: 0.6, ease: 'easeOut' }}
-                    />
-                  </div>
+                    size="sm"
+                    value={Math.round((listings.length / totalItems) * 100)}
+                    classNames={{ track: 'bg-theme-elevated', indicator: 'bg-emerald-500' }}
+                  />
                 </div>
               )}
               <div className="text-center">
@@ -839,6 +838,47 @@ export function ListingsPage() {
       )}
       </div>
     </>
+  );
+}
+
+const BADGE_TONES = {
+  offer: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400',
+  request: 'bg-amber-500/20 text-amber-600 dark:text-amber-400',
+  mutual: 'bg-violet-500/20 text-violet-600 dark:text-violet-400',
+  one_way: 'bg-sky-500/20 text-sky-600 dark:text-sky-400',
+  remote: 'bg-blue-500/20 text-blue-600 dark:text-blue-400',
+  hybrid: 'bg-teal-500/20 text-teal-600 dark:text-teal-400',
+  category: 'bg-theme-hover text-theme-muted',
+} as const;
+
+type BadgeTone = keyof typeof BADGE_TONES;
+
+/**
+ * Status pill for listing cards. Wraps the HeroUI Chip so every badge shares one
+ * size/shape; `tone` carries the bespoke colour palette (emerald/violet/sky/…),
+ * which isn't part of Chip's semantic colour set.
+ */
+function ListingBadge({
+  tone,
+  icon: Icon,
+  title,
+  children,
+}: {
+  tone: BadgeTone;
+  icon?: React.ElementType;
+  title?: string;
+  children: ReactNode;
+}) {
+  return (
+    <Chip
+      size="sm"
+      variant="soft"
+      title={title}
+      className={`h-auto gap-0.5 rounded-full px-2 py-0.5 text-[10px] font-medium ${BADGE_TONES[tone]}`}
+      startContent={Icon ? <Icon className="w-2.5 h-2.5" aria-hidden="true" /> : undefined}
+    >
+      {children}
+    </Chip>
   );
 }
 
@@ -871,22 +911,12 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
     }
   }
 
-  function handleSaveContainerClick(e: React.MouseEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-
   const imageUrl = listing.image_url ? resolveAssetUrl(listing.image_url) : null;
 
   if (!isGrid) {
     // ─── List View ───
     return (
-      <Link
-        to={tenantPath(`/listings/${listing.id}`)}
-        className="block rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-        aria-label={t('open_listing_aria', { title: listing.title })}
-      >
-        <GlassCard className={`cursor-pointer p-4 transition-all duration-200 hover:-translate-y-0.5 hover:bg-theme-hover hover:shadow-md border-l-4 ${listing.type === 'offer' ? 'border-l-emerald-500/70' : 'border-l-amber-500/70'}`}>
+      <GlassCard className={`relative cursor-pointer p-4 transition-all duration-200 hover:-translate-y-0.5 hover:bg-theme-hover hover:shadow-md border-l-4 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent ${listing.type === 'offer' ? 'border-l-emerald-500/70' : 'border-l-amber-500/70'}`}>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
             {imageUrl && !imgError ? (
               <img
@@ -909,42 +939,34 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
             )}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
-                  listing.type === 'offer' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
-                }`}>
+                <ListingBadge tone={listing.type === 'offer' ? 'offer' : 'request'}>
                   {listing.type === 'offer' ? t('offering') : t('requesting')}
-                </span>
+                </ListingBadge>
                 {listing.reciprocity_match === 'mutual' && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-violet-500/20 text-violet-600 dark:text-violet-400 font-medium flex items-center gap-0.5">
-                    <Zap className="w-2.5 h-2.5" aria-hidden="true" />
-                    {t('reciprocity_mutual')}
-                  </span>
+                  <ListingBadge tone="mutual" icon={Zap}>{t('reciprocity_mutual')}</ListingBadge>
                 )}
                 {listing.reciprocity_match === 'one_way' && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-sky-500/20 text-sky-600 dark:text-sky-400 font-medium flex items-center gap-0.5">
-                    <Zap className="w-2.5 h-2.5" aria-hidden="true" />
-                    {t('reciprocity_one_way')}
-                  </span>
+                  <ListingBadge tone="one_way" icon={Zap}>{t('reciprocity_one_way')}</ListingBadge>
                 )}
                 {listing.service_type === 'remote_only' && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-400 font-medium flex items-center gap-0.5">
-                    <Monitor className="w-2.5 h-2.5" aria-hidden="true" />
-                    {t('service_type_remote')}
-                  </span>
+                  <ListingBadge tone="remote" icon={Monitor}>{t('service_type_remote')}</ListingBadge>
                 )}
                 {listing.service_type === 'hybrid' && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-medium flex items-center gap-0.5">
-                    <ArrowRightLeft className="w-2.5 h-2.5" aria-hidden="true" />
-                    {t('service_type_hybrid_available')}
-                  </span>
+                  <ListingBadge tone="hybrid" icon={ArrowRightLeft}>{t('service_type_hybrid_available')}</ListingBadge>
                 )}
                 {listing.category_name && (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-theme-hover text-theme-muted">
-                    {listing.category_name}
-                  </span>
+                  <ListingBadge tone="category">{listing.category_name}</ListingBadge>
                 )}
               </div>
-              <h3 className="truncate text-base font-semibold text-theme-primary sm:text-lg">{listing.title}</h3>
+              <h3 className="truncate text-base font-semibold text-theme-primary sm:text-lg">
+                <Link
+                  to={tenantPath(`/listings/${listing.id}`)}
+                  className="outline-none after:absolute after:inset-0"
+                  aria-label={t('open_listing_aria', { title: listing.title })}
+                >
+                  {listing.title}
+                </Link>
+              </h3>
               <p className="mt-1 line-clamp-2 text-sm leading-6 text-theme-muted sm:line-clamp-1">{listing.description}</p>
             </div>
             <div className="flex flex-row flex-wrap items-center justify-between gap-3 text-xs text-theme-subtle sm:flex-col sm:items-end sm:justify-start sm:gap-1 sm:shrink-0">
@@ -967,38 +989,30 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
                 </span>
               )}
               {onToggleSave && (
-                <span role="presentation" onClick={handleSaveContainerClick}>
-                  <Button
-                    isIconOnly
-                    size="sm"
-                    variant="secondary"
-                    onPress={handleSaveClick}
-                    isDisabled={isSaving}
-                    aria-label={isFavorited ? t('unsave_listing') : t('save_listing')}
-                    className="p-1 rounded transition-colors hover:bg-theme-hover min-w-[44px] min-h-[44px]"
-                  >
-                    <Heart
-                      className={`w-4 h-4 transition-colors ${isFavorited ? 'fill-rose-500 text-rose-500' : 'text-theme-muted hover:text-rose-400'}`}
-                      aria-hidden="true"
-                    />
-                  </Button>
-                </span>
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="secondary"
+                  onPress={handleSaveClick}
+                  isDisabled={isSaving}
+                  aria-label={isFavorited ? t('unsave_listing') : t('save_listing')}
+                  className="relative z-10 p-1 rounded transition-colors hover:bg-theme-hover min-w-[44px] min-h-[44px]"
+                >
+                  <Heart
+                    className={`w-4 h-4 transition-colors ${isFavorited ? 'fill-rose-500 text-rose-500' : 'text-theme-muted hover:text-rose-400'}`}
+                    aria-hidden="true"
+                  />
+                </Button>
               )}
             </div>
           </div>
         </GlassCard>
-      </Link>
     );
   }
 
   // ─── Grid View ───
   return (
-    <Link
-      to={tenantPath(`/listings/${listing.id}`)}
-      className="group block h-full rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-      aria-label={t('open_listing_aria', { title: listing.title })}
-    >
-      <GlassCard className="flex h-full cursor-pointer flex-col overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+      <GlassCard className="group relative flex h-full cursor-pointer flex-col overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent">
         {/* Listing Image with hover overlay and floating save button */}
         <div className="relative aspect-video overflow-hidden bg-theme-elevated">
           {imageUrl && !imgError ? (
@@ -1019,7 +1033,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200 pointer-events-none" aria-hidden="true" />
           {/* Floating save button */}
           {onToggleSave && (
-            <div role="presentation" className="absolute top-2 right-2" onClick={handleSaveContainerClick}>
+            <div className="absolute top-2 right-2 z-10">
               <Button
                 isIconOnly
                 size="sm"
@@ -1044,51 +1058,37 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
         <div className="flex flex-1 flex-col p-4">
         {/* Type + Category Badges */}
         <div className="flex items-center gap-1.5 mb-3 flex-wrap">
-          <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${
-            listing.type === 'offer' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
-          }`}>
+          <ListingBadge tone={listing.type === 'offer' ? 'offer' : 'request'}>
             {listing.type === 'offer' ? t('offering') : t('requesting')}
-          </span>
+          </ListingBadge>
           {listing.is_featured && <FeaturedBadge />}
           {listing.reciprocity_match === 'mutual' && (
-            <span
-              className="text-[10px] px-1.5 py-0.5 rounded-full bg-violet-500/20 text-violet-600 dark:text-violet-400 font-medium flex items-center gap-0.5"
-              title={t('reciprocity_mutual_title')}
-            >
-              <Zap className="w-2.5 h-2.5" aria-hidden="true" />
-              {t('reciprocity_mutual')}
-            </span>
+            <ListingBadge tone="mutual" icon={Zap} title={t('reciprocity_mutual_title')}>{t('reciprocity_mutual')}</ListingBadge>
           )}
           {listing.reciprocity_match === 'one_way' && (
-            <span
-              className="text-[10px] px-1.5 py-0.5 rounded-full bg-sky-500/20 text-sky-600 dark:text-sky-400 font-medium flex items-center gap-0.5"
-              title={t('reciprocity_one_way_title')}
-            >
-              <Zap className="w-2.5 h-2.5" aria-hidden="true" />
-              {t('reciprocity_one_way')}
-            </span>
+            <ListingBadge tone="one_way" icon={Zap} title={t('reciprocity_one_way_title')}>{t('reciprocity_one_way')}</ListingBadge>
           )}
           {listing.service_type === 'remote_only' && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-400 font-medium flex items-center gap-0.5">
-              <Monitor className="w-2.5 h-2.5" aria-hidden="true" />
-              {t('service_type_remote')}
-            </span>
+            <ListingBadge tone="remote" icon={Monitor}>{t('service_type_remote')}</ListingBadge>
           )}
           {listing.service_type === 'hybrid' && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-medium flex items-center gap-0.5">
-              <ArrowRightLeft className="w-2.5 h-2.5" aria-hidden="true" />
-              {t('service_type_hybrid_available')}
-            </span>
+            <ListingBadge tone="hybrid" icon={ArrowRightLeft}>{t('service_type_hybrid_available')}</ListingBadge>
           )}
           {listing.category_name && (
-            <span className="text-[11px] px-2 py-0.5 rounded-full bg-theme-hover text-theme-muted">
-              {listing.category_name}
-            </span>
+            <ListingBadge tone="category">{listing.category_name}</ListingBadge>
           )}
         </div>
 
         {/* Title & Description */}
-        <h3 className="mb-2 line-clamp-2 text-lg font-semibold leading-6 text-theme-primary">{listing.title}</h3>
+        <h3 className="mb-2 line-clamp-2 text-lg font-semibold leading-6 text-theme-primary">
+          <Link
+            to={tenantPath(`/listings/${listing.id}`)}
+            className="outline-none after:absolute after:inset-0"
+            aria-label={t('open_listing_aria', { title: listing.title })}
+          >
+            {listing.title}
+          </Link>
+        </h3>
         <p className="mb-4 line-clamp-3 flex-1 text-sm leading-6 text-theme-muted">{listing.description}</p>
 
         {/* Footer: Author + Meta */}
@@ -1131,7 +1131,6 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
         </div>
         </div>{/* end p-5 wrapper */}
       </GlassCard>
-    </Link>
   );
 });
 

@@ -337,14 +337,15 @@ export function GroupExchangesPage() {
 
                             {/* Role indicator */}
                             <div className="mt-2">
-                              <span className={`
-                                text-xs px-2 py-1 rounded-full
-                                ${isOrganizer
+                              <Chip
+                                size="sm"
+                                variant="flat"
+                                className={isOrganizer
                                   ? 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-400'
                                   : 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400'}
-                              `}>
+                              >
                                 {isOrganizer ? t('role_organizer') : t('role_participant')}
-                              </span>
+                              </Chip>
                             </div>
                           </div>
 

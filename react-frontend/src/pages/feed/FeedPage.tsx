@@ -13,7 +13,7 @@
  * Uses V2 API: POST /api/v2/feed/polls, POST /api/v2/feed/polls/{id}/vote
  */
 
-import React, { useState, useEffect, useCallback, useMemo, useRef, Component, type ReactNode, type ErrorInfo, type KeyboardEvent } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef, Component, type ReactNode, type ErrorInfo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from '@/lib/motion';
 
@@ -29,7 +29,8 @@ import ArrowUp from 'lucide-react/icons/arrow-up';
 import CircleX from 'lucide-react/icons/circle-x';
 import ListFilter from 'lucide-react/icons/list-filter';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, AlgorithmLabel, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure, Button, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, useConfirm } from '@/components/ui';
+import { GlassCard, AlgorithmLabel, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure, Button, ToggleButton, ToggleButtonGroup, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, useConfirm } from '@/components/ui';
+import type { Key } from '@heroui/react';
 import { PageMeta } from '@/components/seo';
 import { ComposeHub } from '@/components/compose';
 import type { ComposeTab } from '@/components/compose';
@@ -928,7 +929,42 @@ export function FeedPage() {
         </div>
 
         <div className="min-w-0" role="group" aria-label={t('filter.select')}>
-          <div className="grid grid-cols-2 gap-2 min-[390px]:flex min-[390px]:items-center sm:flex-wrap">
+          {/*
+            Desktop & up: a single-select ToggleButtonGroup is the idiomatic HeroUI v3
+            component for a mutually-exclusive filter set. disallowEmptySelection keeps
+            exactly one filter active (the group always renders every option on ≥sm).
+          */}
+          <ToggleButtonGroup
+            aria-label={t('filter.select')}
+            selectionMode="single"
+            disallowEmptySelection
+            isDetached
+            size="sm"
+            selectedKeys={new Set<Key>([filter])}
+            onSelectionChange={(keys) => {
+              const [key] = Array.from(keys);
+              if (key) handleFilterChange(key as FeedFilter);
+            }}
+            className="hidden flex-wrap items-center gap-2 sm:flex"
+          >
+            {filterOptions.map((opt) => (
+              <ToggleButton
+                key={opt.key}
+                id={opt.key}
+                variant="ghost"
+                className="shrink-0 rounded-full border border-theme-default bg-theme-elevated px-3 text-theme-muted transition-colors hover:bg-accent/5 hover:text-accent data-[selected=true]:border-transparent data-[selected=true]:bg-accent data-[selected=true]:text-white data-[selected=true]:shadow-sm"
+              >
+                {opt.label}
+              </ToggleButton>
+            ))}
+          </ToggleButtonGroup>
+
+          {/*
+            Mobile: primary filters in a 2-col grid + an overflow Dropdown. A single
+            ToggleButtonGroup can't express the primary/overflow split, so the compact
+            layout keeps Button pills (still HeroUI v3) plus the v3 Dropdown.
+          */}
+          <div className="grid grid-cols-2 gap-2 min-[390px]:flex min-[390px]:items-center sm:hidden">
             {mobilePrimaryFilterOptions.map((opt) => (
               <Button
                 key={opt.key}
@@ -952,7 +988,7 @@ export function FeedPage() {
                   size="sm"
                   variant={activeOverflowFilter ? 'solid' : 'flat'}
                   radius="full"
-                  className={`min-w-0 px-3 sm:hidden ${
+                  className={`min-w-0 px-3 ${
                     activeOverflowFilter
                       ? 'bg-accent text-white shadow-sm'
                       : 'bg-theme-elevated text-theme-muted hover:text-accent hover:bg-accent/5 border border-theme-default transition-colors'
@@ -975,23 +1011,6 @@ export function FeedPage() {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            {mobileOverflowFilterOptions.map((opt) => (
-              <Button
-                key={opt.key}
-                size="sm"
-                variant={filter === opt.key ? 'solid' : 'flat'}
-                radius="full"
-                aria-pressed={filter === opt.key}
-                className={`hidden shrink-0 sm:inline-flex ${
-                  filter === opt.key
-                    ? 'bg-accent text-white shadow-sm'
-                    : 'bg-theme-elevated text-theme-muted hover:text-accent hover:bg-accent/5 border border-theme-default transition-colors'
-                }`}
-                onPress={() => handleFilterChange(opt.key)}
-              >
-                {opt.label}
-              </Button>
-            ))}
           </div>
         </div>
 
@@ -1007,14 +1026,13 @@ export function FeedPage() {
       {/* Quick Post Box */}
       {isAuthenticated && (
         <GlassCard className="p-3.5 transition-colors hover:border-accent/20 sm:p-4">
-          <div
-            className="flex cursor-pointer flex-col gap-3 sm:flex-row sm:items-center"
-            role="button"
-            tabIndex={0}
-            aria-label={t('whats_on_your_mind')}
-            onClick={() => openCompose('post')}
-            onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCompose('post'); } }}
-          >
+          {/*
+            The composer trigger is a real <button> (HeroUI Button), with the two
+            quick-action icon buttons as siblings rather than nested children — so
+            there are no interactive elements inside a pressable region (which would
+            be invalid button-in-button markup) and no stopPropagation hack is needed.
+          */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <div className="flex min-w-0 flex-1 items-center gap-3">
               <Avatar
                 name={user?.first_name || t('you')}
@@ -1023,18 +1041,16 @@ export function FeedPage() {
                 isBordered
                 className="shrink-0 ring-2 ring-[var(--border-default)]"
               />
-              <div className="min-h-11 flex-1 rounded-full border border-theme-default bg-theme-elevated px-4 py-2.5 text-sm text-theme-subtle transition-colors hover:border-accent/30">
+              <Button
+                variant="flat"
+                onPress={() => openCompose('post')}
+                aria-label={t('whats_on_your_mind')}
+                className="min-h-11 flex-1 justify-start rounded-full border border-theme-default bg-theme-elevated px-4 py-2.5 text-left text-sm font-normal text-theme-subtle transition-colors hover:border-accent/30 hover:bg-theme-elevated"
+              >
                 <span className="line-clamp-1">{t('whats_on_your_mind')}</span>
-              </div>
+              </Button>
             </div>
-            {/*
-              Inner buttons must NOT bubble their click to the outer composer-trigger
-              row — otherwise tapping "image" or "poll" fires both inner and outer
-              handlers (opening the composer twice). stopPropagation on the wrapper
-              keeps inner button activations local while preserving keyboard support
-              on the outer surface.
-            */}
-            <div className="flex shrink-0 justify-end gap-1" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+            <div className="flex shrink-0 justify-end gap-1">
               <Button
                 isIconOnly
                 size="sm"
@@ -1223,11 +1239,14 @@ export function FeedPage() {
               {/* End-of-feed message */}
               {!hasMore && items.length > 0 && !isLoading && (
                 <div className="text-center py-10">
-                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-theme-elevated text-theme-muted text-sm border border-theme-default">
-                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-400/60" aria-hidden="true" />
+                  <Chip
+                    variant="flat"
+                    className="border border-theme-default bg-theme-elevated text-theme-muted"
+                    startContent={<span className="w-1.5 h-1.5 rounded-full bg-indigo-400/60" aria-hidden="true" />}
+                    endContent={<span className="w-1.5 h-1.5 rounded-full bg-purple-400/60" aria-hidden="true" />}
+                  >
                     {t('feed.end_of_feed')}
-                    <span className="w-1.5 h-1.5 rounded-full bg-purple-400/60" aria-hidden="true" />
-                  </span>
+                  </Chip>
                 </div>
               )}
 

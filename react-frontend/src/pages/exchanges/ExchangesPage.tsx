@@ -347,14 +347,15 @@ export function ExchangesPage() {
 
                             {/* Role indicator */}
                             <div className="mt-2">
-                              <span className={`
-                                text-xs px-2 py-1 rounded-full
-                                ${isRequester(exchange)
+                              <Chip
+                                size="sm"
+                                variant="flat"
+                                className={isRequester(exchange)
                                   ? 'bg-amber-500/20 text-amber-700 dark:text-amber-400'
                                   : 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400'}
-                              `}>
+                              >
                                 {isRequester(exchange) ? t('card.you_requested') : t('card.you_providing')}
-                              </span>
+                              </Chip>
                             </div>
                           </div>
 

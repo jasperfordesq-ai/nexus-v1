@@ -1304,17 +1304,20 @@ const FeedCard = React.memo(function FeedCard({
                         }
 
                         return (
-                          <button
+                          <Button
                             key={option.id}
-                            onClick={() => handleVote(option.id)}
-                            disabled={pollExpired}
-                            className="group relative w-full text-left px-4 py-3 rounded-xl border-2 border-theme-default bg-[var(--surface-base)] hover:border-amber-500 hover:bg-amber-500/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-elevated)] active:scale-[0.99] transition-all text-sm font-medium text-theme-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                            onPress={() => handleVote(option.id)}
+                            isDisabled={pollExpired}
+                            variant="bordered"
+                            fullWidth
+                            disableRipple
+                            className="group relative h-auto justify-start rounded-xl border-2 border-theme-default bg-[var(--surface-base)] px-4 py-3 text-left text-sm font-medium text-theme-primary transition-all hover:border-amber-500 hover:bg-amber-500/5 active:scale-[0.99]"
                           >
-                            <span className="flex items-center justify-between gap-3">
+                            <span className="flex w-full items-center justify-between gap-3">
                               <span className="truncate">{option.text}</span>
                               <ArrowRight className="w-4 h-4 text-theme-subtle group-hover:text-amber-500 group-hover:translate-x-0.5 transition-all" aria-hidden="true" />
                             </span>
-                          </button>
+                          </Button>
                         );
                       })}
                     </div>
