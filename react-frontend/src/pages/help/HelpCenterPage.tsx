@@ -261,14 +261,14 @@ export function HelpCenterPage() {
           <p className="text-sm text-theme-muted mb-4">
             {t('help.still_need_help_description')}
           </p>
-          <Link to={tenantPath('/contact')}>
-            <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-              startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
-            >
-              {t('help.contact_support')}
-            </Button>
-          </Link>
+          <Button
+            as={Link}
+            to={tenantPath('/contact')}
+            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
+          >
+            {t('help.contact_support')}
+          </Button>
         </GlassCard>
       </motion.div>
     </div>

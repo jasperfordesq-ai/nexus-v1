@@ -481,48 +481,48 @@ export function AboutPage() {
 
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     {isAuthenticated ? (
-                      <Link to={tenantPath("/dashboard")}>
-                        <Button
-                          size="lg"
-                          className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold px-8"
-                          endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
-                        >
-                          {t('about.cta.dashboard')}
-                        </Button>
-                      </Link>
+                      <Button
+                        as={Link}
+                        to={tenantPath("/dashboard")}
+                        size="lg"
+                        className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold px-8"
+                        endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
+                      >
+                        {t('about.cta.dashboard')}
+                      </Button>
                     ) : (
-                      <Link to={tenantPath("/register")}>
-                        <Button
-                          size="lg"
-                          className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold px-8"
-                          endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
-                        >
-                          {t('about.cta.join')}
-                        </Button>
-                      </Link>
+                      <Button
+                        as={Link}
+                        to={tenantPath("/register")}
+                        size="lg"
+                        className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold px-8"
+                        endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
+                      >
+                        {t('about.cta.join')}
+                      </Button>
                     )}
 
-                    <Link to={tenantPath("/help")}>
-                      <Button
-                        size="lg"
-                        variant="secondary"
-                        className="w-full sm:w-auto border-theme-default text-theme-primary hover:bg-theme-hover"
-                        startContent={<HelpCircle className="w-5 h-5" aria-hidden="true" />}
-                      >
-                        {t('about.cta.help_center')}
-                      </Button>
-                    </Link>
+                    <Button
+                      as={Link}
+                      to={tenantPath("/help")}
+                      size="lg"
+                      variant="secondary"
+                      className="w-full sm:w-auto border-theme-default text-theme-primary hover:bg-theme-hover"
+                      startContent={<HelpCircle className="w-5 h-5" aria-hidden="true" />}
+                    >
+                      {t('about.cta.help_center')}
+                    </Button>
 
-                    <Link to={tenantPath("/contact")}>
-                      <Button
-                        size="lg"
-                        variant="secondary"
-                        className="w-full sm:w-auto border-theme-default text-theme-primary hover:bg-theme-hover"
-                        startContent={<Mail className="w-5 h-5" aria-hidden="true" />}
-                      >
-                        {t('about.cta.contact_us')}
-                      </Button>
-                    </Link>
+                    <Button
+                      as={Link}
+                      to={tenantPath("/contact")}
+                      size="lg"
+                      variant="secondary"
+                      className="w-full sm:w-auto border-theme-default text-theme-primary hover:bg-theme-hover"
+                      startContent={<Mail className="w-5 h-5" aria-hidden="true" />}
+                    >
+                      {t('about.cta.contact_us')}
+                    </Button>
                   </div>
                 </div>
               </GlassCard>
