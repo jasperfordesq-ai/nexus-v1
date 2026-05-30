@@ -112,5 +112,8 @@
   },
   "course.enrolled": "これで {{title}} に登録されました。",
   "course.completed": "{{title}} を完了しました!よくやった。",
-  "course.enrolment_payment": "コース登録: {{title}}"
+  "course.enrolment_payment": "コース登録: {{title}}",
+  "vol_org_wallet.volunteer_paid_bell": "ボランティア活動に対して{{org}}から{{amount}}時間クレジットを受け取りました。",
+  "vol_org_wallet.admin_adjustment_credit_bell": "{{org}}のウォレットに管理者が{{amount}}時間クレジットを追加しました。理由: {{reason}}",
+  "vol_org_wallet.admin_adjustment_debit_bell": "{{org}}のウォレットから管理者が{{amount}}時間クレジットを差し引きました。理由: {{reason}}"
 }

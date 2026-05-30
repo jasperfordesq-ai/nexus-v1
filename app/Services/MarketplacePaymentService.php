@@ -188,6 +188,16 @@ class MarketplacePaymentService
                 'user_id' => $userId,
                 'account_id' => $sellerProfile->stripe_account_id,
             ]);
+
+            // Bell the seller now that payouts are enabled (success path: after
+            // stripe_onboarding_complete has persisted true). Covers the case
+            // where the frontend polls status on return from Stripe before the
+            // account.updated webhook lands. notifySellerOnboardingComplete is
+            // best-effort and self-guards on failure.
+            self::notifySellerOnboardingComplete(
+                (int) $userId,
+                (int) $sellerProfile->tenant_id
+            );
         }
 
         return [
@@ -1023,6 +1033,57 @@ class MarketplacePaymentService
             Log::info('MarketplacePayment webhook: seller onboarding complete via webhook', [
                 'user_id' => $sellerProfile->user_id,
                 'account_id' => $accountId,
+            ]);
+
+            // Bell the seller now that their payout account is live (success path:
+            // after stripe_onboarding_complete has persisted true). Best-effort —
+            // a bell failure must never break webhook processing.
+            self::notifySellerOnboardingComplete(
+                (int) $sellerProfile->user_id,
+                (int) $sellerProfile->tenant_id
+            );
+        }
+    }
+
+    /**
+     * Send an in-app bell to a seller when their Stripe Connect onboarding
+     * completes (payouts now enabled). No email — bell only.
+     *
+     * Renders in the recipient's preferred_language and is tenant-safe via
+     * Notification::createNotification (which forces tenant_id to the
+     * recipient's users.tenant_id). Wrapped in try/catch so a notification
+     * failure can never break the financial / onboarding flow.
+     */
+    private static function notifySellerOnboardingComplete(int $sellerId, int $tenantId): void
+    {
+        if ($sellerId <= 0) {
+            return;
+        }
+
+        try {
+            $recipient = DB::table('users')
+                ->where('id', $sellerId)
+                ->where('tenant_id', $tenantId)
+                ->select(['id', 'preferred_language'])
+                ->first();
+
+            if (!$recipient) {
+                return;
+            }
+
+            LocaleContext::withLocale($recipient, function () use ($sellerId): void {
+                Notification::createNotification(
+                    $sellerId,
+                    __('svc_notifications.marketplace_payout.onboarding_complete_bell'),
+                    '/marketplace/seller/dashboard',
+                    'marketplace_payout'
+                );
+            });
+        } catch (\Throwable $e) {
+            Log::warning('[MarketplacePaymentService] onboarding-complete bell failed', [
+                'seller_id' => $sellerId,
+                'tenant_id' => $tenantId,
+                'error' => $e->getMessage(),
             ]);
         }
     }

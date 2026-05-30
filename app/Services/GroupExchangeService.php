@@ -7,6 +7,8 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
+use App\Models\Notification;
 use App\Services\SafeguardingTriggerService;
 use App\Services\VettingService;
 use Illuminate\Support\Facades\DB;
@@ -474,13 +476,19 @@ class GroupExchangeService
         }
 
         $transactionIds = [];
+        // Participants whose balance actually changed in the committed transaction.
+        // Captured here so we can bell them ONLY after the DB::transaction commits.
+        // Each entry: ['user_id' => int, 'role' => 'provider'|string, 'hours' => int]
+        $balanceChanges = [];
 
-        DB::transaction(function () use ($exchangeId, $exchange, $split, $tenantId, &$transactionIds) {
+        DB::transaction(function () use ($exchangeId, $exchange, $split, $tenantId, &$transactionIds, &$balanceChanges) {
             // Create wallet transactions for each participant
             foreach ($split as $entry) {
                 if ((float) $entry['hours'] <= 0) {
                     continue;
                 }
+
+                $hours = (int) $entry['hours'];
 
                 // Providers earn credits, receivers spend them
                 if ($entry['role'] === 'provider') {
@@ -489,7 +497,7 @@ class GroupExchangeService
                         'tenant_id'        => $tenantId,
                         'sender_id'        => $exchange->organizer_id,
                         'receiver_id'      => $entry['user_id'],
-                        'amount'           => (int) $entry['hours'],
+                        'amount'           => $hours,
                         'description'      => __('api.group_exchange_transaction_description', ['title' => $exchange->title]),
                         'status'           => 'completed',
                         'transaction_type' => 'exchange',
@@ -501,14 +509,20 @@ class GroupExchangeService
                     DB::table('users')
                         ->where('id', $entry['user_id'])
                         ->where('tenant_id', $tenantId)
-                        ->increment('balance', (int) $entry['hours']);
+                        ->increment('balance', $hours);
                 } else {
                     // Debit the receiver
                     DB::table('users')
                         ->where('id', $entry['user_id'])
                         ->where('tenant_id', $tenantId)
-                        ->decrement('balance', (int) $entry['hours']);
+                        ->decrement('balance', $hours);
                 }
+
+                $balanceChanges[] = [
+                    'user_id' => (int) $entry['user_id'],
+                    'role'    => $entry['role'],
+                    'hours'   => $hours,
+                ];
             }
 
             // Mark exchange as completed
@@ -522,9 +536,84 @@ class GroupExchangeService
                 ]);
         });
 
+        // SUCCESS PATH ONLY — the DB::transaction above committed. Bell each
+        // participant whose balance actually changed so the financial event is no
+        // longer silent. Wrapped in try/catch so a notification failure can never
+        // unwind or mask the already-committed credit/debit.
+        $this->notifyBalanceChanges($exchangeId, (string) $exchange->title, $balanceChanges, $tenantId);
+
         return [
             'success'         => true,
             'transaction_ids' => $transactionIds,
         ];
+    }
+
+    /**
+     * Bell each participant whose wallet balance changed when an exchange completed.
+     *
+     * MUST be called only on the success path — after the balance change has
+     * persisted (the DB::transaction in complete() has committed). Providers were
+     * credited; all other roles were debited. Each recipient is notified in their
+     * own preferred_language, and the whole thing is fail-safe: a bell failure is
+     * logged but never propagated, so the already-committed financial transaction
+     * is never affected.
+     *
+     * @param array<int, array{user_id: int, role: string, hours: int}> $balanceChanges
+     */
+    private function notifyBalanceChanges(int $exchangeId, string $title, array $balanceChanges, int $tenantId): void
+    {
+        if (empty($balanceChanges)) {
+            return;
+        }
+
+        $exchangeTitle = trim($title) !== '' ? $title : __('svc_notifications.group_exchange.fallback_title');
+
+        foreach ($balanceChanges as $change) {
+            try {
+                $userId = (int) ($change['user_id'] ?? 0);
+                $hours = (int) ($change['hours'] ?? 0);
+                if ($userId <= 0 || $hours <= 0) {
+                    continue;
+                }
+
+                $isProvider = ($change['role'] ?? '') === 'provider';
+
+                // Resolve recipient + preferred_language so the bell renders in
+                // THEIR language (not the caller's / queue worker's locale).
+                $recipient = DB::table('users')
+                    ->where('id', $userId)
+                    ->where('tenant_id', $tenantId)
+                    ->select(['id', 'preferred_language'])
+                    ->first();
+
+                if (! $recipient) {
+                    continue;
+                }
+
+                // Wrap INSIDE the per-recipient loop — each message renders in the
+                // recipient's own locale.
+                LocaleContext::withLocale($recipient, function () use ($userId, $isProvider, $hours, $exchangeTitle) {
+                    $message = $isProvider
+                        ? __('svc_notifications.group_exchange.completed_credit', ['hours' => $hours, 'title' => $exchangeTitle])
+                        : __('svc_notifications.group_exchange.completed_debit', ['hours' => $hours, 'title' => $exchangeTitle]);
+
+                    // Canonical tenant-safe writer — forces tenant_id to the
+                    // recipient's users.tenant_id. Never raw Notification::create().
+                    Notification::createNotification(
+                        $userId,
+                        $message,
+                        '/wallet',
+                        'transaction'
+                    );
+                });
+            } catch (\Throwable $e) {
+                // A bell failure must never unwind or mask the committed transfer.
+                Log::warning('[GroupExchange] completion bell failed (continuing)', [
+                    'exchange_id' => $exchangeId,
+                    'user_id'     => $change['user_id'] ?? null,
+                    'error'       => $e->getMessage(),
+                ]);
+            }
+        }
     }
 }

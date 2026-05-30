@@ -16,6 +16,7 @@ use App\Services\TranscriptionService;
 use App\Services\TranslationConfigurationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Services\FederatedConnectionService;
 use App\Services\FederationAuditService;
@@ -2592,7 +2593,7 @@ class FederationV2Controller extends BaseApiController
 
             // Verify receiver exists, opted in, and accepts federated transactions
             $receiver = DB::selectOne(
-                "SELECT u.id, u.tenant_id, t.name as tenant_name, fus.transactions_enabled_federated
+                "SELECT u.id, u.tenant_id, u.preferred_language, t.name as tenant_name, fus.transactions_enabled_federated
                  FROM users u JOIN tenants t ON t.id = u.tenant_id
                  JOIN federation_user_settings fus ON fus.user_id = u.id
                  WHERE u.id = ? AND u.tenant_id = ? AND u.status = 'active' AND fus.federation_optin = 1",
@@ -2628,6 +2629,51 @@ class FederationV2Controller extends BaseApiController
 
             $this->federationAuditService->log('federation_transaction', $tenantId, $receiverTenantIdInt, $userId,
                 ['transaction_id' => $txId, 'amount' => $amount, 'receiver_id' => $receiverIdInt]);
+
+            // In-app bell to the recipient: the credit has now committed, so the
+            // recipient's wallet actually changed. Mirror the EXTERNAL inbound bell
+            // (FederationExternalWebhookController::ensureExternalTransactionDelivery)
+            // which is the only federation transaction path that previously bell'd
+            // the receiver. Wrapped in try/catch so a bell failure can never undo
+            // or break the already-committed financial transaction.
+            try {
+                $senderInfo = DB::selectOne(
+                    "SELECT TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))) AS sender_name,
+                            t.name AS sender_tenant_name
+                     FROM users u JOIN tenants t ON t.id = u.tenant_id
+                     WHERE u.id = ? AND u.tenant_id = ?",
+                    [$userId, $tenantId]
+                );
+                $senderName = trim((string) ($senderInfo->sender_name ?? '')) !== ''
+                    ? (string) $senderInfo->sender_name
+                    : __('api.external_user_fallback');
+                $sourceCommunity = (string) ($senderInfo->sender_tenant_name ?? __('api.external_partner_fallback'));
+
+                // Render the bell text in the RECIPIENT's preferred_language, not
+                // the sending caller's locale. $receiver carries preferred_language.
+                LocaleContext::withLocale($receiver, function () use ($receiverIdInt, $receiverTenantIdInt, $amount, $senderName, $sourceCommunity) {
+                    $notifyMessage = __('svc_notifications.federation.transaction_received', [
+                        'amount' => (string) $amount,
+                        'sender' => $senderName,
+                        'partner' => $sourceCommunity,
+                    ]);
+                    Notification::createNotification(
+                        $receiverIdInt,
+                        $notifyMessage,
+                        '/wallet',
+                        'federation_transaction',
+                        false,
+                        $receiverTenantIdInt
+                    );
+                });
+            } catch (\Throwable $bellEx) {
+                \Illuminate\Support\Facades\Log::warning('FederationV2::sendTransaction in-app bell failed', [
+                    'transaction_id' => $txId,
+                    'receiver_id' => $receiverIdInt,
+                    'receiver_tenant_id' => $receiverTenantIdInt,
+                    'error' => $bellEx->getMessage(),
+                ]);
+            }
 
             try {
                 FederationEmailService::sendTransactionNotification(

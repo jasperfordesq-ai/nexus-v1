@@ -112,5 +112,8 @@
   },
   "course.enrolled": "Sie sind jetzt bei {{title}} registriert.",
   "course.completed": "Du hast {{title}} abgeschlossen! Gut gemacht.",
-  "course.enrolment_payment": "Kursanmeldung: {{title}}"
+  "course.enrolment_payment": "Kursanmeldung: {{title}}",
+  "vol_org_wallet.volunteer_paid_bell": "Du hast {{amount}} Zeitgutschriften von {{org}} für dein Engagement erhalten.",
+  "vol_org_wallet.admin_adjustment_credit_bell": "Das Guthaben von {{org}} wurde von der Verwaltung um {{amount}} Zeitgutschriften aufgestockt. Grund: {{reason}}",
+  "vol_org_wallet.admin_adjustment_debit_bell": "Das Guthaben von {{org}} wurde von der Verwaltung um {{amount}} Zeitgutschriften verringert. Grund: {{reason}}"
 }

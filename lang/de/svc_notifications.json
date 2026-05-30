@@ -135,5 +135,17 @@
     "reminder_bell": "Zielerinnerung: \"{{title}}\"",
     "reminder_push_title": "Zielerinnerung",
     "reminder_push_message": "Vergessen Sie Ihr Ziel nicht: \"{{title}}\""
+  },
+  "group_exchange": {
+    "completed_credit": "Du hast {{hours}} Zeitgutschriften aus dem abgeschlossenen Austausch „{{title}}\" erhalten.",
+    "completed_debit": "{{hours}} Zeitgutschriften wurden für den abgeschlossenen Austausch „{{title}}\" von deinem Guthaben abgezogen.",
+    "fallback_title": "einem Gruppenaustausch"
+  },
+  "credit_donation": {
+    "received_bell": "{{donor}} hat dir {{amount}} Zeitgutschriften gespendet.",
+    "received_bell_anonymous": "Du hast eine Spende von {{amount}} Zeitgutschriften erhalten."
+  },
+  "marketplace_payout": {
+    "onboarding_complete_bell": "Dein Verkäuferkonto ist vollständig eingerichtet — du kannst jetzt Marktplatz-Auszahlungen erhalten."
   }
 }

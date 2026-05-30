@@ -135,5 +135,17 @@
     "reminder_bell": "تذكير بالهدف: \"{{title}}\"",
     "reminder_push_title": "تذكير بالهدف",
     "reminder_push_message": "لا تنسَ هدفك: \"{{title}}\""
+  },
+  "group_exchange": {
+    "completed_credit": "لقد كسبت {{hours}} ساعة رصيد من التبادل المكتمل \"{{title}}\".",
+    "completed_debit": "تم خصم {{hours}} ساعة رصيد من رصيدك مقابل التبادل المكتمل \"{{title}}\".",
+    "fallback_title": "تبادل جماعي"
+  },
+  "credit_donation": {
+    "received_bell": "تبرّع لك {{donor}} بـ {{amount}} ساعة رصيد.",
+    "received_bell_anonymous": "لقد تلقّيت تبرعًا قدره {{amount}} ساعة رصيد."
+  },
+  "marketplace_payout": {
+    "onboarding_complete_bell": "تم إعداد حساب البائع بالكامل — يمكنك الآن استلام مدفوعات السوق."
   }
 }

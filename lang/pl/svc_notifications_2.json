@@ -112,5 +112,8 @@
   },
   "course.enrolled": "Jesteś teraz zarejestrowany w {{title}}.",
   "course.completed": "Ukończyłeś {{title}}! Dobrze zrobiony.",
-  "course.enrolment_payment": "Zapisy na kurs: {{title}}"
+  "course.enrolment_payment": "Zapisy na kurs: {{title}}",
+  "vol_org_wallet.volunteer_paid_bell": "Otrzymałeś/aś {{amount}} kredytów czasu od {{org}} za swój wolontariat.",
+  "vol_org_wallet.admin_adjustment_credit_bell": "Saldo {{org}} zostało zwiększone o {{amount}} kredytów czasu przez administrację. Powód: {{reason}}",
+  "vol_org_wallet.admin_adjustment_debit_bell": "Saldo {{org}} zostało zmniejszone o {{amount}} kredytów czasu przez administrację. Powód: {{reason}}"
 }

@@ -135,5 +135,17 @@
     "reminder_bell": "Rappel d'objectif : \"{{title}}\"",
     "reminder_push_title": "Rappel d'objectif",
     "reminder_push_message": "N'oubliez pas votre objectif : \"{{title}}\""
+  },
+  "group_exchange": {
+    "completed_credit": "Vous avez gagné {{hours}} crédits-temps grâce à l'échange terminé « {{title}} ».",
+    "completed_debit": "{{hours}} crédits-temps ont été débités de votre solde pour l'échange terminé « {{title}} ».",
+    "fallback_title": "un échange de groupe"
+  },
+  "credit_donation": {
+    "received_bell": "{{donor}} vous a fait don de {{amount}} crédits-temps.",
+    "received_bell_anonymous": "Vous avez reçu un don de {{amount}} crédits-temps."
+  },
+  "marketplace_payout": {
+    "onboarding_complete_bell": "Votre compte vendeur est entièrement configuré — vous pouvez désormais recevoir les versements de la place de marché."
   }
 }

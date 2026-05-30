@@ -356,6 +356,31 @@ class VolOrgWalletService
 
         // Send payment confirmation email to volunteer (outside transaction)
         if (!empty($result['success'])) {
+            $orgNameForBell = $result['_org_name'] ?? '';
+            $amountForBell  = (int) ($result['_amount'] ?? 0);
+
+            // In-app bell to the paid volunteer (success path only; rendered in
+            // their preferred_language). Wrapped in try/catch so a bell failure
+            // never affects the already-committed payment.
+            try {
+                $bellVolunteer = DB::table('users')->where('id', $volunteerId)->where('tenant_id', TenantContext::getId())->select(['preferred_language'])->first();
+                $walletLink = TenantContext::getSlugPrefix() . '/wallet';
+                LocaleContext::withLocale($bellVolunteer, function () use ($volunteerId, $amountForBell, $orgNameForBell, $walletLink) {
+                    $message = __('svc_notifications_2.vol_org_wallet.volunteer_paid_bell', [
+                        'amount' => $amountForBell,
+                        'org' => $orgNameForBell,
+                    ]);
+                    \App\Models\Notification::createNotification(
+                        $volunteerId,
+                        $message,
+                        $walletLink,
+                        'volunteer_payment'
+                    );
+                });
+            } catch (\Throwable $e) {
+                Log::warning('[VolOrgWalletService] payVolunteer bell error: ' . $e->getMessage(), ['volunteer_id' => $volunteerId]);
+            }
+
             try {
                 $volunteer = DB::table('users')->where('id', $volunteerId)->where('tenant_id', TenantContext::getId())->select(['email', 'first_name', 'name', 'preferred_language'])->first();
                 if ($volunteer && !empty($volunteer->email)) {
@@ -402,9 +427,9 @@ class VolOrgWalletService
 
         $tenantId = TenantContext::getId();
 
-        return DB::transaction(function () use ($volOrgId, $amount, $adminId, $reason, $tenantId) {
+        $result = DB::transaction(function () use ($volOrgId, $amount, $adminId, $reason, $tenantId) {
             $org = DB::selectOne(
-                "SELECT id, balance FROM vol_organizations WHERE id = ? AND tenant_id = ? FOR UPDATE",
+                "SELECT id, name, balance FROM vol_organizations WHERE id = ? AND tenant_id = ? FOR UPDATE",
                 [$volOrgId, $tenantId]
             );
 
@@ -427,7 +452,69 @@ class VolOrgWalletService
                 VALUES (?, ?, ?, 'admin_adjustment', ?, ?, ?, NOW())
             ", [$tenantId, $volOrgId, $adminId, $amount, $newBalance, __('svc_notifications_2.vol_org_wallet.admin_adjustment_description', ['reason' => $reason])]);
 
-            return ['success' => true, 'message' => __('svc_notifications_2.vol_org_wallet.adjustment_applied'), 'new_balance' => $newBalance];
+            return ['success' => true, 'message' => __('svc_notifications_2.vol_org_wallet.adjustment_applied'), 'new_balance' => $newBalance, '_org_name' => $org->name];
         });
+
+        // In-app bell fan-out to the org's owner/admin members (success path only,
+        // after the balance change has committed). Wrapped in try/catch so a bell
+        // failure never affects the already-applied adjustment.
+        if (!empty($result['success'])) {
+            try {
+                $orgName = $result['_org_name'] ?? '';
+
+                // Resolve distinct owner/admin members: the org's primary owner
+                // (vol_organizations.user_id) plus any active owner/admin in
+                // org_members. Load preferred_language for per-recipient locale.
+                $recipients = DB::select("
+                    SELECT DISTINCT u.id, u.preferred_language
+                    FROM users u
+                    WHERE u.tenant_id = ?
+                      AND (
+                            u.id = (SELECT vo.user_id FROM vol_organizations vo WHERE vo.id = ? AND vo.tenant_id = ?)
+                            OR u.id IN (
+                                SELECT om.user_id FROM org_members om
+                                WHERE om.tenant_id = ?
+                                  AND om.organization_id = ?
+                                  AND om.status = 'active'
+                                  AND om.role IN ('owner', 'admin')
+                            )
+                          )
+                ", [$tenantId, $volOrgId, $tenantId, $tenantId, $volOrgId]);
+
+                $dashboardLink = TenantContext::getSlugPrefix() . '/volunteering/org/' . $volOrgId . '/dashboard';
+
+                foreach ($recipients as $recipient) {
+                    // Wrap per-recipient so each owner/admin sees the message in
+                    // their own preferred_language.
+                    LocaleContext::withLocale($recipient, function () use ($recipient, $amount, $reason, $orgName, $dashboardLink) {
+                        if ($amount >= 0) {
+                            $message = __('svc_notifications_2.vol_org_wallet.admin_adjustment_credit_bell', [
+                                'amount' => (int) round(abs($amount)),
+                                'org' => $orgName,
+                                'reason' => $reason,
+                            ]);
+                        } else {
+                            $message = __('svc_notifications_2.vol_org_wallet.admin_adjustment_debit_bell', [
+                                'amount' => (int) round(abs($amount)),
+                                'org' => $orgName,
+                                'reason' => $reason,
+                            ]);
+                        }
+                        \App\Models\Notification::createNotification(
+                            (int) $recipient->id,
+                            $message,
+                            $dashboardLink,
+                            'admin_adjustment'
+                        );
+                    });
+                }
+            } catch (\Throwable $e) {
+                Log::warning('[VolOrgWalletService] adminAdjustment bell error: ' . $e->getMessage(), ['vol_org_id' => $volOrgId]);
+            }
+
+            unset($result['_org_name']);
+        }
+
+        return $result;
     }
 }

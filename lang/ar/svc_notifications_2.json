@@ -112,5 +112,8 @@
   },
   "course.enrolled": "أنت الآن مسجل في {{title}}.",
   "course.completed": "لقد أكملت {{title}}! أحسنت.",
-  "course.enrolment_payment": "التسجيل في الدورة: {{title}}"
+  "course.enrolment_payment": "التسجيل في الدورة: {{title}}",
+  "vol_org_wallet.volunteer_paid_bell": "لقد تلقّيت {{amount}} ساعة رصيد من {{org}} مقابل تطوّعك.",
+  "vol_org_wallet.admin_adjustment_credit_bell": "تمت زيادة رصيد {{org}} بمقدار {{amount}} ساعة رصيد من قِبل الإدارة. السبب: {{reason}}",
+  "vol_org_wallet.admin_adjustment_debit_bell": "تم تخفيض رصيد {{org}} بمقدار {{amount}} ساعة رصيد من قِبل الإدارة. السبب: {{reason}}"
 }

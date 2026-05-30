@@ -135,5 +135,17 @@
     "reminder_bell": "Goal reminder: \"{{title}}\"",
     "reminder_push_title": "Goal Reminder",
     "reminder_push_message": "Don't forget your goal: \"{{title}}\""
+  },
+  "group_exchange": {
+    "completed_credit": "You earned {{hours}} time credits from the completed exchange \"{{title}}\".",
+    "completed_debit": "{{hours}} time credits were debited from your balance for the completed exchange \"{{title}}\".",
+    "fallback_title": "a group exchange"
+  },
+  "credit_donation": {
+    "received_bell": "{{donor}} donated {{amount}} time credits to you.",
+    "received_bell_anonymous": "You received a donation of {{amount}} time credits."
+  },
+  "marketplace_payout": {
+    "onboarding_complete_bell": "Your seller account is fully set up — you can now receive marketplace payouts."
   }
 }

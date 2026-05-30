@@ -135,5 +135,17 @@
     "reminder_bell": "Promemoria obiettivo: \"{{title}}\"",
     "reminder_push_title": "Promemoria obiettivo",
     "reminder_push_message": "Non dimenticare il tuo obiettivo: \"{{title}}\""
+  },
+  "group_exchange": {
+    "completed_credit": "Hai guadagnato {{hours}} crediti di tempo dallo scambio completato \"{{title}}\".",
+    "completed_debit": "{{hours}} crediti di tempo sono stati addebitati dal tuo saldo per lo scambio completato \"{{title}}\".",
+    "fallback_title": "uno scambio di gruppo"
+  },
+  "credit_donation": {
+    "received_bell": "{{donor}} ti ha donato {{amount}} crediti di tempo.",
+    "received_bell_anonymous": "Hai ricevuto una donazione di {{amount}} crediti di tempo."
+  },
+  "marketplace_payout": {
+    "onboarding_complete_bell": "Il tuo account venditore è completamente configurato: ora puoi ricevere i pagamenti del marketplace."
   }
 }

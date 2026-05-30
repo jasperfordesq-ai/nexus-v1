@@ -112,5 +112,8 @@
   },
   "course.enrolled": "Je bent nu ingeschreven bij {{title}}.",
   "course.completed": "Je hebt {{title}} voltooid! Goed gedaan.",
-  "course.enrolment_payment": "Cursusinschrijving: {{title}}"
+  "course.enrolment_payment": "Cursusinschrijving: {{title}}",
+  "vol_org_wallet.volunteer_paid_bell": "Je hebt {{amount}} tijdcredits van {{org}} ontvangen voor je vrijwilligerswerk.",
+  "vol_org_wallet.admin_adjustment_credit_bell": "Het saldo van {{org}} is door de beheerder met {{amount}} tijdcredits verhoogd. Reden: {{reason}}",
+  "vol_org_wallet.admin_adjustment_debit_bell": "Het saldo van {{org}} is door de beheerder met {{amount}} tijdcredits verlaagd. Reden: {{reason}}"
 }

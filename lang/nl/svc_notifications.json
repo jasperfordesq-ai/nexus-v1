@@ -135,5 +135,17 @@
     "reminder_bell": "Doelherinnering: \"{{title}}\"",
     "reminder_push_title": "Doelherinnering",
     "reminder_push_message": "Vergeet uw doel niet: \"{{title}}\""
+  },
+  "group_exchange": {
+    "completed_credit": "Je hebt {{hours}} tijdcredits verdiend met de afgeronde uitwisseling \"{{title}}\".",
+    "completed_debit": "Er zijn {{hours}} tijdcredits van je saldo afgeschreven voor de afgeronde uitwisseling \"{{title}}\".",
+    "fallback_title": "een groepsuitwisseling"
+  },
+  "credit_donation": {
+    "received_bell": "{{donor}} heeft je {{amount}} tijdcredits gedoneerd.",
+    "received_bell_anonymous": "Je hebt een donatie van {{amount}} tijdcredits ontvangen."
+  },
+  "marketplace_payout": {
+    "onboarding_complete_bell": "Je verkopersaccount is volledig ingesteld — je kunt nu marktplaatsuitbetalingen ontvangen."
   }
 }

@@ -135,5 +135,17 @@
     "reminder_bell": "Meabhrúchán sprice: \"{{title}}\"",
     "reminder_push_title": "Meabhrúchán Sprice",
     "reminder_push_message": "Ná déan dearmad de do sprioc: \"{{title}}\""
+  },
+  "group_exchange": {
+    "completed_credit": "Thuill tú {{hours}} creidmheas ama ón malartú críochnaithe \"{{title}}\".",
+    "completed_debit": "Baineadh {{hours}} creidmheas ama de do iarmhéid don mhalartú críochnaithe \"{{title}}\".",
+    "fallback_title": "malartú grúpa"
+  },
+  "credit_donation": {
+    "received_bell": "Bhronn {{donor}} {{amount}} creidmheas ama ort.",
+    "received_bell_anonymous": "Fuair tú bronntanas de {{amount}} creidmheas ama."
+  },
+  "marketplace_payout": {
+    "onboarding_complete_bell": "Tá do chuntas díoltóra socraithe go hiomlán — is féidir leat íocaíochtaí margaidh a fháil anois."
   }
 }

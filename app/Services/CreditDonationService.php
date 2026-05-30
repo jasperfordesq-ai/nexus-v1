@@ -7,7 +7,9 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\CreditDonation;
+use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -97,6 +99,39 @@ class CreditDonationService
                 DonationEmailService::sendDonationEmails($tenantId, $donor, $recipient, $amount, $message);
             } catch (\Throwable $e) {
                 Log::warning('CreditDonationService: donation email failed: ' . $e->getMessage());
+            }
+
+            // In-app bell to the RECIPIENT — their balance just changed, but the
+            // member-to-member donation path was previously email-only / silent.
+            // Rendered in the recipient's preferred_language; never breaks the
+            // already-committed financial transaction.
+            try {
+                $donorName = trim(
+                    trim(($donor->first_name ?? '') . ' ' . ($donor->last_name ?? ''))
+                        ?: (string) ($donor->name ?? '')
+                );
+
+                LocaleContext::withLocale($recipient, function () use ($toUserId, $amount, $donorName, $tenantId) {
+                    $message = $donorName !== ''
+                        ? __('svc_notifications.credit_donation.received_bell', [
+                            'amount' => $amount,
+                            'donor'  => $donorName,
+                        ])
+                        : __('svc_notifications.credit_donation.received_bell_anonymous', [
+                            'amount' => $amount,
+                        ]);
+
+                    Notification::createNotification(
+                        $toUserId,
+                        $message,
+                        '/wallet',
+                        'transaction',
+                        false,
+                        $tenantId
+                    );
+                });
+            } catch (\Throwable $e) {
+                Log::warning('CreditDonationService: donation recipient bell failed: ' . $e->getMessage());
             }
         }
 

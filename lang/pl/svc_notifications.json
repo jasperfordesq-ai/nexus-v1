@@ -135,5 +135,17 @@
     "reminder_bell": "Przypomnienie o celu: \"{{title}}\"",
     "reminder_push_title": "Przypomnienie o celu",
     "reminder_push_message": "Nie zapomnij o swoim celu: \"{{title}}\""
+  },
+  "group_exchange": {
+    "completed_credit": "Zdobyłeś/aś {{hours}} kredytów czasu z zakończonej wymiany „{{title}}\".",
+    "completed_debit": "Z Twojego salda odjęto {{hours}} kredytów czasu za zakończoną wymianę „{{title}}\".",
+    "fallback_title": "wymianę grupową"
+  },
+  "credit_donation": {
+    "received_bell": "{{donor}} przekazał(a) Ci {{amount}} kredytów czasu.",
+    "received_bell_anonymous": "Otrzymałeś/aś darowiznę {{amount}} kredytów czasu."
+  },
+  "marketplace_payout": {
+    "onboarding_complete_bell": "Twoje konto sprzedawcy jest w pełni skonfigurowane — możesz teraz otrzymywać wypłaty z targowiska."
   }
 }

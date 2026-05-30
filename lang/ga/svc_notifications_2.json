@@ -112,5 +112,8 @@
   },
   "course.enrolled": "Tá tú cláraithe ar {{title}} anois.",
   "course.completed": "Chríochnaigh tú {{title}}! Maith thú.",
-  "course.enrolment_payment": "Clárú an chúrsa: {{title}}"
+  "course.enrolment_payment": "Clárú an chúrsa: {{title}}",
+  "vol_org_wallet.volunteer_paid_bell": "Fuair tú {{amount}} creidmheas ama ó {{org}} as do chuid oibre deonaí.",
+  "vol_org_wallet.admin_adjustment_credit_bell": "Cuireadh {{amount}} creidmheas ama le hiarmhéid {{org}} ag riarthóir. Cúis: {{reason}}",
+  "vol_org_wallet.admin_adjustment_debit_bell": "Baineadh {{amount}} creidmheas ama d'iarmhéid {{org}} ag riarthóir. Cúis: {{reason}}"
 }
