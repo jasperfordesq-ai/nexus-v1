@@ -12,6 +12,11 @@
   "messages": "Messages",
   "notifications": "Notifications",
   "activity": "Activity",
+  "menuLabels": {
+    "activity": "Activity",
+    "matches": "Matches",
+    "reviews": "Reviews"
+  },
   "matches": {
     "title": "Matches",
     "subtitle": "Recommended opportunities across your timebank.",
