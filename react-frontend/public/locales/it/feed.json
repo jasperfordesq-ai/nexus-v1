@@ -344,7 +344,8 @@
       "level_reached": "Livello raggiunto"
     },
     "read_more_about": "Read more about {{title}}",
-    "detail_course": "Visualizza il corso"
+    "detail_course": "Visualizza il corso",
+    "type_course": "Corso"
   },
   "poll": {
     "load_failed": "Impossibile caricare i dati del sondaggio.",

@@ -344,7 +344,8 @@
       "level_reached": "レベル到達"
     },
     "read_more_about": "Read more about {{title}}",
-    "detail_course": "コースを見る"
+    "detail_course": "コースを見る",
+    "type_course": "コース"
   },
   "poll": {
     "load_failed": "投票データの読み込みに失敗しました。",

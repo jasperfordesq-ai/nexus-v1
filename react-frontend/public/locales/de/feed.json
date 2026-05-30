@@ -344,7 +344,8 @@
       "level_reached": "Stufe erreicht"
     },
     "read_more_about": "Read more about {{title}}",
-    "detail_course": "Kurs ansehen"
+    "detail_course": "Kurs ansehen",
+    "type_course": "Kurs"
   },
   "poll": {
     "load_failed": "Umfragedaten konnten nicht geladen werden.",

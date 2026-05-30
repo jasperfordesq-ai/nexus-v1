@@ -279,6 +279,13 @@ const typeConfig = {
     softGradient: 'from-emerald-500/10 to-teal-500/10',
     accentGradient: 'from-emerald-500 via-teal-500 to-emerald-500',
   },
+  course: {
+    labelKey: 'card.type_course',
+    color: 'primary' as const,
+    icon: <BookOpen className="w-3 h-3" aria-hidden="true" />,
+    softGradient: 'from-indigo-500/10 to-violet-500/10',
+    accentGradient: 'from-indigo-500 via-violet-500 to-indigo-500',
+  },
 };
 
 /* ────────────── Heart Overlay (double-tap to like) ────────────── */

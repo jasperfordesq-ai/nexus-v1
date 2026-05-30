@@ -344,7 +344,8 @@
       "level_reached": "Osiągnięto poziom"
     },
     "read_more_about": "Read more about {{title}}",
-    "detail_course": "Zobacz kurs"
+    "detail_course": "Zobacz kurs",
+    "type_course": "Kurs"
   },
   "poll": {
     "load_failed": "Nie udało się załadować danych ankiety.",

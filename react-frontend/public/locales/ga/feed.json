@@ -344,7 +344,8 @@
       "level_reached": "Leibhéal bainte amach"
     },
     "read_more_about": "Read more about {{title}}",
-    "detail_course": "Féach ar an gcúrsa"
+    "detail_course": "Féach ar an gcúrsa",
+    "type_course": "Cúrsa"
   },
   "poll": {
     "load_failed": "Theip ar shonraí an vóta a luchtú.",
