@@ -6,6 +6,7 @@
 import { useCallback } from 'react';
 import {
   Image,
+  Pressable,
   RefreshControl,
   ScrollView,
   Share,
@@ -15,7 +16,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Button as HeroButton, Card as HeroCard, Chip, Surface } from 'heroui-native';
+import { Card as HeroCard, Chip, Surface } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import { getBlogPost, type BlogPost } from '@/lib/api/blog';
@@ -31,6 +32,42 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 const WEB_URL = 'https://app.project-nexus.ie';
+
+function ActionPill({
+  label,
+  icon,
+  onPress,
+  primary,
+  accessibilityLabel,
+}: {
+  label: string;
+  icon: React.ComponentProps<typeof Ionicons>['name'];
+  onPress: () => void;
+  primary: string;
+  accessibilityLabel?: string;
+}) {
+  const theme = useTheme();
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel ?? label}
+      onPress={onPress}
+      className="min-h-10 flex-row items-center justify-center gap-2 rounded-full px-4"
+      style={({ pressed }) => ({
+        backgroundColor: withAlpha(primary, 0.12),
+        borderWidth: 1,
+        borderColor: withAlpha(primary, 0.22),
+        opacity: pressed ? 0.86 : 1,
+      })}
+    >
+      <Ionicons name={icon} size={16} color={primary} />
+      <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
 
 export default function BlogPostScreen() {
   const { t } = useTranslation(['blog', 'common']);
@@ -118,26 +155,28 @@ export default function BlogPostScreen() {
           }}
         />
         <ScrollView
-          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 48 }}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 110 }}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl refreshing={isLoading} onRefresh={refresh} tintColor={primary} colors={[primary]} />
           }
         >
-          <HeroCard className="mb-4 overflow-hidden rounded-panel p-0">
+          <HeroCard className="mb-4 overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.16) }}>
             {post.cover_image ? (
               <Image
                 source={{ uri: resolveImageUrl(post.cover_image) ?? post.cover_image }}
-                className="h-[220px] w-full"
+                className="h-[240px] w-full"
                 resizeMode="cover"
                 accessibilityLabel={post.title}
               />
             ) : (
-              <View className="h-[180px] w-full items-center justify-center" style={{ backgroundColor: withAlpha(primary, 0.10) }}>
-                <Ionicons name="newspaper-outline" size={42} color={primary} />
+              <View className="h-[150px] w-full items-center justify-center" style={{ backgroundColor: withAlpha(primary, 0.10) }}>
+                <View className="size-16 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.12) }}>
+                  <Ionicons name="newspaper-outline" size={34} color={primary} />
+                </View>
               </View>
             )}
-            <HeroCard.Body className="gap-4 p-4">
+            <HeroCard.Body className="gap-5 p-5">
               <View className="flex-row flex-wrap gap-2">
                 {post.category ? (
                   <Chip size="sm" variant="secondary">
@@ -153,7 +192,7 @@ export default function BlogPostScreen() {
                 ) : null}
               </View>
 
-              <Text className="text-2xl font-bold leading-8" style={{ color: theme.text }}>
+              <Text className="text-3xl font-bold leading-9" style={{ color: theme.text }} numberOfLines={5}>
                 {post.title}
               </Text>
 
@@ -163,7 +202,12 @@ export default function BlogPostScreen() {
                 </Text>
               ) : null}
 
-              <Surface variant="secondary" className="flex-row items-center gap-3 rounded-panel-inner p-3">
+              <Surface
+                variant="secondary"
+                className="gap-3 rounded-panel-inner p-3"
+                style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+              >
+                <View className="flex-row items-center gap-3">
                 <Avatar uri={post.author?.avatar ?? null} name={post.author?.name ?? '?'} size={40} />
                 <View className="min-w-0 flex-1">
                   <Text className="text-sm font-semibold" style={{ color: theme.text }}>
@@ -175,19 +219,24 @@ export default function BlogPostScreen() {
                     </Text>
                   ) : null}
                 </View>
-                <HeroButton isIconOnly variant="secondary" accessibilityLabel={t('detail.share')} onPress={() => void handleShare(post)}>
-                  <Ionicons name="share-outline" size={18} color={primary} />
-                </HeroButton>
+                </View>
+                <View className="items-start">
+                  <ActionPill
+                    label={t('detail.share')}
+                    icon="share-outline"
+                    primary={primary}
+                    accessibilityLabel={t('detail.share')}
+                    onPress={() => void handleShare(post)}
+                  />
+                </View>
               </Surface>
             </HeroCard.Body>
           </HeroCard>
 
           {(post.tags ?? []).length > 0 ? (
-            <HeroCard className="mb-4 rounded-panel p-0">
+            <HeroCard className="mb-4 overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.1) }}>
               <HeroCard.Body className="gap-3 p-4">
-                <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>
-                  {t('detail.tags')}
-                </Text>
+                <SectionTitle icon="pricetags-outline" label={t('detail.tags')} primary={primary} theme={theme} />
                 <View className="flex-row flex-wrap gap-2">
                   {(post.tags ?? []).map((tag) => (
                     <Chip key={tag} size="sm" variant="secondary">
@@ -199,11 +248,9 @@ export default function BlogPostScreen() {
             </HeroCard>
           ) : null}
 
-          <HeroCard className="rounded-panel p-0">
-            <HeroCard.Body className="gap-3 p-4">
-              <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>
-                {t('detail.article')}
-              </Text>
+          <HeroCard className="overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.1) }}>
+            <HeroCard.Body className="gap-4 p-5">
+              <SectionTitle icon="document-text-outline" label={t('detail.article')} primary={primary} theme={theme} />
               {post.content ? (
                 <Text className="text-base leading-7" style={{ color: theme.text }}>
                   {stripHtml(post.content)}
@@ -213,7 +260,11 @@ export default function BlogPostScreen() {
                   <Text className="text-base leading-7" style={{ color: theme.text }}>
                     {post.excerpt}
                   </Text>
-                  <Surface variant="secondary" className="flex-row items-center gap-2 rounded-panel-inner p-3">
+                  <Surface
+                    variant="secondary"
+                    className="flex-row items-center gap-2 rounded-panel-inner p-3"
+                    style={{ borderWidth: 1, borderColor: withAlpha(theme.info ?? primary, 0.16) }}
+                  >
                     <Ionicons name="information-circle-outline" size={16} color={theme.info ?? primary} />
                     <Text className="min-w-0 flex-1 text-xs font-medium" style={{ color: theme.info ?? primary }}>
                       {t('detail.readFull')}
@@ -226,6 +277,29 @@ export default function BlogPostScreen() {
         </ScrollView>
       </SafeAreaView>
     </ModalErrorBoundary>
+  );
+}
+
+function SectionTitle({
+  icon,
+  label,
+  primary,
+  theme,
+}: {
+  icon: React.ComponentProps<typeof Ionicons>['name'];
+  label: string;
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+}) {
+  return (
+    <View className="flex-row items-center gap-2">
+      <View className="size-8 items-center justify-center rounded-full" style={{ backgroundColor: withAlpha(primary, 0.12) }}>
+        <Ionicons name={icon} size={16} color={primary} />
+      </View>
+      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>
+        {label}
+      </Text>
+    </View>
   );
 }
 

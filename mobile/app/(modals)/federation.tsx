@@ -3,8 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useMemo, type ReactNode } from 'react';
-import { FlatList, RefreshControl, Text, View } from 'react-native';
+import { useCallback, useMemo, type ComponentProps, type ReactNode } from 'react';
+import { FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -32,7 +32,7 @@ import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
-type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
+type IoniconName = ComponentProps<typeof Ionicons>['name'];
 
 const quickLinks: { key: string; icon: IoniconName; tone: string; href: '/(modals)/federation-partners' | '/(modals)/federation-members' | '/(modals)/federation-connections' | '/(modals)/federation-messages' | '/(modals)/federation-listings' | '/(modals)/federation-groups' | '/(modals)/federation-events' | '/(modals)/federation-onboarding' | '/(modals)/federation-settings' }[] = [
   { key: 'partners', icon: 'globe-outline', tone: '#6366f1', href: '/(modals)/federation-partners' },
@@ -90,14 +90,18 @@ function StatTile({
   theme: ReturnType<typeof useTheme>;
 }) {
   return (
-    <Surface variant="secondary" className="min-w-[46%] flex-1 gap-2 rounded-panel-inner p-4">
-      <View className="size-9 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(tone, 0.14) }}>
-        <Ionicons name={icon} size={18} color={tone} />
+    <Surface
+      variant="secondary"
+      className="min-h-[112px] min-w-[46%] flex-1 gap-2 rounded-panel-inner p-3.5"
+      style={{ borderWidth: 1, borderColor: withAlpha(tone, 0.14) }}
+    >
+      <View className="size-9 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(tone, 0.13) }}>
+        <Ionicons name={icon} size={17} color={tone} />
       </View>
       <Text className="text-2xl font-bold" style={{ color: theme.text }} numberOfLines={1}>
         {value}
       </Text>
-      <Text className="text-[11px] font-semibold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>
+      <Text className="text-[11px] font-semibold uppercase leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>
         {label}
       </Text>
     </Surface>
@@ -123,27 +127,33 @@ function FederationHero({
   const transactions = stats?.transactions_count ?? status?.transactions_count ?? stats?.cross_community_exchanges ?? 0;
 
   return (
-    <HeroCard className="mb-4 overflow-hidden rounded-panel p-0">
+    <HeroCard
+      variant="default"
+      className="mb-4 overflow-hidden rounded-panel p-0"
+      style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.16) }}
+    >
       <View className="h-1.5" style={{ backgroundColor: primary }} />
-      <HeroCard.Body className="gap-5 p-4 pt-0">
+      <HeroCard.Body className="gap-5 p-5">
         <View className="flex-row items-start gap-3">
-          <View className="size-14 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
-            <Ionicons name="git-network-outline" size={27} color={primary} />
+          <View className="size-12 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+            <Ionicons name="git-network-outline" size={24} color={primary} />
           </View>
           <View className="min-w-0 flex-1 gap-2">
-            <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>
+            <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>
               {t('hub.eyebrow')}
             </Text>
             <Text className="text-2xl font-bold" style={{ color: theme.text }} numberOfLines={2}>
               {t('hub.heroTitle')}
             </Text>
-            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={4}>
               {t('hub.heroDescription')}
             </Text>
-            <Chip size="sm" variant="secondary" color={enabled ? 'success' : 'warning'}>
-              <Ionicons name={enabled ? 'checkmark-circle-outline' : 'pause-circle-outline'} size={13} color={enabled ? '#22c55e' : '#f59e0b'} />
-              <Chip.Label>{enabled ? t('hub.statusActive') : t('hub.statusInactive')}</Chip.Label>
-            </Chip>
+            <View className="items-start">
+              <Chip size="sm" variant="secondary" color={enabled ? 'success' : 'warning'}>
+                <Ionicons name={enabled ? 'checkmark-circle-outline' : 'pause-circle-outline'} size={13} color={enabled ? '#22c55e' : '#f59e0b'} />
+                <Chip.Label>{enabled ? t('hub.statusActive') : t('hub.statusInactive')}</Chip.Label>
+              </Chip>
+            </View>
           </View>
         </View>
 
@@ -167,35 +177,37 @@ function QuickLinksSection({
 }) {
   return (
     <View className="mb-4 gap-3">
-      <Text className="text-lg font-bold" style={{ color: theme.text }}>
-        {t('hub.exploreNetwork')}
-      </Text>
-      <View className="flex-row flex-wrap gap-3">
+      <SectionHeading title={t('hub.exploreNetwork')} theme={theme} />
+      <View className="gap-2">
         {quickLinks.map((link) => (
           <HeroButton
             key={link.key}
             variant="ghost"
             feedbackVariant="scale"
-            className="min-w-[46%] flex-1"
+            className="w-full rounded-panel-inner p-0"
             accessibilityLabel={t(`hub.quick.${link.key}.title`)}
             onPress={() => {
               void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               router.push(link.href as Href);
             }}
           >
-            <Surface variant="secondary" className="gap-2 rounded-panel-inner p-4">
-              <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(link.tone, 0.14) }}>
+            <Surface
+              variant="secondary"
+              className="w-full flex-row items-center gap-3 rounded-panel-inner p-3"
+              style={{ borderWidth: 1, borderColor: withAlpha(link.tone, 0.14) }}
+            >
+              <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(link.tone, 0.13) }}>
                 <Ionicons name={link.icon} size={20} color={link.tone} />
               </View>
-              <View className="flex-row items-center gap-1">
-                <Text className="min-w-0 flex-1 text-sm font-bold" style={{ color: theme.text }} numberOfLines={1}>
+              <View className="min-w-0 flex-1 gap-0.5">
+                <Text className="text-sm font-bold" style={{ color: theme.text }} numberOfLines={1}>
                   {t(`hub.quick.${link.key}.title`)}
                 </Text>
-                <Ionicons name="chevron-forward-outline" size={14} color={theme.textSecondary} />
+                <Text className="text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>
+                  {t(`hub.quick.${link.key}.description`)}
+                </Text>
               </View>
-              <Text className="text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>
-                {t(`hub.quick.${link.key}.description`)}
-              </Text>
+              <Ionicons name="chevron-forward-outline" size={16} color={theme.textSecondary} />
             </Surface>
           </HeroButton>
         ))}
@@ -218,19 +230,24 @@ function PartnerCard({
   const connectedDate = formatDate(item.connected_since ?? item.partnership_since);
 
   return (
-    <HeroButton
-      className="mx-4 my-2"
-      variant="ghost"
-      feedbackVariant="scale"
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={item.name}
+      className="mb-3 w-full rounded-panel"
       onPress={() => {
         void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         router.push({ pathname: '/(modals)/federation-partner', params: { id: String(item.id) } });
       }}
-      accessibilityLabel={item.name}
+      style={({ pressed }) => ({ opacity: pressed ? 0.86 : 1 })}
     >
-      <HeroCard className="min-h-[156px] rounded-panel p-0">
+      <HeroCard
+        variant="default"
+        className="w-full overflow-hidden rounded-panel p-0"
+        style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.12) }}
+      >
         <HeroCard.Body className="gap-4 p-4">
-          <View className="flex-row items-start gap-3">
+          <View className="absolute bottom-0 left-0 top-0 w-1" style={{ backgroundColor: primary }} />
+          <View className="flex-row items-start gap-3 pl-1">
             <Avatar uri={item.logo} name={item.name} size={56} />
             <View className="min-w-0 flex-1 gap-1">
               <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={2}>
@@ -252,10 +269,10 @@ function PartnerCard({
             </View>
           </View>
 
-          <View className="flex-row flex-wrap items-center gap-2">
+          <View className="flex-row flex-wrap items-center gap-2 pl-1">
             {item.federation_level_name ? (
               <Chip size="sm" variant="secondary">
-                <Chip.Label>{item.federation_level_name}</Chip.Label>
+                <Chip.Label numberOfLines={1}>{item.federation_level_name}</Chip.Label>
               </Chip>
             ) : null}
             <Chip size="sm" variant="secondary">
@@ -270,7 +287,11 @@ function PartnerCard({
             ) : null}
           </View>
 
-          <Surface variant="secondary" className="flex-row items-center justify-center gap-2 rounded-panel-inner px-3 py-2">
+          <Surface
+            variant="secondary"
+            className="self-start flex-row items-center gap-2 rounded-full px-3 py-2"
+            style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.18) }}
+          >
             <Text className="text-sm font-semibold" style={{ color: primary }}>
               {t('hub.viewCommunity')}
             </Text>
@@ -278,7 +299,7 @@ function PartnerCard({
           </Surface>
         </HeroCard.Body>
       </HeroCard>
-    </HeroButton>
+    </Pressable>
   );
 }
 
@@ -301,9 +322,13 @@ function ActivityCard({
   };
 
   return (
-    <Surface variant="secondary" className="gap-2 rounded-panel-inner p-3">
+    <Surface
+      variant="secondary"
+      className="gap-2 rounded-panel-inner p-3"
+      style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+    >
       <View className="flex-row items-start gap-3">
-        <View className="size-9 items-center justify-center rounded-2xl bg-background">
+        <View className="size-9 items-center justify-center rounded-2xl" style={{ backgroundColor: theme.surface }}>
           <Ionicons name={iconByType[item.type] ?? 'pulse-outline'} size={18} color={theme.textSecondary} />
         </View>
         <View className="min-w-0 flex-1 gap-1">
@@ -322,6 +347,22 @@ function ActivityCard({
   );
 }
 
+function SectionHeading({
+  title,
+  theme,
+}: {
+  title: string;
+  theme: ReturnType<typeof useTheme>;
+}) {
+  return (
+    <View className="flex-row items-center justify-between gap-3">
+      <Text className="min-w-0 flex-1 text-lg font-bold" style={{ color: theme.text }} numberOfLines={2}>
+        {title}
+      </Text>
+    </View>
+  );
+}
+
 function SectionCard({
   title,
   children,
@@ -333,9 +374,7 @@ function SectionCard({
 }) {
   return (
     <View className="mb-4 gap-3">
-      <Text className="text-lg font-bold" style={{ color: theme.text }}>
-        {title}
-      </Text>
+      <SectionHeading title={title} theme={theme} />
       {children}
     </View>
   );
@@ -398,7 +437,7 @@ export default function FederationScreen() {
             />
           }
           ListHeaderComponent={
-            <View className="px-4 pb-2">
+            <View className="pb-2">
               <FederationHero status={status} stats={stats} primary={primary} theme={theme} t={t} />
 
               <QuickLinksSection theme={theme} t={t} />
@@ -417,7 +456,7 @@ export default function FederationScreen() {
             </View>
           }
           ListFooterComponent={
-            <View className="px-4 pb-8 pt-2">
+            <View className="pb-8 pt-2">
               {isLoadingMore ? (
                 <View className="items-center py-4">
                   <Spinner size="sm" />
@@ -447,7 +486,7 @@ export default function FederationScreen() {
           }
           onEndReached={() => { if (hasMore) loadMore(); }}
           onEndReachedThreshold={0.3}
-          contentContainerStyle={{ paddingBottom: 8 }}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 8 }}
         />
       </SafeAreaView>
     </ModalErrorBoundary>

@@ -30,6 +30,13 @@ jest.mock('@/lib/hooks/useTenant', () => ({
   usePrimaryColor: () => '#006FEE',
 }));
 
+jest.mock('@/lib/hooks/useTheme', () => ({
+  useTheme: () => ({
+    borderSubtle: '#F0F0F0',
+    textSecondary: '#687076',
+  }),
+}));
+
 jest.mock('@expo/vector-icons', () => ({
   Ionicons: 'View',
 }));
@@ -53,7 +60,7 @@ jest.mock('@/components/ui/Avatar', () => 'View');
 import StoryCircles from './StoryCircles';
 
 describe('StoryCircles', () => {
-  it('routes the current member and story members through HeroUI Native-backed buttons', () => {
+  it('routes the current member and story members through pressable story avatars', () => {
     const onPress = jest.fn();
     const { getByLabelText } = render(
       <StoryCircles

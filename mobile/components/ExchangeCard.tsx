@@ -3,12 +3,12 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
-import { Button as HeroButton, Card as HeroCard, Chip, Separator, Surface } from 'heroui-native';
+import { Card as HeroCard, Chip, Separator, Surface } from 'heroui-native';
 
 import { type Exchange } from '@/lib/api/exchanges';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -38,12 +38,15 @@ export default function ExchangeCard({ exchange }: ExchangeCardProps) {
   const accentSoft = isOffer ? 'rgba(16, 185, 129, 0.14)' : 'rgba(245, 158, 11, 0.14)';
 
   return (
-    <HeroButton
-      variant="ghost"
-      feedbackVariant="scale"
+    <Pressable
+      accessibilityRole="button"
       className="mx-4 my-2"
       onPress={openDetail}
       accessibilityLabel={exchange.title ?? ''}
+      style={({ pressed }) => ({
+        opacity: pressed ? 0.92 : 1,
+        transform: [{ scale: pressed ? 0.99 : 1 }],
+      })}
     >
       <HeroCard variant="default" className="w-full overflow-hidden">
         <View className="h-1 w-full" style={{ backgroundColor: accent }} />
@@ -122,6 +125,6 @@ export default function ExchangeCard({ exchange }: ExchangeCardProps) {
           </Surface>
         </HeroCard.Footer>
       </HeroCard>
-    </HeroButton>
+    </Pressable>
   );
 }

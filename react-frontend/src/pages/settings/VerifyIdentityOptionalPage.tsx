@@ -237,7 +237,7 @@ export function VerifyIdentityOptionalPage() {
       <div className="min-h-[60vh] flex items-center justify-center p-4">
         <GlassCard className="p-8 text-center max-w-md">
           <p className="text-theme-muted mb-4">{t('identity_auth.please_login')}</p>
-          <Link to={tenantPath('/login')}><Button>{t('identity_auth.go_to_login')}</Button></Link>
+          <Button as={Link} to={tenantPath('/login')}>{t('identity_auth.go_to_login')}</Button>
         </GlassCard>
       </div>
     );

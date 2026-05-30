@@ -92,11 +92,9 @@ export function BlockedUsersPage() {
       <header className="overflow-hidden rounded-2xl border border-theme-default bg-theme-surface">
         <div className="flex flex-col gap-5 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex max-w-2xl items-start gap-4">
-            <Link to={tenantPath('/settings?tab=privacy')}>
-              <Button isIconOnly variant="tertiary" aria-label={t('back', { ns: 'common' })}>
-                <ArrowLeft className="h-5 w-5" aria-hidden="true" />
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath('/settings?tab=privacy')} isIconOnly variant="tertiary" aria-label={t('back', { ns: 'common' })}>
+              <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+            </Button>
             <div>
               <Chip size="sm" variant="soft" color="danger" className="mb-3 font-medium">
                 {t('blocked_users.privacy_badge')}

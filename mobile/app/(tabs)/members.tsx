@@ -3,11 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useMemo, useState } from 'react';
-import { FlatList, RefreshControl, Text, View } from 'react-native';
+import { useCallback, useState } from 'react';
+import { FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
+import { Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import { getMembers, type Member, type MemberListResponse } from '@/lib/api/members';
@@ -22,8 +22,13 @@ import { SkeletonBox } from '@/components/ui/Skeleton';
 import AppTopBar from '@/components/ui/AppTopBar';
 
 function MemberCardSkeleton() {
+  const theme = useTheme();
   return (
-    <View className="mx-4 my-2 rounded-2xl bg-surface p-4">
+    <Surface
+      variant="default"
+      className="mx-4 my-1.5 overflow-hidden rounded-panel p-4"
+      style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+    >
       <View className="flex-row items-center gap-3">
         <SkeletonBox width={56} height={56} borderRadius={28} />
         <View className="flex-1 gap-2">
@@ -32,7 +37,7 @@ function MemberCardSkeleton() {
           <SkeletonBox width="46%" height={12} />
         </View>
       </View>
-    </View>
+    </Surface>
   );
 }
 
@@ -111,9 +116,7 @@ export default function MembersScreen() {
               <HeroCard.Body className="items-center gap-4">
                 <Ionicons name="warning-outline" size={30} color={primary} />
                 <Text className="text-center text-sm leading-5" style={{ color: theme.textSecondary }}>{error}</Text>
-                <HeroButton variant="primary" onPress={() => void refresh()} style={{ backgroundColor: primary }}>
-                  <HeroButton.Label>{t('common:buttons.retry')}</HeroButton.Label>
-                </HeroButton>
+                <ActionPill label={t('common:buttons.retry')} primary={primary} onPress={() => void refresh()} />
               </HeroCard.Body>
             </HeroCard>
           ) : (
@@ -127,10 +130,13 @@ export default function MembersScreen() {
                   {t('empty.subtitle')}
                 </Text>
                 {hasSearch ? (
-                  <HeroButton variant="secondary" size="sm" onPress={() => setSearch('')}>
-                    <Ionicons name="close-circle-outline" size={16} color={theme.textSecondary} />
-                    <HeroButton.Label>{t('clearSearch')}</HeroButton.Label>
-                  </HeroButton>
+                  <ActionPill
+                    label={t('clearSearch')}
+                    icon="close-circle-outline"
+                    primary={primary}
+                    tone="secondary"
+                    onPress={() => setSearch('')}
+                  />
                 ) : null}
               </HeroCard.Body>
             </HeroCard>
@@ -173,24 +179,22 @@ function MembersHeader({
   isLoading: boolean;
 }) {
   return (
-    <View className="gap-3 pb-2">
-      <HeroCard variant="default" className="mx-4 mt-4 overflow-hidden">
+    <View className="gap-3 pb-3">
+      <HeroCard variant="default" className="mx-4 mt-3 overflow-hidden rounded-panel p-0">
         <View className="h-1 w-full" style={{ backgroundColor: primary }} />
-        <HeroCard.Body className="gap-4 px-4 py-4">
-          <View className="flex-row items-start justify-between gap-4">
+        <HeroCard.Body className="gap-4 p-4">
+          <View className="flex-row items-center gap-3">
+            <View className="h-12 w-12 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+              <Ionicons name="people-outline" size={24} color={primary} />
+            </View>
             <View className="min-w-0 flex-1">
-              <View className="mb-2 flex-row items-center gap-2">
-                <View className="h-8 w-8 items-center justify-center rounded-full" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
-                  <Ionicons name="people-outline" size={18} color={primary} />
-                </View>
-                <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>
-                  {t('heroEyebrow')}
-                </Text>
-              </View>
-              <Text className="text-2xl font-bold leading-8" style={{ color: theme.text }}>
+              <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>
+                {t('heroEyebrow')}
+              </Text>
+              <Text className="mt-1 text-[26px] font-bold leading-8" style={{ color: theme.text }} numberOfLines={1}>
                 {t('title')}
               </Text>
-              <Text className="mt-1 text-sm leading-5" style={{ color: theme.textSecondary }}>
+              <Text className="mt-1 text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>
                 {t('subtitle')}
               </Text>
             </View>
@@ -209,7 +213,11 @@ function MembersHeader({
         </HeroCard.Body>
       </HeroCard>
 
-      <Surface variant="default" className="mx-4 gap-3 rounded-panel-inner p-3">
+      <Surface
+        variant="default"
+        className="mx-4 gap-3 overflow-hidden rounded-panel p-3.5"
+        style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+      >
         <View className="min-w-0">
           <Text className="text-base font-semibold" style={{ color: theme.text }}>
             {t('directory')}
@@ -230,12 +238,56 @@ function MembersHeader({
           style={{ color: theme.text }}
           leftIcon={<Ionicons name="search-outline" size={18} color={theme.textMuted} />}
           rightIcon={search ? (
-            <HeroButton isIconOnly size="sm" variant="ghost" accessibilityLabel={t('clearSearch')} onPress={() => setSearch('')}>
+            <Pressable
+              className="h-9 w-9 items-center justify-center rounded-2xl"
+              accessibilityLabel={t('clearSearch')}
+              accessibilityRole="button"
+              onPress={() => setSearch('')}
+              style={({ pressed }) => ({
+                backgroundColor: withAlpha(primary, pressed ? 0.16 : 0.08),
+                opacity: pressed ? 0.82 : 1,
+              })}
+            >
               <Ionicons name="close-circle" size={18} color={theme.textMuted} />
-            </HeroButton>
+            </Pressable>
           ) : null}
         />
       </Surface>
     </View>
+  );
+}
+
+function ActionPill({
+  label,
+  icon,
+  primary,
+  tone = 'primary',
+  onPress,
+}: {
+  label: string;
+  icon?: keyof typeof Ionicons.glyphMap;
+  primary: string;
+  tone?: 'primary' | 'secondary';
+  onPress: () => void;
+}) {
+  const isPrimary = tone === 'primary';
+  return (
+    <Pressable
+      className="min-h-10 flex-row items-center justify-center gap-2 rounded-full px-4"
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={onPress}
+      style={({ pressed }) => ({
+        backgroundColor: isPrimary ? primary : withAlpha(primary, pressed ? 0.18 : 0.1),
+        borderColor: isPrimary ? primary : withAlpha(primary, 0.18),
+        borderWidth: 1,
+        opacity: pressed ? 0.86 : 1,
+      })}
+    >
+      {icon ? <Ionicons name={icon} size={16} color={isPrimary ? '#fff' : primary} /> : null}
+      <Text className="text-sm font-bold" style={{ color: isPrimary ? '#fff' : primary }}>
+        {label}
+      </Text>
+    </Pressable>
   );
 }

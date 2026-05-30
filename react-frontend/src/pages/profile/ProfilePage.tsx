@@ -498,15 +498,15 @@ export function ProfilePage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <div className="flex justify-center gap-3">
-            <Link to={fallbackPath}>
-              <Button
-                variant="flat"
-                className="bg-theme-elevated text-theme-primary"
-                startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
-              >
-                {fallbackLabel}
-              </Button>
-            </Link>
+            <Button
+              as={Link}
+              to={fallbackPath}
+              variant="flat"
+              className="bg-theme-elevated text-theme-primary"
+              startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
+            >
+              {fallbackLabel}
+            </Button>
             <Button
               color="primary"
               startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
@@ -528,15 +528,15 @@ export function ProfilePage() {
         title={errorCode === 'PROFILE_INCOMPLETE' ? t('profile_incomplete') : t('not_found')}
         description={errorCode === 'PROFILE_INCOMPLETE' ? t('profile_incomplete_desc') : t('not_found_desc')}
         action={
-          <Link to={fallbackPath}>
-            <Button
-              variant="flat"
-              className="bg-theme-elevated text-theme-primary"
-              startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
-            >
-              {fallbackLabel}
-            </Button>
-          </Link>
+          <Button
+            as={Link}
+            to={fallbackPath}
+            variant="flat"
+            className="bg-theme-elevated text-theme-primary"
+            startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
+          >
+            {fallbackLabel}
+          </Button>
         }
       />
     );
@@ -701,15 +701,15 @@ export function ProfilePage() {
               {/* Actions */}
               <div className="mt-6 grid w-full grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:justify-start sm:gap-3">
                 {isOwnProfile ? (
-                  <Link to={tenantPath('/settings')} className="w-full sm:w-auto">
-                    <Button
-                      color="primary"
-                      startContent={<Settings className="w-4 h-4" aria-hidden="true" />}
-                      className="w-full sm:w-auto"
-                    >
-                      {t('settings')}
-                    </Button>
-                  </Link>
+                  <Button
+                    as={Link}
+                    to={tenantPath('/settings')}
+                    color="primary"
+                    startContent={<Settings className="w-4 h-4" aria-hidden="true" />}
+                    className="w-full sm:w-auto"
+                  >
+                    {t('settings')}
+                  </Button>
                 ) : isBlocked ? (
                   // Blocked state — show only unblock option and a notice
                   <>
@@ -729,26 +729,26 @@ export function ProfilePage() {
                 ) : (
                   <>
                     {isAuthenticated && (
-                      <Link to={tenantPath(`/messages/new/${profile.id}`)} className="w-full sm:w-auto">
-                        <Button
-                          color="primary"
-                          startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
-                          className="w-full sm:w-auto"
-                        >
-                          {t('send_message')}
-                        </Button>
-                      </Link>
+                      <Button
+                        as={Link}
+                        to={tenantPath(`/messages/new/${profile.id}`)}
+                        color="primary"
+                        startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
+                        className="w-full sm:w-auto"
+                      >
+                        {t('send_message')}
+                      </Button>
                     )}
                     {!isAuthenticated && (
-                      <Link to={tenantPath('/login')} className="w-full sm:w-auto">
-                        <Button
-                          variant="flat"
-                          className="w-full bg-theme-elevated text-theme-primary sm:w-auto"
-                          startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
-                        >
-                          {t('login_to_message')}
-                        </Button>
-                      </Link>
+                      <Button
+                        as={Link}
+                        to={tenantPath('/login')}
+                        variant="flat"
+                        className="w-full bg-theme-elevated text-theme-primary sm:w-auto"
+                        startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
+                      >
+                        {t('login_to_message')}
+                      </Button>
                     )}
                     {hasConnections && isAuthenticated && connectionStatus !== 'connected' && (
                       <Button
@@ -1107,11 +1107,9 @@ export function ProfilePage() {
                       description={isOwnProfile ? t('no_listings_own') : t('no_listings_other')}
                       action={
                         isOwnProfile && (
-                          <Link to={tenantPath('/listings/create')}>
-                            <Button color="primary">
-                              {t('create_listing')}
-                            </Button>
-                          </Link>
+                          <Button as={Link} to={tenantPath('/listings/create')} color="primary">
+                            {t('create_listing')}
+                          </Button>
                         )
                       }
                     />
@@ -1121,15 +1119,15 @@ export function ProfilePage() {
               {/* View all link — shown when we may have loaded only the first 6 */}
               {listings.length >= 6 && (
                 <div className="text-center pt-2">
-                  <Link to={tenantPath(`/listings?user_id=${profile.id}`)}>
-                    <Button
-                      variant="light"
-                      color="primary"
-                      endContent={<ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />}
-                    >
-                      {t('view_all_listings')}
-                    </Button>
-                  </Link>
+                  <Button
+                    as={Link}
+                    to={tenantPath(`/listings?user_id=${profile.id}`)}
+                    variant="light"
+                    color="primary"
+                    endContent={<ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />}
+                  >
+                    {t('view_all_listings')}
+                  </Button>
                 </div>
               )}
             </div>
@@ -1256,11 +1254,15 @@ export function ProfilePage() {
                         </div>
                       </div>
                       {isOwnProfile && (
-                        <Link to={tenantPath('/achievements')} className="w-full sm:w-auto">
-                          <Button size="sm" variant="flat" className="w-full bg-theme-elevated text-theme-muted sm:w-auto">
-                            {t('achievements.view_all')}
-                          </Button>
-                        </Link>
+                        <Button
+                          as={Link}
+                          to={tenantPath('/achievements')}
+                          size="sm"
+                          variant="flat"
+                          className="w-full bg-theme-elevated text-theme-muted sm:w-auto"
+                        >
+                          {t('achievements.view_all')}
+                        </Button>
                       )}
                     </div>
                   </GlassCard>
@@ -1301,11 +1303,9 @@ export function ProfilePage() {
                     title={t('achievements.no_achievements')}
                     description={isOwnProfile ? t('achievements.no_achievements_own') : t('achievements.no_achievements_other')}
                     action={isOwnProfile && (
-                      <Link to={tenantPath('/achievements')}>
-                        <Button color="warning" className="text-white">
-                          {t('achievements.view_badges')}
-                        </Button>
-                      </Link>
+                      <Button as={Link} to={tenantPath('/achievements')} color="warning" className="text-white">
+                        {t('achievements.view_badges')}
+                      </Button>
                     )}
                   />
                 </GlassCard>

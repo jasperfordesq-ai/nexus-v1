@@ -8,6 +8,7 @@ import {
   Alert,
   FlatList,
   Linking,
+  Pressable,
   RefreshControl,
   ScrollView,
   Text,
@@ -162,27 +163,116 @@ function StatusChip({ label, tone, icon }: { label: string; tone: string; icon?:
   );
 }
 
+function ActionPill({
+  label,
+  icon,
+  onPress,
+  primary,
+  tone = 'secondary',
+  disabled = false,
+  loading = false,
+  accessibilityLabel,
+}: {
+  label: string;
+  icon: IoniconName;
+  onPress: () => void;
+  primary: string;
+  tone?: 'primary' | 'secondary';
+  disabled?: boolean;
+  loading?: boolean;
+  accessibilityLabel?: string;
+}) {
+  const theme = useTheme();
+  const isPrimary = tone === 'primary';
+  const foreground = isPrimary ? '#fff' : primary;
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel ?? label}
+      accessibilityState={{ disabled }}
+      disabled={disabled}
+      onPress={onPress}
+      className="min-h-10 flex-row items-center justify-center gap-2 rounded-full px-4"
+      style={({ pressed }) => ({
+        backgroundColor: isPrimary ? primary : withAlpha(primary, 0.12),
+        borderWidth: isPrimary ? 0 : 1,
+        borderColor: isPrimary ? 'transparent' : withAlpha(primary, 0.22),
+        opacity: disabled ? 0.55 : pressed ? 0.86 : 1,
+      })}
+    >
+      {loading ? <Spinner size="sm" /> : <Ionicons name={icon} size={16} color={foreground} />}
+      <Text className="text-sm font-semibold" style={{ color: isPrimary ? '#fff' : theme.text }} numberOfLines={1}>
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
+function TabPill({
+  label,
+  icon,
+  selected,
+  onPress,
+  primary,
+}: {
+  label: string;
+  icon: IoniconName;
+  selected: boolean;
+  onPress: () => void;
+  primary: string;
+}) {
+  const theme = useTheme();
+  const foreground = selected ? primary : theme.textSecondary;
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ selected }}
+      onPress={onPress}
+      className="min-h-10 flex-row items-center justify-center gap-2 rounded-full px-3.5"
+      style={({ pressed }) => ({
+        backgroundColor: selected ? withAlpha(primary, 0.14) : 'transparent',
+        borderWidth: selected ? 1 : 0,
+        borderColor: selected ? withAlpha(primary, 0.28) : 'transparent',
+        opacity: pressed ? 0.84 : 1,
+      })}
+    >
+      <Ionicons name={icon} size={16} color={foreground} />
+      <Text className="text-sm font-semibold" style={{ color: foreground }} numberOfLines={1}>
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
 function StatTile({
   label,
   value,
   tone,
+  icon = 'stats-chart-outline',
 }: {
   label: string;
   value: string;
   tone: string;
+  icon?: IoniconName;
 }) {
   const theme = useTheme();
   return (
-    <Surface variant="secondary" className="min-w-[46%] flex-1 gap-1 rounded-panel-inner p-4">
-      <Text className="text-[11px] font-semibold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>
+    <Surface
+      variant="secondary"
+      className="min-w-[31%] flex-1 rounded-panel-inner p-3.5"
+      style={{ borderWidth: 1, borderColor: withAlpha(tone, 0.14) }}
+    >
+      <View className="mb-3 size-8 items-center justify-center rounded-full" style={{ backgroundColor: withAlpha(tone, 0.12) }}>
+        <Ionicons name={icon} size={16} color={tone} />
+      </View>
+      <Text className="text-xl font-bold" style={{ color: theme.text }} numberOfLines={1}>
+        {value}
+      </Text>
+      <Text className="mt-1 text-[11px] font-semibold uppercase leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>
         {label}
       </Text>
-      <View className="flex-row items-end justify-between gap-2">
-        <Text className="text-2xl font-bold" style={{ color: theme.text }} numberOfLines={1}>
-          {value}
-        </Text>
-        <View className="h-1.5 w-10 rounded-full" style={{ backgroundColor: tone }} />
-      </View>
     </Surface>
   );
 }
@@ -201,50 +291,46 @@ function HeroHeader({
   const theme = useTheme();
 
   return (
-    <HeroCard className="overflow-hidden rounded-panel p-0">
-      <View className="h-1.5" style={{ backgroundColor: '#e11d48' }} />
+    <HeroCard className="overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: withAlpha('#e11d48', 0.16) }}>
+      <View className="h-1" style={{ backgroundColor: '#e11d48' }} />
       <HeroCard.Body className="gap-5 p-5">
         <View className="flex-row items-start gap-3">
-          <View className="size-12 items-center justify-center rounded-panel-inner" style={{ backgroundColor: withAlpha('#e11d48', 0.14) }}>
+          <View className="size-12 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha('#e11d48', 0.14) }}>
             <Ionicons name="heart-outline" size={24} color="#e11d48" />
           </View>
           <View className="min-w-0 flex-1">
-            <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>
+            <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>
               {t('heroEyebrow')}
             </Text>
             <Text className="mt-1 text-2xl font-bold" style={{ color: theme.text }} numberOfLines={2}>
               {t('title')}
             </Text>
-            <Text className="mt-2 text-sm leading-5" style={{ color: theme.textSecondary }}>
+            <Text className="mt-2 text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>
               {t('subtitle')}
             </Text>
           </View>
         </View>
 
         <View className="flex-row flex-wrap gap-3">
-          <StatTile label={t('stats.opportunities')} value={String(activeCount)} tone="#e11d48" />
-          <StatTile label={t('stats.applications')} value={String(applicationsCount)} tone={primary} />
-          <StatTile label={t('stats.hours')} value={String(verifiedHours)} tone="#22c55e" />
+          <StatTile label={t('stats.opportunities')} value={String(activeCount)} tone="#e11d48" icon="briefcase-outline" />
+          <StatTile label={t('stats.applications')} value={String(applicationsCount)} tone={primary} icon="send-outline" />
+          <StatTile label={t('stats.hours')} value={String(verifiedHours)} tone="#22c55e" icon="time-outline" />
         </View>
 
-        <View className="flex-row gap-2">
-          <HeroButton
-            className="flex-1"
-            variant="primary"
+        <View className="flex-row flex-wrap gap-2">
+          <ActionPill
+            label={t('createOpportunity')}
+            icon="add-outline"
             onPress={() => router.push('/(modals)/new-volunteering' as Href)}
-            style={{ backgroundColor: primary }}
-          >
-            <Ionicons name="add-outline" size={16} color="#fff" />
-            <HeroButton.Label>{t('createOpportunity')}</HeroButton.Label>
-          </HeroButton>
-          <HeroButton
-            className="flex-1"
-            variant="secondary"
+            primary={primary}
+            tone="primary"
+          />
+          <ActionPill
+            label={t('browseOrganisations')}
+            icon="business-outline"
             onPress={() => router.push('/(modals)/organisations')}
-          >
-            <Ionicons name="business-outline" size={16} color={primary} />
-            <HeroButton.Label>{t('browseOrganisations')}</HeroButton.Label>
-          </HeroButton>
+            primary={primary}
+          />
         </View>
       </HeroCard.Body>
     </HeroCard>
@@ -283,13 +369,23 @@ function OrganisationsPanel({
   return (
     <View className="gap-3">
       {pending.length > 0 ? (
-        <HeroCard className="rounded-panel p-0">
+        <HeroCard className="overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: withAlpha(theme.warning, 0.14) }}>
+          <View className="h-1" style={{ backgroundColor: theme.warning }} />
           <HeroCard.Body className="gap-3 p-4">
-            <Text className="text-sm font-semibold" style={{ color: theme.warning }}>
-              {t('org.pendingHeading')}
-            </Text>
+            <View className="flex-row items-center gap-2">
+              <View className="size-8 items-center justify-center rounded-full" style={{ backgroundColor: withAlpha(theme.warning, 0.12) }}>
+                <Ionicons name="time-outline" size={16} color={theme.warning} />
+              </View>
+              <Text className="text-sm font-semibold" style={{ color: theme.text }}>
+                {t('org.pendingHeading')}
+              </Text>
+            </View>
             {pending.map((org) => (
-              <View key={org.id} className="flex-row items-center gap-3 rounded-panel-inner p-3" style={{ backgroundColor: theme.surface }}>
+              <View
+                key={org.id}
+                className="flex-row items-center gap-3 rounded-panel-inner p-3"
+                style={{ backgroundColor: theme.surface, borderWidth: 1, borderColor: theme.borderSubtle }}
+              >
                 <Avatar uri={org.logo_url ?? org.avatar ?? undefined} name={org.name} size={38} />
                 <View className="min-w-0 flex-1">
                   <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={1}>
@@ -309,47 +405,51 @@ function OrganisationsPanel({
       ) : null}
 
       {managed.map((org) => (
-        <HeroCard key={org.id} className="rounded-panel p-0">
-          <HeroCard.Body className="gap-3 p-4">
-            <View className="flex-row items-start gap-3">
-              <Avatar uri={org.logo_url ?? org.avatar ?? undefined} name={org.name} size={46} />
-              <View className="min-w-0 flex-1">
-                <View className="flex-row items-start justify-between gap-2">
-                  <View className="min-w-0 flex-1">
-                    <Text className="text-base font-semibold" style={{ color: theme.text }} numberOfLines={2}>
-                      {org.name}
-                    </Text>
-                    {org.description ? (
-                      <Text className="mt-1 text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>
-                        {org.description}
-                      </Text>
-                    ) : null}
-                  </View>
+        <HeroCard
+          key={org.id}
+          className="overflow-hidden rounded-panel p-0"
+          style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.14) }}
+        >
+          <HeroCard.Body className="gap-4 p-4">
+            <View className="absolute bottom-0 left-0 top-0 w-1" style={{ backgroundColor: withAlpha(primary, 0.75) }} />
+            <View className="flex-row items-start gap-3 pl-1">
+              <Avatar uri={org.logo_url ?? org.avatar ?? undefined} name={org.name} size={48} />
+              <View className="min-w-0 flex-1 gap-2">
+                <View className="flex-row flex-wrap items-center gap-2">
+                  <Text className="min-w-0 flex-1 text-base font-semibold" style={{ color: theme.text }} numberOfLines={2}>
+                    {org.name}
+                  </Text>
                   <Chip size="sm" variant="secondary" color="default">
                     <Chip.Label>{t(`org.roles.${org.member_role ?? 'member'}`, { defaultValue: org.member_role ?? '' })}</Chip.Label>
                   </Chip>
                 </View>
+                {org.description ? (
+                  <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>
+                    {org.description}
+                  </Text>
+                ) : null}
               </View>
             </View>
-            <View className="flex-row items-center justify-between gap-3">
+            <View className="flex-row flex-wrap items-center justify-between gap-3 pl-1">
               {typeof org.balance === 'number' ? (
-                <Text className="text-sm font-semibold" style={{ color: theme.success }}>
-                  {t('org.walletBalance', { count: org.balance })}
-                </Text>
+                <Surface variant="secondary" className="flex-row items-center gap-2 rounded-full px-3 py-2">
+                  <Ionicons name="wallet-outline" size={15} color={theme.success} />
+                  <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+                    {t('org.walletBalance', { count: org.balance })}
+                  </Text>
+                </Surface>
               ) : (
-                <Text className="text-sm" style={{ color: theme.textSecondary }}>
+                <Text className="min-w-0 flex-1 text-sm" style={{ color: theme.textSecondary }} numberOfLines={2}>
                   {t('org.managerTools')}
                 </Text>
               )}
-              <HeroButton
-                size="sm"
-                variant="secondary"
+              <ActionPill
+                label={t('org.manage')}
+                icon="open-outline"
                 onPress={() => router.push({ pathname: '/(modals)/volunteering-org-dashboard', params: { id: String(org.id) } } as unknown as Href)}
+                primary={primary}
                 accessibilityLabel={t('org.openDashboardLabel', { name: org.name })}
-              >
-                <Ionicons name="open-outline" size={16} color={primary} />
-                <HeroButton.Label>{t('org.manage')}</HeroButton.Label>
-              </HeroButton>
+              />
             </View>
           </HeroCard.Body>
         </HeroCard>
@@ -378,17 +478,18 @@ function OpportunityCard({
   const deadline = formatDate(item.deadline);
 
   return (
-    <HeroCard className="mb-3 rounded-panel p-0">
-      <HeroCard.Body className="gap-4 p-4" style={{ minHeight: 178 }}>
-        <View className="flex-row items-start justify-between gap-3">
+    <HeroCard className="mb-3 overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.12) }}>
+      <HeroCard.Body className="gap-4 p-4">
+        <View className="absolute bottom-0 left-0 top-0 w-1" style={{ backgroundColor: statusColor }} />
+        <View className="flex-row items-start justify-between gap-3 pl-1">
           <View className="min-w-0 flex-1">
-            <Text className="text-base font-semibold" style={{ color: theme.text }} numberOfLines={2}>
+            <Text className="text-lg font-bold leading-6" style={{ color: theme.text }} numberOfLines={2}>
               {item.title}
             </Text>
             {org ? (
               <View className="mt-2 flex-row items-center gap-2">
-                <Avatar uri={org.avatar ?? org.logo_url ?? undefined} name={org.name} size={26} />
-                <Text className="min-w-0 flex-1 text-sm" style={{ color: theme.textSecondary }} numberOfLines={1}>
+                <Avatar uri={org.avatar ?? org.logo_url ?? undefined} name={org.name} size={28} />
+                <Text className="min-w-0 flex-1 text-sm font-medium" style={{ color: theme.textSecondary }} numberOfLines={1}>
                   {org.name}
                 </Text>
               </View>
@@ -397,11 +498,11 @@ function OpportunityCard({
           <StatusChip label={t(statusLabelKey(item.status))} tone={statusColor} icon="radio-button-on-outline" />
         </View>
 
-        <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>
+        <Text className="pl-1 text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>
           {item.description ?? t('noDescription')}
         </Text>
 
-        <View className="flex-row flex-wrap gap-2">
+        <View className="flex-row flex-wrap gap-2 pl-1">
           {item.is_remote ? (
             <StatusChip label={t('remote')} tone={primary} icon="globe-outline" />
           ) : item.location ? (
@@ -416,7 +517,7 @@ function OpportunityCard({
         </View>
 
         {skills.length > 0 ? (
-          <View className="flex-row flex-wrap gap-2">
+          <View className="flex-row flex-wrap gap-2 pl-1">
             {skills.slice(0, 3).map((skill) => (
               <Chip key={skill} size="sm" variant="secondary" color="default">
                 <Chip.Label>{skill}</Chip.Label>
@@ -425,16 +526,25 @@ function OpportunityCard({
           </View>
         ) : null}
 
-        <View className="flex-row gap-2">
-          <HeroButton className="flex-1" size="sm" variant="secondary" onPress={onOpen} accessibilityLabel={t('openOpportunityLabel', { title: item.title })}>
-            <Ionicons name="open-outline" size={16} color={primary} />
-            <HeroButton.Label>{t('viewOpportunity')}</HeroButton.Label>
-          </HeroButton>
+        <View className="flex-row flex-wrap gap-2 pl-1">
+          <ActionPill
+            label={t('viewOpportunity')}
+            icon="open-outline"
+            onPress={onOpen}
+            primary={primary}
+            accessibilityLabel={t('openOpportunityLabel', { title: item.title })}
+          />
           {item.status !== 'closed' && item.status !== 'filled' && !item.has_applied ? (
-            <HeroButton className="flex-1" size="sm" isDisabled={applying} onPress={onApply} accessibilityLabel={t('applyOpportunityLabel', { title: item.title })}>
-              {applying ? <Spinner size="sm" /> : <Ionicons name="send-outline" size={16} color="#fff" />}
-              <HeroButton.Label>{t('apply')}</HeroButton.Label>
-            </HeroButton>
+            <ActionPill
+              label={t('apply')}
+              icon="send-outline"
+              onPress={onApply}
+              primary={primary}
+              tone="primary"
+              disabled={applying}
+              loading={applying}
+              accessibilityLabel={t('applyOpportunityLabel', { title: item.title })}
+            />
           ) : null}
         </View>
       </HeroCard.Body>
@@ -1617,58 +1727,55 @@ function VolunteeringScreenInner() {
               verifiedHours={verifiedHours}
             />
 
-            <Surface variant="secondary" className="rounded-panel p-1">
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-1">
+            <Surface variant="secondary" className="rounded-panel p-2">
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-2">
                 {visibleTabs.map((tab) => {
                   const selected = activeTab === tab.key;
                   return (
-                    <HeroButton
+                    <TabPill
                       key={tab.key}
-                      size="sm"
-                      variant={selected ? 'primary' : 'ghost'}
+                      label={tab.label}
+                      icon={tab.icon}
+                      selected={selected}
                       onPress={() => {
                         void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                         setActiveTab(tab.key);
                       }}
-                      className="h-11 min-w-[132px] rounded-panel-inner"
-                      style={{ backgroundColor: selected ? withAlpha(primary, 0.18) : 'transparent' }}
-                    >
-                      <Ionicons name={tab.icon} size={16} color={selected ? primary : theme.textSecondary} />
-                      <HeroButton.Label style={{ color: selected ? primary : theme.textSecondary }}>
-                        {tab.label}
-                      </HeroButton.Label>
-                    </HeroButton>
+                      primary={primary}
+                    />
                   );
                 })}
               </ScrollView>
             </Surface>
 
             {activeTab === 'opportunities' ? (
-              <Input
-                className="text-sm"
-                style={{ color: theme.text }}
-                placeholder={t('searchPlaceholder')}
-                placeholderTextColor={theme.textMuted}
-                value={search}
-                onChangeText={handleSearchChange}
-                returnKeyType="search"
-                clearButtonMode="never"
-                autoCorrect={false}
-                autoCapitalize="none"
-                accessibilityLabel={t('searchPlaceholder')}
-                leftIcon={<Ionicons name="search-outline" size={18} color={theme.textMuted} />}
-                rightIcon={search.length > 0 ? (
-                  <HeroButton
-                    isIconOnly
-                    size="sm"
-                    variant="ghost"
-                    onPress={handleClear}
-                    accessibilityLabel={t('clearSearch')}
-                  >
-                    <Ionicons name="close-circle" size={18} color={theme.textMuted} />
-                  </HeroButton>
-                ) : null}
-              />
+              <Surface variant="secondary" className="rounded-panel p-2">
+                <Input
+                  className="text-sm"
+                  style={{ color: theme.text }}
+                  placeholder={t('searchPlaceholder')}
+                  placeholderTextColor={theme.textMuted}
+                  value={search}
+                  onChangeText={handleSearchChange}
+                  returnKeyType="search"
+                  clearButtonMode="never"
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  accessibilityLabel={t('searchPlaceholder')}
+                  leftIcon={<Ionicons name="search-outline" size={18} color={theme.textMuted} />}
+                  rightIcon={search.length > 0 ? (
+                    <HeroButton
+                      isIconOnly
+                      size="sm"
+                      variant="ghost"
+                      onPress={handleClear}
+                      accessibilityLabel={t('clearSearch')}
+                    >
+                      <Ionicons name="close-circle" size={18} color={theme.textMuted} />
+                    </HeroButton>
+                  ) : null}
+                />
+              </Surface>
             ) : null}
 
             {activeTab === 'applications' ? (
@@ -1782,7 +1889,7 @@ function VolunteeringScreenInner() {
             </View>
           ) : null
         }
-        contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: 32 }}
+        contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: 110 }}
       />
     </SafeAreaView>
   );

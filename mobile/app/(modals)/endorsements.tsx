@@ -3,10 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useRef, useState, type RefObject } from 'react';
+import { useCallback, useRef, useState, type ComponentProps, type RefObject } from 'react';
 import {
   Alert,
   FlatList,
+  Pressable,
   RefreshControl,
   Text,
   type TextInput,
@@ -16,7 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from '@/lib/haptics';
-import { Button as HeroButton, Card as HeroCard, Chip, Surface, Tabs } from 'heroui-native';
+import { Card as HeroCard, Chip, Surface, Tabs } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -47,6 +48,101 @@ import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 type Tab = 'skills' | 'endorsements' | 'discover';
 type ListItem = Skill | Endorsement;
+
+function HeaderStat({
+  icon,
+  label,
+  tone,
+  theme,
+}: {
+  icon: ComponentProps<typeof Ionicons>['name'];
+  label: string;
+  tone: string;
+  theme: ReturnType<typeof useTheme>;
+}) {
+  return (
+    <Surface
+      variant="secondary"
+      className="min-w-[46%] flex-1 rounded-panel-inner p-3"
+      style={{ borderWidth: 1, borderColor: withAlpha(tone, 0.14) }}
+    >
+      <View className="mb-2 size-8 items-center justify-center rounded-full" style={{ backgroundColor: withAlpha(tone, 0.12) }}>
+        <Ionicons name={icon} size={16} color={tone} />
+      </View>
+      <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={2}>
+        {label}
+      </Text>
+    </Surface>
+  );
+}
+
+function ActionPill({
+  label,
+  icon,
+  onPress,
+  primary,
+  tone = 'secondary',
+  disabled = false,
+  accessibilityLabel,
+}: {
+  label: string;
+  icon: ComponentProps<typeof Ionicons>['name'];
+  onPress: () => void;
+  primary: string;
+  tone?: 'primary' | 'secondary' | 'danger';
+  disabled?: boolean;
+  accessibilityLabel?: string;
+}) {
+  const theme = useTheme();
+  const isPrimary = tone === 'primary';
+  const isDanger = tone === 'danger';
+  const color = isDanger ? theme.error : primary;
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel ?? label}
+      accessibilityState={{ disabled }}
+      disabled={disabled}
+      onPress={onPress}
+      className="min-h-10 flex-row items-center justify-center gap-2 rounded-full px-4"
+      style={({ pressed }) => ({
+        backgroundColor: isPrimary ? primary : withAlpha(color, 0.12),
+        borderWidth: isPrimary ? 0 : 1,
+        borderColor: isPrimary ? 'transparent' : withAlpha(color, 0.22),
+        opacity: disabled ? 0.55 : pressed ? 0.86 : 1,
+      })}
+    >
+      <Ionicons name={icon} size={16} color={isPrimary ? '#ffffff' : color} />
+      <Text className="text-sm font-semibold" style={{ color: isPrimary ? '#ffffff' : theme.text }} numberOfLines={1}>
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
+function SectionTitle({
+  icon,
+  label,
+  primary,
+  theme,
+}: {
+  icon: ComponentProps<typeof Ionicons>['name'];
+  label: string;
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+}) {
+  return (
+    <View className="flex-row items-center gap-2">
+      <View className="size-8 items-center justify-center rounded-full" style={{ backgroundColor: withAlpha(primary, 0.12) }}>
+        <Ionicons name={icon} size={16} color={primary} />
+      </View>
+      <Text className="min-w-0 flex-1 text-sm font-semibold" style={{ color: theme.text }} numberOfLines={2}>
+        {label}
+      </Text>
+    </View>
+  );
+}
 
 function getSkillMemberName(member: SkillMember, fallback: string) {
   return member.name ?? ([member.first_name, member.last_name].filter(Boolean).join(' ') || fallback);
@@ -186,32 +282,40 @@ export default function EndorsementsScreen() {
     ({ item }: { item: Skill }) => {
       const endorseCount = endorsements.filter((e) => e.skill.id === item.id).length;
       return (
-        <HeroCard variant="default" className="mx-4 my-2 overflow-hidden rounded-panel p-0">
-          <View className="h-1 w-full" style={{ backgroundColor: primary }} />
-          <HeroCard.Body className="flex-row items-center gap-3 p-4">
-            <View className="size-11 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
-              <Ionicons name="construct-outline" size={20} color={primary} />
+        <HeroCard
+          variant="default"
+          className="mb-3 overflow-hidden rounded-panel p-0"
+          style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.12) }}
+        >
+          <HeroCard.Body className="gap-4 p-4">
+            <View className="absolute bottom-0 left-0 top-0 w-1" style={{ backgroundColor: primary }} />
+            <View className="flex-row items-start gap-3 pl-1">
+              <View className="size-11 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+                <Ionicons name="construct-outline" size={20} color={primary} />
+              </View>
+              <View className="min-w-0 flex-1 gap-1">
+                <Text className="text-base font-semibold" style={{ color: theme.text }} numberOfLines={2}>{item.name}</Text>
+                {item.category ? (
+                  <Text className="text-xs" style={{ color: theme.textSecondary }} numberOfLines={1}>{item.category}</Text>
+                ) : null}
+                {endorseCount > 0 ? (
+                  <Chip size="sm" variant="soft" color="success" className="self-start">
+                    <Ionicons name="ribbon-outline" size={12} color={theme.success} />
+                    <Chip.Label>{t('endorsedBy', { count: endorseCount })}</Chip.Label>
+                  </Chip>
+                ) : null}
+              </View>
             </View>
-            <View className="min-w-0 flex-1 gap-1">
-              <Text className="text-base font-semibold" style={{ color: theme.text }} numberOfLines={2}>{item.name}</Text>
-            {item.category ? (
-                <Text className="text-xs" style={{ color: theme.textSecondary }}>{item.category}</Text>
-            ) : null}
-            {endorseCount > 0 ? (
-                <Chip size="sm" variant="soft" color="success" className="self-start">
-                  <Ionicons name="ribbon-outline" size={12} color={theme.success} />
-                  <Chip.Label>{t('endorsedBy', { count: endorseCount })}</Chip.Label>
-                </Chip>
-            ) : null}
+            <View className="items-start pl-1">
+              <ActionPill
+                label={t('removeSkill')}
+                icon="trash-outline"
+                primary={primary}
+                tone="danger"
+                onPress={() => void handleRemoveSkill(item.id)}
+                accessibilityLabel={t('removeSkill')}
+              />
             </View>
-            <HeroButton
-              isIconOnly
-              variant="danger-soft"
-            onPress={() => void handleRemoveSkill(item.id)}
-            accessibilityLabel={t('removeSkill')}
-          >
-            <Ionicons name="trash-outline" size={18} color={theme.error} />
-            </HeroButton>
           </HeroCard.Body>
         </HeroCard>
       );
@@ -227,25 +331,32 @@ export default function EndorsementsScreen() {
         year: 'numeric',
       });
       return (
-        <HeroCard variant="default" className="mx-4 my-2 rounded-panel p-0">
-          <HeroCard.Body className="flex-row gap-3 p-4">
-            <Avatar uri={item.endorsed_by.avatar} name={item.endorsed_by.name} size={44} />
-            <View className="min-w-0 flex-1 gap-2">
-              <View className="flex-row items-start justify-between gap-2">
-                <View className="min-w-0 flex-1">
-                  <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={1}>{item.endorsed_by.name}</Text>
-                  <Text className="text-[11px]" style={{ color: theme.textMuted }}>{date}</Text>
+        <HeroCard
+          variant="default"
+          className="mb-3 overflow-hidden rounded-panel p-0"
+          style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.12) }}
+        >
+          <HeroCard.Body className="gap-3 p-4">
+            <View className="absolute bottom-0 left-0 top-0 w-1" style={{ backgroundColor: theme.success }} />
+            <View className="flex-row gap-3 pl-1">
+              <Avatar uri={item.endorsed_by.avatar} name={item.endorsed_by.name} size={44} />
+              <View className="min-w-0 flex-1 gap-2">
+                <View className="flex-row items-start justify-between gap-2">
+                  <View className="min-w-0 flex-1">
+                    <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={1}>{item.endorsed_by.name}</Text>
+                    <Text className="text-[11px]" style={{ color: theme.textMuted }}>{date}</Text>
+                  </View>
+                  <Chip size="sm" variant="secondary">
+                    <Ionicons name="ribbon-outline" size={12} color={primary} />
+                    <Chip.Label>{item.skill.name}</Chip.Label>
+                  </Chip>
                 </View>
-                <Chip size="sm" variant="secondary">
-                  <Ionicons name="ribbon-outline" size={12} color={primary} />
-                  <Chip.Label>{item.skill.name}</Chip.Label>
-                </Chip>
+                {item.message ? (
+                  <Surface variant="secondary" className="rounded-panel-inner px-3 py-2">
+                    <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{item.message}</Text>
+                  </Surface>
+                ) : null}
               </View>
-              {item.message ? (
-                <Surface variant="secondary" className="rounded-panel-inner px-3 py-2">
-                  <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{item.message}</Text>
-                </Surface>
-              ) : null}
             </View>
           </HeroCard.Body>
         </HeroCard>
@@ -269,7 +380,7 @@ export default function EndorsementsScreen() {
               ? renderSkill({ item: item as unknown as Skill })
               : renderEndorsement({ item: item as Endorsement })
           )}
-          contentContainerStyle={{ paddingBottom: 40 }}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 110 }}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -391,33 +502,31 @@ function EndorsementsHeader({
 
   return (
     <View className="gap-3 pb-2">
-      <HeroCard variant="default" className="mx-4 overflow-hidden rounded-panel p-0">
-        <View className="h-1 w-full" style={{ backgroundColor: primary }} />
-        <HeroCard.Body className="gap-4 p-4">
+      <HeroCard
+        variant="default"
+        className="overflow-hidden rounded-panel p-0"
+        style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.16) }}
+      >
+        <View className="h-1" style={{ backgroundColor: primary }} />
+        <HeroCard.Body className="gap-5 p-5">
           <View className="flex-row items-start gap-3">
-            <View className="size-13 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+            <View className="size-12 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
               <Ionicons name="ribbon-outline" size={24} color={primary} />
             </View>
             <View className="min-w-0 flex-1">
-              <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('heroEyebrow')}</Text>
-              <Text className="mt-1 text-2xl font-bold leading-8" style={{ color: theme.text }}>{t('title')}</Text>
-              <Text className="mt-1 text-sm leading-5" style={{ color: theme.textSecondary }}>{t('subtitle')}</Text>
+              <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>{t('heroEyebrow')}</Text>
+              <Text className="mt-1 text-2xl font-bold leading-8" style={{ color: theme.text }} numberOfLines={2}>{t('title')}</Text>
+              <Text className="mt-1 text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>{t('subtitle')}</Text>
             </View>
           </View>
-          <View className="flex-row flex-wrap gap-2">
-            <Chip size="sm" variant="secondary">
-              <Ionicons name="construct-outline" size={12} color={primary} />
-              <Chip.Label>{t('skillsCount', { count: skillsCount })}</Chip.Label>
-            </Chip>
-            <Chip size="sm" variant="soft" color="success">
-              <Ionicons name="ribbon-outline" size={12} color={theme.success} />
-              <Chip.Label>{t('endorsementsCount', { count: endorsementsCount })}</Chip.Label>
-            </Chip>
+          <View className="flex-row flex-wrap gap-3">
+            <HeaderStat icon="construct-outline" label={t('skillsCount', { count: skillsCount })} tone={primary} theme={theme} />
+            <HeaderStat icon="ribbon-outline" label={t('endorsementsCount', { count: endorsementsCount })} tone={theme.success} theme={theme} />
           </View>
         </HeroCard.Body>
       </HeroCard>
 
-      <Surface variant="default" className="mx-4 gap-3 rounded-panel-inner p-3">
+      <Surface variant="secondary" className="gap-3 rounded-panel p-2">
         <Tabs value={activeTab} onValueChange={(value) => selectTab(value as Tab)} variant="secondary">
           <Tabs.List>
             <Tabs.Indicator />
@@ -441,7 +550,7 @@ function EndorsementsHeader({
       </Surface>
 
       {activeTab === 'skills' ? (
-        <Surface variant="default" className="mx-4 gap-3 rounded-panel-inner p-3">
+        <Surface variant="secondary" className="gap-3 rounded-panel p-3">
           {addingSkill ? (
             <>
               <View className="flex-row items-center gap-2 rounded-panel-inner border px-3 py-2" style={{ borderColor: withAlpha(primary, 0.34), backgroundColor: theme.surface }}>
@@ -460,41 +569,43 @@ function EndorsementsHeader({
                   onSubmitEditing={() => void handleAddSkill()}
                 />
               </View>
-              <View className="flex-row gap-2">
-                <HeroButton className="flex-1" variant="secondary" onPress={() => { setAddingSkill(false); setSkillInput(''); }}>
-                  <HeroButton.Label>{t('common:cancel')}</HeroButton.Label>
-                </HeroButton>
-                <HeroButton
-                  className="flex-1"
-                  variant="primary"
-                  isDisabled={submitting || !skillInput.trim()}
-                  style={{ backgroundColor: submitting || !skillInput.trim() ? theme.border : primary }}
+              <View className="flex-row flex-wrap gap-2">
+                <ActionPill
+                  label={t('common:cancel')}
+                  icon="close-outline"
+                  primary={primary}
+                  onPress={() => { setAddingSkill(false); setSkillInput(''); }}
+                />
+                <ActionPill
+                  label={t('addSkill')}
+                  icon="checkmark-outline"
+                  primary={primary}
+                  tone="primary"
+                  disabled={submitting || !skillInput.trim()}
                   onPress={() => void handleAddSkill()}
                   accessibilityLabel={t('addSkill')}
-                >
-                  <Ionicons name="checkmark-outline" size={18} color={theme.onPrimary} />
-                  <HeroButton.Label>{t('addSkill')}</HeroButton.Label>
-                </HeroButton>
+                />
               </View>
             </>
           ) : (
-            <HeroButton
-              variant="primary"
-              style={{ backgroundColor: primary }}
-              onPress={() => {
-                setAddingSkill(true);
-                setTimeout(() => skillInputRef.current?.focus(), 50);
-              }}
-              accessibilityLabel={t('addSkill')}
-            >
-              <Ionicons name="add-circle-outline" size={18} color={theme.onPrimary} />
-              <HeroButton.Label>{t('addSkill')}</HeroButton.Label>
-            </HeroButton>
+            <View className="items-start">
+              <ActionPill
+                label={t('addSkill')}
+                icon="add-circle-outline"
+                primary={primary}
+                tone="primary"
+                onPress={() => {
+                  setAddingSkill(true);
+                  setTimeout(() => skillInputRef.current?.focus(), 50);
+                }}
+                accessibilityLabel={t('addSkill')}
+              />
+            </View>
           )}
         </Surface>
       ) : null}
       {activeTab === 'discover' ? (
-        <View className="mx-4 gap-3">
+        <View className="gap-3">
           {categoriesLoading ? (
             <Surface variant="secondary" className="min-h-[120px] items-center justify-center rounded-panel-inner p-4">
               <LoadingSpinner />
@@ -502,9 +613,14 @@ function EndorsementsHeader({
           ) : categories.length === 0 ? null : (
             <>
               {categories.map((category) => (
-                <HeroCard key={category.id} className="rounded-panel p-0">
+                <HeroCard
+                  key={category.id}
+                  className="overflow-hidden rounded-panel p-0"
+                  style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.12) }}
+                >
                   <HeroCard.Body className="gap-3 p-4">
-                    <View className="flex-row items-start gap-3">
+                    <View className="absolute bottom-0 left-0 top-0 w-1" style={{ backgroundColor: primary }} />
+                    <View className="flex-row items-start gap-3 pl-1">
                       <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
                         <Ionicons name="folder-open-outline" size={19} color={primary} />
                       </View>
@@ -520,8 +636,8 @@ function EndorsementsHeader({
                       </View>
                     </View>
                     <View className="flex-row flex-wrap gap-2">
-                        <Chip size="sm" variant="secondary" color="default">
-                          <Chip.Label>{t('discover.skillsCount', { count: asCount(category.skills_count) })}</Chip.Label>
+                      <Chip size="sm" variant="secondary" color="default">
+                        <Chip.Label>{t('discover.skillsCount', { count: asCount(category.skills_count) })}</Chip.Label>
                       </Chip>
                       {category.children && category.children.length > 0 ? (
                         <Chip size="sm" variant="secondary" color="default">
@@ -529,24 +645,26 @@ function EndorsementsHeader({
                         </Chip>
                       ) : null}
                     </View>
-                    <HeroButton
-                      size="sm"
-                      variant="secondary"
-                      isDisabled={loadingCategoryId === category.id}
-                      onPress={() => void onOpenCategory(category)}
-                    >
-                      {loadingCategoryId === category.id ? <LoadingSpinner /> : <HeroButton.Label>{t('discover.viewSkills')}</HeroButton.Label>}
-                    </HeroButton>
+                    <View className="items-start pl-1">
+                      {loadingCategoryId === category.id ? (
+                        <LoadingSpinner />
+                      ) : (
+                        <ActionPill
+                          label={t('discover.viewSkills')}
+                          icon="chevron-forward-outline"
+                          primary={primary}
+                          onPress={() => void onOpenCategory(category)}
+                        />
+                      )}
+                    </View>
                   </HeroCard.Body>
                 </HeroCard>
               ))}
 
               {selectedCategory ? (
-                <HeroCard className="rounded-panel p-0">
+                <HeroCard className="overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.12) }}>
                   <HeroCard.Body className="gap-3 p-4">
-                    <Text className="text-base font-semibold" style={{ color: theme.text }}>
-                      {t('discover.skillsInCategory', { category: selectedCategory.name })}
-                    </Text>
+                    <SectionTitle icon="construct-outline" label={t('discover.skillsInCategory', { category: selectedCategory.name })} primary={primary} theme={theme} />
                     {loadingCategoryId === selectedCategory.id ? (
                       <View className="items-center justify-center py-4">
                         <LoadingSpinner />
@@ -555,7 +673,12 @@ function EndorsementsHeader({
                       <Text className="text-sm" style={{ color: theme.textSecondary }}>{t('discover.noSkillsInCategory')}</Text>
                     ) : (
                       categorySkills.map((skill) => (
-                        <Surface key={skill.skill_name} variant="secondary" className="gap-3 rounded-panel-inner p-3">
+                        <Surface
+                          key={skill.skill_name}
+                          variant="secondary"
+                          className="gap-3 rounded-panel-inner p-3"
+                          style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+                        >
                           <View className="flex-row items-start justify-between gap-3">
                             <View className="min-w-0 flex-1">
                               <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={2}>
@@ -565,14 +688,16 @@ function EndorsementsHeader({
                                 {t('discover.memberCount', { count: asCount(skill.user_count) })}
                               </Text>
                             </View>
-                            <HeroButton
-                              size="sm"
-                              variant="secondary"
-                              isDisabled={loadingSkill === skill.skill_name}
-                              onPress={() => void onOpenMembers(skill.skill_name)}
-                            >
-                              {loadingSkill === skill.skill_name ? <LoadingSpinner /> : <HeroButton.Label>{t('discover.viewMembers')}</HeroButton.Label>}
-                            </HeroButton>
+                            {loadingSkill === skill.skill_name ? (
+                              <LoadingSpinner />
+                            ) : (
+                              <ActionPill
+                                label={t('discover.viewMembers')}
+                                icon="people-outline"
+                                primary={primary}
+                                onPress={() => void onOpenMembers(skill.skill_name)}
+                              />
+                            )}
                           </View>
                           <View className="flex-row flex-wrap gap-2">
                             <Chip size="sm" variant="secondary" color="success">
@@ -590,11 +715,9 @@ function EndorsementsHeader({
               ) : null}
 
               {selectedSkill ? (
-                <HeroCard className="rounded-panel p-0">
+                <HeroCard className="overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.12) }}>
                   <HeroCard.Body className="gap-3 p-4">
-                    <Text className="text-base font-semibold" style={{ color: theme.text }}>
-                      {t('discover.membersWith', { skill: selectedSkill })}
-                    </Text>
+                    <SectionTitle icon="people-outline" label={t('discover.membersWith', { skill: selectedSkill })} primary={primary} theme={theme} />
                     {loadingSkill === selectedSkill ? (
                       <View className="items-center justify-center py-4">
                         <LoadingSpinner />
@@ -605,12 +728,13 @@ function EndorsementsHeader({
                       skillMembers.map((member) => {
                         const name = getSkillMemberName(member, t('discover.memberFallback'));
                         return (
-                          <HeroButton
+                          <Pressable
                             key={member.id}
-                            variant="ghost"
-                            className="w-full justify-start rounded-panel-inner p-0"
+                            accessibilityRole="button"
+                            className="rounded-panel-inner"
                             onPress={() => onOpenMemberProfile(member.id)}
                             accessibilityLabel={t('discover.openMember', { name })}
+                            style={({ pressed }) => ({ opacity: pressed ? 0.86 : 1 })}
                           >
                             <Surface variant="secondary" className="w-full flex-row items-center gap-3 rounded-panel-inner p-3">
                               <Avatar uri={member.avatar ?? undefined} name={name} size={38} />
@@ -634,7 +758,7 @@ function EndorsementsHeader({
                                 </Chip>
                               ) : null}
                             </Surface>
-                          </HeroButton>
+                          </Pressable>
                         );
                       })
                     )}

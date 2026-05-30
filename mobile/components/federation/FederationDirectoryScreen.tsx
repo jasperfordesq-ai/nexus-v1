@@ -3,8 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, Image, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useState, type ComponentProps } from 'react';
+import { Alert, Image, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -49,7 +49,7 @@ import Toggle from '@/components/ui/Toggle';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 type DirectoryMode = 'partners' | 'members' | 'messages' | 'listings' | 'groups' | 'events' | 'settings';
-type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
+type IoniconName = ComponentProps<typeof Ionicons>['name'];
 type ServiceReachFilter = 'all' | 'local_only' | 'remote_ok' | 'travel_ok';
 type ListingTypeFilter = 'all' | 'offer' | 'request';
 type DirectoryItem = FederatedTenant | FederatedMember | FederatedListing | FederatedGroup | FederatedEvent | FederatedMessage;
@@ -224,30 +224,36 @@ function HeaderCard({
 }) {
   const meta = modeMeta[mode];
   return (
-    <HeroCard className="mb-4 overflow-hidden rounded-panel p-0">
+    <HeroCard
+      variant="default"
+      className="mb-4 overflow-hidden rounded-panel p-0"
+      style={{ borderWidth: 1, borderColor: withAlpha(meta.tone, 0.16) }}
+    >
       <View className="h-1.5" style={{ backgroundColor: meta.tone }} />
-      <HeroCard.Body className="gap-4 p-4 pt-0">
+      <HeroCard.Body className="gap-4 p-5">
         <View className="flex-row items-start gap-3">
-          <View className="size-13 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(meta.tone, 0.14) }}>
-            <Ionicons name={meta.icon} size={25} color={meta.tone} />
+          <View className="size-12 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(meta.tone, 0.14) }}>
+            <Ionicons name={meta.icon} size={24} color={meta.tone} />
           </View>
           <View className="min-w-0 flex-1 gap-1">
-            <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>
+            <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>
               {t(`directory.${mode}.eyebrow`)}
             </Text>
-            <Text className="text-2xl font-bold" style={{ color: theme.text }}>
+            <Text className="text-2xl font-bold leading-8" style={{ color: theme.text }} numberOfLines={2}>
               {t(`directory.${mode}.title`)}
             </Text>
-            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={4}>
               {t(`directory.${mode}.subtitle`)}
             </Text>
           </View>
         </View>
         {typeof count === 'number' ? (
-          <Chip size="sm" variant="secondary">
-            <Ionicons name="analytics-outline" size={13} color={meta.tone} />
-            <Chip.Label>{t('directory.resultsCount', { count })}</Chip.Label>
-          </Chip>
+          <View className="items-start">
+            <Chip size="sm" variant="secondary">
+              <Ionicons name="analytics-outline" size={13} color={meta.tone} />
+              <Chip.Label>{t('directory.resultsCount', { count })}</Chip.Label>
+            </Chip>
+          </View>
         ) : null}
       </HeroCard.Body>
     </HeroCard>
@@ -309,36 +315,50 @@ function FeatureUnavailableCard({
 
 function PartnerCard({ partner, t, theme, primary }: { partner: FederatedTenant; t: (key: string, opts?: Record<string, unknown>) => string; theme: ReturnType<typeof useTheme>; primary: string }) {
   return (
-    <HeroButton
-      variant="ghost"
-      feedbackVariant="scale"
-      className="mb-3"
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={partner.name}
+      className="mb-3 rounded-panel"
       onPress={() => {
         void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         router.push({ pathname: '/(modals)/federation-partner', params: { id: String(partner.id) } });
       }}
-      accessibilityLabel={partner.name}
+      style={({ pressed }) => ({ opacity: pressed ? 0.86 : 1 })}
     >
-      <HeroCard className="rounded-panel p-0">
+      <HeroCard
+        variant="default"
+        className="overflow-hidden rounded-panel p-0"
+        style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.12) }}
+      >
         <HeroCard.Body className="gap-4 p-4">
-          <View className="flex-row items-start gap-3">
+          <View className="absolute bottom-0 left-0 top-0 w-1" style={{ backgroundColor: primary }} />
+          <View className="flex-row items-start gap-3 pl-1">
             <Avatar uri={partner.logo} name={partner.name} size={56} />
             <View className="min-w-0 flex-1 gap-1">
               <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={2}>{partner.name}</Text>
+              {partner.location ? (
+                <View className="flex-row items-center gap-1">
+                  <Ionicons name="location-outline" size={13} color={theme.textSecondary} />
+                  <Text className="min-w-0 flex-1 text-xs" style={{ color: theme.textSecondary }} numberOfLines={1}>
+                    {partner.location}
+                  </Text>
+                </View>
+              ) : null}
               {partner.tagline || partner.description ? (
                 <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>
                   {partner.tagline || partner.description}
                 </Text>
               ) : null}
             </View>
+            <Ionicons name="chevron-forward-outline" size={18} color={primary} />
           </View>
-          <View className="flex-row flex-wrap gap-2">
+          <View className="flex-row flex-wrap gap-2 pl-1">
             <Chip size="sm" variant="secondary">
               <Ionicons name="people-outline" size={12} color={primary} />
               <Chip.Label>{t('directory.memberCount', { count: partner.member_count ?? 0 })}</Chip.Label>
             </Chip>
             {partner.federation_level_name ? (
-              <Chip size="sm" variant="secondary"><Chip.Label>{partner.federation_level_name}</Chip.Label></Chip>
+              <Chip size="sm" variant="secondary"><Chip.Label numberOfLines={1}>{partner.federation_level_name}</Chip.Label></Chip>
             ) : null}
             {partner.is_external ? (
               <Chip size="sm" variant="secondary" color="warning"><Chip.Label>{t('directory.external')}</Chip.Label></Chip>
@@ -346,7 +366,7 @@ function PartnerCard({ partner, t, theme, primary }: { partner: FederatedTenant;
           </View>
         </HeroCard.Body>
       </HeroCard>
-    </HeroButton>
+    </Pressable>
   );
 }
 
@@ -357,34 +377,42 @@ function MemberCard({ member, t, theme, primary }: { member: FederatedMember; t:
     ? externalTenantIdFromFederatedId(member.id) ?? member.tenant_id ?? member.timebank?.id
     : member.tenant_id ?? member.timebank?.id;
   return (
-    <HeroCard className="mb-3 rounded-panel p-0">
-      <HeroCard.Body className="gap-3 p-4">
-        <View className="flex-row items-start gap-3">
-          <Avatar uri={member.avatar ?? null} name={name} size={54} />
-          <View className="min-w-0 flex-1 gap-1">
-            <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={2}>{name}</Text>
-            <View className="flex-row flex-wrap gap-2">
-              <Chip size="sm" variant="secondary">
-                <Ionicons name="globe-outline" size={12} color={primary} />
-                <Chip.Label>{communityName}</Chip.Label>
-              </Chip>
-              {member.is_external ? <Chip size="sm" variant="secondary" color="warning"><Chip.Label>{t('directory.external')}</Chip.Label></Chip> : null}
+    <HeroCard
+      variant="default"
+      className="mb-3 overflow-hidden rounded-panel p-0"
+      style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.12) }}
+    >
+      <HeroCard.Body className="gap-4 p-4">
+        <View className="absolute bottom-0 left-0 top-0 w-1" style={{ backgroundColor: primary }} />
+        <View className="flex-row items-start gap-3 pl-1">
+          <Avatar uri={member.avatar ?? null} name={name} size={52} />
+          <View className="min-w-0 flex-1 gap-2">
+            <View className="gap-1">
+              <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={2}>{name}</Text>
+              <View className="flex-row flex-wrap gap-2">
+                <Chip size="sm" variant="secondary">
+                  <Ionicons name="globe-outline" size={12} color={primary} />
+                  <Chip.Label numberOfLines={1}>{communityName}</Chip.Label>
+                </Chip>
+                {member.is_external ? <Chip size="sm" variant="secondary" color="warning"><Chip.Label>{t('directory.external')}</Chip.Label></Chip> : null}
+              </View>
             </View>
           </View>
         </View>
-        {member.bio ? <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>{member.bio}</Text> : null}
+        {member.bio ? <Text className="pl-1 text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>{member.bio}</Text> : null}
         {member.skills?.length ? (
-          <View className="flex-row flex-wrap gap-2">
+          <View className="flex-row flex-wrap gap-2 pl-1">
             {member.skills.slice(0, 5).map((skill) => (
-              <Chip key={skill} size="sm" variant="secondary"><Chip.Label>{skill}</Chip.Label></Chip>
+              <Chip key={skill} size="sm" variant="secondary"><Chip.Label numberOfLines={1}>{skill}</Chip.Label></Chip>
             ))}
           </View>
         ) : null}
-        <View className="flex-row gap-2">
+        <View className="flex-row flex-wrap gap-2 pl-1">
           {tenantId ? (
             <HeroButton
               size="sm"
               variant="secondary"
+              className="min-w-[128px]"
               onPress={() => router.push({
                 pathname: '/(modals)/federation-member',
                 params: member.is_external
@@ -397,7 +425,7 @@ function MemberCard({ member, t, theme, primary }: { member: FederatedMember; t:
             </HeroButton>
           ) : null}
           {tenantId ? (
-            <HeroButton size="sm" variant="secondary" onPress={() => router.push({ pathname: '/(modals)/federation-messages', params: { compose: 'true', to_user: String(member.id), to_tenant: String(tenantId), name, community: communityName } } as unknown as Href)}>
+            <HeroButton size="sm" variant="secondary" className="min-w-[112px]" onPress={() => router.push({ pathname: '/(modals)/federation-messages', params: { compose: 'true', to_user: String(member.id), to_tenant: String(tenantId), name, community: communityName } } as unknown as Href)}>
               <Ionicons name="chatbubble-ellipses-outline" size={14} color={primary} />
               <HeroButton.Label>{t('directory.members.message')}</HeroButton.Label>
             </HeroButton>
@@ -890,15 +918,36 @@ function MessageCard({
 }) {
   const { partner, lastMessage: message } = thread;
   const partnerName = displayFederationPartnerName(partner, t('directory.messages.unknownSender'));
+  const tone = modeMeta.messages.tone;
   return (
-    <HeroButton variant="ghost" feedbackVariant="scale" className="mb-3" accessibilityLabel={t('directory.messages.openThread', { name: partnerName })} onPress={onPress}>
-      <HeroCard className="rounded-panel p-0">
-        <HeroCard.Body className="gap-3 p-4">
+    <Pressable
+      className="mb-3"
+      accessibilityRole="button"
+      accessibilityLabel={t('directory.messages.openThread', { name: partnerName })}
+      onPress={onPress}
+      style={({ pressed }) => ({ opacity: pressed ? 0.86 : 1 })}
+    >
+      <HeroCard
+        className="overflow-hidden rounded-panel p-0"
+        style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+      >
+        <View className="absolute bottom-0 left-0 top-0 w-1.5" style={{ backgroundColor: tone }} />
+        <HeroCard.Body className="gap-3 p-4 pl-5">
           <View className="flex-row items-start gap-3">
-            <Avatar uri={partner.avatar ?? null} name={partnerName} size={48} />
-            <View className="min-w-0 flex-1 gap-1">
-              <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={1}>{partnerName}</Text>
-              <Text className="text-xs" style={{ color: theme.textSecondary }} numberOfLines={1}>{partner.tenant_name ?? t('directory.unknownCommunity')}</Text>
+            <View
+              className="rounded-full p-1"
+              style={{ backgroundColor: withAlpha(tone, 0.1), borderWidth: 1, borderColor: withAlpha(tone, 0.18) }}
+            >
+              <Avatar uri={partner.avatar ?? null} name={partnerName} size={50} />
+            </View>
+            <View className="min-w-0 flex-1 gap-1.5">
+              <Text className="text-[17px] font-bold leading-6" style={{ color: theme.text }} numberOfLines={1}>{partnerName}</Text>
+              <View className="flex-row items-center gap-1">
+                <Ionicons name="business-outline" size={13} color={theme.textMuted} />
+                <Text className="min-w-0 flex-1 text-sm" style={{ color: theme.textSecondary }} numberOfLines={1}>
+                  {partner.tenant_name ?? t('directory.unknownCommunity')}
+                </Text>
+              </View>
             </View>
             <View className="items-end gap-2">
               {thread.unreadCount > 0 ? (
@@ -911,15 +960,28 @@ function MessageCard({
               </Chip>
             </View>
           </View>
-          {message.subject ? <Text className="text-sm font-semibold" style={{ color: theme.text }}>{message.subject}</Text> : null}
-          <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>{message.body}</Text>
+          <View
+            className="gap-1 rounded-2xl px-3 py-2"
+            style={{ backgroundColor: withAlpha(tone, 0.06), borderWidth: 1, borderColor: withAlpha(tone, 0.12) }}
+          >
+            {message.subject ? <Text className="text-sm font-bold" style={{ color: theme.text }} numberOfLines={2}>{message.subject}</Text> : null}
+            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>{message.body}</Text>
+          </View>
           <View className="flex-row items-center justify-between gap-3">
-            <Text className="text-xs" style={{ color: theme.textMuted }}>{formatDate(message.created_at)}</Text>
-            <Ionicons name="chevron-forward-outline" size={18} color={primary} />
+            <View className="flex-row items-center gap-1">
+              <Ionicons name="time-outline" size={13} color={theme.textMuted} />
+              <Text className="text-xs" style={{ color: theme.textMuted }}>{formatDate(message.created_at)}</Text>
+            </View>
+            <View
+              className="h-8 w-8 items-center justify-center rounded-2xl"
+              style={{ backgroundColor: withAlpha(primary, 0.1), borderWidth: 1, borderColor: withAlpha(primary, 0.16) }}
+            >
+              <Ionicons name="chevron-forward-outline" size={17} color={primary} />
+            </View>
           </View>
         </HeroCard.Body>
       </HeroCard>
-    </HeroButton>
+    </Pressable>
   );
 }
 
@@ -995,11 +1057,19 @@ function MessageThreadView({
 
   return (
     <View className="gap-4">
-      <HeroCard className="overflow-hidden rounded-panel p-0">
+      <HeroCard
+        className="overflow-hidden rounded-panel p-0"
+        style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+      >
         <View className="h-1.5" style={{ backgroundColor: modeMeta.messages.tone }} />
         <HeroCard.Body className="gap-4 p-4">
           <View className="flex-row items-start gap-3">
-            <Avatar uri={thread.partner.avatar ?? null} name={partnerName} size={52} />
+            <View
+              className="rounded-full p-1"
+              style={{ backgroundColor: withAlpha(modeMeta.messages.tone, 0.1), borderWidth: 1, borderColor: withAlpha(modeMeta.messages.tone, 0.18) }}
+            >
+              <Avatar uri={thread.partner.avatar ?? null} name={partnerName} size={52} />
+            </View>
             <View className="min-w-0 flex-1 gap-1">
               <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>
                 {t('directory.messages.threadEyebrow')}
@@ -1030,7 +1100,11 @@ function MessageThreadView({
               <Surface
                 variant={outbound ? 'default' : 'secondary'}
                 className="max-w-[88%] rounded-panel p-3"
-                style={outbound ? { backgroundColor: withAlpha(primary, 0.18) } : undefined}
+                style={{
+                  borderWidth: 1,
+                  borderColor: outbound ? withAlpha(primary, 0.24) : theme.borderSubtle,
+                  ...(outbound ? { backgroundColor: withAlpha(primary, 0.18) } : {}),
+                }}
               >
                 {message.subject ? (
                   <Text className="mb-1 text-sm font-semibold" style={{ color: theme.text }}>{message.subject}</Text>
@@ -1068,7 +1142,10 @@ function MessageThreadView({
         })}
       </View>
 
-      <HeroCard className="rounded-panel p-0">
+      <HeroCard
+        className="rounded-panel p-0"
+        style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+      >
         <HeroCard.Body className="gap-3 p-4">
           <Text className="text-sm font-semibold" style={{ color: theme.text }}>{t('directory.messages.reply')}</Text>
           <Input
@@ -1079,7 +1156,7 @@ function MessageThreadView({
             multiline
             textAlignVertical="top"
             containerClassName="mb-0"
-            inputClassName="min-h-28 rounded-panel-inner border border-border bg-surface px-4 py-3 text-base"
+            inputClassName="min-h-28 flex-1 rounded-panel-inner border border-border bg-surface px-4 py-3 text-base"
             style={{ color: theme.text }}
           />
           <HeroButton variant="primary" isDisabled={!canSend} onPress={() => void sendReply()} style={{ backgroundColor: canSend ? primary : theme.border }}>
@@ -1184,11 +1261,19 @@ function FederationComposeCard({
   }
 
   return (
-    <HeroCard className="mb-4 overflow-hidden rounded-panel p-0">
+    <HeroCard
+      className="mb-4 overflow-hidden rounded-panel p-0"
+      style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+    >
       <View className="h-1.5" style={{ backgroundColor: modeMeta.messages.tone }} />
       <HeroCard.Body className="gap-4 p-4">
         <View className="flex-row items-start gap-3">
-          <Avatar uri={recipient?.avatar ?? null} name={recipientName} size={50} />
+          <View
+            className="rounded-full p-1"
+            style={{ backgroundColor: withAlpha(modeMeta.messages.tone, 0.1), borderWidth: 1, borderColor: withAlpha(modeMeta.messages.tone, 0.18) }}
+          >
+            <Avatar uri={recipient?.avatar ?? null} name={recipientName} size={50} />
+          </View>
           <View className="min-w-0 flex-1 gap-1">
             <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>
               {t('directory.messages.composeEyebrow')}
@@ -1211,7 +1296,11 @@ function FederationComposeCard({
 
         {!hasTarget ? (
           <View className="gap-3">
-            <Surface variant="secondary" className="rounded-panel-inner p-3">
+            <Surface
+              variant="secondary"
+              className="rounded-panel-inner p-3"
+              style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+            >
               <Text className="text-sm" style={{ color: theme.textSecondary }}>
                 {t('directory.messages.noRecipient')}
               </Text>
@@ -1224,7 +1313,7 @@ function FederationComposeCard({
                 placeholder={t('directory.messages.recipientSearchPlaceholder')}
                 placeholderTextColor={theme.textMuted}
                 containerClassName="mb-0"
-                inputClassName="rounded-panel-inner border border-border bg-surface px-4 py-3 text-base"
+                inputClassName="flex-1 rounded-panel-inner border border-border bg-surface px-4 py-3 text-base"
                 style={{ color: theme.text }}
               />
             </View>
@@ -1249,6 +1338,7 @@ function FederationComposeCard({
                         setRecipientResults([]);
                       }}
                       accessibilityLabel={t('directory.messages.selectRecipient', { name: candidateName })}
+                      className="justify-start"
                     >
                       <Avatar uri={candidate.avatar ?? null} name={candidateName} size={32} />
                       <View className="min-w-0 flex-1 items-start">
@@ -1290,7 +1380,7 @@ function FederationComposeCard({
             placeholder={t('directory.messages.subjectPlaceholder')}
             placeholderTextColor={theme.textMuted}
             containerClassName="mb-0"
-            inputClassName="rounded-panel-inner border border-border bg-surface px-4 py-3 text-base"
+            inputClassName="flex-1 rounded-panel-inner border border-border bg-surface px-4 py-3 text-base"
             style={{ color: theme.text }}
           />
         </View>
@@ -1305,7 +1395,7 @@ function FederationComposeCard({
             multiline
             textAlignVertical="top"
             containerClassName="mb-0"
-            inputClassName="min-h-32 rounded-panel-inner border border-border bg-surface px-4 py-3 text-base"
+            inputClassName="min-h-32 flex-1 rounded-panel-inner border border-border bg-surface px-4 py-3 text-base"
             style={{ color: theme.text }}
           />
         </View>

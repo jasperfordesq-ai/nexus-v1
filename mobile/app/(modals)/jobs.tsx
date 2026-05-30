@@ -8,6 +8,7 @@ import {
   FlatList,
   View,
   Text,
+  Pressable,
   RefreshControl,
   ScrollView,
 } from 'react-native';
@@ -120,12 +121,15 @@ function JobCard({
   const visibleSkills = (item.skills_required ?? []).slice(0, 3);
 
   return (
-    <HeroButton
-      variant="ghost"
-      feedbackVariant="scale"
+    <Pressable
+      accessibilityRole="button"
       className="w-full p-0"
       onPress={onPress}
       accessibilityLabel={item.title}
+      style={({ pressed }) => ({
+        opacity: pressed ? 0.92 : 1,
+        transform: [{ scale: pressed ? 0.99 : 1 }],
+      })}
     >
       <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
         <View className="h-1.5" style={{ backgroundColor: item.is_featured ? warningColor : typeColor }} />
@@ -205,7 +209,7 @@ function JobCard({
           ) : null}
         </HeroCard.Body>
       </HeroCard>
-    </HeroButton>
+    </Pressable>
   );
 }
 
@@ -879,7 +883,7 @@ function JobAlertsPanel({
           />
         )
       }
-      contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: 32, paddingTop: 4 }}
+      contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: 112, paddingTop: 4 }}
     />
   );
 }
@@ -1206,7 +1210,7 @@ export default function JobsScreen() {
                 </View>
               ) : null
             }
-            contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: 32, paddingTop: 4 }}
+            contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: 112, paddingTop: 4 }}
           />
         </>
       ) : activeTab === 'myApplications' ? (
@@ -1248,7 +1252,7 @@ export default function JobsScreen() {
               </View>
             ) : null
           }
-          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: 32, paddingTop: 4 }}
+          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: 112, paddingTop: 4 }}
         />
       ) : activeTab === 'myPostings' ? (
         <FlatList<JobVacancy>
@@ -1289,7 +1293,7 @@ export default function JobsScreen() {
               </View>
             ) : null
           }
-          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: 32, paddingTop: 4 }}
+          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: 112, paddingTop: 4 }}
         />
       ) : (
         <JobAlertsPanel

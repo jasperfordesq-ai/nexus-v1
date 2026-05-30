@@ -4,11 +4,11 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState } from 'react';
-import { RefreshControl, ScrollView, Text, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Button as HeroButton, Card as HeroCard, Chip, Surface, Tabs } from 'heroui-native';
+import { Card as HeroCard, Chip, Surface, Tabs } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -81,19 +81,19 @@ export default function IdeationScreen() {
           contentContainerStyle={{ paddingBottom: 40 }}
           refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refresh} tintColor={primary} colors={[primary]} />}
         >
-          <View className="gap-3">
+          <View className="gap-3 pb-2">
             <HeroCard variant="default" className="mx-4 overflow-hidden rounded-panel p-0">
               <View className="h-1 w-full" style={{ backgroundColor: primary }} />
               <HeroCard.Body className="gap-4 p-4">
-                <View className="flex-row items-start gap-3">
-                  <View className="size-13 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
-                    <Ionicons name="bulb-outline" size={25} color={primary} />
+                <View className="flex-row items-center gap-3">
+                  <View className="h-12 w-12 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+                    <Ionicons name="bulb-outline" size={24} color={primary} />
                   </View>
                   <View className="min-w-0 flex-1">
-                    <Text className="text-2xl font-bold leading-8" style={{ color: theme.text }}>
+                    <Text className="text-[26px] font-bold leading-8" style={{ color: theme.text }} numberOfLines={1}>
                       {t('ideation:title')}
                     </Text>
-                    <Text className="mt-1 text-sm leading-5" style={{ color: theme.textSecondary }}>
+                    <Text className="mt-1 text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>
                       {t('ideation:subtitle')}
                     </Text>
                   </View>
@@ -101,7 +101,11 @@ export default function IdeationScreen() {
               </HeroCard.Body>
             </HeroCard>
 
-            <View className="mx-4">
+            <Surface
+              variant="default"
+              className="mx-4 gap-3 overflow-hidden rounded-panel p-3.5"
+              style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+            >
               <Input
                 label={t('ideation:searchLabel')}
                 placeholder={t('ideation:searchPlaceholder')}
@@ -110,12 +114,10 @@ export default function IdeationScreen() {
                 leftIcon={<Ionicons name="search-outline" size={18} className="text-muted-foreground" />}
                 containerClassName="mb-0"
               />
-            </View>
 
-            <Surface variant="default" className="mx-4 rounded-panel-inner p-2">
               <Tabs value={status} onValueChange={(value) => setStatus(value as FilterStatus)} variant="secondary">
                 <Tabs.List>
-                  <Tabs.ScrollView scrollAlign="start" contentContainerClassName="gap-1">
+                  <Tabs.ScrollView scrollAlign="start" contentContainerClassName="gap-1 pr-2">
                     <Tabs.Indicator />
                     {STATUS_FILTERS.map((item) => (
                       <Tabs.Trigger key={item} value={item}>
@@ -125,9 +127,9 @@ export default function IdeationScreen() {
                   </Tabs.ScrollView>
                 </Tabs.List>
               </Tabs>
-            </Surface>
 
-            <CategoryStrip categories={categories ?? []} selectedId={categoryId} onSelect={setCategoryId} />
+              <CategoryStrip categories={categories ?? []} selectedId={categoryId} onSelect={setCategoryId} />
+            </Surface>
 
             {isLoading ? (
               <View className="items-center justify-center py-14">
@@ -163,64 +165,142 @@ function CategoryStrip({
   onSelect: (id: number | null) => void;
 }) {
   const { t } = useTranslation(['ideation']);
+  const primary = usePrimaryColor();
+  const theme = useTheme();
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-2 px-4">
-      <HeroButton size="sm" variant={selectedId === null ? 'primary' : 'secondary'} onPress={() => onSelect(null)}>
-        <HeroButton.Label>{t('ideation:allCategories')}</HeroButton.Label>
-      </HeroButton>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-2 pr-2">
+      <FilterPill
+        label={t('ideation:allCategories')}
+        isSelected={selectedId === null}
+        primary={primary}
+        theme={theme}
+        onPress={() => onSelect(null)}
+      />
       {categories.map((category) => (
-        <HeroButton key={category.id} size="sm" variant={selectedId === category.id ? 'primary' : 'secondary'} onPress={() => onSelect(category.id)}>
-          <HeroButton.Label>{category.name}</HeroButton.Label>
-          <Chip size="sm" variant="secondary">
-            <Chip.Label>{t('ideation:categoryCount', { count: category.challenges_count ?? 0 })}</Chip.Label>
-          </Chip>
-        </HeroButton>
+        <FilterPill
+          key={category.id}
+          label={category.name}
+          detail={t('ideation:categoryCount', { count: category.challenges_count ?? 0 })}
+          isSelected={selectedId === category.id}
+          primary={primary}
+          theme={theme}
+          onPress={() => onSelect(category.id)}
+        />
       ))}
     </ScrollView>
+  );
+}
+
+function FilterPill({
+  label,
+  detail,
+  isSelected,
+  primary,
+  theme,
+  onPress,
+}: {
+  label: string;
+  detail?: string;
+  isSelected: boolean;
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      className="min-h-10 flex-row items-center gap-2 rounded-full px-3.5"
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={onPress}
+      style={({ pressed }) => ({
+        backgroundColor: isSelected ? primary : withAlpha(primary, pressed ? 0.14 : 0.08),
+        borderColor: isSelected ? primary : theme.borderSubtle,
+        borderWidth: 1,
+        opacity: pressed ? 0.86 : 1,
+      })}
+    >
+      <Text className="text-sm font-bold" style={{ color: isSelected ? '#fff' : theme.text }} numberOfLines={1}>
+        {label}
+      </Text>
+      {detail ? (
+        <View
+          className="rounded-full px-2 py-0.5"
+          style={{ backgroundColor: isSelected ? withAlpha('#ffffff', 0.2) : withAlpha(primary, 0.12) }}
+        >
+          <Text className="text-[11px] font-semibold" style={{ color: isSelected ? '#fff' : primary }} numberOfLines={1}>
+            {detail}
+          </Text>
+        </View>
+      ) : null}
+    </Pressable>
   );
 }
 
 function ChallengeCard({ challenge }: { challenge: IdeationChallenge }) {
   const { t } = useTranslation(['ideation']);
   const theme = useTheme();
+  const primary = usePrimaryColor();
+  const description = truncateText(stripHtml(challenge.description), 220);
+  const openChallenge = () => router.push({ pathname: '/(modals)/ideation-detail', params: { id: String(challenge.id) } } as unknown as Href);
+
   return (
-    <HeroCard variant="default" className="overflow-hidden rounded-panel p-0">
-      <HeroCard.Body className="gap-3 p-4">
-        <View className="flex-row items-start gap-3">
-          <View className="size-11 items-center justify-center rounded-panel-inner bg-surface-secondary">
-            <Ionicons name="bulb-outline" size={22} color={theme.info} />
-          </View>
-          <View className="min-w-0 flex-1 gap-1">
-            <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={2}>
-              {challenge.title}
-            </Text>
-            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>
-              {stripHtml(challenge.description)}
-            </Text>
-            <View className="flex-row flex-wrap gap-2">
-              <Chip size="sm" variant="secondary">
-                <Chip.Label>{t(`ideation:status.${challenge.status}`)}</Chip.Label>
-              </Chip>
-              {challenge.category ? (
-                <Chip size="sm" variant="secondary">
-                  <Chip.Label>{challenge.category}</Chip.Label>
-                </Chip>
-              ) : null}
-              <Chip size="sm" variant="secondary">
-                <Chip.Label>{t('ideation:ideasCount', { count: challenge.ideas_count ?? 0 })}</Chip.Label>
-              </Chip>
+    <Pressable accessibilityRole="button" accessibilityLabel={challenge.title} onPress={openChallenge} style={({ pressed }) => ({ opacity: pressed ? 0.9 : 1 })}>
+      <HeroCard variant="default" className="overflow-hidden rounded-panel p-0">
+        <View className="absolute bottom-0 left-0 top-0 w-1.5" style={{ backgroundColor: primary }} />
+        <HeroCard.Body className="gap-3 p-4 pl-5">
+          <View className="flex-row items-start gap-3">
+            <View className="h-11 w-11 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.12) }}>
+              <Ionicons name="bulb-outline" size={21} color={primary} />
+            </View>
+            <View className="min-w-0 flex-1 gap-2">
+              <View className="flex-row items-start justify-between gap-2">
+                <Text className="min-w-0 flex-1 text-[17px] font-bold leading-6" style={{ color: theme.text }} numberOfLines={2}>
+                  {challenge.title}
+                </Text>
+                <Ionicons name="chevron-forward" size={17} color={theme.textMuted} />
+              </View>
+              <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={4}>
+                {description}
+              </Text>
             </View>
           </View>
-        </View>
-        <HeroButton variant="secondary" onPress={() => router.push({ pathname: '/(modals)/ideation-detail', params: { id: String(challenge.id) } } as unknown as Href)}>
-          <HeroButton.Label>{t('ideation:viewChallenge')}</HeroButton.Label>
-          <Ionicons name="chevron-forward-outline" size={16} color={theme.info} />
-        </HeroButton>
-      </HeroCard.Body>
-    </HeroCard>
+
+          <View className="flex-row flex-wrap gap-2 pl-14">
+            <Chip size="sm" variant="secondary">
+              <Chip.Label>{t(`ideation:status.${challenge.status}`)}</Chip.Label>
+            </Chip>
+            {challenge.category ? (
+              <Chip size="sm" variant="soft" color="default">
+                <Chip.Label>{challenge.category}</Chip.Label>
+              </Chip>
+            ) : null}
+            <Chip size="sm" variant="soft" color="default">
+              <Chip.Label>{t('ideation:ideasCount', { count: challenge.ideas_count ?? 0 })}</Chip.Label>
+            </Chip>
+          </View>
+
+          <View className="pl-14">
+            <View
+              className="min-h-10 flex-row items-center justify-center gap-2 rounded-full px-4"
+              style={{ backgroundColor: withAlpha(primary, 0.1), borderColor: withAlpha(primary, 0.18), borderWidth: 1 }}
+            >
+              <Text className="text-sm font-bold" style={{ color: primary }}>
+                {t('ideation:viewChallenge')}
+              </Text>
+              <Ionicons name="chevron-forward-outline" size={16} color={primary} />
+            </View>
+          </View>
+        </HeroCard.Body>
+      </HeroCard>
+    </Pressable>
   );
 }
 
 function stripHtml(value: string): string {
   return value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function truncateText(value: string, maxLength: number): string {
+  if (value.length <= maxLength) return value;
+  return `${value.slice(0, maxLength).trimEnd()}...`;
 }

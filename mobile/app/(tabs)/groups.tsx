@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useMemo, useState } from 'react';
-import { FlatList, Image, RefreshControl, Text, View } from 'react-native';
+import { FlatList, Image, Pressable, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -192,12 +192,15 @@ function GroupCard({
   const visibilityIcon: IoniconName = item.visibility === 'private' ? 'lock-closed-outline' : 'globe-outline';
 
   return (
-    <HeroButton
+    <Pressable
+      accessibilityRole="button"
       className="mx-4 my-2"
-      variant="ghost"
-      feedbackVariant="scale"
       onPress={onPress}
       accessibilityLabel={item.name ?? ''}
+      style={({ pressed }) => ({
+        opacity: pressed ? 0.92 : 1,
+        transform: [{ scale: pressed ? 0.99 : 1 }],
+      })}
     >
       <HeroCard className="min-h-[148px] w-full rounded-panel p-0">
         <HeroCard.Body className="gap-4 p-4">
@@ -253,7 +256,7 @@ function GroupCard({
           </View>
         </HeroCard.Body>
       </HeroCard>
-    </HeroButton>
+    </Pressable>
   );
 }
 
@@ -301,38 +304,6 @@ export default function GroupsScreen() {
         }}
       />
 
-      <View className="gap-3 px-4 pb-3">
-        <GroupsHero groups={groups} primary={primary} theme={theme} t={t} />
-
-        <Surface variant="default" className="gap-3 rounded-panel p-3">
-          <Input
-            value={search}
-            onChangeText={setSearch}
-            placeholder={t('searchPlaceholder')}
-            placeholderTextColor={theme.textMuted}
-            returnKeyType="search"
-            clearButtonMode="while-editing"
-            accessibilityLabel={t('searchPlaceholder')}
-            style={{ color: theme.text }}
-            leftIcon={<Ionicons name="search-outline" size={18} color={theme.textMuted} />}
-          />
-
-          <View className="flex-row gap-2">
-            {filterOptions.map((option) => (
-              <FilterButton
-                key={option.value}
-                label={option.label}
-                selected={filter === option.value}
-                onPress={() => {
-                  void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  setFilter(option.value);
-                }}
-              />
-            ))}
-          </View>
-        </Surface>
-      </View>
-
       <OfflineBanner />
 
       <FlatList<ApiGroup>
@@ -360,6 +331,39 @@ export default function GroupsScreen() {
         }
         onEndReached={() => { if (hasMore) loadMore(); }}
         onEndReachedThreshold={0.3}
+        ListHeaderComponent={
+          <View className="gap-3 px-4 pb-3">
+            <GroupsHero groups={groups} primary={primary} theme={theme} t={t} />
+
+            <Surface variant="default" className="gap-3 rounded-panel p-3">
+              <Input
+                value={search}
+                onChangeText={setSearch}
+                placeholder={t('searchPlaceholder')}
+                placeholderTextColor={theme.textMuted}
+                returnKeyType="search"
+                clearButtonMode="while-editing"
+                accessibilityLabel={t('searchPlaceholder')}
+                style={{ color: theme.text }}
+                leftIcon={<Ionicons name="search-outline" size={18} color={theme.textMuted} />}
+              />
+
+              <View className="flex-row gap-2">
+                {filterOptions.map((option) => (
+                  <FilterButton
+                    key={option.value}
+                    label={option.label}
+                    selected={filter === option.value}
+                    onPress={() => {
+                      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      setFilter(option.value);
+                    }}
+                  />
+                ))}
+              </View>
+            </Surface>
+          </View>
+        }
         ListEmptyComponent={
           isLoading ? (
             <><GroupCardSkeleton /><GroupCardSkeleton /><GroupCardSkeleton /></>
@@ -386,7 +390,7 @@ export default function GroupsScreen() {
             </View>
           ) : null
         }
-        contentContainerStyle={{ paddingBottom: 24 }}
+        contentContainerStyle={{ paddingBottom: 112 }}
       />
     </SafeAreaView>
   );

@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Spinner, SearchField, Tabs, Tab } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, TagGroup, Tag, Chip, Spinner, SearchField, Tabs, Tab } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -419,29 +419,25 @@ export function IdeationPage() {
 
         {/* Tag Filter Buttons */}
         {availableTags.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            {availableTags.slice(0, 15).map(({ tag, count }) => (
-              <Button
-                key={tag}
-                size="sm"
-                variant="flat"
-                aria-pressed={selectedTags.includes(tag)}
-                onPress={() => {
-                  setSelectedTags(prev =>
-                    prev.includes(tag)
-                      ? prev.filter(t => t !== tag)
-                      : [...prev, tag]
-                  );
-                }}
-                className={
-                  selectedTags.includes(tag)
-                    ? 'bg-primary text-white'
-                    : 'border border-default bg-transparent text-[var(--color-text-secondary)]'
-                }
-              >
-                {tag} ({count})
-              </Button>
-            ))}
+          <div className="flex flex-wrap items-center gap-1.5">
+            <TagGroup
+              aria-label={t('tags')}
+              selectionMode="multiple"
+              selectedKeys={new Set(selectedTags)}
+              onSelectionChange={(keys) => setSelectedTags(keys === 'all' ? availableTags.map((a) => a.tag) : Array.from(keys).map(String))}
+            >
+              <TagGroup.List className="flex flex-wrap gap-1.5">
+                {availableTags.slice(0, 15).map(({ tag, count }) => (
+                  <Tag
+                    key={tag}
+                    id={tag}
+                    className="data-[selected=true]:bg-primary data-[selected=true]:text-white"
+                  >
+                    {tag} ({count})
+                  </Tag>
+                ))}
+              </TagGroup.List>
+            </TagGroup>
             {selectedTags.length > 0 && (
               <Button
                 size="sm"

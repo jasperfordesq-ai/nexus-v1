@@ -1,4 +1,5 @@
-import { Select, SelectItem, useDisclosure, GlassCard, ConfettiCelebration, Progress, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch, Skeleton } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, GlassCard, ConfettiCelebration, Progress, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, ToggleButton, ToggleButtonGroup, DatePicker, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch, Skeleton } from '@/components/ui';
+import { parseDate } from '@internationalized/date';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -472,32 +473,40 @@ export function GoalsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 flex-wrap">
-        <Button
-          variant={tab === 'my' ? 'solid' : 'flat'}
-          className={tab === 'my' ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white' : 'bg-theme-elevated text-theme-muted'}
-          onPress={() => setTab('my')}
-          startContent={<Target className="w-4 h-4" aria-hidden="true" />}
+      <ToggleButtonGroup
+        aria-label={t('goals.title')}
+        selectionMode="single"
+        disallowEmptySelection
+        isDetached
+        selectedKeys={new Set([tab])}
+        onSelectionChange={(keys) => { const [k] = Array.from(keys); if (k) setTab(k as GoalTab); }}
+        className="flex gap-2 flex-wrap"
+      >
+        <ToggleButton
+          id="my"
+          variant="ghost"
+          className="bg-theme-elevated text-theme-muted data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-indigo-500 data-[selected=true]:to-purple-600 data-[selected=true]:text-white"
         >
+          <Target className="w-4 h-4" aria-hidden="true" />
           {t('goals.tab_my')}
-        </Button>
-        <Button
-          variant={tab === 'buddying' ? 'solid' : 'flat'}
-          className={tab === 'buddying' ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white' : 'bg-theme-elevated text-theme-muted'}
-          onPress={() => setTab('buddying')}
-          startContent={<Users className="w-4 h-4" aria-hidden="true" />}
+        </ToggleButton>
+        <ToggleButton
+          id="buddying"
+          variant="ghost"
+          className="bg-theme-elevated text-theme-muted data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-indigo-500 data-[selected=true]:to-purple-600 data-[selected=true]:text-white"
         >
+          <Users className="w-4 h-4" aria-hidden="true" />
           {t('goals.tab_buddying')}
-        </Button>
-        <Button
-          variant={tab === 'discover' ? 'solid' : 'flat'}
-          className={tab === 'discover' ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white' : 'bg-theme-elevated text-theme-muted'}
-          onPress={() => setTab('discover')}
-          startContent={<Globe className="w-4 h-4" aria-hidden="true" />}
+        </ToggleButton>
+        <ToggleButton
+          id="discover"
+          variant="ghost"
+          className="bg-theme-elevated text-theme-muted data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-indigo-500 data-[selected=true]:to-purple-600 data-[selected=true]:text-white"
         >
+          <Globe className="w-4 h-4" aria-hidden="true" />
           {t('goals.tab_discover')}
-        </Button>
-      </div>
+        </ToggleButton>
+      </ToggleButtonGroup>
 
       <section className="rounded-lg border border-theme-default bg-theme-elevated/60 p-4 sm:p-5">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-4 lg:items-center">
@@ -679,12 +688,11 @@ export function GoalsPage() {
                 <SelectItem key={frequency} id={frequency}>{t(`frequency.${frequency}`)}</SelectItem>
               ))}
             </Select>
-            <Input
-              type="date"
+            <DatePicker
               label={t('goals.modal.deadline_label')}
-              value={newGoal.deadline}
-              onChange={(e) => setNewGoal((prev) => ({ ...prev, deadline: e.target.value }))}
-              classNames={inputClasses}
+              value={newGoal.deadline ? parseDate(newGoal.deadline) : null}
+              onChange={(val) => setNewGoal((prev) => ({ ...prev, deadline: val ? val.toString() : '' }))}
+              classNames={{ inputWrapper: inputClasses.inputWrapper, input: inputClasses.input }}
             />
             <div className="flex items-center justify-between">
               <div>
@@ -754,12 +762,11 @@ export function GoalsPage() {
                 <SelectItem key={frequency} id={frequency}>{t(`frequency.${frequency}`)}</SelectItem>
               ))}
             </Select>
-            <Input
-              type="date"
+            <DatePicker
               label={t('goals.modal.deadline_label')}
-              value={editForm.deadline}
-              onChange={(e) => setEditForm((prev) => ({ ...prev, deadline: e.target.value }))}
-              classNames={inputClasses}
+              value={editForm.deadline ? parseDate(editForm.deadline) : null}
+              onChange={(val) => setEditForm((prev) => ({ ...prev, deadline: val ? val.toString() : '' }))}
+              classNames={{ inputWrapper: inputClasses.inputWrapper, input: inputClasses.input }}
             />
             <div className="flex items-center justify-between">
               <div>

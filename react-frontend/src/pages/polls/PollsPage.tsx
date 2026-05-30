@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure, GlassCard, Progress, Button, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch, Tabs, Tab, CardRowsSkeleton } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, GlassCard, Progress, Button, ToggleButton, ToggleButtonGroup, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch, Tabs, Tab, CardRowsSkeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -1017,32 +1017,35 @@ export function PollsPage() {
 
       {/* P2 - Category Filter */}
       {categories.length > 0 && (
-        <div role="group" aria-label={t('category_filter_label')} className="flex gap-2 flex-wrap">
-          <Button
-            size="sm"
-            variant={!selectedCategory ? 'solid' : 'flat'}
-            className={!selectedCategory
-              ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white'
-              : 'bg-theme-elevated text-theme-muted'}
-            onPress={() => setSelectedCategory(null)}
-            startContent={<Filter className="w-3.5 h-3.5" aria-hidden="true" />}
+        <ToggleButtonGroup
+          aria-label={t('category_filter_label')}
+          selectionMode="single"
+          disallowEmptySelection
+          isDetached
+          size="sm"
+          selectedKeys={new Set([selectedCategory ?? '__all__'])}
+          onSelectionChange={(keys) => { const [k] = Array.from(keys); setSelectedCategory(!k || k === '__all__' ? null : String(k)); }}
+          className="flex gap-2 flex-wrap"
+        >
+          <ToggleButton
+            id="__all__"
+            variant="ghost"
+            className="bg-theme-elevated text-theme-muted data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-amber-500 data-[selected=true]:to-orange-600 data-[selected=true]:text-white"
           >
+            <Filter className="w-3.5 h-3.5" aria-hidden="true" />
             {t('all_categories')}
-          </Button>
+          </ToggleButton>
           {categories.map((cat) => (
-            <Button
+            <ToggleButton
               key={cat}
-              size="sm"
-              variant={selectedCategory === cat ? 'solid' : 'flat'}
-              className={selectedCategory === cat
-                ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white'
-                : 'bg-theme-elevated text-theme-muted'}
-              onPress={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
+              id={cat}
+              variant="ghost"
+              className="bg-theme-elevated text-theme-muted data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-amber-500 data-[selected=true]:to-orange-600 data-[selected=true]:text-white"
             >
               {cat}
-            </Button>
+            </ToggleButton>
           ))}
-        </div>
+        </ToggleButtonGroup>
       )}
 
       {/* Error State */}
@@ -1235,12 +1238,13 @@ export function PollsPage() {
                                       <span className={`text-xs flex-1 truncate ${eliminated === option ? 'line-through text-theme-subtle' : 'text-theme-primary'}`}>
                                         {option}
                                       </span>
-                                      <div className="w-24 h-1.5 rounded-full bg-[var(--surface-hover)] overflow-hidden">
-                                        <div
-                                          className="h-full rounded-full bg-gradient-to-r from-purple-500 to-indigo-500"
-                                          style={{ width: `${pct}%` }}
-                                        />
-                                      </div>
+                                      <Progress
+                                        aria-label={option}
+                                        size="sm"
+                                        value={pct}
+                                        className="w-24"
+                                        classNames={{ track: 'bg-[var(--surface-hover)]', indicator: 'bg-gradient-to-r from-purple-500 to-indigo-500' }}
+                                      />
                                       <span className="text-xs text-theme-muted w-12 text-right">{count} ({pct}%)</span>
                                     </div>
                                   );

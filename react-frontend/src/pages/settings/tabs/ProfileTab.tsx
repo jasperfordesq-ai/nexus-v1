@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Input, Textarea, Avatar } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, ToggleButton, ToggleButtonGroup, Input, Textarea, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -308,19 +308,27 @@ export function ProfileTab({
           {/* Theme preference */}
           <div className="pt-4 border-t border-theme-default">
             <p className="text-sm font-medium text-theme-primary mb-3">{t('theme.title')}</p>
-            <div className="flex gap-2 flex-wrap">
+            <ToggleButtonGroup
+              aria-label={t('theme.title')}
+              selectionMode="single"
+              disallowEmptySelection
+              isDetached
+              size="sm"
+              selectedKeys={new Set([theme])}
+              onSelectionChange={(keys) => { const [k] = Array.from(keys); if (k) setTheme(k as typeof theme); }}
+              className="flex gap-2 flex-wrap"
+            >
               {(['light', 'dark', 'system'] as const).map((mode) => (
-                <Button
+                <ToggleButton
                   key={mode}
-                  size="sm"
-                  variant={theme === mode ? 'solid' : 'flat'}
-                  color={theme === mode ? 'primary' : 'default'}
-                  onPress={() => setTheme(mode)}
+                  id={mode}
+                  variant="ghost"
+                  className="data-[selected=true]:bg-[var(--color-primary)] data-[selected=true]:text-white"
                 >
                   {t(`theme.${mode}`)}
-                </Button>
+                </ToggleButton>
               ))}
-            </div>
+            </ToggleButtonGroup>
           </div>
         </div>
       </GlassCard>

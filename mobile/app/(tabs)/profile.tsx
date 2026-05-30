@@ -3,13 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Alert, ScrollView, View } from 'react-native';
+import { Alert, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
-import { Button as HeroButton, Card as HeroCard, Chip, Text } from 'heroui-native';
+import { Accordion, Button as HeroButton, Card as HeroCard, Chip, Text } from 'heroui-native';
 
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useTenant, usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -41,8 +41,6 @@ const MY_SPACE: MenuItem[] = [
   { labelKey: 'menuLabels.reviews', descriptionKey: 'navDescriptions.reviews', icon: 'star-outline', route: '/(modals)/reviews' as Href, tone: '#f59e0b', featureGate: 'reviews' },
   { labelKey: 'achievements', descriptionKey: 'navDescriptions.achievements', icon: 'trophy-outline', route: '/(modals)/gamification', tone: '#f59e0b', featureGate: 'gamification' },
   { labelKey: 'myGoals', descriptionKey: 'navDescriptions.myGoals', icon: 'flag-outline', route: '/(modals)/goals', tone: '#8b5cf6', featureGate: 'goals' },
-  { labelKey: 'groups', descriptionKey: 'navDescriptions.groups', icon: 'people-outline', route: '/(modals)/groups', tone: '#06b6d4', featureGate: 'groups' },
-  { labelKey: 'groupExchanges', descriptionKey: 'navDescriptions.groupExchanges', icon: 'swap-horizontal-outline', route: '/(modals)/group-exchanges' as Href, tone: '#6366f1', featureGate: 'group_exchanges' },
 ];
 
 const DISCOVER: MenuItem[] = [
@@ -51,6 +49,8 @@ const DISCOVER: MenuItem[] = [
   { labelKey: 'marketplace', descriptionKey: 'navDescriptions.marketplace', icon: 'bag-handle-outline', route: '/(modals)/marketplace' as Href, tone: '#0ea5e9', featureGate: 'marketplace' },
   { labelKey: 'jobs', descriptionKey: 'navDescriptions.jobs', icon: 'briefcase-outline', route: '/(modals)/jobs', tone: '#2563eb', featureGate: 'job_vacancies' },
   { labelKey: 'events', descriptionKey: 'navDescriptions.events', icon: 'calendar-outline', route: '/(tabs)/events', tone: '#f43f5e', featureGate: 'events' },
+  { labelKey: 'groups', descriptionKey: 'navDescriptions.groups', icon: 'people-outline', route: '/(modals)/groups', tone: '#06b6d4', featureGate: 'groups' },
+  { labelKey: 'groupExchanges', descriptionKey: 'navDescriptions.groupExchanges', icon: 'swap-horizontal-outline', route: '/(modals)/group-exchanges' as Href, tone: '#6366f1', featureGate: 'group_exchanges' },
   { labelKey: 'polls', descriptionKey: 'navDescriptions.polls', icon: 'stats-chart-outline', route: '/(modals)/polls' as Href, tone: '#7c3aed', featureGate: 'polls' },
   { labelKey: 'ideation', descriptionKey: 'navDescriptions.ideation', icon: 'bulb-outline', route: '/(modals)/ideation' as Href, tone: '#f59e0b', featureGate: 'ideation_challenges' },
   { labelKey: 'browseMembers', descriptionKey: 'navDescriptions.browseMembers', icon: 'people-outline', route: '/(modals)/members', tone: '#14b8a6', featureGate: 'connections' },
@@ -197,8 +197,8 @@ export default function MoreScreen() {
 
         <MenuSection title={t('discover')} items={visibleDiscover} onNavigate={navigate} theme={theme} />
         <MenuSection title={t('marketplaceSection')} items={visibleMarketplace} onNavigate={navigate} theme={theme} />
-        <MenuSection title={t('federationSection')} items={visibleFederation} onNavigate={navigate} theme={theme} />
-        <MenuSection title={t('mySpace')} items={visibleMySpace} onNavigate={navigate} theme={theme} />
+        <CollapsibleMenuSection title={t('federationSection')} value="federation" items={visibleFederation} onNavigate={navigate} theme={theme} />
+        <CollapsibleMenuSection title={t('mySpace')} value="my-space" items={visibleMySpace} onNavigate={navigate} theme={theme} />
         <MenuSection title={t('account')} items={visibleAccount} onNavigate={navigate} theme={theme} />
 
         <HeroButton variant="danger" onPress={confirmLogout} className="mt-1">
@@ -247,30 +247,85 @@ function MenuSection({ title, items, onNavigate, theme }: { title: string; items
   );
 }
 
+function CollapsibleMenuSection({
+  title,
+  value,
+  items,
+  onNavigate,
+  theme,
+}: {
+  title: string;
+  value: string;
+  items: MenuItem[];
+  onNavigate: (route: Href) => void;
+  theme: Theme;
+}) {
+  if (items.length === 0) return null;
+
+  return (
+    <Accordion selectionMode="single" variant="surface" hideSeparator className="mb-4 overflow-hidden rounded-panel">
+      <Accordion.Item value={value}>
+        <Accordion.Trigger className="px-4 py-4" accessibilityLabel={title}>
+          <View className="min-w-0 flex-1 flex-row items-center gap-3">
+            <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(theme.text, 0.08) }}>
+              <Ionicons name="albums-outline" size={18} color={theme.textSecondary} />
+            </View>
+            <View className="min-w-0 flex-1">
+              <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>
+                {title}
+              </Text>
+            </View>
+            <Chip size="sm" variant="secondary">
+              <Chip.Label>{items.length}</Chip.Label>
+            </Chip>
+          </View>
+          <Accordion.Indicator iconProps={{ color: theme.textSecondary }} />
+        </Accordion.Trigger>
+        <Accordion.Content className="px-2 pb-2">
+          <View className="gap-2">
+            {items.map((item) => (
+              <MenuRow key={item.labelKey} item={item} onPress={() => onNavigate(item.route)} theme={theme} />
+            ))}
+          </View>
+        </Accordion.Content>
+      </Accordion.Item>
+    </Accordion>
+  );
+}
+
 function MenuRow({ item, onPress, theme }: { item: MenuItem; onPress: () => void; theme: Theme }) {
   const { t } = useTranslation('profile');
 
   return (
-    <HeroButton
-      variant="secondary"
+    <Pressable
+      accessibilityRole="button"
       accessibilityLabel={t(item.labelKey)}
       onPress={onPress}
-      className="w-full justify-start rounded-panel-inner px-3 py-3"
+      className="w-full rounded-panel-inner px-3 py-3"
+      style={({ pressed }) => ({
+        minHeight: 76,
+        backgroundColor: pressed ? withAlpha(item.tone, 0.14) : withAlpha(theme.text, 0.06),
+        borderColor: pressed ? withAlpha(item.tone, 0.28) : 'transparent',
+        borderWidth: 1,
+        transform: [{ scale: pressed ? 0.99 : 1 }],
+      })}
     >
-      <View className="flex-row items-center gap-3">
-        <View className="size-11 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(item.tone, 0.14) }}>
+      <View className="min-h-[50px] flex-row items-center gap-3">
+        <View className="size-12 shrink-0 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(item.tone, 0.14) }}>
           <Ionicons name={item.icon} size={20} color={item.tone} />
         </View>
-        <View className="min-w-0 flex-1 gap-0.5">
-          <Text className="text-base font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+        <View className="min-w-0 flex-1 gap-1">
+          <Text className="text-base font-semibold leading-5" style={{ color: theme.text }} numberOfLines={2}>
             {t(item.labelKey)}
           </Text>
-          <Text className="text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>
+          <Text className="text-xs leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>
             {t(item.descriptionKey)}
           </Text>
         </View>
-        <Ionicons name="chevron-forward-outline" size={18} color={theme.textSecondary} />
+        <View className="shrink-0">
+          <Ionicons name="chevron-forward-outline" size={18} color={theme.textSecondary} />
+        </View>
       </View>
-    </HeroButton>
+    </Pressable>
   );
 }

@@ -124,9 +124,9 @@ export default function PollsScreen() {
 
   const renderItem = useCallback(
     ({ item }: { item: FeedItem }) => (
-      <PollFeedCard item={item} primary={primary} theme={theme} t={t} />
+      <PollFeedCard item={item} primary={primary} t={t} onVoted={() => void refresh()} />
     ),
-    [primary, theme, t],
+    [primary, refresh, t],
   );
 
   return (
@@ -144,43 +144,49 @@ export default function PollsScreen() {
           onEndReached={loadMore}
           onEndReachedThreshold={0.3}
           ListHeaderComponent={
-            <View className="gap-3 px-4 pb-3">
+            <View className="gap-3 px-4 pb-4">
               <HeroCard className="overflow-hidden rounded-panel p-0">
                 <View className="h-1.5" style={{ backgroundColor: primary }} />
-                <HeroCard.Body className="gap-3 p-4">
-                  <View className="flex-row items-center gap-3">
+                <HeroCard.Body className="gap-4 p-4">
+                  <View className="flex-row items-start gap-3">
                     <View className="size-12 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
                       <Ionicons name="stats-chart-outline" size={24} color={primary} />
                     </View>
-                    <View className="min-w-0 flex-1">
+                    <View className="min-w-0 flex-1 gap-1">
                       <Text className="text-xs font-semibold uppercase text-muted-foreground">
                         {t('pollsScreen.heroEyebrow')}
                       </Text>
-                      <Text className="text-2xl font-bold text-foreground" numberOfLines={1}>
+                      <Text className="text-2xl font-bold leading-8 text-foreground">
                         {t('pollsScreen.title')}
+                      </Text>
+                      <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+                        {t('pollsScreen.subtitle')}
                       </Text>
                     </View>
                   </View>
-                  <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
-                    {t('pollsScreen.subtitle')}
-                  </Text>
+
                   <HeroButton
-                    variant="primary"
+                    variant={showCreate ? 'secondary' : 'primary'}
                     onPress={() => setShowCreate((value) => !value)}
                     accessibilityLabel={t('pollsScreen.createPoll')}
-                    style={{ backgroundColor: primary }}
+                    style={showCreate ? undefined : { backgroundColor: primary }}
                   >
-                    <Ionicons name={showCreate ? 'close-outline' : 'add-circle-outline'} size={18} color={theme.onPrimary} />
+                    <Ionicons name={showCreate ? 'close-outline' : 'add-circle-outline'} size={18} color={showCreate ? primary : theme.onPrimary} />
                     <HeroButton.Label>{showCreate ? t('common:cancel') : t('pollsScreen.createPoll')}</HeroButton.Label>
                   </HeroButton>
                 </HeroCard.Body>
               </HeroCard>
               {showCreate ? (
-                <HeroCard className="rounded-panel p-0">
-                  <HeroCard.Body className="gap-3 p-4">
-                    <Text className="text-base font-semibold" style={{ color: theme.text }}>
-                      {t('pollsScreen.createTitle')}
-                    </Text>
+                <HeroCard variant="secondary" className="rounded-panel p-0">
+                  <HeroCard.Body className="gap-4 p-4">
+                    <View className="flex-row items-center gap-3">
+                      <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+                        <Ionicons name="create-outline" size={20} color={primary} />
+                      </View>
+                      <Text className="min-w-0 flex-1 text-base font-semibold" style={{ color: theme.text }}>
+                        {t('pollsScreen.createTitle')}
+                      </Text>
+                    </View>
                     <Input
                       label={t('pollsScreen.questionLabel')}
                       value={question}
@@ -207,6 +213,7 @@ export default function PollsScreen() {
                           {options.length > 2 ? (
                             <HeroButton
                               size="sm"
+                              isIconOnly
                               variant="danger-soft"
                               onPress={() => removeOption(index)}
                               accessibilityLabel={t('pollsScreen.removeOption', { number: index + 1 })}
@@ -217,13 +224,12 @@ export default function PollsScreen() {
                         </View>
                       ))}
                     </View>
-                    <View className="flex-row gap-2">
-                      <HeroButton className="flex-1" variant="secondary" isDisabled={options.length >= 6} onPress={addOption}>
+                    <View className="gap-2">
+                      <HeroButton variant="secondary" isDisabled={options.length >= 6} onPress={addOption}>
                         <Ionicons name="add-outline" size={16} color={primary} />
                         <HeroButton.Label>{t('pollsScreen.addOption')}</HeroButton.Label>
                       </HeroButton>
                       <HeroButton
-                        className="flex-1"
                         variant="primary"
                         isDisabled={isCreating}
                         onPress={() => void handleCreatePoll()}
@@ -274,7 +280,7 @@ export default function PollsScreen() {
               </View>
             ) : null
           }
-          contentContainerStyle={{ paddingBottom: 28 }}
+          contentContainerStyle={{ paddingBottom: 112 }}
         />
       </SafeAreaView>
     </ModalErrorBoundary>
@@ -284,31 +290,36 @@ export default function PollsScreen() {
 function PollFeedCard({
   item,
   primary,
-  theme,
   t,
+  onVoted,
 }: {
   item: FeedItem;
   primary: string;
-  theme: ReturnType<typeof useTheme>;
   t: (key: string, opts?: Record<string, unknown>) => string;
+  onVoted: (updated: NonNullable<FeedItem['poll_data']>) => void;
 }) {
   if (!item.poll_data) return null;
 
   const author = getFeedAuthor(item, t('common:labels.member'));
-  const voteCount = item.poll_data.total_votes ?? 0;
 
   return (
-    <HeroCard variant="default" className="mx-4 mb-3 overflow-hidden rounded-panel p-0">
+    <HeroCard variant="default" className="mx-4 mb-4 overflow-hidden rounded-panel p-0">
       <HeroCard.Body className="gap-4 p-4">
-        <View className="flex-row items-start justify-between gap-3">
+        <View className="flex-row items-start gap-3">
+          <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+            <Ionicons name="stats-chart-outline" size={19} color={primary} />
+          </View>
           <View className="min-w-0 flex-1 gap-1">
-            <Text className="text-base font-semibold text-foreground" numberOfLines={2}>
+            <Text className="text-base font-semibold leading-6 text-foreground" numberOfLines={3}>
               {t('pollsScreen.feedItemTitle', { title: item.title || item.poll_data.question })}
             </Text>
             <Text className="text-xs text-muted-foreground" numberOfLines={1}>
               {author.name}
             </Text>
           </View>
+        </View>
+
+        <View className="flex-row flex-wrap gap-2 pl-[52px]">
           <Chip size="sm" variant={item.poll_data.is_active ? 'secondary' : 'soft'} color={item.poll_data.is_active ? 'accent' : 'default'}>
             <Ionicons name={item.poll_data.is_active ? 'radio-button-on-outline' : 'lock-closed-outline'} size={12} color={primary} />
             <Chip.Label>{item.poll_data.is_active ? t('pollsScreen.statusOpen') : t('pollsScreen.statusClosed')}</Chip.Label>
@@ -316,12 +327,8 @@ function PollFeedCard({
         </View>
 
         <Surface variant="secondary" className="rounded-panel-inner p-3">
-          <PollCard pollData={item.poll_data} itemId={item.id} />
+          <PollCard pollData={item.poll_data} itemId={item.id} onVoted={onVoted} />
         </Surface>
-
-        <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>
-          {t('pollsScreen.totalVotes', { count: voteCount })}
-        </Text>
       </HeroCard.Body>
     </HeroCard>
   );

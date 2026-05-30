@@ -77,8 +77,14 @@ jest.mock('@/lib/hooks/usePaginatedApi', () => ({
 }));
 
 jest.mock('@/components/PollCard', () => {
-  const { Text } = require('react-native');
-  return ({ pollData }: { pollData: { question: string } }) => <Text>{pollData.question}</Text>;
+  const React = require('react');
+  const { Text, View } = require('react-native');
+  return ({ pollData }: { pollData: { question: string; total_votes?: number } }) => (
+    <View>
+      <Text>{pollData.question}</Text>
+      <Text>{`${String(pollData.total_votes ?? 0)} votes`}</Text>
+    </View>
+  );
 });
 
 jest.mock('@/components/ui/AppTopBar', () => {

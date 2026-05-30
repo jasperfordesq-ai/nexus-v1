@@ -110,6 +110,8 @@ const TYPE_CONFIG: Record<
   },
 };
 
+const DEFAULT_TYPE_CONFIG = TYPE_CONFIG.post;
+
 const COMMENTABLE_TYPES = new Set<FeedItemType['type']>([
   'post',
   'listing',
@@ -134,12 +136,16 @@ const BOOKMARKABLE_TYPES = new Set<FeedItemType['type']>([
   'discussion',
 ]);
 
-function getTypeColor(type: FeedItemType['type']): ChipColor {
-  return TYPE_CONFIG[type].chipColor;
+function getTypeConfig(type: FeedItemType['type'] | string) {
+  return TYPE_CONFIG[type as FeedItemType['type']] ?? DEFAULT_TYPE_CONFIG;
 }
 
-function getTypeIcon(type: FeedItemType['type']): keyof typeof Ionicons.glyphMap {
-  return TYPE_CONFIG[type].icon;
+function getTypeColor(type: FeedItemType['type'] | string): ChipColor {
+  return getTypeConfig(type).chipColor;
+}
+
+function getTypeIcon(type: FeedItemType['type'] | string): keyof typeof Ionicons.glyphMap {
+  return getTypeConfig(type).icon;
 }
 
 function getDetailTarget(item: FeedItemType) {
@@ -296,7 +302,7 @@ export default function FeedItem({ item, disableDetailNavigation = false }: Feed
     }
   }, [bookmarked, item.id, item.type]);
 
-  const typeConfig = TYPE_CONFIG[item.type];
+  const typeConfig = getTypeConfig(item.type);
   const imageItems = item.media
     ?.filter((media) => media.media_type === 'image' && media.file_url)
     .sort((a, b) => a.display_order - b.display_order)

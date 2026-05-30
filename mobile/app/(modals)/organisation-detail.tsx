@@ -6,6 +6,7 @@
 import {
   Alert,
   Linking,
+  Pressable,
   RefreshControl,
   ScrollView,
   Share,
@@ -44,6 +45,45 @@ function getStatusLabel(status: string | null | undefined, t: (key: string) => s
   }
 
   return t(`status.${normalized}`);
+}
+
+function ActionPill({
+  label,
+  icon,
+  onPress,
+  primary,
+  tone = 'secondary',
+  accessibilityLabel,
+}: {
+  label: string;
+  icon: React.ComponentProps<typeof Ionicons>['name'];
+  onPress: () => void;
+  primary: string;
+  tone?: 'primary' | 'secondary';
+  accessibilityLabel?: string;
+}) {
+  const theme = useTheme();
+  const isPrimary = tone === 'primary';
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel ?? label}
+      onPress={onPress}
+      className="min-h-10 flex-row items-center justify-center gap-2 rounded-full px-4"
+      style={({ pressed }) => ({
+        backgroundColor: isPrimary ? primary : withAlpha(primary, 0.12),
+        borderWidth: isPrimary ? 0 : 1,
+        borderColor: isPrimary ? 'transparent' : withAlpha(primary, 0.22),
+        opacity: pressed ? 0.86 : 1,
+      })}
+    >
+      <Ionicons name={icon} size={16} color={isPrimary ? '#ffffff' : primary} />
+      <Text className="text-sm font-semibold" style={{ color: isPrimary ? '#ffffff' : theme.text }} numberOfLines={1}>
+        {label}
+      </Text>
+    </Pressable>
+  );
 }
 
 export default function OrganisationDetailScreen() {
@@ -118,11 +158,12 @@ export default function OrganisationDetailScreen() {
 
   async function handleOpenWebsite() {
     if (!organisation?.website) return;
-    const supported = await Linking.canOpenURL(organisation.website);
+    const url = organisation.website.startsWith('http') ? organisation.website : `https://${organisation.website}`;
+    const supported = await Linking.canOpenURL(url);
     if (supported) {
-      await Linking.openURL(organisation.website);
+      await Linking.openURL(url);
     } else {
-      Alert.alert(t('common:errors.alertTitle'), organisation.website);
+      Alert.alert(t('common:errors.alertTitle'), url);
     }
   }
 
@@ -146,14 +187,14 @@ export default function OrganisationDetailScreen() {
           }}
         />
         <ScrollView
-          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 40 }}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 110 }}
           refreshControl={
             <RefreshControl refreshing={isLoading} onRefresh={refresh} tintColor={primary} colors={[primary]} />
           }
         >
-          <HeroCard className="mb-4 overflow-hidden rounded-panel p-0">
-            <View className="h-1.5" style={{ backgroundColor: primary }} />
-            <HeroCard.Body className="gap-4 p-4">
+          <HeroCard className="mb-4 overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.16) }}>
+            <View className="h-1" style={{ backgroundColor: primary }} />
+            <HeroCard.Body className="gap-5 p-5">
               <View className="flex-row items-start gap-4">
                 <Avatar uri={organisation.logo ?? organisation.logo_url ?? null} name={organisation.name} size={72} />
                 <View className="min-w-0 flex-1 gap-2">
@@ -170,7 +211,7 @@ export default function OrganisationDetailScreen() {
                       </Chip>
                     ) : null}
                   </View>
-                  <Text className="text-2xl font-bold leading-8" style={{ color: theme.text }}>
+                  <Text className="text-2xl font-bold leading-8" style={{ color: theme.text }} numberOfLines={3}>
                     {organisation.name}
                   </Text>
                   {organisation.description ? (
@@ -181,17 +222,23 @@ export default function OrganisationDetailScreen() {
                 </View>
               </View>
 
-              <View className="flex-row gap-2">
+              <View className="flex-row flex-wrap gap-2">
                 {organisation.website ? (
-                  <HeroButton className="flex-1" variant="secondary" accessibilityLabel={t('website')} onPress={() => void handleOpenWebsite()}>
-                    <Ionicons name="globe-outline" size={17} color={primary} />
-                    <HeroButton.Label>{t('website')}</HeroButton.Label>
-                  </HeroButton>
+                  <ActionPill
+                    label={t('website')}
+                    icon="globe-outline"
+                    primary={primary}
+                    accessibilityLabel={t('website')}
+                    onPress={() => void handleOpenWebsite()}
+                  />
                 ) : null}
-                <HeroButton className="flex-1" variant="secondary" accessibilityLabel={t('detail.share')} onPress={() => void handleShare()}>
-                  <Ionicons name="share-outline" size={17} color={primary} />
-                  <HeroButton.Label>{t('detail.share')}</HeroButton.Label>
-                </HeroButton>
+                <ActionPill
+                  label={t('detail.share')}
+                  icon="share-outline"
+                  primary={primary}
+                  accessibilityLabel={t('detail.share')}
+                  onPress={() => void handleShare()}
+                />
               </View>
             </HeroCard.Body>
           </HeroCard>
@@ -204,11 +251,9 @@ export default function OrganisationDetailScreen() {
           </View>
 
           {organisation.location || organisation.contact_email ? (
-            <HeroCard className="mb-4 rounded-panel p-0">
+            <HeroCard className="mb-4 overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.1) }}>
               <HeroCard.Body className="gap-3 p-4">
-                <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>
-                  {t('detail.contact')}
-                </Text>
+                <SectionTitle icon="call-outline" label={t('detail.contact')} primary={primary} theme={theme} />
                 {organisation.location ? (
                   <InfoRow icon="location-outline" text={organisation.location} theme={theme} />
                 ) : null}
@@ -219,11 +264,9 @@ export default function OrganisationDetailScreen() {
             </HeroCard>
           ) : null}
 
-          <HeroCard className="mb-4 rounded-panel p-0">
+          <HeroCard className="mb-4 overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.1) }}>
             <HeroCard.Body className="gap-3 p-4">
-              <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>
-                {t('detail.about')}
-              </Text>
+              <SectionTitle icon="document-text-outline" label={t('detail.about')} primary={primary} theme={theme} />
               <Text className="text-sm leading-6" style={{ color: theme.text }}>
                 {organisation.description ?? t('noDescription')}
               </Text>
@@ -249,13 +292,40 @@ function StatTile({
   theme: ReturnType<typeof useTheme>;
 }) {
   return (
-    <Surface variant="secondary" className="min-w-[47%] flex-1 rounded-panel-inner p-3">
-      <View className="mb-3 size-9 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
-        <Ionicons name={icon} size={18} color={primary} />
+    <Surface
+      variant="secondary"
+      className="min-w-[47%] flex-1 rounded-panel-inner p-3.5"
+      style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.12) }}
+    >
+      <View className="mb-3 size-8 items-center justify-center rounded-full" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+        <Ionicons name={icon} size={16} color={primary} />
       </View>
       <Text className="text-xl font-bold" style={{ color: theme.text }}>{value}</Text>
-      <Text className="text-xs" style={{ color: theme.textSecondary }} numberOfLines={2}>{label}</Text>
+      <Text className="mt-1 text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>{label}</Text>
     </Surface>
+  );
+}
+
+function SectionTitle({
+  icon,
+  label,
+  primary,
+  theme,
+}: {
+  icon: React.ComponentProps<typeof Ionicons>['name'];
+  label: string;
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+}) {
+  return (
+    <View className="flex-row items-center gap-2">
+      <View className="size-8 items-center justify-center rounded-full" style={{ backgroundColor: withAlpha(primary, 0.12) }}>
+        <Ionicons name={icon} size={16} color={primary} />
+      </View>
+      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>
+        {label}
+      </Text>
+    </View>
   );
 }
 
@@ -269,9 +339,9 @@ function InfoRow({
   theme: ReturnType<typeof useTheme>;
 }) {
   return (
-    <View className="flex-row items-center gap-2.5">
-      <Ionicons name={icon} size={16} color={theme.textSecondary} />
-      <Text className="flex-1 text-sm" style={{ color: theme.text }}>{text}</Text>
+    <View className="flex-row items-start gap-2.5 rounded-panel-inner p-3" style={{ backgroundColor: theme.surface }}>
+      <Ionicons name={icon} size={16} color={theme.textSecondary} style={{ marginTop: 1 }} />
+      <Text className="flex-1 text-sm leading-5" style={{ color: theme.text }}>{text}</Text>
     </View>
   );
 }

@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useMemo, useState } from 'react';
-import { Image, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { Image, Pressable, RefreshControl, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -212,7 +212,9 @@ function StatCard({ icon, label, value, suffix = '', tone, theme }: { icon: Ioni
 
 function ExploreSection({ section, data, theme }: { section: SectionMeta; data: ExploreData | null; theme: Theme }) {
   const { t } = useTranslation('explore');
+  const { width } = useWindowDimensions();
   const items = getSectionItems(section.key, data).slice(0, 8);
+  const cardWidth = Math.min(320, Math.max(272, width - 56));
   if (items.length === 0) return null;
 
   return (
@@ -232,9 +234,13 @@ function ExploreSection({ section, data, theme }: { section: SectionMeta; data: 
           </HeroButton>
         ) : null}
       </View>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-3 px-4">
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ gap: 12, paddingHorizontal: 16, paddingBottom: 2 }}
+      >
         {items.map((item) => (
-          <ExploreItemCard key={`${section.key}-${item.id}`} section={section} item={item} theme={theme} />
+          <ExploreItemCard key={`${section.key}-${item.id}`} section={section} item={item} theme={theme} cardWidth={cardWidth} />
         ))}
       </ScrollView>
     </View>
@@ -262,7 +268,17 @@ function getSectionItems(sectionKey: string, data: ExploreData | null): Array<Re
   return map[sectionKey] ?? [];
 }
 
-function ExploreItemCard({ section, item, theme }: { section: SectionMeta; item: Record<string, unknown> & { id: number }; theme: Theme }) {
+function ExploreItemCard({
+  section,
+  item,
+  theme,
+  cardWidth,
+}: {
+  section: SectionMeta;
+  item: Record<string, unknown> & { id: number };
+  theme: Theme;
+  cardWidth: number;
+}) {
   const { t } = useTranslation('explore');
   const title = getItemTitle(section.key, item);
   const subtitle = getItemSubtitle(section.key, item, (level) => t('itemMeta.level', { level }));
@@ -270,14 +286,17 @@ function ExploreItemCard({ section, item, theme }: { section: SectionMeta; item:
   const route = getItemRoute(section.key, item);
 
   return (
-    <HeroButton
-      variant="ghost"
-      feedbackVariant="scale"
-      className="w-[250px] p-0"
+    <Pressable
+      accessibilityRole="button"
       onPress={() => route && router.push(route)}
       accessibilityLabel={title}
+      style={({ pressed }) => ({
+        opacity: pressed ? 0.9 : 1,
+        transform: [{ scale: pressed ? 0.985 : 1 }],
+        width: cardWidth,
+      })}
     >
-      <HeroCard className="h-[176px] w-full overflow-hidden rounded-panel p-0">
+      <HeroCard className="min-h-[188px] w-full overflow-hidden rounded-3xl p-0">
         <View className="h-1.5 w-full" style={{ backgroundColor: section.tone }} />
         <HeroCard.Body className="gap-3 p-4">
           <View className="flex-row items-start gap-3">
@@ -305,7 +324,7 @@ function ExploreItemCard({ section, item, theme }: { section: SectionMeta; item:
           </View>
         </HeroCard.Body>
       </HeroCard>
-    </HeroButton>
+    </Pressable>
   );
 }
 

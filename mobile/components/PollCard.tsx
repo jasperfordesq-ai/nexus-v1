@@ -4,14 +4,15 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { View, Text, Animated } from 'react-native';
+import { View, Text, Animated, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Button as HeroButton } from 'heroui-native';
+import { Chip } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 
 import { voteFeedPoll, type PollData } from '@/lib/api/feed';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
+import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 
 interface PollCardProps {
@@ -23,6 +24,7 @@ interface PollCardProps {
 export default function PollCard({ pollData, itemId, onVoted }: PollCardProps) {
   const { t } = useTranslation('home');
   const primary = usePrimaryColor();
+  const theme = useTheme();
 
   const safePollData = pollData && pollData.options ? pollData : null;
   const [poll, setPoll] = useState<PollData | null>(safePollData);
@@ -35,7 +37,8 @@ export default function PollCard({ pollData, itemId, onVoted }: PollCardProps) {
     }
   }, [pollData]);
 
-  const hasVoted = poll ? poll.user_vote_option_id !== null : false;
+  const selectedOptionId = poll?.user_vote_option_id ?? null;
+  const hasVoted = selectedOptionId !== null;
   const showResults = hasVoted || (poll ? !poll.is_active : false);
 
   const handleVote = useCallback(async (optionId: number) => {
@@ -78,33 +81,38 @@ export default function PollCard({ pollData, itemId, onVoted }: PollCardProps) {
   if (!poll || !poll.options?.length) return null;
 
   return (
-    <View className="gap-2">
-      <Text className="text-base font-semibold text-foreground">{poll.question}</Text>
+    <View className="gap-3">
+      <Text className="text-base font-semibold leading-6 text-foreground" numberOfLines={3}>{poll.question}</Text>
 
       {poll.options.map((option) => (
         <PollOptionRow
           key={option.id}
           option={option}
           showResults={showResults}
-          isUserVote={poll.user_vote_option_id === option.id}
+          isUserVote={selectedOptionId === option.id}
           primary={primary}
+          theme={theme}
           onPress={() => handleVote(option.id)}
           disabled={isVoting || hasVoted || !poll.is_active}
         />
       ))}
 
-      <View className="flex-row items-center gap-2 mt-0.5">
-        <Text className="text-sm text-muted-foreground">
-          {t('poll.totalVotes', { count: poll.total_votes })}
-        </Text>
+      <View className="mt-0.5 flex-row flex-wrap items-center gap-2">
+        <Chip size="sm" variant="soft">
+          <Ionicons name="bar-chart-outline" size={12} color={theme.textSecondary} />
+          <Chip.Label>{t('poll.totalVotes', { count: poll.total_votes })}</Chip.Label>
+        </Chip>
         {hasVoted && (
-          <View className="flex-row items-center gap-[3px]">
+          <Chip size="sm" variant="secondary" color="accent">
             <Ionicons name="checkmark-circle" size={14} color={primary} />
-            <Text className="text-xs font-semibold" style={{ color: primary }}>{t('poll.voted')}</Text>
-          </View>
+            <Chip.Label>{t('poll.voted')}</Chip.Label>
+          </Chip>
         )}
         {!poll.is_active && (
-          <Text className="text-xs italic text-muted-foreground">{t('poll.closed')}</Text>
+          <Chip size="sm" variant="soft">
+            <Ionicons name="lock-closed-outline" size={12} color={theme.textSecondary} />
+            <Chip.Label>{t('poll.closed')}</Chip.Label>
+          </Chip>
         )}
       </View>
     </View>
@@ -116,11 +124,19 @@ interface PollOptionRowProps {
   showResults: boolean;
   isUserVote: boolean;
   primary: string;
+  theme: {
+    surface: string;
+    border: string;
+    borderSubtle: string;
+    text: string;
+    textSecondary: string;
+    onPrimary: string;
+  };
   onPress: () => void;
   disabled: boolean;
 }
 
-function PollOptionRow({ option, showResults, isUserVote, primary, onPress, disabled }: PollOptionRowProps) {
+function PollOptionRow({ option, showResults, isUserVote, primary, theme, onPress, disabled }: PollOptionRowProps) {
   const fillAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -141,12 +157,16 @@ function PollOptionRow({ option, showResults, isUserVote, primary, onPress, disa
   });
 
   if (showResults) {
+    const resultBorderColor = isUserVote ? withAlpha(primary, 0.65) : theme.border;
+    const resultFillColor = isUserVote ? withAlpha(primary, 0.18) : withAlpha(theme.textSecondary, 0.12);
+
     return (
       <View
-        className="rounded-xl overflow-hidden min-h-[44px] justify-center"
+        className="min-h-[56px] justify-center overflow-hidden rounded-panel-inner"
         style={{
           borderWidth: 1,
-          borderColor: isUserVote ? primary : 'rgba(128,128,128,0.2)',
+          borderColor: resultBorderColor,
+          backgroundColor: withAlpha(theme.surface, 0.82),
         }}
       >
         <Animated.View
@@ -156,38 +176,76 @@ function PollOptionRow({ option, showResults, isUserVote, primary, onPress, disa
             left: 0,
             bottom: 0,
             width: fillWidth,
-            backgroundColor: isUserVote ? withAlpha(primary, 0.13) : 'rgba(128,128,128,0.1)',
+            backgroundColor: resultFillColor,
             borderRadius: 11,
           }}
         />
-        <View className="flex-row justify-between items-center px-3 py-2.5">
-          <Text
-            className="flex-1 text-sm"
-            style={{ color: isUserVote ? primary : undefined, fontWeight: isUserVote ? '600' : '400' }}
-          >
-            {option.text}
-          </Text>
-          <Text
-            className="text-sm font-semibold ml-2"
-            style={{ color: isUserVote ? primary : undefined }}
-          >
-            {option.percentage}%
-          </Text>
+        <View className="flex-row items-center justify-between gap-3 px-3 py-3.5">
+          <View className="min-w-0 flex-1 flex-row items-center gap-2.5">
+            <View
+              className="size-7 items-center justify-center rounded-full"
+              style={{
+                backgroundColor: isUserVote ? withAlpha(primary, 0.16) : withAlpha(theme.textSecondary, 0.08),
+                borderWidth: 1,
+                borderColor: isUserVote ? withAlpha(primary, 0.45) : theme.borderSubtle,
+              }}
+            >
+              <Ionicons
+                name={isUserVote ? 'checkmark' : 'ellipse-outline'}
+                size={14}
+                color={isUserVote ? primary : theme.textSecondary}
+              />
+            </View>
+            <Text
+              className="min-w-0 flex-1 text-sm leading-5"
+              style={{ color: isUserVote ? primary : theme.text, fontWeight: isUserVote ? '700' : '500' }}
+              numberOfLines={3}
+            >
+              {option.text}
+            </Text>
+          </View>
+          <View className="min-w-[48px] rounded-full px-2 py-1" style={{ backgroundColor: isUserVote ? withAlpha(primary, 0.14) : withAlpha(theme.textSecondary, 0.1) }}>
+            <Text
+              className="text-center text-xs font-bold"
+              style={{ color: isUserVote ? primary : theme.textSecondary }}
+            >
+              {option.percentage}%
+            </Text>
+          </View>
         </View>
       </View>
     );
   }
 
   return (
-    <HeroButton
-      variant="outline"
-      className="min-h-[44px] w-full justify-center rounded-xl"
+    <Pressable
+      className="min-h-[56px] w-full justify-center rounded-panel-inner border px-3 py-3"
       onPress={onPress}
-      isDisabled={disabled}
+      disabled={disabled}
       accessibilityRole="button"
       accessibilityLabel={option.text}
+      accessibilityState={{ disabled }}
+      style={({ pressed }) => ({
+        backgroundColor: pressed ? withAlpha(primary, 0.14) : withAlpha(primary, 0.07),
+        borderColor: pressed ? withAlpha(primary, 0.62) : withAlpha(primary, 0.28),
+        opacity: disabled ? 0.65 : 1,
+      })}
     >
-      <HeroButton.Label>{option.text}</HeroButton.Label>
-    </HeroButton>
+      <View className="flex-row items-center gap-3">
+        <View
+          className="size-8 items-center justify-center rounded-full"
+          style={{
+            backgroundColor: withAlpha(primary, 0.12),
+            borderWidth: 1,
+            borderColor: withAlpha(primary, 0.32),
+          }}
+        >
+          <Ionicons name="ellipse-outline" size={16} color={primary} />
+        </View>
+        <Text className="min-w-0 flex-1 text-sm font-semibold leading-5" style={{ color: theme.text }} numberOfLines={3}>
+          {option.text}
+        </Text>
+      </View>
+    </Pressable>
   );
 }

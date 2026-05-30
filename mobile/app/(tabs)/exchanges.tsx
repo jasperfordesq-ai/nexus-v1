@@ -237,7 +237,7 @@ export default function ExchangesScreen() {
             </View>
           ) : null
         }
-        contentContainerStyle={{ paddingBottom: 24 }}
+        contentContainerStyle={{ paddingBottom: 112 }}
       />
     </SafeAreaView>
   );

@@ -65,7 +65,7 @@ function avatarForUser(user: unknown) {
 
 function TypingIndicator({ t }: { t: (key: string) => string }) {
   return (
-    <View className="flex-row items-center gap-2">
+    <View className="min-h-6 flex-row items-center gap-2">
       <Spinner size="sm" />
       <Text className="text-sm text-muted-foreground">{t('typing_aria')}</Text>
     </View>
@@ -82,11 +82,11 @@ function SourceChips({
   if (sources.length === 0) return null;
 
   return (
-    <View className="mt-2 flex-row flex-wrap gap-1.5">
+    <View className="mt-2 flex-row flex-wrap gap-2">
       {sources.slice(0, 4).map((source) => (
         <Chip key={`${source.type}-${source.id}`} size="sm" variant="secondary">
           <Ionicons name="book-outline" size={12} color={theme.textSecondary} />
-          <Chip.Label>{source.title}</Chip.Label>
+          <Chip.Label numberOfLines={1}>{source.title}</Chip.Label>
         </Chip>
       ))}
     </View>
@@ -147,7 +147,7 @@ function ToolResultCards({
   if (renderableInvocations.length === 0) return null;
 
   return (
-    <View className="mt-2 gap-2">
+    <View className="mt-3 gap-2">
       <Text className="px-1 text-[11px] font-semibold uppercase" style={{ color: theme.textSecondary }}>
         {t('tool_results.label')}
       </Text>
@@ -162,14 +162,18 @@ function ToolResultCards({
                 key={`${invocation.card_type}-${String(item.id ?? resultIndex)}`}
                 variant="ghost"
                 feedbackVariant="scale"
-                className="w-full"
+                className="w-full rounded-panel-inner p-0"
                 isDisabled={!url}
                 accessibilityLabel={t('tool_results.open', { title })}
                 onPress={() => {
                   if (url) void Linking.openURL(url);
                 }}
               >
-                <Surface variant="secondary" className="w-full flex-row items-start gap-3 rounded-panel-inner p-3">
+                <Surface
+                  variant="secondary"
+                  className="w-full flex-row items-start gap-3 rounded-panel-inner p-3"
+                  style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+                >
                   <View className="size-9 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
                     <Ionicons name={getResultIcon(invocation.card_type)} size={17} color={primary} />
                   </View>
@@ -228,23 +232,24 @@ function MessageBubble({
   return (
     <View className={`mb-4 flex-row items-end gap-2 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
       {isUser ? (
-        <Avatar uri={userAvatar ?? null} name={userName || t('you')} size={34} />
+        <Avatar uri={userAvatar ?? null} name={userName || t('you')} size={32} />
       ) : (
-        <View className="size-9 items-center justify-center rounded-2xl" style={{ backgroundColor: primary }}>
-          <Ionicons name="sparkles-outline" size={17} color="#ffffff" />
+        <View className="size-9 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.16) }}>
+          <Ionicons name="sparkles-outline" size={17} color={primary} />
         </View>
       )}
 
-      <View className={`max-w-[78%] gap-1 ${isUser ? 'items-end' : 'items-start'}`}>
+      <View className={`max-w-[84%] gap-1.5 ${isUser ? 'items-end' : 'items-start'}`}>
         <View
-          className={`rounded-2xl px-4 py-3 ${isUser ? 'rounded-br' : 'rounded-bl border border-border'}`}
+          className={`rounded-3xl px-4 py-3 ${isUser ? 'rounded-br-md' : 'rounded-bl-md'}`}
           style={{
             backgroundColor: isUser
               ? primary
               : isError
                 ? withAlpha(theme.error, 0.14)
                 : theme.surface,
-            borderColor: isError ? withAlpha(theme.error, 0.4) : theme.border,
+            borderWidth: isUser ? 0 : 1,
+            borderColor: isError ? withAlpha(theme.error, 0.4) : theme.borderSubtle,
           }}
         >
           {isThinking ? (
@@ -319,37 +324,44 @@ function EmptyChat({
   onStarterPress: (prompt: string) => void;
 }) {
   return (
-    <View className="flex-1 justify-center gap-6 px-4 py-8">
-      <View className="items-center gap-3">
-        <View className="size-20 items-center justify-center rounded-3xl" style={{ backgroundColor: primary }}>
-          <Ionicons name="sparkles-outline" size={34} color="#ffffff" />
-        </View>
+    <View className="flex-1 justify-center gap-5 px-4 py-6">
+      <HeroCard
+        variant="default"
+        className="overflow-hidden rounded-panel p-0"
+        style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.16) }}
+      >
+        <View className="h-1" style={{ backgroundColor: primary }} />
+        <HeroCard.Body className="items-center gap-4 p-5">
+          <View className="size-16 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.16) }}>
+            <Ionicons name="sparkles-outline" size={30} color={primary} />
+          </View>
         <View className="items-center gap-1">
-          <Text className="text-2xl font-bold" style={{ color: theme.text }}>
+          <Text className="text-2xl font-bold" style={{ color: theme.text }} numberOfLines={2}>
             {t('empty_title')}
           </Text>
           <Text className="max-w-[320px] text-center text-sm leading-5" style={{ color: theme.textSecondary }}>
             {t('empty_description')}
           </Text>
         </View>
-      </View>
+        </HeroCard.Body>
+      </HeroCard>
 
-      <View className="gap-2">
-        <Text className="text-center text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>
+      <Surface variant="secondary" className="gap-3 rounded-panel p-3">
+        <Text className="px-1 text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>
           {t('try_asking')}
         </Text>
         {starters.map((question) => (
           <HeroButton
             key={question}
             variant="secondary"
-            className="justify-start rounded-panel-inner"
+            className="min-h-12 justify-start rounded-panel-inner px-3 py-2"
             onPress={() => onStarterPress(question)}
           >
             <Ionicons name="chatbubble-ellipses-outline" size={16} color={primary} />
-            <HeroButton.Label>{question}</HeroButton.Label>
+            <HeroButton.Label numberOfLines={2}>{question}</HeroButton.Label>
           </HeroButton>
         ))}
-      </View>
+      </Surface>
     </View>
   );
 }
@@ -370,32 +382,43 @@ function ChatHeader({
   onNewConversation: () => void;
 }) {
   return (
-    <Surface variant="default" className="mx-4 mb-3 gap-3 rounded-panel p-4">
-      <View className="flex-row items-center gap-3">
-        <View className="size-11 items-center justify-center rounded-2xl" style={{ backgroundColor: primary }}>
-          <Ionicons name="sparkles-outline" size={21} color="#ffffff" />
-        </View>
-        <View className="min-w-0 flex-1">
-          <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={1}>
-            {t('header_title')}
-          </Text>
-          <Text className="text-xs" style={{ color: theme.textSecondary }} numberOfLines={1}>
-            {t('header_subtitle')}
-          </Text>
-        </View>
-        {hasMessages ? (
-          <HeroButton isIconOnly variant="secondary" accessibilityLabel={t('new_conversation_aria')} onPress={onNewConversation}>
-            <Ionicons name="refresh-outline" size={18} color={primary} />
-          </HeroButton>
-        ) : null}
-      </View>
-      {limits ? (
-        <Chip size="sm" variant="secondary">
-          <Ionicons name="flash-outline" size={13} color={primary} />
-          <Chip.Label>{t('limits_left_today', { count: limits.daily_remaining })}</Chip.Label>
-        </Chip>
-      ) : null}
-    </Surface>
+    <View className="px-4 pb-3">
+      <HeroCard
+        variant="default"
+        className="overflow-hidden rounded-panel p-0"
+        style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.14) }}
+      >
+        <View className="h-1" style={{ backgroundColor: primary }} />
+        <HeroCard.Body className="gap-3 p-4">
+          <View className="flex-row items-center gap-3">
+            <View className="size-11 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.16) }}>
+              <Ionicons name="sparkles-outline" size={21} color={primary} />
+            </View>
+            <View className="min-w-0 flex-1">
+              <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={1}>
+                {t('header_title')}
+              </Text>
+              <Text className="text-xs" style={{ color: theme.textSecondary }} numberOfLines={2}>
+                {t('header_subtitle')}
+              </Text>
+            </View>
+            {hasMessages ? (
+              <HeroButton isIconOnly variant="secondary" accessibilityLabel={t('new_conversation_aria')} onPress={onNewConversation}>
+                <Ionicons name="refresh-outline" size={18} color={primary} />
+              </HeroButton>
+            ) : null}
+          </View>
+          {limits ? (
+            <View className="items-start">
+              <Chip size="sm" variant="secondary">
+                <Ionicons name="flash-outline" size={13} color={primary} />
+                <Chip.Label>{t('limits_left_today', { count: limits.daily_remaining })}</Chip.Label>
+              </Chip>
+            </View>
+          ) : null}
+        </HeroCard.Body>
+      </HeroCard>
+    </View>
   );
 }
 
@@ -640,19 +663,23 @@ function ChatScreenInner() {
             keyExtractor={(item) => item.id}
             renderItem={renderItem}
             inverted
-            contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 12 }}
+            contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 18, paddingTop: 8 }}
             onContentSizeChange={scrollToBottom}
             accessibilityLabel={t('messages_region')}
           />
         )}
 
-        <View className="border-t border-border bg-background px-4 pt-3">
-          <HeroCard className="rounded-panel p-0">
-            <HeroCard.Body className="p-2">
-              <View className="flex-row items-end gap-2">
+        <View className="bg-background px-4 pt-2" style={{ borderTopWidth: 1, borderTopColor: theme.borderSubtle }}>
+          <HeroCard
+            variant="default"
+            className="overflow-hidden rounded-panel p-0"
+            style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.14) }}
+          >
+            <HeroCard.Body className="p-2.5">
+              <View className="flex-row items-end gap-2.5">
                 <Input
                   containerClassName="mb-0 flex-1"
-                  inputClassName="min-h-[42px] flex-1 px-3 py-2 text-sm"
+                  inputClassName="min-h-12 flex-1 rounded-panel-inner px-3 py-2 text-sm"
                   style={{ maxHeight: 126, color: theme.text }}
                   placeholder={t('input_placeholder')}
                   placeholderTextColor={theme.textMuted}
@@ -666,6 +693,7 @@ function ChatScreenInner() {
                 <HeroButton
                   isIconOnly
                   variant="primary"
+                  className="size-12"
                   accessibilityLabel={t('send_aria')}
                   isDisabled={!inputText.trim() || sending}
                   onPress={() => void handleSend()}

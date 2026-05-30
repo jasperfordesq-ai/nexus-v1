@@ -7,6 +7,7 @@ import { useCallback, useState } from 'react';
 import {
   FlatList,
   Image,
+  Pressable,
   RefreshControl,
   Text,
   View,
@@ -36,6 +37,45 @@ function extractBlogPage(response: BlogListResponse) {
     cursor: response.meta.cursor,
     hasMore: response.meta.has_more,
   };
+}
+
+function ActionPill({
+  label,
+  icon,
+  onPress,
+  primary,
+  tone = 'secondary',
+  accessibilityLabel,
+}: {
+  label: string;
+  icon: React.ComponentProps<typeof Ionicons>['name'];
+  onPress: () => void;
+  primary: string;
+  tone?: 'primary' | 'secondary';
+  accessibilityLabel?: string;
+}) {
+  const theme = useTheme();
+  const isPrimary = tone === 'primary';
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel ?? label}
+      onPress={onPress}
+      className="min-h-10 flex-row items-center justify-center gap-2 rounded-full px-4"
+      style={({ pressed }) => ({
+        backgroundColor: isPrimary ? primary : withAlpha(primary, 0.12),
+        borderWidth: isPrimary ? 0 : 1,
+        borderColor: isPrimary ? 'transparent' : withAlpha(primary, 0.22),
+        opacity: pressed ? 0.86 : 1,
+      })}
+    >
+      <Ionicons name={icon} size={16} color={isPrimary ? '#ffffff' : primary} />
+      <Text className="text-sm font-semibold" style={{ color: isPrimary ? '#ffffff' : theme.text }} numberOfLines={1}>
+        {label}
+      </Text>
+    </Pressable>
+  );
 }
 
 export default function BlogScreen() {
@@ -69,36 +109,38 @@ export default function BlogScreen() {
 
   function renderHeader() {
     return (
-      <View className="px-4 pb-3">
-        <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
-          <View className="h-1.5" style={{ backgroundColor: primary }} />
-          <HeroCard.Body className="gap-4 p-4">
+      <View className="pb-3">
+        <HeroCard className="mb-3 overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.16) }}>
+          <View className="h-1" style={{ backgroundColor: primary }} />
+          <HeroCard.Body className="gap-4 p-5">
             <View className="flex-row items-start gap-3">
-              <View className="size-12 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+              <View className="size-12 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
                 <Ionicons name="book-outline" size={24} color={primary} />
               </View>
               <View className="min-w-0 flex-1 gap-1">
-                <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>
+                <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>
                   {t('heroEyebrow')}
                 </Text>
-                <Text className="text-2xl font-bold" style={{ color: theme.text }}>
+                <Text className="text-2xl font-bold" style={{ color: theme.text }} numberOfLines={2}>
                   {t('title')}
                 </Text>
-                <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+                <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>
                   {t('subtitle')}
                 </Text>
               </View>
-              {items.length > 0 ? (
-                <Chip size="sm" variant="secondary">
-                  <Chip.Label>{t('postsCount', { count: items.length })}</Chip.Label>
-                </Chip>
-              ) : null}
             </View>
+            {items.length > 0 ? (
+              <Surface variant="secondary" className="self-start rounded-full px-3 py-2">
+                <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+                  {t('postsCount', { count: items.length })}
+                </Text>
+              </Surface>
+            ) : null}
           </HeroCard.Body>
         </HeroCard>
 
-        <View className="mb-3 flex-row items-start gap-2">
-          <View className="min-w-0 flex-1">
+        <Surface variant="secondary" className="mb-3 gap-2 rounded-panel p-2">
+          <View className="min-w-0">
             <Input
               style={{ color: theme.text }}
               placeholder={t('searchPlaceholder')}
@@ -116,10 +158,17 @@ export default function BlogScreen() {
               ) : null}
             />
           </View>
-          <HeroButton size="sm" variant="primary" style={{ backgroundColor: primary }} onPress={submitSearch} accessibilityLabel={t('searchAction')}>
-            <HeroButton.Label>{t('searchAction')}</HeroButton.Label>
-          </HeroButton>
-        </View>
+          <View className="items-start">
+            <ActionPill
+              label={t('searchAction')}
+              icon="search-outline"
+              onPress={submitSearch}
+              primary={primary}
+              tone="primary"
+              accessibilityLabel={t('searchAction')}
+            />
+          </View>
+        </Surface>
       </View>
     );
   }
@@ -132,14 +181,16 @@ export default function BlogScreen() {
       : null;
 
     return (
-      <HeroButton
-        variant="ghost"
-        feedbackVariant="scale"
-        className="mx-4 mb-3"
-        onPress={() => openPost(item)}
+      <Pressable
+        accessibilityRole="button"
         accessibilityLabel={item.title}
+        onPress={() => openPost(item)}
+        style={({ pressed }) => ({ opacity: pressed ? 0.92 : 1 })}
       >
-        <HeroCard className="overflow-hidden rounded-panel p-0">
+        <HeroCard
+          className="mb-3 overflow-hidden rounded-panel p-0"
+          style={{ borderWidth: 1, borderColor: index === 0 && !committedSearch ? withAlpha(primary, 0.18) : withAlpha(primary, 0.10) }}
+        >
           {coverImage ? (
             <Image source={{ uri: coverImage }} className="w-full" style={{ height: imageHeight }} resizeMode="cover" />
           ) : (
@@ -163,7 +214,7 @@ export default function BlogScreen() {
               ) : null}
             </View>
 
-            <Text className="text-lg font-bold leading-6" style={{ color: theme.text }} numberOfLines={2}>
+            <Text className={`${index === 0 && !committedSearch ? 'text-xl' : 'text-lg'} font-bold leading-6`} style={{ color: theme.text }} numberOfLines={3}>
               {item.title}
             </Text>
             {item.excerpt ? (
@@ -188,7 +239,7 @@ export default function BlogScreen() {
             </View>
           </HeroCard.Body>
         </HeroCard>
-      </HeroButton>
+      </Pressable>
     );
   }
 
@@ -212,7 +263,7 @@ export default function BlogScreen() {
                 <LoadingSpinner />
               </View>
             ) : error ? (
-              <Surface variant="secondary" className="mx-4 rounded-panel p-6">
+              <Surface variant="secondary" className="rounded-panel p-6">
                 <View className="items-center gap-3">
                   <Ionicons name="warning-outline" size={34} color={theme.error} />
                   <Text className="text-center text-sm" style={{ color: theme.text }}>{error}</Text>
@@ -235,14 +286,14 @@ export default function BlogScreen() {
                 <LoadingSpinner />
               </View>
             ) : hasMore ? (
-              <View className="px-4 py-3">
+              <View className="py-3">
                 <HeroButton variant="secondary" onPress={loadMore}>
                   <HeroButton.Label>{t('loadMore')}</HeroButton.Label>
                 </HeroButton>
               </View>
             ) : null
           }
-          contentContainerStyle={{ paddingBottom: 24 }}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 110 }}
         />
       </SafeAreaView>
     </ModalErrorBoundary>

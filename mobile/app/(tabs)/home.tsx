@@ -4,11 +4,11 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { FlatList, RefreshControl, Text, View } from 'react-native';
+import { FlatList, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface, Tabs } from 'heroui-native';
+import { Card as HeroCard, Chip, Spinner, Surface, Tabs } from 'heroui-native';
 
 import * as Sentry from '@sentry/react-native';
 import { useTranslation } from 'react-i18next';
@@ -28,6 +28,7 @@ import TenantBanner from '@/components/TenantBanner';
 import { FeedItemSkeleton } from '@/components/ui/Skeleton';
 import FAB from '@/components/ui/FAB';
 import * as Haptics from '@/lib/haptics';
+import { withAlpha } from '@/lib/utils/color';
 
 function extractFeedPage(response: FeedResponse) {
   if (!response?.data || !response?.meta) {
@@ -67,6 +68,14 @@ interface DashboardSummary {
   balance: number | null;
   upcomingEvents: number | null;
   openRequests: number | null;
+}
+
+interface SummaryCardItem {
+  key: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  value: string;
+  route: string;
 }
 
 export default function HomeScreen() {
@@ -178,7 +187,7 @@ export default function HomeScreen() {
     }
   }, []);
 
-  const summaryCards = useMemo(
+  const summaryCards = useMemo<SummaryCardItem[]>(
     () => [
       {
         key: 'balance',
@@ -230,29 +239,36 @@ export default function HomeScreen() {
         maxToRenderPerBatch={8}
         windowSize={5}
         ListHeaderComponent={
-          <View className="gap-3 pb-2">
-            <HeroCard variant="default" className="mx-4 mt-4">
-              <HeroCard.Body className="flex-row items-start justify-between gap-4">
+          <View className="gap-3 pb-3">
+            <HeroCard variant="default" className="mx-4 mt-3 overflow-hidden rounded-panel p-0">
+              <View className="h-1" style={{ backgroundColor: primary }} />
+              <HeroCard.Body className="flex-row items-center justify-between gap-4 p-4">
                 <View className="min-w-0 flex-1">
-                  <Text className="text-2xl font-bold leading-8" style={{ color: theme.text }}>
+                  <Text className="text-[26px] font-bold leading-8" style={{ color: theme.text }} numberOfLines={1}>
                     {t('feed.greeting', { name: (displayName || '').split(' ')[0] || t('common:labels.friend') })}
                   </Text>
-                  <Text className="mt-1 text-sm leading-5" style={{ color: theme.textSecondary }}>{t('feed.subtitle')}</Text>
+                  <Text className="mt-1 text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>
+                    {t('feed.subtitle')}
+                  </Text>
                 </View>
                 <View className="relative h-12 w-12 items-center justify-center">
-                  <HeroButton
-                    isIconOnly
-                    size="md"
-                    variant="tertiary"
-                    className="h-12 w-12 rounded-full"
+                  <Pressable
+                    className="h-12 w-12 items-center justify-center rounded-2xl"
                     onPress={() => {
                       void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                       router.push('/(modals)/notifications');
                     }}
                     accessibilityLabel={t('notifications.title')}
+                    accessibilityRole="button"
+                    style={({ pressed }) => ({
+                      backgroundColor: withAlpha(primary, pressed ? 0.2 : 0.12),
+                      borderColor: withAlpha(primary, 0.24),
+                      borderWidth: 1,
+                      opacity: pressed ? 0.86 : 1,
+                    })}
                   >
                     <Ionicons name="notifications-outline" size={22} color={primary} />
-                  </HeroButton>
+                  </Pressable>
                   {notificationBadgeText ? (
                     <View
                       className="absolute right-0 top-0 h-5 min-w-5 items-center justify-center rounded-full border-2 border-background px-1"
@@ -266,24 +282,23 @@ export default function HomeScreen() {
                 </View>
               </HeroCard.Body>
             </HeroCard>
-            <View className="mx-4 flex-row flex-wrap gap-2">
+            <View className="mx-4 flex-row flex-wrap gap-2.5">
               {summaryCards.map((card) => (
-                <HeroButton
+                <DashboardSummaryCard
                   key={card.key}
-                  variant="secondary"
-                  className="min-h-[74px] min-w-[47%] flex-1 items-start justify-center px-3 py-3"
+                  card={card}
+                  primary={primary}
+                  theme={theme}
                   accessibilityLabel={t('dashboard.openCard', { label: card.label })}
                   onPress={() => router.push(card.route as never)}
-                >
-                  <View className="flex-row items-center gap-2">
-                    <Ionicons name={card.icon} size={16} color={primary} />
-                    <HeroButton.Label className="text-xs font-semibold">{card.label}</HeroButton.Label>
-                  </View>
-                  <HeroButton.Label className="mt-1 text-base font-bold">{card.value}</HeroButton.Label>
-                </HeroButton>
+                />
               ))}
             </View>
-            <Surface variant="default" className="mx-4 gap-3 rounded-panel-inner p-3">
+            <Surface
+              variant="default"
+              className="mx-4 gap-3 overflow-hidden rounded-panel p-3.5"
+              style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+            >
               <View className="flex-row items-center justify-between gap-3">
                 <Tabs value={feedMode} onValueChange={(value) => setFeedMode(value as FeedMode)} variant="secondary" className="flex-1">
                   <Tabs.List>
@@ -299,38 +314,46 @@ export default function HomeScreen() {
                   </Tabs.List>
                 </Tabs>
                 {filter !== 'all' || subFilter ? (
-                  <HeroButton
-                    isIconOnly
-                    size="sm"
-                    variant="ghost"
+                  <Pressable
+                    className="h-9 w-9 items-center justify-center rounded-2xl"
                     onPress={() => {
                       setFilter('all');
                       setSubFilter(null);
                     }}
                     accessibilityLabel={t('filter.clear')}
+                    accessibilityRole="button"
+                    style={({ pressed }) => ({
+                      backgroundColor: withAlpha(primary, pressed ? 0.16 : 0.08),
+                      opacity: pressed ? 0.82 : 1,
+                    })}
                   >
                     <Ionicons name="close-circle-outline" size={20} color={primary} />
-                  </HeroButton>
+                  </Pressable>
                 ) : null}
               </View>
 
-              <View className="flex-row flex-wrap gap-2">
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerClassName="gap-2 pr-2"
+              >
                 {FILTER_OPTIONS.map((option) => (
-                  <HeroButton
+                  <Chip
                     key={option.key}
                     size="sm"
-                    variant={filter === option.key ? 'secondary' : 'ghost'}
+                    variant={filter === option.key ? 'secondary' : 'soft'}
+                    color={filter === option.key ? 'accent' : 'default'}
                     onPress={() => handleFilterChange(option.key)}
                     accessibilityLabel={t(`filter.${option.key}`)}
                   >
-                    <Ionicons name={option.icon} size={15} color={filter === option.key ? primary : undefined} />
-                    <HeroButton.Label>{t(`filter.${option.key}`)}</HeroButton.Label>
-                  </HeroButton>
+                    <Ionicons name={option.icon} size={13} color={filter === option.key ? primary : theme.textSecondary} />
+                    <Chip.Label>{t(`filter.${option.key}`)}</Chip.Label>
+                  </Chip>
                 ))}
-              </View>
+              </ScrollView>
 
               {filter === 'listings' ? (
-                <View className="flex-row gap-2">
+                <View className="flex-row flex-wrap gap-2">
                   {LISTING_SUBFILTERS.map((option) => (
                     <Chip
                       key={option}
@@ -345,37 +368,50 @@ export default function HomeScreen() {
                 </View>
               ) : null}
 
-              <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>
-                {t('feed.currentView', { filter: activeFilterLabel })}
-              </Text>
+              <View className="flex-row">
+                <Chip size="sm" variant="soft" color="default">
+                  <Chip.Label>{t('feed.currentView', { filter: activeFilterLabel })}</Chip.Label>
+                </Chip>
+              </View>
             </Surface>
             {storyMembers.length > 0 ? <StoryCircles members={storyMembers} onPress={handleStoryPress} /> : null}
-            <HeroCard variant="default" className="mx-4">
-              <HeroCard.Body className="gap-3">
+            <HeroCard variant="default" className="mx-4 overflow-hidden rounded-panel p-0">
+              <HeroCard.Body className="gap-4 p-4">
                 <View className="flex-row items-center gap-3">
-                  <View className="h-10 w-10 items-center justify-center rounded-full" style={{ backgroundColor: primary }}>
+                  <View className="h-11 w-11 items-center justify-center rounded-2xl" style={{ backgroundColor: primary }}>
                     <Ionicons name="add" size={22} color="#fff" />
                   </View>
                   <View className="min-w-0 flex-1">
-                    <Text className="font-semibold" style={{ color: theme.text }}>{t('composer.title')}</Text>
+                    <Text className="font-semibold leading-5" style={{ color: theme.text }} numberOfLines={2}>
+                      {t('composer.title')}
+                    </Text>
                     <Text className="text-sm" style={{ color: theme.textSecondary }} numberOfLines={1}>
                       {t('composer.subtitle')}
                     </Text>
                   </View>
                 </View>
-                <View className="flex-row gap-2">
-                  <HeroButton size="sm" variant="primary" onPress={() => router.push('/(modals)/new-exchange')} style={{ backgroundColor: primary }}>
-                    <Ionicons name="swap-horizontal-outline" size={16} color="#fff" />
-                    <HeroButton.Label>{t('composer.exchange')}</HeroButton.Label>
-                  </HeroButton>
-                  <HeroButton size="sm" variant="secondary" onPress={() => setFilter('polls')}>
-                    <Ionicons name="stats-chart-outline" size={16} color={primary} />
-                    <HeroButton.Label>{t('composer.polls')}</HeroButton.Label>
-                  </HeroButton>
-                  <HeroButton size="sm" variant="ghost" onPress={() => router.push('/(modals)/feed-hashtags' as never)}>
-                    <Ionicons name="pricetag-outline" size={16} color={primary} />
-                    <HeroButton.Label>{t('composer.hashtags')}</HeroButton.Label>
-                  </HeroButton>
+                <View className="flex-row flex-wrap gap-2">
+                  <ComposerActionPill
+                    icon="swap-horizontal-outline"
+                    label={t('composer.exchange')}
+                    primary={primary}
+                    tone="primary"
+                    onPress={() => router.push('/(modals)/new-exchange')}
+                  />
+                  <ComposerActionPill
+                    icon="stats-chart-outline"
+                    label={t('composer.polls')}
+                    primary={primary}
+                    tone="secondary"
+                    onPress={() => setFilter('polls')}
+                  />
+                  <ComposerActionPill
+                    icon="pricetag-outline"
+                    label={t('composer.hashtags')}
+                    primary={primary}
+                    tone="ghost"
+                    onPress={() => router.push('/(modals)/feed-hashtags' as never)}
+                  />
                 </View>
               </HeroCard.Body>
             </HeroCard>
@@ -393,9 +429,17 @@ export default function HomeScreen() {
               <HeroCard.Body className="items-center gap-4">
                 <Ionicons name="cloud-offline-outline" size={30} color={primary} />
                 <Text className="text-center text-sm leading-5 text-danger">{error}</Text>
-                <HeroButton variant="primary" onPress={() => void refresh()} style={{ backgroundColor: primary }}>
-                  <HeroButton.Label>{t('common:buttons.retry')}</HeroButton.Label>
-                </HeroButton>
+                <Pressable
+                  className="min-h-10 items-center justify-center rounded-full px-5"
+                  accessibilityRole="button"
+                  onPress={() => void refresh()}
+                  style={({ pressed }) => ({
+                    backgroundColor: primary,
+                    opacity: pressed ? 0.86 : 1,
+                  })}
+                >
+                  <Text className="text-sm font-bold text-white">{t('common:buttons.retry')}</Text>
+                </Pressable>
               </HeroCard.Body>
             </HeroCard>
           ) : (
@@ -424,5 +468,98 @@ export default function HomeScreen() {
 
       <FAB icon="add" onPress={() => router.push('/(modals)/new-exchange')} position="bottom-right" />
     </SafeAreaView>
+  );
+}
+
+function ComposerActionPill({
+  icon,
+  label,
+  primary,
+  tone,
+  onPress,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  primary: string;
+  tone: 'primary' | 'secondary' | 'ghost';
+  onPress: () => void;
+}) {
+  const isPrimary = tone === 'primary';
+  return (
+    <Pressable
+      className="min-h-10 flex-row items-center justify-center gap-2 rounded-full px-3.5"
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={onPress}
+      style={({ pressed }) => ({
+        backgroundColor: isPrimary ? primary : tone === 'secondary' ? withAlpha(primary, pressed ? 0.18 : 0.12) : 'transparent',
+        borderColor: tone === 'ghost' ? withAlpha(primary, pressed ? 0.24 : 0.16) : 'transparent',
+        borderWidth: tone === 'ghost' ? 1 : 0,
+        opacity: pressed ? 0.86 : 1,
+      })}
+    >
+      <Ionicons name={icon} size={16} color={isPrimary ? '#fff' : primary} />
+      <Text className="text-sm font-bold" style={{ color: isPrimary ? '#fff' : primary }} numberOfLines={1}>
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
+function DashboardSummaryCard({
+  card,
+  primary,
+  theme,
+  accessibilityLabel,
+  onPress,
+}: {
+  card: SummaryCardItem;
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+  accessibilityLabel: string;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      className="min-w-[47%] flex-1"
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      onPress={onPress}
+      style={({ pressed }) => ({
+        opacity: pressed ? 0.86 : 1,
+        transform: [{ scale: pressed ? 0.99 : 1 }],
+      })}
+    >
+      <Surface
+        variant="secondary"
+        className="min-h-[92px] overflow-hidden rounded-panel p-3.5"
+        style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+      >
+        <View className="absolute bottom-0 left-0 top-0 w-1.5" style={{ backgroundColor: primary }} />
+        <View className="gap-2 pl-1">
+          <View className="flex-row items-center justify-between gap-2">
+            <View
+              className="h-9 w-9 items-center justify-center rounded-2xl"
+              style={{ backgroundColor: withAlpha(primary, 0.14) }}
+            >
+              <Ionicons name={card.icon} size={17} color={primary} />
+            </View>
+            <Ionicons name="chevron-forward" size={15} color={theme.textMuted} />
+          </View>
+          <Text className="text-xs font-semibold leading-4" style={{ color: theme.textSecondary }} numberOfLines={1}>
+            {card.label}
+          </Text>
+          <Text
+            className="text-[17px] font-bold leading-6"
+            style={{ color: theme.text }}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.78}
+          >
+            {card.value}
+          </Text>
+        </View>
+      </Surface>
+    </Pressable>
   );
 }
