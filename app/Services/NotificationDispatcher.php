@@ -359,29 +359,47 @@ class NotificationDispatcher
         $uid = $userId;
         $pushContent = $content;
         $pushLink = (string) ($link ?? '');
+        $pushType = $activityType;
+        // Captured now so push_log records the right tenant even though $send
+        // runs after the response (when the request's tenant context is gone).
+        $tid = TenantContext::currentId();
 
-        $send = function () use ($uid, $pushTitle, $pushContent, $pushLink) {
+        $send = function () use ($uid, $pushTitle, $pushContent, $pushLink, $pushType, $tid) {
             // Web push (browser) and mobile push (FCM via Capacitor) fan out in
             // parallel — a user on multiple devices is notified everywhere they
             // are subscribed. Failure-isolated so one provider being down does
-            // not suppress the other.
+            // not suppress the other. Per-channel outcomes are captured and
+            // recorded to push_log for delivery observability; genuine send
+            // failures surface at warning level (previously discarded at debug).
+            $webOk = null;
+            $fcmSent = 0;
+            $fcmFailed = 0;
+            $errors = [];
+
             try {
-                \App\Services\WebPushService::sendToUserStatic($uid, $pushTitle, $pushContent, $pushLink);
+                $webOk = (bool) \App\Services\WebPushService::sendToUserStatic($uid, $pushTitle, $pushContent, $pushLink);
             } catch (\Throwable $e) {
-                Log::debug('[NotificationDispatcher] WebPush failed: ' . $e->getMessage());
+                $webOk = false;
+                $errors[] = 'web: ' . $e->getMessage();
+                Log::warning('[NotificationDispatcher] WebPush failed', ['user_id' => $uid, 'type' => $pushType, 'error' => $e->getMessage()]);
             }
+
             try {
                 if (class_exists(\App\Services\FCMPushService::class)) {
-                    \App\Services\FCMPushService::sendToUser(
-                        $uid,
-                        $pushTitle,
-                        $pushContent,
-                        ['link' => $pushLink]
-                    );
+                    $result = \App\Services\FCMPushService::sendToUser($uid, $pushTitle, $pushContent, ['link' => $pushLink]);
+                    $fcmSent = (int) ($result['sent'] ?? 0);
+                    $fcmFailed = (int) ($result['failed'] ?? 0);
+                    foreach ((array) ($result['errors'] ?? []) as $fcmErr) {
+                        $errors[] = 'fcm: ' . $fcmErr;
+                    }
                 }
             } catch (\Throwable $e) {
-                Log::debug('[NotificationDispatcher] FCM push failed: ' . $e->getMessage());
+                $errors[] = 'fcm: ' . $e->getMessage();
+                Log::warning('[NotificationDispatcher] FCM push failed', ['user_id' => $uid, 'type' => $pushType, 'error' => $e->getMessage()]);
             }
+
+            // Delivery observability — best-effort, never affects delivery.
+            \App\Models\PushLog::record($tid, $uid, $pushType, $pushTitle, $webOk, $fcmSent, $fcmFailed, $errors);
         };
 
         try {
