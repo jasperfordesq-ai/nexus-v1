@@ -13841,6 +13841,19 @@
     },
     "empty": {
       "no_statuses": "Noch keine Status"
+    },
+    "push": {
+      "title": "Push-Benachrichtigungen",
+      "subtitle": "Web- und Mobil-Push-Zustellung im gewählten Zeitraum",
+      "unavailable": "Die Protokollierung der Push-Zustellung ist noch nicht verfügbar.",
+      "total": "Pushes",
+      "delivered": "Zugestellt",
+      "partial": "Teilweise",
+      "failed": "Fehlgeschlagen",
+      "success_rate": "Erfolgsrate",
+      "fcm": "Mobil gesendet/fehlgeschlagen",
+      "web": "Web zugestellt",
+      "recent_failures": "Letzte Fehler"
     }
   },
   "help_drawer": {

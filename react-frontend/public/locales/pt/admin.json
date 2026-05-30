@@ -13841,6 +13841,19 @@
     },
     "empty": {
       "no_statuses": "Ainda não há status"
+    },
+    "push": {
+      "title": "Notificações push",
+      "subtitle": "Entrega de notificações push web e móvel no período selecionado",
+      "unavailable": "O registo de entrega de notificações push ainda não está disponível.",
+      "total": "Notificações",
+      "delivered": "Entregues",
+      "partial": "Parciais",
+      "failed": "Falhadas",
+      "success_rate": "Taxa de sucesso",
+      "fcm": "Móvel enviadas/falhadas",
+      "web": "Web entregues",
+      "recent_failures": "Falhas recentes"
     }
   },
   "help_drawer": {

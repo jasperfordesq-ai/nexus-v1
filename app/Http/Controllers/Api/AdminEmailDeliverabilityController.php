@@ -76,6 +76,73 @@ class AdminEmailDeliverabilityController extends BaseApiController
     }
 
     /**
+     * GET /api/v2/admin/email-deliverability/push-summary
+     *
+     * Device-push (web + FCM) delivery observability over a window, the push
+     * sibling of summary(). Reads push_log (written by NotificationDispatcher::
+     * fanOutPush). Returns delivered/partial/failed counts, FCM sent/failed and
+     * web-delivered totals, a breakdown by notification type, and the most
+     * recent failures so an admin can see whether push is actually landing.
+     */
+    public function pushSummary(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->resolveAdminTenantFilter($this->isSuperAdmin(), $this->getTenantId());
+        $windowDays = max(1, min((int) ($this->input('days', 7) ?: 7), 90));
+
+        if (!\Illuminate\Support\Facades\Schema::hasTable('push_log')) {
+            return $this->respondWithData([
+                'available' => false,
+                'window_days' => $windowDays,
+                'total' => 0, 'delivered' => 0, 'partial' => 0, 'failed' => 0,
+                'success_pct' => null, 'fcm_sent' => 0, 'fcm_failed' => 0, 'web_delivered' => 0,
+                'by_type' => [], 'recent_failures' => [],
+            ]);
+        }
+
+        $since = now()->subDays($windowDays);
+        $base = DB::table('push_log')
+            ->when($tenantId !== null, fn ($q) => $q->where('tenant_id', $tenantId))
+            ->where('created_at', '>=', $since);
+
+        $byStatus = (clone $base)->select('status', DB::raw('COUNT(*) as c'))->groupBy('status')->pluck('c', 'status');
+        $sums = (clone $base)->selectRaw('COALESCE(SUM(fcm_sent),0) as s, COALESCE(SUM(fcm_failed),0) as f, COALESCE(SUM(web_ok),0) as w')->first();
+        $byType = (clone $base)->select('activity_type', DB::raw('COUNT(*) as c'))
+            ->groupBy('activity_type')->orderByDesc('c')->limit(12)->pluck('c', 'activity_type');
+        $recentFailures = (clone $base)->whereIn('status', ['failed', 'partial'])
+            ->orderByDesc('id')->limit(20)
+            ->get(['id', 'user_id', 'activity_type', 'status', 'fcm_failed', 'error', 'created_at']);
+
+        $delivered = (int) ($byStatus['delivered'] ?? 0);
+        $partial   = (int) ($byStatus['partial'] ?? 0);
+        $failed    = (int) ($byStatus['failed'] ?? 0);
+        $total     = $delivered + $partial + $failed;
+
+        return $this->respondWithData([
+            'available'     => true,
+            'window_days'   => $windowDays,
+            'total'         => $total,
+            'delivered'     => $delivered,
+            'partial'       => $partial,
+            'failed'        => $failed,
+            'success_pct'   => $total > 0 ? round((($delivered + $partial) / $total) * 100, 1) : null,
+            'fcm_sent'      => (int) ($sums->s ?? 0),
+            'fcm_failed'    => (int) ($sums->f ?? 0),
+            'web_delivered' => (int) ($sums->w ?? 0),
+            'by_type'       => $byType,
+            'recent_failures' => $recentFailures->map(fn ($r) => [
+                'id'            => (int) $r->id,
+                'user_id'       => $r->user_id ? (int) $r->user_id : null,
+                'activity_type' => $r->activity_type,
+                'status'        => $r->status,
+                'fcm_failed'    => (int) $r->fcm_failed,
+                'error'         => $r->error ? mb_substr((string) $r->error, 0, 300) : null,
+                'created_at'    => $r->created_at,
+            ])->all(),
+        ]);
+    }
+
+    /**
      * GET /api/v2/admin/email-deliverability/trigger-audit
      *
      * Reconciles business events against email_log so admins can see missing

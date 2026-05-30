@@ -13841,6 +13841,19 @@
     },
     "empty": {
       "no_statuses": "まだステータスがありません"
+    },
+    "push": {
+      "title": "プッシュ通知",
+      "subtitle": "選択した期間のウェブおよびモバイルのプッシュ配信",
+      "unavailable": "プッシュ配信のログはまだ利用できません。",
+      "total": "プッシュ数",
+      "delivered": "配信済み",
+      "partial": "一部",
+      "failed": "失敗",
+      "success_rate": "成功率",
+      "fcm": "モバイル送信/失敗",
+      "web": "ウェブ配信",
+      "recent_failures": "最近の失敗"
     }
   },
   "help_drawer": {

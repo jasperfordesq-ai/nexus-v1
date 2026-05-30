@@ -57,6 +57,31 @@ interface SummaryData {
   trigger_audit?: TriggerAudit;
 }
 
+interface PushFailureRow {
+  id: number;
+  user_id: number | null;
+  activity_type: string;
+  status: string;
+  fcm_failed: number;
+  error: string | null;
+  created_at: string;
+}
+
+interface PushSummaryData {
+  available: boolean;
+  window_days: number;
+  total: number;
+  delivered: number;
+  partial: number;
+  failed: number;
+  success_pct: number | null;
+  fcm_sent: number;
+  fcm_failed: number;
+  web_delivered: number;
+  by_type: Record<string, number>;
+  recent_failures: PushFailureRow[];
+}
+
 interface LogRow {
   id: number;
   user_id: number | null;
@@ -149,6 +174,8 @@ export default function EmailDeliverability() {
   const [summary, setSummary] = useState<SummaryData | null>(null);
   const [summaryDays, setSummaryDays] = useState(7);
   const [loadingSummary, setLoadingSummary] = useState(true);
+  const [pushSummary, setPushSummary] = useState<PushSummaryData | null>(null);
+  const [loadingPushSummary, setLoadingPushSummary] = useState(true);
 
   const [logRows, setLogRows] = useState<LogRow[]>([]);
   const [logTotal, setLogTotal] = useState(0);
@@ -185,6 +212,17 @@ export default function EmailDeliverability() {
       if (r.success && r.data) setSummary(r.data);
     } finally {
       setLoadingSummary(false);
+    }
+  }, [summaryDays]);
+
+  const loadPushSummary = useCallback(async () => {
+    setLoadingPushSummary(true);
+    try {
+      const query = new URLSearchParams({ days: String(summaryDays) });
+      const r = await api.get<PushSummaryData>(`/v2/admin/email-deliverability/push-summary?${query}`);
+      if (r.success && r.data) setPushSummary(r.data);
+    } finally {
+      setLoadingPushSummary(false);
     }
   }, [summaryDays]);
 
@@ -242,6 +280,7 @@ export default function EmailDeliverability() {
   }, []);
 
   useEffect(() => { loadSummary(); }, [loadSummary]);
+  useEffect(() => { loadPushSummary(); }, [loadPushSummary]);
   useEffect(() => { loadLogs(); }, [loadLogs]);
   useEffect(() => { loadSuppressions(); }, [loadSuppressions]);
   useEffect(() => { loadQueues(); }, [loadQueues]);
@@ -440,6 +479,61 @@ export default function EmailDeliverability() {
           );
         })}
       </section>
+
+      <Card className="border border-[var(--color-border)]">
+        <CardHeader className="flex flex-col items-start gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-theme-primary">{t('email_deliverability.push.title')}</h2>
+            <p className="text-sm text-theme-secondary">{t('email_deliverability.push.subtitle')}</p>
+          </div>
+          <Button size="sm" variant="tertiary" onPress={loadPushSummary} isIconOnly aria-label={t('email_deliverability.actions.refresh')}>
+            <RotateCcw className="h-4 w-4" aria-hidden="true" />
+          </Button>
+        </CardHeader>
+        <Separator />
+        <CardBody className="gap-4">
+          {pushSummary && !pushSummary.available ? (
+            <Alert variant="secondary">{t('email_deliverability.push.unavailable')}</Alert>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-7">
+                {[
+                  { key: 'total', label: t('email_deliverability.push.total'), value: pushSummary?.total ?? 0, color: 'text-theme-primary' },
+                  { key: 'delivered', label: t('email_deliverability.push.delivered'), value: pushSummary?.delivered ?? 0, color: 'text-[var(--color-success)]' },
+                  { key: 'partial', label: t('email_deliverability.push.partial'), value: pushSummary?.partial ?? 0, color: 'text-[var(--color-warning)]' },
+                  { key: 'failed', label: t('email_deliverability.push.failed'), value: pushSummary?.failed ?? 0, color: 'text-[var(--color-error)]' },
+                  { key: 'success', label: t('email_deliverability.push.success_rate'), value: pushSummary?.success_pct != null ? `${pushSummary.success_pct}%` : '-', color: 'text-theme-primary' },
+                  { key: 'fcm', label: t('email_deliverability.push.fcm'), value: `${pushSummary?.fcm_sent ?? 0}/${pushSummary?.fcm_failed ?? 0}`, color: 'text-theme-primary' },
+                  { key: 'web', label: t('email_deliverability.push.web'), value: pushSummary?.web_delivered ?? 0, color: 'text-theme-primary' },
+                ].map((tile) => (
+                  <div key={tile.key} className="rounded-md border border-[var(--color-border)] p-3">
+                    <div className="text-xs font-semibold uppercase text-theme-subtle">{tile.label}</div>
+                    <div className={`mt-1 text-xl font-semibold ${tile.color}`}>
+                      {loadingPushSummary ? <span role="status" aria-busy="true" aria-label="Loading" className="inline-flex"><Spinner size="sm" /></span> : tile.value}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {(pushSummary?.recent_failures?.length ?? 0) > 0 && (
+                <div>
+                  <div className="mb-2 text-xs font-semibold uppercase text-theme-subtle">{t('email_deliverability.push.recent_failures')}</div>
+                  <div className="flex flex-col gap-2">
+                    {pushSummary!.recent_failures.slice(0, 8).map((f) => (
+                      <div key={f.id} className="flex items-center justify-between gap-3 rounded-md border border-[var(--color-border)] p-2 text-sm">
+                        <div className="flex min-w-0 items-center gap-2">
+                          <Chip size="sm" color={f.status === 'failed' ? 'danger' : 'warning'} variant="soft">{f.status}</Chip>
+                          <span className="truncate text-theme-secondary">{f.activity_type}{f.user_id ? ` · #${f.user_id}` : ''}</span>
+                        </div>
+                        {f.error ? <span className="max-w-[45%] truncate text-xs text-theme-subtle" title={f.error}>{f.error}</span> : null}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </CardBody>
+      </Card>
 
       <Card className="border border-[var(--color-border)]">
         <CardHeader className="flex flex-col items-start gap-3 md:flex-row md:items-center md:justify-between">

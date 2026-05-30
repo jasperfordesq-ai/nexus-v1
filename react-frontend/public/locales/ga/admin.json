@@ -13841,6 +13841,19 @@
     },
     "empty": {
       "no_statuses": "Níl aon stádas fós"
+    },
+    "push": {
+      "title": "Brúthfógraí",
+      "subtitle": "Seachadadh brúthfógraí gréasáin agus móibíleach thar an tréimhse roghnaithe",
+      "unavailable": "Níl logáil seachadta brúthfógraí ar fáil go fóill.",
+      "total": "Brúnna",
+      "delivered": "Seachadta",
+      "partial": "Páirteach",
+      "failed": "Teipthe",
+      "success_rate": "Ráta rathúlachta",
+      "fcm": "Móibíleach seolta/teipthe",
+      "web": "Gréasán seachadta",
+      "recent_failures": "Teipeanna le déanaí"
     }
   },
   "help_drawer": {

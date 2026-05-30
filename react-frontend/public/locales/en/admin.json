@@ -16840,6 +16840,19 @@
         "title": "Warning check failed",
         "body": "Email warning checks could not complete."
       }
+    },
+    "push": {
+      "title": "Device push",
+      "subtitle": "Web and mobile push delivery over the selected window",
+      "unavailable": "Push delivery logging is not yet available.",
+      "total": "Pushes",
+      "delivered": "Delivered",
+      "partial": "Partial",
+      "failed": "Failed",
+      "success_rate": "Success rate",
+      "fcm": "Mobile sent/failed",
+      "web": "Web delivered",
+      "recent_failures": "Recent failures"
     }
   },
   "panel": {

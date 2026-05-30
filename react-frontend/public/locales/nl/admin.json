@@ -13841,6 +13841,19 @@
     },
     "empty": {
       "no_statuses": "Nog geen statussen"
+    },
+    "push": {
+      "title": "Pushmeldingen",
+      "subtitle": "Bezorging van web- en mobiele pushmeldingen in de geselecteerde periode",
+      "unavailable": "Logboekregistratie van pushbezorging is nog niet beschikbaar.",
+      "total": "Pushes",
+      "delivered": "Bezorgd",
+      "partial": "Gedeeltelijk",
+      "failed": "Mislukt",
+      "success_rate": "Slagingspercentage",
+      "fcm": "Mobiel verzonden/mislukt",
+      "web": "Web bezorgd",
+      "recent_failures": "Recente fouten"
     }
   },
   "help_drawer": {

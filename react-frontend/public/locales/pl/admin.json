@@ -13841,6 +13841,19 @@
     },
     "empty": {
       "no_statuses": "Nie ma jeszcze żadnych statusów"
+    },
+    "push": {
+      "title": "Powiadomienia push",
+      "subtitle": "Dostarczanie powiadomień push w sieci i na urządzeniach mobilnych w wybranym okresie",
+      "unavailable": "Rejestrowanie dostarczania powiadomień push nie jest jeszcze dostępne.",
+      "total": "Powiadomienia",
+      "delivered": "Dostarczone",
+      "partial": "Częściowe",
+      "failed": "Nieudane",
+      "success_rate": "Wskaźnik sukcesu",
+      "fcm": "Mobilne wysłane/nieudane",
+      "web": "Web dostarczone",
+      "recent_failures": "Ostatnie błędy"
     }
   },
   "help_drawer": {

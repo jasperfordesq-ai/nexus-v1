@@ -13841,6 +13841,19 @@
     },
     "empty": {
       "no_statuses": "Aucun statut pour l'instant"
+    },
+    "push": {
+      "title": "Notifications push",
+      "subtitle": "Distribution des notifications push web et mobile sur la période sélectionnée",
+      "unavailable": "La journalisation de la distribution des notifications push n’est pas encore disponible.",
+      "total": "Notifications",
+      "delivered": "Distribuées",
+      "partial": "Partielles",
+      "failed": "Échecs",
+      "success_rate": "Taux de réussite",
+      "fcm": "Mobile envoyées/échouées",
+      "web": "Web distribuées",
+      "recent_failures": "Échecs récents"
     }
   },
   "help_drawer": {
