@@ -124,6 +124,16 @@ class NotificationDispatcher
             }
         }
 
+        // 1b. DEVICE PUSH — fired here, decoupled from the email digest.
+        // Push is its own channel (own push_enabled pref, enforced inside the
+        // push services). It fires whenever a fresh bell is written, regardless
+        // of the email frequency setting below. Gated to the curated push-title
+        // allowlist (notifications.push_<type>) so routine bell writes do not all
+        // become device push, and internally deduped for 60s.
+        if ($bellCreated && !$isDuplicateBell) {
+            self::fanOutPush((int) $userId, (string) $activityType, (string) $content, $link, true);
+        }
+
         // 2. CHECK Notification Settings Hierarchy
         $frequency = self::getFrequencySetting($userId, $contextType, $contextId);
 
@@ -170,53 +180,14 @@ class NotificationDispatcher
         $queueSucceeded = true;
         switch ($frequency) {
             case 'instant':
+                // Device push is NOT fired here anymore. It used to live inside
+                // this 'instant' email branch, which coupled push to the email
+                // digest preference: a member who had not opted into instant
+                // digest emails (the default is 'off') received no web/FCM push
+                // at all, even though push is a separate channel with its own
+                // push_enabled pref. Push now fires from fanOutPush() right after
+                // the bell is written — see step 1b above.
                 $queueSucceeded = self::queueNotification($userId, $activityType, $content, $link, 'instant', $htmlContent);
-                if (!$queueSucceeded) {
-                    break;
-                }
-                // Also dispatch a real-time web push notification.
-                // Runs AFTER the HTTP response is sent so a slow WebPush POST
-                // (VAPID endpoints can block 5–30s) never delays the caller.
-                // Falls back to inline try/catch if afterResponse dispatch
-                // is unavailable (CLI / tests).
-                $pushTitle = self::getPushTitle($activityType);
-                $uid = (int) $userId;
-                $pushContent = $content;
-                $pushLink = $link;
-
-                $send = function () use ($uid, $pushTitle, $pushContent, $pushLink) {
-                    // Web push (browser) and mobile push (FCM via Capacitor)
-                    // fan out in parallel. A user on multiple devices gets
-                    // notified everywhere they're subscribed. Both are
-                    // failure-isolated so one provider being down doesn't
-                    // suppress the other.
-                    try {
-                        \App\Services\WebPushService::sendToUserStatic($uid, $pushTitle, $pushContent, $pushLink);
-                    } catch (\Throwable $e) {
-                        Log::debug('[NotificationDispatcher] WebPush failed: ' . $e->getMessage());
-                    }
-                    try {
-                        if (class_exists(\App\Services\FCMPushService::class)) {
-                            \App\Services\FCMPushService::sendToUser(
-                                $uid,
-                                $pushTitle,
-                                $pushContent,
-                                ['link' => (string) $pushLink]
-                            );
-                        }
-                    } catch (\Throwable $e) {
-                        Log::debug('[NotificationDispatcher] FCM push failed: ' . $e->getMessage());
-                    }
-                };
-
-                try {
-                    // Laravel's afterResponse() closure dispatch: flushes response,
-                    // then runs the closure. Non-blocking for the HTTP request.
-                    dispatch($send)->afterResponse();
-                } catch (\Throwable $e) {
-                    // No container / running in CLI / queue misconfigured — run inline.
-                    $send();
-                }
                 break;
 
             case 'daily':
@@ -316,13 +287,108 @@ class NotificationDispatcher
     // =========================================================================
 
     /**
+     * Resolve a push title for an activity type.
+     *
+     * Returns the curated `notifications.push_<type>` title when one exists.
+     * Otherwise returns the generic default title — or null when $onlyCurated
+     * is set, which lets the auto-push path skip activity types nobody curated
+     * a push title for (so routine bell writes don't all turn into push).
+     */
+    private static function resolvePushTitle(string $activityType, bool $onlyCurated = false): ?string
+    {
+        $key = 'notifications.push_' . $activityType;
+        $translated = __($key);
+        if ($translated !== $key) {
+            return $translated;
+        }
+        return $onlyCurated ? null : __('notifications.push_default');
+    }
+
+    /**
      * Map activity types to short push notification titles.
      */
     private static function getPushTitle(string $activityType): string
     {
-        $key = 'notifications.push_' . $activityType;
-        $translated = __($key);
-        return $translated !== $key ? $translated : __('notifications.push_default');
+        return self::resolvePushTitle($activityType, false) ?? __('notifications.push_default');
+    }
+
+    /**
+     * Fan out web + mobile (FCM) push for a single notification.
+     *
+     * This is the canonical push entry point. Push is a SEPARATE channel from
+     * the email digest — it has its own push_enabled preference, enforced inside
+     * WebPushService and FCMPushService, so this method does not re-check it.
+     * The send runs after the HTTP response (afterResponse) so a slow VAPID/FCM
+     * POST never delays the caller, falling back to an inline send under CLI /
+     * queue workers. Both providers are failure-isolated. A per-(user,type,link)
+     * 60s dedup means a retry or a double-dispatch can never double-push.
+     *
+     * Call this from any path that writes a bell directly via
+     * Notification::createNotification() and wants the matching device push —
+     * those paths otherwise bypass the dispatcher and never reach a push fan-out.
+     *
+     * @param int         $userId       Recipient user id.
+     * @param string      $activityType Notification type (drives the push title).
+     * @param string      $content      Push body text (already localized).
+     * @param string|null $link         Deep link for the push tap target.
+     * @param bool        $onlyCurated  When true, only fire for activity types
+     *   that have a curated notifications.push_<type> title. When false, an
+     *   explicit caller has decided this event warrants push, so the generic
+     *   title is used as a fallback for uncurated types.
+     */
+    public static function fanOutPush(int $userId, string $activityType, string $content, ?string $link, bool $onlyCurated = false): void
+    {
+        if ($userId <= 0) {
+            return;
+        }
+
+        $pushTitle = self::resolvePushTitle($activityType, $onlyCurated);
+        if ($pushTitle === null) {
+            return;
+        }
+
+        // Dedup so a retry / double-dispatch within the window can't double-push.
+        $dedupKey = 'push_dedup:' . $userId . ':' . $activityType . ':' . md5((string) ($link ?? ''));
+        if (!Cache::add($dedupKey, 1, now()->addSeconds(60))) {
+            return;
+        }
+
+        $uid = $userId;
+        $pushContent = $content;
+        $pushLink = (string) ($link ?? '');
+
+        $send = function () use ($uid, $pushTitle, $pushContent, $pushLink) {
+            // Web push (browser) and mobile push (FCM via Capacitor) fan out in
+            // parallel — a user on multiple devices is notified everywhere they
+            // are subscribed. Failure-isolated so one provider being down does
+            // not suppress the other.
+            try {
+                \App\Services\WebPushService::sendToUserStatic($uid, $pushTitle, $pushContent, $pushLink);
+            } catch (\Throwable $e) {
+                Log::debug('[NotificationDispatcher] WebPush failed: ' . $e->getMessage());
+            }
+            try {
+                if (class_exists(\App\Services\FCMPushService::class)) {
+                    \App\Services\FCMPushService::sendToUser(
+                        $uid,
+                        $pushTitle,
+                        $pushContent,
+                        ['link' => $pushLink]
+                    );
+                }
+            } catch (\Throwable $e) {
+                Log::debug('[NotificationDispatcher] FCM push failed: ' . $e->getMessage());
+            }
+        };
+
+        try {
+            // Laravel's afterResponse() closure dispatch: flushes the response,
+            // then runs the closure. Non-blocking for the HTTP request.
+            dispatch($send)->afterResponse();
+        } catch (\Throwable $e) {
+            // No container / running in CLI / queue misconfigured — run inline.
+            $send();
+        }
     }
 
     private static function queueNotification($userId, $activityType, $content, $link, $frequency = 'daily', $emailBody = null): bool
@@ -443,6 +509,9 @@ class NotificationDispatcher
             $link = "/listings/{$listingId}";
 
             Notification::createNotification((int) $userId, $content, $link, 'hot_match');
+            // Device push (curated push_hot_match title). Independent of the
+            // digest frequency this method queues below.
+            self::fanOutPush((int) $userId, 'hot_match', $content, $link);
 
             $htmlContent = self::buildHotMatchEmail($match, $matchScore);
             return self::queueNotification($userId, 'hot_match', $content, $link, $queueFrequency, $htmlContent);
@@ -488,6 +557,8 @@ class NotificationDispatcher
             $link = "/listings/{$listingId}";
 
             Notification::createNotification((int) $userId, $content, $link, 'mutual_match');
+            // Device push (curated push_mutual_match title).
+            self::fanOutPush((int) $userId, 'mutual_match', $content, $link);
 
             $htmlContent = self::buildMutualMatchEmail($match, $reciprocalInfo);
             self::queueNotification($userId, 'mutual_match', $content, $link, $queueFrequency, $htmlContent);
@@ -527,6 +598,9 @@ class NotificationDispatcher
             $link = "/matches";
 
             Notification::createNotification((int) $userId, $content, $link, 'match_digest');
+            // Device push — falls back to the generic title (no curated
+            // push_match_digest); this is an explicit, low-frequency digest.
+            self::fanOutPush((int) $userId, 'match_digest', $content, $link);
 
             $htmlContent = self::buildMatchDigestEmail($matches, $period, $hotCount, $mutualCount);
             self::queueNotification($userId, 'match_digest', $content, $link, 'instant', $htmlContent);
@@ -560,6 +634,8 @@ class NotificationDispatcher
             $link = "/broker/exchanges?status=pending_broker";
 
             Notification::createNotification((int) $brokerId, $content, $link, 'match_approval_request');
+            // Device push to the broker/admin — an approval is waiting on them.
+            self::fanOutPush((int) $brokerId, 'match_approval_request', $content, $link);
 
             $htmlContent = self::buildMatchApprovalRequestEmail($userName, $listingTitle, $requestId);
             self::queueNotification($brokerId, 'match_approval_request', $content, $link, 'instant', $htmlContent);
@@ -584,6 +660,8 @@ class NotificationDispatcher
             $link = "/listings/{$listingId}";
 
             Notification::createNotification((int) $userId, $content, $link, 'match_approved');
+            // Device push — their match was approved; a clear, expected event.
+            self::fanOutPush((int) $userId, 'match_approved', $content, $link);
 
             $htmlContent = self::buildMatchApprovedEmail($listingTitle, $listingId, $matchScore);
             self::queueNotification($userId, 'match_approved', $content, $link, 'instant', $htmlContent);
@@ -611,6 +689,8 @@ class NotificationDispatcher
             $link = "/matches";
 
             Notification::createNotification((int) $userId, $content, $link, 'match_rejected');
+            // Device push — the outcome of their match request.
+            self::fanOutPush((int) $userId, 'match_rejected', $content, $link);
 
             $htmlContent = self::buildMatchRejectedEmail($listingTitle, $reason);
             self::queueNotification($userId, 'match_rejected', $content, $link, 'instant', $htmlContent);
@@ -639,6 +719,8 @@ class NotificationDispatcher
             $link = self::buildNotificationLink($type, $data);
 
             Notification::createNotification($userId, $content, $link, $type);
+            // Device push for exchange/broker lifecycle events.
+            self::fanOutPush((int) $userId, (string) $type, $content, $link);
 
             // Send email immediately for exchange notifications
             self::sendExchangeEmailImmediately($userId, $type, $data, $content, $link);
@@ -666,6 +748,8 @@ class NotificationDispatcher
                 $link = self::buildNotificationLink($type, $data);
 
                 Notification::createNotification((int) $admin->id, $content, $link, $type);
+                // Device push to each admin/broker — these are action alerts.
+                self::fanOutPush((int) $admin->id, (string) $type, $content, $link);
 
                 self::sendExchangeEmailImmediately((int) $admin->id, $type, $data, $content, $link);
             });
@@ -1028,6 +1112,8 @@ class NotificationDispatcher
             $content = __('notifications.verification_passed');
 
             Notification::createNotification($userId, $content, $link, 'verification_passed');
+            // Device push — identity verification result is a clear, expected event.
+            self::fanOutPush((int) $userId, 'verification_passed', $content, $link);
 
             // Send a direct email immediately. Do not also queue an instant
             // email here; the instant queue is processed every minute and
@@ -1082,6 +1168,8 @@ class NotificationDispatcher
                 : __('notifications.verification_failed');
 
             Notification::createNotification($userId, $content, $link, 'verification_failed');
+            // Device push — identity verification result is a clear, expected event.
+            self::fanOutPush((int) $userId, 'verification_failed', $content, $link);
 
             // Send a direct email immediately. Do not also queue an instant
             // email here; the instant queue would send an identical copy.
