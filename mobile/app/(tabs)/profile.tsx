@@ -27,38 +27,40 @@ interface MenuItem {
   route: Href;
   tone: string;
   featureGate?: string;
+  featureGates?: string[];
+  moduleGate?: string;
 }
 
 const MY_SPACE: MenuItem[] = [
-  { labelKey: 'myProfile', descriptionKey: 'navDescriptions.myProfile', icon: 'person-outline', route: '/(modals)/member-profile', tone: '#3b82f6' },
-  { labelKey: 'wallet', descriptionKey: 'navDescriptions.wallet', icon: 'wallet-outline', route: '/(modals)/wallet', tone: '#f59e0b' },
-  { labelKey: 'messages', descriptionKey: 'navDescriptions.messages', icon: 'chatbubble-outline', route: '/(tabs)/messages', tone: '#0ea5e9' },
-  { labelKey: 'notifications', descriptionKey: 'navDescriptions.notifications', icon: 'notifications-outline', route: '/(modals)/notifications', tone: '#ef4444' },
+  { labelKey: 'myProfile', descriptionKey: 'navDescriptions.myProfile', icon: 'person-outline', route: '/(modals)/member-profile', tone: '#3b82f6', moduleGate: 'profile' },
+  { labelKey: 'wallet', descriptionKey: 'navDescriptions.wallet', icon: 'wallet-outline', route: '/(modals)/wallet', tone: '#f59e0b', moduleGate: 'wallet' },
+  { labelKey: 'messages', descriptionKey: 'navDescriptions.messages', icon: 'chatbubble-outline', route: '/(tabs)/messages', tone: '#0ea5e9', moduleGate: 'messages' },
+  { labelKey: 'notifications', descriptionKey: 'navDescriptions.notifications', icon: 'notifications-outline', route: '/(modals)/notifications', tone: '#ef4444', moduleGate: 'notifications' },
   { labelKey: 'activity', descriptionKey: 'navDescriptions.activity', icon: 'pulse-outline', route: '/(modals)/activity' as Href, tone: '#22c55e' },
   { labelKey: 'matches', descriptionKey: 'navDescriptions.matches', icon: 'sparkles-outline', route: '/(modals)/matches' as Href, tone: '#a855f7' },
   { labelKey: 'reviews', descriptionKey: 'navDescriptions.reviews', icon: 'star-outline', route: '/(modals)/reviews' as Href, tone: '#f59e0b', featureGate: 'reviews' },
-  { labelKey: 'achievements', descriptionKey: 'navDescriptions.achievements', icon: 'trophy-outline', route: '/(modals)/gamification', tone: '#f59e0b' },
-  { labelKey: 'myGoals', descriptionKey: 'navDescriptions.myGoals', icon: 'flag-outline', route: '/(modals)/goals', tone: '#8b5cf6' },
-  { labelKey: 'groups', descriptionKey: 'navDescriptions.groups', icon: 'people-outline', route: '/(modals)/groups', tone: '#06b6d4' },
+  { labelKey: 'achievements', descriptionKey: 'navDescriptions.achievements', icon: 'trophy-outline', route: '/(modals)/gamification', tone: '#f59e0b', featureGate: 'gamification' },
+  { labelKey: 'myGoals', descriptionKey: 'navDescriptions.myGoals', icon: 'flag-outline', route: '/(modals)/goals', tone: '#8b5cf6', featureGate: 'goals' },
+  { labelKey: 'groups', descriptionKey: 'navDescriptions.groups', icon: 'people-outline', route: '/(modals)/groups', tone: '#06b6d4', featureGate: 'groups' },
   { labelKey: 'groupExchanges', descriptionKey: 'navDescriptions.groupExchanges', icon: 'swap-horizontal-outline', route: '/(modals)/group-exchanges' as Href, tone: '#6366f1', featureGate: 'group_exchanges' },
 ];
 
 const DISCOVER: MenuItem[] = [
-  { labelKey: 'search', descriptionKey: 'navDescriptions.search', icon: 'search-outline', route: '/(modals)/search', tone: '#64748b' },
-  { labelKey: 'listings', descriptionKey: 'navDescriptions.listings', icon: 'storefront-outline', route: '/(tabs)/exchanges', tone: '#0f766e' },
+  { labelKey: 'search', descriptionKey: 'navDescriptions.search', icon: 'search-outline', route: '/(modals)/search', tone: '#64748b', featureGate: 'search' },
+  { labelKey: 'listings', descriptionKey: 'navDescriptions.listings', icon: 'storefront-outline', route: '/(tabs)/exchanges', tone: '#0f766e', moduleGate: 'listings' },
   { labelKey: 'marketplace', descriptionKey: 'navDescriptions.marketplace', icon: 'bag-handle-outline', route: '/(modals)/marketplace' as Href, tone: '#0ea5e9', featureGate: 'marketplace' },
   { labelKey: 'jobs', descriptionKey: 'navDescriptions.jobs', icon: 'briefcase-outline', route: '/(modals)/jobs', tone: '#2563eb', featureGate: 'job_vacancies' },
-  { labelKey: 'events', descriptionKey: 'navDescriptions.events', icon: 'calendar-outline', route: '/(tabs)/events', tone: '#f43f5e' },
+  { labelKey: 'events', descriptionKey: 'navDescriptions.events', icon: 'calendar-outline', route: '/(tabs)/events', tone: '#f43f5e', featureGate: 'events' },
   { labelKey: 'polls', descriptionKey: 'navDescriptions.polls', icon: 'stats-chart-outline', route: '/(modals)/polls' as Href, tone: '#7c3aed', featureGate: 'polls' },
   { labelKey: 'ideation', descriptionKey: 'navDescriptions.ideation', icon: 'bulb-outline', route: '/(modals)/ideation' as Href, tone: '#f59e0b', featureGate: 'ideation_challenges' },
-  { labelKey: 'browseMembers', descriptionKey: 'navDescriptions.browseMembers', icon: 'people-outline', route: '/(modals)/members', tone: '#14b8a6' },
-  { labelKey: 'connections', descriptionKey: 'navDescriptions.connections', icon: 'person-add-outline', route: '/(modals)/connections' as Href, tone: '#6366f1' },
-  { labelKey: 'volunteering', descriptionKey: 'navDescriptions.volunteering', icon: 'heart-outline', route: '/(modals)/volunteering', tone: '#e11d48' },
-  { labelKey: 'organisations', descriptionKey: 'navDescriptions.organisations', icon: 'business-outline', route: '/(modals)/organisations', tone: '#6366f1' },
-  { labelKey: 'blog', descriptionKey: 'navDescriptions.blog', icon: 'newspaper-outline', route: '/(modals)/blog', tone: '#f97316' },
+  { labelKey: 'browseMembers', descriptionKey: 'navDescriptions.browseMembers', icon: 'people-outline', route: '/(modals)/members', tone: '#14b8a6', featureGate: 'connections' },
+  { labelKey: 'connections', descriptionKey: 'navDescriptions.connections', icon: 'person-add-outline', route: '/(modals)/connections' as Href, tone: '#6366f1', featureGate: 'connections' },
+  { labelKey: 'volunteering', descriptionKey: 'navDescriptions.volunteering', icon: 'heart-outline', route: '/(modals)/volunteering', tone: '#e11d48', featureGate: 'volunteering' },
+  { labelKey: 'organisations', descriptionKey: 'navDescriptions.organisations', icon: 'business-outline', route: '/(modals)/organisations', tone: '#6366f1', featureGate: 'organisations' },
+  { labelKey: 'blog', descriptionKey: 'navDescriptions.blog', icon: 'newspaper-outline', route: '/(modals)/blog', tone: '#f97316', featureGate: 'blog' },
   { labelKey: 'support.title', descriptionKey: 'navDescriptions.support', icon: 'help-circle-outline', route: '/(modals)/support' as Href, tone: '#0ea5e9' },
   { labelKey: 'skills', descriptionKey: 'navDescriptions.skills', icon: 'ribbon-outline', route: '/(modals)/skills' as Href, tone: '#10b981' },
-  { labelKey: 'aiChat', descriptionKey: 'navDescriptions.aiChat', icon: 'sparkles-outline', route: '/(modals)/chat', tone: '#a855f7' },
+  { labelKey: 'aiChat', descriptionKey: 'navDescriptions.aiChat', icon: 'sparkles-outline', route: '/(modals)/chat', tone: '#a855f7', featureGate: 'ai_chat' },
   { labelKey: 'federation', descriptionKey: 'navDescriptions.federation', icon: 'globe-outline', route: '/(modals)/federation', tone: '#0ea5e9', featureGate: 'federation' },
 ];
 
@@ -74,10 +76,10 @@ const MARKETPLACE: MenuItem[] = [
   { labelKey: 'marketplaceSales', descriptionKey: 'navDescriptions.marketplaceSales', icon: 'storefront-outline', route: { pathname: '/(modals)/marketplace-orders', params: { mode: 'sales' } } as unknown as Href, tone: '#db2777', featureGate: 'marketplace' },
   { labelKey: 'marketplacePickups', descriptionKey: 'navDescriptions.marketplacePickups', icon: 'qr-code-outline', route: '/(modals)/marketplace-pickups' as Href, tone: '#0ea5e9', featureGate: 'marketplace' },
   { labelKey: 'marketplaceShipping', descriptionKey: 'navDescriptions.marketplaceShipping', icon: 'cube-outline', route: '/(modals)/marketplace-shipping-options' as Href, tone: '#f59e0b', featureGate: 'marketplace' },
-  { labelKey: 'marketplaceCoupons', descriptionKey: 'navDescriptions.marketplaceCoupons', icon: 'ticket-outline', route: '/(modals)/marketplace-coupons' as Href, tone: '#16a34a', featureGate: 'merchant_coupons' },
+  { labelKey: 'marketplaceCoupons', descriptionKey: 'navDescriptions.marketplaceCoupons', icon: 'ticket-outline', route: '/(modals)/marketplace-coupons' as Href, tone: '#16a34a', featureGates: ['marketplace', 'merchant_coupons'] },
   { labelKey: 'marketplaceOffers', descriptionKey: 'navDescriptions.marketplaceOffers', icon: 'pricetag-outline', route: '/(modals)/marketplace-offers' as Href, tone: '#14b8a6', featureGate: 'marketplace' },
   { labelKey: 'marketplaceSaved', descriptionKey: 'navDescriptions.marketplaceSaved', icon: 'folder-open-outline', route: '/(modals)/marketplace-collections' as Href, tone: '#8b5cf6', featureGate: 'marketplace' },
-  { labelKey: 'marketplaceSellerCoupons', descriptionKey: 'navDescriptions.marketplaceSellerCoupons', icon: 'ticket-outline', route: { pathname: '/(modals)/marketplace-tools', params: { tab: 'coupons' } } as unknown as Href, tone: '#22c55e', featureGate: 'merchant_coupons' },
+  { labelKey: 'marketplaceSellerCoupons', descriptionKey: 'navDescriptions.marketplaceSellerCoupons', icon: 'ticket-outline', route: { pathname: '/(modals)/marketplace-tools', params: { tab: 'coupons' } } as unknown as Href, tone: '#22c55e', featureGates: ['marketplace', 'merchant_coupons'] },
   { labelKey: 'marketplacePickupTools', descriptionKey: 'navDescriptions.marketplacePickupTools', icon: 'calendar-number-outline', route: { pathname: '/(modals)/marketplace-tools', params: { tab: 'pickups' } } as unknown as Href, tone: '#f59e0b', featureGate: 'marketplace' },
   { labelKey: 'marketplacePromotions', descriptionKey: 'navDescriptions.marketplacePromotions', icon: 'megaphone-outline', route: { pathname: '/(modals)/marketplace-tools', params: { tab: 'promotions' } } as unknown as Href, tone: '#db2777', featureGate: 'marketplace' },
   { labelKey: 'marketplaceSavedSearches', descriptionKey: 'navDescriptions.marketplaceSavedSearches', icon: 'notifications-outline', route: { pathname: '/(modals)/marketplace-tools', params: { tab: 'savedSearches' } } as unknown as Href, tone: '#2563eb', featureGate: 'marketplace' },
@@ -98,22 +100,29 @@ const FEDERATION: MenuItem[] = [
 ];
 
 const ACCOUNT: MenuItem[] = [
-  { labelKey: 'settings', descriptionKey: 'navDescriptions.settings', icon: 'settings-outline', route: '/(modals)/settings', tone: '#64748b' },
+  { labelKey: 'settings', descriptionKey: 'navDescriptions.settings', icon: 'settings-outline', route: '/(modals)/settings', tone: '#64748b', moduleGate: 'settings' },
 ];
 
 export default function MoreScreen() {
   const { t } = useTranslation(['profile', 'common']);
   const { user, displayName, logout } = useAuth();
-  const { hasFeature } = useTenant();
+  const { hasFeature, hasModule } = useTenant();
   const primary = usePrimaryColor();
   const theme = useTheme();
 
   const rawBalance = user && 'balance' in user ? (user.balance as number | null) : null;
   const balance = typeof rawBalance === 'number' && Number.isFinite(rawBalance) ? rawBalance : null;
-  const visibleDiscover = DISCOVER.filter((item) => !item.featureGate || hasFeature(item.featureGate));
-  const visibleMySpace = MY_SPACE.filter((item) => !item.featureGate || hasFeature(item.featureGate));
-  const visibleMarketplace = MARKETPLACE.filter((item) => !item.featureGate || hasFeature(item.featureGate));
-  const visibleFederation = FEDERATION.filter((item) => !item.featureGate || hasFeature(item.featureGate));
+  const isMenuItemVisible = (item: MenuItem) => {
+    if (item.moduleGate && !hasModule(item.moduleGate)) return false;
+    if (item.featureGate && !hasFeature(item.featureGate)) return false;
+    if (item.featureGates?.some((feature) => !hasFeature(feature))) return false;
+    return true;
+  };
+  const visibleDiscover = DISCOVER.filter(isMenuItemVisible);
+  const visibleMySpace = MY_SPACE.filter(isMenuItemVisible);
+  const visibleMarketplace = MARKETPLACE.filter(isMenuItemVisible);
+  const visibleFederation = FEDERATION.filter(isMenuItemVisible);
+  const visibleAccount = ACCOUNT.filter(isMenuItemVisible);
 
   function navigate(route: Href) {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -190,7 +199,7 @@ export default function MoreScreen() {
         <MenuSection title={t('marketplaceSection')} items={visibleMarketplace} onNavigate={navigate} theme={theme} />
         <MenuSection title={t('federationSection')} items={visibleFederation} onNavigate={navigate} theme={theme} />
         <MenuSection title={t('mySpace')} items={visibleMySpace} onNavigate={navigate} theme={theme} />
-        <MenuSection title={t('account')} items={ACCOUNT} onNavigate={navigate} theme={theme} />
+        <MenuSection title={t('account')} items={visibleAccount} onNavigate={navigate} theme={theme} />
 
         <HeroButton variant="danger" onPress={confirmLogout} className="mt-1">
           <Ionicons name="log-out-outline" size={18} color="#fff" />

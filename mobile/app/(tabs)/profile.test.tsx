@@ -152,6 +152,8 @@ jest.mock('react-i18next', () => ({
 
 const mockLogout = jest.fn();
 const mockUseAuth = jest.fn();
+const mockHasFeature = jest.fn<boolean, [string]>(() => true);
+const mockHasModule = jest.fn<boolean, [string]>(() => true);
 
 jest.mock('@/lib/hooks/useAuth', () => ({
   useAuth: (...args: unknown[]) => mockUseAuth(...args),
@@ -172,7 +174,10 @@ const defaultAuthState = {
 
 jest.mock('@/lib/hooks/useTenant', () => ({
   usePrimaryColor: () => '#006FEE',
-  useTenant: () => ({ hasFeature: () => true }),
+  useTenant: () => ({
+    hasFeature: (feature: string) => mockHasFeature(feature),
+    hasModule: (module: string) => mockHasModule(module),
+  }),
 }));
 
 jest.mock('@/lib/hooks/useTheme', () => ({
@@ -212,6 +217,8 @@ describe('MoreScreen (More tab)', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseAuth.mockReturnValue(defaultAuthState);
+    mockHasFeature.mockReturnValue(true);
+    mockHasModule.mockReturnValue(true);
   });
 
   it('renders the user display name and email', () => {
@@ -345,6 +352,34 @@ describe('MoreScreen (More tab)', () => {
     const { getAllByText, getByText } = render(<MoreScreen />);
     expect(getAllByText('Account').length).toBeGreaterThanOrEqual(1);
     expect(getByText('Settings')).toBeTruthy();
+  });
+
+  it('hides More menu buttons when their backend module is disabled', () => {
+    mockHasModule.mockImplementation((module: string) => !['wallet', 'messages', 'notifications', 'listings', 'settings'].includes(module));
+
+    const { getAllByText, queryByText } = render(<MoreScreen />);
+
+    expect(queryByText('Wallet')).toBeNull();
+    expect(queryByText('Messages')).toBeNull();
+    expect(queryByText('Notifications')).toBeNull();
+    expect(queryByText('Listings')).toBeNull();
+    expect(queryByText('Settings')).toBeNull();
+    expect(getAllByText('Marketplace').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('hides More menu buttons when their backend feature is disabled', () => {
+    mockHasFeature.mockImplementation((feature: string) => !['marketplace', 'events', 'groups', 'volunteering', 'blog', 'ai_chat', 'federation'].includes(feature));
+
+    const { queryByText } = render(<MoreScreen />);
+
+    expect(queryByText('Marketplace')).toBeNull();
+    expect(queryByText('Events')).toBeNull();
+    expect(queryByText('Groups')).toBeNull();
+    expect(queryByText('Volunteering')).toBeNull();
+    expect(queryByText('Blog')).toBeNull();
+    expect(queryByText('AI Assistant')).toBeNull();
+    expect(queryByText('Federation')).toBeNull();
+    expect(queryByText('Wallet')).toBeTruthy();
   });
 
   it('renders the Sign out button', () => {
