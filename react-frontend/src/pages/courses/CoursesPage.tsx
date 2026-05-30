@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Input, Select, SelectItem, Spinner, AlphaBadge, Button } from '@/components/ui';
 import Search from 'lucide-react/icons/search';
+import Plus from 'lucide-react/icons/plus';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useTenant } from '@/contexts';
 import { coursesApi, type Course, type CourseCategory } from '@/lib/api/courses';
@@ -75,9 +76,17 @@ export default function CoursesPage() {
           <AlphaBadge />
         </div>
         {isAuthenticated && (
-          <Button as={Link} to={tenantPath('/courses/my-learning')} variant="tertiary" size="sm">
-            {t('my_learning.title')}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button as={Link} to={tenantPath('/courses/my-learning')} variant="tertiary" size="sm">
+              {t('my_learning.title')}
+            </Button>
+            <Button as={Link} to={tenantPath('/courses/instructor')} variant="tertiary" size="sm">
+              {t('instructor.my_courses')}
+            </Button>
+            <Button as={Link} to={tenantPath('/courses/instructor/new')} color="primary" size="sm" startContent={<Plus size={16} />}>
+              {t('instructor.create_course')}
+            </Button>
+          </div>
         )}
       </div>
       <p className="text-sm text-muted mb-6">{t('subtitle')}</p>
