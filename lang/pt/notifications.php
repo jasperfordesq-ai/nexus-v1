@@ -112,6 +112,7 @@ return [
     'push_hot_match' => 'Hot Match Found',
     'push_mutual_match' => 'Mutual Match Found',
     'push_default' => 'New Notification',
+    'push_marketplace_enforcement' => 'Atualização sobre o seu anúncio',
     'push_feed_report_created' => 'Novo relatório',
     'push_social_report_created' => 'Novo relatório',
     'push_listing_report_created' => 'Novo relatório de anúncio',

@@ -702,5 +702,23 @@
     "marketplace_body": "Er is een marktplaatsmelding ingediend (melding #{{report_id}}). Reden: {{reason}}. Op grond van de Digital Services Act moet deze binnen 24 uur worden bevestigd en behandeld. Beoordeel het nu in het beheerpaneel.",
     "job_subject": "Vacature gemarkeerd voor beoordeling — {{title}}",
     "job_body": "Een vacature is automatisch gemarkeerd als mogelijke spam. Titel: {{title}} (#{{job_id}}). Spamscore: {{score}}/100. Ze wacht op beoordeling — keur ze goed of af in het beheerpaneel."
+  },
+  "marketplace_enforcement": {
+    "reason_unspecified": "niet gespecificeerd",
+    "cta_view": "Advertentie bekijken",
+    "cta_appeal": "Bezwaar maken tegen dit besluit",
+    "action_label_listing_removed": "advertentie verwijderd",
+    "action_label_seller_suspended": "account geschorst",
+    "action_label_listing_rejected": "advertentie afgewezen",
+    "action_label_none": "geen verdere actie",
+    "under_review_subject": "Je advertentie is gemeld — in beoordeling",
+    "under_review_body": "Je advertentie \"{{title}}\" is gemeld en wordt beoordeeld door ons moderatieteam. We laten je de uitkomst weten. Om privacyredenen kunnen we niet zeggen wie het heeft gemeld.",
+    "action_subject": "Actie ondernomen op je advertentie — {{title}}",
+    "action_body": "Na een moderatiebeoordeling van je advertentie \"{{title}}\" is de volgende actie ondernomen: {{action}}. Reden: {{reason}}.",
+    "action_appeal_note": "Als je denkt dat dit besluit een vergissing is, kun je binnen 14 dagen bezwaar maken.",
+    "cleared_subject": "Je advertentie is gemeld — geen actie",
+    "cleared_body": "Een melding over je advertentie \"{{title}}\" is beoordeeld en er is geen actie ondernomen. Je advertentie blijft actief. Bedankt dat je deel uitmaakt van de community.",
+    "appeal_outcome_subject": "Bezwaarbeslissing — je advertentie \"{{title}}\"",
+    "appeal_outcome_body": "Een bezwaar over je advertentie \"{{title}}\" is afgehandeld. Uitkomst: {{action}}. Reden: {{reason}}. Dit is de definitieve beslissing."
   }
 }

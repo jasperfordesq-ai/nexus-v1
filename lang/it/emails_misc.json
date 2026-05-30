@@ -702,5 +702,23 @@
     "marketplace_body": "È stata presentata una segnalazione marketplace (segnalazione #{{report_id}}). Motivo: {{reason}}. In base al Digital Services Act deve essere riscontrata e gestita entro 24 ore. Esaminala subito nel pannello di amministrazione.",
     "job_subject": "Annuncio di lavoro segnalato per revisione — {{title}}",
     "job_body": "Un annuncio di lavoro è stato automaticamente segnalato come possibile spam. Titolo: {{title}} (#{{job_id}}). Punteggio spam: {{score}}/100. È in attesa di revisione — approvalo o rifiutalo nel pannello di amministrazione."
+  },
+  "marketplace_enforcement": {
+    "reason_unspecified": "non specificato",
+    "cta_view": "Vedi annuncio",
+    "cta_appeal": "Fai ricorso contro questa decisione",
+    "action_label_listing_removed": "annuncio rimosso",
+    "action_label_seller_suspended": "account sospeso",
+    "action_label_listing_rejected": "annuncio rifiutato",
+    "action_label_none": "nessuna ulteriore azione",
+    "under_review_subject": "Il tuo annuncio è stato segnalato — in revisione",
+    "under_review_body": "Il tuo annuncio \"{{title}}\" è stato segnalato ed è in fase di revisione da parte del nostro team di moderazione. Ti comunicheremo l'esito. Per motivi di privacy non possiamo dirti chi lo ha segnalato.",
+    "action_subject": "Azione intrapresa sul tuo annuncio — {{title}}",
+    "action_body": "A seguito di una revisione di moderazione del tuo annuncio \"{{title}}\", è stata intrapresa la seguente azione: {{action}}. Motivo: {{reason}}.",
+    "action_appeal_note": "Se ritieni che questa decisione sia un errore, puoi presentare ricorso entro 14 giorni.",
+    "cleared_subject": "Il tuo annuncio è stato segnalato — nessuna azione",
+    "cleared_body": "Una segnalazione sul tuo annuncio \"{{title}}\" è stata esaminata e non è stata intrapresa alcuna azione. Il tuo annuncio rimane attivo. Grazie di far parte della community.",
+    "appeal_outcome_subject": "Decisione sul ricorso — il tuo annuncio \"{{title}}\"",
+    "appeal_outcome_body": "Un ricorso relativo al tuo annuncio \"{{title}}\" è stato risolto. Esito: {{action}}. Motivo: {{reason}}. Questa è la decisione definitiva."
   }
 }

@@ -702,5 +702,23 @@
     "marketplace_body": "Eine Marktplatz-Meldung wurde eingereicht (Meldung #{{report_id}}). Grund: {{reason}}. Nach den Regeln des Digital Services Act muss sie innerhalb von 24 Stunden bestätigt und bearbeitet werden. Bitte jetzt im Admin-Bereich prüfen.",
     "job_subject": "Stellenanzeige zur Prüfung markiert — {{title}}",
     "job_body": "Eine Stellenanzeige wurde automatisch als möglicher Spam markiert. Titel: {{title}} (#{{job_id}}). Spam-Score: {{score}}/100. Sie wird bis zur Prüfung zurückgehalten — bitte im Admin-Bereich genehmigen oder ablehnen."
+  },
+  "marketplace_enforcement": {
+    "reason_unspecified": "nicht angegeben",
+    "cta_view": "Inserat ansehen",
+    "cta_appeal": "Gegen Entscheidung Einspruch einlegen",
+    "action_label_listing_removed": "Inserat entfernt",
+    "action_label_seller_suspended": "Konto gesperrt",
+    "action_label_listing_rejected": "Inserat abgelehnt",
+    "action_label_none": "keine weitere Maßnahme",
+    "under_review_subject": "Ihr Inserat wurde gemeldet — in Prüfung",
+    "under_review_body": "Ihr Inserat „{{title}}“ wurde gemeldet und wird von unserem Moderationsteam geprüft. Wir informieren Sie über das Ergebnis. Aus Datenschutzgründen können wir nicht mitteilen, wer es gemeldet hat.",
+    "action_subject": "Maßnahme zu Ihrem Inserat — {{title}}",
+    "action_body": "Nach einer Moderationsprüfung Ihres Inserats „{{title}}“ wurde folgende Maßnahme ergriffen: {{action}}. Grund: {{reason}}.",
+    "action_appeal_note": "Wenn Sie der Meinung sind, dass diese Entscheidung ein Fehler war, können Sie innerhalb von 14 Tagen Einspruch einlegen.",
+    "cleared_subject": "Ihr Inserat wurde gemeldet — keine Maßnahme",
+    "cleared_body": "Eine Meldung zu Ihrem Inserat „{{title}}“ wurde geprüft und es wurde keine Maßnahme ergriffen. Ihr Inserat bleibt aktiv. Danke, dass Sie Teil der Community sind.",
+    "appeal_outcome_subject": "Einspruchsentscheidung — Ihr Inserat „{{title}}“",
+    "appeal_outcome_body": "Ein Einspruch zu Ihrem Inserat „{{title}}“ wurde entschieden. Ergebnis: {{action}}. Grund: {{reason}}. Dies ist die endgültige Entscheidung."
   }
 }

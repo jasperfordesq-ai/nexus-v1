@@ -120,5 +120,9 @@
   "social_report.admin_alert": "Nuova segnalazione di contenuto: {{target_type}} segnalato — {{reason}}",
   "listing_report.admin_alert": "Nuova segnalazione di annuncio: \"{{listing_title}}\" — {{reason}}",
   "marketplace_report.admin_alert": "Segnalazione marketplace #{{report_id}} — da esaminare entro 24 h (DSA). Motivo: {{reason}}",
-  "job_vacancy.spam_flag": "Annuncio \"{{title}}\" segnalato per revisione — punteggio spam {{score}}/100"
+  "job_vacancy.spam_flag": "Annuncio \"{{title}}\" segnalato per revisione — punteggio spam {{score}}/100",
+  "marketplace_enforcement.under_review_bell": "Il tuo annuncio \"{{title}}\" è stato segnalato ed è in fase di revisione.",
+  "marketplace_enforcement.action_bell": "Azione intrapresa sul tuo annuncio \"{{title}}\": {{action}}.",
+  "marketplace_enforcement.cleared_bell": "Una segnalazione sul tuo annuncio \"{{title}}\" è stata esaminata — nessuna azione intrapresa.",
+  "marketplace_enforcement.appeal_outcome_bell": "Ricorso risolto per il tuo annuncio \"{{title}}\": {{action}}."
 }

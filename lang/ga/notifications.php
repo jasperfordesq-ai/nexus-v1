@@ -112,6 +112,7 @@ return [
     'push_hot_match' => 'Hot Match Found',
     'push_mutual_match' => 'Mutual Match Found',
     'push_default' => 'New Notification',
+    'push_marketplace_enforcement' => 'Nuashonrú ar do liostú',
     'push_feed_report_created' => 'Tuairisc nua',
     'push_social_report_created' => 'Tuairisc nua',
     'push_listing_report_created' => 'Tuairisc nua ar liostú',

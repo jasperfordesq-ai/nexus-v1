@@ -120,5 +120,9 @@
   "social_report.admin_alert": "Tuairisc nua ar ábhar: tuairiscíodh {{target_type}} — {{reason}}",
   "listing_report.admin_alert": "Tuairisc nua ar liostú: \"{{listing_title}}\" — {{reason}}",
   "marketplace_report.admin_alert": "Tuairisc mhargaidh #{{report_id}} — déan athbhreithniú laistigh de 24 uair (DSA). Fáth: {{reason}}",
-  "job_vacancy.spam_flag": "Cuireadh post \"{{title}}\" faoi bhratach le hathbhreithniú — scór turscair {{score}}/100"
+  "job_vacancy.spam_flag": "Cuireadh post \"{{title}}\" faoi bhratach le hathbhreithniú — scór turscair {{score}}/100",
+  "marketplace_enforcement.under_review_bell": "Tuairiscíodh do liostú \"{{title}}\" agus tá sé á athbhreithniú.",
+  "marketplace_enforcement.action_bell": "Gníomh déanta ar do liostú \"{{title}}\": {{action}}.",
+  "marketplace_enforcement.cleared_bell": "Rinneadh athbhreithniú ar thuairisc faoi do liostú \"{{title}}\" — níor glacadh aon ghníomh.",
+  "marketplace_enforcement.appeal_outcome_bell": "Réitíodh achomharc do do liostú \"{{title}}\": {{action}}."
 }

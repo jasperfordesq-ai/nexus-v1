@@ -702,5 +702,23 @@
     "marketplace_body": "Złożono zgłoszenie marketplace (zgłoszenie #{{report_id}}). Powód: {{reason}}. Zgodnie z aktem o usługach cyfrowych (DSA) należy je potwierdzić i rozpatrzyć w ciągu 24 godzin. Sprawdź je teraz w panelu administracyjnym.",
     "job_subject": "Ogłoszenie o pracę oznaczone do przeglądu — {{title}}",
     "job_body": "Ogłoszenie o pracę zostało automatycznie oznaczone jako możliwy spam. Tytuł: {{title}} (#{{job_id}}). Wynik spamu: {{score}}/100. Oczekuje na przegląd — zatwierdź je lub odrzuć w panelu administracyjnym."
+  },
+  "marketplace_enforcement": {
+    "reason_unspecified": "nie podano",
+    "cta_view": "Zobacz ogłoszenie",
+    "cta_appeal": "Odwołaj się od tej decyzji",
+    "action_label_listing_removed": "ogłoszenie usunięte",
+    "action_label_seller_suspended": "konto zawieszone",
+    "action_label_listing_rejected": "ogłoszenie odrzucone",
+    "action_label_none": "brak dalszych działań",
+    "under_review_subject": "Twoje ogłoszenie zostało zgłoszone — w trakcie sprawdzania",
+    "under_review_body": "Twoje ogłoszenie „{{title}}” zostało zgłoszone i jest sprawdzane przez nasz zespół moderacji. Poinformujemy Cię o wyniku. Ze względu na prywatność nie możemy ujawnić, kto je zgłosił.",
+    "action_subject": "Podjęto działanie wobec Twojego ogłoszenia — {{title}}",
+    "action_body": "Po przeglądzie moderacyjnym Twojego ogłoszenia „{{title}}” podjęto następujące działanie: {{action}}. Powód: {{reason}}.",
+    "action_appeal_note": "Jeśli uważasz, że ta decyzja jest błędna, możesz odwołać się w ciągu 14 dni.",
+    "cleared_subject": "Twoje ogłoszenie zgłoszono — bez działań",
+    "cleared_body": "Zgłoszenie dotyczące Twojego ogłoszenia „{{title}}” zostało sprawdzone i nie podjęto żadnych działań. Twoje ogłoszenie pozostaje aktywne. Dziękujemy, że jesteś częścią społeczności.",
+    "appeal_outcome_subject": "Decyzja w sprawie odwołania — Twoje ogłoszenie „{{title}}”",
+    "appeal_outcome_body": "Odwołanie dotyczące Twojego ogłoszenia „{{title}}” zostało rozpatrzone. Wynik: {{action}}. Powód: {{reason}}. To jest decyzja ostateczna."
   }
 }

@@ -702,5 +702,23 @@
     "marketplace_body": "マーケットプレイスの通報が提出されました（通報 #{{report_id}}）。理由：{{reason}}。デジタルサービス法（DSA）に基づき、24時間以内に確認・対応する必要があります。今すぐ管理パネルで確認してください。",
     "job_subject": "求人がレビュー対象に — {{title}}",
     "job_body": "求人が自動的にスパムの可能性ありとしてフラグされました。タイトル：{{title}}（#{{job_id}}）。スパムスコア：{{score}}/100。レビュー待ちで保留中です — 管理パネルで承認または却下してください。"
+  },
+  "marketplace_enforcement": {
+    "reason_unspecified": "指定なし",
+    "cta_view": "出品を見る",
+    "cta_appeal": "この決定に異議を申し立てる",
+    "action_label_listing_removed": "出品削除",
+    "action_label_seller_suspended": "アカウント停止",
+    "action_label_listing_rejected": "出品却下",
+    "action_label_none": "追加の措置なし",
+    "under_review_subject": "あなたの出品が通報されました — 審査中",
+    "under_review_body": "あなたの出品「{{title}}」が通報され、モデレーションチームが審査しています。結果はお知らせします。プライバシー保護のため、通報者をお伝えすることはできません。",
+    "action_subject": "あなたの出品に対する措置 — {{title}}",
+    "action_body": "あなたの出品「{{title}}」のモデレーション審査の結果、次の措置を講じました：{{action}}。理由：{{reason}}。",
+    "action_appeal_note": "この決定が誤りであるとお考えの場合、14日以内に異議を申し立てることができます。",
+    "cleared_subject": "あなたの出品が通報されました — 措置なし",
+    "cleared_body": "あなたの出品「{{title}}」に関する通報を審査しましたが、措置は講じませんでした。出品は引き続き有効です。コミュニティにご参加いただきありがとうございます。",
+    "appeal_outcome_subject": "異議申し立ての決定 — あなたの出品「{{title}}」",
+    "appeal_outcome_body": "あなたの出品「{{title}}」に関する異議申し立てが解決しました。結果：{{action}}。理由：{{reason}}。これが最終決定です。"
   }
 }

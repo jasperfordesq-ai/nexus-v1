@@ -115,6 +115,7 @@ return [
     'push_hot_match' => 'Hot Match Found',
     'push_mutual_match' => 'Mutual Match Found',
     'push_default' => 'New Notification',
+    'push_marketplace_enforcement' => 'تحديث بشأن إعلانك',
     'push_feed_report_created' => 'بلاغ جديد',
     'push_social_report_created' => 'بلاغ جديد',
     'push_listing_report_created' => 'بلاغ إعلان جديد',

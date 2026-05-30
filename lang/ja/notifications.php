@@ -115,6 +115,7 @@ return [
     'push_hot_match' => 'Hot Match Found',
     'push_mutual_match' => 'Mutual Match Found',
     'push_default' => 'New Notification',
+    'push_marketplace_enforcement' => '出品に関する更新',
     'push_feed_report_created' => '新しい通報',
     'push_social_report_created' => '新しい通報',
     'push_listing_report_created' => '新しい出品の通報',

@@ -114,5 +114,9 @@
   "social_report.admin_alert": "New content report: {{target_type}} reported — {{reason}}",
   "listing_report.admin_alert": "New listing report: \"{{listing_title}}\" — {{reason}}",
   "marketplace_report.admin_alert": "Marketplace report #{{report_id}} — review within 24h (DSA). Reason: {{reason}}",
-  "job_vacancy.spam_flag": "Job \"{{title}}\" flagged for review — spam score {{score}}/100"
+  "job_vacancy.spam_flag": "Job \"{{title}}\" flagged for review — spam score {{score}}/100",
+  "marketplace_enforcement.under_review_bell": "Your listing \"{{title}}\" was reported and is under review.",
+  "marketplace_enforcement.action_bell": "Action taken on your listing \"{{title}}\": {{action}}.",
+  "marketplace_enforcement.cleared_bell": "A report about your listing \"{{title}}\" was reviewed — no action taken.",
+  "marketplace_enforcement.appeal_outcome_bell": "Appeal resolved for your listing \"{{title}}\": {{action}}."
 }

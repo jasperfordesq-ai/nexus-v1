@@ -120,5 +120,9 @@
   "social_report.admin_alert": "Nieuwe inhoudsmelding: {{target_type}} gemeld — {{reason}}",
   "listing_report.admin_alert": "Nieuwe advertentiemelding: \"{{listing_title}}\" — {{reason}}",
   "marketplace_report.admin_alert": "Marktplaatsmelding #{{report_id}} — beoordeel binnen 24 u (DSA). Reden: {{reason}}",
-  "job_vacancy.spam_flag": "Vacature \"{{title}}\" gemarkeerd voor beoordeling — spamscore {{score}}/100"
+  "job_vacancy.spam_flag": "Vacature \"{{title}}\" gemarkeerd voor beoordeling — spamscore {{score}}/100",
+  "marketplace_enforcement.under_review_bell": "Je advertentie \"{{title}}\" is gemeld en wordt beoordeeld.",
+  "marketplace_enforcement.action_bell": "Actie ondernomen op je advertentie \"{{title}}\": {{action}}.",
+  "marketplace_enforcement.cleared_bell": "Een melding over je advertentie \"{{title}}\" is beoordeeld — geen actie ondernomen.",
+  "marketplace_enforcement.appeal_outcome_bell": "Bezwaar afgehandeld voor je advertentie \"{{title}}\": {{action}}."
 }

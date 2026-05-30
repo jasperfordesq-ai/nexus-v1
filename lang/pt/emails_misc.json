@@ -702,5 +702,23 @@
     "marketplace_body": "Foi apresentado um relatório do marketplace (relatório #{{report_id}}). Motivo: {{reason}}. Ao abrigo do Regulamento dos Serviços Digitais (DSA) deve ser confirmado e tratado em 24 horas. Reveja-o agora no painel de administração.",
     "job_subject": "Vaga marcada para revisão — {{title}}",
     "job_body": "Uma vaga foi automaticamente marcada como possível spam. Título: {{title}} (#{{job_id}}). Pontuação de spam: {{score}}/100. Está pendente de revisão — aprove-a ou rejeite-a no painel de administração."
+  },
+  "marketplace_enforcement": {
+    "reason_unspecified": "não especificado",
+    "cta_view": "Ver anúncio",
+    "cta_appeal": "Recorrer desta decisão",
+    "action_label_listing_removed": "anúncio removido",
+    "action_label_seller_suspended": "conta suspensa",
+    "action_label_listing_rejected": "anúncio rejeitado",
+    "action_label_none": "nenhuma medida adicional",
+    "under_review_subject": "O seu anúncio foi denunciado — em análise",
+    "under_review_body": "O seu anúncio \"{{title}}\" foi denunciado e está a ser analisado pela nossa equipa de moderação. Iremos informá-lo do resultado. Por motivos de privacidade não podemos dizer quem o denunciou.",
+    "action_subject": "Medida tomada sobre o seu anúncio — {{title}}",
+    "action_body": "Na sequência de uma análise de moderação do seu anúncio \"{{title}}\", foi tomada a seguinte medida: {{action}}. Motivo: {{reason}}.",
+    "action_appeal_note": "Se considera que esta decisão foi um erro, pode recorrer no prazo de 14 dias.",
+    "cleared_subject": "O seu anúncio foi denunciado — nenhuma medida",
+    "cleared_body": "Uma denúncia sobre o seu anúncio \"{{title}}\" foi analisada e não foi tomada nenhuma medida. O seu anúncio permanece ativo. Obrigado por fazer parte da comunidade.",
+    "appeal_outcome_subject": "Decisão do recurso — o seu anúncio \"{{title}}\"",
+    "appeal_outcome_body": "Um recurso relativo ao seu anúncio \"{{title}}\" foi resolvido. Resultado: {{action}}. Motivo: {{reason}}. Esta é a decisão final."
   }
 }

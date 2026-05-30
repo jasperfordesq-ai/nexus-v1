@@ -178,6 +178,7 @@ return [
     'push_mutual_match'              => 'Mutual Match Found',
     'push_default'                   => 'New Notification',
 
+    'push_marketplace_enforcement' => 'Update on your listing',
     'push_feed_report_created' => 'New content report',
     'push_social_report_created' => 'New content report',
     'push_listing_report_created' => 'New listing report',

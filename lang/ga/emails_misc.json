@@ -702,5 +702,23 @@
     "marketplace_body": "Comhdaíodh tuairisc mhargaidh (tuairisc #{{report_id}}). Fáth: {{reason}}. Faoi rialacha an Achta um Sheirbhísí Digiteacha (DSA) ní mór é a admháil agus gníomhú air laistigh de 24 uair. Déan athbhreithniú air anois sa phainéal riaracháin.",
     "job_subject": "Cuireadh fógra poist faoi bhratach le hathbhreithniú — {{title}}",
     "job_body": "Cuireadh fógra poist faoi bhratach go huathoibríoch mar thurscar féideartha. Teideal: {{title}} (#{{job_id}}). Scór turscair: {{score}}/100. Tá sé ar coinneáil go dtí an t-athbhreithniú — formheas nó diúltaigh dó sa phainéal riaracháin."
+  },
+  "marketplace_enforcement": {
+    "reason_unspecified": "gan sonrú",
+    "cta_view": "Féach ar an liostú",
+    "cta_appeal": "Déan achomharc in aghaidh an chinnidh seo",
+    "action_label_listing_removed": "liostú bainte",
+    "action_label_seller_suspended": "cuntas ar fionraí",
+    "action_label_listing_rejected": "liostú diúltaithe",
+    "action_label_none": "gan tuilleadh gnímh",
+    "under_review_subject": "Tuairiscíodh do liostú — á athbhreithniú",
+    "under_review_body": "Tuairiscíodh do liostú \"{{title}}\" agus tá ár bhfoireann modhnóireachta á athbhreithniú. Cuirfimid an toradh in iúl duit. Ar chúiseanna príobháideachais ní féidir linn a rá cé a thuairiscigh é.",
+    "action_subject": "Gníomh déanta ar do liostú — {{title}}",
+    "action_body": "Tar éis athbhreithniú modhnóireachta ar do liostú \"{{title}}\", glacadh an gníomh seo a leanas: {{action}}. Fáth: {{reason}}.",
+    "action_appeal_note": "Má chreideann tú gur botún a bhí sa chinneadh seo, is féidir leat achomharc a dhéanamh laistigh de 14 lá.",
+    "cleared_subject": "Tuairiscíodh do liostú — gan ghníomh",
+    "cleared_body": "Rinneadh athbhreithniú ar thuairisc faoi do liostú \"{{title}}\" agus níor glacadh aon ghníomh. Tá do liostú fós gníomhach. Go raibh maith agat as bheith mar chuid den phobal.",
+    "appeal_outcome_subject": "Cinneadh achomhairc — do liostú \"{{title}}\"",
+    "appeal_outcome_body": "Réitíodh achomharc maidir le do liostú \"{{title}}\". Toradh: {{action}}. Fáth: {{reason}}. Is é seo an cinneadh deiridh."
   }
 }

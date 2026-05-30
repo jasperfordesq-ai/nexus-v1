@@ -120,5 +120,9 @@
   "social_report.admin_alert": "Neue Inhaltsmeldung: {{target_type}} gemeldet — {{reason}}",
   "listing_report.admin_alert": "Neue Inseratsmeldung: „{{listing_title}}“ — {{reason}}",
   "marketplace_report.admin_alert": "Marktplatz-Meldung #{{report_id}} — Prüfung innerhalb von 24 Std. (DSA). Grund: {{reason}}",
-  "job_vacancy.spam_flag": "Stelle „{{title}}“ zur Prüfung markiert — Spam-Score {{score}}/100"
+  "job_vacancy.spam_flag": "Stelle „{{title}}“ zur Prüfung markiert — Spam-Score {{score}}/100",
+  "marketplace_enforcement.under_review_bell": "Ihr Inserat „{{title}}“ wurde gemeldet und wird geprüft.",
+  "marketplace_enforcement.action_bell": "Maßnahme zu Ihrem Inserat „{{title}}“: {{action}}.",
+  "marketplace_enforcement.cleared_bell": "Eine Meldung zu Ihrem Inserat „{{title}}“ wurde geprüft — keine Maßnahme ergriffen.",
+  "marketplace_enforcement.appeal_outcome_bell": "Einspruch zu Ihrem Inserat „{{title}}“ entschieden: {{action}}."
 }

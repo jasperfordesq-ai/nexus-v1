@@ -120,5 +120,9 @@
   "social_report.admin_alert": "بلاغ محتوى جديد: تم الإبلاغ عن {{target_type}} — {{reason}}",
   "listing_report.admin_alert": "بلاغ جديد عن إعلان: \"{{listing_title}}\" — {{reason}}",
   "marketplace_report.admin_alert": "بلاغ السوق رقم {{report_id}} — يجب المراجعة خلال 24 ساعة (DSA). السبب: {{reason}}",
-  "job_vacancy.spam_flag": "تم وضع علامة على الوظيفة \"{{title}}\" للمراجعة — درجة الرسائل المزعجة {{score}}/100"
+  "job_vacancy.spam_flag": "تم وضع علامة على الوظيفة \"{{title}}\" للمراجعة — درجة الرسائل المزعجة {{score}}/100",
+  "marketplace_enforcement.under_review_bell": "تم الإبلاغ عن إعلانك \"{{title}}\" وهو قيد المراجعة.",
+  "marketplace_enforcement.action_bell": "تم اتخاذ إجراء بشأن إعلانك \"{{title}}\": {{action}}.",
+  "marketplace_enforcement.cleared_bell": "تمت مراجعة بلاغ بخصوص إعلانك \"{{title}}\" — لم يُتخذ أي إجراء.",
+  "marketplace_enforcement.appeal_outcome_bell": "تم البت في الطعن بخصوص إعلانك \"{{title}}\": {{action}}."
 }

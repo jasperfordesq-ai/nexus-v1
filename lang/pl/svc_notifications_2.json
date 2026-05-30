@@ -120,5 +120,9 @@
   "social_report.admin_alert": "Nowe zgłoszenie treści: {{target_type}} zgłoszone — {{reason}}",
   "listing_report.admin_alert": "Nowe zgłoszenie ogłoszenia: „{{listing_title}}” — {{reason}}",
   "marketplace_report.admin_alert": "Zgłoszenie marketplace #{{report_id}} — przejrzyj w 24 h (DSA). Powód: {{reason}}",
-  "job_vacancy.spam_flag": "Ogłoszenie „{{title}}” oznaczone do przeglądu — wynik spamu {{score}}/100"
+  "job_vacancy.spam_flag": "Ogłoszenie „{{title}}” oznaczone do przeglądu — wynik spamu {{score}}/100",
+  "marketplace_enforcement.under_review_bell": "Twoje ogłoszenie „{{title}}” zostało zgłoszone i jest sprawdzane.",
+  "marketplace_enforcement.action_bell": "Podjęto działanie wobec Twojego ogłoszenia „{{title}}”: {{action}}.",
+  "marketplace_enforcement.cleared_bell": "Zgłoszenie dotyczące Twojego ogłoszenia „{{title}}” sprawdzono — nie podjęto działań.",
+  "marketplace_enforcement.appeal_outcome_bell": "Odwołanie rozpatrzone dla Twojego ogłoszenia „{{title}}”: {{action}}."
 }

@@ -150,6 +150,19 @@ class MarketplaceReportService
             'emails_misc.marketplace_report.received_cta'
         );
 
+        // Notify the SELLER their listing is under review (DSA transparency).
+        try {
+            self::notifySellerEnforcement(
+                (int) ($report->listing->user_id ?? 0),
+                (int) $report->tenant_id,
+                (int) $report->marketplace_listing_id,
+                (string) ($report->listing->title ?? ''),
+                'under_review'
+            );
+        } catch (\Throwable $e) {
+            Log::warning('[MarketplaceReportService] acknowledge seller notice failed: ' . $e->getMessage());
+        }
+
         return $report;
     }
 
@@ -211,6 +224,23 @@ class MarketplaceReportService
             );
         } catch (\Throwable $e) {
             Log::warning('[MarketplaceReportService] resolveReport email failed: ' . $e->getMessage());
+        }
+
+        // Notify the SELLER of the outcome (DSA transparency): enforcement detail
+        // + appeal rights when action was taken, or a "no action" clearance.
+        // The reporter's identity is never disclosed to the seller.
+        try {
+            self::notifySellerEnforcement(
+                (int) ($report->listing->user_id ?? 0),
+                (int) $report->tenant_id,
+                (int) $report->marketplace_listing_id,
+                (string) ($report->listing->title ?? ''),
+                $actionTaken !== 'none' ? 'action' : 'cleared',
+                $actionTaken !== 'none' ? $actionTaken : '',
+                $report->resolution_reason
+            );
+        } catch (\Throwable $e) {
+            Log::warning('[MarketplaceReportService] resolve seller notice failed: ' . $e->getMessage());
         }
 
         return $report;
@@ -313,6 +343,22 @@ class MarketplaceReportService
             );
         } catch (\Throwable $e) {
             Log::warning('[MarketplaceReportService] resolveAppeal email failed: ' . $e->getMessage());
+        }
+
+        // Notify the SELLER of the final appeal outcome (DSA — end of the
+        // appeals process). Reporter identity is never disclosed.
+        try {
+            self::notifySellerEnforcement(
+                (int) ($report->listing->user_id ?? 0),
+                (int) $report->tenant_id,
+                (int) $report->marketplace_listing_id,
+                (string) ($report->listing->title ?? ''),
+                'appeal_outcome',
+                $actionTaken !== 'none' ? $actionTaken : '',
+                $report->resolution_reason
+            );
+        } catch (\Throwable $e) {
+            Log::warning('[MarketplaceReportService] appeal seller notice failed: ' . $e->getMessage());
         }
 
         return $report;
@@ -490,6 +536,15 @@ class MarketplaceReportService
                     '/marketplace/reports/' . $report->id,
                     'emails_misc.marketplace_report.received_cta'
                 );
+
+                // Notify the SELLER their listing is under review (DSA transparency).
+                self::notifySellerEnforcement(
+                    (int) ($report->listing->user_id ?? 0),
+                    (int) $report->tenant_id,
+                    (int) $report->marketplace_listing_id,
+                    (string) ($report->listing->title ?? ''),
+                    'under_review'
+                );
             } catch (\Throwable $e) {
                 Log::warning('[MarketplaceReportService] processUnacknowledged email failed: ' . $e->getMessage());
             } finally {
@@ -513,6 +568,81 @@ class MarketplaceReportService
     // -----------------------------------------------------------------
     //  Email helpers
     // -----------------------------------------------------------------
+
+    /**
+     * Notify a marketplace SELLER (listing owner) about a moderation action on
+     * their listing — DSA transparency. Sends bell + device push + email in the
+     * seller's own preferred_language. Reporter identity and report details are
+     * NEVER disclosed; the seller is told only what happened, a generic reason,
+     * and (for enforcement) their appeal rights. Best-effort and failure
+     * isolated — nothing here may unwind the moderation action.
+     *
+     * @param string $event     one of: under_review | action | cleared | appeal_outcome
+     * @param string $actionCode listing_removed | seller_suspended | listing_rejected | '' (none)
+     * @param string $reason    free-text moderation reason (optional)
+     */
+    public static function notifySellerEnforcement(int $sellerId, int $tenantId, int $listingId, string $listingTitle, string $event, string $actionCode = '', ?string $reason = null): void
+    {
+        if ($sellerId <= 0 || $tenantId <= 0) {
+            return;
+        }
+
+        $seller = DB::table('users')
+            ->where('id', $sellerId)
+            ->where('tenant_id', $tenantId)
+            ->first(['id', 'email', 'first_name', 'preferred_language']);
+        if (!$seller) {
+            return;
+        }
+
+        $isEnforcement = in_array($event, ['action', 'appeal_outcome'], true);
+        $link = '/marketplace/listings/' . $listingId;
+
+        \App\I18n\LocaleContext::withLocale($seller, function () use ($seller, $sellerId, $tenantId, $event, $actionCode, $reason, $listingTitle, $link, $isEnforcement): void {
+            $ns = 'emails_misc.marketplace_enforcement.';
+            $actionLabel = $actionCode !== '' ? __($ns . 'action_label_' . $actionCode) : __($ns . 'action_label_none');
+            $params = [
+                'title'  => $listingTitle !== '' ? $listingTitle : ('#' . 0),
+                'action' => $actionLabel,
+                'reason' => ($reason !== null && trim($reason) !== '') ? $reason : __($ns . 'reason_unspecified'),
+            ];
+
+            $bellMsg = trim(strip_tags(__('svc_notifications_2.marketplace_enforcement.' . $event . '_bell', $params)));
+
+            try {
+                Notification::createNotification($sellerId, $bellMsg, $link, 'marketplace_enforcement', true, $tenantId);
+            } catch (\Throwable $e) {
+                Log::warning('[MarketplaceReportService] seller enforcement bell failed: ' . $e->getMessage(), ['user_id' => $sellerId]);
+            }
+
+            try {
+                \App\Services\NotificationDispatcher::fanOutPush($sellerId, 'marketplace_enforcement', $bellMsg, $link);
+            } catch (\Throwable $e) {
+                Log::debug('[MarketplaceReportService] seller enforcement push failed: ' . $e->getMessage());
+            }
+
+            if (empty($seller->email)) {
+                return;
+            }
+            try {
+                $base    = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix();
+                $subject = __($ns . $event . '_subject', $params);
+                $builder = \App\Core\EmailTemplateBuilder::make()
+                    ->theme($isEnforcement ? 'danger' : 'brand')
+                    ->title($subject)
+                    ->paragraph(__($ns . $event . '_body', $params));
+                if ($isEnforcement) {
+                    $builder->paragraph(__($ns . 'action_appeal_note'))
+                        ->button(__($ns . 'cta_appeal'), $base . '/marketplace/reports');
+                } else {
+                    $builder->button(__($ns . 'cta_view'), $base . $link);
+                }
+                \App\Services\EmailDispatchService::sendRaw($seller->email, $subject, $builder->render(), null, null, null, 'marketplace', ['tenant_id' => $tenantId]);
+            } catch (\Throwable $e) {
+                Log::warning('[MarketplaceReportService] seller enforcement email failed: ' . $e->getMessage(), ['user_id' => $sellerId]);
+            }
+        });
+    }
 
     /**
      * Persist and immediately attempt report lifecycle notifications.

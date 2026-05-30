@@ -702,5 +702,23 @@
     "marketplace_body": "A marketplace report has been filed (report #{{report_id}}). Reason: {{reason}}. Under Digital Services Act rules this must be acknowledged and acted on within 24 hours. Please review it in the admin panel now.",
     "job_subject": "Job posting flagged for review — {{title}}",
     "job_body": "A job posting was automatically flagged as possible spam. Title: {{title}} (#{{job_id}}). Spam score: {{score}}/100. It is held pending review — please approve or reject it in the admin panel."
+  },
+  "marketplace_enforcement": {
+    "reason_unspecified": "not specified",
+    "cta_view": "View listing",
+    "cta_appeal": "Appeal this decision",
+    "action_label_listing_removed": "listing removed",
+    "action_label_seller_suspended": "account suspended",
+    "action_label_listing_rejected": "listing rejected",
+    "action_label_none": "no further action",
+    "under_review_subject": "Your listing has been reported — under review",
+    "under_review_body": "Your listing \"{{title}}\" has been reported and is being reviewed by our moderation team. We'll let you know the outcome. For privacy reasons we can't tell you who reported it.",
+    "action_subject": "Action taken on your listing — {{title}}",
+    "action_body": "Following a moderation review of your listing \"{{title}}\", the following action was taken: {{action}}. Reason: {{reason}}.",
+    "action_appeal_note": "If you believe this decision was a mistake, you can appeal within 14 days.",
+    "cleared_subject": "Your listing was reported — no action taken",
+    "cleared_body": "A report about your listing \"{{title}}\" has been reviewed and no action was taken. Your listing remains active. Thank you for being part of the community.",
+    "appeal_outcome_subject": "Appeal decision — your listing \"{{title}}\"",
+    "appeal_outcome_body": "An appeal regarding your listing \"{{title}}\" has been resolved. Outcome: {{action}}. Reason: {{reason}}. This is the final decision."
   }
 }

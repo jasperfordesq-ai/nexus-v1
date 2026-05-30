@@ -702,5 +702,23 @@
     "marketplace_body": "Se ha presentado un informe de marketplace (informe #{{report_id}}). Motivo: {{reason}}. Según el Reglamento de Servicios Digitales (DSA) debe acusarse y tramitarse en 24 horas. Revísalo ahora en el panel de administración.",
     "job_subject": "Oferta de empleo marcada para revisión — {{title}}",
     "job_body": "Una oferta de empleo se marcó automáticamente como posible spam. Título: {{title}} (#{{job_id}}). Puntuación de spam: {{score}}/100. Está pendiente de revisión — apruébala o recházala en el panel de administración."
+  },
+  "marketplace_enforcement": {
+    "reason_unspecified": "no especificado",
+    "cta_view": "Ver anuncio",
+    "cta_appeal": "Apelar esta decisión",
+    "action_label_listing_removed": "anuncio eliminado",
+    "action_label_seller_suspended": "cuenta suspendida",
+    "action_label_listing_rejected": "anuncio rechazado",
+    "action_label_none": "sin más medidas",
+    "under_review_subject": "Tu anuncio ha sido denunciado — en revisión",
+    "under_review_body": "Tu anuncio \"{{title}}\" ha sido denunciado y nuestro equipo de moderación lo está revisando. Te informaremos del resultado. Por motivos de privacidad no podemos decirte quién lo denunció.",
+    "action_subject": "Medida tomada sobre tu anuncio — {{title}}",
+    "action_body": "Tras una revisión de moderación de tu anuncio \"{{title}}\", se tomó la siguiente medida: {{action}}. Motivo: {{reason}}.",
+    "action_appeal_note": "Si crees que esta decisión es un error, puedes apelar en un plazo de 14 días.",
+    "cleared_subject": "Tu anuncio fue denunciado — sin medidas",
+    "cleared_body": "Una denuncia sobre tu anuncio \"{{title}}\" ha sido revisada y no se tomó ninguna medida. Tu anuncio sigue activo. Gracias por formar parte de la comunidad.",
+    "appeal_outcome_subject": "Decisión de apelación — tu anuncio \"{{title}}\"",
+    "appeal_outcome_body": "Una apelación sobre tu anuncio \"{{title}}\" se ha resuelto. Resultado: {{action}}. Motivo: {{reason}}. Esta es la decisión final."
   }
 }

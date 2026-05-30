@@ -702,5 +702,23 @@
     "marketplace_body": "Un signalement Marketplace a été déposé (signalement #{{report_id}}). Motif : {{reason}}. Conformément au Digital Services Act, il doit être accusé de réception et traité sous 24 heures. Veuillez l’examiner dès maintenant dans le panneau d’administration.",
     "job_subject": "Offre d’emploi signalée pour examen — {{title}}",
     "job_body": "Une offre d’emploi a été automatiquement signalée comme spam potentiel. Titre : {{title}} (#{{job_id}}). Score de spam : {{score}}/100. Elle est en attente d’examen — veuillez l’approuver ou la refuser dans le panneau d’administration."
+  },
+  "marketplace_enforcement": {
+    "reason_unspecified": "non précisé",
+    "cta_view": "Voir l’annonce",
+    "cta_appeal": "Contester cette décision",
+    "action_label_listing_removed": "annonce supprimée",
+    "action_label_seller_suspended": "compte suspendu",
+    "action_label_listing_rejected": "annonce rejetée",
+    "action_label_none": "aucune autre mesure",
+    "under_review_subject": "Votre annonce a été signalée — en cours d’examen",
+    "under_review_body": "Votre annonce « {{title}} » a été signalée et est examinée par notre équipe de modération. Nous vous communiquerons le résultat. Pour des raisons de confidentialité, nous ne pouvons pas vous dire qui l’a signalée.",
+    "action_subject": "Mesure prise concernant votre annonce — {{title}}",
+    "action_body": "À la suite d’un examen de modération de votre annonce « {{title}} », la mesure suivante a été prise : {{action}}. Motif : {{reason}}.",
+    "action_appeal_note": "Si vous estimez que cette décision est une erreur, vous pouvez faire appel dans un délai de 14 jours.",
+    "cleared_subject": "Votre annonce a été signalée — aucune mesure prise",
+    "cleared_body": "Un signalement concernant votre annonce « {{title}} » a été examiné et aucune mesure n’a été prise. Votre annonce reste active. Merci de faire partie de la communauté.",
+    "appeal_outcome_subject": "Décision d’appel — votre annonce « {{title}} »",
+    "appeal_outcome_body": "Un appel concernant votre annonce « {{title}} » a été résolu. Résultat : {{action}}. Motif : {{reason}}. Il s’agit de la décision finale."
   }
 }

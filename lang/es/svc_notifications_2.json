@@ -120,5 +120,9 @@
   "social_report.admin_alert": "Nuevo informe de contenido: {{target_type}} denunciado — {{reason}}",
   "listing_report.admin_alert": "Nuevo informe de anuncio: \"{{listing_title}}\" — {{reason}}",
   "marketplace_report.admin_alert": "Informe de marketplace #{{report_id}} — revisar en 24 h (DSA). Motivo: {{reason}}",
-  "job_vacancy.spam_flag": "Empleo \"{{title}}\" marcado para revisión — puntuación de spam {{score}}/100"
+  "job_vacancy.spam_flag": "Empleo \"{{title}}\" marcado para revisión — puntuación de spam {{score}}/100",
+  "marketplace_enforcement.under_review_bell": "Tu anuncio \"{{title}}\" ha sido denunciado y está en revisión.",
+  "marketplace_enforcement.action_bell": "Medida tomada sobre tu anuncio \"{{title}}\": {{action}}.",
+  "marketplace_enforcement.cleared_bell": "Una denuncia sobre tu anuncio \"{{title}}\" fue revisada — no se tomó ninguna medida.",
+  "marketplace_enforcement.appeal_outcome_bell": "Apelación resuelta para tu anuncio \"{{title}}\": {{action}}."
 }
