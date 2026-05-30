@@ -139,7 +139,15 @@
     "reporter_status_title": "Safeguarding Report Update",
     "reporter_status_preview": "Your report status has been updated to: :status",
     "reporter_status_body": "Your safeguarding report #:incident_id has been updated. The current status is now: :status.",
-    "reporter_status_confidentiality": "This report is handled with strict confidentiality. If you have additional information to share, please contact your community coordinator."
+    "reporter_status_confidentiality": "This report is handled with strict confidentiality. If you have additional information to share, please contact your community coordinator.",
+    "assignment_subject": "セーフガーディング報告が割り当てられました — {{severity}}",
+    "assignment_title": "あなたに割り当てられたセーフガーディング報告",
+    "assignment_body": "セーフガーディング報告 #{{id}} があなたに割り当てられました（カテゴリ：{{category}}、重大度：{{severity}}）。確認期限：{{review_due_at}}。報告を開いて確認を開始してください。",
+    "assignment_cta": "報告を開く",
+    "escalation_subject": "エスカレーション — セーフガーディング報告 #{{id}}",
+    "escalation_title": "セーフガーディング報告がエスカレーションされました",
+    "escalation_body": "セーフガーディング報告 #{{id}}（重大度：{{severity}}、カテゴリ：{{category}}）は、確認期限（{{review_due_at}}）を過ぎたためエスカレーションされました。直ちに確認が必要です。",
+    "escalation_cta": "今すぐ確認"
   },
   "onboarding_completed": {
     "subject": "You're all set, {{name}}! Welcome to {{community}}",

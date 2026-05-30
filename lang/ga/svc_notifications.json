@@ -3,7 +3,9 @@
     "collection_complete": "Bailiúchán Críochnaithe! Chríochnaigh tú '{{name}}' agus thuill tú {{xp}} XP bónais! {{icon}}"
   },
   "safeguarding": {
-    "critical_report_submitted": "Tuarascáil chosanta criticiúil curtha isteach"
+    "critical_report_submitted": "Tuarascáil chosanta criticiúil curtha isteach",
+    "assigned_bell": "Sannadh tuairisc chosanta #{{id}} duit ({{severity}}, {{category}})",
+    "escalated_bell": "Géaraíodh tuairisc chosanta #{{id}} ({{severity}}, {{category}}) — sáraíodh an SLA"
   },
   "broker": {
     "message_for_review": "Teachtaireacht nua le hathbhreithniú ó {{sender}}"

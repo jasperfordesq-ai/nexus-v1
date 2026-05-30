@@ -3,7 +3,9 @@
     "collection_complete": "اكتملت المجموعة! لقد أنهيت '{{name}}' وحصلت على {{xp}} نقطة XP إضافية! {{icon}}"
   },
   "safeguarding": {
-    "critical_report_submitted": "تم تقديم تقرير حماية حرج"
+    "critical_report_submitted": "تم تقديم تقرير حماية حرج",
+    "assigned_bell": "تم تعيين بلاغ الحماية رقم {{id}} إليك ({{severity}}، {{category}})",
+    "escalated_bell": "تم تصعيد بلاغ الحماية رقم {{id}} ({{severity}}، {{category}}) — تجاوز اتفاقية مستوى الخدمة"
   },
   "broker": {
     "message_for_review": "رسالة جديدة في انتظار المراجعة من {{sender}}"

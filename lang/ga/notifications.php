@@ -112,6 +112,8 @@ return [
     'push_hot_match' => 'Hot Match Found',
     'push_mutual_match' => 'Mutual Match Found',
     'push_default' => 'New Notification',
+    'push_safeguarding_assigned' => 'Sannadh tuairisc chosanta',
+    'push_safeguarding_escalated' => 'Géaraíodh an tuairisc',
     'push_new_message' => 'Teachtaireacht Nua',
     'push_connection_request' => 'Iarratas Nasctha Nua',
     'push_connection_accepted' => 'Nasc Glactha',

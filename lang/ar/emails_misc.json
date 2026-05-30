@@ -139,7 +139,15 @@
     "reporter_status_title": "Safeguarding Report Update",
     "reporter_status_preview": "Your report status has been updated to: :status",
     "reporter_status_body": "Your safeguarding report #:incident_id has been updated. The current status is now: :status.",
-    "reporter_status_confidentiality": "This report is handled with strict confidentiality. If you have additional information to share, please contact your community coordinator."
+    "reporter_status_confidentiality": "This report is handled with strict confidentiality. If you have additional information to share, please contact your community coordinator.",
+    "assignment_subject": "تم تعيين بلاغ حماية — {{severity}}",
+    "assignment_title": "تم تعيين بلاغ حماية إليك",
+    "assignment_body": "تم تعيين بلاغ الحماية رقم {{id}} إليك (الفئة: {{category}}، الخطورة: {{severity}}). الموعد النهائي للمراجعة: {{review_due_at}}. يرجى فتح البلاغ وبدء المراجعة.",
+    "assignment_cta": "فتح البلاغ",
+    "escalation_subject": "تصعيد — بلاغ الحماية رقم {{id}}",
+    "escalation_title": "تم تصعيد بلاغ الحماية",
+    "escalation_body": "تم تصعيد بلاغ الحماية رقم {{id}} (الخطورة: {{severity}}، الفئة: {{category}}) لأن الموعد النهائي لمراجعته ({{review_due_at}}) قد انقضى. المراجعة الفورية مطلوبة.",
+    "escalation_cta": "راجع الآن"
   },
   "onboarding_completed": {
     "subject": "You're all set, {{name}}! Welcome to {{community}}",

@@ -139,7 +139,15 @@
     "reporter_status_title": "Safeguarding Report Update",
     "reporter_status_preview": "Your report status has been updated to: :status",
     "reporter_status_body": "Your safeguarding report #:incident_id has been updated. The current status is now: :status.",
-    "reporter_status_confidentiality": "This report is handled with strict confidentiality. If you have additional information to share, please contact your community coordinator."
+    "reporter_status_confidentiality": "This report is handled with strict confidentiality. If you have additional information to share, please contact your community coordinator.",
+    "assignment_subject": "Safeguarding report assigned — {{severity}}",
+    "assignment_title": "Safeguarding report assigned to you",
+    "assignment_body": "You have been assigned safeguarding report #{{id}} (category: {{category}}, severity: {{severity}}). Review deadline: {{review_due_at}}. Please open the report and begin your review.",
+    "assignment_cta": "Open report",
+    "escalation_subject": "Escalation — safeguarding report #{{id}}",
+    "escalation_title": "Safeguarding report escalated",
+    "escalation_body": "Safeguarding report #{{id}} (severity: {{severity}}, category: {{category}}) has been escalated because its review deadline ({{review_due_at}}) passed. Immediate review is required.",
+    "escalation_cta": "Review now"
   },
   "onboarding_completed": {
     "subject": "You're all set, {{name}}! Welcome to {{community}}",

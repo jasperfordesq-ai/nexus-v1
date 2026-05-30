@@ -3,7 +3,9 @@
     "collection_complete": "Kolekcja ukończona! Ukończyłeś/aś '{{name}}' i zdobyłeś/aś {{xp}} bonusowych XP! {{icon}}"
   },
   "safeguarding": {
-    "critical_report_submitted": "Złożono krytyczny raport dotyczący ochrony"
+    "critical_report_submitted": "Złożono krytyczny raport dotyczący ochrony",
+    "assigned_bell": "Zgłoszenie ochrony #{{id}} przypisane do Ciebie ({{severity}}, {{category}})",
+    "escalated_bell": "Zgłoszenie ochrony #{{id}} eskalowane ({{severity}}, {{category}}) — przekroczono SLA"
   },
   "broker": {
     "message_for_review": "Nowa wiadomość do przeglądu od {{sender}}"

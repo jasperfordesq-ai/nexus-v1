@@ -3,7 +3,9 @@
     "collection_complete": "Collezione completata! Ha finito '{{name}}' e guadagnato {{xp}} XP bonus! {{icon}}"
   },
   "safeguarding": {
-    "critical_report_submitted": "Segnalazione critica di tutela inviata"
+    "critical_report_submitted": "Segnalazione critica di tutela inviata",
+    "assigned_bell": "Segnalazione di tutela #{{id}} assegnata a te ({{severity}}, {{category}})",
+    "escalated_bell": "Segnalazione di tutela #{{id}} inoltrata ({{severity}}, {{category}}) — SLA superato"
   },
   "broker": {
     "message_for_review": "Nuovo messaggio in attesa di revisione da {{sender}}"

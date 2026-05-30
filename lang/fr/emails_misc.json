@@ -139,7 +139,15 @@
     "reporter_status_title": "Safeguarding Report Update",
     "reporter_status_preview": "Your report status has been updated to: :status",
     "reporter_status_body": "Your safeguarding report #:incident_id has been updated. The current status is now: :status.",
-    "reporter_status_confidentiality": "This report is handled with strict confidentiality. If you have additional information to share, please contact your community coordinator."
+    "reporter_status_confidentiality": "This report is handled with strict confidentiality. If you have additional information to share, please contact your community coordinator.",
+    "assignment_subject": "Signalement de protection attribué — {{severity}}",
+    "assignment_title": "Signalement de protection qui vous a été attribué",
+    "assignment_body": "Le signalement de protection #{{id}} vous a été attribué (catégorie : {{category}}, gravité : {{severity}}). Échéance d'examen : {{review_due_at}}. Veuillez ouvrir le signalement et commencer votre examen.",
+    "assignment_cta": "Ouvrir le signalement",
+    "escalation_subject": "Escalade — signalement de protection #{{id}}",
+    "escalation_title": "Signalement de protection escaladé",
+    "escalation_body": "Le signalement de protection #{{id}} (gravité : {{severity}}, catégorie : {{category}}) a été escaladé car son échéance d'examen ({{review_due_at}}) est dépassée. Un examen immédiat est requis.",
+    "escalation_cta": "Examiner maintenant"
   },
   "onboarding_completed": {
     "subject": "You're all set, {{name}}! Welcome to {{community}}",

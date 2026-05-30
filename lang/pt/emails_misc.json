@@ -139,7 +139,15 @@
     "reporter_status_title": "Safeguarding Report Update",
     "reporter_status_preview": "Your report status has been updated to: :status",
     "reporter_status_body": "Your safeguarding report #:incident_id has been updated. The current status is now: :status.",
-    "reporter_status_confidentiality": "This report is handled with strict confidentiality. If you have additional information to share, please contact your community coordinator."
+    "reporter_status_confidentiality": "This report is handled with strict confidentiality. If you have additional information to share, please contact your community coordinator.",
+    "assignment_subject": "Relatório de salvaguarda atribuído — {{severity}}",
+    "assignment_title": "Relatório de salvaguarda atribuído a si",
+    "assignment_body": "Foi-lhe atribuído o relatório de salvaguarda #{{id}} (categoria: {{category}}, gravidade: {{severity}}). Prazo de revisão: {{review_due_at}}. Abra o relatório e inicie a revisão.",
+    "assignment_cta": "Abrir relatório",
+    "escalation_subject": "Escalada — relatório de salvaguarda #{{id}}",
+    "escalation_title": "Relatório de salvaguarda escalado",
+    "escalation_body": "O relatório de salvaguarda #{{id}} (gravidade: {{severity}}, categoria: {{category}}) foi escalado porque o seu prazo de revisão ({{review_due_at}}) expirou. É necessária uma revisão imediata.",
+    "escalation_cta": "Rever agora"
   },
   "onboarding_completed": {
     "subject": "You're all set, {{name}}! Welcome to {{community}}",

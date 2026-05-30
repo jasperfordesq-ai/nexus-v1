@@ -175,6 +175,17 @@ class SafeguardingService
             ]);
 
         $this->logAction($reportId, $actorId, 'assigned', 'Assigned to user #' . $assigneeUserId);
+
+        // Tell the assigned reviewer (staff-only) — bell + email + push in their
+        // own locale. Best-effort: a notification failure must never unwind the
+        // assignment itself.
+        try {
+            $this->notifyReportStaff($reportId, $tenantId, [$assigneeUserId], 'assigned');
+        } catch (\Throwable $e) {
+            Log::warning('[Safeguarding] assignment notification failed: ' . $e->getMessage(), [
+                'report_id' => $reportId,
+            ]);
+        }
     }
 
     /**
@@ -202,6 +213,23 @@ class SafeguardingService
             ]);
 
         $this->logAction($reportId, $actorId, 'escalated', $note);
+
+        // Alert safeguarding staff that this report has escalated — fired here so
+        // it covers BOTH manual escalation and the SafeguardingSlaEscalateCommand
+        // cron (which calls this method). Recipients: the assigned reviewer (if
+        // any) plus every safeguarding.view holder. Previously an SLA breach
+        // escalated silently and nobody was told. Best-effort.
+        try {
+            $recipients = $this->resolveSafeguardingViewers($tenantId);
+            if (!empty($report->assigned_to_user_id)) {
+                $recipients[] = (int) $report->assigned_to_user_id;
+            }
+            $this->notifyReportStaff($reportId, $tenantId, $recipients, 'escalated');
+        } catch (\Throwable $e) {
+            Log::warning('[Safeguarding] escalation notification failed: ' . $e->getMessage(), [
+                'report_id' => $reportId,
+            ]);
+        }
     }
 
     /**
@@ -525,6 +553,136 @@ class SafeguardingService
             'notes'         => $notes !== null && trim($notes) !== '' ? $notes : null,
             'created_at'    => now(),
         ]);
+    }
+
+    /**
+     * Resolve the user IDs holding the `safeguarding.view` permission in this
+     * tenant. Best-effort — schema differs across installs, so a query failure
+     * yields an empty list rather than an exception.
+     *
+     * @return int[]
+     */
+    private function resolveSafeguardingViewers(int $tenantId): array
+    {
+        if (!Schema::hasTable('user_permissions') || !Schema::hasTable('permissions')) {
+            return [];
+        }
+
+        try {
+            return DB::table('user_permissions as up')
+                ->join('permissions as p', 'p.id', '=', 'up.permission_id')
+                ->where('p.name', 'safeguarding.view')
+                ->where('up.tenant_id', $tenantId)
+                ->distinct()
+                ->pluck('up.user_id')
+                ->map(fn ($id) => (int) $id)
+                ->all();
+        } catch (\Throwable $e) {
+            Log::info('[Safeguarding] viewer resolve skipped — permissions layout differs: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Notify safeguarding STAFF about an assignment or escalation on a report.
+     *
+     * Staff-only — recipients are passed in by the caller (the assigned reviewer
+     * for 'assigned'; assigned reviewer + safeguarding.view holders for
+     * 'escalated'). The report SUBJECT/member is never a recipient. Each
+     * recipient receives a bell + device push + email rendered in their own
+     * preferred_language. Only report metadata (id, severity, category, review
+     * deadline) is disclosed — never the case description. Best-effort and
+     * failure-isolated per recipient/channel; nothing here may unwind the
+     * assignment/escalation that triggered it.
+     *
+     * @param int[]  $recipientIds
+     * @param string $event 'assigned' | 'escalated'
+     */
+    private function notifyReportStaff(int $reportId, int $tenantId, array $recipientIds, string $event): void
+    {
+        $recipientIds = array_values(array_unique(array_filter(
+            array_map(static fn ($id) => (int) $id, $recipientIds),
+            static fn (int $id) => $id > 0
+        )));
+        if (empty($recipientIds) || !Schema::hasTable('safeguarding_reports') || !Schema::hasTable('notifications')) {
+            return;
+        }
+
+        $report = DB::table('safeguarding_reports')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $reportId)
+            ->first(['id', 'severity', 'category', 'review_due_at']);
+        if (!$report) {
+            return;
+        }
+
+        $recipients = DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('id', $recipientIds)
+            ->where('status', 'active')
+            ->get(['id', 'email', 'first_name', 'preferred_language']);
+        if ($recipients->isEmpty()) {
+            return;
+        }
+
+        $params = [
+            'id'            => $reportId,
+            'severity'      => (string) ($report->severity ?? 'medium'),
+            'category'      => (string) ($report->category ?? ''),
+            'review_due_at' => $report->review_due_at ? (string) $report->review_due_at : '',
+        ];
+
+        $link     = '/admin/caring-community/safeguarding/' . $reportId;
+        $adminUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
+
+        $isEscalation = $event === 'escalated';
+        $bellKey  = $isEscalation ? 'svc_notifications.safeguarding.escalated_bell' : 'svc_notifications.safeguarding.assigned_bell';
+        $pushType = $isEscalation ? 'safeguarding_escalated' : 'safeguarding_assigned';
+        $emailNs  = $isEscalation ? 'emails_misc.safeguarding.escalation_' : 'emails_misc.safeguarding.assignment_';
+        $theme    = $isEscalation ? 'danger' : 'brand';
+
+        foreach ($recipients as $recipient) {
+            $userId = (int) $recipient->id;
+
+            LocaleContext::withLocale($recipient, function () use ($recipient, $userId, $tenantId, $bellKey, $pushType, $emailNs, $theme, $params, $link, $adminUrl): void {
+                $bellMessage = __($bellKey, $params);
+
+                // 1) Bell (tenant-safe writer), flagged important.
+                try {
+                    \App\Models\Notification::createNotification($userId, $bellMessage, $link, $pushType, true, $tenantId);
+                } catch (\Throwable $e) {
+                    Log::warning('[Safeguarding] staff bell failed: ' . $e->getMessage(), ['user_id' => $userId]);
+                }
+
+                // 2) Device push (separate channel, staff-only).
+                try {
+                    \App\Services\NotificationDispatcher::fanOutPush($userId, $pushType, $bellMessage, $link);
+                } catch (\Throwable $e) {
+                    Log::debug('[Safeguarding] staff push failed: ' . $e->getMessage());
+                }
+
+                // 3) Email — always sent (time-sensitive), rendered in the
+                //    recipient's locale. Metadata only; no case description.
+                if (empty($recipient->email)) {
+                    return;
+                }
+                try {
+                    $html = \App\Core\EmailTemplateBuilder::make()
+                        ->theme($theme)
+                        ->title(__($emailNs . 'title', $params))
+                        ->paragraph(__($emailNs . 'body', $params))
+                        ->button(__($emailNs . 'cta'), $adminUrl)
+                        ->render();
+                    $subject = __($emailNs . 'subject', $params);
+                    $sent = \App\Services\EmailDispatchService::sendRaw($recipient->email, $subject, $html, null, null, null, 'safeguarding', ['tenant_id' => $tenantId]);
+                    if (!$sent) {
+                        Log::warning('[Safeguarding] staff email returned false from Mailer', ['user_id' => $userId]);
+                    }
+                } catch (\Throwable $e) {
+                    Log::warning('[Safeguarding] staff email send failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
+                }
+            });
+        }
     }
 
     /**

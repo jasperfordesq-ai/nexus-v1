@@ -3,7 +3,9 @@
     "collection_complete": "Collection Complete! You finished '{{name}}' and earned {{xp}} bonus XP! {{icon}}"
   },
   "safeguarding": {
-    "critical_report_submitted": "Critical safeguarding report submitted"
+    "critical_report_submitted": "Critical safeguarding report submitted",
+    "assigned_bell": "Safeguarding report #{{id}} assigned to you ({{severity}}, {{category}})",
+    "escalated_bell": "Safeguarding report #{{id}} escalated ({{severity}}, {{category}}) — SLA breached"
   },
   "broker": {
     "message_for_review": "New message for review from {{sender}}"

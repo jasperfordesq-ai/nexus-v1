@@ -112,6 +112,8 @@ return [
     'push_hot_match' => 'Hot Match Found',
     'push_mutual_match' => 'Mutual Match Found',
     'push_default' => 'New Notification',
+    'push_safeguarding_assigned' => 'Informe de protección asignado',
+    'push_safeguarding_escalated' => 'Informe escalado',
     'push_new_message' => 'Nuevo mensaje',
     'push_connection_request' => 'Nueva solicitud de conexión',
     'push_connection_accepted' => 'Conexión aceptada',

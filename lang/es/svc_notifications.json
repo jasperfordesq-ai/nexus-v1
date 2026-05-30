@@ -3,7 +3,9 @@
     "collection_complete": "¡Colección completada! Ha terminado '{{name}}' y ganado {{xp}} XP de bonificación. {{icon}}"
   },
   "safeguarding": {
-    "critical_report_submitted": "Informe crítico de protección enviado"
+    "critical_report_submitted": "Informe crítico de protección enviado",
+    "assigned_bell": "Informe de protección #{{id}} asignado a ti ({{severity}}, {{category}})",
+    "escalated_bell": "Informe de protección #{{id}} escalado ({{severity}}, {{category}}) — SLA incumplido"
   },
   "broker": {
     "message_for_review": "Nuevo mensaje para revisar de {{sender}}"

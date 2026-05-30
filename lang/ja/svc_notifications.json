@@ -3,7 +3,9 @@
     "collection_complete": "コレクション完了！「{{name}}」を達成し、ボーナスXP {{xp}} を獲得しました！{{icon}}"
   },
   "safeguarding": {
-    "critical_report_submitted": "重大なセーフガーディングレポートが提出されました"
+    "critical_report_submitted": "重大なセーフガーディングレポートが提出されました",
+    "assigned_bell": "セーフガーディング報告 #{{id}} があなたに割り当てられました（{{severity}}、{{category}}）",
+    "escalated_bell": "セーフガーディング報告 #{{id}} がエスカレーションされました（{{severity}}、{{category}}）— SLA超過"
   },
   "broker": {
     "message_for_review": "{{sender}} からの新しいレビュー待ちメッセージが届いています"

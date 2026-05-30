@@ -139,7 +139,15 @@
     "reporter_status_title": "Safeguarding Report Update",
     "reporter_status_preview": "Your report status has been updated to: :status",
     "reporter_status_body": "Your safeguarding report #:incident_id has been updated. The current status is now: :status.",
-    "reporter_status_confidentiality": "This report is handled with strict confidentiality. If you have additional information to share, please contact your community coordinator."
+    "reporter_status_confidentiality": "This report is handled with strict confidentiality. If you have additional information to share, please contact your community coordinator.",
+    "assignment_subject": "Schutzmeldung zugewiesen — {{severity}}",
+    "assignment_title": "Schutzmeldung Ihnen zugewiesen",
+    "assignment_body": "Ihnen wurde die Schutzmeldung #{{id}} zugewiesen (Kategorie: {{category}}, Schweregrad: {{severity}}). Prüffrist: {{review_due_at}}. Bitte öffnen Sie die Meldung und beginnen Sie mit der Prüfung.",
+    "assignment_cta": "Meldung öffnen",
+    "escalation_subject": "Eskalation — Schutzmeldung #{{id}}",
+    "escalation_title": "Schutzmeldung eskaliert",
+    "escalation_body": "Die Schutzmeldung #{{id}} (Schweregrad: {{severity}}, Kategorie: {{category}}) wurde eskaliert, weil ihre Prüffrist ({{review_due_at}}) überschritten wurde. Eine sofortige Prüfung ist erforderlich.",
+    "escalation_cta": "Jetzt prüfen"
   },
   "onboarding_completed": {
     "subject": "You're all set, {{name}}! Welcome to {{community}}",

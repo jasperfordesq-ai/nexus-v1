@@ -3,7 +3,9 @@
     "collection_complete": "Collectie voltooid! U heeft '{{name}}' afgerond en {{xp}} bonus-XP verdiend! {{icon}}"
   },
   "safeguarding": {
-    "critical_report_submitted": "Kritisch veiligheidsrapport ingediend"
+    "critical_report_submitted": "Kritisch veiligheidsrapport ingediend",
+    "assigned_bell": "Beschermingsmelding #{{id}} aan jou toegewezen ({{severity}}, {{category}})",
+    "escalated_bell": "Beschermingsmelding #{{id}} geëscaleerd ({{severity}}, {{category}}) — SLA overschreden"
   },
   "broker": {
     "message_for_review": "Nieuw bericht ter beoordeling van {{sender}}"

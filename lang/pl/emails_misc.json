@@ -139,7 +139,15 @@
     "reporter_status_title": "Safeguarding Report Update",
     "reporter_status_preview": "Your report status has been updated to: :status",
     "reporter_status_body": "Your safeguarding report #:incident_id has been updated. The current status is now: :status.",
-    "reporter_status_confidentiality": "This report is handled with strict confidentiality. If you have additional information to share, please contact your community coordinator."
+    "reporter_status_confidentiality": "This report is handled with strict confidentiality. If you have additional information to share, please contact your community coordinator.",
+    "assignment_subject": "Przypisano zgłoszenie ochrony — {{severity}}",
+    "assignment_title": "Zgłoszenie ochrony przypisane do Ciebie",
+    "assignment_body": "Przypisano Ci zgłoszenie ochrony #{{id}} (kategoria: {{category}}, waga: {{severity}}). Termin przeglądu: {{review_due_at}}. Otwórz zgłoszenie i rozpocznij przegląd.",
+    "assignment_cta": "Otwórz zgłoszenie",
+    "escalation_subject": "Eskalacja — zgłoszenie ochrony #{{id}}",
+    "escalation_title": "Zgłoszenie ochrony eskalowane",
+    "escalation_body": "Zgłoszenie ochrony #{{id}} (waga: {{severity}}, kategoria: {{category}}) zostało eskalowane, ponieważ minął jego termin przeglądu ({{review_due_at}}). Wymagany jest natychmiastowy przegląd.",
+    "escalation_cta": "Przejrzyj teraz"
   },
   "onboarding_completed": {
     "subject": "You're all set, {{name}}! Welcome to {{community}}",

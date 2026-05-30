@@ -178,6 +178,8 @@ return [
     'push_mutual_match'              => 'Mutual Match Found',
     'push_default'                   => 'New Notification',
 
+    'push_safeguarding_assigned' => 'Safeguarding report assigned',
+    'push_safeguarding_escalated' => 'Report escalated',
     'push_new_message' => 'New Message',
     'push_connection_request' => 'New Connection Request',
     'push_connection_accepted' => 'Connection Accepted',

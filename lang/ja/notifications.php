@@ -115,6 +115,8 @@ return [
     'push_hot_match' => 'Hot Match Found',
     'push_mutual_match' => 'Mutual Match Found',
     'push_default' => 'New Notification',
+    'push_safeguarding_assigned' => 'セーフガーディング報告が割り当てられました',
+    'push_safeguarding_escalated' => '報告がエスカレーションされました',
     'push_new_message' => '新着メッセージ',
     'push_connection_request' => '新しいつながりリクエスト',
     'push_connection_accepted' => 'つながりが承認されました',

@@ -3,7 +3,9 @@
     "collection_complete": "Coleção completa! Terminou '{{name}}' e ganhou {{xp}} XP de bónus! {{icon}}"
   },
   "safeguarding": {
-    "critical_report_submitted": "Relatório crítico de salvaguarda submetido"
+    "critical_report_submitted": "Relatório crítico de salvaguarda submetido",
+    "assigned_bell": "Relatório de salvaguarda #{{id}} atribuído a si ({{severity}}, {{category}})",
+    "escalated_bell": "Relatório de salvaguarda #{{id}} escalado ({{severity}}, {{category}}) — SLA excedido"
   },
   "broker": {
     "message_for_review": "Nova mensagem para revisão de {{sender}}"

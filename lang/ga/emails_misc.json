@@ -139,7 +139,15 @@
     "reporter_status_title": "Safeguarding Report Update",
     "reporter_status_preview": "Your report status has been updated to: :status",
     "reporter_status_body": "Your safeguarding report #:incident_id has been updated. The current status is now: :status.",
-    "reporter_status_confidentiality": "This report is handled with strict confidentiality. If you have additional information to share, please contact your community coordinator."
+    "reporter_status_confidentiality": "This report is handled with strict confidentiality. If you have additional information to share, please contact your community coordinator.",
+    "assignment_subject": "Sannadh tuairisc chosanta — {{severity}}",
+    "assignment_title": "Sannadh tuairisc chosanta duit",
+    "assignment_body": "Sannadh tuairisc chosanta #{{id}} duit (catagóir: {{category}}, déine: {{severity}}). Spriocdháta athbhreithnithe: {{review_due_at}}. Oscail an tuairisc agus tosaigh d'athbhreithniú.",
+    "assignment_cta": "Oscail an tuairisc",
+    "escalation_subject": "Géarú — tuairisc chosanta #{{id}}",
+    "escalation_title": "Géaraíodh tuairisc chosanta",
+    "escalation_body": "Géaraíodh tuairisc chosanta #{{id}} (déine: {{severity}}, catagóir: {{category}}) toisc gur sháraigh sé a spriocdháta athbhreithnithe ({{review_due_at}}). Tá athbhreithniú láithreach ag teastáil.",
+    "escalation_cta": "Athbhreithnigh anois"
   },
   "onboarding_completed": {
     "subject": "You're all set, {{name}}! Welcome to {{community}}",
