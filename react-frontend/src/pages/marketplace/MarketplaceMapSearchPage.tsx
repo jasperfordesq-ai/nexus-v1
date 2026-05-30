@@ -316,7 +316,7 @@ export function MarketplaceMapSearchPage() {
             <ToggleButton
               id="map"
               isIconOnly
-              variant="bordered"
+              variant="default"
               aria-label={t('map.map_view')}
               className="data-[selected=true]:bg-primary data-[selected=true]:text-white"
             >
@@ -325,7 +325,7 @@ export function MarketplaceMapSearchPage() {
             <ToggleButton
               id="list"
               isIconOnly
-              variant="bordered"
+              variant="default"
               aria-label={t('map.list_view')}
               className="data-[selected=true]:bg-primary data-[selected=true]:text-white"
             >
