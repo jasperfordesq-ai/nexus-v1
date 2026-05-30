@@ -39,6 +39,20 @@
         "EXPO_PUBLIC_DEFAULT_TENANT": "hour-timebank"
       }
     },
+    "website": {
+      "distribution": "internal",
+      "channel": "website",
+      "android": {
+        "buildType": "apk"
+      },
+      "cache": {
+        "key": "nexus-website-apk-v1"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://api.project-nexus.ie",
+        "EXPO_PUBLIC_DEFAULT_TENANT": "hour-timebank"
+      }
+    },
     "production": {
       "autoIncrement": true,
       "channel": "production",

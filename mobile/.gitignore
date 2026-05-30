@@ -17,6 +17,8 @@ ios/
 # EAS
 eas-build-local-nodejs/
 google-play-key.json
+google-services.json
+GoogleService-Info.plist
 *.keystore
 *.jks
 

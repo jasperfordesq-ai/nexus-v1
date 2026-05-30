@@ -3,27 +3,44 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 //
-// Dynamic Expo config — evaluated at build time by EAS.
-// Static fields live in app.json; this file overrides/extends them with
-// environment-specific values (API URL, tenant, EAS project ID).
-//
-// Setup notes:
-//   1. Run `eas init` once to get your EXPO_PROJECT_ID from expo.dev.
-//   2. Set EAS_PROJECT_ID in your local .env.local (gitignored) and in EAS
-//      secrets (eas secret:create --name EAS_PROJECT_ID --value <id>).
-//   3. The OTA update URL is https://u.expo.dev/<EAS_PROJECT_ID> — set this
-//      in app.json once you have the real ID.
+// Dynamic Expo config, evaluated at build time by EAS.
+// Static defaults live in app.json; this file adds environment-specific values.
 
-const appJson = require('./app.json');
+const fs = require('fs');
+const path = require('path');
 
-module.exports = () => {
-  const projectId = process.env.EAS_PROJECT_ID ?? null;
-  const plugins = [...(appJson.expo.plugins ?? [])];
-  const hasStripePlugin = plugins.some((plugin) => {
-    return Array.isArray(plugin) ? plugin[0] === '@stripe/stripe-react-native' : plugin === '@stripe/stripe-react-native';
+module.exports = ({ config }) => {
+  const projectId = process.env.EAS_PROJECT_ID ?? process.env.EXPO_PUBLIC_EAS_PROJECT_ID ?? null;
+  const googleServicesFile = './google-services.json';
+  const notificationIcon = './assets/notification-icon.png';
+  const hasGoogleServicesFile = fs.existsSync(path.join(__dirname, googleServicesFile));
+  const hasNotificationIcon = fs.existsSync(path.join(__dirname, notificationIcon));
+  const plugins = [...(config.plugins ?? [])];
+
+  const hasPlugin = (name) => plugins.some((plugin) => {
+    return Array.isArray(plugin) ? plugin[0] === name : plugin === name;
   });
 
-  if (!hasStripePlugin) {
+  if (!hasPlugin('expo-font')) {
+    plugins.push('expo-font');
+  }
+
+  const notificationsPluginIndex = plugins.findIndex((plugin) => {
+    return Array.isArray(plugin) ? plugin[0] === 'expo-notifications' : plugin === 'expo-notifications';
+  });
+
+  if (notificationsPluginIndex >= 0 && hasNotificationIcon) {
+    const notificationsPlugin = plugins[notificationsPluginIndex];
+    plugins[notificationsPluginIndex] = [
+      'expo-notifications',
+      {
+        ...(Array.isArray(notificationsPlugin) ? notificationsPlugin[1] ?? {} : {}),
+        icon: notificationIcon,
+      },
+    ];
+  }
+
+  if (!hasPlugin('@stripe/stripe-react-native')) {
     plugins.push([
       '@stripe/stripe-react-native',
       {
@@ -34,28 +51,29 @@ module.exports = () => {
   }
 
   return {
-    ...appJson.expo,
+    ...config,
     plugins,
     ios: {
-      ...appJson.expo.ios,
+      ...config.ios,
       infoPlist: {
-        ...(appJson.expo.ios?.infoPlist ?? {}),
+        ...(config.ios?.infoPlist ?? {}),
         CFBundleAllowMixedLocalizations: true,
       },
     },
+    android: {
+      ...config.android,
+      ...(hasGoogleServicesFile ? { googleServicesFile } : {}),
+    },
     extra: {
-      ...(appJson.expo.extra ?? {}),
+      ...(config.extra ?? {}),
       apiUrl: process.env.EXPO_PUBLIC_API_URL ?? 'https://api.project-nexus.ie',
       defaultTenant: process.env.EXPO_PUBLIC_DEFAULT_TENANT ?? 'hour-timebank',
-      // EAS project ID — required for EAS Update (OTA) and push notifications.
-      // Populated from the EAS_PROJECT_ID environment variable.
       ...(projectId ? { eas: { projectId } } : {}),
     },
-    // Override the OTA update URL with the real project ID when available.
     ...(projectId
       ? {
           updates: {
-            ...appJson.expo.updates,
+            ...config.updates,
             url: `https://u.expo.dev/${projectId}`,
           },
         }

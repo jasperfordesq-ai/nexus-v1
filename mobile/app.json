@@ -57,6 +57,7 @@
       "expo-router",
       "expo-secure-store",
       "expo-image-picker",
+      "expo-font",
       [
         "expo-notifications",
         {
@@ -82,13 +83,13 @@
     "updates": {
       "enabled": true,
       "fallbackToCacheTimeout": 0,
-      "runtimeVersion": {
-        "policy": "appVersion"
-      },
       "url": "https://u.expo.dev/EXPO_PROJECT_ID"
     },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": false
     }
   }
 }

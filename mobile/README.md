@@ -165,10 +165,10 @@ Focused route/component tests are useful during migration work, but run the comm
 ```bash
 npm install -g eas-cli
 eas login
-eas build --platform android   # APK/AAB
-eas build --platform ios       # IPA
-eas submit --platform android  # Submit to Play Store
-eas submit --platform ios      # Submit to App Store
+npm run prepackage             # TypeScript, Jest, Expo Doctor
+npm run build:android:website  # APK for website/internal tester downloads
+npm run build:android:play     # AAB for Google Play
+npm run submit:android:internal # Submit latest AAB to Play internal testing
 ```
 
 Configure `eas.json` before submitting. See [Expo EAS docs](https://docs.expo.dev/eas/).
@@ -181,4 +181,5 @@ Configure `eas.json` before submitting. See [Expo EAS docs](https://docs.expo.de
 - **Real-time messaging**: Pusher WebSocket channels are established after login and torn down on logout. Private channels use server-side auth (`/api/v2/pusher/auth`).
 - **Push notifications**: FCM tokens are registered on login via `POST /api/v2/notifications/device-token` and deregistered on logout. Requires `google-services.json` (Android) and `GoogleService-Info.plist` (iOS) in the project root before any EAS build.
 - **AGPL-3.0 attribution** is displayed in the Profile/About screen as required by Section 7(b) and Section 13. The attribution notice must include a copyright notice and visible source repository link: <https://github.com/jasperfordesq-ai/nexus-v1>.
-- Replace `assets/` placeholder images before any public build.
+- Replace `assets/` placeholder images before any public build. When the generated notification icon is ready, save it as `assets/notification-icon.png` (96x96, white on transparent). The dynamic Expo config will use it automatically when the file exists.
+- Add `google-services.json` at the project root before push-notification production builds. It is gitignored and will be added to native config automatically when present.
