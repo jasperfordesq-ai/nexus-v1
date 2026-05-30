@@ -328,30 +328,30 @@ export function JobsPage() {
           </div>
           {isAuthenticated && (
             <div className="flex gap-2 flex-wrap shrink-0">
-              <Link to={tenantPath('/jobs/my-applications')}>
-                <Button
-                  variant="flat"
-                  startContent={<FileText className="w-4 h-4" aria-hidden="true" />}
-                >
-                  {t('my_applications.title')}
-                </Button>
-              </Link>
-              <Link to={tenantPath('/jobs/alerts')}>
-                <Button
-                  variant="flat"
-                  startContent={<Bell className="w-4 h-4" aria-hidden="true" />}
-                >
-                  {t('alerts.title')}
-                </Button>
-              </Link>
-              <Link to={tenantPath('/jobs/create')}>
-                <Button
-                  color="primary"
-                  startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-                >
-                  {t('create_vacancy')}
-                </Button>
-              </Link>
+              <Button
+                as={Link}
+                to={tenantPath('/jobs/my-applications')}
+                variant="flat"
+                startContent={<FileText className="w-4 h-4" aria-hidden="true" />}
+              >
+                {t('my_applications.title')}
+              </Button>
+              <Button
+                as={Link}
+                to={tenantPath('/jobs/alerts')}
+                variant="flat"
+                startContent={<Bell className="w-4 h-4" aria-hidden="true" />}
+              >
+                {t('alerts.title')}
+              </Button>
+              <Button
+                as={Link}
+                to={tenantPath('/jobs/create')}
+                color="primary"
+                startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+              >
+                {t('create_vacancy')}
+              </Button>
             </div>
           )}
         </div>
@@ -418,15 +418,15 @@ export function JobsPage() {
                 <p className="text-sm text-theme-muted">{t('onboarding.first_time_desc')}</p>
               </div>
             </div>
-            <Link to={tenantPath('/jobs/employer-onboarding')}>
-              <Button
-                size="sm"
-                className="bg-linear-to-r from-indigo-500 to-purple-600 text-white"
-                startContent={<Rocket className="w-3.5 h-3.5" aria-hidden="true" />}
-              >
-                {t('onboarding.start_wizard')}
-              </Button>
-            </Link>
+            <Button
+              as={Link}
+              to={tenantPath('/jobs/employer-onboarding')}
+              size="sm"
+              className="bg-linear-to-r from-indigo-500 to-purple-600 text-white"
+              startContent={<Rocket className="w-3.5 h-3.5" aria-hidden="true" />}
+            >
+              {t('onboarding.start_wizard')}
+            </Button>
           </div>
         </GlassCard>
       )}

@@ -279,14 +279,15 @@ export default function ProjectAnnouncementsPage() {
           modifiedTime={(project.last_update_at ?? project.published_at) ?? undefined}
         />
         <div className="mx-auto flex max-w-4xl flex-col gap-6 px-4 py-8">
-          <Link to={tenantPath('/caring-community/projects')} className="w-fit">
-            <Button
-              variant="light"
-              startContent={<ArrowLeft className="h-4 w-4" aria-hidden="true" />}
-            >
-              {t('back_to_projects')}
-            </Button>
-          </Link>
+          <Button
+            as={Link}
+            to={tenantPath('/caring-community/projects')}
+            variant="light"
+            className="w-fit"
+            startContent={<ArrowLeft className="h-4 w-4" aria-hidden="true" />}
+          >
+            {t('back_to_projects')}
+          </Button>
 
           {error && <p role="alert" className="text-sm text-danger">{error}</p>}
 

@@ -112,12 +112,13 @@ export default function CoursePlayerPage() {
             const locked = availability[lesson.id]?.available === false;
             const active = lesson.id === activeLessonId;
             return (
-              <button
+              <Button
                 key={lesson.id}
-                type="button"
-                onClick={() => setActiveLessonId(lesson.id)}
-                className={`flex items-center gap-2 text-left text-sm px-3 py-2 rounded-md transition-colors ${
-                  active ? 'bg-accent-soft text-accent' : 'hover:bg-[var(--color-surface-2)]'
+                variant="light"
+                fullWidth
+                onPress={() => setActiveLessonId(lesson.id)}
+                className={`h-auto justify-start gap-2 rounded-md px-3 py-2 text-left text-sm font-normal transition-colors ${
+                  active ? 'bg-accent-soft text-accent' : 'text-theme-primary hover:bg-[var(--color-surface-2)]'
                 }`}
               >
                 {done
@@ -126,7 +127,7 @@ export default function CoursePlayerPage() {
                     ? <Lock size={16} className="text-muted" aria-hidden="true" />
                     : <PlayCircle size={16} aria-hidden="true" />}
                 <span className="line-clamp-1">{lesson.title}</span>
-              </button>
+              </Button>
             );
           })}
         </nav>

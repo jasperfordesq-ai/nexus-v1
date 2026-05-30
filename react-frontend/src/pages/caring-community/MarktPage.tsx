@@ -20,7 +20,7 @@ import Tag from 'lucide-react/icons/tag';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Store from 'lucide-react/icons/store';
-import { GlassCard, Button, Avatar, Tab, Tabs, Skeleton } from '@/components/ui';
+import { GlassCard, Button, Chip, Avatar, Tab, Tabs, Skeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
 import { useAuth, useTenant } from '@/contexts';
@@ -163,15 +163,13 @@ function MarktCard({ item }: MarktCardProps) {
         {/* Source badge */}
         <div className="absolute top-2 left-2">
           {isListing ? (
-            <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-teal-500/90 text-white backdrop-blur-sm">
-              <Clock className="w-3 h-3" aria-hidden="true" />
+            <Chip size="sm" className="bg-teal-500/90 text-white backdrop-blur-sm" startContent={<Clock className="w-3 h-3" aria-hidden="true" />}>
               {t('markt.badges.listing')}
-            </span>
+            </Chip>
           ) : (
-            <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-amber-500/90 text-white backdrop-blur-sm">
-              <ShoppingBag className="w-3 h-3" aria-hidden="true" />
+            <Chip size="sm" className="bg-amber-500/90 text-white backdrop-blur-sm" startContent={<ShoppingBag className="w-3 h-3" aria-hidden="true" />}>
               {t('markt.badges.marketplace')}
-            </span>
+            </Chip>
           )}
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure, GlassCard, Progress, Button, Chip, Input, SearchField, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, CardRowsSkeleton } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, GlassCard, Progress, Button, ToggleButton, ToggleButtonGroup, Chip, Input, SearchField, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, CardRowsSkeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -566,48 +566,50 @@ export function ResourcesPage() {
 
         <div className="flex gap-2 flex-wrap items-center">
           {/* R3 - Admin reorder toggle */}
+          {/* R3 - Admin reorder toggle (binary ToggleButton) */}
           {isAdmin && (
-            <Button
+            <ToggleButton
               size="sm"
-              variant={isReordering ? 'solid' : 'flat'}
-              color={isReordering ? 'warning' : 'default'}
-              className={isReordering ? 'text-white' : 'bg-theme-elevated text-theme-muted'}
-              startContent={<GripVertical className="w-3.5 h-3.5" aria-hidden="true" />}
-              onPress={() => setIsReordering(!isReordering)}
+              variant="ghost"
+              isSelected={isReordering}
+              onChange={setIsReordering}
+              className="bg-theme-elevated text-theme-muted data-[selected=true]:bg-warning data-[selected=true]:text-white"
             >
+              <GripVertical className="w-3.5 h-3.5" aria-hidden="true" />
               {isReordering ? t('resources.done_reordering') : t('resources.reorder')}
-            </Button>
+            </ToggleButton>
           )}
 
-          {/* Category quick-filter chips (fallback if tree not available) */}
+          {/* Category quick-filter (fallback if tree not available) — single-select ToggleButtonGroup */}
           {categoryTree.length === 0 && categories.length > 0 && (
-            <div role="group" aria-label={t('resources.filter_by_category')}>
-              <Button
-                size="sm"
-                variant={!selectedCategory ? 'solid' : 'flat'}
-                color={!selectedCategory ? 'warning' : 'default'}
-                className={!selectedCategory ? 'text-white' : 'bg-theme-elevated text-theme-muted'}
-                onPress={() => setSelectedCategory(null)}
+            <ToggleButtonGroup
+              aria-label={t('resources.filter_by_category')}
+              selectionMode="single"
+              disallowEmptySelection
+              isDetached
+              size="sm"
+              selectedKeys={new Set([selectedCategory == null ? '__all__' : String(selectedCategory)])}
+              onSelectionChange={(keys) => { const [k] = Array.from(keys); setSelectedCategory(!k || k === '__all__' ? null : Number(k)); }}
+              className="flex flex-wrap gap-2"
+            >
+              <ToggleButton
+                id="__all__"
+                variant="ghost"
+                className="bg-theme-elevated text-theme-muted data-[selected=true]:bg-warning data-[selected=true]:text-white"
               >
                 {t('resources.filter_all')}
-              </Button>
+              </ToggleButton>
               {categories.map((cat) => (
-                <Button
+                <ToggleButton
                   key={cat.id}
-                  size="sm"
-                  variant={selectedCategory === cat.id ? 'solid' : 'flat'}
-                  color={selectedCategory === cat.id ? 'warning' : 'default'}
-                  className={
-                    selectedCategory === cat.id
-                      ? 'text-white'
-                      : 'bg-theme-elevated text-theme-muted'
-                  }
-                  onPress={() => setSelectedCategory(cat.id)}
+                  id={String(cat.id)}
+                  variant="ghost"
+                  className="bg-theme-elevated text-theme-muted data-[selected=true]:bg-warning data-[selected=true]:text-white"
                 >
                   {cat.name}
-                </Button>
+                </ToggleButton>
               ))}
-            </div>
+            </ToggleButtonGroup>
           )}
         </div>
       </div>

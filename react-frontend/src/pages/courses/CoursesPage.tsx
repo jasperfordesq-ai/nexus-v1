@@ -10,7 +10,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Input, Select, SelectItem, Spinner, AlphaBadge, Button } from '@/components/ui';
+import { SearchField, Select, SelectItem, Spinner, AlphaBadge, Button } from '@/components/ui';
 import Search from 'lucide-react/icons/search';
 import Plus from 'lucide-react/icons/plus';
 import { usePageTitle } from '@/hooks';
@@ -92,9 +92,8 @@ export default function CoursesPage() {
       <p className="text-sm text-muted mb-6">{t('subtitle')}</p>
 
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
-        <Input
+        <SearchField
           size="sm"
-          type="text"
           placeholder={t('browse.search_placeholder')}
           aria-label={t('browse.search_placeholder')}
           startContent={<Search size={16} className="text-muted" />}

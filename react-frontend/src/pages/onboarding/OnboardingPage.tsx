@@ -39,7 +39,7 @@ import Clock from 'lucide-react/icons/clock';
 import Users from 'lucide-react/icons/users';
 import Star from 'lucide-react/icons/star';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Spinner, Textarea, Avatar } from '@/components/ui';
+import { GlassCard, Button, Chip, TagGroup, Tag, Spinner, Textarea, Avatar } from '@/components/ui';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 import { useOnboardingConfig } from '@/hooks/useOnboardingConfig';
@@ -398,33 +398,8 @@ export function OnboardingPage() {
     goNextAnimated();
   }, [goNextAnimated]);
 
-  // ── Interest toggling (Step 3) ───────────────────────────────────────────
-
-  const toggleInterest = useCallback((categoryId: number) => {
-    setSelectedInterests((prev) =>
-      prev.includes(categoryId)
-        ? prev.filter((id) => id !== categoryId)
-        : [...prev, categoryId]
-    );
-  }, []);
-
-  // ── Skill toggling (Step 4) ──────────────────────────────────────────────
-
-  const toggleOffer = useCallback((categoryId: number) => {
-    setSkillOffers((prev) =>
-      prev.includes(categoryId)
-        ? prev.filter((id) => id !== categoryId)
-        : [...prev, categoryId]
-    );
-  }, []);
-
-  const toggleNeed = useCallback((categoryId: number) => {
-    setSkillNeeds((prev) =>
-      prev.includes(categoryId)
-        ? prev.filter((id) => id !== categoryId)
-        : [...prev, categoryId]
-    );
-  }, []);
+  // Interest/skill multi-selection (steps 3–4) is handled directly by the
+  // TagGroup `onSelectionChange` setters below — no per-item toggle handlers needed.
 
   // ── Category name lookup ─────────────────────────────────────────────────
 
@@ -930,31 +905,24 @@ export function OnboardingPage() {
                     </p>
                   </div>
                 ) : (
-                  <div className="flex flex-wrap gap-2">
-                    {categories.map((cat) => {
-                      const isSelected = selectedInterests.includes(cat.id);
-                      return (
-                        <Chip
+                  <TagGroup
+                    aria-label={t('interests_title')}
+                    selectionMode="multiple"
+                    selectedKeys={new Set(selectedInterests.map(String))}
+                    onSelectionChange={(keys) => setSelectedInterests(keys === 'all' ? categories.map((c) => c.id) : Array.from(keys).map(Number))}
+                  >
+                    <TagGroup.List className="flex flex-wrap gap-2">
+                      {categories.map((cat) => (
+                        <Tag
                           key={cat.id}
-                          variant={isSelected ? 'primary' : 'secondary'}
-                          color={isSelected ? 'success' : 'default'}
-                          className="cursor-pointer transition-all hover:scale-105"
-                          onClick={() => toggleInterest(cat.id)}
-                          aria-pressed={isSelected}
-                          role="button"
-                          tabIndex={0}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
-                              toggleInterest(cat.id);
-                            }
-                          }}
+                          id={String(cat.id)}
+                          className="data-[selected=true]:bg-emerald-500/20 data-[selected=true]:text-emerald-600 dark:data-[selected=true]:text-emerald-400"
                         >
                           {cat.name}
-                        </Chip>
-                      );
-                    })}
-                  </div>
+                        </Tag>
+                      ))}
+                    </TagGroup.List>
+                  </TagGroup>
                 )}
 
                 {categories.length > 0 && (
@@ -1022,31 +990,24 @@ export function OnboardingPage() {
                     {t('no_categories_skip')}
                   </p>
                 ) : (
-                  <div className="flex flex-wrap gap-2">
-                    {categories.map((cat) => {
-                      const isOffer = skillOffers.includes(cat.id);
-                      return (
-                        <Chip
+                  <TagGroup
+                    aria-label={t('skills_offer_title')}
+                    selectionMode="multiple"
+                    selectedKeys={new Set(skillOffers.map(String))}
+                    onSelectionChange={(keys) => setSkillOffers(keys === 'all' ? categories.map((c) => c.id) : Array.from(keys).map(Number))}
+                  >
+                    <TagGroup.List className="flex flex-wrap gap-2">
+                      {categories.map((cat) => (
+                        <Tag
                           key={cat.id}
-                          variant={isOffer ? 'solid' : 'bordered'}
-                          color={isOffer ? 'success' : 'default'}
-                          className="cursor-pointer transition-all hover:scale-105"
-                          onClick={() => toggleOffer(cat.id)}
-                          aria-pressed={isOffer}
-                          role="button"
-                          tabIndex={0}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
-                              toggleOffer(cat.id);
-                            }
-                          }}
+                          id={String(cat.id)}
+                          className="data-[selected=true]:bg-emerald-500/20 data-[selected=true]:text-emerald-600 dark:data-[selected=true]:text-emerald-400"
                         >
                           {cat.name}
-                        </Chip>
-                      );
-                    })}
-                  </div>
+                        </Tag>
+                      ))}
+                    </TagGroup.List>
+                  </TagGroup>
                 )}
 
                 {skillOffers.length > 0 && (
@@ -1078,31 +1039,24 @@ export function OnboardingPage() {
                     {t('no_categories_skip')}
                   </p>
                 ) : (
-                  <div className="flex flex-wrap gap-2">
-                    {categories.map((cat) => {
-                      const isNeed = skillNeeds.includes(cat.id);
-                      return (
-                        <Chip
+                  <TagGroup
+                    aria-label={t('skills_need_title')}
+                    selectionMode="multiple"
+                    selectedKeys={new Set(skillNeeds.map(String))}
+                    onSelectionChange={(keys) => setSkillNeeds(keys === 'all' ? categories.map((c) => c.id) : Array.from(keys).map(Number))}
+                  >
+                    <TagGroup.List className="flex flex-wrap gap-2">
+                      {categories.map((cat) => (
+                        <Tag
                           key={cat.id}
-                          variant={isNeed ? 'solid' : 'bordered'}
-                          color={isNeed ? 'warning' : 'default'}
-                          className="cursor-pointer transition-all hover:scale-105"
-                          onClick={() => toggleNeed(cat.id)}
-                          aria-pressed={isNeed}
-                          role="button"
-                          tabIndex={0}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault();
-                              toggleNeed(cat.id);
-                            }
-                          }}
+                          id={String(cat.id)}
+                          className="data-[selected=true]:bg-amber-500/20 data-[selected=true]:text-amber-600 dark:data-[selected=true]:text-amber-400"
                         >
                           {cat.name}
-                        </Chip>
-                      );
-                    })}
-                  </div>
+                        </Tag>
+                      ))}
+                    </TagGroup.List>
+                  </TagGroup>
                 )}
 
                 {skillNeeds.length > 0 && (
