@@ -7,11 +7,13 @@ import { useState } from 'react';
 import {
   Alert,
   FlatList,
+  Pressable,
   RefreshControl,
   Text,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Swipeable } from 'react-native-gesture-handler';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, Surface } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
@@ -156,6 +158,41 @@ export default function NotificationsScreen() {
     );
   }
 
+  function renderSwipeActions(item: Notification) {
+    const isGrouped = isGroupedNotification(item);
+
+    if (item.is_read && isGrouped) {
+      return null;
+    }
+
+    return (
+      <View className="mr-4 mb-3 flex-row items-stretch overflow-hidden rounded-panel">
+        {!item.is_read ? (
+          <SwipeActionButton
+            label={isGrouped ? t('markGroupRead') : t('markRead')}
+            accessibilityLabel={isGrouped ? t('swipeMarkGroupRead') : t('swipeMarkRead')}
+            icon="checkmark-outline"
+            backgroundColor={withAlpha(primary, 0.16)}
+            foregroundColor={primary}
+            disabled={actingId === item.id}
+            onPress={() => void handleMarkRead(item)}
+          />
+        ) : null}
+        {!isGrouped ? (
+          <SwipeActionButton
+            label={t('delete')}
+            accessibilityLabel={t('swipeDelete')}
+            icon="trash-outline"
+            backgroundColor={theme.error}
+            foregroundColor="#fff"
+            disabled={actingId === item.id}
+            onPress={() => void handleDelete(item)}
+          />
+        ) : null}
+      </View>
+    );
+  }
+
   function renderItem({ item }: { item: Notification }) {
     const label = item.title ? `${item.title}. ${item.message}` : item.message;
     const categoryTint = categoryColor(item.category, theme.textMuted, theme);
@@ -163,7 +200,7 @@ export default function NotificationsScreen() {
     const groupKey = item.group_key ?? String(item.id);
     const isExpanded = Boolean(expandedGroups[groupKey]);
 
-    return (
+    const card = (
       <View className="mx-4 mb-3">
         <HeroCard className={`overflow-hidden rounded-panel p-0 ${!item.is_read ? 'border border-primary/30' : ''}`}>
           {!item.is_read ? <View className="h-1.5" style={{ backgroundColor: primary }} /> : null}
@@ -294,6 +331,15 @@ export default function NotificationsScreen() {
         </HeroCard>
       </View>
     );
+
+    return (
+      <Swipeable
+        overshootRight={false}
+        renderRightActions={() => renderSwipeActions(item)}
+      >
+        {card}
+      </Swipeable>
+    );
   }
 
   return (
@@ -334,6 +380,40 @@ export default function NotificationsScreen() {
         />
       </SafeAreaView>
     </ModalErrorBoundary>
+  );
+}
+
+function SwipeActionButton({
+  label,
+  accessibilityLabel,
+  icon,
+  backgroundColor,
+  foregroundColor,
+  disabled,
+  onPress,
+}: {
+  label: string;
+  accessibilityLabel: string;
+  icon: React.ComponentProps<typeof Ionicons>['name'];
+  backgroundColor: string;
+  foregroundColor: string;
+  disabled: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      disabled={disabled}
+      onPress={onPress}
+      className="min-w-[86px] items-center justify-center gap-1 px-3"
+      style={{ backgroundColor, opacity: disabled ? 0.55 : 1 }}
+    >
+      <Ionicons name={icon} size={18} color={foregroundColor} />
+      <Text className="text-center text-xs font-bold" style={{ color: foregroundColor }} numberOfLines={2}>
+        {label}
+      </Text>
+    </Pressable>
   );
 }
 

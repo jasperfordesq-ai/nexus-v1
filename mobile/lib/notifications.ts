@@ -99,6 +99,7 @@ export async function registerForPushNotifications(): Promise<void> {
 
     await api.post<void>('/api/push/register-device', {
       token: tokenData.data,
+      token_type: 'expo',
       platform: Platform.OS === 'ios' ? 'ios' : 'android',
     });
   } catch (err) {
@@ -118,7 +119,7 @@ export async function unregisterPushNotifications(): Promise<void> {
     if (status !== 'granted') return;
     const projectId = Constants.expoConfig?.extra?.eas?.projectId;
     const tokenData = await Notifications.getExpoPushTokenAsync(projectId ? { projectId } : undefined);
-    await api.post<void>('/api/push/unregister-device', { token: tokenData.data });
+    await api.post<void>('/api/push/unregister-device', { token: tokenData.data, token_type: 'expo' });
   } catch (err) {
     // Best effort on logout — log to Sentry for visibility
     if (err instanceof Error) {

@@ -4,12 +4,13 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, FlatList, ScrollView, View } from 'react-native';
+import { Alert, FlatList, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 
 import AppTopBar from '@/components/ui/AppTopBar';
 import BottomSheet from '@/components/ui/BottomSheet';
@@ -570,6 +571,7 @@ function PickupsPanel() {
   const [editingSlot, setEditingSlot] = useState<MarketplacePickupSlot | null>(null);
   const [qrCode, setQrCode] = useState('');
   const [lastScan, setLastScan] = useState<MarketplacePickupReservation | null>(null);
+  const [isScannerVisible, setIsScannerVisible] = useState(false);
   const slots = useApi(() => getMarketplacePickupSlots(), [], { enabled: true });
   const reservations = useApi(() => getMyMarketplacePickups(), [], { enabled: true });
 
@@ -616,6 +618,19 @@ function PickupsPanel() {
     if (!qrCode.trim()) return;
     try {
       const response = await scanMarketplacePickup(qrCode.trim());
+      setLastScan(response.data);
+      setQrCode('');
+      reservations.refresh();
+    } catch (err) {
+      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.pickups.scanFailed'));
+    }
+  }
+
+  async function scanToken(token: string) {
+    setQrCode(token);
+    setIsScannerVisible(false);
+    try {
+      const response = await scanMarketplacePickup(token);
       setLastScan(response.data);
       setQrCode('');
       reservations.refresh();
@@ -679,6 +694,7 @@ function PickupsPanel() {
           </HeroButton>
         ) : null}
         <FormInput label={t('tools.pickups.qr')} value={qrCode} onChangeText={setQrCode} placeholder={t('tools.pickups.qrPlaceholder')} />
+        <ScanButton label={t('tools.pickups.scanCamera')} primary={primary} onPress={() => setIsScannerVisible(true)} />
         <HeroButton variant="secondary" onPress={scan} isDisabled={!qrCode.trim()}>
           <HeroButton.Label>{t('tools.pickups.scan')}</HeroButton.Label>
         </HeroButton>
@@ -701,6 +717,12 @@ function PickupsPanel() {
           </Surface>
         ) : null}
       </View>
+      <QrScannerSheet
+        visible={isScannerVisible}
+        title={t('tools.pickups.scanCamera')}
+        onClose={() => setIsScannerVisible(false)}
+        onScanned={(token) => void scanToken(token)}
+      />
       <PanelList
         isLoading={slots.isLoading}
         items={slots.data?.data ?? []}
@@ -790,6 +812,7 @@ function CouponsPanel() {
   const [isLoadingRedemptions, setIsLoadingRedemptions] = useState(false);
   const [isSavingCoupon, setIsSavingCoupon] = useState(false);
   const [isRedeemingQr, setIsRedeemingQr] = useState(false);
+  const [isScannerVisible, setIsScannerVisible] = useState(false);
   const [handledRouteCouponKey, setHandledRouteCouponKey] = useState<string | null>(null);
   const coupons = useApi(() => getMerchantCoupons(), [], { enabled: true });
 
@@ -888,6 +911,25 @@ function CouponsPanel() {
     }
   }
 
+  async function redeemScannedQr(token: string) {
+    setRedeemToken(token);
+    setIsScannerVisible(false);
+    setIsRedeemingQr(true);
+    try {
+      const response = await redeemPublicMerchantCouponQr(token);
+      setLastQrRedemption(response.data);
+      setRedeemToken('');
+      coupons.refresh();
+      if (redemptionCoupon) {
+        void openRedemptions(redemptionCoupon);
+      }
+    } catch (err) {
+      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.coupons.qrRedeemFailed'));
+    } finally {
+      setIsRedeemingQr(false);
+    }
+  }
+
   useEffect(() => {
     if (!targetCouponId || !targetCouponMode) return;
     const routeKey = `${targetCouponMode}:${targetCouponId}`;
@@ -965,8 +1007,8 @@ function CouponsPanel() {
           <View className="min-w-0 flex-1">
             <FormInput label={t('tools.coupons.validUntil')} value={form.validUntil} onChangeText={(value) => updateForm('validUntil', value)} placeholder={t('tools.coupons.datePlaceholder')} />
           </View>
-        </View>
-        <View className="gap-2">
+      </View>
+      <View className="gap-2">
           <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('tools.coupons.status')}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
             {COUPON_STATUSES.map((status) => (
@@ -1007,6 +1049,7 @@ function CouponsPanel() {
           </View>
         </View>
         <FormInput label={t('tools.coupons.qrToken')} value={redeemToken} onChangeText={setRedeemToken} placeholder={t('tools.coupons.qrTokenPlaceholder')} />
+        <ScanButton label={t('tools.coupons.scanCamera')} primary={primary} onPress={() => setIsScannerVisible(true)} />
         <HeroButton variant="secondary" onPress={redeemQr} isDisabled={isRedeemingQr || !redeemToken.trim()}>
           {isRedeemingQr ? <Spinner size="sm" /> : null}
           <HeroButton.Label>{isRedeemingQr ? t('tools.coupons.redeemingQr') : t('tools.coupons.redeemQr')}</HeroButton.Label>
@@ -1046,6 +1089,13 @@ function CouponsPanel() {
             onDelete={() => void remove(item)}
           />
         )}
+      />
+
+      <QrScannerSheet
+        visible={isScannerVisible}
+        title={t('tools.coupons.scanCamera')}
+        onClose={() => setIsScannerVisible(false)}
+        onScanned={(token) => void redeemScannedQr(token)}
       />
 
       <BottomSheet visible={Boolean(redemptionCoupon)} onClose={() => setRedemptionCoupon(null)} snapPoints={[620]}>
@@ -1320,6 +1370,82 @@ function FormInput({
         accessibilityLabel={label}
       />
     </View>
+  );
+}
+
+export function QrScannerSheet({
+  visible,
+  title,
+  onClose,
+  onScanned,
+}: {
+  visible: boolean;
+  title: string;
+  onClose: () => void;
+  onScanned: (token: string) => void;
+}) {
+  const { t } = useTranslation(['marketplace', 'common']);
+  const primary = usePrimaryColor();
+  const theme = useTheme();
+  const [permission, requestPermission] = useCameraPermissions();
+  const [scanned, setScanned] = useState(false);
+
+  useEffect(() => {
+    if (!visible) {
+      setScanned(false);
+      return;
+    }
+    if (!permission?.granted) {
+      void requestPermission();
+    }
+  }, [permission?.granted, requestPermission, visible]);
+
+  return (
+    <BottomSheet visible={visible} onClose={onClose} snapPoints={[560]} title={title}>
+      <View className="gap-3">
+        {permission?.granted ? (
+          <View className="h-80 overflow-hidden rounded-panel-inner">
+            <CameraView
+              style={{ flex: 1 }}
+              barcodeScannerSettings={{ barcodeTypes: ['qr'] }}
+              onBarcodeScanned={scanned ? undefined : (event) => {
+                const token = event.data.trim();
+                if (!token) return;
+                setScanned(true);
+                onScanned(token);
+              }}
+            />
+          </View>
+        ) : (
+          <Surface variant="secondary" className="gap-2 rounded-panel-inner p-4">
+            <Text className="text-sm font-bold" style={{ color: theme.text }}>{t('tools.scanner.permissionTitle')}</Text>
+            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('tools.scanner.permissionHint')}</Text>
+            <HeroButton variant="primary" onPress={() => void requestPermission()} style={{ backgroundColor: primary }}>
+              <HeroButton.Label>{t('tools.scanner.permissionAction')}</HeroButton.Label>
+            </HeroButton>
+          </Surface>
+        )}
+      </View>
+    </BottomSheet>
+  );
+}
+
+function ScanButton({ label, primary, onPress }: { label: string; primary: string; onPress: () => void }) {
+  return (
+    <Pressable
+      className="min-h-11 flex-row items-center justify-center gap-2 rounded-panel-inner border px-4"
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={onPress}
+      style={({ pressed }) => ({
+        borderColor: withAlpha(primary, 0.24),
+        backgroundColor: withAlpha(primary, pressed ? 0.16 : 0.08),
+        opacity: pressed ? 0.86 : 1,
+      })}
+    >
+      <Ionicons name="scan-outline" size={16} color={primary} />
+      <Text className="text-sm font-bold" style={{ color: primary }} onPress={onPress}>{label}</Text>
+    </Pressable>
   );
 }
 

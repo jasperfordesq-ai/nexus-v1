@@ -27,6 +27,9 @@ jest.mock('react-i18next', () => ({
         'markRead': 'Mark read',
         'markGroupRead': 'Mark group read',
         'delete': 'Delete',
+        'swipeMarkRead': 'Swipe action: mark read',
+        'swipeMarkGroupRead': 'Swipe action: mark group read',
+        'swipeDelete': 'Swipe action: delete notification',
         'marking': 'Marking...',
         'markError': 'Failed to mark as read.',
         'deleteError': 'Could not delete notification.',
@@ -95,6 +98,26 @@ jest.mock('@expo/vector-icons', () => ({
   Ionicons: 'View',
 }));
 
+jest.mock('react-native-gesture-handler', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+
+  return {
+    Swipeable: ({
+      children,
+      renderRightActions,
+    }: {
+      children: React.ReactNode;
+      renderRightActions?: () => React.ReactNode;
+    }) => (
+      <View>
+        {children}
+        {renderRightActions ? renderRightActions() : null}
+      </View>
+    ),
+  };
+});
+
 jest.mock('@/lib/api/notifications', () => ({
   getNotifications: jest.fn(),
   markAllRead: jest.fn().mockResolvedValue(undefined),
@@ -121,6 +144,7 @@ import { navigateToLink } from '@/lib/utils/navigateToLink';
 const defaultApiState = { data: null, isLoading: false, error: null, refresh: jest.fn() };
 
 beforeEach(() => {
+  jest.clearAllMocks();
   mockUseApi.mockReturnValue(defaultApiState);
 });
 
@@ -185,8 +209,8 @@ describe('NotificationsScreen', () => {
       refresh,
     });
 
-    const { getByText } = render(<NotificationsScreen />);
-    fireEvent.press(getByText('Mark read'));
+    const { getAllByText } = render(<NotificationsScreen />);
+    fireEvent.press(getAllByText('Mark read')[0]);
 
     await waitFor(() => expect(markRead).toHaveBeenCalledWith(1));
     expect(refresh).toHaveBeenCalled();
@@ -201,9 +225,40 @@ describe('NotificationsScreen', () => {
       refresh,
     });
 
-    const { getByText } = render(<NotificationsScreen />);
-    fireEvent.press(getByText('Delete'));
+    const { getAllByText } = render(<NotificationsScreen />);
+    fireEvent.press(getAllByText('Delete')[0]);
 
+    await waitFor(() => expect(deleteNotification).toHaveBeenCalledWith(1));
+    expect(refresh).toHaveBeenCalled();
+  });
+
+  it('exposes a swipe action for marking an ungrouped notification read', async () => {
+    const refresh = jest.fn();
+    mockUseApi.mockReturnValue({
+      data: { data: [mockNotification] },
+      isLoading: false,
+      error: null,
+      refresh,
+    });
+
+    const { getByLabelText } = render(<NotificationsScreen />);
+
+    fireEvent.press(getByLabelText('Swipe action: mark read'));
+    await waitFor(() => expect(markRead).toHaveBeenCalledWith(1));
+    expect(refresh).toHaveBeenCalled();
+  });
+
+  it('exposes a swipe action for deleting an ungrouped notification', async () => {
+    const refresh = jest.fn();
+    mockUseApi.mockReturnValue({
+      data: { data: [mockNotification] },
+      isLoading: false,
+      error: null,
+      refresh,
+    });
+
+    const { getByLabelText } = render(<NotificationsScreen />);
+    fireEvent.press(getByLabelText('Swipe action: delete notification'));
     await waitFor(() => expect(deleteNotification).toHaveBeenCalledWith(1));
     expect(refresh).toHaveBeenCalled();
   });
@@ -248,7 +303,7 @@ describe('NotificationsScreen', () => {
       refresh,
     });
 
-    const { getByLabelText, getByText, queryByText } = render(<NotificationsScreen />);
+    const { getAllByText, getByLabelText, getByText, queryByText } = render(<NotificationsScreen />);
 
     expect(getByText('2 notifications')).toBeTruthy();
     expect(queryByText('Delete')).toBeNull();
@@ -258,7 +313,7 @@ describe('NotificationsScreen', () => {
     expect(getByText('Jo')).toBeTruthy();
     expect(getByText('And 1 others')).toBeTruthy();
 
-    fireEvent.press(getByText('Mark group read'));
+    fireEvent.press(getAllByText('Mark group read')[0]);
 
     await waitFor(() => expect(markGroupRead).toHaveBeenCalledWith('federation_message:/federation/messages'));
     expect(refresh).toHaveBeenCalled();

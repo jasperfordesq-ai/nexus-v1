@@ -10,6 +10,7 @@ import { router, type Href, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
+import * as Location from 'expo-location';
 
 import MarketplaceListingCard from '@/components/marketplace/MarketplaceListingCard';
 import AppTopBar from '@/components/ui/AppTopBar';
@@ -84,6 +85,42 @@ function MarketplaceMapScreen() {
     }
   }
 
+  async function searchCurrentLocation() {
+    setIsLoading(true);
+    setHasSearched(true);
+    setError(null);
+
+    try {
+      const permission = await Location.requestForegroundPermissionsAsync();
+      if (permission.status !== 'granted') {
+        setItems([]);
+        setError(t('map.locationPermissionDenied'));
+        return;
+      }
+
+      const current = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+      const nextLatitude = String(current.coords.latitude);
+      const nextLongitude = String(current.coords.longitude);
+      setLatitude(nextLatitude);
+      setLongitude(nextLongitude);
+
+      const response = await getNearbyMarketplaceListings({
+        latitude: current.coords.latitude,
+        longitude: current.coords.longitude,
+        radius: Number(radius) || 25,
+        limit: 50,
+      });
+      setItems(response.data);
+    } catch (err) {
+      setItems([]);
+      setError(err instanceof Error ? err.message : t('map.locationLoadFailed'));
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   if (!hasFeature('marketplace')) {
     return (
       <SafeAreaView className="flex-1 bg-background">
@@ -133,6 +170,10 @@ function MarketplaceMapScreen() {
                   <HeroButton variant="primary" onPress={() => void search()} isDisabled={isLoading} style={{ backgroundColor: primary }}>
                     <Ionicons name="locate-outline" size={16} color="#fff" />
                     <HeroButton.Label>{t('map.search')}</HeroButton.Label>
+                  </HeroButton>
+                  <HeroButton variant="secondary" onPress={() => void searchCurrentLocation()} isDisabled={isLoading}>
+                    <Ionicons name="navigate-outline" size={16} color={primary} />
+                    <HeroButton.Label>{t('map.useCurrentLocation')}</HeroButton.Label>
                   </HeroButton>
                 </Surface>
               </HeroCard.Body>

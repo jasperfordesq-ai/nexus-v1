@@ -5,6 +5,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, Platform, type AppStateStatus } from 'react-native';
+import NetInfo from '@react-native-community/netinfo';
 import { API_BASE_URL } from '@/lib/constants';
 
 /** How long to wait for the health-check ping before treating as offline (ms). */
@@ -108,6 +109,24 @@ export function useNetworkStatus(): NetworkStatus {
   useEffect(() => {
     if (Platform.OS === 'web') return;
     void checkConnectivity();
+  }, [checkConnectivity]);
+
+  // Native reachability changes should update the UI immediately. The API ping
+  // remains as a backend-specific confirmation layer for foreground resumes.
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+
+    return NetInfo.addEventListener((state) => {
+      const hasNetwork = state.isConnected !== false;
+      const hasInternet = state.isInternetReachable !== false;
+      const nextOnline = hasNetwork && hasInternet;
+
+      setIsOnline(nextOnline);
+
+      if (state.isConnected && state.isInternetReachable === null) {
+        void checkConnectivity();
+      }
+    });
   }, [checkConnectivity]);
 
   // Re-check every time the app returns to the foreground (native only).

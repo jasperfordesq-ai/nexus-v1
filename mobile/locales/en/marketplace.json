@@ -761,6 +761,7 @@
       "activate": "Activate",
       "qr": "QR code",
       "qrPlaceholder": "Paste or scan pickup code",
+      "scanCamera": "Scan with camera",
       "scan": "Mark pickup complete",
       "lastScan": "Pickup confirmed",
       "lastScanDetail": "Order {{order}} is now {{status}}.",
@@ -812,6 +813,7 @@
       "qrRedeemHint": "Paste the token shown on a member coupon QR to mark it redeemed.",
       "qrToken": "QR token",
       "qrTokenPlaceholder": "Paste coupon token",
+      "scanCamera": "Scan with camera",
       "redeemQr": "Redeem coupon QR",
       "redeemingQr": "Redeeming QR",
       "qrRedeemed": "Coupon QR redeemed",
@@ -849,6 +851,11 @@
         "listing_ids": "Specific listings",
         "category_ids": "Specific categories"
       }
+    },
+    "scanner": {
+      "permissionTitle": "Camera access is needed",
+      "permissionHint": "Allow camera access to scan marketplace QR codes.",
+      "permissionAction": "Allow camera access"
     }
   },
   "map": {
@@ -862,6 +869,9 @@
     "radius": "Radius",
     "radiusOption": "{{radius}} km",
     "search": "Search nearby",
+    "useCurrentLocation": "Use current location",
+    "locationPermissionDenied": "Location permission is needed to search from your current position.",
+    "locationLoadFailed": "Could not read your current location. Please enter coordinates instead.",
     "invalidCoordinates": "Enter a valid latitude and longitude.",
     "loadFailed": "Could not load nearby marketplace listings.",
     "results": "{{count}} nearby listings",

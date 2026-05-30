@@ -117,6 +117,8 @@
   "push.no_subscribers": "No subscribers found",
   "push.token_pending": "Token received - will be associated on login",
   "push.device_registered": "Device registered for push notifications",
+  "push.device_unregistered": "Device unregistered",
+  "push.device_not_found": "Device not found",
   "registration.email_verified": "Email verified successfully",
   "registration.verification_sent": "Verification email sent if account exists",
   "resource_category.reordered": "Resources reordered successfully",

@@ -57,6 +57,7 @@ const mockT = (key: string, opts?: Record<string, unknown>) => {
     'tools.pickups.activate': 'Activate',
     'tools.pickups.qr': 'QR code',
     'tools.pickups.qrPlaceholder': 'Paste or scan pickup code',
+    'tools.pickups.scanCamera': 'Scan with camera',
     'tools.pickups.scan': 'Mark pickup complete',
     'tools.pickups.emptySlots': 'No pickup slots yet',
     'tools.pickups.emptyReservations': 'No pickup reservations yet',
@@ -128,6 +129,7 @@ const mockT = (key: string, opts?: Record<string, unknown>) => {
     'tools.coupons.qrRedeemHint': 'Paste the token shown on a member coupon QR to mark it redeemed.',
     'tools.coupons.qrToken': 'QR token',
     'tools.coupons.qrTokenPlaceholder': 'Paste coupon token',
+    'tools.coupons.scanCamera': 'Scan with camera',
     'tools.coupons.redeemQr': 'Redeem coupon QR',
     'tools.coupons.redeemingQr': 'Redeeming QR',
     'tools.coupons.qrRedeemed': 'Coupon QR redeemed',
@@ -251,7 +253,19 @@ jest.mock('@/lib/api/marketplace', () => ({
   updateMarketplacePickupSlot: jest.fn(),
 }));
 
-import MarketplaceToolsRoute from './marketplace-tools';
+jest.mock('expo-camera', () => ({
+  CameraView: ({ onBarcodeScanned }: { onBarcodeScanned?: (event: { data: string }) => void }) => {
+    const { Pressable, Text } = require('react-native');
+    return (
+      <Pressable onPress={() => onBarcodeScanned?.({ data: 'camera-token-123' })}>
+        <Text>Mock camera scanner</Text>
+      </Pressable>
+    );
+  },
+  useCameraPermissions: jest.fn(() => [{ granted: true }, jest.fn().mockResolvedValue({ granted: true })]),
+}));
+
+import MarketplaceToolsRoute, { QrScannerSheet } from './marketplace-tools';
 import {
   createMarketplacePickupSlot,
   createMarketplaceSavedSearch,
@@ -503,5 +517,22 @@ describe('MarketplaceToolsRoute', () => {
     });
     expect(await findByText('Coupon QR redeemed')).toBeTruthy();
     expect(getMerchantCoupons).toHaveBeenCalledTimes(2);
+  });
+
+  it('reads QR tokens from the device camera scanner sheet', async () => {
+    const onScanned = jest.fn();
+
+    const { getByText } = render(
+      <QrScannerSheet
+        visible
+        title="Scan with camera"
+        onClose={jest.fn()}
+        onScanned={onScanned}
+      />,
+    );
+
+    fireEvent.press(getByText('Mock camera scanner'));
+
+    expect(onScanned).toHaveBeenCalledWith('camera-token-123');
   });
 });

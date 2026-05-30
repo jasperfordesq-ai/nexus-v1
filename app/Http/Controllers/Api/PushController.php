@@ -277,7 +277,9 @@ class PushController extends BaseApiController
 
             return $this->respondWithData([
                 'unregistered' => $result,
-                'message' => $result ? 'Device unregistered' : 'Device not found',
+                'message' => $result
+                    ? __('api_controllers_2.push.device_unregistered')
+                    : __('api_controllers_2.push.device_not_found'),
             ]);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning('[PushApi] Unregister device error: ' . $e->getMessage());

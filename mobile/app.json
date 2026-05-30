@@ -57,6 +57,18 @@
       "expo-router",
       "expo-secure-store",
       "expo-image-picker",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Project NEXUS uses your location only when you choose to search nearby marketplace listings."
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Project NEXUS uses the camera only when you choose to scan marketplace QR codes."
+        }
+      ],
       "expo-font",
       [
         "expo-notifications",

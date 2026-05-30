@@ -34,6 +34,9 @@ class FCMPushService
     /** Legacy FCM HTTP API endpoint. */
     private const FCM_LEGACY_URL = 'https://fcm.googleapis.com/fcm/send';
 
+    /** Expo Push API endpoint for Expo-managed Android/iOS tokens. */
+    private const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send';
+
     /** Cached OAuth2 access token for HTTP v1 API. */
     private static ?string $accessToken = null;
 
@@ -51,10 +54,6 @@ class FCMPushService
      */
     public static function sendToUser(int $userId, string $title, string $body, array $data = []): array
     {
-        if (!self::isConfiguredStatic()) {
-            return ['sent' => 0, 'failed' => 0, 'errors' => ['FCM not configured']];
-        }
-
         // Honour the user's push_enabled preference. Default true so legacy
         // users with no JSON pref still receive notifications until they
         // explicitly opt out. Best-effort — pref-lookup failures don't block.
@@ -88,8 +87,8 @@ class FCMPushService
      */
     public static function sendToUsers(array $userIds, string $title, string $body, array $data = []): array
     {
-        if (!self::isConfiguredStatic() || empty($userIds)) {
-            return ['sent' => 0, 'failed' => 0, 'errors' => empty($userIds) ? [] : ['FCM not configured']];
+        if (empty($userIds)) {
+            return ['sent' => 0, 'failed' => 0, 'errors' => []];
         }
 
         // Filter out users who turned off push_enabled.
@@ -237,6 +236,37 @@ class FCMPushService
         $sent = 0;
         $failed = 0;
         $errors = [];
+        $expoTokens = [];
+        $nativeTokens = [];
+
+        foreach ($tokens as $token) {
+            if (self::isExpoPushToken((string) $token)) {
+                $expoTokens[] = (string) $token;
+            } else {
+                $nativeTokens[] = (string) $token;
+            }
+        }
+
+        if (!empty($expoTokens)) {
+            $expoResult = self::sendToExpoTokens($expoTokens, $title, $body, $data);
+            $sent += $expoResult['sent'];
+            $failed += $expoResult['failed'];
+            $errors = array_merge($errors, $expoResult['errors']);
+        }
+
+        if (empty($nativeTokens)) {
+            return ['sent' => $sent, 'failed' => $failed, 'errors' => $errors];
+        }
+
+        $tokens = $nativeTokens;
+
+        if (!self::isConfiguredStatic()) {
+            return [
+                'sent' => $sent,
+                'failed' => $failed + count($tokens),
+                'errors' => array_merge($errors, ['FCM not configured']),
+            ];
+        }
 
         // Try HTTP v1 API first
         $projectId = self::getProjectId();
@@ -467,5 +497,77 @@ class FCMPushService
     private static function base64UrlEncode(string $data): string
     {
         return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+    }
+
+    private static function isExpoPushToken(string $token): bool
+    {
+        return str_starts_with($token, 'ExponentPushToken[')
+            || str_starts_with($token, 'ExpoPushToken[');
+    }
+
+    /**
+     * Send Expo-managed push tokens through Expo Push Service.
+     *
+     * @return array{sent: int, failed: int, errors: string[]}
+     */
+    private static function sendToExpoTokens(array $tokens, string $title, string $body, array $data): array
+    {
+        $messages = array_map(static fn (string $token): array => [
+            'to' => $token,
+            'title' => $title,
+            'body' => $body,
+            'sound' => 'default',
+            'data' => array_map('strval', $data),
+        ], $tokens);
+
+        try {
+            $response = Http::acceptJson()
+                ->asJson()
+                ->timeout(10)
+                ->post(self::EXPO_PUSH_URL, count($messages) === 1 ? $messages[0] : $messages);
+
+            if (!$response->successful()) {
+                return [
+                    'sent' => 0,
+                    'failed' => count($tokens),
+                    'errors' => ['Expo push HTTP ' . $response->status()],
+                ];
+            }
+
+            $payload = $response->json();
+            $tickets = $payload['data'] ?? [];
+            if (isset($tickets['status'])) {
+                $tickets = [$tickets];
+            }
+
+            $sent = 0;
+            $failed = 0;
+            $errors = [];
+
+            foreach ($tokens as $index => $token) {
+                $ticket = $tickets[$index] ?? null;
+                if (($ticket['status'] ?? null) === 'ok') {
+                    $sent++;
+                    continue;
+                }
+
+                $failed++;
+                $message = $ticket['message'] ?? 'Unknown Expo push error';
+                $detailsError = $ticket['details']['error'] ?? null;
+                $errors[] = "Token {$token}: {$message}";
+
+                if ($detailsError === 'DeviceNotRegistered') {
+                    DB::table('fcm_device_tokens')->where('token', $token)->delete();
+                }
+            }
+
+            return ['sent' => $sent, 'failed' => $failed, 'errors' => $errors];
+        } catch (\Throwable $e) {
+            return [
+                'sent' => 0,
+                'failed' => count($tokens),
+                'errors' => ['Expo push failed: ' . $e->getMessage()],
+            ];
+        }
     }
 }

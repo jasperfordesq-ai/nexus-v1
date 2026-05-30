@@ -9,6 +9,7 @@ namespace Tests\Laravel\Unit\Services;
 use Tests\Laravel\TestCase;
 use App\Services\FCMPushService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class FCMPushServiceTest extends TestCase
@@ -44,6 +45,46 @@ class FCMPushServiceTest extends TestCase
         $this->assertEquals(0, $result['sent']);
         $this->assertEquals(0, $result['failed']);
         $this->assertEmpty($result['errors']);
+    }
+
+    public function test_sendToUser_sends_expo_tokens_through_expo_push_api_without_fcm_credentials(): void
+    {
+        config([
+            'services.fcm.server_key' => null,
+            'services.fcm.project_id' => null,
+            'services.fcm.service_account_path' => base_path('missing-firebase-service-account.json'),
+        ]);
+
+        Http::fake([
+            'https://exp.host/--/api/v2/push/send' => Http::response([
+                'data' => [
+                    ['status' => 'ok', 'id' => 'ticket-1'],
+                ],
+            ], 200),
+        ]);
+
+        $query = \Mockery::mock();
+        $query->shouldReceive('where')->with('user_id', 1)->once()->andReturnSelf();
+        $query->shouldReceive('where')->with('tenant_id', $this->testTenantId)->once()->andReturnSelf();
+        $query->shouldReceive('pluck')->with('token')->once()->andReturn(collect(['ExponentPushToken[abc123]']));
+        DB::shouldReceive('table')->with('fcm_device_tokens')->once()->andReturn($query);
+
+        $result = FCMPushService::sendToUser(1, 'New message', 'You have a new message.', [
+            'link' => '/messages/123',
+        ]);
+
+        $this->assertSame(1, $result['sent']);
+        $this->assertSame(0, $result['failed']);
+
+        Http::assertSent(function ($request) {
+            $payload = $request->data();
+
+            return $request->url() === 'https://exp.host/--/api/v2/push/send'
+                && $payload['to'] === 'ExponentPushToken[abc123]'
+                && $payload['title'] === 'New message'
+                && $payload['body'] === 'You have a new message.'
+                && $payload['data']['link'] === '/messages/123';
+        });
     }
 
     // =========================================================================

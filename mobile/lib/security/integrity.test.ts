@@ -49,7 +49,6 @@ describe('integrity', () => {
       const originalDevice = Device.isDevice;
       const originalEnv = process.env.NODE_ENV;
       Object.defineProperty(Device, 'isDevice', { value: false, writable: true });
-      // @ts-expect-error — overriding readonly for test
       process.env.NODE_ENV = 'production';
       try {
         const result = checkDeviceIntegrity();
@@ -57,7 +56,6 @@ describe('integrity', () => {
         expect(result.warnings).toContain('Running on emulator in production');
       } finally {
         Object.defineProperty(Device, 'isDevice', { value: originalDevice, writable: true });
-        // @ts-expect-error — restoring readonly for test
         process.env.NODE_ENV = originalEnv;
       }
     });

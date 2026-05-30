@@ -30,6 +30,7 @@ jest.mock('react-i18next', () => ({
         'map.longitudePlaceholder': '-74.0060',
         'map.radius': 'Radius',
         'map.search': 'Search nearby',
+        'map.useCurrentLocation': 'Use current location',
         'map.invalidCoordinates': 'Enter a valid latitude and longitude.',
         'map.loadFailed': 'Could not load nearby marketplace listings.',
         'map.startTitle': 'Enter a location',
@@ -76,14 +77,25 @@ jest.mock('@/lib/api/marketplace', () => ({
   getNearbyMarketplaceListings: jest.fn(),
 }));
 
+jest.mock('expo-location', () => ({
+  requestForegroundPermissionsAsync: jest.fn(),
+  getCurrentPositionAsync: jest.fn(),
+  Accuracy: { Balanced: 3 },
+}));
+
 import MarketplaceMapRoute from './marketplace-map';
 import { getNearbyMarketplaceListings } from '@/lib/api/marketplace';
+import * as Location from 'expo-location';
 
 describe('MarketplaceMapRoute', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockSearchParams = {};
     (getNearbyMarketplaceListings as jest.Mock).mockResolvedValue({ data: [] });
+    jest.mocked(Location.requestForegroundPermissionsAsync).mockResolvedValue({ status: 'granted' } as never);
+    jest.mocked(Location.getCurrentPositionAsync).mockResolvedValue({
+      coords: { latitude: 53.3498, longitude: -6.2603 },
+    } as never);
   });
 
   it('honors React marketplace map lat/lng deep links', async () => {
@@ -136,6 +148,24 @@ describe('MarketplaceMapRoute', () => {
           longitude: -0.1278,
         }),
       );
+    });
+
+    unmount();
+  });
+
+  it('can search from the device current location', async () => {
+    const { getByText, unmount } = render(<MarketplaceMapRoute />);
+
+    fireEvent.press(getByText('Use current location'));
+
+    await waitFor(() => {
+      expect(Location.requestForegroundPermissionsAsync).toHaveBeenCalled();
+      expect(getNearbyMarketplaceListings).toHaveBeenCalledWith({
+        latitude: 53.3498,
+        longitude: -6.2603,
+        radius: 25,
+        limit: 50,
+      });
     });
 
     unmount();
