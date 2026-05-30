@@ -254,11 +254,9 @@ export function MatchesPage() {
           title={filter === 'all' ? t('empty_title_all') : t('empty_title_filtered', { source: filter })}
           description={t('empty_description')}
           action={
-            <Link to={tenantPath('/listings')}>
-              <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                {t('browse_listings')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath('/listings')} className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+              {t('browse_listings')}
+            </Button>
           }
         />
       ) : (

@@ -25,7 +25,7 @@ import Settings from 'lucide-react/icons/settings';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Spinner, SearchField, Avatar, CardRowsSkeleton } from '@/components/ui';
+import { GlassCard, Button, ToggleButton, ToggleButtonGroup, Chip, Spinner, SearchField, Avatar, CardRowsSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
@@ -485,23 +485,25 @@ export function SkillsBrowsePage() {
                                   <p className="text-xs font-medium text-theme-subtle uppercase tracking-wider mb-2">
                                     {t('skills.skills_in_category')} ({skills.length})
                                   </p>
-                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                    {skills.map((skill) => {
-                                      const isSelected =
-                                        selectedSkill?.categoryId === category.id &&
-                                        selectedSkill?.skillName === skill.skill_name;
-                                      return (
-                                        <Button
-                                          key={skill.skill_name}
-                                          variant="flat"
-                                          onPress={() => selectSkill(category.id, skill.skill_name)}
-                                          aria-pressed={isSelected}
-                                          className={`text-left p-3 rounded-xl border transition-all justify-start min-h-9 ${
-                                            isSelected
-                                              ? 'border-accent/40 bg-accent/10 shadow-sm shadow-accent/10'
-                                              : 'bg-theme-elevated border-theme-default hover:border-accent/30 hover:bg-theme-hover'
-                                          }`}
-                                        >
+                                  <ToggleButtonGroup
+                                    aria-label={t('skills.skills_in_category')}
+                                    selectionMode="single"
+                                    isDetached
+                                    selectedKeys={selectedSkill?.categoryId === category.id && selectedSkill?.skillName ? new Set([selectedSkill.skillName]) : new Set()}
+                                    onSelectionChange={(keys) => {
+                                      const [k] = Array.from(keys);
+                                      const next = k ?? (selectedSkill?.categoryId === category.id ? selectedSkill.skillName : undefined);
+                                      if (next) selectSkill(category.id, String(next));
+                                    }}
+                                    className="grid grid-cols-1 sm:grid-cols-2 gap-2"
+                                  >
+                                    {skills.map((skill) => (
+                                      <ToggleButton
+                                        key={skill.skill_name}
+                                        id={skill.skill_name}
+                                        variant="ghost"
+                                        className="text-left p-3 rounded-xl border transition-all justify-start min-h-9 bg-theme-elevated border-theme-default hover:border-accent/30 hover:bg-theme-hover data-[selected=true]:border-accent/40 data-[selected=true]:bg-accent/10 data-[selected=true]:shadow-sm data-[selected=true]:shadow-accent/10"
+                                      >
                                           <div className="flex items-center justify-between">
                                             <span className="text-sm font-medium text-theme-primary">
                                               {skill.skill_name}
@@ -529,10 +531,9 @@ export function SkillsBrowsePage() {
                                               </span>
                                             )}
                                           </div>
-                                        </Button>
-                                      );
-                                    })}
-                                  </div>
+                                      </ToggleButton>
+                                    ))}
+                                  </ToggleButtonGroup>
                                 </div>
                               ) : (
                                 <div className="py-6 text-center">
