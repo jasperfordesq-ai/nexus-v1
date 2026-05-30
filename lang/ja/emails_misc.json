@@ -29,7 +29,13 @@
     "interview_email_subject_cancelled": "Interview cancelled — {{title}}",
     "interview_email_subject_reminder": "Upcoming interview — {{title}}",
     "interview_email_title": "Interview Update",
-    "interview_email_cta": "View Job"
+    "interview_email_cta": "View Job",
+    "posting_approved_subject": "求人が公開されました — {{title}}",
+    "posting_approved_email_body": "朗報です — 求人「{{title}}」が承認され、メンバーが閲覧・応募できるよう公開されました。",
+    "posting_approved_cta": "求人を見る",
+    "posting_not_approved_subject": "求人が承認されませんでした — {{title}}",
+    "posting_not_approved_email_body": "求人「{{title}}」は審査の結果、承認できませんでした。理由：{{reason}}。編集して再申請できます。",
+    "posting_not_approved_cta": "求人を編集"
   },
   "guardian": {
     "consent_title": "Guardian Consent Request",

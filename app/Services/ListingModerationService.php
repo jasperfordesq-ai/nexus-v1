@@ -123,14 +123,20 @@ class ListingModerationService
             ->where('id', $listing->user_id)
             ->where('tenant_id', $tenantId)
             ->value('preferred_language');
-        LocaleContext::withLocale($ownerLang, function () use ($listing, $title, $listingId) {
-            Notification::create([
-                'user_id' => $listing->user_id,
-                'message' => __('emails_listings.listings.approved.notification', ['title' => $title]),
-                'link' => "/listings/{$listingId}",
-                'type' => 'listing_approved',
-                'created_at' => now(),
-            ]);
+        LocaleContext::withLocale($ownerLang, function () use ($listing, $title, $listingId, $tenantId) {
+            $message = __('emails_listings.listings.approved.notification', ['title' => $title]);
+            // Tenant-safe writer (forces the recipient's tenant_id) instead of a
+            // raw Notification::create that omitted tenant_id, plus device push
+            // for channel parity — this path previously sent a bell only.
+            Notification::createNotification(
+                (int) $listing->user_id,
+                $message,
+                "/listings/{$listingId}",
+                'listing_approved',
+                false,
+                (int) $tenantId
+            );
+            \App\Services\NotificationDispatcher::fanOutPush((int) $listing->user_id, 'listing_approved', $message, "/listings/{$listingId}");
         });
 
         ActivityLog::log($adminId, 'listing_moderation_approve', "Approved listing #{$listingId}: {$listing->title}");

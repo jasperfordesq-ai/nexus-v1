@@ -29,7 +29,13 @@
     "interview_email_subject_cancelled": "Interview cancelled — {{title}}",
     "interview_email_subject_reminder": "Upcoming interview — {{title}}",
     "interview_email_title": "Interview Update",
-    "interview_email_cta": "View Job"
+    "interview_email_cta": "View Job",
+    "posting_approved_subject": "تم نشر إعلان وظيفتك — {{title}}",
+    "posting_approved_email_body": "أخبار جيدة — تمت الموافقة على إعلان وظيفتك \"{{title}}\" وأصبح الآن منشورًا ليطّلع عليه الأعضاء ويتقدموا إليه.",
+    "posting_approved_cta": "عرض الإعلان",
+    "posting_not_approved_subject": "لم تتم الموافقة على إعلان وظيفتك — {{title}}",
+    "posting_not_approved_email_body": "تمت مراجعة إعلان وظيفتك \"{{title}}\" ولم تتم الموافقة عليه. السبب: {{reason}}. يمكنك تعديله وإعادة إرساله للمراجعة.",
+    "posting_not_approved_cta": "تعديل الإعلان"
   },
   "guardian": {
     "consent_title": "Guardian Consent Request",

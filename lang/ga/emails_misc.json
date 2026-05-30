@@ -29,7 +29,13 @@
     "interview_email_subject_cancelled": "Interview cancelled — {{title}}",
     "interview_email_subject_reminder": "Upcoming interview — {{title}}",
     "interview_email_title": "Interview Update",
-    "interview_email_cta": "View Job"
+    "interview_email_cta": "View Job",
+    "posting_approved_subject": "Tá d’fhógra poist beo — {{title}}",
+    "posting_approved_email_body": "Dea-scéal — ceadaíodh d’fhógra poist \"{{title}}\" agus tá sé beo anois le go bhfeicfidh baill é agus cur isteach air.",
+    "posting_approved_cta": "Féach ar an bhfógra",
+    "posting_not_approved_subject": "Níor ceadaíodh d’fhógra poist — {{title}}",
+    "posting_not_approved_email_body": "Rinneadh athbhreithniú ar d’fhógra poist \"{{title}}\" agus níorbh fhéidir é a cheadú. Fáth: {{reason}}. Is féidir leat é a chur in eagar agus a athsheoladh lena athbhreithniú.",
+    "posting_not_approved_cta": "Cuir an fógra in eagar"
   },
   "guardian": {
     "consent_title": "Guardian Consent Request",

@@ -29,7 +29,13 @@
     "interview_email_subject_cancelled": "Interview cancelled — {{title}}",
     "interview_email_subject_reminder": "Upcoming interview — {{title}}",
     "interview_email_title": "Interview Update",
-    "interview_email_cta": "View Job"
+    "interview_email_cta": "View Job",
+    "posting_approved_subject": "Ihre Stellenanzeige ist online — {{title}}",
+    "posting_approved_email_body": "Gute Nachrichten — Ihre Stellenanzeige „{{title}}“ wurde genehmigt und ist jetzt online, sodass Mitglieder sie sehen und sich bewerben können.",
+    "posting_approved_cta": "Anzeige ansehen",
+    "posting_not_approved_subject": "Ihre Stellenanzeige wurde nicht genehmigt — {{title}}",
+    "posting_not_approved_email_body": "Ihre Stellenanzeige „{{title}}“ wurde geprüft und konnte nicht genehmigt werden. Grund: {{reason}}. Sie können sie bearbeiten und erneut zur Prüfung einreichen.",
+    "posting_not_approved_cta": "Anzeige bearbeiten"
   },
   "guardian": {
     "consent_title": "Guardian Consent Request",

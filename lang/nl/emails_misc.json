@@ -29,7 +29,13 @@
     "interview_email_subject_cancelled": "Interview cancelled — {{title}}",
     "interview_email_subject_reminder": "Upcoming interview — {{title}}",
     "interview_email_title": "Interview Update",
-    "interview_email_cta": "View Job"
+    "interview_email_cta": "View Job",
+    "posting_approved_subject": "Je vacature staat live — {{title}}",
+    "posting_approved_email_body": "Goed nieuws — je vacature \"{{title}}\" is goedgekeurd en staat nu live zodat leden hem kunnen zien en erop kunnen reageren.",
+    "posting_approved_cta": "Vacature bekijken",
+    "posting_not_approved_subject": "Je vacature is niet goedgekeurd — {{title}}",
+    "posting_not_approved_email_body": "Je vacature \"{{title}}\" is beoordeeld en kon niet worden goedgekeurd. Reden: {{reason}}. Je kunt hem bewerken en opnieuw indienen.",
+    "posting_not_approved_cta": "Vacature bewerken"
   },
   "guardian": {
     "consent_title": "Guardian Consent Request",

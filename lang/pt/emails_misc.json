@@ -29,7 +29,13 @@
     "interview_email_subject_cancelled": "Interview cancelled — {{title}}",
     "interview_email_subject_reminder": "Upcoming interview — {{title}}",
     "interview_email_title": "Interview Update",
-    "interview_email_cta": "View Job"
+    "interview_email_cta": "View Job",
+    "posting_approved_subject": "A sua vaga está publicada — {{title}}",
+    "posting_approved_email_body": "Boas notícias — a sua vaga \"{{title}}\" foi aprovada e está agora publicada para os membros verem e candidatarem-se.",
+    "posting_approved_cta": "Ver vaga",
+    "posting_not_approved_subject": "A sua vaga não foi aprovada — {{title}}",
+    "posting_not_approved_email_body": "A sua vaga \"{{title}}\" foi analisada e não pôde ser aprovada. Motivo: {{reason}}. Pode editá-la e submetê-la novamente para análise.",
+    "posting_not_approved_cta": "Editar vaga"
   },
   "guardian": {
     "consent_title": "Guardian Consent Request",

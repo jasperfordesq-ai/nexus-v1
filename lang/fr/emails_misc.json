@@ -29,7 +29,13 @@
     "interview_email_subject_cancelled": "Interview cancelled — {{title}}",
     "interview_email_subject_reminder": "Upcoming interview — {{title}}",
     "interview_email_title": "Interview Update",
-    "interview_email_cta": "View Job"
+    "interview_email_cta": "View Job",
+    "posting_approved_subject": "Votre offre d’emploi est en ligne — {{title}}",
+    "posting_approved_email_body": "Bonne nouvelle — votre offre d’emploi « {{title}} » a été approuvée et est désormais en ligne ; les membres peuvent la consulter et postuler.",
+    "posting_approved_cta": "Voir l’offre",
+    "posting_not_approved_subject": "Votre offre d’emploi n’a pas été approuvée — {{title}}",
+    "posting_not_approved_email_body": "Votre offre d’emploi « {{title}} » a été examinée et n’a pas pu être approuvée. Motif : {{reason}}. Vous pouvez la modifier et la soumettre à nouveau.",
+    "posting_not_approved_cta": "Modifier l’offre"
   },
   "guardian": {
     "consent_title": "Guardian Consent Request",

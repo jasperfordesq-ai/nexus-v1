@@ -29,7 +29,13 @@
     "interview_email_subject_cancelled": "Interview cancelled — {{title}}",
     "interview_email_subject_reminder": "Upcoming interview — {{title}}",
     "interview_email_title": "Interview Update",
-    "interview_email_cta": "View Job"
+    "interview_email_cta": "View Job",
+    "posting_approved_subject": "Twoje ogłoszenie o pracę jest aktywne — {{title}}",
+    "posting_approved_email_body": "Dobra wiadomość — Twoje ogłoszenie o pracę „{{title}}” zostało zatwierdzone i jest teraz aktywne, aby członkowie mogli je zobaczyć i aplikować.",
+    "posting_approved_cta": "Zobacz ogłoszenie",
+    "posting_not_approved_subject": "Twoje ogłoszenie o pracę nie zostało zatwierdzone — {{title}}",
+    "posting_not_approved_email_body": "Twoje ogłoszenie o pracę „{{title}}” zostało sprawdzone i nie mogło zostać zatwierdzone. Powód: {{reason}}. Możesz je edytować i ponownie przesłać do weryfikacji.",
+    "posting_not_approved_cta": "Edytuj ogłoszenie"
   },
   "guardian": {
     "consent_title": "Guardian Consent Request",

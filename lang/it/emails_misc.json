@@ -29,7 +29,13 @@
     "interview_email_subject_cancelled": "Interview cancelled — {{title}}",
     "interview_email_subject_reminder": "Upcoming interview — {{title}}",
     "interview_email_title": "Interview Update",
-    "interview_email_cta": "View Job"
+    "interview_email_cta": "View Job",
+    "posting_approved_subject": "Il tuo annuncio di lavoro è online — {{title}}",
+    "posting_approved_email_body": "Buone notizie — il tuo annuncio di lavoro \"{{title}}\" è stato approvato ed è ora online: i membri possono vederlo e candidarsi.",
+    "posting_approved_cta": "Vedi annuncio",
+    "posting_not_approved_subject": "Il tuo annuncio di lavoro non è stato approvato — {{title}}",
+    "posting_not_approved_email_body": "Il tuo annuncio di lavoro \"{{title}}\" è stato esaminato e non è stato possibile approvarlo. Motivo: {{reason}}. Puoi modificarlo e inviarlo di nuovo per la revisione.",
+    "posting_not_approved_cta": "Modifica annuncio"
   },
   "guardian": {
     "consent_title": "Guardian Consent Request",

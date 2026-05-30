@@ -120,8 +120,8 @@ class JobModerationService
 
             // Notify the job poster — render in poster's preferred_language, not admin's locale
             try {
-                $poster = User::select('id', 'preferred_language')->find($job->user_id);
-                LocaleContext::withLocale($poster, function () use ($job, $jobId) {
+                $poster = User::select('id', 'email', 'first_name', 'preferred_language')->find($job->user_id);
+                LocaleContext::withLocale($poster, function () use ($job, $jobId, $poster) {
                     Notification::createNotification(
                         (int) $job->user_id,
                         __('emails_misc.jobs.posting_approved'),
@@ -129,6 +129,19 @@ class JobModerationService
                         'job_moderation'
                     );
                     \App\Services\NotificationDispatcher::fanOutPush((int) ($job->user_id), 'job_moderation', __('emails_misc.jobs.posting_approved'), "/jobs/{$jobId}");
+
+                    // Durable email — the bell + push above leave no lasting record.
+                    if ($poster && !empty($poster->email)) {
+                        $title = htmlspecialchars((string) $job->title, ENT_QUOTES, 'UTF-8');
+                        $subject = __('emails_misc.jobs.posting_approved_subject', ['title' => $title]);
+                        $html = \App\Core\EmailTemplateBuilder::make()
+                            ->theme('success')
+                            ->title($subject)
+                            ->paragraph(__('emails_misc.jobs.posting_approved_email_body', ['title' => $title]))
+                            ->button(__('emails_misc.jobs.posting_approved_cta'), \App\Core\EmailTemplateBuilder::tenantUrl("/jobs/{$jobId}"))
+                            ->render();
+                        \App\Services\EmailDispatchService::sendRaw($poster->email, $subject, $html, null, null, null, 'job_moderation', ['tenant_id' => (int) $job->tenant_id]);
+                    }
                 });
             } catch (\Throwable $e) {
                 Log::warning('JobModerationService::approveJob notification failed', [
@@ -176,8 +189,8 @@ class JobModerationService
 
             // Notify the job poster — render in poster's preferred_language, not admin's locale
             try {
-                $poster = User::select('id', 'preferred_language')->find($job->user_id);
-                LocaleContext::withLocale($poster, function () use ($job, $jobId) {
+                $poster = User::select('id', 'email', 'first_name', 'preferred_language')->find($job->user_id);
+                LocaleContext::withLocale($poster, function () use ($job, $jobId, $poster, $reason) {
                     Notification::createNotification(
                         (int) $job->user_id,
                         __('emails_misc.jobs.posting_not_approved'),
@@ -185,6 +198,21 @@ class JobModerationService
                         'job_moderation'
                     );
                     \App\Services\NotificationDispatcher::fanOutPush((int) ($job->user_id), 'job_moderation', __('emails_misc.jobs.posting_not_approved'), "/jobs/{$jobId}");
+
+                    // Durable email with the rejection reason — a negative
+                    // outcome especially needs a lasting, actionable record.
+                    if ($poster && !empty($poster->email)) {
+                        $title = htmlspecialchars((string) $job->title, ENT_QUOTES, 'UTF-8');
+                        $safeReason = htmlspecialchars((string) $reason, ENT_QUOTES, 'UTF-8');
+                        $subject = __('emails_misc.jobs.posting_not_approved_subject', ['title' => $title]);
+                        $html = \App\Core\EmailTemplateBuilder::make()
+                            ->theme('danger')
+                            ->title($subject)
+                            ->paragraph(__('emails_misc.jobs.posting_not_approved_email_body', ['title' => $title, 'reason' => $safeReason]))
+                            ->button(__('emails_misc.jobs.posting_not_approved_cta'), \App\Core\EmailTemplateBuilder::tenantUrl("/jobs/{$jobId}"))
+                            ->render();
+                        \App\Services\EmailDispatchService::sendRaw($poster->email, $subject, $html, null, null, null, 'job_moderation', ['tenant_id' => (int) $job->tenant_id]);
+                    }
                 });
             } catch (\Throwable $e) {
                 Log::warning('JobModerationService::rejectJob notification failed', [

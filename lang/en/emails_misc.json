@@ -29,7 +29,13 @@
     "interview_email_subject_cancelled": "Interview cancelled — {{title}}",
     "interview_email_subject_reminder": "Upcoming interview — {{title}}",
     "interview_email_title": "Interview Update",
-    "interview_email_cta": "View Job"
+    "interview_email_cta": "View Job",
+    "posting_approved_subject": "Your job posting is live — {{title}}",
+    "posting_approved_email_body": "Good news — your job posting \"{{title}}\" has been approved and is now live for members to see and apply to.",
+    "posting_approved_cta": "View posting",
+    "posting_not_approved_subject": "Your job posting was not approved — {{title}}",
+    "posting_not_approved_email_body": "Your job posting \"{{title}}\" was reviewed and could not be approved. Reason: {{reason}}. You can edit it and resubmit it for review.",
+    "posting_not_approved_cta": "Edit posting"
   },
   "guardian": {
     "consent_title": "Guardian Consent Request",
