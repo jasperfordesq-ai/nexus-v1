@@ -265,12 +265,12 @@ class ChallengeService
                         ->find($userId);
 
                     LocaleContext::withLocale($recipient, function () use ($userId, $challenge) {
-                        Notification::create([
-                            'user_id' => $userId,
-                            'type'    => 'achievement',
-                            'message' => __('svc_notifications.challenge.complete_claim', ['title' => $challenge->title]),
-                            'link'    => '/achievements',
-                        ]);
+                        Notification::createNotification(
+                            $userId,
+                            __('svc_notifications.challenge.complete_claim', ['title' => $challenge->title]),
+                            '/achievements',
+                            'achievement'
+                        );
                     });
                 }
             } catch (\Throwable $e) {
@@ -315,12 +315,12 @@ class ChallengeService
             ->find($userId);
 
         LocaleContext::withLocale($recipient, function () use ($userId, $challenge) {
-            Notification::create([
-                'user_id' => $userId,
-                'type'    => 'achievement',
-                'message' => __('svc_notifications.challenge.complete_earned', ['title' => $challenge->title, 'xp' => $challenge->xp_reward]),
-                'link'    => '/achievements',
-            ]);
+            Notification::createNotification(
+                $userId,
+                __('svc_notifications.challenge.complete_earned', ['title' => $challenge->title, 'xp' => $challenge->xp_reward]),
+                '/achievements',
+                'achievement'
+            );
         });
     }
 }

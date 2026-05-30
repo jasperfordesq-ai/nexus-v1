@@ -500,12 +500,14 @@ class GamificationService
             ->find($userId);
 
         LocaleContext::withLocale($recipient, function () use ($userId, $badge) {
-            Notification::create([
-                'user_id' => $userId,
-                'type'    => 'achievement',
-                'message' => __('svc_notifications.gamification.badge_earned', ['name' => $badge['name'], 'icon' => $badge['icon']]),
-                'link'    => '/profile',
-            ]);
+            // Route through createNotification() so the bell's tenant_id is forced to
+            // the recipient's users.tenant_id (cross-tenant write guard).
+            Notification::createNotification(
+                $userId,
+                __('svc_notifications.gamification.badge_earned', ['name' => $badge['name'], 'icon' => $badge['icon']]),
+                '/profile',
+                'achievement'
+            );
         });
 
         // Broadcast badge earned event
@@ -655,12 +657,12 @@ class GamificationService
                     ->find($userId);
 
                 LocaleContext::withLocale($recipient, function () use ($userId, $newLevel) {
-                    Notification::create([
-                        'user_id' => $userId,
-                        'type'    => 'achievement',
-                        'message' => __('svc_notifications.gamification.level_up', ['level' => $newLevel]),
-                        'link'    => '/profile',
-                    ]);
+                    Notification::createNotification(
+                        $userId,
+                        __('svc_notifications.gamification.level_up', ['level' => $newLevel]),
+                        '/profile',
+                        'achievement'
+                    );
                 });
 
                 // Broadcast level up event

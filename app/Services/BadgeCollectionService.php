@@ -314,12 +314,12 @@ class BadgeCollectionService
                 ->find($userId);
 
             LocaleContext::withLocale($recipient, function () use ($userId, $collection) {
-                Notification::create([
-                    'user_id' => $userId,
-                    'type'    => 'achievement',
-                    'message' => __('svc_notifications.badge_collection.collection_complete', ['name' => $collection->name, 'xp' => $collection->bonus_xp, 'icon' => $collection->icon]),
-                    'link'    => '/achievements',
-                ]);
+                Notification::createNotification(
+                    $userId,
+                    __('svc_notifications.badge_collection.collection_complete', ['name' => $collection->name, 'xp' => $collection->bonus_xp, 'icon' => $collection->icon]),
+                    '/achievements',
+                    'achievement'
+                );
             });
         } catch (\Throwable $e) {
             Log::error('Failed to award collection completion: ' . $e->getMessage());
