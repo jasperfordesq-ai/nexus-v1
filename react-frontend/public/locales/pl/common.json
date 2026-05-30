@@ -413,8 +413,8 @@
       "loyalty_history_sub": "Zobacz, jak wykorzystałeś/aś zarobione godziny u lokalnych sprzedawców.",
       "future_care_fund": "Fundusz Przyszłej Opieki",
       "future_care_fund_sub": "Traktuj zgromadzone godziny jak ubezpieczenie na przyszłą opiekę.",
-      "cover_care": "Opieka zastępcza",
-      "cover_care_sub": "Zorganizuj zaufane wsparcie zastępcze, gdy opiekun potrzebuje pomocy.",
+      "cover_care": "Zastępstwo opiekuna",
+      "cover_care_sub": "Dla opiekunów: zorganizuj zaufane zastępstwo, gdy potrzebujesz przerwy. Bardziej przydatne, w miarę jak sieć rośnie.",
       "hour_gift": "Podaruj godziny",
       "hour_gift_sub": "Podaruj zgromadzone godziny rodzinie lub przyjaciołom.",
       "hour_transfer": "Przenieś godziny",
@@ -422,7 +422,9 @@
       "safeguarding_report": "Zgłoś obawy",
       "safeguarding_report_sub": "Zgłaszaj obawy dotyczące ochrony poufnie.",
       "projects": "Projekty społeczne",
-      "projects_sub": "Śledź aktualności gmin i okolicy."
+      "projects_sub": "Śledź aktualności gmin i okolicy.",
+      "become_caregiver": "Zostań opiekunem",
+      "become_caregiver_sub": "Daj nam znać, że chcesz regularnie się opiekować, i pomóż nam zbudować zespół."
     },
     "operating_model": {
       "title": "Model operacyjny",
@@ -506,6 +508,59 @@
       "show_all": "Pokaż wszystkie działania",
       "show_recommended": "Pokaż polecane",
       "change_answer": "Zmień odpowiedź"
+    },
+    "alpha": {
+      "badge": "Nowość · Wczesny dostęp"
+    },
+    "preview_tag": "Podgląd",
+    "hero": {
+      "title": "Wspierająca Społeczność",
+      "intro": "Wspierająca Społeczność to miejsce, gdzie sąsiedzi pomagają sobie na co dzień — podwiezienie na wizytę, drobne zakupy albo po prostu towarzystwo na popołudnie. Poproś o pomoc, gdy jej potrzebujesz, i zaoferuj ją, gdy możesz.",
+      "timebank_note": "Działa razem z bankiem czasu: gdy dajesz swój czas, jest on zapisywany jako godziny, których możesz użyć później — te same godziny, na jednym wspólnym saldzie.",
+      "cta_get_help": "Potrzebuję pomocy",
+      "cta_give_help": "Chcę pomóc"
+    },
+    "new_notice": {
+      "title": "To zupełna nowość.",
+      "body": "Wspierająca Społeczność dopiero co tu wystartowała i wciąż ją budujemy. Niektóre funkcje to wczesne podglądy i nie działa sama — opiera się na sąsiadach, którzy ochotniczo niosą pomoc. Dziękujemy, że jesteś z nami od początku."
+    },
+    "how": {
+      "title": "Jak to działa",
+      "subtitle": "Trzy proste kroki.",
+      "step1_title": "Poproś o pomoc",
+      "step1_desc": "Opisz własnymi słowami, czego potrzebujesz. Twoja prośba trafia do zaufanych członków w pobliżu.",
+      "step2_title": "Sąsiad oferuje pomoc",
+      "step2_desc": "Ktoś ze społeczności proponuje pomoc, a wy uzgadniacie termin, który pasuje wam obojgu.",
+      "step3_title": "Godziny są zapisywane",
+      "step3_desc": "Poświęcony czas jest zapisywany jako godziny, więc pomagający gromadzą godziny do wykorzystania lub przekazania później."
+    },
+    "recruit": {
+      "title": "Szukamy naszych pierwszych opiekunów",
+      "body": "Wspierająca Społeczność działa tylko wtedy, gdy ludzie zgłaszają się do pomocy. Nie mamy jeszcze zespołu opiekunów — dopiero go tworzymy. Jeśli możesz poświęcić trochę czasu, możesz być jednym z pierwszych.",
+      "cta": "Zaoferuj pomoc"
+    },
+    "your_hours_note": "To te same kredyty czasu, co w banku czasu — jedno wspólne saldo, a nie osobna waluta Wspierającej Społeczności.",
+    "groups": {
+      "get_help": {
+        "title": "Otrzymaj pomoc",
+        "desc": "Poproś o wsparcie i śledź osoby, które ci pomagają."
+      },
+      "give_help": {
+        "title": "Pomóż innym",
+        "desc": "Zaoferuj swój czas i umiejętności sąsiadom, którzy potrzebują wsparcia."
+      },
+      "your_hours": {
+        "title": "Twoje godziny",
+        "desc": "Sprawdź i wykorzystaj zgromadzone kredyty czasu."
+      },
+      "caregiver_tools": {
+        "title": "Narzędzia dla opiekunów",
+        "desc": "Narzędzia dla osób, które regularnie się opiekują. Stają się przydatniejsze, w miarę jak rośnie nasza sieć opiekunów."
+      },
+      "safety": {
+        "title": "Bezpieczeństwo i aktualności",
+        "desc": "Zgłoś problem lub śledź to, co dzieje się w okolicy."
+      }
     }
   },
   "request_help": {

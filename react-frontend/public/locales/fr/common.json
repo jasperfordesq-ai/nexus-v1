@@ -413,8 +413,8 @@
       "loyalty_history_sub": "Voyez comment vous avez utilisé vos heures gagnées chez les commerçants locaux.",
       "future_care_fund": "Fonds de soins futurs",
       "future_care_fund_sub": "Considérez vos heures épargnées comme une assurance pour les soins futurs.",
-      "cover_care": "Accompagnement de remplacement",
-      "cover_care_sub": "Organisez un accompagnement de remplacement de confiance lorsqu'un·e proche aidant·e a besoin de relais.",
+      "cover_care": "Relais pour aidants",
+      "cover_care_sub": "Pour les aidants : organisez un relais de confiance quand vous avez besoin d'une pause. Plus utile à mesure que le réseau grandit.",
       "hour_gift": "Offrir des heures",
       "hour_gift_sub": "Offrez vos heures épargnées à votre famille ou vos amis.",
       "hour_transfer": "Transférer des heures",
@@ -422,7 +422,9 @@
       "safeguarding_report": "Signaler une préoccupation",
       "safeguarding_report_sub": "Signalez confidentiellement des préoccupations relatives à la protection.",
       "projects": "Projets communautaires",
-      "projects_sub": "Suivez les actualités progressives de la commune et du quartier."
+      "projects_sub": "Suivez les actualités progressives de la commune et du quartier.",
+      "become_caregiver": "Devenir aidant",
+      "become_caregiver_sub": "Dites-nous que vous souhaitez apporter une aide régulière et aidez-nous à constituer l'équipe."
     },
     "operating_model": {
       "title": "Modèle opérationnel",
@@ -506,6 +508,59 @@
       "show_all": "Afficher toutes les actions",
       "show_recommended": "Afficher les recommandées",
       "change_answer": "Changer la réponse"
+    },
+    "alpha": {
+      "badge": "Nouveau · Accès anticipé"
+    },
+    "preview_tag": "Aperçu",
+    "hero": {
+      "title": "Communauté Solidaire",
+      "intro": "La Communauté Solidaire est un espace où les voisins s'entraident au quotidien — un trajet vers un rendez-vous, quelques courses ou simplement un peu de compagnie. Demandez de l'aide quand vous en avez besoin, et offrez-en quand vous le pouvez.",
+      "timebank_note": "Elle fonctionne avec la banque de temps : lorsque vous donnez de votre temps, il est enregistré sous forme d'heures que vous pourrez utiliser plus tard — les mêmes heures, dans un solde commun.",
+      "cta_get_help": "J'ai besoin d'aide",
+      "cta_give_help": "Je veux aider"
+    },
+    "new_notice": {
+      "title": "C'est tout nouveau.",
+      "body": "La Communauté Solidaire vient tout juste d'être lancée ici et nous la construisons encore. Certaines fonctions sont des aperçus, et elle ne fonctionne pas toute seule — elle repose sur des voisins qui se portent volontaires pour aider. Merci d'être parmi les premiers."
+    },
+    "how": {
+      "title": "Comment ça marche",
+      "subtitle": "Trois étapes simples.",
+      "step1_title": "Demander de l'aide",
+      "step1_desc": "Dites-nous ce dont vous avez besoin, avec vos mots. Votre demande est envoyée à des membres de confiance à proximité.",
+      "step2_title": "Un voisin propose son aide",
+      "step2_desc": "Quelqu'un de la communauté propose son aide, et vous convenez ensemble d'un moment qui vous convient.",
+      "step3_title": "Les heures sont enregistrées",
+      "step3_desc": "Le temps donné est enregistré en heures : les personnes qui aident accumulent des heures à utiliser ou à transmettre plus tard."
+    },
+    "recruit": {
+      "title": "Nous cherchons nos premiers aidants",
+      "body": "La Communauté Solidaire ne fonctionne que si des personnes se proposent d'aider. Nous n'avons pas encore d'équipe d'aidants — nous la constituons. Si vous pouvez offrir un peu de temps, vous pourriez être parmi les premiers.",
+      "cta": "Proposer mon aide"
+    },
+    "your_hours_note": "Ce sont les mêmes crédits-temps que ceux de la banque de temps — un solde commun, pas une monnaie distincte de la Communauté Solidaire.",
+    "groups": {
+      "get_help": {
+        "title": "Obtenir de l'aide",
+        "desc": "Demandez du soutien et gardez le fil des personnes qui vous aident."
+      },
+      "give_help": {
+        "title": "Donner un coup de main",
+        "desc": "Offrez votre temps et vos compétences aux voisins qui en ont besoin."
+      },
+      "your_hours": {
+        "title": "Vos heures",
+        "desc": "Consultez et utilisez les crédits-temps que vous avez gagnés."
+      },
+      "caregiver_tools": {
+        "title": "Outils pour les aidants",
+        "desc": "Des outils pour les personnes qui apportent une aide régulière. Ils gagnent en utilité à mesure que notre réseau d'aidants grandit."
+      },
+      "safety": {
+        "title": "Sécurité & actualités",
+        "desc": "Signalez une préoccupation ou suivez ce qui se passe près de chez vous."
+      }
     }
   },
   "request_help": {

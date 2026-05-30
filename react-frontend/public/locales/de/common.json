@@ -413,8 +413,8 @@
       "loyalty_history_sub": "So haben Sie Ihre verdienten Stunden bei lokalen Händlern eingesetzt.",
       "future_care_fund": "Zeitvorsorge-Fonds",
       "future_care_fund_sub": "Deine gesparten Stunden als Zukunftsvorsorge sehen.",
-      "cover_care": "Stellvertretende Begleitung",
-      "cover_care_sub": "Vertrauensvolle Stellvertretung organisieren, wenn eine Begleitperson Entlastung braucht.",
+      "cover_care": "Vertretung für Pflegende",
+      "cover_care_sub": "Für Pflegende: organisiere vertrauenswürdige Vertretung, wenn du eine Pause brauchst. Wird nützlicher, je grösser das Netzwerk wird.",
       "hour_gift": "Stunden schenken",
       "hour_gift_sub": "Schenke deine gesparten Stunden an Familie oder Freund:innen.",
       "hour_transfer": "Stunden übertragen",
@@ -422,7 +422,9 @@
       "safeguarding_report": "Anliegen melden",
       "safeguarding_report_sub": "Sicherheitsanliegen vertraulich melden.",
       "projects": "Gemeinschaftsprojekte",
-      "projects_sub": "Mehrstufige Updates aus Gemeinde und Quartier verfolgen."
+      "projects_sub": "Mehrstufige Updates aus Gemeinde und Quartier verfolgen.",
+      "become_caregiver": "Pflegende:r werden",
+      "become_caregiver_sub": "Sag uns, dass du regelmässig Fürsorge leisten möchtest, und hilf uns, das Team aufzubauen."
     },
     "operating_model": {
       "title": "Funktionsweise",
@@ -506,6 +508,59 @@
       "show_all": "Alle Aktionen anzeigen",
       "show_recommended": "Empfohlene anzeigen",
       "change_answer": "Antwort ändern"
+    },
+    "alpha": {
+      "badge": "Neu · Früher Zugang"
+    },
+    "preview_tag": "Vorschau",
+    "hero": {
+      "title": "Fürsorgliche Gemeinschaft",
+      "intro": "Die Fürsorgliche Gemeinschaft ist ein Ort, an dem sich Nachbarinnen und Nachbarn im Alltag gegenseitig unterstützen – eine Fahrt zum Termin, ein paar Einkäufe oder einfach Gesellschaft an einem Nachmittag. Bitte um Hilfe, wenn du sie brauchst, und biete Hilfe an, wenn du kannst.",
+      "timebank_note": "Sie arbeitet Hand in Hand mit der Zeitbank: Wenn du deine Zeit gibst, wird sie als Stunden erfasst, die du später nutzen kannst – dieselben Stunden, in einem gemeinsamen Guthaben.",
+      "cta_get_help": "Ich brauche Hilfe",
+      "cta_give_help": "Ich möchte helfen"
+    },
+    "new_notice": {
+      "title": "Das ist brandneu.",
+      "body": "Die Fürsorgliche Gemeinschaft ist hier gerade erst gestartet und wir bauen sie noch auf. Einige Funktionen sind frühe Vorschauen, und sie funktioniert nicht von allein – sie lebt davon, dass Nachbarinnen und Nachbarn freiwillig Fürsorge leisten. Danke, dass du von Anfang an dabei bist."
+    },
+    "how": {
+      "title": "So funktioniert es",
+      "subtitle": "Drei einfache Schritte.",
+      "step1_title": "Um Hilfe bitten",
+      "step1_desc": "Sag uns mit eigenen Worten, was du brauchst. Deine Anfrage geht an vertrauenswürdige Mitglieder in der Nähe.",
+      "step2_title": "Eine Nachbarin bietet Hilfe an",
+      "step2_desc": "Jemand aus der Gemeinschaft bietet Hilfe an, und ihr vereinbart eine Zeit, die euch beiden passt.",
+      "step3_title": "Stunden werden erfasst",
+      "step3_desc": "Die geleistete Zeit wird als Stunden erfasst, sodass Helfende Stunden aufbauen, die sie später nutzen oder weitergeben können."
+    },
+    "recruit": {
+      "title": "Wir suchen unsere ersten Pflegenden",
+      "body": "Die Fürsorgliche Gemeinschaft funktioniert nur, wenn Menschen bereit sind zu helfen. Wir haben noch kein fertiges Team von Pflegenden – wir bauen es gerade auf. Wenn du ein wenig Zeit erübrigen kannst, könntest du eine:r der Ersten sein.",
+      "cta": "Hilfe anbieten"
+    },
+    "your_hours_note": "Das sind dieselben Zeitgutschriften wie in der Zeitbank – ein gemeinsames Guthaben, keine separate Währung der Fürsorglichen Gemeinschaft.",
+    "groups": {
+      "get_help": {
+        "title": "Hilfe erhalten",
+        "desc": "Bitte um Unterstützung und behalte den Überblick über die Menschen, die dir helfen."
+      },
+      "give_help": {
+        "title": "Hilfe geben",
+        "desc": "Biete Nachbarinnen und Nachbarn, die Unterstützung brauchen, deine Zeit und Fähigkeiten an."
+      },
+      "your_hours": {
+        "title": "Deine Stunden",
+        "desc": "Sieh dir die verdienten Zeitgutschriften an und nutze sie."
+      },
+      "caregiver_tools": {
+        "title": "Werkzeuge für Pflegende",
+        "desc": "Werkzeuge für Menschen, die regelmässig Fürsorge leisten. Sie werden nützlicher, je grösser unser Netzwerk an Pflegenden wird."
+      },
+      "safety": {
+        "title": "Sicherheit & Neuigkeiten",
+        "desc": "Melde ein Anliegen oder verfolge, was vor Ort passiert."
+      }
     }
   },
   "request_help": {

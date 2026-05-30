@@ -413,8 +413,8 @@
       "loyalty_history_sub": "Féach conas a d'úsáid tú do chuid uaireanta tuilte ag ceannaithe áitiúla.",
       "future_care_fund": "Ciste Cúraim sa Todhchaí",
       "future_care_fund_sub": "Féach ar na huaireanta atá curtha i dtaisce mar árachas don chúram amach anseo.",
-      "cover_care": "Cúram Ionadach",
-      "cover_care_sub": "Eagraigh tacaíocht ionadach iontaofa nuair a theastaíonn cabhair ó chúramóir.",
+      "cover_care": "Ionadaíocht chúraim",
+      "cover_care_sub": "Do chúramóirí: socraigh ionadaí iontaofa nuair a bhíonn sos uait. Níos úsáidí de réir mar a fhásann an líonra.",
       "hour_gift": "Bronn Uaireanta",
       "hour_gift_sub": "Bronn na huaireanta atá curtha i dtaisce ar an teaghlach nó ar chairde.",
       "hour_transfer": "Aistrigh Uaireanta",
@@ -422,7 +422,9 @@
       "safeguarding_report": "Tabhair Tuairisc ar Imní",
       "safeguarding_report_sub": "Tabhair tuairisc faoi imní cosanta go rúnda.",
       "projects": "Tionscadail Phobail",
-      "projects_sub": "Lean nuashonruithe bardais agus comharsanachta."
+      "projects_sub": "Lean nuashonruithe bardais agus comharsanachta.",
+      "become_caregiver": "Bí i do chúramóir",
+      "become_caregiver_sub": "Inis dúinn gur mhaith leat cúram rialta a thabhairt agus cabhraigh linn an fhoireann a thógáil."
     },
     "operating_model": {
       "title": "Múnla oibríochta",
@@ -506,6 +508,59 @@
       "show_all": "Taispeáin gach gníomh",
       "show_recommended": "Taispeáin gníomhartha molta",
       "change_answer": "Athraigh freagra"
+    },
+    "alpha": {
+      "badge": "Nua · Luath-rochtain"
+    },
+    "preview_tag": "Réamhamharc",
+    "hero": {
+      "title": "Pobal Cúraim",
+      "intro": "Is áit é an Pobal Cúraim ina gcabhraíonn comharsana lena chéile sa ghnáthshaol — síob chuig coinne, beagán siopadóireachta, nó comhluadar tráthnóna. Iarr cabhair nuair a bhíonn sí uait, agus tairg cabhair nuair is féidir leat.",
+      "timebank_note": "Oibríonn sé taobh le taobh leis an mbanc ama: nuair a thugann tú do chuid ama, cláraítear é mar uaireanta is féidir leat a úsáid níos déanaí — na huaireanta céanna, in aon iarmhéid roinnte.",
+      "cta_get_help": "Tá cabhair uaim",
+      "cta_give_help": "Ba mhaith liom cabhrú"
+    },
+    "new_notice": {
+      "title": "Tá sé seo úrnua.",
+      "body": "Níl an Pobal Cúraim ach díreach tosaithe anseo agus táimid á thógáil fós. Is réamhamhairc luatha cuid de na gnéithe, agus ní oibríonn sé leis féin — braitheann sé ar chomharsana a thugann cúram go deonach. Go raibh maith agat as a bheith ar dhuine de na chéad daoine."
+    },
+    "how": {
+      "title": "Conas a oibríonn sé",
+      "subtitle": "Trí chéim shimplí.",
+      "step1_title": "Iarr cabhair",
+      "step1_desc": "Inis dúinn i d'fhocail féin cad atá uait. Téann d'iarratas chuig baill iontaofa in aice láimhe.",
+      "step2_title": "Tairgeann comharsa cabhair",
+      "step2_desc": "Tairgeann duine éigin sa phobal cabhair, agus socraíonn sibh am a oireann don bheirt agaibh.",
+      "step3_title": "Cláraítear na huaireanta",
+      "step3_desc": "Cláraítear an t-am a thugtar mar uaireanta, mar sin cruinníonn cabhróirí uaireanta le húsáid nó le tabhairt ar aghaidh níos déanaí."
+    },
+    "recruit": {
+      "title": "Táimid ag lorg ár gcéad chúramóirí",
+      "body": "Ní oibríonn an Pobal Cúraim ach nuair a thagann daoine chun tosaigh chun cabhrú. Níl foireann chúramóirí againn fós — táimid á tógáil. Más féidir leat beagán ama a thabhairt, d'fhéadfá a bheith ar dhuine de na chéad daoine.",
+      "cta": "Tairg cabhair"
+    },
+    "your_hours_note": "Is iad seo na creidmheasanna ama céanna a úsáidtear ar fud an bhainc ama — aon iarmhéid roinnte amháin, ní airgeadra ar leith don Phobal Cúraim.",
+    "groups": {
+      "get_help": {
+        "title": "Faigh cabhair",
+        "desc": "Iarr tacaíocht agus coinnigh súil ar na daoine atá ag cabhrú leat."
+      },
+      "give_help": {
+        "title": "Tabhair cabhair",
+        "desc": "Tairg do chuid ama agus do scileanna do chomharsana a bhfuil cúnamh uathu."
+      },
+      "your_hours": {
+        "title": "Do chuid uaireanta",
+        "desc": "Féach ar na creidmheasanna ama atá tuillte agat agus úsáid iad."
+      },
+      "caregiver_tools": {
+        "title": "Uirlisí do chúramóirí",
+        "desc": "Uirlisí dóibh siúd a thugann cúram go rialta. Éiríonn siad níos úsáidí de réir mar a fhásann ár líonra cúramóirí."
+      },
+      "safety": {
+        "title": "Sábháilteacht & nuacht",
+        "desc": "Tuairiscigh ábhar imní nó lean a bhfuil ag tarlú go háitiúil."
+      }
     }
   },
   "request_help": {

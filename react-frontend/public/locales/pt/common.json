@@ -413,8 +413,8 @@
       "loyalty_history_sub": "Vê como usaste as tuas horas ganhas nos comerciantes locais.",
       "future_care_fund": "Fundo de Cuidados Futuros",
       "future_care_fund_sub": "Vê as tuas horas acumuladas como um seguro para cuidados futuros.",
-      "cover_care": "Apoio de Substituição",
-      "cover_care_sub": "Organiza apoio substituto de confiança quando um cuidador precisa de retaguarda.",
+      "cover_care": "Substituição de cuidadores",
+      "cover_care_sub": "Para cuidadores: organiza uma substituição de confiança quando precisares de uma pausa. Mais útil à medida que a rede cresce.",
       "hour_gift": "Oferecer horas",
       "hour_gift_sub": "Oferece as tuas horas acumuladas a familiares ou amigos.",
       "hour_transfer": "Transferir horas",
@@ -422,7 +422,9 @@
       "safeguarding_report": "Reportar uma preocupação",
       "safeguarding_report_sub": "Reporta preocupações de salvaguarda de forma confidencial.",
       "projects": "Projetos comunitários",
-      "projects_sub": "Acompanha as atualizações dos municípios e bairros."
+      "projects_sub": "Acompanha as atualizações dos municípios e bairros.",
+      "become_caregiver": "Tornar-me cuidador",
+      "become_caregiver_sub": "Diz-nos que queres prestar cuidados regulares e ajuda-nos a formar a equipa."
     },
     "operating_model": {
       "title": "Modelo operacional",
@@ -506,6 +508,59 @@
       "show_all": "Mostrar todas as ações",
       "show_recommended": "Mostrar recomendadas",
       "change_answer": "Alterar resposta"
+    },
+    "alpha": {
+      "badge": "Novo · Acesso antecipado"
+    },
+    "preview_tag": "Pré-visualização",
+    "hero": {
+      "title": "Comunidade Solidária",
+      "intro": "A Comunidade Solidária é um espaço onde os vizinhos se ajudam no dia a dia — uma boleia para uma consulta, umas compras ou simplesmente companhia numa tarde. Pede ajuda quando precisares e oferece-a quando puderes.",
+      "timebank_note": "Funciona em conjunto com o banco de tempo: quando dás o teu tempo, ele é registado como horas que podes usar mais tarde — as mesmas horas, num saldo partilhado.",
+      "cta_get_help": "Preciso de ajuda",
+      "cta_give_help": "Quero ajudar"
+    },
+    "new_notice": {
+      "title": "Isto é totalmente novo.",
+      "body": "A Comunidade Solidária acabou de arrancar aqui e ainda a estamos a construir. Algumas funcionalidades são pré-visualizações e não funciona sozinha — depende de vizinhos que se voluntariam para cuidar. Obrigado por estares connosco desde o início."
+    },
+    "how": {
+      "title": "Como funciona",
+      "subtitle": "Três passos simples.",
+      "step1_title": "Pede ajuda",
+      "step1_desc": "Diz-nos por palavras tuas do que precisas. O teu pedido chega a membros de confiança por perto.",
+      "step2_title": "Um vizinho oferece-se",
+      "step2_desc": "Alguém da comunidade oferece-se para ajudar e combinam uma hora que vos dê jeito a ambos.",
+      "step3_title": "As horas são registadas",
+      "step3_desc": "O tempo dado é registado em horas, por isso quem ajuda acumula horas para usar ou ceder mais tarde."
+    },
+    "recruit": {
+      "title": "Procuramos os nossos primeiros cuidadores",
+      "body": "A Comunidade Solidária só funciona quando há pessoas dispostas a ajudar. Ainda não temos uma equipa de cuidadores — estamos a criá-la. Se puderes dispensar um pouco de tempo, podes ser dos primeiros.",
+      "cta": "Oferecer ajuda"
+    },
+    "your_hours_note": "São os mesmos créditos de tempo usados no banco de tempo — um saldo partilhado, não uma moeda separada da Comunidade Solidária.",
+    "groups": {
+      "get_help": {
+        "title": "Receber ajuda",
+        "desc": "Pede apoio e acompanha as pessoas que te ajudam."
+      },
+      "give_help": {
+        "title": "Dar uma ajuda",
+        "desc": "Oferece o teu tempo e as tuas competências a vizinhos que precisem."
+      },
+      "your_hours": {
+        "title": "As tuas horas",
+        "desc": "Vê e usa os créditos de tempo que ganhaste."
+      },
+      "caregiver_tools": {
+        "title": "Ferramentas para cuidadores",
+        "desc": "Ferramentas para quem presta cuidados regulares. Tornam-se mais úteis à medida que a nossa rede de cuidadores cresce."
+      },
+      "safety": {
+        "title": "Segurança e novidades",
+        "desc": "Comunica uma preocupação ou acompanha o que se passa perto de ti."
+      }
     }
   },
   "request_help": {

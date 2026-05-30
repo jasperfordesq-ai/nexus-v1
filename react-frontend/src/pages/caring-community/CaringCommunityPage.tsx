@@ -5,26 +5,28 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import type { ComponentType } from 'react';import ArrowRight from 'lucide-react/icons/arrow-right';
+import type { ComponentType } from 'react';
+import ArrowRight from 'lucide-react/icons/arrow-right';
 import Building2 from 'lucide-react/icons/building-2';
 import Calendar from 'lucide-react/icons/calendar';
 import FileText from 'lucide-react/icons/file-text';
 import Globe from 'lucide-react/icons/globe';
-import Handshake from 'lucide-react/icons/handshake';
 import Heart from 'lucide-react/icons/heart';
 import HeartHandshake from 'lucide-react/icons/heart-handshake';
+import HelpingHand from 'lucide-react/icons/hand-helping';
 import ListChecks from 'lucide-react/icons/list-checks';
 import Megaphone from 'lucide-react/icons/megaphone';
 import MessageSquare from 'lucide-react/icons/message-square';
+import Sparkles from 'lucide-react/icons/sparkles';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
-import MoveRight from 'lucide-react/icons/move-right';
 import Store from 'lucide-react/icons/store';
 import Coins from 'lucide-react/icons/coins';
 import PiggyBank from 'lucide-react/icons/piggy-bank';
 import Gift from 'lucide-react/icons/gift';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import UserRoundCheck from 'lucide-react/icons/user-round-check';
+import UserRoundPlus from 'lucide-react/icons/user-round-plus';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
 import Target from 'lucide-react/icons/target';
 import Users from 'lucide-react/icons/users';
@@ -48,24 +50,71 @@ interface ActionDef {
   icon: ComponentType<{ className?: string }>;
   feature?: keyof TenantFeatures;
   module?: keyof TenantModules;
+  /** Mark features that aren't fully live yet so we never imply they're ready. */
+  preview?: boolean;
 }
 
-const primaryActions: ActionDef[] = [
-  // "Request Help" always visible within the hub — uses the dedicated low-friction flow
-  { key: 'request_help', href: '/caring-community/request-help', icon: ListChecks },
-  { key: 'offer_favour', href: '/caring-community/offer-favour', icon: HeartHandshake, feature: 'caring_community' },
-  { key: 'offer_time', href: '/listings/create?type=offer', icon: Heart, module: 'listings' },
-  { key: 'log_hours', href: '/volunteering?tab=hours', icon: Wallet, feature: 'volunteering' },
-  { key: 'coordinate_org', href: '/volunteering/my-organisations', icon: Building2, feature: 'volunteering' },
-  { key: 'my_relationships', href: '/caring-community/my-relationships', icon: Users, feature: 'caring_community' },
-  { key: 'markt', href: '/caring-community/markt', icon: Store, feature: 'caring_community' },
-  { key: 'loyalty_history', href: '/caring-community/loyalty/history', icon: Coins, feature: 'caring_community' },
-  { key: 'future_care_fund', href: '/caring-community/future-care-fund', icon: PiggyBank, feature: 'caring_community' },
-  { key: 'cover_care', href: '/caring-community/caregiver/cover', icon: UserRoundCheck, feature: 'caring_community' },
-  { key: 'hour_gift', href: '/caring-community/hour-gift', icon: Gift, feature: 'caring_community' },
-  { key: 'hour_transfer', href: '/caring-community/hour-transfer', icon: ArrowRightLeft, feature: 'caring_community' },
-  { key: 'safeguarding_report', href: '/caring-community/safeguarding/report', icon: ShieldAlert, feature: 'caring_community' },
-  { key: 'projects', href: '/caring-community/projects', icon: Megaphone, feature: 'caring_community' },
+interface GroupDef {
+  id: string;
+  icon: ComponentType<{ className?: string }>;
+  /** Optional clarifying note rendered under the group description. */
+  note?: boolean;
+  actions: ActionDef[];
+}
+
+/**
+ * Actions are grouped by the user's intent so the hub reads as a clear set of
+ * tasks rather than a flat wall of buttons. Time-credit actions are kept in one
+ * group and explicitly flagged as shared with the timebank to avoid the
+ * "two systems doing the same thing" confusion.
+ */
+const GROUPS: GroupDef[] = [
+  {
+    id: 'get_help',
+    icon: ListChecks,
+    actions: [
+      { key: 'request_help', href: '/caring-community/request-help', icon: ListChecks },
+      { key: 'my_relationships', href: '/caring-community/my-relationships', icon: Users, feature: 'caring_community' },
+    ],
+  },
+  {
+    id: 'give_help',
+    icon: HelpingHand,
+    actions: [
+      { key: 'become_caregiver', href: '/volunteering', icon: UserRoundPlus, feature: 'caring_community' },
+      { key: 'offer_favour', href: '/caring-community/offer-favour', icon: HeartHandshake, feature: 'caring_community' },
+      { key: 'offer_time', href: '/listings/create?type=offer', icon: Heart, module: 'listings' },
+      { key: 'log_hours', href: '/volunteering?tab=hours', icon: Wallet, feature: 'volunteering' },
+      { key: 'coordinate_org', href: '/volunteering/my-organisations', icon: Building2, feature: 'volunteering' },
+    ],
+  },
+  {
+    id: 'your_hours',
+    icon: Coins,
+    note: true,
+    actions: [
+      { key: 'hour_gift', href: '/caring-community/hour-gift', icon: Gift, feature: 'caring_community' },
+      { key: 'hour_transfer', href: '/caring-community/hour-transfer', icon: ArrowRightLeft, feature: 'caring_community' },
+      { key: 'loyalty_history', href: '/caring-community/loyalty/history', icon: Coins, feature: 'caring_community' },
+      { key: 'future_care_fund', href: '/caring-community/future-care-fund', icon: PiggyBank, feature: 'caring_community' },
+      { key: 'markt', href: '/caring-community/markt', icon: Store, feature: 'caring_community' },
+    ],
+  },
+  {
+    id: 'caregiver_tools',
+    icon: UserRoundCheck,
+    actions: [
+      { key: 'cover_care', href: '/caring-community/caregiver/cover', icon: UserRoundCheck, feature: 'caring_community', preview: true },
+    ],
+  },
+  {
+    id: 'safety',
+    icon: ShieldAlert,
+    actions: [
+      { key: 'safeguarding_report', href: '/caring-community/safeguarding/report', icon: ShieldAlert, feature: 'caring_community' },
+      { key: 'projects', href: '/caring-community/projects', icon: Megaphone, feature: 'caring_community' },
+    ],
+  },
 ];
 
 const moduleCards: ActionDef[] = [
@@ -78,17 +127,9 @@ const moduleCards: ActionDef[] = [
   { key: 'goals', href: '/goals', icon: Target, feature: 'goals' },
   { key: 'federation', href: '/federation', icon: Globe, feature: 'federation' },
   { key: 'clubs', href: '/clubs', icon: ShoppingBag },
-  { key: 'projects', href: '/caring-community/projects', icon: Megaphone, feature: 'caring_community' },
   { key: 'messages', href: '/messages', icon: MessageSquare, module: 'messages' },
   { key: 'trust', href: '/verify-identity', icon: ShieldCheck },
 ];
-
-// Per-choice priority lists. Keys are surfaced first; remaining actions
-// (when "show all" is active) follow in their original declaration order.
-const CHOICE_PRIORITY: Record<Exclude<OnboardingChoice, 'browse'>, ReadonlyArray<string>> = {
-  recipient: ['request_help', 'my_relationships', 'future_care_fund', 'safeguarding_report', 'markt', 'hour_gift'],
-  helper: ['offer_favour', 'offer_time', 'log_hours', 'coordinate_org', 'cover_care', 'my_relationships'],
-};
 
 function isVisible(
   item: ActionDef,
@@ -100,25 +141,6 @@ function isVisible(
   return true;
 }
 
-function applyChoiceFilter(
-  actions: ActionDef[],
-  choice: OnboardingChoice | null,
-  showAll: boolean,
-): ActionDef[] {
-  if (!choice || choice === 'browse' || showAll) return actions;
-  const priority = CHOICE_PRIORITY[choice];
-  const lookup = new Map(actions.map((a) => [a.key, a] as const));
-  const ordered: ActionDef[] = [];
-  for (const key of priority) {
-    const match = lookup.get(key);
-    if (match) {
-      ordered.push(match);
-      lookup.delete(key);
-    }
-  }
-  return ordered;
-}
-
 export function CaringCommunityPage() {
   const { t } = useTranslation('common');
   const { branding, hasFeature, hasModule, tenant, tenantPath, tenantSlug } = useTenant();
@@ -127,7 +149,6 @@ export function CaringCommunityPage() {
   const onboardingTenantScope = tenant?.slug ?? tenantSlug ?? (tenant?.id ? String(tenant.id) : null);
   const [choice, setChoice] = useState<OnboardingChoice | null>(() => readStoredOnboardingChoice(onboardingTenantScope));
   const [modalOpen, setModalOpen] = useState<boolean>(false);
-  const [showAll, setShowAll] = useState<boolean>(false);
 
   // Open the modal once on first mount when no stored choice exists.
   useEffect(() => {
@@ -140,32 +161,30 @@ export function CaringCommunityPage() {
 
   const handleChoice = useCallback((picked: OnboardingChoice) => {
     setChoice(picked);
-    setShowAll(false);
     setModalOpen(false);
   }, []);
 
   const handleRefine = useCallback(() => {
     clearStoredOnboardingChoice(onboardingTenantScope);
     setChoice(null);
-    setShowAll(false);
     setModalOpen(true);
   }, [onboardingTenantScope]);
 
-  const handleToggleShowAll = useCallback(() => {
-    setShowAll((v) => !v);
-  }, []);
+  // The hero's primary call-to-action follows what the visitor told us they're here for.
+  const primaryCta = choice === 'helper' ? 'give' : 'get';
 
-  const visibleActions = useMemo(() => {
-    const base = primaryActions.filter((item) => isVisible(item, hasFeature, hasModule));
-    return applyChoiceFilter(base, choice, showAll);
-  }, [choice, hasFeature, hasModule, showAll]);
+  const visibleGroups = useMemo(
+    () =>
+      GROUPS
+        .map((group) => ({ ...group, actions: group.actions.filter((a) => isVisible(a, hasFeature, hasModule)) }))
+        .filter((group) => group.actions.length > 0),
+    [hasFeature, hasModule],
+  );
 
   const visibleCards = useMemo(
     () => moduleCards.filter((item) => isVisible(item, hasFeature, hasModule)),
     [hasFeature, hasModule],
   );
-
-  const isFiltering = choice !== null && choice !== 'browse' && !showAll;
 
   return (
     <>
@@ -181,49 +200,132 @@ export function CaringCommunityPage() {
         tenantScope={onboardingTenantScope}
       />
 
-      <div className="space-y-6">
-        {/* AG16 — warm welcome banner for elderly/non-technical users */}
-        <div className="rounded-xl border border-emerald-200/60 bg-emerald-50/60 px-5 py-4 dark:border-emerald-800/40 dark:bg-emerald-950/30">
-          <p className="text-base leading-7 text-emerald-800 dark:text-emerald-300">
-            {t('caring_community.welcome_banner')}
-          </p>
-        </div>
+      <div className="mx-auto max-w-5xl space-y-8">
+        {/* ── Hero: what this is, in plain words, and that it's brand new ── */}
+        <GlassCard className="overflow-hidden p-0">
+          <div className="bg-gradient-to-br from-emerald-50 to-teal-50/40 p-6 dark:from-emerald-950/40 dark:to-teal-950/20 sm:p-8">
+            <div className="flex flex-wrap items-center gap-2">
+              <Chip color="warning" variant="flat" size="sm" startContent={<Sparkles className="h-3.5 w-3.5" aria-hidden="true" />}>
+                {t('caring_community.alpha.badge')}
+              </Chip>
+              <Chip color="primary" variant="flat" size="sm">
+                {branding.name}
+              </Chip>
+            </div>
 
-        <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <GlassCard className="p-6 sm:p-8">
-            <div className="flex flex-col gap-6">
-              <div className="flex flex-wrap items-center gap-2">
-                <Chip color="success" variant="flat" size="sm">
-                  {t('caring_community.badge')}
-                </Chip>
-                <Chip color="primary" variant="flat" size="sm">
-                  {branding.name}
-                </Chip>
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold leading-tight text-theme-primary sm:text-4xl">
-                  {t('caring_community.title')}
-                </h1>
-                <p className="mt-3 max-w-3xl text-base leading-8 text-theme-muted">
-                  {t('caring_community.subtitle')}
+            <h1 className="mt-4 text-3xl font-bold leading-tight text-theme-primary sm:text-4xl">
+              {t('caring_community.hero.title')}
+            </h1>
+            <p className="mt-3 max-w-2xl text-base leading-8 text-theme-muted">
+              {t('caring_community.hero.intro')}
+            </p>
+            <p className="mt-2 max-w-2xl text-sm leading-7 text-theme-muted">
+              {t('caring_community.hero.timebank_note')}
+            </p>
+
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+              {primaryCta === 'get' ? (
+                <>
+                  <Button as={Link} to={tenantPath('/caring-community/request-help')} className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white" startContent={<ListChecks className="h-4 w-4" aria-hidden="true" />}>
+                    {t('caring_community.hero.cta_get_help')}
+                  </Button>
+                  <Button as={Link} to={tenantPath('/volunteering')} variant="tertiary" startContent={<HelpingHand className="h-4 w-4" aria-hidden="true" />}>
+                    {t('caring_community.hero.cta_give_help')}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button as={Link} to={tenantPath('/volunteering')} className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white" startContent={<HelpingHand className="h-4 w-4" aria-hidden="true" />}>
+                    {t('caring_community.hero.cta_give_help')}
+                  </Button>
+                  <Button as={Link} to={tenantPath('/caring-community/request-help')} variant="tertiary" startContent={<ListChecks className="h-4 w-4" aria-hidden="true" />}>
+                    {t('caring_community.hero.cta_get_help')}
+                  </Button>
+                </>
+              )}
+              {choice !== null && (
+                <Button size="sm" variant="light" onPress={handleRefine} className="sm:ml-auto">
+                  {t('caring_community:onboarding.change_answer')}
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* Honest "this is new" notice — set expectations, don't oversell */}
+          <div className="border-t border-amber-200/60 bg-amber-50/70 px-6 py-4 dark:border-amber-900/40 dark:bg-amber-950/20 sm:px-8">
+            <p className="text-sm leading-7 text-amber-900 dark:text-amber-200">
+              <span className="font-semibold">{t('caring_community.new_notice.title')}</span>{' '}
+              {t('caring_community.new_notice.body')}
+            </p>
+          </div>
+        </GlassCard>
+
+        {/* ── How it works: three plain steps ── */}
+        <section>
+          <h2 className="text-xl font-semibold text-theme-primary">{t('caring_community.how.title')}</h2>
+          <p className="mt-1 text-sm text-theme-muted">{t('caring_community.how.subtitle')}</p>
+          <div className="mt-4 grid gap-4 sm:grid-cols-3">
+            {['step1', 'step2', 'step3'].map((step, i) => (
+              <div key={step} className="rounded-xl border border-theme-default bg-theme-elevated p-4">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/15 text-sm font-bold text-emerald-700 dark:text-emerald-400">
+                  {i + 1}
+                </div>
+                <p className="mt-3 text-sm font-semibold text-theme-primary">
+                  {t(`caring_community.how.${step}_title`)}
+                </p>
+                <p className="mt-1 text-xs leading-6 text-theme-muted">
+                  {t(`caring_community.how.${step}_desc`)}
                 </p>
               </div>
+            ))}
+          </div>
+        </section>
 
-              {(choice !== null && choice !== 'browse') && (
-                <div className="flex flex-wrap items-center gap-2">
-                  <Button size="sm" variant="flat" onPress={handleToggleShowAll}>
-                    {isFiltering
-                      ? t('caring_community:onboarding.show_all')
-                      : t('caring_community:onboarding.show_recommended')}
-                  </Button>
-                  <Button size="sm" variant="light" onPress={handleRefine}>
-                    {t('caring_community:onboarding.change_answer')}
-                  </Button>
+        {/* ── We need caregivers: honest recruitment, not a pretend roster ── */}
+        {hasFeature('caring_community') && (
+          <GlassCard className="border-emerald-200/60 bg-emerald-50/50 p-6 dark:border-emerald-900/40 dark:bg-emerald-950/20 sm:p-8">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-4">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-700 dark:text-emerald-400">
+                  <UserRoundPlus className="h-6 w-6" aria-hidden="true" />
                 </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-theme-primary">{t('caring_community.recruit.title')}</h2>
+                  <p className="mt-1 max-w-2xl text-sm leading-7 text-theme-muted">{t('caring_community.recruit.body')}</p>
+                </div>
+              </div>
+              <Button as={Link} to={tenantPath('/volunteering')} className="shrink-0 bg-gradient-to-r from-emerald-500 to-teal-600 text-white" startContent={<HelpingHand className="h-4 w-4" aria-hidden="true" />}>
+                {t('caring_community.recruit.cta')}
+              </Button>
+            </div>
+          </GlassCard>
+        )}
+
+        {/* ── Grouped actions ── */}
+        {visibleGroups.map((group) => {
+          const GroupIcon = group.icon;
+          return (
+            <section key={group.id}>
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal-500/15 text-teal-700 dark:text-teal-400">
+                  <GroupIcon className="h-5 w-5" aria-hidden="true" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-theme-primary">
+                    {t(`caring_community.groups.${group.id}.title`)}
+                  </h2>
+                  <p className="text-sm text-theme-muted">{t(`caring_community.groups.${group.id}.desc`)}</p>
+                </div>
+              </div>
+
+              {group.note && (
+                <p className="mt-2 rounded-lg border border-theme-default bg-theme-elevated px-3 py-2 text-xs leading-6 text-theme-muted">
+                  {t('caring_community.your_hours_note')}
+                </p>
               )}
 
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                {visibleActions.map((item) => {
+              <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                {group.actions.map((item) => {
                   const Icon = item.icon;
                   return (
                     <Button
@@ -237,61 +339,36 @@ export function CaringCommunityPage() {
                         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
                           <Icon className="h-5 w-5" aria-hidden="true" />
                         </span>
-                        <span className="min-w-0 text-left text-sm font-semibold leading-5 break-words">
-                          {t(`caring_community.actions.${item.key}`)}
+                        <span className="flex min-w-0 flex-col text-left">
+                          <span className="flex items-center gap-2 text-sm font-semibold leading-5 break-words">
+                            {t(`caring_community.actions.${item.key}`)}
+                            {item.preview && (
+                              <span className="rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-amber-700 dark:text-amber-400">
+                                {t('caring_community.preview_tag')}
+                              </span>
+                            )}
+                          </span>
                         </span>
                       </span>
                       <span className="flex w-full min-w-0 items-end justify-between gap-3">
                         <span className="block min-w-0 text-left text-xs font-normal leading-5 break-words text-theme-muted">
                           {t(`caring_community.actions.${item.key}_sub`)}
                         </span>
-                        <MoveRight className="h-4 w-4 shrink-0 text-theme-subtle transition-transform group-hover:translate-x-0.5 group-hover:text-[var(--color-primary)]" aria-hidden="true" />
+                        <ArrowRight className="h-4 w-4 shrink-0 text-theme-subtle transition-transform group-hover:translate-x-0.5 group-hover:text-[var(--color-primary)]" aria-hidden="true" />
                       </span>
                     </Button>
                   );
                 })}
               </div>
-            </div>
-          </GlassCard>
+            </section>
+          );
+        })}
 
-          <GlassCard className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/15">
-                <Handshake className="h-5 w-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
-              </div>
-              <div>
-                <h2 className="font-semibold text-theme-primary">{t('caring_community.operating_model.title')}</h2>
-                <p className="text-sm text-theme-muted">{t('caring_community.operating_model.subtitle')}</p>
-              </div>
-            </div>
-            <div className="mt-5 space-y-3">
-              {['trusted_requests', 'verified_hours', 'municipal_value'].map((key) => (
-                <div key={key} className="rounded-lg border border-theme-default bg-theme-elevated p-3">
-                  <p className="text-sm font-medium text-theme-primary">
-                    {t(`caring_community.operating_model.${key}.title`)}
-                  </p>
-                  <p className="mt-1 text-xs leading-5 text-theme-muted">
-                    {t(`caring_community.operating_model.${key}.description`)}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </GlassCard>
-        </section>
-
+        {/* ── The rest of the community ── */}
         <section>
-          <div className="mb-4 flex items-center justify-between gap-3">
-            <div>
-              <h2 className="text-xl font-semibold text-theme-primary">
-                {t('caring_community.modules.title')}
-              </h2>
-              <p className="text-sm text-theme-muted">
-                {t('caring_community.modules.subtitle')}
-              </p>
-            </div>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <h2 className="text-xl font-semibold text-theme-primary">{t('caring_community.modules.title')}</h2>
+          <p className="mt-1 text-sm text-theme-muted">{t('caring_community.modules.subtitle')}</p>
+          <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {visibleCards.map((item) => {
               const Icon = item.icon;
               return (

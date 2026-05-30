@@ -413,8 +413,8 @@
       "loyalty_history_sub": "Vedi come hai usato le tue ore guadagnate presso i commercianti locali.",
       "future_care_fund": "Fondo di Cura Futura",
       "future_care_fund_sub": "Considera le tue ore accumulate come un'assicurazione per la cura futura.",
-      "cover_care": "Accompagnamento sostitutivo",
-      "cover_care_sub": "Organizza un accompagnamento sostitutivo di fiducia quando un familiare assistente ha bisogno di un sostegno.",
+      "cover_care": "Sostituzione assistenti",
+      "cover_care_sub": "Per gli assistenti: organizza una sostituzione di fiducia quando hai bisogno di una pausa. Più utile man mano che la rete cresce.",
       "hour_gift": "Regala ore",
       "hour_gift_sub": "Regala le tue ore accumulate a familiari o amici.",
       "hour_transfer": "Trasferisci ore",
@@ -422,7 +422,9 @@
       "safeguarding_report": "Segnala una preoccupazione",
       "safeguarding_report_sub": "Segnala preoccupazioni di tutela in modo riservato.",
       "projects": "Progetti della comunità",
-      "projects_sub": "Segui gli aggiornamenti progressivi del comune e del quartiere."
+      "projects_sub": "Segui gli aggiornamenti progressivi del comune e del quartiere.",
+      "become_caregiver": "Diventa assistente",
+      "become_caregiver_sub": "Dicci che vuoi prestare assistenza regolare e aiutaci a formare il team."
     },
     "operating_model": {
       "title": "Modello operativo",
@@ -506,6 +508,59 @@
       "show_all": "Mostra tutte le azioni",
       "show_recommended": "Mostra le consigliate",
       "change_answer": "Cambia risposta"
+    },
+    "alpha": {
+      "badge": "Novità · Accesso anticipato"
+    },
+    "preview_tag": "Anteprima",
+    "hero": {
+      "title": "Comunità Solidale",
+      "intro": "La Comunità Solidale è uno spazio in cui i vicini si aiutano a vicenda nella vita di tutti i giorni — un passaggio a un appuntamento, un po' di spesa o semplicemente compagnia per un pomeriggio. Chiedi aiuto quando ne hai bisogno e offrilo quando puoi.",
+      "timebank_note": "Funziona insieme alla banca del tempo: quando doni il tuo tempo, viene registrato come ore che potrai usare più avanti — le stesse ore, in un unico saldo condiviso.",
+      "cta_get_help": "Ho bisogno di aiuto",
+      "cta_give_help": "Voglio aiutare"
+    },
+    "new_notice": {
+      "title": "È una novità assoluta.",
+      "body": "La Comunità Solidale è appena nata qui e la stiamo ancora costruendo. Alcune funzioni sono anteprime e non funziona da sola — si regge sui vicini che si offrono volontari per dare una mano. Grazie per esserci fin dall'inizio."
+    },
+    "how": {
+      "title": "Come funziona",
+      "subtitle": "Tre semplici passi.",
+      "step1_title": "Chiedi aiuto",
+      "step1_desc": "Raccontaci con parole tue di cosa hai bisogno. La tua richiesta arriva a membri di fiducia nelle vicinanze.",
+      "step2_title": "Un vicino si offre",
+      "step2_desc": "Qualcuno della comunità si offre di aiutare e concordate insieme un momento che vada bene a entrambi.",
+      "step3_title": "Le ore vengono registrate",
+      "step3_desc": "Il tempo donato viene registrato in ore, così chi aiuta accumula ore da usare o donare in seguito."
+    },
+    "recruit": {
+      "title": "Cerchiamo i nostri primi assistenti",
+      "body": "La Comunità Solidale funziona solo se le persone si fanno avanti per aiutare. Non abbiamo ancora un team di assistenti — lo stiamo creando. Se puoi dedicare un po' di tempo, potresti essere tra i primi.",
+      "cta": "Offri il tuo aiuto"
+    },
+    "your_hours_note": "Sono gli stessi crediti di tempo usati nella banca del tempo — un unico saldo condiviso, non una valuta separata della Comunità Solidale.",
+    "groups": {
+      "get_help": {
+        "title": "Ricevi aiuto",
+        "desc": "Chiedi supporto e tieni traccia delle persone che ti aiutano."
+      },
+      "give_help": {
+        "title": "Dai una mano",
+        "desc": "Offri il tuo tempo e le tue competenze ai vicini che ne hanno bisogno."
+      },
+      "your_hours": {
+        "title": "Le tue ore",
+        "desc": "Vedi e usa i crediti di tempo che hai guadagnato."
+      },
+      "caregiver_tools": {
+        "title": "Strumenti per gli assistenti",
+        "desc": "Strumenti per chi presta assistenza regolare. Diventano più utili man mano che la rete di assistenti cresce."
+      },
+      "safety": {
+        "title": "Sicurezza e novità",
+        "desc": "Segnala un problema o segui ciò che accade nella tua zona."
+      }
     }
   },
   "request_help": {

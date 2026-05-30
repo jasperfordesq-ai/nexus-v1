@@ -394,6 +394,59 @@
     "title": "Caring Community",
     "subtitle": "Bring time-bank exchange, verified volunteering, trusted organisations, groups, events, resources, and impact signals into one coordinated care workflow.",
     "welcome_banner": "Welcome! Here you can ask for help, offer your time, or simply record a neighbourly kindness. Every contribution — big or small — makes your community stronger.",
+    "alpha": {
+      "badge": "New · Early access"
+    },
+    "preview_tag": "Preview",
+    "hero": {
+      "title": "Caring Community",
+      "intro": "Caring Community is a place for neighbours to help each other with everyday care — a lift to an appointment, a bit of shopping, or some company for an afternoon. Ask for help when you need it, and offer help when you can.",
+      "timebank_note": "It works alongside the timebank: when you give your time it's recorded as hours you can use later — the same hours, in one shared balance.",
+      "cta_get_help": "I need some help",
+      "cta_give_help": "I'd like to help"
+    },
+    "new_notice": {
+      "title": "This is brand new.",
+      "body": "Caring Community has only just launched here and we're still building it. Some features are early previews, and it won't run on its own — it depends on neighbours volunteering to give care. Thank you for being one of the first."
+    },
+    "how": {
+      "title": "How it works",
+      "subtitle": "Three simple steps.",
+      "step1_title": "Ask for help",
+      "step1_desc": "Tell us what you need in your own words. Your request goes to trusted members nearby.",
+      "step2_title": "A neighbour offers",
+      "step2_desc": "Someone in the community offers to help, and you agree a time that suits you both.",
+      "step3_title": "Hours are recorded",
+      "step3_desc": "The time given is logged as hours, so helpers build up hours they can use or pass on later."
+    },
+    "recruit": {
+      "title": "We're looking for our first caregivers",
+      "body": "Caring Community only works when people step forward to help. We don't have a ready team of caregivers yet — we're building one. If you can spare a little time, you could be one of the first.",
+      "cta": "Offer to help"
+    },
+    "your_hours_note": "These are the same time credits used across the timebank — one shared balance, not a separate caring-community currency.",
+    "groups": {
+      "get_help": {
+        "title": "Get help",
+        "desc": "Ask for support and keep track of the people helping you."
+      },
+      "give_help": {
+        "title": "Give help",
+        "desc": "Offer your time and skills to neighbours who need a hand."
+      },
+      "your_hours": {
+        "title": "Your hours",
+        "desc": "See and use the time credits you've earned."
+      },
+      "caregiver_tools": {
+        "title": "Caregiver tools",
+        "desc": "Tools for people giving regular care. They become more useful as our caregiver network grows."
+      },
+      "safety": {
+        "title": "Safety & updates",
+        "desc": "Raise a concern, or follow what's happening locally."
+      }
+    },
     "actions": {
       "request_help": "Request help",
       "request_help_sub": "Ask your community for practical support",
@@ -413,8 +466,10 @@
       "loyalty_history_sub": "See how you've used your earned hours at local merchants.",
       "future_care_fund": "Future Care Fund",
       "future_care_fund_sub": "See your banked hours as future-care insurance.",
-      "cover_care": "Cover Care",
-      "cover_care_sub": "Arrange trusted substitute support when a caregiver needs backup.",
+      "cover_care": "Caregiver cover",
+      "cover_care_sub": "For caregivers: arrange trusted backup when you need a break. More useful as the network grows.",
+      "become_caregiver": "Become a caregiver",
+      "become_caregiver_sub": "Tell us you'd like to give regular care and help us build the team.",
       "hour_gift": "Gift Hours",
       "hour_gift_sub": "Give your banked hours to family or friends.",
       "hour_transfer": "Transfer Hours",
