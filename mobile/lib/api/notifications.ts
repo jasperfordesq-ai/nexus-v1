@@ -15,7 +15,7 @@ export interface NotificationActor {
 export interface Notification {
   id: number;
   type: string;
-  category: 'message' | 'transaction' | 'social' | 'system' | 'other';
+  category: 'message' | 'transaction' | 'social' | 'system' | 'event' | 'group' | 'listing' | 'connection' | 'mention' | 'other' | string;
   title: string | null;
   /** Primary display text */
   message: string;
@@ -26,6 +26,12 @@ export interface Notification {
   /** Deep-link URL (web format — e.g. /exchanges/123) */
   link: string | null;
   created_at: string;
+  latest_at?: string | null;
+  group_key?: string | null;
+  group_count?: number | null;
+  remaining_count?: number | null;
+  is_grouped?: boolean;
+  actors?: NotificationActor[];
 }
 
 export interface NotificationListResponse {
@@ -50,7 +56,7 @@ export interface NotificationCounts {
 export function getNotifications(cursor?: string | null): Promise<NotificationListResponse> {
   const params: Record<string, string> = { per_page: '25' };
   if (cursor) params.cursor = cursor;
-  return api.get<NotificationListResponse>(`${API_V2}/notifications`, params);
+  return api.get<NotificationListResponse>(`${API_V2}/notifications/grouped`, params);
 }
 
 /** GET /api/v2/notifications/counts — unread counts by category */
@@ -66,6 +72,10 @@ export function markRead(id: number): Promise<void> {
 /** POST /api/v2/notifications/read-all */
 export function markAllRead(): Promise<void> {
   return api.post<void>(`${API_V2}/notifications/read-all`);
+}
+
+export function markGroupRead(groupKey: string): Promise<void> {
+  return api.post<void>(`${API_V2}/notifications/group/read`, { group_key: groupKey });
 }
 
 /** DELETE /api/v2/notifications/{id} */

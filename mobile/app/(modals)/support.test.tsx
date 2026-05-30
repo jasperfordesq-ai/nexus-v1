@@ -43,7 +43,7 @@ describe('SupportRoute', () => {
   it('opens selected web support pages externally', () => {
     const { getAllByText } = render(<SupportRoute />);
 
-    fireEvent.press(getAllByText('Open page')[0]);
+    fireEvent.press(getAllByText('Open web')[0]);
 
     expect(Linking.openURL).toHaveBeenCalledWith('https://app.project-nexus.ie/help');
   });

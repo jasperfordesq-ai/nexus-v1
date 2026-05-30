@@ -39,6 +39,8 @@ jest.mock('react-i18next', () => ({
         'blockedUsers.settingsHint': 'Review blocked users.',
         'dataExport.title': 'Data export',
         'dataExport.settingsHint': 'Request your data.',
+        'linkedAccounts.title': 'Linked accounts',
+        'linkedAccounts.settingsHint': 'Manage delegated account access.',
         'translation.preferencesTitle': 'Content preferences',
         'translation.preferencesHint': 'Language and feed ordering.',
         'translation.title': 'Translation preferences',
@@ -240,6 +242,9 @@ describe('SettingsScreen', () => {
 
     fireEvent.press(getByText('Data export'));
     expect(router.push).toHaveBeenCalledWith('/(modals)/settings-data-export');
+
+    fireEvent.press(getByText('Linked accounts'));
+    expect(router.push).toHaveBeenCalledWith('/(modals)/settings-linked-accounts');
 
     fireEvent.press(getByText('Translation preferences'));
     expect(router.push).toHaveBeenCalledWith('/(modals)/settings-translation');

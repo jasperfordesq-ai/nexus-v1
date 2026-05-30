@@ -39,6 +39,27 @@ export interface UserPreferences {
   };
 }
 
+export type SubAccountStatus = 'active' | 'pending' | 'revoked' | 'rejected';
+export type SubAccountPermission =
+  | 'can_view_activity'
+  | 'can_manage_listings'
+  | 'can_transact'
+  | 'can_view_messages';
+
+export interface SubAccountRelationship {
+  relationship_id: number;
+  relationship_type: string;
+  permissions: Partial<Record<SubAccountPermission, boolean>>;
+  status: SubAccountStatus;
+  approved_at?: string | null;
+  created_at: string;
+  user_id: number;
+  first_name?: string | null;
+  last_name?: string | null;
+  avatar_url?: string | null;
+  email: string;
+}
+
 function unwrap<T>(response: ApiEnvelope<T>, fallback: T): T {
   if (response && typeof response === 'object' && 'data' in response) {
     return (response as { data?: T }).data ?? fallback;
@@ -71,4 +92,33 @@ export async function getUserPreferences(): Promise<UserPreferences> {
 
 export function saveUserPreferences(preferences: UserPreferences): Promise<unknown> {
   return api.put<unknown>(`${API_V2}/users/me/preferences`, preferences);
+}
+
+export async function getManagedSubAccounts(): Promise<SubAccountRelationship[]> {
+  const response = await api.get<ApiEnvelope<SubAccountRelationship[]>>(`${API_V2}/users/me/sub-accounts`);
+  return unwrap(response, []);
+}
+
+export async function getManagerSubAccounts(): Promise<SubAccountRelationship[]> {
+  const response = await api.get<ApiEnvelope<SubAccountRelationship[]>>(`${API_V2}/users/me/parent-accounts`);
+  return unwrap(response, []);
+}
+
+export function requestSubAccount(email: string): Promise<unknown> {
+  return api.post<unknown>(`${API_V2}/users/me/sub-accounts`, { email });
+}
+
+export function approveSubAccount(relationshipId: number): Promise<unknown> {
+  return api.put<unknown>(`${API_V2}/users/me/sub-accounts/${relationshipId}/approve`);
+}
+
+export function updateSubAccountPermissions(
+  relationshipId: number,
+  permissions: Partial<Record<SubAccountPermission, boolean>>,
+): Promise<unknown> {
+  return api.put<unknown>(`${API_V2}/users/me/sub-accounts/${relationshipId}/permissions`, { permissions });
+}
+
+export function revokeSubAccount(relationshipId: number): Promise<unknown> {
+  return api.delete<unknown>(`${API_V2}/users/me/sub-accounts/${relationshipId}`);
 }

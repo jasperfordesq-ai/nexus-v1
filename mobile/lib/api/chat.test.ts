@@ -19,7 +19,7 @@ jest.mock('@/lib/constants', () => ({
 }));
 
 import { api } from '@/lib/api/client';
-import { sendChatMessage, getChatHistory, getChatStarters } from './chat';
+import { sendChatMessage, getChatHistory, getChatStarters, submitChatFeedback } from './chat';
 import type { ChatResponse, ChatMessage } from './chat';
 
 const mockUserMessage: ChatMessage = {
@@ -121,5 +121,31 @@ describe('getChatStarters', () => {
     const result = await getChatStarters();
     expect(api.get).toHaveBeenCalledWith('/api/ai/chat/starters');
     expect(result.starters).toEqual(['Offer help', 'Find events']);
+  });
+});
+
+describe('submitChatFeedback', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('posts assistant feedback by trace id', async () => {
+    (api.post as jest.Mock).mockResolvedValue({ data: { recorded: true, feedback: 'up' } });
+    const payload = { trace_id: 44, message_id: null, feedback: 'up' as const };
+    const result = await submitChatFeedback(payload);
+    expect(api.post).toHaveBeenCalledWith('/api/ai/chat/feedback', payload);
+    expect(result.data.recorded).toBe(true);
+  });
+
+  it('includes optional notes for negative assistant feedback', async () => {
+    (api.post as jest.Mock).mockResolvedValue({ data: { recorded: true, feedback: 'down' } });
+    const payload = {
+      trace_id: 44,
+      message_id: 90,
+      feedback: 'down' as const,
+      note: 'It missed the local context.',
+    };
+
+    await submitChatFeedback(payload);
+
+    expect(api.post).toHaveBeenCalledWith('/api/ai/chat/feedback', payload);
   });
 });

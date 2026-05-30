@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 jest.mock('@/lib/api/client', () => ({
-  api: { get: jest.fn(), post: jest.fn(), put: jest.fn(), patch: jest.fn(), delete: jest.fn() },
+  api: { get: jest.fn(), post: jest.fn(), put: jest.fn(), patch: jest.fn(), delete: jest.fn(), upload: jest.fn() },
   ApiResponseError: class ApiResponseError extends Error {
     status!: number;
     constructor(status: number, message: string) { super(message); this.status = status; this.name = 'ApiResponseError'; }
@@ -30,6 +30,8 @@ import {
   getMessagingRestrictionStatus,
   updateMessage,
   deleteMessage,
+  sendMessageWithAttachments,
+  sendVoiceMessage,
 } from './messages';
 import type { ConversationListResponse, MessageListResponse, Message } from './messages';
 
@@ -213,6 +215,40 @@ describe('sendMessage', () => {
   it('propagates errors from the API', async () => {
     (api.post as jest.Mock).mockRejectedValue(new Error('Forbidden'));
     await expect(sendMessage(2, 'Hi')).rejects.toThrow('Forbidden');
+  });
+});
+
+describe('sendMessageWithAttachments', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('uploads multipart message attachments', async () => {
+    (api.upload as jest.Mock).mockResolvedValue({ data: mockMessage });
+
+    await sendMessageWithAttachments(2, 'Photo update', [{
+      uri: 'file:///tmp/photo.jpg',
+      name: 'photo.jpg',
+      mimeType: 'image/jpeg',
+    }], {
+      context_type: 'job',
+      context_id: 44,
+    });
+
+    expect(api.upload).toHaveBeenCalledWith('/api/v2/messages', expect.any(FormData));
+  });
+});
+
+describe('sendVoiceMessage', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('uploads a voice message', async () => {
+    (api.upload as jest.Mock).mockResolvedValue({ data: { ...mockMessage, is_voice: true, audio_url: 'https://cdn.test/voice.m4a' } });
+
+    await sendVoiceMessage(2, 'file:///tmp/voice.m4a', {
+      context_type: 'job',
+      context_id: 44,
+    });
+
+    expect(api.upload).toHaveBeenCalledWith('/api/v2/messages/voice', expect.any(FormData));
   });
 });
 

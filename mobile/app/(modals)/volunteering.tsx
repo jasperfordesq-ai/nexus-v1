@@ -14,13 +14,14 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router, type Href } from 'expo-router';
+import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 
 import {
+  cancelShiftSwap,
   cancelShiftSignup,
   expressInterest,
   generateVolunteerCertificate,
@@ -33,7 +34,9 @@ import {
   getVolunteerDonations,
   getVolunteerExpenses,
   getVolunteerGivingDays,
+  getShiftSwaps,
   logVolunteerHours,
+  respondToShiftSwap,
   submitVolunteerExpense,
   submitVolunteerDonation,
   withdrawApplication,
@@ -53,6 +56,8 @@ import {
   type VolunteerHoursSummary,
   type VolunteerOpportunity,
   type VolunteerShiftRegistration,
+  type VolunteerShiftSwap,
+  type VolunteerShiftSwapsResponse,
   type VolunteeringOrganisation,
   type VolunteeringResponse,
 } from '@/lib/api/volunteering';
@@ -70,7 +75,7 @@ import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
-type TabKey = 'opportunities' | 'applications' | 'shifts' | 'hours' | 'certificates' | 'expenses' | 'donations';
+type TabKey = 'opportunities' | 'applications' | 'shifts' | 'swaps' | 'hours' | 'certificates' | 'expenses' | 'donations' | 'organisations';
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 const EXPENSE_TYPES: VolunteerExpenseType[] = ['travel', 'meals', 'supplies', 'equipment', 'parking', 'other'];
 
@@ -243,6 +248,113 @@ function HeroHeader({
         </View>
       </HeroCard.Body>
     </HeroCard>
+  );
+}
+
+function OrganisationsPanel({
+  organisations,
+  isLoading,
+}: {
+  organisations: VolunteeringOrganisation[];
+  isLoading: boolean;
+}) {
+  const { t } = useTranslation('volunteering');
+  const primary = usePrimaryColor();
+  const theme = useTheme();
+  const managed = organisations.filter((org) => ['owner', 'admin'].includes(org.member_role ?? '') && org.status !== 'pending');
+  const pending = organisations.filter((org) => org.status === 'pending');
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (managed.length === 0 && pending.length === 0) {
+    return (
+      <EmptyState
+        icon="business-outline"
+        title={t('org.emptyTitle')}
+        subtitle={t('org.emptyDescription')}
+        actionLabel={t('org.register')}
+        onAction={() => router.push('/(modals)/organisations')}
+      />
+    );
+  }
+
+  return (
+    <View className="gap-3">
+      {pending.length > 0 ? (
+        <HeroCard className="rounded-panel p-0">
+          <HeroCard.Body className="gap-3 p-4">
+            <Text className="text-sm font-semibold" style={{ color: theme.warning }}>
+              {t('org.pendingHeading')}
+            </Text>
+            {pending.map((org) => (
+              <View key={org.id} className="flex-row items-center gap-3 rounded-panel-inner p-3" style={{ backgroundColor: theme.surface }}>
+                <Avatar uri={org.logo_url ?? org.avatar ?? undefined} name={org.name} size={38} />
+                <View className="min-w-0 flex-1">
+                  <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+                    {org.name}
+                  </Text>
+                  <Text className="text-xs" style={{ color: theme.textSecondary }} numberOfLines={2}>
+                    {t('org.pendingDescription')}
+                  </Text>
+                </View>
+                <Chip size="sm" variant="secondary" color="default">
+                  <Chip.Label>{t('org.status.pending')}</Chip.Label>
+                </Chip>
+              </View>
+            ))}
+          </HeroCard.Body>
+        </HeroCard>
+      ) : null}
+
+      {managed.map((org) => (
+        <HeroCard key={org.id} className="rounded-panel p-0">
+          <HeroCard.Body className="gap-3 p-4">
+            <View className="flex-row items-start gap-3">
+              <Avatar uri={org.logo_url ?? org.avatar ?? undefined} name={org.name} size={46} />
+              <View className="min-w-0 flex-1">
+                <View className="flex-row items-start justify-between gap-2">
+                  <View className="min-w-0 flex-1">
+                    <Text className="text-base font-semibold" style={{ color: theme.text }} numberOfLines={2}>
+                      {org.name}
+                    </Text>
+                    {org.description ? (
+                      <Text className="mt-1 text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>
+                        {org.description}
+                      </Text>
+                    ) : null}
+                  </View>
+                  <Chip size="sm" variant="secondary" color="default">
+                    <Chip.Label>{t(`org.roles.${org.member_role ?? 'member'}`, { defaultValue: org.member_role ?? '' })}</Chip.Label>
+                  </Chip>
+                </View>
+              </View>
+            </View>
+            <View className="flex-row items-center justify-between gap-3">
+              {typeof org.balance === 'number' ? (
+                <Text className="text-sm font-semibold" style={{ color: theme.success }}>
+                  {t('org.walletBalance', { count: org.balance })}
+                </Text>
+              ) : (
+                <Text className="text-sm" style={{ color: theme.textSecondary }}>
+                  {t('org.managerTools')}
+                </Text>
+              )}
+              <HeroButton
+                size="sm"
+                variant="secondary"
+                onPress={() => router.push({ pathname: '/(modals)/volunteering-org-dashboard', params: { id: String(org.id) } } as unknown as Href)}
+                accessibilityLabel={t('org.openDashboardLabel', { name: org.name })}
+              >
+                <Ionicons name="open-outline" size={16} color={primary} />
+                <HeroButton.Label>{t('org.manage')}</HeroButton.Label>
+              </HeroButton>
+            </View>
+          </HeroCard.Body>
+        </HeroCard>
+      ))}
+    </View>
   );
 }
 
@@ -504,6 +616,186 @@ function ShiftsPanel({
           </HeroCard>
         );
       })}
+    </View>
+  );
+}
+
+function swapStatusTone(status: string, theme: ReturnType<typeof useTheme>) {
+  if (['accepted', 'admin_approved'].includes(status)) return theme.success;
+  if (['rejected', 'admin_rejected', 'cancelled'].includes(status)) return theme.error;
+  if (status === 'expired') return theme.textMuted;
+  return theme.warning;
+}
+
+function SwapsPanel({
+  swaps,
+  isLoading,
+  onRefresh,
+}: {
+  swaps: VolunteerShiftSwap[];
+  isLoading: boolean;
+  onRefresh: () => void;
+}) {
+  const { t } = useTranslation('volunteering');
+  const primary = usePrimaryColor();
+  const theme = useTheme();
+  const [filter, setFilter] = useState<'all' | 'sent' | 'received'>('all');
+  const [actioningId, setActioningId] = useState<number | null>(null);
+
+  const filteredSwaps = swaps.filter((swap) => (filter === 'all' ? true : swap.direction === filter));
+  const sentCount = swaps.filter((swap) => swap.direction === 'sent').length;
+  const receivedCount = swaps.filter((swap) => swap.direction === 'received').length;
+
+  async function handleRespond(id: number, action: 'accept' | 'reject') {
+    setActioningId(id);
+    try {
+      await respondToShiftSwap(id, action);
+      onRefresh();
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(t('common:errors.alertTitle'), t(action === 'accept' ? 'swaps.acceptError' : 'swaps.rejectError'));
+    } finally {
+      setActioningId(null);
+    }
+  }
+
+  async function handleCancel(id: number) {
+    setActioningId(id);
+    try {
+      await cancelShiftSwap(id);
+      onRefresh();
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(t('common:errors.alertTitle'), t('swaps.cancelError'));
+    } finally {
+      setActioningId(null);
+    }
+  }
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  return (
+    <View className="gap-4">
+      <HeroCard className="rounded-panel p-0">
+        <HeroCard.Body className="gap-3 p-4">
+          <View className="flex-row items-start justify-between gap-3">
+            <View className="min-w-0 flex-1">
+              <Text className="text-base font-semibold" style={{ color: theme.text }}>
+                {t('swaps.heading')}
+              </Text>
+              <Text className="mt-1 text-sm leading-5" style={{ color: theme.textSecondary }}>
+                {t('swaps.description')}
+              </Text>
+            </View>
+            <View className="size-10 items-center justify-center rounded-panel-inner" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+              <Ionicons name="swap-horizontal-outline" size={20} color={primary} />
+            </View>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-2">
+            {([
+              ['all', t('swaps.all', { count: swaps.length })],
+              ['sent', t('swaps.sent', { count: sentCount })],
+              ['received', t('swaps.received', { count: receivedCount })],
+            ] as const).map(([key, label]) => {
+              const selected = filter === key;
+              return (
+                <HeroButton
+                  key={key}
+                  size="sm"
+                  variant={selected ? 'primary' : 'secondary'}
+                  onPress={() => setFilter(key)}
+                  style={selected ? { backgroundColor: withAlpha(primary, 0.18) } : undefined}
+                >
+                  <HeroButton.Label style={{ color: selected ? primary : theme.textSecondary }}>
+                    {label}
+                  </HeroButton.Label>
+                </HeroButton>
+              );
+            })}
+          </ScrollView>
+        </HeroCard.Body>
+      </HeroCard>
+
+      {filteredSwaps.length === 0 ? (
+        <EmptyState icon="swap-horizontal-outline" title={t('swaps.emptyTitle')} />
+      ) : (
+        filteredSwaps.map((swap) => {
+          const actorName = swap.direction === 'sent' ? swap.recipient?.name : swap.requester?.name;
+          const statusTone = swapStatusTone(String(swap.status), theme);
+          const originalDate = formatDate(swap.original_shift?.start_time);
+          const originalStart = formatTime(swap.original_shift?.start_time);
+          const originalEnd = formatTime(swap.original_shift?.end_time);
+          const proposedDate = formatDate(swap.proposed_shift?.start_time);
+          const proposedStart = formatTime(swap.proposed_shift?.start_time);
+          const proposedEnd = formatTime(swap.proposed_shift?.end_time);
+
+          return (
+            <HeroCard key={swap.id} className="rounded-panel p-0">
+              <HeroCard.Body className="gap-4 p-4">
+                <View className="flex-row items-start justify-between gap-3">
+                  <View className="min-w-0 flex-1">
+                    <Text className="text-base font-semibold" style={{ color: theme.text }} numberOfLines={2}>
+                      {t(swap.direction === 'sent' ? 'swaps.sentTo' : 'swaps.receivedFrom', { name: actorName })}
+                    </Text>
+                    <Text className="mt-1 text-xs" style={{ color: theme.textMuted }}>
+                      {t('swaps.requested', { date: formatDate(swap.created_at) ?? '' })}
+                    </Text>
+                  </View>
+                  <StatusChip label={t(`swaps.status.${swap.status}`, { defaultValue: String(swap.status) })} tone={statusTone} icon="ellipse-outline" />
+                </View>
+
+                <View className="gap-2">
+                  <Surface variant="secondary" className="rounded-panel-inner p-3">
+                    <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>{t('swaps.yourShift')}</Text>
+                    <Text className="mt-1 text-sm font-semibold" style={{ color: theme.text }} numberOfLines={2}>
+                      {swap.original_shift?.opportunity_title}
+                    </Text>
+                    <Text className="mt-1 text-xs" style={{ color: theme.textMuted }} numberOfLines={2}>
+                      {swap.original_shift?.organization_name} · {originalDate ?? t('myShifts.dateUnknown')} {originalStart && originalEnd ? t('myShifts.timeRange', { start: originalStart, end: originalEnd }) : ''}
+                    </Text>
+                  </Surface>
+                  <Surface variant="secondary" className="rounded-panel-inner p-3">
+                    <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>{t('swaps.proposedShift')}</Text>
+                    <Text className="mt-1 text-sm font-semibold" style={{ color: theme.text }} numberOfLines={2}>
+                      {swap.proposed_shift?.opportunity_title}
+                    </Text>
+                    <Text className="mt-1 text-xs" style={{ color: theme.textMuted }} numberOfLines={2}>
+                      {swap.proposed_shift?.organization_name} · {proposedDate ?? t('myShifts.dateUnknown')} {proposedStart && proposedEnd ? t('myShifts.timeRange', { start: proposedStart, end: proposedEnd }) : ''}
+                    </Text>
+                  </Surface>
+                </View>
+
+                {swap.message ? (
+                  <Text className="text-sm italic leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>
+                    {swap.message}
+                  </Text>
+                ) : null}
+
+                {swap.direction === 'received' && swap.status === 'pending' ? (
+                  <View className="flex-row gap-2">
+                    <HeroButton className="flex-1" size="sm" isDisabled={actioningId === swap.id} onPress={() => void handleRespond(swap.id, 'accept')}>
+                      {actioningId === swap.id ? <Spinner size="sm" /> : <HeroButton.Label>{t('swaps.accept')}</HeroButton.Label>}
+                    </HeroButton>
+                    <HeroButton className="flex-1" size="sm" variant="danger-soft" isDisabled={actioningId === swap.id} onPress={() => void handleRespond(swap.id, 'reject')}>
+                      <HeroButton.Label>{t('swaps.reject')}</HeroButton.Label>
+                    </HeroButton>
+                  </View>
+                ) : null}
+
+                {swap.direction === 'sent' && swap.status === 'pending' ? (
+                  <HeroButton size="sm" variant="danger-soft" isDisabled={actioningId === swap.id} onPress={() => void handleCancel(swap.id)}>
+                    {actioningId === swap.id ? <Spinner size="sm" /> : <HeroButton.Label>{t('swaps.cancel')}</HeroButton.Label>}
+                  </HeroButton>
+                ) : null}
+              </HeroCard.Body>
+            </HeroCard>
+          );
+        })
+      )}
     </View>
   );
 }
@@ -1155,10 +1447,12 @@ export default function VolunteeringScreen() {
 
 function VolunteeringScreenInner() {
   const { t } = useTranslation(['volunteering', 'common']);
+  const params = useLocalSearchParams<{ tab?: string }>();
   const { isAuthenticated } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const [activeTab, setActiveTab] = useState<TabKey>('opportunities');
+  const initialTab = params.tab === 'organisations' ? 'organisations' : 'opportunities';
+  const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
   const [search, setSearch] = useState('');
   const [committedSearch, setCommittedSearch] = useState('');
   const [applyingId, setApplyingId] = useState<number | null>(null);
@@ -1207,16 +1501,26 @@ function VolunteeringScreenInner() {
   const expensesApi = useApi<VolunteerExpensesResponse>(() => getVolunteerExpenses(), [], { enabled: isAuthenticated });
   const givingDaysApi = useApi<VolunteerGivingDaysResponse>(() => getVolunteerGivingDays(), [], { enabled: isAuthenticated });
   const donationsApi = useApi<VolunteerDonationsResponse>(() => getVolunteerDonations(), [], { enabled: isAuthenticated });
+  const swapsApi = useApi<VolunteerShiftSwapsResponse>(() => getShiftSwaps(), [], { enabled: isAuthenticated });
 
   const opportunities = opportunitiesApi.items;
-  const applications = applicationsApi.data?.data ?? [];
-  const shifts = shiftsApi.data?.data.items ?? [];
+  const applicationsPayload = applicationsApi.data?.data;
+  const applications = Array.isArray(applicationsPayload) ? applicationsPayload : [];
+  const shiftsPayload = shiftsApi.data?.data.items;
+  const shifts = Array.isArray(shiftsPayload) ? shiftsPayload : [];
   const summary = hoursApi.data?.data ?? null;
-  const organisations = organisationsApi.data?.data ?? [];
-  const certificates = certificatesApi.data?.data.items ?? [];
-  const expenses = expensesApi.data?.data.items ?? expensesApi.data?.data.expenses ?? [];
-  const givingDays = givingDaysApi.data?.data ?? [];
-  const donations = donationsApi.data?.data.items ?? [];
+  const organisationsPayload = organisationsApi.data?.data;
+  const organisations = Array.isArray(organisationsPayload) ? organisationsPayload : [];
+  const certificatesPayload = certificatesApi.data?.data.items;
+  const certificates = Array.isArray(certificatesPayload) ? certificatesPayload : [];
+  const expensesPayload = expensesApi.data?.data.items ?? expensesApi.data?.data.expenses;
+  const expenses = Array.isArray(expensesPayload) ? expensesPayload : [];
+  const givingDaysPayload = givingDaysApi.data?.data;
+  const givingDays = Array.isArray(givingDaysPayload) ? givingDaysPayload : [];
+  const donationsPayload = donationsApi.data?.data.items;
+  const donations = Array.isArray(donationsPayload) ? donationsPayload : [];
+  const swapsPayload = swapsApi.data?.data;
+  const swaps = Array.isArray(swapsPayload) ? swapsPayload : swapsPayload?.swaps ?? [];
   const loggableOrganisations = useMemo(
     () => getLoggableOrganisations(organisations, applications),
     [applications, organisations],
@@ -1242,23 +1546,30 @@ function VolunteeringScreenInner() {
     }
   }
 
-  const tabs: Array<{ key: TabKey; label: string; icon: IoniconName; requiresAuth?: boolean }> = [
+  const tabs: Array<{ key: TabKey; label: string; icon: IoniconName; requiresAuth?: boolean }> = useMemo(() => [
     { key: 'opportunities', label: t('tabs.opportunities'), icon: 'briefcase-outline' },
     { key: 'applications', label: t('tabs.applications'), icon: 'send-outline', requiresAuth: true },
     { key: 'shifts', label: t('tabs.shifts'), icon: 'calendar-outline', requiresAuth: true },
+    { key: 'swaps', label: t('tabs.swaps'), icon: 'swap-horizontal-outline', requiresAuth: true },
     { key: 'hours', label: t('tabs.hours'), icon: 'time-outline', requiresAuth: true },
     { key: 'certificates', label: t('tabs.certificates'), icon: 'ribbon-outline', requiresAuth: true },
     { key: 'expenses', label: t('tabs.expenses'), icon: 'receipt-outline', requiresAuth: true },
     { key: 'donations', label: t('tabs.donations'), icon: 'heart-outline', requiresAuth: true },
-  ];
+    { key: 'organisations', label: t('tabs.organisations'), icon: 'business-outline', requiresAuth: true },
+  ], [t]);
 
-  const visibleTabs = tabs.filter((tab) => !tab.requiresAuth || isAuthenticated);
+  const visibleTabs = useMemo(
+    () => tabs.filter((tab) => !tab.requiresAuth || isAuthenticated),
+    [isAuthenticated, tabs],
+  );
 
   useEffect(() => {
     if (!visibleTabs.some((tab) => tab.key === activeTab)) {
       setActiveTab('opportunities');
     }
-  }, [activeTab, visibleTabs]);
+    // `visibleTabs` is derived from translated labels, so keep this guard tied to auth and the selected key.
+    // Otherwise tests and fast i18n refreshes can trigger unnecessary tab-state resets.
+  }, [activeTab, isAuthenticated]);
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -1292,6 +1603,7 @@ function VolunteeringScreenInner() {
               expensesApi.refresh();
               givingDaysApi.refresh();
               donationsApi.refresh();
+              swapsApi.refresh();
             }}
             tintColor={primary}
             colors={[primary]}
@@ -1367,6 +1679,13 @@ function VolunteeringScreenInner() {
               />
             ) : null}
 
+            {activeTab === 'organisations' ? (
+              <OrganisationsPanel
+                organisations={organisations}
+                isLoading={organisationsApi.isLoading}
+              />
+            ) : null}
+
             {activeTab === 'hours' ? (
               <HoursPanel
                 summary={summary}
@@ -1390,6 +1709,14 @@ function VolunteeringScreenInner() {
                 shifts={shifts}
                 isLoading={shiftsApi.isLoading}
                 onRefresh={shiftsApi.refresh}
+              />
+            ) : null}
+
+            {activeTab === 'swaps' ? (
+              <SwapsPanel
+                swaps={swaps}
+                isLoading={swapsApi.isLoading}
+                onRefresh={swapsApi.refresh}
               />
             ) : null}
 

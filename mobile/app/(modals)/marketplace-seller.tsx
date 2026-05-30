@@ -25,6 +25,7 @@ import {
   type MarketplaceListingItem,
   type MarketplaceSellerProfile,
 } from '@/lib/api/marketplace';
+import { getUserReviews, type ReviewItem } from '@/lib/api/reviews';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
@@ -34,6 +35,7 @@ import { withAlpha } from '@/lib/utils/color';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 
 type SellerTab = 'listings' | 'reviews';
+type SellerListItem = MarketplaceListingItem | ReviewItem;
 
 export default function MarketplaceSellerRoute() {
   return (
@@ -51,6 +53,8 @@ function MarketplaceSellerScreen() {
   const [tab, setTab] = useState<SellerTab>('listings');
   const { isAuthenticated, user } = useAuth();
   const seller = useApi(() => getMarketplaceSeller(safeId), [safeId], { enabled: safeId > 0 });
+  const profile = seller.data?.data ?? null;
+  const reviewUserId = profile?.user_id ?? 0;
   const listings = usePaginatedApi<MarketplaceListingItem, Awaited<ReturnType<typeof getMarketplaceSellerListings>>>(
     (cursor) => getMarketplaceSellerListings(safeId, cursor),
     (response) => ({
@@ -61,7 +65,17 @@ function MarketplaceSellerScreen() {
     [safeId],
     { enabled: safeId > 0 },
   );
-  const profile = seller.data?.data ?? null;
+  const reviews = usePaginatedApi<ReviewItem, Awaited<ReturnType<typeof getUserReviews>>>(
+    (cursor) => getUserReviews(reviewUserId, { cursor }),
+    (response) => ({
+      items: response.items,
+      cursor: response.cursor,
+      hasMore: response.hasMore,
+    }),
+    [reviewUserId],
+    { enabled: reviewUserId > 0 },
+  );
+  const listData: SellerListItem[] = tab === 'listings' ? listings.items : reviews.items;
 
   if (!safeId) {
     return (
@@ -75,8 +89,8 @@ function MarketplaceSellerScreen() {
   return (
     <SafeAreaView className="flex-1 bg-background">
       <AppTopBar title={t('seller.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
-      <FlatList
-        data={tab === 'listings' ? listings.items : []}
+      <FlatList<SellerListItem>
+        data={listData}
         keyExtractor={(item) => String(item.id)}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 132 }}
         ListHeaderComponent={
@@ -97,18 +111,26 @@ function MarketplaceSellerScreen() {
           )
         }
         renderItem={({ item }) => (
-          <MarketplaceListingCard item={item} onPress={() => router.push({ pathname: '/(modals)/marketplace-detail', params: { id: String(item.id) } } as unknown as Href)} />
+          tab === 'listings' ? (
+            <MarketplaceListingCard item={item as MarketplaceListingItem} onPress={() => router.push({ pathname: '/(modals)/marketplace-detail', params: { id: String(item.id) } } as unknown as Href)} />
+          ) : (
+            <SellerReviewCard review={item as ReviewItem} />
+          )
         )}
         ListEmptyComponent={
           tab === 'reviews' ? (
-            <ReviewsPlaceholder />
+            reviews.isLoading ? (
+              <View className="py-16"><LoadingSpinner /></View>
+            ) : (
+              <EmptyState icon="star-outline" title={reviews.error ?? t('seller.reviewsEmpty')} subtitle={t('seller.reviewsEmptyHint')} />
+            )
           ) : listings.isLoading ? (
             <View className="py-16"><LoadingSpinner /></View>
           ) : (
             <EmptyState icon="bag-handle-outline" title={listings.error ?? t('seller.empty')} subtitle={t('seller.emptyHint')} />
           )
         }
-        onEndReached={tab === 'listings' ? listings.loadMore : undefined}
+        onEndReached={tab === 'listings' ? listings.loadMore : reviews.loadMore}
         onEndReachedThreshold={0.35}
       />
     </SafeAreaView>
@@ -149,15 +171,47 @@ function SellerTabs({
   );
 }
 
-function ReviewsPlaceholder() {
+function SellerReviewCard({ review }: { review: ReviewItem }) {
   const { t } = useTranslation('marketplace');
+  const theme = useTheme();
+  const reviewerName = getReviewerName(review, t);
+  const reviewerAvatar = resolveImageUrl(review.reviewer?.avatar_url ?? review.reviewer?.avatar ?? null);
+  const createdAt = review.created_at ? new Date(review.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : null;
+
   return (
-    <EmptyState
-      icon="star-outline"
-      title={t('seller.reviewsTitle')}
-      subtitle={t('seller.reviewsHint')}
-    />
+    <HeroCard className="mb-3 rounded-panel p-0">
+      <HeroCard.Body className="gap-3 p-4">
+        <View className="flex-row items-start gap-3">
+          <Avatar uri={reviewerAvatar} name={reviewerName} size={44} />
+          <View className="min-w-0 flex-1 gap-1">
+            <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={1}>{reviewerName}</Text>
+            {createdAt ? (
+              <Text className="text-xs" style={{ color: theme.textSecondary }}>{t('seller.reviewDate', { date: createdAt })}</Text>
+            ) : null}
+          </View>
+          <Chip size="sm" variant="secondary" color="warning">
+            <Ionicons name="star" size={12} color={theme.warning} />
+            <Chip.Label>{t('seller.reviewRating', { rating: Math.max(0, Math.min(5, review.rating)).toFixed(1) })}</Chip.Label>
+          </Chip>
+        </View>
+        <View className="flex-row gap-0.5" accessibilityLabel={t('seller.reviewRating', { rating: Math.max(0, Math.min(5, review.rating)).toFixed(1) })}>
+          {[1, 2, 3, 4, 5].map((level) => (
+            <Ionicons key={level} name={level <= Math.round(review.rating) ? 'star' : 'star-outline'} size={16} color={theme.warning} />
+          ))}
+        </View>
+        {review.comment ? (
+          <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{review.comment}</Text>
+        ) : null}
+      </HeroCard.Body>
+    </HeroCard>
   );
+}
+
+function getReviewerName(review: ReviewItem, t: (key: string) => string): string {
+  if (review.is_anonymous) return t('seller.reviewAnonymous');
+  const reviewer = review.reviewer;
+  const fullName = [reviewer?.first_name, reviewer?.last_name].filter(Boolean).join(' ').trim();
+  return reviewer?.name || fullName || t('seller.reviewMember');
 }
 
 function SellerHeader({ profile, canMessage }: { profile: MarketplaceSellerProfile; canMessage: boolean }) {

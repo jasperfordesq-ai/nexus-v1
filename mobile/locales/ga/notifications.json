@@ -14,5 +14,13 @@
   "daysAgo": "{{count}} lá ó shin",
   "markRead": "Mark read",
   "delete": "Delete",
-  "deleteError": "Could not delete notification."
+  "deleteError": "Could not delete notification.",
+  "groupCount": "{{count}} notification",
+  "groupCount_other": "{{count}} notifications",
+  "expandGroup": "Expand group",
+  "collapseGroup": "Collapse group",
+  "markGroupRead": "Mark group read",
+  "unknownActor": "Community member",
+  "andOthers": "And {{count}} others",
+  "andOthers_one": "And {{count}} other"
 }

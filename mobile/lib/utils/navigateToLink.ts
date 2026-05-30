@@ -11,19 +11,43 @@ const knownSections = new Set([
   'listings',
   'events',
   'members',
+  'profile',
+  'users',
+  'me',
   'messages',
   'blog',
   'blog-post',
+  'resources',
+  'kb',
+  'help',
+  'support',
+  'about',
+  'contact',
+  'terms',
+  'privacy',
+  'cookies',
+  'accessibility',
+  'trust',
   'groups',
   'jobs',
   'job',
+  'marketplace',
   'organisations',
   'organizations',
   'organisation',
   'organization',
   'volunteering',
   'goals',
+  'activity',
+  'matches',
+  'reviews',
+  'skills',
+  'polls',
   'endorsements',
+  'leaderboard',
+  'achievements',
+  'nexus-score',
+  'ideation',
   'gamification',
   'federation',
   'wallet',
@@ -56,6 +80,29 @@ export function navigateToLink(link: string | null): void {
       if (id) router.push({ pathname: '/(modals)/member-profile', params: { id } });
       else router.push('/(modals)/members');
       break;
+    case 'profile':
+      if (id) router.push({ pathname: '/(modals)/member-profile', params: { id } });
+      else router.push('/(tabs)/profile');
+      break;
+    case 'users':
+      if (id && segments[1] === 'appreciations') {
+        router.push({ pathname: '/(modals)/appreciations', params: { userId: id } } as unknown as Href);
+      } else if (id && segments[1] === 'collections') {
+        router.push({ pathname: '/(modals)/profile-collections', params: { userId: id, scope: 'public' } } as unknown as Href);
+      } else if (id) {
+        router.push({ pathname: '/(modals)/member-profile', params: { id } });
+      } else {
+        router.push('/(modals)/members');
+      }
+      break;
+    case 'me':
+      if (id === 'collections') {
+        router.push({
+          pathname: '/(modals)/profile-collections',
+          params: segments[1] ? { collectionId: segments[1] } : {},
+        } as unknown as Href);
+      }
+      break;
     case 'messages':
       navigateMessages(segments, params);
       break;
@@ -63,6 +110,26 @@ export function navigateToLink(link: string | null): void {
     case 'blog-post':
       if (id) router.push({ pathname: '/(modals)/blog-post', params: { id } });
       else router.push('/(modals)/blog');
+      break;
+    case 'resources':
+      pushWithOptionalParams('/(modals)/resources', id ? { ...params, category: id } : params);
+      break;
+    case 'kb':
+      if (id) router.push({ pathname: '/(modals)/kb-article', params: { id, ...params } } as unknown as Href);
+      else pushWithOptionalParams('/(modals)/resources', { ...params, tab: 'kb' });
+      break;
+    case 'help':
+    case 'support':
+      pushWithOptionalParams('/(modals)/support', params);
+      break;
+    case 'about':
+    case 'contact':
+    case 'terms':
+    case 'privacy':
+    case 'cookies':
+    case 'accessibility':
+    case 'trust':
+      pushWithOptionalParams('/(modals)/support', { ...params, doc: section });
       break;
     case 'groups':
       if (id) router.push({ pathname: '/(modals)/group-detail', params: { id } });
@@ -76,6 +143,9 @@ export function navigateToLink(link: string | null): void {
       if (id) router.push({ pathname: '/(modals)/job-detail', params: { id } });
       else router.push('/(modals)/jobs');
       break;
+    case 'marketplace':
+      navigateMarketplace(segments, params);
+      break;
     case 'organisations':
     case 'organizations':
       if (id) router.push({ pathname: '/(modals)/organisation-detail', params: { id } });
@@ -87,14 +157,50 @@ export function navigateToLink(link: string | null): void {
       else router.push('/(modals)/organisations');
       break;
     case 'volunteering':
-      if (id) router.push({ pathname: '/(modals)/volunteering-detail', params: { id } });
+      if (id === 'my-organisations') {
+        router.push({ pathname: '/(modals)/volunteering', params: { tab: 'organisations' } } as unknown as Href);
+      } else if (id === 'org' && segments[1]) {
+        router.push({
+          pathname: '/(modals)/volunteering-org-dashboard',
+          params: { id: segments[1], tab: params.tab ?? (segments[2] === 'dashboard' && segments[3] ? segments[3] : undefined) },
+        } as unknown as Href);
+      } else if (id) router.push({ pathname: '/(modals)/volunteering-detail', params: { id } });
       else router.push('/(modals)/volunteering');
       break;
     case 'goals':
-      router.push('/(modals)/goals');
+      if (id) router.push({ pathname: '/(modals)/goal-detail', params: { id } } as unknown as Href);
+      else router.push('/(modals)/goals');
+      break;
+    case 'activity':
+      router.push('/(modals)/activity' as Href);
+      break;
+    case 'matches':
+      router.push('/(modals)/matches' as Href);
+      break;
+    case 'reviews':
+      router.push('/(modals)/reviews' as Href);
+      break;
+    case 'skills':
+      router.push('/(modals)/skills' as Href);
+      break;
+    case 'polls':
+      router.push('/(modals)/polls' as Href);
       break;
     case 'endorsements':
       router.push('/(modals)/endorsements');
+      break;
+    case 'leaderboard':
+      router.push({ pathname: '/(modals)/gamification', params: { tab: 'leaderboard', ...params } } as unknown as Href);
+      break;
+    case 'achievements':
+      router.push({ pathname: '/(modals)/gamification', params: { tab: 'badges', ...params } } as unknown as Href);
+      break;
+    case 'nexus-score':
+      router.push({ pathname: '/(modals)/gamification', params: { tab: 'score', ...params } } as unknown as Href);
+      break;
+    case 'ideation':
+      if (id) router.push({ pathname: '/(modals)/ideation-detail', params: { id } } as unknown as Href);
+      else router.push('/(modals)/ideation' as Href);
       break;
     case 'gamification':
       router.push('/(modals)/gamification');
@@ -142,6 +248,61 @@ function parseLink(link: string): { section: string; segments: string[]; params:
     segments,
     params: Object.fromEntries(url.searchParams.entries()),
   };
+}
+
+function navigateMarketplace(segments: string[], queryParams: Record<string, string>): void {
+  const [branch, detailId] = segments;
+  if (!branch) {
+    pushWithOptionalParams('/(modals)/marketplace', queryParams);
+    return;
+  }
+
+  switch (branch) {
+    case 'search':
+      pushWithOptionalParams('/(modals)/marketplace-search', queryParams);
+      break;
+    case 'map':
+      pushWithOptionalParams('/(modals)/marketplace-map', queryParams);
+      break;
+    case 'category':
+    case 'categories':
+      if (detailId) {
+        router.push({ pathname: '/(modals)/marketplace-category', params: { id: detailId, ...queryParams } } as unknown as Href);
+      } else {
+        pushWithOptionalParams('/(modals)/marketplace', queryParams);
+      }
+      break;
+    case 'seller':
+    case 'sellers':
+      if (detailId) {
+        router.push({ pathname: '/(modals)/marketplace-seller', params: { id: detailId, ...queryParams } } as unknown as Href);
+      } else {
+        pushWithOptionalParams('/(modals)/marketplace', queryParams);
+      }
+      break;
+    case 'orders':
+      pushWithOptionalParams('/(modals)/marketplace-orders', queryParams);
+      break;
+    case 'offers':
+      pushWithOptionalParams('/(modals)/marketplace-offers', queryParams);
+      break;
+    case 'tools':
+      pushWithOptionalParams('/(modals)/marketplace-tools', queryParams);
+      break;
+    case 'saved-searches':
+      pushWithOptionalParams('/(modals)/marketplace-tools', { ...queryParams, tab: 'savedSearches' });
+      break;
+    case 'collections':
+      pushWithOptionalParams('/(modals)/marketplace-collections', queryParams);
+      break;
+    case 'new':
+    case 'create':
+      pushWithOptionalParams('/(modals)/new-marketplace-listing', queryParams);
+      break;
+    default:
+      router.push({ pathname: '/(modals)/marketplace-detail', params: { id: branch, ...queryParams } } as unknown as Href);
+      break;
+  }
 }
 
 function navigateFederation(segments: string[], queryParams: Record<string, string>): void {

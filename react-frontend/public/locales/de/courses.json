@@ -34,7 +34,9 @@
     "cost": "{{credits}} Credits",
     "insufficient_credits": "Ihr Zeitguthaben reicht für die Anmeldung nicht aus.",
     "prerequisites": "Voraussetzungen",
-    "prerequisites_required": "Absolvieren Sie die erforderlichen Kurse, um die Anmeldung freizuschalten."
+    "prerequisites_required": "Absolvieren Sie die erforderlichen Kurse, um die Anmeldung freizuschalten.",
+    "not_available": "Dieser Kurs ist noch nicht veröffentlicht.",
+    "your_course": "Das ist Ihr Kurs."
   },
   "player": {
     "mark_complete": "Als abgeschlossen markieren",
@@ -205,7 +207,10 @@
     "untitled_lesson": "Lektion ohne Titel",
     "empty": "Noch keine Abschnitte. Fügen Sie Ihren ersten Abschnitt hinzu, um mit der Erstellung des Lehrplans zu beginnen.",
     "done": "Erledigt",
-    "preview_course": "Vorschau"
+    "preview_course": "Vorschau",
+    "published_toast": "Kurs veröffentlicht – er ist jetzt für Mitglieder sichtbar.",
+    "unpublished_toast": "Kurs unveröffentlicht – zurück zum Entwurf.",
+    "publish_hint": "Ihr Kurs ist ein Entwurf. Veröffentlichen Sie es, um es für Mitglieder sichtbar zu machen und für die Anmeldung freizugeben."
   },
   "lesson_content": {
     "text": "Text",

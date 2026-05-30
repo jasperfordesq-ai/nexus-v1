@@ -34,7 +34,9 @@
     "cost": "{{credits}} créditos",
     "insufficient_credits": "No tienes suficientes créditos de tiempo para matricularte.",
     "prerequisites": "Requisitos previos",
-    "prerequisites_required": "Complete los cursos de requisitos previos para desbloquear la inscripción."
+    "prerequisites_required": "Complete los cursos de requisitos previos para desbloquear la inscripción.",
+    "not_available": "Este curso aún no está publicado.",
+    "your_course": "Este es tu curso."
   },
   "player": {
     "mark_complete": "Marcar como completo",
@@ -205,7 +207,10 @@
     "untitled_lesson": "Lección sin título",
     "empty": "Aún no hay secciones. Agregue su primera sección para comenzar a construir el plan de estudios.",
     "done": "Hecho",
-    "preview_course": "Avance"
+    "preview_course": "Avance",
+    "published_toast": "Curso publicado: ahora es visible para los miembros.",
+    "unpublished_toast": "Curso inédito: volver al borrador.",
+    "publish_hint": "Tu curso es un borrador. Publíquelo para que sea visible para los miembros y esté abierto a la inscripción."
   },
   "lesson_content": {
     "text": "Texto",

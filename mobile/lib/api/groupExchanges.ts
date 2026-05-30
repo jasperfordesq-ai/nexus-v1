@@ -61,6 +61,19 @@ export interface GroupExchangeListResponse {
   };
 }
 
+export interface CreateGroupExchangePayload {
+  title: string;
+  description?: string | null;
+  split_type: GroupExchange['split_type'];
+  total_hours: number;
+  participants?: Array<{
+    user_id: number;
+    role: 'provider' | 'receiver';
+    hours?: number;
+    weight?: number;
+  }>;
+}
+
 export function getGroupExchanges(params: { status?: string; limit?: number; offset?: number } = {}): Promise<GroupExchangeListResponse> {
   const query: Record<string, string> = {
     limit: String(params.limit ?? 20),
@@ -72,6 +85,10 @@ export function getGroupExchanges(params: { status?: string; limit?: number; off
 
 export function getGroupExchange(id: number): Promise<{ data: GroupExchangeDetail }> {
   return api.get<{ data: GroupExchangeDetail }>(`${API_V2}/group-exchanges/${id}`);
+}
+
+export function createGroupExchange(payload: CreateGroupExchangePayload): Promise<{ data: GroupExchangeDetail }> {
+  return api.post<{ data: GroupExchangeDetail }>(`${API_V2}/group-exchanges`, payload);
 }
 
 export function confirmGroupExchange(id: number): Promise<{ data: GroupExchangeDetail }> {

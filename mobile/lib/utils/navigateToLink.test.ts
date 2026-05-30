@@ -74,4 +74,87 @@ describe('navigateToLink', () => {
       params: { id: '5', context_type: 'event', context_id: '12' },
     });
   });
+
+  it('maps web user profile and appreciation links to native profile routes', () => {
+    navigateToLink('/users/7');
+    navigateToLink('/users/7/appreciations');
+    navigateToLink('/users/7/collections');
+
+    expect(mockPush).toHaveBeenNthCalledWith(1, {
+      pathname: '/(modals)/member-profile',
+      params: { id: '7' },
+    });
+    expect(mockPush).toHaveBeenNthCalledWith(2, {
+      pathname: '/(modals)/appreciations',
+      params: { userId: '7' },
+    });
+    expect(mockPush).toHaveBeenNthCalledWith(3, {
+      pathname: '/(modals)/profile-collections',
+      params: { userId: '7', scope: 'public' },
+    });
+  });
+
+  it('maps my collection links to the native profile collections route', () => {
+    navigateToLink('/me/collections');
+    navigateToLink('/me/collections/9');
+
+    expect(mockPush).toHaveBeenNthCalledWith(1, {
+      pathname: '/(modals)/profile-collections',
+      params: {},
+    });
+    expect(mockPush).toHaveBeenNthCalledWith(2, {
+      pathname: '/(modals)/profile-collections',
+      params: { collectionId: '9' },
+    });
+  });
+
+  it('maps volunteering organisation workflow links to native organiser routes', () => {
+    navigateToLink('/volunteering/my-organisations');
+    navigateToLink('/volunteering/org/5/dashboard?tab=wallet');
+
+    expect(mockPush).toHaveBeenNthCalledWith(1, {
+      pathname: '/(modals)/volunteering',
+      params: { tab: 'organisations' },
+    });
+    expect(mockPush).toHaveBeenNthCalledWith(2, {
+      pathname: '/(modals)/volunteering-org-dashboard',
+      params: { id: '5', tab: 'wallet' },
+    });
+  });
+
+  it('maps implemented workflow utility links to native modal routes', () => {
+    navigateToLink('/activity');
+    navigateToLink('/goals/3');
+    navigateToLink('/matches');
+    navigateToLink('/reviews');
+    navigateToLink('/skills');
+    navigateToLink('/polls');
+    navigateToLink('/kb/12');
+    navigateToLink('/privacy');
+
+    expect(mockPush).toHaveBeenNthCalledWith(1, '/(modals)/activity');
+    expect(mockPush).toHaveBeenNthCalledWith(2, { pathname: '/(modals)/goal-detail', params: { id: '3' } });
+    expect(mockPush).toHaveBeenNthCalledWith(3, '/(modals)/matches');
+    expect(mockPush).toHaveBeenNthCalledWith(4, '/(modals)/reviews');
+    expect(mockPush).toHaveBeenNthCalledWith(5, '/(modals)/skills');
+    expect(mockPush).toHaveBeenNthCalledWith(6, '/(modals)/polls');
+    expect(mockPush).toHaveBeenNthCalledWith(7, { pathname: '/(modals)/kb-article', params: { id: '12' } });
+    expect(mockPush).toHaveBeenNthCalledWith(8, { pathname: '/(modals)/support', params: { doc: 'privacy' } });
+  });
+
+  it('maps marketplace deep links to native marketplace screens', () => {
+    navigateToLink('/marketplace');
+    navigateToLink('/marketplace/search?q=lamp');
+    navigateToLink('/marketplace/category/furniture');
+    navigateToLink('/marketplace/seller/8');
+    navigateToLink('/marketplace/saved-searches');
+    navigateToLink('/marketplace/44');
+
+    expect(mockPush).toHaveBeenNthCalledWith(1, '/(modals)/marketplace');
+    expect(mockPush).toHaveBeenNthCalledWith(2, { pathname: '/(modals)/marketplace-search', params: { q: 'lamp' } });
+    expect(mockPush).toHaveBeenNthCalledWith(3, { pathname: '/(modals)/marketplace-category', params: { id: 'furniture' } });
+    expect(mockPush).toHaveBeenNthCalledWith(4, { pathname: '/(modals)/marketplace-seller', params: { id: '8' } });
+    expect(mockPush).toHaveBeenNthCalledWith(5, { pathname: '/(modals)/marketplace-tools', params: { tab: 'savedSearches' } });
+    expect(mockPush).toHaveBeenNthCalledWith(6, { pathname: '/(modals)/marketplace-detail', params: { id: '44' } });
+  });
 });

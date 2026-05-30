@@ -343,7 +343,8 @@
       "badge_unlocked": "Abzeichen freigeschaltet",
       "level_reached": "Stufe erreicht"
     },
-    "read_more_about": "Read more about {{title}}"
+    "read_more_about": "Read more about {{title}}",
+    "detail_course": "Kurs ansehen"
   },
   "poll": {
     "load_failed": "Umfragedaten konnten nicht geladen werden.",

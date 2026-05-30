@@ -86,6 +86,15 @@ function GroupExchangesScreenInner() {
                 <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('groupExchanges.subtitle')}</Text>
               </View>
             </View>
+            <HeroButton
+              variant="primary"
+              style={{ backgroundColor: primary }}
+              onPress={() => router.push('/(modals)/new-group-exchange' as Href)}
+              accessibilityLabel={t('groupExchanges.create.open')}
+            >
+              <HeroButton.Label>{t('groupExchanges.create.open')}</HeroButton.Label>
+              <Ionicons name="add-outline" size={16} color={theme.onPrimary ?? '#fff'} />
+            </HeroButton>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
               {statusFilters.map((value) => (
                 <HeroButton

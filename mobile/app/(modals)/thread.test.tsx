@@ -11,6 +11,15 @@ import { Alert } from 'react-native';
 
 let mockThreadSearchParams: Record<string, string> = { id: '5', name: 'Alice' };
 const mockRouterPush = jest.fn();
+const mockLaunchImageLibraryAsync = jest.fn();
+const mockRequestMediaLibraryPermissionsAsync = jest.fn();
+const mockAudioRecording = {
+  stopAndUnloadAsync: jest.fn().mockResolvedValue(undefined),
+  getURI: jest.fn(() => 'file:///tmp/voice.m4a'),
+};
+const mockCreateRecordingAsync = jest.fn().mockResolvedValue({ recording: mockAudioRecording });
+const mockRequestAudioPermissionsAsync = jest.fn().mockResolvedValue({ granted: true });
+const mockSetAudioModeAsync = jest.fn().mockResolvedValue(undefined);
 type MockThreadMessage = {
   id: number;
   body: string;
@@ -40,12 +49,34 @@ jest.mock('react-i18next', () => ({
         'thread.inputPlaceholder': 'Type a message...',
         'thread.send': 'Send',
         'thread.voiceMessage': 'Voice message',
+        'thread.voice.record': 'Record voice message',
+        'thread.voice.recording': 'Recording voice message',
+        'thread.voice.ready': 'Voice message ready',
+        'thread.voice.stop': 'Stop',
+        'thread.voice.cancel': 'Cancel voice message',
+        'thread.voice.send': 'Send voice message',
+        'thread.voice.permissionTitle': 'Microphone access needed',
+        'thread.voice.permissionMessage': 'Allow microphone access to record voice messages.',
+        'thread.voice.failedTitle': 'Voice message failed',
+        'thread.voice.startFailed': 'Could not start recording. Please try again.',
+        'thread.voice.stopFailed': 'Could not save this recording. Please try again.',
+        'thread.voice.sendFailed': 'Voice message could not be sent. Please try again.',
         'thread.sendFailed': 'Message not sent.',
         'thread.goBack': 'Go back',
         'thread.messageCount': '2 messages',
         'thread.messagingRestrictedTitle': 'Messaging paused',
         'thread.messagingRestrictedContact': 'Please contact your community team before sending more messages.',
         'thread.messageOptions': 'Message options',
+        'thread.attachments.add': 'Add attachment',
+        'thread.attachments.title': 'Add attachment',
+        'thread.attachments.photoLibrary': 'Photo library',
+        'thread.attachments.remove': `Remove ${String(options?.name ?? '')}`,
+        'thread.attachments.removeLabel': 'Remove',
+        'thread.attachments.open': `Open ${String(options?.name ?? '')}`,
+        'thread.attachments.file': 'Attachment',
+        'thread.attachments.permissionTitle': 'Photo access needed',
+        'thread.attachments.permissionMessage': 'Allow photo access to attach images.',
+        'thread.attachmentName': `Attachment ${String(options?.index ?? '')}`,
         'thread.edit': 'Edit',
         'thread.editing': 'Editing message',
         'thread.saveEdit': 'Save edit',
@@ -122,6 +153,33 @@ const mockGetMessagingRestrictionStatus = jest.fn().mockResolvedValue({
 });
 const mockUpdateMessage = jest.fn().mockResolvedValue({ data: { id: 2, body: 'Edited reply', is_edited: true } });
 const mockDeleteMessage = jest.fn().mockResolvedValue({ data: { success: true } });
+const mockSendMessageWithAttachments = jest.fn().mockResolvedValue({
+  data: {
+    id: 100,
+    body: 'Photo update',
+    sender: { id: 1, name: 'Me', avatar_url: null },
+    created_at: '2026-03-10T10:03:00Z',
+    is_own: true,
+    is_voice: false,
+    audio_url: null,
+    reactions: {},
+    is_read: false,
+    attachments: [{ id: 8, name: 'photo.jpg', url: 'https://example.test/photo.jpg', type: 'image', size: 2048 }],
+  },
+});
+const mockSendVoiceMessage = jest.fn().mockResolvedValue({
+  data: {
+    id: 101,
+    body: '',
+    sender: { id: 1, name: 'Me', avatar_url: null },
+    created_at: '2026-03-10T10:04:00Z',
+    is_own: true,
+    is_voice: true,
+    audio_url: 'https://example.test/voice.m4a',
+    reactions: {},
+    is_read: false,
+  },
+});
 
 jest.mock('@/lib/api/messages', () => ({
   getThread: jest.fn(),
@@ -129,6 +187,8 @@ jest.mock('@/lib/api/messages', () => ({
   getMessagingRestrictionStatus: (...args: unknown[]) => mockGetMessagingRestrictionStatus(...args),
   markConversationRead: (...args: unknown[]) => mockMarkConversationRead(...args),
   sendMessage: jest.fn().mockResolvedValue({ data: { id: 99 } }),
+  sendMessageWithAttachments: (...args: unknown[]) => mockSendMessageWithAttachments(...args),
+  sendVoiceMessage: (...args: unknown[]) => mockSendVoiceMessage(...args),
   toggleMessageReaction: (...args: unknown[]) => mockToggleMessageReaction(...args),
   updateMessage: (...args: unknown[]) => mockUpdateMessage(...args),
   deleteMessage: (...args: unknown[]) => mockDeleteMessage(...args),
@@ -139,6 +199,23 @@ jest.mock('@/lib/api/messages', () => ({
 jest.mock('expo-haptics', () => ({
   notificationAsync: jest.fn().mockResolvedValue(undefined),
   NotificationFeedbackType: { Success: 'success', Error: 'error' },
+}));
+
+jest.mock('expo-image-picker', () => ({
+  MediaTypeOptions: { Images: 'Images' },
+  requestMediaLibraryPermissionsAsync: (...args: unknown[]) => mockRequestMediaLibraryPermissionsAsync(...args),
+  launchImageLibraryAsync: (...args: unknown[]) => mockLaunchImageLibraryAsync(...args),
+}));
+
+jest.mock('expo-av', () => ({
+  Audio: {
+    requestPermissionsAsync: (...args: unknown[]) => mockRequestAudioPermissionsAsync(...args),
+    setAudioModeAsync: (...args: unknown[]) => mockSetAudioModeAsync(...args),
+    Recording: {
+      createAsync: (...args: unknown[]) => mockCreateRecordingAsync(...args),
+    },
+    RecordingOptionsPresets: { HIGH_QUALITY: 'HIGH_QUALITY' },
+  },
 }));
 
 jest.mock('@/lib/hooks/useAuth', () => ({
@@ -152,6 +229,22 @@ jest.mock('@/components/ui/Avatar', () => {
   return ({ name }: { name: string }) => React.createElement(View, { accessibilityLabel: `${name} avatar` });
 });
 jest.mock('@/components/ui/LoadingSpinner', () => () => null);
+jest.mock('@/components/ui/ActionSheet', () => {
+  const React = require('react');
+  const { Pressable, Text, View } = require('react-native');
+  return ({ visible, title, actions }: { visible: boolean; title?: string; actions: Array<{ label: string; onPress: () => void }> }) => {
+    if (!visible) return null;
+    return (
+      <View accessibilityLabel={title}>
+        {actions.map((action) => (
+          <Pressable key={action.label} accessibilityLabel={action.label} onPress={action.onPress}>
+            <Text>{action.label}</Text>
+          </Pressable>
+        ))}
+      </View>
+    );
+  };
+});
 jest.mock('@/components/OfflineBanner', () => () => null);
 jest.mock('@/components/VoiceMessageBubble', () => 'View');
 
@@ -194,6 +287,20 @@ beforeEach(() => {
   mockGetMessagingRestrictionStatus.mockClear();
   mockUpdateMessage.mockClear();
   mockDeleteMessage.mockClear();
+  mockSendMessageWithAttachments.mockClear();
+  mockSendVoiceMessage.mockClear();
+  mockAudioRecording.stopAndUnloadAsync.mockClear();
+  mockAudioRecording.getURI.mockClear();
+  mockCreateRecordingAsync.mockClear();
+  mockRequestAudioPermissionsAsync.mockClear();
+  mockSetAudioModeAsync.mockClear();
+  mockCreateRecordingAsync.mockResolvedValue({ recording: mockAudioRecording });
+  mockRequestAudioPermissionsAsync.mockResolvedValue({ granted: true });
+  mockSetAudioModeAsync.mockResolvedValue(undefined);
+  mockRequestMediaLibraryPermissionsAsync.mockReset();
+  mockLaunchImageLibraryAsync.mockReset();
+  mockRequestMediaLibraryPermissionsAsync.mockResolvedValue({ granted: true });
+  mockLaunchImageLibraryAsync.mockResolvedValue({ canceled: true, assets: [] });
   mockGetMessagingRestrictionStatus.mockResolvedValue({
     data: { messaging_disabled: false, under_monitoring: false, restriction_reason: null },
   });
@@ -330,6 +437,109 @@ describe('ThreadScreen', () => {
     });
   });
 
+  it('attaches images and sends them through the multipart message helper', async () => {
+    mockLaunchImageLibraryAsync.mockResolvedValue({
+      canceled: false,
+      assets: [{
+        uri: 'file:///tmp/photo.jpg',
+        fileName: 'photo.jpg',
+        mimeType: 'image/jpeg',
+        width: 800,
+        height: 600,
+        fileSize: 2048,
+      }],
+    });
+    mockUseApi.mockReturnValue({
+      data: {
+        data: mockMessages,
+        meta: {
+          conversation: {
+            other_user: { id: 42, name: 'Alice' },
+          },
+        },
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByLabelText, getByPlaceholderText, getByText } = render(<ThreadScreen />);
+
+    fireEvent.press(getByLabelText('Add attachment'));
+    fireEvent.press(getByLabelText('Photo library'));
+
+    await waitFor(() => {
+      expect(mockRequestMediaLibraryPermissionsAsync).toHaveBeenCalled();
+      expect(getByText('photo.jpg')).toBeTruthy();
+    });
+
+    fireEvent.changeText(getByPlaceholderText('Type a message...'), 'Photo update');
+    fireEvent.press(getByLabelText('Send'));
+
+    await waitFor(() => {
+      expect(mockSendMessageWithAttachments).toHaveBeenCalledWith(42, 'Photo update', expect.arrayContaining([
+        expect.objectContaining({ uri: 'file:///tmp/photo.jpg', name: 'photo.jpg', mimeType: 'image/jpeg' }),
+      ]), undefined);
+    });
+  });
+
+  it('renders message attachments with open actions', () => {
+    mockUseApi.mockReturnValue({
+      data: {
+        data: [{
+          ...mockMessages[0],
+          attachments: [{ id: 8, name: 'photo.jpg', url: 'https://example.test/photo.jpg', type: 'image', size: 2048 }],
+        }],
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByLabelText } = render(<ThreadScreen />);
+
+    expect(getByLabelText('Open photo.jpg')).toBeTruthy();
+  });
+
+  it('records and sends a voice message through the voice upload helper', async () => {
+    mockUseApi.mockReturnValue({
+      data: {
+        data: mockMessages,
+        meta: {
+          conversation: {
+            other_user: { id: 42, name: 'Alice' },
+          },
+        },
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByLabelText, getByText } = render(<ThreadScreen />);
+
+    fireEvent.press(getByLabelText('Record voice message'));
+
+    await waitFor(() => {
+      expect(mockRequestAudioPermissionsAsync).toHaveBeenCalled();
+      expect(mockCreateRecordingAsync).toHaveBeenCalledWith('HIGH_QUALITY');
+      expect(getByText('Recording voice message')).toBeTruthy();
+    });
+
+    fireEvent.press(getByLabelText('Stop'));
+
+    await waitFor(() => {
+      expect(mockAudioRecording.stopAndUnloadAsync).toHaveBeenCalled();
+      expect(getByText('Voice message ready')).toBeTruthy();
+    });
+
+    fireEvent.press(getByLabelText('Send voice message'));
+
+    await waitFor(() => {
+      expect(mockSendVoiceMessage).toHaveBeenCalledWith(42, 'file:///tmp/voice.m4a', undefined);
+    });
+  });
+
   it('shows messaging restriction notice and blocks sends when disabled', async () => {
     mockGetMessagingRestrictionStatus.mockResolvedValue({
       data: { messaging_disabled: true, under_monitoring: true, restriction_reason: 'Safety review' },
@@ -362,7 +572,6 @@ describe('ThreadScreen', () => {
   });
 
   it('edits an own text message through message options', async () => {
-    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
     mockUseApi.mockReturnValue({
       data: { data: mockMessages },
       isLoading: false,
@@ -373,10 +582,7 @@ describe('ThreadScreen', () => {
     const { getAllByLabelText, getByDisplayValue, getByLabelText, getByText } = render(<ThreadScreen />);
 
     fireEvent.press(getAllByLabelText('Message options')[1]);
-    const optionButtons = alertSpy.mock.calls[0]?.[2] as Array<{ text: string; onPress?: () => void }>;
-    act(() => {
-      optionButtons.find((button) => button.text === 'Edit')?.onPress?.();
-    });
+    fireEvent.press(getByLabelText('Edit'));
 
     expect(getByText('Editing message')).toBeTruthy();
     fireEvent.changeText(getByDisplayValue('Hi back!'), 'Edited reply');
@@ -401,11 +607,8 @@ describe('ThreadScreen', () => {
     const { getAllByLabelText, queryByText } = render(<ThreadScreen />);
 
     fireEvent.press(getAllByLabelText('Message options')[0]);
-    const optionButtons = alertSpy.mock.calls[0]?.[2] as Array<{ text: string; onPress?: () => void }>;
-    act(() => {
-      optionButtons.find((button) => button.text === 'Delete for me')?.onPress?.();
-    });
-    const confirmButtons = alertSpy.mock.calls[1]?.[2] as Array<{ text: string; onPress?: () => void }>;
+    fireEvent.press(getAllByLabelText('Delete for me')[0]);
+    const confirmButtons = alertSpy.mock.calls[0]?.[2] as Array<{ text: string; onPress?: () => void }>;
     await act(async () => {
       await confirmButtons.find((button) => button.text === 'Delete')?.onPress?.();
     });

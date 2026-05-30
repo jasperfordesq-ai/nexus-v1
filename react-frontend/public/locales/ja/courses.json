@@ -34,7 +34,9 @@
     "cost": "{{credits}} クレジット",
     "insufficient_credits": "登録するのに十分な時間クレジットがありません。",
     "prerequisites": "前提条件",
-    "prerequisites_required": "登録のロックを解除するには、前提条件コースを完了してください。"
+    "prerequisites_required": "登録のロックを解除するには、前提条件コースを完了してください。",
+    "not_available": "このコースはまだ公開されていません。",
+    "your_course": "これがあなたのコースです。"
   },
   "player": {
     "mark_complete": "完了としてマークする",
@@ -205,7 +207,10 @@
     "untitled_lesson": "無題のレッスン",
     "empty": "まだセクションはありません。最初のセクションを追加して、カリキュラムの作成を開始します。",
     "done": "終わり",
-    "preview_course": "プレビュー"
+    "preview_course": "プレビュー",
+    "published_toast": "コースが公開されました - メンバーが閲覧できるようになりました。",
+    "unpublished_toast": "コースは未公開 — ドラフトに戻ります。",
+    "publish_hint": "あなたのコースはドラフトです。公開するとメンバーが閲覧できるようになり、登録が可能になります。"
   },
   "lesson_content": {
     "text": "文章",

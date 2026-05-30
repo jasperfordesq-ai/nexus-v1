@@ -34,7 +34,9 @@
     "cost": "{{credits}} kredytów",
     "insufficient_credits": "Nie masz wystarczającej liczby kredytów czasowych, aby się zarejestrować.",
     "prerequisites": "Warunki wstępne",
-    "prerequisites_required": "Ukończ wymagane kursy, aby odblokować rejestrację."
+    "prerequisites_required": "Ukończ wymagane kursy, aby odblokować rejestrację.",
+    "not_available": "Ten kurs nie został jeszcze opublikowany.",
+    "your_course": "To jest twój kurs."
   },
   "player": {
     "mark_complete": "Oznacz jako ukończone",
@@ -205,7 +207,10 @@
     "untitled_lesson": "Lekcja bez tytułu",
     "empty": "Nie ma jeszcze sekcji. Dodaj pierwszą sekcję, aby rozpocząć tworzenie programu nauczania.",
     "done": "Zrobione",
-    "preview_course": "Zapowiedź"
+    "preview_course": "Zapowiedź",
+    "published_toast": "Kurs opublikowany — jest teraz widoczny dla członków.",
+    "unpublished_toast": "Kurs nieopublikowany — powrót do wersji roboczej.",
+    "publish_hint": "Twój kurs jest wersją roboczą. Opublikuj go, aby był widoczny dla członków i otwarty do rejestracji."
   },
   "lesson_content": {
     "text": "Tekst",

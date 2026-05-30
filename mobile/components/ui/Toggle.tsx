@@ -13,10 +13,11 @@ interface ToggleProps {
   onValueChange: (value: boolean) => void;
   disabled?: boolean;
   label?: string;
+  accessibilityLabel?: string;
   size?: 'sm' | 'md';
 }
 
-export default function Toggle({ value, onValueChange, disabled = false, label, size = 'md' }: ToggleProps) {
+export default function Toggle({ value, onValueChange, disabled = false, label, accessibilityLabel, size = 'md' }: ToggleProps) {
   const handleChange = (isSelected: boolean) => {
     Haptics.selectionAsync().catch(() => {});
     onValueChange(isSelected);
@@ -27,6 +28,7 @@ export default function Toggle({ value, onValueChange, disabled = false, label, 
       isSelected={value}
       onSelectedChange={handleChange}
       isDisabled={disabled}
+      accessibilityLabel={accessibilityLabel ?? label}
       className={size === 'sm' ? 'scale-75' : undefined}
     />
   );

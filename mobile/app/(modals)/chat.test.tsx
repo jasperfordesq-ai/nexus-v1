@@ -41,6 +41,14 @@ jest.mock('react-i18next', () => ({
         limits_left_today: opts ? `${String(opts.count ?? 0)} left today` : '0 left today',
         messages_region: 'Messages',
         you: 'You',
+        'feedback.label': 'Was this helpful?',
+        'feedback.upLabel': 'Mark response helpful',
+        'feedback.downLabel': 'Mark response not helpful',
+        'feedback.noteTitle': 'What went wrong?',
+        'feedback.noteDescription': 'Add a short note to help improve future answers.',
+        'feedback.notePlaceholder': 'Tell us what was missing or wrong',
+        'feedback.submitNote': 'Send note',
+        'feedback.skipNote': 'Skip',
         'tool_results.label': 'Results',
         'tool_results.fallbackTitle': 'Result',
         'tool_results.open': opts ? `Open ${String(opts.title ?? '')}` : 'Open result',
@@ -129,10 +137,12 @@ jest.mock('@/lib/api/chat', () => ({
       conversation_id: 'conv-1',
       message: {
         id: 'msg-2',
-        role: 'assistant',
-        content: 'Hello!',
-        created_at: new Date().toISOString(),
-        tool_invocations: [
+          role: 'assistant',
+          content: 'Hello!',
+          created_at: new Date().toISOString(),
+          trace_id: 101,
+          message_id: 202,
+          tool_invocations: [
           {
             name: 'search_listings',
             arguments: {},
@@ -153,12 +163,27 @@ jest.mock('@/lib/api/chat', () => ({
       },
     },
   }),
+  submitChatFeedback: jest.fn().mockResolvedValue({ data: { recorded: true, feedback: 'up' } }),
 }));
 
 jest.mock('@/components/ui/AppTopBar', () => 'View');
 jest.mock('@/components/ui/Avatar', () => 'View');
+jest.mock('@/components/ui/BottomSheet', () => {
+  const React = require('react');
+  const { Text, View } = require('react-native');
+  return ({ visible, title, children }: { visible: boolean; title?: string; children?: React.ReactNode }) => {
+    if (!visible) return null;
+    return (
+      <View accessibilityLabel={title}>
+        <Text>{title}</Text>
+        {children}
+      </View>
+    );
+  };
+});
 
 import ChatScreen from './chat';
+import { submitChatFeedback } from '@/lib/api/chat';
 
 describe('ChatScreen', () => {
   it('renders the chat screen without crashing', () => {
@@ -200,6 +225,55 @@ describe('ChatScreen', () => {
     expect(await findByText('Community garden')).toBeTruthy();
     await waitFor(() => {
       expect(getByLabelText('Open Garden help')).toBeTruthy();
+    });
+  });
+
+  it('submits feedback for assistant responses', async () => {
+    const { getByLabelText, getByPlaceholderText, findByText } = render(<ChatScreen />);
+
+    fireEvent.changeText(getByPlaceholderText('Ask me anything...'), 'Find gardening offers');
+    fireEvent.press(getByLabelText('Send message'));
+
+    expect(await findByText('Hello!')).toBeTruthy();
+    fireEvent.press(getByLabelText('Mark response helpful'));
+
+    await waitFor(() => {
+      expect(submitChatFeedback).toHaveBeenCalledWith({
+        trace_id: 101,
+        message_id: 202,
+        feedback: 'up',
+      });
+    });
+  });
+
+  it('submits an optional note after negative feedback', async () => {
+    const { getByLabelText, getByPlaceholderText, findByText } = render(<ChatScreen />);
+
+    fireEvent.changeText(getByPlaceholderText('Ask me anything...'), 'Find gardening offers');
+    fireEvent.press(getByLabelText('Send message'));
+
+    expect(await findByText('Hello!')).toBeTruthy();
+    fireEvent.press(getByLabelText('Mark response not helpful'));
+
+    await waitFor(() => {
+      expect(submitChatFeedback).toHaveBeenCalledWith({
+        trace_id: 101,
+        message_id: 202,
+        feedback: 'down',
+      });
+    });
+
+    expect(await findByText('What went wrong?')).toBeTruthy();
+    fireEvent.changeText(getByPlaceholderText('Tell us what was missing or wrong'), 'It missed the local context.');
+    fireEvent.press(getByLabelText('Send note'));
+
+    await waitFor(() => {
+      expect(submitChatFeedback).toHaveBeenCalledWith({
+        trace_id: 101,
+        message_id: 202,
+        feedback: 'down',
+        note: 'It missed the local context.',
+      });
     });
   });
 });

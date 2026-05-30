@@ -343,7 +343,8 @@
       "badge_unlocked": "バッジ解除",
       "level_reached": "レベル到達"
     },
-    "read_more_about": "Read more about {{title}}"
+    "read_more_about": "Read more about {{title}}",
+    "detail_course": "コースを見る"
   },
   "poll": {
     "load_failed": "投票データの読み込みに失敗しました。",

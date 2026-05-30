@@ -54,6 +54,10 @@ jest.mock('react-i18next', () => ({
         'activity.groupsJoined': 'Groups joined',
         'activity.posts': 'Posts',
         'activity.skills': 'Skills',
+        'activity.monthlyActivity': 'Monthly activity',
+        'activity.monthlyActivityA11y': 'Monthly given and received hours chart',
+        'activity.given': 'Given',
+        'activity.received': 'Received',
         'activity.recent': 'Recent activity',
         'activity.emptyTitle': 'No activity yet',
         'activity.emptySubtitle': 'Your activity will appear here after you take part.',
@@ -105,7 +109,10 @@ describe('ActivityScreen', () => {
             offering_count: 1,
             requesting_count: 0,
           },
-          monthly_hours: [],
+          monthly_hours: [
+            { month: '2026-04', label: 'Apr', given: 2, received: 1 },
+            { month: '2026-05', label: 'May', given: 3, received: 4 },
+          ],
         },
       },
       isLoading: false,
@@ -121,6 +128,9 @@ describe('ActivityScreen', () => {
     expect(getByText('Hours given')).toBeTruthy();
     expect(getAllByText('2').length).toBeGreaterThan(0);
     expect(getByText('Connections')).toBeTruthy();
+    expect(getByText('Monthly activity')).toBeTruthy();
+    expect(getByText('Given')).toBeTruthy();
+    expect(getByText('Received')).toBeTruthy();
     expect(getByText('Gardening')).toBeTruthy();
     expect(getByText('Posted an update')).toBeTruthy();
   });

@@ -25,6 +25,7 @@ import {
   getNotificationCounts,
   markRead,
   markAllRead,
+  markGroupRead,
   deleteNotification,
 } from './notifications';
 import type { NotificationListResponse, NotificationCounts } from './notifications';
@@ -59,10 +60,10 @@ const mockCounts: NotificationCounts = {
 describe('getNotifications', () => {
   beforeEach(() => { jest.clearAllMocks(); });
 
-  it('calls /api/v2/notifications with per_page=25 and no cursor by default', async () => {
+  it('calls /api/v2/notifications/grouped with per_page=25 and no cursor by default', async () => {
     (api.get as jest.Mock).mockResolvedValue(mockNotificationsListResponse);
     const result = await getNotifications();
-    expect(api.get).toHaveBeenCalledWith('/api/v2/notifications', { per_page: '25' });
+    expect(api.get).toHaveBeenCalledWith('/api/v2/notifications/grouped', { per_page: '25' });
     expect(result.data).toHaveLength(1);
     expect(result.meta.per_page).toBe(25);
   });
@@ -70,7 +71,7 @@ describe('getNotifications', () => {
   it('includes cursor param when provided', async () => {
     (api.get as jest.Mock).mockResolvedValue(mockNotificationsListResponse);
     await getNotifications('cursor-abc');
-    expect(api.get).toHaveBeenCalledWith('/api/v2/notifications', {
+    expect(api.get).toHaveBeenCalledWith('/api/v2/notifications/grouped', {
       per_page: '25',
       cursor: 'cursor-abc',
     });
@@ -137,6 +138,18 @@ describe('markAllRead', () => {
     (api.post as jest.Mock).mockResolvedValue(undefined);
     await markAllRead();
     expect(api.post).toHaveBeenCalledWith('/api/v2/notifications/read-all');
+  });
+});
+
+describe('markGroupRead', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('sends POST to /api/v2/notifications/group/read with the group key', async () => {
+    (api.post as jest.Mock).mockResolvedValue(undefined);
+    await markGroupRead('message:/messages/1');
+    expect(api.post).toHaveBeenCalledWith('/api/v2/notifications/group/read', {
+      group_key: 'message:/messages/1',
+    });
   });
 });
 

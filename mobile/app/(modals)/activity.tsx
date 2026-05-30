@@ -81,6 +81,7 @@ export default function ActivityScreen() {
   const theme = useTheme();
   const { data, isLoading, error, refresh } = useApi(() => getActivityDashboard());
   const dashboard = data?.data ?? emptyDashboard();
+  const hasMonthlyHours = dashboard.monthly_hours.some((month) => month.given > 0 || month.received > 0);
 
   const renderItem = useCallback(
     ({ item }: { item: ActivityItem }) => (
@@ -147,6 +148,16 @@ export default function ActivityScreen() {
                 <StatTile icon="construct-outline" label={t('activity.skills')} value={dashboard.skills_breakdown.skills.length} tone="#8b5cf6" />
               </View>
 
+              {hasMonthlyHours ? (
+                <MonthlyHoursChart
+                  data={dashboard.monthly_hours}
+                  title={t('activity.monthlyActivity')}
+                  accessibilityLabel={t('activity.monthlyActivityA11y')}
+                  givenLabel={t('activity.given')}
+                  receivedLabel={t('activity.received')}
+                />
+              ) : null}
+
               {dashboard.skills_breakdown.skills.length > 0 ? (
                 <HeroCard variant="default" className="mx-4 rounded-panel p-0">
                   <HeroCard.Body className="gap-3 p-4">
@@ -189,6 +200,76 @@ export default function ActivityScreen() {
         />
       </SafeAreaView>
     </ModalErrorBoundary>
+  );
+}
+
+function MonthlyHoursChart({
+  data,
+  title,
+  accessibilityLabel,
+  givenLabel,
+  receivedLabel,
+}: {
+  data: ActivityDashboard['monthly_hours'];
+  title: string;
+  accessibilityLabel: string;
+  givenLabel: string;
+  receivedLabel: string;
+}) {
+  const theme = useTheme();
+  const visibleData = data.slice(-6);
+  const maxValue = Math.max(...visibleData.flatMap((item) => [item.given, item.received]), 1);
+
+  return (
+    <HeroCard variant="default" className="mx-4 rounded-panel p-0">
+      <HeroCard.Body className="gap-4 p-4">
+        <View className="flex-row items-center gap-2">
+          <Ionicons name="bar-chart-outline" size={18} color="#6366f1" />
+          <Text className="text-lg font-bold" style={{ color: theme.text }}>
+            {title}
+          </Text>
+        </View>
+        <View className="flex-row gap-4">
+          <ChartLegend color="#22c55e" label={givenLabel} />
+          <ChartLegend color="#6366f1" label={receivedLabel} />
+        </View>
+        <View accessible accessibilityRole="image" accessibilityLabel={accessibilityLabel} className="h-36 flex-row items-end gap-2">
+          {visibleData.map((item) => {
+            const label = item.label ? item.label.slice(0, 3) : item.month.slice(5);
+            return (
+              <View key={`${item.month}-${label}`} className="min-w-0 flex-1 items-center gap-1">
+                <View className="h-28 w-full flex-row items-end gap-1">
+                  <View
+                    className="flex-1 rounded-t-md"
+                    style={{ height: `${Math.max((item.given / maxValue) * 100, 5)}%`, backgroundColor: withAlpha('#22c55e', 0.72) }}
+                  />
+                  <View
+                    className="flex-1 rounded-t-md"
+                    style={{ height: `${Math.max((item.received / maxValue) * 100, 5)}%`, backgroundColor: withAlpha('#6366f1', 0.72) }}
+                  />
+                </View>
+                <Text className="text-[10px] font-semibold" style={{ color: theme.textMuted }} numberOfLines={1}>
+                  {label}
+                </Text>
+              </View>
+            );
+          })}
+        </View>
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function ChartLegend({ color, label }: { color: string; label: string }) {
+  const theme = useTheme();
+
+  return (
+    <View className="flex-row items-center gap-1.5">
+      <View className="size-3 rounded-sm" style={{ backgroundColor: color }} />
+      <Text className="text-xs font-semibold" style={{ color: theme.textSecondary }}>
+        {label}
+      </Text>
+    </View>
   );
 }
 

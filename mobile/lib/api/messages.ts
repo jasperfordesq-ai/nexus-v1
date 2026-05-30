@@ -5,6 +5,7 @@
 
 import { api } from '@/lib/api/client';
 import { API_V2 } from '@/lib/constants';
+import { Platform } from 'react-native';
 
 /** Helper to compute a display name from API user objects that may have
  *  `name`, `first_name`/`last_name`, or `organization_name`. */
@@ -79,6 +80,16 @@ export interface Message {
   listing_id?: number | null;
   context_type?: string | null;
   context_id?: number | null;
+  attachments?: MessageAttachment[];
+}
+
+export interface MessageAttachment {
+  id: number | string;
+  name: string;
+  url: string;
+  type: 'image' | 'file' | 'audio' | 'video' | string;
+  size?: number | null;
+  mime_type?: string | null;
 }
 
 export interface ConversationListResponse {
@@ -105,6 +116,12 @@ export interface SendMessageOptions {
   listing_id?: number;
   context_type?: string;
   context_id?: number;
+}
+
+export interface MessageAttachmentUpload {
+  uri: string;
+  name?: string | null;
+  mimeType?: string | null;
 }
 
 export interface MessagingRestrictionStatus {
@@ -189,4 +206,97 @@ export function sendMessage(recipientId: number, body: string, options: SendMess
     body,
     ...options,
   });
+}
+
+export async function sendMessageWithAttachments(
+  recipientId: number,
+  body: string,
+  attachments: MessageAttachmentUpload[],
+  options: SendMessageOptions = {},
+): Promise<{ data: Message }> {
+  const formData = new FormData();
+  formData.append('recipient_id', String(recipientId));
+  formData.append('body', body);
+  Object.entries(options).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      formData.append(key, String(value));
+    }
+  });
+
+  for (const attachment of attachments) {
+    await appendMessageAttachmentFile(formData, attachment);
+  }
+
+  return api.upload<{ data: Message }>(`${API_V2}/messages`, formData);
+}
+
+export async function sendVoiceMessage(
+  recipientId: number,
+  uri: string,
+  options: SendMessageOptions = {},
+): Promise<{ data: Message }> {
+  const formData = new FormData();
+  formData.append('recipient_id', String(recipientId));
+  Object.entries(options).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      formData.append(key, String(value));
+    }
+  });
+  await appendMessageVoiceFile(formData, uri);
+
+  return api.upload<{ data: Message }>(`${API_V2}/messages/voice`, formData);
+}
+
+function getUploadFilename(uri: string, providedName?: string | null): string {
+  if (providedName?.trim()) return providedName.trim();
+  const cleanUri = uri.split('?')[0] ?? uri;
+  const lastSegment = cleanUri.split('/').pop();
+  return lastSegment && lastSegment.includes('.') ? lastSegment : 'message-attachment.jpg';
+}
+
+function getMimeType(filename: string, fallback?: string | null): string {
+  if (fallback?.includes('/')) return fallback;
+  const extension = filename.split('.').pop()?.toLowerCase();
+  if (extension === 'png') return 'image/png';
+  if (extension === 'webp') return 'image/webp';
+  if (extension === 'gif') return 'image/gif';
+  if (extension === 'heic') return 'image/heic';
+  if (extension === 'heif') return 'image/heif';
+  return 'image/jpeg';
+}
+
+async function appendMessageAttachmentFile(formData: FormData, attachment: MessageAttachmentUpload): Promise<void> {
+  const filename = getUploadFilename(attachment.uri, attachment.name);
+
+  if (Platform.OS === 'web') {
+    const response = await fetch(attachment.uri);
+    const blob = await response.blob();
+    const type = getMimeType(filename, attachment.mimeType ?? blob.type);
+    if (typeof File !== 'undefined') {
+      formData.append('attachments[]', new File([blob], filename, { type }));
+      return;
+    }
+    formData.append('attachments[]', blob, filename);
+    return;
+  }
+
+  const type = getMimeType(filename, attachment.mimeType);
+  formData.append('attachments[]', { uri: attachment.uri, name: filename, type } as unknown as Blob);
+}
+
+async function appendMessageVoiceFile(formData: FormData, uri: string): Promise<void> {
+  const filename = getUploadFilename(uri, 'voice-message.m4a');
+
+  if (Platform.OS === 'web') {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    if (typeof File !== 'undefined') {
+      formData.append('voice_message', new File([blob], filename, { type: blob.type || 'audio/mp4' }));
+      return;
+    }
+    formData.append('voice_message', blob, filename);
+    return;
+  }
+
+  formData.append('voice_message', { uri, name: filename, type: 'audio/mp4' } as unknown as Blob);
 }

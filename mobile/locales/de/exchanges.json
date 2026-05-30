@@ -1,5 +1,51 @@
 {
   "newTitle": "Neues Angebot",
   "detailTitle": "Angebotsdetails",
-  "share": "Angebot teilen"
+  "share": "Angebot teilen",
+  "groupExchanges": {
+    "create": {
+      "open": "Create group exchange",
+      "title": "Create group exchange",
+      "eyebrow": "Shared workflow",
+      "subtitle": "Start a multi-person time exchange, then manage confirmation from the detail screen.",
+      "fields": {
+        "title": "Title",
+        "description": "Description",
+        "totalHours": "Total hours",
+        "splitType": "Split type",
+        "memberSearch": "Find members",
+        "participantHours": "Hours",
+        "participantWeight": "Weight"
+      },
+      "placeholders": {
+        "title": "e.g. Community garden workday",
+        "description": "Describe the shared work and expected outcome.",
+        "totalHours": "e.g. 6",
+        "memberSearch": "Search by name or skill",
+        "participantHours": "0",
+        "participantWeight": "1"
+      },
+      "participantNote": "Add providers and receivers, then tune participant hours or weighting before submit. You can still confirm actual hours from the detail workflow later.",
+      "summaryHours": "{{count}} hour planned",
+      "summaryHours_other": "{{count}} hours planned",
+      "submit": "Create exchange",
+      "saving": "Creating...",
+      "error": "We could not create this group exchange. Please check the details and try again.",
+      "participantsTitle": "Participants",
+      "participantsDescription": "Optionally add members before creating the group exchange. Hours can be confirmed later from the detail screen.",
+      "searchMembers": "Search members",
+      "searching": "Searching...",
+      "searchError": "We could not search members right now. Please try again.",
+      "addProvider": "Add provider",
+      "addReceiver": "Add receiver",
+      "providers": "{{count}} provider",
+      "providers_other": "{{count}} providers",
+      "receivers": "{{count}} receiver",
+      "receivers_other": "{{count}} receivers",
+      "summaryParticipants": "{{count}} participant selected",
+      "summaryParticipants_other": "{{count}} participants selected",
+      "remove": "Remove",
+      "removeParticipant": "Remove {{name}}"
+    }
+  }
 }

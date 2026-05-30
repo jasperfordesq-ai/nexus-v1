@@ -34,7 +34,9 @@
     "cost": "{{credits}} crédits",
     "insufficient_credits": "Vous ne disposez pas de suffisamment de crédits temps pour vous inscrire.",
     "prerequisites": "Conditions préalables",
-    "prerequisites_required": "Suivez les cours préalables pour débloquer l’inscription."
+    "prerequisites_required": "Suivez les cours préalables pour débloquer l’inscription.",
+    "not_available": "Ce cours n'est pas encore publié.",
+    "your_course": "Ceci est votre cours."
   },
   "player": {
     "mark_complete": "Marquer comme terminé",
@@ -205,7 +207,10 @@
     "untitled_lesson": "Leçon sans titre",
     "empty": "Aucune section pour l'instant. Ajoutez votre première section pour commencer à construire le programme.",
     "done": "Fait",
-    "preview_course": "Aperçu"
+    "preview_course": "Aperçu",
+    "published_toast": "Cours publié — il est désormais visible par les membres.",
+    "unpublished_toast": "Cours non publié — retour au brouillon.",
+    "publish_hint": "Votre cours est une ébauche. Publiez-le pour le rendre visible aux membres et ouvrez-le aux inscriptions."
   },
   "lesson_content": {
     "text": "Texte",

@@ -343,7 +343,8 @@
       "badge_unlocked": "Badge sbloccato",
       "level_reached": "Livello raggiunto"
     },
-    "read_more_about": "Read more about {{title}}"
+    "read_more_about": "Read more about {{title}}",
+    "detail_course": "Visualizza il corso"
   },
   "poll": {
     "load_failed": "Impossibile caricare i dati del sondaggio.",

@@ -34,7 +34,9 @@
     "cost": "{{credits}} créditos",
     "insufficient_credits": "Você não tem créditos de tempo suficientes para se inscrever.",
     "prerequisites": "Pré-requisitos",
-    "prerequisites_required": "Conclua os cursos de pré-requisito para desbloquear a inscrição."
+    "prerequisites_required": "Conclua os cursos de pré-requisito para desbloquear a inscrição.",
+    "not_available": "Este curso ainda não foi publicado.",
+    "your_course": "Este é o seu curso."
   },
   "player": {
     "mark_complete": "Marcar como concluído",
@@ -205,7 +207,10 @@
     "untitled_lesson": "Lição sem título",
     "empty": "Nenhuma seção ainda. Adicione sua primeira seção para começar a construir o currículo.",
     "done": "Feito",
-    "preview_course": "Visualização"
+    "preview_course": "Visualização",
+    "published_toast": "Curso publicado — agora está visível para os membros.",
+    "unpublished_toast": "Curso não publicado — de volta ao rascunho.",
+    "publish_hint": "Seu curso é um rascunho. Publique-o para torná-lo visível aos membros e aberto para inscrição."
   },
   "lesson_content": {
     "text": "Texto",

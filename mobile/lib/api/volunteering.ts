@@ -11,8 +11,13 @@ export interface VolunteeringOrganisation {
   name: string;
   avatar?: string | null;
   logo_url?: string | null;
+  description?: string | null;
+  contact_email?: string | null;
+  website?: string | null;
   status?: string;
   member_role?: string;
+  balance?: number;
+  auto_pay_enabled?: boolean;
 }
 
 export interface VolunteerOpportunity {
@@ -193,6 +198,155 @@ export interface VolunteerDonation {
   created_at: string;
 }
 
+export type VolunteerSwapStatus = 'pending' | 'accepted' | 'rejected' | 'admin_pending' | 'admin_approved' | 'admin_rejected' | 'cancelled' | 'expired' | string;
+export type VolunteerSwapDirection = 'sent' | 'received' | string;
+
+export interface VolunteerSwapShift {
+  id: number;
+  start_time: string;
+  end_time: string;
+  opportunity_title: string;
+  organization_name: string;
+}
+
+export interface VolunteerShiftSwap {
+  id: number;
+  status: VolunteerSwapStatus;
+  direction: VolunteerSwapDirection;
+  requester: {
+    id: number;
+    name: string;
+    avatar_url?: string | null;
+  };
+  recipient: {
+    id: number;
+    name: string;
+    avatar_url?: string | null;
+  };
+  original_shift: VolunteerSwapShift;
+  proposed_shift: VolunteerSwapShift;
+  message?: string | null;
+  created_at: string;
+}
+
+export interface VolunteerOrganisationStats {
+  total_volunteers: number;
+  pending_applications: number;
+  pending_hours: number;
+  total_approved_hours: number;
+  active_opportunities: number;
+  wallet_balance: number;
+  auto_pay_enabled: boolean;
+  org_name: string;
+}
+
+export interface OrganisationVolunteerApplication {
+  id: number;
+  status: 'pending' | 'approved' | 'declined' | string;
+  message?: string | null;
+  org_note?: string | null;
+  created_at: string;
+  user: {
+    id: number;
+    name: string;
+    avatar_url?: string | null;
+    email?: string | null;
+  };
+  opportunity: {
+    id: number;
+    title: string;
+  };
+  shift?: {
+    start_time: string;
+    end_time: string;
+  } | null;
+}
+
+export interface OrganisationApplicationsResponse {
+  data: {
+    items: OrganisationVolunteerApplication[];
+    cursor: string | null;
+    has_more: boolean;
+  } | OrganisationVolunteerApplication[];
+  meta?: {
+    cursor: string | null;
+    has_more: boolean;
+  };
+}
+
+export interface OrganisationPendingHour {
+  id: number;
+  hours: number;
+  date: string;
+  description?: string | null;
+  status: 'pending' | string;
+  created_at: string;
+  user: {
+    id: number;
+    name: string;
+    avatar_url?: string | null;
+  };
+  opportunity?: {
+    id: number;
+    title: string;
+  } | null;
+}
+
+export interface OrganisationPendingHoursResponse {
+  data: {
+    items: OrganisationPendingHour[];
+    cursor: string | null;
+    has_more: boolean;
+  } | OrganisationPendingHour[];
+  meta?: {
+    cursor: string | null;
+    has_more: boolean;
+  };
+}
+
+export interface OrganisationVolunteer {
+  id: number;
+  name: string;
+  avatar_url?: string | null;
+  email?: string | null;
+  total_hours: number;
+  applications_count: number;
+  applied_at?: string | null;
+}
+
+export interface OrganisationVolunteersResponse {
+  data: {
+    items: OrganisationVolunteer[];
+    cursor: string | null;
+    has_more: boolean;
+  } | OrganisationVolunteer[];
+  meta?: {
+    cursor: string | null;
+    has_more: boolean;
+  };
+}
+
+export interface OrganisationWalletTransaction {
+  id: number;
+  type: string;
+  amount: number | string;
+  balance_after?: number | string | null;
+  note?: string | null;
+  created_at: string;
+}
+
+export interface OrganisationWalletTransactionsResponse {
+  data: {
+    items: OrganisationWalletTransaction[];
+    cursor: string | null;
+    has_more: boolean;
+  } | OrganisationWalletTransaction[];
+  meta?: {
+    cursor: string | null;
+    has_more: boolean;
+  };
+}
+
 export interface MyOrganisationsResponse {
   data: VolunteeringOrganisation[];
   meta: {
@@ -240,6 +394,8 @@ export interface VolunteerDonationsResponse {
 }
 
 export type VolunteerGivingDaysResponse = { data: VolunteerGivingDay[] };
+
+export type VolunteerShiftSwapsResponse = { data: VolunteerShiftSwap[] | { swaps?: VolunteerShiftSwap[] } };
 
 export interface SubmitVolunteerDonationPayload {
   giving_day_id?: number | null;
@@ -323,6 +479,10 @@ export function handleVolunteerApplication(
   return api.put<{ data: unknown }>(`${API_V2}/volunteering/applications/${id}`, { action });
 }
 
+export function verifyVolunteerHours(id: number, action: 'approve' | 'decline'): Promise<{ data: unknown }> {
+  return api.put<{ data: unknown }>(`${API_V2}/volunteering/hours/${id}/verify`, { action });
+}
+
 export function withdrawApplication(id: number): Promise<void> {
   return api.delete<void>(`${API_V2}/volunteering/applications/${id}`);
 }
@@ -333,6 +493,62 @@ export function getHoursSummary(): Promise<{ data: VolunteerHoursSummary }> {
 
 export function getMyOrganisations(): Promise<MyOrganisationsResponse> {
   return api.get<MyOrganisationsResponse>(`${API_V2}/volunteering/my-organisations`, { per_page: '50' });
+}
+
+export function getOrganisation(id: number): Promise<{ data: VolunteeringOrganisation }> {
+  return api.get<{ data: VolunteeringOrganisation }>(`${API_V2}/volunteering/organisations/${id}`);
+}
+
+export function getOrganisationStats(id: number): Promise<{ data: VolunteerOrganisationStats }> {
+  return api.get<{ data: VolunteerOrganisationStats }>(`${API_V2}/volunteering/organisations/${id}/stats`);
+}
+
+export function getOrganisationApplications(
+  id: number,
+  status?: 'pending' | 'approved' | 'declined' | 'all',
+): Promise<OrganisationApplicationsResponse> {
+  return api.get<OrganisationApplicationsResponse>(`${API_V2}/volunteering/organisations/${id}/applications`, {
+    per_page: '20',
+    ...(status && status !== 'all' ? { status } : {}),
+  });
+}
+
+export function getOrganisationPendingHours(id: number): Promise<OrganisationPendingHoursResponse> {
+  return api.get<OrganisationPendingHoursResponse>(`${API_V2}/volunteering/organisations/${id}/hours/pending`, {
+    per_page: '20',
+  });
+}
+
+export function getOrganisationVolunteers(id: number): Promise<OrganisationVolunteersResponse> {
+  return api.get<OrganisationVolunteersResponse>(`${API_V2}/volunteering/organisations/${id}/volunteers`, {
+    per_page: '20',
+  });
+}
+
+export function getOrganisationWalletTransactions(id: number): Promise<OrganisationWalletTransactionsResponse> {
+  return api.get<OrganisationWalletTransactionsResponse>(`${API_V2}/volunteering/organisations/${id}/wallet/transactions`, {
+    per_page: '20',
+  });
+}
+
+export function depositOrganisationWallet(id: number, amount: number, note?: string): Promise<{ data: { message: string; new_balance: number } }> {
+  return api.post<{ data: { message: string; new_balance: number } }>(`${API_V2}/volunteering/organisations/${id}/wallet/deposit`, {
+    amount,
+    ...(note ? { note } : {}),
+  });
+}
+
+export function setOrganisationAutoPay(id: number, enabled: boolean): Promise<{ data: { auto_pay_enabled: boolean } }> {
+  return api.put<{ data: { auto_pay_enabled: boolean } }>(`${API_V2}/volunteering/organisations/${id}/wallet/auto-pay`, { enabled });
+}
+
+export function updateOrganisation(id: number, payload: {
+  name?: string;
+  description?: string | null;
+  contact_email?: string | null;
+  website?: string | null;
+}): Promise<{ data: VolunteeringOrganisation }> {
+  return api.put<{ data: VolunteeringOrganisation }>(`${API_V2}/volunteering/organisations/${id}`, payload);
 }
 
 export function getMyShifts(): Promise<MyShiftsResponse> {
@@ -361,6 +577,20 @@ export function getVolunteerGivingDays(): Promise<VolunteerGivingDaysResponse> {
 
 export function getVolunteerDonations(): Promise<VolunteerDonationsResponse> {
   return api.get<VolunteerDonationsResponse>(`${API_V2}/volunteering/donations`, { per_page: '20' });
+}
+
+export function getShiftSwaps(direction: 'all' | 'sent' | 'received' = 'all'): Promise<VolunteerShiftSwapsResponse> {
+  return api.get<VolunteerShiftSwapsResponse>(`${API_V2}/volunteering/swaps`, {
+    ...(direction !== 'all' ? { direction } : {}),
+  });
+}
+
+export function respondToShiftSwap(id: number, action: 'accept' | 'reject'): Promise<{ data: unknown }> {
+  return api.put<{ data: unknown }>(`${API_V2}/volunteering/swaps/${id}`, { action });
+}
+
+export function cancelShiftSwap(id: number): Promise<void> {
+  return api.delete<void>(`${API_V2}/volunteering/swaps/${id}`);
 }
 
 export function submitVolunteerDonation(payload: SubmitVolunteerDonationPayload): Promise<{ data: VolunteerDonation }> {

@@ -36,7 +36,7 @@ export interface FeedItem {
   };
   created_at: string;
   updated_at?: string;
-  type: 'post' | 'listing' | 'event' | 'poll' | 'goal' | 'review' | 'job' | 'challenge' | 'volunteer' | 'blog' | 'discussion' | 'resource' | 'badge_earned' | 'level_up';
+  type: 'post' | 'listing' | 'event' | 'poll' | 'goal' | 'review' | 'job' | 'challenge' | 'volunteer' | 'blog' | 'discussion' | 'resource' | 'badge_earned' | 'level_up' | 'course';
   likes_count: number;
   comments_count: number;
   views_count?: number;
@@ -210,6 +210,8 @@ export function getItemDetailPath(item: FeedItem): string | null {
       return `/volunteering/opportunities/${item.id}`;
     case 'blog':
       return item.slug ? `/blog/${item.slug}` : `/feed/item/blog/${item.id}`;
+    case 'course':
+      return item.slug ? `/courses/${item.slug}` : `/courses/${item.id}`;
     case 'discussion':
     case 'resource':
     case 'badge_earned':
@@ -245,6 +247,8 @@ export function getItemDetailLabel(item: FeedItem): string | null {
       return 'card.detail_volunteer';
     case 'blog':
       return 'card.detail_blog';
+    case 'course':
+      return 'card.detail_course';
     default:
       return null;
   }

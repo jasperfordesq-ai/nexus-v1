@@ -541,6 +541,14 @@ function MemberProfileScreenInner() {
 
           <ReviewsSection reviews={member.reviews ?? []} rating={member.rating} primary={primary} theme={theme} t={t} />
 
+          {!isFederatedProfile ? (
+            <AppreciationCta member={member} displayName={displayName} primary={primary} theme={theme} t={t} />
+          ) : null}
+
+          {!isFederatedProfile ? (
+            <CollectionsCta member={member} displayName={displayName} isOwnProfile={isOwnProfile} primary={primary} theme={theme} t={t} />
+          ) : null}
+
           <HeroCard variant="secondary" className="mt-3">
             <HeroCard.Body className="gap-3 px-4 py-4">
               <SectionTitle icon="information-circle-outline" title={t('profile.about')} primary={primary} theme={theme} />
@@ -1466,6 +1474,79 @@ function ReviewsSection({
             {t('profile.noReviews')}
           </Text>
         )}
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function AppreciationCta({
+  member,
+  displayName,
+  primary,
+  theme,
+  t,
+}: {
+  member: MemberProfile;
+  displayName: string;
+  primary: string;
+  theme: Theme;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+}) {
+  return (
+    <HeroCard variant="secondary" className="mt-3">
+      <HeroCard.Body className="gap-3 px-4 py-4">
+        <SectionTitle icon="chatbubble-ellipses-outline" title={t('profile.appreciations')} primary={primary} theme={theme} />
+        <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+          {t('profile.appreciationsHint', { name: displayName })}
+        </Text>
+        <HeroButton
+          variant="secondary"
+          onPress={() => router.push({ pathname: '/(modals)/appreciations', params: { userId: String(member.id), name: displayName } } as unknown as Href)}
+          accessibilityLabel={t('profile.viewAppreciationsFor', { name: displayName })}
+        >
+          <Ionicons name="chatbubble-ellipses-outline" size={18} color={primary} />
+          <HeroButton.Label>{t('profile.viewAppreciations')}</HeroButton.Label>
+        </HeroButton>
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function CollectionsCta({
+  member,
+  displayName,
+  isOwnProfile,
+  primary,
+  theme,
+  t,
+}: {
+  member: MemberProfile;
+  displayName: string;
+  isOwnProfile: boolean;
+  primary: string;
+  theme: Theme;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+}) {
+  return (
+    <HeroCard variant="secondary" className="mt-3">
+      <HeroCard.Body className="gap-3 px-4 py-4">
+        <SectionTitle icon="folder-open-outline" title={t('profile.collections')} primary={primary} theme={theme} />
+        <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+          {isOwnProfile ? t('profile.collectionsOwnHint') : t('profile.collectionsPublicHint', { name: displayName })}
+        </Text>
+        <HeroButton
+          variant="secondary"
+          onPress={() =>
+            router.push({
+              pathname: '/(modals)/profile-collections',
+              params: isOwnProfile ? {} : { userId: String(member.id), name: displayName, scope: 'public' },
+            } as unknown as Href)
+          }
+          accessibilityLabel={isOwnProfile ? t('profile.viewMyCollections') : t('profile.viewCollectionsFor', { name: displayName })}
+        >
+          <Ionicons name="folder-open-outline" size={18} color={primary} />
+          <HeroButton.Label>{isOwnProfile ? t('profile.viewMyCollections') : t('profile.viewCollections')}</HeroButton.Label>
+        </HeroButton>
       </HeroCard.Body>
     </HeroCard>
   );

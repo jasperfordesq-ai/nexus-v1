@@ -227,6 +227,14 @@ function RootNavigator() {
         options={{ ...modalOptions, headerShown: false, title: t('members:profileTitle') }}
       />
       <Stack.Screen
+        name="(modals)/appreciations"
+        options={{ ...modalOptions, headerShown: false, title: t('members:appreciations.wallTitle') }}
+      />
+      <Stack.Screen
+        name="(modals)/profile-collections"
+        options={{ ...modalOptions, headerShown: false, title: t('members:collections.myTitle') }}
+      />
+      <Stack.Screen
         name="(modals)/notifications"
         options={{ ...modalOptions, headerShown: false, title: t('notifications:title') }}
       />
@@ -263,12 +271,20 @@ function RootNavigator() {
         options={{ ...modalOptions, headerShown: false, title: t('settings:identity.page_title') }}
       />
       <Stack.Screen
+        name="(modals)/settings-linked-accounts"
+        options={{ ...modalOptions, headerShown: false, title: t('settings:linkedAccounts.title') }}
+      />
+      <Stack.Screen
         name="(modals)/group-detail"
         options={{ ...modalOptions, headerShown: false, title: t('groups:detailTitle') }}
       />
       <Stack.Screen
         name="(modals)/group-exchanges"
         options={{ ...modalOptions, headerShown: false, title: t('exchanges:groupExchanges.title') }}
+      />
+      <Stack.Screen
+        name="(modals)/new-group-exchange"
+        options={{ ...modalOptions, headerShown: false, title: t('exchanges:groupExchanges.create.title') }}
       />
       <Stack.Screen
         name="(modals)/group-exchange-detail"
@@ -329,6 +345,10 @@ function RootNavigator() {
       <Stack.Screen
         name="(modals)/volunteering"
         options={{ ...modalOptions, headerShown: false, title: t('volunteering:title') }}
+      />
+      <Stack.Screen
+        name="(modals)/volunteering-org-dashboard"
+        options={{ ...modalOptions, headerShown: false, title: t('volunteering:org.title') }}
       />
       <Stack.Screen
         name="(modals)/volunteering-detail"

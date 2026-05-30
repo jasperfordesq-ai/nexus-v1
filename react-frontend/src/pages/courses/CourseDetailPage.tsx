@@ -25,7 +25,7 @@ export default function CourseDetailPage() {
   const { idOrSlug } = useParams<{ idOrSlug: string }>();
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const toast = useToast();
 
   const [course, setCourse] = useState<Course | null>(null);
@@ -67,10 +67,16 @@ export default function CourseDetailPage() {
       navigate(tenantPath(`/courses/${course.id}/learn`));
     } else if (res.code === 'INSUFFICIENT_CREDITS') {
       toast.error(t('detail.insufficient_credits'));
+    } else if (res.code === 'COURSE_NOT_AVAILABLE') {
+      toast.error(t('detail.not_available'));
+    } else if (res.code === 'PREREQUISITES_NOT_MET') {
+      toast.error(t('detail.prerequisites_required'));
     } else {
       toast.error(t('detail.enroll_error'));
     }
   };
+
+  const isOwner = !!(user && course && Number(user.id) === Number(course.author_user_id));
 
   if (loading) {
     return (
@@ -165,7 +171,14 @@ export default function CourseDetailPage() {
               <div className="text-sm text-muted">
                 {lessonCount === 1 ? t('card.lessons', { count: lessonCount }) : t('card.lessons_plural', { count: lessonCount })}
               </div>
-              {course.is_enrolled ? (
+              {isOwner ? (
+                <>
+                  <Button color="primary" onPress={() => navigate(tenantPath(`/courses/instructor/${course.id}/edit`))}>
+                    {t('instructor.edit_course')}
+                  </Button>
+                  <p className="text-xs text-muted">{t('detail.your_course')}</p>
+                </>
+              ) : course.is_enrolled ? (
                 <Button color="primary" onPress={() => navigate(tenantPath(`/courses/${course.id}/learn`))}>
                   {t('detail.continue')}
                 </Button>

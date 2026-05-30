@@ -34,7 +34,9 @@
     "cost": "{{credits}} creidmheasanna",
     "insufficient_credits": "Níl go leor creidmheasanna ama agat chun clárú.",
     "prerequisites": "Réamhriachtanais",
-    "prerequisites_required": "Críochnaigh na cúrsaí réamhriachtanas chun rollú a dhíghlasáil."
+    "prerequisites_required": "Críochnaigh na cúrsaí réamhriachtanas chun rollú a dhíghlasáil.",
+    "not_available": "Níl an cúrsa seo foilsithe fós.",
+    "your_course": "Seo é do chúrsa."
   },
   "player": {
     "mark_complete": "Marcáil mar iomlán",
@@ -205,7 +207,10 @@
     "untitled_lesson": "Ceacht gan teideal",
     "empty": "Níl aon rannóg fós. Cuir do chéad chuid leis le tosú ar an gcuraclam a thógáil.",
     "done": "Déanta",
-    "preview_course": "Réamhamharc"
+    "preview_course": "Réamhamharc",
+    "published_toast": "Cúrsa foilsithe — tá sé le feiceáil anois ag baill.",
+    "unpublished_toast": "Cúrsa neamhfhoilsithe — ar ais go dréacht.",
+    "publish_hint": "Is dréacht é do chúrsa. Foilsigh é le go mbeidh sé infheicthe ag baill agus oscailte le haghaidh clárúcháin."
   },
   "lesson_content": {
     "text": "Téacs",

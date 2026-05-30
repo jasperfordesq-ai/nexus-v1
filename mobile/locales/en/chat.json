@@ -42,5 +42,15 @@
       "kb": "Knowledge base",
       "wallet": "Wallet"
     }
+  },
+  "feedback": {
+    "label": "Was this helpful?",
+    "upLabel": "Mark response helpful",
+    "downLabel": "Mark response not helpful",
+    "noteTitle": "What went wrong?",
+    "noteDescription": "Add a short note to help improve future answers.",
+    "notePlaceholder": "Tell us what was missing or wrong",
+    "submitNote": "Send note",
+    "skipNote": "Skip"
   }
 }

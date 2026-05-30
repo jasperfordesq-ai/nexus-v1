@@ -8,7 +8,7 @@ import { fireEvent, render } from '@testing-library/react-native';
 
 const mockRouterPush = jest.fn();
 const mockResolveImageUrl = jest.fn((value?: string | null) => value ? `resolved:${value}` : null);
-const mockUsePaginatedApi = jest.fn((_fetchFn?: unknown, _extractor?: unknown, _deps?: unknown, _options?: unknown) => ({
+const listingPage = {
   items: [
     {
       id: 91,
@@ -23,7 +23,28 @@ const mockUsePaginatedApi = jest.fn((_fetchFn?: unknown, _extractor?: unknown, _
   error: null,
   hasMore: false,
   loadMore: jest.fn(),
-}));
+};
+const reviewsPage = {
+  items: [
+    {
+      id: 201,
+      rating: 5,
+      comment: 'Great seller and fast pickup.',
+      reviewer: { name: 'Alex Buyer', avatar_url: null },
+      created_at: '2026-05-01T00:00:00Z',
+    },
+  ],
+  isLoading: false,
+  error: null,
+  hasMore: false,
+  loadMore: jest.fn(),
+};
+const mockUsePaginatedApi = jest.fn((_fetchFn?: unknown, _extractor?: unknown, deps?: unknown, _options?: unknown) => {
+  const [firstDep] = Array.isArray(deps) ? deps : [];
+  if (firstDep === 8) return reviewsPage;
+  if (firstDep === 0) return { ...listingPage, items: [] };
+  return listingPage;
+});
 let mockParams: Record<string, string> = { id: '5' };
 let mockAuthState = {
   isAuthenticated: true,
@@ -84,8 +105,12 @@ jest.mock('react-i18next', () => ({
         'seller.emptyHint': 'This seller does not have public listings right now.',
         'seller.listingsTab': 'Listings',
         'seller.reviewsTab': 'Reviews',
-        'seller.reviewsTitle': 'Reviews are coming soon',
-        'seller.reviewsHint': 'Buyer and seller reviews will appear here once rating history is available.',
+        'seller.reviewsEmpty': 'No seller reviews yet',
+        'seller.reviewsEmptyHint': 'Buyer and seller reviews will appear here after completed marketplace activity.',
+        'seller.reviewAnonymous': 'Anonymous reviewer',
+        'seller.reviewMember': 'Community member',
+        'seller.reviewDate': `Reviewed ${String(opts?.date ?? '')}`,
+        'seller.reviewRating': `${String(opts?.rating ?? '')} out of 5`,
       };
       return map[key] ?? key;
     },
@@ -177,8 +202,9 @@ describe('MarketplaceSellerRoute', () => {
     expect(getAllByText('4').length).toBeGreaterThanOrEqual(2);
     fireEvent.press(getByText('Reviews'));
 
-    expect(getByText('Reviews are coming soon')).toBeTruthy();
-    expect(getByText('Buyer and seller reviews will appear here once rating history is available.')).toBeTruthy();
+    expect(getByText('Alex Buyer')).toBeTruthy();
+    expect(getByText('Great seller and fast pickup.')).toBeTruthy();
+    expect(getByText('5.0 out of 5')).toBeTruthy();
     expect(queryByText('Repaired table')).toBeNull();
   });
 

@@ -179,6 +179,17 @@ export default function SettingsScreen() {
               theme={theme}
             />
             <ActionRow
+              label={t('linkedAccounts.title')}
+              subtitle={t('linkedAccounts.settingsHint')}
+              icon="people-circle-outline"
+              tone={primary}
+              onPress={() => {
+                void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push('/(modals)/settings-linked-accounts' as Href);
+              }}
+              theme={theme}
+            />
+            <ActionRow
               label={t('identity.page_title')}
               subtitle={t('identity.hint')}
               icon="finger-print-outline"

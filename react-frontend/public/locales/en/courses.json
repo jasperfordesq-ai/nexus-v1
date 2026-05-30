@@ -34,7 +34,9 @@
     "cost": "{{credits}} credits",
     "insufficient_credits": "You don't have enough time credits to enrol.",
     "prerequisites": "Prerequisites",
-    "prerequisites_required": "Complete the prerequisite courses to unlock enrolment."
+    "prerequisites_required": "Complete the prerequisite courses to unlock enrolment.",
+    "not_available": "This course isn’t published yet.",
+    "your_course": "This is your course."
   },
   "player": {
     "mark_complete": "Mark as complete",
@@ -205,7 +207,10 @@
     "untitled_lesson": "Untitled lesson",
     "empty": "No sections yet. Add your first section to start building the curriculum.",
     "done": "Done",
-    "preview_course": "Preview"
+    "preview_course": "Preview",
+    "published_toast": "Course published — it is now visible to members.",
+    "unpublished_toast": "Course unpublished — back to draft.",
+    "publish_hint": "Your course is a draft. Publish it to make it visible to members and open for enrolment."
   },
   "lesson_content": {
     "text": "Text",

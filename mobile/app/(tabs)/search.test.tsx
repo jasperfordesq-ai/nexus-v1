@@ -4,15 +4,20 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { fireEvent, render } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 const mockRouterPush = jest.fn();
+let mockSearchParams: Record<string, string | undefined> = {};
+const mockUseApi = jest.fn();
+const mockSaveSearch = jest.fn();
+const mockRunSavedSearch = jest.fn();
+const mockDeleteSavedSearch = jest.fn();
 
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) }),
   useSegments: () => ['(tabs)'],
   router: { push: (...args: unknown[]) => mockRouterPush(...args), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
-  useLocalSearchParams: () => ({}),
+  useLocalSearchParams: () => mockSearchParams,
 }));
 
 jest.mock('react-i18next', () => ({
@@ -39,6 +44,23 @@ jest.mock('react-i18next', () => ({
         'types.event': 'Events',
         'types.group': 'Groups',
         'types.blog_post': 'Blog',
+        'saved.title': 'Saved searches',
+        'saved.subtitle': 'Save useful searches and run them again later.',
+        'saved.saveThis': 'Save search',
+        'saved.namePlaceholder': 'Search name',
+        'saved.save': 'Save',
+        'saved.saving': 'Saving...',
+        'saved.cancel': 'Cancel',
+        'saved.run': 'Run',
+        'saved.delete': 'Delete',
+        'saved.deleteNamed': `Delete ${String(opts?.name ?? '')}`,
+        'saved.empty': 'No saved searches yet.',
+        'saved.noQuery': 'No query',
+        'saved.resultCount': `${String(opts?.count ?? 0)} results`,
+        'saved.saveFailedTitle': 'Could not save search',
+        'saved.saveFailedMessage': 'Please check the search name and try again.',
+        'saved.deleteFailedTitle': 'Could not delete search',
+        'saved.deleteFailedMessage': 'Please try again.',
       };
       return map[key] ?? key;
     },
@@ -65,6 +87,9 @@ jest.mock('@/lib/hooks/useTheme', () => ({
 }));
 
 const mockUsePaginatedApi = jest.fn();
+jest.mock('@/lib/hooks/useApi', () => ({
+  useApi: (...args: unknown[]) => mockUseApi(...args),
+}));
 jest.mock('@/lib/hooks/usePaginatedApi', () => ({
   usePaginatedApi: (...args: unknown[]) => mockUsePaginatedApi(...args),
 }));
@@ -84,6 +109,10 @@ jest.mock('@expo/vector-icons', () => ({
 
 jest.mock('@/lib/api/search', () => ({
   search: jest.fn(),
+  getSavedSearches: jest.fn(),
+  saveSearch: (...args: unknown[]) => mockSaveSearch(...args),
+  runSavedSearch: (...args: unknown[]) => mockRunSavedSearch(...args),
+  deleteSavedSearch: (...args: unknown[]) => mockDeleteSavedSearch(...args),
 }));
 
 jest.mock('@/components/ui/Avatar', () => 'View');
@@ -103,6 +132,16 @@ const defaultPaginatedState = {
 
 beforeEach(() => {
   mockRouterPush.mockReset();
+  mockSearchParams = {};
+  mockSaveSearch.mockReset().mockResolvedValue({ data: { id: 2 } });
+  mockRunSavedSearch.mockReset().mockResolvedValue({ data: { id: 1 } });
+  mockDeleteSavedSearch.mockReset().mockResolvedValue({ data: { deleted: true } });
+  mockUseApi.mockReset().mockReturnValue({
+    data: { data: [] },
+    isLoading: false,
+    error: null,
+    refresh: jest.fn(),
+  });
   mockUsePaginatedApi.mockReturnValue(defaultPaginatedState);
 });
 
@@ -147,6 +186,61 @@ describe('SearchScreen', () => {
     expect(getByText('Events')).toBeTruthy();
     expect(getByText('Groups')).toBeTruthy();
     expect(getByText('Blog')).toBeTruthy();
+  });
+
+  it('initializes query and type filter from route params', () => {
+    mockSearchParams = { q: 'gardening', type: 'event' };
+
+    const { getByPlaceholderText } = render(<SearchScreen />);
+
+    expect(getByPlaceholderText('Search for people, listings...').props.value).toBe('gardening');
+    const latestCall = mockUsePaginatedApi.mock.calls[mockUsePaginatedApi.mock.calls.length - 1];
+    expect(latestCall[2]).toEqual(['gardening', 'event']);
+  });
+
+  it('saves the current native search with the active type filter', async () => {
+    mockSearchParams = { q: 'gardening', type: 'event' };
+    const { getByPlaceholderText, getByText } = render(<SearchScreen />);
+
+    fireEvent.press(getByText('Save search'));
+    fireEvent.changeText(getByPlaceholderText('Search name'), 'Garden events');
+    fireEvent.press(getByText('Save'));
+
+    await waitFor(() => {
+      expect(mockSaveSearch).toHaveBeenCalledWith({
+        name: 'Garden events',
+        query_params: { q: 'gardening', type: 'event' },
+      });
+    });
+  });
+
+  it('runs and deletes saved searches from the native search surface', async () => {
+    const refresh = jest.fn();
+    mockUseApi.mockReturnValue({
+      data: {
+        data: [{
+          id: 9,
+          name: 'Garden events',
+          query_params: { q: 'garden', type: 'event' },
+          notify_on_new: false,
+          last_run_at: null,
+          last_result_count: 4,
+          created_at: '2026-01-01T00:00:00Z',
+        }],
+      },
+      isLoading: false,
+      error: null,
+      refresh,
+    });
+    const { getByPlaceholderText, getByText } = render(<SearchScreen />);
+
+    fireEvent.press(getByText('Run'));
+    await waitFor(() => expect(mockRunSavedSearch).toHaveBeenCalledWith(9, 0));
+    expect(getByPlaceholderText('Search for people, listings...').props.value).toBe('garden');
+
+    fireEvent.press(getByText('Delete'));
+    await waitFor(() => expect(mockDeleteSavedSearch).toHaveBeenCalledWith(9));
+    expect(refresh).toHaveBeenCalled();
   });
 
   it('renders results when data is provided', () => {

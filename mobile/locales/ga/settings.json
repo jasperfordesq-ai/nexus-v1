@@ -125,5 +125,47 @@
       "pt": "Portuguese",
       "es": "Spanish"
     }
+  },
+  "linkedAccounts": {
+    "title": "Linked accounts",
+    "settingsHint": "Manage family, dependent, or delegated account access.",
+    "eyebrow": "Delegated access",
+    "subtitle": "Request and manage account relationships with clear permissions.",
+    "addTitle": "Request linked account access",
+    "addDescription": "Send a request to a member in your community by email. They can approve before access becomes active.",
+    "emailLabel": "Member email",
+    "emailPlaceholder": "member@example.com",
+    "sendRequest": "Send request",
+    "sending": "Sending...",
+    "emailRequired": "Enter the member email address.",
+    "requestFailed": "Could not send the linked account request. Please try again.",
+    "loadFailed": "Could not load linked accounts. Please try again.",
+    "managedTitle": "Accounts you manage",
+    "managedDescription": "People who have granted you delegated account access.",
+    "managedEmpty": "You are not managing any accounts yet.",
+    "managersTitle": "People who manage you",
+    "managersDescription": "Members who can help manage parts of your account after approval.",
+    "managersEmpty": "No one is managing your account.",
+    "unknownMember": "Community member",
+    "permissionsTitle": "Permissions",
+    "approve": "Approve",
+    "decline": "Decline",
+    "remove": "Remove",
+    "approveFailed": "Could not approve this request. Please try again.",
+    "revokeFailed": "Could not remove this linked account. Please try again.",
+    "permissionFailed": "Could not update linked account permission. Please try again.",
+    "status": {
+      "active": "Active",
+      "pending": "Pending",
+      "revoked": "Revoked",
+      "rejected": "Rejected"
+    },
+    "permissions": {
+      "can_view_activity": "View activity",
+      "can_manage_listings": "Manage listings",
+      "can_transact": "Transfer credits",
+      "can_view_messages": "View messages"
+    },
+    "permissionToggle": "Toggle {{permission}} for {{name}}"
   }
 }

@@ -21,6 +21,7 @@ import {
   deleteNotification,
   getNotifications,
   markAllRead,
+  markGroupRead,
   markRead,
   type Notification,
 } from '@/lib/api/notifications';
@@ -42,6 +43,7 @@ export default function NotificationsScreen() {
   const theme = useTheme();
   const [markingAll, setMarkingAll] = useState(false);
   const [actingId, setActingId] = useState<number | null>(null);
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
 
   const { data, isLoading, error, refresh } = useApi(() => getNotifications());
   const notifications = data?.data ?? [];
@@ -81,7 +83,11 @@ export default function NotificationsScreen() {
   async function handleMarkRead(item: Notification) {
     setActingId(item.id);
     try {
-      await markRead(item.id);
+      if (isGroupedNotification(item) && item.group_key) {
+        await markGroupRead(item.group_key);
+      } else {
+        await markRead(item.id);
+      }
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       refresh();
     } catch {
@@ -153,6 +159,9 @@ export default function NotificationsScreen() {
   function renderItem({ item }: { item: Notification }) {
     const label = item.title ? `${item.title}. ${item.message}` : item.message;
     const categoryTint = categoryColor(item.category, theme.textMuted, theme);
+    const isGrouped = isGroupedNotification(item);
+    const groupKey = item.group_key ?? String(item.id);
+    const isExpanded = Boolean(expandedGroups[groupKey]);
 
     return (
       <View className="mx-4 mb-3">
@@ -168,13 +177,23 @@ export default function NotificationsScreen() {
               accessibilityHint={t('itemHint')}
             >
               <View className="flex-row items-start gap-3">
-                <View className="relative">
-                  <Avatar uri={item.actor?.avatar_url ?? null} name={item.actor?.name ?? '?'} size={44} />
-                  <View
-                    className="absolute bottom-0 right-0 size-3 rounded-full border-[1.5px]"
-                    style={{ backgroundColor: categoryTint, borderColor: theme.surface }}
-                  />
-                </View>
+                {isGrouped && item.actors?.length ? (
+                  <View className="w-[58px] flex-row items-center">
+                    {item.actors.slice(0, 3).map((actor, index) => (
+                      <View key={actor.id} className={index > 0 ? '-ml-4' : ''} style={{ zIndex: 3 - index }}>
+                        <Avatar uri={actor.avatar_url ?? null} name={actor.name ?? '?'} size={34} />
+                      </View>
+                    ))}
+                  </View>
+                ) : (
+                  <View className="relative">
+                    <Avatar uri={item.actor?.avatar_url ?? null} name={item.actor?.name ?? '?'} size={44} />
+                    <View
+                      className="absolute bottom-0 right-0 size-3 rounded-full border-[1.5px]"
+                      style={{ backgroundColor: categoryTint, borderColor: theme.surface }}
+                    />
+                  </View>
+                )}
 
                 <View className="min-w-0 flex-1 gap-2">
                   <View className="flex-row items-start gap-2">
@@ -201,40 +220,76 @@ export default function NotificationsScreen() {
                     <Chip size="sm" variant="secondary">
                       <Ionicons name="time-outline" size={12} color={theme.textSecondary} />
                       <Chip.Label>
-                        {(Date.now() - new Date(item.created_at).getTime()) < 60_000
+                        {(Date.now() - new Date(item.latest_at ?? item.created_at).getTime()) < 60_000
                           ? t('justNow')
-                          : formatRelativeTime(item.created_at)}
+                          : formatRelativeTime(item.latest_at ?? item.created_at)}
                       </Chip.Label>
                     </Chip>
+                    {isGrouped ? (
+                      <Chip size="sm" variant="secondary">
+                        <Ionicons name="albums-outline" size={12} color={categoryTint} />
+                        <Chip.Label>{t('groupCount', { count: item.group_count ?? 0 })}</Chip.Label>
+                      </Chip>
+                    ) : null}
                   </View>
                 </View>
               </View>
             </HeroButton>
 
             <View className="flex-row flex-wrap gap-2 border-t border-border pt-2">
+              {isGrouped ? (
+                <HeroButton
+                  size="sm"
+                  variant="secondary"
+                  onPress={() => setExpandedGroups((current) => ({ ...current, [groupKey]: !current[groupKey] }))}
+                  accessibilityLabel={isExpanded ? t('collapseGroup') : t('expandGroup')}
+                >
+                  <Ionicons name={isExpanded ? 'chevron-up-outline' : 'chevron-down-outline'} size={15} color={primary} />
+                  <HeroButton.Label>{isExpanded ? t('collapseGroup') : t('expandGroup')}</HeroButton.Label>
+                </HeroButton>
+              ) : null}
               {!item.is_read ? (
                 <HeroButton
                   size="sm"
                   variant="secondary"
                   isDisabled={actingId === item.id}
                   onPress={() => void handleMarkRead(item)}
-                  accessibilityLabel={t('markRead')}
+                  accessibilityLabel={isGrouped ? t('markGroupRead') : t('markRead')}
                 >
                   <Ionicons name="checkmark-outline" size={15} color={primary} />
-                  <HeroButton.Label>{t('markRead')}</HeroButton.Label>
+                  <HeroButton.Label>{isGrouped ? t('markGroupRead') : t('markRead')}</HeroButton.Label>
                 </HeroButton>
               ) : null}
-              <HeroButton
-                size="sm"
-                variant="danger"
-                isDisabled={actingId === item.id}
-                onPress={() => void handleDelete(item)}
-                accessibilityLabel={t('delete')}
-              >
-                <Ionicons name="trash-outline" size={15} color="#fff" />
-                <HeroButton.Label>{t('delete')}</HeroButton.Label>
-              </HeroButton>
+              {!isGrouped ? (
+                <HeroButton
+                  size="sm"
+                  variant="danger"
+                  isDisabled={actingId === item.id}
+                  onPress={() => void handleDelete(item)}
+                  accessibilityLabel={t('delete')}
+                >
+                  <Ionicons name="trash-outline" size={15} color="#fff" />
+                  <HeroButton.Label>{t('delete')}</HeroButton.Label>
+                </HeroButton>
+              ) : null}
             </View>
+            {isGrouped && isExpanded && item.actors?.length ? (
+              <View className="gap-2 border-t border-border pt-3">
+                {item.actors.map((actor) => (
+                  <View key={actor.id} className="flex-row items-center gap-2">
+                    <Avatar uri={actor.avatar_url ?? null} name={actor.name ?? '?'} size={28} />
+                    <Text className="text-sm" style={{ color: theme.textSecondary }} numberOfLines={1}>
+                      {actor.name ?? t('unknownActor')}
+                    </Text>
+                  </View>
+                ))}
+                {(item.remaining_count ?? 0) > 0 ? (
+                  <Text className="text-xs" style={{ color: theme.textMuted }}>
+                    {t('andOthers', { count: item.remaining_count ?? 0 })}
+                  </Text>
+                ) : null}
+              </View>
+            ) : null}
           </HeroCard.Body>
         </HeroCard>
       </View>
@@ -280,6 +335,10 @@ export default function NotificationsScreen() {
       </SafeAreaView>
     </ModalErrorBoundary>
   );
+}
+
+function isGroupedNotification(item: Notification): boolean {
+  return Boolean(item.is_grouped && (item.group_count ?? 0) > 1 && item.group_key);
 }
 
 function categoryLabel(category: string | undefined | null, t: (key: string) => string): string {

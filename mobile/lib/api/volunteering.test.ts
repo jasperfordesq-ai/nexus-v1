@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 jest.mock('@/lib/api/client', () => ({
-  api: { get: jest.fn(), post: jest.fn(), delete: jest.fn(), patch: jest.fn() },
+  api: { get: jest.fn(), post: jest.fn(), put: jest.fn(), delete: jest.fn(), patch: jest.fn() },
   ApiResponseError: class ApiResponseError extends Error {
     status!: number;
     constructor(status: number, message: string) { super(message); this.status = status; this.name = 'ApiResponseError'; }
@@ -22,8 +22,10 @@ jest.mock('@/lib/constants', () => ({
 import { api } from '@/lib/api/client';
 import {
   cancelShiftSignup,
+  cancelShiftSwap,
   expressInterest,
   generateVolunteerCertificate,
+  getShiftSwaps,
   getMyShifts,
   getOpportunities,
   getOpportunity,
@@ -31,8 +33,19 @@ import {
   getVolunteerExpenses,
   getVolunteerDonations,
   getVolunteerGivingDays,
+  getOrganisation,
+  getOrganisationApplications,
+  getOrganisationPendingHours,
+  getOrganisationStats,
+  getOrganisationVolunteers,
+  getOrganisationWalletTransactions,
   submitVolunteerExpense,
   submitVolunteerDonation,
+  respondToShiftSwap,
+  depositOrganisationWallet,
+  setOrganisationAutoPay,
+  updateOrganisation,
+  verifyVolunteerHours,
 } from './volunteering';
 import type { VolunteeringResponse, VolunteerOpportunity } from './volunteering';
 
@@ -145,6 +158,37 @@ describe('shift helpers', () => {
   });
 });
 
+describe('shift swap helpers', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('loads shift swaps without a direction filter by default', async () => {
+    const response = { data: { swaps: [] } };
+    (api.get as jest.Mock).mockResolvedValue(response);
+    const result = await getShiftSwaps();
+    expect(api.get).toHaveBeenCalledWith('/api/v2/volunteering/swaps', {});
+    expect(result.data).toEqual({ swaps: [] });
+  });
+
+  it('loads shift swaps with a direction filter', async () => {
+    const response = { data: { swaps: [] } };
+    (api.get as jest.Mock).mockResolvedValue(response);
+    await getShiftSwaps('received');
+    expect(api.get).toHaveBeenCalledWith('/api/v2/volunteering/swaps', { direction: 'received' });
+  });
+
+  it('responds to a shift swap', async () => {
+    (api.put as jest.Mock).mockResolvedValue({ data: { id: 3, status: 'accepted' } });
+    await respondToShiftSwap(3, 'accept');
+    expect(api.put).toHaveBeenCalledWith('/api/v2/volunteering/swaps/3', { action: 'accept' });
+  });
+
+  it('cancels a shift swap', async () => {
+    (api.delete as jest.Mock).mockResolvedValue(undefined);
+    await cancelShiftSwap(3);
+    expect(api.delete).toHaveBeenCalledWith('/api/v2/volunteering/swaps/3');
+  });
+});
+
 describe('certificate helpers', () => {
   beforeEach(() => { jest.clearAllMocks(); });
 
@@ -221,5 +265,50 @@ describe('donation helpers', () => {
     (api.post as jest.Mock).mockResolvedValue({ data: { id: 4 } });
     await submitVolunteerDonation(payload);
     expect(api.post).toHaveBeenCalledWith('/api/v2/volunteering/donations', payload);
+  });
+});
+
+describe('organisation dashboard helpers', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('loads managed organisation details and stats', async () => {
+    (api.get as jest.Mock)
+      .mockResolvedValueOnce({ data: { id: 9, name: 'Garden Team' } })
+      .mockResolvedValueOnce({ data: { total_volunteers: 2, wallet_balance: 5 } });
+
+    await getOrganisation(9);
+    await getOrganisationStats(9);
+
+    expect(api.get).toHaveBeenNthCalledWith(1, '/api/v2/volunteering/organisations/9');
+    expect(api.get).toHaveBeenNthCalledWith(2, '/api/v2/volunteering/organisations/9/stats');
+  });
+
+  it('loads organisation review queues and volunteers', async () => {
+    (api.get as jest.Mock).mockResolvedValue({ data: { items: [], cursor: null, has_more: false } });
+
+    await getOrganisationApplications(9, 'pending');
+    await getOrganisationPendingHours(9);
+    await getOrganisationVolunteers(9);
+    await getOrganisationWalletTransactions(9);
+
+    expect(api.get).toHaveBeenNthCalledWith(1, '/api/v2/volunteering/organisations/9/applications', { per_page: '20', status: 'pending' });
+    expect(api.get).toHaveBeenNthCalledWith(2, '/api/v2/volunteering/organisations/9/hours/pending', { per_page: '20' });
+    expect(api.get).toHaveBeenNthCalledWith(3, '/api/v2/volunteering/organisations/9/volunteers', { per_page: '20' });
+    expect(api.get).toHaveBeenNthCalledWith(4, '/api/v2/volunteering/organisations/9/wallet/transactions', { per_page: '20' });
+  });
+
+  it('updates organisation dashboard actions', async () => {
+    (api.put as jest.Mock).mockResolvedValue({ data: {} });
+    (api.post as jest.Mock).mockResolvedValue({ data: { new_balance: 8 } });
+
+    await verifyVolunteerHours(4, 'approve');
+    await setOrganisationAutoPay(9, true);
+    await updateOrganisation(9, { name: 'Garden Team' });
+    await depositOrganisationWallet(9, 3, 'Top-up');
+
+    expect(api.put).toHaveBeenNthCalledWith(1, '/api/v2/volunteering/hours/4/verify', { action: 'approve' });
+    expect(api.put).toHaveBeenNthCalledWith(2, '/api/v2/volunteering/organisations/9/wallet/auto-pay', { enabled: true });
+    expect(api.put).toHaveBeenNthCalledWith(3, '/api/v2/volunteering/organisations/9', { name: 'Garden Team' });
+    expect(api.post).toHaveBeenCalledWith('/api/v2/volunteering/organisations/9/wallet/deposit', { amount: 3, note: 'Top-up' });
   });
 });

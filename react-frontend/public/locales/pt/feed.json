@@ -343,7 +343,8 @@
       "badge_unlocked": "Distintivo desbloqueado",
       "level_reached": "Nível atingido"
     },
-    "read_more_about": "Read more about {{title}}"
+    "read_more_about": "Read more about {{title}}",
+    "detail_course": "Ver curso"
   },
   "poll": {
     "load_failed": "Falha ao carregar os dados da sondagem.",

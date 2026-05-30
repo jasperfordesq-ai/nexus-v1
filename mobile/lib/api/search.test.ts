@@ -20,7 +20,7 @@ jest.mock('@/lib/constants', () => ({
 }));
 
 import { api } from '@/lib/api/client';
-import { search } from './search';
+import { deleteSavedSearch, getSavedSearches, runSavedSearch, saveSearch, search } from './search';
 import type { SearchResponse } from './search';
 
 const mockSearchResponse: SearchResponse = {
@@ -92,5 +92,37 @@ describe('search', () => {
       cursor: 'cursor-1',
       type: 'user',
     });
+  });
+});
+
+describe('saved search API', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('loads saved searches from the V2 endpoint', async () => {
+    (api.get as jest.Mock).mockResolvedValue({ data: [] });
+    await getSavedSearches();
+    expect(api.get).toHaveBeenCalledWith('/api/v2/search/saved');
+  });
+
+  it('saves current search parameters with notifications disabled by default', async () => {
+    (api.post as jest.Mock).mockResolvedValue({ data: { id: 1 } });
+    await saveSearch({ name: 'Garden events', query_params: { q: 'garden', type: 'event' } });
+    expect(api.post).toHaveBeenCalledWith('/api/v2/search/saved', {
+      name: 'Garden events',
+      query_params: { q: 'garden', type: 'event' },
+      notify_on_new: false,
+    });
+  });
+
+  it('deletes saved searches by id', async () => {
+    (api.delete as jest.Mock).mockResolvedValue({ data: { deleted: true } });
+    await deleteSavedSearch(7);
+    expect(api.delete).toHaveBeenCalledWith('/api/v2/search/saved/7');
+  });
+
+  it('records saved search runs with result counts', async () => {
+    (api.post as jest.Mock).mockResolvedValue({ data: { id: 7 } });
+    await runSavedSearch(7, 3);
+    expect(api.post).toHaveBeenCalledWith('/api/v2/search/saved/7/run', { result_count: 3 });
   });
 });

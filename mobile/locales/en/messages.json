@@ -58,7 +58,33 @@
     "deleteEveryoneConfirm": "Delete this message for everyone?",
     "deletedMessage": "This message was deleted.",
     "reactWith": "React with {{emoji}}",
-    "toggleReaction": "Toggle {{emoji}} reaction"
+    "toggleReaction": "Toggle {{emoji}} reaction",
+    "attachmentName": "Attachment {{index}}",
+    "attachments": {
+      "add": "Add attachment",
+      "title": "Add attachment",
+      "photoLibrary": "Photo library",
+      "remove": "Remove {{name}}",
+      "removeLabel": "Remove",
+      "open": "Open {{name}}",
+      "file": "Attachment",
+      "permissionTitle": "Photo access needed",
+      "permissionMessage": "Allow photo access to attach images."
+    },
+    "voice": {
+      "record": "Record voice message",
+      "recording": "Recording voice message",
+      "ready": "Voice message ready",
+      "stop": "Stop",
+      "cancel": "Cancel voice message",
+      "send": "Send voice message",
+      "permissionTitle": "Microphone access needed",
+      "permissionMessage": "Allow microphone access to record voice messages.",
+      "failedTitle": "Voice message failed",
+      "startFailed": "Could not start recording. Please try again.",
+      "stopFailed": "Could not save this recording. Please try again.",
+      "sendFailed": "Voice message could not be sent. Please try again."
+    }
   },
   "context": {
     "regarding": "Regarding",

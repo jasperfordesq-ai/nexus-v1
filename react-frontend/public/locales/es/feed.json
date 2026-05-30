@@ -343,7 +343,8 @@
       "badge_unlocked": "Insignia desbloqueada",
       "level_reached": "Nivel alcanzado"
     },
-    "read_more_about": "Read more about {{title}}"
+    "read_more_about": "Read more about {{title}}",
+    "detail_course": "Ver curso"
   },
   "poll": {
     "load_failed": "Error al cargar los datos de la encuesta.",

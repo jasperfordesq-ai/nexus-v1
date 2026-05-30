@@ -151,10 +151,32 @@ class CourseService
         if ($autoApprove) {
             $course->moderation_status = 'approved';
         }
-        if (!$course->published_at) {
+        $firstPublish = !$course->published_at;
+        if ($firstPublish) {
             $course->published_at = now();
         }
         $course->save();
+
+        // Post a celebration activity to the community feed on first publish.
+        // Guarded so a feed failure never blocks publishing.
+        if ($firstPublish) {
+            try {
+                app(\App\Services\FeedActivityService::class)->recordActivity(
+                    TenantContext::getId(),
+                    (int) $course->author_user_id,
+                    'course',
+                    (int) $course->id,
+                    [
+                        'title' => $course->title,
+                        'content' => (string) ($course->summary ?? ''),
+                        'image_url' => $course->cover_image,
+                        'metadata' => ['slug' => $course->slug, 'level' => $course->level],
+                    ]
+                );
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('[CourseService] feed post on publish failed', ['error' => $e->getMessage()]);
+            }
+        }
 
         return $course;
     }

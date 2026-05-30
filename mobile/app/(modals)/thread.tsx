@@ -7,8 +7,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
   FlatList,
+  Image,
   Keyboard,
   KeyboardAvoidingView,
+  Linking,
   Platform,
   RefreshControl,
   Text,
@@ -17,11 +19,13 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { Audio } from 'expo-av';
+import * as ImagePicker from 'expo-image-picker';
 import * as Haptics from '@/lib/haptics';
 import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
 
 import { useTranslation } from 'react-i18next';
-import { deleteMessage, displayName, getMessagingRestrictionStatus, getOrCreateThread, getThread, markConversationRead, sendMessage, toggleMessageReaction, updateMessage, type Message, type MessagingRestrictionStatus, type SendMessageOptions } from '@/lib/api/messages';
+import { deleteMessage, displayName, getMessagingRestrictionStatus, getOrCreateThread, getThread, markConversationRead, sendMessage, sendMessageWithAttachments, sendVoiceMessage as sendVoiceMessageApi, toggleMessageReaction, updateMessage, type Message, type MessageAttachmentUpload, type MessagingRestrictionStatus, type SendMessageOptions } from '@/lib/api/messages';
 import { useApi } from '@/lib/hooks/useApi';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -29,6 +33,7 @@ import { useTheme } from '@/lib/hooks/useTheme';
 import { useRealtimeContext } from '@/lib/context/RealtimeContext';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
+import ActionSheet from '@/components/ui/ActionSheet';
 import Avatar from '@/components/ui/Avatar';
 import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -40,6 +45,8 @@ import VoiceMessageBubble from '@/components/VoiceMessageBubble';
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 const REACTION_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
 
+const MAX_ATTACHMENTS = 5;
+
 const THREAD_CONTEXT_CONFIG = {
   listing: { icon: 'list-outline', labelKey: 'context.type.listing', pathname: '/(modals)/exchange-detail', color: '#06b6d4' },
   event: { icon: 'calendar-outline', labelKey: 'context.type.event', pathname: '/(modals)/event-detail', color: '#6366f1' },
@@ -49,6 +56,7 @@ const THREAD_CONTEXT_CONFIG = {
 
 type ThreadContextType = keyof typeof THREAD_CONTEXT_CONFIG;
 type ThreadContext = { type: ThreadContextType; id: number };
+type PendingAttachment = MessageAttachmentUpload & { id: string; width?: number | null; height?: number | null; size?: number | null };
 
 export default function ThreadScreen() {
   return (
@@ -106,8 +114,16 @@ function ThreadScreenInner() {
   const [isSending, setIsSending] = useState(false);
   const [messagingRestriction, setMessagingRestriction] = useState<MessagingRestrictionStatus | null>(null);
   const [editingMessage, setEditingMessage] = useState<Message | null>(null);
+  const [pendingAttachments, setPendingAttachments] = useState<PendingAttachment[]>([]);
+  const [attachmentSheetVisible, setAttachmentSheetVisible] = useState(false);
+  const [optionsMessage, setOptionsMessage] = useState<Message | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const [voiceUri, setVoiceUri] = useState<string | null>(null);
   const flatListRef = useRef<FlatList<Message>>(null);
   const inputTextRef = useRef(inputText);
+  const recordingRef = useRef<Audio.Recording | null>(null);
+  const recordingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   inputTextRef.current = inputText;
 
   const enrichedMessages = useMemo(() => {
@@ -169,6 +185,13 @@ function ThreadScreenInner() {
     };
   }, [isValidId]);
 
+  useEffect(() => () => {
+    if (recordingTimerRef.current) {
+      clearInterval(recordingTimerRef.current);
+    }
+    void recordingRef.current?.stopAndUnloadAsync().catch(() => null);
+  }, []);
+
   const resolvedRecipientId = useMemo(() => {
     if (!isValidId) return null;
     if (isNewConversation && safeThreadLookupId > 0) return safeThreadLookupId;
@@ -192,7 +215,7 @@ function ThreadScreenInner() {
 
   const handleSend = useCallback(async () => {
     const body = inputTextRef.current.trim();
-    if (!body || isSending || resolvedRecipientId === null) return;
+    if ((!body && pendingAttachments.length === 0) || isSending || resolvedRecipientId === null) return;
     if (messagingRestriction?.messaging_disabled) {
       Alert.alert(t('thread.messagingRestrictedTitle'), t('thread.messagingRestrictedContact'));
       return;
@@ -219,6 +242,14 @@ function ThreadScreenInner() {
       return;
     }
 
+    const optimisticAttachments = pendingAttachments.map((attachment, index) => ({
+      id: `pending-${attachment.id}`,
+      name: attachment.name ?? t('thread.attachmentName', { index: index + 1 }),
+      url: attachment.uri,
+      type: 'image',
+      size: attachment.size ?? null,
+      mime_type: attachment.mimeType ?? null,
+    }));
     const optimistic: Message = {
       id: Date.now(),
       body,
@@ -229,17 +260,21 @@ function ThreadScreenInner() {
       audio_url: null,
       reactions: {},
       is_read: false,
+      attachments: optimisticAttachments,
     };
 
     setMessages((prev) => [...prev, optimistic]);
     setInputText('');
+    setPendingAttachments([]);
     Keyboard.dismiss();
     setIsSending(true);
 
     try {
-      const res = newConversationOptions
-        ? await sendMessage(resolvedRecipientId, body, newConversationOptions)
-        : await sendMessage(resolvedRecipientId, body);
+      const res = pendingAttachments.length > 0
+        ? await sendMessageWithAttachments(resolvedRecipientId, body, pendingAttachments, newConversationOptions)
+        : newConversationOptions
+          ? await sendMessage(resolvedRecipientId, body, newConversationOptions)
+          : await sendMessage(resolvedRecipientId, body);
       setMessages((prev) => {
         if (prev.some((message) => message.id === res.data.id)) {
           return prev.filter((message) => message.id !== optimistic.id);
@@ -250,16 +285,18 @@ function ThreadScreenInner() {
     } catch {
       setMessages((prev) => prev.filter((message) => message.id !== optimistic.id));
       setInputText(body);
+      setPendingAttachments(pendingAttachments);
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       Alert.alert(t('errors.sendFailed'), t('thread.sendFailed'));
     } finally {
       setIsSending(false);
     }
-  }, [editingMessage, isSending, messagingRestriction?.messaging_disabled, newConversationOptions, resolvedRecipientId, t]);
+  }, [editingMessage, isSending, messagingRestriction?.messaging_disabled, newConversationOptions, pendingAttachments, resolvedRecipientId, t]);
 
   const startEditingMessage = useCallback((message: Message) => {
     if (!message.is_own || message.is_voice || message.is_deleted) return;
     setEditingMessage(message);
+    setPendingAttachments([]);
     setInputText(message.body || message.content || '');
   }, []);
 
@@ -301,17 +338,142 @@ function ThreadScreenInner() {
 
   const openMessageOptions = useCallback((message: Message) => {
     if (message.is_deleted || message.is_voice) return;
-    const options: Array<{ text: string; style?: 'cancel' | 'destructive'; onPress?: () => void }> = [];
-    if (message.is_own) {
-      options.push({ text: t('thread.edit'), onPress: () => startEditingMessage(message) });
+    setOptionsMessage(message);
+  }, []);
+
+  const handlePickImages = useCallback(async () => {
+    if (pendingAttachments.length >= MAX_ATTACHMENTS) return;
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert(t('thread.attachments.permissionTitle'), t('thread.attachments.permissionMessage'));
+      return;
     }
-    options.push(
-      { text: t('thread.deleteForMe'), style: 'destructive', onPress: () => handleDeleteMessage(message, 'self') },
-      { text: t('thread.deleteForEveryone'), style: 'destructive', onPress: () => handleDeleteMessage(message, 'everyone') },
-      { text: t('common:buttons.cancel'), style: 'cancel' },
-    );
-    Alert.alert(t('thread.messageOptions'), undefined, options);
-  }, [handleDeleteMessage, startEditingMessage, t]);
+
+    const remaining = Math.max(1, MAX_ATTACHMENTS - pendingAttachments.length);
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsMultipleSelection: true,
+      selectionLimit: remaining,
+      quality: 0.85,
+    });
+    if (result.canceled) return;
+
+    const nextAttachments = result.assets.slice(0, remaining).map((asset, index): PendingAttachment => ({
+      id: `${Date.now()}-${index}`,
+      uri: asset.uri,
+      name: asset.fileName ?? `message-image-${pendingAttachments.length + index + 1}.jpg`,
+      mimeType: asset.mimeType ?? null,
+      width: asset.width,
+      height: asset.height,
+      size: asset.fileSize ?? null,
+    }));
+    setPendingAttachments((current) => [...current, ...nextAttachments].slice(0, MAX_ATTACHMENTS));
+  }, [pendingAttachments.length, t]);
+
+  const removePendingAttachment = useCallback((id: string) => {
+    setPendingAttachments((current) => current.filter((attachment) => attachment.id !== id));
+  }, []);
+
+  const stopRecordingTimer = useCallback(() => {
+    if (recordingTimerRef.current) {
+      clearInterval(recordingTimerRef.current);
+      recordingTimerRef.current = null;
+    }
+  }, []);
+
+  const handleStartRecording = useCallback(async () => {
+    if (isRecording || inputTextRef.current.trim() || pendingAttachments.length > 0 || editingMessage) return;
+    try {
+      const permission = await Audio.requestPermissionsAsync();
+      if (!permission.granted) {
+        Alert.alert(t('thread.voice.permissionTitle'), t('thread.voice.permissionMessage'));
+        return;
+      }
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
+      const { recording } = await Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+      recordingRef.current = recording;
+      setVoiceUri(null);
+      setRecordingSeconds(0);
+      setIsRecording(true);
+      recordingTimerRef.current = setInterval(() => {
+        setRecordingSeconds((seconds) => seconds + 1);
+      }, 1000);
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    } catch {
+      stopRecordingTimer();
+      setIsRecording(false);
+      recordingRef.current = null;
+      Alert.alert(t('thread.voice.failedTitle'), t('thread.voice.startFailed'));
+    }
+  }, [editingMessage, isRecording, pendingAttachments.length, stopRecordingTimer, t]);
+
+  const handleStopRecording = useCallback(async () => {
+    const recording = recordingRef.current;
+    if (!recording) return;
+    try {
+      stopRecordingTimer();
+      await recording.stopAndUnloadAsync();
+      const uri = recording.getURI();
+      recordingRef.current = null;
+      setIsRecording(false);
+      if (uri) {
+        setVoiceUri(uri);
+      }
+    } catch {
+      recordingRef.current = null;
+      setIsRecording(false);
+      setVoiceUri(null);
+      Alert.alert(t('thread.voice.failedTitle'), t('thread.voice.stopFailed'));
+    }
+  }, [stopRecordingTimer, t]);
+
+  const handleCancelVoice = useCallback(async () => {
+    stopRecordingTimer();
+    const recording = recordingRef.current;
+    recordingRef.current = null;
+    setIsRecording(false);
+    setVoiceUri(null);
+    setRecordingSeconds(0);
+    await recording?.stopAndUnloadAsync().catch(() => null);
+  }, [stopRecordingTimer]);
+
+  const handleSendVoice = useCallback(async () => {
+    if (!voiceUri || isSending || resolvedRecipientId === null) return;
+    if (messagingRestriction?.messaging_disabled) {
+      Alert.alert(t('thread.messagingRestrictedTitle'), t('thread.messagingRestrictedContact'));
+      return;
+    }
+
+    const optimistic: Message = {
+      id: Date.now(),
+      body: '',
+      sender: { id: -1, name: t('common:labels.you'), avatar_url: null },
+      created_at: new Date().toISOString(),
+      is_own: true,
+      is_voice: true,
+      audio_url: voiceUri,
+      reactions: {},
+      is_read: false,
+    };
+
+    setMessages((prev) => [...prev, optimistic]);
+    setVoiceUri(null);
+    setRecordingSeconds(0);
+    setIsSending(true);
+
+    try {
+      const response = await sendVoiceMessageApi(resolvedRecipientId, voiceUri, newConversationOptions);
+      setMessages((prev) => prev.map((message) => (message.id === optimistic.id ? { ...response.data, is_own: true } : message)));
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch {
+      setMessages((prev) => prev.filter((message) => message.id !== optimistic.id));
+      setVoiceUri(voiceUri);
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(t('errors.sendFailed'), t('thread.voice.sendFailed'));
+    } finally {
+      setIsSending(false);
+    }
+  }, [isSending, messagingRestriction?.messaging_disabled, newConversationOptions, resolvedRecipientId, t, voiceUri]);
 
   const handleReaction = useCallback(async (messageId: number, emoji: string) => {
     try {
@@ -434,37 +596,126 @@ function ThreadScreenInner() {
           </Surface>
         ) : null}
 
+        {isRecording || voiceUri ? (
+          <Surface variant="secondary" className="mx-3 mb-2 flex-row items-center gap-3 rounded-panel-inner px-3 py-2">
+            <View className="h-10 w-10 items-center justify-center rounded-full" style={{ backgroundColor: withAlpha(theme.error, isRecording ? 0.18 : 0.1) }}>
+              <Ionicons name={isRecording ? 'radio-button-on' : 'mic-outline'} size={20} color={isRecording ? theme.error : primary} />
+            </View>
+            <View className="min-w-0 flex-1">
+              <Text className="text-xs font-semibold" style={{ color: theme.text }}>
+                {isRecording ? t('thread.voice.recording') : t('thread.voice.ready')}
+              </Text>
+              <Text className="text-xs" style={{ color: theme.textMuted }}>
+                {formatRecordingTime(recordingSeconds)}
+              </Text>
+            </View>
+            {isRecording ? (
+              <HeroButton size="sm" variant="primary" onPress={() => void handleStopRecording()} accessibilityLabel={t('thread.voice.stop')}>
+                <HeroButton.Label>{t('thread.voice.stop')}</HeroButton.Label>
+              </HeroButton>
+            ) : (
+              <HeroButton isIconOnly size="sm" variant="primary" style={{ backgroundColor: primary }} onPress={() => void handleSendVoice()} isDisabled={isSending} accessibilityLabel={t('thread.voice.send')}>
+                {isSending ? <Spinner size="sm" /> : <Ionicons name="send" size={16} color="#fff" />}
+              </HeroButton>
+            )}
+            <HeroButton isIconOnly size="sm" variant="ghost" onPress={() => void handleCancelVoice()} accessibilityLabel={t('thread.voice.cancel')}>
+              <Ionicons name="close-circle-outline" size={18} color={theme.textMuted} />
+            </HeroButton>
+          </Surface>
+        ) : null}
+
         <Surface
           variant="default"
-          className="flex-row items-end gap-2 border-t border-border/50 px-3 py-2.5"
+          className="border-t border-border/50 px-3 py-2.5"
           style={{ paddingBottom: Math.max(10, insets.bottom) }}
         >
-          <Input
-            containerClassName="mb-0 flex-1"
-            inputClassName="min-h-[44px] max-h-[120px] flex-1 rounded-[22px] border border-border px-4 pb-2.5 pt-2.5 text-[15px]"
-            style={{ color: theme.text, backgroundColor: theme.bg }}
-            value={inputText}
-            onChangeText={setInputText}
-            placeholder={t('thread.inputPlaceholder')}
-            placeholderTextColor={theme.textMuted}
-            multiline
-            maxLength={1000}
-            returnKeyType="default"
-            accessibilityLabel={t('thread.inputPlaceholder')}
-          />
-          <HeroButton
-            isIconOnly
-            size="lg"
-            variant="primary"
-            style={{ backgroundColor: primary }}
-            onPress={handleSend}
-            isDisabled={isSending || !inputText.trim() || messagingRestriction?.messaging_disabled}
-            accessibilityLabel={editingMessage ? t('thread.saveEdit') : t('thread.send')}
-          >
-            {isSending ? <Spinner size="sm" /> : <Ionicons name={editingMessage ? 'checkmark' : 'send'} size={18} color="#fff" />}
-          </HeroButton>
+          {pendingAttachments.length > 0 ? (
+            <View className="mb-2 flex-row flex-wrap gap-2">
+              {pendingAttachments.map((attachment) => (
+                <HeroCard key={attachment.id} variant="secondary" className="w-[96px] overflow-hidden rounded-panel-inner p-0">
+                  <Image source={{ uri: attachment.uri }} className="h-[64px] w-full" resizeMode="cover" />
+                  <HeroCard.Body className="gap-1 px-2 py-1.5">
+                    <Text className="text-[11px] font-medium" style={{ color: theme.text }} numberOfLines={1}>
+                      {attachment.name}
+                    </Text>
+                    <HeroButton
+                      size="sm"
+                      variant="ghost"
+                      accessibilityLabel={t('thread.attachments.remove', { name: attachment.name })}
+                      className="min-h-0 justify-start px-0 py-0"
+                      onPress={() => removePendingAttachment(attachment.id)}
+                    >
+                      <HeroButton.Label className="text-[11px]">{t('thread.attachments.removeLabel')}</HeroButton.Label>
+                    </HeroButton>
+                  </HeroCard.Body>
+                </HeroCard>
+              ))}
+            </View>
+          ) : null}
+          <View className="flex-row items-end gap-2">
+            <HeroButton
+              isIconOnly
+              size="lg"
+              variant="secondary"
+              onPress={() => setAttachmentSheetVisible(true)}
+              isDisabled={Boolean(editingMessage) || Boolean(voiceUri) || isRecording || pendingAttachments.length >= MAX_ATTACHMENTS || messagingRestriction?.messaging_disabled}
+              accessibilityLabel={t('thread.attachments.add')}
+            >
+              <Ionicons name="attach-outline" size={20} color={theme.textSecondary} />
+            </HeroButton>
+            {!inputText.trim() && pendingAttachments.length === 0 && !voiceUri ? (
+              <HeroButton
+                isIconOnly
+                size="lg"
+                variant="secondary"
+                onPress={() => void handleStartRecording()}
+                isDisabled={Boolean(editingMessage) || isRecording || messagingRestriction?.messaging_disabled}
+                accessibilityLabel={t('thread.voice.record')}
+              >
+                <Ionicons name="mic-outline" size={20} color={theme.textSecondary} />
+              </HeroButton>
+            ) : null}
+            <Input
+              containerClassName="mb-0 flex-1"
+              inputClassName="min-h-[44px] max-h-[120px] flex-1 rounded-[22px] border border-border px-4 pb-2.5 pt-2.5 text-[15px]"
+              style={{ color: theme.text, backgroundColor: theme.bg }}
+              value={inputText}
+              onChangeText={setInputText}
+              placeholder={t('thread.inputPlaceholder')}
+              placeholderTextColor={theme.textMuted}
+              multiline
+              maxLength={1000}
+              returnKeyType="default"
+              accessibilityLabel={t('thread.inputPlaceholder')}
+            />
+            <HeroButton
+              isIconOnly
+              size="lg"
+              variant="primary"
+              style={{ backgroundColor: primary }}
+              onPress={handleSend}
+              isDisabled={isSending || (!inputText.trim() && pendingAttachments.length === 0) || messagingRestriction?.messaging_disabled}
+              accessibilityLabel={editingMessage ? t('thread.saveEdit') : t('thread.send')}
+            >
+              {isSending ? <Spinner size="sm" /> : <Ionicons name={editingMessage ? 'checkmark' : 'send'} size={18} color="#fff" />}
+            </HeroButton>
+          </View>
         </Surface>
       </KeyboardAvoidingView>
+      <ActionSheet
+        visible={attachmentSheetVisible}
+        onClose={() => setAttachmentSheetVisible(false)}
+        title={t('thread.attachments.title')}
+        actions={[
+          { label: t('thread.attachments.photoLibrary'), icon: 'image-outline', onPress: () => void handlePickImages() },
+        ]}
+      />
+      <ActionSheet
+        visible={Boolean(optionsMessage)}
+        onClose={() => setOptionsMessage(null)}
+        title={t('thread.messageOptions')}
+        actions={buildMessageActions(optionsMessage, t, startEditingMessage, handleDeleteMessage)}
+      />
     </SafeAreaView>
   );
 }
@@ -549,6 +800,34 @@ function ThreadContextCard({
   );
 }
 
+function buildMessageActions(
+  message: Message | null,
+  t: (key: string, options?: Record<string, unknown>) => string,
+  startEditingMessage: (message: Message) => void,
+  handleDeleteMessage: (message: Message, scope: 'self' | 'everyone') => void,
+) {
+  if (!message) return [];
+  return [
+    ...(message.is_own ? [{
+      label: t('thread.edit'),
+      icon: 'pencil-outline',
+      onPress: () => startEditingMessage(message),
+    }] : []),
+    {
+      label: t('thread.deleteForMe'),
+      icon: 'trash-outline',
+      destructive: true,
+      onPress: () => handleDeleteMessage(message, 'self'),
+    },
+    {
+      label: t('thread.deleteForEveryone'),
+      icon: 'trash-bin-outline',
+      destructive: true,
+      onPress: () => handleDeleteMessage(message, 'everyone'),
+    },
+  ];
+}
+
 function MessageBubble({
   item,
   primary,
@@ -606,6 +885,49 @@ function MessageBubble({
               {body}
             </Text>
           )}
+          {!item.is_deleted && item.attachments?.length ? (
+            <View className={`${body ? 'mt-2' : ''} gap-2`}>
+              {item.attachments.map((attachment) => {
+                const isImage = attachment.type === 'image' || attachment.mime_type?.startsWith('image/');
+                const attachmentLabel = attachment.name || t('thread.attachments.file');
+                return (
+                  <HeroButton
+                    key={String(attachment.id)}
+                    variant="ghost"
+                    accessibilityLabel={t('thread.attachments.open', { name: attachmentLabel })}
+                    className="self-start rounded-panel-inner p-0"
+                    onPress={() => {
+                      if (attachment.url) {
+                        void Linking.openURL(attachment.url);
+                      }
+                    }}
+                  >
+                    {isImage ? (
+                      <Image
+                        source={{ uri: attachment.url }}
+                        className="h-[132px] w-[180px] rounded-panel-inner"
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <View className="max-w-[220px] flex-row items-center gap-2 rounded-panel-inner px-3 py-2" style={{ backgroundColor: isOwn ? 'rgba(255,255,255,0.14)' : theme.bg }}>
+                        <Ionicons name="document-text-outline" size={18} color={isOwn ? '#fff' : theme.textSecondary} />
+                        <View className="min-w-0 flex-1">
+                          <Text className={`text-xs font-medium ${isOwn ? 'text-white' : 'text-foreground'}`} numberOfLines={1}>
+                            {attachmentLabel}
+                          </Text>
+                          {attachment.size ? (
+                            <Text className="text-[10px]" style={{ color: isOwn ? 'rgba(255,255,255,0.7)' : theme.textMuted }}>
+                              {formatFileSize(attachment.size)}
+                            </Text>
+                          ) : null}
+                        </View>
+                      </View>
+                    )}
+                  </HeroButton>
+                );
+              })}
+            </View>
+          ) : null}
           {item.is_edited && !item.is_deleted ? (
             <Text className="mt-0.5 text-[10px]" style={{ color: isOwn ? 'rgba(255,255,255,0.6)' : theme.textMuted }}>
               {t('thread.edited')}
@@ -757,4 +1079,16 @@ function parsePositiveIntValue(value: number | string | null | undefined): numbe
 function formatTime(iso: string): string {
   const date = new Date(iso);
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function formatFileSize(size: number): string {
+  if (size < 1024) return `${size} B`;
+  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function formatRecordingTime(seconds: number): string {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes}:${String(remainingSeconds).padStart(2, '0')}`;
 }

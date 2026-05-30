@@ -34,7 +34,9 @@
     "cost": "{{credits}} crediti",
     "insufficient_credits": "Non hai abbastanza crediti temporali per iscriverti.",
     "prerequisites": "Prerequisiti",
-    "prerequisites_required": "Completa i corsi prerequisiti per sbloccare l'iscrizione."
+    "prerequisites_required": "Completa i corsi prerequisiti per sbloccare l'iscrizione.",
+    "not_available": "Questo corso non è ancora stato pubblicato.",
+    "your_course": "Questo è il tuo corso."
   },
   "player": {
     "mark_complete": "Contrassegna come completo",
@@ -205,7 +207,10 @@
     "untitled_lesson": "Lezione senza titolo",
     "empty": "Nessuna sezione ancora. Aggiungi la tua prima sezione per iniziare a costruire il curriculum.",
     "done": "Fatto",
-    "preview_course": "Anteprima"
+    "preview_course": "Anteprima",
+    "published_toast": "Corso pubblicato: ora è visibile ai membri.",
+    "unpublished_toast": "Corso non pubblicato: torna alla bozza.",
+    "publish_hint": "Il tuo corso è una bozza. Pubblicalo per renderlo visibile ai membri e aprire le iscrizioni."
   },
   "lesson_content": {
     "text": "Testo",

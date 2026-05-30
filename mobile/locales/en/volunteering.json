@@ -88,7 +88,9 @@
     "hours": "My Hours",
     "certificates": "Certificates",
     "expenses": "Expenses",
-    "donations": "Donations"
+    "donations": "Donations",
+    "swaps": "Swaps",
+    "organisations": "Organisations"
   },
   "myShifts": {
     "empty": "No confirmed shifts yet.",
@@ -242,5 +244,122 @@
     "failedDescription": "We could not create the opportunity. Please try again.",
     "editFailedTitle": "Opportunity not updated",
     "editFailedDescription": "We could not update the opportunity. Please try again."
+  },
+  "org": {
+    "title": "Organisation dashboard",
+    "dashboardEyebrow": "Organiser tools",
+    "invalid": "Organisation not found.",
+    "loadError": "Could not load this organisation dashboard.",
+    "statsUnavailable": "Organisation stats are unavailable.",
+    "emptyTitle": "No managed organisations yet",
+    "emptyDescription": "Register or join an approved organisation before using organiser tools.",
+    "register": "Browse organisations",
+    "pendingHeading": "Pending approval",
+    "pendingDescription": "This organisation is waiting for approval.",
+    "walletBalance": "{{count}}h available",
+    "managerTools": "Manager tools",
+    "openDashboardLabel": "Open dashboard for {{name}}",
+    "manage": "Manage",
+    "reviewApplications": "Review applications",
+    "reviewHours": "Review hours",
+    "postOpportunity": "Post opportunity",
+    "tabs": {
+      "overview": "Overview",
+      "applications": "Applications",
+      "hours": "Hours review",
+      "volunteers": "Volunteers",
+      "wallet": "Wallet",
+      "settings": "Settings"
+    },
+    "stats": {
+      "volunteers": "Volunteers",
+      "pendingApplications": "Applications",
+      "pendingHours": "Hours to review",
+      "walletBalance": "Wallet",
+      "approvedHours": "Approved hours",
+      "activeOpportunities": "Active opportunities"
+    },
+    "status": {
+      "active": "Active",
+      "approved": "Approved",
+      "pending": "Pending",
+      "declined": "Declined"
+    },
+    "roles": {
+      "owner": "Owner",
+      "admin": "Admin",
+      "member": "Member",
+      "volunteer": "Volunteer"
+    },
+    "applications": {
+      "empty": "No applications to review.",
+      "applied": "Applied {{date}}",
+      "actionError": "Could not update this application."
+    },
+    "hours": {
+      "empty": "No hours are waiting for review.",
+      "approve": "Approve hours",
+      "decline": "Decline",
+      "actionError": "Could not update this hours entry."
+    },
+    "volunteers": {
+      "empty": "No approved volunteers yet.",
+      "summary": "{{hours}}h across {{count}} applications",
+      "openProfile": "Open profile for {{name}}"
+    },
+    "wallet": {
+      "balance": "Wallet balance",
+      "autoPayToggle": "Toggle auto-pay",
+      "autoPayOn": "Auto-pay is on for approved hours.",
+      "autoPayOff": "Auto-pay is off. Approved hours will need manual payment.",
+      "amountPlaceholder": "Amount",
+      "notePlaceholder": "Optional note",
+      "deposit": "Deposit credits",
+      "validation": "Enter an amount greater than zero.",
+      "depositError": "Could not deposit credits.",
+      "autoPayError": "Could not update auto-pay.",
+      "transactions": "Transactions",
+      "empty": "No wallet transactions yet.",
+      "transactionFallback": "Wallet transaction"
+    },
+    "settings": {
+      "heading": "Organisation settings",
+      "namePlaceholder": "Organisation name",
+      "descriptionPlaceholder": "Description",
+      "emailPlaceholder": "Contact email",
+      "websitePlaceholder": "Website",
+      "save": "Save organisation",
+      "validation": "Organisation name is required.",
+      "saveError": "Could not save organisation details."
+    }
+  },
+  "swaps": {
+    "heading": "Shift swaps",
+    "description": "Review sent and received swap requests for your confirmed volunteer shifts.",
+    "all": "All ({{count}})",
+    "sent": "Sent ({{count}})",
+    "received": "Received ({{count}})",
+    "emptyTitle": "No shift swaps yet",
+    "sentTo": "Sent to {{name}}",
+    "receivedFrom": "From {{name}}",
+    "requested": "Requested {{date}}",
+    "yourShift": "Your shift",
+    "proposedShift": "Proposed shift",
+    "accept": "Accept",
+    "reject": "Reject",
+    "cancel": "Cancel request",
+    "acceptError": "Could not accept this swap.",
+    "rejectError": "Could not reject this swap.",
+    "cancelError": "Could not cancel this swap request.",
+    "status": {
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "admin_pending": "Admin review",
+      "admin_approved": "Approved",
+      "admin_rejected": "Declined",
+      "cancelled": "Cancelled",
+      "expired": "Expired"
+    }
   }
 }

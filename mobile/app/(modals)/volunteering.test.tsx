@@ -31,10 +31,25 @@ jest.mock('react-i18next', () => ({
         'tabs.opportunities': 'Opportunities',
         'tabs.applications': 'My Applications',
         'tabs.shifts': 'My Shifts',
+        'tabs.swaps': 'Swaps',
         'tabs.hours': 'My Hours',
         'tabs.certificates': 'Certificates',
         'tabs.expenses': 'Expenses',
         'tabs.donations': 'Donations',
+        'tabs.organisations': 'Organisations',
+        'org.emptyTitle': 'No managed organisations yet',
+        'org.emptyDescription': 'Register or join an approved organisation before using organiser tools.',
+        'org.register': 'Browse organisations',
+        'org.pendingHeading': 'Pending approval',
+        'org.pendingDescription': 'This organisation is waiting for approval.',
+        'org.walletBalance': opts ? `${String(opts.count ?? 0)}h available` : '0h available',
+        'org.managerTools': 'Manager tools',
+        'org.openDashboardLabel': opts ? `Open dashboard for ${String(opts.name ?? '')}` : 'Open dashboard',
+        'org.manage': 'Manage',
+        'org.status.pending': 'Pending',
+        'org.roles.owner': 'Owner',
+        'org.roles.admin': 'Admin',
+        'org.roles.member': 'Member',
         'myShifts.empty': 'No confirmed shifts yet.',
         'myShifts.date': opts ? String(opts.date ?? '') : 'Date',
         'myShifts.dateUnknown': 'Date unavailable',
@@ -44,6 +59,25 @@ jest.mock('react-i18next', () => ({
         'myShifts.cancelError': 'Could not cancel this shift.',
         'myShifts.openOpportunityLabel': opts ? `Open opportunity for ${String(opts.title ?? '')}` : 'Open opportunity',
         'myShifts.cancelLabel': opts ? `Cancel shift for ${String(opts.title ?? '')}` : 'Cancel shift',
+        'swaps.heading': 'Shift swaps',
+        'swaps.description': 'Review swap requests.',
+        'swaps.all': opts ? `All (${String(opts.count ?? 0)})` : 'All (0)',
+        'swaps.sent': opts ? `Sent (${String(opts.count ?? 0)})` : 'Sent (0)',
+        'swaps.received': opts ? `Received (${String(opts.count ?? 0)})` : 'Received (0)',
+        'swaps.emptyTitle': 'No shift swaps yet',
+        'swaps.sentTo': opts ? `Sent to ${String(opts.name ?? '')}` : 'Sent to',
+        'swaps.receivedFrom': opts ? `From ${String(opts.name ?? '')}` : 'From',
+        'swaps.requested': opts ? `Requested ${String(opts.date ?? '')}` : 'Requested',
+        'swaps.yourShift': 'Your shift',
+        'swaps.proposedShift': 'Proposed shift',
+        'swaps.accept': 'Accept',
+        'swaps.reject': 'Reject',
+        'swaps.cancel': 'Cancel request',
+        'swaps.acceptError': 'Could not accept this swap.',
+        'swaps.rejectError': 'Could not reject this swap.',
+        'swaps.cancelError': 'Could not cancel this swap.',
+        'swaps.status.pending': 'Pending',
+        'swaps.status.accepted': 'Accepted',
         'certificates.title': 'Volunteer certificates',
         'certificates.description': 'Generate verified certificates.',
         'certificates.generate': 'Generate certificate',
@@ -199,6 +233,19 @@ jest.mock('@/lib/api/volunteering', () => ({
   getVolunteerGivingDays: jest.fn(),
   getVolunteerDonations: jest.fn(),
   submitVolunteerDonation: jest.fn().mockResolvedValue({ data: {} }),
+  getShiftSwaps: jest.fn(),
+  getOrganisation: jest.fn(),
+  getOrganisationApplications: jest.fn(),
+  getOrganisationPendingHours: jest.fn(),
+  getOrganisationStats: jest.fn(),
+  getOrganisationVolunteers: jest.fn(),
+  getOrganisationWalletTransactions: jest.fn(),
+  depositOrganisationWallet: jest.fn().mockResolvedValue({ data: {} }),
+  setOrganisationAutoPay: jest.fn().mockResolvedValue({ data: {} }),
+  updateOrganisation: jest.fn().mockResolvedValue({ data: {} }),
+  verifyVolunteerHours: jest.fn().mockResolvedValue({ data: {} }),
+  respondToShiftSwap: jest.fn().mockResolvedValue({ data: {} }),
+  cancelShiftSwap: jest.fn().mockResolvedValue(undefined),
   expressInterest: jest.fn().mockResolvedValue({}),
   cancelShiftSignup: jest.fn().mockResolvedValue(undefined),
   withdrawApplication: jest.fn().mockResolvedValue({}),
@@ -307,6 +354,50 @@ describe('VolunteeringScreen', () => {
     expect(getByText('Open')).toBeTruthy();
   });
 
+  it('renders managed volunteering organisations and dashboard entry points', () => {
+    let apiCall = 0;
+    mockUseApi.mockImplementation(() => {
+      const responses = [
+        { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() },
+        { data: { data: { items: [], cursor: null, has_more: false } }, isLoading: false, error: null, refresh: jest.fn() },
+        { data: { data: { total_verified: 0, total_pending: 0, total_declined: 0, by_organization: [], by_month: [] } }, isLoading: false, error: null, refresh: jest.fn() },
+        {
+          data: {
+            data: [{
+              id: 5,
+              name: 'Green Spaces',
+              description: 'Community gardens and food growing.',
+              status: 'approved',
+              member_role: 'owner',
+              balance: 14,
+              logo_url: null,
+            }],
+          },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+        { data: { data: { items: [], cursor: null, has_more: false } }, isLoading: false, error: null, refresh: jest.fn() },
+        { data: { data: { items: [], expenses: [], stats: {}, cursor: null, has_more: false } }, isLoading: false, error: null, refresh: jest.fn() },
+        { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() },
+        { data: { data: { items: [], next_cursor: null } }, isLoading: false, error: null, refresh: jest.fn() },
+        { data: { data: { swaps: [] } }, isLoading: false, error: null, refresh: jest.fn() },
+      ];
+      const response = responses[apiCall % responses.length];
+      apiCall += 1;
+      return response;
+    });
+
+    const { getByText } = render(<VolunteeringScreen />);
+
+    fireEvent.press(getByText('Organisations'));
+
+    expect(getByText('Green Spaces')).toBeTruthy();
+    expect(getByText('Community gardens and food growing.')).toBeTruthy();
+    expect(getByText('14h available')).toBeTruthy();
+    expect(getByText('Manage')).toBeTruthy();
+  });
+
   it('lets approved volunteers log hours for application organisations', () => {
     let apiCall = 0;
     mockUseApi.mockImplementation(() => {
@@ -364,6 +455,12 @@ describe('VolunteeringScreen', () => {
         },
         {
           data: { data: { items: [], next_cursor: null } },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+        {
+          data: { data: { swaps: [] } },
           isLoading: false,
           error: null,
           refresh: jest.fn(),
@@ -451,6 +548,12 @@ describe('VolunteeringScreen', () => {
           error: null,
           refresh: jest.fn(),
         },
+        {
+          data: { data: { swaps: [] } },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
       ];
       const response = responses[apiCall % responses.length];
       apiCall += 1;
@@ -464,6 +567,68 @@ describe('VolunteeringScreen', () => {
     expect(getByText('Garden Helper')).toBeTruthy();
     expect(getByText('Confirmed')).toBeTruthy();
     expect(getByText('Cancel shift')).toBeTruthy();
+  });
+
+  it('renders native volunteer shift swaps and received actions', () => {
+    let apiCall = 0;
+    mockUseApi.mockImplementation(() => {
+      const responses = [
+        { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() },
+        { data: { data: { items: [], cursor: null, has_more: false } }, isLoading: false, error: null, refresh: jest.fn() },
+        { data: { data: { total_verified: 0, total_pending: 0, total_declined: 0, by_organization: [], by_month: [] } }, isLoading: false, error: null, refresh: jest.fn() },
+        { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() },
+        { data: { data: { items: [], cursor: null, has_more: false } }, isLoading: false, error: null, refresh: jest.fn() },
+        { data: { data: { items: [], expenses: [], stats: {}, cursor: null, has_more: false } }, isLoading: false, error: null, refresh: jest.fn() },
+        { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() },
+        { data: { data: { items: [], next_cursor: null } }, isLoading: false, error: null, refresh: jest.fn() },
+        {
+          data: {
+            data: {
+              swaps: [{
+                id: 77,
+                status: 'pending',
+                direction: 'received',
+                requester: { id: 12, name: 'Alex Volunteer', avatar_url: null },
+                recipient: { id: 1, name: 'Current User', avatar_url: null },
+                original_shift: {
+                  id: 42,
+                  start_time: '2026-06-01T10:00:00Z',
+                  end_time: '2026-06-01T12:00:00Z',
+                  opportunity_title: 'Garden Helper',
+                  organization_name: 'Green Spaces',
+                },
+                proposed_shift: {
+                  id: 43,
+                  start_time: '2026-06-02T10:00:00Z',
+                  end_time: '2026-06-02T12:00:00Z',
+                  opportunity_title: 'Food Pantry',
+                  organization_name: 'Care Hub',
+                },
+                message: 'Can we trade shifts?',
+                created_at: '2026-05-29T10:00:00Z',
+              }],
+            },
+          },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
+      ];
+      const response = responses[apiCall % responses.length];
+      apiCall += 1;
+      return response;
+    });
+
+    const { getByText } = render(<VolunteeringScreen />);
+
+    fireEvent.press(getByText('Swaps'));
+
+    expect(getByText('Shift swaps')).toBeTruthy();
+    expect(getByText('From Alex Volunteer')).toBeTruthy();
+    expect(getByText('Garden Helper')).toBeTruthy();
+    expect(getByText('Food Pantry')).toBeTruthy();
+    expect(getByText('Accept')).toBeTruthy();
+    expect(getByText('Reject')).toBeTruthy();
   });
 
   it('renders volunteer certificates in the native certificates tab', () => {
@@ -533,6 +698,12 @@ describe('VolunteeringScreen', () => {
           error: null,
           refresh: jest.fn(),
         },
+        {
+          data: { data: { swaps: [] } },
+          isLoading: false,
+          error: null,
+          refresh: jest.fn(),
+        },
       ];
       const response = responses[apiCall % responses.length];
       apiCall += 1;
@@ -581,6 +752,7 @@ describe('VolunteeringScreen', () => {
         },
         { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() },
         { data: { data: { items: [], next_cursor: null } }, isLoading: false, error: null, refresh: jest.fn() },
+        { data: { data: { swaps: [] } }, isLoading: false, error: null, refresh: jest.fn() },
       ];
       const response = responses[apiCall % responses.length];
       apiCall += 1;
@@ -645,6 +817,7 @@ describe('VolunteeringScreen', () => {
           error: null,
           refresh: jest.fn(),
         },
+        { data: { data: { swaps: [] } }, isLoading: false, error: null, refresh: jest.fn() },
       ];
       const response = responses[apiCall % responses.length];
       apiCall += 1;

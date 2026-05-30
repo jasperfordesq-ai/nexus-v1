@@ -4,15 +4,26 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useCallback } from 'react';
-import { FlatList, RefreshControl, Text, View } from 'react-native';
+import { Alert, FlatList, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from '@/lib/haptics';
 import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface, Tabs } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
-import { search, type SearchResult, type SearchResultType, type SearchResponse } from '@/lib/api/search';
+import {
+  deleteSavedSearch,
+  getSavedSearches,
+  runSavedSearch,
+  saveSearch,
+  search,
+  type SavedSearch,
+  type SearchResult,
+  type SearchResultType,
+  type SearchResponse,
+} from '@/lib/api/search';
+import { useApi } from '@/lib/hooks/useApi';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -50,6 +61,10 @@ const TYPE_TONES: Record<SearchResultType, string> = {
   group: '#8B5CF6',
   blog_post: '#0EA5E9',
 };
+
+function isSearchResultType(value: unknown): value is SearchResultType {
+  return value === 'user' || value === 'listing' || value === 'event' || value === 'group' || value === 'blog_post';
+}
 
 function navigateToResult(item: SearchResult): void {
   switch (item.type) {
@@ -99,10 +114,15 @@ function SearchResultSkeleton() {
 
 export default function SearchScreen() {
   const { t } = useTranslation(['search', 'common']);
+  const params = useLocalSearchParams<{ q?: string; type?: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const [query, setQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState<FilterOption>('all');
+  const initialType = isSearchResultType(params.type) ? params.type : 'all';
+  const [query, setQuery] = useState(typeof params.q === 'string' ? params.q : '');
+  const [activeFilter, setActiveFilter] = useState<FilterOption>(initialType);
+  const [showSaveSearch, setShowSaveSearch] = useState(false);
+  const [saveSearchName, setSaveSearchName] = useState('');
+  const [isSavingSearch, setIsSavingSearch] = useState(false);
   const debouncedQuery = useDebounce(query, 400);
 
   const activeType = activeFilter === 'all' ? undefined : activeFilter;
@@ -123,12 +143,59 @@ export default function SearchScreen() {
       extractSearchPage,
       [debouncedQuery, activeFilter],
     );
+  const savedSearchesQuery = useApi(() => getSavedSearches(), []);
+  const savedSearches = savedSearchesQuery.data?.data ?? [];
 
   const filters: FilterOption[] = ['all', 'user', 'listing', 'event', 'group', 'blog_post'];
 
   function filterLabel(f: FilterOption): string {
     if (f === 'all') return t('filterAll');
     return t(`types.${f}`);
+  }
+
+  async function handleSaveSearch() {
+    const trimmedQuery = debouncedQuery.trim();
+    const trimmedName = saveSearchName.trim();
+    if (!trimmedQuery || !trimmedName) return;
+    try {
+      setIsSavingSearch(true);
+      await saveSearch({
+        name: trimmedName,
+        query_params: {
+          q: trimmedQuery,
+          ...(activeFilter !== 'all' ? { type: activeFilter } : {}),
+        },
+      });
+      setSaveSearchName('');
+      setShowSaveSearch(false);
+      savedSearchesQuery.refresh();
+    } catch {
+      Alert.alert(t('saved.saveFailedTitle'), t('saved.saveFailedMessage'));
+    } finally {
+      setIsSavingSearch(false);
+    }
+  }
+
+  async function handleRunSavedSearch(item: SavedSearch) {
+    const savedQuery = item.query_params.q ?? '';
+    const savedType = isSearchResultType(item.query_params.type) ? item.query_params.type : 'all';
+    setQuery(savedQuery);
+    setActiveFilter(savedType);
+    try {
+      await runSavedSearch(item.id, results.length);
+      savedSearchesQuery.refresh();
+    } catch {
+      // Running the search locally is still useful if analytics bookkeeping fails.
+    }
+  }
+
+  async function handleDeleteSavedSearch(item: SavedSearch) {
+    try {
+      await deleteSavedSearch(item.id);
+      savedSearchesQuery.refresh();
+    } catch {
+      Alert.alert(t('saved.deleteFailedTitle'), t('saved.deleteFailedMessage'));
+    }
   }
 
   function renderResult({ item }: { item: SearchResult }) {
@@ -259,6 +326,16 @@ export default function SearchScreen() {
             primary={primary}
             theme={theme}
             t={t}
+            savedSearches={savedSearches}
+            savedSearchesLoading={savedSearchesQuery.isLoading}
+            showSaveSearch={showSaveSearch}
+            setShowSaveSearch={setShowSaveSearch}
+            saveSearchName={saveSearchName}
+            setSaveSearchName={setSaveSearchName}
+            isSavingSearch={isSavingSearch}
+            onSaveSearch={handleSaveSearch}
+            onRunSavedSearch={handleRunSavedSearch}
+            onDeleteSavedSearch={handleDeleteSavedSearch}
           />
         }
         ListFooterComponent={
@@ -290,6 +367,16 @@ function SearchHeader({
   primary,
   theme,
   t,
+  savedSearches,
+  savedSearchesLoading,
+  showSaveSearch,
+  setShowSaveSearch,
+  saveSearchName,
+  setSaveSearchName,
+  isSavingSearch,
+  onSaveSearch,
+  onRunSavedSearch,
+  onDeleteSavedSearch,
 }: {
   query: string;
   setQuery: (value: string) => void;
@@ -303,7 +390,18 @@ function SearchHeader({
   primary: string;
   theme: Theme;
   t: (key: string, options?: Record<string, unknown>) => string;
+  savedSearches: SavedSearch[];
+  savedSearchesLoading: boolean;
+  showSaveSearch: boolean;
+  setShowSaveSearch: (value: boolean) => void;
+  saveSearchName: string;
+  setSaveSearchName: (value: string) => void;
+  isSavingSearch: boolean;
+  onSaveSearch: () => void;
+  onRunSavedSearch: (item: SavedSearch) => void;
+  onDeleteSavedSearch: (item: SavedSearch) => void;
 }) {
+  const canSaveSearch = hasQuery && query.trim().length > 0;
   return (
     <View className="gap-3 pb-2">
       <HeroCard variant="default" className="mx-4 overflow-hidden rounded-panel p-0">
@@ -364,6 +462,80 @@ function SearchHeader({
             })}
           </Tabs.List>
         </Tabs>
+
+        <View className="gap-3 rounded-panel-inner bg-surface-secondary p-3">
+          <View className="flex-row items-center justify-between gap-3">
+            <View className="min-w-0 flex-1">
+              <Text className="text-sm font-semibold" style={{ color: theme.text }}>{t('saved.title')}</Text>
+              <Text className="text-xs" style={{ color: theme.textSecondary }}>{t('saved.subtitle')}</Text>
+            </View>
+            {canSaveSearch ? (
+              <HeroButton size="sm" variant="secondary" onPress={() => setShowSaveSearch(!showSaveSearch)}>
+                <Ionicons name="bookmark-outline" size={14} color={primary} />
+                <HeroButton.Label>{t('saved.saveThis')}</HeroButton.Label>
+              </HeroButton>
+            ) : null}
+          </View>
+
+          {showSaveSearch ? (
+            <View className="gap-2">
+              <Input
+                value={saveSearchName}
+                onChangeText={setSaveSearchName}
+                placeholder={t('saved.namePlaceholder')}
+                returnKeyType="done"
+                onSubmitEditing={onSaveSearch}
+                accessibilityLabel={t('saved.namePlaceholder')}
+              />
+              <View className="flex-row gap-2">
+                <HeroButton className="flex-1" size="sm" variant="primary" onPress={onSaveSearch} isDisabled={!saveSearchName.trim() || isSavingSearch}>
+                  <HeroButton.Label>{isSavingSearch ? t('saved.saving') : t('saved.save')}</HeroButton.Label>
+                </HeroButton>
+                <HeroButton className="flex-1" size="sm" variant="secondary" onPress={() => {
+                  setShowSaveSearch(false);
+                  setSaveSearchName('');
+                }}>
+                  <HeroButton.Label>{t('saved.cancel')}</HeroButton.Label>
+                </HeroButton>
+              </View>
+            </View>
+          ) : null}
+
+          {savedSearchesLoading ? (
+            <View className="items-center py-2"><Spinner size="sm" /></View>
+          ) : savedSearches.length > 0 ? (
+            <View className="gap-2">
+              {savedSearches.slice(0, 4).map((item) => (
+                <View key={item.id} className="gap-2 rounded-panel-inner bg-background p-3">
+                  <View className="flex-row items-center gap-2">
+                    <Ionicons name="bookmark" size={14} color={primary} />
+                    <View className="min-w-0 flex-1">
+                      <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={1}>{item.name}</Text>
+                      <Text className="text-xs" style={{ color: theme.textSecondary }} numberOfLines={1}>
+                        {item.query_params.q || t('saved.noQuery')}
+                      </Text>
+                    </View>
+                    {typeof item.last_result_count === 'number' ? (
+                      <Chip size="sm" variant="secondary">
+                        <Chip.Label>{t('saved.resultCount', { count: item.last_result_count })}</Chip.Label>
+                      </Chip>
+                    ) : null}
+                  </View>
+                  <View className="flex-row gap-2">
+                    <HeroButton className="flex-1" size="sm" variant="secondary" onPress={() => onRunSavedSearch(item)}>
+                      <HeroButton.Label>{t('saved.run')}</HeroButton.Label>
+                    </HeroButton>
+                    <HeroButton className="flex-1" size="sm" variant="secondary" onPress={() => onDeleteSavedSearch(item)} accessibilityLabel={t('saved.deleteNamed', { name: item.name })}>
+                      <HeroButton.Label>{t('saved.delete')}</HeroButton.Label>
+                    </HeroButton>
+                  </View>
+                </View>
+              ))}
+            </View>
+          ) : (
+            <Text className="text-xs" style={{ color: theme.textSecondary }}>{t('saved.empty')}</Text>
+          )}
+        </View>
       </Surface>
     </View>
   );

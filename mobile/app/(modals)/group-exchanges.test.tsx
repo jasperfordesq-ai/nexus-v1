@@ -18,6 +18,7 @@ jest.mock('react-i18next', () => ({
         'groupExchanges.title': 'Group Exchanges',
         'groupExchanges.eyebrow': 'Shared time exchange',
         'groupExchanges.subtitle': 'Review multi-person exchanges, hours, splits, and confirmation status.',
+        'groupExchanges.create.open': 'Create group exchange',
         'groupExchanges.filters.all': 'All',
         'groupExchanges.filters.active': 'Active',
         'groupExchanges.filters.pending_confirmation': 'Needs confirmation',
@@ -139,5 +140,13 @@ describe('GroupExchangesScreen', () => {
       pathname: '/(modals)/group-exchange-detail',
       params: { id: '10' },
     });
+  });
+
+  it('opens the native create group exchange flow', () => {
+    const { getByText } = render(<GroupExchangesScreen />);
+
+    fireEvent.press(getByText('Create group exchange'));
+
+    expect(mockRouterPush).toHaveBeenCalledWith('/(modals)/new-group-exchange');
   });
 });

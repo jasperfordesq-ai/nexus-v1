@@ -25,6 +25,7 @@ jest.mock('react-i18next', () => ({
         'unreadSummary': opts ? `You have ${String(opts.count ?? 0)} unread notifications.` : 'You have unread notifications.',
         'markAllRead': 'Mark all read',
         'markRead': 'Mark read',
+        'markGroupRead': 'Mark group read',
         'delete': 'Delete',
         'marking': 'Marking...',
         'markError': 'Failed to mark as read.',
@@ -32,6 +33,11 @@ jest.mock('react-i18next', () => ({
         'justNow': 'Just now',
         'itemHint': 'Tap to view',
         'unreadItem': opts ? `Unread: ${String(opts.label ?? '')}` : 'Unread',
+        'groupCount': opts ? `${String(opts.count ?? 0)} notifications` : '0 notifications',
+        'expandGroup': 'Expand group',
+        'collapseGroup': 'Collapse group',
+        'unknownActor': 'Community member',
+        'andOthers': opts ? `And ${String(opts.count ?? 0)} others` : 'And others',
         'category.message': 'Message',
         'category.transaction': 'Transaction',
         'category.social': 'Social',
@@ -92,6 +98,7 @@ jest.mock('@expo/vector-icons', () => ({
 jest.mock('@/lib/api/notifications', () => ({
   getNotifications: jest.fn(),
   markAllRead: jest.fn().mockResolvedValue(undefined),
+  markGroupRead: jest.fn().mockResolvedValue(undefined),
   markRead: jest.fn().mockResolvedValue(undefined),
   deleteNotification: jest.fn().mockResolvedValue(undefined),
 }));
@@ -108,7 +115,7 @@ jest.mock('@/lib/utils/formatRelativeTime', () => ({
 }));
 
 import NotificationsScreen from './notifications';
-import { deleteNotification, markRead } from '@/lib/api/notifications';
+import { deleteNotification, markGroupRead, markRead } from '@/lib/api/notifications';
 import { navigateToLink } from '@/lib/utils/navigateToLink';
 
 const defaultApiState = { data: null, isLoading: false, error: null, refresh: jest.fn() };
@@ -215,6 +222,46 @@ describe('NotificationsScreen', () => {
 
     await waitFor(() => expect(markRead).toHaveBeenCalledWith(1));
     expect(navigateToLink).toHaveBeenCalledWith('/messages/1');
+  });
+
+  it('renders grouped notifications and marks the group as read', async () => {
+    const grouped = {
+      ...mockNotification,
+      id: 9,
+      title: 'Federation messages',
+      message: 'Two partners sent federation messages.',
+      is_grouped: true,
+      group_count: 2,
+      group_key: 'federation_message:/federation/messages',
+      actors: [
+        { id: 3, name: 'Mina', avatar_url: null },
+        { id: 4, name: 'Jo', avatar_url: null },
+      ],
+      remaining_count: 1,
+      latest_at: new Date(Date.now() - 120_000).toISOString(),
+    };
+    const refresh = jest.fn();
+    mockUseApi.mockReturnValue({
+      data: { data: [grouped] },
+      isLoading: false,
+      error: null,
+      refresh,
+    });
+
+    const { getByLabelText, getByText, queryByText } = render(<NotificationsScreen />);
+
+    expect(getByText('2 notifications')).toBeTruthy();
+    expect(queryByText('Delete')).toBeNull();
+
+    fireEvent.press(getByLabelText('Expand group'));
+    expect(getByText('Mina')).toBeTruthy();
+    expect(getByText('Jo')).toBeTruthy();
+    expect(getByText('And 1 others')).toBeTruthy();
+
+    fireEvent.press(getByText('Mark group read'));
+
+    await waitFor(() => expect(markGroupRead).toHaveBeenCalledWith('federation_message:/federation/messages'));
+    expect(refresh).toHaveBeenCalled();
   });
 
   it('renders the "Mark all read" button when unread notifications exist', () => {

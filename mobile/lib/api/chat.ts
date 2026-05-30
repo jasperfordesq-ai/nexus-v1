@@ -68,6 +68,8 @@ export interface ChatStartersResponse {
   starters: string[];
 }
 
+export type ChatFeedbackVote = 'up' | 'down';
+
 // ─── API Functions ────────────────────────────────────────────────────────────
 
 /**
@@ -117,4 +119,13 @@ export function getChatHistory(conversationId: string): Promise<{ data: ChatMess
 export function getChatStarters(): Promise<ChatStartersResponse> {
   return api.get<{ data?: ChatStartersResponse; starters?: string[] }>(`${AI_API}/chat/starters`)
     .then((response) => response.data ?? { starters: response.starters ?? [] });
+}
+
+export function submitChatFeedback(payload: {
+  trace_id?: number | null;
+  message_id?: number | null;
+  feedback: ChatFeedbackVote;
+  note?: string | null;
+}): Promise<{ data: { recorded: boolean; feedback: ChatFeedbackVote } }> {
+  return api.post<{ data: { recorded: boolean; feedback: ChatFeedbackVote } }>(`${AI_API}/chat/feedback`, payload);
 }

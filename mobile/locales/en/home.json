@@ -68,6 +68,10 @@
     "groupsJoined": "Groups joined",
     "posts": "Posts",
     "skills": "Skills",
+    "monthlyActivity": "Monthly activity",
+    "monthlyActivityA11y": "Monthly given and received hours chart",
+    "given": "Given",
+    "received": "Received",
     "recent": "Recent activity",
     "emptyTitle": "No activity yet",
     "emptySubtitle": "Your activity will appear here after you take part."

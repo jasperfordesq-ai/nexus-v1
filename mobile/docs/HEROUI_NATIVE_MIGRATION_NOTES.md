@@ -89,6 +89,10 @@ Keep raw React Native primitives for layout and native capabilities: `View`, `Te
 - Added native gamification route aliases for achievements, leaderboard, and Nexus Score, plus a HeroUI Native Nexus Score tab backed by `/v2/gamification/nexus-score`, a daily reward claim card backed by `/v2/gamification/daily-reward`, challenge reward workflows backed by `/v2/gamification/challenges`, badge collection journeys backed by `/v2/gamification/collections`, XP shop browse/purchase backed by `/v2/gamification/shop`, and badge showcase management backed by `/v2/gamification/showcase`.
 - Added native standard poll creation to the polls route, backed by `/v2/polls`, using HeroUI Native cards/buttons and the shared HeroUI Native-backed Input wrapper.
 - Added native Support & Legal document summaries for about, contact, terms, privacy, cookies, accessibility, and trust/safety, while keeping canonical web links available from the HeroUI Native support hub.
+- Added a native group exchange create route backed by `POST /v2/group-exchanges`, using HeroUI Native cards/buttons plus the shared Input wrapper for the core coordinator workflow, including member search, provider/receiver assignment, and per-participant hours/weighting before submit.
+- Added mobile search route-param parity for incoming `q` and `type` links, so native search can open directly to a populated HeroUI Native result view from profile, explore, or assistant links.
+- Added native saved-search management to the Search screen, backed by `/v2/search/saved` list/save/delete and `/run`, with HeroUI Native cards/buttons/chips and the shared Input wrapper.
+- Added native linked/sub-account settings, backed by `/v2/users/me/sub-accounts` and `/v2/users/me/parent-accounts`, covering relationship lists, requests, approvals, revocation, and permission toggles with HeroUI Native cards/buttons and shared inputs/toggles.
 - Migrated thread context cards from raw React Native `Pressable` wrappers to HeroUI Native `Button` wrappers while preserving contextual deep links; removed an unused chat `Pressable` import.
 - Migrated member-profile listing rows from raw React Native `Pressable` wrappers to HeroUI Native `Button` wrappers while preserving listing detail navigation.
 - Migrated exchange-detail author cards from raw React Native `Pressable` wrappers to HeroUI Native `Button` wrappers while leaving image thumbnail controls native.
@@ -110,6 +114,7 @@ Keep raw React Native primitives for layout and native capabilities: `View`, `Te
 - Added a native volunteering Certificates tab backed by `/v2/volunteering/certificates`, with HeroUI Native certificate cards, generation, and printable certificate open actions.
 - Added a native volunteering Expenses tab backed by `/v2/volunteering/expenses`, with HeroUI Native expense cards, organisation/type selectors, and submission fields.
 - Added a native volunteering Donations tab backed by `/v2/volunteering/giving-days` and `/v2/volunteering/donations`, with HeroUI Native giving-day cards, donation history, anonymous toggle, and pledge/offline donation submission fields.
+- Added a native volunteering Swaps tab backed by `/v2/volunteering/swaps`, with HeroUI Native shift-swap cards, sent/received filters, accept/reject actions, and sent-request cancellation.
 - Migrated exchange-detail gallery thumbnail selectors from raw `Pressable` controls to HeroUI Native icon buttons while preserving selected accessibility state.
 - Migrated messages inbox rows from raw `Pressable` controls to HeroUI Native buttons while preserving swipe-to-archive behavior.
 - Migrated the shared image carousel image press target from raw `Pressable` to a HeroUI Native button while preserving translated image-button accessibility labels.
@@ -118,10 +123,20 @@ Keep raw React Native primitives for layout and native capabilities: `View`, `Te
 - Added explicit native notification mark-read and delete card actions backed by the V2 notification endpoints.
 - Migrated the app-level and modal error-boundary recovery actions from hand-styled React Native `Pressable` controls to the shared HeroUI Native-backed `Button` wrapper.
 - Added a first-class native skills route that reuses the existing HeroUI Native skills and endorsements management screen, and pointed the profile shortcut at that route.
-- Added a native activity dashboard route backed by `/v2/users/me/activity/dashboard`, with HeroUI Native summary cards for hours, connections, posts, skills, and recent timeline entries.
+- Added a native activity dashboard route backed by `/v2/users/me/activity/dashboard`, with HeroUI Native summary cards for hours, connections, posts, skills, a compact monthly given/received hours chart, and recent timeline entries.
+- Added a native appreciation wall route backed by `/v2/users/{userId}/appreciations` and `/v2/appreciations/{id}/react`, with HeroUI Native cards, reaction buttons, profile CTAs, and `/users/:id/appreciations` deep-link handling.
+- Added native saved/profile collections backed by `/v2/me/collections`, `/v2/me/collections/{id}/items`, `/v2/me/saved-items/{id}`, and `/v2/users/{userId}/public-collections`, with HeroUI Native collection cards, creation fields, item rows, profile CTAs, and `/me/collections`, `/me/collections/:id`, and `/users/:id/collections` deep-link handling.
+- Added native volunteering organiser workflows: a My Organisations tab plus an org dashboard modal backed by `/v2/volunteering/my-organisations` and `/v2/volunteering/organisations/{id}/*`, covering overview stats, application review, pending-hours review, volunteers, wallet deposit/auto-pay/history, settings, and `/volunteering/my-organisations` plus `/volunteering/org/:id/dashboard` deep-link handling.
+- Expanded web-style deep-link routing for implemented native workflow screens, including activity, goal detail, matches, reviews, skills, polls, KB/support/legal summaries, and marketplace hub/search/category/seller/tools/detail routes.
+- Replaced the marketplace seller Reviews placeholder with native review cards backed by `/v2/reviews/user/{userId}`, using HeroUI Native cards, chips, translated empty states, and the existing paginated review API helper.
 - Added a native matches route backed by `/v2/matches/all`, with HeroUI Native tabs/cards/chips, profile navigation, source routing for listings/jobs/volunteering/groups, and listing dismiss actions.
 - Added a native reviews route backed by the V2 reviews endpoints for received, given, and pending review workflows, including the mobile write-review form and own-review deletion.
 - Added native HeroUI Native AI tool-result cards for structured chat `tool_invocations`, preserving listing/member/event/job/marketplace/knowledge-base/wallet result payloads from the AI chat API.
+- Added native AI response feedback controls backed by `/api/ai/chat/feedback`, with HeroUI Native thumb buttons for assistant turns that include a trace or message id.
+- Added optional native negative-feedback notes for AI assistant responses, using a HeroUI Native bottom sheet and shared Input wrapper before resubmitting `/api/ai/chat/feedback` with the note.
+- Added native message image attachment parity in thread conversations: HeroUI Native action sheets for message options and attachment picking, Expo ImagePicker previews, multipart `/v2/messages` upload helpers, and attachment rendering/open actions inside message bubbles.
+- Added native voice-message recording parity in thread conversations, backed by Expo AV recording and multipart `/v2/messages/voice` upload helpers, with HeroUI Native recording preview, stop/cancel/send controls, and existing voice playback.
+- Added native grouped-notification parity by switching mobile notifications to `/v2/notifications/grouped`, adding group count chips, expandable grouped actors, and `/v2/notifications/group/read` support with HeroUI Native controls.
 - Added the parity audit and migration queue in `mobile/docs/HEROUI_NATIVE_PARITY_AUDIT.md`.
 
 ## Practical Exceptions

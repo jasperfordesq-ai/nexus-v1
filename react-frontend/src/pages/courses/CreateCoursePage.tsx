@@ -12,7 +12,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, CardBody, Input, Textarea, Select, SelectItem, Spinner } from '@/components/ui';
+import { Button, Card, CardBody, Input, Textarea, Select, SelectItem, Spinner, Chip } from '@/components/ui';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { coursesApi, type Course, type CourseCategory, type CourseSection } from '@/lib/api/courses';
@@ -35,6 +35,9 @@ export default function CreateCoursePage() {
   const [categories, setCategories] = useState<CourseCategory[]>([]);
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [status, setStatus] = useState<string>('draft');
+  const [moderationStatus, setModerationStatus] = useState<string>('pending');
   const [sections, setSections] = useState<CourseSection[]>([]);
 
   const [form, setForm] = useState({
@@ -66,10 +69,27 @@ export default function CreateCoursePage() {
             category_id: c.category_id ? String(c.category_id) : '',
           });
           setSections(c.sections ?? []);
+          setStatus(c.status ?? 'draft');
+          setModerationStatus(c.moderation_status ?? 'pending');
         }
       })
       .finally(() => setLoading(false));
   }, [isEdit, courseId]);
+
+  const publishCourse = async () => {
+    setPublishing(true);
+    const res = status === 'published'
+      ? await coursesApi.unpublish(courseId)
+      : await coursesApi.publish(courseId);
+    setPublishing(false);
+    if (res.success && res.data) {
+      setStatus(res.data.status);
+      setModerationStatus(res.data.moderation_status);
+      toast.success(res.data.status === 'published' ? t('builder.published_toast') : t('builder.unpublished_toast'));
+    } else {
+      toast.error(t('builder.save_error'));
+    }
+  };
 
   const saveDetails = async () => {
     if (!form.title.trim()) {
@@ -103,7 +123,30 @@ export default function CreateCoursePage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold mb-6">{isEdit ? t('instructor.edit_course') : t('instructor.new_course')}</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold">{isEdit ? t('instructor.edit_course') : t('instructor.new_course')}</h1>
+          {isEdit ? (
+            status === 'published'
+              ? <Chip size="sm" color="success" variant="soft">{t('instructor.published')}</Chip>
+              : moderationStatus === 'pending' && status !== 'draft'
+                ? <Chip size="sm" color="warning" variant="soft">{t('instructor.pending_review')}</Chip>
+                : <Chip size="sm" variant="soft">{t('instructor.draft')}</Chip>
+          ) : null}
+        </div>
+        {isEdit ? (
+          <Button
+            color={status === 'published' ? 'secondary' : 'primary'}
+            isLoading={publishing}
+            onPress={publishCourse}
+          >
+            {status === 'published' ? t('instructor.unpublish') : t('instructor.publish')}
+          </Button>
+        ) : null}
+      </div>
+      {isEdit && status !== 'published' ? (
+        <p className="text-sm text-muted -mt-3 mb-6">{t('builder.publish_hint')}</p>
+      ) : null}
 
       <Card className="mb-6">
         <CardBody className="p-5 flex flex-col gap-4">

@@ -20,6 +20,8 @@ import { useTranslation } from 'react-i18next';
 import {
   getChatStarters,
   sendChatMessage,
+  submitChatFeedback,
+  type ChatFeedbackVote,
   type ChatMessage,
   type ChatSource,
   type ToolInvocation,
@@ -30,10 +32,17 @@ import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
+import BottomSheet from '@/components/ui/BottomSheet';
 import Input from '@/components/ui/Input';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 type DisplayMessage = ChatMessage | { id: string; role: 'thinking'; content: string; created_at: string };
+type FeedbackState = Record<string, ChatFeedbackVote>;
+type PendingFeedbackNote = {
+  messageId: string;
+  traceId: number | null;
+  numericMessageId: number | null;
+};
 
 const THINKING_ID = '__thinking__';
 const FALLBACK_STARTER_KEYS = ['starter_q1', 'starter_q2', 'starter_q3', 'starter_q4', 'starter_q5'] as const;
@@ -197,19 +206,24 @@ function MessageBubble({
   userName,
   userAvatar,
   t,
+  feedback,
+  onFeedback,
 }: {
   message: DisplayMessage;
   primary: string;
   theme: ReturnType<typeof useTheme>;
   userName: string;
   userAvatar?: string | null;
-  t: (key: string) => string;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+  feedback?: ChatFeedbackVote;
+  onFeedback?: (message: ChatMessage, vote: ChatFeedbackVote) => void;
 }) {
   const isUser = message.role === 'user';
   const isThinking = message.role === 'thinking';
   const isError = 'is_error' in message && message.is_error === true;
   const sources = 'sources' in message && message.sources ? message.sources : [];
   const toolInvocations = 'tool_invocations' in message && message.tool_invocations ? message.tool_invocations : [];
+  const canRate = !isUser && !isThinking && !isError && ('trace_id' in message || 'message_id' in message);
 
   return (
     <View className={`mb-4 flex-row items-end gap-2 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
@@ -256,6 +270,33 @@ function MessageBubble({
           <Text className="px-1 text-[11px]" style={{ color: theme.textMuted }}>
             {messageTime(message.created_at)}
           </Text>
+        ) : null}
+        {canRate ? (
+          <View className="flex-row items-center gap-1 px-1">
+            <Text className="mr-1 text-[11px]" style={{ color: theme.textMuted }}>
+              {t('feedback.label')}
+            </Text>
+            {(['up', 'down'] as const).map((vote) => {
+              const selected = feedback === vote;
+              return (
+                <HeroButton
+                  key={vote}
+                  isIconOnly
+                  size="sm"
+                  variant={selected ? 'primary' : 'secondary'}
+                  accessibilityLabel={t(`feedback.${vote === 'up' ? 'upLabel' : 'downLabel'}`)}
+                  onPress={() => onFeedback?.(message as ChatMessage, vote)}
+                  style={selected ? { backgroundColor: vote === 'up' ? primary : theme.error } : undefined}
+                >
+                  <Ionicons
+                    name={vote === 'up' ? 'thumbs-up-outline' : 'thumbs-down-outline'}
+                    size={14}
+                    color={selected ? '#ffffff' : vote === 'up' ? primary : theme.error}
+                  />
+                </HeroButton>
+              );
+            })}
+          </View>
         ) : null}
         {!isUser && !isThinking ? <ToolResultCards invocations={toolInvocations} primary={primary} theme={theme} t={t} /> : null}
         {!isUser && !isThinking ? <SourceChips sources={sources} theme={theme} /> : null}
@@ -378,6 +419,10 @@ function ChatScreenInner() {
   const [sending, setSending] = useState(false);
   const [starters, setStarters] = useState<string[]>([]);
   const [limits, setLimits] = useState<{ daily_remaining: number; monthly_remaining: number } | null>(null);
+  const [feedbackState, setFeedbackState] = useState<FeedbackState>({});
+  const [pendingFeedbackNote, setPendingFeedbackNote] = useState<PendingFeedbackNote | null>(null);
+  const [feedbackNote, setFeedbackNote] = useState('');
+  const [submittingFeedbackNote, setSubmittingFeedbackNote] = useState(false);
   const conversationIdRef = useRef<string | null>(null);
   const listRef = useRef<FlatList<DisplayMessage>>(null);
   const thinkingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -414,6 +459,9 @@ function ChatScreenInner() {
     thinkingTimeoutRef.current = null;
     conversationIdRef.current = null;
     setMessages([]);
+    setFeedbackState({});
+    setPendingFeedbackNote(null);
+    setFeedbackNote('');
     setInputText('');
     setSending(false);
     setLimits(null);
@@ -486,6 +534,62 @@ function ChatScreenInner() {
     }
   }, [inputText, sending, t]);
 
+  const handleFeedback = useCallback(async (message: ChatMessage, vote: ChatFeedbackVote) => {
+    const traceId = typeof message.trace_id === 'number' ? message.trace_id : null;
+    const numericMessageId = typeof message.message_id === 'number' ? message.message_id : Number(message.id);
+    const messageId = Number.isFinite(numericMessageId) ? numericMessageId : null;
+    if (!traceId && !messageId) return;
+
+    setFeedbackState((prev) => ({ ...prev, [message.id]: vote }));
+    try {
+      await submitChatFeedback({
+        trace_id: traceId,
+        message_id: messageId,
+        feedback: vote,
+      });
+      if (vote === 'down') {
+        setPendingFeedbackNote({ messageId: message.id, traceId, numericMessageId: messageId });
+        setFeedbackNote('');
+      } else {
+        setPendingFeedbackNote(null);
+        setFeedbackNote('');
+      }
+    } catch {
+      setFeedbackState((prev) => {
+        const next = { ...prev };
+        delete next[message.id];
+        return next;
+      });
+    }
+  }, []);
+
+  const closeFeedbackNote = useCallback(() => {
+    setPendingFeedbackNote(null);
+    setFeedbackNote('');
+    setSubmittingFeedbackNote(false);
+  }, []);
+
+  const submitFeedbackNote = useCallback(async () => {
+    const note = feedbackNote.trim();
+    if (!pendingFeedbackNote || !note) {
+      closeFeedbackNote();
+      return;
+    }
+
+    setSubmittingFeedbackNote(true);
+    try {
+      await submitChatFeedback({
+        trace_id: pendingFeedbackNote.traceId,
+        message_id: pendingFeedbackNote.numericMessageId,
+        feedback: 'down',
+        note,
+      });
+      closeFeedbackNote();
+    } catch {
+      setSubmittingFeedbackNote(false);
+    }
+  }, [closeFeedbackNote, feedbackNote, pendingFeedbackNote]);
+
   const renderItem = useCallback(
     ({ item }: { item: DisplayMessage }) => (
       <MessageBubble
@@ -495,9 +599,11 @@ function ChatScreenInner() {
         userName={displayName}
         userAvatar={userAvatar}
         t={t}
+        feedback={'id' in item ? feedbackState[item.id] : undefined}
+        onFeedback={handleFeedback}
       />
     ),
-    [displayName, primary, t, theme, userAvatar],
+    [displayName, feedbackState, handleFeedback, primary, t, theme, userAvatar],
   );
 
   const hasMessages = messages.length > 0;
@@ -577,6 +683,43 @@ function ChatScreenInner() {
           </Text>
         </View>
       </KeyboardAvoidingView>
+      <BottomSheet
+        visible={Boolean(pendingFeedbackNote)}
+        onClose={closeFeedbackNote}
+        title={t('feedback.noteTitle')}
+        snapPoints={[360]}
+      >
+        <View className="gap-4 px-1 pb-2">
+          <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+            {t('feedback.noteDescription')}
+          </Text>
+          <Input
+            value={feedbackNote}
+            onChangeText={setFeedbackNote}
+            placeholder={t('feedback.notePlaceholder')}
+            placeholderTextColor={theme.textMuted}
+            multiline
+            maxLength={500}
+            accessibilityLabel={t('feedback.notePlaceholder')}
+            inputClassName="min-h-[96px] px-3 py-2 text-sm"
+            style={{ color: theme.text }}
+          />
+          <View className="flex-row gap-2">
+            <HeroButton className="flex-1" variant="secondary" onPress={closeFeedbackNote} accessibilityLabel={t('feedback.skipNote')}>
+              <HeroButton.Label>{t('feedback.skipNote')}</HeroButton.Label>
+            </HeroButton>
+            <HeroButton
+              className="flex-1"
+              variant="primary"
+              isDisabled={!feedbackNote.trim() || submittingFeedbackNote}
+              onPress={() => void submitFeedbackNote()}
+              accessibilityLabel={t('feedback.submitNote')}
+            >
+              {submittingFeedbackNote ? <Spinner size="sm" /> : <HeroButton.Label>{t('feedback.submitNote')}</HeroButton.Label>}
+            </HeroButton>
+          </View>
+        </View>
+      </BottomSheet>
     </SafeAreaView>
   );
 }

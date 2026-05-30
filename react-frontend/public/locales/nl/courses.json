@@ -34,7 +34,9 @@
     "cost": "{{credits}} tegoeden",
     "insufficient_credits": "Je hebt niet genoeg tijdskrediet om je in te schrijven.",
     "prerequisites": "Vereisten",
-    "prerequisites_required": "Voltooi de vereiste cursussen om de inschrijving te ontgrendelen."
+    "prerequisites_required": "Voltooi de vereiste cursussen om de inschrijving te ontgrendelen.",
+    "not_available": "Deze cursus is nog niet gepubliceerd.",
+    "your_course": "Dit is jouw cursus."
   },
   "player": {
     "mark_complete": "Markeer als voltooid",
@@ -205,7 +207,10 @@
     "untitled_lesson": "Naamloze les",
     "empty": "Nog geen secties. Voeg uw eerste sectie toe om te beginnen met het samenstellen van het leerplan.",
     "done": "Klaar",
-    "preview_course": "Voorbeeld"
+    "preview_course": "Voorbeeld",
+    "published_toast": "Cursus gepubliceerd: deze is nu zichtbaar voor leden.",
+    "unpublished_toast": "Cursus niet gepubliceerd — terug naar concept.",
+    "publish_hint": "Je cursus is een concept. Publiceer het om het zichtbaar te maken voor leden en open te stellen voor inschrijving."
   },
   "lesson_content": {
     "text": "Tekst",
