@@ -66,7 +66,7 @@ class SearchService
      * Keep in sync with updateFilterableAttributes() calls in ensureIndexes().
      */
     private const FILTERABLE_ATTRIBUTES = [
-        'listings'             => ['tenant_id', 'status', 'category_id', 'type', 'user_id', 'skill_tags'],
+        'listings'             => ['tenant_id', 'status', 'category_id', 'type', 'user_id', 'skill_tags', 'moderation_status'],
         'users'                => ['tenant_id', 'status', 'profile_type'],
         'events'               => ['tenant_id', 'status', 'start_time', 'is_online'],
         'groups'               => ['tenant_id', 'status', 'privacy'],
