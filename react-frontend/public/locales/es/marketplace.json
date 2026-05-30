@@ -637,7 +637,8 @@
     "use_my_location": "Usar Mi Ubicación",
     "search_this_area": "Buscar en Esta Área",
     "distance_km": "{{km}} km de distancia",
-    "distance_meters": "{{m}}m de distancia"
+    "distance_meters": "{{m}}m de distancia",
+    "view_toggle": "View mode"
   },
   "shipping": {
     "title": "Opciones de Envío",

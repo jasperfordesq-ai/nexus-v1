@@ -29,7 +29,7 @@ import Eye from 'lucide-react/icons/eye';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import ChevronUp from 'lucide-react/icons/chevron-up';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Avatar, AvatarGroup, Skeleton } from '@/components/ui';
+import { GlassCard, Button, ToggleButton, ToggleButtonGroup, Chip, Avatar, AvatarGroup, Skeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast, useTenant, useNotifications, useAuth } from '@/contexts';
 import { usePusherOptional } from '@/contexts/PusherContext';
@@ -321,42 +321,46 @@ export function NotificationsPage() {
                 {t('mark_all_read')}
               </Button>
             )}
-            <Link to={tenantPath('/settings')}>
-              <Button
-                variant="flat"
-                size="sm"
-                aria-label={t('settings_aria')}
-                className="w-full bg-theme-elevated text-theme-primary"
-                startContent={<Settings className="w-4 h-4" aria-hidden="true" />}
-              >
-                {t('settings_label')}
-              </Button>
-            </Link>
+            <Button
+              as={Link}
+              to={tenantPath('/settings')}
+              variant="flat"
+              size="sm"
+              aria-label={t('settings_aria')}
+              className="w-full bg-theme-elevated text-theme-primary"
+              startContent={<Settings className="w-4 h-4" aria-hidden="true" />}
+            >
+              {t('settings_label')}
+            </Button>
           </div>
         </div>
       </header>
 
-      {/* Filter */}
-      <div className="flex gap-2 rounded-2xl border border-theme-default bg-theme-surface p-2">
-        <Button
-          size="sm"
-          variant={filter === 'all' ? 'solid' : 'flat'}
-          className={filter === 'all' ? 'bg-theme-hover text-theme-primary' : 'bg-theme-elevated text-theme-muted'}
-          onPress={() => setFilter('all')}
-          aria-pressed={filter === 'all'}
+      {/* Filter — single-select ToggleButtonGroup */}
+      <ToggleButtonGroup
+        aria-label={t('filter_all')}
+        selectionMode="single"
+        disallowEmptySelection
+        size="sm"
+        selectedKeys={new Set([filter])}
+        onSelectionChange={(keys) => { const [k] = Array.from(keys); if (k) setFilter(k as 'all' | 'unread'); }}
+        className="flex gap-2 rounded-2xl border border-theme-default bg-theme-surface p-2"
+      >
+        <ToggleButton
+          id="all"
+          variant="ghost"
+          className="bg-theme-elevated text-theme-muted data-[selected=true]:bg-theme-hover data-[selected=true]:text-theme-primary"
         >
           {t('filter_all')}
-        </Button>
-        <Button
-          size="sm"
-          variant={filter === 'unread' ? 'solid' : 'flat'}
-          className={filter === 'unread' ? 'bg-theme-hover text-theme-primary' : 'bg-theme-elevated text-theme-muted'}
-          onPress={() => setFilter('unread')}
-          aria-pressed={filter === 'unread'}
+        </ToggleButton>
+        <ToggleButton
+          id="unread"
+          variant="ghost"
+          className="bg-theme-elevated text-theme-muted data-[selected=true]:bg-theme-hover data-[selected=true]:text-theme-primary"
         >
           {t('filter_unread', { count: unreadCount })}
-        </Button>
-      </div>
+        </ToggleButton>
+      </ToggleButtonGroup>
 
       {/* Undo delete banner — always present in DOM so screen readers hear it when it appears */}
       <div role="status" aria-live="polite" aria-atomic="true">

@@ -637,7 +637,8 @@
     "use_my_location": "استخدم موقعي",
     "search_this_area": "ابحث في هذه المنطقة",
     "distance_km": "{{km}} كم بعيد",
-    "distance_meters": "{{m}}م بعيد"
+    "distance_meters": "{{m}}م بعيد",
+    "view_toggle": "View mode"
   },
   "shipping": {
     "title": "خيارات الشحن",

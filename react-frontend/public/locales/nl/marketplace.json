@@ -637,7 +637,8 @@
     "use_my_location": "Gebruik Mijn Locatie",
     "search_this_area": "Zoek Dit Gebied",
     "distance_km": "{{km}} km afstand",
-    "distance_meters": "{{m}}m afstand"
+    "distance_meters": "{{m}}m afstand",
+    "view_toggle": "View mode"
   },
   "shipping": {
     "title": "Verzendopties",

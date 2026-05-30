@@ -637,7 +637,8 @@
     "use_my_location": "現在地を使用",
     "search_this_area": "このエリアを検索",
     "distance_km": "{{km}} km 先",
-    "distance_meters": "{{m}} m 先"
+    "distance_meters": "{{m}} m 先",
+    "view_toggle": "View mode"
   },
   "shipping": {
     "title": "配送オプション",

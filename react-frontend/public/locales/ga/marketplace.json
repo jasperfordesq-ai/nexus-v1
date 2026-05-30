@@ -637,7 +637,8 @@
     "use_my_location": "Úsáid Mo Shuíomh",
     "search_this_area": "Cuardaigh an Limistéar Seo",
     "distance_km": "{{km}} km ar shiúl",
-    "distance_meters": "{{m}}m ar shiúl"
+    "distance_meters": "{{m}}m ar shiúl",
+    "view_toggle": "View mode"
   },
   "shipping": {
     "title": "Roghanna Loingseoireachta",

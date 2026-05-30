@@ -1,4 +1,4 @@
-import { Select, SelectItem, Autocomplete, AutocompleteItem, GlassCard, Button, Chip, Spinner, SearchField } from '@/components/ui';
+import { Select, SelectItem, Autocomplete, AutocompleteItem, GlassCard, Button, ToggleButton, ToggleButtonGroup, Chip, Spinner, SearchField } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -303,29 +303,35 @@ export function MarketplaceMapSearchPage() {
             ))}
           </Autocomplete>
 
-          {/* Mobile view toggle */}
-          <div className="flex gap-1 lg:hidden">
-            <Button
+          {/* Mobile view toggle — single-select ToggleButtonGroup */}
+          <ToggleButtonGroup
+            aria-label={t('map.view_toggle')}
+            selectionMode="single"
+            disallowEmptySelection
+            size="lg"
+            selectedKeys={new Set([viewMode])}
+            onSelectionChange={(keys) => { const [k] = Array.from(keys); if (k) setViewMode(k as 'map' | 'list'); }}
+            className="flex gap-1 lg:hidden"
+          >
+            <ToggleButton
+              id="map"
               isIconOnly
-              variant={viewMode === 'map' ? 'solid' : 'bordered'}
-              color={viewMode === 'map' ? 'primary' : 'default'}
-              size="lg"
-              onPress={() => setViewMode('map')}
+              variant="bordered"
               aria-label={t('map.map_view')}
+              className="data-[selected=true]:bg-primary data-[selected=true]:text-white"
             >
               <MapIcon className="w-4 h-4" />
-            </Button>
-            <Button
+            </ToggleButton>
+            <ToggleButton
+              id="list"
               isIconOnly
-              variant={viewMode === 'list' ? 'solid' : 'bordered'}
-              color={viewMode === 'list' ? 'primary' : 'default'}
-              size="lg"
-              onPress={() => setViewMode('list')}
+              variant="bordered"
               aria-label={t('map.list_view')}
+              className="data-[selected=true]:bg-primary data-[selected=true]:text-white"
             >
               <List className="w-4 h-4" />
-            </Button>
-          </div>
+            </ToggleButton>
+          </ToggleButtonGroup>
         </div>
 
         {/* Active filter chips */}
