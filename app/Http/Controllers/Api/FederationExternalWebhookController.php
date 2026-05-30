@@ -1482,6 +1482,7 @@ class FederationExternalWebhookController extends BaseApiController
                         false,
                         $receiverTenantId
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($receiverUserId), 'federation_transaction', $notifyMessage, '/wallet');
                 });
 
                 DB::table('federation_transactions')

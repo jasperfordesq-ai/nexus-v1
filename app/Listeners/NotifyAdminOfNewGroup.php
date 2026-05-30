@@ -102,6 +102,7 @@ class NotifyAdminOfNewGroup implements ShouldQueue
 
                     $bellContent = __('emails_misc.admin_notify.new_group_bell', ['name' => $groupName]);
                     Notification::createNotification((int) $admin->id, $bellContent, '/groups/' . $group->id, 'new_group_created');
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($admin->id), 'new_group_created', $bellContent, '/groups/' . $group->id);
 
                     $subject = __('emails_misc.admin_notify.new_group_subject', ['community' => $tenantName]);
 

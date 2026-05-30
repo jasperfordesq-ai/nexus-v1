@@ -74,6 +74,7 @@ class NotifyConnectionRequest implements ShouldQueue
                 } else {
                     // Bell only — user opted out of connection emails
                     Notification::createNotification($targetUserId, $content, $link, 'connection_request');
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($targetUserId), 'connection_request', $content, $link);
                 }
             });
         } catch (\Throwable $e) {

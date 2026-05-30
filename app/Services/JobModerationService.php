@@ -128,6 +128,7 @@ class JobModerationService
                         "/jobs/{$jobId}",
                         'job_moderation'
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($job->user_id), 'job_moderation', __('emails_misc.jobs.posting_approved'), "/jobs/{$jobId}");
                 });
             } catch (\Throwable $e) {
                 Log::warning('JobModerationService::approveJob notification failed', [
@@ -183,6 +184,7 @@ class JobModerationService
                         "/jobs/{$jobId}",
                         'job_moderation'
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($job->user_id), 'job_moderation', __('emails_misc.jobs.posting_not_approved'), "/jobs/{$jobId}");
                 });
             } catch (\Throwable $e) {
                 Log::warning('JobModerationService::rejectJob notification failed', [

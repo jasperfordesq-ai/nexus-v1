@@ -383,6 +383,7 @@ class AdminDeliverabilityController extends BaseApiController
                     "/deliverables/{$newId}",
                     'deliverable_assigned'
                 );
+                \App\Services\NotificationDispatcher::fanOutPush((int) $assignedTo, 'deliverable_assigned', __('api_controllers_3.deliverable.assigned', ['title' => $title]), "/deliverables/{$newId}");
             }
         } catch (\Throwable $e) {
             \Log::warning('Deliverable assignment notification failed', ['deliverable_id' => $newId, 'error' => $e->getMessage()]);
@@ -483,6 +484,7 @@ class AdminDeliverabilityController extends BaseApiController
                             "/deliverables/{$id}",
                             'deliverable_assigned'
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) $newAssignee, 'deliverable_assigned', __('api_controllers_3.deliverable.reassigned', ['title' => $deliverableTitle]), "/deliverables/{$id}");
                     } catch (\Throwable $e) {
                         \Log::warning('Deliverable reassignment notification failed', ['deliverable_id' => $id, 'error' => $e->getMessage()]);
                     }

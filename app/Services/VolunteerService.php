@@ -800,6 +800,7 @@ class VolunteerService
                             '/volunteering',
                             'volunteer_opportunity'
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) ($recipientId), 'volunteer_opportunity', __('api_controllers_3.volunteer.opportunity_cancelled', ['title' => $oppTitle]), '/volunteering');
                     });
                 }
             } catch (\Throwable $notifErr) {
@@ -1116,6 +1117,7 @@ class VolunteerService
                             '/volunteering',
                             'volunteer_shift'
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'volunteer_shift', __('api_controllers_3.volunteer.shift_signup_confirmed', ['date' => $shiftDate]), '/volunteering');
                     });
                 } catch (\Throwable $notifErr) {
                     Log::warning('VolunteerService::signUpForShift notification failed', ['error' => $notifErr->getMessage()]);
@@ -1174,6 +1176,7 @@ class VolunteerService
                         '/volunteering',
                         'volunteer_shift'
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'volunteer_shift', __('api_controllers_3.volunteer.shift_signup_cancelled'), '/volunteering');
                 });
             } catch (\Throwable $notifErr) {
                 Log::warning('VolunteerService::cancelShiftSignup notification failed', ['error' => $notifErr->getMessage()]);

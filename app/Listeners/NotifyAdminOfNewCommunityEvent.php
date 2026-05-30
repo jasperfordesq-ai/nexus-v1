@@ -102,6 +102,7 @@ class NotifyAdminOfNewCommunityEvent implements ShouldQueue
 
                     $bellContent = __('emails_misc.admin_notify.new_event_bell', ['title' => $eventTitle]);
                     Notification::createNotification((int) $admin->id, $bellContent, '/events/' . $communityEvent->id, 'new_event_created');
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($admin->id), 'new_event_created', $bellContent, '/events/' . $communityEvent->id);
 
                     $subject = __('emails_misc.admin_notify.new_event_subject', ['community' => $tenantName]);
 

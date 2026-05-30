@@ -731,6 +731,7 @@ class FederationController extends BaseApiController
                     'subject' => substr($input['subject'], 0, 50),
                 ]);
                 Notification::createNotification((int) $input['recipient_id'], $notifBody, '/federation/messages', 'federation_message', true, (int) $recipient['tenant_id']);
+                \App\Services\NotificationDispatcher::fanOutPush((int) ((int) $input['recipient_id']), 'federation_message', $notifBody, '/federation/messages');
             });
         } catch (\Exception $e) {
             \Log::warning('[Federation] createNotification failed', ['recipient' => $input['recipient_id'] ?? null, 'error' => $e->getMessage()]);
@@ -1047,6 +1048,7 @@ class FederationController extends BaseApiController
                     'review',
                     (int) $reviewee['tenant_id']
                 );
+                \App\Services\NotificationDispatcher::fanOutPush((int) ((int) $input['reviewee_id']), 'review', __('api_controllers_3.federation.review_received', ['name' => $reviewerName, 'rating' => $rating]), '/reviews');
             });
         } catch (\Throwable $e) {
             \Log::warning('[Federation] review notification failed', ['reviewee' => $input['reviewee_id'] ?? null, 'error' => $e->getMessage()]);

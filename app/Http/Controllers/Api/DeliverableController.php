@@ -159,6 +159,7 @@ class DeliverableController extends BaseApiController
                         "/deliverables/{$id}",
                         'comment'
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($owner->user_id), 'comment', __('api_controllers_3.deliverable_comment.posted', ['name' => $commenterName, 'title' => $owner->title]), "/deliverables/{$id}");
                 });
             }
         } catch (\Throwable $e) {

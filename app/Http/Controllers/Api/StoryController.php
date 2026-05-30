@@ -280,6 +280,7 @@ class StoryController extends BaseApiController
                             '/feed',
                             'story_reaction'
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) ((int) $story->user_id), 'story_reaction', "{$reactorName} reacted to your story", '/feed');
                     });
                 }
             } catch (\Throwable $e) {
@@ -492,6 +493,7 @@ class StoryController extends BaseApiController
                             '/feed',
                             'story_reply'
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) ((int) $story->user_id), 'story_reply', "{$replierName} replied to your story", '/feed');
                     });
                 }
             } catch (\Throwable $e) {

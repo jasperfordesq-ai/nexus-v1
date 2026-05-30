@@ -330,6 +330,7 @@ class AdminVettingController extends BaseApiController
                             'moderation',
                             false
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'moderation', __('api_controllers_3.admin_bells.vetting_removed'), null);
                     });
                 }
             } catch (\Throwable $e) {
@@ -434,6 +435,7 @@ class AdminVettingController extends BaseApiController
                         'moderation',
                         true
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'moderation', __('api_controllers_3.admin_bells.vetting_approved'), '/dashboard');
                 });
             }
             foreach ($notifyRejected as $userId) {
@@ -445,6 +447,7 @@ class AdminVettingController extends BaseApiController
                         'moderation',
                         true
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'moderation', __('api_controllers_3.admin_bells.vetting_rejected'), '/help');
                 });
             }
             foreach ($notifyDeleted as $userId) {
@@ -456,6 +459,7 @@ class AdminVettingController extends BaseApiController
                         'moderation',
                         false
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'moderation', __('api_controllers_3.admin_bells.vetting_removed'), null);
                 });
             }
         } catch (\Throwable $e) {
@@ -577,6 +581,7 @@ class AdminVettingController extends BaseApiController
                     'moderation',
                     true
                 );
+                \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'moderation', __($bellMessageKey), $bellLink);
 
                 // Email notification
                 if ($user && !empty($user->email)) {

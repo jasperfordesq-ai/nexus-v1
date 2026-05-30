@@ -139,6 +139,7 @@ class NotifyMessageReceived implements ShouldQueue
                     );
                 } else {
                     Notification::createNotification($recipientId, $content, $link, 'new_message');
+                    \App\Services\NotificationDispatcher::fanOutPush((int) $recipientId, 'new_message', $content, $link);
                     return true;
                 }
             });

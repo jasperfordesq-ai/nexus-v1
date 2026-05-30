@@ -240,6 +240,7 @@ class AdminTimebankingController extends BaseApiController
                 '/wallet',
                 'transaction'
             );
+            \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'transaction', $msg, '/wallet');
         } catch (\Throwable $e) {
             \Log::warning('Balance adjustment notification failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
         }

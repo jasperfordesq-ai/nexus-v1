@@ -120,6 +120,7 @@ class NotifyGroupChatroomMessage implements ShouldQueue
                     false,
                     $event->tenantId
                 );
+                \App\Services\NotificationDispatcher::fanOutPush((int) $userId, 'group_chatroom_message', $content, $link);
             }
 
             Log::debug('NotifyGroupChatroomMessage: notified members', [

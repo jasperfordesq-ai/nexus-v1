@@ -238,6 +238,7 @@ class AdminCommentsController extends BaseApiController
                     'moderation',
                     true
                 );
+                \App\Services\NotificationDispatcher::fanOutPush((int) $commentAuthorId, 'moderation', __('api_controllers_3.admin_bells.comment_hidden'), $link);
             }
         } catch (\Throwable $e) {
             Log::warning("AdminCommentsController::hide notification failed: " . $e->getMessage());
@@ -293,6 +294,7 @@ class AdminCommentsController extends BaseApiController
                     'moderation',
                     true
                 );
+                \App\Services\NotificationDispatcher::fanOutPush((int) $commentAuthorId, 'moderation', __('api_controllers_3.admin_bells.comment_removed'), null);
             }
         } catch (\Throwable $e) {
             Log::warning("AdminCommentsController::destroy notification failed: " . $e->getMessage());

@@ -478,6 +478,7 @@ class RegistrationOrchestrationService
                             '/notifications',
                             'pending_approval'
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) $admin->id, 'pending_approval', $message, '/notifications');
                     });
                 }
             }

@@ -956,6 +956,7 @@ class MemberPremiumService
                             true,
                             $tenantId
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) ($row->user_id), 'member_premium_billing', __($keys[$event]['bell'], $params), '/premium/manage');
                     } catch (\Throwable $e) {
                         Log::warning('MemberPremiumService billing bell notification failed after email send', [
                             'subscription_id' => $row->id,

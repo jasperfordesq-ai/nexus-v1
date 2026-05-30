@@ -271,6 +271,7 @@ class ChallengeService
                             '/achievements',
                             'achievement'
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'achievement', __('svc_notifications.challenge.complete_claim', ['title' => $challenge->title]), '/achievements');
                     });
                 }
             } catch (\Throwable $e) {
@@ -321,6 +322,7 @@ class ChallengeService
                 '/achievements',
                 'achievement'
             );
+            \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'achievement', __('svc_notifications.challenge.complete_earned', ['title' => $challenge->title, 'xp' => $challenge->xp_reward]), '/achievements');
         });
     }
 }

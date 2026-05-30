@@ -452,6 +452,10 @@ class ProjectAnnouncementService
                 false,
                 $tenantId,
             );
+            \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'caring_project_update', __('api.caring_project_update_notification', [
+                'project' => $projectTitle,
+                'update' => $updateTitle,
+            ]), '/caring-community/projects/' . $projectId);
         }
 
         return count($userIds);

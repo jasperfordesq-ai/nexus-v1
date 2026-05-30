@@ -401,6 +401,7 @@ class VolunteerController extends BaseApiController
                         "/volunteering/opportunities/{$shift->opportunity_id}",
                         'volunteering'
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ((int) $shift->opportunity->created_by), 'volunteering', __('notifications.vol_shift_signup_body', ['name' => $volunteerName]), "/volunteering/opportunities/{$shift->opportunity_id}");
                 });
             }
         } catch (\Throwable $e) {

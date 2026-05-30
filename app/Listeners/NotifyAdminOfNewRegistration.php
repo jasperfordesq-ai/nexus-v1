@@ -96,6 +96,7 @@ class NotifyAdminOfNewRegistration implements ShouldQueue
                         // Use the broker panel members list which all admin-tier
                         // and broker-tier roles can access.
                         Notification::createNotification((int) $admin->id, $bellContent, '/broker/members', 'new_user_registered');
+                        \App\Services\NotificationDispatcher::fanOutPush((int) $admin->id, 'new_user_registered', $bellContent, '/broker/members');
 
                         $subject = __('emails_misc.admin_notify.new_user_subject', ['community' => $tenantName]);
 

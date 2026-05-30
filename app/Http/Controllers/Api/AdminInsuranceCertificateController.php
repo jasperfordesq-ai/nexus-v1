@@ -236,6 +236,7 @@ class AdminInsuranceCertificateController extends BaseApiController
                             'moderation',
                             true
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'moderation', __('api_controllers_3.admin_bells.insurance_verified'), '/dashboard');
                     });
                     $emailSent = (bool) LocaleContext::withLocale(
                         $recipient,
@@ -294,6 +295,7 @@ class AdminInsuranceCertificateController extends BaseApiController
                             'moderation',
                             true
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'moderation', __('api_controllers_3.admin_bells.insurance_rejected'), '/help');
                     });
                     $emailSent = (bool) LocaleContext::withLocale(
                         $recipient,

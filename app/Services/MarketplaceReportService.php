@@ -701,6 +701,7 @@ class MarketplaceReportService
             true,
             TenantContext::getId()
         );
+        \App\Services\NotificationDispatcher::fanOutPush((int) $userId, 'marketplace_report_' . $eventType, $message, $link);
 
         return true;
     }

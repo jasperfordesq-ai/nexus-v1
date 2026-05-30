@@ -304,6 +304,7 @@ class FederatedMessageService
                         false,
                         $receiverTenantId
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) $receiverUserId, 'federation_message', $notifyMessage, '/federation/messages');
                 });
 
                 DB::table('federation_messages')

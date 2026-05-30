@@ -274,6 +274,7 @@ class AdminGroupsController extends BaseApiController
                         false,
                         $tenantId
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($membership->user_id), 'info', __('api_controllers_3.admin_bells.group_member_approved', ['group' => $membership->group_name]), "/groups/{$membership->group_id}");
                 }
             } catch (\Throwable $e) {
                 Log::warning('Failed to send group member approval notification', [
@@ -324,6 +325,7 @@ class AdminGroupsController extends BaseApiController
                         false,
                         $tenantId
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($membership->user_id), 'info', __('api_controllers_3.admin_bells.group_member_rejected', ['group' => $membership->group_name]), null);
                 }
             } catch (\Throwable $e) {
                 Log::warning('Failed to send group member rejection notification', [
@@ -367,6 +369,7 @@ class AdminGroupsController extends BaseApiController
                     false,
                     $tenantId
                 );
+                \App\Services\NotificationDispatcher::fanOutPush((int) ($group->owner_id), 'info', __('api_controllers_3.admin_bells.group_approved'), "/groups/{$id}");
             }
         } catch (\Throwable $e) {
             Log::warning('Failed to send group approval notification', [
@@ -898,6 +901,7 @@ class AdminGroupsController extends BaseApiController
                         false,
                         $tenantId
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'info', __('api_controllers_3.admin_bells.group_member_removed', ['group' => $member->group_name]), null);
                 }
             } catch (\Throwable $e) {
                 Log::warning('Failed to send group kick notification', [

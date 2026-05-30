@@ -138,6 +138,7 @@ class AdminEventsController extends BaseApiController
                     false,
                     $tenantId
                 );
+                \App\Services\NotificationDispatcher::fanOutPush((int) ((int) $event->created_by), 'info', __('api_controllers_3.admin_bells.event_approved'), "/events/{$id}");
             }
         } catch (\Throwable $e) {
             Log::warning('Failed to send event approval notification', [

@@ -131,6 +131,7 @@ class HandleFederatedConnectionReceived implements ShouldQueue
                             false,
                             $event->tenantId
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) ($localUserId), 'federation_connection', $message, '/network');
                     }
                 });
 

@@ -438,6 +438,7 @@ class AdminVolunteerController extends BaseApiController
                                 true,
                                 $tenantId
                             );
+                            \App\Services\NotificationDispatcher::fanOutPush((int) $userId, 'vol_hours_approved', __('notifications.vol_hours_approved_paid_body', ['hours' => $hours]), '/wallet');
                             return;
                         }
 
@@ -880,6 +881,7 @@ class AdminVolunteerController extends BaseApiController
                             true,
                             $tenantId
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) $applicantId, 'moderation', __('api_controllers_3.admin_bells.volunteer_approved'), '/volunteering');
                     });
                 }
             } catch (\Throwable $e) {
@@ -982,6 +984,7 @@ class AdminVolunteerController extends BaseApiController
                             true,
                             $tenantId
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) $applicantId, 'moderation', __('api_controllers_3.admin_bells.volunteer_declined'), null);
                     });
                 }
             } catch (\Throwable $e) {

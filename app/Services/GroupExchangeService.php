@@ -605,6 +605,7 @@ class GroupExchangeService
                         '/wallet',
                         'transaction'
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'transaction', $message, '/wallet');
                 });
             } catch (\Throwable $e) {
                 // A bell failure must never unwind or mask the committed transfer.

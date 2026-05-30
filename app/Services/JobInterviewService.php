@@ -89,6 +89,7 @@ class JobInterviewService
                         "/jobs/{$application->vacancy_id}",
                         'job_application'
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) $candidateId, 'job_application', $interviewMsg, "/jobs/{$application->vacancy_id}");
                     RealtimeService::broadcastAndPush($candidateId, $interviewMsg, [
                         'type'      => 'job_interview_proposed',
                         'job_id'    => (int) $application->vacancy_id,
@@ -167,6 +168,7 @@ class JobInterviewService
                             "/jobs/{$interview->vacancy_id}/applications",
                             'job_application_status'
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) $posterId, 'job_application_status', $acceptMsg, "/jobs/{$interview->vacancy_id}/applications");
                         RealtimeService::broadcastAndPush((int) $posterId, $acceptMsg, [
                             'type'      => 'job_interview_accepted',
                             'job_id'    => (int) $interview->vacancy_id,
@@ -246,6 +248,7 @@ class JobInterviewService
                             "/jobs/{$interview->vacancy_id}/applications",
                             'job_application_status'
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) $posterId, 'job_application_status', $declineMsg, "/jobs/{$interview->vacancy_id}/applications");
                         RealtimeService::broadcastAndPush((int) $posterId, $declineMsg, [
                             'type'      => 'job_interview_declined',
                             'job_id'    => (int) $interview->vacancy_id,
@@ -369,6 +372,7 @@ class JobInterviewService
                             "/jobs/{$interview->vacancy_id}",
                             'job_application_status'
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) $candidateId, 'job_application_status', $cancelMsg, "/jobs/{$interview->vacancy_id}");
                         RealtimeService::broadcastAndPush((int) $candidateId, $cancelMsg, [
                             'type'      => 'job_interview_cancelled',
                             'job_id'    => (int) $interview->vacancy_id,
@@ -501,6 +505,7 @@ class JobInterviewService
                                         "/jobs/{$interview->vacancy_id}",
                                         'job_interview_proposed'
                                     );
+                                    \App\Services\NotificationDispatcher::fanOutPush((int) $candidateId, 'job_interview_proposed', $message, "/jobs/{$interview->vacancy_id}");
                                     RealtimeService::broadcastAndPush((int) $candidateId, __('emails_misc.jobs.interview_reminder_push_title'), [
                                         'type'      => 'job_interview_reminder',
                                         'job_id'    => (int) $interview->vacancy_id,
@@ -553,6 +558,7 @@ class JobInterviewService
                                         "/jobs/{$interview->vacancy_id}/applications",
                                         'job_interview_proposed'
                                     );
+                                    \App\Services\NotificationDispatcher::fanOutPush((int) $posterId, 'job_interview_proposed', $message, "/jobs/{$interview->vacancy_id}/applications");
                                     RealtimeService::broadcastAndPush((int) $posterId, __('emails_misc.jobs.interview_reminder_push_title'), [
                                         'type'      => 'job_interview_reminder',
                                         'job_id'    => (int) $interview->vacancy_id,

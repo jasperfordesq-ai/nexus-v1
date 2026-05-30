@@ -170,6 +170,7 @@ class AdminWalletGrantController extends BaseApiController
                 '/wallet',
                 'transaction'
             );
+            \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'transaction', __('api_controllers_3.wallet_admin.grant_received', ['amount' => $amount, 'unit' => $unit]), '/wallet');
         } catch (\Throwable $e) {
             \Log::warning('Admin grant notification failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
         }

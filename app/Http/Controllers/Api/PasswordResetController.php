@@ -258,6 +258,7 @@ class PasswordResetController extends BaseApiController
                     null,
                     'password_changed'
                 );
+                \App\Services\NotificationDispatcher::fanOutPush((int) ((int) $user['id']), 'password_changed', __('api_controllers_2.password_reset.changed_bell'), null);
             });
         } catch (\Throwable $e) {
             Log::warning('[PasswordReset] Failed to create password change notification: ' . $e->getMessage());

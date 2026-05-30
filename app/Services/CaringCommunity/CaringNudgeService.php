@@ -360,17 +360,25 @@ class CaringNudgeService
 
                     // Wrap the bell render + insert in the recipient's locale
                     // so the message is translated to their preferred_language.
+                    // Hoist the rendered body so the matching device push reuses
+                    // the SAME recipient-locale string (and __() is evaluated once
+                    // inside the locale closure, not twice / in the caller locale).
+                    $pushBody = '';
                     $notificationId = LocaleContext::withLocale(
                         $lang !== '' ? $lang : null,
-                        fn () => Notification::createNotification(
-                            $targetId,
-                            (string) __($notificationKey, $notificationParams),
-                            $url,
-                            'caring_smart_nudge',
-                            false,
-                            $tenantId,
-                        ),
+                        function () use ($targetId, $notificationKey, $notificationParams, $url, $tenantId, &$pushBody) {
+                            $pushBody = (string) __($notificationKey, $notificationParams);
+                            return Notification::createNotification(
+                                $targetId,
+                                $pushBody,
+                                $url,
+                                'caring_smart_nudge',
+                                false,
+                                $tenantId,
+                            );
+                        },
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($targetId), 'caring_smart_nudge', $pushBody, $url);
 
                     DB::table('caring_smart_nudges')
                         ->where('tenant_id', $tenantId)

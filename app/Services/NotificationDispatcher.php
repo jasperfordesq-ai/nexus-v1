@@ -124,16 +124,6 @@ class NotificationDispatcher
             }
         }
 
-        // 1b. DEVICE PUSH — fired here, decoupled from the email digest.
-        // Push is its own channel (own push_enabled pref, enforced inside the
-        // push services). It fires whenever a fresh bell is written, regardless
-        // of the email frequency setting below. Gated to the curated push-title
-        // allowlist (notifications.push_<type>) so routine bell writes do not all
-        // become device push, and internally deduped for 60s.
-        if ($bellCreated && !$isDuplicateBell) {
-            self::fanOutPush((int) $userId, (string) $activityType, (string) $content, $link, true);
-        }
-
         // 2. CHECK Notification Settings Hierarchy
         $frequency = self::getFrequencySetting($userId, $contextType, $contextId);
 
@@ -176,6 +166,19 @@ class NotificationDispatcher
             $frequency = 'instant';
         }
 
+        // 5b. DEVICE PUSH — a SEPARATE channel from the email digest (its own
+        // push_enabled pref, enforced inside the push services), fired as soon as
+        // a fresh bell exists and independent of whether the email queue insert
+        // below succeeds. For 'instant' notifications (critical types + members
+        // who opted into instant) push everything, falling back to the generic
+        // push title — this preserves the prior behaviour where new_message,
+        // connection_request, etc. pushed even though they have no curated title.
+        // For digest frequencies push only curated push-title types, so routine
+        // digest items don't all turn into device push. Deduped 60s in fanOutPush().
+        if ($bellCreated && !$isDuplicateBell) {
+            self::fanOutPush((int) $userId, (string) $activityType, (string) $content, $link, $frequency !== 'instant');
+        }
+
         // 6. TRAFFIC LIGHT LOGIC
         $queueSucceeded = true;
         switch ($frequency) {
@@ -185,8 +188,8 @@ class NotificationDispatcher
                 // digest preference: a member who had not opted into instant
                 // digest emails (the default is 'off') received no web/FCM push
                 // at all, even though push is a separate channel with its own
-                // push_enabled pref. Push now fires from fanOutPush() right after
-                // the bell is written — see step 1b above.
+                // push_enabled pref. Push now fires from fanOutPush() once the
+                // frequency is resolved — see step 5b above.
                 $queueSucceeded = self::queueNotification($userId, $activityType, $content, $link, 'instant', $htmlContent);
                 break;
 

@@ -1144,6 +1144,7 @@ class IdeationChallengeService
                 $link = '/ideation/' . $challengeId;
 
                 Notification::createNotification((int) $challenge->user_id, $message, $link, 'ideation_idea_submitted');
+                \App\Services\NotificationDispatcher::fanOutPush((int) ($challenge->user_id), 'ideation_idea_submitted', $message, $link);
 
                 if ($owner->email) {
                     try {
@@ -1232,6 +1233,7 @@ class IdeationChallengeService
                 $link = '/ideation/' . $challengeId;
 
                 Notification::createNotification($ideaAuthorId, $message, $link, 'ideation_idea_voted');
+                \App\Services\NotificationDispatcher::fanOutPush((int) ($ideaAuthorId), 'ideation_idea_voted', $message, $link);
 
                 if ($owner->email) {
                     $this->sendIdeationEmail(
@@ -1296,6 +1298,7 @@ class IdeationChallengeService
                 $link = '/ideation/' . $challengeId;
 
                 Notification::createNotification($ideaAuthorId, $message, $link, 'ideation_idea_commented');
+                \App\Services\NotificationDispatcher::fanOutPush((int) ($ideaAuthorId), 'ideation_idea_commented', $message, $link);
 
                 if ($owner->email) {
                     try {
@@ -1380,6 +1383,7 @@ class IdeationChallengeService
 
                 $type = $newStatus === 'winner' ? 'ideation_idea_won' : 'ideation_idea_status';
                 Notification::createNotification($ideaAuthorId, $message, $link, $type);
+                \App\Services\NotificationDispatcher::fanOutPush((int) ($ideaAuthorId), (string) $type, $message, $link);
 
                 if ($owner->email) {
                     $emailTitle = $newStatus === 'winner'

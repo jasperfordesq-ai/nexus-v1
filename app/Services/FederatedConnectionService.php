@@ -137,6 +137,7 @@ class FederatedConnectionService
                         true,
                         $receiverTenantId
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($receiverId), 'federation_connection', __('svc_notifications.federation.connection_request', ['sender' => $senderName, 'community' => $communityName]), '/connections');
                 });
             } catch (\Exception $notifEx) {
                 Log::warning('[FederatedConnection] sendRequest notification failed', [
@@ -219,6 +220,7 @@ class FederatedConnectionService
                         false,
                         (int) $connection->requester_tenant_id
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ((int) $connection->requester_user_id), 'federation_connection', __('svc_notifications.federation.connection_accepted', ['name' => $accepterName]), '/connections');
                 });
             } catch (\Exception $notifEx) {
                 Log::warning('[FederatedConnection] acceptRequest notification failed', [
@@ -295,6 +297,7 @@ class FederatedConnectionService
                         false,
                         (int) $connection->requester_tenant_id
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ((int) $connection->requester_user_id), 'federation_connection', __('svc_notifications.federation.connection_declined'), '/connections');
                 });
             } catch (\Exception $notifEx) {
                 Log::warning('[FederatedConnection] rejectRequest notification failed', [

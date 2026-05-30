@@ -129,6 +129,7 @@ class CreditDonationService
                         false,
                         $tenantId
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) $toUserId, 'transaction', $message, '/wallet');
                 });
             } catch (\Throwable $e) {
                 Log::warning('CreditDonationService: donation recipient bell failed: ' . $e->getMessage());

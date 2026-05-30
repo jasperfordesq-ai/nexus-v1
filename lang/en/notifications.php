@@ -178,6 +178,9 @@ return [
     'push_mutual_match'              => 'Mutual Match Found',
     'push_default'                   => 'New Notification',
 
+    'push_new_message' => 'New Message',
+    'push_connection_request' => 'New Connection Request',
+    'push_connection_accepted' => 'Connection Accepted',
     // =========================================================================
     // NotificationDispatcher — Match notifications
     // =========================================================================

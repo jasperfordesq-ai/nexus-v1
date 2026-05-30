@@ -320,6 +320,7 @@ class BadgeCollectionService
                     '/achievements',
                     'achievement'
                 );
+                \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'achievement', __('svc_notifications.badge_collection.collection_complete', ['name' => $collection->name, 'xp' => $collection->bonus_xp, 'icon' => $collection->icon]), '/achievements');
             });
         } catch (\Throwable $e) {
             Log::error('Failed to award collection completion: ' . $e->getMessage());

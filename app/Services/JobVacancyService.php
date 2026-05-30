@@ -1147,6 +1147,7 @@ class JobVacancyService
                         "/jobs/{$application->vacancy_id}",
                         'job_application'
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($applicantId), 'job_application', $message, "/jobs/{$application->vacancy_id}");
 
                     // Real-time broadcast to candidate
                     RealtimeService::broadcastAndPush($applicantId, $message, [

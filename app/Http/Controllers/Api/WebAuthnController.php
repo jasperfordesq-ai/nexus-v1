@@ -217,6 +217,7 @@ class WebAuthnController extends BaseApiController
                         null,
                         'passkey_registered'
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'passkey_registered', __('emails_security_alerts.passkey_registered.body', ['community' => TenantContext::get()['name'] ?? 'Project NEXUS']), null);
                 } catch (\Throwable $e) {
                     \Illuminate\Support\Facades\Log::warning("Failed to create passkey registered notification: " . $e->getMessage());
                 }
@@ -516,6 +517,7 @@ class WebAuthnController extends BaseApiController
                         null,
                         'passkey_removed'
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'passkey_removed', __('api_controllers_2.webauthn.passkey_removed_bell'), null);
                 } catch (\Throwable $e) {
                     Log::warning('[WebAuthn] Failed to create passkey removed notification: ' . $e->getMessage(), ['user_id' => $userId]);
                 }
@@ -613,6 +615,7 @@ class WebAuthnController extends BaseApiController
                             null,
                             'passkey_removed'
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'passkey_removed', __('api_controllers_2.webauthn.all_passkeys_removed_bell', ['count' => $count]), null);
                     } catch (\Throwable $e) {
                         Log::warning('[WebAuthn] Failed to create all-passkeys removed notification: ' . $e->getMessage(), ['user_id' => $userId]);
                     }

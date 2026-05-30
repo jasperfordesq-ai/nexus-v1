@@ -148,6 +148,7 @@ class TwoFactorController extends BaseApiController
                         null,
                         '2fa_enabled'
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), '2fa_enabled', __('api_controllers_2.two_factor.enabled_notification'), null);
                 } catch (\Throwable $e) {
                     Log::warning('[2FA] Failed to create 2FA enabled notification: ' . $e->getMessage(), ['user_id' => $userId]);
                 }
@@ -266,6 +267,7 @@ class TwoFactorController extends BaseApiController
                         null,
                         '2fa_disabled'
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), '2fa_disabled', __('api_controllers_2.two_factor.disabled_notification'), null);
                 } catch (\Throwable $e) {
                     Log::warning('[2FA] Failed to create 2FA disabled notification: ' . $e->getMessage(), ['user_id' => $userId]);
                 }

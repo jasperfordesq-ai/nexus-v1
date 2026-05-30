@@ -86,6 +86,7 @@ class SocialNotificationService
 
                 // 1. Create platform notification (bell)
                 Notification::createNotification((int) $contentOwnerId, $message, $link, 'like');
+                \App\Services\NotificationDispatcher::fanOutPush((int) ($contentOwnerId), 'like', $message, $link);
 
                 // 2. Send email notification (if user has email and hasn't opted out)
                 if ($ownerEmail && self::shouldSendEmail($contentOwnerId, 'like')) {
@@ -141,6 +142,7 @@ class SocialNotificationService
 
                 // 1. Create platform notification (bell)
                 Notification::createNotification((int) $contentOwnerId, $message, $link, 'comment');
+                \App\Services\NotificationDispatcher::fanOutPush((int) ($contentOwnerId), 'comment', $message, $link);
 
                 // 2. Send email notification (if user has email and hasn't opted out)
                 if ($ownerEmail && self::shouldSendEmail($contentOwnerId, 'comment')) {
@@ -197,6 +199,7 @@ class SocialNotificationService
                 $message = __('notifications.replied_to_your_comment', ['name' => $replierName, 'comment' => $shortReply]);
 
                 Notification::createNotification((int) $commentOwnerId, $message, $link, 'comment_reply');
+                \App\Services\NotificationDispatcher::fanOutPush((int) ($commentOwnerId), 'comment_reply', $message, $link);
 
                 if ($ownerEmail && self::shouldSendEmail($commentOwnerId, 'comment')) {
                     TenantContext::runForTenant((int) $owner->tenant_id, function () use ($owner, $replier, $contentType, $replyText, $link) {
@@ -248,6 +251,7 @@ class SocialNotificationService
 
                 // 1. Create platform notification (bell)
                 Notification::createNotification((int) $contentOwnerId, $message, $link, 'share');
+                \App\Services\NotificationDispatcher::fanOutPush((int) ($contentOwnerId), 'share', $message, $link);
 
                 // 2. Send email notification (if user has email and hasn't opted out)
                 if ($ownerEmail && self::shouldSendEmail($contentOwnerId, 'share')) {

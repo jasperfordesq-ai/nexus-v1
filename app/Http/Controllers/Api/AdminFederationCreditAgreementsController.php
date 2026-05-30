@@ -199,6 +199,7 @@ class AdminFederationCreditAgreementsController extends BaseApiController
                         true,
                         $partnerTenantId
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ((int) $admin->id), 'federation_credit_agreement_' . $action, __('api_controllers_3.federation_credit.action_taken', ['tenant' => $tenantName, 'action' => $label]), '/admin/federation');
                 }
             } catch (\Exception $e) {
                 Log::warning('[FederationCreditAgreement] Failed to notify partner admins', [

@@ -59,6 +59,7 @@ class JobTeamService
                         "/jobs/{$vacancyId}",
                         'job_application'
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($targetUserId), 'job_application', __('svc_notifications.job_team.added_as_role', ['role' => $role, 'title' => $vacancy->title]), "/jobs/{$vacancyId}");
                 });
             } catch (\Throwable $e) {
                 Log::warning('JobTeamService::addMember notification failed: ' . $e->getMessage());

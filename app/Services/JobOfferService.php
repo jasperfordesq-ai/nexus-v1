@@ -91,6 +91,7 @@ class JobOfferService
                         "/jobs/{$application->vacancy_id}",
                         'job_application_status'
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) $candidateId, 'job_application_status', __('svc_notifications.job_offer.received_bell', ['title' => $jobTitle]), "/jobs/{$application->vacancy_id}");
                     RealtimeService::broadcastAndPush($candidateId, __('svc_notifications.job_offer.received_push_title'), [
                         'type'      => 'job_offer_received',
                         'job_id'    => (int) $application->vacancy_id,
@@ -202,6 +203,7 @@ class JobOfferService
                             '/wallet',
                             'transaction'
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) $candidateId, 'transaction', __('svc_notifications.job_offer.credits_earned_bell', ['amount' => $creditAmount, 'title' => $jobTitle]), '/wallet');
                         RealtimeService::broadcastAndPush($candidateId, __('svc_notifications.job_offer.credits_earned_push_title'), [
                             'type'      => 'job_completion_credits',
                             'amount'    => $creditAmount,
@@ -233,6 +235,7 @@ class JobOfferService
                             "/jobs/{$offer->vacancy_id}/applications",
                             'job_application_status'
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) $posterId, 'job_application_status', __('svc_notifications.job_offer.accepted_bell', ['title' => $jobTitle]), "/jobs/{$offer->vacancy_id}/applications");
                         RealtimeService::broadcastAndPush((int) $posterId, __('svc_notifications.job_offer.accepted_push_title', ['title' => $jobTitle]), [
                             'type'      => 'job_offer_accepted',
                             'job_id'    => (int) $offer->vacancy_id,
@@ -316,6 +319,7 @@ class JobOfferService
                             "/jobs/{$offer->vacancy_id}/applications",
                             'job_application_status'
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) $posterId, 'job_application_status', __('svc_notifications.job_offer.rejected_bell', ['title' => $jobTitle]), "/jobs/{$offer->vacancy_id}/applications");
                         RealtimeService::broadcastAndPush((int) $posterId, __('svc_notifications.job_offer.rejected_push_title', ['title' => $jobTitle]), [
                             'type'      => 'job_offer_rejected',
                             'job_id'    => (int) $offer->vacancy_id,
@@ -384,6 +388,7 @@ class JobOfferService
                             "/jobs/{$offer->vacancy_id}",
                             'job_application_status'
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) $candidateId, 'job_application_status', __('svc_notifications.job_offer.withdrawn_bell', ['title' => $jobTitle]), "/jobs/{$offer->vacancy_id}");
                         RealtimeService::broadcastAndPush((int) $candidateId, __('svc_notifications.job_offer.withdrawn_push_title', ['title' => $jobTitle]), [
                             'type'      => 'job_offer_withdrawn',
                             'job_id'    => (int) $offer->vacancy_id,

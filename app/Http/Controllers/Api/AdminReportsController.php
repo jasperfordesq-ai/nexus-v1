@@ -245,6 +245,7 @@ class AdminReportsController extends BaseApiController
                     'moderation',
                     false
                 );
+                \App\Services\NotificationDispatcher::fanOutPush((int) ($reporterId), 'moderation', __('api_controllers_3.admin_bells.report_resolved'), $link);
             }
         } catch (\Throwable $e) {
             Log::warning("AdminReportsController::resolve notification failed: " . $e->getMessage());
@@ -301,6 +302,7 @@ class AdminReportsController extends BaseApiController
                     'moderation',
                     false
                 );
+                \App\Services\NotificationDispatcher::fanOutPush((int) ($reporterId), 'moderation', __('api_controllers_3.admin_bells.report_reviewed'), null);
             }
         } catch (\Throwable $e) {
             Log::warning("AdminReportsController::dismiss notification failed: " . $e->getMessage());

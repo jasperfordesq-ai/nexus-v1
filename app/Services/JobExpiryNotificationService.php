@@ -121,6 +121,7 @@ class JobExpiryNotificationService
                                         false,
                                         (int) $vacancy->tenant_id
                                     );
+                                    \App\Services\NotificationDispatcher::fanOutPush((int) $vacancy->user_id, 'job_expiry', __('notifications.job_expiring_soon', ['title' => $vacancy->title, 'days' => $daysLeft]), "/jobs/{$vacancy->id}");
                                 }
                             });
 

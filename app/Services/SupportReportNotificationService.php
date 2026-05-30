@@ -134,6 +134,10 @@ class SupportReportNotificationService
                 true,
                 (int) $report->tenant_id,
             );
+            \App\Services\NotificationDispatcher::fanOutPush((int) ((int) $admin->id), 'support_report', __('emails.support_report.created_bell', [
+                'reference' => $report->reference,
+                'summary' => $report->summary,
+            ]), $adminPath);
         } catch (\Throwable $e) {
             Log::warning('[SupportReportNotificationService] bell notification failed', [
                 'report_id' => $report->id,

@@ -68,6 +68,7 @@ class AdminFederationController extends BaseApiController
                         true,
                         $partnerTenantId
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ((int) $admin->id), (string) $type, $message, $link);
                 });
             }
         } catch (\Exception $e) {

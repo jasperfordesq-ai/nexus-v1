@@ -171,6 +171,7 @@ class IdeaTeamConversionService
                                 "/groups/{$groupId}",
                                 'group_added'
                             );
+                            \App\Services\NotificationDispatcher::fanOutPush((int) ($idea->user_id), 'group_added', __('svc_notifications.idea_team.added_to_group', ['group' => $groupName]), "/groups/{$groupId}");
                         });
                     } catch (\Throwable $e) {
                         Log::warning('IdeaTeamConversionService: failed to notify added user', [

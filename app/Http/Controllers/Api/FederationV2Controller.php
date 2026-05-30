@@ -1973,6 +1973,7 @@ class FederationV2Controller extends BaseApiController
                     true,
                     (int)$receiverTenantId  // Receiver's tenant, not sender's
                 );
+                \App\Services\NotificationDispatcher::fanOutPush((int) (int)$receiverId, 'federation_message', $notifMessage, '/federation/messages');
 
                 DB::update(
                     "UPDATE federation_messages
@@ -2665,6 +2666,7 @@ class FederationV2Controller extends BaseApiController
                         false,
                         $receiverTenantIdInt
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) $receiverIdInt, 'federation_transaction', $notifyMessage, '/wallet');
                 });
             } catch (\Throwable $bellEx) {
                 \Illuminate\Support\Facades\Log::warning('FederationV2::sendTransaction in-app bell failed', [

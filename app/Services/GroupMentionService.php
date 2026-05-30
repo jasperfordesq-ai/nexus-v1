@@ -106,6 +106,7 @@ class GroupMentionService
                         $link,
                         'group_mention'
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($mention['user_id']), 'group_mention', __('svc_notifications.group_mention.mentioned_in_group', ['group' => $groupName]), $link);
                 });
             } catch (\Exception $e) {
                 Log::debug("GroupMentionService::notifyMentioned error: " . $e->getMessage());

@@ -90,6 +90,7 @@ class AdminListingsService
                         true,
                         $tenantId
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($listing->user_id), 'listing_approved', __('emails_listings.listings.approved.notification_short', ['title' => $safeTitle]), "/listings/{$listingId}");
                 } catch (\Throwable $e) {
                     Log::warning("AdminListingsService::approve bell notification failed for listing #{$listingId}: " . $e->getMessage());
                 }
@@ -179,6 +180,7 @@ class AdminListingsService
                         true,
                         $tenantId
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($listing->user_id), 'listing_rejected', $bellMsg, "/listings/{$listingId}");
                 } catch (\Throwable $e) {
                     Log::warning("AdminListingsService::reject bell notification failed for listing #{$listingId}: " . $e->getMessage());
                 }

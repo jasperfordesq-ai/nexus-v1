@@ -513,6 +513,15 @@ class JobVacanciesController extends BaseApiController
                         "/jobs/{$id}/applications",
                         'job_application'
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush(
+                        (int) ($job->user_id),
+                        'job_application',
+                        __('svc_notifications.job_application.owner_applied', [
+                            'name' => $applicantName,
+                            'title' => $job->title,
+                        ]),
+                        "/jobs/{$id}/applications"
+                    );
                 });
             }
         } catch (\Throwable $e) {

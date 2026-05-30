@@ -307,6 +307,7 @@ class ReviewService
                     false,
                     $tenantId
                 );
+                \App\Services\NotificationDispatcher::fanOutPush((int) ($receiverId), 'review', __('notifications.review_received_in_app', ['name' => $reviewerName, 'rating' => $rating]), '/reviews');
 
                 NotificationDispatcher::sendReviewEmail(
                     $receiverId,

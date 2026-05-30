@@ -213,12 +213,14 @@ class CommentsController extends BaseApiController
                     LocaleContext::withLocale($recipient, function () use ($reactor, $comment) {
                         $reactorName = $reactor ? trim(($reactor->first_name ?? '') . ' ' . ($reactor->last_name ?? '')) : __('emails.common.fallback_someone');
                         $message = __('api_controllers_3.comments.reaction', ['name' => $reactorName]);
+                        $pushLink = SocialNotificationService::getContentLink('comment', (int) $comment->id);
                         Notification::createNotification(
                             (int) $comment->user_id,
                             $message,
-                            SocialNotificationService::getContentLink('comment', (int) $comment->id),
+                            $pushLink,
                             'reaction'
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) $comment->user_id, 'reaction', $message, $pushLink);
                     });
                 }
             } catch (\Throwable $e) {

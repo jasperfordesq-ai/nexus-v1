@@ -98,6 +98,7 @@ class NotifyAdminOfNewListing implements ShouldQueue
                         'poster' => $posterName,
                     ]);
                     Notification::createNotification((int) $admin->id, $bellContent, '/listings/' . $listing->id, 'new_listing_created');
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($admin->id), 'new_listing_created', $bellContent, '/listings/' . $listing->id);
 
                     if ($skipEmailFanout) {
                         return;

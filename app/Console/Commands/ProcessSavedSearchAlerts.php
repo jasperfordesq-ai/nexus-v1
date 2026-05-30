@@ -183,6 +183,7 @@ class ProcessSavedSearchAlerts extends Command
             type: 'saved_search_alert',
             tenantId: $tenantId,
         );
+        \App\Services\NotificationDispatcher::fanOutPush((int) ($search->user_id), 'saved_search_alert', $message, $link);
 
         // Update the saved search timestamps
         DB::table('saved_searches')

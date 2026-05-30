@@ -508,6 +508,7 @@ class GamificationService
                 '/profile',
                 'achievement'
             );
+            \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'achievement', __('svc_notifications.gamification.badge_earned', ['name' => $badge['name'], 'icon' => $badge['icon']]), '/profile');
         });
 
         // Broadcast badge earned event
@@ -663,6 +664,7 @@ class GamificationService
                         '/profile',
                         'achievement'
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'achievement', __('svc_notifications.gamification.level_up', ['level' => $newLevel]), '/profile');
                 });
 
                 // Broadcast level up event

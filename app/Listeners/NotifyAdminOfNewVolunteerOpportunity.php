@@ -100,6 +100,7 @@ class NotifyAdminOfNewVolunteerOpportunity implements ShouldQueue
 
                         $bellContent = __('emails_misc.admin_notify.new_vol_opp_bell', ['title' => $oppTitle]);
                         Notification::createNotification((int) $admin->id, $bellContent, $oppPath, 'new_vol_opp_created');
+                        \App\Services\NotificationDispatcher::fanOutPush((int) ((int) $admin->id), 'new_vol_opp_created', $bellContent, $oppPath);
 
                         $subject = __('emails_misc.admin_notify.new_vol_opp_subject', ['community' => $tenantName]);
 

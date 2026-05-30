@@ -376,6 +376,7 @@ class VolOrgWalletService
                         $walletLink,
                         'volunteer_payment'
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($volunteerId), 'volunteer_payment', $message, $walletLink);
                 });
             } catch (\Throwable $e) {
                 Log::warning('[VolOrgWalletService] payVolunteer bell error: ' . $e->getMessage(), ['volunteer_id' => $volunteerId]);
@@ -506,6 +507,7 @@ class VolOrgWalletService
                             $dashboardLink,
                             'admin_adjustment'
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) ((int) $recipient->id), 'admin_adjustment', $message, $dashboardLink);
                     });
                 }
             } catch (\Throwable $e) {

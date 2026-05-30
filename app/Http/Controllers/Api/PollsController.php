@@ -217,6 +217,7 @@ class PollsController extends BaseApiController
                     $pollTitle = $pollModel->question ?? 'your poll';
                     $message = __('api_controllers_3.polls.vote_received', ['name' => $voterName, 'title' => $pollTitle]);
                     Notification::createNotification((int) $pollModel->user_id, $message, "/polls/{$id}", 'poll_vote');
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ((int) $pollModel->user_id), 'poll_vote', $message, "/polls/{$id}");
                 });
             }
         } catch (\Throwable $e) {
@@ -260,6 +261,7 @@ class PollsController extends BaseApiController
                     $pollTitle = $pollModel->question ?? 'your poll';
                     $message = __('api_controllers_3.polls.ranking_received', ['name' => $rankerName, 'title' => $pollTitle]);
                     Notification::createNotification((int) $pollModel->user_id, $message, "/polls/{$id}", 'poll_vote');
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ((int) $pollModel->user_id), 'poll_vote', $message, "/polls/{$id}");
                 });
             }
         } catch (\Throwable $e) {

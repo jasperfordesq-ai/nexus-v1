@@ -205,6 +205,7 @@ class VolunteerEmergencyAlertService
                                 'volunteer_emergency_filled',
                                 true
                             );
+                            \App\Services\NotificationDispatcher::fanOutPush((int) ($alert->created_by), 'volunteer_emergency_filled', __('api.vol_alert_filled_bell', ['name' => $userName]), '/volunteering');
                         });
                     });
                 } catch (\Throwable $e) {
@@ -491,19 +492,22 @@ class VolunteerEmergencyAlertService
             try {
                 $priorityLabel = strtoupper($priority);
                 $bellCreated = TenantContext::runForTenant($tenantId, function () use ($candidate, $priorityLabel, $message, $shiftDate, $tenantId): bool {
-                    return (bool) LocaleContext::withLocale($candidate, function () use ($candidate, $priorityLabel, $message, $shiftDate, $tenantId): bool {
-                        return \App\Models\Notification::createNotification(
+                    return (bool) LocaleContext::withLocale($candidate, function () use ($candidate, $priorityLabel, $message, $shiftDate, $tenantId) {
+                        $pushBody = __('api.vol_alert_request_bell', [
+                            'priority' => $priorityLabel,
+                            'message' => $message,
+                            'date' => $shiftDate,
+                        ]);
+                        $bellId = \App\Models\Notification::createNotification(
                             (int) $candidate->user_id,
-                            __('api.vol_alert_request_bell', [
-                                'priority' => $priorityLabel,
-                                'message' => $message,
-                                'date' => $shiftDate,
-                            ]),
+                            $pushBody,
                             '/volunteering',
                             'volunteer_emergency',
                             true,
                             $tenantId
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) ($candidate->user_id), 'volunteer_emergency', $pushBody, '/volunteering');
+                        return $bellId;
                     });
                 });
 

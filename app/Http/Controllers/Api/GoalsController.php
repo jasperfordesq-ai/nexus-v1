@@ -258,6 +258,7 @@ class GoalsController extends BaseApiController
                             "/goals/{$id}",
                             'goal_completed'
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) $mentorId, 'goal_completed', __('api_controllers_3.goals.completed_mentor', ['name' => $ownerName, 'title' => $goalTitle]), "/goals/{$id}");
                     } else {
                         Notification::createNotification(
                             $mentorId,
@@ -265,6 +266,7 @@ class GoalsController extends BaseApiController
                             "/goals/{$id}",
                             'goal_progress'
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) $mentorId, 'goal_progress', __('api_controllers_3.goals.progress_mentor', ['name' => $ownerName, 'title' => $goalTitle]), "/goals/{$id}");
                     }
                 });
             }
@@ -281,6 +283,7 @@ class GoalsController extends BaseApiController
                     "/goals/{$id}",
                     'goal_completed'
                 );
+                \App\Services\NotificationDispatcher::fanOutPush((int) $userId, 'goal_completed', __('api_controllers_3.goals.completed_self', ['title' => $goal->title]), "/goals/{$id}");
             }
         } catch (\Throwable $e) {
             \Log::warning('Goal auto-completion notification failed', ['goal' => $id, 'error' => $e->getMessage()]);
@@ -323,6 +326,7 @@ class GoalsController extends BaseApiController
                 "/goals/{$id}",
                 'goal_completed'
             );
+            \App\Services\NotificationDispatcher::fanOutPush((int) $userId, 'goal_completed', __('api_controllers_3.goals.completed_self', ['title' => $goalTitle]), "/goals/{$id}");
         } catch (\Throwable $e) {
             \Log::warning('Goal completion notification failed', ['goal' => $id, 'error' => $e->getMessage()]);
         }
@@ -341,6 +345,7 @@ class GoalsController extends BaseApiController
                         "/goals/{$id}",
                         'goal_completed'
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) $mentorId, 'goal_completed', __('api_controllers_3.goals.completed_mentor', ['name' => $ownerName, 'title' => $goal->title]), "/goals/{$id}");
                 });
             }
         } catch (\Throwable $e) {
@@ -438,6 +443,7 @@ class GoalsController extends BaseApiController
                         "/goals/{$id}",
                         'goal_buddy'
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) $goalOwnerId, 'goal_buddy', __('api_controllers_3.goals.buddy_joined_owner', ['name' => $buddyName, 'title' => $goal->title]), "/goals/{$id}");
                 });
             }
         } catch (\Throwable $e) {
@@ -468,16 +474,18 @@ class GoalsController extends BaseApiController
                 $owner = User::find($ownerId);
                 LocaleContext::withLocale($owner, function () use ($buddy, $goal, $ownerId, $id, $note) {
                     $buddyName = $buddy->name ?? __('emails.common.fallback_someone');
+                    $pushBody = __('api_controllers_3.goals.buddy_action_owner', [
+                        'name' => $buddyName,
+                        'title' => $goal->title,
+                        'action' => __('api_controllers_3.goals.buddy_action_' . ($note['type'] ?? 'encouragement')),
+                    ]);
                     Notification::createNotification(
                         $ownerId,
-                        __('api_controllers_3.goals.buddy_action_owner', [
-                            'name' => $buddyName,
-                            'title' => $goal->title,
-                            'action' => __('api_controllers_3.goals.buddy_action_' . ($note['type'] ?? 'encouragement')),
-                        ]),
+                        $pushBody,
                         "/goals/{$id}",
                         'goal_buddy'
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) $ownerId, 'goal_buddy', $pushBody, "/goals/{$id}");
                 });
             }
         } catch (\Throwable $e) {

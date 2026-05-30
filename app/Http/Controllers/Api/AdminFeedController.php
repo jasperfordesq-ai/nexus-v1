@@ -303,6 +303,7 @@ class AdminFeedController extends BaseApiController
                     false,
                     $itemTenantId
                 );
+                \App\Services\NotificationDispatcher::fanOutPush((int) ((int) $feedItem->user_id), 'moderation', __('api_controllers_3.admin_bells.post_hidden'), null);
             }
         } catch (\Throwable $e) {
             Log::warning("AdminFeedController::hide notification failed for {$sourceType} #{$id}: " . $e->getMessage());
@@ -384,6 +385,7 @@ class AdminFeedController extends BaseApiController
                     false,
                     $itemTenantId
                 );
+                \App\Services\NotificationDispatcher::fanOutPush((int) ($creatorUserId), 'moderation', __('api_controllers_3.admin_bells.post_removed'), null);
             } catch (\Throwable $e) {
                 Log::warning("AdminFeedController::destroy notification failed for {$sourceType} #{$id}: " . $e->getMessage());
             }

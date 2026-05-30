@@ -386,6 +386,7 @@ class AdminUsersController extends BaseApiController
                             'system',
                             true
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) $id, 'system', __('api_controllers_3.admin_bells.account_suspended'), null);
                     });
                 } elseif ($statusForNotification === 'banned') {
                     LocaleContext::withLocale($recipientLocale, function () use ($id) {
@@ -396,6 +397,7 @@ class AdminUsersController extends BaseApiController
                             'system',
                             true
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) $id, 'system', __('api_controllers_3.admin_bells.account_banned'), null);
                     });
                 }
             } catch (\Throwable $e) {
@@ -822,6 +824,7 @@ class AdminUsersController extends BaseApiController
                     'security',
                     true
                 );
+                \App\Services\NotificationDispatcher::fanOutPush((int) $id, 'security', __('emails_misc.admin_actions.reset_2fa_bell'), '/settings/security');
             });
         } catch (\Throwable $e) {
             Log::warning("[AdminUsers] Failed to create 2FA reset bell notification for user #{$id}: " . $e->getMessage());
@@ -896,6 +899,7 @@ class AdminUsersController extends BaseApiController
                     'achievement',
                     false
                 );
+                \App\Services\NotificationDispatcher::fanOutPush((int) $id, 'achievement', "You've been awarded the {$badgeDisplayName} badge!", '/achievements');
             } catch (\Throwable $e) {
                 Log::warning("[AdminUsers] Failed to create badge award bell notification for user #{$id}: " . $e->getMessage());
             }
@@ -937,6 +941,7 @@ class AdminUsersController extends BaseApiController
                 'system',
                 false
             );
+            \App\Services\NotificationDispatcher::fanOutPush((int) $id, 'system', "The {$badgeDisplayName} badge has been removed from your profile.", '/achievements');
         } catch (\Throwable $e) {
             Log::warning("[AdminUsers] Failed to create badge removal bell notification for user #{$id}: " . $e->getMessage());
         }
@@ -1204,6 +1209,7 @@ class AdminUsersController extends BaseApiController
                         'system',
                         true
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) $id, 'system', $message, null);
                 });
             } catch (\Throwable $e) {
                 Log::warning("[AdminUsers] Failed to create super admin role change notification for user #{$id}: " . $e->getMessage());
@@ -1278,6 +1284,7 @@ class AdminUsersController extends BaseApiController
                         'system',
                         true
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) $id, 'system', $message, null);
                 });
             } catch (\Throwable $e) {
                 Log::warning("[AdminUsers] Failed to create global super admin role change notification for user #{$id}: " . $e->getMessage());
@@ -1743,6 +1750,7 @@ class AdminUsersController extends BaseApiController
                     'system',
                     true
                 );
+                \App\Services\NotificationDispatcher::fanOutPush((int) $id, 'system', __('emails_misc.admin_actions.suspension_bell'), null);
             });
         } catch (\Throwable $e) {
             Log::warning("[AdminUsers] Failed to create suspension bell notification for user #{$id}: " . $e->getMessage());
@@ -1958,6 +1966,7 @@ class AdminUsersController extends BaseApiController
                     true,
                     $tenant['tenant_id']
                 );
+                \App\Services\NotificationDispatcher::fanOutPush((int) $user['id'], 'system', $message, '/dashboard');
             });
         } catch (\Throwable $e) {
             try { \Illuminate\Support\Facades\Log::warning("[AdminUsers] Failed to create approval notification for user #{$user['id']}: " . $e->getMessage()); } catch (\Throwable) {}
@@ -2032,6 +2041,7 @@ class AdminUsersController extends BaseApiController
                     true,
                     $tenant['tenant_id']
                 );
+                \App\Services\NotificationDispatcher::fanOutPush((int) $user['id'], 'system', __('api_controllers_3.admin_bells.account_reactivated', ['community' => $tenant['name']]), '/dashboard');
             });
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning("[AdminUsers] Failed to create reactivation notification for user #{$user['id']}: " . $e->getMessage());

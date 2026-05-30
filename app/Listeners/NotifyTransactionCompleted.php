@@ -70,12 +70,14 @@ class NotifyTransactionCompleted implements ShouldQueue
                 }
 
                 self::deliverTransactionBell((int) $transaction->id, (int) $receiver->id, 'credit_received', function () use ($receiver, $content): int {
-                    return Notification::createNotification(
+                    $bellId = Notification::createNotification(
                         $receiver->id,
                         $content,
                         '/wallet',
                         'transaction'
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($receiver->id), 'transaction', $content, '/wallet');
+                    return $bellId;
                 });
 
                 $emailEnabled = true;

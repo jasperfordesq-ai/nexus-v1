@@ -107,6 +107,7 @@ class AppreciationService
                 $displayName = $senderName ?: __('notifications.appreciation_someone');
                 $message = __('notifications.appreciation_received', ['name' => $displayName]);
                 Notification::createNotification((int) $appreciation->receiver_id, $message, $link, 'appreciation');
+                \App\Services\NotificationDispatcher::fanOutPush((int) $appreciation->receiver_id, 'appreciation', $message, $link);
             });
 
             // Send mail (LocaleContext is wrapped inside the Mailable).

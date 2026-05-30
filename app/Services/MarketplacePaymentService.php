@@ -1078,6 +1078,7 @@ class MarketplacePaymentService
                     '/marketplace/seller/dashboard',
                     'marketplace_payout'
                 );
+                \App\Services\NotificationDispatcher::fanOutPush((int) $sellerId, 'marketplace_payout', __('svc_notifications.marketplace_payout.onboarding_complete_bell'), '/marketplace/seller/dashboard');
             });
         } catch (\Throwable $e) {
             Log::warning('[MarketplacePaymentService] onboarding-complete bell failed', [

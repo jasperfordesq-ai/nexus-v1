@@ -166,6 +166,7 @@ class MentionService
                         $link,
                         'mention'
                     );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($mentionedUserId), 'mention', $message, $link);
                 });
             } catch (\Exception $e) {
                 // Ignore duplicate mention errors, log others

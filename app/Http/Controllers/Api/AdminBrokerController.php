@@ -1229,6 +1229,7 @@ class AdminBrokerController extends BaseApiController
                             ? __('api_controllers_3.admin_bells.monitoring_restricted')
                             : __('api_controllers_3.admin_bells.monitoring_under_review');
                         Notification::createNotification($userId, $msg, '/messages', 'system', true);
+                        \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'system', $msg, '/messages');
                     });
                 } catch (\Throwable $e) { \Log::warning('[AdminBroker] monitoring notification failed', ['user_id' => $userId, 'error' => $e->getMessage()]); }
 
@@ -1267,6 +1268,7 @@ class AdminBrokerController extends BaseApiController
                 try {
                     LocaleContext::withLocale($user, function () use ($userId) {
                         Notification::createNotification($userId, __('api_controllers_3.admin_bells.monitoring_lifted'), '/messages', 'system', true);
+                        \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'system', __('api_controllers_3.admin_bells.monitoring_lifted'), '/messages');
                     });
                 } catch (\Throwable $e) { \Log::warning('[AdminBroker] restrictions-lifted notification failed', ['user_id' => $userId, 'error' => $e->getMessage()]); }
 

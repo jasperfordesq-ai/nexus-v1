@@ -285,6 +285,7 @@ class PartnerV1Controller extends BaseApiController
                     false,
                     $tenantId
                 );
+                \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'transaction', __('notifications.credit_received', ['name' => $partnerName, 'amount' => round($hours, 2)]), '/wallet');
                 NotificationDispatcher::sendCreditEmail($userId, $partnerName, round($hours, 2), $note);
             } catch (\Throwable $e) {
                 \Illuminate\Support\Facades\Log::warning('Partner wallet credit notification failed', [

@@ -365,6 +365,7 @@ class SafeguardingService
                             true,
                             $tenantId
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) ((int) $record->user_id), 'moderation', __('emails_misc.safeguarding.training_verified', ['training_name' => $trainingName]), '/dashboard');
 
                         if ($trainee && !empty($trainee->email)) {
                             $traineeName  = trim(($trainee->first_name ?? '') . ' ' . ($trainee->last_name ?? '')) ?: ($trainee->name ?? '');
@@ -443,6 +444,7 @@ class SafeguardingService
                             true,
                             $tenantId
                         );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) ((int) $record->user_id), 'moderation', __('emails_misc.safeguarding.training_not_approved', ['training_name' => $trainingName]), '/help');
 
                         if ($trainee && !empty($trainee->email)) {
                             $traineeName  = trim(($trainee->first_name ?? '') . ' ' . ($trainee->last_name ?? '')) ?: ($trainee->name ?? '');

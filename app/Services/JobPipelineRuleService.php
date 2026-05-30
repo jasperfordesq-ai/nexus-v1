@@ -160,6 +160,7 @@ class JobPipelineRuleService
                                     "/jobs/{$vacancyId}",
                                     'job_application_status'
                                 );
+                                \App\Services\NotificationDispatcher::fanOutPush((int) ((int) $app->user_id), 'job_application_status', __('svc_notifications.job_application.status_updated_generic'), "/jobs/{$vacancyId}");
                             });
                             $actioned++;
                         } elseif ($rule->action === 'notify_reviewer') {
@@ -174,6 +175,7 @@ class JobPipelineRuleService
                                         "/jobs/{$vacancyId}/kanban",
                                         'job_application'
                                     );
+                                    \App\Services\NotificationDispatcher::fanOutPush((int) ((int) $vacancy->user_id), 'job_application', __('svc_notifications.job_application.stuck_in_stage', ['id' => $app->id, 'stage' => $rule->trigger_stage, 'days' => $rule->condition_days]), "/jobs/{$vacancyId}/kanban");
                                 });
                             }
                             $actioned++;

@@ -37,6 +37,7 @@ class CourseNotificationService
             LocaleContext::withLocale($user, function () use ($course, $userId) {
                 $message = __('svc_notifications_2.course.enrolled', ['title' => $course->title]);
                 Notification::createNotification($userId, $message, self::courseUrl($course->slug), 'course');
+                \App\Services\NotificationDispatcher::fanOutPush((int) $userId, 'course', $message, self::courseUrl($course->slug));
             });
         } catch (\Throwable $e) {
             Log::warning('[CourseNotification] enrolled failed', ['error' => $e->getMessage()]);
@@ -59,6 +60,7 @@ class CourseNotificationService
                 // In-app
                 $message = __('svc_notifications_2.course.completed', ['title' => $course->title]);
                 Notification::createNotification($userId, $message, $link, 'course');
+                \App\Services\NotificationDispatcher::fanOutPush((int) $userId, 'course', $message, $link);
 
                 // Email (best-effort)
                 if (!empty($user->email)) {

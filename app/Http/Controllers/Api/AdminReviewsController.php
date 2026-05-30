@@ -288,6 +288,7 @@ class AdminReviewsController extends BaseApiController
                     true,
                     $reviewTenantId
                 );
+                \App\Services\NotificationDispatcher::fanOutPush((int) $reviewerId, 'moderation', __('api_controllers_3.admin_bells.review_hidden'), null);
             }
         } catch (\Throwable $e) {
             Log::warning("AdminReviewsController::hide notification failed: " . $e->getMessage());
@@ -337,6 +338,7 @@ class AdminReviewsController extends BaseApiController
                     true,
                     $reviewTenantId
                 );
+                \App\Services\NotificationDispatcher::fanOutPush((int) $reviewerId, 'moderation', __('api_controllers_3.admin_bells.review_removed'), null);
             }
         } catch (\Throwable $e) {
             Log::warning("AdminReviewsController::destroy notification failed: " . $e->getMessage());
