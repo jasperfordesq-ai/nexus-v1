@@ -15,7 +15,7 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, CardBody, Input, Textarea, Select, SelectItem, Switch } from '@/components/ui';
+import { Button, Card, CardBody, Input, Textarea, Select, SelectItem } from '@/components/ui';
 import Plus from 'lucide-react/icons/plus';
 import Trash2 from 'lucide-react/icons/trash-2';
 import ChevronUp from 'lucide-react/icons/chevron-up';
@@ -200,7 +200,6 @@ function LessonRow({ courseId, lesson, isFirst, isLast, onChange, onDelete, onMo
       video_url: draft.video_url,
       embed_url: draft.embed_url,
       attachment_url: draft.attachment_url,
-      is_preview: draft.is_preview,
     });
     setSaving(false);
     if (res.success) {
@@ -247,11 +246,6 @@ function LessonRow({ courseId, lesson, isFirst, isLast, onChange, onDelete, onMo
           {draft.content_type === 'pdf' ? (
             <Input size="sm" label={t('builder.attachment_url')} placeholder="https://…" value={draft.attachment_url ?? ''} onValueChange={(v) => set({ attachment_url: v })} />
           ) : null}
-
-          <div className="flex items-center gap-2">
-            <Switch isSelected={!!draft.is_preview} onValueChange={(v) => set({ is_preview: v })} aria-label={t('builder.free_preview')} />
-            <span className="text-sm">{t('builder.free_preview')}</span>
-          </div>
 
           <div>
             <Button size="sm" color="primary" isLoading={saving} onPress={save}>{t('builder.save_lesson')}</Button>

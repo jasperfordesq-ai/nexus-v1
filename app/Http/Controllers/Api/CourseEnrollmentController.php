@@ -48,22 +48,9 @@ class CourseEnrollmentController extends BaseApiController
             return $this->respondWithError('PREREQUISITES_NOT_MET', __('api_controllers_2.courses.prerequisites_not_met'), null, 422);
         }
 
-        // Paid course: charge the learner (credits transfer to the author) before enrolling.
-        $charged = 0.0;
-        if ((float) $course->credit_cost > 0) {
-            $result = \App\Services\CourseCreditService::chargeEnrollment($course, $userId);
-            if (!$result['charged']) {
-                return $this->respondWithError('INSUFFICIENT_CREDITS', __('api_controllers_2.courses.insufficient_credits'), null, 422);
-            }
-            $charged = $result['amount'];
-        }
-
+        // Community platform: all courses are free. Enrolment is never charged.
         $cohortId = $this->inputInt('cohort_id', null, 1);
         $enrollment = CourseEnrollmentService::enroll($id, $userId, $cohortId);
-        if ($charged > 0) {
-            $enrollment->credits_paid = $charged;
-            $enrollment->save();
-        }
 
         return $this->respondWithData($enrollment, null, 201);
     }
