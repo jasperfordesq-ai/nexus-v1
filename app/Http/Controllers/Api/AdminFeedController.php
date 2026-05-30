@@ -386,6 +386,28 @@ class AdminFeedController extends BaseApiController
                     $itemTenantId
                 );
                 \App\Services\NotificationDispatcher::fanOutPush((int) ($creatorUserId), 'moderation', __('api_controllers_3.admin_bells.post_removed'), null);
+
+                // The bell/push above give no reason or recourse. Send a durable
+                // email with WHY it was removed and HOW to contest (DSA
+                // transparency), in the author's own language.
+                try {
+                    $owner = DB::selectOne("SELECT email, preferred_language FROM users WHERE id = ? AND tenant_id = ?", [$creatorUserId, $itemTenantId]);
+                    if ($owner && !empty($owner->email)) {
+                        \App\I18n\LocaleContext::withLocale($owner, function () use ($owner, $itemTenantId): void {
+                            $ct = __('emails_misc.content_enforcement.type_post');
+                            $subject = __('emails_misc.content_enforcement.subject', ['content_type' => $ct]);
+                            $html = \App\Core\EmailTemplateBuilder::make()
+                                ->theme('danger')
+                                ->title($subject)
+                                ->paragraph(__('emails_misc.content_enforcement.body', ['content_type' => $ct]))
+                                ->button(__('emails_misc.content_enforcement.cta'), \App\Core\EmailTemplateBuilder::tenantUrl('/help'))
+                                ->render();
+                            \App\Services\EmailDispatchService::sendRaw($owner->email, $subject, $html, null, null, null, 'moderation', ['tenant_id' => $itemTenantId]);
+                        });
+                    }
+                } catch (\Throwable $emailError) {
+                    Log::warning("AdminFeedController::destroy owner email failed: " . $emailError->getMessage());
+                }
             } catch (\Throwable $e) {
                 Log::warning("AdminFeedController::destroy notification failed for {$sourceType} #{$id}: " . $e->getMessage());
             }

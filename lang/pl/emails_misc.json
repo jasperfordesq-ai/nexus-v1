@@ -719,6 +719,18 @@
     "cleared_subject": "Twoje ogłoszenie zgłoszono — bez działań",
     "cleared_body": "Zgłoszenie dotyczące Twojego ogłoszenia „{{title}}” zostało sprawdzone i nie podjęto żadnych działań. Twoje ogłoszenie pozostaje aktywne. Dziękujemy, że jesteś częścią społeczności.",
     "appeal_outcome_subject": "Decyzja w sprawie odwołania — Twoje ogłoszenie „{{title}}”",
-    "appeal_outcome_body": "Odwołanie dotyczące Twojego ogłoszenia „{{title}}” zostało rozpatrzone. Wynik: {{action}}. Powód: {{reason}}. To jest decyzja ostateczna."
+    "appeal_outcome_body": "Odwołanie dotyczące Twojego ogłoszenia „{{title}}” zostało rozpatrzone. Wynik: {{action}}. Powód: {{reason}}. To jest decyzja ostateczna.",
+    "suspended_subject": "Twoje konto sprzedawcy zostało zawieszone",
+    "suspended_body": "Twoje konto sprzedawcy zostało zawieszone przez administratora, a aktywne ogłoszenia usunięto.",
+    "contact_support_note": "W razie pytań dotyczących tej decyzji skontaktuj się z naszym zespołem wsparcia."
+  },
+  "content_enforcement": {
+    "subject": "Twój/Twoja {{content_type}} został(a) usunięty(a)",
+    "body": "Usunęliśmy Twój/Twoją {{content_type}}, ponieważ naruszał(a) zasady naszej społeczności. Jeśli uważasz, że to pomyłka, skontaktuj się z naszym zespołem wsparcia.",
+    "cta": "Skontaktuj się ze wsparciem",
+    "type_post": "wpis",
+    "type_comment": "komentarz",
+    "type_listing": "ogłoszenie",
+    "type_content": "treść"
   }
 }

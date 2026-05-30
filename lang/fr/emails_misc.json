@@ -719,6 +719,18 @@
     "cleared_subject": "Votre annonce a été signalée — aucune mesure prise",
     "cleared_body": "Un signalement concernant votre annonce « {{title}} » a été examiné et aucune mesure n’a été prise. Votre annonce reste active. Merci de faire partie de la communauté.",
     "appeal_outcome_subject": "Décision d’appel — votre annonce « {{title}} »",
-    "appeal_outcome_body": "Un appel concernant votre annonce « {{title}} » a été résolu. Résultat : {{action}}. Motif : {{reason}}. Il s’agit de la décision finale."
+    "appeal_outcome_body": "Un appel concernant votre annonce « {{title}} » a été résolu. Résultat : {{action}}. Motif : {{reason}}. Il s’agit de la décision finale.",
+    "suspended_subject": "Votre compte vendeur a été suspendu",
+    "suspended_body": "Votre compte vendeur a été suspendu par un administrateur et vos annonces actives ont été supprimées.",
+    "contact_support_note": "Si vous avez des questions sur cette décision, veuillez contacter notre équipe d’assistance."
+  },
+  "content_enforcement": {
+    "subject": "Votre {{content_type}} a été supprimé",
+    "body": "Nous avons supprimé votre {{content_type}} car il ne respectait pas nos règles de la communauté. Si vous pensez qu’il s’agit d’une erreur, vous pouvez contacter notre équipe d’assistance.",
+    "cta": "Contacter l’assistance",
+    "type_post": "publication",
+    "type_comment": "commentaire",
+    "type_listing": "annonce",
+    "type_content": "contenu"
   }
 }

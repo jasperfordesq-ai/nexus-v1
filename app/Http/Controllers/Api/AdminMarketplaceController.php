@@ -196,6 +196,24 @@ class AdminMarketplaceController extends BaseApiController
         $listing->status = 'removed';
         $listing->save();
 
+        // Tell the seller their listing was rejected — previously this admin
+        // action was silent (no reason, no path to query). Direct action, so no
+        // report-based appeal: the notice points to support.
+        try {
+            \App\Services\MarketplaceReportService::notifySellerEnforcement(
+                (int) $listing->user_id,
+                (int) (TenantContext::getId() ?? $listing->tenant_id),
+                (int) $listing->id,
+                (string) ($listing->title ?? ''),
+                'action',
+                'listing_rejected',
+                $data['notes'],
+                false
+            );
+        } catch (\Throwable $notifyError) {
+            \Illuminate\Support\Facades\Log::warning('Admin listing-reject seller notice failed: ' . $notifyError->getMessage());
+        }
+
         return $this->respondWithData(['message' => __('api_controllers_1.admin_marketplace.listing_rejected')]);
     }
 
@@ -326,6 +344,23 @@ class AdminMarketplaceController extends BaseApiController
             ->where('user_id', $seller->user_id)
             ->where('status', 'active')
             ->update(['status' => 'removed', 'moderation_status' => 'rejected']);
+
+        // Tell the seller their account was suspended — previously silent. This
+        // is an account-level notice (no specific listing); points to support.
+        try {
+            \App\Services\MarketplaceReportService::notifySellerEnforcement(
+                (int) $seller->user_id,
+                (int) TenantContext::getId(),
+                0,
+                '',
+                'suspended',
+                'seller_suspended',
+                null,
+                false
+            );
+        } catch (\Throwable $notifyError) {
+            \Illuminate\Support\Facades\Log::warning('Admin seller-suspend notice failed: ' . $notifyError->getMessage());
+        }
 
         return $this->respondWithData(['message' => __('api_controllers_1.admin_marketplace.seller_suspended')]);
     }
@@ -475,6 +510,22 @@ class AdminMarketplaceController extends BaseApiController
                 $listing->save();
                 $touchedIds[] = (int) $listing->id;
                 $success++;
+
+                // Tell the seller their listing was rejected (reason + support).
+                try {
+                    \App\Services\MarketplaceReportService::notifySellerEnforcement(
+                        (int) $listing->user_id,
+                        (int) $tenantId,
+                        (int) $listing->id,
+                        (string) ($listing->title ?? ''),
+                        'action',
+                        'listing_rejected',
+                        $reason,
+                        false
+                    );
+                } catch (\Throwable $notifyError) {
+                    \Illuminate\Support\Facades\Log::warning('Admin bulk-reject seller notice failed: ' . $notifyError->getMessage());
+                }
             } catch (\Throwable $e) {
                 $failed++;
                 $skippedIds[] = (int) $listing->id;

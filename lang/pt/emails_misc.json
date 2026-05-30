@@ -719,6 +719,18 @@
     "cleared_subject": "O seu anúncio foi denunciado — nenhuma medida",
     "cleared_body": "Uma denúncia sobre o seu anúncio \"{{title}}\" foi analisada e não foi tomada nenhuma medida. O seu anúncio permanece ativo. Obrigado por fazer parte da comunidade.",
     "appeal_outcome_subject": "Decisão do recurso — o seu anúncio \"{{title}}\"",
-    "appeal_outcome_body": "Um recurso relativo ao seu anúncio \"{{title}}\" foi resolvido. Resultado: {{action}}. Motivo: {{reason}}. Esta é a decisão final."
+    "appeal_outcome_body": "Um recurso relativo ao seu anúncio \"{{title}}\" foi resolvido. Resultado: {{action}}. Motivo: {{reason}}. Esta é a decisão final.",
+    "suspended_subject": "A sua conta de vendedor foi suspensa",
+    "suspended_body": "A sua conta de vendedor foi suspensa por um administrador e os seus anúncios ativos foram removidos.",
+    "contact_support_note": "Se tiver dúvidas sobre esta decisão, contacte a nossa equipa de apoio."
+  },
+  "content_enforcement": {
+    "subject": "O seu {{content_type}} foi removido",
+    "body": "Removemos o seu {{content_type}} porque violava as normas da nossa comunidade. Se considera que foi um erro, pode contactar a nossa equipa de apoio.",
+    "cta": "Contactar o apoio",
+    "type_post": "publicação",
+    "type_comment": "comentário",
+    "type_listing": "anúncio",
+    "type_content": "conteúdo"
   }
 }

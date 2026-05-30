@@ -124,5 +124,6 @@
   "marketplace_enforcement.under_review_bell": "Tuairiscíodh do liostú \"{{title}}\" agus tá sé á athbhreithniú.",
   "marketplace_enforcement.action_bell": "Gníomh déanta ar do liostú \"{{title}}\": {{action}}.",
   "marketplace_enforcement.cleared_bell": "Rinneadh athbhreithniú ar thuairisc faoi do liostú \"{{title}}\" — níor glacadh aon ghníomh.",
-  "marketplace_enforcement.appeal_outcome_bell": "Réitíodh achomharc do do liostú \"{{title}}\": {{action}}."
+  "marketplace_enforcement.appeal_outcome_bell": "Réitíodh achomharc do do liostú \"{{title}}\": {{action}}.",
+  "marketplace_enforcement.suspended_bell": "Cuireadh do chuntas díoltóra ar fionraí agus baineadh do liostuithe."
 }

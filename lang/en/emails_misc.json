@@ -719,6 +719,18 @@
     "cleared_subject": "Your listing was reported — no action taken",
     "cleared_body": "A report about your listing \"{{title}}\" has been reviewed and no action was taken. Your listing remains active. Thank you for being part of the community.",
     "appeal_outcome_subject": "Appeal decision — your listing \"{{title}}\"",
-    "appeal_outcome_body": "An appeal regarding your listing \"{{title}}\" has been resolved. Outcome: {{action}}. Reason: {{reason}}. This is the final decision."
+    "appeal_outcome_body": "An appeal regarding your listing \"{{title}}\" has been resolved. Outcome: {{action}}. Reason: {{reason}}. This is the final decision.",
+    "suspended_subject": "Your seller account has been suspended",
+    "suspended_body": "Your seller account has been suspended by an administrator and your active listings have been removed.",
+    "contact_support_note": "If you have questions about this decision, please contact our support team."
+  },
+  "content_enforcement": {
+    "subject": "Your {{content_type}} has been removed",
+    "body": "We've removed your {{content_type}} because it breached our community standards. If you believe this was a mistake, you can contact our support team.",
+    "cta": "Contact support",
+    "type_post": "post",
+    "type_comment": "comment",
+    "type_listing": "listing",
+    "type_content": "content"
   }
 }

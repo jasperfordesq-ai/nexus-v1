@@ -124,5 +124,6 @@
   "marketplace_enforcement.under_review_bell": "Il tuo annuncio \"{{title}}\" è stato segnalato ed è in fase di revisione.",
   "marketplace_enforcement.action_bell": "Azione intrapresa sul tuo annuncio \"{{title}}\": {{action}}.",
   "marketplace_enforcement.cleared_bell": "Una segnalazione sul tuo annuncio \"{{title}}\" è stata esaminata — nessuna azione intrapresa.",
-  "marketplace_enforcement.appeal_outcome_bell": "Ricorso risolto per il tuo annuncio \"{{title}}\": {{action}}."
+  "marketplace_enforcement.appeal_outcome_bell": "Ricorso risolto per il tuo annuncio \"{{title}}\": {{action}}.",
+  "marketplace_enforcement.suspended_bell": "Il tuo account venditore è stato sospeso e i tuoi annunci rimossi."
 }

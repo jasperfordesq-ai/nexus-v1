@@ -124,5 +124,6 @@
   "marketplace_enforcement.under_review_bell": "تم الإبلاغ عن إعلانك \"{{title}}\" وهو قيد المراجعة.",
   "marketplace_enforcement.action_bell": "تم اتخاذ إجراء بشأن إعلانك \"{{title}}\": {{action}}.",
   "marketplace_enforcement.cleared_bell": "تمت مراجعة بلاغ بخصوص إعلانك \"{{title}}\" — لم يُتخذ أي إجراء.",
-  "marketplace_enforcement.appeal_outcome_bell": "تم البت في الطعن بخصوص إعلانك \"{{title}}\": {{action}}."
+  "marketplace_enforcement.appeal_outcome_bell": "تم البت في الطعن بخصوص إعلانك \"{{title}}\": {{action}}.",
+  "marketplace_enforcement.suspended_bell": "تم تعليق حساب البائع الخاص بك وإزالة إعلاناتك."
 }

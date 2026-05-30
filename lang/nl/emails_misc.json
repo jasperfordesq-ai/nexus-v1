@@ -719,6 +719,18 @@
     "cleared_subject": "Je advertentie is gemeld — geen actie",
     "cleared_body": "Een melding over je advertentie \"{{title}}\" is beoordeeld en er is geen actie ondernomen. Je advertentie blijft actief. Bedankt dat je deel uitmaakt van de community.",
     "appeal_outcome_subject": "Bezwaarbeslissing — je advertentie \"{{title}}\"",
-    "appeal_outcome_body": "Een bezwaar over je advertentie \"{{title}}\" is afgehandeld. Uitkomst: {{action}}. Reden: {{reason}}. Dit is de definitieve beslissing."
+    "appeal_outcome_body": "Een bezwaar over je advertentie \"{{title}}\" is afgehandeld. Uitkomst: {{action}}. Reden: {{reason}}. Dit is de definitieve beslissing.",
+    "suspended_subject": "Je verkopersaccount is geschorst",
+    "suspended_body": "Je verkopersaccount is door een beheerder geschorst en je actieve advertenties zijn verwijderd.",
+    "contact_support_note": "Heb je vragen over dit besluit? Neem dan contact op met ons supportteam."
+  },
+  "content_enforcement": {
+    "subject": "Je {{content_type}} is verwijderd",
+    "body": "We hebben je {{content_type}} verwijderd omdat het in strijd was met onze communityregels. Denk je dat dit een vergissing is? Neem dan contact op met ons supportteam.",
+    "cta": "Contact opnemen met support",
+    "type_post": "bericht",
+    "type_comment": "reactie",
+    "type_listing": "advertentie",
+    "type_content": "inhoud"
   }
 }

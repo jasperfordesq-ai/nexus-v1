@@ -124,5 +124,6 @@
   "marketplace_enforcement.under_review_bell": "O seu anúncio \"{{title}}\" foi denunciado e está em análise.",
   "marketplace_enforcement.action_bell": "Medida tomada sobre o seu anúncio \"{{title}}\": {{action}}.",
   "marketplace_enforcement.cleared_bell": "Uma denúncia sobre o seu anúncio \"{{title}}\" foi analisada — nenhuma medida tomada.",
-  "marketplace_enforcement.appeal_outcome_bell": "Recurso resolvido para o seu anúncio \"{{title}}\": {{action}}."
+  "marketplace_enforcement.appeal_outcome_bell": "Recurso resolvido para o seu anúncio \"{{title}}\": {{action}}.",
+  "marketplace_enforcement.suspended_bell": "A sua conta de vendedor foi suspensa e os seus anúncios removidos."
 }

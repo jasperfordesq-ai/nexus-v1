@@ -124,5 +124,6 @@
   "marketplace_enforcement.under_review_bell": "Votre annonce « {{title}} » a été signalée et est en cours d’examen.",
   "marketplace_enforcement.action_bell": "Mesure prise concernant votre annonce « {{title}} » : {{action}}.",
   "marketplace_enforcement.cleared_bell": "Un signalement concernant votre annonce « {{title}} » a été examiné — aucune mesure prise.",
-  "marketplace_enforcement.appeal_outcome_bell": "Appel résolu pour votre annonce « {{title}} » : {{action}}."
+  "marketplace_enforcement.appeal_outcome_bell": "Appel résolu pour votre annonce « {{title}} » : {{action}}.",
+  "marketplace_enforcement.suspended_bell": "Votre compte vendeur a été suspendu et vos annonces supprimées."
 }

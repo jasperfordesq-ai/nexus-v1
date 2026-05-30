@@ -719,6 +719,18 @@
     "cleared_subject": "Tuairiscíodh do liostú — gan ghníomh",
     "cleared_body": "Rinneadh athbhreithniú ar thuairisc faoi do liostú \"{{title}}\" agus níor glacadh aon ghníomh. Tá do liostú fós gníomhach. Go raibh maith agat as bheith mar chuid den phobal.",
     "appeal_outcome_subject": "Cinneadh achomhairc — do liostú \"{{title}}\"",
-    "appeal_outcome_body": "Réitíodh achomharc maidir le do liostú \"{{title}}\". Toradh: {{action}}. Fáth: {{reason}}. Is é seo an cinneadh deiridh."
+    "appeal_outcome_body": "Réitíodh achomharc maidir le do liostú \"{{title}}\". Toradh: {{action}}. Fáth: {{reason}}. Is é seo an cinneadh deiridh.",
+    "suspended_subject": "Cuireadh do chuntas díoltóra ar fionraí",
+    "suspended_body": "Chuir riarthóir do chuntas díoltóra ar fionraí agus baineadh do liostuithe gníomhacha.",
+    "contact_support_note": "Má tá ceist agat faoin gcinneadh seo, déan teagmháil lenár bhfoireann tacaíochta."
+  },
+  "content_enforcement": {
+    "subject": "Baineadh do {{content_type}}",
+    "body": "Bhaineamar do {{content_type}} mar gur sháraigh sé caighdeáin ár bpobail. Má chreideann tú gur botún a bhí ann, is féidir leat teagmháil a dhéanamh lenár bhfoireann tacaíochta.",
+    "cta": "Déan teagmháil le tacaíocht",
+    "type_post": "postáil",
+    "type_comment": "trácht",
+    "type_listing": "liostú",
+    "type_content": "ábhar"
   }
 }

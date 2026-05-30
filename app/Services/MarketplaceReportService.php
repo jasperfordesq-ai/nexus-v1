@@ -577,11 +577,14 @@ class MarketplaceReportService
      * and (for enforcement) their appeal rights. Best-effort and failure
      * isolated — nothing here may unwind the moderation action.
      *
-     * @param string $event     one of: under_review | action | cleared | appeal_outcome
+     * @param string $event     one of: under_review | action | cleared | appeal_outcome | suspended
      * @param string $actionCode listing_removed | seller_suspended | listing_rejected | '' (none)
      * @param string $reason    free-text moderation reason (optional)
+     * @param bool   $appealable true for report-driven enforcement (offers the
+     *   reports appeal flow); false for a direct admin action with no report to
+     *   appeal (offers a contact-support note instead).
      */
-    public static function notifySellerEnforcement(int $sellerId, int $tenantId, int $listingId, string $listingTitle, string $event, string $actionCode = '', ?string $reason = null): void
+    public static function notifySellerEnforcement(int $sellerId, int $tenantId, int $listingId, string $listingTitle, string $event, string $actionCode = '', ?string $reason = null, bool $appealable = true): void
     {
         if ($sellerId <= 0 || $tenantId <= 0) {
             return;
@@ -595,10 +598,12 @@ class MarketplaceReportService
             return;
         }
 
-        $isEnforcement = in_array($event, ['action', 'appeal_outcome'], true);
-        $link = '/marketplace/listings/' . $listingId;
+        $isEnforcement = in_array($event, ['action', 'appeal_outcome', 'suspended'], true);
+        // Account-level events (suspension) and missing listings link to the
+        // marketplace home rather than to a specific listing.
+        $link = ($event === 'suspended' || $listingId <= 0) ? '/marketplace' : ('/marketplace/listings/' . $listingId);
 
-        \App\I18n\LocaleContext::withLocale($seller, function () use ($seller, $sellerId, $tenantId, $event, $actionCode, $reason, $listingTitle, $link, $isEnforcement): void {
+        \App\I18n\LocaleContext::withLocale($seller, function () use ($seller, $sellerId, $tenantId, $event, $actionCode, $reason, $listingTitle, $link, $isEnforcement, $appealable): void {
             $ns = 'emails_misc.marketplace_enforcement.';
             $actionLabel = $actionCode !== '' ? __($ns . 'action_label_' . $actionCode) : __($ns . 'action_label_none');
             $params = [
@@ -631,9 +636,14 @@ class MarketplaceReportService
                     ->theme($isEnforcement ? 'danger' : 'brand')
                     ->title($subject)
                     ->paragraph(__($ns . $event . '_body', $params));
-                if ($isEnforcement) {
+                if ($isEnforcement && $appealable) {
                     $builder->paragraph(__($ns . 'action_appeal_note'))
                         ->button(__($ns . 'cta_appeal'), $base . '/marketplace/reports');
+                } elseif ($isEnforcement) {
+                    // Direct admin action — there is no report to appeal, so point
+                    // the seller to support rather than the reports appeal flow.
+                    $builder->paragraph(__($ns . 'contact_support_note'))
+                        ->button(__($ns . 'cta_view'), $base . $link);
                 } else {
                     $builder->button(__($ns . 'cta_view'), $base . $link);
                 }

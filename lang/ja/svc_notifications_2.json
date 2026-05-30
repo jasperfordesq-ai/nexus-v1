@@ -124,5 +124,6 @@
   "marketplace_enforcement.under_review_bell": "あなたの出品「{{title}}」が通報され、現在審査中です。",
   "marketplace_enforcement.action_bell": "あなたの出品「{{title}}」に対する措置：{{action}}。",
   "marketplace_enforcement.cleared_bell": "あなたの出品「{{title}}」に関する通報が審査されました — 措置はありません。",
-  "marketplace_enforcement.appeal_outcome_bell": "あなたの出品「{{title}}」の異議申し立てが解決しました：{{action}}。"
+  "marketplace_enforcement.appeal_outcome_bell": "あなたの出品「{{title}}」の異議申し立てが解決しました：{{action}}。",
+  "marketplace_enforcement.suspended_bell": "あなたの出品者アカウントは停止され、出品は削除されました。"
 }

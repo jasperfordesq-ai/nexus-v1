@@ -719,6 +719,18 @@
     "cleared_subject": "Il tuo annuncio è stato segnalato — nessuna azione",
     "cleared_body": "Una segnalazione sul tuo annuncio \"{{title}}\" è stata esaminata e non è stata intrapresa alcuna azione. Il tuo annuncio rimane attivo. Grazie di far parte della community.",
     "appeal_outcome_subject": "Decisione sul ricorso — il tuo annuncio \"{{title}}\"",
-    "appeal_outcome_body": "Un ricorso relativo al tuo annuncio \"{{title}}\" è stato risolto. Esito: {{action}}. Motivo: {{reason}}. Questa è la decisione definitiva."
+    "appeal_outcome_body": "Un ricorso relativo al tuo annuncio \"{{title}}\" è stato risolto. Esito: {{action}}. Motivo: {{reason}}. Questa è la decisione definitiva.",
+    "suspended_subject": "Il tuo account venditore è stato sospeso",
+    "suspended_body": "Il tuo account venditore è stato sospeso da un amministratore e i tuoi annunci attivi sono stati rimossi.",
+    "contact_support_note": "Per domande su questa decisione, contatta il nostro team di assistenza."
+  },
+  "content_enforcement": {
+    "subject": "Il tuo {{content_type}} è stato rimosso",
+    "body": "Abbiamo rimosso il tuo {{content_type}} perché violava gli standard della nostra community. Se ritieni che si tratti di un errore, puoi contattare il nostro team di assistenza.",
+    "cta": "Contatta l’assistenza",
+    "type_post": "post",
+    "type_comment": "commento",
+    "type_listing": "annuncio",
+    "type_content": "contenuto"
   }
 }

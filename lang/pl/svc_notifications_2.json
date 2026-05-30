@@ -124,5 +124,6 @@
   "marketplace_enforcement.under_review_bell": "Twoje ogłoszenie „{{title}}” zostało zgłoszone i jest sprawdzane.",
   "marketplace_enforcement.action_bell": "Podjęto działanie wobec Twojego ogłoszenia „{{title}}”: {{action}}.",
   "marketplace_enforcement.cleared_bell": "Zgłoszenie dotyczące Twojego ogłoszenia „{{title}}” sprawdzono — nie podjęto działań.",
-  "marketplace_enforcement.appeal_outcome_bell": "Odwołanie rozpatrzone dla Twojego ogłoszenia „{{title}}”: {{action}}."
+  "marketplace_enforcement.appeal_outcome_bell": "Odwołanie rozpatrzone dla Twojego ogłoszenia „{{title}}”: {{action}}.",
+  "marketplace_enforcement.suspended_bell": "Twoje konto sprzedawcy zostało zawieszone, a ogłoszenia usunięte."
 }

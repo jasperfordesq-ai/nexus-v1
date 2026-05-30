@@ -719,6 +719,18 @@
     "cleared_subject": "Tu anuncio fue denunciado — sin medidas",
     "cleared_body": "Una denuncia sobre tu anuncio \"{{title}}\" ha sido revisada y no se tomó ninguna medida. Tu anuncio sigue activo. Gracias por formar parte de la comunidad.",
     "appeal_outcome_subject": "Decisión de apelación — tu anuncio \"{{title}}\"",
-    "appeal_outcome_body": "Una apelación sobre tu anuncio \"{{title}}\" se ha resuelto. Resultado: {{action}}. Motivo: {{reason}}. Esta es la decisión final."
+    "appeal_outcome_body": "Una apelación sobre tu anuncio \"{{title}}\" se ha resuelto. Resultado: {{action}}. Motivo: {{reason}}. Esta es la decisión final.",
+    "suspended_subject": "Tu cuenta de vendedor ha sido suspendida",
+    "suspended_body": "Un administrador ha suspendido tu cuenta de vendedor y se han eliminado tus anuncios activos.",
+    "contact_support_note": "Si tienes preguntas sobre esta decisión, contacta con nuestro equipo de soporte."
+  },
+  "content_enforcement": {
+    "subject": "Tu {{content_type}} ha sido eliminado",
+    "body": "Hemos eliminado tu {{content_type}} porque incumplía las normas de nuestra comunidad. Si crees que es un error, puedes contactar con nuestro equipo de soporte.",
+    "cta": "Contactar con soporte",
+    "type_post": "publicación",
+    "type_comment": "comentario",
+    "type_listing": "anuncio",
+    "type_content": "contenido"
   }
 }

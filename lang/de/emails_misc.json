@@ -719,6 +719,18 @@
     "cleared_subject": "Ihr Inserat wurde gemeldet — keine Maßnahme",
     "cleared_body": "Eine Meldung zu Ihrem Inserat „{{title}}“ wurde geprüft und es wurde keine Maßnahme ergriffen. Ihr Inserat bleibt aktiv. Danke, dass Sie Teil der Community sind.",
     "appeal_outcome_subject": "Einspruchsentscheidung — Ihr Inserat „{{title}}“",
-    "appeal_outcome_body": "Ein Einspruch zu Ihrem Inserat „{{title}}“ wurde entschieden. Ergebnis: {{action}}. Grund: {{reason}}. Dies ist die endgültige Entscheidung."
+    "appeal_outcome_body": "Ein Einspruch zu Ihrem Inserat „{{title}}“ wurde entschieden. Ergebnis: {{action}}. Grund: {{reason}}. Dies ist die endgültige Entscheidung.",
+    "suspended_subject": "Ihr Verkäuferkonto wurde gesperrt",
+    "suspended_body": "Ihr Verkäuferkonto wurde von einem Administrator gesperrt und Ihre aktiven Inserate wurden entfernt.",
+    "contact_support_note": "Bei Fragen zu dieser Entscheidung wenden Sie sich bitte an unser Support-Team."
+  },
+  "content_enforcement": {
+    "subject": "Ihr {{content_type}} wurde entfernt",
+    "body": "Wir haben Ihr {{content_type}} entfernt, da es gegen unsere Community-Standards verstoßen hat. Wenn Sie der Meinung sind, dass dies ein Fehler war, können Sie unser Support-Team kontaktieren.",
+    "cta": "Support kontaktieren",
+    "type_post": "Beitrag",
+    "type_comment": "Kommentar",
+    "type_listing": "Inserat",
+    "type_content": "Inhalt"
   }
 }

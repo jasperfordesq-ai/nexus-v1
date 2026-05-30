@@ -719,6 +719,18 @@
     "cleared_subject": "あなたの出品が通報されました — 措置なし",
     "cleared_body": "あなたの出品「{{title}}」に関する通報を審査しましたが、措置は講じませんでした。出品は引き続き有効です。コミュニティにご参加いただきありがとうございます。",
     "appeal_outcome_subject": "異議申し立ての決定 — あなたの出品「{{title}}」",
-    "appeal_outcome_body": "あなたの出品「{{title}}」に関する異議申し立てが解決しました。結果：{{action}}。理由：{{reason}}。これが最終決定です。"
+    "appeal_outcome_body": "あなたの出品「{{title}}」に関する異議申し立てが解決しました。結果：{{action}}。理由：{{reason}}。これが最終決定です。",
+    "suspended_subject": "出品者アカウントが停止されました",
+    "suspended_body": "あなたの出品者アカウントは管理者によって停止され、有効な出品は削除されました。",
+    "contact_support_note": "この決定についてご質問がある場合は、サポートチームにお問い合わせください。"
+  },
+  "content_enforcement": {
+    "subject": "あなたの{{content_type}}が削除されました",
+    "body": "あなたの{{content_type}}はコミュニティ基準に違反したため削除しました。誤りだとお考えの場合は、サポートチームにお問い合わせください。",
+    "cta": "サポートに問い合わせる",
+    "type_post": "投稿",
+    "type_comment": "コメント",
+    "type_listing": "出品",
+    "type_content": "コンテンツ"
   }
 }

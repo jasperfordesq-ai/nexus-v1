@@ -124,5 +124,6 @@
   "marketplace_enforcement.under_review_bell": "Ihr Inserat „{{title}}“ wurde gemeldet und wird geprüft.",
   "marketplace_enforcement.action_bell": "Maßnahme zu Ihrem Inserat „{{title}}“: {{action}}.",
   "marketplace_enforcement.cleared_bell": "Eine Meldung zu Ihrem Inserat „{{title}}“ wurde geprüft — keine Maßnahme ergriffen.",
-  "marketplace_enforcement.appeal_outcome_bell": "Einspruch zu Ihrem Inserat „{{title}}“ entschieden: {{action}}."
+  "marketplace_enforcement.appeal_outcome_bell": "Einspruch zu Ihrem Inserat „{{title}}“ entschieden: {{action}}.",
+  "marketplace_enforcement.suspended_bell": "Ihr Verkäuferkonto wurde gesperrt und Ihre Inserate entfernt."
 }
