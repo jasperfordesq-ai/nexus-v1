@@ -928,7 +928,7 @@ class SocialController extends BaseApiController
             return $this->respondWithError('DUPLICATE', __('api.already_reported'), null, 409);
         }
 
-        DB::table('reports')->insert([
+        $reportId = DB::table('reports')->insertGetId([
             'reporter_id' => $userId,
             'tenant_id'   => $tenantId,
             'target_type' => $targetType,
@@ -937,6 +937,20 @@ class SocialController extends BaseApiController
             'status'      => 'open',
             'created_at'  => now(),
         ]);
+
+        // Alert moderators a new report awaits review (previously a silent queue).
+        try {
+            \App\Services\NotificationDispatcher::notifyModerationAdmins(
+                'social_report_created',
+                '/admin/reports',
+                'svc_notifications_2.social_report.admin_alert',
+                'emails_misc.moderation.social_subject',
+                'emails_misc.moderation.social_body',
+                ['target_type' => $targetType, 'reason' => $reason, 'report_id' => $reportId]
+            );
+        } catch (\Throwable $notifyError) {
+            \Illuminate\Support\Facades\Log::warning('Social report admin alert failed: ' . $notifyError->getMessage());
+        }
 
         return $this->respondWithData(['reported' => true, 'target_type' => $targetType, 'target_id' => $id]);
     }

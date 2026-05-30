@@ -115,5 +115,10 @@
   "course.enrolment_payment": "Inscription aux cours : {{title}}",
   "vol_org_wallet.volunteer_paid_bell": "Vous avez reçu {{amount}} crédits-temps de {{org}} pour votre bénévolat.",
   "vol_org_wallet.admin_adjustment_credit_bell": "Le solde de {{org}} a été crédité de {{amount}} crédits-temps par l'administration. Motif : {{reason}}",
-  "vol_org_wallet.admin_adjustment_debit_bell": "Le solde de {{org}} a été réduit de {{amount}} crédits-temps par l'administration. Motif : {{reason}}"
+  "vol_org_wallet.admin_adjustment_debit_bell": "Le solde de {{org}} a été réduit de {{amount}} crédits-temps par l'administration. Motif : {{reason}}",
+  "feed_report.admin_alert": "Nouveau signalement de contenu : {{post_type}} signalé pour {{reason}}",
+  "social_report.admin_alert": "Nouveau signalement de contenu : {{target_type}} signalé — {{reason}}",
+  "listing_report.admin_alert": "Nouveau signalement d’annonce : « {{listing_title}} » — {{reason}}",
+  "marketplace_report.admin_alert": "Signalement Marketplace #{{report_id}} — à examiner sous 24 h (DSA). Motif : {{reason}}",
+  "job_vacancy.spam_flag": "Offre « {{title}} » signalée pour examen — score de spam {{score}}/100"
 }

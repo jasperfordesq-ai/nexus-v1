@@ -115,5 +115,10 @@
   "course.enrolment_payment": "Kursanmeldung: {{title}}",
   "vol_org_wallet.volunteer_paid_bell": "Du hast {{amount}} Zeitgutschriften von {{org}} für dein Engagement erhalten.",
   "vol_org_wallet.admin_adjustment_credit_bell": "Das Guthaben von {{org}} wurde von der Verwaltung um {{amount}} Zeitgutschriften aufgestockt. Grund: {{reason}}",
-  "vol_org_wallet.admin_adjustment_debit_bell": "Das Guthaben von {{org}} wurde von der Verwaltung um {{amount}} Zeitgutschriften verringert. Grund: {{reason}}"
+  "vol_org_wallet.admin_adjustment_debit_bell": "Das Guthaben von {{org}} wurde von der Verwaltung um {{amount}} Zeitgutschriften verringert. Grund: {{reason}}",
+  "feed_report.admin_alert": "Neue Meldung zu Feed-Inhalt: {{post_type}} gemeldet wegen {{reason}}",
+  "social_report.admin_alert": "Neue Inhaltsmeldung: {{target_type}} gemeldet — {{reason}}",
+  "listing_report.admin_alert": "Neue Inseratsmeldung: „{{listing_title}}“ — {{reason}}",
+  "marketplace_report.admin_alert": "Marktplatz-Meldung #{{report_id}} — Prüfung innerhalb von 24 Std. (DSA). Grund: {{reason}}",
+  "job_vacancy.spam_flag": "Stelle „{{title}}“ zur Prüfung markiert — Spam-Score {{score}}/100"
 }

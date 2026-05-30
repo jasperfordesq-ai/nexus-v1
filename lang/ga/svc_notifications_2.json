@@ -115,5 +115,10 @@
   "course.enrolment_payment": "Clárú an chúrsa: {{title}}",
   "vol_org_wallet.volunteer_paid_bell": "Fuair tú {{amount}} creidmheas ama ó {{org}} as do chuid oibre deonaí.",
   "vol_org_wallet.admin_adjustment_credit_bell": "Cuireadh {{amount}} creidmheas ama le hiarmhéid {{org}} ag riarthóir. Cúis: {{reason}}",
-  "vol_org_wallet.admin_adjustment_debit_bell": "Baineadh {{amount}} creidmheas ama d'iarmhéid {{org}} ag riarthóir. Cúis: {{reason}}"
+  "vol_org_wallet.admin_adjustment_debit_bell": "Baineadh {{amount}} creidmheas ama d'iarmhéid {{org}} ag riarthóir. Cúis: {{reason}}",
+  "feed_report.admin_alert": "Tuairisc nua ar ábhar fotha: tuairiscíodh {{post_type}} mar gheall ar {{reason}}",
+  "social_report.admin_alert": "Tuairisc nua ar ábhar: tuairiscíodh {{target_type}} — {{reason}}",
+  "listing_report.admin_alert": "Tuairisc nua ar liostú: \"{{listing_title}}\" — {{reason}}",
+  "marketplace_report.admin_alert": "Tuairisc mhargaidh #{{report_id}} — déan athbhreithniú laistigh de 24 uair (DSA). Fáth: {{reason}}",
+  "job_vacancy.spam_flag": "Cuireadh post \"{{title}}\" faoi bhratach le hathbhreithniú — scór turscair {{score}}/100"
 }

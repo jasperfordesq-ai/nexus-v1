@@ -689,5 +689,18 @@
     "title": "Gefeliciteerd!",
     "body": "Je hebt {{title}} met succes voltooid. Uw certificaat is klaar.",
     "cta": "Bekijk jouw cursus"
+  },
+  "moderation": {
+    "review_cta": "Beoordelen in het beheerpaneel",
+    "feed_subject": "Nieuwe inhoudsmelding — feed {{post_type}}",
+    "feed_body": "Een lid heeft feed-inhoud gemeld. Reden: {{reason}}. Referentie: #{{report_id}}. Beoordeel het in het beheerpaneel.",
+    "social_subject": "Nieuwe inhoudsmelding — {{target_type}}",
+    "social_body": "Een lid heeft {{target_type}}-inhoud gemeld. Reden: {{reason}}. Referentie: #{{report_id}}. Beoordeel het in het beheerpaneel.",
+    "listing_subject": "Nieuwe advertentiemelding — {{listing_title}}",
+    "listing_body": "Een lid heeft een advertentie gemeld. Titel: {{listing_title}}. Reden: {{reason}}. Referentie: #{{report_id}}. Beoordeel het in het beheerpaneel.",
+    "marketplace_subject": "Actie vereist: marktplaatsmelding #{{report_id}}",
+    "marketplace_body": "Er is een marktplaatsmelding ingediend (melding #{{report_id}}). Reden: {{reason}}. Op grond van de Digital Services Act moet deze binnen 24 uur worden bevestigd en behandeld. Beoordeel het nu in het beheerpaneel.",
+    "job_subject": "Vacature gemarkeerd voor beoordeling — {{title}}",
+    "job_body": "Een vacature is automatisch gemarkeerd als mogelijke spam. Titel: {{title}} (#{{job_id}}). Spamscore: {{score}}/100. Ze wacht op beoordeling — keur ze goed of af in het beheerpaneel."
   }
 }

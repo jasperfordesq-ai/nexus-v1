@@ -92,6 +92,23 @@ class MarketplaceReportService
             'emails_misc.marketplace_report.received_cta'
         );
 
+        // Alert moderators a new DSA report awaits review within the 24h window.
+        // Previously only the reporter got a receipt; admins had no signal and
+        // had to poll the queue.
+        try {
+            \App\Services\NotificationDispatcher::notifyModerationAdmins(
+                'marketplace_report_filed',
+                '/admin/marketplace/reports/' . $report->id,
+                'svc_notifications_2.marketplace_report.admin_alert',
+                'emails_misc.moderation.marketplace_subject',
+                'emails_misc.moderation.marketplace_body',
+                ['report_id' => $report->id, 'reason' => (string) $report->reason],
+                'danger'
+            );
+        } catch (\Throwable $notifyError) {
+            \Illuminate\Support\Facades\Log::warning('Marketplace report admin alert failed: ' . $notifyError->getMessage());
+        }
+
         return $report;
     }
 

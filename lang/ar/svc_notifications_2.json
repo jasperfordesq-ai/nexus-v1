@@ -115,5 +115,10 @@
   "course.enrolment_payment": "التسجيل في الدورة: {{title}}",
   "vol_org_wallet.volunteer_paid_bell": "لقد تلقّيت {{amount}} ساعة رصيد من {{org}} مقابل تطوّعك.",
   "vol_org_wallet.admin_adjustment_credit_bell": "تمت زيادة رصيد {{org}} بمقدار {{amount}} ساعة رصيد من قِبل الإدارة. السبب: {{reason}}",
-  "vol_org_wallet.admin_adjustment_debit_bell": "تم تخفيض رصيد {{org}} بمقدار {{amount}} ساعة رصيد من قِبل الإدارة. السبب: {{reason}}"
+  "vol_org_wallet.admin_adjustment_debit_bell": "تم تخفيض رصيد {{org}} بمقدار {{amount}} ساعة رصيد من قِبل الإدارة. السبب: {{reason}}",
+  "feed_report.admin_alert": "بلاغ جديد عن محتوى الموجز: تم الإبلاغ عن {{post_type}} بسبب {{reason}}",
+  "social_report.admin_alert": "بلاغ محتوى جديد: تم الإبلاغ عن {{target_type}} — {{reason}}",
+  "listing_report.admin_alert": "بلاغ جديد عن إعلان: \"{{listing_title}}\" — {{reason}}",
+  "marketplace_report.admin_alert": "بلاغ السوق رقم {{report_id}} — يجب المراجعة خلال 24 ساعة (DSA). السبب: {{reason}}",
+  "job_vacancy.spam_flag": "تم وضع علامة على الوظيفة \"{{title}}\" للمراجعة — درجة الرسائل المزعجة {{score}}/100"
 }

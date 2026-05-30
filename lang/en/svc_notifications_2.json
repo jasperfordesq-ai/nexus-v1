@@ -109,5 +109,10 @@
   "course.enrolment_payment": "Course enrolment: {{title}}",
   "vol_org_wallet.volunteer_paid_bell": "You received {{amount}} time credits from {{org}} for your volunteering.",
   "vol_org_wallet.admin_adjustment_credit_bell": "{{org}}'s wallet was topped up by {{amount}} time credits by an administrator. Reason: {{reason}}",
-  "vol_org_wallet.admin_adjustment_debit_bell": "{{org}}'s wallet was reduced by {{amount}} time credits by an administrator. Reason: {{reason}}"
+  "vol_org_wallet.admin_adjustment_debit_bell": "{{org}}'s wallet was reduced by {{amount}} time credits by an administrator. Reason: {{reason}}",
+  "feed_report.admin_alert": "New feed content report: {{post_type}} reported for {{reason}}",
+  "social_report.admin_alert": "New content report: {{target_type}} reported — {{reason}}",
+  "listing_report.admin_alert": "New listing report: \"{{listing_title}}\" — {{reason}}",
+  "marketplace_report.admin_alert": "Marketplace report #{{report_id}} — review within 24h (DSA). Reason: {{reason}}",
+  "job_vacancy.spam_flag": "Job \"{{title}}\" flagged for review — spam score {{score}}/100"
 }

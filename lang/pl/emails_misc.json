@@ -689,5 +689,18 @@
     "title": "Gratulacje!",
     "body": "Pomyślnie ukończyłeś {{title}}. Twój certyfikat jest gotowy.",
     "cta": "Zobacz swój kurs"
+  },
+  "moderation": {
+    "review_cta": "Sprawdź w panelu administracyjnym",
+    "feed_subject": "Nowe zgłoszenie treści — feed {{post_type}}",
+    "feed_body": "Członek zgłosił treść z feedu. Powód: {{reason}}. Numer: #{{report_id}}. Sprawdź ją w panelu administracyjnym.",
+    "social_subject": "Nowe zgłoszenie treści — {{target_type}}",
+    "social_body": "Członek zgłosił treść typu {{target_type}}. Powód: {{reason}}. Numer: #{{report_id}}. Sprawdź ją w panelu administracyjnym.",
+    "listing_subject": "Nowe zgłoszenie ogłoszenia — {{listing_title}}",
+    "listing_body": "Członek zgłosił ogłoszenie. Tytuł: {{listing_title}}. Powód: {{reason}}. Numer: #{{report_id}}. Sprawdź je w panelu administracyjnym.",
+    "marketplace_subject": "Wymagane działanie: zgłoszenie marketplace #{{report_id}}",
+    "marketplace_body": "Złożono zgłoszenie marketplace (zgłoszenie #{{report_id}}). Powód: {{reason}}. Zgodnie z aktem o usługach cyfrowych (DSA) należy je potwierdzić i rozpatrzyć w ciągu 24 godzin. Sprawdź je teraz w panelu administracyjnym.",
+    "job_subject": "Ogłoszenie o pracę oznaczone do przeglądu — {{title}}",
+    "job_body": "Ogłoszenie o pracę zostało automatycznie oznaczone jako możliwy spam. Tytuł: {{title}} (#{{job_id}}). Wynik spamu: {{score}}/100. Oczekuje na przegląd — zatwierdź je lub odrzuć w panelu administracyjnym."
   }
 }

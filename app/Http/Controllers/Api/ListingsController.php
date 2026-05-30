@@ -953,7 +953,7 @@ class ListingsController extends BaseApiController
         }
 
         // Create the report
-        ListingReport::create([
+        $report = ListingReport::create([
             'tenant_id'   => $tenantId,
             'listing_id'  => $id,
             'reporter_id' => $userId,
@@ -968,6 +968,22 @@ class ListingsController extends BaseApiController
             'reason'      => $reason,
             'tenant_id'   => $tenantId,
         ]);
+
+        // Alert moderators a new listing report awaits review (previously silent).
+        try {
+            $listingTitle = (string) (\Illuminate\Support\Facades\DB::table('listings')
+                ->where('id', $id)->where('tenant_id', $tenantId)->value('title') ?? ('#' . $id));
+            \App\Services\NotificationDispatcher::notifyModerationAdmins(
+                'listing_report_created',
+                '/admin/reports',
+                'svc_notifications_2.listing_report.admin_alert',
+                'emails_misc.moderation.listing_subject',
+                'emails_misc.moderation.listing_body',
+                ['listing_title' => $listingTitle, 'reason' => $reason, 'details' => (string) ($details ?? ''), 'report_id' => $report->id]
+            );
+        } catch (\Throwable $notifyError) {
+            Log::warning('Listing report admin alert failed: ' . $notifyError->getMessage());
+        }
 
         return $this->respondWithData([
             'reported' => true,

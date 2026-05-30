@@ -689,5 +689,18 @@
     "title": "Congratulations!",
     "body": "You have successfully completed {{title}}. Your certificate is ready.",
     "cta": "View your course"
+  },
+  "moderation": {
+    "review_cta": "Review in admin panel",
+    "feed_subject": "New content report — feed {{post_type}}",
+    "feed_body": "A member reported feed content. Reason: {{reason}}. Reference: #{{report_id}}. Please review it in the admin panel.",
+    "social_subject": "New content report — {{target_type}}",
+    "social_body": "A member reported {{target_type}} content. Reason: {{reason}}. Reference: #{{report_id}}. Please review it in the admin panel.",
+    "listing_subject": "New listing report — {{listing_title}}",
+    "listing_body": "A member reported a listing. Title: {{listing_title}}. Reason: {{reason}}. Reference: #{{report_id}}. Please review it in the admin panel.",
+    "marketplace_subject": "Action needed: marketplace report #{{report_id}}",
+    "marketplace_body": "A marketplace report has been filed (report #{{report_id}}). Reason: {{reason}}. Under Digital Services Act rules this must be acknowledged and acted on within 24 hours. Please review it in the admin panel now.",
+    "job_subject": "Job posting flagged for review — {{title}}",
+    "job_body": "A job posting was automatically flagged as possible spam. Title: {{title}} (#{{job_id}}). Spam score: {{score}}/100. It is held pending review — please approve or reject it in the admin panel."
   }
 }

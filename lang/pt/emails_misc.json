@@ -689,5 +689,18 @@
     "title": "Parabéns!",
     "body": "Você concluiu {{title}} com sucesso. Seu certificado está pronto.",
     "cta": "Veja seu curso"
+  },
+  "moderation": {
+    "review_cta": "Rever no painel de administração",
+    "feed_subject": "Novo relatório de conteúdo — feed {{post_type}}",
+    "feed_body": "Um membro denunciou conteúdo do feed. Motivo: {{reason}}. Referência: #{{report_id}}. Reveja-o no painel de administração.",
+    "social_subject": "Novo relatório de conteúdo — {{target_type}}",
+    "social_body": "Um membro denunciou conteúdo {{target_type}}. Motivo: {{reason}}. Referência: #{{report_id}}. Reveja-o no painel de administração.",
+    "listing_subject": "Novo relatório de anúncio — {{listing_title}}",
+    "listing_body": "Um membro denunciou um anúncio. Título: {{listing_title}}. Motivo: {{reason}}. Referência: #{{report_id}}. Reveja-o no painel de administração.",
+    "marketplace_subject": "Ação necessária: relatório do marketplace #{{report_id}}",
+    "marketplace_body": "Foi apresentado um relatório do marketplace (relatório #{{report_id}}). Motivo: {{reason}}. Ao abrigo do Regulamento dos Serviços Digitais (DSA) deve ser confirmado e tratado em 24 horas. Reveja-o agora no painel de administração.",
+    "job_subject": "Vaga marcada para revisão — {{title}}",
+    "job_body": "Uma vaga foi automaticamente marcada como possível spam. Título: {{title}} (#{{job_id}}). Pontuação de spam: {{score}}/100. Está pendente de revisão — aprove-a ou rejeite-a no painel de administração."
   }
 }

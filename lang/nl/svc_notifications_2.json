@@ -115,5 +115,10 @@
   "course.enrolment_payment": "Cursusinschrijving: {{title}}",
   "vol_org_wallet.volunteer_paid_bell": "Je hebt {{amount}} tijdcredits van {{org}} ontvangen voor je vrijwilligerswerk.",
   "vol_org_wallet.admin_adjustment_credit_bell": "Het saldo van {{org}} is door de beheerder met {{amount}} tijdcredits verhoogd. Reden: {{reason}}",
-  "vol_org_wallet.admin_adjustment_debit_bell": "Het saldo van {{org}} is door de beheerder met {{amount}} tijdcredits verlaagd. Reden: {{reason}}"
+  "vol_org_wallet.admin_adjustment_debit_bell": "Het saldo van {{org}} is door de beheerder met {{amount}} tijdcredits verlaagd. Reden: {{reason}}",
+  "feed_report.admin_alert": "Nieuwe melding van feed-inhoud: {{post_type}} gemeld wegens {{reason}}",
+  "social_report.admin_alert": "Nieuwe inhoudsmelding: {{target_type}} gemeld — {{reason}}",
+  "listing_report.admin_alert": "Nieuwe advertentiemelding: \"{{listing_title}}\" — {{reason}}",
+  "marketplace_report.admin_alert": "Marktplaatsmelding #{{report_id}} — beoordeel binnen 24 u (DSA). Reden: {{reason}}",
+  "job_vacancy.spam_flag": "Vacature \"{{title}}\" gemarkeerd voor beoordeling — spamscore {{score}}/100"
 }

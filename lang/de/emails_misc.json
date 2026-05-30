@@ -689,5 +689,18 @@
     "title": "Glückwunsch!",
     "body": "Sie haben {{title}} erfolgreich abgeschlossen. Ihr Zertifikat ist fertig.",
     "cta": "Sehen Sie sich Ihren Kurs an"
+  },
+  "moderation": {
+    "review_cta": "Im Admin-Bereich prüfen",
+    "feed_subject": "Neue Inhaltsmeldung — Feed {{post_type}}",
+    "feed_body": "Ein Mitglied hat Feed-Inhalt gemeldet. Grund: {{reason}}. Referenz: #{{report_id}}. Bitte im Admin-Bereich prüfen.",
+    "social_subject": "Neue Inhaltsmeldung — {{target_type}}",
+    "social_body": "Ein Mitglied hat {{target_type}}-Inhalt gemeldet. Grund: {{reason}}. Referenz: #{{report_id}}. Bitte im Admin-Bereich prüfen.",
+    "listing_subject": "Neue Inseratsmeldung — {{listing_title}}",
+    "listing_body": "Ein Mitglied hat ein Inserat gemeldet. Titel: {{listing_title}}. Grund: {{reason}}. Referenz: #{{report_id}}. Bitte im Admin-Bereich prüfen.",
+    "marketplace_subject": "Handlung erforderlich: Marktplatz-Meldung #{{report_id}}",
+    "marketplace_body": "Eine Marktplatz-Meldung wurde eingereicht (Meldung #{{report_id}}). Grund: {{reason}}. Nach den Regeln des Digital Services Act muss sie innerhalb von 24 Stunden bestätigt und bearbeitet werden. Bitte jetzt im Admin-Bereich prüfen.",
+    "job_subject": "Stellenanzeige zur Prüfung markiert — {{title}}",
+    "job_body": "Eine Stellenanzeige wurde automatisch als möglicher Spam markiert. Titel: {{title}} (#{{job_id}}). Spam-Score: {{score}}/100. Sie wird bis zur Prüfung zurückgehalten — bitte im Admin-Bereich genehmigen oder ablehnen."
   }
 }

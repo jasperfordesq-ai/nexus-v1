@@ -760,6 +760,88 @@ class NotificationDispatcher
     }
 
     /**
+     * Fan out a MODERATION alert (bell + device push + email) to every
+     * admin/broker/coordinator in the current tenant, each rendered in their
+     * own preferred_language. Used for "new report" / auto-flag alerts so a
+     * moderation queue never sits silent.
+     *
+     * Distinct from notifyAdmins(): that path renders via the legacy exchange
+     * switch and only emails 'exchange_*' types. This method takes explicit
+     * translation keys + shared placeholders and always sends all three
+     * channels. Best-effort and failure-isolated per recipient/channel.
+     *
+     * @param string $type       activity type (bell type + drives push title)
+     * @param string $link       relative deep link to the moderation item
+     * @param string $bellKey    translation key for the bell + push body
+     * @param string $subjectKey translation key for the email subject + heading
+     * @param string $bodyKey    translation key for the email body paragraph
+     * @param array  $params     placeholder replacements shared by the keys
+     * @param string $theme      EmailTemplateBuilder theme (warning/danger/brand)
+     * @return int number of admins the alert was dispatched to
+     */
+    public static function notifyModerationAdmins(string $type, string $link, string $bellKey, string $subjectKey, string $bodyKey, array $params = [], string $theme = 'warning'): int
+    {
+        $tenantId = TenantContext::getId();
+        if ($tenantId === null) {
+            return 0;
+        }
+
+        $admins = DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('role', ['admin', 'broker', 'coordinator'])
+            ->where('status', 'active')
+            ->select(['id', 'email', 'preferred_language'])
+            ->get();
+
+        if ($admins->isEmpty()) {
+            return 0;
+        }
+
+        $adminUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
+        $count = 0;
+
+        foreach ($admins as $admin) {
+            $uid = (int) $admin->id;
+
+            LocaleContext::withLocale($admin, function () use ($admin, $uid, $tenantId, $type, $link, $bellKey, $subjectKey, $bodyKey, $params, $theme, $adminUrl): void {
+                $bell = __($bellKey, $params);
+
+                try {
+                    Notification::createNotification($uid, $bell, $link, $type, true, (int) $tenantId);
+                } catch (\Throwable $e) {
+                    Log::warning('notifyModerationAdmins bell failed: ' . $e->getMessage(), ['user_id' => $uid, 'type' => $type]);
+                }
+
+                try {
+                    self::fanOutPush($uid, $type, $bell, $link);
+                } catch (\Throwable $e) {
+                    Log::debug('notifyModerationAdmins push failed: ' . $e->getMessage());
+                }
+
+                if (empty($admin->email)) {
+                    return;
+                }
+                try {
+                    $subject = __($subjectKey, $params);
+                    $html = EmailTemplateBuilder::make()
+                        ->theme($theme)
+                        ->title($subject)
+                        ->paragraph(__($bodyKey, $params))
+                        ->button(__('emails_misc.moderation.review_cta'), $adminUrl)
+                        ->render();
+                    EmailDispatchService::sendRaw($admin->email, $subject, $html, null, null, null, 'moderation', ['tenant_id' => (int) $tenantId]);
+                } catch (\Throwable $e) {
+                    Log::warning('notifyModerationAdmins email failed: ' . $e->getMessage(), ['user_id' => $uid]);
+                }
+            });
+
+            $count++;
+        }
+
+        return $count;
+    }
+
+    /**
      * Send credit received email to a user.
      */
     public static function sendCreditEmail(int $recipientUserId, string $senderName, float $amount, string $description = ''): ?bool

@@ -115,5 +115,10 @@
   "course.enrolment_payment": "コース登録: {{title}}",
   "vol_org_wallet.volunteer_paid_bell": "ボランティア活動に対して{{org}}から{{amount}}時間クレジットを受け取りました。",
   "vol_org_wallet.admin_adjustment_credit_bell": "{{org}}のウォレットに管理者が{{amount}}時間クレジットを追加しました。理由: {{reason}}",
-  "vol_org_wallet.admin_adjustment_debit_bell": "{{org}}のウォレットから管理者が{{amount}}時間クレジットを差し引きました。理由: {{reason}}"
+  "vol_org_wallet.admin_adjustment_debit_bell": "{{org}}のウォレットから管理者が{{amount}}時間クレジットを差し引きました。理由: {{reason}}",
+  "feed_report.admin_alert": "新しいフィードコンテンツの通報：{{post_type}} が「{{reason}}」で通報されました",
+  "social_report.admin_alert": "新しいコンテンツの通報：{{target_type}} が通報されました — {{reason}}",
+  "listing_report.admin_alert": "新しい出品の通報：「{{listing_title}}」— {{reason}}",
+  "marketplace_report.admin_alert": "マーケットプレイス通報 #{{report_id}} — 24時間以内に確認（DSA）。理由：{{reason}}",
+  "job_vacancy.spam_flag": "求人「{{title}}」がレビュー対象に — スパムスコア {{score}}/100"
 }

@@ -316,15 +316,31 @@ class FeedController extends BaseApiController
         }
 
         try {
-            DB::table('reports')->insert([
+            $reason = (string) __('api.feed_report_default_reason');
+            $reportId = DB::table('reports')->insertGetId([
                 'tenant_id'   => $tenantId,
                 'reporter_id' => $userId,
                 'target_type' => $targetType,
                 'target_id'   => $postId,
-                'reason'      => (string) __('api.feed_report_default_reason'),
+                'reason'      => $reason,
                 'status'      => 'open',
                 'created_at'  => now(),
             ]);
+
+            // Alert moderators a new report awaits review — these reports were
+            // previously written with no admin signal (silent moderation queue).
+            try {
+                \App\Services\NotificationDispatcher::notifyModerationAdmins(
+                    'feed_report_created',
+                    '/admin/reports',
+                    'svc_notifications_2.feed_report.admin_alert',
+                    'emails_misc.moderation.feed_subject',
+                    'emails_misc.moderation.feed_body',
+                    ['post_type' => $targetType, 'reason' => $reason, 'report_id' => $reportId]
+                );
+            } catch (\Throwable $notifyError) {
+                \Illuminate\Support\Facades\Log::warning('Feed report admin alert failed: ' . $notifyError->getMessage());
+            }
 
             return $this->respondWithData(['success' => true]);
         } catch (\Exception $e) {

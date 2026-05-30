@@ -689,5 +689,18 @@
     "title": "おめでとう！",
     "body": "{{title}} が正常に完了しました。証明書の準備ができました。",
     "cta": "コースを見る"
+  },
+  "moderation": {
+    "review_cta": "管理パネルで確認",
+    "feed_subject": "新しいコンテンツの通報 — フィード {{post_type}}",
+    "feed_body": "メンバーがフィードのコンテンツを通報しました。理由：{{reason}}。参照番号：#{{report_id}}。管理パネルで確認してください。",
+    "social_subject": "新しいコンテンツの通報 — {{target_type}}",
+    "social_body": "メンバーが{{target_type}}のコンテンツを通報しました。理由：{{reason}}。参照番号：#{{report_id}}。管理パネルで確認してください。",
+    "listing_subject": "新しい出品の通報 — {{listing_title}}",
+    "listing_body": "メンバーが出品を通報しました。タイトル：{{listing_title}}。理由：{{reason}}。参照番号：#{{report_id}}。管理パネルで確認してください。",
+    "marketplace_subject": "対応が必要：マーケットプレイス通報 #{{report_id}}",
+    "marketplace_body": "マーケットプレイスの通報が提出されました（通報 #{{report_id}}）。理由：{{reason}}。デジタルサービス法（DSA）に基づき、24時間以内に確認・対応する必要があります。今すぐ管理パネルで確認してください。",
+    "job_subject": "求人がレビュー対象に — {{title}}",
+    "job_body": "求人が自動的にスパムの可能性ありとしてフラグされました。タイトル：{{title}}（#{{job_id}}）。スパムスコア：{{score}}/100。レビュー待ちで保留中です — 管理パネルで承認または却下してください。"
   }
 }

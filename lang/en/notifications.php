@@ -178,6 +178,11 @@ return [
     'push_mutual_match'              => 'Mutual Match Found',
     'push_default'                   => 'New Notification',
 
+    'push_feed_report_created' => 'New content report',
+    'push_social_report_created' => 'New content report',
+    'push_listing_report_created' => 'New listing report',
+    'push_marketplace_report_filed' => 'Marketplace report (DSA)',
+    'push_job_flagged_spam' => 'Job flagged for review',
     'push_safeguarding_assigned' => 'Safeguarding report assigned',
     'push_safeguarding_escalated' => 'Report escalated',
     'push_new_message' => 'New Message',

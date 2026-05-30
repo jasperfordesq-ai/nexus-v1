@@ -115,5 +115,10 @@
   "course.enrolment_payment": "Zapisy na kurs: {{title}}",
   "vol_org_wallet.volunteer_paid_bell": "Otrzymałeś/aś {{amount}} kredytów czasu od {{org}} za swój wolontariat.",
   "vol_org_wallet.admin_adjustment_credit_bell": "Saldo {{org}} zostało zwiększone o {{amount}} kredytów czasu przez administrację. Powód: {{reason}}",
-  "vol_org_wallet.admin_adjustment_debit_bell": "Saldo {{org}} zostało zmniejszone o {{amount}} kredytów czasu przez administrację. Powód: {{reason}}"
+  "vol_org_wallet.admin_adjustment_debit_bell": "Saldo {{org}} zostało zmniejszone o {{amount}} kredytów czasu przez administrację. Powód: {{reason}}",
+  "feed_report.admin_alert": "Nowe zgłoszenie treści: {{post_type}} zgłoszone z powodu: {{reason}}",
+  "social_report.admin_alert": "Nowe zgłoszenie treści: {{target_type}} zgłoszone — {{reason}}",
+  "listing_report.admin_alert": "Nowe zgłoszenie ogłoszenia: „{{listing_title}}” — {{reason}}",
+  "marketplace_report.admin_alert": "Zgłoszenie marketplace #{{report_id}} — przejrzyj w 24 h (DSA). Powód: {{reason}}",
+  "job_vacancy.spam_flag": "Ogłoszenie „{{title}}” oznaczone do przeglądu — wynik spamu {{score}}/100"
 }

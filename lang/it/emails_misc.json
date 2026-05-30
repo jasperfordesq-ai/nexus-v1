@@ -689,5 +689,18 @@
     "title": "Congratulazioni!",
     "body": "Hai completato con successo {{title}}. Il tuo certificato è pronto.",
     "cta": "Visualizza il tuo corso"
+  },
+  "moderation": {
+    "review_cta": "Esamina nel pannello di amministrazione",
+    "feed_subject": "Nuova segnalazione di contenuto — feed {{post_type}}",
+    "feed_body": "Un membro ha segnalato un contenuto del feed. Motivo: {{reason}}. Riferimento: #{{report_id}}. Esaminalo nel pannello di amministrazione.",
+    "social_subject": "Nuova segnalazione di contenuto — {{target_type}}",
+    "social_body": "Un membro ha segnalato un contenuto {{target_type}}. Motivo: {{reason}}. Riferimento: #{{report_id}}. Esaminalo nel pannello di amministrazione.",
+    "listing_subject": "Nuova segnalazione di annuncio — {{listing_title}}",
+    "listing_body": "Un membro ha segnalato un annuncio. Titolo: {{listing_title}}. Motivo: {{reason}}. Riferimento: #{{report_id}}. Esaminalo nel pannello di amministrazione.",
+    "marketplace_subject": "Azione necessaria: segnalazione marketplace #{{report_id}}",
+    "marketplace_body": "È stata presentata una segnalazione marketplace (segnalazione #{{report_id}}). Motivo: {{reason}}. In base al Digital Services Act deve essere riscontrata e gestita entro 24 ore. Esaminala subito nel pannello di amministrazione.",
+    "job_subject": "Annuncio di lavoro segnalato per revisione — {{title}}",
+    "job_body": "Un annuncio di lavoro è stato automaticamente segnalato come possibile spam. Titolo: {{title}} (#{{job_id}}). Punteggio spam: {{score}}/100. È in attesa di revisione — approvalo o rifiutalo nel pannello di amministrazione."
   }
 }

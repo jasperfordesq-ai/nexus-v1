@@ -689,5 +689,18 @@
     "title": "Comhghairdeachas!",
     "body": "Tá {{title}} críochnaithe agat. Tá do theastas réidh.",
     "cta": "Féach ar do chúrsa"
+  },
+  "moderation": {
+    "review_cta": "Athbhreithnigh sa phainéal riaracháin",
+    "feed_subject": "Tuairisc nua ar ábhar — fotha {{post_type}}",
+    "feed_body": "Thuairiscigh ball ábhar fotha. Fáth: {{reason}}. Tagairt: #{{report_id}}. Déan athbhreithniú air sa phainéal riaracháin.",
+    "social_subject": "Tuairisc nua ar ábhar — {{target_type}}",
+    "social_body": "Thuairiscigh ball ábhar {{target_type}}. Fáth: {{reason}}. Tagairt: #{{report_id}}. Déan athbhreithniú air sa phainéal riaracháin.",
+    "listing_subject": "Tuairisc nua ar liostú — {{listing_title}}",
+    "listing_body": "Thuairiscigh ball liostú. Teideal: {{listing_title}}. Fáth: {{reason}}. Tagairt: #{{report_id}}. Déan athbhreithniú air sa phainéal riaracháin.",
+    "marketplace_subject": "Gníomh de dhíth: tuairisc mhargaidh #{{report_id}}",
+    "marketplace_body": "Comhdaíodh tuairisc mhargaidh (tuairisc #{{report_id}}). Fáth: {{reason}}. Faoi rialacha an Achta um Sheirbhísí Digiteacha (DSA) ní mór é a admháil agus gníomhú air laistigh de 24 uair. Déan athbhreithniú air anois sa phainéal riaracháin.",
+    "job_subject": "Cuireadh fógra poist faoi bhratach le hathbhreithniú — {{title}}",
+    "job_body": "Cuireadh fógra poist faoi bhratach go huathoibríoch mar thurscar féideartha. Teideal: {{title}} (#{{job_id}}). Scór turscair: {{score}}/100. Tá sé ar coinneáil go dtí an t-athbhreithniú — formheas nó diúltaigh dó sa phainéal riaracháin."
   }
 }

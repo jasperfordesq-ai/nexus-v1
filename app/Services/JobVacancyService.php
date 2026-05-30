@@ -507,6 +507,29 @@ class JobVacancyService
             ]);
         }
 
+        // Alert moderators when spam detection flags/blocks a posting so it does
+        // not sit silently in the queue. Only fires on an actual spam action —
+        // normal moderation holds are not spam and are handled elsewhere.
+        if ($spamAction === 'flag' || $spamAction === 'block') {
+            try {
+                \App\Services\NotificationDispatcher::notifyModerationAdmins(
+                    'job_flagged_spam',
+                    '/admin/jobs/moderation',
+                    'svc_notifications_2.job_vacancy.spam_flag',
+                    'emails_misc.moderation.job_subject',
+                    'emails_misc.moderation.job_body',
+                    [
+                        'title'  => (string) $vacancy->title,
+                        'job_id' => $vacancy->id,
+                        'score'  => $spamScore,
+                        'flags'  => is_array($spamFlags) ? implode(', ', $spamFlags) : (string) $spamFlags,
+                    ]
+                );
+            } catch (\Throwable $notifyError) {
+                Log::warning('Job spam-flag admin alert failed: ' . $notifyError->getMessage());
+            }
+        }
+
         // Dispatch webhook for vacancy creation
         try {
             \App\Services\WebhookDispatchService::dispatch('job.vacancy.created', [
