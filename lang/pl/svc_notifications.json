@@ -146,6 +146,7 @@
     "received_bell_anonymous": "Otrzymałeś/aś darowiznę {{amount}} kredytów czasu."
   },
   "marketplace_payout": {
-    "onboarding_complete_bell": "Twoje konto sprzedawcy jest w pełni skonfigurowane — możesz teraz otrzymywać wypłaty z targowiska."
+    "onboarding_complete_bell": "Twoje konto sprzedawcy jest w pełni skonfigurowane — możesz teraz otrzymywać wypłaty z targowiska.",
+    "payout_sent_bell": "Twoja wypłata {{amount}} za zamówienie #{{order}} została zwolniona."
   }
 }

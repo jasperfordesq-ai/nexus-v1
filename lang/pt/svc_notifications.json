@@ -146,6 +146,7 @@
     "received_bell_anonymous": "Recebeste uma doação de {{amount}} créditos de tempo."
   },
   "marketplace_payout": {
-    "onboarding_complete_bell": "A tua conta de vendedor está totalmente configurada — já podes receber pagamentos do mercado."
+    "onboarding_complete_bell": "A tua conta de vendedor está totalmente configurada — já podes receber pagamentos do mercado.",
+    "payout_sent_bell": "O teu pagamento de {{amount}} pela encomenda #{{order}} foi libertado."
   }
 }

@@ -146,6 +146,7 @@
     "received_bell_anonymous": "Du hast eine Spende von {{amount}} Zeitgutschriften erhalten."
   },
   "marketplace_payout": {
-    "onboarding_complete_bell": "Dein Verkäuferkonto ist vollständig eingerichtet — du kannst jetzt Marktplatz-Auszahlungen erhalten."
+    "onboarding_complete_bell": "Dein Verkäuferkonto ist vollständig eingerichtet — du kannst jetzt Marktplatz-Auszahlungen erhalten.",
+    "payout_sent_bell": "Deine Auszahlung von {{amount}} für Bestellung #{{order}} wurde freigegeben."
   }
 }

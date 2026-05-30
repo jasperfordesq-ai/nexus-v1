@@ -146,6 +146,7 @@
     "received_bell_anonymous": "لقد تلقّيت تبرعًا قدره {{amount}} ساعة رصيد."
   },
   "marketplace_payout": {
-    "onboarding_complete_bell": "تم إعداد حساب البائع بالكامل — يمكنك الآن استلام مدفوعات السوق."
+    "onboarding_complete_bell": "تم إعداد حساب البائع بالكامل — يمكنك الآن استلام مدفوعات السوق.",
+    "payout_sent_bell": "تم تحرير دفعتك البالغة {{amount}} عن الطلب رقم {{order}} إليك."
   }
 }

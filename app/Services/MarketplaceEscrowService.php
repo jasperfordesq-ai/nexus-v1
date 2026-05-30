@@ -7,9 +7,11 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\MarketplaceEscrow;
 use App\Models\MarketplaceOrder;
 use App\Models\MarketplacePayment;
+use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -119,6 +121,38 @@ class MarketplaceEscrowService
             'trigger' => $trigger,
             'amount' => $escrow->amount,
         ]);
+
+        // P0.2: tell the seller their payout was released — previously silent.
+        // Tenant-safe (createNotification forces the recipient's tenant_id),
+        // rendered in the seller's language, and fail-safe so a bell error can
+        // never unwind the already-committed release.
+        try {
+            $order = $escrow->order;
+            $sellerId = (int) ($order->seller_id ?? 0);
+            if ($order && $sellerId > 0) {
+                $seller = DB::table('users')
+                    ->where('id', $sellerId)
+                    ->where('tenant_id', $order->tenant_id)
+                    ->select(['id', 'preferred_language'])
+                    ->first();
+                LocaleContext::withLocale($seller, function () use ($sellerId, $escrow, $order) {
+                    Notification::createNotification(
+                        $sellerId,
+                        __('svc_notifications.marketplace_payout.payout_sent_bell', [
+                            'amount' => $escrow->amount,
+                            'order'  => $order->id,
+                        ]),
+                        '/marketplace/orders/' . $order->id,
+                        'marketplace_payout'
+                    );
+                });
+            }
+        } catch (\Throwable $e) {
+            Log::warning('MarketplaceEscrow: seller payout bell failed', [
+                'escrow_id' => $escrow->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**

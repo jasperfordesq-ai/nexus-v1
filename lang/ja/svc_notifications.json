@@ -146,6 +146,7 @@
     "received_bell_anonymous": "{{amount}}時間クレジットの寄付を受け取りました。"
   },
   "marketplace_payout": {
-    "onboarding_complete_bell": "出品者アカウントの設定が完了しました。マーケットプレイスの支払いを受け取れます。"
+    "onboarding_complete_bell": "出品者アカウントの設定が完了しました。マーケットプレイスの支払いを受け取れます。",
+    "payout_sent_bell": "注文 #{{order}} のあなたへの支払い {{amount}} がリリースされました。"
   }
 }

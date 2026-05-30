@@ -146,6 +146,7 @@
     "received_bell_anonymous": "Je hebt een donatie van {{amount}} tijdcredits ontvangen."
   },
   "marketplace_payout": {
-    "onboarding_complete_bell": "Je verkopersaccount is volledig ingesteld — je kunt nu marktplaatsuitbetalingen ontvangen."
+    "onboarding_complete_bell": "Je verkopersaccount is volledig ingesteld — je kunt nu marktplaatsuitbetalingen ontvangen.",
+    "payout_sent_bell": "Je uitbetaling van {{amount}} voor bestelling #{{order}} is vrijgegeven."
   }
 }
