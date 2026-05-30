@@ -6,11 +6,24 @@
 /**
  * Group Branding Picker
  * Color picker for group custom branding (primary + accent colors).
+ *
+ * Uses the HeroUI v3 ColorPicker (branded popover: area + hue slider + hex field)
+ * instead of the native <input type="color">. Values are stored as hex strings;
+ * parseColor() adapts them to the Color objects the picker works with, and
+ * Color.toString('hex') converts back on change.
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, type ReactNode } from 'react';
 import Paintbrush from 'lucide-react/icons/paintbrush';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, ColorPicker } from '@/components/ui';
+import {
+  ColorArea,
+  ColorField,
+  ColorSlider,
+  ColorSwatch,
+  Label,
+  parseColor,
+} from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 
 interface GroupBrandingPickerProps {
@@ -21,6 +34,45 @@ interface GroupBrandingPickerProps {
 
 const DEFAULT_PRIMARY = '#0070f3';
 const DEFAULT_ACCENT = '#7928ca';
+
+/** A single labelled brand-colour picker. */
+function BrandColor({ label, value, onChange }: { label: ReactNode; value: string; onChange: (hex: string) => void }) {
+  return (
+    <ColorPicker value={parseColor(value)} onChange={(color) => onChange(color.toString('hex'))}>
+      <ColorPicker.Trigger className="flex items-center gap-3">
+        <ColorSwatch size="lg" className="h-10 w-10 rounded-lg border border-border" />
+        <span className="text-left">
+          <Label className="block cursor-pointer text-sm font-medium text-foreground">{label}</Label>
+          <span className="font-mono text-sm uppercase text-muted">{value}</span>
+        </span>
+      </ColorPicker.Trigger>
+      <ColorPicker.Popover className="gap-2">
+        <ColorArea
+          aria-label={typeof label === 'string' ? label : undefined}
+          className="max-w-full"
+          colorSpace="hsb"
+          xChannel="saturation"
+          yChannel="brightness"
+        >
+          <ColorArea.Thumb />
+        </ColorArea>
+        <ColorSlider channel="hue" className="gap-1 px-1" colorSpace="hsb" aria-label="Hue">
+          <ColorSlider.Track>
+            <ColorSlider.Thumb />
+          </ColorSlider.Track>
+        </ColorSlider>
+        <ColorField aria-label={typeof label === 'string' ? label : undefined}>
+          <ColorField.Group variant="secondary">
+            <ColorField.Prefix>
+              <ColorSwatch size="xs" />
+            </ColorField.Prefix>
+            <ColorField.Input />
+          </ColorField.Group>
+        </ColorField>
+      </ColorPicker.Popover>
+    </ColorPicker>
+  );
+}
 
 export function GroupBrandingPicker({ primaryColor, accentColor, onChange }: GroupBrandingPickerProps) {
   const { t } = useTranslation('groups');
@@ -56,48 +108,12 @@ export function GroupBrandingPicker({ primaryColor, accentColor, onChange }: Gro
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Primary Color */}
         <div className="space-y-2">
-          <label
-            htmlFor="group-primary-color"
-            className="block text-sm font-medium text-foreground"
-          >
-            {t('branding.primary_color')}
-          </label>
-          <div className="flex items-center gap-3">
-            <input
-              id="group-primary-color"
-              type="color"
-              value={primary}
-              onChange={(e) => handlePrimaryChange(e.target.value)}
-              className="w-10 h-10 rounded-lg border border-border cursor-pointer"
-              aria-label={t('branding.primary_color')}
-            />
-            <span className="text-sm text-muted font-mono uppercase">
-              {primary}
-            </span>
-          </div>
+          <BrandColor label={t('branding.primary_color')} value={primary} onChange={handlePrimaryChange} />
         </div>
 
         {/* Accent Color */}
         <div className="space-y-2">
-          <label
-            htmlFor="group-accent-color"
-            className="block text-sm font-medium text-foreground"
-          >
-            {t('branding.accent_color')}
-          </label>
-          <div className="flex items-center gap-3">
-            <input
-              id="group-accent-color"
-              type="color"
-              value={accent}
-              onChange={(e) => handleAccentChange(e.target.value)}
-              className="w-10 h-10 rounded-lg border border-border cursor-pointer"
-              aria-label={t('branding.accent_color')}
-            />
-            <span className="text-sm text-muted font-mono uppercase">
-              {accent}
-            </span>
-          </div>
+          <BrandColor label={t('branding.accent_color')} value={accent} onChange={handleAccentChange} />
         </div>
       </div>
 

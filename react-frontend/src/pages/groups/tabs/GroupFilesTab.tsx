@@ -24,7 +24,7 @@ import FolderPlus from 'lucide-react/icons/folder-plus';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure, Button, Chip, Spinner, Input, SearchField, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useConfirm } from '@/components/ui';
+import { GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure, Button, ToggleButton, ToggleButtonGroup, Chip, Spinner, Input, SearchField, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useConfirm } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -281,38 +281,37 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
         />
       </div>
 
-      {/* Folder chips */}
+      {/* Folder filter — single-select ToggleButtonGroup ("__all__" sentinel = no folder filter) */}
       {folders.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          <Chip
-            variant={activeFolder === null ? 'solid' : 'bordered'}
-            color="primary"
-            className="cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-base)]"
-            role="button"
-            tabIndex={0}
-            aria-pressed={activeFolder === null}
-            onClick={() => setActiveFolder(null)}
-            onKeyDown={(e: React.KeyboardEvent<HTMLElement>) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveFolder(null); } }}
+        <ToggleButtonGroup
+          aria-label={t('filters_aria')}
+          selectionMode="single"
+          disallowEmptySelection
+          isDetached
+          size="sm"
+          selectedKeys={new Set([activeFolder ?? '__all__'])}
+          onSelectionChange={(keys) => { const [k] = Array.from(keys); setActiveFolder(!k || k === '__all__' ? null : String(k)); }}
+          className="flex flex-wrap gap-2"
+        >
+          <ToggleButton
+            id="__all__"
+            variant="ghost"
+            className="data-[selected=true]:bg-[var(--color-primary)] data-[selected=true]:text-white"
           >
             {t('files.all_files')}
-          </Chip>
+          </ToggleButton>
           {folders.map((folder) => (
-            <Chip
+            <ToggleButton
               key={folder.folder}
-              variant={activeFolder === folder.folder ? 'solid' : 'bordered'}
-              color="primary"
-              className="cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-base)]"
-              role="button"
-              tabIndex={0}
-              aria-pressed={activeFolder === folder.folder}
-              onClick={() => setActiveFolder(folder.folder)}
-              onKeyDown={(e: React.KeyboardEvent<HTMLElement>) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveFolder(folder.folder); } }}
+              id={folder.folder}
+              variant="ghost"
+              className="data-[selected=true]:bg-[var(--color-primary)] data-[selected=true]:text-white"
             >
-              <FolderOpen className="w-3 h-3 mr-1 inline" aria-hidden="true" />
+              <FolderOpen className="w-3 h-3" aria-hidden="true" />
               {t('files.folder_chip', { name: folder.folder, count: folder.file_count })}
-            </Chip>
+            </ToggleButton>
           ))}
-        </div>
+        </ToggleButtonGroup>
       )}
 
       {/* File list */}

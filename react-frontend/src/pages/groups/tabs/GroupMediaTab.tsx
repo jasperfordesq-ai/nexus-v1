@@ -18,7 +18,7 @@ import X from 'lucide-react/icons/x';
 import ChevronLeft from 'lucide-react/icons/chevron-left';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, useDisclosure, Button, Chip, Spinner, Modal, ModalContent, ModalBody, useConfirm } from '@/components/ui';
+import { GlassCard, useDisclosure, Button, ToggleButton, ToggleButtonGroup, Spinner, Modal, ModalContent, ModalBody, useConfirm } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -241,26 +241,30 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
     <div className="space-y-4">
       {/* Toolbar: filter chips + upload */}
       <div className="flex flex-col gap-3 rounded-xl border border-border bg-surface/80 p-3 shadow-sm sm:flex-row sm:items-center">
-        <div className="flex flex-wrap gap-2 flex-1" role="group" aria-label={t('media.filter_group')}>
+        <ToggleButtonGroup
+          aria-label={t('media.filter_group')}
+          selectionMode="single"
+          disallowEmptySelection
+          isDetached
+          size="sm"
+          selectedKeys={new Set([filter])}
+          onSelectionChange={(keys) => { const [k] = Array.from(keys); if (k) setFilter(k as typeof filter); }}
+          className="flex flex-wrap gap-2 flex-1"
+        >
           {FILTER_CHIPS.map((chip) => (
-            <Chip
+            <ToggleButton
               key={chip.key}
-              variant={filter === chip.key ? 'solid' : 'bordered'}
-              color="primary"
-              className="cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-base)]"
-              role="button"
-              tabIndex={0}
-              onClick={() => setFilter(chip.key)}
-              onKeyDown={(e: React.KeyboardEvent<HTMLElement>) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setFilter(chip.key); } }}
-              aria-pressed={filter === chip.key}
+              id={chip.key}
+              variant="ghost"
+              className="data-[selected=true]:bg-[var(--color-primary)] data-[selected=true]:text-white"
             >
               {chip.icon && (
-                <chip.icon className="w-3 h-3 mr-1 inline" aria-hidden="true" />
+                <chip.icon className="w-3 h-3" aria-hidden="true" />
               )}
               {t(chip.labelKey)}
-            </Chip>
+            </ToggleButton>
           ))}
-        </div>
+        </ToggleButtonGroup>
 
         {isMember && (
           <Button

@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, SearchField, Skeleton } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, ToggleButton, ToggleButtonGroup, Progress, Chip, SearchField, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -344,30 +344,32 @@ export function EventsPage() {
         )}
       </GlassCard>
 
-      {/* Category Filter Buttons */}
-      <div className="flex flex-wrap gap-2" role="group" aria-label={t('category_aria')}>
+      {/* Category Filter — single-select ToggleButtonGroup */}
+      <ToggleButtonGroup
+        aria-label={t('category_aria')}
+        selectionMode="single"
+        disallowEmptySelection
+        isDetached
+        size="sm"
+        selectedKeys={new Set([selectedCategory])}
+        onSelectionChange={(keys) => { const [k] = Array.from(keys); if (k) setSelectedCategory(String(k)); }}
+        className="flex flex-wrap gap-2"
+      >
         {EVENT_CATEGORIES.map((cat) => {
-          const isSelected = selectedCategory === cat.id;
           const IconComp = cat.icon;
           return (
-            <Button
+            <ToggleButton
               key={cat.id}
-              variant="flat"
-              size="sm"
-              className={
-                isSelected
-                  ? 'bg-linear-to-r from-indigo-500 to-purple-600 text-white'
-                  : 'bg-theme-elevated text-theme-muted hover:bg-theme-hover'
-              }
-              startContent={<IconComp className="w-3.5 h-3.5" aria-hidden="true" />}
-              onPress={() => setSelectedCategory(cat.id)}
-              aria-pressed={isSelected}
+              id={cat.id}
+              variant="ghost"
+              className="bg-theme-elevated text-theme-muted transition-colors hover:bg-theme-hover data-[selected=true]:bg-linear-to-r data-[selected=true]:from-indigo-500 data-[selected=true]:to-purple-600 data-[selected=true]:text-white"
             >
+              <IconComp className="w-3.5 h-3.5" aria-hidden="true" />
               {cat.name}
-            </Button>
+            </ToggleButton>
           );
         })}
-      </div>
+      </ToggleButtonGroup>
 
       {/* Error State */}
       {error && !isLoading && (
@@ -457,26 +459,17 @@ export function EventsPage() {
               {hasMore && (
                 <div className="space-y-3 pt-4">
                   {totalCount != null && totalCount > 0 && (
-                    <div
-                      className="space-y-1.5"
-                      role="progressbar"
-                      aria-valuenow={Math.round((events.length / totalCount) * 100)}
-                      aria-valuemin={0}
-                      aria-valuemax={100}
-                      aria-label={t('loading_more_aria')}
-                    >
+                    <div className="space-y-1.5">
                       <div className="flex justify-between text-xs text-theme-muted px-1">
                         <span>{events.length.toLocaleString()} / {totalCount.toLocaleString()}</span>
                         <span className="font-medium text-theme-secondary">{Math.round((events.length / totalCount) * 100)}%</span>
                       </div>
-                      <div className="h-1.5 rounded-full bg-theme-elevated overflow-hidden">
-                        <motion.div
-                          className="h-full rounded-full bg-accent"
-                          initial={{ width: '0%' }}
-                          animate={{ width: `${Math.round((events.length / totalCount) * 100)}%` }}
-                          transition={{ duration: 0.6, ease: 'easeOut' }}
-                        />
-                      </div>
+                      <Progress
+                        aria-label={t('loading_more_aria')}
+                        size="sm"
+                        value={Math.round((events.length / totalCount) * 100)}
+                        classNames={{ track: 'bg-theme-elevated', indicator: 'bg-accent' }}
+                      />
                     </div>
                   )}
                   <div className="text-center">

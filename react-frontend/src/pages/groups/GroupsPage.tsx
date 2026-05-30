@@ -20,7 +20,7 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Star from 'lucide-react/icons/star';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, GroupCardSkeleton, Button, SearchField, Avatar, AvatarGroup, Tooltip } from '@/components/ui';
+import { GlassCard, GroupCardSkeleton, Button, ToggleButton, ToggleButtonGroup, Chip, SearchField, Avatar, AvatarGroup, Tooltip } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
@@ -231,52 +231,52 @@ export function GroupsPage() {
         }
       />
 
-      {/* Quick Filters */}
-      <div role="group" className="flex flex-wrap items-center gap-2" aria-label={t('filters_aria')}>
-        <Button
-          size="sm"
-          variant={filter === 'all' ? 'solid' : 'flat'}
-          color={filter === 'all' ? 'primary' : 'default'}
-          className={filter === 'all' ? 'font-semibold shadow-sm' : 'bg-theme-elevated text-theme-secondary hover:text-indigo-600'}
-          startContent={<Users className="w-3.5 h-3.5" aria-hidden="true" />}
-          onPress={() => setFilter('all')}
-          aria-pressed={filter === 'all'}
+      {/* Quick Filters — single-select ToggleButtonGroup (per-filter accent via data-[selected]). */}
+      <ToggleButtonGroup
+        aria-label={t('filters_aria')}
+        selectionMode="single"
+        disallowEmptySelection
+        isDetached
+        size="sm"
+        selectedKeys={new Set([filter])}
+        onSelectionChange={(keys) => { const [k] = Array.from(keys); if (k) setFilter(k as typeof filter); }}
+        className="flex flex-wrap items-center gap-2"
+      >
+        <ToggleButton
+          id="all"
+          variant="ghost"
+          className="bg-theme-elevated text-theme-secondary hover:text-indigo-600 data-[selected=true]:bg-indigo-600 data-[selected=true]:font-semibold data-[selected=true]:text-white data-[selected=true]:shadow-sm"
         >
+          <Users className="w-3.5 h-3.5" aria-hidden="true" />
           {t('filter_all')}
-        </Button>
+        </ToggleButton>
         {isAuthenticated && (
-          <Button
-            size="sm"
-            variant={filter === 'joined' ? 'solid' : 'flat'}
-            className={filter === 'joined' ? 'bg-emerald-600 text-white font-semibold shadow-sm' : 'bg-theme-elevated text-theme-secondary hover:text-emerald-600'}
-            startContent={<Star className="w-3.5 h-3.5" aria-hidden="true" />}
-            onPress={() => setFilter('joined')}
-            aria-pressed={filter === 'joined'}
+          <ToggleButton
+            id="joined"
+            variant="ghost"
+            className="bg-theme-elevated text-theme-secondary hover:text-emerald-600 data-[selected=true]:bg-emerald-600 data-[selected=true]:font-semibold data-[selected=true]:text-white data-[selected=true]:shadow-sm"
           >
+            <Star className="w-3.5 h-3.5" aria-hidden="true" />
             {t('filter_my')}
-          </Button>
+          </ToggleButton>
         )}
-        <Button
-          size="sm"
-          variant={filter === 'public' ? 'solid' : 'flat'}
-          className={filter === 'public' ? 'bg-sky-600 text-white font-semibold shadow-sm' : 'bg-theme-elevated text-theme-secondary hover:text-sky-600'}
-          startContent={<Globe className="w-3.5 h-3.5" aria-hidden="true" />}
-          onPress={() => setFilter('public')}
-          aria-pressed={filter === 'public'}
+        <ToggleButton
+          id="public"
+          variant="ghost"
+          className="bg-theme-elevated text-theme-secondary hover:text-sky-600 data-[selected=true]:bg-sky-600 data-[selected=true]:font-semibold data-[selected=true]:text-white data-[selected=true]:shadow-sm"
         >
+          <Globe className="w-3.5 h-3.5" aria-hidden="true" />
           {t('filter_public')}
-        </Button>
-        <Button
-          size="sm"
-          variant={filter === 'private' ? 'solid' : 'flat'}
-          className={filter === 'private' ? 'bg-amber-600 text-white font-semibold shadow-sm' : 'bg-theme-elevated text-theme-secondary hover:text-amber-600'}
-          startContent={<Lock className="w-3.5 h-3.5" aria-hidden="true" />}
-          onPress={() => setFilter('private')}
-          aria-pressed={filter === 'private'}
+        </ToggleButton>
+        <ToggleButton
+          id="private"
+          variant="ghost"
+          className="bg-theme-elevated text-theme-secondary hover:text-amber-600 data-[selected=true]:bg-amber-600 data-[selected=true]:font-semibold data-[selected=true]:text-white data-[selected=true]:shadow-sm"
         >
+          <Lock className="w-3.5 h-3.5" aria-hidden="true" />
           {t('filter_private')}
-        </Button>
-      </div>
+        </ToggleButton>
+      </ToggleButtonGroup>
 
       {/* Filters */}
       <GlassCard className="p-4">
@@ -298,8 +298,8 @@ export function GroupsPage() {
           {(debouncedQuery || filter !== 'all') && (
             <div className="flex flex-wrap items-center gap-2 text-xs text-theme-muted">
               <span>{t('active_filters')}</span>
-              {debouncedQuery && <span className="rounded-full bg-theme-elevated px-2 py-1 text-theme-secondary">{debouncedQuery}</span>}
-              {filter !== 'all' && <span className="rounded-full bg-theme-elevated px-2 py-1 text-theme-secondary">{getFilterLabel(filter)}</span>}
+              {debouncedQuery && <Chip size="sm" variant="flat" className="bg-theme-elevated text-theme-secondary">{debouncedQuery}</Chip>}
+              {filter !== 'all' && <Chip size="sm" variant="flat" className="bg-theme-elevated text-theme-secondary">{getFilterLabel(filter)}</Chip>}
             </div>
           )}
         </div>
@@ -547,9 +547,9 @@ const GroupCard = memo(function GroupCard({ group, featured }: GroupCardProps) {
           {/* Member Status */}
           {(group.is_member || group.viewer_membership?.status === 'active') && (
             <div className="mt-4 pt-4 border-t border-theme-default">
-              <span className="text-xs px-2 py-1 rounded-full bg-indigo-500/20 text-indigo-600 dark:text-indigo-400">
+              <Chip size="sm" variant="flat" className="bg-indigo-500/20 text-indigo-600 dark:text-indigo-400">
                 {t('member_status')}
-              </span>
+              </Chip>
             </div>
           )}
           </div>

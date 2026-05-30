@@ -1,4 +1,4 @@
-import { Button, Spinner, Card, CardBody, CardHeader, Chip, GlassCard, Avatar, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
+import { Button, ToggleButton, ToggleButtonGroup, Spinner, Card, CardBody, CardHeader, Chip, GlassCard, Avatar, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 
 import TrendingUp from 'lucide-react/icons/trending-up';
@@ -216,20 +216,26 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
       {/* Header: Date Range + Export Buttons */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         {/* Date range selector */}
-        <div className="flex items-center gap-2" role="group" aria-label={t('analytics.date_range_aria')}>
+        <ToggleButtonGroup
+          aria-label={t('analytics.date_range_aria')}
+          selectionMode="single"
+          disallowEmptySelection
+          size="sm"
+          selectedKeys={new Set([String(days)])}
+          onSelectionChange={(keys) => { const [k] = Array.from(keys); if (k) setDays(Number(k) as DaysRange); }}
+          className="flex items-center gap-0"
+        >
           {([7, 30, 90] as DaysRange[]).map((d) => (
-            <Button
+            <ToggleButton
               key={d}
-              size="sm"
-              variant={days === d ? 'solid' : 'flat'}
-              color={days === d ? 'primary' : 'default'}
-              onPress={() => setDays(d)}
-              aria-pressed={days === d}
+              id={String(d)}
+              variant="ghost"
+              className="data-[selected=true]:bg-[var(--color-primary)] data-[selected=true]:text-white"
             >
               {t(`analytics.days_${d}`)}
-            </Button>
+            </ToggleButton>
           ))}
-        </div>
+        </ToggleButtonGroup>
 
         {/* Export buttons */}
         <div className="flex items-center gap-2">

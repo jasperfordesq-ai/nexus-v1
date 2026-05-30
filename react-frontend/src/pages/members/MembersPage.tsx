@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, MemberCardSkeleton, AlgorithmLabel, useAlgorithmInfo, Button, Chip, SearchField, Avatar, Tooltip } from '@/components/ui';
+import { Select, SelectItem, GlassCard, MemberCardSkeleton, AlgorithmLabel, useAlgorithmInfo, Button, ToggleButton, ToggleButtonGroup, Chip, SearchField, Avatar, Tooltip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -347,54 +347,43 @@ export function MembersPage() {
         </div>
       )}
 
-      {/* Quick Filters */}
-      <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t('members.quick_filters')}>
-        <Button
-          size="sm"
-          variant={quickFilter === 'all' ? 'solid' : 'flat'}
-          className={
-            quickFilter === 'all'
-              ? 'bg-indigo-600 text-white shadow-sm'
-              : 'bg-theme-elevated text-theme-secondary hover:text-indigo-500 hover:bg-indigo-500/5 transition-colors'
-          }
-          isDisabled={isNearbyMode}
-          startContent={<Users className="w-3.5 h-3.5" aria-hidden="true" />}
-          onPress={() => handleQuickFilter('all')}
-          aria-pressed={quickFilter === 'all'}
+      {/* Quick Filters — single-select ToggleButtonGroup (per-filter accent colour via data-[selected]). */}
+      <ToggleButtonGroup
+        aria-label={t('members.quick_filters')}
+        selectionMode="single"
+        disallowEmptySelection
+        isDetached
+        size="sm"
+        isDisabled={isNearbyMode}
+        selectedKeys={new Set([quickFilter])}
+        onSelectionChange={(keys) => { const [k] = Array.from(keys); if (k) handleQuickFilter(k as QuickFilter); }}
+        className="flex flex-wrap items-center gap-2"
+      >
+        <ToggleButton
+          id="all"
+          variant="ghost"
+          className="bg-theme-elevated text-theme-secondary transition-colors hover:bg-indigo-500/5 hover:text-indigo-500 data-[selected=true]:bg-indigo-600 data-[selected=true]:text-white data-[selected=true]:shadow-sm"
         >
+          <Users className="w-3.5 h-3.5" aria-hidden="true" />
           {t('members.all')}
-        </Button>
-        <Button
-          size="sm"
-          variant={quickFilter === 'new' ? 'solid' : 'flat'}
-          className={
-            quickFilter === 'new'
-              ? 'bg-emerald-600 text-white shadow-sm'
-              : 'bg-theme-elevated text-theme-secondary hover:text-emerald-500 hover:bg-emerald-500/5 transition-colors'
-          }
-          isDisabled={isNearbyMode}
-          startContent={<Sparkles className="w-3.5 h-3.5" aria-hidden="true" />}
-          onPress={() => handleQuickFilter('new')}
-          aria-pressed={quickFilter === 'new'}
+        </ToggleButton>
+        <ToggleButton
+          id="new"
+          variant="ghost"
+          className="bg-theme-elevated text-theme-secondary transition-colors hover:bg-emerald-500/5 hover:text-emerald-500 data-[selected=true]:bg-emerald-600 data-[selected=true]:text-white data-[selected=true]:shadow-sm"
         >
+          <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
           {t('members.new')}
-        </Button>
-        <Button
-          size="sm"
-          variant={quickFilter === 'active' ? 'solid' : 'flat'}
-          className={
-            quickFilter === 'active'
-              ? 'bg-amber-600 text-white shadow-sm'
-              : 'bg-theme-elevated text-theme-secondary hover:text-[var(--color-warning)] hover:bg-amber-500/5 transition-colors'
-          }
-          isDisabled={isNearbyMode}
-          startContent={<TrendingUp className="w-3.5 h-3.5" aria-hidden="true" />}
-          onPress={() => handleQuickFilter('active')}
-          aria-pressed={quickFilter === 'active'}
+        </ToggleButton>
+        <ToggleButton
+          id="active"
+          variant="ghost"
+          className="bg-theme-elevated text-theme-secondary transition-colors hover:bg-amber-500/5 hover:text-[var(--color-warning)] data-[selected=true]:bg-amber-600 data-[selected=true]:text-white data-[selected=true]:shadow-sm"
         >
+          <TrendingUp className="w-3.5 h-3.5" aria-hidden="true" />
           {t('members.active')}
-        </Button>
-      </div>
+        </ToggleButton>
+      </ToggleButtonGroup>
 
       {/* Search & Sort Filters */}
       <GlassCard className="p-4">
@@ -438,19 +427,17 @@ export function MembersPage() {
               <SelectItem key="hours_given" id="hours_given">{t('members.sort_active')}</SelectItem>
             </Select>
 
-            <Button
+            <ToggleButton
               size="sm"
-              variant={nearMeEnabled ? 'solid' : 'flat'}
-              className={nearMeEnabled
-                ? 'bg-emerald-600 text-white shadow-sm'
-                : 'bg-theme-elevated text-theme-primary hover:bg-emerald-500/10 hover:text-emerald-600'}
-              startContent={<MapPin className="w-4 h-4" aria-hidden="true" />}
-              onPress={handleNearMeToggle}
-              aria-pressed={nearMeEnabled}
+              variant="ghost"
+              isSelected={nearMeEnabled}
+              onChange={() => handleNearMeToggle()}
+              className="bg-theme-elevated text-theme-primary transition-colors hover:bg-emerald-500/10 hover:text-emerald-600 data-[selected=true]:bg-emerald-600 data-[selected=true]:text-white data-[selected=true]:shadow-sm"
               aria-label={t('members.near_me')}
             >
+              <MapPin className="w-4 h-4" aria-hidden="true" />
               {t('members.near_me')}
-            </Button>
+            </ToggleButton>
 
             {nearMeEnabled && (
               <Select
@@ -475,43 +462,45 @@ export function MembersPage() {
               </Select>
             )}
 
-            <div className="flex w-fit rounded-xl overflow-hidden border border-theme-default" role="group" aria-label={t('aria.view_mode')}>
-              <Button
+            <ToggleButtonGroup
+              aria-label={t('aria.view_mode')}
+              selectionMode="single"
+              disallowEmptySelection
+              size="sm"
+              selectedKeys={new Set([viewMode])}
+              onSelectionChange={(keys) => { const [k] = Array.from(keys); if (k) setViewMode(k as ViewMode); }}
+              className="flex w-fit gap-0 overflow-hidden rounded-xl border border-theme-default"
+            >
+              <ToggleButton
+                id="grid"
                 isIconOnly
-                size="sm"
-                variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
-                className={`rounded-none transition-colors ${viewMode === 'grid' ? 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400' : 'bg-theme-elevated text-theme-muted'}`}
+                variant="ghost"
                 aria-label={t('aria.grid_view')}
-                aria-pressed={viewMode === 'grid'}
-                onPress={() => setViewMode('grid')}
+                className="rounded-none bg-theme-elevated text-theme-muted transition-colors data-[selected=true]:bg-indigo-500/10 data-[selected=true]:text-indigo-500 dark:data-[selected=true]:text-indigo-400"
               >
                 <Grid className="w-4 h-4" aria-hidden="true" />
-              </Button>
-              <Button
+              </ToggleButton>
+              <ToggleButton
+                id="list"
                 isIconOnly
-                size="sm"
-                variant={viewMode === 'list' ? 'secondary' : 'ghost'}
-                className={`rounded-none transition-colors ${!canUseMapView ? 'rounded-r-xl' : ''} ${viewMode === 'list' ? 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400' : 'bg-theme-elevated text-theme-muted'}`}
+                variant="ghost"
                 aria-label={t('aria.list_view')}
-                aria-pressed={viewMode === 'list'}
-                onPress={() => setViewMode('list')}
+                className="rounded-none bg-theme-elevated text-theme-muted transition-colors data-[selected=true]:bg-indigo-500/10 data-[selected=true]:text-indigo-500 dark:data-[selected=true]:text-indigo-400"
               >
                 <List className="w-4 h-4" aria-hidden="true" />
-              </Button>
+              </ToggleButton>
               {canUseMapView && (
-                <Button
+                <ToggleButton
+                  id="map"
                   isIconOnly
-                  size="sm"
-                  variant={viewMode === 'map' ? 'secondary' : 'ghost'}
-                  className={`rounded-none rounded-r-xl transition-colors ${viewMode === 'map' ? 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400' : 'bg-theme-elevated text-theme-muted'}`}
+                  variant="ghost"
                   aria-label={t('aria.map_view')}
-                  aria-pressed={viewMode === 'map'}
-                  onPress={() => setViewMode('map')}
+                  className="rounded-none bg-theme-elevated text-theme-muted transition-colors data-[selected=true]:bg-indigo-500/10 data-[selected=true]:text-indigo-500 dark:data-[selected=true]:text-indigo-400"
                 >
                   <MapIcon className="w-4 h-4" aria-hidden="true" />
-                </Button>
+                </ToggleButton>
               )}
-            </div>
+            </ToggleButtonGroup>
           </div>
         </div>
         {(debouncedQuery || nearMeEnabled) && (

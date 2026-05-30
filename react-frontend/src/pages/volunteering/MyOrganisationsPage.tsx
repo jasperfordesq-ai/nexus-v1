@@ -98,14 +98,14 @@ export default function MyOrganisationsPage() {
             {t('my_organisations_subtitle')}
           </p>
         </div>
-        <Link to={tenantPath('/organisations/register')} className="sm:shrink-0">
-          <Button
-            className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
-            startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-          >
-            {t('register_organisation')}
-          </Button>
-        </Link>
+        <Button
+          as={Link}
+          to={tenantPath('/organisations/register')}
+          className="bg-gradient-to-r from-rose-500 to-pink-600 text-white sm:shrink-0"
+          startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+        >
+          {t('register_organisation')}
+        </Button>
       </div>
 
       {isLoading ? (
@@ -123,14 +123,14 @@ export default function MyOrganisationsPage() {
           <p className="text-theme-muted max-w-md mx-auto mb-6">
             {t('my_organisations_none_desc')}
           </p>
-          <Link to={tenantPath('/organisations/register')}>
-            <Button
-              className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
-              startContent={<Plus className="w-4 h-4" />}
-            >
-              {t('register_organisation')}
-            </Button>
-          </Link>
+          <Button
+            as={Link}
+            to={tenantPath('/organisations/register')}
+            className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
+            startContent={<Plus className="w-4 h-4" />}
+          >
+            {t('register_organisation')}
+          </Button>
         </GlassCard>
       ) : (
         <div className="space-y-4">

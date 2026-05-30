@@ -195,16 +195,12 @@ export default function CreateOpportunityPage() {
             {t('no_approved_orgs_description')}
           </p>
           <div className="flex flex-col justify-center gap-3 sm:flex-row">
-            <Link to={tenantPath('/organisations/register')}>
-              <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                {t('register_org_link')}
-              </Button>
-            </Link>
-            <Link to={tenantPath('/volunteering')}>
-              <Button variant="tertiary">
-                {t('form_cancel')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath('/organisations/register')} className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+              {t('register_org_link')}
+            </Button>
+            <Button as={Link} to={tenantPath('/volunteering')} variant="tertiary">
+              {t('form_cancel')}
+            </Button>
           </div>
         </GlassCard>
       </motion.div>
@@ -379,14 +375,14 @@ export default function CreateOpportunityPage() {
             >
               {t('form_submit_opportunity')}
             </Button>
-            <Link to={tenantPath('/volunteering')}>
-              <Button
-                type="button"
-                variant="tertiary"
-              >
-                {t('form_cancel')}
-              </Button>
-            </Link>
+            <Button
+              as={Link}
+              to={tenantPath('/volunteering')}
+              type="button"
+              variant="tertiary"
+            >
+              {t('form_cancel')}
+            </Button>
           </div>
         </form>
       </GlassCard>

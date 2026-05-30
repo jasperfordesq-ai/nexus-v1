@@ -263,36 +263,36 @@ export function VolunteeringPage() {
           </div>
           <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:shrink-0">
             {hasApprovedOrg && (
-              <Link to={tenantPath('/volunteering/create')} className="w-full sm:w-auto">
-                <Button
-                  variant="primary"
-                  className="w-full sm:w-auto"
-                  startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-                >
-                  {t('post_opportunity')}
-                </Button>
-              </Link>
+              <Button
+                as={Link}
+                to={tenantPath('/volunteering/create')}
+                variant="primary"
+                className="w-full sm:w-auto"
+                startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+              >
+                {t('post_opportunity')}
+              </Button>
             )}
             {hasApprovedOrg && (
-              <Link to={tenantPath('/volunteering/my-organisations')} className="w-full sm:w-auto">
-                <Button
-                  variant="secondary"
-                  className="w-full sm:w-auto"
-                  startContent={<Building2 className="w-4 h-4" aria-hidden="true" />}
-                >
-                  {t('my_organisations')}
-                </Button>
-              </Link>
-            )}
-            <Link to={tenantPath('/organisations')} className="w-full sm:w-auto">
               <Button
+                as={Link}
+                to={tenantPath('/volunteering/my-organisations')}
                 variant="secondary"
                 className="w-full sm:w-auto"
-                startContent={<Globe className="w-4 h-4" aria-hidden="true" />}
+                startContent={<Building2 className="w-4 h-4" aria-hidden="true" />}
               >
-                {t('browse_organisations')}
+                {t('my_organisations')}
               </Button>
-            </Link>
+            )}
+            <Button
+              as={Link}
+              to={tenantPath('/organisations')}
+              variant="secondary"
+              className="w-full sm:w-auto"
+              startContent={<Globe className="w-4 h-4" aria-hidden="true" />}
+            >
+              {t('browse_organisations')}
+            </Button>
           </div>
         </div>
       </div>

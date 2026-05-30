@@ -19,7 +19,7 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import History from 'lucide-react/icons/history';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { GlassCard, useDisclosure, Button, Chip, Spinner, Input, Select, SelectItem, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -626,34 +626,26 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                   }}
                 />
                 {pages.length > 0 && (
-                  <div>
-                    <label className="text-sm text-theme-muted mb-2 block">
-                      {t('wiki.parent_label')}
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      <Button
-                        variant={newParentId === null ? 'solid' : 'flat'}
-                        size="sm"
-                        color="primary"
-                        onPress={() => setNewParentId(null)}
-                        aria-pressed={newParentId === null}
-                      >
-                        {t('wiki.no_parent')}
-                      </Button>
+                  <Select
+                    label={t('wiki.parent_label')}
+                    selectedKeys={new Set([newParentId === null ? '__none__' : String(newParentId)])}
+                    disallowEmptySelection
+                    onSelectionChange={(keys) => {
+                      const k = keys instanceof Set ? (Array.from(keys)[0] as string | undefined) : undefined;
+                      setNewParentId(!k || k === '__none__' ? null : Number(k));
+                    }}
+                    classNames={{
+                      trigger: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
+                      value: 'text-theme-primary',
+                    }}
+                  >
+                    <>
+                      <SelectItem key="__none__" id="__none__">{t('wiki.no_parent')}</SelectItem>
                       {pages.map((page) => (
-                        <Button
-                          key={page.id}
-                          variant={newParentId === page.id ? 'solid' : 'flat'}
-                          size="sm"
-                          color="primary"
-                          onPress={() => setNewParentId(page.id)}
-                          aria-pressed={newParentId === page.id}
-                        >
-                          {page.title}
-                        </Button>
+                        <SelectItem key={page.id} id={String(page.id)}>{page.title}</SelectItem>
                       ))}
-                    </div>
-                  </div>
+                    </>
+                  </Select>
                 )}
                 <Textarea
                   label={t('wiki.content_label')}

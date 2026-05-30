@@ -1,4 +1,4 @@
-import { Button, Chip, Card, CardBody, Textarea, GlassCard, Surface, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, AvatarGroup, Badge, Tabs, Tab, Skeleton } from '@/components/ui';
+import { Button, ToggleButton, ToggleButtonGroup, Chip, Card, CardBody, Textarea, GlassCard, Surface, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, AvatarGroup, Badge, Tabs, Tab, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -1227,51 +1227,51 @@ export function EventDetailPage() {
               </span>
             </div>
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-              {/* RSVP Options */}
-              <div className="grid gap-2 sm:grid-cols-3 lg:flex lg:flex-wrap" role="group" aria-label={t('detail.rsvp_aria')}>
-                <Button
-                  className={
-                    rsvpStatus === 'going'
-                      ? 'bg-emerald-500 text-white'
-                      : 'bg-theme-elevated text-theme-primary hover:bg-emerald-500/20'
-                  }
-                  startContent={<CheckCircle2 className="w-4 h-4" aria-hidden="true" />}
-                  onPress={() => handleRsvp('going')}
-                  isLoading={isSubmitting}
-                  aria-pressed={rsvpStatus === 'going'}
-                  aria-label={t('detail.rsvp_going_aria')}
+              {/* RSVP Options — single-select toggle; clicking the active option clears
+                  the RSVP (handleRsvp cancels when newStatus === current). The group is
+                  disabled while a request is in flight. */}
+              <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap lg:items-center">
+                <ToggleButtonGroup
+                  aria-label={t('detail.rsvp_aria')}
+                  selectionMode="single"
+                  isDetached
+                  isDisabled={isSubmitting}
+                  selectedKeys={rsvpStatus ? new Set([rsvpStatus]) : new Set()}
+                  onSelectionChange={(keys) => {
+                    const [k] = Array.from(keys);
+                    const next = (k as RsvpOption | undefined) ?? rsvpStatus;
+                    if (next) handleRsvp(next);
+                  }}
+                  className="grid gap-2 sm:grid-cols-3 lg:flex lg:flex-wrap"
                 >
-                  {t('detail.going_btn')}
-                </Button>
-                <Button
-                  className={
-                    rsvpStatus === 'interested'
-                      ? 'bg-amber-500 text-white'
-                      : 'bg-theme-elevated text-theme-primary hover:bg-amber-500/20'
-                  }
-                  startContent={<Heart className="w-4 h-4" aria-hidden="true" />}
-                  onPress={() => handleRsvp('interested')}
-                  isLoading={isSubmitting}
-                  aria-pressed={rsvpStatus === 'interested'}
-                  aria-label={t('detail.rsvp_interested_aria')}
-                >
-                  {t('detail.interested_btn')}
-                </Button>
-                <Button
-                  className={
-                    rsvpStatus === 'not_going'
-                      ? 'bg-theme-hover text-theme-muted'
-                      : 'bg-theme-elevated text-theme-primary hover:bg-theme-hover'
-                  }
-                  variant="flat"
-                  startContent={<XCircle className="w-4 h-4" aria-hidden="true" />}
-                  onPress={() => handleRsvp('not_going')}
-                  isLoading={isSubmitting}
-                  aria-pressed={rsvpStatus === 'not_going'}
-                  aria-label={t('detail.rsvp_not_going_aria')}
-                >
-                  {t('detail.not_going_btn')}
-                </Button>
+                  <ToggleButton
+                    id="going"
+                    variant="ghost"
+                    aria-label={t('detail.rsvp_going_aria')}
+                    className="bg-theme-elevated text-theme-primary transition-colors hover:bg-emerald-500/20 data-[selected=true]:bg-emerald-500 data-[selected=true]:text-white"
+                  >
+                    <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
+                    {t('detail.going_btn')}
+                  </ToggleButton>
+                  <ToggleButton
+                    id="interested"
+                    variant="ghost"
+                    aria-label={t('detail.rsvp_interested_aria')}
+                    className="bg-theme-elevated text-theme-primary transition-colors hover:bg-amber-500/20 data-[selected=true]:bg-amber-500 data-[selected=true]:text-white"
+                  >
+                    <Heart className="w-4 h-4" aria-hidden="true" />
+                    {t('detail.interested_btn')}
+                  </ToggleButton>
+                  <ToggleButton
+                    id="not_going"
+                    variant="ghost"
+                    aria-label={t('detail.rsvp_not_going_aria')}
+                    className="bg-theme-elevated text-theme-primary transition-colors hover:bg-theme-hover data-[selected=true]:bg-theme-hover data-[selected=true]:text-theme-muted"
+                  >
+                    <XCircle className="w-4 h-4" aria-hidden="true" />
+                    {t('detail.not_going_btn')}
+                  </ToggleButton>
+                </ToggleButtonGroup>
 
                 {/* E3: Waitlist join/leave button when event is full */}
                 {event.is_full && !rsvpStatus && !isWaitlisted && (

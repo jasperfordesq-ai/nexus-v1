@@ -1037,15 +1037,15 @@ export function GroupDetailPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('detail.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error || t('detail.not_found_desc')}</p>
           <div className="flex justify-center gap-3">
-            <Link to={tenantPath("/groups")}>
-              <Button
-                variant="flat"
-                className="bg-theme-elevated text-theme-primary"
-                startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
-              >
-                {t('detail.browse_groups')}
-              </Button>
-            </Link>
+            <Button
+              as={Link}
+              to={tenantPath("/groups")}
+              variant="flat"
+              className="bg-theme-elevated text-theme-primary"
+              startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
+            >
+              {t('detail.browse_groups')}
+            </Button>
             <Button
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
               startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}

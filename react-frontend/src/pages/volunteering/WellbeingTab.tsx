@@ -24,7 +24,7 @@ import TrendingDown from 'lucide-react/icons/trending-down';
 import Coffee from 'lucide-react/icons/coffee';
 import Sun from 'lucide-react/icons/sun';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Progress, useDisclosure, Button, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, CardRowsSkeleton } from '@/components/ui';
+import { GlassCard, Progress, useDisclosure, Button, ToggleButton, ToggleButtonGroup, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, CardRowsSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -486,25 +486,28 @@ export function WellbeingTab() {
             {/* Mood Selector */}
             <div>
               <p className="text-sm font-medium text-theme-primary mb-3">{t('wellbeing.select_mood')}</p>
-              <div className="flex justify-center gap-3">
+              <ToggleButtonGroup
+                aria-label={t('wellbeing.select_mood')}
+                selectionMode="single"
+                disallowEmptySelection
+                isDetached
+                selectedKeys={new Set([String(selectedMood)])}
+                onSelectionChange={(keys) => { const [k] = Array.from(keys); if (k) setSelectedMood(Number(k)); }}
+                className="flex justify-center gap-3"
+              >
                 {moodOptions.map((mood) => (
-                  <Button
+                  <ToggleButton
                     key={mood.value}
-                    variant={selectedMood === mood.value ? 'secondary' : 'ghost'}
-                    onPress={() => setSelectedMood(mood.value)}
-                    className={`flex min-h-20 min-w-0 flex-col items-center gap-1 rounded-xl p-3 transition-all ${
-                      selectedMood === mood.value
-                        ? 'bg-rose-500/20 ring-2 ring-rose-500 scale-110'
-                        : 'bg-theme-elevated hover:bg-theme-hover'
-                    }`}
+                    id={String(mood.value)}
+                    variant="ghost"
                     aria-label={t('wellbeing.mood_aria', { mood: mood.label })}
-                    aria-pressed={selectedMood === mood.value}
+                    className="flex min-h-20 min-w-0 flex-col items-center gap-1 rounded-xl p-3 transition-all bg-theme-elevated hover:bg-theme-hover data-[selected=true]:bg-rose-500/20 data-[selected=true]:ring-2 data-[selected=true]:ring-rose-500 data-[selected=true]:scale-110"
                   >
                     <span className="text-3xl" role="img" aria-hidden="true">{mood.emoji}</span>
                     <span className="text-xs text-theme-muted">{mood.label}</span>
-                  </Button>
+                  </ToggleButton>
                 ))}
-              </div>
+              </ToggleButtonGroup>
             </div>
 
             {/* Optional Note */}

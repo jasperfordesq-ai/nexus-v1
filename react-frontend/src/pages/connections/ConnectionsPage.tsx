@@ -575,10 +575,14 @@ export default function ConnectionsPage() {
           <div className="flex items-center gap-3 flex-wrap">
             <p className="text-sm text-theme-muted">{t('subtitle')}</p>
             {pendingReceivedCount > 0 && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-warning/10 text-warning text-xs font-medium">
-                <span className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse" aria-hidden="true" />
+              <Chip
+                size="sm"
+                color="warning"
+                variant="soft"
+                startContent={<span className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse" aria-hidden="true" />}
+              >
                 {t('pending_count', { count: pendingReceivedCount })}
-              </span>
+              </Chip>
             )}
           </div>
         </div>
@@ -619,9 +623,9 @@ export default function ConnectionsPage() {
                 <UserCheck className="w-4 h-4" aria-hidden="true" />
                 <span>{t('tab_my_connections')}</span>
                 {!loading.accepted && (
-                  <span className="text-xs bg-theme-elevated rounded-full px-1.5 py-0.5 min-w-[20px] text-center">
+                  <Chip size="sm" variant="flat" className="bg-theme-elevated text-xs min-w-[20px]">
                     {accepted.length}
-                  </span>
+                  </Chip>
                 )}
               </div>
             }
@@ -753,9 +757,9 @@ export default function ConnectionsPage() {
                 <Send className="w-4 h-4" aria-hidden="true" />
                 <span>{t('tab_sent')}</span>
                 {pendingSentCount > 0 && (
-                  <span className="text-xs bg-theme-elevated rounded-full px-1.5 py-0.5 min-w-[20px] text-center">
+                  <Chip size="sm" variant="flat" className="bg-theme-elevated text-xs min-w-[20px]">
                     {pendingSentCount}
-                  </span>
+                  </Chip>
                 )}
               </div>
             }
