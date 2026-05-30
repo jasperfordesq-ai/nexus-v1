@@ -13,6 +13,7 @@ use App\Models\Notification;
 use App\Models\User;
 use App\Services\EmailService;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Mockery;
 use Tests\Laravel\TestCase;
@@ -115,5 +116,35 @@ class SendWelcomeNotificationTest extends TestCase
 
         $listener = new SendWelcomeNotification();
         $listener->handle($event);
+    }
+
+    /**
+     * Regression guard for the 2026-04-02 email-bombing class: if a redis
+     * re-delivery fires the listener again for the SAME registration, the
+     * idempotency guard must short-circuit BEFORE any bell/email/token work.
+     */
+    public function test_handle_suppresses_duplicate_delivery_when_already_handled(): void
+    {
+        $user = new User();
+        $user->id = 91;
+        $user->first_name = 'Dup';
+        $user->email = 'dup@example.com';
+        $event = new UserRegistered($user, 2);
+
+        // Simulate a prior successful delivery for tenant 2 / user 91.
+        Cache::put('send_welcome:done:2:91', 1, now()->addHour());
+
+        // The guard must log the suppression and return — never reaching the
+        // welcome flow (which would otherwise log an error or touch the DB here).
+        Log::shouldReceive('info')
+            ->once()
+            ->with('SendWelcomeNotification: duplicate delivery suppressed', Mockery::type('array'));
+        Log::shouldReceive('error')->never();
+        Log::shouldReceive('warning')->never();
+
+        (new SendWelcomeNotification())->handle($event);
+
+        // Reaching here without the welcome flow running proves the short-circuit.
+        $this->assertTrue(Cache::has('send_welcome:done:2:91'));
     }
 }

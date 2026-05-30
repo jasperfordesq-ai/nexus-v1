@@ -13,6 +13,7 @@ use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Services\EmailDispatchService;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -25,6 +26,16 @@ use Illuminate\Support\Facades\Log;
  */
 class SendWelcomeNotification implements ShouldQueue
 {
+    /**
+     * Fail fast rather than letting redis re-deliver mid-flight. The queue's
+     * retry_after is 90s; a slow welcome (HTML build + email send + token write)
+     * released back to another worker would re-send the activation email and
+     * re-issue the verification token. Killing at 60s and not retrying keeps one
+     * registration → one welcome. Belt-and-braces with the Cache guard in handle().
+     */
+    public int $tries = 1;
+    public int $timeout = 60;
+
     public function __construct()
     {
         //
@@ -35,6 +46,28 @@ class SendWelcomeNotification implements ShouldQueue
      */
     public function handle(UserRegistered $event): void
     {
+        // Idempotency guard: suppress duplicate/concurrent re-deliveries for the
+        // same registration so the activation email + verification token are
+        // issued exactly once (regression guard for the 2026-04-02 email-bombing class).
+        $userId = (int) ($event->user->id ?? 0);
+        $tenantId = (int) ($event->tenantId ?? 0);
+        $handledKey = null;
+        $claimKey = null;
+        $claimAcquired = false;
+        if ($userId > 0) {
+            $handledKey = 'send_welcome:done:' . $tenantId . ':' . $userId;
+            $claimKey = 'send_welcome:claim:' . $tenantId . ':' . $userId;
+            if (Cache::has($handledKey)) {
+                Log::info('SendWelcomeNotification: duplicate delivery suppressed', ['user_id' => $userId, 'tenant_id' => $tenantId]);
+                return;
+            }
+            $claimAcquired = Cache::add($claimKey, 1, now()->addMinutes(5));
+            if (!$claimAcquired) {
+                Log::info('SendWelcomeNotification: concurrent delivery suppressed', ['user_id' => $userId, 'tenant_id' => $tenantId]);
+                return;
+            }
+        }
+
         $previousTenantId = TenantContext::currentId();
 
         try {
@@ -124,6 +157,12 @@ class SendWelcomeNotification implements ShouldQueue
                     }
                 }
             });
+
+            // Mark handled only after the flow ran to completion so a redis
+            // re-delivery cannot re-send the welcome/activation email.
+            if ($handledKey !== null) {
+                Cache::put($handledKey, 1, now()->addHours(24));
+            }
         } catch (\Throwable $e) {
             Log::error('SendWelcomeNotification listener failed', [
                 'user_id' => $event->user->id ?? null,
@@ -131,6 +170,9 @@ class SendWelcomeNotification implements ShouldQueue
                 'trace' => $e->getTraceAsString(),
             ]);
         } finally {
+            if ($claimAcquired && $claimKey !== null) {
+                Cache::forget($claimKey);
+            }
             TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }

@@ -13,6 +13,7 @@ use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Services\EmailDispatchService;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -21,8 +22,37 @@ use Illuminate\Support\Facades\Log;
  */
 class NotifyAdminOfNewRegistration implements ShouldQueue
 {
+    /**
+     * Fail fast instead of letting redis re-deliver this fanout mid-flight
+     * (retry_after=90s). A re-delivery would re-email EVERY admin. $timeout<retry_after
+     * plus the Cache idempotency guard keep one event → one fanout.
+     */
+    public int $tries = 1;
+    public int $timeout = 60;
+
     public function handle(UserRegistered $event): void
     {
+        // Idempotency guard: suppress duplicate/concurrent re-deliveries so the admin
+        // fanout (email + bell to every admin) runs exactly once per event.
+        $entityId = (int) ($event->user->id ?? 0);
+        $tenantId = (int) ($event->tenantId ?? 0);
+        $handledKey = null;
+        $claimKey = null;
+        $claimAcquired = false;
+        if ($entityId > 0) {
+            $handledKey = 'notify_admin_new_registration:done:' . $tenantId . ':' . $entityId;
+            $claimKey = 'notify_admin_new_registration:claim:' . $tenantId . ':' . $entityId;
+            if (Cache::has($handledKey)) {
+                Log::info('NotifyAdminOfNewRegistration: duplicate fanout suppressed', ['entity_id' => $entityId, 'tenant_id' => $tenantId]);
+                return;
+            }
+            $claimAcquired = Cache::add($claimKey, 1, now()->addMinutes(5));
+            if (!$claimAcquired) {
+                Log::info('NotifyAdminOfNewRegistration: concurrent fanout suppressed', ['entity_id' => $entityId, 'tenant_id' => $tenantId]);
+                return;
+            }
+        }
+
         $previousTenantId = TenantContext::currentId();
 
         try {
@@ -91,7 +121,15 @@ class NotifyAdminOfNewRegistration implements ShouldQueue
                     ]);
                 }
             }
+
+            // Mark handled only after the full fanout ran, so a redis re-delivery can't re-email admins.
+            if ($handledKey !== null) {
+                Cache::put($handledKey, 1, now()->addHours(24));
+            }
         } finally {
+            if ($claimAcquired && $claimKey !== null) {
+                Cache::forget($claimKey);
+            }
             TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }
