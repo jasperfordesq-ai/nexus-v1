@@ -100,4 +100,37 @@ describe('BottomSheet', () => {
 
     expect(rootProps.at(-1)?.isOpen).toBe(true);
   });
+
+  it('stays mounted while animating closed, then unmounts', () => {
+    jest.useFakeTimers();
+    const { rerender, queryByText } = render(
+      <BottomSheet visible title="Closing sheet" onClose={jest.fn()}>
+        <Text>Closing body</Text>
+      </BottomSheet>,
+    );
+
+    // Open (flush the open-defer timer).
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
+    expect(rootProps.at(-1)?.isOpen).toBe(true);
+    expect(queryByText('Closing body')).toBeTruthy();
+
+    // Close: isOpen must flip false so the library animates the sheet closed,
+    // but the sheet must stay mounted so that exit animation can play (the old
+    // behavior unmounted synchronously and destroyed it).
+    rerender(
+      <BottomSheet visible={false} title="Closing sheet" onClose={jest.fn()}>
+        <Text>Closing body</Text>
+      </BottomSheet>,
+    );
+    expect(rootProps.at(-1)?.isOpen).toBe(false);
+    expect(queryByText('Closing body')).toBeTruthy();
+
+    // Once the close animation window elapses, it unmounts.
+    act(() => {
+      jest.advanceTimersByTime(400);
+    });
+    expect(queryByText('Closing body')).toBeNull();
+  });
 });

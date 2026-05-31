@@ -13,6 +13,12 @@ import { useDeferredBottomSheetState } from './useDeferredBottomSheetState';
 interface BottomSheetProps {
   visible: boolean;
   onClose: () => void;
+  /**
+   * Explicit snap points. Numbers are pixel heights (the bottom safe-area inset
+   * is added so content isn't clipped by the home indicator); strings are
+   * percentages (e.g. '90%'). Omit entirely to let the library size the sheet
+   * to its content (dynamic sizing) — no manual height math required.
+   */
   snapPoints?: Array<number | string>;
   children: React.ReactNode;
   title?: string;
@@ -22,7 +28,7 @@ interface BottomSheetProps {
 export default function BottomSheet({
   visible,
   onClose,
-  snapPoints = [300],
+  snapPoints,
   children,
   title,
   childrenClassName,
@@ -31,7 +37,13 @@ export default function BottomSheet({
   const theme = useTheme();
   const { mounted: sheetMounted, open: sheetOpen } = useDeferredBottomSheetState(visible);
 
-  const resolvedSnapPoints = snapPoints.map((point) => (typeof point === 'number' ? point + insets.bottom : point));
+  // With explicit snap points, honour them (numbers get the bottom inset added
+  // so content isn't clipped). With none, let the library size the sheet to its
+  // content — no magic height math, no clipping, no dead space.
+  const hasSnapPoints = Array.isArray(snapPoints) && snapPoints.length > 0;
+  const resolvedSnapPoints = hasSnapPoints
+    ? snapPoints!.map((point) => (typeof point === 'number' ? point + insets.bottom : point))
+    : undefined;
   const bottomPadding = Math.max(16, insets.bottom + 16);
 
   if (!sheetMounted) return null;
@@ -46,13 +58,17 @@ export default function BottomSheet({
       <HeroBottomSheet.Portal unstable_accessibilityContainerViewIsModal>
         <HeroBottomSheet.Overlay isCloseOnPress className="bg-black/55" />
         <HeroBottomSheet.Content
-          snapPoints={resolvedSnapPoints as unknown as string[]}
-          enableDynamicSizing={false}
+          snapPoints={resolvedSnapPoints}
+          enableDynamicSizing={!hasSnapPoints}
           enableOverDrag={false}
           keyboardBehavior="extend"
           keyboardBlurBehavior="restore"
-          contentContainerClassName="h-full"
-          contentContainerProps={{ style: { height: '100%', backgroundColor: theme.bg } }}
+          contentContainerClassName={hasSnapPoints ? 'h-full' : undefined}
+          contentContainerProps={{
+            style: hasSnapPoints
+              ? { height: '100%', backgroundColor: theme.bg }
+              : { backgroundColor: theme.bg },
+          }}
           backgroundClassName="rounded-t-[30px] bg-background"
           handleClassName="rounded-t-[30px] bg-background"
           handleIndicatorClassName="bg-muted-foreground/50"
@@ -62,7 +78,10 @@ export default function BottomSheet({
               <HeroBottomSheet.Title className="text-center">{title}</HeroBottomSheet.Title>
             </View>
           ) : null}
-          <View className={`flex-1 px-4 ${childrenClassName ?? ''}`} style={{ paddingBottom: bottomPadding }}>
+          <View
+            className={`px-4 ${hasSnapPoints ? 'flex-1 ' : ''}${childrenClassName ?? ''}`}
+            style={{ paddingBottom: bottomPadding }}
+          >
             {children}
           </View>
         </HeroBottomSheet.Content>

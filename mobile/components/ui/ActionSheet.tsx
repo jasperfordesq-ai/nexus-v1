@@ -25,15 +25,18 @@ interface ActionSheetProps {
 }
 
 export default function ActionSheet({ visible, onClose, title, actions }: ActionSheetProps) {
-  const snapHeight = Math.min((title ? 50 : 18) + actions.length * 56 + 24, 400);
-
+  // No manual snap-point height math — with no snapPoints the BottomSheet
+  // wrapper uses dynamic sizing, so the sheet fits the action list exactly
+  // (and never clips or leaves dead space).
   const handleAction = (action: Action) => {
     onClose();
+    // Let the close animation start before the action fires (it may navigate
+    // or open another surface).
     setTimeout(() => action.onPress(), 200);
   };
 
   return (
-    <BottomSheet visible={visible} onClose={onClose} snapPoints={[snapHeight]} title={title}>
+    <BottomSheet visible={visible} onClose={onClose} title={title}>
       <View className="pt-1">
         {actions.map((action, index) => (
           <Button
@@ -63,4 +66,3 @@ export default function ActionSheet({ visible, onClose, title, actions }: Action
     </BottomSheet>
   );
 }
-

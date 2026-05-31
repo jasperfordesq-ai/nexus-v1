@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { KeyboardAvoidingView, Platform, Text, View } from 'react-native';
+import { Platform, Text, View } from 'react-native';
 import { BottomSheetFlatList, BottomSheetFooter, type BottomSheetFooterProps } from '@gorhom/bottom-sheet';
 import { Ionicons } from '@expo/vector-icons';
 import { BottomSheet as HeroBottomSheet, Button as HeroButton, Spinner, Surface, useBottomSheetAwareHandlers } from 'heroui-native';
@@ -165,8 +165,7 @@ export default function CommentSheet({
             </BottomSheetFooter>
           )}
         >
-          <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          <View
             className="flex-1"
             style={{ flex: 1, height: '100%', backgroundColor: theme.bg }}
           >
@@ -213,7 +212,7 @@ export default function CommentSheet({
                 <CommentRow comment={item} authorFallback={strings.authorFallback} />
               )}
             />
-          </KeyboardAvoidingView>
+          </View>
         </HeroBottomSheet.Content>
       </HeroBottomSheet.Portal>
     </HeroBottomSheet>
