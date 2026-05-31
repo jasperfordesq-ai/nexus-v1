@@ -171,11 +171,7 @@ export default function CommentSheet({
                   {strings.title}
                 </HeroBottomSheet.Title>
               </View>
-              <HeroBottomSheet.Close>
-                <View className="h-10 w-10 items-center justify-center rounded-full bg-surface">
-                  <Ionicons name="close" size={20} color={theme.text} />
-                </View>
-              </HeroBottomSheet.Close>
+              <HeroBottomSheet.Close iconProps={{ size: 20 }} />
             </View>
 
             <BottomSheetFlatList
