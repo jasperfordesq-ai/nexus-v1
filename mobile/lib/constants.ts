@@ -11,8 +11,8 @@ import Constants from 'expo-constants';
  * Falls back to production URL.
  */
 export const API_BASE_URL: string =
-  (Constants.expoConfig?.extra?.apiUrl as string | undefined) ??
   process.env.EXPO_PUBLIC_API_URL ??
+  (Constants.expoConfig?.extra?.apiUrl as string | undefined) ??
   'https://api.project-nexus.ie';
 
 /**
@@ -20,7 +20,9 @@ export const API_BASE_URL: string =
  * Configurable via EXPO_PUBLIC_DEFAULT_TENANT.
  */
 export const DEFAULT_TENANT: string =
-  process.env.EXPO_PUBLIC_DEFAULT_TENANT ?? 'hour-timebank';
+  process.env.EXPO_PUBLIC_DEFAULT_TENANT ??
+  (Constants.expoConfig?.extra?.defaultTenant as string | undefined) ??
+  'hour-timebank';
 
 /** Secure storage keys */
 export const STORAGE_KEYS = {

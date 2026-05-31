@@ -60,7 +60,7 @@ export default function MarketplaceListingCard({
   const inventory = inventoryChip(item);
 
   return (
-    <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
+    <HeroCard className="mb-3 overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: theme.borderSubtle }}>
       <View className="h-1.5" style={{ backgroundColor: accent }} />
       <HeroCard.Body className="gap-3 p-3">
         <View className="flex-row gap-3">
@@ -72,14 +72,14 @@ export default function MarketplaceListingCard({
             )}
           </Surface>
 
-          <View className="min-w-0 flex-1 gap-2">
+          <View className="min-w-0 flex-1">
             <View className="flex-row items-start gap-2">
               <View className="min-w-0 flex-1">
                 <Text className="text-base font-bold leading-5" style={{ color: theme.text }} numberOfLines={2}>
                   {item.title}
                 </Text>
                 {item.tagline ? (
-                  <Text className="mt-0.5 text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>
+                  <Text className="mt-1 text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={3}>
                     {item.tagline}
                   </Text>
                 ) : null}
@@ -97,53 +97,57 @@ export default function MarketplaceListingCard({
                 </HeroButton>
               ) : null}
             </View>
-
-            <View className="flex-row flex-wrap gap-1.5">
-              <Chip size="sm" variant="secondary">
-                <Ionicons name={item.price_type === 'free' ? 'gift-outline' : 'pricetag-outline'} size={12} color={accent} />
-                <Chip.Label>{price}</Chip.Label>
-              </Chip>
-              {item.condition ? (
-                <Chip size="sm" variant="secondary">
-                  <Chip.Label>{t(`condition.${item.condition}`)}</Chip.Label>
-                </Chip>
-              ) : null}
-              {item.category?.name ? (
-                <Chip size="sm" variant="secondary">
-                  <Chip.Label>{item.category.name}</Chip.Label>
-                </Chip>
-              ) : null}
-              {inventory ? (
-                <Chip size="sm" variant="secondary">
-                  <Ionicons name={inventory.icon} size={12} color={inventory.tone} />
-                  <Chip.Label style={{ color: inventory.tone }}>{t(inventory.labelKey, inventory.params)}</Chip.Label>
-                </Chip>
-              ) : null}
-            </View>
-
-            <View className="flex-row items-center gap-2">
-              <Avatar uri={item.user?.avatar_url} name={item.user?.name} size={28} />
-              <View className="min-w-0 flex-1">
-                <Text className="text-xs font-semibold" style={{ color: theme.text }} numberOfLines={1}>
-                  {item.user?.name ?? t('common.seller')}
-                </Text>
-                <Text className="text-[11px]" style={{ color: theme.textMuted }} numberOfLines={1}>
-                  {item.location || t(`delivery_method.${item.delivery_method || 'other'}`)}
-                </Text>
-              </View>
-              {item.user?.is_verified ? <Ionicons name="shield-checkmark-outline" size={16} color={theme.success} /> : null}
-            </View>
           </View>
         </View>
-        <HeroButton
-          size="sm"
-          variant="secondary"
-          className="self-start"
-          accessibilityLabel={t('actions.viewListing', { title: item.title })}
-          onPress={onPress}
-        >
-          <HeroButton.Label>{t('actions.view')}</HeroButton.Label>
-        </HeroButton>
+
+        <View className="flex-row flex-wrap gap-1.5">
+          <Chip size="sm" variant="secondary">
+            <Ionicons name={item.price_type === 'free' ? 'gift-outline' : 'pricetag-outline'} size={12} color={accent} />
+            <Chip.Label>{price}</Chip.Label>
+          </Chip>
+          {item.condition ? (
+            <Chip size="sm" variant="secondary">
+              <Chip.Label>{t(`condition.${item.condition}`)}</Chip.Label>
+            </Chip>
+          ) : null}
+          {item.category?.name ? (
+            <Chip size="sm" variant="secondary">
+              <Chip.Label>{item.category.name}</Chip.Label>
+            </Chip>
+          ) : null}
+          {inventory ? (
+            <Chip size="sm" variant="secondary">
+              <Ionicons name={inventory.icon} size={12} color={inventory.tone} />
+              <Chip.Label style={{ color: inventory.tone }}>{t(inventory.labelKey, inventory.params)}</Chip.Label>
+            </Chip>
+          ) : null}
+        </View>
+
+        <View className="flex-row items-center justify-between gap-3">
+          <View className="min-w-0 flex-1 flex-row items-center gap-2">
+            <Avatar uri={item.user?.avatar_url} name={item.user?.name} size={28} />
+            <View className="min-w-0 flex-1">
+              <View className="flex-row items-center gap-1">
+                <Text className="min-w-0 text-xs font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+                  {item.user?.name ?? t('common.seller')}
+                </Text>
+                {item.user?.is_verified ? <Ionicons name="shield-checkmark-outline" size={14} color={theme.success} /> : null}
+              </View>
+              <Text className="text-[11px] leading-4" style={{ color: theme.textMuted }} numberOfLines={1}>
+                {item.location || t(`delivery_method.${item.delivery_method || 'other'}`)}
+              </Text>
+            </View>
+          </View>
+          <HeroButton
+            size="sm"
+            variant="secondary"
+            className="shrink-0"
+            accessibilityLabel={t('actions.viewListing', { title: item.title })}
+            onPress={onPress}
+          >
+            <HeroButton.Label>{t('actions.view')}</HeroButton.Label>
+          </HeroButton>
+        </View>
       </HeroCard.Body>
     </HeroCard>
   );

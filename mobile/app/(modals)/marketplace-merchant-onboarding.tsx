@@ -243,18 +243,21 @@ function MarketplaceMerchantOnboardingScreen() {
   return (
     <SafeAreaView className="flex-1 bg-background">
       <AppTopBar title={t('merchantOnboarding.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace-my-listings' as Href} />
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 132 }}>
-        <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 132, gap: 12 }}>
+        <HeroCard className="overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: theme.border }}>
           <View className="h-1.5" style={{ backgroundColor: completed ? theme.success : primary }} />
-          <HeroCard.Body className="gap-4 p-4">
+          <HeroCard.Body className="gap-3 p-4">
             <View className="flex-row items-start gap-3">
-              <View className="size-13 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
-                <Ionicons name={completed ? 'checkmark-circle-outline' : 'storefront-outline'} size={25} color={completed ? theme.success : primary} />
+              <View
+                className="h-12 w-12 items-center justify-center rounded-3xl"
+                style={{ backgroundColor: withAlpha(completed ? theme.success : primary, 0.14), borderWidth: 1, borderColor: withAlpha(completed ? theme.success : primary, 0.2) }}
+              >
+                <Ionicons name={completed ? 'checkmark-circle-outline' : 'storefront-outline'} size={23} color={completed ? theme.success : primary} />
               </View>
-              <View className="min-w-0 flex-1 gap-1">
-                <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('merchantOnboarding.eyebrow')}</Text>
-                <Text className="text-2xl font-bold" style={{ color: theme.text }}>{completed ? t('merchantOnboarding.completeTitle') : t('merchantOnboarding.title')}</Text>
-                <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{completed ? t('merchantOnboarding.completeSubtitle') : t('merchantOnboarding.subtitle')}</Text>
+              <View className="min-w-0 flex-1">
+                <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>{t('merchantOnboarding.eyebrow')}</Text>
+                <Text className="text-xl font-bold leading-7" style={{ color: theme.text }} numberOfLines={1}>{completed ? t('merchantOnboarding.completeTitle') : t('merchantOnboarding.title')}</Text>
+                <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>{completed ? t('merchantOnboarding.completeSubtitle') : t('merchantOnboarding.subtitle')}</Text>
               </View>
             </View>
             <View className="flex-row flex-wrap gap-2">
@@ -269,7 +272,7 @@ function MarketplaceMerchantOnboardingScreen() {
         </HeroCard>
 
         {completed ? (
-          <HeroCard className="rounded-panel p-0">
+          <HeroCard className="rounded-panel p-0" style={{ borderWidth: 1, borderColor: theme.border }}>
             <HeroCard.Body className="gap-3 p-4">
               <HeroButton variant="primary" onPress={() => router.replace('/(modals)/marketplace-my-listings' as Href)} style={{ backgroundColor: primary }}>
                 <Ionicons name="albums-outline" size={17} color="#fff" />
@@ -282,8 +285,8 @@ function MarketplaceMerchantOnboardingScreen() {
             </HeroCard.Body>
           </HeroCard>
         ) : (
-          <HeroCard className="rounded-panel p-0">
-            <HeroCard.Body className="gap-4 p-4">
+          <HeroCard className="rounded-panel p-0" style={{ borderWidth: 1, borderColor: theme.border }}>
+            <HeroCard.Body className="gap-5 p-3.5">
               {step === 1 ? (
                 <>
                   <ButtonGroup
@@ -304,14 +307,14 @@ function MarketplaceMerchantOnboardingScreen() {
                   <FormInput label={t('merchantOnboarding.street')} value={street} onChangeText={setStreet} placeholder={t('merchantOnboarding.streetPlaceholder')} />
                   <FormInput label={t('merchantOnboarding.city')} value={city} onChangeText={setCity} placeholder={t('merchantOnboarding.cityPlaceholder')} />
                   <View className="flex-row gap-3">
-                    <View className="flex-1"><FormInput label={t('merchantOnboarding.postalCode')} value={postalCode} onChangeText={setPostalCode} placeholder={t('merchantOnboarding.postalCodePlaceholder')} /></View>
-                    <View className="flex-1"><FormInput label={t('merchantOnboarding.country')} value={country} onChangeText={setCountry} placeholder={t('merchantOnboarding.countryPlaceholder')} /></View>
+                    <View className="min-w-0 flex-1"><FormInput label={t('merchantOnboarding.postalCode')} value={postalCode} onChangeText={setPostalCode} placeholder={t('merchantOnboarding.postalCodePlaceholder')} /></View>
+                    <View className="min-w-0 flex-1"><FormInput label={t('merchantOnboarding.country')} value={country} onChangeText={setCountry} placeholder={t('merchantOnboarding.countryPlaceholder')} /></View>
                   </View>
-                  <Surface variant="secondary" className="rounded-panel-inner p-3">
-                    <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('merchantOnboarding.hoursHint')}</Text>
+                  <Surface variant="secondary" className="rounded-panel-inner p-3" style={{ borderWidth: 1, borderColor: theme.border }}>
+                    <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>{t('merchantOnboarding.hoursHint')}</Text>
                   </Surface>
                   <View className="gap-3">
-                    <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('merchantOnboarding.openingHours')}</Text>
+                    <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>{t('merchantOnboarding.openingHours')}</Text>
                     {DAYS.map((day) => (
                       <OpeningHoursRow
                         key={day}
@@ -327,7 +330,7 @@ function MarketplaceMerchantOnboardingScreen() {
 
               {step === 3 ? (
                 <>
-                  <View className="items-center gap-3">
+                  <View className="items-center gap-3 rounded-panel-inner p-4" style={{ borderWidth: 1, borderColor: theme.border, backgroundColor: withAlpha(primary, 0.05) }}>
                     <Surface variant="secondary" className="size-28 items-center justify-center overflow-hidden rounded-full p-0">
                       {avatarPreview ? <Image source={{ uri: avatarPreview }} className="h-full w-full" resizeMode="cover" /> : <Ionicons name="person-outline" size={34} color={primary} />}
                     </Surface>
@@ -346,8 +349,8 @@ function MarketplaceMerchantOnboardingScreen() {
                   <SummaryRow label={t('merchantOnboarding.displayName')} value={display} />
                   <SummaryRow label={t('merchantOnboarding.sellerTypeLabel')} value={t(`merchantOnboarding.sellerType.${sellerType}`)} />
                   <SummaryRow label={t('merchantOnboarding.locationLabel')} value={[city, country].filter(Boolean).join(', ') || t('merchantOnboarding.notSet')} />
-                  <Surface variant="secondary" className="rounded-panel-inner p-3">
-                    <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('merchantOnboarding.reviewHint')}</Text>
+                  <Surface variant="secondary" className="rounded-panel-inner p-3" style={{ borderWidth: 1, borderColor: theme.border }}>
+                    <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={4}>{t('merchantOnboarding.reviewHint')}</Text>
                   </Surface>
                 </View>
               ) : null}
@@ -437,7 +440,7 @@ function ButtonGroup<T extends string>({
   return (
     <View className="flex-row gap-2">
       {values.map((value) => (
-        <HeroButton key={value} className="flex-1" variant={selected === value ? 'primary' : 'secondary'} onPress={() => onSelect(value)} style={selected === value ? { backgroundColor: primary } : undefined}>
+        <HeroButton key={value} className="min-w-0 flex-1" variant={selected === value ? 'primary' : 'secondary'} onPress={() => onSelect(value)} style={selected === value ? { backgroundColor: primary } : undefined}>
           <HeroButton.Label>{labelFor(value)}</HeroButton.Label>
         </HeroButton>
       ))}
@@ -460,9 +463,11 @@ function FormInput({
 }) {
   const theme = useTheme();
   return (
-    <View>
+    <View className="w-full">
       <Input
         label={label}
+        containerClassName="mb-0 w-full"
+        inputClassName={`w-full ${multiline ? 'min-h-28' : 'min-h-12'} text-sm`}
         style={{ color: theme.text, minHeight: multiline ? 112 : undefined, textAlignVertical: multiline ? 'top' : 'center' }}
         value={value}
         onChangeText={onChangeText}
@@ -491,18 +496,18 @@ function OpeningHoursRow({
   const isOpen = hours !== null;
 
   return (
-    <Surface variant="secondary" className="gap-3 rounded-panel-inner p-3">
+    <Surface variant="secondary" className="gap-3 rounded-panel-inner p-3" style={{ borderWidth: 1, borderColor: theme.border }}>
       <View className="flex-row items-center justify-between gap-3">
         <View className="min-w-0 flex-1">
-          <Text className="text-base font-semibold" style={{ color: theme.text }}>{t(`merchantOnboarding.days.${day}`)}</Text>
+          <Text className="text-base font-semibold" style={{ color: theme.text }} numberOfLines={1}>{t(`merchantOnboarding.days.${day}`)}</Text>
         </View>
-        <HeroButton variant={isOpen ? 'primary' : 'secondary'} onPress={onToggle} style={isOpen ? { backgroundColor: primary } : undefined}>
+        <HeroButton size="sm" variant={isOpen ? 'primary' : 'secondary'} onPress={onToggle} style={isOpen ? { backgroundColor: primary } : undefined}>
           <HeroButton.Label>{isOpen ? t('merchantOnboarding.open') : t('merchantOnboarding.closed')}</HeroButton.Label>
         </HeroButton>
       </View>
       {isOpen ? (
         <View className="flex-row gap-3">
-          <View className="flex-1">
+          <View className="min-w-0 flex-1">
             <FormInput
               label={t('merchantOnboarding.openTime')}
               value={hours.open}
@@ -510,7 +515,7 @@ function OpeningHoursRow({
               placeholder={t('merchantOnboarding.openTimePlaceholder')}
             />
           </View>
-          <View className="flex-1">
+          <View className="min-w-0 flex-1">
             <FormInput
               label={t('merchantOnboarding.closeTime')}
               value={hours.close}
@@ -527,9 +532,9 @@ function OpeningHoursRow({
 function SummaryRow({ label, value }: { label: string; value: string }) {
   const theme = useTheme();
   return (
-    <Surface variant="secondary" className="rounded-panel-inner p-3">
-      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{label}</Text>
-      <Text className="mt-1 text-base font-semibold" style={{ color: theme.text }}>{value}</Text>
+    <Surface variant="secondary" className="rounded-panel-inner p-3" style={{ borderWidth: 1, borderColor: theme.border }}>
+      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>{label}</Text>
+      <Text className="mt-1 text-base font-semibold" style={{ color: theme.text }} numberOfLines={2}>{value}</Text>
     </Surface>
   );
 }

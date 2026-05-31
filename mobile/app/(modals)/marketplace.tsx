@@ -196,21 +196,24 @@ function MarketplaceScreen() {
         refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={refresh} />}
         ListHeaderComponent={
           <View>
-            <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
+            <HeroCard className="mb-3 overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: theme.borderSubtle }}>
               <View className="h-1.5" style={{ backgroundColor: primary }} />
-              <HeroCard.Body className="gap-4 p-4">
+              <HeroCard.Body className="gap-3 p-4">
                 <View className="flex-row items-start gap-3">
-                  <View className="size-13 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
-                    <Ionicons name="bag-handle-outline" size={25} color={primary} />
+                  <View
+                    className="h-12 w-12 items-center justify-center rounded-3xl"
+                    style={{ backgroundColor: withAlpha(primary, 0.14), borderWidth: 1, borderColor: withAlpha(primary, 0.2) }}
+                  >
+                    <Ionicons name="bag-handle-outline" size={23} color={primary} />
                   </View>
-                  <View className="min-w-0 flex-1 gap-1">
-                    <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>
+                  <View className="min-w-0 flex-1">
+                    <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>
                       {t('eyebrow')}
                     </Text>
-                    <Text className="text-2xl font-bold" style={{ color: theme.text }}>
+                    <Text className="text-xl font-bold leading-7" style={{ color: theme.text }} numberOfLines={1}>
                       {t('title')}
                     </Text>
-                    <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+                    <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>
                       {t('subtitle')}
                     </Text>
                   </View>
@@ -226,48 +229,19 @@ function MarketplaceScreen() {
                     <HeroButton.Label>{t('actions.myListings')}</HeroButton.Label>
                   </HeroButton>
                 </View>
-                <View className="flex-row gap-2">
-                  <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-orders' as Href)}>
-                    <Ionicons name="receipt-outline" size={16} color={primary} />
-                    <HeroButton.Label>{t('actions.orders')}</HeroButton.Label>
-                  </HeroButton>
-                  <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-pickups' as Href)}>
-                    <Ionicons name="qr-code-outline" size={16} color={primary} />
-                    <HeroButton.Label>{t('actions.pickups')}</HeroButton.Label>
-                  </HeroButton>
-                </View>
-                <View className="flex-row gap-2">
-                  <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-tools' as Href)}>
-                    <Ionicons name="construct-outline" size={16} color={primary} />
-                    <HeroButton.Label>{t('actions.tools')}</HeroButton.Label>
-                  </HeroButton>
-                  <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-free' as Href)}>
-                    <Ionicons name="gift-outline" size={16} color={theme.success} />
-                    <HeroButton.Label>{t('actions.freeItems')}</HeroButton.Label>
-                  </HeroButton>
-                </View>
-                <View className="flex-row gap-2">
-                  <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-collections' as Href)}>
-                    <Ionicons name="folder-open-outline" size={16} color={primary} />
-                    <HeroButton.Label>{t('actions.collections')}</HeroButton.Label>
-                  </HeroButton>
-                  <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-search' as Href)}>
-                    <Ionicons name="options-outline" size={16} color={primary} />
-                    <HeroButton.Label>{t('actions.search')}</HeroButton.Label>
-                  </HeroButton>
-                </View>
-                <View className="flex-row gap-2">
+
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingRight: 2 }}>
+                  <ShortcutButton label={t('actions.orders')} icon="receipt-outline" color={primary} onPress={() => router.push('/(modals)/marketplace-orders' as Href)} />
+                  <ShortcutButton label={t('actions.pickups')} icon="qr-code-outline" color={primary} onPress={() => router.push('/(modals)/marketplace-pickups' as Href)} />
+                  <ShortcutButton label={t('actions.tools')} icon="construct-outline" color={primary} onPress={() => router.push('/(modals)/marketplace-tools' as Href)} />
+                  <ShortcutButton label={t('actions.freeItems')} icon="gift-outline" color={theme.success} onPress={() => router.push('/(modals)/marketplace-free' as Href)} />
+                  <ShortcutButton label={t('actions.collections')} icon="folder-open-outline" color={primary} onPress={() => router.push('/(modals)/marketplace-collections' as Href)} />
+                  <ShortcutButton label={t('actions.search')} icon="options-outline" color={primary} onPress={() => router.push('/(modals)/marketplace-search' as Href)} />
                   {hasFeature('merchant_coupons') ? (
-                    <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-coupons' as Href)}>
-                      <Ionicons name="ticket-outline" size={16} color={primary} />
-                      <HeroButton.Label>{t('actions.coupons')}</HeroButton.Label>
-                    </HeroButton>
+                    <ShortcutButton label={t('actions.coupons')} icon="ticket-outline" color={primary} onPress={() => router.push('/(modals)/marketplace-coupons' as Href)} />
                   ) : null}
-                  <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-map' as Href)}>
-                    <Ionicons name="map-outline" size={16} color={primary} />
-                    <HeroButton.Label>{t('actions.nearby')}</HeroButton.Label>
-                  </HeroButton>
-                </View>
+                  <ShortcutButton label={t('actions.nearby')} icon="map-outline" color={primary} onPress={() => router.push('/(modals)/marketplace-map' as Href)} />
+                </ScrollView>
               </HeroCard.Body>
             </HeroCard>
 
@@ -326,12 +300,12 @@ function MarketplaceScreen() {
             </ScrollView>
 
             {shouldShowFeatured ? (
-              <HeroCard className="mb-3 rounded-panel p-0">
+              <HeroCard className="mb-3 overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: theme.borderSubtle }}>
                 <HeroCard.Body className="gap-3 p-3">
                   <View className="flex-row items-center justify-between">
-                    <View className="flex-row items-center gap-2">
+                    <View className="min-w-0 flex-1 flex-row items-center gap-2">
                       <Ionicons name="star-outline" size={17} color={theme.warning} />
-                      <Text className="text-base font-bold" style={{ color: theme.text }}>{t('featured.title')}</Text>
+                      <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={1}>{t('featured.title')}</Text>
                     </View>
                     <Chip size="sm" variant="secondary">
                       <Chip.Label>{t('featured.count', { count: featured.length })}</Chip.Label>
@@ -339,7 +313,7 @@ function MarketplaceScreen() {
                   </View>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10 }}>
                     {featured.slice(0, 8).map((item) => (
-                      <HeroButton key={item.id} variant="secondary" onPress={() => openDetail(item)}>
+                      <HeroButton key={item.id} variant="secondary" className="max-w-48" onPress={() => openDetail(item)}>
                         <HeroButton.Label>{item.title}</HeroButton.Label>
                       </HeroButton>
                     ))}
@@ -349,7 +323,7 @@ function MarketplaceScreen() {
             ) : null}
 
             <View className="mb-2 flex-row items-center justify-between">
-              <Text className="text-sm font-bold" style={{ color: theme.text }}>
+              <Text className="min-w-0 flex-1 text-sm font-bold" style={{ color: theme.text }} numberOfLines={1}>
                 {categoryLabel}
               </Text>
               <HeroButton size="sm" variant="secondary" onPress={() => router.push('/(modals)/marketplace-offers' as Href)}>
@@ -405,4 +379,31 @@ function normalizePriceType(value?: string): MarketplacePriceType | '' {
   return value === 'fixed' || value === 'negotiable' || value === 'free' || value === 'auction' || value === 'contact'
     ? value
     : '';
+}
+
+type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
+
+function ShortcutButton({
+  label,
+  icon,
+  color,
+  onPress,
+}: {
+  label: string;
+  icon: IoniconName;
+  color: string;
+  onPress: () => void;
+}) {
+  return (
+    <HeroButton
+      size="sm"
+      variant="secondary"
+      className="min-w-[112px]"
+      accessibilityLabel={label}
+      onPress={onPress}
+    >
+      <Ionicons name={icon} size={15} color={color} />
+      <HeroButton.Label>{label}</HeroButton.Label>
+    </HeroButton>
+  );
 }

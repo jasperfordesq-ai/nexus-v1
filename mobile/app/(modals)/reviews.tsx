@@ -134,18 +134,25 @@ export default function ReviewsScreen() {
           refreshControl={<RefreshControl refreshing={isLoading} onRefresh={handleRefresh} tintColor={primary} colors={[primary]} />}
         >
           <View className="gap-3">
-            <HeroCard variant="default" className="mx-4 overflow-hidden rounded-panel p-0">
-              <View className="h-1 w-full" style={{ backgroundColor: primary }} />
-              <HeroCard.Body className="gap-4 p-4">
+            <HeroCard
+              variant="default"
+              className="mx-4 overflow-hidden rounded-panel p-0"
+              style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.16) }}
+            >
+              <View className="h-1.5 w-full" style={{ backgroundColor: primary }} />
+              <HeroCard.Body className="gap-3 p-4">
                 <View className="flex-row items-start gap-3">
-                  <View className="size-13 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
-                    <Ionicons name="star-outline" size={25} color={primary} />
+                  <View
+                    className="h-12 w-12 items-center justify-center rounded-3xl"
+                    style={{ backgroundColor: withAlpha(primary, 0.14), borderWidth: 1, borderColor: withAlpha(primary, 0.2) }}
+                  >
+                    <Ionicons name="star-outline" size={23} color={primary} />
                   </View>
                   <View className="min-w-0 flex-1">
-                    <Text className="text-2xl font-bold leading-8" style={{ color: theme.text }}>
+                    <Text className="text-xl font-bold leading-7" style={{ color: theme.text }} numberOfLines={1}>
                       {t('reviews.title')}
                     </Text>
-                    <Text className="mt-1 text-sm leading-5" style={{ color: theme.textSecondary }}>
+                    <Text className="mt-1 text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>
                       {t('reviews.subtitle')}
                     </Text>
                   </View>
@@ -153,13 +160,19 @@ export default function ReviewsScreen() {
               </HeroCard.Body>
             </HeroCard>
 
-            <View className="mx-4 flex-row flex-wrap gap-3">
-              <StatTile icon="chatbubble-ellipses-outline" label={t('reviews.total')} value={reviews.length} tone={primary} />
-              <StatTile icon="star-outline" label={t('reviews.average')} value={averageRating ? averageRating.toFixed(1) : '0.0'} tone="#f59e0b" />
-              <StatTile icon="create-outline" label={t('reviews.pendingCount')} value={pending.length} tone="#22c55e" />
-            </View>
+            <HeroCard
+              variant="default"
+              className="mx-4 rounded-panel p-0"
+              style={{ borderWidth: 1, borderColor: theme.border }}
+            >
+              <HeroCard.Body className="flex-row gap-2 p-2.5">
+                <StatTile icon="chatbubble-ellipses-outline" label={t('reviews.total')} value={reviews.length} tone={primary} />
+                <StatTile icon="star-outline" label={t('reviews.average')} value={averageRating ? averageRating.toFixed(1) : '0.0'} tone="#f59e0b" />
+                <StatTile icon="create-outline" label={t('reviews.pendingCount')} value={pending.length} tone="#22c55e" />
+              </HeroCard.Body>
+            </HeroCard>
 
-            <Surface variant="default" className="mx-4 rounded-panel-inner p-2">
+            <Surface variant="default" className="mx-4 rounded-panel-inner p-1.5" style={{ borderWidth: 1, borderColor: theme.border }}>
               <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as ReviewTab)} variant="secondary">
                 <Tabs.List>
                   <Tabs.ScrollView scrollAlign="start" contentContainerClassName="gap-1">
@@ -274,23 +287,31 @@ function PendingList({
       {items.map((item) => {
         const isActive = activePending?.exchange_id === item.exchange_id;
         return (
-          <HeroCard key={item.exchange_id} variant="default" className="overflow-hidden rounded-panel p-0">
-            <HeroCard.Body className="gap-3 p-4">
+          <HeroCard
+            key={item.exchange_id}
+            variant="default"
+            className="overflow-hidden rounded-panel p-0"
+            style={{ borderWidth: 1, borderColor: theme.border }}
+          >
+            <View className="absolute bottom-0 left-0 top-0 w-1.5" style={{ backgroundColor: primary }} />
+            <HeroCard.Body className="gap-3 p-3.5 pl-5">
               <View className="flex-row items-center gap-3">
-                <Avatar uri={item.receiver_avatar ?? undefined} name={item.receiver_name} size={48} />
-                <View className="min-w-0 flex-1">
-                  <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={1}>
+                <View
+                  className="rounded-full p-1"
+                  style={{ backgroundColor: withAlpha(primary, 0.1), borderWidth: 1, borderColor: withAlpha(primary, 0.18) }}
+                >
+                  <Avatar uri={item.receiver_avatar ?? undefined} name={item.receiver_name} size={44} />
+                </View>
+                <View className="min-w-0 flex-1 gap-1">
+                  <Text className="text-[17px] font-bold leading-6" style={{ color: theme.text }} numberOfLines={1}>
                     {item.receiver_name}
                   </Text>
                   {item.exchange_title ? (
-                    <Text className="text-sm" style={{ color: theme.textSecondary }} numberOfLines={1}>
+                    <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>
                       {t('reviews.forExchange', { title: item.exchange_title })}
                     </Text>
                   ) : null}
                 </View>
-                <HeroButton size="sm" variant="primary" onPress={() => onStart(item)} style={{ backgroundColor: primary }}>
-                  <HeroButton.Label>{t('reviews.write')}</HeroButton.Label>
-                </HeroButton>
               </View>
 
               {isActive ? (
@@ -315,7 +336,12 @@ function PendingList({
                     </HeroButton>
                   </View>
                 </View>
-              ) : null}
+              ) : (
+                <HeroButton size="sm" variant="primary" onPress={() => onStart(item)} style={{ backgroundColor: primary }}>
+                  <Ionicons name="create-outline" size={14} color="#fff" />
+                  <HeroButton.Label>{t('reviews.write')}</HeroButton.Label>
+                </HeroButton>
+              )}
             </HeroCard.Body>
           </HeroCard>
         );
@@ -339,16 +365,27 @@ function ReviewCard({
   const theme = useTheme();
   const primary = usePrimaryColor();
   const displayName = review.is_anonymous ? t('reviews.anonymous') : userName(review.reviewer);
+  const tone = Number(review.rating || 0) >= 4 ? '#f59e0b' : primary;
 
   return (
-    <HeroCard variant="default" className="overflow-hidden rounded-panel p-0">
-      <HeroCard.Body className="gap-3 p-4">
+    <HeroCard
+      variant="default"
+      className="overflow-hidden rounded-panel p-0"
+      style={{ borderWidth: 1, borderColor: theme.border }}
+    >
+      <View className="absolute bottom-0 left-0 top-0 w-1.5" style={{ backgroundColor: tone }} />
+      <HeroCard.Body className="gap-3 p-3.5 pl-5">
         <View className="flex-row items-start gap-3">
-          <Avatar uri={review.is_anonymous ? undefined : review.reviewer?.avatar_url ?? review.reviewer?.avatar ?? undefined} name={displayName} size={48} />
+          <View
+            className="rounded-full p-1"
+            style={{ backgroundColor: withAlpha(tone, 0.1), borderWidth: 1, borderColor: withAlpha(tone, 0.18) }}
+          >
+            <Avatar uri={review.is_anonymous ? undefined : review.reviewer?.avatar_url ?? review.reviewer?.avatar ?? undefined} name={displayName} size={44} />
+          </View>
           <View className="min-w-0 flex-1 gap-1">
-            <View className="flex-row items-start justify-between gap-2">
-              <View className="min-w-0 flex-1">
-                <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={1}>
+            <View className="flex-row items-start justify-between gap-3">
+              <View className="min-w-0 flex-1 gap-1">
+                <Text className="text-[17px] font-bold leading-6" style={{ color: theme.text }} numberOfLines={1}>
                   {displayName}
                 </Text>
                 <StarRating rating={review.rating} />
@@ -360,16 +397,24 @@ function ReviewCard({
                 </HeroButton>
               ) : null}
             </View>
-            {review.comment ? (
-              <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
-                {review.comment}
-              </Text>
-            ) : null}
-            <Chip size="sm" variant="secondary" className="self-start">
-              <Ionicons name="star" size={12} color={primary} />
-              <Chip.Label>{t('reviews.ratingLabel', { rating: review.rating })}</Chip.Label>
-            </Chip>
           </View>
+        </View>
+        {review.comment ? (
+          <Surface
+            variant="secondary"
+            className="rounded-panel-inner p-3"
+            style={{ borderWidth: 1, borderColor: withAlpha(tone, 0.14) }}
+          >
+            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+              {review.comment}
+            </Text>
+          </Surface>
+        ) : null}
+        <View className="flex-row flex-wrap gap-2 pl-1">
+          <Chip size="sm" variant="secondary" className="self-start">
+            <Ionicons name="star" size={12} color={tone} />
+            <Chip.Label>{t('reviews.ratingLabel', { rating: review.rating })}</Chip.Label>
+          </Chip>
         </View>
       </HeroCard.Body>
     </HeroCard>
@@ -380,9 +425,9 @@ function StarPicker({ rating, onChange }: { rating: number; onChange: (rating: n
   const { t } = useTranslation(['profile']);
   const theme = useTheme();
   return (
-    <View className="flex-row gap-1">
+    <View className="flex-row justify-between gap-1">
       {[1, 2, 3, 4, 5].map((star) => (
-        <HeroButton key={star} isIconOnly variant="secondary" accessibilityLabel={t('reviews.rateStar', { star })} onPress={() => onChange(star)}>
+        <HeroButton key={star} isIconOnly variant="secondary" className="flex-1" accessibilityLabel={t('reviews.rateStar', { star })} onPress={() => onChange(star)}>
           <Ionicons name={star <= rating ? 'star' : 'star-outline'} size={22} color={star <= rating ? '#f59e0b' : theme.textMuted} />
         </HeroButton>
       ))}
@@ -416,14 +461,18 @@ function StatTile({
   const theme = useTheme();
 
   return (
-    <Surface variant="secondary" className="min-w-[30%] flex-1 gap-2 rounded-panel-inner p-4">
-      <View className="size-9 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(tone, 0.14) }}>
-        <Ionicons name={icon} size={18} color={tone} />
+    <Surface
+      variant="secondary"
+      className="min-w-0 flex-1 gap-1.5 rounded-panel-inner p-3"
+      style={{ borderWidth: 1, borderColor: withAlpha(tone, 0.14) }}
+    >
+      <View className="h-8 w-8 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(tone, 0.14) }}>
+        <Ionicons name={icon} size={17} color={tone} />
       </View>
-      <Text className="text-2xl font-bold" style={{ color: theme.text }} numberOfLines={1}>
+      <Text className="text-xl font-bold leading-6" style={{ color: theme.text }} numberOfLines={1}>
         {value}
       </Text>
-      <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }} numberOfLines={2}>
+      <Text className="text-[11px] font-semibold uppercase leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>
         {label}
       </Text>
     </Surface>

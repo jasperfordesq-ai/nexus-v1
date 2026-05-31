@@ -33,10 +33,12 @@ class CorsHelper
         'http://localhost:5173',
         'http://localhost:5176',
         'http://localhost:4176',
+        'http://localhost:8082',
         'http://localhost:8090',
         'http://127.0.0.1:5173',
         'http://127.0.0.1:5176',
         'http://127.0.0.1:4176',
+        'http://127.0.0.1:8082',
     ];
 
     /** Cached tenant domain origins (null = not loaded yet) */
@@ -54,7 +56,10 @@ class CorsHelper
             self::$allowedOrigins = self::$defaultOrigins;
 
             // Merge any additional origins from environment (additive, never replaces)
-            $envOrigins = getenv('ALLOWED_ORIGINS') ?: ($_ENV['ALLOWED_ORIGINS'] ?? '');
+            $envOrigins = getenv('CORS_ALLOWED_ORIGINS') ?: ($_ENV['CORS_ALLOWED_ORIGINS'] ?? '');
+            if (empty($envOrigins)) {
+                $envOrigins = getenv('ALLOWED_ORIGINS') ?: ($_ENV['ALLOWED_ORIGINS'] ?? '');
+            }
             if (!empty($envOrigins)) {
                 $envList = array_filter(array_map('trim', explode(',', $envOrigins)));
                 self::$allowedOrigins = array_values(array_unique(

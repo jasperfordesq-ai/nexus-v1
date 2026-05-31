@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, FlatList, RefreshControl, ScrollView, View } from 'react-native';
+import { Alert, FlatList, RefreshControl, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -197,26 +197,31 @@ function MarketplaceSearchScreen() {
       <FlatList
         data={items}
         keyExtractor={(item) => String(item.id)}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 132 }}
+        contentContainerStyle={{ gap: 12, paddingHorizontal: 16, paddingBottom: 132 }}
         refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={() => { setIsRefreshing(true); void fetchListings(false); }} />}
         ListHeaderComponent={
           <View>
-            <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
+            <HeroCard className="overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: theme.border }}>
               <View className="h-1.5" style={{ backgroundColor: primary }} />
-              <HeroCard.Body className="gap-4 p-4">
+              <HeroCard.Body className="gap-3 p-4">
                 <View className="flex-row items-start gap-3">
-                  <View className="size-13 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
-                    <Ionicons name="options-outline" size={25} color={primary} />
+                  <View
+                    className="h-12 w-12 items-center justify-center rounded-3xl"
+                    style={{ backgroundColor: withAlpha(primary, 0.14), borderWidth: 1, borderColor: withAlpha(primary, 0.2) }}
+                  >
+                    <Ionicons name="options-outline" size={23} color={primary} />
                   </View>
                   <View className="min-w-0 flex-1 gap-1">
-                    <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('advancedSearch.eyebrow')}</Text>
-                    <Text className="text-2xl font-bold" style={{ color: theme.text }}>{t('advancedSearch.title')}</Text>
-                    <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('advancedSearch.subtitle')}</Text>
+                    <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>{t('advancedSearch.eyebrow')}</Text>
+                    <Text className="text-xl font-bold leading-7" style={{ color: theme.text }} numberOfLines={1}>{t('advancedSearch.title')}</Text>
+                    <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>{t('advancedSearch.subtitle')}</Text>
                   </View>
                 </View>
 
-                <Surface variant="secondary" className="rounded-panel-inner px-3 py-3">
+                <Surface variant="secondary" className="rounded-panel-inner p-3" style={{ borderWidth: 1, borderColor: theme.border }}>
                   <Input
+                    containerClassName="mb-0 w-full"
+                    inputClassName="min-h-12 w-full text-sm"
                     style={{ color: theme.text }}
                     placeholder={t('advancedSearch.placeholder')}
                     placeholderTextColor={theme.textMuted}
@@ -276,16 +281,20 @@ function MarketplaceSearchScreen() {
                 </FilterStrip>
 
                 {activeFilterCount > 0 ? (
-                  <HeroButton variant="secondary" onPress={resetFilters}>
+                  <HeroButton className="self-start" variant="secondary" onPress={resetFilters}>
                     <Ionicons name="refresh-outline" size={16} color={primary} />
                     <HeroButton.Label>{t('advancedSearch.reset', { count: activeFilterCount })}</HeroButton.Label>
                   </HeroButton>
                 ) : null}
               </HeroCard.Body>
             </HeroCard>
-            <View className="mb-2 flex-row items-center justify-between">
-              <Text className="text-sm font-bold" style={{ color: theme.text }}>{t('advancedSearch.results', { count: items.length })}</Text>
-              {debouncedQuery ? <Chip size="sm" variant="secondary"><Chip.Label>{debouncedQuery}</Chip.Label></Chip> : null}
+            <View className="flex-row items-center justify-between gap-3">
+              <Text className="min-w-0 flex-1 text-sm font-bold" style={{ color: theme.text }} numberOfLines={1}>{t('advancedSearch.results', { count: items.length })}</Text>
+              {debouncedQuery ? (
+                <Chip size="sm" variant="secondary">
+                  <Chip.Label numberOfLines={1}>{debouncedQuery}</Chip.Label>
+                </Chip>
+              ) : null}
             </View>
           </View>
         }
@@ -341,6 +350,8 @@ function FilterInput({
   return (
     <View className="min-w-0 flex-1">
       <Input
+        containerClassName="mb-0 w-full"
+        inputClassName="min-h-12 w-full text-sm"
         label={label}
         placeholder={placeholder}
         value={value}
@@ -355,10 +366,10 @@ function FilterStrip({ label, children }: { label: string; children: React.React
   const theme = useTheme();
   return (
     <View className="gap-2">
-      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{label}</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>{label}</Text>
+      <View className="flex-row flex-wrap gap-2">
         {children}
-      </ScrollView>
+      </View>
     </View>
   );
 }
@@ -366,8 +377,8 @@ function FilterStrip({ label, children }: { label: string; children: React.React
 function FilterButton({ active, label, onPress }: { active: boolean; label: string; onPress: () => void }) {
   const primary = usePrimaryColor();
   return (
-    <HeroButton size="sm" variant={active ? 'primary' : 'secondary'} onPress={onPress} style={active ? { backgroundColor: primary } : undefined}>
-      <HeroButton.Label>{label}</HeroButton.Label>
+    <HeroButton className="max-w-full" size="sm" variant={active ? 'primary' : 'secondary'} onPress={onPress} style={active ? { backgroundColor: primary } : undefined}>
+      <HeroButton.Label numberOfLines={1}>{label}</HeroButton.Label>
     </HeroButton>
   );
 }

@@ -31,6 +31,8 @@ if (file_exists(__DIR__ . '/../.maintenance')) {
             'https://nexuscivic.ie',
             'https://www.nexuscivic.ie',
             'http://localhost:5173',
+            'http://localhost:8082',
+            'http://127.0.0.1:8082',
             'http://localhost:3000',
         ];
         if ($origin !== '' && in_array($origin, $allowedOrigins, true)) {
@@ -41,7 +43,7 @@ if (file_exists(__DIR__ . '/../.maintenance')) {
         // Let OPTIONS preflight succeed so the real request can follow.
         if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
             header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH, OPTIONS');
-            header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Tenant-ID, Accept, X-CSRF-TOKEN, X-Trusted-Device, X-Timezone, X-Locale');
+            header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Tenant-ID, X-Tenant-Slug, Accept, X-CSRF-TOKEN, X-Trusted-Device, X-Timezone, X-Locale');
             header('Access-Control-Max-Age: 86400');
             http_response_code(204);
             exit;

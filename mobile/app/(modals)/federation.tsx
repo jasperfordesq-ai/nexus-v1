@@ -92,18 +92,20 @@ function StatTile({
   return (
     <Surface
       variant="secondary"
-      className="min-h-[112px] min-w-[46%] flex-1 gap-2 rounded-panel-inner p-3.5"
+      className="min-h-[78px] min-w-[46%] flex-1 flex-row items-center gap-3 rounded-panel-inner p-3"
       style={{ borderWidth: 1, borderColor: withAlpha(tone, 0.14) }}
     >
-      <View className="size-9 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(tone, 0.13) }}>
+      <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(tone, 0.13) }}>
         <Ionicons name={icon} size={17} color={tone} />
       </View>
-      <Text className="text-2xl font-bold" style={{ color: theme.text }} numberOfLines={1}>
-        {value}
-      </Text>
-      <Text className="text-[11px] font-semibold uppercase leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>
-        {label}
-      </Text>
+      <View className="min-w-0 flex-1 gap-0.5">
+        <Text className="text-xl font-bold leading-6" style={{ color: theme.text }} numberOfLines={1}>
+          {value}
+        </Text>
+        <Text className="text-[11px] font-semibold uppercase leading-4" style={{ color: theme.textSecondary }} numberOfLines={1}>
+          {label}
+        </Text>
+      </View>
     </Surface>
   );
 }
@@ -133,7 +135,7 @@ function FederationHero({
       style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.16) }}
     >
       <View className="h-1.5" style={{ backgroundColor: primary }} />
-      <HeroCard.Body className="gap-5 p-5">
+      <HeroCard.Body className="gap-4 p-4">
         <View className="flex-row items-start gap-3">
           <View className="size-12 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
             <Ionicons name="git-network-outline" size={24} color={primary} />
@@ -142,7 +144,7 @@ function FederationHero({
             <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>
               {t('hub.eyebrow')}
             </Text>
-            <Text className="text-2xl font-bold" style={{ color: theme.text }} numberOfLines={2}>
+            <Text className="text-[23px] font-bold leading-7" style={{ color: theme.text }} numberOfLines={2}>
               {t('hub.heroTitle')}
             </Text>
             <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={4}>
@@ -157,7 +159,7 @@ function FederationHero({
           </View>
         </View>
 
-        <View className="flex-row flex-wrap gap-3">
+        <View className="flex-row flex-wrap gap-2">
           <StatTile icon="globe-outline" label={t('hub.statPartners')} value={String(partnerCount)} tone={primary} theme={theme} />
           <StatTile icon="chatbubbles-outline" label={t('hub.statMessages')} value={String(messages)} tone="#a855f7" theme={theme} />
           <StatTile icon="swap-horizontal-outline" label={t('hub.statExchanges')} value={String(transactions)} tone="#06b6d4" theme={theme} />
@@ -178,38 +180,32 @@ function QuickLinksSection({
   return (
     <View className="mb-4 gap-3">
       <SectionHeading title={t('hub.exploreNetwork')} theme={theme} />
-      <View className="gap-2">
+      <View className="flex-row flex-wrap gap-2">
         {quickLinks.map((link) => (
-          <HeroButton
+          <Pressable
             key={link.key}
-            variant="ghost"
-            feedbackVariant="scale"
-            className="w-full rounded-panel-inner p-0"
+            accessibilityRole="button"
             accessibilityLabel={t(`hub.quick.${link.key}.title`)}
+            className="min-w-[31%] flex-1 rounded-panel-inner"
             onPress={() => {
               void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               router.push(link.href as Href);
             }}
+            style={({ pressed }) => ({ opacity: pressed ? 0.86 : 1 })}
           >
             <Surface
               variant="secondary"
-              className="w-full flex-row items-center gap-3 rounded-panel-inner p-3"
+              className="min-h-[88px] w-full items-center justify-center gap-2 rounded-panel-inner p-3"
               style={{ borderWidth: 1, borderColor: withAlpha(link.tone, 0.14) }}
             >
               <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(link.tone, 0.13) }}>
                 <Ionicons name={link.icon} size={20} color={link.tone} />
               </View>
-              <View className="min-w-0 flex-1 gap-0.5">
-                <Text className="text-sm font-bold" style={{ color: theme.text }} numberOfLines={1}>
-                  {t(`hub.quick.${link.key}.title`)}
-                </Text>
-                <Text className="text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>
-                  {t(`hub.quick.${link.key}.description`)}
-                </Text>
-              </View>
-              <Ionicons name="chevron-forward-outline" size={16} color={theme.textSecondary} />
+              <Text className="text-center text-xs font-bold leading-4" style={{ color: theme.text }} numberOfLines={1} adjustsFontSizeToFit>
+                {t(`hub.quick.${link.key}.title`)}
+              </Text>
             </Surface>
-          </HeroButton>
+          </Pressable>
         ))}
       </View>
     </View>
@@ -245,10 +241,10 @@ function PartnerCard({
         className="w-full overflow-hidden rounded-panel p-0"
         style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.12) }}
       >
-        <HeroCard.Body className="gap-4 p-4">
+        <HeroCard.Body className="gap-3 p-4">
           <View className="absolute bottom-0 left-0 top-0 w-1" style={{ backgroundColor: primary }} />
           <View className="flex-row items-start gap-3 pl-1">
-            <Avatar uri={item.logo} name={item.name} size={56} />
+            <Avatar uri={item.logo} name={item.name} size={48} />
             <View className="min-w-0 flex-1 gap-1">
               <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={2}>
                 {item.name}
@@ -266,6 +262,9 @@ function PartnerCard({
                   {item.tagline || item.description}
                 </Text>
               ) : null}
+            </View>
+            <View className="size-8 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.1) }}>
+              <Ionicons name="chevron-forward-outline" size={17} color={primary} />
             </View>
           </View>
 
@@ -287,16 +286,9 @@ function PartnerCard({
             ) : null}
           </View>
 
-          <Surface
-            variant="secondary"
-            className="self-start flex-row items-center gap-2 rounded-full px-3 py-2"
-            style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.18) }}
-          >
-            <Text className="text-sm font-semibold" style={{ color: primary }}>
-              {t('hub.viewCommunity')}
-            </Text>
-            <Ionicons name="chevron-forward-outline" size={15} color={primary} />
-          </Surface>
+          <Text className="pl-1 text-sm font-semibold" style={{ color: primary }} numberOfLines={1}>
+            {t('hub.viewCommunity')}
+          </Text>
         </HeroCard.Body>
       </HeroCard>
     </Pressable>

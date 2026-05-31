@@ -43,7 +43,6 @@ import { withAlpha } from '@/lib/utils/color';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
-import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
 import Toggle from '@/components/ui/Toggle';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
@@ -75,7 +74,7 @@ function resolvedMediaUrl(url?: string | null): string | null {
   return resolveImageUrl(url ?? null);
 }
 
-const settingKeys: Array<keyof FederationSettings> = [
+const settingKeys = [
   'profile_visible_federated',
   'appear_in_federated_search',
   'show_skills_federated',
@@ -84,7 +83,7 @@ const settingKeys: Array<keyof FederationSettings> = [
   'messaging_enabled_federated',
   'transactions_enabled_federated',
   'email_notifications',
-];
+] as const satisfies ReadonlyArray<keyof FederationSettings>;
 
 const serviceReachFilters: ServiceReachFilter[] = ['all', 'local_only', 'remote_ok', 'travel_ok'];
 const listingTypeFilters: ListingTypeFilter[] = ['all', 'offer', 'request'];
@@ -230,19 +229,19 @@ function HeaderCard({
       style={{ borderWidth: 1, borderColor: withAlpha(meta.tone, 0.16) }}
     >
       <View className="h-1.5" style={{ backgroundColor: meta.tone }} />
-      <HeroCard.Body className="gap-4 p-5">
+      <HeroCard.Body className="gap-3 p-4">
         <View className="flex-row items-start gap-3">
-          <View className="size-12 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(meta.tone, 0.14) }}>
-            <Ionicons name={meta.icon} size={24} color={meta.tone} />
+          <View className="size-11 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(meta.tone, 0.14) }}>
+            <Ionicons name={meta.icon} size={22} color={meta.tone} />
           </View>
           <View className="min-w-0 flex-1 gap-1">
             <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>
               {t(`directory.${mode}.eyebrow`)}
             </Text>
-            <Text className="text-2xl font-bold leading-8" style={{ color: theme.text }} numberOfLines={2}>
+            <Text className="text-xl font-bold leading-7" style={{ color: theme.text }} numberOfLines={2}>
               {t(`directory.${mode}.title`)}
             </Text>
-            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={4}>
+            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>
               {t(`directory.${mode}.subtitle`)}
             </Text>
           </View>
@@ -272,8 +271,8 @@ function FilterChip({
   tone: string;
 }) {
   return (
-    <HeroButton size="sm" variant={selected ? 'primary' : 'secondary'} onPress={onPress}>
-      <HeroButton.Label>{label}</HeroButton.Label>
+    <HeroButton size="sm" variant={selected ? 'primary' : 'secondary'} className="max-w-[136px]" onPress={onPress}>
+      <HeroButton.Label numberOfLines={1}>{label}</HeroButton.Label>
       {selected ? <Ionicons name="checkmark-outline" size={13} color="#fff" /> : <Ionicons name="add-outline" size={13} color={tone} />}
     </HeroButton>
   );
@@ -314,6 +313,11 @@ function FeatureUnavailableCard({
 }
 
 function PartnerCard({ partner, t, theme, primary }: { partner: FederatedTenant; t: (key: string, opts?: Record<string, unknown>) => string; theme: ReturnType<typeof useTheme>; primary: string }) {
+  const connectedDate = formatDate(partner.connected_since ?? partner.partnership_since);
+  const federationLevel = partner.federation_level_name?.trim();
+  const externalLabel = t('directory.external');
+  const shouldShowExternalChip = partner.is_external && federationLevel?.toLowerCase() !== externalLabel.toLowerCase();
+
   return (
     <Pressable
       accessibilityRole="button"
@@ -330,12 +334,17 @@ function PartnerCard({ partner, t, theme, primary }: { partner: FederatedTenant;
         className="overflow-hidden rounded-panel p-0"
         style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.12) }}
       >
-        <HeroCard.Body className="gap-4 p-4">
+        <HeroCard.Body className="gap-3 p-4">
           <View className="absolute bottom-0 left-0 top-0 w-1" style={{ backgroundColor: primary }} />
           <View className="flex-row items-start gap-3 pl-1">
-            <Avatar uri={partner.logo} name={partner.name} size={56} />
+            <View
+              className="rounded-full p-1"
+              style={{ backgroundColor: withAlpha(primary, 0.1), borderWidth: 1, borderColor: withAlpha(primary, 0.18) }}
+            >
+              <Avatar uri={partner.logo} name={partner.name} size={48} />
+            </View>
             <View className="min-w-0 flex-1 gap-1">
-              <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={2}>{partner.name}</Text>
+              <Text className="text-[17px] font-bold leading-6" style={{ color: theme.text }} numberOfLines={2}>{partner.name}</Text>
               {partner.location ? (
                 <View className="flex-row items-center gap-1">
                   <Ionicons name="location-outline" size={13} color={theme.textSecondary} />
@@ -350,20 +359,31 @@ function PartnerCard({ partner, t, theme, primary }: { partner: FederatedTenant;
                 </Text>
               ) : null}
             </View>
-            <Ionicons name="chevron-forward-outline" size={18} color={primary} />
+            <View className="size-8 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.1) }}>
+              <Ionicons name="chevron-forward-outline" size={17} color={primary} />
+            </View>
           </View>
           <View className="flex-row flex-wrap gap-2 pl-1">
             <Chip size="sm" variant="secondary">
               <Ionicons name="people-outline" size={12} color={primary} />
               <Chip.Label>{t('directory.memberCount', { count: partner.member_count ?? 0 })}</Chip.Label>
             </Chip>
-            {partner.federation_level_name ? (
-              <Chip size="sm" variant="secondary"><Chip.Label numberOfLines={1}>{partner.federation_level_name}</Chip.Label></Chip>
+            {federationLevel ? (
+              <Chip size="sm" variant="secondary"><Chip.Label numberOfLines={1}>{federationLevel}</Chip.Label></Chip>
             ) : null}
-            {partner.is_external ? (
-              <Chip size="sm" variant="secondary" color="warning"><Chip.Label>{t('directory.external')}</Chip.Label></Chip>
+            {shouldShowExternalChip ? (
+              <Chip size="sm" variant="secondary" color="warning"><Chip.Label>{externalLabel}</Chip.Label></Chip>
+            ) : null}
+            {connectedDate ? (
+              <Chip size="sm" variant="secondary">
+                <Ionicons name="time-outline" size={12} color={theme.textSecondary} />
+                <Chip.Label>{t('connectedSince', { date: connectedDate })}</Chip.Label>
+              </Chip>
             ) : null}
           </View>
+          <Text className="pl-1 text-sm font-semibold" style={{ color: primary }} numberOfLines={1}>
+            {t('hub.viewCommunity')}
+          </Text>
         </HeroCard.Body>
       </HeroCard>
     </Pressable>
@@ -376,61 +396,94 @@ function MemberCard({ member, t, theme, primary }: { member: FederatedMember; t:
   const tenantId = member.is_external
     ? externalTenantIdFromFederatedId(member.id) ?? member.tenant_id ?? member.timebank?.id
     : member.tenant_id ?? member.timebank?.id;
+  const reach = member.service_reach === 'local_only' || member.service_reach === 'remote_ok' || member.service_reach === 'travel_ok'
+    ? member.service_reach
+    : null;
+
   return (
     <HeroCard
       variant="default"
       className="mb-3 overflow-hidden rounded-panel p-0"
       style={{ borderWidth: 1, borderColor: withAlpha(primary, 0.12) }}
     >
-      <HeroCard.Body className="gap-4 p-4">
+      <HeroCard.Body className="gap-3 p-4">
         <View className="absolute bottom-0 left-0 top-0 w-1" style={{ backgroundColor: primary }} />
         <View className="flex-row items-start gap-3 pl-1">
-          <Avatar uri={member.avatar ?? null} name={name} size={52} />
+          <View
+            className="rounded-full p-1"
+            style={{ backgroundColor: withAlpha(primary, 0.1), borderWidth: 1, borderColor: withAlpha(primary, 0.18) }}
+          >
+            <Avatar uri={member.avatar ?? null} name={name} size={48} />
+          </View>
           <View className="min-w-0 flex-1 gap-2">
             <View className="gap-1">
-              <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={2}>{name}</Text>
+              <Text className="text-[17px] font-bold leading-6" style={{ color: theme.text }} numberOfLines={2}>{name}</Text>
               <View className="flex-row flex-wrap gap-2">
                 <Chip size="sm" variant="secondary">
                   <Ionicons name="globe-outline" size={12} color={primary} />
                   <Chip.Label numberOfLines={1}>{communityName}</Chip.Label>
                 </Chip>
                 {member.is_external ? <Chip size="sm" variant="secondary" color="warning"><Chip.Label>{t('directory.external')}</Chip.Label></Chip> : null}
+                {reach ? (
+                  <Chip size="sm" variant="secondary">
+                    <Ionicons name={reachIcon(reach)} size={12} color={primary} />
+                    <Chip.Label>{t(`directory.members.reach.${reach}`)}</Chip.Label>
+                  </Chip>
+                ) : null}
               </View>
             </View>
           </View>
         </View>
-        {member.bio ? <Text className="pl-1 text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>{member.bio}</Text> : null}
+        {member.bio ? (
+          <Surface
+            variant="secondary"
+            className="rounded-panel-inner p-3"
+            style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+          >
+            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>{member.bio}</Text>
+          </Surface>
+        ) : null}
         {member.skills?.length ? (
           <View className="flex-row flex-wrap gap-2 pl-1">
             {member.skills.slice(0, 5).map((skill) => (
-              <Chip key={skill} size="sm" variant="secondary"><Chip.Label numberOfLines={1}>{skill}</Chip.Label></Chip>
+              <Chip key={skill} size="sm" variant="secondary">
+                <Ionicons name="sparkles-outline" size={12} color={primary} />
+                <Chip.Label numberOfLines={1}>{skill}</Chip.Label>
+              </Chip>
             ))}
           </View>
         ) : null}
-        <View className="flex-row flex-wrap gap-2 pl-1">
+        <Surface
+          variant="secondary"
+          className="rounded-panel-inner p-2"
+          style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+        >
+        <View className="flex-row flex-wrap gap-2">
           {tenantId ? (
             <HeroButton
               size="sm"
-              variant="secondary"
-              className="min-w-[128px]"
+              variant="primary"
+              className="min-w-[46%] flex-1"
+              style={{ backgroundColor: primary }}
               onPress={() => router.push({
                 pathname: '/(modals)/federation-member',
                 params: member.is_external
                   ? { id: String(member.id), tenant_id: String(tenantId), name }
-                  : { id: String(member.id), tenant_id: String(tenantId) },
+                : { id: String(member.id), tenant_id: String(tenantId) },
               } as unknown as Href)}
             >
-              <Ionicons name="person-outline" size={14} color={primary} />
+              <Ionicons name="person-outline" size={14} color="#fff" />
               <HeroButton.Label>{t('directory.members.viewProfile')}</HeroButton.Label>
             </HeroButton>
           ) : null}
           {tenantId ? (
-            <HeroButton size="sm" variant="secondary" className="min-w-[112px]" onPress={() => router.push({ pathname: '/(modals)/federation-messages', params: { compose: 'true', to_user: String(member.id), to_tenant: String(tenantId), name, community: communityName } } as unknown as Href)}>
+            <HeroButton size="sm" variant="secondary" className="min-w-[46%] flex-1" onPress={() => router.push({ pathname: '/(modals)/federation-messages', params: { compose: 'true', to_user: String(member.id), to_tenant: String(tenantId), name, community: communityName } } as unknown as Href)}>
               <Ionicons name="chatbubble-ellipses-outline" size={14} color={primary} />
               <HeroButton.Label>{t('directory.members.message')}</HeroButton.Label>
             </HeroButton>
           ) : null}
         </View>
+        </Surface>
       </HeroCard.Body>
     </HeroCard>
   );
@@ -468,55 +521,83 @@ function ListingCard({
 }) {
   const isOffer = listing.type === 'offer';
   const typeColor = isOffer ? '#22c55e' : '#f59e0b';
+  const authorName = listingAuthorName(listing, t);
+  const community = listingCommunityName(listing, t);
+  const listingImage = resolvedMediaUrl(listing.image_url);
   return (
-    <HeroCard className="mb-3 rounded-panel p-0">
-      <HeroCard.Body className="gap-3 p-4">
-        {resolvedMediaUrl(listing.image_url) ? (
-          <Image source={{ uri: resolvedMediaUrl(listing.image_url)! }} className="h-36 w-full rounded-panel-inner bg-surface" resizeMode="cover" />
-        ) : (
-          <Surface variant="secondary" className="h-24 items-center justify-center rounded-panel-inner" style={{ backgroundColor: withAlpha(typeColor, 0.14) }}>
-            <Ionicons name={isOffer ? 'hand-left-outline' : 'search-outline'} size={32} color={typeColor} />
-          </Surface>
-        )}
-        <View className="flex-row flex-wrap gap-2">
-          <Chip size="sm" variant="secondary" color={isOffer ? 'success' : 'warning'}>
-            <Chip.Label>{isOffer ? t('directory.listings.offer') : t('directory.listings.request')}</Chip.Label>
-          </Chip>
-          {listing.category_name ? <Chip size="sm" variant="secondary"><Chip.Label>{listing.category_name}</Chip.Label></Chip> : null}
-          {listing.is_external ? <Chip size="sm" variant="secondary"><Chip.Label>{t('directory.external')}</Chip.Label></Chip> : null}
-        </View>
-        <View className="flex-row items-start gap-3">
-          <View className="min-w-0 flex-1">
-            <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={2}>{listing.title}</Text>
-            <Text className="text-xs" style={{ color: theme.textMuted }} numberOfLines={1}>{listingAuthorName(listing, t)}</Text>
+    <Pressable
+      className="mb-3"
+      accessibilityRole="button"
+      accessibilityLabel={t('directory.listings.openDetails', { title: listing.title })}
+      onPress={onPress}
+      style={({ pressed }) => ({ opacity: pressed ? 0.86 : 1 })}
+    >
+      <HeroCard
+        className="overflow-hidden rounded-panel p-0"
+        style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+      >
+        <View className="absolute bottom-0 left-0 top-0 w-1.5" style={{ backgroundColor: typeColor }} />
+        <HeroCard.Body className="gap-2.5 p-3.5 pl-5">
+          <View className="flex-row items-start gap-3">
+            <View
+              className="h-16 w-16 overflow-hidden rounded-panel-inner"
+              style={{ backgroundColor: withAlpha(typeColor, 0.1), borderWidth: 1, borderColor: withAlpha(typeColor, 0.18) }}
+            >
+              {listingImage ? (
+                <Image source={{ uri: listingImage }} className="h-full w-full bg-surface" resizeMode="cover" />
+              ) : (
+                <View className="h-full w-full items-center justify-center">
+                  <Ionicons name={isOffer ? 'hand-left-outline' : 'search-outline'} size={27} color={typeColor} />
+                </View>
+              )}
+            </View>
+            <View className="min-w-0 flex-1 gap-2">
+              <View className="flex-row flex-wrap gap-2">
+                <Chip size="sm" variant="secondary" color={isOffer ? 'success' : 'warning'}>
+                  <Chip.Label>{isOffer ? t('directory.listings.offer') : t('directory.listings.request')}</Chip.Label>
+                </Chip>
+                {listing.category_name ? <Chip size="sm" variant="secondary"><Chip.Label>{listing.category_name}</Chip.Label></Chip> : null}
+                {listing.is_external ? <Chip size="sm" variant="secondary"><Chip.Label>{t('directory.external')}</Chip.Label></Chip> : null}
+              </View>
+              <View className="gap-1">
+                <Text className="text-[17px] font-bold leading-6" style={{ color: theme.text }} numberOfLines={2}>{listing.title}</Text>
+                <View className="flex-row items-center gap-1">
+                  <Ionicons name="person-outline" size={13} color={theme.textMuted} />
+                  <Text className="min-w-0 flex-1 text-xs font-semibold" style={{ color: theme.textMuted }} numberOfLines={1}>{authorName}</Text>
+                </View>
+              </View>
+            </View>
+            <View
+              className="h-8 w-8 items-center justify-center rounded-2xl"
+              style={{ backgroundColor: withAlpha(primary, 0.1), borderWidth: 1, borderColor: withAlpha(primary, 0.16) }}
+            >
+              <Ionicons name="chevron-forward-outline" size={17} color={primary} />
+            </View>
           </View>
-          <Ionicons name="chevron-forward-outline" size={18} color={primary} />
-        </View>
-        {listing.description ? <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>{listing.description}</Text> : null}
-        <View className="flex-row flex-wrap gap-2">
-          <Chip size="sm" variant="secondary">
-            <Ionicons name="globe-outline" size={12} color={primary} />
-            <Chip.Label>{listingCommunityName(listing, t)}</Chip.Label>
-          </Chip>
-          {listing.location ? (
-            <Chip size="sm" variant="secondary">
-              <Ionicons name="location-outline" size={12} color={primary} />
-              <Chip.Label>{listing.location}</Chip.Label>
-            </Chip>
+          {listing.description ? (
+            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>{listing.description}</Text>
           ) : null}
-          {listing.estimated_hours ? <Chip size="sm" variant="secondary"><Chip.Label>{t('directory.listings.hours', { hours: listing.estimated_hours })}</Chip.Label></Chip> : null}
-        </View>
-        <HeroButton
-          size="sm"
-          variant="secondary"
-          onPress={onPress}
-          accessibilityLabel={t('directory.listings.openDetails', { title: listing.title })}
-        >
-          <Ionicons name="open-outline" size={14} color={primary} />
-          <HeroButton.Label>{t('directory.listings.viewDetails')}</HeroButton.Label>
-        </HeroButton>
-      </HeroCard.Body>
-    </HeroCard>
+          <View className="flex-row flex-wrap gap-2">
+            <Chip size="sm" variant="secondary">
+              <Ionicons name="globe-outline" size={12} color={primary} />
+              <Chip.Label>{community}</Chip.Label>
+            </Chip>
+            {listing.location ? (
+              <Chip size="sm" variant="secondary">
+                <Ionicons name="location-outline" size={12} color={primary} />
+                <Chip.Label>{listing.location}</Chip.Label>
+              </Chip>
+            ) : null}
+            {listing.estimated_hours ? (
+              <Chip size="sm" variant="secondary">
+                <Ionicons name="time-outline" size={12} color={primary} />
+                <Chip.Label>{t('directory.listings.hours', { hours: listing.estimated_hours })}</Chip.Label>
+              </Chip>
+            ) : null}
+          </View>
+        </HeroCard.Body>
+      </HeroCard>
+    </Pressable>
   );
 }
 
@@ -568,13 +649,24 @@ function ListingDetailView({
         <HeroButton.Label>{t('directory.listings.backToListings')}</HeroButton.Label>
       </HeroButton>
 
-      <HeroCard className="rounded-panel p-0">
+      <HeroCard
+        className="overflow-hidden rounded-panel p-0"
+        style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+      >
+        <View className="h-1.5" style={{ backgroundColor: typeColor }} />
         <HeroCard.Body className="gap-4 p-4">
           {resolvedMediaUrl(listing.image_url) ? (
             <Image source={{ uri: resolvedMediaUrl(listing.image_url)! }} className="h-52 w-full rounded-panel-inner bg-surface" resizeMode="cover" />
           ) : (
-            <Surface variant="secondary" className="h-36 items-center justify-center rounded-panel-inner" style={{ backgroundColor: withAlpha(typeColor, 0.14) }}>
+            <Surface
+              variant="secondary"
+              className="h-36 items-center justify-center gap-2 rounded-panel-inner"
+              style={{ backgroundColor: withAlpha(typeColor, 0.12), borderWidth: 1, borderColor: withAlpha(typeColor, 0.18) }}
+            >
               <Ionicons name={isOffer ? 'hand-left-outline' : 'search-outline'} size={42} color={typeColor} />
+              <Text className="text-xs font-bold uppercase" style={{ color: theme.textMuted }}>
+                {isOffer ? t('directory.listings.offer') : t('directory.listings.request')}
+              </Text>
             </Surface>
           )}
 
@@ -622,16 +714,28 @@ function ListingDetailView({
         </HeroCard.Body>
       </HeroCard>
 
-      <HeroCard className="rounded-panel p-0">
+      <HeroCard
+        className="rounded-panel p-0"
+        style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+      >
         <HeroCard.Body className="gap-3 p-4">
           <Text className="text-xs font-bold uppercase" style={{ color: theme.textMuted }}>{t('directory.listings.postedBy')}</Text>
-          <View className="flex-row items-center gap-3">
-            <Avatar uri={listing.author?.avatar ?? null} name={authorName} size={48} />
+          <Surface
+            variant="secondary"
+            className="flex-row items-center gap-3 rounded-panel-inner p-3"
+            style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+          >
+            <View
+              className="rounded-full p-1"
+              style={{ backgroundColor: withAlpha(primary, 0.1), borderWidth: 1, borderColor: withAlpha(primary, 0.18) }}
+            >
+              <Avatar uri={listing.author?.avatar ?? null} name={authorName} size={48} />
+            </View>
             <View className="min-w-0 flex-1">
               <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={1}>{authorName}</Text>
               <Text className="text-sm" style={{ color: theme.textSecondary }} numberOfLines={1}>{listingCommunityName(listing, t)}</Text>
             </View>
-          </View>
+          </Surface>
           <View className="flex-row flex-wrap gap-2">
             {canOpenAuthor ? (
               <HeroButton size="sm" variant="secondary" onPress={openAuthorProfile}>
@@ -666,20 +770,41 @@ function GroupCard({
   onPress: () => void;
 }) {
   const community = group.timebank?.name ?? group.partner_name ?? t('directory.unknownCommunity');
+  const tone = modeMeta.groups.tone;
   return (
-    <HeroButton variant="ghost" feedbackVariant="scale" className="mb-3" accessibilityLabel={t('directory.groups.openDetails', { name: group.name })} onPress={onPress}>
-      <HeroCard className="overflow-hidden rounded-panel p-0">
-        {resolvedMediaUrl(group.cover_image) ? <Image source={{ uri: resolvedMediaUrl(group.cover_image)! }} className="h-32 w-full bg-surface" resizeMode="cover" /> : <View className="h-1.5" style={{ backgroundColor: '#8b5cf6' }} />}
-        <HeroCard.Body className="gap-3 p-4">
+    <Pressable
+      className="mb-3"
+      accessibilityRole="button"
+      accessibilityLabel={t('directory.groups.openDetails', { name: group.name })}
+      onPress={onPress}
+      style={({ pressed }) => ({ opacity: pressed ? 0.86 : 1 })}
+    >
+      <HeroCard
+        className="overflow-hidden rounded-panel p-0"
+        style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+      >
+        <View className="absolute bottom-0 left-0 top-0 w-1.5" style={{ backgroundColor: tone }} />
+        {resolvedMediaUrl(group.cover_image) ? (
+          <Image source={{ uri: resolvedMediaUrl(group.cover_image)! }} className="h-32 w-full bg-surface" resizeMode="cover" />
+        ) : null}
+        <HeroCard.Body className="gap-3 p-4 pl-5">
           <View className="flex-row items-start gap-3">
-            <View className="size-12 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha('#8b5cf6', 0.14) }}>
-              <Ionicons name={group.privacy === 'private' ? 'lock-closed-outline' : 'people-circle-outline'} size={24} color="#8b5cf6" />
+            <View
+              className="size-12 items-center justify-center rounded-2xl"
+              style={{ backgroundColor: withAlpha(tone, 0.14), borderWidth: 1, borderColor: withAlpha(tone, 0.18) }}
+            >
+              <Ionicons name={group.privacy === 'private' ? 'lock-closed-outline' : 'people-circle-outline'} size={24} color={tone} />
             </View>
             <View className="min-w-0 flex-1 gap-1">
-              <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={2}>{group.name}</Text>
+              <Text className="text-[17px] font-bold leading-6" style={{ color: theme.text }} numberOfLines={2}>{group.name}</Text>
               {group.description ? <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>{group.description}</Text> : null}
             </View>
-            <Ionicons name="chevron-forward-outline" size={18} color={primary} />
+            <View
+              className="h-8 w-8 items-center justify-center rounded-2xl"
+              style={{ backgroundColor: withAlpha(primary, 0.1), borderWidth: 1, borderColor: withAlpha(primary, 0.16) }}
+            >
+              <Ionicons name="chevron-forward-outline" size={17} color={primary} />
+            </View>
           </View>
           <View className="flex-row flex-wrap gap-2">
             <Chip size="sm" variant="secondary">
@@ -695,7 +820,7 @@ function GroupCard({
           </View>
         </HeroCard.Body>
       </HeroCard>
-    </HeroButton>
+    </Pressable>
   );
 }
 
@@ -713,6 +838,7 @@ function GroupDetailView({
   onBack: () => void;
 }) {
   const community = group.timebank?.name ?? group.partner_name ?? t('directory.unknownCommunity');
+  const tone = modeMeta.groups.tone;
   return (
     <View className="gap-4">
       <HeroButton variant="secondary" onPress={onBack}>
@@ -720,12 +846,18 @@ function GroupDetailView({
         <HeroButton.Label>{t('directory.groups.backToGroups')}</HeroButton.Label>
       </HeroButton>
 
-      <HeroCard className="overflow-hidden rounded-panel p-0">
-        {resolvedMediaUrl(group.cover_image) ? <Image source={{ uri: resolvedMediaUrl(group.cover_image)! }} className="h-44 w-full bg-surface" resizeMode="cover" /> : <View className="h-1.5" style={{ backgroundColor: '#8b5cf6' }} />}
+      <HeroCard
+        className="overflow-hidden rounded-panel p-0"
+        style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+      >
+        {resolvedMediaUrl(group.cover_image) ? <Image source={{ uri: resolvedMediaUrl(group.cover_image)! }} className="h-44 w-full bg-surface" resizeMode="cover" /> : <View className="h-1.5" style={{ backgroundColor: tone }} />}
         <HeroCard.Body className="gap-4 p-4">
           <View className="flex-row items-start gap-3">
-            <View className="size-13 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha('#8b5cf6', 0.14) }}>
-              <Ionicons name={group.privacy === 'private' ? 'lock-closed-outline' : 'people-circle-outline'} size={25} color="#8b5cf6" />
+            <View
+              className="size-13 items-center justify-center rounded-3xl"
+              style={{ backgroundColor: withAlpha(tone, 0.14), borderWidth: 1, borderColor: withAlpha(tone, 0.18) }}
+            >
+              <Ionicons name={group.privacy === 'private' ? 'lock-closed-outline' : 'people-circle-outline'} size={25} color={tone} />
             </View>
             <View className="min-w-0 flex-1 gap-1">
               <Text className="text-xs font-bold uppercase" style={{ color: theme.textMuted }}>{t('directory.groups.detailEyebrow')}</Text>
@@ -780,24 +912,51 @@ function EventCard({
 }) {
   const startDate = formatDate(event.start_date);
   const organizerName = event.organizer?.name?.trim() || t('directory.events.organizerFallback');
+  const community = event.timebank?.name ?? t('directory.unknownCommunity');
+  const tone = modeMeta.events.tone;
   return (
-    <HeroButton variant="ghost" feedbackVariant="scale" className="mb-3" accessibilityLabel={t('directory.events.openDetails', { title: event.title })} onPress={onPress}>
-      <HeroCard className="rounded-panel p-0">
-        <HeroCard.Body className="gap-3 p-4">
-          {resolvedMediaUrl(event.cover_image) ? <Image source={{ uri: resolvedMediaUrl(event.cover_image)! }} className="h-36 w-full rounded-panel-inner bg-surface" resizeMode="cover" /> : null}
+    <Pressable
+      className="mb-3"
+      accessibilityRole="button"
+      accessibilityLabel={t('directory.events.openDetails', { title: event.title })}
+      onPress={onPress}
+      style={({ pressed }) => ({ opacity: pressed ? 0.86 : 1 })}
+    >
+      <HeroCard
+        className="overflow-hidden rounded-panel p-0"
+        style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+      >
+        <View className="absolute bottom-0 left-0 top-0 w-1.5" style={{ backgroundColor: tone }} />
+        <HeroCard.Body className="gap-3 p-4 pl-5">
+          {resolvedMediaUrl(event.cover_image) ? (
+            <Image source={{ uri: resolvedMediaUrl(event.cover_image)! }} className="h-36 w-full rounded-panel-inner bg-surface" resizeMode="cover" />
+          ) : null}
           <View className="flex-row items-start gap-3">
-            <Surface variant="secondary" className="w-16 items-center rounded-panel-inner p-2">
-              <Ionicons name="calendar-outline" size={18} color={primary} />
-              <Text className="text-center text-xs font-semibold" style={{ color: theme.text }}>{startDate}</Text>
+            <Surface
+              variant="secondary"
+              className="w-16 items-center rounded-panel-inner p-2"
+              style={{ backgroundColor: withAlpha(tone, 0.1), borderWidth: 1, borderColor: withAlpha(tone, 0.18) }}
+            >
+              <Ionicons name="calendar-outline" size={18} color={tone} />
+              <Text className="text-center text-xs font-bold" style={{ color: theme.text }} numberOfLines={2}>{startDate}</Text>
             </Surface>
             <View className="min-w-0 flex-1 gap-1">
-              <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={2}>{event.title}</Text>
+              <Text className="text-[17px] font-bold leading-6" style={{ color: theme.text }} numberOfLines={2}>{event.title}</Text>
               {event.description ? <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>{event.description}</Text> : null}
             </View>
-            <Ionicons name="chevron-forward-outline" size={18} color={primary} />
+            <View
+              className="h-8 w-8 items-center justify-center rounded-2xl"
+              style={{ backgroundColor: withAlpha(primary, 0.1), borderWidth: 1, borderColor: withAlpha(primary, 0.16) }}
+            >
+              <Ionicons name="chevron-forward-outline" size={17} color={primary} />
+            </View>
           </View>
-          <View className="flex-row items-center gap-2">
-            <Avatar uri={event.organizer?.avatar ?? null} name={organizerName} size={30} />
+          <Surface
+            variant="secondary"
+            className="flex-row items-center gap-2 rounded-panel-inner p-2.5"
+            style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+          >
+            <Avatar uri={event.organizer?.avatar ?? null} name={organizerName} size={32} />
             <View className="min-w-0 flex-1">
               <Text className="text-[11px] font-semibold uppercase" style={{ color: theme.textMuted }} numberOfLines={1}>
                 {t('directory.events.organizer')}
@@ -806,15 +965,29 @@ function EventCard({
                 {organizerName}
               </Text>
             </View>
-          </View>
+          </Surface>
           <View className="flex-row flex-wrap gap-2">
             {event.is_online ? <Chip size="sm" variant="secondary" color="success"><Chip.Label>{t('directory.events.online')}</Chip.Label></Chip> : null}
-            {event.location ? <Chip size="sm" variant="secondary"><Chip.Label>{event.location}</Chip.Label></Chip> : null}
-            <Chip size="sm" variant="secondary"><Chip.Label>{event.timebank?.name ?? t('directory.unknownCommunity')}</Chip.Label></Chip>
+            {event.location ? (
+              <Chip size="sm" variant="secondary">
+                <Ionicons name="location-outline" size={12} color={primary} />
+                <Chip.Label>{event.location}</Chip.Label>
+              </Chip>
+            ) : null}
+            <Chip size="sm" variant="secondary">
+              <Ionicons name="globe-outline" size={12} color={primary} />
+              <Chip.Label>{community}</Chip.Label>
+            </Chip>
+            {typeof event.attendees_count === 'number' ? (
+              <Chip size="sm" variant="secondary">
+                <Ionicons name="people-outline" size={12} color={primary} />
+                <Chip.Label>{t('directory.events.attendeeCount', { count: event.attendees_count })}</Chip.Label>
+              </Chip>
+            ) : null}
           </View>
         </HeroCard.Body>
       </HeroCard>
-    </HeroButton>
+    </Pressable>
   );
 }
 
@@ -833,6 +1006,7 @@ function EventDetailView({
 }) {
   const community = event.timebank?.name ?? t('directory.unknownCommunity');
   const organizerName = event.organizer?.name?.trim() || t('directory.events.organizerFallback');
+  const tone = modeMeta.events.tone;
   return (
     <View className="gap-4">
       <HeroButton variant="secondary" onPress={onBack}>
@@ -840,12 +1014,18 @@ function EventDetailView({
         <HeroButton.Label>{t('directory.events.backToEvents')}</HeroButton.Label>
       </HeroButton>
 
-      <HeroCard className="overflow-hidden rounded-panel p-0">
-        {resolvedMediaUrl(event.cover_image) ? <Image source={{ uri: resolvedMediaUrl(event.cover_image)! }} className="h-52 w-full bg-surface" resizeMode="cover" /> : <View className="h-1.5" style={{ backgroundColor: modeMeta.events.tone }} />}
+      <HeroCard
+        className="overflow-hidden rounded-panel p-0"
+        style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+      >
+        {resolvedMediaUrl(event.cover_image) ? <Image source={{ uri: resolvedMediaUrl(event.cover_image)! }} className="h-52 w-full bg-surface" resizeMode="cover" /> : <View className="h-1.5" style={{ backgroundColor: tone }} />}
         <HeroCard.Body className="gap-4 p-4">
           <View className="flex-row items-start gap-3">
-            <View className="size-13 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(modeMeta.events.tone, 0.14) }}>
-              <Ionicons name="calendar-outline" size={25} color={modeMeta.events.tone} />
+            <View
+              className="size-13 items-center justify-center rounded-3xl"
+              style={{ backgroundColor: withAlpha(tone, 0.14), borderWidth: 1, borderColor: withAlpha(tone, 0.18) }}
+            >
+              <Ionicons name="calendar-outline" size={25} color={tone} />
             </View>
             <View className="min-w-0 flex-1 gap-1">
               <Text className="text-xs font-bold uppercase" style={{ color: theme.textMuted }}>{t('directory.events.detailEyebrow')}</Text>
@@ -856,8 +1036,17 @@ function EventDetailView({
             </View>
           </View>
 
-          <Surface variant="secondary" className="flex-row items-center gap-3 rounded-panel-inner p-3">
-            <Avatar uri={event.organizer?.avatar ?? null} name={organizerName} size={42} />
+          <Surface
+            variant="secondary"
+            className="flex-row items-center gap-3 rounded-panel-inner p-3"
+            style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+          >
+            <View
+              className="rounded-full p-1"
+              style={{ backgroundColor: withAlpha(tone, 0.1), borderWidth: 1, borderColor: withAlpha(tone, 0.18) }}
+            >
+              <Avatar uri={event.organizer?.avatar ?? null} name={organizerName} size={42} />
+            </View>
             <View className="min-w-0 flex-1">
               <Text className="text-xs font-bold uppercase" style={{ color: theme.textMuted }} numberOfLines={1}>
                 {t('directory.events.organizer')}
@@ -919,6 +1108,8 @@ function MessageCard({
   const { partner, lastMessage: message } = thread;
   const partnerName = displayFederationPartnerName(partner, t('directory.messages.unknownSender'));
   const tone = modeMeta.messages.tone;
+  const showStatusChip = !(thread.unreadCount > 0 && message.status === 'unread');
+
   return (
     <Pressable
       className="mb-3"
@@ -932,45 +1123,44 @@ function MessageCard({
         style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
       >
         <View className="absolute bottom-0 left-0 top-0 w-1.5" style={{ backgroundColor: tone }} />
-        <HeroCard.Body className="gap-3 p-4 pl-5">
+        <HeroCard.Body className="gap-2.5 p-3.5 pl-5">
           <View className="flex-row items-start gap-3">
             <View
               className="rounded-full p-1"
               style={{ backgroundColor: withAlpha(tone, 0.1), borderWidth: 1, borderColor: withAlpha(tone, 0.18) }}
             >
-              <Avatar uri={partner.avatar ?? null} name={partnerName} size={50} />
+              <Avatar uri={partner.avatar ?? null} name={partnerName} size={44} />
             </View>
-            <View className="min-w-0 flex-1 gap-1.5">
-              <Text className="text-[17px] font-bold leading-6" style={{ color: theme.text }} numberOfLines={1}>{partnerName}</Text>
-              <View className="flex-row items-center gap-1">
-                <Ionicons name="business-outline" size={13} color={theme.textMuted} />
-                <Text className="min-w-0 flex-1 text-sm" style={{ color: theme.textSecondary }} numberOfLines={1}>
-                  {partner.tenant_name ?? t('directory.unknownCommunity')}
-                </Text>
+            <View className="min-w-0 flex-1 gap-2">
+              <View className="min-w-0 gap-1">
+                <Text className="text-[17px] font-bold leading-6" style={{ color: theme.text }} numberOfLines={1}>{partnerName}</Text>
+                <View className="flex-row items-center gap-1">
+                  <Ionicons name="business-outline" size={13} color={theme.textMuted} />
+                  <Text className="min-w-0 flex-1 text-sm" style={{ color: theme.textSecondary }} numberOfLines={1}>
+                    {partner.tenant_name ?? t('directory.unknownCommunity')}
+                  </Text>
+                </View>
               </View>
-            </View>
-            <View className="items-end gap-2">
-              {thread.unreadCount > 0 ? (
-                <Chip size="sm" variant="secondary" color="warning">
-                  <Chip.Label>{t('directory.messages.unreadCount', { count: thread.unreadCount })}</Chip.Label>
+              <View className="flex-row flex-wrap gap-2">
+                {thread.unreadCount > 0 ? (
+                  <Chip size="sm" variant="secondary" color="warning">
+                    <Chip.Label>{t('directory.messages.unreadCount', { count: thread.unreadCount })}</Chip.Label>
+                  </Chip>
+                ) : null}
+                {showStatusChip ? (
+                  <Chip size="sm" variant="secondary" color={message.status === 'unread' ? 'warning' : 'default'}>
+                    <Chip.Label>{message.status ?? t('directory.messages.delivered')}</Chip.Label>
+                  </Chip>
+                ) : null}
+                <Chip size="sm" variant="secondary">
+                  <Ionicons name="time-outline" size={12} color={theme.textMuted} />
+                  <Chip.Label>{formatDate(message.created_at)}</Chip.Label>
                 </Chip>
-              ) : null}
-              <Chip size="sm" variant="secondary" color={message.status === 'unread' ? 'warning' : 'default'}>
-                <Chip.Label>{message.status ?? t('directory.messages.delivered')}</Chip.Label>
-              </Chip>
-            </View>
-          </View>
-          <View
-            className="gap-1 rounded-2xl px-3 py-2"
-            style={{ backgroundColor: withAlpha(tone, 0.06), borderWidth: 1, borderColor: withAlpha(tone, 0.12) }}
-          >
-            {message.subject ? <Text className="text-sm font-bold" style={{ color: theme.text }} numberOfLines={2}>{message.subject}</Text> : null}
-            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>{message.body}</Text>
-          </View>
-          <View className="flex-row items-center justify-between gap-3">
-            <View className="flex-row items-center gap-1">
-              <Ionicons name="time-outline" size={13} color={theme.textMuted} />
-              <Text className="text-xs" style={{ color: theme.textMuted }}>{formatDate(message.created_at)}</Text>
+              </View>
+              <View className="gap-0.5">
+                {message.subject ? <Text className="text-sm font-bold" style={{ color: theme.text }} numberOfLines={1}>{message.subject}</Text> : null}
+                <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>{message.body}</Text>
+              </View>
             </View>
             <View
               className="h-8 w-8 items-center justify-center rounded-2xl"
@@ -1455,63 +1645,133 @@ function SettingsScreen({ theme, primary, t }: { theme: ReturnType<typeof useThe
 
   return (
     <View className="gap-4">
-      <Surface variant="secondary" className="gap-4 rounded-panel p-4">
-        <View className="flex-row items-center gap-3">
-          <View className="size-11 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(federationEnabled ? '#22c55e' : '#f59e0b', 0.14) }}>
-            <Ionicons name={federationEnabled ? 'shield-checkmark-outline' : 'shield-outline'} size={22} color={federationEnabled ? '#22c55e' : '#f59e0b'} />
+      <HeroCard
+        className="overflow-hidden rounded-panel p-0"
+        style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+      >
+        <View className="h-1.5" style={{ backgroundColor: federationEnabled ? '#22c55e' : '#f59e0b' }} />
+        <HeroCard.Body className="gap-3 p-4">
+          <View className="flex-row items-center gap-3">
+            <View
+              className="size-11 items-center justify-center rounded-2xl"
+              style={{
+                backgroundColor: withAlpha(federationEnabled ? '#22c55e' : '#f59e0b', 0.14),
+                borderWidth: 1,
+                borderColor: withAlpha(federationEnabled ? '#22c55e' : '#f59e0b', 0.2),
+              }}
+            >
+              <Ionicons name={federationEnabled ? 'shield-checkmark-outline' : 'shield-outline'} size={22} color={federationEnabled ? '#22c55e' : '#f59e0b'} />
+            </View>
+            <View className="min-w-0 flex-1 gap-1">
+              <Text className="text-lg font-bold leading-6" style={{ color: theme.text }} numberOfLines={1}>
+                {federationEnabled ? t('directory.settings.active') : t('directory.settings.inactive')}
+              </Text>
+              <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>
+                {t('directory.settings.statusDescription')}
+              </Text>
+            </View>
           </View>
-          <View className="min-w-0 flex-1">
-            <Text className="text-base font-bold" style={{ color: theme.text }}>{federationEnabled ? t('directory.settings.active') : t('directory.settings.inactive')}</Text>
-            <Text className="text-sm" style={{ color: theme.textSecondary }}>{t('directory.settings.statusDescription')}</Text>
-          </View>
-        </View>
-        <HeroButton
-          variant={federationEnabled ? 'danger-soft' : 'primary'}
-          onPress={() => void toggleFederationStatus()}
-          isDisabled={isTogglingStatus}
-          accessibilityLabel={federationEnabled ? t('directory.settings.disable') : t('directory.settings.enable')}
-          style={!federationEnabled ? { backgroundColor: primary } : undefined}
-        >
-          {isTogglingStatus ? <Spinner size="sm" /> : <Ionicons name={federationEnabled ? 'shield-outline' : 'shield-checkmark-outline'} size={16} color={federationEnabled ? theme.error : '#fff'} />}
-          <HeroButton.Label>{federationEnabled ? t('directory.settings.disable') : t('directory.settings.enable')}</HeroButton.Label>
-        </HeroButton>
-      </Surface>
 
-      <HeroCard className="rounded-panel p-0">
-        <HeroCard.Body className="gap-1 p-4">
-          {settingKeys.map((key) => (
-            <Surface key={key} variant="transparent" className="flex-row items-center justify-between gap-3 rounded-panel-inner p-3">
-              <View className="min-w-0 flex-1">
-                <Text className="text-sm font-semibold" style={{ color: theme.text }}>{t(`directory.settings.${key}.label`)}</Text>
-                <Text className="text-xs leading-4" style={{ color: theme.textSecondary }}>{t(`directory.settings.${key}.description`)}</Text>
-              </View>
-              <Toggle
-                value={current[key] === true}
-                onValueChange={(value) => setDraft((prev) => ({ ...(prev ?? current), [key]: value }))}
-              />
-            </Surface>
-          ))}
+          <HeroButton
+            variant={federationEnabled ? 'danger-soft' : 'primary'}
+            onPress={() => void toggleFederationStatus()}
+            isDisabled={isTogglingStatus}
+            accessibilityLabel={federationEnabled ? t('directory.settings.disable') : t('directory.settings.enable')}
+            style={!federationEnabled ? { backgroundColor: primary } : undefined}
+          >
+            {isTogglingStatus ? <Spinner size="sm" /> : <Ionicons name={federationEnabled ? 'shield-outline' : 'shield-checkmark-outline'} size={16} color={federationEnabled ? theme.error : '#fff'} />}
+            <HeroButton.Label>{federationEnabled ? t('directory.settings.disable') : t('directory.settings.enable')}</HeroButton.Label>
+          </HeroButton>
         </HeroCard.Body>
       </HeroCard>
 
-      <View className="flex-row flex-wrap gap-2">
-        {(['local_only', 'remote_ok', 'travel_ok'] as const).map((reach) => (
-          <HeroButton
-            key={reach}
-            variant={current.service_reach === reach ? 'primary' : 'secondary'}
-            onPress={() => setDraft((prev) => ({ ...(prev ?? current), service_reach: reach }))}
-          >
-            <HeroButton.Label>{t(`directory.settings.reach.${reach}`)}</HeroButton.Label>
-          </HeroButton>
-        ))}
-      </View>
+      <HeroCard
+        className="overflow-hidden rounded-panel p-0"
+        style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+      >
+        <HeroCard.Body className="gap-1.5 p-2.5">
+          {settingKeys.map((key) => {
+            const selected = current[key] === true;
+            return (
+              <Surface
+                key={key}
+                variant={selected ? 'secondary' : 'transparent'}
+                className="flex-row items-center justify-between gap-2.5 rounded-panel-inner px-2.5 py-2"
+                style={{ borderWidth: 1, borderColor: selected ? withAlpha(primary, 0.16) : theme.borderSubtle }}
+              >
+                <View
+                  className="size-9 items-center justify-center rounded-2xl"
+                  style={{ backgroundColor: withAlpha(primary, selected ? 0.14 : 0.08) }}
+                >
+                  <Ionicons name={settingIcon(key)} size={18} color={selected ? primary : theme.textMuted} />
+                </View>
+                <View className="min-w-0 flex-1">
+                  <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={1}>{t(`directory.settings.${key}.label`)}</Text>
+                  <Text className="text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>{t(`directory.settings.${key}.description`)}</Text>
+                </View>
+                <Toggle
+                  value={selected}
+                  size="sm"
+                  accessibilityLabel={t(`directory.settings.${key}.label`)}
+                  onValueChange={(value) => setDraft((prev) => ({ ...(prev ?? current), [key]: value }))}
+                />
+              </Surface>
+            );
+          })}
+        </HeroCard.Body>
+      </HeroCard>
 
-      <HeroButton variant="primary" onPress={save} isDisabled={isSaving} accessibilityLabel={t('directory.settings.save')}>
-        <Ionicons name="save-outline" size={16} color="#fff" />
-        <HeroButton.Label>{t('directory.settings.save')}</HeroButton.Label>
-      </HeroButton>
+      <HeroCard
+        className="overflow-hidden rounded-panel p-0"
+        style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+      >
+        <HeroCard.Body className="gap-3 p-3">
+          <View className="flex-row flex-wrap gap-2">
+            {(['local_only', 'remote_ok', 'travel_ok'] as const).map((reach) => (
+              <HeroButton
+                key={reach}
+                size="sm"
+                variant={current.service_reach === reach ? 'primary' : 'secondary'}
+                onPress={() => setDraft((prev) => ({ ...(prev ?? current), service_reach: reach }))}
+                style={current.service_reach === reach ? { backgroundColor: primary } : undefined}
+              >
+                <Ionicons name={reachIcon(reach)} size={14} color={current.service_reach === reach ? '#fff' : primary} />
+                <HeroButton.Label>{t(`directory.settings.reach.${reach}`)}</HeroButton.Label>
+              </HeroButton>
+            ))}
+          </View>
+
+          <HeroButton
+            variant="primary"
+            onPress={save}
+            isDisabled={isSaving}
+            accessibilityLabel={t('directory.settings.save')}
+            style={{ backgroundColor: primary }}
+          >
+            {isSaving ? <Spinner size="sm" /> : <Ionicons name="save-outline" size={16} color="#fff" />}
+            <HeroButton.Label>{t('directory.settings.save')}</HeroButton.Label>
+          </HeroButton>
+        </HeroCard.Body>
+      </HeroCard>
     </View>
   );
+}
+
+function settingIcon(key: (typeof settingKeys)[number]): IoniconName {
+  if (key === 'profile_visible_federated') return 'person-outline';
+  if (key === 'appear_in_federated_search') return 'search-outline';
+  if (key === 'show_skills_federated') return 'sparkles-outline';
+  if (key === 'show_location_federated') return 'location-outline';
+  if (key === 'show_reviews_federated') return 'star-outline';
+  if (key === 'messaging_enabled_federated') return 'chatbubbles-outline';
+  if (key === 'transactions_enabled_federated') return 'swap-horizontal-outline';
+  return 'mail-outline';
+}
+
+function reachIcon(reach: NonNullable<FederationSettings['service_reach']>): IoniconName {
+  if (reach === 'local_only') return 'home-outline';
+  if (reach === 'remote_ok') return 'laptop-outline';
+  return 'navigate-outline';
 }
 
 export default function FederationDirectoryScreen({ mode }: { mode: DirectoryMode }) {
@@ -1692,7 +1952,7 @@ export default function FederationDirectoryScreen({ mode }: { mode: DirectoryMod
               ) : null}
 
               {partnerFilters.length > 0 ? (
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+                <View className="flex-row flex-wrap gap-2">
                   <FilterChip label={t('directory.filters.allCommunities')} selected={!selectedPartner} onPress={() => setSelectedPartner('')} tone={primary} />
                   {partnerFilters.map((partner) => (
                     <FilterChip
@@ -1703,11 +1963,10 @@ export default function FederationDirectoryScreen({ mode }: { mode: DirectoryMod
                       tone={primary}
                     />
                   ))}
-                </ScrollView>
+                </View>
               ) : null}
-
               {mode === 'members' ? (
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+                <View className="flex-row flex-wrap gap-2">
                   {serviceReachFilters.map((reach) => (
                     <FilterChip
                       key={reach}
@@ -1717,11 +1976,11 @@ export default function FederationDirectoryScreen({ mode }: { mode: DirectoryMod
                       tone={primary}
                     />
                   ))}
-                </ScrollView>
+                </View>
               ) : null}
 
               {mode === 'listings' ? (
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+                <View className="flex-row flex-wrap gap-2">
                   {listingTypeFilters.map((type) => (
                     <FilterChip
                       key={type}
@@ -1731,7 +1990,7 @@ export default function FederationDirectoryScreen({ mode }: { mode: DirectoryMod
                       tone={primary}
                     />
                   ))}
-                </ScrollView>
+                </View>
               ) : null}
 
               {mode === 'events' ? (
@@ -1747,7 +2006,7 @@ export default function FederationDirectoryScreen({ mode }: { mode: DirectoryMod
 
           {mode === 'messages' && partnerFilters.length > 0 ? (
             <Surface variant="secondary" className="mb-4 rounded-panel p-4">
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+              <View className="flex-row flex-wrap gap-2">
                 <FilterChip label={t('directory.filters.allCommunities')} selected={!selectedPartner} onPress={() => setSelectedPartner('')} tone={primary} />
                 {partnerFilters.map((partner) => (
                   <FilterChip
@@ -1758,7 +2017,7 @@ export default function FederationDirectoryScreen({ mode }: { mode: DirectoryMod
                     tone={primary}
                   />
                 ))}
-              </ScrollView>
+              </View>
             </Surface>
           ) : null}
 
@@ -1809,12 +2068,27 @@ export default function FederationDirectoryScreen({ mode }: { mode: DirectoryMod
               <HeroButton variant="secondary" onPress={refresh}><HeroButton.Label>{t('directory.tryAgain')}</HeroButton.Label></HeroButton>
             </Surface>
           ) : isEmpty ? (
-            <Surface variant="secondary" className="rounded-panel p-5">
-              <EmptyState
-                icon={meta.icon}
-                title={mode === 'messages' && selectedPartner ? t('directory.messages.emptyForPartnerTitle') : t(`directory.${mode}.emptyTitle`)}
-                subtitle={mode === 'messages' && selectedPartner ? t('directory.messages.emptyForPartnerDescription') : t(`directory.${mode}.emptyDescription`)}
-              />
+            <Surface
+              variant="secondary"
+              className="overflow-hidden rounded-panel p-0"
+              style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+            >
+              <View className="items-center gap-3 px-5 py-7">
+                <View
+                  className="h-14 w-14 items-center justify-center rounded-3xl"
+                  style={{ backgroundColor: withAlpha(meta.tone, 0.12), borderWidth: 1, borderColor: withAlpha(meta.tone, 0.18) }}
+                >
+                  <Ionicons name={meta.icon} size={27} color={meta.tone} />
+                </View>
+                <View className="gap-1">
+                  <Text className="text-center text-lg font-bold leading-6" style={{ color: theme.text }}>
+                    {mode === 'messages' && selectedPartner ? t('directory.messages.emptyForPartnerTitle') : t(`directory.${mode}.emptyTitle`)}
+                  </Text>
+                  <Text className="text-center text-sm leading-5" style={{ color: theme.textSecondary }}>
+                    {mode === 'messages' && selectedPartner ? t('directory.messages.emptyForPartnerDescription') : t(`directory.${mode}.emptyDescription`)}
+                  </Text>
+                </View>
+              </View>
             </Surface>
           ) : (
             <View>

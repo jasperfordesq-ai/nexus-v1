@@ -101,6 +101,7 @@ jest.mock('react-i18next', () => ({
         'navDescriptions.reviews': 'Review feedback you have received and exchanges waiting for a review.',
         'navDescriptions.achievements': 'Badges, levels, streaks, and community progress.',
         'navDescriptions.myGoals': 'Track personal goals and timebank milestones.',
+        'navDescriptions.discover': 'Open the discovery hub with listings, events, groups, members, and posts.',
         'navDescriptions.groups': 'Your community spaces and group conversations.',
         'navDescriptions.groupExchanges': 'Review multi-person time exchanges, splits, confirmations, and completion status.',
         'navDescriptions.search': 'Search listings, members, events, groups, and posts.',
@@ -257,11 +258,12 @@ describe('MoreScreen (More tab)', () => {
   });
 
   it('renders Discover section with community navigation items', () => {
-    const { getAllByText, getByText } = render(<MoreScreen />);
-    expect(getByText('Discover')).toBeTruthy();
+    const { getAllByText, getByText, queryByText } = render(<MoreScreen />);
+    expect(getAllByText('Discover').length).toBeGreaterThanOrEqual(2);
+    expect(getByText('Open the discovery hub with listings, events, groups, members, and posts.')).toBeTruthy();
     expect(getByText('Search')).toBeTruthy();
     expect(getByText('Listings')).toBeTruthy();
-    expect(getAllByText('Marketplace').length).toBeGreaterThanOrEqual(1);
+    expect(queryByText('Buy, sell, save, and manage community marketplace listings.')).toBeNull();
     expect(getByText('Jobs')).toBeTruthy();
     expect(getByText('Events')).toBeTruthy();
     expect(getByText('Groups')).toBeTruthy();
@@ -274,8 +276,9 @@ describe('MoreScreen (More tab)', () => {
   });
 
   it('renders the Marketplace section with seller and buyer shortcuts', () => {
-    const { getAllByText, getByText } = render(<MoreScreen />);
-    expect(getAllByText('Marketplace').length).toBeGreaterThanOrEqual(2);
+    const { getByLabelText, getByText } = render(<MoreScreen />);
+    expect(getByText('Marketplace')).toBeTruthy();
+    fireEvent.press(getByLabelText('Marketplace'));
     expect(getByText('Browse marketplace')).toBeTruthy();
     expect(getByText('Marketplace search')).toBeTruthy();
     expect(getByText('Nearby marketplace')).toBeTruthy();
@@ -296,6 +299,21 @@ describe('MoreScreen (More tab)', () => {
     expect(getByText('Saved searches')).toBeTruthy();
     expect(getByText('Seller tools')).toBeTruthy();
     expect(getByText('Seller payments')).toBeTruthy();
+  });
+
+  it('collapses the previously open More accordion section when another opens', () => {
+    const { getByLabelText, getByText, queryByText } = render(<MoreScreen />);
+
+    fireEvent.press(getByLabelText('Marketplace'));
+    expect(getByText('Browse marketplace')).toBeTruthy();
+
+    fireEvent.press(getByLabelText('Partner communities'));
+    expect(queryByText('Browse marketplace')).toBeNull();
+    expect(getByText('Federation hub')).toBeTruthy();
+
+    fireEvent.press(getByLabelText('My Space'));
+    expect(queryByText('Federation hub')).toBeNull();
+    expect(getByText('My Profile')).toBeTruthy();
   });
 
   it('renders direct federation shortcuts in the partner communities section', () => {
@@ -325,6 +343,7 @@ describe('MoreScreen (More tab)', () => {
   it('opens the seller sales orders view from Marketplace shortcuts', () => {
     const { getByLabelText } = render(<MoreScreen />);
 
+    fireEvent.press(getByLabelText('Marketplace'));
     fireEvent.press(getByLabelText('Sales orders'));
 
     expect(router.push).toHaveBeenCalledWith({
@@ -336,6 +355,7 @@ describe('MoreScreen (More tab)', () => {
   it('opens seller promotion tools from Marketplace shortcuts', () => {
     const { getByLabelText } = render(<MoreScreen />);
 
+    fireEvent.press(getByLabelText('Marketplace'));
     fireEvent.press(getByLabelText('Promotions'));
 
     expect(router.push).toHaveBeenCalledWith({
@@ -347,6 +367,7 @@ describe('MoreScreen (More tab)', () => {
   it('opens saved search tools from Marketplace shortcuts', () => {
     const { getByLabelText } = render(<MoreScreen />);
 
+    fireEvent.press(getByLabelText('Marketplace'));
     fireEvent.press(getByLabelText('Saved searches'));
 
     expect(router.push).toHaveBeenCalledWith({
@@ -364,14 +385,14 @@ describe('MoreScreen (More tab)', () => {
   it('hides More menu buttons when their backend module is disabled', () => {
     mockHasModule.mockImplementation((module: string) => !['wallet', 'messages', 'notifications', 'listings', 'settings'].includes(module));
 
-    const { getAllByText, queryByText } = render(<MoreScreen />);
+    const { getByText, queryByText } = render(<MoreScreen />);
 
     expect(queryByText('Wallet')).toBeNull();
     expect(queryByText('Messages')).toBeNull();
     expect(queryByText('Notifications')).toBeNull();
     expect(queryByText('Listings')).toBeNull();
     expect(queryByText('Settings')).toBeNull();
-    expect(getAllByText('Marketplace').length).toBeGreaterThanOrEqual(1);
+    expect(getByText('Marketplace')).toBeTruthy();
   });
 
   it('hides More menu buttons when their backend feature is disabled', () => {

@@ -8,7 +8,7 @@ import { Alert, FlatList, RefreshControl, ScrollView, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Button as HeroButton, Card as HeroCard, Chip, Text } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import MarketplaceListingCard from '@/components/marketplace/MarketplaceListingCard';
@@ -166,22 +166,24 @@ function MarketplaceMyListingsScreen() {
         renderItem={({ item }) => (
           <View>
             <MarketplaceListingCard item={item} onPress={() => router.push({ pathname: '/(modals)/marketplace-detail', params: { id: String(item.id) } } as unknown as Href)} />
-            <View className="mb-3 flex-row gap-2">
-              <HeroButton className="flex-1" size="sm" variant="secondary" onPress={() => router.push({ pathname: '/(modals)/edit-marketplace-listing', params: { id: String(item.id) } } as unknown as Href)}>
-                <Ionicons name="create-outline" size={14} color={primary} />
-                <HeroButton.Label>{t('owner.edit')}</HeroButton.Label>
-              </HeroButton>
-              {activeTab === 'expired' ? (
-                <HeroButton className="flex-1" size="sm" variant="secondary" onPress={() => void renew(item)}>
-                  <Ionicons name="refresh-outline" size={14} color={primary} />
-                  <HeroButton.Label>{t('owner.renew')}</HeroButton.Label>
+            <Surface variant="secondary" className="-mt-1 mb-3 rounded-panel-inner px-2.5 py-2">
+              <View className="flex-row gap-2">
+                <HeroButton className="flex-1" size="sm" variant="secondary" onPress={() => router.push({ pathname: '/(modals)/edit-marketplace-listing', params: { id: String(item.id) } } as unknown as Href)}>
+                  <Ionicons name="create-outline" size={14} color={primary} />
+                  <HeroButton.Label>{t('owner.edit')}</HeroButton.Label>
                 </HeroButton>
-              ) : null}
-              <HeroButton className="flex-1" size="sm" variant="danger" onPress={() => void removeListing(item)}>
-                <Ionicons name="trash-outline" size={14} color="#fff" />
-                <HeroButton.Label>{t('owner.delete')}</HeroButton.Label>
-              </HeroButton>
-            </View>
+                {activeTab === 'expired' ? (
+                  <HeroButton className="flex-1" size="sm" variant="secondary" onPress={() => void renew(item)}>
+                    <Ionicons name="refresh-outline" size={14} color={primary} />
+                    <HeroButton.Label>{t('owner.renew')}</HeroButton.Label>
+                  </HeroButton>
+                ) : null}
+                <HeroButton className="flex-1" size="sm" variant="danger" onPress={() => void removeListing(item)}>
+                  <Ionicons name="trash-outline" size={14} color="#fff" />
+                  <HeroButton.Label>{t('owner.delete')}</HeroButton.Label>
+                </HeroButton>
+              </View>
+            </Surface>
           </View>
         )}
         ListEmptyComponent={
@@ -229,17 +231,20 @@ function DashboardCard({
   const { t } = useTranslation('marketplace');
   const theme = useTheme();
   return (
-    <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
+    <HeroCard className="mb-3 overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: theme.border }}>
       <View className="h-1.5" style={{ backgroundColor: primary }} />
-      <HeroCard.Body className="gap-4 p-4">
+      <HeroCard.Body className="gap-3 p-4">
         <View className="flex-row items-start gap-3">
-          <View className="size-13 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
-            <Ionicons name="storefront-outline" size={25} color={primary} />
+          <View
+            className="h-12 w-12 items-center justify-center rounded-3xl"
+            style={{ backgroundColor: withAlpha(primary, 0.14), borderWidth: 1, borderColor: withAlpha(primary, 0.2) }}
+          >
+            <Ionicons name="storefront-outline" size={23} color={primary} />
           </View>
-          <View className="min-w-0 flex-1 gap-1">
-            <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('myListings.eyebrow')}</Text>
-            <Text className="text-2xl font-bold" style={{ color: theme.text }}>{t('myListings.title')}</Text>
-            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('myListings.subtitle')}</Text>
+          <View className="min-w-0 flex-1">
+            <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>{t('myListings.eyebrow')}</Text>
+            <Text className="text-xl font-bold leading-7" style={{ color: theme.text }} numberOfLines={1}>{t('myListings.title')}</Text>
+            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>{t('myListings.subtitle')}</Text>
           </View>
         </View>
         <View className="flex-row flex-wrap gap-2">
@@ -248,7 +253,7 @@ function DashboardCard({
           <Chip size="sm" variant="secondary"><Chip.Label>{t('myListings.views', { count: stats.total_views ?? stats.views_30d ?? 0 })}</Chip.Label></Chip>
           <Chip size="sm" variant="secondary"><Chip.Label>{t('myListings.offers', { count: stats.pending_offers ?? 0 })}</Chip.Label></Chip>
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingRight: 2 }}>
           {LISTING_TABS.map((tab) => (
             <HeroButton
               key={tab}
@@ -261,38 +266,43 @@ function DashboardCard({
             </HeroButton>
           ))}
         </ScrollView>
-        <View className="flex-row gap-2">
-          <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-merchant-onboarding' as Href)}>
-            <Ionicons name="storefront-outline" size={16} color={primary} />
-            <HeroButton.Label>{t('myListings.onboarding')}</HeroButton.Label>
-          </HeroButton>
-          <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-stripe-onboarding' as Href)}>
-            <Ionicons name="card-outline" size={16} color={primary} />
-            <HeroButton.Label>{t('myListings.payments')}</HeroButton.Label>
-          </HeroButton>
-        </View>
-        <View className="flex-row gap-2">
-          <HeroButton className="flex-1" variant="secondary" onPress={() => router.push({ pathname: '/(modals)/marketplace-orders', params: { mode: 'sales' } } as unknown as Href)}>
-            <Ionicons name="receipt-outline" size={16} color={primary} />
-            <HeroButton.Label>{t('myListings.salesOrders')}</HeroButton.Label>
-          </HeroButton>
-          <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-offers' as Href)}>
-            <Ionicons name="chatbubbles-outline" size={16} color={primary} />
-            <HeroButton.Label>{t('myListings.offersCta')}</HeroButton.Label>
-          </HeroButton>
-        </View>
-        <View className="flex-row gap-2">
-          <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-tools' as Href)}>
-            <Ionicons name="construct-outline" size={16} color={primary} />
-            <HeroButton.Label>{t('myListings.sellerTools')}</HeroButton.Label>
-          </HeroButton>
-          <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-shipping-options' as Href)}>
-            <Ionicons name="car-outline" size={16} color={primary} />
-            <HeroButton.Label>{t('myListings.shipping')}</HeroButton.Label>
-          </HeroButton>
-        </View>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingRight: 2 }}>
+          <SellerShortcutButton label={t('myListings.onboarding')} icon="storefront-outline" primary={primary} onPress={() => router.push('/(modals)/marketplace-merchant-onboarding' as Href)} />
+          <SellerShortcutButton label={t('myListings.payments')} icon="card-outline" primary={primary} onPress={() => router.push('/(modals)/marketplace-stripe-onboarding' as Href)} />
+          <SellerShortcutButton label={t('myListings.salesOrders')} icon="receipt-outline" primary={primary} onPress={() => router.push({ pathname: '/(modals)/marketplace-orders', params: { mode: 'sales' } } as unknown as Href)} />
+          <SellerShortcutButton label={t('myListings.offersCta')} icon="chatbubbles-outline" primary={primary} onPress={() => router.push('/(modals)/marketplace-offers' as Href)} />
+          <SellerShortcutButton label={t('myListings.sellerTools')} icon="construct-outline" primary={primary} onPress={() => router.push('/(modals)/marketplace-tools' as Href)} />
+          <SellerShortcutButton label={t('myListings.shipping')} icon="car-outline" primary={primary} onPress={() => router.push('/(modals)/marketplace-shipping-options' as Href)} />
+        </ScrollView>
       </HeroCard.Body>
     </HeroCard>
+  );
+}
+
+type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
+
+function SellerShortcutButton({
+  label,
+  icon,
+  primary,
+  onPress,
+}: {
+  label: string;
+  icon: IoniconName;
+  primary: string;
+  onPress: () => void;
+}) {
+  return (
+    <HeroButton
+      size="sm"
+      variant="secondary"
+      className="min-w-[118px]"
+      accessibilityLabel={label}
+      onPress={onPress}
+    >
+      <Ionicons name={icon} size={15} color={primary} />
+      <HeroButton.Label>{label}</HeroButton.Label>
+    </HeroButton>
   );
 }
 
@@ -300,16 +310,19 @@ function OnboardingNudge({ primary, onDismiss }: { primary: string; onDismiss: (
   const { t } = useTranslation('marketplace');
   const theme = useTheme();
   return (
-    <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
+    <HeroCard className="mb-3 overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: theme.border }}>
       <View className="h-1.5" style={{ backgroundColor: primary }} />
-      <HeroCard.Body className="gap-4 p-4">
+      <HeroCard.Body className="gap-3 p-4">
         <View className="flex-row items-start gap-3">
-          <View className="size-12 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
-            <Ionicons name="ribbon-outline" size={24} color={primary} />
+          <View
+            className="h-11 w-11 items-center justify-center rounded-3xl"
+            style={{ backgroundColor: withAlpha(primary, 0.14), borderWidth: 1, borderColor: withAlpha(primary, 0.2) }}
+          >
+            <Ionicons name="ribbon-outline" size={21} color={primary} />
           </View>
-          <View className="min-w-0 flex-1 gap-1">
-            <Text className="text-base font-bold" style={{ color: theme.text }}>{t('myListings.onboardingNudge.title')}</Text>
-            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('myListings.onboardingNudge.subtitle')}</Text>
+          <View className="min-w-0 flex-1">
+            <Text className="text-base font-bold leading-5" style={{ color: theme.text }} numberOfLines={2}>{t('myListings.onboardingNudge.title')}</Text>
+            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>{t('myListings.onboardingNudge.subtitle')}</Text>
           </View>
         </View>
         <View className="flex-row gap-2">

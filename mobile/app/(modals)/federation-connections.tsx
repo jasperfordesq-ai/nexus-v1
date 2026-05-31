@@ -128,7 +128,18 @@ function FederationConnectionsScreen() {
         </HeroCard>
 
         {isLoading ? (
-          <View className="items-center py-8"><Spinner size="lg" /></View>
+          <Surface
+            variant="secondary"
+            className="items-center gap-3 rounded-panel p-6"
+            style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+          >
+            <View
+              className="h-14 w-14 items-center justify-center rounded-3xl"
+              style={{ backgroundColor: withAlpha(primary, 0.12), borderWidth: 1, borderColor: withAlpha(primary, 0.18) }}
+            >
+              <Spinner size="sm" />
+            </View>
+          </Surface>
         ) : error ? (
           <Surface
             variant="secondary"

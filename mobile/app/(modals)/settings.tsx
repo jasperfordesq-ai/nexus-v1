@@ -130,17 +130,20 @@ export default function SettingsScreen() {
       <SafeAreaView className="flex-1 bg-background">
         <AppTopBar title={t('title')} backLabel={t('common:buttons.back')} fallbackHref="/(tabs)/profile" />
         <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40, gap: 12 }}>
-          <HeroCard className="overflow-hidden rounded-panel p-0">
+          <HeroCard className="overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: theme.borderSubtle }}>
             <View className="h-1.5" style={{ backgroundColor: primary }} />
-            <HeroCard.Body className="gap-4 p-4">
+            <HeroCard.Body className="gap-3 p-4">
               <View className="flex-row items-start gap-3">
-                <View className="size-13 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
-                  <Ionicons name="settings-outline" size={25} color={primary} />
+                <View
+                  className="h-12 w-12 items-center justify-center rounded-3xl"
+                  style={{ backgroundColor: withAlpha(primary, 0.14), borderWidth: 1, borderColor: withAlpha(primary, 0.2) }}
+                >
+                  <Ionicons name="settings-outline" size={23} color={primary} />
                 </View>
                 <View className="min-w-0 flex-1">
-                  <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('eyebrow')}</Text>
-                  <Text className="text-2xl font-bold" style={{ color: theme.text }}>{t('title')}</Text>
-                  <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('subtitle')}</Text>
+                  <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>{t('eyebrow')}</Text>
+                  <Text className="text-xl font-bold leading-7" style={{ color: theme.text }} numberOfLines={1}>{t('title')}</Text>
+                  <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>{t('subtitle')}</Text>
                 </View>
               </View>
               <View className="flex-row flex-wrap gap-2">
@@ -388,15 +391,19 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <HeroCard className="rounded-panel p-0">
-      <HeroCard.Body className="gap-3 p-4">
+    <HeroCard className="overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: theme.borderSubtle }}>
+      <View className="absolute bottom-0 left-0 top-0 w-1" style={{ backgroundColor: withAlpha(primary, 0.65) }} />
+      <HeroCard.Body className="gap-3 p-3.5 pl-4">
         <View className="flex-row items-start gap-3">
-          <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.12) }}>
-            <Ionicons name={icon} size={20} color={primary} />
+          <View
+            className="h-9 w-9 items-center justify-center rounded-2xl"
+            style={{ backgroundColor: withAlpha(primary, 0.12), borderWidth: 1, borderColor: withAlpha(primary, 0.16) }}
+          >
+            <Ionicons name={icon} size={18} color={primary} />
           </View>
           <View className="min-w-0 flex-1">
-            <Text className="text-base font-bold" style={{ color: theme.text }}>{title}</Text>
-            <Text className="text-xs leading-4" style={{ color: theme.textSecondary }}>{subtitle}</Text>
+            <Text className="text-base font-bold leading-5" style={{ color: theme.text }} numberOfLines={1}>{title}</Text>
+            <Text className="text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>{subtitle}</Text>
           </View>
         </View>
         <View className="gap-2">
@@ -443,26 +450,24 @@ function ActionRow({
 }) {
   return (
     <HeroButton
-      variant="ghost"
+      variant="secondary"
       feedbackVariant="scale"
-      className="w-full p-0"
+      className="w-full min-h-[60px] items-stretch justify-start rounded-panel-inner px-3 py-3"
       onPress={onPress}
       accessibilityLabel={label}
     >
-      <Surface variant="secondary" className="rounded-panel-inner px-3 py-3">
-        <View className="flex-row items-center justify-between gap-3">
-          <View className="size-9 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(tone, 0.12) }}>
-            <Ionicons name={icon} size={18} color={tone} />
-          </View>
-          <View className="min-w-0 flex-1">
-            <Text className="text-sm font-semibold" style={{ color: theme.text }}>{label}</Text>
-            {subtitle ? (
-              <Text className="text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>{subtitle}</Text>
-            ) : null}
-          </View>
-          <Ionicons name="chevron-forward" size={18} color={theme.textMuted} />
+      <View className="w-full flex-row items-center justify-between gap-3">
+        <View className="h-9 w-9 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(tone, 0.12) }}>
+          <Ionicons name={icon} size={18} color={tone} />
         </View>
-      </Surface>
+        <View className="min-w-0 flex-1">
+          <Text className="text-sm font-semibold leading-5" style={{ color: theme.text }} numberOfLines={1}>{label}</Text>
+          {subtitle ? (
+            <Text className="text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>{subtitle}</Text>
+          ) : null}
+        </View>
+        <Ionicons name="chevron-forward" size={18} color={theme.textMuted} />
+      </View>
     </HeroButton>
   );
 }
@@ -486,10 +491,10 @@ function PrivacyVisibilityRow({
     <Surface variant="secondary" className="rounded-panel-inner px-3 py-3">
       <View className="flex-row items-center justify-between gap-3">
         <View className="min-w-0 flex-1">
-          <Text className="text-sm font-semibold" style={{ color: theme.text }}>{label}</Text>
-          <Text className="text-xs leading-4" style={{ color: theme.textSecondary }}>{t(`privacy.visibility.${value}`)}</Text>
+          <Text className="text-sm font-semibold leading-5" style={{ color: theme.text }} numberOfLines={1}>{label}</Text>
+          <Text className="text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={1}>{t(`privacy.visibility.${value}`)}</Text>
         </View>
-        <HeroButton size="sm" variant="secondary" onPress={onPress} isDisabled={disabled}>
+        <HeroButton size="sm" variant="secondary" className="shrink-0" onPress={onPress} isDisabled={disabled}>
           <HeroButton.Label>{t('privacy.changeVisibility')}</HeroButton.Label>
         </HeroButton>
       </View>

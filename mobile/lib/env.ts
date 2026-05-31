@@ -21,16 +21,17 @@ export function validateEnv(): void {
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
   const defaultTenant = process.env.EXPO_PUBLIC_DEFAULT_TENANT;
   const sentryDsn = process.env.EXPO_PUBLIC_SENTRY_DSN;
+  const allowProductionApiInDev = process.env.EXPO_PUBLIC_ALLOW_PRODUCTION_API_IN_DEV === 'true';
 
   // --- EXPO_PUBLIC_API_URL ---
   if (!apiUrl) {
     warn('EXPO_PUBLIC_API_URL is not set. API calls will fail.');
   } else {
     // Warn if the production URL is being used in a development build
-    if (isDev && apiUrl === PRODUCTION_API_URL) {
+    if (isDev && apiUrl === PRODUCTION_API_URL && !allowProductionApiInDev) {
       warn(
         `EXPO_PUBLIC_API_URL points to production (${PRODUCTION_API_URL}) in a development build. ` +
-          'Use http://10.0.2.2:8090 (Android emulator) or http://localhost:8090 (iOS simulator) instead.'
+          'Set EXPO_PUBLIC_ALLOW_PRODUCTION_API_IN_DEV=true when this is intentional.'
       );
     }
 

@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, FlatList, Platform, RefreshControl, Text, View } from 'react-native';
+import { Alert, FlatList, Platform, Pressable, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -493,17 +493,20 @@ function ConversationCard({
       onSwipeableWillOpen={() => void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}
       onSwipeableOpen={() => onArchive(conversation)}
     >
-      <HeroButton
-        className="mx-4 my-2 p-0"
-        variant="ghost"
+      <Pressable
+        className="mx-4 my-2 rounded-panel"
         accessibilityLabel={`${otherName}${lastMsgBody ? `, ${lastMsgBody}` : ''}`}
         accessibilityRole="button"
         onPress={() => {
           void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           onOpen(conversation);
         }}
+        style={({ pressed }) => ({
+          opacity: pressed ? 0.92 : 1,
+          transform: [{ scale: pressed ? 0.99 : 1 }],
+        })}
       >
-        <HeroCard variant={isUnread ? 'default' : 'secondary'} className="w-full overflow-hidden">
+        <HeroCard variant={isUnread ? 'default' : 'secondary'} className="w-full overflow-hidden rounded-panel p-0">
           <View className="h-1 w-full" style={{ backgroundColor: isUnread ? primary : theme.border }} />
           <HeroCard.Body className="gap-3 px-4 py-4">
             <View className="flex-row items-center gap-3">
@@ -574,7 +577,7 @@ function ConversationCard({
             </View>
           </HeroCard.Footer>
         </HeroCard>
-      </HeroButton>
+      </Pressable>
     </Swipeable>
   );
 }

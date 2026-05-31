@@ -401,25 +401,28 @@ export function MarketplaceListingForm() {
   return (
     <SafeAreaView className="flex-1 bg-background">
       <AppTopBar title={isEditing ? t('forms.editTitle') : t('forms.createTitle')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
-      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 132 }}>
-        <HeroCard className="mb-4 overflow-hidden rounded-panel p-0">
+      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 132, gap: 12 }}>
+        <HeroCard className="overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: theme.border }}>
           <View className="h-1.5" style={{ backgroundColor: primary }} />
-          <HeroCard.Body className="gap-4 p-4">
+          <HeroCard.Body className="gap-3 p-4">
             <View className="flex-row items-start gap-3">
-              <View className="size-13 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
-                <Ionicons name="bag-add-outline" size={25} color={primary} />
+              <View
+                className="h-12 w-12 items-center justify-center rounded-3xl"
+                style={{ backgroundColor: withAlpha(primary, 0.14), borderWidth: 1, borderColor: withAlpha(primary, 0.2) }}
+              >
+                <Ionicons name="bag-add-outline" size={23} color={primary} />
               </View>
               <View className="min-w-0 flex-1">
-                <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('forms.eyebrow')}</Text>
-                <Text className="text-2xl font-bold" style={{ color: theme.text }}>{isEditing ? t('forms.editTitle') : t('forms.createTitle')}</Text>
-                <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('forms.subtitle')}</Text>
+                <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>{t('forms.eyebrow')}</Text>
+                <Text className="text-xl font-bold leading-7" style={{ color: theme.text }} numberOfLines={1}>{isEditing ? t('forms.editTitle') : t('forms.createTitle')}</Text>
+                <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>{t('forms.subtitle')}</Text>
               </View>
             </View>
           </HeroCard.Body>
         </HeroCard>
 
-        <HeroCard className="rounded-panel p-0">
-          <HeroCard.Body className="gap-4 p-4">
+        <HeroCard className="rounded-panel p-0" style={{ borderWidth: 1, borderColor: theme.border }}>
+          <HeroCard.Body className="gap-5 p-3.5">
             <FormField label={t('forms.title')} value={title} onChangeText={setTitle} placeholder={t('forms.titlePlaceholder')} />
             <FormField label={t('forms.tagline')} value={tagline} onChangeText={setTagline} placeholder={t('forms.taglinePlaceholder')} />
             <FormField label={t('forms.description')} value={description} onChangeText={setDescription} placeholder={t('forms.descriptionPlaceholder')} multiline />
@@ -445,14 +448,14 @@ export function MarketplaceListingForm() {
               primary={primary}
             />
             <FormField label={t('forms.quantity')} value={quantity} onChangeText={setQuantity} placeholder={t('forms.quantityPlaceholder')} keyboardType="decimal-pad" />
-            <View className="gap-3 rounded-panel-inner border p-3" style={{ borderColor: theme.border, backgroundColor: withAlpha(primary, 0.06) }}>
+            <View className="gap-3 rounded-panel-inner p-3" style={{ borderWidth: 1, borderColor: theme.border, backgroundColor: withAlpha(primary, 0.06) }}>
               <View className="flex-row items-start gap-3">
-                <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+                <View className="h-10 w-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
                   <Ionicons name="cube-outline" size={18} color={primary} />
                 </View>
                 <View className="min-w-0 flex-1">
-                  <Text className="text-sm font-bold" style={{ color: theme.text }}>{t('inventory.section_title')}</Text>
-                  <Text className="text-xs leading-5" style={{ color: theme.textSecondary }}>{t('inventory.section_subtitle')}</Text>
+                  <Text className="text-sm font-bold" style={{ color: theme.text }} numberOfLines={1}>{t('inventory.section_title')}</Text>
+                  <Text className="text-xs leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>{t('inventory.section_subtitle')}</Text>
                 </View>
               </View>
               <SwitchRow label={t('inventory.unlimited')} value={inventoryUnlimited} onValueChange={setInventoryUnlimited} />
@@ -469,14 +472,14 @@ export function MarketplaceListingForm() {
               <SwitchRow label={t('inventory.oversold_protected')} value={oversoldProtected} onValueChange={setOversoldProtected} />
             </View>
             <FormField label={t('forms.location')} value={location} onChangeText={setLocation} placeholder={t('forms.locationPlaceholder')} />
-            <View className="gap-3 rounded-panel-inner border p-3" style={{ borderColor: theme.border, backgroundColor: withAlpha(primary, 0.06) }}>
+            <View className="gap-3 rounded-panel-inner p-3" style={{ borderWidth: 1, borderColor: theme.border, backgroundColor: withAlpha(primary, 0.06) }}>
               <View className="flex-row items-start gap-3">
-                <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+                <View className="h-10 w-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
                   <Ionicons name="navigate-outline" size={18} color={primary} />
                 </View>
                 <View className="min-w-0 flex-1">
-                  <Text className="text-sm font-bold" style={{ color: theme.text }}>{t('forms.coordinates')}</Text>
-                  <Text className="text-xs leading-5" style={{ color: theme.textSecondary }}>{t('forms.coordinatesHint')}</Text>
+                  <Text className="text-sm font-bold" style={{ color: theme.text }} numberOfLines={1}>{t('forms.coordinates')}</Text>
+                  <Text className="text-xs leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>{t('forms.coordinatesHint')}</Text>
                 </View>
               </View>
               <View className="flex-row gap-3">
@@ -555,11 +558,11 @@ export function MarketplaceListingForm() {
                   ))}
                 </ScrollView>
               ) : null}
-              <View className="gap-2 rounded-panel-inner border p-3" style={{ borderColor: theme.border, backgroundColor: withAlpha(primary, 0.05) }}>
+              <View className="gap-2 rounded-panel-inner p-3" style={{ borderWidth: 1, borderColor: theme.border, backgroundColor: withAlpha(primary, 0.05) }}>
                 <View className="flex-row items-center justify-between gap-3">
                   <View className="min-w-0 flex-1">
-                    <Text className="text-sm font-bold" style={{ color: theme.text }}>{t('forms.video')}</Text>
-                    <Text className="text-xs leading-5" style={{ color: theme.textSecondary }}>{t('forms.videoHint')}</Text>
+                    <Text className="text-sm font-bold" style={{ color: theme.text }} numberOfLines={1}>{t('forms.video')}</Text>
+                    <Text className="text-xs leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>{t('forms.videoHint')}</Text>
                   </View>
                   <HeroButton size="sm" variant="secondary" onPress={pickVideo}>
                     <Ionicons name="videocam-outline" size={15} color={primary} />
@@ -567,7 +570,7 @@ export function MarketplaceListingForm() {
                   </HeroButton>
                 </View>
                 {videoAsset || existingVideoUrl ? (
-                  <View className="flex-row items-center gap-3 rounded-panel-inner border px-3 py-2" style={{ borderColor: theme.border, backgroundColor: theme.bg }}>
+                  <View className="flex-row items-center gap-3 rounded-panel-inner px-3 py-2" style={{ borderWidth: 1, borderColor: theme.border, backgroundColor: theme.bg }}>
                     <Ionicons name="film-outline" size={18} color={primary} />
                     <View className="min-w-0 flex-1">
                       <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>
@@ -618,8 +621,8 @@ function ButtonGroup<T extends string>({
   const theme = useTheme();
   return (
     <View className="gap-2">
-      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{label}</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>{label}</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingRight: 2 }}>
         {values.map((value) => (
           <HeroButton key={value} size="sm" variant={selected === value ? 'primary' : 'secondary'} onPress={() => onSelect(value)} style={selected === value ? { backgroundColor: primary } : undefined}>
             <HeroButton.Label>{labelFor(value)}</HeroButton.Label>
@@ -634,7 +637,7 @@ function SwitchRow({ label, value, onValueChange }: { label: string; value: bool
   const theme = useTheme();
   return (
     <View className="min-h-11 flex-row items-center justify-between gap-3">
-      <Text className="flex-1 text-sm font-semibold" style={{ color: theme.text }}>{label}</Text>
+      <Text className="flex-1 text-sm font-semibold" style={{ color: theme.text }} numberOfLines={2}>{label}</Text>
       <Toggle value={value} onValueChange={onValueChange} />
     </View>
   );
@@ -645,8 +648,8 @@ function CategoryGroup({ categories, selected, onSelect, primary }: { categories
   const theme = useTheme();
   return (
     <View className="gap-2">
-      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('forms.category')}</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>{t('forms.category')}</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingRight: 2 }}>
         <HeroButton size="sm" variant={selected === null ? 'primary' : 'secondary'} onPress={() => onSelect(null)} style={selected === null ? { backgroundColor: primary } : undefined}>
           <HeroButton.Label>{t('filters.noCategory')}</HeroButton.Label>
         </HeroButton>
@@ -678,9 +681,9 @@ function TemplateFieldsSection({
 
   if (isLoading) {
     return (
-      <View className="min-h-12 flex-row items-center gap-3 rounded-panel-inner border px-3" style={{ borderColor: theme.border, backgroundColor: withAlpha(primary, 0.05) }}>
+      <View className="min-h-12 flex-row items-center gap-3 rounded-panel-inner px-3" style={{ borderWidth: 1, borderColor: theme.border, backgroundColor: withAlpha(primary, 0.05) }}>
         <Ionicons name="options-outline" size={18} color={primary} />
-        <Text className="text-sm font-semibold" style={{ color: theme.text }}>{t('forms.loadingCategoryFields')}</Text>
+        <Text className="min-w-0 flex-1 text-sm font-semibold" style={{ color: theme.text }} numberOfLines={2}>{t('forms.loadingCategoryFields')}</Text>
       </View>
     );
   }
@@ -688,14 +691,14 @@ function TemplateFieldsSection({
   if (fields.length === 0) return null;
 
   return (
-    <View className="gap-3 rounded-panel-inner border p-3" style={{ borderColor: theme.border, backgroundColor: withAlpha(primary, 0.06) }}>
+    <View className="gap-3 rounded-panel-inner p-3" style={{ borderWidth: 1, borderColor: theme.border, backgroundColor: withAlpha(primary, 0.06) }}>
       <View className="flex-row items-start gap-3">
-        <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+        <View className="h-10 w-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
           <Ionicons name="options-outline" size={18} color={primary} />
         </View>
         <View className="min-w-0 flex-1">
-          <Text className="text-sm font-bold" style={{ color: theme.text }}>{t('forms.categorySpecificDetails')}</Text>
-          <Text className="text-xs leading-5" style={{ color: theme.textSecondary }}>{t('forms.categorySpecificHint')}</Text>
+          <Text className="text-sm font-bold" style={{ color: theme.text }} numberOfLines={1}>{t('forms.categorySpecificDetails')}</Text>
+          <Text className="text-xs leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>{t('forms.categorySpecificHint')}</Text>
         </View>
       </View>
       {fields.map((field) => {
@@ -744,13 +747,13 @@ function TemplateSelectField({
 
   return (
     <View className="gap-2">
-      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{field.label}</Text>
+      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>{field.label}</Text>
       {!value ? (
-        <Text className="text-xs leading-5" style={{ color: theme.textMuted }}>
+        <Text className="text-xs leading-5" style={{ color: theme.textMuted }} numberOfLines={2}>
           {t('forms.templateSelectPlaceholder', { field: field.label.replace(/\s+\*$/, '').toLowerCase() })}
         </Text>
       ) : null}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingRight: 2 }}>
         {options.map((option) => (
           <HeroButton
             key={option}
@@ -784,10 +787,11 @@ function FormField({
 }) {
   const theme = useTheme();
   return (
-    <View className="gap-2">
-      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{label}</Text>
+    <View className="w-full gap-2">
+      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>{label}</Text>
       <Input
-        className={`${multiline ? 'min-h-28' : 'min-h-12'} text-sm`}
+        containerClassName="mb-0 w-full"
+        inputClassName={`w-full ${multiline ? 'min-h-28' : 'min-h-12'} text-sm`}
         style={{ color: theme.text, textAlignVertical: multiline ? 'top' : 'center' }}
         placeholder={placeholder}
         placeholderTextColor={theme.textMuted}

@@ -62,12 +62,12 @@ describe('TabsLayout', () => {
 
     expect(tabScreens.slice(0, 5).map((screen) => screen.name)).toEqual([
       'home',
-      'explore',
+      'exchanges',
       'create',
       'messages',
       'profile',
     ]);
-    expect(tabScreens.find((screen) => screen.name === 'exchanges')?.options?.href).toBeNull();
+    expect(tabScreens.find((screen) => screen.name === 'explore')?.options?.href).toBeNull();
     expect(tabScreens.find((screen) => screen.name === 'search')?.options?.href).toBeNull();
     expect(tabScreens.find((screen) => screen.name === 'groups')?.options?.href).toBeNull();
   });

@@ -384,30 +384,33 @@ function MarketplaceOrdersScreen() {
       <FlatList
         data={orders.items}
         keyExtractor={(item) => String(item.id)}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 132 }}
+        contentContainerStyle={{ gap: 12, paddingHorizontal: 16, paddingBottom: 132 }}
         ListHeaderComponent={
-          <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
+          <HeroCard className="overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: theme.border }}>
             <View className="h-1.5" style={{ backgroundColor: primary }} />
-            <HeroCard.Body className="gap-4 p-4">
+            <HeroCard.Body className="gap-3 p-4">
               <View className="flex-row items-start gap-3">
-                <View className="size-13 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
-                  <Ionicons name="receipt-outline" size={25} color={primary} />
+                <View
+                  className="h-12 w-12 items-center justify-center rounded-3xl"
+                  style={{ backgroundColor: withAlpha(primary, 0.14), borderWidth: 1, borderColor: withAlpha(primary, 0.2) }}
+                >
+                  <Ionicons name="receipt-outline" size={23} color={primary} />
                 </View>
                 <View className="min-w-0 flex-1">
-                  <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('orders.eyebrow')}</Text>
-                  <Text className="text-2xl font-bold" style={{ color: theme.text }}>{t('orders.title')}</Text>
-                  <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('orders.subtitle')}</Text>
+                  <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>{t('orders.eyebrow')}</Text>
+                  <Text className="text-xl font-bold leading-7" style={{ color: theme.text }} numberOfLines={1}>{t('orders.title')}</Text>
+                  <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>{t('orders.subtitle')}</Text>
                 </View>
               </View>
               <View className="flex-row gap-2">
-                <HeroButton className="flex-1" variant={mode === 'purchases' ? 'primary' : 'secondary'} onPress={() => setMode('purchases')} style={mode === 'purchases' ? { backgroundColor: primary } : undefined}>
+                <HeroButton className="min-w-0 flex-1" variant={mode === 'purchases' ? 'primary' : 'secondary'} onPress={() => setMode('purchases')} style={mode === 'purchases' ? { backgroundColor: primary } : undefined}>
                   <HeroButton.Label>{t('orders.purchases')}</HeroButton.Label>
                 </HeroButton>
-                <HeroButton className="flex-1" variant={mode === 'sales' ? 'primary' : 'secondary'} onPress={() => setMode('sales')} style={mode === 'sales' ? { backgroundColor: primary } : undefined}>
+                <HeroButton className="min-w-0 flex-1" variant={mode === 'sales' ? 'primary' : 'secondary'} onPress={() => setMode('sales')} style={mode === 'sales' ? { backgroundColor: primary } : undefined}>
                   <HeroButton.Label>{t('orders.sales')}</HeroButton.Label>
                 </HeroButton>
               </View>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingRight: 2 }}>
                 {(['all', 'active', 'completed', 'cancelled'] as OrderStatusTab[]).map((tab) => (
                   <HeroButton
                     key={tab}
@@ -460,7 +463,7 @@ function MarketplaceOrdersScreen() {
       <BottomSheet visible={Boolean(shipOrder)} onClose={() => setShipOrder(null)} snapPoints={[520]}>
         <Surface variant="default" className="rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
-              <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('orders.shipTitle')}</Text>
+              <Text className="min-w-0 flex-1 pr-3 text-lg font-bold" style={{ color: theme.text }} numberOfLines={1}>{t('orders.shipTitle')}</Text>
               <HeroButton isIconOnly variant="secondary" onPress={() => setShipOrder(null)}>
                 <Ionicons name="close-outline" size={20} color={primary} />
               </HeroButton>
@@ -470,14 +473,14 @@ function MarketplaceOrdersScreen() {
               <OrderInput label={t('orders.trackingNumber')} value={trackingNumber} onChangeText={setTrackingNumber} placeholder={t('orders.trackingNumberPlaceholder')} />
               <OrderInput label={t('orders.trackingUrl')} value={trackingUrl} onChangeText={setTrackingUrl} placeholder={t('orders.trackingUrlPlaceholder')} />
               <View className="gap-2">
-                <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('orders.shippingMethod')}</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+                <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>{t('orders.shippingMethod')}</Text>
+                <View className="flex-row flex-wrap gap-2">
                   {SHIPPING_METHODS.map((method) => (
-                    <HeroButton key={method} size="sm" variant={shippingMethod === method ? 'primary' : 'secondary'} onPress={() => setShippingMethod(method)} style={shippingMethod === method ? { backgroundColor: primary } : undefined}>
+                    <HeroButton key={method} className="min-w-[46%] flex-1" size="sm" variant={shippingMethod === method ? 'primary' : 'secondary'} onPress={() => setShippingMethod(method)} style={shippingMethod === method ? { backgroundColor: primary } : undefined}>
                       <HeroButton.Label>{t(`orders.shippingMethods.${method}`)}</HeroButton.Label>
                     </HeroButton>
                   ))}
-                </ScrollView>
+                </View>
               </View>
               <HeroButton variant="primary" isDisabled={isSubmitting} onPress={() => void submitShipment()} style={{ backgroundColor: primary }}>
                 <Ionicons name="car-outline" size={17} color="#fff" />
@@ -490,7 +493,7 @@ function MarketplaceOrdersScreen() {
       <BottomSheet visible={Boolean(cancelOrder)} onClose={() => setCancelOrder(null)} snapPoints={[360]}>
         <Surface variant="default" className="rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
-              <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('orders.cancelTitle')}</Text>
+              <Text className="min-w-0 flex-1 pr-3 text-lg font-bold" style={{ color: theme.text }} numberOfLines={1}>{t('orders.cancelTitle')}</Text>
               <HeroButton isIconOnly variant="secondary" onPress={() => setCancelOrder(null)}>
                 <Ionicons name="close-outline" size={20} color={primary} />
               </HeroButton>
@@ -508,14 +511,14 @@ function MarketplaceOrdersScreen() {
       <BottomSheet visible={Boolean(rateOrder)} onClose={() => setRateOrder(null)} snapPoints={[520]}>
         <Surface variant="default" className="rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
-              <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('orders.rateTitle')}</Text>
+              <Text className="min-w-0 flex-1 pr-3 text-lg font-bold" style={{ color: theme.text }} numberOfLines={1}>{t('orders.rateTitle')}</Text>
               <HeroButton isIconOnly variant="secondary" onPress={() => setRateOrder(null)}>
                 <Ionicons name="close-outline" size={20} color={primary} />
               </HeroButton>
             </View>
             <View className="gap-3">
               <View className="gap-2">
-                <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('orders.rating')}</Text>
+                <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>{t('orders.rating')}</Text>
                 <View className="flex-row gap-2">
                   {[1, 2, 3, 4, 5].map((value) => (
                     <HeroButton
@@ -547,22 +550,23 @@ function MarketplaceOrdersScreen() {
       <BottomSheet visible={Boolean(disputeOrder)} onClose={() => setDisputeOrder(null)} snapPoints={[640]}>
         <Surface variant="default" className="max-h-[86%] rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
-              <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('orders.disputeTitle')}</Text>
+              <Text className="min-w-0 flex-1 pr-3 text-lg font-bold" style={{ color: theme.text }} numberOfLines={1}>{t('orders.disputeTitle')}</Text>
               <HeroButton isIconOnly variant="secondary" onPress={() => setDisputeOrder(null)}>
                 <Ionicons name="close-outline" size={20} color={primary} />
               </HeroButton>
             </View>
             <ScrollView contentContainerStyle={{ gap: 12 }} showsVerticalScrollIndicator={false}>
               <View className="gap-2">
-                <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('orders.disputeReason')}</Text>
+                <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>{t('orders.disputeReason')}</Text>
                 <View className="flex-row flex-wrap gap-2">
                   {DISPUTE_REASONS.map((reason) => (
                     <HeroButton
                       key={reason}
+                      className="min-w-[46%] flex-1"
                       size="sm"
                       variant={disputeReason === reason ? 'primary' : 'secondary'}
                       onPress={() => setDisputeReason(reason)}
-                      style={disputeReason === reason ? { backgroundColor: primary } : { minWidth: '46%' }}
+                      style={disputeReason === reason ? { backgroundColor: primary } : undefined}
                     >
                       <HeroButton.Label>{t(`orders.disputeReasons.${reason}`)}</HeroButton.Label>
                     </HeroButton>
@@ -582,8 +586,8 @@ function MarketplaceOrdersScreen() {
         <Surface variant="default" className="max-h-[86%] rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <View className="min-w-0 flex-1">
-                <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('orders.deliveryOffersTitle')}</Text>
-                <Text className="text-xs" style={{ color: theme.textSecondary }}>{deliveryOrder ? t('orders.number', { number: deliveryOrder.order_number }) : ''}</Text>
+                <Text className="text-lg font-bold" style={{ color: theme.text }} numberOfLines={1}>{t('orders.deliveryOffersTitle')}</Text>
+                <Text className="text-xs" style={{ color: theme.textSecondary }} numberOfLines={1}>{deliveryOrder ? t('orders.number', { number: deliveryOrder.order_number }) : ''}</Text>
               </View>
               <HeroButton isIconOnly variant="secondary" onPress={() => setDeliveryOrder(null)}>
                 <Ionicons name="close-outline" size={20} color={primary} />
@@ -661,10 +665,13 @@ function OrderCard({
   const hasBuyerRating = orderHasRating(item, 'buyer');
   const hasCurrentUserRating = orderHasRating(item, mode === 'purchases' ? 'buyer' : 'seller');
   return (
-    <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
-      <HeroCard.Body className="gap-3 p-4">
+    <HeroCard className="overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: theme.border }}>
+      <HeroCard.Body className="gap-3 p-3.5">
         <View className="flex-row gap-3">
-          <View className="h-20 w-20 items-center justify-center overflow-hidden rounded-panel-inner" style={{ backgroundColor: withAlpha(primary, 0.12) }}>
+          <View
+            className="h-20 w-20 items-center justify-center overflow-hidden rounded-panel-inner"
+            style={{ backgroundColor: withAlpha(primary, 0.12), borderWidth: 1, borderColor: withAlpha(primary, 0.16) }}
+          >
             {imageUrl ? (
               <Image source={{ uri: imageUrl }} className="h-full w-full" resizeMode="cover" />
             ) : (
@@ -674,8 +681,8 @@ function OrderCard({
           <View className="min-w-0 flex-1 gap-2">
             <View className="flex-row items-start justify-between gap-3">
               <View className="min-w-0 flex-1">
-                <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={2}>{item.listing?.title ?? item.order_number}</Text>
-                <Text className="text-sm font-semibold" style={{ color: theme.textSecondary }}>{total}</Text>
+                <Text className="text-base font-bold leading-5" style={{ color: theme.text }} numberOfLines={2}>{item.listing?.title ?? item.order_number}</Text>
+                <Text className="text-sm font-semibold" style={{ color: theme.textSecondary }} numberOfLines={1}>{total}</Text>
               </View>
               <Chip size="sm" variant="secondary" style={{ backgroundColor: withAlpha(statusColor, 0.14) }}>
                 <Chip.Label style={{ color: statusColor }}>{translatedOrderStatus(item.status, t)}</Chip.Label>
@@ -697,17 +704,17 @@ function OrderCard({
           {orderDate ? <Text className="text-xs" style={{ color: theme.textMuted }}>{t('orders.date', { date: orderDate })}</Text> : null}
         </View>
         {item.quantity > 1 ? (
-          <Text className="text-xs" style={{ color: theme.textSecondary }}>{t('orders.quantity', { count: item.quantity })}</Text>
+          <Text className="text-xs" style={{ color: theme.textSecondary }} numberOfLines={1}>{t('orders.quantity', { count: item.quantity })}</Text>
         ) : null}
-        <Surface variant="secondary" className="flex-row items-start gap-3 rounded-panel-inner p-3">
-          <View className="size-9 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(statusColor, 0.14) }}>
+        <Surface variant="secondary" className="flex-row items-start gap-3 rounded-panel-inner p-3" style={{ borderWidth: 1, borderColor: theme.border }}>
+          <View className="h-9 w-9 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(statusColor, 0.14) }}>
             <Ionicons name={orderStatusIcon(item.status)} size={17} color={statusColor} />
           </View>
           <View className="min-w-0 flex-1 gap-1">
-            <Text className="text-xs font-bold uppercase" style={{ color: statusColor }}>
+            <Text className="text-xs font-bold uppercase" style={{ color: statusColor }} numberOfLines={1}>
               {translatedOrderStatus(item.status, t)}
             </Text>
-            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>
               {t(statusHintKey)}
             </Text>
           </View>
@@ -726,99 +733,99 @@ function OrderCard({
           </View>
         ) : null}
         {item.listing?.id ? (
-          <HeroButton size="sm" variant="secondary" onPress={() => router.push({ pathname: '/(modals)/marketplace-detail', params: { id: String(item.listing?.id) } } as unknown as Href)}>
+          <HeroButton className="self-start" size="sm" variant="secondary" onPress={() => router.push({ pathname: '/(modals)/marketplace-detail', params: { id: String(item.listing?.id) } } as unknown as Href)}>
             <Ionicons name="open-outline" size={14} color={primary} />
             <HeroButton.Label>{t('actions.view')}</HeroButton.Label>
           </HeroButton>
         ) : null}
         <View className="flex-row flex-wrap gap-2">
           {mode === 'purchases' && item.status === 'paid' ? (
-            <HeroButton className="flex-1" size="sm" variant="secondary" isDisabled style={{ minWidth: '46%' }}>
+            <HeroButton className="min-w-[46%] flex-1" size="sm" variant="secondary" isDisabled>
               <Ionicons name="cube-outline" size={14} color={theme.textMuted} />
               <HeroButton.Label>{t('orders.waitingShipment')}</HeroButton.Label>
             </HeroButton>
           ) : null}
           {mode === 'purchases' && item.status === 'pending_payment' ? (
-            <HeroButton className="flex-1" size="sm" variant="primary" isDisabled={isSubmitting} onPress={onContinuePayment} style={{ minWidth: '46%', backgroundColor: primary }}>
+            <HeroButton className="min-w-[46%] flex-1" size="sm" variant="primary" isDisabled={isSubmitting} onPress={onContinuePayment} style={{ backgroundColor: primary }}>
               <Ionicons name="card-outline" size={14} color="#fff" />
               <HeroButton.Label>{t('orders.continuePayment')}</HeroButton.Label>
             </HeroButton>
           ) : null}
           {mode === 'sales' && item.status === 'paid' ? (
-            <HeroButton className="flex-1" size="sm" variant="primary" isDisabled={isSubmitting} onPress={onShip} style={{ minWidth: '46%', backgroundColor: primary }}>
+            <HeroButton className="min-w-[46%] flex-1" size="sm" variant="primary" isDisabled={isSubmitting} onPress={onShip} style={{ backgroundColor: primary }}>
               <Ionicons name="car-outline" size={14} color="#fff" />
               <HeroButton.Label>{t('orders.markShipped')}</HeroButton.Label>
             </HeroButton>
           ) : null}
           {mode === 'sales' && item.status === 'pending_payment' ? (
-            <HeroButton className="flex-1" size="sm" variant="secondary" isDisabled style={{ minWidth: '46%' }}>
+            <HeroButton className="min-w-[46%] flex-1" size="sm" variant="secondary" isDisabled>
               <Ionicons name="card-outline" size={14} color={theme.textMuted} />
               <HeroButton.Label>{t('orders.awaitingPayment')}</HeroButton.Label>
             </HeroButton>
           ) : null}
           {mode === 'sales' && item.status === 'shipped' ? (
-            <HeroButton className="flex-1" size="sm" variant="secondary" isDisabled style={{ minWidth: '46%' }}>
+            <HeroButton className="min-w-[46%] flex-1" size="sm" variant="secondary" isDisabled>
               <Ionicons name="time-outline" size={14} color={theme.textMuted} />
               <HeroButton.Label>{t('orders.awaitingConfirmation')}</HeroButton.Label>
             </HeroButton>
           ) : null}
           {mode === 'sales' && item.status === 'delivered' ? (
-            <HeroButton className="flex-1" size="sm" variant="secondary" isDisabled style={{ minWidth: '46%' }}>
+            <HeroButton className="min-w-[46%] flex-1" size="sm" variant="secondary" isDisabled>
               <Ionicons name="hourglass-outline" size={14} color={theme.textMuted} />
               <HeroButton.Label>{t('orders.awaitingCompletion')}</HeroButton.Label>
             </HeroButton>
           ) : null}
           {mode === 'sales' && item.status === 'completed' ? (
             hasBuyerRating ? (
-              <HeroButton className="flex-1" size="sm" variant="secondary" isDisabled style={{ minWidth: '46%' }}>
+              <HeroButton className="min-w-[46%] flex-1" size="sm" variant="secondary" isDisabled>
                 <Ionicons name="star" size={14} color={theme.success} />
                 <HeroButton.Label>{t('orders.buyerRated')}</HeroButton.Label>
               </HeroButton>
             ) : (
-              <HeroButton className="flex-1" size="sm" variant="secondary" isDisabled style={{ minWidth: '46%' }}>
+              <HeroButton className="min-w-[46%] flex-1" size="sm" variant="secondary" isDisabled>
                 <Ionicons name="checkmark-circle-outline" size={14} color={theme.success} />
                 <HeroButton.Label>{t('orders.saleCompleted')}</HeroButton.Label>
               </HeroButton>
             )
           ) : null}
           {mode === 'sales' && item.status === 'disputed' ? (
-            <HeroButton className="flex-1" size="sm" variant="danger-soft" isDisabled style={{ minWidth: '46%' }}>
+            <HeroButton className="min-w-[46%] flex-1" size="sm" variant="danger-soft" isDisabled>
               <Ionicons name="alert-circle-outline" size={14} color={theme.error} />
               <HeroButton.Label>{t('orders.disputeOpen')}</HeroButton.Label>
             </HeroButton>
           ) : null}
           {mode === 'purchases' && item.status === 'shipped' ? (
-            <HeroButton className="flex-1" size="sm" variant="primary" isDisabled={isSubmitting} onPress={onConfirmDelivery} style={{ minWidth: '46%', backgroundColor: theme.success }}>
+            <HeroButton className="min-w-[46%] flex-1" size="sm" variant="primary" isDisabled={isSubmitting} onPress={onConfirmDelivery} style={{ backgroundColor: theme.success }}>
               <Ionicons name="checkmark-circle-outline" size={14} color="#fff" />
               <HeroButton.Label>{t('orders.confirmDelivery')}</HeroButton.Label>
             </HeroButton>
           ) : null}
           {['pending_payment', 'paid'].includes(item.status) ? (
-            <HeroButton className="flex-1" size="sm" variant="danger" isDisabled={isSubmitting} onPress={onCancel} style={{ minWidth: '46%' }}>
+            <HeroButton className="min-w-[46%] flex-1" size="sm" variant="danger" isDisabled={isSubmitting} onPress={onCancel}>
               <Ionicons name="close-circle-outline" size={14} color="#fff" />
               <HeroButton.Label>{t('orders.cancel')}</HeroButton.Label>
             </HeroButton>
           ) : null}
           {mode === 'purchases' && ['delivered', 'completed'].includes(item.status) && !hasCurrentUserRating ? (
-            <HeroButton className="flex-1" size="sm" variant="secondary" isDisabled={isSubmitting} onPress={onRate} style={{ minWidth: '46%' }}>
+            <HeroButton className="min-w-[46%] flex-1" size="sm" variant="secondary" isDisabled={isSubmitting} onPress={onRate}>
               <Ionicons name="star-outline" size={14} color={primary} />
               <HeroButton.Label>{t('orders.rate')}</HeroButton.Label>
             </HeroButton>
           ) : null}
           {mode === 'purchases' && item.status === 'completed' && hasCurrentUserRating ? (
-            <HeroButton className="flex-1" size="sm" variant="secondary" isDisabled style={{ minWidth: '46%' }}>
+            <HeroButton className="min-w-[46%] flex-1" size="sm" variant="secondary" isDisabled>
               <Ionicons name="star" size={14} color={theme.success} />
               <HeroButton.Label>{t('orders.rated')}</HeroButton.Label>
             </HeroButton>
           ) : null}
           {mode === 'purchases' && ['paid', 'processing', 'shipped', 'delivered'].includes(item.status) ? (
-            <HeroButton className="flex-1" size="sm" variant="secondary" isDisabled={isSubmitting} onPress={onDispute} style={{ minWidth: '46%' }}>
+            <HeroButton className="min-w-[46%] flex-1" size="sm" variant="secondary" isDisabled={isSubmitting} onPress={onDispute}>
               <Ionicons name="alert-circle-outline" size={14} color={theme.error} />
               <HeroButton.Label>{t('orders.dispute')}</HeroButton.Label>
             </HeroButton>
           ) : null}
           {canManageCommunityDelivery ? (
-            <HeroButton className="flex-1" size="sm" variant="secondary" isDisabled={isSubmitting} onPress={onDeliveryOffers} style={{ minWidth: '46%' }}>
+            <HeroButton className="min-w-[46%] flex-1" size="sm" variant="secondary" isDisabled={isSubmitting} onPress={onDeliveryOffers}>
               <Ionicons name="people-outline" size={14} color={primary} />
               <HeroButton.Label>{t('orders.deliveryOffers')}</HeroButton.Label>
             </HeroButton>
@@ -847,8 +854,8 @@ function DeliveryOfferCard({
   const avatarUri = offer.deliverer?.avatar_url ?? null;
   const isVerified = Boolean(offer.deliverer?.is_verified);
   return (
-    <HeroCard className="rounded-panel p-0">
-      <HeroCard.Body className="gap-3 p-4">
+    <HeroCard className="rounded-panel p-0" style={{ borderWidth: 1, borderColor: theme.border }}>
+      <HeroCard.Body className="gap-3 p-3.5">
         <View className="flex-row items-start gap-3">
           <Avatar uri={avatarUri} name={delivererName} size={40} />
           <View className="min-w-0 flex-1">
@@ -861,7 +868,7 @@ function DeliveryOfferCard({
                 </Chip>
               ) : null}
             </View>
-            <Text className="text-sm" style={{ color: theme.textSecondary }}>
+            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>
               {t('orders.deliveryTimeCredits', { count: offer.time_credits })}
               {offer.estimated_minutes ? ` - ${t('orders.deliveryEstimate', { count: offer.estimated_minutes })}` : ''}
             </Text>
@@ -869,17 +876,17 @@ function DeliveryOfferCard({
           <Chip size="sm" variant="secondary"><Chip.Label>{translatedDeliveryStatus(offer.status, t)}</Chip.Label></Chip>
         </View>
         {offer.notes ? (
-          <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{offer.notes}</Text>
+          <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={4}>{offer.notes}</Text>
         ) : null}
         <View className="flex-row flex-wrap gap-2">
           {offer.status === 'pending' ? (
-            <HeroButton className="flex-1" size="sm" variant="primary" isDisabled={isSubmitting} onPress={onAccept} style={{ minWidth: '46%', backgroundColor: primary }}>
+            <HeroButton className="min-w-[46%] flex-1" size="sm" variant="primary" isDisabled={isSubmitting} onPress={onAccept} style={{ backgroundColor: primary }}>
               <Ionicons name="checkmark-circle-outline" size={14} color="#fff" />
               <HeroButton.Label>{t('orders.acceptDeliveryOffer')}</HeroButton.Label>
             </HeroButton>
           ) : null}
           {offer.status === 'accepted' ? (
-            <HeroButton className="flex-1" size="sm" variant="primary" isDisabled={isSubmitting} onPress={onConfirm} style={{ minWidth: '46%', backgroundColor: theme.success }}>
+            <HeroButton className="min-w-[46%] flex-1" size="sm" variant="primary" isDisabled={isSubmitting} onPress={onConfirm} style={{ backgroundColor: theme.success }}>
               <Ionicons name="flag-outline" size={14} color="#fff" />
               <HeroButton.Label>{t('orders.confirmDeliveryOffer')}</HeroButton.Label>
             </HeroButton>
@@ -905,10 +912,11 @@ function OrderInput({
 }) {
   const theme = useTheme();
   return (
-    <View className="gap-2">
-      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{label}</Text>
+    <View className="w-full gap-2">
+      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>{label}</Text>
       <Input
-        className={`${multiline ? 'min-h-24' : 'min-h-12'} text-sm`}
+        containerClassName="mb-0 w-full"
+        inputClassName={`w-full ${multiline ? 'min-h-24' : 'min-h-12'} text-sm`}
         style={{ color: theme.text, textAlignVertical: multiline ? 'top' : 'center' }}
         value={value}
         onChangeText={onChangeText}

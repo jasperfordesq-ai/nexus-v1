@@ -14,6 +14,7 @@ return [
     | The React frontend runs on:
     |   - Production: https://app.project-nexus.ie
     |   - Development: http://localhost:5173
+    |   - Expo web development: http://localhost:8082
     |
     | The API serves from:
     |   - Production: https://api.project-nexus.ie
@@ -44,11 +45,13 @@ return [
             'http://localhost:5176',
             'http://localhost:4174',
             'http://localhost:4176',
+            'http://localhost:8082',
             'http://localhost:8090',
             'http://127.0.0.1:5173',
             'http://127.0.0.1:5176',
             'http://127.0.0.1:4174',
             'http://127.0.0.1:4176',
+            'http://127.0.0.1:8082',
         ],
         // Additional origins from environment (additive)
         array_map('trim', array_filter(

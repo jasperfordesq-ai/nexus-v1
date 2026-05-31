@@ -134,4 +134,11 @@ class CorsHelperTest extends TestCase
         $this->assertIsArray($origins);
         $this->assertNotEmpty($origins);
     }
+
+    public function test_getAllowedOrigins_includes_expo_web_dev_origin(): void
+    {
+        $origins = CorsHelper::getAllowedOrigins();
+        $this->assertContains('http://localhost:8082', $origins);
+        $this->assertContains('http://127.0.0.1:8082', $origins);
+    }
 }
