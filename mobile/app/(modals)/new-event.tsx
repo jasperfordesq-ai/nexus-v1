@@ -10,7 +10,7 @@ import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
-import { Button as HeroButton, Card as HeroCard, Text } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, TagGroup, Text } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 
@@ -306,19 +306,23 @@ function NewEventScreen() {
             </View>
             <View className="gap-2">
               <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('create.categoryLabel')}</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
-                {eventCategoryIds.map((value) => (
-                  <HeroButton
-                    key={value}
-                    size="sm"
-                    variant={category === value ? 'primary' : 'secondary'}
-                    onPress={() => setCategory((current) => (current === value ? '' : value))}
-                    style={category === value ? { backgroundColor: primary } : undefined}
-                  >
-                    <HeroButton.Label>{t(`category.${value}`)}</HeroButton.Label>
-                  </HeroButton>
-                ))}
-              </ScrollView>
+              <TagGroup
+                size="sm"
+                selectionMode="single"
+                selectedKeys={category ? [category] : []}
+                onSelectionChange={(keys) => {
+                  const next = Array.from(keys)[0];
+                  setCategory((next as EventCategoryId | undefined) ?? '');
+                }}
+              >
+                <TagGroup.List>
+                  {eventCategoryIds.map((value) => (
+                    <TagGroup.Item key={value} id={value}>
+                      <TagGroup.ItemLabel>{t(`category.${value}`)}</TagGroup.ItemLabel>
+                    </TagGroup.Item>
+                  ))}
+                </TagGroup.List>
+              </TagGroup>
             </View>
             <FormField label={t('create.startLabel')} value={startTime} onChangeText={setStartTime} placeholder={t('create.datePlaceholder')} theme={theme} />
             <FormField label={t('create.endLabel')} value={endTime} onChangeText={setEndTime} placeholder={t('create.optionalDatePlaceholder')} theme={theme} />
