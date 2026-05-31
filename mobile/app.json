@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "Project NEXUS",
+    "name": "Timebank Global",
     "slug": "nexus-mobile",
     "scheme": "nexus",
     "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash.png",
@@ -14,7 +14,7 @@
       "backgroundColor": "#006FEE"
     },
     "ios": {
-      "bundleIdentifier": "ie.hour.nexus",
+      "bundleIdentifier": "ie.project.nexus",
       "buildNumber": "1",
       "supportsTablet": false,
       "associatedDomains": [
@@ -23,7 +23,8 @@
       "infoPlist": {
         "NSCameraUsageDescription": "Take a photo for your profile picture or post.",
         "NSPhotoLibraryUsageDescription": "Choose a photo from your library for your profile or post.",
-        "NSPhotoLibraryAddUsageDescription": "Save photos to your library."
+        "NSPhotoLibraryAddUsageDescription": "Save photos to your library.",
+        "CFBundleAllowMixedLocalizations": true
       }
     },
     "android": {
@@ -32,7 +33,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#006FEE"
       },
-      "package": "ie.hour.nexus",
+      "package": "ie.project.nexus",
       "intentFilters": [
         {
           "action": "VIEW",
@@ -51,6 +52,13 @@
             "DEFAULT"
           ]
         }
+      ],
+      "googleServicesFile": "./google-services.json",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.CAMERA"
       ]
     },
     "plugins": [
@@ -60,13 +68,13 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Project NEXUS uses your location only when you choose to search nearby marketplace listings."
+          "locationWhenInUsePermission": "Timebank Global uses your location only when you choose to search nearby marketplace listings."
         }
       ],
       [
         "expo-camera",
         {
-          "cameraPermission": "Project NEXUS uses the camera only when you choose to scan marketplace QR codes."
+          "cameraPermission": "Timebank Global uses the camera only when you choose to scan marketplace QR codes."
         }
       ],
       "expo-font",
@@ -95,13 +103,21 @@
     "updates": {
       "enabled": true,
       "fallbackToCacheTimeout": 0,
-      "url": "https://u.expo.dev/EXPO_PROJECT_ID"
+      "url": "https://u.expo.dev/90f411f3-b6b4-4251-85ad-00937bb0513d"
     },
     "runtimeVersion": {
       "policy": "appVersion"
     },
     "experiments": {
       "typedRoutes": false
+    },
+    "extra": {
+      "apiUrl": "https://api.project-nexus.ie",
+      "defaultTenant": "hour-timebank",
+      "router": {},
+      "eas": {
+        "projectId": "90f411f3-b6b4-4251-85ad-00937bb0513d"
+      }
     }
   }
 }

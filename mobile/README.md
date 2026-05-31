@@ -1,6 +1,8 @@
-# Project NEXUS - Mobile App
+# Timebank Global - Mobile App
 
 React Native (Expo) mobile client for the [Project NEXUS](https://github.com/jasperfordesq-ai/nexus-v1) timebanking platform.
+
+Release identity, package IDs, and website/Play Store distribution decisions are recorded in [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md).
 
 **License:** AGPL-3.0-or-later (c) 2024-2026 Jasper Ford
 

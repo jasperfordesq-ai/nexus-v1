@@ -18,8 +18,29 @@
         "key": "nexus-dev-v1"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "http://10.0.2.2:8090",
-        "EXPO_PUBLIC_DEFAULT_TENANT": "hour-timebank"
+        "EXPO_PUBLIC_API_URL": "https://api.project-nexus.ie",
+        "EXPO_PUBLIC_DEFAULT_TENANT": "hour-timebank",
+        "EXPO_PUBLIC_ALLOW_PRODUCTION_API_IN_DEV": "true",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
+      }
+    },
+    "local-emulator": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleDebug"
+      },
+      "ios": {
+        "simulator": true
+      },
+      "cache": {
+        "key": "nexus-local-emulator-v1"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "http://10.0.2.2:8088",
+        "EXPO_PUBLIC_DEFAULT_TENANT": "hour-timebank",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
       }
     },
     "preview": {
@@ -36,7 +57,8 @@
       },
       "env": {
         "EXPO_PUBLIC_API_URL": "https://api.project-nexus.ie",
-        "EXPO_PUBLIC_DEFAULT_TENANT": "hour-timebank"
+        "EXPO_PUBLIC_DEFAULT_TENANT": "hour-timebank",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
       }
     },
     "website": {
@@ -50,7 +72,8 @@
       },
       "env": {
         "EXPO_PUBLIC_API_URL": "https://api.project-nexus.ie",
-        "EXPO_PUBLIC_DEFAULT_TENANT": "hour-timebank"
+        "EXPO_PUBLIC_DEFAULT_TENANT": "hour-timebank",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
       }
     },
     "production": {
@@ -67,7 +90,8 @@
       },
       "env": {
         "EXPO_PUBLIC_API_URL": "https://api.project-nexus.ie",
-        "EXPO_PUBLIC_DEFAULT_TENANT": "hour-timebank"
+        "EXPO_PUBLIC_DEFAULT_TENANT": "hour-timebank",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
       }
     }
   },

@@ -11,9 +11,11 @@ const path = require('path');
 
 module.exports = ({ config }) => {
   const projectId = process.env.EAS_PROJECT_ID ?? process.env.EXPO_PUBLIC_EAS_PROJECT_ID ?? null;
-  const googleServicesFile = './google-services.json';
+  const googleServicesFile = process.env.GOOGLE_SERVICES_JSON ?? './google-services.json';
   const notificationIcon = './assets/notification-icon.png';
-  const hasGoogleServicesFile = fs.existsSync(path.join(__dirname, googleServicesFile));
+  const hasGoogleServicesFile = path.isAbsolute(googleServicesFile)
+    ? fs.existsSync(googleServicesFile)
+    : fs.existsSync(path.join(__dirname, googleServicesFile));
   const hasNotificationIcon = fs.existsSync(path.join(__dirname, notificationIcon));
   const plugins = [...(config.plugins ?? [])];
 

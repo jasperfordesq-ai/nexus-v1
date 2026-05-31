@@ -19,6 +19,9 @@ eas-build-local-nodejs/
 google-play-key.json
 google-services.json
 GoogleService-Info.plist
+fcm-service-account*.json
+firebase-service-account*.json
+*-service-account*.json
 *.keystore
 *.jks
 
