@@ -27,6 +27,8 @@ jest.mock('react-i18next', () => ({
         'detail.timeEstimate': 'Time Estimate',
         'detail.requestService': 'Request this Service',
         'detail.offerHelp': 'Offer Help',
+        'detail.messageMember': 'Message',
+        'detail.save': 'Save',
         'detail.communityActions': 'Community actions',
         'detail.like': 'Like',
         'detail.comment': 'Comment',
@@ -109,6 +111,22 @@ jest.mock('@/lib/api/verification', () => ({
 
 jest.mock('@/components/ui/Avatar', () => 'View');
 jest.mock('@/components/ui/LoadingSpinner', () => () => null);
+jest.mock('@/components/comments/CommentSheet', () => {
+  const React = require('react');
+  const { Text } = require('react-native');
+
+  return function MockCommentSheet({
+    visible,
+    targetType,
+    targetId,
+  }: {
+    visible: boolean;
+    targetType: string;
+    targetId: number;
+  }) {
+    return visible ? <Text>{`comments-${targetType}-${targetId}`}</Text> : null;
+  };
+});
 
 // --- Tests ---
 
@@ -182,6 +200,25 @@ describe('ExchangeDetailModal', () => {
       pathname: '/(modals)/member-profile',
       params: { id: '42' },
     });
+  });
+
+  it('keeps member workflow actions available in the bottom footer', () => {
+    mockUseApi.mockReturnValue({ data: { data: mockExchange }, isLoading: false, error: null, refresh: jest.fn() });
+
+    const { getByLabelText } = render(<ExchangeDetailModal />);
+
+    expect(getByLabelText('Save')).toBeTruthy();
+    expect(getByLabelText('Message')).toBeTruthy();
+    expect(getByLabelText('Request this Service')).toBeTruthy();
+  });
+
+  it('opens listing comments in a native bottom sheet', () => {
+    mockUseApi.mockReturnValue({ data: { data: mockExchange }, isLoading: false, error: null, refresh: jest.fn() });
+
+    const { getByText } = render(<ExchangeDetailModal />);
+    fireEvent.press(getByText('Comment'));
+
+    expect(getByText('comments-listing-5')).toBeTruthy();
   });
 
   it('renders backend listing image galleries from detail responses', () => {

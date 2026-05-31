@@ -7,12 +7,13 @@ import { useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
+  Pressable,
   ScrollView,
   RefreshControl,
   Share,
   Alert,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router, type Href } from 'expo-router';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
@@ -25,17 +26,13 @@ import {
   createExchangeRequest,
   deleteExchange,
   getExchange,
-  getExchangeComments,
   getExchangeWorkflowConfig,
   reportExchange,
   renewExchange,
   saveExchange,
-  submitExchangeComment,
   toggleExchangeLike,
   unsaveExchange,
   type ActiveExchange,
-  type ExchangeComment,
-  type ExchangeCommentsResponse,
   type RelatedExchange,
   type Exchange,
 } from '@/lib/api/exchanges';
@@ -51,6 +48,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import AppTopBar from '@/components/ui/AppTopBar';
 import VerificationBadgeRow from '@/components/verification/VerificationBadgeRow';
+import CommentSheet from '@/components/comments/CommentSheet';
 
 interface DetailStateProps {
   title: string;
@@ -85,10 +83,11 @@ export default function ExchangeDetailModal() {
 }
 
 function ExchangeDetailModalInner() {
-  const { t } = useTranslation('exchanges');
+  const { t } = useTranslation(['exchanges', 'common']);
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const { user: currentUser } = useAuth();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -106,11 +105,6 @@ function ExchangeDetailModalInner() {
   const [commentsCount, setCommentsCount] = useState(0);
   const [isLiking, setIsLiking] = useState(false);
   const [showComments, setShowComments] = useState(false);
-  const [comments, setComments] = useState<ExchangeComment[]>([]);
-  const [commentsLoading, setCommentsLoading] = useState(false);
-  const [commentsLoaded, setCommentsLoaded] = useState(false);
-  const [commentText, setCommentText] = useState('');
-  const [isCommenting, setIsCommenting] = useState(false);
   const [showReportForm, setShowReportForm] = useState(false);
   const [isReporting, setIsReporting] = useState(false);
   const [isReported, setIsReported] = useState(false);
@@ -166,8 +160,7 @@ function ExchangeDetailModalInner() {
       setLikesCount(exchange.likes_count ?? 0);
       setCommentsCount(exchange.comments_count ?? 0);
       setIsReported(Boolean(exchange.is_reported));
-      setComments([]);
-      setCommentsLoaded(false);
+      setShowComments(false);
       setActiveImageIndex(0);
     }
   }, [exchange?.id, exchange?.is_favorited, exchange?.is_liked, exchange?.likes_count, exchange?.comments_count, exchange?.is_reported]);
@@ -258,6 +251,13 @@ function ExchangeDetailModalInner() {
   const saveCount = listing.save_count ?? 0;
   const responseCount = listing.responses_count ?? 0;
   const contactCount = listing.contact_count ?? 0;
+  const showMemberActions = !isOwner && exchangeUser.id > 0;
+  const footerBottomPadding = Math.max(16, insets.bottom + 12);
+  const footerReservedSpace = showMemberActions ? footerBottomPadding + 112 : 32;
+  const primaryActionLabel = workflowEnabled
+    ? activeExchange ? t('detail.exchangeActive') : t('detail.requestExchange')
+    : exchange.type === 'offer' ? t('detail.requestService') : t('detail.offerHelp');
+  const primaryActionIcon = workflowEnabled ? 'repeat-outline' : 'swap-horizontal-outline';
 
   async function handleShare() {
     try {
@@ -291,22 +291,6 @@ function ExchangeDetailModalInner() {
     }
   }
 
-  async function loadComments(force = false) {
-    if (commentsLoading || (!force && commentsLoaded)) return;
-    setCommentsLoading(true);
-    try {
-      const response = await getExchangeComments(listing.id);
-      const payload = ('data' in response && response.data ? response.data : response) as ExchangeCommentsResponse;
-      setComments(payload.comments ?? []);
-      setCommentsCount(payload.count ?? payload.comments?.length ?? 0);
-      setCommentsLoaded(true);
-    } catch {
-      Alert.alert(t('detail.actionFailedTitle'), t('detail.commentsFailed'));
-    } finally {
-      setCommentsLoading(false);
-    }
-  }
-
   async function handleLikeToggle() {
     if (isLiking) return;
     setIsLiking(true);
@@ -331,30 +315,8 @@ function ExchangeDetailModalInner() {
   }
 
   function handleToggleComments() {
-    setShowComments((current) => !current);
-    if (!showComments) {
-      void loadComments();
-    }
-  }
-
-  async function handleSubmitComment() {
-    const content = commentText.trim();
-    if (!content || isCommenting) return;
-    setIsCommenting(true);
-    try {
-      await submitExchangeComment(listing.id, content);
-      setCommentText('');
-      setCommentsLoaded(false);
-      setComments([]);
-      setCommentsCount((current) => current + 1);
-      await loadComments(true);
-      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch {
-      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('detail.actionFailedTitle'), t('detail.commentFailed'));
-    } finally {
-      setIsCommenting(false);
-    }
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setShowComments(true);
   }
 
   async function handleReportSubmit() {
@@ -450,7 +412,7 @@ function ExchangeDetailModalInner() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{ backgroundColor: theme.bg }}>
       <AppTopBar
         title={t('detailTitle')}
         backLabel={t('detail.goBack')}
@@ -458,7 +420,8 @@ function ExchangeDetailModalInner() {
         rightAction={{ accessibilityLabel: t('share'), icon: 'share-outline', onPress: handleShare }}
       />
       <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 96, gap: 12 }}
+        style={{ flex: 1, backgroundColor: theme.bg }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: footerReservedSpace, gap: 12 }}
         refreshControl={
           <RefreshControl
             refreshing={isRefreshing}
@@ -564,32 +527,29 @@ function ExchangeDetailModalInner() {
           </HeroCard>
         ) : null}
 
-        <HeroButton
-          variant="ghost"
-          feedbackVariant="scale"
-          className="w-full p-0"
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={exchangeUserName}
           onPress={() => {
             void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             if (exchangeUser.id > 0) {
               router.push({ pathname: '/(modals)/member-profile', params: { id: String(exchangeUser.id) } });
             }
           }}
-          accessibilityLabel={exchangeUserName}
+          style={({ pressed }) => ({ opacity: pressed ? 0.86 : 1 })}
         >
           <Surface
             variant="secondary"
-            className="rounded-panel-inner p-4"
+            className="w-full rounded-panel-inner p-4"
           >
-              <View className="flex-row items-start justify-between gap-3">
-                <View className="min-w-0 flex-1 flex-row items-start gap-3">
-                  <Avatar uri={exchangeUserAvatar} name={exchangeUserName} size={48} />
-                  <View className="min-w-0 flex-1 gap-1">
+              <View className="flex-row items-start gap-3">
+                <Avatar uri={exchangeUserAvatar} name={exchangeUserName} size={52} />
+                <View className="min-w-0 flex-1 gap-1">
                   <Text className="text-xs text-muted-foreground">{t('detail.postedBy')}</Text>
-                    <Text className="text-base font-semibold text-foreground" numberOfLines={1}>{exchangeUserName}</Text>
-                    {exchangeUser.tagline ? (
-                      <Text className="text-xs text-muted-foreground" numberOfLines={2}>{exchangeUser.tagline}</Text>
-                    ) : null}
-                  </View>
+                  <Text className="text-base font-semibold text-foreground" numberOfLines={1}>{exchangeUserName}</Text>
+                  {exchangeUser.tagline ? (
+                    <Text className="text-xs text-muted-foreground" numberOfLines={2}>{exchangeUser.tagline}</Text>
+                  ) : null}
                 </View>
                 <Ionicons name="chevron-forward" size={18} color={theme.textSecondary} />
               </View>
@@ -615,7 +575,7 @@ function ExchangeDetailModalInner() {
                 </View>
               ) : null}
           </Surface>
-        </HeroButton>
+        </Pressable>
 
         {exchange.created_at ? (
           <HeroCard variant="secondary">
@@ -696,39 +656,6 @@ function ExchangeDetailModalInner() {
                 </HeroButton>
               ) : null}
             </View>
-
-            {showComments ? (
-              <View className="gap-3 border-t border-border pt-3">
-                <View className="flex-row items-end gap-2">
-                  <Input
-                    value={commentText}
-                    onChangeText={setCommentText}
-                    placeholder={t('detail.commentPlaceholder')}
-                    placeholderTextColor={theme.textMuted}
-                    multiline
-                    className="min-h-12 text-sm"
-                    style={{ color: theme.text, textAlignVertical: 'top' }}
-                    accessibilityLabel={t('detail.commentPlaceholder')}
-                  />
-                  <HeroButton isIconOnly variant="primary" isDisabled={isCommenting || !commentText.trim()} style={{ backgroundColor: primary }} onPress={() => void handleSubmitComment()}>
-                    {isCommenting ? <Spinner size="sm" /> : <Ionicons name="send-outline" size={18} color="#fff" />}
-                  </HeroButton>
-                </View>
-                {commentsLoading ? (
-                  <View className="items-center py-3">
-                    <Spinner size="sm" />
-                  </View>
-                ) : comments.length > 0 ? (
-                  <View className="gap-2">
-                    {comments.slice(0, 6).map((comment) => (
-                      <CommentRow key={comment.id} comment={comment} theme={theme} />
-                    ))}
-                  </View>
-                ) : (
-                  <Text className="text-center text-xs text-muted-foreground">{t('detail.noComments')}</Text>
-                )}
-              </View>
-            ) : null}
 
             {showReportForm && !isReported ? (
               <View className="gap-3 border-t border-border pt-3">
@@ -838,32 +765,72 @@ function ExchangeDetailModalInner() {
         ) : null}
       </ScrollView>
 
-      {!isOwner && exchangeUser.id > 0 ? (
-        <Surface variant="default" className="absolute bottom-0 left-0 right-0 flex-row gap-3 border-t border-border p-4">
+      <CommentSheet
+        visible={showComments}
+        targetType="listing"
+        targetId={listing.id}
+        initialCount={commentsCount}
+        strings={{
+          title: t('detail.comment'),
+          placeholder: t('detail.commentPlaceholder'),
+          empty: t('detail.noComments'),
+          loadFailed: t('detail.commentsFailed'),
+          submitFailed: t('detail.commentFailed'),
+          actionFailedTitle: t('detail.actionFailedTitle'),
+          send: t('common:buttons.send'),
+          authorFallback: t('common:labels.member'),
+        }}
+        onClose={() => setShowComments(false)}
+        onCountChange={setCommentsCount}
+      />
+
+      {showMemberActions ? (
+        <Surface
+          variant="default"
+          className="flex-row items-center gap-3 border-t border-border px-4 pt-3"
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            paddingBottom: footerBottomPadding,
+            backgroundColor: theme.surface,
+            borderTopWidth: 1,
+            borderTopColor: theme.border,
+          }}
+        >
           <HeroButton
+            isIconOnly
             size="lg"
             variant="secondary"
             isDisabled={isSaving}
             accessibilityLabel={isSaved ? t('detail.savedShort') : t('detail.save')}
             onPress={() => void handleSaveToggle()}
+            className="h-12 w-12"
           >
             {isSaving ? (
               <Spinner size="sm" />
             ) : (
               <Ionicons name={isSaved ? 'bookmark' : 'bookmark-outline'} size={20} color={primary} />
             )}
-            <HeroButton.Label>{isSaved ? t('detail.savedShort') : t('detail.save')}</HeroButton.Label>
           </HeroButton>
           <HeroButton
-            className="flex-1"
+            size="lg"
+            variant="secondary"
+            accessibilityLabel={t('detail.messageMember')}
+            onPress={() => handleAction(exchangeUser.id, exchangeUserName)}
+            style={{ flex: 1 }}
+          >
+            <Ionicons name="chatbubble-ellipses-outline" size={18} color={primary} />
+            <HeroButton.Label>{t('detail.messageMember')}</HeroButton.Label>
+          </HeroButton>
+          <HeroButton
             size="lg"
             variant="primary"
             isDisabled={isSubmitting}
-            style={{ backgroundColor: primary }}
+            style={{ backgroundColor: primary, flex: 1.35 }}
             accessibilityLabel={
-              workflowEnabled
-                ? activeExchange ? t('detail.exchangeActive') : t('detail.requestExchange')
-                : exchange.type === 'offer' ? t('detail.requestService') : t('detail.offerHelp')
+              primaryActionLabel
             }
             onPress={() => {
               if (workflowEnabled) {
@@ -882,35 +849,15 @@ function ExchangeDetailModalInner() {
             ) : (
               <>
                 <HeroButton.Label>
-                  {workflowEnabled
-                    ? activeExchange ? t('detail.exchangeActive') : t('detail.requestExchange')
-                    : exchange.type === 'offer' ? t('detail.requestService') : t('detail.offerHelp')}
+                  {primaryActionLabel}
                 </HeroButton.Label>
-                <Ionicons name={workflowEnabled ? 'repeat-outline' : 'chatbubble-ellipses-outline'} size={18} color="#fff" />
+                <Ionicons name={primaryActionIcon} size={18} color="#fff" />
               </>
             )}
           </HeroButton>
         </Surface>
       ) : null}
     </SafeAreaView>
-  );
-}
-
-function CommentRow({ comment, theme }: { comment: ExchangeComment; theme: Theme }) {
-  const author = comment.author ?? { id: 0, name: 'Member', avatar_url: null };
-  return (
-    <Surface variant="default" className="rounded-panel-inner border border-border p-3">
-      <View className="flex-row items-start gap-3">
-        <Avatar uri={author.avatar_url ?? author.avatar ?? null} name={author.name} size={32} />
-        <View className="min-w-0 flex-1 gap-1">
-          <View className="flex-row flex-wrap items-center gap-2">
-            <Text className="text-xs font-semibold text-foreground">{author.name}</Text>
-            <Text className="text-[11px]" style={{ color: theme.textMuted }}>{formatDate(comment.created_at)}</Text>
-          </View>
-          <Text className="text-sm leading-5 text-muted-foreground">{stripHtml(comment.content)}</Text>
-        </View>
-      </View>
-    </Surface>
   );
 }
 

@@ -14,12 +14,14 @@ import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 
 import { getFeedAuthor, toggleBookmark, toggleLike, type FeedItem as FeedItemType, type PollData } from '@/lib/api/feed';
+import type { CommentTargetType } from '@/lib/api/comments';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 import Avatar from '@/components/ui/Avatar';
 import ImageCarousel from '@/components/ui/ImageCarousel';
 import ActionSheet from '@/components/ui/ActionSheet';
+import CommentSheet from '@/components/comments/CommentSheet';
 import PollCard from '@/components/PollCard';
 import { formatRelativeTime } from '@/lib/utils/formatRelativeTime';
 
@@ -178,15 +180,17 @@ function getDetailTarget(item: FeedItemType) {
 }
 
 export default function FeedItem({ item, disableDetailNavigation = false }: FeedItemProps) {
-  const { t } = useTranslation('home');
+  const { t } = useTranslation(['home', 'exchanges', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
 
   const [liked, setLiked] = useState(item.is_liked ?? false);
   const [likesCount, setLikesCount] = useState(item.likes_count ?? 0);
+  const [commentsCount, setCommentsCount] = useState(item.comments_count ?? 0);
   const [pollData, setPollData] = useState<PollData | null | undefined>(item.poll_data);
   const [bookmarked, setBookmarked] = useState(item.is_bookmarked ?? false);
   const [actionSheetVisible, setActionSheetVisible] = useState(false);
+  const [commentsVisible, setCommentsVisible] = useState(false);
 
   const lastTapRef = useRef<number>(0);
   const singleTapTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -254,6 +258,16 @@ export default function FeedItem({ item, disableDetailNavigation = false }: Feed
     }
   }
 
+  function handleFeedImagePress() {
+    if (detailTarget) {
+      navigateToDetail();
+      return;
+    }
+    if (imageUrl) {
+      router.push({ pathname: '/(modals)/image-viewer', params: { uri: imageUrl, title: item.title ?? '' } });
+    }
+  }
+
   function handleDoubleTap() {
     const now = Date.now();
     if (now - lastTapRef.current < 300) {
@@ -280,6 +294,11 @@ export default function FeedItem({ item, disableDetailNavigation = false }: Feed
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     animateHeartButton();
     void performLike();
+  }
+
+  function handleCommentPress() {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setCommentsVisible(true);
   }
 
   const handleShare = useCallback(async () => {
@@ -413,13 +432,11 @@ export default function FeedItem({ item, disableDetailNavigation = false }: Feed
 
             {imageItems && imageItems.length > 0 ? (
               <View className="overflow-hidden rounded-panel-inner">
-                <ImageCarousel images={imageItems} height={210} />
+                <ImageCarousel images={imageItems} height={210} onImagePress={detailTarget ? handleFeedImagePress : undefined} />
               </View>
             ) : imageUrl ? (
               <Pressable
-                onPress={() =>
-                  router.push({ pathname: '/(modals)/image-viewer', params: { uri: imageUrl, title: item.title ?? '' } })
-                }
+                onPress={handleFeedImagePress}
                 accessibilityLabel={t('feedTypes.post')}
                 accessibilityRole="imagebutton"
               >
@@ -502,7 +519,7 @@ export default function FeedItem({ item, disableDetailNavigation = false }: Feed
           <Separator />
         </View>
 
-        {reactionTotal > 0 || (item.comments_count ?? 0) > 0 || (item.views_count ?? 0) > 0 || (item.share_count ?? 0) > 0 ? (
+        {reactionTotal > 0 || commentsCount > 0 || (item.views_count ?? 0) > 0 || (item.share_count ?? 0) > 0 ? (
           <View className="flex-row items-center justify-between px-4 pt-3">
             <View className="flex-row flex-wrap items-center gap-3">
               {reactionTotal > 0 ? (
@@ -521,10 +538,24 @@ export default function FeedItem({ item, disableDetailNavigation = false }: Feed
                 </Text>
               ) : null}
             </View>
-            {(item.comments_count ?? 0) > 0 ? (
-              <Text className="text-xs" style={{ color: theme.textSecondary }}>
-                {t('stats.comments', { count: item.comments_count })}
-              </Text>
+            {commentsCount > 0 ? (
+              isCommentable ? (
+                <HeroButton
+                  size="sm"
+                  variant="ghost"
+                  className="px-0"
+                  onPress={handleCommentPress}
+                  accessibilityLabel={t('stats.comments', { count: commentsCount })}
+                >
+                  <HeroButton.Label style={{ color: theme.textSecondary }}>
+                    {t('stats.comments', { count: commentsCount })}
+                  </HeroButton.Label>
+                </HeroButton>
+              ) : (
+                <Text className="text-xs" style={{ color: theme.textSecondary }}>
+                  {t('stats.comments', { count: commentsCount })}
+                </Text>
+              )
             ) : null}
           </View>
         ) : null}
@@ -545,9 +576,11 @@ export default function FeedItem({ item, disableDetailNavigation = false }: Feed
           </HeroButton>
 
           {isCommentable ? (
-            <HeroButton size="sm" variant="ghost" onPress={navigateToDetail}>
+            <HeroButton size="sm" variant={commentsVisible ? 'secondary' : 'ghost'} onPress={handleCommentPress}>
               <Ionicons name="chatbubble-outline" size={17} color={theme.textMuted} />
-              <HeroButton.Label style={{ color: theme.textMuted }}>{t('comment')}</HeroButton.Label>
+              <HeroButton.Label style={{ color: commentsVisible ? primary : theme.textMuted }}>
+                {commentsCount > 0 ? t('stats.comments', { count: commentsCount }) : t('comment')}
+              </HeroButton.Label>
             </HeroButton>
           ) : null}
 
@@ -573,6 +606,26 @@ export default function FeedItem({ item, disableDetailNavigation = false }: Feed
           ...(detailTarget ? [{ label: t(detailTarget.labelKey), icon: 'arrow-forward-outline', onPress: navigateToDetail }] : []),
         ]}
       />
+      {isCommentable ? (
+        <CommentSheet
+          visible={commentsVisible}
+          targetType={item.type as CommentTargetType}
+          targetId={item.id}
+          initialCount={commentsCount}
+          strings={{
+            title: t('comment'),
+            placeholder: t('exchanges:detail.commentPlaceholder'),
+            empty: t('exchanges:detail.noComments'),
+            loadFailed: t('exchanges:detail.commentsFailed'),
+            submitFailed: t('exchanges:detail.commentFailed'),
+            actionFailedTitle: t('exchanges:detail.actionFailedTitle'),
+            send: t('common:buttons.send'),
+            authorFallback: t('common:labels.member'),
+          }}
+          onClose={() => setCommentsVisible(false)}
+          onCountChange={setCommentsCount}
+        />
+      ) : null}
     </View>
   );
 }

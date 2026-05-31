@@ -225,6 +225,7 @@
     "completedExchanges_other": "{{count}} exchanges completed",
     "requestService": "Request this service",
     "offerHelp": "Offer to help",
+    "messageMember": "Message",
     "location": "Location",
     "imageThumbnail": "Show listing image {{number}}",
     "onlineOrFlexible": "Flexible",

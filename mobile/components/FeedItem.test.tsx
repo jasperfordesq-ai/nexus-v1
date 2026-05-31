@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { fireEvent, render } from '@testing-library/react-native';
 
 import type { FeedItem as FeedItemType } from '@/lib/api/feed';
 import FeedItem from './FeedItem';
@@ -85,11 +85,42 @@ jest.mock('heroui-native', () => {
 });
 
 jest.mock('@/components/ui/Avatar', () => 'View');
-jest.mock('@/components/ui/ImageCarousel', () => 'View');
+jest.mock('@/components/ui/ImageCarousel', () => {
+  const React = require('react');
+  const { Pressable, Text } = require('react-native');
+
+  return function MockImageCarousel({ onImagePress }: { onImagePress?: (index: number) => void }) {
+    return (
+      <Pressable accessibilityRole="imagebutton" accessibilityLabel="carousel image" onPress={() => onImagePress?.(0)}>
+        <Text>carousel image</Text>
+      </Pressable>
+    );
+  };
+});
 jest.mock('@/components/ui/ActionSheet', () => 'View');
 jest.mock('@/components/PollCard', () => 'View');
+jest.mock('@/components/comments/CommentSheet', () => {
+  const React = require('react');
+  const { Text } = require('react-native');
+
+  return function MockCommentSheet({
+    visible,
+    targetType,
+    targetId,
+  }: {
+    visible: boolean;
+    targetType: string;
+    targetId: number;
+  }) {
+    return visible ? <Text>{`comments-${targetType}-${targetId}`}</Text> : null;
+  };
+});
 
 describe('FeedItem', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('falls back to the default visual config for feed item types not known by the mobile client', () => {
     const item = {
       id: 501,
@@ -117,5 +148,134 @@ describe('FeedItem', () => {
 
     expect(getByText('Thanks for the lift')).toBeTruthy();
     expect(getByText('A kind note from the community feed.')).toBeTruthy();
+  });
+
+  it('opens the native comments sheet instead of navigating when Comment is pressed', () => {
+    const item = {
+      id: 501,
+      type: 'listing',
+      title: 'Help with garden planning',
+      content: 'Could use some local advice.',
+      image_url: null,
+      user_id: 1,
+      author_name: 'Alice Smith',
+      author_avatar: null,
+      is_liked: false,
+      likes_count: 0,
+      comments_count: 0,
+      created_at: '2026-05-30T10:00:00Z',
+      location: null,
+      rating: null,
+      start_date: null,
+      job_type: null,
+      commitment: null,
+      submission_deadline: null,
+      receiver: null,
+    } as FeedItemType;
+    const { router } = require('expo-router');
+
+    const { getByText } = render(<FeedItem item={item} />);
+    fireEvent.press(getByText('comment'));
+
+    expect(getByText('comments-listing-501')).toBeTruthy();
+    expect(router.push).not.toHaveBeenCalled();
+  });
+
+  it('opens the native comments sheet when the visible comment count is pressed', () => {
+    const item = {
+      id: 502,
+      type: 'listing',
+      title: 'Garden help',
+      content: 'There are comments on this listing.',
+      image_url: null,
+      user_id: 1,
+      author_name: 'Alice Smith',
+      author_avatar: null,
+      is_liked: false,
+      likes_count: 0,
+      comments_count: 4,
+      created_at: '2026-05-30T10:00:00Z',
+      location: null,
+      rating: null,
+      start_date: null,
+      job_type: null,
+      commitment: null,
+      submission_deadline: null,
+      receiver: null,
+    } as FeedItemType;
+    const { router } = require('expo-router');
+
+    const { getAllByText, getByText } = render(<FeedItem item={item} />);
+    fireEvent.press(getAllByText('stats.comments')[0]);
+
+    expect(getByText('comments-listing-502')).toBeTruthy();
+    expect(router.push).not.toHaveBeenCalled();
+  });
+
+  it('opens feed item detail instead of the image viewer when a feed image is pressed', () => {
+    const item = {
+      id: 503,
+      type: 'post',
+      title: 'Garden photo',
+      content: 'A post with an image.',
+      image_url: 'https://example.test/photo.jpg',
+      user_id: 1,
+      author_name: 'Alice Smith',
+      author_avatar: null,
+      is_liked: false,
+      likes_count: 0,
+      comments_count: 0,
+      created_at: '2026-05-30T10:00:00Z',
+      location: null,
+      rating: null,
+      start_date: null,
+      job_type: null,
+      commitment: null,
+      submission_deadline: null,
+      receiver: null,
+    } as FeedItemType;
+    const { router } = require('expo-router');
+
+    const { getByLabelText } = render(<FeedItem item={item} />);
+    fireEvent.press(getByLabelText('feedTypes.post'));
+
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/(modals)/feed-item-detail',
+      params: { id: '503', type: 'post' },
+    });
+  });
+
+  it('opens feed item detail instead of the image viewer when carousel media is pressed', () => {
+    const item = {
+      id: 504,
+      type: 'post',
+      title: 'Carousel photo',
+      content: 'A post with carousel media.',
+      image_url: null,
+      media: [{ id: 1, media_type: 'image', file_url: 'https://example.test/photo.jpg', display_order: 0 }],
+      user_id: 1,
+      author_name: 'Alice Smith',
+      author_avatar: null,
+      is_liked: false,
+      likes_count: 0,
+      comments_count: 0,
+      created_at: '2026-05-30T10:00:00Z',
+      location: null,
+      rating: null,
+      start_date: null,
+      job_type: null,
+      commitment: null,
+      submission_deadline: null,
+      receiver: null,
+    } as FeedItemType;
+    const { router } = require('expo-router');
+
+    const { getByLabelText } = render(<FeedItem item={item} />);
+    fireEvent.press(getByLabelText('carousel image'));
+
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/(modals)/feed-item-detail',
+      params: { id: '504', type: 'post' },
+    });
   });
 });
