@@ -152,7 +152,7 @@ jest.mock('heroui-native', () => {
   Button.Label = ({ children }: { children: React.ReactNode }) => <Text>{children}</Text>;
   const Card = ({ children }: { children: React.ReactNode }) => <View>{children}</View>;
   Card.Body = ({ children }: { children: React.ReactNode }) => <View>{children}</View>;
-  const TagGroupContext = React.createContext<{ onSelectionChange?: (keys: Set<string | number>) => void } | null>(null);
+  const TagGroupContext = React.createContext(null);
   const TagGroup = ({ children, onSelectionChange }: { children: React.ReactNode; onSelectionChange?: (keys: Set<string | number>) => void }) => (
     <TagGroupContext.Provider value={{ onSelectionChange }}>
       <View>{children}</View>
