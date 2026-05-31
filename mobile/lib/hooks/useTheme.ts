@@ -5,42 +5,66 @@
 
 import { useColorScheme } from 'react-native';
 
+// ---------------------------------------------------------------------------
+// THEMING CONVENTION (read me)
+//
+// HeroUI Native does NOT theme through a provider prop — its tokens are uniwind
+// CSS variables, overridden in `mobile/global.css` (the indigo-glow palette
+// that mirrors the web app's `react-frontend/src/styles/tokens.css`). So the
+// single source of truth for colours is global.css.
+//
+// PREFER HeroUI / Tailwind className tokens in components — they resolve to the
+// values below automatically and support light/dark out of the box:
+//   bg-background, bg-surface, text-foreground, text-muted-foreground,
+//   border-border, and the <Surface> component for elevated panels.
+//
+// This `useTheme()` hex hook is the bridge for code that still needs a literal
+// colour (e.g. a third-party `style={{ backgroundColor }}` such as gorhom's
+// BottomSheetFlatList, or a chart). Its values are kept IN SYNC with global.css
+// so token-based and inline-styled UI render identically — no more clashing
+// neutral-grey vs indigo surfaces. Reserve genuinely dynamic per-tenant colours
+// (the brand primary) for `usePrimaryColor()` from `@/lib/hooks/useTenant`.
+//
+// When touching a component, migrate its inline `theme.*` to className tokens
+// where one exists; this hook is the fallback, not the default.
+// ---------------------------------------------------------------------------
+
 export const LIGHT = {
-  bg: '#F8F9FA',
-  surface: '#FFFFFF',
-  border: '#E4E4E7',
-  borderSubtle: '#F0F0F0',
-  text: '#11181C',
-  textSecondary: '#687076',
-  textMuted: '#9BA1A6',
+  bg: '#F8FAFC',           // --background (web light)
+  surface: '#FFFFFF',      // --surface-solid
+  border: '#E2E8F0',       // --border-default ≈ rgba(0,0,0,0.08) on white (slate-200)
+  borderSubtle: '#F1F5F9', // slate-100
+  text: '#1E293B',         // --foreground (slate-800)
+  textSecondary: '#475569',// --foreground-muted (slate-600)
+  textMuted: '#94A3B8',    // --foreground-subtle (slate-400)
   onPrimary: '#FFFFFF',
   overlay: 'rgba(0,0,0,0.5)',
   error: '#DC2626',
   errorBg: '#FEE2E2',
-  success: '#065F46',
+  success: '#16A34A',      // web light --color-success
   successBg: '#D1FAE5',
-  info: '#1E40AF',
+  info: '#2563EB',         // web light --color-info
   infoBg: '#DBEAFE',
-  warning: '#D97706',
+  warning: '#D97706',      // web light --color-warning
 } as const;
 
 export const DARK = {
-  bg: '#0F0F0F',
-  surface: '#1C1C1E',
-  border: '#2C2C2E',
-  borderSubtle: '#2C2C2E',
-  text: '#F2F2F7',
-  textSecondary: '#98989F',
-  textMuted: '#636366',
+  bg: '#0A0A0F',           // --background (web dark) — matches global.css --background
+  surface: '#16162A',      // --surface-dropdown (solid elevated indigo-dark)
+  border: '#24242E',       // --border-default ≈ rgba(255,255,255,0.10) on bg
+  borderSubtle: '#1A1A24',
+  text: '#EDEDED',         // --foreground (web dark)
+  textSecondary: '#A8A8B4',// --foreground-muted ≈ rgba(237,237,237,0.7)
+  textMuted: '#7C7C8A',    // --foreground-subtle ≈ rgba(237,237,237,0.5)
   onPrimary: '#FFFFFF',
-  overlay: 'rgba(0,0,0,0.5)',
+  overlay: 'rgba(0,0,0,0.6)',
   error: '#FF453A',
   errorBg: '#2D1B1B',
-  success: '#4ADE80',
+  success: '#22C55E',      // web dark --color-success
   successBg: '#052E16',
-  info: '#60A5FA',
+  info: '#3B82F6',         // web dark --color-info
   infoBg: '#1E3A5F',
-  warning: '#FBBF24',
+  warning: '#F59E0B',      // web dark --color-warning
 } as const;
 
 export type Theme = { [K in keyof typeof LIGHT]: string };

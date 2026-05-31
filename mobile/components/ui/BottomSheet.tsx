@@ -7,7 +7,6 @@ import React from 'react';
 import { View } from 'react-native';
 import { BottomSheet as HeroBottomSheet } from 'heroui-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTheme } from '@/lib/hooks/useTheme';
 import { useDeferredBottomSheetState } from './useDeferredBottomSheetState';
 
 interface BottomSheetProps {
@@ -34,7 +33,6 @@ export default function BottomSheet({
   childrenClassName,
 }: BottomSheetProps) {
   const insets = useSafeAreaInsets();
-  const theme = useTheme();
   const { mounted: sheetMounted, open: sheetOpen } = useDeferredBottomSheetState(visible);
 
   // With explicit snap points, honour them (numbers get the bottom inset added
@@ -63,12 +61,7 @@ export default function BottomSheet({
           enableOverDrag={false}
           keyboardBehavior="extend"
           keyboardBlurBehavior="restore"
-          contentContainerClassName={hasSnapPoints ? 'h-full' : undefined}
-          contentContainerProps={{
-            style: hasSnapPoints
-              ? { height: '100%', backgroundColor: theme.bg }
-              : { backgroundColor: theme.bg },
-          }}
+          contentContainerClassName={hasSnapPoints ? 'h-full bg-background' : 'bg-background'}
           backgroundClassName="rounded-t-[30px] bg-background"
           handleClassName="rounded-t-[30px] bg-background"
           handleIndicatorClassName="bg-muted-foreground/50"

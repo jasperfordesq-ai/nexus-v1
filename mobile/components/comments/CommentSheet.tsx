@@ -145,8 +145,7 @@ export default function CommentSheet({
           enableOverDrag={false}
           keyboardBehavior="extend"
           keyboardBlurBehavior="restore"
-          contentContainerClassName="h-full"
-          contentContainerProps={{ style: { height: '100%', backgroundColor: theme.bg } }}
+          contentContainerClassName="h-full bg-background"
           backgroundClassName="rounded-t-[30px] bg-background"
           handleClassName="rounded-t-[30px] bg-background"
           handleIndicatorClassName="bg-muted-foreground/50"
@@ -165,10 +164,7 @@ export default function CommentSheet({
             </BottomSheetFooter>
           )}
         >
-          <View
-            className="flex-1"
-            style={{ flex: 1, height: '100%', backgroundColor: theme.bg }}
-          >
+          <View className="flex-1 bg-background" style={{ flex: 1, height: '100%' }}>
             <View className="flex-row items-center justify-between gap-3 border-b border-border px-5 pb-4 pt-2">
               <View className="min-w-0 flex-1">
                 <HeroBottomSheet.Title className="text-xl font-bold text-foreground">
@@ -176,7 +172,7 @@ export default function CommentSheet({
                 </HeroBottomSheet.Title>
               </View>
               <HeroBottomSheet.Close>
-                <View className="h-10 w-10 items-center justify-center rounded-full" style={{ backgroundColor: theme.surface }}>
+                <View className="h-10 w-10 items-center justify-center rounded-full bg-surface">
                   <Ionicons name="close" size={20} color={theme.text} />
                 </View>
               </HeroBottomSheet.Close>
@@ -204,7 +200,7 @@ export default function CommentSheet({
                     <View className="h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
                       <Ionicons name="chatbubble-ellipses-outline" size={22} color={primary} />
                     </View>
-                    <Text className="text-center text-sm" style={{ color: theme.textSecondary }}>{strings.empty}</Text>
+                    <Text className="text-center text-sm text-muted-foreground">{strings.empty}</Text>
                   </Surface>
                 )
               }
@@ -245,7 +241,7 @@ function CommentComposer({
     : awareHandlers;
 
   return (
-    <View className="flex-row items-end gap-2 border-t border-border px-4 pt-3" style={{ backgroundColor: theme.bg, paddingBottom: bottomPadding }}>
+    <View className="flex-row items-end gap-2 border-t border-border bg-background px-4 pt-3" style={{ paddingBottom: bottomPadding }}>
       <TextArea
         value={draft}
         onChangeText={onChangeDraft}
@@ -276,7 +272,6 @@ function CommentComposer({
 }
 
 function CommentRow({ comment, authorFallback }: { comment: FlatComment; authorFallback: string }) {
-  const theme = useTheme();
   const author = comment.author ?? { id: 0, name: authorFallback, avatar_url: null };
   const marginLeft = Math.min(comment.depth, 2) * 20;
 
@@ -287,16 +282,16 @@ function CommentRow({ comment, authorFallback }: { comment: FlatComment; authorF
           <Avatar uri={author.avatar_url ?? author.avatar ?? null} name={author.name || authorFallback} size={34} />
           <View className="min-w-0 flex-1 gap-1">
             <View className="flex-row flex-wrap items-center gap-2">
-              <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+              <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
                 {author.name || authorFallback}
               </Text>
               {comment.created_at ? (
-                <Text className="text-[11px]" style={{ color: theme.textMuted }}>
+                <Text className="text-[11px] text-muted-foreground">
                   {formatRelativeTime(comment.created_at, true)}
                 </Text>
               ) : null}
             </View>
-            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+            <Text className="text-sm leading-5 text-muted-foreground">
               {stripHtml(comment.content)}
             </Text>
           </View>
