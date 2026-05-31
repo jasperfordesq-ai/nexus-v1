@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from '@/lib/haptics';
-import { Card as HeroCard, Text } from 'heroui-native';
+import { Card as HeroCard, Description, Text } from 'heroui-native';
 
 import { useTranslation } from 'react-i18next';
 
@@ -190,8 +190,8 @@ function PasswordField({
         onChangeText={onChangeText}
         accessibilityLabel={label}
       />
-      {!error && helper ? (
-        <Text className="text-xs" style={{ color: theme.textMuted }}>{helper}</Text>
+      {helper ? (
+        <Description isInvalid={!!error} hideOnInvalid className="text-xs">{helper}</Description>
       ) : null}
     </View>
   );

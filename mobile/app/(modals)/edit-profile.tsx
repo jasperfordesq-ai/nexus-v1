@@ -17,7 +17,7 @@ import { router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import * as Haptics from '@/lib/haptics';
-import { Button as HeroButton, Card as HeroCard, Spinner } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Description, Spinner } from 'heroui-native';
 
 import { useTranslation } from 'react-i18next';
 
@@ -444,8 +444,8 @@ function ProfileField({
         placeholderTextColor={theme.textMuted}
         accessibilityLabel={label}
       />
-      {!error && helper ? (
-        <Text className="text-xs" style={{ color: theme.textMuted }}>{helper}</Text>
+      {helper ? (
+        <Description isInvalid={!!error} hideOnInvalid className="text-xs">{helper}</Description>
       ) : null}
     </View>
   );
