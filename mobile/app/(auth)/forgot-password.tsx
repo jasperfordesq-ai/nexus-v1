@@ -12,7 +12,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import { Card as HeroCard } from 'heroui-native';
+import { Alert, Card as HeroCard } from 'heroui-native';
 
 import { forgotPassword } from '@/lib/api/auth';
 import { ApiResponseError } from '@/lib/api/client';
@@ -108,9 +108,12 @@ export default function ForgotPasswordScreen() {
               ) : (
                 <View className="gap-1">
                   {submitError ? (
-                    <View className="mb-4 rounded-lg bg-danger/10 p-3" accessibilityRole="alert" accessibilityLiveRegion="polite">
-                      <Text className="text-sm text-danger">{submitError}</Text>
-                    </View>
+                    <Alert status="danger" className="mb-4" accessibilityRole="alert" accessibilityLiveRegion="polite">
+                      <Alert.Indicator />
+                      <Alert.Content>
+                        <Alert.Description className="text-danger">{submitError}</Alert.Description>
+                      </Alert.Content>
+                    </Alert>
                   ) : null}
 
                   <Controller

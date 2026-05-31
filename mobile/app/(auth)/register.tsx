@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { router, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Button as HeroButton, Card as HeroCard } from 'heroui-native';
+import { Alert, Button as HeroButton, Card as HeroCard } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 
 import { extractToken, register as apiRegister } from '@/lib/api/auth';
@@ -164,13 +164,17 @@ export default function RegisterScreen() {
 
             <HeroCard.Body className="px-6 pb-6">
               {globalError ? (
-                <View
-                  className="bg-danger/10 rounded-lg p-3 mb-4"
+                <Alert
+                  status="danger"
+                  className="mb-4"
                   accessibilityRole="alert"
                   accessibilityLiveRegion="polite"
                 >
-                  <Text className="text-danger text-sm">{globalError}</Text>
-                </View>
+                  <Alert.Indicator />
+                  <Alert.Content>
+                    <Alert.Description className="text-danger">{globalError}</Alert.Description>
+                  </Alert.Content>
+                </Alert>
               ) : null}
 
               <View className="gap-1">
