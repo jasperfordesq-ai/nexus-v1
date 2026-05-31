@@ -5,7 +5,7 @@
 
 import React, { forwardRef } from 'react';
 import { TextInput, View, type TextInputProps } from 'react-native';
-import { FieldError, Input as HeroInput, Label, TextField } from 'heroui-native';
+import { FieldError, Input as HeroInput, InputGroup, Label, TextField } from 'heroui-native';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -37,22 +37,38 @@ const Input = forwardRef<TextInput, InputProps>(function Input(
       {label ? (
         <Label className="mb-1.5 text-sm font-semibold">{label}</Label>
       ) : null}
-      <View className="flex-row items-center">
-        {leftIcon ? (
-          <View className="pl-3 absolute left-0 z-10">{leftIcon}</View>
-        ) : null}
-        <HeroInput
-          ref={ref}
-          isInvalid={!!error}
-          isDisabled={isDisabled}
-          style={[leftIcon ? { paddingLeft: 40 } : undefined, rightIcon ? { paddingRight: 40 } : undefined, style]}
-          className={inputClassName ?? 'flex-1'}
-          {...rest}
-        />
-        {rightIcon ? (
-          <View className="pr-3 absolute right-0 z-10">{rightIcon}</View>
-        ) : null}
-      </View>
+      {leftIcon || rightIcon ? (
+        // InputGroup auto-measures the prefix/suffix width and pads the input
+        // to match (no hardcoded 40px). isDecorative makes the icons
+        // non-interactive and hidden from screen readers, and lets taps fall
+        // through to focus the input — matching the old absolute-View behaviour.
+        <InputGroup isDisabled={isDisabled}>
+          {leftIcon ? (
+            <InputGroup.Prefix isDecorative>{leftIcon}</InputGroup.Prefix>
+          ) : null}
+          <InputGroup.Input
+            ref={ref}
+            isInvalid={!!error}
+            style={style}
+            className={inputClassName ?? 'flex-1'}
+            {...rest}
+          />
+          {rightIcon ? (
+            <InputGroup.Suffix isDecorative>{rightIcon}</InputGroup.Suffix>
+          ) : null}
+        </InputGroup>
+      ) : (
+        <View className="flex-row items-center">
+          <HeroInput
+            ref={ref}
+            isInvalid={!!error}
+            isDisabled={isDisabled}
+            style={style}
+            className={inputClassName ?? 'flex-1'}
+            {...rest}
+          />
+        </View>
+      )}
       {error ? (
         <FieldError className="mt-1 text-xs">{error}</FieldError>
       ) : null}
