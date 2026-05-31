@@ -316,11 +316,20 @@ function NewEventScreen() {
                 }}
               >
                 <TagGroup.List>
-                  {eventCategoryIds.map((value) => (
-                    <TagGroup.Item key={value} id={value}>
-                      <TagGroup.ItemLabel>{t(`category.${value}`)}</TagGroup.ItemLabel>
-                    </TagGroup.Item>
-                  ))}
+                  {eventCategoryIds.map((value) => {
+                    const isSelected = category === value;
+                    return (
+                      <TagGroup.Item
+                        key={value}
+                        id={value}
+                        style={isSelected ? { backgroundColor: primary } : undefined}
+                      >
+                        <TagGroup.ItemLabel style={isSelected ? { color: '#FFFFFF' } : undefined}>
+                          {t(`category.${value}`)}
+                        </TagGroup.ItemLabel>
+                      </TagGroup.Item>
+                    );
+                  })}
                 </TagGroup.List>
               </TagGroup>
             </View>
