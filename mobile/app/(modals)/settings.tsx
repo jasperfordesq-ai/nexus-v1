@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState } from 'react';
+import { Children, Fragment, useState } from 'react';
 import {
   View,
   ScrollView,
@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from '@/lib/haptics';
 import Constants from 'expo-constants';
 import { useTranslation } from 'react-i18next';
-import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, ListGroup, Text } from 'heroui-native';
 
 import { api } from '@/lib/api/client';
 import { useApi } from '@/lib/hooks/useApi';
@@ -380,7 +380,6 @@ function Section({
   subtitle,
   icon,
   primary,
-  theme,
   children,
 }: {
   title: string;
@@ -390,46 +389,53 @@ function Section({
   theme: ReturnType<typeof useTheme>;
   children: React.ReactNode;
 }) {
+  // Grouped settings card built on HeroUI Native's ListGroup. A branded
+  // (per-tenant accent) header sits above the group; each child row is a
+  // ListGroup.Item, separated by hairline dividers.
+  const items = Children.toArray(children);
   return (
-    <HeroCard className="overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: theme.borderSubtle }}>
-      <View className="absolute bottom-0 left-0 top-0 w-1" style={{ backgroundColor: withAlpha(primary, 0.65) }} />
-      <HeroCard.Body className="gap-3 p-3.5 pl-4">
-        <View className="flex-row items-start gap-3">
-          <View
-            className="h-9 w-9 items-center justify-center rounded-2xl"
-            style={{ backgroundColor: withAlpha(primary, 0.12), borderWidth: 1, borderColor: withAlpha(primary, 0.16) }}
-          >
-            <Ionicons name={icon} size={18} color={primary} />
-          </View>
-          <View className="min-w-0 flex-1">
-            <Text className="text-base font-bold leading-5" style={{ color: theme.text }} numberOfLines={1}>{title}</Text>
-            <Text className="text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>{subtitle}</Text>
-          </View>
+    <View className="gap-2.5">
+      <View className="flex-row items-center gap-3 px-1">
+        <View
+          className="h-9 w-9 items-center justify-center rounded-2xl"
+          style={{ backgroundColor: withAlpha(primary, 0.12), borderWidth: 1, borderColor: withAlpha(primary, 0.16) }}
+        >
+          <Ionicons name={icon} size={18} color={primary} />
         </View>
-        <View className="gap-2">
-          {children}
+        <View className="min-w-0 flex-1">
+          <Text className="text-base font-bold leading-5 text-foreground" numberOfLines={1}>{title}</Text>
+          <Text className="text-xs leading-4 text-muted-foreground" numberOfLines={2}>{subtitle}</Text>
         </View>
-      </HeroCard.Body>
-    </HeroCard>
+      </View>
+      <ListGroup className="overflow-hidden rounded-panel border border-border">
+        {items.map((child, index) => (
+          <Fragment key={index}>
+            {index > 0 ? <View className="h-px bg-border" /> : null}
+            {child}
+          </Fragment>
+        ))}
+      </ListGroup>
+    </View>
   );
 }
 
 function InfoRow({
   label,
   value,
-  theme,
 }: {
   label: string;
   value: string;
   theme: ReturnType<typeof useTheme>;
 }) {
   return (
-    <Surface variant="secondary" className="rounded-panel-inner px-3 py-3">
-      <View className="flex-row items-center justify-between gap-3">
-        <Text className="text-sm font-semibold" style={{ color: theme.text }}>{label}</Text>
-        <Text className="shrink text-right text-sm" style={{ color: theme.textSecondary }}>{value}</Text>
-      </View>
-    </Surface>
+    <ListGroup.Item>
+      <ListGroup.ItemContent>
+        <ListGroup.ItemTitle numberOfLines={1}>{label}</ListGroup.ItemTitle>
+      </ListGroup.ItemContent>
+      <ListGroup.ItemSuffix>
+        <Text className="shrink text-right text-sm text-muted-foreground" numberOfLines={1}>{value}</Text>
+      </ListGroup.ItemSuffix>
+    </ListGroup.Item>
   );
 }
 
@@ -439,7 +445,6 @@ function ActionRow({
   icon,
   tone,
   onPress,
-  theme,
 }: {
   label: string;
   subtitle?: string;
@@ -449,26 +454,23 @@ function ActionRow({
   theme: ReturnType<typeof useTheme>;
 }) {
   return (
-    <HeroButton
-      variant="secondary"
-      feedbackVariant="scale"
-      className="w-full min-h-[60px] items-stretch justify-start rounded-panel-inner px-3 py-3"
+    <ListGroup.Item
       onPress={onPress}
+      accessibilityRole="button"
       accessibilityLabel={label}
+      className="active:opacity-60"
     >
-      <View className="w-full flex-row items-center justify-between gap-3">
+      <ListGroup.ItemPrefix>
         <View className="h-9 w-9 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(tone, 0.12) }}>
           <Ionicons name={icon} size={18} color={tone} />
         </View>
-        <View className="min-w-0 flex-1">
-          <Text className="text-sm font-semibold leading-5" style={{ color: theme.text }} numberOfLines={1}>{label}</Text>
-          {subtitle ? (
-            <Text className="text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>{subtitle}</Text>
-          ) : null}
-        </View>
-        <Ionicons name="chevron-forward" size={18} color={theme.textMuted} />
-      </View>
-    </HeroButton>
+      </ListGroup.ItemPrefix>
+      <ListGroup.ItemContent>
+        <ListGroup.ItemTitle numberOfLines={1}>{label}</ListGroup.ItemTitle>
+        {subtitle ? <ListGroup.ItemDescription numberOfLines={2}>{subtitle}</ListGroup.ItemDescription> : null}
+      </ListGroup.ItemContent>
+      <ListGroup.ItemSuffix />
+    </ListGroup.Item>
   );
 }
 
@@ -477,7 +479,6 @@ function PrivacyVisibilityRow({
   value,
   disabled,
   onPress,
-  theme,
   t,
 }: {
   label: string;
@@ -487,18 +488,19 @@ function PrivacyVisibilityRow({
   theme: ReturnType<typeof useTheme>;
   t: (key: string, opts?: Record<string, unknown>) => string;
 }) {
+  const valueLabel = t(`privacy.visibility.${value}`);
   return (
-    <Surface variant="secondary" className="rounded-panel-inner px-3 py-3">
-      <View className="flex-row items-center justify-between gap-3">
-        <View className="min-w-0 flex-1">
-          <Text className="text-sm font-semibold leading-5" style={{ color: theme.text }} numberOfLines={1}>{label}</Text>
-          <Text className="text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={1}>{t(`privacy.visibility.${value}`)}</Text>
-        </View>
-        <HeroButton size="sm" variant="secondary" className="shrink-0" onPress={onPress} isDisabled={disabled}>
+    <ListGroup.Item>
+      <ListGroup.ItemContent>
+        <ListGroup.ItemTitle numberOfLines={1}>{label}</ListGroup.ItemTitle>
+        <ListGroup.ItemDescription numberOfLines={1}>{valueLabel}</ListGroup.ItemDescription>
+      </ListGroup.ItemContent>
+      <ListGroup.ItemSuffix>
+        <HeroButton size="sm" variant="secondary" onPress={onPress} isDisabled={disabled}>
           <HeroButton.Label>{t('privacy.changeVisibility')}</HeroButton.Label>
         </HeroButton>
-      </View>
-    </Surface>
+      </ListGroup.ItemSuffix>
+    </ListGroup.Item>
   );
 }
 
@@ -513,16 +515,21 @@ function SettingRow({
   onToggle: () => void;
   disabled: boolean;
 }) {
+  // The row itself is not pressable — the Switch owns the interaction (and its
+  // own disabled state), so we avoid a nested-Pressable touch conflict.
   return (
-    <Surface variant="secondary" className="rounded-panel-inner px-3 py-2.5">
-      <View className="min-h-10 justify-center">
+    <ListGroup.Item>
+      <ListGroup.ItemContent>
+        <ListGroup.ItemTitle numberOfLines={2}>{label}</ListGroup.ItemTitle>
+      </ListGroup.ItemContent>
+      <ListGroup.ItemSuffix>
         <Toggle
-          label={label}
           value={value}
           onValueChange={onToggle}
           disabled={disabled}
+          accessibilityLabel={label}
         />
-      </View>
-    </Surface>
+      </ListGroup.ItemSuffix>
+    </ListGroup.Item>
   );
 }
