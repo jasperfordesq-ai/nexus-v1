@@ -529,13 +529,14 @@ function ThreadScreenInner() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{ backgroundColor: theme.bg }}>
       <AppTopBar title={threadTitle} backLabel={t('thread.goBack')} fallbackHref="/(tabs)/messages" />
       <OfflineBanner />
       <KeyboardAvoidingView
         className="flex-1"
-        behavior="padding"
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 30}
+        style={{ flex: 1, backgroundColor: theme.bg }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
         <Surface variant="secondary" className="mx-4 mb-2 mt-3 flex-row items-center gap-3 rounded-panel-inner p-3">
           <Avatar uri={null} name={threadTitle} size={42} />
@@ -563,9 +564,11 @@ function ThreadScreenInner() {
           data={messages}
           keyExtractor={(item) => String(item.id)}
           renderItem={({ item }) => <MessageBubble item={item} primary={primary} theme={theme} t={t} unknownMemberLabel={unknownMemberLabel} onReact={handleReaction} onOptions={openMessageOptions} />}
+          style={{ flex: 1, backgroundColor: theme.bg }}
           contentContainerStyle={{
             flexGrow: 1,
             justifyContent: messages.length ? 'flex-start' : 'center',
+            backgroundColor: theme.bg,
             paddingHorizontal: 12,
             paddingVertical: 12,
           }}

@@ -21,7 +21,8 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { useRealtimeContext } from '@/lib/context/RealtimeContext';
-import FeedItem from '@/components/FeedItem';
+import FeedItem, { type FeedCommentTarget } from '@/components/FeedItem';
+import CommentSheet from '@/components/comments/CommentSheet';
 import OfflineBanner from '@/components/OfflineBanner';
 import StoryCircles from '@/components/StoryCircles';
 import TenantBanner from '@/components/TenantBanner';
@@ -79,7 +80,7 @@ interface SummaryCardItem {
 }
 
 export default function HomeScreen() {
-  const { t } = useTranslation(['home', 'common']);
+  const { t } = useTranslation(['home', 'common', 'exchanges']);
   const { user, displayName } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
@@ -91,6 +92,8 @@ export default function HomeScreen() {
     upcomingEvents: null,
     openRequests: null,
   });
+  const [commentTarget, setCommentTarget] = useState<FeedCommentTarget | null>(null);
+  const [commentCountOverrides, setCommentCountOverrides] = useState<Record<string, number>>({});
 
   const fetchFeed = useCallback(
     (cursor: string | null) => getFeed(1, cursor, { filter, mode: feedMode, subtype: subFilter }),
@@ -176,7 +179,31 @@ export default function HomeScreen() {
     router.push({ pathname: '/(modals)/member-profile', params: { id: String(memberId) } });
   }, []);
 
-  const renderItem = useCallback(({ item }: { item: FeedItemType }) => <FeedItem item={item} />, []);
+  const handleOpenComments = useCallback((target: FeedCommentTarget) => {
+    const key = `${target.targetType}-${target.targetId}`;
+    setCommentTarget({
+      ...target,
+      initialCount: commentCountOverrides[key] ?? target.initialCount,
+    });
+  }, [commentCountOverrides]);
+
+  const handleCommentCountChange = useCallback((count: number) => {
+    if (!commentTarget) return;
+    const key = `${commentTarget.targetType}-${commentTarget.targetId}`;
+    setCommentCountOverrides((previous) => ({ ...previous, [key]: count }));
+    setCommentTarget({ ...commentTarget, initialCount: count });
+  }, [commentTarget]);
+
+  const renderItem = useCallback(({ item }: { item: FeedItemType }) => {
+    const commentKey = `${item.type}-${item.id}`;
+    return (
+      <FeedItem
+        item={item}
+        commentsCountOverride={commentCountOverrides[commentKey]}
+        onOpenComments={handleOpenComments}
+      />
+    );
+  }, [commentCountOverrides, handleOpenComments]);
   const keyExtractor = useCallback((item: FeedItemType) => `${item.type}-${item.id}`, []);
   const activeFilterLabel = t(`filter.${filter}`);
 
@@ -467,6 +494,24 @@ export default function HomeScreen() {
       />
 
       <FAB icon="add" onPress={() => router.push('/(modals)/new-exchange')} position="bottom-right" />
+      <CommentSheet
+        visible={Boolean(commentTarget)}
+        targetType={commentTarget?.targetType ?? 'post'}
+        targetId={commentTarget?.targetId ?? 0}
+        initialCount={commentTarget?.initialCount ?? 0}
+        strings={{
+          title: t('comment'),
+          placeholder: t('exchanges:detail.commentPlaceholder'),
+          empty: t('exchanges:detail.noComments'),
+          loadFailed: t('exchanges:detail.commentsFailed'),
+          submitFailed: t('exchanges:detail.commentFailed'),
+          actionFailedTitle: t('exchanges:detail.actionFailedTitle'),
+          send: t('common:buttons.send'),
+          authorFallback: t('common:labels.member'),
+        }}
+        onClose={() => setCommentTarget(null)}
+        onCountChange={handleCommentCountChange}
+      />
     </SafeAreaView>
   );
 }

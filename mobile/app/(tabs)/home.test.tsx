@@ -109,12 +109,62 @@ jest.mock('@/lib/api/exchanges', () => ({
 }));
 
 jest.mock('@/components/FeedItem', () => {
-  const MockFeedItem = ({ item }: { item: { id: number; content?: string } }) => {
-    const { Text } = require('react-native');
-    return <Text>{item.content ?? `feed-item-${item.id}`}</Text>;
+  const MockFeedItem = ({
+    item,
+    commentsCountOverride,
+    onOpenComments,
+  }: {
+    item: { id: number; type?: string; content?: string; comments_count?: number };
+    commentsCountOverride?: number;
+    onOpenComments?: (target: { targetType: string; targetId: number; initialCount: number }) => void;
+  }) => {
+    const { Pressable, Text } = require('react-native');
+    return (
+      <>
+        <Text>{item.content ?? `feed-item-${item.id}`}</Text>
+        {commentsCountOverride != null ? <Text>{`override-count-${commentsCountOverride}`}</Text> : null}
+        <Pressable
+          accessibilityLabel={`open-comments-${item.id}`}
+          onPress={() => onOpenComments?.({
+            targetType: item.type ?? 'post',
+            targetId: item.id,
+            initialCount: item.comments_count ?? 0,
+          })}
+        >
+          <Text>{`comments-button-${item.id}`}</Text>
+        </Pressable>
+      </>
+    );
   };
   MockFeedItem.displayName = 'MockFeedItem';
   return MockFeedItem;
+});
+
+jest.mock('@/components/comments/CommentSheet', () => {
+  const MockCommentSheet = ({
+    visible,
+    targetType,
+    targetId,
+    onCountChange,
+  }: {
+    visible: boolean;
+    targetType: string;
+    targetId: number;
+    onCountChange?: (count: number) => void;
+  }) => {
+    const { Pressable, Text } = require('react-native');
+    if (!visible) return null;
+    return (
+      <>
+        <Text>{`home-comments-${targetType}-${targetId}`}</Text>
+        <Pressable accessibilityLabel="mock-comment-count-change" onPress={() => onCountChange?.(7)}>
+          <Text>count-change</Text>
+        </Pressable>
+      </>
+    );
+  };
+  MockCommentSheet.displayName = 'MockCommentSheet';
+  return MockCommentSheet;
 });
 
 jest.mock('@/components/OfflineBanner', () => () => null);
@@ -211,6 +261,44 @@ describe('HomeScreen', () => {
 
     const { getByText } = render(<HomeScreen />);
     expect(getByText('Hello, timebank!')).toBeTruthy();
+  });
+
+  it('opens feed comments from a screen-level sheet outside clipped list rows', () => {
+    mockUsePaginatedApi.mockReturnValueOnce({
+      items: [{ ...mockFeedItem, comments_count: 2 }],
+      isLoading: false,
+      isLoadingMore: false,
+      error: null,
+      hasMore: false,
+      loadMore: jest.fn(),
+      refresh: jest.fn(),
+    });
+
+    const { getByLabelText, getByText } = render(<HomeScreen />);
+
+    fireEvent.press(getByLabelText('open-comments-1'));
+
+    expect(getByText('home-comments-post-1')).toBeTruthy();
+  });
+
+  it('keeps updated comment counts in the home feed target map', () => {
+    mockUsePaginatedApi.mockReturnValue({
+      items: [{ ...mockFeedItem, comments_count: 2 }],
+      isLoading: false,
+      isLoadingMore: false,
+      error: null,
+      hasMore: false,
+      loadMore: jest.fn(),
+      refresh: jest.fn(),
+    });
+
+    const { getByLabelText, getByText } = render(<HomeScreen />);
+
+    fireEvent.press(getByLabelText('open-comments-1'));
+    fireEvent.press(getByLabelText('mock-comment-count-change'));
+
+    expect(getByText('home-comments-post-1')).toBeTruthy();
+    expect(getByText('override-count-7')).toBeTruthy();
   });
 
   it('shows error message with Retry button when feed fails to load', () => {

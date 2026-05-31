@@ -182,12 +182,12 @@ function ExchangeDetailModalInner() {
       void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       router.push({
         pathname: '/(modals)/thread',
-        params: { recipientId: String(recipientId), name: recipientName },
+        params: { recipientId: String(recipientId), name: recipientName, listing: String(safeExchangeId) },
       });
       // Reset after navigation begins so the button is re-enabled if user returns
       setTimeout(() => setIsSubmitting(false), 600);
     },
-    [isSubmitting],
+    [isSubmitting, safeExchangeId],
   );
 
   if (isNaN(exchangeId) || exchangeId <= 0) {

@@ -212,6 +212,19 @@ describe('ExchangeDetailModal', () => {
     expect(getByLabelText('Request this Service')).toBeTruthy();
   });
 
+  it('opens member messages with the listing context attached', () => {
+    mockUseApi.mockReturnValue({ data: { data: mockExchange }, isLoading: false, error: null, refresh: jest.fn() });
+    const { router } = require('expo-router');
+
+    const { getByLabelText } = render(<ExchangeDetailModal />);
+    fireEvent.press(getByLabelText('Message'));
+
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/(modals)/thread',
+      params: { recipientId: '42', name: 'Alice Baker', listing: '5' },
+    });
+  });
+
   it('opens listing comments in a native bottom sheet', () => {
     mockUseApi.mockReturnValue({ data: { data: mockExchange }, isLoading: false, error: null, refresh: jest.fn() });
 

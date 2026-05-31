@@ -28,6 +28,15 @@ import { formatRelativeTime } from '@/lib/utils/formatRelativeTime';
 interface FeedItemProps {
   item: FeedItemType;
   disableDetailNavigation?: boolean;
+  commentsCountOverride?: number;
+  onOpenComments?: (target: FeedCommentTarget) => void;
+  onCommentsCountChange?: (target: FeedCommentTarget, count: number) => void;
+}
+
+export interface FeedCommentTarget {
+  targetType: CommentTargetType;
+  targetId: number;
+  initialCount: number;
 }
 
 type ChipColor = 'accent' | 'default' | 'success' | 'warning' | 'danger';
@@ -179,14 +188,20 @@ function getDetailTarget(item: FeedItemType) {
   }
 }
 
-export default function FeedItem({ item, disableDetailNavigation = false }: FeedItemProps) {
+export default function FeedItem({
+  item,
+  disableDetailNavigation = false,
+  commentsCountOverride,
+  onOpenComments,
+  onCommentsCountChange,
+}: FeedItemProps) {
   const { t } = useTranslation(['home', 'exchanges', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
 
   const [liked, setLiked] = useState(item.is_liked ?? false);
   const [likesCount, setLikesCount] = useState(item.likes_count ?? 0);
-  const [commentsCount, setCommentsCount] = useState(item.comments_count ?? 0);
+  const [localCommentsCount, setLocalCommentsCount] = useState(item.comments_count ?? 0);
   const [pollData, setPollData] = useState<PollData | null | undefined>(item.poll_data);
   const [bookmarked, setBookmarked] = useState(item.is_bookmarked ?? false);
   const [actionSheetVisible, setActionSheetVisible] = useState(false);
@@ -296,9 +311,40 @@ export default function FeedItem({ item, disableDetailNavigation = false }: Feed
     void performLike();
   }
 
+  const typeConfig = getTypeConfig(item.type);
+  const imageItems = item.media
+    ?.filter((media) => media.media_type === 'image' && media.file_url)
+    .sort((a, b) => a.display_order - b.display_order)
+    .map((media) => ({ uri: resolveImageUrl(media.file_url) ?? media.file_url, alt: media.alt_text ?? undefined }));
+  const videoItems = item.media?.filter((media) => media.media_type === 'video' && media.file_url) ?? [];
+  const imageUrl = resolveImageUrl(item.image_url);
+  const author = getFeedAuthor(item, t('stories.member'));
+  const authorName = author.name;
+  const detailTarget = disableDetailNavigation ? null : getDetailTarget(item);
+  const isCommentable = COMMENTABLE_TYPES.has(item.type);
+  const canBookmark = BOOKMARKABLE_TYPES.has(item.type);
+  const commentsCount = commentsCountOverride ?? localCommentsCount;
+  const reactionTotal = item.reactions?.total ?? likesCount;
+  const linkPreview = item.link_previews?.[0];
+  const linkPreviewImageUrl = resolveImageUrl(linkPreview?.image_url);
+  const commentTarget = isCommentable
+    ? { targetType: item.type as CommentTargetType, targetId: item.id, initialCount: commentsCount }
+    : null;
+
   function handleCommentPress() {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (commentTarget && onOpenComments) {
+      onOpenComments(commentTarget);
+      return;
+    }
     setCommentsVisible(true);
+  }
+
+  function handleCommentsCountChange(count: number) {
+    setLocalCommentsCount(count);
+    if (commentTarget) {
+      onCommentsCountChange?.(commentTarget, count);
+    }
   }
 
   const handleShare = useCallback(async () => {
@@ -320,22 +366,6 @@ export default function FeedItem({ item, disableDetailNavigation = false }: Feed
       setBookmarked(wasBookmarked);
     }
   }, [bookmarked, item.id, item.type]);
-
-  const typeConfig = getTypeConfig(item.type);
-  const imageItems = item.media
-    ?.filter((media) => media.media_type === 'image' && media.file_url)
-    .sort((a, b) => a.display_order - b.display_order)
-    .map((media) => ({ uri: resolveImageUrl(media.file_url) ?? media.file_url, alt: media.alt_text ?? undefined }));
-  const videoItems = item.media?.filter((media) => media.media_type === 'video' && media.file_url) ?? [];
-  const imageUrl = resolveImageUrl(item.image_url);
-  const author = getFeedAuthor(item, t('stories.member'));
-  const authorName = author.name;
-  const detailTarget = disableDetailNavigation ? null : getDetailTarget(item);
-  const isCommentable = COMMENTABLE_TYPES.has(item.type);
-  const canBookmark = BOOKMARKABLE_TYPES.has(item.type);
-  const reactionTotal = item.reactions?.total ?? likesCount;
-  const linkPreview = item.link_previews?.[0];
-  const linkPreviewImageUrl = resolveImageUrl(linkPreview?.image_url);
 
   const cardLabel = `${authorName}. ${item.title ?? ''}${item.content ? '. ' + item.content.slice(0, 100) : ''}`;
 
@@ -606,7 +636,7 @@ export default function FeedItem({ item, disableDetailNavigation = false }: Feed
           ...(detailTarget ? [{ label: t(detailTarget.labelKey), icon: 'arrow-forward-outline', onPress: navigateToDetail }] : []),
         ]}
       />
-      {isCommentable ? (
+      {isCommentable && !onOpenComments ? (
         <CommentSheet
           visible={commentsVisible}
           targetType={item.type as CommentTargetType}
@@ -623,7 +653,7 @@ export default function FeedItem({ item, disableDetailNavigation = false }: Feed
             authorFallback: t('common:labels.member'),
           }}
           onClose={() => setCommentsVisible(false)}
-          onCountChange={setCommentsCount}
+          onCountChange={handleCommentsCountChange}
         />
       ) : null}
     </View>

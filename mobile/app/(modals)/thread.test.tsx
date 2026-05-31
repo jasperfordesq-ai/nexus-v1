@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
-import { Alert } from 'react-native';
+import { Alert, FlatList, KeyboardAvoidingView, Platform } from 'react-native';
 
 // --- Mocks ---
 
@@ -313,6 +313,12 @@ beforeEach(() => {
 });
 
 describe('ThreadScreen', () => {
+  const originalPlatformOS = Platform.OS;
+
+  afterEach(() => {
+    Object.defineProperty(Platform, 'OS', { configurable: true, get: () => originalPlatformOS });
+  });
+
   it('renders without crashing when data is loaded', () => {
     mockUseApi.mockReturnValue({
       data: { data: mockMessages },
@@ -336,6 +342,48 @@ describe('ThreadScreen', () => {
     const { getByLabelText, getByPlaceholderText } = render(<ThreadScreen />);
     expect(getByPlaceholderText('Type a message...')).toBeTruthy();
     expect(getByLabelText('Send')).toBeTruthy();
+  });
+
+  it('keeps the native chat frame full height with an explicit background', () => {
+    mockUseApi.mockReturnValue({
+      data: { data: [] },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { UNSAFE_getByType } = render(<ThreadScreen />);
+    const keyboardFrame = UNSAFE_getByType(KeyboardAvoidingView);
+    const messageList = UNSAFE_getByType(FlatList);
+
+    expect(keyboardFrame.props.style).toEqual(expect.objectContaining({
+      flex: 1,
+      backgroundColor: '#ffffff',
+    }));
+    expect(messageList.props.style).toEqual(expect.objectContaining({
+      flex: 1,
+      backgroundColor: '#ffffff',
+    }));
+    expect(messageList.props.contentContainerStyle).toEqual(expect.objectContaining({
+      flexGrow: 1,
+      backgroundColor: '#ffffff',
+    }));
+  });
+
+  it('uses Android height keyboard avoidance so the composer is resized instead of panned under the header', () => {
+    Object.defineProperty(Platform, 'OS', { configurable: true, get: () => 'android' });
+    mockUseApi.mockReturnValue({
+      data: { data: [] },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { UNSAFE_getByType } = render(<ThreadScreen />);
+    const keyboardFrame = UNSAFE_getByType(KeyboardAvoidingView);
+
+    expect(keyboardFrame.props.behavior).toBe('height');
+    expect(keyboardFrame.props.keyboardVerticalOffset).toBe(0);
   });
 
   it('renders message bubbles when messages are loaded', () => {
