@@ -138,12 +138,12 @@ function MarketplaceMapScreen() {
         keyExtractor={(item) => String(item.id)}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 132 }}
         ListHeaderComponent={
-          <View>
-            <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
+          <View className="gap-3">
+            <HeroCard className="overflow-hidden rounded-panel p-0">
               <View className="h-1.5" style={{ backgroundColor: primary }} />
               <HeroCard.Body className="gap-4 p-4">
                 <View className="flex-row items-start gap-3">
-                  <View className="size-13 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+                  <View className="size-12 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
                     <Ionicons name="map-outline" size={25} color={primary} />
                   </View>
                   <View className="min-w-0 flex-1 gap-1">
@@ -152,36 +152,55 @@ function MarketplaceMapScreen() {
                     <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('map.subtitle')}</Text>
                   </View>
                 </View>
-                <Surface variant="secondary" className="gap-3 rounded-panel-inner p-3">
-                  <View className="flex-row gap-2">
-                    <CoordinateInput label={t('map.latitude')} value={latitude} onChangeText={setLatitude} placeholder={t('map.latitudePlaceholder')} />
-                    <CoordinateInput label={t('map.longitude')} value={longitude} onChangeText={setLongitude} placeholder={t('map.longitudePlaceholder')} />
-                  </View>
-                  <FilterStrip label={t('map.radius')}>
-                    {RADIUS_OPTIONS.map((option) => (
-                      <FilterButton
-                        key={option}
-                        active={radius === option}
-                        label={t('map.radiusOption', { radius: option })}
-                        onPress={() => setRadius(option)}
-                      />
-                    ))}
-                  </FilterStrip>
-                  <HeroButton variant="primary" onPress={() => void search()} isDisabled={isLoading} style={{ backgroundColor: primary }}>
-                    <Ionicons name="locate-outline" size={16} color="#fff" />
-                    <HeroButton.Label>{t('map.search')}</HeroButton.Label>
-                  </HeroButton>
-                  <HeroButton variant="secondary" onPress={() => void searchCurrentLocation()} isDisabled={isLoading}>
-                    <Ionicons name="navigate-outline" size={16} color={primary} />
-                    <HeroButton.Label>{t('map.useCurrentLocation')}</HeroButton.Label>
-                  </HeroButton>
-                </Surface>
+                <MapPreview
+                  latitude={latitude}
+                  longitude={longitude}
+                  radius={radius}
+                  resultCount={items.length}
+                  hasSearched={hasSearched}
+                  primary={primary}
+                  theme={theme}
+                  t={t}
+                />
               </HeroCard.Body>
             </HeroCard>
+
+            <Surface variant="default" className="gap-4 rounded-panel p-4">
+              <View className="gap-1">
+                <Text className="text-base font-bold" style={{ color: theme.text }}>{t('map.searchPanelTitle')}</Text>
+                <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('map.searchPanelSubtitle')}</Text>
+              </View>
+              <View className="flex-row gap-2">
+                <CoordinateInput label={t('map.latitude')} value={latitude} onChangeText={setLatitude} placeholder={t('map.latitudePlaceholder')} />
+                <CoordinateInput label={t('map.longitude')} value={longitude} onChangeText={setLongitude} placeholder={t('map.longitudePlaceholder')} />
+              </View>
+              <FilterStrip label={t('map.radius')}>
+                {RADIUS_OPTIONS.map((option) => (
+                  <FilterButton
+                    key={option}
+                    active={radius === option}
+                    label={t('map.radiusOption', { radius: option })}
+                    onPress={() => setRadius(option)}
+                  />
+                ))}
+              </FilterStrip>
+              <View className="gap-2">
+                <HeroButton variant="primary" onPress={() => void search()} isDisabled={isLoading} style={{ backgroundColor: primary }}>
+                  <Ionicons name="locate-outline" size={16} color="#fff" />
+                  <HeroButton.Label>{t('map.search')}</HeroButton.Label>
+                </HeroButton>
+                <HeroButton variant="secondary" onPress={() => void searchCurrentLocation()} isDisabled={isLoading}>
+                  <Ionicons name="navigate-outline" size={16} color={primary} />
+                  <HeroButton.Label>{t('map.useCurrentLocation')}</HeroButton.Label>
+                </HeroButton>
+              </View>
+            </Surface>
+
             {items.length > 0 ? (
-              <View className="mb-2 gap-2">
-                <Text className="text-sm font-bold" style={{ color: theme.text }}>{t('map.results', { count: items.length })}</Text>
+              <View className="gap-2">
+                <Text className="text-base font-bold" style={{ color: theme.text }}>{t('map.resultsTitle')}</Text>
                 <View className="flex-row flex-wrap gap-2">
+                  <Chip size="sm" variant="secondary"><Chip.Label>{t('map.results', { count: items.length })}</Chip.Label></Chip>
                   <Chip size="sm" variant="secondary"><Chip.Label>{t('map.radiusLabel', { radius })}</Chip.Label></Chip>
                   <Chip size="sm" variant="secondary"><Chip.Label>{t('map.coordinatesLabel', { latitude, longitude })}</Chip.Label></Chip>
                 </View>
@@ -216,6 +235,74 @@ function MarketplaceMapScreen() {
         }
       />
     </SafeAreaView>
+  );
+}
+
+function MapPreview({
+  latitude,
+  longitude,
+  radius,
+  resultCount,
+  hasSearched,
+  primary,
+  theme,
+  t,
+}: {
+  latitude: string;
+  longitude: string;
+  radius: string;
+  resultCount: number;
+  hasSearched: boolean;
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+  t: ReturnType<typeof useTranslation>['t'];
+}) {
+  const hasCoordinates = parseCoordinate(latitude) !== null && parseCoordinate(longitude) !== null;
+
+  return (
+    <Surface variant="secondary" className="overflow-hidden rounded-panel-inner p-0">
+      <View className="relative h-48 overflow-hidden rounded-panel-inner">
+        <View className="absolute inset-0" style={{ backgroundColor: withAlpha(primary, 0.08) }} />
+        <View className="absolute left-0 right-0 top-12 h-px" style={{ backgroundColor: withAlpha(primary, 0.18) }} />
+        <View className="absolute left-0 right-0 top-24 h-px" style={{ backgroundColor: withAlpha(theme.text, 0.08) }} />
+        <View className="absolute left-0 right-0 top-36 h-px" style={{ backgroundColor: withAlpha(primary, 0.14) }} />
+        <View className="absolute bottom-0 top-0 left-16 w-px" style={{ backgroundColor: withAlpha(theme.text, 0.08) }} />
+        <View className="absolute bottom-0 top-0 left-36 w-px" style={{ backgroundColor: withAlpha(primary, 0.14) }} />
+        <View className="absolute bottom-0 top-0 right-20 w-px" style={{ backgroundColor: withAlpha(theme.text, 0.08) }} />
+
+        <View className="absolute left-7 top-8 size-7 items-center justify-center rounded-full" style={{ backgroundColor: withAlpha('#14b8a6', 0.16) }}>
+          <View className="size-2.5 rounded-full" style={{ backgroundColor: '#14b8a6' }} />
+        </View>
+        <View className="absolute right-10 top-12 size-8 items-center justify-center rounded-full" style={{ backgroundColor: withAlpha(primary, 0.18) }}>
+          <View className="size-3 rounded-full" style={{ backgroundColor: primary }} />
+        </View>
+        <View className="absolute bottom-10 left-28 size-7 items-center justify-center rounded-full" style={{ backgroundColor: withAlpha('#f59e0b', 0.18) }}>
+          <View className="size-2.5 rounded-full" style={{ backgroundColor: '#f59e0b' }} />
+        </View>
+
+        <View className="absolute inset-x-4 bottom-4 gap-3 rounded-panel-inner p-3" style={{ backgroundColor: withAlpha(theme.surface, 0.94) }}>
+          <View className="flex-row items-center justify-between gap-3">
+            <View className="min-w-0 flex-1">
+              <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>
+                {t('map.previewTitle')}
+              </Text>
+              <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+                {hasCoordinates
+                  ? t('map.previewCoordinates', { latitude, longitude })
+                  : t('map.previewCoordinatesEmpty')}
+              </Text>
+            </View>
+            <Chip size="sm" variant="secondary">
+              <Ionicons name="radio-button-on-outline" size={12} color={primary} />
+              <Chip.Label>{t('map.previewRadius', { radius })}</Chip.Label>
+            </Chip>
+          </View>
+          <Text className="text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>
+            {hasSearched ? t('map.pinCount', { count: resultCount }) : t('map.previewHint')}
+          </Text>
+        </View>
+      </View>
+    </Surface>
   );
 }
 

@@ -18,7 +18,7 @@ import { api } from '@/lib/api';
 
 /**
  * RevenueDashboard
- * God-only page: platform-wide billing overview at /admin/super/billing/revenue
+ * God-only page: platform-wide billing overview at /super-admin/billing/revenue
  */
 
 
@@ -189,7 +189,7 @@ export function RevenueDashboard() {
         </div>
         <Button
           as={Link}
-          to={tenantPath('/admin/super/billing')}
+          to={tenantPath('/super-admin/billing')}
           variant="tertiary"
           size="sm"
         >

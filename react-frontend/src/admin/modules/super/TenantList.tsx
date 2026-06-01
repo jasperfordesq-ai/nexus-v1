@@ -141,9 +141,9 @@ export function TenantList() {
     const handleMenuAction = (key: React.Key) => {
       const action = key as ActionKey;
       if (action === 'view') {
-        navigate(tenantPath(`/admin/super/tenants/${tenant.id}`));
+        navigate(tenantPath(`/super-admin/tenants/${tenant.id}`));
       } else if (action === 'edit') {
-        navigate(tenantPath(`/admin/super/tenants/${tenant.id}/edit`));
+        navigate(tenantPath(`/super-admin/tenants/${tenant.id}/edit`));
       } else {
         setConfirmAction({ type: action as 'delete' | 'deactivate' | 'reactivate' | 'toggle-hub', tenant });
       }
@@ -191,7 +191,7 @@ export function TenantList() {
       render: (tenant) => (
         <div>
           <Link
-            to={tenantPath(`/admin/super/tenants/${tenant.id}`)}
+            to={tenantPath(`/super-admin/tenants/${tenant.id}`)}
             className="font-medium text-foreground hover:text-accent"
           >
             {tenant.name}
@@ -262,7 +262,7 @@ export function TenantList() {
   return (
     <div>
       <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-muted mb-1">
-        <Link to={tenantPath('/admin/super')} className="hover:text-accent">{t('super.breadcrumb_super_admin')}</Link>
+        <Link to={tenantPath('/super-admin')} className="hover:text-accent">{t('super.breadcrumb_super_admin')}</Link>
         <span>/</span>
         <span className="text-foreground">{t('super.breadcrumb_tenants')}</span>
       </nav>
@@ -278,7 +278,7 @@ export function TenantList() {
             )}
             <Button
               as={Link}
-              to={tenantPath('/admin/super/tenants/hierarchy')}
+              to={tenantPath('/super-admin/tenants/hierarchy')}
               variant="tertiary"
               startContent={<Network aria-hidden="true" size={16} />}
               size="sm"
@@ -287,7 +287,7 @@ export function TenantList() {
             </Button>
             <Button
               startContent={<Plus aria-hidden="true" size={16} />}
-              onPress={() => navigate(tenantPath('/admin/super/tenants/create'))}
+              onPress={() => navigate(tenantPath('/super-admin/tenants/create'))}
             >
               {t('super.create_tenant')}
             </Button>

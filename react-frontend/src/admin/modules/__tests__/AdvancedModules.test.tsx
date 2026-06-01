@@ -12,7 +12,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 // ─── Common mocks ────────────────────────────────────────────────────────────
@@ -135,6 +135,13 @@ describe('Error404Tracking', () => {
   it('renders without crashing', () => {
     const { container } = render(<W><Error404Tracking /></W>);
     expect(container.querySelector('div')).toBeTruthy();
+  });
+
+  it('renders translated 404 tracking header copy', () => {
+    render(<W><Error404Tracking /></W>);
+
+    expect(screen.getByText('404 Error Tracking')).toBeInTheDocument();
+    expect(screen.getByText('Track pages that return 404 errors so you can create redirects or fix broken links')).toBeInTheDocument();
   });
 });
 

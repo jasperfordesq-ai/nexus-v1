@@ -452,7 +452,7 @@ function CreateCollectionModal({
   const primary = usePrimaryColor();
   const theme = useTheme();
   return (
-    <BottomSheet visible={visible} onClose={onClose} snapPoints={[440]}>
+    <BottomSheet visible={visible} onClose={onClose} snapPoints={['48%', '78%']}>
       <Surface variant="default" className="gap-4 rounded-panel p-4">
           <View className="flex-row items-center justify-between gap-3">
             <View className="min-w-0 flex-1">

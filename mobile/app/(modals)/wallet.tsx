@@ -33,6 +33,7 @@ import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
+import BottomSheet from '@/components/ui/BottomSheet';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 type TransactionFilter = 'all' | 'earned' | 'spent' | 'pending';
@@ -216,23 +217,6 @@ function WalletModalInner() {
               onDonate={() => setActiveAction(activeAction === 'donate' ? null : 'donate')}
             />
 
-            {activeAction ? (
-              <WalletActionPanel
-                action={activeAction}
-                balance={balance ?? 0}
-                theme={theme}
-                primary={primary}
-                t={t}
-                onClose={() => setActiveAction(null)}
-                onComplete={() => {
-                  setActiveAction(null);
-                  refresh();
-                }}
-                initialRecipientId={params.to}
-                initialRecipientName={params.name}
-              />
-            ) : null}
-
             <CommunityFundCard fund={fund} isLoading={fundQuery.isLoading} theme={theme} primary={primary} t={t} onDonate={() => setActiveAction('donate')} />
 
             <View className="flex-row gap-3">
@@ -288,6 +272,24 @@ function WalletModalInner() {
           </View>
         )}
       </ScrollView>
+      <BottomSheet visible={activeAction !== null} onClose={() => setActiveAction(null)} snapPoints={['72%', '92%']}>
+        {activeAction ? (
+          <WalletActionPanel
+            action={activeAction}
+            balance={balance ?? 0}
+            theme={theme}
+            primary={primary}
+            t={t}
+            onClose={() => setActiveAction(null)}
+            onComplete={() => {
+              setActiveAction(null);
+              refresh();
+            }}
+            initialRecipientId={params.to}
+            initialRecipientName={params.name}
+          />
+        ) : null}
+      </BottomSheet>
     </SafeAreaView>
   );
 }

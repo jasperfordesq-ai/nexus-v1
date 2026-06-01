@@ -26,6 +26,7 @@ import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
+import BottomSheet from '@/components/ui/BottomSheet';
 import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -205,8 +206,6 @@ export default function ReviewsScreen() {
               <PendingList
                 items={pending}
                 activePending={activePending}
-                rating={rating}
-                comment={comment}
                 submitting={submitting}
                 onStart={(item) => {
                   void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -214,10 +213,6 @@ export default function ReviewsScreen() {
                   setRating(0);
                   setComment('');
                 }}
-                onCancel={resetForm}
-                onRatingChange={setRating}
-                onCommentChange={setComment}
-                onSubmit={() => void handleSubmitReview()}
               />
             ) : visibleReviews.length > 0 ? (
               <View className="gap-3 px-4">
@@ -242,6 +237,20 @@ export default function ReviewsScreen() {
             )}
           </View>
         </ScrollView>
+        <BottomSheet visible={activePending !== null} onClose={resetForm} snapPoints={['52%', '84%']}>
+          {activePending ? (
+            <PendingReviewForm
+              item={activePending}
+              rating={rating}
+              comment={comment}
+              submitting={submitting}
+              onCancel={resetForm}
+              onRatingChange={setRating}
+              onCommentChange={setComment}
+              onSubmit={() => void handleSubmitReview()}
+            />
+          ) : null}
+        </BottomSheet>
       </SafeAreaView>
     </ModalErrorBoundary>
   );
@@ -250,25 +259,13 @@ export default function ReviewsScreen() {
 function PendingList({
   items,
   activePending,
-  rating,
-  comment,
   submitting,
   onStart,
-  onCancel,
-  onRatingChange,
-  onCommentChange,
-  onSubmit,
 }: {
   items: PendingReview[];
   activePending: PendingReview | null;
-  rating: number;
-  comment: string;
   submitting: boolean;
   onStart: (item: PendingReview) => void;
-  onCancel: () => void;
-  onRatingChange: (rating: number) => void;
-  onCommentChange: (comment: string) => void;
-  onSubmit: () => void;
 }) {
   const { t } = useTranslation(['profile']);
   const theme = useTheme();
@@ -314,38 +311,81 @@ function PendingList({
                 </View>
               </View>
 
-              {isActive ? (
-                <View className="gap-3">
-                  <StarPicker rating={rating} onChange={onRatingChange} />
-                  <Input
-                    label={t('reviews.comment')}
-                    placeholder={t('reviews.commentPlaceholder')}
-                    value={comment}
-                    onChangeText={onCommentChange}
-                    multiline
-                    numberOfLines={4}
-                    textAlignVertical="top"
-                    containerClassName="mb-0"
-                  />
-                  <View className="flex-row gap-2">
-                    <HeroButton className="flex-1" variant="secondary" onPress={onCancel} isDisabled={submitting}>
-                      <HeroButton.Label>{t('reviews.cancel')}</HeroButton.Label>
-                    </HeroButton>
-                    <HeroButton className="flex-1" variant="primary" onPress={onSubmit} isDisabled={rating < 1 || submitting} style={{ backgroundColor: primary }}>
-                      <HeroButton.Label>{t('reviews.submit')}</HeroButton.Label>
-                    </HeroButton>
-                  </View>
-                </View>
-              ) : (
-                <HeroButton size="sm" variant="primary" onPress={() => onStart(item)} style={{ backgroundColor: primary }}>
-                  <Ionicons name="create-outline" size={14} color="#fff" />
-                  <HeroButton.Label>{t('reviews.write')}</HeroButton.Label>
-                </HeroButton>
-              )}
+              <HeroButton
+                size="sm"
+                variant={isActive ? 'secondary' : 'primary'}
+                isDisabled={submitting}
+                onPress={() => onStart(item)}
+                style={!isActive ? { backgroundColor: primary } : undefined}
+              >
+                <Ionicons name="create-outline" size={14} color={isActive ? primary : '#fff'} />
+                <HeroButton.Label>{t('reviews.write')}</HeroButton.Label>
+              </HeroButton>
             </HeroCard.Body>
           </HeroCard>
         );
       })}
+    </View>
+  );
+}
+
+function PendingReviewForm({
+  item,
+  rating,
+  comment,
+  submitting,
+  onCancel,
+  onRatingChange,
+  onCommentChange,
+  onSubmit,
+}: {
+  item: PendingReview;
+  rating: number;
+  comment: string;
+  submitting: boolean;
+  onCancel: () => void;
+  onRatingChange: (rating: number) => void;
+  onCommentChange: (comment: string) => void;
+  onSubmit: () => void;
+}) {
+  const { t } = useTranslation(['profile']);
+  const theme = useTheme();
+  const primary = usePrimaryColor();
+
+  return (
+    <View className="gap-4 py-2">
+      <View className="flex-row items-center gap-3">
+        <Avatar uri={item.receiver_avatar ?? undefined} name={item.receiver_name} size={46} />
+        <View className="min-w-0 flex-1">
+          <Text className="text-lg font-bold" style={{ color: theme.text }} numberOfLines={1}>
+            {item.receiver_name}
+          </Text>
+          {item.exchange_title ? (
+            <Text className="text-sm" style={{ color: theme.textSecondary }} numberOfLines={2}>
+              {t('reviews.forExchange', { title: item.exchange_title })}
+            </Text>
+          ) : null}
+        </View>
+      </View>
+      <StarPicker rating={rating} onChange={onRatingChange} />
+      <Input
+        label={t('reviews.comment')}
+        placeholder={t('reviews.commentPlaceholder')}
+        value={comment}
+        onChangeText={onCommentChange}
+        multiline
+        numberOfLines={4}
+        textAlignVertical="top"
+        containerClassName="mb-0"
+      />
+      <View className="flex-row gap-2">
+        <HeroButton className="flex-1" variant="secondary" onPress={onCancel} isDisabled={submitting}>
+          <HeroButton.Label>{t('reviews.cancel')}</HeroButton.Label>
+        </HeroButton>
+        <HeroButton className="flex-1" variant="primary" onPress={onSubmit} isDisabled={rating < 1 || submitting} style={{ backgroundColor: primary }}>
+          <HeroButton.Label>{t('reviews.submit')}</HeroButton.Label>
+        </HeroButton>
+      </View>
     </View>
   );
 }

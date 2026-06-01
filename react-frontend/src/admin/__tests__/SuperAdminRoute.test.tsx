@@ -101,6 +101,17 @@ describe('SuperAdminRoute', () => {
     expect(screen.getByTestId('super-content')).toBeInTheDocument();
   });
 
+  it('allows god users through', () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: 1, role: 'admin', is_super_admin: false, is_god: true },
+      isLoading: false,
+      status: 'authenticated',
+    });
+
+    renderWithRouter();
+    expect(screen.getByTestId('super-content')).toBeInTheDocument();
+  });
+
   it('blocks regular admin users', () => {
     mockUseAuth.mockReturnValue({
       user: { id: 1, role: 'admin', is_super_admin: false },

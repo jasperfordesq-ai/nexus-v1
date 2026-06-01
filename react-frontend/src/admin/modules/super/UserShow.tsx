@@ -224,7 +224,7 @@ export function UserShow() {
     return (
       <div className="p-8 text-center">
         <p className="text-muted">{t('super.user_not_found')}</p>
-        <Button className="mt-4" variant="secondary" onPress={() => navigate(tenantPath('/admin/super/users'))}>
+        <Button className="mt-4" variant="secondary" onPress={() => navigate(tenantPath('/super-admin/users'))}>
           {t('super.back_to_users')}
         </Button>
       </div>
@@ -243,14 +243,14 @@ export function UserShow() {
             <Button
               variant="primary"
               startContent={<Edit aria-hidden="true" size={16} />}
-              onPress={() => navigate(tenantPath(`/admin/super/users/${user.id}/edit`))}
+              onPress={() => navigate(tenantPath(`/super-admin/users/${user.id}/edit`))}
             >
               {t('super.edit')}
             </Button>
             <Button
               variant="secondary"
               startContent={<ArrowLeft aria-hidden="true" size={16} />}
-              onPress={() => navigate(tenantPath('/admin/super/users'))}
+              onPress={() => navigate(tenantPath('/super-admin/users'))}
             >
               {t('super.back_to_users')}
             </Button>
@@ -367,7 +367,7 @@ export function UserShow() {
                 <div>
                   <p className="text-xs text-muted">{t('super.label_current_tenant')}</p>
                   <Link
-                    to={tenantPath(`/admin/super/tenants/${user.tenant_id}`)}
+                    to={tenantPath(`/super-admin/tenants/${user.tenant_id}`)}
                     className="text-sm font-medium text-accent hover:underline"
                   >
                     {user.tenant_name || t('super.tenant_with_id', { id: user.tenant_id })}
@@ -538,7 +538,7 @@ export function UserShow() {
                   variant="primary"
                   startContent={<Edit aria-hidden="true" size={16} />}
                   fullWidth
-                  onPress={() => navigate(tenantPath(`/admin/super/users/${user.id}/edit`))}
+                  onPress={() => navigate(tenantPath(`/super-admin/users/${user.id}/edit`))}
                 >
                   {t('super.edit_user')}
                 </Button>
@@ -557,7 +557,7 @@ export function UserShow() {
                   variant="secondary"
                   startContent={<ArrowLeft aria-hidden="true" size={16} />}
                   fullWidth
-                  onPress={() => navigate(tenantPath('/admin/super/users'))}
+                  onPress={() => navigate(tenantPath('/super-admin/users'))}
                 >
                   {t('super.back_to_users')}
                 </Button>

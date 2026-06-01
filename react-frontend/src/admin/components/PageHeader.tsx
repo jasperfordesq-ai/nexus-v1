@@ -31,9 +31,9 @@ export function PageHeader({ title, description, subtitle, icon, actions }: Page
   const body = description ?? subtitle;
   const location = useLocation();
 
-  // Strip the tenant-slug prefix so /slug/caring/foo → /caring/foo
-  // and /slug/admin/national/kiss → /admin/national/kiss
-  const normalizedPath = location.pathname.replace(/^\/[^/]+(?=\/(?:admin|caring))/, '');
+  // Strip the tenant-slug prefix so /slug/caring/foo -> /caring/foo
+  // and /slug/super-admin/national/kiss -> /super-admin/national/kiss.
+  const normalizedPath = location.pathname.replace(/^\/[^/]+(?=\/(?:admin|caring|super-admin))/, '');
   const article = HELP_CONTENT[normalizedPath] ?? HELP_CONTENT[location.pathname] ?? null;
 
   const [helpOpen, setHelpOpen] = useState(false);

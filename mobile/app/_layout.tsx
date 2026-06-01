@@ -24,6 +24,8 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import { navigateToLink } from '@/lib/utils/navigateToLink';
 import * as Sentry from '@sentry/react-native';
 
+const NATIVE_SCREEN_BACKGROUND = '#0F0F0F';
+
 // Validate environment variables at startup — logs warnings for missing config
 validateEnv();
 
@@ -57,7 +59,7 @@ function RootLayout() {
             <TenantProvider>
               <AuthProvider>
                 <RealtimeProvider>
-                  <StatusBar style="auto" />
+                  <StatusBar style="light" />
                   <RootNavigator />
                 </RealtimeProvider>
               </AuthProvider>
@@ -162,7 +164,7 @@ function RootNavigator() {
     animation: 'slide_from_bottom' as const,
     gestureEnabled: true,
     gestureDirection: 'vertical' as const,
-    contentStyle: { backgroundColor: 'transparent' },
+    contentStyle: { backgroundColor: NATIVE_SCREEN_BACKGROUND },
   };
 
   return (
@@ -577,7 +579,7 @@ function RootNavigator() {
           headerShown: false,
           gestureEnabled: true,
           gestureDirection: 'vertical',
-          contentStyle: { backgroundColor: 'transparent' },
+          contentStyle: { backgroundColor: NATIVE_SCREEN_BACKGROUND },
         }}
       />
     </Stack>

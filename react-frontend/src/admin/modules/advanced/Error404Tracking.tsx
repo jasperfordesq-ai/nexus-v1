@@ -27,7 +27,7 @@ interface Error404Entry {
 }
 
 export function Error404Tracking() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin', { keyPrefix: 'advanced' });
   const { t: tNav } = useTranslation('admin_nav');
   usePageTitle(tNav('advanced'));
   const toast = useToast();

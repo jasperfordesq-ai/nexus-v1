@@ -38,6 +38,7 @@ import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
+import BottomSheet from '@/components/ui/BottomSheet';
 import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
@@ -301,6 +302,7 @@ function VolunteeringDetailScreenInner() {
   const theme = useTheme();
   const [interestSent, setInterestSent] = useState(false);
   const [interestLoading, setInterestLoading] = useState(false);
+  const [applySheetOpen, setApplySheetOpen] = useState(false);
   const [applyMessage, setApplyMessage] = useState('');
   const [signingShiftId, setSigningShiftId] = useState<number | null>(null);
   const [applicationActionId, setApplicationActionId] = useState<number | null>(null);
@@ -360,6 +362,7 @@ function VolunteeringDetailScreenInner() {
       await expressInterest(opportunity.id, applyMessage.trim() || undefined);
       setInterestSent(true);
       setApplyMessage('');
+      setApplySheetOpen(false);
       refresh();
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert(t('interestSentTitle'), t('interestSentMessage'));
@@ -649,21 +652,9 @@ function VolunteeringDetailScreenInner() {
                   {hasApplied ? t('applicationSubmittedHint') : t('coverMessageHint')}
                 </Text>
               </View>
-              {!hasApplied ? (
-                <Input
-                  value={applyMessage}
-                  onChangeText={setApplyMessage}
-                  placeholder={t('coverMessagePlaceholder')}
-                  placeholderTextColor={theme.textMuted}
-                  multiline
-                  className="min-h-[104px] text-base"
-                  style={{ color: theme.text, textAlignVertical: 'top' }}
-                  accessibilityLabel={t('coverMessagePlaceholder')}
-                />
-              ) : null}
               <HeroButton
                 isDisabled={!open || hasApplied || interestLoading}
-                onPress={() => void handleApply()}
+                onPress={() => setApplySheetOpen(true)}
               >
                 {interestLoading ? (
                   <Spinner size="sm" />
@@ -680,6 +671,41 @@ function VolunteeringDetailScreenInner() {
           </HeroCard>
         )}
       </ScrollView>
+      <BottomSheet visible={!opportunity.is_owner && applySheetOpen} onClose={() => setApplySheetOpen(false)} snapPoints={['52%', '84%']}>
+        <View className="gap-4 py-2">
+          <View>
+            <Text className="text-lg font-bold" style={{ color: theme.text }}>
+              {t('applyToVolunteer')}
+            </Text>
+            <Text className="mt-1 text-sm leading-5" style={{ color: theme.textSecondary }}>
+              {t('coverMessageHint')}
+            </Text>
+          </View>
+          <Input
+            value={applyMessage}
+            onChangeText={setApplyMessage}
+            placeholder={t('coverMessagePlaceholder')}
+            placeholderTextColor={theme.textMuted}
+            multiline
+            className="min-h-[124px] text-base"
+            style={{ color: theme.text, textAlignVertical: 'top' }}
+            accessibilityLabel={t('coverMessagePlaceholder')}
+          />
+          <View className="flex-row gap-3">
+            <HeroButton className="flex-1" variant="secondary" isDisabled={interestLoading} onPress={() => setApplySheetOpen(false)}>
+              <HeroButton.Label>{t('common:buttons.cancel')}</HeroButton.Label>
+            </HeroButton>
+            <HeroButton
+              className="flex-1"
+              isDisabled={!open || hasApplied || interestLoading}
+              onPress={() => void handleApply()}
+            >
+              {interestLoading ? <Spinner size="sm" /> : <Ionicons name="send-outline" size={18} color="#fff" />}
+              <HeroButton.Label>{t('expressInterest')}</HeroButton.Label>
+            </HeroButton>
+          </View>
+        </View>
+      </BottomSheet>
     </SafeAreaView>
   );
 }

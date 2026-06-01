@@ -91,10 +91,10 @@ export function SuperUserForm() {
     if (res?.success) {
       toast.success(isEditing ? t('super.user_updated_successfully') : t('super.user_created_successfully'));
       if (isEditing) {
-        navigate(tenantPath(`/admin/super/users/${id}`));
+        navigate(tenantPath(`/super-admin/users/${id}`));
       } else {
         const newId = (res as { data?: { user_id?: number } }).data?.user_id;
-        navigate(tenantPath(newId ? `/admin/super/users/${newId}` : '/admin/super/users'));
+        navigate(tenantPath(newId ? `/super-admin/users/${newId}` : '/super-admin/users'));
       }
     } else {
       toast.error(res?.error || t('super.failed_to_save_user'));
@@ -140,9 +140,9 @@ export function SuperUserForm() {
   return (
     <div>
       <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-muted mb-1">
-        <Link to={tenantPath('/admin/super')} className="hover:text-accent">{t('super.page_title')}</Link>
+        <Link to={tenantPath('/super-admin')} className="hover:text-accent">{t('super.page_title')}</Link>
         <span>/</span>
-        <Link to={tenantPath('/admin/super/users')} className="hover:text-accent">{t('super.users')}</Link>
+        <Link to={tenantPath('/super-admin/users')} className="hover:text-accent">{t('super.users')}</Link>
         <span>/</span>
         <span className="text-foreground">{isEditing ? t('super.breadcrumb_edit') : t('super.breadcrumb_create')}</span>
       </nav>
@@ -151,7 +151,7 @@ export function SuperUserForm() {
         description={isEditing ? t('super.edit_user_desc') : t('super.create_user_desc')}
         actions={
           <Button variant="tertiary" startContent={<ArrowLeft size={16} />}
-            onPress={() => navigate(tenantPath(isEditing ? `/admin/super/users/${id}` : '/admin/super/users'))}>
+            onPress={() => navigate(tenantPath(isEditing ? `/super-admin/users/${id}` : '/super-admin/users'))}>
             {t('super.back')}
           </Button>
         }
@@ -348,7 +348,7 @@ export function SuperUserForm() {
                   </div>
                   <div>
                     <p className="text-xs text-muted">{t('super.label_tenant')}</p>
-                    <Link to={tenantPath(`/admin/super/tenants/${user.tenant_id}`)} className="text-sm text-accent hover:underline">
+                    <Link to={tenantPath(`/super-admin/tenants/${user.tenant_id}`)} className="text-sm text-accent hover:underline">
                       {user.tenant_name || t('super.tenant_with_id', { id: user.tenant_id })}
                     </Link>
                   </div>
@@ -387,7 +387,7 @@ export function SuperUserForm() {
                 </div>
                 <p className="text-xs text-muted mt-2">
                   {t('super.manage_sa_from')}{' '}
-                  <Link to={tenantPath(`/admin/super/users/${id}`)} className="text-accent hover:underline">
+                  <Link to={tenantPath(`/super-admin/users/${id}`)} className="text-accent hover:underline">
                     {t('super.user_detail_page')}
                   </Link>
                 </p>
@@ -402,14 +402,14 @@ export function SuperUserForm() {
                 <Button
                   variant="tertiary"
                   fullWidth
-                  onPress={() => navigate(tenantPath(`/admin/super/users/${id}`))}
+                  onPress={() => navigate(tenantPath(`/super-admin/users/${id}`))}
                 >
                   {t('super.view_full_details')}
                 </Button>
                 <Button
                   variant="tertiary"
                   fullWidth
-                  onPress={() => navigate(tenantPath('/admin/super/users'))}
+                  onPress={() => navigate(tenantPath('/super-admin/users'))}
                 >
                   {t('super.back_to_users')}
                 </Button>

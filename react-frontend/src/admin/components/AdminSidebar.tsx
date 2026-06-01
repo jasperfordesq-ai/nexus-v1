@@ -56,7 +56,6 @@ import Shield from 'lucide-react/icons/shield';
 import KeyIcon from 'lucide-react/icons/key';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import Heart from 'lucide-react/icons/heart';
-import HelpCircle from 'lucide-react/icons/help-circle';
 import Timer from 'lucide-react/icons/timer';
 import Contact from 'lucide-react/icons/contact';
 import StickyNote from 'lucide-react/icons/sticky-note';
@@ -147,9 +146,9 @@ const RECENT_PAGES_KEY = 'admin_recent_pages';
 const RECENT_PAGES_MAX = 5;
 
 const ZONES: NavZone[] = [
-  { key: 'overview', label: 'zone_overview', sectionKeys: ['dashboard', 'broker-panel'] },
+  { key: 'overview', label: 'zone_overview', sectionKeys: ['dashboard', 'broker-panel', 'super-admin'] },
   { key: 'people', label: 'zone_people', sectionKeys: ['users', 'crm'] },
-  { key: 'community', label: 'zone_community', sectionKeys: ['caring_community', 'community', 'listings', 'content', 'jobs'] },
+  { key: 'community', label: 'zone_community', sectionKeys: ['community', 'listings', 'content', 'jobs'] },
   { key: 'safety', label: 'zone_safety', sectionKeys: ['moderation', 'matching'] },
   { key: 'communications', label: 'zone_communications', sectionKeys: ['communications', 'marketing', 'advertising'] },
   { key: 'growth', label: 'zone_growth', sectionKeys: ['engagement', 'analytics', 'discovery'] },
@@ -217,10 +216,12 @@ function useAdminNav(safeguardingFlagCount: number): NavSection[] {
   const isSuperAdmin =
     (user?.role as string) === 'super_admin' ||
     userRecord?.is_super_admin === true ||
-    userRecord?.is_tenant_super_admin === true;
+    userRecord?.is_tenant_super_admin === true ||
+    userRecord?.is_god === true;
   const isPlatformSuperAdmin =
     (user?.role as string) === 'super_admin' ||
-    userRecord?.is_super_admin === true;
+    userRecord?.is_super_admin === true ||
+    userRecord?.is_god === true;
 
   return useMemo(() => {
     const communityItems: NavItem[] = [
@@ -252,6 +253,13 @@ function useAdminNav(safeguardingFlagCount: number): NavSection[] {
         href: '/broker',
         zone: 'overview',
       },
+      ...(isSuperAdmin ? [{
+        key: 'super-admin',
+        label: t('super_admin_panel'),
+        icon: Crown,
+        href: '/super-admin',
+        zone: 'overview' as const,
+      }] : []),
       {
         key: 'users',
         label: t('users'),
@@ -281,7 +289,7 @@ function useAdminNav(safeguardingFlagCount: number): NavSection[] {
         label: t('caring_community'),
         icon: Heart,
         href: '/caring',
-        zone: 'community' as const,
+        zone: 'pinned' as const,
       }] : []),
       ...(communityItems.length > 0 ? [{
         key: 'community',
@@ -552,30 +560,6 @@ function useAdminNav(safeguardingFlagCount: number): NavSection[] {
         icon: Webhook,
         zone: 'platform',
         items: [{ label: t('api_partners'), href: '/admin/api-partners', icon: KeyIcon }],
-      });
-    }
-
-    if (isSuperAdmin) {
-      sections.push({
-        key: 'super-admin',
-        label: t('super_admin'),
-        icon: Crown,
-        zone: 'pinned',
-        items: [
-          { label: t('super_dashboard'), href: '/admin/super', icon: Crown },
-          { label: t('national_kiss_dashboard'), href: '/admin/national/kiss', icon: Landmark },
-          { label: t('provisioning_queue'), href: '/admin/provisioning-requests', icon: Building2 },
-          { label: t('super_tenants'), href: '/admin/super/tenants', icon: Building2 },
-          { label: t('super_hierarchy'), href: '/admin/super/tenants/hierarchy', icon: Network },
-          { label: t('super_cross_tenant_users'), href: '/admin/super/users', icon: Users },
-          { label: t('super_bulk_operations'), href: '/admin/super/bulk', icon: ListChecks },
-          { label: t('super_audit_log'), href: '/admin/super/audit', icon: ScrollText },
-          { label: t('super_federation_controls'), href: '/admin/super/federation', icon: Globe },
-          { label: t('super_federation_whitelist'), href: '/admin/super/federation/whitelist', icon: Shield },
-          { label: t('super_federation_partnerships'), href: '/admin/super/federation/partnerships', icon: Handshake },
-          { label: t('super_federation_audit'), href: '/admin/super/federation/audit', icon: FileSearch },
-          { label: t('regional_analytics_paid'), href: '/admin/regional-analytics/subscriptions', icon: BarChart3 },
-        ],
       });
     }
 
@@ -856,7 +840,7 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
       .map((key) => sections.find((section) => section.key === key))
       .filter((section): section is NavSection => Boolean(section)),
   })).filter((zone) => zone.sections.length > 0);
-  const superAdmin = sections.find((section) => section.key === 'super-admin');
+  const caringCommunity = sections.find((section) => section.key === 'caring_community');
 
   return (
     <aside
@@ -946,15 +930,9 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
           </ul>
         ) : collapsed ? (
           <ul className="space-y-1">
-            {sections.filter((section) => section.key !== 'super-admin').map((section) => (
+            {sections.filter((section) => section.key !== 'caring_community').map((section) => (
               <li key={section.key}>{renderCollapsedSection(section)}</li>
             ))}
-            {superAdmin && (
-              <>
-                <li><div className="mx-2 my-2 border-t border-divider" /></li>
-                <li>{renderCollapsedSection(superAdmin)}</li>
-              </>
-            )}
           </ul>
         ) : (
           <ul className="space-y-1">
@@ -1004,29 +982,38 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
               </li>
             ))}
 
-            {superAdmin && (
-              <li>
-                <div className="my-2 border-t border-warning/30" />
-                {renderSection(superAdmin)}
-              </li>
-            )}
           </ul>
         )}
       </ScrollShadow>
 
       <div className="shrink-0 border-t border-divider px-2 py-2">
-        <Tooltip content={t('help_centre')} placement="right" isDisabled={!collapsed}>
-          <Link
-            to={tenantPath('/admin/help')}
-            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-surface-secondary ${
-              location.pathname.includes('/admin/help') ? 'bg-accent/10 text-accent' : 'text-muted'
-            } ${collapsed ? 'justify-center' : ''}`}
-            title={t('help_centre')}
-          >
-            <HelpCircle size={16} className="shrink-0" />
-            {!collapsed && <span>{t('help_centre')}</span>}
-          </Link>
-        </Tooltip>
+        {caringCommunity && (
+          <Tooltip content={caringCommunity.label} placement="right" isDisabled={!collapsed}>
+            <Link
+              to={tenantPath(caringCommunity.href ?? '/caring')}
+              onClick={() => {
+                if (caringCommunity.href) trackVisit(caringCommunity.label, caringCommunity.href);
+              }}
+              aria-current={isActive(caringCommunity.href ?? '/caring') ? 'page' : undefined}
+              className={`mb-1 flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold transition-colors ${
+                isActive(caringCommunity.href ?? '/caring')
+                  ? 'border-accent/30 bg-accent/10 text-accent'
+                  : 'border-warning/30 bg-warning/10 text-warning hover:bg-warning/15'
+              } ${collapsed ? 'justify-center' : ''}`}
+              title={caringCommunity.label}
+            >
+              <Heart size={16} className="shrink-0" />
+              {!collapsed && (
+                <>
+                  <span className="min-w-0 flex-1 truncate">{caringCommunity.label}</span>
+                  <span className="shrink-0 rounded-full bg-warning px-2 py-0.5 text-[10px] font-bold uppercase text-warning-foreground">
+                    {t('alpha_badge')}
+                  </span>
+                </>
+              )}
+            </Link>
+          </Tooltip>
+        )}
       </div>
     </aside>
   );

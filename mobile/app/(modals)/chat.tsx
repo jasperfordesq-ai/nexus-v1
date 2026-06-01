@@ -715,7 +715,7 @@ function ChatScreenInner() {
         visible={Boolean(pendingFeedbackNote)}
         onClose={closeFeedbackNote}
         title={t('feedback.noteTitle')}
-        snapPoints={[360]}
+        snapPoints={['44%', '70%']}
       >
         <View className="gap-4 px-1 pb-2">
           <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>

@@ -2,6 +2,9 @@
   "newTitle": "Liostáil nua",
   "detailTitle": "Sonraí na liostála",
   "share": "Roinn liostáil",
+  "detail": {
+    "messageMember": "Teachtaireacht"
+  },
   "groupExchanges": {
     "create": {
       "open": "Create group exchange",

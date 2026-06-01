@@ -8,6 +8,7 @@
   "matching": "Dopasowanie i bezpieczeństwo",
   "moderation": "Umiar",
   "community": "Wspólnota",
+  "alpha_badge": "Alpha",
   "marketing": "Marketing",
   "analytics_reporting": "Analityka i raportowanie",
   "advanced": "Zaawansowany",
@@ -259,5 +260,6 @@
   "skip_to_main": "Skip to main content",
   "admin_navigation": "Admin navigation",
   "close_sidebar": "Close sidebar",
-  "support_reports": "Support Reports"
+  "support_reports": "Support Reports",
+  "super_admin_panel": "Super Admin Panel"
 }

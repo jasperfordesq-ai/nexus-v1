@@ -9,6 +9,7 @@
   "matching": "Matching en veiligheid",
   "moderation": "Matiging",
   "community": "Gemeenschap",
+  "alpha_badge": "Alpha",
   "marketing": "Marketing",
   "analytics_reporting": "Analyse en rapportage",
   "advanced": "Geavanceerd",
@@ -259,5 +260,6 @@
   "skip_to_main": "Skip to main content",
   "admin_navigation": "Admin navigation",
   "close_sidebar": "Close sidebar",
-  "support_reports": "Support Reports"
+  "support_reports": "Support Reports",
+  "super_admin_panel": "Super Admin Panel"
 }

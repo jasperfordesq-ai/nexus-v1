@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
-import { Linking } from 'react-native';
+import { Linking, ScrollView, StyleSheet } from 'react-native';
 
 // --- Mocks ---
 
@@ -112,6 +112,17 @@ jest.mock('@/lib/hooks/useTheme', () => ({
   }),
 }));
 
+jest.mock('react-native-safe-area-context', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return {
+    SafeAreaView: ({ children, style }: { children: React.ReactNode; style?: unknown }) => (
+      <View style={style}>{children}</View>
+    ),
+    useSafeAreaInsets: () => ({ top: 0, right: 0, bottom: 24, left: 0 }),
+  };
+});
+
 jest.mock('@/lib/hooks/useAuth', () => ({
   useAuth: () => ({ user: { id: 3, name: 'Current User' } }),
 }));
@@ -213,6 +224,19 @@ describe('EventDetailScreen', () => {
 
     const { getByText } = render(<EventDetailScreen />);
     expect(getByText('Going')).toBeTruthy();
+  });
+
+  it('keeps the RSVP footer above the device safe area and reserves scroll space', () => {
+    mockUseApi.mockReturnValue({ data: { data: mockEvent }, isLoading: false, error: null, refresh: jest.fn() });
+
+    const { getByTestId, UNSAFE_getAllByType } = render(<EventDetailScreen />);
+    const mainScroll = UNSAFE_getAllByType(ScrollView).find((node) => node.props.contentContainerStyle?.paddingHorizontal === 16);
+
+    expect(StyleSheet.flatten(getByTestId('event-rsvp-footer').props.style)).toEqual(
+      expect.objectContaining({ paddingBottom: 36 }),
+    );
+    expect(mainScroll?.props.contentContainerStyle).toEqual(expect.objectContaining({ paddingBottom: expect.any(Number) }));
+    expect(mainScroll?.props.contentContainerStyle.paddingBottom).toBeGreaterThanOrEqual(124);
   });
 
   it('submits an RSVP and updates the visible attendee count', async () => {

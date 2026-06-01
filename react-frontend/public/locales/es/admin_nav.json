@@ -8,6 +8,7 @@
   "matching": "Coincidencia y seguridad",
   "moderation": "Moderación",
   "community": "Comunidad",
+  "alpha_badge": "Alpha",
   "marketing": "Comercialización",
   "analytics_reporting": "Análisis e informes",
   "advanced": "Avanzado",
@@ -259,5 +260,6 @@
   "skip_to_main": "Skip to main content",
   "admin_navigation": "Admin navigation",
   "close_sidebar": "Close sidebar",
-  "support_reports": "Support Reports"
+  "support_reports": "Support Reports",
+  "super_admin_panel": "Super Admin Panel"
 }

@@ -181,15 +181,15 @@ export function TenantHierarchy() {
   }, [loadHierarchy]);
 
   const handleNavigate = (tenantId: number) => {
-    navigate(tenantPath(`/admin/super/tenants/${tenantId}`));
+    navigate(tenantPath(`/super-admin/tenants/${tenantId}`));
   };
 
   return (
     <div>
       <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-muted mb-1">
-        <Link to={tenantPath('/admin/super')} className="hover:text-accent">{t('super.super_dashboard_title')}</Link>
+        <Link to={tenantPath('/super-admin')} className="hover:text-accent">{t('super.super_dashboard_title')}</Link>
         <span>/</span>
-        <Link to={tenantPath('/admin/super/tenants')} className="hover:text-accent">{t('super.tenants')}</Link>
+        <Link to={tenantPath('/super-admin/tenants')} className="hover:text-accent">{t('super.tenants')}</Link>
         <span>/</span>
         <span className="text-foreground">{t('super.hierarchy')}</span>
       </nav>
@@ -216,7 +216,7 @@ export function TenantHierarchy() {
             </Button>
             <Button
               as={Link}
-              to={tenantPath('/admin/super/tenants')}
+              to={tenantPath('/super-admin/tenants')}
               variant="tertiary"
               startContent={<List size={16} />}
               size="sm"
@@ -225,7 +225,7 @@ export function TenantHierarchy() {
             </Button>
             <Button
               as={Link}
-              to={tenantPath('/admin/super/tenants/create')}
+              to={tenantPath('/super-admin/tenants/create')}
               startContent={<Plus size={16} />}
               size="sm"
             >

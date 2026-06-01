@@ -1098,7 +1098,7 @@ function CouponsPanel() {
         onScanned={(token) => void redeemScannedQr(token)}
       />
 
-      <BottomSheet visible={Boolean(redemptionCoupon)} onClose={() => setRedemptionCoupon(null)} snapPoints={[620]}>
+      <BottomSheet visible={Boolean(redemptionCoupon)} onClose={() => setRedemptionCoupon(null)} snapPoints={['68%', '92%']}>
         <Surface variant="default" className="max-h-[78%] rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <View className="min-w-0 flex-1">
@@ -1401,7 +1401,7 @@ export function QrScannerSheet({
   }, [permission?.granted, requestPermission, visible]);
 
   return (
-    <BottomSheet visible={visible} onClose={onClose} snapPoints={[560]} title={title}>
+    <BottomSheet visible={visible} onClose={onClose} snapPoints={['60%', '88%']} title={title}>
       <View className="gap-3">
         {permission?.granted ? (
           <View className="h-80 overflow-hidden rounded-panel-inner">

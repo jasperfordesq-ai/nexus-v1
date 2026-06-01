@@ -5,8 +5,9 @@
 
 import React from 'react';
 import { type StyleProp, type ViewStyle } from 'react-native';
-import { Button as HeroButton, Card as HeroCard } from 'heroui-native';
-import * as Haptics from '@/lib/haptics';
+import { Card as HeroCard } from 'heroui-native';
+
+import NativePressable from '@/components/ui/NativePressable';
 
 type CardVariant = 'elevated' | 'outlined' | 'flat';
 
@@ -36,18 +37,13 @@ export default function Card({
 }: CardProps) {
   const heroVariant = VARIANT_MAP[variant];
 
-  const handlePress = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
-    onPress?.();
-  };
-
   if (pressable) {
     return (
-      <HeroButton variant="ghost" feedbackVariant="scale" className="p-0" onPress={handlePress}>
+      <NativePressable feedback="ripple" className="w-full" onPress={onPress}>
         <HeroCard variant={heroVariant} style={style} className={className}>
           <HeroCard.Body>{children}</HeroCard.Body>
         </HeroCard>
-      </HeroButton>
+      </NativePressable>
     );
   }
 

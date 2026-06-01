@@ -16,10 +16,12 @@ export function FloatingReportProblemButton() {
 
   return (
     <div
-      className="fixed bottom-[calc(var(--safe-area-bottom)+5.25rem)] right-3 z-280 md:bottom-6 md:right-6"
+      className="fixed bottom-6 right-6 z-280 hidden md:block"
       data-testid="floating-report-problem"
     >
-      <ReportProblemButton className="h-12 rounded-full border border-[var(--border-default)] bg-[var(--surface-elevated)] px-4 shadow-xl shadow-black/15 backdrop-blur-sm hover:bg-theme-hover md:px-5" />
+      <ReportProblemButton
+        className="h-12 rounded-full border border-[var(--border-default)] bg-[var(--surface-elevated)] px-5 shadow-xl shadow-black/15 backdrop-blur-sm hover:bg-theme-hover"
+      />
     </div>
   );
 }

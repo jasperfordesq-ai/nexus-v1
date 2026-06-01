@@ -283,11 +283,11 @@ export function TenantForm() {
       if (res.success) {
         toast.success(isEdit ? t('tenant_form.tenant_updated') : t('tenant_form.tenant_created'));
         if (isEdit) {
-          navigate(tenantPath(`/admin/super/tenants/${id}`));
+          navigate(tenantPath(`/super-admin/tenants/${id}`));
         } else {
           // Navigate to the new tenant's show page if ID is returned, otherwise go to list
           const newId = (res as { data?: { tenant_id?: number } }).data?.tenant_id;
-          navigate(tenantPath(newId ? `/admin/super/tenants/${newId}` : '/admin/super/tenants'));
+          navigate(tenantPath(newId ? `/super-admin/tenants/${newId}` : '/super-admin/tenants'));
         }
       } else {
         toast.error(res.error || (isEdit ? t('tenant_form.failed_to_update_tenant') : t('tenant_form.failed_to_create_tenant')));
@@ -309,9 +309,9 @@ export function TenantForm() {
   return (
     <div>
       <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-muted mb-1">
-        <Link to={tenantPath('/admin/super')} className="hover:text-accent">{t('tenant_form.breadcrumb_super_admin')}</Link>
+        <Link to={tenantPath('/super-admin')} className="hover:text-accent">{t('tenant_form.breadcrumb_super_admin')}</Link>
         <span>/</span>
-        <Link to={tenantPath('/admin/super/tenants')} className="hover:text-accent">{t('tenant_form.breadcrumb_tenants')}</Link>
+        <Link to={tenantPath('/super-admin/tenants')} className="hover:text-accent">{t('tenant_form.breadcrumb_tenants')}</Link>
         <span>/</span>
         <span className="text-foreground">{isEdit ? t('tenant_form.breadcrumb_edit') : t('tenant_form.breadcrumb_create')}</span>
       </nav>
@@ -323,7 +323,7 @@ export function TenantForm() {
             <Button
               variant="tertiary"
               startContent={<ArrowLeft size={16} />}
-              onPress={() => navigate(tenantPath(isEdit ? `/admin/super/tenants/${id}` : '/admin/super/tenants'))}
+              onPress={() => navigate(tenantPath(isEdit ? `/super-admin/tenants/${id}` : '/super-admin/tenants'))}
             >
               {t('tenant_form.back')}
             </Button>

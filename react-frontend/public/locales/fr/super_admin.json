@@ -14,7 +14,13 @@
     "partnerships": "Partenariats",
     "federation_audit": "Audit de la Fédération",
     "platform_admin": "Administrateur de la plateforme",
-    "back_to_platform_admin": "Retour à l'administrateur de la plateforme"
+    "back_to_platform_admin": "Retour à l'administrateur de la plateforme",
+    "pilot_inquiries": "Pilot Inquiries",
+    "provisioning_queue": "Provisioning Queue",
+    "billing_control": "Billing Control",
+    "revenue_dashboard": "Revenue Dashboard",
+    "regional_analytics": "Regional Analytics",
+    "national_dashboard": "National Dashboard"
   },
   "dashboard": {
     "title": "Tableau de bord des infrastructures",
@@ -750,5 +756,55 @@
       "feat_groups_title": "Groupes",
       "feat_groups_desc": "Autoriser l’appartenance à un groupe entre locataires"
     }
+  },
+  "layout": {
+    "loading": "Loading super admin",
+    "skip_to_main": "Skip to main content",
+    "close_navigation": "Close super admin navigation",
+    "navigation": "Super admin navigation"
+  },
+  "header": {
+    "back_to_admin": "Back to admin",
+    "toggle_sidebar": "Toggle sidebar",
+    "notifications": "Notifications",
+    "user_fallback": "Super Admin",
+    "user_menu": "Super admin menu",
+    "my_profile": "My Profile",
+    "sign_out": "Sign Out"
+  },
+  "sidebar": {
+    "section_overview": "Overview",
+    "section_tenants": "Tenants",
+    "section_federation": "Federation",
+    "section_commercial": "Commercial",
+    "expand": "Expand sidebar",
+    "collapse": "Collapse sidebar",
+    "nav_label": "Super admin navigation"
+  },
+  "breadcrumbs": {
+    "aria_label": "Breadcrumbs",
+    "super_admin": "Super Admin",
+    "tenants": "Tenants",
+    "create": "Create",
+    "edit": "Edit",
+    "hierarchy": "Hierarchy",
+    "users": "Users",
+    "bulk": "Bulk Operations",
+    "audit": "Audit Log",
+    "federation": "Federation",
+    "whitelist": "Whitelist",
+    "partnerships": "Partnerships",
+    "tenant": "Tenant",
+    "features": "Features",
+    "billing": "Billing",
+    "revenue": "Revenue",
+    "platform": "Platform",
+    "pilot_inquiries": "Pilot Inquiries",
+    "provisioning_requests": "Provisioning Requests",
+    "national": "National",
+    "kiss": "KISS",
+    "regional_analytics": "Regional Analytics",
+    "subscriptions": "Subscriptions",
+    "unknown": "{{segment}}"
   }
 }

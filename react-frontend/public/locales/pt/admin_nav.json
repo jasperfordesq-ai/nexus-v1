@@ -8,6 +8,7 @@
   "matching": "Correspondência e segurança",
   "moderation": "Moderação",
   "community": "Comunidade",
+  "alpha_badge": "Alpha",
   "marketing": "Comercialização",
   "analytics_reporting": "Análise e relatórios",
   "advanced": "Avançado",
@@ -259,5 +260,6 @@
   "skip_to_main": "Skip to main content",
   "admin_navigation": "Admin navigation",
   "close_sidebar": "Close sidebar",
-  "support_reports": "Support Reports"
+  "support_reports": "Support Reports",
+  "super_admin_panel": "Super Admin Panel"
 }

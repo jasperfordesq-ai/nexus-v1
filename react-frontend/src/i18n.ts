@@ -125,7 +125,7 @@ i18n
       'municipality_survey', 'civic_digest', 'municipality_feedback',
       'success_stories', 'pilot_inquiry', 'project_announcements', 'project_announcements_admin',
       'api_controllers_1', 'api_controllers_2', 'api_controllers_3',
-      'svc_notifications', 'svc_notifications_2', 'courses',
+      'svc_notifications', 'svc_notifications_2', 'courses', 'super_admin',
     ],
     debug: isInteractiveDev,
 

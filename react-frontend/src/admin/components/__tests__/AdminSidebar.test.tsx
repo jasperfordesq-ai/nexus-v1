@@ -15,10 +15,17 @@ import { MemoryRouter } from 'react-router-dom';
 
 const mockTenantPath = (p: string) => `/test${p}`;
 const mockOnToggle = vi.fn();
+const mockHasFeature = vi.fn((feature: string) => feature === 'caring_community');
+const mockUser: Record<string, unknown> = {
+  id: 1,
+  name: 'Admin User',
+  role: 'super_admin',
+  is_super_admin: true,
+};
 
 vi.mock('@/contexts', () => ({
   useAuth: vi.fn(() => ({
-    user: { id: 1, name: 'Admin User', role: 'admin', is_super_admin: false },
+    user: mockUser,
     isAuthenticated: true,
     logout: vi.fn(),
   })),
@@ -26,7 +33,7 @@ vi.mock('@/contexts', () => ({
     tenant: { id: 2, name: 'Test Community', slug: 'test', configuration: {} },
     tenantSlug: 'test',
     branding: { name: 'Test Community' },
-    hasFeature: vi.fn(() => false),
+    hasFeature: mockHasFeature,
     hasModule: vi.fn(() => true),
     tenantPath: mockTenantPath,
   })),
@@ -74,6 +81,15 @@ function W({ children, path = '/test/admin' }: { children: React.ReactNode; path
 describe('AdminSidebar', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    Object.assign(mockUser, {
+      id: 1,
+      name: 'Admin User',
+      role: 'super_admin',
+      is_super_admin: true,
+      is_tenant_super_admin: undefined,
+      is_god: undefined,
+    });
+    mockHasFeature.mockImplementation((feature: string) => feature === 'caring_community');
   });
 
   it('renders without crashing', () => {
@@ -141,6 +157,69 @@ describe('AdminSidebar', () => {
       <W><AdminSidebar collapsed={false} onToggle={mockOnToggle} /></W>
     );
     expect(screen.getByText('Broker Panel')).toBeTruthy();
+  });
+
+  it('shows one Super Admin Panel link instead of the full super-admin navigation tree', () => {
+    render(
+      <W><AdminSidebar collapsed={false} onToggle={mockOnToggle} /></W>
+    );
+
+    const superAdminLinks = screen.getAllByRole('link', { name: 'Super Admin Panel' });
+    expect(superAdminLinks).toHaveLength(1);
+    expect(superAdminLinks[0]).toHaveAttribute('href', '/test/super-admin');
+    expect(screen.queryByText('Super Dashboard')).not.toBeInTheDocument();
+  });
+
+  it('keeps Super Admin Panel under Overview after Broker Panel', () => {
+    const { container } = render(
+      <W><AdminSidebar collapsed={false} onToggle={mockOnToggle} /></W>
+    );
+
+    const overview = Array.from(container.querySelectorAll('li')).find((item) =>
+      item.textContent?.includes('Overview') &&
+      item.textContent.includes('Dashboard') &&
+      item.textContent.includes('Broker Panel') &&
+      item.textContent.includes('Super Admin Panel'),
+    );
+    const overviewText = overview?.textContent ?? '';
+
+    expect(overview).toBeTruthy();
+    expect(overviewText.indexOf('Dashboard')).toBeLessThan(overviewText.indexOf('Broker Panel'));
+    expect(overviewText.indexOf('Broker Panel')).toBeLessThan(overviewText.indexOf('Super Admin Panel'));
+  });
+
+  it('pins only the Caring Community link in the footer', () => {
+    const { container } = render(
+      <W><AdminSidebar collapsed={false} onToggle={mockOnToggle} /></W>
+    );
+
+    const caringLinks = screen.getAllByRole('link', { name: /Caring Community/i });
+    expect(caringLinks).toHaveLength(1);
+
+    const footer = container.querySelector('aside > div:last-child');
+    const footerLinks = Array.from(footer?.querySelectorAll('a') ?? []);
+    expect(footerLinks).toHaveLength(1);
+    expect(footerLinks[0]).toHaveTextContent('Caring Community');
+    expect(footerLinks[0]).toHaveTextContent('Alpha');
+    expect(footerLinks[0]).toHaveAttribute('href', '/test/caring');
+    expect(footerLinks[0].className).toContain('border-warning/30');
+    expect(footerLinks[0].className).toContain('bg-warning/10');
+    expect(footer?.textContent).not.toContain('Help Centre');
+  });
+
+  it('shows the Super Admin Panel overview link for god users', () => {
+    Object.assign(mockUser, {
+      role: 'admin',
+      is_super_admin: false,
+      is_tenant_super_admin: false,
+      is_god: true,
+    });
+
+    render(
+      <W><AdminSidebar collapsed={false} onToggle={mockOnToggle} /></W>
+    );
+
+    expect(screen.getByRole('link', { name: 'Super Admin Panel' })).toHaveAttribute('href', '/test/super-admin');
   });
 
   it('applies w-16 class when collapsed', () => {

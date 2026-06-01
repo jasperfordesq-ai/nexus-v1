@@ -618,7 +618,7 @@ function MarketplaceDetailScreen() {
         </Surface>
       ) : null}
 
-      <BottomSheet visible={collectionOpen} onClose={() => setCollectionOpen(false)} snapPoints={[520]}>
+      <BottomSheet visible={collectionOpen} onClose={() => setCollectionOpen(false)} snapPoints={['58%', '86%']}>
         <Surface variant="default" className="max-h-[72%] rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('collections.addTitle')}</Text>
@@ -649,7 +649,7 @@ function MarketplaceDetailScreen() {
         </Surface>
       </BottomSheet>
 
-      <BottomSheet visible={offerOpen} onClose={() => setOfferOpen(false)} snapPoints={[460]}>
+      <BottomSheet visible={offerOpen} onClose={() => setOfferOpen(false)} snapPoints={['48%', '78%']}>
         <Surface variant="default" className="rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('offers.makeTitle')}</Text>
@@ -668,7 +668,7 @@ function MarketplaceDetailScreen() {
         </Surface>
       </BottomSheet>
 
-      <BottomSheet visible={reportOpen} onClose={() => setReportOpen(false)} snapPoints={[640]}>
+      <BottomSheet visible={reportOpen} onClose={() => setReportOpen(false)} snapPoints={['70%', '92%']}>
         <Surface variant="default" className="max-h-[86%] rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('detail.reportTitle')}</Text>

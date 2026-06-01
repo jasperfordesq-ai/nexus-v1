@@ -9,8 +9,6 @@ import {
   Text,
   ScrollView,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
   Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -460,12 +458,8 @@ export default function JobDetailScreen() {
       </Surface>
 
       {/* Apply sheet */}
-      <BottomSheet visible={applyModalVisible} onClose={handleCloseModal} snapPoints={[720]}>
-        <KeyboardAvoidingView
-          style={{ maxHeight: 700, backgroundColor: theme.bg }}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        >
-          <View>
+      <BottomSheet visible={applyModalVisible} onClose={handleCloseModal} snapPoints={['72%', '92%']}>
+        <View style={{ flex: 1, backgroundColor: theme.bg }}>
             <View className="flex-row items-center justify-between px-5 py-3 border-b border-border/50">
               <HeroButton isIconOnly variant="secondary" onPress={handleCloseModal} accessibilityLabel={t('common:close')}>
                 <Ionicons name="close" size={24} color={theme.text} />
@@ -492,6 +486,7 @@ export default function JobDetailScreen() {
               </View>
             ) : (
               <ScrollView
+                style={{ flex: 1 }}
                 contentContainerStyle={{ padding: 20, paddingBottom: 32 }}
                 keyboardShouldPersistTaps="handled"
               >
@@ -548,8 +543,7 @@ export default function JobDetailScreen() {
                 </HeroButton>
               </ScrollView>
             )}
-          </View>
-        </KeyboardAvoidingView>
+        </View>
       </BottomSheet>
     </SafeAreaView>
     </ModalErrorBoundary>

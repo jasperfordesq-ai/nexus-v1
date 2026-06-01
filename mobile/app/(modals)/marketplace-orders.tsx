@@ -460,7 +460,7 @@ function MarketplaceOrdersScreen() {
         onEndReachedThreshold={0.35}
       />
 
-      <BottomSheet visible={Boolean(shipOrder)} onClose={() => setShipOrder(null)} snapPoints={[520]}>
+      <BottomSheet visible={Boolean(shipOrder)} onClose={() => setShipOrder(null)} snapPoints={['58%', '86%']}>
         <Surface variant="default" className="rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <Text className="min-w-0 flex-1 pr-3 text-lg font-bold" style={{ color: theme.text }} numberOfLines={1}>{t('orders.shipTitle')}</Text>
@@ -490,7 +490,7 @@ function MarketplaceOrdersScreen() {
         </Surface>
       </BottomSheet>
 
-      <BottomSheet visible={Boolean(cancelOrder)} onClose={() => setCancelOrder(null)} snapPoints={[360]}>
+      <BottomSheet visible={Boolean(cancelOrder)} onClose={() => setCancelOrder(null)} snapPoints={['40%', '66%']}>
         <Surface variant="default" className="rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <Text className="min-w-0 flex-1 pr-3 text-lg font-bold" style={{ color: theme.text }} numberOfLines={1}>{t('orders.cancelTitle')}</Text>
@@ -508,7 +508,7 @@ function MarketplaceOrdersScreen() {
         </Surface>
       </BottomSheet>
 
-      <BottomSheet visible={Boolean(rateOrder)} onClose={() => setRateOrder(null)} snapPoints={[520]}>
+      <BottomSheet visible={Boolean(rateOrder)} onClose={() => setRateOrder(null)} snapPoints={['58%', '86%']}>
         <Surface variant="default" className="rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <Text className="min-w-0 flex-1 pr-3 text-lg font-bold" style={{ color: theme.text }} numberOfLines={1}>{t('orders.rateTitle')}</Text>
@@ -547,7 +547,7 @@ function MarketplaceOrdersScreen() {
         </Surface>
       </BottomSheet>
 
-      <BottomSheet visible={Boolean(disputeOrder)} onClose={() => setDisputeOrder(null)} snapPoints={[640]}>
+      <BottomSheet visible={Boolean(disputeOrder)} onClose={() => setDisputeOrder(null)} snapPoints={['70%', '92%']}>
         <Surface variant="default" className="max-h-[86%] rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <Text className="min-w-0 flex-1 pr-3 text-lg font-bold" style={{ color: theme.text }} numberOfLines={1}>{t('orders.disputeTitle')}</Text>
@@ -582,7 +582,7 @@ function MarketplaceOrdersScreen() {
         </Surface>
       </BottomSheet>
 
-      <BottomSheet visible={Boolean(deliveryOrder)} onClose={() => setDeliveryOrder(null)} snapPoints={[640]}>
+      <BottomSheet visible={Boolean(deliveryOrder)} onClose={() => setDeliveryOrder(null)} snapPoints={['70%', '92%']}>
         <Surface variant="default" className="max-h-[86%] rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <View className="min-w-0 flex-1">

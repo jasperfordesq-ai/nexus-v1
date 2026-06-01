@@ -1,1 +1,13 @@
-{}
+{
+  "map": {
+    "searchPanelTitle": "Choose search area",
+    "searchPanelSubtitle": "Use coordinates from a map link, then adjust the distance.",
+    "previewTitle": "Search area",
+    "previewCoordinates": "{{latitude}}, {{longitude}}",
+    "previewCoordinatesEmpty": "No coordinates selected",
+    "previewRadius": "Radius {{radius}} km",
+    "previewHint": "Use current location or enter coordinates to search nearby listings.",
+    "pinCount": "{{count}} pins",
+    "resultsTitle": "Nearby results"
+  }
+}

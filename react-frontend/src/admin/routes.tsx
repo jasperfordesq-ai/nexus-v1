@@ -33,6 +33,15 @@ export function TenantParamRedirect({ to }: { to: string }) {
   return <Navigate to={tenantPath(resolved)} replace />;
 }
 
+export function TenantSplatRedirect({ to }: { to: string }) {
+  const { tenantPath } = useTenant();
+  const params = useParams<Record<string, string | undefined>>();
+  const splat = params['*'];
+  const suffix = splat ? `/${splat}` : '';
+
+  return <Navigate to={tenantPath(`${to}${suffix}`)} replace />;
+}
+
 /**
  * Route element that renders children only when a feature is enabled.
  * When disabled, redirects to the admin 404 page so the URL resolves
@@ -177,10 +186,8 @@ const AgentRunsPage = lazy(() => import('./modules/agents/AgentRunsPage'));
 const RegionalAnalyticsPage = lazy(() => import('./modules/analytics/RegionalAnalyticsPage'));
 
 // Platform — pilot inquiries (super-admin)
-const PilotInquiryAdminPage = lazy(() => import('./modules/super/PilotInquiryAdminPage'));
 
 // AG44 — Tenant provisioning queue (super-admin)
-const ProvisioningRequestsPage = lazy(() => import('./modules/provisioning/ProvisioningRequestsPage'));
 
 // Events module
 const EventsAdmin = lazy(() => import('./modules/events/EventsAdmin'));
@@ -296,7 +303,6 @@ const HoursReportsPage = lazy(() => import('./modules/reports/HoursReportsPage')
 const InactiveMembersPage = lazy(() => import('./modules/reports/InactiveMembersPage'));
 const ModerationQueuePage = lazy(() => import('./modules/reports/ModerationQueuePage'));
 // National (Caring Community Foundation) module
-const NationalKissDashboardPage = lazy(() => import('./modules/national/NationalKissDashboardPage'));
 
 // Help Centre
 const AdminHelpCenterPage = lazy(() => import('./modules/help/AdminHelpCenterPage'));
@@ -312,21 +318,6 @@ const ReportsManagement = lazy(() => import('./modules/moderation/ReportsManagem
 const SupportReportsPage = lazy(() => import('./modules/support/SupportReportsPage'));
 
 // Super Admin module — all implementations live in modules/super/
-const SuperDashboard = lazy(() => import('./modules/super/SuperDashboard'));
-const TenantListAdmin = lazy(() => import('./modules/super/TenantList'));
-const TenantForm = lazy(() => import('./modules/super/TenantForm'));
-const TenantShow = lazy(() => import('./modules/super/TenantShow'));
-const TenantHierarchy = lazy(() => import('./modules/super/TenantHierarchy'));
-const SuperUserList = lazy(() => import('./modules/super/SuperUserList'));
-const SuperUserForm = lazy(() => import('./modules/super/SuperUserForm'));
-const UserShow = lazy(() => import('./modules/super/UserShow'));
-const BulkOperations = lazy(() => import('./modules/super/BulkOperations'));
-const SuperAuditLog = lazy(() => import('./modules/super/SuperAuditLog'));
-const FederationControls = lazy(() => import('./modules/super/FederationControls'));
-const FederationWhitelist = lazy(() => import('./modules/super/FederationWhitelist'));
-const SuperPartnerships = lazy(() => import('./modules/super/SuperPartnerships'));
-const FederationAuditLog = lazy(() => import('./modules/super/FederationAuditLog'));
-const FederationTenantFeatures = lazy(() => import('./modules/super/FederationTenantFeatures'));
 
 // AG58 — Member Premium admin
 const MemberPremiumAdminPage = lazy(() => import('./modules/premium/MemberPremiumAdminPage'));
@@ -337,8 +328,6 @@ const BillingPage = lazy(() => import('./modules/billing/BillingPage'));
 const PlanSelector = lazy(() => import('./modules/billing/PlanSelector'));
 const InvoiceHistory = lazy(() => import('./modules/billing/InvoiceHistory'));
 const CheckoutReturn = lazy(() => import('./modules/billing/CheckoutReturn'));
-const BillingControl = lazy(() => import('./modules/billing/BillingControl'));
-const RevenueDashboard = lazy(() => import('./modules/billing/RevenueDashboard'));
 
 // Content module
 const PagesAdmin = lazy(() => import('./modules/content/PagesAdmin'));
@@ -353,7 +342,6 @@ const LandingPageBuilder = lazy(() => import('./modules/content/LandingPageBuild
 // AG60 — API Partners admin (Partner API integration management)
 const ApiPartnersAdminPage = lazy(() => import('./modules/api-partners/ApiPartnersAdminPage'));
 // AG59 — Paid Regional Analytics admin (super-admin only)
-const RegionalAnalyticsAdminPage = lazy(() => import('./modules/regional-analytics/RegionalAnalyticsAdminPage'));
 
 // Wrap lazy components in Suspense
 function Lazy({ children }: { children: React.ReactNode }) {
@@ -680,12 +668,10 @@ export function AdminRoutes() {
       <Route path="analytics/regional" element={<Lazy><RegionalAnalyticsPage /></Lazy>} />
 
       {/* AG71 — Pilot region inquiry funnel */}
-      <Route path="platform/pilot-inquiries" element={<Lazy><PilotInquiryAdminPage /></Lazy>} />
+      <Route path="platform/pilot-inquiries" element={<TenantRedirect to="/super-admin/platform/pilot-inquiries" />} />
 
       {/* AG44 — Self-service tenant provisioning queue (super-admin) */}
-      <Route element={<SuperAdminRoute />}>
-        <Route path="provisioning-requests" element={<Lazy><ProvisioningRequestsPage /></Lazy>} />
-      </Route>
+      <Route path="provisioning-requests" element={<TenantRedirect to="/super-admin/provisioning-requests" />} />
 
       {/* ─── EVENTS ─── */}
       <Route path="events" element={<Lazy><EventsAdmin /></Lazy>} />
@@ -735,30 +721,11 @@ export function AdminRoutes() {
       <Route path="nexus-score/analytics" element={<Lazy><NexusScoreAnalytics /></Lazy>} />
 
       {/* ─── SUPER ADMIN (requires super admin role) ─── */}
-      <Route path="super" element={<SuperAdminRoute />}>
-        <Route index element={<Lazy><SuperDashboard /></Lazy>} />
-        <Route path="tenants" element={<Lazy><TenantListAdmin /></Lazy>} />
-        <Route path="tenants/create" element={<Lazy><TenantForm /></Lazy>} />
-        <Route path="tenants/hierarchy" element={<Lazy><TenantHierarchy /></Lazy>} />
-        <Route path="tenants/:id" element={<Lazy><TenantShow /></Lazy>} />
-        <Route path="tenants/:id/edit" element={<Lazy><TenantForm /></Lazy>} />
-        <Route path="users" element={<Lazy><SuperUserList /></Lazy>} />
-        <Route path="users/create" element={<Lazy><SuperUserForm /></Lazy>} />
-        <Route path="users/:id" element={<Lazy><UserShow /></Lazy>} />
-        <Route path="users/:id/edit" element={<Lazy><SuperUserForm /></Lazy>} />
-        <Route path="bulk" element={<Lazy><BulkOperations /></Lazy>} />
-        <Route path="audit" element={<Lazy><SuperAuditLog /></Lazy>} />
-        <Route path="federation" element={<Lazy><FederationControls /></Lazy>} />
-        <Route path="federation/whitelist" element={<Lazy><FederationWhitelist /></Lazy>} />
-        <Route path="federation/partnerships" element={<Lazy><SuperPartnerships /></Lazy>} />
-        <Route path="federation/audit" element={<Lazy><FederationAuditLog /></Lazy>} />
-        <Route path="federation/tenant/:tenantId/features" element={<Lazy><FederationTenantFeatures /></Lazy>} />
-        <Route path="billing" element={<Lazy><BillingControl /></Lazy>} />
-        <Route path="billing/revenue" element={<Lazy><RevenueDashboard /></Lazy>} />
-      </Route>
+      <Route path="super" element={<TenantRedirect to="/super-admin" />} />
+      <Route path="super/*" element={<TenantSplatRedirect to="/super-admin" />} />
 
       {/* ─── NATIONAL CARING COMMUNITY FOUNDATION DASHBOARD (super-admin / national_admin) ─── */}
-      <Route path="national/kiss" element={<Lazy><NationalKissDashboardPage /></Lazy>} />
+      <Route path="national/kiss" element={<TenantRedirect to="/super-admin/national/kiss" />} />
 
       {/* ─── ANALYTICS & REPORTING ─── */}
       <Route path="community-analytics" element={<Lazy><CommunityAnalytics /></Lazy>} />
@@ -771,7 +738,7 @@ export function AdminRoutes() {
       <Route path="moderation/queue" element={<Lazy><ModerationQueuePage /></Lazy>} />
 
       {/* ─── SELLABLE PRODUCTS — Regional Analytics (AG59) ─── */}
-      <Route path="regional-analytics/subscriptions" element={<Lazy><RegionalAnalyticsAdminPage /></Lazy>} />
+      <Route path="regional-analytics/subscriptions" element={<TenantRedirect to="/super-admin/regional-analytics/subscriptions" />} />
 
       {/* ─── INTEGRATIONS — API Partners (AG60) ─── */}
       <Route

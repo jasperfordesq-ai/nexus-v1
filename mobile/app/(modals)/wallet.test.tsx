@@ -129,6 +129,12 @@ jest.mock('@/lib/api/wallet', () => ({
 
 jest.mock('@/components/ui/Avatar', () => 'View');
 jest.mock('@/components/ui/AppTopBar', () => 'View');
+jest.mock('@/components/ui/BottomSheet', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return ({ children, visible }: { children: React.ReactNode; visible: boolean }) =>
+    visible ? <View testID="wallet-action-sheet">{children}</View> : null;
+});
 
 // --- Tests ---
 
@@ -271,6 +277,28 @@ describe('WalletModal', () => {
     const { getByText } = render(<WalletModal />);
     expect(getByText('Jasper Ford')).toBeTruthy();
     expect(getByText('Selected recipient')).toBeTruthy();
+  });
+
+  it('opens wallet transfer actions in a bottom sheet instead of the page scroll', () => {
+    const walletState = { data: { data: { balance: 12.5, total_credits: 20, total_debits: 7.5, currency: 'hours' } }, isLoading: false, error: null, refresh: jest.fn() };
+    const transactionsState = { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
+    const fundState = { data: { data: { balance: 3, total_deposited: 5, total_donated: 2 } }, isLoading: false, error: null, refresh: jest.fn() };
+    let apiCall = 0;
+    mockUseApi
+      .mockReset()
+      .mockImplementation(() => {
+        const states = [walletState, transactionsState, fundState];
+        const state = states[apiCall % states.length];
+        apiCall += 1;
+        return state;
+      });
+
+    const { getByTestId, getByText } = render(<WalletModal />);
+
+    fireEvent.press(getByText('Send credits'));
+
+    expect(getByTestId('wallet-action-sheet')).toBeTruthy();
+    expect(getByText('Recipient search')).toBeTruthy();
   });
 
   it('accepts transfer amount and description through shared input fields', () => {

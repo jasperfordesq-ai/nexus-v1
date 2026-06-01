@@ -126,9 +126,9 @@ export default function SuperAuditLog() {
       key: 'target_label', label: t('super.col_target'), sortable: true,
       render: (entry) => {
         const targetLink = entry.target_type === 'user' && entry.target_id
-          ? tenantPath(`/admin/super/users/${entry.target_id}`)
+          ? tenantPath(`/super-admin/users/${entry.target_id}`)
           : entry.target_type === 'tenant' && entry.target_id
-            ? tenantPath(`/admin/super/tenants/${entry.target_id}`)
+            ? tenantPath(`/super-admin/tenants/${entry.target_id}`)
             : null;
         return (
           <div>
@@ -147,7 +147,7 @@ export default function SuperAuditLog() {
     {
       key: 'actor_name', label: t('super.col_actor'),
       render: (entry) => entry.actor_id ? (
-        <Link to={tenantPath(`/admin/super/users/${entry.actor_id}`)} className="hover:text-accent">
+        <Link to={tenantPath(`/super-admin/users/${entry.actor_id}`)} className="hover:text-accent">
           {entry.actor_name || t('super.user_with_id', { id: entry.actor_id })}
         </Link>
       ) : (
@@ -171,7 +171,7 @@ export default function SuperAuditLog() {
   return (
     <div>
       <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-muted mb-1">
-        <Link to={tenantPath('/admin/super')} className="hover:text-accent">{t('super.breadcrumb_super_admin')}</Link>
+        <Link to={tenantPath('/super-admin')} className="hover:text-accent">{t('super.breadcrumb_super_admin')}</Link>
         <span>/</span>
         <span className="text-foreground">{t('super.audit_log')}</span>
       </nav>

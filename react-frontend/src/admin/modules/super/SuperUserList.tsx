@@ -118,7 +118,7 @@ export function SuperUserList() {
         <div className="flex items-center gap-3">
           <Avatar name={user.name} size="sm" />
           <div>
-            <Link to={tenantPath(`/admin/super/users/${user.id}`)} className="font-medium text-foreground hover:text-accent">
+            <Link to={tenantPath(`/super-admin/users/${user.id}`)} className="font-medium text-foreground hover:text-accent">
               {user.name}
             </Link>
             <p className="text-xs text-muted">{user.email}</p>
@@ -129,7 +129,7 @@ export function SuperUserList() {
     {
       key: 'tenant', label: t('super.col_tenant'), sortable: true,
       render: (user) => (
-        <Link to={tenantPath(`/admin/super/tenants/${user.tenant_id}`)} className="hover:text-accent">
+        <Link to={tenantPath(`/super-admin/tenants/${user.tenant_id}`)} className="hover:text-accent">
           <Chip size="sm" variant="soft">{user.tenant_name || t('super.tenant_with_id', { id: user.tenant_id })}</Chip>
         </Link>
       ),
@@ -180,8 +180,8 @@ export function SuperUserList() {
         <Dropdown>
           <DropdownTrigger><Button isIconOnly size="sm" variant="tertiary" aria-label={t('super.label_user_actions')}><MoreVertical size={16} /></Button></DropdownTrigger>
           <DropdownMenu aria-label={t('super.label_user_actions')} onAction={(key) => {
-            if (key === 'view') navigate(tenantPath(`/admin/super/users/${user.id}`));
-            else if (key === 'edit') navigate(tenantPath(`/admin/super/users/${user.id}/edit`));
+            if (key === 'view') navigate(tenantPath(`/super-admin/users/${user.id}`));
+            else if (key === 'edit') navigate(tenantPath(`/super-admin/users/${user.id}/edit`));
             else if (key === 'grant-sa') setConfirmAction({ type: 'grant-sa', user });
             else if (key === 'revoke-sa') setConfirmAction({ type: 'revoke-sa', user });
             else if (key === 'grant-global') setConfirmAction({ type: 'grant-global', user });
@@ -213,7 +213,7 @@ export function SuperUserList() {
   return (
     <div>
       <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-muted mb-1">
-        <Link to={tenantPath('/admin/super')} className="hover:text-accent">{t('super.breadcrumb_super_admin')}</Link>
+        <Link to={tenantPath('/super-admin')} className="hover:text-accent">{t('super.breadcrumb_super_admin')}</Link>
         <span>/</span>
         <span className="text-foreground">{t('super.breadcrumb_users')}</span>
       </nav>
@@ -228,7 +228,7 @@ export function SuperUserList() {
               </span>
             )}
             <Button startContent={<Plus size={16} />}
-              onPress={() => navigate(tenantPath('/admin/super/users/create'))}>
+              onPress={() => navigate(tenantPath('/super-admin/users/create'))}>
               {t('super.create_user')}
             </Button>
           </div>

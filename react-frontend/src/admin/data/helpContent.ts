@@ -5,7 +5,7 @@
 
 /**
  * Master registry of contextual help articles for every admin page.
- * Keys are the path AFTER the tenant slug (e.g. '/caring', '/admin/national/kiss').
+ * Keys are the path AFTER the tenant slug (e.g. '/caring', '/super-admin/national/kiss').
  */
 
 export interface HelpStep {
@@ -839,7 +839,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
 
   // ─── Caring Community national / super-admin pages ────────────────────────────
 
-  '/admin/national/kiss': {
+  '/super-admin/national/kiss': {
     title: 'Caring Community — National Cross-Cooperative Dashboard',
     summary:
       'A national-level aggregate dashboard visible only to Caring Community national staff and super-administrators. Aggregates key metrics across all active Caring Community cooperatives: total exchange hours, combined CHF cost-avoidance, cross-cooperative Warmth Pass usage, and federation health.',
@@ -879,7 +879,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
       'Never raise the auto-apply threshold for agents that can initiate financial transfers, safeguarding escalations, or member tier changes. These must always require human review.',
     relatedPaths: [
       { label: 'Smart Nudges', path: '/caring/nudges' },
-      { label: 'National Caring Community Dashboard', path: '/admin/national/kiss' },
+      { label: 'National Caring Community Dashboard', path: '/super-admin/national/kiss' },
     ],
   },
 
@@ -901,7 +901,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
     relatedPaths: [
       { label: 'Lead Nurture', path: '/caring/lead-nurture' },
       { label: 'Launch Readiness', path: '/caring/launch-readiness' },
-      { label: 'National Caring Community Dashboard', path: '/admin/national/kiss' },
+      { label: 'National Caring Community Dashboard', path: '/super-admin/national/kiss' },
     ],
   },
 };

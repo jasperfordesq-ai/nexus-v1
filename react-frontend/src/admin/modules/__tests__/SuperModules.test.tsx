@@ -223,7 +223,7 @@ import { FederationTenantFeatures } from '../super/FederationTenantFeatures';
 describe('FederationTenantFeatures (super)', () => {
   it('renders without crashing with route param', () => {
     const { container } = render(
-      <WRoute path="/admin/super/federation/tenants/:tenantId" entry="/admin/super/federation/tenants/1">
+      <WRoute path="/super-admin/federation/tenants/:tenantId" entry="/super-admin/federation/tenants/1">
         <FederationTenantFeatures />
       </WRoute>
     );
@@ -249,7 +249,7 @@ import { SuperUserForm } from '../super/SuperUserForm';
 describe('SuperUserForm', () => {
   it('renders without crashing with route param', () => {
     const { container } = render(
-      <WRoute path="/admin/super/users/:id" entry="/admin/super/users/1">
+      <WRoute path="/super-admin/users/:id" entry="/super-admin/users/1">
         <SuperUserForm />
       </WRoute>
     );
@@ -275,7 +275,7 @@ import { TenantForm } from '../super/TenantForm';
 describe('TenantForm (super)', () => {
   it('renders without crashing with route param', () => {
     const { container } = render(
-      <WRoute path="/admin/super/tenants/:id" entry="/admin/super/tenants/1">
+      <WRoute path="/super-admin/tenants/:id" entry="/super-admin/tenants/1">
         <TenantForm />
       </WRoute>
     );
@@ -312,7 +312,7 @@ import { TenantShow } from '../super/TenantShow';
 describe('TenantShow (super)', () => {
   it('renders without crashing with route param', () => {
     const { container } = render(
-      <WRoute path="/admin/super/tenants/:id" entry="/admin/super/tenants/1">
+      <WRoute path="/super-admin/tenants/:id" entry="/super-admin/tenants/1">
         <TenantShow />
       </WRoute>
     );
@@ -327,7 +327,7 @@ import { UserShow } from '../super/UserShow';
 describe('UserShow (super)', () => {
   it('renders without crashing with route param', () => {
     const { container } = render(
-      <WRoute path="/admin/super/users/:id" entry="/admin/super/users/1">
+      <WRoute path="/super-admin/users/:id" entry="/super-admin/users/1">
         <UserShow />
       </WRoute>
     );

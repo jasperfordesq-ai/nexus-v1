@@ -129,7 +129,7 @@ export function BulkOperations() {
   return (
     <div>
       <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-muted mb-1">
-        <Link to={tenantPath('/admin/super')} className="hover:text-accent">{t('super.breadcrumb_super_admin')}</Link>
+        <Link to={tenantPath('/super-admin')} className="hover:text-accent">{t('super.breadcrumb_super_admin')}</Link>
         <span>/</span>
         <span className="text-foreground">{t('super.bulk_operations_title')}</span>
       </nav>
@@ -144,7 +144,7 @@ export function BulkOperations() {
             </div>
             <p className="text-xs text-muted">
               {t('super.bulk_move_users_desc')}{' '}
-              <Link to={tenantPath('/admin/super/users')} className="text-accent hover:underline">{t('super.manage_individual_users')}</Link>
+              <Link to={tenantPath('/super-admin/users')} className="text-accent hover:underline">{t('super.manage_individual_users')}</Link>
             </p>
           </CardHeader>
           <CardBody className="flex flex-col gap-4">
@@ -208,7 +208,7 @@ export function BulkOperations() {
             </div>
             <p className="text-xs text-muted">
               {t('super.bulk_update_tenants_desc')}{' '}
-              <Link to={tenantPath('/admin/super/tenants')} className="text-accent hover:underline">{t('super.manage_individual_tenants')}</Link>
+              <Link to={tenantPath('/super-admin/tenants')} className="text-accent hover:underline">{t('super.manage_individual_tenants')}</Link>
             </p>
           </CardHeader>
           <CardBody className="flex flex-col gap-4">

@@ -5,7 +5,7 @@
 
 import { useEffect, useState } from 'react';
 import { Alert, Linking, RefreshControl, ScrollView, Share, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -58,6 +58,7 @@ function EventDetailScreenInner() {
   const { user } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
 
   const eventId = Number(id);
   const safeEventId = Number.isFinite(eventId) && eventId > 0 ? eventId : 0;
@@ -130,6 +131,9 @@ function EventDetailScreenInner() {
     checked_in: attendee.checked_in || checkedInAttendeeIds.includes(attendee.id) || attendee.rsvp_status === 'attended' || attendee.status === 'attended',
   }));
   const currentWaitlistPosition = waitlistPosition ?? event.user_waitlist_position ?? waitlistApi.data?.meta?.user_position ?? null;
+  const hasWaitlistAction = event.is_full && currentRsvp !== 'going';
+  const footerBottomPadding = Math.max(16, insets.bottom + 12);
+  const footerReservedSpace = footerBottomPadding + (hasWaitlistAction ? 124 : 88);
 
   async function handleShare() {
     if (!event) return;
@@ -248,7 +252,7 @@ function EventDetailScreenInner() {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 116, gap: 12 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: footerReservedSpace, gap: 12 }}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={handleRefresh} tintColor={primary} colors={[primary]} />}
       >
         <HeroCard variant="default" className="overflow-hidden">
@@ -385,7 +389,12 @@ function EventDetailScreenInner() {
         ) : null}
       </ScrollView>
 
-      <Surface variant="default" className="absolute bottom-0 left-0 right-0 border-t border-border p-4">
+      <Surface
+        testID="event-rsvp-footer"
+        variant="default"
+        className="absolute bottom-0 left-0 right-0 border-t border-border p-4"
+        style={{ paddingBottom: footerBottomPadding, backgroundColor: theme.bg }}
+      >
         <View className="flex-row gap-3">
           <RsvpButton
             label={t('going')}
@@ -406,7 +415,7 @@ function EventDetailScreenInner() {
             onPress={() => void handleRsvp('interested')}
           />
         </View>
-        {event.is_full && currentRsvp !== 'going' ? (
+        {hasWaitlistAction ? (
           <HeroButton
             className="mt-3"
             variant={currentWaitlistPosition ? 'secondary' : 'primary'}

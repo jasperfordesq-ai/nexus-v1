@@ -235,7 +235,17 @@ function EmptyCard({ icon, message }: { icon: IoniconName; message: string }) {
   );
 }
 
-function StateMessage({ title, action, primary }: { title: string; action: string; primary: string }) {
+function StateMessage({
+  title,
+  action,
+  primary,
+  onAction,
+}: {
+  title: string;
+  action: string;
+  primary: string;
+  onAction?: () => void;
+}) {
   return (
     <SafeAreaView className="flex-1 bg-background">
       <AppTopBar title={title} backLabel={action} fallbackHref="/(tabs)/groups" />
@@ -245,7 +255,7 @@ function StateMessage({ title, action, primary }: { title: string; action: strin
             <Ionicons name="people-outline" size={24} color={primary} />
           </View>
           <Text className="text-center text-sm text-muted-foreground">{title}</Text>
-          <HeroButton variant="secondary" onPress={() => router.back()}>
+          <HeroButton variant="secondary" onPress={onAction ?? (() => router.back())}>
             <HeroButton.Label>{action}</HeroButton.Label>
           </HeroButton>
         </Surface>
@@ -274,7 +284,7 @@ function GroupDetailScreenInner() {
   const groupId = Number(id);
   const safeGroupId = Number.isFinite(groupId) && groupId > 0 ? groupId : 0;
 
-  const { data, isLoading, refresh } = useApi(
+  const { data, isLoading, error, refresh } = useApi(
     () => getGroup(safeGroupId),
     [safeGroupId],
     { enabled: safeGroupId > 0 },
@@ -376,6 +386,17 @@ function GroupDetailScreenInner() {
           <LoadingSpinner />
         </View>
       </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <StateMessage
+        title={error}
+        action={t('common:buttons.retry')}
+        primary={primary}
+        onAction={refresh}
+      />
     );
   }
 

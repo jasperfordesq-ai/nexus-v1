@@ -110,6 +110,9 @@ const OauthCallbackPage = lazyWithRetry(() => import('./pages/auth/OauthCallback
 // Admin Panel (lazy-loaded — keeps recharts, jsPDF, admin sidebar/header out of main bundle)
 const AdminApp = lazyWithRetry(() => import('@/admin/AdminApp'));
 
+// Super Admin Panel (lazy-loaded — separate platform-wide admin area)
+const SuperAdminApp = lazyWithRetry(() => import('@/super-admin/SuperAdminApp'));
+
 // Broker Panel (lazy-loaded — simplified admin interface for brokers)
 const BrokerApp = lazyWithRetry(() => import('@/broker/BrokerApp'));
 
@@ -1725,6 +1728,9 @@ function AppRoutes() {
 
       {/* Admin Panel (separate layout, no main navbar/footer) — fully lazy-loaded */}
       <Route path="admin/*" element={<AdminApp />} />
+
+      {/* Super Admin Panel (separate platform-wide area) — fully lazy-loaded */}
+      <Route path="super-admin/*" element={<SuperAdminApp />} />
 
       {/* Broker Panel (simplified admin for brokers) — fully lazy-loaded */}
       <Route path="broker/*" element={<BrokerApp />} />

@@ -2,6 +2,9 @@
   "newTitle": "Neues Angebot",
   "detailTitle": "Angebotsdetails",
   "share": "Angebot teilen",
+  "detail": {
+    "messageMember": "Nachricht"
+  },
   "groupExchanges": {
     "create": {
       "open": "Create group exchange",

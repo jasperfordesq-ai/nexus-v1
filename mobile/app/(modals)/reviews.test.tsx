@@ -42,6 +42,12 @@ jest.mock('@expo/vector-icons', () => ({
 }));
 
 jest.mock('@/components/ModalErrorBoundary', () => ({ children }: { children: React.ReactNode }) => children);
+jest.mock('@/components/ui/BottomSheet', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return ({ children, visible }: { children: React.ReactNode; visible: boolean }) =>
+    visible ? <View testID="review-form-sheet">{children}</View> : null;
+});
 jest.mock('@/components/ui/AppTopBar', () => {
   const { Text } = require('react-native');
   return function MockAppTopBar({ title }: { title: string }) {
@@ -164,10 +170,11 @@ describe('ReviewsScreen', () => {
   });
 
   it('submits a pending review and refreshes the pending list', async () => {
-    const { getByLabelText, getByPlaceholderText, getByText } = render(<ReviewsScreen />);
+    const { getByLabelText, getByPlaceholderText, getByTestId, getByText } = render(<ReviewsScreen />);
 
     fireEvent.press(getByText('Pending'));
     fireEvent.press(getByText('Write review'));
+    expect(getByTestId('review-form-sheet')).toBeTruthy();
     fireEvent.press(getByLabelText('Rate 4 stars'));
     fireEvent.changeText(getByPlaceholderText('Share what went well...'), 'Friendly and clear.');
     fireEvent.press(getByText('Submit review'));

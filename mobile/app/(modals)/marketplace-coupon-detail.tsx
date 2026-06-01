@@ -101,7 +101,7 @@ function MarketplaceCouponDetailScreen() {
         </View>
       )}
 
-      <BottomSheet visible={isQrOpen} onClose={() => setIsQrOpen(false)} snapPoints={[500]}>
+      <BottomSheet visible={isQrOpen} onClose={() => setIsQrOpen(false)} snapPoints={['58%', '84%']}>
         <Surface variant="default" className="rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <View className="min-w-0 flex-1">

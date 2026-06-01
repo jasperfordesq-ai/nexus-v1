@@ -265,7 +265,7 @@ export function TenantShow() {
           variant="secondary"
           className="mt-4"
           startContent={<ArrowLeft aria-hidden="true" size={16} />}
-          onPress={() => navigate(tenantPath('/admin/super/tenants'))}
+          onPress={() => navigate(tenantPath('/super-admin/tenants'))}
         >
           {t('super.back_to_tenants')}
         </Button>
@@ -293,13 +293,13 @@ export function TenantShow() {
             <Button
               variant="secondary"
               startContent={<ArrowLeft aria-hidden="true" size={16} />}
-              onPress={() => navigate(tenantPath('/admin/super/tenants'))}
+              onPress={() => navigate(tenantPath('/super-admin/tenants'))}
             >
               {t('super.back')}
             </Button>
             <Button
               startContent={<Edit aria-hidden="true" size={16} />}
-              onPress={() => navigate(tenantPath(`/admin/super/tenants/${tenant.id}/edit`))}
+              onPress={() => navigate(tenantPath(`/super-admin/tenants/${tenant.id}/edit`))}
             >
               {t('super.edit')}
             </Button>
@@ -317,7 +317,7 @@ export function TenantShow() {
                 <span className="font-medium text-foreground">{crumb.name}</span>
               ) : (
                 <Link
-                  to={tenantPath(`/admin/super/tenants/${crumb.id}`)}
+                  to={tenantPath(`/super-admin/tenants/${crumb.id}`)}
                   className="text-accent hover:underline"
                 >
                   {crumb.name}
@@ -349,7 +349,7 @@ export function TenantShow() {
                   value={
                     tenant.parent_id ? (
                       <Link
-                        to={tenantPath(`/admin/super/tenants/${tenant.parent_id}`)}
+                        to={tenantPath(`/super-admin/tenants/${tenant.parent_id}`)}
                         className="text-accent hover:underline"
                       >
                         {tenant.parent_name || `Tenant #${tenant.parent_id}`}
@@ -631,7 +631,7 @@ export function TenantShow() {
                   {tenant.children.map((child) => (
                     <li key={child.id}>
                       <Link
-                        to={tenantPath(`/admin/super/tenants/${child.id}`)}
+                        to={tenantPath(`/super-admin/tenants/${child.id}`)}
                         className="flex items-center gap-3 rounded-lg p-2 hover:bg-surface-hover transition-colors"
                       >
                         <Avatar
@@ -757,7 +757,7 @@ export function TenantShow() {
                     <li key={admin.id}>
                       <div className="flex items-center gap-3 rounded-lg p-2 hover:bg-surface-hover transition-colors">
                         <Link
-                          to={tenantPath(`/admin/super/users/${admin.id}`)}
+                          to={tenantPath(`/super-admin/users/${admin.id}`)}
                           className="flex items-center gap-3 min-w-0 flex-1"
                         >
                           <Avatar
@@ -801,7 +801,7 @@ export function TenantShow() {
                 variant="primary"
                 fullWidth
                 startContent={<Edit aria-hidden="true" size={16} />}
-                onPress={() => navigate(tenantPath(`/admin/super/tenants/${tenant.id}/edit`))}
+                onPress={() => navigate(tenantPath(`/super-admin/tenants/${tenant.id}/edit`))}
               >
                 {t('super.edit_tenant')}
               </Button>
@@ -810,7 +810,7 @@ export function TenantShow() {
                   variant="secondary"
                   fullWidth
                   startContent={<Plus aria-hidden="true" size={16} />}
-                  onPress={() => navigate(tenantPath(`/admin/super/tenants/create?parent_id=${tenant.id}`))}
+                  onPress={() => navigate(tenantPath(`/super-admin/tenants/create?parent_id=${tenant.id}`))}
                 >
                   {t('super.create_sub_tenant')}
                 </Button>
@@ -819,7 +819,7 @@ export function TenantShow() {
                 variant="secondary"
                 fullWidth
                 startContent={<ArrowLeft aria-hidden="true" size={16} />}
-                onPress={() => navigate(tenantPath('/admin/super/tenants'))}
+                onPress={() => navigate(tenantPath('/super-admin/tenants'))}
               >
                 {t('super.back_to_tenants')}
               </Button>

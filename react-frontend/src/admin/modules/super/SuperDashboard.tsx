@@ -71,12 +71,12 @@ export function SuperDashboard() {
   }, [loadData]);
 
   const quickActions = [
-    { label: t('super.create_tenant'), href: tenantPath('/admin/super/tenants/create'), icon: Plus },
-    { label: t('super.view_hierarchy'), href: tenantPath('/admin/super/tenants/hierarchy'), icon: Network },
-    { label: t('super.bulk_operations'), href: tenantPath('/admin/super/bulk'), icon: ListChecks },
-    { label: t('super.cross_tenant_users'), href: tenantPath('/admin/super/users'), icon: Users },
-    { label: t('super.audit_log'), href: tenantPath('/admin/super/audit'), icon: Activity },
-    { label: t('super.federation_controls'), href: tenantPath('/admin/super/federation'), icon: Globe },
+    { label: t('super.create_tenant'), href: tenantPath('/super-admin/tenants/create'), icon: Plus },
+    { label: t('super.view_hierarchy'), href: tenantPath('/super-admin/tenants/hierarchy'), icon: Network },
+    { label: t('super.bulk_operations'), href: tenantPath('/super-admin/bulk'), icon: ListChecks },
+    { label: t('super.cross_tenant_users'), href: tenantPath('/super-admin/users'), icon: Users },
+    { label: t('super.audit_log'), href: tenantPath('/super-admin/audit'), icon: Activity },
+    { label: t('super.federation_controls'), href: tenantPath('/super-admin/federation'), icon: Globe },
   ];
 
   return (
@@ -99,7 +99,7 @@ export function SuperDashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
-        <Link to={tenantPath('/admin/super/tenants')} className="block cursor-pointer hover:scale-[1.02] transition-transform">
+        <Link to={tenantPath('/super-admin/tenants')} className="block cursor-pointer hover:scale-[1.02] transition-transform">
           <StatCard
             label={t('super.label_total_tenants')}
             value={stats?.total_tenants ?? '---'}
@@ -107,7 +107,7 @@ export function SuperDashboard() {
             loading={loading}
           />
         </Link>
-        <Link to={tenantPath('/admin/super/tenants')} className="block cursor-pointer hover:scale-[1.02] transition-transform">
+        <Link to={tenantPath('/super-admin/tenants')} className="block cursor-pointer hover:scale-[1.02] transition-transform">
           <StatCard
             label={t('super.label_active_tenants')}
             value={stats?.active_tenants ?? '---'}
@@ -116,7 +116,7 @@ export function SuperDashboard() {
             loading={loading}
           />
         </Link>
-        <Link to={tenantPath('/admin/super/users')} className="block cursor-pointer hover:scale-[1.02] transition-transform">
+        <Link to={tenantPath('/super-admin/users')} className="block cursor-pointer hover:scale-[1.02] transition-transform">
           <StatCard
             label={t('super.label_total_users')}
             value={stats?.total_users ?? '---'}
@@ -124,7 +124,7 @@ export function SuperDashboard() {
             loading={loading}
           />
         </Link>
-        <Link to={tenantPath('/admin/super/tenants')} className="block cursor-pointer hover:scale-[1.02] transition-transform">
+        <Link to={tenantPath('/super-admin/tenants')} className="block cursor-pointer hover:scale-[1.02] transition-transform">
           <StatCard
             label={t('super.label_total_listings')}
             value={stats?.total_listings ?? '---'}
@@ -178,7 +178,7 @@ export function SuperDashboard() {
 
               isPressable
               as={Link}
-              to={tenantPath(`/admin/super/tenants/${tenant.id}`)}
+              to={tenantPath(`/super-admin/tenants/${tenant.id}`)}
             >
               <CardBody className="p-4">
                 <div className="flex items-start justify-between mb-2">
@@ -214,7 +214,7 @@ export function SuperDashboard() {
         <div className="mt-4 flex justify-center">
           <Button
             as={Link}
-            to={tenantPath('/admin/super/tenants')}
+            to={tenantPath('/super-admin/tenants')}
             variant="tertiary"
             endContent={<ArrowRight aria-hidden="true" size={16} />}
           >

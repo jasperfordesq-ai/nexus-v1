@@ -8,6 +8,7 @@
   "matching": "マッチングと安全性",
   "moderation": "節度",
   "community": "コミュニティ",
+  "alpha_badge": "Alpha",
   "marketing": "マーケティング",
   "analytics_reporting": "分析とレポート作成",
   "advanced": "高度な",
@@ -259,5 +260,6 @@
   "skip_to_main": "Skip to main content",
   "admin_navigation": "Admin navigation",
   "close_sidebar": "Close sidebar",
-  "support_reports": "Support Reports"
+  "support_reports": "Support Reports",
+  "super_admin_panel": "Super Admin Panel"
 }

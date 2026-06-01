@@ -341,37 +341,37 @@ export function TimebankingGuidePage() {
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   {isAuthenticated ? (
-                    <Link to={tenantPath('/listings')}>
-                      <Button
-                        size="lg"
-                        className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold px-8"
-                        endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
-                      >
-                        {t('timebanking_guide.cta_browse_listings')}
-                      </Button>
-                    </Link>
+                    <Button
+                      as={Link}
+                      to={tenantPath('/listings')}
+                      size="lg"
+                      className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold px-8"
+                      endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
+                    >
+                      {t('timebanking_guide.cta_browse_listings')}
+                    </Button>
                   ) : (
-                    <Link to={tenantPath('/register')}>
-                      <Button
-                        size="lg"
-                        className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold px-8"
-                        endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
-                      >
-                        {t('timebanking_guide.cta_join_free')}
-                      </Button>
-                    </Link>
+                    <Button
+                      as={Link}
+                      to={tenantPath('/register')}
+                      size="lg"
+                      className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold px-8"
+                      endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
+                    >
+                      {t('timebanking_guide.cta_join_free')}
+                    </Button>
                   )}
 
-                  <Link to={tenantPath('/partner')}>
-                    <Button
-                      size="lg"
-                      variant="bordered"
-                      className="w-full sm:w-auto border-theme-default text-theme-primary hover:bg-theme-hover"
-                      startContent={<Handshake className="w-5 h-5" aria-hidden="true" />}
-                    >
-                      {t('timebanking_guide.cta_partner')}
-                    </Button>
-                  </Link>
+                  <Button
+                    as={Link}
+                    to={tenantPath('/partner')}
+                    size="lg"
+                    variant="bordered"
+                    className="w-full sm:w-auto border-theme-default text-theme-primary hover:bg-theme-hover"
+                    startContent={<Handshake className="w-5 h-5" aria-hidden="true" />}
+                  >
+                    {t('timebanking_guide.cta_partner')}
+                  </Button>
                 </div>
               </div>
             </GlassCard>

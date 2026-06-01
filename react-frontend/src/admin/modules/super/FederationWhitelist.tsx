@@ -186,7 +186,7 @@ export default function FederationWhitelist() {
                 <TableRow key={entry.id}>
                   <TableCell>
                     <Link
-                      to={tenantPath(`/admin/super/federation/tenant/${entry.tenant_id}/features`)}
+                      to={tenantPath(`/super-admin/federation/tenant/${entry.tenant_id}/features`)}
                       className="text-accent hover:underline"
                     >
                       {entry.tenant_name}
@@ -204,7 +204,7 @@ export default function FederationWhitelist() {
                     <div className="flex items-center gap-2">
                       <Button
                         as={Link}
-                        to={tenantPath(`/admin/super/federation/tenant/${entry.tenant_id}/features`)}
+                        to={tenantPath(`/super-admin/federation/tenant/${entry.tenant_id}/features`)}
                         size="sm"
                         variant="tertiary"
                       >

@@ -22,7 +22,7 @@ import { HELP_CONTENT, type HelpArticle } from '../../data/helpContent';
 type Category = 'Caring Community' | 'General Admin';
 
 const CARING_PATHS = new Set([
-  '/admin/national/kiss',
+  '/super-admin/national/kiss',
   '/admin/ki-agents',
   '/admin/pilot-inquiries',
 ]);

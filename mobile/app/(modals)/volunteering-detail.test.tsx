@@ -136,6 +136,12 @@ jest.mock('@/lib/api/volunteering', () => ({
 
 jest.mock('@/components/ui/Avatar', () => 'View');
 jest.mock('@/components/ui/LoadingSpinner', () => () => null);
+jest.mock('@/components/ui/BottomSheet', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return ({ children, visible }: { children: React.ReactNode; visible: boolean }) =>
+    visible ? <View testID="volunteer-apply-sheet">{children}</View> : null;
+});
 
 // --- Tests ---
 
@@ -229,6 +235,17 @@ describe('VolunteeringDetailScreen', () => {
     expect(getByText('Express Interest')).toBeTruthy();
   });
 
+  it('opens the express interest form in a bottom sheet', () => {
+    mockUseApi.mockReturnValue({ data: { data: mockOpportunity }, isLoading: false, error: null, refresh: jest.fn() });
+
+    const { getByPlaceholderText, getByTestId, getByText } = render(<VolunteeringDetailScreen />);
+
+    fireEvent.press(getByText('Express Interest'));
+
+    expect(getByTestId('volunteer-apply-sheet')).toBeTruthy();
+    expect(getByPlaceholderText(/Tell the organiser/)).toBeTruthy();
+  });
+
   it('does not show the apply action for owner-managed opportunities', () => {
     mockUseApi.mockReturnValueOnce({
       data: { data: { ...mockOpportunity, is_owner: true } },
@@ -303,10 +320,12 @@ describe('VolunteeringDetailScreen', () => {
   it('submits an interest note for an open opportunity', async () => {
     mockUseApi.mockReturnValue({ data: { data: mockOpportunity }, isLoading: false, error: null, refresh: jest.fn() });
 
-    const { getByPlaceholderText, getByText } = render(<VolunteeringDetailScreen />);
+    const { getAllByText, getByPlaceholderText, getByText } = render(<VolunteeringDetailScreen />);
 
-    fireEvent.changeText(getByPlaceholderText(/Tell the organiser/), 'Happy to help on Saturday mornings.');
     fireEvent.press(getByText('Express Interest'));
+    fireEvent.changeText(getByPlaceholderText(/Tell the organiser/), 'Happy to help on Saturday mornings.');
+    const expressButtons = getAllByText('Express Interest');
+    fireEvent.press(expressButtons[expressButtons.length - 1]);
 
     await waitFor(() => {
       expect(expressInterest).toHaveBeenCalledWith(10, 'Happy to help on Saturday mornings.');
