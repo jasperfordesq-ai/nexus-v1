@@ -246,4 +246,111 @@ class AdminSecurityAuditTest extends TestCase
                 'SEC-007: Unexpected status code when non-super-admin attempts role escalation.');
         }
     }
+
+    // ================================================================
+    // SEC-008/009/010: Tenant super-admin cross-tenant moderation IDOR
+    //
+    // A TENANT super-admin (is_tenant_super_admin) is scoped to a single
+    // tenant. AdminReviewsController, AdminReportsController and
+    // AdminSupportReportController previously treated is_tenant_super_admin
+    // as a PLATFORM super-admin in their isSuperAdmin() helper, taking an
+    // unscoped fetch branch and then writing back using the fetched row's
+    // tenant_id — letting one tenant's super-admin delete/resolve/edit
+    // another tenant's records. The fix routes those helpers through
+    // BaseApiController::isPlatformSuperAdmin() (platform-only, explicitly
+    // excluding is_tenant_super_admin).
+    // ================================================================
+
+    private function actingAsTenantSuperAdmin(): User
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->admin()->create([
+            'is_super_admin' => false,
+            'is_god' => false,
+            'is_tenant_super_admin' => true,
+        ]);
+        Sanctum::actingAs($user);
+
+        return $user;
+    }
+
+    public function test_tenant_super_admin_cannot_delete_cross_tenant_review(): void
+    {
+        $this->actingAsTenantSuperAdmin();
+        $foreign = User::factory()->forTenant(999)->create();
+
+        $reviewId = DB::table('reviews')->insertGetId([
+            'tenant_id' => 999,
+            'reviewer_id' => $foreign->id,
+            'receiver_id' => $foreign->id,
+            'rating' => 5,
+            'comment' => 'cross-tenant review',
+            'status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->apiDelete('/v2/admin/reviews/' . $reviewId);
+
+        $this->assertNotEquals(200, $response->getStatusCode(),
+            'SEC-008: tenant super-admin deleted a review owned by another tenant (cross-tenant IDOR).');
+        $this->assertNotNull(DB::table('reviews')->where('id', $reviewId)->first(),
+            'SEC-008: cross-tenant review was deleted by a tenant super-admin.');
+    }
+
+    public function test_tenant_super_admin_cannot_resolve_cross_tenant_report(): void
+    {
+        $this->actingAsTenantSuperAdmin();
+        $foreign = User::factory()->forTenant(999)->create();
+
+        $reportId = DB::table('reports')->insertGetId([
+            'tenant_id' => 999,
+            'reporter_id' => $foreign->id,
+            'target_type' => 'post',
+            'target_id' => 4242,
+            'reason' => 'cross-tenant report',
+            'status' => 'open',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->apiPost('/v2/admin/reports/' . $reportId . '/resolve');
+
+        $this->assertNotEquals(200, $response->getStatusCode(),
+            'SEC-009: tenant super-admin resolved a report owned by another tenant (cross-tenant IDOR).');
+        $report = DB::table('reports')->where('id', $reportId)->first();
+        $this->assertNotNull($report);
+        $this->assertSame('open', $report->status,
+            'SEC-009: cross-tenant report was resolved by a tenant super-admin.');
+    }
+
+    public function test_tenant_super_admin_cannot_update_cross_tenant_support_report(): void
+    {
+        $this->actingAsTenantSuperAdmin();
+        $foreign = User::factory()->forTenant(999)->create();
+
+        $supportId = DB::table('support_reports')->insertGetId([
+            'tenant_id' => 999,
+            'user_id' => $foreign->id,
+            'reference' => 'SR-' . substr(md5((string) $foreign->id . microtime()), 0, 12),
+            'source' => 'in_app',
+            'summary' => 'cross-tenant support report',
+            'description' => 'should not be editable cross-tenant',
+            'impact' => 'minor',
+            'status' => 'open',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->apiPut('/v2/admin/support-reports/' . $supportId, [
+            'status' => 'triaged',
+            'triage_notes' => 'attempted cross-tenant edit',
+        ]);
+
+        $this->assertNotEquals(200, $response->getStatusCode(),
+            'SEC-010: tenant super-admin updated a support report owned by another tenant (cross-tenant IDOR).');
+        $support = DB::table('support_reports')->where('id', $supportId)->first();
+        $this->assertNotNull($support);
+        $this->assertSame('open', $support->status,
+            'SEC-010: cross-tenant support report was modified by a tenant super-admin.');
+    }
 }

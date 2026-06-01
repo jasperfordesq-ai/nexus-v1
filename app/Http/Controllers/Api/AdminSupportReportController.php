@@ -251,17 +251,9 @@ class AdminSupportReportController extends BaseApiController
 
     private function isSuperAdmin(): bool
     {
-        $user = Auth::user();
-        if (!$user) {
-            return false;
-        }
-
-        $role = (string) ($user->role ?? '');
-
-        return in_array($role, ['super_admin', 'god'], true)
-            || (bool) ($user->is_super_admin ?? false)
-            || (bool) ($user->is_god ?? false)
-            || (bool) ($user->is_tenant_super_admin ?? false);
+        // Platform-level super admin only — explicitly NOT is_tenant_super_admin,
+        // which is scoped to a single tenant (see requirePlatformSuperAdmin).
+        return $this->isPlatformSuperAdmin();
     }
 
     private function applyFilters(Builder $query): void

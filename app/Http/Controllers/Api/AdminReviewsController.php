@@ -27,12 +27,10 @@ class AdminReviewsController extends BaseApiController
      */
     private function isSuperAdmin(): bool
     {
-        $userId = $this->getUserId();
-        $user = DB::selectOne(
-            "SELECT is_super_admin, is_tenant_super_admin FROM users WHERE id = ?",
-            [$userId]
-        );
-        return $user && (!empty($user->is_super_admin) || !empty($user->is_tenant_super_admin));
+        // Platform-level super admin only. A tenant super-admin is scoped to their
+        // own tenant by design (see EnsureIsSuperAdmin / requirePlatformSuperAdmin);
+        // they must not reach the cross-tenant moderation branches below.
+        return $this->isPlatformSuperAdmin();
     }
 
     /**

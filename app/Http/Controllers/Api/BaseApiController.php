@@ -724,6 +724,29 @@ abstract class BaseApiController extends Controller
     }
 
     /**
+     * Non-throwing variant of requirePlatformSuperAdmin(): true only for a
+     * PLATFORM-level super admin (is_super_admin / is_god / role), explicitly
+     * NOT is_tenant_super_admin. Use for branch decisions (e.g. cross-tenant
+     * admin views or moderation) where a non-super admin should be silently
+     * scoped to their own tenant rather than receiving a 403. Admitting a
+     * tenant super-admin here would let one tenant's admin read or mutate
+     * another tenant's records.
+     */
+    protected function isPlatformSuperAdmin(): bool
+    {
+        $user = $this->resolveUser();
+        if (!$user) {
+            return false;
+        }
+
+        $role = $user->role ?? 'member';
+
+        return in_array($role, ['super_admin', 'god'], true)
+            || ($user->is_super_admin ?? false)
+            || ($user->is_god ?? false);
+    }
+
+    /**
      * Get current tenant ID from TenantContext
      *
      * @return int
