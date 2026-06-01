@@ -11,7 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { useTranslation } from 'react-i18next';
-import { Button as HeroButton, Card as HeroCard, Chip, Spinner } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, Spinner, TagGroup } from 'heroui-native';
 
 import {
   deleteExchangeImage,
@@ -355,20 +355,32 @@ function EditExchangeModalInner() {
 
           <FormSection title={t('form.deliveryTitle')} icon="location-outline" primary={primary} theme={theme}>
               <FieldLabel label={t('form.serviceType')} theme={theme} />
-              <View className="flex-row flex-wrap gap-2">
-                {serviceTypes.map((value) => (
-                  <HeroButton
-                    key={value}
-                    size="sm"
-                    variant={serviceType === value ? 'primary' : 'secondary'}
-                    style={serviceType === value ? { backgroundColor: primary } : undefined}
-                    onPress={() => setServiceType(value)}
-                    accessibilityState={{ selected: serviceType === value }}
-                  >
-                    <HeroButton.Label>{t(`serviceType.${value}`)}</HeroButton.Label>
-                  </HeroButton>
-                ))}
-              </View>
+              <TagGroup
+                size="sm"
+                selectionMode="single"
+                selectedKeys={[serviceType]}
+                onSelectionChange={(keys) => {
+                  const next = Array.from(keys)[0];
+                  if (next !== undefined) setServiceType(next as ServiceType);
+                }}
+              >
+                <TagGroup.List>
+                  {serviceTypes.map((value) => {
+                    const isSelected = serviceType === value;
+                    return (
+                      <TagGroup.Item
+                        key={value}
+                        id={value}
+                        style={isSelected ? { backgroundColor: primary } : undefined}
+                      >
+                        <TagGroup.ItemLabel style={isSelected ? { color: '#FFFFFF' } : undefined}>
+                          {t(`serviceType.${value}`)}
+                        </TagGroup.ItemLabel>
+                      </TagGroup.Item>
+                    );
+                  })}
+                </TagGroup.List>
+              </TagGroup>
 
               <FieldLabel label={t('form.location')} theme={theme} />
               <Input
