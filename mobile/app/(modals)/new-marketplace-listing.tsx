@@ -8,7 +8,7 @@ import { Alert, Image, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Button as HeroButton, Card as HeroCard, Text } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, TagGroup, Text } from 'heroui-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useTranslation } from 'react-i18next';
 import * as Haptics from '@/lib/haptics';
@@ -622,13 +622,32 @@ function ButtonGroup<T extends string>({
   return (
     <View className="gap-2">
       <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>{label}</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingRight: 2 }}>
-        {values.map((value) => (
-          <HeroButton key={value} size="sm" variant={selected === value ? 'primary' : 'secondary'} onPress={() => onSelect(value)} style={selected === value ? { backgroundColor: primary } : undefined}>
-            <HeroButton.Label>{labelFor(value)}</HeroButton.Label>
-          </HeroButton>
-        ))}
-      </ScrollView>
+      <TagGroup
+        size="sm"
+        selectionMode="single"
+        selectedKeys={[selected]}
+        onSelectionChange={(keys) => {
+          const next = Array.from(keys)[0];
+          if (next !== undefined) onSelect(next as T);
+        }}
+      >
+        <TagGroup.List>
+          {values.map((value) => {
+            const isSelected = selected === value;
+            return (
+              <TagGroup.Item
+                key={value}
+                id={value}
+                style={isSelected ? { backgroundColor: primary } : undefined}
+              >
+                <TagGroup.ItemLabel style={isSelected ? { color: '#FFFFFF' } : undefined}>
+                  {labelFor(value)}
+                </TagGroup.ItemLabel>
+              </TagGroup.Item>
+            );
+          })}
+        </TagGroup.List>
+      </TagGroup>
     </View>
   );
 }
