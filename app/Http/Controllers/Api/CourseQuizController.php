@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\MaxAttemptsExceededException;
 use App\Http\Controllers\Api\Concerns\InteractsWithCourses;
 use App\Models\CourseQuestion;
 use App\Models\CourseQuiz;
@@ -65,13 +66,14 @@ class CourseQuizController extends BaseApiController
             return $this->respondWithError('LESSON_LOCKED', __('api_controllers_2.courses.lesson_locked'), null, 403);
         }
 
-        if ((int) $quiz->max_attempts > 0
-            && CourseQuizService::attemptsUsed($quizId, $userId) >= (int) $quiz->max_attempts) {
+        // max_attempts is enforced atomically inside submitAttempt (row-locked
+        // transaction) so concurrent submissions can't race past the ceiling.
+        $answers = (array) $this->input('answers', []);
+        try {
+            $result = CourseQuizService::submitAttempt($quizId, $userId, $answers, $enrollment->id);
+        } catch (MaxAttemptsExceededException) {
             return $this->respondWithError('MAX_ATTEMPTS_REACHED', __('api_controllers_2.courses.max_attempts_reached'), null, 422);
         }
-
-        $answers = (array) $this->input('answers', []);
-        $result = CourseQuizService::submitAttempt($quizId, $userId, $answers, $enrollment->id);
 
         return $this->respondWithData([
             'score_percent' => $result['score_percent'],

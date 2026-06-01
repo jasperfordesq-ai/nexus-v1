@@ -7,6 +7,7 @@
 namespace Tests\Laravel\Feature\Courses;
 
 use App\Core\TenantContext;
+use App\Exceptions\MaxAttemptsExceededException;
 use App\Models\Course;
 use App\Models\CourseLesson;
 use App\Models\CourseQuestion;
@@ -123,6 +124,35 @@ class CourseProgressAndQuizTest extends TestCase
         $result = CourseQuizService::submitAttempt($quiz->id, 42, [$q->id => 'b'], null);
         $this->assertSame(100.0, (float) $result['score_percent']);
         $this->assertTrue($result['passed']);
+    }
+
+    public function test_quiz_enforces_max_attempts(): void
+    {
+        $course = $this->makeCourseWithLessons(1);
+        $quiz = CourseQuiz::create([
+            'course_id' => $course->id,
+            'title' => 'Limited',
+            'pass_mark_percent' => 50,
+            'max_attempts' => 1,
+        ]);
+        CourseQuestion::create([
+            'quiz_id' => $quiz->id,
+            'type' => 'mcq',
+            'prompt' => 'Pick b',
+            'options' => [['id' => 'a', 'label' => 'A'], ['id' => 'b', 'label' => 'B']],
+            'correct' => ['b'],
+            'points' => 1,
+            'position' => 1,
+        ]);
+
+        // First attempt is allowed.
+        $first = CourseQuizService::submitAttempt($quiz->id, 42, [], null);
+        $this->assertNotNull($first['attempt']->id);
+
+        // A second attempt exceeds max_attempts and is rejected (enforced inside
+        // the row-locked transaction, so it can't be raced by concurrent requests).
+        $this->expectException(MaxAttemptsExceededException::class);
+        CourseQuizService::submitAttempt($quiz->id, 42, [], null);
     }
 
     public function test_course_is_tenant_scoped(): void

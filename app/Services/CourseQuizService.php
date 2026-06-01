@@ -6,9 +6,12 @@
 
 namespace App\Services;
 
+use App\Exceptions\MaxAttemptsExceededException;
+use App\Models\CourseEnrollment;
 use App\Models\CourseQuiz;
 use App\Models\CourseQuizAttempt;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 /**
  * CourseQuizService — quiz delivery and grading.
@@ -69,49 +72,65 @@ class CourseQuizService
      */
     public static function submitAttempt(int $quizId, int $userId, array $answers, ?int $enrollmentId = null): array
     {
-        $quiz = CourseQuiz::with('questions')->findOrFail($quizId);
-
-        $totalPoints = 0;
-        $earnedPoints = 0;
-        $needsReview = false;
-
-        foreach ($quiz->questions as $question) {
-            $points = max(1, (int) $question->points);
-            $totalPoints += $points;
-
-            $given = $answers[$question->id] ?? $answers[(string) $question->id] ?? null;
-
-            if (!in_array($question->type, self::OBJECTIVE_TYPES, true)) {
-                // Subjective — defer to instructor grading.
-                $needsReview = true;
-                continue;
+        return DB::transaction(function () use ($quizId, $userId, $answers, $enrollmentId) {
+            // Serialize concurrent submissions for this learner so the max_attempts
+            // ceiling can't be raced (count-then-insert was a TOCTOU hole). The
+            // enrollment row is the natural lock target — one per learner+course, and
+            // every quiz belongs to that course. When no enrollment id is supplied
+            // (service-level callers), the count check below still enforces the cap.
+            if ($enrollmentId !== null) {
+                CourseEnrollment::whereKey($enrollmentId)->lockForUpdate()->first();
             }
 
-            if (self::isCorrect($question->correct ?? [], $given)) {
-                $earnedPoints += $points;
+            $quiz = CourseQuiz::with('questions')->findOrFail($quizId);
+
+            $maxAttempts = (int) $quiz->max_attempts;
+            if ($maxAttempts > 0 && self::attemptsUsed($quizId, $userId) >= $maxAttempts) {
+                throw new MaxAttemptsExceededException();
             }
-        }
 
-        $scorePercent = $totalPoints > 0 ? round(($earnedPoints / $totalPoints) * 100, 2) : 0;
-        $passed = !$needsReview && $scorePercent >= (int) $quiz->pass_mark_percent;
+            $totalPoints = 0;
+            $earnedPoints = 0;
+            $needsReview = false;
 
-        $attempt = CourseQuizAttempt::create([
-            'quiz_id' => $quizId,
-            'user_id' => $userId,
-            'enrollment_id' => $enrollmentId,
-            'answers' => $answers,
-            'score_percent' => $scorePercent,
-            'passed' => $passed,
-            'grading_status' => $needsReview ? 'pending_review' : 'auto',
-            'submitted_at' => Carbon::now(),
-        ]);
+            foreach ($quiz->questions as $question) {
+                $points = max(1, (int) $question->points);
+                $totalPoints += $points;
 
-        return [
-            'attempt' => $attempt,
-            'score_percent' => $scorePercent,
-            'passed' => $passed,
-            'needs_review' => $needsReview,
-        ];
+                $given = $answers[$question->id] ?? $answers[(string) $question->id] ?? null;
+
+                if (!in_array($question->type, self::OBJECTIVE_TYPES, true)) {
+                    // Subjective — defer to instructor grading.
+                    $needsReview = true;
+                    continue;
+                }
+
+                if (self::isCorrect($question->correct ?? [], $given)) {
+                    $earnedPoints += $points;
+                }
+            }
+
+            $scorePercent = $totalPoints > 0 ? round(($earnedPoints / $totalPoints) * 100, 2) : 0;
+            $passed = !$needsReview && $scorePercent >= (int) $quiz->pass_mark_percent;
+
+            $attempt = CourseQuizAttempt::create([
+                'quiz_id' => $quizId,
+                'user_id' => $userId,
+                'enrollment_id' => $enrollmentId,
+                'answers' => $answers,
+                'score_percent' => $scorePercent,
+                'passed' => $passed,
+                'grading_status' => $needsReview ? 'pending_review' : 'auto',
+                'submitted_at' => Carbon::now(),
+            ]);
+
+            return [
+                'attempt' => $attempt,
+                'score_percent' => $scorePercent,
+                'passed' => $passed,
+                'needs_review' => $needsReview,
+            ];
+        });
     }
 
     /**
