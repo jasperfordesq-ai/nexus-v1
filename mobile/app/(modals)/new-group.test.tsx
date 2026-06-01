@@ -129,6 +129,22 @@ jest.mock('heroui-native', () => {
   Button.Label = ({ children }: { children: React.ReactNode }) => <Text>{children}</Text>;
   const Card = ({ children }: { children: React.ReactNode }) => <View>{children}</View>;
   Card.Body = ({ children }: { children: React.ReactNode }) => <View>{children}</View>;
+  const TagGroupContext = React.createContext(null);
+  const TagGroup = ({ children, onSelectionChange }: { children: React.ReactNode; onSelectionChange?: (keys: Set<string | number>) => void }) => (
+    <TagGroupContext.Provider value={{ onSelectionChange }}>
+      <View>{children}</View>
+    </TagGroupContext.Provider>
+  );
+  TagGroup.List = ({ children }: { children: React.ReactNode }) => <View>{children}</View>;
+  TagGroup.Item = ({ children, id }: { children: React.ReactNode; id: string | number }) => {
+    const ctx = React.useContext(TagGroupContext);
+    return (
+      <Pressable onPress={() => ctx?.onSelectionChange?.(new Set([id]))}>
+        <View>{children}</View>
+      </Pressable>
+    );
+  };
+  TagGroup.ItemLabel = ({ children }: { children: React.ReactNode }) => <Text>{children}</Text>;
   return {
     Button,
     Card,
@@ -137,6 +153,7 @@ jest.mock('heroui-native', () => {
     Label: ({ children }: { children: React.ReactNode }) => <Text>{children}</Text>,
     Input: React.forwardRef((props: Record<string, unknown>, ref: React.Ref<unknown>) => <TextInput ref={ref} {...props} />),
     FieldError: ({ children }: { children: React.ReactNode }) => <Text>{children}</Text>,
+    TagGroup,
   };
 });
 

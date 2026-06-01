@@ -10,7 +10,7 @@ import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
-import { Button as HeroButton, Card as HeroCard, Text } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, TagGroup, Text } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 
@@ -312,19 +312,33 @@ function NewGroupScreen() {
             {!isEditing && templates.length > 0 ? (
               <View className="gap-2">
                 <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('create.templateLabel')}</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
-                  {templates.map((template) => (
-                    <HeroButton
-                      key={template.id}
-                      size="sm"
-                      variant={selectedTemplateId === template.id ? 'primary' : 'secondary'}
-                      onPress={() => applyTemplate(template)}
-                      style={selectedTemplateId === template.id ? { backgroundColor: primary } : undefined}
-                    >
-                      <HeroButton.Label>{template.name}</HeroButton.Label>
-                    </HeroButton>
-                  ))}
-                </ScrollView>
+                <TagGroup
+                  size="sm"
+                  selectionMode="single"
+                  selectedKeys={selectedTemplateId !== null ? [selectedTemplateId] : []}
+                  onSelectionChange={(keys) => {
+                    const id = Array.from(keys)[0];
+                    const template = templates.find((tpl) => tpl.id === id);
+                    if (template) applyTemplate(template);
+                  }}
+                >
+                  <TagGroup.List>
+                    {templates.map((template) => {
+                      const isSelected = selectedTemplateId === template.id;
+                      return (
+                        <TagGroup.Item
+                          key={template.id}
+                          id={template.id}
+                          style={isSelected ? { backgroundColor: primary } : undefined}
+                        >
+                          <TagGroup.ItemLabel style={isSelected ? { color: '#FFFFFF' } : undefined}>
+                            {template.name}
+                          </TagGroup.ItemLabel>
+                        </TagGroup.Item>
+                      );
+                    })}
+                  </TagGroup.List>
+                </TagGroup>
               </View>
             ) : null}
 
