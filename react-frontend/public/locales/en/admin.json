@@ -13854,7 +13854,15 @@
     "validation_last_name_required": "Last name is required",
     "validation_password_min": "Password must be at least 8 characters",
     "validation_role_required": "Role is required",
-    "tabs_aria": "User status filter"
+    "tabs_aria": "User status filter",
+    "smart_search_label": "Smart user search",
+    "smart_search_placeholder": "Search name, email, phone, role, status, or ID...",
+    "smart_search_description": "Try names, emails, phone numbers, role:admin, pending, never logged in, or id:42.",
+    "smart_search_clear": "Clear search",
+    "smart_search_status_chip": "Status: {{status}}",
+    "smart_search_role_chip": "Role: {{role}}",
+    "smart_search_text_chip": "Query: {{query}}",
+    "role_super_admin": "Super Admin"
   },
   "view_all": "View All",
   "visibility_rules": {

@@ -9920,7 +9920,15 @@
     "validation_last_name_required": "Il cognome è obbligatorio",
     "validation_password_min": "La password deve contenere almeno 8 caratteri",
     "validation_role_required": "Il ruolo è obbligatorio",
-    "tabs_aria": "User status filter"
+    "tabs_aria": "User status filter",
+    "smart_search_label": "Ricerca utenti intelligente",
+    "smart_search_placeholder": "Cerca per nome, email, telefono, ruolo, stato o ID...",
+    "smart_search_description": "Prova nomi, email, telefoni, role:admin, pending, never logged in o id:42.",
+    "smart_search_clear": "Cancella ricerca",
+    "smart_search_status_chip": "Stato: {{status}}",
+    "smart_search_role_chip": "Ruolo: {{role}}",
+    "smart_search_text_chip": "Ricerca: {{query}}",
+    "role_super_admin": "Super amministratore"
   },
   "view_all": "Visualizza tutto",
   "visibility_rules": {

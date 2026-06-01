@@ -9920,7 +9920,15 @@
     "validation_last_name_required": "Nazwisko jest wymagane",
     "validation_password_min": "Hasło musi mieć co najmniej 8 znaków",
     "validation_role_required": "Rola jest wymagana",
-    "tabs_aria": "User status filter"
+    "tabs_aria": "User status filter",
+    "smart_search_label": "Inteligentne wyszukiwanie u?ytkownik?w",
+    "smart_search_placeholder": "Szukaj po nazwie, e-mailu, telefonie, roli, statusie lub ID...",
+    "smart_search_description": "Spr?buj nazw, e-maili, telefon?w, role:admin, pending, never logged in lub id:42.",
+    "smart_search_clear": "Wyczy?? wyszukiwanie",
+    "smart_search_status_chip": "Status: {{status}}",
+    "smart_search_role_chip": "Rola: {{role}}",
+    "smart_search_text_chip": "Zapytanie: {{query}}",
+    "role_super_admin": "Superadministrator"
   },
   "view_all": "Zobacz wszystko",
   "visibility_rules": {

@@ -9920,7 +9920,15 @@
     "validation_last_name_required": "Achternaam is vereist",
     "validation_password_min": "Wachtwoord moet minimaal 8 tekens lang zijn",
     "validation_role_required": "Rol is vereist",
-    "tabs_aria": "User status filter"
+    "tabs_aria": "User status filter",
+    "smart_search_label": "Slimme gebruikerszoekopdracht",
+    "smart_search_placeholder": "Zoek op naam, e-mail, telefoon, rol, status of ID...",
+    "smart_search_description": "Probeer namen, e-mails, telefoonnummers, role:admin, pending, never logged in of id:42.",
+    "smart_search_clear": "Zoekopdracht wissen",
+    "smart_search_status_chip": "Status: {{status}}",
+    "smart_search_role_chip": "Rol: {{role}}",
+    "smart_search_text_chip": "Zoekterm: {{query}}",
+    "role_super_admin": "Superbeheerder"
   },
   "view_all": "Bekijk alles",
   "visibility_rules": {

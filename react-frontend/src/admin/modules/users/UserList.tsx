@@ -1,4 +1,4 @@
-import { Select, SelectItem, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab } from '@/components/ui';
+import { Select, SelectItem, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab, SearchField } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +10,7 @@ import { Select, SelectItem, Dropdown, DropdownTrigger, DropdownMenu, DropdownIt
  * Parity: PHP Admin\UserController::index()
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
 import Plus from 'lucide-react/icons/plus';
@@ -47,6 +47,140 @@ import { DataTable,
 import type { AdminUser,
   UserListParams } from '../../api/types';
 
+type UserStatusFilter = NonNullable<UserListParams['status']>;
+
+type ParsedUserSearch = {
+  role?: string;
+  search: string;
+  status?: UserStatusFilter;
+};
+
+const PHRASE_HINTS: Array<
+  | { type: 'role'; value: string; pattern: RegExp }
+  | { type: 'status'; value: UserStatusFilter; pattern: RegExp }
+> = [
+  { type: 'status', value: 'never_logged_in', pattern: /\bnever[\s_-]+logged[\s_-]+in\b/gi },
+  { type: 'status', value: 'onboarding_incomplete', pattern: /\bonboarding[\s_-]+incomplete\b/gi },
+  { type: 'role', value: 'tenant_admin', pattern: /\btenant[\s_-]+admin\b/gi },
+  { type: 'role', value: 'super_admin', pattern: /\bsuper[\s_-]+admin\b/gi },
+];
+
+const STATUS_HINTS: Record<string, UserStatusFilter> = {
+  active: 'active',
+  approved: 'active',
+  banned: 'banned',
+  ban: 'banned',
+  incomplete: 'onboarding_incomplete',
+  never_logged_in: 'never_logged_in',
+  neverloggedin: 'never_logged_in',
+  onboarding: 'onboarding_incomplete',
+  onboarding_incomplete: 'onboarding_incomplete',
+  pending: 'pending',
+  suspended: 'suspended',
+  suspend: 'suspended',
+  unapproved: 'pending',
+};
+
+const ROLE_HINTS: Record<string, string> = {
+  admin: 'admin',
+  broker: 'broker',
+  member: 'member',
+  moderator: 'moderator',
+  super_admin: 'super_admin',
+  superadmin: 'super_admin',
+  tenant_admin: 'tenant_admin',
+  tenantadmin: 'tenant_admin',
+};
+
+const SEARCH_PREFIXES = new Set([
+  'email',
+  'id',
+  'location',
+  'name',
+  'organisation',
+  'organization',
+  'phone',
+  'user',
+  'username',
+]);
+
+function normalizeHint(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/^["']|["']$/g, '')
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+}
+
+function cleanSearchToken(value: string): string {
+  return value.trim().replace(/^["']|["']$/g, '');
+}
+
+function parseUserSearch(value: string): ParsedUserSearch {
+  let remaining = value.trim();
+  let role: string | undefined;
+  let status: UserStatusFilter | undefined;
+
+  for (const hint of PHRASE_HINTS) {
+    if (hint.pattern.test(remaining)) {
+      if (hint.type === 'role') {
+        role = hint.value;
+      } else {
+        status = hint.value;
+      }
+      remaining = remaining.replace(hint.pattern, ' ');
+    }
+    hint.pattern.lastIndex = 0;
+  }
+
+  const searchTerms: string[] = [];
+  const tokens = remaining.match(/"[^"]+"|'[^']+'|\S+/g) ?? [];
+
+  for (const rawToken of tokens) {
+    const token = cleanSearchToken(rawToken);
+    if (!token) continue;
+
+    const colonIndex = token.indexOf(':');
+    if (colonIndex > 0) {
+      const prefix = normalizeHint(token.slice(0, colonIndex));
+      const tokenValue = cleanSearchToken(token.slice(colonIndex + 1));
+      const normalizedValue = normalizeHint(tokenValue);
+
+      if (prefix === 'role' && ROLE_HINTS[normalizedValue]) {
+        role = ROLE_HINTS[normalizedValue];
+        continue;
+      }
+      if (prefix === 'status' && STATUS_HINTS[normalizedValue]) {
+        status = STATUS_HINTS[normalizedValue];
+        continue;
+      }
+      if (SEARCH_PREFIXES.has(prefix) && tokenValue) {
+        searchTerms.push(tokenValue);
+        continue;
+      }
+    }
+
+    const normalizedToken = normalizeHint(token);
+    if (STATUS_HINTS[normalizedToken]) {
+      status = STATUS_HINTS[normalizedToken];
+      continue;
+    }
+    if (ROLE_HINTS[normalizedToken]) {
+      role = ROLE_HINTS[normalizedToken];
+      continue;
+    }
+
+    searchTerms.push(token);
+  }
+
+  return {
+    role,
+    search: searchTerms.join(' ').trim(),
+    status,
+  };
+}
+
 export function UserList() {
   const { t } = useTranslation('admin');
   useAdminPageMeta({ title: t('users.title') });
@@ -65,6 +199,7 @@ export function UserList() {
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState(searchParams.get('filter') || 'all');
   const [search, setSearch] = useState('');
+  const parsedSearch = useMemo(() => parseUserSearch(search), [search]);
 
   // Sync filter state when the URL changes externally (e.g. sidebar link click)
   useEffect(() => {
@@ -117,11 +252,14 @@ export function UserList() {
 
   const loadUsers = useCallback(async () => {
     setLoading(true);
+    const effectiveStatus = parsedSearch.status
+      ?? (filter === 'all' ? undefined : filter as UserListParams['status']);
     const params: UserListParams = {
       page,
       limit: 20,
-      search: search || undefined,
-      status: filter === 'all' ? undefined : filter as UserListParams['status'],
+      search: parsedSearch.search || undefined,
+      status: effectiveStatus,
+      role: parsedSearch.role,
       tenant_id: tenant?.id,
     };
 
@@ -141,7 +279,7 @@ export function UserList() {
       }
     }
     setLoading(false);
-  }, [page, filter, search, tenant?.id]);
+  }, [page, filter, parsedSearch, tenant?.id]);
 
   useEffect(() => {
     loadUsers();
@@ -157,6 +295,41 @@ export function UserList() {
     }
     setSearchParams(searchParams);
   };
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
+
+  const roleLabel = (role: string) => {
+    const key = `users.role_${role}`;
+    return t(key, { defaultValue: role.replace(/_/g, ' ') });
+  };
+
+  const activeSearchChips = [
+    parsedSearch.status
+      ? {
+          key: 'status',
+          label: t('users.smart_search_status_chip', {
+            status: t(`users.${parsedSearch.status}`),
+          }),
+        }
+      : null,
+    parsedSearch.role
+      ? {
+          key: 'role',
+          label: t('users.smart_search_role_chip', {
+            role: roleLabel(parsedSearch.role),
+          }),
+        }
+      : null,
+    parsedSearch.search
+      ? {
+          key: 'query',
+          label: t('users.smart_search_text_chip', { query: parsedSearch.search }),
+        }
+      : null,
+  ].filter(Boolean) as Array<{ key: string; label: string }>;
 
   const handleImport = async () => {
     if (!importFile) return;
@@ -431,6 +604,51 @@ export function UserList() {
         }
       />
 
+      <section className="rounded-2xl border border-divider/70 bg-surface p-4 shadow-sm shadow-black/[0.03]">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
+          <div className="min-w-0 flex-1">
+            <p className="mb-2 text-sm font-semibold text-foreground">
+              {t('users.smart_search_label')}
+            </p>
+            <SearchField
+              id="admin-user-smart-search"
+              aria-label={t('users.smart_search_label')}
+              value={search}
+              onValueChange={handleSearchChange}
+              placeholder={t('users.smart_search_placeholder')}
+              size="lg"
+              variant="bordered"
+              autoComplete="off"
+              classNames={{
+                inputWrapper: 'bg-surface-secondary/50 border-divider/70',
+                input: 'text-sm',
+              }}
+            />
+          </div>
+          {search && (
+            <Button
+              variant="secondary"
+              onPress={() => handleSearchChange('')}
+              className="lg:mb-0.5"
+            >
+              {t('users.smart_search_clear')}
+            </Button>
+          )}
+        </div>
+        <p className="mt-2 text-xs text-muted">
+          {t('users.smart_search_description')}
+        </p>
+        {activeSearchChips.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {activeSearchChips.map((chip) => (
+              <Chip key={chip.key} size="sm" variant="soft" color={chip.key === 'query' ? 'default' : 'primary'}>
+                {chip.label}
+              </Chip>
+            ))}
+          </div>
+        )}
+      </section>
+
       {/* Status Filter Tabs */}
       <div className="rounded-2xl border border-divider/70 bg-surface p-2 shadow-sm shadow-black/[0.03]">
         <Tabs
@@ -506,8 +724,7 @@ export function UserList() {
         columns={columns}
         data={users}
         isLoading={loading}
-        searchPlaceholder={t('users.search_placeholder')}
-        onSearch={(q) => { setSearch(q); setPage(1); }}
+        searchable={false}
         onRefresh={loadUsers}
         totalItems={total}
         page={page}

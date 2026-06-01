@@ -9920,7 +9920,15 @@
     "validation_last_name_required": "Le nom de famille est obligatoire",
     "validation_password_min": "Le mot de passe doit contenir au moins 8 caractères",
     "validation_role_required": "Le rôle est requis",
-    "tabs_aria": "User status filter"
+    "tabs_aria": "User status filter",
+    "smart_search_label": "Recherche intelligente des utilisateurs",
+    "smart_search_placeholder": "Rechercher par nom, e-mail, t?l?phone, r?le, statut ou ID...",
+    "smart_search_description": "Essayez des noms, e-mails, t?l?phones, role:admin, pending, never logged in ou id:42.",
+    "smart_search_clear": "Effacer la recherche",
+    "smart_search_status_chip": "Statut : {{status}}",
+    "smart_search_role_chip": "R?le : {{role}}",
+    "smart_search_text_chip": "Recherche : {{query}}",
+    "role_super_admin": "Super administrateur"
   },
   "view_all": "Tout afficher",
   "visibility_rules": {

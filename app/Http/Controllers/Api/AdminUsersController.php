@@ -97,12 +97,25 @@ class AdminUsersController extends BaseApiController
         }
 
         if ($search) {
-            $conditions[] = "(u.first_name LIKE ? OR u.last_name LIKE ? OR u.email LIKE ? OR CONCAT(u.first_name, ' ', u.last_name) LIKE ?)";
             $searchTerm = '%' . addcslashes($search, '%_') . '%';
-            $params[] = $searchTerm;
-            $params[] = $searchTerm;
-            $params[] = $searchTerm;
-            $params[] = $searchTerm;
+            $searchConditions = [
+                'u.first_name LIKE ?',
+                'u.last_name LIKE ?',
+                'u.email LIKE ?',
+                'u.username LIKE ?',
+                'u.phone LIKE ?',
+                'u.location LIKE ?',
+                'u.organization_name LIKE ?',
+                "CONCAT(u.first_name, ' ', u.last_name) LIKE ?",
+            ];
+            $params = array_merge($params, array_fill(0, count($searchConditions), $searchTerm));
+
+            if (ctype_digit((string) $search)) {
+                $searchConditions[] = 'u.id = ?';
+                $params[] = (int) $search;
+            }
+
+            $conditions[] = '(' . implode(' OR ', $searchConditions) . ')';
         }
 
         // Safety: $where is built exclusively from hardcoded SQL fragments above.

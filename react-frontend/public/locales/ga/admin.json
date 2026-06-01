@@ -9920,7 +9920,15 @@
     "validation_last_name_required": "Tá sloinne ag teastáil",
     "validation_password_min": "Caithfidh pasfhocal a bheith 8 gcarachtar ar a laghad",
     "validation_role_required": "Tá ról ag teastáil",
-    "tabs_aria": "User status filter"
+    "tabs_aria": "User status filter",
+    "smart_search_label": "Cuardach cliste ?s?ideoir?",
+    "smart_search_placeholder": "Cuardaigh ainm, r?omhphost, f?n, r?l, st?das n? ID...",
+    "smart_search_description": "Bain triail as ainmneacha, r?omhphoist, uimhreacha f?in, role:admin, pending, never logged in n? id:42.",
+    "smart_search_clear": "Glan an cuardach",
+    "smart_search_status_chip": "St?das: {{status}}",
+    "smart_search_role_chip": "R?l: {{role}}",
+    "smart_search_text_chip": "Iarratas: {{query}}",
+    "role_super_admin": "S?rriarth?ir"
   },
   "view_all": "Féach ar Uile",
   "visibility_rules": {
