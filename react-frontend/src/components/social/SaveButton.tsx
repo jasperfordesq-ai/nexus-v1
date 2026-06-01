@@ -215,7 +215,7 @@ export function SaveButton({
                 >
                   <span
                     className="w-3 h-3 rounded-full mr-2"
-                    style={{ backgroundColor: col.color || '#6366f1' }}
+                    style={{ backgroundColor: col.color || 'var(--color-primary)' }}
                   />
                   <span className="flex-1 truncate text-left">{col.name}</span>
                   <span className="text-xs text-[var(--text-subtle)]">{col.items_count}</span>

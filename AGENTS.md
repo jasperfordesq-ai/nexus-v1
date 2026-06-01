@@ -255,6 +255,7 @@ This project is **publicly released** under AGPL-3.0-or-later at <https://github
 - **NEVER create hooks, checks, or CI gates** that reference legacy views
 - **NEVER suggest improvements** to any legacy PHP view code
 - All user-facing UI is React. Period.
+- **⚠️ Two live exceptions (do NOT delete):** `views/emails/match_{hot,mutual,digest}.php` are still rendered by `app/Services/NotificationDispatcher.php` (each with an inline HTML fallback), and `views/errors/404.php` by `app/Middleware/TenantModuleMiddleware.php`. Deleting these silently changes match-notification emails / the module-404 page. To fully retire `views/`, migrate these into the Laravel mail/view layer first.
 
 ---
 

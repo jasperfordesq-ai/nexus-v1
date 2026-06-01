@@ -111,7 +111,7 @@ export default function CollectionDetailPage() {
         <div className="flex items-center gap-3 mb-6">
           <span
             className="w-5 h-5 rounded-full"
-            style={{ backgroundColor: data.collection.color || '#6366f1' }}
+            style={{ backgroundColor: data.collection.color || 'var(--color-primary)' }}
             aria-hidden="true"
           />
           <h1 className="text-2xl font-bold">{data.collection.name}</h1>

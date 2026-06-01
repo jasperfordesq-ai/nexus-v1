@@ -78,7 +78,7 @@ export default function UserCollectionsView() {
                   <div className="flex items-center gap-2">
                     <span
                       className="w-4 h-4 rounded-full"
-                      style={{ backgroundColor: c.color || '#6366f1' }}
+                      style={{ backgroundColor: c.color || 'var(--color-primary)' }}
                       aria-hidden="true"
                     />
                     <h3 className="font-semibold flex-1 truncate">{c.name}</h3>
