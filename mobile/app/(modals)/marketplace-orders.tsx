@@ -8,7 +8,7 @@ import { Alert, FlatList, Image, Linking, ScrollView, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, CloseButton, Surface, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import AppTopBar from '@/components/ui/AppTopBar';
@@ -464,9 +464,7 @@ function MarketplaceOrdersScreen() {
         <Surface variant="default" className="rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <Text className="min-w-0 flex-1 pr-3 text-lg font-bold" style={{ color: theme.text }} numberOfLines={1}>{t('orders.shipTitle')}</Text>
-              <HeroButton isIconOnly variant="secondary" onPress={() => setShipOrder(null)}>
-                <Ionicons name="close-outline" size={20} color={primary} />
-              </HeroButton>
+              <CloseButton onPress={() => setShipOrder(null)} iconProps={{ size: 20, color: primary }} />
             </View>
             <View className="gap-3">
               <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('orders.shipHint')}</Text>
@@ -494,9 +492,7 @@ function MarketplaceOrdersScreen() {
         <Surface variant="default" className="rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <Text className="min-w-0 flex-1 pr-3 text-lg font-bold" style={{ color: theme.text }} numberOfLines={1}>{t('orders.cancelTitle')}</Text>
-              <HeroButton isIconOnly variant="secondary" onPress={() => setCancelOrder(null)}>
-                <Ionicons name="close-outline" size={20} color={primary} />
-              </HeroButton>
+              <CloseButton onPress={() => setCancelOrder(null)} iconProps={{ size: 20, color: primary }} />
             </View>
             <View className="gap-3">
               <OrderInput label={t('orders.cancelReason')} value={cancelReason} onChangeText={setCancelReason} placeholder={t('orders.cancelReasonPlaceholder')} multiline />
@@ -512,9 +508,7 @@ function MarketplaceOrdersScreen() {
         <Surface variant="default" className="rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <Text className="min-w-0 flex-1 pr-3 text-lg font-bold" style={{ color: theme.text }} numberOfLines={1}>{t('orders.rateTitle')}</Text>
-              <HeroButton isIconOnly variant="secondary" onPress={() => setRateOrder(null)}>
-                <Ionicons name="close-outline" size={20} color={primary} />
-              </HeroButton>
+              <CloseButton onPress={() => setRateOrder(null)} iconProps={{ size: 20, color: primary }} />
             </View>
             <View className="gap-3">
               <View className="gap-2">
@@ -551,9 +545,7 @@ function MarketplaceOrdersScreen() {
         <Surface variant="default" className="max-h-[86%] rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <Text className="min-w-0 flex-1 pr-3 text-lg font-bold" style={{ color: theme.text }} numberOfLines={1}>{t('orders.disputeTitle')}</Text>
-              <HeroButton isIconOnly variant="secondary" onPress={() => setDisputeOrder(null)}>
-                <Ionicons name="close-outline" size={20} color={primary} />
-              </HeroButton>
+              <CloseButton onPress={() => setDisputeOrder(null)} iconProps={{ size: 20, color: primary }} />
             </View>
             <ScrollView contentContainerStyle={{ gap: 12 }} showsVerticalScrollIndicator={false}>
               <View className="gap-2">
@@ -589,9 +581,7 @@ function MarketplaceOrdersScreen() {
                 <Text className="text-lg font-bold" style={{ color: theme.text }} numberOfLines={1}>{t('orders.deliveryOffersTitle')}</Text>
                 <Text className="text-xs" style={{ color: theme.textSecondary }} numberOfLines={1}>{deliveryOrder ? t('orders.number', { number: deliveryOrder.order_number }) : ''}</Text>
               </View>
-              <HeroButton isIconOnly variant="secondary" onPress={() => setDeliveryOrder(null)}>
-                <Ionicons name="close-outline" size={20} color={primary} />
-              </HeroButton>
+              <CloseButton onPress={() => setDeliveryOrder(null)} iconProps={{ size: 20, color: primary }} />
             </View>
             {isLoadingDeliveryOffers ? (
               <View className="py-10"><LoadingSpinner /></View>

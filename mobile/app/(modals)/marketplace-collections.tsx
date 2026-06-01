@@ -8,7 +8,7 @@ import { Alert, FlatList, RefreshControl, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, CloseButton, Surface, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import MarketplaceListingCard from '@/components/marketplace/MarketplaceListingCard';
@@ -459,9 +459,7 @@ function CreateCollectionModal({
               <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('collections.createTitle')}</Text>
               <Text className="text-sm" style={{ color: theme.textSecondary }}>{t('collections.createSubtitle')}</Text>
             </View>
-            <HeroButton isIconOnly variant="secondary" onPress={onClose}>
-              <Ionicons name="close-outline" size={20} color={primary} />
-            </HeroButton>
+            <CloseButton onPress={onClose} iconProps={{ size: 20, color: primary }} />
           </View>
 
           <FormInput label={t('collections.name')} value={name} onChangeText={onNameChange} placeholder={t('collections.namePlaceholder')} />

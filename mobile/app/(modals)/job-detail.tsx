@@ -14,7 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Button as HeroButton, Card as HeroCard, Chip, Surface } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, CloseButton, Surface } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 
@@ -461,9 +461,7 @@ export default function JobDetailScreen() {
       <BottomSheet visible={applyModalVisible} onClose={handleCloseModal} snapPoints={['72%', '92%']}>
         <View style={{ flex: 1, backgroundColor: theme.bg }}>
             <View className="flex-row items-center justify-between px-5 py-3 border-b border-border/50">
-              <HeroButton isIconOnly variant="secondary" onPress={handleCloseModal} accessibilityLabel={t('common:close')}>
-                <Ionicons name="close" size={24} color={theme.text} />
-              </HeroButton>
+              <CloseButton onPress={handleCloseModal} accessibilityLabel={t('common:close')} iconProps={{ size: 24, color: theme.text }} />
               <Text className="text-base font-bold text-foreground flex-1 text-center mx-2">
                 {t('apply.title', { jobTitle: job.title })}
               </Text>

@@ -9,7 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { ResizeMode, Video } from 'expo-av';
 import { Ionicons } from '@expo/vector-icons';
-import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
+import { Button as HeroButton, CloseButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 import * as Haptics from '@/lib/haptics';
 
@@ -622,9 +622,7 @@ function MarketplaceDetailScreen() {
         <Surface variant="default" className="max-h-[72%] rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('collections.addTitle')}</Text>
-              <HeroButton isIconOnly variant="secondary" onPress={() => setCollectionOpen(false)}>
-                <Ionicons name="close-outline" size={20} color={primary} />
-              </HeroButton>
+              <CloseButton onPress={() => setCollectionOpen(false)} iconProps={{ size: 20, color: primary }} />
             </View>
             {isCollectionLoading ? (
               <View className="py-8"><LoadingSpinner /></View>
@@ -653,9 +651,7 @@ function MarketplaceDetailScreen() {
         <Surface variant="default" className="rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('offers.makeTitle')}</Text>
-              <HeroButton isIconOnly variant="secondary" onPress={() => setOfferOpen(false)}>
-                <Ionicons name="close-outline" size={20} color={primary} />
-              </HeroButton>
+              <CloseButton onPress={() => setOfferOpen(false)} iconProps={{ size: 20, color: primary }} />
             </View>
             <View className="gap-3">
               <FormInput label={t('offers.amount')} value={offerAmount} onChangeText={setOfferAmount} placeholder={t('offers.amountPlaceholder')} keyboardType="decimal-pad" />
@@ -672,9 +668,7 @@ function MarketplaceDetailScreen() {
         <Surface variant="default" className="max-h-[86%] rounded-panel p-4">
             <View className="mb-4 flex-row items-center justify-between">
               <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('detail.reportTitle')}</Text>
-              <HeroButton isIconOnly variant="secondary" onPress={() => setReportOpen(false)}>
-                <Ionicons name="close-outline" size={20} color={primary} />
-              </HeroButton>
+              <CloseButton onPress={() => setReportOpen(false)} iconProps={{ size: 20, color: primary }} />
             </View>
             <ScrollView contentContainerStyle={{ gap: 12 }} showsVerticalScrollIndicator={false}>
               <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('detail.reportHint')}</Text>

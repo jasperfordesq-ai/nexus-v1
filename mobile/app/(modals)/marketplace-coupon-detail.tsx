@@ -7,7 +7,7 @@ import { Alert, Image, Share, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, CloseButton, Surface, Text } from 'heroui-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -108,9 +108,7 @@ function MarketplaceCouponDetailScreen() {
                 <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('publicCoupons.showQr')}</Text>
                 <Text className="text-xs" style={{ color: theme.textSecondary }}>{qr?.coupon_code ?? item?.code ?? ''}</Text>
               </View>
-              <HeroButton isIconOnly variant="secondary" onPress={() => setIsQrOpen(false)}>
-                <Ionicons name="close-outline" size={20} color={primary} />
-              </HeroButton>
+              <CloseButton onPress={() => setIsQrOpen(false)} iconProps={{ size: 20, color: primary }} />
             </View>
             {qr ? (
               <View className="items-center gap-3">

@@ -10,7 +10,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
-import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface, Text } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, CloseButton, Spinner, Surface, Text } from 'heroui-native';
 
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -401,9 +401,7 @@ function WalletActionPanel({
             <Text className="text-lg font-bold" style={{ color: theme.text }}>{t(action === 'transfer' ? 'actions.transferTitle' : 'actions.donateTitle')}</Text>
             <Text className="text-sm" style={{ color: theme.textSecondary }}>{t(action === 'transfer' ? 'actions.transferSubtitle' : 'actions.donateSubtitle')}</Text>
           </View>
-          <HeroButton size="sm" variant="secondary" isIconOnly onPress={onClose} accessibilityLabel={t('actions.closeAction')}>
-            <Ionicons name="close-outline" size={18} color={primary} />
-          </HeroButton>
+          <CloseButton onPress={onClose} accessibilityLabel={t('actions.closeAction')} iconProps={{ size: 18, color: primary }} />
         </View>
 
         {action === 'donate' ? (

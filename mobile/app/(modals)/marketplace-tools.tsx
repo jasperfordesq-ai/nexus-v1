@@ -8,7 +8,7 @@ import { Alert, FlatList, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface, Text } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, CloseButton, Spinner, Surface, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 
@@ -710,9 +710,7 @@ function PickupsPanel() {
                   {t('tools.pickups.lastScanDetail', { order: lastScan.order_id, status: t(`pickup.status.${lastScan.status}`, { defaultValue: lastScan.status }) })}
                 </Text>
               </View>
-              <HeroButton isIconOnly size="sm" variant="secondary" onPress={() => setLastScan(null)}>
-                <Ionicons name="close-outline" size={16} color={primary} />
-              </HeroButton>
+              <CloseButton onPress={() => setLastScan(null)} iconProps={{ size: 16, color: primary }} />
             </View>
           </Surface>
         ) : null}
@@ -1069,9 +1067,7 @@ function CouponsPanel() {
                   })}
                 </Text>
               </View>
-              <HeroButton isIconOnly size="sm" variant="secondary" onPress={() => setLastQrRedemption(null)}>
-                <Ionicons name="close-outline" size={16} color={primary} />
-              </HeroButton>
+              <CloseButton onPress={() => setLastQrRedemption(null)} iconProps={{ size: 16, color: primary }} />
             </View>
           </Surface>
         ) : null}
@@ -1105,9 +1101,7 @@ function CouponsPanel() {
                 <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('tools.coupons.redemptionsTitle')}</Text>
                 <Text className="text-xs" style={{ color: theme.textSecondary }}>{redemptionCoupon?.title ?? ''}</Text>
               </View>
-              <HeroButton isIconOnly variant="secondary" onPress={() => setRedemptionCoupon(null)}>
-                <Ionicons name="close-outline" size={20} color={primary} />
-              </HeroButton>
+              <CloseButton onPress={() => setRedemptionCoupon(null)} iconProps={{ size: 20, color: primary }} />
             </View>
             {isLoadingRedemptions ? (
               <View className="py-10"><LoadingSpinner /></View>
