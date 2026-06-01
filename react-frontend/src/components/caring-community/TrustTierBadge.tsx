@@ -1,3 +1,8 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 import Award from 'lucide-react/icons/award';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import Star from 'lucide-react/icons/star';

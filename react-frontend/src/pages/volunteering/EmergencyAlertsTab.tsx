@@ -168,7 +168,7 @@ export function EmergencyAlertsTab() {
       )}
 
       {!error && isLoading && (
-        <div className="space-y-4" role="status" aria-busy="true" aria-label="Loading">
+        <div className="space-y-4" role="status" aria-busy="true" aria-label={t('common:loading')}>
           {[1, 2].map((i) => (
             <CardRowsSkeleton key={i} />
           ))}

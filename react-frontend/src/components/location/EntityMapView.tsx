@@ -76,7 +76,7 @@ export function EntityMapView<T>({
       <Skeleton
         role="status"
         aria-busy="true"
-        aria-label="Loading"
+        aria-label={t('common:loading')}
         className={`rounded-xl ${className}`}
         style={{ height }}
       />

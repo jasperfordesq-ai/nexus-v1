@@ -544,7 +544,7 @@ export function OnboardingPage() {
             animate={{ opacity: 1 }}
             transition={{ delay: 1.0 }}
           >
-            <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" color="success" /></div>
+            <div role="status" aria-busy="true" aria-label={t('common:loading')} className="flex justify-center py-4"><Spinner size="sm" color="success" /></div>
             <p className="text-sm text-theme-subtle mt-2">{t('complete_redirecting')}</p>
           </motion.div>
         </motion.div>
@@ -562,7 +562,7 @@ export function OnboardingPage() {
 
   if (configLoading) {
     return (
-      <div role="status" aria-busy="true" aria-label="Loading" className="flex items-center justify-center py-20">
+      <div role="status" aria-busy="true" aria-label={t('common:loading')} className="flex items-center justify-center py-20">
         <Spinner size="lg" />
       </div>
     );

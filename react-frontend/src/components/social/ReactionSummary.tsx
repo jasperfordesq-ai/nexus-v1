@@ -267,7 +267,7 @@ export function ReactionSummary({
             {/* Reactor list */}
             <div className="mt-3">
               {isLoadingReactors && reactors.length === 0 ? (
-                <div className="flex justify-center py-8" role="status" aria-busy="true" aria-label="Loading">
+                <div className="flex justify-center py-8" role="status" aria-busy="true" aria-label={t('common:loading')}>
                   <Spinner size="md" />
                 </div>
               ) : reactors.length === 0 ? (

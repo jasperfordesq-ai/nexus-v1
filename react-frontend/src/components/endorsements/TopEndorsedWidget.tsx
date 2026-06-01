@@ -57,7 +57,7 @@ export function TopEndorsedWidget({ limit = 5 }: { limit?: number }) {
   if (isLoading) {
     return (
       <GlassCard className="p-4">
-        <div className="flex justify-center py-4" role="status" aria-busy="true" aria-label="Loading">
+        <div className="flex justify-center py-4" role="status" aria-busy="true" aria-label={t('common:loading')}>
           <Spinner size="sm" />
         </div>
       </GlassCard>

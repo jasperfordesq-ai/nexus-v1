@@ -272,7 +272,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
             size="sm"
             startContent={
               uploading ? (
-                <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" color="current" /></div>
+                <div role="status" aria-busy="true" aria-label={t('common:loading')} className="flex justify-center py-4"><Spinner size="sm" color="current" /></div>
               ) : (
                 <Upload className="w-4 h-4" aria-hidden="true" />
               )
@@ -372,7 +372,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
                     aria-label={t('media.delete_aria')}
                   >
                     {deleting === item.id ? (
-                      <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" color="current" /></div>
+                      <div role="status" aria-busy="true" aria-label={t('common:loading')} className="flex justify-center py-4"><Spinner size="sm" color="current" /></div>
                     ) : (
                       <Trash2 className="w-4 h-4" />
                     )}

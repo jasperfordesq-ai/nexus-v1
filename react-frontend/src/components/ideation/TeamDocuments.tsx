@@ -206,7 +206,7 @@ export function TeamDocuments({ groupId, isGroupAdmin }: TeamDocumentsProps) {
 
       {/* Loading */}
       {isLoading && (
-        <div className="flex justify-center py-8" role="status" aria-busy="true" aria-label="Loading">
+        <div className="flex justify-center py-8" role="status" aria-busy="true" aria-label={t('common:loading')}>
           <Spinner size="md" />
         </div>
       )}

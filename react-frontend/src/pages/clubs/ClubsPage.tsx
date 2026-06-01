@@ -185,7 +185,7 @@ export function ClubsPage() {
       {!error && (
         <>
           {isLoading ? (
-            <div role="status" aria-busy="true" aria-label="Loading" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div role="status" aria-busy="true" aria-label={t('common:loading')} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <CardRowsSkeleton key={i} />
               ))}

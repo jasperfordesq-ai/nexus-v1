@@ -225,7 +225,7 @@ export function CommunityProjectsTab() {
 
       {/* Loading */}
       {!error && isLoading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4" role="status" aria-busy="true" aria-label="Loading">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4" role="status" aria-busy="true" aria-label={t('common:loading')}>
           {[1, 2, 3, 4].map((i) => (
             <CardRowsSkeleton key={i} />
           ))}

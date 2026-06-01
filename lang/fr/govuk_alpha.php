@@ -1,4 +1,9 @@
 <?php
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 // Auto-filled missing keys from lang/en/govuk_alpha.php — see MEMORY.md i18n rules.
 return [
     'service_name' => 'Project NEXUS Accessible',

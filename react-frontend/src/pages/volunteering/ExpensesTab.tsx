@@ -241,7 +241,7 @@ export function ExpensesTab() {
 
       {/* Loading */}
       {!error && isLoading && (
-        <div role="status" aria-busy="true" aria-label="Loading" className="space-y-4">
+        <div role="status" aria-busy="true" aria-label={t('common:loading')} className="space-y-4">
           {[1, 2, 3].map((i) => (
             <CardRowsSkeleton key={i} />
           ))}

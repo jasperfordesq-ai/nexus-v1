@@ -165,7 +165,7 @@ export function ShareViaDMModal({ isOpen, onClose, postUrl, postContent }: Share
 
           <div className="max-h-64 overflow-y-auto space-y-1">
             {isSearching && (
-              <div className="flex justify-center py-4" role="status" aria-busy="true" aria-label="Loading">
+              <div className="flex justify-center py-4" role="status" aria-busy="true" aria-label={t('common:loading')}>
                 <Spinner size="sm" />
               </div>
             )}

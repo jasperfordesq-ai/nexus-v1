@@ -212,7 +212,7 @@ export function GroupMarketplaceTab({ groupId }: GroupMarketplaceTabProps) {
 
       {/* Listings Grid */}
       {loading ? (
-        <div className="flex justify-center py-12" role="status" aria-busy="true" aria-label="Loading">
+        <div className="flex justify-center py-12" role="status" aria-busy="true" aria-label={t('common:loading')}>
           <Spinner size="lg" />
         </div>
       ) : listings.length === 0 ? (

@@ -170,7 +170,7 @@ export function MapSearchView({
         style={{ height }}
         role="status"
         aria-busy="true"
-        aria-label="Loading"
+        aria-label={t('common:loading')}
       />
     );
   }

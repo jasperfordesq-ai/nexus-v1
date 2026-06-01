@@ -198,7 +198,7 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
 
       {/* Saved searches list */}
       {isLoading ? (
-        <div className="flex justify-center py-4" role="status" aria-busy="true" aria-label="Loading">
+        <div className="flex justify-center py-4" role="status" aria-busy="true" aria-label={t('common:loading')}>
           <Spinner size="sm" />
         </div>
       ) : savedSearches.length > 0 ? (

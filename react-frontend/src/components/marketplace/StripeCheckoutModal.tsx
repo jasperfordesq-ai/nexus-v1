@@ -146,7 +146,7 @@ function CheckoutForm({
         {/* Stripe Payment Element */}
         <div className="min-h-[200px]">
           {!isReady && (
-            <div className="flex justify-center py-8" role="status" aria-busy="true" aria-label="Loading">
+            <div className="flex justify-center py-8" role="status" aria-busy="true" aria-label={t('common:loading')}>
               <Spinner size="lg" color="accent" />
             </div>
           )}

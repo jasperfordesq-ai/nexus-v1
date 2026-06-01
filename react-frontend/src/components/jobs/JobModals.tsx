@@ -259,7 +259,7 @@ export function QualificationModal({
             </ModalHeader>
             <ModalBody>
               {isLoading ? (
-                <div role="status" aria-busy="true" aria-label="Loading" className="space-y-4">
+                <div role="status" aria-busy="true" aria-label={t('common:loading')} className="space-y-4">
                   <Skeleton className="h-4 w-3/4 rounded" />
                   <Skeleton className="h-8 rounded" />
                   <Skeleton className="h-4 w-1/2 rounded" />
@@ -313,7 +313,7 @@ export function QualificationModal({
                   </div>
                 </div>
               ) : (
-                <div className="flex justify-center py-8" role="status" aria-busy="true" aria-label="Loading">
+                <div className="flex justify-center py-8" role="status" aria-busy="true" aria-label={t('common:loading')}>
                   <Spinner />
                 </div>
               )}

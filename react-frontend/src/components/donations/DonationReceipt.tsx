@@ -77,7 +77,7 @@ export function DonationReceipt({ donationId }: DonationReceiptProps) {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12" role="status" aria-busy="true" aria-label="Loading">
+      <div className="flex items-center justify-center py-12" role="status" aria-busy="true" aria-label={t('common:loading')}>
         <Spinner size="lg" />
       </div>
     );

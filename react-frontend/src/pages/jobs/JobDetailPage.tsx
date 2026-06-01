@@ -685,7 +685,7 @@ export function JobDetailPage() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="space-y-6" role="status" aria-busy="true" aria-label="Loading">
+      <div className="space-y-6" role="status" aria-busy="true" aria-label={t('common:loading')}>
         <PageMeta title={t('detail.loading')} noIndex />
         <CardRowsSkeleton className="p-6" />
       </div>

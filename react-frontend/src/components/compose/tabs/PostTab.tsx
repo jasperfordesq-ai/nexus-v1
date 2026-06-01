@@ -268,7 +268,7 @@ export function PostTab({ onSuccess, onClose, isOpen, groupId, templateData, onC
           isBordered
         />
         <div className="flex-1 min-w-0">
-          <Suspense fallback={<div role="status" aria-busy="true" aria-label="Loading"><Spinner size="sm" className="m-4" /></div>}>
+          <Suspense fallback={<div role="status" aria-busy="true" aria-label={t('common:loading')}><Spinner size="sm" className="m-4" /></div>}>
             <ComposeEditor
               ref={editorRef}
               value={draft.htmlContent}

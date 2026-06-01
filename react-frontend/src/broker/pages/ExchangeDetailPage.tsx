@@ -73,7 +73,7 @@ export default function ExchangeDetail() {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[300px]">
-        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" /></div>
+        <div role="status" aria-busy="true" aria-label={t('common:loading')} className="flex justify-center py-4"><Spinner size="lg" /></div>
       </div>
     );
   }

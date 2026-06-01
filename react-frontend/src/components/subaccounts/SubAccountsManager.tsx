@@ -405,7 +405,7 @@ export function SubAccountsManager() {
       <p className="text-sm text-theme-subtle">{t('sub_accounts.description')}</p>
 
       {isLoading && (
-        <div className="flex justify-center py-8" role="status" aria-busy="true" aria-label="Loading">
+        <div className="flex justify-center py-8" role="status" aria-busy="true" aria-label={t('common:loading')}>
           <Spinner size="lg" />
         </div>
       )}

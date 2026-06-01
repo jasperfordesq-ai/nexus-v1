@@ -232,7 +232,7 @@ export default function OnboardingPage() {
         <CardBody>
           {funnelLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" label={t('common.loading')} /></div>
+              <div role="status" aria-busy="true" aria-label={t('common:loading')} className="flex justify-center py-4"><Spinner size="lg" label={t('common.loading')} /></div>
             </div>
           ) : stages.length === 0 ? (
             <p className="text-sm text-muted text-center py-8">

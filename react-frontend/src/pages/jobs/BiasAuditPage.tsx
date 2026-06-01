@@ -285,7 +285,7 @@ export function BiasAuditPage() {
 
       {/* Loading state */}
       {isLoading && (
-        <div className="space-y-4" role="status" aria-busy="true" aria-label="Loading">
+        <div className="space-y-4" role="status" aria-busy="true" aria-label={t('common:loading')}>
           {[1, 2, 3].map((i) => (
             <CardRowsSkeleton key={i} className="p-6" />
           ))}

@@ -548,6 +548,7 @@ function ClusterChooser({
 
 export function LocationMap(props: LocationMapProps) {
   const { mapProvider, hasFeature } = useTenant();
+  const { t } = useTranslation();
 
   if (!hasFeature('maps')) {
     return null;
@@ -560,7 +561,7 @@ export function LocationMap(props: LocationMapProps) {
           <Skeleton
             role="status"
             aria-busy="true"
-            aria-label="Loading"
+            aria-label={t('common:loading')}
             className={`rounded-xl ${props.className ?? ''}`}
             style={{ height: props.height ?? '400px' }}
           />

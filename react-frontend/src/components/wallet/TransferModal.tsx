@@ -339,7 +339,7 @@ export function TransferModal({
                       }}
                       startContent={
                         isSearching ? (
-                          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" color="current" /></div>
+                          <div role="status" aria-busy="true" aria-label={t('common:loading')} className="flex justify-center py-4"><Spinner size="sm" color="current" /></div>
                         ) : (
                           <Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />
                         )

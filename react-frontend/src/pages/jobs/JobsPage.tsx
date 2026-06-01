@@ -626,7 +626,7 @@ export function JobsPage() {
       {activeTab === 'saved' && (
         <>
           {isLoadingSaved ? (
-            <div className="space-y-4" role="status" aria-busy="true" aria-label="Loading">
+            <div className="space-y-4" role="status" aria-busy="true" aria-label={t('common:loading')}>
               {[1, 2].map((i) => (
                 <CardRowsSkeleton key={i} rows={['w-1/2', 'w-3/4', 'w-1/4']} />
               ))}
@@ -669,7 +669,7 @@ export function JobsPage() {
             </Link>
           </div>
           {isLoadingMyPostings ? (
-            <div className="space-y-4" role="status" aria-busy="true" aria-label="Loading">
+            <div className="space-y-4" role="status" aria-busy="true" aria-label={t('common:loading')}>
               {[1, 2].map((i) => (
                 <CardRowsSkeleton key={i} rows={['w-1/2', 'w-3/4', 'w-1/4']} />
               ))}

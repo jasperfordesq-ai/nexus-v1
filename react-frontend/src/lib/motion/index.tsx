@@ -464,8 +464,8 @@ function createMotionComponent(tag: string) {
         const onMove = (e: PointerEvent) => {
           const d = dragData.current;
           if (!d || e.pointerId !== d.pointerId) return;
-          let dx = drag === 'y' ? 0 : e.clientX - d.startX;
-          let dy = drag === 'x' ? 0 : e.clientY - d.startY;
+          const dx = drag === 'y' ? 0 : e.clientX - d.startX;
+          const dy = drag === 'x' ? 0 : e.clientY - d.startY;
           d.lastX = e.clientX; d.lastY = e.clientY; d.lastT = performance.now();
           setDragVisual({ x: elasticFactor('x', dx), y: elasticFactor('y', dy) });
         };

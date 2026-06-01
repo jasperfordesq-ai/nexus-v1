@@ -333,7 +333,7 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
   // ─── Render ────────────────────────────────────────────────────────────────
   if (isLoading) {
     return (
-      <div className="flex justify-center py-8" role="status" aria-busy="true" aria-label="Loading">
+      <div className="flex justify-center py-8" role="status" aria-busy="true" aria-label={t('common:loading')}>
         <Spinner size="md" color="accent" />
       </div>
     );

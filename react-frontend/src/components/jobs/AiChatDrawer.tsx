@@ -87,7 +87,7 @@ export function AiChatDrawer({
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-surface-secondary rounded-2xl px-4 py-2.5" role="status" aria-busy="true" aria-label="Loading">
+                <div className="bg-surface-secondary rounded-2xl px-4 py-2.5" role="status" aria-busy="true" aria-label={t('common:loading')}>
                   <Spinner size="sm" />
                 </div>
               </div>

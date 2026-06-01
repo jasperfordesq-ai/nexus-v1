@@ -335,7 +335,7 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-8" role="status" aria-busy="true" aria-label="Loading">
+      <div className="flex justify-center py-8" role="status" aria-busy="true" aria-label={t('common:loading')}>
         <Spinner size="md" />
       </div>
     );
@@ -515,7 +515,7 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
             {/* Messages */}
             <div className="flex-1 overflow-y-auto space-y-3 mb-3 max-h-96">
               {isLoadingMessages && (
-                <div className="flex justify-center py-4" role="status" aria-busy="true" aria-label="Loading">
+                <div className="flex justify-center py-4" role="status" aria-busy="true" aria-label={t('common:loading')}>
                   <Spinner size="sm" />
                 </div>
               )}

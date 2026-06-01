@@ -1,3 +1,8 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 import Users from 'lucide-react/icons/users';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -49,7 +54,7 @@ export function JobApplicationsList({
         {showApplications && (
           <div className="mt-4 space-y-4">
             {isLoadingApps ? (
-              <div role="status" aria-busy="true" aria-label="Loading" className="space-y-3">
+              <div role="status" aria-busy="true" aria-label={t('common:loading')} className="space-y-3">
                 {[1, 2].map((i) => (
                   <CardRowsSkeleton key={i} className="p-4" rows={['w-1/3', 'w-2/3']} />
                 ))}

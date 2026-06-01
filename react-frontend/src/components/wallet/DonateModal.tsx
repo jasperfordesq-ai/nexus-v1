@@ -245,7 +245,7 @@ export function DonateModal({ isOpen, onClose, currentBalance, onDonationComplet
                     }}
                     startContent={
                       isSearching
-                        ? <span role="status" aria-busy="true" aria-label="Loading" className="inline-flex"><Spinner size="sm" color="current" /></span>
+                        ? <span role="status" aria-busy="true" aria-label={t('common:loading')} className="inline-flex"><Spinner size="sm" color="current" /></span>
                         : <Search className="w-4 h-4 text-theme-subtle" />
                     }
                     classNames={{
