@@ -12,6 +12,7 @@ import * as Notifications from 'expo-notifications';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { ThemeProvider, DarkTheme, type Theme } from '@react-navigation/native';
 import { HeroUINativeProvider } from 'heroui-native';
 
 import { useTranslation } from 'react-i18next';
@@ -25,6 +26,22 @@ import { navigateToLink } from '@/lib/utils/navigateToLink';
 import * as Sentry from '@sentry/react-native';
 
 const NATIVE_SCREEN_BACKGROUND = '#0F0F0F';
+
+// The app is dark-only (app.json userInterfaceStyle: "dark"). React Navigation
+// otherwise defaults every navigator's scene background to its light theme, so
+// any screen that doesn't paint `bg-background` shows a light page. Providing a
+// dark navigation theme makes the dark backdrop the default everywhere — no
+// page can fall back to white.
+const NAV_THEME: Theme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    background: NATIVE_SCREEN_BACKGROUND,
+    card: '#16162A',
+    border: '#24242E',
+    text: '#EDEDED',
+  },
+};
 
 // Validate environment variables at startup — logs warnings for missing config
 validateEnv();
@@ -60,7 +77,9 @@ function RootLayout() {
               <AuthProvider>
                 <RealtimeProvider>
                   <StatusBar style="light" />
-                  <RootNavigator />
+                  <ThemeProvider value={NAV_THEME}>
+                    <RootNavigator />
+                  </ThemeProvider>
                 </RealtimeProvider>
               </AuthProvider>
             </TenantProvider>
