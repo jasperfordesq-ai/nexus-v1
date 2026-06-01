@@ -26,7 +26,7 @@ class AdminFederationNeighborhoodsController extends BaseApiController
      */
     public function index(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
 
         if (class_exists(\App\Services\FederationNeighborhoodService::class)) {
             try {
@@ -47,7 +47,7 @@ class AdminFederationNeighborhoodsController extends BaseApiController
      */
     public function store(): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requirePlatformSuperAdmin();
         $input = $this->getAllInput();
 
         $name = trim($input['name'] ?? '');
@@ -76,7 +76,7 @@ class AdminFederationNeighborhoodsController extends BaseApiController
      */
     public function destroy(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
 
         try {
             $existing = DB::selectOne("SELECT id FROM federation_neighborhoods WHERE id = ?", [$id]);
@@ -100,7 +100,7 @@ class AdminFederationNeighborhoodsController extends BaseApiController
      */
     public function addTenant(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
         $input = $this->getAllInput();
 
         $tenantId = (int) ($input['tenant_id'] ?? 0);
@@ -127,7 +127,7 @@ class AdminFederationNeighborhoodsController extends BaseApiController
      */
     public function removeTenant(int $id, int $tenantId): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
 
         try {
             $deleted = DB::delete(
@@ -152,7 +152,7 @@ class AdminFederationNeighborhoodsController extends BaseApiController
      */
     public function availableTenants(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
         $currentTenantId = $this->getTenantId();
 
         try {

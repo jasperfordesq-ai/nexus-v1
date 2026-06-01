@@ -27,7 +27,7 @@ class AdminFederationNeighborhoodsControllerTest extends TestCase
 
     public function test_index_returns_200_for_admin(): void
     {
-        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create(['is_super_admin' => true]);
         Sanctum::actingAs($admin);
 
         $response = $this->apiGet('/v2/admin/federation/neighborhoods');
@@ -59,7 +59,7 @@ class AdminFederationNeighborhoodsControllerTest extends TestCase
 
     public function test_store_validates_name_required(): void
     {
-        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create(['is_super_admin' => true]);
         Sanctum::actingAs($admin);
 
         $response = $this->apiPost('/v2/admin/federation/neighborhoods', [
@@ -88,7 +88,7 @@ class AdminFederationNeighborhoodsControllerTest extends TestCase
 
     public function test_available_tenants_returns_200_for_admin(): void
     {
-        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create(['is_super_admin' => true]);
         Sanctum::actingAs($admin);
 
         $response = $this->apiGet('/v2/admin/federation/available-tenants');
@@ -113,7 +113,7 @@ class AdminFederationNeighborhoodsControllerTest extends TestCase
 
     public function test_destroy_returns_404_for_nonexistent(): void
     {
-        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create(['is_super_admin' => true]);
         Sanctum::actingAs($admin);
 
         $response = $this->apiDelete('/v2/admin/federation/neighborhoods/999999');
@@ -136,5 +136,26 @@ class AdminFederationNeighborhoodsControllerTest extends TestCase
         $response = $this->apiDelete('/v2/admin/federation/neighborhoods/1');
 
         $response->assertStatus(401);
+    }
+
+    // ================================================================
+    // Platform-super-admin boundary — a TENANT super-admin must NOT be
+    // able to manage cross-tenant federation topology.
+    // ================================================================
+
+    public function test_store_returns_403_for_tenant_super_admin(): void
+    {
+        $tenantAdmin = User::factory()->forTenant($this->testTenantId)->admin()->create([
+            'is_super_admin' => false,
+            'is_god' => false,
+            'is_tenant_super_admin' => true,
+        ]);
+        Sanctum::actingAs($tenantAdmin);
+
+        $response = $this->apiPost('/v2/admin/federation/neighborhoods', [
+            'name' => 'Should be blocked',
+        ]);
+
+        $response->assertStatus(403);
     }
 }
