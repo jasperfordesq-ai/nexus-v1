@@ -8,7 +8,7 @@ import { Alert, FlatList, RefreshControl, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Button as HeroButton, Card as HeroCard, Surface, Text } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Surface, TagGroup, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import MarketplaceListingCard from '@/components/marketplace/MarketplaceListingCard';
@@ -143,12 +143,6 @@ function MarketplaceCategoryScreen() {
     }
   }
 
-  function toggleCondition(value: MarketplaceCondition) {
-    setConditions((current) => current.includes(value)
-      ? current.filter((item) => item !== value)
-      : [...current, value]);
-  }
-
   if (!hasFeature('marketplace') || !safeCategoryId) {
     return (
       <SafeAreaView className="flex-1 bg-background">
@@ -208,33 +202,68 @@ function MarketplaceCategoryScreen() {
               <FilterInput label={t('category.priceMax')} value={priceMax} onChangeText={setPriceMax} placeholder={t('category.maxPlaceholder')} />
             </View>
 
-            <View className="mb-3 flex-row flex-wrap gap-2">
-              {CONDITION_FILTERS.map((value) => (
-                <HeroButton
-                  key={value || 'all'}
-                  size="sm"
-                  variant={(value ? conditions.includes(value) : conditions.length === 0) ? 'primary' : 'secondary'}
-                  onPress={() => value ? toggleCondition(value) : setConditions([])}
-                  style={(value ? conditions.includes(value) : conditions.length === 0) ? { backgroundColor: primary } : undefined}
-                >
-                  <HeroButton.Label>{value ? t(`condition.${value}`) : t('category.allConditions')}</HeroButton.Label>
-                </HeroButton>
-              ))}
-            </View>
+            <TagGroup
+              size="sm"
+              selectionMode="multiple"
+              selectedKeys={conditions.length === 0 ? ['all'] : conditions}
+              onSelectionChange={(keys) => {
+                const next = Array.from(keys);
+                // The 'all' sentinel chip clears the multi-select; picking any
+                // real condition drops 'all'.
+                if (next.includes('all') && conditions.length > 0) {
+                  setConditions([]);
+                } else {
+                  setConditions(next.filter((key) => key !== 'all') as MarketplaceCondition[]);
+                }
+              }}
+              className="mb-3"
+            >
+              <TagGroup.List>
+                {CONDITION_FILTERS.map((value) => {
+                  const id = value || 'all';
+                  const isSelected = value ? conditions.includes(value) : conditions.length === 0;
+                  return (
+                    <TagGroup.Item
+                      key={id}
+                      id={id}
+                      style={isSelected ? { backgroundColor: primary } : undefined}
+                    >
+                      <TagGroup.ItemLabel style={isSelected ? { color: '#FFFFFF' } : undefined}>
+                        {value ? t(`condition.${value}`) : t('category.allConditions')}
+                      </TagGroup.ItemLabel>
+                    </TagGroup.Item>
+                  );
+                })}
+              </TagGroup.List>
+            </TagGroup>
 
-            <View className="mb-3 flex-row flex-wrap gap-2">
-              {SORTS.map((value) => (
-                <HeroButton
-                  key={value}
-                  size="sm"
-                  variant={sort === value ? 'primary' : 'secondary'}
-                  onPress={() => setSort(value)}
-                  style={sort === value ? { backgroundColor: primary } : undefined}
-                >
-                  <HeroButton.Label>{t(`advancedSearch.sortOptions.${value}`)}</HeroButton.Label>
-                </HeroButton>
-              ))}
-            </View>
+            <TagGroup
+              size="sm"
+              selectionMode="single"
+              selectedKeys={[sort]}
+              onSelectionChange={(keys) => {
+                const next = Array.from(keys)[0];
+                if (next !== undefined) setSort(next as typeof sort);
+              }}
+              className="mb-3"
+            >
+              <TagGroup.List>
+                {SORTS.map((value) => {
+                  const isSelected = sort === value;
+                  return (
+                    <TagGroup.Item
+                      key={value}
+                      id={value}
+                      style={isSelected ? { backgroundColor: primary } : undefined}
+                    >
+                      <TagGroup.ItemLabel style={isSelected ? { color: '#FFFFFF' } : undefined}>
+                        {t(`advancedSearch.sortOptions.${value}`)}
+                      </TagGroup.ItemLabel>
+                    </TagGroup.Item>
+                  );
+                })}
+              </TagGroup.List>
+            </TagGroup>
 
             {activeFilterCount > 0 ? (
               <HeroButton className="mb-3" variant="secondary" onPress={resetFilters}>
