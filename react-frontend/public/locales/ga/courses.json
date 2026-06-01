@@ -117,7 +117,9 @@
     "feedback": "Aiseolas (roghnach)",
     "submit": "Cuir isteach grád",
     "graded": "Sábháladh an grád",
-    "error": "Níorbh fhéidir an grád a shábháil."
+    "error": "Níorbh fhéidir an grád a shábháil.",
+    "answer": "Freagra",
+    "no_answer": "Gan freagra"
   },
   "analytics": {
     "title": "Anailísíocht",

@@ -117,7 +117,9 @@
     "feedback": "Commentaires (facultatif)",
     "submit": "Soumettre la note",
     "graded": "Note enregistrée",
-    "error": "Impossible d'enregistrer la note."
+    "error": "Impossible d'enregistrer la note.",
+    "answer": "Réponse",
+    "no_answer": "Aucune réponse"
   },
   "analytics": {
     "title": "Analytique",

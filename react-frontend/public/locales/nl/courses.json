@@ -117,7 +117,9 @@
     "feedback": "Feedback (optioneel)",
     "submit": "Cijfer indienen",
     "graded": "Cijfer opgeslagen",
-    "error": "Kan het cijfer niet opslaan."
+    "error": "Kan het cijfer niet opslaan.",
+    "answer": "Antwoord",
+    "no_answer": "Geen antwoord"
   },
   "analytics": {
     "title": "Analyse",

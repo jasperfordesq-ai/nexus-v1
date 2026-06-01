@@ -15,7 +15,22 @@ import { Avatar, Button, Card, CardBody, Input, Spinner, Switch, Textarea } from
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
-import { coursesApi, type PendingAttempt } from '@/lib/api/courses';
+import { coursesApi, type PendingAttempt, type QuizQuestion } from '@/lib/api/courses';
+
+/**
+ * Render a learner's answer to a question in human-readable form: map objective
+ * option id(s) back to their labels; show short-answer/essay text as-is.
+ */
+function formatAnswer(question: QuizQuestion, answers: PendingAttempt['answers']): string {
+  if (!answers) return '';
+  const raw = answers[String(question.id)];
+  if (raw == null || raw === '') return '';
+  if (question.options && question.options.length) {
+    const ids = Array.isArray(raw) ? raw.map(String) : [String(raw)];
+    return ids.map((id) => question.options!.find((o) => o.id === id)?.label ?? id).join(', ');
+  }
+  return Array.isArray(raw) ? raw.map(String).join(', ') : String(raw);
+}
 
 export default function CourseGradingPage() {
   const { t } = useTranslation('courses');
@@ -92,10 +107,32 @@ function GradeCard({ attempt, onGraded }: { attempt: PendingAttempt; onGraded: (
           </div>
         </div>
 
-        {attempt.answers ? (
-          <pre className="text-xs bg-[var(--color-surface-2)] rounded-md p-3 whitespace-pre-wrap overflow-x-auto">
-            {JSON.stringify(attempt.answers, null, 2)}
-          </pre>
+        {attempt.quiz?.questions?.length ? (
+          <div className="flex flex-col gap-2">
+            {attempt.quiz.questions.map((q) => {
+              const ans = formatAnswer(q, attempt.answers);
+              return (
+                <div key={q.id} className="rounded-md border border-[var(--color-border)] p-3">
+                  <div className="text-sm font-medium whitespace-pre-wrap">{q.prompt}</div>
+                  <div className="mt-1 text-sm whitespace-pre-wrap">
+                    <span className="text-muted">{t('grading.answer')}: </span>
+                    {ans ? <span>{ans}</span> : <span className="italic text-muted">{t('grading.no_answer')}</span>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : attempt.answers && Object.keys(attempt.answers).length ? (
+          // Defensive fallback when question metadata is unavailable — readable
+          // lines rather than a raw JSON blob.
+          <div className="flex flex-col gap-1 text-sm">
+            {Object.entries(attempt.answers).map(([qid, val]) => (
+              <div key={qid} className="whitespace-pre-wrap">
+                <span className="text-muted">#{qid}: </span>
+                {Array.isArray(val) ? val.map(String).join(', ') : String(val ?? '')}
+              </div>
+            ))}
+          </div>
         ) : null}
 
         <div className="flex items-end gap-3 flex-wrap">

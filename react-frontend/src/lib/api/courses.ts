@@ -169,7 +169,7 @@ export interface PendingAttempt {
   score_percent: string | number;
   grading_status: string;
   submitted_at?: string | null;
-  quiz?: { id: number; title: string };
+  quiz?: { id: number; title: string; questions?: QuizQuestion[] };
   user?: { id: number; name: string; avatar_url?: string | null };
 }
 

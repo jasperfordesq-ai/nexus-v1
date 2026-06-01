@@ -117,7 +117,9 @@
     "feedback": "Comentarios (opcional)",
     "submit": "Enviar calificación",
     "graded": "Calificación guardada",
-    "error": "No se pudo guardar la calificación."
+    "error": "No se pudo guardar la calificación.",
+    "answer": "Respuesta",
+    "no_answer": "Sin respuesta"
   },
   "analytics": {
     "title": "Analítica",

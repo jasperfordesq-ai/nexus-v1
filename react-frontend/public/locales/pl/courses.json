@@ -117,7 +117,9 @@
     "feedback": "Opinia (opcjonalnie)",
     "submit": "Prześlij ocenę",
     "graded": "Ocena zapisana",
-    "error": "Nie udało się zapisać oceny."
+    "error": "Nie udało się zapisać oceny.",
+    "answer": "Odpowiedź",
+    "no_answer": "Brak odpowiedzi"
   },
   "analytics": {
     "title": "Analityka",

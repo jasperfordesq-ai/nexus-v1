@@ -117,7 +117,9 @@
     "feedback": "Feedback (facoltativo)",
     "submit": "Invia voto",
     "graded": "Voto salvato",
-    "error": "Impossibile salvare il voto."
+    "error": "Impossibile salvare il voto.",
+    "answer": "Risposta",
+    "no_answer": "Nessuna risposta"
   },
   "analytics": {
     "title": "Analitica",

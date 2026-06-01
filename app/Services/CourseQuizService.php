@@ -128,7 +128,15 @@ class CourseQuizService
 
         return CourseQuizAttempt::whereIn('quiz_id', $quizIds)
             ->where('grading_status', 'pending_review')
-            ->with(['quiz:id,title', 'user:id,name,avatar_url'])
+            ->with([
+                'quiz:id,title',
+                // Include question prompts/options so the grader sees readable
+                // questions + the learner's answers (not a raw JSON blob). The
+                // answer key is never exposed: 'correct'/'explanation' are omitted
+                // by the column select AND by CourseQuestion::$hidden.
+                'quiz.questions:id,quiz_id,type,prompt,options,points,position',
+                'user:id,name,avatar_url',
+            ])
             ->orderBy('submitted_at')
             ->get()
             ->toArray();

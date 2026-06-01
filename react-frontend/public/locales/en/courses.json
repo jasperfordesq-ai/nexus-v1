@@ -117,7 +117,9 @@
     "feedback": "Feedback (optional)",
     "submit": "Submit grade",
     "graded": "Grade saved",
-    "error": "Could not save the grade."
+    "error": "Could not save the grade.",
+    "answer": "Answer",
+    "no_answer": "No answer"
   },
   "analytics": {
     "title": "Analytics",

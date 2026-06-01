@@ -117,7 +117,9 @@
     "feedback": "Feedback (optional)",
     "submit": "Note abgeben",
     "graded": "Note gespeichert",
-    "error": "Die Note konnte nicht gespeichert werden."
+    "error": "Die Note konnte nicht gespeichert werden.",
+    "answer": "Antwort",
+    "no_answer": "Keine Antwort"
   },
   "analytics": {
     "title": "Analytik",

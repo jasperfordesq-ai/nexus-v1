@@ -117,7 +117,9 @@
     "feedback": "Comentários (opcional)",
     "submit": "Enviar nota",
     "graded": "Nota salva",
-    "error": "Não foi possível salvar a nota."
+    "error": "Não foi possível salvar a nota.",
+    "answer": "Resposta",
+    "no_answer": "Sem resposta"
   },
   "analytics": {
     "title": "Análise",
