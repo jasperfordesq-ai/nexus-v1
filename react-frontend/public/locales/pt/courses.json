@@ -15,10 +15,11 @@
     "advanced": "Avançado"
   },
   "card": {
-    "lessons": "{{count}} lição",
-    "lessons_plural": "{{count}} lições",
-    "enrolled": "{{count}} inscrito",
-    "by_author": "por {{name}}"
+    "by_author": "por {{name}}",
+    "lessons_one": "{{count}} lição",
+    "lessons_other": "{{count}} lições",
+    "enrolled_one": "{{count}} inscrito",
+    "enrolled_other": "{{count}} inscrito"
   },
   "detail": {
     "about": "Sobre este curso",
@@ -159,12 +160,12 @@
     "your_rating": "Sua classificação",
     "submit": "Enviar avaliação",
     "empty": "Ainda não há comentários.",
-    "count": "{{count}} revisão",
-    "count_plural": "{{count}} comentários",
     "rating_required": "Escolha uma classificação por estrelas.",
     "thanks": "Obrigado pela sua avaliação!",
     "rate_n_stars": "Avaliar {{count}} de 5 estrelas",
-    "submit_error": "Não foi possível enviar a sua avaliação. Tente novamente."
+    "submit_error": "Não foi possível enviar a sua avaliação. Tente novamente.",
+    "count_one": "{{count}} revisão",
+    "count_other": "{{count}} comentários"
   },
   "admin": {
     "title": "Cursos",

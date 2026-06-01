@@ -15,10 +15,11 @@
     "advanced": "متقدم"
   },
   "card": {
-    "lessons": "{{count}} الدرس",
-    "lessons_plural": "{{count}} الدروس",
-    "enrolled": "تم تسجيل {{count}}",
-    "by_author": "بواسطة {{name}}"
+    "by_author": "بواسطة {{name}}",
+    "lessons_one": "{{count}} الدرس",
+    "lessons_other": "{{count}} الدروس",
+    "enrolled_one": "تم تسجيل {{count}}",
+    "enrolled_other": "تم تسجيل {{count}}"
   },
   "detail": {
     "about": "حول هذه الدورة",
@@ -159,12 +160,12 @@
     "your_rating": "تقييمك",
     "submit": "إرسال المراجعة",
     "empty": "لا توجد تعليقات حتى الآن.",
-    "count": "مراجعة {{count}}",
-    "count_plural": "{{count}} التعليقات",
     "rating_required": "الرجاء اختيار تصنيف النجوم.",
     "thanks": "شكرا لمراجعتك!",
     "rate_n_stars": "قيِّم {{count}} من 5 نجوم",
-    "submit_error": "تعذّر إرسال مراجعتك. يرجى المحاولة مرة أخرى."
+    "submit_error": "تعذّر إرسال مراجعتك. يرجى المحاولة مرة أخرى.",
+    "count_one": "مراجعة {{count}}",
+    "count_other": "{{count}} التعليقات"
   },
   "admin": {
     "title": "الدورات",

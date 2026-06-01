@@ -15,10 +15,11 @@
     "advanced": "Advanced"
   },
   "card": {
-    "lessons": "{{count}} lesson",
-    "lessons_plural": "{{count}} lessons",
-    "enrolled": "{{count}} enrolled",
-    "by_author": "by {{name}}"
+    "by_author": "by {{name}}",
+    "lessons_one": "{{count}} lesson",
+    "lessons_other": "{{count}} lessons",
+    "enrolled_one": "{{count}} enrolled",
+    "enrolled_other": "{{count}} enrolled"
   },
   "detail": {
     "about": "About this course",
@@ -159,12 +160,12 @@
     "your_rating": "Your rating",
     "submit": "Submit review",
     "empty": "No reviews yet.",
-    "count": "{{count}} review",
-    "count_plural": "{{count}} reviews",
     "rating_required": "Please choose a star rating.",
     "thanks": "Thanks for your review!",
     "rate_n_stars": "Rate {{count}} out of 5 stars",
-    "submit_error": "Couldn't submit your review. Please try again."
+    "submit_error": "Couldn't submit your review. Please try again.",
+    "count_one": "{{count}} review",
+    "count_other": "{{count}} reviews"
   },
   "admin": {
     "title": "Courses",

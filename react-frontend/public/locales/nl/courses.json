@@ -15,10 +15,11 @@
     "advanced": "Geavanceerd"
   },
   "card": {
-    "lessons": "{{count}} les",
-    "lessons_plural": "{{count}} lessen",
-    "enrolled": "{{count}} ingeschreven",
-    "by_author": "door {{name}}"
+    "by_author": "door {{name}}",
+    "lessons_one": "{{count}} les",
+    "lessons_other": "{{count}} lessen",
+    "enrolled_one": "{{count}} ingeschreven",
+    "enrolled_other": "{{count}} ingeschreven"
   },
   "detail": {
     "about": "Over deze cursus",
@@ -159,12 +160,12 @@
     "your_rating": "Jouw beoordeling",
     "submit": "Beoordeling indienen",
     "empty": "Nog geen beoordelingen.",
-    "count": "{{count}} beoordeling",
-    "count_plural": "{{count}} beoordelingen",
     "rating_required": "Kies een sterbeoordeling.",
     "thanks": "Bedankt voor uw recensie!",
     "rate_n_stars": "Beoordeel {{count}} van de 5 sterren",
-    "submit_error": "Kan je beoordeling niet verzenden. Probeer het opnieuw."
+    "submit_error": "Kan je beoordeling niet verzenden. Probeer het opnieuw.",
+    "count_one": "{{count}} beoordeling",
+    "count_other": "{{count}} beoordelingen"
   },
   "admin": {
     "title": "Cursussen",

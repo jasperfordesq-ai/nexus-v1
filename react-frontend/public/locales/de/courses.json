@@ -15,10 +15,11 @@
     "advanced": "Fortschrittlich"
   },
   "card": {
-    "lessons": "{{count}} Lektion",
-    "lessons_plural": "{{count}}-Lektionen",
-    "enrolled": "{{count}} registriert",
-    "by_author": "von {{name}}"
+    "by_author": "von {{name}}",
+    "lessons_one": "{{count}} Lektion",
+    "lessons_other": "{{count}}-Lektionen",
+    "enrolled_one": "{{count}} registriert",
+    "enrolled_other": "{{count}} registriert"
   },
   "detail": {
     "about": "Über diesen Kurs",
@@ -159,12 +160,12 @@
     "your_rating": "Ihre Bewertung",
     "submit": "Bewertung abgeben",
     "empty": "Noch keine Bewertungen.",
-    "count": "{{count}}-Rezension",
-    "count_plural": "{{count}} Bewertungen",
     "rating_required": "Bitte wählen Sie eine Sternebewertung.",
     "thanks": "Vielen Dank für Ihre Bewertung!",
     "rate_n_stars": "{{count}} von 5 Sternen bewerten",
-    "submit_error": "Ihre Bewertung konnte nicht gesendet werden. Bitte versuchen Sie es erneut."
+    "submit_error": "Ihre Bewertung konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
+    "count_one": "{{count}}-Rezension",
+    "count_other": "{{count}} Bewertungen"
   },
   "admin": {
     "title": "Kurse",

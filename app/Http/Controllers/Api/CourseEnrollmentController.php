@@ -182,7 +182,10 @@ class CourseEnrollmentController extends BaseApiController
         $this->ensureCoursesFeature();
         $userId = $this->requireAuth();
 
-        if (!CourseEnrollmentService::isEnrolled($id, $userId)) {
+        // Only an active or completed enrollment may review — a dropped learner
+        // must not be able to post/overwrite a review feeding the public rating.
+        $enrollment = CourseEnrollmentService::find($id, $userId);
+        if (!$enrollment || !in_array($enrollment->status, ['active', 'completed'], true)) {
             return $this->respondWithError('NOT_ENROLLED', __('api_controllers_2.courses.review_requires_enrollment'), null, 403);
         }
 

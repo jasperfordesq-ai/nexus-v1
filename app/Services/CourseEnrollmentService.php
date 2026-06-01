@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Models\Course;
+use App\Models\CourseCohort;
 use App\Models\CourseEnrollment;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -40,6 +41,13 @@ class CourseEnrollmentService
         $existing = self::find($courseId, $userId);
         if ($existing) {
             return $existing;
+        }
+
+        // Ignore a cohort that doesn't belong to this course (tenant-scoped check) —
+        // prevents roster/analytics pollution from an arbitrary or cross-course cohort id.
+        if ($cohortId !== null
+            && !CourseCohort::where('id', $cohortId)->where('course_id', $courseId)->exists()) {
+            $cohortId = null;
         }
 
         $enrollment = CourseEnrollment::create([

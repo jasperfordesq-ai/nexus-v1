@@ -15,10 +15,11 @@
     "advanced": "Casta"
   },
   "card": {
-    "lessons": "{{count}} ceacht",
-    "lessons_plural": "{{count}} ceachtanna",
-    "enrolled": "{{count}} cláraithe",
-    "by_author": "le {{name}}"
+    "by_author": "le {{name}}",
+    "lessons_one": "{{count}} ceacht",
+    "lessons_other": "{{count}} ceachtanna",
+    "enrolled_one": "{{count}} cláraithe",
+    "enrolled_other": "{{count}} cláraithe"
   },
   "detail": {
     "about": "Maidir leis an gcúrsa seo",
@@ -159,12 +160,12 @@
     "your_rating": "Do rátáil",
     "submit": "Cuir isteach athbhreithniú",
     "empty": "Níl aon léirmheasanna fós.",
-    "count": "{{count}} léirmheas",
-    "count_plural": "{{count}} léirmheasanna",
     "rating_required": "Roghnaigh rátáil réalta.",
     "thanks": "Go raibh maith agat as do léirmheas!",
     "rate_n_stars": "Rátáil {{count}} as 5 réalta",
-    "submit_error": "Níorbh fhéidir d'athbhreithniú a sheoladh. Bain triail eile as."
+    "submit_error": "Níorbh fhéidir d'athbhreithniú a sheoladh. Bain triail eile as.",
+    "count_one": "{{count}} léirmheas",
+    "count_other": "{{count}} léirmheasanna"
   },
   "admin": {
     "title": "Cúrsaí",

@@ -167,7 +167,7 @@ export default function CourseDetailPage() {
                 {Number(course.credit_cost) > 0 ? t('detail.cost', { credits: Number(course.credit_cost) }) : t('detail.free')}
               </div>
               <div className="text-sm text-muted">
-                {lessonCount === 1 ? t('card.lessons', { count: lessonCount }) : t('card.lessons_plural', { count: lessonCount })}
+                {t('card.lessons', { count: lessonCount })}
               </div>
               {isOwner ? (
                 <>

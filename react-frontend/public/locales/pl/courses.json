@@ -15,10 +15,11 @@
     "advanced": "Zaawansowany"
   },
   "card": {
-    "lessons": "Lekcja {{count}}",
-    "lessons_plural": "{{count}} lekcje",
-    "enrolled": "{{count}} zarejestrowany",
-    "by_author": "przez {{name}}"
+    "by_author": "przez {{name}}",
+    "lessons_one": "Lekcja {{count}}",
+    "lessons_other": "{{count}} lekcje",
+    "enrolled_one": "{{count}} zarejestrowany",
+    "enrolled_other": "{{count}} zarejestrowany"
   },
   "detail": {
     "about": "O tym kursie",
@@ -159,12 +160,12 @@
     "your_rating": "Twoja ocena",
     "submit": "Prześlij recenzję",
     "empty": "Nie ma jeszcze żadnych recenzji.",
-    "count": "Recenzja {{count}}",
-    "count_plural": "Recenzje {{count}}",
     "rating_required": "Proszę wybrać ocenę w postaci gwiazdek.",
     "thanks": "Dziękujemy za opinię!",
     "rate_n_stars": "Oceń {{count}} na 5 gwiazdek",
-    "submit_error": "Nie udało się wysłać recenzji. Spróbuj ponownie."
+    "submit_error": "Nie udało się wysłać recenzji. Spróbuj ponownie.",
+    "count_one": "Recenzja {{count}}",
+    "count_other": "Recenzje {{count}}"
   },
   "admin": {
     "title": "Kursy",

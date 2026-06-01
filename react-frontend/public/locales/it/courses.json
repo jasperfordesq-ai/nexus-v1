@@ -15,10 +15,11 @@
     "advanced": "Avanzato"
   },
   "card": {
-    "lessons": "{{count}} lezione",
-    "lessons_plural": "{{count}} lezioni",
-    "enrolled": "{{count}} iscritto",
-    "by_author": "di {{name}}"
+    "by_author": "di {{name}}",
+    "lessons_one": "{{count}} lezione",
+    "lessons_other": "{{count}} lezioni",
+    "enrolled_one": "{{count}} iscritto",
+    "enrolled_other": "{{count}} iscritto"
   },
   "detail": {
     "about": "A proposito di questo corso",
@@ -159,12 +160,12 @@
     "your_rating": "La tua valutazione",
     "submit": "Invia recensione",
     "empty": "Nessuna recensione ancora.",
-    "count": "{{count}} recensione",
-    "count_plural": "{{count}} recensioni",
     "rating_required": "Scegli una valutazione in stelle.",
     "thanks": "Grazie per la tua recensione!",
     "rate_n_stars": "Valuta {{count}} su 5 stelle",
-    "submit_error": "Impossibile inviare la tua recensione. Riprova."
+    "submit_error": "Impossibile inviare la tua recensione. Riprova.",
+    "count_one": "{{count}} recensione",
+    "count_other": "{{count}} recensioni"
   },
   "admin": {
     "title": "Corsi",

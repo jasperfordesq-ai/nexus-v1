@@ -15,10 +15,11 @@
     "advanced": "高度な"
   },
   "card": {
-    "lessons": "{{count}} レッスン",
-    "lessons_plural": "{{count}} レッスン",
-    "enrolled": "{{count}} が登録されました",
-    "by_author": "{{name}} によって"
+    "by_author": "{{name}} によって",
+    "lessons_one": "{{count}} レッスン",
+    "lessons_other": "{{count}} レッスン",
+    "enrolled_one": "{{count}} が登録されました",
+    "enrolled_other": "{{count}} が登録されました"
   },
   "detail": {
     "about": "このコースについて",
@@ -159,12 +160,12 @@
     "your_rating": "あなたの評価",
     "submit": "レビューを送信する",
     "empty": "まだレビューはありません。",
-    "count": "{{count}} レビュー",
-    "count_plural": "{{count}} のレビュー",
     "rating_required": "星評価を選択してください。",
     "thanks": "レビューいただきありがとうございます！",
     "rate_n_stars": "5つ星中{{count}}と評価",
-    "submit_error": "レビューを送信できませんでした。もう一度お試しください。"
+    "submit_error": "レビューを送信できませんでした。もう一度お試しください。",
+    "count_one": "{{count}} レビュー",
+    "count_other": "{{count}} のレビュー"
   },
   "admin": {
     "title": "コース",
