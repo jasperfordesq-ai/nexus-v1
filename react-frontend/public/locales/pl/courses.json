@@ -162,7 +162,9 @@
     "count": "Recenzja {{count}}",
     "count_plural": "Recenzje {{count}}",
     "rating_required": "Proszę wybrać ocenę w postaci gwiazdek.",
-    "thanks": "Dziękujemy za opinię!"
+    "thanks": "Dziękujemy za opinię!",
+    "rate_n_stars": "Oceń {{count}} na 5 gwiazdek",
+    "submit_error": "Nie udało się wysłać recenzji. Spróbuj ponownie."
   },
   "admin": {
     "title": "Kursy",

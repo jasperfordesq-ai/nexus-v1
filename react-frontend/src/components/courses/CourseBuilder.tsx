@@ -49,25 +49,39 @@ export function CourseBuilder({ courseId, initialSections }: CourseBuilderProps)
   };
 
   const renameSection = async (sectionId: number, title: string) => {
-    setSections((prev) => prev.map((s) => (s.id === sectionId ? { ...s, title } : s)));
-    await coursesApi.updateSection(courseId, sectionId, { title });
+    const prev = sections;
+    setSections((p) => p.map((s) => (s.id === sectionId ? { ...s, title } : s)));
+    const res = await coursesApi.updateSection(courseId, sectionId, { title });
+    if (!res.success) {
+      setSections(prev);
+      toast.error(t('builder.save_error'));
+    }
   };
 
   const deleteSection = async (sectionId: number) => {
-    await coursesApi.deleteSection(courseId, sectionId);
-    setSections((prev) => prev.filter((s) => s.id !== sectionId));
+    const res = await coursesApi.deleteSection(courseId, sectionId);
+    if (res.success) {
+      setSections((prev) => prev.filter((s) => s.id !== sectionId));
+    } else {
+      toast.error(t('builder.save_error'));
+    }
   };
 
   const moveSection = async (index: number, dir: -1 | 1) => {
     const target = index + dir;
     if (target < 0 || target >= sections.length) return;
+    const prev = sections;
     const next = [...sections];
     [next[index], next[target]] = [next[target]!, next[index]!];
     setSections(next);
-    await Promise.all([
+    const results = await Promise.all([
       coursesApi.updateSection(courseId, next[index]!.id, { position: index }),
       coursesApi.updateSection(courseId, next[target]!.id, { position: target }),
     ]);
+    if (results.some((r) => !r.success)) {
+      setSections(prev);
+      toast.error(t('builder.save_error'));
+    }
   };
 
   const addLesson = async (sectionId: number) => {
@@ -92,10 +106,14 @@ export function CourseBuilder({ courseId, initialSections }: CourseBuilderProps)
   };
 
   const deleteLesson = async (sectionId: number, lessonId: number) => {
-    await coursesApi.deleteLesson(courseId, lessonId);
-    setSections((prev) => prev.map((s) => (
-      s.id === sectionId ? { ...s, lessons: (s.lessons ?? []).filter((l) => l.id !== lessonId) } : s
-    )));
+    const res = await coursesApi.deleteLesson(courseId, lessonId);
+    if (res.success) {
+      setSections((prev) => prev.map((s) => (
+        s.id === sectionId ? { ...s, lessons: (s.lessons ?? []).filter((l) => l.id !== lessonId) } : s
+      )));
+    } else {
+      toast.error(t('builder.save_error'));
+    }
   };
 
   const moveLesson = async (sectionId: number, index: number, dir: -1 | 1) => {
@@ -104,12 +122,17 @@ export function CourseBuilder({ courseId, initialSections }: CourseBuilderProps)
     const lessons = [...(section.lessons ?? [])];
     const target = index + dir;
     if (target < 0 || target >= lessons.length) return;
+    const prev = sections;
     [lessons[index], lessons[target]] = [lessons[target]!, lessons[index]!];
-    setSections((prev) => prev.map((s) => (s.id === sectionId ? { ...s, lessons } : s)));
-    await Promise.all([
+    setSections((p) => p.map((s) => (s.id === sectionId ? { ...s, lessons } : s)));
+    const results = await Promise.all([
       coursesApi.updateLesson(courseId, lessons[index]!.id, { position: index }),
       coursesApi.updateLesson(courseId, lessons[target]!.id, { position: target }),
     ]);
+    if (results.some((r) => !r.success)) {
+      setSections(prev);
+      toast.error(t('builder.save_error'));
+    }
   };
 
   return (

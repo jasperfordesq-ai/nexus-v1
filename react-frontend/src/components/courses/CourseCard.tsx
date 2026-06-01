@@ -13,6 +13,7 @@ import { Card, CardBody, Chip } from '@/components/ui';
 import { useTenant } from '@/contexts';
 import GraduationCap from 'lucide-react/icons/graduation-cap';
 import Users from 'lucide-react/icons/users';
+import { normalizeCourseMediaUrl } from '@/lib/courseContentSecurity';
 import type { Course } from '@/lib/api/courses';
 
 interface CourseCardProps {
@@ -22,13 +23,14 @@ interface CourseCardProps {
 export function CourseCard({ course }: CourseCardProps) {
   const { t } = useTranslation('courses');
   const { tenantPath } = useTenant();
+  const coverImage = normalizeCourseMediaUrl(course.cover_image);
 
   return (
     <Card className="h-full overflow-hidden transition-shadow hover:shadow-md">
       <Link to={tenantPath(`/courses/${course.slug}`)} className="block">
         <div className="aspect-video w-full bg-[var(--color-surface-2)] flex items-center justify-center overflow-hidden">
-          {course.cover_image ? (
-            <img src={course.cover_image} alt={course.title} className="w-full h-full object-cover" />
+          {coverImage ? (
+            <img src={coverImage} alt={course.title} className="w-full h-full object-cover" />
           ) : (
             <GraduationCap size={40} className="text-muted" aria-hidden="true" />
           )}

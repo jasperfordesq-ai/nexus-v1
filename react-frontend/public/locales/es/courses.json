@@ -162,7 +162,9 @@
     "count": "{{count}} revisión",
     "count_plural": "{{count}} opiniones",
     "rating_required": "Elija una calificación de estrellas.",
-    "thanks": "¡Gracias por tu reseña!"
+    "thanks": "¡Gracias por tu reseña!",
+    "rate_n_stars": "Valorar {{count}} de 5 estrellas",
+    "submit_error": "No se pudo enviar tu reseña. Inténtalo de nuevo."
   },
   "admin": {
     "title": "Cursos",

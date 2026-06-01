@@ -29,7 +29,11 @@ class CourseQuestion extends Model
         'position',
     ];
 
-    protected $hidden = ['tenant_id'];
+    // Never expose the answer key or rationale through model serialization — a
+    // learner-facing payload must be hand-built (see CourseQuizService::forLearner).
+    // Server-side grading reads ->correct as a direct attribute, which $hidden
+    // does not affect.
+    protected $hidden = ['tenant_id', 'correct', 'explanation'];
 
     protected $casts = [
         'options' => 'array',

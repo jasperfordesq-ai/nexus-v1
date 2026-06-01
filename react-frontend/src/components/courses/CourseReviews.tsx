@@ -23,6 +23,7 @@ interface CourseReviewsProps {
 }
 
 function StarRow({ value, onChange, size = 18 }: { value: number; onChange?: (v: number) => void; size?: number }) {
+  const { t } = useTranslation('courses');
   return (
     <div className="flex items-center gap-0.5">
       {[1, 2, 3, 4, 5].map((n) => {
@@ -36,7 +37,7 @@ function StarRow({ value, onChange, size = 18 }: { value: number; onChange?: (v:
           />
         );
         return onChange ? (
-          <button key={n} type="button" onClick={() => onChange(n)} aria-label={`${n}`} className="p-0.5">
+          <button key={n} type="button" onClick={() => onChange(n)} aria-label={t('reviews.rate_n_stars', { count: n })} className="p-0.5">
             {star}
           </button>
         ) : (
@@ -79,7 +80,7 @@ export function CourseReviews({ courseId, ratingAvg, ratingCount, canReview }: C
       setRating(0);
       load();
     } else {
-      toast.error(t('detail.enroll_error'));
+      toast.error(t('reviews.submit_error'));
     }
   };
 

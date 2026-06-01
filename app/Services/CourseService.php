@@ -102,8 +102,8 @@ class CourseService
     {
         $title = trim((string) ($data['title'] ?? ''));
 
-        return Course::create([
-            'author_user_id' => $authorUserId,
+        // Only content/economic fields are mass-assignable (see Course::$fillable).
+        $course = new Course([
             'category_id' => $data['category_id'] ?? null,
             'title' => $title,
             'slug' => self::uniqueSlug($data['slug'] ?? $title),
@@ -113,13 +113,20 @@ class CourseService
             'level' => $data['level'] ?? 'beginner',
             'visibility' => $data['visibility'] ?? 'members',
             'enrollment_type' => $data['enrollment_type'] ?? 'self_paced',
-            'status' => 'draft',
-            'moderation_status' => 'pending',
             'credit_cost' => $data['credit_cost'] ?? 0,
             'learner_credit_reward' => $data['learner_credit_reward'] ?? 0,
             'instructor_credit_reward' => $data['instructor_credit_reward'] ?? 0,
             'prerequisites' => $data['prerequisites'] ?? null,
         ]);
+
+        // Author identity and lifecycle/moderation state are set server-side only —
+        // never from the caller's payload — so they can't be spoofed.
+        $course->author_user_id = $authorUserId;
+        $course->status = 'draft';
+        $course->moderation_status = 'pending';
+        $course->save();
+
+        return $course;
     }
 
     public static function update(Course $course, array $data): Course

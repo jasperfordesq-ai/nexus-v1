@@ -162,7 +162,9 @@
     "count": "{{count}} レビュー",
     "count_plural": "{{count}} のレビュー",
     "rating_required": "星評価を選択してください。",
-    "thanks": "レビューいただきありがとうございます！"
+    "thanks": "レビューいただきありがとうございます！",
+    "rate_n_stars": "5つ星中{{count}}と評価",
+    "submit_error": "レビューを送信できませんでした。もう一度お試しください。"
   },
   "admin": {
     "title": "コース",

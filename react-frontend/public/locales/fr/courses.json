@@ -162,7 +162,9 @@
     "count": "{{count}} avis",
     "count_plural": "{{count}} avis",
     "rating_required": "Veuillez choisir un nombre d'étoiles.",
-    "thanks": "Merci pour votre avis !"
+    "thanks": "Merci pour votre avis !",
+    "rate_n_stars": "Noter {{count}} sur 5 étoiles",
+    "submit_error": "Impossible d'envoyer votre avis. Veuillez réessayer."
   },
   "admin": {
     "title": "Cours",

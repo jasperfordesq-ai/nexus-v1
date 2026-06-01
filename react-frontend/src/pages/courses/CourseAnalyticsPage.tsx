@@ -80,7 +80,7 @@ export default function CourseAnalyticsPage() {
           {data.per_lesson.length === 0 ? (
             <p className="text-sm text-muted">{t('analytics.no_lessons')}</p>
           ) : (
-            <div style={{ width: '100%', height: 320 }}>
+            <div className="w-full h-80">
               <ResponsiveContainer>
                 <BarChart data={data.per_lesson} margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />

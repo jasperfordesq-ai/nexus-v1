@@ -162,7 +162,9 @@
     "count": "{{count}} léirmheas",
     "count_plural": "{{count}} léirmheasanna",
     "rating_required": "Roghnaigh rátáil réalta.",
-    "thanks": "Go raibh maith agat as do léirmheas!"
+    "thanks": "Go raibh maith agat as do léirmheas!",
+    "rate_n_stars": "Rátáil {{count}} as 5 réalta",
+    "submit_error": "Níorbh fhéidir d'athbhreithniú a sheoladh. Bain triail eile as."
   },
   "admin": {
     "title": "Cúrsaí",

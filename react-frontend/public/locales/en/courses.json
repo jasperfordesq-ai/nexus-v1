@@ -162,7 +162,9 @@
     "count": "{{count}} review",
     "count_plural": "{{count}} reviews",
     "rating_required": "Please choose a star rating.",
-    "thanks": "Thanks for your review!"
+    "thanks": "Thanks for your review!",
+    "rate_n_stars": "Rate {{count}} out of 5 stars",
+    "submit_error": "Couldn't submit your review. Please try again."
   },
   "admin": {
     "title": "Courses",

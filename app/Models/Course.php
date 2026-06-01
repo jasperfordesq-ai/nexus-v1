@@ -20,8 +20,11 @@ class Course extends Model
 
     protected $table = 'courses';
 
+    // Author identity, lifecycle status, and moderation columns are deliberately
+    // NOT mass-assignable so untrusted request input can never spoof authorship,
+    // self-publish, or bypass moderation. They are set explicitly by the service
+    // layer (CourseService::create/publish, AdminCourseController::moderate).
     protected $fillable = [
-        'author_user_id',
         'category_id',
         'title',
         'slug',
@@ -31,16 +34,10 @@ class Course extends Model
         'level',
         'visibility',
         'enrollment_type',
-        'status',
-        'moderation_status',
-        'moderation_notes',
-        'moderated_by',
-        'moderated_at',
         'credit_cost',
         'learner_credit_reward',
         'instructor_credit_reward',
         'prerequisites',
-        'published_at',
     ];
 
     protected $hidden = ['tenant_id'];

@@ -162,7 +162,9 @@
     "count": "{{count}} beoordeling",
     "count_plural": "{{count}} beoordelingen",
     "rating_required": "Kies een sterbeoordeling.",
-    "thanks": "Bedankt voor uw recensie!"
+    "thanks": "Bedankt voor uw recensie!",
+    "rate_n_stars": "Beoordeel {{count}} van de 5 sterren",
+    "submit_error": "Kan je beoordeling niet verzenden. Probeer het opnieuw."
   },
   "admin": {
     "title": "Cursussen",
