@@ -122,6 +122,12 @@ export const Checkbox = forwardRef<HTMLLabelElement, CheckboxProps>(function Che
   onValueChange,
   radius,
   size,
+  // Default `slot` to null so a standalone Checkbox rendered inside a Table /
+  // collection cell opts OUT of React Aria's slotted CheckboxContext (the
+  // selection checkbox). Without this, React Aria throws "A slot prop is
+  // required. Valid slot names are 'selection'." Callers can still pass an
+  // explicit slot when they genuinely want the collection's selection slot.
+  slot = null,
   ...props
 }, ref) {
   const generatedId = useId();
@@ -134,6 +140,7 @@ export const Checkbox = forwardRef<HTMLLabelElement, CheckboxProps>(function Che
         className={combineClasses(classNames?.base, className)}
         id={checkboxId}
         onChange={onChange ?? onValueChange}
+        slot={slot}
         {...props}
       >
         {children}
@@ -147,6 +154,7 @@ export const Checkbox = forwardRef<HTMLLabelElement, CheckboxProps>(function Che
       className={combineClasses(classNames?.base, className)}
       id={checkboxId}
       onChange={onChange ?? onValueChange}
+      slot={slot}
       {...props}
     >
       <HeroUICheckbox.Control

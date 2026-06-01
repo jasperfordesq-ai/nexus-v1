@@ -595,6 +595,8 @@ class PrerenderService
         $logPath = $this->cachePath . '/.bot-access.jsonl';
         $empty = [
             'total_hits'      => 0,
+            'verified_hits'   => 0,
+            'spoofed_by_crawler' => [],
             'window_started_at' => $sinceIso,
             'hits_by_status'  => [],
             'hits_by_crawler' => [],

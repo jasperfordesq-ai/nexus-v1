@@ -1487,7 +1487,24 @@ function AnalyticsTab() {
     setLoading(true);
     const sinceIso = new Date(Date.now() - parseInt(windowDays, 10) * 86400_000).toISOString();
     adminPrerender.getAnalytics({ since: sinceIso, limit: 300 })
-      .then((res) => { if (res.data) setData(res.data); })
+      .then((res) => {
+        if (!res.data) return;
+        // Defend against a malformed/partial payload: every collection field
+        // is read unconditionally via Object.entries/values/.length/.map below,
+        // and a null/undefined there throws "Cannot convert undefined or null
+        // to object" and white-screens the whole admin.
+        setData({
+          ...res.data,
+          total_hits: res.data.total_hits ?? 0,
+          verified_hits: res.data.verified_hits ?? 0,
+          spoofed_by_crawler: res.data.spoofed_by_crawler ?? {},
+          hits_by_status: res.data.hits_by_status ?? {},
+          hits_by_crawler: res.data.hits_by_crawler ?? {},
+          hits_by_host: res.data.hits_by_host ?? {},
+          top_uris: res.data.top_uris ?? [],
+          recent: res.data.recent ?? [],
+        });
+      })
       .catch(() => toast.error(t('errors.load')))
       .finally(() => setLoading(false));
   }, [t, toast, windowDays]);
