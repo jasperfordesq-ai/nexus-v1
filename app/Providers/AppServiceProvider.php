@@ -87,7 +87,6 @@ use App\Services\AdminListingsService;
 use App\Services\AdminUsersService;
 use App\Services\OrgWalletService;
 use App\Services\DeliverableService;
-use App\Services\BrokerService;
 use App\Services\FederationService;
 use App\Services\ChallengeService;
 use App\Services\BadgeService;
@@ -471,10 +470,6 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(DeliverableService::class, function ($app) {
             return new DeliverableService();
-        });
-
-        $this->app->singleton(BrokerService::class, function ($app) {
-            return new BrokerService();
         });
 
         $this->app->singleton(FederationService::class, function ($app) {

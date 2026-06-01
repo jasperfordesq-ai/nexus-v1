@@ -221,17 +221,15 @@ class PaidPushCampaignService
 
         if ($radiusKm > 0 && $lat !== 0.0 && $lng !== 0.0) {
             // Haversine formula — distance in kilometres
-            $haversine = DB::raw(
-                "(6371 * acos(
-                    cos(radians({$lat}))
+            $haversine = "(6371 * acos(
+                    cos(radians(?))
                     * cos(radians(latitude))
-                    * cos(radians(longitude) - radians({$lng}))
-                    + sin(radians({$lat})) * sin(radians(latitude))
-                ))"
-            );
+                    * cos(radians(longitude) - radians(?))
+                    + sin(radians(?)) * sin(radians(latitude))
+                ))";
             $query->whereNotNull('latitude')
                   ->whereNotNull('longitude')
-                  ->havingRaw("{$haversine} < ?", [$radiusKm]);
+                  ->havingRaw("{$haversine} < ?", [$lat, $lng, $lat, $radiusKm]);
         }
 
         // Trust tier minimum — only if the column exists
@@ -571,17 +569,15 @@ class PaidPushCampaignService
         $lng      = isset($audienceFilter['lng']) ? (float) $audienceFilter['lng'] : 0;
 
         if ($radiusKm > 0 && $lat !== 0.0 && $lng !== 0.0) {
-            $haversine = DB::raw(
-                "(6371 * acos(
-                    cos(radians({$lat}))
+            $haversine = "(6371 * acos(
+                    cos(radians(?))
                     * cos(radians(latitude))
-                    * cos(radians(longitude) - radians({$lng}))
-                    + sin(radians({$lat})) * sin(radians(latitude))
-                ))"
-            );
+                    * cos(radians(longitude) - radians(?))
+                    + sin(radians(?)) * sin(radians(latitude))
+                ))";
             $query->whereNotNull('latitude')
                   ->whereNotNull('longitude')
-                  ->havingRaw("{$haversine} < ?", [$radiusKm]);
+                  ->havingRaw("{$haversine} < ?", [$lat, $lng, $lat, $radiusKm]);
         }
 
         // Trust tier minimum

@@ -45,12 +45,13 @@ project-nexus/
 │   ├── src/                      # components/, contexts/, pages/, lib/, hooks/, styles/, types/
 │   ├── CLAUDE.md                 # React frontend conventions
 │   └── package.json
-├── src/                          # PHP source (PSR-4: Nexus\)
-│   ├── Controllers/Api/          # V2 API controllers (for React)
-│   ├── Core/                     # Framework (Router, Database, Auth)
-│   ├── Models/                   # Data models (59+ files)
-│   ├── Services/                 # Business logic (120+ services)
-│   └── helpers.php
+├── app/                          # PHP source — Laravel 12 (PSR-4: App\)
+│   ├── Http/Controllers/Api/     # V2 API controllers (for React)
+│   ├── Http/Middleware/          # Tenant, auth, CORS middleware
+│   ├── Services/                 # Business logic (220+ services)
+│   ├── Models/                   # Eloquent models
+│   ├── Listeners/                # Event listeners
+│   └── Core/                     # Legacy helpers (TenantContext, ImageUploader)
 ├── views/                        # PHP admin templates only (DEAD — see rules below)
 ├── httpdocs/                     # Web root (index.php, routes.php, health.php)
 ├── sales-site/                   # Static marketing site (project-nexus.ie)
@@ -135,8 +136,8 @@ The NGC folder (`C:\Users\{user}\AppData\Local\Microsoft\Ngc`) must exist — th
 **Key files:**
 - `react-frontend/src/lib/webauthn.ts` — all WebAuthn frontend logic (SimpleWebAuthn wrapper)
 - `react-frontend/src/components/security/BiometricSettings.tsx` — passkey settings UI
-- `src/Controllers/Api/WebAuthnApiController.php` — registration/auth endpoints
-- `src/Services/WebAuthnChallengeStore.php` — Redis/file challenge storage
+- `app/Http/Controllers/Api/WebAuthnController.php` — registration/auth endpoints
+- `app/Services/WebAuthnChallengeStore.php` — Redis/file challenge storage
 
 ---
 
@@ -146,7 +147,7 @@ The Laravel migration has been **merged to `main`** (2026-03-19) and is live in 
 
 - **Phases 0–5 are complete**: Laravel 12.54 is the sole HTTP handler, routing, middleware, controllers, and auth
 - **All 223 services are native Laravel implementations** — zero stubs remain (47 converted + 45 dead stubs deleted on 2026-03-21)
-- **43 legacy `src/` files** remain (39 deleted 2026-03-21) — kept alive only by admin views and `app/Core/ImageUploader.php`
+- **Legacy top-level `src/` directory has been fully removed** — all PHP now lives in `app/` (PSR-4 `App\`); there is no longer a `Nexus\` autoload namespace. `app/Core/ImageUploader.php` is the last remaining legacy-style helper.
 - **5 Event Listeners** in `app/Listeners/` are fully implemented (completed 2026-03-21)
 - All new schema changes use Laravel migrations in `database/migrations/` (5 Laravel, 190 legacy SQL)
 - See [LARAVEL_MIGRATION_PLAN.md](LARAVEL_MIGRATION_PLAN.md) for the full remaining work breakdown
@@ -623,13 +624,13 @@ Full guide: [docs/REGRESSION_PREVENTION.md](docs/REGRESSION_PREVENTION.md)
 
 ### Add a New API Endpoint
 
-1. Create controller in `src/Controllers/Api/`
-2. Add route in `httpdocs/routes.php`
-3. Add tests in `tests/Controllers/`
+1. Create controller in `app/Http/Controllers/Api/`
+2. Add route in `routes/api.php`
+3. Add tests in `tests/Laravel/Feature/Controllers/`
 
 ### Add a New Service
 
-1. Create in `src/Services/` using static methods pattern
+1. Create in `app/Services/` (scope by tenant — see existing services)
 2. Always scope by tenant — see [docs/PHP_CONVENTIONS.md](docs/PHP_CONVENTIONS.md)
 3. Add unit tests
 

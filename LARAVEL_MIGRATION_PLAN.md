@@ -1,5 +1,7 @@
 # Laravel Migration Plan — Project NEXUS
 
+> **✅ STATUS UPDATE (2026-06-01):** The top-level `src/` directory has been **fully removed** — all PHP now lives in `app/` (PSR-4 `App\`) and the `Nexus\` autoload namespace is gone. Sections below that describe "remaining `src/` files", the 43-file breakdown, or steps to delete `src/` are **complete / historical**, retained only for the record. `app/Core/ImageUploader.php` is the last legacy-style helper.
+
 ## Context
 
 Project NEXUS migrated from a custom PHP 8.2 framework to Laravel 12.54. The React frontend is unaffected — only the PHP backend changed.

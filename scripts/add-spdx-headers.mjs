@@ -34,6 +34,7 @@ const DIRS = [
   { path: 'routes', extensions: ['.php'] },
   { path: 'views', extensions: ['.php'] },
   { path: 'migrations', extensions: ['.php'] },
+  { path: 'lang', extensions: ['.php'] },
   { path: join('database', 'migrations'), extensions: ['.php'] },
   { path: join('react-frontend', 'src'), extensions: ['.ts', '.tsx'] },
   { path: 'e2e', extensions: ['.ts', '.tsx'] },
