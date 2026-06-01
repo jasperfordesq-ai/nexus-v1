@@ -511,8 +511,20 @@ class AdminBrokerControllerTest extends TestCase
         $requester = User::factory()->forTenant($this->testTenantId)->create();
         $provider = User::factory()->forTenant($this->testTenantId)->create();
 
+        $listingId = DB::table('listings')->insertGetId([
+            'tenant_id'      => $this->testTenantId,
+            'user_id'        => $provider->id,
+            'title'          => 'Test listing',
+            'description'    => 'Test listing for exchange details',
+            'type'           => 'offer',
+            'status'         => 'active',
+            'created_at'     => now(),
+            'updated_at'     => now(),
+        ]);
+
         $exchangeId = DB::table('exchange_requests')->insertGetId([
             'tenant_id'      => $this->testTenantId,
+            'listing_id'     => $listingId,
             'requester_id'   => $requester->id,
             'provider_id'    => $provider->id,
             'proposed_hours' => 3.0,
@@ -530,13 +542,72 @@ class AdminBrokerControllerTest extends TestCase
         $response->assertJsonPath('data.exchange.id', $exchangeId);
     }
 
+    public function test_show_exchange_returns_linked_listing_details(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $requester = User::factory()->forTenant($this->testTenantId)->create([
+            'avatar_url' => '/uploads/avatars/requester.jpg',
+        ]);
+        $provider = User::factory()->forTenant($this->testTenantId)->create([
+            'avatar_url' => '/uploads/avatars/provider.jpg',
+        ]);
+
+        $listingId = DB::table('listings')->insertGetId([
+            'tenant_id'      => $this->testTenantId,
+            'user_id'        => $provider->id,
+            'title'          => 'Piano lessons',
+            'description'    => 'Introductory piano lesson',
+            'type'           => 'offer',
+            'status'         => 'active',
+            'hours_estimate' => 4.5,
+            'created_at'     => now(),
+            'updated_at'     => now(),
+        ]);
+
+        $exchangeId = DB::table('exchange_requests')->insertGetId([
+            'tenant_id'      => $this->testTenantId,
+            'listing_id'     => $listingId,
+            'requester_id'   => $requester->id,
+            'provider_id'    => $provider->id,
+            'proposed_hours' => 3.0,
+            'status'         => 'pending_broker',
+            'created_at'     => now(),
+            'updated_at'     => now(),
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiGet("/v2/admin/broker/exchanges/{$exchangeId}");
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.exchange.listing_title', 'Piano lessons');
+        $response->assertJsonPath('data.exchange.listing_type', 'offer');
+        $response->assertJsonPath('data.exchange.requester_avatar', '/uploads/avatars/requester.jpg');
+        $response->assertJsonPath('data.exchange.provider_avatar', '/uploads/avatars/provider.jpg');
+        $this->assertSame(4.5, (float) $response->json('data.exchange.hours_offered'));
+    }
+
     public function test_show_exchange_returns_404_for_wrong_tenant(): void
     {
         $adminB = User::factory()->forTenant(999)->admin()->create();
+        $requester = User::factory()->forTenant($this->testTenantId)->create();
+        $provider = User::factory()->forTenant($this->testTenantId)->create();
+        $listingId = DB::table('listings')->insertGetId([
+            'tenant_id'      => $this->testTenantId,
+            'user_id'        => $provider->id,
+            'title'          => 'Other tenant listing',
+            'description'    => 'Test listing for tenant isolation',
+            'type'           => 'offer',
+            'status'         => 'active',
+            'created_at'     => now(),
+            'updated_at'     => now(),
+        ]);
+
         $exchangeId = DB::table('exchange_requests')->insertGetId([
             'tenant_id'      => $this->testTenantId,
-            'requester_id'   => User::factory()->forTenant($this->testTenantId)->create()->id,
-            'provider_id'    => User::factory()->forTenant($this->testTenantId)->create()->id,
+            'listing_id'     => $listingId,
+            'requester_id'   => $requester->id,
+            'provider_id'    => $provider->id,
             'proposed_hours' => 2.0,
             'status'         => 'pending_broker',
             'created_at'     => now(),

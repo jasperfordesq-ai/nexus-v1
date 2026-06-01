@@ -482,10 +482,10 @@ class AdminBrokerController extends BaseApiController
                 $exchange = DB::selectOne(
                     "SELECT er.*,
                         CONCAT(req.first_name, ' ', req.last_name) as requester_name,
-                        req.email as requester_email, req.avatar as requester_avatar,
+                        req.email as requester_email, req.avatar_url as requester_avatar,
                         CONCAT(prov.first_name, ' ', prov.last_name) as provider_name,
-                        prov.email as provider_email, prov.avatar as provider_avatar,
-                        l.title as listing_title, l.listing_type, l.hours_offered,
+                        prov.email as provider_email, prov.avatar_url as provider_avatar,
+                        l.title as listing_title, l.type as listing_type, l.hours_estimate as hours_offered,
                         t.name as tenant_name
                     FROM exchange_requests er
                     JOIN users req ON er.requester_id = req.id
@@ -499,10 +499,10 @@ class AdminBrokerController extends BaseApiController
                 $exchange = DB::selectOne(
                     "SELECT er.*,
                         CONCAT(req.first_name, ' ', req.last_name) as requester_name,
-                        req.email as requester_email, req.avatar as requester_avatar,
+                        req.email as requester_email, req.avatar_url as requester_avatar,
                         CONCAT(prov.first_name, ' ', prov.last_name) as provider_name,
-                        prov.email as provider_email, prov.avatar as provider_avatar,
-                        l.title as listing_title, l.listing_type, l.hours_offered,
+                        prov.email as provider_email, prov.avatar_url as provider_avatar,
+                        l.title as listing_title, l.type as listing_type, l.hours_estimate as hours_offered,
                         t.name as tenant_name
                     FROM exchange_requests er
                     JOIN users req ON er.requester_id = req.id
