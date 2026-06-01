@@ -6,7 +6,8 @@
     "all_categories": "Wszystkie kategorie",
     "all_levels": "Wszystkie poziomy",
     "empty": "Nie znaleziono kursów.",
-    "empty_hint": "Zajrzyj tu wkrótce — nowe kursy są już w drodze."
+    "empty_hint": "Zajrzyj tu wkrótce — nowe kursy są już w drodze.",
+    "load_more": "Zaladuj wiecej"
   },
   "level": {
     "beginner": "Początkujący",
@@ -60,7 +61,8 @@
     "failed": "Jeszcze nie minęło",
     "score": "Twój wynik: {{score}}%",
     "pending_review": "Twoje odpowiedzi zostały przesłane do sprawdzenia.",
-    "retry": "Spróbuj ponownie"
+    "retry": "Spróbuj ponownie",
+    "unavailable": "Ten quiz nie jest jeszcze gotowy."
   },
   "my_learning": {
     "title": "Moja nauka",
@@ -98,7 +100,13 @@
     "lesson_title": "Tytuł lekcji",
     "lesson_type": "Typ treści",
     "section_title": "Tytuł sekcji",
-    "create_error": "Nie udało się zapisać. Spróbuj ponownie."
+    "create_error": "Nie udało się zapisać. Spróbuj ponownie.",
+    "enrollment_type_label": "Tempo",
+    "enrollment_self_paced": "We wlasnym tempie",
+    "enrollment_cohort": "Kohorta",
+    "credit_cost_label": "Koszt w kredytach czasu",
+    "prerequisites_label": "Identyfikatory kursow wymaganych",
+    "no_category": "Brak kategorii"
   },
   "grading": {
     "title": "Cieniowanie",
@@ -210,12 +218,31 @@
     "preview_course": "Zapowiedź",
     "published_toast": "Kurs opublikowany — jest teraz widoczny dla członków.",
     "unpublished_toast": "Kurs nieopublikowany — powrót do wersji roboczej.",
-    "publish_hint": "Twój kurs jest wersją roboczą. Opublikuj go, aby był widoczny dla członków i otwarty do rejestracji."
+    "publish_hint": "Twój kurs jest wersją roboczą. Opublikuj go, aby był widoczny dla członków i otwarty do rejestracji.",
+    "drip_type": "Termin udostepnienia",
+    "drip_none": "Dostepne natychmiast",
+    "drip_days_after_enroll": "Dni po zapisaniu",
+    "drip_fixed_date": "Stala data",
+    "drip_offset_days": "Dni",
+    "drip_date": "Data odblokowania",
+    "no_questions": "Nie ma jeszcze pytan. Zapisz lekcje quizu, a potem dodaj pytania.",
+    "question_prompt": "Pytanie",
+    "question_options": "Opcje odpowiedzi, oddzielone przecinkami",
+    "question_correct": "ID poprawnej opcji",
+    "add_question": "Dodaj pytanie",
+    "question_added": "Pytanie dodane",
+    "cohorts": "Kohorty",
+    "no_cohorts": "Nie ma jeszcze kohort.",
+    "cohort_name": "Nazwa kohorty",
+    "add_cohort": "Dodaj kohorte",
+    "cohort_added": "Kohorta dodana",
+    "url_placeholder": "Przykład: https://example.com/file"
   },
   "lesson_content": {
     "text": "Tekst",
     "video": "Wideo",
     "pdf": "PDF",
-    "embed": "Osadzać"
+    "embed": "Osadzać",
+    "quiz": "Quiz"
   }
 }

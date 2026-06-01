@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Models\Course;
 use App\Models\CourseEnrollment;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 /**
  * CourseEnrollmentService — tenant-scoped enrollment lifecycle.
@@ -55,6 +56,32 @@ class CourseEnrollmentService
         CourseNotificationService::enrolled($courseId, $userId);
 
         return $enrollment;
+    }
+
+    /**
+     * Enroll a user and charge any configured course credit cost exactly once.
+     */
+    public static function enrollWithPayment(Course $course, int $userId, ?int $cohortId = null): CourseEnrollment
+    {
+        $existing = self::find((int) $course->id, $userId);
+        if ($existing) {
+            return $existing;
+        }
+
+        return DB::transaction(function () use ($course, $userId, $cohortId) {
+            $payment = CourseCreditService::chargeEnrollment($course, $userId);
+            $cost = (float) $course->credit_cost;
+
+            if ($cost > 0 && (int) $course->author_user_id !== $userId && empty($payment['charged'])) {
+                throw new \RuntimeException((string) ($payment['reason'] ?? 'insufficient_credits'));
+            }
+
+            $enrollment = self::enroll((int) $course->id, $userId, $cohortId);
+            $enrollment->credits_paid = (float) ($payment['amount'] ?? 0);
+            $enrollment->save();
+
+            return $enrollment;
+        });
     }
 
     /**

@@ -6,7 +6,8 @@
     "all_categories": "Toutes les catégories",
     "all_levels": "Tous niveaux",
     "empty": "Aucun cours trouvé.",
-    "empty_hint": "Revenez bientôt – de nouveaux cours sont en route."
+    "empty_hint": "Revenez bientôt – de nouveaux cours sont en route.",
+    "load_more": "Charger plus"
   },
   "level": {
     "beginner": "Débutant",
@@ -60,7 +61,8 @@
     "failed": "Pas encore passé",
     "score": "Votre score : {{score}}%",
     "pending_review": "Vos réponses ont été soumises pour examen.",
-    "retry": "Essayer à nouveau"
+    "retry": "Essayer à nouveau",
+    "unavailable": "Ce quiz n'est pas encore pret."
   },
   "my_learning": {
     "title": "Mon apprentissage",
@@ -98,7 +100,13 @@
     "lesson_title": "Titre de la leçon",
     "lesson_type": "Type de contenu",
     "section_title": "Titre de la section",
-    "create_error": "Impossible d'enregistrer. Veuillez réessayer."
+    "create_error": "Impossible d'enregistrer. Veuillez réessayer.",
+    "enrollment_type_label": "Rythme",
+    "enrollment_self_paced": "A son rythme",
+    "enrollment_cohort": "Cohorte",
+    "credit_cost_label": "Cout en credits-temps",
+    "prerequisites_label": "ID des cours prerequis",
+    "no_category": "Aucune cat?gorie"
   },
   "grading": {
     "title": "Classement",
@@ -210,12 +218,31 @@
     "preview_course": "Aperçu",
     "published_toast": "Cours publié — il est désormais visible par les membres.",
     "unpublished_toast": "Cours non publié — retour au brouillon.",
-    "publish_hint": "Votre cours est une ébauche. Publiez-le pour le rendre visible aux membres et ouvrez-le aux inscriptions."
+    "publish_hint": "Votre cours est une ébauche. Publiez-le pour le rendre visible aux membres et ouvrez-le aux inscriptions.",
+    "drip_type": "Calendrier de publication",
+    "drip_none": "Disponible immediatement",
+    "drip_days_after_enroll": "Jours apres l'inscription",
+    "drip_fixed_date": "Date fixe",
+    "drip_offset_days": "Jours",
+    "drip_date": "Date de deverrouillage",
+    "no_questions": "Aucune question pour l'instant. Enregistrez la lecon de quiz, puis ajoutez des questions.",
+    "question_prompt": "Question",
+    "question_options": "Options de reponse, separees par des virgules",
+    "question_correct": "ID de l'option correcte",
+    "add_question": "Ajouter une question",
+    "question_added": "Question ajoutee",
+    "cohorts": "Cohortes",
+    "no_cohorts": "Aucune cohorte pour le moment.",
+    "cohort_name": "Nom de la cohorte",
+    "add_cohort": "Ajouter une cohorte",
+    "cohort_added": "Cohorte ajoutee",
+    "url_placeholder": "Exemple : https://example.com/file"
   },
   "lesson_content": {
     "text": "Texte",
     "video": "Vidéo",
     "pdf": "PDF",
-    "embed": "Intégrer"
+    "embed": "Intégrer",
+    "quiz": "Quiz"
   }
 }

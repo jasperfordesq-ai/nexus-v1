@@ -6,7 +6,8 @@
     "all_categories": "Todas las categorias",
     "all_levels": "Todos los niveles",
     "empty": "No se encontraron cursos.",
-    "empty_hint": "Vuelve pronto: hay nuevos cursos en camino."
+    "empty_hint": "Vuelve pronto: hay nuevos cursos en camino.",
+    "load_more": "Cargar mas"
   },
   "level": {
     "beginner": "Principiante",
@@ -60,7 +61,8 @@
     "failed": "Aún no aprobado",
     "score": "Tu puntuación: {{score}}%",
     "pending_review": "Sus respuestas fueron enviadas para su revisión.",
-    "retry": "Intentar otra vez"
+    "retry": "Intentar otra vez",
+    "unavailable": "Este cuestionario aun no esta listo."
   },
   "my_learning": {
     "title": "mi aprendizaje",
@@ -98,7 +100,13 @@
     "lesson_title": "Título de la lección",
     "lesson_type": "tipo de contenido",
     "section_title": "Título de la sección",
-    "create_error": "No se pudo guardar. Por favor inténtalo de nuevo."
+    "create_error": "No se pudo guardar. Por favor inténtalo de nuevo.",
+    "enrollment_type_label": "Ritmo",
+    "enrollment_self_paced": "A tu ritmo",
+    "enrollment_cohort": "Cohorte",
+    "credit_cost_label": "Coste en creditos de tiempo",
+    "prerequisites_label": "ID de cursos prerequisito",
+    "no_category": "Sin categor?a"
   },
   "grading": {
     "title": "Calificación",
@@ -210,12 +218,31 @@
     "preview_course": "Avance",
     "published_toast": "Curso publicado: ahora es visible para los miembros.",
     "unpublished_toast": "Curso inédito: volver al borrador.",
-    "publish_hint": "Tu curso es un borrador. Publíquelo para que sea visible para los miembros y esté abierto a la inscripción."
+    "publish_hint": "Tu curso es un borrador. Publíquelo para que sea visible para los miembros y esté abierto a la inscripción.",
+    "drip_type": "Calendario de publicacion",
+    "drip_none": "Disponible inmediatamente",
+    "drip_days_after_enroll": "Dias despues de la inscripcion",
+    "drip_fixed_date": "Fecha fija",
+    "drip_offset_days": "Dias",
+    "drip_date": "Fecha de desbloqueo",
+    "no_questions": "Aun no hay preguntas. Guarda la leccion de cuestionario y luego anade preguntas.",
+    "question_prompt": "Pregunta",
+    "question_options": "Opciones de respuesta, separadas por comas",
+    "question_correct": "ID de la opcion correcta",
+    "add_question": "Anadir pregunta",
+    "question_added": "Pregunta anadida",
+    "cohorts": "Cohortes",
+    "no_cohorts": "Aun no hay cohortes.",
+    "cohort_name": "Nombre de la cohorte",
+    "add_cohort": "Anadir cohorte",
+    "cohort_added": "Cohorte anadida",
+    "url_placeholder": "Ejemplo: https://example.com/file"
   },
   "lesson_content": {
     "text": "Texto",
     "video": "Video",
     "pdf": "PDF",
-    "embed": "Empotrar"
+    "embed": "Empotrar",
+    "quiz": "Cuestionario"
   }
 }

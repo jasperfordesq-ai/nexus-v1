@@ -5,6 +5,7 @@
     "search_placeholder": "Search courses…",
     "all_categories": "All categories",
     "all_levels": "All levels",
+    "load_more": "Load more",
     "empty": "No courses found.",
     "empty_hint": "Check back soon — new courses are on the way."
   },
@@ -60,7 +61,8 @@
     "failed": "Not passed yet",
     "score": "Your score: {{score}}%",
     "pending_review": "Your answers were submitted for review.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "unavailable": "This quiz is not ready yet."
   },
   "my_learning": {
     "title": "My learning",
@@ -95,10 +97,16 @@
     "visibility_label": "Visibility",
     "visibility_public": "Public",
     "visibility_members": "Members only",
+    "enrollment_type_label": "Pacing",
+    "enrollment_self_paced": "Self-paced",
+    "enrollment_cohort": "Cohort",
+    "credit_cost_label": "Time-credit cost",
+    "prerequisites_label": "Prerequisite course IDs",
     "lesson_title": "Lesson title",
     "lesson_type": "Content type",
     "section_title": "Section title",
-    "create_error": "Could not save. Please try again."
+    "create_error": "Could not save. Please try again.",
+    "no_category": "No category"
   },
   "grading": {
     "title": "Grading",
@@ -197,6 +205,23 @@
     "embed_url": "Embed URL",
     "attachment_url": "PDF / file URL",
     "free_preview": "Free preview lesson",
+    "drip_type": "Release timing",
+    "drip_none": "Available immediately",
+    "drip_days_after_enroll": "Days after enrolment",
+    "drip_fixed_date": "Fixed date",
+    "drip_offset_days": "Days",
+    "drip_date": "Unlock date",
+    "no_questions": "No questions yet. Save the quiz lesson, then add questions.",
+    "question_prompt": "Question",
+    "question_options": "Answer options, separated by commas",
+    "question_correct": "Correct option ID",
+    "add_question": "Add question",
+    "question_added": "Question added",
+    "cohorts": "Cohorts",
+    "no_cohorts": "No cohorts yet.",
+    "cohort_name": "Cohort name",
+    "add_cohort": "Add cohort",
+    "cohort_added": "Cohort added",
     "save_lesson": "Save lesson",
     "lesson_saved": "Lesson saved",
     "save_error": "Could not save. Please try again.",
@@ -210,12 +235,14 @@
     "preview_course": "Preview",
     "published_toast": "Course published — it is now visible to members.",
     "unpublished_toast": "Course unpublished — back to draft.",
-    "publish_hint": "Your course is a draft. Publish it to make it visible to members and open for enrolment."
+    "publish_hint": "Your course is a draft. Publish it to make it visible to members and open for enrolment.",
+    "url_placeholder": "Example: https://example.com/file"
   },
   "lesson_content": {
     "text": "Text",
     "video": "Video",
     "pdf": "PDF",
-    "embed": "Embed"
+    "embed": "Embed",
+    "quiz": "Quiz"
   }
 }

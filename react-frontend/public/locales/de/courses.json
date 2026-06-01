@@ -6,7 +6,8 @@
     "all_categories": "Alle Kategorien",
     "all_levels": "Alle Ebenen",
     "empty": "Keine Kurse gefunden.",
-    "empty_hint": "Schauen Sie bald wieder vorbei – neue Kurse sind in Vorbereitung."
+    "empty_hint": "Schauen Sie bald wieder vorbei – neue Kurse sind in Vorbereitung.",
+    "load_more": "Mehr laden"
   },
   "level": {
     "beginner": "Anfänger",
@@ -60,7 +61,8 @@
     "failed": "Noch nicht bestanden",
     "score": "Ihr Punktestand: {{score}} %",
     "pending_review": "Ihre Antworten wurden zur Überprüfung eingereicht.",
-    "retry": "Versuchen Sie es erneut"
+    "retry": "Versuchen Sie es erneut",
+    "unavailable": "Dieses Quiz ist noch nicht bereit."
   },
   "my_learning": {
     "title": "Mein Lernen",
@@ -98,7 +100,13 @@
     "lesson_title": "Titel der Lektion",
     "lesson_type": "Inhaltstyp",
     "section_title": "Abschnittstitel",
-    "create_error": "Konnte nicht gespeichert werden. Bitte versuchen Sie es erneut."
+    "create_error": "Konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+    "enrollment_type_label": "Tempo",
+    "enrollment_self_paced": "Selbstgesteuert",
+    "enrollment_cohort": "Kohorte",
+    "credit_cost_label": "Zeitguthaben-Kosten",
+    "prerequisites_label": "IDs der vorausgesetzten Kurse",
+    "no_category": "Keine Kategorie"
   },
   "grading": {
     "title": "Benotung",
@@ -210,12 +218,31 @@
     "preview_course": "Vorschau",
     "published_toast": "Kurs veröffentlicht – er ist jetzt für Mitglieder sichtbar.",
     "unpublished_toast": "Kurs unveröffentlicht – zurück zum Entwurf.",
-    "publish_hint": "Ihr Kurs ist ein Entwurf. Veröffentlichen Sie es, um es für Mitglieder sichtbar zu machen und für die Anmeldung freizugeben."
+    "publish_hint": "Ihr Kurs ist ein Entwurf. Veröffentlichen Sie es, um es für Mitglieder sichtbar zu machen und für die Anmeldung freizugeben.",
+    "drip_type": "Freigabezeitpunkt",
+    "drip_none": "Sofort verfuegbar",
+    "drip_days_after_enroll": "Tage nach Einschreibung",
+    "drip_fixed_date": "Festes Datum",
+    "drip_offset_days": "Tage",
+    "drip_date": "Freischaltdatum",
+    "no_questions": "Noch keine Fragen. Speichere die Quizlektion und fuege dann Fragen hinzu.",
+    "question_prompt": "Frage",
+    "question_options": "Antwortoptionen, durch Kommas getrennt",
+    "question_correct": "ID der richtigen Option",
+    "add_question": "Frage hinzufuegen",
+    "question_added": "Frage hinzugefuegt",
+    "cohorts": "Kohorten",
+    "no_cohorts": "Noch keine Kohorten.",
+    "cohort_name": "Name der Kohorte",
+    "add_cohort": "Kohorte hinzufuegen",
+    "cohort_added": "Kohorte hinzugefuegt",
+    "url_placeholder": "Beispiel: https://example.com/file"
   },
   "lesson_content": {
     "text": "Text",
     "video": "Video",
     "pdf": "PDF",
-    "embed": "Einbetten"
+    "embed": "Einbetten",
+    "quiz": "Quiz"
   }
 }

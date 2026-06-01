@@ -6,7 +6,8 @@
     "all_categories": "Tutte le categorie",
     "all_levels": "Tutti i livelli",
     "empty": "Nessun corso trovato.",
-    "empty_hint": "Torna presto: nuovi corsi sono in arrivo."
+    "empty_hint": "Torna presto: nuovi corsi sono in arrivo.",
+    "load_more": "Carica altro"
   },
   "level": {
     "beginner": "Principiante",
@@ -60,7 +61,8 @@
     "failed": "Non ancora superato",
     "score": "Il tuo punteggio: {{score}}%",
     "pending_review": "Le tue risposte sono state inviate per la revisione.",
-    "retry": "Riprova"
+    "retry": "Riprova",
+    "unavailable": "Questo quiz non e ancora pronto."
   },
   "my_learning": {
     "title": "Il mio apprendimento",
@@ -98,7 +100,13 @@
     "lesson_title": "Titolo della lezione",
     "lesson_type": "Tipo di contenuto",
     "section_title": "Titolo della sezione",
-    "create_error": "Impossibile salvare. Per favore riprova."
+    "create_error": "Impossibile salvare. Per favore riprova.",
+    "enrollment_type_label": "Ritmo",
+    "enrollment_self_paced": "Autogestito",
+    "enrollment_cohort": "Coorte",
+    "credit_cost_label": "Costo in crediti di tempo",
+    "prerequisites_label": "ID dei corsi prerequisiti",
+    "no_category": "Nessuna categoria"
   },
   "grading": {
     "title": "Classificazione",
@@ -210,12 +218,31 @@
     "preview_course": "Anteprima",
     "published_toast": "Corso pubblicato: ora è visibile ai membri.",
     "unpublished_toast": "Corso non pubblicato: torna alla bozza.",
-    "publish_hint": "Il tuo corso è una bozza. Pubblicalo per renderlo visibile ai membri e aprire le iscrizioni."
+    "publish_hint": "Il tuo corso è una bozza. Pubblicalo per renderlo visibile ai membri e aprire le iscrizioni.",
+    "drip_type": "Programmazione rilascio",
+    "drip_none": "Disponibile subito",
+    "drip_days_after_enroll": "Giorni dopo l'iscrizione",
+    "drip_fixed_date": "Data fissa",
+    "drip_offset_days": "Giorni",
+    "drip_date": "Data di sblocco",
+    "no_questions": "Nessuna domanda ancora. Salva la lezione quiz, poi aggiungi domande.",
+    "question_prompt": "Domanda",
+    "question_options": "Opzioni di risposta, separate da virgole",
+    "question_correct": "ID dell'opzione corretta",
+    "add_question": "Aggiungi domanda",
+    "question_added": "Domanda aggiunta",
+    "cohorts": "Coorti",
+    "no_cohorts": "Nessuna coorte ancora.",
+    "cohort_name": "Nome della coorte",
+    "add_cohort": "Aggiungi coorte",
+    "cohort_added": "Coorte aggiunta",
+    "url_placeholder": "Esempio: https://example.com/file"
   },
   "lesson_content": {
     "text": "Testo",
     "video": "Video",
     "pdf": "PDF",
-    "embed": "Incorpora"
+    "embed": "Incorpora",
+    "quiz": "Quiz"
   }
 }

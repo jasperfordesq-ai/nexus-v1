@@ -6,7 +6,8 @@
     "all_categories": "Alle categorieën",
     "all_levels": "Alle niveaus",
     "empty": "Geen cursussen gevonden.",
-    "empty_hint": "Kom snel terug: er komen nieuwe cursussen aan."
+    "empty_hint": "Kom snel terug: er komen nieuwe cursussen aan.",
+    "load_more": "Meer laden"
   },
   "level": {
     "beginner": "Beginner",
@@ -60,7 +61,8 @@
     "failed": "Nog niet voorbij",
     "score": "Jouw score: {{score}}%",
     "pending_review": "Uw antwoorden zijn ter beoordeling ingediend.",
-    "retry": "Probeer het opnieuw"
+    "retry": "Probeer het opnieuw",
+    "unavailable": "Deze quiz is nog niet klaar."
   },
   "my_learning": {
     "title": "Mijn leerproces",
@@ -98,7 +100,13 @@
     "lesson_title": "Titel van de les",
     "lesson_type": "Inhoudstype",
     "section_title": "Sectietitel",
-    "create_error": "Kan niet opslaan. Probeer het opnieuw."
+    "create_error": "Kan niet opslaan. Probeer het opnieuw.",
+    "enrollment_type_label": "Tempo",
+    "enrollment_self_paced": "Zelfstandig",
+    "enrollment_cohort": "Cohort",
+    "credit_cost_label": "Kosten in tijdkredieten",
+    "prerequisites_label": "ID's van vereiste cursussen",
+    "no_category": "Geen categorie"
   },
   "grading": {
     "title": "Beoordeling",
@@ -210,12 +218,31 @@
     "preview_course": "Voorbeeld",
     "published_toast": "Cursus gepubliceerd: deze is nu zichtbaar voor leden.",
     "unpublished_toast": "Cursus niet gepubliceerd — terug naar concept.",
-    "publish_hint": "Je cursus is een concept. Publiceer het om het zichtbaar te maken voor leden en open te stellen voor inschrijving."
+    "publish_hint": "Je cursus is een concept. Publiceer het om het zichtbaar te maken voor leden en open te stellen voor inschrijving.",
+    "drip_type": "Vrijgavemoment",
+    "drip_none": "Direct beschikbaar",
+    "drip_days_after_enroll": "Dagen na inschrijving",
+    "drip_fixed_date": "Vaste datum",
+    "drip_offset_days": "Dagen",
+    "drip_date": "Ontgrendeldatum",
+    "no_questions": "Nog geen vragen. Sla de quizles op en voeg daarna vragen toe.",
+    "question_prompt": "Vraag",
+    "question_options": "Antwoordopties, gescheiden door komma's",
+    "question_correct": "ID van de juiste optie",
+    "add_question": "Vraag toevoegen",
+    "question_added": "Vraag toegevoegd",
+    "cohorts": "Cohorten",
+    "no_cohorts": "Nog geen cohorten.",
+    "cohort_name": "Naam van cohort",
+    "add_cohort": "Cohort toevoegen",
+    "cohort_added": "Cohort toegevoegd",
+    "url_placeholder": "Voorbeeld: https://example.com/file"
   },
   "lesson_content": {
     "text": "Tekst",
     "video": "Video",
     "pdf": "PDF",
-    "embed": "Insluiten"
+    "embed": "Insluiten",
+    "quiz": "Quiz"
   }
 }

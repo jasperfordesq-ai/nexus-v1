@@ -6,7 +6,8 @@
     "all_categories": "Gach catagóir",
     "all_levels": "Gach leibhéal",
     "empty": "Níor aimsíodh aon chúrsaí.",
-    "empty_hint": "Seiceáil siar go luath - tá cúrsaí nua ar an mbealach."
+    "empty_hint": "Seiceáil siar go luath - tá cúrsaí nua ar an mbealach.",
+    "load_more": "Luchtaigh tuilleadh"
   },
   "level": {
     "beginner": "Tosaitheoir",
@@ -60,7 +61,8 @@
     "failed": "Níor ritheadh ​​go fóill",
     "score": "Do scór: {{score}}%",
     "pending_review": "Cuireadh do fhreagraí isteach le haghaidh athbhreithnithe.",
-    "retry": "Bain triail eile as"
+    "retry": "Bain triail eile as",
+    "unavailable": "N?l an trath na gceist seo r?idh f?s."
   },
   "my_learning": {
     "title": "Mo chuid foghlama",
@@ -98,7 +100,13 @@
     "lesson_title": "Teideal an cheachta",
     "lesson_type": "Cineál ábhair",
     "section_title": "Teideal ailt",
-    "create_error": "Níorbh fhéidir a shábháil. Bain triail eile as."
+    "create_error": "Níorbh fhéidir a shábháil. Bain triail eile as.",
+    "enrollment_type_label": "Luas",
+    "enrollment_self_paced": "Ar do luas f?in",
+    "enrollment_cohort": "Coh?rt",
+    "credit_cost_label": "Costas i gcreidmheasanna ama",
+    "prerequisites_label": "Aitheantais na gc?rsa? riachtanacha",
+    "no_category": "Gan chatag?ir"
   },
   "grading": {
     "title": "Grádú",
@@ -210,12 +218,31 @@
     "preview_course": "Réamhamharc",
     "published_toast": "Cúrsa foilsithe — tá sé le feiceáil anois ag baill.",
     "unpublished_toast": "Cúrsa neamhfhoilsithe — ar ais go dréacht.",
-    "publish_hint": "Is dréacht é do chúrsa. Foilsigh é le go mbeidh sé infheicthe ag baill agus oscailte le haghaidh clárúcháin."
+    "publish_hint": "Is dréacht é do chúrsa. Foilsigh é le go mbeidh sé infheicthe ag baill agus oscailte le haghaidh clárúcháin.",
+    "drip_type": "Am scaoilte",
+    "drip_none": "Ar f?il l?ithreach",
+    "drip_days_after_enroll": "Laethanta tar ?is cl?r?ch?in",
+    "drip_fixed_date": "D?ta socraithe",
+    "drip_offset_days": "Laethanta",
+    "drip_date": "D?ta d?ghlas?la",
+    "no_questions": "N?l aon cheist ann f?s. S?bh?il an ceacht trath na gceist, ansin cuir ceisteanna leis.",
+    "question_prompt": "Ceist",
+    "question_options": "Roghanna freagra, scartha le cam?ga",
+    "question_correct": "Aitheantas an rogha cheart",
+    "add_question": "Cuir ceist leis",
+    "question_added": "Cuireadh an cheist leis",
+    "cohorts": "Coh?irt",
+    "no_cohorts": "N?l aon choh?rt ann f?s.",
+    "cohort_name": "Ainm an choh?irt",
+    "add_cohort": "Cuir coh?rt leis",
+    "cohort_added": "Cuireadh an coh?rt leis",
+    "url_placeholder": "Sampla: https://example.com/file"
   },
   "lesson_content": {
     "text": "Téacs",
     "video": "Físeán",
     "pdf": "PDF",
-    "embed": "Leabú"
+    "embed": "Leabú",
+    "quiz": "Trath na gceist"
   }
 }

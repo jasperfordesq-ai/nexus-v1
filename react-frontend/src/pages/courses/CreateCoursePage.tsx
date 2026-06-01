@@ -20,6 +20,7 @@ import { CourseBuilder } from '@/components/courses/CourseBuilder';
 
 const LEVELS = ['beginner', 'intermediate', 'advanced'] as const;
 const VISIBILITIES = ['public', 'members'] as const;
+const ENROLLMENT_TYPES = ['self_paced', 'cohort'] as const;
 
 export default function CreateCoursePage() {
   const { t } = useTranslation('courses');
@@ -39,6 +40,8 @@ export default function CreateCoursePage() {
   const [status, setStatus] = useState<string>('draft');
   const [moderationStatus, setModerationStatus] = useState<string>('pending');
   const [sections, setSections] = useState<CourseSection[]>([]);
+  const [cohorts, setCohorts] = useState<Array<{ id: number; name: string; start_date?: string | null; end_date?: string | null; capacity?: number | null }>>([]);
+  const [cohortName, setCohortName] = useState('');
 
   const [form, setForm] = useState({
     title: '',
@@ -46,7 +49,10 @@ export default function CreateCoursePage() {
     description: '',
     level: 'beginner',
     visibility: 'members',
+    enrollment_type: 'self_paced',
     category_id: '',
+    credit_cost: '0',
+    prerequisites: '',
   });
 
   useEffect(() => {
@@ -66,11 +72,17 @@ export default function CreateCoursePage() {
             description: c.description ?? '',
             level: c.level ?? 'beginner',
             visibility: c.visibility === 'group' ? 'members' : (c.visibility ?? 'members'),
+            enrollment_type: c.enrollment_type ?? 'self_paced',
             category_id: c.category_id ? String(c.category_id) : '',
+            credit_cost: String(c.credit_cost ?? 0),
+            prerequisites: Array.isArray(c.prerequisites) ? c.prerequisites.join(', ') : '',
           });
           setSections(c.sections ?? []);
           setStatus(c.status ?? 'draft');
           setModerationStatus(c.moderation_status ?? 'pending');
+          coursesApi.cohorts(courseId).then((cohortRes) => {
+            if (cohortRes.success && cohortRes.data) setCohorts(cohortRes.data);
+          });
         }
       })
       .finally(() => setLoading(false));
@@ -103,7 +115,13 @@ export default function CreateCoursePage() {
       description: form.description,
       level: form.level as Course['level'],
       visibility: form.visibility as Course['visibility'],
+      enrollment_type: form.enrollment_type as Course['enrollment_type'],
       category_id: form.category_id ? Number(form.category_id) : null,
+      credit_cost: Number(form.credit_cost) || 0,
+      prerequisites: form.prerequisites
+        .split(',')
+        .map((v) => Number(v.trim()))
+        .filter((v) => Number.isInteger(v) && v > 0),
     };
     const res = isEdit
       ? await coursesApi.update(courseId, payload)
@@ -114,6 +132,19 @@ export default function CreateCoursePage() {
       if (!isEdit) navigate(tenantPath(`/courses/instructor/${res.data.id}/edit`));
     } else {
       toast.error(t('instructor.create_error'));
+    }
+  };
+
+  const addCohort = async () => {
+    if (!isEdit || !cohortName.trim()) return;
+    const res = await coursesApi.createCohort(courseId, { name: cohortName.trim() });
+    if (res.success) {
+      const list = await coursesApi.cohorts(courseId);
+      if (list.success && list.data) setCohorts(list.data);
+      setCohortName('');
+      toast.success(t('builder.cohort_added'));
+    } else {
+      toast.error(t('builder.save_error'));
     }
   };
 
@@ -161,9 +192,16 @@ export default function CreateCoursePage() {
               {VISIBILITIES.map((v) => <SelectItem key={v} id={v}>{t(`instructor.visibility_${v}`)}</SelectItem>)}
             </Select>
             <Select label={t('instructor.category_label')} selectedKeys={[form.category_id]} onSelectionChange={(k) => setForm({ ...form, category_id: (Array.from(k)[0] as string) ?? '' })}>
-              <SelectItem id="">—</SelectItem>
+              <SelectItem id="">{t('instructor.no_category')}</SelectItem>
               {categories.map((c) => <SelectItem key={c.id} id={String(c.id)}>{c.name}</SelectItem>)}
             </Select>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <Select label={t('instructor.enrollment_type_label')} selectedKeys={[form.enrollment_type]} onSelectionChange={(k) => setForm({ ...form, enrollment_type: (Array.from(k)[0] as string) ?? 'self_paced' })}>
+              {ENROLLMENT_TYPES.map((v) => <SelectItem key={v} id={v}>{t(`instructor.enrollment_${v}`)}</SelectItem>)}
+            </Select>
+            <Input label={t('instructor.credit_cost_label')} type="number" value={form.credit_cost} onValueChange={(v) => setForm({ ...form, credit_cost: v })} />
+            <Input label={t('instructor.prerequisites_label')} value={form.prerequisites} onValueChange={(v) => setForm({ ...form, prerequisites: v })} />
           </div>
           <div>
             <Button color="primary" isLoading={saving} onPress={saveDetails}>{t('instructor.save')}</Button>
@@ -174,6 +212,24 @@ export default function CreateCoursePage() {
       {isEdit && (
         <>
           <CourseBuilder courseId={courseId} initialSections={sections} />
+          {form.enrollment_type === 'cohort' ? (
+            <Card className="mt-6">
+              <CardBody className="p-5 flex flex-col gap-3">
+                <h2 className="text-lg font-semibold">{t('builder.cohorts')}</h2>
+                {cohorts.length > 0 ? (
+                  <ul className="text-sm text-muted list-disc pl-5">
+                    {cohorts.map((cohort) => <li key={cohort.id}>{cohort.name}</li>)}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-muted">{t('builder.no_cohorts')}</p>
+                )}
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+                  <Input size="sm" label={t('builder.cohort_name')} value={cohortName} onValueChange={setCohortName} />
+                  <Button className="sm:self-end" size="sm" variant="secondary" onPress={addCohort}>{t('builder.add_cohort')}</Button>
+                </div>
+              </CardBody>
+            </Card>
+          ) : null}
           <div className="mt-6 flex items-center gap-2">
             <Button as={Link} to={tenantPath('/courses/instructor')} variant="secondary" size="sm">
               {t('builder.done')}

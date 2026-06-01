@@ -9,7 +9,7 @@
  * by the client (response.data IS the payload — never double-unwrap).
  */
 
-import { api } from '@/lib/api';
+import { api, type ApiResponse } from '@/lib/api';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -41,7 +41,11 @@ export interface CourseLesson {
   embed_url?: string | null;
   position: number;
   min_watch_percent: number;
+  drip_type?: 'none' | 'days_after_enroll' | 'fixed_date';
+  drip_offset_days?: number | null;
+  drip_date?: string | null;
   is_preview: boolean;
+  quiz?: Quiz | null;
 }
 
 export interface CourseSection {
@@ -69,6 +73,7 @@ export interface Course {
   credit_cost: string | number;
   learner_credit_reward: string | number;
   instructor_credit_reward: string | number;
+  prerequisites?: number[] | null;
   enrollment_count: number;
   completion_count: number;
   rating_avg: string | number;
@@ -183,6 +188,8 @@ export interface BrowseResult {
   total: number;
   page: number;
   per_page: number;
+  total_pages: number;
+  has_more: boolean;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -191,13 +198,37 @@ export interface BrowseResult {
 
 export const coursesApi = {
   // Public / browse
-  browse: (params: Record<string, string | number | undefined> = {}) => {
+  browse: async (params: Record<string, string | number | undefined> = {}): Promise<ApiResponse<BrowseResult>> => {
     const qs = new URLSearchParams();
     Object.entries(params).forEach(([k, v]) => {
       if (v !== undefined && v !== '') qs.append(k, String(v));
     });
     const suffix = qs.toString() ? `?${qs.toString()}` : '';
-    return api.get<Course[]>(`/v2/courses${suffix}`);
+    const res = await api.get<Course[]>(`/v2/courses${suffix}`);
+    if (!res.success) {
+      return {
+        ...res,
+        data: {
+          items: [],
+          total: 0,
+          page: Number(res.meta?.current_page ?? 1),
+          per_page: Number(res.meta?.per_page ?? 0),
+          total_pages: 0,
+          has_more: false,
+        },
+      };
+    }
+    return {
+      ...res,
+      data: {
+        items: res.data ?? [],
+        total: Number(res.meta?.total ?? (res.data ?? []).length),
+        page: Number(res.meta?.current_page ?? 1),
+        per_page: Number(res.meta?.per_page ?? (res.data ?? []).length),
+        total_pages: Number(res.meta?.total_pages ?? 1),
+        has_more: Boolean(res.meta?.has_more),
+      },
+    };
   },
   categories: () => api.get<CourseCategory[]>('/v2/courses/categories'),
   forGroup: (groupId: number) => api.get<Course[]>(`/v2/groups/${groupId}/courses`),
@@ -249,6 +280,20 @@ export const coursesApi = {
   gradingQueue: (courseId: number) => api.get<PendingAttempt[]>(`/v2/courses/${courseId}/grading`),
   gradeAttempt: (attemptId: number, scorePercent: number, passed: boolean, feedback: string) =>
     api.post(`/v2/courses/attempts/${attemptId}/grade`, { score_percent: scorePercent, passed, feedback }),
+  createQuiz: (courseId: number, data: Partial<Quiz>) =>
+    api.post<Quiz>(`/v2/courses/${courseId}/quizzes`, data),
+  createQuestion: (courseId: number, quizId: number, data: Partial<QuizQuestion> & { correct?: unknown }) =>
+    api.post<QuizQuestion>(`/v2/courses/${courseId}/quizzes/${quizId}/questions`, data),
+  deleteQuestion: (courseId: number, quizId: number, questionId: number) =>
+    api.delete(`/v2/courses/${courseId}/quizzes/${quizId}/questions/${questionId}`),
+  cohorts: (courseId: number) =>
+    api.get<Array<{ id: number; name: string; start_date?: string | null; end_date?: string | null; capacity?: number | null }>>(
+      `/v2/courses/${courseId}/cohorts`,
+    ),
+  createCohort: (courseId: number, data: { name: string; start_date?: string; end_date?: string; capacity?: number | null }) =>
+    api.post(`/v2/courses/${courseId}/cohorts`, data),
+  deleteCohort: (courseId: number, cohortId: number) =>
+    api.delete(`/v2/courses/${courseId}/cohorts/${cohortId}`),
   create: (data: Partial<Course>) => api.post<Course>('/v2/courses', data),
   update: (id: number, data: Partial<Course>) => api.put<Course>(`/v2/courses/${id}`, data),
   publish: (id: number) => api.post<Course>(`/v2/courses/${id}/publish`, {}),

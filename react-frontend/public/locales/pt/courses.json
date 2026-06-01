@@ -6,7 +6,8 @@
     "all_categories": "Todas as categorias",
     "all_levels": "Todos os níveis",
     "empty": "Nenhum curso encontrado.",
-    "empty_hint": "Volte em breve – novos cursos estão a caminho."
+    "empty_hint": "Volte em breve – novos cursos estão a caminho.",
+    "load_more": "Carregar mais"
   },
   "level": {
     "beginner": "Novato",
@@ -60,7 +61,8 @@
     "failed": "Ainda não passou",
     "score": "Sua pontuação: {{score}}%",
     "pending_review": "Suas respostas foram enviadas para análise.",
-    "retry": "Tente novamente"
+    "retry": "Tente novamente",
+    "unavailable": "Este questionario ainda nao esta pronto."
   },
   "my_learning": {
     "title": "Meu aprendizado",
@@ -98,7 +100,13 @@
     "lesson_title": "Título da lição",
     "lesson_type": "Tipo de conteúdo",
     "section_title": "Título da seção",
-    "create_error": "Não foi possível salvar. Por favor, tente novamente."
+    "create_error": "Não foi possível salvar. Por favor, tente novamente.",
+    "enrollment_type_label": "Ritmo",
+    "enrollment_self_paced": "Ao seu ritmo",
+    "enrollment_cohort": "Coorte",
+    "credit_cost_label": "Custo em creditos de tempo",
+    "prerequisites_label": "IDs dos cursos pre-requisitos",
+    "no_category": "Sem categoria"
   },
   "grading": {
     "title": "Classificação",
@@ -210,12 +218,31 @@
     "preview_course": "Visualização",
     "published_toast": "Curso publicado — agora está visível para os membros.",
     "unpublished_toast": "Curso não publicado — de volta ao rascunho.",
-    "publish_hint": "Seu curso é um rascunho. Publique-o para torná-lo visível aos membros e aberto para inscrição."
+    "publish_hint": "Seu curso é um rascunho. Publique-o para torná-lo visível aos membros e aberto para inscrição.",
+    "drip_type": "Calendario de lancamento",
+    "drip_none": "Disponivel imediatamente",
+    "drip_days_after_enroll": "Dias apos a inscricao",
+    "drip_fixed_date": "Data fixa",
+    "drip_offset_days": "Dias",
+    "drip_date": "Data de desbloqueio",
+    "no_questions": "Ainda nao ha perguntas. Guarde a licao de questionario e depois adicione perguntas.",
+    "question_prompt": "Pergunta",
+    "question_options": "Opcoes de resposta, separadas por virgulas",
+    "question_correct": "ID da opcao correta",
+    "add_question": "Adicionar pergunta",
+    "question_added": "Pergunta adicionada",
+    "cohorts": "Coortes",
+    "no_cohorts": "Ainda nao ha coortes.",
+    "cohort_name": "Nome da coorte",
+    "add_cohort": "Adicionar coorte",
+    "cohort_added": "Coorte adicionada",
+    "url_placeholder": "Exemplo: https://example.com/file"
   },
   "lesson_content": {
     "text": "Texto",
     "video": "Vídeo",
     "pdf": "PDF",
-    "embed": "Incorporar"
+    "embed": "Incorporar",
+    "quiz": "Questionario"
   }
 }

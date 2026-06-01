@@ -30,6 +30,8 @@ export default function CoursesPage() {
   const [search, setSearch] = useState('');
   const [categoryId, setCategoryId] = useState<string>('');
   const [level, setLevel] = useState<string>('');
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
 
   useEffect(() => {
     coursesApi.categories().then((res) => {
@@ -45,10 +47,17 @@ export default function CoursesPage() {
         q: search || undefined,
         category_id: categoryId || undefined,
         level: level || undefined,
+        page,
       })
       .then((res) => {
         if (cancelled) return;
-        setCourses(res.success && res.data ? res.data : []);
+        if (res.success && res.data) {
+          setCourses((prev) => (page === 1 ? res.data!.items : [...prev, ...res.data!.items]));
+          setHasMore(res.data.has_more);
+        } else {
+          setCourses([]);
+          setHasMore(false);
+        }
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -56,6 +65,10 @@ export default function CoursesPage() {
     return () => {
       cancelled = true;
     };
+  }, [search, categoryId, level, page]);
+
+  useEffect(() => {
+    setPage(1);
   }, [search, categoryId, level]);
 
   const levelOptions = useMemo(
@@ -70,13 +83,13 @@ export default function CoursesPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
-      <div className="flex items-center justify-between gap-3 mb-1">
+      <div className="flex flex-col gap-3 mb-1 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold">{t('title')}</h1>
+          <h1 className="text-2xl font-bold leading-tight">{t('title')}</h1>
           <AlphaBadge />
         </div>
         {isAuthenticated && (
-          <div className="flex items-center gap-2">
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
             <Button as={Link} to={tenantPath('/courses/my-learning')} variant="tertiary" size="sm">
               {t('my_learning.title')}
             </Button>
@@ -91,7 +104,7 @@ export default function CoursesPage() {
       </div>
       <p className="text-sm text-muted mb-6">{t('subtitle')}</p>
 
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
+      <div className="grid grid-cols-1 gap-3 mb-6 sm:grid-cols-[minmax(16rem,1fr)_minmax(11rem,14rem)_minmax(11rem,14rem)]">
         <SearchField
           size="sm"
           placeholder={t('browse.search_placeholder')}
@@ -101,7 +114,6 @@ export default function CoursesPage() {
           onValueChange={setSearch}
           isClearable
           onClear={() => setSearch('')}
-          className="sm:max-w-xs"
         />
         <Select
           size="sm"
@@ -136,11 +148,20 @@ export default function CoursesPage() {
           <p className="text-sm mt-1">{t('browse.empty_hint')}</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {courses.map((course) => (
-            <CourseCard key={course.id} course={course} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {courses.map((course) => (
+              <CourseCard key={course.id} course={course} />
+            ))}
+          </div>
+          {hasMore ? (
+            <div className="flex justify-center mt-6">
+              <Button variant="secondary" isLoading={loading} onPress={() => setPage((p) => p + 1)}>
+                {t('browse.load_more')}
+              </Button>
+            </div>
+          ) : null}
+        </>
       )}
     </div>
   );

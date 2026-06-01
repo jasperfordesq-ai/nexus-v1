@@ -6,7 +6,8 @@
     "all_categories": "جميع الفئات",
     "all_levels": "جميع المستويات",
     "empty": "لم يتم العثور على دورات.",
-    "empty_hint": "التحقق مرة أخرى قريبا - دورات جديدة في الطريق."
+    "empty_hint": "التحقق مرة أخرى قريبا - دورات جديدة في الطريق.",
+    "load_more": "تحميل المزيد"
   },
   "level": {
     "beginner": "مبتدئ",
@@ -60,7 +61,8 @@
     "failed": "لم يمر بعد",
     "score": "درجاتك: {{score}}%",
     "pending_review": "تم تقديم إجاباتك للمراجعة.",
-    "retry": "حاول ثانية"
+    "retry": "حاول ثانية",
+    "unavailable": "هذا الاختبار غير متاح بعد."
   },
   "my_learning": {
     "title": "تعلمي",
@@ -98,7 +100,13 @@
     "lesson_title": "عنوان الدرس",
     "lesson_type": "نوع المحتوى",
     "section_title": "عنوان القسم",
-    "create_error": "لا يمكن الحفظ. يرجى المحاولة مرة أخرى."
+    "create_error": "لا يمكن الحفظ. يرجى المحاولة مرة أخرى.",
+    "enrollment_type_label": "نوع التسجيل",
+    "enrollment_self_paced": "ذاتي الوتيرة",
+    "enrollment_cohort": "مجموعة",
+    "credit_cost_label": "التكلفة بالأرصدة",
+    "prerequisites_label": "معرفات الدورات المطلوبة",
+    "no_category": "بدون فئة"
   },
   "grading": {
     "title": "الدرجات",
@@ -210,12 +218,31 @@
     "move_up": "تحرك للأعلى",
     "published_toast": "تم نشر الدورة التدريبية — وهي الآن مرئية للأعضاء.",
     "unpublished_toast": "الدورة التدريبية غير منشورة - العودة إلى المسودة.",
-    "publish_hint": "الدورة الخاصة بك هي مسودة. قم بنشره ليكون مرئيًا للأعضاء ويكون مفتوحًا للتسجيل."
+    "publish_hint": "الدورة الخاصة بك هي مسودة. قم بنشره ليكون مرئيًا للأعضاء ويكون مفتوحًا للتسجيل.",
+    "drip_type": "توقيت الإصدار",
+    "drip_none": "متاح فورًا",
+    "drip_days_after_enroll": "أيام بعد التسجيل",
+    "drip_fixed_date": "تاريخ محدد",
+    "drip_offset_days": "أيام",
+    "drip_date": "تاريخ الفتح",
+    "no_questions": "لا توجد أسئلة بعد. احفظ درس الاختبار، ثم أضف أسئلة.",
+    "question_prompt": "السؤال",
+    "question_options": "خيارات الإجابة، مفصولة بفواصل",
+    "question_correct": "معرف الخيار الصحيح",
+    "add_question": "إضافة سؤال",
+    "question_added": "تمت إضافة السؤال",
+    "cohorts": "المجموعات",
+    "no_cohorts": "لا توجد مجموعات بعد.",
+    "cohort_name": "اسم المجموعة",
+    "add_cohort": "إضافة مجموعة",
+    "cohort_added": "تمت إضافة المجموعة",
+    "url_placeholder": "مثال: https://example.com/file"
   },
   "lesson_content": {
     "text": "نص",
     "video": "فيديو",
     "pdf": "PDF",
-    "embed": "تضمين"
+    "embed": "تضمين",
+    "quiz": "اختبار"
   }
 }

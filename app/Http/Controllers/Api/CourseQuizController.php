@@ -35,8 +35,12 @@ class CourseQuizController extends BaseApiController
         if (!$quiz) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.courses.not_found'), null, 404);
         }
-        if (!CourseEnrollmentService::isEnrolled($quiz->course_id, $userId)) {
+        $enrollment = CourseEnrollmentService::find($quiz->course_id, $userId);
+        if (!$enrollment) {
             return $this->respondWithError('NOT_ENROLLED', __('api_controllers_2.courses.not_enrolled'), null, 403);
+        }
+        if (!$this->quizLessonAvailable($quiz, $enrollment->enrolled_at)) {
+            return $this->respondWithError('LESSON_LOCKED', __('api_controllers_2.courses.lesson_locked'), null, 403);
         }
 
         return $this->respondWithData(CourseQuizService::forLearner($quizId));
@@ -56,6 +60,9 @@ class CourseQuizController extends BaseApiController
         $enrollment = CourseEnrollmentService::find($quiz->course_id, $userId);
         if (!$enrollment) {
             return $this->respondWithError('NOT_ENROLLED', __('api_controllers_2.courses.not_enrolled'), null, 403);
+        }
+        if (!$this->quizLessonAvailable($quiz, $enrollment->enrolled_at)) {
+            return $this->respondWithError('LESSON_LOCKED', __('api_controllers_2.courses.lesson_locked'), null, 403);
         }
 
         if ((int) $quiz->max_attempts > 0
@@ -181,5 +188,21 @@ class CourseQuizController extends BaseApiController
                 $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.courses.not_found'), null, 404)
             );
         }
+    }
+
+    private function quizLessonAvailable(CourseQuiz $quiz, $enrolledAt): bool
+    {
+        if (!$quiz->lesson_id) {
+            return true;
+        }
+
+        $lesson = \App\Models\CourseLesson::where('id', $quiz->lesson_id)
+            ->where('course_id', $quiz->course_id)
+            ->first();
+        if (!$lesson) {
+            return true;
+        }
+
+        return (bool) \App\Services\CourseLessonService::availability($lesson, $enrolledAt)['available'];
     }
 }

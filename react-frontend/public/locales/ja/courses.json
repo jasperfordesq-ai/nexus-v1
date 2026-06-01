@@ -6,7 +6,8 @@
     "all_categories": "すべてのカテゴリ",
     "all_levels": "すべてのレベル",
     "empty": "コースが見つかりませんでした。",
-    "empty_hint": "新しいコースも準備中です。"
+    "empty_hint": "新しいコースも準備中です。",
+    "load_more": "もっと読み込む"
   },
   "level": {
     "beginner": "初心者",
@@ -60,7 +61,8 @@
     "failed": "まだ合格していない",
     "score": "あなたのスコア: {{score}}%",
     "pending_review": "あなたの回答は審査のために送信されました。",
-    "retry": "もう一度やり直してください"
+    "retry": "もう一度やり直してください",
+    "unavailable": "この小テストはまだ利用できません。"
   },
   "my_learning": {
     "title": "私の学び",
@@ -98,7 +100,13 @@
     "lesson_title": "レッスンタイトル",
     "lesson_type": "コンテンツタイプ",
     "section_title": "セクションのタイトル",
-    "create_error": "保存できませんでした。もう一度試してください。"
+    "create_error": "保存できませんでした。もう一度試してください。",
+    "enrollment_type_label": "受講形式",
+    "enrollment_self_paced": "自分のペース",
+    "enrollment_cohort": "コホート",
+    "credit_cost_label": "必要クレジット数",
+    "prerequisites_label": "前提コースID",
+    "no_category": "カテゴリなし"
   },
   "grading": {
     "title": "グレーディング",
@@ -210,12 +218,31 @@
     "preview_course": "プレビュー",
     "published_toast": "コースが公開されました - メンバーが閲覧できるようになりました。",
     "unpublished_toast": "コースは未公開 — ドラフトに戻ります。",
-    "publish_hint": "あなたのコースはドラフトです。公開するとメンバーが閲覧できるようになり、登録が可能になります。"
+    "publish_hint": "あなたのコースはドラフトです。公開するとメンバーが閲覧できるようになり、登録が可能になります。",
+    "drip_type": "公開タイミング",
+    "drip_none": "すぐに利用可能",
+    "drip_days_after_enroll": "登録後の日数",
+    "drip_fixed_date": "固定日",
+    "drip_offset_days": "日数",
+    "drip_date": "公開日",
+    "no_questions": "まだ質問はありません。小テストレッスンを保存してから質問を追加してください。",
+    "question_prompt": "質問",
+    "question_options": "回答オプションをカンマ区切りで入力",
+    "question_correct": "正解オプションID",
+    "add_question": "質問を追加",
+    "question_added": "質問を追加しました",
+    "cohorts": "コホート",
+    "no_cohorts": "まだコホートはありません。",
+    "cohort_name": "コホート名",
+    "add_cohort": "コホートを追加",
+    "cohort_added": "コホートを追加しました",
+    "url_placeholder": "例: https://example.com/file"
   },
   "lesson_content": {
     "text": "文章",
     "video": "ビデオ",
     "pdf": "PDF",
-    "embed": "埋め込む"
+    "embed": "埋め込む",
+    "quiz": "クイズ"
   }
 }

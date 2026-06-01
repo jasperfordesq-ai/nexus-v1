@@ -69,6 +69,8 @@ export default function CourseDetailPage() {
       toast.error(t('detail.not_available'));
     } else if (res.code === 'PREREQUISITES_NOT_MET') {
       toast.error(t('detail.prerequisites_required'));
+    } else if (res.code === 'INSUFFICIENT_CREDITS') {
+      toast.error(t('detail.insufficient_credits'));
     } else {
       toast.error(t('detail.enroll_error'));
     }
@@ -94,12 +96,12 @@ export default function CourseDetailPage() {
     <div className="max-w-4xl mx-auto px-4 py-6">
       <div className="flex flex-col md:flex-row gap-6">
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex flex-wrap items-center gap-2 mb-2">
             <Chip size="sm" variant="soft">{t(`level.${course.level}`)}</Chip>
             {course.category?.name ? <Chip size="sm" variant="soft" color="secondary">{course.category.name}</Chip> : null}
             <AlphaBadge />
           </div>
-          <h1 className="text-2xl font-bold mb-2">{course.title}</h1>
+          <h1 className="text-2xl font-bold leading-tight mb-2">{course.title}</h1>
           {course.summary ? <p className="text-muted mb-4">{course.summary}</p> : null}
 
           <Card className="mb-6">
@@ -122,9 +124,9 @@ export default function CourseDetailPage() {
                     <h3 className="font-semibold text-sm mb-2">{section.title}</h3>
                     <ul className="flex flex-col gap-1">
                       {(section.lessons ?? []).map((lesson) => (
-                        <li key={lesson.id} className="flex items-center gap-2 text-sm text-muted">
-                          <PlayCircle size={14} aria-hidden="true" />
-                          {lesson.title}
+                        <li key={lesson.id} className="flex min-w-0 items-center gap-2 text-sm text-muted">
+                          <PlayCircle size={14} className="shrink-0" aria-hidden="true" />
+                          <span className="min-w-0 truncate">{lesson.title}</span>
                         </li>
                       ))}
                     </ul>
@@ -161,7 +163,9 @@ export default function CourseDetailPage() {
         <aside className="md:w-72 flex-shrink-0">
           <Card>
             <CardBody className="p-4 flex flex-col gap-3">
-              <div className="text-2xl font-bold">{t('detail.free')}</div>
+              <div className="text-2xl font-bold">
+                {Number(course.credit_cost) > 0 ? t('detail.cost', { credits: Number(course.credit_cost) }) : t('detail.free')}
+              </div>
               <div className="text-sm text-muted">
                 {lessonCount === 1 ? t('card.lessons', { count: lessonCount }) : t('card.lessons_plural', { count: lessonCount })}
               </div>

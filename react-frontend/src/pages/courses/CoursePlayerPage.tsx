@@ -10,14 +10,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, CardBody, Spinner, Progress } from '@/components/ui';
+import { Alert, Button, Card, CardBody, Checkbox, Radio, RadioGroup, Spinner, Progress, Textarea } from '@/components/ui';
 import CheckCircle from 'lucide-react/icons/circle-check';
 import PlayCircle from 'lucide-react/icons/play-circle';
 import Lock from 'lucide-react/icons/lock';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
-import { coursesApi, type Course, type CourseLesson, type LessonProgress, type LessonAvailability } from '@/lib/api/courses';
+import { coursesApi, type Course, type CourseLesson, type LessonProgress, type LessonAvailability, type Quiz } from '@/lib/api/courses';
 import { LessonDiscussion } from '@/components/courses/LessonDiscussion';
+import { normalizeCourseMediaUrl } from '@/lib/courseContentSecurity';
 
 export default function CoursePlayerPage() {
   const { t } = useTranslation('courses');
@@ -122,11 +123,11 @@ export default function CoursePlayerPage() {
                 }`}
               >
                 {done
-                  ? <CheckCircle size={16} className="text-success" aria-hidden="true" />
+                  ? <CheckCircle size={16} className="shrink-0 text-success" aria-hidden="true" />
                   : locked
-                    ? <Lock size={16} className="text-muted" aria-hidden="true" />
-                    : <PlayCircle size={16} aria-hidden="true" />}
-                <span className="line-clamp-1">{lesson.title}</span>
+                    ? <Lock size={16} className="shrink-0 text-muted" aria-hidden="true" />
+                    : <PlayCircle size={16} className="shrink-0" aria-hidden="true" />}
+                <span className="min-w-0 flex-1 truncate">{lesson.title}</span>
               </Button>
             );
           })}
@@ -143,7 +144,7 @@ export default function CoursePlayerPage() {
             <CardBody className="p-5">
               <h1 className="text-xl font-bold mb-4">{activeLesson.title}</h1>
               {availability[activeLesson.id]?.available === false ? (
-                <div className="flex flex-col items-center justify-center py-12 text-center text-muted gap-2">
+            <div className="flex flex-col items-center justify-center py-12 text-center text-muted gap-2">
                   <Lock size={32} aria-hidden="true" />
                   <p className="text-sm">
                     {availability[activeLesson.id]?.unlock_at
@@ -179,25 +180,141 @@ export default function CoursePlayerPage() {
 }
 
 function LessonContent({ lesson }: { lesson: CourseLesson }) {
+  const videoUrl = normalizeCourseMediaUrl(lesson.video_url);
+  const embedUrl = normalizeCourseMediaUrl(lesson.embed_url);
+  const attachmentUrl = normalizeCourseMediaUrl(lesson.attachment_url);
+
   switch (lesson.content_type) {
     case 'video':
-      return lesson.video_url ? (
-        <video controls className="w-full rounded-md" src={lesson.video_url}>
+      return videoUrl ? (
+        <video controls className="w-full rounded-md" src={videoUrl}>
           <track kind="captions" />
         </video>
       ) : null;
     case 'embed':
-      return lesson.embed_url ? (
+      return embedUrl ? (
         <div className="aspect-video">
-          <iframe title={lesson.title} src={lesson.embed_url} className="w-full h-full rounded-md" allowFullScreen />
+          <iframe
+            title={lesson.title}
+            src={embedUrl}
+            className="w-full h-full rounded-md"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allowFullScreen
+          />
         </div>
       ) : null;
     case 'pdf':
-      return lesson.attachment_url ? (
-        <iframe title={lesson.title} src={lesson.attachment_url} className="w-full h-[70vh] rounded-md" />
+      return attachmentUrl ? (
+        <iframe
+          title={lesson.title}
+          src={attachmentUrl}
+          className="w-full h-[70vh] rounded-md"
+          sandbox="allow-same-origin allow-downloads"
+          referrerPolicy="strict-origin-when-cross-origin"
+        />
       ) : null;
+    case 'quiz':
+      return <QuizLesson lesson={lesson} />;
     case 'text':
     default:
       return <div className="prose prose-sm max-w-none whitespace-pre-wrap">{lesson.body}</div>;
   }
+}
+
+function QuizLesson({ lesson }: { lesson: CourseLesson }) {
+  const { t } = useTranslation('courses');
+  const [quiz, setQuiz] = useState<Quiz | null>(lesson.quiz ?? null);
+  const [answers, setAnswers] = useState<Record<string, unknown>>({});
+  const [result, setResult] = useState<{ score_percent: number; passed: boolean; needs_review: boolean } | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!lesson.quiz?.id) return;
+    coursesApi.getQuiz(lesson.quiz.id).then((res) => {
+      if (res.success && res.data) setQuiz(res.data);
+    });
+  }, [lesson.quiz?.id]);
+
+  if (!quiz) {
+    return <p className="text-sm text-muted">{t('quiz.unavailable')}</p>;
+  }
+
+  const submit = async () => {
+    setSubmitting(true);
+    const res = await coursesApi.submitQuiz(quiz.id, answers);
+    setSubmitting(false);
+    if (res.success && res.data) {
+      setResult(res.data);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div>
+        <h2 className="text-lg font-semibold">{quiz.title}</h2>
+        {quiz.description ? <p className="text-sm text-muted mt-1">{quiz.description}</p> : null}
+      </div>
+      {quiz.questions.map((question) => (
+        <div key={question.id} className="rounded-md border border-[var(--color-border)] p-3">
+          <p className="text-sm font-medium mb-2">{question.prompt}</p>
+          {(question.options ?? []).length > 0 ? (
+            question.type === 'multi' ? (
+              <div className="flex flex-col gap-2">
+                {(question.options ?? []).map((option) => {
+                  const current = Array.isArray(answers[String(question.id)]) ? answers[String(question.id)] as string[] : [];
+                  return (
+                    <Checkbox
+                      key={option.id}
+                      isSelected={current.includes(option.id)}
+                      onValueChange={(checked) => {
+                        setAnswers({
+                          ...answers,
+                          [question.id]: checked
+                            ? [...current, option.id]
+                            : current.filter((id) => id !== option.id),
+                        });
+                      }}
+                    >
+                      {option.label}
+                    </Checkbox>
+                  );
+                })}
+              </div>
+            ) : (
+              <RadioGroup
+                value={String(answers[String(question.id)] ?? '')}
+                onValueChange={(value) => setAnswers({ ...answers, [question.id]: value })}
+              >
+                {(question.options ?? []).map((option) => (
+                  <Radio key={option.id} value={option.id}>
+                    {option.label}
+                  </Radio>
+                ))}
+              </RadioGroup>
+            )
+          ) : (
+            <Textarea
+              className="w-full"
+              rows={question.type === 'essay' ? 5 : 2}
+              value={String(answers[String(question.id)] ?? '')}
+              onValueChange={(value) => setAnswers({ ...answers, [question.id]: value })}
+            />
+          )}
+        </div>
+      ))}
+      {result ? (
+        <Alert
+          color={result.needs_review ? 'warning' : result.passed ? 'success' : 'danger'}
+          title={result.needs_review ? t('quiz.pending_review') : result.passed ? t('quiz.passed') : t('quiz.failed')}
+          description={!result.needs_review ? t('quiz.score', { score: Math.round(result.score_percent) }) : undefined}
+        />
+      ) : null}
+      <div>
+        <Button color="primary" isLoading={submitting} onPress={submit}>
+          {submitting ? t('quiz.submitting') : t('quiz.submit')}
+        </Button>
+      </div>
+    </div>
+  );
 }

@@ -31,7 +31,7 @@ class CourseLessonService
 
         foreach (self::FIELDS as $field) {
             if ($field !== 'title' && array_key_exists($field, $data)) {
-                $payload[$field] = $data[$field];
+                $payload[$field] = self::normaliseField($field, $data[$field]);
             }
         }
 
@@ -50,7 +50,7 @@ class CourseLessonService
         }
         foreach (self::FIELDS as $field) {
             if ($field !== 'title' && array_key_exists($field, $data)) {
-                $lesson->{$field} = $data[$field];
+                $lesson->{$field} = self::normaliseField($field, $data[$field]);
             }
         }
         $lesson->save();
@@ -113,5 +113,25 @@ class CourseLessonService
     private static function nextPosition(int $courseId): int
     {
         return (int) CourseLesson::where('course_id', $courseId)->max('position') + 1;
+    }
+
+    public static function normalizeMediaUrl(?string $value): ?string
+    {
+        $raw = trim((string) $value);
+        if ($raw === '' || filter_var($raw, FILTER_VALIDATE_URL) === false) {
+            return null;
+        }
+
+        $scheme = strtolower((string) parse_url($raw, PHP_URL_SCHEME));
+        return in_array($scheme, ['http', 'https'], true) ? $raw : null;
+    }
+
+    private static function normaliseField(string $field, mixed $value): mixed
+    {
+        if (in_array($field, ['video_url', 'attachment_url', 'embed_url'], true)) {
+            return self::normalizeMediaUrl(is_string($value) ? $value : null);
+        }
+
+        return $value;
     }
 }

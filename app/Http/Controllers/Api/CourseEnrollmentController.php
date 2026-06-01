@@ -48,9 +48,12 @@ class CourseEnrollmentController extends BaseApiController
             return $this->respondWithError('PREREQUISITES_NOT_MET', __('api_controllers_2.courses.prerequisites_not_met'), null, 422);
         }
 
-        // Community platform: all courses are free. Enrolment is never charged.
         $cohortId = $this->inputInt('cohort_id', null, 1);
-        $enrollment = CourseEnrollmentService::enroll($id, $userId, $cohortId);
+        try {
+            $enrollment = CourseEnrollmentService::enrollWithPayment($course, $userId, $cohortId);
+        } catch (\RuntimeException) {
+            return $this->respondWithError('INSUFFICIENT_CREDITS', __('api_controllers_2.courses.insufficient_credits'), null, 422);
+        }
 
         return $this->respondWithData($enrollment, null, 201);
     }
