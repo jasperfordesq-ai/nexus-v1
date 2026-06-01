@@ -353,6 +353,14 @@ describe('MessagesScreen', () => {
     expect(mockRouterPush).toHaveBeenCalledWith({ pathname: '/(modals)/new-group' });
   });
 
+  it('opens the native new-message route from the header action', () => {
+    const { getByLabelText } = render(<MessagesScreen />);
+
+    fireEvent.press(getByLabelText('New message'));
+
+    expect(mockRouterPush).toHaveBeenCalledWith('/(modals)/new-message');
+  });
+
   it('archives conversations with source-of-truth archive copy', async () => {
     mockUsePaginatedApi.mockReturnValue({
       ...defaultPaginatedState,

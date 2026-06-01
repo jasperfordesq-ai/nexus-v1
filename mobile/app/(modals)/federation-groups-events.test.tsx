@@ -41,10 +41,17 @@ jest.mock('react-i18next', () => ({
         'directory.events.online': 'Online',
         'directory.events.organizer': 'Hosted by',
         'directory.events.organizerFallback': 'Event organizer',
+        'directory.partners.eyebrow': 'Partner communities',
+        'directory.partners.title': 'Federated Partners',
+        'directory.partners.subtitle': 'Browse communities connected to your federation.',
+        'directory.partners.search': 'Search partners...',
+        'directory.memberCount': `${String(opts?.count ?? 0)} members`,
         'directory.resultsCount': `${String(opts?.count ?? 0)} results`,
         'directory.filters.allCommunities': 'All communities',
         'directory.unknownCommunity': 'Partner community',
         'directory.external': 'External',
+        connectedSince: `Connected ${String(opts?.date ?? '')}`,
+        'hub.viewCommunity': 'View community',
         'common:back': 'Back',
       };
       if (key === 'directory.groups.openDetails') return `Open details for ${String(opts?.name ?? '')}`;
@@ -112,17 +119,50 @@ jest.mock('@/components/ui/Toggle', () => 'View');
 
 import FederationGroupsScreen from './federation-groups';
 import FederationEventsScreen from './federation-events';
-import { getFederationEvents, getFederationGroups } from '@/lib/api/federation';
+import FederationPartnersScreen from './federation-partners';
+import { getFederationEvents, getFederationGroups, getFederationPartners } from '@/lib/api/federation';
 
 beforeEach(() => {
   mockSearchParams = {};
   mockUsePaginatedApi.mockClear();
   (getFederationEvents as jest.Mock).mockReset();
   (getFederationGroups as jest.Mock).mockReset();
+  (getFederationPartners as jest.Mock).mockReset();
   mockUseApi.mockReturnValue({ data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() });
 });
 
 describe('Federation group and event directory actions', () => {
+  it('opens a federated partner detail view from a partner card', () => {
+    mockUsePaginatedApi.mockReturnValue({
+      items: [{
+        id: 5,
+        name: 'Cork Timebank',
+        location: 'Cork',
+        tagline: 'Neighbourly help across the city.',
+        member_count: 42,
+        federation_level_name: 'Trusted partner',
+        is_external: true,
+      }],
+      isLoading: false,
+      isLoadingMore: false,
+      error: null,
+      hasMore: false,
+      loadMore: jest.fn(),
+      refresh: jest.fn(),
+    });
+
+    const { getByLabelText, getByText } = render(<FederationPartnersScreen />);
+    fireEvent.press(getByLabelText('Cork Timebank'));
+
+    expect(getByText('Federated Partners')).toBeTruthy();
+    expect(getByText('Neighbourly help across the city.')).toBeTruthy();
+    expect(getByText('Trusted partner')).toBeTruthy();
+    expect(jest.requireMock('expo-router').router.push).toHaveBeenCalledWith({
+      pathname: '/(modals)/federation-partner',
+      params: { id: '5' },
+    });
+  });
+
   it('opens a federated group detail view from a group card', () => {
     mockUsePaginatedApi.mockReturnValue({
       items: [{

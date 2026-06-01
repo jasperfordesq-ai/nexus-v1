@@ -24,7 +24,7 @@ jest.mock('@expo/vector-icons', () => ({
 jest.mock('@/lib/hooks/useTenant', () => ({
   usePrimaryColor: () => '#006FEE',
   useTenant: () => ({
-    hasFeature: (feature: string) => ['events', 'groups', 'goals'].includes(feature),
+    hasFeature: (feature: string) => ['events', 'groups', 'goals', 'marketplace'].includes(feature),
     hasModule: (module: string) => module === 'listings',
   }),
 }));
@@ -46,13 +46,14 @@ describe('QuickCreateRoute', () => {
   });
 
   it('renders source-of-truth quick-create options without caring community', () => {
-    const { getByText, queryByText } = render(<QuickCreateRoute />);
+    const { getByText } = render(<QuickCreateRoute />);
 
-    expect(getByText('New exchange')).toBeTruthy();
+    expect(getByText('New listing')).toBeTruthy();
+    expect(getByText('Sell item')).toBeTruthy();
+    expect(getByText('New message')).toBeTruthy();
     expect(getByText('New event')).toBeTruthy();
     expect(getByText('New group')).toBeTruthy();
     expect(getByText('New goal')).toBeTruthy();
-    expect(queryByText('Offer time')).toBeNull();
   });
 
   it('opens the selected create flow', () => {
@@ -61,5 +62,21 @@ describe('QuickCreateRoute', () => {
     fireEvent.press(getByText('New event'));
 
     expect(mockRouterPush).toHaveBeenCalledWith('/(modals)/new-event');
+  });
+
+  it('opens the native message composer from quick-create', () => {
+    const { getByText } = render(<QuickCreateRoute />);
+
+    fireEvent.press(getByText('New message'));
+
+    expect(mockRouterPush).toHaveBeenCalledWith('/(modals)/new-message');
+  });
+
+  it('opens the marketplace listing creator from quick-create', () => {
+    const { getByText } = render(<QuickCreateRoute />);
+
+    fireEvent.press(getByText('Sell item'));
+
+    expect(mockRouterPush).toHaveBeenCalledWith('/(modals)/new-marketplace-listing');
   });
 });

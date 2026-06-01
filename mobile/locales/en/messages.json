@@ -107,6 +107,18 @@
   },
   "newMessage": "New message",
   "newGroup": "New group",
+  "composer": {
+    "eyebrow": "Start a conversation",
+    "subtitle": "Search for a member, then open a private thread.",
+    "searchPlaceholder": "Search members",
+    "loading": "Loading members",
+    "emptyTitle": "No members found",
+    "emptySubtitle": "Try a different name or check the member directory.",
+    "memberFallback": "Community member",
+    "resultsCount": "{{count}} member shown",
+    "resultsCount_other": "{{count}} members shown",
+    "openThread": "Message {{name}}"
+  },
   "empty": {
     "title": "No conversations yet",
     "subtitle": "Connect with members to start messaging",

@@ -30,12 +30,27 @@ interface QuickCreateOption {
 
 const QUICK_CREATE_OPTIONS: QuickCreateOption[] = [
   {
-    labelKey: 'quickCreate.newExchange',
-    descriptionKey: 'quickCreate.newExchangeDescription',
+    labelKey: 'quickCreate.newTimebankListing',
+    descriptionKey: 'quickCreate.newTimebankListingDescription',
     icon: 'storefront-outline',
     route: '/(modals)/new-exchange',
     tone: '#0f766e',
     moduleGate: 'listings',
+  },
+  {
+    labelKey: 'quickCreate.newMarketplaceListing',
+    descriptionKey: 'quickCreate.newMarketplaceListingDescription',
+    icon: 'bag-add-outline',
+    route: '/(modals)/new-marketplace-listing',
+    tone: '#16a34a',
+    featureGate: 'marketplace',
+  },
+  {
+    labelKey: 'quickCreate.newMessage',
+    descriptionKey: 'quickCreate.newMessageDescription',
+    icon: 'chatbubble-ellipses-outline',
+    route: '/(modals)/new-message',
+    tone: '#0ea5e9',
   },
   {
     labelKey: 'quickCreate.newEvent',

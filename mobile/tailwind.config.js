@@ -8,6 +8,7 @@ module.exports = {
   content: [
     './app/**/*.{js,jsx,ts,tsx}',
     './components/**/*.{js,jsx,ts,tsx}',
+    './lib/**/*.{js,jsx,ts,tsx}',
     './node_modules/heroui-native/lib/**/*.{js,jsx,ts,tsx}',
   ],
 };

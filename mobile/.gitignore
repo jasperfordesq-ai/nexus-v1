@@ -1,6 +1,8 @@
 node_modules/
 .expo/
 .codex-logs/
+.apk-audit/
+audit-screenshots/
 dist/
 web-build/
 android/

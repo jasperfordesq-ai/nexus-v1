@@ -125,7 +125,7 @@ export default function MessagesScreen() {
 
   const openNewMessage = useCallback(() => {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    navigation.push('/(modals)/members');
+    navigation.push('/(modals)/new-message');
   }, [navigation]);
 
   const openNewGroup = useCallback(() => {

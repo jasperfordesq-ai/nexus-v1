@@ -246,6 +246,10 @@ function RootNavigator() {
         options={{ ...modalOptions, headerShown: false, title: t('messages:threadTitle') }}
       />
       <Stack.Screen
+        name="(modals)/new-message"
+        options={{ ...modalOptions, headerShown: false, title: t('messages:newMessage') }}
+      />
+      <Stack.Screen
         name="(modals)/member-profile"
         options={{ ...modalOptions, headerShown: false, title: t('members:profileTitle') }}
       />
