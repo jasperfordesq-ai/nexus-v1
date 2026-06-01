@@ -8,7 +8,7 @@ import { Alert, FlatList, Image, Linking, ScrollView, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Button as HeroButton, Card as HeroCard, Chip, CloseButton, Surface, Text } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, CloseButton, Surface, TagGroup, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import AppTopBar from '@/components/ui/AppTopBar';
@@ -410,19 +410,32 @@ function MarketplaceOrdersScreen() {
                   <HeroButton.Label>{t('orders.sales')}</HeroButton.Label>
                 </HeroButton>
               </View>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingRight: 2 }}>
-                {(['all', 'active', 'completed', 'cancelled'] as OrderStatusTab[]).map((tab) => (
-                  <HeroButton
-                    key={tab}
-                    size="sm"
-                    variant={statusTab === tab ? 'primary' : 'secondary'}
-                    onPress={() => setStatusTab(tab)}
-                    style={statusTab === tab ? { backgroundColor: primary } : undefined}
-                  >
-                    <HeroButton.Label>{t(`orders.tabs.${tab}`)}</HeroButton.Label>
-                  </HeroButton>
-                ))}
-              </ScrollView>
+              <TagGroup
+                size="sm"
+                selectionMode="single"
+                selectedKeys={[statusTab]}
+                onSelectionChange={(keys) => {
+                  const next = Array.from(keys)[0];
+                  if (next !== undefined) setStatusTab(next as OrderStatusTab);
+                }}
+              >
+                <TagGroup.List>
+                  {(['all', 'active', 'completed', 'cancelled'] as OrderStatusTab[]).map((tab) => {
+                    const isSelected = statusTab === tab;
+                    return (
+                      <TagGroup.Item
+                        key={tab}
+                        id={tab}
+                        style={isSelected ? { backgroundColor: primary } : undefined}
+                      >
+                        <TagGroup.ItemLabel style={isSelected ? { color: '#FFFFFF' } : undefined}>
+                          {t(`orders.tabs.${tab}`)}
+                        </TagGroup.ItemLabel>
+                      </TagGroup.Item>
+                    );
+                  })}
+                </TagGroup.List>
+              </TagGroup>
             </HeroCard.Body>
           </HeroCard>
         }

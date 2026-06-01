@@ -8,7 +8,7 @@ import { Alert, FlatList, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Button as HeroButton, Card as HeroCard, Chip, CloseButton, Spinner, Surface, Text } from 'heroui-native';
+import { Alert as HeroAlert, Button as HeroButton, Card as HeroCard, Chip, CloseButton, Spinner, Surface, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 
@@ -699,20 +699,16 @@ function PickupsPanel() {
           <HeroButton.Label>{t('tools.pickups.scan')}</HeroButton.Label>
         </HeroButton>
         {lastScan ? (
-          <Surface variant="secondary" className="rounded-panel-inner border p-3" style={{ borderColor: withAlpha(theme.success, 0.28) }}>
-            <View className="flex-row items-center gap-3">
-              <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(theme.success, 0.14) }}>
-                <Ionicons name="checkmark-circle-outline" size={20} color={theme.success} />
-              </View>
-              <View className="min-w-0 flex-1">
-                <Text className="text-sm font-bold" style={{ color: theme.success }}>{t('tools.pickups.lastScan')}</Text>
-                <Text className="text-xs leading-4" style={{ color: theme.textSecondary }}>
-                  {t('tools.pickups.lastScanDetail', { order: lastScan.order_id, status: t(`pickup.status.${lastScan.status}`, { defaultValue: lastScan.status }) })}
-                </Text>
-              </View>
-              <CloseButton onPress={() => setLastScan(null)} iconProps={{ size: 16, color: primary }} />
-            </View>
-          </Surface>
+          <HeroAlert status="success">
+            <HeroAlert.Indicator />
+            <HeroAlert.Content>
+              <HeroAlert.Title>{t('tools.pickups.lastScan')}</HeroAlert.Title>
+              <HeroAlert.Description>
+                {t('tools.pickups.lastScanDetail', { order: lastScan.order_id, status: t(`pickup.status.${lastScan.status}`, { defaultValue: lastScan.status }) })}
+              </HeroAlert.Description>
+            </HeroAlert.Content>
+            <CloseButton onPress={() => setLastScan(null)} iconProps={{ size: 16, color: primary }} />
+          </HeroAlert>
         ) : null}
       </View>
       <QrScannerSheet
@@ -1053,23 +1049,19 @@ function CouponsPanel() {
           <HeroButton.Label>{isRedeemingQr ? t('tools.coupons.redeemingQr') : t('tools.coupons.redeemQr')}</HeroButton.Label>
         </HeroButton>
         {lastQrRedemption ? (
-          <Surface variant="default" className="rounded-panel-inner border p-3" style={{ borderColor: withAlpha(theme.success, 0.28) }}>
-            <View className="flex-row items-center gap-3">
-              <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(theme.success, 0.14) }}>
-                <Ionicons name="checkmark-circle-outline" size={20} color={theme.success} />
-              </View>
-              <View className="min-w-0 flex-1">
-                <Text className="text-sm font-bold" style={{ color: theme.success }}>{t('tools.coupons.qrRedeemed')}</Text>
-                <Text className="text-xs leading-4" style={{ color: theme.textSecondary }}>
-                  {t('tools.coupons.qrRedeemedDetail', {
-                    coupon: lastQrRedemption.coupon_id,
-                    date: lastQrRedemption.redeemed_at ? new Date(lastQrRedemption.redeemed_at).toLocaleString() : t('tools.coupons.dateUnknown'),
-                  })}
-                </Text>
-              </View>
-              <CloseButton onPress={() => setLastQrRedemption(null)} iconProps={{ size: 16, color: primary }} />
-            </View>
-          </Surface>
+          <HeroAlert status="success">
+            <HeroAlert.Indicator />
+            <HeroAlert.Content>
+              <HeroAlert.Title>{t('tools.coupons.qrRedeemed')}</HeroAlert.Title>
+              <HeroAlert.Description>
+                {t('tools.coupons.qrRedeemedDetail', {
+                  coupon: lastQrRedemption.coupon_id,
+                  date: lastQrRedemption.redeemed_at ? new Date(lastQrRedemption.redeemed_at).toLocaleString() : t('tools.coupons.dateUnknown'),
+                })}
+              </HeroAlert.Description>
+            </HeroAlert.Content>
+            <CloseButton onPress={() => setLastQrRedemption(null)} iconProps={{ size: 16, color: primary }} />
+          </HeroAlert>
         ) : null}
       </Surface>
       <PanelList
