@@ -6,6 +6,7 @@
 
 namespace Tests\Laravel\Feature\Courses;
 
+use App\Core\TenantContext;
 use App\Models\Course;
 use App\Models\User;
 use App\Services\CourseCreditService;
@@ -22,16 +23,28 @@ class CourseCreditTest extends TestCase
 
     private function paidCourse(int $authorId, float $cost): Course
     {
-        return Course::create([
-            'author_user_id' => $authorId,
+        // author_user_id / status / moderation_status / published_at are not
+        // mass-assignable (Course::$fillable hardening) — set them explicitly.
+        $course = new Course([
             'title' => 'Paid Course',
             'slug' => 'paid-course-' . uniqid(),
-            'status' => 'published',
-            'moderation_status' => 'approved',
             'visibility' => 'members',
             'credit_cost' => $cost,
-            'published_at' => now(),
         ]);
+        $course->author_user_id = $authorId;
+        $course->status = 'published';
+        $course->moderation_status = 'approved';
+        $course->published_at = now();
+        $course->save();
+
+        // Re-assert the active tenant after model creation. WalletService resolves
+        // the transfer recipient through the User model's tenant scope, so the
+        // charge must run in the same tenant the author/learner were created in.
+        // (Creating models in the test can reset the cached tenant id; in
+        // production a single request tenant covers course/author/learner.)
+        TenantContext::setById($this->testTenantId);
+
+        return $course;
     }
 
     public function test_paid_enrolment_transfers_credits_from_learner_to_author(): void

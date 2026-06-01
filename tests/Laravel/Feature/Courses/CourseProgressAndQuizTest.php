@@ -28,15 +28,18 @@ class CourseProgressAndQuizTest extends TestCase
 
     private function makeCourseWithLessons(int $lessonCount = 2): Course
     {
-        $course = Course::create([
-            'author_user_id' => 1,
+        // author_user_id / status / moderation_status / published_at are not
+        // mass-assignable (Course::$fillable hardening) — set them explicitly.
+        $course = new Course([
             'title' => 'Test Course',
             'slug' => 'test-course-' . uniqid(),
-            'status' => 'published',
-            'moderation_status' => 'approved',
             'visibility' => 'members',
-            'published_at' => now(),
         ]);
+        $course->author_user_id = 1;
+        $course->status = 'published';
+        $course->moderation_status = 'approved';
+        $course->published_at = now();
+        $course->save();
 
         for ($i = 1; $i <= $lessonCount; $i++) {
             CourseLesson::create([
