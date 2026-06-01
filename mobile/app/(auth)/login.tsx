@@ -23,6 +23,7 @@ import { Alert, Button as HeroButton, Card as HeroCard } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 import { ApiResponseError } from '@/lib/api/client';
 import { useAuth } from '@/lib/hooks/useAuth';
+import { useTheme } from '@/lib/hooks/useTheme';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -41,6 +42,7 @@ export default function LoginScreen() {
   const { login: authLogin } = useAuth();
   const router = useRouter();
   const primary = usePrimaryColor();
+  const theme = useTheme();
   const insets = useSafeAreaInsets();
 
   const loginSchema = useMemo(() => makeLoginSchema(t), [t]);
@@ -169,7 +171,7 @@ export default function LoginScreen() {
                           <Ionicons
                             name={showPassword ? 'eye-off-outline' : 'eye-outline'}
                             size={20}
-                            className="text-muted-foreground"
+                            color={theme.textMuted}
                           />
                         </HeroButton>
                       }

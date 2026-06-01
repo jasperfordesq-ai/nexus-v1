@@ -23,6 +23,7 @@ import { TenantProvider } from '@/lib/context/TenantContext';
 import { RealtimeProvider } from '@/lib/context/RealtimeContext';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { navigateToLink } from '@/lib/utils/navigateToLink';
+import { configureNativeTheme } from '@/lib/theme/nativeTheme';
 import * as Sentry from '@sentry/react-native';
 
 const NATIVE_SCREEN_BACKGROUND = '#0F0F0F';
@@ -45,6 +46,7 @@ const NAV_THEME: Theme = {
 
 // Validate environment variables at startup — logs warnings for missing config
 validateEnv();
+configureNativeTheme();
 
 // Suppress known non-fatal dev-mode warnings that block the UI in Expo Go
 LogBox.ignoreLogs([

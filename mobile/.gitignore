@@ -1,5 +1,6 @@
 node_modules/
 .expo/
+.codex-logs/
 dist/
 web-build/
 android/

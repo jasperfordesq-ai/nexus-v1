@@ -111,7 +111,7 @@ export default function IdeationScreen() {
                 placeholder={t('ideation:searchPlaceholder')}
                 value={search}
                 onChangeText={setSearch}
-                leftIcon={<Ionicons name="search-outline" size={18} className="text-muted-foreground" />}
+                leftIcon={<Ionicons name="search-outline" size={18} color={theme.textMuted} />}
                 containerClassName="mb-0"
               />
 

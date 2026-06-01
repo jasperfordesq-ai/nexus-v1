@@ -7,6 +7,7 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Button from './Button';
+import { useTheme } from '@/lib/hooks/useTheme';
 
 interface EmptyStateProps {
   icon: React.ComponentProps<typeof Ionicons>['name'];
@@ -17,9 +18,11 @@ interface EmptyStateProps {
 }
 
 export default function EmptyState({ icon, title, subtitle, actionLabel, onAction }: EmptyStateProps) {
+  const theme = useTheme();
+
   return (
     <View className="items-center justify-center px-8 py-12">
-      <Ionicons name={icon} size={48} className="mb-4 text-muted-foreground" />
+      <Ionicons name={icon} size={48} color={theme.textMuted} style={{ marginBottom: 16 }} />
       <Text className="text-lg font-semibold text-foreground text-center mb-2">{title}</Text>
       {subtitle ? (
         <Text className="text-sm text-muted-foreground text-center leading-5 mb-1">{subtitle}</Text>

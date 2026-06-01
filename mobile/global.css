@@ -10,6 +10,10 @@
 
 @source './node_modules/heroui-native/lib';
 
+@theme {
+  --color-muted-foreground: var(--muted);
+}
+
 /* Project NEXUS brand override — mirrors react-frontend/src/styles/tokens.css.
  * HeroUI Native exposes these CSS variables on :root and resolves them via
  * tailwind-variants at runtime through NativeWind. Overriding here propagates

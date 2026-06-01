@@ -16,6 +16,7 @@ import { Alert, Card as HeroCard } from 'heroui-native';
 
 import { forgotPassword } from '@/lib/api/auth';
 import { ApiResponseError } from '@/lib/api/client';
+import { useTheme } from '@/lib/hooks/useTheme';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -32,6 +33,7 @@ export default function ForgotPasswordScreen() {
   const { t } = useTranslation(['auth', 'common']);
   const router = useRouter();
   const primary = usePrimaryColor();
+  const theme = useTheme();
   const insets = useSafeAreaInsets();
   const schema = useMemo(() => makeForgotPasswordSchema(t), [t]);
   const [isLoading, setIsLoading] = useState(false);
@@ -135,7 +137,7 @@ export default function ForgotPasswordScreen() {
                         autoComplete="email"
                         returnKeyType="send"
                         onSubmitEditing={handleSubmit(onSubmit)}
-                        leftIcon={<Ionicons name="mail-outline" size={18} className="text-muted-foreground" />}
+                        leftIcon={<Ionicons name="mail-outline" size={18} color={theme.textMuted} />}
                       />
                     )}
                   />

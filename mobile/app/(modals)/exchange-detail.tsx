@@ -60,11 +60,13 @@ interface DetailStateProps {
 const reportReasons = ['safety_concern', 'inappropriate', 'misleading', 'spam', 'not_timebank_service', 'other'] as const;
 
 function DetailState({ title, backLabel, message, onAction }: DetailStateProps) {
+  const theme = useTheme();
+
   return (
     <SafeAreaView className="flex-1 bg-background">
       <AppTopBar title={title} backLabel={backLabel} fallbackHref="/(tabs)/exchanges" />
       <Surface variant="secondary" className="mx-4 my-8 items-center gap-4 rounded-panel p-6">
-        <Ionicons name="alert-circle-outline" size={28} className="text-danger" />
+        <Ionicons name="alert-circle-outline" size={28} color={theme.error} />
         <Text className="text-center text-sm text-muted-foreground">{message}</Text>
         <HeroButton variant="secondary" onPress={onAction}>
           <HeroButton.Label>{backLabel}</HeroButton.Label>

@@ -9,6 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import BottomSheet from '@/components/ui/BottomSheet';
 import Button from '@/components/ui/Button';
+import { useTheme } from '@/lib/hooks/useTheme';
 
 interface Action {
   label: string;
@@ -25,6 +26,8 @@ interface ActionSheetProps {
 }
 
 export default function ActionSheet({ visible, onClose, title, actions }: ActionSheetProps) {
+  const theme = useTheme();
+
   // No manual snap-point height math — with no snapPoints the BottomSheet
   // wrapper uses dynamic sizing, so the sheet fits the action list exactly
   // (and never clips or leaves dead space).
@@ -51,7 +54,8 @@ export default function ActionSheet({ visible, onClose, title, actions }: Action
                 <Ionicons
                   name={action.icon as keyof typeof Ionicons.glyphMap}
                   size={22}
-                  className={action.destructive ? 'mr-3.5 text-danger' : 'mr-3.5 text-foreground'}
+                  color={action.destructive ? theme.error : theme.text}
+                  style={{ marginRight: 14 }}
                 />
               ) : null}
               <Text

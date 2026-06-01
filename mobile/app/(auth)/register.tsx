@@ -26,6 +26,7 @@ import { ApiResponseError } from '@/lib/api/client';
 import { STORAGE_KEYS } from '@/lib/constants';
 import { storage } from '@/lib/storage';
 import { useAuth } from '@/lib/hooks/useAuth';
+import { useTheme } from '@/lib/hooks/useTheme';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { registerForPushNotifications } from '@/lib/notifications';
 import Button from '@/components/ui/Button';
@@ -63,6 +64,7 @@ export default function RegisterScreen() {
   const { setSession } = useAuth();
   const authRouter = useRouter();
   const primary = usePrimaryColor();
+  const theme = useTheme();
   const insets = useSafeAreaInsets();
 
   const registerSchema = useMemo(() => makeRegisterSchema(t), [t]);
@@ -127,7 +129,7 @@ export default function RegisterScreen() {
       <Ionicons
         name={show ? 'eye-off-outline' : 'eye-outline'}
         size={20}
-        className="text-muted-foreground"
+        color={theme.textMuted}
       />
     </HeroButton>
   );

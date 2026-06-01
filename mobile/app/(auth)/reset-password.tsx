@@ -16,6 +16,7 @@ import { Alert, Button as HeroButton, Card as HeroCard } from 'heroui-native';
 
 import { resetPassword } from '@/lib/api/auth';
 import { ApiResponseError } from '@/lib/api/client';
+import { useTheme } from '@/lib/hooks/useTheme';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -41,6 +42,7 @@ export default function ResetPasswordScreen() {
   const params = useLocalSearchParams<{ token?: string }>();
   const token = typeof params.token === 'string' ? params.token : '';
   const primary = usePrimaryColor();
+  const theme = useTheme();
   const insets = useSafeAreaInsets();
   const schema = useMemo(() => makeResetPasswordSchema(t), [t]);
   const [isLoading, setIsLoading] = useState(false);
@@ -162,10 +164,10 @@ export default function ResetPasswordScreen() {
                         secureTextEntry={!showPassword}
                         autoComplete="new-password"
                         returnKeyType="next"
-                        leftIcon={<Ionicons name="lock-closed-outline" size={18} className="text-muted-foreground" />}
+                        leftIcon={<Ionicons name="lock-closed-outline" size={18} color={theme.textMuted} />}
                         rightIcon={(
                           <HeroButton isIconOnly variant="secondary" accessibilityLabel={t('login.togglePassword')} onPress={() => setShowPassword((current) => !current)}>
-                            <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={18} className="text-muted-foreground" />
+                            <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={18} color={theme.textMuted} />
                           </HeroButton>
                         )}
                       />
@@ -190,7 +192,7 @@ export default function ResetPasswordScreen() {
                         autoComplete="new-password"
                         returnKeyType="send"
                         onSubmitEditing={handleSubmit(onSubmit)}
-                        leftIcon={<Ionicons name="lock-closed-outline" size={18} className="text-muted-foreground" />}
+                        leftIcon={<Ionicons name="lock-closed-outline" size={18} color={theme.textMuted} />}
                       />
                     )}
                   />
