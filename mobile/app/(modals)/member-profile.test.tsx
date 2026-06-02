@@ -9,6 +9,8 @@ import { fireEvent, render, waitFor } from '@testing-library/react-native';
 // --- Mocks ---
 
 let mockParams: Record<string, string | undefined> = { id: '7' };
+const mockHasFeature = jest.fn<boolean, [string]>(() => true);
+const mockHasModule = jest.fn<boolean, [string]>(() => true);
 
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }),
@@ -99,7 +101,7 @@ jest.mock('react-i18next', () => ({
 
 jest.mock('@/lib/hooks/useTenant', () => ({
   usePrimaryColor: () => '#6366f1',
-  useTenant: () => ({ hasFeature: () => true }),
+  useTenant: () => ({ hasFeature: mockHasFeature, hasModule: mockHasModule }),
 }));
 
 jest.mock('@/lib/hooks/useTheme', () => ({
@@ -193,6 +195,8 @@ const defaultApiState = { data: null, isLoading: false, error: null, refresh: je
 beforeEach(() => {
   mockParams = { id: '7' };
   jest.clearAllMocks();
+  mockHasFeature.mockReturnValue(true);
+  mockHasModule.mockReturnValue(true);
   mockUseApi.mockReturnValue(defaultApiState);
 });
 
@@ -293,6 +297,8 @@ describe('MemberProfileScreen', () => {
   });
 
   it('opens same-community wallet transfers from member profiles', () => {
+    mockHasFeature.mockReturnValue(false);
+    mockHasModule.mockImplementation((module: string) => module === 'wallet');
     mockUseApi.mockReturnValue({ data: { data: mockMember }, isLoading: false, error: null, refresh: jest.fn() });
     const { router } = require('expo-router');
 

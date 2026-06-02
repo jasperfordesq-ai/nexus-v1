@@ -7,8 +7,11 @@ import React from 'react';
 import { Alert } from 'react-native';
 import { fireEvent, render } from '@testing-library/react-native';
 
+let mockPollSearchParams: Record<string, string | string[]> = {};
+
 jest.mock('expo-router', () => ({
   router: { back: jest.fn(), canGoBack: jest.fn(() => false), push: jest.fn() },
+  useLocalSearchParams: () => mockPollSearchParams,
 }));
 
 jest.mock('react-i18next', () => ({
@@ -119,6 +122,7 @@ const defaultState = {
 
 describe('PollsScreen', () => {
   beforeEach(() => {
+    mockPollSearchParams = {};
     mockUsePaginatedApi.mockReset();
     mockUsePaginatedApi.mockReturnValue(defaultState);
     jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
@@ -206,5 +210,14 @@ describe('PollsScreen', () => {
     await Promise.resolve();
     expect(Alert.alert).toHaveBeenCalledWith('Poll created', 'Your poll is now open.');
     expect(refresh).toHaveBeenCalled();
+  });
+
+  it('opens the native create panel from the create deep-link flag', () => {
+    mockPollSearchParams = { create: '1' };
+
+    const { getByPlaceholderText, getByText } = render(<PollsScreen />);
+
+    expect(getByText('Create a poll')).toBeTruthy();
+    expect(getByPlaceholderText('Ask a question')).toBeTruthy();
   });
 });

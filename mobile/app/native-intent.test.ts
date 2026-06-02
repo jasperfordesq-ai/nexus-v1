@@ -1,0 +1,40 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { mapSystemPathToNativeRoute, redirectSystemPath } from './+native-intent';
+
+describe('native intent route rewriting', () => {
+  it('maps Android listing and group app links to implemented modal routes', () => {
+    expect(mapSystemPathToNativeRoute('nexus:///listings/90877')).toBe('/(modals)/exchange-detail?id=90877');
+    expect(mapSystemPathToNativeRoute('https://app.project-nexus.ie/groups/90106')).toBe('/(modals)/group-detail?id=90106');
+  });
+
+  it('maps profile parity links to native member, appreciations, and collections routes', () => {
+    expect(mapSystemPathToNativeRoute('/users/25717')).toBe('/(modals)/member-profile?id=25717');
+    expect(mapSystemPathToNativeRoute('/users/25717/appreciations')).toBe('/(modals)/appreciations?userId=25717');
+    expect(mapSystemPathToNativeRoute('/users/25717/collections')).toBe('/(modals)/profile-collections?userId=25717&scope=public');
+  });
+
+  it('maps create aliases to native create surfaces', () => {
+    expect(mapSystemPathToNativeRoute('/listings/new')).toBe('/(modals)/new-exchange');
+    expect(mapSystemPathToNativeRoute('/events/create')).toBe('/(modals)/new-event');
+    expect(mapSystemPathToNativeRoute('/groups/new')).toBe('/(modals)/new-group');
+    expect(mapSystemPathToNativeRoute('/polls/new')).toBe('/(modals)/polls?create=1');
+    expect(mapSystemPathToNativeRoute('/challenges/new')).toBe('/(modals)/new-challenge');
+  });
+
+  it('maps messages and ideation links without going through unmatched routes', () => {
+    expect(mapSystemPathToNativeRoute('/messages/new/260?listing=90877')).toBe('/(modals)/thread?listing=90877&recipientId=260');
+    expect(mapSystemPathToNativeRoute('/messages?user=25717&context=event&context_id=12&name=E2E%20Admin')).toBe(
+      '/(modals)/thread?context_id=12&name=E2E+Admin&context_type=event&recipientId=25717',
+    );
+    expect(mapSystemPathToNativeRoute('/ideation/23')).toBe('/(modals)/ideation-detail?id=23');
+  });
+
+  it('preserves unknown paths so Expo Router can handle native routes normally', () => {
+    expect(mapSystemPathToNativeRoute('/(modals)/exchange-detail?id=90877')).toBeNull();
+    expect(redirectSystemPath({ path: '/(modals)/exchange-detail?id=90877', initial: false })).toBe('/(modals)/exchange-detail?id=90877');
+  });
+});

@@ -795,7 +795,7 @@ function ExchangeDetailModalInner() {
         <Surface
           testID="exchange-detail-footer"
           variant="default"
-          className="flex-row items-center gap-3 border-t border-border px-4 pt-3"
+          className="flex-row items-center gap-2 border-t border-border px-3 pt-3"
           style={{
             position: 'absolute',
             bottom: 0,
@@ -810,7 +810,7 @@ function ExchangeDetailModalInner() {
           <HeroButton
             testID="exchange-detail-save-action"
             isIconOnly
-            size="lg"
+            size="md"
             variant="secondary"
             isDisabled={isSaving}
             accessibilityLabel={isSaved ? t('detail.savedShort') : t('detail.save')}
@@ -824,22 +824,22 @@ function ExchangeDetailModalInner() {
             )}
           </HeroButton>
           <HeroButton
-            size="lg"
+            size="md"
             variant="secondary"
             accessibilityLabel={t('detail.messageMember')}
             onPress={() => handleAction(exchangeUser.id, exchangeUserName)}
-            style={{ flex: 0.85, minWidth: 96 }}
+            style={{ flex: 0.72, minWidth: 84, height: 48 }}
           >
             <Ionicons name="chatbubble-ellipses-outline" size={18} color={primary} />
-            <HeroButton.Label numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.86}>
+            <HeroButton.Label className="text-[13px] leading-4" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.76}>
               {t('detail.messageMember')}
             </HeroButton.Label>
           </HeroButton>
           <HeroButton
-            size="lg"
+            size="md"
             variant="primary"
             isDisabled={isSubmitting}
-            style={{ backgroundColor: primary, flex: 1.65, minWidth: 168 }}
+            style={{ backgroundColor: primary, flex: 1.78, minWidth: 148, height: 48 }}
             accessibilityLabel={
               primaryActionLabel
             }
@@ -859,10 +859,10 @@ function ExchangeDetailModalInner() {
               <Spinner size="sm" />
             ) : (
               <>
-                <HeroButton.Label numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.78}>
+                <HeroButton.Label className="text-[13px] font-semibold leading-4" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.72}>
                   {primaryActionLabel}
                 </HeroButton.Label>
-                <Ionicons name={primaryActionIcon} size={18} color="#fff" />
+                <Ionicons name={primaryActionIcon} size={16} color="#fff" />
               </>
             )}
           </HeroButton>

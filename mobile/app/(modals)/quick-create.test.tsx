@@ -24,7 +24,7 @@ jest.mock('@expo/vector-icons', () => ({
 jest.mock('@/lib/hooks/useTenant', () => ({
   usePrimaryColor: () => '#006FEE',
   useTenant: () => ({
-    hasFeature: (feature: string) => ['events', 'groups', 'goals', 'marketplace'].includes(feature),
+    hasFeature: (feature: string) => ['events', 'groups', 'goals', 'marketplace', 'polls'].includes(feature),
     hasModule: (module: string) => module === 'listings',
   }),
 }));
@@ -52,6 +52,7 @@ describe('QuickCreateRoute', () => {
     expect(getByText('Sell item')).toBeTruthy();
     expect(getByText('New message')).toBeTruthy();
     expect(getByText('New event')).toBeTruthy();
+    expect(getByText('New poll')).toBeTruthy();
     expect(getByText('New group')).toBeTruthy();
     expect(getByText('New goal')).toBeTruthy();
   });
@@ -78,5 +79,13 @@ describe('QuickCreateRoute', () => {
     fireEvent.press(getByText('Sell item'));
 
     expect(mockRouterPush).toHaveBeenCalledWith('/(modals)/new-marketplace-listing');
+  });
+
+  it('opens the native poll composer from quick-create', () => {
+    const { getByText } = render(<QuickCreateRoute />);
+
+    fireEvent.press(getByText('New poll'));
+
+    expect(mockRouterPush).toHaveBeenCalledWith('/(modals)/polls?create=1');
   });
 });

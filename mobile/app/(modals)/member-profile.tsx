@@ -127,7 +127,7 @@ function MemberProfileScreenInner() {
   const { t } = useTranslation(['members', 'federation', 'common']);
   const { id, tenant_id: tenantIdParam, name: nameParam } = useLocalSearchParams<{ id?: string; tenant_id?: string; name?: string }>();
   const primary = usePrimaryColor();
-  const { hasFeature } = useTenant();
+  const { hasFeature, hasModule } = useTenant();
   const theme = useTheme();
   const { user } = useAuth();
 
@@ -142,7 +142,7 @@ function MemberProfileScreenInner() {
   const safeTenantId = Number.isFinite(routeTenantId) && routeTenantId > 0 ? routeTenantId : null;
   const isFederatedProfile = isExternalFederatedProfile || (safeTenantId !== null && (!Number.isFinite(authTenantId) || safeTenantId !== authTenantId));
   const isOwnProfile = !isFederatedProfile && user?.id === safeMemberId;
-  const sameTenantCanSendCredits = !isOwnProfile && !isFederatedProfile && hasFeature('wallet');
+  const sameTenantCanSendCredits = !isOwnProfile && !isFederatedProfile && (hasModule('wallet') || hasFeature('wallet'));
 
   const { data, isLoading, error, refresh } = useApi(
     () => loadMemberProfileData(safeMemberId, safeTenantId, isFederatedProfile),
@@ -567,44 +567,46 @@ function MemberProfileScreenInner() {
         </View>
       </ScrollView>
 
-      <Surface variant="default" className="absolute bottom-0 left-0 right-0 border-t border-border p-4">
-        <View className="flex-row flex-wrap items-center gap-3">
+      <Surface variant="default" className="absolute bottom-0 left-0 right-0 border-t border-border px-3 py-3">
+        <View className="flex-row items-center gap-2">
           {isOwnProfile ? (
             <HeroButton
-              className="flex-1"
+              className="min-w-0 flex-1"
               variant="primary"
-              style={{ backgroundColor: primary }}
+              style={{ minHeight: 48, paddingHorizontal: 8, backgroundColor: primary }}
               accessibilityLabel={t('profile.editProfile')}
               onPress={openEditProfile}
             >
-              <Ionicons name="create-outline" size={18} color="#fff" />
-              <HeroButton.Label>{t('profile.editProfile')}</HeroButton.Label>
+              <Ionicons name="create-outline" size={16} color="#fff" />
+              <HeroButton.Label numberOfLines={1} style={{ fontSize: 13, lineHeight: 16 }}>{t('profile.editProfile')}</HeroButton.Label>
             </HeroButton>
           ) : null}
           {!isOwnProfile && connStatus === 'none' ? (
-            <HeroButton className="min-w-[30%] flex-1" variant="secondary" isDisabled={connActionLoading} accessibilityLabel={t('profile.connect')} onPress={() => void handleConnect()}>
-              {connActionLoading ? <Spinner size="sm" /> : <Ionicons name="person-add-outline" size={18} color={primary} />}
-              <HeroButton.Label>{t('profile.connect')}</HeroButton.Label>
+            <HeroButton className="min-w-0 flex-1" variant="secondary" style={{ minHeight: 48, paddingHorizontal: 8 }} isDisabled={connActionLoading} accessibilityLabel={t('profile.connect')} onPress={() => void handleConnect()}>
+              {connActionLoading ? <Spinner size="sm" /> : <Ionicons name="person-add-outline" size={16} color={primary} />}
+              <HeroButton.Label numberOfLines={1} style={{ fontSize: 13, lineHeight: 16 }}>{t('profile.connect')}</HeroButton.Label>
             </HeroButton>
           ) : null}
           {isFederatedProfile && member.transactions_enabled ? (
             <HeroButton
-              className="min-w-[30%] flex-1"
+              className="min-w-0 flex-1"
               variant="secondary"
+              style={{ minHeight: 48, paddingHorizontal: 8 }}
               accessibilityLabel={t('profile.sendCredits')}
               onPress={() => {
                 void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 setShowFederationTransfer((current) => !current);
               }}
             >
-              <Ionicons name="wallet-outline" size={18} color={primary} />
-              <HeroButton.Label>{t('profile.sendCredits')}</HeroButton.Label>
+              <Ionicons name="wallet-outline" size={16} color={primary} />
+              <HeroButton.Label numberOfLines={1} style={{ fontSize: 13, lineHeight: 16 }}>{t('profile.sendCredits')}</HeroButton.Label>
             </HeroButton>
           ) : null}
           {sameTenantCanSendCredits ? (
             <HeroButton
-              className="min-w-[30%] flex-1"
+              className="min-w-0 flex-1"
               variant="secondary"
+              style={{ minHeight: 48, paddingHorizontal: 8 }}
               accessibilityLabel={t('profile.sendCredits')}
               onPress={() => {
                 void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -614,15 +616,15 @@ function MemberProfileScreenInner() {
                 } as unknown as Href);
               }}
             >
-              <Ionicons name="wallet-outline" size={18} color={primary} />
-              <HeroButton.Label>{t('profile.sendCredits')}</HeroButton.Label>
+              <Ionicons name="wallet-outline" size={16} color={primary} />
+              <HeroButton.Label numberOfLines={1} style={{ fontSize: 13, lineHeight: 16 }}>{t('profile.sendCredits')}</HeroButton.Label>
             </HeroButton>
           ) : null}
           {!isOwnProfile ? (
             <HeroButton
-              className="min-w-[30%] flex-1"
+              className="min-w-0 flex-1"
               variant="primary"
-              style={{ backgroundColor: primary }}
+              style={{ minHeight: 48, paddingHorizontal: 8, backgroundColor: primary }}
               accessibilityLabel={t('profile.sendMessage')}
               onPress={() => {
                 void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -636,8 +638,8 @@ function MemberProfileScreenInner() {
                 router.push({ pathname: '/(modals)/thread', params: { recipientId: String(member.id), name: displayName } });
               }}
             >
-              <Ionicons name="chatbubble-outline" size={18} color="#fff" />
-              <HeroButton.Label>{t('profile.sendMessage')}</HeroButton.Label>
+              <Ionicons name="chatbubble-outline" size={16} color="#fff" />
+              <HeroButton.Label numberOfLines={1} style={{ fontSize: 13, lineHeight: 16 }}>{t('profile.sendMessage')}</HeroButton.Label>
             </HeroButton>
           ) : null}
         </View>

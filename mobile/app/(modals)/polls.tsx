@@ -6,6 +6,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, FlatList, KeyboardAvoidingView, Platform, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
@@ -46,8 +47,11 @@ export default function PollsScreen() {
   const { t } = useTranslation(['home', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const params = useLocalSearchParams<{ create?: string | string[] }>();
+  const createParam = Array.isArray(params.create) ? params.create[0] : params.create;
+  const shouldOpenCreate = createParam === '1' || createParam === 'true';
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [showCreate, setShowCreate] = useState(false);
+  const [showCreate, setShowCreate] = useState(shouldOpenCreate);
   const [question, setQuestion] = useState('');
   const [description, setDescription] = useState('');
   const [options, setOptions] = useState(['', '']);
@@ -74,6 +78,12 @@ export default function PollsScreen() {
       setIsRefreshing(false);
     }
   }, [isLoading, isRefreshing]);
+
+  useEffect(() => {
+    if (shouldOpenCreate) {
+      setShowCreate(true);
+    }
+  }, [shouldOpenCreate]);
 
   async function handleCreatePoll() {
     const trimmedQuestion = question.trim();

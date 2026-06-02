@@ -279,7 +279,34 @@ describe('WalletModal', () => {
     expect(getByText('Selected recipient')).toBeTruthy();
   });
 
-  it('opens wallet transfer actions in a bottom sheet instead of the page scroll', () => {
+  it('opens the transfer panel when recipient query params arrive on a mounted wallet', () => {
+    const walletState = { data: { data: { balance: 12.5, total_credits: 20, total_debits: 7.5, currency: 'hours' } }, isLoading: false, error: null, refresh: jest.fn() };
+    const transactionsState = { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
+    const fundState = { data: { data: { balance: 3, total_deposited: 5, total_donated: 2 } }, isLoading: false, error: null, refresh: jest.fn() };
+    const routeParams: { current: Record<string, string> } = { current: {} };
+    let apiCall = 0;
+
+    mockSearchParams.mockImplementation(() => routeParams.current);
+    mockUseApi
+      .mockReset()
+      .mockImplementation(() => {
+        const states = [walletState, transactionsState, fundState];
+        const state = states[apiCall % states.length];
+        apiCall += 1;
+        return state;
+      });
+
+    const { queryByText, rerender, getByText } = render(<WalletModal />);
+    expect(queryByText('Recipient search')).toBeNull();
+
+    routeParams.current = { to: '260', name: 'Jasper Ford' };
+    rerender(<WalletModal />);
+
+    expect(getByText('Jasper Ford')).toBeTruthy();
+    expect(getByText('Selected recipient')).toBeTruthy();
+  });
+
+  it('opens wallet transfer actions inline under the balance card', () => {
     const walletState = { data: { data: { balance: 12.5, total_credits: 20, total_debits: 7.5, currency: 'hours' } }, isLoading: false, error: null, refresh: jest.fn() };
     const transactionsState = { data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() };
     const fundState = { data: { data: { balance: 3, total_deposited: 5, total_donated: 2 } }, isLoading: false, error: null, refresh: jest.fn() };
@@ -293,11 +320,10 @@ describe('WalletModal', () => {
         return state;
       });
 
-    const { getByTestId, getByText } = render(<WalletModal />);
+    const { getByText } = render(<WalletModal />);
 
     fireEvent.press(getByText('Send credits'));
 
-    expect(getByTestId('wallet-action-sheet')).toBeTruthy();
     expect(getByText('Recipient search')).toBeTruthy();
   });
 

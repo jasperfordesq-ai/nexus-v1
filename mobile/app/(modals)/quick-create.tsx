@@ -64,7 +64,7 @@ const QUICK_CREATE_OPTIONS: QuickCreateOption[] = [
     labelKey: 'quickCreate.newPoll',
     descriptionKey: 'quickCreate.newPollDescription',
     icon: 'stats-chart-outline',
-    route: '/(modals)/polls',
+    route: '/(modals)/polls?create=1',
     tone: '#7c3aed',
     featureGate: 'polls',
   },
