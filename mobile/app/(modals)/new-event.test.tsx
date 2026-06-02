@@ -203,6 +203,26 @@ describe('NewEventRoute', () => {
     alertSpy.mockRestore();
   });
 
+  it('keeps the native create event frame full height with an explicit background', () => {
+    const { getByTestId } = render(<NewEventRoute />);
+    const screen = getByTestId('new-event-screen');
+    const scroll = getByTestId('new-event-scroll');
+
+    expect(screen.props.style).toEqual(expect.objectContaining({
+      flex: 1,
+      backgroundColor: '#ffffff',
+    }));
+    expect(scroll.props.style).toEqual(expect.objectContaining({
+      flex: 1,
+      backgroundColor: '#ffffff',
+    }));
+    expect(scroll.props.contentContainerStyle).toEqual(expect.objectContaining({
+      flexGrow: 1,
+      backgroundColor: '#ffffff',
+      paddingBottom: 120,
+    }));
+  });
+
   it('blocks event starts in the past', async () => {
     const { getByPlaceholderText, getByText } = render(<NewEventRoute />);
 

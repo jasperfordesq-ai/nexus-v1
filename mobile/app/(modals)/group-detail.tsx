@@ -246,10 +246,12 @@ function StateMessage({
   primary: string;
   onAction?: () => void;
 }) {
+  const theme = useTheme();
+
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
       <AppTopBar title={title} backLabel={action} fallbackHref="/(tabs)/groups" />
-      <View className="flex-1 items-center justify-center px-6">
+      <View className="flex-1 items-center justify-center px-6" style={{ flex: 1, backgroundColor: theme.bg }}>
         <Surface variant="secondary" className="items-center gap-4 rounded-panel p-8">
           <View className="size-12 items-center justify-center rounded-full" style={{ backgroundColor: withAlpha(primary, 0.12) }}>
             <Ionicons name="people-outline" size={24} color={primary} />
@@ -380,9 +382,9 @@ function GroupDetailScreenInner() {
 
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-background">
+      <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
         <AppTopBar title={t('detail.title')} backLabel={t('common:back')} fallbackHref="/(tabs)/groups" />
-        <View className="flex-1 items-center justify-center">
+        <View className="flex-1 items-center justify-center" style={{ flex: 1, backgroundColor: theme.bg }}>
           <LoadingSpinner />
         </View>
       </SafeAreaView>
@@ -608,7 +610,7 @@ function GroupDetailScreenInner() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView testID="group-detail-screen" className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
       <AppTopBar
         title={t('detail.title')}
         backLabel={t('common:back')}
@@ -621,8 +623,10 @@ function GroupDetailScreenInner() {
       />
 
       <ScrollView
+        testID="group-detail-scroll"
         className="flex-1"
-        contentContainerClassName="gap-4 px-4 pb-10"
+        style={{ flex: 1, backgroundColor: theme.bg }}
+        contentContainerStyle={{ flexGrow: 1, gap: 16, paddingHorizontal: 16, paddingBottom: 40, backgroundColor: theme.bg }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}

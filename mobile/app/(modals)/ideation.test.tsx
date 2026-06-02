@@ -24,9 +24,12 @@ jest.mock('@/lib/hooks/useTenant', () => ({
 
 jest.mock('@/lib/hooks/useTheme', () => ({
   useTheme: () => ({
+    bg: '#ffffff',
     text: '#111827',
     textSecondary: '#4b5563',
+    textMuted: '#6b7280',
     info: '#2563eb',
+    borderSubtle: '#e5e7eb',
   }),
 }));
 
@@ -103,6 +106,26 @@ describe('IdeationScreen', () => {
         refresh: jest.fn(),
       };
     });
+  });
+
+  it('keeps the native ideation list frame full height with an explicit background', () => {
+    const { getByTestId } = render(<IdeationScreen />);
+    const screen = getByTestId('ideation-screen');
+    const scroll = getByTestId('ideation-scroll');
+
+    expect(screen.props.style).toEqual(expect.objectContaining({
+      flex: 1,
+      backgroundColor: '#ffffff',
+    }));
+    expect(scroll.props.style).toEqual(expect.objectContaining({
+      flex: 1,
+      backgroundColor: '#ffffff',
+    }));
+    expect(scroll.props.contentContainerStyle).toEqual(expect.objectContaining({
+      flexGrow: 1,
+      backgroundColor: '#ffffff',
+      paddingBottom: 40,
+    }));
   });
 
   it('renders challenges and opens detail', () => {

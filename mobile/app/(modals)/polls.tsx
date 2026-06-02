@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, FlatList, RefreshControl, Text, View } from 'react-native';
+import { Alert, FlatList, KeyboardAvoidingView, Platform, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
@@ -131,13 +131,19 @@ export default function PollsScreen() {
 
   return (
     <ModalErrorBoundary>
-      <SafeAreaView className="flex-1 bg-background">
+      <SafeAreaView testID="polls-screen" className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
         <AppTopBar title={t('pollsScreen.title')} backLabel={t('common:back')} fallbackHref="/(tabs)/home" />
 
+        <KeyboardAvoidingView
+          style={{ flex: 1, backgroundColor: theme.bg }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
         <FlatList
+          testID="polls-list"
           data={items}
           keyExtractor={(item) => `poll-${item.id}`}
           renderItem={renderItem}
+          style={{ flex: 1, backgroundColor: theme.bg }}
           refreshControl={
             <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} tintColor={primary} colors={[primary]} />
           }
@@ -280,8 +286,9 @@ export default function PollsScreen() {
               </View>
             ) : null
           }
-          contentContainerStyle={{ paddingBottom: 112 }}
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 112, backgroundColor: theme.bg }}
         />
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </ModalErrorBoundary>
   );

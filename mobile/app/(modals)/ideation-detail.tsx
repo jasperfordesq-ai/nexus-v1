@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { type Href, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -78,9 +78,9 @@ export default function IdeationDetailScreen() {
   if (!hasFeature('ideation_challenges')) {
     return (
       <ModalErrorBoundary>
-        <SafeAreaView className="flex-1 bg-background">
+        <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
           <AppTopBar title={t('ideation:title')} backLabel={t('common:back')} fallbackHref={'/(modals)/ideation' as Href} />
-          <View className="px-4 py-8">
+          <View className="px-4 py-8" style={{ flex: 1, backgroundColor: theme.bg }}>
             <EmptyState icon="bulb-outline" title={t('ideation:disabledTitle')} subtitle={t('ideation:disabledSubtitle')} />
           </View>
         </SafeAreaView>
@@ -95,9 +95,18 @@ export default function IdeationDetailScreen() {
 
   return (
     <ModalErrorBoundary>
-      <SafeAreaView className="flex-1 bg-background">
+      <SafeAreaView testID="ideation-detail-screen" className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
         <AppTopBar title={challenge?.title ?? t('ideation:challengeTitle')} backLabel={t('common:back')} fallbackHref={'/(modals)/ideation' as Href} />
-        <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+        <KeyboardAvoidingView
+          style={{ flex: 1, backgroundColor: theme.bg }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+        <ScrollView
+          testID="ideation-detail-scroll"
+          style={{ flex: 1, backgroundColor: theme.bg }}
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 40, backgroundColor: theme.bg }}
+          keyboardShouldPersistTaps="handled"
+        >
           {loading ? (
             <View className="items-center justify-center py-14">
               <LoadingSpinner />
@@ -185,6 +194,7 @@ export default function IdeationDetailScreen() {
             </View>
           )}
         </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </ModalErrorBoundary>
   );

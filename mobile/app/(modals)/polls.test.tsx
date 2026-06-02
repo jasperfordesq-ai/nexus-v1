@@ -63,6 +63,7 @@ jest.mock('@/lib/hooks/useTenant', () => ({
 
 jest.mock('@/lib/hooks/useTheme', () => ({
   useTheme: () => ({
+    bg: '#ffffff',
     text: '#111827',
     textSecondary: '#4b5563',
     onPrimary: '#ffffff',
@@ -122,6 +123,26 @@ describe('PollsScreen', () => {
     mockUsePaginatedApi.mockReturnValue(defaultState);
     jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
     (createPoll as jest.Mock).mockClear();
+  });
+
+  it('keeps the native poll list frame full height with an explicit background', () => {
+    const { getByTestId } = render(<PollsScreen />);
+    const screen = getByTestId('polls-screen');
+    const list = getByTestId('polls-list');
+
+    expect(screen.props.style).toEqual(expect.objectContaining({
+      flex: 1,
+      backgroundColor: '#ffffff',
+    }));
+    expect(list.props.style).toEqual(expect.objectContaining({
+      flex: 1,
+      backgroundColor: '#ffffff',
+    }));
+    expect(list.props.contentContainerStyle).toEqual(expect.objectContaining({
+      flexGrow: 1,
+      backgroundColor: '#ffffff',
+      paddingBottom: 112,
+    }));
   });
 
   it('renders the translated polls empty state', () => {

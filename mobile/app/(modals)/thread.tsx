@@ -529,7 +529,7 @@ function ThreadScreenInner() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background" style={{ backgroundColor: theme.bg }}>
+    <SafeAreaView testID="thread-screen" className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
       <AppTopBar title={threadTitle} backLabel={t('thread.goBack')} fallbackHref="/(tabs)/messages" />
       <OfflineBanner />
       <KeyboardAvoidingView
@@ -1011,10 +1011,12 @@ function EmptyThread({ primary, text }: { primary: string; text: string }) {
 }
 
 function ThreadShell({ title, backLabel, children }: { title: string; backLabel: string; children: React.ReactNode }) {
+  const theme = useTheme();
+
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
       <AppTopBar title={title} backLabel={backLabel} fallbackHref="/(tabs)/messages" />
-      <View className="flex-1 items-center justify-center px-6">{children}</View>
+      <View className="flex-1 items-center justify-center px-6" style={{ flex: 1, backgroundColor: theme.bg }}>{children}</View>
     </SafeAreaView>
   );
 }

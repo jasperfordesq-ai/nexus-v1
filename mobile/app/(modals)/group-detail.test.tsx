@@ -468,6 +468,33 @@ describe('GroupDetailScreen', () => {
     expect(getByText('Garden Club')).toBeTruthy();
   });
 
+  it('keeps the native group detail frame full height with an explicit background', () => {
+    mockUseApi.mockReturnValue({
+      data: { data: mockGroupDetail },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByTestId } = render(<GroupDetailScreen />);
+    const screen = getByTestId('group-detail-screen');
+    const scroll = getByTestId('group-detail-scroll');
+
+    expect(screen.props.style).toEqual(expect.objectContaining({
+      flex: 1,
+      backgroundColor: '#ffffff',
+    }));
+    expect(scroll.props.style).toEqual(expect.objectContaining({
+      flex: 1,
+      backgroundColor: '#ffffff',
+    }));
+    expect(scroll.props.contentContainerStyle).toEqual(expect.objectContaining({
+      flexGrow: 1,
+      backgroundColor: '#ffffff',
+      paddingBottom: 40,
+    }));
+  });
+
   it('renders join button when user is not a member', () => {
     mockUseApi.mockReturnValue({
       data: { data: { ...mockGroupDetail, is_member: false } },

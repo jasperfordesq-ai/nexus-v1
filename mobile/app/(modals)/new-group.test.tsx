@@ -180,6 +180,26 @@ describe('NewGroupRoute', () => {
     jest.restoreAllMocks();
   });
 
+  it('keeps the native create group frame full height with an explicit background', () => {
+    const { getByTestId } = render(<NewGroupRoute />);
+    const screen = getByTestId('new-group-screen');
+    const scroll = getByTestId('new-group-scroll');
+
+    expect(screen.props.style).toEqual(expect.objectContaining({
+      flex: 1,
+      backgroundColor: '#ffffff',
+    }));
+    expect(scroll.props.style).toEqual(expect.objectContaining({
+      flex: 1,
+      backgroundColor: '#ffffff',
+    }));
+    expect(scroll.props.contentContainerStyle).toEqual(expect.objectContaining({
+      flexGrow: 1,
+      backgroundColor: '#ffffff',
+      paddingBottom: 120,
+    }));
+  });
+
   it('requires a description before creating a group', async () => {
     const { getByPlaceholderText, getByText } = render(<NewGroupRoute />);
 

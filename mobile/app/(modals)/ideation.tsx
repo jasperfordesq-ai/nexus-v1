@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState } from 'react';
-import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -61,9 +61,9 @@ export default function IdeationScreen() {
   if (!hasFeature('ideation_challenges')) {
     return (
       <ModalErrorBoundary>
-        <SafeAreaView className="flex-1 bg-background">
+        <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
           <AppTopBar title={t('ideation:title')} backLabel={t('common:back')} fallbackHref="/(tabs)/profile" />
-          <View className="px-4 py-8">
+          <View className="px-4 py-8" style={{ flex: 1, backgroundColor: theme.bg }}>
             <EmptyState icon="bulb-outline" title={t('ideation:disabledTitle')} subtitle={t('ideation:disabledSubtitle')} />
           </View>
         </SafeAreaView>
@@ -75,10 +75,17 @@ export default function IdeationScreen() {
 
   return (
     <ModalErrorBoundary>
-      <SafeAreaView className="flex-1 bg-background">
+      <SafeAreaView testID="ideation-screen" className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
         <AppTopBar title={t('ideation:title')} backLabel={t('common:back')} fallbackHref="/(tabs)/profile" />
+        <KeyboardAvoidingView
+          style={{ flex: 1, backgroundColor: theme.bg }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
         <ScrollView
-          contentContainerStyle={{ paddingBottom: 40 }}
+          testID="ideation-scroll"
+          style={{ flex: 1, backgroundColor: theme.bg }}
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 40, backgroundColor: theme.bg }}
+          keyboardShouldPersistTaps="handled"
           refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refresh} tintColor={primary} colors={[primary]} />}
         >
           <View className="gap-3 pb-2">
@@ -150,6 +157,7 @@ export default function IdeationScreen() {
             )}
           </View>
         </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </ModalErrorBoundary>
   );

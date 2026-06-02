@@ -32,6 +32,7 @@ jest.mock('@/lib/hooks/useTenant', () => ({
 
 jest.mock('@/lib/hooks/useTheme', () => ({
   useTheme: () => ({
+    bg: '#ffffff',
     text: '#111827',
     textSecondary: '#4b5563',
     info: '#2563eb',
@@ -122,6 +123,26 @@ describe('IdeationDetailScreen', () => {
     });
     mockSubmitIdea.mockResolvedValue({ id: 99 });
     mockVoteIdea.mockResolvedValue({ voted: true, votes_count: 5 });
+  });
+
+  it('keeps the native ideation detail frame full height with an explicit background', () => {
+    const { getByTestId } = render(<IdeationDetailScreen />);
+    const screen = getByTestId('ideation-detail-screen');
+    const scroll = getByTestId('ideation-detail-scroll');
+
+    expect(screen.props.style).toEqual(expect.objectContaining({
+      flex: 1,
+      backgroundColor: '#ffffff',
+    }));
+    expect(scroll.props.style).toEqual(expect.objectContaining({
+      flex: 1,
+      backgroundColor: '#ffffff',
+    }));
+    expect(scroll.props.contentContainerStyle).toEqual(expect.objectContaining({
+      flexGrow: 1,
+      backgroundColor: '#ffffff',
+      paddingBottom: 40,
+    }));
   });
 
   it('renders challenge ideas, submits a new idea, and votes', async () => {

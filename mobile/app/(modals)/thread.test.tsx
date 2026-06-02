@@ -352,10 +352,15 @@ describe('ThreadScreen', () => {
       refresh: jest.fn(),
     });
 
-    const { UNSAFE_getByType } = render(<ThreadScreen />);
+    const { getByTestId, UNSAFE_getByType } = render(<ThreadScreen />);
+    const screen = getByTestId('thread-screen');
     const keyboardFrame = UNSAFE_getByType(KeyboardAvoidingView);
     const messageList = UNSAFE_getByType(FlatList);
 
+    expect(screen.props.style).toEqual(expect.objectContaining({
+      flex: 1,
+      backgroundColor: '#ffffff',
+    }));
     expect(keyboardFrame.props.style).toEqual(expect.objectContaining({
       flex: 1,
       backgroundColor: '#ffffff',
