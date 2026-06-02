@@ -252,7 +252,9 @@ export default function ExchangeDetail() {
                 <div key={entry.id} className="flex gap-3 items-start">
                   <div className="w-2 h-2 rounded-full bg-accent mt-2 flex-shrink-0" />
                   <div>
-                    <p className="text-sm font-medium">{entry.action}</p>
+                    <p className="text-sm font-medium">
+                      {t(`exchanges.detail_history_actions.${entry.action}`, { defaultValue: entry.action })}
+                    </p>
                     {entry.actor_name && (
                       <p className="text-xs text-muted">{t('exchanges.detail_history_by', { name: entry.actor_name })}</p>
                     )}

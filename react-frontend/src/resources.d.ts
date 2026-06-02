@@ -18843,6 +18843,12 @@ export default interface Resources {
       "detail_default_description": "Review the exchange details and decide whether to approve or reject.",
       "detail_header_title": "Exchange Details",
       "detail_history": "History",
+      "detail_history_actions": {
+        "provider_confirmed": "Provider confirmed hours",
+        "request_created": "Request created",
+        "requester_confirmed": "Requester confirmed hours",
+        "status_changed": "Status changed"
+      },
       "detail_history_by": "by {{name}}",
       "detail_hours_label": "Hours",
       "detail_hours_value": "{{hours}} hours",
