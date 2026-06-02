@@ -206,11 +206,13 @@ describe('ExchangeDetailModal', () => {
   it('keeps member workflow actions available in the bottom footer', () => {
     mockUseApi.mockReturnValue({ data: { data: mockExchange }, isLoading: false, error: null, refresh: jest.fn() });
 
-    const { getByLabelText } = render(<ExchangeDetailModal />);
+    const { getByLabelText, getByText } = render(<ExchangeDetailModal />);
 
     expect(getByLabelText('Save')).toBeTruthy();
     expect(getByLabelText('Message')).toBeTruthy();
     expect(getByLabelText('Request this Service')).toBeTruthy();
+    expect(getByText('Request this Service').props.numberOfLines).toBe(1);
+    expect(getByText('Message').props.numberOfLines).toBe(1);
   });
 
   it('pins the detail content and member action footer to a full-height Android layout', () => {
@@ -226,6 +228,9 @@ describe('ExchangeDetailModal', () => {
     );
     expect(StyleSheet.flatten(getByTestId('exchange-detail-footer').props.style)).toEqual(
       expect.objectContaining({ position: 'absolute', bottom: 0, left: 0, right: 0 }),
+    );
+    expect(StyleSheet.flatten(getByTestId('exchange-detail-save-action').props.style)).toEqual(
+      expect.objectContaining({ height: 48, width: 48, flexShrink: 0 }),
     );
   });
 

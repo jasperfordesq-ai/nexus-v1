@@ -292,6 +292,19 @@ describe('MemberProfileScreen', () => {
     expect(getByText('Send Message')).toBeTruthy();
   });
 
+  it('opens same-community wallet transfers from member profiles', () => {
+    mockUseApi.mockReturnValue({ data: { data: mockMember }, isLoading: false, error: null, refresh: jest.fn() });
+    const { router } = require('expo-router');
+
+    const { getByLabelText } = render(<MemberProfileScreen />);
+    fireEvent.press(getByLabelText('Send credits'));
+
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/(modals)/wallet',
+      params: { to: '7', name: 'Alice Tanner' },
+    });
+  });
+
   it('renders profile parity sections for stats, achievements, listings, reviews, and trust status', () => {
     mockUseApi.mockReturnValue({ data: { data: mockMember }, isLoading: false, error: null, refresh: jest.fn() });
 

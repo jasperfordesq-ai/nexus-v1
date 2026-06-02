@@ -32,7 +32,7 @@ import {
 } from '@/lib/api/connections';
 import { useApi } from '@/lib/hooks/useApi';
 import { useAuth } from '@/lib/hooks/useAuth';
-import { usePrimaryColor } from '@/lib/hooks/useTenant';
+import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
 import Input from '@/components/ui/Input';
@@ -127,6 +127,7 @@ function MemberProfileScreenInner() {
   const { t } = useTranslation(['members', 'federation', 'common']);
   const { id, tenant_id: tenantIdParam, name: nameParam } = useLocalSearchParams<{ id?: string; tenant_id?: string; name?: string }>();
   const primary = usePrimaryColor();
+  const { hasFeature } = useTenant();
   const theme = useTheme();
   const { user } = useAuth();
 
@@ -141,6 +142,7 @@ function MemberProfileScreenInner() {
   const safeTenantId = Number.isFinite(routeTenantId) && routeTenantId > 0 ? routeTenantId : null;
   const isFederatedProfile = isExternalFederatedProfile || (safeTenantId !== null && (!Number.isFinite(authTenantId) || safeTenantId !== authTenantId));
   const isOwnProfile = !isFederatedProfile && user?.id === safeMemberId;
+  const sameTenantCanSendCredits = !isOwnProfile && !isFederatedProfile && hasFeature('wallet');
 
   const { data, isLoading, error, refresh } = useApi(
     () => loadMemberProfileData(safeMemberId, safeTenantId, isFederatedProfile),
@@ -593,6 +595,23 @@ function MemberProfileScreenInner() {
               onPress={() => {
                 void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 setShowFederationTransfer((current) => !current);
+              }}
+            >
+              <Ionicons name="wallet-outline" size={18} color={primary} />
+              <HeroButton.Label>{t('profile.sendCredits')}</HeroButton.Label>
+            </HeroButton>
+          ) : null}
+          {sameTenantCanSendCredits ? (
+            <HeroButton
+              className="min-w-[30%] flex-1"
+              variant="secondary"
+              accessibilityLabel={t('profile.sendCredits')}
+              onPress={() => {
+                void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                router.push({
+                  pathname: '/(modals)/wallet',
+                  params: { to: String(member.id), name: displayName },
+                } as unknown as Href);
               }}
             >
               <Ionicons name="wallet-outline" size={18} color={primary} />

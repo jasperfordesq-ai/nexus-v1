@@ -808,13 +808,14 @@ function ExchangeDetailModalInner() {
           }}
         >
           <HeroButton
+            testID="exchange-detail-save-action"
             isIconOnly
             size="lg"
             variant="secondary"
             isDisabled={isSaving}
             accessibilityLabel={isSaved ? t('detail.savedShort') : t('detail.save')}
             onPress={() => void handleSaveToggle()}
-            className="h-12 w-12"
+            style={{ height: 48, width: 48, flexShrink: 0 }}
           >
             {isSaving ? (
               <Spinner size="sm" />
@@ -827,16 +828,18 @@ function ExchangeDetailModalInner() {
             variant="secondary"
             accessibilityLabel={t('detail.messageMember')}
             onPress={() => handleAction(exchangeUser.id, exchangeUserName)}
-            style={{ flex: 1 }}
+            style={{ flex: 0.85, minWidth: 96 }}
           >
             <Ionicons name="chatbubble-ellipses-outline" size={18} color={primary} />
-            <HeroButton.Label>{t('detail.messageMember')}</HeroButton.Label>
+            <HeroButton.Label numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.86}>
+              {t('detail.messageMember')}
+            </HeroButton.Label>
           </HeroButton>
           <HeroButton
             size="lg"
             variant="primary"
             isDisabled={isSubmitting}
-            style={{ backgroundColor: primary, flex: 1.35 }}
+            style={{ backgroundColor: primary, flex: 1.65, minWidth: 168 }}
             accessibilityLabel={
               primaryActionLabel
             }
@@ -856,7 +859,7 @@ function ExchangeDetailModalInner() {
               <Spinner size="sm" />
             ) : (
               <>
-                <HeroButton.Label>
+                <HeroButton.Label numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.78}>
                   {primaryActionLabel}
                 </HeroButton.Label>
                 <Ionicons name={primaryActionIcon} size={18} color="#fff" />
