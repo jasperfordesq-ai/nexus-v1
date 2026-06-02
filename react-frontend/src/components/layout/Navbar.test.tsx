@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, userEvent } from '@/test/test-utils';
+import { render, screen, userEvent, waitFor } from '@/test/test-utils';
 import React from 'react';
 
 // --- Mocks ---
@@ -66,7 +66,9 @@ vi.mock('@/contexts', () => ({
 }));
 
 vi.mock('@/components/LanguageSwitcher', () => ({
-  LanguageSwitcher: () => null,
+  LanguageSwitcher: ({ triggerClassName }: { triggerClassName?: string }) => (
+    <button type="button" className={triggerClassName} aria-label="Language switcher">Language</button>
+  ),
 }));
 
 vi.mock('@/components/social', () => ({
@@ -93,8 +95,13 @@ const i18nMap: Record<string, string> = {
   'nav.messages': 'Messages',
   'nav.community': 'Community',
   'nav.more': 'More',
+  'nav.ideation': 'Ideas',
+  'nav.partner_communities': 'Partner Communities',
+  'nav_desc.ideation': 'Ideas & innovation challenges',
+  'nav_desc.partner_communities': 'Federation Hub',
   'nav.unread_notifications': 'Notifications, 5 unread',
   'nav.accessibility_alpha': 'Accessibility (alpha)',
+  'theme_picker.open_label': 'Theme',
   'accessibility.create_new': 'Create new',
   'accessibility.open_menu': 'Open menu',
   'accessibility.search': 'Search',
@@ -372,6 +379,47 @@ describe('Navbar', () => {
     });
   });
 
+  describe('Utility bar', () => {
+    it('renders compact controls with transparent styling', () => {
+      setupDefaultMocks({
+        auth: {
+          user: {
+            id: 9,
+            first_name: 'Bridge',
+            last_name: 'Builder',
+            email: 'broker@example.com',
+            role: 'broker',
+          },
+          isAuthenticated: true,
+        },
+      });
+
+      render(<Navbar />);
+
+      const searchButton = screen.getAllByRole('button', { name: 'Search (Ctrl+K)' })
+        .find((element) => element.className.includes('h-8'));
+      const languageButton = screen.getAllByRole('button', { name: 'Language switcher' })
+        .find((element) => element.className.includes('h-8'));
+      const themeButton = screen.getByRole('button', { name: 'Theme' });
+      expect(searchButton).toBeDefined();
+      expect(languageButton).toBeDefined();
+      expect(themeButton.className).toContain('w-8');
+      expect(themeButton.querySelector('svg')?.getAttribute('class')).toContain('w-4');
+
+      [
+        screen.getByRole('button', { name: 'Broker Panel' }),
+        languageButton!,
+        themeButton,
+        searchButton!,
+      ].forEach((button) => {
+        expect(button.className).toContain('utility-bar-action');
+        expect(button.className).toContain('!bg-transparent');
+        expect(button.className).toContain('hover:!bg-transparent');
+        expect(button.className).toContain('!shadow-none');
+      });
+    });
+  });
+
   describe('Theme toggle', () => {
     it('shows moon icon in light mode', async () => {
       const user = userEvent.setup();
@@ -509,6 +557,25 @@ describe('Navbar', () => {
       render(<Navbar />);
       expect(screen.queryByText('Community')).not.toBeInTheDocument();
     });
+
+    it('routes Partner Communities to the Federation Hub', async () => {
+      const user = userEvent.setup();
+      setupDefaultMocks({
+        auth: { user: { id: 1, first_name: 'A', last_name: 'B', email: 'a@b.com', role: 'member' }, isAuthenticated: true },
+        tenant: {
+          hasFeature: vi.fn((feature: string) => feature === 'federation'),
+          hasModule: vi.fn(() => false),
+        },
+      });
+
+      render(<Navbar />);
+      await user.click(screen.getByRole('button', { name: 'Community' }));
+      await user.click(screen.getByText('Partner Communities'));
+
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('/federation');
+      });
+    });
   });
 
   describe('More dropdown', () => {
@@ -518,6 +585,26 @@ describe('Navbar', () => {
       });
       render(<Navbar />);
       expect(screen.getByText('More')).toBeInTheDocument();
+    });
+
+    it('labels the ideation menu item as Ideas', async () => {
+      const user = userEvent.setup();
+      setupDefaultMocks({
+        auth: { user: { id: 1, first_name: 'A', last_name: 'B', email: 'a@b.com', role: 'member' }, isAuthenticated: true },
+        tenant: {
+          hasFeature: vi.fn((feature: string) => feature === 'ideation_challenges'),
+          hasModule: vi.fn(() => true),
+        },
+      });
+
+      render(<Navbar />);
+      const moreButton = screen.getAllByRole('button', { name: 'More' })
+        .find((element) => element.tagName === 'BUTTON');
+      expect(moreButton).toBeDefined();
+      await user.click(moreButton!);
+
+      expect(screen.getByRole('button', { name: /^Ideas\b/ })).toBeInTheDocument();
+      expect(screen.queryByText('Ideation Challenges')).not.toBeInTheDocument();
     });
   });
 

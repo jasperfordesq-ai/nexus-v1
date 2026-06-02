@@ -22087,7 +22087,7 @@ export default interface Resources {
       "group_exchanges": "Group Exchanges",
       "groups": "Groups",
       "home": "Home",
-      "ideation": "Ideation Challenges",
+      "ideation": "Ideas",
       "impact_report": "Impact Report",
       "jobs": "Jobs",
       "knowledge_base": "Knowledge Base",

@@ -3,8 +3,6 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useColorScheme } from 'react-native';
-
 // ---------------------------------------------------------------------------
 // THEMING CONVENTION (read me)
 //
@@ -70,6 +68,5 @@ export const DARK = {
 export type Theme = { [K in keyof typeof LIGHT]: string };
 
 export function useTheme(): Theme {
-  const scheme = useColorScheme();
-  return (scheme === 'dark' ? DARK : LIGHT) as Theme;
+  return DARK as Theme;
 }

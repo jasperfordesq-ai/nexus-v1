@@ -119,6 +119,11 @@ export function getVisibleCommunityItems(
   return items.filter(item => !item.feature || hasFeature(item.feature));
 }
 
+const utilityBarActionClass = 'utility-bar-action inline-flex items-center justify-center rounded-[8px] !bg-transparent hover:!bg-transparent data-[hovered=true]:!bg-transparent data-[pressed=true]:!bg-transparent !shadow-none border-0 outline-solid outline-transparent focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2 text-theme-muted hover:text-theme-primary h-8 min-w-0 px-2.5 gap-1.5 text-xs shrink-0 transition-colors';
+const utilityBarIconActionClass = `${utilityBarActionClass} w-8 min-w-8 px-0`;
+const utilityBarSuccessActionClass = `${utilityBarActionClass} text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 font-semibold`;
+const utilityBarDividerClass = 'text-[var(--border-default)] text-xs select-none shrink-0 opacity-70';
+
 export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChange, isMobileMenuOpen }: NavbarProps) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -294,7 +299,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     );
     // Partner Communities — authenticated users with federation; sits directly below Volunteering
     if (isAuthenticated && hasFeature('federation')) {
-      items.push({ label: t('nav.partner_communities'), desc: t('nav_desc.partner_communities'), path: '/federation/partners', href: tenantPath('/federation/partners'), icon: Building2, feature: 'federation' as const });
+      items.push({ label: t('nav.partner_communities'), desc: t('nav_desc.partner_communities'), path: '/federation', href: tenantPath('/federation'), icon: Building2, feature: 'federation' as const });
     }
     items.push(
       { label: t('nav.resources'), desc: t('nav_desc.resources'), path: '/resources', href: tenantPath('/resources'), icon: FolderOpen, feature: 'resources' as const },
@@ -440,29 +445,29 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
         {/* Utility Bar — slim top strip, auto-hides on scroll down */}
         <div
           className={`hidden sm:block border-b border-[var(--border-default)] bg-[var(--surface-elevated)] transition-all duration-200 overflow-hidden ${
-            isUtilityBarVisible ? 'max-h-8 opacity-100' : 'max-h-0 opacity-0 border-b-0'
+            isUtilityBarVisible ? 'max-h-9 opacity-100' : 'max-h-0 opacity-0 border-b-0'
           }`}
         >
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-end gap-1 h-8 flex-nowrap overflow-x-auto">
+            <div className="flex items-center justify-end gap-2 h-9 flex-nowrap overflow-x-auto">
               {/* Identity verification status */}
               {isAuthenticated && idVerifiedLoaded && (
                 <>
-                  <span className="text-[var(--border-default)] text-xs select-none shrink-0">|</span>
+                  <span className={utilityBarDividerClass}>|</span>
                   {isIdVerified ? (
-                    <div className="flex items-center gap-1 px-2 h-7 text-xs text-emerald-600 dark:text-emerald-400 shrink-0" aria-label={t('verified')}>
-                      <ShieldCheck className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                    <div className={utilityBarSuccessActionClass} aria-label={t('verified')}>
+                      <ShieldCheck className="w-4 h-4 shrink-0" aria-hidden="true" />
                       <span className="hidden md:inline" aria-hidden="true">{t('verified')}</span>
                     </div>
                   ) : (
                     <Button
                       variant="light"
                       size="sm"
-                      className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 h-7 min-w-0 px-2 gap-1 text-xs shrink-0 font-semibold"
+                      className={utilityBarSuccessActionClass}
                       onPress={() => navigate(tenantPath('/verify-identity-optional'))}
                       aria-label={t('verify_identity')}
                     >
-                      <Fingerprint className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                      <Fingerprint className="w-4 h-4 shrink-0" aria-hidden="true" />
                       <span className="hidden md:inline" aria-hidden="true">{t('verify_identity')}</span>
                     </Button>
                   )}
@@ -471,51 +476,51 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
               {/* Admin links — admin users only */}
               {isAuthenticated && (isAdmin || isBroker) && (
                 <>
-                  <span className="text-[var(--border-default)] text-xs select-none shrink-0">|</span>
+                  <span className={utilityBarDividerClass}>|</span>
                   <Button
                     variant="light"
                     size="sm"
-                    className="text-theme-muted hover:text-theme-primary h-7 min-w-0 px-2 gap-1 text-xs shrink-0"
+                    className={utilityBarActionClass}
                     onPress={() => navigate(tenantPath(isBroker ? '/broker' : '/admin'))}
                     aria-label={isBroker ? t('broker:sidebar.title') : t('user_menu.admin_panel')}
                   >
-                    <Shield className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                    <Shield className="w-4 h-4 shrink-0" aria-hidden="true" />
                     <span className="hidden md:inline">
                       {isBroker ? t('broker:sidebar.title') : t('user_menu.admin_panel')}
                     </span>
                   </Button>
                 </>
               )}
-              {isAuthenticated && <span className="text-[var(--border-default)] text-xs select-none shrink-0">|</span>}
+              {isAuthenticated && <span className={utilityBarDividerClass}>|</span>}
               {accessibleFrontendUrl && (
                 <Tooltip content={t('nav.accessibility_alpha_tooltip')} placement="bottom" delay={300}>
                   <a
                     href={accessibleFrontendUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center rounded-[8px] text-theme-muted hover:text-theme-primary hover:bg-surface-secondary h-7 min-w-0 px-2 gap-1 text-xs shrink-0 outline-solid outline-transparent focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2"
+                    className={utilityBarActionClass}
                     aria-label={t('accessibility.accessibility_alpha_new_tab')}
                   >
-                    <BadgeCheck className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                    <BadgeCheck className="w-4 h-4 shrink-0" aria-hidden="true" />
                     <span className="hidden md:inline">{t('nav.accessibility_alpha')}</span>
-                    <ExternalLink className="hidden lg:block w-3 h-3 shrink-0" aria-hidden="true" />
+                    <ExternalLink className="hidden lg:block w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                   </a>
                 </Tooltip>
               )}
-              <LanguageSwitcher />
-              <ThemePicker triggerSize="sm" placement="bottom-end" />
-              <span className="text-[var(--border-default)] text-xs select-none shrink-0">|</span>
+              <LanguageSwitcher triggerClassName={utilityBarActionClass} />
+              <ThemePicker triggerSize="sm" placement="bottom-end" triggerClassName={utilityBarIconActionClass} />
+              <span className={utilityBarDividerClass}>|</span>
               {/* Search — in utility bar on desktop */}
               <Button
                 variant="light"
                 size="sm"
                 onPress={() => setIsSearchOpen(true)}
                 aria-label={t('accessibility.search_ctrl_k')}
-                className="flex items-center gap-1 px-2 h-7 min-w-0 text-theme-muted hover:text-theme-primary text-xs shrink-0"
+                className={utilityBarActionClass}
               >
-                <Search className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                <Search className="w-4 h-4 shrink-0" aria-hidden="true" />
                 <span className="hidden md:inline">{t('accessibility.search')}</span>
-                <Kbd className="hidden lg:inline-flex items-center gap-0.5 ms-0.5 px-1 py-0 text-[10px] font-medium">
+                <Kbd className="hidden lg:inline-flex items-center gap-0.5 ms-0.5 px-0 py-0 text-[10px] font-medium !bg-transparent !border-transparent !shadow-none text-theme-subtle">
                   <span className="text-xs">{t('keyboard.command_symbol')}</span>{t('keyboard.k_key')}
                 </Kbd>
               </Button>

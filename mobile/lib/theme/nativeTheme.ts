@@ -3,8 +3,10 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Appearance } from 'react-native';
 import { Uniwind } from 'uniwind';
 
 export function configureNativeTheme() {
+  Appearance.setColorScheme('dark');
   Uniwind.setTheme('dark');
 }

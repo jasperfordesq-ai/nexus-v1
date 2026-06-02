@@ -20,7 +20,6 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts';
 import type { Density, ThemeMode } from '@/contexts/ThemeContext';
 import { Button, ButtonGroup, Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
-import Palette from 'lucide-react/icons/palette';
 import Sun from 'lucide-react/icons/sun';
 import Moon from 'lucide-react/icons/moon';
 import Monitor from 'lucide-react/icons/monitor';
@@ -72,6 +71,7 @@ export function ThemePicker({
   const { t } = useTranslation(['common', 'settings']);
   const {
     theme,
+    resolvedTheme,
     setTheme,
     accentColor,
     setAccentColor,
@@ -80,6 +80,16 @@ export function ThemePicker({
   } = useTheme();
 
   const isCompact = triggerSize === 'sm';
+  const TriggerIcon = theme === 'system' ? Monitor : theme === 'dark' ? Moon : Sun;
+  const triggerIconClassName = `${isCompact ? 'w-4 h-4' : 'w-[18px] h-[18px]'} ${
+    theme === 'light'
+      ? 'text-amber-500 dark:text-amber-300'
+      : theme === 'dark'
+        ? 'text-accent'
+        : resolvedTheme === 'dark'
+          ? 'text-sky-300'
+          : 'text-theme-primary'
+  }`;
 
   return (
     <Popover placement={placement} offset={8}>
@@ -92,11 +102,11 @@ export function ThemePicker({
           className={
             triggerClassName ??
             (isCompact
-              ? 'text-theme-muted hover:text-theme-primary w-7 h-7 min-w-7 shrink-0'
+              ? 'text-theme-muted hover:text-theme-primary w-8 h-8 min-w-8 shrink-0'
               : 'text-theme-muted hover:text-theme-primary')
           }
         >
-          <Palette className={isCompact ? 'w-3.5 h-3.5' : 'w-4 h-4'} aria-hidden="true" />
+          <TriggerIcon className={triggerIconClassName} aria-hidden="true" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[280px] bg-surface-solid border border-theme-default rounded-2xl shadow-xl p-4">

@@ -45,9 +45,11 @@ const ALL_LANGUAGES: Language[] = [
 interface LanguageSwitcherProps {
   /** Compact mode: show only icon + short code. Default: true */
   compact?: boolean;
+  /** Optional trigger styling override for compact host surfaces such as the utility bar. */
+  triggerClassName?: string;
 }
 
-export function LanguageSwitcher({ compact = true }: LanguageSwitcherProps) {
+export function LanguageSwitcher({ compact = true, triggerClassName }: LanguageSwitcherProps) {
   const { i18n, t } = useTranslation('common');
   const tenantLanguages = useTenantLanguages();
 
@@ -79,7 +81,7 @@ export function LanguageSwitcher({ compact = true }: LanguageSwitcherProps) {
         <Button
           variant="light"
           size="sm"
-          className="text-theme-muted hover:text-theme-primary gap-1 min-w-0"
+          className={triggerClassName ?? 'text-theme-muted hover:text-theme-primary gap-1 min-w-0'}
           aria-label={t('aria.current_language', { language: currentLang.label })}
           startContent={<Globe className="w-4 h-4 shrink-0" aria-hidden="true" />}
         >

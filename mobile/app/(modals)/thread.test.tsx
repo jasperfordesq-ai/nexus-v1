@@ -33,6 +33,7 @@ type MockThreadMessage = {
   is_read: boolean;
 };
 let mockRealtimeCallback: ((message: MockThreadMessage) => void) | null = null;
+const thumbsUpReaction = '\u{1F44D}';
 
 jest.mock('expo-router', () => ({
   router: { push: (...args: unknown[]) => mockRouterPush(...args), back: jest.fn() },
@@ -147,7 +148,7 @@ jest.mock('@/lib/context/RealtimeContext', () => ({
 }));
 
 const mockMarkConversationRead = jest.fn().mockResolvedValue({ data: { marked_read: 1 } });
-const mockToggleMessageReaction = jest.fn().mockResolvedValue({ data: { action: 'added', emoji: '👍', message_id: 1 } });
+const mockToggleMessageReaction = jest.fn().mockResolvedValue({ data: { action: 'added', emoji: thumbsUpReaction, message_id: 1 } });
 const mockGetMessagingRestrictionStatus = jest.fn().mockResolvedValue({
   data: { messaging_disabled: false, under_monitoring: false, restriction_reason: null },
 });
@@ -306,7 +307,7 @@ beforeEach(() => {
   });
   mockUpdateMessage.mockResolvedValue({ data: { id: 2, body: 'Edited reply', is_edited: true } });
   mockDeleteMessage.mockResolvedValue({ data: { success: true } });
-  mockToggleMessageReaction.mockResolvedValue({ data: { action: 'added', emoji: '👍', message_id: 1 } });
+  mockToggleMessageReaction.mockResolvedValue({ data: { action: 'added', emoji: thumbsUpReaction, message_id: 1 } });
   (sendMessage as jest.Mock).mockClear();
   mockUseApi.mockReturnValue({ data: null, isLoading: false, error: null, refresh: jest.fn() });
   jest.restoreAllMocks();
@@ -767,10 +768,10 @@ describe('ThreadScreen', () => {
 
     const { getAllByLabelText, getByText } = render(<ThreadScreen />);
 
-    fireEvent.press(getAllByLabelText('React with 👍')[0]);
+    fireEvent.press(getAllByLabelText(`React with ${thumbsUpReaction}`)[0]);
 
     await waitFor(() => {
-      expect(mockToggleMessageReaction).toHaveBeenCalledWith(1, '👍');
+      expect(mockToggleMessageReaction).toHaveBeenCalledWith(1, thumbsUpReaction);
       expect(getByText('1')).toBeTruthy();
     });
   });

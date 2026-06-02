@@ -4,6 +4,13 @@
 // See NOTICE file for attribution and acknowledgements.
 
 const mockSetTheme = jest.fn();
+const mockSetColorScheme = jest.fn();
+
+jest.mock('react-native', () => ({
+  Appearance: {
+    setColorScheme: (...args: unknown[]) => mockSetColorScheme(...args),
+  },
+}));
 
 jest.mock('uniwind', () => ({
   Uniwind: {
@@ -15,12 +22,14 @@ import { configureNativeTheme } from './nativeTheme';
 
 describe('configureNativeTheme', () => {
   beforeEach(() => {
+    mockSetColorScheme.mockClear();
     mockSetTheme.mockClear();
   });
 
-  it('forces the dark HeroUI Native theme for the dark-only app shell', () => {
+  it('forces the dark React Native and HeroUI Native theme for the dark-only app shell', () => {
     configureNativeTheme();
 
+    expect(mockSetColorScheme).toHaveBeenCalledWith('dark');
     expect(mockSetTheme).toHaveBeenCalledWith('dark');
   });
 });
