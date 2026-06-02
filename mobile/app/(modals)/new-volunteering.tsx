@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, ScrollView, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -184,9 +184,18 @@ function NewVolunteeringScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
       <AppTopBar title={isEditing ? t('create.editTitle') : t('create.title')} backLabel={t('common:back')} fallbackHref="/(modals)/volunteering" />
-      <ScrollView className="flex-1" contentContainerStyle={{ padding: 16, paddingBottom: 120 }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1, backgroundColor: theme.bg }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+      <ScrollView
+        className="flex-1"
+        style={{ flex: 1, backgroundColor: theme.bg }}
+        contentContainerStyle={{ flexGrow: 1, padding: 16, paddingBottom: 120 }}
+        keyboardShouldPersistTaps="handled"
+      >
         <HeroCard className="mb-4 overflow-hidden rounded-panel p-0">
           <View className="h-1.5" style={{ backgroundColor: '#e11d48' }} />
           <HeroCard.Body className="gap-4 p-4">
@@ -248,6 +257,7 @@ function NewVolunteeringScreen() {
         isDisabled={!isEditing && organisations.length === 0}
         onSubmit={submit}
       />
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

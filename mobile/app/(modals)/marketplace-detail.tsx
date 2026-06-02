@@ -146,7 +146,7 @@ function MarketplaceDetailScreen() {
 
   if (!safeId) {
     return (
-      <SafeAreaView className="flex-1 bg-background">
+      <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
         <AppTopBar title={t('detail.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
         <EmptyState icon="bag-handle-outline" title={t('detail.invalid')} subtitle={t('detail.invalidHint')} />
       </SafeAreaView>
@@ -155,9 +155,9 @@ function MarketplaceDetailScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-background">
+      <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
         <AppTopBar title={t('detail.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
-        <View className="flex-1 items-center justify-center">
+        <View className="flex-1 items-center justify-center" style={{ flex: 1 }}>
           <LoadingSpinner />
         </View>
       </SafeAreaView>
@@ -166,7 +166,7 @@ function MarketplaceDetailScreen() {
 
   if (!listing) {
     return (
-      <SafeAreaView className="flex-1 bg-background">
+      <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
         <AppTopBar title={t('detail.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
         <EmptyState
           icon="bag-handle-outline"
@@ -370,7 +370,7 @@ function MarketplaceDetailScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
       <AppTopBar
         title={t('detail.title')}
         backLabel={t('common:back')}
@@ -378,7 +378,7 @@ function MarketplaceDetailScreen() {
         rightAction={{ accessibilityLabel: t('detail.share'), icon: 'share-outline', onPress: handleShare }}
       />
 
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 142 }}>
+      <ScrollView style={{ flex: 1, backgroundColor: theme.bg }} contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: 142 }}>
         <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
           <View className="h-1.5" style={{ backgroundColor: accent }} />
           <HeroCard.Body className="gap-4 p-4">

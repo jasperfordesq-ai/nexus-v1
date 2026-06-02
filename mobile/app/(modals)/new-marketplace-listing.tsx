@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useState } from 'react';
-import { Alert, Image, ScrollView, View } from 'react-native';
+import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -399,9 +399,17 @@ export function MarketplaceListingForm() {
   const totalImageCount = existingImages.length + imageUris.length;
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
       <AppTopBar title={isEditing ? t('forms.editTitle') : t('forms.createTitle')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
-      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 132, gap: 12 }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1, backgroundColor: theme.bg }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+      <ScrollView
+        style={{ flex: 1, backgroundColor: theme.bg }}
+        contentContainerStyle={{ flexGrow: 1, padding: 16, paddingBottom: 132, gap: 12 }}
+        keyboardShouldPersistTaps="handled"
+      >
         <HeroCard className="overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: theme.border }}>
           <View className="h-1.5" style={{ backgroundColor: primary }} />
           <HeroCard.Body className="gap-3 p-4">
@@ -599,6 +607,7 @@ export function MarketplaceListingForm() {
         isSubmitting={isSubmitting}
         onSubmit={submit}
       />
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

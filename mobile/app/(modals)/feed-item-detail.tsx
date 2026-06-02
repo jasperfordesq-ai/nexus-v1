@@ -10,6 +10,7 @@ import { useLocalSearchParams } from 'expo-router';
 
 import { getFeedItem, type FeedItem as FeedItemType, type FeedItemType as FeedType } from '@/lib/api/feed';
 import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
+import { useTheme } from '@/lib/hooks/useTheme';
 import AppTopBar from '@/components/ui/AppTopBar';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -48,6 +49,7 @@ function FeedItemDetailScreenInner() {
   const { t } = useTranslation(['home', 'common']);
   const params = useLocalSearchParams<{ id?: string; type?: string }>();
   const primary = usePrimaryColor();
+  const theme = useTheme();
   const { hasModule } = useTenant();
   const type = useMemo(() => normalizeType(params.type), [params.type]);
   const id = useMemo(() => normalizeId(params.id), [params.id]);
@@ -88,10 +90,10 @@ function FeedItemDetailScreenInner() {
 
   return (
     <ModalErrorBoundary>
-      <SafeAreaView className="flex-1 bg-background">
+      <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
         <AppTopBar title={title} backLabel={t('common:buttons.back')} fallbackHref="/(tabs)/home" />
         {isLoading ? (
-          <View className="flex-1 items-center justify-center">
+          <View className="flex-1 items-center justify-center" style={{ flex: 1 }}>
             <LoadingSpinner />
           </View>
         ) : !hasModule('feed') ? (
@@ -111,7 +113,8 @@ function FeedItemDetailScreenInner() {
         ) : (
           <ScrollView
             className="flex-1"
-            contentContainerClassName="py-3"
+            style={{ flex: 1, backgroundColor: theme.bg }}
+            contentContainerStyle={{ flexGrow: 1, paddingVertical: 12 }}
             refreshControl={
               <RefreshControl refreshing={isRefreshing} onRefresh={() => void loadItem(true)} tintColor={primary} colors={[primary]} />
             }

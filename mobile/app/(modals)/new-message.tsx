@@ -70,9 +70,10 @@ export default function NewMessageRoute() {
   }, [router, t]);
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
       <KeyboardAvoidingView
         className="flex-1"
+        style={{ flex: 1, backgroundColor: theme.bg }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 8 : 0}
       >
@@ -158,6 +159,7 @@ export default function NewMessageRoute() {
             ) : null
           }
           keyboardShouldPersistTaps="handled"
+          style={{ flex: 1, backgroundColor: theme.bg }}
           contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
         />
       </KeyboardAvoidingView>

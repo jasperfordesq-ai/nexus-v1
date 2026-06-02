@@ -340,7 +340,7 @@ function MemberProfileScreenInner() {
   const eventsAttended = member.events_attended ?? 0;
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
       <AppTopBar
         title={isOwnProfile ? t('profile.myProfile') : isFederatedProfile ? t('federation:directory.members.title') : t('profileTitle')}
         backLabel={t('common:buttons.back')}
@@ -352,8 +352,9 @@ function MemberProfileScreenInner() {
         }
       />
       <ScrollView
+        style={{ flex: 1, backgroundColor: theme.bg }}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 96 }}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 96 }}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={() => void refresh()} tintColor={primary} colors={[primary]} />}
       >
         <View className="px-4">
@@ -676,11 +677,12 @@ function ExternalFederatedMemberState({
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
       <AppTopBar title={t('profile.externalFederatedMember')} backLabel={t('common:buttons.back')} fallbackHref={'/(modals)/federation-members' as Href} />
       <ScrollView
+        style={{ flex: 1, backgroundColor: theme.bg }}
         refreshControl={<RefreshControl refreshing={reviewsLoading} onRefresh={() => void refreshReviews()} tintColor={primary} colors={[primary]} />}
-        contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
+        contentContainerStyle={{ flexGrow: 1, padding: 16, paddingBottom: 40 }}
       >
         <HeroCard variant="default" className="overflow-hidden">
           <View className="h-1 w-full" style={{ backgroundColor: primary }} />
@@ -928,10 +930,11 @@ function reachIcon(reach: string): IoniconName {
 }
 
 function ScreenShell({ t, title, children }: { t: TFunction; title: string; children: React.ReactNode }) {
+  const theme = useTheme();
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
       <AppTopBar title={title} backLabel={t('common:buttons.back')} fallbackHref="/(modals)/members" />
-      <View className="px-4">
+      <View className="flex-1 px-4" style={{ flex: 1 }}>
       {children}
       </View>
     </SafeAreaView>

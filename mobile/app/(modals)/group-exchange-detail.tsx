@@ -214,10 +214,12 @@ function GroupExchangeDetailScreenInner() {
 
 function ScreenShell({ children, title, backLabel, refreshing = false, onRefresh }: { children: React.ReactNode; title: string; backLabel: string; refreshing?: boolean; onRefresh?: () => void }) {
   const primary = usePrimaryColor();
+  const theme = useTheme();
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
       <AppTopBar title={title} backLabel={backLabel} fallbackHref={'/(modals)/group-exchanges' as Href} />
       <ScrollView
+        style={{ flex: 1, backgroundColor: theme.bg }}
         refreshControl={onRefresh ? <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={primary} colors={[primary]} /> : undefined}
         contentContainerStyle={{ padding: 16, paddingBottom: 40, flexGrow: 1 }}
       >

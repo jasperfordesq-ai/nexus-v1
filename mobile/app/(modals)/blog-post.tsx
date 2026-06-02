@@ -94,7 +94,7 @@ export default function BlogPostScreen() {
 
   if (!slug) {
     return (
-      <SafeAreaView className="flex-1 bg-background">
+      <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
         <AppTopBar title={t('detail.title')} backLabel={t('common:back')} fallbackHref="/(modals)/blog" />
         <EmptyState
           icon="newspaper-outline"
@@ -109,9 +109,9 @@ export default function BlogPostScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-background">
+      <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
         <AppTopBar title={t('detail.title')} backLabel={t('common:back')} fallbackHref="/(modals)/blog" />
-        <View className="flex-1 items-center justify-center">
+          <View className="flex-1 items-center justify-center" style={{ flex: 1 }}>
           <LoadingSpinner />
         </View>
       </SafeAreaView>
@@ -120,7 +120,7 @@ export default function BlogPostScreen() {
 
   if (!post) {
     return (
-      <SafeAreaView className="flex-1 bg-background">
+      <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
         <AppTopBar title={t('detail.title')} backLabel={t('common:back')} fallbackHref="/(modals)/blog" />
         <EmptyState
           icon="newspaper-outline"
@@ -143,7 +143,7 @@ export default function BlogPostScreen() {
 
   return (
     <ModalErrorBoundary>
-      <SafeAreaView className="flex-1 bg-background">
+      <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
         <AppTopBar
           title={t('detail.title')}
           backLabel={t('common:back')}
@@ -155,7 +155,8 @@ export default function BlogPostScreen() {
           }}
         />
         <ScrollView
-          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 110 }}
+          style={{ flex: 1, backgroundColor: theme.bg }}
+          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: 110 }}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl refreshing={isLoading} onRefresh={refresh} tintColor={primary} colors={[primary]} />

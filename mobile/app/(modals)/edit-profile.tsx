@@ -251,13 +251,18 @@ export default function EditProfileScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
       <AppTopBar title={t('edit.title')} backLabel={t('common:buttons.back')} fallbackHref="/(modals)/member-profile" />
       <KeyboardAvoidingView
         className="flex-1"
+        style={{ flex: 1, backgroundColor: theme.bg }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 116, gap: 12 }} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          style={{ flex: 1, backgroundColor: theme.bg }}
+          contentContainerStyle={{ flexGrow: 1, padding: 16, paddingBottom: 116, gap: 12 }}
+          keyboardShouldPersistTaps="handled"
+        >
           <OfflineBanner />
 
           <HeroCard variant="default" className="overflow-hidden">

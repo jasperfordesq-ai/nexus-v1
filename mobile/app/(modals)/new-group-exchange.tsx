@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useMemo, useState } from 'react';
-import { Alert, ScrollView, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -135,9 +135,18 @@ function NewGroupExchangeScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
       <AppTopBar title={t('groupExchanges.create.title')} backLabel={t('common:buttons.back')} fallbackHref={'/(modals)/group-exchanges' as Href} />
-      <ScrollView className="flex-1" contentContainerClassName="px-4 pb-8">
+      <KeyboardAvoidingView
+        style={{ flex: 1, backgroundColor: theme.bg }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+      <ScrollView
+        className="flex-1"
+        style={{ flex: 1, backgroundColor: theme.bg }}
+        contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: 32 }}
+        keyboardShouldPersistTaps="handled"
+      >
         <HeroCard className="mb-4 overflow-hidden rounded-panel p-0">
           <View className="h-1.5" style={{ backgroundColor: primary }} />
           <HeroCard.Body className="gap-3 p-4">
@@ -328,6 +337,7 @@ function NewGroupExchangeScreen() {
           </HeroCard.Body>
         </HeroCard>
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

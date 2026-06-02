@@ -242,7 +242,7 @@ function EventDetailScreenInner() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
       <AppTopBar
         title={t('detailTitle')}
         backLabel={t('detail.goBack')}
@@ -251,8 +251,9 @@ function EventDetailScreenInner() {
       />
 
       <ScrollView
+        style={{ flex: 1, backgroundColor: theme.bg }}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: footerReservedSpace, gap: 12 }}
+        contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: footerReservedSpace, gap: 12 }}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={handleRefresh} tintColor={primary} colors={[primary]} />}
       >
         <HeroCard variant="default" className="overflow-hidden">
@@ -821,10 +822,11 @@ function OrganizerAttendanceCard({
 }
 
 function ScreenShell({ title, backLabel, children }: { title: string; backLabel: string; children: React.ReactNode }) {
+  const theme = useTheme();
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
       <AppTopBar title={title} backLabel={backLabel} fallbackHref="/(tabs)/events" />
-      <View className="flex-1 px-4">{children}</View>
+      <View className="flex-1 px-4" style={{ flex: 1 }}>{children}</View>
     </SafeAreaView>
   );
 }

@@ -70,9 +70,9 @@ function MarketplaceCouponDetailScreen() {
 
   if (!hasFeature('merchant_coupons')) {
     return (
-      <SafeAreaView className="flex-1 bg-background">
+      <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
         <AppTopBar title={t('publicCoupons.details')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace-coupons' as Href} />
-        <View className="flex-1 justify-center px-4">
+        <View className="flex-1 justify-center px-4" style={{ flex: 1 }}>
           <EmptyState icon="ticket-outline" title={t('publicCoupons.unavailableTitle')} subtitle={t('publicCoupons.unavailableSubtitle')} />
         </View>
       </SafeAreaView>
@@ -80,14 +80,14 @@ function MarketplaceCouponDetailScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
       <AppTopBar title={t('publicCoupons.details')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace-coupons' as Href} />
       {coupon.isLoading ? (
-        <View className="py-16">
+        <View className="flex-1 justify-center py-16" style={{ flex: 1 }}>
           <LoadingSpinner />
         </View>
       ) : !item ? (
-        <View className="flex-1 justify-center px-4">
+        <View className="flex-1 justify-center px-4" style={{ flex: 1 }}>
           <EmptyState
             icon="ticket-outline"
             title={coupon.error ?? t('publicCoupons.notFound')}
@@ -96,7 +96,7 @@ function MarketplaceCouponDetailScreen() {
           />
         </View>
       ) : (
-        <View className="gap-3 px-4 pt-2">
+        <View className="flex-1 gap-3 px-4 pt-2" style={{ flex: 1 }}>
           <CouponDetailCard item={item} onShare={shareCode} onQr={openQr} isQrLoading={isQrLoading} />
         </View>
       )}

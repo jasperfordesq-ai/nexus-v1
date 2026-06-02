@@ -105,7 +105,7 @@ export default function OrganisationDetailScreen() {
 
   if (safeId === 0) {
     return (
-      <SafeAreaView className="flex-1 bg-background">
+      <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
         <AppTopBar title={t('detailTitle')} backLabel={t('common:back')} fallbackHref="/(modals)/organisations" />
         <EmptyState
           icon="business-outline"
@@ -120,9 +120,9 @@ export default function OrganisationDetailScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-background">
+      <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
         <AppTopBar title={t('detailTitle')} backLabel={t('common:back')} fallbackHref="/(modals)/organisations" />
-        <View className="flex-1 items-center justify-center">
+        <View className="flex-1 items-center justify-center" style={{ flex: 1 }}>
           <LoadingSpinner />
         </View>
       </SafeAreaView>
@@ -131,7 +131,7 @@ export default function OrganisationDetailScreen() {
 
   if (!organisation) {
     return (
-      <SafeAreaView className="flex-1 bg-background">
+      <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
         <AppTopBar title={t('detailTitle')} backLabel={t('common:back')} fallbackHref="/(modals)/organisations" />
         <EmptyState
           icon="business-outline"
@@ -175,7 +175,7 @@ export default function OrganisationDetailScreen() {
 
   return (
     <ModalErrorBoundary>
-      <SafeAreaView className="flex-1 bg-background">
+      <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
         <AppTopBar
           title={t('detailTitle')}
           backLabel={t('common:back')}
@@ -187,7 +187,8 @@ export default function OrganisationDetailScreen() {
           }}
         />
         <ScrollView
-          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 110 }}
+          style={{ flex: 1, backgroundColor: theme.bg }}
+          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: 110 }}
           refreshControl={
             <RefreshControl refreshing={isLoading} onRefresh={refresh} tintColor={primary} colors={[primary]} />
           }

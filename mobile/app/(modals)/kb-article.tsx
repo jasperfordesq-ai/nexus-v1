@@ -27,9 +27,12 @@ export default function KbArticleScreen() {
 
   return (
     <ModalErrorBoundary>
-      <SafeAreaView className="flex-1 bg-background">
+      <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
         <AppTopBar title={article?.title ?? t('resources:articleTitle')} backLabel={t('common:back')} fallbackHref={'/(modals)/resources' as Href} />
-        <ScrollView contentContainerClassName="px-4 pb-10">
+        <ScrollView
+          style={{ flex: 1, backgroundColor: theme.bg }}
+          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: 40 }}
+        >
           {isLoading ? (
             <View className="items-center justify-center py-14">
               <LoadingSpinner />

@@ -203,7 +203,7 @@ export default function GoalDetailScreen() {
   if (isLoading) {
     return (
       <ModalErrorBoundary>
-        <SafeAreaView className="flex-1 bg-background">
+        <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
           <AppTopBar title={t('detail.title')} backLabel={t('common:buttons.back')} fallbackHref="/(modals)/goals" />
           <LoadingSpinner />
         </SafeAreaView>
@@ -214,7 +214,7 @@ export default function GoalDetailScreen() {
   if (!goal) {
     return (
       <ModalErrorBoundary>
-        <SafeAreaView className="flex-1 bg-background">
+        <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
           <AppTopBar title={t('detail.title')} backLabel={t('common:buttons.back')} fallbackHref="/(modals)/goals" />
           <EmptyState icon="flag-outline" title={t('detail.notFound')} subtitle={t('detail.notFoundHint')} />
         </SafeAreaView>
@@ -224,9 +224,9 @@ export default function GoalDetailScreen() {
 
   return (
     <ModalErrorBoundary>
-      <SafeAreaView className="flex-1 bg-background">
+      <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
         <AppTopBar title={t('detail.title')} backLabel={t('common:buttons.back')} fallbackHref="/(modals)/goals" />
-        <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40, gap: 12 }}>
+        <ScrollView style={{ flex: 1, backgroundColor: theme.bg }} contentContainerStyle={{ flexGrow: 1, padding: 16, paddingBottom: 40, gap: 12 }}>
           <HeroCard className="overflow-hidden rounded-panel p-0">
             <View className="h-1.5" style={{ backgroundColor: primary }} />
             <HeroCard.Body className="gap-4 p-4">

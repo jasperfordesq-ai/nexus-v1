@@ -91,7 +91,7 @@ export default function JobDetailScreen() {
 
   if (safeId === 0) {
     return (
-      <SafeAreaView className="flex-1 bg-background">
+      <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
         <AppTopBar title={t('detailTitle')} backLabel={t('common:back')} fallbackHref="/(modals)/jobs" />
         <EmptyState
           icon="briefcase-outline"
@@ -106,9 +106,9 @@ export default function JobDetailScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-background">
+      <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
         <AppTopBar title={t('detailTitle')} backLabel={t('common:back')} fallbackHref="/(modals)/jobs" />
-        <View className="flex-1 items-center justify-center">
+        <View className="flex-1 items-center justify-center" style={{ flex: 1 }}>
           <LoadingSpinner />
         </View>
       </SafeAreaView>
@@ -117,7 +117,7 @@ export default function JobDetailScreen() {
 
   if (!job) {
     return (
-      <SafeAreaView className="flex-1 bg-background">
+      <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
         <AppTopBar title={t('detailTitle')} backLabel={t('common:back')} fallbackHref="/(modals)/jobs" />
         <EmptyState
           icon="briefcase-outline"
@@ -254,7 +254,7 @@ export default function JobDetailScreen() {
 
   return (
     <ModalErrorBoundary>
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
       <AppTopBar
         title={t('detailTitle')}
         backLabel={t('common:back')}
@@ -266,7 +266,7 @@ export default function JobDetailScreen() {
         }}
       />
 
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 132 }}>
+      <ScrollView style={{ flex: 1, backgroundColor: theme.bg }} contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: 132 }}>
         <HeroCard className="mb-4 overflow-hidden rounded-panel p-0">
           <View className="h-1.5" style={{ backgroundColor: isClosed ? theme.textMuted : typeColor[job.type] }} />
           <HeroCard.Body className="gap-4 p-4">
