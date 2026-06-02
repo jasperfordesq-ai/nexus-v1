@@ -1723,6 +1723,8 @@ function AppRoutes() {
 
           {/* Reviews — user reviews for completed exchanges */}
           <Route path="reviews" element={<ErrorBoundary><ReviewsPage /></ErrorBoundary>} />
+          {/* Deep link target for the review-request email (?transaction_id=…) */}
+          <Route path="reviews/create" element={<ErrorBoundary><ReviewsPage /></ErrorBoundary>} />
         </Route>
       </Route>
 

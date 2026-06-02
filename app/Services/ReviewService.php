@@ -118,6 +118,120 @@ class ReviewService
     }
 
     /**
+     * Get the current user's PENDING reviews — completed transactions where the
+     * user has not yet reviewed their counterparty.
+     *
+     * Powers the Reviews page "Pending" tab, the dashboard pending-reviews card,
+     * and the review-request email deep link (/reviews/create?transaction_id=…).
+     *
+     * Returns rows matching the React `PendingReview` contract, where the
+     * `receiver_*` fields describe the COUNTERPARTY being reviewed:
+     *   { exchange_id, exchange_title, receiver_id, receiver_name,
+     *     receiver_avatar, transaction_id, completed_at }
+     *
+     * @param  array $filters  Optional: limit (default 20, max 100),
+     *                         transaction_id (resolve a single transaction).
+     * @return array{items: array<int, array<string, mixed>>, meta: array{total: int}}
+     */
+    public function getPendingReviews(int $userId, array $filters = []): array
+    {
+        $tenantId = (int) (TenantContext::getId() ?? 0);
+        if ($tenantId <= 0 || $userId <= 0) {
+            return ['items' => [], 'meta' => ['total' => 0]];
+        }
+
+        $limit = min(max((int) ($filters['limit'] ?? 20), 1), 100);
+        $onlyTransactionId = isset($filters['transaction_id']) ? (int) $filters['transaction_id'] : null;
+
+        // System credit grants (starting balances, admin grants, community fund)
+        // have no peer to review.
+        $systemTypes = ['starting_balance', 'admin_grant', 'community_fund'];
+
+        // NOTE: these closures receive an Illuminate\Database\Query\Builder, NOT
+        // the Eloquent Builder imported at the top of this file — so they are
+        // intentionally left untyped to avoid a TypeError.
+        $query = DB::table('transactions as t')
+            ->where('t.tenant_id', $tenantId)
+            ->where('t.status', 'completed')
+            ->whereNotIn('t.transaction_type', $systemTypes)
+            ->whereNotNull('t.sender_id')
+            ->whereNotNull('t.receiver_id')
+            ->whereColumn('t.sender_id', '!=', 't.receiver_id')
+            // Current user must be a participant AND must not have hidden the
+            // transaction from their own wallet view.
+            ->where(function ($w) use ($userId) {
+                $w->where(function ($s) use ($userId) {
+                    $s->where('t.sender_id', $userId)->where('t.deleted_for_sender', 0);
+                })->orWhere(function ($r) use ($userId) {
+                    $r->where('t.receiver_id', $userId)->where('t.deleted_for_receiver', 0);
+                });
+            })
+            // Exclude transactions the user has already reviewed (same uniqueness
+            // rule create() enforces: one review per reviewer per transaction).
+            ->whereNotExists(function ($sub) use ($userId, $tenantId) {
+                $sub->selectRaw('1')
+                    ->from('reviews as r')
+                    ->whereColumn('r.transaction_id', 't.id')
+                    ->where('r.tenant_id', $tenantId)
+                    ->where('r.reviewer_id', $userId);
+            });
+
+        if ($onlyTransactionId !== null) {
+            $query->where('t.id', $onlyTransactionId);
+        }
+
+        $rows = $query->orderByDesc('t.id')
+            ->limit($limit)
+            ->get(['t.id', 't.sender_id', 't.receiver_id', 't.description', 't.created_at', 't.updated_at']);
+
+        if ($rows->isEmpty()) {
+            return ['items' => [], 'meta' => ['total' => 0]];
+        }
+
+        // Resolve each counterparty (the person the review is ABOUT) in one query.
+        $counterpartyIds = $rows->map(
+            fn ($r) => ((int) $r->sender_id === $userId) ? (int) $r->receiver_id : (int) $r->sender_id
+        )->filter()->unique()->values()->all();
+
+        $users = DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('id', $counterpartyIds)
+            ->whereNotIn('status', ['banned', 'suspended'])
+            ->get(['id', 'first_name', 'last_name', 'organization_name', 'profile_type', 'avatar_url'])
+            ->keyBy('id');
+
+        $items = [];
+        foreach ($rows as $r) {
+            $counterpartyId = ((int) $r->sender_id === $userId) ? (int) $r->receiver_id : (int) $r->sender_id;
+            $u = $users->get($counterpartyId);
+            if ($u === null) {
+                continue; // counterparty missing / banned / suspended — nothing to review
+            }
+
+            $name = ($u->profile_type === 'organisation' && $u->organization_name)
+                ? $u->organization_name
+                : trim(($u->first_name ?? '') . ' ' . ($u->last_name ?? ''));
+            if ($name === '') {
+                continue; // no displayable name — skip rather than show a blank prompt
+            }
+
+            $description = trim((string) ($r->description ?? ''));
+
+            $items[] = [
+                'exchange_id'     => (int) $r->id,
+                'exchange_title'  => $description !== '' ? $description : null,
+                'receiver_id'     => $counterpartyId,
+                'receiver_name'   => $name,
+                'receiver_avatar' => $u->avatar_url,
+                'transaction_id'  => (int) $r->id,
+                'completed_at'    => $r->updated_at ?? $r->created_at,
+            ];
+        }
+
+        return ['items' => $items, 'meta' => ['total' => count($items)]];
+    }
+
+    /**
      * Get review stats (average, total, distribution) for a user.
      *
      * @return array{total: int, average: float, distribution: array}

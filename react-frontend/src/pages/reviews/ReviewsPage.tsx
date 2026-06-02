@@ -12,8 +12,9 @@
  *   DELETE /api/v2/reviews/{id}             — delete own review
  */
 
-import { useState, useCallback, useEffect, type JSX } from 'react';
+import { useState, useCallback, useEffect, useRef, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 
 import Star from 'lucide-react/icons/star';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
@@ -186,7 +187,11 @@ export default function ReviewsPage(): JSX.Element {
   const toast = useToast();
   usePageTitle(t('page_title'));
 
-  const [activeTab, setActiveTab] = useState<string>('received');
+  // Deep link from the review-request email: /reviews/create?transaction_id=…
+  const [searchParams] = useSearchParams();
+  const deepLinkTxnId = searchParams.get('transaction_id');
+
+  const [activeTab, setActiveTab] = useState<string>(deepLinkTxnId ? 'pending' : 'received');
 
   // Reviews received state
   const [received, setReceived] = useState<Review[]>([]);
@@ -249,6 +254,32 @@ export default function ReviewsPage(): JSX.Element {
     fetchReceived();
     fetchPending();
   }, [fetchReceived, fetchPending]);
+
+  // Resolve the email deep link to a specific pending review and open the modal.
+  // Uses the transaction_id filter so the target is found even when the user has
+  // more pending reviews than fit on the first page (and avoids re-running).
+  const deepLinkHandled = useRef(false);
+  useEffect(() => {
+    if (!deepLinkTxnId || deepLinkHandled.current) return;
+    deepLinkHandled.current = true;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await api.get<PendingReview[]>(
+          `/v2/reviews/pending?transaction_id=${encodeURIComponent(deepLinkTxnId)}`,
+        );
+        const list = Array.isArray(res.data) ? res.data : [];
+        const match = list.find(p => String(p.transaction_id) === String(deepLinkTxnId)) ?? list[0] ?? null;
+        if (!cancelled && match) {
+          setActiveTab('pending');
+          setReviewTarget(match);
+        }
+      } catch {
+        /* Leave the pending tab visible — nothing to auto-open. */
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [deepLinkTxnId]);
 
   const handleReviewWritten = useCallback((pendingItem: PendingReview) => {
     setPending(prev => prev.filter(p => p.exchange_id !== pendingItem.exchange_id));

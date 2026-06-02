@@ -35,10 +35,19 @@ class ReviewsController extends BaseApiController
     public function pending(): JsonResponse
     {
         $userId = $this->requireAuth();
-        $reviews = $this->reviewService->getForUser($userId, [
-            'per_page' => $this->queryInt('per_page', 20, 1, 100),
-        ]);
-        return $this->respondWithData($reviews['items'] ?? [], $reviews['meta'] ?? null);
+
+        $filters = ['limit' => $this->queryInt('per_page', 20, 1, 100)];
+
+        // Optional: resolve a single transaction's pending review. Used by the
+        // review-request email deep link (/reviews/create?transaction_id=…) so
+        // the target is found even when the user has many pending reviews.
+        if ($this->query('transaction_id')) {
+            $filters['transaction_id'] = $this->queryInt('transaction_id');
+        }
+
+        $result = $this->reviewService->getPendingReviews($userId, $filters);
+
+        return $this->respondWithData($result['items'] ?? [], $result['meta'] ?? null);
     }
 
     // -----------------------------------------------------------------

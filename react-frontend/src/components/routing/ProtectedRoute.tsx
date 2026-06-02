@@ -42,7 +42,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   // Redirect to login if not authenticated, preserving tenant slug prefix
   if (!isAuthenticated) {
-    return <Navigate to={tenantPath('/login')} state={{ from: tenantPath(location.pathname) }} replace />;
+    return <Navigate to={tenantPath('/login')} state={{ from: tenantPath(location.pathname) + location.search }} replace />;
   }
 
   // Redirect non-admin users away from /admin routes
