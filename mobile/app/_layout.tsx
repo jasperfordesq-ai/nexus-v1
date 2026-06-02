@@ -338,6 +338,10 @@ function RootNavigator() {
         options={{ ...modalOptions, headerShown: false, title: t('ideation:title') }}
       />
       <Stack.Screen
+        name="(modals)/new-challenge"
+        options={{ ...modalOptions, headerShown: false, title: t('ideation:create.title') }}
+      />
+      <Stack.Screen
         name="(modals)/ideation-detail"
         options={{ ...modalOptions, headerShown: false, title: t('ideation:challengeTitle') }}
       />

@@ -66,6 +66,17 @@ export interface IdeationVoteResult {
   votes_count: number;
 }
 
+export interface CreateIdeationChallengePayload {
+  title: string;
+  description: string;
+  status?: IdeationStatus;
+  category?: string | null;
+  submission_deadline?: string | null;
+  voting_deadline?: string | null;
+  prize_description?: string | null;
+  max_ideas_per_user?: number | null;
+}
+
 export interface CursorPage<T> {
   items: T[];
   cursor: string | null;
@@ -110,6 +121,14 @@ export async function getIdeationCategories(): Promise<IdeationCategory[]> {
 
 export async function getIdeationChallenge(id: number): Promise<IdeationChallenge> {
   const response = await api.get<{ data?: IdeationChallenge } | IdeationChallenge>(`${API_V2}/ideation-challenges/${id}`);
+  if (isObjectWithData(response) && response.data) {
+    return response.data;
+  }
+  return response as IdeationChallenge;
+}
+
+export async function createIdeationChallenge(payload: CreateIdeationChallengePayload): Promise<IdeationChallenge> {
+  const response = await api.post<{ data?: IdeationChallenge } | IdeationChallenge>(`${API_V2}/ideation-challenges`, payload);
   if (isObjectWithData(response) && response.data) {
     return response.data;
   }

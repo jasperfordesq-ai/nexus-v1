@@ -261,43 +261,63 @@ class EventService
 
             $event->save();
 
-            $fresh = $event->fresh(['user', 'category']);
-
-            // Fire-and-forget: federation push is queued; failure must not
-            // break event creation.
-            try {
-                $previousTenantId = TenantContext::currentId();
-                try {
-                    CommunityEventCreated::dispatch($fresh ?? $event, (int) TenantContext::getId());
-                } finally {
-                    if ($previousTenantId !== null) {
-                        TenantContext::setById($previousTenantId);
-                    }
-                }
-            } catch (\Throwable $e) {
-                Log::warning('Failed to dispatch CommunityEventCreated', [
-                    'event_id' => $event->id ?? null,
-                    'error'    => $e->getMessage(),
-                ]);
-            }
-            TenantContext::setById($tenantId);
-
-            return $fresh ?? $event;
+            return $event->fresh(['user', 'category']) ?? $event;
         });
         TenantContext::setById($tenantId);
 
-        // Send creation confirmation through the auditable event notification path.
-        try {
-            app(EventNotificationService::class)->notifyEventCreated(
-                $tenantId,
-                (int) $event->id,
-                $userId
-            );
-        } catch (\Throwable $e) {
-            Log::warning('[EventService] creation notification failed: ' . $e->getMessage());
-        }
+        self::dispatchCreatedEventSideEffectsAfterResponse($tenantId, (int) $event->id, $userId);
 
         return $event;
+    }
+
+    private static function dispatchCreatedEventSideEffectsAfterResponse(int $tenantId, int $eventId, int $userId): void
+    {
+        $run = function () use ($tenantId, $eventId, $userId): void {
+            $previousTenantId = TenantContext::currentId();
+
+            try {
+                TenantContext::setById($tenantId);
+
+                $event = Event::query()
+                    ->with(['user', 'category'])
+                    ->where('tenant_id', $tenantId)
+                    ->find($eventId);
+
+                if ($event !== null) {
+                    CommunityEventCreated::dispatch($event, $tenantId);
+                }
+
+                app(EventNotificationService::class)->notifyEventCreated($tenantId, $eventId, $userId);
+            } catch (\Throwable $e) {
+                Log::warning('[EventService] creation side effects failed', [
+                    'event_id' => $eventId,
+                    'tenant_id' => $tenantId,
+                    'error' => $e->getMessage(),
+                ]);
+            } finally {
+                if ($previousTenantId !== null) {
+                    TenantContext::setById($previousTenantId);
+                } else {
+                    TenantContext::reset();
+                }
+            }
+        };
+
+        if (app()->runningInConsole()) {
+            $run();
+            return;
+        }
+
+        try {
+            dispatch($run)->afterResponse();
+        } catch (\Throwable $e) {
+            Log::warning('[EventService] after-response dispatch failed; running inline', [
+                'event_id' => $eventId,
+                'tenant_id' => $tenantId,
+                'error' => $e->getMessage(),
+            ]);
+            $run();
+        }
     }
 
     /**

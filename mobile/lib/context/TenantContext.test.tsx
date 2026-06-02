@@ -23,14 +23,17 @@ jest.mock('@/lib/constants', () => ({
 
 const mockStorageGet = jest.fn();
 const mockStorageSet = jest.fn().mockResolvedValue(undefined);
+const mockStorageRemove = jest.fn().mockResolvedValue(undefined);
+const mockStorageGetJson = jest.fn().mockResolvedValue(null);
+const mockStorageSetJson = jest.fn().mockResolvedValue(undefined);
 
 jest.mock('@/lib/storage', () => ({
   storage: {
     get: (...args: unknown[]) => mockStorageGet(...args),
     set: (...args: unknown[]) => mockStorageSet(...args),
-    remove: jest.fn().mockResolvedValue(undefined),
-    getJson: jest.fn().mockResolvedValue(null),
-    setJson: jest.fn().mockResolvedValue(undefined),
+    remove: (...args: unknown[]) => mockStorageRemove(...args),
+    getJson: (...args: unknown[]) => mockStorageGetJson(...args),
+    setJson: (...args: unknown[]) => mockStorageSetJson(...args),
   },
 }));
 
@@ -63,6 +66,7 @@ describe('TenantContext', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockStorageGet.mockResolvedValue(null);
+    mockStorageGetJson.mockResolvedValue(null);
     mockGetTenantConfig.mockResolvedValue({ data: mockTenant });
   });
 
@@ -85,6 +89,24 @@ describe('TenantContext', () => {
 
     expect(result.current.tenantSlug).toBe('my-community');
     expect(mockStorageSet).toHaveBeenCalledWith('tenant_slug', 'my-community');
+  });
+
+  it('ignores cached config for a different tenant slug', async () => {
+    mockStorageGet.mockResolvedValue('hour-timebank');
+    mockStorageGetJson.mockResolvedValue({
+      ...mockTenant,
+      slug: 'other-community',
+      features: { events: false, marketplace: false, blog: false },
+    });
+
+    const { result } = renderHook(() => useTenantContext(), { wrapper });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    expect(mockStorageGetJson).toHaveBeenCalledWith('nexus_tenant_config:hour-timebank');
+    expect(mockStorageRemove).toHaveBeenCalledWith('nexus_tenant_config:hour-timebank');
+    expect(result.current.tenant?.slug).toBe('hour-timebank');
+    expect(result.current.hasFeature('events')).toBe(true);
   });
 
   it('hasFeature returns true for an enabled feature', async () => {

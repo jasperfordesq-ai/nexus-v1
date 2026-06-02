@@ -52,5 +52,40 @@
   "sort": {
     "votes": "Top voted",
     "newest": "Newest"
+  },
+  "create": {
+    "eyebrow": "New challenge",
+    "title": "New challenge",
+    "subtitle": "Invite members to submit ideas for a focused community question.",
+    "titleLabel": "Challenge title",
+    "titlePlaceholder": "What should the community solve?",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Describe the problem, criteria, and useful context",
+    "categoryLabel": "Category",
+    "categoryPlaceholder": "Technology, safety, environment...",
+    "statusLabel": "Publishing mode",
+    "status": {
+      "open": "Open now",
+      "draft": "Save draft"
+    },
+    "submissionDeadlineLabel": "Submission deadline",
+    "votingDeadlineLabel": "Voting deadline",
+    "deadlinePlaceholder": "2026-06-30 17:00",
+    "maxIdeasLabel": "Max ideas per member",
+    "maxIdeasPlaceholder": "Optional",
+    "prizeLabel": "Prize or recognition",
+    "prizePlaceholder": "Optional",
+    "reviewTitle": "Ready to publish?",
+    "reviewSubtitle": "Members can submit ideas once the challenge is open.",
+    "footerTitle": "Ready",
+    "footerSubtitle": "Open for ideas.",
+    "submit": "Create challenge",
+    "saving": "Creating...",
+    "validationTitle": "Check challenge details",
+    "validationRequired": "Add a title and description before continuing.",
+    "validationDates": "Use a valid date and time, such as 2026-06-30 17:00.",
+    "validationMaxIdeas": "Use a whole number between 1 and 50.",
+    "failedTitle": "Could not create challenge",
+    "failedDescription": "Try again in a moment."
   }
 }

@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { fireEvent, render } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 const mockRouterReplace = jest.fn();
 
@@ -121,7 +121,7 @@ describe('NewMessageRoute', () => {
     expect(getByText('Bob Smith')).toBeTruthy();
   });
 
-  it('opens the thread composer for the selected member', () => {
+  it('opens the thread composer for the selected member', async () => {
     mockUsePaginatedApi.mockReturnValue({
       ...defaultPaginatedState,
       items: [
@@ -133,10 +133,10 @@ describe('NewMessageRoute', () => {
 
     fireEvent.press(getByLabelText('Message Alice Green'));
 
-    expect(mockRouterReplace).toHaveBeenCalledWith({
+    await waitFor(() => expect(mockRouterReplace).toHaveBeenCalledWith({
       pathname: '/(modals)/thread',
       params: { recipientId: '10', name: 'Alice Green' },
-    });
+    }));
   });
 
   it('shows a useful empty state when no members match', () => {

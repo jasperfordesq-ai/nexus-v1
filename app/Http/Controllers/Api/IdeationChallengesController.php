@@ -144,7 +144,11 @@ class IdeationChallengesController extends BaseApiController
         $this->rateLimit('ideation_create', 10, 60);
 
         $data = $this->getAllInput();
-        $challengeId = $this->challengeService->create($userId, $data);
+        try {
+            $challengeId = $this->challengeService->create($userId, $data);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
+        }
 
         $challenge = $this->challengeService->getById($challengeId);
 

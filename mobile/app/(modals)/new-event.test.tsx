@@ -304,7 +304,7 @@ describe('NewEventRoute', () => {
         online_link: 'https://meet.example/workshop',
       }));
     });
-    expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/event-detail', params: { id: '6' } });
+    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/event-detail', params: { id: '6' } }));
   });
 
   it('uploads a selected cover image after creating the event', async () => {
@@ -320,7 +320,7 @@ describe('NewEventRoute', () => {
       expect(mockCreateEvent).toHaveBeenCalled();
     });
     expect(mockUploadEventImage).toHaveBeenCalledWith(6, 'file:///tmp/event-cover.jpg');
-    expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/event-detail', params: { id: '6' } });
+    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/event-detail', params: { id: '6' } }));
   });
 
   it('hydrates an existing event and updates it in edit mode', async () => {
@@ -373,7 +373,7 @@ describe('NewEventRoute', () => {
       }));
     });
     expect(mockCreateEvent).not.toHaveBeenCalled();
-    expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/event-detail', params: { id: '7' } });
+    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/event-detail', params: { id: '7' } }));
   });
 
   it('shows an existing cover image and uploads a replacement in edit mode', async () => {

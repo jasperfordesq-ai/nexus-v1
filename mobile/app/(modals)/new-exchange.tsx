@@ -183,6 +183,8 @@ function NewExchangeModalInner() {
     setFieldErrors({});
     setError(null);
     setSubmitting(true);
+    let successDestination: Parameters<typeof router.push>[0] | null = null;
+    let shouldGoBack = false;
     try {
       const created = await createExchange({
         title: trimmedTitle,
@@ -211,15 +213,24 @@ function NewExchangeModalInner() {
       }
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       if (listingId) {
-        router.replace({ pathname: '/(modals)/exchange-detail', params: { id: String(listingId) } });
+        successDestination = { pathname: '/(modals)/exchange-detail', params: { id: String(listingId) } };
       } else {
-        router.back();
+        shouldGoBack = true;
       }
     } catch (err) {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       setError(err instanceof ApiResponseError ? err.message : t('createError'));
     } finally {
       setSubmitting(false);
+    }
+
+    if (successDestination) {
+      setTimeout(() => {
+        if (typeof router.push === 'function') router.push(successDestination);
+        else router.replace(successDestination);
+      }, 0);
+    } else if (shouldGoBack) {
+      setTimeout(() => router.back(), 0);
     }
   }
 

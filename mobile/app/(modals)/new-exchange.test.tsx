@@ -252,7 +252,7 @@ describe('NewExchangeModal', () => {
     })));
     expect(mockSetExchangeTags).toHaveBeenCalledWith(9, ['gardening', 'pruning']);
     expect(mockUploadExchangeImage).toHaveBeenCalledWith(9, 'file:///tmp/listing.jpg');
-    expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/exchange-detail', params: { id: '9' } });
+    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/exchange-detail', params: { id: '9' } }));
   });
 
   it('warns when the listing is saved but the image upload fails', async () => {
@@ -267,7 +267,7 @@ describe('NewExchangeModal', () => {
 
     await waitFor(() => expect(mockUploadExchangeImage).toHaveBeenCalledWith(9, 'file:///tmp/listing.jpg'));
     expect(mockAlert).toHaveBeenCalledWith('Listing saved', 'Image upload failed');
-    expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/exchange-detail', params: { id: '9' } });
+    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/exchange-detail', params: { id: '9' } }));
   });
 
   it('generates a description from the listing context', async () => {

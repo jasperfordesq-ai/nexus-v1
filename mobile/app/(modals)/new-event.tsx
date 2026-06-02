@@ -201,6 +201,8 @@ function NewEventScreen() {
     }
 
     setIsSubmitting(true);
+    let successDestination: Parameters<typeof router.push>[0] | null = null;
+    let shouldGoBack = false;
     try {
       const payload: CreateEventPayload = {
         title: title.trim(),
@@ -228,14 +230,23 @@ function NewEventScreen() {
             Alert.alert(t('create.imageUploadFailedTitle'), t('create.imageUploadFailedDescription'));
           }
         }
-        router.replace({ pathname: '/(modals)/event-detail', params: { id: String(id) } });
+        successDestination = { pathname: '/(modals)/event-detail', params: { id: String(id) } };
       } else {
-        router.back();
+        shouldGoBack = true;
       }
     } catch (error) {
       Alert.alert(t('create.failedTitle'), error instanceof Error ? error.message : t('create.failedDescription'));
     } finally {
       setIsSubmitting(false);
+    }
+
+    if (successDestination) {
+      setTimeout(() => {
+        if (typeof router.push === 'function') router.push(successDestination);
+        else router.replace(successDestination);
+      }, 0);
+    } else if (shouldGoBack) {
+      setTimeout(() => router.back(), 0);
     }
   }
 

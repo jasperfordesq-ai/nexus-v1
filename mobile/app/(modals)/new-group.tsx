@@ -188,6 +188,8 @@ function NewGroupScreen() {
     }
 
     setIsSubmitting(true);
+    let successDestination: Parameters<typeof router.push>[0] | null = null;
+    let shouldGoBack = false;
     try {
       const payload = {
         name: trimmedName,
@@ -209,9 +211,9 @@ function NewGroupScreen() {
             Alert.alert(t('create.imageUploadFailedTitle'), t('create.imageUploadFailedDescription'));
           }
         }
-        router.replace({ pathname: '/(modals)/group-detail', params: { id: String(id) } });
+        successDestination = { pathname: '/(modals)/group-detail', params: { id: String(id) } };
       } else {
-        router.back();
+        shouldGoBack = true;
       }
     } catch (error) {
       Alert.alert(
@@ -220,6 +222,15 @@ function NewGroupScreen() {
       );
     } finally {
       setIsSubmitting(false);
+    }
+
+    if (successDestination) {
+      setTimeout(() => {
+        if (typeof router.push === 'function') router.push(successDestination);
+        else router.replace(successDestination);
+      }, 0);
+    } else if (shouldGoBack) {
+      setTimeout(() => router.back(), 0);
     }
   }
 

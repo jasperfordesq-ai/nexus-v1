@@ -63,10 +63,14 @@ export default function NewMessageRoute() {
     if (!Number.isFinite(recipientId) || recipientId <= 0) return;
     const name = getMemberDisplayName(member, t('composer.memberFallback'));
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.replace({
-      pathname: '/(modals)/thread',
-      params: { recipientId: String(recipientId), name },
-    });
+    setTimeout(() => {
+      const destination = {
+        pathname: '/(modals)/thread',
+        params: { recipientId: String(recipientId), name },
+      } as const;
+      if (typeof router.push === 'function') router.push(destination);
+      else router.replace(destination);
+    }, 0);
   }, [router, t]);
 
   return (

@@ -61,6 +61,22 @@ const QUICK_CREATE_OPTIONS: QuickCreateOption[] = [
     featureGate: 'events',
   },
   {
+    labelKey: 'quickCreate.newPoll',
+    descriptionKey: 'quickCreate.newPollDescription',
+    icon: 'stats-chart-outline',
+    route: '/(modals)/polls',
+    tone: '#7c3aed',
+    featureGate: 'polls',
+  },
+  {
+    labelKey: 'quickCreate.newChallenge',
+    descriptionKey: 'quickCreate.newChallengeDescription',
+    icon: 'bulb-outline',
+    route: '/(modals)/new-challenge',
+    tone: '#f59e0b',
+    featureGate: 'ideation_challenges',
+  },
+  {
     labelKey: 'quickCreate.newGroup',
     descriptionKey: 'quickCreate.newGroupDescription',
     icon: 'people-outline',

@@ -261,7 +261,7 @@ describe('NewGroupRoute', () => {
         federated_visibility: 'listed',
       }));
     });
-    expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/group-detail', params: { id: '484' } });
+    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/group-detail', params: { id: '484' } }));
   });
 
   it('loads group templates for new groups and applies default visibility', async () => {
@@ -313,7 +313,7 @@ describe('NewGroupRoute', () => {
       expect(mockCreateGroup).toHaveBeenCalled();
     });
     expect(mockUploadGroupImage).toHaveBeenCalledWith(484, 'file:///tmp/group.jpg');
-    expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/group-detail', params: { id: '484' } });
+    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/group-detail', params: { id: '484' } }));
   });
 
   it('loads an existing group and submits updates in edit mode', async () => {
@@ -363,7 +363,7 @@ describe('NewGroupRoute', () => {
       }));
     });
     expect(mockCreateGroup).not.toHaveBeenCalled();
-    expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/group-detail', params: { id: '9' } });
+    await waitFor(() => expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/group-detail', params: { id: '9' } }));
   });
 
   it('shows an existing group image and uploads a replacement in edit mode', async () => {

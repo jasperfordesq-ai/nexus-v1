@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import {
+  createIdeationChallenge,
   getIdeationCategories,
   getIdeationChallenge,
   getIdeationChallenges,
@@ -58,5 +59,26 @@ describe('ideation api', () => {
     await expect(getIdeationIdeas(3, 'newest')).resolves.toMatchObject({ items: [{ id: 7, title: 'More bins' }] });
     await expect(submitIdeationIdea(3, { title: 'More trees', description: 'Plant them' })).resolves.toEqual({ id: 9 });
     await expect(voteIdeationIdea(7)).resolves.toEqual({ voted: true, votes_count: 5 });
+  });
+
+  it('creates an ideation challenge with the native create payload', async () => {
+    mockPost.mockResolvedValueOnce({ data: { id: 14, title: 'Community welcome challenge' } });
+
+    const result = await createIdeationChallenge({
+      title: 'Community welcome challenge',
+      description: 'Gather practical ideas for helping new members feel welcome.',
+      status: 'open',
+      submission_deadline: '2026-06-15 09:00:00',
+      voting_deadline: '2026-06-20 09:00:00',
+    });
+
+    expect(mockPost).toHaveBeenCalledWith('/api/v2/ideation-challenges', {
+      title: 'Community welcome challenge',
+      description: 'Gather practical ideas for helping new members feel welcome.',
+      status: 'open',
+      submission_deadline: '2026-06-15 09:00:00',
+      voting_deadline: '2026-06-20 09:00:00',
+    });
+    expect(result).toEqual({ id: 14, title: 'Community welcome challenge' });
   });
 });

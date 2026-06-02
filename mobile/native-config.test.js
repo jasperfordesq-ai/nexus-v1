@@ -119,4 +119,15 @@ describe('native app configuration', () => {
     expect(app.splash.image).toBe('./assets/splash.png');
     expect(app.android.adaptiveIcon.foregroundImage).toBe('./assets/adaptive-icon.png');
   });
+
+  it('allows Android release APKs to reach only approved cleartext development hosts', () => {
+    const manifest = read('android/app/src/main/AndroidManifest.xml');
+    const networkConfig = read('android/app/src/main/res/xml/network_security_config.xml');
+
+    expect(manifest).toContain('android:networkSecurityConfig="@xml/network_security_config"');
+    expect(networkConfig).toContain('<domain-config cleartextTrafficPermitted="true">');
+    expect(networkConfig).toContain('<domain includeSubdomains="false">10.0.2.2</domain>');
+    expect(networkConfig).toContain('<domain includeSubdomains="false">localhost</domain>');
+    expect(networkConfig).toContain('<base-config cleartextTrafficPermitted="false">');
+  });
 });

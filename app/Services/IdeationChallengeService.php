@@ -167,16 +167,49 @@ class IdeationChallengeService
      */
     public function create(int $userId, array $data): int
     {
+        $title = trim((string) ($data['title'] ?? ''));
+        $description = trim((string) ($data['description'] ?? ''));
+        $status = (string) ($data['status'] ?? 'open');
+        $validStatuses = ['draft', 'open', 'voting', 'evaluating', 'closed', 'archived'];
+
+        if ($title === '') {
+            throw new \InvalidArgumentException(__('api.title_required'));
+        }
+        if ($description === '') {
+            throw new \InvalidArgumentException(__('api.description_required'));
+        }
+        if (! in_array($status, $validStatuses, true)) {
+            $status = 'open';
+        }
+
+        $tags = $data['tags'] ?? null;
+        if (is_array($tags)) {
+            $tags = json_encode(array_values(array_filter(array_map('trim', $tags))));
+        }
+
         return DB::table('ideation_challenges')->insertGetId([
-            'tenant_id'   => TenantContext::getId(),
-            'title'       => trim($data['title']),
-            'description' => trim($data['description'] ?? ''),
-            'status'      => $data['status'] ?? 'open',
-            'created_by'  => $userId,
-            'starts_at'   => $data['starts_at'] ?? null,
-            'ends_at'     => $data['ends_at'] ?? null,
-            'created_at'  => now(),
-            'updated_at'  => now(),
+            'tenant_id'            => TenantContext::getId(),
+            'user_id'              => $userId,
+            'title'                => $title,
+            'description'          => $description,
+            'category'             => trim((string) ($data['category'] ?? '')) ?: null,
+            'status'               => $status,
+            'submission_deadline'  => $data['submission_deadline'] ?? null,
+            'voting_deadline'      => $data['voting_deadline'] ?? null,
+            'cover_image'          => trim((string) ($data['cover_image'] ?? '')) ?: null,
+            'prize_description'    => trim((string) ($data['prize_description'] ?? '')) ?: null,
+            'max_ideas_per_user'   => isset($data['max_ideas_per_user']) && $data['max_ideas_per_user'] !== ''
+                ? (int) $data['max_ideas_per_user']
+                : null,
+            'tags'                 => $tags,
+            'category_id'          => isset($data['category_id']) && $data['category_id'] !== ''
+                ? (int) $data['category_id']
+                : null,
+            'evaluation_criteria'  => isset($data['evaluation_criteria']) && is_array($data['evaluation_criteria'])
+                ? json_encode(array_values($data['evaluation_criteria']))
+                : null,
+            'created_at'           => now(),
+            'updated_at'           => now(),
         ]);
     }
 

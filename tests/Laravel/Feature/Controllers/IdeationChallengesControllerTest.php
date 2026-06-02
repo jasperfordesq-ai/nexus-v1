@@ -57,6 +57,33 @@ class IdeationChallengesControllerTest extends TestCase
         $response->assertStatus(401);
     }
 
+    public function test_store_creates_challenge_against_current_schema(): void
+    {
+        $user = $this->authenticatedUser();
+
+        $response = $this->apiPost('/v2/ideation-challenges', [
+            'title' => 'Community welcome challenge',
+            'description' => 'Gather practical ideas for helping new members feel welcome.',
+            'status' => 'open',
+            'submission_deadline' => '2026-06-15 09:00:00',
+            'voting_deadline' => '2026-06-20 09:00:00',
+        ]);
+
+        $response->assertStatus(201);
+        $id = $response->json('data.id');
+
+        $this->assertDatabaseHas('ideation_challenges', [
+            'id' => $id,
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'title' => 'Community welcome challenge',
+            'description' => 'Gather practical ideas for helping new members feel welcome.',
+            'status' => 'open',
+            'submission_deadline' => '2026-06-15 09:00:00',
+            'voting_deadline' => '2026-06-20 09:00:00',
+        ]);
+    }
+
     // ------------------------------------------------------------------
     //  GET /v2/ideation-challenges/{id}
     // ------------------------------------------------------------------

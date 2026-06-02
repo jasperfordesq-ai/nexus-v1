@@ -27,7 +27,11 @@ const TenantContext = createContext<TenantContextValue | null>(null);
 const FALLBACK_PRIMARY = '#006FEE';
 
 /** SecureStore key for cached tenant config — mirrors AuthContext's cache-first pattern. */
-const TENANT_CONFIG_CACHE_KEY = 'nexus_tenant_config';
+const TENANT_CONFIG_CACHE_PREFIX = 'nexus_tenant_config';
+
+function tenantConfigCacheKey(slug: string): string {
+  return `${TENANT_CONFIG_CACHE_PREFIX}:${slug}`;
+}
 
 export function TenantProvider({ children }: { children: React.ReactNode }) {
   // Start with null slug to indicate "not yet read from storage".
@@ -48,13 +52,14 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
     try {
       // Write the slug so the API client's X-Tenant-Slug header is correct.
       await storage.set(STORAGE_KEYS.TENANT_SLUG, slug);
+      const cacheKey = tenantConfigCacheKey(slug);
 
       // Cache-first: render from cached config immediately, then validate
       // in the background. Mirrors AuthContext's session restore pattern.
       if (!skipCache) {
-        const cached = await storage.getJson<TenantConfig>(TENANT_CONFIG_CACHE_KEY);
+        const cached = await storage.getJson<TenantConfig>(cacheKey);
         if (!isMountedRef.current) return;
-        if (cached) {
+        if (cached?.slug === slug) {
           setTenant(cached);
           setIsLoading(false);
 
@@ -64,10 +69,14 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
             .then(async (response) => {
               if (!isMountedRef.current) return;
               setTenant(response.data);
-              await storage.setJson(TENANT_CONFIG_CACHE_KEY, response.data);
+              await storage.setJson(cacheKey, response.data);
             })
             .catch(() => { /* keep cached config */ });
           return;
+        }
+
+        if (cached) {
+          await storage.remove(cacheKey);
         }
       }
 
@@ -75,7 +84,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
       const response = await getTenantConfig();
       if (!isMountedRef.current) return;
       setTenant(response.data);
-      await storage.setJson(TENANT_CONFIG_CACHE_KEY, response.data);
+      await storage.setJson(cacheKey, response.data);
     } catch {
       // Tenant config failed — app still works with null tenant (graceful degradation)
       if (isMountedRef.current) setTenant(null);
@@ -102,7 +111,8 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
     async (slug: string) => {
       setSlug(slug);
       // Clear stale cache when switching tenants — force fresh fetch
-      await storage.remove(TENANT_CONFIG_CACHE_KEY);
+      await storage.remove(TENANT_CONFIG_CACHE_PREFIX);
+      await storage.remove(tenantConfigCacheKey(slug));
       await loadTenantConfig(slug, true);
     },
     [loadTenantConfig],
