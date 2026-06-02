@@ -80,6 +80,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     registerUnauthorizedCallback(handleUnauthorized);
   }, [handleUnauthorized]);
 
+  const registerPushBestEffort = useCallback(() => {
+    registerForPushNotifications()
+      .then(() => { isPushRegisteredRef.current = true; })
+      .catch(() => { /* best-effort */ });
+  }, []);
+
   // On app start: restore cached user immediately, then re-validate in background.
   // This avoids blocking the UI on a slow network — the app renders from cache first.
   useEffect(() => {
@@ -99,6 +105,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setToken(storedToken);
           setUser(cachedUser);
           setIsLoading(false);
+          registerPushBestEffort();
 
           // Re-validate token with /users/me in the background
           try {
@@ -134,6 +141,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setToken(storedToken);
         setUser(response.data);
         await storage.setJson(STORAGE_KEYS.USER_DATA, response.data);
+        registerPushBestEffort();
       } catch {
         if (!isMounted) return;
         // Token invalid and no cache — clear everything
@@ -157,7 +165,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [registerPushBestEffort]);
 
   const login = useCallback(async (payload: LoginPayload) => {
     const response = await apiLogin(payload);
@@ -175,10 +183,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.replace('/(tabs)/home');
 
     // Register device for push notifications (non-blocking, best-effort)
-    registerForPushNotifications()
-      .then(() => { isPushRegisteredRef.current = true; })
-      .catch(() => { /* best-effort */ });
-  }, []);
+    registerPushBestEffort();
+  }, [registerPushBestEffort]);
 
   const setSession = useCallback((newToken: string, newUser: AnyUser) => {
     setToken(newToken);

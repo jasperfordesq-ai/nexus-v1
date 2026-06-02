@@ -57,9 +57,12 @@ jest.mock('@/lib/api/client', () => ({
   },
 }));
 
+const mockRegisterForPushNotifications = jest.fn().mockResolvedValue(undefined);
+const mockUnregisterPushNotifications = jest.fn().mockResolvedValue(undefined);
+
 jest.mock('@/lib/notifications', () => ({
-  registerForPushNotifications: jest.fn().mockResolvedValue(undefined),
-  unregisterPushNotifications: jest.fn().mockResolvedValue(undefined),
+  registerForPushNotifications: (...args: unknown[]) => mockRegisterForPushNotifications(...args),
+  unregisterPushNotifications: (...args: unknown[]) => mockUnregisterPushNotifications(...args),
 }));
 
 // --- Tests ---
@@ -126,6 +129,17 @@ describe('AuthContext', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.isAuthenticated).toBe(true);
     expect(result.current.token).toBe('stored-token');
+  });
+
+  it('registers push notifications when restoring a cached session', async () => {
+    mockStorageGet.mockResolvedValue('stored-token');
+    mockStorageGetJson.mockResolvedValue(mockUser);
+    mockGetMe.mockResolvedValue({ data: mockFullUser });
+
+    const { result } = renderHook(() => useAuthContext(), { wrapper });
+
+    await waitFor(() => expect(result.current.isAuthenticated).toBe(true));
+    await waitFor(() => expect(mockRegisterForPushNotifications).toHaveBeenCalledTimes(1));
   });
 
   it('clears session when stored token is invalid (getMe rejects)', async () => {
