@@ -63,7 +63,7 @@ function DetailState({ title, backLabel, message, onAction }: DetailStateProps) 
   const theme = useTheme();
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
       <AppTopBar title={title} backLabel={backLabel} fallbackHref="/(tabs)/exchanges" />
       <Surface variant="secondary" className="mx-4 my-8 items-center gap-4 rounded-panel p-6">
         <Ionicons name="alert-circle-outline" size={28} color={theme.error} />
@@ -414,7 +414,11 @@ function ExchangeDetailModalInner() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background" style={{ backgroundColor: theme.bg }}>
+    <SafeAreaView
+      testID="exchange-detail-screen"
+      className="flex-1 bg-background"
+      style={{ flex: 1, backgroundColor: theme.bg }}
+    >
       <AppTopBar
         title={t('detailTitle')}
         backLabel={t('detail.goBack')}
@@ -422,6 +426,7 @@ function ExchangeDetailModalInner() {
         rightAction={{ accessibilityLabel: t('share'), icon: 'share-outline', onPress: handleShare }}
       />
       <ScrollView
+        testID="exchange-detail-scroll"
         style={{ flex: 1, backgroundColor: theme.bg }}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: footerReservedSpace, gap: 12 }}
         refreshControl={
@@ -788,6 +793,7 @@ function ExchangeDetailModalInner() {
 
       {showMemberActions ? (
         <Surface
+          testID="exchange-detail-footer"
           variant="default"
           className="flex-row items-center gap-3 border-t border-border px-4 pt-3"
           style={{

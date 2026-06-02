@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
+import { StyleSheet } from 'react-native';
 import { fireEvent, render } from '@testing-library/react-native';
 
 // --- Mocks ---
@@ -210,6 +211,22 @@ describe('ExchangeDetailModal', () => {
     expect(getByLabelText('Save')).toBeTruthy();
     expect(getByLabelText('Message')).toBeTruthy();
     expect(getByLabelText('Request this Service')).toBeTruthy();
+  });
+
+  it('pins the detail content and member action footer to a full-height Android layout', () => {
+    mockUseApi.mockReturnValue({ data: { data: mockExchange }, isLoading: false, error: null, refresh: jest.fn() });
+
+    const { getByTestId } = render(<ExchangeDetailModal />);
+
+    expect(StyleSheet.flatten(getByTestId('exchange-detail-screen').props.style)).toEqual(
+      expect.objectContaining({ flex: 1, backgroundColor: '#ffffff' }),
+    );
+    expect(StyleSheet.flatten(getByTestId('exchange-detail-scroll').props.style)).toEqual(
+      expect.objectContaining({ flex: 1, backgroundColor: '#ffffff' }),
+    );
+    expect(StyleSheet.flatten(getByTestId('exchange-detail-footer').props.style)).toEqual(
+      expect.objectContaining({ position: 'absolute', bottom: 0, left: 0, right: 0 }),
+    );
   });
 
   it('opens member messages with the listing context attached', () => {

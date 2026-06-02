@@ -224,10 +224,19 @@ function NewExchangeModalInner() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView
+      testID="new-exchange-screen"
+      className="flex-1 bg-background"
+      style={{ flex: 1, backgroundColor: theme.bg }}
+    >
       <AppTopBar title={t('newExchange')} backLabel={t('detail.goBack')} fallbackHref="/(tabs)/exchanges" />
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 120, gap: 14 }} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          testID="new-exchange-scroll"
+          style={{ flex: 1, backgroundColor: theme.bg }}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 120, gap: 14 }}
+          keyboardShouldPersistTaps="handled"
+        >
           <OfflineBanner />
 
           <HeroCard variant="default" className="overflow-hidden">
@@ -471,7 +480,7 @@ function NewExchangeModalInner() {
           </FormSection>
         </ScrollView>
 
-        <View className="border-t px-4 py-3" style={{ backgroundColor: theme.surface, borderColor: theme.border }}>
+        <View testID="new-exchange-footer" className="border-t px-4 py-3" style={{ backgroundColor: theme.surface, borderColor: theme.border }}>
           <View className="flex-row gap-3">
             <HeroButton className="flex-1" variant="secondary" isDisabled={submitting} onPress={() => router.back()}>
               <HeroButton.Label>{t('detail.cancel')}</HeroButton.Label>

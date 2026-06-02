@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { Alert } from 'react-native';
+import { Alert, StyleSheet } from 'react-native';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 const mockUseApi = jest.fn();
@@ -118,6 +118,7 @@ jest.mock('@/lib/hooks/useAuth', () => ({
 
 jest.mock('@/lib/hooks/useTheme', () => ({
   useTheme: () => ({
+    bg: '#0A0A0F',
     text: '#000',
     textMuted: '#777',
     textSecondary: '#666',
@@ -180,6 +181,18 @@ describe('NewExchangeModal', () => {
     expect(getByPlaceholderText('Add more details...')).toBeTruthy();
     expect(getByPlaceholderText('Enter hours')).toBeTruthy();
     expect(getAllByText('Category').length).toBeGreaterThan(0);
+  });
+
+  it('keeps the Android release layout full-height so form content renders below the header', () => {
+    const { getByTestId } = render(<NewExchangeModal />);
+
+    expect(StyleSheet.flatten(getByTestId('new-exchange-screen').props.style)).toEqual(
+      expect.objectContaining({ flex: 1, backgroundColor: '#0A0A0F' }),
+    );
+    expect(StyleSheet.flatten(getByTestId('new-exchange-scroll').props.style)).toEqual(
+      expect.objectContaining({ flex: 1, backgroundColor: '#0A0A0F' }),
+    );
+    expect(getByTestId('new-exchange-footer')).toBeTruthy();
   });
 
   it('requires title, description, category, and valid credits', async () => {
