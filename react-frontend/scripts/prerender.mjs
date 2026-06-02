@@ -40,6 +40,8 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST_DIR = join(__dirname, '..', 'dist');
+const INDEX_PATH = join(DIST_DIR, 'index.html');
+const SPA_FALLBACK_PATH = join(DIST_DIR, '_spa.html');
 const PORT = Math.max(1, Number.parseInt(process.env.NEXUS_PRERENDER_PORT || '4173', 10) || 4173);
 const DEFAULT_SITEMAP_URL = `${process.env.VITE_APP_URL || 'https://app.project-nexus.ie'}/sitemap.xml`;
 const DYNAMIC_ROUTE_LIMIT = Math.max(0, Number.parseInt(process.env.NEXUS_PRERENDER_DYNAMIC_LIMIT || '80', 10) || 80);
@@ -93,6 +95,14 @@ const DYNAMIC_ROUTE_PATTERNS = [
   /^\/(?:[a-z0-9-]+\/)?listings\/[^/?#]+$/i,
   /^\/(?:[a-z0-9-]+\/)?groups\/[^/?#]+$/i,
 ];
+
+function shouldSkipPrerender() {
+  return process.env.NEXUS_SKIP_PRERENDER === '1' || process.env.NEXUS_SKIP_PRERENDER === 'true';
+}
+
+function writeSpaFallback(html) {
+  writeFileSync(SPA_FALLBACK_PATH, html, 'utf-8');
+}
 
 function extractXmlLocs(xml) {
   return [...xml.matchAll(/<loc>\s*([^<]+)\s*<\/loc>/gi)]
@@ -170,7 +180,7 @@ async function fetchDynamicRoutesFromSitemap() {
 // ─── Lightweight static file server ──────────────────────────────────────────
 // Serves dist/ locally so Playwright can visit pages. Mimics nginx behaviour:
 // known files are served directly, everything else gets index.html (SPA routing).
-function createStaticServer() {
+function createStaticServer(spaShell) {
   const mimeTypes = {
     '.html': 'text/html',
     '.js': 'application/javascript',
@@ -181,9 +191,6 @@ function createStaticServer() {
     '.ico': 'image/x-icon',
     '.woff2': 'font/woff2',
   };
-
-  // Read the SPA shell once at startup (before pre-rendering overwrites index.html)
-  const spaShell = readFileSync(join(DIST_DIR, 'index.html'), 'utf-8');
 
   return createServer((req, res) => {
     const urlPath = req.url.split('?')[0]; // strip query params
@@ -282,14 +289,26 @@ async function prerenderRoute(page, route) {
 
 // ─── Main ────────────────────────────────────────────────────────────────────
 async function main() {
-  if (process.env.NEXUS_SKIP_PRERENDER === '1' || process.env.NEXUS_SKIP_PRERENDER === 'true') {
-    console.log('Skipping pre-render because NEXUS_SKIP_PRERENDER is set.');
-    return;
-  }
-
   if (!existsSync(DIST_DIR)) {
     console.error('dist/ not found. Run `vite build` first.');
     process.exit(1);
+  }
+
+  if (!existsSync(INDEX_PATH)) {
+    console.error('dist/index.html not found. Run `vite build` first.');
+    process.exit(1);
+  }
+
+  // Keep a pristine SPA shell beside any rendered snapshots. nginx serves
+  // /_spa.html to real users so prerendered public-page DOM can never flash on
+  // protected/admin routes while React hydrates.
+  const originalIndex = readFileSync(INDEX_PATH, 'utf-8');
+  writeSpaFallback(originalIndex);
+
+  if (shouldSkipPrerender()) {
+    console.log('Skipping pre-render because NEXUS_SKIP_PRERENDER is set.');
+    console.log('SPA fallback saved as dist/_spa.html');
+    return;
   }
 
   // Parse --routes flag for selective pre-rendering
@@ -299,37 +318,39 @@ async function main() {
     ? args.slice(routesIdx + 1).filter(r => r.startsWith('/'))
     : [...new Set([...PUBLIC_ROUTES, ...(await fetchDynamicRoutesFromSitemap())])];
 
-  // Save the original index.html before we overwrite it with the pre-rendered homepage
-  const originalIndex = readFileSync(join(DIST_DIR, 'index.html'), 'utf-8');
-  const spaFallbackPath = join(DIST_DIR, '_spa.html');
-  writeFileSync(spaFallbackPath, originalIndex, 'utf-8');
-
   console.log(`\nPre-rendering ${routes.length} public pages...\n`);
 
-  const server = createStaticServer();
-  await new Promise(resolve => server.listen(PORT, resolve));
-
-  const browser = await chromium.launch({ headless: true });
-  const context = await browser.newContext({
-    userAgent: 'NexusPrerender/1.0',
-    viewport: { width: 1280, height: 720 },
-  });
-
+  const server = createStaticServer(originalIndex);
   let success = 0;
   let failed = 0;
+  let browser;
 
-  for (const route of routes) {
-    const page = await context.newPage();
-    const ok = await prerenderRoute(page, route);
-    ok ? success++ : failed++;
-    await page.close();
+  try {
+    await new Promise(resolve => server.listen(PORT, resolve));
+
+    browser = await chromium.launch({ headless: true });
+    const context = await browser.newContext({
+      userAgent: 'NexusPrerender/1.0',
+      viewport: { width: 1280, height: 720 },
+    });
+
+    for (const route of routes) {
+      const page = await context.newPage();
+      const ok = await prerenderRoute(page, route);
+      ok ? success++ : failed++;
+      await page.close();
+    }
+  } finally {
+    if (browser) {
+      await browser.close().catch(() => {});
+    }
+    await new Promise(resolve => server.close(resolve)).catch(() => {});
+    writeFileSync(INDEX_PATH, originalIndex, 'utf-8');
   }
-
-  await browser.close();
-  server.close();
 
   console.log(`\nDone: ${success} succeeded, ${failed} failed`);
   console.log(`SPA fallback saved as dist/_spa.html`);
+  console.log(`SPA shell restored as dist/index.html`);
 
   if (failed > 0) {
     process.exit(1);

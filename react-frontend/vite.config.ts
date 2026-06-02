@@ -113,14 +113,20 @@ export default defineConfig(({ command, mode }) => {
             },
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'nexus-html-shell',
+              // v2 intentionally abandons the older runtime cache, which could
+              // contain prerendered/offline-looking HTML shells from before the
+              // clean /_spa.html fallback existed.
+              cacheName: 'nexus-html-shell-v2',
               networkTimeoutSeconds: 3,
               expiration: { maxEntries: 16, maxAgeSeconds: 7 * 86400 },
               matchOptions: { ignoreSearch: true },
               // 200 only — status 0 (opaque cross-origin no-cors) responses
               // shouldn't be cached as the HTML shell. Our HTML is same-origin
               // so this would never hit, but tightening eliminates the footgun.
-              cacheableResponse: { statuses: [200] },
+              cacheableResponse: {
+                statuses: [200],
+                headers: { 'X-Nexus-Spa-Shell': '1' },
+              },
             },
           },
           {
