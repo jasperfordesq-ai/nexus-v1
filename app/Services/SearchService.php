@@ -66,7 +66,7 @@ class SearchService
      * Keep in sync with updateFilterableAttributes() calls in ensureIndexes().
      */
     private const FILTERABLE_ATTRIBUTES = [
-        'listings'             => ['tenant_id', 'status', 'category_id', 'type', 'user_id', 'skill_tags'],
+        'listings'             => ['tenant_id', 'status', 'moderation_status', 'category_id', 'type', 'user_id', 'skill_tags'],
         'users'                => ['tenant_id', 'status', 'profile_type'],
         'events'               => ['tenant_id', 'status', 'start_time', 'is_online'],
         'groups'               => ['tenant_id', 'status', 'privacy'],
@@ -181,7 +181,7 @@ class SearchService
             'listings' => [
                 'pk'         => 'id',
                 'searchable' => ['title', 'description', 'location', 'author_name', 'category_name', 'skill_tags'],
-                'filterable' => ['tenant_id', 'status', 'category_id', 'type', 'user_id', 'skill_tags'],
+                'filterable' => ['tenant_id', 'status', 'moderation_status', 'category_id', 'type', 'user_id', 'skill_tags'],
                 'sortable'   => ['created_at', 'updated_at'],
                 'ranking'    => ['words', 'typo', 'proximity', 'attribute', 'sort', 'exactness'],
             ],
@@ -952,7 +952,17 @@ class SearchService
         $sort  = $filters['sort'] ?? 'relevance';
 
         if (static::isAvailable()) {
-            $result = $this->unifiedSearchViaMeilisearch($term, $filters, $limit, $type, $sort);
+            try {
+                $result = $this->unifiedSearchViaMeilisearch($term, $filters, $limit, $type, $sort);
+            } catch (\Throwable $e) {
+                // A Meilisearch error (e.g. an index missing a filterable
+                // attribute, or a transient outage) must NEVER 500 the whole
+                // search endpoint — degrade gracefully to the SQL path.
+                Log::warning('SearchService: Meilisearch unified search failed, falling back to SQL', [
+                    'error' => $e->getMessage(),
+                ]);
+                $result = $this->unifiedSearchViaSQL($term, $filters, $limit, $type, $sort);
+            }
         } else {
             $result = $this->unifiedSearchViaSQL($term, $filters, $limit, $type, $sort);
         }
@@ -1195,7 +1205,14 @@ class SearchService
         }
 
         if (static::isAvailable()) {
-            return $this->suggestionsViaMeilisearch($term, $limit);
+            try {
+                return $this->suggestionsViaMeilisearch($term, $limit);
+            } catch (\Throwable $e) {
+                // Never let a Meilisearch error 500 autocomplete — degrade to SQL.
+                Log::warning('SearchService: Meilisearch suggestions failed, falling back to SQL', [
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
 
         return $this->suggestionsViaSQL($term, $limit);
