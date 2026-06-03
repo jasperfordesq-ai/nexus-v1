@@ -3345,7 +3345,10 @@
       "refresh": "Refresh",
       "approve": "Approve",
       "reject": "Reject",
-      "flag": "Flag"
+      "flag": "Flag",
+      "resolve_report": "Resolve report",
+      "dismiss_report": "Dismiss report",
+      "validate_feed": "Validate RSS feed"
     },
     "filters": {
       "label": "Podcast moderation filter",
@@ -3358,7 +3361,10 @@
     "sections": {
       "shows": "Shows",
       "episodes": "Episodes",
-      "top_episodes": "Top episodes"
+      "top_episodes": "Top episodes",
+      "client_breakdown": "Client breakdown",
+      "retention": "Retention",
+      "reports": "Open reports"
     },
     "columns": {
       "title": "Title",
@@ -3369,7 +3375,12 @@
       "moderation": "Moderation",
       "updated": "Updated",
       "actions": "Actions",
-      "listens": "Listens"
+      "listens": "Listens",
+      "client": "Client",
+      "bucket": "Bucket",
+      "episode": "Episode",
+      "reason": "Reason",
+      "details": "Details"
     },
     "stats": {
       "total_shows": "Shows",
@@ -3381,6 +3392,11 @@
       "total_listens": "Listens",
       "completed_listens": "Completed listens",
       "completion_rate": "Completion rate",
+      "unique_listeners": "Unique listeners",
+      "open_reports": "Open reports",
+      "subscribers": "Followers",
+      "pending_media_scans": "Pending scans",
+      "pending_media_processing": "Pending media jobs",
       "percent": "{{value}}%"
     },
     "status": {
@@ -3397,7 +3413,9 @@
     "empty": {
       "shows": "No shows match the current filter.",
       "episodes": "No episodes match the current filter.",
-      "top_episodes": "No listen analytics yet."
+      "top_episodes": "No listen analytics yet.",
+      "analytics": "No analytics breakdown yet.",
+      "reports": "No open reports."
     },
     "toasts": {
       "show_approve": "Show approved.",
@@ -3405,7 +3423,12 @@
       "show_flag": "Show flagged.",
       "episode_approve": "Episode approved.",
       "episode_reject": "Episode rejected.",
-      "episode_flag": "Episode flagged."
+      "episode_flag": "Episode flagged.",
+      "report_resolved": "Report resolved.",
+      "report_dismissed": "Report dismissed.",
+      "report_escalated": "Report escalated.",
+      "feed_valid": "RSS feed is ready.",
+      "feed_invalid": "RSS feed has {{count}} issue(s)."
     }
   },
   "member_premium_admin": {

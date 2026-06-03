@@ -3,7 +3,8 @@
   "subtitle": "Community shows, audio stories, interviews, and local knowledge from members.",
   "actions": {
     "back_to_podcasts": "Back to podcasts",
-    "back_to_show": "Back to show"
+    "back_to_show": "Back to show",
+    "cancel": "Cancel"
   },
   "browse": {
     "search_placeholder": "Search shows",
@@ -19,6 +20,11 @@
     "episode_count_one": "{{count}} episode",
     "episode_count_other": "{{count}} episodes",
     "rss_feed": "RSS feed",
+    "subscribe": "Follow show",
+    "unsubscribe": "Unfollow show",
+    "subscribed": "Show followed.",
+    "unsubscribed": "Show unfollowed.",
+    "subscribe_failed": "Could not update follow preference.",
     "episodes": "Episodes",
     "no_episodes": "No published episodes yet."
   },
@@ -30,10 +36,24 @@
     "from_show": "From {{title}}",
     "description": "Description",
     "transcript": "Transcript",
+    "download_transcript": "Download transcript",
     "chapters": "Chapters",
     "explicit": "Explicit",
     "react": "React",
     "reacted": "Reacted",
+    "report": "Report",
+    "report_title": "Report episode",
+    "report_reason": "Reason",
+    "report_details": "Details for moderators",
+    "submit_report": "Send report",
+    "reported": "Report sent to moderators.",
+    "report_failed": "Could not send report.",
+    "report_reasons": {
+      "safety": "Safety or harm",
+      "spam": "Spam or misleading content",
+      "rights": "Copyright or rights concern",
+      "other": "Other"
+    },
     "type": {
       "full": "Full episode",
       "trailer": "Trailer",
@@ -43,7 +63,10 @@
   "player": {
     "unsupported": "Your browser does not support the audio player.",
     "duration_unknown": "Duration unknown",
-    "progress": "Playback progress"
+    "progress": "Playback progress",
+    "skip_back": "Back 15s",
+    "skip_forward": "Forward 30s",
+    "speed": "{{rate}}x"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -79,6 +102,11 @@
     "show_title": "Show title",
     "episode_title": "Episode title",
     "category": "Category",
+    "author_name": "Directory author name",
+    "owner_email": "Directory owner email",
+    "copyright": "Copyright notice",
+    "funding_url": "Funding URL",
+    "explicit_show": "Mark this show as explicit",
     "artwork_url": "Artwork URL",
     "audio_url": "Audio URL",
     "audio_file": "Hosted audio file",

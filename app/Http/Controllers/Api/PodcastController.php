@@ -13,6 +13,7 @@ use App\Models\PodcastShow;
 use App\Services\PodcastConfigurationService;
 use App\Services\PodcastService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -332,7 +333,46 @@ class PodcastController extends BaseApiController
         return $this->respondWithData(['active' => $active]);
     }
 
-    public function audio(int $tenantId, int $episodeId): BinaryFileResponse|JsonResponse
+    public function subscribe(int $showId): JsonResponse
+    {
+        $this->ensurePodcastsFeature();
+        $this->rateLimit('podcasts_subscribe', 30, 60);
+        $userId = $this->requireAuth();
+        $show = $this->findPodcastShowOrFail($showId);
+
+        if (!PodcastService::canViewShow($show, $userId, $this->callerIsAdmin())) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.podcasts.show_not_found'), null, 404);
+        }
+
+        $subscribed = PodcastService::toggleSubscription($show, $userId, filter_var($this->input('notify_new_episodes', true), FILTER_VALIDATE_BOOLEAN));
+
+        return $this->respondWithData(['subscribed' => $subscribed]);
+    }
+
+    public function report(int $episodeId): JsonResponse
+    {
+        $this->ensurePodcastsFeature();
+        $this->rateLimit('podcasts_report', 10, 60);
+        $userId = $this->requireAuth();
+        $episode = $this->findPodcastEpisodeOrFail($episodeId);
+
+        if (!PodcastService::canViewEpisode($episode, $episode->show, $userId, $this->callerIsAdmin())) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.podcasts.episode_not_found'), null, 404);
+        }
+
+        $reason = trim((string) $this->input('reason', ''));
+        if ($reason === '') {
+            return $this->respondWithError('VALIDATION_FAILED', __('api_controllers_2.podcasts.report_reason_required'), 'reason', 422);
+        }
+
+        return $this->respondWithData(
+            PodcastService::reportEpisode($episode, $userId, $reason, $this->input('details')),
+            null,
+            201
+        );
+    }
+
+    public function audio(int $tenantId, int $episodeId): BinaryFileResponse|JsonResponse|RedirectResponse
     {
         if (!TenantContext::setById($tenantId)) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.podcasts.episode_not_found'), null, 404);
@@ -363,6 +403,15 @@ class PodcastController extends BaseApiController
             );
 
         if (!$canView) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.podcasts.episode_not_found'), null, 404);
+        }
+
+        if (($episode->audio_storage_disk ?? 'local') !== 'local') {
+            $cloudUrl = PodcastService::cloudAccessUrl($episode);
+            if ($cloudUrl) {
+                return redirect()->away($cloudUrl);
+            }
+
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.podcasts.episode_not_found'), null, 404);
         }
 

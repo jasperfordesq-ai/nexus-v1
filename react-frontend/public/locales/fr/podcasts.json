@@ -19,6 +19,11 @@
     "episode_count_one": "{{count}} episode",
     "episode_count_other": "{{count}} episodes",
     "rss_feed": "Flux RSS",
+    "subscribe": "Suivre l'émission",
+    "unsubscribe": "Ne plus suivre l'émission",
+    "subscribed": "Spectacle suivi.",
+    "unsubscribed": "Afficher non suivi.",
+    "subscribe_failed": "Impossible de mettre à jour les préférences de suivi.",
     "episodes": "Episodes",
     "no_episodes": "Aucun épisode publié pour l'instant."
   },
@@ -30,10 +35,21 @@
     "from_show": "From {{title}}",
     "description": "Description",
     "transcript": "Transcript",
+    "download_transcript": "Télécharger la transcription",
     "chapters": "Chapters",
     "explicit": "Explicit",
     "react": "React",
     "reacted": "Reacted",
+    "report_title": "Signaler l'épisode",
+    "report_details": "Détails pour les modérateurs",
+    "submit_report": "Envoyer le rapport",
+    "reported": "Rapport envoyé aux modérateurs.",
+    "report_failed": "Impossible d'envoyer le rapport.",
+    "report_reasons": {
+      "safety": "Sécurité ou préjudice",
+      "spam": "Spam ou contenu trompeur",
+      "rights": "Problème de droits d'auteur ou de droits"
+    },
     "type": {
       "full": "Épisode complet",
       "trailer": "Trailer",
@@ -43,7 +59,9 @@
   "player": {
     "unsupported": "Votre navigateur ne prend pas en charge le lecteur audio.",
     "duration_unknown": "Durée inconnue",
-    "progress": "Progression de la lecture"
+    "progress": "Progression de la lecture",
+    "skip_back": "Retour 15s",
+    "skip_forward": "Avancer de 30 s"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -79,6 +97,10 @@
     "show_title": "Afficher le titre",
     "episode_title": "Titre de l'épisode",
     "category": "Category",
+    "author_name": "Nom de l'auteur du répertoire",
+    "owner_email": "E-mail du propriétaire de l'annuaire",
+    "copyright": "Avis de droit d'auteur",
+    "explicit_show": "Marquer cette émission comme explicite",
     "artwork_url": "Artwork URL",
     "audio_url": "Audio URL",
     "audio_file": "Fichier audio hébergé",

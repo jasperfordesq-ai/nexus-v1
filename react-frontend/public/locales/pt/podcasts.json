@@ -19,6 +19,11 @@
     "episode_count_one": "{{count}} episode",
     "episode_count_other": "{{count}} episodes",
     "rss_feed": "Feed RSS",
+    "subscribe": "Seguir programa",
+    "unsubscribe": "Deixar de seguir o programa",
+    "subscribed": "Show seguido.",
+    "unsubscribed": "Mostrar não seguido.",
+    "subscribe_failed": "Não foi possível atualizar a preferência de acompanhamento.",
     "episodes": "Episodes",
     "no_episodes": "Nenhum episódio publicado ainda."
   },
@@ -30,10 +35,21 @@
     "from_show": "From {{title}}",
     "description": "Description",
     "transcript": "Transcript",
+    "download_transcript": "Baixar transcrição",
     "chapters": "Chapters",
     "explicit": "Explicit",
     "react": "React",
     "reacted": "Reacted",
+    "report_title": "Relatar episódio",
+    "report_details": "Detalhes para moderadores",
+    "submit_report": "Enviar relatório",
+    "reported": "Relatório enviado aos moderadores.",
+    "report_failed": "Não foi possível enviar o relatório.",
+    "report_reasons": {
+      "safety": "Segurança ou dano",
+      "spam": "Spam ou conteúdo enganoso",
+      "rights": "Preocupação com direitos autorais ou direitos"
+    },
     "type": {
       "full": "Episódio completo",
       "trailer": "Trailer",
@@ -43,7 +59,9 @@
   "player": {
     "unsupported": "Seu navegador não suporta o reprodutor de áudio.",
     "duration_unknown": "Duração desconhecida",
-    "progress": "Progresso da reprodução"
+    "progress": "Progresso da reprodução",
+    "skip_back": "Voltar 15s",
+    "skip_forward": "Avançando 30 anos"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -79,6 +97,10 @@
     "show_title": "Mostrar título",
     "episode_title": "Título do episódio",
     "category": "Category",
+    "author_name": "Nome do autor do diretório",
+    "owner_email": "E-mail do proprietário do diretório",
+    "copyright": "Aviso de direitos autorais",
+    "explicit_show": "Marcar este programa como explícito",
     "artwork_url": "Artwork URL",
     "audio_url": "Audio URL",
     "audio_file": "Arquivo de áudio hospedado",

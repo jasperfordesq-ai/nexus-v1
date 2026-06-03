@@ -7,11 +7,13 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import { Avatar, Button, Card, CardBody, Chip, Spinner } from '@/components/ui';
-import { useAuth, useTenant } from '@/contexts';
+import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { API_BASE } from '@/lib/api';
 import { podcastsApi, type PodcastShow } from '@/lib/api/podcasts';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Bell from 'lucide-react/icons/bell';
+import BellOff from 'lucide-react/icons/bell-off';
 import Radio from 'lucide-react/icons/radio';
 import Rss from 'lucide-react/icons/rss';
 
@@ -19,7 +21,8 @@ export default function PodcastShowPage() {
   const { t } = useTranslation('podcasts');
   const { showSlug = '' } = useParams();
   const { tenant, tenantPath } = useTenant();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
+  const toast = useToast();
   const [show, setShow] = useState<PodcastShow | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -45,6 +48,23 @@ export default function PodcastShowPage() {
   const feedUrl = tenant?.id
     ? `${API_BASE}/v2/podcasts/feed/${tenant.id}/${encodeURIComponent(showSlug)}.xml`
     : `${API_BASE}/v2/podcasts/${encodeURIComponent(showSlug)}/feed.xml`;
+
+  async function handleSubscribe(): Promise<void> {
+    if (!show || !isAuthenticated) return;
+    const res = await podcastsApi.toggleSubscription(show.id, true);
+    if (res.success && res.data) {
+      setShow((current) => current
+        ? {
+            ...current,
+            is_subscribed: res.data!.subscribed,
+            subscriber_count: Math.max(0, (current.subscriber_count ?? 0) + (res.data!.subscribed ? 1 : -1)),
+          }
+        : current);
+      toast.success(res.data.subscribed ? t('show.subscribed') : t('show.unsubscribed'));
+    } else {
+      toast.error(t('show.subscribe_failed'));
+    }
+  }
 
   if (loading) {
     return (
@@ -90,6 +110,16 @@ export default function PodcastShowPage() {
             {show.rss_enabled && (
               <Button as="a" href={feedUrl} variant="tertiary" size="sm" startContent={<Rss size={16} aria-hidden="true" />}>
                 {t('show.rss_feed')}
+              </Button>
+            )}
+            {isAuthenticated && !isOwner && (
+              <Button
+                variant={show.is_subscribed ? 'secondary' : 'tertiary'}
+                size="sm"
+                startContent={show.is_subscribed ? <BellOff size={16} aria-hidden="true" /> : <Bell size={16} aria-hidden="true" />}
+                onPress={handleSubscribe}
+              >
+                {show.is_subscribed ? t('show.unsubscribe') : t('show.subscribe')}
               </Button>
             )}
             {isOwner && (

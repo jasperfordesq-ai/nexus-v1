@@ -7009,7 +7009,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=275 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=277 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -7402,7 +7402,7 @@ CREATE TABLE `login_attempts` (
   PRIMARY KEY (`id`),
   KEY `idx_identifier_type` (`identifier`,`type`),
   KEY `idx_attempted_at` (`attempted_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=39092 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=39096 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `marketplace_categories`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -9888,7 +9888,7 @@ CREATE TABLE `personal_access_tokens` (
   UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
   KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`),
   KEY `pat_tenant_tokenable_idx` (`tenant_id`,`tokenable_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=302 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=303 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `pilot_inquiries`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -9958,6 +9958,8 @@ CREATE TABLE `podcast_episode_listens` (
   `session_hash` varchar(64) DEFAULT NULL,
   `listened_seconds` int(11) NOT NULL DEFAULT 0,
   `completed` tinyint(1) NOT NULL DEFAULT 0,
+  `client_family` varchar(40) DEFAULT NULL,
+  `retention_bucket` varchar(20) DEFAULT NULL,
   `user_agent_hash` varchar(64) DEFAULT NULL,
   `ip_hash` varchar(64) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -9984,6 +9986,27 @@ CREATE TABLE `podcast_episode_reactions` (
   KEY `podcast_episode_reactions_tenant_id_index` (`tenant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `podcast_episode_reports`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `podcast_episode_reports` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `episode_id` bigint(20) unsigned NOT NULL,
+  `reporter_user_id` bigint(20) unsigned NOT NULL,
+  `reason` varchar(80) NOT NULL,
+  `details` text DEFAULT NULL,
+  `status` varchar(30) NOT NULL DEFAULT 'open',
+  `reviewed_by` bigint(20) unsigned DEFAULT NULL,
+  `reviewed_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `pod_reports_tenant_episode_idx` (`tenant_id`,`episode_id`),
+  KEY `pod_reports_tenant_status_idx` (`tenant_id`,`status`),
+  KEY `podcast_episode_reports_tenant_id_index` (`tenant_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `podcast_episodes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -9999,6 +10022,10 @@ CREATE TABLE `podcast_episodes` (
   `audio_url` varchar(1000) NOT NULL,
   `audio_storage_path` varchar(1000) DEFAULT NULL,
   `audio_storage_disk` varchar(50) DEFAULT NULL,
+  `media_processing_status` varchar(30) NOT NULL DEFAULT 'pending',
+  `media_scan_status` varchar(30) NOT NULL DEFAULT 'pending',
+  `media_waveform_json` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`media_waveform_json`)),
+  `media_duration_source` varchar(30) DEFAULT NULL,
   `audio_mime` varchar(120) DEFAULT NULL,
   `audio_bytes` bigint(20) unsigned DEFAULT NULL,
   `duration_seconds` int(11) DEFAULT NULL,
@@ -10028,6 +10055,23 @@ CREATE TABLE `podcast_episodes` (
   FULLTEXT KEY `pod_eps_title_desc_ft` (`title`,`summary`,`description`,`transcript`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `podcast_show_subscriptions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `podcast_show_subscriptions` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `tenant_id` bigint(20) unsigned NOT NULL,
+  `show_id` bigint(20) unsigned NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `notify_new_episodes` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `pod_subs_tenant_show_user_unique` (`tenant_id`,`show_id`,`user_id`),
+  KEY `pod_subs_tenant_user_idx` (`tenant_id`,`user_id`),
+  KEY `podcast_show_subscriptions_tenant_id_index` (`tenant_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `podcast_shows`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -10042,6 +10086,11 @@ CREATE TABLE `podcast_shows` (
   `artwork_url` varchar(1000) DEFAULT NULL,
   `language` varchar(20) NOT NULL DEFAULT 'en',
   `category` varchar(120) DEFAULT NULL,
+  `author_name` varchar(200) DEFAULT NULL,
+  `owner_email` varchar(320) DEFAULT NULL,
+  `copyright` varchar(300) DEFAULT NULL,
+  `funding_url` varchar(1000) DEFAULT NULL,
+  `explicit` tinyint(1) NOT NULL DEFAULT 0,
   `visibility` enum('public','members','private') NOT NULL DEFAULT 'public',
   `status` enum('draft','published','archived') NOT NULL DEFAULT 'draft',
   `moderation_status` enum('pending','approved','rejected','flagged') NOT NULL DEFAULT 'approved',
@@ -14403,7 +14452,9 @@ INSERT INTO `laravel_migrations` VALUES
 (271,'2026_05_23_100000_add_contact_language_to_regional_analytics_subscriptions',133),
 (272,'2026_05_27_000001_create_support_reports_table',133),
 (273,'2026_05_30_120000_create_push_log_table',134),
-(274,'2026_06_03_000001_create_podcast_module_tables',135);
+(274,'2026_06_03_000001_create_podcast_module_tables',135),
+(275,'2026_06_03_000002_add_distribution_metadata_to_podcasts',136),
+(276,'2026_06_03_000003_harden_podcast_media_and_moderation',137);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

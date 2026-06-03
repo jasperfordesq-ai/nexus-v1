@@ -19,6 +19,11 @@
     "episode_count_one": "{{count}} episode",
     "episode_count_other": "{{count}} episodes",
     "rss_feed": "RSSフィード",
+    "subscribe": "番組をフォローする",
+    "unsubscribe": "番組のフォローを解除する",
+    "subscribed": "ショーが続きました。",
+    "unsubscribed": "フォローされていない人を表示します。",
+    "subscribe_failed": "フォロー設定を更新できませんでした。",
     "episodes": "Episodes",
     "no_episodes": "公開されたエピソードはまだありません。"
   },
@@ -30,10 +35,21 @@
     "from_show": "From {{title}}",
     "description": "Description",
     "transcript": "Transcript",
+    "download_transcript": "トランスクリプトをダウンロードする",
     "chapters": "Chapters",
     "explicit": "Explicit",
     "react": "React",
     "reacted": "Reacted",
+    "report_title": "レポートエピソード",
+    "report_details": "モデレーター向けの詳細",
+    "submit_report": "レポートの送信",
+    "reported": "レポートはモデレーターに送信されました。",
+    "report_failed": "レポートを送信できませんでした。",
+    "report_reasons": {
+      "safety": "安全か害か",
+      "spam": "スパムまたは誤解を招くコンテンツ",
+      "rights": "著作権または権利に関する懸念"
+    },
     "type": {
       "full": "エピソード全体",
       "trailer": "Trailer",
@@ -43,7 +59,9 @@
   "player": {
     "unsupported": "お使いのブラウザはオーディオ プレーヤーをサポートしていません。",
     "duration_unknown": "期間不明",
-    "progress": "再生の進行状況"
+    "progress": "再生の進行状況",
+    "skip_back": "バック 15 秒",
+    "skip_forward": "30秒前へ"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -79,6 +97,10 @@
     "show_title": "番組タイトル",
     "episode_title": "エピソードのタイトル",
     "category": "Category",
+    "author_name": "ディレクトリ作成者名",
+    "owner_email": "ディレクトリ所有者の電子メール",
+    "copyright": "著作権表示",
+    "explicit_show": "この番組を露骨なものとしてマークします",
     "artwork_url": "Artwork URL",
     "audio_url": "Audio URL",
     "audio_file": "ホストされた音声ファイル",

@@ -63,4 +63,30 @@ class AdminPodcastController extends BaseApiController
 
         return $this->respondWithData($episode);
     }
+
+    public function validateFeed(int $id): JsonResponse
+    {
+        $this->ensurePodcastsFeature();
+        $this->requireAdmin();
+        $show = $this->findPodcastShowOrFail($id);
+
+        return $this->respondWithData(PodcastService::validateFeed($show));
+    }
+
+    public function resolveReport(int $episodeId): JsonResponse
+    {
+        $this->ensurePodcastsFeature();
+        $adminId = $this->requireAdmin();
+        $episode = $this->findPodcastEpisodeOrFail($episodeId);
+
+        try {
+            return $this->respondWithData(PodcastService::resolveEpisodeReports(
+                $episode,
+                $adminId,
+                (string) $this->input('status', 'resolved')
+            ));
+        } catch (\InvalidArgumentException) {
+            return $this->respondWithError('VALIDATION_FAILED', __('api_controllers_2.podcasts.invalid_report_status'), 'status', 422);
+        }
+    }
 }

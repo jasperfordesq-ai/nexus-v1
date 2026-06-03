@@ -24,6 +24,8 @@ class PodcastEpisodeListen extends Model
         'session_hash',
         'listened_seconds',
         'completed',
+        'client_family',
+        'retention_bucket',
         'user_agent_hash',
         'ip_hash',
         'created_at',

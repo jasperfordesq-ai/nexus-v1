@@ -1108,8 +1108,10 @@ Route::put('/v2/podcasts/{showId}/episodes/{episodeId}', [\App\Http\Controllers\
 Route::post('/v2/podcasts/{showId}/episodes/{episodeId}/publish', [\App\Http\Controllers\Api\PodcastController::class, 'publishEpisode'])->where(['showId' => '[0-9]+', 'episodeId' => '[0-9]+']);
 Route::post('/v2/podcasts/{showId}/episodes/{episodeId}/archive', [\App\Http\Controllers\Api\PodcastController::class, 'archiveEpisode'])->where(['showId' => '[0-9]+', 'episodeId' => '[0-9]+']);
 Route::delete('/v2/podcasts/{showId}/episodes/{episodeId}', [\App\Http\Controllers\Api\PodcastController::class, 'destroyEpisode'])->where(['showId' => '[0-9]+', 'episodeId' => '[0-9]+']);
+Route::post('/v2/podcasts/{showId}/subscribe', [\App\Http\Controllers\Api\PodcastController::class, 'subscribe'])->where('showId', '[0-9]+');
 Route::post('/v2/podcasts/episodes/{episodeId}/listen', [\App\Http\Controllers\Api\PodcastController::class, 'listen'])->where('episodeId', '[0-9]+');
 Route::post('/v2/podcasts/episodes/{episodeId}/reaction', [\App\Http\Controllers\Api\PodcastController::class, 'reaction'])->where('episodeId', '[0-9]+');
+Route::post('/v2/podcasts/episodes/{episodeId}/report', [\App\Http\Controllers\Api\PodcastController::class, 'report'])->where('episodeId', '[0-9]+');
 
 }); // End Route::middleware('auth:sanctum')
 
@@ -2133,7 +2135,9 @@ Route::post('/v2/admin/courses/discussions/{id}/hide', [\App\Http\Controllers\Ap
 // Podcasts Module (ALPHA) — Admin moderation and analytics
 Route::get('/v2/admin/podcasts', [\App\Http\Controllers\Api\AdminPodcastController::class, 'index']);
 Route::post('/v2/admin/podcasts/shows/{id}/moderate', [\App\Http\Controllers\Api\AdminPodcastController::class, 'moderateShow'])->where('id', '[0-9]+');
+Route::get('/v2/admin/podcasts/shows/{id}/validate-feed', [\App\Http\Controllers\Api\AdminPodcastController::class, 'validateFeed'])->where('id', '[0-9]+');
 Route::post('/v2/admin/podcasts/episodes/{id}/moderate', [\App\Http\Controllers\Api\AdminPodcastController::class, 'moderateEpisode'])->where('id', '[0-9]+');
+Route::post('/v2/admin/podcasts/reports/{episodeId}/resolve', [\App\Http\Controllers\Api\AdminPodcastController::class, 'resolveReport'])->where('episodeId', '[0-9]+');
 
 Route::get('/v2/admin/ideation', [\App\Http\Controllers\Api\AdminIdeationController::class, 'index']);
 Route::get('/v2/admin/ideation/{id}', [\App\Http\Controllers\Api\AdminIdeationController::class, 'show']);

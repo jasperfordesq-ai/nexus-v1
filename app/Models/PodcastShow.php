@@ -28,6 +28,11 @@ class PodcastShow extends Model
         'artwork_url',
         'language',
         'category',
+        'author_name',
+        'owner_email',
+        'copyright',
+        'funding_url',
+        'explicit',
         'visibility',
     ];
 
@@ -37,6 +42,7 @@ class PodcastShow extends Model
         'owner_user_id' => 'integer',
         'episode_count' => 'integer',
         'subscriber_count' => 'integer',
+        'explicit' => 'boolean',
         'moderated_by' => 'integer',
         'moderated_at' => 'datetime',
         'published_at' => 'datetime',

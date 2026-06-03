@@ -8,6 +8,9 @@ import { useTranslation } from 'react-i18next';
 import { Button, Chip, Progress } from '@/components/ui';
 import type { PodcastChapter, PodcastEpisode } from '@/lib/api/podcasts';
 import Clock from 'lucide-react/icons/clock';
+import Gauge from 'lucide-react/icons/gauge';
+import RotateCcw from 'lucide-react/icons/rotate-ccw';
+import RotateCw from 'lucide-react/icons/rotate-cw';
 
 interface PodcastAudioPlayerProps {
   episode: PodcastEpisode;
@@ -33,6 +36,7 @@ export function PodcastAudioPlayer({ episode, onCompleted }: PodcastAudioPlayerP
   const completedRef = useRef(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(episode.duration_seconds ?? 0);
+  const [playbackRate, setPlaybackRate] = useState(1);
 
   const chapters = (episode.chapters ?? []).filter((chapter): chapter is PodcastChapter => Boolean(chapter.title));
   const progress = duration > 0 ? Math.min(100, (currentTime / duration) * 100) : 0;
@@ -41,6 +45,20 @@ export function PodcastAudioPlayer({ episode, onCompleted }: PodcastAudioPlayerP
     if (!audioRef.current) return;
     audioRef.current.currentTime = seconds;
     audioRef.current.play().catch(() => undefined);
+  }
+
+  function skip(deltaSeconds: number): void {
+    if (!audioRef.current) return;
+    const nextTime = Math.min(Math.max(audioRef.current.currentTime + deltaSeconds, 0), duration || Number.MAX_SAFE_INTEGER);
+    audioRef.current.currentTime = nextTime;
+    setCurrentTime(nextTime);
+  }
+
+  function changePlaybackRate(nextRate: number): void {
+    setPlaybackRate(nextRate);
+    if (audioRef.current) {
+      audioRef.current.playbackRate = nextRate;
+    }
   }
 
   function handleEnded(): void {
@@ -59,10 +77,45 @@ export function PodcastAudioPlayer({ episode, onCompleted }: PodcastAudioPlayerP
         src={episode.audio_url}
         onLoadedMetadata={(event) => setDuration(event.currentTarget.duration || episode.duration_seconds || 0)}
         onTimeUpdate={(event) => setCurrentTime(event.currentTarget.currentTime)}
+        onRateChange={(event) => setPlaybackRate(event.currentTarget.playbackRate)}
         onEnded={handleEnded}
       >
         {t('player.unsupported')}
       </audio>
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="tertiary"
+            startContent={<RotateCcw size={16} aria-hidden="true" />}
+            onPress={() => skip(-15)}
+          >
+            {t('player.skip_back')}
+          </Button>
+          <Button
+            size="sm"
+            variant="tertiary"
+            startContent={<RotateCw size={16} aria-hidden="true" />}
+            onPress={() => skip(30)}
+          >
+            {t('player.skip_forward')}
+          </Button>
+        </div>
+        <div className="flex items-center gap-2">
+          <Gauge size={16} className="text-muted" aria-hidden="true" />
+          {[1, 1.25, 1.5, 2].map((rate) => (
+            <Button
+              key={rate}
+              size="sm"
+              variant={playbackRate === rate ? 'secondary' : 'tertiary'}
+              onPress={() => changePlaybackRate(rate)}
+            >
+              {t('player.speed', { rate })}
+            </Button>
+          ))}
+        </div>
+      </div>
 
       <div className="space-y-2">
         <div className="flex items-center justify-between text-xs text-muted">

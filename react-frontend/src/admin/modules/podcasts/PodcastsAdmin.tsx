@@ -14,11 +14,12 @@ import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Flag from 'lucide-react/icons/flag';
 import Podcast from 'lucide-react/icons/podcast';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Rss from 'lucide-react/icons/rss';
 import XCircle from 'lucide-react/icons/circle-x';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import type { PodcastEpisode, PodcastModerationStatus, PodcastShow, PodcastStatus } from '@/lib/api/podcasts';
+import { podcastsApi, type PodcastEpisode, type PodcastModerationStatus, type PodcastShow, type PodcastStatus } from '@/lib/api/podcasts';
 import {
   Button,
   Card,
@@ -50,6 +51,27 @@ interface PodcastAdminStats {
   total_listens: number;
   completed_listens: number;
   completion_rate: number;
+  unique_listeners: number;
+  open_reports: number;
+  subscribers: number;
+  pending_media_scans: number;
+  pending_media_processing: number;
+}
+
+interface PodcastReport {
+  id: number;
+  episode_id: number;
+  reporter_user_id: number;
+  reason: string;
+  details?: string | null;
+  status: string;
+  created_at?: string | null;
+}
+
+interface PodcastBreakdown {
+  client?: string;
+  bucket?: string;
+  listens: number;
 }
 
 interface PodcastAdminIndex {
@@ -57,6 +79,9 @@ interface PodcastAdminIndex {
   episodes: PodcastEpisode[];
   stats: PodcastAdminStats;
   top_episodes: PodcastEpisode[];
+  reports: PodcastReport[];
+  client_breakdown: PodcastBreakdown[];
+  retention: PodcastBreakdown[];
 }
 
 const FILTERS: ModerationFilter[] = ['all', 'pending', 'approved', 'rejected', 'flagged'];
@@ -122,6 +147,11 @@ export default function PodcastsAdmin() {
       { key: 'total_listens', label: t('podcasts_admin.stats.total_listens'), value: data.stats.total_listens },
       { key: 'completed_listens', label: t('podcasts_admin.stats.completed_listens'), value: data.stats.completed_listens },
       { key: 'completion_rate', label: t('podcasts_admin.stats.completion_rate'), value: t('podcasts_admin.stats.percent', { value: data.stats.completion_rate }) },
+      { key: 'unique_listeners', label: t('podcasts_admin.stats.unique_listeners'), value: data.stats.unique_listeners },
+      { key: 'open_reports', label: t('podcasts_admin.stats.open_reports'), value: data.stats.open_reports },
+      { key: 'subscribers', label: t('podcasts_admin.stats.subscribers'), value: data.stats.subscribers },
+      { key: 'pending_media_scans', label: t('podcasts_admin.stats.pending_media_scans'), value: data.stats.pending_media_scans },
+      { key: 'pending_media_processing', label: t('podcasts_admin.stats.pending_media_processing'), value: data.stats.pending_media_processing },
     ];
   }, [data, t]);
 
@@ -136,6 +166,45 @@ export default function PodcastsAdmin() {
       if (res.success) {
         toast.success(t(`podcasts_admin.toasts.${type}_${action}`));
         load();
+      } else {
+        toast.error(res.error || t('podcasts_admin.action_failed'));
+      }
+    } catch {
+      toast.error(t('podcasts_admin.action_failed'));
+    } finally {
+      setActionKey(null);
+    }
+  };
+
+  const resolveReport = async (episodeId: number, status: 'resolved' | 'dismissed' | 'escalated') => {
+    const key = `report:${episodeId}:${status}`;
+    setActionKey(key);
+    try {
+      const res = await podcastsApi.resolveReport(episodeId, status);
+      if (res.success) {
+        toast.success(t(`podcasts_admin.toasts.report_${status}`));
+        load();
+      } else {
+        toast.error(res.error || t('podcasts_admin.action_failed'));
+      }
+    } catch {
+      toast.error(t('podcasts_admin.action_failed'));
+    } finally {
+      setActionKey(null);
+    }
+  };
+
+  const validateFeed = async (show: PodcastShow) => {
+    const key = `feed:${show.id}`;
+    setActionKey(key);
+    try {
+      const res = await podcastsApi.validateFeed(show.id);
+      if (res.success && res.data) {
+        if (res.data.valid) {
+          toast.success(t('podcasts_admin.toasts.feed_valid'));
+        } else {
+          toast.error(t('podcasts_admin.toasts.feed_invalid', { count: res.data.errors.length }));
+        }
       } else {
         toast.error(res.error || t('podcasts_admin.action_failed'));
       }
@@ -201,6 +270,36 @@ export default function PodcastsAdmin() {
     </div>
   );
 
+  const reportButtons = (episodeId: number) => (
+    <div className="flex items-center gap-1">
+      <Tooltip content={t('podcasts_admin.actions.resolve_report')}>
+        <Button
+          isIconOnly
+          size="sm"
+          variant="tertiary"
+          color="success"
+          aria-label={t('podcasts_admin.actions.resolve_report')}
+          isLoading={actionKey === `report:${episodeId}:resolved`}
+          onPress={() => resolveReport(episodeId, 'resolved')}
+        >
+          <CheckCircle size={16} aria-hidden="true" />
+        </Button>
+      </Tooltip>
+      <Tooltip content={t('podcasts_admin.actions.dismiss_report')}>
+        <Button
+          isIconOnly
+          size="sm"
+          variant="tertiary"
+          aria-label={t('podcasts_admin.actions.dismiss_report')}
+          isLoading={actionKey === `report:${episodeId}:dismissed`}
+          onPress={() => resolveReport(episodeId, 'dismissed')}
+        >
+          <XCircle size={16} aria-hidden="true" />
+        </Button>
+      </Tooltip>
+    </div>
+  );
+
   return (
     <div className="mx-auto max-w-7xl px-4 pb-8">
       <PageHeader
@@ -226,7 +325,7 @@ export default function PodcastsAdmin() {
         </div>
       ) : (
         <div className="space-y-8">
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-9">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-7">
             {stats.map((stat) => (
               <Card key={stat.key}>
                 <CardBody className="p-4">
@@ -261,6 +360,89 @@ export default function PodcastsAdmin() {
               </Table>
             ) : (
               <p className="py-6 text-sm text-muted">{t('podcasts_admin.empty.top_episodes')}</p>
+            )}
+          </section>
+
+          <section className="grid gap-6 lg:grid-cols-2">
+            <div>
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <h2 className="text-lg font-semibold">{t('podcasts_admin.sections.client_breakdown')}</h2>
+                <span className="text-sm text-muted">{t('podcasts_admin.count', { count: data?.client_breakdown.length ?? 0 })}</span>
+              </div>
+              {data?.client_breakdown.length ? (
+                <Table aria-label={t('podcasts_admin.sections.client_breakdown')}>
+                  <TableHeader>
+                    <TableColumn>{t('podcasts_admin.columns.client')}</TableColumn>
+                    <TableColumn>{t('podcasts_admin.columns.listens')}</TableColumn>
+                  </TableHeader>
+                  <TableBody>
+                    {data.client_breakdown.map((row) => (
+                      <TableRow key={row.client}>
+                        <TableCell>{row.client ?? t('podcasts_admin.empty_value')}</TableCell>
+                        <TableCell>{row.listens}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <p className="py-6 text-sm text-muted">{t('podcasts_admin.empty.analytics')}</p>
+              )}
+            </div>
+
+            <div>
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <h2 className="text-lg font-semibold">{t('podcasts_admin.sections.retention')}</h2>
+                <span className="text-sm text-muted">{t('podcasts_admin.count', { count: data?.retention.length ?? 0 })}</span>
+              </div>
+              {data?.retention.length ? (
+                <Table aria-label={t('podcasts_admin.sections.retention')}>
+                  <TableHeader>
+                    <TableColumn>{t('podcasts_admin.columns.bucket')}</TableColumn>
+                    <TableColumn>{t('podcasts_admin.columns.listens')}</TableColumn>
+                  </TableHeader>
+                  <TableBody>
+                    {data.retention.map((row) => (
+                      <TableRow key={row.bucket}>
+                        <TableCell>{row.bucket ?? t('podcasts_admin.empty_value')}</TableCell>
+                        <TableCell>{row.listens}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <p className="py-6 text-sm text-muted">{t('podcasts_admin.empty.analytics')}</p>
+              )}
+            </div>
+          </section>
+
+          <section>
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <h2 className="text-lg font-semibold">{t('podcasts_admin.sections.reports')}</h2>
+              <span className="text-sm text-muted">{t('podcasts_admin.count', { count: data?.reports.length ?? 0 })}</span>
+            </div>
+            {data?.reports.length ? (
+              <Table aria-label={t('podcasts_admin.sections.reports')}>
+                <TableHeader>
+                  <TableColumn>{t('podcasts_admin.columns.episode')}</TableColumn>
+                  <TableColumn>{t('podcasts_admin.columns.reason')}</TableColumn>
+                  <TableColumn>{t('podcasts_admin.columns.details')}</TableColumn>
+                  <TableColumn>{t('podcasts_admin.columns.updated')}</TableColumn>
+                  <TableColumn align="end">{t('podcasts_admin.columns.actions')}</TableColumn>
+                </TableHeader>
+                <TableBody>
+                  {data.reports.map((report) => (
+                    <TableRow key={report.id}>
+                      <TableCell>{report.episode_id}</TableCell>
+                      <TableCell>{report.reason}</TableCell>
+                      <TableCell>{report.details || t('podcasts_admin.empty_value')}</TableCell>
+                      <TableCell>{formatDate(report.created_at) || t('podcasts_admin.empty_value')}</TableCell>
+                      <TableCell>{reportButtons(report.episode_id)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <p className="py-6 text-sm text-muted">{t('podcasts_admin.empty.reports')}</p>
             )}
           </section>
 
@@ -302,7 +484,23 @@ export default function PodcastsAdmin() {
                       <TableCell>{statusChip(show.status)}</TableCell>
                       <TableCell>{moderationChip(show.moderation_status)}</TableCell>
                       <TableCell>{formatDate(show.updated_at) || t('podcasts_admin.empty_value')}</TableCell>
-                      <TableCell>{actionButtons('show', show.id)}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center justify-end gap-1">
+                          <Tooltip content={t('podcasts_admin.actions.validate_feed')}>
+                            <Button
+                              isIconOnly
+                              size="sm"
+                              variant="tertiary"
+                              aria-label={t('podcasts_admin.actions.validate_feed')}
+                              isLoading={actionKey === `feed:${show.id}`}
+                              onPress={() => validateFeed(show)}
+                            >
+                              <Rss size={16} aria-hidden="true" />
+                            </Button>
+                          </Tooltip>
+                          {actionButtons('show', show.id)}
+                        </div>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

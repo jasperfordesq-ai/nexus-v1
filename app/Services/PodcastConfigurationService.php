@@ -26,6 +26,11 @@ class PodcastConfigurationService
     public const CONFIG_ENABLE_LISTEN_ANALYTICS = 'podcasts.enable_listen_analytics';
     public const CONFIG_MAX_SHOWS_PER_USER = 'podcasts.max_shows_per_user';
     public const CONFIG_MAX_AUDIO_SIZE_MB = 'podcasts.max_audio_size_mb';
+    public const CONFIG_MEDIA_STORAGE_DRIVER = 'podcasts.media_storage_driver';
+    public const CONFIG_CLOUD_STORAGE_DISK = 'podcasts.cloud_storage_disk';
+    public const CONFIG_CLOUD_CDN_BASE_URL = 'podcasts.cloud_cdn_base_url';
+    public const CONFIG_ENABLE_MEDIA_SCANNING = 'podcasts.enable_media_scanning';
+    public const CONFIG_ENABLE_MEDIA_PROCESSING = 'podcasts.enable_media_processing';
 
     public const DEFAULTS = [
         self::CONFIG_ALLOW_MEMBER_SHOW_CREATION => true,
@@ -38,6 +43,11 @@ class PodcastConfigurationService
         self::CONFIG_ENABLE_LISTEN_ANALYTICS => true,
         self::CONFIG_MAX_SHOWS_PER_USER => 5,
         self::CONFIG_MAX_AUDIO_SIZE_MB => 250,
+        self::CONFIG_MEDIA_STORAGE_DRIVER => 'local',
+        self::CONFIG_CLOUD_STORAGE_DISK => 's3',
+        self::CONFIG_CLOUD_CDN_BASE_URL => '',
+        self::CONFIG_ENABLE_MEDIA_SCANNING => true,
+        self::CONFIG_ENABLE_MEDIA_PROCESSING => true,
     ];
 
     private const CACHE_TTL = 300;

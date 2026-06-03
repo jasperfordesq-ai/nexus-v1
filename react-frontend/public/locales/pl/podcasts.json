@@ -19,6 +19,11 @@
     "episode_count_one": "{{count}} episode",
     "episode_count_other": "{{count}} episodes",
     "rss_feed": "Kanał RSS",
+    "subscribe": "Śledź pokaz",
+    "unsubscribe": "Przestań obserwować program",
+    "subscribed": "Pokaż śledzony.",
+    "unsubscribed": "Pokaż nieobserwowanych.",
+    "subscribe_failed": "Nie można zaktualizować preferencji obserwowania.",
     "episodes": "Episodes",
     "no_episodes": "Nie ma jeszcze opublikowanych odcinków."
   },
@@ -30,10 +35,21 @@
     "from_show": "From {{title}}",
     "description": "Description",
     "transcript": "Transcript",
+    "download_transcript": "Pobierz transkrypcję",
     "chapters": "Chapters",
     "explicit": "Explicit",
     "react": "React",
     "reacted": "Reacted",
+    "report_title": "Zgłoś odcinek",
+    "report_details": "Szczegóły dla moderatorów",
+    "submit_report": "Wyślij raport",
+    "reported": "Zgłoszenie wysłane do moderatorów.",
+    "report_failed": "Nie można wysłać raportu.",
+    "report_reasons": {
+      "safety": "Bezpieczeństwo lub szkoda",
+      "spam": "Spam lub treści wprowadzające w błąd",
+      "rights": "Problem dotyczący praw autorskich lub praw"
+    },
     "type": {
       "full": "Pełny odcinek",
       "trailer": "Trailer",
@@ -43,7 +59,9 @@
   "player": {
     "unsupported": "Twoja przeglądarka nie obsługuje odtwarzacza audio.",
     "duration_unknown": "Czas trwania nieznany",
-    "progress": "Postęp odtwarzania"
+    "progress": "Postęp odtwarzania",
+    "skip_back": "Powrót 15s",
+    "skip_forward": "Do przodu 30 s"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -79,6 +97,10 @@
     "show_title": "Pokaż tytuł",
     "episode_title": "Tytuł odcinka",
     "category": "Category",
+    "author_name": "Nazwisko autora katalogu",
+    "owner_email": "Adres e-mail właściciela katalogu",
+    "copyright": "Informacja o prawach autorskich",
+    "explicit_show": "Oznacz ten program jako wulgarny",
     "artwork_url": "Artwork URL",
     "audio_url": "Audio URL",
     "audio_file": "Hostowany plik audio",

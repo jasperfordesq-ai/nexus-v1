@@ -19,6 +19,11 @@
     "episode_count_one": "{{count}} episode",
     "episode_count_other": "{{count}} episodes",
     "rss_feed": "RSS-Feed",
+    "subscribe": "Show folgen",
+    "unsubscribe": "Show nicht mehr folgen",
+    "subscribed": "Show gefolgt.",
+    "unsubscribed": "Nicht verfolgt anzeigen.",
+    "subscribe_failed": "Die Follow-Präferenz konnte nicht aktualisiert werden.",
     "episodes": "Episodes",
     "no_episodes": "Noch keine veröffentlichten Episoden."
   },
@@ -30,10 +35,21 @@
     "from_show": "From {{title}}",
     "description": "Description",
     "transcript": "Transcript",
+    "download_transcript": "Transkript herunterladen",
     "chapters": "Chapters",
     "explicit": "Explicit",
     "react": "React",
     "reacted": "Reacted",
+    "report_title": "Folge melden",
+    "report_details": "Details für Moderatoren",
+    "submit_report": "Bericht senden",
+    "reported": "Bericht an Moderatoren gesendet.",
+    "report_failed": "Bericht konnte nicht gesendet werden.",
+    "report_reasons": {
+      "safety": "Sicherheit oder Schaden",
+      "spam": "Spam oder irreführender Inhalt",
+      "rights": "Urheberrechts- oder Rechtebedenken"
+    },
     "type": {
       "full": "Vollständige Folge",
       "trailer": "Trailer",
@@ -43,7 +59,9 @@
   "player": {
     "unsupported": "Ihr Browser unterstützt den Audioplayer nicht.",
     "duration_unknown": "Dauer unbekannt",
-    "progress": "Wiedergabefortschritt"
+    "progress": "Wiedergabefortschritt",
+    "skip_back": "Zurück 15s",
+    "skip_forward": "Vorwärts 30er"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -79,6 +97,10 @@
     "show_title": "Titel anzeigen",
     "episode_title": "Episodentitel",
     "category": "Category",
+    "author_name": "Name des Verzeichnisautors",
+    "owner_email": "E-Mail des Verzeichnisbesitzers",
+    "copyright": "Urheberrechtshinweis",
+    "explicit_show": "Markieren Sie diese Show als explizit",
     "artwork_url": "Artwork URL",
     "audio_url": "Audio URL",
     "audio_file": "Gehostete Audiodatei",

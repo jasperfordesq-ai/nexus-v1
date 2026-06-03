@@ -19,6 +19,11 @@
     "episode_count_one": "{{count}} episode",
     "episode_count_other": "{{count}} episodes",
     "rss_feed": "Fotha RSS",
+    "subscribe": "Lean seó",
+    "unsubscribe": "Dílean ​​an seó",
+    "subscribed": "Taispeáin ina dhiaidh sin.",
+    "unsubscribed": "Taispeáin gan leanúint.",
+    "subscribe_failed": "Níorbh fhéidir an rogha a leanúint a nuashonrú.",
     "episodes": "Episodes",
     "no_episodes": "Níl aon eipeasóid foilsithe fós."
   },
@@ -30,10 +35,21 @@
     "from_show": "From {{title}}",
     "description": "Description",
     "transcript": "Transcript",
+    "download_transcript": "Íosluchtaigh trascríobh béarla",
     "chapters": "Chapters",
     "explicit": "Explicit",
     "react": "React",
     "reacted": "Reacted",
+    "report_title": "Tuairiscigh eipeasóid",
+    "report_details": "Sonraí do mhodhnóirí",
+    "submit_report": "Seol tuairisc",
+    "reported": "Seoladh an tuairisc chuig na modhnóirí.",
+    "report_failed": "Níorbh fhéidir an tuairisc a sheoladh.",
+    "report_reasons": {
+      "safety": "Sábháilteacht nó dochar",
+      "spam": "Turscar nó ábhar míthreorach",
+      "rights": "Baineann cóipcheart nó cearta"
+    },
     "type": {
       "full": "Eipeasóid iomlán",
       "trailer": "Trailer",
@@ -43,7 +59,9 @@
   "player": {
     "unsupported": "Ní thacaíonn do bhrabhsálaí leis an seinnteoir fuaime.",
     "duration_unknown": "Fad anaithnid",
-    "progress": "Dul chun cinn athsheinm"
+    "progress": "Dul chun cinn athsheinm",
+    "skip_back": "Ar ais 15s",
+    "skip_forward": "Ar aghaidh 30s"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -79,6 +97,10 @@
     "show_title": "Taispeáin teideal",
     "episode_title": "Teideal na heachtra",
     "category": "Category",
+    "author_name": "Ainm an údair eolaire",
+    "owner_email": "Ríomhphost úinéir eolaire",
+    "copyright": "Fógra cóipchirt",
+    "explicit_show": "Marcáil an seó seo mar rud follasach",
     "artwork_url": "Artwork URL",
     "audio_url": "Audio URL",
     "audio_file": "Comhad fuaime arna óstáil",

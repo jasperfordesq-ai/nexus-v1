@@ -19,6 +19,11 @@
     "episode_count_one": "{{count}} episode",
     "episode_count_other": "{{count}} episodes",
     "rss_feed": "تغذية آر إس إس",
+    "subscribe": "اتبع العرض",
+    "unsubscribe": "إلغاء متابعة العرض",
+    "subscribed": "يتبع العرض.",
+    "unsubscribed": "إظهار غير المتابعة.",
+    "subscribe_failed": "تعذر تحديث تفضيلات المتابعة.",
     "episodes": "Episodes",
     "no_episodes": "لم يتم نشر أي حلقات بعد."
   },
@@ -30,10 +35,21 @@
     "from_show": "From {{title}}",
     "description": "Description",
     "transcript": "Transcript",
+    "download_transcript": "تحميل النص",
     "chapters": "Chapters",
     "explicit": "Explicit",
     "react": "React",
     "reacted": "Reacted",
+    "report_title": "الإبلاغ عن الحلقة",
+    "report_details": "التفاصيل للمشرفين",
+    "submit_report": "إرسال التقرير",
+    "reported": "تم إرسال التقرير إلى المشرفين.",
+    "report_failed": "لا يمكن إرسال التقرير.",
+    "report_reasons": {
+      "safety": "سلامة أو ضرر",
+      "spam": "محتوى غير مرغوب فيه أو مضلل",
+      "rights": "حقوق الطبع والنشر أو القلق بشأن الحقوق"
+    },
     "type": {
       "full": "الحلقة كاملة",
       "trailer": "Trailer",
@@ -43,7 +59,9 @@
   "player": {
     "unsupported": "متصفحك لا يدعم مشغل الصوت.",
     "duration_unknown": "المدة غير معروفة",
-    "progress": "تقدم التشغيل"
+    "progress": "تقدم التشغيل",
+    "skip_back": "العودة 15 ثانية",
+    "skip_forward": "إلى الأمام 30 ثانية"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -79,6 +97,10 @@
     "show_title": "إظهار العنوان",
     "episode_title": "عنوان الحلقة",
     "category": "Category",
+    "author_name": "اسم مؤلف الدليل",
+    "owner_email": "البريد الإلكتروني لصاحب الدليل",
+    "copyright": "إشعار حقوق النشر",
+    "explicit_show": "ضع علامة على هذا العرض على أنه صريح",
     "artwork_url": "Artwork URL",
     "audio_url": "Audio URL",
     "audio_file": "ملف صوتي مستضاف",

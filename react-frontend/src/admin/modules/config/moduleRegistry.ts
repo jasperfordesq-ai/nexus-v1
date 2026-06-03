@@ -715,6 +715,11 @@ const FEATURE_MODULES: ModuleDefinition[] = [
       { key: 'podcasts.enable_episode_reactions', label: 'Episode Reactions', description: 'Allow members to react to episodes.', type: 'boolean', defaultValue: true, category: 'Community' },
       { key: 'podcasts.enable_listen_analytics', label: 'Listen Analytics', description: 'Record tenant-scoped listens and completion signals.', type: 'boolean', defaultValue: true, category: 'Analytics' },
       { key: 'podcasts.max_audio_size_mb', label: 'Max Audio Size', description: 'Maximum episode audio file size in megabytes for future uploads.', type: 'number', defaultValue: 250, category: 'Publishing', min: 10, max: 2000 },
+      { key: 'podcasts.media_storage_driver', label: 'Media Storage', description: 'Choose local private storage or a configured cloud disk for hosted podcast audio.', type: 'select', defaultValue: 'local', category: 'Media', choices: [{ value: 'local', label: 'Local' }, { value: 'cloud', label: 'Cloud' }] },
+      { key: 'podcasts.cloud_storage_disk', label: 'Cloud Storage Disk', description: 'Laravel filesystem disk to use when Media Storage is Cloud.', type: 'select', defaultValue: 's3', category: 'Media', choices: [{ value: 's3', label: 'S3 / R2 compatible' }, { value: 'azure', label: 'Azure Blob' }] },
+      { key: 'podcasts.cloud_cdn_base_url', label: 'Cloud CDN Base URL', description: 'Optional public CDN base URL for hosted podcast audio in cloud storage.', type: 'string', defaultValue: '', category: 'Media' },
+      { key: 'podcasts.enable_media_scanning', label: 'Media Security Scan', description: 'Mark uploaded audio for malware/security scanning before operational review.', type: 'boolean', defaultValue: true, category: 'Media' },
+      { key: 'podcasts.enable_media_processing', label: 'Media Processing Queue', description: 'Mark uploaded audio for duration extraction, waveform generation, and normalization jobs.', type: 'boolean', defaultValue: true, category: 'Media' },
     ],
   },
   {

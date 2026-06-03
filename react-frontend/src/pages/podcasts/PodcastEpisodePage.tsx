@@ -6,22 +6,29 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
-import { Button, Card, CardBody, Chip, Spinner } from '@/components/ui';
+import { Button, Card, CardBody, Chip, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Spinner, Textarea } from '@/components/ui';
 import { PodcastAudioPlayer } from '@/components/podcasts/PodcastAudioPlayer';
-import { useAuth, useTenant } from '@/contexts';
+import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { podcastsApi, type PodcastEpisode } from '@/lib/api/podcasts';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
+import FileText from 'lucide-react/icons/file-text';
 import Heart from 'lucide-react/icons/heart';
+import Flag from 'lucide-react/icons/flag';
 
 export default function PodcastEpisodePage() {
   const { t } = useTranslation('podcasts');
   const { showSlug = '', episodeSlug = '' } = useParams();
   const { tenantPath } = useTenant();
   const { isAuthenticated } = useAuth();
+  const toast = useToast();
   const [episode, setEpisode] = useState<PodcastEpisode | null>(null);
   const [loading, setLoading] = useState(true);
   const [reactionActive, setReactionActive] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportReason, setReportReason] = useState('safety');
+  const [reportDetails, setReportDetails] = useState('');
+  const [reporting, setReporting] = useState(false);
 
   usePageTitle(episode?.title ?? t('episode.title'));
 
@@ -58,6 +65,20 @@ export default function PodcastEpisodePage() {
     }
   }
 
+  async function handleReport(): Promise<void> {
+    if (!episode || !isAuthenticated) return;
+    setReporting(true);
+    const res = await podcastsApi.reportEpisode(episode.id, { reason: reportReason, details: reportDetails.trim() || undefined });
+    setReporting(false);
+    if (res.success) {
+      setReportOpen(false);
+      setReportDetails('');
+      toast.success(t('episode.reported'));
+    } else {
+      toast.error(t('episode.report_failed'));
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex justify-center py-20" role="status" aria-busy="true">
@@ -78,6 +99,9 @@ export default function PodcastEpisodePage() {
   }
 
   const showPath = episode.show?.slug ?? showSlug;
+  const transcriptDownload = episode.transcript
+    ? `data:text/plain;charset=utf-8,${encodeURIComponent(episode.transcript)}`
+    : null;
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-6">
@@ -112,6 +136,11 @@ export default function PodcastEpisodePage() {
               {reactionActive ? t('episode.reacted') : t('episode.react')}
             </Button>
           )}
+          {isAuthenticated && (
+            <Button variant="tertiary" size="sm" startContent={<Flag size={16} aria-hidden="true" />} onPress={() => setReportOpen(true)}>
+              {t('episode.report')}
+            </Button>
+          )}
         </div>
 
         {episode.description && (
@@ -123,13 +152,58 @@ export default function PodcastEpisodePage() {
 
         {episode.transcript && (
           <section>
-            <h2 className="mb-2 text-lg font-semibold">{t('episode.transcript')}</h2>
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <h2 className="text-lg font-semibold">{t('episode.transcript')}</h2>
+              {transcriptDownload && (
+                <Button
+                  as="a"
+                  href={transcriptDownload}
+                  download={`${episode.slug}-transcript.txt`}
+                  size="sm"
+                  variant="tertiary"
+                  startContent={<FileText size={16} aria-hidden="true" />}
+                >
+                  {t('episode.download_transcript')}
+                </Button>
+              )}
+            </div>
             <div className="max-h-[28rem] overflow-auto rounded-lg border border-border bg-surface-secondary/50 p-4 text-sm leading-6 text-foreground">
               <p className="whitespace-pre-line">{episode.transcript}</p>
             </div>
           </section>
         )}
       </article>
+
+      <Modal isOpen={reportOpen} onClose={() => setReportOpen(false)} size="md">
+        <ModalContent>
+          <ModalHeader>{t('episode.report_title')}</ModalHeader>
+          <ModalBody className="gap-4">
+            <Select
+              label={t('episode.report_reason')}
+              selectedKeys={[reportReason]}
+              onSelectionChange={(keys) => setReportReason((Array.from(keys)[0] as string) ?? 'safety')}
+            >
+              <SelectItem id="safety">{t('episode.report_reasons.safety')}</SelectItem>
+              <SelectItem id="spam">{t('episode.report_reasons.spam')}</SelectItem>
+              <SelectItem id="rights">{t('episode.report_reasons.rights')}</SelectItem>
+              <SelectItem id="other">{t('episode.report_reasons.other')}</SelectItem>
+            </Select>
+            <Textarea
+              label={t('episode.report_details')}
+              value={reportDetails}
+              onValueChange={setReportDetails}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="tertiary" onPress={() => setReportOpen(false)}>
+              {t('actions.cancel')}
+            </Button>
+            <Button color="danger" isLoading={reporting} onPress={handleReport}>
+              {t('episode.submit_report')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

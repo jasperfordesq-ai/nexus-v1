@@ -31,12 +31,18 @@ export interface PodcastShow {
   artwork_url?: string | null;
   language: string;
   category?: string | null;
+  author_name?: string | null;
+  owner_email?: string | null;
+  copyright?: string | null;
+  funding_url?: string | null;
+  explicit?: boolean;
   visibility: PodcastVisibility;
   status: PodcastStatus;
   moderation_status: PodcastModerationStatus;
   episode_count: number;
   approved_episode_count?: number;
   subscriber_count: number;
+  is_subscribed?: boolean;
   rss_enabled?: boolean;
   published_at?: string | null;
   updated_at?: string | null;
@@ -64,6 +70,10 @@ export interface PodcastEpisode {
   audio_url: string;
   audio_mime?: string | null;
   audio_bytes?: number | null;
+  media_processing_status?: string | null;
+  media_scan_status?: string | null;
+  media_waveform_json?: number[] | null;
+  media_duration_source?: string | null;
   duration_seconds?: number | null;
   episode_number?: number | null;
   season_number?: number | null;
@@ -98,6 +108,11 @@ export interface CreatePodcastShowPayload {
   artwork_url?: string;
   language?: string;
   category?: string;
+  author_name?: string;
+  owner_email?: string;
+  copyright?: string;
+  funding_url?: string;
+  explicit?: boolean;
   visibility?: PodcastVisibility;
 }
 
@@ -162,6 +177,9 @@ export const podcastsApi = {
   deleteShow: (id: number) =>
     api.delete<{ deleted: boolean }>(`/v2/podcasts/${id}`),
 
+  toggleSubscription: (showId: number, notifyNewEpisodes = true) =>
+    api.post<{ subscribed: boolean }>(`/v2/podcasts/${showId}/subscribe`, { notify_new_episodes: notifyNewEpisodes }),
+
   createEpisode: (showId: number, data: CreatePodcastEpisodePayload) => {
     if (data.audio_file) {
       const formData = new FormData();
@@ -197,4 +215,13 @@ export const podcastsApi = {
 
   toggleReaction: (episodeId: number, reaction = 'like') =>
     api.post<{ active: boolean }>(`/v2/podcasts/episodes/${episodeId}/reaction`, { reaction }),
+
+  reportEpisode: (episodeId: number, data: { reason: string; details?: string }) =>
+    api.post(`/v2/podcasts/episodes/${episodeId}/report`, data),
+
+  resolveReport: (episodeId: number, status: 'resolved' | 'dismissed' | 'escalated' = 'resolved') =>
+    api.post<{ episode_id: number; open_reports: number }>(`/v2/admin/podcasts/reports/${episodeId}/resolve`, { status }),
+
+  validateFeed: (showId: number) =>
+    api.get<{ valid: boolean; errors: string[]; warnings: string[] }>(`/v2/admin/podcasts/shows/${showId}/validate-feed`),
 };

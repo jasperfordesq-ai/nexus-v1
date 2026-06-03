@@ -6,7 +6,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Button, Card, CardBody, Chip, Input, Select, SelectItem, Spinner, Textarea } from '@/components/ui';
+import { Button, Card, CardBody, Checkbox, Chip, Input, Select, SelectItem, Spinner, Textarea } from '@/components/ui';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import {
@@ -56,6 +56,11 @@ const emptyShow: CreatePodcastShowPayload = {
   artwork_url: '',
   language: 'en',
   category: '',
+  author_name: '',
+  owner_email: '',
+  copyright: '',
+  funding_url: '',
+  explicit: false,
   visibility: 'public',
 };
 
@@ -241,6 +246,10 @@ export default function PodcastStudioPage() {
                   <Input label={t('fields.show_title')} value={showForm.title} onValueChange={(title) => setShowForm((prev) => ({ ...prev, title }))} />
                   <Input label={t('fields.category')} value={showForm.category ?? ''} onValueChange={(category) => setShowForm((prev) => ({ ...prev, category }))} />
                   <Input label={t('fields.artwork_url')} value={showForm.artwork_url ?? ''} onValueChange={(artwork_url) => setShowForm((prev) => ({ ...prev, artwork_url }))} />
+                  <Input label={t('fields.author_name')} value={showForm.author_name ?? ''} onValueChange={(author_name) => setShowForm((prev) => ({ ...prev, author_name }))} />
+                  <Input label={t('fields.owner_email')} type="email" value={showForm.owner_email ?? ''} onValueChange={(owner_email) => setShowForm((prev) => ({ ...prev, owner_email }))} />
+                  <Input label={t('fields.copyright')} value={showForm.copyright ?? ''} onValueChange={(copyright) => setShowForm((prev) => ({ ...prev, copyright }))} />
+                  <Input label={t('fields.funding_url')} value={showForm.funding_url ?? ''} onValueChange={(funding_url) => setShowForm((prev) => ({ ...prev, funding_url }))} />
                   <Select
                     label={t('fields.visibility')}
                     selectedKeys={[showForm.visibility ?? 'public']}
@@ -251,6 +260,9 @@ export default function PodcastStudioPage() {
                     <SelectItem id="private">{t('visibility.private')}</SelectItem>
                   </Select>
                 </div>
+                <Checkbox isSelected={Boolean(showForm.explicit)} onValueChange={(explicit) => setShowForm((prev) => ({ ...prev, explicit }))}>
+                  {t('fields.explicit_show')}
+                </Checkbox>
                 <Textarea label={t('fields.summary')} value={showForm.summary ?? ''} onValueChange={(summary) => setShowForm((prev) => ({ ...prev, summary }))} />
                 <Textarea label={t('fields.description')} value={showForm.description ?? ''} onValueChange={(description) => setShowForm((prev) => ({ ...prev, description }))} />
                 <div className="flex justify-end">

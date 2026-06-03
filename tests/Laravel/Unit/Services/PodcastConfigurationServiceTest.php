@@ -29,6 +29,8 @@ class PodcastConfigurationServiceTest extends TestCase
         $this->assertSame(true, $config[PodcastConfigurationService::CONFIG_ENABLE_RSS_FEED]);
         $this->assertSame(true, $config[PodcastConfigurationService::CONFIG_ENABLE_TRANSCRIPTS]);
         $this->assertSame(true, $config[PodcastConfigurationService::CONFIG_ENABLE_CHAPTERS]);
+        $this->assertSame('local', $config[PodcastConfigurationService::CONFIG_MEDIA_STORAGE_DRIVER]);
+        $this->assertSame('s3', $config[PodcastConfigurationService::CONFIG_CLOUD_STORAGE_DISK]);
     }
 
     public function test_set_persists_tenant_scoped_values(): void

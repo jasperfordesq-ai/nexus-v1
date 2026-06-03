@@ -7,11 +7,15 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
+use App\Models\Notification;
 use App\Models\PodcastEpisode;
 use App\Models\PodcastEpisodeChapter;
 use App\Models\PodcastEpisodeListen;
 use App\Models\PodcastEpisodeReaction;
 use App\Models\PodcastShow;
+use App\Models\User;
+use App\Jobs\ProcessPodcastEpisodeMedia;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\UploadedFile;
@@ -124,6 +128,13 @@ class PodcastService
         ]);
 
         $show->episodes->each(fn (PodcastEpisode $episode) => self::prepareEpisodeForResponse($episode, $userId, $isAdmin));
+        if ($userId !== null) {
+            $show->is_subscribed = DB::table('podcast_show_subscriptions')
+                ->where('tenant_id', TenantContext::getId())
+                ->where('show_id', $show->id)
+                ->where('user_id', $userId)
+                ->exists();
+        }
 
         return $show;
     }
@@ -156,6 +167,11 @@ class PodcastService
             'artwork_url' => self::nullableUrl($data['artwork_url'] ?? null),
             'language' => self::nullableText($data['language'] ?? 'en', 20) ?: 'en',
             'category' => self::nullableText($data['category'] ?? null, 120),
+            'author_name' => self::nullableText($data['author_name'] ?? null, 200),
+            'owner_email' => self::nullableEmail($data['owner_email'] ?? null),
+            'copyright' => self::nullableText($data['copyright'] ?? null, 300),
+            'funding_url' => self::nullableUrl($data['funding_url'] ?? null),
+            'explicit' => filter_var($data['explicit'] ?? false, FILTER_VALIDATE_BOOLEAN),
             'visibility' => $visibility,
         ]);
 
@@ -169,19 +185,31 @@ class PodcastService
 
     public static function updateShow(PodcastShow $show, array $data): PodcastShow
     {
-        foreach (['title', 'summary', 'description', 'artwork_url', 'language', 'category'] as $field) {
+        foreach (['title', 'summary', 'description', 'artwork_url', 'language', 'category', 'author_name', 'owner_email', 'copyright', 'funding_url'] as $field) {
             if (array_key_exists($field, $data)) {
                 $limit = match ($field) {
                     'summary' => 600,
                     'artwork_url' => 1000,
                     'language' => 20,
                     'category' => 120,
+                    'author_name' => 200,
+                    'owner_email' => 320,
+                    'copyright' => 300,
+                    'funding_url' => 1000,
                     default => null,
                 };
-                $show->{$field} = $field === 'artwork_url'
-                    ? self::nullableUrl($data[$field] ?? null)
-                    : self::nullableText($data[$field], $limit);
+                if (in_array($field, ['artwork_url', 'funding_url'], true)) {
+                    $show->{$field} = self::nullableUrl($data[$field] ?? null);
+                } elseif ($field === 'owner_email') {
+                    $show->{$field} = self::nullableEmail($data[$field] ?? null);
+                } else {
+                    $show->{$field} = self::nullableText($data[$field], $limit);
+                }
             }
+        }
+
+        if (array_key_exists('explicit', $data)) {
+            $show->explicit = filter_var($data['explicit'], FILTER_VALIDATE_BOOLEAN);
         }
 
         if (array_key_exists('visibility', $data)) {
@@ -225,6 +253,8 @@ class PodcastService
                 'audio_url' => $hasHostedAudio ? self::HOSTED_AUDIO_PLACEHOLDER : self::requiredUrl($data['audio_url'] ?? ''),
                 'audio_mime' => $hasHostedAudio ? null : self::nullableText($data['audio_mime'] ?? null, 120),
                 'audio_bytes' => $hasHostedAudio ? null : self::normalizeAudioBytes($data['audio_bytes'] ?? null),
+                'media_processing_status' => $hasHostedAudio && PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_ENABLE_MEDIA_PROCESSING) ? 'pending' : 'complete',
+                'media_scan_status' => $hasHostedAudio && PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_ENABLE_MEDIA_SCANNING) ? 'pending' : 'not_required',
                 'duration_seconds' => isset($data['duration_seconds']) ? max(0, (int) $data['duration_seconds']) : null,
                 'episode_number' => isset($data['episode_number']) ? max(0, (int) $data['episode_number']) : null,
                 'season_number' => isset($data['season_number']) ? max(0, (int) $data['season_number']) : null,
@@ -331,6 +361,7 @@ class PodcastService
                 'show_id' => $episode->show_id,
                 'slug' => $episode->slug,
             ]);
+            self::notifySubscribersOfEpisode($episode);
         }
 
         self::prepareEpisodeForResponse($episode, (int) $episode->author_user_id, false);
@@ -351,6 +382,7 @@ class PodcastService
 
         self::normalizeAudioBytes($file->getSize());
 
+        $disk = self::mediaStorageDisk();
         $path = sprintf(
             'podcasts/%d/shows/%d/episodes/%d/audio_%s.%s',
             TenantContext::getId(),
@@ -361,7 +393,7 @@ class PodcastService
         );
 
         $stream = fopen($file->getRealPath(), 'rb');
-        if (!$stream || !Storage::disk('local')->put($path, $stream)) {
+        if (!$stream || !Storage::disk($disk)->put($path, $stream)) {
             if (is_resource($stream)) {
                 fclose($stream);
             }
@@ -371,12 +403,18 @@ class PodcastService
             fclose($stream);
         }
 
-        $episode->audio_storage_disk = 'local';
+        $episode->audio_storage_disk = $disk;
         $episode->audio_storage_path = $path;
         $episode->audio_mime = $mime;
         $episode->audio_bytes = $file->getSize();
+        $episode->media_processing_status = PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_ENABLE_MEDIA_PROCESSING) ? 'pending' : 'complete';
+        $episode->media_scan_status = PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_ENABLE_MEDIA_SCANNING) ? 'pending' : 'not_required';
         $episode->audio_url = self::episodeAudioUrl($episode, false);
         $episode->save();
+
+        if ($episode->media_processing_status === 'pending' || $episode->media_scan_status === 'pending') {
+            ProcessPodcastEpisodeMedia::dispatch(TenantContext::getId(), (int) $episode->id);
+        }
 
         return $episode;
     }
@@ -385,6 +423,14 @@ class PodcastService
     {
         $tenantId = (int) ($episode->tenant_id ?: TenantContext::getId());
         $base = self::apiUrl('/api/v2/podcasts/media/' . $tenantId . '/' . $episode->id . '/audio');
+        if (($episode->audio_storage_disk ?? 'local') !== 'local') {
+            if ($signed) {
+                $expires = time() + self::HOSTED_AUDIO_ROUTE_TTL_SECONDS;
+                return $base . '?expires=' . $expires . '&signature=' . self::mediaSignature($tenantId, $episode->id, $expires);
+            }
+
+            return self::cloudMediaUrl((string) $episode->audio_storage_path);
+        }
         if (!$signed) {
             return $base;
         }
@@ -410,6 +456,30 @@ class PodcastService
         }
 
         return Storage::disk('local')->path($episode->audio_storage_path);
+    }
+
+    public static function cloudAccessUrl(PodcastEpisode $episode): ?string
+    {
+        $path = (string) $episode->audio_storage_path;
+        $disk = (string) ($episode->audio_storage_disk ?? 'local');
+        if ($path === '' || $disk === 'local') {
+            return null;
+        }
+
+        $storage = Storage::disk($disk);
+        if (method_exists($storage, 'temporaryUrl')) {
+            try {
+                return $storage->temporaryUrl($path, now()->addMinutes(10));
+            } catch (\Throwable $e) {
+                Log::warning('Podcast cloud temporary URL generation failed', [
+                    'episode_id' => $episode->id,
+                    'disk' => $disk,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return $storage->url($path);
     }
 
     public static function archiveShow(PodcastShow $show): PodcastShow
@@ -491,6 +561,7 @@ class PodcastService
                 'show_id' => $episode->show_id,
                 'slug' => $episode->slug,
             ]);
+            self::notifySubscribersOfEpisode($episode);
         }
 
         return $episode;
@@ -508,6 +579,8 @@ class PodcastService
             'session_hash' => !empty($data['session_id']) ? self::privateHash((string) $data['session_id']) : null,
             'listened_seconds' => max(0, (int) ($data['listened_seconds'] ?? 0)),
             'completed' => filter_var($data['completed'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            'client_family' => self::clientFamily($userAgent),
+            'retention_bucket' => self::retentionBucket($episode, max(0, (int) ($data['listened_seconds'] ?? 0))),
             'user_agent_hash' => $userAgent ? self::privateHash($userAgent) : null,
             'ip_hash' => $ip ? self::privateHash($ip) : null,
             'created_at' => now(),
@@ -542,8 +615,89 @@ class PodcastService
         return true;
     }
 
+    public static function toggleSubscription(PodcastShow $show, int $userId, bool $notifyNewEpisodes = true): bool
+    {
+        $existing = DB::table('podcast_show_subscriptions')
+            ->where('show_id', $show->id)
+            ->where('user_id', $userId)
+            ->first();
+
+        if ($existing) {
+            DB::table('podcast_show_subscriptions')
+                ->where('id', $existing->id)
+                ->delete();
+            self::refreshSubscriberCount($show);
+            return false;
+        }
+
+        DB::table('podcast_show_subscriptions')->insert([
+            'tenant_id' => TenantContext::getId(),
+            'show_id' => $show->id,
+            'user_id' => $userId,
+            'notify_new_episodes' => $notifyNewEpisodes,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        self::refreshSubscriberCount($show);
+
+        return true;
+    }
+
+    public static function reportEpisode(PodcastEpisode $episode, int $userId, string $reason, ?string $details): array
+    {
+        $id = DB::table('podcast_episode_reports')->insertGetId([
+            'tenant_id' => TenantContext::getId(),
+            'episode_id' => $episode->id,
+            'reporter_user_id' => $userId,
+            'reason' => self::nullableText($reason, 80) ?: 'other',
+            'details' => self::nullableText($details, 2000),
+            'status' => 'open',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $episode->moderation_status = 'flagged';
+        $episode->save();
+
+        return (array) DB::table('podcast_episode_reports')->where('id', $id)->first();
+    }
+
+    public static function resolveEpisodeReports(PodcastEpisode $episode, int $adminId, string $status): array
+    {
+        if (!in_array($status, ['resolved', 'dismissed', 'escalated'], true)) {
+            throw new \InvalidArgumentException('Invalid podcast report status');
+        }
+
+        DB::table('podcast_episode_reports')
+            ->where('tenant_id', TenantContext::getId())
+            ->where('episode_id', $episode->id)
+            ->where('status', 'open')
+            ->update([
+                'status' => $status,
+                'reviewed_by' => $adminId,
+                'reviewed_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+        if ($status === 'resolved' && $episode->moderation_status === 'flagged') {
+            $episode->moderation_status = 'approved';
+            $episode->moderated_by = $adminId;
+            $episode->moderated_at = now();
+            $episode->save();
+        }
+
+        return [
+            'episode_id' => (int) $episode->id,
+            'open_reports' => DB::table('podcast_episode_reports')
+                ->where('tenant_id', TenantContext::getId())
+                ->where('episode_id', $episode->id)
+                ->where('status', 'open')
+                ->count(),
+        ];
+    }
+
     /**
-     * @return array{shows:array,episodes:array,stats:array,top_episodes:array}
+     * @return array{shows:array,episodes:array,stats:array,top_episodes:array,reports:array,client_breakdown:array,retention:array}
      */
     public static function adminIndex(?string $moderationStatus = null): array
     {
@@ -568,8 +722,54 @@ class PodcastService
                 'total_listens' => PodcastEpisodeListen::count(),
                 'completed_listens' => PodcastEpisodeListen::where('completed', true)->count(),
                 'completion_rate' => self::completionRate(),
+                'unique_listeners' => self::uniqueListeners(),
+                'open_reports' => DB::table('podcast_episode_reports')->where('status', 'open')->count(),
+                'subscribers' => DB::table('podcast_show_subscriptions')->count(),
+                'pending_media_scans' => PodcastEpisode::where('media_scan_status', 'pending')->count(),
+                'pending_media_processing' => PodcastEpisode::where('media_processing_status', 'pending')->count(),
             ],
             'top_episodes' => self::topEpisodes(),
+            'reports' => self::openReports(),
+            'client_breakdown' => self::clientBreakdown(),
+            'retention' => self::retentionBreakdown(),
+        ];
+    }
+
+    public static function validateFeed(PodcastShow $show): array
+    {
+        $errors = [];
+        $warnings = [];
+
+        if ($show->visibility !== 'public' || $show->status !== 'published' || $show->moderation_status !== 'approved') {
+            $errors[] = 'show_not_public';
+        }
+        foreach (['title', 'description', 'language', 'owner_email'] as $field) {
+            if (empty($show->{$field}) && ($field !== 'description' || empty($show->summary))) {
+                $warnings[] = "missing_{$field}";
+            }
+        }
+
+        $episodes = PodcastEpisode::where('show_id', $show->id)->published()->whereIn('visibility', ['inherit', 'public'])->get();
+        if ($episodes->isEmpty()) {
+            $errors[] = 'missing_public_episodes';
+        }
+        foreach ($episodes as $episode) {
+            $audioUrl = $episode->audio_storage_path ? self::episodeAudioUrl($episode, false) : (string) $episode->audio_url;
+            if (!self::isHttpUrl($audioUrl)) {
+                $errors[] = "episode_{$episode->id}_missing_audio_url";
+            }
+            if (empty($episode->audio_bytes)) {
+                $warnings[] = "episode_{$episode->id}_missing_audio_length";
+            }
+            if (empty($episode->audio_mime)) {
+                $warnings[] = "episode_{$episode->id}_missing_audio_mime";
+            }
+        }
+
+        return [
+            'valid' => $errors === [],
+            'errors' => array_values(array_unique($errors)),
+            'warnings' => array_values(array_unique($warnings)),
         ];
     }
 
@@ -584,6 +784,54 @@ class PodcastService
             ->limit(10)
             ->get(['id', 'show_id', 'title', 'slug', 'listen_count'])
             ->toArray();
+    }
+
+    private static function openReports(): array
+    {
+        return DB::table('podcast_episode_reports')
+            ->where('status', 'open')
+            ->orderByDesc('created_at')
+            ->limit(50)
+            ->get()
+            ->map(fn ($row) => (array) $row)
+            ->all();
+    }
+
+    private static function clientBreakdown(): array
+    {
+        return PodcastEpisodeListen::select('client_family', DB::raw('COUNT(*) as listens'))
+            ->whereNotNull('client_family')
+            ->groupBy('client_family')
+            ->orderByDesc('listens')
+            ->orderBy('client_family')
+            ->get()
+            ->map(fn ($row) => [
+                'client' => $row->client_family,
+                'listens' => (int) $row->listens,
+            ])
+            ->all();
+    }
+
+    private static function retentionBreakdown(): array
+    {
+        return PodcastEpisodeListen::select('retention_bucket', DB::raw('COUNT(*) as listens'))
+            ->whereNotNull('retention_bucket')
+            ->groupBy('retention_bucket')
+            ->orderByRaw("FIELD(retention_bucket, '0-25', '25-50', '50-75', '75-100', '100+')")
+            ->get()
+            ->map(fn ($row) => [
+                'bucket' => $row->retention_bucket,
+                'listens' => (int) $row->listens,
+            ])
+            ->all();
+    }
+
+    private static function uniqueListeners(): int
+    {
+        $userCount = PodcastEpisodeListen::whereNotNull('user_id')->distinct('user_id')->count('user_id');
+        $anonymousCount = PodcastEpisodeListen::whereNull('user_id')->whereNotNull('session_hash')->distinct('session_hash')->count('session_hash');
+
+        return $userCount + $anonymousCount;
     }
 
     private static function completionRate(): int
@@ -616,9 +864,25 @@ class PodcastService
             '<link>' . self::xml($channelLink) . '</link>',
             '<description>' . self::xml((string) ($show->description ?: $show->summary ?: $show->title)) . '</description>',
             '<language>' . self::xml((string) $show->language) . '</language>',
-            '<itunes:author>' . self::xml((string) ($show->owner?->name ?? '')) . '</itunes:author>',
-            '<itunes:explicit>false</itunes:explicit>',
+            '<itunes:author>' . self::xml(self::showAuthor($show)) . '</itunes:author>',
+            '<itunes:explicit>' . ($show->explicit ? 'true' : 'false') . '</itunes:explicit>',
         ];
+
+        if ($show->owner_email) {
+            $rss[] = '<itunes:owner>';
+            $rss[] = '<itunes:name>' . self::xml(self::showAuthor($show)) . '</itunes:name>';
+            $rss[] = '<itunes:email>' . self::xml((string) $show->owner_email) . '</itunes:email>';
+            $rss[] = '</itunes:owner>';
+        }
+        if ($show->category) {
+            $rss[] = '<itunes:category text="' . self::xml((string) $show->category) . '" />';
+        }
+        if ($show->copyright) {
+            $rss[] = '<copyright>' . self::xml((string) $show->copyright) . '</copyright>';
+        }
+        if (self::isHttpUrl((string) $show->funding_url)) {
+            $rss[] = '<podcast:funding url="' . self::xml((string) $show->funding_url) . '">' . self::xml((string) __('api_controllers_2.podcasts.support_show')) . '</podcast:funding>';
+        }
 
         if (self::isHttpUrl((string) $show->artwork_url)) {
             $rss[] = '<itunes:image href="' . self::xml($show->artwork_url) . '" />';
@@ -648,6 +912,13 @@ class PodcastService
             $rss[] = '<enclosure ' . implode(' ', $enclosureAttrs) . ' />';
             if ($episode->duration_seconds) {
                 $rss[] = '<itunes:duration>' . gmdate('H:i:s', (int) $episode->duration_seconds) . '</itunes:duration>';
+            }
+            $rss[] = '<itunes:episodeType>' . self::xml((string) $episode->episode_type) . '</itunes:episodeType>';
+            if ($episode->season_number) {
+                $rss[] = '<itunes:season>' . (int) $episode->season_number . '</itunes:season>';
+            }
+            if ($episode->episode_number) {
+                $rss[] = '<itunes:episode>' . (int) $episode->episode_number . '</itunes:episode>';
             }
             if ($episode->transcript && PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_ENABLE_TRANSCRIPTS)) {
                 $rss[] = '<podcast:transcript url="' . self::xml(self::transcriptUrl($episode)) . '" type="text/plain" language="' . self::xml((string) ($episode->transcript_language ?: $show->language ?: 'en')) . '" />';
@@ -808,6 +1079,65 @@ class PodcastService
         $show->save();
     }
 
+    private static function refreshSubscriberCount(PodcastShow $show): void
+    {
+        $show->subscriber_count = DB::table('podcast_show_subscriptions')->where('show_id', $show->id)->count();
+        $show->save();
+    }
+
+    private static function notifySubscribersOfEpisode(PodcastEpisode $episode): void
+    {
+        $show = $episode->show ?: PodcastShow::find($episode->show_id);
+        if (!$show) {
+            return;
+        }
+
+        $subscriberIds = DB::table('podcast_show_subscriptions')
+            ->where('tenant_id', TenantContext::getId())
+            ->where('show_id', $show->id)
+            ->where('notify_new_episodes', true)
+            ->where('user_id', '<>', (int) $episode->author_user_id)
+            ->pluck('user_id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        if ($subscriberIds === []) {
+            return;
+        }
+
+        $users = User::query()
+            ->whereIn('id', $subscriberIds)
+            ->select('id', 'preferred_language')
+            ->get();
+        $link = '/podcasts/' . $show->slug . '/' . $episode->slug;
+
+        foreach ($users as $user) {
+            LocaleContext::withLocale($user, function () use ($user, $show, $episode, $link): void {
+                $exists = DB::table('notifications')
+                    ->where('tenant_id', TenantContext::getId())
+                    ->where('user_id', (int) $user->id)
+                    ->where('type', 'podcast_episode')
+                    ->where('link', $link)
+                    ->exists();
+                if ($exists) {
+                    return;
+                }
+
+                Notification::createNotification(
+                    (int) $user->id,
+                    __('svc_notifications.podcast.new_episode', [
+                        'show' => $show->title,
+                        'title' => $episode->title,
+                    ]),
+                    $link,
+                    'podcast_episode',
+                    false,
+                    TenantContext::getId()
+                );
+            });
+        }
+    }
+
     private static function moderationEnabled(): bool
     {
         return (bool) PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_MODERATION_ENABLED);
@@ -844,6 +1174,60 @@ class PodcastService
     private static function normalizeEpisodeType(string $type): string
     {
         return in_array($type, ['full', 'trailer', 'bonus'], true) ? $type : 'full';
+    }
+
+    private static function mediaStorageDisk(): string
+    {
+        $driver = (string) PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_MEDIA_STORAGE_DRIVER);
+        if ($driver !== 'cloud') {
+            return 'local';
+        }
+
+        return (string) PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_CLOUD_STORAGE_DISK, 's3') ?: 's3';
+    }
+
+    private static function cloudMediaUrl(string $path): string
+    {
+        $base = trim((string) PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_CLOUD_CDN_BASE_URL, ''));
+        if (self::isHttpUrl($base)) {
+            return rtrim($base, '/') . '/' . ltrim($path, '/');
+        }
+
+        return Storage::disk((string) PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_CLOUD_STORAGE_DISK, 's3'))->url($path);
+    }
+
+    private static function clientFamily(?string $userAgent): ?string
+    {
+        if (!$userAgent) {
+            return null;
+        }
+
+        $ua = strtolower($userAgent);
+        return match (true) {
+            str_contains($ua, 'applecoremedia'), str_contains($ua, 'podcasts') => 'apple',
+            str_contains($ua, 'spotify') => 'spotify',
+            str_contains($ua, 'overcast') => 'overcast',
+            str_contains($ua, 'pocket casts') => 'pocket_casts',
+            str_contains($ua, 'mozilla'), str_contains($ua, 'chrome'), str_contains($ua, 'safari') => 'browser',
+            default => 'other',
+        };
+    }
+
+    private static function retentionBucket(PodcastEpisode $episode, int $listenedSeconds): string
+    {
+        $duration = max(0, (int) ($episode->duration_seconds ?? 0));
+        if ($duration <= 0) {
+            return $listenedSeconds > 0 ? '0-25' : '0-25';
+        }
+
+        $percent = ($listenedSeconds / $duration) * 100;
+        return match (true) {
+            $percent < 25 => '0-25',
+            $percent < 50 => '25-50',
+            $percent < 75 => '50-75',
+            $percent <= 100 => '75-100',
+            default => '100+',
+        };
     }
 
     private static function uniqueShowSlug(string $base): string
@@ -906,6 +1290,21 @@ class PodcastService
         return self::isHttpUrl($url) ? $url : null;
     }
 
+    private static function nullableEmail(mixed $value): ?string
+    {
+        $email = self::nullableText($value, 320);
+        if ($email === null) {
+            return null;
+        }
+
+        return filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : null;
+    }
+
+    private static function showAuthor(PodcastShow $show): string
+    {
+        return (string) ($show->author_name ?: $show->owner?->name ?: $show->title);
+    }
+
     private static function requiredUrl(mixed $value): string
     {
         $url = self::nullableText($value, 1000);
@@ -944,8 +1343,8 @@ class PodcastService
 
         self::storeHostedAudio($episode, $file);
 
-        if ($oldPath && $oldDisk === 'local' && $oldPath !== $episode->audio_storage_path) {
-            Storage::disk('local')->delete($oldPath);
+        if ($oldPath && $oldDisk && $oldPath !== $episode->audio_storage_path) {
+            Storage::disk($oldDisk)->delete($oldPath);
         }
     }
 
@@ -958,8 +1357,8 @@ class PodcastService
 
     private static function deleteHostedAudioFile(PodcastEpisode $episode): void
     {
-        if ($episode->audio_storage_path && ($episode->audio_storage_disk ?? 'local') === 'local') {
-            Storage::disk('local')->delete($episode->audio_storage_path);
+        if ($episode->audio_storage_path) {
+            Storage::disk($episode->audio_storage_disk ?? 'local')->delete($episode->audio_storage_path);
         }
     }
 

@@ -150,5 +150,8 @@
   "marketplace_payout": {
     "onboarding_complete_bell": "Your seller account is fully set up — you can now receive marketplace payouts.",
     "payout_sent_bell": "Your payout of {{amount}} for order #{{order}} has been released to you."
+  },
+  "podcast": {
+    "new_episode": "New episode from {{show}}: {{title}}"
   }
 }

@@ -29,6 +29,10 @@ class PodcastEpisode extends Model
         'audio_url',
         'audio_storage_path',
         'audio_storage_disk',
+        'media_processing_status',
+        'media_scan_status',
+        'media_waveform_json',
+        'media_duration_source',
         'audio_mime',
         'audio_bytes',
         'duration_seconds',
@@ -58,6 +62,7 @@ class PodcastEpisode extends Model
         'moderated_at' => 'datetime',
         'scheduled_for' => 'datetime',
         'published_at' => 'datetime',
+        'media_waveform_json' => 'array',
     ];
 
     public function show(): BelongsTo

@@ -19,6 +19,11 @@
     "episode_count_one": "{{count}} episode",
     "episode_count_other": "{{count}} episodes",
     "rss_feed": "RSS-feed",
+    "subscribe": "Volg show",
+    "unsubscribe": "Show niet meer volgen",
+    "subscribed": "Toon volgde.",
+    "unsubscribed": "Toon niet gevolgd.",
+    "subscribe_failed": "Kan de volgvoorkeur niet updaten.",
     "episodes": "Episodes",
     "no_episodes": "Nog geen gepubliceerde afleveringen."
   },
@@ -30,10 +35,21 @@
     "from_show": "From {{title}}",
     "description": "Description",
     "transcript": "Transcript",
+    "download_transcript": "Afschrift downloaden",
     "chapters": "Chapters",
     "explicit": "Explicit",
     "react": "React",
     "reacted": "Reacted",
+    "report_title": "Aflevering melden",
+    "report_details": "Details voor moderators",
+    "submit_report": "Rapport verzenden",
+    "reported": "Rapport verzonden naar moderators.",
+    "report_failed": "Kan rapport niet verzenden.",
+    "report_reasons": {
+      "safety": "Veiligheid of schade",
+      "spam": "Spam of misleidende inhoud",
+      "rights": "Auteursrecht of rechten betreft"
+    },
     "type": {
       "full": "Volledige aflevering",
       "trailer": "Trailer",
@@ -43,7 +59,9 @@
   "player": {
     "unsupported": "Uw browser ondersteunt de audiospeler niet.",
     "duration_unknown": "Duur onbekend",
-    "progress": "Afspeelvoortgang"
+    "progress": "Afspeelvoortgang",
+    "skip_back": "Terug 15s",
+    "skip_forward": "Voorwaarts jaren '30"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -79,6 +97,10 @@
     "show_title": "Titel tonen",
     "episode_title": "Titel van de aflevering",
     "category": "Category",
+    "author_name": "Naam van directoryauteur",
+    "owner_email": "E-mailadres van directory-eigenaar",
+    "copyright": "Copyrightvermelding",
+    "explicit_show": "Markeer deze show als expliciet",
     "artwork_url": "Artwork URL",
     "audio_url": "Audio URL",
     "audio_file": "Gehost audiobestand",
