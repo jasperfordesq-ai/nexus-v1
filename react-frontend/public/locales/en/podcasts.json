@@ -1,0 +1,113 @@
+{
+  "title": "Podcasts",
+  "subtitle": "Community shows, audio stories, interviews, and local knowledge from members.",
+  "actions": {
+    "back_to_podcasts": "Back to podcasts",
+    "back_to_show": "Back to show"
+  },
+  "browse": {
+    "search_placeholder": "Search shows",
+    "empty": "No podcast shows yet",
+    "empty_hint": "When members publish approved shows, they will appear here.",
+    "load_more": "Load more"
+  },
+  "show": {
+    "not_found": "Podcast show not found",
+    "no_summary": "No summary yet.",
+    "byline": "Hosted by {{name}}",
+    "community_show": "Community show",
+    "episode_count_one": "{{count}} episode",
+    "episode_count_other": "{{count}} episodes",
+    "rss_feed": "RSS feed",
+    "episodes": "Episodes",
+    "no_episodes": "No published episodes yet."
+  },
+  "episode": {
+    "title": "Podcast episode",
+    "not_found": "Podcast episode not found",
+    "no_summary": "No summary yet.",
+    "listen": "Listen",
+    "from_show": "From {{title}}",
+    "description": "Description",
+    "transcript": "Transcript",
+    "chapters": "Chapters",
+    "explicit": "Explicit",
+    "react": "React",
+    "reacted": "Reacted",
+    "type": {
+      "full": "Full episode",
+      "trailer": "Trailer",
+      "bonus": "Bonus"
+    }
+  },
+  "player": {
+    "unsupported": "Your browser does not support the audio player.",
+    "duration_unknown": "Duration unknown",
+    "progress": "Playback progress"
+  },
+  "studio": {
+    "title": "Podcast Studio",
+    "subtitle": "Create member-led shows, add episodes, and publish them into the community podcast library.",
+    "create_show": "Create show",
+    "manage_show": "Manage show",
+    "add_episode": "Add episode",
+    "my_shows": "My shows",
+    "no_shows": "You have not created any shows yet.",
+    "select_show": "Select show",
+    "publish_show": "Publish show",
+    "publish_episode": "Publish episode",
+    "archive_show": "Archive show",
+    "delete_show": "Delete show",
+    "archive_episode": "Archive episode",
+    "delete_episode": "Delete episode",
+    "show_created": "Show created.",
+    "show_published": "Show published.",
+    "show_archived": "Show archived.",
+    "show_deleted": "Show deleted.",
+    "episode_created": "Episode created.",
+    "episode_published": "Episode published.",
+    "episode_archived": "Episode archived.",
+    "episode_deleted": "Episode deleted.",
+    "save_failed": "Could not save changes.",
+    "confirm_archive_show": "Archive {{title}}? It will be hidden from public podcast lists.",
+    "confirm_delete_show": "Delete {{title}} and all of its episodes? This cannot be undone.",
+    "confirm_archive_episode": "Archive {{title}}? It will be hidden from public podcast lists.",
+    "confirm_delete_episode": "Delete {{title}}? This cannot be undone."
+  },
+  "fields": {
+    "show": "Show",
+    "show_title": "Show title",
+    "episode_title": "Episode title",
+    "category": "Category",
+    "artwork_url": "Artwork URL",
+    "audio_url": "Audio URL",
+    "audio_file": "Hosted audio file",
+    "audio_file_hint": "Upload audio for private NEXUS hosting, or use an external audio URL.",
+    "visibility": "Visibility",
+    "summary": "Summary",
+    "description": "Description",
+    "duration_seconds": "Duration in seconds",
+    "scheduled_for": "Schedule publication",
+    "episode_type": "Episode type",
+    "transcript": "Transcript",
+    "chapters": "Chapters",
+    "chapters_hint": "One chapter per line, for example: 00:30 Introductions"
+  },
+  "visibility": {
+    "public": "Public",
+    "members": "Members",
+    "private": "Private",
+    "inherit": "Inherit show visibility"
+  },
+  "status": {
+    "draft": "Draft",
+    "published": "Published",
+    "archived": "Archived"
+  },
+  "moderation": {
+    "pending": "Pending review",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "flagged": "Flagged"
+  }
+}

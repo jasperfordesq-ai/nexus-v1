@@ -42,6 +42,8 @@ import ShieldCheck from 'lucide-react/icons/shield-check';
 import Mail from 'lucide-react/icons/mail';
 import Languages from 'lucide-react/icons/languages';
 import GraduationCap from 'lucide-react/icons/graduation-cap';
+import Podcast from 'lucide-react/icons/podcast';
+import Crown from 'lucide-react/icons/crown';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -57,6 +59,7 @@ export type ConfigSource =
   | 'listing_config'
   | 'volunteering_config'
   | 'job_config'
+  | 'podcast_config'
   | 'identity_config'
   | 'group_policies'
   | 'onboarding_config'
@@ -691,6 +694,37 @@ const FEATURE_MODULES: ModuleDefinition[] = [
       { key: 'courses.award_xp', label: 'Award XP & Badges', description: 'Award gamification XP and a graduate badge on course completion', type: 'boolean', defaultValue: true, category: 'Gamification' },
       { key: 'courses.post_completions_to_feed', label: 'Post Completions to Feed', description: 'Celebrate course completions in the community activity feed (Phase 3)', type: 'boolean', defaultValue: true, category: 'Social', comingSoon: true },
     ],
+  },
+  {
+    id: 'podcasts',
+    name: 'Podcasts',
+    description: 'Community audio — member-created shows, episodes, transcripts, chapters, RSS, and moderation.',
+    icon: Podcast,
+    type: 'feature',
+    configSource: 'podcast_config',
+    detailPageUrl: '/admin/podcasts',
+    stage: 'alpha',
+    configOptions: [
+      { key: 'podcasts.allow_member_show_creation', label: 'Member Show Creation', description: 'Allow ordinary members to create podcast shows. This is on by default.', type: 'boolean', defaultValue: true, category: 'Authoring' },
+      { key: 'podcasts.max_shows_per_user', label: 'Max Shows Per Member', description: 'Maximum number of shows one member can own. Set to 0 for no limit.', type: 'number', defaultValue: 5, category: 'Authoring', min: 0, max: 100 },
+      { key: 'podcasts.moderation_enabled', label: 'Require Moderation', description: 'Newly published shows and episodes stay pending until an admin approves them. Off by default.', type: 'boolean', defaultValue: false, category: 'Moderation' },
+      { key: 'podcasts.enable_rss_feed', label: 'RSS Feeds', description: 'Publish standards-compatible RSS feeds for public shows.', type: 'boolean', defaultValue: true, category: 'Publishing' },
+      { key: 'podcasts.enable_private_shows', label: 'Private Shows', description: 'Allow creators to keep shows private or members-only.', type: 'boolean', defaultValue: true, category: 'Publishing' },
+      { key: 'podcasts.enable_transcripts', label: 'Transcripts', description: 'Allow episode transcripts for accessibility and search.', type: 'boolean', defaultValue: true, category: 'Accessibility' },
+      { key: 'podcasts.enable_chapters', label: 'Chapters', description: 'Allow timestamped episode chapters.', type: 'boolean', defaultValue: true, category: 'Accessibility' },
+      { key: 'podcasts.enable_episode_reactions', label: 'Episode Reactions', description: 'Allow members to react to episodes.', type: 'boolean', defaultValue: true, category: 'Community' },
+      { key: 'podcasts.enable_listen_analytics', label: 'Listen Analytics', description: 'Record tenant-scoped listens and completion signals.', type: 'boolean', defaultValue: true, category: 'Analytics' },
+      { key: 'podcasts.max_audio_size_mb', label: 'Max Audio Size', description: 'Maximum episode audio file size in megabytes for future uploads.', type: 'number', defaultValue: 250, category: 'Publishing', min: 10, max: 2000 },
+    ],
+  },
+  {
+    id: 'member_premium',
+    name: 'Premium',
+    description: 'Premium member benefits and paid community upgrades.',
+    icon: Crown,
+    type: 'feature',
+    configSource: 'tenant_features',
+    configOptions: [],
   },
 ];
 

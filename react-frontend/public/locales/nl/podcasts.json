@@ -1,0 +1,113 @@
+{
+  "title": "Podcasts",
+  "subtitle": "Communityshows, audioverhalen, interviews en lokale kennis van leden.",
+  "actions": {
+    "back_to_podcasts": "Terug naar podcasts",
+    "back_to_show": "Terug naar show"
+  },
+  "browse": {
+    "search_placeholder": "Zoekprogramma's",
+    "empty": "Er zijn nog geen podcastshows",
+    "empty_hint": "Wanneer leden goedgekeurde programma's publiceren, worden deze hier weergegeven.",
+    "load_more": "Laad meer"
+  },
+  "show": {
+    "not_found": "Podcastshow niet gevonden",
+    "no_summary": "Nog geen samenvatting.",
+    "byline": "Hosted by {{name}}",
+    "community_show": "Gemeenschapsshow",
+    "episode_count_one": "{{count}} episode",
+    "episode_count_other": "{{count}} episodes",
+    "rss_feed": "RSS-feed",
+    "episodes": "Episodes",
+    "no_episodes": "Nog geen gepubliceerde afleveringen."
+  },
+  "episode": {
+    "title": "Podcast-aflevering",
+    "not_found": "Podcast-aflevering niet gevonden",
+    "no_summary": "Nog geen samenvatting.",
+    "listen": "Listen",
+    "from_show": "From {{title}}",
+    "description": "Description",
+    "transcript": "Transcript",
+    "chapters": "Chapters",
+    "explicit": "Explicit",
+    "react": "React",
+    "reacted": "Reacted",
+    "type": {
+      "full": "Volledige aflevering",
+      "trailer": "Trailer",
+      "bonus": "Bonus"
+    }
+  },
+  "player": {
+    "unsupported": "Uw browser ondersteunt de audiospeler niet.",
+    "duration_unknown": "Duur onbekend",
+    "progress": "Afspeelvoortgang"
+  },
+  "studio": {
+    "title": "Podcast Studio",
+    "subtitle": "Creëer door leden geleide shows, voeg afleveringen toe en publiceer ze in de podcastbibliotheek van de community.",
+    "create_show": "Toon maken",
+    "manage_show": "Beheer show",
+    "add_episode": "Aflevering toevoegen",
+    "my_shows": "Mijn shows",
+    "no_shows": "Je hebt nog geen shows gemaakt.",
+    "select_show": "Selecteer tonen",
+    "publish_show": "Toon publiceren",
+    "publish_episode": "Aflevering publiceren",
+    "archive_show": "Archiefshow",
+    "delete_show": "Toon verwijderen",
+    "archive_episode": "Aflevering archiveren",
+    "delete_episode": "Aflevering verwijderen",
+    "show_created": "Toon gemaakt.",
+    "show_published": "Toon gepubliceerd.",
+    "show_archived": "Gearchiveerd weergeven.",
+    "show_deleted": "Toon verwijderd.",
+    "episode_created": "Aflevering gemaakt.",
+    "episode_published": "Aflevering gepubliceerd.",
+    "episode_archived": "Aflevering gearchiveerd.",
+    "episode_deleted": "Aflevering verwijderd.",
+    "save_failed": "Kan de wijzigingen niet opslaan.",
+    "confirm_archive_show": "{{title}} archiveren? Het wordt verborgen voor openbare podcastlijsten.",
+    "confirm_delete_show": "{{title}} en alle afleveringen verwijderen? Dit kan niet ongedaan worden gemaakt.",
+    "confirm_archive_episode": "{{title}} archiveren? Het wordt verborgen voor openbare podcastlijsten.",
+    "confirm_delete_episode": "{{title}} verwijderen? Dit kan niet ongedaan worden gemaakt."
+  },
+  "fields": {
+    "show": "Show",
+    "show_title": "Titel tonen",
+    "episode_title": "Titel van de aflevering",
+    "category": "Category",
+    "artwork_url": "Artwork URL",
+    "audio_url": "Audio URL",
+    "audio_file": "Gehost audiobestand",
+    "audio_file_hint": "Upload audio voor privé NEXUS-hosting of gebruik een externe audio-URL.",
+    "visibility": "Visibility",
+    "summary": "Summary",
+    "description": "Description",
+    "duration_seconds": "Duur in seconden",
+    "scheduled_for": "Publicatie plannen",
+    "episode_type": "Afleveringstype",
+    "transcript": "Transcript",
+    "chapters": "Chapters",
+    "chapters_hint": "Eén hoofdstuk per regel, bijvoorbeeld: 00:30 Introducties"
+  },
+  "visibility": {
+    "public": "Public",
+    "members": "Members",
+    "private": "Private",
+    "inherit": "Zichtbaarheid van show overnemen"
+  },
+  "status": {
+    "draft": "Draft",
+    "published": "Published",
+    "archived": "Archived"
+  },
+  "moderation": {
+    "pending": "In afwachting van beoordeling",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "flagged": "Flagged"
+  }
+}

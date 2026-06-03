@@ -12,6 +12,7 @@ use App\Services\GroupConfigurationService;
 use App\Services\JobConfigurationService;
 use App\Services\ListingConfigurationService;
 use App\Services\ListingRankingService;
+use App\Services\PodcastConfigurationService;
 use App\Services\VolunteeringConfigurationService;
 use App\Services\MemberRankingService;
 use App\Services\RedisCache;
@@ -2420,6 +2421,55 @@ class AdminConfigController extends BaseApiController
         }
 
         $this->redisCache->delete('tenant_bootstrap', $tenantId);
+
+        return $this->respondWithData(['updated' => $updated]);
+    }
+
+    // =========================================================================
+    // Podcasts Module Configuration
+    // =========================================================================
+
+    /** GET /api/v2/admin/config/podcasts */
+    public function getPodcastConfig(): JsonResponse
+    {
+        $this->requireAdmin();
+
+        return $this->respondWithData([
+            'config' => PodcastConfigurationService::getAll(),
+            'defaults' => PodcastConfigurationService::DEFAULTS,
+        ]);
+    }
+
+    /** PUT /api/v2/admin/config/podcasts/bulk */
+    public function updatePodcastConfigBulk(): JsonResponse
+    {
+        $this->requireAdmin();
+        $tenantId = $this->getTenantId();
+
+        $settings = $this->input('settings');
+        if (!is_array($settings) || empty($settings)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_2.podcasts.settings_required'), 'settings', 422);
+        }
+
+        $updated = [];
+        foreach ($settings as $key => $value) {
+            if (!is_string($key) || !array_key_exists($key, PodcastConfigurationService::DEFAULTS)) {
+                continue;
+            }
+
+            $defaultValue = PodcastConfigurationService::DEFAULTS[$key];
+            if (is_bool($defaultValue)) {
+                $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+            } elseif (is_int($defaultValue)) {
+                $value = max(0, (int) $value);
+            }
+
+            PodcastConfigurationService::set($key, $value);
+            $updated[$key] = $value;
+        }
+
+        $this->redisCache->delete('tenant_bootstrap', $tenantId);
+        $this->tenantSettingsService->clearCacheForTenant($tenantId);
 
         return $this->respondWithData(['updated' => $updated]);
     }

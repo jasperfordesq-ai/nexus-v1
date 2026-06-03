@@ -1,0 +1,113 @@
+{
+  "title": "Podcasts",
+  "subtitle": "Programy społecznościowe, historie audio, wywiady i wiedza lokalna od członków.",
+  "actions": {
+    "back_to_podcasts": "Wracając do podcastów",
+    "back_to_show": "Powrót do pokazania"
+  },
+  "browse": {
+    "search_placeholder": "Wyszukaj programy",
+    "empty": "Nie ma jeszcze żadnych podcastów",
+    "empty_hint": "Gdy członkowie opublikują zatwierdzone programy, pojawią się one tutaj.",
+    "load_more": "Załaduj więcej"
+  },
+  "show": {
+    "not_found": "Nie znaleziono programu podcastu",
+    "no_summary": "Nie ma jeszcze podsumowania.",
+    "byline": "Hosted by {{name}}",
+    "community_show": "Spektakl społecznościowy",
+    "episode_count_one": "{{count}} episode",
+    "episode_count_other": "{{count}} episodes",
+    "rss_feed": "Kanał RSS",
+    "episodes": "Episodes",
+    "no_episodes": "Nie ma jeszcze opublikowanych odcinków."
+  },
+  "episode": {
+    "title": "Odcinek podcastu",
+    "not_found": "Nie znaleziono odcinka podcastu",
+    "no_summary": "Nie ma jeszcze podsumowania.",
+    "listen": "Listen",
+    "from_show": "From {{title}}",
+    "description": "Description",
+    "transcript": "Transcript",
+    "chapters": "Chapters",
+    "explicit": "Explicit",
+    "react": "React",
+    "reacted": "Reacted",
+    "type": {
+      "full": "Pełny odcinek",
+      "trailer": "Trailer",
+      "bonus": "Bonus"
+    }
+  },
+  "player": {
+    "unsupported": "Twoja przeglądarka nie obsługuje odtwarzacza audio.",
+    "duration_unknown": "Czas trwania nieznany",
+    "progress": "Postęp odtwarzania"
+  },
+  "studio": {
+    "title": "Podcast Studio",
+    "subtitle": "Twórz programy prowadzone przez członków, dodawaj odcinki i publikuj je w bibliotece podcastów społeczności.",
+    "create_show": "Utwórz przedstawienie",
+    "manage_show": "Zarządzaj pokazem",
+    "add_episode": "Dodaj odcinek",
+    "my_shows": "Moje występy",
+    "no_shows": "Nie utworzyłeś jeszcze żadnych programów.",
+    "select_show": "Wybierz pokaz",
+    "publish_show": "Opublikuj program",
+    "publish_episode": "Opublikuj odcinek",
+    "archive_show": "Wystawa archiwalna",
+    "delete_show": "Usuń program",
+    "archive_episode": "Odcinek archiwalny",
+    "delete_episode": "Usuń odcinek",
+    "show_created": "Pokaż utworzony.",
+    "show_published": "Pokaż opublikowany.",
+    "show_archived": "Pokaż zarchiwizowane.",
+    "show_deleted": "Pokaż usunięte.",
+    "episode_created": "Odcinek utworzony.",
+    "episode_published": "Odcinek opublikowany.",
+    "episode_archived": "Odcinek zarchiwizowany.",
+    "episode_deleted": "Odcinek usunięty.",
+    "save_failed": "Nie udało się zapisać zmian.",
+    "confirm_archive_show": "Zarchiwizować {{title}}? Będzie ukryty na publicznych listach podcastów.",
+    "confirm_delete_show": "Usunąć {{title}} i wszystkie jego odcinki? Tego nie można cofnąć.",
+    "confirm_archive_episode": "Zarchiwizować {{title}}? Będzie ukryty na publicznych listach podcastów.",
+    "confirm_delete_episode": "Usunąć {{title}}? Tego nie można cofnąć."
+  },
+  "fields": {
+    "show": "Show",
+    "show_title": "Pokaż tytuł",
+    "episode_title": "Tytuł odcinka",
+    "category": "Category",
+    "artwork_url": "Artwork URL",
+    "audio_url": "Audio URL",
+    "audio_file": "Hostowany plik audio",
+    "audio_file_hint": "Prześlij dźwięk do prywatnego hostingu NEXUS lub użyj zewnętrznego adresu URL dźwięku.",
+    "visibility": "Visibility",
+    "summary": "Summary",
+    "description": "Description",
+    "duration_seconds": "Czas trwania w sekundach",
+    "scheduled_for": "Zaplanuj publikację",
+    "episode_type": "Typ odcinka",
+    "transcript": "Transcript",
+    "chapters": "Chapters",
+    "chapters_hint": "Jeden rozdział w każdym wierszu, na przykład: 00:30 Wprowadzenie"
+  },
+  "visibility": {
+    "public": "Public",
+    "members": "Members",
+    "private": "Private",
+    "inherit": "Dziedzicz widoczność pokazu"
+  },
+  "status": {
+    "draft": "Draft",
+    "published": "Published",
+    "archived": "Archived"
+  },
+  "moderation": {
+    "pending": "Oczekuje na recenzję",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "flagged": "Flagged"
+  }
+}

@@ -1151,6 +1151,8 @@ export interface TenantFeatures {
   maps: boolean;
   /** Courses / learning module (alpha) — opt-in per tenant. */
   courses: boolean;
+  /** Podcasts / community audio module (alpha) — opt-in per tenant. */
+  podcasts: boolean;
 }
 
 export interface TenantModules {

@@ -85,6 +85,7 @@ import MapPin from 'lucide-react/icons/map-pin';
 import FileSearch from 'lucide-react/icons/file-search';
 import Webhook from 'lucide-react/icons/webhook';
 import Puzzle from 'lucide-react/icons/puzzle';
+import Podcast from 'lucide-react/icons/podcast';
 import Palette from 'lucide-react/icons/palette';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import Store from 'lucide-react/icons/store';
@@ -234,6 +235,7 @@ function useAdminNav(safeguardingFlagCount: number): NavSection[] {
       ...(hasFeature('events') ? [{ label: t('events'), href: '/admin/events', icon: Calendar }] : []),
       ...(hasFeature('polls') ? [{ label: t('polls'), href: '/admin/polls', icon: BarChart2 }] : []),
       ...(hasFeature('goals') ? [{ label: t('goals'), href: '/admin/goals', icon: Target }] : []),
+      ...(hasFeature('podcasts') ? [{ label: t('podcasts'), href: '/admin/podcasts', icon: Podcast, keywords: keyword('audio', 'shows', 'episodes') }] : []),
       ...(hasFeature('ideation_challenges') ? [{ label: t('ideation_challenges'), href: '/admin/ideation', icon: Lightbulb }] : []),
       ...(hasFeature('volunteering') ? [{ label: t('volunteering'), href: '/admin/volunteering', icon: Heart }] : []),
     ];

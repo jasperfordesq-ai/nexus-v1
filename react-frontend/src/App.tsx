@@ -292,6 +292,12 @@ const CreateCoursePage = lazyWithRetry(() => import('./pages/courses/CreateCours
 const CourseAnalyticsPage = lazyWithRetry(() => import('./pages/courses/CourseAnalyticsPage'));
 const CourseGradingPage = lazyWithRetry(() => import('./pages/courses/CourseGradingPage'));
 
+// Podcasts Pages (alpha)
+const PodcastsPage = lazyWithRetry(() => import('./pages/podcasts/PodcastsPage'));
+const PodcastShowPage = lazyWithRetry(() => import('./pages/podcasts/PodcastShowPage'));
+const PodcastEpisodePage = lazyWithRetry(() => import('./pages/podcasts/PodcastEpisodePage'));
+const PodcastStudioPage = lazyWithRetry(() => import('./pages/podcasts/PodcastStudioPage'));
+
 // Static Pages
 const FeaturesPage = lazyWithRetry(() => import('@/pages/public/FeaturesPage'));
 const ChangelogPage = lazyWithRetry(() => import('@/pages/public/ChangelogPage'));
@@ -580,6 +586,38 @@ function AppRoutes() {
           <FeatureGate feature="courses" redirect="/">
             <FeatureErrorBoundary featureName="Courses">
               <CourseDetailPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+
+        {/* Podcasts Module (alpha) — feature-gated */}
+        <Route path="podcasts" element={
+          <FeatureGate feature="podcasts" redirect="/">
+            <FeatureErrorBoundary featureName="Podcasts">
+              <PodcastsPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="podcasts/studio" element={
+          <ProtectedRoute>
+            <FeatureGate feature="podcasts" redirect="/">
+              <FeatureErrorBoundary featureName="Podcasts">
+                <PodcastStudioPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          </ProtectedRoute>
+        } />
+        <Route path="podcasts/:showSlug" element={
+          <FeatureGate feature="podcasts" redirect="/">
+            <FeatureErrorBoundary featureName="Podcasts">
+              <PodcastShowPage />
+            </FeatureErrorBoundary>
+          </FeatureGate>
+        } />
+        <Route path="podcasts/:showSlug/:episodeSlug" element={
+          <FeatureGate feature="podcasts" redirect="/">
+            <FeatureErrorBoundary featureName="Podcasts">
+              <PodcastEpisodePage />
             </FeatureErrorBoundary>
           </FeatureGate>
         } />

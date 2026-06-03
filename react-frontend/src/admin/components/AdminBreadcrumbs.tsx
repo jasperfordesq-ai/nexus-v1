@@ -275,6 +275,7 @@ const SEGMENT_LABEL_KEYS: Record<string, string> = {
   tenant: 'breadcrumbs.tenant',
   webhooks: 'breadcrumbs.webhooks',
   login: 'breadcrumbs.login',
+  podcasts: 'breadcrumbs.podcasts',
   'member-premium': 'breadcrumbs.member_premium',
   fadp: 'breadcrumbs.fadp',
   'push-campaigns': 'breadcrumbs.push_campaigns',

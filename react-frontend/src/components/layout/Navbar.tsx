@@ -53,6 +53,7 @@ import Bot from 'lucide-react/icons/bot';
 import Briefcase from 'lucide-react/icons/briefcase';
 import Lightbulb from 'lucide-react/icons/lightbulb';
 import GraduationCap from 'lucide-react/icons/graduation-cap';
+import Podcast from 'lucide-react/icons/podcast';
 import Activity from 'lucide-react/icons/activity';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import Fingerprint from 'lucide-react/icons/fingerprint';
@@ -306,6 +307,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
       { label: t('nav.jobs'), desc: t('nav_desc.jobs'), path: '/jobs', href: tenantPath('/jobs'), icon: Briefcase, feature: 'job_vacancies' as const },
       { label: t('nav.marketplace'), desc: t('nav_desc.marketplace'), path: '/marketplace', href: tenantPath('/marketplace'), icon: ShoppingBag, feature: 'marketplace' as const },
       { label: t('nav.courses'), desc: t('nav_desc.courses'), path: '/courses', href: tenantPath('/courses'), icon: GraduationCap, feature: 'courses' as const },
+      { label: t('nav.podcasts'), desc: t('nav_desc.podcasts'), path: '/podcasts', href: tenantPath('/podcasts'), icon: Podcast, feature: 'podcasts' as const },
       { label: t('nav.premium'), desc: t('nav_desc.premium'), path: '/premium', href: tenantPath('/premium'), icon: Crown, feature: 'member_premium' as const },
     );
     return items;

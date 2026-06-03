@@ -48,6 +48,9 @@ class TenantFeatureConfig
         // Courses (alpha) — opt-in per tenant. Ships marked stage:'alpha' in the
         // React module registry. Default OFF like marketplace / caring_community.
         'courses' => false,
+        // Podcasts (alpha) — opt-in per tenant. Member-created shows are controlled
+        // separately by podcasts.allow_member_show_creation and default ON there.
+        'podcasts' => false,
     ];
 
     /**

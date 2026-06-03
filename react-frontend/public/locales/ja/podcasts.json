@@ -1,0 +1,113 @@
+{
+  "title": "Podcasts",
+  "subtitle": "コミュニティ ショー、オーディオ ストーリー、インタビュー、メンバーからの地元の知識。",
+  "actions": {
+    "back_to_podcasts": "ポッドキャストに戻る",
+    "back_to_show": "ショーに戻る"
+  },
+  "browse": {
+    "search_placeholder": "番組を検索する",
+    "empty": "ポッドキャスト番組はまだありません",
+    "empty_hint": "メンバーが承認された番組を公開すると、ここに表示されます。",
+    "load_more": "さらにロードする"
+  },
+  "show": {
+    "not_found": "ポッドキャスト番組が見つかりません",
+    "no_summary": "まだ概要はありません。",
+    "byline": "Hosted by {{name}}",
+    "community_show": "コミュニティショー",
+    "episode_count_one": "{{count}} episode",
+    "episode_count_other": "{{count}} episodes",
+    "rss_feed": "RSSフィード",
+    "episodes": "Episodes",
+    "no_episodes": "公開されたエピソードはまだありません。"
+  },
+  "episode": {
+    "title": "ポッドキャストのエピソード",
+    "not_found": "ポッドキャストのエピソードが見つかりません",
+    "no_summary": "まだ概要はありません。",
+    "listen": "Listen",
+    "from_show": "From {{title}}",
+    "description": "Description",
+    "transcript": "Transcript",
+    "chapters": "Chapters",
+    "explicit": "Explicit",
+    "react": "React",
+    "reacted": "Reacted",
+    "type": {
+      "full": "エピソード全体",
+      "trailer": "Trailer",
+      "bonus": "Bonus"
+    }
+  },
+  "player": {
+    "unsupported": "お使いのブラウザはオーディオ プレーヤーをサポートしていません。",
+    "duration_unknown": "期間不明",
+    "progress": "再生の進行状況"
+  },
+  "studio": {
+    "title": "Podcast Studio",
+    "subtitle": "メンバー主導の番組を作成し、エピソードを追加して、コミュニティ ポッドキャスト ライブラリに公開します。",
+    "create_show": "番組の作成",
+    "manage_show": "番組の管理",
+    "add_episode": "エピソードを追加",
+    "my_shows": "私の番組",
+    "no_shows": "まだ番組を作成していません。",
+    "select_show": "番組を選択",
+    "publish_show": "番組を公開する",
+    "publish_episode": "エピソードを公開する",
+    "archive_show": "アーカイブ番組",
+    "delete_show": "番組を削除する",
+    "archive_episode": "アーカイブエピソード",
+    "delete_episode": "エピソードを削除する",
+    "show_created": "ショーが作成されました。",
+    "show_published": "ショーが公開されました。",
+    "show_archived": "アーカイブされたものを表示します。",
+    "show_deleted": "削除された番組。",
+    "episode_created": "エピソードが作成されました。",
+    "episode_published": "エピソードが公開されました。",
+    "episode_archived": "エピソードがアーカイブされました。",
+    "episode_deleted": "エピソードが削除されました。",
+    "save_failed": "変更を保存できませんでした。",
+    "confirm_archive_show": "{{title}} をアーカイブしますか?公開ポッドキャスト リストからは非表示になります。",
+    "confirm_delete_show": "{{title}} とそのすべてのエピソードを削除しますか?これを元に戻すことはできません。",
+    "confirm_archive_episode": "{{title}} をアーカイブしますか?公開ポッドキャスト リストからは非表示になります。",
+    "confirm_delete_episode": "{{title}} を削除しますか?これを元に戻すことはできません。"
+  },
+  "fields": {
+    "show": "Show",
+    "show_title": "番組タイトル",
+    "episode_title": "エピソードのタイトル",
+    "category": "Category",
+    "artwork_url": "Artwork URL",
+    "audio_url": "Audio URL",
+    "audio_file": "ホストされた音声ファイル",
+    "audio_file_hint": "プライベート NEXUS ホスティング用にオーディオをアップロードするか、外部オーディオ URL を使用します。",
+    "visibility": "Visibility",
+    "summary": "Summary",
+    "description": "Description",
+    "duration_seconds": "秒単位の継続時間",
+    "scheduled_for": "出版スケジュール",
+    "episode_type": "エピソードの種類",
+    "transcript": "Transcript",
+    "chapters": "Chapters",
+    "chapters_hint": "1 行に 1 章、例: 00:30 はじめに"
+  },
+  "visibility": {
+    "public": "Public",
+    "members": "Members",
+    "private": "Private",
+    "inherit": "ショーの可視性を継承する"
+  },
+  "status": {
+    "draft": "Draft",
+    "published": "Published",
+    "archived": "Archived"
+  },
+  "moderation": {
+    "pending": "審査待ち",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "flagged": "Flagged"
+  }
+}

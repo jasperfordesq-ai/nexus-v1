@@ -3334,6 +3334,80 @@
       "delete_failed": "Delete failed"
     }
   },
+  "podcasts_admin": {
+    "title": "Podcasts",
+    "description": "Review community shows and episodes, including content held for tenant moderation.",
+    "load_failed": "Could not load podcast moderation.",
+    "action_failed": "Could not update podcast moderation.",
+    "empty_value": "-",
+    "count": "{{count}} items",
+    "actions": {
+      "refresh": "Refresh",
+      "approve": "Approve",
+      "reject": "Reject",
+      "flag": "Flag"
+    },
+    "filters": {
+      "label": "Podcast moderation filter",
+      "all": "All",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "flagged": "Flagged"
+    },
+    "sections": {
+      "shows": "Shows",
+      "episodes": "Episodes",
+      "top_episodes": "Top episodes"
+    },
+    "columns": {
+      "title": "Title",
+      "owner": "Owner",
+      "show": "Show",
+      "author": "Author",
+      "status": "Status",
+      "moderation": "Moderation",
+      "updated": "Updated",
+      "actions": "Actions",
+      "listens": "Listens"
+    },
+    "stats": {
+      "total_shows": "Shows",
+      "published_shows": "Published shows",
+      "pending_shows": "Pending shows",
+      "total_episodes": "Episodes",
+      "published_episodes": "Published episodes",
+      "pending_episodes": "Pending episodes",
+      "total_listens": "Listens",
+      "completed_listens": "Completed listens",
+      "completion_rate": "Completion rate",
+      "percent": "{{value}}%"
+    },
+    "status": {
+      "draft": "Draft",
+      "published": "Published",
+      "archived": "Archived"
+    },
+    "moderation": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "flagged": "Flagged"
+    },
+    "empty": {
+      "shows": "No shows match the current filter.",
+      "episodes": "No episodes match the current filter.",
+      "top_episodes": "No listen analytics yet."
+    },
+    "toasts": {
+      "show_approve": "Show approved.",
+      "show_reject": "Show rejected.",
+      "show_flag": "Show flagged.",
+      "episode_approve": "Episode approved.",
+      "episode_reject": "Episode rejected.",
+      "episode_flag": "Episode flagged."
+    }
+  },
   "member_premium_admin": {
     "meta": {
       "title": "Member Premium Tiers",
@@ -5255,6 +5329,7 @@
     "regional_points": "Regional Points",
     "advertising": "Advertising",
     "api_partners": "API Partners",
+    "podcasts": "Podcasts",
     "member_premium": "Member Premium",
     "fadp": "FADP",
     "push_campaigns": "Push Campaigns",
@@ -6199,6 +6274,8 @@
     "modal_identity_saved": "Modal Identity saved",
     "modal_job_load_failed": "Modal Job Load failed",
     "modal_job_saved": "Modal Job saved",
+    "modal_podcast_load_failed": "Could not load podcast settings.",
+    "modal_podcast_saved": "Podcast settings saved.",
     "modal_listing_load_failed": "Modal Listing Load failed",
     "modal_listing_saved": "Modal Listing saved",
     "modal_onboarding_desc": "Modal Onboarding.",
@@ -6266,6 +6343,8 @@
     "module_desc_marketplace": "Commercial buy/sell marketplace for physical goods and paid services",
     "module_name_courses": "Courses",
     "module_desc_courses": "Community learning — courses, lessons, quizzes, enrollment, and certificates",
+    "module_name_podcasts": "Podcasts",
+    "module_desc_podcasts": "Community audio — member-created shows, episodes, transcripts, chapters, RSS, and moderation",
     "module_name_identity_verification": "Identity Verification",
     "module_desc_identity_verification": "Stripe Identity verification with ID Verified badge, document + selfie matching, and configurable fee",
     "module_name_members": "Members",
@@ -6289,6 +6368,31 @@
     "module_desc_newsletter": "Email newsletter campaigns, subscribers, segments, templates, and analytics.",
     "module_name_message_translation": "Message Translation",
     "module_desc_message_translation": "Auto-translate direct messages between members who speak different languages.",
+    "option_podcasts_allow_member_show_creation_label": "Member Show Creation",
+    "option_podcasts_allow_member_show_creation_desc": "Allow ordinary members to create podcast shows. This is on by default.",
+    "option_podcasts_max_shows_per_user_label": "Max Shows Per Member",
+    "option_podcasts_max_shows_per_user_desc": "Maximum number of shows one member can own. Set to 0 for no limit.",
+    "option_podcasts_moderation_enabled_label": "Require Moderation",
+    "option_podcasts_moderation_enabled_desc": "Newly published shows and episodes stay pending until an admin approves them. Off by default.",
+    "option_podcasts_enable_rss_feed_label": "RSS Feeds",
+    "option_podcasts_enable_rss_feed_desc": "Publish standards-compatible RSS feeds for public shows.",
+    "option_podcasts_enable_private_shows_label": "Private Shows",
+    "option_podcasts_enable_private_shows_desc": "Allow creators to keep shows private or members-only.",
+    "option_podcasts_enable_transcripts_label": "Transcripts",
+    "option_podcasts_enable_transcripts_desc": "Allow episode transcripts for accessibility and search.",
+    "option_podcasts_enable_chapters_label": "Chapters",
+    "option_podcasts_enable_chapters_desc": "Allow timestamped episode chapters.",
+    "option_podcasts_enable_episode_reactions_label": "Episode Reactions",
+    "option_podcasts_enable_episode_reactions_desc": "Allow members to react to episodes.",
+    "option_podcasts_enable_listen_analytics_label": "Listen Analytics",
+    "option_podcasts_enable_listen_analytics_desc": "Record tenant-scoped listens and completion signals.",
+    "option_podcasts_max_audio_size_mb_label": "Max Audio Size",
+    "option_podcasts_max_audio_size_mb_desc": "Maximum episode audio file size in megabytes for future uploads.",
+    "option_category_authoring": "Authoring",
+    "option_category_publishing": "Publishing",
+    "option_category_accessibility": "Accessibility",
+    "option_category_community": "Community",
+    "option_category_analytics": "Analytics",
     "option_listing_moderation_enabled_label": "Require Moderation",
     "option_listing_moderation_enabled_desc": "New listings must be approved by an admin before going live",
     "option_category_moderation_approval": "Moderation & Approval",

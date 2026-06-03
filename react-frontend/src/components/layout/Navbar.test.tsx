@@ -97,8 +97,14 @@ const i18nMap: Record<string, string> = {
   'nav.more': 'More',
   'nav.ideation': 'Ideas',
   'nav.partner_communities': 'Partner Communities',
+  'nav.courses': 'Courses',
+  'nav.podcasts': 'Podcasts',
+  'nav.premium': 'Premium',
   'nav_desc.ideation': 'Ideas & innovation challenges',
   'nav_desc.partner_communities': 'Federation Hub',
+  'nav_desc.courses': 'Community learning',
+  'nav_desc.podcasts': 'Community shows and episodes',
+  'nav_desc.premium': 'Premium member benefits',
   'nav.unread_notifications': 'Notifications, 5 unread',
   'nav.accessibility_alpha': 'Accessibility (alpha)',
   'theme_picker.open_label': 'Theme',
@@ -575,6 +581,26 @@ describe('Navbar', () => {
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledWith('/federation');
       });
+    });
+
+    it('places Podcasts after Courses and before Premium when enabled', async () => {
+      const user = userEvent.setup();
+      setupDefaultMocks({
+        auth: { user: { id: 1, first_name: 'A', last_name: 'B', email: 'a@b.com', role: 'member' }, isAuthenticated: true },
+        tenant: {
+          hasFeature: vi.fn((feature: string) => ['courses', 'podcasts', 'member_premium'].includes(feature)),
+          hasModule: vi.fn(() => false),
+        },
+      });
+
+      render(<Navbar />);
+      await user.click(screen.getByRole('button', { name: 'Community' }));
+
+      expect(screen.getByRole('menuitem', { name: /^Podcasts\b/ })).toBeInTheDocument();
+
+      const bodyText = document.body.textContent ?? '';
+      expect(bodyText.indexOf('Courses')).toBeLessThan(bodyText.indexOf('Podcasts'));
+      expect(bodyText.indexOf('Podcasts')).toBeLessThan(bodyText.indexOf('Premium'));
     });
   });
 

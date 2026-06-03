@@ -1,0 +1,132 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link, useParams } from 'react-router-dom';
+import { Avatar, Button, Card, CardBody, Chip, Spinner } from '@/components/ui';
+import { useAuth, useTenant } from '@/contexts';
+import { usePageTitle } from '@/hooks';
+import { API_BASE } from '@/lib/api';
+import { podcastsApi, type PodcastShow } from '@/lib/api/podcasts';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Radio from 'lucide-react/icons/radio';
+import Rss from 'lucide-react/icons/rss';
+
+export default function PodcastShowPage() {
+  const { t } = useTranslation('podcasts');
+  const { showSlug = '' } = useParams();
+  const { tenant, tenantPath } = useTenant();
+  const { user } = useAuth();
+  const [show, setShow] = useState<PodcastShow | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  usePageTitle(show?.title ?? t('title'));
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    podcastsApi.show(showSlug)
+      .then((res) => {
+        if (!cancelled) setShow(res.success && res.data ? res.data : null);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [showSlug]);
+
+  const isOwner = user?.id && show?.owner_user_id === user.id;
+  const feedUrl = tenant?.id
+    ? `${API_BASE}/v2/podcasts/feed/${tenant.id}/${encodeURIComponent(showSlug)}.xml`
+    : `${API_BASE}/v2/podcasts/${encodeURIComponent(showSlug)}/feed.xml`;
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-20" role="status" aria-busy="true">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  if (!show) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-16 text-center">
+        <p className="text-lg font-medium">{t('show.not_found')}</p>
+        <Button as={Link} to={tenantPath('/podcasts')} className="mt-4" variant="tertiary">
+          {t('actions.back_to_podcasts')}
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto max-w-6xl px-4 py-6">
+      <Button as={Link} to={tenantPath('/podcasts')} variant="tertiary" size="sm" startContent={<ArrowLeft size={16} aria-hidden="true" />}>
+        {t('actions.back_to_podcasts')}
+      </Button>
+
+      <section className="mt-5 grid gap-6 md:grid-cols-[12rem_1fr]">
+        <Avatar src={show.artwork_url ?? undefined} name={show.title} radius="md" className="h-48 w-48" />
+        <div className="min-w-0">
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <Chip size="sm" variant="soft">{t(`visibility.${show.visibility}`)}</Chip>
+            {show.category ? <Chip size="sm" variant="soft">{show.category}</Chip> : null}
+            {show.status !== 'published' || show.moderation_status !== 'approved' ? (
+              <Chip size="sm" variant="soft" color="warning">{t(`moderation.${show.moderation_status}`)}</Chip>
+            ) : null}
+          </div>
+          <h1 className="text-3xl font-bold leading-tight">{show.title}</h1>
+          <p className="mt-2 text-sm text-muted">{show.owner?.name ? t('show.byline', { name: show.owner.name }) : t('show.community_show')}</p>
+          {show.summary && <p className="mt-4 max-w-3xl text-base text-foreground">{show.summary}</p>}
+          {show.description && <p className="mt-3 max-w-3xl whitespace-pre-line text-sm text-muted">{show.description}</p>}
+
+          <div className="mt-5 flex flex-wrap gap-2">
+            {show.rss_enabled && (
+              <Button as="a" href={feedUrl} variant="tertiary" size="sm" startContent={<Rss size={16} aria-hidden="true" />}>
+                {t('show.rss_feed')}
+              </Button>
+            )}
+            {isOwner && (
+              <Button as={Link} to={tenantPath('/podcasts/studio')} color="primary" size="sm">
+                {t('studio.manage_show')}
+              </Button>
+            )}
+          </div>
+        </div>
+      </section>
+
+      <section className="mt-8">
+        <h2 className="mb-4 text-xl font-semibold">{t('show.episodes')}</h2>
+        {show.episodes && show.episodes.length > 0 ? (
+          <div className="space-y-3">
+            {show.episodes.map((episode) => (
+              <Card key={episode.id}>
+                <CardBody className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="min-w-0">
+                    <Link className="font-semibold hover:text-accent" to={tenantPath(`/podcasts/${show.slug}/${episode.slug}`)}>
+                      {episode.title}
+                    </Link>
+                    <p className="mt-1 line-clamp-2 text-sm text-muted">{episode.summary || episode.description || t('episode.no_summary')}</p>
+                  </div>
+                  <Button as={Link} to={tenantPath(`/podcasts/${show.slug}/${episode.slug}`)} variant="tertiary" size="sm" startContent={<Radio size={16} aria-hidden="true" />}>
+                    {t('episode.listen')}
+                  </Button>
+                </CardBody>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-lg border border-border bg-surface-secondary/60 px-5 py-8 text-center text-muted">
+            {t('show.no_episodes')}
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}

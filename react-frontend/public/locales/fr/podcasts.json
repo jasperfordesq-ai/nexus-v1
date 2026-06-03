@@ -1,0 +1,113 @@
+{
+  "title": "Podcasts",
+  "subtitle": "Émissions communautaires, histoires audio, interviews et connaissances locales des membres.",
+  "actions": {
+    "back_to_podcasts": "Retour aux podcasts",
+    "back_to_show": "Retour au spectacle"
+  },
+  "browse": {
+    "search_placeholder": "Rechercher des émissions",
+    "empty": "Aucune émission de podcast pour l'instant",
+    "empty_hint": "Lorsque les membres publient des émissions approuvées, elles apparaîtront ici.",
+    "load_more": "Charger plus"
+  },
+  "show": {
+    "not_found": "Émission de podcast introuvable",
+    "no_summary": "Pas encore de résumé.",
+    "byline": "Hosted by {{name}}",
+    "community_show": "Spectacle communautaire",
+    "episode_count_one": "{{count}} episode",
+    "episode_count_other": "{{count}} episodes",
+    "rss_feed": "Flux RSS",
+    "episodes": "Episodes",
+    "no_episodes": "Aucun épisode publié pour l'instant."
+  },
+  "episode": {
+    "title": "Épisode de podcast",
+    "not_found": "Épisode de podcast introuvable",
+    "no_summary": "Pas encore de résumé.",
+    "listen": "Listen",
+    "from_show": "From {{title}}",
+    "description": "Description",
+    "transcript": "Transcript",
+    "chapters": "Chapters",
+    "explicit": "Explicit",
+    "react": "React",
+    "reacted": "Reacted",
+    "type": {
+      "full": "Épisode complet",
+      "trailer": "Trailer",
+      "bonus": "Bonus"
+    }
+  },
+  "player": {
+    "unsupported": "Votre navigateur ne prend pas en charge le lecteur audio.",
+    "duration_unknown": "Durée inconnue",
+    "progress": "Progression de la lecture"
+  },
+  "studio": {
+    "title": "Podcast Studio",
+    "subtitle": "Créez des émissions dirigées par les membres, ajoutez des épisodes et publiez-les dans la bibliothèque de podcasts de la communauté.",
+    "create_show": "Créer un spectacle",
+    "manage_show": "Gérer le spectacle",
+    "add_episode": "Ajouter un épisode",
+    "my_shows": "Mes spectacles",
+    "no_shows": "Vous n'avez pas encore créé de spectacles.",
+    "select_show": "Sélectionnez le spectacle",
+    "publish_show": "Publier l'émission",
+    "publish_episode": "Publier l'épisode",
+    "archive_show": "Spectacle d'archives",
+    "delete_show": "Supprimer l'émission",
+    "archive_episode": "Archiver l'épisode",
+    "delete_episode": "Supprimer l'épisode",
+    "show_created": "Spectacle créé.",
+    "show_published": "Spectacle publié.",
+    "show_archived": "Spectacle archivé.",
+    "show_deleted": "Afficher supprimé.",
+    "episode_created": "Épisode créé.",
+    "episode_published": "Épisode publié.",
+    "episode_archived": "Épisode archivé.",
+    "episode_deleted": "Épisode supprimé.",
+    "save_failed": "Impossible d'enregistrer les modifications.",
+    "confirm_archive_show": "Archiver {{title}} ? Il sera masqué des listes de podcasts publiques.",
+    "confirm_delete_show": "Supprimer {{title}} et tous ses épisodes ? Cela ne peut pas être annulé.",
+    "confirm_archive_episode": "Archiver {{title}} ? Il sera masqué des listes de podcasts publiques.",
+    "confirm_delete_episode": "Supprimer {{title}} ? Cela ne peut pas être annulé."
+  },
+  "fields": {
+    "show": "Show",
+    "show_title": "Afficher le titre",
+    "episode_title": "Titre de l'épisode",
+    "category": "Category",
+    "artwork_url": "Artwork URL",
+    "audio_url": "Audio URL",
+    "audio_file": "Fichier audio hébergé",
+    "audio_file_hint": "Téléchargez de l'audio pour un hébergement NEXUS privé ou utilisez une URL audio externe.",
+    "visibility": "Visibility",
+    "summary": "Summary",
+    "description": "Description",
+    "duration_seconds": "Durée en secondes",
+    "scheduled_for": "Calendrier de publication",
+    "episode_type": "Type d'épisode",
+    "transcript": "Transcript",
+    "chapters": "Chapters",
+    "chapters_hint": "Un chapitre par ligne, par exemple : 00:30 Introductions"
+  },
+  "visibility": {
+    "public": "Public",
+    "members": "Members",
+    "private": "Private",
+    "inherit": "Hériter de la visibilité de l'exposition"
+  },
+  "status": {
+    "draft": "Draft",
+    "published": "Published",
+    "archived": "Archived"
+  },
+  "moderation": {
+    "pending": "En attente d'examen",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "flagged": "Flagged"
+  }
+}

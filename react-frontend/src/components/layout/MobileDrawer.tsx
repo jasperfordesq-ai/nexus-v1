@@ -51,6 +51,7 @@ import Briefcase from 'lucide-react/icons/briefcase';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import Lightbulb from 'lucide-react/icons/lightbulb';
 import GraduationCap from 'lucide-react/icons/graduation-cap';
+import Podcast from 'lucide-react/icons/podcast';
 import Activity from 'lucide-react/icons/activity';
 import Fingerprint from 'lucide-react/icons/fingerprint';
 import Bookmark from 'lucide-react/icons/bookmark';
@@ -195,6 +196,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     { label: t('nav.jobs'), href: '/jobs', icon: Briefcase, feature: 'job_vacancies' as const },
     { label: t('nav.marketplace'), href: '/marketplace', icon: ShoppingBag, feature: 'marketplace' as const },
     { label: t('nav.courses'), href: '/courses', icon: GraduationCap, feature: 'courses' as const },
+    { label: t('nav.podcasts'), href: '/podcasts', icon: Podcast, feature: 'podcasts' as const },
   ];
 
   const engageNavItems = [

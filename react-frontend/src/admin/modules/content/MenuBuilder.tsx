@@ -107,6 +107,8 @@ const getAppRoutes = (t: TFunction): { value: string; label: string; group: stri
   { value: '/goals', label: t('config.module_name_goals'), group: t('menu_builder.group_features') },
   { value: '/blog', label: t('config.module_name_blog'), group: t('menu_builder.group_features') },
   { value: '/resources', label: t('config.module_name_resources'), group: t('menu_builder.group_features') },
+  { value: '/courses', label: t('config.module_name_courses'), group: t('menu_builder.group_features') },
+  { value: '/podcasts', label: t('config.module_name_podcasts'), group: t('menu_builder.group_features') },
   { value: '/jobs', label: t('config.module_name_job_vacancies'), group: t('menu_builder.group_features') },
   { value: '/marketplace', label: t('config.module_name_marketplace'), group: t('menu_builder.group_features') },
   { value: '/leaderboard', label: t('config.module_name_leaderboard'), group: t('menu_builder.group_gamification') },
@@ -169,6 +171,16 @@ function getDefaultItems(t: TFunction): MenuItemData[] {
     {
       id: next(), label: t('config.module_name_resources'), url: '/resources', type: 'link',
       icon: 'FolderOpen', target: '_self', sort_order: 8, parent_id: communityId,
+      visibility_rules: null, is_active: 1, css_class: null,
+    },
+    {
+      id: next(), label: t('config.module_name_courses'), url: '/courses', type: 'link',
+      icon: 'BookOpen', target: '_self', sort_order: 9, parent_id: communityId,
+      visibility_rules: null, is_active: 1, css_class: null,
+    },
+    {
+      id: next(), label: t('config.module_name_podcasts'), url: '/podcasts', type: 'link',
+      icon: 'Podcast', target: '_self', sort_order: 10, parent_id: communityId,
       visibility_rules: null, is_active: 1, css_class: null,
     },
   ];

@@ -367,6 +367,17 @@ export const adminConfig = {
       { settings }
     ),
 
+  getPodcastConfig: () =>
+    api.get<{ config: Record<string, boolean | number | string>; defaults: Record<string, boolean | number | string> }>(
+      '/v2/admin/config/podcasts'
+    ),
+
+  updatePodcastConfigBulk: (settings: Record<string, boolean | number | string>) =>
+    api.put<{ updated: Record<string, boolean | number | string> }>(
+      '/v2/admin/config/podcasts/bulk',
+      { settings }
+    ),
+
   getIdentityConfig: () =>
     api.get<{ config: Record<string, boolean | number | string>; defaults: Record<string, boolean | number | string> }>(
       '/v2/admin/config/identity'

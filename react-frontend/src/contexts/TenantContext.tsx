@@ -116,6 +116,7 @@ const defaultFeatures: TenantFeatures = {
   maps: true,
   // Courses (alpha) — opt-in per tenant. Synced with PHP TenantFeatureConfig.
   courses: false,
+  podcasts: false,
 };
 
 // Default modules (all enabled)

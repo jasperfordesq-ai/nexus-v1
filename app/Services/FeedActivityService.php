@@ -26,7 +26,7 @@ class FeedActivityService
         'post', 'listing', 'event', 'poll', 'goal',
         'review', 'job', 'challenge', 'volunteer',
         'blog', 'discussion', 'badge_earned', 'level_up',
-        'course',
+        'course', 'podcast_show', 'podcast_episode',
     ];
 
     public function __construct()

@@ -22,6 +22,7 @@ import HelpCircle from 'lucide-react/icons/circle-help';
 import Newspaper from 'lucide-react/icons/newspaper';
 import BookOpen from 'lucide-react/icons/book-open';
 import FolderOpen from 'lucide-react/icons/folder-open';
+import Podcast from 'lucide-react/icons/podcast';
 import Heart from 'lucide-react/icons/heart';
 import Building2 from 'lucide-react/icons/building-2';
 import Globe from 'lucide-react/icons/globe';
@@ -99,6 +100,7 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   Newspaper,
   BookOpen,
   FolderOpen,
+  Podcast,
   Heart,
   Building2,
   Globe,

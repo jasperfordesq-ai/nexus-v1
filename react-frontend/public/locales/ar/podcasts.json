@@ -1,0 +1,113 @@
+{
+  "title": "Podcasts",
+  "subtitle": "العروض المجتمعية والقصص الصوتية والمقابلات والمعرفة المحلية من الأعضاء.",
+  "actions": {
+    "back_to_podcasts": "العودة إلى البودكاست",
+    "back_to_show": "العودة للعرض"
+  },
+  "browse": {
+    "search_placeholder": "يظهر البحث",
+    "empty": "لا يوجد عروض بودكاست حتى الآن",
+    "empty_hint": "عندما ينشر الأعضاء العروض المعتمدة، ستظهر هنا.",
+    "load_more": "تحميل المزيد"
+  },
+  "show": {
+    "not_found": "لم يتم العثور على عرض البودكاست",
+    "no_summary": "لا يوجد ملخص بعد.",
+    "byline": "Hosted by {{name}}",
+    "community_show": "عرض المجتمع",
+    "episode_count_one": "{{count}} episode",
+    "episode_count_other": "{{count}} episodes",
+    "rss_feed": "تغذية آر إس إس",
+    "episodes": "Episodes",
+    "no_episodes": "لم يتم نشر أي حلقات بعد."
+  },
+  "episode": {
+    "title": "حلقة بودكاست",
+    "not_found": "لم يتم العثور على حلقة البودكاست",
+    "no_summary": "لا يوجد ملخص بعد.",
+    "listen": "Listen",
+    "from_show": "From {{title}}",
+    "description": "Description",
+    "transcript": "Transcript",
+    "chapters": "Chapters",
+    "explicit": "Explicit",
+    "react": "React",
+    "reacted": "Reacted",
+    "type": {
+      "full": "الحلقة كاملة",
+      "trailer": "Trailer",
+      "bonus": "Bonus"
+    }
+  },
+  "player": {
+    "unsupported": "متصفحك لا يدعم مشغل الصوت.",
+    "duration_unknown": "المدة غير معروفة",
+    "progress": "تقدم التشغيل"
+  },
+  "studio": {
+    "title": "Podcast Studio",
+    "subtitle": "أنشئ عروضًا يقودها الأعضاء وأضف الحلقات وانشرها في مكتبة البودكاست المجتمعية.",
+    "create_show": "إنشاء عرض",
+    "manage_show": "إدارة العرض",
+    "add_episode": "أضف الحلقة",
+    "my_shows": "عروضي",
+    "no_shows": "لم تقم بإنشاء أي عروض حتى الآن.",
+    "select_show": "حدد العرض",
+    "publish_show": "نشر العرض",
+    "publish_episode": "نشر الحلقة",
+    "archive_show": "عرض الأرشيف",
+    "delete_show": "حذف العرض",
+    "archive_episode": "الحلقة الأرشيفية",
+    "delete_episode": "حذف الحلقة",
+    "show_created": "عرض تم إنشاؤه.",
+    "show_published": "عرض المنشورة.",
+    "show_archived": "عرض المؤرشفة.",
+    "show_deleted": "إظهار المحذوفة.",
+    "episode_created": "تم إنشاء الحلقة.",
+    "episode_published": "تم نشر الحلقة .",
+    "episode_archived": "تم أرشفة الحلقة.",
+    "episode_deleted": "تم حذف الحلقة.",
+    "save_failed": "لا يمكن حفظ التغييرات.",
+    "confirm_archive_show": "أرشيف {{title}}؟ سيتم إخفاؤه من قوائم البودكاست العامة.",
+    "confirm_delete_show": "هل تريد حذف {{title}} وجميع حلقاته؟ لا يمكن التراجع عن هذا.",
+    "confirm_archive_episode": "أرشيف {{title}}؟ سيتم إخفاؤه من قوائم البودكاست العامة.",
+    "confirm_delete_episode": "هل تريد حذف {{title}}؟ لا يمكن التراجع عن هذا."
+  },
+  "fields": {
+    "show": "Show",
+    "show_title": "إظهار العنوان",
+    "episode_title": "عنوان الحلقة",
+    "category": "Category",
+    "artwork_url": "Artwork URL",
+    "audio_url": "Audio URL",
+    "audio_file": "ملف صوتي مستضاف",
+    "audio_file_hint": "قم بتحميل الصوت لاستضافة NEXUS الخاصة، أو استخدم عنوان URL صوتيًا خارجيًا.",
+    "visibility": "Visibility",
+    "summary": "Summary",
+    "description": "Description",
+    "duration_seconds": "المدة بالثواني",
+    "scheduled_for": "جدولة النشر",
+    "episode_type": "نوع الحلقة",
+    "transcript": "Transcript",
+    "chapters": "Chapters",
+    "chapters_hint": "فصل واحد في كل سطر، على سبيل المثال: 00:30 مقدمات"
+  },
+  "visibility": {
+    "public": "Public",
+    "members": "Members",
+    "private": "Private",
+    "inherit": "وراثة رؤية العرض"
+  },
+  "status": {
+    "draft": "Draft",
+    "published": "Published",
+    "archived": "Archived"
+  },
+  "moderation": {
+    "pending": "في انتظار المراجعة",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "flagged": "Flagged"
+  }
+}
