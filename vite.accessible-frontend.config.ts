@@ -6,6 +6,11 @@
 import { defineConfig } from 'vite';
 import path from 'path';
 
+const laravelOrigin = (process.env.ACCESSIBLE_FRONTEND_LARAVEL_ORIGIN || process.env.APP_URL || 'http://127.0.0.1:8088')
+  .replace(/\/+$/, '');
+
+const pageRoutePattern = /^\/([a-zA-Z0-9_-]+)(\/alpha(?:\/.*)?|\/?)$/;
+
 export default defineConfig({
   build: {
     outDir: 'httpdocs/build/accessible-frontend',
@@ -17,6 +22,40 @@ export default defineConfig({
       },
     },
   },
+  plugins: [
+    {
+      name: 'nexus-accessible-frontend-dev-redirects',
+      apply: 'serve',
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          if (!req.url || !['GET', 'HEAD'].includes(req.method ?? 'GET')) {
+            next();
+            return;
+          }
+
+          const requestUrl = new URL(req.url, 'http://127.0.0.1');
+          if (requestUrl.pathname === '/') {
+            res.statusCode = 302;
+            res.setHeader('Location', `${laravelOrigin}/`);
+            res.end();
+            return;
+          }
+
+          const match = requestUrl.pathname.match(pageRoutePattern);
+          if (!match) {
+            next();
+            return;
+          }
+
+          const tenantSlug = match[1];
+          const alphaPath = match[2].startsWith('/alpha') ? match[2] : '/alpha';
+          res.statusCode = 302;
+          res.setHeader('Location', `${laravelOrigin}/${tenantSlug}${alphaPath}${requestUrl.search}`);
+          res.end();
+        });
+      },
+    },
+  ],
   css: {
     preprocessorOptions: {
       scss: {
