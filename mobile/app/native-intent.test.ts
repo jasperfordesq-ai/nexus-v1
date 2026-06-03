@@ -33,6 +33,17 @@ describe('native intent route rewriting', () => {
     expect(mapSystemPathToNativeRoute('/ideation/23')).toBe('/(modals)/ideation-detail?id=23');
   });
 
+  it('maps discover and support/legal web aliases to implemented native routes', () => {
+    expect(mapSystemPathToNativeRoute('/explore')).toBe('/(tabs)/explore');
+    expect(mapSystemPathToNativeRoute('/discover')).toBe('/(tabs)/explore');
+    expect(mapSystemPathToNativeRoute('nexus:///support')).toBe('/(modals)/support');
+    expect(mapSystemPathToNativeRoute('/legal')).toBe('/(modals)/support');
+    expect(mapSystemPathToNativeRoute('/privacy')).toBe('/(modals)/support?doc=privacy');
+    expect(mapSystemPathToNativeRoute('/terms')).toBe('/(modals)/support?doc=terms');
+    expect(mapSystemPathToNativeRoute('/trust-and-safety')).toBe('/(modals)/support?doc=trust');
+    expect(mapSystemPathToNativeRoute('/platform/privacy')).toBe('/(modals)/support?doc=privacy');
+  });
+
   it('preserves unknown paths so Expo Router can handle native routes normally', () => {
     expect(mapSystemPathToNativeRoute('/(modals)/exchange-detail?id=90877')).toBeNull();
     expect(redirectSystemPath({ path: '/(modals)/exchange-detail?id=90877', initial: false })).toBe('/(modals)/exchange-detail?id=90877');

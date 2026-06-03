@@ -21,6 +21,21 @@ const KNOWN_SECTIONS = new Set([
   'polls',
   'ideation',
   'challenges',
+  'explore',
+  'discover',
+  'search',
+  'resources',
+  'support',
+  'help',
+  'legal',
+  'about',
+  'contact',
+  'terms',
+  'privacy',
+  'cookies',
+  'accessibility',
+  'trust-and-safety',
+  'platform',
 ]);
 
 export function redirectSystemPath({ path }: RedirectEvent): string {
@@ -77,6 +92,36 @@ export function mapSystemPathToNativeRoute(rawPath: string | null): string | nul
     case 'challenges':
       if (isCreateAlias(id)) return appendParams('/(modals)/new-challenge', params);
       return id ? appendParams('/(modals)/ideation-detail', { ...params, id }) : '/(modals)/ideation';
+
+    case 'explore':
+    case 'discover':
+      return appendParams('/(tabs)/explore', params);
+
+    case 'search':
+      return appendParams('/(modals)/search', params);
+
+    case 'resources':
+      return id ? appendParams('/(modals)/kb-article', { ...params, id }) : appendParams('/(modals)/resources', params);
+
+    case 'support':
+    case 'help':
+    case 'legal':
+      return appendParams('/(modals)/support', params);
+
+    case 'about':
+    case 'contact':
+    case 'terms':
+    case 'privacy':
+    case 'cookies':
+    case 'accessibility':
+    case 'trust-and-safety':
+      return appendParams('/(modals)/support', { ...params, doc: supportDocumentForSection(section) });
+
+    case 'platform':
+      if (id === 'terms' || id === 'privacy') {
+        return appendParams('/(modals)/support', { ...params, doc: id });
+      }
+      return appendParams('/(modals)/support', params);
 
     default:
       return null;
@@ -145,4 +190,8 @@ function appendParams(pathname: string, params: Record<string, string | undefine
 
 function isCreateAlias(value: string | undefined): boolean {
   return value === 'new' || value === 'create';
+}
+
+function supportDocumentForSection(section: string): string {
+  return section === 'trust-and-safety' ? 'trust' : section;
 }

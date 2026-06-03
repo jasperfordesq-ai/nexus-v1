@@ -4,10 +4,10 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import type { ComponentProps } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router, type Href } from 'expo-router';
+import { router, type Href, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Linking from 'expo-linking';
 import { useTranslation } from 'react-i18next';
@@ -97,15 +97,21 @@ export default function SupportRoute() {
 
 function SupportScreen() {
   const { t } = useTranslation(['profile', 'common']);
+  const { doc } = useLocalSearchParams<{ doc?: string | string[] }>();
   const theme = useTheme();
   const tone = theme.info ?? '#0ea5e9';
-  const [selectedDocumentKey, setSelectedDocumentKey] = useState<string | null>(null);
+  const initialDocumentKey = normalizeSupportDocumentKey(doc);
+  const [selectedDocumentKey, setSelectedDocumentKey] = useState<string | null>(initialDocumentKey);
   const selectedDocument = selectedDocumentKey ? SUPPORT_DOCUMENTS[selectedDocumentKey] : null;
 
+  useEffect(() => {
+    setSelectedDocumentKey(normalizeSupportDocumentKey(doc));
+  }, [doc]);
+
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
       <AppTopBar title={t('support.title')} backLabel={t('common:back')} fallbackHref="/(tabs)/profile" />
-      <ScrollView className="flex-1" contentContainerClassName="px-4" contentContainerStyle={{ paddingBottom: 110 }}>
+      <ScrollView className="flex-1" style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 110, paddingHorizontal: 16 }}>
         <HeroCard className="mb-4 overflow-hidden rounded-panel p-0" style={{ borderWidth: 1, borderColor: withAlpha(tone, 0.16) }}>
           <View className="h-1" style={{ backgroundColor: tone }} />
           <HeroCard.Body className="gap-4 p-5">
@@ -181,6 +187,13 @@ function SupportScreen() {
       </ScrollView>
     </SafeAreaView>
   );
+}
+
+function normalizeSupportDocumentKey(value: string | string[] | undefined): string | null {
+  const raw = Array.isArray(value) ? value[0] : value;
+  if (!raw) return null;
+  const normalized = raw === 'trust-and-safety' ? 'trust' : raw;
+  return SUPPORT_DOCUMENTS[normalized] ? normalized : null;
 }
 
 function SupportDocumentCard({

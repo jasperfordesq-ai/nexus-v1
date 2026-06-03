@@ -122,10 +122,11 @@ export default function ExploreScreen() {
   const stats = data?.community_stats;
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1, backgroundColor: theme.bg }}>
       <OfflineBanner />
       <ScrollView
         className="flex-1"
+        style={{ flex: 1 }}
         contentContainerStyle={{ paddingBottom: 120 }}
         refreshControl={<RefreshControl refreshing={isRefreshing && isLoading} onRefresh={onRefresh} tintColor={primary} />}
       >

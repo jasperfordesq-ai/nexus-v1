@@ -99,4 +99,20 @@ describe('native create/detail route layout coverage', () => {
 
     expect(riskyScrollViews).toEqual([]);
   });
+
+  it('keeps auxiliary hub routes on explicit native flex frames for Android release builds', () => {
+    const routes = [
+      path.join(projectDir, 'app/(tabs)/explore.tsx'),
+      path.join(projectDir, 'app/(modals)/support.tsx'),
+    ];
+    const riskyRoutes = routes
+      .filter((routePath) => {
+        const source = fs.readFileSync(routePath, 'utf8');
+        return !hasExplicitNativeFlexFrame(source) || !/<ScrollView[\s\S]{0,220}style=\{\{[^}]*flex:\s*1/.test(source);
+      })
+      .map((routePath) => toProjectPath(routePath))
+      .sort();
+
+    expect(riskyRoutes).toEqual([]);
+  });
 });

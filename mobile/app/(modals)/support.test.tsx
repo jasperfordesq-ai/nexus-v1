@@ -9,6 +9,13 @@ import * as Linking from 'expo-linking';
 
 import SupportRoute from './support';
 
+let mockSearchParams: Record<string, string> = {};
+
+jest.mock('expo-router', () => ({
+  router: { push: jest.fn() },
+  useLocalSearchParams: () => mockSearchParams,
+}));
+
 jest.mock('@expo/vector-icons', () => {
   const { Text } = require('react-native');
   return {
@@ -29,6 +36,11 @@ jest.mock('@/components/ui/AppTopBar', () => {
 });
 
 describe('SupportRoute', () => {
+  beforeEach(() => {
+    mockSearchParams = {};
+    jest.clearAllMocks();
+  });
+
   it('renders support and legal destinations', () => {
     const { getByText } = render(<SupportRoute />);
 
@@ -59,5 +71,14 @@ describe('SupportRoute', () => {
     fireEvent.press(getAllByText('Open web')[0]);
 
     expect(Linking.openURL).toHaveBeenCalledWith('https://app.project-nexus.ie/privacy');
+  });
+
+  it('opens a requested legal document from native route params', () => {
+    mockSearchParams = { doc: 'terms' };
+
+    const { getByText } = render(<SupportRoute />);
+
+    expect(getByText('Terms of use summary')).toBeTruthy();
+    expect(getByText('Use the platform responsibly')).toBeTruthy();
   });
 });
