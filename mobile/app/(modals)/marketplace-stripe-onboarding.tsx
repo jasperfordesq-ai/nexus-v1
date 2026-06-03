@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useRef, useState } from 'react';
-import { Alert, Linking, ScrollView, View } from 'react-native';
+import { Linking, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import {
   getMarketplaceSellerBalance,
@@ -41,6 +42,7 @@ function MarketplaceStripeOnboardingScreen() {
   const params = useLocalSearchParams<{ return?: string; complete?: string; refresh?: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const handledReturnKeyRef = useRef('');
   const [status, setStatus] = useState<MarketplaceStripeOnboardingStatus | null>(null);
   const [balance, setBalance] = useState<MarketplaceSellerBalance | null>(null);
@@ -78,11 +80,11 @@ function MarketplaceStripeOnboardingScreen() {
     if (!isReturn || isLoading || !status || handledReturnKeyRef.current === returnKey) return;
     handledReturnKeyRef.current = returnKey;
     if (status.stripe_onboarding_complete) {
-      Alert.alert(t('stripeOnboarding.returnCompleteTitle'), t('stripeOnboarding.returnCompleteMessage'));
+      showToast({ title: t('stripeOnboarding.returnCompleteTitle'), description: t('stripeOnboarding.returnCompleteMessage'), variant: 'success' });
     } else {
-      Alert.alert(t('stripeOnboarding.returnIncompleteTitle'), t('stripeOnboarding.returnIncompleteMessage'));
+      showToast({ title: t('stripeOnboarding.returnIncompleteTitle'), description: t('stripeOnboarding.returnIncompleteMessage'), variant: 'warning' });
     }
-  }, [isLoading, params.complete, params.refresh, params.return, status, t]);
+  }, [isLoading, params.complete, params.refresh, params.return, showToast, status, t]);
 
   async function start() {
     setIsStarting(true);
@@ -92,7 +94,7 @@ function MarketplaceStripeOnboardingScreen() {
       if (!url) throw new Error(t('stripeOnboarding.startFailed'));
       await Linking.openURL(url);
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('stripeOnboarding.startFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('stripeOnboarding.startFailed'), variant: 'danger' });
     } finally {
       setIsStarting(false);
     }

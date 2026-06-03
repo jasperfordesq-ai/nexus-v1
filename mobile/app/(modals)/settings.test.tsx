@@ -66,6 +66,14 @@ jest.mock('react-i18next', () => ({
         'identity.hint': 'Verify identity.',
         'saveError': 'Failed to save.',
         'common:errors.generic': 'Error',
+        'appearance.title': 'Appearance',
+        'appearance.hint': 'Choose how the app looks on this device.',
+        'appearance.mode.system': 'System',
+        'appearance.mode.systemHint': 'Match your device settings',
+        'appearance.mode.light': 'Light',
+        'appearance.mode.lightHint': 'Always use the light theme',
+        'appearance.mode.dark': 'Dark',
+        'appearance.mode.darkHint': 'Always use the dark theme',
       };
       return map[key] ?? key;
     },
@@ -78,6 +86,7 @@ jest.mock('@/lib/hooks/useTenant', () => ({
   useTenant: () => ({ hasFeature: () => true }),
 }));
 
+const mockSetThemeMode = jest.fn();
 jest.mock('@/lib/hooks/useTheme', () => ({
   useTheme: () => ({
     bg: '#ffffff',
@@ -89,6 +98,11 @@ jest.mock('@/lib/hooks/useTheme', () => ({
     borderSubtle: '#eeeeee',
     error: '#e53e3e',
     success: '#22c55e',
+  }),
+  useThemeController: () => ({
+    mode: 'system',
+    scheme: 'dark',
+    setMode: mockSetThemeMode,
   }),
 }));
 
@@ -106,6 +120,14 @@ jest.mock('@/lib/api/client', () => ({
     put: jest.fn().mockResolvedValue(undefined),
   },
 }));
+
+jest.mock('@/components/ui/AppToast', () => {
+  // Stable references so screens that put `show` in a useCallback/useEffect
+  // dependency array don't re-run their effects on every render.
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
 
 jest.mock('@/lib/constants', () => ({
   API_V2: '/api/v2',
@@ -248,5 +270,24 @@ describe('SettingsScreen', () => {
 
     fireEvent.press(getByText('Translation preferences'));
     expect(router.push).toHaveBeenCalledWith('/(modals)/settings-translation');
+  });
+
+  it('renders the Appearance section with theme mode options', () => {
+    const { getByText } = render(<SettingsScreen />);
+    expect(getByText('Appearance')).toBeTruthy();
+    expect(getByText('System')).toBeTruthy();
+    expect(getByText('Light')).toBeTruthy();
+    expect(getByText('Dark')).toBeTruthy();
+  });
+
+  it('sets the theme mode when an appearance option is pressed', () => {
+    mockSetThemeMode.mockClear();
+    const { getByText } = render(<SettingsScreen />);
+
+    fireEvent.press(getByText('Light'));
+    expect(mockSetThemeMode).toHaveBeenCalledWith('light');
+
+    fireEvent.press(getByText('Dark'));
+    expect(mockSetThemeMode).toHaveBeenCalledWith('dark');
   });
 });

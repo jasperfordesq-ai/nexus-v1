@@ -5,7 +5,6 @@
 
 import React from 'react';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
-import { Alert } from 'react-native';
 
 const mockCreateJob = jest.fn().mockResolvedValue({ data: { id: 301 } });
 const mockGetJobDetail = jest.fn();
@@ -130,6 +129,13 @@ jest.mock('@/lib/haptics', () => ({
 }));
 jest.mock('@expo/vector-icons', () => ({ Ionicons: 'View' }));
 jest.mock('@/components/ui/AppTopBar', () => 'View');
+jest.mock('@/components/ui/AppToast', () => {
+  // Stable references so screens that put `show` in a useCallback/useEffect
+  // dependency array don't re-run their effects on every render.
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
 jest.mock('@/components/ui/FormActionFooter', () => {
   const React = require('react');
   const { Pressable, Text, View } = require('react-native');
@@ -184,12 +190,13 @@ jest.mock('heroui-native', () => {
 
 import NewJobRoute from './new-job';
 import { updateJob } from '@/lib/api/jobs';
+import { useAppToast } from '@/components/ui/AppToast';
+
+const showToast = useAppToast().show as jest.Mock;
 
 describe('NewJobRoute', () => {
-  let alertSpy: jest.SpyInstance;
-
   beforeEach(() => {
-    alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+    showToast.mockClear();
     mockSearchParams = {};
     mockCreateJob.mockClear();
     mockGenerateJobDescription.mockReset();
@@ -197,10 +204,6 @@ describe('NewJobRoute', () => {
     mockGetJobDetail.mockReset();
     (updateJob as jest.Mock).mockClear();
     mockReplace.mockClear();
-  });
-
-  afterEach(() => {
-    alertSpy.mockRestore();
   });
 
   it('blocks paid roles without salary transparency unless negotiable', async () => {
@@ -212,7 +215,7 @@ describe('NewJobRoute', () => {
     fireEvent.press(getByText('Create job'));
 
     await waitFor(() => {
-      expect(alertSpy).toHaveBeenCalledWith('Check job details', 'Salary range required. You may mark salary negotiable to omit it.');
+      expect(showToast).toHaveBeenCalledWith({ title: 'Check job details', description: 'Salary range required. You may mark salary negotiable to omit it.', variant: 'warning' });
     });
     expect(mockCreateJob).not.toHaveBeenCalled();
   });
@@ -243,7 +246,7 @@ describe('NewJobRoute', () => {
     fireEvent.press(getByText('Generate with AI'));
 
     await waitFor(() => {
-      expect(alertSpy).toHaveBeenCalledWith('Check job details', 'Add a title before generating a description.');
+      expect(showToast).toHaveBeenCalledWith({ title: 'Check job details', description: 'Add a title before generating a description.', variant: 'warning' });
     });
     expect(mockGenerateJobDescription).not.toHaveBeenCalled();
   });
@@ -279,7 +282,7 @@ describe('NewJobRoute', () => {
     fireEvent.press(getByText('Create job'));
 
     await waitFor(() => {
-      expect(alertSpy).toHaveBeenCalledWith('Check job details', 'Minimum salary cannot exceed maximum salary.');
+      expect(showToast).toHaveBeenCalledWith({ title: 'Check job details', description: 'Minimum salary cannot exceed maximum salary.', variant: 'warning' });
     });
     expect(mockCreateJob).not.toHaveBeenCalled();
   });
@@ -293,7 +296,7 @@ describe('NewJobRoute', () => {
     fireEvent.press(getByText('Create job'));
 
     await waitFor(() => {
-      expect(alertSpy).toHaveBeenCalledWith('Check job details', 'Deadline must be a future date.');
+      expect(showToast).toHaveBeenCalledWith({ title: 'Check job details', description: 'Deadline must be a future date.', variant: 'warning' });
     });
     expect(mockCreateJob).not.toHaveBeenCalled();
   });

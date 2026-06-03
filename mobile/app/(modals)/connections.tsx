@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useMemo, useState, type ComponentProps } from 'react';
-import { Alert, Pressable, RefreshControl, ScrollView, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -26,6 +26,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
@@ -65,6 +66,7 @@ function ConnectionsScreen() {
   const [actionId, setActionId] = useState<number | null>(null);
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const { data, isLoading, error, refresh } = useApi(() => getConnections(tab), [tab]);
   const connections = useMemo(() => unwrapConnections(data), [data]);
 
@@ -79,7 +81,7 @@ function ConnectionsScreen() {
       refresh();
     } catch {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('connections.actionFailedTitle'), t('connections.actionFailedDescription'));
+      showToast({ title: t('connections.actionFailedTitle'), description: t('connections.actionFailedDescription'), variant: 'danger' });
     } finally {
       setActionId(null);
     }

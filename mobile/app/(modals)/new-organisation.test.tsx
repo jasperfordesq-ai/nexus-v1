@@ -4,7 +4,6 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { Alert } from 'react-native';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 const mockBack = jest.fn();
@@ -123,13 +122,24 @@ jest.mock('@/lib/haptics', () => ({
 
 jest.mock('@/components/ui/AppTopBar', () => 'View');
 
+// Stable AppToast mock — fns created inside the factory closure.
+jest.mock('@/components/ui/AppToast', () => {
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
+
+const { show: mockShowToast } = (jest.requireMock('@/components/ui/AppToast') as {
+  useAppToast: () => { show: jest.Mock };
+}).useAppToast();
+
 import NewOrganisationScreen from './new-organisation';
 
 describe('NewOrganisationScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockCreateOrganisation.mockResolvedValue({ data: { id: 44, name: 'Neighbourhood Skills Network' } });
-    jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+    mockShowToast.mockClear();
   });
 
   it('renders the organisation registration form', () => {
@@ -169,5 +179,6 @@ describe('NewOrganisationScreen', () => {
       pathname: '/(modals)/organisation-detail',
       params: { id: '44' },
     }));
+    expect(mockShowToast).toHaveBeenCalledWith(expect.objectContaining({ title: 'Organisation submitted', variant: 'success' }));
   });
 });

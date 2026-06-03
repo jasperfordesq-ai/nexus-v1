@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useState } from 'react';
-import { Alert, Linking, RefreshControl, ScrollView, Share, Text, View } from 'react-native';
+import { Linking, RefreshControl, ScrollView, Share, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
@@ -38,6 +38,8 @@ import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
+import { useConfirm } from '@/components/ui/useConfirm';
 
 const WEB_URL = 'https://app.project-nexus.ie';
 const REMINDER_OPTIONS = [60, 1440, 10080] as const;
@@ -59,6 +61,8 @@ function EventDetailScreenInner() {
   const primary = usePrimaryColor();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+  const { show: showToast } = useAppToast();
+  const { confirm, confirmDialog } = useConfirm();
 
   const eventId = Number(id);
   const safeEventId = Number.isFinite(eventId) && eventId > 0 ? eventId : 0;
@@ -152,28 +156,25 @@ function EventDetailScreenInner() {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     if (currentRsvp === status) {
-      Alert.alert(
-        t('common:buttons.confirm'),
-        t('confirmCancelRsvp'),
-        [
-          { text: t('common:no'), style: 'cancel' },
-          {
-            text: t('common:yes'),
-            onPress: async () => {
-              setUpdating(true);
-              try {
-                await removeRsvp(event.id);
-                setRsvp(null);
-                setRsvpCounts({ ...counts, [status]: Math.max(0, counts[status] - 1) });
-              } catch {
-                Alert.alert(t('common:errors.alertTitle'), t('rsvpError'));
-              } finally {
-                setUpdating(false);
-              }
-            },
-          },
-        ],
-      );
+      confirm({
+        title: t('common:buttons.confirm'),
+        message: t('confirmCancelRsvp'),
+        confirmLabel: t('common:yes'),
+        cancelLabel: t('common:no'),
+        variant: 'danger',
+        onConfirm: async () => {
+          setUpdating(true);
+          try {
+            await removeRsvp(event.id);
+            setRsvp(null);
+            setRsvpCounts({ ...counts, [status]: Math.max(0, counts[status] - 1) });
+          } catch {
+            showToast({ title: t('common:errors.alertTitle'), description: t('rsvpError'), variant: 'danger' });
+          } finally {
+            setUpdating(false);
+          }
+        },
+      });
       return;
     }
 
@@ -184,7 +185,7 @@ function EventDetailScreenInner() {
       if (result?.data?.rsvp_counts) setRsvpCounts(result.data.rsvp_counts);
       setWaitlistPosition(null);
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('rsvpError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('rsvpError'), variant: 'danger' });
     } finally {
       setUpdating(false);
     }
@@ -212,7 +213,7 @@ function EventDetailScreenInner() {
       await checkInEventAttendee(event.id, attendee.id);
       setCheckedInAttendeeIds((prev) => (prev.includes(attendee.id) ? prev : [...prev, attendee.id]));
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('detail.checkInError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.checkInError'), variant: 'danger' });
     } finally {
       setCheckingInAttendeeId(null);
     }
@@ -235,7 +236,7 @@ function EventDetailScreenInner() {
       setWaitlistPosition(result.data.position ?? null);
       waitlistApi.refresh();
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t(currentWaitlistPosition ? 'detail.leaveWaitlistError' : 'detail.joinWaitlistError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t(currentWaitlistPosition ? 'detail.leaveWaitlistError' : 'detail.joinWaitlistError'), variant: 'danger' });
     } finally {
       setUpdating(false);
     }
@@ -435,6 +436,7 @@ function EventDetailScreenInner() {
           </HeroButton>
         ) : null}
       </Surface>
+      {confirmDialog}
     </SafeAreaView>
   );
 }
@@ -546,6 +548,7 @@ function EventPollsCard({
   theme: Theme;
   t: (key: string, opts?: Record<string, unknown>) => string;
 }) {
+  const { show: showToast } = useAppToast();
   const [localPolls, setLocalPolls] = useState<Record<number, EventPoll>>({});
   const [votingPollId, setVotingPollId] = useState<number | null>(null);
   const mergedPolls = polls.map((poll) => localPolls[poll.id] ?? poll).filter((poll) => poll.options?.length);
@@ -559,7 +562,7 @@ function EventPollsCard({
       const result = await voteEventPoll(poll.id, optionId);
       setLocalPolls((prev) => ({ ...prev, [poll.id]: result.data }));
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('detail.pollVoteError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.pollVoteError'), variant: 'danger' });
     } finally {
       setVotingPollId(null);
     }

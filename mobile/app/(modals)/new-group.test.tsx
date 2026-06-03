@@ -4,7 +4,6 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { Alert } from 'react-native';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 const mockCreateGroup = jest.fn().mockResolvedValue({ data: { id: 484 } });
@@ -105,6 +104,13 @@ jest.mock('expo-image-picker', () => ({
   launchImageLibraryAsync: (...args: unknown[]) => mockLaunchImageLibraryAsync(...args),
 }));
 jest.mock('@/components/ui/AppTopBar', () => 'View');
+jest.mock('@/components/ui/AppToast', () => {
+  // Stable references so screens that put `show` in a useCallback/useEffect
+  // dependency array don't re-run their effects on every render.
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
 jest.mock('@/components/ui/FormActionFooter', () => {
   const React = require('react');
   const { Pressable, Text, View } = require('react-native');
@@ -158,6 +164,9 @@ jest.mock('heroui-native', () => {
 });
 
 import NewGroupRoute from './new-group';
+import { useAppToast } from '@/components/ui/AppToast';
+
+const showToast = useAppToast().show as jest.Mock;
 
 describe('NewGroupRoute', () => {
   beforeEach(() => {
@@ -173,11 +182,7 @@ describe('NewGroupRoute', () => {
     });
     mockReplace.mockClear();
     mockSearchParams = {};
-    jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
+    showToast.mockClear();
   });
 
   it('keeps the native create group frame full height with an explicit background', () => {
@@ -207,7 +212,7 @@ describe('NewGroupRoute', () => {
     fireEvent.press(getByText('Create group'));
 
     await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith('Check group details', 'Add a group name and description before continuing.');
+      expect(showToast).toHaveBeenCalledWith({ title: 'Check group details', description: 'Add a group name and description before continuing.', variant: 'warning' });
     });
     expect(mockCreateGroup).not.toHaveBeenCalled();
   });
@@ -220,7 +225,7 @@ describe('NewGroupRoute', () => {
     fireEvent.press(getByText('Create group'));
 
     await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith('Check group details', 'Use 3 to 100 characters for the group name.');
+      expect(showToast).toHaveBeenCalledWith({ title: 'Check group details', description: 'Use 3 to 100 characters for the group name.', variant: 'warning' });
     });
     expect(mockCreateGroup).not.toHaveBeenCalled();
   });
@@ -233,7 +238,7 @@ describe('NewGroupRoute', () => {
     fireEvent.press(getByText('Create group'));
 
     await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith('Check group details', 'Use 20 to 2000 characters for the group description.');
+      expect(showToast).toHaveBeenCalledWith({ title: 'Check group details', description: 'Use 20 to 2000 characters for the group description.', variant: 'warning' });
     });
     expect(mockCreateGroup).not.toHaveBeenCalled();
   });
@@ -295,7 +300,7 @@ describe('NewGroupRoute', () => {
     fireEvent.press(getByText('Create group'));
 
     await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith('Check group details', 'Enter both latitude and longitude using valid coordinate ranges.');
+      expect(showToast).toHaveBeenCalledWith({ title: 'Check group details', description: 'Enter both latitude and longitude using valid coordinate ranges.', variant: 'warning' });
     });
     expect(mockCreateGroup).not.toHaveBeenCalled();
   });

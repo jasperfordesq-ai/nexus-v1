@@ -4,7 +4,6 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { Alert } from 'react-native';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 let mockFeatures = new Set(['merchant_coupons']);
@@ -146,7 +145,16 @@ jest.mock('@/lib/payments/marketplacePayment', () => ({
   presentMarketplacePayment: jest.fn().mockResolvedValue({ status: 'redirected' }),
 }));
 
+// Stable references so screens that put `show` in a useCallback/useEffect
+// dependency array don't re-run their effects on every render.
+jest.mock('@/components/ui/AppToast', () => {
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
+
 import MarketplaceDetailRoute from './marketplace-detail';
+import { useAppToast } from '@/components/ui/AppToast';
 import {
   confirmMarketplacePayment,
   createMarketplaceOrder,
@@ -193,19 +201,14 @@ const mockListing = {
 };
 
 describe('MarketplaceDetailRoute', () => {
-  let alertSpy: jest.SpyInstance;
+  const showToast = useAppToast().show as jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
     mockFeatures = new Set(['merchant_coupons']);
-    alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
     (getMarketplaceListing as jest.Mock).mockResolvedValue({ data: mockListing });
     (getMarketplaceListingPickupSlots as jest.Mock).mockResolvedValue({ data: [] });
     (getMarketplaceSellerListings as jest.Mock).mockResolvedValue({ data: [] });
-  });
-
-  afterEach(() => {
-    alertSpy.mockRestore();
   });
 
   it('renders category-specific template details from the listing payload', async () => {
@@ -273,10 +276,11 @@ describe('MarketplaceDetailRoute', () => {
 
     await waitFor(() => {
       expect(createMarketplacePaymentIntent).toHaveBeenCalledWith(44);
-      expect(Alert.alert).toHaveBeenCalledWith(
-        'Checkout paused',
-        'Order MKT-000044 was created, but payment could not start. Continue payment from Orders.',
-      );
+      expect(showToast).toHaveBeenCalledWith({
+        title: 'Checkout paused',
+        description: 'Order MKT-000044 was created, but payment could not start. Continue payment from Orders.',
+        variant: 'danger',
+      });
     });
   });
 
@@ -317,10 +321,11 @@ describe('MarketplaceDetailRoute', () => {
         clientSecret: 'pi_secret',
         merchantDisplayName: 'Project NEXUS marketplace',
       });
-      expect(Alert.alert).toHaveBeenCalledWith(
-        'Checkout started',
-        'The order was created. Complete payment from the web checkout if the payment sheet does not open on this device.',
-      );
+      expect(showToast).toHaveBeenCalledWith({
+        title: 'Checkout started',
+        description: 'The order was created. Complete payment from the web checkout if the payment sheet does not open on this device.',
+        variant: 'default',
+      });
     });
   });
 
@@ -343,10 +348,11 @@ describe('MarketplaceDetailRoute', () => {
 
     await waitFor(() => {
       expect(confirmMarketplacePayment).toHaveBeenCalledWith('pi_46');
-      expect(Alert.alert).toHaveBeenCalledWith(
-        'Payment complete',
-        'Your order is paid. You can track it from Orders.',
-      );
+      expect(showToast).toHaveBeenCalledWith({
+        title: 'Payment complete',
+        description: 'Your order is paid. You can track it from Orders.',
+        variant: 'success',
+      });
     });
   });
 

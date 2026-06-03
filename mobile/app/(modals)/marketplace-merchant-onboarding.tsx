@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Image, ScrollView, View } from 'react-native';
+import { Image, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import {
@@ -65,6 +66,7 @@ function MarketplaceMerchantOnboardingScreen() {
   const { user, displayName, refreshUser } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const [step, setStep] = useState<Step>(1);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -93,7 +95,7 @@ function MarketplaceMerchantOnboardingScreen() {
       })
       .catch(() => {
         if (mounted) {
-          Alert.alert(t('common:errors.alertTitle'), t('merchantOnboarding.loadFailed'));
+          showToast({ title: t('common:errors.alertTitle'), description: t('merchantOnboarding.loadFailed'), variant: 'danger' });
         }
       })
       .finally(() => {
@@ -128,7 +130,7 @@ function MarketplaceMerchantOnboardingScreen() {
   async function pickAvatar() {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert(t('forms.permissionTitle'), t('forms.permissionMessage'));
+      showToast({ title: t('forms.permissionTitle'), description: t('forms.permissionMessage'), variant: 'warning' });
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -144,7 +146,7 @@ function MarketplaceMerchantOnboardingScreen() {
       setAvatarUrl(response.data.avatar_url);
       if (user) refreshUser({ ...user, avatar_url: response.data.avatar_url });
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('merchantOnboarding.avatarFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('merchantOnboarding.avatarFailed'), variant: 'danger' });
     } finally {
       setIsSaving(false);
     }
@@ -156,7 +158,7 @@ function MarketplaceMerchantOnboardingScreen() {
     try {
       if (step === 1) {
         if (!display.trim() || !bio.trim() || (sellerType === 'business' && !businessName.trim())) {
-          Alert.alert(t('forms.validation'), t('merchantOnboarding.step1Required'));
+          showToast({ title: t('forms.validation'), description: t('merchantOnboarding.step1Required'), variant: 'warning' });
           return;
         }
         await saveMerchantOnboardingStep1({
@@ -180,7 +182,7 @@ function MarketplaceMerchantOnboardingScreen() {
         setStep(3);
       } else if (step === 3) {
         if (!avatarUrl.trim()) {
-          Alert.alert(t('forms.validation'), t('merchantOnboarding.avatarRequired'));
+          showToast({ title: t('forms.validation'), description: t('merchantOnboarding.avatarRequired'), variant: 'warning' });
           return;
         }
         await saveMerchantOnboardingStep3({
@@ -194,7 +196,11 @@ function MarketplaceMerchantOnboardingScreen() {
         setBadgeGranted(Boolean(response.data.badge_granted));
       }
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('merchantOnboarding.saveFailed'));
+      showToast({
+        title: t('common:errors.alertTitle'),
+        description: err instanceof Error ? err.message : t('merchantOnboarding.saveFailed'),
+        variant: 'danger',
+      });
     } finally {
       setIsSaving(false);
     }

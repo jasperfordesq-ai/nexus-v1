@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Alert, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,6 +12,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
+import { useConfirm } from '@/components/ui/useConfirm';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
@@ -54,6 +56,8 @@ function GroupExchangeDetailScreenInner() {
   const { user } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
+  const { confirm, confirmDialog } = useConfirm();
   const [submitting, setSubmitting] = useState(false);
 
   const exchangeId = Number(id);
@@ -74,21 +78,21 @@ function GroupExchangeDetailScreenInner() {
       }
       await refresh();
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t(`groupExchanges.detail.actions.${action}Failed`));
+      showToast({ title: t('common:errors.alertTitle'), description: t(`groupExchanges.detail.actions.${action}Failed`), variant: 'danger' });
     } finally {
       setSubmitting(false);
     }
   }
 
   function confirmCancel() {
-    Alert.alert(
-      t('groupExchanges.detail.actions.cancelTitle'),
-      t('groupExchanges.detail.actions.cancelDescription'),
-      [
-        { text: t('common:buttons.cancel'), style: 'cancel' },
-        { text: t('groupExchanges.detail.actions.cancel'), style: 'destructive', onPress: () => void runAction('cancel') },
-      ],
-    );
+    confirm({
+      title: t('groupExchanges.detail.actions.cancelTitle'),
+      message: t('groupExchanges.detail.actions.cancelDescription'),
+      confirmLabel: t('groupExchanges.detail.actions.cancel'),
+      cancelLabel: t('common:buttons.cancel'),
+      variant: 'danger',
+      onConfirm: () => runAction('cancel'),
+    });
   }
 
   if (safeExchangeId <= 0) {
@@ -208,6 +212,7 @@ function GroupExchangeDetailScreenInner() {
           </HeroCard.Body>
         </HeroCard>
       ) : null}
+      {confirmDialog}
     </ScreenShell>
   );
 }

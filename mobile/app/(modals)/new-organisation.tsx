@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useMemo, useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,6 +17,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import Checkbox from '@/components/ui/Checkbox';
 import Input from '@/components/ui/Input';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
@@ -58,6 +59,7 @@ function NewOrganisationInner() {
   const { t } = useTranslation(['organisations', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const [form, setForm] = useState<FormState>(INITIAL_FORM);
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
@@ -121,14 +123,14 @@ function NewOrganisationInner() {
       });
       const organisation = response.data;
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert(t('register.successTitle'), t('register.successMessage'));
+      showToast({ title: t('register.successTitle'), description: t('register.successMessage'), variant: 'success' });
       router.replace({
         pathname: '/(modals)/organisation-detail',
         params: { id: String(organisation.id) },
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : t('register.saveFailedMessage');
-      Alert.alert(t('register.saveFailedTitle'), message);
+      showToast({ title: t('register.saveFailedTitle'), description: message, variant: 'danger' });
     } finally {
       setIsSubmitting(false);
     }

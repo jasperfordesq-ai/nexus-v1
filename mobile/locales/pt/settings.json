@@ -167,5 +167,17 @@
       "can_view_messages": "View messages"
     },
     "permissionToggle": "Toggle {{permission}} for {{name}}"
+  },
+  "appearance": {
+    "title": "Aparência",
+    "hint": "Escolha como a app aparece neste dispositivo.",
+    "mode": {
+      "system": "Sistema",
+      "systemHint": "Acompanhar as definições do dispositivo",
+      "light": "Claro",
+      "lightHint": "Usar sempre o tema claro",
+      "dark": "Escuro",
+      "darkHint": "Usar sempre o tema escuro"
+    }
   }
 }

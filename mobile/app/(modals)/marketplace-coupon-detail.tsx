@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Alert, Image, Share, View } from 'react-native';
+import { Image, Share, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import BottomSheet from '@/components/ui/BottomSheet';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -41,6 +42,7 @@ function MarketplaceCouponDetailScreen() {
   const { hasFeature } = useTenant();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const couponId = Number(id);
   const safeCouponId = Number.isFinite(couponId) && couponId > 0 ? couponId : null;
   const coupon = useApi(() => safeCouponId ? getPublicMerchantCoupon(safeCouponId) : Promise.reject(new Error(t('publicCoupons.notFound'))), [safeCouponId], { enabled: hasFeature('merchant_coupons') && Boolean(safeCouponId) });
@@ -62,7 +64,7 @@ function MarketplaceCouponDetailScreen() {
       setQr(response.data);
       setIsQrOpen(true);
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('publicCoupons.qrFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('publicCoupons.qrFailed'), variant: 'danger' });
     } finally {
       setIsQrLoading(false);
     }

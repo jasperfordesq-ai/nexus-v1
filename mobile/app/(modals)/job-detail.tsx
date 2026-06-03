@@ -8,7 +8,6 @@ import {
   View,
   Text,
   ScrollView,
-  Alert,
   Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -26,6 +25,7 @@ import { useTheme } from '@/lib/hooks/useTheme';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import Avatar from '@/components/ui/Avatar';
 import BottomSheet from '@/components/ui/BottomSheet';
 import EmptyState from '@/components/ui/EmptyState';
@@ -41,6 +41,7 @@ export default function JobDetailScreen() {
   const primary = usePrimaryColor();
   const theme = useTheme();
   const { user } = useAuth();
+  const { show: showToast } = useAppToast();
 
   const jobId = Number(id);
   const safeId = isNaN(jobId) || jobId <= 0 ? 0 : jobId;
@@ -143,7 +144,7 @@ export default function JobDetailScreen() {
         setIsSaved(true);
       }
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('detail.saveError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.saveError'), variant: 'danger' });
     } finally {
       setSaveLoading(false);
     }
@@ -157,7 +158,7 @@ export default function JobDetailScreen() {
       setApplySuccess(true);
       setHasApplied(true);
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('apply.error'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('apply.error'), variant: 'danger' });
     } finally {
       setApplyLoading(false);
     }
@@ -190,7 +191,7 @@ export default function JobDetailScreen() {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       refreshJob();
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('owner.statusUpdateError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('owner.statusUpdateError'), variant: 'danger' });
     }
   }
 
@@ -736,6 +737,7 @@ function OwnerApplicationCard({
   t: (key: string, opts?: Record<string, unknown>) => string;
   onUpdated: () => void;
 }) {
+  const { show: showToast } = useAppToast();
   const [isUpdating, setIsUpdating] = useState(false);
   const applicantName = application.applicant?.name?.trim() || t('owner.unknownApplicant');
   const submitted = application.created_at
@@ -750,7 +752,7 @@ function OwnerApplicationCard({
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       onUpdated();
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('owner.updateError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('owner.updateError'), variant: 'danger' });
     } finally {
       setIsUpdating(false);
     }

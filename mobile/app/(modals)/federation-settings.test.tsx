@@ -138,6 +138,14 @@ jest.mock('@/components/ui/EmptyState', () => 'View');
 jest.mock('@/components/ui/Input', () => 'View');
 jest.mock('@/components/ui/Toggle', () => 'View');
 
+jest.mock('@/components/ui/AppToast', () => {
+  // Stable references so screens that put `show` in a useCallback/useEffect
+  // dependency array don't re-run their effects on every render.
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
+
 import FederationSettingsScreen from './federation-settings';
 
 beforeEach(() => {

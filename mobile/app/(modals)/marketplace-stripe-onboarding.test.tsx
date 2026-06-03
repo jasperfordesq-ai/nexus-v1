@@ -5,7 +5,6 @@
 
 import React from 'react';
 import { render, waitFor } from '@testing-library/react-native';
-import { Alert } from 'react-native';
 
 let mockParams: Record<string, string> = {};
 
@@ -83,6 +82,13 @@ jest.mock('@/lib/hooks/useTheme', () => ({
 }));
 
 jest.mock('@expo/vector-icons', () => ({ Ionicons: 'View' }));
+jest.mock('@/components/ui/AppToast', () => {
+  // Stable references so screens that put `show` in a useCallback/useEffect
+  // dependency array don't re-run their effects on every render.
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
 jest.mock('@/components/ui/LoadingSpinner', () => () => null);
 
 jest.mock('@/lib/api/marketplace', () => ({
@@ -93,11 +99,14 @@ jest.mock('@/lib/api/marketplace', () => ({
 }));
 
 import MarketplaceStripeOnboardingRoute from './marketplace-stripe-onboarding';
+import { useAppToast } from '@/components/ui/AppToast';
 import {
   getMarketplaceSellerBalance,
   getMarketplaceSellerPayouts,
   getMarketplaceStripeOnboardingStatus,
 } from '@/lib/api/marketplace';
+
+const toastShow = useAppToast().show as jest.Mock;
 
 describe('MarketplaceStripeOnboardingRoute', () => {
   beforeEach(() => {
@@ -149,16 +158,17 @@ describe('MarketplaceStripeOnboardingRoute', () => {
         payouts_enabled: true,
       },
     });
-    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
-
     const { getByText, unmount } = render(<MarketplaceStripeOnboardingRoute />);
 
     await waitFor(() => {
       expect(getByText('Payments ready')).toBeTruthy();
-      expect(alertSpy).toHaveBeenCalledWith('Stripe setup complete', 'Your Stripe account is ready for marketplace payments.');
+      expect(toastShow).toHaveBeenCalledWith({
+        title: 'Stripe setup complete',
+        description: 'Your Stripe account is ready for marketplace payments.',
+        variant: 'success',
+      });
     });
 
-    alertSpy.mockRestore();
     unmount();
   });
 });

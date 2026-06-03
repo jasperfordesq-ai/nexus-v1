@@ -4,7 +4,6 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { Alert } from 'react-native';
 import { render, fireEvent } from '@testing-library/react-native';
 
 // --- Mocks ---
@@ -186,17 +185,29 @@ jest.mock('@/lib/api/gamification', () => ({
 jest.mock('@/components/ui/Avatar', () => 'View');
 jest.mock('@/components/ui/LoadingSpinner', () => () => null);
 
+jest.mock('@/components/ui/AppToast', () => {
+  // Stable references so screens that put `show` in a useCallback/useEffect
+  // dependency array don't re-run their effects on every render.
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
+
 // --- Tests ---
 
 import GamificationScreen from './gamification';
 import { claimChallengeReward, claimDailyReward, purchaseShopItem, updateBadgeShowcase } from '@/lib/api/gamification';
+import { useAppToast } from '@/components/ui/AppToast';
+
+// Grab the stable toast `show` mock to assert on branded toasts.
+const { show: mockToastShow } = useAppToast();
 
 const defaultLoadingState = { data: null, isLoading: true, error: null, refresh: jest.fn() };
 
 beforeEach(() => {
   // Default: all loading so LoadingSpinner is rendered
   mockUseApi.mockReturnValue(defaultLoadingState);
-  jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
+  (mockToastShow as jest.Mock).mockClear();
   (claimDailyReward as jest.Mock).mockClear();
   (claimChallengeReward as jest.Mock).mockClear();
   (purchaseShopItem as jest.Mock).mockClear();
@@ -407,7 +418,7 @@ describe('GamificationScreen', () => {
 
     expect(updateBadgeShowcase).toHaveBeenCalledWith(['first_exchange']);
     await Promise.resolve();
-    expect(Alert.alert).toHaveBeenCalledWith('Showcase updated', 'Your profile showcase was updated.');
+    expect(mockToastShow).toHaveBeenCalledWith({ title: 'Showcase updated', description: 'Your profile showcase was updated.', variant: 'success' });
   });
 
   it('switches to leaderboard tab when tapped', () => {
@@ -461,7 +472,7 @@ describe('GamificationScreen', () => {
 
     expect(claimDailyReward).toHaveBeenCalled();
     await Promise.resolve();
-    expect(Alert.alert).toHaveBeenCalledWith('Reward claimed', 'You earned 20 XP.');
+    expect(mockToastShow).toHaveBeenCalledWith({ title: 'Reward claimed', description: 'You earned 20 XP.', variant: 'success' });
   });
 
   it('renders challenges and claims a completed challenge reward', async () => {
@@ -480,7 +491,7 @@ describe('GamificationScreen', () => {
 
     expect(claimChallengeReward).toHaveBeenCalledWith(11);
     await Promise.resolve();
-    expect(Alert.alert).toHaveBeenCalledWith('Challenge claimed', 'Challenge reward claimed.');
+    expect(mockToastShow).toHaveBeenCalledWith({ title: 'Challenge claimed', description: 'Challenge reward claimed.', variant: 'success' });
   });
 
   it('renders badge collection journeys with progress and completion state', () => {
@@ -514,7 +525,7 @@ describe('GamificationScreen', () => {
 
     expect(purchaseShopItem).toHaveBeenCalledWith(12);
     await Promise.resolve();
-    expect(Alert.alert).toHaveBeenCalledWith('Purchase complete', 'Profile Sparkle is yours.');
+    expect(mockToastShow).toHaveBeenCalledWith({ title: 'Purchase complete', description: 'Profile Sparkle is yours.', variant: 'success' });
   });
 
   it('disables XP shop purchase when balance is too low', () => {

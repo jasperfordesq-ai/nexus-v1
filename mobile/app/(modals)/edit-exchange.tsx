@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useState, type ReactNode } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -33,6 +33,7 @@ import { withAlpha } from '@/lib/utils/color';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 import * as Haptics from '@/lib/haptics';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import Input from '@/components/ui/Input';
@@ -65,6 +66,7 @@ function EditExchangeModalInner() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const { user } = useAuth();
   const profileLocation = getProfileLocation(user);
   const listingId = Number(id);
@@ -131,7 +133,7 @@ function EditExchangeModalInner() {
       setSelectedImageUri(result.assets[0].uri);
       setRemoveExistingImage(false);
     } catch {
-      Alert.alert(t('detail.actionFailedTitle'), t('detail.imagePickFailed'));
+      showToast({ title: t('detail.actionFailedTitle'), description: t('detail.imagePickFailed'), variant: 'danger' });
     }
   }
 
@@ -154,7 +156,7 @@ function EditExchangeModalInner() {
       }
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('detail.actionFailedTitle'), t('detail.aiGenerateFailed'));
+      showToast({ title: t('detail.actionFailedTitle'), description: t('detail.aiGenerateFailed'), variant: 'danger' });
     } finally {
       setGeneratingDescription(false);
     }
@@ -218,12 +220,11 @@ function EditExchangeModalInner() {
         await deleteExchangeImage(safeListingId);
       }
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert(t('detail.editSavedTitle'), t('detail.editSavedMessage'), [
-        { text: t('detail.goBack'), onPress: () => router.replace({ pathname: '/(modals)/exchange-detail', params: { id: String(safeListingId) } }) },
-      ]);
+      showToast({ title: t('detail.editSavedTitle'), description: t('detail.editSavedMessage'), variant: 'success' });
+      router.replace({ pathname: '/(modals)/exchange-detail', params: { id: String(safeListingId) } });
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('detail.actionFailedTitle'), t('detail.editSaveFailed'));
+      showToast({ title: t('detail.actionFailedTitle'), description: t('detail.editSaveFailed'), variant: 'danger' });
     } finally {
       setSaving(false);
     }

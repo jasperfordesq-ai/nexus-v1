@@ -11,7 +11,6 @@ import {
   ScrollView,
   RefreshControl,
   Share,
-  Alert,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
@@ -49,6 +48,8 @@ import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
+import { useConfirm } from '@/components/ui/useConfirm';
 import VerificationBadgeRow from '@/components/verification/VerificationBadgeRow';
 import CommentSheet from '@/components/comments/CommentSheet';
 
@@ -93,6 +94,8 @@ function ExchangeDetailModalInner() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const { user: currentUser } = useAuth();
+  const { show: showToast } = useAppToast();
+  const { confirm, confirmDialog } = useConfirm();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -289,7 +292,7 @@ function ExchangeDetailModalInner() {
       void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     } catch {
       setIsSaved(!nextSaved);
-      Alert.alert(t('detail.actionFailedTitle'), t('detail.saveFailed'));
+      showToast({ title: t('detail.actionFailedTitle'), description: t('detail.saveFailed'), variant: 'danger' });
     } finally {
       setIsSaving(false);
     }
@@ -312,7 +315,7 @@ function ExchangeDetailModalInner() {
     } catch {
       setIsLiked(wasLiked);
       setLikesCount(previousCount);
-      Alert.alert(t('detail.actionFailedTitle'), t('detail.likeFailed'));
+      showToast({ title: t('detail.actionFailedTitle'), description: t('detail.likeFailed'), variant: 'danger' });
     } finally {
       setIsLiking(false);
     }
@@ -332,9 +335,9 @@ function ExchangeDetailModalInner() {
         details: reportDetails.trim() || undefined,
       });
       if (response.code === 'ALREADY_REPORTED') {
-        Alert.alert(t('detail.reportAlreadyTitle'), t('detail.reportAlreadyMessage'));
+        showToast({ title: t('detail.reportAlreadyTitle'), description: t('detail.reportAlreadyMessage'), variant: 'default' });
       } else {
-        Alert.alert(t('detail.reportSentTitle'), t('detail.reportSentMessage'));
+        showToast({ title: t('detail.reportSentTitle'), description: t('detail.reportSentMessage'), variant: 'success' });
       }
       setIsReported(true);
       setShowReportForm(false);
@@ -342,7 +345,7 @@ function ExchangeDetailModalInner() {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('detail.actionFailedTitle'), t('detail.reportFailed'));
+      showToast({ title: t('detail.actionFailedTitle'), description: t('detail.reportFailed'), variant: 'danger' });
     } finally {
       setIsReporting(false);
     }
@@ -355,44 +358,42 @@ function ExchangeDetailModalInner() {
       await renewExchange(listing.id);
       refresh();
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert(t('detail.renewedTitle'), t('detail.renewedMessage'));
+      showToast({ title: t('detail.renewedTitle'), description: t('detail.renewedMessage'), variant: 'success' });
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('detail.actionFailedTitle'), t('detail.renewFailed'));
+      showToast({ title: t('detail.actionFailedTitle'), description: t('detail.renewFailed'), variant: 'danger' });
     } finally {
       setIsRenewing(false);
     }
   }
 
   function handleDelete() {
-    Alert.alert(t('detail.deleteTitle'), t('detail.deleteMessage'), [
-      { text: t('detail.cancel'), style: 'cancel' },
-      {
-        text: t('detail.deleteConfirm'),
-        style: 'destructive',
-        onPress: () => {
-          void (async () => {
-            setIsDeleting(true);
-            try {
-              await deleteExchange(listing.id);
-              void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              router.replace('/(tabs)/exchanges' as Href);
-            } catch {
-              void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-              Alert.alert(t('detail.actionFailedTitle'), t('detail.deleteFailed'));
-            } finally {
-              setIsDeleting(false);
-            }
-          })();
-        },
+    confirm({
+      title: t('detail.deleteTitle'),
+      message: t('detail.deleteMessage'),
+      confirmLabel: t('detail.deleteConfirm'),
+      cancelLabel: t('detail.cancel'),
+      variant: 'danger',
+      onConfirm: async () => {
+        setIsDeleting(true);
+        try {
+          await deleteExchange(listing.id);
+          void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          router.replace('/(tabs)/exchanges' as Href);
+        } catch {
+          void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+          showToast({ title: t('detail.actionFailedTitle'), description: t('detail.deleteFailed'), variant: 'danger' });
+        } finally {
+          setIsDeleting(false);
+        }
       },
-    ]);
+    });
   }
 
   async function handleRequestExchange() {
     if (isSubmitting || activeExchange) {
       if (activeExchange) {
-        Alert.alert(t('detail.exchangeActiveTitle'), t('detail.exchangeActiveMessage'));
+        showToast({ title: t('detail.exchangeActiveTitle'), description: t('detail.exchangeActiveMessage'), variant: 'warning' });
       }
       return;
     }
@@ -406,10 +407,10 @@ function ExchangeDetailModalInner() {
       setActiveExchange(response.data);
       setShowRequestForm(false);
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert(t('detail.exchangeRequestedTitle'), t('detail.exchangeRequestedMessage'));
+      showToast({ title: t('detail.exchangeRequestedTitle'), description: t('detail.exchangeRequestedMessage'), variant: 'success' });
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('detail.actionFailedTitle'), t('detail.exchangeRequestFailed'));
+      showToast({ title: t('detail.actionFailedTitle'), description: t('detail.exchangeRequestFailed'), variant: 'danger' });
     } finally {
       setIsSubmitting(false);
     }
@@ -886,7 +887,7 @@ function ExchangeDetailModalInner() {
             onPress={() => {
               if (workflowEnabled) {
                 if (activeExchange) {
-                  Alert.alert(t('detail.exchangeActiveTitle'), t('detail.exchangeActiveMessage'));
+                  showToast({ title: t('detail.exchangeActiveTitle'), description: t('detail.exchangeActiveMessage'), variant: 'warning' });
                   return;
                 }
                 void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -909,6 +910,7 @@ function ExchangeDetailModalInner() {
           </HeroButton>
         </Surface>
       ) : null}
+      {confirmDialog}
     </SafeAreaView>
   );
 }

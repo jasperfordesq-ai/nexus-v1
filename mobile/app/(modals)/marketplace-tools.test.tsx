@@ -4,10 +4,28 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { Alert } from 'react-native';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 let mockParams: Record<string, string> = {};
+
+// Stable references so panels that put `show` in a useCallback/useEffect
+// dependency array don't re-run their effects on every render.
+jest.mock('@/components/ui/AppToast', () => {
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
+
+// Auto-confirm: invoking confirm() runs the action immediately, mirroring the
+// old Alert.alert destructive button-press simulation.
+jest.mock('@/components/ui/useConfirm', () => ({
+  useConfirm: () => ({
+    confirm: (opts: { onConfirm: () => void | Promise<void> }) => {
+      void opts.onConfirm();
+    },
+    confirmDialog: null,
+  }),
+}));
 const mockHasFeature = jest.fn(() => true);
 let mockAuthState: {
   isAuthenticated: boolean;
@@ -266,6 +284,7 @@ jest.mock('expo-camera', () => ({
 }));
 
 import MarketplaceToolsRoute, { QrScannerSheet } from './marketplace-tools';
+import { useAppToast } from '@/components/ui/AppToast';
 import {
   createMarketplacePickupSlot,
   createMarketplaceSavedSearch,
@@ -282,6 +301,8 @@ import {
   redeemPublicMerchantCouponQr,
   updateMarketplacePickupSlot,
 } from '@/lib/api/marketplace';
+
+const mockShowToast = useAppToast().show as jest.Mock;
 
 const coupon = {
   id: 7,
@@ -403,7 +424,6 @@ describe('MarketplaceToolsRoute', () => {
 
   it('creates promotions for the selected active listing and product', async () => {
     mockParams = { tab: 'promotions' };
-    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
     jest.mocked(getMyMarketplaceListings).mockResolvedValue({
       data: [{ id: 42, title: 'Promotable lamp', price: 12, price_currency: 'EUR', price_type: 'fixed', image: null }],
       meta: { cursor: null, has_more: false },
@@ -420,10 +440,13 @@ describe('MarketplaceToolsRoute', () => {
 
     await waitFor(() => {
       expect(promoteMarketplaceListing).toHaveBeenCalledWith(42, 'featured');
-      expect(Alert.alert).toHaveBeenCalledWith('Promotion created', 'Your listing promotion is now active.');
+      expect(mockShowToast).toHaveBeenCalledWith(expect.objectContaining({
+        title: 'Promotion created',
+        description: 'Your listing promotion is now active.',
+        variant: 'success',
+      }));
       expect(getMyMarketplacePromotions).toHaveBeenCalledTimes(2);
     });
-    alertSpy.mockRestore();
   });
 
   it('creates pickup slots with selected capacity and recurrence', async () => {

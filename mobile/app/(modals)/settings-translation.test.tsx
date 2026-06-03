@@ -4,7 +4,6 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { Alert } from 'react-native';
 import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 
 import SettingsTranslationScreen from './settings-translation';
@@ -80,6 +79,12 @@ jest.mock('@/lib/i18n', () => ({
   changeLanguage: jest.fn(),
 }));
 
+jest.mock('@/components/ui/AppToast', () => {
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
+
 const mockGetUserPreferences = getUserPreferences as jest.MockedFunction<typeof getUserPreferences>;
 const mockSaveUserPreferences = saveUserPreferences as jest.MockedFunction<typeof saveUserPreferences>;
 const mockChangeLanguage = changeLanguage as jest.MockedFunction<typeof changeLanguage>;
@@ -110,7 +115,6 @@ describe('SettingsTranslationScreen', () => {
       translation: { auto_translate_ugc: true, auto_translate_target_locale: 'en' },
     });
     mockSaveUserPreferences.mockResolvedValue({});
-    jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
 
     const { getByText } = render(<SettingsTranslationScreen />);
     await waitFor(() => expect(getByText('Save preferences')).toBeTruthy());

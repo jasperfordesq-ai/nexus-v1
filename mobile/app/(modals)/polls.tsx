@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, FlatList, KeyboardAvoidingView, Platform, RefreshControl, Text, View } from 'react-native';
+import { FlatList, KeyboardAvoidingView, Platform, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,6 +12,7 @@ import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from '
 import { useTranslation } from 'react-i18next';
 
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -47,6 +48,7 @@ export default function PollsScreen() {
   const { t } = useTranslation(['home', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const params = useLocalSearchParams<{ create?: string | string[] }>();
   const createParam = Array.isArray(params.create) ? params.create[0] : params.create;
   const shouldOpenCreate = createParam === '1' || createParam === 'true';
@@ -90,11 +92,11 @@ export default function PollsScreen() {
     const validOptions = options.map((option) => option.trim()).filter(Boolean);
 
     if (!trimmedQuestion) {
-      Alert.alert(t('pollsScreen.createMissingTitle'), t('pollsScreen.createQuestionRequired'));
+      showToast({ title: t('pollsScreen.createMissingTitle'), description: t('pollsScreen.createQuestionRequired'), variant: 'warning' });
       return;
     }
     if (validOptions.length < 2) {
-      Alert.alert(t('pollsScreen.createMissingTitle'), t('pollsScreen.createOptionsRequired'));
+      showToast({ title: t('pollsScreen.createMissingTitle'), description: t('pollsScreen.createOptionsRequired'), variant: 'warning' });
       return;
     }
 
@@ -111,10 +113,10 @@ export default function PollsScreen() {
       setDescription('');
       setOptions(['', '']);
       setShowCreate(false);
-      Alert.alert(t('pollsScreen.createdTitle'), t('pollsScreen.createdMessage'));
+      showToast({ title: t('pollsScreen.createdTitle'), description: t('pollsScreen.createdMessage'), variant: 'success' });
       refresh();
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('pollsScreen.createError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('pollsScreen.createError'), variant: 'danger' });
     } finally {
       setIsCreating(false);
     }

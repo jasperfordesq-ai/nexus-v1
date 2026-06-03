@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useRef, useState, type ReactNode } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, type TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, Text, type TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -30,6 +30,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import OfflineBanner from '@/components/OfflineBanner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import Input from '@/components/ui/Input';
@@ -77,6 +78,7 @@ function NewExchangeModalInner() {
   const { t } = useTranslation('exchanges');
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const { user } = useAuth();
   const profileLocation = getProfileLocation(user);
   const descriptionRef = useRef<TextInput>(null);
@@ -138,7 +140,7 @@ function NewExchangeModalInner() {
       }
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('detail.actionFailedTitle'), t('detail.aiGenerateFailed'));
+      showToast({ title: t('detail.actionFailedTitle'), description: t('detail.aiGenerateFailed'), variant: 'danger' });
     } finally {
       setGeneratingDescription(false);
     }
@@ -207,7 +209,7 @@ function NewExchangeModalInner() {
           try {
             await uploadExchangeImage(listingId, selectedImageUri);
           } catch {
-            Alert.alert(t('detail.imageUploadFailedTitle'), t('detail.imageUploadFailedMessage'));
+            showToast({ title: t('detail.imageUploadFailedTitle'), description: t('detail.imageUploadFailedMessage'), variant: 'danger' });
           }
         }
       }

@@ -5,7 +5,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Alert,
   FlatList,
   Linking,
   Pressable,
@@ -70,6 +69,7 @@ import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import { API_BASE_URL } from '@/lib/constants';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
@@ -563,6 +563,7 @@ function ApplicationsPanel({
 }) {
   const { t } = useTranslation('volunteering');
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const [withdrawingId, setWithdrawingId] = useState<number | null>(null);
 
   async function handleWithdraw(id: number) {
@@ -573,7 +574,7 @@ function ApplicationsPanel({
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('withdrawError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('withdrawError'), variant: 'danger' });
     } finally {
       setWithdrawingId(null);
     }
@@ -643,6 +644,7 @@ function ShiftsPanel({
   const { t } = useTranslation('volunteering');
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const [cancellingId, setCancellingId] = useState<number | null>(null);
 
   async function handleCancel(id: number) {
@@ -653,7 +655,7 @@ function ShiftsPanel({
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('myShifts.cancelError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('myShifts.cancelError'), variant: 'danger' });
     } finally {
       setCancellingId(null);
     }
@@ -749,6 +751,7 @@ function SwapsPanel({
   const { t } = useTranslation('volunteering');
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const [filter, setFilter] = useState<'all' | 'sent' | 'received'>('all');
   const [actioningId, setActioningId] = useState<number | null>(null);
 
@@ -764,7 +767,7 @@ function SwapsPanel({
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t(action === 'accept' ? 'swaps.acceptError' : 'swaps.rejectError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t(action === 'accept' ? 'swaps.acceptError' : 'swaps.rejectError'), variant: 'danger' });
     } finally {
       setActioningId(null);
     }
@@ -778,7 +781,7 @@ function SwapsPanel({
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('swaps.cancelError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('swaps.cancelError'), variant: 'danger' });
     } finally {
       setActioningId(null);
     }
@@ -922,6 +925,7 @@ function CertificatesPanel({
   const { t } = useTranslation('volunteering');
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const [generating, setGenerating] = useState(false);
 
   async function handleGenerate() {
@@ -932,7 +936,7 @@ function CertificatesPanel({
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('certificates.generateError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('certificates.generateError'), variant: 'danger' });
     } finally {
       setGenerating(false);
     }
@@ -1036,6 +1040,7 @@ function ExpensesPanel({
   const { t } = useTranslation('volunteering');
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const [selectedOrgId, setSelectedOrgId] = useState<number | null>(null);
   const [expenseType, setExpenseType] = useState<VolunteerExpenseType>('travel');
   const [amount, setAmount] = useState('');
@@ -1052,7 +1057,7 @@ function ExpensesPanel({
   async function handleSubmit() {
     const parsedAmount = Number(amount);
     if (!selectedOrgId || !Number.isFinite(parsedAmount) || parsedAmount <= 0 || description.trim().length === 0) {
-      Alert.alert(t('common:errors.alertTitle'), t('expenses.validation'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('expenses.validation'), variant: 'warning' });
       return;
     }
 
@@ -1071,7 +1076,7 @@ function ExpensesPanel({
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('expenses.submitError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('expenses.submitError'), variant: 'danger' });
     } finally {
       setSubmitting(false);
     }
@@ -1231,6 +1236,7 @@ function DonationsPanel({
   const { t } = useTranslation('volunteering');
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const [selectedDayId, setSelectedDayId] = useState<number | null>(null);
   const [amount, setAmount] = useState('');
   const [currency, setCurrency] = useState('EUR');
@@ -1241,7 +1247,7 @@ function DonationsPanel({
   async function handleSubmit() {
     const parsedAmount = Number(amount);
     if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
-      Alert.alert(t('common:errors.alertTitle'), t('donations.validation'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('donations.validation'), variant: 'warning' });
       return;
     }
     setSubmitting(true);
@@ -1260,7 +1266,7 @@ function DonationsPanel({
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('donations.submitError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('donations.submitError'), variant: 'danger' });
     } finally {
       setSubmitting(false);
     }
@@ -1411,6 +1417,7 @@ function HoursPanel({
   const { t } = useTranslation('volunteering');
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const [selectedOrgId, setSelectedOrgId] = useState<number | null>(null);
   const [hours, setHours] = useState('');
   const [description, setDescription] = useState('');
@@ -1425,7 +1432,7 @@ function HoursPanel({
   async function handleLogHours() {
     const parsedHours = Number(hours);
     if (!selectedOrgId || !Number.isFinite(parsedHours) || parsedHours <= 0) {
-      Alert.alert(t('common:errors.alertTitle'), t('hoursRequired'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('hoursRequired'), variant: 'warning' });
       return;
     }
 
@@ -1443,7 +1450,7 @@ function HoursPanel({
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('hoursLogError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('hoursLogError'), variant: 'danger' });
     } finally {
       setLogging(false);
     }
@@ -1561,6 +1568,7 @@ function VolunteeringScreenInner() {
   const { isAuthenticated } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const initialTab = params.tab === 'organisations' ? 'organisations' : 'opportunities';
   const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
   const [search, setSearch] = useState('');
@@ -1639,7 +1647,7 @@ function VolunteeringScreenInner() {
 
   async function handleApply(item: VolunteerOpportunity) {
     if (!isAuthenticated) {
-      Alert.alert(t('signInRequiredTitle'), t('signInRequiredMessage'));
+      showToast({ title: t('signInRequiredTitle'), description: t('signInRequiredMessage'), variant: 'warning' });
       return;
     }
     setApplyingId(item.id);
@@ -1650,7 +1658,7 @@ function VolunteeringScreenInner() {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('applyError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('applyError'), variant: 'danger' });
     } finally {
       setApplyingId(null);
     }

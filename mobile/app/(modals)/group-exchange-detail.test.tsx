@@ -10,6 +10,7 @@ const mockUseApi = jest.fn();
 const mockRefresh = jest.fn();
 const mockConfirmGroupExchange = jest.fn();
 const mockCompleteGroupExchange = jest.fn();
+const mockCancelGroupExchange = jest.fn();
 let mockParams: { id?: string } = { id: '42' };
 
 jest.mock('react-i18next', () => ({
@@ -76,7 +77,7 @@ jest.mock('@/lib/hooks/useTheme', () => ({
 
 jest.mock('@/lib/api/groupExchanges', () => ({
   getGroupExchange: jest.fn(),
-  cancelGroupExchange: jest.fn(),
+  cancelGroupExchange: (...args: unknown[]) => mockCancelGroupExchange(...args),
   confirmGroupExchange: (...args: unknown[]) => mockConfirmGroupExchange(...args),
   completeGroupExchange: (...args: unknown[]) => mockCompleteGroupExchange(...args),
 }));
@@ -91,6 +92,25 @@ jest.mock('@/components/ui/EmptyState', () => {
     return <View>{title ? <Text>{title}</Text> : null}{subtitle ? <Text>{subtitle}</Text> : null}</View>;
   };
 });
+
+jest.mock('@/components/ui/AppToast', () => {
+  // Stable references so screens that put `show` in a useCallback/useEffect
+  // dependency array don't re-run their effects on every render.
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
+
+// Auto-confirm: invoking confirm() runs the action immediately, mirroring the
+// old Alert.alert destructive button-press simulation.
+jest.mock('@/components/ui/useConfirm', () => ({
+  useConfirm: () => ({
+    confirm: (opts: { onConfirm: () => void | Promise<void> }) => {
+      void opts.onConfirm();
+    },
+    confirmDialog: null,
+  }),
+}));
 
 import GroupExchangeDetailScreen from './group-exchange-detail';
 
@@ -127,6 +147,7 @@ beforeEach(() => {
   mockRefresh.mockReset();
   mockConfirmGroupExchange.mockReset().mockResolvedValue({});
   mockCompleteGroupExchange.mockReset().mockResolvedValue({});
+  mockCancelGroupExchange.mockReset().mockResolvedValue({});
 });
 
 describe('GroupExchangeDetailScreen', () => {
@@ -156,5 +177,14 @@ describe('GroupExchangeDetailScreen', () => {
 
     expect(getByText('Group exchange not available')).toBeTruthy();
     expect(mockUseApi).toHaveBeenCalledWith(expect.any(Function), [0], { enabled: false });
+  });
+
+  it('cancels the exchange through the branded confirm flow', async () => {
+    const { getByText } = render(<GroupExchangeDetailScreen />);
+
+    fireEvent.press(getByText('Cancel exchange'));
+
+    await waitFor(() => expect(mockCancelGroupExchange).toHaveBeenCalledWith(42));
+    expect(mockRefresh).toHaveBeenCalled();
   });
 });

@@ -4,7 +4,6 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { Alert } from 'react-native';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 // --- Mocks ---
@@ -375,6 +374,25 @@ jest.mock('@/lib/api/groups', () => ({
 
 jest.mock('@/components/ui/Avatar', () => 'View');
 jest.mock('@/components/ui/LoadingSpinner', () => () => null);
+
+jest.mock('@/components/ui/AppToast', () => {
+  // Stable references so screens that put `show` in a useCallback/useEffect
+  // dependency array don't re-run their effects on every render.
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
+
+// Auto-confirm: pressing a destructive button runs the action immediately,
+// mirroring the old Alert.alert destructive button-press simulation.
+jest.mock('@/components/ui/useConfirm', () => ({
+  useConfirm: () => ({
+    confirm: (opts: { onConfirm: () => void | Promise<void> }) => {
+      void opts.onConfirm();
+    },
+    confirmDialog: null,
+  }),
+}));
 
 // --- Tests ---
 
@@ -782,9 +800,6 @@ describe('GroupDetailScreen', () => {
 
   it('lets group admins delete files from the native files tab', async () => {
     const refreshFiles = jest.fn();
-    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation((_title, _message, buttons) => {
-      buttons?.find((button) => button.style === 'destructive')?.onPress?.();
-    });
     const groupState = {
       data: {
         data: {
@@ -842,7 +857,6 @@ describe('GroupDetailScreen', () => {
       expect(deleteGroupFile).toHaveBeenCalledWith(1, 31);
       expect(refreshFiles).toHaveBeenCalled();
     });
-    alertSpy.mockRestore();
   });
 
   it('renders native group media and filters by type', async () => {
@@ -885,9 +899,6 @@ describe('GroupDetailScreen', () => {
   });
 
   it('lets group admins delete native group media', async () => {
-    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation((_title, _message, buttons) => {
-      buttons?.find((button) => button.style === 'destructive')?.onPress?.();
-    });
     jest.mocked(getGroupMedia).mockResolvedValue({
       data: {
         items: [{
@@ -927,7 +938,6 @@ describe('GroupDetailScreen', () => {
     await waitFor(() => {
       expect(deleteGroupMedia).toHaveBeenCalledWith(1, 81);
     });
-    alertSpy.mockRestore();
   });
 
   it('lets members upload native group media from the photo library', async () => {
@@ -1313,9 +1323,6 @@ describe('GroupDetailScreen', () => {
   });
 
   it('lets group admins delete native wiki pages', async () => {
-    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation((_title, _message, buttons) => {
-      buttons?.find((button) => button.style === 'destructive')?.onPress?.();
-    });
     jest.mocked(getGroupWikiPages).mockResolvedValue({
       data: [{
         id: 61,
@@ -1363,7 +1370,6 @@ describe('GroupDetailScreen', () => {
     await waitFor(() => {
       expect(deleteGroupWikiPage).toHaveBeenCalledWith(1, 61);
     });
-    alertSpy.mockRestore();
   });
 
   it('lets members create and edit native wiki pages', async () => {

@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, FlatList, Pressable, ScrollView, View } from 'react-native';
+import { FlatList, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -13,6 +13,8 @@ import { useTranslation } from 'react-i18next';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
+import { useConfirm } from '@/components/ui/useConfirm';
 import BottomSheet from '@/components/ui/BottomSheet';
 import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
@@ -259,6 +261,7 @@ function MarketplaceToolsScreen() {
 
 function CollectionsPanel() {
   const { t } = useTranslation(['marketplace', 'common']);
+  const { show: showToast } = useAppToast();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -273,7 +276,7 @@ function CollectionsPanel() {
       setDescription('');
       collections.refresh();
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.collections.saveFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('tools.collections.saveFailed'), variant: 'danger' });
     } finally {
       setIsSaving(false);
     }
@@ -284,7 +287,7 @@ function CollectionsPanel() {
       await deleteMarketplaceCollection(item.id);
       collections.refresh();
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.collections.deleteFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('tools.collections.deleteFailed'), variant: 'danger' });
     }
   }
 
@@ -318,6 +321,7 @@ function CollectionsPanel() {
 
 function SavedSearchesPanel() {
   const { t } = useTranslation(['marketplace', 'common']);
+  const { show: showToast } = useAppToast();
   const [name, setName] = useState('');
   const [query, setQuery] = useState('');
   const [alertFrequency, setAlertFrequency] = useState<SavedSearchAlertFrequency>('daily');
@@ -337,7 +341,7 @@ function SavedSearchesPanel() {
       setQuery('');
       searches.refresh();
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.savedSearches.saveFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('tools.savedSearches.saveFailed'), variant: 'danger' });
     }
   }
 
@@ -346,7 +350,7 @@ function SavedSearchesPanel() {
       await deleteMarketplaceSavedSearch(item.id);
       searches.refresh();
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.savedSearches.deleteFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('tools.savedSearches.deleteFailed'), variant: 'danger' });
     }
   }
 
@@ -429,6 +433,7 @@ function ChoiceGroup<T extends string>({
 
 function PromotionsPanel() {
   const { t } = useTranslation(['marketplace', 'common']);
+  const { show: showToast } = useAppToast();
   const { user } = useAuth();
   const [selectedListing, setSelectedListing] = useState<number | null>(null);
   const [promotionType, setPromotionType] = useState<MarketplacePromotionProduct['type'] | null>(null);
@@ -455,10 +460,10 @@ function PromotionsPanel() {
     setIsPromoting(true);
     try {
       await promoteMarketplaceListing(selectedListing, promotionType);
-      Alert.alert(t('tools.promotions.successTitle'), t('tools.promotions.successHint'));
+      showToast({ title: t('tools.promotions.successTitle'), description: t('tools.promotions.successHint'), variant: 'success' });
       promotions.refresh();
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.promotions.failed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('tools.promotions.failed'), variant: 'danger' });
     } finally {
       setIsPromoting(false);
     }
@@ -562,6 +567,7 @@ function normalizePickupCapacity(value: string): number {
 
 function PickupsPanel() {
   const { t } = useTranslation(['marketplace', 'common']);
+  const { show: showToast } = useAppToast();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const [slotStart, setSlotStart] = useState('');
@@ -610,7 +616,7 @@ function PickupsPanel() {
       resetSlotForm();
       slots.refresh();
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t(editingSlot ? 'tools.pickups.updateFailed' : 'tools.pickups.slotFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t(editingSlot ? 'tools.pickups.updateFailed' : 'tools.pickups.slotFailed'), variant: 'danger' });
     }
   }
 
@@ -622,7 +628,7 @@ function PickupsPanel() {
       setQrCode('');
       reservations.refresh();
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.pickups.scanFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('tools.pickups.scanFailed'), variant: 'danger' });
     }
   }
 
@@ -635,7 +641,7 @@ function PickupsPanel() {
       setQrCode('');
       reservations.refresh();
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.pickups.scanFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('tools.pickups.scanFailed'), variant: 'danger' });
     }
   }
 
@@ -645,7 +651,7 @@ function PickupsPanel() {
       if (editingSlot?.id === slot.id) resetSlotForm();
       slots.refresh();
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.pickups.deleteFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('tools.pickups.deleteFailed'), variant: 'danger' });
     }
   }
 
@@ -657,7 +663,7 @@ function PickupsPanel() {
       }
       slots.refresh();
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.pickups.updateFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('tools.pickups.updateFailed'), variant: 'danger' });
     }
   }
 
@@ -792,6 +798,8 @@ function PickupSlotToolCard({
 
 function CouponsPanel() {
   const { t } = useTranslation(['marketplace', 'common']);
+  const { show: showToast } = useAppToast();
+  const { confirm, confirmDialog } = useConfirm();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const params = useLocalSearchParams<{ couponId?: string; couponMode?: string }>();
@@ -846,30 +854,28 @@ function CouponsPanel() {
       setForm(emptyCouponForm);
       coupons.refresh();
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.coupons.saveFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('tools.coupons.saveFailed'), variant: 'danger' });
     } finally {
       setIsSavingCoupon(false);
     }
   }
 
-  async function remove(item: MerchantCoupon) {
-    Alert.alert(t('tools.coupons.deleteTitle'), t('tools.coupons.deleteMessage', { code: item.code }), [
-      { text: t('common:cancel'), style: 'cancel' },
-      {
-        text: t('tools.delete'),
-        style: 'destructive',
-        onPress: () => {
-          void (async () => {
-            try {
-              await deleteMerchantCoupon(item.id);
-              coupons.refresh();
-            } catch (err) {
-              Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.coupons.deleteFailed'));
-            }
-          })();
-        },
+  function remove(item: MerchantCoupon) {
+    confirm({
+      title: t('tools.coupons.deleteTitle'),
+      message: t('tools.coupons.deleteMessage', { code: item.code }),
+      confirmLabel: t('tools.delete'),
+      cancelLabel: t('common:cancel'),
+      variant: 'danger',
+      onConfirm: async () => {
+        try {
+          await deleteMerchantCoupon(item.id);
+          coupons.refresh();
+        } catch (err) {
+          showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('tools.coupons.deleteFailed'), variant: 'danger' });
+        }
       },
-    ]);
+    });
   }
 
   const openRedemptions = useCallback(async (item: MerchantCoupon) => {
@@ -880,11 +886,11 @@ function CouponsPanel() {
       const response = await getMerchantCouponRedemptions(item.id);
       setRedemptions(response.data.items);
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.coupons.redemptionsFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('tools.coupons.redemptionsFailed'), variant: 'danger' });
     } finally {
       setIsLoadingRedemptions(false);
     }
-  }, [t]);
+  }, [t, showToast]);
 
   async function redeemQr() {
     const token = redeemToken.trim();
@@ -899,7 +905,7 @@ function CouponsPanel() {
         void openRedemptions(redemptionCoupon);
       }
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.coupons.qrRedeemFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('tools.coupons.qrRedeemFailed'), variant: 'danger' });
     } finally {
       setIsRedeemingQr(false);
     }
@@ -918,7 +924,7 @@ function CouponsPanel() {
         void openRedemptions(redemptionCoupon);
       }
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.coupons.qrRedeemFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('tools.coupons.qrRedeemFailed'), variant: 'danger' });
     } finally {
       setIsRedeemingQr(false);
     }
@@ -1108,6 +1114,7 @@ function CouponsPanel() {
             )}
         </Surface>
       </BottomSheet>
+      {confirmDialog}
     </PanelCard>
   );
 }

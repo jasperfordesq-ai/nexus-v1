@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,6 +12,7 @@ import { Button as HeroButton, Card as HeroCard, Chip, Text } from 'heroui-nativ
 import { useTranslation } from 'react-i18next';
 
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import EmptyState from '@/components/ui/EmptyState';
 import FormActionFooter from '@/components/ui/FormActionFooter';
 import Input from '@/components/ui/Input';
@@ -50,6 +51,7 @@ function NewChallengeScreen() {
   const { hasFeature } = useTenant();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
@@ -75,20 +77,20 @@ function NewChallengeScreen() {
     const trimmedTitle = title.trim();
     const trimmedDescription = description.trim();
     if (!trimmedTitle || !trimmedDescription) {
-      Alert.alert(t('ideation:create.validationTitle'), t('ideation:create.validationRequired'));
+      showToast({ title: t('ideation:create.validationTitle'), description: t('ideation:create.validationRequired'), variant: 'warning' });
       return;
     }
 
     const submissionDate = normalizeDateTime(submissionDeadline);
     const votingDate = normalizeDateTime(votingDeadline);
     if ((submissionDeadline.trim() && !submissionDate) || (votingDeadline.trim() && !votingDate)) {
-      Alert.alert(t('ideation:create.validationTitle'), t('ideation:create.validationDates'));
+      showToast({ title: t('ideation:create.validationTitle'), description: t('ideation:create.validationDates'), variant: 'warning' });
       return;
     }
 
     const maxIdeas = maxIdeasPerUser.trim() ? Number(maxIdeasPerUser.trim()) : null;
     if (maxIdeas !== null && (!Number.isInteger(maxIdeas) || maxIdeas < 1 || maxIdeas > 50)) {
-      Alert.alert(t('ideation:create.validationTitle'), t('ideation:create.validationMaxIdeas'));
+      showToast({ title: t('ideation:create.validationTitle'), description: t('ideation:create.validationMaxIdeas'), variant: 'warning' });
       return;
     }
 
@@ -112,7 +114,7 @@ function NewChallengeScreen() {
         successDestination = '/(modals)/ideation' as Href;
       }
     } catch (error) {
-      Alert.alert(t('ideation:create.failedTitle'), error instanceof Error ? error.message : t('ideation:create.failedDescription'));
+      showToast({ title: t('ideation:create.failedTitle'), description: error instanceof Error ? error.message : t('ideation:create.failedDescription'), variant: 'danger' });
     } finally {
       setIsSubmitting(false);
     }

@@ -4,7 +4,6 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { Alert } from 'react-native';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 const mockCreateIdeationChallenge = jest.fn().mockResolvedValue({ id: 14 });
@@ -87,6 +86,17 @@ jest.mock('@/lib/haptics', () => ({
   NotificationFeedbackType: { Success: 'success' },
 }));
 
+// Stable AppToast mock — fns created inside the factory closure.
+jest.mock('@/components/ui/AppToast', () => {
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
+
+const { show: mockShowToast } = (jest.requireMock('@/components/ui/AppToast') as {
+  useAppToast: () => { show: jest.Mock };
+}).useAppToast();
+
 jest.mock('@expo/vector-icons', () => ({ Ionicons: 'View' }));
 jest.mock('@/components/ModalErrorBoundary', () => ({ children }: { children: React.ReactNode }) => children);
 jest.mock('@/components/ui/AppTopBar', () => 'View');
@@ -164,7 +174,7 @@ describe('NewChallengeRoute', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockCreateIdeationChallenge.mockResolvedValue({ id: 14 });
-    jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
+    mockShowToast.mockClear();
   });
 
   afterEach(() => {
@@ -197,7 +207,7 @@ describe('NewChallengeRoute', () => {
     fireEvent.press(getByText('Create challenge'));
 
     await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith('Check challenge details', 'Add a title and description before continuing.');
+      expect(mockShowToast).toHaveBeenCalledWith(expect.objectContaining({ title: 'Check challenge details', description: 'Add a title and description before continuing.', variant: 'warning' }));
     });
     expect(mockCreateIdeationChallenge).not.toHaveBeenCalled();
   });

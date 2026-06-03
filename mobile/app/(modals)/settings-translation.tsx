@@ -4,13 +4,14 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import Toggle from '@/components/ui/Toggle';
@@ -35,6 +36,7 @@ export default function SettingsTranslationScreen() {
   const { t, i18n } = useTranslation(['settings', 'common']);
   const theme = useTheme();
   const primary = usePrimaryColor();
+  const { show: showToast } = useAppToast();
   const initialLocale = normalizeLocale(i18n.resolvedLanguage || i18n.language, 'en');
   const [prefersChronological, setPrefersChronological] = useState(false);
   const [autoTranslate, setAutoTranslate] = useState(false);
@@ -50,11 +52,11 @@ export default function SettingsTranslationScreen() {
       setAutoTranslate(Boolean(preferences.translation?.auto_translate_ugc));
       setTargetLocale(normalizeLocale(preferences.translation?.auto_translate_target_locale, initialLocale));
     } catch {
-      Alert.alert(t('common:errors.generic'), t('translation.loadError'));
+      showToast({ title: t('common:errors.generic'), description: t('translation.loadError'), variant: 'danger' });
     } finally {
       setIsLoading(false);
     }
-  }, [initialLocale, t]);
+  }, [initialLocale, t, showToast]);
 
   useEffect(() => {
     void load();
@@ -79,9 +81,9 @@ export default function SettingsTranslationScreen() {
         },
       });
       await changeLanguage(targetLocale);
-      Alert.alert(t('translation.saved'), t('translation.savedBody'));
+      showToast({ title: t('translation.saved'), description: t('translation.savedBody'), variant: 'success' });
     } catch {
-      Alert.alert(t('common:errors.generic'), t('translation.saveError'));
+      showToast({ title: t('common:errors.generic'), description: t('translation.saveError'), variant: 'danger' });
     } finally {
       setIsSaving(false);
     }

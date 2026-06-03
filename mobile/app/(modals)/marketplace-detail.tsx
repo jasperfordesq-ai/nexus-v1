@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useState, type ComponentProps } from 'react';
-import { Alert, Image, Linking, ScrollView, Share, View } from 'react-native';
+import { Image, Linking, ScrollView, Share, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { ResizeMode, Video } from 'expo-av';
@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import * as Haptics from '@/lib/haptics';
 
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import Avatar from '@/components/ui/Avatar';
 import BottomSheet from '@/components/ui/BottomSheet';
 import EmptyState from '@/components/ui/EmptyState';
@@ -67,6 +68,7 @@ function MarketplaceDetailScreen() {
   const { hasFeature } = useTenant();
   const theme = useTheme();
   const { user } = useAuth();
+  const { show: showToast } = useAppToast();
   const listingId = Number(params.id);
   const safeId = Number.isFinite(listingId) && listingId > 0 ? listingId : 0;
   const [listing, setListing] = useState<MarketplaceListingDetail | null>(null);
@@ -199,7 +201,7 @@ function MarketplaceDetailScreen() {
       else await saveMarketplaceListing(listing.id);
     } catch {
       setListing(previous);
-      Alert.alert(t('common:errors.alertTitle'), t('common.save_failed'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('common.save_failed'), variant: 'danger' });
     }
   }
 
@@ -225,7 +227,7 @@ function MarketplaceDetailScreen() {
       try {
         payment = await createMarketplacePaymentIntent(orderId);
       } catch {
-        Alert.alert(t('checkout.paymentRecoveryTitle'), t('checkout.paymentRecoveryHint', { order: orderNumber }));
+        showToast({ title: t('checkout.paymentRecoveryTitle'), description: t('checkout.paymentRecoveryHint', { order: orderNumber }), variant: 'danger' });
         return;
       }
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -240,20 +242,20 @@ function MarketplaceDetailScreen() {
         });
         if (paymentResult.status === 'completed' && payment.data.payment_intent_id) {
           await confirmMarketplacePayment(payment.data.payment_intent_id);
-          Alert.alert(t('checkout.paymentCompleteTitle'), t('checkout.paymentCompleteHint'));
+          showToast({ title: t('checkout.paymentCompleteTitle'), description: t('checkout.paymentCompleteHint'), variant: 'success' });
           router.push({ pathname: '/(modals)/marketplace-orders', params: { mode: 'purchases' } } as unknown as Href);
           return;
         }
         if (paymentResult.status === 'failed') {
-          Alert.alert(t('common:errors.alertTitle'), paymentResult.message || t('checkout.paymentSheetFailed'));
+          showToast({ title: t('common:errors.alertTitle'), description: paymentResult.message || t('checkout.paymentSheetFailed'), variant: 'danger' });
           return;
         }
-        Alert.alert(t('checkout.openedTitle'), t('checkout.clientSecretHint'));
+        showToast({ title: t('checkout.openedTitle'), description: t('checkout.clientSecretHint'), variant: 'default' });
         return;
       }
-      Alert.alert(t('detail.orderCreated'), t('detail.orderCreatedHint', { order: response.data.order_number }));
+      showToast({ title: t('detail.orderCreated'), description: t('detail.orderCreatedHint', { order: response.data.order_number }), variant: 'success' });
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('detail.orderFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('detail.orderFailed'), variant: 'danger' });
     } finally {
       setIsActionLoading(false);
     }
@@ -269,10 +271,10 @@ function MarketplaceDetailScreen() {
         listing_id: listing.id,
       });
       setCouponApplied(true);
-      Alert.alert(t('checkout.couponAppliedTitle'), t('checkout.couponAppliedHint'));
+      showToast({ title: t('checkout.couponAppliedTitle'), description: t('checkout.couponAppliedHint'), variant: 'success' });
     } catch {
       setCouponApplied(false);
-      Alert.alert(t('common:errors.alertTitle'), t('checkout.invalidCoupon'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('checkout.invalidCoupon'), variant: 'danger' });
     } finally {
       setIsActionLoading(false);
     }
@@ -286,7 +288,7 @@ function MarketplaceDetailScreen() {
     if (!listing || isActionLoading) return;
     const amount = Number(offerAmount.replace(/[,\s]/g, ''));
     if (!Number.isFinite(amount) || amount <= 0) {
-      Alert.alert(t('forms.validation'), t('offers.amountRequired'));
+      showToast({ title: t('forms.validation'), description: t('offers.amountRequired'), variant: 'warning' });
       return;
     }
     setIsActionLoading(true);
@@ -296,9 +298,9 @@ function MarketplaceDetailScreen() {
       setOfferOpen(false);
       setOfferAmount('');
       setOfferMessage('');
-      Alert.alert(t('offers.sent'), t('offers.sentHint'));
+      showToast({ title: t('offers.sent'), description: t('offers.sentHint'), variant: 'success' });
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('offers.failed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('offers.failed'), variant: 'danger' });
     } finally {
       setIsActionLoading(false);
     }
@@ -307,7 +309,7 @@ function MarketplaceDetailScreen() {
   async function handleSubmitReport() {
     if (!listing || isActionLoading) return;
     if (!reportDescription.trim()) {
-      Alert.alert(t('forms.validation'), t('detail.reportRequired'));
+      showToast({ title: t('forms.validation'), description: t('detail.reportRequired'), variant: 'warning' });
       return;
     }
     setIsActionLoading(true);
@@ -320,9 +322,9 @@ function MarketplaceDetailScreen() {
       setReportOpen(false);
       setReportReason('misleading');
       setReportDescription('');
-      Alert.alert(t('detail.reportSubmittedTitle'), t('detail.reportSubmittedHint'));
+      showToast({ title: t('detail.reportSubmittedTitle'), description: t('detail.reportSubmittedHint'), variant: 'success' });
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('detail.reportFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('detail.reportFailed'), variant: 'danger' });
     } finally {
       setIsActionLoading(false);
     }
@@ -336,7 +338,7 @@ function MarketplaceDetailScreen() {
       const response = await getMarketplaceCollections();
       setCollections(response.data);
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('collections.unableToLoad'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('collections.unableToLoad'), variant: 'danger' });
     } finally {
       setIsCollectionLoading(false);
     }
@@ -349,9 +351,9 @@ function MarketplaceDetailScreen() {
       await addMarketplaceCollectionItem(collection.id, listing.id);
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setCollectionOpen(false);
-      Alert.alert(t('collections.addedTitle'), t('collections.addedHint', { name: collection.name }));
+      showToast({ title: t('collections.addedTitle'), description: t('collections.addedHint', { name: collection.name }), variant: 'success' });
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('collections.addFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('collections.addFailed'), variant: 'danger' });
     } finally {
       setIsActionLoading(false);
     }

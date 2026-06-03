@@ -4,7 +4,6 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { Alert } from 'react-native';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 const mockUseApi = jest.fn();
@@ -101,6 +100,18 @@ jest.mock('@/lib/haptics', () => ({
   NotificationFeedbackType: { Success: 'success' },
 }));
 
+// Stable AppToast mock — create the fns inside the factory closure so screens
+// that list `show` in a useCallback/useEffect dependency array stay stable.
+jest.mock('@/components/ui/AppToast', () => {
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
+
+const { show: mockShowToast } = (jest.requireMock('@/components/ui/AppToast') as {
+  useAppToast: () => { show: jest.Mock };
+}).useAppToast();
+
 jest.mock('@expo/vector-icons', () => ({ Ionicons: 'View' }));
 jest.mock('@/components/ui/AppTopBar', () => 'View');
 jest.mock('@/components/ModalErrorBoundary', () => ({ children }: { children: React.ReactNode }) => <>{children}</>);
@@ -158,7 +169,7 @@ describe('NewVolunteeringRoute', () => {
     mockGetOpportunity.mockReset();
     mockUpdateOpportunity.mockReset().mockResolvedValue({ data: { id: 19 } });
     mockReplace.mockClear();
-    jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
+    mockShowToast.mockClear();
   });
 
   afterEach(() => {
@@ -174,7 +185,7 @@ describe('NewVolunteeringRoute', () => {
     fireEvent.press(getByText('Create opportunity'));
 
     await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith('Check opportunity details', 'Use at least 5 characters for the title.');
+      expect(mockShowToast).toHaveBeenCalledWith(expect.objectContaining({ title: 'Check opportunity details', description: 'Use at least 5 characters for the title.', variant: 'warning' }));
     });
     expect(mockCreateOpportunity).not.toHaveBeenCalled();
   });
@@ -225,7 +236,7 @@ describe('NewVolunteeringRoute', () => {
     fireEvent.press(getByText('Create opportunity'));
 
     await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith('Check opportunity details', 'Use at least 20 characters for the description.');
+      expect(mockShowToast).toHaveBeenCalledWith(expect.objectContaining({ title: 'Check opportunity details', description: 'Use at least 20 characters for the description.', variant: 'warning' }));
     });
     expect(mockCreateOpportunity).not.toHaveBeenCalled();
   });
@@ -242,7 +253,7 @@ describe('NewVolunteeringRoute', () => {
     fireEvent.press(getByText('Create opportunity'));
 
     await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith('Check opportunity details', 'Use an end date after the start date.');
+      expect(mockShowToast).toHaveBeenCalledWith(expect.objectContaining({ title: 'Check opportunity details', description: 'Use an end date after the start date.', variant: 'warning' }));
     });
     expect(mockCreateOpportunity).not.toHaveBeenCalled();
   });

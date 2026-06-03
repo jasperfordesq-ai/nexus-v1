@@ -213,6 +213,17 @@ jest.mock('@/components/ui/Skeleton', () => ({
   ExchangeCardSkeleton: () => null,
 }));
 
+// Auto-confirm: invoking confirm() runs the action immediately, mirroring the
+// old Alert.alert destructive button-press simulation.
+jest.mock('@/components/ui/useConfirm', () => ({
+  useConfirm: () => ({
+    confirm: (opts: { onConfirm: () => void | Promise<void> }) => {
+      void opts.onConfirm();
+    },
+    confirmDialog: null,
+  }),
+}));
+
 // --- Tests ---
 
 import MoreScreen from './profile';

@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -36,6 +36,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
@@ -182,6 +183,7 @@ function ApplicationsPanel({ applications, loading, onRefresh }: { applications:
   const { t } = useTranslation('volunteering');
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const [actioningId, setActioningId] = useState<number | null>(null);
 
   async function act(id: number, action: 'approve' | 'decline') {
@@ -192,7 +194,7 @@ function ApplicationsPanel({ applications, loading, onRefresh }: { applications:
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('org.applications.actionError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('org.applications.actionError'), variant: 'danger' });
     } finally {
       setActioningId(null);
     }
@@ -252,6 +254,7 @@ function HoursPanel({ entries, loading, onRefresh }: { entries: OrganisationPend
   const { t } = useTranslation('volunteering');
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const [actioningId, setActioningId] = useState<number | null>(null);
 
   async function act(id: number, action: 'approve' | 'decline') {
@@ -262,7 +265,7 @@ function HoursPanel({ entries, loading, onRefresh }: { entries: OrganisationPend
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('org.hours.actionError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('org.hours.actionError'), variant: 'danger' });
     } finally {
       setActioningId(null);
     }
@@ -369,6 +372,7 @@ function WalletPanel({
   const { t } = useTranslation('volunteering');
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
@@ -381,7 +385,7 @@ function WalletPanel({
   async function deposit() {
     const parsed = Number(amount);
     if (!Number.isFinite(parsed) || parsed <= 0) {
-      Alert.alert(t('common:errors.alertTitle'), t('org.wallet.validation'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('org.wallet.validation'), variant: 'warning' });
       return;
     }
     setSaving(true);
@@ -393,7 +397,7 @@ function WalletPanel({
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('org.wallet.depositError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('org.wallet.depositError'), variant: 'danger' });
     } finally {
       setSaving(false);
     }
@@ -407,7 +411,7 @@ function WalletPanel({
       void Haptics.selectionAsync();
     } catch {
       setAutoPay(!next);
-      Alert.alert(t('common:errors.alertTitle'), t('org.wallet.autoPayError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('org.wallet.autoPayError'), variant: 'danger' });
     }
   }
 
@@ -481,6 +485,7 @@ function SettingsPanel({ org, onRefresh }: { org: VolunteeringOrganisation | nul
   const { t } = useTranslation('volunteering');
   const theme = useTheme();
   const primary = usePrimaryColor();
+  const { show: showToast } = useAppToast();
   const [name, setName] = useState(org?.name ?? '');
   const [description, setDescription] = useState(org?.description ?? '');
   const [contactEmail, setContactEmail] = useState(org?.contact_email ?? '');
@@ -496,7 +501,7 @@ function SettingsPanel({ org, onRefresh }: { org: VolunteeringOrganisation | nul
 
   async function save() {
     if (!org || !name.trim()) {
-      Alert.alert(t('common:errors.alertTitle'), t('org.settings.validation'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('org.settings.validation'), variant: 'warning' });
       return;
     }
     setSaving(true);
@@ -511,7 +516,7 @@ function SettingsPanel({ org, onRefresh }: { org: VolunteeringOrganisation | nul
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('org.settings.saveError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('org.settings.saveError'), variant: 'danger' });
     } finally {
       setSaving(false);
     }

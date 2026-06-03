@@ -106,6 +106,14 @@ jest.mock('@/lib/hooks/useApi', () => ({
 jest.mock('@/components/ui/LoadingSpinner', () => () => null);
 jest.mock('@/components/ui/Avatar', () => 'View');
 
+jest.mock('@/components/ui/AppToast', () => {
+  // Stable references so screens that put `show` in a useCallback/useEffect
+  // dependency array don't re-run their effects on every render.
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
+
 jest.mock('@/lib/api/volunteering', () => ({
   depositOrganisationWallet: jest.fn().mockResolvedValue({ data: {} }),
   getOrganisation: jest.fn(),

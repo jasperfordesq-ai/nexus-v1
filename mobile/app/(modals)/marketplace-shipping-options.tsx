@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState } from 'react';
-import { Alert, FlatList, ScrollView, View } from 'react-native';
+import { FlatList, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,6 +12,8 @@ import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'her
 import { useTranslation } from 'react-i18next';
 
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
+import { useConfirm } from '@/components/ui/useConfirm';
 import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -61,6 +63,8 @@ function MarketplaceShippingOptionsScreen() {
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
+  const { confirm, confirmDialog } = useConfirm();
   const marketplaceEnabled = hasFeature('marketplace');
   const canLoadOptions = marketplaceEnabled && !isAuthLoading && isAuthenticated;
   const options = useApi(() => getMarketplaceShippingOptions(), [], { enabled: canLoadOptions });
@@ -129,7 +133,7 @@ function MarketplaceShippingOptionsScreen() {
     const price = Number(form.price);
     const estimatedDays = form.estimatedDays ? Number(form.estimatedDays) : null;
     if (!form.courierName.trim() || !Number.isFinite(price) || price < 0) {
-      Alert.alert(t('common:errors.alertTitle'), t('shipping.validation'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('shipping.validation'), variant: 'warning' });
       return;
     }
 
@@ -150,21 +154,25 @@ function MarketplaceShippingOptionsScreen() {
       reset();
       options.refresh();
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('shipping.saveFailed'));
+      showToast({
+        title: t('common:errors.alertTitle'),
+        description: err instanceof Error ? err.message : t('shipping.saveFailed'),
+        variant: 'danger',
+      });
     } finally {
       setIsSaving(false);
     }
   }
 
   function confirmRemove(option: MarketplaceShippingOption) {
-    Alert.alert(
-      t('shipping.deleteTitle'),
-      t('shipping.deleteMessage', { name: option.courier_name }),
-      [
-        { text: t('common:buttons.cancel'), style: 'cancel' },
-        { text: t('common:buttons.delete'), style: 'destructive', onPress: () => void remove(option) },
-      ],
-    );
+    confirm({
+      title: t('shipping.deleteTitle'),
+      message: t('shipping.deleteMessage', { name: option.courier_name }),
+      confirmLabel: t('common:buttons.delete'),
+      cancelLabel: t('common:buttons.cancel'),
+      variant: 'danger',
+      onConfirm: () => remove(option),
+    });
   }
 
   async function remove(option: MarketplaceShippingOption) {
@@ -173,7 +181,11 @@ function MarketplaceShippingOptionsScreen() {
       if (editingId === option.id) reset();
       options.refresh();
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('shipping.deleteFailed'));
+      showToast({
+        title: t('common:errors.alertTitle'),
+        description: err instanceof Error ? err.message : t('shipping.deleteFailed'),
+        variant: 'danger',
+      });
     }
   }
 
@@ -182,7 +194,11 @@ function MarketplaceShippingOptionsScreen() {
       await updateMarketplaceShippingOption(option.id, { is_default: true });
       options.refresh();
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('shipping.saveFailed'));
+      showToast({
+        title: t('common:errors.alertTitle'),
+        description: err instanceof Error ? err.message : t('shipping.saveFailed'),
+        variant: 'danger',
+      });
     }
   }
 
@@ -262,6 +278,7 @@ function MarketplaceShippingOptionsScreen() {
           )
         }
       />
+      {confirmDialog}
     </SafeAreaView>
   );
 }

@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, FlatList, RefreshControl, Text, View } from 'react-native';
+import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -25,6 +25,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -55,6 +56,7 @@ function ProfileCollectionsInner() {
   const params = useLocalSearchParams<{ userId?: string; name?: string; scope?: string; collectionId?: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const publicScope = isPublicScope(params.scope) && Boolean(params.userId);
   const [selectedCollection, setSelectedCollection] = useState<SavedCollection | null>(null);
   const [itemPage, setItemPage] = useState(1);
@@ -106,13 +108,13 @@ function ProfileCollectionsInner() {
       await removeSavedItem(item.id);
       setItems((current) => current.filter((candidate) => candidate.id !== item.id));
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('collections.removeFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('collections.removeFailed'), variant: 'danger' });
     }
   }
 
   async function handleCreate(payload: { name: string; description: string; isPublic: boolean }) {
     if (!payload.name.trim()) {
-      Alert.alert(t('common:errors.alertTitle'), t('collections.nameRequired'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('collections.nameRequired'), variant: 'warning' });
       return;
     }
     setCreating(true);
@@ -125,7 +127,7 @@ function ProfileCollectionsInner() {
       setShowCreate(false);
       collectionsQuery.refresh();
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('collections.createFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('collections.createFailed'), variant: 'danger' });
     } finally {
       setCreating(false);
     }

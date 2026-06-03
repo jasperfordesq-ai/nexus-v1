@@ -2,6 +2,18 @@
   "title": "Settings",
   "eyebrow": "Preferences",
   "subtitle": "Manage notifications, security, and app information.",
+  "appearance": {
+    "title": "Appearance",
+    "hint": "Choose how the app looks on this device.",
+    "mode": {
+      "system": "System",
+      "systemHint": "Match your device settings",
+      "light": "Light",
+      "lightHint": "Always use the light theme",
+      "dark": "Dark",
+      "darkHint": "Always use the dark theme"
+    }
+  },
   "changePasswordTitle": "Change Password",
   "pushNotifications": "Push Notifications",
   "pushHint": "Choose which activity can appear as device notifications.",

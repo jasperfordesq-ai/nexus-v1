@@ -76,6 +76,11 @@ jest.mock('react-i18next', () => ({
 
 jest.mock('@expo/vector-icons', () => ({ Ionicons: 'View' }));
 jest.mock('@/components/ModalErrorBoundary', () => ({ children }: { children: React.ReactNode }) => children);
+jest.mock('@/components/ui/AppToast', () => {
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
 jest.mock('@/components/ui/AppTopBar', () => {
   const { Text, Pressable, View } = require('react-native');
   return ({ title, rightAction }: { title: string; rightAction?: { accessibilityLabel: string; onPress: () => void } }) => (

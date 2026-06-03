@@ -5,7 +5,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  Alert,
   Image,
   Linking,
   RefreshControl,
@@ -102,6 +101,8 @@ import { withAlpha } from '@/lib/utils/color';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 import { API_BASE_URL, API_V2 } from '@/lib/constants';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
+import { useConfirm } from '@/components/ui/useConfirm';
 import Avatar from '@/components/ui/Avatar';
 import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -281,6 +282,8 @@ function GroupDetailScreenInner() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
+  const { confirm, confirmDialog } = useConfirm();
   const [activeTab, setActiveTab] = useState<TabKey>('overview');
 
   const groupId = Number(id);
@@ -438,46 +441,46 @@ function GroupDetailScreenInner() {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       setIsMember(prevIsMember);
       setMemberCount(prevMemberCount);
-      Alert.alert(t('common:errors.alertTitle'), t('joinError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('joinError'), variant: 'danger' });
     } finally {
       setJoining(false);
     }
   }
 
-  async function handleLeave() {
+  function handleLeave() {
     void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-    Alert.alert(t('leaveConfirmTitle'), t('leaveConfirmMessage'), [
-      { text: t('common:buttons.cancel'), style: 'cancel' },
-      {
-        text: t('leave'),
-        style: 'destructive',
-        onPress: async () => {
-          const prevIsMember = isMember ?? isGroupMember(loadedGroup);
-          const prevMemberCount = memberCount ?? loadedGroup.member_count ?? 0;
-          setLeaving(true);
-          setIsMember(false);
-          setMemberCount(Math.max(0, prevMemberCount - 1));
-          try {
-            await leaveGroup(loadedGroup.id);
-            refresh();
-          } catch {
-            void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-            setIsMember(prevIsMember);
-            setMemberCount(prevMemberCount);
-            Alert.alert(t('common:errors.alertTitle'), t('leaveError'));
-          } finally {
-            setLeaving(false);
-          }
-        },
+    confirm({
+      title: t('leaveConfirmTitle'),
+      message: t('leaveConfirmMessage'),
+      confirmLabel: t('leave'),
+      cancelLabel: t('common:buttons.cancel'),
+      variant: 'danger',
+      onConfirm: async () => {
+        const prevIsMember = isMember ?? isGroupMember(loadedGroup);
+        const prevMemberCount = memberCount ?? loadedGroup.member_count ?? 0;
+        setLeaving(true);
+        setIsMember(false);
+        setMemberCount(Math.max(0, prevMemberCount - 1));
+        try {
+          await leaveGroup(loadedGroup.id);
+          refresh();
+        } catch {
+          void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+          setIsMember(prevIsMember);
+          setMemberCount(prevMemberCount);
+          showToast({ title: t('common:errors.alertTitle'), description: t('leaveError'), variant: 'danger' });
+        } finally {
+          setLeaving(false);
+        }
       },
-    ]);
+    });
   }
 
   async function handleCreateDiscussion() {
     const title = discussionTitle.trim();
     const content = discussionContent.trim();
     if (!title || !content) {
-      Alert.alert(t('common:errors.alertTitle'), t('detail.discussionRequired'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.discussionRequired'), variant: 'warning' });
       return;
     }
 
@@ -492,7 +495,7 @@ function GroupDetailScreenInner() {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('detail.discussionCreateError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.discussionCreateError'), variant: 'danger' });
     } finally {
       setCreatingDiscussion(false);
     }
@@ -502,7 +505,7 @@ function GroupDetailScreenInner() {
     const title = announcementTitle.trim();
     const content = announcementContent.trim();
     if (!title || !content) {
-      Alert.alert(t('common:errors.alertTitle'), t('detail.announcementRequired'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.announcementRequired'), variant: 'warning' });
       return;
     }
 
@@ -522,7 +525,7 @@ function GroupDetailScreenInner() {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('detail.announcementCreateError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.announcementCreateError'), variant: 'danger' });
     } finally {
       setCreatingAnnouncement(false);
     }
@@ -536,41 +539,41 @@ function GroupDetailScreenInner() {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('detail.announcementUpdateError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.announcementUpdateError'), variant: 'danger' });
     } finally {
       setUpdatingAnnouncementId(null);
     }
   }
 
   function handleDeleteAnnouncement(announcement: GroupAnnouncement) {
-    Alert.alert(t('detail.deleteAnnouncementTitle'), t('detail.deleteAnnouncementMessage'), [
-      { text: t('common:buttons.cancel'), style: 'cancel' },
-      {
-        text: t('detail.deleteAnnouncement'),
-        style: 'destructive',
-        onPress: async () => {
-          setUpdatingAnnouncementId(announcement.id);
-          try {
-            await deleteGroupAnnouncement(loadedGroup.id, announcement.id);
-            announcementsApi.refresh();
-            refresh();
-            void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-          } catch {
-            void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-            Alert.alert(t('common:errors.alertTitle'), t('detail.announcementDeleteError'));
-          } finally {
-            setUpdatingAnnouncementId(null);
-          }
-        },
+    confirm({
+      title: t('detail.deleteAnnouncementTitle'),
+      message: t('detail.deleteAnnouncementMessage'),
+      confirmLabel: t('detail.deleteAnnouncement'),
+      cancelLabel: t('common:buttons.cancel'),
+      variant: 'danger',
+      onConfirm: async () => {
+        setUpdatingAnnouncementId(announcement.id);
+        try {
+          await deleteGroupAnnouncement(loadedGroup.id, announcement.id);
+          announcementsApi.refresh();
+          refresh();
+          void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        } catch {
+          void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+          showToast({ title: t('common:errors.alertTitle'), description: t('detail.announcementDeleteError'), variant: 'danger' });
+        } finally {
+          setUpdatingAnnouncementId(null);
+        }
       },
-    ]);
+    });
   }
 
   async function handleCreateQuestion() {
     const title = questionTitle.trim();
     const body = questionBody.trim();
     if (!title || !body) {
-      Alert.alert(t('common:errors.alertTitle'), t('detail.qa.validation'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.qa.validation'), variant: 'warning' });
       return;
     }
 
@@ -584,7 +587,7 @@ function GroupDetailScreenInner() {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('detail.qa.createError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.qa.createError'), variant: 'danger' });
     } finally {
       setCreatingQuestion(false);
     }
@@ -1125,6 +1128,7 @@ function GroupDetailScreenInner() {
           <GroupMarketplacePanel groupId={loadedGroup.id} canView={userCanSeeMemberContent} />
         ) : null}
       </ScrollView>
+      {confirmDialog}
     </SafeAreaView>
   );
 }
@@ -1265,6 +1269,8 @@ function GroupFilesPanel({
   const { t } = useTranslation(['groups', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
+  const { confirm, confirmDialog } = useConfirm();
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   function openDownload(fileId: number) {
@@ -1273,28 +1279,26 @@ function GroupFilesPanel({
   }
 
   function confirmDelete(file: GroupFileItem) {
-    Alert.alert(t('detail.files.deleteTitle'), t('detail.files.deleteMessage', { name: file.file_name }), [
-      { text: t('common:buttons.cancel'), style: 'cancel' },
-      {
-        text: t('detail.files.delete'),
-        style: 'destructive',
-        onPress: () => {
-          void (async () => {
-            setDeletingId(file.id);
-            try {
-              await deleteGroupFile(groupId, file.id);
-              onRefresh();
-              void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            } catch {
-              void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-              Alert.alert(t('common:errors.alertTitle'), t('detail.files.deleteError'));
-            } finally {
-              setDeletingId(null);
-            }
-          })();
-        },
+    confirm({
+      title: t('detail.files.deleteTitle'),
+      message: t('detail.files.deleteMessage', { name: file.file_name }),
+      confirmLabel: t('detail.files.delete'),
+      cancelLabel: t('common:buttons.cancel'),
+      variant: 'danger',
+      onConfirm: async () => {
+        setDeletingId(file.id);
+        try {
+          await deleteGroupFile(groupId, file.id);
+          onRefresh();
+          void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        } catch {
+          void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+          showToast({ title: t('common:errors.alertTitle'), description: t('detail.files.deleteError'), variant: 'danger' });
+        } finally {
+          setDeletingId(null);
+        }
       },
-    ]);
+    });
   }
 
   if (!canView) {
@@ -1377,6 +1381,7 @@ function GroupFilesPanel({
           </HeroCard>
         ))
       )}
+      {confirmDialog}
     </View>
   );
 }
@@ -1393,6 +1398,8 @@ function GroupMediaPanel({
   const { t } = useTranslation(['groups', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
+  const { confirm, confirmDialog } = useConfirm();
   const [filter, setFilter] = useState<GroupMediaType | 'all'>('all');
   const [items, setItems] = useState<GroupMediaItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -1406,7 +1413,7 @@ function GroupMediaPanel({
       const response = await getGroupMedia(groupId, { type: filter });
       setItems(response.data.items ?? []);
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('detail.media.loadError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.media.loadError'), variant: 'danger' });
     } finally {
       setIsLoading(false);
     }
@@ -1423,34 +1430,32 @@ function GroupMediaPanel({
   }
 
   function confirmDelete(item: GroupMediaItem) {
-    Alert.alert(t('detail.media.deleteTitle'), t('detail.media.deleteMessage'), [
-      { text: t('common:buttons.cancel'), style: 'cancel' },
-      {
-        text: t('detail.media.delete'),
-        style: 'destructive',
-        onPress: () => {
-          void (async () => {
-            setDeletingId(item.id);
-            try {
-              await deleteGroupMedia(groupId, item.id);
-              await loadMedia();
-              void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            } catch {
-              void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-              Alert.alert(t('common:errors.alertTitle'), t('detail.media.deleteError'));
-            } finally {
-              setDeletingId(null);
-            }
-          })();
-        },
+    confirm({
+      title: t('detail.media.deleteTitle'),
+      message: t('detail.media.deleteMessage'),
+      confirmLabel: t('detail.media.delete'),
+      cancelLabel: t('common:buttons.cancel'),
+      variant: 'danger',
+      onConfirm: async () => {
+        setDeletingId(item.id);
+        try {
+          await deleteGroupMedia(groupId, item.id);
+          await loadMedia();
+          void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        } catch {
+          void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+          showToast({ title: t('common:errors.alertTitle'), description: t('detail.media.deleteError'), variant: 'danger' });
+        } finally {
+          setDeletingId(null);
+        }
       },
-    ]);
+    });
   }
 
   async function pickMedia(type: GroupMediaType) {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert(t('detail.media.permissionTitle'), t('detail.media.permissionMessage'));
+      showToast({ title: t('detail.media.permissionTitle'), description: t('detail.media.permissionMessage'), variant: 'warning' });
       return;
     }
 
@@ -1475,7 +1480,7 @@ function GroupMediaPanel({
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('detail.media.uploadError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.media.uploadError'), variant: 'danger' });
     } finally {
       setUploadingMediaType(null);
     }
@@ -1571,6 +1576,7 @@ function GroupMediaPanel({
           })}
         </View>
       )}
+      {confirmDialog}
     </View>
   );
 }
@@ -1611,6 +1617,7 @@ function GroupQAPanel({
   const { t } = useTranslation(['groups', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [detail, setDetail] = useState<GroupQuestionDetail | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
@@ -1634,7 +1641,7 @@ function GroupQAPanel({
       const response = await getGroupQuestion(groupId, questionId);
       setDetail(response.data);
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('detail.qa.loadError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.qa.loadError'), variant: 'danger' });
       setExpandedId(null);
     } finally {
       setLoadingDetail(false);
@@ -1644,7 +1651,7 @@ function GroupQAPanel({
   async function submitAnswer() {
     const content = answerBody.trim();
     if (!expandedId || !content) {
-      Alert.alert(t('common:errors.alertTitle'), t('detail.qa.answerValidation'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.qa.answerValidation'), variant: 'warning' });
       return;
     }
 
@@ -1658,7 +1665,7 @@ function GroupQAPanel({
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('detail.qa.answerError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.qa.answerError'), variant: 'danger' });
     } finally {
       setAnswering(false);
     }
@@ -1680,7 +1687,7 @@ function GroupQAPanel({
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('detail.qa.voteError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.qa.voteError'), variant: 'danger' });
     } finally {
       setVotingTarget(null);
     }
@@ -1695,7 +1702,7 @@ function GroupQAPanel({
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('detail.qa.acceptError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.qa.acceptError'), variant: 'danger' });
     } finally {
       setAcceptingAnswerId(null);
     }
@@ -1923,6 +1930,8 @@ function GroupWikiPanel({
 }) {
   const { t } = useTranslation(['groups', 'common']);
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
+  const { confirm, confirmDialog } = useConfirm();
   const [pages, setPages] = useState<GroupWikiPage[]>([]);
   const [selectedPage, setSelectedPage] = useState<GroupWikiPageDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -1951,7 +1960,7 @@ function GroupWikiPanel({
       setEditContent(response.data.content ?? '');
       setChangeSummary('');
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('detail.wiki.pageLoadError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.wiki.pageLoadError'), variant: 'danger' });
     } finally {
       setPageLoading(false);
     }
@@ -1969,7 +1978,7 @@ function GroupWikiPanel({
         setSelectedPage(null);
       }
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('detail.wiki.loadError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.wiki.loadError'), variant: 'danger' });
     } finally {
       setIsLoading(false);
     }
@@ -1984,7 +1993,7 @@ function GroupWikiPanel({
     const title = newTitle.trim();
     const content = newContent.trim();
     if (!title || !content) {
-      Alert.alert(t('common:errors.alertTitle'), t('detail.wiki.validation'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.wiki.validation'), variant: 'warning' });
       return;
     }
 
@@ -1999,7 +2008,7 @@ function GroupWikiPanel({
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('detail.wiki.createError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.wiki.createError'), variant: 'danger' });
     } finally {
       setCreating(false);
     }
@@ -2007,7 +2016,7 @@ function GroupWikiPanel({
 
   async function savePage() {
     if (!selectedPage || !editContent.trim()) {
-      Alert.alert(t('common:errors.alertTitle'), t('detail.wiki.validation'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.wiki.validation'), variant: 'warning' });
       return;
     }
 
@@ -2025,7 +2034,7 @@ function GroupWikiPanel({
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('detail.wiki.saveError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.wiki.saveError'), variant: 'danger' });
     } finally {
       setSaving(false);
     }
@@ -2039,7 +2048,7 @@ function GroupWikiPanel({
       setRevisions(response.data ?? []);
       setShowRevisions(true);
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('detail.wiki.revisionsError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.wiki.revisionsError'), variant: 'danger' });
     } finally {
       setRevisionsLoading(false);
     }
@@ -2047,32 +2056,30 @@ function GroupWikiPanel({
 
   function confirmDeletePage() {
     if (!selectedPage) return;
-    Alert.alert(t('detail.wiki.deleteTitle'), t('detail.wiki.deleteMessage', { title: selectedPage.title }), [
-      { text: t('common:buttons.cancel'), style: 'cancel' },
-      {
-        text: t('detail.wiki.delete'),
-        style: 'destructive',
-        onPress: () => {
-          void (async () => {
-            if (!selectedPage) return;
-            setDeletingPage(true);
-            try {
-              await deleteGroupWikiPage(groupId, selectedPage.id);
-              setSelectedPage(null);
-              setRevisions([]);
-              setShowRevisions(false);
-              await loadPages(false);
-              void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            } catch {
-              void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-              Alert.alert(t('common:errors.alertTitle'), t('detail.wiki.deleteError'));
-            } finally {
-              setDeletingPage(false);
-            }
-          })();
-        },
+    confirm({
+      title: t('detail.wiki.deleteTitle'),
+      message: t('detail.wiki.deleteMessage', { title: selectedPage.title }),
+      confirmLabel: t('detail.wiki.delete'),
+      cancelLabel: t('common:buttons.cancel'),
+      variant: 'danger',
+      onConfirm: async () => {
+        if (!selectedPage) return;
+        setDeletingPage(true);
+        try {
+          await deleteGroupWikiPage(groupId, selectedPage.id);
+          setSelectedPage(null);
+          setRevisions([]);
+          setShowRevisions(false);
+          await loadPages(false);
+          void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        } catch {
+          void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+          showToast({ title: t('common:errors.alertTitle'), description: t('detail.wiki.deleteError'), variant: 'danger' });
+        } finally {
+          setDeletingPage(false);
+        }
       },
-    ]);
+    });
   }
 
   if (!canView) {
@@ -2263,6 +2270,7 @@ function GroupWikiPanel({
           </HeroCard.Body>
         </HeroCard>
       ) : null}
+      {confirmDialog}
     </View>
   );
 }
@@ -2280,6 +2288,8 @@ function GroupTasksPanel({
 }) {
   const { t } = useTranslation(['groups', 'common']);
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
+  const { confirm, confirmDialog } = useConfirm();
   const [statusFilter, setStatusFilter] = useState<GroupTaskStatus | 'all'>('all');
   const [tasks, setTasks] = useState<GroupTask[]>([]);
   const [stats, setStats] = useState<GroupTaskStats | null>(null);
@@ -2304,7 +2314,7 @@ function GroupTasksPanel({
       setTasks(taskResponse.data ?? []);
       setStats(statsResponse.data);
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('detail.tasks.loadError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.tasks.loadError'), variant: 'danger' });
     } finally {
       setIsLoading(false);
     }
@@ -2325,7 +2335,7 @@ function GroupTasksPanel({
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('detail.tasks.updateError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.tasks.updateError'), variant: 'danger' });
     } finally {
       setUpdatingTaskId(null);
     }
@@ -2342,7 +2352,7 @@ function GroupTasksPanel({
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('detail.tasks.updateError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.tasks.updateError'), variant: 'danger' });
     } finally {
       setUpdatingTaskId(null);
     }
@@ -2351,7 +2361,7 @@ function GroupTasksPanel({
   const createTask = async () => {
     const cleanTitle = title.trim();
     if (!cleanTitle) {
-      Alert.alert(t('common:errors.alertTitle'), t('detail.tasks.validation'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.tasks.validation'), variant: 'warning' });
       return;
     }
 
@@ -2375,35 +2385,33 @@ function GroupTasksPanel({
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('detail.tasks.createError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.tasks.createError'), variant: 'danger' });
     } finally {
       setCreating(false);
     }
   };
 
   const confirmDelete = (task: GroupTask) => {
-    Alert.alert(t('detail.tasks.deleteTitle'), t('detail.tasks.deleteMessage', { title: task.title }), [
-      { text: t('common:buttons.cancel'), style: 'cancel' },
-      {
-        text: t('detail.tasks.delete'),
-        style: 'destructive',
-        onPress: () => {
-          void (async () => {
-            setUpdatingTaskId(task.id);
-            try {
-              await deleteGroupTask(task.id);
-              await loadTasks();
-              void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            } catch {
-              void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-              Alert.alert(t('common:errors.alertTitle'), t('detail.tasks.deleteError'));
-            } finally {
-              setUpdatingTaskId(null);
-            }
-          })();
-        },
+    confirm({
+      title: t('detail.tasks.deleteTitle'),
+      message: t('detail.tasks.deleteMessage', { title: task.title }),
+      confirmLabel: t('detail.tasks.delete'),
+      cancelLabel: t('common:buttons.cancel'),
+      variant: 'danger',
+      onConfirm: async () => {
+        setUpdatingTaskId(task.id);
+        try {
+          await deleteGroupTask(task.id);
+          await loadTasks();
+          void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        } catch {
+          void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+          showToast({ title: t('common:errors.alertTitle'), description: t('detail.tasks.deleteError'), variant: 'danger' });
+        } finally {
+          setUpdatingTaskId(null);
+        }
       },
-    ]);
+    });
   };
 
   if (!canView) {
@@ -2627,6 +2635,7 @@ function GroupTasksPanel({
           </HeroCard>
         ))
       )}
+      {confirmDialog}
     </View>
   );
 }
@@ -2635,6 +2644,7 @@ function GroupAnalyticsPanel({ groupId, canView }: { groupId: number; canView: b
   const { t } = useTranslation(['groups', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const [days, setDays] = useState(30);
   const [dashboard, setDashboard] = useState<GroupAnalyticsDashboard | null>(null);
   const [retention, setRetention] = useState<GroupAnalyticsRetentionCohort[]>([]);
@@ -2654,7 +2664,7 @@ function GroupAnalyticsPanel({ groupId, canView }: { groupId: number; canView: b
       setRetention(retentionResponse.data);
       setComparative(comparativeResponse.data);
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('detail.analytics.loadError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.analytics.loadError'), variant: 'danger' });
     } finally {
       setIsLoading(false);
     }
@@ -2869,6 +2879,7 @@ function GroupMarketplacePanel({ groupId, canView }: { groupId: number; canView:
   const { t } = useTranslation(['groups', 'marketplace', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [items, setItems] = useState<MarketplaceListingItem[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
@@ -2897,12 +2908,12 @@ function GroupMarketplacePanel({ groupId, canView }: { groupId: number; canView:
       setItems((current) => append ? [...current, ...response.data] : response.data);
     } catch (err) {
       if (!append) setError(err instanceof Error ? err.message : t('detail.marketplace.loadFailed'));
-      else Alert.alert(t('common:errors.alertTitle'), t('detail.marketplace.loadMoreFailed'));
+      else showToast({ title: t('common:errors.alertTitle'), description: t('detail.marketplace.loadMoreFailed'), variant: 'danger' });
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [canView, cursor, groupId, selectedCategory, t]);
+  }, [canView, cursor, groupId, selectedCategory, showToast, t]);
 
   useEffect(() => {
     void loadListings(false);
@@ -2922,7 +2933,7 @@ function GroupMarketplacePanel({ groupId, canView }: { groupId: number; canView:
       else await unsaveMarketplaceListing(item.id);
     } catch {
       setItems((current) => current.map((listing) => listing.id === item.id ? item : listing));
-      Alert.alert(t('common:errors.alertTitle'), t('marketplace:common.save_failed'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('marketplace:common.save_failed'), variant: 'danger' });
     }
   }
 

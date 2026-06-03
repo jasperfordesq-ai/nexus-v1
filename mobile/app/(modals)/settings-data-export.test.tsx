@@ -4,7 +4,6 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { Alert } from 'react-native';
 import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 
 import SettingsDataExportScreen from './settings-data-export';
@@ -73,6 +72,12 @@ jest.mock('@/lib/api/settings', () => ({
   requestDataExport: jest.fn(),
 }));
 
+jest.mock('@/components/ui/AppToast', () => {
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
+
 const mockGetDataExportHistory = getDataExportHistory as jest.MockedFunction<typeof getDataExportHistory>;
 const mockRequestDataExport = requestDataExport as jest.MockedFunction<typeof requestDataExport>;
 
@@ -98,7 +103,6 @@ describe('SettingsDataExportScreen', () => {
   it('requests a data export using the selected format', async () => {
     mockGetDataExportHistory.mockResolvedValue([]);
     mockRequestDataExport.mockResolvedValue({});
-    jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
 
     const { getByText } = render(<SettingsDataExportScreen />);
     await waitFor(() => expect(getByText('Request export')).toBeTruthy());

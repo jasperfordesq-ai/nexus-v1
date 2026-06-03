@@ -4,7 +4,6 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { Alert } from 'react-native';
 import { fireEvent, render } from '@testing-library/react-native';
 
 let mockPollSearchParams: Record<string, string | string[]> = {};
@@ -96,6 +95,14 @@ jest.mock('@/components/ui/AppTopBar', () => {
   return ({ title }: { title: string }) => <Text>{title}</Text>;
 });
 
+// Stable references so screens that put `show` in a useCallback/useEffect
+// dependency array don't re-run their effects on every render.
+jest.mock('@/components/ui/AppToast', () => {
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
+
 jest.mock('@/components/ModalErrorBoundary', () => ({ children }: { children: React.ReactNode }) => children);
 
 jest.mock('@/lib/api/feed', () => ({
@@ -109,6 +116,9 @@ jest.mock('@/lib/api/polls', () => ({
 
 import PollsScreen from './polls';
 import { createPoll } from '@/lib/api/polls';
+import { useAppToast } from '@/components/ui/AppToast';
+
+const mockShowToast = useAppToast().show as jest.Mock;
 
 const defaultState = {
   items: [],
@@ -125,7 +135,7 @@ describe('PollsScreen', () => {
     mockPollSearchParams = {};
     mockUsePaginatedApi.mockReset();
     mockUsePaginatedApi.mockReturnValue(defaultState);
-    jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
+    mockShowToast.mockClear();
     (createPoll as jest.Mock).mockClear();
   });
 
@@ -208,7 +218,11 @@ describe('PollsScreen', () => {
       is_anonymous: false,
     });
     await Promise.resolve();
-    expect(Alert.alert).toHaveBeenCalledWith('Poll created', 'Your poll is now open.');
+    expect(mockShowToast).toHaveBeenCalledWith({
+      title: 'Poll created',
+      description: 'Your poll is now open.',
+      variant: 'success',
+    });
     expect(refresh).toHaveBeenCalled();
   });
 

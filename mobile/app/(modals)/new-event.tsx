@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,6 +20,7 @@ import { useTheme } from '@/lib/hooks/useTheme';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import FormActionFooter from '@/components/ui/FormActionFooter';
 import Input from '@/components/ui/Input';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
@@ -74,6 +75,7 @@ function NewEventScreen() {
   const params = useLocalSearchParams<{ group_id?: string; id?: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const parsedGroupId = Number(params.group_id);
   const groupId = Number.isFinite(parsedGroupId) && parsedGroupId > 0 ? parsedGroupId : null;
   const eventId = Number(params.id);
@@ -112,7 +114,7 @@ function NewEventScreen() {
       })
       .catch(() => {
         if (!isMounted) return;
-        Alert.alert(t('create.failedTitle'), t('create.loadFailed'));
+        showToast({ title: t('create.failedTitle'), description: t('create.loadFailed'), variant: 'danger' });
       });
 
     return () => {
@@ -148,17 +150,17 @@ function NewEventScreen() {
 
       const asset = result.assets[0];
       if (asset.mimeType && !ALLOWED_COVER_IMAGE_TYPES.includes(asset.mimeType)) {
-        Alert.alert(t('create.validationTitle'), t('create.imageTypeError'));
+        showToast({ title: t('create.validationTitle'), description: t('create.imageTypeError'), variant: 'warning' });
         return;
       }
       if (asset.fileSize && asset.fileSize > MAX_COVER_IMAGE_SIZE) {
-        Alert.alert(t('create.validationTitle'), t('create.imageSizeError'));
+        showToast({ title: t('create.validationTitle'), description: t('create.imageSizeError'), variant: 'warning' });
         return;
       }
 
       setSelectedImageUri(asset.uri);
     } catch {
-      Alert.alert(t('create.imagePickFailedTitle'), t('create.imagePickFailedDescription'));
+      showToast({ title: t('create.imagePickFailedTitle'), description: t('create.imagePickFailedDescription'), variant: 'danger' });
     }
   }
 
@@ -166,24 +168,24 @@ function NewEventScreen() {
     const start = toApiDate(startTime);
     const end = endTime.trim() ? toApiDate(endTime) : null;
     if (!title.trim() || !description.trim() || !start) {
-      Alert.alert(t('create.validationTitle'), t('create.validationRequired'));
+      showToast({ title: t('create.validationTitle'), description: t('create.validationRequired'), variant: 'warning' });
       return;
     }
 
     const startDate = new Date(start);
     if (startDate <= new Date()) {
-      Alert.alert(t('create.validationTitle'), t('create.validationStartFuture'));
+      showToast({ title: t('create.validationTitle'), description: t('create.validationStartFuture'), variant: 'warning' });
       return;
     }
 
     if (end && new Date(end) <= startDate) {
-      Alert.alert(t('create.validationTitle'), t('create.validationEndAfterStart'));
+      showToast({ title: t('create.validationTitle'), description: t('create.validationEndAfterStart'), variant: 'warning' });
       return;
     }
 
     const parsedMaxAttendees = maxAttendees.trim() ? Number(maxAttendees) : null;
     if (parsedMaxAttendees !== null && (!Number.isFinite(parsedMaxAttendees) || parsedMaxAttendees < 1 || parsedMaxAttendees > 10000)) {
-      Alert.alert(t('create.validationTitle'), t('create.validationCapacity'));
+      showToast({ title: t('create.validationTitle'), description: t('create.validationCapacity'), variant: 'warning' });
       return;
     }
 
@@ -196,7 +198,7 @@ function NewEventScreen() {
       || (hasLatitude && (latitudeValue === null || latitudeValue < -90 || latitudeValue > 90))
       || (hasLongitude && (longitudeValue === null || longitudeValue < -180 || longitudeValue > 180))
     ) {
-      Alert.alert(t('create.validationTitle'), t('create.invalidCoordinates'));
+      showToast({ title: t('create.validationTitle'), description: t('create.invalidCoordinates'), variant: 'warning' });
       return;
     }
 
@@ -227,7 +229,7 @@ function NewEventScreen() {
           try {
             await uploadEventImage(id, selectedImageUri);
           } catch {
-            Alert.alert(t('create.imageUploadFailedTitle'), t('create.imageUploadFailedDescription'));
+            showToast({ title: t('create.imageUploadFailedTitle'), description: t('create.imageUploadFailedDescription'), variant: 'danger' });
           }
         }
         successDestination = { pathname: '/(modals)/event-detail', params: { id: String(id) } };
@@ -235,7 +237,7 @@ function NewEventScreen() {
         shouldGoBack = true;
       }
     } catch (error) {
-      Alert.alert(t('create.failedTitle'), error instanceof Error ? error.message : t('create.failedDescription'));
+      showToast({ title: t('create.failedTitle'), description: error instanceof Error ? error.message : t('create.failedDescription'), variant: 'danger' });
     } finally {
       setIsSubmitting(false);
     }

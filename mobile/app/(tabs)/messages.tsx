@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, FlatList, Platform, Pressable, RefreshControl, Text, View } from 'react-native';
+import { FlatList, Platform, Pressable, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,6 +18,8 @@ import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
+import { useAppToast } from '@/components/ui/AppToast';
+import { useConfirm } from '@/components/ui/useConfirm';
 import Avatar from '@/components/ui/Avatar';
 import Input from '@/components/ui/Input';
 import { ConversationSkeleton } from '@/components/ui/Skeleton';
@@ -38,6 +40,8 @@ export default function MessagesScreen() {
   const { t } = useTranslation(['messages', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
+  const { confirm, confirmDialog } = useConfirm();
   const unknownMemberLabel = t('unknownMember');
   const navigation = useRouter();
   const params = useLocalSearchParams<{
@@ -134,25 +138,22 @@ export default function MessagesScreen() {
   }, [navigation]);
 
   function handleArchiveConversation(conversation: Conversation) {
-    Alert.alert(
-      t('archiveConversation'),
-      t('archiveConfirm', { name: displayName(conversation.other_user, unknownMemberLabel) }),
-      [
-        { text: t('common:buttons.cancel'), style: 'cancel' },
-        {
-          text: t('archive'),
-          onPress: async () => {
-            try {
-              await archiveConversation(conversation.id);
-              void inboxPage.refresh();
-              void archivedPage.refresh();
-            } catch {
-              Alert.alert(t('errors.archiveFailedTitle'), t('errors.archiveFailed'));
-            }
-          },
-        },
-      ],
-    );
+    confirm({
+      title: t('archiveConversation'),
+      message: t('archiveConfirm', { name: displayName(conversation.other_user, unknownMemberLabel) }),
+      confirmLabel: t('archive'),
+      cancelLabel: t('common:buttons.cancel'),
+      variant: 'primary',
+      onConfirm: async () => {
+        try {
+          await archiveConversation(conversation.id);
+          void inboxPage.refresh();
+          void archivedPage.refresh();
+        } catch {
+          showToast({ title: t('errors.archiveFailedTitle'), description: t('errors.archiveFailed'), variant: 'danger' });
+        }
+      },
+    });
   }
 
   async function handleRestoreConversation(conversation: Conversation) {
@@ -161,7 +162,7 @@ export default function MessagesScreen() {
       void inboxPage.refresh();
       void archivedPage.refresh();
     } catch {
-      Alert.alert(t('errors.restoreFailedTitle'), t('errors.restoreFailed'));
+      showToast({ title: t('errors.restoreFailedTitle'), description: t('errors.restoreFailed'), variant: 'danger' });
     }
   }
 
@@ -191,7 +192,7 @@ export default function MessagesScreen() {
           const otherName = displayName(conversation.other_user, unknownMemberLabel);
           const recipientId = Number(conversation.other_user?.id);
           if (!Number.isFinite(recipientId) || recipientId <= 0) {
-            Alert.alert(t('errors.threadUnavailableTitle'), t('errors.threadUnavailable'));
+            showToast({ title: t('errors.threadUnavailableTitle'), description: t('errors.threadUnavailable'), variant: 'danger' });
             return;
           }
           void navigation.push({
@@ -292,6 +293,7 @@ export default function MessagesScreen() {
         }
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
       />
+      {confirmDialog}
     </SafeAreaView>
   );
 }

@@ -5,7 +5,6 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import {
-  Alert,
   FlatList,
   KeyboardAvoidingView,
   Platform,
@@ -35,6 +34,8 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
+import { useConfirm } from '@/components/ui/useConfirm';
 import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -233,6 +234,7 @@ function GoalCard({
   onComplete: (id: number) => void;
   onAbandon: (id: number) => void;
 }) {
+  const { confirm, confirmDialog } = useConfirm();
   const target = getGoalTarget(goal);
   const current = getGoalProgress(goal);
   const percent = getGoalProgressPercent(goal);
@@ -247,17 +249,18 @@ function GoalCard({
 
   function handleAbandon() {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Alert.alert(
-      t('abandonTitle'),
-      t('abandonMessage'),
-      [
-        { text: t('common:buttons.cancel'), style: 'cancel' },
-        { text: t('abandon'), style: 'destructive', onPress: () => void onAbandon(goal.id) },
-      ],
-    );
+    confirm({
+      title: t('abandonTitle'),
+      message: t('abandonMessage'),
+      confirmLabel: t('abandon'),
+      cancelLabel: t('common:buttons.cancel'),
+      variant: 'danger',
+      onConfirm: () => onAbandon(goal.id),
+    });
   }
 
   return (
+    <>
     <HeroCard className="rounded-panel p-0" accessible accessibilityLabel={goal.title}>
       <HeroCard.Body className="gap-4 p-4">
         <View className="flex-row items-start gap-3">
@@ -345,6 +348,8 @@ function GoalCard({
         )}
       </HeroCard.Body>
     </HeroCard>
+    {confirmDialog}
+    </>
   );
 }
 
@@ -359,6 +364,7 @@ function CreateGoalForm({
   onCreated: (goal: Goal) => void;
   onCancel: () => void;
 }) {
+  const { show: showToast } = useAppToast();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [targetValue, setTargetValue] = useState('');
@@ -381,7 +387,7 @@ function CreateGoalForm({
       setDescription('');
       setTargetValue('');
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('create.error'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('create.error'), variant: 'danger' });
     } finally {
       setSubmitting(false);
     }
@@ -467,6 +473,7 @@ function GoalTemplatesPanel({
   t: (key: string, opts?: Record<string, unknown>) => string;
   onCreated: (goal: Goal) => void;
 }) {
+  const { show: showToast } = useAppToast();
   const [templates, setTemplates] = useState<GoalTemplate[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -507,7 +514,7 @@ function GoalTemplatesPanel({
     ? templates.filter((template) => template.category === selectedCategory)
     : templates;
 
-  async function useTemplate(template: GoalTemplate) {
+  async function applyTemplate(template: GoalTemplate) {
     setCreatingFromId(template.id);
     try {
       const result = await createGoalFromTemplate(template.id);
@@ -515,7 +522,7 @@ function GoalTemplatesPanel({
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('templates.createError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('templates.createError'), variant: 'danger' });
     } finally {
       setCreatingFromId(null);
     }
@@ -596,7 +603,7 @@ function GoalTemplatesPanel({
                           size="sm"
                           variant="primary"
                           isDisabled={creatingFromId !== null}
-                          onPress={() => void useTemplate(template)}
+                          onPress={() => void applyTemplate(template)}
                           accessibilityLabel={t('templates.useLabel', { title: template.title })}
                         >
                           {creatingFromId === template.id ? <Spinner size="sm" /> : <HeroButton.Label>{t('templates.use')}</HeroButton.Label>}
@@ -637,6 +644,7 @@ export default function GoalsScreen() {
   const { t } = useTranslation(['goals', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
 
   const [showForm, setShowForm] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
@@ -669,7 +677,7 @@ export default function GoalsScreen() {
       const result = await updateGoalStatus(id, status);
       setGoals((prev) => prev.map((goal) => (goal.id === id ? result.data as ApiGoal : goal)));
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('goals:updateError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('goals:updateError'), variant: 'danger' });
     }
   }
 

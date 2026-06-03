@@ -4,7 +4,6 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { Alert } from 'react-native';
 import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 
 import SettingsBlockedUsersScreen from './settings-blocked-users';
@@ -70,6 +69,25 @@ jest.mock('@/lib/api/settings', () => ({
   unblockUser: jest.fn(),
 }));
 
+jest.mock('@/components/ui/AppToast', () => {
+  // Stable references so screens that put `show` in a useCallback/useEffect
+  // dependency array don't re-run their effects on every render.
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
+
+// Auto-confirm: pressing the destructive button runs the action immediately,
+// mirroring the old Alert.alert button-press simulation.
+jest.mock('@/components/ui/useConfirm', () => ({
+  useConfirm: () => ({
+    confirm: (opts: { onConfirm: () => void | Promise<void> }) => {
+      void opts.onConfirm();
+    },
+    confirmDialog: null,
+  }),
+}));
+
 const mockGetBlockedUsers = getBlockedUsers as jest.MockedFunction<typeof getBlockedUsers>;
 const mockUnblockUser = unblockUser as jest.MockedFunction<typeof unblockUser>;
 
@@ -113,10 +131,6 @@ describe('SettingsBlockedUsersScreen', () => {
       },
     ]);
     mockUnblockUser.mockResolvedValue({});
-    jest.spyOn(Alert, 'alert').mockImplementation((title, message, buttons) => {
-      const action = buttons?.find((button) => button.text === 'Unblock');
-      action?.onPress?.();
-    });
 
     const { getByText, queryByText } = render(<SettingsBlockedUsersScreen />);
     await waitFor(() => expect(getByText('Sam Carter')).toBeTruthy());

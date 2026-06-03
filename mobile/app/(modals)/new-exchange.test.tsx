@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { Alert, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 const mockUseApi = jest.fn();
@@ -15,7 +15,6 @@ const mockSetExchangeTags = jest.fn();
 const mockUploadExchangeImage = jest.fn();
 const mockGenerateExchangeDescription = jest.fn();
 const mockLaunchImageLibraryAsync = jest.fn();
-const mockAlert = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
 
 jest.mock('expo-router', () => ({
   router: {
@@ -146,6 +145,17 @@ jest.mock('@/lib/haptics', () => ({
   NotificationFeedbackType: { Success: 'success', Error: 'error' },
 }));
 
+// Stable AppToast mock — fns created inside the factory closure.
+jest.mock('@/components/ui/AppToast', () => {
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
+
+const { show: mockShowToast } = (jest.requireMock('@/components/ui/AppToast') as {
+  useAppToast: () => { show: jest.Mock };
+}).useAppToast();
+
 jest.mock('expo-image-picker', () => ({
   MediaTypeOptions: { Images: 'Images' },
   launchImageLibraryAsync: (...args: unknown[]) => mockLaunchImageLibraryAsync(...args),
@@ -170,7 +180,7 @@ beforeEach(() => {
   mockUploadExchangeImage.mockReset().mockResolvedValue({ data: { image_url: '/uploads/listing.jpg' } });
   mockGenerateExchangeDescription.mockReset().mockResolvedValue({ data: { description: 'Generated listing body' } });
   mockLaunchImageLibraryAsync.mockReset().mockResolvedValue({ canceled: false, assets: [{ uri: 'file:///tmp/listing.jpg' }] });
-  mockAlert.mockClear();
+  mockShowToast.mockClear();
 });
 
 describe('NewExchangeModal', () => {
@@ -266,7 +276,7 @@ describe('NewExchangeModal', () => {
     fireEvent.press(getByText('Post Offer'));
 
     await waitFor(() => expect(mockUploadExchangeImage).toHaveBeenCalledWith(9, 'file:///tmp/listing.jpg'));
-    expect(mockAlert).toHaveBeenCalledWith('Listing saved', 'Image upload failed');
+    expect(mockShowToast).toHaveBeenCalledWith(expect.objectContaining({ title: 'Listing saved', description: 'Image upload failed', variant: 'danger' }));
     await waitFor(() => expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/exchange-detail', params: { id: '9' } }));
   });
 

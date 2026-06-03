@@ -5,7 +5,6 @@
 
 import React from 'react';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
-import { Alert } from 'react-native';
 
 const mockUseApi = jest.fn();
 const mockBack = jest.fn();
@@ -100,8 +99,10 @@ jest.mock('@/lib/haptics', () => ({
   NotificationFeedbackType: { Success: 'success', Error: 'error' },
 }));
 
-jest.spyOn(Alert, 'alert').mockImplementation((_title, _message, buttons?: Array<{ onPress?: () => void }>) => {
-  buttons?.[0]?.onPress?.();
+jest.mock('@/components/ui/AppToast', () => {
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
 });
 
 jest.mock('@expo/vector-icons', () => ({ Ionicons: 'View' }));

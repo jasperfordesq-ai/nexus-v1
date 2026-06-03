@@ -5,7 +5,6 @@
 
 import { useState } from 'react';
 import {
-  Alert,
   FlatList,
   Pressable,
   RefreshControl,
@@ -32,6 +31,8 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
+import { useConfirm } from '@/components/ui/useConfirm';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -43,6 +44,8 @@ export default function NotificationsScreen() {
   const { t } = useTranslation(['notifications', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
+  const { confirm, confirmDialog } = useConfirm();
   const [markingAll, setMarkingAll] = useState(false);
   const [actingId, setActingId] = useState<number | null>(null);
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
@@ -52,28 +55,25 @@ export default function NotificationsScreen() {
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   function handleMarkAll() {
-    Alert.alert(
-      t('common:buttons.confirm'),
-      t('confirmMarkAllRead'),
-      [
-        { text: t('common:no'), style: 'cancel' },
-        {
-          text: t('common:yes'),
-          onPress: async () => {
-            setMarkingAll(true);
-            try {
-              await markAllRead();
-              void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              refresh();
-            } catch {
-              Alert.alert(t('common:errors.alertTitle'), t('markError'));
-            } finally {
-              setMarkingAll(false);
-            }
-          },
-        },
-      ],
-    );
+    confirm({
+      title: t('common:buttons.confirm'),
+      message: t('confirmMarkAllRead'),
+      confirmLabel: t('common:yes'),
+      cancelLabel: t('common:no'),
+      variant: 'primary',
+      onConfirm: async () => {
+        setMarkingAll(true);
+        try {
+          await markAllRead();
+          void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          refresh();
+        } catch {
+          showToast({ title: t('common:errors.alertTitle'), description: t('markError'), variant: 'danger' });
+        } finally {
+          setMarkingAll(false);
+        }
+      },
+    });
   }
 
   function handleNotificationPress(item: Notification) {
@@ -93,7 +93,7 @@ export default function NotificationsScreen() {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       refresh();
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('markError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('markError'), variant: 'danger' });
     } finally {
       setActingId(null);
     }
@@ -106,7 +106,7 @@ export default function NotificationsScreen() {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       refresh();
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('deleteError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('deleteError'), variant: 'danger' });
     } finally {
       setActingId(null);
     }
@@ -378,6 +378,7 @@ export default function NotificationsScreen() {
           }
           contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
         />
+        {confirmDialog}
       </SafeAreaView>
     </ModalErrorBoundary>
   );

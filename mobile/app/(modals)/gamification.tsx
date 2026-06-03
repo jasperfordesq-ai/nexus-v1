@@ -5,7 +5,6 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import {
-  Alert,
   RefreshControl,
   ScrollView,
   Text,
@@ -46,6 +45,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
@@ -1108,6 +1108,7 @@ export default function GamificationScreen() {
   const theme = useTheme();
   const pathname = usePathname();
   const params = useLocalSearchParams<{ tab?: string }>();
+  const { show: showToast } = useAppToast();
 
   const [activeTab, setActiveTab] = useState<Tab>(() => getInitialTab(pathname, params.tab));
   const [period, setPeriod] = useState<LeaderboardPeriod>('monthly');
@@ -1196,12 +1197,12 @@ export default function GamificationScreen() {
         next_reward_xp: current?.next_reward_xp ?? reward?.xp_earned ?? 0,
         current_streak: reward?.streak_day ?? (current?.current_streak ?? 0) + 1,
       });
-      Alert.alert(t('dailyReward.claimedTitle'), t('dailyReward.claimedMessage', { xp: reward?.xp_earned ?? current?.reward_xp ?? 0 }));
+      showToast({ title: t('dailyReward.claimedTitle'), description: t('dailyReward.claimedMessage', { xp: reward?.xp_earned ?? current?.reward_xp ?? 0 }), variant: 'success' });
       refreshProfile();
       refreshBadges();
       refreshReward();
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('dailyReward.claimError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('dailyReward.claimError'), variant: 'danger' });
     } finally {
       setIsClaimingReward(false);
     }
@@ -1216,11 +1217,11 @@ export default function GamificationScreen() {
         ...current,
         [challengeId]: { reward_claimed: true, is_completed: true },
       }));
-      Alert.alert(t('challenges.claimedTitle'), t('challenges.claimedMessage'));
+      showToast({ title: t('challenges.claimedTitle'), description: t('challenges.claimedMessage'), variant: 'success' });
       refreshProfile();
       refreshChallenges();
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('challenges.claimError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('challenges.claimError'), variant: 'danger' });
     } finally {
       setClaimingChallengeId(null);
     }
@@ -1231,7 +1232,7 @@ export default function GamificationScreen() {
     const cost = getShopItemCost(item);
     const currentBalance = shopBalanceOverride ?? shopData?.meta?.user_xp ?? getProfileXp((profileData?.data ?? {}) as ApiProfile);
     if (currentBalance < cost) {
-      Alert.alert(t('shop.notEnoughXp'), t('shop.notEnoughXpDescription', { xp: cost - currentBalance }));
+      showToast({ title: t('shop.notEnoughXp'), description: t('shop.notEnoughXpDescription', { xp: cost - currentBalance }), variant: 'warning' });
       return;
     }
 
@@ -1243,11 +1244,11 @@ export default function GamificationScreen() {
         [item.id]: { user_purchases: numberOrFallback(item.user_purchases) + 1, can_purchase: false },
       }));
       setShopBalanceOverride(currentBalance - cost);
-      Alert.alert(t('shop.purchaseComplete'), t('shop.purchaseCompleteDescription', { name: item.name }));
+      showToast({ title: t('shop.purchaseComplete'), description: t('shop.purchaseCompleteDescription', { name: item.name }), variant: 'success' });
       refreshProfile();
       refreshShop();
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('shop.purchaseError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('shop.purchaseError'), variant: 'danger' });
     } finally {
       setPurchasingShopItemId(null);
     }
@@ -1275,10 +1276,10 @@ export default function GamificationScreen() {
     try {
       await updateBadgeShowcase(selectedKeys);
       setShowcaseKeysOverride(new Set(selectedKeys));
-      Alert.alert(t('showcase.updated'), t('showcase.updatedDescription'));
+      showToast({ title: t('showcase.updated'), description: t('showcase.updatedDescription'), variant: 'success' });
       refreshBadges();
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('showcase.saveError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('showcase.saveError'), variant: 'danger' });
     } finally {
       setIsSavingShowcase(false);
     }

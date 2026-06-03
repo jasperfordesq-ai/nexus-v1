@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,6 +12,7 @@ import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'her
 import { useTranslation } from 'react-i18next';
 
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -105,6 +106,7 @@ export default function GoalDetailScreen() {
   const { t, i18n } = useTranslation(['goals', 'common']);
   const theme = useTheme();
   const primary = usePrimaryColor();
+  const { show: showToast } = useAppToast();
   const [goal, setGoal] = useState<Goal | null>(null);
   const [history, setHistory] = useState<GoalHistoryEntry[]>([]);
   const [insights, setInsights] = useState<GoalInsights | null>(null);
@@ -138,11 +140,11 @@ export default function GoalDetailScreen() {
         if (nextReminder?.frequency) setSelectedFrequency(nextReminder.frequency);
       }
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('detail.loadError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.loadError'), variant: 'danger' });
     } finally {
       setIsLoading(false);
     }
-  }, [goalId, t]);
+  }, [goalId, t, showToast]);
 
   useEffect(() => {
     void load();
@@ -176,7 +178,7 @@ export default function GoalDetailScreen() {
       setProgressIncrement('');
       await load();
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('detail.progressError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.progressError'), variant: 'danger' });
     } finally {
       setIsSaving(false);
     }
@@ -194,7 +196,7 @@ export default function GoalDetailScreen() {
         setReminder(result.data);
       }
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('detail.reminderError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('detail.reminderError'), variant: 'danger' });
     } finally {
       setIsSaving(false);
     }

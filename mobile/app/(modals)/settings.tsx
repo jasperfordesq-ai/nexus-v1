@@ -7,7 +7,6 @@ import { Children, Fragment, useState } from 'react';
 import {
   View,
   ScrollView,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
@@ -20,10 +19,12 @@ import { Button as HeroButton, Card as HeroCard, Chip, ListGroup, Text } from 'h
 import { api } from '@/lib/api/client';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme } from '@/lib/hooks/useTheme';
+import { useTheme, useThemeController } from '@/lib/hooks/useTheme';
+import type { ThemeMode } from '@/lib/theme/themeStore';
 import { API_V2 } from '@/lib/constants';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import Toggle from '@/components/ui/Toggle';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
@@ -69,6 +70,13 @@ export default function SettingsScreen() {
   const { t } = useTranslation(['settings', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
+  const { mode: themeMode, setMode: setThemeMode } = useThemeController();
+
+  function selectThemeMode(nextMode: ThemeMode) {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setThemeMode(nextMode);
+  }
 
   const { data, isLoading } = useApi(() => getPrefs());
   const { data: preferencesData, isLoading: isLoadingPreferences } = useApi(() => getPreferences());
@@ -94,7 +102,7 @@ export default function SettingsScreen() {
     } catch {
       // Revert
       setPrefs(current);
-      Alert.alert(t('common:errors.generic'), t('saveError'));
+      showToast({ title: t('common:errors.generic'), description: t('saveError'), variant: 'danger' });
     } finally {
       setSaving(false);
     }
@@ -108,7 +116,7 @@ export default function SettingsScreen() {
       await savePrivacyPrefs(nextPrefs);
     } catch {
       setPrivacyPrefs(currentPrivacy);
-      Alert.alert(t('common:errors.generic'), t('privacy.saveError'));
+      showToast({ title: t('common:errors.generic'), description: t('privacy.saveError'), variant: 'danger' });
     } finally {
       setSavingPrivacy(false);
     }
@@ -213,6 +221,39 @@ export default function SettingsScreen() {
                 router.push('/(modals)/change-password');
               }}
               theme={theme}
+            />
+          </Section>
+
+          <Section
+            title={t('appearance.title')}
+            subtitle={t('appearance.hint')}
+            icon="contrast-outline"
+            primary={primary}
+            theme={theme}
+          >
+            <ThemeModeRow
+              label={t('appearance.mode.system')}
+              subtitle={t('appearance.mode.systemHint')}
+              icon="phone-portrait-outline"
+              selected={themeMode === 'system'}
+              primary={primary}
+              onPress={() => selectThemeMode('system')}
+            />
+            <ThemeModeRow
+              label={t('appearance.mode.light')}
+              subtitle={t('appearance.mode.lightHint')}
+              icon="sunny-outline"
+              selected={themeMode === 'light'}
+              primary={primary}
+              onPress={() => selectThemeMode('light')}
+            />
+            <ThemeModeRow
+              label={t('appearance.mode.dark')}
+              subtitle={t('appearance.mode.darkHint')}
+              icon="moon-outline"
+              selected={themeMode === 'dark'}
+              primary={primary}
+              onPress={() => selectThemeMode('dark')}
             />
           </Section>
 
@@ -470,6 +511,52 @@ function ActionRow({
         {subtitle ? <ListGroup.ItemDescription numberOfLines={2}>{subtitle}</ListGroup.ItemDescription> : null}
       </ListGroup.ItemContent>
       <ListGroup.ItemSuffix />
+    </ListGroup.Item>
+  );
+}
+
+function ThemeModeRow({
+  label,
+  subtitle,
+  icon,
+  selected,
+  primary,
+  onPress,
+}: {
+  label: string;
+  subtitle: string;
+  icon: IoniconName;
+  selected: boolean;
+  primary: string;
+  onPress: () => void;
+}) {
+  return (
+    <ListGroup.Item
+      onPress={onPress}
+      accessibilityRole="radio"
+      accessibilityLabel={label}
+      accessibilityState={{ selected }}
+      className="active:opacity-60"
+    >
+      <ListGroup.ItemPrefix>
+        <View
+          className="h-9 w-9 items-center justify-center rounded-2xl"
+          style={{ backgroundColor: withAlpha(primary, selected ? 0.18 : 0.1) }}
+        >
+          <Ionicons name={icon} size={18} color={primary} />
+        </View>
+      </ListGroup.ItemPrefix>
+      <ListGroup.ItemContent>
+        <ListGroup.ItemTitle numberOfLines={1}>{label}</ListGroup.ItemTitle>
+        <ListGroup.ItemDescription numberOfLines={1}>{subtitle}</ListGroup.ItemDescription>
+      </ListGroup.ItemContent>
+      <ListGroup.ItemSuffix>
+        {selected ? (
+          <Ionicons name="checkmark-circle" size={22} color={primary} />
+        ) : (
+          <View className="h-[22px] w-[22px] rounded-full border-2 border-border" />
+        )}
+      </ListGroup.ItemSuffix>
     </ListGroup.Item>
   );
 }

@@ -5,7 +5,6 @@
 
 import React from 'react';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
-import { Alert } from 'react-native';
 
 const mockCreateEvent = jest.fn().mockResolvedValue({ data: { id: 6 } });
 const mockGetEvent = jest.fn();
@@ -127,6 +126,14 @@ jest.mock('expo-image-picker', () => ({
 }));
 jest.mock('@/components/ui/AppTopBar', () => 'View');
 
+jest.mock('@/components/ui/AppToast', () => {
+  // Stable references so screens that put `show` in a useCallback/useEffect
+  // dependency array don't re-run their effects on every render.
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
+
 jest.mock('@/components/ui/FormActionFooter', () => {
   const React = require('react');
   const { Pressable, Text, View } = require('react-native');
@@ -181,12 +188,13 @@ jest.mock('heroui-native', () => {
 });
 
 import NewEventRoute from './new-event';
+import { useAppToast } from '@/components/ui/AppToast';
+
+const showToast = useAppToast().show as jest.Mock;
 
 describe('NewEventRoute', () => {
-  let alertSpy: jest.SpyInstance;
-
   beforeEach(() => {
-    alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
+    showToast.mockClear();
     mockSearchParams = {};
     mockCreateEvent.mockClear();
     mockGetEvent.mockReset();
@@ -197,10 +205,6 @@ describe('NewEventRoute', () => {
       assets: [{ uri: 'file:///tmp/event-cover.jpg', mimeType: 'image/jpeg', fileSize: 1024 }],
     });
     mockReplace.mockClear();
-  });
-
-  afterEach(() => {
-    alertSpy.mockRestore();
   });
 
   it('keeps the native create event frame full height with an explicit background', () => {
@@ -232,7 +236,7 @@ describe('NewEventRoute', () => {
     fireEvent.press(getByText('Create event'));
 
     await waitFor(() => {
-      expect(alertSpy).toHaveBeenCalledWith('Check event details', 'Choose a future start time.');
+      expect(showToast).toHaveBeenCalledWith({ title: 'Check event details', description: 'Choose a future start time.', variant: 'warning' });
     });
     expect(mockCreateEvent).not.toHaveBeenCalled();
   });
@@ -247,7 +251,7 @@ describe('NewEventRoute', () => {
     fireEvent.press(getByText('Create event'));
 
     await waitFor(() => {
-      expect(alertSpy).toHaveBeenCalledWith('Check event details', 'End time must be after the start time.');
+      expect(showToast).toHaveBeenCalledWith({ title: 'Check event details', description: 'End time must be after the start time.', variant: 'warning' });
     });
     expect(mockCreateEvent).not.toHaveBeenCalled();
   });
@@ -261,7 +265,7 @@ describe('NewEventRoute', () => {
     fireEvent.press(getByText('Create event'));
 
     await waitFor(() => {
-      expect(alertSpy).toHaveBeenCalledWith('Check event details', 'Capacity must be between 1 and 10,000.');
+      expect(showToast).toHaveBeenCalledWith({ title: 'Check event details', description: 'Capacity must be between 1 and 10,000.', variant: 'warning' });
     });
     expect(mockCreateEvent).not.toHaveBeenCalled();
   });
@@ -276,7 +280,7 @@ describe('NewEventRoute', () => {
     fireEvent.press(getByText('Create event'));
 
     await waitFor(() => {
-      expect(alertSpy).toHaveBeenCalledWith('Check event details', 'Enter both latitude and longitude using valid coordinate ranges.');
+      expect(showToast).toHaveBeenCalledWith({ title: 'Check event details', description: 'Enter both latitude and longitude using valid coordinate ranges.', variant: 'warning' });
     });
     expect(mockCreateEvent).not.toHaveBeenCalled();
   });

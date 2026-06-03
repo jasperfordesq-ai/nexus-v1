@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,6 +20,7 @@ import { useTheme } from '@/lib/hooks/useTheme';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import FormActionFooter from '@/components/ui/FormActionFooter';
 import Input from '@/components/ui/Input';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
@@ -51,6 +52,7 @@ function NewGroupScreen() {
   const params = useLocalSearchParams<{ id?: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const groupId = Number(params.id);
   const isEditing = Number.isFinite(groupId) && groupId > 0;
   const [name, setName] = useState('');
@@ -82,7 +84,7 @@ function NewGroupScreen() {
       })
       .catch(() => {
         if (!isMounted) return;
-        Alert.alert(t('create.loadFailedTitle'), t('create.loadFailed'));
+        showToast({ title: t('create.loadFailedTitle'), description: t('create.loadFailed'), variant: 'danger' });
       });
 
     return () => {
@@ -141,17 +143,17 @@ function NewGroupScreen() {
 
       const asset = result.assets[0];
       if (asset.mimeType && !ALLOWED_GROUP_IMAGE_TYPES.includes(asset.mimeType)) {
-        Alert.alert(t('create.validationTitle'), t('create.imageTypeError'));
+        showToast({ title: t('create.validationTitle'), description: t('create.imageTypeError'), variant: 'warning' });
         return;
       }
       if (asset.fileSize && asset.fileSize > MAX_GROUP_IMAGE_SIZE) {
-        Alert.alert(t('create.validationTitle'), t('create.imageSizeError'));
+        showToast({ title: t('create.validationTitle'), description: t('create.imageSizeError'), variant: 'warning' });
         return;
       }
 
       setSelectedImageUri(asset.uri);
     } catch {
-      Alert.alert(t('create.imagePickFailedTitle'), t('create.imagePickFailedDescription'));
+      showToast({ title: t('create.imagePickFailedTitle'), description: t('create.imagePickFailedDescription'), variant: 'danger' });
     }
   }
 
@@ -160,17 +162,17 @@ function NewGroupScreen() {
     const trimmedDescription = description.trim();
 
     if (!trimmedName || !trimmedDescription) {
-      Alert.alert(t('create.validationTitle'), t('create.validationRequired'));
+      showToast({ title: t('create.validationTitle'), description: t('create.validationRequired'), variant: 'warning' });
       return;
     }
 
     if (trimmedName.length < GROUP_NAME_MIN_LENGTH || trimmedName.length > GROUP_NAME_MAX_LENGTH) {
-      Alert.alert(t('create.validationTitle'), t('create.validationNameLength'));
+      showToast({ title: t('create.validationTitle'), description: t('create.validationNameLength'), variant: 'warning' });
       return;
     }
 
     if (trimmedDescription.length < GROUP_DESCRIPTION_MIN_LENGTH || trimmedDescription.length > GROUP_DESCRIPTION_MAX_LENGTH) {
-      Alert.alert(t('create.validationTitle'), t('create.validationDescriptionLength'));
+      showToast({ title: t('create.validationTitle'), description: t('create.validationDescriptionLength'), variant: 'warning' });
       return;
     }
 
@@ -183,7 +185,7 @@ function NewGroupScreen() {
       || (hasLatitude && (latitudeValue === null || latitudeValue < -90 || latitudeValue > 90))
       || (hasLongitude && (longitudeValue === null || longitudeValue < -180 || longitudeValue > 180))
     ) {
-      Alert.alert(t('create.validationTitle'), t('create.invalidCoordinates'));
+      showToast({ title: t('create.validationTitle'), description: t('create.invalidCoordinates'), variant: 'warning' });
       return;
     }
 
@@ -208,7 +210,7 @@ function NewGroupScreen() {
           try {
             await uploadGroupImage(id, selectedImageUri);
           } catch {
-            Alert.alert(t('create.imageUploadFailedTitle'), t('create.imageUploadFailedDescription'));
+            showToast({ title: t('create.imageUploadFailedTitle'), description: t('create.imageUploadFailedDescription'), variant: 'danger' });
           }
         }
         successDestination = { pathname: '/(modals)/group-detail', params: { id: String(id) } };
@@ -216,10 +218,11 @@ function NewGroupScreen() {
         shouldGoBack = true;
       }
     } catch (error) {
-      Alert.alert(
-        isEditing ? t('create.saveFailedTitle') : t('create.failedTitle'),
-        error instanceof Error ? error.message : (isEditing ? t('create.saveFailedDescription') : t('create.failedDescription')),
-      );
+      showToast({
+        title: isEditing ? t('create.saveFailedTitle') : t('create.failedTitle'),
+        description: error instanceof Error ? error.message : (isEditing ? t('create.saveFailedDescription') : t('create.failedDescription')),
+        variant: 'danger',
+      });
     } finally {
       setIsSubmitting(false);
     }

@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState } from 'react';
-import { Alert, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,6 +17,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import Toggle from '@/components/ui/Toggle';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
@@ -62,6 +63,7 @@ function FederationOnboardingScreen() {
   const { t } = useTranslation(['federation', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const [step, setStep] = useState<Step>(0);
   const [settings, setSettings] = useState<FederationSettings>(defaultSettings);
   const [isSaving, setIsSaving] = useState(false);
@@ -77,7 +79,7 @@ function FederationOnboardingScreen() {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.replace('/(modals)/federation');
     } catch {
-      Alert.alert(t('directory.onboarding.failedTitle'), t('directory.onboarding.failedDescription'));
+      showToast({ title: t('directory.onboarding.failedTitle'), description: t('directory.onboarding.failedDescription'), variant: 'danger' });
     } finally {
       setIsSaving(false);
     }

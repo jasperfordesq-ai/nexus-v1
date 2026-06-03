@@ -4,7 +4,6 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import {
-  Alert,
   Linking,
   Pressable,
   RefreshControl,
@@ -26,6 +25,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -91,6 +91,7 @@ export default function OrganisationDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
 
   const orgId = Number(id);
   const safeId = isNaN(orgId) || orgId <= 0 ? 0 : orgId;
@@ -163,7 +164,7 @@ export default function OrganisationDetailScreen() {
     if (supported) {
       await Linking.openURL(url);
     } else {
-      Alert.alert(t('common:errors.alertTitle'), url);
+      showToast({ title: t('common:errors.alertTitle'), description: url, variant: 'danger' });
     }
   }
 

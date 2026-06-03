@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, FlatList, RefreshControl, View } from 'react-native';
+import { FlatList, RefreshControl, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import MarketplaceListingCard from '@/components/marketplace/MarketplaceListingCard';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -55,6 +56,7 @@ function MarketplaceCategoryScreen() {
   }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const categoryId = Number(firstParam(params.id));
   const safeCategoryId = Number.isFinite(categoryId) && categoryId > 0 ? categoryId : 0;
   const paramName = firstParam(params.name);
@@ -103,14 +105,14 @@ function MarketplaceCategoryScreen() {
       if (!append) {
         setError(err instanceof Error ? err.message : t('category.unableToLoad'));
       } else {
-        Alert.alert(t('common:errors.alertTitle'), t('category.loadMoreFailed'));
+        showToast({ title: t('common:errors.alertTitle'), description: t('category.loadMoreFailed'), variant: 'danger' });
       }
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
       setIsLoadingMore(false);
     }
-  }, [conditions, cursor, debouncedQuery, hasFeature, priceMax, priceMin, safeCategoryId, sort, t]);
+  }, [conditions, cursor, debouncedQuery, hasFeature, priceMax, priceMin, safeCategoryId, showToast, sort, t]);
 
   useEffect(() => {
     void fetchListings(false);
@@ -139,7 +141,7 @@ function MarketplaceCategoryScreen() {
       else await unsaveMarketplaceListing(item.id);
     } catch {
       setListings((current) => current.map((listing) => listing.id === item.id ? item : listing));
-      Alert.alert(t('common:errors.alertTitle'), t('common.save_failed'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('common.save_failed'), variant: 'danger' });
     }
   }
 

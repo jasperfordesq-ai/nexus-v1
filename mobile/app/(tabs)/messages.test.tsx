@@ -5,9 +5,10 @@
 
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
-import { Alert } from 'react-native';
 
 // --- Mocks ---
+
+const mockShowToast = jest.fn();
 
 const mockRouterPush = jest.fn();
 const mockRouterReplace = jest.fn();
@@ -130,6 +131,24 @@ jest.mock('@/components/ui/Skeleton', () => ({
   ProfileSkeleton: () => null,
 }));
 
+jest.mock('@/components/ui/AppToast', () => {
+  // Stable references so screens that put `show` in a useCallback/useEffect
+  // dependency array don't re-run their effects on every render.
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show: mockShowToast, hide, isToastVisible: false }) };
+});
+
+// Auto-confirm: pressing the archive button runs the action immediately,
+// mirroring the old Alert.alert button-press simulation.
+jest.mock('@/components/ui/useConfirm', () => ({
+  useConfirm: () => ({
+    confirm: (opts: { onConfirm: () => void | Promise<void> }) => {
+      void opts.onConfirm();
+    },
+    confirmDialog: null,
+  }),
+}));
+
 // --- Tests ---
 
 import MessagesScreen from './messages';
@@ -148,6 +167,7 @@ const defaultPaginatedState = {
 beforeEach(() => {
   mockRouterPush.mockReset();
   mockRouterReplace.mockReset();
+  mockShowToast.mockReset();
   mockSearchParams.mockReturnValue({});
   mockUsePaginatedApi.mockReturnValue(defaultPaginatedState);
 });
@@ -297,7 +317,6 @@ describe('MessagesScreen', () => {
   });
 
   it('does not open stale conversation cards without a valid recipient', () => {
-    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
     mockUsePaginatedApi.mockReturnValue({
       ...defaultPaginatedState,
       items: [{ ...mockConversation, other_user: { ...mockConversation.other_user, id: 0 } }],
@@ -307,11 +326,11 @@ describe('MessagesScreen', () => {
     fireEvent.press(getByLabelText('Bob Builder, Can you help with plumbing?'));
 
     expect(mockRouterPush).not.toHaveBeenCalled();
-    expect(alertSpy).toHaveBeenCalledWith(
-      'Conversation unavailable',
-      'This conversation no longer has a valid recipient. Refresh messages and try again.',
-    );
-    alertSpy.mockRestore();
+    expect(mockShowToast).toHaveBeenCalledWith({
+      title: 'Conversation unavailable',
+      description: 'This conversation no longer has a valid recipient. Refresh messages and try again.',
+      variant: 'danger',
+    });
   });
 
   it('routes deep-linked recipients to the native thread composer', () => {
@@ -361,17 +380,10 @@ describe('MessagesScreen', () => {
     expect(mockRouterPush).toHaveBeenCalledWith('/(modals)/new-message');
   });
 
-  it('archives conversations with source-of-truth archive copy', async () => {
+  it('archives conversations through the branded confirm dialog', async () => {
     mockUsePaginatedApi.mockReturnValue({
       ...defaultPaginatedState,
       items: [mockConversation],
-    });
-    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation((title, message, buttons) => {
-      expect(title).toBe('Archive conversation');
-      expect(message).toBe('Archive conversation with Bob Builder? You can restore it from Archived.');
-      const archiveAction = buttons?.find((button) => button.text === 'Archive');
-      expect(archiveAction).toBeTruthy();
-      void archiveAction?.onPress?.();
     });
 
     const { getByLabelText } = render(<MessagesScreen />);
@@ -381,7 +393,6 @@ describe('MessagesScreen', () => {
     await waitFor(() => {
       expect(archiveConversation).toHaveBeenCalledWith(7);
     });
-    alertSpy.mockRestore();
   });
 
   it('shows archived conversations and restores them from the Archived tab', async () => {

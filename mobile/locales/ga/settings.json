@@ -167,5 +167,17 @@
       "can_view_messages": "View messages"
     },
     "permissionToggle": "Toggle {{permission}} for {{name}}"
+  },
+  "appearance": {
+    "title": "Cuma",
+    "hint": "Roghnaigh conas a bhreathnaíonn an aip ar an ngléas seo.",
+    "mode": {
+      "system": "Córas",
+      "systemHint": "Meaitseáil socruithe do ghléis",
+      "light": "Geal",
+      "lightHint": "Úsáid an téama geal i gcónaí",
+      "dark": "Dorcha",
+      "darkHint": "Úsáid an téama dorcha i gcónaí"
+    }
   }
 }

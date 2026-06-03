@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, RefreshControl, ScrollView, Share, Text, View } from 'react-native';
+import { RefreshControl, ScrollView, Share, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -39,6 +39,8 @@ import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
+import { useConfirm } from '@/components/ui/useConfirm';
 import { APP_URL } from '@/lib/constants';
 import VerificationBadgeRow from '@/components/verification/VerificationBadgeRow';
 import {
@@ -130,6 +132,8 @@ function MemberProfileScreenInner() {
   const { hasFeature, hasModule } = useTenant();
   const theme = useTheme();
   const { user } = useAuth();
+  const { show: showToast } = useAppToast();
+  const { confirm, confirmDialog } = useConfirm();
 
   const rawMemberId = typeof id === 'string' ? id.trim() : '';
   const isExternalFederatedProfile = rawMemberId.startsWith('ext-');
@@ -201,7 +205,7 @@ function MemberProfileScreenInner() {
       }
       setConnStatus('pending_sent');
     } catch {
-      Alert.alert(t('profile.connectionError'));
+      showToast({ title: t('profile.connectionError'), variant: 'danger' });
     } finally {
       setConnActionLoading(false);
     }
@@ -219,7 +223,7 @@ function MemberProfileScreenInner() {
       }
       setConnStatus('connected');
     } catch {
-      Alert.alert(t('profile.connectionError'));
+      showToast({ title: t('profile.connectionError'), variant: 'danger' });
     } finally {
       setConnActionLoading(false);
     }
@@ -238,7 +242,7 @@ function MemberProfileScreenInner() {
       setConnStatus('none');
       setConnId(null);
     } catch {
-      Alert.alert(t('profile.connectionError'));
+      showToast({ title: t('profile.connectionError'), variant: 'danger' });
     } finally {
       setConnActionLoading(false);
     }
@@ -246,34 +250,30 @@ function MemberProfileScreenInner() {
 
   function handleDisconnect() {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Alert.alert(
-      t('profile.disconnectConfirm'),
-      t('profile.disconnectMessage'),
-      [
-        { text: t('common:buttons.cancel'), style: 'cancel' },
-        {
-          text: t('profile.disconnect'),
-          style: 'destructive',
-          onPress: async () => {
-            if (!connId) return;
-            setConnActionLoading(true);
-            try {
-              if (isFederatedProfile) {
-                await removeFederationConnection(connId);
-              } else {
-                await removeConnection(connId);
-              }
-              setConnStatus('none');
-              setConnId(null);
-            } catch {
-              Alert.alert(t('profile.connectionError'));
-            } finally {
-              setConnActionLoading(false);
-            }
-          },
-        },
-      ],
-    );
+    confirm({
+      title: t('profile.disconnectConfirm'),
+      message: t('profile.disconnectMessage'),
+      confirmLabel: t('profile.disconnect'),
+      cancelLabel: t('common:buttons.cancel'),
+      variant: 'danger',
+      onConfirm: async () => {
+        if (!connId) return;
+        setConnActionLoading(true);
+        try {
+          if (isFederatedProfile) {
+            await removeFederationConnection(connId);
+          } else {
+            await removeConnection(connId);
+          }
+          setConnStatus('none');
+          setConnId(null);
+        } catch {
+          showToast({ title: t('profile.connectionError'), variant: 'danger' });
+        } finally {
+          setConnActionLoading(false);
+        }
+      },
+    });
   }
 
   async function handleShare() {
@@ -644,6 +644,7 @@ function MemberProfileScreenInner() {
           ) : null}
         </View>
       </Surface>
+      {confirmDialog}
     </SafeAreaView>
   );
 }
@@ -771,6 +772,7 @@ function FederatedTransferCard({
   onCancel: () => void;
   onComplete: () => void;
 }) {
+  const { show: showToast } = useAppToast();
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -779,15 +781,15 @@ function FederatedTransferCard({
   async function submit() {
     const parsedAmount = Number(amount.replace(',', '.').trim());
     if (!Number.isInteger(parsedAmount) || parsedAmount < 1 || parsedAmount > 100) {
-      Alert.alert(t('profile.transferValidationTitle'), t('profile.transferAmountRequired'));
+      showToast({ title: t('profile.transferValidationTitle'), description: t('profile.transferAmountRequired'), variant: 'warning' });
       return;
     }
     if (!description.trim()) {
-      Alert.alert(t('profile.transferValidationTitle'), t('profile.transferDescriptionRequired'));
+      showToast({ title: t('profile.transferValidationTitle'), description: t('profile.transferDescriptionRequired'), variant: 'warning' });
       return;
     }
     if (!tenantId) {
-      Alert.alert(t('profile.transferFailedTitle'), t('profile.transferFailedMessage'));
+      showToast({ title: t('profile.transferFailedTitle'), description: t('profile.transferFailedMessage'), variant: 'danger' });
       return;
     }
 
@@ -800,12 +802,12 @@ function FederatedTransferCard({
         description: description.trim(),
       });
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert(t('profile.transferSuccessTitle'), t('profile.transferSuccessMessage', { amount: parsedAmount, name: displayName }));
+      showToast({ title: t('profile.transferSuccessTitle'), description: t('profile.transferSuccessMessage', { amount: parsedAmount, name: displayName }), variant: 'success' });
       setAmount('');
       setDescription('');
       onComplete();
     } catch {
-      Alert.alert(t('profile.transferFailedTitle'), t('profile.transferFailedMessage'));
+      showToast({ title: t('profile.transferFailedTitle'), description: t('profile.transferFailedMessage'), variant: 'danger' });
     } finally {
       setIsSubmitting(false);
     }

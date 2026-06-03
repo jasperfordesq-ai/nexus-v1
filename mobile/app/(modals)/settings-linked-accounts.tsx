@@ -4,13 +4,14 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState } from 'react';
-import { Alert, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import Input from '@/components/ui/Input';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import Toggle from '@/components/ui/Toggle';
@@ -60,6 +61,7 @@ function SettingsLinkedAccountsScreen() {
   const { t } = useTranslation(['settings', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const [email, setEmail] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [busyId, setBusyId] = useState<number | null>(null);
@@ -68,7 +70,7 @@ function SettingsLinkedAccountsScreen() {
   async function sendRequest() {
     const trimmed = email.trim();
     if (!trimmed) {
-      Alert.alert(t('common:errors.alertTitle'), t('linkedAccounts.emailRequired'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('linkedAccounts.emailRequired'), variant: 'warning' });
       return;
     }
     try {
@@ -77,7 +79,7 @@ function SettingsLinkedAccountsScreen() {
       setEmail('');
       query.refresh();
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('linkedAccounts.requestFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('linkedAccounts.requestFailed'), variant: 'danger' });
     } finally {
       setIsSending(false);
     }
@@ -89,7 +91,7 @@ function SettingsLinkedAccountsScreen() {
       await approveSubAccount(item.relationship_id);
       query.refresh();
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('linkedAccounts.approveFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('linkedAccounts.approveFailed'), variant: 'danger' });
     } finally {
       setBusyId(null);
     }
@@ -101,7 +103,7 @@ function SettingsLinkedAccountsScreen() {
       await revokeSubAccount(item.relationship_id);
       query.refresh();
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('linkedAccounts.revokeFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('linkedAccounts.revokeFailed'), variant: 'danger' });
     } finally {
       setBusyId(null);
     }
@@ -115,7 +117,7 @@ function SettingsLinkedAccountsScreen() {
       });
       query.refresh();
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('linkedAccounts.permissionFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('linkedAccounts.permissionFailed'), variant: 'danger' });
     } finally {
       setBusyId(null);
     }

@@ -8,7 +8,6 @@ import {
   View,
   Text,
   ScrollView,
-  Alert,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
@@ -29,6 +28,8 @@ import { useTheme } from '@/lib/hooks/useTheme';
 import { storage } from '@/lib/storage';
 import { STORAGE_KEYS } from '@/lib/constants';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
+import { useConfirm } from '@/components/ui/useConfirm';
 import Avatar from '@/components/ui/Avatar';
 import FormActionFooter from '@/components/ui/FormActionFooter';
 import Input from '@/components/ui/Input';
@@ -48,6 +49,8 @@ export default function EditProfileScreen() {
   const { user, refreshUser } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
+  const { confirm, confirmDialog } = useConfirm();
 
   const fullUser = user as User | null;
 
@@ -107,7 +110,7 @@ export default function EditProfileScreen() {
     try {
       const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (!permission.granted) {
-        Alert.alert(t('permissionNeeded'), t('permissionMessage'));
+        showToast({ title: t('permissionNeeded'), description: t('permissionMessage'), variant: 'warning' });
         return;
       }
 
@@ -135,7 +138,7 @@ export default function EditProfileScreen() {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('uploadFailed'), t('uploadFailedMessage'));
+      showToast({ title: t('uploadFailed'), description: t('uploadFailedMessage'), variant: 'danger' });
     } finally {
       setUploadingAvatar(false);
     }
@@ -178,21 +181,17 @@ export default function EditProfileScreen() {
     const unsubscribe = navigation.addListener('beforeRemove', (e) => {
       if (!isDirty || saving) return;
       e.preventDefault();
-      Alert.alert(
-        t('edit.unsavedTitle'),
-        t('edit.unsavedMessage'),
-        [
-          { text: t('common:buttons.cancel'), style: 'cancel' },
-          {
-            text: t('edit.discard'),
-            style: 'destructive',
-            onPress: () => navigation.dispatch(e.data.action),
-          },
-        ],
-      );
+      confirm({
+        title: t('edit.unsavedTitle'),
+        message: t('edit.unsavedMessage'),
+        confirmLabel: t('edit.discard'),
+        cancelLabel: t('common:buttons.cancel'),
+        variant: 'danger',
+        onConfirm: () => navigation.dispatch(e.data.action),
+      });
     });
     return unsubscribe;
-  }, [navigation, isDirty, saving, t]);
+  }, [navigation, isDirty, saving, t, confirm]);
 
   function validate(): FieldErrors {
     const errors: FieldErrors = {};
@@ -238,13 +237,12 @@ export default function EditProfileScreen() {
       });
 
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert(t('edit.saved'), t('edit.savedMessage'), [
-        { text: t('common:buttons.done'), onPress: () => router.back() },
-      ]);
+      showToast({ title: t('edit.saved'), description: t('edit.savedMessage'), variant: 'success' });
+      router.back();
     } catch (err: unknown) {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       const msg = err instanceof Error ? err.message : t('edit.saveError');
-      Alert.alert(t('common:errors.generic'), msg);
+      showToast({ title: t('common:errors.generic'), description: msg, variant: 'danger' });
     } finally {
       setSaving(false);
     }
@@ -393,6 +391,7 @@ export default function EditProfileScreen() {
           onSecondary={() => router.back()}
         />
       </KeyboardAvoidingView>
+      {confirmDialog}
     </SafeAreaView>
   );
 }

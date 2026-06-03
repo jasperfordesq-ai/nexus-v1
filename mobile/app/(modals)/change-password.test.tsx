@@ -84,6 +84,12 @@ jest.mock('@/lib/api/profile', () => ({
 
 // Input and Button use already-mocked useTheme/usePrimaryColor — no extra mocks needed
 
+jest.mock('@/components/ui/AppToast', () => {
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
+
 jest.mock('@/components/OfflineBanner', () => () => null);
 
 // --- Tests ---

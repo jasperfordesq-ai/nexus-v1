@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useCallback } from 'react';
-import { Alert, FlatList, RefreshControl, Text, View } from 'react-native';
+import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -30,6 +30,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
@@ -117,6 +118,7 @@ export default function SearchScreen() {
   const params = useLocalSearchParams<{ q?: string; type?: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const initialType = isSearchResultType(params.type) ? params.type : 'all';
   const [query, setQuery] = useState(typeof params.q === 'string' ? params.q : '');
   const [activeFilter, setActiveFilter] = useState<FilterOption>(initialType);
@@ -170,7 +172,7 @@ export default function SearchScreen() {
       setShowSaveSearch(false);
       savedSearchesQuery.refresh();
     } catch {
-      Alert.alert(t('saved.saveFailedTitle'), t('saved.saveFailedMessage'));
+      showToast({ title: t('saved.saveFailedTitle'), description: t('saved.saveFailedMessage'), variant: 'danger' });
     } finally {
       setIsSavingSearch(false);
     }
@@ -194,7 +196,7 @@ export default function SearchScreen() {
       await deleteSavedSearch(item.id);
       savedSearchesQuery.refresh();
     } catch {
-      Alert.alert(t('saved.deleteFailedTitle'), t('saved.deleteFailedMessage'));
+      showToast({ title: t('saved.deleteFailedTitle'), description: t('saved.deleteFailedMessage'), variant: 'danger' });
     }
   }
 

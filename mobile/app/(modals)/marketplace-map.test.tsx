@@ -51,6 +51,13 @@ jest.mock('react-i18next', () => ({
 }));
 
 jest.mock('@expo/vector-icons', () => ({ Ionicons: 'View' }));
+jest.mock('@/components/ui/AppToast', () => {
+  // Stable references so screens that put `show` in a useCallback dependency
+  // array don't re-run their effects on every render.
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
 jest.mock('@/components/ui/LoadingSpinner', () => () => null);
 jest.mock('@/components/marketplace/MarketplaceListingCard', () => ({ item }: { item: { title: string } }) => item.title);
 

@@ -5,7 +5,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Alert,
   FlatList,
   Image,
   Keyboard,
@@ -34,6 +33,8 @@ import { useRealtimeContext } from '@/lib/context/RealtimeContext';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
 import ActionSheet from '@/components/ui/ActionSheet';
+import { useAppToast } from '@/components/ui/AppToast';
+import { useConfirm } from '@/components/ui/useConfirm';
 import Avatar from '@/components/ui/Avatar';
 import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -81,6 +82,8 @@ function ThreadScreenInner() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const { subscribeToMessages } = useRealtimeContext();
+  const { show: showToast } = useAppToast();
+  const { confirm, confirmDialog } = useConfirm();
   const unknownMemberLabel = t('unknownMember');
 
   const rawRecipientId = firstParam(recipientId);
@@ -217,7 +220,7 @@ function ThreadScreenInner() {
     const body = inputTextRef.current.trim();
     if ((!body && pendingAttachments.length === 0) || isSending || resolvedRecipientId === null) return;
     if (messagingRestriction?.messaging_disabled) {
-      Alert.alert(t('thread.messagingRestrictedTitle'), t('thread.messagingRestrictedContact'));
+      showToast({ title: t('thread.messagingRestrictedTitle'), description: t('thread.messagingRestrictedContact'), variant: 'warning' });
       return;
     }
 
@@ -235,7 +238,7 @@ function ThreadScreenInner() {
         void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       } catch {
         void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-        Alert.alert(t('errors.editFailedTitle'), t('errors.editFailed'));
+        showToast({ title: t('errors.editFailedTitle'), description: t('errors.editFailed'), variant: 'danger' });
       } finally {
         setIsSending(false);
       }
@@ -287,11 +290,11 @@ function ThreadScreenInner() {
       setInputText(body);
       setPendingAttachments(pendingAttachments);
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('errors.sendFailed'), t('thread.sendFailed'));
+      showToast({ title: t('errors.sendFailed'), description: t('thread.sendFailed'), variant: 'danger' });
     } finally {
       setIsSending(false);
     }
-  }, [editingMessage, isSending, messagingRestriction?.messaging_disabled, newConversationOptions, pendingAttachments, resolvedRecipientId, t]);
+  }, [editingMessage, isSending, messagingRestriction?.messaging_disabled, newConversationOptions, pendingAttachments, resolvedRecipientId, showToast, t]);
 
   const startEditingMessage = useCallback((message: Message) => {
     if (!message.is_own || message.is_voice || message.is_deleted) return;
@@ -306,35 +309,31 @@ function ThreadScreenInner() {
   }, []);
 
   const handleDeleteMessage = useCallback((message: Message, scope: 'self' | 'everyone') => {
-    Alert.alert(
-      t('thread.deleteTitle'),
-      scope === 'everyone' ? t('thread.deleteEveryoneConfirm') : t('thread.deleteSelfConfirm'),
-      [
-        { text: t('common:buttons.cancel'), style: 'cancel' },
-        {
-          text: t('thread.delete'),
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteMessage(message.id, scope);
-              setMessages((prev) => {
-                if (scope === 'self') {
-                  return prev.filter((item) => item.id !== message.id);
-                }
-                return prev.map((item) => (
-                  item.id === message.id
-                    ? { ...item, body: t('thread.deletedMessage'), is_deleted: true }
-                    : item
-                ));
-              });
-            } catch {
-              Alert.alert(t('errors.deleteFailedTitle'), t('errors.deleteFailed'));
+    confirm({
+      title: t('thread.deleteTitle'),
+      message: scope === 'everyone' ? t('thread.deleteEveryoneConfirm') : t('thread.deleteSelfConfirm'),
+      confirmLabel: t('thread.delete'),
+      cancelLabel: t('common:buttons.cancel'),
+      variant: 'danger',
+      onConfirm: async () => {
+        try {
+          await deleteMessage(message.id, scope);
+          setMessages((prev) => {
+            if (scope === 'self') {
+              return prev.filter((item) => item.id !== message.id);
             }
-          },
-        },
-      ],
-    );
-  }, [t]);
+            return prev.map((item) => (
+              item.id === message.id
+                ? { ...item, body: t('thread.deletedMessage'), is_deleted: true }
+                : item
+            ));
+          });
+        } catch {
+          showToast({ title: t('errors.deleteFailedTitle'), description: t('errors.deleteFailed'), variant: 'danger' });
+        }
+      },
+    });
+  }, [confirm, showToast, t]);
 
   const openMessageOptions = useCallback((message: Message) => {
     if (message.is_deleted || message.is_voice) return;
@@ -345,7 +344,7 @@ function ThreadScreenInner() {
     if (pendingAttachments.length >= MAX_ATTACHMENTS) return;
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert(t('thread.attachments.permissionTitle'), t('thread.attachments.permissionMessage'));
+      showToast({ title: t('thread.attachments.permissionTitle'), description: t('thread.attachments.permissionMessage'), variant: 'warning' });
       return;
     }
 
@@ -368,7 +367,7 @@ function ThreadScreenInner() {
       size: asset.fileSize ?? null,
     }));
     setPendingAttachments((current) => [...current, ...nextAttachments].slice(0, MAX_ATTACHMENTS));
-  }, [pendingAttachments.length, t]);
+  }, [pendingAttachments.length, showToast, t]);
 
   const removePendingAttachment = useCallback((id: string) => {
     setPendingAttachments((current) => current.filter((attachment) => attachment.id !== id));
@@ -386,7 +385,7 @@ function ThreadScreenInner() {
     try {
       const permission = await Audio.requestPermissionsAsync();
       if (!permission.granted) {
-        Alert.alert(t('thread.voice.permissionTitle'), t('thread.voice.permissionMessage'));
+        showToast({ title: t('thread.voice.permissionTitle'), description: t('thread.voice.permissionMessage'), variant: 'warning' });
         return;
       }
       await Audio.setAudioModeAsync({
@@ -409,9 +408,9 @@ function ThreadScreenInner() {
       stopRecordingTimer();
       setIsRecording(false);
       recordingRef.current = null;
-      Alert.alert(t('thread.voice.failedTitle'), t('thread.voice.startFailed'));
+      showToast({ title: t('thread.voice.failedTitle'), description: t('thread.voice.startFailed'), variant: 'danger' });
     }
-  }, [editingMessage, isRecording, pendingAttachments.length, stopRecordingTimer, t]);
+  }, [editingMessage, isRecording, pendingAttachments.length, showToast, stopRecordingTimer, t]);
 
   const handleStopRecording = useCallback(async () => {
     const recording = recordingRef.current;
@@ -429,9 +428,9 @@ function ThreadScreenInner() {
       recordingRef.current = null;
       setIsRecording(false);
       setVoiceUri(null);
-      Alert.alert(t('thread.voice.failedTitle'), t('thread.voice.stopFailed'));
+      showToast({ title: t('thread.voice.failedTitle'), description: t('thread.voice.stopFailed'), variant: 'danger' });
     }
-  }, [stopRecordingTimer, t]);
+  }, [showToast, stopRecordingTimer, t]);
 
   const handleCancelVoice = useCallback(async () => {
     stopRecordingTimer();
@@ -446,7 +445,7 @@ function ThreadScreenInner() {
   const handleSendVoice = useCallback(async () => {
     if (!voiceUri || isSending || resolvedRecipientId === null) return;
     if (messagingRestriction?.messaging_disabled) {
-      Alert.alert(t('thread.messagingRestrictedTitle'), t('thread.messagingRestrictedContact'));
+      showToast({ title: t('thread.messagingRestrictedTitle'), description: t('thread.messagingRestrictedContact'), variant: 'warning' });
       return;
     }
 
@@ -475,11 +474,11 @@ function ThreadScreenInner() {
       setMessages((prev) => prev.filter((message) => message.id !== optimistic.id));
       setVoiceUri(voiceUri);
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('errors.sendFailed'), t('thread.voice.sendFailed'));
+      showToast({ title: t('errors.sendFailed'), description: t('thread.voice.sendFailed'), variant: 'danger' });
     } finally {
       setIsSending(false);
     }
-  }, [isSending, messagingRestriction?.messaging_disabled, newConversationOptions, resolvedRecipientId, t, voiceUri]);
+  }, [isSending, messagingRestriction?.messaging_disabled, newConversationOptions, resolvedRecipientId, showToast, t, voiceUri]);
 
   const handleReaction = useCallback(async (messageId: number, emoji: string) => {
     try {
@@ -502,9 +501,9 @@ function ThreadScreenInner() {
       }));
       void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     } catch {
-      Alert.alert(t('errors.reactionFailedTitle'), t('errors.reactionFailed'));
+      showToast({ title: t('errors.reactionFailedTitle'), description: t('errors.reactionFailed'), variant: 'danger' });
     }
-  }, [t]);
+  }, [showToast, t]);
 
   if (!isValidId) {
     return (
@@ -725,6 +724,7 @@ function ThreadScreenInner() {
         title={t('thread.messageOptions')}
         actions={buildMessageActions(optionsMessage, t, startEditingMessage, handleDeleteMessage)}
       />
+      {confirmDialog}
     </SafeAreaView>
   );
 }

@@ -3,10 +3,14 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Appearance } from 'react-native';
-import { Uniwind } from 'uniwind';
+import { themeStore } from '@/lib/theme/themeStore';
 
+/**
+ * Startup theme wiring, called once from the app shell. Seeds the resolved
+ * scheme from the OS appearance, applies the persisted user preference (if
+ * any), and keeps following the OS while the user stays on 'system'. Pushes
+ * the scheme into both Uniwind (className tokens) and RN Appearance.
+ */
 export function configureNativeTheme() {
-  Appearance.setColorScheme('dark');
-  Uniwind.setTheme('dark');
+  themeStore.init();
 }

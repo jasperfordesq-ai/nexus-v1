@@ -4,11 +4,18 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { Alert } from 'react-native';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 import * as ImagePicker from 'expo-image-picker';
 
 let mockParams: Record<string, string> = {};
+
+// Stable references so screens that put `show` in a useCallback/useEffect
+// dependency array don't re-run their effects on every render.
+jest.mock('@/components/ui/AppToast', () => {
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
 
 jest.mock('expo-router', () => ({
   router: { push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
@@ -147,6 +154,7 @@ jest.mock('@/lib/api/marketplace', () => ({
 }));
 
 import NewMarketplaceListingRoute from './new-marketplace-listing';
+import { useAppToast } from '@/components/ui/AppToast';
 import {
   createMarketplaceListing,
   deleteMarketplaceListingImage,
@@ -156,6 +164,8 @@ import {
   uploadMarketplaceImages,
   uploadMarketplaceVideo,
 } from '@/lib/api/marketplace';
+
+const mockShowToast = useAppToast().show as jest.Mock;
 
 describe('NewMarketplaceListingRoute', () => {
   beforeEach(() => {
@@ -213,8 +223,6 @@ describe('NewMarketplaceListingRoute', () => {
   });
 
   it('blocks paid listings without a positive price before calling the API', async () => {
-    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
-
     const { getByPlaceholderText, getByText } = render(<NewMarketplaceListingRoute />);
 
     fireEvent.changeText(getByPlaceholderText('What are you selling?'), 'Garden shears');
@@ -222,11 +230,13 @@ describe('NewMarketplaceListingRoute', () => {
     fireEvent.press(getByText('Publish'));
 
     await waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith('Validation', 'Enter a price greater than zero for paid listings.');
+      expect(mockShowToast).toHaveBeenCalledWith(expect.objectContaining({
+        title: 'Validation',
+        description: 'Enter a price greater than zero for paid listings.',
+        variant: 'warning',
+      }));
     });
     expect(createMarketplaceListing).not.toHaveBeenCalled();
-
-    alertSpy.mockRestore();
   });
 
   it('uploads a selected listing video after creating the listing', async () => {

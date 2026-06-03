@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState } from 'react';
-import { Alert, FlatList, Image, View } from 'react-native';
+import { FlatList, Image, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,6 +12,7 @@ import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'her
 import { useTranslation } from 'react-i18next';
 
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
@@ -52,6 +53,7 @@ function MarketplaceOffersScreen() {
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const [mode, setMode] = useState<OfferMode>(normalizeOfferMode(firstParam(params.mode)));
   const canLoadOffers = !isAuthLoading && isAuthenticated;
   const offers = usePaginatedApi<MarketplaceOffer, Awaited<ReturnType<typeof getMarketplaceOffers>>>(
@@ -108,7 +110,11 @@ function MarketplaceOffersScreen() {
       if (kind === 'acceptCounter') await acceptMarketplaceCounterOffer(offer.id);
       offers.refresh();
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('offers.actionFailed'));
+      showToast({
+        title: t('common:errors.alertTitle'),
+        description: err instanceof Error ? err.message : t('offers.actionFailed'),
+        variant: 'danger',
+      });
     }
   }
 
@@ -117,7 +123,11 @@ function MarketplaceOffersScreen() {
       await counterMarketplaceOffer(offer.id, { amount, message });
       offers.refresh();
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('offers.counterFailed'));
+      showToast({
+        title: t('common:errors.alertTitle'),
+        description: err instanceof Error ? err.message : t('offers.counterFailed'),
+        variant: 'danger',
+      });
     }
   }
 
@@ -229,6 +239,7 @@ function OfferCard({
   const { t } = useTranslation('marketplace');
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const [isCountering, setIsCountering] = useState(false);
   const [counterAmount, setCounterAmount] = useState('');
   const [counterMessage, setCounterMessage] = useState('');
@@ -243,7 +254,7 @@ function OfferCard({
   function submitCounter() {
     const value = Number(counterAmount);
     if (!Number.isFinite(value) || value <= 0) {
-      Alert.alert(t('offers.amountRequired'), t('offers.amountRequired'));
+      showToast({ title: t('offers.amountRequired'), description: t('offers.amountRequired'), variant: 'warning' });
       return;
     }
     onCounter(offer, value, counterMessage.trim() || null);

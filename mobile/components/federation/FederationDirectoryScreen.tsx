@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState, type ComponentProps } from 'react';
-import { Alert, Image, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { Image, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -42,6 +42,7 @@ import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import Avatar from '@/components/ui/Avatar';
 import Input from '@/components/ui/Input';
 import Toggle from '@/components/ui/Toggle';
@@ -1193,6 +1194,7 @@ function MessageThreadView({
   onSent: (message?: FederatedMessage) => void;
 }) {
   const { i18n } = useTranslation();
+  const { show: showToast } = useAppToast();
   const partnerName = displayFederationPartnerName(thread.partner, t('directory.messages.unknownSender'));
   const [reply, setReply] = useState('');
   const [isSending, setIsSending] = useState(false);
@@ -1217,7 +1219,7 @@ function MessageThreadView({
       setReply('');
       onSent(response.data);
     } catch {
-      Alert.alert(t('directory.messages.sendFailedTitle'), t('directory.messages.sendFailedDescription'));
+      showToast({ title: t('directory.messages.sendFailedTitle'), description: t('directory.messages.sendFailedDescription'), variant: 'danger' });
     } finally {
       setIsSending(false);
     }
@@ -1378,6 +1380,7 @@ function FederationComposeCard({
   t: (key: string, opts?: Record<string, unknown>) => string;
   onSent: (message?: FederatedMessage) => void;
 }) {
+  const { show: showToast } = useAppToast();
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [isSending, setIsSending] = useState(false);
@@ -1441,10 +1444,10 @@ function FederationComposeCard({
       });
       setSubject('');
       setBody('');
-      Alert.alert(t('directory.messages.sentTitle'), t('directory.messages.sentDescription', { name: recipientName }));
+      showToast({ title: t('directory.messages.sentTitle'), description: t('directory.messages.sentDescription', { name: recipientName }), variant: 'success' });
       onSent(response.data);
     } catch {
-      Alert.alert(t('directory.messages.sendFailedTitle'), t('directory.messages.sendFailedDescription'));
+      showToast({ title: t('directory.messages.sendFailedTitle'), description: t('directory.messages.sendFailedDescription'), variant: 'danger' });
     } finally {
       setIsSending(false);
     }
@@ -1600,6 +1603,7 @@ function FederationComposeCard({
 }
 
 function SettingsScreen({ theme, primary, t }: { theme: ReturnType<typeof useTheme>; primary: string; t: (key: string, opts?: Record<string, unknown>) => string }) {
+  const { show: showToast } = useAppToast();
   const { data, isLoading, refresh } = useApi(() => getFederationSettings(), []);
   const payload = unwrapSettings(data);
   const [draft, setDraft] = useState<FederationSettings | null>(null);
@@ -1633,7 +1637,7 @@ function SettingsScreen({ theme, primary, t }: { theme: ReturnType<typeof useThe
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       refresh();
     } catch {
-      Alert.alert(t('directory.settings.statusFailedTitle'), t('directory.settings.statusFailedDescription'));
+      showToast({ title: t('directory.settings.statusFailedTitle'), description: t('directory.settings.statusFailedDescription'), variant: 'danger' });
     } finally {
       setIsTogglingStatus(false);
     }

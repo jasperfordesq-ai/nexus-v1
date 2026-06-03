@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useMemo, useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,6 +12,7 @@ import { Button as HeroButton, Card as HeroCard, Chip, Text } from 'heroui-nativ
 import { useTranslation } from 'react-i18next';
 
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import Input from '@/components/ui/Input';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import { createGroupExchange, type CreateGroupExchangePayload, type GroupExchange } from '@/lib/api/groupExchanges';
@@ -47,6 +48,7 @@ function NewGroupExchangeScreen() {
   const { t } = useTranslation(['exchanges', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [totalHours, setTotalHours] = useState('');
@@ -74,7 +76,7 @@ function NewGroupExchangeScreen() {
       const response = await getMembers(0, query);
       setMemberResults((response.data ?? []).filter((member) => !selectedIds.has(member.id)));
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('groupExchanges.create.searchError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('groupExchanges.create.searchError'), variant: 'danger' });
     } finally {
       setIsSearching(false);
     }
@@ -128,7 +130,7 @@ function NewGroupExchangeScreen() {
       }
       router.replace('/(modals)/group-exchanges' as Href);
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('groupExchanges.create.error'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('groupExchanges.create.error'), variant: 'danger' });
     } finally {
       setIsSubmitting(false);
     }

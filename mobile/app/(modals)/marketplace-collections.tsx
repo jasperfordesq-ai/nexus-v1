@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, FlatList, RefreshControl, View } from 'react-native';
+import { FlatList, RefreshControl, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,6 +14,8 @@ import { useTranslation } from 'react-i18next';
 import MarketplaceListingCard from '@/components/marketplace/MarketplaceListingCard';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
+import { useConfirm } from '@/components/ui/useConfirm';
 import BottomSheet from '@/components/ui/BottomSheet';
 import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
@@ -54,6 +56,8 @@ function MarketplaceCollectionsScreen() {
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
+  const { confirm, confirmDialog } = useConfirm();
   const params = useLocalSearchParams<{ tab?: string }>();
   const currentRouteTab = routeTab(params.tab);
   const [tab, setTab] = useState<TabKey>(currentRouteTab);
@@ -115,7 +119,11 @@ function MarketplaceCollectionsScreen() {
       const response = await getMarketplaceCollectionItems(collection.id, null, 50);
       setItems(response.data);
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('collections.itemsLoadFailed'));
+      showToast({
+        title: t('common:errors.alertTitle'),
+        description: err instanceof Error ? err.message : t('collections.itemsLoadFailed'),
+        variant: 'danger',
+      });
     } finally {
       setIsLoadingItems(false);
     }
@@ -131,36 +139,32 @@ function MarketplaceCollectionsScreen() {
         : collection));
       setSelectedCollection((current) => current ? { ...current, item_count: Math.max(0, current.item_count - 1) } : current);
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('collections.removeItemFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('collections.removeItemFailed'), variant: 'danger' });
     }
   }
 
-  async function deleteSavedSearch(search: MarketplaceSavedSearch) {
-    Alert.alert(
-      t('savedSearches.deleteTitle'),
-      t('savedSearches.deleteMessage', { name: search.name }),
-      [
-        { text: t('common:buttons.cancel'), style: 'cancel' },
-        {
-          text: t('tools.delete'),
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteMarketplaceSavedSearch(search.id);
-              setSavedSearches((current) => current.filter((entry) => entry.id !== search.id));
-            } catch {
-              Alert.alert(t('common:errors.alertTitle'), t('savedSearches.deleteFailed'));
-            }
-          },
-        },
-      ],
-    );
+  function deleteSavedSearch(search: MarketplaceSavedSearch) {
+    confirm({
+      title: t('savedSearches.deleteTitle'),
+      message: t('savedSearches.deleteMessage', { name: search.name }),
+      confirmLabel: t('tools.delete'),
+      cancelLabel: t('common:buttons.cancel'),
+      variant: 'danger',
+      onConfirm: async () => {
+        try {
+          await deleteMarketplaceSavedSearch(search.id);
+          setSavedSearches((current) => current.filter((entry) => entry.id !== search.id));
+        } catch {
+          showToast({ title: t('common:errors.alertTitle'), description: t('savedSearches.deleteFailed'), variant: 'danger' });
+        }
+      },
+    });
   }
 
   async function createCollection() {
     const name = newName.trim();
     if (!name) {
-      Alert.alert(t('common:errors.alertTitle'), t('collections.nameRequired'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('collections.nameRequired'), variant: 'warning' });
       return;
     }
     setIsCreating(true);
@@ -176,7 +180,7 @@ function MarketplaceCollectionsScreen() {
       setNewIsPublic(false);
       setIsCreateOpen(false);
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('collections.createFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('collections.createFailed'), variant: 'danger' });
     } finally {
       setIsCreating(false);
     }
@@ -317,7 +321,7 @@ function MarketplaceCollectionsScreen() {
             {tab === 'saved' ? (
               <View className="gap-3">
                 {savedSearches.map((search) => (
-                  <SavedSearchRow key={search.id} search={search} onRun={() => runSavedSearch(search)} onDelete={() => void deleteSavedSearch(search)} />
+                  <SavedSearchRow key={search.id} search={search} onRun={() => runSavedSearch(search)} onDelete={() => deleteSavedSearch(search)} />
                 ))}
                 {!isLoading && savedSearches.length === 0 ? (
                   <EmptyState icon="search-outline" title={t('savedSearches.empty')} subtitle={t('savedSearches.emptyHint')} actionLabel={t('collections.manage')} onAction={() => openManageTools('saved')} />
@@ -354,6 +358,7 @@ function MarketplaceCollectionsScreen() {
         onClose={() => setIsCreateOpen(false)}
         onCreate={() => void createCollection()}
       />
+      {confirmDialog}
     </SafeAreaView>
   );
 }

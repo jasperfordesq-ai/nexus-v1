@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useState, type ComponentProps } from 'react';
-import { Alert, FlatList, Image, Linking, ScrollView, View } from 'react-native';
+import { FlatList, Image, Linking, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,6 +12,7 @@ import { Button as HeroButton, Card as HeroCard, Chip, CloseButton, Surface, Tag
 import { useTranslation } from 'react-i18next';
 
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import Avatar from '@/components/ui/Avatar';
 import BottomSheet from '@/components/ui/BottomSheet';
 import EmptyState from '@/components/ui/EmptyState';
@@ -132,6 +133,7 @@ function MarketplaceOrdersScreen() {
   const { t } = useTranslation(['marketplace', 'common', 'auth']);
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const params = useLocalSearchParams<{ mode?: string }>();
   const initialMode: OrderMode = params.mode === 'sales' ? 'sales' : 'purchases';
@@ -203,7 +205,7 @@ function MarketplaceOrdersScreen() {
       const response = await getMarketplaceDeliveryOffers(order.id);
       setDeliveryOffers(response.data);
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('orders.deliveryOffersLoadFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('orders.deliveryOffersLoadFailed'), variant: 'danger' });
     } finally {
       setIsLoadingDeliveryOffers(false);
     }
@@ -221,7 +223,7 @@ function MarketplaceOrdersScreen() {
       setShipOrder(null);
       orders.refresh();
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('orders.actionFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('orders.actionFailed'), variant: 'danger' });
     } finally {
       setIsSubmitting(false);
     }
@@ -233,7 +235,7 @@ function MarketplaceOrdersScreen() {
       await confirmMarketplaceOrderDelivery(order.id);
       orders.refresh();
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('orders.actionFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('orders.actionFailed'), variant: 'danger' });
     } finally {
       setIsSubmitting(false);
     }
@@ -252,21 +254,21 @@ function MarketplaceOrdersScreen() {
         });
         if (paymentResult.status === 'completed' && payment.data.payment_intent_id) {
           await confirmMarketplacePayment(payment.data.payment_intent_id);
-          Alert.alert(t('orders.paymentCompleteTitle'), t('orders.paymentCompleteHint'));
+          showToast({ title: t('orders.paymentCompleteTitle'), description: t('orders.paymentCompleteHint'), variant: 'success' });
           orders.refresh();
           return;
         }
         if (paymentResult.status === 'failed') {
-          Alert.alert(t('common:errors.alertTitle'), paymentResult.message || t('orders.paymentSheetFailed'));
+          showToast({ title: t('common:errors.alertTitle'), description: paymentResult.message || t('orders.paymentSheetFailed'), variant: 'danger' });
           return;
         }
-        Alert.alert(t('orders.paymentStartedTitle'), t('orders.paymentClientSecretHint'));
+        showToast({ title: t('orders.paymentStartedTitle'), description: t('orders.paymentClientSecretHint'), variant: 'default' });
       } else {
-        Alert.alert(t('orders.paymentStartedTitle'), t('orders.paymentStartedHint'));
+        showToast({ title: t('orders.paymentStartedTitle'), description: t('orders.paymentStartedHint'), variant: 'default' });
       }
       orders.refresh();
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('orders.paymentFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('orders.paymentFailed'), variant: 'danger' });
     } finally {
       setIsSubmitting(false);
     }
@@ -274,7 +276,7 @@ function MarketplaceOrdersScreen() {
 
   async function submitCancel() {
     if (!cancelOrder || !cancelReason.trim()) {
-      Alert.alert(t('common:errors.alertTitle'), t('orders.cancelReasonRequired'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('orders.cancelReasonRequired'), variant: 'warning' });
       return;
     }
     setIsSubmitting(true);
@@ -284,7 +286,7 @@ function MarketplaceOrdersScreen() {
       setCancelReason('');
       orders.refresh();
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('orders.actionFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('orders.actionFailed'), variant: 'danger' });
     } finally {
       setIsSubmitting(false);
     }
@@ -292,7 +294,7 @@ function MarketplaceOrdersScreen() {
 
   async function submitRating() {
     if (!rateOrder || rating < 1) {
-      Alert.alert(t('common:errors.alertTitle'), t('orders.ratingRequired'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('orders.ratingRequired'), variant: 'warning' });
       return;
     }
     setIsSubmitting(true);
@@ -306,7 +308,7 @@ function MarketplaceOrdersScreen() {
       setRatingComment('');
       orders.refresh();
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('orders.actionFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('orders.actionFailed'), variant: 'danger' });
     } finally {
       setIsSubmitting(false);
     }
@@ -314,7 +316,7 @@ function MarketplaceOrdersScreen() {
 
   async function submitDispute() {
     if (!disputeOrder || !disputeDescription.trim()) {
-      Alert.alert(t('common:errors.alertTitle'), t('orders.disputeDescriptionRequired'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('orders.disputeDescriptionRequired'), variant: 'warning' });
       return;
     }
     setIsSubmitting(true);
@@ -327,7 +329,7 @@ function MarketplaceOrdersScreen() {
       setDisputeDescription('');
       orders.refresh();
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('orders.actionFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('orders.actionFailed'), variant: 'danger' });
     } finally {
       setIsSubmitting(false);
     }
@@ -346,7 +348,7 @@ function MarketplaceOrdersScreen() {
       setDeliveryOffers(response.data);
       orders.refresh();
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('orders.actionFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('orders.actionFailed'), variant: 'danger' });
     } finally {
       setIsSubmitting(false);
     }

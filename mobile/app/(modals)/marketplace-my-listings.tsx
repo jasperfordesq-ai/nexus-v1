@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useState } from 'react';
-import { Alert, FlatList, RefreshControl, ScrollView, View } from 'react-native';
+import { FlatList, RefreshControl, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -13,6 +13,8 @@ import { useTranslation } from 'react-i18next';
 
 import MarketplaceListingCard from '@/components/marketplace/MarketplaceListingCard';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
+import { useConfirm } from '@/components/ui/useConfirm';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
@@ -52,6 +54,8 @@ function MarketplaceMyListingsScreen() {
   const { t } = useTranslation(['marketplace', 'common', 'auth']);
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
+  const { confirm, confirmDialog } = useConfirm();
   const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const [activeTab, setActiveTab] = useState<ListingTab>('active');
   const [onboardingDismissed, setOnboardingDismissed] = useState(true);
@@ -87,22 +91,26 @@ function MarketplaceMyListingsScreen() {
     void storage.set(ONBOARDING_DISMISS_KEY, '1');
   }
 
-  async function removeListing(item: MarketplaceListingItem) {
-    Alert.alert(t('owner.deleteTitle'), t('owner.deleteMessage'), [
-      { text: t('common:buttons.cancel'), style: 'cancel' },
-      {
-        text: t('common:buttons.delete'),
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await deleteMarketplaceListing(item.id);
-            list.refresh();
-          } catch (err) {
-            Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('owner.deleteFailed'));
-          }
-        },
+  function removeListing(item: MarketplaceListingItem) {
+    confirm({
+      title: t('owner.deleteTitle'),
+      message: t('owner.deleteMessage'),
+      confirmLabel: t('common:buttons.delete'),
+      cancelLabel: t('common:buttons.cancel'),
+      variant: 'danger',
+      onConfirm: async () => {
+        try {
+          await deleteMarketplaceListing(item.id);
+          list.refresh();
+        } catch (err) {
+          showToast({
+            title: t('common:errors.alertTitle'),
+            description: err instanceof Error ? err.message : t('owner.deleteFailed'),
+            variant: 'danger',
+          });
+        }
       },
-    ]);
+    });
   }
 
   async function renew(item: MarketplaceListingItem) {
@@ -110,7 +118,11 @@ function MarketplaceMyListingsScreen() {
       await renewMarketplaceListing(item.id);
       list.refresh();
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('owner.renewFailed'));
+      showToast({
+        title: t('common:errors.alertTitle'),
+        description: err instanceof Error ? err.message : t('owner.renewFailed'),
+        variant: 'danger',
+      });
     }
   }
 
@@ -178,7 +190,7 @@ function MarketplaceMyListingsScreen() {
                     <HeroButton.Label>{t('owner.renew')}</HeroButton.Label>
                   </HeroButton>
                 ) : null}
-                <HeroButton className="flex-1" size="sm" variant="danger" onPress={() => void removeListing(item)}>
+                <HeroButton className="flex-1" size="sm" variant="danger" onPress={() => removeListing(item)}>
                   <Ionicons name="trash-outline" size={14} color="#fff" />
                   <HeroButton.Label>{t('owner.delete')}</HeroButton.Label>
                 </HeroButton>
@@ -213,6 +225,7 @@ function MarketplaceMyListingsScreen() {
         onEndReached={list.loadMore}
         onEndReachedThreshold={0.35}
       />
+      {confirmDialog}
     </SafeAreaView>
   );
 }

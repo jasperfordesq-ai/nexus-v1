@@ -5,7 +5,6 @@
 
 import { useCallback, useRef, useState, type ComponentProps, type RefObject } from 'react';
 import {
-  Alert,
   FlatList,
   Pressable,
   RefreshControl,
@@ -40,6 +39,8 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
+import { useConfirm } from '@/components/ui/useConfirm';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
@@ -162,6 +163,8 @@ export default function EndorsementsScreen() {
   const primary = usePrimaryColor();
   const theme = useTheme();
   const { user } = useAuth();
+  const { show: showToast } = useAppToast();
+  const { confirm, confirmDialog } = useConfirm();
 
   const [activeTab, setActiveTab] = useState<Tab>('skills');
   const [addingSkill, setAddingSkill] = useState(false);
@@ -215,7 +218,7 @@ export default function EndorsementsScreen() {
       setAddingSkill(false);
       refreshSkills();
     } catch {
-      Alert.alert(t('addSkillErrorTitle'), t('addSkillError'));
+      showToast({ title: t('addSkillErrorTitle'), description: t('addSkillError'), variant: 'danger' });
     } finally {
       setSubmitting(false);
     }
@@ -232,7 +235,7 @@ export default function EndorsementsScreen() {
       const response = await getSkillCategory(category.id);
       setCategorySkills(response.data.skills ?? []);
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('discover.loadSkillsError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('discover.loadSkillsError'), variant: 'danger' });
     } finally {
       setLoadingCategoryId(null);
     }
@@ -247,7 +250,7 @@ export default function EndorsementsScreen() {
       const response = await getMembersWithSkill(skillName);
       setSkillMembers(response.data ?? []);
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('discover.loadMembersError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('discover.loadMembersError'), variant: 'danger' });
     } finally {
       setLoadingSkill(null);
     }
@@ -257,25 +260,25 @@ export default function EndorsementsScreen() {
     router.push({ pathname: '/(modals)/member-profile', params: { id: String(memberId) } } as unknown as Href);
   }
 
-  async function handleRemoveSkill(skillId: number) {
-    Alert.alert(t('removeSkillTitle'), t('removeSkillConfirm'), [
-      { text: t('common:cancel'), style: 'cancel' },
-      {
-        text: t('removeSkill'),
-        style: 'destructive',
-        onPress: async () => {
-          void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-          try {
-            await removeSkill(skillId);
-            void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            Alert.alert(t('skillRemovedTitle'), t('skillRemoved'));
-            refreshSkills();
-          } catch {
-            Alert.alert(t('removeSkillErrorTitle'), t('removeSkillError'));
-          }
-        },
+  function handleRemoveSkill(skillId: number) {
+    confirm({
+      title: t('removeSkillTitle'),
+      message: t('removeSkillConfirm'),
+      confirmLabel: t('removeSkill'),
+      cancelLabel: t('common:cancel'),
+      variant: 'danger',
+      onConfirm: async () => {
+        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        try {
+          await removeSkill(skillId);
+          void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          showToast({ title: t('skillRemovedTitle'), description: t('skillRemoved'), variant: 'success' });
+          refreshSkills();
+        } catch {
+          showToast({ title: t('removeSkillErrorTitle'), description: t('removeSkillError'), variant: 'danger' });
+        }
       },
-    ]);
+    });
   }
 
   const renderSkill = useCallback(
@@ -435,6 +438,7 @@ export default function EndorsementsScreen() {
             )
           }
         />
+        {confirmDialog}
       </SafeAreaView>
     </ModalErrorBoundary>
   );

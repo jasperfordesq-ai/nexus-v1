@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,6 +17,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import FormActionFooter from '@/components/ui/FormActionFooter';
 import Input from '@/components/ui/Input';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
@@ -51,6 +52,7 @@ function NewJobScreen() {
   const params = useLocalSearchParams<{ id?: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const jobId = Number(params.id);
   const isEditing = Number.isFinite(jobId) && jobId > 0;
   const [title, setTitle] = useState('');
@@ -92,7 +94,7 @@ function NewJobScreen() {
       })
       .catch(() => {
         if (!isMounted) return;
-        Alert.alert(t('create.failedTitle'), t('create.loadFailed'));
+        showToast({ title: t('create.failedTitle'), description: t('create.loadFailed'), variant: 'danger' });
       });
 
     return () => {
@@ -128,7 +130,7 @@ function NewJobScreen() {
 
   async function submit() {
     if (!title.trim() || !description.trim()) {
-      Alert.alert(t('create.validationTitle'), t('create.validationRequired'));
+      showToast({ title: t('create.validationTitle'), description: t('create.validationRequired'), variant: 'warning' });
       return;
     }
 
@@ -138,7 +140,7 @@ function NewJobScreen() {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       if (!Number.isNaN(deadlineDate.getTime()) && deadlineDate < today) {
-        Alert.alert(t('create.validationTitle'), t('create.deadlinePast'));
+        showToast({ title: t('create.validationTitle'), description: t('create.deadlinePast'), variant: 'warning' });
         return;
       }
     }
@@ -146,11 +148,11 @@ function NewJobScreen() {
     const parsedSalaryMin = optionalNumber(salaryMin);
     const parsedSalaryMax = optionalNumber(salaryMax);
     if (parsedSalaryMin !== null && parsedSalaryMax !== null && parsedSalaryMin > parsedSalaryMax) {
-      Alert.alert(t('create.validationTitle'), t('create.salaryRangeInvalid'));
+      showToast({ title: t('create.validationTitle'), description: t('create.salaryRangeInvalid'), variant: 'warning' });
       return;
     }
     if (type === 'paid' && !salaryNegotiable && parsedSalaryMin === null && parsedSalaryMax === null) {
-      Alert.alert(t('create.validationTitle'), t('create.salaryRequired'));
+      showToast({ title: t('create.validationTitle'), description: t('create.salaryRequired'), variant: 'warning' });
       return;
     }
 
@@ -190,10 +192,11 @@ function NewJobScreen() {
         router.back();
       }
     } catch (error) {
-      Alert.alert(
-        isEditing ? t('create.editFailedTitle') : t('create.failedTitle'),
-        error instanceof Error ? error.message : (isEditing ? t('create.editFailedDescription') : t('create.failedDescription')),
-      );
+      showToast({
+        title: isEditing ? t('create.editFailedTitle') : t('create.failedTitle'),
+        description: error instanceof Error ? error.message : (isEditing ? t('create.editFailedDescription') : t('create.failedDescription')),
+        variant: 'danger',
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -202,7 +205,7 @@ function NewJobScreen() {
   async function generateDescription() {
     const cleanTitle = title.trim();
     if (!cleanTitle) {
-      Alert.alert(t('create.validationTitle'), t('create.generateTitleRequired'));
+      showToast({ title: t('create.validationTitle'), description: t('create.generateTitleRequired'), variant: 'warning' });
       return;
     }
 
@@ -217,10 +220,11 @@ function NewJobScreen() {
       setDescription(response.data.description);
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (error) {
-      Alert.alert(
-        t('common:errors.alertTitle'),
-        error instanceof Error ? error.message : t('create.generateDescriptionFailed'),
-      );
+      showToast({
+        title: t('common:errors.alertTitle'),
+        description: error instanceof Error ? error.message : t('create.generateDescriptionFailed'),
+        variant: 'danger',
+      });
     } finally {
       setIsGeneratingDescription(false);
     }

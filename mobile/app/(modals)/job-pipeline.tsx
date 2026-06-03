@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useMemo, useState } from 'react';
-import { Alert, ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,6 +19,7 @@ import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import * as Haptics from '@/lib/haptics';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -237,6 +238,7 @@ function PipelineApplicationCard({
   t: (key: string, opts?: Record<string, unknown>) => string;
   onUpdated: () => void;
 }) {
+  const { show: showToast } = useAppToast();
   const [isUpdating, setIsUpdating] = useState(false);
   const applicantName = application.applicant?.name?.trim() || t('owner.unknownApplicant');
   const currentStatus = normalizeStatus(application.status);
@@ -249,7 +251,7 @@ function PipelineApplicationCard({
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       onUpdated();
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('owner.updateError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('owner.updateError'), variant: 'danger' });
     } finally {
       setIsUpdating(false);
     }

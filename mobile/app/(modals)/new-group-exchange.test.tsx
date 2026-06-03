@@ -81,6 +81,13 @@ jest.mock('@/lib/api/members', () => ({
   getMembers: (...args: unknown[]) => mockGetMembers(...args),
 }));
 
+// Stable AppToast mock — fns created inside the factory closure.
+jest.mock('@/components/ui/AppToast', () => {
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
+
 import NewGroupExchangeRoute from './new-group-exchange';
 
 beforeEach(() => {

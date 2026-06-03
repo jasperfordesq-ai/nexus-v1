@@ -4,7 +4,6 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { Alert } from 'react-native';
 import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 
 import GoalDetailScreen from './goal-detail';
@@ -107,6 +106,14 @@ jest.mock('@/lib/api/goals', () => ({
   deleteGoalReminder: jest.fn(),
 }));
 
+jest.mock('@/components/ui/AppToast', () => {
+  // Stable references so screens that put `show` in a useCallback/useEffect
+  // dependency array don't re-run their effects on every render.
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
+
 const mockGetGoal = getGoal as jest.MockedFunction<typeof getGoal>;
 const mockGetGoalHistory = getGoalHistory as jest.MockedFunction<typeof getGoalHistory>;
 const mockGetGoalInsights = getGoalInsights as jest.MockedFunction<typeof getGoalInsights>;
@@ -151,7 +158,6 @@ beforeEach(() => {
   mockUpdateGoalProgress.mockResolvedValue({ data: { ...goal, progress_hours: 5 } });
   mockSetGoalReminder.mockResolvedValue({ data: { id: 2, frequency: 'daily', enabled: true, next_reminder_at: '2026-05-10T10:00:00Z' } });
   mockDeleteGoalReminder.mockResolvedValue(undefined);
-  jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
 });
 
 describe('GoalDetailScreen', () => {

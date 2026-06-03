@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, FlatList, RefreshControl, View } from 'react-native';
+import { FlatList, RefreshControl, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import MarketplaceListingCard from '@/components/marketplace/MarketplaceListingCard';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import {
@@ -41,6 +42,7 @@ function MarketplaceFreeScreen() {
   const { hasFeature } = useTenant();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const [listings, setListings] = useState<MarketplaceListingItem[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
@@ -69,14 +71,14 @@ function MarketplaceFreeScreen() {
       if (!append) {
         setError(err instanceof Error ? err.message : t('free.unableToLoad'));
       } else {
-        Alert.alert(t('common:errors.alertTitle'), t('free.loadMoreFailed'));
+        showToast({ title: t('common:errors.alertTitle'), description: t('free.loadMoreFailed'), variant: 'danger' });
       }
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
       setIsLoadingMore(false);
     }
-  }, [cursor, hasFeature, t]);
+  }, [cursor, hasFeature, showToast, t]);
 
   useEffect(() => {
     void fetchListings(false);
@@ -91,7 +93,7 @@ function MarketplaceFreeScreen() {
       else await unsaveMarketplaceListing(item.id);
     } catch {
       setListings((current) => current.map((listing) => listing.id === item.id ? item : listing));
-      Alert.alert(t('common:errors.alertTitle'), t('common.save_failed'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('common.save_failed'), variant: 'danger' });
     }
   }
 

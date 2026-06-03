@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, FlatList, RefreshControl, ScrollView, View } from 'react-native';
+import { FlatList, RefreshControl, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,6 +17,7 @@ import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import {
   getFeaturedMarketplaceListings,
@@ -55,6 +56,7 @@ function MarketplaceScreen() {
   }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const initialQuery = firstParam(params.q) ?? '';
   const initialCategory = Number(firstParam(params.category_id) ?? firstParam(params.category));
   const initialPriceType = normalizePriceType(firstParam(params.price_type));
@@ -117,14 +119,14 @@ function MarketplaceScreen() {
       if (!append) {
         setError(err instanceof Error ? err.message : t('hub.unable_to_load'));
       } else {
-        Alert.alert(t('common:errors.alertTitle'), t('hub.load_more_failed'));
+        showToast({ title: t('common:errors.alertTitle'), description: t('hub.load_more_failed'), variant: 'danger' });
       }
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
       setIsLoadingMore(false);
     }
-  }, [cursor, debouncedQuery, hasFeature, priceType, selectedCategory, t]);
+  }, [cursor, debouncedQuery, hasFeature, priceType, selectedCategory, showToast, t]);
 
   useEffect(() => {
     void fetchListings(false);
@@ -163,7 +165,7 @@ function MarketplaceScreen() {
     } catch {
       setListings((list) => list.map((listing) => listing.id === item.id ? item : listing));
       setFeatured((list) => list.map((listing) => listing.id === item.id ? item : listing));
-      Alert.alert(t('common:errors.alertTitle'), t('common.save_failed'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('common.save_failed'), variant: 'danger' });
     }
   }
 

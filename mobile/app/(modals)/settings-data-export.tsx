@@ -4,13 +4,14 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
@@ -42,6 +43,7 @@ export default function SettingsDataExportScreen() {
   const { t, i18n } = useTranslation(['settings', 'common']);
   const theme = useTheme();
   const primary = usePrimaryColor();
+  const { show: showToast } = useAppToast();
   const [format, setFormat] = useState<DataExportFormat>('json');
   const [history, setHistory] = useState<DataExportHistoryRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -52,11 +54,11 @@ export default function SettingsDataExportScreen() {
     try {
       setHistory(await getDataExportHistory());
     } catch {
-      Alert.alert(t('common:errors.generic'), t('dataExport.loadError'));
+      showToast({ title: t('common:errors.generic'), description: t('dataExport.loadError'), variant: 'danger' });
     } finally {
       setIsLoading(false);
     }
-  }, [t]);
+  }, [t, showToast]);
 
   useEffect(() => {
     void loadHistory();
@@ -74,10 +76,10 @@ export default function SettingsDataExportScreen() {
     setIsRequesting(true);
     try {
       await requestDataExport(format);
-      Alert.alert(t('dataExport.requested'), t('dataExport.requestedBody'));
+      showToast({ title: t('dataExport.requested'), description: t('dataExport.requestedBody'), variant: 'success' });
       await loadHistory();
     } catch {
-      Alert.alert(t('common:errors.generic'), t('dataExport.requestError'));
+      showToast({ title: t('common:errors.generic'), description: t('dataExport.requestError'), variant: 'danger' });
     } finally {
       setIsRequesting(false);
     }

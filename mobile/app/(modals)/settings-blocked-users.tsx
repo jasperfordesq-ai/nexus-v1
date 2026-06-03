@@ -4,13 +4,15 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
+import { useConfirm } from '@/components/ui/useConfirm';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -31,6 +33,8 @@ export default function SettingsBlockedUsersScreen() {
   const { t, i18n } = useTranslation(['settings', 'common']);
   const theme = useTheme();
   const primary = usePrimaryColor();
+  const { show: showToast } = useAppToast();
+  const { confirm, confirmDialog } = useConfirm();
   const [users, setUsers] = useState<BlockedUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [unblockingId, setUnblockingId] = useState<number | null>(null);
@@ -40,31 +44,25 @@ export default function SettingsBlockedUsersScreen() {
     try {
       setUsers(await getBlockedUsers());
     } catch {
-      Alert.alert(t('common:errors.generic'), t('blockedUsers.loadError'));
+      showToast({ title: t('common:errors.generic'), description: t('blockedUsers.loadError'), variant: 'danger' });
     } finally {
       setIsLoading(false);
     }
-  }, [t]);
+  }, [t, showToast]);
 
   useEffect(() => {
     void load();
   }, [load]);
 
-  async function confirmUnblock(user: BlockedUser) {
-    Alert.alert(
-      t('blockedUsers.unblockConfirmTitle', { name: user.name }),
-      t('blockedUsers.unblockConfirmBody'),
-      [
-        { text: t('common:buttons.cancel'), style: 'cancel' },
-        {
-          text: t('blockedUsers.unblock'),
-          style: 'destructive',
-          onPress: () => {
-            void handleUnblock(user);
-          },
-        },
-      ],
-    );
+  function confirmUnblock(user: BlockedUser) {
+    confirm({
+      title: t('blockedUsers.unblockConfirmTitle', { name: user.name }),
+      message: t('blockedUsers.unblockConfirmBody'),
+      confirmLabel: t('blockedUsers.unblock'),
+      cancelLabel: t('common:buttons.cancel'),
+      variant: 'danger',
+      onConfirm: () => handleUnblock(user),
+    });
   }
 
   async function handleUnblock(user: BlockedUser) {
@@ -72,9 +70,9 @@ export default function SettingsBlockedUsersScreen() {
     try {
       await unblockUser(user.user_id);
       setUsers((current) => current.filter((item) => item.user_id !== user.user_id));
-      Alert.alert(t('blockedUsers.unblocked'), t('blockedUsers.unblockedDesc', { name: user.name }));
+      showToast({ title: t('blockedUsers.unblocked'), description: t('blockedUsers.unblockedDesc', { name: user.name }), variant: 'success' });
     } catch {
-      Alert.alert(t('common:errors.generic'), t('blockedUsers.unblockError'));
+      showToast({ title: t('common:errors.generic'), description: t('blockedUsers.unblockError'), variant: 'danger' });
     } finally {
       setUnblockingId(null);
     }
@@ -135,7 +133,7 @@ export default function SettingsBlockedUsersScreen() {
                   ) : null}
                   <HeroButton
                     variant="danger"
-                    onPress={() => void confirmUnblock(user)}
+                    onPress={() => confirmUnblock(user)}
                     isDisabled={unblockingId !== null}
                   >
                     <HeroButton.Label>{unblockingId === user.user_id ? t('blockedUsers.unblocking') : t('blockedUsers.unblock')}</HeroButton.Label>
@@ -149,6 +147,7 @@ export default function SettingsBlockedUsersScreen() {
             {t('common:attribution')}
           </Text>
         </ScrollView>
+        {confirmDialog}
       </SafeAreaView>
     </ModalErrorBoundary>
   );

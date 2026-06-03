@@ -134,6 +134,25 @@ jest.mock('@/lib/api/verification', () => ({
   getUserVerificationBadges: jest.fn().mockResolvedValue([]),
 }));
 
+jest.mock('@/components/ui/AppToast', () => {
+  // Stable references so screens that put `show` in a useCallback/useEffect
+  // dependency array don't re-run their effects on every render.
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
+
+// Auto-confirm: invoking confirm() runs the action immediately, mirroring the
+// old Alert.alert destructive-button-press simulation.
+jest.mock('@/components/ui/useConfirm', () => ({
+  useConfirm: () => ({
+    confirm: (opts: { onConfirm: () => void | Promise<void> }) => {
+      void opts.onConfirm();
+    },
+    confirmDialog: null,
+  }),
+}));
+
 jest.mock('@/components/ui/Avatar', () => 'View');
 jest.mock('@/components/ui/LoadingSpinner', () => () => null);
 jest.mock('@/components/comments/CommentSheet', () => {

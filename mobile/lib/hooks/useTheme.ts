@@ -25,7 +25,16 @@
 //
 // When touching a component, migrate its inline `theme.*` to className tokens
 // where one exists; this hook is the fallback, not the default.
+//
+// The hook is reactive: it reads the resolved scheme from `themeStore` via
+// `useSyncExternalStore`, so flipping light/dark in Settings re-renders every
+// consumer alongside the Uniwind className tokens. With no startup wiring (e.g.
+// in unit tests) the store defaults to 'dark', preserving prior behaviour.
 // ---------------------------------------------------------------------------
+
+import { useSyncExternalStore } from 'react';
+
+import { themeStore, type ThemeMode } from '@/lib/theme/themeStore';
 
 export const LIGHT = {
   bg: '#F8FAFC',           // --background (web light)
@@ -68,5 +77,33 @@ export const DARK = {
 export type Theme = { [K in keyof typeof LIGHT]: string };
 
 export function useTheme(): Theme {
-  return DARK as Theme;
+  const scheme = useSyncExternalStore(
+    themeStore.subscribe,
+    themeStore.getSnapshot,
+    themeStore.getSnapshot,
+  );
+  return (scheme === 'light' ? LIGHT : DARK) as Theme;
+}
+
+/**
+ * Theme controller for settings UI: the user's chosen `mode`, the resolved
+ * `scheme` that is currently painting, and a `setMode` setter. Reactive via
+ * `useSyncExternalStore`, so the selector reflects external/system changes too.
+ */
+export function useThemeController(): {
+  mode: ThemeMode;
+  scheme: 'light' | 'dark';
+  setMode: (mode: ThemeMode) => void;
+} {
+  const scheme = useSyncExternalStore(
+    themeStore.subscribe,
+    themeStore.getSnapshot,
+    themeStore.getSnapshot,
+  );
+  const mode = useSyncExternalStore(
+    themeStore.subscribe,
+    themeStore.getMode,
+    themeStore.getMode,
+  );
+  return { mode, scheme, setMode: themeStore.setMode };
 }

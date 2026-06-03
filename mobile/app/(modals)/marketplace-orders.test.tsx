@@ -4,7 +4,6 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { Alert } from 'react-native';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 let mockAuthState: {
@@ -148,7 +147,16 @@ jest.mock('@/lib/payments/marketplacePayment', () => ({
   presentMarketplacePayment: jest.fn().mockResolvedValue({ status: 'redirected' }),
 }));
 
+// Stable references so screens that put `show` in a useCallback/useEffect
+// dependency array don't re-run their effects on every render.
+jest.mock('@/components/ui/AppToast', () => {
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
+
 import MarketplaceOrdersRoute from './marketplace-orders';
+import { useAppToast } from '@/components/ui/AppToast';
 import {
   confirmMarketplacePayment,
   createMarketplacePaymentIntent,
@@ -158,11 +166,10 @@ import {
 import { presentMarketplacePayment } from '@/lib/payments/marketplacePayment';
 
 describe('MarketplaceOrdersRoute', () => {
-  let alertSpy: jest.SpyInstance;
+  const showToast = useAppToast().show as jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
     mockAuthState = {
       isAuthenticated: true,
       isLoading: false,
@@ -176,10 +183,6 @@ describe('MarketplaceOrdersRoute', () => {
     (createMarketplacePaymentIntent as jest.Mock).mockResolvedValue({
       data: { client_secret: 'pi_secret', payment_intent_id: 'pi_42' },
     });
-  });
-
-  afterEach(() => {
-    alertSpy.mockRestore();
   });
 
   it('includes pending-payment recovery states in the active orders filter', async () => {
@@ -326,10 +329,11 @@ describe('MarketplaceOrdersRoute', () => {
         merchantDisplayName: 'Project NEXUS marketplace',
       });
       expect(confirmMarketplacePayment).toHaveBeenCalledWith('pi_42');
-      expect(Alert.alert).toHaveBeenCalledWith(
-        'Payment complete',
-        'Your order is paid. The seller can now prepare it.',
-      );
+      expect(showToast).toHaveBeenCalledWith({
+        title: 'Payment complete',
+        description: 'Your order is paid. The seller can now prepare it.',
+        variant: 'success',
+      });
     });
     unmount();
   });

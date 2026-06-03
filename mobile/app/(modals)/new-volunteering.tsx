@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,6 +18,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import FormActionFooter from '@/components/ui/FormActionFooter';
 import Input from '@/components/ui/Input';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
@@ -66,6 +67,7 @@ function NewVolunteeringScreen() {
   const params = useLocalSearchParams<{ id?: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const opportunityId = Number(params.id);
   const isEditing = Number.isFinite(opportunityId) && opportunityId > 0;
   const orgQuery = useApi(() => getMyOrganisations(), []);
@@ -93,7 +95,7 @@ function NewVolunteeringScreen() {
       })
       .catch(() => {
         if (!isMounted) return;
-        Alert.alert(t('create.failedTitle'), t('create.loadFailed'));
+        showToast({ title: t('create.failedTitle'), description: t('create.loadFailed'), variant: 'danger' });
       });
 
     return () => {
@@ -127,17 +129,17 @@ function NewVolunteeringScreen() {
     const trimmedEndDate = endDate.trim();
 
     if ((!isEditing && !organisationId) || !trimmedTitle || !trimmedDescription) {
-      Alert.alert(t('create.validationTitle'), t('create.validationRequired'));
+      showToast({ title: t('create.validationTitle'), description: t('create.validationRequired'), variant: 'warning' });
       return;
     }
 
     if (trimmedTitle.length < 5) {
-      Alert.alert(t('create.validationTitle'), t('create.validationTitleMinLength'));
+      showToast({ title: t('create.validationTitle'), description: t('create.validationTitleMinLength'), variant: 'warning' });
       return;
     }
 
     if (trimmedDescription.length < 20) {
-      Alert.alert(t('create.validationTitle'), t('create.validationDescriptionMinLength'));
+      showToast({ title: t('create.validationTitle'), description: t('create.validationDescriptionMinLength'), variant: 'warning' });
       return;
     }
 
@@ -145,7 +147,7 @@ function NewVolunteeringScreen() {
     const parsedEndDate = trimmedEndDate ? parseDateOnly(trimmedEndDate) : null;
 
     if (parsedStartDate !== null && parsedEndDate !== null && parsedEndDate <= parsedStartDate) {
-      Alert.alert(t('create.validationTitle'), t('create.validationEndAfterStart'));
+      showToast({ title: t('create.validationTitle'), description: t('create.validationEndAfterStart'), variant: 'warning' });
       return;
     }
 
@@ -174,10 +176,11 @@ function NewVolunteeringScreen() {
         router.back();
       }
     } catch (error) {
-      Alert.alert(
-        isEditing ? t('create.editFailedTitle') : t('create.failedTitle'),
-        error instanceof Error ? error.message : (isEditing ? t('create.editFailedDescription') : t('create.failedDescription')),
-      );
+      showToast({
+        title: isEditing ? t('create.editFailedTitle') : t('create.failedTitle'),
+        description: error instanceof Error ? error.message : (isEditing ? t('create.editFailedDescription') : t('create.failedDescription')),
+        variant: 'danger',
+      });
     } finally {
       setIsSubmitting(false);
     }

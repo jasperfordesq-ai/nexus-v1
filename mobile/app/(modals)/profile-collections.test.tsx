@@ -43,6 +43,13 @@ jest.mock('@/components/ui/AppTopBar', () => {
   };
 });
 jest.mock('@/components/ui/LoadingSpinner', () => () => null);
+// Stable references so screens that put `show` in a useCallback/useEffect
+// dependency array don't re-run their effects on every render.
+jest.mock('@/components/ui/AppToast', () => {
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
 jest.mock('@/components/ui/Toggle', () => {
   const { Text } = require('react-native');
   return function MockToggle({ label }: { label?: string }) {

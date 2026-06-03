@@ -9,7 +9,7 @@
     "assetBundlePatterns": [
       "assets/**/*"
     ],
-    "userInterfaceStyle": "dark",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash.png",

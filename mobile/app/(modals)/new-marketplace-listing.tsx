@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useState } from 'react';
-import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { Image, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import * as Haptics from '@/lib/haptics';
 
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import FormActionFooter from '@/components/ui/FormActionFooter';
 import Input from '@/components/ui/Input';
 import Toggle from '@/components/ui/Toggle';
@@ -80,6 +81,7 @@ export function MarketplaceListingForm() {
   const params = useLocalSearchParams<{ id?: string; price_type?: MarketplacePriceType }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const listingId = Number(params.id);
   const isEditing = Number.isFinite(listingId) && listingId > 0;
   const [categories, setCategories] = useState<MarketplaceCategory[]>([]);
@@ -178,7 +180,7 @@ export function MarketplaceListingForm() {
         setRemoveExistingVideo(false);
         setHydrated(true);
       })
-      .catch(() => Alert.alert(t('common:errors.alertTitle'), t('forms.loadFailed')));
+      .catch(() => showToast({ title: t('common:errors.alertTitle'), description: t('forms.loadFailed'), variant: 'danger' }));
     return () => {
       mounted = false;
     };
@@ -222,13 +224,13 @@ export function MarketplaceListingForm() {
 
   async function submit() {
     if (!title.trim() || !description.trim()) {
-      Alert.alert(t('forms.validation'), t('forms.required'));
+      showToast({ title: t('forms.validation'), description: t('forms.required'), variant: 'warning' });
       return;
     }
 
     const priceValue = priceType === 'free' ? 0 : toNumber(price);
     if (priceType !== 'free' && priceType !== 'contact' && (priceValue === null || priceValue <= 0)) {
-      Alert.alert(t('forms.validation'), t('forms.priceRequired'));
+      showToast({ title: t('forms.validation'), description: t('forms.priceRequired'), variant: 'warning' });
       return;
     }
 
@@ -243,7 +245,7 @@ export function MarketplaceListingForm() {
         || (hasLatitude && (latitudeValue === null || latitudeValue < -90 || latitudeValue > 90))
         || (hasLongitude && (longitudeValue === null || longitudeValue < -180 || longitudeValue > 180))
       ) {
-        Alert.alert(t('forms.validation'), t('forms.invalidCoordinates'));
+        showToast({ title: t('forms.validation'), description: t('forms.invalidCoordinates'), variant: 'warning' });
         return;
       }
       const filledTemplateFields = Object.fromEntries(
@@ -293,7 +295,7 @@ export function MarketplaceListingForm() {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.replace({ pathname: '/(modals)/marketplace-detail', params: { id: String(response.data.id) } } as unknown as Href);
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('forms.saveFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('forms.saveFailed'), variant: 'danger' });
     } finally {
       setIsSubmitting(false);
     }
@@ -302,7 +304,7 @@ export function MarketplaceListingForm() {
   async function generateDescription() {
     const cleanTitle = title.trim();
     if (!cleanTitle) {
-      Alert.alert(t('forms.validation'), t('forms.generateTitleRequired'));
+      showToast({ title: t('forms.validation'), description: t('forms.generateTitleRequired'), variant: 'warning' });
       return;
     }
 
@@ -317,7 +319,7 @@ export function MarketplaceListingForm() {
       setDescription(response.data.description);
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (err) {
-      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('forms.generateDescriptionFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: err instanceof Error ? err.message : t('forms.generateDescriptionFailed'), variant: 'danger' });
     } finally {
       setIsGeneratingDescription(false);
     }
@@ -326,12 +328,12 @@ export function MarketplaceListingForm() {
   async function pickImages() {
     const availableSlots = Math.max(0, MAX_IMAGES - existingImages.length - imageUris.length);
     if (availableSlots <= 0) {
-      Alert.alert(t('forms.validation'), t('forms.maxImagesReached', { max: MAX_IMAGES }));
+      showToast({ title: t('forms.validation'), description: t('forms.maxImagesReached', { max: MAX_IMAGES }), variant: 'warning' });
       return;
     }
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert(t('forms.permissionTitle'), t('forms.permissionMessage'));
+      showToast({ title: t('forms.permissionTitle'), description: t('forms.permissionMessage'), variant: 'warning' });
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -348,7 +350,7 @@ export function MarketplaceListingForm() {
   async function pickVideo() {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert(t('forms.permissionTitle'), t('forms.permissionMessage'));
+      showToast({ title: t('forms.permissionTitle'), description: t('forms.permissionMessage'), variant: 'warning' });
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -362,11 +364,11 @@ export function MarketplaceListingForm() {
     if (!asset?.uri) return;
 
     if (asset.mimeType && !ALLOWED_VIDEO_TYPES.includes(asset.mimeType)) {
-      Alert.alert(t('forms.validation'), t('forms.videoTypeError'));
+      showToast({ title: t('forms.validation'), description: t('forms.videoTypeError'), variant: 'warning' });
       return;
     }
     if (asset.fileSize && asset.fileSize > MAX_VIDEO_SIZE) {
-      Alert.alert(t('forms.validation'), t('forms.videoSizeError'));
+      showToast({ title: t('forms.validation'), description: t('forms.videoSizeError'), variant: 'warning' });
       return;
     }
 

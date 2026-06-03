@@ -4,7 +4,6 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { Alert } from 'react-native';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 
 // --- Mocks ---
@@ -143,6 +142,13 @@ jest.mock('@/components/ui/BottomSheet', () => {
     visible ? <View testID="volunteer-apply-sheet">{children}</View> : null;
 });
 
+const mockShowToast = jest.fn();
+jest.mock('@/components/ui/AppToast', () => ({
+  // Stable references so screens that put `show` in a useCallback/useEffect
+  // dependency array don't re-run their effects on every render.
+  useAppToast: () => ({ show: mockShowToast, hide: jest.fn(), isToastVisible: false }),
+}));
+
 // --- Tests ---
 
 import VolunteeringDetailScreen from './volunteering-detail';
@@ -154,7 +160,6 @@ beforeEach(() => {
   mockUseApi.mockReturnValue(defaultApiState);
   mockHandleVolunteerApplication.mockResolvedValue({ data: {} });
   jest.clearAllMocks();
-  jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
 });
 
 const mockOpportunity = {
@@ -297,7 +302,11 @@ describe('VolunteeringDetailScreen', () => {
     await waitFor(() => {
       expect(mockHandleVolunteerApplication).toHaveBeenCalledWith(55, 'approve');
       expect(applicationsApiRefresh).toHaveBeenCalled();
-      expect(Alert.alert).toHaveBeenCalledWith('Application approved', 'The volunteer has been approved.');
+      expect(mockShowToast).toHaveBeenCalledWith(expect.objectContaining({
+        title: 'Application approved',
+        description: 'The volunteer has been approved.',
+        variant: 'success',
+      }));
     });
   });
 
@@ -329,7 +338,11 @@ describe('VolunteeringDetailScreen', () => {
 
     await waitFor(() => {
       expect(expressInterest).toHaveBeenCalledWith(10, 'Happy to help on Saturday mornings.');
-      expect(Alert.alert).toHaveBeenCalledWith('Interest sent', 'The organisation will be in touch.');
+      expect(mockShowToast).toHaveBeenCalledWith(expect.objectContaining({
+        title: 'Interest sent',
+        description: 'The organisation will be in touch.',
+        variant: 'success',
+      }));
     });
   });
 
@@ -353,7 +366,11 @@ describe('VolunteeringDetailScreen', () => {
 
     await waitFor(() => {
       expect(signUpForShift).toHaveBeenCalledWith(1);
-      expect(Alert.alert).toHaveBeenCalledWith('Shift joined', 'You joined the shift.');
+      expect(mockShowToast).toHaveBeenCalledWith(expect.objectContaining({
+        title: 'Shift joined',
+        description: 'You joined the shift.',
+        variant: 'success',
+      }));
     });
   });
 });

@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Alert, Pressable, ScrollView, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -16,6 +16,7 @@ import { useTenant, usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import { ProfileSkeleton } from '@/components/ui/Skeleton';
+import { useConfirm } from '@/components/ui/useConfirm';
 import Avatar from '@/components/ui/Avatar';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
@@ -85,6 +86,7 @@ export default function MoreScreen() {
   const { hasFeature, hasModule } = useTenant();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { confirm, confirmDialog } = useConfirm();
 
   const rawBalance = user && 'balance' in user ? (user.balance as number | null) : null;
   const balance = typeof rawBalance === 'number' && Number.isFinite(rawBalance) ? rawBalance : null;
@@ -110,14 +112,14 @@ export default function MoreScreen() {
 
   function confirmLogout() {
     void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-    Alert.alert(
-      t('signOutConfirmTitle'),
-      t('signOutConfirmMessage'),
-      [
-        { text: t('common:buttons.cancel'), style: 'cancel' },
-        { text: t('signOut'), style: 'destructive', onPress: () => void logout() },
-      ],
-    );
+    confirm({
+      title: t('signOutConfirmTitle'),
+      message: t('signOutConfirmMessage'),
+      confirmLabel: t('signOut'),
+      cancelLabel: t('common:buttons.cancel'),
+      variant: 'danger',
+      onConfirm: () => void logout(),
+    });
   }
 
   if (!user) {
@@ -187,6 +189,7 @@ export default function MoreScreen() {
           {t('common:attribution')}
         </Text>
       </ScrollView>
+      {confirmDialog}
     </SafeAreaView>
   );
 }

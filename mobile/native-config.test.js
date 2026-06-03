@@ -102,12 +102,17 @@ describe('native app configuration', () => {
     const gestureIndex = layout.indexOf('<GestureHandlerRootView');
     const heroIndex = layout.indexOf('<HeroUINativeProvider>');
     const safeAreaIndex = layout.indexOf('<SafeAreaProvider>');
-    const statusIndex = layout.indexOf('<StatusBar style="light"');
+    // StatusBar now lives in <ThemedShell/> (mounted inside the provider stack)
+    // and its style follows the active light/dark scheme.
+    const themedShellIndex = layout.indexOf('<ThemedShell />');
+    const statusIndex = layout.indexOf('<StatusBar style={');
 
     expect(gestureIndex).toBeGreaterThan(-1);
     expect(heroIndex).toBeGreaterThan(gestureIndex);
     expect(safeAreaIndex).toBeGreaterThan(heroIndex);
-    expect(statusIndex).toBeGreaterThan(safeAreaIndex);
+    // ThemedShell (which renders StatusBar) is mounted after SafeAreaProvider.
+    expect(themedShellIndex).toBeGreaterThan(safeAreaIndex);
+    expect(statusIndex).toBeGreaterThan(-1);
   });
 
   it('bundles native fonts and assets into Android release builds', () => {

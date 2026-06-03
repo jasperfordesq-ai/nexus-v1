@@ -5,7 +5,6 @@
 
 import { useState } from 'react';
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -24,6 +23,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import FormActionFooter from '@/components/ui/FormActionFooter';
 import Input from '@/components/ui/Input';
 import OfflineBanner from '@/components/OfflineBanner';
@@ -32,6 +32,7 @@ export default function ChangePasswordScreen() {
   const { t } = useTranslation(['settings', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -70,14 +71,13 @@ export default function ChangePasswordScreen() {
         new_password_confirmation: confirmPassword,
       });
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert(t('password.success'), t('password.successMessage'), [
-        { text: t('common:buttons.done'), onPress: () => router.back() },
-      ]);
+      showToast({ title: t('password.success'), description: t('password.successMessage'), variant: 'success' });
+      router.back();
     } catch (err: unknown) {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       const message =
         err instanceof Error ? err.message : t('password.changeError');
-      Alert.alert(t('common:errors.generic'), message);
+      showToast({ title: t('common:errors.generic'), description: message, variant: 'danger' });
     } finally {
       setIsLoading(false);
     }

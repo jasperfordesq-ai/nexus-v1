@@ -5,7 +5,6 @@
 
 import { useMemo, useState } from 'react';
 import {
-  Alert,
   RefreshControl,
   ScrollView,
   Share,
@@ -37,6 +36,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import Avatar from '@/components/ui/Avatar';
 import BottomSheet from '@/components/ui/BottomSheet';
 import Input from '@/components/ui/Input';
@@ -301,6 +301,7 @@ function VolunteeringDetailScreenInner() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const [interestSent, setInterestSent] = useState(false);
   const [interestLoading, setInterestLoading] = useState(false);
   const [applySheetOpen, setApplySheetOpen] = useState(false);
@@ -354,7 +355,7 @@ function VolunteeringDetailScreenInner() {
   async function handleApply() {
     if (!opportunity || interestLoading || hasApplied) return;
     if (!isAuthenticated) {
-      Alert.alert(t('signInRequiredTitle'), t('signInRequiredMessage'));
+      showToast({ title: t('signInRequiredTitle'), description: t('signInRequiredMessage'), variant: 'warning' });
       return;
     }
 
@@ -366,10 +367,10 @@ function VolunteeringDetailScreenInner() {
       setApplySheetOpen(false);
       refresh();
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert(t('interestSentTitle'), t('interestSentMessage'));
+      showToast({ title: t('interestSentTitle'), description: t('interestSentMessage'), variant: 'success' });
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('interestError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('interestError'), variant: 'danger' });
     } finally {
       setInterestLoading(false);
     }
@@ -377,7 +378,7 @@ function VolunteeringDetailScreenInner() {
 
   async function handleSignUpForShift(shiftId: number) {
     if (!isAuthenticated) {
-      Alert.alert(t('signInRequiredTitle'), t('signInRequiredMessage'));
+      showToast({ title: t('signInRequiredTitle'), description: t('signInRequiredMessage'), variant: 'warning' });
       return;
     }
 
@@ -386,10 +387,10 @@ function VolunteeringDetailScreenInner() {
       await signUpForShift(shiftId);
       refresh();
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert(t('shiftSignupTitle'), t('shiftSignupMessage'));
+      showToast({ title: t('shiftSignupTitle'), description: t('shiftSignupMessage'), variant: 'success' });
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('shiftSignupError'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('shiftSignupError'), variant: 'danger' });
     } finally {
       setSigningShiftId(null);
     }
@@ -401,13 +402,14 @@ function VolunteeringDetailScreenInner() {
       await handleVolunteerApplication(applicationId, action);
       ownerApplicationsApi.refresh();
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert(
-        t(action === 'approve' ? 'applications.approvedTitle' : 'applications.declinedTitle'),
-        t(action === 'approve' ? 'applications.approvedMessage' : 'applications.declinedMessage'),
-      );
+      showToast({
+        title: t(action === 'approve' ? 'applications.approvedTitle' : 'applications.declinedTitle'),
+        description: t(action === 'approve' ? 'applications.approvedMessage' : 'applications.declinedMessage'),
+        variant: 'success',
+      });
     } catch {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert(t('common:errors.alertTitle'), t('applications.actionFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('applications.actionFailed'), variant: 'danger' });
     } finally {
       setApplicationActionId(null);
     }

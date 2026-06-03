@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
-import { Alert, FlatList, KeyboardAvoidingView, Platform } from 'react-native';
+import { FlatList, KeyboardAvoidingView, Platform } from 'react-native';
 
 // --- Mocks ---
 
@@ -248,6 +248,25 @@ jest.mock('@/components/ui/ActionSheet', () => {
 });
 jest.mock('@/components/OfflineBanner', () => () => null);
 jest.mock('@/components/VoiceMessageBubble', () => 'View');
+
+jest.mock('@/components/ui/AppToast', () => {
+  // Stable references so screens that put `show` in a useCallback/useEffect
+  // dependency array don't re-run their effects on every render.
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
+
+// Auto-confirm: triggering a destructive action runs onConfirm immediately,
+// mirroring the old Alert.alert destructive-button simulation.
+jest.mock('@/components/ui/useConfirm', () => ({
+  useConfirm: () => ({
+    confirm: (opts: { onConfirm: () => void | Promise<void> }) => {
+      void opts.onConfirm();
+    },
+    confirmDialog: null,
+  }),
+}));
 
 // --- Tests ---
 
@@ -656,7 +675,6 @@ describe('ThreadScreen', () => {
   });
 
   it('deletes a message for the current user through message options', async () => {
-    const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
     mockUseApi.mockReturnValue({
       data: { data: mockMessages },
       isLoading: false,
@@ -667,10 +685,8 @@ describe('ThreadScreen', () => {
     const { getAllByLabelText, queryByText } = render(<ThreadScreen />);
 
     fireEvent.press(getAllByLabelText('Message options')[0]);
-    fireEvent.press(getAllByLabelText('Delete for me')[0]);
-    const confirmButtons = alertSpy.mock.calls[0]?.[2] as Array<{ text: string; onPress?: () => void }>;
     await act(async () => {
-      await confirmButtons.find((button) => button.text === 'Delete')?.onPress?.();
+      fireEvent.press(getAllByLabelText('Delete for me')[0]);
     });
 
     await waitFor(() => {

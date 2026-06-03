@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Platform, RefreshControl, ScrollView, Share, View } from 'react-native';
+import { Platform, RefreshControl, ScrollView, Share, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -29,6 +29,7 @@ import {
   type WalletUserSearchResult,
 } from '@/lib/api/wallet';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
@@ -90,6 +91,7 @@ function WalletModalInner() {
   const params = useLocalSearchParams<{ to?: string; name?: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const [filter, setFilter] = useState<TransactionFilter>('all');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeAction, setActiveAction] = useState<WalletAction>(params.to ? 'transfer' : null);
@@ -158,7 +160,11 @@ function WalletModalInner() {
       setExtraCursor(response.meta?.cursor ?? null);
       setExtraHasMore(Boolean(response.meta?.has_more));
     } catch {
-      Alert.alert(t('actions.loadMoreFailedTitle'), t('actions.loadMoreFailedMessage'));
+      showToast({
+        title: t('actions.loadMoreFailedTitle'),
+        description: t('actions.loadMoreFailedMessage'),
+        variant: 'danger',
+      });
     } finally {
       setIsLoadingMore(false);
     }
@@ -166,7 +172,11 @@ function WalletModalInner() {
 
   async function handleExport() {
     if (transactions.length === 0) {
-      Alert.alert(t('actions.exportNoDataTitle'), t('actions.exportNoDataMessage'));
+      showToast({
+        title: t('actions.exportNoDataTitle'),
+        description: t('actions.exportNoDataMessage'),
+        variant: 'default',
+      });
       return;
     }
 
@@ -191,7 +201,11 @@ function WalletModalInner() {
       link.download = `wallet-transactions-${new Date().toISOString().slice(0, 10)}.csv`;
       link.click();
       URL.revokeObjectURL(url);
-      Alert.alert(t('actions.exportSuccessTitle'), t('actions.exportSuccessMessage'));
+      showToast({
+        title: t('actions.exportSuccessTitle'),
+        description: t('actions.exportSuccessMessage'),
+        variant: 'success',
+      });
       return;
     }
 
@@ -330,6 +344,7 @@ function WalletActionPanel({
       avatar_url: null,
     };
   }, [initialRecipientId, initialRecipientName, t]);
+  const { show: showToast } = useAppToast();
   const [donationTarget, setDonationTarget] = useState<DonationTarget>('community_fund');
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<WalletUserSearchResult[]>([]);
@@ -347,7 +362,11 @@ function WalletActionPanel({
       const response = await searchWalletUsers(query.trim(), 10);
       setResults(response.data?.users ?? []);
     } catch {
-      Alert.alert(t('actions.searchFailedTitle'), t('actions.searchFailedMessage'));
+      showToast({
+        title: t('actions.searchFailedTitle'),
+        description: t('actions.searchFailedMessage'),
+        variant: 'danger',
+      });
     } finally {
       setIsSearching(false);
     }
@@ -356,15 +375,15 @@ function WalletActionPanel({
   async function submit() {
     const parsedAmount = normaliseAmount(amount);
     if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
-      Alert.alert(t('actions.validationTitle'), t('actions.validationAmount'));
+      showToast({ title: t('actions.validationTitle'), description: t('actions.validationAmount'), variant: 'warning' });
       return;
     }
     if (parsedAmount > balance) {
-      Alert.alert(t('actions.validationTitle'), t('actions.validationInsufficient'));
+      showToast({ title: t('actions.validationTitle'), description: t('actions.validationInsufficient'), variant: 'warning' });
       return;
     }
     if (needsRecipient && !selectedUser) {
-      Alert.alert(t('actions.validationTitle'), t('actions.validationRecipient'));
+      showToast({ title: t('actions.validationTitle'), description: t('actions.validationRecipient'), variant: 'warning' });
       return;
     }
 
@@ -377,7 +396,7 @@ function WalletActionPanel({
           description: note.trim() || t('actions.defaultTransferDescription'),
         });
         await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        Alert.alert(t('actions.transferSuccessTitle'), t('actions.transferSuccessMessage'));
+        showToast({ title: t('actions.transferSuccessTitle'), description: t('actions.transferSuccessMessage'), variant: 'success' });
       } else {
         await donateWalletCredits({
           recipient_type: donationTarget,
@@ -386,12 +405,12 @@ function WalletActionPanel({
           message: note.trim(),
         });
         await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        Alert.alert(t('actions.donationSuccessTitle'), t('actions.donationSuccessMessage'));
+        showToast({ title: t('actions.donationSuccessTitle'), description: t('actions.donationSuccessMessage'), variant: 'success' });
       }
       onComplete();
     } catch (error) {
       const message = error instanceof Error ? error.message : t('actions.mutationFailedMessage');
-      Alert.alert(t('actions.mutationFailedTitle'), message);
+      showToast({ title: t('actions.mutationFailedTitle'), description: message, variant: 'danger' });
     } finally {
       setIsSubmitting(false);
     }

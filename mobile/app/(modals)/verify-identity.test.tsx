@@ -51,6 +51,12 @@ jest.mock('@expo/vector-icons', () => ({
 jest.mock('@/components/ui/AppTopBar', () => 'View');
 jest.mock('@/components/ModalErrorBoundary', () => ({ children }: { children: React.ReactNode }) => <>{children}</>);
 
+jest.mock('@/components/ui/AppToast', () => {
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
+
 jest.mock('@/lib/hooks/useTenant', () => ({
   usePrimaryColor: () => '#006fee',
 }));

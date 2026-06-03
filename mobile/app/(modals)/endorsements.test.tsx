@@ -4,7 +4,6 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { Alert } from 'react-native';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { router } from 'expo-router';
 
@@ -137,16 +136,36 @@ jest.mock('@/lib/api/endorsements', () => ({
 jest.mock('@/components/ui/Avatar', () => 'View');
 jest.mock('@/components/ui/LoadingSpinner', () => () => null);
 
+jest.mock('@/components/ui/AppToast', () => {
+  // Stable references so screens that put `show` in a useCallback/useEffect
+  // dependency array don't re-run their effects on every render.
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
+
+// Auto-confirm: pressing the destructive button runs the action immediately,
+// mirroring the old Alert.alert button-press simulation.
+jest.mock('@/components/ui/useConfirm', () => ({
+  useConfirm: () => ({
+    confirm: (opts: { onConfirm: () => void | Promise<void> }) => {
+      void opts.onConfirm();
+    },
+    confirmDialog: null,
+  }),
+}));
+
 // --- Tests ---
 
 import EndorsementsScreen from './endorsements';
+import { useAppToast } from '@/components/ui/AppToast';
 import { getMembersWithSkill, getSkillCategory, removeSkill } from '@/lib/api/endorsements';
 
 const defaultApiState = { data: null, isLoading: false, error: null, refresh: jest.fn() };
 
 beforeEach(() => {
   mockUseApi.mockReturnValue(defaultApiState);
-  jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
+  (useAppToast() as { show: jest.Mock }).show.mockClear();
   (removeSkill as jest.Mock).mockClear();
   (getSkillCategory as jest.Mock).mockClear();
   (getMembersWithSkill as jest.Mock).mockClear();
@@ -295,22 +314,16 @@ describe('EndorsementsScreen', () => {
     mockUseApi
       .mockReturnValueOnce({ data: { data: { skills: [mockSkill] } }, isLoading: false, error: null, refresh })
       .mockReturnValueOnce({ data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() });
+    const { show } = useAppToast() as { show: jest.Mock };
 
     const { getByLabelText } = render(<EndorsementsScreen />);
+    // The auto-confirm mock runs onConfirm immediately, mirroring the user
+    // tapping the destructive button in the branded ConfirmDialog.
     fireEvent.press(getByLabelText('Remove'));
 
-    expect(Alert.alert).toHaveBeenCalledWith(
-      'Remove skill',
-      'Remove this skill?',
-      expect.arrayContaining([
-        expect.objectContaining({ text: 'Remove' }),
-      ]),
+    await waitFor(() => expect(removeSkill).toHaveBeenCalledWith(1));
+    expect(show).toHaveBeenCalledWith(
+      expect.objectContaining({ title: 'Skill removed', description: 'Skill removed.', variant: 'success' }),
     );
-
-    const removeButton = (Alert.alert as jest.Mock).mock.calls[0][2][1];
-    await removeButton.onPress();
-
-    expect(removeSkill).toHaveBeenCalledWith(1);
-    expect(Alert.alert).toHaveBeenLastCalledWith('Skill removed', 'Skill removed.');
   });
 });

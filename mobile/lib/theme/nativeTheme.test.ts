@@ -3,18 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-const mockSetTheme = jest.fn();
-const mockSetColorScheme = jest.fn();
+const mockInit = jest.fn();
 
-jest.mock('react-native', () => ({
-  Appearance: {
-    setColorScheme: (...args: unknown[]) => mockSetColorScheme(...args),
-  },
-}));
-
-jest.mock('uniwind', () => ({
-  Uniwind: {
-    setTheme: (...args: unknown[]) => mockSetTheme(...args),
+jest.mock('@/lib/theme/themeStore', () => ({
+  themeStore: {
+    init: (...args: unknown[]) => mockInit(...args),
   },
 }));
 
@@ -22,14 +15,12 @@ import { configureNativeTheme } from './nativeTheme';
 
 describe('configureNativeTheme', () => {
   beforeEach(() => {
-    mockSetColorScheme.mockClear();
-    mockSetTheme.mockClear();
+    mockInit.mockClear();
   });
 
-  it('forces the dark React Native and HeroUI Native theme for the dark-only app shell', () => {
+  it('delegates startup theme wiring to the theme store', () => {
     configureNativeTheme();
 
-    expect(mockSetColorScheme).toHaveBeenCalledWith('dark');
-    expect(mockSetTheme).toHaveBeenCalledWith('dark');
+    expect(mockInit).toHaveBeenCalledTimes(1);
   });
 });

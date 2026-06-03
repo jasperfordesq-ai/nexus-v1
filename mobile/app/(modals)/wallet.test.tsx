@@ -129,6 +129,9 @@ jest.mock('@/lib/api/wallet', () => ({
 
 jest.mock('@/components/ui/Avatar', () => 'View');
 jest.mock('@/components/ui/AppTopBar', () => 'View');
+jest.mock('@/components/ui/AppToast', () => ({
+  useAppToast: () => ({ show: jest.fn(), hide: jest.fn(), isToastVisible: false }),
+}));
 jest.mock('@/components/ui/BottomSheet', () => {
   const React = require('react');
   const { View } = require('react-native');

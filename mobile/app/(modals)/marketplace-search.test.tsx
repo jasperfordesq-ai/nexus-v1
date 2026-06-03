@@ -69,6 +69,13 @@ jest.mock('react-i18next', () => ({
 }));
 
 jest.mock('@expo/vector-icons', () => ({ Ionicons: 'View' }));
+jest.mock('@/components/ui/AppToast', () => {
+  // Stable references so screens that put `show` in a useCallback dependency
+  // array don't re-run their effects on every render.
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
 jest.mock('@/components/ModalErrorBoundary', () => ({ children }: { children: React.ReactNode }) => children);
 jest.mock('@/components/ui/AppTopBar', () => {
   const { Text } = require('react-native');
@@ -131,11 +138,13 @@ describe('MarketplaceSearchRoute', () => {
     fireEvent.changeText(getByPlaceholderText('Search by title, keyword, or seller...'), 'bike');
     fireEvent.changeText(getByPlaceholderText('0'), '10');
 
+    // The query is debounced 300ms before it reaches the fetch effect; allow
+    // generous headroom so the assertion stays deterministic under CPU load.
     await waitFor(() => {
       expect(getMarketplaceListings).toHaveBeenLastCalledWith(expect.objectContaining({
         q: 'bike',
         price_min: '10',
       }));
-    });
+    }, { timeout: 3000 });
   });
 });

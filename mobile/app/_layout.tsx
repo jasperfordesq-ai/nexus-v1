@@ -12,7 +12,7 @@ import * as Notifications from 'expo-notifications';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { ThemeProvider, DarkTheme, type Theme } from '@react-navigation/native';
+import { ThemeProvider, DarkTheme, DefaultTheme, type Theme } from '@react-navigation/native';
 import { HeroUINativeProvider } from 'heroui-native';
 
 import { useTranslation } from 'react-i18next';
@@ -24,25 +24,34 @@ import { RealtimeProvider } from '@/lib/context/RealtimeContext';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { navigateToLink } from '@/lib/utils/navigateToLink';
 import { configureNativeTheme } from '@/lib/theme/nativeTheme';
+import { useTheme, useThemeController } from '@/lib/hooks/useTheme';
 import * as Sentry from '@sentry/react-native';
 
-const NATIVE_SCREEN_BACKGROUND = '#0F0F0F';
+// Image lightbox always sits on black regardless of theme.
+const IMAGE_VIEWER_BACKGROUND = '#000000';
 
-// The app is dark-only (app.json userInterfaceStyle: "dark"). React Navigation
-// otherwise defaults every navigator's scene background to its light theme, so
-// any screen that doesn't paint `bg-background` shows a light page. Providing a
-// dark navigation theme makes the dark backdrop the default everywhere — no
-// page can fall back to white.
-const NAV_THEME: Theme = {
-  ...DarkTheme,
-  colors: {
-    ...DarkTheme.colors,
-    background: NATIVE_SCREEN_BACKGROUND,
-    card: '#16162A',
-    border: '#24242E',
-    text: '#EDEDED',
-  },
-};
+// React Navigation otherwise defaults every navigator's scene background to its
+// light theme, so any screen that doesn't paint `bg-background` would flash the
+// wrong colour. Building the nav theme from the resolved scheme keeps the
+// scene/card/border/text in sync with the active light or dark palette.
+function useNavigationTheme(): { navTheme: Theme; scheme: 'light' | 'dark' } {
+  const theme = useTheme();
+  const { scheme } = useThemeController();
+  const base = scheme === 'dark' ? DarkTheme : DefaultTheme;
+  return {
+    scheme,
+    navTheme: {
+      ...base,
+      colors: {
+        ...base.colors,
+        background: theme.bg,
+        card: theme.surface,
+        border: theme.border,
+        text: theme.text,
+      },
+    },
+  };
+}
 
 // Validate environment variables at startup — logs warnings for missing config
 validateEnv();
@@ -78,10 +87,7 @@ function RootLayout() {
             <TenantProvider>
               <AuthProvider>
                 <RealtimeProvider>
-                  <StatusBar style="light" />
-                  <ThemeProvider value={NAV_THEME}>
-                    <RootNavigator />
-                  </ThemeProvider>
+                  <ThemedShell />
                 </RealtimeProvider>
               </AuthProvider>
             </TenantProvider>
@@ -93,6 +99,23 @@ function RootLayout() {
 }
 
 export default Sentry.wrap(RootLayout);
+
+/**
+ * Themed shell: keeps the status bar and React Navigation scene theme in sync
+ * with the resolved light/dark scheme. Lives inside the providers so it can
+ * react to runtime theme changes from Settings.
+ */
+function ThemedShell() {
+  const { navTheme, scheme } = useNavigationTheme();
+  return (
+    <>
+      <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+      <ThemeProvider value={navTheme}>
+        <RootNavigator />
+      </ThemeProvider>
+    </>
+  );
+}
 
 /**
  * Handles the redirect logic after auth state resolves.
@@ -125,6 +148,7 @@ function RootNavigator() {
     'wallet',
   ]);
   const { isLoading, isAuthenticated } = useAuthContext();
+  const theme = useTheme();
   const pathname = usePathname();
   const isTenantSelectionPath =
     pathname === '/select-tenant' || pathname.startsWith('/select-tenant/');
@@ -185,7 +209,7 @@ function RootNavigator() {
     animation: 'slide_from_bottom' as const,
     gestureEnabled: true,
     gestureDirection: 'vertical' as const,
-    contentStyle: { backgroundColor: NATIVE_SCREEN_BACKGROUND },
+    contentStyle: { backgroundColor: theme.bg },
   };
 
   return (
@@ -608,7 +632,7 @@ function RootNavigator() {
           headerShown: false,
           gestureEnabled: true,
           gestureDirection: 'vertical',
-          contentStyle: { backgroundColor: NATIVE_SCREEN_BACKGROUND },
+          contentStyle: { backgroundColor: IMAGE_VIEWER_BACKGROUND },
         }}
       />
     </Stack>

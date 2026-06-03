@@ -128,6 +128,25 @@ jest.mock('@/lib/hooks/useTheme', () => ({
   }),
 }));
 
+jest.mock('@/components/ui/AppToast', () => {
+  // Stable references so screens that put `show` in a useCallback/useEffect
+  // dependency array don't re-run their effects on every render.
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
+
+// Auto-confirm: opening the dialog runs the destructive action immediately,
+// mirroring the old Alert.alert button-press simulation.
+jest.mock('@/components/ui/useConfirm', () => ({
+  useConfirm: () => ({
+    confirm: (opts: { onConfirm: () => void | Promise<void> }) => {
+      void opts.onConfirm();
+    },
+    confirmDialog: null,
+  }),
+}));
+
 jest.mock('@/lib/api/marketplace', () => ({
   createMarketplaceCollection: jest.fn(),
   deleteMarketplaceSavedSearch: jest.fn(),

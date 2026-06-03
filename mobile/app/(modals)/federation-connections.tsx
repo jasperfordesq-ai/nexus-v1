@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useMemo, useState, type ComponentProps } from 'react';
-import { Alert, Pressable, RefreshControl, ScrollView, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -24,6 +24,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import Avatar from '@/components/ui/Avatar';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
@@ -54,6 +55,7 @@ export default function FederationConnectionsRoute() {
 
 function FederationConnectionsScreen() {
   const { t } = useTranslation(['federation', 'common']);
+  const { show: showToast } = useAppToast();
   const [tab, setTab] = useState<ConnectionTab>('accepted');
   const [actionId, setActionId] = useState<number | null>(null);
   const primary = usePrimaryColor();
@@ -70,7 +72,7 @@ function FederationConnectionsScreen() {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       refresh();
     } catch {
-      Alert.alert(t('directory.connections.actionFailedTitle'), t('directory.connections.actionFailedDescription'));
+      showToast({ title: t('directory.connections.actionFailedTitle'), description: t('directory.connections.actionFailedDescription'), variant: 'danger' });
     } finally {
       setActionId(null);
     }

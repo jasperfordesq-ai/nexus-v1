@@ -117,6 +117,13 @@ jest.mock('@/lib/api/search', () => ({
 
 jest.mock('@/components/ui/Avatar', () => 'View');
 jest.mock('@/components/OfflineBanner', () => () => null);
+// Stable references so screens that put `show` in a useCallback/useEffect
+// dependency array don't re-run their effects on every render.
+jest.mock('@/components/ui/AppToast', () => {
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
 
 import SearchScreen from './search';
 

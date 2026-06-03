@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { type ReactNode, useState } from 'react';
-import { Alert, FlatList, ScrollView, View } from 'react-native';
+import { FlatList, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,6 +14,7 @@ import * as Location from 'expo-location';
 
 import MarketplaceListingCard from '@/components/marketplace/MarketplaceListingCard';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -48,6 +49,7 @@ function MarketplaceMapScreen() {
   const { hasFeature } = useTenant();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const [latitude, setLatitude] = useState(firstParam(params.latitude) ?? firstParam(params.lat) ?? '');
   const [longitude, setLongitude] = useState(firstParam(params.longitude) ?? firstParam(params.lng) ?? '');
   const [radius, setRadius] = useState(normalizeRadius(firstParam(params.radius)));
@@ -62,7 +64,7 @@ function MarketplaceMapScreen() {
     const radiusKm = Number(radius) || 25;
 
     if (lat === null || lng === null || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-      Alert.alert(t('common:errors.alertTitle'), t('map.invalidCoordinates'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('map.invalidCoordinates'), variant: 'warning' });
       return;
     }
 

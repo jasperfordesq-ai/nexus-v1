@@ -4,13 +4,14 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, Linking, RefreshControl, ScrollView, View } from 'react-native';
+import { Linking, RefreshControl, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface, Text } from 'heroui-native';
 
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import Input from '@/components/ui/Input';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import {
@@ -41,6 +42,7 @@ function VerifyIdentityScreenInner() {
   const { t } = useTranslation(['settings', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [status, setStatus] = useState<IdentityStatus | null>(null);
   const [pageState, setPageState] = useState<PageState>('loading');
@@ -117,7 +119,7 @@ function VerifyIdentityScreenInner() {
   async function handleSaveDob() {
     const value = dob.trim();
     if (!value) {
-      Alert.alert(t('identity.error_title'), t('identity.error_missing_dob'));
+      showToast({ title: t('identity.error_title'), description: t('identity.error_missing_dob'), variant: 'warning' });
       return;
     }
 
@@ -126,7 +128,7 @@ function VerifyIdentityScreenInner() {
       await saveIdentityDateOfBirth(value);
       await refreshStatus();
     } catch {
-      Alert.alert(t('identity.error_title'), t('identity.error_save_dob'));
+      showToast({ title: t('identity.error_title'), description: t('identity.error_save_dob'), variant: 'danger' });
     } finally {
       setIsSavingDob(false);
     }
@@ -150,7 +152,7 @@ function VerifyIdentityScreenInner() {
       setPageState('in_progress');
       startPolling();
     } catch {
-      Alert.alert(t('identity.error_title'), t('identity.error_start_verification'));
+      showToast({ title: t('identity.error_title'), description: t('identity.error_start_verification'), variant: 'danger' });
       await refreshStatus();
     } finally {
       setIsStarting(false);
@@ -169,7 +171,7 @@ function VerifyIdentityScreenInner() {
       }
 
       if (!data?.client_secret) {
-        Alert.alert(t('identity.error_title'), t('identity.error_create_payment'));
+        showToast({ title: t('identity.error_title'), description: t('identity.error_create_payment'), variant: 'danger' });
         return;
       }
 
@@ -184,14 +186,14 @@ function VerifyIdentityScreenInner() {
       }
 
       if (paymentResult.status === 'failed') {
-        Alert.alert(t('identity.error_title'), paymentResult.message || t(data.publishable_key ? 'identity.error_create_payment' : 'identity.error_missing_publishable_key'));
+        showToast({ title: t('identity.error_title'), description: paymentResult.message || t(data.publishable_key ? 'identity.error_create_payment' : 'identity.error_missing_publishable_key'), variant: 'danger' });
         return;
       }
 
-      Alert.alert(t('identity.payment_success_title'), t('identity.payment_success_body'));
+      showToast({ title: t('identity.payment_success_title'), description: t('identity.payment_success_body'), variant: 'success' });
       await refreshStatus();
     } catch {
-      Alert.alert(t('identity.error_title'), t('identity.error_create_payment'));
+      showToast({ title: t('identity.error_title'), description: t('identity.error_create_payment'), variant: 'danger' });
     } finally {
       setIsCreatingPayment(false);
     }

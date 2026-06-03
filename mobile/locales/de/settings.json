@@ -167,5 +167,17 @@
       "can_view_messages": "View messages"
     },
     "permissionToggle": "Toggle {{permission}} for {{name}}"
+  },
+  "appearance": {
+    "title": "Darstellung",
+    "hint": "Wählen Sie, wie die App auf diesem Gerät aussieht.",
+    "mode": {
+      "system": "System",
+      "systemHint": "An Geräteeinstellungen anpassen",
+      "light": "Hell",
+      "lightHint": "Immer das helle Design verwenden",
+      "dark": "Dunkel",
+      "darkHint": "Immer das dunkle Design verwenden"
+    }
   }
 }

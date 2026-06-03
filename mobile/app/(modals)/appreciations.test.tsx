@@ -81,6 +81,12 @@ jest.mock('@/lib/api/appreciations', () => ({
   reactToAppreciation: (...args: unknown[]) => mockReactToAppreciation(...args),
 }));
 
+jest.mock('@/components/ui/AppToast', () => {
+  const show = jest.fn();
+  const hide = jest.fn();
+  return { useAppToast: () => ({ show, hide, isToastVisible: false }) };
+});
+
 import AppreciationsScreen from './appreciations';
 
 describe('AppreciationsScreen', () => {

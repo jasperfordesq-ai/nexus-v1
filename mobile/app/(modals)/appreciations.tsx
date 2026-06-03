@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, FlatList, RefreshControl, Text, View } from 'react-native';
+import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -23,6 +23,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
+import { useAppToast } from '@/components/ui/AppToast';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -56,6 +57,7 @@ function AppreciationsScreenInner() {
   const { isAuthenticated } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { show: showToast } = useAppToast();
   const [page, setPage] = useState(1);
   const [items, setItems] = useState<Appreciation[]>([]);
   const [isReacting, setIsReacting] = useState<number | null>(null);
@@ -81,7 +83,7 @@ function AppreciationsScreenInner() {
 
   async function handleReaction(appreciation: Appreciation, reactionType: AppreciationReactionType) {
     if (!isAuthenticated) {
-      Alert.alert(t('appreciations.signInTitle'), t('appreciations.signInMessage'));
+      showToast({ title: t('appreciations.signInTitle'), description: t('appreciations.signInMessage'), variant: 'warning' });
       return;
     }
     const priorReaction = appreciation.my_reaction ?? null;
@@ -108,7 +110,7 @@ function AppreciationsScreenInner() {
       );
     } catch {
       setItems((current) => current.map((item) => item.id === appreciation.id ? appreciation : item));
-      Alert.alert(t('common:errors.alertTitle'), t('appreciations.reactionFailed'));
+      showToast({ title: t('common:errors.alertTitle'), description: t('appreciations.reactionFailed'), variant: 'danger' });
     } finally {
       setIsReacting(null);
     }

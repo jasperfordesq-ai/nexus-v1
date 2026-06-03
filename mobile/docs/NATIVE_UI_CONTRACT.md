@@ -16,11 +16,25 @@ Checked against the HeroUI Native docs on 2026-05-31:
 - ListGroup: https://www.heroui.com/en/docs/native/components/list-group
 - Popover: https://www.heroui.com/en/docs/native/components/popover
 
+## Status (2026-06-03)
+
+- **`Alert.alert` is fully retired from product code.** All ~359 calls across 62
+  screens/components were migrated to branded HeroUI Native feedback. New code
+  MUST NOT introduce `Alert.alert` — use the wrappers below.
+- Transient feedback → `useAppToast()` from `components/ui/AppToast.tsx`
+  (`show({ title, description, variant })`; variant `danger`/`warning`/`success`/`default`).
+- Yes/no confirmations → `useConfirm()` from `components/ui/useConfirm.tsx`
+  (`confirm({ title, message, confirmLabel, cancelLabel, variant, onConfirm })`
+  plus render `{confirmDialog}` once in the screen). See
+  `docs/ALERT_MIGRATION_PLAYBOOK.md`.
+- Light/dark theming is live: `useTheme()` is reactive (backed by
+  `lib/theme/themeStore.ts`); the user picks System/Light/Dark in Settings.
+
 ## Rules
 
 - Use `components/ui/BottomSheet.tsx` for mobile drawers and form/action sheets.
 - Use `components/ui/AppToast.tsx` for transient success/error feedback instead of `Alert.alert`.
-- Use `components/ui/ConfirmDialog.tsx` for destructive or blocking confirmations.
+- Use `components/ui/useConfirm.tsx` (built on `ConfirmDialog.tsx`) for destructive or blocking confirmations.
 - Use `components/ui/NativePressable.tsx` for card/list row taps instead of raw `Pressable` or button-shaped cards.
 - Use `components/ui/SearchInput.tsx` for search boxes, so clear actions and search affordances are native.
 - Use `components/ui/TextArea.tsx` for long mobile text entry, especially inside drawers.
