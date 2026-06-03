@@ -245,9 +245,8 @@ describe('MoreScreen (More tab)', () => {
   });
 
   it('renders My Space section with profile navigation items', () => {
-    const { getByLabelText, getByText } = render(<MoreScreen />);
+    const { getByText } = render(<MoreScreen />);
     expect(getByText('My Space')).toBeTruthy();
-    fireEvent.press(getByLabelText('My Space'));
     expect(getByText('My Profile')).toBeTruthy();
     expect(getByText('Wallet')).toBeTruthy();
     expect(getByText('Messages')).toBeTruthy();
@@ -303,26 +302,19 @@ describe('MoreScreen (More tab)', () => {
     expect(queryByText('Seller payments')).toBeNull();
   });
 
-  it('collapses the previously open More accordion section when another opens', () => {
-    const { getByLabelText, getByText, queryByText } = render(<MoreScreen />);
+  it('keeps non-marketplace More sections visible without accordion interaction', () => {
+    const { getAllByText, getByText } = render(<MoreScreen />);
 
-    fireEvent.press(getByLabelText('My Space'));
+    expect(getByText('My Space')).toBeTruthy();
     expect(getByText('My Profile')).toBeTruthy();
-
-    fireEvent.press(getByLabelText('Partner communities'));
-    expect(queryByText('My Profile')).toBeNull();
+    expect(getAllByText('Partner communities').length).toBeGreaterThanOrEqual(1);
     expect(getByText('Federation hub')).toBeTruthy();
-
-    fireEvent.press(getByLabelText('My Space'));
-    expect(queryByText('Federation hub')).toBeNull();
-    expect(getByText('My Profile')).toBeTruthy();
   });
 
   it('renders direct federation shortcuts in the partner communities section', () => {
-    const { getByLabelText, getByText } = render(<MoreScreen />);
+    const { getAllByText, getByText } = render(<MoreScreen />);
 
-    expect(getByText('Partner communities')).toBeTruthy();
-    fireEvent.press(getByLabelText('Partner communities'));
+    expect(getAllByText('Partner communities').length).toBeGreaterThanOrEqual(1);
     expect(getByText('Federation hub')).toBeTruthy();
     expect(getByText('Federated members')).toBeTruthy();
     expect(getByText('Federation connections')).toBeTruthy();
@@ -336,7 +328,6 @@ describe('MoreScreen (More tab)', () => {
   it('opens federated members directly from the partner communities shortcuts', () => {
     const { getByLabelText } = render(<MoreScreen />);
 
-    fireEvent.press(getByLabelText('Partner communities'));
     fireEvent.press(getByLabelText('Federated members'));
 
     expect(router.push).toHaveBeenCalledWith('/(modals)/federation-members');
@@ -364,7 +355,7 @@ describe('MoreScreen (More tab)', () => {
   it('hides More menu buttons when their backend feature is disabled', () => {
     mockHasFeature.mockImplementation((feature: string) => !['marketplace', 'events', 'groups', 'volunteering', 'blog', 'ai_chat', 'federation'].includes(feature));
 
-    const { getByLabelText, queryByText } = render(<MoreScreen />);
+    const { getByText, queryByText } = render(<MoreScreen />);
 
     expect(queryByText('Browse marketplace')).toBeNull();
     expect(queryByText('Events')).toBeNull();
@@ -373,8 +364,7 @@ describe('MoreScreen (More tab)', () => {
     expect(queryByText('Blog')).toBeNull();
     expect(queryByText('AI Assistant')).toBeNull();
     expect(queryByText('Federation')).toBeNull();
-    fireEvent.press(getByLabelText('My Space'));
-    expect(queryByText('Wallet')).toBeTruthy();
+    expect(getByText('Wallet')).toBeTruthy();
   });
 
   it('renders the Sign out button', () => {
