@@ -107,7 +107,7 @@ jest.mock('react-i18next', () => ({
         'navDescriptions.search': 'Search listings, members, events, groups, and posts.',
         'navDescriptions.listings': 'Browse offers, requests, and timebank exchanges.',
         'navDescriptions.marketplace': 'Buy, sell, save, and manage community marketplace listings.',
-        'navDescriptions.marketplaceBrowse': 'Browse all marketplace listings, categories, maps, and saved searches.',
+        'navDescriptions.marketplaceBrowse': 'Browse all marketplace listings, categories, and maps.',
         'navDescriptions.marketplaceSearch': 'Search marketplace listings by keyword, category, delivery method, and price.',
         'navDescriptions.marketplaceNearby': 'Find marketplace listings around you on the map.',
         'navDescriptions.marketplaceFree': 'Browse free community items and giveaway listings.',
@@ -261,6 +261,8 @@ describe('MoreScreen (More tab)', () => {
     const { getAllByText, getByText, queryByText } = render(<MoreScreen />);
     expect(getAllByText('Discover').length).toBeGreaterThanOrEqual(2);
     expect(getByText('Open the discovery hub with listings, events, groups, members, and posts.')).toBeTruthy();
+    expect(getByText('Browse marketplace')).toBeTruthy();
+    expect(getByText('Browse all marketplace listings, categories, and maps.')).toBeTruthy();
     expect(getByText('Search')).toBeTruthy();
     expect(getByText('Listings')).toBeTruthy();
     expect(queryByText('Buy, sell, save, and manage community marketplace listings.')).toBeNull();
@@ -275,40 +277,40 @@ describe('MoreScreen (More tab)', () => {
     expect(getByText('AI Assistant')).toBeTruthy();
   });
 
-  it('renders the Marketplace section with seller and buyer shortcuts', () => {
-    const { getByLabelText, getByText } = render(<MoreScreen />);
-    expect(getByText('Marketplace')).toBeTruthy();
-    fireEvent.press(getByLabelText('Marketplace'));
+  it('keeps only Browse marketplace in Discover and removes Marketplace shortcut clutter', () => {
+    const { getByText, queryByLabelText, queryByText } = render(<MoreScreen />);
+
     expect(getByText('Browse marketplace')).toBeTruthy();
-    expect(getByText('Marketplace search')).toBeTruthy();
-    expect(getByText('Nearby marketplace')).toBeTruthy();
-    expect(getByText('Free items')).toBeTruthy();
-    expect(getByText('Sell something')).toBeTruthy();
-    expect(getByText('My marketplace listings')).toBeTruthy();
-    expect(getByText('Seller setup')).toBeTruthy();
-    expect(getByText('Marketplace orders')).toBeTruthy();
-    expect(getByText('Sales orders')).toBeTruthy();
-    expect(getByText('Marketplace pickups')).toBeTruthy();
-    expect(getByText('Shipping options')).toBeTruthy();
-    expect(getByText('Marketplace coupons')).toBeTruthy();
-    expect(getByText('Marketplace offers')).toBeTruthy();
-    expect(getByText('Saved marketplace')).toBeTruthy();
-    expect(getByText('Seller coupons')).toBeTruthy();
-    expect(getByText('Pickup tools')).toBeTruthy();
-    expect(getByText('Promotions')).toBeTruthy();
-    expect(getByText('Saved searches')).toBeTruthy();
-    expect(getByText('Seller tools')).toBeTruthy();
-    expect(getByText('Seller payments')).toBeTruthy();
+    expect(queryByLabelText('Marketplace')).toBeNull();
+    expect(queryByText('Marketplace search')).toBeNull();
+    expect(queryByText('Nearby marketplace')).toBeNull();
+    expect(queryByText('Free items')).toBeNull();
+    expect(queryByText('Sell something')).toBeNull();
+    expect(queryByText('My marketplace listings')).toBeNull();
+    expect(queryByText('Seller setup')).toBeNull();
+    expect(queryByText('Marketplace orders')).toBeNull();
+    expect(queryByText('Sales orders')).toBeNull();
+    expect(queryByText('Marketplace pickups')).toBeNull();
+    expect(queryByText('Shipping options')).toBeNull();
+    expect(queryByText('Marketplace coupons')).toBeNull();
+    expect(queryByText('Marketplace offers')).toBeNull();
+    expect(queryByText('Saved marketplace')).toBeNull();
+    expect(queryByText('Seller coupons')).toBeNull();
+    expect(queryByText('Pickup tools')).toBeNull();
+    expect(queryByText('Promotions')).toBeNull();
+    expect(queryByText('Saved searches')).toBeNull();
+    expect(queryByText('Seller tools')).toBeNull();
+    expect(queryByText('Seller payments')).toBeNull();
   });
 
   it('collapses the previously open More accordion section when another opens', () => {
     const { getByLabelText, getByText, queryByText } = render(<MoreScreen />);
 
-    fireEvent.press(getByLabelText('Marketplace'));
-    expect(getByText('Browse marketplace')).toBeTruthy();
+    fireEvent.press(getByLabelText('My Space'));
+    expect(getByText('My Profile')).toBeTruthy();
 
     fireEvent.press(getByLabelText('Partner communities'));
-    expect(queryByText('Browse marketplace')).toBeNull();
+    expect(queryByText('My Profile')).toBeNull();
     expect(getByText('Federation hub')).toBeTruthy();
 
     fireEvent.press(getByLabelText('My Space'));
@@ -340,42 +342,6 @@ describe('MoreScreen (More tab)', () => {
     expect(router.push).toHaveBeenCalledWith('/(modals)/federation-members');
   });
 
-  it('opens the seller sales orders view from Marketplace shortcuts', () => {
-    const { getByLabelText } = render(<MoreScreen />);
-
-    fireEvent.press(getByLabelText('Marketplace'));
-    fireEvent.press(getByLabelText('Sales orders'));
-
-    expect(router.push).toHaveBeenCalledWith({
-      pathname: '/(modals)/marketplace-orders',
-      params: { mode: 'sales' },
-    });
-  });
-
-  it('opens seller promotion tools from Marketplace shortcuts', () => {
-    const { getByLabelText } = render(<MoreScreen />);
-
-    fireEvent.press(getByLabelText('Marketplace'));
-    fireEvent.press(getByLabelText('Promotions'));
-
-    expect(router.push).toHaveBeenCalledWith({
-      pathname: '/(modals)/marketplace-tools',
-      params: { tab: 'promotions' },
-    });
-  });
-
-  it('opens saved search tools from Marketplace shortcuts', () => {
-    const { getByLabelText } = render(<MoreScreen />);
-
-    fireEvent.press(getByLabelText('Marketplace'));
-    fireEvent.press(getByLabelText('Saved searches'));
-
-    expect(router.push).toHaveBeenCalledWith({
-      pathname: '/(modals)/marketplace-tools',
-      params: { tab: 'savedSearches' },
-    });
-  });
-
   it('renders Settings in the Account section', () => {
     const { getAllByText, getByText } = render(<MoreScreen />);
     expect(getAllByText('Account').length).toBeGreaterThanOrEqual(1);
@@ -392,7 +358,7 @@ describe('MoreScreen (More tab)', () => {
     expect(queryByText('Notifications')).toBeNull();
     expect(queryByText('Listings')).toBeNull();
     expect(queryByText('Settings')).toBeNull();
-    expect(getByText('Marketplace')).toBeTruthy();
+    expect(getByText('Browse marketplace')).toBeTruthy();
   });
 
   it('hides More menu buttons when their backend feature is disabled', () => {
@@ -400,7 +366,7 @@ describe('MoreScreen (More tab)', () => {
 
     const { getByLabelText, queryByText } = render(<MoreScreen />);
 
-    expect(queryByText('Marketplace')).toBeNull();
+    expect(queryByText('Browse marketplace')).toBeNull();
     expect(queryByText('Events')).toBeNull();
     expect(queryByText('Groups')).toBeNull();
     expect(queryByText('Volunteering')).toBeNull();

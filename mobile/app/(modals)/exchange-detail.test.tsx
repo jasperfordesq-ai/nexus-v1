@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import { fireEvent, render } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 // --- Mocks ---
 
@@ -28,6 +28,14 @@ jest.mock('react-i18next', () => ({
         'detail.timeEstimate': 'Time Estimate',
         'detail.requestService': 'Request this Service',
         'detail.offerHelp': 'Offer Help',
+        'detail.requestExchange': 'Request exchange',
+        'detail.requestHoursPlaceholder': 'Proposed hours',
+        'detail.requestMessagePlaceholder': 'Add a note for the member',
+        'detail.sendRequest': 'Send request',
+        'detail.cancel': 'Cancel',
+        'detail.exchangeActive': 'Exchange open',
+        'detail.exchangeActiveTitle': 'Exchange already open',
+        'detail.exchangeActiveMessage': 'You already have an exchange in progress for this listing.',
         'detail.messageMember': 'Message',
         'detail.save': 'Save',
         'detail.communityActions': 'Community actions',
@@ -90,6 +98,22 @@ jest.mock('expo-haptics', () => ({
 jest.mock('@expo/vector-icons', () => ({
   Ionicons: 'View',
 }));
+
+jest.mock('heroui-native', () => {
+  const actual = jest.requireActual('heroui-native');
+  const React = require('react');
+  const { Pressable, Text, View } = require('react-native');
+  const Dialog = ({ children, isOpen }: { children: React.ReactNode; isOpen?: boolean }) => (
+    isOpen ? <View>{children}</View> : null
+  );
+  Dialog.Portal = ({ children }: { children: React.ReactNode }) => <View>{children}</View>;
+  Dialog.Overlay = (props: Record<string, unknown>) => <Pressable {...props} />;
+  Dialog.Content = ({ children, ...props }: { children: React.ReactNode }) => <View {...props}>{children}</View>;
+  Dialog.Title = ({ children, ...props }: { children: React.ReactNode }) => <Text {...props}>{children}</Text>;
+  Dialog.Description = ({ children, ...props }: { children: React.ReactNode }) => <Text {...props}>{children}</Text>;
+
+  return { ...actual, Dialog };
+});
 
 jest.mock('@/lib/api/exchanges', () => ({
   getExchange: jest.fn(),
@@ -244,6 +268,26 @@ describe('ExchangeDetailModal', () => {
     expect(router.push).toHaveBeenCalledWith({
       pathname: '/(modals)/thread',
       params: { recipientId: '42', name: 'Alice Baker', listing: '5' },
+    });
+  });
+
+  it('opens the request exchange form as a visible native dialog', async () => {
+    mockUseApi.mockReturnValue({ data: { data: mockExchange }, isLoading: false, error: null, refresh: jest.fn() });
+
+    const { getByLabelText, getByTestId, queryByTestId } = render(<ExchangeDetailModal />);
+
+    await waitFor(() => {
+      expect(getByLabelText('Request exchange')).toBeTruthy();
+    });
+
+    expect(queryByTestId('exchange-request-dialog')).toBeNull();
+    fireEvent.press(getByLabelText('Request exchange'));
+
+    await waitFor(() => {
+      expect(getByTestId('exchange-request-dialog')).toBeTruthy();
+      expect(getByLabelText('Proposed hours')).toBeTruthy();
+      expect(getByLabelText('Add a note for the member')).toBeTruthy();
+      expect(getByLabelText('Send request')).toBeTruthy();
     });
   });
 

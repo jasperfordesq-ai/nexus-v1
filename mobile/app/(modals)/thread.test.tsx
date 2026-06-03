@@ -576,6 +576,12 @@ describe('ThreadScreen', () => {
 
     await waitFor(() => {
       expect(mockRequestAudioPermissionsAsync).toHaveBeenCalled();
+      expect(mockSetAudioModeAsync).toHaveBeenCalledWith(expect.objectContaining({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+        shouldDuckAndroid: true,
+        playThroughEarpieceAndroid: false,
+      }));
       expect(mockCreateRecordingAsync).toHaveBeenCalledWith('HIGH_QUALITY');
       expect(getByText('Recording voice message')).toBeTruthy();
     });

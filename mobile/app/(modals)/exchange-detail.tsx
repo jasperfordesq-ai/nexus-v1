@@ -12,6 +12,8 @@ import {
   RefreshControl,
   Share,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router, type Href } from 'expo-router';
@@ -19,7 +21,7 @@ import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import * as Haptics from '@/lib/haptics';
-import { Button as HeroButton, Card as HeroCard, Chip, Separator, Spinner, Surface } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, Dialog, Separator, Spinner, Surface } from 'heroui-native';
 
 import {
   checkActiveExchange,
@@ -739,37 +741,6 @@ function ExchangeDetailModalInner() {
           </HeroCard>
         ) : null}
 
-        {!isOwner && workflowEnabled && showRequestForm ? (
-          <HeroCard variant="secondary">
-            <HeroCard.Body className="gap-3 px-4 py-4">
-              <SectionTitle icon="repeat-outline" title={t('detail.requestExchange')} primary={primary} theme={theme} />
-              <Input
-                value={requestHours}
-                onChangeText={setRequestHours}
-                keyboardType="decimal-pad"
-                placeholder={t('detail.requestHoursPlaceholder')}
-                placeholderTextColor={theme.textMuted}
-                style={{ color: theme.text }}
-                accessibilityLabel={t('detail.requestHoursPlaceholder')}
-              />
-              <Input
-                value={requestMessage}
-                onChangeText={setRequestMessage}
-                placeholder={t('detail.requestMessagePlaceholder')}
-                placeholderTextColor={theme.textMuted}
-                multiline
-                textAlignVertical="top"
-                className="min-h-24 text-sm"
-                style={{ color: theme.text, textAlignVertical: 'top' }}
-                accessibilityLabel={t('detail.requestMessagePlaceholder')}
-              />
-              <HeroButton variant="primary" isDisabled={isSubmitting} style={{ backgroundColor: primary }} onPress={() => void handleRequestExchange()}>
-                {isSubmitting ? <Spinner size="sm" /> : <Ionicons name="send-outline" size={18} color="#fff" />}
-                <HeroButton.Label>{t('detail.sendRequest')}</HeroButton.Label>
-              </HeroButton>
-            </HeroCard.Body>
-          </HeroCard>
-        ) : null}
       </ScrollView>
 
       <CommentSheet
@@ -790,6 +761,75 @@ function ExchangeDetailModalInner() {
         onClose={() => setShowComments(false)}
         onCountChange={setCommentsCount}
       />
+
+      <Dialog
+        isOpen={!isOwner && workflowEnabled && showRequestForm}
+        onOpenChange={(open) => setShowRequestForm(open)}
+      >
+        <Dialog.Portal unstable_accessibilityContainerViewIsModal>
+          <Dialog.Overlay isCloseOnPress className="bg-black/60" />
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            className="w-full px-4"
+          >
+            <Dialog.Content
+              testID="exchange-request-dialog"
+              isSwipeable
+              className="gap-4 rounded-[28px] border border-border bg-background p-5"
+            >
+              <View className="gap-2">
+                <Dialog.Title className="text-xl font-bold text-foreground">
+                  {t('detail.requestExchange')}
+                </Dialog.Title>
+                <Dialog.Description className="text-sm leading-5 text-muted-foreground">
+                  {t('detail.requestMessagePlaceholder')}
+                </Dialog.Description>
+              </View>
+              <Input
+                value={requestHours}
+                onChangeText={setRequestHours}
+                keyboardType="decimal-pad"
+                placeholder={t('detail.requestHoursPlaceholder')}
+                placeholderTextColor={theme.textMuted}
+                style={{ color: theme.text }}
+                accessibilityLabel={t('detail.requestHoursPlaceholder')}
+              />
+              <Input
+                value={requestMessage}
+                onChangeText={setRequestMessage}
+                placeholder={t('detail.requestMessagePlaceholder')}
+                placeholderTextColor={theme.textMuted}
+                multiline
+                textAlignVertical="top"
+                inputClassName="min-h-24 text-sm"
+                style={{ color: theme.text, textAlignVertical: 'top' }}
+                accessibilityLabel={t('detail.requestMessagePlaceholder')}
+              />
+              <View className="flex-row gap-3">
+                <HeroButton
+                  variant="ghost"
+                  className="min-w-0 flex-1"
+                  isDisabled={isSubmitting}
+                  accessibilityLabel={t('detail.cancel')}
+                  onPress={() => setShowRequestForm(false)}
+                >
+                  <HeroButton.Label>{t('detail.cancel')}</HeroButton.Label>
+                </HeroButton>
+                <HeroButton
+                  variant="primary"
+                  className="min-w-0 flex-1"
+                  isDisabled={isSubmitting}
+                  style={{ backgroundColor: primary }}
+                  accessibilityLabel={t('detail.sendRequest')}
+                  onPress={() => void handleRequestExchange()}
+                >
+                  {isSubmitting ? <Spinner size="sm" /> : <HeroButton.Label>{t('detail.sendRequest')}</HeroButton.Label>}
+                </HeroButton>
+              </View>
+            </Dialog.Content>
+          </KeyboardAvoidingView>
+        </Dialog.Portal>
+      </Dialog>
 
       {showMemberActions ? (
         <Surface
@@ -849,7 +889,8 @@ function ExchangeDetailModalInner() {
                   Alert.alert(t('detail.exchangeActiveTitle'), t('detail.exchangeActiveMessage'));
                   return;
                 }
-                setShowRequestForm((current) => !current);
+                void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                setShowRequestForm(true);
                 return;
               }
               handleAction(exchangeUser.id, exchangeUserName);

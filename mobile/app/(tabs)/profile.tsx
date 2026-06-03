@@ -45,6 +45,7 @@ const MY_SPACE: MenuItem[] = [
 
 const DISCOVER: MenuItem[] = [
   { labelKey: 'discover', descriptionKey: 'navDescriptions.discover', icon: 'compass-outline', route: '/(tabs)/explore', tone: '#0ea5e9' },
+  { labelKey: 'marketplaceBrowse', descriptionKey: 'navDescriptions.marketplaceBrowse', icon: 'bag-handle-outline', route: '/(modals)/marketplace' as Href, tone: '#0ea5e9', featureGate: 'marketplace' },
   { labelKey: 'search', descriptionKey: 'navDescriptions.search', icon: 'search-outline', route: '/(modals)/search', tone: '#64748b', featureGate: 'search' },
   { labelKey: 'listings', descriptionKey: 'navDescriptions.listings', icon: 'storefront-outline', route: '/(tabs)/exchanges', tone: '#0f766e', moduleGate: 'listings' },
   { labelKey: 'jobs', descriptionKey: 'navDescriptions.jobs', icon: 'briefcase-outline', route: '/(modals)/jobs', tone: '#2563eb', featureGate: 'job_vacancies' },
@@ -61,29 +62,6 @@ const DISCOVER: MenuItem[] = [
   { labelKey: 'support.title', descriptionKey: 'navDescriptions.support', icon: 'help-circle-outline', route: '/(modals)/support' as Href, tone: '#0ea5e9' },
   { labelKey: 'skills', descriptionKey: 'navDescriptions.skills', icon: 'ribbon-outline', route: '/(modals)/skills' as Href, tone: '#10b981' },
   { labelKey: 'aiChat', descriptionKey: 'navDescriptions.aiChat', icon: 'sparkles-outline', route: '/(modals)/chat', tone: '#a855f7', featureGate: 'ai_chat' },
-];
-
-const MARKETPLACE: MenuItem[] = [
-  { labelKey: 'marketplaceBrowse', descriptionKey: 'navDescriptions.marketplaceBrowse', icon: 'bag-handle-outline', route: '/(modals)/marketplace' as Href, tone: '#0ea5e9', featureGate: 'marketplace' },
-  { labelKey: 'marketplaceSearch', descriptionKey: 'navDescriptions.marketplaceSearch', icon: 'search-outline', route: '/(modals)/marketplace-search' as Href, tone: '#2563eb', featureGate: 'marketplace' },
-  { labelKey: 'marketplaceNearby', descriptionKey: 'navDescriptions.marketplaceNearby', icon: 'map-outline', route: '/(modals)/marketplace-map' as Href, tone: '#14b8a6', featureGate: 'marketplace' },
-  { labelKey: 'marketplaceFree', descriptionKey: 'navDescriptions.marketplaceFree', icon: 'gift-outline', route: '/(modals)/marketplace-free' as Href, tone: '#22c55e', featureGate: 'marketplace' },
-  { labelKey: 'marketplaceSell', descriptionKey: 'navDescriptions.marketplaceSell', icon: 'add-circle-outline', route: '/(modals)/new-marketplace-listing' as Href, tone: '#22c55e', featureGate: 'marketplace' },
-  { labelKey: 'marketplaceMyListings', descriptionKey: 'navDescriptions.marketplaceMyListings', icon: 'albums-outline', route: '/(modals)/marketplace-my-listings' as Href, tone: '#6366f1', featureGate: 'marketplace' },
-  { labelKey: 'marketplaceSellerSetup', descriptionKey: 'navDescriptions.marketplaceSellerSetup', icon: 'storefront-outline', route: '/(modals)/marketplace-merchant-onboarding' as Href, tone: '#0f766e', featureGate: 'marketplace' },
-  { labelKey: 'marketplaceOrders', descriptionKey: 'navDescriptions.marketplaceOrders', icon: 'receipt-outline', route: '/(modals)/marketplace-orders' as Href, tone: '#f97316', featureGate: 'marketplace' },
-  { labelKey: 'marketplaceSales', descriptionKey: 'navDescriptions.marketplaceSales', icon: 'storefront-outline', route: { pathname: '/(modals)/marketplace-orders', params: { mode: 'sales' } } as unknown as Href, tone: '#db2777', featureGate: 'marketplace' },
-  { labelKey: 'marketplacePickups', descriptionKey: 'navDescriptions.marketplacePickups', icon: 'qr-code-outline', route: '/(modals)/marketplace-pickups' as Href, tone: '#0ea5e9', featureGate: 'marketplace' },
-  { labelKey: 'marketplaceShipping', descriptionKey: 'navDescriptions.marketplaceShipping', icon: 'cube-outline', route: '/(modals)/marketplace-shipping-options' as Href, tone: '#f59e0b', featureGate: 'marketplace' },
-  { labelKey: 'marketplaceCoupons', descriptionKey: 'navDescriptions.marketplaceCoupons', icon: 'ticket-outline', route: '/(modals)/marketplace-coupons' as Href, tone: '#16a34a', featureGates: ['marketplace', 'merchant_coupons'] },
-  { labelKey: 'marketplaceOffers', descriptionKey: 'navDescriptions.marketplaceOffers', icon: 'pricetag-outline', route: '/(modals)/marketplace-offers' as Href, tone: '#14b8a6', featureGate: 'marketplace' },
-  { labelKey: 'marketplaceSaved', descriptionKey: 'navDescriptions.marketplaceSaved', icon: 'folder-open-outline', route: '/(modals)/marketplace-collections' as Href, tone: '#8b5cf6', featureGate: 'marketplace' },
-  { labelKey: 'marketplaceSellerCoupons', descriptionKey: 'navDescriptions.marketplaceSellerCoupons', icon: 'ticket-outline', route: { pathname: '/(modals)/marketplace-tools', params: { tab: 'coupons' } } as unknown as Href, tone: '#22c55e', featureGates: ['marketplace', 'merchant_coupons'] },
-  { labelKey: 'marketplacePickupTools', descriptionKey: 'navDescriptions.marketplacePickupTools', icon: 'calendar-number-outline', route: { pathname: '/(modals)/marketplace-tools', params: { tab: 'pickups' } } as unknown as Href, tone: '#f59e0b', featureGate: 'marketplace' },
-  { labelKey: 'marketplacePromotions', descriptionKey: 'navDescriptions.marketplacePromotions', icon: 'megaphone-outline', route: { pathname: '/(modals)/marketplace-tools', params: { tab: 'promotions' } } as unknown as Href, tone: '#db2777', featureGate: 'marketplace' },
-  { labelKey: 'marketplaceSavedSearches', descriptionKey: 'navDescriptions.marketplaceSavedSearches', icon: 'notifications-outline', route: { pathname: '/(modals)/marketplace-tools', params: { tab: 'savedSearches' } } as unknown as Href, tone: '#2563eb', featureGate: 'marketplace' },
-  { labelKey: 'marketplaceTools', descriptionKey: 'navDescriptions.marketplaceTools', icon: 'construct-outline', route: '/(modals)/marketplace-tools' as Href, tone: '#64748b', featureGate: 'marketplace' },
-  { labelKey: 'marketplacePayments', descriptionKey: 'navDescriptions.marketplacePayments', icon: 'card-outline', route: '/(modals)/marketplace-stripe-onboarding' as Href, tone: '#0f766e', featureGate: 'marketplace' },
 ];
 
 const FEDERATION: MenuItem[] = [
@@ -119,11 +97,9 @@ export default function MoreScreen() {
   };
   const visibleDiscover = DISCOVER.filter(isMenuItemVisible);
   const visibleMySpace = MY_SPACE.filter(isMenuItemVisible);
-  const visibleMarketplace = MARKETPLACE.filter(isMenuItemVisible);
   const visibleFederation = FEDERATION.filter(isMenuItemVisible);
   const visibleAccount = ACCOUNT.filter(isMenuItemVisible);
   const collapsibleSections = [
-    { title: t('marketplaceSection'), value: 'marketplace', icon: 'bag-handle-outline' as IoniconName, items: visibleMarketplace },
     { title: t('federationSection'), value: 'federation', icon: 'git-network-outline' as IoniconName, items: visibleFederation },
     { title: t('mySpace'), value: 'my-space', icon: 'person-circle-outline' as IoniconName, items: visibleMySpace },
   ].filter((section) => section.items.length > 0);
