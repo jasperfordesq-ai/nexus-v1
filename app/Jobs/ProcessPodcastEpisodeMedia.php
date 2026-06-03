@@ -38,9 +38,10 @@ class ProcessPodcastEpisodeMedia implements ShouldQueue
             return;
         }
 
-        // Provision hook: real scanners/transcoders can replace this no-op once
-        // cloud/object storage processing infrastructure is configured.
-        $episode->media_scan_status = $episode->media_scan_status === 'pending' ? 'clean' : $episode->media_scan_status;
+        // Provision hook: real scanners/transcoders can replace this once
+        // cloud/object storage processing infrastructure is configured. Until
+        // then, never label unscanned media as clean.
+        $episode->media_scan_status = $episode->media_scan_status === 'pending' ? 'scan_unavailable' : $episode->media_scan_status;
         $episode->media_processing_status = $episode->media_processing_status === 'pending' ? 'ready_for_processing' : $episode->media_processing_status;
         $episode->media_duration_source = $episode->duration_seconds ? ($episode->media_duration_source ?: 'creator') : $episode->media_duration_source;
         $episode->save();

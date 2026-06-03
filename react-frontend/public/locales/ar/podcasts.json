@@ -3,13 +3,24 @@
   "subtitle": "العروض المجتمعية والقصص الصوتية والمقابلات والمعرفة المحلية من الأعضاء.",
   "actions": {
     "back_to_podcasts": "العودة إلى البودكاست",
-    "back_to_show": "العودة للعرض"
+    "back_to_show": "العودة للعرض",
+    "cancel": "يلغي"
   },
   "browse": {
     "search_placeholder": "يظهر البحث",
+    "all_categories": "جميع الفئات",
+    "sort_label": "فرز العروض",
+    "sort": {
+      "episodes": "معظم الحلقات",
+      "followers": "الأكثر متابعة",
+      "newest": "الأحدث",
+      "title": "من الألف إلى الياء"
+    },
     "empty": "لا يوجد عروض بودكاست حتى الآن",
     "empty_hint": "عندما ينشر الأعضاء العروض المعتمدة، ستظهر هنا.",
-    "load_more": "تحميل المزيد"
+    "load_more": "تحميل المزيد",
+    "category_label": "فئة",
+    "clear_filters": "واضح"
   },
   "show": {
     "not_found": "لم يتم العثور على عرض البودكاست",
@@ -25,7 +36,9 @@
     "unsubscribed": "إظهار غير المتابعة.",
     "subscribe_failed": "تعذر تحديث تفضيلات المتابعة.",
     "episodes": "Episodes",
-    "no_episodes": "لم يتم نشر أي حلقات بعد."
+    "no_episodes": "لم يتم نشر أي حلقات بعد.",
+    "follower_count_one": "{{عدد}} متابع",
+    "follower_count_other": "{{عدد}} متابعين"
   },
   "episode": {
     "title": "حلقة بودكاست",
@@ -48,20 +61,24 @@
     "report_reasons": {
       "safety": "سلامة أو ضرر",
       "spam": "محتوى غير مرغوب فيه أو مضلل",
-      "rights": "حقوق الطبع والنشر أو القلق بشأن الحقوق"
+      "rights": "حقوق الطبع والنشر أو القلق بشأن الحقوق",
+      "other": "آخر"
     },
     "type": {
       "full": "الحلقة كاملة",
       "trailer": "Trailer",
       "bonus": "Bonus"
-    }
+    },
+    "report": "تقرير",
+    "report_reason": "سبب"
   },
   "player": {
     "unsupported": "متصفحك لا يدعم مشغل الصوت.",
     "duration_unknown": "المدة غير معروفة",
     "progress": "تقدم التشغيل",
     "skip_back": "العودة 15 ثانية",
-    "skip_forward": "إلى الأمام 30 ثانية"
+    "skip_forward": "إلى الأمام 30 ثانية",
+    "speed": "{{معدل}}x"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -78,6 +95,25 @@
     "delete_show": "حذف العرض",
     "archive_episode": "الحلقة الأرشيفية",
     "delete_episode": "حذف الحلقة",
+    "readiness_title": "إظهار الاستعداد",
+    "readiness": {
+      "public_show": "يتم نشر العرض، للعامة، والموافقة عليه",
+      "owner_email": "تم تعيين البريد الإلكتروني لمالك الدليل",
+      "description": "العرض يحتوي على ملخص أو وصف",
+      "artwork": "تم تعيين إظهار عنوان URL للعمل الفني",
+      "published_episode": "يتم نشر حلقة واحدة معتمدة على الأقل"
+    },
+    "media_status": {
+      "not_required": "غير مطلوب",
+      "pending": "قيد الانتظار",
+      "complete": "مكتمل",
+      "clean": "ينظف",
+      "failed": "فشل",
+      "blocked": "محظور",
+      "infected": "محظور",
+      "ready_for_processing": "???? ????????",
+      "scan_unavailable": "?????? ??? ????"
+    },
     "show_created": "عرض تم إنشاؤه.",
     "show_published": "عرض المنشورة.",
     "show_archived": "عرض المؤرشفة.",
@@ -90,7 +126,10 @@
     "confirm_archive_show": "أرشيف {{title}}؟ سيتم إخفاؤه من قوائم البودكاست العامة.",
     "confirm_delete_show": "هل تريد حذف {{title}} وجميع حلقاته؟ لا يمكن التراجع عن هذا.",
     "confirm_archive_episode": "أرشيف {{title}}؟ سيتم إخفاؤه من قوائم البودكاست العامة.",
-    "confirm_delete_episode": "هل تريد حذف {{title}}؟ لا يمكن التراجع عن هذا."
+    "confirm_delete_episode": "هل تريد حذف {{title}}؟ لا يمكن التراجع عن هذا.",
+    "readiness_subtitle": "قائمة التحقق {{title}}.",
+    "media_scan_status": "مسح: {{الحالة}}",
+    "media_processing_status": "الوسائط: {{الحالة}}"
   },
   "fields": {
     "show": "Show",
@@ -113,7 +152,8 @@
     "episode_type": "نوع الحلقة",
     "transcript": "Transcript",
     "chapters": "Chapters",
-    "chapters_hint": "فصل واحد في كل سطر، على سبيل المثال: 00:30 مقدمات"
+    "chapters_hint": "فصل واحد في كل سطر، على سبيل المثال: 00:30 مقدمات",
+    "funding_url": "عنوان URL للتمويل"
   },
   "visibility": {
     "public": "Public",

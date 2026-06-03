@@ -33,6 +33,8 @@ class PodcastController extends BaseApiController
             'page' => $this->queryInt('page', 1, 1),
             'per_page' => $this->queryInt('per_page', 12, 1, 50),
             'search' => $this->query('q'),
+            'category' => $this->query('category'),
+            'sort' => $this->query('sort'),
             'include_member_only' => $userId !== null,
         ]);
 

@@ -8,6 +8,16 @@
   },
   "browse": {
     "search_placeholder": "Search shows",
+    "category_label": "Category",
+    "all_categories": "All categories",
+    "sort_label": "Sort shows",
+    "clear_filters": "Clear",
+    "sort": {
+      "newest": "Newest",
+      "title": "A-Z",
+      "episodes": "Most episodes",
+      "followers": "Most followed"
+    },
     "empty": "No podcast shows yet",
     "empty_hint": "When members publish approved shows, they will appear here.",
     "load_more": "Load more"
@@ -19,6 +29,8 @@
     "community_show": "Community show",
     "episode_count_one": "{{count}} episode",
     "episode_count_other": "{{count}} episodes",
+    "follower_count_one": "{{count}} follower",
+    "follower_count_other": "{{count}} followers",
     "rss_feed": "RSS feed",
     "subscribe": "Follow show",
     "unsubscribe": "Unfollow show",
@@ -83,6 +95,28 @@
     "delete_show": "Delete show",
     "archive_episode": "Archive episode",
     "delete_episode": "Delete episode",
+    "readiness_title": "Show readiness",
+    "readiness_subtitle": "{{title}} checklist",
+    "readiness": {
+      "public_show": "Show is published, public, and approved",
+      "owner_email": "Directory owner email is set",
+      "description": "Show has a summary or description",
+      "artwork": "Show artwork URL is set",
+      "published_episode": "At least one approved episode is published"
+    },
+    "media_scan_status": "Scan: {{status}}",
+    "media_processing_status": "Media: {{status}}",
+    "media_status": {
+      "pending": "Pending",
+      "complete": "Complete",
+      "ready_for_processing": "Ready for processing",
+      "clean": "Clean",
+      "scan_unavailable": "Scanner unavailable",
+      "failed": "Failed",
+      "blocked": "Blocked",
+      "infected": "Blocked",
+      "not_required": "Not required"
+    },
     "show_created": "Show created.",
     "show_published": "Show published.",
     "show_archived": "Show archived.",

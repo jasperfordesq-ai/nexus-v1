@@ -7,7 +7,7 @@
  * Podcasts module (alpha) — typed API client.
  */
 
-import { api } from '@/lib/api';
+import { api, type ApiResponse } from '@/lib/api';
 
 export type PodcastVisibility = 'public' | 'members' | 'private';
 export type PodcastEpisodeVisibility = 'inherit' | 'public' | 'members' | 'private';
@@ -101,6 +101,13 @@ export interface PodcastPage<T> {
   has_more: boolean;
 }
 
+interface PodcastPaginationMeta {
+  total?: number;
+  current_page?: number;
+  per_page?: number;
+  has_more?: boolean;
+}
+
 export interface CreatePodcastShowPayload {
   title: string;
   summary?: string;
@@ -150,8 +157,28 @@ function query(params: Record<string, string | number | undefined>): string {
 }
 
 export const podcastsApi = {
-  browse: (params: { q?: string; page?: number; per_page?: number } = {}) =>
-    api.get<PodcastPage<PodcastShow>>(`/v2/podcasts${query(params)}`),
+  browse: async (params: { q?: string; category?: string; sort?: string; page?: number; per_page?: number } = {}): Promise<ApiResponse<PodcastPage<PodcastShow>>> => {
+    const res = await api.get<PodcastShow[] | PodcastPage<PodcastShow>>(`/v2/podcasts${query(params)}`);
+    if (!res.success || !res.data) {
+      return { ...res, data: undefined };
+    }
+
+    if (Array.isArray(res.data)) {
+      const meta = (res.meta ?? {}) as PodcastPaginationMeta;
+      return {
+        ...res,
+        data: {
+          items: res.data,
+          total: meta.total ?? res.data.length,
+          page: meta.current_page ?? params.page ?? 1,
+          per_page: meta.per_page ?? params.per_page ?? 12,
+          has_more: Boolean(meta.has_more),
+        },
+      };
+    }
+
+    return res as ApiResponse<PodcastPage<PodcastShow>>;
+  },
 
   show: (slug: string) =>
     api.get<PodcastShow>(`/v2/podcasts/${encodeURIComponent(slug)}`),

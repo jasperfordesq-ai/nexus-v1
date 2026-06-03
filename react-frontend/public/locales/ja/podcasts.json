@@ -3,13 +3,24 @@
   "subtitle": "コミュニティ ショー、オーディオ ストーリー、インタビュー、メンバーからの地元の知識。",
   "actions": {
     "back_to_podcasts": "ポッドキャストに戻る",
-    "back_to_show": "ショーに戻る"
+    "back_to_show": "ショーに戻る",
+    "cancel": "キャンセル"
   },
   "browse": {
     "search_placeholder": "番組を検索する",
+    "all_categories": "すべてのカテゴリー",
+    "sort_label": "番組を並べ替える",
+    "sort": {
+      "episodes": "ほとんどのエピソード",
+      "followers": "最もフォローされている",
+      "newest": "最新",
+      "title": "A-Z"
+    },
     "empty": "ポッドキャスト番組はまだありません",
     "empty_hint": "メンバーが承認された番組を公開すると、ここに表示されます。",
-    "load_more": "さらにロードする"
+    "load_more": "さらにロードする",
+    "category_label": "カテゴリ",
+    "clear_filters": "クリア"
   },
   "show": {
     "not_found": "ポッドキャスト番組が見つかりません",
@@ -25,7 +36,9 @@
     "unsubscribed": "フォローされていない人を表示します。",
     "subscribe_failed": "フォロー設定を更新できませんでした。",
     "episodes": "Episodes",
-    "no_episodes": "公開されたエピソードはまだありません。"
+    "no_episodes": "公開されたエピソードはまだありません。",
+    "follower_count_one": "{{count}} 人のフォロワー",
+    "follower_count_other": "{{count}} 人のフォロワー"
   },
   "episode": {
     "title": "ポッドキャストのエピソード",
@@ -48,20 +61,24 @@
     "report_reasons": {
       "safety": "安全か害か",
       "spam": "スパムまたは誤解を招くコンテンツ",
-      "rights": "著作権または権利に関する懸念"
+      "rights": "著作権または権利に関する懸念",
+      "other": "他の"
     },
     "type": {
       "full": "エピソード全体",
       "trailer": "Trailer",
       "bonus": "Bonus"
-    }
+    },
+    "report": "報告",
+    "report_reason": "理由"
   },
   "player": {
     "unsupported": "お使いのブラウザはオーディオ プレーヤーをサポートしていません。",
     "duration_unknown": "期間不明",
     "progress": "再生の進行状況",
     "skip_back": "バック 15 秒",
-    "skip_forward": "30秒前へ"
+    "skip_forward": "30秒前へ",
+    "speed": "{{レート}}x"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -78,6 +95,25 @@
     "delete_show": "番組を削除する",
     "archive_episode": "アーカイブエピソード",
     "delete_episode": "エピソードを削除する",
+    "readiness_title": "準備を示す",
+    "readiness": {
+      "public_show": "ショーは公開され、公開され、承認されています",
+      "owner_email": "ディレクトリ所有者の電子メールが設定されています",
+      "description": "番組には概要または説明があります",
+      "artwork": "アートワークの表示URLが設定されています",
+      "published_episode": "少なくとも 1 つの承認されたエピソードが公開されている"
+    },
+    "media_status": {
+      "not_required": "不要",
+      "pending": "保留中",
+      "complete": "完了",
+      "clean": "クリーン",
+      "failed": "失敗した",
+      "blocked": "ブロックされました",
+      "infected": "ブロックされました",
+      "ready_for_processing": "??????",
+      "scan_unavailable": "?????????????"
+    },
     "show_created": "ショーが作成されました。",
     "show_published": "ショーが公開されました。",
     "show_archived": "アーカイブされたものを表示します。",
@@ -90,7 +126,10 @@
     "confirm_archive_show": "{{title}} をアーカイブしますか?公開ポッドキャスト リストからは非表示になります。",
     "confirm_delete_show": "{{title}} とそのすべてのエピソードを削除しますか?これを元に戻すことはできません。",
     "confirm_archive_episode": "{{title}} をアーカイブしますか?公開ポッドキャスト リストからは非表示になります。",
-    "confirm_delete_episode": "{{title}} を削除しますか?これを元に戻すことはできません。"
+    "confirm_delete_episode": "{{title}} を削除しますか?これを元に戻すことはできません。",
+    "readiness_subtitle": "{{title}} チェックリスト",
+    "media_scan_status": "スキャン: {{ステータス}}",
+    "media_processing_status": "メディア: {{ステータス}}"
   },
   "fields": {
     "show": "Show",
@@ -113,7 +152,8 @@
     "episode_type": "エピソードの種類",
     "transcript": "Transcript",
     "chapters": "Chapters",
-    "chapters_hint": "1 行に 1 章、例: 00:30 はじめに"
+    "chapters_hint": "1 行に 1 章、例: 00:30 はじめに",
+    "funding_url": "ファンディングURL"
   },
   "visibility": {
     "public": "Public",

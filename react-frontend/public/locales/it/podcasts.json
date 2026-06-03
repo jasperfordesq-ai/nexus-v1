@@ -3,13 +3,24 @@
   "subtitle": "Spettacoli della comunità, storie audio, interviste e conoscenze locali da parte dei membri.",
   "actions": {
     "back_to_podcasts": "Torniamo ai podcast",
-    "back_to_show": "Torniamo a mostrare"
+    "back_to_show": "Torniamo a mostrare",
+    "cancel": "Cancellare"
   },
   "browse": {
     "search_placeholder": "Cerca spettacoli",
+    "all_categories": "Tutte le categorie",
+    "sort_label": "Ordina gli spettacoli",
+    "sort": {
+      "episodes": "La maggior parte degli episodi",
+      "followers": "La maggior parte lo seguì",
+      "newest": "Più recente",
+      "title": "A-Z"
+    },
     "empty": "Nessun podcast viene ancora trasmesso",
     "empty_hint": "Quando i membri pubblicano programmi approvati, verranno visualizzati qui.",
-    "load_more": "Carica di più"
+    "load_more": "Carica di più",
+    "category_label": "Categoria",
+    "clear_filters": "Chiaro"
   },
   "show": {
     "not_found": "Programma podcast non trovato",
@@ -25,7 +36,9 @@
     "unsubscribed": "Mostra non seguito.",
     "subscribe_failed": "Impossibile aggiornare la preferenza Segui.",
     "episodes": "Episodes",
-    "no_episodes": "Nessun episodio ancora pubblicato."
+    "no_episodes": "Nessun episodio ancora pubblicato.",
+    "follower_count_one": "{{count}} seguace",
+    "follower_count_other": "{{count}} follower"
   },
   "episode": {
     "title": "Episodio podcast",
@@ -48,20 +61,24 @@
     "report_reasons": {
       "safety": "Sicurezza o danno",
       "spam": "Spam o contenuti fuorvianti",
-      "rights": "Problema relativo al copyright o ai diritti"
+      "rights": "Problema relativo al copyright o ai diritti",
+      "other": "Altro"
     },
     "type": {
       "full": "Episodio completo",
       "trailer": "Trailer",
       "bonus": "Bonus"
-    }
+    },
+    "report": "Rapporto",
+    "report_reason": "Motivo"
   },
   "player": {
     "unsupported": "Il tuo browser non supporta il lettore audio.",
     "duration_unknown": "Durata sconosciuta",
     "progress": "Avanzamento della riproduzione",
     "skip_back": "Indietro 15 secondi",
-    "skip_forward": "Avanti 30 anni"
+    "skip_forward": "Avanti 30 anni",
+    "speed": "{{tariffa}}x"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -78,6 +95,25 @@
     "delete_show": "Elimina spettacolo",
     "archive_episode": "Episodio d'archivio",
     "delete_episode": "Elimina episodio",
+    "readiness_title": "Mostra prontezza",
+    "readiness": {
+      "public_show": "Lo spettacolo è pubblicato, pubblico e approvato",
+      "owner_email": "L'e-mail del proprietario della directory è impostata",
+      "description": "Lo spettacolo ha un riepilogo o una descrizione",
+      "artwork": "Mostra l'URL dell'opera d'arte è impostato",
+      "published_episode": "Viene pubblicato almeno un episodio approvato"
+    },
+    "media_status": {
+      "not_required": "Non richiesto",
+      "pending": "In attesa di",
+      "complete": "Completare",
+      "clean": "Pulito",
+      "failed": "Fallito",
+      "blocked": "Bloccato",
+      "infected": "Bloccato",
+      "ready_for_processing": "Pronto per l'elaborazione",
+      "scan_unavailable": "Scanner non disponibile"
+    },
     "show_created": "Spettacolo creato.",
     "show_published": "Spettacolo pubblicato.",
     "show_archived": "Mostra archiviato.",
@@ -90,7 +126,10 @@
     "confirm_archive_show": "Archiviare {{title}}? Verrà nascosto dagli elenchi di podcast pubblici.",
     "confirm_delete_show": "Eliminare {{title}} e tutti i suoi episodi? Questa operazione non può essere annullata.",
     "confirm_archive_episode": "Archiviare {{title}}? Verrà nascosto dagli elenchi di podcast pubblici.",
-    "confirm_delete_episode": "Eliminare {{title}}? Questa operazione non può essere annullata."
+    "confirm_delete_episode": "Eliminare {{title}}? Questa operazione non può essere annullata.",
+    "readiness_subtitle": "Lista di controllo {{title}}",
+    "media_scan_status": "Scansione: {{status}}",
+    "media_processing_status": "Mezzi multimediali: {{status}}"
   },
   "fields": {
     "show": "Show",
@@ -113,7 +152,8 @@
     "episode_type": "Tipo di episodio",
     "transcript": "Transcript",
     "chapters": "Chapters",
-    "chapters_hint": "Un capitolo per riga, ad esempio: 00:30 Introduzioni"
+    "chapters_hint": "Un capitolo per riga, ad esempio: 00:30 Introduzioni",
+    "funding_url": "URL di finanziamento"
   },
   "visibility": {
     "public": "Public",

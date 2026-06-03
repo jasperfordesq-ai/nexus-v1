@@ -70,7 +70,8 @@
     "accessibility_alpha": "Inrochtaineacht (alfa)",
     "features": "Gnéithe",
     "accessibility_alpha_tooltip": "Enhanced accessible version — WCAG 2.2 AA compliant. Opens in a new tab.",
-    "courses": "Cúrsaí"
+    "courses": "Cúrsaí",
+    "podcasts": "Podchraoltaí"
   },
   "landing_links": {
     "title": "Déan iniúchadh ar an bpobal seo",
@@ -134,7 +135,8 @@
     "accessibility_alpha": "Oscail an aghaidh alfa ina bhfuil tús áite ag inrochtaineacht",
     "features": "Gach rud a dhéanann Project NEXUS, le lipéid aibíochta macánta",
     "dashboard": "Your personalised home overview",
-    "courses": "Foghlaim scileanna nua le do phobal"
+    "courses": "Foghlaim scileanna nua le do phobal",
+    "podcasts": "Seónna pobail agus scéalta fuaime"
   },
   "user_menu": {
     "my_profile": "Mo Phróifíl",

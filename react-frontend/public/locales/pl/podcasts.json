@@ -3,13 +3,24 @@
   "subtitle": "Programy społecznościowe, historie audio, wywiady i wiedza lokalna od członków.",
   "actions": {
     "back_to_podcasts": "Wracając do podcastów",
-    "back_to_show": "Powrót do pokazania"
+    "back_to_show": "Powrót do pokazania",
+    "cancel": "Anulować"
   },
   "browse": {
     "search_placeholder": "Wyszukaj programy",
+    "all_categories": "Wszystkie kategorie",
+    "sort_label": "Sortuj programy",
+    "sort": {
+      "episodes": "Większość odcinków",
+      "followers": "Większość poszła za nimi",
+      "newest": "Najnowszy",
+      "title": "A-Z"
+    },
     "empty": "Nie ma jeszcze żadnych podcastów",
     "empty_hint": "Gdy członkowie opublikują zatwierdzone programy, pojawią się one tutaj.",
-    "load_more": "Załaduj więcej"
+    "load_more": "Załaduj więcej",
+    "category_label": "Kategoria",
+    "clear_filters": "Jasne"
   },
   "show": {
     "not_found": "Nie znaleziono programu podcastu",
@@ -25,7 +36,9 @@
     "unsubscribed": "Pokaż nieobserwowanych.",
     "subscribe_failed": "Nie można zaktualizować preferencji obserwowania.",
     "episodes": "Episodes",
-    "no_episodes": "Nie ma jeszcze opublikowanych odcinków."
+    "no_episodes": "Nie ma jeszcze opublikowanych odcinków.",
+    "follower_count_one": "{{count}} obserwujący",
+    "follower_count_other": "{{count}} obserwujących"
   },
   "episode": {
     "title": "Odcinek podcastu",
@@ -48,20 +61,24 @@
     "report_reasons": {
       "safety": "Bezpieczeństwo lub szkoda",
       "spam": "Spam lub treści wprowadzające w błąd",
-      "rights": "Problem dotyczący praw autorskich lub praw"
+      "rights": "Problem dotyczący praw autorskich lub praw",
+      "other": "Inny"
     },
     "type": {
       "full": "Pełny odcinek",
       "trailer": "Trailer",
       "bonus": "Bonus"
-    }
+    },
+    "report": "Raport",
+    "report_reason": "Powód"
   },
   "player": {
     "unsupported": "Twoja przeglądarka nie obsługuje odtwarzacza audio.",
     "duration_unknown": "Czas trwania nieznany",
     "progress": "Postęp odtwarzania",
     "skip_back": "Powrót 15s",
-    "skip_forward": "Do przodu 30 s"
+    "skip_forward": "Do przodu 30 s",
+    "speed": "{{rate}}x"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -78,6 +95,25 @@
     "delete_show": "Usuń program",
     "archive_episode": "Odcinek archiwalny",
     "delete_episode": "Usuń odcinek",
+    "readiness_title": "Pokaż gotowość",
+    "readiness": {
+      "public_show": "Program został opublikowany, publiczny i zatwierdzony",
+      "owner_email": "Adres e-mail właściciela katalogu jest ustawiony",
+      "description": "Program zawiera podsumowanie lub opis",
+      "artwork": "Pokaż adres URL grafiki jest ustawiony",
+      "published_episode": "Opublikowano co najmniej jeden zatwierdzony odcinek"
+    },
+    "media_status": {
+      "not_required": "Nie jest wymagane",
+      "pending": "Aż do",
+      "complete": "Kompletny",
+      "clean": "Czysty",
+      "failed": "Przegrany",
+      "blocked": "Zablokowany",
+      "infected": "Zablokowany",
+      "ready_for_processing": "Gotowe do przetwarzania",
+      "scan_unavailable": "Skaner niedost?pny"
+    },
     "show_created": "Pokaż utworzony.",
     "show_published": "Pokaż opublikowany.",
     "show_archived": "Pokaż zarchiwizowane.",
@@ -90,7 +126,10 @@
     "confirm_archive_show": "Zarchiwizować {{title}}? Będzie ukryty na publicznych listach podcastów.",
     "confirm_delete_show": "Usunąć {{title}} i wszystkie jego odcinki? Tego nie można cofnąć.",
     "confirm_archive_episode": "Zarchiwizować {{title}}? Będzie ukryty na publicznych listach podcastów.",
-    "confirm_delete_episode": "Usunąć {{title}}? Tego nie można cofnąć."
+    "confirm_delete_episode": "Usunąć {{title}}? Tego nie można cofnąć.",
+    "readiness_subtitle": "Lista kontrolna {{title}}",
+    "media_scan_status": "Skanowanie: {{status}}",
+    "media_processing_status": "Media: {{status}}"
   },
   "fields": {
     "show": "Show",
@@ -113,7 +152,8 @@
     "episode_type": "Typ odcinka",
     "transcript": "Transcript",
     "chapters": "Chapters",
-    "chapters_hint": "Jeden rozdział w każdym wierszu, na przykład: 00:30 Wprowadzenie"
+    "chapters_hint": "Jeden rozdział w każdym wierszu, na przykład: 00:30 Wprowadzenie",
+    "funding_url": "Adres URL finansowania"
   },
   "visibility": {
     "public": "Public",

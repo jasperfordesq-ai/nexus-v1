@@ -3,13 +3,24 @@
   "subtitle": "Programas comunitários, histórias em áudio, entrevistas e conhecimento local dos membros.",
   "actions": {
     "back_to_podcasts": "Voltar aos podcasts",
-    "back_to_show": "Voltar para mostrar"
+    "back_to_show": "Voltar para mostrar",
+    "cancel": "Cancelar"
   },
   "browse": {
     "search_placeholder": "Programas de pesquisa",
+    "all_categories": "Todas as categorias",
+    "sort_label": "Classificar programas",
+    "sort": {
+      "episodes": "A maioria dos episódios",
+      "followers": "Mais seguidos",
+      "newest": "Mais recente",
+      "title": "A-Z"
+    },
     "empty": "Ainda não há programas de podcast",
     "empty_hint": "Quando os membros publicarem programas aprovados, eles aparecerão aqui.",
-    "load_more": "Carregar mais"
+    "load_more": "Carregar mais",
+    "category_label": "Categoria",
+    "clear_filters": "Claro"
   },
   "show": {
     "not_found": "Programa de podcast não encontrado",
@@ -25,7 +36,9 @@
     "unsubscribed": "Mostrar não seguido.",
     "subscribe_failed": "Não foi possível atualizar a preferência de acompanhamento.",
     "episodes": "Episodes",
-    "no_episodes": "Nenhum episódio publicado ainda."
+    "no_episodes": "Nenhum episódio publicado ainda.",
+    "follower_count_one": "{{count}} seguidores",
+    "follower_count_other": "{{count}} seguidores"
   },
   "episode": {
     "title": "Episódio de podcast",
@@ -48,20 +61,24 @@
     "report_reasons": {
       "safety": "Segurança ou dano",
       "spam": "Spam ou conteúdo enganoso",
-      "rights": "Preocupação com direitos autorais ou direitos"
+      "rights": "Preocupação com direitos autorais ou direitos",
+      "other": "Outro"
     },
     "type": {
       "full": "Episódio completo",
       "trailer": "Trailer",
       "bonus": "Bonus"
-    }
+    },
+    "report": "Relatório",
+    "report_reason": "Razão"
   },
   "player": {
     "unsupported": "Seu navegador não suporta o reprodutor de áudio.",
     "duration_unknown": "Duração desconhecida",
     "progress": "Progresso da reprodução",
     "skip_back": "Voltar 15s",
-    "skip_forward": "Avançando 30 anos"
+    "skip_forward": "Avançando 30 anos",
+    "speed": "{{taxa}}x"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -78,6 +95,25 @@
     "delete_show": "Excluir programa",
     "archive_episode": "Arquivar episódio",
     "delete_episode": "Excluir episódio",
+    "readiness_title": "Mostrar prontidão",
+    "readiness": {
+      "public_show": "O programa é publicado, público e aprovado",
+      "owner_email": "O e-mail do proprietário do diretório está definido",
+      "description": "O programa tem um resumo ou uma descrição",
+      "artwork": "Mostrar URL da arte está definido",
+      "published_episode": "Pelo menos um episódio aprovado é publicado"
+    },
+    "media_status": {
+      "not_required": "Não obrigatório",
+      "pending": "Pendente",
+      "complete": "Completo",
+      "clean": "Limpar",
+      "failed": "Fracassado",
+      "blocked": "Bloqueado",
+      "infected": "Bloqueado",
+      "ready_for_processing": "Pronto para processamento",
+      "scan_unavailable": "Scanner indispon?vel"
+    },
     "show_created": "Espetáculo criado.",
     "show_published": "Espetáculo publicado.",
     "show_archived": "Mostrar arquivado.",
@@ -90,7 +126,10 @@
     "confirm_archive_show": "Arquivar {{title}}? Ele ficará oculto nas listas públicas de podcast.",
     "confirm_delete_show": "Excluir {{title}} e todos os seus episódios? Isto não pode ser desfeito.",
     "confirm_archive_episode": "Arquivar {{title}}? Ele ficará oculto nas listas públicas de podcast.",
-    "confirm_delete_episode": "Excluir {{title}}? Isto não pode ser desfeito."
+    "confirm_delete_episode": "Excluir {{title}}? Isto não pode ser desfeito.",
+    "readiness_subtitle": "lista de verificação {{title}}",
+    "media_scan_status": "Verificação: {{status}}",
+    "media_processing_status": "Mídia: {{status}}"
   },
   "fields": {
     "show": "Show",
@@ -113,7 +152,8 @@
     "episode_type": "Tipo de episódio",
     "transcript": "Transcript",
     "chapters": "Chapters",
-    "chapters_hint": "Um capítulo por linha, por exemplo: 00:30 Apresentações"
+    "chapters_hint": "Um capítulo por linha, por exemplo: 00:30 Apresentações",
+    "funding_url": "URL de financiamento"
   },
   "visibility": {
     "public": "Public",

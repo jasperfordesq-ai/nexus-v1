@@ -14,15 +14,18 @@ import {
   type CreatePodcastEpisodePayload,
   type CreatePodcastShowPayload,
   type PodcastChapter,
+  type PodcastEpisode,
   type PodcastShow,
   type PodcastVisibility,
 } from '@/lib/api/podcasts';
 import Archive from 'lucide-react/icons/archive';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Megaphone from 'lucide-react/icons/megaphone';
 import Plus from 'lucide-react/icons/plus';
 import Radio from 'lucide-react/icons/radio';
 import Trash2 from 'lucide-react/icons/trash-2';
+import XCircle from 'lucide-react/icons/circle-x';
 
 function parseTimestamp(value: string): number {
   const parts = value.split(':').map((part) => Number.parseInt(part, 10));
@@ -47,6 +50,13 @@ function parseChapters(input: string): PodcastChapter[] {
         position: index,
       };
     });
+}
+
+function mediaStatusColor(status?: string | null): 'success' | 'warning' | 'danger' | 'default' {
+  if (!status || status === 'not_required') return 'default';
+  if (status === 'complete' || status === 'clean') return 'success';
+  if (status === 'failed' || status === 'blocked' || status === 'infected') return 'danger';
+  return 'warning';
 }
 
 const emptyShow: CreatePodcastShowPayload = {
@@ -95,6 +105,20 @@ export default function PodcastStudioPage() {
     () => shows.find((show) => String(show.id) === selectedShowId) ?? null,
     [shows, selectedShowId],
   );
+
+  const readinessChecks = useMemo(() => {
+    if (!selectedShow) return [];
+
+    const hasPublishedEpisode = selectedShow.episodes?.some((episode) => episode.status === 'published' && episode.moderation_status === 'approved') ?? false;
+
+    return [
+      { key: 'public_show', ok: selectedShow.visibility === 'public' && selectedShow.status === 'published' && selectedShow.moderation_status === 'approved' },
+      { key: 'owner_email', ok: Boolean(selectedShow.owner_email) },
+      { key: 'description', ok: Boolean(selectedShow.description || selectedShow.summary) },
+      { key: 'artwork', ok: Boolean(selectedShow.artwork_url) },
+      { key: 'published_episode', ok: hasPublishedEpisode },
+    ];
+  }, [selectedShow]);
 
   async function loadShows(): Promise<void> {
     setLoading(true);
@@ -339,6 +363,30 @@ export default function PodcastStudioPage() {
           </section>
 
           <aside className="space-y-3">
+            {selectedShow && (
+              <Card>
+                <CardBody className="space-y-3">
+                  <div>
+                    <h2 className="text-lg font-semibold">{t('studio.readiness_title')}</h2>
+                    <p className="mt-1 text-sm text-muted">{t('studio.readiness_subtitle', { title: selectedShow.title })}</p>
+                  </div>
+                  <div className="space-y-2">
+                    {readinessChecks.map((check) => {
+                      const Icon = check.ok ? CheckCircle : XCircle;
+                      return (
+                        <div key={check.key} className="flex items-start gap-2 text-sm">
+                          <Icon size={16} className={check.ok ? 'mt-0.5 text-success' : 'mt-0.5 text-warning'} aria-hidden="true" />
+                          <span className={check.ok ? 'text-foreground' : 'text-muted'}>
+                            {t(`studio.readiness.${check.key}`)}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardBody>
+              </Card>
+            )}
+
             <div className="flex items-center gap-2">
               <Megaphone size={18} className="text-accent" aria-hidden="true" />
               <h2 className="text-lg font-semibold">{t('studio.my_shows')}</h2>
@@ -393,6 +441,16 @@ export default function PodcastStudioPage() {
                                 <Chip size="sm" variant="soft" color={episode.moderation_status === 'approved' ? 'success' : 'warning'}>
                                   {t(`moderation.${episode.moderation_status}`)}
                                 </Chip>
+                                {(['media_scan_status', 'media_processing_status'] as const).map((field) => {
+                                  const status = episode[field as keyof PodcastEpisode] as string | null | undefined;
+                                  if (!status) return null;
+
+                                  return (
+                                    <Chip key={field} size="sm" variant="soft" color={mediaStatusColor(status)}>
+                                      {t(`studio.${field}`, { status: t(`studio.media_status.${status}`, { defaultValue: status }) })}
+                                    </Chip>
+                                  );
+                                })}
                               </div>
                             </div>
                             <div className="flex flex-wrap gap-2">

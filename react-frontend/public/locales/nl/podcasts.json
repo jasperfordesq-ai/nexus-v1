@@ -3,13 +3,24 @@
   "subtitle": "Communityshows, audioverhalen, interviews en lokale kennis van leden.",
   "actions": {
     "back_to_podcasts": "Terug naar podcasts",
-    "back_to_show": "Terug naar show"
+    "back_to_show": "Terug naar show",
+    "cancel": "Annuleren"
   },
   "browse": {
     "search_placeholder": "Zoekprogramma's",
+    "all_categories": "Alle categorieën",
+    "sort_label": "Sorteer programma's",
+    "sort": {
+      "episodes": "De meeste afleveringen",
+      "followers": "De meesten volgden",
+      "newest": "Nieuwste",
+      "title": "A-Z"
+    },
     "empty": "Er zijn nog geen podcastshows",
     "empty_hint": "Wanneer leden goedgekeurde programma's publiceren, worden deze hier weergegeven.",
-    "load_more": "Laad meer"
+    "load_more": "Laad meer",
+    "category_label": "Categorie",
+    "clear_filters": "Duidelijk"
   },
   "show": {
     "not_found": "Podcastshow niet gevonden",
@@ -25,7 +36,9 @@
     "unsubscribed": "Toon niet gevolgd.",
     "subscribe_failed": "Kan de volgvoorkeur niet updaten.",
     "episodes": "Episodes",
-    "no_episodes": "Nog geen gepubliceerde afleveringen."
+    "no_episodes": "Nog geen gepubliceerde afleveringen.",
+    "follower_count_one": "{{count}} volger",
+    "follower_count_other": "{{count}} volgers"
   },
   "episode": {
     "title": "Podcast-aflevering",
@@ -48,20 +61,24 @@
     "report_reasons": {
       "safety": "Veiligheid of schade",
       "spam": "Spam of misleidende inhoud",
-      "rights": "Auteursrecht of rechten betreft"
+      "rights": "Auteursrecht of rechten betreft",
+      "other": "Ander"
     },
     "type": {
       "full": "Volledige aflevering",
       "trailer": "Trailer",
       "bonus": "Bonus"
-    }
+    },
+    "report": "Rapport",
+    "report_reason": "Reden"
   },
   "player": {
     "unsupported": "Uw browser ondersteunt de audiospeler niet.",
     "duration_unknown": "Duur onbekend",
     "progress": "Afspeelvoortgang",
     "skip_back": "Terug 15s",
-    "skip_forward": "Voorwaarts jaren '30"
+    "skip_forward": "Voorwaarts jaren '30",
+    "speed": "{{tarief}}x"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -78,6 +95,25 @@
     "delete_show": "Toon verwijderen",
     "archive_episode": "Aflevering archiveren",
     "delete_episode": "Aflevering verwijderen",
+    "readiness_title": "Toon bereidheid",
+    "readiness": {
+      "public_show": "Show is gepubliceerd, openbaar en goedgekeurd",
+      "owner_email": "Het e-mailadres van de directory-eigenaar is ingesteld",
+      "description": "Show heeft een samenvatting of beschrijving",
+      "artwork": "URL voor illustratie weergeven is ingesteld",
+      "published_episode": "Er is ten minste één goedgekeurde aflevering gepubliceerd"
+    },
+    "media_status": {
+      "not_required": "Niet vereist",
+      "pending": "In behandeling",
+      "complete": "Compleet",
+      "clean": "Schoon",
+      "failed": "Mislukt",
+      "blocked": "Geblokkeerd",
+      "infected": "Geblokkeerd",
+      "ready_for_processing": "Klaar voor verwerking",
+      "scan_unavailable": "Scanner niet beschikbaar"
+    },
     "show_created": "Toon gemaakt.",
     "show_published": "Toon gepubliceerd.",
     "show_archived": "Gearchiveerd weergeven.",
@@ -90,7 +126,10 @@
     "confirm_archive_show": "{{title}} archiveren? Het wordt verborgen voor openbare podcastlijsten.",
     "confirm_delete_show": "{{title}} en alle afleveringen verwijderen? Dit kan niet ongedaan worden gemaakt.",
     "confirm_archive_episode": "{{title}} archiveren? Het wordt verborgen voor openbare podcastlijsten.",
-    "confirm_delete_episode": "{{title}} verwijderen? Dit kan niet ongedaan worden gemaakt."
+    "confirm_delete_episode": "{{title}} verwijderen? Dit kan niet ongedaan worden gemaakt.",
+    "readiness_subtitle": "{{title}} checklist",
+    "media_scan_status": "Scannen: {{status}}",
+    "media_processing_status": "Media: {{status}}"
   },
   "fields": {
     "show": "Show",
@@ -113,7 +152,8 @@
     "episode_type": "Afleveringstype",
     "transcript": "Transcript",
     "chapters": "Chapters",
-    "chapters_hint": "Eén hoofdstuk per regel, bijvoorbeeld: 00:30 Introducties"
+    "chapters_hint": "Eén hoofdstuk per regel, bijvoorbeeld: 00:30 Introducties",
+    "funding_url": "Financierings-URL"
   },
   "visibility": {
     "public": "Public",

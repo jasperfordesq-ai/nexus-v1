@@ -70,7 +70,8 @@
     "accessibility_alpha": "إمكانية الوصول (ألفا)",
     "features": "الميزات",
     "accessibility_alpha_tooltip": "Enhanced accessible version — WCAG 2.2 AA compliant. Opens in a new tab.",
-    "courses": "الدورات"
+    "courses": "الدورات",
+    "podcasts": "البودكاست"
   },
   "landing_links": {
     "title": "استكشف هذا المجتمع",
@@ -134,7 +135,8 @@
     "accessibility_alpha": "افتح الواجهة التجريبية ذات الأولوية لإمكانية الوصول",
     "features": "كل ما يفعله Project NEXUS، مع علامات نضج صادقة",
     "dashboard": "Your personalised home overview",
-    "courses": "تعلم مهارات جديدة مع مجتمعك"
+    "courses": "تعلم مهارات جديدة مع مجتمعك",
+    "podcasts": "عروض المجتمع والقصص الصوتية"
   },
   "user_menu": {
     "my_profile": "ملفي الشخصي",

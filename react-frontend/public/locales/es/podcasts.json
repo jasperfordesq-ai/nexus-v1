@@ -3,13 +3,24 @@
   "subtitle": "Programas comunitarios, historias de audio, entrevistas y conocimiento local de los miembros.",
   "actions": {
     "back_to_podcasts": "Volver a los podcasts",
-    "back_to_show": "Volver a mostrar"
+    "back_to_show": "Volver a mostrar",
+    "cancel": "Cancelar"
   },
   "browse": {
     "search_placeholder": "La búsqueda muestra",
+    "all_categories": "Todas las categorias",
+    "sort_label": "Ordenar programas",
+    "sort": {
+      "episodes": "La mayoría de los episodios",
+      "followers": "Los más seguidos",
+      "newest": "El más nuevo",
+      "title": "ARIZONA"
+    },
     "empty": "Aún no hay programas de podcasts",
     "empty_hint": "Cuando los miembros publiquen programas aprobados, aparecerán aquí.",
-    "load_more": "Cargar más"
+    "load_more": "Cargar más",
+    "category_label": "Categoría",
+    "clear_filters": "Claro"
   },
   "show": {
     "not_found": "Programa de podcast no encontrado",
@@ -25,7 +36,9 @@
     "unsubscribed": "Mostrar no seguido.",
     "subscribe_failed": "No se pudo actualizar la preferencia de seguimiento.",
     "episodes": "Episodes",
-    "no_episodes": "Aún no hay episodios publicados."
+    "no_episodes": "Aún no hay episodios publicados.",
+    "follower_count_one": "{{count}} seguidor",
+    "follower_count_other": "{{count}} seguidores"
   },
   "episode": {
     "title": "episodio de podcast",
@@ -48,20 +61,24 @@
     "report_reasons": {
       "safety": "Seguridad o daño",
       "spam": "Spam o contenido engañoso",
-      "rights": "Problema de derechos de autor o derechos"
+      "rights": "Problema de derechos de autor o derechos",
+      "other": "Otro"
     },
     "type": {
       "full": "episodio completo",
       "trailer": "Trailer",
       "bonus": "Bonus"
-    }
+    },
+    "report": "Informe",
+    "report_reason": "Razón"
   },
   "player": {
     "unsupported": "Su navegador no soporta el reproductor de audio.",
     "duration_unknown": "Duración desconocida",
     "progress": "Progreso de la reproducción",
     "skip_back": "Atrás 15",
-    "skip_forward": "Adelante 30s"
+    "skip_forward": "Adelante 30s",
+    "speed": "{{tasa}}x"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -78,6 +95,25 @@
     "delete_show": "Eliminar espectáculo",
     "archive_episode": "Episodio de archivo",
     "delete_episode": "Eliminar episodio",
+    "readiness_title": "Mostrar preparación",
+    "readiness": {
+      "public_show": "El programa es publicado, público y aprobado.",
+      "owner_email": "El correo electrónico del propietario del directorio está configurado",
+      "description": "El programa tiene un resumen o descripción.",
+      "artwork": "La URL para mostrar la obra de arte está configurada",
+      "published_episode": "Se publica al menos un episodio aprobado."
+    },
+    "media_status": {
+      "not_required": "No requerido",
+      "pending": "Pendiente",
+      "complete": "Completo",
+      "clean": "Limpio",
+      "failed": "Fallido",
+      "blocked": "Obstruido",
+      "infected": "Obstruido",
+      "ready_for_processing": "Listo para procesar",
+      "scan_unavailable": "Esc?ner no disponible"
+    },
     "show_created": "Espectáculo creado.",
     "show_published": "Mostrar publicado.",
     "show_archived": "Mostrar archivado.",
@@ -90,7 +126,10 @@
     "confirm_archive_show": "¿Archivar {{title}}? Estará oculto de las listas públicas de podcasts.",
     "confirm_delete_show": "¿Eliminar {{title}} y todos sus episodios? Esto no se puede deshacer.",
     "confirm_archive_episode": "¿Archivar {{title}}? Estará oculto de las listas públicas de podcasts.",
-    "confirm_delete_episode": "¿Eliminar {{title}}? Esto no se puede deshacer."
+    "confirm_delete_episode": "¿Eliminar {{title}}? Esto no se puede deshacer.",
+    "readiness_subtitle": "{{title}} lista de verificación",
+    "media_scan_status": "Escanear: {{estado}}",
+    "media_processing_status": "Medios: {{estado}}"
   },
   "fields": {
     "show": "Show",
@@ -113,7 +152,8 @@
     "episode_type": "Tipo de episodio",
     "transcript": "Transcript",
     "chapters": "Chapters",
-    "chapters_hint": "Un capítulo por línea, por ejemplo: 00:30 Introducciones"
+    "chapters_hint": "Un capítulo por línea, por ejemplo: 00:30 Introducciones",
+    "funding_url": "URL de financiación"
   },
   "visibility": {
     "public": "Public",

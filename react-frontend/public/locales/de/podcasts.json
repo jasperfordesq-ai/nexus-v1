@@ -3,13 +3,24 @@
   "subtitle": "Community-Shows, Audio-Geschichten, Interviews und lokales Wissen von Mitgliedern.",
   "actions": {
     "back_to_podcasts": "Zurück zu Podcasts",
-    "back_to_show": "Zurück zur Show"
+    "back_to_show": "Zurück zur Show",
+    "cancel": "Stornieren"
   },
   "browse": {
     "search_placeholder": "Suche zeigt",
+    "all_categories": "Alle Kategorien",
+    "sort_label": "Sendungen sortieren",
+    "sort": {
+      "episodes": "Die meisten Episoden",
+      "followers": "Die meisten folgten",
+      "newest": "Neueste",
+      "title": "A-Z"
+    },
     "empty": "Noch keine Podcast-Shows",
     "empty_hint": "Wenn Mitglieder genehmigte Shows veröffentlichen, werden sie hier angezeigt.",
-    "load_more": "Mehr laden"
+    "load_more": "Mehr laden",
+    "category_label": "Kategorie",
+    "clear_filters": "Klar"
   },
   "show": {
     "not_found": "Podcast-Show nicht gefunden",
@@ -25,7 +36,9 @@
     "unsubscribed": "Nicht verfolgt anzeigen.",
     "subscribe_failed": "Die Follow-Präferenz konnte nicht aktualisiert werden.",
     "episodes": "Episodes",
-    "no_episodes": "Noch keine veröffentlichten Episoden."
+    "no_episodes": "Noch keine veröffentlichten Episoden.",
+    "follower_count_one": "{{count}} Follower",
+    "follower_count_other": "{{count}} Follower"
   },
   "episode": {
     "title": "Podcast-Folge",
@@ -48,20 +61,24 @@
     "report_reasons": {
       "safety": "Sicherheit oder Schaden",
       "spam": "Spam oder irreführender Inhalt",
-      "rights": "Urheberrechts- oder Rechtebedenken"
+      "rights": "Urheberrechts- oder Rechtebedenken",
+      "other": "Andere"
     },
     "type": {
       "full": "Vollständige Folge",
       "trailer": "Trailer",
       "bonus": "Bonus"
-    }
+    },
+    "report": "Bericht",
+    "report_reason": "Grund"
   },
   "player": {
     "unsupported": "Ihr Browser unterstützt den Audioplayer nicht.",
     "duration_unknown": "Dauer unbekannt",
     "progress": "Wiedergabefortschritt",
     "skip_back": "Zurück 15s",
-    "skip_forward": "Vorwärts 30er"
+    "skip_forward": "Vorwärts 30er",
+    "speed": "{{rate}}x"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -78,6 +95,25 @@
     "delete_show": "Sendung löschen",
     "archive_episode": "Archivfolge",
     "delete_episode": "Folge löschen",
+    "readiness_title": "Bereitschaft zeigen",
+    "readiness": {
+      "public_show": "Die Show ist veröffentlicht, öffentlich und genehmigt",
+      "owner_email": "Die E-Mail-Adresse des Verzeichnisbesitzers ist festgelegt",
+      "description": "Show hat eine Zusammenfassung oder Beschreibung",
+      "artwork": "Die URL zum Anzeigen des Bildmaterials ist festgelegt",
+      "published_episode": "Mindestens eine genehmigte Folge wird veröffentlicht"
+    },
+    "media_status": {
+      "not_required": "Nicht erforderlich",
+      "pending": "Ausstehend",
+      "complete": "Vollständig",
+      "clean": "Sauber",
+      "failed": "Fehlgeschlagen",
+      "blocked": "Blockiert",
+      "infected": "Blockiert",
+      "ready_for_processing": "Bereit zur Verarbeitung",
+      "scan_unavailable": "Scanner nicht verf?gbar"
+    },
     "show_created": "Show erstellt.",
     "show_published": "Show veröffentlicht.",
     "show_archived": "Archiviert anzeigen.",
@@ -90,7 +126,10 @@
     "confirm_archive_show": "Archiv {{title}}? Es wird aus öffentlichen Podcast-Listen ausgeblendet.",
     "confirm_delete_show": "{{title}} und alle seine Episoden löschen? Dies kann nicht rückgängig gemacht werden.",
     "confirm_archive_episode": "Archiv {{title}}? Es wird aus öffentlichen Podcast-Listen ausgeblendet.",
-    "confirm_delete_episode": "{{title}} löschen? Dies kann nicht rückgängig gemacht werden."
+    "confirm_delete_episode": "{{title}} löschen? Dies kann nicht rückgängig gemacht werden.",
+    "readiness_subtitle": "{{title}} Checkliste",
+    "media_scan_status": "Scannen: {{status}}",
+    "media_processing_status": "Medien: {{status}}"
   },
   "fields": {
     "show": "Show",
@@ -113,7 +152,8 @@
     "episode_type": "Episodentyp",
     "transcript": "Transcript",
     "chapters": "Chapters",
-    "chapters_hint": "Ein Kapitel pro Zeile, zum Beispiel: 00:30 Einführungen"
+    "chapters_hint": "Ein Kapitel pro Zeile, zum Beispiel: 00:30 Einführungen",
+    "funding_url": "Finanzierungs-URL"
   },
   "visibility": {
     "public": "Public",

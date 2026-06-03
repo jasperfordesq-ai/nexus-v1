@@ -3,13 +3,24 @@
   "subtitle": "Léiríonn pobail, scéalta fuaime, agallaimh, agus eolas áitiúil ó bhaill.",
   "actions": {
     "back_to_podcasts": "Ar ais go podchraoltaí",
-    "back_to_show": "Ar ais go dtí a thaispeáint"
+    "back_to_show": "Ar ais go dtí a thaispeáint",
+    "cancel": "Cealaigh"
   },
   "browse": {
     "search_placeholder": "Léiríonn cuardaigh",
+    "all_categories": "Gach catagóir",
+    "sort_label": "Léiríonn sórtáil",
+    "sort": {
+      "episodes": "An chuid is mó eipeasóid",
+      "followers": "Lean an chuid is mó",
+      "newest": "is nuaí",
+      "title": "A-Z"
+    },
     "empty": "Níl aon seónna podchraoltaí fós",
     "empty_hint": "Nuair a fhoilseoidh baill seónna ceadaithe, beidh siad le feiceáil anseo.",
-    "load_more": "Luchtaigh níos mó"
+    "load_more": "Luchtaigh níos mó",
+    "category_label": "Catagóir",
+    "clear_filters": "Glan"
   },
   "show": {
     "not_found": "Níor aimsíodh seó podchraolta",
@@ -25,7 +36,9 @@
     "unsubscribed": "Taispeáin gan leanúint.",
     "subscribe_failed": "Níorbh fhéidir an rogha a leanúint a nuashonrú.",
     "episodes": "Episodes",
-    "no_episodes": "Níl aon eipeasóid foilsithe fós."
+    "no_episodes": "Níl aon eipeasóid foilsithe fós.",
+    "follower_count_one": "{{count}} leantóir",
+    "follower_count_other": "{{count}} leantóir"
   },
   "episode": {
     "title": "Eipeasóid podchraolta",
@@ -48,20 +61,24 @@
     "report_reasons": {
       "safety": "Sábháilteacht nó dochar",
       "spam": "Turscar nó ábhar míthreorach",
-      "rights": "Baineann cóipcheart nó cearta"
+      "rights": "Baineann cóipcheart nó cearta",
+      "other": "Eile"
     },
     "type": {
       "full": "Eipeasóid iomlán",
       "trailer": "Trailer",
       "bonus": "Bonus"
-    }
+    },
+    "report": "Tuairisc",
+    "report_reason": "Cúis"
   },
   "player": {
     "unsupported": "Ní thacaíonn do bhrabhsálaí leis an seinnteoir fuaime.",
     "duration_unknown": "Fad anaithnid",
     "progress": "Dul chun cinn athsheinm",
     "skip_back": "Ar ais 15s",
-    "skip_forward": "Ar aghaidh 30s"
+    "skip_forward": "Ar aghaidh 30s",
+    "speed": "{{ ráta}}x"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -78,6 +95,25 @@
     "delete_show": "Scrios seó",
     "archive_episode": "Eipeasóid cartlainne",
     "delete_episode": "Scrios eipeasóid",
+    "readiness_title": "Taispeáin ullmhacht",
+    "readiness": {
+      "public_show": "Tá an seó foilsithe, poiblí, agus ceadaithe",
+      "owner_email": "Tá ríomhphost úinéir eolaire socraithe",
+      "description": "Tá achoimre nó cur síos ar an seó",
+      "artwork": "Socraítear URL an tsaothair ealaíne a thaispeáint",
+      "published_episode": "Foilsítear eipeasóid cheadaithe amháin ar a laghad"
+    },
+    "media_status": {
+      "not_required": "Ní gá",
+      "pending": "Ar feitheamh",
+      "complete": "Críochnaigh",
+      "clean": "Glan",
+      "failed": "Theip",
+      "blocked": "bactha",
+      "infected": "bactha",
+      "ready_for_processing": "R?idh le pr?ise?il",
+      "scan_unavailable": "N?l an scan?ir ar f?il"
+    },
     "show_created": "Taispeáin cruthaithe.",
     "show_published": "Taispeáin foilsithe.",
     "show_archived": "Taispeáin sa chartlann.",
@@ -90,7 +126,10 @@
     "confirm_archive_show": "Cartlann {{title}}? Beidh sé i bhfolach ó liostaí podchraoltaí poiblí.",
     "confirm_delete_show": "An bhfuil fonn ort {{title}} agus a chuid eipeasóid go léir a scriosadh? Ní féidir é seo a chealú.",
     "confirm_archive_episode": "Cartlann {{title}}? Beidh sé i bhfolach ó liostaí podchraoltaí poiblí.",
-    "confirm_delete_episode": "An bhfuil fonn ort {{title}} a scriosadh? Ní féidir é seo a chealú."
+    "confirm_delete_episode": "An bhfuil fonn ort {{title}} a scriosadh? Ní féidir é seo a chealú.",
+    "readiness_subtitle": "{{title}} seicliosta",
+    "media_scan_status": "Scan: {{status}}",
+    "media_processing_status": "Meáin: {{status}}"
   },
   "fields": {
     "show": "Show",
@@ -113,7 +152,8 @@
     "episode_type": "Cineál eipeasóid",
     "transcript": "Transcript",
     "chapters": "Chapters",
-    "chapters_hint": "Caibidil amháin in aghaidh an líne, mar shampla: 00:30 Réamhrá"
+    "chapters_hint": "Caibidil amháin in aghaidh an líne, mar shampla: 00:30 Réamhrá",
+    "funding_url": "URL maoinithe"
   },
   "visibility": {
     "public": "Public",

@@ -28,6 +28,7 @@ class PodcastService
 {
     private const HOSTED_AUDIO_PLACEHOLDER = 'podcast-hosted://pending';
     private const HOSTED_AUDIO_ROUTE_TTL_SECONDS = 3600;
+    private const LISTEN_DEDUPE_WINDOW_HOURS = 6;
     private const ALLOWED_AUDIO_TYPES = [
         'audio/mpeg' => 'mp3',
         'audio/mp3' => 'mp3',
@@ -41,13 +42,14 @@ class PodcastService
     ];
 
     /**
-     * @param array{search?:string,page?:int,per_page?:int,include_member_only?:bool} $filters
+     * @param array{search?:string,category?:string,sort?:string,page?:int,per_page?:int,include_member_only?:bool} $filters
      * @return array{items:array,total:int,page:int,per_page:int}
      */
     public static function browse(array $filters = []): array
     {
         $page = max(1, (int) ($filters['page'] ?? 1));
         $perPage = min(50, max(1, (int) ($filters['per_page'] ?? 12)));
+        $sort = (string) ($filters['sort'] ?? 'newest');
 
         $query = PodcastShow::query()
             ->published()
@@ -69,12 +71,20 @@ class PodcastService
             });
         }
 
+        if (!empty($filters['category'])) {
+            $category = trim((string) $filters['category']);
+            $query->where('category', $category);
+        }
+
         $total = (clone $query)->count();
-        $items = $query->orderByDesc('published_at')
-            ->orderByDesc('id')
-            ->forPage($page, $perPage)
-            ->get()
-            ->toArray();
+        $query = match ($sort) {
+            'title' => $query->orderBy('title')->orderByDesc('id'),
+            'episodes' => $query->orderByDesc('approved_episode_count')->orderByDesc('published_at')->orderByDesc('id'),
+            'followers' => $query->orderByDesc('subscriber_count')->orderByDesc('published_at')->orderByDesc('id'),
+            default => $query->orderByDesc('published_at')->orderByDesc('id'),
+        };
+
+        $items = $query->forPage($page, $perPage)->get()->toArray();
 
         return [
             'items' => $items,
@@ -91,7 +101,7 @@ class PodcastService
     {
         $shows = PodcastShow::where('owner_user_id', $userId)
             ->with([
-                'episodes' => fn (Builder $q) => $q->with('chapters'),
+                'episodes' => fn ($q) => $q->with('chapters'),
             ])
             ->withCount('episodes')
             ->orderByDesc('updated_at')
@@ -479,7 +489,12 @@ class PodcastService
             }
         }
 
-        return $storage->url($path);
+        Log::warning('Podcast cloud temporary URL is unavailable; refusing private cloud media redirect', [
+            'episode_id' => $episode->id,
+            'disk' => $disk,
+        ]);
+
+        return null;
     }
 
     public static function archiveShow(PodcastShow $show): PodcastShow
@@ -573,16 +588,34 @@ class PodcastService
             return;
         }
 
+        $sessionHash = !empty($data['session_id']) ? self::privateHash((string) $data['session_id']) : null;
+        $userAgentHash = $userAgent ? self::privateHash($userAgent) : null;
+        $ipHash = $ip ? self::privateHash($ip) : null;
+        $listenedSeconds = max(0, (int) ($data['listened_seconds'] ?? 0));
+        $completed = filter_var($data['completed'] ?? false, FILTER_VALIDATE_BOOLEAN);
+
+        $existing = self::findRecentListen($episode, $userId, $sessionHash, $userAgentHash, $ipHash);
+        if ($existing) {
+            $existing->listened_seconds = max((int) $existing->listened_seconds, $listenedSeconds);
+            $existing->completed = (bool) $existing->completed || $completed;
+            $existing->client_family = $existing->client_family ?: self::clientFamily($userAgent);
+            $existing->retention_bucket = self::retentionBucket($episode, (int) $existing->listened_seconds);
+            $existing->user_agent_hash = $existing->user_agent_hash ?: $userAgentHash;
+            $existing->ip_hash = $existing->ip_hash ?: $ipHash;
+            $existing->save();
+            return;
+        }
+
         PodcastEpisodeListen::create([
             'episode_id' => $episode->id,
             'user_id' => $userId,
-            'session_hash' => !empty($data['session_id']) ? self::privateHash((string) $data['session_id']) : null,
-            'listened_seconds' => max(0, (int) ($data['listened_seconds'] ?? 0)),
-            'completed' => filter_var($data['completed'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            'session_hash' => $sessionHash,
+            'listened_seconds' => $listenedSeconds,
+            'completed' => $completed,
             'client_family' => self::clientFamily($userAgent),
-            'retention_bucket' => self::retentionBucket($episode, max(0, (int) ($data['listened_seconds'] ?? 0))),
-            'user_agent_hash' => $userAgent ? self::privateHash($userAgent) : null,
-            'ip_hash' => $ip ? self::privateHash($ip) : null,
+            'retention_bucket' => self::retentionBucket($episode, $listenedSeconds),
+            'user_agent_hash' => $userAgentHash,
+            'ip_hash' => $ipHash,
             'created_at' => now(),
         ]);
 
@@ -618,12 +651,14 @@ class PodcastService
     public static function toggleSubscription(PodcastShow $show, int $userId, bool $notifyNewEpisodes = true): bool
     {
         $existing = DB::table('podcast_show_subscriptions')
+            ->where('tenant_id', TenantContext::getId())
             ->where('show_id', $show->id)
             ->where('user_id', $userId)
             ->first();
 
         if ($existing) {
             DB::table('podcast_show_subscriptions')
+                ->where('tenant_id', TenantContext::getId())
                 ->where('id', $existing->id)
                 ->delete();
             self::refreshSubscriberCount($show);
@@ -645,6 +680,32 @@ class PodcastService
 
     public static function reportEpisode(PodcastEpisode $episode, int $userId, string $reason, ?string $details): array
     {
+        $existing = DB::table('podcast_episode_reports')
+            ->where('tenant_id', TenantContext::getId())
+            ->where('episode_id', $episode->id)
+            ->where('reporter_user_id', $userId)
+            ->where('status', 'open')
+            ->first();
+
+        if ($existing) {
+            DB::table('podcast_episode_reports')
+                ->where('tenant_id', TenantContext::getId())
+                ->where('id', $existing->id)
+                ->update([
+                    'reason' => self::nullableText($reason, 80) ?: 'other',
+                    'details' => self::nullableText($details, 2000),
+                    'updated_at' => now(),
+                ]);
+
+            $episode->moderation_status = 'flagged';
+            $episode->save();
+
+            return (array) DB::table('podcast_episode_reports')
+                ->where('tenant_id', TenantContext::getId())
+                ->where('id', $existing->id)
+                ->first();
+        }
+
         $id = DB::table('podcast_episode_reports')->insertGetId([
             'tenant_id' => TenantContext::getId(),
             'episode_id' => $episode->id,
@@ -723,9 +784,15 @@ class PodcastService
                 'completed_listens' => PodcastEpisodeListen::where('completed', true)->count(),
                 'completion_rate' => self::completionRate(),
                 'unique_listeners' => self::uniqueListeners(),
-                'open_reports' => DB::table('podcast_episode_reports')->where('status', 'open')->count(),
-                'subscribers' => DB::table('podcast_show_subscriptions')->count(),
+                'open_reports' => DB::table('podcast_episode_reports')
+                    ->where('tenant_id', TenantContext::getId())
+                    ->where('status', 'open')
+                    ->count(),
+                'subscribers' => DB::table('podcast_show_subscriptions')
+                    ->where('tenant_id', TenantContext::getId())
+                    ->count(),
                 'pending_media_scans' => PodcastEpisode::where('media_scan_status', 'pending')->count(),
+                'media_scan_unavailable' => PodcastEpisode::where('media_scan_status', 'scan_unavailable')->count(),
                 'pending_media_processing' => PodcastEpisode::where('media_processing_status', 'pending')->count(),
             ],
             'top_episodes' => self::topEpisodes(),
@@ -747,6 +814,9 @@ class PodcastService
             if (empty($show->{$field}) && ($field !== 'description' || empty($show->summary))) {
                 $warnings[] = "missing_{$field}";
             }
+        }
+        if (empty($show->artwork_url)) {
+            $warnings[] = 'missing_artwork';
         }
 
         $episodes = PodcastEpisode::where('show_id', $show->id)->published()->whereIn('visibility', ['inherit', 'public'])->get();
@@ -788,10 +858,28 @@ class PodcastService
 
     private static function openReports(): array
     {
-        return DB::table('podcast_episode_reports')
-            ->where('status', 'open')
-            ->orderByDesc('created_at')
+        return DB::table('podcast_episode_reports as reports')
+            ->leftJoin('podcast_episodes as episodes', function ($join): void {
+                $join->on('episodes.id', '=', 'reports.episode_id')
+                    ->where('episodes.tenant_id', TenantContext::getId());
+            })
+            ->leftJoin('podcast_shows as shows', function ($join): void {
+                $join->on('shows.id', '=', 'episodes.show_id')
+                    ->where('shows.tenant_id', TenantContext::getId());
+            })
+            ->leftJoin('users as reporter', 'reporter.id', '=', 'reports.reporter_user_id')
+            ->where('reports.tenant_id', TenantContext::getId())
+            ->where('reports.status', 'open')
+            ->orderByDesc('reports.created_at')
             ->limit(50)
+            ->select([
+                'reports.*',
+                'episodes.title as episode_title',
+                'episodes.slug as episode_slug',
+                'shows.title as show_title',
+                'shows.slug as show_slug',
+                'reporter.name as reporter_name',
+            ])
             ->get()
             ->map(fn ($row) => (array) $row)
             ->all();
@@ -1081,8 +1169,38 @@ class PodcastService
 
     private static function refreshSubscriberCount(PodcastShow $show): void
     {
-        $show->subscriber_count = DB::table('podcast_show_subscriptions')->where('show_id', $show->id)->count();
+        $show->subscriber_count = DB::table('podcast_show_subscriptions')
+            ->where('tenant_id', TenantContext::getId())
+            ->where('show_id', $show->id)
+            ->count();
         $show->save();
+    }
+
+    private static function findRecentListen(PodcastEpisode $episode, ?int $userId, ?string $sessionHash, ?string $userAgentHash, ?string $ipHash): ?PodcastEpisodeListen
+    {
+        $query = PodcastEpisodeListen::where('episode_id', $episode->id)
+            ->where('created_at', '>=', now()->subHours(self::LISTEN_DEDUPE_WINDOW_HOURS));
+
+        if ($sessionHash !== null) {
+            return (clone $query)->where('session_hash', $sessionHash)->first();
+        }
+
+        if ($userId !== null) {
+            return (clone $query)
+                ->where('user_id', $userId)
+                ->whereNull('session_hash')
+                ->first();
+        }
+
+        if ($userAgentHash !== null && $ipHash !== null) {
+            return (clone $query)
+                ->where('user_agent_hash', $userAgentHash)
+                ->where('ip_hash', $ipHash)
+                ->whereNull('session_hash')
+                ->first();
+        }
+
+        return null;
     }
 
     private static function notifySubscribersOfEpisode(PodcastEpisode $episode): void

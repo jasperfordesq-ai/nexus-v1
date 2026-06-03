@@ -3,16 +3,20 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { AlphaBadge, Avatar, Button, Card, CardBody, Chip, SearchField, Spinner } from '@/components/ui';
+import { AlphaBadge, Avatar, Button, Card, CardBody, Chip, SearchField, Select, SelectItem, Spinner } from '@/components/ui';
 import { useAuth, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { podcastsApi, type PodcastShow } from '@/lib/api/podcasts';
 import PodcastIcon from 'lucide-react/icons/podcast';
 import Plus from 'lucide-react/icons/plus';
 import Search from 'lucide-react/icons/search';
+
+type PodcastSort = 'newest' | 'title' | 'episodes' | 'followers';
+
+const SORT_OPTIONS: PodcastSort[] = ['newest', 'title', 'episodes', 'followers'];
 
 function showArtwork(show: PodcastShow): string | undefined {
   return show.artwork_url ?? undefined;
@@ -27,19 +31,29 @@ export default function PodcastsPage() {
   const [shows, setShows] = useState<PodcastShow[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [category, setCategory] = useState('');
+  const [sort, setSort] = useState<PodcastSort>('newest');
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
+  const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     podcastsApi
-      .browse({ q: searchTerm || undefined, page })
+      .browse({ q: searchTerm || undefined, category: category || undefined, sort, page })
       .then((res) => {
         if (cancelled) return;
         if (res.success && res.data) {
           setShows((prev) => (page === 1 ? res.data!.items : [...prev, ...res.data!.items]));
           setHasMore(res.data.has_more);
+          setCategoryOptions((prev) => {
+            const next = new Set(prev);
+            res.data!.items.forEach((show) => {
+              if (show.category) next.add(show.category);
+            });
+            return Array.from(next).sort((a, b) => a.localeCompare(b));
+          });
         } else {
           setShows([]);
           setHasMore(false);
@@ -52,11 +66,22 @@ export default function PodcastsPage() {
     return () => {
       cancelled = true;
     };
-  }, [searchTerm, page]);
+  }, [category, searchTerm, sort, page]);
 
   useEffect(() => {
     setPage(1);
-  }, [searchTerm]);
+  }, [category, searchTerm, sort]);
+
+  const activeFilterCount = useMemo(
+    () => [searchTerm.trim(), category].filter(Boolean).length,
+    [category, searchTerm],
+  );
+
+  function clearFilters(): void {
+    setSearchTerm('');
+    setCategory('');
+    setSort('newest');
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6">
@@ -81,7 +106,7 @@ export default function PodcastsPage() {
         )}
       </div>
 
-      <div className="mb-6 max-w-xl">
+      <div className="mb-6 grid gap-3 lg:grid-cols-[minmax(0,1fr)_14rem_12rem_auto]">
         <SearchField
           size="sm"
           value={searchTerm}
@@ -92,6 +117,35 @@ export default function PodcastsPage() {
           aria-label={t('browse.search_placeholder')}
           startContent={<Search size={16} className="text-muted" aria-hidden="true" />}
         />
+        <Select
+          size="sm"
+          aria-label={t('browse.category_label')}
+          selectedKeys={category ? [category] : ['']}
+          onSelectionChange={(keys) => setCategory((Array.from(keys)[0] as string) ?? '')}
+        >
+          <SelectItem id="">{t('browse.all_categories')}</SelectItem>
+          {categoryOptions.map((option) => (
+            <SelectItem key={option} id={option}>{option}</SelectItem>
+          ))}
+        </Select>
+        <Select
+          size="sm"
+          aria-label={t('browse.sort_label')}
+          selectedKeys={[sort]}
+          onSelectionChange={(keys) => setSort(((Array.from(keys)[0] as PodcastSort) || 'newest'))}
+        >
+          {SORT_OPTIONS.map((option) => (
+            <SelectItem key={option} id={option}>{t(`browse.sort.${option}`)}</SelectItem>
+          ))}
+        </Select>
+        <Button
+          size="sm"
+          variant="tertiary"
+          isDisabled={activeFilterCount === 0 && sort === 'newest'}
+          onPress={clearFilters}
+        >
+          {t('browse.clear_filters')}
+        </Button>
       </div>
 
       {loading ? (
@@ -127,7 +181,9 @@ export default function PodcastsPage() {
 
                   <div className="mt-auto flex flex-wrap items-center gap-2 text-xs text-muted">
                     <Chip size="sm" variant="soft">{t(`visibility.${show.visibility}`)}</Chip>
+                    {show.category ? <Chip size="sm" variant="soft">{show.category}</Chip> : null}
                     <span>{t('show.episode_count', { count: show.approved_episode_count ?? show.episode_count ?? 0 })}</span>
+                    <span>{t('show.follower_count', { count: show.subscriber_count ?? 0 })}</span>
                     {show.owner?.name ? <span>{t('show.byline', { name: show.owner.name })}</span> : null}
                   </div>
                 </CardBody>

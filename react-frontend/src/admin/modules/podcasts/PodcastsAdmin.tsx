@@ -12,9 +12,11 @@ import { useTranslation } from 'react-i18next';
 
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Flag from 'lucide-react/icons/flag';
+import HardDrive from 'lucide-react/icons/hard-drive';
 import Podcast from 'lucide-react/icons/podcast';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Rss from 'lucide-react/icons/rss';
+import ShieldCheck from 'lucide-react/icons/shield-check';
 import XCircle from 'lucide-react/icons/circle-x';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
@@ -55,6 +57,7 @@ interface PodcastAdminStats {
   open_reports: number;
   subscribers: number;
   pending_media_scans: number;
+  media_scan_unavailable: number;
   pending_media_processing: number;
 }
 
@@ -62,10 +65,23 @@ interface PodcastReport {
   id: number;
   episode_id: number;
   reporter_user_id: number;
+  episode_title?: string | null;
+  episode_slug?: string | null;
+  show_title?: string | null;
+  show_slug?: string | null;
+  reporter_name?: string | null;
   reason: string;
   details?: string | null;
   status: string;
   created_at?: string | null;
+}
+
+interface FeedValidationResult {
+  showId: number;
+  showTitle: string;
+  valid: boolean;
+  errors: string[];
+  warnings: string[];
 }
 
 interface PodcastBreakdown {
@@ -104,6 +120,13 @@ function formatDate(value?: string | null): string {
   return new Date(value).toLocaleDateString();
 }
 
+function feedIssueKey(issue: string): string {
+  if (/^episode_\d+_missing_audio_url$/.test(issue)) return 'episode_missing_audio_url';
+  if (/^episode_\d+_missing_audio_length$/.test(issue)) return 'episode_missing_audio_length';
+  if (/^episode_\d+_missing_audio_mime$/.test(issue)) return 'episode_missing_audio_mime';
+  return issue;
+}
+
 export default function PodcastsAdmin() {
   const { t } = useTranslation('admin');
   usePageTitle(t('podcasts_admin.title'));
@@ -113,6 +136,7 @@ export default function PodcastsAdmin() {
   const [filter, setFilter] = useState<ModerationFilter>('all');
   const [loading, setLoading] = useState(true);
   const [actionKey, setActionKey] = useState<string | null>(null);
+  const [feedValidation, setFeedValidation] = useState<FeedValidationResult | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -151,8 +175,52 @@ export default function PodcastsAdmin() {
       { key: 'open_reports', label: t('podcasts_admin.stats.open_reports'), value: data.stats.open_reports },
       { key: 'subscribers', label: t('podcasts_admin.stats.subscribers'), value: data.stats.subscribers },
       { key: 'pending_media_scans', label: t('podcasts_admin.stats.pending_media_scans'), value: data.stats.pending_media_scans },
+      { key: 'media_scan_unavailable', label: t('podcasts_admin.stats.media_scan_unavailable'), value: data.stats.media_scan_unavailable },
       { key: 'pending_media_processing', label: t('podcasts_admin.stats.pending_media_processing'), value: data.stats.pending_media_processing },
     ];
+  }, [data, t]);
+
+  const readiness = useMemo(() => {
+    if (!data) return [];
+
+    return [
+      {
+        key: 'moderation',
+        icon: ShieldCheck,
+        label: t('podcasts_admin.readiness.moderation'),
+        value: data.stats.pending_shows + data.stats.pending_episodes,
+        detail: t('podcasts_admin.readiness.pending_items', {
+          count: data.stats.pending_shows + data.stats.pending_episodes,
+        }),
+        color: data.stats.pending_shows + data.stats.pending_episodes > 0 ? 'warning' : 'success',
+      },
+      {
+        key: 'reports',
+        icon: Flag,
+        label: t('podcasts_admin.readiness.reports'),
+        value: data.stats.open_reports,
+        detail: t('podcasts_admin.readiness.open_reports', { count: data.stats.open_reports }),
+        color: data.stats.open_reports > 0 ? 'danger' : 'success',
+      },
+      {
+        key: 'media',
+        icon: HardDrive,
+        label: t('podcasts_admin.readiness.media'),
+        value: data.stats.pending_media_scans + data.stats.media_scan_unavailable + data.stats.pending_media_processing,
+        detail: t('podcasts_admin.readiness.media_jobs', {
+          count: data.stats.pending_media_scans + data.stats.media_scan_unavailable + data.stats.pending_media_processing,
+        }),
+        color: data.stats.pending_media_scans + data.stats.media_scan_unavailable + data.stats.pending_media_processing > 0 ? 'warning' : 'success',
+      },
+      {
+        key: 'rss',
+        icon: Rss,
+        label: t('podcasts_admin.readiness.rss'),
+        value: data.stats.published_shows,
+        detail: t('podcasts_admin.readiness.rss_ready', { count: data.stats.published_shows }),
+        color: data.stats.published_shows > 0 ? 'success' : 'default',
+      },
+    ] as const;
   }, [data, t]);
 
   const moderate = async (type: 'show' | 'episode', id: number, action: ModerationAction) => {
@@ -200,6 +268,13 @@ export default function PodcastsAdmin() {
     try {
       const res = await podcastsApi.validateFeed(show.id);
       if (res.success && res.data) {
+        setFeedValidation({
+          showId: show.id,
+          showTitle: show.title,
+          valid: res.data.valid,
+          errors: res.data.errors,
+          warnings: res.data.warnings,
+        });
         if (res.data.valid) {
           toast.success(t('podcasts_admin.toasts.feed_valid'));
         } else {
@@ -336,6 +411,66 @@ export default function PodcastsAdmin() {
             ))}
           </div>
 
+          <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            {readiness.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Card key={item.key}>
+                  <CardBody className="flex flex-row items-start gap-3 p-4">
+                    <div className="rounded-md bg-surface-secondary p-2 text-accent">
+                      <Icon size={18} aria-hidden="true" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-semibold text-foreground">{item.label}</p>
+                        <Chip size="sm" variant="soft" color={item.color}>
+                          {item.value}
+                        </Chip>
+                      </div>
+                      <p className="mt-1 text-xs text-muted">{item.detail}</p>
+                    </div>
+                  </CardBody>
+                </Card>
+              );
+            })}
+          </section>
+
+          {feedValidation && (
+            <Card>
+              <CardBody className="space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <h2 className="text-lg font-semibold">{t('podcasts_admin.feed_validation.title')}</h2>
+                    <p className="text-sm text-muted">{t('podcasts_admin.feed_validation.subtitle', { title: feedValidation.showTitle })}</p>
+                  </div>
+                  <Chip size="sm" variant="soft" color={feedValidation.valid ? 'success' : 'danger'}>
+                    {feedValidation.valid ? t('podcasts_admin.feed_validation.valid') : t('podcasts_admin.feed_validation.invalid')}
+                  </Chip>
+                </div>
+                {feedValidation.errors.length > 0 && (
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{t('podcasts_admin.feed_validation.errors')}</p>
+                    <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-muted">
+                      {feedValidation.errors.map((issue) => (
+                        <li key={issue}>{t(`podcasts_admin.feed_issues.${feedIssueKey(issue)}`, { defaultValue: issue })}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {feedValidation.warnings.length > 0 && (
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{t('podcasts_admin.feed_validation.warnings')}</p>
+                    <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-muted">
+                      {feedValidation.warnings.map((issue) => (
+                        <li key={issue}>{t(`podcasts_admin.feed_issues.${feedIssueKey(issue)}`, { defaultValue: issue })}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </CardBody>
+            </Card>
+          )}
+
           <section>
             <div className="mb-3 flex items-center justify-between gap-3">
               <h2 className="text-lg font-semibold">{t('podcasts_admin.sections.top_episodes')}</h2>
@@ -432,7 +567,17 @@ export default function PodcastsAdmin() {
                 <TableBody>
                   {data.reports.map((report) => (
                     <TableRow key={report.id}>
-                      <TableCell>{report.episode_id}</TableCell>
+                      <TableCell>
+                        <div className="min-w-0">
+                          <div className="truncate font-medium text-foreground">
+                            {report.episode_title ?? t('podcasts_admin.report_unknown_episode', { id: report.episode_id })}
+                          </div>
+                          <div className="truncate text-xs text-muted">
+                            {report.show_title ?? t('podcasts_admin.empty_value')}
+                            {report.reporter_name ? ` - ${t('podcasts_admin.reporter', { name: report.reporter_name })}` : ''}
+                          </div>
+                        </div>
+                      </TableCell>
                       <TableCell>{report.reason}</TableCell>
                       <TableCell>{report.details || t('podcasts_admin.empty_value')}</TableCell>
                       <TableCell>{formatDate(report.created_at) || t('podcasts_admin.empty_value')}</TableCell>

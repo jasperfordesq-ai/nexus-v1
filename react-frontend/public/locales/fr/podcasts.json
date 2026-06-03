@@ -3,13 +3,24 @@
   "subtitle": "Émissions communautaires, histoires audio, interviews et connaissances locales des membres.",
   "actions": {
     "back_to_podcasts": "Retour aux podcasts",
-    "back_to_show": "Retour au spectacle"
+    "back_to_show": "Retour au spectacle",
+    "cancel": "Annuler"
   },
   "browse": {
     "search_placeholder": "Rechercher des émissions",
+    "all_categories": "Toutes les catégories",
+    "sort_label": "Trier les émissions",
+    "sort": {
+      "episodes": "La plupart des épisodes",
+      "followers": "Les plus suivis",
+      "newest": "Le plus récent",
+      "title": "A à Z"
+    },
     "empty": "Aucune émission de podcast pour l'instant",
     "empty_hint": "Lorsque les membres publient des émissions approuvées, elles apparaîtront ici.",
-    "load_more": "Charger plus"
+    "load_more": "Charger plus",
+    "category_label": "Catégorie",
+    "clear_filters": "Clair"
   },
   "show": {
     "not_found": "Émission de podcast introuvable",
@@ -25,7 +36,9 @@
     "unsubscribed": "Afficher non suivi.",
     "subscribe_failed": "Impossible de mettre à jour les préférences de suivi.",
     "episodes": "Episodes",
-    "no_episodes": "Aucun épisode publié pour l'instant."
+    "no_episodes": "Aucun épisode publié pour l'instant.",
+    "follower_count_one": "{{count}} abonné",
+    "follower_count_other": "{{count}} abonnés"
   },
   "episode": {
     "title": "Épisode de podcast",
@@ -48,20 +61,24 @@
     "report_reasons": {
       "safety": "Sécurité ou préjudice",
       "spam": "Spam ou contenu trompeur",
-      "rights": "Problème de droits d'auteur ou de droits"
+      "rights": "Problème de droits d'auteur ou de droits",
+      "other": "Autre"
     },
     "type": {
       "full": "Épisode complet",
       "trailer": "Trailer",
       "bonus": "Bonus"
-    }
+    },
+    "report": "Rapport",
+    "report_reason": "Raison"
   },
   "player": {
     "unsupported": "Votre navigateur ne prend pas en charge le lecteur audio.",
     "duration_unknown": "Durée inconnue",
     "progress": "Progression de la lecture",
     "skip_back": "Retour 15s",
-    "skip_forward": "Avancer de 30 s"
+    "skip_forward": "Avancer de 30 s",
+    "speed": "{{taux}}x"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -78,6 +95,25 @@
     "delete_show": "Supprimer l'émission",
     "archive_episode": "Archiver l'épisode",
     "delete_episode": "Supprimer l'épisode",
+    "readiness_title": "Montrer la préparation",
+    "readiness": {
+      "public_show": "L'émission est publiée, publique et approuvée",
+      "owner_email": "L'adresse e-mail du propriétaire de l'annuaire est définie",
+      "description": "L'émission contient un résumé ou une description",
+      "artwork": "L'URL d'affichage de l'illustration est définie",
+      "published_episode": "Au moins un épisode approuvé est publié"
+    },
+    "media_status": {
+      "not_required": "Non requis",
+      "pending": "En attente",
+      "complete": "Complet",
+      "clean": "Faire le ménage",
+      "failed": "Échoué",
+      "blocked": "Bloqué",
+      "infected": "Bloqué",
+      "ready_for_processing": "Pr?t pour le traitement",
+      "scan_unavailable": "Analyseur indisponible"
+    },
     "show_created": "Spectacle créé.",
     "show_published": "Spectacle publié.",
     "show_archived": "Spectacle archivé.",
@@ -90,7 +126,10 @@
     "confirm_archive_show": "Archiver {{title}} ? Il sera masqué des listes de podcasts publiques.",
     "confirm_delete_show": "Supprimer {{title}} et tous ses épisodes ? Cela ne peut pas être annulé.",
     "confirm_archive_episode": "Archiver {{title}} ? Il sera masqué des listes de podcasts publiques.",
-    "confirm_delete_episode": "Supprimer {{title}} ? Cela ne peut pas être annulé."
+    "confirm_delete_episode": "Supprimer {{title}} ? Cela ne peut pas être annulé.",
+    "readiness_subtitle": "{{title}} liste de contrôle",
+    "media_scan_status": "Analyse : {{statut}}",
+    "media_processing_status": "Médias : {{status}}"
   },
   "fields": {
     "show": "Show",
@@ -113,7 +152,8 @@
     "episode_type": "Type d'épisode",
     "transcript": "Transcript",
     "chapters": "Chapters",
-    "chapters_hint": "Un chapitre par ligne, par exemple : 00:30 Introductions"
+    "chapters_hint": "Un chapitre par ligne, par exemple : 00:30 Introductions",
+    "funding_url": "URL de financement"
   },
   "visibility": {
     "public": "Public",
