@@ -245,8 +245,10 @@ describe('MoreScreen (More tab)', () => {
   });
 
   it('renders My Space section with profile navigation items', () => {
-    const { getByText } = render(<MoreScreen />);
+    const { getByLabelText, getByText, queryByText } = render(<MoreScreen />);
     expect(getByText('My Space')).toBeTruthy();
+    expect(queryByText('My Profile')).toBeNull();
+    fireEvent.press(getByLabelText('My Space'));
     expect(getByText('My Profile')).toBeTruthy();
     expect(getByText('Wallet')).toBeTruthy();
     expect(getByText('Messages')).toBeTruthy();
@@ -271,7 +273,7 @@ describe('MoreScreen (More tab)', () => {
     expect(getByText('Group exchanges')).toBeTruthy();
     expect(getByText('Browse Members')).toBeTruthy();
     expect(getByText('Volunteering')).toBeTruthy();
-    expect(getByText('Blog')).toBeTruthy();
+    expect(queryByText('Blog')).toBeNull();
     expect(getByText('Skills & Endorsements')).toBeTruthy();
     expect(getByText('AI Assistant')).toBeTruthy();
   });
@@ -302,19 +304,22 @@ describe('MoreScreen (More tab)', () => {
     expect(queryByText('Seller payments')).toBeNull();
   });
 
-  it('keeps non-marketplace More sections visible without accordion interaction', () => {
-    const { getAllByText, getByText } = render(<MoreScreen />);
+  it('keeps My Space collapsed above Account until opened', () => {
+    const { getAllByText, getByLabelText, getByText, queryByText } = render(<MoreScreen />);
 
     expect(getByText('My Space')).toBeTruthy();
+    expect(queryByText('My Profile')).toBeNull();
+    expect(getAllByText('Account').length).toBeGreaterThanOrEqual(1);
+
+    fireEvent.press(getByLabelText('My Space'));
     expect(getByText('My Profile')).toBeTruthy();
-    expect(getAllByText('Partner communities').length).toBeGreaterThanOrEqual(1);
-    expect(getByText('Federation hub')).toBeTruthy();
   });
 
   it('renders direct federation shortcuts in the partner communities section', () => {
-    const { getAllByText, getByText } = render(<MoreScreen />);
+    const { getByLabelText, getByText } = render(<MoreScreen />);
 
-    expect(getAllByText('Partner communities').length).toBeGreaterThanOrEqual(1);
+    expect(getByText('Partner communities')).toBeTruthy();
+    fireEvent.press(getByLabelText('Partner communities'));
     expect(getByText('Federation hub')).toBeTruthy();
     expect(getByText('Federated members')).toBeTruthy();
     expect(getByText('Federation connections')).toBeTruthy();
@@ -328,6 +333,7 @@ describe('MoreScreen (More tab)', () => {
   it('opens federated members directly from the partner communities shortcuts', () => {
     const { getByLabelText } = render(<MoreScreen />);
 
+    fireEvent.press(getByLabelText('Partner communities'));
     fireEvent.press(getByLabelText('Federated members'));
 
     expect(router.push).toHaveBeenCalledWith('/(modals)/federation-members');
@@ -342,7 +348,7 @@ describe('MoreScreen (More tab)', () => {
   it('hides More menu buttons when their backend module is disabled', () => {
     mockHasModule.mockImplementation((module: string) => !['wallet', 'messages', 'notifications', 'listings', 'settings'].includes(module));
 
-    const { getByText, queryByText } = render(<MoreScreen />);
+    const { getByLabelText, getByText, queryByText } = render(<MoreScreen />);
 
     expect(queryByText('Wallet')).toBeNull();
     expect(queryByText('Messages')).toBeNull();
@@ -355,7 +361,7 @@ describe('MoreScreen (More tab)', () => {
   it('hides More menu buttons when their backend feature is disabled', () => {
     mockHasFeature.mockImplementation((feature: string) => !['marketplace', 'events', 'groups', 'volunteering', 'blog', 'ai_chat', 'federation'].includes(feature));
 
-    const { getByText, queryByText } = render(<MoreScreen />);
+    const { getByLabelText, queryByText } = render(<MoreScreen />);
 
     expect(queryByText('Browse marketplace')).toBeNull();
     expect(queryByText('Events')).toBeNull();
@@ -364,7 +370,8 @@ describe('MoreScreen (More tab)', () => {
     expect(queryByText('Blog')).toBeNull();
     expect(queryByText('AI Assistant')).toBeNull();
     expect(queryByText('Federation')).toBeNull();
-    expect(getByText('Wallet')).toBeTruthy();
+    fireEvent.press(getByLabelText('My Space'));
+    expect(queryByText('Wallet')).toBeTruthy();
   });
 
   it('renders the Sign out button', () => {

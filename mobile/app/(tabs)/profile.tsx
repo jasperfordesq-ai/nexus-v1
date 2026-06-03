@@ -9,7 +9,7 @@ import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
-import { Button as HeroButton, Card as HeroCard, Chip, Text } from 'heroui-native';
+import { Accordion, Button as HeroButton, Card as HeroCard, Chip, Text } from 'heroui-native';
 
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useTenant, usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -45,7 +45,6 @@ const MY_SPACE: MenuItem[] = [
 
 const DISCOVER: MenuItem[] = [
   { labelKey: 'discover', descriptionKey: 'navDescriptions.discover', icon: 'compass-outline', route: '/(tabs)/explore', tone: '#0ea5e9' },
-  { labelKey: 'marketplaceBrowse', descriptionKey: 'navDescriptions.marketplaceBrowse', icon: 'bag-handle-outline', route: '/(modals)/marketplace' as Href, tone: '#0ea5e9', featureGate: 'marketplace' },
   { labelKey: 'search', descriptionKey: 'navDescriptions.search', icon: 'search-outline', route: '/(modals)/search', tone: '#64748b', featureGate: 'search' },
   { labelKey: 'listings', descriptionKey: 'navDescriptions.listings', icon: 'storefront-outline', route: '/(tabs)/exchanges', tone: '#0f766e', moduleGate: 'listings' },
   { labelKey: 'jobs', descriptionKey: 'navDescriptions.jobs', icon: 'briefcase-outline', route: '/(modals)/jobs', tone: '#2563eb', featureGate: 'job_vacancies' },
@@ -58,10 +57,10 @@ const DISCOVER: MenuItem[] = [
   { labelKey: 'connections', descriptionKey: 'navDescriptions.connections', icon: 'person-add-outline', route: '/(modals)/connections' as Href, tone: '#6366f1', featureGate: 'connections' },
   { labelKey: 'volunteering', descriptionKey: 'navDescriptions.volunteering', icon: 'heart-outline', route: '/(modals)/volunteering', tone: '#e11d48', featureGate: 'volunteering' },
   { labelKey: 'organisations', descriptionKey: 'navDescriptions.organisations', icon: 'business-outline', route: '/(modals)/organisations', tone: '#6366f1', featureGate: 'organisations' },
-  { labelKey: 'blog', descriptionKey: 'navDescriptions.blog', icon: 'newspaper-outline', route: '/(modals)/blog', tone: '#f97316', featureGate: 'blog' },
   { labelKey: 'support.title', descriptionKey: 'navDescriptions.support', icon: 'help-circle-outline', route: '/(modals)/support' as Href, tone: '#0ea5e9' },
   { labelKey: 'skills', descriptionKey: 'navDescriptions.skills', icon: 'ribbon-outline', route: '/(modals)/skills' as Href, tone: '#10b981' },
   { labelKey: 'aiChat', descriptionKey: 'navDescriptions.aiChat', icon: 'sparkles-outline', route: '/(modals)/chat', tone: '#a855f7', featureGate: 'ai_chat' },
+  { labelKey: 'marketplaceBrowse', descriptionKey: 'navDescriptions.marketplaceBrowse', icon: 'bag-handle-outline', route: '/(modals)/marketplace' as Href, tone: '#0ea5e9', featureGate: 'marketplace' },
 ];
 
 const FEDERATION: MenuItem[] = [
@@ -99,6 +98,10 @@ export default function MoreScreen() {
   const visibleMySpace = MY_SPACE.filter(isMenuItemVisible);
   const visibleFederation = FEDERATION.filter(isMenuItemVisible);
   const visibleAccount = ACCOUNT.filter(isMenuItemVisible);
+  const collapsibleSections = [
+    { title: t('federationSection'), value: 'federation', icon: 'git-network-outline' as IoniconName, items: visibleFederation },
+    { title: t('mySpace'), value: 'my-space', icon: 'person-circle-outline' as IoniconName, items: visibleMySpace },
+  ].filter((section) => section.items.length > 0);
 
   function navigate(route: Href) {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -171,9 +174,8 @@ export default function MoreScreen() {
           <MetricCard icon="shield-checkmark-outline" label={t('quickStats.account')} value={t('quickStats.ready')} tone="#22c55e" theme={theme} />
         </View>
 
-        <MenuSection title={t('mySpace')} items={visibleMySpace} onNavigate={navigate} theme={theme} />
         <MenuSection title={t('discover')} items={visibleDiscover} onNavigate={navigate} theme={theme} />
-        <MenuSection title={t('federationSection')} items={visibleFederation} onNavigate={navigate} theme={theme} />
+        <CollapsibleMenuSections sections={collapsibleSections} onNavigate={navigate} theme={theme} />
         <MenuSection title={t('account')} items={visibleAccount} onNavigate={navigate} theme={theme} />
 
         <HeroButton variant="danger" onPress={confirmLogout} className="mt-1">
@@ -219,6 +221,72 @@ function MenuSection({ title, items, onNavigate, theme }: { title: string; items
         </HeroCard.Body>
       </HeroCard>
     </View>
+  );
+}
+
+function CollapsibleMenuSections({
+  sections,
+  onNavigate,
+  theme,
+}: {
+  sections: Array<{ title: string; value: string; icon: IoniconName; items: MenuItem[] }>;
+  onNavigate: (route: Href) => void;
+  theme: Theme;
+}) {
+  if (sections.length === 0) return null;
+
+  return (
+    <Accordion selectionMode="single" variant="surface" hideSeparator className="mb-4 overflow-hidden rounded-panel">
+      {sections.map((section) => (
+        <CollapsibleMenuSection key={section.value} {...section} onNavigate={onNavigate} theme={theme} />
+      ))}
+    </Accordion>
+  );
+}
+
+function CollapsibleMenuSection({
+  title,
+  value,
+  icon,
+  items,
+  onNavigate,
+  theme,
+}: {
+  title: string;
+  value: string;
+  icon: IoniconName;
+  items: MenuItem[];
+  onNavigate: (route: Href) => void;
+  theme: Theme;
+}) {
+  if (items.length === 0) return null;
+
+  return (
+    <Accordion.Item value={value}>
+      <Accordion.Trigger className="px-4 py-4" accessibilityLabel={title}>
+        <View className="min-w-0 flex-1 flex-row items-center gap-3">
+          <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(theme.text, 0.08) }}>
+            <Ionicons name={icon} size={18} color={theme.textSecondary} />
+          </View>
+          <View className="min-w-0 flex-1">
+            <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>
+              {title}
+            </Text>
+          </View>
+          <Chip size="sm" variant="secondary">
+            <Chip.Label>{items.length}</Chip.Label>
+          </Chip>
+        </View>
+        <Accordion.Indicator iconProps={{ color: theme.textSecondary }} />
+      </Accordion.Trigger>
+      <Accordion.Content className="px-2 pb-2">
+        <View className="gap-2">
+          {items.map((item) => (
+            <MenuRow key={item.labelKey} item={item} onPress={() => onNavigate(item.route)} theme={theme} />
+          ))}
+        </View>
+      </Accordion.Content>
+    </Accordion.Item>
   );
 }
 
