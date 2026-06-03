@@ -79,6 +79,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { DesktopMenuItems } from '@/components/navigation';
 import { SearchOverlay } from '@/components/layout/SearchOverlay';
 import { MegaMenu } from '@/components/layout/MegaMenu';
+import { DesktopNavPanel, type DesktopNavPanelSection } from '@/components/layout/DesktopNavPanel';
 import { ThemePicker } from '@/components/layout/ThemePicker';
 import { NotificationFlyout } from '@/components/layout/NotificationFlyout';
 import { TenantLogo } from '@/components/branding';
@@ -291,7 +292,6 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
       items.push({ label: t('nav.dashboard'), desc: t('nav_desc.dashboard'), path: '/dashboard', href: tenantPath('/dashboard'), icon: LayoutDashboard });
     }
     items.push(
-      { label: t('nav.caring_community'), desc: t('nav_desc.caring_community'), path: CARING_COMMUNITY_ROUTE.href, href: tenantPath(CARING_COMMUNITY_ROUTE.href), icon: Heart, feature: CARING_COMMUNITY_ROUTE.feature },
       { label: t('nav.members'), desc: t('nav_desc.members'), path: '/members', href: tenantPath('/members'), icon: Users, feature: 'connections' as const },
       { label: t('nav.connections'), desc: t('nav_desc.connections'), path: '/connections', href: tenantPath('/connections'), icon: Users2, feature: 'connections' as const },
       { label: t('nav.events'), desc: t('nav_desc.events'), path: '/events', href: tenantPath('/events'), icon: Calendar, feature: 'events' as const },
@@ -302,6 +302,9 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     if (isAuthenticated && hasFeature('federation')) {
       items.push({ label: t('nav.partner_communities'), desc: t('nav_desc.partner_communities'), path: '/federation', href: tenantPath('/federation'), icon: Building2, feature: 'federation' as const });
     }
+    items.push(
+      { label: t('nav.caring_community'), desc: t('nav_desc.caring_community'), path: CARING_COMMUNITY_ROUTE.href, href: tenantPath(CARING_COMMUNITY_ROUTE.href), icon: Heart, feature: CARING_COMMUNITY_ROUTE.feature },
+    );
     items.push(
       { label: t('nav.resources'), desc: t('nav_desc.resources'), path: '/resources', href: tenantPath('/resources'), icon: FolderOpen, feature: 'resources' as const },
       { label: t('nav.jobs'), desc: t('nav_desc.jobs'), path: '/jobs', href: tenantPath('/jobs'), icon: Briefcase, feature: 'job_vacancies' as const },
@@ -316,6 +319,54 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     () => communityItems.filter(item => !item.feature || hasFeature(item.feature)),
     [communityItems, hasFeature],
   );
+  const communityLeftSections = useMemo<DesktopNavPanelSection[]>(() => {
+    const mainPaths = new Set(['/dashboard']);
+    const communityPathsSet = new Set(['/members', '/connections', '/events', '/groups', '/volunteering', '/federation', CARING_COMMUNITY_ROUTE.href]);
+    const toPanelItem = (item: CommunityNavItem) => ({
+      label: item.label,
+      desc: item.desc,
+      href: item.href,
+      icon: item.icon,
+    });
+    const mainItems = visibleCommunityItems
+      .filter(item => mainPaths.has(item.path))
+      .map(toPanelItem);
+    const localCommunityItems = visibleCommunityItems
+      .filter(item => communityPathsSet.has(item.path))
+      .map(toPanelItem);
+
+    return [
+      ...(mainItems.length > 0 ? [{
+        key: 'main',
+        title: t('sections.main'),
+        items: mainItems,
+      }] : []),
+      ...(localCommunityItems.length > 0 ? [{
+        key: 'community',
+        title: t('sections.community'),
+        items: localCommunityItems,
+      }] : []),
+    ];
+  }, [visibleCommunityItems, t]);
+  const communityRightSections = useMemo<DesktopNavPanelSection[]>(() => {
+    const mainPaths = new Set(['/dashboard']);
+    const communityPathsSet = new Set(['/members', '/connections', '/events', '/groups', '/volunteering', '/federation', CARING_COMMUNITY_ROUTE.href]);
+    const toPanelItem = (item: CommunityNavItem) => ({
+      label: item.label,
+      desc: item.desc,
+      href: item.href,
+      icon: item.icon,
+    });
+    const exploreItems = visibleCommunityItems
+      .filter(item => !mainPaths.has(item.path) && !communityPathsSet.has(item.path))
+      .map(toPanelItem);
+
+    return exploreItems.length > 0 ? [{
+      key: 'explore',
+      title: t('sections.explore'),
+      items: exploreItems,
+    }] : [];
+  }, [visibleCommunityItems, t]);
 
   // Helper to filter items by feature/module gates
   const gateFilter = useCallback((item: Record<string, unknown> & { feature?: string; module?: string }) => {
@@ -663,44 +714,17 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
 
               {/* Community Dropdown — always visible on desktop */}
               {visibleCommunityItems.length > 0 && (
-                <Dropdown placement="bottom-start" isOpen={communityOpen} onOpenChange={handleCommunityOpenChange} shouldBlockScroll={false}>
-                  <DropdownTrigger>
-                    <Button
-                      variant="light"
-                      size="sm"
-                      className={`flex items-center gap-1 px-3 py-2 text-sm font-medium transition-all ${
-                        isActiveGroup(communityPaths)
-                          ? 'bg-theme-active text-theme-primary'
-                          : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
-                      }`}
-                      endContent={<ChevronDown className="w-3 h-3" aria-hidden="true" />}
-                    >
-                      <Users className="w-4 h-4" aria-hidden="true" />
-                      {t('nav.community')}
-                    </Button>
-                  </DropdownTrigger>
-                  <DropdownMenu
-                    aria-label={t('aria.community_navigation')}
-                    className="min-w-[220px]"
-                    classNames={{
-                      base: 'bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-xl max-h-[70vh] overflow-y-auto',
-                    }}
-                    onAction={(key) => {
-                      dropdownNavigate(String(key));
-                    }}
-                  >
-                    {visibleCommunityItems.map((item) => (
-                      <DropdownItem
-                        key={item.href} id={item.href}
-                        description={item.desc}
-                        startContent={<item.icon className="w-4 h-4" aria-hidden="true" />}
-                        className={location.pathname.startsWith(item.href) ? 'bg-theme-active' : ''}
-                      >
-                        {item.label}
-                      </DropdownItem>
-                    ))}
-                  </DropdownMenu>
-                </Dropdown>
+                <DesktopNavPanel
+                  ariaLabel={t('aria.community_navigation')}
+                  isActive={isActiveGroup(communityPaths)}
+                  isOpen={communityOpen}
+                  leftSections={communityLeftSections}
+                  onNavigate={dropdownNavigate}
+                  onOpenChange={handleCommunityOpenChange}
+                  rightSections={communityRightSections}
+                  triggerIcon={Users}
+                  triggerLabel={t('nav.community')}
+                />
               )}
 
               {/* More — Multi-column mega menu */}

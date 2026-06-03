@@ -94,17 +94,35 @@ const i18nMap: Record<string, string> = {
   'nav.timebanking': 'Timebanking',
   'nav.messages': 'Messages',
   'nav.community': 'Community',
+  'nav.caring_community': 'Caring Community',
+  'nav.members': 'Members',
+  'nav.connections': 'Connections',
+  'nav.events': 'Events',
+  'nav.groups': 'Groups',
+  'nav.resources': 'Resources',
+  'nav.marketplace': 'Marketplace',
   'nav.more': 'More',
   'nav.ideation': 'Ideas',
   'nav.partner_communities': 'Partner Communities',
   'nav.courses': 'Courses',
   'nav.podcasts': 'Podcasts',
   'nav.premium': 'Premium',
+  'nav_desc.dashboard': 'Your personalised home overview',
+  'nav_desc.caring_community': 'Time banking, care support, organisations, and impact',
+  'nav_desc.members': 'Browse community members',
+  'nav_desc.connections': 'Your connections & requests',
+  'nav_desc.events': 'Upcoming community events',
+  'nav_desc.groups': 'Join interest groups',
+  'nav_desc.resources': 'Shared files & documents',
+  'nav_desc.marketplace': 'Buy & sell in your community',
   'nav_desc.ideation': 'Ideas & innovation challenges',
   'nav_desc.partner_communities': 'Federation Hub',
   'nav_desc.courses': 'Community learning',
   'nav_desc.podcasts': 'Community shows and episodes',
   'nav_desc.premium': 'Premium member benefits',
+  'sections.main': 'Main',
+  'sections.community': 'Community',
+  'sections.explore': 'Explore',
   'nav.unread_notifications': 'Notifications, 5 unread',
   'nav.accessibility_alpha': 'Accessibility (alpha)',
   'theme_picker.open_label': 'Theme',
@@ -553,6 +571,35 @@ describe('Navbar', () => {
       expect(screen.getByText('Community')).toBeInTheDocument();
     });
 
+    it('groups Community links into the shared desktop navigation panel', async () => {
+      const user = userEvent.setup();
+      setupDefaultMocks({
+        auth: { user: { id: 1, first_name: 'A', last_name: 'B', email: 'a@b.com', role: 'member' }, isAuthenticated: true },
+        tenant: {
+          hasFeature: vi.fn((feature: string) => [
+            'connections',
+            'events',
+            'groups',
+            'resources',
+            'marketplace',
+          ].includes(feature)),
+          hasModule: vi.fn((module: string) => module === 'dashboard'),
+        },
+      });
+
+      render(<Navbar />);
+      await user.click(screen.getByRole('button', { name: 'Community' }));
+
+      const panel = screen.getByRole('navigation', { name: 'Community navigation' });
+      expect(panel.className).toContain('desktop-nav-panel');
+      expect(screen.getByText('Main')).toBeInTheDocument();
+      expect(screen.getAllByText('Community').length).toBeGreaterThanOrEqual(2);
+      expect(screen.getByText('Explore')).toBeInTheDocument();
+
+      const membersItem = screen.getByRole('button', { name: /^Members\b/ });
+      expect(membersItem.className).toContain('desktop-nav-panel-item');
+    });
+
     it('does NOT render Community dropdown when no community features are enabled', () => {
       setupDefaultMocks({
         tenant: {
@@ -583,6 +630,38 @@ describe('Navbar', () => {
       });
     });
 
+    it('places Caring Community underneath Partner Communities in the Community section', async () => {
+      const user = userEvent.setup();
+      setupDefaultMocks({
+        auth: { user: { id: 1, first_name: 'A', last_name: 'B', email: 'a@b.com', role: 'member' }, isAuthenticated: true },
+        tenant: {
+          hasFeature: vi.fn((feature: string) => [
+            'connections',
+            'events',
+            'groups',
+            'volunteering',
+            'federation',
+            'caring_community',
+          ].includes(feature)),
+          hasModule: vi.fn(() => false),
+        },
+      });
+
+      render(<Navbar />);
+      await user.click(screen.getByRole('button', { name: 'Community' }));
+
+      const panel = screen.getByRole('navigation', { name: 'Community navigation' });
+      expect(screen.queryByText('Main')).not.toBeInTheDocument();
+
+      const itemLabels = Array.from(panel.querySelectorAll('[data-desktop-nav-item]'))
+        .map(item => item.textContent ?? '');
+      const partnerIndex = itemLabels.findIndex(label => label.includes('Partner Communities'));
+      const caringIndex = itemLabels.findIndex(label => label.includes('Caring Community'));
+
+      expect(partnerIndex).toBeGreaterThanOrEqual(0);
+      expect(caringIndex).toBe(partnerIndex + 1);
+    });
+
     it('places Podcasts after Courses and before Premium when enabled', async () => {
       const user = userEvent.setup();
       setupDefaultMocks({
@@ -596,7 +675,7 @@ describe('Navbar', () => {
       render(<Navbar />);
       await user.click(screen.getByRole('button', { name: 'Community' }));
 
-      expect(screen.getByRole('menuitem', { name: /^Podcasts\b/ })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /^Podcasts\b/ })).toBeInTheDocument();
 
       const bodyText = document.body.textContent ?? '';
       expect(bodyText.indexOf('Courses')).toBeLessThan(bodyText.indexOf('Podcasts'));
@@ -624,12 +703,12 @@ describe('Navbar', () => {
       });
 
       render(<Navbar />);
-      const moreButton = screen.getAllByRole('button', { name: 'More' })
-        .find((element) => element.tagName === 'BUTTON');
-      expect(moreButton).toBeDefined();
-      await user.click(moreButton!);
+      const moreButton = screen.getByRole('button', { name: 'More' });
+      await user.click(moreButton);
 
-      expect(screen.getByRole('button', { name: /^Ideas\b/ })).toBeInTheDocument();
+      const ideasItem = screen.getByRole('button', { name: /^Ideas\b/ });
+      expect(ideasItem).toBeInTheDocument();
+      expect(ideasItem.className).toContain('desktop-nav-panel-item');
       expect(screen.queryByText('Ideation Challenges')).not.toBeInTheDocument();
     });
   });
