@@ -686,6 +686,22 @@ class FederationKomunitinController extends BaseApiController
         // is 'committed'/'completed'; pending/accepted/etc. just record the intent.
         $shouldSettle = ($nexusStatus === 'completed');
 
+        // Authorization: a federated transfer may only debit a local payer who has
+        // opted into federation. Without this, a transactions:write caller could
+        // move credits out of an arbitrary member's wallet (cross-account IDOR) —
+        // mirrors the Credit Commons createTransaction consent gate.
+        if ($shouldSettle) {
+            $payerOptedIn = DB::table('users')
+                ->where('id', (int) $payerId)
+                ->where('tenant_id', $tenantId)
+                ->where('federation_optin', 1)
+                ->exists();
+            if (!$payerOptedIn) {
+                return $this->jsonApiError('Forbidden', 'Forbidden',
+                    'Payer has not opted into federation; their balance cannot be debited by a federated transfer', 403);
+            }
+        }
+
         DB::beginTransaction();
         try {
             if ($shouldSettle) {
