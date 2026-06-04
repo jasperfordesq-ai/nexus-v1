@@ -191,7 +191,9 @@ export function EmergencyAlertsTab() {
           className="space-y-4"
         >
           {alerts.map((alert) => {
-            const config = priorityConfig[alert.priority];
+            // Fall back to 'normal' if the backend ever sends an unknown priority,
+            // otherwise the undefined lookup would throw and blank the tab.
+            const config = priorityConfig[alert.priority] ?? priorityConfig.normal;
             return (
               <motion.div key={alert.id} variants={itemVariants}>
                 <GlassCard className={`p-5 border ${config.bgClass}`}>

@@ -365,8 +365,11 @@ export function VolunteeringPage() {
               ))}
             </ToggleButtonGroup>
 
-            {/* Tab Content */}
-            {activeTab && <div>
+            {/* Tab Content — wrapped in a keyed ErrorBoundary so a render error in
+                any single tab (eager OR lazy) is contained to the tab instead of
+                blanking the whole page; the key resets the boundary when the user
+                switches tabs. */}
+            {activeTab && <ErrorBoundary key={activeTab}><div>
               {activeTab === 'opportunities' && isTabEnabled('opportunities') && <OpportunitiesTab />}
               {activeTab === 'applications' && isTabEnabled('applications') && <ApplicationsTab />}
               {activeTab === 'hours' && isTabEnabled('hours') && <HoursTab />}
@@ -379,16 +382,14 @@ export function VolunteeringPage() {
               {activeTab === 'swaps' && isTabEnabled('swaps') && <ShiftSwapsTab />}
               {activeTab === 'group-signups' && isTabEnabled('group-signups') && <GroupSignUpTab />}
               {activeTab === 'hours-review' && isTabEnabled('hours-review') && <HoursReviewTab />}
-              <ErrorBoundary>
-                <Suspense fallback={<div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-12"><Spinner size="lg" /></div>}>
-                  {activeTab === 'expenses' && isTabEnabled('expenses') && <ExpensesTab />}
-                  {activeTab === 'safeguarding' && isTabEnabled('safeguarding') && <SafeguardingTab />}
-                  {activeTab === 'community-projects' && isTabEnabled('community-projects') && <CommunityProjectsTab />}
-                  {activeTab === 'donations' && isTabEnabled('donations') && <DonationsTab />}
-                  {activeTab === 'accessibility' && isTabEnabled('accessibility') && <AccessibilityTab />}
-                </Suspense>
-              </ErrorBoundary>
-            </div>}
+              <Suspense fallback={<div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-12"><Spinner size="lg" /></div>}>
+                {activeTab === 'expenses' && isTabEnabled('expenses') && <ExpensesTab />}
+                {activeTab === 'safeguarding' && isTabEnabled('safeguarding') && <SafeguardingTab />}
+                {activeTab === 'community-projects' && isTabEnabled('community-projects') && <CommunityProjectsTab />}
+                {activeTab === 'donations' && isTabEnabled('donations') && <DonationsTab />}
+                {activeTab === 'accessibility' && isTabEnabled('accessibility') && <AccessibilityTab />}
+              </Suspense>
+            </div></ErrorBoundary>}
           </>
         );
       })()}

@@ -504,7 +504,13 @@ class VolunteerController extends BaseApiController
             $errors = $this->volunteerService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
         }
-        return $this->respondWithData(['id' => (int) $id, 'status' => $action === 'approve' ? 'approved' : 'declined']);
+        return $this->respondWithData([
+            'id' => (int) $id,
+            'status' => $action === 'approve' ? 'approved' : 'declined',
+            // 'paid' | 'insufficient_balance' | 'already_paid' | 'already_processed' | null
+            // Lets the org dashboard show an accurate toast instead of always claiming "paid".
+            'payment_result' => $this->volunteerService->getLastPaymentOutcome(),
+        ]);
     }
 
     // ========================================
@@ -528,6 +534,11 @@ class VolunteerController extends BaseApiController
         $this->rateLimit('volunteering_org_show', 120, 60);
         $org = $this->volunteerService->getOrganisationById((int) $id);
         if (!$org) return $this->respondWithError('NOT_FOUND', __('api.organization_not_found'), null, 404);
+        // This endpoint is public (withoutMiddleware('auth:sanctum')). Never expose
+        // internal wallet/financial state to unauthenticated callers — org owners
+        // read balance/auto-pay from the ownership-scoped /organisations/{id}/stats
+        // endpoint instead.
+        unset($org['balance'], $org['auto_pay_enabled']);
         return $this->respondWithData($org);
     }
 

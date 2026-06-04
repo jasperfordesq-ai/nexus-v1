@@ -90,6 +90,12 @@ vi.mock('@/lib/helpers', () => ({
 
 import OpportunityDetailPage from './OpportunityDetailPage';
 
+// Use future-relative shift times so the page's "upcoming shifts" filter
+// (start_time >= now) always keeps them. A fixed past date silently breaks the
+// "shows shift information" test once real time advances past it.
+const FUTURE_SHIFT_START = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+const FUTURE_SHIFT_END = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000 + 4 * 60 * 60 * 1000).toISOString();
+
 const mockOpportunity = {
   id: 42,
   title: 'Park Cleanup Drive',
@@ -106,8 +112,8 @@ const mockOpportunity = {
   shifts: [
     {
       id: 1,
-      start_time: '2026-06-01T09:00:00Z',
-      end_time: '2026-06-01T13:00:00Z',
+      start_time: FUTURE_SHIFT_START,
+      end_time: FUTURE_SHIFT_END,
       capacity: 10,
       signup_count: 3,
       spots_available: 7,
@@ -133,7 +139,7 @@ const mockApplicationsResponse = {
         message: 'I love the environment!',
         created_at: '2026-02-01T10:00:00Z',
         user: { id: 20, name: 'Alice Volunteer', email: 'alice@example.com', avatar_url: null },
-        shift: { id: 1, start_time: '2026-06-01T09:00:00Z', end_time: '2026-06-01T13:00:00Z' },
+        shift: { id: 1, start_time: FUTURE_SHIFT_START, end_time: FUTURE_SHIFT_END },
       },
     ],
     cursor: null,

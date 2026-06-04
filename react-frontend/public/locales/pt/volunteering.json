@@ -821,7 +821,7 @@
     "cancel": "Cancelar",
     "deposit_button": "Depositar",
     "invalid_amount": "Insira um valor válido.",
-    "deposit_amount_too_large": "O valor do depósito não pode exceder 9.999 horas.",
+    "deposit_amount_too_large": "O valor do depósito não pode exceder 1.000 horas.",
     "deposit_success": "Créditos depositados com sucesso.",
     "deposit_error": "Falha ao depositar créditos.",
     "types": {
@@ -839,5 +839,6 @@
   "my_organisations_pending": "Aprovação pendente",
   "my_organisations_pending_desc": "Aguardando aprovação do administrador",
   "filter_by_status": "Filter by status",
-  "search_organisations": "Search organisations"
+  "search_organisations": "Search organisations",
+  "org_hours_approved_unpaid": "Horas aprovadas. Carregue a carteira para pagar este voluntário."
 }

@@ -821,7 +821,7 @@
     "cancel": "Abbrechen",
     "deposit_button": "Einzahlen",
     "invalid_amount": "Bitte geben Sie einen gültigen Betrag ein.",
-    "deposit_amount_too_large": "Der Einzahlungsbetrag darf 9'999 Stunden nicht überschreiten.",
+    "deposit_amount_too_large": "Der Einzahlungsbetrag darf 1'000 Stunden nicht überschreiten.",
     "deposit_success": "Zeitguthaben erfolgreich eingezahlt.",
     "deposit_error": "Zeitguthaben konnten nicht eingezahlt werden.",
     "types": {
@@ -839,5 +839,6 @@
   "my_organisations_pending": "Genehmigung ausstehend",
   "my_organisations_pending_desc": "Wartet auf Admin-Genehmigung",
   "filter_by_status": "Filter by status",
-  "search_organisations": "Search organisations"
+  "search_organisations": "Search organisations",
+  "org_hours_approved_unpaid": "Stunden genehmigt. Laden Sie das Guthaben auf, um diese:n Freiwillige:n zu bezahlen."
 }

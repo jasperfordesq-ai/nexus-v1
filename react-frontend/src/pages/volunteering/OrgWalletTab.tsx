@@ -152,10 +152,12 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
   const loadRef = useRef(loadTransactions);
   loadRef.current = loadTransactions;
 
+  // Reload when orgId changes so switching between org dashboards never shows a
+  // stale org's wallet transactions under the new org's header.
   useEffect(() => {
     loadRef.current();
     return () => { abortRef.current?.abort(); };
-  }, []);
+  }, [orgId]);
 
   /* ───────────────────────── Auto-pay toggle ───────────────────────── */
 
@@ -204,7 +206,10 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
       toastRef.current.error(tRef.current('org_wallet.invalid_amount'));
       return;
     }
-    if (amount > 9999) {
+    if (amount > 1000) {
+      // Mirror the backend per-deposit cap (VolOrgWalletService::depositFromUser
+      // rejects amounts > 1000) so the user gets clear field-level guidance
+      // instead of a generic server rejection.
       toastRef.current.error(tRef.current('org_wallet.deposit_amount_too_large'));
       return;
     }
@@ -469,7 +474,7 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
                   label={t('org_wallet.form.amount')}
                   type="number"
                   min="0.25"
-                  max="9999"
+                  max="1000"
                   step="0.25"
                   value={depositAmount}
                   onValueChange={setDepositAmount}

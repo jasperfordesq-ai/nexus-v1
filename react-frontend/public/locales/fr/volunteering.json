@@ -821,7 +821,7 @@
     "cancel": "Annuler",
     "deposit_button": "D?poser",
     "invalid_amount": "Veuillez saisir un montant valide.",
-    "deposit_amount_too_large": "Le montant du dépôt ne peut pas dépasser 9 999 heures.",
+    "deposit_amount_too_large": "Le montant du dépôt ne peut pas dépasser 1 000 heures.",
     "deposit_success": "Crédits déposés avec succès.",
     "deposit_error": "Échec du dépôt des crédits.",
     "types": {
@@ -839,5 +839,6 @@
   "my_organisations_pending": "En attente d'approbation",
   "my_organisations_pending_desc": "En attente de l'approbation de l'administrateur",
   "filter_by_status": "Filter by status",
-  "search_organisations": "Search organisations"
+  "search_organisations": "Search organisations",
+  "org_hours_approved_unpaid": "Heures approuvées. Rechargez le portefeuille pour payer ce bénévole."
 }

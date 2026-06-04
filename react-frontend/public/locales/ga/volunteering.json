@@ -821,7 +821,7 @@
     "cancel": "Cealaigh",
     "deposit_button": "Taisce",
     "invalid_amount": "Cuir isteach méid bailí.",
-    "deposit_amount_too_large": "Ní féidir leis an méid taisce a bheith níos mó ná 9,999 uair an chloig.",
+    "deposit_amount_too_large": "Ní féidir leis an méid taisce a bheith níos mó ná 1,000 uair an chloig.",
     "deposit_success": "Creidmheasanna taiscthe go rathúil.",
     "deposit_error": "Theip ar chreidmheasanna a thaisceadh.",
     "types": {
@@ -839,5 +839,6 @@
   "my_organisations_pending": "Ceadú ar Feitheamh",
   "my_organisations_pending_desc": "Ag feitheamh le ceadú riarthóir",
   "filter_by_status": "Filter by status",
-  "search_organisations": "Search organisations"
+  "search_organisations": "Search organisations",
+  "org_hours_approved_unpaid": "Uaireanta ceadaithe. Cuir leis an sparán chun an saorálaí seo a íoc."
 }

@@ -821,7 +821,7 @@
     "cancel": "Cancellare",
     "deposit_button": "Depositare",
     "invalid_amount": "Inserisci un importo valido.",
-    "deposit_amount_too_large": "L'importo del deposito non può superare le 9.999 ore.",
+    "deposit_amount_too_large": "L'importo del deposito non può superare le 1.000 ore.",
     "deposit_success": "Crediti depositati con successo.",
     "deposit_error": "Impossibile depositare crediti.",
     "types": {
@@ -839,5 +839,6 @@
   "my_organisations_pending": "In attesa di approvazione",
   "my_organisations_pending_desc": "In attesa di approvazione da parte dell'amministratore",
   "filter_by_status": "Filter by status",
-  "search_organisations": "Search organisations"
+  "search_organisations": "Search organisations",
+  "org_hours_approved_unpaid": "Ore approvate. Ricarica il portafoglio per pagare questo volontario."
 }

@@ -64,13 +64,23 @@ export function SafeguardingTab() {
       setIsLoading(true); setError(null);
       const [tRes, iRes] = await Promise.all([api.get<{ items: Training[]; cursor?: string | null; has_more?: boolean }>('/v2/volunteering/training'), api.get<{ items: Incident[]; total?: number; page?: number; per_page?: number }>('/v2/volunteering/incidents')]);
       if (controller.signal.aborted) return;
+      let anyFailed = false;
       if (tRes.success && tRes.data) {
         const tPayload = tRes.data as Record<string, unknown>;
         setTrainings(Array.isArray(tPayload.items) ? tPayload.items as Training[] : Array.isArray(tRes.data) ? tRes.data as unknown as Training[] : []);
+      } else {
+        anyFailed = true;
       }
       if (iRes.success && iRes.data) {
         const iPayload = iRes.data as Record<string, unknown>;
         setIncidents(Array.isArray(iPayload.items) ? iPayload.items as Incident[] : Array.isArray(iRes.data) ? iRes.data as unknown as Incident[] : []);
+      } else {
+        anyFailed = true;
+      }
+      // Surface an error (with retry) if either fetch failed, instead of silently
+      // showing an empty tab while leaving the other list stale.
+      if (anyFailed) {
+        setError(tRef.current('safeguarding.load_error'));
       }
     } catch (err) { if (controller.signal.aborted) return; logError('Failed to load safeguarding data', err); setError(tRef.current('safeguarding.load_error')); }
     finally { setIsLoading(false); }
@@ -115,8 +125,8 @@ export function SafeguardingTab() {
         </Button>
       </div>
       <div className="flex flex-wrap gap-2">
-        <Button size="sm" variant={subView === 'training' ? 'solid' : 'flat'} color={subView === 'training' ? 'primary' : 'default'} startContent={<GraduationCap className="w-4 h-4" aria-hidden="true" />} onPress={() => setSubView('training')}>{t('safeguarding.training_records')}</Button>
-        <Button size="sm" variant={subView === 'incidents' ? 'solid' : 'flat'} color={subView === 'incidents' ? 'primary' : 'default'} startContent={<FileWarning className="w-4 h-4" aria-hidden="true" />} onPress={() => setSubView('incidents')}>{t('safeguarding.incident_reports')}</Button>
+        <Button size="sm" variant={subView === 'training' ? 'primary' : 'tertiary'} className={subView === 'training' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'} startContent={<GraduationCap className="w-4 h-4" aria-hidden="true" />} onPress={() => setSubView('training')}>{t('safeguarding.training_records')}</Button>
+        <Button size="sm" variant={subView === 'incidents' ? 'primary' : 'tertiary'} className={subView === 'incidents' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'} startContent={<FileWarning className="w-4 h-4" aria-hidden="true" />} onPress={() => setSubView('incidents')}>{t('safeguarding.incident_reports')}</Button>
       </div>
       {error && !isLoading && (<GlassCard className="p-8 text-center" role="alert"><AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" /><p className="text-theme-muted mb-4">{error}</p><Button className="bg-gradient-to-r from-rose-500 to-pink-600 text-white" startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />} onPress={load}>{t('safeguarding.try_again')}</Button></GlassCard>)}
       {!error && isLoading && (<div className="space-y-3" role="status" aria-busy="true" aria-label={t('common:loading')}>{[1, 2, 3].map((i) => (<CardRowsSkeleton key={i} />))}</div>)}

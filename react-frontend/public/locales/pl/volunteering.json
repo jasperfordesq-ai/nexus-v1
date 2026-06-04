@@ -821,7 +821,7 @@
     "cancel": "Anulować",
     "deposit_button": "Depozyt",
     "invalid_amount": "Proszę wprowadzić prawidłową kwotę.",
-    "deposit_amount_too_large": "Kwota depozytu nie może przekroczyć 9999 godzin.",
+    "deposit_amount_too_large": "Kwota depozytu nie może przekroczyć 1000 godzin.",
     "deposit_success": "Kredyty zdeponowane pomyślnie.",
     "deposit_error": "Nie udało się wpłacić środków.",
     "types": {
@@ -839,5 +839,6 @@
   "my_organisations_pending": "Oczekujące na zatwierdzenie",
   "my_organisations_pending_desc": "Oczekiwanie na zgodę administratora",
   "filter_by_status": "Filter by status",
-  "search_organisations": "Search organisations"
+  "search_organisations": "Search organisations",
+  "org_hours_approved_unpaid": "Godziny zatwierdzone. Doładuj portfel, aby zapłacić temu wolontariuszowi."
 }

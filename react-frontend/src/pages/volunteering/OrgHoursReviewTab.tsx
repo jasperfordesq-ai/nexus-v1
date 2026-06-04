@@ -109,16 +109,16 @@ function OrgHoursReviewTab({ orgId, balance, autoPay, onBalanceChange }: OrgHour
     }
   }, [orgId]);
 
+  // Reload whenever orgId changes (loadEntries is memoised on [orgId]). Without
+  // this, navigating between two org dashboards would leave a stale org's pending
+  // hours on screen under the new org's header — and let an admin approve/pay
+  // against the wrong org.
   useEffect(() => {
     loadEntries();
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- load once on mount
-  }, []);
-
-  useEffect(() => {
     return () => {
       abortRef.current?.abort();
     };
-  }, []);
+  }, [loadEntries]);
 
   const handleAction = async (entryId: number, action: 'approve' | 'decline') => {
     setActionInFlight((prev) => new Set(prev).add(entryId));
@@ -128,18 +128,24 @@ function OrgHoursReviewTab({ orgId, balance, autoPay, onBalanceChange }: OrgHour
     setEntries((prev) => prev.filter((e) => e.id !== entryId));
 
     try {
-      const response = await api.put(`/v2/volunteering/hours/${entryId}/verify`, { action });
+      const response = await api.put<{ id: number; status: string; payment_result: string | null }>(
+        `/v2/volunteering/hours/${entryId}/verify`,
+        { action },
+      );
 
       if (response.success) {
         if (action === 'approve') {
-          if (autoPay) {
-            toastRef.current.success(
-              tRef.current('org_hours_approved_paid'),
-            );
+          // The backend approves regardless of balance and only pays when the
+          // wallet can cover it. Trust the backend's payment_result, not the
+          // autoPay flag — otherwise we'd claim "paid" when the org actually ran
+          // out of balance and the volunteer was NOT paid.
+          const outcome = (response.data as { payment_result?: string | null } | undefined)?.payment_result ?? null;
+          if (outcome === 'paid' || outcome === 'already_paid') {
+            toastRef.current.success(tRef.current('org_hours_approved_paid'));
+          } else if (outcome === 'insufficient_balance') {
+            toastRef.current.warning(tRef.current('org_hours_approved_unpaid'));
           } else {
-            toastRef.current.success(
-              tRef.current('org_hours_approved'),
-            );
+            toastRef.current.success(tRef.current('org_hours_approved'));
           }
           onBalanceChange();
         } else {

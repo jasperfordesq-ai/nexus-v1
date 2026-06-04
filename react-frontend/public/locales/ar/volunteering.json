@@ -821,7 +821,7 @@
     "cancel": "يلغي",
     "deposit_button": "إيداع",
     "invalid_amount": "الرجاء إدخال مبلغ صالح.",
-    "deposit_amount_too_large": "لا يمكن أن يتجاوز مبلغ الإيداع 9,999 ساعة.",
+    "deposit_amount_too_large": "لا يمكن أن يتجاوز مبلغ الإيداع 1,000 ساعة.",
     "deposit_success": "تم إيداع الاعتمادات بنجاح.",
     "deposit_error": "فشل في إيداع الاعتمادات.",
     "types": {
@@ -839,5 +839,6 @@
   "my_organisations_pending": "في انتظار الموافقة",
   "my_organisations_pending_desc": "في انتظار موافقة المشرف",
   "filter_by_status": "Filter by status",
-  "search_organisations": "Search organisations"
+  "search_organisations": "Search organisations",
+  "org_hours_approved_unpaid": "تمت الموافقة على الساعات. اشحن المحفظة لدفع أجر هذا المتطوع."
 }

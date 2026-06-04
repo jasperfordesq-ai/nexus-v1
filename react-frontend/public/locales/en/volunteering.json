@@ -198,6 +198,7 @@
   "all_hours_reviewed": "You're all caught up — every submission has been reviewed.",
   "org_hours_approved_paid": "Hours approved. Time credits paid to volunteer.",
   "org_hours_approved": "Hours approved.",
+  "org_hours_approved_unpaid": "Hours approved. Top up the wallet to pay this volunteer.",
   "org_hours_declined": "Hours declined.",
   "org_all_hours_reviewed": "All volunteer hours have been reviewed.",
   "org_balance_low_warning": "Balance may be insufficient for {{count}} pending hours.",
@@ -823,7 +824,7 @@
     "cancel": "Cancel",
     "deposit_button": "Deposit",
     "invalid_amount": "Please enter a valid amount.",
-    "deposit_amount_too_large": "Deposit amount cannot exceed 9,999 hours.",
+    "deposit_amount_too_large": "Deposit amount cannot exceed 1,000 hours.",
     "deposit_success": "Credits deposited successfully.",
     "deposit_error": "Failed to deposit credits.",
     "types": {

@@ -28,6 +28,14 @@ class PushVolunteerOpportunityToFederatedPartners implements ShouldQueue
     /** Route to the standard federation queue (bulk, non-time-critical). */
     public string $queue = 'federation';
 
+    /**
+     * Run exactly once and cap runtime below the queue's retry_after (~90s) so a
+     * long per-partner push can't still be in flight when the job becomes visible
+     * again — which would re-broadcast every opportunity to every partner.
+     */
+    public int $tries = 1;
+    public int $timeout = 60;
+
     public function __construct(
         private readonly FederationFeatureService $federationFeatureService,
     ) {}

@@ -821,7 +821,7 @@
     "cancel": "キャンセル",
     "deposit_button": "デポジット",
     "invalid_amount": "有効な金額を入力してください。",
-    "deposit_amount_too_large": "デポジット額は 9,999 時間を超えることはできません。",
+    "deposit_amount_too_large": "デポジット額は 1,000 時間を超えることはできません。",
     "deposit_success": "クレジットが正常に入金されました。",
     "deposit_error": "クレジットの入金に失敗しました。",
     "types": {
@@ -839,5 +839,6 @@
   "my_organisations_pending": "承認待ち",
   "my_organisations_pending_desc": "管理者の承認を待っています",
   "filter_by_status": "Filter by status",
-  "search_organisations": "Search organisations"
+  "search_organisations": "Search organisations",
+  "org_hours_approved_unpaid": "時間が承認されました。このボランティアに支払うにはウォレットにチャージしてください。"
 }

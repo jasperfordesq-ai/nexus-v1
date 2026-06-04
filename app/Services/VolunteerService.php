@@ -17,6 +17,7 @@ use App\Models\VolOpportunity;
 use App\Models\VolOrganization;
 use App\Models\VolShift;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
@@ -599,12 +600,25 @@ class VolunteerService
     /** Status assigned by the last successful hour-log operation. */
     private static string $lastLogStatus = 'pending';
 
+    /** Payment outcome of the last verifyHours() call: paid|insufficient_balance|already_paid|already_processed|null */
+    private static ?string $lastPaymentOutcome = null;
+
     /**
      * Get errors from the last operation.
      */
     public static function getErrors(): array
     {
         return self::$errors;
+    }
+
+    /**
+     * Payment outcome of the most recent verifyHours() call.
+     * Values: 'paid', 'insufficient_balance', 'already_paid', 'already_processed',
+     * or null (declined, or approved with auto-pay disabled).
+     */
+    public static function getLastPaymentOutcome(): ?string
+    {
+        return self::$lastPaymentOutcome;
     }
 
     public static function getLastLogStatus(): string
@@ -1273,24 +1287,36 @@ class VolunteerService
             return null;
         }
 
-        // Prevent duplicate hour logging for the same org + date + opportunity
-        if ($oppId !== null) {
-            $duplicateCheck = DB::selectOne(
-                "SELECT id FROM vol_logs WHERE user_id = ? AND tenant_id = ? AND organization_id = ? AND date_logged = ? AND opportunity_id = ? AND status NOT IN ('declined', 'rejected')",
-                [$userId, $tenantId, $organizationId, $data['date'], $oppId]
-            );
-        } else {
-            $duplicateCheck = DB::selectOne(
-                "SELECT id FROM vol_logs WHERE user_id = ? AND tenant_id = ? AND organization_id = ? AND date_logged = ? AND opportunity_id IS NULL AND status NOT IN ('declined', 'rejected')",
-                [$userId, $tenantId, $organizationId, $data['date']]
-            );
-        }
-        if ($duplicateCheck) {
+        // Serialise the duplicate-check + insert (+ optional auto-pay) under an
+        // atomic lock keyed on the natural duplicate key. Without this, two
+        // concurrent identical submissions can both pass the existence check and
+        // double-insert — and, on the caring-workflow auto-approve path, double-pay.
+        $dupLockKey = sprintf('vol_log_dedupe:%d:%d:%d:%s:%s', $tenantId, $userId, $organizationId, (string) $data['date'], $oppId ?? 'none');
+        $dupLock = Cache::lock($dupLockKey, 10);
+        if (! $dupLock->get()) {
+            // A concurrent identical submission already holds the lock.
             self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'You have already logged hours for this organization and date'];
             return null;
         }
 
         try {
+            // Prevent duplicate hour logging for the same org + date + opportunity
+            if ($oppId !== null) {
+                $duplicateCheck = DB::selectOne(
+                    "SELECT id FROM vol_logs WHERE user_id = ? AND tenant_id = ? AND organization_id = ? AND date_logged = ? AND opportunity_id = ? AND status NOT IN ('declined', 'rejected')",
+                    [$userId, $tenantId, $organizationId, $data['date'], $oppId]
+                );
+            } else {
+                $duplicateCheck = DB::selectOne(
+                    "SELECT id FROM vol_logs WHERE user_id = ? AND tenant_id = ? AND organization_id = ? AND date_logged = ? AND opportunity_id IS NULL AND status NOT IN ('declined', 'rejected')",
+                    [$userId, $tenantId, $organizationId, $data['date']]
+                );
+            }
+            if ($duplicateCheck) {
+                self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'You have already logged hours for this organization and date'];
+                return null;
+            }
+
             $status = self::resolveCaringHourLogStatus($userId, $tenantId, $policy);
             $logId = null;
 
@@ -1331,6 +1357,8 @@ class VolunteerService
             Log::warning("VolunteerService::logHours error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to log hours'];
             return null;
+        } finally {
+            $dupLock->release();
         }
     }
 
@@ -1416,6 +1444,7 @@ class VolunteerService
     public static function verifyHours(int $logId, int $adminUserId, string $action): bool
     {
         self::$errors = [];
+        self::$lastPaymentOutcome = null;
 
         if (!in_array($action, ['approve', 'decline'])) {
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Action must be approve or decline'];
@@ -1465,11 +1494,25 @@ class VolunteerService
             $volunteerId = (int) $log->user_id;
             $orgName = $org->name ?? __('emails.common.fallback_organization');
             $paymentResult = null;
+            $transitioned = false;
 
             // DB transaction for data mutations only — notifications sent AFTER commit
-            DB::transaction(function () use ($logId, $tenantId, $status, $action, $log, $org, $adminUserId, $hours, $volunteerId, &$paymentResult) {
-                // 1. Update hours status
-                DB::update("UPDATE vol_logs SET status = ? WHERE id = ? AND tenant_id = ?", [$status, $logId, $tenantId]);
+            DB::transaction(function () use ($logId, $tenantId, $status, $action, $log, $org, $adminUserId, $hours, $volunteerId, &$paymentResult, &$transitioned) {
+                // 1. Flip status — conditional on the log still being pending. This is
+                //    the idempotency gate: a concurrent or retried approval finds 0 rows
+                //    affected and aborts without paying again. The org-row lock below
+                //    serialises payment, but the status guard is what prevents a second
+                //    approval from re-entering the payout branch at all.
+                $affected = DB::update(
+                    "UPDATE vol_logs SET status = ? WHERE id = ? AND tenant_id = ? AND status = 'pending'",
+                    [$status, $logId, $tenantId]
+                );
+                if ($affected === 0) {
+                    // Already verified by a concurrent/retried request — nothing to do.
+                    $paymentResult = 'already_processed';
+                    return;
+                }
+                $transitioned = true;
 
                 // 2. If approved and org has auto-pay enabled, pay inline (avoid nested transaction)
                 if ($action === 'approve' && $org->auto_pay_enabled) {
@@ -1478,6 +1521,18 @@ class VolunteerService
                     if ($intHours <= 0) {
                         return;
                     }
+
+                    // Idempotency: never pay twice for the same log, even if a prior
+                    // partial run or another code path already recorded a payment.
+                    $existingPayment = DB::selectOne(
+                        "SELECT id FROM vol_org_transactions WHERE tenant_id = ? AND vol_organization_id = ? AND vol_log_id = ? AND type = 'volunteer_payment' LIMIT 1",
+                        [$tenantId, (int) $org->id, $logId]
+                    );
+                    if ($existingPayment) {
+                        $paymentResult = 'already_paid';
+                        return;
+                    }
+
                     // Lock org row
                     $orgLocked = DB::selectOne(
                         "SELECT id, balance, user_id FROM vol_organizations WHERE id = ? AND tenant_id = ? FOR UPDATE",
@@ -1521,6 +1576,14 @@ class VolunteerService
                     }
                 }
             });
+
+            self::$lastPaymentOutcome = $paymentResult;
+
+            // If a concurrent/retried request already verified this log, return
+            // idempotently without re-dispatching events or re-sending notifications.
+            if (! $transitioned) {
+                return true;
+            }
 
             // 3. Notify the regional-points cascade-revert listener.
             // For pending -> approved or pending -> declined transitions the

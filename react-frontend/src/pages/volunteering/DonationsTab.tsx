@@ -507,8 +507,7 @@ export function DonationsTab() {
                   maxRows={3}
                 />
                 <Button
-                  variant={form.anonymous ? 'solid' : 'flat'}
-                  color={form.anonymous ? 'secondary' : 'default'}
+                  variant={form.anonymous ? 'primary' : 'outline'}
                   size="sm"
                   startContent={<EyeOff className="w-4 h-4" aria-hidden="true" />}
                   onPress={() => setForm((f) => ({ ...f, anonymous: !f.anonymous }))}

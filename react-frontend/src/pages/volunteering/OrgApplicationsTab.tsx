@@ -78,6 +78,7 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
   const [actionLoading, setActionLoading] = useState<Record<number, boolean>>({});
   const [nameSearch, setNameSearch] = useState('');
   const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [isBulkRunning, setIsBulkRunning] = useState(false);
 
   const tRef = useRef(t);
   tRef.current = t;
@@ -186,12 +187,18 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
   /* ---- Bulk action ---- */
 
   async function handleBulkAction(action: 'approve' | 'decline') {
-    const ids = Array.from(selected);
-    for (const id of ids) {
-      await handleAction(id, action);
+    if (isBulkRunning) return; // prevent a second click re-submitting in-flight ids
+    setIsBulkRunning(true);
+    try {
+      const ids = Array.from(selected);
+      for (const id of ids) {
+        await handleAction(id, action);
+      }
+      setSelected(new Set());
+      loadApplications(statusFilter);
+    } finally {
+      setIsBulkRunning(false);
     }
-    setSelected(new Set());
-    loadApplications(statusFilter);
   }
 
   /* ---- Derived state ---- */
@@ -290,6 +297,8 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
             className="bg-success-soft text-success hover:bg-success-soft/80"
             startContent={<CheckCircle className="w-3.5 h-3.5" />}
             onPress={() => handleBulkAction('approve')}
+            isDisabled={isBulkRunning}
+            isLoading={isBulkRunning}
           >
             {t('applications.approve_all')}
           </Button>
@@ -298,6 +307,7 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
             variant="danger-soft"
             startContent={<XCircle className="w-3.5 h-3.5" />}
             onPress={() => handleBulkAction('decline')}
+            isDisabled={isBulkRunning}
           >
             {t('applications.decline_all')}
           </Button>

@@ -821,7 +821,7 @@
     "cancel": "Annuleren",
     "deposit_button": "Borg",
     "invalid_amount": "Voer een geldig bedrag in.",
-    "deposit_amount_too_large": "Het stortingsbedrag mag niet groter zijn dan 9.999 uur.",
+    "deposit_amount_too_large": "Het stortingsbedrag mag niet groter zijn dan 1.000 uur.",
     "deposit_success": "Credits zijn succesvol gestort.",
     "deposit_error": "Het is niet gelukt om tegoeden te storten.",
     "types": {
@@ -839,5 +839,6 @@
   "my_organisations_pending": "In afwachting van goedkeuring",
   "my_organisations_pending_desc": "In afwachting van goedkeuring door de beheerder",
   "filter_by_status": "Filter by status",
-  "search_organisations": "Search organisations"
+  "search_organisations": "Search organisations",
+  "org_hours_approved_unpaid": "Uren goedgekeurd. Vul de portemonnee aan om deze vrijwilliger te betalen."
 }

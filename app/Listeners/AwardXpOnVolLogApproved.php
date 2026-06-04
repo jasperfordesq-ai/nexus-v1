@@ -70,10 +70,13 @@ class AwardXpOnVolLogApproved
             $reference = sprintf('vol_log:%d', $event->volLogId);
 
             // Idempotency: if we've already logged XP for this vol_log, skip.
+            // Match the bracketed token "[vol_log:N]" (written below) exactly — an
+            // unbracketed "%vol_log:1%" also matches vol_log:11/100/1000 and would
+            // silently skip XP for those higher-id logs (substring collision).
             $alreadyAwarded = UserXpLog::query()
                 ->where('user_id', $userId)
                 ->where('action', 'volunteer_hour')
-                ->where('description', 'like', '%' . $reference . '%')
+                ->where('description', 'like', '%[' . $reference . ']%')
                 ->exists();
 
             if ($alreadyAwarded) {

@@ -821,7 +821,7 @@
     "cancel": "Cancelar",
     "deposit_button": "Depósito",
     "invalid_amount": "Por favor ingrese una cantidad válida.",
-    "deposit_amount_too_large": "El monto del depósito no puede exceder las 9,999 horas.",
+    "deposit_amount_too_large": "El monto del depósito no puede exceder las 1,000 horas.",
     "deposit_success": "Créditos depositados exitosamente.",
     "deposit_error": "No se pudieron depositar créditos.",
     "types": {
@@ -839,5 +839,6 @@
   "my_organisations_pending": "Pendiente de aprobación",
   "my_organisations_pending_desc": "Esperando la aprobación del administrador",
   "filter_by_status": "Filter by status",
-  "search_organisations": "Search organisations"
+  "search_organisations": "Search organisations",
+  "org_hours_approved_unpaid": "Horas aprobadas. Recarga la cartera para pagar a esta persona voluntaria."
 }

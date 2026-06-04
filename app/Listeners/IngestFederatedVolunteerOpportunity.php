@@ -52,6 +52,14 @@ class IngestFederatedVolunteerOpportunity implements ShouldQueue
     /** Route to the standard federation queue (bulk, non-time-critical). */
     public string $queue = 'federation';
 
+    /**
+     * Run once and finish well under the queue's retry_after (~90s). The mirror
+     * upsert is idempotent, so this mainly prevents wasted duplicate re-runs if
+     * the handler is slow.
+     */
+    public int $tries = 1;
+    public int $timeout = 60;
+
     public function handle(FederatedVolunteeringReceived $event): void
     {
         $previousTenantId = TenantContext::currentId();
