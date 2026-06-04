@@ -178,6 +178,9 @@ jest.mock('@/components/ui/Skeleton', () => ({
 // --- Tests ---
 
 import HomeScreen from './home';
+import { getEvents } from '@/lib/api/events';
+import { getExchanges } from '@/lib/api/exchanges';
+import { getWalletBalance } from '@/lib/api/wallet';
 
 const defaultPaginatedState = {
   items: [],
@@ -190,6 +193,7 @@ const defaultPaginatedState = {
 };
 
 beforeEach(() => {
+  jest.clearAllMocks();
   mockUsePaginatedApi.mockReturnValue(defaultPaginatedState);
   mockRealtimeContext.unreadNotifications = 0;
   mockRealtimeContext.unreadMessages = 0;
@@ -217,15 +221,15 @@ describe('HomeScreen', () => {
     expect(getByText("Here's what's happening in your timebank")).toBeTruthy();
   });
 
-  it('renders dashboard summary cards from existing mobile APIs', async () => {
-    const { findByText, getByText } = render(<HomeScreen />);
+  it('keeps dashboard summary cards off the feed-first landing page', () => {
+    const { queryByText } = render(<HomeScreen />);
 
-    expect(getByText('Balance')).toBeTruthy();
-    expect(await findByText('12 hours')).toBeTruthy();
-    expect(getByText('Upcoming events')).toBeTruthy();
-    expect(await findByText('2')).toBeTruthy();
-    expect(getByText('Open requests')).toBeTruthy();
-    expect(await findByText('3')).toBeTruthy();
+    expect(queryByText('Balance')).toBeNull();
+    expect(queryByText('Upcoming events')).toBeNull();
+    expect(queryByText('Open requests')).toBeNull();
+    expect(getWalletBalance).not.toHaveBeenCalled();
+    expect(getEvents).not.toHaveBeenCalled();
+    expect(getExchanges).not.toHaveBeenCalled();
   });
 
   it('renders empty state when feed has no items and is not loading', () => {

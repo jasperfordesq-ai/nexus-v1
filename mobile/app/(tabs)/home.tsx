@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FlatList, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -12,10 +12,7 @@ import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface, Tabs } 
 
 import * as Sentry from '@sentry/react-native';
 import { useTranslation } from 'react-i18next';
-import { getFeed, getFeedAuthor, type FeedFilter, type FeedItem as FeedItemType, type FeedMode, type FeedResponse } from '@/lib/api/feed';
-import { getWalletBalance } from '@/lib/api/wallet';
-import { getEvents } from '@/lib/api/events';
-import { getExchanges } from '@/lib/api/exchanges';
+import { getFeed, type FeedFilter, type FeedItem as FeedItemType, type FeedMode, type FeedResponse } from '@/lib/api/feed';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -24,9 +21,7 @@ import { useRealtimeContext } from '@/lib/context/RealtimeContext';
 import FeedItem, { type FeedCommentTarget } from '@/components/FeedItem';
 import CommentSheet from '@/components/comments/CommentSheet';
 import OfflineBanner from '@/components/OfflineBanner';
-import StoryCircles from '@/components/StoryCircles';
 import TenantBanner from '@/components/TenantBanner';
-import NativePressable from '@/components/ui/NativePressable';
 import { FeedItemSkeleton } from '@/components/ui/Skeleton';
 import FAB from '@/components/ui/FAB';
 import * as Haptics from '@/lib/haptics';
@@ -66,33 +61,14 @@ const FILTER_OPTIONS: Array<{ key: FeedFilter; icon: keyof typeof Ionicons.glyph
 
 const LISTING_SUBFILTERS = ['offer', 'request'] as const;
 
-interface DashboardSummary {
-  balance: number | null;
-  upcomingEvents: number | null;
-  openRequests: number | null;
-}
-
-interface SummaryCardItem {
-  key: string;
-  icon: keyof typeof Ionicons.glyphMap;
-  label: string;
-  value: string;
-  route: string;
-}
-
 export default function HomeScreen() {
   const { t } = useTranslation(['home', 'common', 'exchanges']);
-  const { user, displayName } = useAuth();
+  const { displayName } = useAuth();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const [feedMode, setFeedMode] = useState<FeedMode>('ranking');
   const [filter, setFilter] = useState<FeedFilter>('all');
   const [subFilter, setSubFilter] = useState<string | null>(null);
-  const [summary, setSummary] = useState<DashboardSummary>({
-    balance: null,
-    upcomingEvents: null,
-    openRequests: null,
-  });
   const [commentTarget, setCommentTarget] = useState<FeedCommentTarget | null>(null);
   const [commentCountOverrides, setCommentCountOverrides] = useState<Record<string, number>>({});
 
@@ -107,48 +83,11 @@ export default function HomeScreen() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const wasRefreshingRef = useRef(false);
 
-  const loadDashboardSummary = useCallback(async () => {
-    const [walletResult, eventsResult, requestsResult] = await Promise.allSettled([
-      getWalletBalance(),
-      getEvents('upcoming', null, 5),
-      getExchanges(null, { type: 'request', per_page: '5' }),
-    ]);
-
-    setSummary({
-      balance: walletResult.status === 'fulfilled' ? walletResult.value.data.balance : null,
-      upcomingEvents: eventsResult.status === 'fulfilled' ? eventsResult.value.data.length : null,
-      openRequests: requestsResult.status === 'fulfilled' ? requestsResult.value.data.length : null,
-    });
-  }, []);
-
-  useEffect(() => {
-    let isMounted = true;
-    const load = async () => {
-      const [walletResult, eventsResult, requestsResult] = await Promise.allSettled([
-        getWalletBalance(),
-        getEvents('upcoming', null, 5),
-        getExchanges(null, { type: 'request', per_page: '5' }),
-      ]);
-
-      if (!isMounted) return;
-      setSummary({
-        balance: walletResult.status === 'fulfilled' ? walletResult.value.data.balance : null,
-        upcomingEvents: eventsResult.status === 'fulfilled' ? eventsResult.value.data.length : null,
-        openRequests: requestsResult.status === 'fulfilled' ? requestsResult.value.data.length : null,
-      });
-    };
-    void load();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
   const handleRefresh = useCallback(() => {
     setIsRefreshing(true);
     wasRefreshingRef.current = true;
     refresh();
-    void loadDashboardSummary();
-  }, [loadDashboardSummary, refresh]);
+  }, [refresh]);
 
   useEffect(() => {
     if (wasRefreshingRef.current && !isLoading) {
@@ -160,25 +99,6 @@ export default function HomeScreen() {
   const { unreadNotifications } = useRealtimeContext();
   const notificationBadgeText =
     unreadNotifications > 99 ? '99+' : unreadNotifications > 0 ? String(unreadNotifications) : null;
-
-  const storyMembers = useMemo(() => {
-    const seen = new Set<number>();
-    if (user?.id) seen.add(user.id);
-    const members: { id: number; name: string; avatar?: string | null }[] = [];
-    for (const item of items) {
-      const author = getFeedAuthor(item, '');
-      if (author.id && author.name && !seen.has(author.id)) {
-        seen.add(author.id);
-        members.push({ id: author.id, name: author.name, avatar: author.avatar });
-      }
-      if (members.length >= 10) break;
-    }
-    return members;
-  }, [items, user?.id]);
-
-  const handleStoryPress = useCallback((memberId: number) => {
-    router.push({ pathname: '/(modals)/member-profile', params: { id: String(memberId) } });
-  }, []);
 
   const handleOpenComments = useCallback((target: FeedCommentTarget) => {
     const key = `${target.targetType}-${target.targetId}`;
@@ -206,7 +126,6 @@ export default function HomeScreen() {
     );
   }, [commentCountOverrides, handleOpenComments]);
   const keyExtractor = useCallback((item: FeedItemType) => `${item.type}-${item.id}`, []);
-  const activeFilterLabel = t(`filter.${filter}`);
 
   const handleFilterChange = useCallback((nextFilter: FeedFilter) => {
     setFilter(nextFilter);
@@ -214,40 +133,6 @@ export default function HomeScreen() {
       setSubFilter(null);
     }
   }, []);
-
-  const summaryCards = useMemo<SummaryCardItem[]>(
-    () => [
-      {
-        key: 'balance',
-        icon: 'wallet-outline' as const,
-        label: t('dashboard.balance'),
-        value: summary.balance === null ? t('dashboard.unavailable') : t('dashboard.hours', { count: summary.balance }),
-        route: '/(modals)/wallet' as const,
-      },
-      {
-        key: 'events',
-        icon: 'calendar-outline' as const,
-        label: t('dashboard.upcomingEvents'),
-        value: summary.upcomingEvents === null ? t('dashboard.unavailable') : String(summary.upcomingEvents),
-        route: '/(tabs)/events' as const,
-      },
-      {
-        key: 'requests',
-        icon: 'help-buoy-outline' as const,
-        label: t('dashboard.openRequests'),
-        value: summary.openRequests === null ? t('dashboard.unavailable') : String(summary.openRequests),
-        route: '/(tabs)/exchanges' as const,
-      },
-      {
-        key: 'notifications',
-        icon: 'notifications-outline' as const,
-        label: t('dashboard.notifications'),
-        value: unreadNotifications > 99 ? '99+' : String(unreadNotifications),
-        route: '/(modals)/notifications' as const,
-      },
-    ],
-    [summary.balance, summary.openRequests, summary.upcomingEvents, t, unreadNotifications],
-  );
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -267,24 +152,36 @@ export default function HomeScreen() {
         maxToRenderPerBatch={8}
         windowSize={5}
         ListHeaderComponent={
-          <View className="gap-3 pb-3">
-            <HeroCard variant="default" className="mx-4 mt-3 overflow-hidden rounded-panel p-0">
-              <View className="h-1" style={{ backgroundColor: primary }} />
-              <HeroCard.Body className="flex-row items-center justify-between gap-4 p-4">
-                <View className="min-w-0 flex-1">
-                  <Text className="text-[26px] font-bold leading-8" style={{ color: theme.text }} numberOfLines={1}>
+          <View className="pb-2">
+            <Surface
+              variant="default"
+              className="mx-3 mt-2 gap-2.5 overflow-hidden rounded-panel px-3 py-2.5"
+              style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
+            >
+              <View className="absolute bottom-0 left-0 top-0 w-1" style={{ backgroundColor: primary }} />
+              <View className="flex-row items-center justify-between gap-2 pl-1">
+                <View className="min-w-0 flex-1 gap-1">
+                  <View className="flex-row items-center gap-2">
+                    <View className="h-7 w-7 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+                      <Ionicons name="albums-outline" size={15} color={primary} />
+                    </View>
+                    <Text className="min-w-0 flex-1 text-lg font-bold leading-6" style={{ color: theme.text }} numberOfLines={1}>
+                      {t('feed.title')}
+                    </Text>
+                  </View>
+                  <Text className="text-xs font-semibold" style={{ color: primary }} numberOfLines={1}>
                     {t('feed.greeting', { name: (displayName || '').split(' ')[0] || t('common:labels.friend') })}
                   </Text>
-                  <Text className="mt-1 text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>
+                  <Text className="text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={1}>
                     {t('feed.subtitle')}
                   </Text>
                 </View>
-                <View className="relative h-12 w-12 items-center justify-center">
+                <View className="relative h-10 w-10 items-center justify-center">
                   <HeroButton
                     isIconOnly
-                    size="lg"
+                    size="sm"
                     variant="secondary"
-                    className="h-12 w-12 rounded-2xl"
+                    className="h-10 w-10 rounded-2xl"
                     onPress={() => {
                       void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                       router.push('/(modals)/notifications');
@@ -297,7 +194,7 @@ export default function HomeScreen() {
                       borderWidth: 1,
                     }}
                   >
-                    <Ionicons name="notifications-outline" size={22} color={primary} />
+                    <Ionicons name="notifications-outline" size={20} color={primary} />
                   </HeroButton>
                   {notificationBadgeText ? (
                     <View
@@ -310,25 +207,8 @@ export default function HomeScreen() {
                     </View>
                   ) : null}
                 </View>
-              </HeroCard.Body>
-            </HeroCard>
-            <View className="mx-4 flex-row flex-wrap gap-2.5">
-              {summaryCards.map((card) => (
-                <DashboardSummaryCard
-                  key={card.key}
-                  card={card}
-                  primary={primary}
-                  theme={theme}
-                  accessibilityLabel={t('dashboard.openCard', { label: card.label })}
-                  onPress={() => router.push(card.route as never)}
-                />
-              ))}
-            </View>
-            <Surface
-              variant="default"
-              className="mx-4 gap-3 overflow-hidden rounded-panel p-3.5"
-              style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
-            >
+              </View>
+
               <View className="flex-row items-center justify-between gap-3">
                 <Tabs value={feedMode} onValueChange={(value) => setFeedMode(value as FeedMode)} variant="secondary" className="flex-1">
                   <Tabs.List>
@@ -396,54 +276,7 @@ export default function HomeScreen() {
                   ))}
                 </View>
               ) : null}
-
-              <View className="flex-row">
-                <Chip size="sm" variant="soft" color="default">
-                  <Chip.Label>{t('feed.currentView', { filter: activeFilterLabel })}</Chip.Label>
-                </Chip>
-              </View>
             </Surface>
-            {storyMembers.length > 0 ? <StoryCircles members={storyMembers} onPress={handleStoryPress} /> : null}
-            <HeroCard variant="default" className="mx-4 overflow-hidden rounded-panel p-0">
-              <HeroCard.Body className="gap-4 p-4">
-                <View className="flex-row items-center gap-3">
-                  <View className="h-11 w-11 items-center justify-center rounded-2xl" style={{ backgroundColor: primary }}>
-                    <Ionicons name="add" size={22} color="#fff" />
-                  </View>
-                  <View className="min-w-0 flex-1">
-                    <Text className="font-semibold leading-5" style={{ color: theme.text }} numberOfLines={2}>
-                      {t('composer.title')}
-                    </Text>
-                    <Text className="text-sm" style={{ color: theme.textSecondary }} numberOfLines={1}>
-                      {t('composer.subtitle')}
-                    </Text>
-                  </View>
-                </View>
-                <View className="flex-row flex-wrap gap-2">
-                  <ComposerActionPill
-                    icon="swap-horizontal-outline"
-                    label={t('composer.exchange')}
-                    primary={primary}
-                    tone="primary"
-                    onPress={() => router.push('/(modals)/new-exchange')}
-                  />
-                  <ComposerActionPill
-                    icon="stats-chart-outline"
-                    label={t('composer.polls')}
-                    primary={primary}
-                    tone="secondary"
-                    onPress={() => setFilter('polls')}
-                  />
-                  <ComposerActionPill
-                    icon="pricetag-outline"
-                    label={t('composer.hashtags')}
-                    primary={primary}
-                    tone="ghost"
-                    onPress={() => router.push('/(modals)/feed-hashtags' as never)}
-                  />
-                </View>
-              </HeroCard.Body>
-            </HeroCard>
           </View>
         }
         ListEmptyComponent={
@@ -511,94 +344,5 @@ export default function HomeScreen() {
         onCountChange={handleCommentCountChange}
       />
     </SafeAreaView>
-  );
-}
-
-function ComposerActionPill({
-  icon,
-  label,
-  primary,
-  tone,
-  onPress,
-}: {
-  icon: keyof typeof Ionicons.glyphMap;
-  label: string;
-  primary: string;
-  tone: 'primary' | 'secondary' | 'ghost';
-  onPress: () => void;
-}) {
-  const isPrimary = tone === 'primary';
-  return (
-    <HeroButton
-      className="min-h-10 flex-row items-center justify-center gap-2 rounded-full px-3.5"
-      accessibilityLabel={label}
-      onPress={onPress}
-      size="sm"
-      variant={isPrimary ? 'primary' : tone === 'secondary' ? 'secondary' : 'outline'}
-      style={{
-        backgroundColor: isPrimary ? primary : tone === 'secondary' ? withAlpha(primary, 0.12) : 'transparent',
-        borderColor: tone === 'ghost' ? withAlpha(primary, 0.16) : 'transparent',
-        borderWidth: tone === 'ghost' ? 1 : 0,
-      }}
-    >
-      <Ionicons name={icon} size={16} color={isPrimary ? '#fff' : primary} />
-      <HeroButton.Label className="text-sm font-bold" style={{ color: isPrimary ? '#fff' : primary }} numberOfLines={1}>
-        {label}
-      </HeroButton.Label>
-    </HeroButton>
-  );
-}
-
-function DashboardSummaryCard({
-  card,
-  primary,
-  theme,
-  accessibilityLabel,
-  onPress,
-}: {
-  card: SummaryCardItem;
-  primary: string;
-  theme: ReturnType<typeof useTheme>;
-  accessibilityLabel: string;
-  onPress: () => void;
-}) {
-  return (
-    <NativePressable
-      className="min-w-[47%] flex-1"
-      accessibilityLabel={accessibilityLabel}
-      onPress={onPress}
-      feedback="highlight"
-    >
-      <Surface
-        variant="secondary"
-        className="min-h-[92px] overflow-hidden rounded-panel p-3.5"
-        style={{ borderWidth: 1, borderColor: theme.borderSubtle }}
-      >
-        <View className="absolute bottom-0 left-0 top-0 w-1.5" style={{ backgroundColor: primary }} />
-        <View className="gap-2 pl-1">
-          <View className="flex-row items-center justify-between gap-2">
-            <View
-              className="h-9 w-9 items-center justify-center rounded-2xl"
-              style={{ backgroundColor: withAlpha(primary, 0.14) }}
-            >
-              <Ionicons name={card.icon} size={17} color={primary} />
-            </View>
-            <Ionicons name="chevron-forward" size={15} color={theme.textMuted} />
-          </View>
-          <Text className="text-xs font-semibold leading-4" style={{ color: theme.textSecondary }} numberOfLines={1}>
-            {card.label}
-          </Text>
-          <Text
-            className="text-[17px] font-bold leading-6"
-            style={{ color: theme.text }}
-            numberOfLines={1}
-            adjustsFontSizeToFit
-            minimumFontScale={0.78}
-          >
-            {card.value}
-          </Text>
-        </View>
-      </Surface>
-    </NativePressable>
   );
 }

@@ -25,6 +25,12 @@ describe('useNetworkStatus', () => {
   });
 
   it('updates immediately when native connectivity reports offline', async () => {
+    let resolveFetch: ((value: { ok: boolean; status: number }) => void) | undefined;
+    const pendingFetch = new Promise<{ ok: boolean; status: number }>((resolve) => {
+      resolveFetch = resolve;
+    });
+    global.fetch = jest.fn().mockReturnValue(pendingFetch) as jest.Mock;
+
     const { result } = renderHook(() => useNetworkStatus());
 
     expect(NetInfo.addEventListener).toHaveBeenCalled();
@@ -37,17 +43,35 @@ describe('useNetworkStatus', () => {
     await waitFor(() => {
       expect(result.current.isOnline).toBe(false);
     });
+
+    await act(async () => {
+      resolveFetch?.({ ok: true, status: 200 });
+      await pendingFetch;
+    });
+
+    expect(result.current.isOnline).toBe(false);
   });
 
-  it('does not show online when the device has local network but no internet reachability', async () => {
+  it('keeps the app online while backend reachability confirms an ambiguous native signal', async () => {
+    let resolveFetch: ((value: { ok: boolean; status: number }) => void) | undefined;
+    const pendingFetch = new Promise<{ ok: boolean; status: number }>((resolve) => {
+      resolveFetch = resolve;
+    });
+    global.fetch = jest.fn().mockReturnValue(pendingFetch) as jest.Mock;
+
     const { result } = renderHook(() => useNetworkStatus());
 
     act(() => {
       netInfoListener?.({ isConnected: true, isInternetReachable: false });
     });
 
-    await waitFor(() => {
-      expect(result.current.isOnline).toBe(false);
+    expect(result.current.isOnline).toBe(true);
+
+    await act(async () => {
+      resolveFetch?.({ ok: true, status: 200 });
+      await pendingFetch;
     });
+
+    expect(result.current.isOnline).toBe(true);
   });
 });

@@ -64,6 +64,7 @@ export function useNetworkStatus(): NetworkStatus {
   // ── Native path ─────────────────────────────────────────────────────────────
   const isMountedRef = useRef(true);
   const isCheckingRef = useRef(false); // guard against concurrent pings
+  const isHardOfflineRef = useRef(false);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -99,7 +100,7 @@ export function useNetworkStatus(): NetworkStatus {
     }
 
     if (isMountedRef.current) {
-      setIsOnline(online);
+      setIsOnline(isHardOfflineRef.current ? false : online);
       setIsChecking(false);
     }
     isCheckingRef.current = false;
@@ -117,13 +118,23 @@ export function useNetworkStatus(): NetworkStatus {
     if (Platform.OS === 'web') return;
 
     return NetInfo.addEventListener((state) => {
-      const hasNetwork = state.isConnected !== false;
-      const hasInternet = state.isInternetReachable !== false;
-      const nextOnline = hasNetwork && hasInternet;
+      if (state.isConnected === false) {
+        isHardOfflineRef.current = true;
+        setIsOnline(false);
+        return;
+      }
 
-      setIsOnline(nextOnline);
+      isHardOfflineRef.current = false;
 
-      if (state.isConnected && state.isInternetReachable === null) {
+      if (state.isInternetReachable === true) {
+        setIsOnline(true);
+        return;
+      }
+
+      // Android emulators and some networks can report internet reachability
+      // as false while the configured API is reachable. Confirm with the
+      // backend before showing a global offline banner.
+      if (state.isConnected) {
         void checkConnectivity();
       }
     });
