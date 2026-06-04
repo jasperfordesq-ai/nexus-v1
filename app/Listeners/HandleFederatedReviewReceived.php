@@ -136,8 +136,14 @@ class HandleFederatedReviewReceived implements ShouldQueue
                             'email_last_error' => null,
                         ]);
                     } else {
+                        // Best-effort email: the review is already recorded and the
+                        // failure is persisted (email_failed_at / email_last_error) for
+                        // retry and visibility. Do NOT throw — this is a ShouldQueue
+                        // listener, so throwing would retry the job and re-fire the
+                        // side-effects (duplicate-email risk), and when the queue runs
+                        // sync it 500s the federated-review ingest. Fail gracefully,
+                        // matching the federated message / transaction handlers.
                         $this->markReviewEmailFailed('Email dispatch returned false');
-                        throw new \RuntimeException('Federated review email dispatch returned false');
                     }
                 }
             });

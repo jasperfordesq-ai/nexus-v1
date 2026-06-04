@@ -164,13 +164,17 @@ class HandleFederatedConnectionReceived implements ShouldQueue
                 ]);
 
             if (! $sent) {
+                // Best-effort email: the connection is already recorded and the
+                // failure is persisted (email_failed_at) for retry and visibility. Do
+                // NOT throw — this is a queued listener, so throwing would retry and
+                // re-fire side-effects (duplicate-email risk), and when the queue runs
+                // sync it 500s the federated-connection ingest. Fail gracefully.
                 Log::warning('[HandleFederatedConnectionReceived] external connection email returned false', [
                     'tenant_id'     => $event->tenantId,
                     'partner_id'    => $event->externalPartnerId,
                     'local_user_id' => $localUserId,
                     'status'        => $status,
                 ]);
-                throw new \RuntimeException('Federated connection email dispatch returned false');
             }
 
             Log::info('[HandleFederatedConnectionReceived] notified local user', [

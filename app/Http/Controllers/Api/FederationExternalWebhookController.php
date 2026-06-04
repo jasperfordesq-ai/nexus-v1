@@ -506,7 +506,10 @@ class FederationExternalWebhookController extends BaseApiController
 
         $reviewRow = [
             'tenant_id'          => $tenantId,
-            'reviewer_id'        => $reviewerExternalId,
+            // Federated reviewer is remote — not a local users row — so reviewer_id
+            // stays NULL (its origin is captured by reviewer_tenant_id +
+            // external_partner_id). Avoids violating the reviewer_id -> users FK.
+            'reviewer_id'        => null,
             'reviewer_tenant_id' => $reviewerTenantId ?: null,
             'receiver_id'        => $receiverId,
             'receiver_tenant_id' => $tenantId,
