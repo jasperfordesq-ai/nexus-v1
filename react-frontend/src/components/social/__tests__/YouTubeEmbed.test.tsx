@@ -216,7 +216,8 @@ describe('YouTubeEmbed', () => {
 
     const playButton = screen.getByLabelText('Play video: Video');
     const container = playButton.parentElement;
-    expect(container).toHaveStyle({ aspectRatio: '16 / 9' });
+    // 16:9 is now expressed via Tailwind's `aspect-video` utility rather than an inline style.
+    expect(container).toHaveClass('aspect-video');
   });
 
   it('handles youtube.com/embed/ URL format', () => {
