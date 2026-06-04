@@ -107,6 +107,37 @@ function cloneConfig(config: LandingPageConfig): LandingPageConfig {
   return JSON.parse(JSON.stringify(config));
 }
 
+/** Monotonic client-only id source for stable list keys (never persisted). */
+let _listKeySeq = 0;
+function genListKey(): string {
+  _listKeySeq += 1;
+  return `lpk-${_listKeySeq}`;
+}
+
+/**
+ * Inject a stable client-only `_key` into every content-array item that lacks one,
+ * so React keys survive reorder/delete — index keys misassociate input focus/state
+ * when items move. cleanConfig() strips `_key` again before save, so the persisted
+ * config (and the public landing page) never sees it.
+ */
+function withListKeys(config: LandingPageConfig): LandingPageConfig {
+  const next = cloneConfig(config);
+  for (const section of next.sections) {
+    if (!section.content) continue;
+    const content = section.content as Record<string, unknown>;
+    for (const key of Object.keys(content)) {
+      const val = content[key];
+      if (!Array.isArray(val)) continue;
+      for (const item of val) {
+        if (item && typeof item === 'object' && !(item as Record<string, unknown>)._key) {
+          (item as Record<string, unknown>)._key = genListKey();
+        }
+      }
+    }
+  }
+  return next;
+}
+
 /** Sort sections by order */
 function sortedSections(sections: LandingSection[]): LandingSection[] {
   return [...sections].sort((a, b) => a.order - b.order);
@@ -127,13 +158,19 @@ function cleanConfig(config: LandingPageConfig): LandingPageConfig {
       if (val === '' || val === undefined || val === null) {
         delete content[key];
       }
-      // Clean arrays: remove items with all-empty fields
+      // Clean arrays: strip the client-only `_key`, then remove all-empty items.
       if (Array.isArray(val)) {
-        const filtered = val.filter((item: Record<string, unknown>) => {
-          return Object.values(item).some(
-            (v) => v !== '' && v !== undefined && v !== null,
+        const filtered = val
+          .map((item: Record<string, unknown>) => {
+            const rest = { ...item };
+            delete rest._key;
+            return rest;
+          })
+          .filter((item: Record<string, unknown>) =>
+            Object.values(item).some(
+              (v) => v !== '' && v !== undefined && v !== null,
+            ),
           );
-        });
         if (filtered.length === 0) {
           delete content[key];
         } else {
@@ -319,7 +356,7 @@ function AudienceCardsEditor({
       ...content,
       cards: [
         ...cards,
-        { title: '', description: '', cta_label: t('content.landing_default_cta_learn_more'), target_url: '/' },
+        { _key: genListKey(), title: '', description: '', cta_label: t('content.landing_default_cta_learn_more'), target_url: '/' },
       ],
     });
   };
@@ -357,7 +394,7 @@ function AudienceCardsEditor({
         {t('content.landing_audience_cards_hint')}
       </p>
       {cards.map((card, i) => (
-        <Card key={i} variant="transparent" className="border border-border bg-surface">
+        <Card key={card._key ?? i} variant="transparent" className="border border-border bg-surface">
           <CardBody className="flex flex-col gap-3 p-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-foreground">
@@ -491,7 +528,7 @@ function FeaturePillsEditor({
     if (items.length >= 6) return;
     onChange({
       ...content,
-      items: [...items, { title: '', description: '' }],
+      items: [...items, { _key: genListKey(), title: '', description: '' }],
     });
   };
 
@@ -503,7 +540,7 @@ function FeaturePillsEditor({
   return (
     <div className="flex flex-col gap-4">
       {items.map((item, i) => (
-        <Card key={i} variant="transparent" className="border border-border bg-surface">
+        <Card key={item._key ?? i} variant="transparent" className="border border-border bg-surface">
           <CardBody className="flex flex-col gap-3 p-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-foreground">
@@ -608,7 +645,7 @@ function HowItWorksEditor({
   const addStep = () => {
     onChange({
       ...content,
-      steps: [...steps, { title: '', description: '' }],
+      steps: [...steps, { _key: genListKey(), title: '', description: '' }],
     });
   };
 
@@ -638,7 +675,7 @@ function HowItWorksEditor({
       </div>
       <Separator />
       {steps.map((step, i) => (
-        <Card key={i} variant="transparent" className="border border-border bg-surface">
+        <Card key={step._key ?? i} variant="transparent" className="border border-border bg-surface">
           <CardBody className="flex flex-col gap-3 p-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-foreground">
@@ -711,7 +748,7 @@ function CoreValuesEditor({
   const addValue = () => {
     onChange({
       ...content,
-      values: [...values, { title: '', description: '' }],
+      values: [...values, { _key: genListKey(), title: '', description: '' }],
     });
   };
 
@@ -741,7 +778,7 @@ function CoreValuesEditor({
       </div>
       <Separator />
       {values.map((val, i) => (
-        <Card key={i} variant="transparent" className="border border-border bg-surface">
+        <Card key={val._key ?? i} variant="transparent" className="border border-border bg-surface">
           <CardBody className="flex flex-col gap-3 p-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-foreground">
@@ -1024,11 +1061,11 @@ export function LandingPageBuilder() {
       if (res.success && res.data) {
         const result = res.data as unknown as { config: LandingPageConfig | null };
         if (result.config) {
-          setConfig(result.config);
+          setConfig(withListKeys(result.config));
           setSavedConfig(cloneConfig(result.config));
         } else {
           // No custom config — use defaults
-          const defaults = cloneConfig(DEFAULT_LANDING_PAGE_CONFIG);
+          const defaults = withListKeys(cloneConfig(DEFAULT_LANDING_PAGE_CONFIG));
           setConfig(defaults);
           setSavedConfig(null);
         }
@@ -1093,7 +1130,7 @@ export function LandingPageBuilder() {
     try {
       const res = await adminLandingPage.update(null);
       if (res.success) {
-        const defaults = cloneConfig(DEFAULT_LANDING_PAGE_CONFIG);
+        const defaults = withListKeys(cloneConfig(DEFAULT_LANDING_PAGE_CONFIG));
         setConfig(defaults);
         setSavedConfig(null);
         setIsDirty(false);

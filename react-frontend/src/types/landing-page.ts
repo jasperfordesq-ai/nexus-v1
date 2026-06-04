@@ -61,6 +61,8 @@ export interface HeroContent {
 }
 
 export interface AudienceCard {
+  /** Client-only stable React key; injected on load, stripped before save by cleanConfig(). */
+  _key?: string;
   icon?: LandingIconId;
   title: string;
   description: string;
@@ -75,6 +77,8 @@ export interface AudienceCardsContent {
 }
 
 export interface FeaturePillItem {
+  /** Client-only stable React key; injected on load, stripped before save by cleanConfig(). */
+  _key?: string;
   icon?: LandingIconId;
   title: string;
   description: string;
@@ -90,6 +94,8 @@ export interface StatsContent {
 }
 
 export interface HowItWorksStep {
+  /** Client-only stable React key; injected on load, stripped before save by cleanConfig(). */
+  _key?: string;
   icon?: LandingIconId;
   title: string;
   description: string;
@@ -102,6 +108,8 @@ export interface HowItWorksContent {
 }
 
 export interface CoreValue {
+  /** Client-only stable React key; injected on load, stripped before save by cleanConfig(). */
+  _key?: string;
   title: string;
   description: string;
 }
