@@ -8,7 +8,10 @@ namespace App\Http\Controllers\Api\Concerns;
 
 use App\Core\TenantContext;
 use App\Models\Course;
+use App\Models\CourseGroupLink;
+use App\Models\User;
 use App\Services\CourseInstructorService;
+use App\Services\GroupService;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 /**
@@ -108,5 +111,95 @@ trait InteractsWithCourses
 
         // Non-owner: only admins may modify someone else's course.
         $this->requireAdmin();
+    }
+
+    /**
+     * Ensure a course may be viewed by the current public/member audience.
+     *
+     * Draft, archived, rejected, flagged, member-only, and group-only courses all
+     * use a not-found response when the caller is outside the intended audience.
+     * That avoids leaking private course existence through direct URLs.
+     *
+     * @throws HttpResponseException
+     */
+    protected function ensureCourseViewable(Course $course, ?int $userId): void
+    {
+        if ($this->canViewCourse($course, $userId)) {
+            return;
+        }
+
+        throw new HttpResponseException(
+            $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.courses.not_found'), null, 404)
+        );
+    }
+
+    protected function canViewCourse(Course $course, ?int $userId): bool
+    {
+        if ($userId !== null && $this->canManageCourseAsUser($course, $userId)) {
+            return true;
+        }
+
+        if ($course->status !== 'published' || $course->moderation_status !== 'approved') {
+            return false;
+        }
+
+        return $this->canViewPublishedCourseAudience($course, $userId);
+    }
+
+    protected function canViewPublishedCourseAudience(Course $course, ?int $userId): bool
+    {
+        if ($course->visibility === 'public') {
+            return true;
+        }
+
+        if ($course->visibility === 'members') {
+            return $userId !== null;
+        }
+
+        if ($course->visibility === 'group') {
+            return $userId !== null && $this->isCourseLinkedGroupMember($course, $userId);
+        }
+
+        return false;
+    }
+
+    protected function canManageCourseAsUser(Course $course, int $userId): bool
+    {
+        return (int) $course->author_user_id === $userId || $this->isCourseAdminUser($userId);
+    }
+
+    protected function isCourseAdminUser(int $userId): bool
+    {
+        $user = User::query()
+            ->select(['id', 'role', 'is_admin', 'is_super_admin', 'is_tenant_super_admin', 'is_god'])
+            ->find($userId);
+
+        if (!$user) {
+            return false;
+        }
+
+        $role = $user->role ?? 'member';
+
+        return in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'], true)
+            || (bool) ($user->is_admin ?? false)
+            || (bool) ($user->is_super_admin ?? false)
+            || (bool) ($user->is_tenant_super_admin ?? false)
+            || (bool) ($user->is_god ?? false);
+    }
+
+    private function isCourseLinkedGroupMember(Course $course, int $userId): bool
+    {
+        $groupIds = CourseGroupLink::where('course_id', $course->id)
+            ->pluck('group_id')
+            ->map(fn ($value) => (int) $value)
+            ->all();
+
+        foreach ($groupIds as $groupId) {
+            if (GroupService::isActiveMember($groupId, $userId) || GroupService::canModify($groupId, $userId)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

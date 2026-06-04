@@ -7,13 +7,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Api\Concerns\InteractsWithCourses;
+use App\Models\Group;
 use App\Services\CourseGroupService;
+use App\Services\GroupService;
 use Illuminate\Http\JsonResponse;
 
 /**
  * CourseGroupController — link/unlink courses to community groups and expose a
- * group's recommended courses. Linking is course-owner-or-admin; listing is open
- * to anyone who can see the group.
+ * group's recommended courses. Linking is course-owner-or-admin; listing is an
+ * authenticated route filtered to the viewer's group access.
  */
 class CourseGroupController extends BaseApiController
 {
@@ -28,6 +30,9 @@ class CourseGroupController extends BaseApiController
         $userId = $this->requireCourseAuthor();
         $course = $this->findCourseOrFail($courseId);
         $this->ensureCourseOwnerOrAdmin($course, $userId);
+        if (!Group::where('id', $groupId)->exists()) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.courses.not_found'), null, 404);
+        }
 
         $link = CourseGroupService::attach($courseId, $groupId);
 
@@ -51,8 +56,13 @@ class CourseGroupController extends BaseApiController
     public function forGroup(int $groupId): JsonResponse
     {
         $this->ensureCoursesFeature();
+        $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
 
-        return $this->respondWithData(CourseGroupService::coursesForGroup($groupId));
+        if (!GroupService::canView($groupId, $userId)) {
+            return $this->respondWithData([]);
+        }
+
+        return $this->respondWithData(CourseGroupService::coursesForGroup($groupId, $userId));
     }
 
     /** GET /v2/courses/{courseId}/groups — group ids this course is linked to (owner/admin). */

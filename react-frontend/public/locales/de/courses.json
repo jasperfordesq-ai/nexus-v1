@@ -52,7 +52,8 @@
     "take_quiz": "Machen Sie ein Quiz",
     "back_to_course": "Zurück zum Kurs",
     "locked": "Diese Lektion ist noch nicht verfügbar.",
-    "locked_until": "Verfügbar von {{date}}"
+    "locked_until": "Verfügbar von {{date}}",
+    "action_failed": "Couldn't save your progress. Please try again."
   },
   "quiz": {
     "title": "Quiz",
@@ -107,7 +108,8 @@
     "enrollment_cohort": "Kohorte",
     "credit_cost_label": "Zeitguthaben-Kosten",
     "prerequisites_label": "IDs der vorausgesetzten Kurse",
-    "no_category": "Keine Kategorie"
+    "no_category": "Keine Kategorie",
+    "no_courses": "You haven't created any courses yet."
   },
   "grading": {
     "title": "Benotung",

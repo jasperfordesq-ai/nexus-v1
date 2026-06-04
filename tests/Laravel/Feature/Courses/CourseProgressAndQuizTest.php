@@ -12,10 +12,14 @@ use App\Models\Course;
 use App\Models\CourseLesson;
 use App\Models\CourseQuestion;
 use App\Models\CourseQuiz;
+use App\Models\CourseSection;
 use App\Services\CourseEnrollmentService;
+use App\Services\CourseLessonService;
 use App\Services\CourseProgressService;
 use App\Services\CourseQuizService;
+use App\Services\CourseService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Tests\Laravel\TestCase;
 
 /**
@@ -35,6 +39,7 @@ class CourseProgressAndQuizTest extends TestCase
             'slug' => 'test-course-' . uniqid(),
             'visibility' => 'members',
         ]);
+        $course->tenant_id = $this->testTenantId;
         $course->author_user_id = 1;
         $course->status = 'published';
         $course->moderation_status = 'approved';
@@ -53,6 +58,19 @@ class CourseProgressAndQuizTest extends TestCase
         return $course;
     }
 
+    private function setCourseModeration(bool $enabled): void
+    {
+        $raw = DB::table('tenants')->where('id', $this->testTenantId)->value('configuration');
+        $config = is_string($raw) && $raw !== '' ? json_decode($raw, true) : [];
+        if (!is_array($config)) {
+            $config = [];
+        }
+        $config['courses']['moderation_enabled'] = $enabled;
+        DB::table('tenants')->where('id', $this->testTenantId)
+            ->update(['configuration' => json_encode($config)]);
+        TenantContext::setById($this->testTenantId);
+    }
+
     public function test_enroll_is_idempotent(): void
     {
         $course = $this->makeCourseWithLessons(1);
@@ -61,6 +79,34 @@ class CourseProgressAndQuizTest extends TestCase
         $second = CourseEnrollmentService::enroll($course->id, 42);
 
         $this->assertSame($first->id, $second->id);
+    }
+
+    public function test_dropped_enrollment_is_not_active_and_can_be_reactivated_without_duplicate_row(): void
+    {
+        $course = $this->makeCourseWithLessons(1);
+
+        $first = CourseEnrollmentService::enroll($course->id, 42);
+        $this->assertTrue(CourseEnrollmentService::isEnrolled($course->id, 42));
+        $this->assertSame(1, (int) $course->fresh()->enrollment_count);
+
+        $this->assertTrue(CourseEnrollmentService::drop($course->id, 42));
+        $this->assertFalse(CourseEnrollmentService::isEnrolled($course->id, 42));
+        $this->assertSame('dropped', $first->fresh()->status);
+        $this->assertSame(0, (int) $course->fresh()->enrollment_count);
+
+        $again = CourseEnrollmentService::enroll($course->id, 42);
+        $this->assertSame($first->id, $again->id);
+        $this->assertSame('active', $again->fresh()->status);
+        $this->assertSame(1, (int) $course->fresh()->enrollment_count);
+    }
+
+    public function test_for_user_excludes_dropped_enrollments(): void
+    {
+        $course = $this->makeCourseWithLessons(1);
+        CourseEnrollmentService::enroll($course->id, 42);
+        CourseEnrollmentService::drop($course->id, 42);
+
+        $this->assertSame([], CourseEnrollmentService::forUser(42));
     }
 
     public function test_completing_all_lessons_completes_course(): void
@@ -156,6 +202,59 @@ class CourseProgressAndQuizTest extends TestCase
         // the row-locked transaction, so it can't be raced by concurrent requests).
         $this->expectException(MaxAttemptsExceededException::class);
         CourseQuizService::submitAttempt($quiz->id, 42, [], null);
+    }
+
+    public function test_lesson_service_rejects_section_ids_from_another_course(): void
+    {
+        $course = $this->makeCourseWithLessons(0);
+        $otherCourse = $this->makeCourseWithLessons(0);
+        $otherSection = CourseSection::create([
+            'course_id' => $otherCourse->id,
+            'title' => 'Other course section',
+            'position' => 0,
+        ]);
+
+        $lesson = CourseLessonService::create($course->id, [
+            'section_id' => $otherSection->id,
+            'title' => 'Lesson',
+            'content_type' => 'text',
+        ]);
+
+        $this->assertNull($lesson->section_id);
+    }
+
+    public function test_course_publish_honours_moderation_setting(): void
+    {
+        $this->setCourseModeration(true);
+        $course = $this->makeCourseWithLessons(0);
+        $course->status = 'draft';
+        $course->moderation_status = 'pending';
+        $course->published_at = null;
+        $course->save();
+
+        $published = CourseService::publish($course);
+
+        $this->assertSame('published', $published->status);
+        $this->assertSame('pending', $published->moderation_status);
+        $this->assertNull($published->published_at);
+
+        $this->setCourseModeration(false);
+    }
+
+    public function test_course_service_normalizes_invalid_enums_and_negative_credit_values(): void
+    {
+        $course = CourseService::create(1, [
+            'title' => 'Normalized course',
+            'level' => 'expert',
+            'visibility' => 'secret',
+            'enrollment_type' => 'live',
+            'credit_cost' => -5,
+        ]);
+
+        $this->assertSame('beginner', $course->level);
+        $this->assertSame('members', $course->visibility);
+        $this->assertSame('self_paced', $course->enrollment_type);
+        $this->assertEqualsWithDelta(0.0, (float) $course->credit_cost, 0.01);
     }
 
     public function test_course_is_tenant_scoped(): void

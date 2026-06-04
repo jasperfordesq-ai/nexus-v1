@@ -24,7 +24,9 @@ class CourseCohortController extends BaseApiController
     public function index(int $courseId): JsonResponse
     {
         $this->ensureCoursesFeature();
-        $this->requireAuth();
+        $userId = $this->requireAuth();
+        $course = $this->findCourseOrFail($courseId);
+        $this->ensureCourseViewable($course, $userId);
 
         return $this->respondWithData(CourseCohortService::forCourse($courseId));
     }

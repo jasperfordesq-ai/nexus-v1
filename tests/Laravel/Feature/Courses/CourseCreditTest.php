@@ -31,6 +31,7 @@ class CourseCreditTest extends TestCase
             'visibility' => 'members',
             'credit_cost' => $cost,
         ]);
+        $course->tenant_id = $this->testTenantId;
         $course->author_user_id = $authorId;
         $course->status = 'published';
         $course->moderation_status = 'approved';

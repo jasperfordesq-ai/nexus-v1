@@ -59,6 +59,9 @@ class AdminCourseController extends BaseApiController
         $course->moderation_notes = $this->input('notes');
         $course->moderated_by = $adminId;
         $course->moderated_at = Carbon::now();
+        if ($action === 'approve' && $course->status === 'published' && !$course->published_at) {
+            $course->published_at = Carbon::now();
+        }
         if ($action === 'reject') {
             $course->status = 'draft';
         }

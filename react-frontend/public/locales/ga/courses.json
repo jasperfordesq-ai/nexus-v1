@@ -52,7 +52,8 @@
     "take_quiz": "Tóg tráth na gceist",
     "back_to_course": "Ar ais go cúrsa",
     "locked": "Níl an ceacht seo ar fáil go fóill.",
-    "locked_until": "Ar fáil ó {{date}}"
+    "locked_until": "Ar fáil ó {{date}}",
+    "action_failed": "Couldn't save your progress. Please try again."
   },
   "quiz": {
     "title": "Tráth na gCeist",
@@ -107,7 +108,8 @@
     "enrollment_cohort": "Coh?rt",
     "credit_cost_label": "Costas i gcreidmheasanna ama",
     "prerequisites_label": "Aitheantais na gc?rsa? riachtanacha",
-    "no_category": "Gan chatag?ir"
+    "no_category": "Gan chatag?ir",
+    "no_courses": "You haven't created any courses yet."
   },
   "grading": {
     "title": "Grádú",

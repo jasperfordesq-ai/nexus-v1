@@ -36,6 +36,7 @@ class CourseEnrollmentController extends BaseApiController
         if ($course->status !== 'published' || $course->moderation_status !== 'approved') {
             return $this->respondWithError('COURSE_NOT_AVAILABLE', __('api_controllers_2.courses.not_available'), null, 422);
         }
+        $this->ensureCourseViewable($course, $userId);
 
         // Already enrolled? Return the existing enrollment without charging again.
         if (CourseEnrollmentService::isEnrolled($id, $userId)) {
@@ -65,6 +66,7 @@ class CourseEnrollmentController extends BaseApiController
         $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
 
         $course = $this->findCourseOrFail($id);
+        $this->ensureCourseViewable($course, $userId);
 
         return $this->respondWithData(
             \App\Services\CoursePrerequisiteService::statusFor($course, $userId)
@@ -171,9 +173,9 @@ class CourseEnrollmentController extends BaseApiController
         $this->ensureCoursesFeature();
         $userId = $this->requireAuth();
 
-        CourseEnrollmentService::drop($id, $userId);
+        $dropped = CourseEnrollmentService::drop($id, $userId);
 
-        return $this->respondWithData(['dropped' => true]);
+        return $this->respondWithData(['dropped' => $dropped]);
     }
 
     /** POST /v2/courses/{id}/reviews — leave a review (must be enrolled). */

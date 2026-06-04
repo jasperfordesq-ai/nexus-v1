@@ -88,6 +88,8 @@ export default function CoursePlayerPage() {
       } else {
         toast.success(t('player.lesson_completed'));
       }
+    } else {
+      toast.error(t('player.action_failed'));
     }
   };
 

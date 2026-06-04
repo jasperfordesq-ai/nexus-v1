@@ -119,11 +119,12 @@ class CourseProgressService
         // gamification outage never blocks the learner's progress.
         try {
             if (class_exists(\App\Services\GamificationService::class)) {
+                $courseTitle = (string) (Course::where('id', $enrollment->course_id)->value('title') ?? '');
                 \App\Services\GamificationService::awardXP(
                     $userId,
                     50,
                     'course.completed',
-                    'Completed a course'
+                    __('svc_notifications_2.course.completed', ['title' => $courseTitle])
                 );
                 \App\Services\GamificationService::awardBadgeByKey($userId, 'course_graduate');
             }

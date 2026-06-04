@@ -97,7 +97,13 @@ export default function CreateCoursePage() {
     if (res.success && res.data) {
       setStatus(res.data.status);
       setModerationStatus(res.data.moderation_status);
-      toast.success(res.data.status === 'published' ? t('builder.published_toast') : t('builder.unpublished_toast'));
+      toast.success(
+        res.data.status === 'published'
+          ? res.data.moderation_status === 'approved'
+            ? t('builder.published_toast')
+            : t('instructor.pending_review')
+          : t('builder.unpublished_toast'),
+      );
     } else {
       toast.error(t('builder.save_error'));
     }
@@ -158,7 +164,7 @@ export default function CreateCoursePage() {
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-bold">{isEdit ? t('instructor.edit_course') : t('instructor.new_course')}</h1>
           {isEdit ? (
-            status === 'published'
+            status === 'published' && moderationStatus === 'approved'
               ? <Chip size="sm" color="success" variant="soft">{t('instructor.published')}</Chip>
               : moderationStatus === 'pending' && status !== 'draft'
                 ? <Chip size="sm" color="warning" variant="soft">{t('instructor.pending_review')}</Chip>

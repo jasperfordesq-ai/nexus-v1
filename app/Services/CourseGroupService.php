@@ -6,8 +6,10 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use App\Models\Course;
 use App\Models\CourseGroupLink;
+use App\Models\Group;
 
 /**
  * CourseGroupService — links courses to community groups so a group can surface
@@ -18,10 +20,26 @@ class CourseGroupService
     /** Attach a course to a group (idempotent). */
     public static function attach(int $courseId, int $groupId): CourseGroupLink
     {
-        return CourseGroupLink::firstOrCreate([
+        if (!Group::where('id', $groupId)->exists()) {
+            throw new \RuntimeException('group_not_found');
+        }
+
+        $link = CourseGroupLink::where('course_id', $courseId)
+            ->where('group_id', $groupId)
+            ->first();
+
+        if ($link) {
+            return $link;
+        }
+
+        $link = new CourseGroupLink([
             'course_id' => $courseId,
             'group_id' => $groupId,
         ]);
+        $link->tenant_id = (int) TenantContext::getId();
+        $link->save();
+
+        return $link;
     }
 
     public static function detach(int $courseId, int $groupId): void
@@ -36,15 +54,29 @@ class CourseGroupService
      *
      * @return array<int,array<string,mixed>>
      */
-    public static function coursesForGroup(int $groupId): array
+    public static function coursesForGroup(int $groupId, ?int $viewerUserId = null): array
     {
         $courseIds = CourseGroupLink::where('group_id', $groupId)->pluck('course_id')->all();
         if (!$courseIds) {
             return [];
         }
 
+        $canSeeGroupOnly = $viewerUserId !== null
+            && (GroupService::isActiveMember($groupId, $viewerUserId) || GroupService::canModify($groupId, $viewerUserId));
+
         return Course::whereIn('id', $courseIds)
             ->published()
+            ->where(function ($query) use ($viewerUserId, $canSeeGroupOnly) {
+                $query->where('visibility', 'public');
+
+                if ($viewerUserId !== null) {
+                    $query->orWhere('visibility', 'members');
+                }
+
+                if ($canSeeGroupOnly) {
+                    $query->orWhere('visibility', 'group');
+                }
+            })
             ->with(['category:id,name,slug', 'author:id,name,avatar_url'])
             ->orderByDesc('published_at')
             ->get()

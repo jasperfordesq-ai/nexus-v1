@@ -52,7 +52,8 @@
     "take_quiz": "クイズに挑戦する",
     "back_to_course": "コースに戻る",
     "locked": "このレッスンはまだ利用できません。",
-    "locked_until": "{{date}} から利用可能"
+    "locked_until": "{{date}} から利用可能",
+    "action_failed": "Couldn't save your progress. Please try again."
   },
   "quiz": {
     "title": "クイズ",
@@ -107,7 +108,8 @@
     "enrollment_cohort": "コホート",
     "credit_cost_label": "必要クレジット数",
     "prerequisites_label": "前提コースID",
-    "no_category": "カテゴリなし"
+    "no_category": "カテゴリなし",
+    "no_courses": "You haven't created any courses yet."
   },
   "grading": {
     "title": "グレーディング",

@@ -7,6 +7,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Exceptions\MaxAttemptsExceededException;
+use App\Models\CourseLesson;
 use App\Http\Controllers\Api\Concerns\InteractsWithCourses;
 use App\Models\CourseQuestion;
 use App\Models\CourseQuiz;
@@ -126,9 +127,14 @@ class CourseQuizController extends BaseApiController
     {
         $this->guardCourse($courseId);
 
+        $lessonId = $this->inputInt('lesson_id', null, 1);
+        if ($lessonId !== null && !CourseLesson::where('id', $lessonId)->where('course_id', $courseId)->exists()) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.courses.not_found'), null, 404);
+        }
+
         $quiz = CourseQuiz::create([
             'course_id' => $courseId,
-            'lesson_id' => $this->input('lesson_id'),
+            'lesson_id' => $lessonId,
             'title' => trim((string) $this->input('title', '')),
             'description' => $this->input('description'),
             'pass_mark_percent' => $this->inputInt('pass_mark_percent', 70, 0, 100),
@@ -198,7 +204,7 @@ class CourseQuizController extends BaseApiController
             return true;
         }
 
-        $lesson = \App\Models\CourseLesson::where('id', $quiz->lesson_id)
+        $lesson = CourseLesson::where('id', $quiz->lesson_id)
             ->where('course_id', $quiz->course_id)
             ->first();
         if (!$lesson) {

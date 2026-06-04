@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Models\CourseLesson;
+use App\Models\CourseSection;
 use Carbon\Carbon;
 
 /**
@@ -14,6 +15,9 @@ use Carbon\Carbon;
  */
 class CourseLessonService
 {
+    private const CONTENT_TYPES = ['video', 'text', 'pdf', 'embed', 'quiz'];
+    private const DRIP_TYPES = ['none', 'days_after_enroll', 'fixed_date'];
+
     private const FIELDS = [
         'section_id', 'title', 'content_type', 'body', 'video_url',
         'attachment_url', 'embed_url', 'position', 'min_watch_percent',
@@ -35,6 +39,8 @@ class CourseLessonService
             }
         }
 
+        $payload['section_id'] = self::sectionIdInCourse($payload['section_id'] ?? null, $courseId);
+
         return CourseLesson::create($payload);
     }
 
@@ -50,7 +56,10 @@ class CourseLessonService
         }
         foreach (self::FIELDS as $field) {
             if ($field !== 'title' && array_key_exists($field, $data)) {
-                $lesson->{$field} = self::normaliseField($field, $data[$field]);
+                $value = self::normaliseField($field, $data[$field]);
+                $lesson->{$field} = $field === 'section_id'
+                    ? self::sectionIdInCourse($value, (int) $lesson->course_id)
+                    : $value;
             }
         }
         $lesson->save();
@@ -132,6 +141,38 @@ class CourseLessonService
             return self::normalizeMediaUrl(is_string($value) ? $value : null);
         }
 
+        if ($field === 'content_type') {
+            return in_array($value, self::CONTENT_TYPES, true) ? $value : 'text';
+        }
+
+        if ($field === 'drip_type') {
+            return in_array($value, self::DRIP_TYPES, true) ? $value : 'none';
+        }
+
+        if ($field === 'min_watch_percent') {
+            return max(0, min(100, (int) $value));
+        }
+
+        if (in_array($field, ['position', 'drip_offset_days'], true)) {
+            return max(0, (int) $value);
+        }
+
         return $value;
+    }
+
+    private static function sectionIdInCourse(mixed $sectionId, int $courseId): ?int
+    {
+        if ($sectionId === null || $sectionId === '') {
+            return null;
+        }
+
+        $id = (int) $sectionId;
+        if ($id <= 0) {
+            return null;
+        }
+
+        return CourseSection::where('id', $id)->where('course_id', $courseId)->exists()
+            ? $id
+            : null;
     }
 }

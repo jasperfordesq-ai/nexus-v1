@@ -47,6 +47,7 @@
     "prev_lesson": "Previous lesson",
     "course_progress": "Course progress",
     "lesson_completed": "Lesson completed",
+    "action_failed": "Couldn't save your progress. Please try again.",
     "course_completed_title": "Congratulations!",
     "course_completed_body": "You've completed this course.",
     "take_quiz": "Take quiz",
@@ -107,7 +108,8 @@
     "lesson_type": "Content type",
     "section_title": "Section title",
     "create_error": "Could not save. Please try again.",
-    "no_category": "No category"
+    "no_category": "No category",
+    "no_courses": "You haven't created any courses yet."
   },
   "grading": {
     "title": "Grading",

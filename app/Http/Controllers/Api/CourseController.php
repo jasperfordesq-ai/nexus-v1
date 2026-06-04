@@ -11,7 +11,6 @@ use App\Models\Course;
 use App\Models\CourseReview;
 use App\Services\CourseCategoryService;
 use App\Services\CourseEnrollmentService;
-use App\Services\CourseInstructorService;
 use App\Services\CourseService;
 use Illuminate\Http\JsonResponse;
 
@@ -88,15 +87,9 @@ class CourseController extends BaseApiController
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.courses.not_found'), null, 404);
         }
 
-        // Drafts/archived are only visible to the author or an admin.
-        if ($course->status !== 'published' || $course->moderation_status !== 'approved') {
-            $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
-            if ($userId === null || ((int) $course->author_user_id !== $userId && !CourseInstructorService::isInstructor($userId))) {
-                return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.courses.not_found'), null, 404);
-            }
-        }
-
         $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
+        $this->ensureCourseViewable($course, $userId);
+
         $data = $course->toArray();
         $data['is_enrolled'] = $userId !== null && CourseEnrollmentService::isEnrolled($course->id, $userId);
 
@@ -107,6 +100,10 @@ class CourseController extends BaseApiController
     public function reviews(int $id): JsonResponse
     {
         $this->ensureCoursesFeature();
+
+        $course = $this->findCourseOrFail($id);
+        $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
+        $this->ensureCourseViewable($course, $userId);
 
         $reviews = CourseReview::where('course_id', $id)
             ->where('status', 'approved')

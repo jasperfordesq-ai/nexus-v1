@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Core\TenantContext;
 use App\Models\Course;
 use App\Models\CourseCohort;
 use App\Models\CourseEnrollment;
@@ -21,25 +22,42 @@ class CourseEnrollmentService
 {
     public static function isEnrolled(int $courseId, int $userId): bool
     {
+        $tenantId = self::tenantIdForCourse($courseId);
+        if ($tenantId !== null && TenantContext::currentId() !== $tenantId) {
+            return TenantContext::runForTenant($tenantId, fn () => self::isEnrolled($courseId, $userId));
+        }
+
         return CourseEnrollment::where('course_id', $courseId)
             ->where('user_id', $userId)
+            ->whereIn('status', ['active', 'completed'])
             ->exists();
     }
 
     public static function find(int $courseId, int $userId): ?CourseEnrollment
     {
+        $tenantId = self::tenantIdForCourse($courseId);
+        if ($tenantId !== null && TenantContext::currentId() !== $tenantId) {
+            return TenantContext::runForTenant($tenantId, fn () => self::find($courseId, $userId));
+        }
+
         return CourseEnrollment::where('course_id', $courseId)
             ->where('user_id', $userId)
+            ->whereIn('status', ['active', 'completed'])
             ->first();
     }
 
     /**
      * Enroll a user. Idempotent — returns the existing enrollment if present.
      */
-    public static function enroll(int $courseId, int $userId, ?int $cohortId = null): CourseEnrollment
+    public static function enroll(int $courseId, int $userId, ?int $cohortId = null, bool $notify = true): CourseEnrollment
     {
-        $existing = self::find($courseId, $userId);
-        if ($existing) {
+        $tenantId = self::tenantIdForCourse($courseId);
+        if ($tenantId !== null && TenantContext::currentId() !== $tenantId) {
+            return TenantContext::runForTenant($tenantId, fn () => self::enroll($courseId, $userId, $cohortId, $notify));
+        }
+
+        $existing = self::findAny($courseId, $userId);
+        if ($existing && in_array($existing->status, ['active', 'completed'], true)) {
             return $existing;
         }
 
@@ -50,7 +68,23 @@ class CourseEnrollmentService
             $cohortId = null;
         }
 
-        $enrollment = CourseEnrollment::create([
+        if ($existing && $existing->status === 'dropped') {
+            $existing->cohort_id = $cohortId;
+            $existing->status = 'active';
+            $existing->enrolled_at = Carbon::now();
+            $existing->completed_at = null;
+            $existing->last_accessed_at = Carbon::now();
+            $existing->save();
+
+            Course::where('id', $courseId)->increment('enrollment_count');
+            if ($notify) {
+                CourseNotificationService::enrolled($courseId, $userId);
+            }
+
+            return $existing;
+        }
+
+        $enrollment = new CourseEnrollment([
             'course_id' => $courseId,
             'user_id' => $userId,
             'cohort_id' => $cohortId,
@@ -58,10 +92,14 @@ class CourseEnrollmentService
             'progress_percent' => 0,
             'enrolled_at' => Carbon::now(),
         ]);
+        $enrollment->tenant_id = (int) TenantContext::getId();
+        $enrollment->save();
 
         Course::where('id', $courseId)->increment('enrollment_count');
 
-        CourseNotificationService::enrolled($courseId, $userId);
+        if ($notify) {
+            CourseNotificationService::enrolled($courseId, $userId);
+        }
 
         return $enrollment;
     }
@@ -71,25 +109,57 @@ class CourseEnrollmentService
      */
     public static function enrollWithPayment(Course $course, int $userId, ?int $cohortId = null): CourseEnrollment
     {
-        $existing = self::find((int) $course->id, $userId);
-        if ($existing) {
+        $tenantId = (int) ($course->tenant_id ?: TenantContext::getId());
+        if ($tenantId > 0 && TenantContext::currentId() !== $tenantId) {
+            return TenantContext::runForTenant($tenantId, fn () => self::enrollWithPayment($course, $userId, $cohortId));
+        }
+
+        $existing = self::findAny((int) $course->id, $userId);
+        if ($existing && in_array($existing->status, ['active', 'completed'], true)) {
             return $existing;
         }
 
-        return DB::transaction(function () use ($course, $userId, $cohortId) {
-            $payment = CourseCreditService::chargeEnrollment($course, $userId);
-            $cost = (float) $course->credit_cost;
+        // A dropped learner has already paid once. Reactivate without charging
+        // again, preserving the module's "charge exactly once" contract.
+        if ($existing && $existing->status === 'dropped') {
+            return self::enroll((int) $course->id, $userId, $cohortId);
+        }
 
-            if ($cost > 0 && (int) $course->author_user_id !== $userId && empty($payment['charged'])) {
+        // Run the charge + enrollment atomically under a row lock, but defer the
+        // enrollment notification (push/HTTP I/O) until AFTER commit so we never hold
+        // the locked course/wallet rows open across network calls.
+        [$enrollment, $shouldNotify] = DB::transaction(function () use ($course, $userId, $cohortId) {
+            // Re-read the course under the lock so credit_cost / author_user_id are the
+            // freshest values, not the (possibly stale) instance passed into the method.
+            $locked = Course::whereKey($course->id)->lockForUpdate()->first() ?? $course;
+
+            $existing = self::findAny((int) $course->id, $userId);
+            if ($existing && in_array($existing->status, ['active', 'completed'], true)) {
+                return [$existing, false];
+            }
+            if ($existing && $existing->status === 'dropped') {
+                return [self::enroll((int) $course->id, $userId, $cohortId, false), true];
+            }
+
+            $payment = CourseCreditService::chargeEnrollment($locked, $userId);
+            $cost = (float) $locked->credit_cost;
+
+            if ($cost > 0 && (int) $locked->author_user_id !== $userId && empty($payment['charged'])) {
                 throw new \RuntimeException((string) ($payment['reason'] ?? 'insufficient_credits'));
             }
 
-            $enrollment = self::enroll((int) $course->id, $userId, $cohortId);
+            $enrollment = self::enroll((int) $course->id, $userId, $cohortId, false);
             $enrollment->credits_paid = (float) ($payment['amount'] ?? 0);
             $enrollment->save();
 
-            return $enrollment;
+            return [$enrollment, true];
         });
+
+        if ($shouldNotify) {
+            CourseNotificationService::enrolled((int) $course->id, $userId);
+        }
+
+        return $enrollment;
     }
 
     /**
@@ -100,6 +170,7 @@ class CourseEnrollmentService
     public static function forUser(int $userId): array
     {
         return CourseEnrollment::where('user_id', $userId)
+            ->whereIn('status', ['active', 'completed'])
             ->with(['course:id,title,slug,cover_image,level,author_user_id'])
             ->orderByDesc('last_accessed_at')
             ->orderByDesc('enrolled_at')
@@ -123,14 +194,38 @@ class CourseEnrollmentService
 
     public static function drop(int $courseId, int $userId): bool
     {
-        $enrollment = self::find($courseId, $userId);
-        if (!$enrollment) {
+        $tenantId = self::tenantIdForCourse($courseId);
+        if ($tenantId !== null && TenantContext::currentId() !== $tenantId) {
+            return TenantContext::runForTenant($tenantId, fn () => self::drop($courseId, $userId));
+        }
+
+        $enrollment = self::findAny($courseId, $userId);
+        if (!$enrollment || $enrollment->status !== 'active') {
             return false;
         }
 
         $enrollment->status = 'dropped';
         $enrollment->save();
+        Course::where('id', $courseId)
+            ->where('enrollment_count', '>', 0)
+            ->decrement('enrollment_count');
 
         return true;
+    }
+
+    private static function findAny(int $courseId, int $userId): ?CourseEnrollment
+    {
+        return CourseEnrollment::where('course_id', $courseId)
+            ->where('user_id', $userId)
+            ->first();
+    }
+
+    private static function tenantIdForCourse(int $courseId): ?int
+    {
+        $tenantId = Course::withoutGlobalScopes()
+            ->whereKey($courseId)
+            ->value('tenant_id');
+
+        return $tenantId !== null ? (int) $tenantId : null;
     }
 }

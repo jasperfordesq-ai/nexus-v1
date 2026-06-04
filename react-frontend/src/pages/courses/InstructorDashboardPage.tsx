@@ -49,7 +49,7 @@ export default function InstructorDashboardPage() {
   };
 
   const statusChip = (course: Course) => {
-    if (course.status === 'published') return <Chip size="sm" color="success" variant="soft">{t('instructor.published')}</Chip>;
+    if (course.status === 'published' && course.moderation_status === 'approved') return <Chip size="sm" color="success" variant="soft">{t('instructor.published')}</Chip>;
     if (course.moderation_status === 'pending' && course.status !== 'draft') return <Chip size="sm" color="warning" variant="soft">{t('instructor.pending_review')}</Chip>;
     return <Chip size="sm" variant="soft">{t('instructor.draft')}</Chip>;
   };
@@ -66,7 +66,7 @@ export default function InstructorDashboardPage() {
       {loading ? (
         <div className="flex justify-center py-16" role="status" aria-busy="true"><Spinner size="lg" /></div>
       ) : courses.length === 0 ? (
-        <div className="text-center py-16 text-muted">{t('instructor.my_courses')}</div>
+        <div className="text-center py-16 text-muted">{t('instructor.no_courses')}</div>
       ) : (
         <div className="flex flex-col gap-3">
           {courses.map((course) => (

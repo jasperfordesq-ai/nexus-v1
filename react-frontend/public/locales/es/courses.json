@@ -52,7 +52,8 @@
     "take_quiz": "tomar prueba",
     "back_to_course": "volver al curso",
     "locked": "Esta lección aún no está disponible.",
-    "locked_until": "Disponible desde {{date}}"
+    "locked_until": "Disponible desde {{date}}",
+    "action_failed": "Couldn't save your progress. Please try again."
   },
   "quiz": {
     "title": "Prueba",
@@ -107,7 +108,8 @@
     "enrollment_cohort": "Cohorte",
     "credit_cost_label": "Coste en creditos de tiempo",
     "prerequisites_label": "ID de cursos prerequisito",
-    "no_category": "Sin categor?a"
+    "no_category": "Sin categor?a",
+    "no_courses": "You haven't created any courses yet."
   },
   "grading": {
     "title": "Calificación",
