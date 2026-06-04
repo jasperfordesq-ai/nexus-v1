@@ -922,8 +922,8 @@ export function CreateJobPage() {
             />
             {skillsArray.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-2">
-                {skillsArray.map((skill, idx) => (
-                  <Chip key={idx} size="sm" variant="tertiary" color="accent" className="bg-accent/10 text-accent">
+                {skillsArray.map((skill) => (
+                  <Chip key={skill} size="sm" variant="tertiary" color="accent" className="bg-accent/10 text-accent">
                     <Chip.Label>{skill}</Chip.Label>
                   </Chip>
                 ))}
@@ -1242,7 +1242,7 @@ export function CreateJobPage() {
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       {benefits.map((benefit, idx) => (
                         <Chip
-                          key={idx}
+                          key={benefit}
                           size="sm"
                           variant="tertiary"
                           color="success"
@@ -1570,8 +1570,8 @@ export function CreateJobPage() {
               <div className="space-y-2">
                 <h3 className="text-sm font-semibold text-theme-primary">{t('detail.skills_required')}</h3>
                 <div className="flex flex-wrap gap-1.5">
-                  {skillsArray.map((skill, idx) => (
-                    <Chip key={idx} size="sm" variant="tertiary" color="accent" className="bg-accent/10 text-accent">
+                  {skillsArray.map((skill) => (
+                    <Chip key={skill} size="sm" variant="tertiary" color="accent" className="bg-accent/10 text-accent">
                       <Chip.Label>{skill}</Chip.Label>
                     </Chip>
                   ))}

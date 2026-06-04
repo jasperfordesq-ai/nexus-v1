@@ -85,16 +85,33 @@ function StarRating({ rating, size = 16, interactive, onChange, getStarLabel }: 
   getStarLabel?: (rating: number) => string;
 }) {
   return (
-    <span className="inline-flex gap-0.5">
-      {[1, 2, 3, 4, 5].map((v) => (
-        <Star
-          key={v}
-          size={size}
-          className={`${v <= rating ? 'text-warning fill-warning' : 'text-muted/60'} ${interactive ? 'cursor-pointer hover:scale-110 transition-transform' : ''}`}
-          onClick={interactive && onChange ? () => onChange(v) : undefined}
-          aria-label={interactive && getStarLabel ? getStarLabel(v) : undefined}
-        />
-      ))}
+    <span className="inline-flex gap-0.5" role={interactive ? 'radiogroup' : undefined}>
+      {[1, 2, 3, 4, 5].map((v) => {
+        const star = (
+          <Star
+            size={size}
+            className={`${v <= rating ? 'text-warning fill-warning' : 'text-muted/60'} ${interactive ? 'hover:scale-110 transition-transform' : ''}`}
+            aria-hidden="true"
+          />
+        );
+        // Interactive stars must be real focusable controls so keyboard and
+        // screen-reader users can set a rating (WCAG 2.1.1) — not click-only SVGs.
+        return interactive && onChange ? (
+          <button
+            key={v}
+            type="button"
+            role="radio"
+            aria-checked={v === rating}
+            aria-label={getStarLabel ? getStarLabel(v) : undefined}
+            onClick={() => onChange(v)}
+            className="p-0.5 cursor-pointer rounded-sm focus-visible:outline-2 focus-visible:outline-primary"
+          >
+            {star}
+          </button>
+        ) : (
+          <span key={v}>{star}</span>
+        );
+      })}
     </span>
   );
 }

@@ -176,11 +176,24 @@ interface ApplicationCardProps {
 
 function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmployer, onAcceptInterview, onDeclineInterview, onAcceptOffer, onRejectOffer }: ApplicationCardProps) {
   const { t } = useTranslation('jobs');
+  const toast = useToast();
   const [messageExpanded, setMessageExpanded] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
   const { vacancy } = application;
+
+  // The CV lives on a private disk and is streamed through an authenticated
+  // endpoint (the applicant is authorized for their own CV) — never link the raw
+  // storage path, which is not a public URL.
+  const handleDownloadCv = async () => {
+    try {
+      await api.download(`/v2/jobs/applications/${application.id}/cv`, { filename: 'CV.pdf' });
+    } catch (err) {
+      logError('MyApplicationsPage: failed to download CV', err);
+      toast.error(t('detail.cv_download_error'));
+    }
+  };
 
   const appliedDate = new Date(application.created_at);
   const updatedDate = new Date(application.updated_at);
@@ -470,10 +483,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
           {/* Download CV */}
           {application.cv_path && (
             <Button
-              as='a'
-              href={application.cv_path}
-              target='_blank'
-              rel='noopener noreferrer'
+              onPress={handleDownloadCv}
               size='sm'
               variant='tertiary'
               className='bg-theme-elevated text-theme-muted'
