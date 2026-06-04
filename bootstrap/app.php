@@ -74,6 +74,15 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping()
             ->name('safeguarding-review-flags');
 
+        // Announce podcast episodes whose scheduled publish time has arrived —
+        // notifies subscribers + posts the feed activity. Deferred from publish
+        // time so future-scheduled episodes aren't announced before they're live.
+        $schedule->command('podcasts:release-due')
+            ->everyFiveMinutes()
+            ->withoutOverlapping()
+            ->onOneServer()
+            ->name('podcasts-release-due');
+
         // AG59 — Regional analytics monthly PDF reports for paid subscriptions.
         $schedule->command('regional-analytics:generate-monthly')
             ->monthlyOn(1, '06:00')

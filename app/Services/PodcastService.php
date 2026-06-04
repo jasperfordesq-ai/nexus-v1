@@ -378,17 +378,97 @@ class PodcastService
         $episode->save();
 
         self::refreshEpisodeCount($episode->show);
-        if ($episode->moderation_status === 'approved') {
-            self::recordFeedActivity('podcast_episode', $episode->id, (int) $episode->author_user_id, $episode->title, $episode->summary, $episode->cover_image_url, [
-                'show_id' => $episode->show_id,
-                'slug' => $episode->slug,
-            ]);
-            self::notifySubscribersOfEpisode($episode);
+        // Announce (notify subscribers + post to the feed) only once the episode is
+        // actually live. A future-scheduled episode is left un-announced here and
+        // picked up by `podcasts:release-due` when its scheduled_for arrives, so
+        // subscribers are never notified about an episode they can't open yet.
+        if (self::isEpisodeLive($episode)) {
+            self::announceEpisode($episode);
         }
 
         self::prepareEpisodeForResponse($episode, (int) $episode->author_user_id, false);
 
         return $episode->load('chapters');
+    }
+
+    /**
+     * Is this episode live right now? (published + approved + past any scheduled_for
+     * embargo). Decides whether subscribers should be notified immediately.
+     */
+    private static function isEpisodeLive(PodcastEpisode $episode): bool
+    {
+        if ($episode->status !== 'published' || $episode->moderation_status !== 'approved') {
+            return false;
+        }
+        if ($episode->scheduled_for && $episode->scheduled_for->isFuture()) {
+            return false;
+        }
+
+        return $episode->published_at === null || $episode->published_at <= now();
+    }
+
+    /**
+     * Announce an episode going live — post the feed activity and notify subscribers,
+     * exactly once. `announced_at` is claimed with a conditional UPDATE so the publish
+     * path, the moderation-approval path, and the `podcasts:release-due` scheduler can
+     * never double-post for the same episode.
+     */
+    private static function announceEpisode(PodcastEpisode $episode): void
+    {
+        $claimed = PodcastEpisode::whereKey($episode->id)
+            ->whereNull('announced_at')
+            ->update(['announced_at' => now()]);
+        if ($claimed === 0) {
+            return; // already announced by another path/run
+        }
+        $episode->announced_at = now();
+
+        self::recordFeedActivity('podcast_episode', $episode->id, (int) $episode->author_user_id, $episode->title, $episode->summary, $episode->cover_image_url, [
+            'show_id' => $episode->show_id,
+            'slug' => $episode->slug,
+        ]);
+        self::notifySubscribersOfEpisode($episode);
+    }
+
+    /**
+     * Announce every episode whose scheduled publish time has arrived but which has
+     * not been announced yet. Runs cross-tenant from the `podcasts:release-due`
+     * scheduler (no ambient tenant), setting tenant context per episode — mirroring
+     * GroupScheduledPostService::publishDue().
+     */
+    public static function releaseDueEpisodes(int $limit = 200): int
+    {
+        $previousTenant = TenantContext::getId();
+
+        $due = PodcastEpisode::withoutGlobalScopes()
+            ->where('status', 'published')
+            ->where('moderation_status', 'approved')
+            ->whereNull('announced_at')
+            ->whereNotNull('scheduled_for')
+            ->where('scheduled_for', '<=', now())
+            ->orderBy('scheduled_for')
+            ->limit(max(1, $limit))
+            ->get();
+
+        $released = 0;
+        foreach ($due as $episode) {
+            try {
+                TenantContext::setById((int) $episode->tenant_id);
+                self::announceEpisode($episode);
+                $released++;
+            } catch (\Throwable $e) {
+                Log::warning('[PodcastService] scheduled episode release failed', [
+                    'episode_id' => $episode->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        if ($previousTenant !== null) {
+            TenantContext::setById((int) $previousTenant);
+        }
+
+        return $released;
     }
 
     public static function storeHostedAudio(PodcastEpisode $episode, UploadedFile $file): PodcastEpisode
@@ -594,12 +674,10 @@ class PodcastService
         $episode->save();
         self::refreshEpisodeCount($episode->show);
 
-        if ($action === 'approve' && $episode->status === 'published') {
-            self::recordFeedActivity('podcast_episode', $episode->id, (int) $episode->author_user_id, $episode->title, $episode->summary, $episode->cover_image_url, [
-                'show_id' => $episode->show_id,
-                'slug' => $episode->slug,
-            ]);
-            self::notifySubscribersOfEpisode($episode);
+        // Announce on approval, but only if the episode is actually live now. If it
+        // is still future-scheduled, `podcasts:release-due` announces it when due.
+        if ($action === 'approve' && self::isEpisodeLive($episode)) {
+            self::announceEpisode($episode);
         }
 
         return $episode;

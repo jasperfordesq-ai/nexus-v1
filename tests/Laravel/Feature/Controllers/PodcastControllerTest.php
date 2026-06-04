@@ -7,6 +7,7 @@
 namespace Tests\Laravel\Feature\Controllers;
 
 use App\Core\TenantContext;
+use App\Services\PodcastService;
 use App\Jobs\ProcessPodcastEpisodeMedia;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -738,6 +739,71 @@ class PodcastControllerTest extends TestCase
             'listened_seconds' => 45,
             'completed' => 1,
         ]);
+    }
+
+    public function test_scheduled_episode_is_announced_only_once_when_due(): void
+    {
+        $this->enablePodcasts(true);
+
+        // A subscriber distinct from the episode author (the author is never notified).
+        $subscriber = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+
+        // Author creates + publishes a public show.
+        $author = $this->actingAsMember();
+        $showId = $this->apiPost('/v2/podcasts', [
+            'title' => 'Scheduled Show',
+            'summary' => 'Episodes published on a timer.',
+            'visibility' => 'public',
+        ])->json('data.id');
+        $this->apiPost("/v2/podcasts/{$showId}/publish")->assertStatus(200);
+
+        // Subscriber opts in to new-episode notifications.
+        Sanctum::actingAs($subscriber, ['*']);
+        $this->apiPost("/v2/podcasts/{$showId}/subscribe", ['notify_new_episodes' => true])->assertStatus(200);
+
+        // Author publishes an episode scheduled for the future.
+        Sanctum::actingAs($author, ['*']);
+        $episodeId = $this->apiPost("/v2/podcasts/{$showId}/episodes", [
+            'title' => 'Future Episode',
+            'audio_url' => 'https://cdn.example.test/future.mp3',
+            'audio_bytes' => 1234,
+            'visibility' => 'public',
+            'scheduled_for' => now()->addDay()->toIso8601String(),
+        ])->json('data.id');
+        $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episodeId}/publish")->assertStatus(200);
+
+        // It must NOT be announced while still embargoed.
+        $this->assertNull(DB::table('podcast_episodes')->where('id', $episodeId)->value('announced_at'));
+        $this->assertDatabaseMissing('notifications', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $subscriber->id,
+            'type' => 'podcast_episode',
+        ]);
+
+        // Its scheduled time arrives.
+        DB::table('podcast_episodes')->where('id', $episodeId)->update(['scheduled_for' => now()->subMinute()]);
+
+        TenantContext::setById($this->testTenantId);
+        PodcastService::releaseDueEpisodes();
+
+        // Now it is announced exactly once.
+        $this->assertNotNull(DB::table('podcast_episodes')->where('id', $episodeId)->value('announced_at'));
+        $this->assertDatabaseHas('notifications', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $subscriber->id,
+            'type' => 'podcast_episode',
+        ]);
+
+        // Re-running the scheduler must not produce a duplicate notification.
+        PodcastService::releaseDueEpisodes();
+        $this->assertSame(1, DB::table('notifications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $subscriber->id)
+            ->where('type', 'podcast_episode')
+            ->count());
     }
 
     public function test_cloud_storage_can_be_selected_but_local_remains_default(): void

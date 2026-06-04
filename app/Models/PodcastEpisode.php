@@ -61,6 +61,7 @@ class PodcastEpisode extends Model
         'moderated_at' => 'datetime',
         'scheduled_for' => 'datetime',
         'published_at' => 'datetime',
+        'announced_at' => 'datetime',
         'media_waveform_json' => 'array',
     ];
 
