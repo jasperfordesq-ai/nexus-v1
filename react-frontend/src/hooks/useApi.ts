@@ -50,8 +50,13 @@ export function useApi<T>(
   });
 
   const mountedRef = useRef(true);
+  // Each execute() call gets a monotonic id; only the latest may commit its
+  // response to state, so a slow earlier request can't overwrite a newer one
+  // when `endpoint`/`deps` change (stale-response race).
+  const requestIdRef = useRef(0);
 
   const execute = useCallback(async (): Promise<ApiResponse<T>> => {
+    const requestId = ++requestIdRef.current;
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     if (!endpoint) {
@@ -62,7 +67,7 @@ export function useApi<T>(
 
     const response = await api.get<T>(endpoint);
 
-    if (mountedRef.current) {
+    if (mountedRef.current && requestIdRef.current === requestId) {
       if (response.success) {
         setState({
           data: response.data ?? null,

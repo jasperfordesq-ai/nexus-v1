@@ -191,7 +191,8 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
     const channelName = `private-tenant.${pusher.tenantId}.group.${groupId}`;
 
     try {
-      const channel = pusher.client.subscribe(channelName);
+      const client = pusher.client;
+      const channel = client.subscribe(channelName);
 
       const handler = (data: { chatroom_id: number; message: ChatMessage }) => {
         if (data.chatroom_id === activeChatroomId && data.message.user_id !== user?.id) {
@@ -203,6 +204,9 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
 
       return () => {
         channel.unbind('chatroom.message_posted', handler);
+        // Release the channel subscription too — unbinding the handler alone
+        // leaks the subscription across groupId/chatroom/user changes.
+        client.unsubscribe(channelName);
       };
     } catch {
       // Pusher not available — fall back to polling
