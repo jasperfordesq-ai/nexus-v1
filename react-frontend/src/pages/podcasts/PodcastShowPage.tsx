@@ -25,6 +25,7 @@ export default function PodcastShowPage() {
   const toast = useToast();
   const [show, setShow] = useState<PodcastShow | null>(null);
   const [loading, setLoading] = useState(true);
+  const [subscribing, setSubscribing] = useState(false);
 
   usePageTitle(show?.title ?? t('title'));
 
@@ -50,8 +51,10 @@ export default function PodcastShowPage() {
     : `${API_BASE}/v2/podcasts/${encodeURIComponent(showSlug)}/feed.xml`;
 
   async function handleSubscribe(): Promise<void> {
-    if (!show || !isAuthenticated) return;
+    if (!show || !isAuthenticated || subscribing) return;
+    setSubscribing(true);
     const res = await podcastsApi.toggleSubscription(show.id, true);
+    setSubscribing(false);
     if (res.success && res.data) {
       setShow((current) => current
         ? {
@@ -95,10 +98,16 @@ export default function PodcastShowPage() {
         <Avatar src={show.artwork_url ?? undefined} name={show.title} radius="md" className="h-48 w-48" />
         <div className="min-w-0">
           <div className="mb-2 flex flex-wrap items-center gap-2">
-            <Chip size="sm" variant="soft">{t(`visibility.${show.visibility}`)}</Chip>
+            <Chip size="sm" variant="soft">{t(`visibility.${show.visibility}`, { defaultValue: show.visibility })}</Chip>
             {show.category ? <Chip size="sm" variant="soft">{show.category}</Chip> : null}
             {show.status !== 'published' || show.moderation_status !== 'approved' ? (
-              <Chip size="sm" variant="soft" color="warning">{t(`moderation.${show.moderation_status}`)}</Chip>
+              <Chip
+                size="sm"
+                variant="soft"
+                color={show.moderation_status === 'rejected' || show.moderation_status === 'flagged' ? 'danger' : 'warning'}
+              >
+                {t(`moderation.${show.moderation_status}`, { defaultValue: show.moderation_status })}
+              </Chip>
             ) : null}
           </div>
           <h1 className="text-3xl font-bold leading-tight">{show.title}</h1>
@@ -118,6 +127,8 @@ export default function PodcastShowPage() {
                 size="sm"
                 startContent={show.is_subscribed ? <BellOff size={16} aria-hidden="true" /> : <Bell size={16} aria-hidden="true" />}
                 onPress={handleSubscribe}
+                isDisabled={subscribing}
+                aria-pressed={show.is_subscribed}
               >
                 {show.is_subscribed ? t('show.unsubscribe') : t('show.subscribe')}
               </Button>

@@ -5,16 +5,21 @@
 
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Chip, Progress } from '@/components/ui';
+import { Button, Chip, Slider } from '@/components/ui';
 import type { PodcastChapter, PodcastEpisode } from '@/lib/api/podcasts';
 import Clock from 'lucide-react/icons/clock';
 import Gauge from 'lucide-react/icons/gauge';
 import RotateCcw from 'lucide-react/icons/rotate-ccw';
 import RotateCw from 'lucide-react/icons/rotate-cw';
+import TriangleAlert from 'lucide-react/icons/triangle-alert';
 
 interface PodcastAudioPlayerProps {
   episode: PodcastEpisode;
   onCompleted?: (seconds: number) => void;
+}
+
+function normalizeDuration(value: number | null | undefined): number {
+  return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : 0;
 }
 
 function formatTime(totalSeconds: number): string {
@@ -35,23 +40,30 @@ export function PodcastAudioPlayer({ episode, onCompleted }: PodcastAudioPlayerP
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const completedRef = useRef(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(episode.duration_seconds ?? 0);
+  const [duration, setDuration] = useState(() => normalizeDuration(episode.duration_seconds));
   const [playbackRate, setPlaybackRate] = useState(1);
+  const [scrubValue, setScrubValue] = useState<number | null>(null);
+  const [hasError, setHasError] = useState(false);
 
   const chapters = (episode.chapters ?? []).filter((chapter): chapter is PodcastChapter => Boolean(chapter.title));
-  const progress = duration > 0 ? Math.min(100, (currentTime / duration) * 100) : 0;
+  const canSeek = !hasError && duration > 0;
+  const sliderMax = Math.max(1, duration);
+  const sliderValue = Math.min(Math.max(scrubValue ?? currentTime, 0), sliderMax);
 
-  function seek(seconds: number): void {
-    if (!audioRef.current) return;
-    audioRef.current.currentTime = seconds;
-    audioRef.current.play().catch(() => undefined);
+  function seekTo(seconds: number, autoplay: boolean): void {
+    const audio = audioRef.current;
+    if (!audio || hasError) return;
+    const upperBound = duration > 0 ? duration : seconds;
+    const next = Math.min(Math.max(seconds, 0), upperBound);
+    audio.currentTime = next;
+    setCurrentTime(next);
+    if (autoplay) audio.play().catch(() => undefined);
   }
 
   function skip(deltaSeconds: number): void {
-    if (!audioRef.current) return;
-    const nextTime = Math.min(Math.max(audioRef.current.currentTime + deltaSeconds, 0), duration || Number.MAX_SAFE_INTEGER);
-    audioRef.current.currentTime = nextTime;
-    setCurrentTime(nextTime);
+    const audio = audioRef.current;
+    if (!audio || hasError) return;
+    seekTo(audio.currentTime + deltaSeconds, false);
   }
 
   function changePlaybackRate(nextRate: number): void {
@@ -75,13 +87,30 @@ export function PodcastAudioPlayer({ episode, onCompleted }: PodcastAudioPlayerP
         controls
         preload="metadata"
         src={episode.audio_url}
-        onLoadedMetadata={(event) => setDuration(event.currentTarget.duration || episode.duration_seconds || 0)}
-        onTimeUpdate={(event) => setCurrentTime(event.currentTarget.currentTime)}
+        onLoadedMetadata={(event) => {
+          setDuration(normalizeDuration(event.currentTarget.duration) || normalizeDuration(episode.duration_seconds));
+          setHasError(false);
+        }}
+        onTimeUpdate={(event) => {
+          // Freeze the displayed position while the user is scrubbing.
+          if (scrubValue === null) setCurrentTime(event.currentTarget.currentTime);
+        }}
         onRateChange={(event) => setPlaybackRate(event.currentTarget.playbackRate)}
         onEnded={handleEnded}
+        onError={() => setHasError(true)}
       >
         {t('player.unsupported')}
       </audio>
+
+      {hasError && (
+        <div
+          role="alert"
+          className="flex items-center gap-2 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger"
+        >
+          <TriangleAlert size={16} aria-hidden="true" />
+          <span>{t('player.load_error')}</span>
+        </div>
+      )}
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
@@ -90,6 +119,7 @@ export function PodcastAudioPlayer({ episode, onCompleted }: PodcastAudioPlayerP
             variant="tertiary"
             startContent={<RotateCcw size={16} aria-hidden="true" />}
             onPress={() => skip(-15)}
+            isDisabled={!canSeek}
           >
             {t('player.skip_back')}
           </Button>
@@ -98,6 +128,7 @@ export function PodcastAudioPlayer({ episode, onCompleted }: PodcastAudioPlayerP
             variant="tertiary"
             startContent={<RotateCw size={16} aria-hidden="true" />}
             onPress={() => skip(30)}
+            isDisabled={!canSeek}
           >
             {t('player.skip_forward')}
           </Button>
@@ -110,6 +141,7 @@ export function PodcastAudioPlayer({ episode, onCompleted }: PodcastAudioPlayerP
               size="sm"
               variant={playbackRate === rate ? 'secondary' : 'tertiary'}
               onPress={() => changePlaybackRate(rate)}
+              isDisabled={hasError}
             >
               {t('player.speed', { rate })}
             </Button>
@@ -117,12 +149,27 @@ export function PodcastAudioPlayer({ episode, onCompleted }: PodcastAudioPlayerP
         </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-1">
+        <Slider
+          aria-label={t('player.progress')}
+          size="sm"
+          hideValue
+          minValue={0}
+          maxValue={sliderMax}
+          step={1}
+          value={sliderValue}
+          isDisabled={!canSeek}
+          onChange={(value) => setScrubValue(typeof value === 'number' ? value : (value[0] ?? 0))}
+          onChangeEnd={(value) => {
+            const target = typeof value === 'number' ? value : (value[0] ?? 0);
+            setScrubValue(null);
+            seekTo(target, false);
+          }}
+        />
         <div className="flex items-center justify-between text-xs text-muted">
-          <span>{formatTime(currentTime)}</span>
-          <span>{duration > 0 ? formatTime(duration) : t('player.duration_unknown')}</span>
+          <span className="tabular-nums">{formatTime(sliderValue)}</span>
+          <span className="tabular-nums">{duration > 0 ? formatTime(duration) : t('player.duration_unknown')}</span>
         </div>
-        <Progress aria-label={t('player.progress')} value={progress} />
       </div>
 
       {chapters.length > 0 && (
@@ -137,10 +184,12 @@ export function PodcastAudioPlayer({ episode, onCompleted }: PodcastAudioPlayerP
                 key={`${chapter.starts_at_seconds}-${index}`}
                 size="sm"
                 variant="tertiary"
-                onPress={() => seek(chapter.starts_at_seconds)}
+                onPress={() => seekTo(chapter.starts_at_seconds, true)}
+                isDisabled={hasError}
+                aria-label={t('player.jump_to_chapter', { time: formatTime(chapter.starts_at_seconds), title: chapter.title })}
               >
-                <span>{formatTime(chapter.starts_at_seconds)}</span>
-                <span>{chapter.title}</span>
+                <span className="tabular-nums text-muted">{formatTime(chapter.starts_at_seconds)}</span>
+                <span className="ml-2">{chapter.title}</span>
               </Button>
             ))}
           </div>

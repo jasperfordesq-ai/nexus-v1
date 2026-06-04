@@ -25,6 +25,8 @@ export default function PodcastEpisodePage() {
   const [episode, setEpisode] = useState<PodcastEpisode | null>(null);
   const [loading, setLoading] = useState(true);
   const [reactionActive, setReactionActive] = useState(false);
+  const [reactionCount, setReactionCount] = useState(0);
+  const [reacting, setReacting] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [reportReason, setReportReason] = useState('safety');
   const [reportDetails, setReportDetails] = useState('');
@@ -37,7 +39,11 @@ export default function PodcastEpisodePage() {
     setLoading(true);
     podcastsApi.episode(showSlug, episodeSlug)
       .then((res) => {
-        if (!cancelled) setEpisode(res.success && res.data ? res.data : null);
+        if (cancelled) return;
+        const data = res.success && res.data ? res.data : null;
+        setEpisode(data);
+        setReactionActive(Boolean(data?.viewer_has_reacted));
+        setReactionCount(data?.reaction_count ?? 0);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -58,10 +64,15 @@ export default function PodcastEpisodePage() {
   }
 
   async function handleReaction(): Promise<void> {
-    if (!episode || !isAuthenticated) return;
+    if (!episode || !isAuthenticated || reacting) return;
+    setReacting(true);
     const res = await podcastsApi.toggleReaction(episode.id);
+    setReacting(false);
     if (res.success && res.data) {
       setReactionActive(res.data.active);
+      setReactionCount((count) => Math.max(0, count + (res.data!.active ? 1 : -1)));
+    } else {
+      toast.error(t('episode.reaction_failed'));
     }
   }
 
@@ -99,9 +110,21 @@ export default function PodcastEpisodePage() {
   }
 
   const showPath = episode.show?.slug ?? showSlug;
-  const transcriptDownload = episode.transcript
-    ? `data:text/plain;charset=utf-8,${encodeURIComponent(episode.transcript)}`
-    : null;
+
+  function handleDownloadTranscript(): void {
+    if (!episode?.transcript) return;
+    // Use a Blob URL rather than a data: URI — long transcripts exceed the
+    // browser data-URL length cap and would silently fail to download.
+    const blob = new Blob([episode.transcript], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `${episode.slug}-transcript.txt`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  }
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-6">
@@ -112,9 +135,15 @@ export default function PodcastEpisodePage() {
       <article className="mt-5 space-y-6">
         <header>
           <div className="mb-2 flex flex-wrap items-center gap-2">
-            <Chip size="sm" variant="soft">{t(`episode.type.${episode.episode_type}`)}</Chip>
+            <Chip size="sm" variant="soft">{t(`episode.type.${episode.episode_type}`, { defaultValue: episode.episode_type })}</Chip>
             {episode.status !== 'published' || episode.moderation_status !== 'approved' ? (
-              <Chip size="sm" variant="soft" color="warning">{t(`moderation.${episode.moderation_status}`)}</Chip>
+              <Chip
+                size="sm"
+                variant="soft"
+                color={episode.moderation_status === 'rejected' || episode.moderation_status === 'flagged' ? 'danger' : 'warning'}
+              >
+                {t(`moderation.${episode.moderation_status}`, { defaultValue: episode.moderation_status })}
+              </Chip>
             ) : null}
           </div>
           <h1 className="text-3xl font-bold leading-tight">{episode.title}</h1>
@@ -130,11 +159,21 @@ export default function PodcastEpisodePage() {
           </CardBody>
         </Card>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {isAuthenticated && (
-            <Button variant={reactionActive ? 'secondary' : 'tertiary'} size="sm" startContent={<Heart size={16} aria-hidden="true" />} onPress={handleReaction}>
+            <Button
+              variant={reactionActive ? 'secondary' : 'tertiary'}
+              size="sm"
+              startContent={<Heart size={16} aria-hidden="true" />}
+              onPress={handleReaction}
+              isDisabled={reacting}
+              aria-pressed={reactionActive}
+            >
               {reactionActive ? t('episode.reacted') : t('episode.react')}
             </Button>
+          )}
+          {reactionCount > 0 && (
+            <span className="text-sm text-muted">{t('episode.reactions_count', { count: reactionCount })}</span>
           )}
           {isAuthenticated && (
             <Button variant="tertiary" size="sm" startContent={<Flag size={16} aria-hidden="true" />} onPress={() => setReportOpen(true)}>
@@ -154,18 +193,14 @@ export default function PodcastEpisodePage() {
           <section>
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
               <h2 className="text-lg font-semibold">{t('episode.transcript')}</h2>
-              {transcriptDownload && (
-                <Button
-                  as="a"
-                  href={transcriptDownload}
-                  download={`${episode.slug}-transcript.txt`}
-                  size="sm"
-                  variant="tertiary"
-                  startContent={<FileText size={16} aria-hidden="true" />}
-                >
-                  {t('episode.download_transcript')}
-                </Button>
-              )}
+              <Button
+                onPress={handleDownloadTranscript}
+                size="sm"
+                variant="tertiary"
+                startContent={<FileText size={16} aria-hidden="true" />}
+              >
+                {t('episode.download_transcript')}
+              </Button>
             </div>
             <div className="max-h-[28rem] overflow-auto rounded-lg border border-border bg-surface-secondary/50 p-4 text-sm leading-6 text-foreground">
               <p className="whitespace-pre-line">{episode.transcript}</p>

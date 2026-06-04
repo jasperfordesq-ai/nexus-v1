@@ -70,7 +70,10 @@
       "bonus": "Bonus"
     },
     "report": "Tuairisc",
-    "report_reason": "Cúis"
+    "report_reason": "Cúis",
+    "reaction_failed": "Could not update your reaction.",
+    "reactions_count_one": "{{count}} reaction",
+    "reactions_count_other": "{{count}} reactions"
   },
   "player": {
     "unsupported": "Ní thacaíonn do bhrabhsálaí leis an seinnteoir fuaime.",
@@ -78,7 +81,9 @@
     "progress": "Dul chun cinn athsheinm",
     "skip_back": "Ar ais 15s",
     "skip_forward": "Ar aghaidh 30s",
-    "speed": "{{ ráta}}x"
+    "speed": "{{ ráta}}x",
+    "load_error": "This episode's audio could not be loaded. It may be unavailable or still processing.",
+    "jump_to_chapter": "Jump to {{time}} — {{title}}"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -129,7 +134,10 @@
     "confirm_delete_episode": "An bhfuil fonn ort {{title}} a scriosadh? Ní féidir é seo a chealú.",
     "readiness_subtitle": "{{title}} seicliosta",
     "media_scan_status": "Scan: {{status}}",
-    "media_processing_status": "Meáin: {{status}}"
+    "media_processing_status": "Meáin: {{status}}",
+    "uploading": "Uploading audio…",
+    "chapter_format_warning_one": "{{count}} chapter line has no timestamp and will start at 0:00.",
+    "chapter_format_warning_other": "{{count}} chapter lines have no timestamp and will start at 0:00."
   },
   "fields": {
     "show": "Show",

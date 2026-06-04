@@ -225,6 +225,8 @@ export interface RequestOptions extends Omit<RequestInit, 'body'> {
   body?: unknown;
   timeout?: number; // Request timeout in ms (default 30000)
   responseType?: 'json' | 'blob' | 'text';
+  /** When provided, the upload is sent via XHR so byte progress (0-100) is reported. */
+  onUploadProgress?: (percent: number) => void;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1031,6 +1033,11 @@ class ApiClient {
       headers.set('X-CSRF-Token', csrfToken);
     }
 
+    // Progress-aware uploads use XHR — fetch() exposes no upload progress events.
+    if (options?.onUploadProgress) {
+      return this.xhrUpload<T>(endpoint, formData, headers, options, options.onUploadProgress);
+    }
+
     // Uploads should not be subject to the 30s default timeout — use 2 minutes
     const uploadController = new AbortController();
     const uploadTimeoutId = setTimeout(() => uploadController.abort(), 120000);
@@ -1108,6 +1115,107 @@ class ApiClient {
         : rawMessage;
       return { success: false, error: message, code: 'NETWORK_ERROR' };
     }
+  }
+
+  /**
+   * XHR-based multipart upload that reports byte progress (0-100). fetch()
+   * cannot surface upload progress, so progress-aware callers (e.g. large
+   * podcast audio uploads) route here. Mirrors upload()'s auth/tenant/CSRF
+   * headers, credentials, 401-refresh-retry, and response shaping. The
+   * stale-build gate is intentionally skipped here — ordinary API calls cover it.
+   */
+  private xhrUpload<T>(
+    endpoint: string,
+    formData: FormData,
+    headers: Headers,
+    options: RequestOptions | undefined,
+    onProgress: (percent: number) => void
+  ): Promise<ApiResponse<T>> {
+    return new Promise<ApiResponse<T>>((resolve) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `${this.baseUrl}${endpoint}`);
+      xhr.withCredentials = true;
+      xhr.timeout = options?.timeout ?? 300000; // 5 min default for media uploads
+      headers.forEach((value, key) => {
+        // Content-Type must be set by the browser with the multipart boundary.
+        if (key.toLowerCase() !== 'content-type') xhr.setRequestHeader(key, value);
+      });
+
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable && event.total > 0) {
+          onProgress(Math.min(100, Math.round((event.loaded / event.total) * 100)));
+        }
+      };
+
+      const callerSignal = options?.signal as AbortSignal | undefined;
+      if (callerSignal) {
+        if (callerSignal.aborted) {
+          xhr.abort();
+        } else {
+          callerSignal.addEventListener('abort', () => xhr.abort(), { once: true });
+        }
+      }
+
+      const parse = (): Record<string, unknown> | null => {
+        try {
+          return xhr.responseText ? (JSON.parse(xhr.responseText) as Record<string, unknown>) : null;
+        } catch {
+          return null;
+        }
+      };
+
+      xhr.onload = () => {
+        if (xhr.status === 401) {
+          void this.handleTokenRefresh().then((refreshed) => {
+            resolve(
+              refreshed
+                ? this.upload<T>(endpoint, formData, 'file', options)
+                : { success: false, error: 'Session expired', code: 'SESSION_EXPIRED' }
+            );
+          });
+          return;
+        }
+
+        const data = parse();
+        const errors = data && Array.isArray(data.errors) ? (data.errors as Array<{ code?: string; message?: string }>) : null;
+        const firstError = errors && errors.length > 0 ? errors[0] : null;
+        const meta = (data?.meta ?? undefined) as PaginationMeta | undefined;
+
+        if (xhr.status >= 200 && xhr.status < 300) {
+          if (data === null) {
+            resolve({ success: true, data: undefined as T });
+            return;
+          }
+          if ('success' in data && data.success === false) {
+            resolve({
+              success: false,
+              error: (data.error as string) ?? firstError?.message ?? (data.message as string) ?? 'Upload failed',
+              code: (data.code as string) ?? firstError?.code ?? 'UPLOAD_ERROR',
+              meta,
+            });
+            return;
+          }
+          resolve({ success: true, data: ('data' in data ? data.data : data) as T, meta });
+          return;
+        }
+
+        resolve({
+          success: false,
+          error: (data?.error as string) ?? firstError?.message ?? (data?.message as string) ?? 'Upload failed',
+          code: (data?.code as string) ?? firstError?.code ?? 'UPLOAD_ERROR',
+        });
+      };
+
+      xhr.onerror = () => resolve({
+        success: false,
+        error: import.meta.env.PROD ? 'Upload failed. Please try again.' : 'Network error during upload',
+        code: 'NETWORK_ERROR',
+      });
+      xhr.ontimeout = () => resolve({ success: false, error: 'Upload timed out. Please try again.', code: 'UPLOAD_TIMEOUT' });
+      xhr.onabort = () => resolve({ success: false, error: 'Upload cancelled', code: 'UPLOAD_ABORTED' });
+
+      xhr.send(formData);
+    });
   }
 }
 

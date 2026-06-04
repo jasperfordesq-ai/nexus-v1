@@ -10,6 +10,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import ArrowUp from 'lucide-react/icons/arrow-up';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Flag from 'lucide-react/icons/flag';
 import HardDrive from 'lucide-react/icons/hard-drive';
@@ -372,6 +373,19 @@ export default function PodcastsAdmin() {
           <XCircle size={16} aria-hidden="true" />
         </Button>
       </Tooltip>
+      <Tooltip content={t('podcasts_admin.actions.escalate_report')}>
+        <Button
+          isIconOnly
+          size="sm"
+          variant="tertiary"
+          color="warning"
+          aria-label={t('podcasts_admin.actions.escalate_report')}
+          isLoading={actionKey === `report:${episodeId}:escalated`}
+          onPress={() => resolveReport(episodeId, 'escalated')}
+        >
+          <ArrowUp size={16} aria-hidden="true" />
+        </Button>
+      </Tooltip>
     </div>
   );
 
@@ -578,7 +592,7 @@ export default function PodcastsAdmin() {
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell>{report.reason}</TableCell>
+                      <TableCell>{t(`podcasts_admin.report_reasons.${report.reason}`, { defaultValue: report.reason })}</TableCell>
                       <TableCell>{report.details || t('podcasts_admin.empty_value')}</TableCell>
                       <TableCell>{formatDate(report.created_at) || t('podcasts_admin.empty_value')}</TableCell>
                       <TableCell>{reportButtons(report.episode_id)}</TableCell>

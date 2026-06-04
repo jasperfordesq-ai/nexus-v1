@@ -86,6 +86,8 @@ export interface PodcastEpisode {
   transcript_language?: string | null;
   cover_image_url?: string | null;
   listen_count: number;
+  reaction_count?: number;
+  viewer_has_reacted?: boolean;
   scheduled_for?: string | null;
   published_at?: string | null;
   show?: PodcastShow | null;
@@ -207,7 +209,7 @@ export const podcastsApi = {
   toggleSubscription: (showId: number, notifyNewEpisodes = true) =>
     api.post<{ subscribed: boolean }>(`/v2/podcasts/${showId}/subscribe`, { notify_new_episodes: notifyNewEpisodes }),
 
-  createEpisode: (showId: number, data: CreatePodcastEpisodePayload) => {
+  createEpisode: (showId: number, data: CreatePodcastEpisodePayload, onProgress?: (percent: number) => void) => {
     if (data.audio_file) {
       const formData = new FormData();
       for (const [key, value] of Object.entries(data)) {
@@ -219,7 +221,12 @@ export const podcastsApi = {
         }
       }
       formData.append('audio', data.audio_file);
-      return api.upload<PodcastEpisode>(`/v2/podcasts/${showId}/episodes`, formData);
+      return api.upload<PodcastEpisode>(
+        `/v2/podcasts/${showId}/episodes`,
+        formData,
+        'file',
+        onProgress ? { onUploadProgress: onProgress } : undefined,
+      );
     }
 
     return api.post<PodcastEpisode>('/v2/podcasts/' + showId + '/episodes', data);

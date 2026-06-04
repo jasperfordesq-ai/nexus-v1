@@ -53,6 +53,9 @@
     "explicit": "Explicit",
     "react": "React",
     "reacted": "Reacted",
+    "reaction_failed": "Could not update your reaction.",
+    "reactions_count_one": "{{count}} reaction",
+    "reactions_count_other": "{{count}} reactions",
     "report": "Report",
     "report_title": "Report episode",
     "report_reason": "Reason",
@@ -74,11 +77,13 @@
   },
   "player": {
     "unsupported": "Your browser does not support the audio player.",
+    "load_error": "This episode's audio could not be loaded. It may be unavailable or still processing.",
     "duration_unknown": "Duration unknown",
     "progress": "Playback progress",
     "skip_back": "Back 15s",
     "skip_forward": "Forward 30s",
-    "speed": "{{rate}}x"
+    "speed": "{{rate}}x",
+    "jump_to_chapter": "Jump to {{time}} — {{title}}"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -126,6 +131,9 @@
     "episode_archived": "Episode archived.",
     "episode_deleted": "Episode deleted.",
     "save_failed": "Could not save changes.",
+    "uploading": "Uploading audio…",
+    "chapter_format_warning_one": "{{count}} chapter line has no timestamp and will start at 0:00.",
+    "chapter_format_warning_other": "{{count}} chapter lines have no timestamp and will start at 0:00.",
     "confirm_archive_show": "Archive {{title}}? It will be hidden from public podcast lists.",
     "confirm_delete_show": "Delete {{title}} and all of its episodes? This cannot be undone.",
     "confirm_archive_episode": "Archive {{title}}? It will be hidden from public podcast lists.",

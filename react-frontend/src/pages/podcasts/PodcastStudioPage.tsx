@@ -6,7 +6,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Button, Card, CardBody, Checkbox, Chip, Input, Select, SelectItem, Spinner, Textarea } from '@/components/ui';
+import { Button, Card, CardBody, Checkbox, Chip, Input, Progress, Select, SelectItem, Spinner, Textarea, useConfirm } from '@/components/ui';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import {
@@ -36,20 +36,33 @@ function parseTimestamp(value: string): number {
   return first;
 }
 
+function looksLikeTimestamp(token: string): boolean {
+  return /^(?:\d+:)?\d{1,2}:\d{2}$/.test(token) || /^\d+$/.test(token);
+}
+
 function parseChapters(input: string): PodcastChapter[] {
   return input
     .split('\n')
     .map((line) => line.trim())
     .filter(Boolean)
     .map((line, index) => {
-      const [timestamp, ...titleParts] = line.split(/\s+/);
-      const startsAt = timestamp ?? '';
+      const [timestamp = '', ...titleParts] = line.split(/\s+/);
+      const hasTimestamp = looksLikeTimestamp(timestamp);
+      const title = titleParts.join(' ').trim();
       return {
-        title: titleParts.join(' ').trim() || startsAt,
-        starts_at_seconds: titleParts.length > 0 ? parseTimestamp(startsAt) : 0,
+        title: hasTimestamp ? (title || line) : line,
+        starts_at_seconds: hasTimestamp ? parseTimestamp(timestamp) : 0,
         position: index,
       };
     });
+}
+
+function countInvalidChapterLines(input: string): number {
+  return input
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .filter((line) => !looksLikeTimestamp(line.split(/\s+/)[0] ?? '')).length;
 }
 
 function mediaStatusColor(status?: string | null): 'success' | 'warning' | 'danger' | 'default' {
@@ -90,6 +103,7 @@ export default function PodcastStudioPage() {
   usePageTitle(t('studio.title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
+  const confirm = useConfirm();
 
   const [shows, setShows] = useState<PodcastShow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -100,6 +114,10 @@ export default function PodcastStudioPage() {
   const [episodeForm, setEpisodeForm] = useState<CreatePodcastEpisodePayload>(emptyEpisode);
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [chaptersText, setChaptersText] = useState('');
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [episodeError, setEpisodeError] = useState<string | null>(null);
+
+  const chapterIssues = useMemo(() => countInvalidChapterLines(chaptersText), [chaptersText]);
 
   const selectedShow = useMemo(
     () => shows.find((show) => String(show.id) === selectedShowId) ?? null,
@@ -175,7 +193,13 @@ export default function PodcastStudioPage() {
   }
 
   async function handleArchiveShow(show: PodcastShow): Promise<void> {
-    if (!window.confirm(t('studio.confirm_archive_show', { title: show.title }))) return;
+    const ok = await confirm({
+      title: t('studio.archive_show'),
+      body: t('studio.confirm_archive_show', { title: show.title }),
+      status: 'warning',
+      confirmLabel: t('studio.archive_show'),
+    });
+    if (!ok) return;
     const res = await podcastsApi.archiveShow(show.id);
     if (res.success) {
       toast.success(t('studio.show_archived'));
@@ -186,7 +210,13 @@ export default function PodcastStudioPage() {
   }
 
   async function handleDeleteShow(show: PodcastShow): Promise<void> {
-    if (!window.confirm(t('studio.confirm_delete_show', { title: show.title }))) return;
+    const ok = await confirm({
+      title: t('studio.delete_show'),
+      body: t('studio.confirm_delete_show', { title: show.title }),
+      status: 'danger',
+      confirmLabel: t('studio.delete_show'),
+    });
+    if (!ok) return;
     const res = await podcastsApi.deleteShow(show.id);
     if (res.success) {
       toast.success(t('studio.show_deleted'));
@@ -198,7 +228,13 @@ export default function PodcastStudioPage() {
   }
 
   async function handleArchiveEpisode(showId: number, episodeId: number, title: string): Promise<void> {
-    if (!window.confirm(t('studio.confirm_archive_episode', { title }))) return;
+    const ok = await confirm({
+      title: t('studio.archive_episode'),
+      body: t('studio.confirm_archive_episode', { title }),
+      status: 'warning',
+      confirmLabel: t('studio.archive_episode'),
+    });
+    if (!ok) return;
     const res = await podcastsApi.archiveEpisode(showId, episodeId);
     if (res.success) {
       toast.success(t('studio.episode_archived'));
@@ -209,7 +245,13 @@ export default function PodcastStudioPage() {
   }
 
   async function handleDeleteEpisode(showId: number, episodeId: number, title: string): Promise<void> {
-    if (!window.confirm(t('studio.confirm_delete_episode', { title }))) return;
+    const ok = await confirm({
+      title: t('studio.delete_episode'),
+      body: t('studio.confirm_delete_episode', { title }),
+      status: 'danger',
+      confirmLabel: t('studio.delete_episode'),
+    });
+    if (!ok) return;
     const res = await podcastsApi.deleteEpisode(showId, episodeId);
     if (res.success) {
       toast.success(t('studio.episode_deleted'));
@@ -222,14 +264,22 @@ export default function PodcastStudioPage() {
   async function handleCreateEpisode(): Promise<void> {
     if (!selectedShow || !episodeForm.title.trim() || (!episodeForm.audio_url.trim() && !audioFile)) return;
     setSavingEpisode(true);
-    const res = await podcastsApi.createEpisode(selectedShow.id, {
-      ...episodeForm,
-      title: episodeForm.title.trim(),
-      audio_url: episodeForm.audio_url.trim(),
-      audio_file: audioFile,
-      chapters: parseChapters(chaptersText),
-    });
+    setEpisodeError(null);
+    if (audioFile) setUploadProgress(0);
+    const res = await podcastsApi.createEpisode(
+      selectedShow.id,
+      {
+        ...episodeForm,
+        title: episodeForm.title.trim(),
+        // When a hosted file is present, omit audio_url so the upload path drives it.
+        audio_url: audioFile ? '' : episodeForm.audio_url.trim(),
+        audio_file: audioFile,
+        chapters: parseChapters(chaptersText),
+      },
+      audioFile ? (percent) => setUploadProgress(percent) : undefined,
+    );
     setSavingEpisode(false);
+    setUploadProgress(null);
 
     if (res.success) {
       toast.success(t('studio.episode_created'));
@@ -238,7 +288,11 @@ export default function PodcastStudioPage() {
       setChaptersText('');
       await loadShows();
     } else {
-      toast.error(t('studio.save_failed'));
+      // The API returns a specific reason (unsupported type, too large, upload
+      // failed, invalid URL) — surface it instead of a generic save error.
+      const message = res.error ?? t('studio.save_failed');
+      setEpisodeError(message);
+      toast.error(message);
     }
   }
 
@@ -316,22 +370,28 @@ export default function PodcastStudioPage() {
                   <Input label={t('fields.episode_title')} value={episodeForm.title} onValueChange={(title) => setEpisodeForm((prev) => ({ ...prev, title }))} />
                   <Input label={t('fields.audio_url')} value={episodeForm.audio_url} onValueChange={(audio_url) => setEpisodeForm((prev) => ({ ...prev, audio_url }))} />
                   <div className="sm:col-span-2">
-                    <label className="block text-sm font-medium text-foreground">
+                    <label htmlFor="podcast-audio-file" className="block text-sm font-medium text-foreground">
                       {t('fields.audio_file')}
                     </label>
                     <input
-                      className="mt-1 block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm"
+                      id="podcast-audio-file"
+                      className="mt-1 block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-surface-secondary file:px-3 file:py-1 file:text-sm file:font-medium file:text-foreground"
                       type="file"
                       accept="audio/*,.mp3,.m4a,.wav,.ogg,.webm"
+                      aria-describedby="podcast-audio-file-hint"
+                      disabled={savingEpisode}
                       onChange={(event) => setAudioFile(event.currentTarget.files?.[0] ?? null)}
                     />
-                    <p className="mt-1 text-xs text-muted">{audioFile ? audioFile.name : t('fields.audio_file_hint')}</p>
+                    <p id="podcast-audio-file-hint" className="mt-1 text-xs text-muted">{audioFile ? audioFile.name : t('fields.audio_file_hint')}</p>
                   </div>
                   <Input
                     label={t('fields.duration_seconds')}
                     type="number"
                     value={episodeForm.duration_seconds ? String(episodeForm.duration_seconds) : ''}
-                    onValueChange={(value) => setEpisodeForm((prev) => ({ ...prev, duration_seconds: value ? Number(value) : undefined }))}
+                    onValueChange={(value) => setEpisodeForm((prev) => {
+                      const parsed = Number(value);
+                      return { ...prev, duration_seconds: value && Number.isFinite(parsed) ? parsed : undefined };
+                    })}
                   />
                   <Input
                     label={t('fields.scheduled_for')}
@@ -353,6 +413,24 @@ export default function PodcastStudioPage() {
                 <Textarea label={t('fields.description')} value={episodeForm.description ?? ''} onValueChange={(description) => setEpisodeForm((prev) => ({ ...prev, description }))} />
                 <Textarea label={t('fields.transcript')} value={episodeForm.transcript ?? ''} onValueChange={(transcript) => setEpisodeForm((prev) => ({ ...prev, transcript }))} />
                 <Textarea label={t('fields.chapters')} description={t('fields.chapters_hint')} value={chaptersText} onValueChange={setChaptersText} />
+                {chapterIssues > 0 && (
+                  <p className="text-xs text-warning">{t('studio.chapter_format_warning', { count: chapterIssues })}</p>
+                )}
+                {uploadProgress !== null && (
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-xs text-muted">
+                      <span>{t('studio.uploading')}</span>
+                      <span className="tabular-nums">{uploadProgress}%</span>
+                    </div>
+                    <Progress aria-label={t('studio.uploading')} value={uploadProgress} />
+                  </div>
+                )}
+                {episodeError && (
+                  <div role="alert" className="flex items-center gap-2 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">
+                    <XCircle size={16} aria-hidden="true" />
+                    <span>{episodeError}</span>
+                  </div>
+                )}
                 <div className="flex justify-end">
                   <Button color="primary" isLoading={savingEpisode} isDisabled={!selectedShow || !episodeForm.title.trim() || (!episodeForm.audio_url.trim() && !audioFile)} onPress={handleCreateEpisode}>
                     {t('studio.add_episode')}

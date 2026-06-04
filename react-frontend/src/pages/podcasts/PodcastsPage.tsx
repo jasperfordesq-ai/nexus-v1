@@ -30,6 +30,7 @@ export default function PodcastsPage() {
 
   const [shows, setShows] = useState<PodcastShow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [category, setCategory] = useState('');
   const [sort, setSort] = useState<PodcastSort>('newest');
@@ -39,28 +40,48 @@ export default function PodcastsPage() {
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
+    const isFirstPage = page === 1;
+    if (isFirstPage) setLoading(true);
+    else setLoadingMore(true);
+
     podcastsApi
       .browse({ q: searchTerm || undefined, category: category || undefined, sort, page })
       .then((res) => {
         if (cancelled) return;
         if (res.success && res.data) {
-          setShows((prev) => (page === 1 ? res.data!.items : [...prev, ...res.data!.items]));
-          setHasMore(res.data.has_more);
-          setCategoryOptions((prev) => {
-            const next = new Set(prev);
-            res.data!.items.forEach((show) => {
-              if (show.category) next.add(show.category);
-            });
-            return Array.from(next).sort((a, b) => a.localeCompare(b));
+          const items = res.data.items;
+          setShows((prev) => {
+            if (isFirstPage) return items;
+            // De-dupe by id — the list can shift between pages (e.g. a new show
+            // published while sorting by newest), which would otherwise append
+            // a duplicate card and collide React keys.
+            const seen = new Set(prev.map((show) => show.id));
+            return [...prev, ...items.filter((show) => !seen.has(show.id))];
           });
-        } else {
+          setHasMore(res.data.has_more);
+          // Only refresh category options while browsing the full catalogue.
+          // When a category filter is active the results are already narrowed,
+          // so leave the dropdown intact. Reset on the first page so stale
+          // categories from a previous search/sort don't linger.
+          if (!category) {
+            setCategoryOptions((prev) => {
+              const next = new Set(isFirstPage ? [] : prev);
+              items.forEach((show) => {
+                if (show.category) next.add(show.category);
+              });
+              return Array.from(next).sort((a, b) => a.localeCompare(b));
+            });
+          }
+        } else if (isFirstPage) {
           setShows([]);
           setHasMore(false);
         }
       })
       .finally(() => {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+          setLoadingMore(false);
+        }
       });
 
     return () => {
@@ -120,10 +141,13 @@ export default function PodcastsPage() {
         <Select
           size="sm"
           aria-label={t('browse.category_label')}
-          selectedKeys={category ? [category] : ['']}
-          onSelectionChange={(keys) => setCategory((Array.from(keys)[0] as string) ?? '')}
+          selectedKeys={category ? [category] : ['all']}
+          onSelectionChange={(keys) => {
+            const value = Array.from(keys)[0] as string | undefined;
+            setCategory(value && value !== 'all' ? value : '');
+          }}
         >
-          <SelectItem id="">{t('browse.all_categories')}</SelectItem>
+          <SelectItem id="all">{t('browse.all_categories')}</SelectItem>
           {categoryOptions.map((option) => (
             <SelectItem key={option} id={option}>{option}</SelectItem>
           ))}
@@ -180,7 +204,7 @@ export default function PodcastsPage() {
                   </div>
 
                   <div className="mt-auto flex flex-wrap items-center gap-2 text-xs text-muted">
-                    <Chip size="sm" variant="soft">{t(`visibility.${show.visibility}`)}</Chip>
+                    <Chip size="sm" variant="soft">{t(`visibility.${show.visibility}`, { defaultValue: show.visibility })}</Chip>
                     {show.category ? <Chip size="sm" variant="soft">{show.category}</Chip> : null}
                     <span>{t('show.episode_count', { count: show.approved_episode_count ?? show.episode_count ?? 0 })}</span>
                     <span>{t('show.follower_count', { count: show.subscriber_count ?? 0 })}</span>
@@ -193,7 +217,7 @@ export default function PodcastsPage() {
 
           {hasMore && (
             <div className="mt-6 flex justify-center">
-              <Button variant="secondary" isLoading={loading} onPress={() => setPage((p) => p + 1)}>
+              <Button variant="secondary" isLoading={loadingMore} onPress={() => setPage((p) => p + 1)}>
                 {t('browse.load_more')}
               </Button>
             </div>

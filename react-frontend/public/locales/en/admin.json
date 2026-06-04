@@ -3348,6 +3348,7 @@
       "flag": "Flag",
       "resolve_report": "Resolve report",
       "dismiss_report": "Dismiss report",
+      "escalate_report": "Escalate report",
       "validate_feed": "Validate RSS feed"
     },
     "filters": {
@@ -3418,6 +3419,12 @@
       },
       "report_unknown_episode": "Episode #{{id}}",
       "reporter": "Reported by {{name}}",
+      "report_reasons": {
+        "safety": "Safety or harm",
+        "spam": "Spam or misleading content",
+        "rights": "Copyright or rights concern",
+        "other": "Other"
+      },
     "stats": {
       "total_shows": "Shows",
       "published_shows": "Published shows",

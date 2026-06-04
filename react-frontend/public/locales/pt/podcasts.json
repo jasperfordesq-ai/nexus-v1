@@ -70,7 +70,10 @@
       "bonus": "Bonus"
     },
     "report": "Relatório",
-    "report_reason": "Razão"
+    "report_reason": "Razão",
+    "reaction_failed": "Could not update your reaction.",
+    "reactions_count_one": "{{count}} reaction",
+    "reactions_count_other": "{{count}} reactions"
   },
   "player": {
     "unsupported": "Seu navegador não suporta o reprodutor de áudio.",
@@ -78,7 +81,9 @@
     "progress": "Progresso da reprodução",
     "skip_back": "Voltar 15s",
     "skip_forward": "Avançando 30 anos",
-    "speed": "{{taxa}}x"
+    "speed": "{{taxa}}x",
+    "load_error": "This episode's audio could not be loaded. It may be unavailable or still processing.",
+    "jump_to_chapter": "Jump to {{time}} — {{title}}"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -129,7 +134,10 @@
     "confirm_delete_episode": "Excluir {{title}}? Isto não pode ser desfeito.",
     "readiness_subtitle": "lista de verificação {{title}}",
     "media_scan_status": "Verificação: {{status}}",
-    "media_processing_status": "Mídia: {{status}}"
+    "media_processing_status": "Mídia: {{status}}",
+    "uploading": "Uploading audio…",
+    "chapter_format_warning_one": "{{count}} chapter line has no timestamp and will start at 0:00.",
+    "chapter_format_warning_other": "{{count}} chapter lines have no timestamp and will start at 0:00."
   },
   "fields": {
     "show": "Show",

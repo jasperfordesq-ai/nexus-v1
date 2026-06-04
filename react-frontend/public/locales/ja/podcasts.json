@@ -70,7 +70,10 @@
       "bonus": "Bonus"
     },
     "report": "報告",
-    "report_reason": "理由"
+    "report_reason": "理由",
+    "reaction_failed": "Could not update your reaction.",
+    "reactions_count_one": "{{count}} reaction",
+    "reactions_count_other": "{{count}} reactions"
   },
   "player": {
     "unsupported": "お使いのブラウザはオーディオ プレーヤーをサポートしていません。",
@@ -78,7 +81,9 @@
     "progress": "再生の進行状況",
     "skip_back": "バック 15 秒",
     "skip_forward": "30秒前へ",
-    "speed": "{{レート}}x"
+    "speed": "{{レート}}x",
+    "load_error": "This episode's audio could not be loaded. It may be unavailable or still processing.",
+    "jump_to_chapter": "Jump to {{time}} — {{title}}"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -129,7 +134,10 @@
     "confirm_delete_episode": "{{title}} を削除しますか?これを元に戻すことはできません。",
     "readiness_subtitle": "{{title}} チェックリスト",
     "media_scan_status": "スキャン: {{ステータス}}",
-    "media_processing_status": "メディア: {{ステータス}}"
+    "media_processing_status": "メディア: {{ステータス}}",
+    "uploading": "Uploading audio…",
+    "chapter_format_warning_one": "{{count}} chapter line has no timestamp and will start at 0:00.",
+    "chapter_format_warning_other": "{{count}} chapter lines have no timestamp and will start at 0:00."
   },
   "fields": {
     "show": "Show",

@@ -20,6 +20,11 @@ class PodcastEpisode extends Model
 
     protected $table = 'podcast_episodes';
 
+    // Note: media lifecycle + storage columns (audio_storage_path/disk,
+    // media_processing_status, media_scan_status, media_waveform_json,
+    // media_duration_source) are intentionally NOT fillable. They are
+    // server-controlled and set only by PodcastService / the media job via
+    // direct assignment, so a client can never inject e.g. scan_status="clean".
     protected $fillable = [
         'show_id',
         'title',
@@ -27,12 +32,6 @@ class PodcastEpisode extends Model
         'summary',
         'description',
         'audio_url',
-        'audio_storage_path',
-        'audio_storage_disk',
-        'media_processing_status',
-        'media_scan_status',
-        'media_waveform_json',
-        'media_duration_source',
         'audio_mime',
         'audio_bytes',
         'duration_seconds',

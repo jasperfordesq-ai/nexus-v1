@@ -70,7 +70,10 @@
       "bonus": "Bonus"
     },
     "report": "Informe",
-    "report_reason": "Razón"
+    "report_reason": "Razón",
+    "reaction_failed": "Could not update your reaction.",
+    "reactions_count_one": "{{count}} reaction",
+    "reactions_count_other": "{{count}} reactions"
   },
   "player": {
     "unsupported": "Su navegador no soporta el reproductor de audio.",
@@ -78,7 +81,9 @@
     "progress": "Progreso de la reproducción",
     "skip_back": "Atrás 15",
     "skip_forward": "Adelante 30s",
-    "speed": "{{tasa}}x"
+    "speed": "{{tasa}}x",
+    "load_error": "This episode's audio could not be loaded. It may be unavailable or still processing.",
+    "jump_to_chapter": "Jump to {{time}} — {{title}}"
   },
   "studio": {
     "title": "Podcast Studio",
@@ -129,7 +134,10 @@
     "confirm_delete_episode": "¿Eliminar {{title}}? Esto no se puede deshacer.",
     "readiness_subtitle": "{{title}} lista de verificación",
     "media_scan_status": "Escanear: {{estado}}",
-    "media_processing_status": "Medios: {{estado}}"
+    "media_processing_status": "Medios: {{estado}}",
+    "uploading": "Uploading audio…",
+    "chapter_format_warning_one": "{{count}} chapter line has no timestamp and will start at 0:00.",
+    "chapter_format_warning_other": "{{count}} chapter lines have no timestamp and will start at 0:00."
   },
   "fields": {
     "show": "Show",

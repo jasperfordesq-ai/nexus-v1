@@ -88,6 +88,8 @@ class PodcastController extends BaseApiController
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.podcasts.episode_not_found'), null, 404);
         }
 
+        PodcastService::decorateEpisodeForViewer($episode, $userId);
+
         return $this->respondWithData($episode->toArray());
     }
 
@@ -483,11 +485,15 @@ class PodcastController extends BaseApiController
 
     private function podcastValidationError(\InvalidArgumentException $e): JsonResponse
     {
-        $key = str_contains($e->getMessage(), 'too large')
-            ? 'audio_too_large'
-            : 'invalid_media_url';
+        $message = $e->getMessage();
+        [$code, $key, $status] = match (true) {
+            str_contains($message, 'too large') => ['VALIDATION_FAILED', 'audio_too_large', 422],
+            str_contains($message, 'Unsupported') => ['VALIDATION_FAILED', 'invalid_media_type', 422],
+            str_contains($message, 'storage failed') => ['MEDIA_UPLOAD_FAILED', 'media_upload_failed', 500],
+            default => ['VALIDATION_FAILED', 'invalid_media_url', 422],
+        };
 
-        return $this->respondWithError('VALIDATION_FAILED', __("api_controllers_2.podcasts.{$key}"), null, 422);
+        return $this->respondWithError($code, __("api_controllers_2.podcasts.{$key}"), null, $status);
     }
 
     private function podcastInput(): array

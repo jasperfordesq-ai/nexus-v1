@@ -943,6 +943,88 @@ class PodcastControllerTest extends TestCase
         ]);
     }
 
+    public function test_single_report_keeps_episode_visible_until_distinct_threshold(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+
+        $show = $this->apiPost('/v2/podcasts', [
+            'title' => 'Threshold Show',
+            'visibility' => 'public',
+        ]);
+        $show->assertStatus(201);
+        $showId = $show->json('data.id');
+        $showSlug = $show->json('data.slug');
+        $this->apiPost("/v2/podcasts/{$showId}/publish")->assertStatus(200);
+
+        $episode = $this->apiPost("/v2/podcasts/{$showId}/episodes", [
+            'title' => 'Threshold Episode',
+            'audio_url' => 'https://cdn.example.test/threshold.mp3',
+            'visibility' => 'public',
+        ]);
+        $episode->assertStatus(201);
+        $episodeId = $episode->json('data.id');
+        $episodeSlug = $episode->json('data.slug');
+        $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episodeId}/publish")->assertStatus(200);
+
+        // A single member report must NOT hide the episode (anti-griefing).
+        $this->actingAsMember();
+        $this->apiPost("/v2/podcasts/episodes/{$episodeId}/report", ['reason' => 'safety'])->assertStatus(201);
+        $this->assertDatabaseHas('podcast_episodes', [
+            'id' => $episodeId,
+            'moderation_status' => 'approved',
+        ]);
+        $this->apiGet("/v2/podcasts/{$showSlug}/{$episodeSlug}")->assertStatus(200);
+
+        // Two more distinct reporters reach the threshold (3) → auto-flagged.
+        $this->actingAsMember();
+        $this->apiPost("/v2/podcasts/episodes/{$episodeId}/report", ['reason' => 'safety'])->assertStatus(201);
+        $this->actingAsMember();
+        $this->apiPost("/v2/podcasts/episodes/{$episodeId}/report", ['reason' => 'safety'])->assertStatus(201);
+
+        $this->assertDatabaseHas('podcast_episodes', [
+            'id' => $episodeId,
+            'moderation_status' => 'flagged',
+        ]);
+    }
+
+    public function test_episode_endpoint_exposes_viewer_reaction_state(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+
+        $show = $this->apiPost('/v2/podcasts', [
+            'title' => 'Reaction Show',
+            'visibility' => 'public',
+        ]);
+        $show->assertStatus(201);
+        $showId = $show->json('data.id');
+        $showSlug = $show->json('data.slug');
+        $this->apiPost("/v2/podcasts/{$showId}/publish")->assertStatus(200);
+
+        $episode = $this->apiPost("/v2/podcasts/{$showId}/episodes", [
+            'title' => 'Reaction Episode',
+            'audio_url' => 'https://cdn.example.test/reaction.mp3',
+            'visibility' => 'public',
+        ]);
+        $episode->assertStatus(201);
+        $episodeId = $episode->json('data.id');
+        $episodeSlug = $episode->json('data.slug');
+        $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episodeId}/publish")->assertStatus(200);
+
+        $before = $this->apiGet("/v2/podcasts/{$showSlug}/{$episodeSlug}");
+        $before->assertStatus(200);
+        $before->assertJsonPath('data.viewer_has_reacted', false);
+        $before->assertJsonPath('data.reaction_count', 0);
+
+        $this->apiPost("/v2/podcasts/episodes/{$episodeId}/reaction", ['reaction' => 'like'])
+            ->assertJsonPath('data.active', true);
+
+        $after = $this->apiGet("/v2/podcasts/{$showSlug}/{$episodeSlug}");
+        $after->assertJsonPath('data.viewer_has_reacted', true);
+        $after->assertJsonPath('data.reaction_count', 1);
+    }
+
     public function test_subscribers_are_notified_when_episode_is_published(): void
     {
         $this->enablePodcasts(true);

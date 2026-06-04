@@ -23,6 +23,8 @@
   "podcasts.episode_title_required": "A podcast episode title is required.",
   "podcasts.audio_url_required": "An audio URL is required.",
   "podcasts.invalid_media_url": "Use a valid HTTP or HTTPS media URL.",
+  "podcasts.invalid_media_type": "That file type is not supported. Upload an MP3, M4A, AAC, WAV, OGG, or WebM audio file.",
+  "podcasts.media_upload_failed": "The audio upload could not be saved. Please try again.",
   "podcasts.audio_too_large": "The podcast audio file is larger than this community allows.",
   "podcasts.max_shows_reached": "You have reached the limit of :max podcast shows for this community.",
   "podcasts.invalid_moderation_action": "Invalid moderation action.",

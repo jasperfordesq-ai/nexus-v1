@@ -69,12 +69,13 @@ Important keys:
 - `podcasts.enable_episode_reactions`: enables member reactions.
 - `podcasts.enable_transcripts`: allows transcripts in episode pages and RSS metadata.
 - `podcasts.enable_chapters`: allows chapters in episode pages and RSS metadata.
-- `podcasts.enable_media_uploads`: allows hosted audio uploads.
+- `podcasts.enable_private_shows`: allows members-only and private show/episode visibility. Default: `true`. (Hosted audio uploads are always accepted; there is no separate upload-enable flag — scanning/processing below govern post-upload handling.)
 - `podcasts.enable_media_scanning`: marks hosted uploads for scanning. Until a real scanner is connected, the processing job records `scan_unavailable` rather than `clean`.
 - `podcasts.enable_media_processing`: marks hosted uploads for processing/transcoding.
 - `podcasts.media_storage_driver`: `local` or `cloud`.
 - `podcasts.cloud_storage_disk`: Laravel filesystem disk to use when provider is `cloud`.
-- `podcasts.max_audio_upload_mb`: maximum hosted media upload size.
+- `podcasts.max_audio_size_mb`: maximum hosted media upload size in MB. Default: `250`.
+- `podcasts.max_shows_per_user`: maximum shows a single member can create. Default: `5`.
 
 ## Storage Modes
 

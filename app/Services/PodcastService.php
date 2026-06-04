@@ -29,6 +29,7 @@ class PodcastService
     private const HOSTED_AUDIO_PLACEHOLDER = 'podcast-hosted://pending';
     private const HOSTED_AUDIO_ROUTE_TTL_SECONDS = 3600;
     private const LISTEN_DEDUPE_WINDOW_HOURS = 6;
+    private const REPORT_AUTO_FLAG_THRESHOLD = 3;
     private const ALLOWED_AUDIO_TYPES = [
         'audio/mpeg' => 'mp3',
         'audio/mp3' => 'mp3',
@@ -263,8 +264,6 @@ class PodcastService
                 'audio_url' => $hasHostedAudio ? self::HOSTED_AUDIO_PLACEHOLDER : self::requiredUrl($data['audio_url'] ?? ''),
                 'audio_mime' => $hasHostedAudio ? null : self::nullableText($data['audio_mime'] ?? null, 120),
                 'audio_bytes' => $hasHostedAudio ? null : self::normalizeAudioBytes($data['audio_bytes'] ?? null),
-                'media_processing_status' => $hasHostedAudio && PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_ENABLE_MEDIA_PROCESSING) ? 'pending' : 'complete',
-                'media_scan_status' => $hasHostedAudio && PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_ENABLE_MEDIA_SCANNING) ? 'pending' : 'not_required',
                 'duration_seconds' => isset($data['duration_seconds']) ? max(0, (int) $data['duration_seconds']) : null,
                 'episode_number' => isset($data['episode_number']) ? max(0, (int) $data['episode_number']) : null,
                 'season_number' => isset($data['season_number']) ? max(0, (int) $data['season_number']) : null,
@@ -282,6 +281,10 @@ class PodcastService
             $episode->author_user_id = $authorUserId;
             $episode->status = 'draft';
             $episode->moderation_status = self::moderationEnabled() ? 'pending' : 'approved';
+            // Media lifecycle columns are server-controlled (not mass-assignable),
+            // so set them explicitly rather than through the fillable constructor.
+            $episode->media_processing_status = $hasHostedAudio && PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_ENABLE_MEDIA_PROCESSING) ? 'pending' : 'complete';
+            $episode->media_scan_status = $hasHostedAudio && PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_ENABLE_MEDIA_SCANNING) ? 'pending' : 'not_required';
             $episode->save();
 
             if ($audioFile) {
@@ -382,12 +385,15 @@ class PodcastService
     public static function storeHostedAudio(PodcastEpisode $episode, UploadedFile $file): PodcastEpisode
     {
         if (!$file->isValid()) {
-            throw new \InvalidArgumentException('Invalid podcast media upload');
+            if (in_array($file->getError(), [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true)) {
+                throw new \InvalidArgumentException('Podcast audio file is too large');
+            }
+            throw new \InvalidArgumentException('Podcast media storage failed');
         }
 
         $mime = (string) $file->getMimeType();
         if (!array_key_exists($mime, self::ALLOWED_AUDIO_TYPES)) {
-            throw new \InvalidArgumentException('Invalid podcast media upload');
+            throw new \InvalidArgumentException('Unsupported podcast media type');
         }
 
         self::normalizeAudioBytes($file->getSize());
@@ -407,7 +413,7 @@ class PodcastService
             if (is_resource($stream)) {
                 fclose($stream);
             }
-            throw new \InvalidArgumentException('Podcast media upload failed');
+            throw new \InvalidArgumentException('Podcast media storage failed');
         }
         if (is_resource($stream)) {
             fclose($stream);
@@ -519,6 +525,10 @@ class PodcastService
         DB::transaction(function () use ($show): void {
             PodcastEpisode::where('show_id', $show->id)->get()
                 ->each(fn (PodcastEpisode $episode) => self::deleteEpisode($episode, false));
+            DB::table('podcast_show_subscriptions')
+                ->where('tenant_id', TenantContext::getId())
+                ->where('show_id', $show->id)
+                ->delete();
             $show->delete();
         });
     }
@@ -531,6 +541,10 @@ class PodcastService
             PodcastEpisodeChapter::where('episode_id', $episode->id)->delete();
             PodcastEpisodeListen::where('episode_id', $episode->id)->delete();
             PodcastEpisodeReaction::where('episode_id', $episode->id)->delete();
+            DB::table('podcast_episode_reports')
+                ->where('tenant_id', TenantContext::getId())
+                ->where('episode_id', $episode->id)
+                ->delete();
             $episode->delete();
 
             if ($refreshShow && $show) {
@@ -594,32 +608,38 @@ class PodcastService
         $listenedSeconds = max(0, (int) ($data['listened_seconds'] ?? 0));
         $completed = filter_var($data['completed'] ?? false, FILTER_VALIDATE_BOOLEAN);
 
-        $existing = self::findRecentListen($episode, $userId, $sessionHash, $userAgentHash, $ipHash);
-        if ($existing) {
-            $existing->listened_seconds = max((int) $existing->listened_seconds, $listenedSeconds);
-            $existing->completed = (bool) $existing->completed || $completed;
-            $existing->client_family = $existing->client_family ?: self::clientFamily($userAgent);
-            $existing->retention_bucket = self::retentionBucket($episode, (int) $existing->listened_seconds);
-            $existing->user_agent_hash = $existing->user_agent_hash ?: $userAgentHash;
-            $existing->ip_hash = $existing->ip_hash ?: $ipHash;
-            $existing->save();
-            return;
-        }
+        DB::transaction(function () use ($episode, $userId, $userAgent, $sessionHash, $userAgentHash, $ipHash, $listenedSeconds, $completed): void {
+            // Serialize concurrent listen pings for this episode so the dedupe
+            // read-modify-write cannot double-insert a row or double-increment.
+            PodcastEpisode::whereKey($episode->id)->lockForUpdate()->first();
 
-        PodcastEpisodeListen::create([
-            'episode_id' => $episode->id,
-            'user_id' => $userId,
-            'session_hash' => $sessionHash,
-            'listened_seconds' => $listenedSeconds,
-            'completed' => $completed,
-            'client_family' => self::clientFamily($userAgent),
-            'retention_bucket' => self::retentionBucket($episode, $listenedSeconds),
-            'user_agent_hash' => $userAgentHash,
-            'ip_hash' => $ipHash,
-            'created_at' => now(),
-        ]);
+            $existing = self::findRecentListen($episode, $userId, $sessionHash, $userAgentHash, $ipHash);
+            if ($existing) {
+                $existing->listened_seconds = max((int) $existing->listened_seconds, $listenedSeconds);
+                $existing->completed = (bool) $existing->completed || $completed;
+                $existing->client_family = $existing->client_family ?: self::clientFamily($userAgent);
+                $existing->retention_bucket = self::retentionBucket($episode, (int) $existing->listened_seconds);
+                $existing->user_agent_hash = $existing->user_agent_hash ?: $userAgentHash;
+                $existing->ip_hash = $existing->ip_hash ?: $ipHash;
+                $existing->save();
+                return;
+            }
 
-        $episode->increment('listen_count');
+            PodcastEpisodeListen::create([
+                'episode_id' => $episode->id,
+                'user_id' => $userId,
+                'session_hash' => $sessionHash,
+                'listened_seconds' => $listenedSeconds,
+                'completed' => $completed,
+                'client_family' => self::clientFamily($userAgent),
+                'retention_bucket' => self::retentionBucket($episode, $listenedSeconds),
+                'user_agent_hash' => $userAgentHash,
+                'ip_hash' => $ipHash,
+                'created_at' => now(),
+            ]);
+
+            $episode->increment('listen_count');
+        });
     }
 
     public static function toggleReaction(PodcastEpisode $episode, int $userId, string $reaction = 'like'): bool
@@ -650,38 +670,46 @@ class PodcastService
 
     public static function toggleSubscription(PodcastShow $show, int $userId, bool $notifyNewEpisodes = true): bool
     {
-        $existing = DB::table('podcast_show_subscriptions')
-            ->where('tenant_id', TenantContext::getId())
-            ->where('show_id', $show->id)
-            ->where('user_id', $userId)
-            ->first();
+        return DB::transaction(function () use ($show, $userId, $notifyNewEpisodes): bool {
+            $tenantId = TenantContext::getId();
+            // Lock the show row so concurrent subscribe/unsubscribe toggles can't
+            // race the recount into a stale subscriber_count.
+            PodcastShow::whereKey($show->id)->lockForUpdate()->first();
 
-        if ($existing) {
-            DB::table('podcast_show_subscriptions')
-                ->where('tenant_id', TenantContext::getId())
-                ->where('id', $existing->id)
-                ->delete();
+            $existing = DB::table('podcast_show_subscriptions')
+                ->where('tenant_id', $tenantId)
+                ->where('show_id', $show->id)
+                ->where('user_id', $userId)
+                ->first();
+
+            if ($existing) {
+                DB::table('podcast_show_subscriptions')
+                    ->where('tenant_id', $tenantId)
+                    ->where('id', $existing->id)
+                    ->delete();
+                self::refreshSubscriberCount($show);
+                return false;
+            }
+
+            DB::table('podcast_show_subscriptions')->insert([
+                'tenant_id' => $tenantId,
+                'show_id' => $show->id,
+                'user_id' => $userId,
+                'notify_new_episodes' => $notifyNewEpisodes,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
             self::refreshSubscriberCount($show);
-            return false;
-        }
 
-        DB::table('podcast_show_subscriptions')->insert([
-            'tenant_id' => TenantContext::getId(),
-            'show_id' => $show->id,
-            'user_id' => $userId,
-            'notify_new_episodes' => $notifyNewEpisodes,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-        self::refreshSubscriberCount($show);
-
-        return true;
+            return true;
+        });
     }
 
     public static function reportEpisode(PodcastEpisode $episode, int $userId, string $reason, ?string $details): array
     {
+        $tenantId = TenantContext::getId();
         $existing = DB::table('podcast_episode_reports')
-            ->where('tenant_id', TenantContext::getId())
+            ->where('tenant_id', $tenantId)
             ->where('episode_id', $episode->id)
             ->where('reporter_user_id', $userId)
             ->where('status', 'open')
@@ -689,7 +717,7 @@ class PodcastService
 
         if ($existing) {
             DB::table('podcast_episode_reports')
-                ->where('tenant_id', TenantContext::getId())
+                ->where('tenant_id', $tenantId)
                 ->where('id', $existing->id)
                 ->update([
                     'reason' => self::nullableText($reason, 80) ?: 'other',
@@ -697,30 +725,57 @@ class PodcastService
                     'updated_at' => now(),
                 ]);
 
-            $episode->moderation_status = 'flagged';
-            $episode->save();
-
-            return (array) DB::table('podcast_episode_reports')
-                ->where('tenant_id', TenantContext::getId())
-                ->where('id', $existing->id)
-                ->first();
+            $reportId = (int) $existing->id;
+        } else {
+            $reportId = (int) DB::table('podcast_episode_reports')->insertGetId([
+                'tenant_id' => $tenantId,
+                'episode_id' => $episode->id,
+                'reporter_user_id' => $userId,
+                'reason' => self::nullableText($reason, 80) ?: 'other',
+                'details' => self::nullableText($details, 2000),
+                'status' => 'open',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
 
-        $id = DB::table('podcast_episode_reports')->insertGetId([
-            'tenant_id' => TenantContext::getId(),
-            'episode_id' => $episode->id,
-            'reporter_user_id' => $userId,
-            'reason' => self::nullableText($reason, 80) ?: 'other',
-            'details' => self::nullableText($details, 2000),
-            'status' => 'open',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        self::maybeFlagEpisodeFromReports($episode);
 
-        $episode->moderation_status = 'flagged';
-        $episode->save();
+        return (array) DB::table('podcast_episode_reports')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $reportId)
+            ->first();
+    }
 
-        return (array) DB::table('podcast_episode_reports')->where('id', $id)->first();
+    /**
+     * Auto-hide a published episode only when moderation is enabled (admins
+     * actively triage) or enough distinct members have independently reported
+     * it. A single report must never remove a creator's episode from public /
+     * RSS / feed visibility — otherwise one bad actor can grief any creator.
+     */
+    private static function maybeFlagEpisodeFromReports(PodcastEpisode $episode): void
+    {
+        if ($episode->moderation_status !== 'approved') {
+            return;
+        }
+
+        if (self::moderationEnabled()) {
+            $episode->moderation_status = 'flagged';
+            $episode->save();
+            return;
+        }
+
+        $distinctReporters = (int) DB::table('podcast_episode_reports')
+            ->where('tenant_id', TenantContext::getId())
+            ->where('episode_id', $episode->id)
+            ->where('status', 'open')
+            ->distinct()
+            ->count('reporter_user_id');
+
+        if ($distinctReporters >= self::REPORT_AUTO_FLAG_THRESHOLD) {
+            $episode->moderation_status = 'flagged';
+            $episode->save();
+        }
     }
 
     public static function resolveEpisodeReports(PodcastEpisode $episode, int $adminId, string $status): array
@@ -740,7 +795,9 @@ class PodcastService
                 'updated_at' => now(),
             ]);
 
-        if ($status === 'resolved' && $episode->moderation_status === 'flagged') {
+        // Resolving or dismissing reports clears an auto-flag and restores the
+        // episode. Escalation deliberately keeps it hidden pending further review.
+        if (in_array($status, ['resolved', 'dismissed'], true) && $episode->moderation_status === 'flagged') {
             $episode->moderation_status = 'approved';
             $episode->moderated_by = $adminId;
             $episode->moderated_at = now();
@@ -1132,6 +1189,26 @@ class PodcastService
         $episode->audio_url = $visibility === 'public'
             ? self::episodeAudioUrl($episode, false)
             : self::episodeAudioUrl($episode, true);
+    }
+
+    /**
+     * Attach the viewer's reaction state + total reaction count to an episode
+     * so the client can render the correct toggle state on first paint instead
+     * of always showing the un-reacted label.
+     */
+    public static function decorateEpisodeForViewer(PodcastEpisode $episode, ?int $userId): void
+    {
+        if (!PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_ENABLE_EPISODE_REACTIONS)) {
+            $episode->reaction_count = 0;
+            $episode->viewer_has_reacted = false;
+            return;
+        }
+
+        $episode->reaction_count = (int) PodcastEpisodeReaction::where('episode_id', $episode->id)->count();
+        $episode->viewer_has_reacted = $userId !== null
+            && PodcastEpisodeReaction::where('episode_id', $episode->id)
+                ->where('user_id', $userId)
+                ->exists();
     }
 
     private static function syncChapters(PodcastEpisode $episode, mixed $chapters): void
