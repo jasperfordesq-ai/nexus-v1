@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Button, Card, CardBody, Checkbox, Chip, Input, Progress, Select, SelectItem, Spinner, Textarea, useConfirm } from '@/components/ui';
@@ -116,6 +116,7 @@ export default function PodcastStudioPage() {
   const [chaptersText, setChaptersText] = useState('');
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [episodeError, setEpisodeError] = useState<string | null>(null);
+  const audioInputRef = useRef<HTMLInputElement | null>(null);
 
   const chapterIssues = useMemo(() => countInvalidChapterLines(chaptersText), [chaptersText]);
 
@@ -296,6 +297,13 @@ export default function PodcastStudioPage() {
     }
   }
 
+  function clearAudioFile(): void {
+    setAudioFile(null);
+    if (audioInputRef.current) {
+      audioInputRef.current.value = '';
+    }
+  }
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-6">
       <Button as={Link} to={tenantPath('/podcasts')} variant="tertiary" size="sm" startContent={<ArrowLeft size={16} aria-hidden="true" />}>
@@ -368,12 +376,19 @@ export default function PodcastStudioPage() {
                 </Select>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <Input label={t('fields.episode_title')} value={episodeForm.title} onValueChange={(title) => setEpisodeForm((prev) => ({ ...prev, title }))} />
-                  <Input label={t('fields.audio_url')} value={episodeForm.audio_url} onValueChange={(audio_url) => setEpisodeForm((prev) => ({ ...prev, audio_url }))} />
+                  <Input
+                    label={t('fields.audio_url')}
+                    value={episodeForm.audio_url}
+                    onValueChange={(audio_url) => setEpisodeForm((prev) => ({ ...prev, audio_url }))}
+                    isDisabled={Boolean(audioFile) || savingEpisode}
+                    description={audioFile ? t('fields.audio_url_disabled_file_selected') : undefined}
+                  />
                   <div className="sm:col-span-2">
                     <label htmlFor="podcast-audio-file" className="block text-sm font-medium text-foreground">
                       {t('fields.audio_file')}
                     </label>
                     <input
+                      ref={audioInputRef}
                       id="podcast-audio-file"
                       className="mt-1 block w-full rounded-md border border-border bg-surface px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-surface-secondary file:px-3 file:py-1 file:text-sm file:font-medium file:text-foreground"
                       type="file"
@@ -382,7 +397,21 @@ export default function PodcastStudioPage() {
                       disabled={savingEpisode}
                       onChange={(event) => setAudioFile(event.currentTarget.files?.[0] ?? null)}
                     />
-                    <p id="podcast-audio-file-hint" className="mt-1 text-xs text-muted">{audioFile ? audioFile.name : t('fields.audio_file_hint')}</p>
+                    <p id="podcast-audio-file-hint" className="mt-1 text-xs text-muted">{t('fields.audio_file_hint')}</p>
+                    {audioFile && (
+                      <div className="mt-2 flex flex-wrap items-center justify-between gap-2 rounded-md bg-surface-secondary/70 px-3 py-2 text-xs text-muted">
+                        <span className="min-w-0 truncate">{audioFile.name}</span>
+                        <Button
+                          size="sm"
+                          variant="tertiary"
+                          startContent={<XCircle size={14} aria-hidden="true" />}
+                          onPress={clearAudioFile}
+                          isDisabled={savingEpisode}
+                        >
+                          {t('fields.clear_audio_file')}
+                        </Button>
+                      </div>
+                    )}
                   </div>
                   <Input
                     label={t('fields.duration_seconds')}

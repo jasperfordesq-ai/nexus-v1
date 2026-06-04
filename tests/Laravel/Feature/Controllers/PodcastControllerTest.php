@@ -519,6 +519,55 @@ class PodcastControllerTest extends TestCase
         $chapters->assertJsonPath('chapters.1.startTime', 60);
     }
 
+    public function test_public_chapter_resources_strip_non_http_urls(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+
+        $show = $this->apiPost('/v2/podcasts', [
+            'title' => 'Safe Chapters',
+            'visibility' => 'public',
+        ]);
+        $show->assertStatus(201);
+        $showId = $show->json('data.id');
+        $this->apiPost("/v2/podcasts/{$showId}/publish")->assertStatus(200);
+
+        $episode = $this->apiPost("/v2/podcasts/{$showId}/episodes", [
+            'title' => 'Chapter Links',
+            'audio_url' => 'https://cdn.example.test/chapter-links.mp3',
+            'audio_bytes' => 1234,
+            'visibility' => 'public',
+            'chapters' => [
+                ['title' => 'Unsafe', 'starts_at_seconds' => 0, 'url' => 'javascript:alert(1)'],
+                ['title' => 'Safe', 'starts_at_seconds' => 30, 'url' => 'https://example.test/context'],
+            ],
+        ]);
+        $episode->assertStatus(201);
+        $episodeId = $episode->json('data.id');
+        $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episodeId}/publish")->assertStatus(200);
+        $updatedChapters = DB::table('podcast_episode_chapters')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('episode_id', $episodeId)
+            ->where('title', 'Unsafe')
+            ->update(['url' => 'javascript:alert(1)']);
+        $this->assertSame(1, $updatedChapters);
+        $this->assertSame('javascript:alert(1)', DB::table('podcast_episode_chapters')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('episode_id', $episodeId)
+            ->where('title', 'Unsafe')
+            ->value('url'));
+
+        $this->app['auth']->forgetGuards();
+        TenantContext::reset();
+
+        $chapters = $this->get("/api/v2/podcasts/chapters/{$this->testTenantId}/{$episodeId}.json");
+
+        $chapters->assertStatus(200);
+        $chapters->assertDontSee('javascript:alert(1)', false);
+        $chapters->assertJsonPath('chapters.0.url', null);
+        $chapters->assertJsonPath('chapters.1.url', 'https://example.test/context');
+    }
+
     public function test_rss_exposes_directory_metadata_and_sanitizes_funding_url(): void
     {
         $this->enablePodcasts(true);

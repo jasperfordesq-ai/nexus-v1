@@ -474,7 +474,7 @@ class PodcastController extends BaseApiController
         $chapters = $episode->chapters->map(fn ($chapter) => [
             'startTime' => (int) $chapter->starts_at_seconds,
             'title' => (string) $chapter->title,
-            'url' => $chapter->url,
+            'url' => PodcastService::safePublicUrl($chapter->url),
         ])->values()->all();
 
         return response()->json([

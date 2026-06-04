@@ -152,6 +152,8 @@
     "audio_url": "Audio URL",
     "audio_file": "ホストされた音声ファイル",
     "audio_file_hint": "プライベート NEXUS ホスティング用にオーディオをアップロードするか、外部オーディオ URL を使用します。",
+    "audio_url_disabled_file_selected": "選択したホスト済みファイルを使用しています。外部音声URLを使うにはクリアしてください。",
+    "clear_audio_file": "選択したファイルをクリア",
     "visibility": "Visibility",
     "summary": "Summary",
     "description": "Description",

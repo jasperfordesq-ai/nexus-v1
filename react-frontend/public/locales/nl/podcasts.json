@@ -152,6 +152,8 @@
     "audio_url": "Audio URL",
     "audio_file": "Gehost audiobestand",
     "audio_file_hint": "Upload audio voor privé NEXUS-hosting of gebruik een externe audio-URL.",
+    "audio_url_disabled_file_selected": "Het geselecteerde gehoste bestand wordt gebruikt. Wis het om een externe audio-URL te gebruiken.",
+    "clear_audio_file": "Geselecteerd bestand wissen",
     "visibility": "Visibility",
     "summary": "Summary",
     "description": "Description",

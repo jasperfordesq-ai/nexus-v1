@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Chip, Slider } from '@/components/ui';
 import type { PodcastChapter, PodcastEpisode } from '@/lib/api/podcasts';
@@ -49,6 +49,19 @@ export function PodcastAudioPlayer({ episode, onCompleted }: PodcastAudioPlayerP
   const canSeek = !hasError && duration > 0;
   const sliderMax = Math.max(1, duration);
   const sliderValue = Math.min(Math.max(scrubValue ?? currentTime, 0), sliderMax);
+
+  useEffect(() => {
+    completedRef.current = false;
+    setCurrentTime(0);
+    setDuration(normalizeDuration(episode.duration_seconds));
+    setPlaybackRate(1);
+    setScrubValue(null);
+    setHasError(false);
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.playbackRate = 1;
+    }
+  }, [episode.id, episode.duration_seconds]);
 
   function seekTo(seconds: number, autoplay: boolean): void {
     const audio = audioRef.current;

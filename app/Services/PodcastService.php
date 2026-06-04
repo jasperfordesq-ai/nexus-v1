@@ -1232,7 +1232,7 @@ class PodcastService
                 'episode_id' => $episode->id,
                 'title' => self::nullableText($chapter['title'], 200),
                 'starts_at_seconds' => max(0, (int) ($chapter['starts_at_seconds'] ?? 0)),
-                'url' => self::nullableText($chapter['url'] ?? null, 1000),
+                'url' => self::safePublicUrl($chapter['url'] ?? null),
                 'position' => $position,
             ]);
         }
@@ -1483,6 +1483,11 @@ class PodcastService
         }
 
         return self::isHttpUrl($url) ? $url : null;
+    }
+
+    public static function safePublicUrl(mixed $value): ?string
+    {
+        return self::nullableUrl($value);
     }
 
     private static function nullableEmail(mixed $value): ?string

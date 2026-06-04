@@ -152,6 +152,8 @@
     "audio_url": "Audio URL",
     "audio_file": "ملف صوتي مستضاف",
     "audio_file_hint": "قم بتحميل الصوت لاستضافة NEXUS الخاصة، أو استخدم عنوان URL صوتيًا خارجيًا.",
+    "audio_url_disabled_file_selected": "يتم استخدام الملف المستضاف المحدد. امسحه لاستخدام رابط صوت خارجي.",
+    "clear_audio_file": "مسح الملف المحدد",
     "visibility": "Visibility",
     "summary": "Summary",
     "description": "Description",

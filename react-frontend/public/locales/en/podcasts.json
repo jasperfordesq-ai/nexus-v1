@@ -153,6 +153,8 @@
     "audio_url": "Audio URL",
     "audio_file": "Hosted audio file",
     "audio_file_hint": "Upload audio for private NEXUS hosting, or use an external audio URL.",
+    "audio_url_disabled_file_selected": "Using the selected hosted file. Clear it to use an external audio URL.",
+    "clear_audio_file": "Clear selected file",
     "visibility": "Visibility",
     "summary": "Summary",
     "description": "Description",

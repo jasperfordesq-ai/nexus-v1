@@ -152,6 +152,8 @@
     "audio_url": "Audio URL",
     "audio_file": "Comhad fuaime arna óstáil",
     "audio_file_hint": "Uaslódáil fuaime le haghaidh óstáil phríobháideach NEXUS, nó úsáid URL fuaime seachtrach.",
+    "audio_url_disabled_file_selected": "Tá an comhad óstáilte roghnaithe in úsáid. Glan é chun URL fuaime seachtrach a úsáid.",
+    "clear_audio_file": "Glan an comhad roghnaithe",
     "visibility": "Visibility",
     "summary": "Summary",
     "description": "Description",
