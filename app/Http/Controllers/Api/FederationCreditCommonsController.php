@@ -291,7 +291,20 @@ class FederationCreditCommonsController extends BaseApiController
             return $this->ccError('UnresolvedAccountnameViolation', "Payee account not found", 400);
         }
 
-        $uuid = (string) Str::uuid();
+        // Idempotency: honour a caller-supplied transaction UUID so a retried
+        // request is de-duplicated rather than moving credits a second time.
+        $uuid = (is_string($payload['uuid'] ?? null) && $payload['uuid'] !== '')
+            ? (string) $payload['uuid']
+            : (string) Str::uuid();
+
+        $existingEntry = DB::table('federation_cc_entries')
+            ->where('tenant_id', $tenantId)
+            ->where('transaction_uuid', $uuid)
+            ->first();
+        if ($existingEntry) {
+            return $this->ccReplayResponse($uuid, $existingEntry);
+        }
+
         $nodeSlug = $this->getNodeSlug($tenantId);
 
         // Determine initial state based on workflow.
@@ -362,6 +375,21 @@ class FederationCreditCommonsController extends BaseApiController
             }
 
             DB::commit();
+        } catch (\Illuminate\Database\QueryException $e) {
+            DB::rollBack();
+            // Duplicate (tenant_id, transaction_uuid) — a concurrent retry won;
+            // return its result idempotently rather than double-applying.
+            if ((int) ($e->errorInfo[1] ?? 0) === 1062) {
+                $dup = DB::table('federation_cc_entries')
+                    ->where('tenant_id', $tenantId)
+                    ->where('transaction_uuid', $uuid)
+                    ->first();
+                if ($dup) {
+                    return $this->ccReplayResponse($uuid, $dup);
+                }
+            }
+            Log::error('[FederationCC] Transaction failed', ['error' => $e->getMessage()]);
+            return $this->ccError('Other', 'Transaction processing failed', 500);
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('[FederationCC] Transaction failed', ['error' => $e->getMessage()]);
@@ -806,7 +834,20 @@ class FederationCreditCommonsController extends BaseApiController
                     "Payee '{$payeePath}' not found on this node", 400);
             }
 
-            $uuid = (string) Str::uuid();
+            // Idempotency: a relayed transaction carries the originating node's
+            // UUID. A repeat delivery of the same UUID must NOT credit the payee
+            // again — return the previously recorded result instead of re-applying.
+            $uuid = (is_string($payload['uuid'] ?? null) && $payload['uuid'] !== '')
+                ? (string) $payload['uuid']
+                : (string) Str::uuid();
+
+            $existing = DB::table('federation_cc_entries')
+                ->where('tenant_id', $tenantId)
+                ->where('transaction_uuid', $uuid)
+                ->first();
+            if ($existing) {
+                return $this->ccReplayResponse($uuid, $existing);
+            }
 
             DB::beginTransaction();
             try {
@@ -814,7 +855,9 @@ class FederationCreditCommonsController extends BaseApiController
                 DB::update("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
                     [$quant, $payeeId, $tenantId]);
 
-                // Record the CC entry
+                // Record the CC entry. The UNIQUE(tenant_id, transaction_uuid)
+                // index makes a concurrent duplicate delivery fail here (caught
+                // below) rather than double-credit.
                 DB::table('federation_cc_entries')->insert([
                     'tenant_id' => $tenantId,
                     'transaction_uuid' => $uuid,
@@ -852,6 +895,21 @@ class FederationCreditCommonsController extends BaseApiController
                     ],
                     'meta' => ['transitions' => []],
                 ], 201, ['Last-hash' => $newHash]);
+            } catch (\Illuminate\Database\QueryException $e) {
+                DB::rollBack();
+                // Concurrent duplicate delivery hit the unique constraint — the
+                // first delivery won; return its result idempotently (no re-credit).
+                if ((int) ($e->errorInfo[1] ?? 0) === 1062) {
+                    $dup = DB::table('federation_cc_entries')
+                        ->where('tenant_id', $tenantId)
+                        ->where('transaction_uuid', $uuid)
+                        ->first();
+                    if ($dup) {
+                        return $this->ccReplayResponse($uuid, $dup);
+                    }
+                }
+                Log::error('[FederationCC] Relay local processing failed', ['error' => $e->getMessage()]);
+                return $this->ccError('Other', 'Relay processing failed', 500);
             } catch (\Throwable $e) {
                 DB::rollBack();
                 Log::error('[FederationCC] Relay local processing failed', ['error' => $e->getMessage()]);
@@ -1139,6 +1197,29 @@ class FederationCreditCommonsController extends BaseApiController
             ->value('username');
 
         return $nodeSlug . '/' . ($username ?? "user-{$userId}");
+    }
+
+    /**
+     * Idempotent-replay response for an already-recorded CC transaction.
+     * Returned (HTTP 200) when a relay/create is delivered again for a UUID that
+     * has already been processed — so no balance change is applied a second time.
+     */
+    private function ccReplayResponse(string $uuid, object $existing): JsonResponse
+    {
+        return response()->json([
+            'data' => [
+                'uuid' => $uuid,
+                'state' => $existing->state,
+                'workflow' => $existing->workflow,
+                'entries' => [[
+                    'payer' => $existing->payer,
+                    'payee' => $existing->payee,
+                    'quant' => (float) $existing->quant,
+                    'description' => $existing->description,
+                ]],
+            ],
+            'meta' => ['transitions' => [], 'idempotent_replay' => true],
+        ], 200);
     }
 
     /**
