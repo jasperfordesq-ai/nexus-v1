@@ -390,6 +390,24 @@ class FederationProtocolEndpointsTest extends TestCase
         $this->assertTrue((bool) $response->json('data.processed'));
     }
 
+    public function test_cc_create_transaction_rejects_debit_of_non_opted_in_payer(): void
+    {
+        // A member who has NOT opted into federation must not be debitable via the
+        // CC protocol — guards the cross-account-debit IDOR on createTransaction.
+        $payer = DB::table('users')->where('tenant_id', $this->testTenantId)->where('status', 'active')->where('federation_optin', 0)->value('id');
+        $payee = DB::table('users')->where('tenant_id', $this->testTenantId)->where('status', 'active')->when($payer, fn ($q) => $q->where('id', '!=', $payer))->value('id');
+        if (!$payer || !$payee) {
+            $this->markTestSkipped('Need two active users to exercise the payer-consent gate');
+        }
+        $response = $this->json('POST', '/api/v2/federation/cc/transaction', [
+            'payer' => (string) $payer,
+            'payee' => (string) $payee,
+            'quant' => 1,
+            'workflow' => '0|PC-CE=',
+        ], $this->authHeaders());
+        $response->assertStatus(403);
+    }
+
     public function test_native_ingest_rejects_empty_body(): void
     {
         $response = $this->json('POST', '/api/v2/federation/ingest/reviews', [], $this->authHeaders());

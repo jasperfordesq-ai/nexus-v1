@@ -319,6 +319,15 @@ class FederationCreditCommonsController extends BaseApiController
         $resolvedPayeePath = $this->toAccountPath($payeeId, $tenantId);
         $newHash = null;
 
+        // Authorization: a federated transaction may only debit a local payer who
+        // has opted into federation. Without this, a transactions:write caller
+        // could move credits out of any member's wallet (cross-account IDOR).
+        if ($initialState === CreditCommonsAdapter::STATE_COMPLETED
+            && !$this->payerMayBeDebited($payerId, $tenantId)) {
+            return $this->ccError('PermissionViolation',
+                'Payer has not opted into federation; their balance cannot be debited by a federated transaction', 403);
+        }
+
         // Execute the transaction with pessimistic locking to prevent race conditions
         DB::beginTransaction();
         try {
@@ -1090,6 +1099,14 @@ class FederationCreditCommonsController extends BaseApiController
 
         DB::beginTransaction();
         try {
+            // Authorization: only debit a local payer who has opted into federation
+            // (mirrors createTransaction — prevents debiting a non-consenting member).
+            if ($payerId && !$this->payerMayBeDebited($payerId, $tenantId)) {
+                DB::rollBack();
+                return $this->ccError('PermissionViolation',
+                    'Payer has not opted into federation; their balance cannot be debited by a federated transaction', 403);
+            }
+
             // Apply balances only when accounts are local. Remote-only entries
             // are recorded as audit rows (relay case).
             if ($payerId) {
@@ -1220,6 +1237,22 @@ class FederationCreditCommonsController extends BaseApiController
             ],
             'meta' => ['transitions' => [], 'idempotent_replay' => true],
         ], 200);
+    }
+
+    /**
+     * Federation consent gate: a local member's balance may only be debited by a
+     * federated transaction if they have explicitly opted into federation. Without
+     * this, a transactions:write caller could move credits out of an arbitrary
+     * member's wallet (the per-account authorization the CC transfer endpoints
+     * otherwise lacked).
+     */
+    private function payerMayBeDebited(int $payerId, int $tenantId): bool
+    {
+        return DB::table('users')
+            ->where('id', $payerId)
+            ->where('tenant_id', $tenantId)
+            ->where('federation_optin', 1)
+            ->exists();
     }
 
     /**
