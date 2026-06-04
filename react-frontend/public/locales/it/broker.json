@@ -461,6 +461,12 @@
     "detail_broker_conditions": "Condizioni del broker",
     "detail_history": "Cronologia",
     "detail_history_by": "da {{name}}",
+    "detail_history_actions": {
+      "provider_confirmed": "Il fornitore ha confermato le ore",
+      "request_created": "Richiesta creata",
+      "requester_confirmed": "Il richiedente ha confermato le ore",
+      "status_changed": "Stato modificato"
+    },
     "detail_no_history": "Nessuna cronologia disponibile.",
     "tabs_aria": "Exchange status filter"
   },

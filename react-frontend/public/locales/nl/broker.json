@@ -461,6 +461,12 @@
     "detail_broker_conditions": "Voorwaarden van de makelaar",
     "detail_history": "Geschiedenis",
     "detail_history_by": "door {{name}}",
+    "detail_history_actions": {
+      "provider_confirmed": "Aanbieder heeft uren bevestigd",
+      "request_created": "Verzoek aangemaakt",
+      "requester_confirmed": "Aanvrager heeft uren bevestigd",
+      "status_changed": "Status gewijzigd"
+    },
     "detail_no_history": "Geen geschiedenis beschikbaar.",
     "tabs_aria": "Exchange status filter"
   },

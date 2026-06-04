@@ -461,6 +461,12 @@
     "detail_broker_conditions": "شروط الوسيط",
     "detail_history": "السجل",
     "detail_history_by": "بواسطة {{name}}",
+    "detail_history_actions": {
+      "provider_confirmed": "أكد مقدم الخدمة الساعات",
+      "request_created": "تم إنشاء الطلب",
+      "requester_confirmed": "أكد مقدم الطلب الساعات",
+      "status_changed": "تم تغيير الحالة"
+    },
     "detail_no_history": "لا يوجد سجل متاح.",
     "tabs_aria": "Exchange status filter"
   },

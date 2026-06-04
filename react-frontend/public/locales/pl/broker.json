@@ -461,6 +461,12 @@
     "detail_broker_conditions": "Warunki brokera",
     "detail_history": "Historia",
     "detail_history_by": "przez {{name}}",
+    "detail_history_actions": {
+      "provider_confirmed": "Dostawca potwierdził godziny",
+      "request_created": "Utworzono prośbę",
+      "requester_confirmed": "Wnioskujący potwierdził godziny",
+      "status_changed": "Zmieniono status"
+    },
     "detail_no_history": "Brak dostępnej historii.",
     "tabs_aria": "Exchange status filter"
   },

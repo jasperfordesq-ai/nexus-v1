@@ -461,6 +461,12 @@
     "detail_broker_conditions": "Coinníollacha an Bhróicéara",
     "detail_history": "Stair",
     "detail_history_by": "ag {{name}}",
+    "detail_history_actions": {
+      "provider_confirmed": "Dhearbhaigh an soláthraí na huaireanta",
+      "request_created": "Iarratas cruthaithe",
+      "requester_confirmed": "Dhearbhaigh an t-iarrthóir na huaireanta",
+      "status_changed": "Athraíodh an stádas"
+    },
     "detail_no_history": "Níl aon stair ar fáil.",
     "tabs_aria": "Exchange status filter"
   },

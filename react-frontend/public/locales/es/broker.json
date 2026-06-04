@@ -461,6 +461,12 @@
     "detail_broker_conditions": "Condiciones del bróker",
     "detail_history": "Historial",
     "detail_history_by": "por {{name}}",
+    "detail_history_actions": {
+      "provider_confirmed": "El proveedor confirmó las horas",
+      "request_created": "Solicitud creada",
+      "requester_confirmed": "El solicitante confirmó las horas",
+      "status_changed": "Estado cambiado"
+    },
     "detail_no_history": "No hay historial disponible.",
     "tabs_aria": "Exchange status filter"
   },

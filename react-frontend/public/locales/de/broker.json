@@ -461,6 +461,12 @@
     "detail_broker_conditions": "Broker-Bedingungen",
     "detail_history": "Verlauf",
     "detail_history_by": "von {{name}}",
+    "detail_history_actions": {
+      "provider_confirmed": "Anbieter hat Stunden bestätigt",
+      "request_created": "Anfrage erstellt",
+      "requester_confirmed": "Anfragender hat Stunden bestätigt",
+      "status_changed": "Status geändert"
+    },
     "detail_no_history": "Kein Verlauf verfügbar.",
     "tabs_aria": "Exchange status filter"
   },

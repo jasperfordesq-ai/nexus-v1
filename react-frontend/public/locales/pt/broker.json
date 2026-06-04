@@ -461,6 +461,12 @@
     "detail_broker_conditions": "Condições do mediador",
     "detail_history": "Histórico",
     "detail_history_by": "por {{name}}",
+    "detail_history_actions": {
+      "provider_confirmed": "O prestador confirmou as horas",
+      "request_created": "Pedido criado",
+      "requester_confirmed": "O solicitante confirmou as horas",
+      "status_changed": "Estado alterado"
+    },
     "detail_no_history": "Sem histórico disponível.",
     "tabs_aria": "Exchange status filter"
   },

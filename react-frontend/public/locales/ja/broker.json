@@ -461,6 +461,12 @@
     "detail_broker_conditions": "ブローカー条件",
     "detail_history": "履歴",
     "detail_history_by": "{{name}}による",
+    "detail_history_actions": {
+      "provider_confirmed": "提供者が時間を確認しました",
+      "request_created": "リクエストが作成されました",
+      "requester_confirmed": "依頼者が時間を確認しました",
+      "status_changed": "ステータスが変更されました"
+    },
     "detail_no_history": "履歴はありません。",
     "tabs_aria": "Exchange status filter"
   },
