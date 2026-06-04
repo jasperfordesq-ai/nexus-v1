@@ -104,7 +104,7 @@ class JobInterviewSchedulingService
             ->first();
 
         if (!$vacancy) {
-            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Job vacancy not found'];
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => __('api.job_vacancy_not_found')];
             return [];
         }
 
@@ -224,11 +224,22 @@ class JobInterviewSchedulingService
             return null;
         }
 
-        $slot->update([
-            'is_booked' => true,
-            'booked_by_user_id' => $candidateUserId,
-            'booked_at' => now(),
-        ]);
+        // Atomically claim the slot: only one concurrent request can flip is_booked
+        // from false to true, so two candidates cannot book the same slot.
+        $claimed = JobInterviewSlot::where('id', $slotId)
+            ->where('tenant_id', $tenantId)
+            ->where('is_booked', false)
+            ->update([
+                'is_booked' => true,
+                'booked_by_user_id' => $candidateUserId,
+                'booked_at' => now(),
+            ]);
+
+        if ($claimed === 0) {
+            // Lost the race — another candidate booked this slot first.
+            $this->errors[] = ['code' => 'RESOURCE_CONFLICT', 'message' => __('api.job_slot_already_booked')];
+            return null;
+        }
 
         $fresh = $slot->fresh();
         return $fresh instanceof JobInterviewSlot ? $this->slotPayload($fresh, true) : $this->slotPayload($slot, true);
@@ -339,7 +350,7 @@ class JobInterviewSchedulingService
             ->first();
 
         if (!$vacancy) {
-            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Job vacancy not found'];
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => __('api.job_vacancy_not_found')];
             return [];
         }
 

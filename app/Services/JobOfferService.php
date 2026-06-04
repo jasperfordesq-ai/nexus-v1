@@ -10,6 +10,7 @@ use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\JobApplication;
 use App\Models\JobOffer;
+use App\Models\JobVacancy;
 use App\Models\Notification;
 use App\Services\RealtimeService;
 use App\Services\WebhookDispatchService;
@@ -59,6 +60,15 @@ class JobOfferService
             // Enforce one offer per application (UNIQUE constraint on application_id)
             $existing = JobOffer::where('application_id', $applicationId)->exists();
             if ($existing) {
+                return false;
+            }
+
+            // Don't offer to candidates who withdrew or were rejected, or for a vacancy
+            // that has already been filled.
+            if (in_array((string) $application->status, ['withdrawn', 'rejected'], true)) {
+                return false;
+            }
+            if ((string) $application->vacancy->status === 'filled') {
                 return false;
             }
 
@@ -149,31 +159,62 @@ class JobOfferService
                 return false;
             }
 
-            $offer->update([
-                'status'       => 'accepted',
-                'responded_at' => now(),  // column added via 2026_03_27_000000 migration
-            ]);
+            // Atomically accept the offer, fill the vacancy, withdraw sibling offers and
+            // mint timebank credits. Serialized on the vacancy row so that two concurrent
+            // accepts — for the same offer, or for two different offers on the same
+            // single-position vacancy — can never both succeed and double-credit the
+            // candidate or double-fill the role.
+            $creditInfo = DB::transaction(function () use ($offer, $offerId, $tenantId) {
+                // Serialize all accepts for this vacancy.
+                $vacancy = JobVacancy::where('id', (int) $offer->vacancy_id)
+                    ->lockForUpdate()
+                    ->first();
 
-            // Update application status to accepted
-            $offer->application->update([
-                'status' => 'accepted',
-                'stage'  => 'accepted',
-            ]);
+                // Re-read the offer status inside the lock — guards same-offer double accept.
+                if (JobOffer::where('id', $offerId)->value('status') !== 'pending') {
+                    return false;
+                }
 
-            // Update vacancy status to filled
-            if ($offer->application->vacancy) {
-                $offer->application->vacancy->update(['status' => 'filled']);
-            }
+                // Another candidate already filled this single-position role.
+                if ($vacancy && $vacancy->status === 'filled') {
+                    Log::info('JobOfferService::accept rejected — vacancy already filled', [
+                        'offer_id'   => $offerId,
+                        'vacancy_id' => (int) $offer->vacancy_id,
+                    ]);
+                    return false;
+                }
 
-            // Auto-credit time credits for timebank jobs
-            try {
-                $vacancy = $offer->application->vacancy;
-                if ($vacancy && $vacancy->type === 'timebank' && $vacancy->time_credits > 0) {
-                    $candidateId = (int) $offer->application->user_id;
+                $offer->update([
+                    'status'       => 'accepted',
+                    'responded_at' => now(),  // column added via 2026_03_27_000000 migration
+                ]);
+
+                // Update application status to accepted
+                $offer->application->update([
+                    'status' => 'accepted',
+                    'stage'  => 'accepted',
+                ]);
+
+                // Update vacancy status to filled
+                if ($vacancy) {
+                    $vacancy->update(['status' => 'filled']);
+                }
+
+                // Withdraw any other pending offers for this single-position vacancy so a
+                // second candidate cannot also accept after the role is filled.
+                JobOffer::where('tenant_id', $tenantId)
+                    ->where('vacancy_id', (int) $offer->vacancy_id)
+                    ->where('id', '!=', $offerId)
+                    ->where('status', 'pending')
+                    ->update(['status' => 'withdrawn', 'responded_at' => now()]);
+
+                // Auto-credit time credits for timebank jobs. Runs exactly once: the
+                // pending→accepted transition above is serialized by the vacancy lock.
+                if ($vacancy && $vacancy->type === 'timebank' && (float) $vacancy->time_credits > 0) {
+                    $candidateId  = (int) $offer->application->user_id;
                     $creditAmount = (float) $vacancy->time_credits;
-                    $jobTitle = $vacancy->title ?? 'a timebank job';
+                    $jobTitle     = $vacancy->title ?? __('emails.common.fallback_job');
 
-                    // Create transaction record
                     \App\Models\Transaction::create([
                         'sender_id'        => (int) $vacancy->user_id,
                         'receiver_id'      => $candidateId,
@@ -183,13 +224,33 @@ class JobOfferService
                         'status'           => 'completed',
                     ]);
 
-                    // Update balances
                     DB::table('users')
                         ->where('id', $candidateId)
                         ->where('tenant_id', $tenantId)
                         ->increment('balance', $creditAmount);
 
-                    // Notify the candidate about their earned credits
+                    return [
+                        'candidate_id'  => $candidateId,
+                        'credit_amount' => $creditAmount,
+                        'job_title'     => $jobTitle,
+                    ];
+                }
+
+                return null;
+            });
+
+            // Already processed by a concurrent request / role already filled.
+            if ($creditInfo === false) {
+                return false;
+            }
+
+            // Notify the candidate about their earned credits (post-commit).
+            if (is_array($creditInfo)) {
+                try {
+                    $candidateId  = (int) $creditInfo['candidate_id'];
+                    $creditAmount = $creditInfo['credit_amount'];
+                    $jobTitle     = $creditInfo['job_title'];
+
                     $candidate = DB::table('users')
                         ->where('id', $candidateId)
                         ->where('tenant_id', $tenantId)
@@ -212,9 +273,9 @@ class JobOfferService
                             'url'       => '/wallet',
                         ]);
                     });
+                } catch (\Throwable $e) {
+                    Log::warning('JobOfferService::accept auto-credit notification failed', ['error' => $e->getMessage()]);
                 }
-            } catch (\Throwable $e) {
-                Log::warning('JobOfferService::accept auto-credit failed', ['error' => $e->getMessage()]);
             }
 
             // Notify the job poster

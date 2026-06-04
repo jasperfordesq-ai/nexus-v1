@@ -9,7 +9,7 @@ import BarChart3 from 'lucide-react/icons/chart-column';
 import Users from 'lucide-react/icons/users';
 import CalendarClock from 'lucide-react/icons/calendar-clock';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button } from '@/components/ui';
+import { GlassCard, Button, useConfirm } from '@/components/ui';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { JobVacancy } from './JobDetailTypes';
@@ -22,8 +22,17 @@ interface JobOwnerBannerProps {
 
 export function JobOwnerBanner({ vacancy, tenantPath, onVacancyUpdated }: JobOwnerBannerProps) {
   const { t } = useTranslation('jobs');
+  const confirm = useConfirm();
 
   const handleCloseVacancy = async () => {
+    const ok = await confirm({
+      title: t('detail.confirm_close_title'),
+      body: t('detail.confirm_close'),
+      status: 'warning',
+      confirmLabel: t('common:confirm'),
+      cancelLabel: t('common:cancel'),
+    });
+    if (!ok) return;
     try {
       const res = await api.put(`/v2/jobs/${vacancy.id}`, { status: 'closed' });
       if (res.success) {
@@ -35,6 +44,14 @@ export function JobOwnerBanner({ vacancy, tenantPath, onVacancyUpdated }: JobOwn
   };
 
   const handleReopenVacancy = async () => {
+    const ok = await confirm({
+      title: t('detail.confirm_reopen_title'),
+      body: t('detail.confirm_reopen'),
+      status: 'success',
+      confirmLabel: t('common:confirm'),
+      cancelLabel: t('common:cancel'),
+    });
+    if (!ok) return;
     try {
       const res = await api.put(`/v2/jobs/${vacancy.id}`, { status: 'open' });
       if (res.success) {

@@ -279,7 +279,8 @@
     "form_negotiable_label": "Salary is negotiable",
     "currency_eur": "EUR",
     "currency_gbp": "GBP",
-    "currency_usd": "USD"
+    "currency_usd": "USD",
+    "monthly": "per month"
   },
   "my_applications": {
     "title": "My Applications",
@@ -380,7 +381,12 @@
     "interview_location_placeholder": "https://meet.google.com/...",
     "offer_salary_placeholder": "e.g. 45000",
     "tabs_aria": "Job pipeline sections",
-    "change_stage_aria": "Change stage for {{name}}"
+    "change_stage_aria": "Change stage for {{name}}",
+    "event_type": {
+      "status_change": "Status change",
+      "interview": "Interview",
+      "offer": "Offer"
+    }
   },
   "apply": {
     "button": "Apply Now",
@@ -460,7 +466,11 @@
     "refresh": "Refresh",
     "message_applicant": "Message",
     "kanban_board": "Kanban Board",
-    "cv_download_error": "Failed to download CV"
+    "cv_download_error": "Failed to download CV",
+    "confirm_close_title": "Close this vacancy?",
+    "confirm_close": "Closing stops new applications from coming in. You can reopen it at any time.",
+    "confirm_reopen_title": "Reopen this vacancy?",
+    "confirm_reopen": "Reopening makes the vacancy visible again and lets people apply."
   },
   "interview": {
     "schedule": "Schedule Interview",
@@ -939,7 +949,9 @@
     "copy_link": "Copy Link",
     "email": "Share via Email",
     "copied": "Link copied!",
-    "native": "Share..."
+    "native": "Share...",
+    "email_body": "Check out this job: {{title}}\n\n{{url}}",
+    "native_text": "Check out this {{type}} opportunity: {{title}}"
   },
   "already_applied": "You've already applied",
   "application_status_label": "Application Status",

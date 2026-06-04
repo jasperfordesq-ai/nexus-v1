@@ -1235,11 +1235,8 @@ class JobVacanciesController extends BaseApiController
         if (!$vacancy || (int) $vacancy->tenant_id !== TenantContext::getId()) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.job_vacancy_not_found'), null, 404);
         }
-        if ((int) $vacancy->user_id !== $userId) {
-            $user = \App\Models\User::where('id', $userId)->first(['id', 'role']);
-            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
-                return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_vacancy_owner_only_interviews'), null, 403);
-            }
+        if (!$this->canManageVacancy($vacancy, $userId)) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_access_denied'), null, 403);
         }
 
         $interviews = JobInterviewService::getForVacancy($vacancyId);
@@ -1457,11 +1454,8 @@ class JobVacanciesController extends BaseApiController
         if (!$vacancy || (int) $vacancy->tenant_id !== TenantContext::getId()) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.job_vacancy_not_found'), null, 404);
         }
-        if ((int) $vacancy->user_id !== $userId) {
-            $user = \App\Models\User::where('id', $userId)->first(['id', 'role']);
-            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
-                return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_vacancy_owner_only_referrals'), null, 403);
-            }
+        if (!$this->canManageVacancy($vacancy, $userId)) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_access_denied'), null, 403);
         }
 
         $stats = JobReferralService::getStats($id);
@@ -1488,11 +1482,8 @@ class JobVacanciesController extends BaseApiController
         if (!$application || !$application->vacancy || (int) $application->vacancy->tenant_id !== TenantContext::getId()) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.job_application_not_found'), null, 404);
         }
-        if ((int) $application->vacancy->user_id !== $userId) {
-            $user = \App\Models\User::where('id', $userId)->first(['id', 'role']);
-            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
-                return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_vacancy_owner_only_scoring'), null, 403);
-            }
+        if (!$this->canManageVacancy($application->vacancy, $userId)) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_access_denied'), null, 403);
         }
 
         $data   = $this->getAllInput();
@@ -1584,11 +1575,8 @@ class JobVacanciesController extends BaseApiController
         if (!$vacancy || (int) $vacancy->tenant_id !== TenantContext::getId()) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.job_vacancy_not_found'), null, 404);
         }
-        if ((int) $vacancy->user_id !== $userId) {
-            $user = \App\Models\User::where('id', $userId)->first(['id', 'role']);
-            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
-                return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_vacancy_owner_only_team'), null, 403);
-            }
+        if (!$this->canManageVacancy($vacancy, $userId)) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_access_denied'), null, 403);
         }
 
         $members = JobTeamService::getMembers($id);
@@ -2237,17 +2225,15 @@ class JobVacanciesController extends BaseApiController
     {
         $this->ensureFeature();
         $userId = $this->requireAuth();
+        $this->rateLimit('jobs_ai_rank', 5, 60);
         $tenantId = TenantContext::getId();
 
         $vacancy = JobVacancy::where('tenant_id', $tenantId)->find($id);
         if (!$vacancy) return $this->respondWithError('NOT_FOUND', __('api_controllers_2.job_vacancies.job_not_found'), null, 404);
 
-        // Must be vacancy owner or admin
-        if ((int) $vacancy->user_id !== $userId) {
-            $user = \App\Models\User::find($userId);
-            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
-                return $this->respondWithError('FORBIDDEN', __('api_controllers_2.job_vacancies.only_poster_can_rank'), null, 403);
-            }
+        // Owner, admin, or hiring-team manager
+        if (!$this->canManageVacancy($vacancy, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api_controllers_2.job_vacancies.only_poster_can_rank'), null, 403);
         }
 
         if (!\App\Services\AI\AIServiceFactory::isEnabled()) {
@@ -2512,6 +2498,7 @@ class JobVacanciesController extends BaseApiController
     public function employerReviews(int $userId): JsonResponse
     {
         $this->ensureFeature();
+        $this->rateLimit('jobs_employer_reviews', 60, 60);
         $tenantId = TenantContext::getId();
 
         $reviews = Review::where('tenant_id', $tenantId)
@@ -2556,6 +2543,7 @@ class JobVacanciesController extends BaseApiController
     {
         $this->ensureFeature();
         $userId = $this->requireAuth();
+        $this->rateLimit('jobs_employer_review_create', 5, 60);
         $tenantId = TenantContext::getId();
         $data = $this->getJsonInput();
 
@@ -2600,10 +2588,10 @@ class JobVacanciesController extends BaseApiController
             'comment'     => trim($data['comment'] ?? ''),
             'review_type' => 'employer',
             'dimensions'  => [
-                'respect'       => (int) ($data['respect'] ?? $rating),
-                'communication' => (int) ($data['communication'] ?? $rating),
-                'flexibility'   => (int) ($data['flexibility'] ?? $rating),
-                'impact'        => (int) ($data['impact'] ?? $rating),
+                'respect'       => max(1, min(5, (int) ($data['respect'] ?? $rating))),
+                'communication' => max(1, min(5, (int) ($data['communication'] ?? $rating))),
+                'flexibility'   => max(1, min(5, (int) ($data['flexibility'] ?? $rating))),
+                'impact'        => max(1, min(5, (int) ($data['impact'] ?? $rating))),
             ],
             'status' => 'approved',
         ]);
@@ -2762,6 +2750,7 @@ class JobVacanciesController extends BaseApiController
     {
         $this->ensureFeature();
         $userId = $this->requireAuth();
+        $this->rateLimit('jobs_audit_trail', 30, 60);
         $tenantId = TenantContext::getId();
 
         $vacancy = \App\Models\JobVacancy::where('tenant_id', $tenantId)->find($id);
@@ -2769,12 +2758,9 @@ class JobVacanciesController extends BaseApiController
             return $this->respondWithError('NOT_FOUND', __('api_controllers_2.job_vacancies.job_not_found'), null, 404);
         }
 
-        // Must be owner or admin
-        if ((int) $vacancy->user_id !== $userId) {
-            $user = \App\Models\User::find($userId);
-            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
-                return $this->respondWithError('FORBIDDEN', __('api_controllers_2.job_vacancies.access_denied'), null, 403);
-            }
+        // Owner, admin, or hiring-team manager
+        if (!$this->canManageVacancy($vacancy, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api_controllers_2.job_vacancies.access_denied'), null, 403);
         }
 
         $page = $this->queryInt('page', 1, 1);
@@ -2857,6 +2843,9 @@ class JobVacanciesController extends BaseApiController
         $vacancy = \App\Models\JobVacancy::where('tenant_id', $tenantId)->find($id);
         if (!$vacancy) return $this->respondWithError('NOT_FOUND', __('api_controllers_2.job_vacancies.job_not_found'), null, 404);
 
+        // Throttle paid LLM calls — any authenticated member can use the advisor.
+        $this->rateLimit('jobs_ai_chat', 15, 60);
+
         if (!\App\Services\AI\AIServiceFactory::isEnabled()) {
             return $this->respondWithError('AI_DISABLED', __('api_controllers_2.job_vacancies.ai_not_configured'), null, 503);
         }
@@ -2932,17 +2921,15 @@ class JobVacanciesController extends BaseApiController
     {
         $this->ensureFeature();
         $userId = $this->requireAuth();
+        $this->rateLimit('jobs_predictions', 10, 60);
         $tenantId = TenantContext::getId();
 
         $vacancy = \App\Models\JobVacancy::where('tenant_id', $tenantId)->find($id);
         if (!$vacancy) return $this->respondWithError('NOT_FOUND', __('api_controllers_2.job_vacancies.job_not_found'), null, 404);
 
-        // Must be owner or admin
-        if ((int) $vacancy->user_id !== $userId) {
-            $user = \App\Models\User::find($userId);
-            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
-                return $this->respondWithError('FORBIDDEN', __('api_controllers_2.job_vacancies.access_denied'), null, 403);
-            }
+        // Owner, admin, or hiring-team manager
+        if (!$this->canManageVacancy($vacancy, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api_controllers_2.job_vacancies.access_denied'), null, 403);
         }
 
         // Gather historical data for similar jobs

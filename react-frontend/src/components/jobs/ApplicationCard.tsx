@@ -32,7 +32,10 @@ export function ApplicationCard({ application, onUpdateStatus, tenantPathFn, nav
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
-  const currentStage = application.stage ?? application.status;
+  const rawStage = application.stage ?? application.status;
+  // Fall back to a known "unknown" label/color when the stage isn't one we recognise,
+  // so we never render a raw `application_status.<unknown-stage>` key.
+  const currentStage = rawStage in STATUS_CHIP_COLORS ? rawStage : 'unknown';
 
   const handleToggleHistory = async () => {
     if (!showHistory && history.length === 0) {
@@ -163,13 +166,15 @@ export function ApplicationCard({ application, onUpdateStatus, tenantPathFn, nav
           variant="light"
           size="sm"
           onPress={handleToggleHistory}
-          className="text-xs text-theme-subtle hover:text-theme-primary flex items-center gap-1 transition-colors min-h-9 p-0 min-w-0"
+          aria-expanded={showHistory}
+          aria-controls={`application-history-${application.id}`}
+          className="text-xs text-theme-subtle hover:text-theme-primary flex items-center gap-1 transition-colors motion-reduce:transition-none min-h-9 p-0 min-w-0"
           startContent={<History className="w-3 h-3" aria-hidden="true" />}
         >
           {t('history.title')}
         </Button>
         {showHistory && (
-          <div className="mt-2 pl-4 border-l-2 border-theme-default space-y-2">
+          <div id={`application-history-${application.id}`} className="mt-2 pl-4 border-l-2 border-theme-default space-y-2">
             {isLoadingHistory ? (
               <Skeleton role="status" aria-busy="true" aria-label={t('common:loading')} className="h-4 bg-theme-hover rounded w-3/4" />
             ) : history.length === 0 ? (

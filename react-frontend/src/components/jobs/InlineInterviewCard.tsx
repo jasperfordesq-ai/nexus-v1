@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { Chip } from '@/components/ui';
 import { GlassCard, Button } from '@/components/ui';
 import { API_BASE } from '@/lib/api';
+import { formatDateTime } from '@/lib/helpers';
 import type { InlineInterview } from './JobDetailTypes';
 
 interface InlineInterviewCardProps {
@@ -47,7 +48,7 @@ export function InlineInterviewCard({
             <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-theme-secondary">
               <span className="flex items-center gap-1">
                 <Calendar className="w-3.5 h-3.5" aria-hidden="true" />
-                {new Date(pendingInterview.scheduled_at).toLocaleString()}
+                {formatDateTime(pendingInterview.scheduled_at)}
               </span>
               <Chip size="sm" variant="tertiary" color="accent">
                 {t(`interview.type_${pendingInterview.interview_type}`)}

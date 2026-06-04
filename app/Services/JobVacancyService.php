@@ -113,6 +113,24 @@ class JobVacancyService
             || (bool) ($user->is_god ?? false);
     }
 
+    /**
+     * Whether a user may manage a vacancy: the owner, an admin, or a hiring-team
+     * manager. Mirrors JobInterviewSchedulingService::canManageSlots so application
+     * management, analytics, exports and bulk actions share one authorization model.
+     */
+    private function canManageVacancy(int $vacancyId, int $vacancyOwnerId, int $userId): bool
+    {
+        if ($vacancyOwnerId === $userId || $this->isAdminUser($userId)) {
+            return true;
+        }
+
+        return \App\Models\JobVacancyTeam::where('tenant_id', TenantContext::getId())
+            ->where('vacancy_id', $vacancyId)
+            ->where('user_id', $userId)
+            ->where('role', 'manager')
+            ->exists();
+    }
+
     private function validateOrganizationForPosting(int $organizationId, int $userId, int $tenantId): bool
     {
         $exists = DB::table('organizations')
@@ -726,7 +744,7 @@ class JobVacancyService
             return true;
         } catch (\Throwable $e) {
             Log::error('JobVacancyService::update failed: ' . $e->getMessage());
-            $this->errors[] = ['code' => 'SERVER_INTERNAL_ERROR', 'message' => 'Failed to update job vacancy'];
+            $this->errors[] = ['code' => 'SERVER_INTERNAL_ERROR', 'message' => __('api.job_update_failed')];
             return false;
         }
     }
@@ -753,10 +771,27 @@ class JobVacancyService
         }
 
         try {
-            // Delete applications first (tenant-scoped via HasTenantScope + explicit)
-            JobApplication::where('tenant_id', TenantContext::getId())
-                ->where('vacancy_id', $id)->delete();
-            $vacancy->delete();
+            $tenantId = TenantContext::getId();
+
+            // Remove all dependent records in one transaction. DB-level ON DELETE CASCADE
+            // covers some of these once the FK-repair migration is applied, but several
+            // job tables shipped without working foreign keys (BIGINT-vs-INT mismatch),
+            // so we delete explicitly here to avoid orphaned interviews / offers /
+            // scorecards / slots / referrals regardless of the DB's FK state.
+            DB::transaction(function () use ($id, $tenantId, $vacancy) {
+                \App\Models\JobInterview::where('tenant_id', $tenantId)->where('vacancy_id', $id)->delete();
+                \App\Models\JobOffer::where('tenant_id', $tenantId)->where('vacancy_id', $id)->delete();
+                \App\Models\JobScorecard::where('tenant_id', $tenantId)->where('vacancy_id', $id)->delete();
+                \App\Models\JobVacancyTeam::where('tenant_id', $tenantId)->where('vacancy_id', $id)->delete();
+                \App\Models\JobPipelineRule::where('tenant_id', $tenantId)->where('vacancy_id', $id)->delete();
+                \App\Models\JobReferral::where('tenant_id', $tenantId)->where('vacancy_id', $id)->delete();
+                \App\Models\JobInterviewSlot::where('tenant_id', $tenantId)->where('job_id', $id)->delete();
+                \App\Models\SavedJob::where('tenant_id', $tenantId)->where('job_id', $id)->delete();
+                // Applications last (cascades to job_application_history via its FK).
+                JobApplication::where('tenant_id', $tenantId)->where('vacancy_id', $id)->delete();
+                $vacancy->delete();
+            });
+
             return true;
         } catch (\Throwable $e) {
             Log::error('JobVacancyService::delete failed: ' . $e->getMessage());
@@ -1020,12 +1055,10 @@ class JobVacancyService
             return null;
         }
 
-        // Check ownership or admin
-        if ((int) $vacancy->user_id !== $adminId) {
-            if (!$this->isAdminUser($adminId)) {
-                $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => __('api.job_access_denied')];
-                return null;
-            }
+        // Owner, admin, or hiring-team manager
+        if (!$this->canManageVacancy($jobId, (int) $vacancy->user_id, $adminId)) {
+            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => __('api.job_access_denied')];
+            return null;
         }
 
         $isBlindHiring = (bool) ($vacancy->blind_hiring ?? false);
@@ -1095,12 +1128,10 @@ class JobVacancyService
 
         $isApplicantWithdraw = $status === 'withdrawn' && (int) $application->user_id === $adminId;
 
-        // Check vacancy ownership/admin, or allow applicants to withdraw their own application only.
-        if ((int) $application->vacancy->user_id !== $adminId && !$isApplicantWithdraw) {
-            if (!$this->isAdminUser($adminId)) {
-                $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => __('api.job_access_denied')];
-                return false;
-            }
+        // Owner, admin, or hiring-team manager — or the applicant withdrawing their own application.
+        if (!$isApplicantWithdraw && !$this->canManageVacancy((int) $application->vacancy_id, (int) $application->vacancy->user_id, $adminId)) {
+            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => __('api.job_access_denied')];
+            return false;
         }
 
         $previousStatus = $application->stage ?? $application->status ?? 'applied';
@@ -1212,7 +1243,7 @@ class JobVacancyService
 
         $job = $this->vacancy->newQuery()->find($id);
         if (!$job) {
-            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Job vacancy not found'];
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => __('api.job_vacancy_not_found')];
             return false;
         }
 
@@ -1554,7 +1585,7 @@ class JobVacancyService
 
         $vacancy = $this->legacyGetById($jobId, $userId);
         if (!$vacancy) {
-            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Job vacancy not found'];
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => __('api.job_vacancy_not_found')];
             return null;
         }
 
@@ -1665,19 +1696,16 @@ class JobVacancyService
             ->where('tenant_id', $tenantId)
             ->find($applicationId);
         if (!$application || !$application->vacancy || (int) $application->vacancy->tenant_id !== $tenantId) {
-            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Application not found'];
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => __('api.job_application_not_found')];
             return null;
         }
 
-        // Must be applicant, vacancy owner, or admin
+        // Must be applicant, vacancy owner, hiring-team manager, or admin
         $isApplicant = (int) $application->user_id === $userId;
-        $isOwner = (int) $application->vacancy->user_id === $userId;
 
-        if (!$isApplicant && !$isOwner) {
-            if (!$this->isAdminUser($userId)) {
-                $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => __('api.job_access_denied')];
-                return null;
-            }
+        if (!$isApplicant && !$this->canManageVacancy((int) $application->vacancy_id, (int) $application->vacancy->user_id, $userId)) {
+            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => __('api.job_access_denied')];
+            return null;
         }
 
         return JobApplicationHistory::with(['changer:id,first_name,last_name'])
@@ -1715,19 +1743,16 @@ class JobVacancyService
 
         $vacancy = $this->legacyGetById($jobId);
         if (!$vacancy) {
-            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Job vacancy not found'];
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => __('api.job_vacancy_not_found')];
             return null;
         }
 
         $tenantId = TenantContext::getId();
 
-        // Check ownership or admin
-        if ((int) $vacancy['user_id'] !== $userId) {
-            $user = User::where('id', $userId)->first(['id', 'role']);
-            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
-                $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'Access denied'];
-                return null;
-            }
+        // Owner, admin, or hiring-team manager
+        if (!$this->canManageVacancy($jobId, (int) $vacancy['user_id'], $userId)) {
+            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => __('api.job_access_denied')];
+            return null;
         }
 
         $viewsByDay = DB::table('job_vacancy_views')
@@ -1853,17 +1878,14 @@ class JobVacancyService
 
         $vacancy = $this->vacancy->newQuery()->find($id);
         if (!$vacancy) {
-            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Job vacancy not found'];
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => __('api.job_vacancy_not_found')];
             return false;
         }
 
         // Check ownership or admin
-        if ((int) $vacancy->user_id !== $userId) {
-            $user = User::where('id', $userId)->first(['id', 'role']);
-            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
-                $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'You can only renew your own job vacancies'];
-                return false;
-            }
+        if ((int) $vacancy->user_id !== $userId && !$this->isAdminUser($userId)) {
+            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => __('api.job_renew_not_owner')];
+            return false;
         }
 
         try {
@@ -2198,16 +2220,13 @@ class JobVacancyService
         $this->errors = [];
         $vacancy = $this->legacyGetById($jobId);
         if (!$vacancy) {
-            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Not found'];
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => __('api.job_vacancy_not_found')];
             return null;
         }
         $tenantId = TenantContext::getId();
-        if ((int) $vacancy['user_id'] !== $userId) {
-            $user = User::where('id', $userId)->first(['id', 'role']);
-            if (!$user || !in_array($user->role, ['admin', 'super_admin'])) {
-                $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'Access denied'];
-                return null;
-            }
+        if (!$this->canManageVacancy($jobId, (int) $vacancy['user_id'], $userId)) {
+            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => __('api.job_access_denied')];
+            return null;
         }
 
         $apps = JobApplication::with(['applicant:id,first_name,last_name,email'])
@@ -2260,47 +2279,54 @@ class JobVacancyService
 
         $vacancy = $this->legacyGetById($vacancyId);
         if (!$vacancy) {
-            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => 'Not found'];
+            $this->errors[] = ['code' => 'RESOURCE_NOT_FOUND', 'message' => __('api.job_vacancy_not_found')];
             return 0;
         }
-        if ((int) $vacancy['user_id'] !== $userId) {
-            $user = User::where('id', $userId)->first(['id', 'role']);
-            $isAdmin = $user && in_array($user->role, ['admin', 'super_admin', 'tenant_admin']);
-            if (!$isAdmin) {
-                $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => 'Access denied'];
-                return 0;
-            }
+        if (!$this->canManageVacancy($vacancyId, (int) $vacancy['user_id'], $userId)) {
+            $this->errors[] = ['code' => 'RESOURCE_FORBIDDEN', 'message' => __('api.job_access_denied')];
+            return 0;
         }
 
-        $allowed = ['applied','screening','reviewed','interview','offer','accepted','rejected','withdrawn'];
+        $allowed = ['applied','pending','screening','reviewed','shortlisted','interview','offer','accepted','rejected','withdrawn'];
         if (!in_array($newStatus, $allowed, true)) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Invalid status'];
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.job_status_invalid')];
             return 0;
         }
 
-        try {
-            $updated = JobApplication::where('tenant_id', $tenantId)
-                ->where('vacancy_id', $vacancyId)
-                ->whereIn('id', $applicationIds)
-                ->update(['status' => $newStatus, 'stage' => $newStatus]);
+        // Resolve the IDs that genuinely belong to this vacancy, then route each through
+        // the single-update path so the terminal-state guard, status history, and
+        // locale-aware applicant notifications all apply. Applications already in a
+        // terminal state are skipped (not counted), matching the single-update contract.
+        $validIds = JobApplication::where('tenant_id', $tenantId)
+            ->where('vacancy_id', $vacancyId)
+            ->whereIn('id', array_map('intval', $applicationIds))
+            ->pluck('id')
+            ->all();
 
-            // Fire webhook for bulk action
-            try {
-                \App\Services\WebhookDispatchService::dispatch('job.application.bulk_status_changed', [
-                    'vacancy_id'      => $vacancyId,
-                    'application_ids' => $applicationIds,
-                    'new_status'      => $newStatus,
-                    'tenant_id'       => $tenantId,
-                ]);
-            } catch (\Throwable $e) {
-                \Illuminate\Support\Facades\Log::warning('Bulk status webhook failed: ' . $e->getMessage());
+        $updated = 0;
+        foreach ($validIds as $appId) {
+            if ($this->updateApplicationStatus((int) $appId, $userId, $newStatus)) {
+                $updated++;
             }
-
-            return $updated;
-        } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('bulkUpdateApplicationStatus failed', ['error' => $e->getMessage()]);
-            return 0;
         }
+
+        // Per-application skips (e.g. terminal-state) are expected in bulk; don't surface
+        // them as a hard error — the caller reports the number actually updated.
+        $this->errors = [];
+
+        // Fire one aggregate webhook for the bulk action.
+        try {
+            \App\Services\WebhookDispatchService::dispatch('job.application.bulk_status_changed', [
+                'vacancy_id'      => $vacancyId,
+                'application_ids' => $applicationIds,
+                'new_status'      => $newStatus,
+                'tenant_id'       => $tenantId,
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Bulk status webhook failed: ' . $e->getMessage());
+        }
+
+        return $updated;
     }
 
     // =====================================================================

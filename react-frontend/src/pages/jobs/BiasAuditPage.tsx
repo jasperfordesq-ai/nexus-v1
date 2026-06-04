@@ -403,6 +403,12 @@ export function BiasAuditPage() {
                         variant="tertiary"
                         color={data.rate > 50 ? 'danger' : data.rate > 25 ? 'warning' : 'success'}
                       >
+                        {/* Icon qualifier so the severity tier isn't conveyed by colour alone (WCAG 1.4.1) */}
+                        {data.rate > 50 ? (
+                          <AlertTriangle className="w-3 h-3" aria-hidden="true" />
+                        ) : data.rate > 25 ? (
+                          <Info className="w-3 h-3" aria-hidden="true" />
+                        ) : null}
                         {data.rate}%
                       </Chip>
                     </TableCell>
@@ -488,6 +494,8 @@ export function BiasAuditPage() {
                       variant="tertiary"
                       color={data.acceptance_rate > 20 ? 'success' : 'default'}
                     >
+                      {/* Icon marks the high-acceptance tier so it isn't colour-only (WCAG 1.4.1) */}
+                      {data.acceptance_rate > 20 && <TrendingUp className="w-3 h-3" aria-hidden="true" />}
                       {data.acceptance_rate}%
                     </Chip>
                   </div>

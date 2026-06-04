@@ -5,6 +5,7 @@
 
 import { useRef } from 'react';
 import { Chip } from '@/components/ui';
+import { useToast } from '@/contexts/ToastContext';
 
 import Target from 'lucide-react/icons/target';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
@@ -34,6 +35,22 @@ interface ApplyModalProps {
   onApply: () => void;
   onCvDrop: (e: React.DragEvent<HTMLDivElement>) => void;
   onCvTooBig: () => void;
+  onCvInvalidType?: () => void;
+}
+
+const CV_ACCEPTED_TYPES = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+];
+const CV_ACCEPTED_EXTENSIONS = ['.pdf', '.doc', '.docx'];
+const CV_MAX_BYTES = 5 * 1024 * 1024;
+
+function isAcceptedCvFile(file: File): boolean {
+  if (file.type && CV_ACCEPTED_TYPES.includes(file.type)) return true;
+  // Some browsers report an empty/incorrect MIME type — fall back to extension.
+  const name = file.name.toLowerCase();
+  return CV_ACCEPTED_EXTENSIONS.some((ext) => name.endsWith(ext));
 }
 
 export function ApplyModal({
@@ -53,9 +70,19 @@ export function ApplyModal({
   onApply,
   onCvDrop,
   onCvTooBig,
+  onCvInvalidType,
 }: ApplyModalProps) {
   const { t } = useTranslation('jobs');
+  const toast = useToast();
   const cvInputRef = useRef<HTMLInputElement>(null);
+
+  const handleInvalidType = () => {
+    if (onCvInvalidType) {
+      onCvInvalidType();
+    } else {
+      toast.error(t('apply.cv_invalid_type'));
+    }
+  };
 
   return (
     <Modal isOpen={isOpen} onOpenChange={(open) => {
@@ -172,13 +199,17 @@ export function ApplyModal({
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) {
-                        if (file.size > 5 * 1024 * 1024) {
+                        if (!isAcceptedCvFile(file)) {
+                          handleInvalidType();
+                        } else if (file.size > CV_MAX_BYTES) {
                           onCvTooBig();
                         } else {
                           setCvFile(file);
                           setCvParsed(null);
                         }
                       }
+                      // Reset so re-selecting the same (or a rejected) file re-fires onChange.
+                      e.target.value = '';
                     }}
                   />
                 </div>
@@ -293,9 +324,9 @@ export function QualificationModal({
                   />
 
                   <div className="space-y-2">
-                    {qualification.breakdown.map((item, idx) => (
+                    {qualification.breakdown.map((item) => (
                       <div
-                        key={idx}
+                        key={`${item.skill}-${item.matched}`}
                         className={`flex items-center gap-3 p-3 rounded-lg ${
                           item.matched ? 'bg-success/5 border border-success/20' : 'bg-danger/5 border border-danger/20'
                         }`}

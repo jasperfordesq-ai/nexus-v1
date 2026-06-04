@@ -458,6 +458,9 @@ export function JobKanbanPage() {
   usePageTitle(vacancy ? `${t('kanban.pipeline_title')} — ${vacancy.title}` : t('kanban.pipeline_title'));
 
   const abortRef = useRef<AbortController | null>(null);
+  // In-flight status-change lock — prevents double PUTs (and stale reverts) when a
+  // card is dragged or its stage select is changed twice in quick succession.
+  const inFlightStatusRef = useRef<Set<number>>(new Set());
   const tRef = useRef(t);
   tRef.current = t;
   const toastRef = useRef(toast);
@@ -513,6 +516,13 @@ export function JobKanbanPage() {
     const app = applications.find((a) => a.id === capturedId);
     if (!app) return;
 
+    // Ignore re-entry while a status change for this card is still in flight —
+    // a second PUT could revert to a stale status if it resolves after the first.
+    if (inFlightStatusRef.current.has(capturedId)) {
+      setDraggingId(null);
+      return;
+    }
+
     // Normalize current status to column status
     const currentColumn = STATUS_TO_COLUMN[app.stage ?? app.status];
     const targetColumn = COLUMNS.find((c) => c.status === targetStatus)?.id;
@@ -526,6 +536,7 @@ export function JobKanbanPage() {
       prev.map((a) => a.id === capturedId ? { ...a, status: targetStatus, stage: targetStatus } : a)
     );
     setDraggingId(null);
+    inFlightStatusRef.current.add(capturedId);
 
     try {
       const response = await api.put(`/v2/jobs/applications/${capturedId}`, { status: targetStatus });
@@ -544,6 +555,8 @@ export function JobKanbanPage() {
         prev.map((a) => a.id === capturedId ? { ...a, status: app.status, stage: app.stage } : a)
       );
       toastRef.current.error(tRef.current('detail.status_update_error'));
+    } finally {
+      inFlightStatusRef.current.delete(capturedId);
     }
   };
 
@@ -552,10 +565,14 @@ export function JobKanbanPage() {
     const app = applications.find((a) => a.id === appId);
     if (!app) return;
 
+    // Ignore re-entry while a status change for this card is still in flight.
+    if (inFlightStatusRef.current.has(appId)) return;
+
     // Optimistic update
     setApplications((prev) =>
       prev.map((a) => a.id === appId ? { ...a, status: targetStatus, stage: targetStatus } : a)
     );
+    inFlightStatusRef.current.add(appId);
 
     try {
       const response = await api.put(`/v2/jobs/applications/${appId}`, { status: targetStatus });
@@ -573,6 +590,8 @@ export function JobKanbanPage() {
         prev.map((a) => a.id === appId ? { ...a, status: app.status, stage: app.stage } : a)
       );
       toastRef.current.error(tRef.current('detail.status_update_error'));
+    } finally {
+      inFlightStatusRef.current.delete(appId);
     }
   };
 
@@ -593,9 +612,11 @@ export function JobKanbanPage() {
   const handleMoveCard = async (appId: number, targetStatus: string) => {
     const app = applications.find((a) => a.id === appId);
     if (!app) return;
+    if (inFlightStatusRef.current.has(appId)) return;
     setApplications((prev) =>
       prev.map((a) => a.id === appId ? { ...a, status: targetStatus, stage: targetStatus } : a)
     );
+    inFlightStatusRef.current.add(appId);
     try {
       const response = await api.put(`/v2/jobs/applications/${appId}`, { status: targetStatus });
       if (!response.success) {
@@ -610,6 +631,8 @@ export function JobKanbanPage() {
       setApplications((prev) =>
         prev.map((a) => a.id === appId ? { ...a, status: app.status, stage: app.stage } : a)
       );
+    } finally {
+      inFlightStatusRef.current.delete(appId);
     }
   };
 
@@ -952,13 +975,13 @@ export function JobKanbanPage() {
               {auditEvents.map((event, i) => (
                 <div key={i} className="relative">
                   <div className={`absolute -left-[25px] w-3 h-3 rounded-full border-2 border-background ${
-                    event.type === 'status_change' ? 'bg-accent' : event.type === 'interview' ? 'bg-surface-tertiary' : 'bg-warning'
+                    event.type === 'status_change' ? 'bg-accent' : event.type === 'interview' ? 'bg-surface-tertiary' : event.type === 'offer' ? 'bg-warning' : 'bg-surface-tertiary'
                   }`} />
                   <div className="bg-surface-secondary rounded-lg p-3">
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-sm font-medium text-foreground">{event.description}</span>
-                      <Chip size="sm" variant="tertiary" color={event.type === 'status_change' ? 'accent' : event.type === 'interview' ? 'default' : 'warning'} className="capitalize shrink-0">
-                        {event.type.replace('_', ' ')}
+                      <Chip size="sm" variant="tertiary" color={event.type === 'status_change' ? 'accent' : event.type === 'interview' ? 'default' : event.type === 'offer' ? 'warning' : 'default'} className="capitalize shrink-0">
+                        {t('kanban.event_type.' + event.type, { defaultValue: event.type.replace('_', ' ') })}
                       </Chip>
                     </div>
                     <div className="flex items-center gap-2 mt-1 text-xs text-muted">

@@ -24,11 +24,12 @@ import FileDown from 'lucide-react/icons/file-down';
 import ExternalLink from 'lucide-react/icons/external-link';
 import { Chip } from '@/components/ui';
 import { GlassCard, useDisclosure, Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab, Skeleton } from '@/components/ui';
-import { useAuth, useToast, useTenant } from '@/contexts';
+import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
+import { EmptyState } from '@/components/feedback';
 
 import { useTranslation } from 'react-i18next';
 // ---------------------------------------------------------------------------
@@ -657,7 +658,7 @@ function ApplicationSkeleton() {
 export function MyApplicationsPage() {
   const { t } = useTranslation('jobs');
   usePageTitle(t('my_applications.title'));
-  useAuth();
+  // Route is auth-gated by <ProtectedRoute> in App.tsx — no need to read auth here.
   const { tenantPath } = useTenant();
   const navigate = useNavigate();
   const toast = useToast();
@@ -668,6 +669,9 @@ export function MyApplicationsPage() {
   const [hasMore, setHasMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const cursorRef = useRef<string | null>(null);
+  // Bumped after every successful page load (fresh OR appended) so the
+  // interview/offer merge effect re-runs and attaches to the latest list.
+  const [mergeTick, setMergeTick] = useState(0);
 
   // AbortController ref to cancel stale requests
   const abortRef = useRef<AbortController | null>(null);
@@ -682,6 +686,14 @@ export function MyApplicationsPage() {
   const [withdrawTarget, setWithdrawTarget] = useState<JobApplication | null>(null);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const { isOpen: isWithdrawOpen, onOpen: openWithdraw, onClose: closeWithdraw } = useDisclosure();
+
+  // Confirm modal for destructive interview/offer responses (decline / reject).
+  // Reuses the in-module Modal pattern (same as withdraw) so it works without the
+  // global ConfirmDialogProvider being mounted in unit tests.
+  const [pendingResponse, setPendingResponse] = useState<
+    { kind: 'decline-interview' | 'reject-offer'; id: number } | null
+  >(null);
+  const [isResponding, setIsResponding] = useState(false);
 
   // GDPR data export
   const [isExportingGdpr, setIsExportingGdpr] = useState(false);
@@ -727,6 +739,8 @@ export function MyApplicationsPage() {
           cursorRef.current = data.cursor ?? null;
           setHasMore(data.has_more);
           setApplications((prev) => (append ? [...prev, ...data.items] : data.items));
+          // Trigger interview/offer merge against the now-current list (incl. appended pages)
+          setMergeTick((n) => n + 1);
         } else {
           const msg = (res as { error?: string }).error ?? tRef.current('my_applications.load_error');
           if (!append) setError(msg);
@@ -746,8 +760,10 @@ export function MyApplicationsPage() {
     [activeTab],
   );
 
-  // Fetch interviews and offers from API and merge them into applications list
-  const mergeInterviewsAndOffers = useCallback(async (apps: JobApplication[]) => {
+  // Fetch interviews and offers from API and merge them into the applications list.
+  // Uses the functional updater so it merges against current state (including any
+  // "load more" appended pages) rather than a captured snapshot.
+  const mergeInterviewsAndOffers = useCallback(async () => {
     try {
       const [interviewsRes, offersRes] = await Promise.all([
         api.get<{ data: ApplicationInterview[] } | ApplicationInterview[]>('/v2/jobs/my-interviews'),
@@ -773,7 +789,7 @@ export function MyApplicationsPage() {
       const offerMap = new Map<number, ApplicationOffer>();
       for (const of_ of offers) offerMap.set(of_.application_id, of_);
 
-      setApplications(apps.map((app) => ({
+      setApplications((prev) => prev.map((app) => ({
         ...app,
         interview: interviewMap.get(app.id) ?? null,
         offer: offerMap.get(app.id) ?? null,
@@ -791,12 +807,14 @@ export function MyApplicationsPage() {
     loadApplications();
   }, [activeTab]); // eslint-disable-line react-hooks/exhaustive-deps -- reset state when tab changes; loadApplications excluded to avoid loop
 
-  // After loadApplications completes, also fetch interviews + offers
+  // After each page load (fresh or "load more"), fetch interviews + offers and
+  // merge them into the current list. Keyed on mergeTick (bumped per successful
+  // load) so appended pages also get their interviews/offers attached.
   useEffect(() => {
-    if (!isLoading && applications.length > 0) {
-      mergeInterviewsAndOffers(applications);
+    if (mergeTick > 0) {
+      mergeInterviewsAndOffers();
     }
-  }, [isLoading]); // eslint-disable-line react-hooks/exhaustive-deps -- merge interviews after load completes; applications excluded to avoid loop
+  }, [mergeTick, mergeInterviewsAndOffers]);
 
   // Feature 3: Interview accept/decline handlers
   const handleAcceptInterview = useCallback(async (interviewId: number) => {
@@ -871,6 +889,30 @@ export function MyApplicationsPage() {
       toastRef.current.error(tRef.current('something_wrong'));
     }
   }, [loadApplications]);
+
+  // Open the confirm modal for a destructive interview/offer response
+  const requestDeclineInterview = useCallback((interviewId: number) => {
+    setPendingResponse({ kind: 'decline-interview', id: interviewId });
+  }, []);
+  const requestRejectOffer = useCallback((offerId: number) => {
+    setPendingResponse({ kind: 'reject-offer', id: offerId });
+  }, []);
+
+  // Run the confirmed destructive response, then close the modal
+  const confirmPendingResponse = useCallback(async () => {
+    if (!pendingResponse) return;
+    setIsResponding(true);
+    try {
+      if (pendingResponse.kind === 'decline-interview') {
+        await handleDeclineInterview(pendingResponse.id);
+      } else {
+        await handleRejectOffer(pendingResponse.id);
+      }
+    } finally {
+      setIsResponding(false);
+      setPendingResponse(null);
+    }
+  }, [pendingResponse, handleDeclineInterview, handleRejectOffer]);
 
   const handleWithdrawClick = (app: JobApplication) => {
     setWithdrawTarget(app);
@@ -987,20 +1029,20 @@ export function MyApplicationsPage() {
 
       {/* Empty state */}
       {!isLoading && !error && applications.length === 0 && (
-        <GlassCard className='p-12 text-center'>
-          <Briefcase size={48} className='mx-auto mb-4 text-theme-muted/50' aria-hidden="true" />
-          <h3 className='text-lg font-semibold text-theme-primary mb-2'>
-            {t('my_applications.empty_title')}
-          </h3>
-          <p className='text-sm text-theme-muted mb-6'>
-            {activeTab === 'all'
+        <EmptyState
+          icon={<Briefcase className='w-12 h-12' aria-hidden="true" />}
+          title={t('my_applications.empty_title')}
+          description={
+            activeTab === 'all'
               ? t('my_applications.empty_all')
-              : t('my_applications.empty_filtered', { filter: t(`my_applications.tab_${activeTab}`) })}
-          </p>
-          <Button as={Link} to={tenantPath('/jobs')} variant='primary'>
-            {t('my_applications.browse_jobs')}
-          </Button>
-        </GlassCard>
+              : t('my_applications.empty_filtered', { filter: t(`my_applications.tab_${activeTab}`) })
+          }
+          action={
+            <Button as={Link} to={tenantPath('/jobs')} variant='primary'>
+              {t('my_applications.browse_jobs')}
+            </Button>
+          }
+        />
       )}
 
       {/* Applications list */}
@@ -1021,9 +1063,9 @@ export function MyApplicationsPage() {
                 onWithdraw={handleWithdrawClick}
                 tenantPath={tenantPath}
                 onAcceptInterview={handleAcceptInterview}
-                onDeclineInterview={handleDeclineInterview}
+                onDeclineInterview={requestDeclineInterview}
                 onAcceptOffer={handleAcceptOffer}
-                onRejectOffer={handleRejectOffer}
+                onRejectOffer={requestRejectOffer}
               />
             ))}
           </motion.div>
@@ -1059,6 +1101,35 @@ export function MyApplicationsPage() {
             </Button>
             <Button color='danger' onPress={confirmWithdraw} isLoading={isWithdrawing}>
               {t('withdraw.button')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Decline interview / reject offer confirmation modal */}
+      <Modal
+        isOpen={pendingResponse !== null}
+        onClose={() => { if (!isResponding) setPendingResponse(null); }}
+        size='sm'
+      >
+        <ModalContent>
+          <ModalHeader>
+            {pendingResponse?.kind === 'reject-offer'
+              ? t('inline_response.offer_decline')
+              : t('inline_response.interview_decline')}
+          </ModalHeader>
+          <ModalFooter>
+            <Button
+              variant='tertiary'
+              onPress={() => setPendingResponse(null)}
+              isDisabled={isResponding}
+            >
+              {t('common:cancel')}
+            </Button>
+            <Button color='danger' onPress={confirmPendingResponse} isLoading={isResponding}>
+              {pendingResponse?.kind === 'reject-offer'
+                ? t('offer.reject')
+                : t('interview.decline')}
             </Button>
           </ModalFooter>
         </ModalContent>

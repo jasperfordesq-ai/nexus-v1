@@ -278,7 +278,8 @@
     "form_negotiable_label": "給与は交渉可能です",
     "currency_eur": "EUR",
     "currency_gbp": "GBP",
-    "currency_usd": "USD"
+    "currency_usd": "USD",
+    "monthly": "月額"
   },
   "my_applications": {
     "title": "私の申請",
@@ -379,7 +380,12 @@
     "interview_location_placeholder": "https://meet.google.com/...",
     "offer_salary_placeholder": "例: 45000",
     "tabs_aria": "Job pipeline sections",
-    "change_stage_aria": "Change stage for {{name}}"
+    "change_stage_aria": "Change stage for {{name}}",
+    "event_type": {
+      "status_change": "ステータス変更",
+      "interview": "面接",
+      "offer": "オファー"
+    }
   },
   "apply": {
     "button": "今すぐ応募",
@@ -459,7 +465,11 @@
     "refresh": "リフレッシュ",
     "message_applicant": "メッセージ",
     "kanban_board": "カンバンボード",
-    "cv_download_error": "履歴書のダウンロードに失敗しました"
+    "cv_download_error": "履歴書のダウンロードに失敗しました",
+    "confirm_close_title": "Close this vacancy?",
+    "confirm_close": "Closing stops new applications from coming in. You can reopen it at any time.",
+    "confirm_reopen_title": "Reopen this vacancy?",
+    "confirm_reopen": "Reopening makes the vacancy visible again and lets people apply."
   },
   "interview": {
     "schedule": "面接をスケジュールする",
@@ -938,7 +948,9 @@
     "copy_link": "リンクをコピー",
     "email": "メールで共有",
     "copied": "リンクがコピーされました！",
-    "native": "共有..."
+    "native": "共有...",
+    "email_body": "この求人をチェック: {{title}}\n\n{{url}}",
+    "native_text": "この{{type}}の機会をチェック: {{title}}"
   },
   "already_applied": "すでに応募しています",
   "application_status_label": "応募状況",

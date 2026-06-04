@@ -278,7 +278,8 @@
     "form_negotiable_label": "Salário é negociável",
     "currency_eur": "EUR",
     "currency_gbp": "GBP",
-    "currency_usd": "USD"
+    "currency_usd": "USD",
+    "monthly": "por mês"
   },
   "my_applications": {
     "title": "As Minhas Candidaturas",
@@ -379,7 +380,12 @@
     "interview_location_placeholder": "https://meet.google.com/...",
     "offer_salary_placeholder": "ex.: 45000",
     "tabs_aria": "Job pipeline sections",
-    "change_stage_aria": "Change stage for {{name}}"
+    "change_stage_aria": "Change stage for {{name}}",
+    "event_type": {
+      "status_change": "Mudança de estado",
+      "interview": "Entrevista",
+      "offer": "Oferta"
+    }
   },
   "apply": {
     "button": "Candidatar Agora",
@@ -459,7 +465,11 @@
     "refresh": "Atualizar",
     "message_applicant": "Mensagem",
     "kanban_board": "Quadro Kanban",
-    "cv_download_error": "Falha ao baixar currículo"
+    "cv_download_error": "Falha ao baixar currículo",
+    "confirm_close_title": "Close this vacancy?",
+    "confirm_close": "Closing stops new applications from coming in. You can reopen it at any time.",
+    "confirm_reopen_title": "Reopen this vacancy?",
+    "confirm_reopen": "Reopening makes the vacancy visible again and lets people apply."
   },
   "interview": {
     "schedule": "Agendar Entrevista",
@@ -938,7 +948,9 @@
     "copy_link": "Copiar Ligação",
     "email": "Partilhar por Email",
     "copied": "Ligação copiada!",
-    "native": "Partilhar..."
+    "native": "Partilhar...",
+    "email_body": "Confira esta vaga: {{title}}\n\n{{url}}",
+    "native_text": "Confira esta oportunidade {{type}}: {{title}}"
   },
   "already_applied": "Já se candidatou",
   "application_status_label": "Estado da Candidatura",

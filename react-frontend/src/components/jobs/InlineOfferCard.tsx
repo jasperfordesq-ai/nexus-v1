@@ -45,7 +45,7 @@ export function InlineOfferCard({
                 <span className="flex items-center gap-1 font-medium">
                   <DollarSign className="w-3.5 h-3.5" aria-hidden="true" />
                   {t('inline_response.offer_salary')}: {pendingOffer.salary_currency}{pendingOffer.salary_offered}
-                  {pendingOffer.salary_type && ` / ${t(`salary.${pendingOffer.salary_type}`)}`}
+                  {pendingOffer.salary_type && ` / ${t(`salary.${pendingOffer.salary_type}`, { defaultValue: pendingOffer.salary_type })}`}
                 </span>
               )}
               {pendingOffer.start_date && (

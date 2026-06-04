@@ -1406,6 +1406,8 @@ return [
     'job_status_invalid' => 'Invalid job status',
     'job_application_terminal_status' => 'Cannot change status from :status because it is a terminal state',
     'job_application_update_failed' => 'Failed to update application',
+    'job_update_failed'                    => 'Failed to update job vacancy',
+    'job_renew_not_owner'                  => 'You can only renew your own job vacancies',
     'listing_ai_generate_failed' => 'Could not generate description. Please try again.',
     'job_resume_searchable_enabled' => 'Your profile is now searchable by employers',
     'job_resume_searchable_disabled' => 'Your profile is no longer searchable by employers',

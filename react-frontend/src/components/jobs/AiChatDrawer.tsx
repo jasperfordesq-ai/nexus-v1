@@ -37,10 +37,37 @@ export function AiChatDrawer({
 }: AiChatDrawerProps) {
   const { t } = useTranslation('jobs');
   const endRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Keep a live ref to onClose/isOpen so the unmount cleanup never closes over a stale value.
+  const onCloseRef = useRef(onClose);
+  const isOpenRef = useRef(isOpen);
+  useEffect(() => { onCloseRef.current = onClose; isOpenRef.current = isOpen; }, [onClose, isOpen]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Focus the input when the drawer opens, and close on Escape while open.
+  useEffect(() => {
+    if (!isOpen) return;
+    inputRef.current?.focus();
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
+  // Ensure the drawer is closed if the component unmounts (e.g. route change) while open.
+  useEffect(() => {
+    return () => {
+      if (isOpenRef.current) onCloseRef.current();
+    };
+  }, []);
 
   return (
     <>
@@ -55,7 +82,12 @@ export function AiChatDrawer({
         <Sparkles size={22} aria-hidden="true" />
       </Button>
       {isOpen && (
-        <div className="fixed bottom-0 right-0 z-50 w-full max-w-md h-[500px] bg-background border-l border-t border-divider rounded-tl-2xl shadow-2xl flex flex-col">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={t('ai_chat.title')}
+          className="fixed bottom-0 right-0 z-50 w-full max-w-md h-[min(500px,100dvh)] max-h-[100dvh] bg-background border-l border-t border-divider rounded-tl-2xl shadow-2xl flex flex-col"
+        >
           <div className="flex items-center justify-between p-4 border-b border-divider">
             <div className="flex items-center gap-2">
               <Sparkles size={18} className="text-accent" aria-hidden="true" />
@@ -96,6 +128,7 @@ export function AiChatDrawer({
           </div>
           <div className="p-3 border-t border-divider flex gap-2">
             <Input
+              ref={inputRef}
               size="sm"
               placeholder={t('ai_chat.placeholder')}
               aria-label={t('ai_chat.placeholder')}

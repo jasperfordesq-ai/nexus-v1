@@ -278,7 +278,8 @@
     "form_negotiable_label": "Gehalt ist verhandelbar",
     "currency_eur": "EUR",
     "currency_gbp": "GBP",
-    "currency_usd": "USD"
+    "currency_usd": "USD",
+    "monthly": "pro Monat"
   },
   "my_applications": {
     "title": "Meine Bewerbungen",
@@ -379,7 +380,12 @@
     "interview_location_placeholder": "https://meet.google.com/...",
     "offer_salary_placeholder": "z. B. 45000",
     "tabs_aria": "Job pipeline sections",
-    "change_stage_aria": "Change stage for {{name}}"
+    "change_stage_aria": "Change stage for {{name}}",
+    "event_type": {
+      "status_change": "Statusänderung",
+      "interview": "Vorstellungsgespräch",
+      "offer": "Angebot"
+    }
   },
   "apply": {
     "button": "Jetzt bewerben",
@@ -459,7 +465,11 @@
     "refresh": "Aktualisieren",
     "message_applicant": "Nachricht",
     "kanban_board": "Kanban-Board",
-    "cv_download_error": "Lebenslauf konnte nicht heruntergeladen werden"
+    "cv_download_error": "Lebenslauf konnte nicht heruntergeladen werden",
+    "confirm_close_title": "Close this vacancy?",
+    "confirm_close": "Closing stops new applications from coming in. You can reopen it at any time.",
+    "confirm_reopen_title": "Reopen this vacancy?",
+    "confirm_reopen": "Reopening makes the vacancy visible again and lets people apply."
   },
   "interview": {
     "schedule": "Vorstellungsgespräch planen",
@@ -938,7 +948,9 @@
     "copy_link": "Link kopieren",
     "email": "Per E-Mail teilen",
     "copied": "Link kopiert!",
-    "native": "Teilen..."
+    "native": "Teilen...",
+    "email_body": "Sieh dir diese Stelle an: {{title}}\n\n{{url}}",
+    "native_text": "Sieh dir diese {{type}}-Gelegenheit an: {{title}}"
   },
   "already_applied": "Sie haben sich bereits beworben",
   "application_status_label": "Bewerbungsstatus",

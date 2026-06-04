@@ -57,9 +57,9 @@ Route::get('/v2/config/google-maps', [\App\Http\Controllers\Api\MapsConfigContro
 // PUBLIC ROUTES — Job Feed (RSS/XML and JSON for aggregator syndication)
 // No auth required, tenant-scoped via subdomain/header (Agent D)
 // ============================================
-Route::get('/v2/jobs/feed.xml', [\App\Http\Controllers\Api\JobFeedController::class, 'rssFeed']);
-Route::get('/v2/jobs/feed.json', [\App\Http\Controllers\Api\JobFeedController::class, 'jsonFeed']);
-Route::get('/v2/jobs/feed/indeed.xml', [\App\Http\Controllers\Api\JobFeedController::class, 'indeedXml']);
+Route::get('/v2/jobs/feed.xml', [\App\Http\Controllers\Api\JobFeedController::class, 'rssFeed'])->middleware('throttle:30,1');
+Route::get('/v2/jobs/feed.json', [\App\Http\Controllers\Api\JobFeedController::class, 'jsonFeed'])->middleware('throttle:30,1');
+Route::get('/v2/jobs/feed/indeed.xml', [\App\Http\Controllers\Api\JobFeedController::class, 'indeedXml'])->middleware('throttle:30,1');
 
 // ============================================
 // PUBLIC ROUTES — Clubs / Verein directory (AG15, no auth required)

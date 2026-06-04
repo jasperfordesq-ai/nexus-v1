@@ -65,8 +65,8 @@ export function JobDescriptionCard({
               <p className="text-sm text-theme-secondary italic">{qualificationData.ai_summary}</p>
               {qualificationData.dimensions.length > 0 && (
                 <div className="grid grid-cols-2 gap-2">
-                  {qualificationData.dimensions.map((d, i) => (
-                    <div key={i} className="bg-white/5 rounded-lg p-2">
+                  {qualificationData.dimensions.map((d) => (
+                    <div key={d.label} className="bg-white/5 rounded-lg p-2">
                       <div className="text-xs font-medium text-theme-primary">{d.label}</div>
                       <div className="text-xs text-theme-muted">{d.detail}</div>
                     </div>
@@ -77,8 +77,8 @@ export function JobDescriptionCard({
                 <div>
                   <p className="text-xs font-medium text-success mb-1">{t('match.you_have')}</p>
                   <div className="flex flex-wrap gap-1">
-                    {qualificationData.matched_skills.map((s, i) => (
-                      <Chip key={i} size="sm" color="success" variant="tertiary">{s}</Chip>
+                    {qualificationData.matched_skills.map((s) => (
+                      <Chip key={s} size="sm" color="success" variant="tertiary">{s}</Chip>
                     ))}
                   </div>
                 </div>
@@ -87,8 +87,8 @@ export function JobDescriptionCard({
                 <div>
                   <p className="text-xs font-medium text-warning mb-1">{t('match.to_develop')}</p>
                   <div className="flex flex-wrap gap-1">
-                    {qualificationData.missing_skills.map((s, i) => (
-                      <Chip key={i} size="sm" color="warning" variant="tertiary">{s}</Chip>
+                    {qualificationData.missing_skills.map((s) => (
+                      <Chip key={s} size="sm" color="warning" variant="tertiary">{s}</Chip>
                     ))}
                   </div>
                 </div>
@@ -125,8 +125,8 @@ export function JobDescriptionCard({
           )}
           {vacancy.benefits && vacancy.benefits.length > 0 && (
             <div className="flex flex-wrap gap-2">
-              {vacancy.benefits.map((b: string, i: number) => (
-                <Chip key={i} size="sm" variant="tertiary" color="success">{b}</Chip>
+              {vacancy.benefits.map((b: string) => (
+                <Chip key={b} size="sm" variant="tertiary" color="success">{b}</Chip>
               ))}
             </div>
           )}
@@ -151,12 +151,12 @@ export function JobDescriptionCard({
             )}
           </div>
           <div className="flex flex-wrap gap-2">
-            {(vacancy.skills ?? []).map((skill, idx) => {
+            {(vacancy.skills ?? []).map((skill) => {
               const isMatched = matchResult?.matched?.includes(skill.toLowerCase());
               const isMissing = matchResult?.missing?.includes(skill.toLowerCase());
               return (
                 <Chip
-                  key={idx}
+                  key={skill}
                   variant="tertiary"
                   color={isMatched ? 'success' : isMissing ? 'danger' : 'accent'}
                   className={isMatched ? 'bg-success/10 text-success' : isMissing ? 'bg-danger/10 text-danger' : 'bg-accent/10 text-accent'}

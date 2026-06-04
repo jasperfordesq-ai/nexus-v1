@@ -278,7 +278,8 @@
     "form_negotiable_label": "Tá an tuarastal inshocraithe",
     "currency_eur": "EUR",
     "currency_gbp": "GBP",
-    "currency_usd": "USD"
+    "currency_usd": "USD",
+    "monthly": "sa mhí"
   },
   "my_applications": {
     "title": "Mo Chuid Iarratas",
@@ -379,7 +380,12 @@
     "interview_location_placeholder": "https://meet.google.com/...",
     "offer_salary_placeholder": "m.sh. 45000",
     "tabs_aria": "Job pipeline sections",
-    "change_stage_aria": "Change stage for {{name}}"
+    "change_stage_aria": "Change stage for {{name}}",
+    "event_type": {
+      "status_change": "Athrú stádais",
+      "interview": "Agallamh",
+      "offer": "Tairiscint"
+    }
   },
   "apply": {
     "button": "Cuir Isteach Anois",
@@ -459,7 +465,11 @@
     "refresh": "Athnuaigh",
     "message_applicant": "Teachtaireacht",
     "kanban_board": "Clár Kanban",
-    "cv_download_error": "Theip ar CV a íoslódáil"
+    "cv_download_error": "Theip ar CV a íoslódáil",
+    "confirm_close_title": "Close this vacancy?",
+    "confirm_close": "Closing stops new applications from coming in. You can reopen it at any time.",
+    "confirm_reopen_title": "Reopen this vacancy?",
+    "confirm_reopen": "Reopening makes the vacancy visible again and lets people apply."
   },
   "interview": {
     "schedule": "Sceideal Agallamh",
@@ -938,7 +948,9 @@
     "copy_link": "Cóipeáil Nasc",
     "email": "Roinn trí Ríomhphost",
     "copied": "Nasc cóipeáilte!",
-    "native": "Comhroinn..."
+    "native": "Comhroinn...",
+    "email_body": "Féach ar an bpost seo: {{title}}\n\n{{url}}",
+    "native_text": "Féach ar an deis {{type}} seo: {{title}}"
   },
   "already_applied": "Tá iarratas curtha isteach agat cheana féin",
   "application_status_label": "Stádas Iarratais",

@@ -707,7 +707,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
                             $join->on('jv.id', '=', 'ji.vacancy_id')
                                 ->whereColumn('jv.tenant_id', '=', 'ji.tenant_id');
                         })
-                        ->leftJoin('job_applications as ja', function ($join): void {
+                        ->leftJoin('job_vacancy_applications as ja', function ($join): void {
                             $join->on('ja.id', '=', 'ji.application_id')
                                 ->whereColumn('ja.tenant_id', '=', 'ji.tenant_id');
                         })
@@ -746,7 +746,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
                             $join->on('jv.id', '=', 'ji.vacancy_id')
                                 ->whereColumn('jv.tenant_id', '=', 'ji.tenant_id');
                         })
-                        ->leftJoin('job_applications as ja', function ($join): void {
+                        ->leftJoin('job_vacancy_applications as ja', function ($join): void {
                             $join->on('ja.id', '=', 'ji.application_id')
                                 ->whereColumn('ja.tenant_id', '=', 'ji.tenant_id');
                         })
@@ -2157,7 +2157,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
     private function hasJobInterviewReminderDeliveryColumns(): bool
     {
         return Schema::hasTable('job_interviews')
-            && Schema::hasTable('job_applications')
+            && Schema::hasTable('job_vacancy_applications')
             && Schema::hasTable('job_vacancies')
             && Schema::hasTable('email_log')
             && Schema::hasTable('users')

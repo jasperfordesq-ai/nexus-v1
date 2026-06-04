@@ -131,6 +131,9 @@ export function JobsPage() {
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const cursorRef = useRef<string | null>(null);
+  // Abort the prior browse request on each new call so out-of-order responses
+  // (from rapid filter/search/sort/tab changes) can't clobber newer results.
+  const browseAbortRef = useRef<AbortController | null>(null);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
   const [selectedType, setSelectedType] = useState(searchParams.get('type') || 'all');
@@ -163,6 +166,9 @@ export function JobsPage() {
   }, [searchQuery]);
 
   const loadVacancies = useCallback(async (append = false) => {
+    browseAbortRef.current?.abort();
+    const controller = new AbortController();
+    browseAbortRef.current = controller;
     try {
       if (!append) {
         setIsLoading(true);
@@ -184,6 +190,8 @@ export function JobsPage() {
       }
 
       const response = await api.get<JobVacancy[]>(`/v2/jobs?${params}`);
+      // Ignore stale responses — a newer call has superseded this one.
+      if (controller.signal.aborted) return;
       if (response.success && response.data) {
         if (append) {
           setVacancies((prev) => [...prev, ...response.data!]);
@@ -199,6 +207,7 @@ export function JobsPage() {
         }
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load job vacancies', err);
       if (!append) {
         setError(t('unable_to_load'));
@@ -206,8 +215,10 @@ export function JobsPage() {
         toast.error(t('error_load_more'));
       }
     } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
     }
   }, [debouncedQuery, selectedType, selectedCommitment, selectedSort, remoteOnly, t, toast]);
 
@@ -763,9 +774,13 @@ const JobCard = memo(function JobCard({ vacancy }: JobCardProps) {
     : null;
 
   return (
-    <Link to={tenantPath(`/jobs/${vacancy.id}`)} aria-label={vacancy.title}>
+    <Link
+      to={tenantPath(`/jobs/${vacancy.id}`)}
+      aria-label={vacancy.title}
+      className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-base)]"
+    >
       <article>
-        <GlassCard className={`p-5 hover:scale-[1.01] transition-transform ${vacancy.is_featured ? 'ring-2 ring-warning/50 bg-linear-to-r from-amber-500/5 to-orange-500/5' : ''}`}>
+        <GlassCard className={`p-5 transition-transform hover:scale-[1.01] motion-reduce:transition-none motion-reduce:hover:scale-100 ${vacancy.is_featured ? 'ring-2 ring-warning/50 bg-linear-to-r from-amber-500/5 to-orange-500/5' : ''}`}>
           <div className="flex gap-3 sm:gap-4">
             {/* Icon */}
             <div className="flex-shrink-0">
@@ -801,14 +816,16 @@ const JobCard = memo(function JobCard({ vacancy }: JobCardProps) {
                     {t('apply.applied')}
                   </HeroChip>
                 )}
-                {/* Deadline countdown chip */}
+                {/* Deadline countdown chip — icon + text so meaning isn't colour-only (WCAG 1.4.1) */}
                 {daysUntilDeadline != null && daysUntilDeadline <= 0 && (
                   <HeroChip size="sm" variant="tertiary" color="danger" className="text-xs font-medium">
+                    <AlertTriangle className="w-3 h-3" aria-hidden="true" />
                     {t('deadline_closed')}
                   </HeroChip>
                 )}
                 {daysUntilDeadline != null && daysUntilDeadline > 0 && daysUntilDeadline <= 7 && (
                   <HeroChip size="sm" variant="tertiary" color="warning" className="text-xs font-medium">
+                    <Timer className="w-3 h-3" aria-hidden="true" />
                     {t('deadline_countdown', { count: daysUntilDeadline })}
                   </HeroChip>
                 )}

@@ -14,6 +14,7 @@ use App\Models\JobAlert;
 use App\Models\JobSavedProfile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -96,6 +97,14 @@ class JobGdprService
                 ->values();
 
             DB::transaction(function () use ($userId, $tenantId) {
+                // Application IDs belonging to this user (tenant-scoped). Used to scrub
+                // dependent records — interviews/offers/scorecards/history — that hold
+                // free-text PII about the data subject.
+                $applicationIds = JobApplication::where('tenant_id', $tenantId)
+                    ->where('user_id', $userId)
+                    ->pluck('id')
+                    ->all();
+
                 // Anonymise applications: clear message, reviewer_notes, cv_path fields
                 JobApplication::where('tenant_id', $tenantId)
                     ->where('user_id', $userId)
@@ -106,6 +115,53 @@ class JobGdprService
                         'cv_filename'    => null,
                         'cv_size'        => null,
                     ]);
+
+                if (!empty($applicationIds)) {
+                    // Interview notes (incl. location notes that may hold a home address).
+                    JobInterview::where('tenant_id', $tenantId)
+                        ->whereIn('application_id', $applicationIds)
+                        ->update([
+                            'candidate_notes'   => null,
+                            'interviewer_notes' => null,
+                            'location_notes'    => null,
+                        ]);
+
+                    // Offer message/details addressed to the candidate. The offer text
+                    // column has historically been either `message` (legacy) or `details`
+                    // (current model), so scrub whichever exists in this database.
+                    $offerScrub = [];
+                    foreach (['message', 'details'] as $col) {
+                        if (Schema::hasColumn('job_offers', $col)) {
+                            $offerScrub[$col] = null;
+                        }
+                    }
+                    if (!empty($offerScrub)) {
+                        JobOffer::where('tenant_id', $tenantId)
+                            ->whereIn('application_id', $applicationIds)
+                            ->update($offerScrub);
+                    }
+
+                    // Scorecard assessments written about the candidate. `criteria` is
+                    // NOT NULL with a json_valid CHECK, so reset it to an empty array.
+                    \App\Models\JobScorecard::where('tenant_id', $tenantId)
+                        ->whereIn('application_id', $applicationIds)
+                        ->update(['notes' => null, 'criteria' => '[]']);
+
+                    // Status-change history is keyed only by application_id.
+                    \App\Models\JobApplicationHistory::whereIn('application_id', $applicationIds)
+                        ->update(['notes' => null, 'changed_by' => null]);
+                }
+
+                // De-link the user from referral records where they are the referred party.
+                \App\Models\JobReferral::where('tenant_id', $tenantId)
+                    ->where('referred_user_id', $userId)
+                    ->update(['referred_user_id' => null]);
+
+                // De-link the user from their view history (anonymous counts remain).
+                DB::table('job_vacancy_views')
+                    ->where('tenant_id', $tenantId)
+                    ->where('user_id', $userId)
+                    ->update(['user_id' => null]);
 
                 // Delete alerts
                 JobAlert::where('tenant_id', $tenantId)
@@ -118,19 +174,23 @@ class JobGdprService
                     ->delete();
             });
 
+            // Best-effort CV file deletion. The DB erasure above is already committed, so
+            // an individual file failure is logged but must not abort the erasure — we
+            // only downgrade the return value to signal incomplete file cleanup.
+            $allFilesDeleted = true;
             foreach ($cvPaths as $path) {
                 try {
                     Storage::disk('local')->delete($path);
                 } catch (\Throwable $e) {
+                    $allFilesDeleted = false;
                     Log::warning('JobGdprService::eraseUserData failed to delete CV file', [
                         'path' => $path,
                         'error' => $e->getMessage(),
                     ]);
-                    return false;
                 }
             }
 
-            return true;
+            return $allFilesDeleted;
         } catch (\Throwable $e) {
             Log::error('JobGdprService::eraseUserData failed', ['error' => $e->getMessage()]);
             return false;

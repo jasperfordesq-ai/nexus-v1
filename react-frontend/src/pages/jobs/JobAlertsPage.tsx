@@ -97,6 +97,8 @@ export function JobAlertsPage() {
       if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setAlerts(response.data);
+      } else {
+        setError(tRef.current('alerts.load_error'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;

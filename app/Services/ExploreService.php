@@ -1372,7 +1372,7 @@ class ExploreService
                     jv.id, jv.title, jv.description, jv.location,
                     jv.deadline, jv.created_at,
                     COALESCE(org.name, '') AS org_name,
-                    (SELECT COUNT(*) FROM job_applications ja WHERE ja.vacancy_id = jv.id) AS application_count
+                    (SELECT COUNT(*) FROM job_vacancy_applications ja WHERE ja.vacancy_id = jv.id) AS application_count
                 FROM job_vacancies jv
                 LEFT JOIN volunteering_organizations org ON org.id = jv.organization_id AND org.tenant_id = ?
                 WHERE jv.tenant_id = ?

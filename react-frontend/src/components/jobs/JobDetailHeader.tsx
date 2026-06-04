@@ -177,7 +177,7 @@ export function JobDetailHeader({
                 onPress={() => {
                   const jobUrl = window.location.origin + tenantPath(`/jobs/${vacancy.id}`);
                   const subject = encodeURIComponent(vacancy.title);
-                  const body = encodeURIComponent(`Check out this job: ${vacancy.title}\n\n${jobUrl}`);
+                  const body = encodeURIComponent(t('share.email_body', { title: vacancy.title, url: jobUrl }));
                   window.open(`mailto:?subject=${subject}&body=${body}`, '_self');
                 }}
               >
@@ -190,7 +190,7 @@ export function JobDetailHeader({
                 onPress={() => {
                   navigator.share?.({
                     title: vacancy.title,
-                    text: `Check out this ${vacancy.type} opportunity: ${vacancy.title}`,
+                    text: t('share.native_text', { type: t(`type.${vacancy.type}`), title: vacancy.title }),
                     url: window.location.origin + tenantPath(`/jobs/${vacancy.id}`),
                   }).catch(() => {});
                 }}

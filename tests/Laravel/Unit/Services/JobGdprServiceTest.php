@@ -166,8 +166,19 @@ class JobGdprServiceTest extends TestCase
             return true;
         });
 
+        // The user's view history is de-linked via the query builder inside the transaction.
+        $viewsBuilder = Mockery::mock();
+        $viewsBuilder->shouldReceive('where')->andReturnSelf();
+        $viewsBuilder->shouldReceive('update')->andReturn(0);
+        DB::shouldReceive('table')->with('job_vacancy_views')->andReturn($viewsBuilder);
+
+        // pluck('id') returns an empty collection, so the dependent-record scrub block
+        // (interviews/offers/scorecards/history) is skipped — this test focuses on the
+        // application anonymisation + alert/profile deletion + true return.
         $appBuilder = Mockery::mock();
         $appBuilder->shouldReceive('where')->andReturnSelf();
+        $appBuilder->shouldReceive('whereNotNull')->andReturnSelf();
+        $appBuilder->shouldReceive('pluck')->andReturn(collect([]));
         $appBuilder->shouldReceive('update')->once()->with(Mockery::on(function ($data) {
             return $data['message'] === null
                 && $data['reviewer_notes'] === null
@@ -179,6 +190,13 @@ class JobGdprServiceTest extends TestCase
         $appMock = Mockery::mock('alias:' . JobApplication::class);
         $appMock->shouldReceive('where')->andReturn($appBuilder);
 
+        // Referral de-link (referred_user_id => null).
+        $referralBuilder = Mockery::mock();
+        $referralBuilder->shouldReceive('where')->andReturnSelf();
+        $referralBuilder->shouldReceive('update')->andReturn(0);
+        $referralMock = Mockery::mock('alias:' . \App\Models\JobReferral::class);
+        $referralMock->shouldReceive('where')->andReturn($referralBuilder);
+
         $alertBuilder = Mockery::mock();
         $alertBuilder->shouldReceive('where')->andReturnSelf();
         $alertBuilder->shouldReceive('delete')->once()->andReturn(2);
@@ -188,6 +206,8 @@ class JobGdprServiceTest extends TestCase
 
         $profileBuilder = Mockery::mock();
         $profileBuilder->shouldReceive('where')->andReturnSelf();
+        $profileBuilder->shouldReceive('whereNotNull')->andReturnSelf();
+        $profileBuilder->shouldReceive('pluck')->andReturn(collect([]));
         $profileBuilder->shouldReceive('delete')->once()->andReturn(1);
 
         $profileMock = Mockery::mock('alias:' . JobSavedProfile::class);

@@ -134,6 +134,9 @@ export function EmployerBrandPage() {
   const { tenantPath } = useTenant();
   const { user, isAuthenticated } = useAuth();
   const abortRef = useRef<AbortController | null>(null);
+  // Separate abort guard for reviews so fast employer→employer navigation can't
+  // render a previous employer's reviews over the new one.
+  const reviewsAbortRef = useRef<AbortController | null>(null);
 
   const [employer, setEmployer] = useState<EmployerProfile | null>(null);
   const [jobs, setJobs] = useState<EmployerJob[]>([]);
@@ -158,8 +161,12 @@ export function EmployerBrandPage() {
 
   const loadReviews = useCallback(async () => {
     if (!userId) return;
+    reviewsAbortRef.current?.abort();
+    const controller = new AbortController();
+    reviewsAbortRef.current = controller;
     try {
       const res = await api.get<{ reviews: EmployerReview[]; stats: ReviewStats }>(`/v2/jobs/employer-reviews/${userId}`);
+      if (controller.signal.aborted) return;
       if (res.success && res.data) {
         const payload = 'data' in (res.data as Record<string, unknown>) && !Array.isArray(res.data)
           ? (res.data as unknown as { data: { reviews: EmployerReview[]; stats: ReviewStats } }).data
@@ -172,6 +179,7 @@ export function EmployerBrandPage() {
         }
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('EmployerBrandPage: reviews load failed', err);
     }
   }, [userId, user?.id]);
@@ -249,7 +257,10 @@ export function EmployerBrandPage() {
   useEffect(() => {
     loadData();
     loadReviews();
-    return () => abortRef.current?.abort();
+    return () => {
+      abortRef.current?.abort();
+      reviewsAbortRef.current?.abort();
+    };
   }, [loadData, loadReviews]);
 
   if (isLoading) return <LoadingScreen />;

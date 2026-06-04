@@ -59,6 +59,12 @@ class JobInterviewService
                 return false;
             }
 
+            // Don't propose interviews for applications the candidate has withdrawn or
+            // that have already been rejected.
+            if (in_array((string) $application->status, ['withdrawn', 'rejected'], true)) {
+                return false;
+            }
+
             $interview = JobInterview::create([
                 'tenant_id'      => $tenantId,
                 'vacancy_id'     => (int) $application->vacancy_id,

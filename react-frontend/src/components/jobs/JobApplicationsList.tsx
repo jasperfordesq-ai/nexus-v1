@@ -42,9 +42,11 @@ export function JobApplicationsList({
         <Button
           variant="tertiary"
           onPress={onToggleShow}
+          aria-expanded={showApplications}
+          aria-controls="job-applications-panel"
           className="flex min-h-11 w-full items-center justify-start gap-2 px-0 text-left"
           startContent={<Users className="w-5 h-5 text-theme-subtle" aria-hidden="true" />}
-          endContent={<ChevronRight className={`w-4 h-4 ml-auto text-theme-subtle transition-transform ${showApplications ? 'rotate-90' : ''}`} aria-hidden="true" />}
+          endContent={<ChevronRight className={`w-4 h-4 ml-auto text-theme-subtle transition-transform motion-reduce:transition-none ${showApplications ? 'rotate-90' : ''}`} aria-hidden="true" />}
         >
           <h2 className="text-lg font-semibold text-theme-primary">
             {t('detail.applications_tab')} ({vacancy.applications_count})
@@ -52,7 +54,7 @@ export function JobApplicationsList({
         </Button>
 
         {showApplications && (
-          <div className="mt-4 space-y-4">
+          <div id="job-applications-panel" className="mt-4 space-y-4">
             {isLoadingApps ? (
               <div role="status" aria-busy="true" aria-label={t('common:loading')} className="space-y-3">
                 {[1, 2].map((i) => (

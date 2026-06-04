@@ -1,5 +1,5 @@
 import { Chip, CloseButton } from '@/components/ui';
-import { Select, SelectItem, GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch, Tooltip, CardRowsSkeleton, NumberField, Label } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch, Tooltip, CardRowsSkeleton, NumberField, Label, useConfirm } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -130,6 +130,7 @@ export function CreateJobPage() {
   const { tenantPath } = useTenant();
   const toast = useToast();
   const { isAuthenticated, user } = useAuth();
+  const confirm = useConfirm();
 
   const isEditing = Boolean(id);
   usePageTitle(isEditing ? t('form.edit_title') : t('form.create_title'));
@@ -334,6 +335,24 @@ export function CreateJobPage() {
       });
     }
   }, [errors]);
+
+  // In-app navigation guard. <BrowserRouter> has no data router, so useBlocker is
+  // unavailable — instead we confirm before leaving via the Cancel button / back link
+  // when the form has unsaved edits. The beforeunload handler below covers hard reloads.
+  const confirmRef = useRef(confirm);
+  confirmRef.current = confirm;
+  const guardedNavigate = useCallback(async (to: string) => {
+    if (formDirtyRef.current) {
+      const ok = await confirmRef.current({
+        title: tRef.current('unsaved_warning'),
+        confirmLabel: tRef.current('common:confirm'),
+        cancelLabel: tRef.current('common:cancel'),
+        status: 'warning',
+      });
+      if (!ok) return;
+    }
+    navigate(to);
+  }, [navigate]);
 
   const validate = (mode: 'publish' | 'draft' = 'publish'): boolean => {
     const newErrors: Record<string, string> = {};
@@ -653,9 +672,15 @@ export function CreateJobPage() {
         description={isEditing ? t('page_meta.edit.description') : t('page_meta.create.description')}
         noIndex
       />
-      {/* Back nav */}
+      {/* Back nav — guarded so unsaved edits prompt a confirmation before leaving */}
       <Link
         to={isEditing ? tenantPath(`/jobs/${id}`) : tenantPath('/jobs')}
+        onClick={(e) => {
+          if (formDirtyRef.current) {
+            e.preventDefault();
+            void guardedNavigate(isEditing ? tenantPath(`/jobs/${id}`) : tenantPath('/jobs'));
+          }
+        }}
         className="inline-flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors"
       >
         <ArrowLeft className="w-4 h-4" aria-hidden="true" />
@@ -739,12 +764,13 @@ export function CreateJobPage() {
               isRequired
               isInvalid={!!errors.title}
               errorMessage={errors.title}
+              aria-describedby="job-title-charcount"
               classNames={{
                 input: 'bg-transparent text-theme-primary',
                 inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
               }}
             />
-            <p className={`text-xs text-right mt-1 ${form.title.length >= 100 ? 'text-danger' : form.title.length >= 90 ? 'text-warning' : 'text-theme-subtle'}`}>
+            <p id="job-title-charcount" className={`text-xs text-right mt-1 ${form.title.length >= 100 ? 'text-danger' : form.title.length >= 90 ? 'text-warning' : 'text-theme-subtle'}`}>
               {t('char_count', { count: form.title.length, max: 100 })}
             </p>
           </div>
@@ -775,13 +801,14 @@ export function CreateJobPage() {
               isRequired
               isInvalid={!!errors.description}
               errorMessage={errors.description}
+              aria-describedby="job-description-charcount"
               minRows={5}
               classNames={{
                 input: 'bg-transparent text-theme-primary',
                 inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover',
               }}
             />
-            <p className={`text-xs text-right mt-1 ${form.description.length >= 5000 ? 'text-danger' : form.description.length >= 4500 ? 'text-warning' : 'text-theme-subtle'}`}>
+            <p id="job-description-charcount" className={`text-xs text-right mt-1 ${form.description.length >= 5000 ? 'text-danger' : form.description.length >= 4500 ? 'text-warning' : 'text-theme-subtle'}`}>
               {t('char_count', { count: form.description.length, max: 5000 })}
             </p>
           </div>
@@ -1335,7 +1362,7 @@ export function CreateJobPage() {
             <Button
               variant="flat"
               className="text-theme-muted"
-              onPress={() => navigate(isEditing ? tenantPath(`/jobs/${id}`) : tenantPath('/jobs'))}
+              onPress={() => void guardedNavigate(isEditing ? tenantPath(`/jobs/${id}`) : tenantPath('/jobs'))}
             >
               {t('form.cancel')}
             </Button>

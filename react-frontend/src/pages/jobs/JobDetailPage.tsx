@@ -23,7 +23,8 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useParams, Link, useNavigate } from 'react-router-dom';import Briefcase from 'lucide-react/icons/briefcase';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import Briefcase from 'lucide-react/icons/briefcase';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';

@@ -10,6 +10,7 @@ import ChevronDown from 'lucide-react/icons/chevron-down';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { useToast } from '@/contexts/ToastContext';
 import type { PipelineRule } from './JobDetailTypes';
 
 interface JobPipelineRulesProps {
@@ -22,6 +23,7 @@ const TARGET_STAGES = PIPELINE_STAGES.filter(stage => stage !== 'applied');
 
 export function JobPipelineRules({ jobId }: JobPipelineRulesProps) {
   const { t } = useTranslation('jobs');
+  const toast = useToast();
   const [pipelineOpen, setPipelineOpen] = useState(false);
   const [pipelineRules, setPipelineRules] = useState<PipelineRule[]>([]);
   const [newRule, setNewRule] = useState({
@@ -32,6 +34,7 @@ export function JobPipelineRules({ jobId }: JobPipelineRulesProps) {
     action_target: 'screening',
   });
   const [isAddingRule, setIsAddingRule] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const stageLabel = useCallback((stage: string) => t(`pipeline.${stage}`), [t]);
   const actionLabel = useCallback((action: string) => {
@@ -53,6 +56,24 @@ export function JobPipelineRules({ jobId }: JobPipelineRulesProps) {
       logError('Failed to load pipeline rules', err);
     }
   }, [jobId]);
+
+  const handleDeleteRule = useCallback(async (ruleId: number) => {
+    if (deletingId !== null) return;
+    setDeletingId(ruleId);
+    try {
+      const res = await api.delete(`/v2/jobs/pipeline-rules/${ruleId}`);
+      if (res.success) {
+        await loadPipelineRules();
+      } else {
+        toast.error(t('common:error_title'));
+      }
+    } catch (err) {
+      logError('Failed to delete pipeline rule', err);
+      toast.error(t('common:error_title'));
+    } finally {
+      setDeletingId(null);
+    }
+  }, [deletingId, loadPipelineRules, toast, t]);
 
   return (
     <GlassCard className="p-4">
@@ -82,7 +103,7 @@ export function JobPipelineRules({ jobId }: JobPipelineRulesProps) {
                 <span className="font-medium">{rule.name}</span>
                 <span className="text-theme-muted ml-2 text-xs">
                   {t(rule.action_target ? 'pipeline.rule_summary_with_target' : 'pipeline.rule_summary', {
-                    stage: rule.trigger_stage,
+                    stage: stageLabel(rule.trigger_stage),
                     count: rule.condition_days,
                     action: actionLabel(rule.action),
                     target: rule.action_target ? stageLabel(rule.action_target) : '',
@@ -93,15 +114,9 @@ export function JobPipelineRules({ jobId }: JobPipelineRulesProps) {
                 size="sm"
                 color="danger"
                 variant="flat"
-                onPress={() =>
-                  api.delete(`/v2/jobs/pipeline-rules/${rule.id}`)
-                    .then((res) => {
-                      if (res.success) {
-                        loadPipelineRules();
-                      }
-                    })
-                    .catch((err) => { if (import.meta.env.DEV) console.warn('Non-critical:', err); })
-                }
+                isLoading={deletingId === rule.id}
+                isDisabled={deletingId !== null && deletingId !== rule.id}
+                onPress={() => handleDeleteRule(rule.id)}
               >
                 {t('pipeline.delete')}
               </Button>
@@ -125,11 +140,16 @@ export function JobPipelineRules({ jobId }: JobPipelineRulesProps) {
               <Input
                 size="sm"
                 type="number"
+                min={1}
                 label={t('pipeline.days')}
                 value={String(newRule.condition_days)}
-                onChange={(e) =>
-                  setNewRule((r) => ({ ...r, condition_days: parseInt(e.target.value) || 7 }))
-                }
+                onChange={(e) => {
+                  const parsed = parseInt(e.target.value, 10);
+                  setNewRule((r) => ({
+                    ...r,
+                    condition_days: Number.isNaN(parsed) ? r.condition_days : Math.max(1, parsed),
+                  }));
+                }}
               />
               <Select
                 size="sm"
