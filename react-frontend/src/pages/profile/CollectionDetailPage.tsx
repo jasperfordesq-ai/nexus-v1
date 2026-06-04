@@ -9,7 +9,7 @@ import { CardBody, Card, Button, Pagination } from '@/components/ui';
  * Paginated saved items hydrated with previews.
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
 import Trash2 from 'lucide-react/icons/trash-2';
@@ -66,18 +66,21 @@ export default function CollectionDetailPage() {
   const [loading, setLoading] = useState(true);
   usePageTitle(data?.collection.name ?? t('collections.detail_title'));
 
+  const reqIdRef = useRef(0);
   const load = useCallback(async (p: number) => {
     if (!id) return;
+    const reqId = ++reqIdRef.current;
     setLoading(true);
     try {
       const res = await api.get<ApiPayload>(`/v2/me/collections/${id}/items?page=${p}`);
+      if (reqId !== reqIdRef.current) return; // a newer load started — drop this stale response
       if (res.success && res.data) {
         setData(res.data);
         const meta = (res as unknown as { meta?: { total_pages?: number } }).meta;
         if (meta?.total_pages) setTotalPages(meta.total_pages);
       }
     } finally {
-      setLoading(false);
+      if (reqId === reqIdRef.current) setLoading(false);
     }
   }, [id]);
 

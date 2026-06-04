@@ -37,18 +37,24 @@ export default function CourseDetailPage() {
 
   useEffect(() => {
     if (!idOrSlug) return;
+    // Guard against a stale response overwriting a newer one when idOrSlug
+    // changes (navigating detail -> detail) or the component unmounts.
+    let cancelled = false;
     setLoading(true);
     coursesApi.show(idOrSlug)
       .then((res) => {
+        if (cancelled) return;
         const c = res.success && res.data ? res.data : null;
         setCourse(c);
         if (c) {
           coursesApi.prerequisites(c.id).then((pr) => {
+            if (cancelled) return;
             if (pr.success && pr.data) setPrereqs(pr.data);
           });
         }
       })
-      .finally(() => setLoading(false));
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [idOrSlug]);
 
   const hasUnmetPrereqs = prereqs.some((p) => !p.completed);

@@ -10,7 +10,7 @@
  * Uses V2 API: GET /api/v2/pages/{slug}
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from '@/lib/motion';import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -62,10 +62,12 @@ export function CustomPage() {
   // tenantId captured as primitive to avoid object reference churn in deps
   const tenantId = tenant?.id ?? null;
 
+  const reqIdRef = useRef(0);
   const loadPage = useCallback(async () => {
     // Wait for tenant bootstrap to complete before fetching — avoids stale closure
     // where tenantId is null and context_tenant is omitted from the request.
     if (!slug || tenantLoading) return;
+    const reqId = ++reqIdRef.current;
     setLoading(true);
     setNotFound(false);
 
@@ -74,16 +76,18 @@ export function CustomPage() {
       // unauthenticated requests (where X-Tenant-ID header is not available).
       const tenantParam = tenantId ? `?context_tenant=${tenantId}` : '';
       const res = await api.get<PageData>(`/v2/pages/${encodeURIComponent(slug)}${tenantParam}`);
+      if (reqId !== reqIdRef.current) return; // a newer load started — drop this stale response
       if (res.success && res.data) {
         setPage(res.data);
       } else {
         setNotFound(true);
       }
     } catch (err) {
+      if (reqId !== reqIdRef.current) return;
       logError('Failed to load page', err);
       setNotFound(true);
     } finally {
-      setLoading(false);
+      if (reqId === reqIdRef.current) setLoading(false);
     }
   }, [slug, tenantId, tenantLoading]);
 

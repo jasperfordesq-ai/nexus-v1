@@ -11,7 +11,7 @@
  * modal renders on /goals, but as a standalone route.
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -80,8 +80,10 @@ export function GoalDetailPage() {
 
   usePageTitle(goal?.title ?? t('goals.page_title'));
 
+  const reqIdRef = useRef(0);
   const loadGoal = useCallback(async () => {
     if (!id) return;
+    const reqId = ++reqIdRef.current;
     try {
       setIsLoading(true);
       setError(null);
@@ -89,6 +91,7 @@ export function GoalDetailPage() {
       setNotFound(false);
 
       const response = await api.get<Goal>(`/v2/goals/${id}`);
+      if (reqId !== reqIdRef.current) return; // a newer load started — drop this stale response
 
       if (response.success && response.data && response.data.id) {
         setGoal(response.data);
@@ -103,10 +106,11 @@ export function GoalDetailPage() {
         }
       }
     } catch (err) {
+      if (reqId !== reqIdRef.current) return;
       logError('Failed to load goal detail', err);
       setError(t('goals.load_error'));
     } finally {
-      setIsLoading(false);
+      if (reqId === reqIdRef.current) setIsLoading(false);
     }
   }, [id, t]);
 

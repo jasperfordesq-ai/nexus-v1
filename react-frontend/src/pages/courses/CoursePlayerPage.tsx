@@ -44,9 +44,13 @@ export default function CoursePlayerPage() {
 
   useEffect(() => {
     if (!courseId) return;
+    // Guard against a stale response overwriting a newer one when courseId
+    // changes (navigating player -> player) or the component unmounts.
+    let cancelled = false;
     setLoading(true);
     Promise.all([coursesApi.show(courseId), coursesApi.progress(courseId)])
       .then(([courseRes, progRes]) => {
+        if (cancelled) return;
         if (courseRes.success && courseRes.data) setCourse(courseRes.data);
         if (progRes.success && progRes.data) {
           const map: Record<number, LessonProgress> = {};
@@ -58,7 +62,8 @@ export default function CoursePlayerPage() {
           setPercent(Number(progRes.data.enrollment.progress_percent) || 0);
         }
       })
-      .finally(() => setLoading(false));
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [courseId]);
 
   useEffect(() => {
