@@ -272,7 +272,11 @@ class AgentAdminController extends BaseApiController
                 $request->input('note'),
             );
         } catch (\Throwable $e) {
-            return $this->respondWithError('APPROVE_FAILED', $e->getMessage(), null, 400);
+            \Illuminate\Support\Facades\Log::warning('Agent proposal approve failed', [
+                'proposal_id' => $proposalId,
+                'error' => $e->getMessage(),
+            ]);
+            return $this->respondWithError('APPROVE_FAILED', 'Could not approve the proposal. See the server logs for details.', null, 400);
         }
 
         return $this->respondWithData($updated);
@@ -292,7 +296,11 @@ class AgentAdminController extends BaseApiController
                 $request->input('note'),
             );
         } catch (\Throwable $e) {
-            return $this->respondWithError('REJECT_FAILED', $e->getMessage(), null, 400);
+            \Illuminate\Support\Facades\Log::warning('Agent proposal reject failed', [
+                'proposal_id' => $proposalId,
+                'error' => $e->getMessage(),
+            ]);
+            return $this->respondWithError('REJECT_FAILED', 'Could not reject the proposal. See the server logs for details.', null, 400);
         }
 
         return $this->respondWithData(['rejected' => true]);
@@ -318,7 +326,11 @@ class AgentAdminController extends BaseApiController
                 $request->input('note'),
             );
         } catch (\Throwable $e) {
-            return $this->respondWithError('EDIT_APPROVE_FAILED', $e->getMessage(), null, 400);
+            \Illuminate\Support\Facades\Log::warning('Agent proposal edit-approve failed', [
+                'proposal_id' => $proposalId,
+                'error' => $e->getMessage(),
+            ]);
+            return $this->respondWithError('EDIT_APPROVE_FAILED', 'Could not approve the edited proposal. See the server logs for details.', null, 400);
         }
 
         return $this->respondWithData($updated);
