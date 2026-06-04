@@ -107,7 +107,7 @@ function WalletModalInner() {
   const balance = unwrap<WalletBalance>(balanceQuery.data)?.balance ?? null;
   const wallet = unwrap<WalletBalance>(balanceQuery.data);
   const transactionsPayload = transactionsQuery.data as { data?: TransactionItem[]; meta?: { cursor?: string | null; next_cursor?: string | null; has_more?: boolean } } | TransactionItem[] | null | undefined;
-  const firstPageTransactions = unwrap<TransactionItem[]>(transactionsQuery.data) ?? [];
+  const firstPageTransactions = useMemo(() => unwrap<TransactionItem[]>(transactionsQuery.data) ?? [], [transactionsQuery.data]);
   const initialCursor = !Array.isArray(transactionsPayload) ? (transactionsPayload?.meta?.cursor ?? transactionsPayload?.meta?.next_cursor ?? null) : null;
   const initialHasMore = !Array.isArray(transactionsPayload) ? Boolean(transactionsPayload?.meta?.has_more) : firstPageTransactions.length >= 50;
   const transactions = useMemo(() => [...firstPageTransactions, ...extraTransactions], [extraTransactions, firstPageTransactions]);

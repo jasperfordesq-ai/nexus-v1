@@ -445,7 +445,7 @@ function PromotionsPanel() {
     (response) => ({ items: response.data, cursor: marketplaceNextCursor(response), hasMore: marketplaceHasMore(response) }),
     [user?.id],
   );
-  const promotionProducts = products.data?.data ?? [];
+  const promotionProducts = useMemo(() => products.data?.data ?? [], [products.data?.data]);
 
   useEffect(() => {
     if (!selectedListing && listings.items[0]) setSelectedListing(listings.items[0].id);

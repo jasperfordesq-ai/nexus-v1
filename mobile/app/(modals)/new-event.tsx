@@ -120,7 +120,7 @@ function NewEventScreen() {
     return () => {
       isMounted = false;
     };
-  }, [eventId, hasHydratedEdit, isEditing, t]);
+  }, [eventId, hasHydratedEdit, isEditing, showToast, t]);
 
   function hydrateFromEvent(event: Event) {
     setTitle(event.title ?? '');

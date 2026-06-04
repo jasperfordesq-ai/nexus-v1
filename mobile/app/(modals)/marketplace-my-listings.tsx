@@ -53,7 +53,6 @@ export default function MarketplaceMyListingsRoute() {
 function MarketplaceMyListingsScreen() {
   const { t } = useTranslation(['marketplace', 'common', 'auth']);
   const primary = usePrimaryColor();
-  const theme = useTheme();
   const { show: showToast } = useAppToast();
   const { confirm, confirmDialog } = useConfirm();
   const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();

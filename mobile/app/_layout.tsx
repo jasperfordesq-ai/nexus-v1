@@ -200,7 +200,7 @@ function RootNavigator() {
         router.replace('/(auth)/login');
       }
     }
-  }, [isLoading, isAuthenticated, isPublicAuthPath, pathname]);
+  }, [isLoading, isAuthenticated, isPublicAuthPath, isTenantSelectionPath, pathname]);
 
   // Shared options for regular modal screens: slide up from bottom, swipe-to-dismiss
   const modalOptions = {

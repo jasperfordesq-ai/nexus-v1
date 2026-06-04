@@ -64,7 +64,7 @@ export default function ReviewsScreen() {
     refresh: refreshPending,
   } = useApi(() => getPendingReviews(), []);
 
-  const reviews = reviewsPage?.items ?? [];
+  const reviews = useMemo(() => reviewsPage?.items ?? [], [reviewsPage?.items]);
   const receivedReviews = useMemo(
     () => reviews.filter((review) => !isOwnReview(review, userId)),
     [reviews, userId],
@@ -73,7 +73,7 @@ export default function ReviewsScreen() {
     () => reviews.filter((review) => isOwnReview(review, userId)),
     [reviews, userId],
   );
-  const pending = pendingReviews ?? [];
+  const pending = useMemo(() => pendingReviews ?? [], [pendingReviews]);
   const visibleReviews = activeTab === 'given' ? givenReviews : receivedReviews;
   const averageRating = reviews.length
     ? reviews.reduce((total, review) => total + Number(review.rating || 0), 0) / reviews.length

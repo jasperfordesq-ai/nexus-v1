@@ -1623,12 +1623,12 @@ function VolunteeringScreenInner() {
 
   const opportunities = opportunitiesApi.items;
   const applicationsPayload = applicationsApi.data?.data;
-  const applications = Array.isArray(applicationsPayload) ? applicationsPayload : [];
+  const applications = useMemo(() => Array.isArray(applicationsPayload) ? applicationsPayload : [], [applicationsPayload]);
   const shiftsPayload = shiftsApi.data?.data.items;
   const shifts = Array.isArray(shiftsPayload) ? shiftsPayload : [];
   const summary = hoursApi.data?.data ?? null;
   const organisationsPayload = organisationsApi.data?.data;
-  const organisations = Array.isArray(organisationsPayload) ? organisationsPayload : [];
+  const organisations = useMemo(() => Array.isArray(organisationsPayload) ? organisationsPayload : [], [organisationsPayload]);
   const certificatesPayload = certificatesApi.data?.data.items;
   const certificates = Array.isArray(certificatesPayload) ? certificatesPayload : [];
   const expensesPayload = expensesApi.data?.data.items ?? expensesApi.data?.data.expenses;
@@ -1685,9 +1685,7 @@ function VolunteeringScreenInner() {
     if (!visibleTabs.some((tab) => tab.key === activeTab)) {
       setActiveTab('opportunities');
     }
-    // `visibleTabs` is derived from translated labels, so keep this guard tied to auth and the selected key.
-    // Otherwise tests and fast i18n refreshes can trigger unnecessary tab-state resets.
-  }, [activeTab, isAuthenticated]);
+  }, [activeTab, visibleTabs]);
 
   return (
     <SafeAreaView className="flex-1 bg-background">

@@ -4,11 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { Stack } from 'expo-router';
-import { useTranslation } from 'react-i18next';
 
 export default function AuthLayout() {
-  const { t } = useTranslation('auth');
-
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="login" />

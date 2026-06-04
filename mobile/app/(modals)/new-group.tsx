@@ -90,7 +90,7 @@ function NewGroupScreen() {
     return () => {
       isMounted = false;
     };
-  }, [groupId, hasHydratedEdit, isEditing, t]);
+  }, [groupId, hasHydratedEdit, isEditing, showToast, t]);
 
   useEffect(() => {
     if (isEditing) return;

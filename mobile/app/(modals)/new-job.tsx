@@ -100,7 +100,7 @@ function NewJobScreen() {
     return () => {
       isMounted = false;
     };
-  }, [hasHydratedEdit, isEditing, jobId, t]);
+  }, [hasHydratedEdit, isEditing, jobId, showToast, t]);
 
   function hydrateFromJob(job: JobVacancy) {
     setTitle(job.title ?? '');

@@ -88,6 +88,7 @@ function EditExchangeModalInner() {
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [generatingDescription, setGeneratingDescription] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [hydratedListingId, setHydratedListingId] = useState<number | null>(null);
 
   const { data, isLoading, error } = useApi(
     () => getExchange(safeListingId),
@@ -106,6 +107,7 @@ function EditExchangeModalInner() {
 
   useEffect(() => {
     if (!listing) return;
+    if (hydratedListingId === listing.id) return;
     const parsedDescription = parseEnrichedDescription(listing.description ?? '', t);
     setTitle(listing.title ?? '');
     setDescription(parsedDescription.description);
@@ -120,7 +122,8 @@ function EditExchangeModalInner() {
     setCategoryId(listing.category_id ?? null);
     setSelectedImageUri(null);
     setRemoveExistingImage(false);
-  }, [listing, profileLocation]);
+    setHydratedListingId(listing.id);
+  }, [hydratedListingId, listing, profileLocation, t]);
 
   async function handlePickImage() {
     try {

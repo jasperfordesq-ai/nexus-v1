@@ -25,7 +25,7 @@ import {
   unsaveMarketplaceListing,
   type MarketplaceListingItem,
 } from '@/lib/api/marketplace';
-import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
+import { useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 
@@ -40,7 +40,6 @@ export default function MarketplaceFreeRoute() {
 function MarketplaceFreeScreen() {
   const { t } = useTranslation(['marketplace', 'common']);
   const { hasFeature } = useTenant();
-  const primary = usePrimaryColor();
   const theme = useTheme();
   const { show: showToast } = useAppToast();
   const [listings, setListings] = useState<MarketplaceListingItem[]>([]);

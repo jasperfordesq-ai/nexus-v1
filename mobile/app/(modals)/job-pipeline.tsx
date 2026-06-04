@@ -43,7 +43,10 @@ export default function JobPipelineScreen() {
     { enabled: safeId > 0 },
   );
 
-  const applications = Array.isArray(applicationsApi.data?.data) ? applicationsApi.data.data : [];
+  const applications = useMemo(
+    () => Array.isArray(applicationsApi.data?.data) ? applicationsApi.data.data : [],
+    [applicationsApi.data],
+  );
   const grouped = useMemo(() => {
     return PIPELINE_COLUMNS.reduce<Record<PipelineStatus, JobOwnerApplication[]>>((acc, status) => {
       acc[status] = applications.filter((application) => normalizeStatus(application.status) === status);

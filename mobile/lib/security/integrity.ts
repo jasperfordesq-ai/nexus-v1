@@ -13,6 +13,7 @@
  */
 
 import * as Device from 'expo-device';
+import * as Sentry from '@sentry/react-native';
 
 export interface IntegrityCheckResult {
   safe: boolean;
@@ -74,20 +75,11 @@ export function logIntegrityWarnings(): void {
   for (const warning of result.warnings) {
     const message = `[NEXUS integrity] ${warning}`;
 
-    if (isProductionBuild()) {
+    if (isProductionBuild() && typeof Sentry.getCurrentScope === 'function') {
       // In production, report to Sentry if available.
       // Sentry is initialised in app/_layout.tsx before this runs.
-      try {
-        // Dynamic import avoids a hard dependency — if Sentry isn't configured
-        // the warning falls through to console.warn below.
-        const Sentry = require('@sentry/react-native') as typeof import('@sentry/react-native');
-        if (typeof Sentry.getCurrentScope === 'function') {
-          Sentry.captureMessage(message, 'warning');
-          continue;
-        }
-      } catch {
-        // Sentry not available — fall through to console.warn
-      }
+      Sentry.captureMessage(message, 'warning');
+      continue;
     }
 
     console.warn(message);

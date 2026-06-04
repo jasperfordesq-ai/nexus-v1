@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useRef, useState, type ComponentProps, type RefObject } from 'react';
+import { useCallback, useMemo, useRef, useState, type ComponentProps, type RefObject } from 'react';
 import {
   FlatList,
   RefreshControl,
@@ -203,9 +203,9 @@ export default function EndorsementsScreen() {
     setRefreshing(false);
   }, [refreshSkills, refreshEndorsements]);
 
-  const skills: Skill[] = skillsData?.data?.skills ?? [];
-  const endorsements: Endorsement[] = endorsementsData?.data ?? [];
-  const categories: SkillCategory[] = categoriesData?.data ?? [];
+  const skills = useMemo<Skill[]>(() => skillsData?.data?.skills ?? [], [skillsData?.data?.skills]);
+  const endorsements = useMemo<Endorsement[]>(() => endorsementsData?.data ?? [], [endorsementsData?.data]);
+  const categories = useMemo<SkillCategory[]>(() => categoriesData?.data ?? [], [categoriesData?.data]);
 
   async function handleAddSkill() {
     const name = skillInput.trim();
@@ -260,7 +260,7 @@ export default function EndorsementsScreen() {
     router.push({ pathname: '/(modals)/member-profile', params: { id: String(memberId) } } as unknown as Href);
   }
 
-  function handleRemoveSkill(skillId: number) {
+  const handleRemoveSkill = useCallback((skillId: number) => {
     confirm({
       title: t('removeSkillTitle'),
       message: t('removeSkillConfirm'),
@@ -279,7 +279,7 @@ export default function EndorsementsScreen() {
         }
       },
     });
-  }
+  }, [confirm, refreshSkills, showToast, t]);
 
   const renderSkill = useCallback(
     ({ item }: { item: Skill }) => {
@@ -323,7 +323,7 @@ export default function EndorsementsScreen() {
         </HeroCard>
       );
     },
-    [endorsements, primary, t, theme.error, theme.success, theme.text, theme.textSecondary],
+    [endorsements, handleRemoveSkill, primary, t, theme.success, theme.text, theme.textSecondary],
   );
 
   const renderEndorsement = useCallback(
@@ -365,7 +365,7 @@ export default function EndorsementsScreen() {
         </HeroCard>
       );
     },
-    [primary, theme.text, theme.textMuted, theme.textSecondary],
+    [primary, theme.success, theme.text, theme.textMuted, theme.textSecondary],
   );
 
   const isLoading = activeTab === 'skills' ? skillsLoading : activeTab === 'endorsements' ? endorsementsLoading : categoriesLoading;

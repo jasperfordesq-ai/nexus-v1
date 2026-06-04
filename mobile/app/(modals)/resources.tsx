@@ -58,7 +58,7 @@ export default function ResourcesScreen() {
   } = useApi(() => getKbArticles());
 
   const resources = resourcesPage?.items ?? [];
-  const kbArticles = kbPage?.items ?? [];
+  const kbArticles = useMemo(() => kbPage?.items ?? [], [kbPage?.items]);
   const filteredKb = useMemo(() => {
     const term = search.trim().toLowerCase();
     if (!term) return kbArticles;

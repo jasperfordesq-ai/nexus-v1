@@ -170,7 +170,7 @@ function ExchangeDetailModalInner() {
       setShowComments(false);
       setActiveImageIndex(0);
     }
-  }, [exchange?.id, exchange?.is_favorited, exchange?.is_liked, exchange?.likes_count, exchange?.comments_count, exchange?.is_reported]);
+  }, [exchange]);
 
   const handleRefresh = useCallback(() => {
     setIsRefreshing(true);

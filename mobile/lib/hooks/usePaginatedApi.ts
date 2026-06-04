@@ -174,9 +174,6 @@ export function usePaginatedApi<TItem, TResponse>(
         }
       }
     },
-    // fetchFn and extractor are treated as stable references (callers should
-    // wrap them in useCallback or define them outside the component if needed).
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [fetchFn, extractor],
   );
 

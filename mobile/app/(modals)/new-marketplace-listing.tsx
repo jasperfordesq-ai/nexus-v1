@@ -184,7 +184,7 @@ export function MarketplaceListingForm() {
     return () => {
       mounted = false;
     };
-  }, [hydrated, isEditing, listingId, t]);
+  }, [hydrated, isEditing, listingId, showToast, t]);
 
   useEffect(() => {
     if (!categoryId) {

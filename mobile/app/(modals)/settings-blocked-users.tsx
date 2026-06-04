@@ -19,7 +19,6 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import { getBlockedUsers, unblockUser, type BlockedUser } from '@/lib/api/settings';
 import { useTheme } from '@/lib/hooks/useTheme';
-import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { withAlpha } from '@/lib/utils/color';
 
 function formatBlockedDate(value: string | null, locale: string): string {
@@ -32,7 +31,6 @@ function formatBlockedDate(value: string | null, locale: string): string {
 export default function SettingsBlockedUsersScreen() {
   const { t, i18n } = useTranslation(['settings', 'common']);
   const theme = useTheme();
-  const primary = usePrimaryColor();
   const { show: showToast } = useAppToast();
   const { confirm, confirmDialog } = useConfirm();
   const [users, setUsers] = useState<BlockedUser[]>([]);

@@ -17,7 +17,7 @@ import { useConfirm } from '@/components/ui/useConfirm';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
-import { cancelGroupExchange, completeGroupExchange, confirmGroupExchange, getGroupExchange, type GroupExchangeDetail, type GroupExchangeParticipant, type GroupExchangeStatus } from '@/lib/api/groupExchanges';
+import { cancelGroupExchange, completeGroupExchange, confirmGroupExchange, getGroupExchange, type GroupExchangeParticipant, type GroupExchangeStatus } from '@/lib/api/groupExchanges';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';

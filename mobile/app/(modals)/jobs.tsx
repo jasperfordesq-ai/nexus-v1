@@ -1056,7 +1056,7 @@ export default function JobsScreen() {
         onOfferRejected={handleOfferRejected}
       />
     ),
-    [theme, t, primary, handleInterviewAccepted, handleInterviewDeclined, handleOfferAccepted, handleOfferRejected],
+    [theme, t, primary, refreshApps, handleInterviewAccepted, handleInterviewDeclined, handleOfferAccepted, handleOfferRejected],
   );
 
   return (

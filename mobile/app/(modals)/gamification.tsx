@@ -1286,7 +1286,7 @@ export default function GamificationScreen() {
   }
 
   const profile = (profileData?.data ?? null) as ApiProfile | null;
-  const badges = (badgesData?.data ?? []) as ApiBadge[];
+  const badges = useMemo(() => (badgesData?.data ?? []) as ApiBadge[], [badgesData?.data]);
   const leaderboardEntries = (leaderboardData?.data ?? []) as ApiLeaderboardEntry[];
   const nexusScore = (nexusScoreData?.data ?? null) as ApiNexusScore | null;
   const dailyReward = dailyRewardOverride ?? dailyRewardData?.data ?? null;

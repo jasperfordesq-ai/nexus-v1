@@ -101,7 +101,7 @@ function NewVolunteeringScreen() {
     return () => {
       isMounted = false;
     };
-  }, [hasHydratedEdit, isEditing, opportunityId, t]);
+  }, [hasHydratedEdit, isEditing, opportunityId, showToast, t]);
 
   useEffect(() => {
     if (isEditing || organisationId || organisations.length !== 1) {
