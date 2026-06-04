@@ -150,7 +150,7 @@ class PodcastController extends BaseApiController
         }
 
         $maxShows = (int) PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_MAX_SHOWS_PER_USER);
-        if ($maxShows > 0 && count(PodcastService::authoredBy($userId)) >= $maxShows) {
+        if ($maxShows > 0 && PodcastService::ownedShowCount($userId) >= $maxShows) {
             return $this->respondWithError('VALIDATION_FAILED', __('api_controllers_2.podcasts.max_shows_reached', ['max' => $maxShows]), null, 422);
         }
 
@@ -312,7 +312,7 @@ class PodcastController extends BaseApiController
         $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
         $episode = PodcastEpisode::with(['show', 'chapters'])->find($episodeId);
 
-        if (!$episode || !PodcastService::canViewEpisode($episode, $episode->show, $userId, $this->callerIsAdmin())) {
+        if (!$episode || !$episode->show || !PodcastService::canViewEpisode($episode, $episode->show, $userId, $this->callerIsAdmin())) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.podcasts.episode_not_found'), null, 404);
         }
 
@@ -328,7 +328,7 @@ class PodcastController extends BaseApiController
         $userId = $this->requireAuth();
         $episode = $this->findPodcastEpisodeOrFail($episodeId);
 
-        if (!PodcastService::canViewEpisode($episode, $episode->show, $userId, $this->callerIsAdmin())) {
+        if (!$episode->show || !PodcastService::canViewEpisode($episode, $episode->show, $userId, $this->callerIsAdmin())) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.podcasts.episode_not_found'), null, 404);
         }
 
@@ -360,7 +360,7 @@ class PodcastController extends BaseApiController
         $userId = $this->requireAuth();
         $episode = $this->findPodcastEpisodeOrFail($episodeId);
 
-        if (!PodcastService::canViewEpisode($episode, $episode->show, $userId, $this->callerIsAdmin())) {
+        if (!$episode->show || !PodcastService::canViewEpisode($episode, $episode->show, $userId, $this->callerIsAdmin())) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.podcasts.episode_not_found'), null, 404);
         }
 

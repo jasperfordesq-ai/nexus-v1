@@ -115,6 +115,15 @@ class PodcastService
         return $shows->toArray();
     }
 
+    /**
+     * Lightweight count of shows owned by a user — for limit checks without
+     * eager-loading every episode/chapter or signing audio URLs (unlike authoredBy()).
+     */
+    public static function ownedShowCount(int $userId): int
+    {
+        return PodcastShow::where('owner_user_id', $userId)->count();
+    }
+
     public static function findShowById(int $id): ?PodcastShow
     {
         return PodcastShow::with(['owner:id,name,avatar_url'])->find($id);
@@ -606,6 +615,12 @@ class PodcastService
         $userAgentHash = $userAgent ? self::privateHash($userAgent) : null;
         $ipHash = $ip ? self::privateHash($ip) : null;
         $listenedSeconds = max(0, (int) ($data['listened_seconds'] ?? 0));
+        // Clamp to the known episode duration so a client cannot inflate retention /
+        // completion analytics by posting an arbitrarily large listened_seconds value.
+        $durationCeiling = (int) ($episode->duration_seconds ?? 0);
+        if ($durationCeiling > 0 && $listenedSeconds > $durationCeiling) {
+            $listenedSeconds = $durationCeiling;
+        }
         $completed = filter_var($data['completed'] ?? false, FILTER_VALIDATE_BOOLEAN);
 
         DB::transaction(function () use ($episode, $userId, $userAgent, $sessionHash, $userAgentHash, $ipHash, $listenedSeconds, $completed): void {
@@ -1148,6 +1163,13 @@ class PodcastService
             return false;
         }
 
+        // Embargo: a future-scheduled episode stays hidden from direct URL / listen /
+        // audio access until its scheduled time arrives, matching scopePublished()
+        // which already hides it from listings and RSS. Admins/authors bypassed above.
+        if ($episode->scheduled_for && $episode->scheduled_for->isFuture()) {
+            return false;
+        }
+
         $visibility = $episode->visibility === 'inherit' ? $show->visibility : $episode->visibility;
 
         return match ($visibility) {
@@ -1412,7 +1434,7 @@ class PodcastService
     {
         $duration = max(0, (int) ($episode->duration_seconds ?? 0));
         if ($duration <= 0) {
-            return $listenedSeconds > 0 ? '0-25' : '0-25';
+            return '0-25';
         }
 
         $percent = ($listenedSeconds / $duration) * 100;
