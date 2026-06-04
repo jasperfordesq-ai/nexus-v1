@@ -6,7 +6,6 @@
 import { useCallback, useRef, useState, type ComponentProps, type RefObject } from 'react';
 import {
   FlatList,
-  Pressable,
   RefreshControl,
   Text,
   type TextInput,
@@ -16,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from '@/lib/haptics';
-import { Card as HeroCard, Chip, Surface, Tabs } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, Surface, Tabs } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -46,6 +45,7 @@ import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
+import NativePressable from '@/components/ui/NativePressable';
 
 type Tab = 'skills' | 'endorsements' | 'discover';
 type ListItem = Skill | Endorsement;
@@ -100,25 +100,25 @@ function ActionPill({
   const color = isDanger ? theme.error : primary;
 
   return (
-    <Pressable
-      accessibilityRole="button"
+    <HeroButton
       accessibilityLabel={accessibilityLabel ?? label}
-      accessibilityState={{ disabled }}
-      disabled={disabled}
+      isDisabled={disabled}
       onPress={onPress}
       className="min-h-10 flex-row items-center justify-center gap-2 rounded-full px-4"
-      style={({ pressed }) => ({
+      size="sm"
+      variant={isPrimary ? 'primary' : 'secondary'}
+      style={{
         backgroundColor: isPrimary ? primary : withAlpha(color, 0.12),
         borderWidth: isPrimary ? 0 : 1,
         borderColor: isPrimary ? 'transparent' : withAlpha(color, 0.22),
-        opacity: disabled ? 0.55 : pressed ? 0.86 : 1,
-      })}
+        opacity: disabled ? 0.55 : 1,
+      }}
     >
       <Ionicons name={icon} size={16} color={isPrimary ? '#ffffff' : color} />
-      <Text className="text-sm font-semibold" style={{ color: isPrimary ? '#ffffff' : theme.text }} numberOfLines={1}>
+      <HeroButton.Label className="text-sm font-semibold" style={{ color: isPrimary ? '#ffffff' : theme.text }} numberOfLines={1}>
         {label}
-      </Text>
-    </Pressable>
+      </HeroButton.Label>
+    </HeroButton>
   );
 }
 
@@ -732,13 +732,12 @@ function EndorsementsHeader({
                       skillMembers.map((member) => {
                         const name = getSkillMemberName(member, t('discover.memberFallback'));
                         return (
-                          <Pressable
+                          <NativePressable
                             key={member.id}
-                            accessibilityRole="button"
                             className="rounded-panel-inner"
                             onPress={() => onOpenMemberProfile(member.id)}
                             accessibilityLabel={t('discover.openMember', { name })}
-                            style={({ pressed }) => ({ opacity: pressed ? 0.86 : 1 })}
+                            feedback="highlight"
                           >
                             <Surface variant="secondary" className="w-full flex-row items-center gap-3 rounded-panel-inner p-3">
                               <Avatar uri={member.avatar ?? undefined} name={name} size={38} />
@@ -762,7 +761,7 @@ function EndorsementsHeader({
                                 </Chip>
                               ) : null}
                             </Surface>
-                          </Pressable>
+                          </NativePressable>
                         );
                       })
                     )}

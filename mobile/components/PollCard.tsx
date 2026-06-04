@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { View, Text, Animated, Pressable } from 'react-native';
+import { View, Text, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Chip } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
@@ -14,6 +14,7 @@ import { voteFeedPoll, type PollData } from '@/lib/api/feed';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
+import NativePressable from '@/components/ui/NativePressable';
 
 interface PollCardProps {
   pollData: PollData;
@@ -218,18 +219,16 @@ function PollOptionRow({ option, showResults, isUserVote, primary, theme, onPres
   }
 
   return (
-    <Pressable
+    <NativePressable
       className="min-h-[56px] w-full justify-center rounded-panel-inner border px-3 py-3"
       onPress={onPress}
       disabled={disabled}
-      accessibilityRole="button"
       accessibilityLabel={option.text}
-      accessibilityState={{ disabled }}
-      style={({ pressed }) => ({
-        backgroundColor: pressed ? withAlpha(primary, 0.14) : withAlpha(primary, 0.07),
-        borderColor: pressed ? withAlpha(primary, 0.62) : withAlpha(primary, 0.28),
+      style={{
+        backgroundColor: withAlpha(primary, 0.07),
+        borderColor: withAlpha(primary, 0.28),
         opacity: disabled ? 0.65 : 1,
-      })}
+      }}
     >
       <View className="flex-row items-center gap-3">
         <View
@@ -246,6 +245,6 @@ function PollOptionRow({ option, showResults, isUserVote, primary, theme, onPres
           {option.text}
         </Text>
       </View>
-    </Pressable>
+    </NativePressable>
   );
 }

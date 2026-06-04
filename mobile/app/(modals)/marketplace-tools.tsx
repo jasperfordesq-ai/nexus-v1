@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FlatList, Pressable, ScrollView, View } from 'react-native';
+import { FlatList, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -1425,20 +1425,19 @@ export function QrScannerSheet({
 
 function ScanButton({ label, primary, onPress }: { label: string; primary: string; onPress: () => void }) {
   return (
-    <Pressable
+    <HeroButton
       className="min-h-11 flex-row items-center justify-center gap-2 rounded-panel-inner border px-4"
-      accessibilityRole="button"
       accessibilityLabel={label}
       onPress={onPress}
-      style={({ pressed }) => ({
+      variant="secondary"
+      style={{
         borderColor: withAlpha(primary, 0.24),
-        backgroundColor: withAlpha(primary, pressed ? 0.16 : 0.08),
-        opacity: pressed ? 0.86 : 1,
-      })}
+        backgroundColor: withAlpha(primary, 0.08),
+      }}
     >
       <Ionicons name="scan-outline" size={16} color={primary} />
-      <Text className="text-sm font-bold" style={{ color: primary }} onPress={onPress}>{label}</Text>
-    </Pressable>
+      <HeroButton.Label className="text-sm font-bold" style={{ color: primary }}>{label}</HeroButton.Label>
+    </HeroButton>
   );
 }
 

@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useMemo, useState } from 'react';
-import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,6 +20,7 @@ import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
+import NativePressable from '@/components/ui/NativePressable';
 
 const statusFilters = ['all', 'active', 'pending_confirmation', 'completed', 'cancelled'] as const;
 type StatusFilter = (typeof statusFilters)[number];
@@ -137,15 +138,11 @@ function GroupExchangesScreenInner() {
     const createdDate = formatDate(exchange.created_at);
 
     return (
-      <Pressable
-        accessibilityRole="button"
+      <NativePressable
         className="w-full p-0"
         accessibilityLabel={exchange.title}
         onPress={() => router.push({ pathname: '/(modals)/group-exchange-detail', params: { id: String(exchange.id) } } as unknown as Href)}
-        style={({ pressed }) => ({
-          opacity: pressed ? 0.92 : 1,
-          transform: [{ scale: pressed ? 0.99 : 1 }],
-        })}
+        feedback="highlight"
       >
         <HeroCard className="w-full rounded-panel p-0">
           <HeroCard.Body className="gap-3 p-4">
@@ -190,7 +187,7 @@ function GroupExchangesScreenInner() {
             </View>
           </HeroCard.Body>
         </HeroCard>
-      </Pressable>
+      </NativePressable>
     );
   }
 }

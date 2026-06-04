@@ -7,7 +7,6 @@ import { useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
-  Pressable,
   ScrollView,
   RefreshControl,
   Share,
@@ -20,7 +19,7 @@ import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import * as Haptics from '@/lib/haptics';
-import { Button as HeroButton, Card as HeroCard, Chip, Dialog, Separator, Spinner, Surface } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, Dialog, Spinner, Surface } from 'heroui-native';
 
 import {
   checkActiveExchange,
@@ -52,6 +51,7 @@ import { useAppToast } from '@/components/ui/AppToast';
 import { useConfirm } from '@/components/ui/useConfirm';
 import VerificationBadgeRow from '@/components/verification/VerificationBadgeRow';
 import CommentSheet from '@/components/comments/CommentSheet';
+import NativePressable from '@/components/ui/NativePressable';
 
 interface DetailStateProps {
   title: string;
@@ -537,16 +537,14 @@ function ExchangeDetailModalInner() {
           </HeroCard>
         ) : null}
 
-        <Pressable
-          accessibilityRole="button"
+        <NativePressable
           accessibilityLabel={exchangeUserName}
           onPress={() => {
-            void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             if (exchangeUser.id > 0) {
               router.push({ pathname: '/(modals)/member-profile', params: { id: String(exchangeUser.id) } });
             }
           }}
-          style={({ pressed }) => ({ opacity: pressed ? 0.86 : 1 })}
+          feedback="highlight"
         >
           <Surface
             variant="secondary"
@@ -585,7 +583,7 @@ function ExchangeDetailModalInner() {
                 </View>
               ) : null}
           </Surface>
-        </Pressable>
+        </NativePressable>
 
         {exchange.created_at ? (
           <HeroCard variant="secondary">

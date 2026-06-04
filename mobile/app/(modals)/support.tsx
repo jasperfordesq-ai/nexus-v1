@@ -5,13 +5,13 @@
 
 import type { ComponentProps } from 'react';
 import { useEffect, useState } from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Linking from 'expo-linking';
 import { useTranslation } from 'react-i18next';
-import { Card as HeroCard, Text } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Text } from 'heroui-native';
 
 import AppTopBar from '@/components/ui/AppTopBar';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
@@ -67,23 +67,23 @@ function ActionPill({
   const theme = useTheme();
 
   return (
-    <Pressable
-      accessibilityRole="button"
+    <HeroButton
       accessibilityLabel={label}
       onPress={onPress}
       className="min-h-10 flex-row items-center justify-center gap-2 rounded-full px-4"
-      style={({ pressed }) => ({
+      size="sm"
+      variant={primary ? 'primary' : 'secondary'}
+      style={{
         backgroundColor: primary ? tone : withAlpha(tone, 0.12),
         borderWidth: primary ? 0 : 1,
         borderColor: primary ? 'transparent' : withAlpha(tone, 0.22),
-        opacity: pressed ? 0.86 : 1,
-      })}
+      }}
     >
-      <Text className="text-sm font-semibold" style={{ color: primary ? '#ffffff' : theme.text }} numberOfLines={1}>
+      <HeroButton.Label className="text-sm font-semibold" style={{ color: primary ? '#ffffff' : theme.text }} numberOfLines={1}>
         {label}
-      </Text>
+      </HeroButton.Label>
       <Ionicons name={icon} size={16} color={primary ? '#ffffff' : tone} />
-    </Pressable>
+    </HeroButton>
   );
 }
 

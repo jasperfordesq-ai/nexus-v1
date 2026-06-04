@@ -19,7 +19,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import ExchangeCard from '@/components/ExchangeCard';
 import OfflineBanner from '@/components/OfflineBanner';
-import Input from '@/components/ui/Input';
+import SearchInput from '@/components/ui/SearchInput';
 import { ExchangeCardSkeleton } from '@/components/ui/Skeleton';
 
 function extractExchangePage(response: ExchangeListResponse) {
@@ -137,21 +137,14 @@ export default function ExchangesScreen() {
                 </Chip>
               </View>
 
-              <Input
+              <SearchInput
                 value={search}
                 onChangeText={setSearch}
                 placeholder={t('searchPlaceholder')}
-                placeholderTextColor={theme.textMuted}
+                clearLabel={t('clearSearch')}
                 returnKeyType="search"
-                clearButtonMode="while-editing"
                 accessibilityLabel={t('searchPlaceholder')}
-                style={{ color: theme.text }}
-                leftIcon={<Ionicons name="search-outline" size={18} color={theme.textMuted} />}
-                rightIcon={search ? (
-                  <HeroButton isIconOnly size="sm" variant="ghost" onPress={() => setSearch('')} accessibilityLabel={t('clearSearch')}>
-                    <Ionicons name="close-circle-outline" size={18} color={theme.textMuted} />
-                  </HeroButton>
-                ) : null}
+                containerClassName="mb-0"
               />
 
               <Tabs value={typeFilter} onValueChange={(value) => setTypeFilter(value as 'all' | ExchangeType)} variant="secondary">

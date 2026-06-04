@@ -6,7 +6,6 @@
 import { useState } from 'react';
 import {
   FlatList,
-  Pressable,
   RefreshControl,
   Text,
   View,
@@ -402,19 +401,19 @@ function SwipeActionButton({
   onPress: () => void;
 }) {
   return (
-    <Pressable
-      accessibilityRole="button"
+    <HeroButton
       accessibilityLabel={accessibilityLabel}
-      disabled={disabled}
+      isDisabled={disabled}
       onPress={onPress}
       className="min-w-[86px] items-center justify-center gap-1 px-3"
+      variant="primary"
       style={{ backgroundColor, opacity: disabled ? 0.55 : 1 }}
     >
       <Ionicons name={icon} size={18} color={foregroundColor} />
-      <Text className="text-center text-xs font-bold" style={{ color: foregroundColor }} numberOfLines={2}>
+      <HeroButton.Label className="text-center text-xs font-bold" style={{ color: foregroundColor }} numberOfLines={2}>
         {label}
-      </Text>
-    </Pressable>
+      </HeroButton.Label>
+    </HeroButton>
   );
 }
 

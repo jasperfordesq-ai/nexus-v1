@@ -4,11 +4,11 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { FlatList, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { FlatList, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Card as HeroCard, Chip, Spinner, Surface, Tabs } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface, Tabs } from 'heroui-native';
 
 import * as Sentry from '@sentry/react-native';
 import { useTranslation } from 'react-i18next';
@@ -26,6 +26,7 @@ import CommentSheet from '@/components/comments/CommentSheet';
 import OfflineBanner from '@/components/OfflineBanner';
 import StoryCircles from '@/components/StoryCircles';
 import TenantBanner from '@/components/TenantBanner';
+import NativePressable from '@/components/ui/NativePressable';
 import { FeedItemSkeleton } from '@/components/ui/Skeleton';
 import FAB from '@/components/ui/FAB';
 import * as Haptics from '@/lib/haptics';
@@ -279,23 +280,25 @@ export default function HomeScreen() {
                   </Text>
                 </View>
                 <View className="relative h-12 w-12 items-center justify-center">
-                  <Pressable
-                    className="h-12 w-12 items-center justify-center rounded-2xl"
+                  <HeroButton
+                    isIconOnly
+                    size="lg"
+                    variant="secondary"
+                    className="h-12 w-12 rounded-2xl"
                     onPress={() => {
                       void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                       router.push('/(modals)/notifications');
                     }}
                     accessibilityLabel={t('notifications.title')}
                     accessibilityRole="button"
-                    style={({ pressed }) => ({
-                      backgroundColor: withAlpha(primary, pressed ? 0.2 : 0.12),
+                    style={{
+                      backgroundColor: withAlpha(primary, 0.12),
                       borderColor: withAlpha(primary, 0.24),
                       borderWidth: 1,
-                      opacity: pressed ? 0.86 : 1,
-                    })}
+                    }}
                   >
                     <Ionicons name="notifications-outline" size={22} color={primary} />
-                  </Pressable>
+                  </HeroButton>
                   {notificationBadgeText ? (
                     <View
                       className="absolute right-0 top-0 h-5 min-w-5 items-center justify-center rounded-full border-2 border-background px-1"
@@ -341,21 +344,20 @@ export default function HomeScreen() {
                   </Tabs.List>
                 </Tabs>
                 {filter !== 'all' || subFilter ? (
-                  <Pressable
-                    className="h-9 w-9 items-center justify-center rounded-2xl"
+                  <HeroButton
+                    isIconOnly
+                    size="sm"
+                    variant="ghost"
+                    className="h-9 w-9 rounded-2xl"
                     onPress={() => {
                       setFilter('all');
                       setSubFilter(null);
                     }}
                     accessibilityLabel={t('filter.clear')}
-                    accessibilityRole="button"
-                    style={({ pressed }) => ({
-                      backgroundColor: withAlpha(primary, pressed ? 0.16 : 0.08),
-                      opacity: pressed ? 0.82 : 1,
-                    })}
+                    style={{ backgroundColor: withAlpha(primary, 0.08) }}
                   >
                     <Ionicons name="close-circle-outline" size={20} color={primary} />
-                  </Pressable>
+                  </HeroButton>
                 ) : null}
               </View>
 
@@ -456,17 +458,13 @@ export default function HomeScreen() {
               <HeroCard.Body className="items-center gap-4">
                 <Ionicons name="cloud-offline-outline" size={30} color={primary} />
                 <Text className="text-center text-sm leading-5 text-danger">{error}</Text>
-                <Pressable
-                  className="min-h-10 items-center justify-center rounded-full px-5"
-                  accessibilityRole="button"
+                <HeroButton
+                  variant="primary"
                   onPress={() => void refresh()}
-                  style={({ pressed }) => ({
-                    backgroundColor: primary,
-                    opacity: pressed ? 0.86 : 1,
-                  })}
+                  style={{ backgroundColor: primary }}
                 >
-                  <Text className="text-sm font-bold text-white">{t('common:buttons.retry')}</Text>
-                </Pressable>
+                  <HeroButton.Label>{t('common:buttons.retry')}</HeroButton.Label>
+                </HeroButton>
               </HeroCard.Body>
             </HeroCard>
           ) : (
@@ -531,23 +529,23 @@ function ComposerActionPill({
 }) {
   const isPrimary = tone === 'primary';
   return (
-    <Pressable
+    <HeroButton
       className="min-h-10 flex-row items-center justify-center gap-2 rounded-full px-3.5"
-      accessibilityRole="button"
       accessibilityLabel={label}
       onPress={onPress}
-      style={({ pressed }) => ({
-        backgroundColor: isPrimary ? primary : tone === 'secondary' ? withAlpha(primary, pressed ? 0.18 : 0.12) : 'transparent',
-        borderColor: tone === 'ghost' ? withAlpha(primary, pressed ? 0.24 : 0.16) : 'transparent',
+      size="sm"
+      variant={isPrimary ? 'primary' : tone === 'secondary' ? 'secondary' : 'outline'}
+      style={{
+        backgroundColor: isPrimary ? primary : tone === 'secondary' ? withAlpha(primary, 0.12) : 'transparent',
+        borderColor: tone === 'ghost' ? withAlpha(primary, 0.16) : 'transparent',
         borderWidth: tone === 'ghost' ? 1 : 0,
-        opacity: pressed ? 0.86 : 1,
-      })}
+      }}
     >
       <Ionicons name={icon} size={16} color={isPrimary ? '#fff' : primary} />
-      <Text className="text-sm font-bold" style={{ color: isPrimary ? '#fff' : primary }} numberOfLines={1}>
+      <HeroButton.Label className="text-sm font-bold" style={{ color: isPrimary ? '#fff' : primary }} numberOfLines={1}>
         {label}
-      </Text>
-    </Pressable>
+      </HeroButton.Label>
+    </HeroButton>
   );
 }
 
@@ -565,15 +563,11 @@ function DashboardSummaryCard({
   onPress: () => void;
 }) {
   return (
-    <Pressable
+    <NativePressable
       className="min-w-[47%] flex-1"
-      accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       onPress={onPress}
-      style={({ pressed }) => ({
-        opacity: pressed ? 0.86 : 1,
-        transform: [{ scale: pressed ? 0.99 : 1 }],
-      })}
+      feedback="highlight"
     >
       <Surface
         variant="secondary"
@@ -605,6 +599,6 @@ function DashboardSummaryCard({
           </Text>
         </View>
       </Surface>
-    </Pressable>
+    </NativePressable>
   );
 }

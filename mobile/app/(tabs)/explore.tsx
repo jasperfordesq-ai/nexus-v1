@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useMemo, useState } from 'react';
-import { Image, Pressable, RefreshControl, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { Image, RefreshControl, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -32,6 +32,7 @@ import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
+import NativePressable from '@/components/ui/NativePressable';
 import OfflineBanner from '@/components/OfflineBanner';
 
 type ExploreTab = 'all' | 'forYou' | 'listings' | 'people' | 'events' | 'groups';
@@ -287,15 +288,11 @@ function ExploreItemCard({
   const route = getItemRoute(section.key, item);
 
   return (
-    <Pressable
-      accessibilityRole="button"
+    <NativePressable
       onPress={() => route && router.push(route)}
       accessibilityLabel={title}
-      style={({ pressed }) => ({
-        opacity: pressed ? 0.9 : 1,
-        transform: [{ scale: pressed ? 0.985 : 1 }],
-        width: cardWidth,
-      })}
+      style={{ width: cardWidth }}
+      feedback="highlight"
     >
       <HeroCard className="min-h-[188px] w-full overflow-hidden rounded-3xl p-0">
         <View className="h-1.5 w-full" style={{ backgroundColor: section.tone }} />
@@ -325,7 +322,7 @@ function ExploreItemCard({
           </View>
         </HeroCard.Body>
       </HeroCard>
-    </Pressable>
+    </NativePressable>
   );
 }
 

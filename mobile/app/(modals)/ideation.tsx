@@ -4,11 +4,11 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Card as HeroCard, Chip, Surface, Tabs } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, Surface, Tabs } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -23,6 +23,7 @@ import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
+import NativePressable from '@/components/ui/NativePressable';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
@@ -215,21 +216,21 @@ function FilterPill({
   onPress: () => void;
 }) {
   return (
-    <Pressable
+    <HeroButton
       className="min-h-10 flex-row items-center gap-2 rounded-full px-3.5"
-      accessibilityRole="button"
       accessibilityLabel={label}
       onPress={onPress}
-      style={({ pressed }) => ({
-        backgroundColor: isSelected ? primary : withAlpha(primary, pressed ? 0.14 : 0.08),
+      size="sm"
+      variant={isSelected ? 'primary' : 'secondary'}
+      style={{
+        backgroundColor: isSelected ? primary : withAlpha(primary, 0.08),
         borderColor: isSelected ? primary : theme.borderSubtle,
         borderWidth: 1,
-        opacity: pressed ? 0.86 : 1,
-      })}
+      }}
     >
-      <Text className="text-sm font-bold" style={{ color: isSelected ? '#fff' : theme.text }} numberOfLines={1}>
+      <HeroButton.Label className="text-sm font-bold" style={{ color: isSelected ? '#fff' : theme.text }} numberOfLines={1}>
         {label}
-      </Text>
+      </HeroButton.Label>
       {detail ? (
         <View
           className="rounded-full px-2 py-0.5"
@@ -240,7 +241,7 @@ function FilterPill({
           </Text>
         </View>
       ) : null}
-    </Pressable>
+    </HeroButton>
   );
 }
 
@@ -252,7 +253,7 @@ function ChallengeCard({ challenge }: { challenge: IdeationChallenge }) {
   const openChallenge = () => router.push({ pathname: '/(modals)/ideation-detail', params: { id: String(challenge.id) } } as unknown as Href);
 
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={challenge.title} onPress={openChallenge} style={({ pressed }) => ({ opacity: pressed ? 0.9 : 1 })}>
+    <NativePressable accessibilityLabel={challenge.title} onPress={openChallenge} feedback="highlight">
       <HeroCard variant="default" className="overflow-hidden rounded-panel p-0">
         <View className="absolute bottom-0 left-0 top-0 w-1.5" style={{ backgroundColor: primary }} />
         <HeroCard.Body className="gap-3 p-4 pl-5">
@@ -300,7 +301,7 @@ function ChallengeCard({ challenge }: { challenge: IdeationChallenge }) {
           </View>
         </HeroCard.Body>
       </HeroCard>
-    </Pressable>
+    </NativePressable>
   );
 }
 

@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useMemo, useState } from 'react';
-import { FlatList, Image, Pressable, RefreshControl, Text, View } from 'react-native';
+import { FlatList, Image, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -22,7 +22,8 @@ import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 import AppTopBar from '@/components/ui/AppTopBar';
 import OfflineBanner from '@/components/OfflineBanner';
 import EmptyState from '@/components/ui/EmptyState';
-import Input from '@/components/ui/Input';
+import NativePressable from '@/components/ui/NativePressable';
+import SearchInput from '@/components/ui/SearchInput';
 import { SkeletonBox } from '@/components/ui/Skeleton';
 
 type FilterValue = 'all' | 'public' | 'private';
@@ -192,15 +193,11 @@ function GroupCard({
   const visibilityIcon: IoniconName = item.visibility === 'private' ? 'lock-closed-outline' : 'globe-outline';
 
   return (
-    <Pressable
-      accessibilityRole="button"
+    <NativePressable
       className="mx-4 my-2"
       onPress={onPress}
       accessibilityLabel={item.name ?? ''}
-      style={({ pressed }) => ({
-        opacity: pressed ? 0.92 : 1,
-        transform: [{ scale: pressed ? 0.99 : 1 }],
-      })}
+      feedback="highlight"
     >
       <HeroCard className="min-h-[148px] w-full rounded-panel p-0">
         <HeroCard.Body className="gap-4 p-4">
@@ -256,7 +253,7 @@ function GroupCard({
           </View>
         </HeroCard.Body>
       </HeroCard>
-    </Pressable>
+    </NativePressable>
   );
 }
 
@@ -316,7 +313,6 @@ export default function GroupsScreen() {
             theme={theme}
             t={t}
             onPress={() => {
-              void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               router.push({ pathname: '/(modals)/group-detail', params: { id: String(item.id) } });
             }}
           />
@@ -336,16 +332,15 @@ export default function GroupsScreen() {
             <GroupsHero groups={groups} primary={primary} theme={theme} t={t} />
 
             <Surface variant="default" className="gap-3 rounded-panel p-3">
-              <Input
+              <SearchInput
                 value={search}
                 onChangeText={setSearch}
                 placeholder={t('searchPlaceholder')}
-                placeholderTextColor={theme.textMuted}
+                clearLabel={t('common:buttons.clear')}
                 returnKeyType="search"
-                clearButtonMode="while-editing"
                 accessibilityLabel={t('searchPlaceholder')}
-                style={{ color: theme.text }}
-                leftIcon={<Ionicons name="search-outline" size={18} color={theme.textMuted} />}
+                containerClassName="mb-0"
+                groupClassName="min-h-12 rounded-full bg-content2"
               />
 
               <View className="flex-row gap-2">

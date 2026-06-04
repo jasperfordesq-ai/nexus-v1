@@ -3,16 +3,16 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import * as Haptics from '@/lib/haptics';
 import { Card as HeroCard, Chip, Surface } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import { type Member } from '@/lib/api/members';
 import Avatar from '@/components/ui/Avatar';
 import VerificationBadgeRow from '@/components/verification/VerificationBadgeRow';
+import NativePressable from '@/components/ui/NativePressable';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
@@ -32,18 +32,13 @@ export default function MemberCard({ member }: MemberCardProps) {
   const totalExchanged = (member.total_hours_given ?? 0) + (member.total_hours_received ?? 0);
 
   return (
-    <Pressable
+    <NativePressable
       className="mx-4 my-1.5"
       onPress={() => {
-        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         router.push({ pathname: '/(modals)/member-profile', params: { id: String(member.id) } });
       }}
       accessibilityLabel={t('memberCard.accessibilityLabel', { name: displayName })}
-      accessibilityRole="button"
-      style={({ pressed }) => ({
-        opacity: pressed ? 0.9 : 1,
-        transform: [{ scale: pressed ? 0.995 : 1 }],
-      })}
+      feedback="highlight"
     >
       <HeroCard
         variant="default"
@@ -117,6 +112,6 @@ export default function MemberCard({ member }: MemberCardProps) {
           </View>
         </HeroCard.Body>
       </HeroCard>
-    </Pressable>
+    </NativePressable>
   );
 }

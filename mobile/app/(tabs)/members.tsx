@@ -4,10 +4,10 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useState } from 'react';
-import { FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
+import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import { getMembers, type Member, type MemberListResponse } from '@/lib/api/members';
@@ -17,7 +17,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import MemberCard from '@/components/MemberCard';
-import Input from '@/components/ui/Input';
+import SearchInput from '@/components/ui/SearchInput';
 import { SkeletonBox } from '@/components/ui/Skeleton';
 import AppTopBar from '@/components/ui/AppTopBar';
 
@@ -227,30 +227,15 @@ function MembersHeader({
           </Text>
         </View>
 
-        <Input
+        <SearchInput
           value={search}
           onChangeText={setSearch}
           placeholder={t('search.placeholder')}
-          placeholderTextColor={theme.textMuted}
+          clearLabel={t('clearSearch')}
           returnKeyType="search"
-          clearButtonMode="while-editing"
           accessibilityLabel={t('search.placeholder')}
-          style={{ color: theme.text }}
-          leftIcon={<Ionicons name="search-outline" size={18} color={theme.textMuted} />}
-          rightIcon={search ? (
-            <Pressable
-              className="h-9 w-9 items-center justify-center rounded-2xl"
-              accessibilityLabel={t('clearSearch')}
-              accessibilityRole="button"
-              onPress={() => setSearch('')}
-              style={({ pressed }) => ({
-                backgroundColor: withAlpha(primary, pressed ? 0.16 : 0.08),
-                opacity: pressed ? 0.82 : 1,
-              })}
-            >
-              <Ionicons name="close-circle" size={18} color={theme.textMuted} />
-            </Pressable>
-          ) : null}
+          containerClassName="mb-0"
+          groupClassName="min-h-12 rounded-full bg-content2"
         />
       </Surface>
     </View>
@@ -272,22 +257,22 @@ function ActionPill({
 }) {
   const isPrimary = tone === 'primary';
   return (
-    <Pressable
+    <HeroButton
       className="min-h-10 flex-row items-center justify-center gap-2 rounded-full px-4"
-      accessibilityRole="button"
       accessibilityLabel={label}
       onPress={onPress}
-      style={({ pressed }) => ({
-        backgroundColor: isPrimary ? primary : withAlpha(primary, pressed ? 0.18 : 0.1),
+      size="sm"
+      variant={isPrimary ? 'primary' : 'secondary'}
+      style={{
+        backgroundColor: isPrimary ? primary : withAlpha(primary, 0.1),
         borderColor: isPrimary ? primary : withAlpha(primary, 0.18),
         borderWidth: 1,
-        opacity: pressed ? 0.86 : 1,
-      })}
+      }}
     >
       {icon ? <Ionicons name={icon} size={16} color={isPrimary ? '#fff' : primary} /> : null}
-      <Text className="text-sm font-bold" style={{ color: isPrimary ? '#fff' : primary }}>
+      <HeroButton.Label className="text-sm font-bold" style={{ color: isPrimary ? '#fff' : primary }}>
         {label}
-      </Text>
-    </Pressable>
+      </HeroButton.Label>
+    </HeroButton>
   );
 }

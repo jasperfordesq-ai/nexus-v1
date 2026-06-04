@@ -165,7 +165,7 @@ const defaultApiState = { data: null, isLoading: false, error: null, refresh: je
 
 beforeEach(() => {
   mockUseApi.mockReturnValue(defaultApiState);
-  (useAppToast() as { show: jest.Mock }).show.mockClear();
+  (useAppToast() as unknown as { show: jest.Mock }).show.mockClear();
   (removeSkill as jest.Mock).mockClear();
   (getSkillCategory as jest.Mock).mockClear();
   (getMembersWithSkill as jest.Mock).mockClear();
@@ -314,7 +314,7 @@ describe('EndorsementsScreen', () => {
     mockUseApi
       .mockReturnValueOnce({ data: { data: { skills: [mockSkill] } }, isLoading: false, error: null, refresh })
       .mockReturnValueOnce({ data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() });
-    const { show } = useAppToast() as { show: jest.Mock };
+    const { show } = useAppToast() as unknown as { show: jest.Mock };
 
     const { getByLabelText } = render(<EndorsementsScreen />);
     // The auto-confirm mock runs onConfirm immediately, mirroring the user

@@ -7,7 +7,6 @@ import { useCallback, useState } from 'react';
 import {
   FlatList,
   Image,
-  Pressable,
   RefreshControl,
   Text,
   View,
@@ -22,7 +21,8 @@ import { useTranslation } from 'react-i18next';
 import { getBlogPosts, type BlogPost, type BlogListResponse } from '@/lib/api/blog';
 import AppTopBar from '@/components/ui/AppTopBar';
 import EmptyState from '@/components/ui/EmptyState';
-import Input from '@/components/ui/Input';
+import NativePressable from '@/components/ui/NativePressable';
+import SearchInput from '@/components/ui/SearchInput';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -58,23 +58,23 @@ function ActionPill({
   const isPrimary = tone === 'primary';
 
   return (
-    <Pressable
-      accessibilityRole="button"
+    <HeroButton
       accessibilityLabel={accessibilityLabel ?? label}
       onPress={onPress}
       className="min-h-10 flex-row items-center justify-center gap-2 rounded-full px-4"
-      style={({ pressed }) => ({
+      size="sm"
+      variant={isPrimary ? 'primary' : 'secondary'}
+      style={{
         backgroundColor: isPrimary ? primary : withAlpha(primary, 0.12),
         borderWidth: isPrimary ? 0 : 1,
         borderColor: isPrimary ? 'transparent' : withAlpha(primary, 0.22),
-        opacity: pressed ? 0.86 : 1,
-      })}
+      }}
     >
       <Ionicons name={icon} size={16} color={isPrimary ? '#ffffff' : primary} />
-      <Text className="text-sm font-semibold" style={{ color: isPrimary ? '#ffffff' : theme.text }} numberOfLines={1}>
+      <HeroButton.Label className="text-sm font-semibold" style={{ color: isPrimary ? '#ffffff' : theme.text }} numberOfLines={1}>
         {label}
-      </Text>
-    </Pressable>
+      </HeroButton.Label>
+    </HeroButton>
   );
 }
 
@@ -97,9 +97,11 @@ export default function BlogScreen() {
     setCommittedSearch(search.trim());
   }
 
-  function clearSearch() {
-    setSearch('');
-    setCommittedSearch('');
+  function handleSearchChange(value: string) {
+    setSearch(value);
+    if (value.length === 0 && committedSearch) {
+      setCommittedSearch('');
+    }
   }
 
   function openPost(item: BlogPost) {
@@ -141,21 +143,16 @@ export default function BlogScreen() {
 
         <Surface variant="secondary" className="mb-3 gap-2 rounded-panel p-2">
           <View className="min-w-0">
-            <Input
-              style={{ color: theme.text }}
+            <SearchInput
               placeholder={t('searchPlaceholder')}
-              placeholderTextColor={theme.textMuted}
               value={search}
-              onChangeText={setSearch}
+              onChangeText={handleSearchChange}
               onSubmitEditing={submitSearch}
               returnKeyType="search"
               accessibilityLabel={t('searchPlaceholder')}
-              leftIcon={<Ionicons name="search-outline" size={18} color={theme.textMuted} />}
-              rightIcon={search.length > 0 ? (
-                <HeroButton isIconOnly size="sm" variant="ghost" accessibilityLabel={t('clearSearch')} onPress={clearSearch}>
-                  <Ionicons name="close-circle-outline" size={18} color={theme.textMuted} />
-                </HeroButton>
-              ) : null}
+              clearLabel={t('clearSearch')}
+              containerClassName="mb-0"
+              groupClassName="min-h-12 rounded-full bg-content2"
             />
           </View>
           <View className="items-start">
@@ -181,11 +178,10 @@ export default function BlogScreen() {
       : null;
 
     return (
-      <Pressable
-        accessibilityRole="button"
+      <NativePressable
         accessibilityLabel={item.title}
         onPress={() => openPost(item)}
-        style={({ pressed }) => ({ opacity: pressed ? 0.92 : 1 })}
+        feedback="highlight"
       >
         <HeroCard
           className="mb-3 overflow-hidden rounded-panel p-0"
@@ -239,7 +235,7 @@ export default function BlogScreen() {
             </View>
           </HeroCard.Body>
         </HeroCard>
-      </Pressable>
+      </NativePressable>
     );
   }
 

@@ -8,7 +8,6 @@ import {
   FlatList,
   View,
   Text,
-  Pressable,
   RefreshControl,
   ScrollView,
 } from 'react-native';
@@ -52,6 +51,8 @@ import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
+import NativePressable from '@/components/ui/NativePressable';
+import SearchInput from '@/components/ui/SearchInput';
 import Toggle from '@/components/ui/Toggle';
 
 // ---------------------------------------------------------------------------
@@ -121,15 +122,11 @@ function JobCard({
   const visibleSkills = (item.skills_required ?? []).slice(0, 3);
 
   return (
-    <Pressable
-      accessibilityRole="button"
+    <NativePressable
       className="w-full p-0"
       onPress={onPress}
       accessibilityLabel={item.title}
-      style={({ pressed }) => ({
-        opacity: pressed ? 0.92 : 1,
-        transform: [{ scale: pressed ? 0.99 : 1 }],
-      })}
+      feedback="highlight"
     >
       <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
         <View className="h-1.5" style={{ backgroundColor: item.is_featured ? warningColor : typeColor }} />
@@ -209,7 +206,7 @@ function JobCard({
           ) : null}
         </HeroCard.Body>
       </HeroCard>
-    </Pressable>
+    </NativePressable>
   );
 }
 
@@ -1113,29 +1110,22 @@ export default function JobsScreen() {
         <>
           {/* Search bar */}
           <Surface variant="secondary" className="mx-4 mb-3 rounded-panel-inner px-3 pt-3">
-            <Input
-              style={{ color: theme.text }}
+            <SearchInput
               placeholder={t('search.placeholder')}
-              placeholderTextColor={theme.textMuted}
               value={search}
-              onChangeText={handleSearchChange}
+              onChangeText={(value) => {
+                if (value.length === 0) {
+                  handleClear();
+                  return;
+                }
+                handleSearchChange(value);
+              }}
+              clearLabel={t('common:actions.clear')}
               returnKeyType="search"
-              clearButtonMode="never"
               autoCorrect={false}
               autoCapitalize="none"
               accessibilityLabel={t('search.placeholder')}
-              leftIcon={<Ionicons name="search-outline" size={18} color={theme.textMuted} />}
-              rightIcon={search.length > 0 ? (
-                <HeroButton
-                  isIconOnly
-                  size="sm"
-                  variant="ghost"
-                  accessibilityLabel={t('common:actions.clear', 'Clear search')}
-                  onPress={handleClear}
-                >
-                  <Ionicons name="close-circle" size={18} color={theme.textMuted} />
-                </HeroButton>
-              ) : null}
+              containerClassName="mb-0"
             />
           </Surface>
 

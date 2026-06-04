@@ -6,7 +6,6 @@
 import { useCallback } from 'react';
 import {
   Image,
-  Pressable,
   RefreshControl,
   ScrollView,
   Share,
@@ -16,7 +15,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Card as HeroCard, Chip, Surface } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, Surface } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import { getBlogPost, type BlogPost } from '@/lib/api/blog';
@@ -49,23 +48,23 @@ function ActionPill({
   const theme = useTheme();
 
   return (
-    <Pressable
-      accessibilityRole="button"
+    <HeroButton
       accessibilityLabel={accessibilityLabel ?? label}
       onPress={onPress}
       className="min-h-10 flex-row items-center justify-center gap-2 rounded-full px-4"
-      style={({ pressed }) => ({
+      size="sm"
+      variant="secondary"
+      style={{
         backgroundColor: withAlpha(primary, 0.12),
         borderWidth: 1,
         borderColor: withAlpha(primary, 0.22),
-        opacity: pressed ? 0.86 : 1,
-      })}
+      }}
     >
       <Ionicons name={icon} size={16} color={primary} />
-      <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+      <HeroButton.Label className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={1}>
         {label}
-      </Text>
-    </Pressable>
+      </HeroButton.Label>
+    </HeroButton>
   );
 }
 

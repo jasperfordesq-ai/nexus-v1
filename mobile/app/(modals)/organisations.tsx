@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useMemo, useState, type ReactNode } from 'react';
-import { FlatList, Linking, Pressable, RefreshControl, Text, View } from 'react-native';
+import { FlatList, Linking, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -25,7 +25,7 @@ import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
-import Input from '@/components/ui/Input';
+import SearchInput from '@/components/ui/SearchInput';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
@@ -77,23 +77,23 @@ function ActionPill({
   const isPrimary = tone === 'primary';
 
   return (
-    <Pressable
-      accessibilityRole="button"
+    <HeroButton
       accessibilityLabel={accessibilityLabel ?? label}
       onPress={onPress}
       className="min-h-10 flex-row items-center justify-center gap-2 rounded-full px-4"
-      style={({ pressed }) => ({
+      size="sm"
+      variant={isPrimary ? 'primary' : 'secondary'}
+      style={{
         backgroundColor: isPrimary ? primary : withAlpha(primary, 0.12),
         borderWidth: isPrimary ? 0 : 1,
         borderColor: isPrimary ? 'transparent' : withAlpha(primary, 0.22),
-        opacity: pressed ? 0.86 : 1,
-      })}
+      }}
     >
       <Ionicons name={icon} size={16} color={isPrimary ? '#ffffff' : primary} />
-      <Text className="text-sm font-semibold" style={{ color: isPrimary ? '#ffffff' : theme.text }} numberOfLines={1}>
+      <HeroButton.Label className="text-sm font-semibold" style={{ color: isPrimary ? '#ffffff' : theme.text }} numberOfLines={1}>
         {label}
-      </Text>
-    </Pressable>
+      </HeroButton.Label>
+    </HeroButton>
   );
 }
 
@@ -403,22 +403,16 @@ export default function OrganisationsScreen() {
               <OrganisationsHero organisations={organisations} primary={primary} theme={theme} t={t} onRegister={openRegistration} />
 
               <Surface variant="secondary" className="gap-3 rounded-panel p-2">
-                <Input
-                  style={{ color: theme.text }}
+                <SearchInput
                   placeholder={t('searchPlaceholder')}
-                  placeholderTextColor={theme.textMuted}
                   value={search}
                   onChangeText={setSearch}
                   returnKeyType="search"
-                  clearButtonMode="while-editing"
                   autoCorrect={false}
                   accessibilityLabel={t('searchPlaceholder')}
-                  leftIcon={<Ionicons name="search-outline" size={18} color={theme.textMuted} />}
-                  rightIcon={search.length > 0 ? (
-                    <HeroButton isIconOnly size="sm" variant="ghost" accessibilityLabel={t('clearSearch')} onPress={() => setSearch('')}>
-                      <Ionicons name="close-circle" size={18} color={theme.textMuted} />
-                    </HeroButton>
-                  ) : null}
+                  clearLabel={t('clearSearch')}
+                  containerClassName="mb-0"
+                  groupClassName="min-h-12 rounded-full bg-content2"
                 />
               </Surface>
             </View>

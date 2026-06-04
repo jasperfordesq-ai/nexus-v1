@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Pressable, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,6 +18,7 @@ import { withAlpha } from '@/lib/utils/color';
 import { ProfileSkeleton } from '@/components/ui/Skeleton';
 import { useConfirm } from '@/components/ui/useConfirm';
 import Avatar from '@/components/ui/Avatar';
+import NativePressable from '@/components/ui/NativePressable';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -297,18 +298,17 @@ function MenuRow({ item, onPress, theme }: { item: MenuItem; onPress: () => void
   const { t } = useTranslation('profile');
 
   return (
-    <Pressable
-      accessibilityRole="button"
+    <NativePressable
       accessibilityLabel={t(item.labelKey)}
       onPress={onPress}
       className="w-full rounded-panel-inner px-3 py-3"
-      style={({ pressed }) => ({
+      style={{
         minHeight: 76,
-        backgroundColor: pressed ? withAlpha(item.tone, 0.14) : withAlpha(theme.text, 0.06),
-        borderColor: pressed ? withAlpha(item.tone, 0.28) : 'transparent',
+        backgroundColor: withAlpha(theme.text, 0.06),
+        borderColor: 'transparent',
         borderWidth: 1,
-        transform: [{ scale: pressed ? 0.99 : 1 }],
-      })}
+      }}
+      feedback="highlight"
     >
       <View className="min-h-[50px] flex-row items-center gap-3">
         <View className="size-12 shrink-0 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(item.tone, 0.14) }}>
@@ -326,6 +326,6 @@ function MenuRow({ item, onPress, theme }: { item: MenuItem; onPress: () => void
           <Ionicons name="chevron-forward-outline" size={18} color={theme.textSecondary} />
         </View>
       </View>
-    </Pressable>
+    </NativePressable>
   );
 }

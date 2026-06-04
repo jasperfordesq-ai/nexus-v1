@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useState } from 'react';
-import { FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
+import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { router, type Href } from 'expo-router';
@@ -20,6 +20,7 @@ import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 import { EventCardSkeleton } from '@/components/ui/Skeleton';
+import NativePressable from '@/components/ui/NativePressable';
 
 function extractEventsPage(r: EventsResponse) {
   return {
@@ -240,18 +241,13 @@ function EventCard({
   const isCancelled = event.status === 'cancelled';
 
   return (
-    <Pressable
-      accessibilityRole="button"
+    <NativePressable
       className="mx-4 my-2"
       onPress={() => {
-        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         onPress();
       }}
       accessibilityLabel={event.title ?? ''}
-      style={({ pressed }) => ({
-        opacity: pressed ? 0.92 : 1,
-        transform: [{ scale: pressed ? 0.99 : 1 }],
-      })}
+      feedback="highlight"
     >
       <HeroCard variant="default" className="w-full overflow-hidden">
         <View className="h-1 w-full" style={{ backgroundColor: accent }} />
@@ -330,6 +326,6 @@ function EventCard({
           <Ionicons name="arrow-forward" size={17} color={primary} />
         </HeroCard.Footer>
       </HeroCard>
-    </Pressable>
+    </NativePressable>
   );
 }

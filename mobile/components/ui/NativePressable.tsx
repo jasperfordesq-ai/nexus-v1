@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React, { useCallback } from 'react';
+import { Pressable } from 'react-native';
 import type { AccessibilityRole, GestureResponderEvent, StyleProp, ViewStyle } from 'react-native';
 import { PressableFeedback } from 'heroui-native';
 
@@ -49,9 +50,31 @@ export default function NativePressable({
   }, [disabled, haptics, onPress]);
 
   const useScale = feedback !== 'none';
+  const FeedbackRoot = PressableFeedback;
+
+  if (!FeedbackRoot) {
+    return (
+      <Pressable
+        accessibilityLabel={accessibilityLabel}
+        accessibilityRole={accessibilityRole}
+        className={`overflow-hidden ${className ?? ''}`}
+        disabled={disabled}
+        onLongPress={onLongPress}
+        onPress={handlePress}
+        style={style}
+        testID={testID}
+      >
+        {children}
+      </Pressable>
+    );
+  }
+
+  const Scale = FeedbackRoot.Scale;
+  const Highlight = FeedbackRoot.Highlight;
+  const Ripple = FeedbackRoot.Ripple;
 
   return (
-    <PressableFeedback
+    <FeedbackRoot
       accessibilityLabel={accessibilityLabel}
       accessibilityRole={accessibilityRole}
       animation={useScale ? false : 'disable-all'}
@@ -62,15 +85,15 @@ export default function NativePressable({
       style={style}
       testID={testID}
     >
-      {useScale ? (
-        <PressableFeedback.Scale className={contentClassName}>
+      {useScale && Scale ? (
+        <Scale className={contentClassName}>
           {children}
-        </PressableFeedback.Scale>
+        </Scale>
       ) : (
         children
       )}
-      {feedback === 'highlight' ? <PressableFeedback.Highlight /> : null}
-      {feedback === 'ripple' ? <PressableFeedback.Ripple /> : null}
-    </PressableFeedback>
+      {feedback === 'highlight' && Highlight ? <Highlight /> : null}
+      {feedback === 'ripple' && Ripple ? <Ripple /> : null}
+    </FeedbackRoot>
   );
 }

@@ -34,6 +34,7 @@ import { useAppToast } from '@/components/ui/AppToast';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
+import SearchInput from '@/components/ui/SearchInput';
 import { SkeletonBox } from '@/components/ui/Skeleton';
 import OfflineBanner from '@/components/OfflineBanner';
 
@@ -429,22 +430,15 @@ function SearchHeader({
       </HeroCard>
 
       <Surface variant="default" className="mx-4 gap-3 rounded-panel-inner p-3">
-        <Input
-          style={{ color: theme.text }}
+        <SearchInput
           value={query}
           onChangeText={setQuery}
           placeholder={t('placeholder')}
-          placeholderTextColor={theme.textMuted}
+          clearLabel={t('clearSearch')}
           returnKeyType="search"
-          clearButtonMode="while-editing"
           autoCorrect={false}
           accessibilityLabel={t('placeholder')}
-          leftIcon={<Ionicons name="search-outline" size={18} color={theme.textMuted} />}
-          rightIcon={query.trim().length > 0 ? (
-            <HeroButton isIconOnly variant="ghost" accessibilityLabel={t('clearSearch')} onPress={() => setQuery('')}>
-              <Ionicons name={isLoading ? 'sync-outline' : 'close-outline'} size={18} color={theme.textMuted} />
-            </HeroButton>
-          ) : null}
+          containerClassName="mb-0"
         />
 
         <Tabs value={activeFilter} onValueChange={(value) => {

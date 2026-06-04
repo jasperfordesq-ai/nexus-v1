@@ -80,7 +80,8 @@ jest.mock('@expo/vector-icons', () => ({
 
 jest.mock('heroui-native', () => {
   const React = require('react');
-  const { Text, View } = require('react-native');
+  const { Pressable, Text, TextInput, View } = require('react-native');
+  const SearchContext = React.createContext({ searchValue: '', onSearchChange: undefined });
 
   const Button = ({
     accessibilityLabel,
@@ -108,6 +109,49 @@ jest.mock('heroui-native', () => {
   };
   const Label = ({ children }: { children: React.ReactNode }) => <Text>{children}</Text>;
   const FieldError = ({ children }: { children: React.ReactNode }) => <Text>{children}</Text>;
+  const SearchField = ({
+    children,
+    value,
+    onChange,
+  }: {
+    children: React.ReactNode;
+    value?: string;
+    onChange?: (value: string) => void;
+  }) => (
+    <SearchContext.Provider value={{ searchValue: value ?? '', onSearchChange: onChange }}>
+      <View>{children}</View>
+    </SearchContext.Provider>
+  );
+  SearchField.Group = ({ children }: { children: React.ReactNode }) => <View>{children}</View>;
+  SearchField.SearchIcon = () => <View />;
+  SearchField.Input = React.forwardRef(
+    (
+      props: {
+        accessibilityLabel?: string;
+        placeholder?: string;
+      },
+      ref: React.Ref<unknown>,
+    ) => {
+      const context = React.useContext(SearchContext);
+      return (
+        <TextInput
+          ref={ref}
+          accessibilityLabel={props.accessibilityLabel}
+          placeholder={props.placeholder}
+          value={context.searchValue}
+          onChangeText={context.onSearchChange}
+        />
+      );
+    },
+  );
+  SearchField.ClearButton = ({ accessibilityLabel }: { accessibilityLabel?: string }) => {
+    const context = React.useContext(SearchContext);
+    return context.searchValue ? (
+      <Pressable accessibilityLabel={accessibilityLabel} accessibilityRole="button" onPress={() => context.onSearchChange?.('')}>
+        <Text>clear</Text>
+      </Pressable>
+    ) : null;
+  };
 
   return {
     Button,
@@ -116,6 +160,7 @@ jest.mock('heroui-native', () => {
     FieldError,
     Input,
     Label,
+    SearchField,
     Spinner: () => null,
     Surface: ({ children }: { children?: React.ReactNode }) => <View>{children}</View>,
     TextField,

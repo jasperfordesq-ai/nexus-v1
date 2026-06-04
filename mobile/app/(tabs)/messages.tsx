@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { FlatList, Platform, Pressable, RefreshControl, Text, View } from 'react-native';
+import { FlatList, Platform, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -22,6 +22,7 @@ import { useAppToast } from '@/components/ui/AppToast';
 import { useConfirm } from '@/components/ui/useConfirm';
 import Avatar from '@/components/ui/Avatar';
 import Input from '@/components/ui/Input';
+import NativePressable from '@/components/ui/NativePressable';
 import { ConversationSkeleton } from '@/components/ui/Skeleton';
 import { formatRelativeTime } from '@/lib/utils/formatRelativeTime';
 
@@ -495,18 +496,13 @@ function ConversationCard({
       onSwipeableWillOpen={() => void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)}
       onSwipeableOpen={() => onArchive(conversation)}
     >
-      <Pressable
+      <NativePressable
         className="mx-4 my-2 rounded-panel"
         accessibilityLabel={`${otherName}${lastMsgBody ? `, ${lastMsgBody}` : ''}`}
-        accessibilityRole="button"
         onPress={() => {
-          void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           onOpen(conversation);
         }}
-        style={({ pressed }) => ({
-          opacity: pressed ? 0.92 : 1,
-          transform: [{ scale: pressed ? 0.99 : 1 }],
-        })}
+        feedback="highlight"
       >
         <HeroCard variant={isUnread ? 'default' : 'secondary'} className="w-full overflow-hidden rounded-panel p-0">
           <View className="h-1 w-full" style={{ backgroundColor: isUnread ? primary : theme.border }} />
@@ -579,7 +575,7 @@ function ConversationCard({
             </View>
           </HeroCard.Footer>
         </HeroCard>
-      </Pressable>
+      </NativePressable>
     </Swipeable>
   );
 }

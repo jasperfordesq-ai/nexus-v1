@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Surface } from 'heroui-native';
 
@@ -13,6 +13,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import Avatar from '@/components/ui/Avatar';
+import NativePressable from '@/components/ui/NativePressable';
 
 interface StoryMember {
   id: number;
@@ -34,12 +35,11 @@ export default function StoryCircles({ members, onPress }: StoryCirclesProps) {
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-3 px-4 py-1.5">
       {user ? (
-        <Pressable
+        <NativePressable
           className="w-16 items-center"
           onPress={() => onPress(user.id)}
           accessibilityLabel={t('stories.you')}
-          accessibilityRole="button"
-          style={({ pressed }) => ({ opacity: pressed ? 0.78 : 1 })}
+          feedback="scale"
         >
           <Surface
             variant="secondary"
@@ -57,17 +57,16 @@ export default function StoryCircles({ members, onPress }: StoryCirclesProps) {
           <Text className="mt-1 max-w-[60px] text-center text-[11px] font-semibold" style={{ color: theme.textSecondary }} numberOfLines={1}>
             {t('stories.you')}
           </Text>
-        </Pressable>
+        </NativePressable>
       ) : null}
 
       {members.map((member) => (
-        <Pressable
+        <NativePressable
           key={member.id}
           className="w-16 items-center"
           onPress={() => onPress(member.id)}
           accessibilityLabel={member.name || t('stories.member')}
-          accessibilityRole="button"
-          style={({ pressed }) => ({ opacity: pressed ? 0.78 : 1 })}
+          feedback="scale"
         >
           <Surface
             variant="secondary"
@@ -79,7 +78,7 @@ export default function StoryCircles({ members, onPress }: StoryCirclesProps) {
           <Text className="mt-1 max-w-[60px] text-center text-[11px] font-semibold" style={{ color: theme.textSecondary }} numberOfLines={1}>
             {(member.name || '').split(' ')[0] || t('stories.memberInitial')}
           </Text>
-        </Pressable>
+        </NativePressable>
       ))}
     </ScrollView>
   );

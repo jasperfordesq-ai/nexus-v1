@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useState } from 'react';
-import { FlatList, KeyboardAvoidingView, Platform, Pressable, RefreshControl, View } from 'react-native';
+import { FlatList, KeyboardAvoidingView, Platform, RefreshControl, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
 import Input from '@/components/ui/Input';
+import NativePressable from '@/components/ui/NativePressable';
 import { SkeletonBox } from '@/components/ui/Skeleton';
 import { getMembers, type Member, type MemberListResponse } from '@/lib/api/members';
 import * as Haptics from '@/lib/haptics';
@@ -261,15 +262,11 @@ function MessageMemberCard({
   const subtitle = member.tagline || member.location || t('composer.memberFallback');
 
   return (
-    <Pressable
+    <NativePressable
       className="mx-4 my-1.5 rounded-panel"
-      accessibilityRole="button"
       accessibilityLabel={t('composer.openThread', { name })}
       onPress={onPress}
-      style={({ pressed }) => ({
-        opacity: pressed ? 0.9 : 1,
-        transform: [{ scale: pressed ? 0.99 : 1 }],
-      })}
+      feedback="highlight"
     >
       <HeroCard variant="secondary" className="overflow-hidden rounded-panel p-0">
         <HeroCard.Body className="flex-row items-center gap-3 px-4 py-4">
@@ -291,7 +288,7 @@ function MessageMemberCard({
           </View>
         </HeroCard.Body>
       </HeroCard>
-    </Pressable>
+    </NativePressable>
   );
 }
 

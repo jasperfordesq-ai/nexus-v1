@@ -7,7 +7,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   FlatList,
   Linking,
-  Pressable,
   RefreshControl,
   ScrollView,
   Text,
@@ -75,6 +74,7 @@ import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
+import SearchInput from '@/components/ui/SearchInput';
 
 type TabKey = 'opportunities' | 'applications' | 'shifts' | 'swaps' | 'hours' | 'certificates' | 'expenses' | 'donations' | 'organisations';
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
@@ -187,25 +187,25 @@ function ActionPill({
   const foreground = isPrimary ? '#fff' : primary;
 
   return (
-    <Pressable
-      accessibilityRole="button"
+    <HeroButton
       accessibilityLabel={accessibilityLabel ?? label}
-      accessibilityState={{ disabled }}
-      disabled={disabled}
+      isDisabled={disabled}
       onPress={onPress}
       className="min-h-10 flex-row items-center justify-center gap-2 rounded-full px-4"
-      style={({ pressed }) => ({
+      size="sm"
+      variant={isPrimary ? 'primary' : 'secondary'}
+      style={{
         backgroundColor: isPrimary ? primary : withAlpha(primary, 0.12),
         borderWidth: isPrimary ? 0 : 1,
         borderColor: isPrimary ? 'transparent' : withAlpha(primary, 0.22),
-        opacity: disabled ? 0.55 : pressed ? 0.86 : 1,
-      })}
+        opacity: disabled ? 0.55 : 1,
+      }}
     >
       {loading ? <Spinner size="sm" /> : <Ionicons name={icon} size={16} color={foreground} />}
-      <Text className="text-sm font-semibold" style={{ color: isPrimary ? '#fff' : theme.text }} numberOfLines={1}>
+      <HeroButton.Label className="text-sm font-semibold" style={{ color: isPrimary ? '#fff' : theme.text }} numberOfLines={1}>
         {label}
-      </Text>
-    </Pressable>
+      </HeroButton.Label>
+    </HeroButton>
   );
 }
 
@@ -226,23 +226,23 @@ function TabPill({
   const foreground = selected ? primary : theme.textSecondary;
 
   return (
-    <Pressable
-      accessibilityRole="button"
+    <HeroButton
       accessibilityState={{ selected }}
       onPress={onPress}
       className="min-h-10 flex-row items-center justify-center gap-2 rounded-full px-3.5"
-      style={({ pressed }) => ({
+      size="sm"
+      variant={selected ? 'primary' : 'ghost'}
+      style={{
         backgroundColor: selected ? withAlpha(primary, 0.14) : 'transparent',
         borderWidth: selected ? 1 : 0,
         borderColor: selected ? withAlpha(primary, 0.28) : 'transparent',
-        opacity: pressed ? 0.84 : 1,
-      })}
+      }}
     >
       <Ionicons name={icon} size={16} color={foreground} />
-      <Text className="text-sm font-semibold" style={{ color: foreground }} numberOfLines={1}>
+      <HeroButton.Label className="text-sm font-semibold" style={{ color: foreground }} numberOfLines={1}>
         {label}
-      </Text>
-    </Pressable>
+      </HeroButton.Label>
+    </HeroButton>
   );
 }
 
@@ -1758,30 +1758,23 @@ function VolunteeringScreenInner() {
 
             {activeTab === 'opportunities' ? (
               <Surface variant="secondary" className="rounded-panel p-2">
-                <Input
-                  className="text-sm"
-                  style={{ color: theme.text }}
+                <SearchInput
                   placeholder={t('searchPlaceholder')}
-                  placeholderTextColor={theme.textMuted}
                   value={search}
-                  onChangeText={handleSearchChange}
+                  onChangeText={(value) => {
+                    if (value.length === 0) {
+                      handleClear();
+                      return;
+                    }
+                    handleSearchChange(value);
+                  }}
+                  clearLabel={t('clearSearch')}
                   returnKeyType="search"
-                  clearButtonMode="never"
                   autoCorrect={false}
                   autoCapitalize="none"
                   accessibilityLabel={t('searchPlaceholder')}
-                  leftIcon={<Ionicons name="search-outline" size={18} color={theme.textMuted} />}
-                  rightIcon={search.length > 0 ? (
-                    <HeroButton
-                      isIconOnly
-                      size="sm"
-                      variant="ghost"
-                      onPress={handleClear}
-                      accessibilityLabel={t('clearSearch')}
-                    >
-                      <Ionicons name="close-circle" size={18} color={theme.textMuted} />
-                    </HeroButton>
-                  ) : null}
+                  containerClassName="mb-0"
+                  inputClassName="min-h-12 flex-1 rounded-full pl-11 pr-10 text-sm"
                 />
               </Surface>
             ) : null}

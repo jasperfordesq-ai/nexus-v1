@@ -3,29 +3,32 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-const mockSetTheme = jest.fn();
-const mockSetColorScheme = jest.fn();
+const mockSetTheme = jest.fn<void, ['light' | 'dark']>();
+const mockSetColorScheme = jest.fn<void, ['light' | 'dark' | null]>();
 const mockGetColorScheme = jest.fn<'light' | 'dark', []>(() => 'dark');
-const mockAddChangeListener = jest.fn(() => ({ remove: jest.fn() }));
+const mockAddChangeListener = jest.fn<
+  { remove: jest.Mock },
+  [(p: { colorScheme: 'light' | 'dark' | null }) => void]
+>(() => ({ remove: jest.fn() }));
 const mockStorageGet = jest.fn<Promise<string | null>, [string]>(async () => null);
-const mockStorageSet = jest.fn(async () => undefined);
+const mockStorageSet = jest.fn<Promise<void>, [string, string]>(async () => undefined);
 
 jest.mock('react-native', () => ({
   Appearance: {
     getColorScheme: () => mockGetColorScheme(),
-    setColorScheme: (...args: unknown[]) => mockSetColorScheme(...args),
-    addChangeListener: (cb: unknown) => mockAddChangeListener(cb as () => void),
+    setColorScheme: (scheme: 'light' | 'dark' | null) => mockSetColorScheme(scheme),
+    addChangeListener: (cb: (p: { colorScheme: 'light' | 'dark' | null }) => void) => mockAddChangeListener(cb),
   },
 }));
 
 jest.mock('uniwind', () => ({
-  Uniwind: { setTheme: (...args: unknown[]) => mockSetTheme(...args) },
+  Uniwind: { setTheme: (theme: 'light' | 'dark') => mockSetTheme(theme) },
 }));
 
 jest.mock('@/lib/storage', () => ({
   storage: {
     get: (...args: [string]) => mockStorageGet(...args),
-    set: (...args: unknown[]) => mockStorageSet(...args),
+    set: (...args: [string, string]) => mockStorageSet(...args),
   },
 }));
 

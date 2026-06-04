@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState, type ComponentProps } from 'react';
-import { Image, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
+import { Image, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -45,6 +45,7 @@ import AppTopBar from '@/components/ui/AppTopBar';
 import { useAppToast } from '@/components/ui/AppToast';
 import Avatar from '@/components/ui/Avatar';
 import Input from '@/components/ui/Input';
+import NativePressable from '@/components/ui/NativePressable';
 import Toggle from '@/components/ui/Toggle';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
@@ -320,15 +321,13 @@ function PartnerCard({ partner, t, theme, primary }: { partner: FederatedTenant;
   const shouldShowExternalChip = partner.is_external && federationLevel?.toLowerCase() !== externalLabel.toLowerCase();
 
   return (
-    <Pressable
-      accessibilityRole="button"
+    <NativePressable
       accessibilityLabel={partner.name}
       className="mb-3 rounded-panel"
       onPress={() => {
-        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         router.push({ pathname: '/(modals)/federation-partner', params: { id: String(partner.id) } });
       }}
-      style={({ pressed }) => ({ opacity: pressed ? 0.86 : 1 })}
+      feedback="highlight"
     >
       <HeroCard
         variant="default"
@@ -387,7 +386,7 @@ function PartnerCard({ partner, t, theme, primary }: { partner: FederatedTenant;
           </Text>
         </HeroCard.Body>
       </HeroCard>
-    </Pressable>
+    </NativePressable>
   );
 }
 
@@ -526,12 +525,11 @@ function ListingCard({
   const community = listingCommunityName(listing, t);
   const listingImage = resolvedMediaUrl(listing.image_url);
   return (
-    <Pressable
+    <NativePressable
       className="mb-3"
-      accessibilityRole="button"
       accessibilityLabel={t('directory.listings.openDetails', { title: listing.title })}
       onPress={onPress}
-      style={({ pressed }) => ({ opacity: pressed ? 0.86 : 1 })}
+      feedback="highlight"
     >
       <HeroCard
         className="overflow-hidden rounded-panel p-0"
@@ -598,7 +596,7 @@ function ListingCard({
           </View>
         </HeroCard.Body>
       </HeroCard>
-    </Pressable>
+    </NativePressable>
   );
 }
 
@@ -773,12 +771,11 @@ function GroupCard({
   const community = group.timebank?.name ?? group.partner_name ?? t('directory.unknownCommunity');
   const tone = modeMeta.groups.tone;
   return (
-    <Pressable
+    <NativePressable
       className="mb-3"
-      accessibilityRole="button"
       accessibilityLabel={t('directory.groups.openDetails', { name: group.name })}
       onPress={onPress}
-      style={({ pressed }) => ({ opacity: pressed ? 0.86 : 1 })}
+      feedback="highlight"
     >
       <HeroCard
         className="overflow-hidden rounded-panel p-0"
@@ -821,7 +818,7 @@ function GroupCard({
           </View>
         </HeroCard.Body>
       </HeroCard>
-    </Pressable>
+    </NativePressable>
   );
 }
 
@@ -916,12 +913,11 @@ function EventCard({
   const community = event.timebank?.name ?? t('directory.unknownCommunity');
   const tone = modeMeta.events.tone;
   return (
-    <Pressable
+    <NativePressable
       className="mb-3"
-      accessibilityRole="button"
       accessibilityLabel={t('directory.events.openDetails', { title: event.title })}
       onPress={onPress}
-      style={({ pressed }) => ({ opacity: pressed ? 0.86 : 1 })}
+      feedback="highlight"
     >
       <HeroCard
         className="overflow-hidden rounded-panel p-0"
@@ -988,7 +984,7 @@ function EventCard({
           </View>
         </HeroCard.Body>
       </HeroCard>
-    </Pressable>
+    </NativePressable>
   );
 }
 
@@ -1112,12 +1108,11 @@ function MessageCard({
   const showStatusChip = !(thread.unreadCount > 0 && message.status === 'unread');
 
   return (
-    <Pressable
+    <NativePressable
       className="mb-3"
-      accessibilityRole="button"
       accessibilityLabel={t('directory.messages.openThread', { name: partnerName })}
       onPress={onPress}
-      style={({ pressed }) => ({ opacity: pressed ? 0.86 : 1 })}
+      feedback="highlight"
     >
       <HeroCard
         className="overflow-hidden rounded-panel p-0"
@@ -1172,7 +1167,7 @@ function MessageCard({
           </View>
         </HeroCard.Body>
       </HeroCard>
-    </Pressable>
+    </NativePressable>
   );
 }
 

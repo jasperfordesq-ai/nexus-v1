@@ -5,7 +5,6 @@
 
 import {
   Linking,
-  Pressable,
   RefreshControl,
   ScrollView,
   Share,
@@ -66,23 +65,23 @@ function ActionPill({
   const isPrimary = tone === 'primary';
 
   return (
-    <Pressable
-      accessibilityRole="button"
+    <HeroButton
       accessibilityLabel={accessibilityLabel ?? label}
       onPress={onPress}
       className="min-h-10 flex-row items-center justify-center gap-2 rounded-full px-4"
-      style={({ pressed }) => ({
+      size="sm"
+      variant={isPrimary ? 'primary' : 'secondary'}
+      style={{
         backgroundColor: isPrimary ? primary : withAlpha(primary, 0.12),
         borderWidth: isPrimary ? 0 : 1,
         borderColor: isPrimary ? 'transparent' : withAlpha(primary, 0.22),
-        opacity: pressed ? 0.86 : 1,
-      })}
+      }}
     >
       <Ionicons name={icon} size={16} color={isPrimary ? '#ffffff' : primary} />
-      <Text className="text-sm font-semibold" style={{ color: isPrimary ? '#ffffff' : theme.text }} numberOfLines={1}>
+      <HeroButton.Label className="text-sm font-semibold" style={{ color: isPrimary ? '#ffffff' : theme.text }} numberOfLines={1}>
         {label}
-      </Text>
-    </Pressable>
+      </HeroButton.Label>
+    </HeroButton>
   );
 }
 

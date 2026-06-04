@@ -4,11 +4,11 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useMemo, useState, type ComponentProps } from 'react';
-import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
+import { RefreshControl, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Card as HeroCard, Chip, Spinner, Surface, Tabs, Text } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface, Tabs, Text } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 
@@ -266,20 +266,21 @@ function ConnectionCard({
                   <Text className="min-w-0 flex-1 text-sm" style={{ color: theme.textSecondary }} numberOfLines={1}>{connection.tenant_name}</Text>
                 </View>
               </View>
-              <Pressable
-                className="h-9 w-9 items-center justify-center rounded-2xl"
-                accessibilityRole="button"
+              <HeroButton
+                isIconOnly
+                size="sm"
+                variant="secondary"
+                className="h-9 w-9 rounded-2xl"
                 accessibilityLabel={t('directory.connections.viewProfile', { name: connection.name })}
                 onPress={openProfile}
-                style={({ pressed }) => ({
-                  backgroundColor: withAlpha(primary, pressed ? 0.18 : 0.1),
+                style={{
+                  backgroundColor: withAlpha(primary, 0.1),
                   borderWidth: 1,
                   borderColor: withAlpha(primary, 0.16),
-                  opacity: pressed ? 0.86 : 1,
-                })}
+                }}
               >
                 <Ionicons name="chevron-forward-outline" size={18} color={primary} />
-              </Pressable>
+              </HeroButton>
             </View>
             {connection.message ? <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>{connection.message}</Text> : null}
           </View>
@@ -372,27 +373,28 @@ function ActionPill({
   const isPrimary = tone === 'primary';
   const color = tone === 'danger' ? theme.error : primary;
   return (
-    <Pressable
+    <HeroButton
       className="min-h-10 flex-row items-center justify-center gap-2 rounded-full px-4"
-      accessibilityRole="button"
       accessibilityLabel={label}
-      disabled={isDisabled || isLoading}
+      isDisabled={isDisabled || isLoading}
       onPress={onPress}
-      style={({ pressed }) => ({
-        backgroundColor: isPrimary ? primary : withAlpha(color, pressed ? 0.18 : 0.1),
+      size="sm"
+      variant={isPrimary ? 'primary' : 'secondary'}
+      style={{
+        backgroundColor: isPrimary ? primary : withAlpha(color, 0.1),
         borderColor: isPrimary ? primary : withAlpha(color, 0.18),
         borderWidth: 1,
-        opacity: isDisabled ? 0.5 : pressed ? 0.86 : 1,
-      })}
+        opacity: isDisabled ? 0.5 : 1,
+      }}
     >
       {isLoading ? (
         <Spinner size="sm" />
       ) : icon ? (
         <Ionicons name={icon} size={15} color={isPrimary ? '#fff' : color} />
       ) : null}
-      <Text className="text-sm font-bold" style={{ color: isPrimary ? '#fff' : color }} numberOfLines={1}>
+      <HeroButton.Label className="text-sm font-bold" style={{ color: isPrimary ? '#fff' : color }} numberOfLines={1}>
         {label}
-      </Text>
-    </Pressable>
+      </HeroButton.Label>
+    </HeroButton>
   );
 }

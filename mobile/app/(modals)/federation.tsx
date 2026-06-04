@@ -4,12 +4,11 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useMemo, type ComponentProps, type ReactNode } from 'react';
-import { FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
+import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
-import * as Haptics from '@/lib/haptics';
+import { Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -31,6 +30,7 @@ import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
+import NativePressable from '@/components/ui/NativePressable';
 
 type IoniconName = ComponentProps<typeof Ionicons>['name'];
 
@@ -182,16 +182,14 @@ function QuickLinksSection({
       <SectionHeading title={t('hub.exploreNetwork')} theme={theme} />
       <View className="flex-row flex-wrap gap-2">
         {quickLinks.map((link) => (
-          <Pressable
+          <NativePressable
             key={link.key}
-            accessibilityRole="button"
             accessibilityLabel={t(`hub.quick.${link.key}.title`)}
             className="min-w-[31%] flex-1 rounded-panel-inner"
             onPress={() => {
-              void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               router.push(link.href as Href);
             }}
-            style={({ pressed }) => ({ opacity: pressed ? 0.86 : 1 })}
+            feedback="highlight"
           >
             <Surface
               variant="secondary"
@@ -205,7 +203,7 @@ function QuickLinksSection({
                 {t(`hub.quick.${link.key}.title`)}
               </Text>
             </Surface>
-          </Pressable>
+          </NativePressable>
         ))}
       </View>
     </View>
@@ -226,15 +224,13 @@ function PartnerCard({
   const connectedDate = formatDate(item.connected_since ?? item.partnership_since);
 
   return (
-    <Pressable
-      accessibilityRole="button"
+    <NativePressable
       accessibilityLabel={item.name}
       className="mb-3 w-full rounded-panel"
       onPress={() => {
-        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         router.push({ pathname: '/(modals)/federation-partner', params: { id: String(item.id) } });
       }}
-      style={({ pressed }) => ({ opacity: pressed ? 0.86 : 1 })}
+      feedback="highlight"
     >
       <HeroCard
         variant="default"
@@ -291,7 +287,7 @@ function PartnerCard({
           </Text>
         </HeroCard.Body>
       </HeroCard>
-    </Pressable>
+    </NativePressable>
   );
 }
 
