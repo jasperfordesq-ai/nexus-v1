@@ -911,7 +911,7 @@ class FederationCreditCommonsController extends BaseApiController
 
         // Optional hashchain verification if a Last-hash header is present
         $remoteHash = $request->header('Last-hash');
-        if ($remoteHash !== null && !CreditCommonsNodeService::verifyHash($remoteHash, $tenantId)) {
+        if (!CreditCommonsNodeService::verifyHash($remoteHash, $tenantId)) {
             return $this->ccError('HashMismatch',
                 'Hashchain verification failed — last hashes do not match', 500);
         }

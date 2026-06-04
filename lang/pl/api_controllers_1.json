@@ -54,6 +54,8 @@
         "api_key_name_required": "Nazwa jest wymagana",
         "api_keys_table_not_configured": "Tabela kluczy API federacji nie jest skonfigurowana",
         "api_key_create_failed": "Tworzenie klucza API nie powiodło się",
+        "api_key_invalid_scope": "Nieznany zakres federacji: :scopes",
+        "api_key_privileged_scope_forbidden": "Tylko superadministrator platformy może wydawać klucze federacji z zakresami zapisu lub administratora.",
         "api_key_not_found": "Klucz API nie znaleziony",
         "api_key_already_revoked": "Klucz API został już odwołany",
         "api_key_revoke_failed": "Odwoływanie klucza API nie powiodło się",

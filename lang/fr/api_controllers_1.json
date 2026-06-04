@@ -54,6 +54,8 @@
         "api_key_name_required": "Le nom est requis",
         "api_keys_table_not_configured": "Table des clés API de fédération non configurée",
         "api_key_create_failed": "Échec de la création de la clé API",
+        "api_key_invalid_scope": "Portée(s) de fédération inconnue(s) : :scopes",
+        "api_key_privileged_scope_forbidden": "Seul un super-administrateur de la plateforme peut émettre des clés de fédération avec des portées d'écriture ou d'administration.",
         "api_key_not_found": "Clé API introuvable",
         "api_key_already_revoked": "La clé API est déjà révoquée",
         "api_key_revoke_failed": "Échec de la révocation de la clé API",

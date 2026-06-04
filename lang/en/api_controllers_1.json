@@ -54,6 +54,8 @@
         "api_key_name_required": "Name is required",
         "api_keys_table_not_configured": "Federation API keys table not configured",
         "api_key_create_failed": "Failed to create API key",
+        "api_key_invalid_scope": "Unknown federation scope(s): :scopes",
+        "api_key_privileged_scope_forbidden": "Only a platform super-admin may issue federation keys with write or admin scopes.",
         "api_key_not_found": "API key not found",
         "api_key_already_revoked": "API key is already revoked",
         "api_key_revoke_failed": "Failed to revoke API key",

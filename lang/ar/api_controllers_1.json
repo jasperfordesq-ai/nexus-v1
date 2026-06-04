@@ -54,6 +54,8 @@
         "api_key_name_required": "الاسم مطلوب",
         "api_keys_table_not_configured": "جدول مفاتيح API للاتحاد غير مُهيَّأ",
         "api_key_create_failed": "فشل إنشاء مفتاح API",
+        "api_key_invalid_scope": "نطاق(ات) اتحاد غير معروف: :scopes",
+        "api_key_privileged_scope_forbidden": "يمكن فقط لمسؤول المنصة الأعلى إصدار مفاتيح اتحاد ذات صلاحيات الكتابة أو الإدارة.",
         "api_key_not_found": "مفتاح API غير موجود",
         "api_key_already_revoked": "مفتاح API تم إلغاؤه بالفعل",
         "api_key_revoke_failed": "فشل إلغاء مفتاح API",

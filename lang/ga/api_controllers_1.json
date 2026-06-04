@@ -54,6 +54,8 @@
         "api_key_name_required": "Tá ainm ag teastáil",
         "api_keys_table_not_configured": "Tábla eochracha API cónaidhme gan chumrú",
         "api_key_create_failed": "Theip ar chruthú eochair API",
+        "api_key_invalid_scope": "Scóip chónaidhme anaithnid: :scopes",
+        "api_key_privileged_scope_forbidden": "Ní féidir ach le sár-riarthóir ardáin eochracha cónaidhme le scóip scríofa nó riaracháin a eisiúint.",
         "api_key_not_found": "Eochair API gan aimsiú",
         "api_key_already_revoked": "Tá eochair API aisghairthe cheana féin",
         "api_key_revoke_failed": "Theip ar aisghairm eochair API",

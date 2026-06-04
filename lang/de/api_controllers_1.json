@@ -54,6 +54,8 @@
         "api_key_name_required": "Name ist erforderlich",
         "api_keys_table_not_configured": "Föderations-API-Schlüsseltabelle nicht konfiguriert",
         "api_key_create_failed": "API-Schlüssel konnte nicht erstellt werden",
+        "api_key_invalid_scope": "Unbekannte Föderations-Berechtigung(en): :scopes",
+        "api_key_privileged_scope_forbidden": "Nur ein Plattform-Super-Admin darf Föderationsschlüssel mit Schreib- oder Admin-Berechtigungen ausstellen.",
         "api_key_not_found": "API-Schlüssel nicht gefunden",
         "api_key_already_revoked": "API-Schlüssel ist bereits widerrufen",
         "api_key_revoke_failed": "API-Schlüssel konnte nicht widerrufen werden",

@@ -54,6 +54,8 @@
         "api_key_name_required": "名前が必要です",
         "api_keys_table_not_configured": "フェデレーションAPIキーテーブルが設定されていません",
         "api_key_create_failed": "APIキーの作成に失敗しました",
+        "api_key_invalid_scope": "不明なフェデレーションスコープ: :scopes",
+        "api_key_privileged_scope_forbidden": "プラットフォームのスーパー管理者のみが、書き込みまたは管理スコープを持つフェデレーションキーを発行できます。",
         "api_key_not_found": "APIキーが見つかりません",
         "api_key_already_revoked": "APIキーはすでに失効されています",
         "api_key_revoke_failed": "APIキーの失効に失敗しました",

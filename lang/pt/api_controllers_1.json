@@ -54,6 +54,8 @@
         "api_key_name_required": "O nome é obrigatório",
         "api_keys_table_not_configured": "Tabela de chaves API da federação não configurada",
         "api_key_create_failed": "Falha ao criar chave API",
+        "api_key_invalid_scope": "Escopo(s) de federação desconhecido(s): :scopes",
+        "api_key_privileged_scope_forbidden": "Apenas um superadministrador da plataforma pode emitir chaves de federação com escopos de escrita ou administração.",
         "api_key_not_found": "Chave API não encontrada",
         "api_key_already_revoked": "A chave API já foi revogada",
         "api_key_revoke_failed": "Falha ao revogar chave API",

@@ -54,6 +54,8 @@
         "api_key_name_required": "Naam is vereist",
         "api_keys_table_not_configured": "Federatie API-sleuteltabel niet geconfigureerd",
         "api_key_create_failed": "API-sleutel aanmaken mislukt",
+        "api_key_invalid_scope": "Onbekende federatie-scope(s): :scopes",
+        "api_key_privileged_scope_forbidden": "Alleen een platform-superbeheerder mag federatiesleutels met schrijf- of beheerscopes uitgeven.",
         "api_key_not_found": "API-sleutel niet gevonden",
         "api_key_already_revoked": "API-sleutel is al ingetrokken",
         "api_key_revoke_failed": "API-sleutel intrekken mislukt",

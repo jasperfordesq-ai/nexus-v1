@@ -906,6 +906,21 @@ class AdminFederationController extends BaseApiController
         if (!$name) { return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_federation.api_key_name_required'), 'name'); }
         if (!$this->tableExists('federation_api_keys')) { return $this->respondWithError('TABLE_MISSING', __('api_controllers_1.admin_federation.api_keys_table_not_configured'), null, 503); }
 
+        // Scope allow-list + privilege gate. Validate against the known federation
+        // scope vocabulary, and require a PLATFORM super-admin to issue value-bearing
+        // scopes — a tenant admin must not be able to self-mint a key that can move
+        // credits (transactions:write) or act as admin across the federation surface.
+        $validScopes = ['members:read', 'members:write', 'transactions:read', 'transactions:write', 'ingest:write', 'admin'];
+        $privilegedScopes = ['members:write', 'transactions:write', 'ingest:write', 'admin'];
+        $scopes = is_array($scopes) ? array_values(array_unique(array_map('strval', $scopes))) : [];
+        $invalidScopes = array_diff($scopes, $validScopes);
+        if (!empty($invalidScopes)) {
+            return $this->respondWithError('INVALID_SCOPE', __('api_controllers_1.admin_federation.api_key_invalid_scope', ['scopes' => implode(', ', $invalidScopes)]), 'scopes', 422);
+        }
+        if (array_intersect($scopes, $privilegedScopes) && !$this->isPlatformSuperAdmin()) {
+            return $this->respondWithError('FORBIDDEN_SCOPE', __('api_controllers_1.admin_federation.api_key_privileged_scope_forbidden'), 'scopes', 403);
+        }
+
         $expiresAt = $this->input('expires_at');
 
         try {

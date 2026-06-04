@@ -393,19 +393,24 @@ class CreditCommonsNodeService
      */
     public static function verifyHash(?string $remoteHash, ?int $tenantId = null): bool
     {
-        if ($remoteHash === null) {
-            return true; // No hash sent — first interaction or hash not required
-        }
-
         $localHash = self::getLastHash($tenantId);
 
-        if ($localHash === null) {
-            // We have no hash yet — accept the remote's hash as our starting point
-            self::recordHash($tenantId ?? TenantContext::getId(), $remoteHash);
-            return true;
+        // An established chain MUST present a matching Last-hash. Previously a
+        // missing/null header returned true unconditionally, which let a caller
+        // bypass an existing hashchain (and replay/forge relays) simply by
+        // omitting the header. Fail closed once a chain exists.
+        if ($localHash !== null) {
+            return $remoteHash !== null && hash_equals($localHash, $remoteHash);
         }
 
-        return hash_equals($localHash, $remoteHash);
+        // No local chain yet — genuine first interaction with a peer that has
+        // already passed federation API-key authentication. Adopt the peer's
+        // hash as the chain root (or start empty if none was provided).
+        if ($remoteHash !== null) {
+            self::recordHash($tenantId ?? TenantContext::getId(), $remoteHash);
+        }
+
+        return true;
     }
 
     /**
