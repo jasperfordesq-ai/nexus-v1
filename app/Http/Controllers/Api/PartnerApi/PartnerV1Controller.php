@@ -277,16 +277,26 @@ class PartnerV1Controller extends BaseApiController
 
         if ($createdCredit) {
             try {
-                Notification::createNotification(
-                    $userId,
-                    __('notifications.credit_received', ['name' => $partnerName, 'amount' => round($hours, 2)]),
-                    '/wallet',
-                    'transaction',
-                    false,
-                    $tenantId
-                );
-                \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'transaction', __('notifications.credit_received', ['name' => $partnerName, 'amount' => round($hours, 2)]), '/wallet');
-                NotificationDispatcher::sendCreditEmail($userId, $partnerName, round($hours, 2), $note);
+                // Render the bell + push text in the RECIPIENT's preferred language —
+                // this is a machine-to-machine partner call, so without this wrap the
+                // notification resolves against the worker/default locale, not the user's.
+                $recipientLocale = (string) (DB::table('users')
+                    ->where('tenant_id', $tenantId)
+                    ->where('id', $userId)
+                    ->value('preferred_language') ?? '');
+
+                \App\I18n\LocaleContext::withLocale($recipientLocale, function () use ($userId, $partnerName, $hours, $note, $tenantId): void {
+                    Notification::createNotification(
+                        $userId,
+                        __('notifications.credit_received', ['name' => $partnerName, 'amount' => round($hours, 2)]),
+                        '/wallet',
+                        'transaction',
+                        false,
+                        $tenantId
+                    );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'transaction', __('notifications.credit_received', ['name' => $partnerName, 'amount' => round($hours, 2)]), '/wallet');
+                    NotificationDispatcher::sendCreditEmail($userId, $partnerName, round($hours, 2), $note);
+                });
             } catch (\Throwable $e) {
                 \Illuminate\Support\Facades\Log::warning('Partner wallet credit notification failed', [
                     'tenant_id' => $tenantId,

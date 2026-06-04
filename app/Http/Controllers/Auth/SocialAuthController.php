@@ -172,10 +172,15 @@ class SocialAuthController extends Controller
             $this->social->unlinkProvider((int) $user->id, $provider);
             return response()->json(['success' => true]);
         } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Social OAuth unlink failed', [
+                'provider' => $provider,
+                'user_id' => (int) $user->id,
+                'error' => $e->getMessage(),
+            ]);
             return response()->json([
                 'success' => false,
                 'error' => 'unlink_failed',
-                'message' => $e->getMessage(),
+                'message' => __('api.social_oauth_unlink_failed'),
             ], 422);
         }
     }
