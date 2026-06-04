@@ -116,6 +116,11 @@ const statusColors: Record<PodcastStatus, 'success' | 'warning' | 'default'> = {
   archived: 'default',
 };
 
+const analyticsTableClassNames = { table: 'min-w-[24rem]' };
+const mediumTableClassNames = { table: 'min-w-[42rem]' };
+const wideTableClassNames = { table: 'min-w-[64rem]' };
+const operationsTableClassNames = { table: 'min-w-[72rem]' };
+
 function formatDate(value?: string | null): string {
   if (!value) return '';
   return new Date(value).toLocaleDateString();
@@ -304,7 +309,7 @@ export default function PodcastsAdmin() {
   );
 
   const actionButtons = (type: 'show' | 'episode', id: number) => (
-    <div className="flex items-center gap-1">
+    <div className="flex min-w-[7.5rem] items-center justify-end gap-1">
       <Tooltip content={t('podcasts_admin.actions.approve')}>
         <Button
           isIconOnly
@@ -347,7 +352,7 @@ export default function PodcastsAdmin() {
   );
 
   const reportButtons = (episodeId: number) => (
-    <div className="flex items-center gap-1">
+    <div className="flex min-w-[7.5rem] items-center justify-end gap-1">
       <Tooltip content={t('podcasts_admin.actions.resolve_report')}>
         <Button
           isIconOnly
@@ -491,18 +496,22 @@ export default function PodcastsAdmin() {
               <span className="text-sm text-muted">{t('podcasts_admin.count', { count: data?.top_episodes.length ?? 0 })}</span>
             </div>
             {data?.top_episodes.length ? (
-              <Table aria-label={t('podcasts_admin.sections.top_episodes')}>
+              <Table aria-label={t('podcasts_admin.sections.top_episodes')} classNames={mediumTableClassNames}>
                 <TableHeader>
-                  <TableColumn>{t('podcasts_admin.columns.title')}</TableColumn>
-                  <TableColumn>{t('podcasts_admin.columns.show')}</TableColumn>
-                  <TableColumn>{t('podcasts_admin.columns.listens')}</TableColumn>
+                  <TableColumn className="min-w-[16rem]">{t('podcasts_admin.columns.title')}</TableColumn>
+                  <TableColumn className="min-w-[14rem]">{t('podcasts_admin.columns.show')}</TableColumn>
+                  <TableColumn align="end">{t('podcasts_admin.columns.listens')}</TableColumn>
                 </TableHeader>
                 <TableBody>
                   {data.top_episodes.map((episode) => (
                     <TableRow key={episode.id}>
-                      <TableCell>{episode.title}</TableCell>
-                      <TableCell>{episode.show?.title ?? t('podcasts_admin.empty_value')}</TableCell>
-                      <TableCell>{episode.listen_count}</TableCell>
+                      <TableCell>
+                        <div className="max-w-[24rem] truncate font-medium text-foreground">{episode.title}</div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="max-w-[20rem] truncate">{episode.show?.title ?? t('podcasts_admin.empty_value')}</div>
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">{episode.listen_count}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -519,16 +528,16 @@ export default function PodcastsAdmin() {
                 <span className="text-sm text-muted">{t('podcasts_admin.count', { count: data?.client_breakdown.length ?? 0 })}</span>
               </div>
               {data?.client_breakdown.length ? (
-                <Table aria-label={t('podcasts_admin.sections.client_breakdown')}>
+                <Table aria-label={t('podcasts_admin.sections.client_breakdown')} classNames={analyticsTableClassNames}>
                   <TableHeader>
                     <TableColumn>{t('podcasts_admin.columns.client')}</TableColumn>
-                    <TableColumn>{t('podcasts_admin.columns.listens')}</TableColumn>
+                    <TableColumn align="end">{t('podcasts_admin.columns.listens')}</TableColumn>
                   </TableHeader>
                   <TableBody>
                     {data.client_breakdown.map((row) => (
                       <TableRow key={row.client}>
                         <TableCell>{row.client ?? t('podcasts_admin.empty_value')}</TableCell>
-                        <TableCell>{row.listens}</TableCell>
+                        <TableCell className="text-right tabular-nums">{row.listens}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -544,16 +553,16 @@ export default function PodcastsAdmin() {
                 <span className="text-sm text-muted">{t('podcasts_admin.count', { count: data?.retention.length ?? 0 })}</span>
               </div>
               {data?.retention.length ? (
-                <Table aria-label={t('podcasts_admin.sections.retention')}>
+                <Table aria-label={t('podcasts_admin.sections.retention')} classNames={analyticsTableClassNames}>
                   <TableHeader>
                     <TableColumn>{t('podcasts_admin.columns.bucket')}</TableColumn>
-                    <TableColumn>{t('podcasts_admin.columns.listens')}</TableColumn>
+                    <TableColumn align="end">{t('podcasts_admin.columns.listens')}</TableColumn>
                   </TableHeader>
                   <TableBody>
                     {data.retention.map((row) => (
                       <TableRow key={row.bucket}>
                         <TableCell>{row.bucket ?? t('podcasts_admin.empty_value')}</TableCell>
-                        <TableCell>{row.listens}</TableCell>
+                        <TableCell className="text-right tabular-nums">{row.listens}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -570,13 +579,13 @@ export default function PodcastsAdmin() {
               <span className="text-sm text-muted">{t('podcasts_admin.count', { count: data?.reports.length ?? 0 })}</span>
             </div>
             {data?.reports.length ? (
-              <Table aria-label={t('podcasts_admin.sections.reports')}>
+              <Table aria-label={t('podcasts_admin.sections.reports')} classNames={wideTableClassNames}>
                 <TableHeader>
-                  <TableColumn>{t('podcasts_admin.columns.episode')}</TableColumn>
-                  <TableColumn>{t('podcasts_admin.columns.reason')}</TableColumn>
-                  <TableColumn>{t('podcasts_admin.columns.details')}</TableColumn>
-                  <TableColumn>{t('podcasts_admin.columns.updated')}</TableColumn>
-                  <TableColumn align="end">{t('podcasts_admin.columns.actions')}</TableColumn>
+                  <TableColumn className="min-w-[18rem]">{t('podcasts_admin.columns.episode')}</TableColumn>
+                  <TableColumn className="min-w-[11rem]">{t('podcasts_admin.columns.reason')}</TableColumn>
+                  <TableColumn className="min-w-[18rem]">{t('podcasts_admin.columns.details')}</TableColumn>
+                  <TableColumn className="min-w-[8rem]">{t('podcasts_admin.columns.updated')}</TableColumn>
+                  <TableColumn align="end" className="min-w-[9rem]">{t('podcasts_admin.columns.actions')}</TableColumn>
                 </TableHeader>
                 <TableBody>
                   {data.reports.map((report) => (
@@ -587,15 +596,19 @@ export default function PodcastsAdmin() {
                             {report.episode_title ?? t('podcasts_admin.report_unknown_episode', { id: report.episode_id })}
                           </div>
                           <div className="truncate text-xs text-muted">
-                            {report.show_title ?? t('podcasts_admin.empty_value')}
-                            {report.reporter_name ? ` - ${t('podcasts_admin.reporter', { name: report.reporter_name })}` : ''}
+                            {report.reporter_name
+                              ? t('podcasts_admin.report_meta', {
+                                  show: report.show_title ?? t('podcasts_admin.empty_value'),
+                                  reporter: t('podcasts_admin.reporter', { name: report.reporter_name }),
+                                })
+                              : report.show_title ?? t('podcasts_admin.empty_value')}
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>{t(`podcasts_admin.report_reasons.${report.reason}`, { defaultValue: report.reason })}</TableCell>
-                      <TableCell>{report.details || t('podcasts_admin.empty_value')}</TableCell>
+                      <TableCell className="max-w-md whitespace-normal text-sm text-muted">{report.details || t('podcasts_admin.empty_value')}</TableCell>
                       <TableCell>{formatDate(report.created_at) || t('podcasts_admin.empty_value')}</TableCell>
-                      <TableCell>{reportButtons(report.episode_id)}</TableCell>
+                      <TableCell className="text-right">{reportButtons(report.episode_id)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -621,14 +634,14 @@ export default function PodcastsAdmin() {
               <span className="text-sm text-muted">{t('podcasts_admin.count', { count: data?.shows.length ?? 0 })}</span>
             </div>
             {data?.shows.length ? (
-              <Table aria-label={t('podcasts_admin.sections.shows')}>
+              <Table aria-label={t('podcasts_admin.sections.shows')} classNames={operationsTableClassNames}>
                 <TableHeader>
-                  <TableColumn>{t('podcasts_admin.columns.title')}</TableColumn>
-                  <TableColumn>{t('podcasts_admin.columns.owner')}</TableColumn>
-                  <TableColumn>{t('podcasts_admin.columns.status')}</TableColumn>
-                  <TableColumn>{t('podcasts_admin.columns.moderation')}</TableColumn>
-                  <TableColumn>{t('podcasts_admin.columns.updated')}</TableColumn>
-                  <TableColumn align="end">{t('podcasts_admin.columns.actions')}</TableColumn>
+                  <TableColumn className="min-w-[22rem]">{t('podcasts_admin.columns.title')}</TableColumn>
+                  <TableColumn className="min-w-[12rem]">{t('podcasts_admin.columns.owner')}</TableColumn>
+                  <TableColumn className="min-w-[8rem]">{t('podcasts_admin.columns.status')}</TableColumn>
+                  <TableColumn className="min-w-[9rem]">{t('podcasts_admin.columns.moderation')}</TableColumn>
+                  <TableColumn className="min-w-[8rem]">{t('podcasts_admin.columns.updated')}</TableColumn>
+                  <TableColumn align="end" className="min-w-[11rem]">{t('podcasts_admin.columns.actions')}</TableColumn>
                 </TableHeader>
                 <TableBody>
                   {data.shows.map((show) => (
@@ -643,7 +656,7 @@ export default function PodcastsAdmin() {
                       <TableCell>{statusChip(show.status)}</TableCell>
                       <TableCell>{moderationChip(show.moderation_status)}</TableCell>
                       <TableCell>{formatDate(show.updated_at) || t('podcasts_admin.empty_value')}</TableCell>
-                      <TableCell>
+                      <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-1">
                           <Tooltip content={t('podcasts_admin.actions.validate_feed')}>
                             <Button
@@ -675,14 +688,14 @@ export default function PodcastsAdmin() {
               <span className="text-sm text-muted">{t('podcasts_admin.count', { count: data?.episodes.length ?? 0 })}</span>
             </div>
             {data?.episodes.length ? (
-              <Table aria-label={t('podcasts_admin.sections.episodes')}>
+              <Table aria-label={t('podcasts_admin.sections.episodes')} classNames={operationsTableClassNames}>
                 <TableHeader>
-                  <TableColumn>{t('podcasts_admin.columns.title')}</TableColumn>
-                  <TableColumn>{t('podcasts_admin.columns.show')}</TableColumn>
-                  <TableColumn>{t('podcasts_admin.columns.author')}</TableColumn>
-                  <TableColumn>{t('podcasts_admin.columns.status')}</TableColumn>
-                  <TableColumn>{t('podcasts_admin.columns.moderation')}</TableColumn>
-                  <TableColumn align="end">{t('podcasts_admin.columns.actions')}</TableColumn>
+                  <TableColumn className="min-w-[22rem]">{t('podcasts_admin.columns.title')}</TableColumn>
+                  <TableColumn className="min-w-[14rem]">{t('podcasts_admin.columns.show')}</TableColumn>
+                  <TableColumn className="min-w-[12rem]">{t('podcasts_admin.columns.author')}</TableColumn>
+                  <TableColumn className="min-w-[8rem]">{t('podcasts_admin.columns.status')}</TableColumn>
+                  <TableColumn className="min-w-[9rem]">{t('podcasts_admin.columns.moderation')}</TableColumn>
+                  <TableColumn align="end" className="min-w-[9rem]">{t('podcasts_admin.columns.actions')}</TableColumn>
                 </TableHeader>
                 <TableBody>
                   {data.episodes.map((episode) => (
@@ -693,11 +706,11 @@ export default function PodcastsAdmin() {
                           <div className="truncate text-xs text-muted">{episode.summary || t('podcasts_admin.empty_value')}</div>
                         </div>
                       </TableCell>
-                      <TableCell>{episode.show?.title ?? t('podcasts_admin.empty_value')}</TableCell>
-                      <TableCell>{episode.author?.name ?? t('podcasts_admin.empty_value')}</TableCell>
+                      <TableCell><div className="max-w-[18rem] truncate">{episode.show?.title ?? t('podcasts_admin.empty_value')}</div></TableCell>
+                      <TableCell><div className="max-w-[16rem] truncate">{episode.author?.name ?? t('podcasts_admin.empty_value')}</div></TableCell>
                       <TableCell>{statusChip(episode.status)}</TableCell>
                       <TableCell>{moderationChip(episode.moderation_status)}</TableCell>
-                      <TableCell>{actionButtons('episode', episode.id)}</TableCell>
+                      <TableCell className="text-right">{actionButtons('episode', episode.id)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

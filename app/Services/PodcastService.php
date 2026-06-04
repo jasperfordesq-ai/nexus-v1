@@ -30,6 +30,8 @@ class PodcastService
     private const HOSTED_AUDIO_ROUTE_TTL_SECONDS = 3600;
     private const LISTEN_DEDUPE_WINDOW_HOURS = 6;
     private const REPORT_AUTO_FLAG_THRESHOLD = 3;
+    private const TITLE_MAX_LENGTH = 200;
+    private const REACTION_MAX_LENGTH = 30;
     private const ALLOWED_AUDIO_TYPES = [
         'audio/mpeg' => 'mp3',
         'audio/mp3' => 'mp3',
@@ -176,7 +178,7 @@ class PodcastService
 
     public static function createShow(int $ownerUserId, array $data): PodcastShow
     {
-        $title = trim((string) ($data['title'] ?? ''));
+        $title = self::requiredText($data['title'] ?? null, self::TITLE_MAX_LENGTH, 'Podcast title is required');
         $visibility = self::normalizeVisibility((string) ($data['visibility'] ?? 'public'));
 
         $show = new PodcastShow([
@@ -222,6 +224,8 @@ class PodcastService
                     $show->{$field} = self::nullableUrl($data[$field] ?? null);
                 } elseif ($field === 'owner_email') {
                     $show->{$field} = self::nullableEmail($data[$field] ?? null);
+                } elseif ($field === 'title') {
+                    $show->{$field} = self::requiredText($data[$field] ?? null, self::TITLE_MAX_LENGTH, 'Podcast title is required');
                 } else {
                     $show->{$field} = self::nullableText($data[$field], $limit);
                 }
@@ -262,7 +266,7 @@ class PodcastService
     public static function createEpisode(PodcastShow $show, int $authorUserId, array $data, ?UploadedFile $audioFile = null): PodcastEpisode
     {
         return DB::transaction(function () use ($show, $authorUserId, $data, $audioFile): PodcastEpisode {
-            $title = trim((string) ($data['title'] ?? ''));
+            $title = self::requiredText($data['title'] ?? null, self::TITLE_MAX_LENGTH, 'Podcast episode title is required');
             $hasHostedAudio = $audioFile !== null;
             $episode = new PodcastEpisode([
                 'show_id' => $show->id,
@@ -327,6 +331,8 @@ class PodcastService
                     self::clearHostedAudio($episode);
                 } elseif ($field === 'cover_image_url') {
                     $episode->{$field} = self::nullableUrl($data[$field] ?? null);
+                } elseif ($field === 'title') {
+                    $episode->{$field} = self::requiredText($data[$field] ?? null, self::TITLE_MAX_LENGTH, 'Podcast episode title is required');
                 } elseif ($field === 'transcript' && !PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_ENABLE_TRANSCRIPTS)) {
                     $episode->{$field} = null;
                 } else {
@@ -438,8 +444,6 @@ class PodcastService
      */
     public static function releaseDueEpisodes(int $limit = 200): int
     {
-        $previousTenant = TenantContext::getId();
-
         $due = PodcastEpisode::withoutGlobalScopes()
             ->where('status', 'published')
             ->where('moderation_status', 'approved')
@@ -453,8 +457,9 @@ class PodcastService
         $released = 0;
         foreach ($due as $episode) {
             try {
-                TenantContext::setById((int) $episode->tenant_id);
-                self::announceEpisode($episode);
+                TenantContext::runForTenant((int) $episode->tenant_id, function () use ($episode): void {
+                    self::announceEpisode($episode);
+                });
                 $released++;
             } catch (\Throwable $e) {
                 Log::warning('[PodcastService] scheduled episode release failed', [
@@ -462,10 +467,6 @@ class PodcastService
                     'error' => $e->getMessage(),
                 ]);
             }
-        }
-
-        if ($previousTenant !== null) {
-            TenantContext::setById((int) $previousTenant);
         }
 
         return $released;
@@ -741,7 +742,7 @@ class PodcastService
             return false;
         }
 
-        $reaction = preg_replace('/[^a-z0-9_-]/i', '', $reaction) ?: 'like';
+        $reaction = self::normalizeReaction($reaction);
         $existing = PodcastEpisodeReaction::where('episode_id', $episode->id)
             ->where('user_id', $userId)
             ->where('reaction', $reaction)
@@ -1561,6 +1562,24 @@ class PodcastService
         }
 
         return $limit ? mb_substr($text, 0, $limit) : $text;
+    }
+
+    private static function requiredText(mixed $value, int $limit, string $message): string
+    {
+        $text = self::nullableText($value, $limit);
+        if ($text === null) {
+            throw new \InvalidArgumentException($message);
+        }
+
+        return $text;
+    }
+
+    private static function normalizeReaction(string $reaction): string
+    {
+        $normalized = preg_replace('/[^a-z0-9_-]/i', '', $reaction) ?: '';
+        $normalized = mb_substr($normalized, 0, self::REACTION_MAX_LENGTH);
+
+        return $normalized !== '' ? $normalized : 'like';
     }
 
     private static function applyConfigVisibilityToEpisode(PodcastEpisode $episode): void

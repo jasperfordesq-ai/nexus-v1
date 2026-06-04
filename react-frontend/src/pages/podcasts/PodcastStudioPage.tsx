@@ -329,7 +329,7 @@ export default function PodcastStudioPage() {
                   <h2 className="text-lg font-semibold">{t('studio.create_show')}</h2>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <Input label={t('fields.show_title')} value={showForm.title} onValueChange={(title) => setShowForm((prev) => ({ ...prev, title }))} />
+                  <Input label={t('fields.show_title')} maxLength={200} value={showForm.title} onValueChange={(title) => setShowForm((prev) => ({ ...prev, title }))} />
                   <Input label={t('fields.category')} value={showForm.category ?? ''} onValueChange={(category) => setShowForm((prev) => ({ ...prev, category }))} />
                   <Input label={t('fields.artwork_url')} value={showForm.artwork_url ?? ''} onValueChange={(artwork_url) => setShowForm((prev) => ({ ...prev, artwork_url }))} />
                   <Input label={t('fields.author_name')} value={showForm.author_name ?? ''} onValueChange={(author_name) => setShowForm((prev) => ({ ...prev, author_name }))} />
@@ -375,7 +375,7 @@ export default function PodcastStudioPage() {
                   ))}
                 </Select>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <Input label={t('fields.episode_title')} value={episodeForm.title} onValueChange={(title) => setEpisodeForm((prev) => ({ ...prev, title }))} />
+                  <Input label={t('fields.episode_title')} maxLength={200} value={episodeForm.title} onValueChange={(title) => setEpisodeForm((prev) => ({ ...prev, title }))} />
                   <Input
                     label={t('fields.audio_url')}
                     value={episodeForm.audio_url}

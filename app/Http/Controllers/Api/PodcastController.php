@@ -12,6 +12,7 @@ use App\Models\PodcastEpisode;
 use App\Models\PodcastShow;
 use App\Services\PodcastConfigurationService;
 use App\Services\PodcastService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
@@ -20,6 +21,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 class PodcastController extends BaseApiController
 {
     use InteractsWithPodcasts;
+
+    private const TITLE_MAX_LENGTH = 200;
 
     protected bool $isV2Api = true;
 
@@ -143,10 +146,11 @@ class PodcastController extends BaseApiController
         $this->ensurePodcastsFeature();
         $this->rateLimit('podcasts_write', 30, 60);
         $userId = $this->requirePodcastAuthor();
+        $input = $this->getAllInput();
 
-        $title = trim((string) $this->input('title', ''));
-        if ($title === '') {
-            return $this->respondWithError('VALIDATION_FAILED', __('api_controllers_2.podcasts.title_required'), 'title', 422);
+        $titleError = $this->validatePodcastTitle($input['title'] ?? null, 'api_controllers_2.podcasts.title_required');
+        if ($titleError) {
+            return $titleError;
         }
 
         $maxShows = (int) PodcastConfigurationService::get(PodcastConfigurationService::CONFIG_MAX_SHOWS_PER_USER);
@@ -154,7 +158,7 @@ class PodcastController extends BaseApiController
             return $this->respondWithError('VALIDATION_FAILED', __('api_controllers_2.podcasts.max_shows_reached', ['max' => $maxShows]), null, 422);
         }
 
-        $show = PodcastService::createShow($userId, $this->getAllInput());
+        $show = PodcastService::createShow($userId, $input);
 
         return $this->respondWithData($show, null, 201);
     }
@@ -168,7 +172,15 @@ class PodcastController extends BaseApiController
         $show = $this->findPodcastShowOrFail($id);
         $this->ensurePodcastOwnerOrAdmin($show, $userId);
 
-        return $this->respondWithData(PodcastService::updateShow($show, $this->getAllInput()));
+        $input = $this->getAllInput();
+        if (array_key_exists('title', $input)) {
+            $titleError = $this->validatePodcastTitle($input['title'], 'api_controllers_2.podcasts.title_required');
+            if ($titleError) {
+                return $titleError;
+            }
+        }
+
+        return $this->respondWithData(PodcastService::updateShow($show, $input));
     }
 
     public function publish(int $id): JsonResponse
@@ -217,18 +229,24 @@ class PodcastController extends BaseApiController
         $show = $this->findPodcastShowOrFail($showId);
         $this->ensurePodcastOwnerOrAdmin($show, $userId);
 
-        $title = trim((string) $this->input('title', ''));
+        $input = $this->podcastInput();
+        $title = trim((string) ($input['title'] ?? ''));
         $audioUrl = trim((string) $this->input('audio_url', ''));
         $audioFile = request()->file('audio');
-        if ($title === '') {
-            return $this->respondWithError('VALIDATION_FAILED', __('api_controllers_2.podcasts.episode_title_required'), 'title', 422);
+        $titleError = $this->validatePodcastTitle($title, 'api_controllers_2.podcasts.episode_title_required');
+        if ($titleError) {
+            return $titleError;
         }
         if ($audioUrl === '' && !$audioFile) {
             return $this->respondWithError('VALIDATION_FAILED', __('api_controllers_2.podcasts.audio_url_required'), 'audio_url', 422);
         }
+        $scheduleError = $this->validatePodcastSchedule($input);
+        if ($scheduleError) {
+            return $scheduleError;
+        }
 
         try {
-            $episode = PodcastService::createEpisode($show, $userId, $this->podcastInput(), $audioFile);
+            $episode = PodcastService::createEpisode($show, $userId, $input, $audioFile);
         } catch (\InvalidArgumentException $e) {
             return $this->podcastValidationError($e);
         }
@@ -249,8 +267,20 @@ class PodcastController extends BaseApiController
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.podcasts.episode_not_found'), null, 404);
         }
 
+        $input = $this->podcastInput();
+        if (array_key_exists('title', $input)) {
+            $titleError = $this->validatePodcastTitle($input['title'], 'api_controllers_2.podcasts.episode_title_required');
+            if ($titleError) {
+                return $titleError;
+            }
+        }
+        $scheduleError = $this->validatePodcastSchedule($input);
+        if ($scheduleError) {
+            return $scheduleError;
+        }
+
         try {
-            return $this->respondWithData(PodcastService::updateEpisode($episode, $this->podcastInput(), request()->file('audio')));
+            return $this->respondWithData(PodcastService::updateEpisode($episode, $input, request()->file('audio')));
         } catch (\InvalidArgumentException $e) {
             return $this->podcastValidationError($e);
         }
@@ -505,5 +535,44 @@ class PodcastController extends BaseApiController
         }
 
         return $input;
+    }
+
+    private function validatePodcastTitle(mixed $value, string $requiredKey): ?JsonResponse
+    {
+        $title = trim((string) $value);
+        if ($title === '') {
+            return $this->respondWithError('VALIDATION_FAILED', __($requiredKey), 'title', 422);
+        }
+
+        if (mb_strlen($title) > self::TITLE_MAX_LENGTH) {
+            return $this->respondWithError(
+                'VALIDATION_FAILED',
+                __('api_controllers_2.podcasts.title_too_long', ['max' => self::TITLE_MAX_LENGTH]),
+                'title',
+                422
+            );
+        }
+
+        return null;
+    }
+
+    private function validatePodcastSchedule(array $input): ?JsonResponse
+    {
+        if (!array_key_exists('scheduled_for', $input) || $input['scheduled_for'] === null || $input['scheduled_for'] === '') {
+            return null;
+        }
+
+        try {
+            Carbon::parse((string) $input['scheduled_for']);
+        } catch (\Throwable) {
+            return $this->respondWithError(
+                'VALIDATION_FAILED',
+                __('api_controllers_2.podcasts.invalid_scheduled_for'),
+                'scheduled_for',
+                422
+            );
+        }
+
+        return null;
     }
 }

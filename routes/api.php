@@ -1109,7 +1109,6 @@ Route::post('/v2/podcasts/{showId}/episodes/{episodeId}/publish', [\App\Http\Con
 Route::post('/v2/podcasts/{showId}/episodes/{episodeId}/archive', [\App\Http\Controllers\Api\PodcastController::class, 'archiveEpisode'])->where(['showId' => '[0-9]+', 'episodeId' => '[0-9]+']);
 Route::delete('/v2/podcasts/{showId}/episodes/{episodeId}', [\App\Http\Controllers\Api\PodcastController::class, 'destroyEpisode'])->where(['showId' => '[0-9]+', 'episodeId' => '[0-9]+']);
 Route::post('/v2/podcasts/{showId}/subscribe', [\App\Http\Controllers\Api\PodcastController::class, 'subscribe'])->where('showId', '[0-9]+');
-Route::post('/v2/podcasts/episodes/{episodeId}/listen', [\App\Http\Controllers\Api\PodcastController::class, 'listen'])->where('episodeId', '[0-9]+');
 Route::post('/v2/podcasts/episodes/{episodeId}/reaction', [\App\Http\Controllers\Api\PodcastController::class, 'reaction'])->where('episodeId', '[0-9]+');
 Route::post('/v2/podcasts/episodes/{episodeId}/report', [\App\Http\Controllers\Api\PodcastController::class, 'report'])->where('episodeId', '[0-9]+');
 
@@ -1127,6 +1126,7 @@ Route::get('/v2/courses/{idOrSlug}', [\App\Http\Controllers\Api\CourseController
 // Podcasts Module (ALPHA) — Public routes (no auth required)
 // ============================================
 Route::get('/v2/podcasts', [\App\Http\Controllers\Api\PodcastController::class, 'index']);
+Route::post('/v2/podcasts/episodes/{episodeId}/listen', [\App\Http\Controllers\Api\PodcastController::class, 'listen'])->where('episodeId', '[0-9]+');
 Route::get('/v2/podcasts/media/{tenantId}/{episodeId}/audio', [\App\Http\Controllers\Api\PodcastController::class, 'audio'])->where(['tenantId' => '[0-9]+', 'episodeId' => '[0-9]+']);
 Route::get('/v2/podcasts/transcripts/{tenantId}/{episodeId}.txt', [\App\Http\Controllers\Api\PodcastController::class, 'transcript'])->where(['tenantId' => '[0-9]+', 'episodeId' => '[0-9]+']);
 Route::get('/v2/podcasts/chapters/{tenantId}/{episodeId}.json', [\App\Http\Controllers\Api\PodcastController::class, 'chapters'])->where(['tenantId' => '[0-9]+', 'episodeId' => '[0-9]+']);

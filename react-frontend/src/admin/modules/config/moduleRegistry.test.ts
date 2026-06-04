@@ -3,8 +3,25 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { getFeatureModules } from './moduleRegistry';
+
+const adminLocale = JSON.parse(
+  readFileSync('public/locales/en/admin.json', 'utf8')
+) as { config: Record<string, string> };
+
+function slugConfigText(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '') || 'value';
+}
+
+function optionToken(optionKey: string): string {
+  return optionKey.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+}
 
 describe('module registry podcast module', () => {
   it('registers podcasts with editable member authoring and moderation options', () => {
@@ -29,5 +46,25 @@ describe('module registry podcast module', () => {
 
     expect(ids.indexOf('courses')).toBeLessThan(ids.indexOf('podcasts'));
     expect(ids.indexOf('podcasts')).toBeLessThan(ids.indexOf('member_premium'));
+  });
+
+  it('has admin translations for every podcast configuration control', () => {
+    const podcasts = getFeatureModules().find(module => module.id === 'podcasts');
+    expect(podcasts).toBeDefined();
+
+    const config = adminLocale.config;
+    for (const option of podcasts?.configOptions ?? []) {
+      const token = optionToken(option.key);
+      expect(config[`option_${token}_label`], `${option.key} label`).toBeTypeOf('string');
+      expect(config[`option_${token}_desc`], `${option.key} description`).toBeTypeOf('string');
+      expect(config[`option_category_${slugConfigText(option.category)}`], `${option.category} category`).toBeTypeOf('string');
+
+      for (const choice of option.choices ?? []) {
+        expect(
+          config[`option_choice_${token}_${slugConfigText(choice.value)}`],
+          `${option.key} choice ${choice.value}`,
+        ).toBeTypeOf('string');
+      }
+    }
   });
 });

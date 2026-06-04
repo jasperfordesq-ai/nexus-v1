@@ -13,6 +13,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class ProcessPodcastEpisodeMedia implements ShouldQueue
 {
@@ -20,6 +21,12 @@ class ProcessPodcastEpisodeMedia implements ShouldQueue
     use InteractsWithQueue;
     use Queueable;
     use SerializesModels;
+
+    /** Cap retries so a permanently-bad upload can't requeue forever. */
+    public int $tries = 3;
+
+    /** Seconds to wait between retries (rides out transient storage/DB hiccups). */
+    public int $backoff = 30;
 
     public function __construct(
         public int $tenantId,
@@ -29,21 +36,51 @@ class ProcessPodcastEpisodeMedia implements ShouldQueue
 
     public function handle(): void
     {
-        if (!TenantContext::setById($this->tenantId)) {
+        try {
+            TenantContext::runForTenant($this->tenantId, function (): void {
+                $episode = PodcastEpisode::find($this->episodeId);
+                if (!$episode || !$episode->audio_storage_path) {
+                    return;
+                }
+
+                // Provision hook: real scanners/transcoders can replace this once
+                // cloud/object storage processing infrastructure is configured. Until
+                // then, never label unscanned media as clean.
+                $episode->media_scan_status = $episode->media_scan_status === 'pending' ? 'scan_unavailable' : $episode->media_scan_status;
+                $episode->media_processing_status = $episode->media_processing_status === 'pending' ? 'ready_for_processing' : $episode->media_processing_status;
+                $episode->media_duration_source = $episode->duration_seconds ? ($episode->media_duration_source ?: 'creator') : $episode->media_duration_source;
+                $episode->save();
+            });
+        } catch (\InvalidArgumentException) {
+            // Bad/missing tenant context — there is nothing to process; do not retry.
             return;
         }
+        // Any other throwable propagates so the queue retries transient failures;
+        // once $tries is exhausted the job lands in failed() below.
+    }
 
-        $episode = PodcastEpisode::find($this->episodeId);
-        if (!$episode || !$episode->audio_storage_path) {
-            return;
+    /**
+     * After all retries are exhausted, surface the stuck media as "failed" so it is
+     * visible to operators instead of silently sitting in pending/ready_for_processing.
+     */
+    public function failed(\Throwable $e): void
+    {
+        try {
+            TenantContext::runForTenant($this->tenantId, function (): void {
+                $episode = PodcastEpisode::find($this->episodeId);
+                if ($episode && in_array($episode->media_processing_status, ['pending', 'ready_for_processing'], true)) {
+                    $episode->media_processing_status = 'failed';
+                    $episode->save();
+                }
+            });
+        } catch (\Throwable) {
+            // The failure handler must never throw.
         }
 
-        // Provision hook: real scanners/transcoders can replace this once
-        // cloud/object storage processing infrastructure is configured. Until
-        // then, never label unscanned media as clean.
-        $episode->media_scan_status = $episode->media_scan_status === 'pending' ? 'scan_unavailable' : $episode->media_scan_status;
-        $episode->media_processing_status = $episode->media_processing_status === 'pending' ? 'ready_for_processing' : $episode->media_processing_status;
-        $episode->media_duration_source = $episode->duration_seconds ? ($episode->media_duration_source ?: 'creator') : $episode->media_duration_source;
-        $episode->save();
+        Log::warning('ProcessPodcastEpisodeMedia permanently failed', [
+            'tenant_id' => $this->tenantId,
+            'episode_id' => $this->episodeId,
+            'error' => $e->getMessage(),
+        ]);
     }
 }

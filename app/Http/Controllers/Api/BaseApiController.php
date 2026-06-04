@@ -532,7 +532,7 @@ abstract class BaseApiController extends Controller
      */
     protected function getOptionalUserId(): ?int
     {
-        return $this->resolveUserId();
+        return $this->resolveSanctumUserOptionally() ?? $this->resolveUserId();
     }
 
     /**
@@ -770,7 +770,48 @@ abstract class BaseApiController extends Controller
      */
     protected function resolveSanctumUserOptionally(): ?int
     {
-        // 1. Try the Sanctum guard directly
+        $bearer = request()->bearerToken();
+
+        // 1. If this request has an Authorization header, resolve that exact
+        // bearer token first. Public optional-auth routes can otherwise observe
+        // stale guard state across multiple requests in the same test process.
+        if ($bearer) {
+            try {
+                $token = \Laravel\Sanctum\PersonalAccessToken::findToken($bearer);
+                if ($token && $token->tokenable) {
+                    return (int) $token->tokenable->id;
+                }
+            } catch (\Throwable $e) {
+                // Not a Sanctum token — try legacy JWT
+            }
+
+            try {
+                $tokenService = app(\App\Services\TokenService::class);
+                $payload = $tokenService->validateToken($bearer);
+                if ($payload) {
+                    $userId = (int) ($payload['user_id'] ?? $payload['sub'] ?? 0);
+                    if ($userId) {
+                        return $userId;
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Invalid JWT — ignore
+            }
+        }
+
+        // 2. Try the Sanctum guard directly. Public routes do not run the
+        // auth:sanctum middleware, but explicitly probing the guard still lets
+        // optional-auth endpoints recognize stateful SPA/cookie sessions.
+        try {
+            $user = Auth::guard('sanctum')->user();
+            if ($user) {
+                return (int) $user->id;
+            }
+        } catch (\Throwable $e) {
+            // Invalid token/session — try fallbacks
+        }
+
+        // 3. Try the configured API guard used by legacy/hybrid callers.
         try {
             $user = Auth::guard('api')->user();
             if ($user) {
@@ -778,35 +819,6 @@ abstract class BaseApiController extends Controller
             }
         } catch (\Throwable $e) {
             // Invalid token — try fallbacks
-        }
-
-        $bearer = request()->bearerToken();
-        if (!$bearer) {
-            return null;
-        }
-
-        // 2. Try Sanctum PersonalAccessToken lookup
-        try {
-            $token = \Laravel\Sanctum\PersonalAccessToken::findToken($bearer);
-            if ($token && $token->tokenable) {
-                return (int) $token->tokenable->id;
-            }
-        } catch (\Throwable $e) {
-            // Not a Sanctum token — try legacy JWT
-        }
-
-        // 3. Try legacy JWT validation (same logic as Authenticate middleware)
-        try {
-            $tokenService = app(\App\Services\TokenService::class);
-            $payload = $tokenService->validateToken($bearer);
-            if ($payload) {
-                $userId = (int) ($payload['user_id'] ?? $payload['sub'] ?? 0);
-                if ($userId) {
-                    return $userId;
-                }
-            }
-        } catch (\Throwable $e) {
-            // Invalid JWT — ignore
         }
 
         return null;

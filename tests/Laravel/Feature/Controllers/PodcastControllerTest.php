@@ -121,6 +121,26 @@ class PodcastControllerTest extends TestCase
         $publish->assertJsonPath('data.moderation_status', 'approved');
     }
 
+    public function test_show_title_validation_prevents_database_errors(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+
+        $this->apiPost('/v2/podcasts', [
+            'title' => str_repeat('A', 201),
+        ])->assertStatus(422)
+            ->assertJsonPath('errors.0.field', 'title');
+
+        $showId = $this->apiPost('/v2/podcasts', [
+            'title' => 'Valid Podcast Title',
+        ])->assertStatus(201)->json('data.id');
+
+        $this->apiPut("/v2/podcasts/{$showId}", [
+            'title' => '',
+        ])->assertStatus(422)
+            ->assertJsonPath('errors.0.field', 'title');
+    }
+
     public function test_moderation_can_be_enabled_and_keeps_published_show_pending(): void
     {
         $this->enablePodcasts(true);
@@ -299,6 +319,40 @@ class PodcastControllerTest extends TestCase
         $detail = $this->apiGet("/v2/podcasts/{$showSlug}/" . $episode->json('data.slug'));
         $detail->assertStatus(200);
         $this->assertNull($detail->json('data.transcript'));
+    }
+
+    public function test_episode_title_and_schedule_validation_prevents_parser_and_database_errors(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+
+        $showId = $this->apiPost('/v2/podcasts', [
+            'title' => 'Episode Validation Show',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+
+        $this->apiPost("/v2/podcasts/{$showId}/episodes", [
+            'title' => str_repeat('B', 201),
+            'audio_url' => 'https://cdn.example.test/too-long.mp3',
+        ])->assertStatus(422)
+            ->assertJsonPath('errors.0.field', 'title');
+
+        $this->apiPost("/v2/podcasts/{$showId}/episodes", [
+            'title' => 'Bad Date',
+            'audio_url' => 'https://cdn.example.test/bad-date.mp3',
+            'scheduled_for' => 'not a real date',
+        ])->assertStatus(422)
+            ->assertJsonPath('errors.0.field', 'scheduled_for');
+
+        $episodeId = $this->apiPost("/v2/podcasts/{$showId}/episodes", [
+            'title' => 'Valid Episode Title',
+            'audio_url' => 'https://cdn.example.test/valid.mp3',
+        ])->assertStatus(201)->json('data.id');
+
+        $this->apiPut("/v2/podcasts/{$showId}/episodes/{$episodeId}", [
+            'title' => '',
+        ])->assertStatus(422)
+            ->assertJsonPath('errors.0.field', 'title');
     }
 
     public function test_hosted_private_audio_is_served_only_with_signed_url(): void
@@ -741,6 +795,119 @@ class PodcastControllerTest extends TestCase
         ]);
     }
 
+    public function test_long_reaction_values_are_normalized_before_storage(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+
+        $show = $this->apiPost('/v2/podcasts', [
+            'title' => 'Reaction Normalization Show',
+            'visibility' => 'public',
+        ]);
+        $showId = $show->json('data.id');
+        $this->apiPost("/v2/podcasts/{$showId}/publish")->assertStatus(200);
+
+        $episode = $this->apiPost("/v2/podcasts/{$showId}/episodes", [
+            'title' => 'Reaction Normalization Episode',
+            'audio_url' => 'https://cdn.example.test/reaction.mp3',
+            'visibility' => 'public',
+        ]);
+        $episodeId = $episode->json('data.id');
+        $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episodeId}/publish")->assertStatus(200);
+
+        $reaction = str_repeat('celebrate-', 10);
+        $this->apiPost("/v2/podcasts/episodes/{$episodeId}/reaction", [
+            'reaction' => $reaction,
+        ])->assertStatus(200)
+            ->assertJsonPath('data.active', true);
+
+        $stored = (string) DB::table('podcast_episode_reactions')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('episode_id', $episodeId)
+            ->value('reaction');
+        $this->assertSame(30, strlen($stored));
+
+        $this->apiPost("/v2/podcasts/episodes/{$episodeId}/reaction", [
+            'reaction' => $reaction,
+        ])->assertStatus(200)
+            ->assertJsonPath('data.active', false);
+    }
+
+    public function test_anonymous_public_listens_are_recorded_without_authentication(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+
+        $show = $this->apiPost('/v2/podcasts', [
+            'title' => 'Public Listen Analytics Show',
+            'visibility' => 'public',
+        ]);
+        $showId = $show->json('data.id');
+        $this->apiPost("/v2/podcasts/{$showId}/publish")->assertStatus(200);
+
+        $episode = $this->apiPost("/v2/podcasts/{$showId}/episodes", [
+            'title' => 'Public Listen Analytics Episode',
+            'audio_url' => 'https://cdn.example.test/public-listen.mp3',
+            'visibility' => 'public',
+            'duration_seconds' => 90,
+        ]);
+        $episodeId = $episode->json('data.id');
+        $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episodeId}/publish")->assertStatus(200);
+
+        $this->app['auth']->forgetGuards();
+        TenantContext::setById($this->testTenantId);
+
+        $this->withHeader('User-Agent', 'Mozilla/5.0')->apiPost("/v2/podcasts/episodes/{$episodeId}/listen", [
+            'listened_seconds' => 120,
+            'session_id' => 'anonymous-public-listener',
+            'completed' => true,
+        ])->assertStatus(200);
+
+        $this->assertDatabaseHas('podcast_episode_listens', [
+            'tenant_id' => $this->testTenantId,
+            'episode_id' => $episodeId,
+            'user_id' => null,
+            'listened_seconds' => 90,
+            'completed' => 1,
+            'client_family' => 'browser',
+        ]);
+        $this->assertSame(1, (int) DB::table('podcast_episodes')->where('id', $episodeId)->value('listen_count'));
+    }
+
+    public function test_anonymous_private_listens_are_not_recorded(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+
+        $show = $this->apiPost('/v2/podcasts', [
+            'title' => 'Private Listen Analytics Show',
+            'visibility' => 'public',
+        ]);
+        $showId = $show->json('data.id');
+        $this->apiPost("/v2/podcasts/{$showId}/publish")->assertStatus(200);
+
+        $episode = $this->apiPost("/v2/podcasts/{$showId}/episodes", [
+            'title' => 'Private Listen Analytics Episode',
+            'audio_url' => 'https://cdn.example.test/private-listen.mp3',
+            'visibility' => 'private',
+        ]);
+        $episodeId = $episode->json('data.id');
+        $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episodeId}/publish")->assertStatus(200);
+
+        $this->app['auth']->forgetGuards();
+        TenantContext::setById($this->testTenantId);
+
+        $this->apiPost("/v2/podcasts/episodes/{$episodeId}/listen", [
+            'listened_seconds' => 30,
+            'session_id' => 'anonymous-private-listener',
+        ])->assertStatus(404);
+
+        $this->assertDatabaseMissing('podcast_episode_listens', [
+            'tenant_id' => $this->testTenantId,
+            'episode_id' => $episodeId,
+        ]);
+    }
+
     public function test_scheduled_episode_is_announced_only_once_when_due(): void
     {
         $this->enablePodcasts(true);
@@ -804,6 +971,33 @@ class PodcastControllerTest extends TestCase
             ->where('user_id', $subscriber->id)
             ->where('type', 'podcast_episode')
             ->count());
+    }
+
+    public function test_release_due_episodes_restores_missing_tenant_context(): void
+    {
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+
+        $showId = $this->apiPost('/v2/podcasts', [
+            'title' => 'Tenant Context Release Show',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+        $this->apiPost("/v2/podcasts/{$showId}/publish")->assertStatus(200);
+
+        $episodeId = $this->apiPost("/v2/podcasts/{$showId}/episodes", [
+            'title' => 'Due Episode Context Reset',
+            'audio_url' => 'https://cdn.example.test/context-reset.mp3',
+            'visibility' => 'public',
+            'scheduled_for' => now()->subMinute()->toIso8601String(),
+        ])->assertStatus(201)->json('data.id');
+        $this->apiPost("/v2/podcasts/{$showId}/episodes/{$episodeId}/publish")->assertStatus(200);
+
+        DB::table('podcast_episodes')->where('id', $episodeId)->update(['announced_at' => null]);
+
+        TenantContext::reset();
+        PodcastService::releaseDueEpisodes();
+
+        $this->assertNull(TenantContext::currentId());
     }
 
     public function test_cloud_storage_can_be_selected_but_local_remains_default(): void
@@ -907,6 +1101,28 @@ class PodcastControllerTest extends TestCase
 
         $this->assertSame('scan_unavailable', DB::table('podcast_episodes')->where('id', $episodeId)->value('media_scan_status'));
         $this->assertSame('ready_for_processing', DB::table('podcast_episodes')->where('id', $episodeId)->value('media_processing_status'));
+    }
+
+    public function test_media_processing_job_restores_missing_tenant_context(): void
+    {
+        Storage::fake('local');
+        $this->enablePodcasts(true);
+        $this->actingAsMember();
+
+        $showId = $this->apiPost('/v2/podcasts', [
+            'title' => 'Media Job Tenant Context Show',
+            'visibility' => 'public',
+        ])->assertStatus(201)->json('data.id');
+
+        $episodeId = $this->post("/api/v2/podcasts/{$showId}/episodes", [
+            'title' => 'Context-clean Audio',
+            'audio' => UploadedFile::fake()->create('context-clean.mp3', 2, 'audio/mpeg'),
+        ], $this->withTenantHeader())->assertStatus(201)->json('data.id');
+
+        TenantContext::reset();
+        (new ProcessPodcastEpisodeMedia($this->testTenantId, $episodeId))->handle();
+
+        $this->assertNull(TenantContext::currentId());
     }
 
     public function test_members_can_subscribe_and_report_episodes_for_moderation(): void
