@@ -709,6 +709,7 @@
     "title": "Groepsbranding",
     "primary_color": "Primaire kleur",
     "accent_color": "Accentkleur",
+    "hue": "Tint",
     "preview": "Voorbeeld"
   },
   "member_fallback": "User"

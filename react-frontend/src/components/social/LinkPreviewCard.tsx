@@ -196,7 +196,7 @@ export function LinkPreviewCard({ preview, compact = false }: LinkPreviewCardPro
       <Card className="overflow-hidden border border-[var(--border-default)] bg-[var(--surface-elevated)] hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
         {/* Image */}
         {showImage && (
-          <div className="w-full overflow-hidden" style={{ aspectRatio: '2 / 1' }}>
+          <div className="w-full overflow-hidden aspect-[2/1]">
             <img
               src={safeUrl(imageUrl!)}
               alt={title ? `Preview for ${title}` : `Preview from ${domain}`}

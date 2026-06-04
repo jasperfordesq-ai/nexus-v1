@@ -81,10 +81,7 @@ export function LocationRadiusFilter({
               thumb: 'bg-white shadow-md',
             }}
           />
-          <span
-            className="text-xs font-medium whitespace-nowrap min-w-[40px] text-right"
-            style={{ color: 'var(--text-muted)' }}
-          >
+          <span className="text-xs font-medium whitespace-nowrap min-w-[40px] text-right text-[var(--text-muted)]">
             {radiusKm} {t('location.km')}
           </span>
         </div>

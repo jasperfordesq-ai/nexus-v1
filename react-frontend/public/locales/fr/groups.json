@@ -709,6 +709,7 @@
     "title": "Image du groupe",
     "primary_color": "Couleur principale",
     "accent_color": "Couleur d accent",
+    "hue": "Teinte",
     "preview": "Apercu"
   },
   "member_fallback": "User"

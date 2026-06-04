@@ -308,7 +308,7 @@ export function KBArticlePage() {
           {/* YouTube Video */}
           {article.video_url && extractYouTubeId(article.video_url) && (
             <div className="mb-6">
-              <div className="relative w-full rounded-xl overflow-hidden" style={{ paddingBottom: '56.25%' }}>
+              <div className="relative w-full rounded-xl overflow-hidden aspect-video">
                 <iframe
                   className="absolute inset-0 w-full h-full"
                   src={`https://www.youtube-nocookie.com/embed/${extractYouTubeId(article.video_url)}?cc_load_policy=1`}

@@ -97,13 +97,10 @@ export function VideoUploader({ onVideoSelect, onVideoRemove, selectedVideo }: V
             <Video className="w-5 h-5 text-indigo-500" aria-hidden="true" />
           </div>
           <div className="flex-1 min-w-0">
-            <p
-              className="text-sm font-medium truncate"
-              style={{ color: 'var(--text-primary)' }}
-            >
+            <p className="text-sm font-medium truncate text-[var(--text-primary)]">
               {selectedVideo.name}
             </p>
-            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-xs text-[var(--text-muted)]">
               {formatFileSize(selectedVideo.size)}
             </p>
           </div>

@@ -709,6 +709,7 @@
     "title": "Gruppenbranding",
     "primary_color": "Prim?rfarbe",
     "accent_color": "Akzentfarbe",
+    "hue": "Farbton",
     "preview": "Vorschau"
   },
   "member_fallback": "User"

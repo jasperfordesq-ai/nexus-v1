@@ -709,6 +709,7 @@
     "title": "Marka grupy",
     "primary_color": "Kolor glowny",
     "accent_color": "Kolor akcentu",
+    "hue": "Odcień",
     "preview": "Podglad"
   },
   "member_fallback": "User"

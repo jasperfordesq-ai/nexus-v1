@@ -76,7 +76,7 @@ export function YouTubeEmbed({ embedUrl, thumbnailUrl, title }: YouTubeEmbedProp
     <Card
       className="overflow-hidden border border-[var(--border-default)] bg-[var(--surface-elevated)]"
     >
-      <div className="relative w-full" style={{ aspectRatio: '16 / 9' }}>
+      <div className="relative w-full aspect-video">
         {isPlaying ? (
           <iframe
             src={embedSrc}

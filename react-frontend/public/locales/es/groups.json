@@ -709,6 +709,7 @@
     "title": "Marca del grupo",
     "primary_color": "Color principal",
     "accent_color": "Color de acento",
+    "hue": "Tono",
     "preview": "Vista previa"
   },
   "member_fallback": "User"

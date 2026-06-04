@@ -709,6 +709,7 @@
     "title": "Branding del gruppo",
     "primary_color": "Colore principale",
     "accent_color": "Colore accento",
+    "hue": "Tonalità",
     "preview": "Anteprima"
   },
   "member_fallback": "User"

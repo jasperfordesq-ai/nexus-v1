@@ -709,6 +709,7 @@
     "title": "グループブランディング",
     "primary_color": "プライマリカラー",
     "accent_color": "アクセントカラー",
+    "hue": "色相",
     "preview": "プレビュー"
   },
   "member_fallback": "User"

@@ -37,6 +37,7 @@ const DEFAULT_ACCENT = '#7928ca';
 
 /** A single labelled brand-colour picker. */
 function BrandColor({ label, value, onChange }: { label: ReactNode; value: string; onChange: (hex: string) => void }) {
+  const { t } = useTranslation('groups');
   return (
     <ColorPicker value={parseColor(value)} onChange={(color) => onChange(color.toString('hex'))}>
       <ColorPicker.Trigger className="flex items-center gap-3">
@@ -56,7 +57,7 @@ function BrandColor({ label, value, onChange }: { label: ReactNode; value: strin
         >
           <ColorArea.Thumb />
         </ColorArea>
-        <ColorSlider channel="hue" className="gap-1 px-1" colorSpace="hsb" aria-label="Hue">
+        <ColorSlider channel="hue" className="gap-1 px-1" colorSpace="hsb" aria-label={t('branding.hue')}>
           <ColorSlider.Track>
             <ColorSlider.Thumb />
           </ColorSlider.Track>

@@ -709,6 +709,7 @@
     "title": "هوية المجموعة البصرية",
     "primary_color": "اللون الأساسي",
     "accent_color": "لون التمييز",
+    "hue": "تدرج اللون",
     "preview": "معاينة"
   },
   "member_fallback": "User"
