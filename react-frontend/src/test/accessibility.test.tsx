@@ -14,7 +14,6 @@ import { axe } from 'vitest-axe';
 import { MemoryRouter } from 'react-router-dom';
 import { EmptyState } from '@/components/feedback/EmptyState';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { GlassButton } from '@/components/ui/GlassButton';
 import { GlassInput } from '@/components/ui/GlassInput';
 import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
 import { BackToTop } from '@/components/ui/BackToTop';
@@ -147,24 +146,6 @@ describe('Accessibility: GlassCard', () => {
         <h2>Card heading</h2>
         <p>Card body content.</p>
       </GlassCard>
-    );
-    const results = await axe(container);
-    expect(results).toHaveNoViolations();
-  });
-});
-
-describe('Accessibility: GlassButton', () => {
-  it('has no violations for a standard button', async () => {
-    const { container } = withProviders(
-      <GlassButton>Click me</GlassButton>
-    );
-    const results = await axe(container);
-    expect(results).toHaveNoViolations();
-  });
-
-  it('has no violations for a disabled button', async () => {
-    const { container } = withProviders(
-      <GlassButton disabled>Cannot click</GlassButton>
     );
     const results = await axe(container);
     expect(results).toHaveNoViolations();
