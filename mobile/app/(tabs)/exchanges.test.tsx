@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
+import { render, fireEvent, waitFor } from '@testing-library/react-native';
 
 // --- Mocks ---
 
@@ -73,6 +73,15 @@ jest.mock('@expo/vector-icons', () => ({
 
 jest.mock('@/lib/api/exchanges', () => ({
   getExchanges: jest.fn(),
+  getExchangeCategories: jest.fn(),
+  saveExchange: jest.fn(),
+  unsaveExchange: jest.fn(),
+}));
+
+jest.mock('expo-location', () => ({
+  requestForegroundPermissionsAsync: jest.fn(),
+  getCurrentPositionAsync: jest.fn(),
+  Accuracy: { Balanced: 3 },
 }));
 
 jest.mock('@/components/ExchangeCard', () => {
@@ -94,6 +103,8 @@ jest.mock('@/components/ui/Skeleton', () => ({
 // --- Tests ---
 
 import ExchangesScreen from './exchanges';
+import { getExchangeCategories, getExchanges, saveExchange, unsaveExchange } from '@/lib/api/exchanges';
+import * as Location from 'expo-location';
 
 const defaultPaginatedState = {
   items: [],
@@ -106,7 +117,16 @@ const defaultPaginatedState = {
 };
 
 beforeEach(() => {
+  jest.clearAllMocks();
   mockUsePaginatedApi.mockReturnValue(defaultPaginatedState);
+  (getExchanges as jest.Mock).mockResolvedValue({ data: [], meta: { cursor: null, has_more: false, per_page: 20 } });
+  (getExchangeCategories as jest.Mock).mockResolvedValue({ data: [] });
+  (saveExchange as jest.Mock).mockResolvedValue({});
+  (unsaveExchange as jest.Mock).mockResolvedValue(undefined);
+  jest.mocked(Location.requestForegroundPermissionsAsync).mockResolvedValue({ status: 'granted' } as never);
+  jest.mocked(Location.getCurrentPositionAsync).mockResolvedValue({
+    coords: { latitude: 53.3498, longitude: -6.2603 },
+  } as never);
 });
 
 const mockExchange = {
@@ -186,5 +206,49 @@ describe('ExchangesScreen', () => {
     const input = getByPlaceholderText('Search listings\u2026');
     fireEvent.changeText(input, 'gardening');
     expect(input.props.value).toBe('gardening');
+  });
+
+  it('uses current device location for the near me filter', async () => {
+    const { getByText } = render(<ExchangesScreen />);
+
+    expect(getByText('nearMe')).toBeTruthy();
+    fireEvent.press(getByText('nearMe'));
+
+    await waitFor(() => {
+      expect(Location.requestForegroundPermissionsAsync).toHaveBeenCalled();
+      expect(Location.getCurrentPositionAsync).toHaveBeenCalledWith({ accuracy: Location.Accuracy.Balanced });
+    });
+
+    const latestFetch = mockUsePaginatedApi.mock.calls.at(-1)?.[0] as ((cursor: string | null) => Promise<unknown>) | undefined;
+    expect(latestFetch).toBeDefined();
+    await latestFetch?.(null);
+
+    expect(getExchanges).toHaveBeenCalledWith(null, expect.objectContaining({
+      near_lat: '53.3498',
+      near_lng: '-6.2603',
+      radius_km: '25',
+    }));
+  });
+
+  it('sends advanced filter params to the listings API', async () => {
+    const { getByText } = render(<ExchangesScreen />);
+
+    fireEvent.press(getByText('filters'));
+    fireEvent.press(getByText('duration.quick'));
+    fireEvent.press(getByText('service.remote'));
+    fireEvent.press(getByText('posted.week'));
+    fireEvent.press(getByText('sort.newest'));
+
+    const latestFetch = mockUsePaginatedApi.mock.calls.at(-1)?.[0] as ((cursor: string | null) => Promise<unknown>) | undefined;
+    expect(latestFetch).toBeDefined();
+    await latestFetch?.(null);
+
+    expect(getExchanges).toHaveBeenCalledWith(null, expect.objectContaining({
+      max_hours: '1',
+      service_type: 'remote_only,hybrid',
+      posted_within: '7',
+      sort: 'newest',
+      personalised: 'false',
+    }));
   });
 });

@@ -8,7 +8,7 @@ import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
-import { Card as HeroCard, Chip, Separator, Surface } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, Separator, Surface } from 'heroui-native';
 
 import { type Exchange } from '@/lib/api/exchanges';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -20,9 +20,10 @@ import NativePressable from '@/components/ui/NativePressable';
 
 interface ExchangeCardProps {
   exchange: Exchange;
+  onToggleSave?: (listingId: number, currentlySaved: boolean) => void;
 }
 
-export default function ExchangeCard({ exchange }: ExchangeCardProps) {
+export default function ExchangeCard({ exchange, onToggleSave }: ExchangeCardProps) {
   const { t } = useTranslation('exchanges');
   const primary = usePrimaryColor();
   const theme = useTheme();
@@ -37,6 +38,13 @@ export default function ExchangeCard({ exchange }: ExchangeCardProps) {
   const isOffer = exchange.type === 'offer';
   const accent = isOffer ? '#10B981' : '#F59E0B';
   const accentSoft = isOffer ? 'rgba(16, 185, 129, 0.14)' : 'rgba(245, 158, 11, 0.14)';
+  const isFavorited = exchange.is_favorited === true;
+  const serviceType = exchange.service_type ?? null;
+  const distanceKm = typeof exchange.distance_km === 'number' ? exchange.distance_km : null;
+
+  function toggleSave() {
+    onToggleSave?.(exchange.id, isFavorited);
+  }
 
   return (
     <NativePressable
@@ -68,9 +76,26 @@ export default function ExchangeCard({ exchange }: ExchangeCardProps) {
               {exchange.title ?? ''}
             </Text>
           </View>
-          <Surface variant="secondary" className="size-9 items-center justify-center rounded-full">
-            <Ionicons name="arrow-forward" size={18} color={primary} />
-          </Surface>
+          <View className="items-end gap-2">
+            {onToggleSave ? (
+              <HeroButton
+                isIconOnly
+                size="sm"
+                variant={isFavorited ? 'danger-soft' : 'secondary'}
+                onPress={toggleSave}
+                accessibilityLabel={isFavorited ? t('unsaveListing') : t('saveListing')}
+              >
+                <Ionicons
+                  name={isFavorited ? 'heart' : 'heart-outline'}
+                  size={17}
+                  color={isFavorited ? '#E11D48' : primary}
+                />
+              </HeroButton>
+            ) : null}
+            <Surface variant="secondary" className="size-9 items-center justify-center rounded-full">
+              <Ionicons name="arrow-forward" size={18} color={primary} />
+            </Surface>
+          </View>
         </HeroCard.Header>
 
         <HeroCard.Body className="gap-3 px-4 pb-4 pt-0">
@@ -94,6 +119,22 @@ export default function ExchangeCard({ exchange }: ExchangeCardProps) {
                 <Ionicons name="location-outline" size={14} color={theme.textMuted} />
                 <Text className="max-w-[210px] text-xs" style={{ color: theme.textSecondary }} numberOfLines={1}>
                   {exchange.location}
+                </Text>
+              </Surface>
+            ) : null}
+            {distanceKm !== null ? (
+              <Surface variant="secondary" className="flex-row items-center gap-1 rounded-full px-3 py-1.5">
+                <Ionicons name="navigate-outline" size={14} color={primary} />
+                <Text className="text-xs font-semibold" style={{ color: primary }}>
+                  {formatDistance(distanceKm, t)}
+                </Text>
+              </Surface>
+            ) : null}
+            {serviceType ? (
+              <Surface variant="secondary" className="flex-row items-center gap-1 rounded-full px-3 py-1.5">
+                <Ionicons name={serviceType === 'remote_only' ? 'desktop-outline' : 'swap-horizontal-outline'} size={14} color={theme.textMuted} />
+                <Text className="text-xs" style={{ color: theme.textSecondary }} numberOfLines={1}>
+                  {t(`serviceType.${serviceType}`)}
                 </Text>
               </Surface>
             ) : null}
@@ -124,4 +165,12 @@ export default function ExchangeCard({ exchange }: ExchangeCardProps) {
       </HeroCard>
     </NativePressable>
   );
+}
+
+function formatDistance(distanceKm: number, t: ReturnType<typeof useTranslation>['t']) {
+  if (distanceKm < 1) {
+    return t('distanceMeters', { distance: Math.round(distanceKm * 1000) });
+  }
+
+  return t('distanceKilometers', { distance: distanceKm.toFixed(1) });
 }

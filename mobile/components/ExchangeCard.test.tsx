@@ -11,16 +11,20 @@ jest.mock('expo-router', () => ({
   router: { push: jest.fn() },
 }));
 
+jest.mock('@expo/vector-icons', () => ({
+  Ionicons: 'View',
+}));
+
+jest.mock('expo-image', () => ({
+  Image: 'View',
+}));
+
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, opts?: Record<string, unknown>) => {
-      const map: Record<string, string> = {
-        offering: 'Offering',
-        requesting: 'Requesting',
-        viewDetails: 'View details',
-        'detail.hours': `${String(opts?.count ?? 0)} hours`,
-      };
-      return map[key] ?? key;
+      if (key === 'distanceKilometers') return `${String(opts?.distance ?? '')} km away`;
+      if (key === 'detail.hours') return `${String(opts?.count ?? '')} hrs`;
+      return key;
     },
   }),
 }));
@@ -31,74 +35,55 @@ jest.mock('@/lib/hooks/useTenant', () => ({
 
 jest.mock('@/lib/hooks/useTheme', () => ({
   useTheme: () => ({
-    text: '#111111',
-    textSecondary: '#555555',
-    textMuted: '#777777',
+    surface: '#ffffff',
+    text: '#111827',
+    textSecondary: '#4b5563',
+    textMuted: '#6b7280',
+    border: '#e5e7eb',
   }),
 }));
 
-jest.mock('@expo/vector-icons', () => ({
-  Ionicons: 'View',
-}));
+jest.mock('@/components/ui/Avatar', () => {
+  const { Text } = require('react-native');
+  return ({ name }: { name?: string }) => <Text>{name ?? 'Avatar'}</Text>;
+});
 
-jest.mock('expo-image', () => ({
-  Image: 'View',
-}));
-
-jest.mock('heroui-native', () => {
-  const React = require('react');
-  const { Pressable, Text, View } = require('react-native');
-
-  const Button = ({ children, onPress, accessibilityLabel }: { children?: React.ReactNode; onPress?: () => void; accessibilityLabel?: string }) => (
-    <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel} onPress={onPress}>
+jest.mock('@/components/ui/NativePressable', () => {
+  const { Pressable } = require('react-native');
+  return ({ children, onPress, accessibilityLabel }: { children: React.ReactNode; onPress?: () => void; accessibilityLabel?: string }) => (
+    <Pressable onPress={onPress} accessibilityLabel={accessibilityLabel}>
       {children}
     </Pressable>
   );
-  Button.Label = ({ children }: { children?: React.ReactNode }) => <Text>{children}</Text>;
-
-  const Card = ({ children }: { children?: React.ReactNode }) => <View>{children}</View>;
-  Card.Header = ({ children }: { children?: React.ReactNode }) => <View>{children}</View>;
-  Card.Body = ({ children }: { children?: React.ReactNode }) => <View>{children}</View>;
-  Card.Footer = ({ children }: { children?: React.ReactNode }) => <View>{children}</View>;
-
-  const Chip = ({ children }: { children?: React.ReactNode }) => <View>{children}</View>;
-  Chip.Label = ({ children }: { children?: React.ReactNode }) => <Text>{children}</Text>;
-
-  return {
-    Button,
-    Card,
-    Chip,
-    Separator: () => <View />,
-    Surface: ({ children }: { children?: React.ReactNode }) => <View>{children}</View>,
-  };
 });
 
-jest.mock('@/components/ui/Avatar', () => 'View');
-
 import ExchangeCard from './ExchangeCard';
+import type { Exchange } from '@/lib/api/exchanges';
+
+const exchange: Exchange = {
+  id: 42,
+  title: 'Garden help',
+  description: 'I can help tidy a garden.',
+  type: 'offer',
+  status: 'active',
+  hours_estimate: 2,
+  category_name: 'Gardening',
+  category_color: null,
+  image_url: null,
+  location: 'Dublin',
+  distance_km: 3.4,
+  user: { id: 7, name: 'Alice', avatar_url: null },
+  created_at: '2026-01-10T09:00:00Z',
+  is_favorited: false,
+};
 
 describe('ExchangeCard', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('opens the exchange detail route through the HeroUI Native-backed card button', () => {
-    const { getByLabelText, getByText } = render(
-      <ExchangeCard
-        exchange={{
-          id: 42,
-          type: 'offer',
-          title: 'Garden help',
-          description: 'I can help clear raised beds.',
-          image_url: null,
-          hours_estimate: 2,
-          location: 'Local park',
-          category_name: 'Gardening',
-          created_at: '2026-05-01T10:00:00Z',
-          user: { id: 8, name: 'Alice Smith', avatar_url: null },
-        } as never}
-      />,
-    );
+  it('opens the exchange detail route through the native card press target', () => {
+    const { getByLabelText, getByText } = render(<ExchangeCard exchange={exchange} />);
 
     expect(getByText('Garden help')).toBeTruthy();
     fireEvent.press(getByLabelText('Garden help'));
@@ -107,5 +92,20 @@ describe('ExchangeCard', () => {
       pathname: '/(modals)/exchange-detail',
       params: { id: '42' },
     });
+  });
+
+  it('shows distance returned by nearby listing searches', () => {
+    const { getByText } = render(<ExchangeCard exchange={exchange} />);
+
+    expect(getByText('3.4 km away')).toBeTruthy();
+  });
+
+  it('exposes a card save action without opening the detail screen', () => {
+    const onToggleSave = jest.fn();
+    const { getByLabelText } = render(<ExchangeCard exchange={exchange} onToggleSave={onToggleSave} />);
+
+    fireEvent.press(getByLabelText('saveListing'));
+
+    expect(onToggleSave).toHaveBeenCalledWith(42, false);
   });
 });

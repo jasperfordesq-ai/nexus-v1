@@ -20,6 +20,8 @@ export interface RelatedExchange {
 export interface ExchangeCategory {
   id: number;
   name: string;
+  slug?: string;
+  color?: string | null;
 }
 
 export interface ExchangeImage {
@@ -43,6 +45,7 @@ export interface Exchange {
   image_url: string | null;
   images?: ExchangeImage[];
   location: string | null;
+  distance_km?: number | null;
   service_type?: 'physical_only' | 'remote_only' | 'hybrid' | 'location_dependent' | null;
   skill_tags?: string[];
   user_id?: number;
@@ -89,6 +92,7 @@ export interface ExchangeListResponse {
     per_page: number;
     has_more: boolean;
     cursor: string | null;
+    total_items?: number;
     base_url?: string;
   };
 }
