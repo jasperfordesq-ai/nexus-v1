@@ -24,9 +24,11 @@ export default function MyLearningPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
     coursesApi.myCourses()
-      .then((res) => setEnrollments(res.success && res.data ? res.data : []))
-      .finally(() => setLoading(false));
+      .then((res) => { if (!cancelled) setEnrollments(res.success && res.data ? res.data : []); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, []);
 
   if (loading) {

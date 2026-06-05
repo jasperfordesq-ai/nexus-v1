@@ -29,19 +29,28 @@ class CourseCertificateService
      */
     public static function issue(int $courseId, int $userId): CourseCertificate
     {
-        $existing = CourseCertificate::where('course_id', $courseId)
-            ->where('user_id', $userId)
-            ->first();
+        $existing = self::findForUser($courseId, $userId);
         if ($existing) {
             return $existing;
         }
 
-        return CourseCertificate::create([
-            'course_id' => $courseId,
-            'user_id' => $userId,
-            'serial' => self::uniqueSerial(),
-            'issued_at' => Carbon::now(),
-        ]);
+        try {
+            return CourseCertificate::create([
+                'course_id' => $courseId,
+                'user_id' => $userId,
+                'serial' => self::uniqueSerial(),
+                'issued_at' => Carbon::now(),
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Lost a race to a concurrent issue() — the unique
+            // (tenant_id, course_id, user_id) index rejected the duplicate.
+            // Return the certificate the winning path created.
+            $winner = self::findForUser($courseId, $userId);
+            if ($winner) {
+                return $winner;
+            }
+            throw $e;
+        }
     }
 
     public static function findForUser(int $courseId, int $userId): ?CourseCertificate
