@@ -11,6 +11,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader } from '../../components';
+import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -194,6 +195,8 @@ export function FederationSettings() {
       />
 
       <div className="space-y-4">
+        <PartnerTimebankGuidance page="settings" />
+
         {/* Platform-level JWT auth is configured in Super Admin → Federation
             Controls. Tenant admins see this pointer so they know where to
             look (and can ask the platform operator) when a partner using

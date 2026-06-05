@@ -152,6 +152,32 @@ describe('AdminSidebar', () => {
     expect(screen.getByText('Dashboard')).toBeTruthy();
   });
 
+  it('groups Partner Timebanks into core network and protocol operations when federation is enabled', () => {
+    mockHasFeature.mockImplementation((feature: string) =>
+      feature === 'federation' || feature === 'partner_api',
+    );
+
+    const { container } = render(
+      <W path="/test/admin/federation/api-docs"><AdminSidebar collapsed={false} onToggle={mockOnToggle} /></W>
+    );
+
+    const partnerSection = Array.from(container.querySelectorAll('li')).find((item) =>
+      item.textContent?.includes('Partner Timebanks') &&
+      item.textContent.includes('Core network') &&
+      item.textContent.includes('Partner protocols') &&
+      item.textContent.includes('Monitoring & data'),
+    );
+    const text = partnerSection?.textContent ?? '';
+
+    expect(partnerSection).toBeTruthy();
+    expect(text.indexOf('Federation Settings')).toBeLessThan(text.indexOf('Trust & settlement'));
+    expect(text.indexOf('Trust & settlement')).toBeLessThan(text.indexOf('Partner protocols'));
+    expect(text.indexOf('Partner protocols')).toBeLessThan(text.indexOf('Monitoring & data'));
+    expect(screen.getByText('Partner APIs & integrations')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Partner APIs & integrations' }));
+    expect(screen.getByRole('link', { name: 'Inbound API Partners' })).toHaveAttribute('href', '/test/admin/api-partners');
+  });
+
   it('keeps Broker Panel visible as a pinned admin link', () => {
     render(
       <W><AdminSidebar collapsed={false} onToggle={mockOnToggle} /></W>

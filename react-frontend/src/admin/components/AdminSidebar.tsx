@@ -64,7 +64,6 @@ import Filter from 'lucide-react/icons/filter';
 import Activity from 'lucide-react/icons/activity';
 import Crown from 'lucide-react/icons/crown';
 import Network from 'lucide-react/icons/network';
-import ScrollText from 'lucide-react/icons/scroll-text';
 import Mail from 'lucide-react/icons/mail';
 import Wrench from 'lucide-react/icons/wrench';
 import Stethoscope from 'lucide-react/icons/stethoscope';
@@ -82,7 +81,6 @@ import Cpu from 'lucide-react/icons/cpu';
 import Handshake from 'lucide-react/icons/handshake';
 import Database from 'lucide-react/icons/database';
 import MapPin from 'lucide-react/icons/map-pin';
-import FileSearch from 'lucide-react/icons/file-search';
 import Webhook from 'lucide-react/icons/webhook';
 import Puzzle from 'lucide-react/icons/puzzle';
 import Podcast from 'lucide-react/icons/podcast';
@@ -90,7 +88,6 @@ import Palette from 'lucide-react/icons/palette';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import Store from 'lucide-react/icons/store';
 import Languages from 'lucide-react/icons/languages';
-import Landmark from 'lucide-react/icons/landmark';
 import X from 'lucide-react/icons/x';
 import BellRing from 'lucide-react/icons/bell-ring';
 import Bug from 'lucide-react/icons/bug';
@@ -537,17 +534,17 @@ function useAdminNav(safeguardingFlagCount: number): NavSection[] {
         icon: Globe,
         zone: 'platform',
         items: [
-          { label: t('federation_settings'), href: '/admin/federation', icon: Settings },
+          { label: t('federation_settings'), href: '/admin/federation', icon: Settings, group: t('federation_group_core_network') },
           { label: t('federation_partnerships'), href: '/admin/federation/partnerships', icon: ArrowLeftRight },
           { label: t('federation_directory'), href: '/admin/federation/directory', icon: Globe },
-          { label: t('federation_credit_agreements'), href: '/admin/federation/credit-agreements', icon: Handshake },
+          { label: t('federation_credit_agreements'), href: '/admin/federation/credit-agreements', icon: Handshake, group: t('federation_group_trust_settlement') },
           { label: t('federation_neighborhoods'), href: '/admin/federation/neighborhoods', icon: MapPin },
-          { label: t('federation_analytics'), href: '/admin/federation/analytics', icon: BarChart3 },
+          { label: t('federation_cc_config'), href: '/admin/federation/cc-config', icon: Network },
+          { label: t('federation_external_partners'), href: '/admin/federation/external-partners', icon: Globe, group: t('federation_group_partner_protocols') },
           { label: t('federation_api_keys'), href: '/admin/federation/api-keys', icon: KeyIcon },
           { label: t('federation_api_docs'), href: '/admin/federation/api-docs', icon: BookOpen },
-          { label: t('federation_external_partners'), href: '/admin/federation/external-partners', icon: Globe },
-          { label: t('federation_cc_config'), href: '/admin/federation/cc-config', icon: Network },
           { label: t('federation_webhooks'), href: '/admin/federation/webhooks', icon: Webhook },
+          { label: t('federation_analytics'), href: '/admin/federation/analytics', icon: BarChart3, group: t('federation_group_monitoring_data') },
           { label: t('federation_activity'), href: '/admin/federation/activity', icon: Activity },
           { label: t('federation_data_management'), href: '/admin/federation/data', icon: Database },
           { label: t('federation_aggregates'), href: '/admin/federation/aggregates', icon: ShieldCheck },
@@ -558,7 +555,7 @@ function useAdminNav(safeguardingFlagCount: number): NavSection[] {
     if (hasFeature('partner_api')) {
       sections.push({
         key: 'integrations',
-        label: t('integrations'),
+        label: t('partner_api_integrations'),
         icon: Webhook,
         zone: 'platform',
         items: [{ label: t('api_partners'), href: '/admin/api-partners', icon: KeyIcon }],

@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { Accordion, AccordionItem, Card, CardBody, CardHeader, Chip, Tab, Tabs, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { PageHeader } from '../../components';
+import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Code block helper
@@ -1280,6 +1281,8 @@ export function ApiDocumentation() {
         title={t('federation.api_docs_title')}
         description={t('federation.api_docs_desc')}
       />
+
+      <PartnerTimebankGuidance page="apiDocs" />
 
       <Tabs
         aria-label={t('api_docs.aria_api_documentation_sections')}

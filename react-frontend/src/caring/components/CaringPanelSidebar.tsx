@@ -85,7 +85,6 @@ const SECTIONS: NavSection[] = [
       { key: 'hour-transfers', labelKey: 'panel.sidebar.items.hour_transfers', icon: ArrowRightLeft, path: '/caring/hour-transfers' },
       { key: 'regional-points', labelKey: 'panel.sidebar.items.regional_points', icon: Coins, path: '/caring/regional-points' },
       { key: 'sub-regions', labelKey: 'panel.sidebar.items.sub_regions', icon: MapPin, path: '/caring/sub-regions' },
-      { key: 'federation-peers', labelKey: 'panel.sidebar.items.federation_peers', icon: Network, path: '/caring/federation-peers' },
       { key: 'sla-dashboard', labelKey: 'panel.sidebar.items.sla_dashboard', icon: Timer, path: '/caring/sla-dashboard' },
       { key: 'providers', labelKey: 'panel.sidebar.items.providers', icon: Users2, path: '/caring/providers' },
       { key: 'warmth-pass', labelKey: 'panel.sidebar.items.warmth_pass', icon: Star, path: '/caring/warmth-pass' },
@@ -132,6 +131,7 @@ const SECTIONS: NavSection[] = [
     key: 'partnerships',
     titleKey: 'panel.sidebar.sections.partnerships',
     items: [
+      { key: 'federation-peers', labelKey: 'panel.sidebar.items.federation_peers', icon: Network, path: '/caring/federation-peers' },
       { key: 'research', labelKey: 'panel.sidebar.items.research', icon: FlaskConical, path: '/caring/research' },
       { key: 'external-integrations', labelKey: 'panel.sidebar.items.external_integrations', icon: PlugZap, path: '/caring/external-integrations' },
       { key: 'integration-showcase', labelKey: 'panel.sidebar.items.integration_showcase', icon: Layers, path: '/caring/integration-showcase' },

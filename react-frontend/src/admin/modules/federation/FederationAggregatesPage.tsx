@@ -11,6 +11,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader } from '../../components';
+import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -160,6 +161,8 @@ export default function FederationAggregatesPage() {
         title={t('federation_aggregates.meta.title')}
         description={t('federation_aggregates.meta.description')}
       />
+
+      <PartnerTimebankGuidance page="aggregates" />
 
       <Card>
         <CardHeader className="flex items-center gap-2">

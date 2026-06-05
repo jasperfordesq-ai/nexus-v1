@@ -12,6 +12,7 @@ import { logError } from '@/lib/logger';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import { useTranslation } from 'react-i18next';
+import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -123,6 +124,9 @@ export function CreateApiKey() {
         description={t('federation.create_api_key_desc')}
         actions={<Button variant="tertiary" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/federation/api-keys'))}>{t('federation.back')}</Button>}
       />
+      <div className="mb-6">
+        <PartnerTimebankGuidance page="apiKeys" />
+      </div>
       <Card >
         <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Key size={20} /> {t('federation.new_api_key')}</h3></CardHeader>
         <CardBody className="gap-4">

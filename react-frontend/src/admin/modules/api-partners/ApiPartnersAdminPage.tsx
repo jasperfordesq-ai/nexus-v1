@@ -29,6 +29,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader } from '../../components';
+import { PartnerTimebankGuidance } from '../federation/PartnerTimebankGuidance';
 
 // ─── Types ────────────────────────────────────────────────────────────────
 
@@ -174,6 +175,8 @@ export default function ApiPartnersAdminPage() {
           </Button>
         }
       />
+
+      <PartnerTimebankGuidance page="apiPartners" />
 
       <Card >
         <CardBody className="p-0">

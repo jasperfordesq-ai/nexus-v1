@@ -20,6 +20,7 @@ import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader, EmptyState } from '../../components';
 import { useTranslation } from 'react-i18next';
+import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 // Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -213,6 +214,10 @@ export function PartnerDirectory() {
           </Button>
         }
       />
+
+      <div className="mb-6">
+        <PartnerTimebankGuidance page="directory" />
+      </div>
 
       {/* Filters */}
       <Card className="mb-6">

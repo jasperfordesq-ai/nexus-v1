@@ -12,6 +12,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { PageHeader } from '../../components';
 import { useTranslation } from 'react-i18next';
+import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -155,6 +156,8 @@ export function CreditCommonsConfig() {
           </div>
         }
       />
+
+      <PartnerTimebankGuidance page="creditCommons" />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Node Identity */}

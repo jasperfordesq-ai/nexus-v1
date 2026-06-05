@@ -133,7 +133,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
       'Do not issue passes to members with any unresolved safeguarding reports, even if their tier technically qualifies them.',
     relatedPaths: [
       { label: 'Trust Tiers', path: '/caring/trust-tier' },
-      { label: 'Federation Peers', path: '/caring/federation-peers' },
+      { label: 'Partner Cooperatives', path: '/caring/federation-peers' },
     ],
   },
 
@@ -226,7 +226,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
     relatedPaths: [
       { label: 'Commercial Boundary', path: '/caring/commercial-boundary' },
       { label: 'Disclosure Pack', path: '/caring/disclosure-pack' },
-      { label: 'Federation Peers', path: '/caring/federation-peers' },
+      { label: 'Partner Cooperatives', path: '/caring/federation-peers' },
     ],
   },
 
@@ -711,12 +711,12 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
   },
 
   '/caring/federation-peers': {
-    title: 'Caring Community Federation Peer Connections',
+    title: 'Partner Cooperatives - Caring Community Federation',
     summary:
-      'Manage the federated connections between your cooperative and other Caring Community cooperatives. Federation enables Warmth Pass portability and cross-cooperative referrals. Each peer connection is governed by a bilateral trust agreement.',
+      'Manage the partner timebank connections between your cooperative and other Caring Community cooperatives. This page is for trusted cooperative-to-cooperative links, not generic API clients or third-party integrations.',
     steps: [
-      { label: 'View active peer connections', detail: 'The connections table shows all currently federated Caring Community cooperatives, their location, connection status, and when the link was last verified.' },
-      { label: 'Invite a new peer', detail: 'Click "Invite Peer Cooperative". Enter their NEXUS instance URL. They receive an invitation to accept and sign the bilateral trust agreement.' },
+      { label: 'View active partner cooperatives', detail: 'The table shows each connected Caring Community cooperative, its instance URL, status, and last verified handshake.' },
+      { label: 'Invite a new cooperative', detail: 'Click "Invite Peer Cooperative". Enter their NEXUS instance URL. They receive an invitation to accept and sign the bilateral trust agreement.' },
       { label: 'Accept an incoming invitation', detail: 'Pending invitations appear in the "Incoming" tab. Review the requesting cooperative\'s profile before accepting.' },
       { label: 'Configure data sharing rules', detail: 'For each peer, choose which data you share: Warmth Pass validation only, or also aggregate exchange statistics for the Caring Community national dashboard.' },
       { label: 'Suspend a peer connection', detail: 'If a cooperative is no longer active or has had a safeguarding issue, use "Suspend" to pause the federation link without permanently removing it.' },
@@ -797,30 +797,30 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
   },
 
   '/caring/external-integrations': {
-    title: 'External Integrations — APIs & Webhooks',
+    title: 'Partner Integration Tracker - External Dependencies',
     summary:
-      'Configure connections between NEXUS and third-party systems: social care case management platforms, cantonal health information systems, calendar tools, and notification services. Each integration uses a webhook or OAuth token that you manage here.',
+      'Track partner-dependent integrations that need an external owner, data sharing agreement, sandbox, or interface specification before they can go live. This page is a readiness tracker, not the Partner Timebanks federation setup page.',
     steps: [
-      { label: 'Review active integrations', detail: 'The integration list shows each connection, its status (Active / Error / Disabled), last successful sync time, and the data types it exchanges.' },
-      { label: 'Add a new integration', detail: 'Click "New Integration". Choose the integration type (Webhook / REST API / OAuth), enter the endpoint URL, and configure the trigger events.' },
-      { label: 'Test the connection', detail: 'Use "Send Test Payload" to verify the endpoint is reachable and returns the expected response. Check the test log for any errors.' },
-      { label: 'Configure retry behaviour', detail: 'Set the retry policy for failed webhook calls: number of retries, backoff interval, and whether to alert a coordinator on repeated failures.' },
-      { label: 'Review the event log', detail: 'The event log shows every outbound webhook call and inbound event received, with request/response bodies for debugging.' },
+      { label: 'Review dependency status', detail: 'The list shows each integration owner, category, operational status, DSA status, sandbox status, and interface specification URL.' },
+      { label: 'Add a tracked dependency', detail: 'Click "Add" when a new external party must provide an API, sandbox, data agreement, or operational contact before delivery can proceed.' },
+      { label: 'Separate readiness from credentials', detail: 'Use this page to track whether a partner is ready. Use Inbound API Partners, External Protocol Partners, or Webhooks when credentials or endpoints need to be configured.' },
+      { label: 'Keep notes current', detail: 'Record blockers, next actions, and owner updates so stakeholders can see whether the delay is technical, legal, or external.' },
+      { label: 'Close out stale entries', detail: 'Remove or archive dependencies that are no longer part of the Caring Community delivery plan.' },
     ],
     tips: [
-      'Rotate API keys at least annually and immediately if a key is accidentally exposed (e.g. committed to a public repository).',
-      'Test integrations in your staging environment before enabling them on the live cooperative.',
+      'Do not paste secrets or OAuth tokens into notes. Store credentials only on the appropriate credential page.',
+      'A green sandbox does not mean the integration is approved. Check DSA and owner status before treating it as ready.',
     ],
     relatedPaths: [
-      { label: 'Integration Showcase', path: '/caring/integration-showcase' },
+      { label: 'Developer Integration Reference', path: '/caring/integration-showcase' },
       { label: 'Disclosure Pack', path: '/caring/disclosure-pack' },
     ],
   },
 
   '/caring/integration-showcase': {
-    title: 'Integration Showcase — Developer Reference',
+    title: 'Developer Integration Reference',
     summary:
-      'A developer-facing reference page showing the available NEXUS API endpoints, webhook event schemas, OAuth configuration, and sample payloads. Use this when building integrations or sharing technical documentation with a third-party developer.',
+      'A developer-facing reference page for available Caring Community API endpoints, webhook event schemas, OAuth configuration, and sample payloads. Use it to explain implementation details after the correct integration type has been chosen.',
     steps: [
       { label: 'Browse available endpoints', detail: 'Use the endpoint browser to explore available REST API paths grouped by domain (Members, Exchanges, Wallet, Events, etc.). Each entry shows the method, path, parameters, and response schema.' },
       { label: 'Copy sample payloads', detail: 'Click "Copy Sample" next to any webhook event to get a realistic example JSON payload for use in your integration code or testing.' },
@@ -833,7 +833,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
       'The sandbox uses a separate set of test credentials from your live API keys — do not mix them up.',
     ],
     relatedPaths: [
-      { label: 'External Integrations', path: '/caring/external-integrations' },
+      { label: 'Partner Integration Tracker', path: '/caring/external-integrations' },
     ],
   },
 

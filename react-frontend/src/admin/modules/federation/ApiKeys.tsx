@@ -21,6 +21,7 @@ import { DataTable, PageHeader, EmptyState, ConfirmModal, type Column } from '..
 
 import { useTranslation } from 'react-i18next';
 import { Button, Chip } from '@/components/ui';
+import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 interface ApiKey {
   id: number;
   name: string;
@@ -149,6 +150,7 @@ export function ApiKeys() {
           description={t('federation.api_keys_desc')}
           actions={<Button startContent={<Plus size={16} />} onPress={() => navigate(tenantPath('/admin/federation/api-keys/create'))}>{t('federation.create_key')}</Button>}
         />
+        <PartnerTimebankGuidance page="apiKeys" />
         <EmptyState icon={Key} title={t('federation.no_api_keys')} description={t('federation.no_api_keys_desc')} actionLabel={t('federation.create_api_key_action')} onAction={() => navigate(tenantPath('/admin/federation/api-keys/create'))} />
       </div>
     );
@@ -166,6 +168,7 @@ export function ApiKeys() {
           </div>
         }
       />
+      <PartnerTimebankGuidance page="apiKeys" />
       <DataTable columns={columns} data={items} isLoading={loading} onRefresh={loadData} />
 
       {revokeTarget && (

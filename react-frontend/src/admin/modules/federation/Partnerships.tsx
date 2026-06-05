@@ -44,6 +44,7 @@ import {
   StatusBadge,
   type Column,
 } from '../../components';
+import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -548,6 +549,7 @@ export function Partnerships() {
     return (
       <div>
         <PageHeader title={t('federation.partnerships_title')} description={t('federation.partnerships_desc')} />
+        <PartnerTimebankGuidance page="partnerships" />
         <EmptyState icon={Handshake} title={t('federation.no_partnerships')} description={t('federation.desc_no_federation_partnerships_have_been_est')} />
       </div>
     );
@@ -560,6 +562,8 @@ export function Partnerships() {
         description={t('federation.partnerships_desc')}
         actions={<Button variant="tertiary" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('federation.refresh')}</Button>}
       />
+
+      <PartnerTimebankGuidance page="partnerships" />
 
       {/* Tabs: All / Incoming / Active */}
       <Tabs

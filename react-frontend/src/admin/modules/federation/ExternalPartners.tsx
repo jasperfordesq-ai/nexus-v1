@@ -31,6 +31,7 @@ import { PageHeader,
   ConfirmModal } from '../../components';
 
 import { useTranslation } from 'react-i18next';
+import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -402,6 +403,8 @@ export function ExternalPartners() {
           </div>
         }
       />
+
+      <PartnerTimebankGuidance page="externalPartners" />
 
       {/* Partners table */}
       <Table aria-label={t('federation.external_partners_title')} removeWrapper>

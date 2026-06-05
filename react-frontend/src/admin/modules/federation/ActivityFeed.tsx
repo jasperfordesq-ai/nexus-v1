@@ -31,6 +31,7 @@ import { usePageTitle } from '@/hooks';
 import { formatRelativeTime } from '@/lib/helpers';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
+import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -481,6 +482,10 @@ export function ActivityFeed() {
           </div>
         }
       />
+
+      <div className="mb-6">
+        <PartnerTimebankGuidance page="activityFeed" />
+      </div>
 
       {/* Stats Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

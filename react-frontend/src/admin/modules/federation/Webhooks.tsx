@@ -32,6 +32,7 @@ import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
 import { PageHeader, ConfirmModal } from '../../components';
 import { useTranslation } from 'react-i18next';
+import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -401,6 +402,8 @@ export function Webhooks() {
           </div>
         }
       />
+
+      <PartnerTimebankGuidance page="webhooks" />
 
       {/* Webhooks table */}
       <Table aria-label={t('federation.webhooks_title')} removeWrapper>

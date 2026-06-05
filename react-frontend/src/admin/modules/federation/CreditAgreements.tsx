@@ -25,6 +25,7 @@ import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
 import { PageHeader, StatCard, ConfirmModal } from '../../components';
 import { useTranslation } from 'react-i18next';
+import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -339,6 +340,8 @@ export function CreditAgreements() {
           </div>
         }
       />
+
+      <PartnerTimebankGuidance page="creditAgreements" />
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

@@ -28,6 +28,7 @@ import { useToast } from '@/contexts/ToastContext';
 import { CHART_TOKEN_COLORS } from '@/lib/chartColors';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
+import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -137,6 +138,10 @@ export function FederationAnalytics() {
           </div>
         }
       />
+
+      <div className="mb-6">
+        <PartnerTimebankGuidance page="analytics" />
+      </div>
 
       {/* KPI cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">

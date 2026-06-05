@@ -21,6 +21,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader } from '../../components';
+import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 
 interface ImportSummary {
   dry_run: boolean;
@@ -102,6 +103,10 @@ export function DataManagement() {
         title={t('federation.data_management_title')}
         description={t('federation.data_management_desc')}
       />
+
+      <div className="mb-4">
+        <PartnerTimebankGuidance page="dataManagement" />
+      </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* Export */}
