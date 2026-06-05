@@ -1250,10 +1250,10 @@ class ListingsController extends BaseApiController
         $userId = $this->requireAuth();
         $this->rateLimit('listing_ai_generate', 5, 60);
 
-        $title = trim($this->input('title', ''));
-        $category = trim($this->input('category', ''));
+        $title = trim($this->input('title') ?? '');
+        $category = trim($this->input('category') ?? '');
         $type = $this->input('type', 'offer');
-        $notes = trim($this->input('notes', ''));
+        $notes = trim($this->input('notes') ?? '');
 
         if (empty($title)) {
             return $this->respondWithError('VALIDATION_REQUIRED_FIELD', __('api.title_required'), 'title', 422);
