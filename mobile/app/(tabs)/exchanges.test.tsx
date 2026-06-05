@@ -63,8 +63,9 @@ jest.mock('@/lib/hooks/useDebounce', () => ({
 jest.mock('expo-haptics', () => ({
   impactAsync: jest.fn().mockResolvedValue(undefined),
   notificationAsync: jest.fn().mockResolvedValue(undefined),
+  selectionAsync: jest.fn().mockResolvedValue(undefined),
   ImpactFeedbackStyle: { Light: 'light' },
-  NotificationFeedbackType: { Success: 'success', Warning: 'warning' },
+  NotificationFeedbackType: { Success: 'success', Warning: 'warning', Error: 'error' },
 }));
 
 jest.mock('@expo/vector-icons', () => ({

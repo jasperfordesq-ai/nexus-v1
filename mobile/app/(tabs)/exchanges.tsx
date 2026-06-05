@@ -536,6 +536,9 @@ export default function ExchangesScreen() {
         }
         onEndReached={() => { if (hasMore) loadMore(); }}
         onEndReachedThreshold={0.3}
+        initialNumToRender={6}
+        maxToRenderPerBatch={8}
+        windowSize={11}
         ListEmptyComponent={
           isLoading ? (
             <><ExchangeCardSkeleton /><ExchangeCardSkeleton /><ExchangeCardSkeleton /></>
