@@ -454,9 +454,11 @@ class PodcastController extends BaseApiController
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.podcasts.episode_not_found'), null, 404);
         }
 
+        // BinaryFileResponse (response()->file) computes Content-Length and handles
+        // Range / 206 partial-content itself; setting a manual full-file Content-Length
+        // conflicts with range requests, so we let the response manage it.
         return response()->file($path, [
             'Content-Type' => $episode->audio_mime ?: 'audio/mpeg',
-            'Content-Length' => (string) filesize($path),
             'Accept-Ranges' => 'bytes',
             'Cache-Control' => 'private, max-age=300',
             'X-Content-Type-Options' => 'nosniff',
