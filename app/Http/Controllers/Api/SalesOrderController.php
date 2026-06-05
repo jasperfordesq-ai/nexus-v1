@@ -102,7 +102,7 @@ class SalesOrderController extends BaseApiController
         return $this->respondWithData([
             'status' => 'received',
             'reference' => $reference,
-            'message' => 'Your Project NEXUS order enquiry has been received.',
+            'message' => __('api.sales_order_received'),
         ], null, 201);
     }
 

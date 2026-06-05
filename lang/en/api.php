@@ -1283,6 +1283,7 @@ return [
     'job_renew_not_owner'                  => 'You can only renew your own job vacancies',
     'job_scheduled_at_required'            => 'scheduled_at is required',
     'job_interview_propose_failed'         => 'Unable to propose interview. Check application ownership and data.',
+    'sales_order_received'                 => 'Your Project NEXUS order enquiry has been received.',
     'job_interview_accept_failed'          => 'Unable to accept interview. It may not exist or already been actioned.',
     'job_interview_decline_failed'         => 'Unable to decline interview. It may not exist or already been actioned.',
     'job_interview_cancel_failed'          => 'Unable to cancel interview. It may not exist or already been completed.',

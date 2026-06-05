@@ -1588,7 +1588,8 @@
     "metrics": "Metrics",
     "module_docs": "Module Docs",
     "prerender": "Prerender",
-    "support_reports": "Support Reports"
+    "support_reports": "Support Reports",
+    "podcasts": "Podcasts"
   },
   "broker": {
     "a_reason_is_required": "مطلوب سبب",
@@ -2833,7 +2834,51 @@
     "stage_alpha": "ألفا",
     "stage_beta": "بيتا",
     "module_name_courses": "الدورات",
-    "module_desc_courses": "التعلم المجتمعي - الدورات والدروس والاختبارات والتسجيل والشهادات"
+    "module_desc_courses": "التعلم المجتمعي - الدورات والدروس والاختبارات والتسجيل والشهادات",
+    "modal_podcast_load_failed": "Could not load podcast settings.",
+    "modal_podcast_saved": "Podcast settings saved.",
+    "module_name_podcasts": "Podcasts",
+    "module_desc_podcasts": "Community audio — member-created shows, episodes, transcripts, chapters, RSS, and moderation",
+    "option_podcasts_allow_member_show_creation_label": "Member Show Creation",
+    "option_podcasts_allow_member_show_creation_desc": "Allow ordinary members to create podcast shows. This is on by default.",
+    "option_podcasts_max_shows_per_user_label": "Max Shows Per Member",
+    "option_podcasts_max_shows_per_user_desc": "Maximum number of shows one member can own. Set to 0 for no limit.",
+    "option_podcasts_moderation_enabled_label": "Require Moderation",
+    "option_podcasts_moderation_enabled_desc": "Newly published shows and episodes stay pending until an admin approves them. Off by default.",
+    "option_podcasts_enable_rss_feed_label": "RSS Feeds",
+    "option_podcasts_enable_rss_feed_desc": "Publish standards-compatible RSS feeds for public shows.",
+    "option_podcasts_enable_private_shows_label": "Private Shows",
+    "option_podcasts_enable_private_shows_desc": "Allow creators to keep shows private or members-only.",
+    "option_podcasts_enable_transcripts_label": "Transcripts",
+    "option_podcasts_enable_transcripts_desc": "Allow episode transcripts for accessibility and search.",
+    "option_podcasts_enable_chapters_label": "Chapters",
+    "option_podcasts_enable_chapters_desc": "Allow timestamped episode chapters.",
+    "option_podcasts_enable_episode_reactions_label": "Episode Reactions",
+    "option_podcasts_enable_episode_reactions_desc": "Allow members to react to episodes.",
+    "option_podcasts_enable_listen_analytics_label": "Listen Analytics",
+    "option_podcasts_enable_listen_analytics_desc": "Record tenant-scoped listens and completion signals.",
+    "option_podcasts_max_audio_size_mb_label": "Max Audio Size",
+    "option_podcasts_max_audio_size_mb_desc": "Maximum episode audio file size in megabytes for future uploads.",
+    "option_podcasts_media_storage_driver_label": "Media Storage",
+    "option_podcasts_media_storage_driver_desc": "Choose local private storage or a configured cloud disk for hosted podcast audio.",
+    "option_choice_podcasts_media_storage_driver_local": "Local",
+    "option_choice_podcasts_media_storage_driver_cloud": "Cloud",
+    "option_podcasts_cloud_storage_disk_label": "Cloud Storage Disk",
+    "option_podcasts_cloud_storage_disk_desc": "Laravel filesystem disk to use when Media Storage is Cloud.",
+    "option_choice_podcasts_cloud_storage_disk_s3": "S3 / R2 compatible",
+    "option_choice_podcasts_cloud_storage_disk_azure": "Azure Blob",
+    "option_podcasts_cloud_cdn_base_url_label": "Cloud CDN Base URL",
+    "option_podcasts_cloud_cdn_base_url_desc": "Optional public CDN base URL for hosted podcast audio in cloud storage.",
+    "option_podcasts_enable_media_scanning_label": "Media Security Scan",
+    "option_podcasts_enable_media_scanning_desc": "Mark uploaded audio for malware/security scanning before operational review.",
+    "option_podcasts_enable_media_processing_label": "Media Processing Queue",
+    "option_podcasts_enable_media_processing_desc": "Mark uploaded audio for duration extraction, waveform generation, and normalization jobs.",
+    "option_category_authoring": "Authoring",
+    "option_category_publishing": "Publishing",
+    "option_category_accessibility": "Accessibility",
+    "option_category_community": "Community",
+    "option_category_analytics": "Analytics",
+    "option_category_media": "Media"
   },
   "content": {
     "about_section": "حول القسم",
@@ -17286,6 +17331,7 @@
       "report_escalated": "Report escalated.",
       "feed_valid": "RSS feed is ready.",
       "feed_invalid": "RSS feed has {{count}} issue(s)."
-    }
+    },
+    "report_meta": "{{show}} · {{reporter}}"
   }
 }
