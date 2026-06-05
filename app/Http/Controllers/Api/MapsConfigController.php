@@ -15,7 +15,8 @@ use Illuminate\Support\Facades\DB;
  *
  * Per-tenant settings considered (in order of precedence over env defaults):
  *   - `maps` feature flag — kill switch for map *display*. When off, no
- *     Google API key is returned and OSM tiles are also withheld.
+ *     interactive map tiles render. Google Places may still receive a key
+ *     when `geocoding_provider=google`.
  *   - `map_provider` — `google` | `openstreetmap`. Default: `google`.
  *   - `geocoding_provider` — `google` | `nominatim`. Default: `google`.
  *   - `google_maps_api_key` — tenant override for Google billing. Falls
@@ -28,8 +29,9 @@ use Illuminate\Support\Facades\DB;
  *
  * Browser API keys are intentionally public — they reach JS and network
  * requests. Protect them via Console-side restrictions (HTTP referrer,
- * IP, API). The kill switch + per-tenant key model means no Google
+ * IP, API). The kill switch + per-tenant key model means no Google map
  * billing can occur for opted-out tenants regardless of frontend behavior.
+ * Places autocomplete remains governed by the geocoding provider setting.
  */
 class MapsConfigController extends BaseApiController
 {
@@ -67,12 +69,14 @@ class MapsConfigController extends BaseApiController
         $resolvedGoogleKey = $tenantGoogleKey !== '' ? $tenantGoogleKey : $envGoogleKey;
         $resolvedMapId     = $tenantMapId !== '' ? $tenantMapId : $envMapId;
 
-        // Google API key is only delivered when (a) the maps kill switch is
-        // ON AND (b) the chosen map provider is Google. Either condition off
-        // means no key reaches the browser.
-        $googleEnabled = $mapsEnabled && $mapProvider === 'google';
-        $googleApiKey  = $googleEnabled ? $resolvedGoogleKey : '';
-        $googleMapId   = $googleEnabled ? $resolvedMapId : '';
+        // Map display and Places autocomplete are intentionally separate.
+        // The maps kill switch suppresses interactive map rendering, but
+        // geocoding_provider=google may still need a browser key for Places.
+        $googleMapsEnabled = $mapsEnabled && $mapProvider === 'google';
+        $googlePlacesEnabled = $geocodingProvider === 'google';
+        $googleApiKey = ($googleMapsEnabled || $googlePlacesEnabled) ? $resolvedGoogleKey : '';
+        $googleMapId = $googleMapsEnabled ? $resolvedMapId : '';
+        $googleRuntimeEnabled = $googleApiKey !== '' && ($googleMapsEnabled || $googlePlacesEnabled);
 
         // OSM tile URL — MapTiler if a tenant key is set, otherwise the
         // free OSM service. Only delivered when maps are enabled AND the
@@ -91,7 +95,7 @@ class MapsConfigController extends BaseApiController
 
         return $this->respondWithData([
             // Legacy keys (kept for backward compatibility)
-            'enabled' => $googleEnabled && $googleApiKey !== '',
+            'enabled' => $googleRuntimeEnabled,
             'apiKey'  => $googleApiKey,
             'mapId'   => $googleMapId !== '' ? $googleMapId : null,
 
@@ -99,6 +103,8 @@ class MapsConfigController extends BaseApiController
             'mapsEnabled'        => $mapsEnabled,
             'mapProvider'        => $mapProvider,
             'geocodingProvider'  => $geocodingProvider,
+            'googleMapsEnabled'  => $googleApiKey !== '' && $googleMapsEnabled,
+            'googlePlacesEnabled' => $googleApiKey !== '' && $googlePlacesEnabled,
             'nominatimBaseUrl'   => self::NOMINATIM_BASE_URL,
 
             // OSM tile config (MapTiler if tenant key set, else free OSM)

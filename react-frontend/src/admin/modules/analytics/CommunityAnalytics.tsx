@@ -33,6 +33,7 @@ import { usePageTitle } from '@/hooks';
 import api from '@/lib/api';
 import { LocationMap } from '@/components/location';
 import { MAPS_ENABLED } from '@/lib/map-config';
+import { useTenant } from '@/contexts';
 import { StatCard, PageHeader } from '../../components';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 // Copyright © 2024–2026 Jasper Ford
@@ -122,6 +123,8 @@ export function CommunityAnalytics() {
   const [geoData, setGeoData] = useState<GeographyData | null>(null);
   const [geoLoading, setGeoLoading] = useState(false);
   const [geoError, setGeoError] = useState<string | null>(null);
+  const { hasFeature } = useTenant();
+  const canUseMaps = MAPS_ENABLED && hasFeature('maps');
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -141,7 +144,7 @@ export function CommunityAnalytics() {
   }, [t]);
 
   const loadGeoData = useCallback(async () => {
-    if (!MAPS_ENABLED) return;
+    if (!canUseMaps) return;
     setGeoLoading(true);
     setGeoError(null);
     try {
@@ -156,7 +159,7 @@ export function CommunityAnalytics() {
     } finally {
       setGeoLoading(false);
     }
-  }, [t]);
+  }, [canUseMaps, t]);
 
   useEffect(() => {
     loadData();
@@ -538,7 +541,7 @@ export function CommunityAnalytics() {
       </div>
 
       {/* Geographic Distribution */}
-      {MAPS_ENABLED && (
+      {canUseMaps && (
         <Card  className="mt-6">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Globe size={18} className="text-accent" aria-hidden="true" />

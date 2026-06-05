@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, waitFor } from '@testing-library/react';
+import { act, render, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 // ─── Set env before module imports ───────────────────────────────────────────
@@ -21,6 +21,11 @@ vi.mock('@/contexts/ThemeContext', () => ({
 
 vi.mock('@/lib/map-styles', () => ({
   DARK_MAP_STYLES: [],
+}));
+
+let mapsEnabled = true;
+vi.mock('@/lib/map-config', () => ({
+  get MAPS_ENABLED() { return mapsEnabled; },
 }));
 
 const mockUseTenant = vi.fn(() => ({
@@ -78,6 +83,7 @@ describe('LocationMap', () => {
         },
       }),
     })));
+    mapsEnabled = true;
     mockUseApiLoadingStatus.mockReturnValue('LOADED');
   });
 
@@ -154,6 +160,18 @@ describe('LocationMap', () => {
       const { container } = render(<W><LocationMap markers={markers} /></W>);
       expect(container.querySelector('[data-testid="google-map"]')).toBeNull();
       // No leaflet either
+      expect(container.querySelector('.nexus-osm-map-wrapper')).toBeNull();
+    });
+
+    it('returns null without fetching runtime config when the platform map display switch is OFF', async () => {
+      mapsEnabled = false;
+      const markers = [{ id: 1, lat: 53.35, lng: -6.26, title: 'Test' }];
+      const { container } = render(<W><LocationMap markers={markers} /></W>);
+      await act(async () => {
+        await Promise.resolve();
+      });
+      expect(fetch).not.toHaveBeenCalled();
+      expect(container.querySelector('[data-testid="google-map"]')).toBeNull();
       expect(container.querySelector('.nexus-osm-map-wrapper')).toBeNull();
     });
 

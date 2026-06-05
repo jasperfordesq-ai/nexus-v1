@@ -16,6 +16,7 @@ import.meta.env.VITE_GOOGLE_MAPS_API_KEY = 'test-key';
 
 // ─── Mocks ──────────────────────────────────────────────────────────────────
 
+let tenantMapsFeature = true;
 vi.mock('@/contexts', () => ({
   useAuth: vi.fn(() => ({
     user: { id: 1, name: 'Test User' },
@@ -25,7 +26,7 @@ vi.mock('@/contexts', () => ({
     tenant: { id: 2, name: 'Test', slug: 'test' },
     tenantSlug: 'test',
     branding: { name: 'Test' },
-    hasFeature: vi.fn(() => true),
+    hasFeature: vi.fn((feature: string) => feature === 'maps' ? tenantMapsFeature : true),
     hasModule: vi.fn(() => true),
     mapProvider: 'google',
     geocodingProvider: 'google',
@@ -109,6 +110,7 @@ describe('EntityMapView', () => {
       headers: { 'Content-Type': 'application/json' },
     })));
     mapsEnabled = true;
+    tenantMapsFeature = true;
     import.meta.env.VITE_GOOGLE_MAPS_API_KEY = 'test-key';
   });
 
@@ -175,6 +177,21 @@ describe('EntityMapView', () => {
 
   it('shows maps-disabled message when MAPS_ENABLED is false', () => {
     mapsEnabled = false;
+    render(
+      <W>
+        <EntityMapView
+          items={[{ id: 1, title: 'X', lat: 0, lng: 0 }]}
+          getCoordinates={getCoordinates}
+          getMarkerConfig={getMarkerConfig}
+          renderInfoContent={renderInfoContent}
+        />
+      </W>,
+    );
+    expect(screen.getByText('Map view is not available')).toBeInTheDocument();
+  });
+
+  it('shows maps-disabled message when the tenant maps feature is false', () => {
+    tenantMapsFeature = false;
     render(
       <W>
         <EntityMapView

@@ -12,6 +12,7 @@ import MapPin from 'lucide-react/icons/map-pin';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { LocationMap, type MapMarker } from './LocationMap';
 import { MAPS_ENABLED } from '@/lib/map-config';
+import { useTenant } from '@/contexts';
 
 export interface LocationMapCardProps {
   title: string;
@@ -32,8 +33,9 @@ export function LocationMapCard({
   className = '',
   zoom = 14,
 }: LocationMapCardProps) {
+  const { hasFeature } = useTenant();
   const hasCoordinates = markers.length > 0 || !!center;
-  const showMap = MAPS_ENABLED && hasCoordinates;
+  const showMap = MAPS_ENABLED && hasFeature('maps') && hasCoordinates;
 
   // Nothing to show
   if (!locationText && !hasCoordinates) return null;

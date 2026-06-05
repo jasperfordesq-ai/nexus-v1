@@ -121,6 +121,8 @@ export function MapSearchView({
   locationLoading = false,
 }: MapSearchViewProps) {
   const { t } = useTranslation('marketplace');
+  const { hasFeature } = useTenant();
+  const mapDisplayEnabled = MAPS_ENABLED && hasFeature('maps');
 
   // Build map markers from listings that have location coordinates
   // Note: MarketplaceListingItem doesn't carry lat/lng, but the extended detail
@@ -146,7 +148,7 @@ export function MapSearchView({
   }, [listings]);
 
   // ─── Fallback: Maps not enabled ───────────────────────────────────────────
-  if (!MAPS_ENABLED) {
+  if (!mapDisplayEnabled) {
     return (
       <GlassCard className={`p-8 flex flex-col items-center justify-center gap-4 ${className}`}>
         <MapPinOff className="w-14 h-14 text-muted" aria-hidden="true" />

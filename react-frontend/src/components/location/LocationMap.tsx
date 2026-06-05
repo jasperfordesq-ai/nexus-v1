@@ -42,6 +42,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { DARK_MAP_STYLES } from '@/lib/map-styles';
 import { GoogleMapsProvider, useGoogleMapsConfig } from './GoogleMapsProvider';
 import { useTenant } from '@/contexts';
+import { MAPS_ENABLED } from '@/lib/map-config';
 
 // Code-split: the Leaflet bundle (~150KB gz) only loads when a tenant has
 // actually selected map_provider=openstreetmap. Google-only tenants pay
@@ -550,7 +551,7 @@ export function LocationMap(props: LocationMapProps) {
   const { mapProvider, hasFeature } = useTenant();
   const { t } = useTranslation();
 
-  if (!hasFeature('maps')) {
+  if (!MAPS_ENABLED || !hasFeature('maps')) {
     return null;
   }
 

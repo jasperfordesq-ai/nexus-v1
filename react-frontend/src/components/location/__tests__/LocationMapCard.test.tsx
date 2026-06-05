@@ -16,13 +16,14 @@ import.meta.env.VITE_GOOGLE_MAPS_API_KEY = 'test-key';
 
 // ─── Mocks ──────────────────────────────────────────────────────────────────
 
+let tenantMapsFeature = true;
 vi.mock('@/contexts', () => ({
   useAuth: vi.fn(() => ({ user: { id: 1 }, isAuthenticated: true })),
   useTenant: vi.fn(() => ({
     tenant: { id: 2, name: 'Test', slug: 'test' },
     tenantSlug: 'test',
     branding: { name: 'Test' },
-    hasFeature: vi.fn(() => true),
+    hasFeature: vi.fn((feature: string) => feature === 'maps' ? tenantMapsFeature : true),
     hasModule: vi.fn(() => true),
     mapProvider: 'google',
     geocodingProvider: 'google',
@@ -106,6 +107,7 @@ describe('LocationMapCard', () => {
       headers: { 'Content-Type': 'application/json' },
     })));
     mapsEnabled = true;
+    tenantMapsFeature = true;
     import.meta.env.VITE_GOOGLE_MAPS_API_KEY = 'test-key';
   });
 
@@ -188,5 +190,21 @@ describe('LocationMapCard', () => {
       </W>,
     );
     expect(container.querySelector('[data-testid="google-map"]')).toBeNull();
+  });
+
+  it('does not show map when the tenant maps feature is false', () => {
+    tenantMapsFeature = false;
+    const markers = [{ id: 1, lat: 53.35, lng: -6.26, title: 'Test' }];
+    const { container } = render(
+      <W>
+        <LocationMapCard
+          title="Location"
+          markers={markers}
+          locationText="Test"
+        />
+      </W>,
+    );
+    expect(container.querySelector('[data-testid="google-map"]')).toBeNull();
+    expect(screen.getByText('Test')).toBeInTheDocument();
   });
 });

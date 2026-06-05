@@ -26,6 +26,11 @@ export interface GoogleMapsConfig {
   enabled: boolean;
   apiKey: string;
   mapId: string | null;
+  mapsEnabled?: boolean;
+  mapProvider?: 'google' | 'openstreetmap';
+  geocodingProvider?: 'google' | 'nominatim';
+  googleMapsEnabled?: boolean;
+  googlePlacesEnabled?: boolean;
   /** Runtime tile URL for the OSM branch — chosen by the server (free OSM
    *  vs MapTiler) based on whether a per-tenant MapTiler key is set. */
   osmTileUrl?: string;
@@ -65,6 +70,17 @@ async function fetchGoogleMapsConfig(): Promise<GoogleMapsConfig> {
           enabled: Boolean(data.enabled && data.apiKey),
           apiKey: typeof data.apiKey === 'string' ? data.apiKey : '',
           mapId: typeof data.mapId === 'string' && data.mapId !== '' ? data.mapId : null,
+          mapsEnabled: typeof data.mapsEnabled === 'boolean' ? data.mapsEnabled : undefined,
+          mapProvider:
+            data.mapProvider === 'google' || data.mapProvider === 'openstreetmap'
+              ? data.mapProvider
+              : undefined,
+          geocodingProvider:
+            data.geocodingProvider === 'google' || data.geocodingProvider === 'nominatim'
+              ? data.geocodingProvider
+              : undefined,
+          googleMapsEnabled: typeof data.googleMapsEnabled === 'boolean' ? data.googleMapsEnabled : undefined,
+          googlePlacesEnabled: typeof data.googlePlacesEnabled === 'boolean' ? data.googlePlacesEnabled : undefined,
           osmTileUrl: typeof data.osmTileUrl === 'string' ? data.osmTileUrl : undefined,
           osmTileAttribution: typeof data.osmTileAttribution === 'string' ? data.osmTileAttribution : undefined,
           osmTileProvider:
@@ -82,6 +98,11 @@ async function fetchGoogleMapsConfig(): Promise<GoogleMapsConfig> {
           enabled: false,
           apiKey: '',
           mapId: null,
+          mapsEnabled: false,
+          mapProvider: undefined,
+          geocodingProvider: undefined,
+          googleMapsEnabled: false,
+          googlePlacesEnabled: false,
           osmTileUrl: undefined,
           osmTileAttribution: undefined,
           osmTileProvider: null,

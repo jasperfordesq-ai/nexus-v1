@@ -62,9 +62,10 @@ export function ListingsPage() {
   const { t } = useTranslation('listings');
   usePageTitle(t('title'));
   const { isAuthenticated } = useAuth();
-  const { tenantPath, hasModule } = useTenant();
+  const { tenantPath, hasModule, hasFeature } = useTenant();
   const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
+  const canUseMapView = MAPS_ENABLED && hasFeature('maps');
 
   const [listings, setListings] = useState<Listing[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -172,7 +173,7 @@ export function ListingsPage() {
       if (selectedType !== 'all') params.set('type', selectedType);
       if (selectedCategory) params.set('category', selectedCategory);
       if (!reset && cursorRef.current) params.set('cursor', cursorRef.current);
-      const isMapView = viewMode === 'map';
+      const isMapView = canUseMapView && viewMode === 'map';
       params.set('per_page', isMapView ? '100' : '20');
       if (isMapView) {
         params.set('with_coordinates', '1');
@@ -247,7 +248,7 @@ export function ListingsPage() {
         setIsLoading(false);
       }
     }
-  }, [searchQuery, selectedType, selectedCategory, proximityParams, hoursRange, serviceMode, postedWithin, sortMode, viewMode]);
+  }, [searchQuery, selectedType, selectedCategory, proximityParams, hoursRange, serviceMode, postedWithin, sortMode, viewMode, canUseMapView]);
 
   // Keep a ref so effects always call the latest version without depending on it
   const loadListingsRef = useRef(loadListings);
@@ -282,21 +283,28 @@ export function ListingsPage() {
     return () => clearTimeout(timer);
   }, [searchInput]);
 
+  useEffect(() => {
+    if (!canUseMapView && viewMode === 'map') {
+      setViewMode('grid');
+    }
+  }, [canUseMapView, viewMode]);
+
   // Load listings when filters change — separate from URL sync to avoid reset loops
   useEffect(() => {
     loadListingsRef.current(true);
     return () => { abortRef.current?.abort(); };
-  }, [searchQuery, selectedType, selectedCategory, proximityParams, hoursRange, serviceMode, postedWithin, sortMode, viewMode]);
+  }, [searchQuery, selectedType, selectedCategory, proximityParams, hoursRange, serviceMode, postedWithin, sortMode, viewMode, canUseMapView]);
 
   // In map view, auto-load remaining pages so all geocoded listings are visible
   // without requiring users to click "Load More". Capped to prevent runaway requests.
   useEffect(() => {
+    if (!canUseMapView) return;
     if (viewMode !== 'map') return;
     if (isLoading) return;
     if (!hasMore) return;
     if (listings.length >= 500) return;
     loadListingsRef.current(false);
-  }, [viewMode, isLoading, hasMore, listings.length]);
+  }, [canUseMapView, viewMode, isLoading, hasMore, listings.length]);
 
   // Restore scroll position on back-navigation; save on unmount
   useEffect(() => {
@@ -571,7 +579,7 @@ export function ListingsPage() {
               >
                 <List className="w-4 h-4" aria-hidden="true" />
               </ToggleButton>
-              {MAPS_ENABLED && (
+              {canUseMapView && (
                 <ToggleButton
                   id="map"
                   isIconOnly

@@ -20,6 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { GlassCard, Button } from '@/components/ui';
 import { LocationMap, type MapMarker } from '@/components/location';
 import { MAPS_ENABLED } from '@/lib/map-config';
+import { useTenant } from '@/contexts';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -55,6 +56,8 @@ export function ListingLocationMap({
   mapHeight = '200px',
 }: ListingLocationMapProps) {
   const { t } = useTranslation('marketplace');
+  const { hasFeature } = useTenant();
+  const mapDisplayEnabled = MAPS_ENABLED && hasFeature('maps');
 
   // Compute a stable offset per render (privacy)
   const offsetPosition = useMemo(
@@ -90,7 +93,7 @@ export function ListingLocationMap({
       </div>
 
       {/* Map or fallback */}
-      {MAPS_ENABLED ? (
+      {mapDisplayEnabled ? (
         <div className="px-4">
           <LocationMap
             markers={markers}

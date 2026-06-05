@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { LocationMap, type MapMarker } from './LocationMap';
 import { Skeleton } from '@/components/ui';
 import { MAPS_ENABLED } from '@/lib/map-config';
+import { useTenant } from '@/contexts';
 
 export interface EntityMapViewProps<T> {
   items: T[];
@@ -43,6 +44,8 @@ export function EntityMapView<T>({
   onMapsFailed,
 }: EntityMapViewProps<T>) {
   const { t } = useTranslation('common');
+  const { hasFeature } = useTenant();
+  const mapDisplayEnabled = MAPS_ENABLED && hasFeature('maps');
   const markers: MapMarker[] = useMemo(() => {
     const result: MapMarker[] = [];
     for (const item of items) {
@@ -62,7 +65,7 @@ export function EntityMapView<T>({
     return result;
   }, [items, getCoordinates, getMarkerConfig, renderInfoContent]);
 
-  if (!MAPS_ENABLED) {
+  if (!mapDisplayEnabled) {
     return (
       <div className={`flex flex-col items-center justify-center gap-3 py-16 ${className}`}>
         <MapPinOff className="w-12 h-12 text-theme-subtle" />
