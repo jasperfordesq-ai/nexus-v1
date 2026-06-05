@@ -90,7 +90,7 @@ class NotifyAdminOfNewListing implements ShouldQueue
                 }
 
                 // Each admin's notification renders in THEIR language.
-                LocaleContext::withLocale($admin, function () use ($admin, $listing, $listingTitle, $listingType, $listingUrl, $posterName, $tenantName, $adminEmail, $event) {
+                LocaleContext::withLocale($admin, function () use ($admin, $listing, $listingTitle, $listingType, $listingUrl, $posterName, $tenantName, $adminEmail, $event, $skipEmailFanout) {
                     $adminName = $admin->first_name ?? $admin->name ?? 'Admin';
 
                     $bellContent = __('emails_misc.admin_notify.new_listing_bell', [
