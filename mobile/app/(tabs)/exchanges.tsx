@@ -673,7 +673,7 @@ function NearMeFilter({
                 {t('nearMeRadiusTitle')}
               </Text>
               <Text className="text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={1}>
-                {t('nearMeActiveDescription', { radius: radiusKm })}
+                {locationError ? t('nearMeDescription') : t('nearMeActiveDescription', { radius: radiusKm })}
               </Text>
             </View>
             <Text className="text-sm font-bold" style={{ color: primary }}>
