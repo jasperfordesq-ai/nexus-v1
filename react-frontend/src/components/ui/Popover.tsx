@@ -4,7 +4,9 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import {
+  cloneElement,
   createContext,
+  isValidElement,
   useContext,
   type ComponentPropsWithoutRef,
   type ReactNode,
@@ -119,10 +121,18 @@ export function Popover({
 
 export function PopoverTrigger({ children, className, ...props }: PopoverTriggerProps) {
   const { classNames } = useContext(PopoverContext);
+  const triggerClassName = combineClasses(classNames?.trigger, className);
+
+  if (isValidElement<{ className?: string }>(children)) {
+    return cloneElement(children, {
+      ...(props as Record<string, unknown>),
+      className: combineClasses(children.props.className, triggerClassName),
+    } as { className?: string });
+  }
 
   return (
     <HeroUIPopover.Trigger
-      className={combineClasses(classNames?.trigger, className)}
+      className={triggerClassName}
       {...props}
     >
       {children}

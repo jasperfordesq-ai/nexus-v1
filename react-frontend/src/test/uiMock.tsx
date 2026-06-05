@@ -35,7 +35,7 @@ const DOM_SAFE = new Set([
 function domSafe(props: AnyProps): Record<string, unknown> {
   const out: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(props)) {
-    if (DOM_SAFE.has(k) || k.startsWith('data-')) out[k] = v;
+    if (DOM_SAFE.has(k) || k.startsWith('data-')) out[k] = v ?? undefined;
   }
   return out;
 }
@@ -65,7 +65,7 @@ function makeStub(name: string): unknown {
   if (cached) return cached;
   const leaf = name.split('.').pop()!.toLowerCase();
   const isContainerPart = /group|section|item|trigger|popover|content|indicator|icon|value|label|description|error|heading|panel|list|menu/.test(leaf);
-  const isButton = /button/.test(leaf);
+  const isButton = !isContainerPart && /button/.test(leaf);
   const isCheckable = !isButton && /^(switch|checkbox|radio)$/.test(leaf);
   const isInputLike =
     !isButton && !isCheckable && !isContainerPart &&

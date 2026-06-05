@@ -69,18 +69,21 @@ abstract class TestCase extends BaseTestCase
                 'updated_at' => now(),
             ]);
 
-            // Seed a secondary tenant used by tenant-isolation tests (forTenant(999))
-            DB::table('tenants')->insertOrIgnore([
-                'id' => 999,
-                'name' => 'Other Test Tenant',
-                'slug' => 'test-999',
-                'domain' => null,
-                'is_active' => true,
-                'depth' => 0,
-                'allows_subtenants' => false,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            // Keep the secondary tenant active even if a stale local fixture row
+            // already exists from an earlier non-transactional test run.
+            DB::table('tenants')->updateOrInsert(
+                ['id' => 999],
+                [
+                    'name' => 'Other Test Tenant',
+                    'slug' => 'test-999',
+                    'domain' => null,
+                    'is_active' => true,
+                    'depth' => 0,
+                    'allows_subtenants' => false,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
 
             TenantContext::setById($this->testTenantId);
         } catch (\Exception $e) {

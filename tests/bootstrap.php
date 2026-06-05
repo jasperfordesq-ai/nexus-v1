@@ -15,13 +15,21 @@ declare(strict_types=1);
 // Load Composer autoloader
 require_once __DIR__ . '/../vendor/autoload.php';
 
-// Load testing environment variables
-// Try multiple env files in order of preference
-$envFiles = [
-    __DIR__ . '/../.env.testing',   // Testing-specific env
-    __DIR__ . '/../.env.docker',    // Docker environment
-    __DIR__ . '/../.env',           // Default env
-];
+// Load testing environment variables.
+// Native Windows development should use .env, not .env.docker: the latter points
+// DB_HOST at the Docker service name `db`, which is unreachable from native PHP.
+$isContainer = file_exists('/.dockerenv') || getenv('RUNNING_IN_DOCKER') === '1';
+$envFiles = $isContainer
+    ? [
+        __DIR__ . '/../.env.testing',
+        __DIR__ . '/../.env.docker',
+        __DIR__ . '/../.env',
+    ]
+    : [
+        __DIR__ . '/../.env.testing',
+        __DIR__ . '/../.env',
+        __DIR__ . '/../.env.docker',
+    ];
 
 $loadEnvFile = function($filePath) {
     if (!file_exists($filePath)) {

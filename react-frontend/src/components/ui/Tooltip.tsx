@@ -79,9 +79,7 @@ export function Tooltip({
       delay={delay ?? 0}
       {...props}
     >
-      <HeroUITooltip.Trigger>
-        {children}
-      </HeroUITooltip.Trigger>
+      {children}
       <HeroUITooltip.Content
         className={combineClasses(mapColor(color), classNames?.base, classNames?.content, className)}
         offset={offset}

@@ -239,7 +239,7 @@ export default function CreateOpportunityPage() {
               label={t('form_org_label')}
               placeholder={t('form_org_placeholder')}
               searchPlaceholder={t('search_organisations')}
-              value={formData.organization_id || null}
+              value={formData.organization_id}
               onChange={(key) => updateField('organization_id', key && !Array.isArray(key) ? String(key) : '')}
               isInvalid={!!errors.organization_id}
               errorMessage={errors.organization_id}

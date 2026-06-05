@@ -171,7 +171,7 @@ export function VerificationBadgeRow({
     const loadBadges = async () => {
       try {
         const response = await api.get<VerificationBadgeData[]>(`/v2/users/${userId}/verification-badges`);
-        if (response.success && response.data) {
+        if (response?.success && response.data) {
           setBadges(normalizeBadges(Array.isArray(response.data) ? response.data : []));
         }
       } catch (err) {
@@ -258,7 +258,7 @@ export function VerificationBadgeSummary({
     const loadBadges = async () => {
       try {
         const response = await api.get<VerificationBadgeData[]>(`/v2/users/${userId}/verification-badges`);
-        if (response.success && response.data) {
+        if (response?.success && response.data) {
           setBadges(normalizeBadges(Array.isArray(response.data) ? response.data : []));
         }
       } catch (err) {
