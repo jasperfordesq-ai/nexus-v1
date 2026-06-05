@@ -248,6 +248,104 @@ describe('AdminSidebar', () => {
     expect(screen.getByRole('link', { name: 'Super Admin Panel' })).toHaveAttribute('href', '/test/super-admin');
   });
 
+  it('hides commercial financial links from non-god super admins', () => {
+    mockHasFeature.mockImplementation((feature: string) =>
+      feature === 'caring_community' || feature === 'member_premium',
+    );
+
+    render(
+      <W><AdminSidebar collapsed={false} onToggle={mockOnToggle} /></W>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Financial' }));
+
+    expect(screen.queryByRole('link', { name: 'Plans & Pricing' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Billing' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Member Premium' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Premium Subscribers' })).not.toBeInTheDocument();
+  });
+
+  it('shows commercial financial links to god users', () => {
+    Object.assign(mockUser, {
+      role: 'admin',
+      is_super_admin: false,
+      is_tenant_super_admin: false,
+      is_god: true,
+    });
+    mockHasFeature.mockImplementation((feature: string) =>
+      feature === 'caring_community' || feature === 'member_premium',
+    );
+
+    render(
+      <W><AdminSidebar collapsed={false} onToggle={mockOnToggle} /></W>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Financial' }));
+
+    expect(screen.getByRole('link', { name: 'Plans & Pricing' })).toHaveAttribute('href', '/test/admin/plans');
+    expect(screen.getByRole('link', { name: 'Billing' })).toHaveAttribute('href', '/test/admin/billing');
+    expect(screen.getByRole('link', { name: 'Member Premium' })).toHaveAttribute('href', '/test/admin/member-premium');
+    expect(screen.getByRole('link', { name: 'Premium Subscribers' })).toHaveAttribute('href', '/test/admin/member-premium/subscribers');
+  });
+
+  it('hides diagnostic debug links from non-god super admins', () => {
+    render(
+      <W><AdminSidebar collapsed={false} onToggle={mockOnToggle} /></W>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Intelligence & Diagnostics' }));
+
+    expect(screen.getByRole('link', { name: 'Algorithm Settings' })).toHaveAttribute('href', '/test/admin/algorithm-settings');
+    expect(screen.queryByRole('link', { name: 'Diagnostics' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Match Debug Panel' })).not.toBeInTheDocument();
+  });
+
+  it('shows diagnostic debug links to god users', () => {
+    Object.assign(mockUser, {
+      role: 'admin',
+      is_super_admin: false,
+      is_tenant_super_admin: false,
+      is_god: true,
+    });
+
+    render(
+      <W><AdminSidebar collapsed={false} onToggle={mockOnToggle} /></W>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Intelligence & Diagnostics' }));
+
+    expect(screen.getByRole('link', { name: 'Diagnostics' })).toHaveAttribute('href', '/test/admin/matching-diagnostic');
+    expect(screen.getByRole('link', { name: 'Match Debug Panel' })).toHaveAttribute('href', '/test/admin/match-debug');
+  });
+
+  it('hides the menus content link from non-god super admins', () => {
+    render(
+      <W><AdminSidebar collapsed={false} onToggle={mockOnToggle} /></W>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Content' }));
+
+    expect(screen.getByRole('link', { name: 'Pages' })).toHaveAttribute('href', '/test/admin/pages');
+    expect(screen.queryByRole('link', { name: 'Menus' })).not.toBeInTheDocument();
+  });
+
+  it('shows the menus content link to god users', () => {
+    Object.assign(mockUser, {
+      role: 'admin',
+      is_super_admin: false,
+      is_tenant_super_admin: false,
+      is_god: true,
+    });
+
+    render(
+      <W><AdminSidebar collapsed={false} onToggle={mockOnToggle} /></W>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Content' }));
+
+    expect(screen.getByRole('link', { name: 'Menus' })).toHaveAttribute('href', '/test/admin/menus');
+  });
+
   it('applies w-16 class when collapsed', () => {
     const { container } = render(
       <W><AdminSidebar collapsed={true} onToggle={mockOnToggle} /></W>

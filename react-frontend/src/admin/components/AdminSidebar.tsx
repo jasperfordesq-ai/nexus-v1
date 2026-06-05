@@ -211,15 +211,16 @@ function useAdminNav(safeguardingFlagCount: number): NavSection[] {
   const { user } = useAuth();
 
   const userRecord = user as Record<string, unknown> | null;
+  const isGod = (user?.role as string) === 'god' || userRecord?.is_god === true;
   const isSuperAdmin =
     (user?.role as string) === 'super_admin' ||
     userRecord?.is_super_admin === true ||
     userRecord?.is_tenant_super_admin === true ||
-    userRecord?.is_god === true;
+    isGod;
   const isPlatformSuperAdmin =
     (user?.role as string) === 'super_admin' ||
     userRecord?.is_super_admin === true ||
-    userRecord?.is_god === true;
+    isGod;
 
   return useMemo(() => {
     const communityItems: NavItem[] = [
@@ -314,7 +315,7 @@ function useAdminNav(safeguardingFlagCount: number): NavSection[] {
           ...(hasFeature('resources') ? [{ label: t('resources'), href: '/admin/resources', icon: BookOpen }] : []),
           { label: t('pages'), href: '/admin/pages', icon: FileText },
           { label: t('landing_page'), href: '/admin/landing-page', icon: Palette },
-          { label: t('menus'), href: '/admin/menus', icon: Menu },
+          ...(isGod ? [{ label: t('menus'), href: '/admin/menus', icon: Menu }] : []),
           { label: t('categories'), href: '/admin/categories', icon: FolderTree },
           { label: t('attributes'), href: '/admin/attributes', icon: Tags },
         ],
@@ -452,9 +453,11 @@ function useAdminNav(safeguardingFlagCount: number): NavSection[] {
             { label: t('org_wallets'), href: '/admin/timebanking/org-wallets', icon: Wallet },
             { label: t('starting_balances'), href: '/admin/timebanking/starting-balances', icon: Wallet },
           ] : []),
-          { label: t('plans_pricing'), href: '/admin/plans', icon: CreditCard },
-          { label: t('billing'), href: '/admin/billing', icon: CreditCard },
-          ...(hasFeature('member_premium') ? [
+          ...(isGod ? [
+            { label: t('plans_pricing'), href: '/admin/plans', icon: CreditCard },
+            { label: t('billing'), href: '/admin/billing', icon: CreditCard },
+          ] : []),
+          ...(isGod && hasFeature('member_premium') ? [
             { label: t('member_premium'), href: '/admin/member-premium', icon: Crown },
             { label: t('premium_subscribers'), href: '/admin/member-premium/subscribers', icon: Users },
           ] : []),
@@ -521,8 +524,10 @@ function useAdminNav(safeguardingFlagCount: number): NavSection[] {
             { label: t('agent_runs'), href: '/admin/agents/runs', icon: Bot },
           ] : []),
           { label: t('algorithm_settings'), href: '/admin/algorithm-settings', icon: Cpu },
-          { label: t('diagnostics'), href: '/admin/matching-diagnostic', icon: Stethoscope },
-          { label: t('match_debug_panel'), href: '/admin/match-debug', icon: Target },
+          ...(isGod ? [
+            { label: t('diagnostics'), href: '/admin/matching-diagnostic', icon: Stethoscope },
+            { label: t('match_debug_panel'), href: '/admin/match-debug', icon: Target },
+          ] : []),
         ],
       },
     ];
@@ -563,7 +568,7 @@ function useAdminNav(safeguardingFlagCount: number): NavSection[] {
     }
 
     return sections.filter((section) => section.href || (section.items?.length ?? 0) > 0);
-  }, [hasFeature, hasModule, isPlatformSuperAdmin, isSuperAdmin, safeguardingFlagCount, t]);
+  }, [hasFeature, hasModule, isGod, isPlatformSuperAdmin, isSuperAdmin, safeguardingFlagCount, t]);
 }
 
 interface AdminSidebarProps {
