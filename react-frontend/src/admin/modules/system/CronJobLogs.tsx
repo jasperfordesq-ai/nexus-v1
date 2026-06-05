@@ -164,7 +164,7 @@ export function CronJobLogs() {
         title={t('system.cron_job_logs_title')}
         description={t('system.cron_job_logs_desc')}
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2">
             <Button
               size="sm"
               variant="secondary"
@@ -197,11 +197,11 @@ export function CronJobLogs() {
 
       {/* Filters */}
       <Card className="mb-6">
-        <CardHeader className="flex items-center gap-2 pb-0">
+        <CardHeader className="flex items-center justify-start gap-2 px-4 pb-2 pt-4 sm:px-5">
           <Filter size={16} className="text-muted" />
           <span className="text-sm font-medium">{t('system.filter_section_header')}</span>
         </CardHeader>
-        <CardBody className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <CardBody className="grid grid-cols-1 gap-4 px-4 pb-4 pt-0 sm:grid-cols-2 sm:px-5 lg:grid-cols-[minmax(12rem,1fr)_minmax(14rem,1.2fr)_minmax(11rem,1fr)_minmax(11rem,1fr)]">
           <Select
             label={t('system.label_status')}
             placeholder={t('system.placeholder_all_statuses')}
@@ -279,62 +279,92 @@ export function CronJobLogs() {
 
       {/* Logs table */}
       {!loading && logs.length > 0 && (
-        <Card>
+        <Card className="overflow-hidden">
           <CardBody className="p-0">
-            <Table aria-label={t('system.cron_job_logs_title')} removeWrapper>
+            <Table
+              aria-label={t('system.cron_job_logs_title')}
+              removeWrapper
+              onRowAction={(key) => {
+                const log = logs.find((item) => String(item.id) === String(key));
+                if (log) {
+                  void handleViewDetail(log);
+                }
+              }}
+              classNames={{
+                base: 'min-w-0',
+                wrapper: 'max-w-full overflow-x-auto',
+                table: 'min-w-[1180px]',
+              }}
+            >
               <TableHeader>
-                <TableColumn>{t('system.col_job_name')}</TableColumn>
-                <TableColumn>{t('system.col_status')}</TableColumn>
-                <TableColumn>{t('system.col_duration')}</TableColumn>
-                <TableColumn>{t('system.col_output')}</TableColumn>
-                <TableColumn>{t('system.col_executed_at')}</TableColumn>
-                <TableColumn>{t('system.col_executed_by')}</TableColumn>
+                <TableColumn className="w-64 min-w-64 whitespace-nowrap">
+                  {t('system.col_job_name')}
+                </TableColumn>
+                <TableColumn className="w-28 min-w-28 whitespace-nowrap">
+                  {t('system.col_status')}
+                </TableColumn>
+                <TableColumn className="w-28 min-w-28 whitespace-nowrap">
+                  {t('system.col_duration')}
+                </TableColumn>
+                <TableColumn className="w-[34rem] min-w-[34rem]">
+                  {t('system.col_output')}
+                </TableColumn>
+                <TableColumn className="w-52 min-w-52 whitespace-nowrap">
+                  {t('system.col_executed_at')}
+                </TableColumn>
+                <TableColumn className="w-32 min-w-32 whitespace-nowrap">
+                  {t('system.col_executed_by')}
+                </TableColumn>
               </TableHeader>
               <TableBody>
                 {logs.map((log) => (
                   <TableRow
                     key={log.id}
+                    id={log.id}
                     className="cursor-pointer hover:bg-surface-secondary"
-                    onClick={() => handleViewDetail(log)}
                   >
-                    <TableCell>
-                      <div className="font-medium">{log.job_name}</div>
-                      <div className="text-xs text-muted">{log.job_id}</div>
+                    <TableCell className="w-64 min-w-64 align-top">
+                      <div className="max-w-[13rem]">
+                        <div className="truncate font-medium text-foreground">{log.job_name}</div>
+                        <div className="truncate font-mono text-xs text-muted">{log.job_id}</div>
+                      </div>
                     </TableCell>
-                    <TableCell>
-                      <Chip
-                        size="sm"
-                        variant="soft"
-                        color={log.status === 'success' ? 'success' : 'danger'}
-                        startContent={
-                          log.status === 'success' ? (
-                            <CheckCircle size={12} />
-                          ) : (
-                            <XCircle size={12} />
-                          )
-                        }
-                      >
-                        {getStatusLabel(log.status)}
-                      </Chip>
+                    <TableCell className="w-28 min-w-28 whitespace-nowrap align-top">
+                      <div className="flex items-center">
+                        <Chip
+                          size="sm"
+                          variant="soft"
+                          color={log.status === 'success' ? 'success' : 'danger'}
+                          startContent={
+                            log.status === 'success' ? (
+                              <CheckCircle size={12} />
+                            ) : (
+                              <XCircle size={12} />
+                            )
+                          }
+                        >
+                          {getStatusLabel(log.status)}
+                        </Chip>
+                      </div>
                     </TableCell>
-                    <TableCell>
-                      <span className="text-sm">
+                    <TableCell className="w-28 min-w-28 whitespace-nowrap align-top">
+                      <span className="text-sm tabular-nums">
                         {Number(log.duration_seconds).toFixed(2)}s
                       </span>
                     </TableCell>
-                    <TableCell>
-                      <span className="text-xs text-foreground line-clamp-2">
+                    <TableCell className="w-[34rem] min-w-[34rem] max-w-[34rem] align-top">
+                      <span className="line-clamp-2 whitespace-normal break-words text-xs leading-5 text-foreground">
                         {log.output || t('system.table_no_output')}
                       </span>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="w-52 min-w-52 whitespace-nowrap align-top">
                       <div className="flex items-center gap-1.5 text-sm">
-                        <Calendar size={14} className="text-muted" />
-                        {new Date(log.executed_at).toLocaleString()}
+                        <Calendar size={14} className="flex-none text-muted" />
+                        <span>{new Date(log.executed_at).toLocaleString()}</span>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <span className="text-sm text-foreground">
+                    <TableCell className="w-32 min-w-32 whitespace-nowrap align-top">
+                      <span className="font-mono text-xs text-foreground">
                         {log.executed_by}
                       </span>
                     </TableCell>

@@ -13,7 +13,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { render } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 // ─── Common mocks ────────────────────────────────────────────────────────────
@@ -81,7 +81,19 @@ vi.mock('../../api/adminApi', () => ({
   adminCron: {
     getLogs: vi.fn().mockResolvedValue({
       success: true,
-      data: { data: [], meta: { page: 1, total_pages: 1, per_page: 20, total: 0 } },
+      data: [
+        {
+          id: 1,
+          job_id: 'geocode-batch',
+          job_name: 'geocode-batch',
+          status: 'success',
+          output: 'Starting batch geocoding... Current Status: Users with coordinates: 229 Users needing geocoding: 0 Listings with coordinates: 40',
+          duration_seconds: 0.15,
+          executed_at: '2026-03-04T17:41:24Z',
+          executed_by: 'manual-14',
+        },
+      ],
+      meta: { page: 1, total_pages: 1, per_page: 20, total: 1 },
     }),
     clearLogs: vi.fn().mockResolvedValue({ success: true }),
     exportLogs: vi.fn().mockResolvedValue({ success: true }),
@@ -162,6 +174,22 @@ describe('CronJobLogs', () => {
   it('renders without crashing', () => {
     const { container } = render(<W><CronJobLogs /></W>);
     expect(container.querySelector('div')).toBeTruthy();
+  });
+
+  it('keeps log table columns from collapsing into vertical text', async () => {
+    const { container } = render(<W><CronJobLogs /></W>);
+
+    await waitFor(() => {
+      expect(screen.getAllByText('geocode-batch').length).toBeGreaterThan(0);
+    });
+
+    const table = container.querySelector('table');
+    const outputCell = screen.getByText(/Starting batch geocoding/).closest('td');
+    const executedByCell = screen.getByText('manual-14').closest('td');
+
+    expect(table?.className).toContain('min-w-[1180px]');
+    expect(outputCell?.className).toContain('min-w-[34rem]');
+    expect(executedByCell?.className).toContain('whitespace-nowrap');
   });
 });
 
