@@ -242,6 +242,17 @@ describe('OnboardingSettings', () => {
 
   // ── 3. Toggle onboarding enabled switch ─────────────────────────────────
 
+  it('renders country preset labels from translations', async () => {
+    render(<OnboardingSettings />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Safeguarding Config')).toBeInTheDocument();
+    });
+
+    expect(screen.getAllByText('Ireland').length).toBeGreaterThan(0);
+    expect(screen.queryByText(/system\.onboarding\.preset_/)).not.toBeInTheDocument();
+  });
+
   it('toggles onboarding enabled switch', async () => {
     render(<OnboardingSettings />);
 
