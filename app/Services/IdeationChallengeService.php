@@ -1320,7 +1320,7 @@ class IdeationChallengeService
             }
             $challengeId = $idea->challenge_id ?? 0;
 
-            LocaleContext::withLocale($owner, function () use ($owner, $commenter, $idea, $ideaAuthorId, $commentText, $challengeId, $tenantId) {
+            LocaleContext::withLocale($owner, function () use ($owner, $commenter, $idea, $ideaAuthorId, $commentText, $challengeId, $tenantId, $ideaId) {
                 $commenterName = $commenter->name ?? __('emails.common.fallback_someone');
 
                 $shortComment = strlen($commentText) > 50 ? substr($commentText, 0, 50) . '...' : $commentText;

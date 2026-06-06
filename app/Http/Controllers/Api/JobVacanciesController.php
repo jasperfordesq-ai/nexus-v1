@@ -493,6 +493,10 @@ class JobVacanciesController extends BaseApiController
 
         $vacancy = $this->jobService->legacyGetById($id, $userId);
 
+        // Initialise $job — it is populated inside the try blocks below, so the
+        // later poster-email block must not read it undefined if a lookup throws.
+        $job = null;
+
         // Notify vacancy owner of new application
         try {
             $job = DB::selectOne(

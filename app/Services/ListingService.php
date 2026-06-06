@@ -1229,7 +1229,7 @@ class ListingService
 
                 foreach ($savedUsers as $savedUser) {
                     try {
-                        LocaleContext::withLocale($savedUser, function () use ($savedUser, $listingTitle, $tenantName, $listingUrl, $tenantId) {
+                        LocaleContext::withLocale($savedUser, function () use ($savedUser, $listingTitle, $tenantName, $listingUrl, $tenantId, $id) {
                             $firstName = $savedUser->first_name ?? $savedUser->name ?? __('emails.common.fallback_name');
 
                             $html = EmailTemplateBuilder::make()

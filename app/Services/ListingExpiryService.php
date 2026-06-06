@@ -68,7 +68,7 @@ class ListingExpiryService
                     ->select(['first_name', 'name', 'email', 'preferred_language'])
                     ->first();
 
-                LocaleContext::withLocale($ownerRow, function () use ($listing, $title, $listingLink, $ownerRow) {
+                LocaleContext::withLocale($ownerRow, function () use ($listing, $title, $listingLink, $ownerRow, $tenantId) {
                     Notification::create([
                         'user_id' => $listing->user_id,
                         'message' => __('emails_listings.listings.expired.notification', ['title' => $title]),

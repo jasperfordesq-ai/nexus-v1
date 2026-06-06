@@ -181,7 +181,7 @@ class LoggerService
             ];
         }
 
-        self::error($exception->getMessage(), $context);
+        self::getInstance()->error($exception->getMessage(), $context);
     }
 
     /**
@@ -348,7 +348,7 @@ class LoggerService
     private function write(string $output, string $level): void
     {
         // Write to file
-        $filename = self::getLogFilename($level);
+        $filename = $this->getLogFilename($level);
         $filepath = "{$this->logPath}/{$filename}";
 
         if (!is_dir($this->logPath)) {
@@ -370,7 +370,7 @@ class LoggerService
     /**
      * Get log filename based on level
      */
-    private static function getLogFilename(string $level): string
+    private function getLogFilename(string $level): string
     {
         $date = date('Y-m-d');
 

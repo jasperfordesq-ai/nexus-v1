@@ -412,7 +412,7 @@ class KnowledgeBaseService
             // Render subject + body in the author's preferred_language so the
             // confirmation arrives in their locale, not the caller's.
             $tenantId = TenantContext::getId();
-            LocaleContext::withLocale($author, function () use ($author, $title, $articleId, $isUpdate, $tenantId) {
+            LocaleContext::withLocale($author, function () use ($author, $title, $articleId, $isUpdate, $tenantId, $authorId) {
                 $firstName  = $author->first_name ?? (explode(' ', $author->name ?? '')[0] ?: __('emails.common.fallback_name'));
                 $community  = TenantContext::getName();
                 $articleUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/kb/' . $articleId;

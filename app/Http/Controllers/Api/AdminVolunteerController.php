@@ -893,7 +893,7 @@ class AdminVolunteerController extends BaseApiController
                 $oppTitle = htmlspecialchars($app->opportunity_title ?? 'the opportunity', ENT_QUOTES, 'UTF-8');
 
                 if ($applicant && !empty($applicant->email)) {
-                    LocaleContext::withLocale($applicant, function () use ($applicant, $oppTitle, $tenantId) {
+                    LocaleContext::withLocale($applicant, function () use ($applicant, $oppTitle, $tenantId, $id) {
                         $firstName = $applicant->first_name ?? $applicant->name ?? __('emails.common.fallback_name');
                         $url = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/volunteering';
 

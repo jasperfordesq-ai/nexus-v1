@@ -574,7 +574,17 @@ class AdminSuperController extends BaseApiController
             'is_tenant_super_admin' => !empty($input['is_tenant_super_admin']) ? 1 : 0,
         ];
 
-        $newUserId = User::createWithTenant($tenantId, $firstName, $lastName, $email, $password, $role, $options);
+        // createWithTenant(array $data, int $tenantId): build the data array it
+        // actually expects (was previously called with 7 positional args, which
+        // is a TypeError against the (array $data, int $tenantId) signature).
+        $data = array_merge($options, [
+            'first_name' => $firstName,
+            'last_name'  => $lastName,
+            'email'      => $email,
+            'password'   => $password,
+            'role'       => $role,
+        ]);
+        $newUserId = User::createWithTenant($data, $tenantId);
 
         if ($newUserId) {
             $this->superAdminAuditService->log(

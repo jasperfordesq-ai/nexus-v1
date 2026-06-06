@@ -572,7 +572,7 @@ class AdminVettingController extends BaseApiController
                 ->select(['email', 'name', 'first_name', 'preferred_language'])
                 ->first();
 
-            LocaleContext::withLocale($user, function () use ($user, $userId, $bellMessageKey, $bellLink, $emailHeadingKey, $emailBodyKey, $gradientFrom, $gradientTo, $ctaLabelKey, $ctaPath) {
+            LocaleContext::withLocale($user, function () use ($user, $userId, $bellMessageKey, $bellLink, $emailHeadingKey, $emailBodyKey, $gradientFrom, $gradientTo, $ctaLabelKey, $ctaPath, $tenantId) {
                 // Bell notification
                 Notification::createNotification(
                     $userId,
@@ -615,7 +615,6 @@ HTML;
                     if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'vetting', ['tenant_id' => $tenantId])) {
                         Log::warning('AdminVettingController::sendVettingNotification mailer returned false', [
                             'user_id' => $userId,
-                            'status' => $status,
                         ]);
                     }
                 }

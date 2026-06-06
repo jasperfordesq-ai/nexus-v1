@@ -1064,7 +1064,7 @@ class NotificationDispatcher
 
                 if (!EmailDispatchService::sendRaw($user->email, $subject, $html, null, null, null, 'review', ['tenant_id' => $tenantId])) {
                     Log::warning('NotificationDispatcher::sendReviewRequestEmail mailer returned false', [
-                        'user_id' => $userId,
+                        'user_id' => $user->id,
                     ]);
                     return false;
                 }

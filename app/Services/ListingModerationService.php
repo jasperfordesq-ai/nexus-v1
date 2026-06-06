@@ -220,7 +220,7 @@ class ListingModerationService
                         ->render();
 
                     if (!EmailDispatchService::sendRaw($owner->email, __('emails_listings.listings.rejected.subject'), $html, null, null, null, 'listing_moderation', ['tenant_id' => $tenantId])) {
-                        Log::warning("[ListingModerationService] reject email send returned false for user={$listing->user_id}, listing={$listingId}");
+                        Log::warning("[ListingModerationService] reject email send returned false for user={$owner->id}, listing={$listingId}");
                     }
                 });
             }

@@ -1058,7 +1058,7 @@ abstract class BaseApiController extends Controller
      *
      * @throws \Illuminate\Http\Exceptions\HttpResponseException if not authenticated
      */
-    private function resolveUser(): object
+    protected function resolveUser(): object
     {
         $user = Auth::user();
 

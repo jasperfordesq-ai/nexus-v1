@@ -43,30 +43,6 @@ parameters:
 			path: app/Http/Controllers/Api/AdminPrerenderController.php
 
 		-
-			message: '#^Static method App\\Models\\User\:\:createWithTenant\(\) invoked with 7 parameters, 2 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: app/Http/Controllers/Api/AdminSuperController.php
-
-		-
-			message: '#^Undefined variable\: \$status$#'
-			identifier: variable.undefined
-			count: 1
-			path: app/Http/Controllers/Api/AdminVettingController.php
-
-		-
-			message: '#^Undefined variable\: \$tenantId$#'
-			identifier: variable.undefined
-			count: 1
-			path: app/Http/Controllers/Api/AdminVettingController.php
-
-		-
-			message: '#^Undefined variable\: \$id$#'
-			identifier: variable.undefined
-			count: 1
-			path: app/Http/Controllers/Api/AdminVolunteerController.php
-
-		-
 			message: '#^Method Illuminate\\Database\\Eloquent\\Model\:\:delete\(\) invoked with 1 parameter, 0 required\.$#'
 			identifier: arguments.count
 			count: 1
@@ -89,12 +65,6 @@ parameters:
 			identifier: larastan.noEnvCallsOutsideOfConfig
 			count: 1
 			path: app/Http/Controllers/Api/AuthController.php
-
-		-
-			message: '#^Variable \$job might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: app/Http/Controllers/Api/JobVacanciesController.php
 
 		-
 			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
@@ -127,22 +97,10 @@ parameters:
 			path: app/Http/Controllers/Api/StripeWebhookController.php
 
 		-
-			message: '#^Call to private method resolveUser\(\) of class App\\Http\\Controllers\\Api\\BaseApiController\.$#'
-			identifier: method.private
-			count: 1
-			path: app/Http/Controllers/Api/SuperAdmin/TenantProvisioningController.php
-
-		-
 			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
 			identifier: larastan.noEnvCallsOutsideOfConfig
 			count: 1
 			path: app/Http/Controllers/Api/Verein/MyDuesController.php
-
-		-
-			message: '#^Call to private method resolveUser\(\) of class App\\Http\\Controllers\\Api\\BaseApiController\.$#'
-			identifier: method.private
-			count: 1
-			path: app/Http/Controllers/Api/VolunteerController.php
 
 		-
 			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
@@ -167,12 +125,6 @@ parameters:
 			identifier: larastan.noEnvCallsOutsideOfConfig
 			count: 2
 			path: app/Http/Middleware/SecurityHeaders.php
-
-		-
-			message: '#^Undefined variable\: \$skipEmailFanout$#'
-			identifier: variable.undefined
-			count: 1
-			path: app/Listeners/NotifyAdminOfNewListing.php
 
 		-
 			message: '#^Call to static method endRequest\(\) on an unknown class App\\Services\\PerformanceMonitorService\.$#'
@@ -277,12 +229,6 @@ parameters:
 			path: app/Services/Enterprise/GdprService.php
 
 		-
-			message: '#^Undefined variable\: \$this$#'
-			identifier: variable.undefined
-			count: 1
-			path: app/Services/Enterprise/LoggerService.php
-
-		-
 			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
 			identifier: larastan.noEnvCallsOutsideOfConfig
 			count: 4
@@ -293,12 +239,6 @@ parameters:
 			identifier: larastan.noEnvCallsOutsideOfConfig
 			count: 2
 			path: app/Services/GroupSearchService.php
-
-		-
-			message: '#^Undefined variable\: \$ideaId$#'
-			identifier: variable.undefined
-			count: 1
-			path: app/Services/IdeationChallengeService.php
 
 		-
 			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
@@ -319,40 +259,10 @@ parameters:
 			path: app/Services/JobTeamService.php
 
 		-
-			message: '#^Undefined variable\: \$authorId$#'
-			identifier: variable.undefined
-			count: 1
-			path: app/Services/KnowledgeBaseService.php
-
-		-
-			message: '#^Undefined variable\: \$tenantId$#'
-			identifier: variable.undefined
-			count: 1
-			path: app/Services/ListingExpiryService.php
-
-		-
-			message: '#^Undefined variable\: \$listing$#'
-			identifier: variable.undefined
-			count: 1
-			path: app/Services/ListingModerationService.php
-
-		-
-			message: '#^Undefined variable\: \$id$#'
-			identifier: variable.undefined
-			count: 1
-			path: app/Services/ListingService.php
-
-		-
 			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
 			identifier: larastan.noEnvCallsOutsideOfConfig
 			count: 2
 			path: app/Services/MailchimpService.php
-
-		-
-			message: '#^Undefined variable\: \$userId$#'
-			identifier: variable.undefined
-			count: 1
-			path: app/Services/NotificationDispatcher.php
 
 		-
 			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
