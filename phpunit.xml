@@ -23,6 +23,12 @@
     <env name="QUEUE_CONNECTION" value="sync"/>
     <env name="MAIL_DRIVER" value="array"/>
     <env name="LOG_CHANNEL" value="null"/>
+    <!-- Tests must NOT instantiate the real Pusher broadcaster. PUSHER_* are
+         unset in CI/test, so BroadcastServiceProvider::boot() resolving the
+         default ('pusher') connection makes Pusher::__construct() throw on a
+         null key, which errored ~8000 tests at bootstrap. The 'null' broadcaster
+         (config/broadcasting.php) is the standard test driver. -->
+    <env name="BROADCAST_CONNECTION" value="null"/>
   </php>
   <coverage>
     <report>

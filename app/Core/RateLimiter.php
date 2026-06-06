@@ -233,7 +233,7 @@ class RateLimiter
     private static function getApiCounter(string $key): int
     {
         // Try APCu first (fastest)
-        if (function_exists('apcu_fetch')) {
+        if (function_exists('apcu_enabled') && apcu_enabled()) {
             $count = apcu_fetch($key);
             return $count === false ? 0 : (int) $count;
         }
@@ -248,7 +248,7 @@ class RateLimiter
     private static function incrementApiCounter(string $key, int $windowSeconds): void
     {
         // Try APCu first
-        if (function_exists('apcu_fetch')) {
+        if (function_exists('apcu_enabled') && apcu_enabled()) {
             if (apcu_exists($key)) {
                 apcu_inc($key);
             } else {
@@ -268,7 +268,7 @@ class RateLimiter
     {
         $windowKey = $key . ':window';
 
-        if (function_exists('apcu_fetch')) {
+        if (function_exists('apcu_enabled') && apcu_enabled()) {
             $start = apcu_fetch($windowKey);
             if ($start === false) {
                 $start = time();

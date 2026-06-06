@@ -12,7 +12,11 @@ permissions:
 
 env:
   PHP_VERSION: '8.2'
-  NODE_VERSION: '20'
+  # Must match react-frontend/package.json engines (node >=22) and the
+  # node:22 base in all Dockerfiles. On node 20 (npm 10.8.2) `npm ci` fails
+  # because newer deps (posthog-node, i18next-cli) require node >=22 and the
+  # older npm enforces lockfile sync more strictly. See commit history.
+  NODE_VERSION: '22'
 
 jobs:
   # ─────────────────────────────────────────────────────────────────
@@ -91,11 +95,11 @@ jobs:
 
       - name: PHP Syntax Check
         run: |
-          echo "Checking PHP syntax in src/ ..."
-          ERRORS=$(find src -name "*.php" -print0 | xargs -0 -n1 php -l 2>&1 | grep -c "Parse error" || true)
+          echo "Checking PHP syntax in app/ ..."
+          ERRORS=$(find app -name "*.php" -print0 | xargs -0 -n1 php -l 2>&1 | grep -c "Parse error" || true)
           if [ "$ERRORS" -gt 0 ]; then
             echo "::error::Found $ERRORS PHP syntax error(s):"
-            find src -name "*.php" -print0 | xargs -0 -n1 php -l 2>&1 | grep "Parse error"
+            find app -name "*.php" -print0 | xargs -0 -n1 php -l 2>&1 | grep "Parse error"
             exit 1
           fi
           echo "All PHP files passed syntax check."
@@ -598,7 +602,7 @@ jobs:
 
           # Find DELETE FROM statements, then check if they lack tenant_id
           # We look for DELETE FROM in PHP files, excluding migrations and test files
-          UNSCOPED=$(grep -rn "DELETE FROM" src/ \
+          UNSCOPED=$(grep -rn "DELETE FROM" app/ \
             --include="*.php" \
             | grep -iv "tenant_id" \
             | grep -iv "migration" \

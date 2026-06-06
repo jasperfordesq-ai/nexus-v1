@@ -109,3 +109,10 @@ CVE-2026-34601
 CVE-2026-1526
 CVE-2026-1528
 CVE-2026-2229
+
+# ── urllib3 CVE-2026-44431 (HIGH) — vendor/mockery/mockery/docs/requirements.txt ──
+# Newly-disclosed urllib3 CVE in the same Python requirements.txt inside the
+# Mockery PHP test-library's docs/ that the block above already covers. No Python
+# in our stack, never installed, vendor/ not deployed. Same false-positive class.
+# (added 2026-06-06)
+CVE-2026-44431
