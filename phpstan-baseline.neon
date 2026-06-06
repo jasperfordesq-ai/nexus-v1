@@ -43,24 +43,6 @@ parameters:
 			path: app/Http/Controllers/Api/AdminPrerenderController.php
 
 		-
-			message: '#^Method Illuminate\\Database\\Eloquent\\Model\:\:delete\(\) invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: app/Http/Controllers/Api/AiChatController.php
-
-		-
-			message: '#^Static method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\AiConversation\>\:\:create\(\) invoked with 2 parameters, 0\-1 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: app/Http/Controllers/Api/AiChatController.php
-
-		-
-			message: '#^Static method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Event\>\:\:upcoming\(\) invoked with 2 parameters, 0 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: app/Http/Controllers/Api/AiChatController.php
-
-		-
 			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
 			identifier: larastan.noEnvCallsOutsideOfConfig
 			count: 1
@@ -83,12 +65,6 @@ parameters:
 			identifier: larastan.noEnvCallsOutsideOfConfig
 			count: 1
 			path: app/Http/Controllers/Api/SendGridWebhookController.php
-
-		-
-			message: '#^Static method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\FeedPost\>\:\:create\(\) invoked with 6 parameters, 0\-1 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: app/Http/Controllers/Api/SocialController.php
 
 		-
 			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'

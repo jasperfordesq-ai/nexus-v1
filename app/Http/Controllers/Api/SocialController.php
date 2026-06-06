@@ -1277,7 +1277,14 @@ class SocialController extends BaseApiController
 
         try {
             if (class_exists(FeedPost::class)) {
-                FeedPost::create($userId, $content, null, null, $parentId, $parentType);
+                // tenant_id is auto-set by HasTenantScope; timestamps + likes_count default.
+                FeedPost::create([
+                    'user_id'     => $userId,
+                    'content'     => $content,
+                    'parent_id'   => $parentId,
+                    'parent_type' => $parentType,
+                    'visibility'  => 'public',
+                ]);
             } else {
                 DB::table('feed_posts')->insert([
                     'user_id'     => $userId,

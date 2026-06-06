@@ -378,12 +378,14 @@ TXT;
     {
         $userId = $this->getUserId();
 
-        $conversationId = AiConversation::create($userId, [
+        // tenant_id is auto-set by HasTenantScope on create.
+        $conversationId = AiConversation::create([
+            'user_id' => $userId,
             'title' => $this->input('title', 'New Chat'),
             'provider' => $this->input('provider'),
             'context_type' => $this->input('context_type', 'general'),
             'context_id' => $this->input('context_id'),
-        ]);
+        ])->id;
 
         return $this->respondWithData([
             'conversation_id' => $conversationId,
@@ -400,7 +402,7 @@ TXT;
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.ai_conversation_not_found'), null, 404);
         }
 
-        AiConversation::delete($id);
+        AiConversation::where('id', $id)->delete();
 
         return $this->respondWithData(['success' => true]);
     }
@@ -1767,7 +1769,9 @@ EOT;
         }
 
         try {
-            $upcomingEvents = Event::upcoming($tenantId, 5) ?: [];
+            // upcoming() is a query scope; tenant filter is applied by HasTenantScope
+            // (== $tenantId here). Execute it (was returning an unexecuted Builder).
+            $upcomingEvents = Event::upcoming()->limit(5)->get()->all();
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning("Newsletter AI: Error fetching events - " . $e->getMessage());
         }
