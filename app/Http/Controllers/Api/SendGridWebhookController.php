@@ -10,6 +10,7 @@ use App\Services\EmailMonitorService;
 use Illuminate\Http\JsonResponse;
 use App\Core\TenantContext;
 use App\Models\NewsletterBounce;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -25,6 +26,8 @@ use Illuminate\Support\Facades\Log;
 class SendGridWebhookController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    private const SIGNATURE_TOLERANCE_SECONDS = 300;
 
     public function __construct(
         private readonly EmailMonitorService $emailMonitorService,
@@ -68,9 +71,21 @@ class SendGridWebhookController extends BaseApiController
             return $this->respondWithError('UNAUTHORIZED', __('api.missing_signature_headers'), null, 401);
         }
 
+        if (!ctype_digit((string) $timestamp)) {
+            return $this->respondWithError('UNAUTHORIZED', __('api.invalid_webhook_signature'), null, 401);
+        }
+
+        $timestampInt = (int) $timestamp;
+        if (abs(time() - $timestampInt) > self::SIGNATURE_TOLERANCE_SECONDS) {
+            return $this->respondWithError('UNAUTHORIZED', __('api.invalid_webhook_signature'), null, 401);
+        }
+
         $payload = request()->getContent();
         $timestampedPayload = $timestamp . $payload;
-        $decodedSignature = base64_decode($signature);
+        $decodedSignature = base64_decode($signature, true);
+        if ($decodedSignature === false) {
+            return $this->respondWithError('UNAUTHORIZED', __('api.invalid_webhook_signature'), null, 401);
+        }
 
         $publicKey = openssl_pkey_get_public($verificationKey);
         if (!$publicKey) {
@@ -83,7 +98,10 @@ class SendGridWebhookController extends BaseApiController
             return $this->respondWithError('UNAUTHORIZED', __('api.invalid_webhook_signature'), null, 401);
         }
 
-        $payload = request()->getContent();
+        $replayKey = 'sendgrid:webhook:signature:' . hash('sha256', $timestamp . ':' . $signature);
+        if (!Cache::add($replayKey, true, self::SIGNATURE_TOLERANCE_SECONDS * 2)) {
+            return $this->respondWithError('UNAUTHORIZED', __('api.invalid_webhook_signature'), null, 401);
+        }
 
         if (empty($payload)) {
             return $this->respondWithError('INVALID_PAYLOAD', __('api.empty_payload'), null, 400);

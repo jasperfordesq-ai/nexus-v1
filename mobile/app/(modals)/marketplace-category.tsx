@@ -31,8 +31,8 @@ import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 
-const CONDITION_FILTERS: Array<MarketplaceCondition | ''> = ['', 'new', 'like_new', 'good', 'fair', 'poor'];
-const SORTS: Array<'newest' | 'price_asc' | 'price_desc' | 'popular'> = ['newest', 'price_asc', 'price_desc', 'popular'];
+const CONDITION_FILTERS: (MarketplaceCondition | '')[] = ['', 'new', 'like_new', 'good', 'fair', 'poor'];
+const SORTS: ('newest' | 'price_asc' | 'price_desc' | 'popular')[] = ['newest', 'price_asc', 'price_desc', 'popular'];
 
 export default function MarketplaceCategoryRoute() {
   return (

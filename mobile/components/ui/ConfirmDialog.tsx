@@ -13,6 +13,10 @@ interface ConfirmDialogProps {
   message?: string;
   cancelLabel: string;
   confirmLabel: string;
+  cancelAccessibilityLabel?: string;
+  confirmAccessibilityLabel?: string;
+  cancelTestID?: string;
+  confirmTestID?: string;
   onClose: () => void;
   onConfirm: () => void | Promise<void>;
   variant?: 'primary' | 'danger';
@@ -26,6 +30,10 @@ export default function ConfirmDialog({
   message,
   cancelLabel,
   confirmLabel,
+  cancelAccessibilityLabel,
+  confirmAccessibilityLabel,
+  cancelTestID,
+  confirmTestID,
   onClose,
   onConfirm,
   variant = 'danger',
@@ -58,18 +66,20 @@ export default function ConfirmDialog({
 
           <View className="flex-row gap-3">
             <HeroButton
+              testID={cancelTestID}
               variant="ghost"
               className="min-w-0 flex-1"
-              accessibilityLabel={cancelLabel}
+              accessibilityLabel={cancelAccessibilityLabel ?? cancelLabel}
               isDisabled={isConfirming}
               onPress={onClose}
             >
               <HeroButton.Label>{cancelLabel}</HeroButton.Label>
             </HeroButton>
             <HeroButton
+              testID={confirmTestID}
               variant={variant}
               className="min-w-0 flex-1"
-              accessibilityLabel={confirmLabel}
+              accessibilityLabel={confirmAccessibilityLabel ?? confirmLabel}
               isDisabled={confirmDisabled || isConfirming}
               onPress={() => void onConfirm()}
             >

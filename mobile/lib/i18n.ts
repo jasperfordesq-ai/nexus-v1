@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import i18n from 'i18next';
+import i18n, { changeLanguage as changeI18nextLanguage, use as useI18next } from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import * as Localization from 'expo-localization';
 
@@ -245,8 +245,7 @@ if (detectedLanguage !== 'en') {
   resources[detectedLanguage] = languageLoaders[detectedLanguage]();
 }
 
-i18n
-  .use(initReactI18next)
+useI18next(initReactI18next)
   .init({
     resources,
     lng: detectedLanguage,
@@ -278,7 +277,7 @@ export function loadLanguage(lang: string): void {
  */
 export async function changeLanguage(lang: string): Promise<void> {
   loadLanguage(lang);
-  await i18n.changeLanguage(lang);
+  await changeI18nextLanguage(lang);
 }
 
 export default i18n;

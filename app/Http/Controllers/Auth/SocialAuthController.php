@@ -102,7 +102,11 @@ class SocialAuthController extends Controller
                 throw new \RuntimeException('OAuth state missing.');
             }
 
-            $result = $this->social->handleCallback($provider, $state);
+            $result = $this->social->handleCallback(
+                $provider,
+                $state,
+                $request->cookie(SocialAuthService::LINK_NONCE_COOKIE)
+            );
             /** @var \App\Models\User $user */
             $user = $result['user'];
 
@@ -115,13 +119,19 @@ class SocialAuthController extends Controller
                 // tenant_id column may be absent on personal_access_tokens in older envs
             }
 
+            $code = $this->social->issueCallbackCode(
+                $accessToken,
+                $provider,
+                (bool) $result['is_new'],
+                (int) $result['tenant_id']
+            );
+
             $params = http_build_query([
-                'token' => $accessToken,
+                'code' => $code,
                 'provider' => $provider,
-                'is_new' => $result['is_new'] ? '1' : '0',
-                'tenant_id' => $result['tenant_id'],
             ]);
-            return redirect($frontend . '/auth/oauth/callback?' . $params);
+            return redirect($frontend . '/auth/oauth/callback?' . $params)
+                ->withoutCookie(SocialAuthService::LINK_NONCE_COOKIE);
         } catch (\Throwable $e) {
             Log::warning('[SocialAuth] callback failed: ' . $e->getMessage());
             $params = http_build_query([
@@ -129,7 +139,29 @@ class SocialAuthController extends Controller
                 'message' => __('api.social_oauth_link_failed'),
                 'provider' => $provider,
             ]);
-            return redirect($frontend . '/auth/oauth/callback?' . $params);
+            return redirect($frontend . '/auth/oauth/callback?' . $params)
+                ->withoutCookie(SocialAuthService::LINK_NONCE_COOKIE);
+        }
+    }
+
+    public function exchange(Request $request): JsonResponse
+    {
+        try {
+            $payload = $this->social->consumeCallbackCode((string) $request->input('code', ''));
+
+            return response()->json([
+                'success' => true,
+                'token' => $payload['token'],
+                'provider' => $payload['provider'],
+                'is_new' => $payload['is_new'],
+                'tenant_id' => $payload['tenant_id'],
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'invalid_oauth_code',
+                'message' => __('api.social_oauth_link_failed'),
+            ], 400);
         }
     }
 
@@ -148,11 +180,27 @@ class SocialAuthController extends Controller
                     'error' => 'socialite_not_installed',
                 ], 503);
             }
-            return response()->json([
+            $response = response()->json([
                 'success' => true,
                 'redirect_url' => $redirect['url'],
                 'state' => $redirect['state'],
             ]);
+
+            if (!empty($redirect['link_nonce'])) {
+                $response->withCookie(cookie(
+                    SocialAuthService::LINK_NONCE_COOKIE,
+                    (string) $redirect['link_nonce'],
+                    60,
+                    '/',
+                    null,
+                    $request->isSecure(),
+                    true,
+                    false,
+                    'Lax'
+                ));
+            }
+
+            return $response;
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,

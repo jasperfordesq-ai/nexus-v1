@@ -12,6 +12,7 @@ use App\Core\TenantContext;
 use App\Events\TransactionCompleted;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Support\OutboundUrlGuard;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -679,9 +680,18 @@ class CaringHourTransferService
         }
 
         $endpoint = $this->remoteInboundEndpoint($baseUrl);
+        if (! OutboundUrlGuard::isSafeHttpUrl($endpoint, requireHttps: true)) {
+            return [
+                'delivered' => false,
+                'status'    => 0,
+                'error'     => 'unsafe peer base_url',
+                'response'  => null,
+            ];
+        }
 
         try {
             $response = Http::timeout(10)
+                ->withOptions(OutboundUrlGuard::httpClientOptions($endpoint, requireHttps: true))
                 ->withHeaders([
                     'X-Federation-Algorithm' => self::ALGORITHM,
                     'X-Federation-Signature' => $signature,

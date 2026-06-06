@@ -37,17 +37,25 @@ class StripeService
      *
      * @param string $payload  Raw request body
      * @param string $sigHeader  Stripe-Signature header value
+     * @param string|null $webhookSecret Explicit webhook secret for route-specific endpoints
+     * @param string $secretEnvName Env var name used in configuration error messages
      * @return Event  Verified Stripe event
      *
      * @throws SignatureVerificationException  If signature verification fails
      * @throws \RuntimeException  If webhook secret is not configured
      */
-    public static function constructWebhookEvent(string $payload, string $sigHeader): Event
-    {
-        $webhookSecret = config('services.stripe.webhook_secret') ?: env('STRIPE_WEBHOOK_SECRET');
+    public static function constructWebhookEvent(
+        string $payload,
+        string $sigHeader,
+        ?string $webhookSecret = null,
+        string $secretEnvName = 'STRIPE_WEBHOOK_SECRET',
+    ): Event {
+        if ($webhookSecret === null) {
+            $webhookSecret = config('services.stripe.webhook_secret') ?: env('STRIPE_WEBHOOK_SECRET');
+        }
 
         if (empty($webhookSecret)) {
-            throw new \RuntimeException('Stripe webhook secret is not configured. Set STRIPE_WEBHOOK_SECRET in .env.');
+            throw new \RuntimeException("Stripe webhook secret is not configured. Set {$secretEnvName} in .env.");
         }
 
         try {

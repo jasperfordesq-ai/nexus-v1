@@ -1,6 +1,6 @@
 # Project NEXUS Mobile — Security Guide
 
-> Last updated: 2026-03-22
+> Last updated: 2026-06-05
 
 This document describes the mobile app's security posture, identifies known gaps, and provides implementation guidance for hardening.
 
@@ -15,16 +15,17 @@ This document describes the mobile app's security posture, identifies known gaps
 | **Secure token storage** | `expo-secure-store` (Keychain on iOS, EncryptedSharedPreferences on Android) | `lib/storage.ts` |
 | **HTTPS enforcement** | `EXPO_PUBLIC_API_URL` always uses `https://` in production | `.env.example`, `lib/env.ts` |
 | **Tenant isolation** | Every API request includes the tenant slug; backend enforces row-level isolation | `lib/api/` |
-| **401 auto-logout** | Axios interceptor catches 401 and clears tokens, redirecting to the login screen | `lib/api/client.ts` |
-| **Rate limit awareness** | 429 responses are surfaced to the user; retry logic is exponential-backoff only | `lib/api/client.ts` |
+| **401 refresh + auto-logout** | Fetch client attempts one refresh-token rotation, retries the original request, then clears credentials and redirects to login if refresh fails | `lib/api/client.ts`, `lib/context/AuthContext.tsx` |
+| **Rate limit awareness** | Non-2xx API responses, including 429, are surfaced through typed `ApiResponseError` objects | `lib/api/client.ts` |
 | **No secrets in code** | All credentials come from `EXPO_PUBLIC_*` env vars; `.env.local` is gitignored | `.gitignore` |
-| **Input validation** | Zod schemas validate all form data before submission | `lib/` schema files |
+| **Auth input validation** | Zod schemas validate login, registration, forgot-password, and reset-password forms before submission | `app/(auth)/*.tsx` |
+| **Android certificate pinning** | Android release builds pin `api.project-nexus.ie` through the network security config injected by `expo-build-properties` | `android-network-security-config.xml`, `android/app/src/main/res/xml/network_security_config.xml`, `lib/security/pinning.ts` |
 
 ### Known gaps / future hardening
 
-- Certificate pinning is not yet implemented (see Section 2)
-- App integrity attestation is not yet implemented (see Section 3)
-- Access tokens are long-lived (24 h); short-lived tokens with refresh rotation are recommended (see Section 5)
+- iOS uses ATS HTTPS enforcement but does not yet enforce strict SHA-256 certificate pinning (see Section 2)
+- Play Integrity / App Attest server-backed attestation is not yet implemented (see Section 3)
+- Extend schema validation beyond auth forms where native forms accept high-risk input
 
 ---
 
@@ -32,21 +33,21 @@ This document describes the mobile app's security posture, identifies known gaps
 
 Certificate pinning prevents MITM (man-in-the-middle) attacks by refusing TLS connections to any certificate not explicitly trusted — even if it chains to a trusted root CA.
 
-### When to implement
+### Current implementation
 
-Implement before submitting to the app stores if the app handles sensitive financial data (time credit transfers) or health data.
+Android pinning is implemented for `api.project-nexus.ie` through the network security config injected by `expo-build-properties`. The checked-in root config is `android-network-security-config.xml`; the generated native config is `android/app/src/main/res/xml/network_security_config.xml`.
 
-### How to implement in Expo managed workflow
+iOS currently relies on App Transport Security (ATS) HTTPS enforcement. Strict iOS SHA-256 certificate pinning still requires TrustKit or a similar native module in a prebuild/bare workflow.
 
-Expo managed workflow does not support native `NSURLSession` / `OkHttp` pinning directly. Use `expo-build-properties` to inject native network security config.
+### How to maintain Android pinning
 
-**Step 1 — Install the plugin:**
+**Step 1 - Keep the plugin installed:**
 
 ```bash
 npx expo install expo-build-properties
 ```
 
-**Step 2 — Add to `app.json`:**
+**Step 2 - Keep `app.json` wired to the root config:**
 
 ```json
 {
@@ -65,13 +66,13 @@ npx expo install expo-build-properties
 }
 ```
 
-**Step 3 — Create `android-network-security-config.xml` at the project root:**
+**Step 3 - Refresh `android-network-security-config.xml` before pin expiry or certificate rotation:**
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
   <domain-config cleartextTrafficPermitted="false">
-    <domain includeSubdomains="true">api.project-nexus.ie</domain>
+    <domain includeSubdomains="false">api.project-nexus.ie</domain>
     <pin-set expiration="2027-01-01">
       <!-- Primary certificate SHA-256 fingerprint (base64) -->
       <!-- Run: openssl s_client -connect api.project-nexus.ie:443 | openssl x509 -pubkey -noout | openssl pkey -pubin -outform DER | openssl dgst -sha256 -binary | base64 -->
@@ -83,7 +84,7 @@ npx expo install expo-build-properties
 </network-security-config>
 ```
 
-**Step 4 — iOS ATS (App Transport Security):**
+**Step 4 - iOS ATS (App Transport Security):**
 
 iOS enforces HTTPS by default via ATS. To add certificate pinning on iOS you need a bare workflow or a custom native module. For managed workflow, ATS ensures HTTPS but cannot pin specific certificates. Options:
 
@@ -223,14 +224,11 @@ Sentry.init({
 
 ### Current token lifecycle
 
-| Token | Lifetime | Storage |
-|-------|----------|---------|
-| Access token | 24 hours | `expo-secure-store` |
-| No refresh token | — | — |
+The mobile app stores both access and refresh tokens in `expo-secure-store`. On a 401, `lib/api/client.ts` posts the stored refresh token to `/api/auth/refresh-token`, saves the rotated token values when returned, and retries the original request once. If refresh fails, the app clears stored credentials and redirects to login through `AuthContext`.
 
-### Recommended: short-lived access tokens + refresh rotation
+### Recommended hardening
 
-Short-lived access tokens (15–60 minutes) reduce the window of exposure if a token is stolen. Pair with a refresh token that is rotated on every use.
+Keep backend access tokens short-lived (15-60 minutes) and rotate refresh tokens on every use. The client already supports a rotated `refresh_token` field in the refresh response.
 
 **Target lifecycle:**
 
@@ -242,36 +240,21 @@ Short-lived access tokens (15–60 minutes) reduce the window of exposure if a t
 **Refresh flow implementation:**
 
 ```typescript
-// lib/api/client.ts — add to Axios response interceptor
+// lib/api/client.ts - existing fetch-client refresh shape
 import * as SecureStore from 'expo-secure-store';
+import { API_BASE_URL } from '@/lib/constants';
 
-axiosInstance.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      try {
-        const refreshToken = await SecureStore.getItemAsync('refresh_token');
-        if (!refreshToken) throw new Error('No refresh token');
-
-        const { data } = await axiosInstance.post('/auth/refresh', { refresh_token: refreshToken });
-
-        await SecureStore.setItemAsync('access_token', data.access_token);
-        await SecureStore.setItemAsync('refresh_token', data.refresh_token); // rotated
-
-        originalRequest.headers['Authorization'] = `Bearer ${data.access_token}`;
-        return axiosInstance(originalRequest);
-      } catch {
-        // Refresh failed — force logout
-        await SecureStore.deleteItemAsync('access_token');
-        await SecureStore.deleteItemAsync('refresh_token');
-        // Redirect to login via router
-      }
-    }
-    return Promise.reject(error);
-  }
-);
+const refreshToken = await SecureStore.getItemAsync('nexus_refresh_token');
+const response = await fetch(`${API_BASE_URL}/api/auth/refresh-token`, {
+  method: 'POST',
+  headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+  body: JSON.stringify({ refresh_token: refreshToken }),
+});
+const data = await response.json();
+await SecureStore.setItemAsync('nexus_auth_token', data.access_token);
+if (data.refresh_token) {
+  await SecureStore.setItemAsync('nexus_refresh_token', data.refresh_token);
+}
 ```
 
 ### Biometric lock (optional enhancement)

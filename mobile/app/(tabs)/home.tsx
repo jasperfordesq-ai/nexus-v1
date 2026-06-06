@@ -47,7 +47,7 @@ function extractFeedPage(response: FeedResponse) {
   };
 }
 
-const FILTER_OPTIONS: Array<{ key: FeedFilter; icon: keyof typeof Ionicons.glyphMap }> = [
+const FILTER_OPTIONS: { key: FeedFilter; icon: keyof typeof Ionicons.glyphMap }[] = [
   { key: 'all', icon: 'albums-outline' },
   { key: 'following', icon: 'people-outline' },
   { key: 'saved', icon: 'bookmark-outline' },

@@ -2522,6 +2522,7 @@ Route::get('/v2/newsletter/click/{token}', [\App\Http\Controllers\Api\Newsletter
 // auth:sanctum below.
 Route::middleware('throttle:30,1')->group(function () {
     Route::get('/v2/auth/oauth/enabled-providers', [\App\Http\Controllers\Auth\SocialAuthController::class, 'enabledProviders']);
+    Route::post('/v2/auth/oauth/exchange', [\App\Http\Controllers\Auth\SocialAuthController::class, 'exchange']);
     Route::get('/v2/auth/oauth/{provider}/redirect', [\App\Http\Controllers\Auth\SocialAuthController::class, 'redirect'])
         ->where('provider', 'google|apple|facebook');
     Route::match(['get', 'post'], '/v2/auth/oauth/{provider}/callback', [\App\Http\Controllers\Auth\SocialAuthController::class, 'callback'])

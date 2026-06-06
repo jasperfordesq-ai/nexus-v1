@@ -431,6 +431,7 @@ function SearchHeader({
 
       <Surface variant="default" className="mx-4 gap-3 rounded-panel-inner p-3">
         <SearchInput
+          testID="search-input"
           value={query}
           onChangeText={setQuery}
           placeholder={t('placeholder')}

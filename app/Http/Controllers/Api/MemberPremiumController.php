@@ -82,12 +82,7 @@ class MemberPremiumController extends BaseApiController
         if (! in_array($interval, ['monthly', 'yearly'], true)) {
             return $this->respondWithError('VALIDATION_ERROR', 'Invalid interval (must be monthly or yearly)', 'interval', 422);
         }
-        if ($returnUrl === '') {
-            // Sensible default: tenant frontend /premium/return
-            $returnUrl = rtrim(TenantContext::getFrontendUrl(), '/')
-                . TenantContext::getSlugPrefix()
-                . '/premium/return';
-        }
+        $returnUrl = MemberPremiumService::safeReturnUrl($returnUrl, '/premium/return');
 
         try {
             $result = MemberPremiumService::createCheckoutSession($userId, $tierId, $interval, $returnUrl);
@@ -131,11 +126,7 @@ class MemberPremiumController extends BaseApiController
         }
 
         $returnUrl = (string) ($this->input('return_url') ?? '');
-        if ($returnUrl === '') {
-            $returnUrl = rtrim(TenantContext::getFrontendUrl(), '/')
-                . TenantContext::getSlugPrefix()
-                . '/premium/manage';
-        }
+        $returnUrl = MemberPremiumService::safeReturnUrl($returnUrl, '/premium/manage');
 
         try {
             $result = MemberPremiumService::createBillingPortalSession($userId, $returnUrl);

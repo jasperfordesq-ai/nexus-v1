@@ -12,15 +12,19 @@
 #   maestro test --env TEST_EMAIL=user@example.com --env TEST_PASSWORD=secret \
 #     .maestro/08-search-flow.yaml
 
-appId: ie.hour.nexus
+appId: ie.project.nexus
 ---
 # ── 1. Launch the app without clearing state
 - launchApp
 
+- extendedWaitUntil:
+    visible: "Welcome back|Community Feed|Home|Listings|Messages|More|View wallet"
+    timeout: 60000
+
 # ── 2. Re-authenticate if session has expired
 - runFlow:
     when:
-      visible: "Sign in"
+      visible: "Welcome back"
     commands:
       - runFlow:
           when:
@@ -33,22 +37,20 @@ appId: ie.hour.nexus
       - tapOn:
           id: "password-input"
       - inputText: "${TEST_PASSWORD}"
-      - tapOn: "Sign in"
-      - wait:
-          for:
-            element:
-              text: "Feed"
-            timeout: 10000
+      - back
+      - tapOn:
+          id: "login-submit"
+      - extendedWaitUntil:
+          visible: "Community Feed"
+          timeout: 10000
 
 # ── 3. Tap the Profile tab
-- tapOn: "Profile"
+- tapOn: "More"
 
 # ── 4. Wait for profile screen to load
-- wait:
-    for:
-      element:
-        text: "View wallet"
-      timeout: 5000
+- extendedWaitUntil:
+    visible: "View wallet"
+    timeout: 5000
 
 # ── 5. Scroll down to the Explore section
 - scrollUntilVisible:
@@ -60,11 +62,9 @@ appId: ie.hour.nexus
 - tapOn: "Search"
 
 # ── 7. Wait for the Search screen to load
-- wait:
-    for:
-      element:
-        text: "Search"
-      timeout: 5000
+- extendedWaitUntil:
+    visible: "Search"
+    timeout: 5000
 
 # ── 8. Assert the search input placeholder is visible (confirms screen rendered)
 - assertVisible: "Search people, listings, events…"
@@ -75,9 +75,8 @@ appId: ie.hour.nexus
 - inputText: "volunteer"
 
 # ── 10. Wait for debounce to fire and results to populate
-- wait:
-    for:
-      milliseconds: 1000
+- waitForAnimationToEnd:
+    timeout: 1000
 
 # ── 11. Assert the type-filter pills are visible after results load
 #   Filter pill labels from locales/en/search.json: "All", "People", "Listings",
@@ -93,9 +92,8 @@ appId: ie.hour.nexus
 - tapOn: "People"
 
 # ── 14. Wait for the filtered results
-- wait:
-    for:
-      milliseconds: 500
+- waitForAnimationToEnd:
+    timeout: 500
 
 # ── 15. Screenshot the people-filtered results
 - takeScreenshot: search-people-filter

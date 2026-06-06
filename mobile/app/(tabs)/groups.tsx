@@ -333,10 +333,11 @@ export default function GroupsScreen() {
 
             <Surface variant="default" className="gap-3 rounded-panel p-3">
               <SearchInput
+                testID="groups-search"
                 value={search}
                 onChangeText={setSearch}
                 placeholder={t('searchPlaceholder')}
-                clearLabel={t('common:buttons.clear')}
+                clearLabel={t('clearSearch')}
                 returnKeyType="search"
                 accessibilityLabel={t('searchPlaceholder')}
                 containerClassName="mb-0"

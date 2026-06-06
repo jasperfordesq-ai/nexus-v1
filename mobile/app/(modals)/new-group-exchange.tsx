@@ -21,7 +21,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 
-const splitTypes: Array<GroupExchange['split_type']> = ['equal', 'custom', 'weighted'];
+const splitTypes: GroupExchange['split_type'][] = ['equal', 'custom', 'weighted'];
 
 type ParticipantDraft = {
   user_id: number;

@@ -61,6 +61,48 @@ class StripeWebhookControllerTest extends TestCase
         $this->assertNotEquals(201, $response->status());
     }
 
+    public function test_marketplace_webhook_rejects_generic_webhook_secret_signature(): void
+    {
+        if (!class_exists(\Stripe\Webhook::class)) {
+            $this->markTestSkipped('Stripe SDK not installed in this test environment');
+        }
+
+        config([
+            'services.stripe.webhook_secret' => 'whsec_generic_test_secret',
+            'services.stripe.marketplace_webhook_secret' => 'whsec_marketplace_test_secret',
+        ]);
+
+        $payload = $this->stripeEventPayload('evt_marketplace_generic_' . uniqid());
+        $response = $this->postRawStripeWebhook(
+            '/api/v2/marketplace/webhooks/stripe',
+            $payload,
+            $this->stripeSignatureHeader($payload, 'whsec_generic_test_secret')
+        );
+
+        $this->assertSame(400, $response->getStatusCode());
+    }
+
+    public function test_marketplace_webhook_accepts_marketplace_webhook_secret_signature(): void
+    {
+        if (!class_exists(\Stripe\Webhook::class)) {
+            $this->markTestSkipped('Stripe SDK not installed in this test environment');
+        }
+
+        config([
+            'services.stripe.webhook_secret' => 'whsec_generic_test_secret',
+            'services.stripe.marketplace_webhook_secret' => 'whsec_marketplace_test_secret',
+        ]);
+
+        $payload = $this->stripeEventPayload('evt_marketplace_specific_' . uniqid());
+        $response = $this->postRawStripeWebhook(
+            '/api/v2/marketplace/webhooks/stripe',
+            $payload,
+            $this->stripeSignatureHeader($payload, 'whsec_marketplace_test_secret')
+        );
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
     // ============================================================
     // DEEP SECURITY TESTS
     // ============================================================
@@ -214,5 +256,44 @@ class StripeWebhookControllerTest extends TestCase
         $this->assertStringContainsString("'status' => 'processing'", $source);
         $this->assertStringContainsString('retry delivery reclaimed failed or stale event', $source);
         $this->assertStringContainsString("'processed_at' => now()", $source);
+    }
+
+    private function stripeEventPayload(string $eventId): string
+    {
+        return json_encode([
+            'id' => $eventId,
+            'object' => 'event',
+            'type' => 'product.created',
+            'data' => [
+                'object' => [
+                    'id' => 'prod_test',
+                    'object' => 'product',
+                ],
+            ],
+        ]);
+    }
+
+    private function stripeSignatureHeader(string $payload, string $secret): string
+    {
+        $timestamp = time();
+        $signature = hash_hmac('sha256', $timestamp . '.' . $payload, $secret);
+
+        return "t={$timestamp},v1={$signature}";
+    }
+
+    private function postRawStripeWebhook(string $uri, string $payload, string $signature): \Illuminate\Testing\TestResponse
+    {
+        return $this->call(
+            'POST',
+            $uri,
+            [],
+            [],
+            [],
+            $this->transformHeadersToServerVars($this->withTenantHeader([
+                'Content-Type' => 'application/json',
+                'Stripe-Signature' => $signature,
+            ])),
+            $payload
+        );
     }
 }

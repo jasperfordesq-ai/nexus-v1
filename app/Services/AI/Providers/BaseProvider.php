@@ -40,7 +40,7 @@ abstract class BaseProvider implements AIProviderInterface
         ];
 
         $ch = curl_init($url);
-        curl_setopt_array($ch, [
+        curl_setopt_array($ch, $this->curlOptionsForUrl($url) + [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => json_encode($data),
@@ -81,7 +81,7 @@ abstract class BaseProvider implements AIProviderInterface
         ];
 
         $ch = curl_init($url);
-        curl_setopt_array($ch, [
+        curl_setopt_array($ch, $this->curlOptionsForUrl($url) + [
             CURLOPT_RETURNTRANSFER => false,
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => json_encode($data),
@@ -124,6 +124,16 @@ abstract class BaseProvider implements AIProviderInterface
         ], $options);
 
         return $response['content'] ?? '';
+    }
+
+    /**
+     * Provider-specific cURL safety options.
+     *
+     * @return array<int,mixed>
+     */
+    protected function curlOptionsForUrl(string $url): array
+    {
+        return [];
     }
 
     /**

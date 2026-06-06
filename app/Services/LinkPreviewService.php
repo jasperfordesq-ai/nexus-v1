@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use App\Support\OutboundUrlGuard;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -67,7 +68,7 @@ class LinkPreviewService
     {
         $url = trim($url);
 
-        if (! $this->isAllowedUrl($url)) {
+        if (! OutboundUrlGuard::isSafeHttpUrl($url)) {
             return null;
         }
 
@@ -87,47 +88,17 @@ class LinkPreviewService
             return null;
         }
 
-        if ($this->isPrivateHost($parsed['host'])) {
-            return null;
-        }
-
-        // Fetch the URL with SSRF-safe redirect validation
+        // Fetch the URL with DNS/IP validation pinned into the cURL request.
         try {
             $response = Http::timeout(self::HTTP_TIMEOUT)
                 ->withHeaders([
                     'User-Agent' => self::USER_AGENT,
                     'Accept' => 'text/html,application/xhtml+xml',
                 ])
-                ->withOptions([
-                    'stream' => true,
-                    'allow_redirects' => [
-                        'max' => 3,
-                        'strict' => true,
-                        'protocols' => ['http', 'https'],
-                        // Recheck IP after every redirect to prevent DNS rebinding
-                        'on_redirect' => function ($request, $response, $uri) {
-                            $redirectHost = $uri->getHost();
-                            if ($this->isPrivateHost($redirectHost)) {
-                                throw new \RuntimeException("SSRF: redirect to private host blocked: {$redirectHost}");
-                            }
-                        },
-                    ],
-                ])
+                ->withOptions(['stream' => true] + OutboundUrlGuard::httpClientOptions($url))
                 ->get($url);
 
             if (! $response->successful()) {
-                return null;
-            }
-
-            // Post-fetch SSRF check: verify the final resolved IP is not private
-            // This catches DNS rebinding where the initial resolution was public
-            // but the connection was made to a private IP
-            $effectiveUrl = $response->effectiveUri()?->getHost() ?? $parsed['host'];
-            if ($effectiveUrl !== $parsed['host'] && $this->isPrivateHost($effectiveUrl)) {
-                Log::warning('LinkPreviewService: SSRF — final host resolved to private IP', [
-                    'original' => $parsed['host'],
-                    'effective' => $effectiveUrl,
-                ]);
                 return null;
             }
 

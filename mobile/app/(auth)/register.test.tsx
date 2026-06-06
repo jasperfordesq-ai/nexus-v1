@@ -38,6 +38,8 @@ jest.mock('@/lib/api/auth', () => ({
   register: (...args: any[]) => mockApiRegister(...args),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   extractToken: (...args: any[]) => mockExtractToken(...args),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getRegistrationResult: (response: any) => ('data' in response ? response.data : response),
 }));
 
 jest.mock('@/lib/api/client', () => ({
@@ -123,6 +125,48 @@ function pressSubmit(getAllByText: ReturnType<typeof render>['getAllByText']) {
   fireEvent.press(getAllByText('Create account').at(-1)!);
 }
 
+type RegisterFixture = {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  location: string;
+  email: string;
+  password: string;
+  passwordConfirm: string;
+  termsAccepted: boolean;
+};
+
+const defaultRegisterFixture: RegisterFixture = {
+  firstName: 'Jane',
+  lastName: 'Smith',
+  phone: '+1 555 123 4567',
+  location: 'Toronto, Canada',
+  email: 'jane@example.com',
+  password: 'TestPassword123!',
+  passwordConfirm: 'TestPassword123!',
+  termsAccepted: true,
+};
+
+function fillRequiredRegistrationFields(
+  getByTestId: ReturnType<typeof render>['getByTestId'],
+  getByText: ReturnType<typeof render>['getByText'],
+  overrides: Partial<RegisterFixture> = {},
+) {
+  const values = { ...defaultRegisterFixture, ...overrides };
+
+  fireEvent.changeText(getByTestId('register-first-name'), values.firstName);
+  fireEvent.changeText(getByTestId('register-last-name'), values.lastName);
+  fireEvent.changeText(getByTestId('register-phone'), values.phone);
+  fireEvent.changeText(getByTestId('register-location'), values.location);
+  fireEvent.changeText(getByTestId('register-email'), values.email);
+  fireEvent.changeText(getByTestId('register-password'), values.password);
+  fireEvent.changeText(getByTestId('register-confirm-password'), values.passwordConfirm);
+
+  if (values.termsAccepted) {
+    fireEvent.press(getByText('I agree to the platform terms and privacy notice.'));
+  }
+}
+
 describe('RegisterScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -131,20 +175,27 @@ describe('RegisterScreen', () => {
   });
 
   it('renders key form elements', () => {
-    const { getAllByText, getByPlaceholderText } = render(<RegisterScreen />);
+    const { getAllByText, getByPlaceholderText, getByTestId } = render(<RegisterScreen />);
     // Both the heading and the button have this text; at least one must exist
     expect(getAllByText('Create account').length).toBeGreaterThanOrEqual(1);
     expect(getByPlaceholderText('Jane')).toBeTruthy();       // first name
+    expect(getByPlaceholderText('+1 555 123 4567')).toBeTruthy(); // phone
+    expect(getByPlaceholderText('City, country')).toBeTruthy(); // location
     expect(getByPlaceholderText('you@example.com')).toBeTruthy(); // email
+    expect(getByTestId('register-first-name')).toBeTruthy();
+    expect(getByTestId('register-last-name')).toBeTruthy();
+    expect(getByTestId('register-phone')).toBeTruthy();
+    expect(getByTestId('register-location')).toBeTruthy();
+    expect(getByTestId('register-email')).toBeTruthy();
+    expect(getByTestId('register-password')).toBeTruthy();
+    expect(getByTestId('register-confirm-password')).toBeTruthy();
+    expect(getByTestId('register-terms')).toBeTruthy();
   });
 
   it('shows first name validation error when first name is empty', async () => {
-    const { getAllByText, getByText, getByPlaceholderText } = render(<RegisterScreen />);
+    const { getAllByText, getByTestId, getByText } = render(<RegisterScreen />);
 
-    fireEvent.changeText(getByPlaceholderText('you@example.com'), 'user@example.com');
-    fireEvent.changeText(getByPlaceholderText('Min. 8 characters'), 'Password123');
-    fireEvent.changeText(getByPlaceholderText('Re-enter password'), 'Password123');
-    // Leave first name empty
+    fillRequiredRegistrationFields(getByTestId, getByText, { firstName: '' });
     pressSubmit(getAllByText);
 
     await waitFor(() => expect(getByText('First name is required')).toBeTruthy());
@@ -152,10 +203,9 @@ describe('RegisterScreen', () => {
   });
 
   it('shows email validation error for invalid email', async () => {
-    const { getAllByText, getByText, getByPlaceholderText } = render(<RegisterScreen />);
+    const { getAllByText, getByTestId, getByText } = render(<RegisterScreen />);
 
-    fireEvent.changeText(getByPlaceholderText('Jane'), 'Jane');
-    fireEvent.changeText(getByPlaceholderText('you@example.com'), 'not-an-email');
+    fillRequiredRegistrationFields(getByTestId, getByText, { email: 'not-an-email' });
     pressSubmit(getAllByText);
 
     await waitFor(() => expect(getByText('Please enter a valid email address')).toBeTruthy());
@@ -163,24 +213,24 @@ describe('RegisterScreen', () => {
   });
 
   it('shows password-too-short error', async () => {
-    const { getAllByText, getByText, getByPlaceholderText } = render(<RegisterScreen />);
+    const { getAllByText, getByTestId, getByText } = render(<RegisterScreen />);
 
-    fireEvent.changeText(getByPlaceholderText('Jane'), 'Jane');
-    fireEvent.changeText(getByPlaceholderText('you@example.com'), 'user@example.com');
-    fireEvent.changeText(getByPlaceholderText('Min. 8 characters'), 'short');
+    fillRequiredRegistrationFields(getByTestId, getByText, {
+      password: 'short',
+      passwordConfirm: 'short',
+    });
     pressSubmit(getAllByText);
 
-    await waitFor(() => expect(getByText('Password must be at least 8 characters.')).toBeTruthy());
+    await waitFor(() => expect(getByText('Password must be at least 12 characters.')).toBeTruthy());
     expect(mockApiRegister).not.toHaveBeenCalled();
   });
 
   it('shows passwords-do-not-match error', async () => {
-    const { getAllByText, getByText, getByPlaceholderText } = render(<RegisterScreen />);
+    const { getAllByText, getByTestId, getByText } = render(<RegisterScreen />);
 
-    fireEvent.changeText(getByPlaceholderText('Jane'), 'Jane');
-    fireEvent.changeText(getByPlaceholderText('you@example.com'), 'user@example.com');
-    fireEvent.changeText(getByPlaceholderText('Min. 8 characters'), 'Password123');
-    fireEvent.changeText(getByPlaceholderText('Re-enter password'), 'Different123');
+    fillRequiredRegistrationFields(getByTestId, getByText, {
+      passwordConfirm: 'Different123!',
+    });
     pressSubmit(getAllByText);
 
     await waitFor(() => expect(getByText('Passwords do not match.')).toBeTruthy());
@@ -191,34 +241,72 @@ describe('RegisterScreen', () => {
     mockApiRegister.mockResolvedValue(validAuthResponse);
     mockExtractToken.mockReturnValue('tok_abc');
 
-    const { getAllByText, getByPlaceholderText } = render(<RegisterScreen />);
+    const { getAllByText, getByTestId, getByText } = render(<RegisterScreen />);
 
-    fireEvent.changeText(getByPlaceholderText('Jane'), 'Jane');
-    fireEvent.changeText(getByPlaceholderText('Smith'), 'Smith');
-    fireEvent.changeText(getByPlaceholderText('you@example.com'), 'jane@example.com');
-    fireEvent.changeText(getByPlaceholderText('Min. 8 characters'), 'Password123');
-    fireEvent.changeText(getByPlaceholderText('Re-enter password'), 'Password123');
+    fillRequiredRegistrationFields(getByTestId, getByText);
     pressSubmit(getAllByText);
 
     await waitFor(() => expect(mockApiRegister).toHaveBeenCalledTimes(1));
     expect(mockApiRegister).toHaveBeenCalledWith(expect.objectContaining({
       first_name: 'Jane',
       last_name: 'Smith',
+      phone: '+1 555 123 4567',
+      location: 'Toronto, Canada',
       email: 'jane@example.com',
-      password: 'Password123',
-      password_confirmation: 'Password123',
+      password: 'TestPassword123!',
+      password_confirmation: 'TestPassword123!',
+      terms_accepted: true,
+      form_started_at: expect.any(Number),
     }));
     await waitFor(() => expect(mockRouter.replace).toHaveBeenCalledWith('/(tabs)/home'));
   });
 
+  it('submits backend-required registration fields and shows pending verification when no token is issued', async () => {
+    mockApiRegister.mockResolvedValue({
+      data: {
+        user: { id: 2, email: 'mobile.pending@example.com', first_name: 'Mobile', last_name: 'Member' },
+        requires_verification: true,
+        message: 'Check your email before signing in.',
+      },
+    });
+
+    const { findByText, getAllByText, getByTestId, getByText } = render(<RegisterScreen />);
+
+    fireEvent.changeText(getByTestId('register-first-name'), 'Mobile');
+    fireEvent.changeText(getByTestId('register-last-name'), 'Member');
+    fireEvent.changeText(getByTestId('register-phone'), '+1 555 123 4567');
+    fireEvent.changeText(getByTestId('register-location'), 'Toronto, Canada');
+    fireEvent.changeText(getByTestId('register-email'), 'Mobile.Pending@Example.com');
+    fireEvent.changeText(getByTestId('register-password'), 'TestPassword123!');
+    fireEvent.changeText(getByTestId('register-confirm-password'), 'TestPassword123!');
+    fireEvent.press(getByText('I agree to the platform terms and privacy notice.'));
+    pressSubmit(getAllByText);
+
+    await waitFor(() => expect(mockApiRegister).toHaveBeenCalledTimes(1));
+    expect(mockApiRegister).toHaveBeenCalledWith(expect.objectContaining({
+      first_name: 'Mobile',
+      last_name: 'Member',
+      phone: '+1 555 123 4567',
+      location: 'Toronto, Canada',
+      email: 'mobile.pending@example.com',
+      password: 'TestPassword123!',
+      password_confirmation: 'TestPassword123!',
+      terms_accepted: true,
+      form_started_at: expect.any(Number),
+    }));
+    expect(mockStorageSet).not.toHaveBeenCalled();
+    expect(mockStorageSetJson).not.toHaveBeenCalled();
+    expect(mockRouter.replace).not.toHaveBeenCalled();
+    expect(await findByText('Check your email before signing in.')).toBeTruthy();
+  });
+
   it('shows API error message in the error banner', async () => {
     mockApiRegister.mockRejectedValue(new ApiResponseError(422, 'Email already in use'));
-    const { getAllByText, getByPlaceholderText, findByText } = render(<RegisterScreen />);
+    const { getAllByText, getByTestId, getByText, findByText } = render(<RegisterScreen />);
 
-    fireEvent.changeText(getByPlaceholderText('Jane'), 'Jane');
-    fireEvent.changeText(getByPlaceholderText('you@example.com'), 'taken@example.com');
-    fireEvent.changeText(getByPlaceholderText('Min. 8 characters'), 'Password123');
-    fireEvent.changeText(getByPlaceholderText('Re-enter password'), 'Password123');
+    fillRequiredRegistrationFields(getByTestId, getByText, {
+      email: 'taken@example.com',
+    });
     pressSubmit(getAllByText);
 
     expect(await findByText('Email already in use')).toBeTruthy();
@@ -226,12 +314,9 @@ describe('RegisterScreen', () => {
 
   it('shows generic error for non-API failures', async () => {
     mockApiRegister.mockRejectedValue(new Error('Network failure'));
-    const { getAllByText, getByPlaceholderText, findByText } = render(<RegisterScreen />);
+    const { getAllByText, getByTestId, getByText, findByText } = render(<RegisterScreen />);
 
-    fireEvent.changeText(getByPlaceholderText('Jane'), 'Jane');
-    fireEvent.changeText(getByPlaceholderText('you@example.com'), 'user@example.com');
-    fireEvent.changeText(getByPlaceholderText('Min. 8 characters'), 'Password123');
-    fireEvent.changeText(getByPlaceholderText('Re-enter password'), 'Password123');
+    fillRequiredRegistrationFields(getByTestId, getByText);
     pressSubmit(getAllByText);
 
     expect(await findByText('Unable to register. Please try again.')).toBeTruthy();

@@ -206,4 +206,47 @@ class CourseControllerTest extends TestCase
         $this->assertContains($publicCourse->id, $memberIds);
         $this->assertContains($groupCourse->id, $memberIds);
     }
+
+    public function test_course_author_cannot_attach_course_to_group_they_do_not_manage(): void
+    {
+        $this->enableCourses(true);
+        $author = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $groupOwner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $course = $this->publishedCourse(['author' => $author]);
+        $group = Group::factory()->forTenant($this->testTenantId)->create([
+            'owner_id' => $groupOwner->id,
+            'visibility' => 'public',
+        ]);
+
+        Sanctum::actingAs($author, ['*']);
+        $response = $this->apiPost("/v2/courses/{$course->id}/groups/{$group->id}");
+
+        $response->assertStatus(403);
+        $this->assertFalse(DB::table('course_group_links')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('course_id', $course->id)
+            ->where('group_id', $group->id)
+            ->exists());
+    }
+
+    public function test_course_author_can_attach_course_to_group_they_manage(): void
+    {
+        $this->enableCourses(true);
+        $author = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $course = $this->publishedCourse(['author' => $author]);
+        $group = Group::factory()->forTenant($this->testTenantId)->create([
+            'owner_id' => $author->id,
+            'visibility' => 'public',
+        ]);
+
+        Sanctum::actingAs($author, ['*']);
+        $response = $this->apiPost("/v2/courses/{$course->id}/groups/{$group->id}");
+
+        $response->assertStatus(201);
+        $this->assertTrue(DB::table('course_group_links')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('course_id', $course->id)
+            ->where('group_id', $group->id)
+            ->exists());
+    }
 }

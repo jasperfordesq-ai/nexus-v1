@@ -20,7 +20,7 @@ jest.mock('@/lib/constants', () => ({
     USER_DATA: 'nexus_user_data',
   },
   TIMEOUTS: {
-    API_GET: 10_000,
+    API_GET: 30_000,
     API_MUTATION: 15_000,
     API_UPLOAD: 60_000,
     API_REQUEST: 15_000,
@@ -117,6 +117,7 @@ describe('api.get', () => {
       'Content-Type': 'application/json',
       Authorization: 'Bearer test-token',
       'X-Tenant-Slug': 'hour-timebank',
+      'X-Nexus-Mobile': '1',
     });
     expect(result).toEqual({ data: [1, 2, 3] });
   });
@@ -298,6 +299,7 @@ describe('token refresh on 401', () => {
     const [refreshUrl, refreshOptions] = fetchMock.mock.calls[1];
     expect(refreshUrl).toBe('https://test.api/api/auth/refresh-token');
     expect(refreshOptions.method).toBe('POST');
+    expect(refreshOptions.headers['X-Nexus-Mobile']).toBe('1');
     expect(JSON.parse(refreshOptions.body)).toEqual({ refresh_token: 'test-refresh-token' });
 
     // Retry used the new token

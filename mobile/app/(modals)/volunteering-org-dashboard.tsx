@@ -47,7 +47,7 @@ import Toggle from '@/components/ui/Toggle';
 type OrgTab = 'overview' | 'applications' | 'hours' | 'volunteers' | 'wallet' | 'settings';
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 
-const ORG_TABS: Array<{ key: OrgTab; icon: IoniconName }> = [
+const ORG_TABS: { key: OrgTab; icon: IoniconName }[] = [
   { key: 'overview', icon: 'grid-outline' },
   { key: 'applications', icon: 'clipboard-outline' },
   { key: 'hours', icon: 'time-outline' },

@@ -396,6 +396,7 @@ class KnowledgeBaseController extends BaseApiController
         // attachment id can exfiltrate draft content via direct download.
         $article = DB::table('knowledge_base_articles')
             ->where('id', $id)
+            ->where('tenant_id', TenantContext::getId())
             ->first(['id', 'tenant_id', 'is_published']);
 
         if (! $article) {

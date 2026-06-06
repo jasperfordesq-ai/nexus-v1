@@ -654,7 +654,7 @@ class AdminContentController extends BaseApiController
 
     public function getPlans(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
 
         $plans = array_map(fn($r) => (array)$r, DB::select(
             "SELECT pp.id, pp.name, pp.slug, pp.description, pp.tier_level, pp.features,
@@ -677,7 +677,7 @@ class AdminContentController extends BaseApiController
 
     public function syncPlanToStripe($id): JsonResponse
     {
-        $this->requireSuperAdmin();
+        $this->requirePlatformSuperAdmin();
         $id = (int) $id;
 
         if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_plan_id'), 'id', 400); }
@@ -702,7 +702,7 @@ class AdminContentController extends BaseApiController
 
     public function getPlan($id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
         $id = (int) $id;
 
         if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_plan_id'), 'id', 400); }
@@ -723,7 +723,7 @@ class AdminContentController extends BaseApiController
 
     public function createPlan(): JsonResponse
     {
-        $this->requireSuperAdmin();
+        $this->requirePlatformSuperAdmin();
 
         $input = $this->getAllInput();
         $name = trim($input['name'] ?? '');
@@ -777,7 +777,7 @@ class AdminContentController extends BaseApiController
 
     public function updatePlan($id): JsonResponse
     {
-        $this->requireSuperAdmin();
+        $this->requirePlatformSuperAdmin();
         $id = (int) $id;
 
         if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_plan_id'), 'id', 400); }
@@ -838,7 +838,7 @@ class AdminContentController extends BaseApiController
 
     public function deletePlan($id): JsonResponse
     {
-        $this->requireSuperAdmin();
+        $this->requirePlatformSuperAdmin();
         $id = (int) $id;
 
         if ($id < 1) { return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_plan_id'), 'id', 400); }

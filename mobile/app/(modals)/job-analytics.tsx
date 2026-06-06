@@ -267,7 +267,7 @@ function ChartCard({
   theme,
 }: {
   title: string;
-  items: Array<{ key: string; label: string; value: number }>;
+  items: { key: string; label: string; value: number }[];
   maxValue: number;
   tint: string;
   theme: ReturnType<typeof useTheme>;

@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Support\OutboundUrlGuard;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -173,6 +174,13 @@ class FederationExternalPartnerService
             return ['success' => false, 'error' => $ssrfError];
         }
 
+        if (!empty($data['oauth_token_url'])) {
+            $oauthUrlError = self::validateBaseUrl($data['oauth_token_url'], requireHttps: true);
+            if ($oauthUrlError) {
+                return ['success' => false, 'error' => $oauthUrlError];
+            }
+        }
+
         // Check URL uniqueness
         if (self::urlExists($data['base_url'], $tenantId)) {
             return ['success' => false, 'error' => 'A partner with this URL already exists for this tenant'];
@@ -279,6 +287,13 @@ class FederationExternalPartnerService
             }
             if (self::urlExists($data['base_url'], $tenantId, $id)) {
                 return ['success' => false, 'error' => 'A partner with this URL already exists for this tenant'];
+            }
+        }
+
+        if (!empty($data['oauth_token_url'])) {
+            $oauthUrlError = self::validateBaseUrl($data['oauth_token_url'], requireHttps: true);
+            if ($oauthUrlError) {
+                return ['success' => false, 'error' => $oauthUrlError];
             }
         }
 
@@ -687,7 +702,7 @@ class FederationExternalPartnerService
      *
      * @return string|null Error message if URL is unsafe, null if safe
      */
-    public static function validateBaseUrl(string $url): ?string
+    public static function validateBaseUrl(string $url, bool $requireHttps = false): ?string
     {
         $parsed = parse_url($url);
 
@@ -699,47 +714,15 @@ class FederationExternalPartnerService
             return 'URL scheme must be http or https';
         }
 
-        $host = strtolower($parsed['host']);
-
-        // Block known dangerous hostnames
-        foreach (self::BLOCKED_HOSTNAMES as $blocked) {
-            if ($host === $blocked) {
-                return 'URL host is not allowed (internal/reserved hostname)';
-            }
+        if ($requireHttps && strtolower((string) $parsed['scheme']) !== 'https') {
+            return 'URL scheme must be https';
         }
 
-        // Resolve hostname to IP and check against blocked ranges
-        $ips = gethostbynamel($host);
-        if ($ips === false) {
-            // If the host is a literal IP address, check it directly
-            if (filter_var($host, FILTER_VALIDATE_IP)) {
-                $ips = [$host];
-            } else {
-                // DNS resolution failed for a non-IP hostname — reject to prevent
-                // DNS rebinding attacks where the hostname resolves to an internal
-                // IP at request time but not at validation time
-                return 'URL hostname could not be resolved (DNS lookup failed)';
-            }
-        }
-
-        foreach ($ips as $ip) {
-            foreach (self::BLOCKED_IP_RANGES as $range) {
-                if (str_starts_with($ip, $range)) {
-                    return 'URL resolves to a private/internal IP address';
-                }
-            }
-
-            // Also check IPv4-mapped IPv6 (::ffff:127.0.0.1)
-            if (str_starts_with($ip, '::ffff:')) {
-                $mappedIp = substr($ip, 7);
-                foreach (self::BLOCKED_IP_RANGES as $range) {
-                    if (str_starts_with($mappedIp, $range)) {
-                        return 'URL resolves to a private/internal IP address';
-                    }
-                }
-            }
+        if (! OutboundUrlGuard::isSafeHttpUrl($url, $requireHttps)) {
+            return 'URL resolves to a private, reserved, or unresolvable host';
         }
 
         return null;
+
     }
 }

@@ -916,7 +916,7 @@ class AdminEnterpriseController extends BaseApiController
     /** GET /api/v2/admin/enterprise/secrets */
     public function secrets(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
 
         $categoryMap = [
             'DB_HOST' => 'database', 'DB_NAME' => 'database', 'DB_USER' => 'database', 'DB_PASS' => 'database',
@@ -1679,7 +1679,7 @@ class AdminEnterpriseController extends BaseApiController
     /** GET /api/v2/admin/enterprise/monitoring/log-files */
     public function logFiles(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
 
         try {
             $logDir = storage_path('logs');
@@ -1729,7 +1729,7 @@ class AdminEnterpriseController extends BaseApiController
     /** GET /api/v2/admin/enterprise/monitoring/log-files/{filename} */
     public function viewLogFile(string $filename): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
 
         // Security: no path traversal
         if (str_contains($filename, '/') || str_contains($filename, '\\') || str_contains($filename, '..')) {
@@ -1784,7 +1784,7 @@ class AdminEnterpriseController extends BaseApiController
     /** DELETE /api/v2/admin/enterprise/monitoring/log-files/{filename} */
     public function clearLogFile(string $filename): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
 
         if (str_contains($filename, '/') || str_contains($filename, '\\') || str_contains($filename, '..')) {
             return $this->respondWithError('VALIDATION_ERROR', __('api_controllers_1.admin_enterprise.invalid_log_filename'), 'filename', 400);

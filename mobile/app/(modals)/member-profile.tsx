@@ -91,7 +91,7 @@ interface MemberProfile {
   reputation_score?: number;
   reputation_count?: number;
   connection_status?: FederatedConnectionStatus;
-  listings?: Array<{
+  listings?: {
     id: number | string;
     title: string;
     type?: string | null;
@@ -100,7 +100,7 @@ interface MemberProfile {
     image_url?: string | null;
     hours_estimate?: number | null;
     estimated_hours?: number | null;
-  }>;
+  }[];
   reviews?: MemberReview[];
   achievements?: MemberAchievements;
 }

@@ -704,7 +704,7 @@ function MarketplaceDetailScreen() {
 
 function CommunityDeliveryInfoCard({ primary, theme }: { primary: string; theme: ReturnType<typeof useTheme> }) {
   const { t } = useTranslation('marketplace');
-  const steps: Array<{ icon: ComponentProps<typeof Ionicons>['name']; label: string }> = [
+  const steps: { icon: ComponentProps<typeof Ionicons>['name']; label: string }[] = [
     { icon: 'people-outline', label: t('communityDelivery.step1') },
     { icon: 'time-outline', label: t('communityDelivery.step2') },
     { icon: 'checkmark-circle-outline', label: t('communityDelivery.step3') },
@@ -799,7 +799,7 @@ function formatPickupSlot(slot: MarketplacePickupSlotOption, fallback: string) {
   }
 }
 
-function getListingTemplateEntries(templateData?: Record<string, unknown> | null): Array<{ key: string; label: string; value: string }> {
+function getListingTemplateEntries(templateData?: Record<string, unknown> | null): { key: string; label: string; value: string }[] {
   if (!templateData) return [];
   return Object.entries(templateData).flatMap(([key, value]) => {
     if (value === null || value === undefined) return [];

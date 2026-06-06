@@ -380,6 +380,10 @@ class StoryService
             throw new \RuntimeException('Story not found');
         }
 
+        if (!$this->canViewStory((object) $story, $userId, $tenantId)) {
+            throw new \RuntimeException('Story not found');
+        }
+
         $allowedReactions = ['heart', 'laugh', 'wow', 'fire', 'clap', 'sad'];
         if (!in_array($reactionType, $allowedReactions)) {
             throw new \RuntimeException('Invalid reaction type');
@@ -854,6 +858,10 @@ class StoryService
         // Prevent self-reply
         if ($senderId === $storyOwnerId) {
             throw new \RuntimeException('You cannot reply to your own story');
+        }
+
+        if (!$this->canViewStory((object) $story, $senderId, $tenantId)) {
+            throw new \RuntimeException('Story not found or has expired');
         }
 
         // Send message with story context
@@ -1345,6 +1353,43 @@ class StoryService
         $result['stickers'] = $this->getStickers((int) $story->id);
 
         return $result;
+    }
+
+    private function canViewStory(object $story, int $viewerId, int $tenantId): bool
+    {
+        $ownerId = (int) $story->user_id;
+        if ($ownerId === $viewerId) {
+            return true;
+        }
+
+        $audience = (string) ($story->audience ?? 'everyone');
+        if ($audience === 'everyone' || $audience === '') {
+            return true;
+        }
+
+        if ($audience === 'connections') {
+            return DB::table('connections')
+                ->where('tenant_id', $tenantId)
+                ->where('status', 'accepted')
+                ->where(function ($query) use ($ownerId, $viewerId) {
+                    $query->where(function ($inner) use ($ownerId, $viewerId) {
+                        $inner->where('requester_id', $ownerId)->where('receiver_id', $viewerId);
+                    })->orWhere(function ($inner) use ($ownerId, $viewerId) {
+                        $inner->where('receiver_id', $ownerId)->where('requester_id', $viewerId);
+                    });
+                })
+                ->exists();
+        }
+
+        if ($audience === 'close_friends') {
+            return DB::table('close_friends')
+                ->where('tenant_id', $tenantId)
+                ->where('user_id', $ownerId)
+                ->where('friend_id', $viewerId)
+                ->exists();
+        }
+
+        return false;
     }
 
     private function deleteMediaFile(?string $url): void

@@ -1,67 +1,72 @@
-# Copyright © 2024–2026 Jasper Ford
+# Copyright (c) 2024-2026 Jasper Ford
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# Flow 02 — Authentication: Logout
+# Flow 02 - Authentication: Logout
 #
-# Verifies that a logged-in user can navigate to the Profile tab, find the
-# "Sign out" option, confirm the sign-out alert, and land back on the login
-# screen. This flow intentionally does NOT use clearState so that it exercises
-# the full sign-out path from an active session.
-#
-# NOTE: This flow assumes the user is already signed in. When running the
-# full suite, flow 01 (auth-login) must run first. When running this flow
-# in isolation, ensure the app has valid session state (do not use clearState).
+# Verifies that a logged-in user can navigate to the More tab, find the
+# stable sign-out control, confirm the dialog, and land back on login.
 #
 # Run:
-#   maestro test --env TEST_EMAIL=user@example.com --env TEST_PASSWORD=secret \
+#   maestro test -e TEST_EMAIL=user@example.com -e TEST_PASSWORD=secret \
 #     .maestro/02-auth-logout.yaml
 
-appId: ie.hour.nexus
+appId: ie.project.nexus
 ---
-# ── 1. Launch the app without clearing state (session persists from flow 01)
+# 1. Launch the app without clearing state
 - launchApp
 
-# ── 2. Wait for the main screen to be ready
-- wait:
-    for:
-      element:
-        text: "Feed"
-      timeout: 10000
+# 2. Wait for the main screen to be ready
+- extendedWaitUntil:
+    visible: "Welcome back|Community Feed|Home|Listings|Messages|More|View wallet"
+    timeout: 60000
 
-# ── 3. Tap the Profile tab in the bottom tab bar
-- tapOn: "Profile"
+# 3. Tap the More tab in the bottom tab bar
+- tapOn: "More"
 
-# ── 4. Wait for the profile screen to load
-- wait:
-    for:
-      element:
-        text: "View wallet"
-      timeout: 5000
+# 4. Wait for the profile screen to load
+- extendedWaitUntil:
+    visible: "View wallet"
+    timeout: 5000
 
-# ── 5. Scroll down to reach the "Sign out" button (it sits below the Explore section)
-- scrollUntilVisible:
-    element:
-      text: "Sign out"
-    direction: DOWN
+# 5. Scroll toward the bottom; extra swipes safely settle at the end of the
+# profile list and avoid flaky scrollUntilVisible matching near the tab bar.
+- swipe:
+    direction: UP
+    duration: 450
+- swipe:
+    direction: UP
+    duration: 450
+- swipe:
+    direction: UP
+    duration: 450
+- swipe:
+    direction: UP
+    duration: 450
+- swipe:
+    direction: UP
+    duration: 450
+- swipe:
+    direction: UP
+    duration: 450
+- waitForAnimationToEnd:
+    timeout: 500
 
-# ── 6. Tap "Sign out"
-- tapOn: "Sign out"
+# 6. Tap Sign out
+- tapOn:
+    id: "profile-sign-out"
 
-# ── 7. Confirm the sign-out alert dialog ("Are you sure you want to sign out?")
-- wait:
-    for:
-      element:
-        text: "Are you sure you want to sign out?"
-      timeout: 3000
-- tapOn: "Yes"
+# 7. Confirm the sign-out dialog
+- extendedWaitUntil:
+    visible: "Are you sure you want to sign out?"
+    timeout: 3000
+- tapOn:
+    id: "profile-confirm-sign-out"
 
-# ── 8. Assert we are back on the login screen
-- wait:
-    for:
-      element:
-        text: "Sign in"
-      timeout: 8000
-- assertVisible: "Sign in"
+# 8. Assert we are back on the login screen
+- extendedWaitUntil:
+    visible: "Welcome back"
+    timeout: 8000
+- assertVisible: "Welcome back"
 
-# ── 9. Screenshot to confirm the final state
+# 9. Screenshot to confirm the final state
 - takeScreenshot: logout-success

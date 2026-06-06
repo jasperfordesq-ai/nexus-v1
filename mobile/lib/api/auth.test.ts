@@ -26,8 +26,15 @@ jest.mock('@/lib/constants', () => ({
 }));
 
 import { api } from '@/lib/api/client';
-import { buildDisplayName, extractToken, resetPassword, verifyEmail } from './auth';
-import type { AuthResponse, LoginUser } from './auth';
+import {
+  buildDisplayName,
+  extractToken,
+  getRegistrationResult,
+  register,
+  resetPassword,
+  verifyEmail,
+} from './auth';
+import type { AuthResponse, LoginUser, RegisterPayload, RegisterResponse } from './auth';
 
 const baseResponse: AuthResponse = {
   success: true,
@@ -47,6 +54,10 @@ const baseResponse: AuthResponse = {
     onboarding_completed: true,
   },
 };
+
+beforeEach(() => {
+  jest.clearAllMocks();
+});
 
 describe('extractToken', () => {
   it('returns access_token when present', () => {
@@ -99,6 +110,50 @@ describe('buildDisplayName', () => {
 
   it('returns "Member" when both names are null', () => {
     expect(buildDisplayName({ ...base, first_name: null, last_name: null })).toBe('Member');
+  });
+});
+
+describe('register', () => {
+  it('posts all backend-required registration fields to the V2 endpoint', async () => {
+    const payload: RegisterPayload = {
+      first_name: 'Mobile',
+      last_name: 'Member',
+      email: 'mobile.member@example.test',
+      password: 'TestPassword123!',
+      password_confirmation: 'TestPassword123!',
+      location: 'City, country',
+      phone: '+1 555 123 4567',
+      terms_accepted: true,
+      form_started_at: 1_780_665_000_000,
+    };
+    const response: RegisterResponse = {
+      data: {
+        user: { id: 2, first_name: 'Mobile', last_name: 'Member', email: 'mobile.member@example.test' },
+        requires_verification: true,
+        message: 'Check your email before signing in.',
+      },
+    };
+    (api.post as jest.Mock).mockResolvedValue(response);
+
+    await expect(register(payload)).resolves.toBe(response);
+
+    expect(api.post).toHaveBeenCalledWith('/api/v2/auth/register', payload);
+  });
+});
+
+describe('getRegistrationResult', () => {
+  it('unwraps Laravel V2 response envelopes', () => {
+    const result = {
+      user: { id: 2, first_name: 'Mobile', last_name: 'Member', email: 'mobile.member@example.test' },
+      requires_verification: true,
+      message: 'Check your email before signing in.',
+    };
+
+    expect(getRegistrationResult({ data: result })).toBe(result);
+  });
+
+  it('returns legacy flat registration responses unchanged', () => {
+    expect(getRegistrationResult(baseResponse)).toBe(baseResponse);
   });
 });
 

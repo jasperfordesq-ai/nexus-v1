@@ -85,7 +85,7 @@ const settingKeys = [
   'messaging_enabled_federated',
   'transactions_enabled_federated',
   'email_notifications',
-] as const satisfies ReadonlyArray<keyof FederationSettings>;
+] as const satisfies readonly (keyof FederationSettings)[];
 
 const serviceReachFilters: ServiceReachFilter[] = ['all', 'local_only', 'remote_ok', 'travel_ok'];
 const listingTypeFilters: ListingTypeFilter[] = ['all', 'offer', 'request'];

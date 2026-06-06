@@ -118,7 +118,7 @@ class AdminToolsController extends BaseApiController
     public function get404Errors(): JsonResponse
     {
         // Global log — intentionally cross-tenant (super-admin only). error_404_log has no tenant_id column.
-        $this->requireSuperAdmin();
+        $this->requirePlatformSuperAdmin();
 
         $page = $this->queryInt('page', 1, 1);
         $perPage = $this->queryInt('per_page', 50, 1, 100);
@@ -154,7 +154,7 @@ class AdminToolsController extends BaseApiController
     public function delete404Error(int $id): JsonResponse
     {
         // Global log — intentionally cross-tenant (super-admin only). error_404_log has no tenant_id column.
-        $this->requireSuperAdmin();
+        $this->requirePlatformSuperAdmin();
 
         try {
             $error = DB::selectOne("SELECT id FROM error_404_log WHERE id = ?", [$id]);

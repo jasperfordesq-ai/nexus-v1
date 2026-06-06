@@ -12,6 +12,10 @@ export interface ConfirmOptions {
   message?: string;
   confirmLabel: string;
   cancelLabel: string;
+  confirmAccessibilityLabel?: string;
+  cancelAccessibilityLabel?: string;
+  confirmTestID?: string;
+  cancelTestID?: string;
   /** 'danger' (default) for destructive actions, 'primary' otherwise. */
   variant?: 'primary' | 'danger';
   onConfirm: () => void | Promise<void>;
@@ -65,6 +69,10 @@ export function useConfirm() {
       message={options?.message}
       cancelLabel={options?.cancelLabel ?? ''}
       confirmLabel={options?.confirmLabel ?? ''}
+      cancelAccessibilityLabel={options?.cancelAccessibilityLabel}
+      confirmAccessibilityLabel={options?.confirmAccessibilityLabel}
+      cancelTestID={options?.cancelTestID}
+      confirmTestID={options?.confirmTestID}
       variant={options?.variant ?? 'danger'}
       isConfirming={isConfirming}
       onClose={close}

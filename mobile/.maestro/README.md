@@ -20,7 +20,7 @@ On Windows, use WSL2 with the Linux install above, or download the Maestro JAR m
 
 ## Running flows
 
-All flows target bundle ID `ie.hour.nexus` (iOS) / package `ie.hour.nexus` (Android).
+All flows target bundle ID `ie.project.nexus` (iOS) / package `ie.project.nexus` (Android).
 
 ```bash
 # Run all flows in numbered order

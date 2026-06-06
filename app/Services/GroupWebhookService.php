@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Core\TenantContext;
+use App\Support\OutboundUrlGuard;
 
 /**
  * GroupWebhookService — Fire HTTP callbacks on group events.
@@ -84,6 +85,14 @@ class GroupWebhookService
                 continue;
             }
 
+            if (! OutboundUrlGuard::isSafeHttpUrl($webhook->url, requireHttps: true)) {
+                Log::warning('GroupWebhook: Unsafe webhook URL blocked', [
+                    'webhook_id' => $webhook->id,
+                    'url' => $webhook->url,
+                ]);
+                continue;
+            }
+
             $body = [
                 'event' => $event,
                 'group_id' => $groupId,
@@ -102,7 +111,10 @@ class GroupWebhookService
             }
 
             try {
-                Http::timeout(10)->withHeaders($headers)->post($webhook->url, $body);
+                Http::timeout(10)
+                    ->withOptions(OutboundUrlGuard::httpClientOptions($webhook->url, requireHttps: true))
+                    ->withHeaders($headers)
+                    ->post($webhook->url, $body);
 
                 DB::table('group_webhooks')
                     ->where('id', $webhook->id)
@@ -198,47 +210,6 @@ class GroupWebhookService
 
     private static function isSafeWebhookUrl(string $url): bool
     {
-        if (!filter_var($url, FILTER_VALIDATE_URL)) {
-            return false;
-        }
-
-        $parts = parse_url($url);
-        $scheme = strtolower($parts['scheme'] ?? '');
-        $host = strtolower(trim($parts['host'] ?? '', '[]'));
-
-        if (!in_array($scheme, ['http', 'https'], true) || $host === '') {
-            return false;
-        }
-
-        if ($host === 'localhost' || str_ends_with($host, '.localhost') || str_ends_with($host, '.local')) {
-            return false;
-        }
-
-        $ips = [];
-        if (filter_var($host, FILTER_VALIDATE_IP)) {
-            $ips[] = $host;
-        } else {
-            $records = @dns_get_record($host, DNS_A + DNS_AAAA) ?: [];
-            foreach ($records as $record) {
-                if (!empty($record['ip'])) {
-                    $ips[] = $record['ip'];
-                }
-                if (!empty($record['ipv6'])) {
-                    $ips[] = $record['ipv6'];
-                }
-            }
-        }
-
-        if (empty($ips)) {
-            return false;
-        }
-
-        foreach ($ips as $ip) {
-            if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
-                return false;
-            }
-        }
-
-        return true;
+        return OutboundUrlGuard::isSafeHttpUrl($url, requireHttps: true);
     }
 }

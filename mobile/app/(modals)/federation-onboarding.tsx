@@ -37,7 +37,7 @@ const defaultSettings: FederationSettings = {
   travel_radius_km: 25,
 };
 
-const privacyKeys: Array<keyof FederationSettings> = [
+const privacyKeys: (keyof FederationSettings)[] = [
   'profile_visible_federated',
   'appear_in_federated_search',
   'show_skills_federated',
@@ -45,7 +45,7 @@ const privacyKeys: Array<keyof FederationSettings> = [
   'show_reviews_federated',
 ];
 
-const communicationKeys: Array<keyof FederationSettings> = [
+const communicationKeys: (keyof FederationSettings)[] = [
   'messaging_enabled_federated',
   'transactions_enabled_federated',
   'email_notifications',
@@ -216,7 +216,7 @@ function SummarySection({
   t,
 }: {
   title: string;
-  rows: Array<{ label: string; enabled: boolean }>;
+  rows: { label: string; enabled: boolean }[];
   theme: ReturnType<typeof useTheme>;
   t: (key: string, opts?: Record<string, unknown>) => string;
 }) {
@@ -242,7 +242,7 @@ function SettingsList({
   onChange,
   prefix,
 }: {
-  keys: Array<keyof FederationSettings>;
+  keys: (keyof FederationSettings)[];
   settings: FederationSettings;
   theme: ReturnType<typeof useTheme>;
   t: (key: string, opts?: Record<string, unknown>) => string;

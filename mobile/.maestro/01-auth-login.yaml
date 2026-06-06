@@ -11,7 +11,7 @@
 #   maestro test --env TEST_EMAIL=user@example.com --env TEST_PASSWORD=secret \
 #     .maestro/01-auth-login.yaml
 
-appId: ie.hour.nexus
+appId: ie.project.nexus
 ---
 # ── 1. Launch the app fresh (clears all stored state including any prior session)
 - launchApp:
@@ -26,16 +26,17 @@ appId: ie.hour.nexus
       visible: "Select your timebank"
     commands:
       # Wait for the community list to populate
-      - wait:
-          for:
-            element:
-              text: "Select your timebank"
-            timeout: 5000
+      - extendedWaitUntil:
+          visible: "Select your timebank"
+          timeout: 5000
       # Tap the test tenant entry — falls back gracefully if already dismissed
       - tapOn: "hour-timebank"
 
 # ── 3. Verify the login screen has loaded
-- assertVisible: "Sign in"
+- extendedWaitUntil:
+    visible: "Welcome back"
+    timeout: 60000
+- assertVisible: "Welcome back"
 
 # ── 4. Enter email address
 - tapOn:
@@ -46,19 +47,19 @@ appId: ie.hour.nexus
 - tapOn:
     id: "password-input"
 - inputText: "${TEST_PASSWORD}"
+- back
 
 # ── 6. Tap the Sign in button
-- tapOn: "Sign in"
+- tapOn:
+    id: "login-submit"
 
 # ── 7. Wait for the home/feed screen to appear (tab bar loaded = login succeeded)
-- wait:
-    for:
-      element:
-        text: "Feed"
-      timeout: 10000
+- extendedWaitUntil:
+    visible: "Community Feed"
+    timeout: 10000
 
 # ── 8. Assert we are on the main screen
-- assertVisible: "Feed"
+- assertVisible: "Community Feed"
 
 # ── 9. Capture a screenshot for the CI artefact store
 - takeScreenshot: login-success

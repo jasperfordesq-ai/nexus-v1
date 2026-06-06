@@ -40,7 +40,7 @@ export class ApiResponseError extends Error {
 function extractErrorMessage(data: unknown, fallback: string): string {
   const body = data as {
     message?: string;
-    errors?: Record<string, string[]> | Array<{ message?: string }>;
+    errors?: Record<string, string[]> | { message?: string }[];
   } | null;
 
   if (body?.message) {
@@ -95,6 +95,7 @@ export async function attemptTokenRefresh(): Promise<string | null> {
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
         Accept: 'application/json',
+        'X-Nexus-Mobile': '1',
       };
       headers['X-Tenant-Slug'] = tenantSlug || DEFAULT_TENANT;
 
@@ -178,6 +179,7 @@ async function request<T>(
 
   const headers: Record<string, string> = {
     Accept: 'application/json',
+    'X-Nexus-Mobile': '1',
   };
 
   // Do NOT set Content-Type for FormData — React Native sets the multipart

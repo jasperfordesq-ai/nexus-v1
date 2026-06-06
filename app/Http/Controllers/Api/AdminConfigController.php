@@ -20,6 +20,7 @@ use App\Services\SearchService;
 use App\Services\SmartMatchingEngine;
 use App\Services\TenantFeatureConfig;
 use App\Services\TenantSettingsService;
+use App\Support\OutboundUrlGuard;
 use App\Jobs\RunAdminCronJob;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -376,7 +377,7 @@ class AdminConfigController extends BaseApiController
     /** POST /api/v2/admin/background-jobs/{id}/run */
     public function runJob(string $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
 
         $methodMap = [
             'digest_emails'  => 'dailyDigest',
@@ -468,7 +469,7 @@ class AdminConfigController extends BaseApiController
     /** POST /api/v2/admin/config/cron-jobs/run */
     public function runCronJob(): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requirePlatformSuperAdmin();
         $tenantId = TenantContext::getId();
 
         $uri = request()->getRequestUri();
@@ -1160,6 +1161,10 @@ class AdminConfigController extends BaseApiController
             if (!in_array($toSave['ai_provider'], $validProviders, true)) {
                 return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_ai_provider', ['providers' => implode(', ', $validProviders)]), 'ai_provider', 422);
             }
+        }
+
+        if (isset($toSave['ollama_host']) && !OutboundUrlGuard::isSafeHttpUrl($toSave['ollama_host'])) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.url_no_private_ip'), 'ollama_host', 422);
         }
 
         \App\Models\AiSettings::setMultiple($tenantId, $toSave);

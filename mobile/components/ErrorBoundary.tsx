@@ -6,7 +6,7 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 import * as Sentry from '@sentry/react-native';
-import i18n from 'i18next';
+import { t as translate } from 'i18next';
 import Button from '@/components/ui/Button';
 
 interface Props {
@@ -25,8 +25,8 @@ interface State {
  * Uses hardcoded colors to guarantee it always renders.
  */
 function ErrorFallback({ onReset }: { onReset: () => void }) {
-  const title = i18n.t('errors.boundaryTitle', { ns: 'common' });
-  const retry = i18n.t('buttons.retry', { ns: 'common' });
+  const title = translate('errors.boundaryTitle', { ns: 'common' });
+  const retry = translate('buttons.retry', { ns: 'common' });
 
   return (
     <View

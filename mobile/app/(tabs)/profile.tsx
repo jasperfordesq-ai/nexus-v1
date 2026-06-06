@@ -118,6 +118,8 @@ export default function MoreScreen() {
       message: t('signOutConfirmMessage'),
       confirmLabel: t('signOut'),
       cancelLabel: t('common:buttons.cancel'),
+      confirmAccessibilityLabel: `${t('signOutConfirmTitle')}: ${t('signOut')}`,
+      confirmTestID: 'profile-confirm-sign-out',
       variant: 'danger',
       onConfirm: () => void logout(),
     });
@@ -181,7 +183,13 @@ export default function MoreScreen() {
         <CollapsibleMenuSections sections={collapsibleSections} onNavigate={navigate} theme={theme} />
         <MenuSection title={t('account')} items={visibleAccount} onNavigate={navigate} theme={theme} />
 
-        <HeroButton variant="danger" onPress={confirmLogout} className="mt-1">
+        <HeroButton
+          testID="profile-sign-out"
+          accessibilityLabel={t('signOut')}
+          variant="danger"
+          onPress={confirmLogout}
+          className="mt-1"
+        >
           <Ionicons name="log-out-outline" size={18} color="#fff" />
           <HeroButton.Label>{t('signOut')}</HeroButton.Label>
         </HeroButton>
@@ -233,7 +241,7 @@ function CollapsibleMenuSections({
   onNavigate,
   theme,
 }: {
-  sections: Array<{ title: string; value: string; icon: IoniconName; items: MenuItem[] }>;
+  sections: { title: string; value: string; icon: IoniconName; items: MenuItem[] }[];
   onNavigate: (route: Href) => void;
   theme: Theme;
 }) {

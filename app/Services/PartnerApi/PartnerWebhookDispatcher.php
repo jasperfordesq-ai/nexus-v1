@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace App\Services\PartnerApi;
 
 use App\Core\TenantContext;
-use App\Services\WebhookDispatchService;
+use App\Support\OutboundUrlGuard;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -32,7 +32,7 @@ class PartnerWebhookDispatcher
         array $eventTypes,
         string $targetUrl,
     ): array {
-        if (WebhookDispatchService::isPrivateUrl($targetUrl)) {
+        if (! OutboundUrlGuard::isSafeHttpUrl($targetUrl, requireHttps: true)) {
             throw new \InvalidArgumentException('target_url_private');
         }
 
@@ -98,6 +98,16 @@ class PartnerWebhookDispatcher
                 continue;
             }
 
+            if (! OutboundUrlGuard::isSafeHttpUrl($sub->target_url, requireHttps: true)) {
+                Log::warning('partner_webhook.unsafe_url_blocked', [
+                    'subscription_id' => $sub->id,
+                    'event' => $eventType,
+                    'target_url' => $sub->target_url,
+                ]);
+                self::recordFailure((int) $sub->id);
+                continue;
+            }
+
             $body = json_encode([
                 'event' => $eventType,
                 'data' => $payload,
@@ -107,6 +117,7 @@ class PartnerWebhookDispatcher
 
             try {
                 $response = Http::timeout(10)
+                    ->withOptions(OutboundUrlGuard::httpClientOptions($sub->target_url, requireHttps: true))
                     ->withHeaders([
                         'Content-Type' => 'application/json',
                         'X-Signature' => 'sha256=' . $signature,

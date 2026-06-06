@@ -18,7 +18,7 @@ interface BottomSheetProps {
    * percentages (e.g. '90%'). Omit entirely to let the library size the sheet
    * to its content (dynamic sizing) — no manual height math required.
    */
-  snapPoints?: Array<number | string>;
+  snapPoints?: (number | string)[];
   children: React.ReactNode;
   title?: string;
   childrenClassName?: string;

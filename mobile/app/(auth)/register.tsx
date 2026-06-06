@@ -21,7 +21,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Alert, Button as HeroButton, Card as HeroCard } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 
-import { extractToken, register as apiRegister } from '@/lib/api/auth';
+import { extractToken, getRegistrationResult, register as apiRegister, type LoginUser, type RegisterResult } from '@/lib/api/auth';
 import { ApiResponseError } from '@/lib/api/client';
 import { STORAGE_KEYS } from '@/lib/constants';
 import { storage } from '@/lib/storage';
@@ -30,20 +30,27 @@ import { useTheme } from '@/lib/hooks/useTheme';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { registerForPushNotifications } from '@/lib/notifications';
 import Button from '@/components/ui/Button';
+import Checkbox from '@/components/ui/Checkbox';
 import Input from '@/components/ui/Input';
 
 function makeRegisterSchema(t: (key: string) => string) {
+  const phoneRegex = /^\+?\d{7,15}$/;
+
   return z
     .object({
       firstName: z.string().min(1, t('errors.firstNameRequired')),
-      lastName: z.string().default(''),
+      lastName: z.string().min(1, t('errors.lastNameRequired')),
+      phone: z
+        .string()
+        .min(1, t('errors.phoneRequired'))
+        .refine((value) => phoneRegex.test(value.replace(/[\s\-().]/g, '')), t('errors.phoneInvalid')),
+      location: z.string().min(1, t('errors.locationRequired')),
       email: z.string().email(t('errors.validEmail')),
       password: z
         .string()
-        .min(8, t('errors.weakPassword'))
-        .regex(/[A-Z]/, t('errors.passwordUppercase'))
-        .regex(/[0-9]/, t('errors.passwordNumber')),
+        .min(12, t('errors.weakPassword')),
       passwordConfirm: z.string().min(1, t('errors.confirmPasswordRequired')),
+      termsAccepted: z.boolean().refine((value) => value, t('errors.termsRequired')),
     })
     .refine((d) => d.password === d.passwordConfirm, {
       message: t('errors.passwordMismatch'),
@@ -54,10 +61,23 @@ function makeRegisterSchema(t: (key: string) => string) {
 type RegisterFormValues = {
   firstName: string;
   lastName: string;
+  phone: string;
+  location: string;
   email: string;
   password: string;
   passwordConfirm: string;
+  termsAccepted: boolean;
 };
+
+function hasAuthSession(result: RegisterResult): result is RegisterResult & {
+  user: LoginUser;
+  refresh_token: string;
+} {
+  return !!(result.access_token ?? result.token)
+    && !!result.refresh_token
+    && !!result.user
+    && 'tenant_id' in result.user;
+}
 
 export default function RegisterScreen() {
   const { t } = useTranslation(['auth', 'common']);
@@ -66,6 +86,7 @@ export default function RegisterScreen() {
   const primary = usePrimaryColor();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+  const [formStartedAt] = useState(() => Date.now());
 
   const registerSchema = useMemo(() => makeRegisterSchema(t), [t]);
 
@@ -75,11 +96,21 @@ export default function RegisterScreen() {
     formState: { errors },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema) as Resolver<RegisterFormValues>,
-    defaultValues: { firstName: '', lastName: '', email: '', password: '', passwordConfirm: '' },
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      phone: '',
+      location: '',
+      email: '',
+      password: '',
+      passwordConfirm: '',
+      termsAccepted: false,
+    },
   });
 
   const [isLoading, setIsLoading] = useState(false);
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const [pendingMessage, setPendingMessage] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -91,20 +122,37 @@ export default function RegisterScreen() {
     try {
       const response = await apiRegister({
         first_name: data.firstName.trim(),
-        last_name: data.lastName?.trim() ?? '',
+        last_name: data.lastName.trim(),
+        phone: data.phone.trim(),
+        location: data.location.trim(),
         email: data.email.trim().toLowerCase(),
         password: data.password,
         password_confirmation: data.passwordConfirm,
+        terms_accepted: data.termsAccepted,
+        form_started_at: formStartedAt,
       });
+      const result = getRegistrationResult(response);
 
-      const token = extractToken(response);
+      if (!hasAuthSession(result)) {
+        setPendingMessage(result.message ?? t('register.successDefaultMessage'));
+        return;
+      }
+
+      const token = extractToken({
+        success: true,
+        access_token: result.access_token ?? result.token ?? '',
+        refresh_token: result.refresh_token,
+        token_type: result.token_type ?? 'Bearer',
+        expires_in: result.expires_in ?? 0,
+        user: result.user,
+      });
       await Promise.all([
         storage.set(STORAGE_KEYS.AUTH_TOKEN, token),
-        storage.set(STORAGE_KEYS.REFRESH_TOKEN, response.refresh_token),
-        storage.setJson(STORAGE_KEYS.USER_DATA, response.user),
+        storage.set(STORAGE_KEYS.REFRESH_TOKEN, result.refresh_token),
+        storage.setJson(STORAGE_KEYS.USER_DATA, result.user),
       ]);
 
-      setSession(token, response.user);
+      setSession(token, result.user);
       router.replace('/(tabs)/home');
       void registerForPushNotifications();
     } catch (err) {
@@ -133,6 +181,54 @@ export default function RegisterScreen() {
       />
     </HeroButton>
   );
+
+  if (pendingMessage) {
+    return (
+      <ScrollView
+        contentContainerStyle={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
+        className="flex-1 bg-background"
+      >
+        <View className="px-5 py-10">
+          <HeroCard className="overflow-hidden">
+            <HeroCard.Header className="items-center px-6 pt-8 pb-4">
+              <View
+                className="w-[72px] h-[72px] rounded-2xl items-center justify-center mb-4"
+                style={{ backgroundColor: primary }}
+                accessibilityRole="image"
+                accessibilityLabel={t('register.successTitle')}
+              >
+                <Ionicons name="mail-unread-outline" size={30} color="#fff" />
+              </View>
+              <HeroCard.Title className="text-2xl font-bold text-center">
+                {t('register.successTitle')}
+              </HeroCard.Title>
+              <HeroCard.Description className="text-center mt-1">
+                {t('register.successSubtitle')}
+              </HeroCard.Description>
+            </HeroCard.Header>
+            <HeroCard.Body className="px-6 pb-6">
+              <Alert status="success" accessibilityRole="alert">
+                <Alert.Indicator />
+                <Alert.Content>
+                  <Alert.Description>{pendingMessage}</Alert.Description>
+                </Alert.Content>
+              </Alert>
+              <View className="mt-6">
+                <Button
+                  variant="outline"
+                  fullWidth
+                  onPress={() => authRouter.replace('/login')}
+                  accessibilityLabel={t('register.signIn')}
+                >
+                  {t('register.signIn')}
+                </Button>
+              </View>
+            </HeroCard.Body>
+          </HeroCard>
+        </View>
+      </ScrollView>
+    );
+  }
 
   return (
     <KeyboardAvoidingView
@@ -185,6 +281,7 @@ export default function RegisterScreen() {
                   name="firstName"
                   render={({ field: { onChange, onBlur, value } }) => (
                     <Input
+                      testID="register-first-name"
                       label={t('register.firstName')}
                       value={value}
                       onChangeText={onChange}
@@ -202,6 +299,7 @@ export default function RegisterScreen() {
                   name="lastName"
                   render={({ field: { onChange, onBlur, value } }) => (
                     <Input
+                      testID="register-last-name"
                       label={t('register.lastName')}
                       value={value}
                       onChangeText={onChange}
@@ -215,9 +313,47 @@ export default function RegisterScreen() {
 
                 <Controller
                   control={control}
+                  name="phone"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <Input
+                      testID="register-phone"
+                      label={t('register.phone')}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      error={errors.phone?.message}
+                      placeholder={t('register.phonePlaceholder')}
+                      keyboardType="phone-pad"
+                      autoComplete="tel"
+                      returnKeyType="next"
+                    />
+                  )}
+                />
+
+                <Controller
+                  control={control}
+                  name="location"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <Input
+                      testID="register-location"
+                      label={t('register.location')}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      error={errors.location?.message}
+                      placeholder={t('register.locationPlaceholder')}
+                      autoComplete="address-line1"
+                      returnKeyType="next"
+                    />
+                  )}
+                />
+
+                <Controller
+                  control={control}
                   name="email"
                   render={({ field: { onChange, onBlur, value } }) => (
                     <Input
+                      testID="register-email"
                       label={t('register.email')}
                       value={value}
                       onChangeText={onChange}
@@ -237,6 +373,7 @@ export default function RegisterScreen() {
                   name="password"
                   render={({ field: { onChange, onBlur, value } }) => (
                     <Input
+                      testID="register-password"
                       label={t('register.password')}
                       value={value}
                       onChangeText={onChange}
@@ -262,6 +399,7 @@ export default function RegisterScreen() {
                   name="passwordConfirm"
                   render={({ field: { onChange, onBlur, value } }) => (
                     <Input
+                      testID="register-confirm-password"
                       label={t('register.confirmPassword')}
                       value={value}
                       onChangeText={onChange}
@@ -280,6 +418,25 @@ export default function RegisterScreen() {
                         />
                       }
                     />
+                  )}
+                />
+
+                <Controller
+                  control={control}
+                  name="termsAccepted"
+                  render={({ field: { onChange, value } }) => (
+                    <View className="mt-2 gap-1.5">
+                      <Checkbox
+                        testID="register-terms"
+                        accessibilityLabel={t('register.termsAccepted')}
+                        checked={value}
+                        onPress={() => onChange(!value)}
+                        label={t('register.termsAccepted')}
+                      />
+                      {errors.termsAccepted?.message ? (
+                        <Text className="text-xs text-danger">{errors.termsAccepted.message}</Text>
+                      ) : null}
+                    </View>
                   )}
                 />
 

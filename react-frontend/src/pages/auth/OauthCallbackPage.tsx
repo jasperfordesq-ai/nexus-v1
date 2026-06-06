@@ -7,12 +7,12 @@
  * OAuth Callback Page (SOC13)
  *
  * The backend redirects the user here after a successful OAuth round-trip with
- * `?token=<sanctum>&provider=<x>&is_new=<0|1>&tenant_id=<id>`.
+ * a short-lived `?code=<one-time-code>` that is exchanged via POST.
  * On error: `?error=<code>&message=<text>&provider=<x>`.
  */
 
 import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, Button, Spinner } from '@/components/ui';
@@ -25,33 +25,62 @@ export function OauthCallbackPage() {
   const { t } = useTranslation('common');
   usePageTitle(t('oauth.callback_signing_in'));
   const [params] = useSearchParams();
-  const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = params.get('token');
+    let cancelled = false;
+    const code = params.get('code');
     const errCode = params.get('error');
     const errMsg = params.get('message');
-    const tenantId = params.get('tenant_id');
 
     if (errCode) {
       setError(errMsg || t('oauth.callback_failed'));
       return;
     }
 
-    if (!token) {
+    if (!code) {
       setError(t('oauth.callback_failed'));
       return;
     }
 
-    if (tenantId) {
-      tokenManager.setTenantId(tenantId);
+    async function exchangeCode() {
+      try {
+        const response = await fetch('/api/v2/auth/oauth/exchange', {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ code }),
+        });
+        const data = await response.json();
+
+        if (!response.ok || !data?.success || !data?.token) {
+          throw new Error(data?.message || 'oauth_exchange_failed');
+        }
+
+        if (cancelled) return;
+
+        if (data.tenant_id) {
+          tokenManager.setTenantId(String(data.tenant_id));
+        }
+        tokenManager.setAccessToken(String(data.token));
+        window.location.href = tenantPath('/dashboard');
+      } catch {
+        if (!cancelled) {
+          setError(t('oauth.callback_failed'));
+        }
+      }
     }
-    tokenManager.setAccessToken(token);
-    // Reload so AuthContext bootstraps from the freshly stored token.
-    window.location.href = tenantPath('/dashboard');
-  }, [params, navigate, tenantPath, t]);
+
+    void exchangeCode();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [params, tenantPath, t]);
 
   if (error) {
     return (

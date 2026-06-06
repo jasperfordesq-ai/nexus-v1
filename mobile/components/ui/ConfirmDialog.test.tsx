@@ -25,14 +25,17 @@ jest.mock('heroui-native', () => {
     children,
     onPress,
     accessibilityLabel,
+    testID,
     isDisabled,
   }: {
     children: React.ReactNode;
     onPress?: () => void;
     accessibilityLabel?: string;
+    testID?: string;
     isDisabled?: boolean;
   }) => (
     <Pressable
+      testID={testID}
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
       disabled={isDisabled}
@@ -62,6 +65,10 @@ describe('ConfirmDialog', () => {
         message="This cannot be undone."
         cancelLabel="Keep it"
         confirmLabel="Delete"
+        cancelAccessibilityLabel="Cancel delete listing"
+        confirmAccessibilityLabel="Confirm delete listing"
+        cancelTestID="delete-cancel"
+        confirmTestID="delete-confirm"
         onClose={onClose}
         onConfirm={onConfirm}
       />,
@@ -70,11 +77,29 @@ describe('ConfirmDialog', () => {
     expect(getByText('Delete listing?')).toBeTruthy();
     expect(getByText('This cannot be undone.')).toBeTruthy();
 
-    fireEvent.press(getByLabelText('Delete'));
+    fireEvent.press(getByLabelText('Confirm delete listing'));
     expect(onConfirm).toHaveBeenCalledTimes(1);
 
-    fireEvent.press(getByLabelText('Keep it'));
+    fireEvent.press(getByLabelText('Cancel delete listing'));
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('passes stable test IDs through to action buttons', () => {
+    const { getByTestId } = render(
+      <ConfirmDialog
+        visible
+        title="Sign out?"
+        cancelLabel="Cancel"
+        confirmLabel="Sign out"
+        cancelTestID="logout-cancel"
+        confirmTestID="logout-confirm"
+        onClose={jest.fn()}
+        onConfirm={jest.fn()}
+      />,
+    );
+
+    expect(getByTestId('logout-cancel')).toBeTruthy();
+    expect(getByTestId('logout-confirm')).toBeTruthy();
   });
 
   it('does not render while closed', () => {

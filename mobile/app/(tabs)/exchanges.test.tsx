@@ -147,8 +147,9 @@ describe('ExchangesScreen', () => {
   });
 
   it('renders the search input', () => {
-    const { getByPlaceholderText } = render(<ExchangesScreen />);
+    const { getByPlaceholderText, getByTestId } = render(<ExchangesScreen />);
     expect(getByPlaceholderText('Search listings\u2026')).toBeTruthy();
+    expect(getByTestId('listings-search')).toBeTruthy();
   });
 
   it('renders empty state when there are no exchanges and not loading', () => {

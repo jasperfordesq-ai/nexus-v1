@@ -35,8 +35,8 @@ export const STORAGE_KEYS = {
 
 /** App-wide timing constants */
 export const TIMEOUTS = {
-  /** GET request timeout — fail fast on poor networks */
-  API_GET: 10_000,
+  /** GET request timeout — allow slower mobile networks and heavier feed/search endpoints */
+  API_GET: 30_000,
   /** POST/PUT/PATCH/DELETE request timeout — more time for data submission */
   API_MUTATION: 15_000,
   /** File upload timeout — large payloads need significantly more time */

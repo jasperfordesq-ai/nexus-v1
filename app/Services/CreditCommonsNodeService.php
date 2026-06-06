@@ -10,6 +10,7 @@ namespace App\Services;
 
 use App\Core\TenantContext;
 use App\Services\Protocols\CreditCommonsAdapter;
+use App\Support\OutboundUrlGuard;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -128,24 +129,8 @@ class CreditCommonsNodeService
      */
     private static function isUrlSafe(string $url): bool
     {
-        $host = parse_url($url, PHP_URL_HOST);
-        if (!$host) return false;
 
-        // Block obvious internal hostnames
-        $blockedHosts = ['localhost', '127.0.0.1', '0.0.0.0', '::1', 'metadata.google.internal'];
-        if (in_array(strtolower($host), $blockedHosts, true)) return false;
-
-        // Resolve DNS and check IP ranges
-        $ips = gethostbynamel($host);
-        if (!$ips) return true; // DNS failure — let the HTTP client handle it
-
-        foreach ($ips as $ip) {
-            if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
-                return false; // Private or reserved IP
-            }
-        }
-
-        return true;
+        return OutboundUrlGuard::isSafeHttpUrl($url);
     }
 
     /**
@@ -172,9 +157,11 @@ class CreditCommonsNodeService
         }
 
         try {
+            $aboutUrl = rtrim($config->parent_node_url, '/') . '/about';
             $response = Http::timeout(10)
+                ->withOptions(OutboundUrlGuard::httpClientOptions($aboutUrl))
                 ->acceptJson()
-                ->get(rtrim($config->parent_node_url, '/') . '/about');
+                ->get($aboutUrl);
 
             if ($response->successful()) {
                 $aboutData = $response->json();
@@ -310,6 +297,7 @@ class CreditCommonsNodeService
             }
 
             $response = Http::withHeaders($headers)
+                ->withOptions(OutboundUrlGuard::httpClientOptions($relayUrl))
                 ->timeout(30)
                 ->post($relayUrl, $transaction);
 
@@ -508,9 +496,11 @@ class CreditCommonsNodeService
         $localHash = self::getLastHash($tenantId);
 
         try {
+            $aboutUrl = rtrim($remoteNodeUrl, '/') . '/about';
             $response = Http::timeout(10)
+                ->withOptions(OutboundUrlGuard::httpClientOptions($aboutUrl))
                 ->acceptJson()
-                ->get(rtrim($remoteNodeUrl, '/') . '/about');
+                ->get($aboutUrl);
 
             if (!$response->successful()) {
                 return [
@@ -639,9 +629,11 @@ class CreditCommonsNodeService
         }
 
         try {
+            $aboutUrl = rtrim($nodeUrl, '/') . '/about';
             $response = Http::timeout(10)
+                ->withOptions(OutboundUrlGuard::httpClientOptions($aboutUrl))
                 ->acceptJson()
-                ->get(rtrim($nodeUrl, '/') . '/about', ['node_path' => $targetNodeSlug]);
+                ->get($aboutUrl, ['node_path' => $targetNodeSlug]);
 
             if ($response->successful()) {
                 $data = $response->json();

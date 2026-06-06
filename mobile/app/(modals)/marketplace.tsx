@@ -35,7 +35,7 @@ import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 
-const PRICE_FILTERS: Array<MarketplacePriceType | ''> = ['', 'free', 'fixed', 'negotiable', 'contact'];
+const PRICE_FILTERS: (MarketplacePriceType | '')[] = ['', 'free', 'fixed', 'negotiable', 'contact'];
 
 export default function MarketplaceRoute() {
   return (

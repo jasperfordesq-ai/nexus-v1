@@ -6,7 +6,7 @@
 import React from 'react';
 import { Appearance, Text, View } from 'react-native';
 import { router } from 'expo-router';
-import i18n from 'i18next';
+import { t as translate } from 'i18next';
 import Button from '@/components/ui/Button';
 
 interface Props {
@@ -52,8 +52,8 @@ export default class ModalErrorBoundary extends React.Component<Props, State> {
   render(): React.ReactNode {
     if (this.state.hasError) {
       const colors = getErrorColors();
-      const title = i18n.t('errors.boundaryTitle', { ns: 'common' });
-      const goBack = i18n.t('buttons.back', { ns: 'common' });
+      const title = translate('errors.boundaryTitle', { ns: 'common' });
+      const goBack = translate('buttons.back', { ns: 'common' });
       return (
         <View
           style={{

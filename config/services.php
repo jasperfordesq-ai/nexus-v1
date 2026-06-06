@@ -74,6 +74,7 @@ return [
         'secret' => env('STRIPE_SECRET_KEY'),
         'publishable' => env('STRIPE_PUBLISHABLE_KEY'),
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
+        'marketplace_webhook_secret' => env('STRIPE_MARKETPLACE_WEBHOOK_SECRET'),
         'default_currency' => env('STRIPE_DEFAULT_CURRENCY', 'eur'),
     ],
 

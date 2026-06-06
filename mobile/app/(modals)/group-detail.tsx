@@ -593,7 +593,7 @@ function GroupDetailScreenInner() {
     }
   }
 
-  const tabs: Array<{ key: TabKey; label: string; icon: IoniconName }> = [
+  const tabs: { key: TabKey; label: string; icon: IoniconName }[] = [
     { key: 'overview', label: t('detail.tabs.overview'), icon: 'newspaper-outline' },
     { key: 'discussion', label: t('detail.tabs.discussion'), icon: 'chatbubble-ellipses-outline' },
     { key: 'members', label: t('detail.tabs.members'), icon: 'people-outline' },

@@ -359,7 +359,7 @@ describe('MoreScreen (More tab)', () => {
   it('hides More menu buttons when their backend module is disabled', () => {
     mockHasModule.mockImplementation((module: string) => !['wallet', 'messages', 'notifications', 'listings', 'settings'].includes(module));
 
-    const { getByLabelText, getByText, queryByText } = render(<MoreScreen />);
+    const { getByText, queryByText } = render(<MoreScreen />);
 
     expect(queryByText('Wallet')).toBeNull();
     expect(queryByText('Messages')).toBeNull();
@@ -386,8 +386,9 @@ describe('MoreScreen (More tab)', () => {
   });
 
   it('renders the Sign out button', () => {
-    const { getByText } = render(<MoreScreen />);
+    const { getByTestId, getByText } = render(<MoreScreen />);
     expect(getByText('Sign out')).toBeTruthy();
+    expect(getByTestId('profile-sign-out')).toBeTruthy();
   });
 
   it('renders ProfileSkeleton when user is null', () => {

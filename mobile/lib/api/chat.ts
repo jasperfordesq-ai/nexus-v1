@@ -46,7 +46,7 @@ export interface ToolInvocation {
   ok: boolean;
   summary: string;
   card_type: string;
-  results: Array<Record<string, unknown>>;
+  results: Record<string, unknown>[];
 }
 
 interface RawChatResponse {

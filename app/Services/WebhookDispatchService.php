@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Support\OutboundUrlGuard;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -30,25 +31,7 @@ class WebhookDispatchService
      */
     public static function isPrivateUrl(string $url): bool
     {
-        $parsed = parse_url($url);
-        $host = $parsed['host'] ?? '';
-        if (empty($host)) {
-            return true;
-        }
-
-        // Check if hostname is literally an IP
-        if (filter_var($host, FILTER_VALIDATE_IP)) {
-            return self::isPrivateIp($host);
-        }
-
-        // Resolve hostname to IP and check
-        $ip = gethostbyname($host);
-        if ($ip === $host) {
-            // Resolution failed — block to be safe
-            return true;
-        }
-
-        return self::isPrivateIp($ip);
+        return ! OutboundUrlGuard::isSafeHttpUrl($url);
     }
 
     private static function isPrivateIp(string $ip): bool
@@ -109,7 +92,7 @@ class WebhookDispatchService
                     $signature = hash_hmac('sha256', $body, $webhook->secret ?? '');
 
                     $ch = curl_init($webhook->url);
-                    curl_setopt_array($ch, [
+                    curl_setopt_array($ch, OutboundUrlGuard::curlOptionsForUrl($webhook->url) + [
                         CURLOPT_POST => true,
                         CURLOPT_POSTFIELDS => $body,
                         CURLOPT_HTTPHEADER => [
@@ -337,7 +320,7 @@ class WebhookDispatchService
         $signature = hash_hmac('sha256', $body, $webhook->secret ?? '');
 
         $ch = curl_init($webhook->url);
-        curl_setopt_array($ch, [
+        curl_setopt_array($ch, OutboundUrlGuard::curlOptionsForUrl($webhook->url) + [
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => $body,
             CURLOPT_HTTPHEADER => [
@@ -430,7 +413,7 @@ class WebhookDispatchService
                     $signature = hash_hmac('sha256', $log->payload, $webhook->secret ?? '');
 
                     $ch = curl_init($webhook->url);
-                    curl_setopt_array($ch, [
+                    curl_setopt_array($ch, OutboundUrlGuard::curlOptionsForUrl($webhook->url) + [
                         CURLOPT_POST => true,
                         CURLOPT_POSTFIELDS => $log->payload,
                         CURLOPT_HTTPHEADER => [

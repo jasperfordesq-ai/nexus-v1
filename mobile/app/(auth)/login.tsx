@@ -130,6 +130,7 @@ export default function LoginScreen() {
                   name="email"
                   render={({ field: { onChange, onBlur, value } }) => (
                     <Input
+                      testID="email-input"
                       label={t('login.email')}
                       value={value}
                       onChangeText={onChange}
@@ -149,6 +150,7 @@ export default function LoginScreen() {
                   name="password"
                   render={({ field: { onChange, onBlur, value } }) => (
                     <Input
+                      testID="password-input"
                       label={t('login.password')}
                       value={value}
                       onChangeText={onChange}
@@ -180,7 +182,12 @@ export default function LoginScreen() {
                 />
 
                 <View className="mt-6">
-                  <Button onPress={handleSubmit(onSubmit)} isLoading={isLoading} fullWidth>
+                  <Button
+                    testID="login-submit"
+                    onPress={handleSubmit(onSubmit)}
+                    isLoading={isLoading}
+                    fullWidth
+                  >
                     {t('login.submit')}
                   </Button>
                 </View>

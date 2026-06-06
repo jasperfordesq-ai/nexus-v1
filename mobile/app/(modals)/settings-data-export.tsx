@@ -64,7 +64,7 @@ export default function SettingsDataExportScreen() {
     void loadHistory();
   }, [loadHistory]);
 
-  const formatOptions = useMemo<Array<{ value: DataExportFormat; label: string; help: string }>>(
+  const formatOptions = useMemo<{ value: DataExportFormat; label: string; help: string }[]>(
     () => [
       { value: 'json', label: t('dataExport.format.json'), help: t('dataExport.format.jsonHelp') },
       { value: 'zip', label: t('dataExport.format.zip'), help: t('dataExport.format.zipHelp') },

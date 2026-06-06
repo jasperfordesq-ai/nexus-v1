@@ -85,6 +85,15 @@ class IdentityProviderRegistry
         return $list;
     }
 
+    public static function mockProviderAllowed(): bool
+    {
+        if ((bool) env('ALLOW_MOCK_IDENTITY_PROVIDER', false)) {
+            return true;
+        }
+
+        return ! app()->environment('production');
+    }
+
     /**
      * Initialize built-in providers on first access.
      */
@@ -97,7 +106,9 @@ class IdentityProviderRegistry
         self::$initialized = true;
 
         // Register built-in providers
-        self::register(new MockIdentityProvider());
+        if (self::mockProviderAllowed()) {
+            self::register(new MockIdentityProvider());
+        }
         self::register(new StripeIdentityProvider());
         self::register(new VeriffProvider());
         self::register(new JumioProvider());

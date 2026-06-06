@@ -44,7 +44,7 @@ export interface LoginUser {
   onboarding_completed: boolean;
 }
 
-/** Response from POST /api/auth/login and POST /api/v2/auth/register */
+/** Response from POST /api/auth/login */
 export interface AuthResponse {
   success: boolean;
   /** Primary token field (new name) */
@@ -68,7 +68,36 @@ export interface RegisterPayload {
   email: string;
   password: string;
   password_confirmation: string;
+  location: string;
+  phone: string;
+  terms_accepted: boolean;
+  form_started_at: number;
+  newsletter_opt_in?: boolean;
 }
+
+export interface RegistrationUser {
+  id: number;
+  first_name: string | null;
+  last_name: string | null;
+  email: string;
+}
+
+export interface RegisterResult {
+  success?: boolean;
+  access_token?: string;
+  token?: string;
+  refresh_token?: string;
+  token_type?: 'Bearer';
+  expires_in?: number;
+  user: LoginUser | RegistrationUser | null;
+  requires_verification?: boolean;
+  requires_approval?: boolean;
+  requires_waitlist?: boolean;
+  message?: string;
+  next_steps?: string[];
+}
+
+export type RegisterResponse = RegisterResult | { data: RegisterResult; meta?: Record<string, unknown> };
 
 export interface ForgotPasswordResponse {
   success?: boolean;
@@ -114,9 +143,13 @@ export function login(payload: LoginPayload): Promise<AuthResponse> {
   });
 }
 
-/** POST /api/v2/auth/register — V2 registration (returns token immediately) */
-export function register(payload: RegisterPayload): Promise<AuthResponse> {
-  return api.post<AuthResponse>(`${API_V2}/auth/register`, payload);
+/** POST /api/v2/auth/register — V2 registration (usually returns verification/approval state) */
+export function register(payload: RegisterPayload): Promise<RegisterResponse> {
+  return api.post<RegisterResponse>(`${API_V2}/auth/register`, payload);
+}
+
+export function getRegistrationResult(response: RegisterResponse): RegisterResult {
+  return 'data' in response ? response.data : response;
 }
 
 /** POST /api/auth/forgot-password â€” request a password reset email. */

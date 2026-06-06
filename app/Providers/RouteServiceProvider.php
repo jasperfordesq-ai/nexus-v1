@@ -76,6 +76,7 @@ class RouteServiceProvider extends ServiceProvider
                 \App\Http\Middleware\ResolveTenant::class,
                 \App\Http\Middleware\CheckMaintenanceMode::class,
                 \App\Http\Middleware\SetLocale::class,
+                'web',
             ])->group(base_path('routes/govuk-alpha.php'));
 
             // HTTP cron endpoint REMOVED (2026-04-02) — email bombing root cause.

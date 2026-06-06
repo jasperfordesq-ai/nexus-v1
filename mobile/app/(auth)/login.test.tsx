@@ -73,9 +73,12 @@ describe('LoginScreen', () => {
   });
 
   it('renders key UI elements', () => {
-    const { getByText, getByPlaceholderText } = render(<LoginScreen />);
+    const { getByText, getByPlaceholderText, getByTestId } = render(<LoginScreen />);
     expect(getByText('Sign in')).toBeTruthy();
     expect(getByPlaceholderText('you@example.com')).toBeTruthy();
+    expect(getByTestId('email-input')).toBeTruthy();
+    expect(getByTestId('password-input')).toBeTruthy();
+    expect(getByTestId('login-submit')).toBeTruthy();
     expect(getByText('Create account')).toBeTruthy();
   });
 

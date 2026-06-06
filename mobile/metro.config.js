@@ -48,6 +48,16 @@ config.transformer.transformIgnorePatterns = [
   '))',
 ];
 
+// The mobile bundle is route-heavy. Inline requires keep non-initial route
+// modules from being evaluated during cold start, which shortens the blank
+// pre-render window in release builds.
+config.transformer.getTransformOptions = async () => ({
+  transform: {
+    experimentalImportSupport: false,
+    inlineRequires: true,
+  },
+});
+
 module.exports = withUniwindConfig(config, {
   cssEntryFile: './global.css',
   dtsFile: './uniwind-types.d.ts',

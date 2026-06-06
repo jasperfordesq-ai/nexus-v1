@@ -13,6 +13,7 @@ use App\Services\Protocols\CreditCommonsAdapter;
 use App\Services\Protocols\KomunitinAdapter;
 use App\Services\Protocols\NexusAdapter;
 use App\Services\Protocols\TimeOverflowAdapter;
+use App\Support\OutboundUrlGuard;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -528,6 +529,9 @@ class FederationExternalApiClient
         // ---- Execute with single retry (only retry on 5xx/connection error) ----
         $lastResponse = null;
         $lastException = null;
+        $httpOptions = OutboundUrlGuard::httpClientOptions($url);
+        $httpOptions['verify'] = true;
+        $httpOptions['curl'][CURLOPT_MAXFILESIZE] = 10 * 1024 * 1024; // 10 MB response body cap
 
         for ($attempt = 0; $attempt <= self::MAX_RETRIES; $attempt++) {
             if ($attempt > 0) {
@@ -543,12 +547,7 @@ class FederationExternalApiClient
                     // Explicit SSL cert validation — auditable, never disabled.
                     // CURLOPT_MAXFILESIZE caps the response body at 10 MB to
                     // prevent a malicious partner from flooding us with data.
-                    ->withOptions([
-                        'verify' => true,
-                        'curl'   => [
-                            CURLOPT_MAXFILESIZE => 10 * 1024 * 1024, // 10 MB response body cap
-                        ],
-                    ])
+                    ->withOptions($httpOptions)
                     ->acceptJson();
 
                 if ($method === 'GET') {
@@ -702,7 +701,10 @@ class FederationExternalApiClient
                 throw new \RuntimeException(__('api.federation.oauth_token_url_failed_safety_validation', ['reason' => $ssrfError]));
             }
 
-            $response = Http::timeout(10)->withOptions(['verify' => true])->asForm()->post($tokenUrl, [
+            $oauthOptions = OutboundUrlGuard::httpClientOptions($tokenUrl, requireHttps: true);
+            $oauthOptions['verify'] = true;
+
+            $response = Http::timeout(10)->withOptions($oauthOptions)->asForm()->post($tokenUrl, [
                 'grant_type' => 'client_credentials',
                 'client_id' => $clientId,
                 'client_secret' => $clientSecret,

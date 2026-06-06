@@ -10,6 +10,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
 use App\Services\CreditCommonsNodeService;
+use App\Support\OutboundUrlGuard;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -106,6 +107,11 @@ class AdminCcConfigController extends BaseApiController
                 return $this->respondWithError('VALIDATION_ERROR',
                     'Validation window must be between 30 and 86400 seconds', 'validated_window', 422);
             }
+        }
+
+        if (!empty($input['parent_node_url']) && !OutboundUrlGuard::isSafeHttpUrl((string) $input['parent_node_url'])) {
+            return $this->respondWithError('VALIDATION_ERROR',
+                'Parent node URL must resolve to a public HTTP or HTTPS endpoint', 'parent_node_url', 422);
         }
 
         // Ensure config exists

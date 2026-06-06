@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Services\CaringCommunity;
 
 use App\Core\TenantContext;
+use App\Support\OutboundUrlGuard;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use InvalidArgumentException;
@@ -97,7 +98,7 @@ class FederationPeerService
             throw new InvalidArgumentException('peer_slug must be lowercase alphanumeric with hyphens.');
         }
 
-        if (! filter_var($baseUrl, FILTER_VALIDATE_URL) || ! str_starts_with($baseUrl, 'https://')) {
+        if (! OutboundUrlGuard::isSafeHttpUrl($baseUrl, requireHttps: true)) {
             throw new InvalidArgumentException('base_url must be a valid HTTPS URL.');
         }
 

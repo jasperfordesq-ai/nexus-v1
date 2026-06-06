@@ -348,6 +348,7 @@ export default function ExchangesScreen() {
       </View>
 
       <SearchInput
+        testID="listings-search"
         value={search}
         onChangeText={setSearch}
         placeholder={t('searchPlaceholder')}

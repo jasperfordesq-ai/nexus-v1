@@ -11,15 +11,19 @@
 #   maestro test --env TEST_EMAIL=user@example.com --env TEST_PASSWORD=secret \
 #     .maestro/03-browse-listings.yaml
 
-appId: ie.hour.nexus
+appId: ie.project.nexus
 ---
 # ── 1. Launch the app without clearing state (relies on persisted session)
 - launchApp
 
+- extendedWaitUntil:
+    visible: "Welcome back|Community Feed|Home|Listings|Messages|More|View wallet"
+    timeout: 60000
+
 # ── 2. Handle re-authentication if the session has expired
 - runFlow:
     when:
-      visible: "Sign in"
+      visible: "Welcome back"
     commands:
       - runFlow:
           when:
@@ -32,22 +36,20 @@ appId: ie.hour.nexus
       - tapOn:
           id: "password-input"
       - inputText: "${TEST_PASSWORD}"
-      - tapOn: "Sign in"
-      - wait:
-          for:
-            element:
-              text: "Feed"
-            timeout: 10000
+      - back
+      - tapOn:
+          id: "login-submit"
+      - extendedWaitUntil:
+          visible: "Community Feed"
+          timeout: 10000
 
 # ── 3. Tap the Listings tab
 - tapOn: "Listings"
 
 # ── 4. Assert the Listings screen title is visible (from exchanges locale)
-- wait:
-    for:
-      element:
-        text: "Listings"
-      timeout: 5000
+- extendedWaitUntil:
+    visible: "Listings"
+    timeout: 5000
 - assertVisible: "Listings"
 
 # ── 5. Tap the search bar and type a query
@@ -56,20 +58,18 @@ appId: ie.hour.nexus
 - inputText: "garden"
 
 # ── 6. Wait for debounce to fire and results to update (500 ms debounce + render)
-- wait:
-    for:
-      milliseconds: 1000
+- waitForAnimationToEnd:
+    timeout: 1000
 
 # ── 7. Screenshot the filtered results
 - takeScreenshot: listings-search
 
 # ── 8. Clear the search input (tap the Clear button or the X icon)
-- tapOn: "Clear"
+- tapOn: "Clear search"
 
 # ── 9. Wait for the full list to restore
-- wait:
-    for:
-      milliseconds: 500
+- waitForAnimationToEnd:
+    timeout: 500
 
 # ── 10. Scroll down through the listing cards to verify no crash on scroll
 - swipe:

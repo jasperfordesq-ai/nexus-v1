@@ -24,7 +24,7 @@ describe('useNetworkStatus', () => {
     global.fetch = jest.fn().mockResolvedValue({ ok: true, status: 200 }) as jest.Mock;
   });
 
-  it('updates immediately when native connectivity reports offline', async () => {
+  it('lets backend reachability override a native offline signal', async () => {
     let resolveFetch: ((value: { ok: boolean; status: number }) => void) | undefined;
     const pendingFetch = new Promise<{ ok: boolean; status: number }>((resolve) => {
       resolveFetch = resolve;
@@ -40,16 +40,24 @@ describe('useNetworkStatus', () => {
       netInfoListener?.({ isConnected: false, isInternetReachable: false });
     });
 
-    await waitFor(() => {
-      expect(result.current.isOnline).toBe(false);
-    });
+    expect(result.current.isOnline).toBe(true);
 
     await act(async () => {
       resolveFetch?.({ ok: true, status: 200 });
       await pendingFetch;
     });
 
-    expect(result.current.isOnline).toBe(false);
+    expect(result.current.isOnline).toBe(true);
+  });
+
+  it('marks the app offline when backend reachability fails', async () => {
+    global.fetch = jest.fn().mockRejectedValue(new Error('Network error')) as jest.Mock;
+
+    const { result } = renderHook(() => useNetworkStatus());
+
+    await waitFor(() => {
+      expect(result.current.isOnline).toBe(false);
+    });
   });
 
   it('keeps the app online while backend reachability confirms an ambiguous native signal', async () => {
@@ -73,5 +81,14 @@ describe('useNetworkStatus', () => {
     });
 
     expect(result.current.isOnline).toBe(true);
+  });
+
+  it('checks the lightweight PHP health endpoint', () => {
+    renderHook(() => useNetworkStatus());
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('/health.php'),
+      expect.objectContaining({ method: 'GET' }),
+    );
   });
 });

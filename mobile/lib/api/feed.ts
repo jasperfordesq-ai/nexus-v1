@@ -105,16 +105,16 @@ export interface FeedItem {
     total: number;
     user_reaction: string | null;
   };
-  link_previews?: Array<{
+  link_previews?: {
     url: string;
     title?: string | null;
     description?: string | null;
     image_url?: string | null;
     site_name?: string | null;
     domain?: string | null;
-  }>;
+  }[];
   poll_data?: PollData | null;
-  media?: Array<{
+  media?: {
     id: number;
     media_type: 'image' | 'video';
     file_url: string;
@@ -123,7 +123,7 @@ export interface FeedItem {
     width: number | null;
     height: number | null;
     display_order: number;
-  }>;
+  }[];
 }
 
 export function getFeedAuthor(item: FeedItem, fallbackName: string) {

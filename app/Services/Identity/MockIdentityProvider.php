@@ -86,7 +86,6 @@ class MockIdentityProvider implements IdentityVerificationProviderInterface
 
     public function isAvailable(int $tenantId): bool
     {
-        // Mock provider is always available
-        return true;
+        return IdentityProviderRegistry::mockProviderAllowed();
     }
 }

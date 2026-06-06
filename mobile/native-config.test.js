@@ -16,6 +16,14 @@ function readJson(relativePath) {
   return JSON.parse(read(relativePath));
 }
 
+function readPngSize(relativePath) {
+  const buffer = fs.readFileSync(path.join(root, relativePath));
+  return {
+    width: buffer.readUInt32BE(16),
+    height: buffer.readUInt32BE(20),
+  };
+}
+
 function listSourceFiles(relativeDir) {
   const dir = path.join(root, relativeDir);
   if (!fs.existsSync(dir)) return [];
@@ -79,6 +87,7 @@ describe('native app configuration', () => {
     expect(metroConfig).toContain('react-native-gesture-handler');
     expect(metroConfig).toContain('react-native-worklets');
     expect(metroConfig).toContain('uniwind');
+    expect(metroConfig).toContain('inlineRequires: true');
   });
 
   it('loads Tailwind v4, Uniwind, and HeroUI Native styles from global CSS', () => {
@@ -123,6 +132,64 @@ describe('native app configuration', () => {
     expect(app.icon).toBe('./assets/icon.png');
     expect(app.splash.image).toBe('./assets/splash.png');
     expect(app.android.adaptiveIcon.foregroundImage).toBe('./assets/adaptive-icon.png');
+  });
+
+  it('does not block cold starts on launch-time remote update checks', () => {
+    const app = readJson('app.json').expo;
+    const manifest = read('android/app/src/main/AndroidManifest.xml');
+
+    expect(app.updates.enabled).toBe(true);
+    expect(app.updates.checkAutomatically).toBe('ON_ERROR_RECOVERY');
+    expect(app.updates.fallbackToCacheTimeout).toBe(0);
+    expect(manifest).toContain('expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" android:value="ERROR_RECOVERY_ONLY"');
+    expect(manifest).toContain('expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS" android:value="0"');
+  });
+
+  it('paints a branded Android window while React is booting', () => {
+    const styles = read('android/app/src/main/res/values/styles.xml');
+    const launchBackground = read('android/app/src/main/res/drawable/ic_launcher_background.xml');
+
+    expect(styles).toContain('<style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">');
+    expect(styles).toContain('<item name="android:windowBackground">@color/splashscreen_background</item>');
+    expect(launchBackground).toContain('@color/splashscreen_background');
+    expect(launchBackground).toContain('@drawable/splashscreen_logo');
+  });
+
+  it('keeps the Android notification icon in Expo-compatible dimensions', () => {
+    const appConfig = require('./app.config.js')({ config: readJson('app.json').expo });
+    const notificationsPlugin = appConfig.plugins.find((plugin) => {
+      return Array.isArray(plugin) && plugin[0] === 'expo-notifications';
+    });
+    const notificationIcon = Array.isArray(notificationsPlugin)
+      ? notificationsPlugin[1]?.icon
+      : null;
+
+    expect(notificationIcon).toBe('./assets/notification-icon.png');
+    expect(readPngSize('assets/notification-icon.png')).toEqual({
+      width: 96,
+      height: 96,
+    });
+  });
+
+  it('keeps Maestro flows aligned with the production native application id', () => {
+    const app = readJson('app.json').expo;
+    const maestroDir = path.join(root, '.maestro');
+    const flows = fs.readdirSync(maestroDir).filter((file) => file.endsWith('.yaml') && file !== 'config.yaml');
+    const mismatched = flows.filter((file) => {
+      const source = read(path.join('.maestro', file));
+      return !source.includes(`appId: ${app.android.package}`);
+    });
+
+    expect(app.android.package).toBe(app.ios.bundleIdentifier);
+    expect(mismatched).toEqual([]);
+  });
+
+  it('documents the native local API port consistently', () => {
+    const envExample = read('.env.example');
+
+    expect(envExample).toContain('http://10.0.2.2:8088');
+    expect(envExample).toContain('http://localhost:8088');
+    expect(envExample).not.toContain(':8090');
   });
 
   it('allows Android release APKs to reach only approved cleartext development hosts', () => {

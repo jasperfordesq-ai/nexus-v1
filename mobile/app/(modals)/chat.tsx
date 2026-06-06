@@ -632,7 +632,7 @@ function ChatScreenInner() {
   const hasMessages = messages.length > 0;
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView className="flex-1 bg-background" style={{ flex: 1 }}>
       <AppTopBar title={t('page_title')} backLabel={t('common:back')} fallbackHref="/(tabs)/home" />
       <ChatHeader
         hasMessages={hasMessages}
@@ -645,6 +645,7 @@ function ChatScreenInner() {
 
       <KeyboardAvoidingView
         className="flex-1"
+        style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 88 : 0}
       >

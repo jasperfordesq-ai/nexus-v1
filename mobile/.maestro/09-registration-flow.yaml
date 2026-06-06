@@ -1,7 +1,7 @@
-# Copyright © 2024–2026 Jasper Ford
+# Copyright (c) 2024-2026 Jasper Ford
 # SPDX-License-Identifier: AGPL-3.0-or-later
 #
-# Flow 09 — Registration Form
+# Flow 09 - Registration Form
 #
 # Verifies that the registration form renders correctly and that all required
 # fields accept input. This flow does NOT submit the form to avoid creating
@@ -12,94 +12,121 @@
 #   title:                "Create account"
 #   firstNamePlaceholder: "Jane"
 #   lastNamePlaceholder:  "Smith"
+#   phonePlaceholder:     "+1 555 123 4567"
+#   locationPlaceholder:  "City, country"
 #   emailPlaceholder:     "you@example.com"
-#   passwordPlaceholder:  "Min. 8 characters"
+#   passwordPlaceholder:  "At least 12 characters"
 #
 # Run:
 #   maestro test .maestro/09-registration-flow.yaml
-#   (No TEST_EMAIL / TEST_PASSWORD required — does not log in)
+#   (No TEST_EMAIL / TEST_PASSWORD required - does not log in)
 
-appId: ie.hour.nexus
+appId: ie.project.nexus
 ---
-# ── 1. Launch fresh — clearState ensures no residual session
+# 1. Launch fresh - clearState ensures no residual session
 - launchApp:
     clearState: true
 
-# ── 2. Handle tenant selection if shown on a clean install
+# 2. Handle tenant selection if shown on a clean install
 - runFlow:
     when:
       visible: "Select your timebank"
     commands:
-      - wait:
-          for:
-            element:
-              text: "Select your timebank"
-            timeout: 5000
+      - extendedWaitUntil:
+          visible: "Select your timebank"
+          timeout: 5000
       - tapOn: "hour-timebank"
 
-# ── 3. Assert we are on the login screen
-- wait:
-    for:
-      element:
-        text: "Sign in"
-      timeout: 8000
-- assertVisible: "Sign in"
+# 3. Assert we are on the login screen
+- extendedWaitUntil:
+    visible: "Welcome back"
+    timeout: 60000
+- assertVisible: "Welcome back"
 
-# ── 4. Tap "Create account" link to navigate to the registration screen
+# 4. Tap "Create account" link to navigate to the registration screen
 - tapOn: "Create account"
 
-# ── 5. Wait for the registration screen to load
-- wait:
-    for:
-      element:
-        text: "Create account"
-      timeout: 5000
+# 5. Wait for the registration screen to load
+- extendedWaitUntil:
+    visible: "Create account"
+    timeout: 5000
 
-# ── 6. Assert the registration form title is visible
+# 6. Assert the registration form title is visible
 - assertVisible: "Create account"
 
-# ── 7. Fill in the First name field
+# 7. Fill in the First name field
 - tapOn:
     id: "register-first-name"
 - inputText: "Test"
 
-# ── 8. Fill in the Last name field
+# 8. Fill in the Last name field
 - tapOn:
     id: "register-last-name"
 - inputText: "User"
 
-# ── 9. Fill in the Email field
+# 9. Fill in the Phone field
+- tapOn:
+    id: "register-phone"
+- inputText: "+15551234567"
+- back
+
+# 10. Fill in the Location field
+- tapOn:
+    id: "register-location"
+- inputText: "City, country"
+- back
+
+# 11. Fill in the Email field
 - tapOn:
     id: "register-email"
 - inputText: "testuser.ci@example.com"
+- back
 
-# ── 10. Fill in the Password field
+# 12. Fill in the Password field
+- scrollUntilVisible:
+    element:
+      id: "register-password"
+    direction: DOWN
 - tapOn:
     id: "register-password"
-- inputText: "TestPassword1"
+- inputText: "TestPassword123!"
+- back
 
-# ── 11. Fill in the Confirm password field
+# 13. Fill in the Confirm password field
 - tapOn:
     id: "register-confirm-password"
-- inputText: "TestPassword1"
+- inputText: "TestPassword123!"
+- back
+- waitForAnimationToEnd:
+    timeout: 500
 
-# ── 12. Screenshot the completed registration form (before submit)
+# 14. Accept the terms checkbox
+- scrollUntilVisible:
+    element:
+      id: "register-terms"
+    direction: DOWN
+- tapOn:
+    id: "register-terms"
+
+# 15. Screenshot the completed registration form before submit
 - takeScreenshot: registration-form
 
-# ── 13. Assert all visible form labels are present (smoke test for i18n rendering)
-- assertVisible: "First name"
-- assertVisible: "Last name"
+# 16. Assert the lower form state remains visible after scrolling
+- assertVisible: "Phone"
+- assertVisible: "Location"
 - assertVisible: "Email"
 - assertVisible: "Password"
+- assertVisible: "Confirm password"
+- assertVisible: "I agree to the platform terms and privacy notice."
 
-# ── NOTE: The submit button ("Create account") is intentionally NOT tapped here.
-#    To test the full registration flow end-to-end, uncomment the lines below
-#    and provide a unique email address (e.g., via a timestamp-based fixture).
+# NOTE: The submit button ("Create account") is intentionally NOT tapped here.
+# To test the full registration flow end-to-end, uncomment the lines below and
+# provide a unique email address (for example, via a timestamp-based fixture).
 #
-#    - tapOn: "Create account"
-#    - wait:
-#        for:
-#          element:
-#            text: "Feed"
-#          timeout: 15000
-#    - assertVisible: "Feed"
+# - tapOn: "Create account"
+# - wait:
+#     for:
+#       element:
+#         text: "Feed"
+#       timeout: 15000
+# - assertVisible: "Feed"

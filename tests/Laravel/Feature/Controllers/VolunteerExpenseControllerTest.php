@@ -10,6 +10,8 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use App\Core\TenantContext;
 use App\Models\User;
+use App\Models\VolExpense;
+use App\Models\VolOrganization;
 use App\Services\TenantFeatureConfig;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
@@ -102,5 +104,56 @@ class VolunteerExpenseControllerTest extends TestCase
         ]);
 
         $response->assertStatus(422);
+    }
+
+    public function test_admin_expense_export_neutralizes_spreadsheet_formula_cells(): void
+    {
+        $this->enableVolunteeringFeature($this->testTenantId);
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $volunteer = User::factory()->forTenant($this->testTenantId)->create([
+            'first_name' => '=IMPORTXML("https://example.test")',
+            'last_name' => 'Member',
+            'email' => 'volunteer@example.test',
+        ]);
+        $organization = VolOrganization::factory()->forTenant($this->testTenantId)->create([
+            'name' => '+SUM(1,1)',
+        ]);
+
+        VolExpense::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $volunteer->id,
+            'organization_id' => $organization->id,
+            'opportunity_id' => null,
+            'status' => 'pending',
+            'description' => '@cmd',
+            'review_notes' => "\t=hidden",
+            'payment_reference' => '-10+20',
+            'submitted_at' => now(),
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiGet('/v2/admin/volunteering/expenses/export');
+
+        $response->assertStatus(200);
+        $csv = $response->getContent();
+        $lines = array_values(array_filter(explode("\n", trim((string) $csv))));
+        $rows = array_map('str_getcsv', $lines);
+        $headers = array_shift($rows);
+        $exported = null;
+        foreach ($rows as $row) {
+            $indexed = array_combine($headers, $row);
+            if (($indexed['email'] ?? '') === 'volunteer@example.test') {
+                $exported = $indexed;
+                break;
+            }
+        }
+
+        $this->assertNotNull($exported);
+        $this->assertSame('\'=IMPORTXML("https://example.test")', $exported['first_name']);
+        $this->assertSame('\'+SUM(1,1)', $exported['organization_name']);
+        $this->assertSame('\'@cmd', $exported['description']);
+        $this->assertSame("'\t=hidden", $exported['review_notes']);
+        $this->assertSame('\'-10+20', $exported['payment_reference']);
     }
 }

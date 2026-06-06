@@ -182,6 +182,15 @@ class EventsController extends BaseApiController
 
         $data = $this->getAllInput();
 
+        $pollIds = [];
+        if (array_key_exists('poll_ids', $data)) {
+            $pollIdsResult = $this->ownedEventPollIds($data['poll_ids'], $userId);
+            if ($pollIdsResult instanceof JsonResponse) {
+                return $pollIdsResult;
+            }
+            $pollIds = $pollIdsResult;
+        }
+
         $result = $this->eventService->create($userId, $data);
 
         if ($result === null) {
@@ -200,9 +209,11 @@ class EventsController extends BaseApiController
         $eventId = $result instanceof \App\Models\Event ? $result->id : (int) $result;
 
         // Link polls to this event
-        if (! empty($data['poll_ids']) && is_array($data['poll_ids'])) {
+        if (! empty($pollIds)) {
             Poll::query()
-                ->whereIn('id', array_map('intval', $data['poll_ids']))
+                ->where('tenant_id', TenantContext::getId())
+                ->where('user_id', $userId)
+                ->whereIn('id', $pollIds)
                 ->update(['event_id' => $eventId]);
         }
 
@@ -246,6 +257,15 @@ class EventsController extends BaseApiController
 
         $data = $this->getAllInput();
 
+        $pollIds = null;
+        if (array_key_exists('poll_ids', $data)) {
+            $pollIdsResult = $this->ownedEventPollIds($data['poll_ids'], $userId);
+            if ($pollIdsResult instanceof JsonResponse) {
+                return $pollIdsResult;
+            }
+            $pollIds = $pollIdsResult;
+        }
+
         $success = $this->eventService->update($id, $userId, $data);
 
         if (!$success) {
@@ -265,13 +285,18 @@ class EventsController extends BaseApiController
         }
 
         // Update poll associations
-        if (array_key_exists('poll_ids', $data)) {
-            // Unlink existing polls from this event
-            Poll::query()->where('event_id', $id)->update(['event_id' => null]);
-            // Link new polls
-            if (! empty($data['poll_ids']) && is_array($data['poll_ids'])) {
+        if ($pollIds !== null) {
+            Poll::query()
+                ->where('tenant_id', TenantContext::getId())
+                ->where('user_id', $userId)
+                ->where('event_id', $id)
+                ->update(['event_id' => null]);
+
+            if (! empty($pollIds)) {
                 Poll::query()
-                    ->whereIn('id', array_map('intval', $data['poll_ids']))
+                    ->where('tenant_id', TenantContext::getId())
+                    ->where('user_id', $userId)
+                    ->whereIn('id', $pollIds)
                     ->update(['event_id' => $id]);
             }
         }
@@ -318,6 +343,34 @@ class EventsController extends BaseApiController
         }
 
         return $this->noContent();
+    }
+
+    private function ownedEventPollIds(mixed $pollIds, int $userId): array|JsonResponse
+    {
+        if (! is_array($pollIds)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('validation.array', ['attribute' => 'poll_ids']), 'poll_ids', 400);
+        }
+
+        $ids = array_values(array_unique(array_filter(
+            array_map(static fn ($id): int => (int) $id, $pollIds),
+            static fn (int $id): bool => $id > 0
+        )));
+
+        if ($ids === []) {
+            return [];
+        }
+
+        $ownedCount = Poll::query()
+            ->where('tenant_id', TenantContext::getId())
+            ->where('user_id', $userId)
+            ->whereIn('id', $ids)
+            ->count();
+
+        if ($ownedCount !== count($ids)) {
+            return $this->respondWithError('FORBIDDEN', __('api.poll_not_found_or_not_owned'), 'poll_ids', 403);
+        }
+
+        return $ids;
     }
 
     // ================================================================

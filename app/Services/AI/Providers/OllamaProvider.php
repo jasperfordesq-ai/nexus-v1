@@ -6,6 +6,8 @@
 
 namespace App\Services\AI\Providers;
 
+use App\Support\OutboundUrlGuard;
+
 /**
  * Ollama Provider (Self-hosted)
  *
@@ -35,7 +37,15 @@ class OllamaProvider extends BaseProvider
      */
     public function isConfigured(): bool
     {
-        return !empty($this->apiUrl);
+        return !empty($this->apiUrl) && OutboundUrlGuard::isSafeHttpUrl($this->apiUrl);
+    }
+
+    /**
+     * @return array<int,mixed>
+     */
+    protected function curlOptionsForUrl(string $url): array
+    {
+        return OutboundUrlGuard::curlOptionsForUrl($url);
     }
 
     /**
@@ -112,7 +122,7 @@ class OllamaProvider extends BaseProvider
         $url = rtrim($this->apiUrl, '/') . '/api/chat';
 
         $ch = curl_init($url);
-        curl_setopt_array($ch, [
+        curl_setopt_array($ch, $this->curlOptionsForUrl($url) + [
             CURLOPT_RETURNTRANSFER => false,
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => json_encode($data),
@@ -173,7 +183,7 @@ class OllamaProvider extends BaseProvider
             $url = rtrim($this->apiUrl, '/') . '/api/tags';
 
             $ch = curl_init($url);
-            curl_setopt_array($ch, [
+            curl_setopt_array($ch, $this->curlOptionsForUrl($url) + [
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_TIMEOUT => 10,
             ]);
@@ -232,7 +242,7 @@ class OllamaProvider extends BaseProvider
             $url = rtrim($this->apiUrl, '/') . '/api/tags';
 
             $ch = curl_init($url);
-            curl_setopt_array($ch, [
+            curl_setopt_array($ch, $this->curlOptionsForUrl($url) + [
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_TIMEOUT => 5,
                 CURLOPT_CONNECTTIMEOUT => 3,

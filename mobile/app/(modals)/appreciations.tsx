@@ -29,7 +29,7 @@ import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
-const REACTIONS: Array<{ key: AppreciationReactionType; icon: keyof typeof Ionicons.glyphMap }> = [
+const REACTIONS: { key: AppreciationReactionType; icon: keyof typeof Ionicons.glyphMap }[] = [
   { key: 'heart', icon: 'heart-outline' },
   { key: 'clap', icon: 'sparkles-outline' },
   { key: 'star', icon: 'star-outline' },

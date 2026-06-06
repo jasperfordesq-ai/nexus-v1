@@ -151,8 +151,33 @@ class OrgWalletController extends BaseApiController
      */
     public function apiMembers(int $orgId): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
         $tenantId = $this->getTenantId();
+
+        $org = DB::table('organizations')
+            ->where('id', $orgId)
+            ->where('tenant_id', $tenantId)
+            ->first(['id']);
+        if (! $org) {
+            return $this->respondWithError('NOT_FOUND', __('api.organization_not_found'), null, 404);
+        }
+
+        $user = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->first(['role']);
+        $isAdmin = $user && in_array($user->role ?? '', ['super_admin', 'admin', 'tenant_admin'], true);
+        if (! $isAdmin) {
+            $isMember = DB::table('org_members')
+                ->where('tenant_id', $tenantId)
+                ->where('organization_id', $orgId)
+                ->where('user_id', $userId)
+                ->where('status', 'active')
+                ->exists();
+            if (! $isMember) {
+                return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
+            }
+        }
 
         $members = DB::table('org_members as om')
             ->join('users as u', 'om.user_id', '=', 'u.id')

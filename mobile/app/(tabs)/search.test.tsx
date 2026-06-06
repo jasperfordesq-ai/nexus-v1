@@ -169,8 +169,9 @@ describe('SearchScreen', () => {
   });
 
   it('renders the search input', () => {
-    const { getByPlaceholderText } = render(<SearchScreen />);
+    const { getByPlaceholderText, getByTestId } = render(<SearchScreen />);
     expect(getByPlaceholderText('Search for people, listings...')).toBeTruthy();
+    expect(getByTestId('search-input')).toBeTruthy();
   });
 
   it('shows clear action after typing in the shared input-backed search field', () => {

@@ -201,6 +201,82 @@ class MemberPremiumService
         return in_array($featureKey, $tier['features'], true);
     }
 
+    public static function safeReturnUrl(string $returnUrl, string $fallbackPath): string
+    {
+        $fallback = self::tenantFrontendUrl($fallbackPath);
+        $returnUrl = trim($returnUrl);
+
+        if ($returnUrl === '' || preg_match('/[\x00-\x1F\x7F]/', $returnUrl) === 1) {
+            return $fallback;
+        }
+
+        if (str_starts_with($returnUrl, '//') || str_starts_with($returnUrl, '\\\\')) {
+            return $fallback;
+        }
+
+        if (str_starts_with($returnUrl, '/')) {
+            if (preg_match('#^/[\\\\]#', $returnUrl) === 1) {
+                return $fallback;
+            }
+
+            return self::tenantFrontendUrl($returnUrl);
+        }
+
+        $scheme = strtolower((string) (parse_url($returnUrl, PHP_URL_SCHEME) ?? ''));
+        if (!in_array($scheme, ['http', 'https'], true)) {
+            return $fallback;
+        }
+
+        return self::isCurrentTenantFrontendUrl($returnUrl) ? $returnUrl : $fallback;
+    }
+
+    private static function tenantFrontendUrl(string $path): string
+    {
+        $base = rtrim(TenantContext::getFrontendUrl(), '/');
+        $slugPrefix = TenantContext::getSlugPrefix();
+        $path = '/' . ltrim($path, '/');
+
+        if ($slugPrefix !== '' && $path !== $slugPrefix && !str_starts_with($path, $slugPrefix . '/')) {
+            $path = $slugPrefix . $path;
+        }
+
+        return $base . $path;
+    }
+
+    private static function isCurrentTenantFrontendUrl(string $url): bool
+    {
+        $urlParts = parse_url($url);
+        $baseParts = parse_url(TenantContext::getFrontendUrl());
+
+        if (!is_array($urlParts) || !is_array($baseParts)) {
+            return false;
+        }
+
+        $urlScheme = strtolower((string) ($urlParts['scheme'] ?? ''));
+        $baseScheme = strtolower((string) ($baseParts['scheme'] ?? ''));
+        $urlHost = strtolower((string) ($urlParts['host'] ?? ''));
+        $baseHost = strtolower((string) ($baseParts['host'] ?? ''));
+
+        if ($urlScheme === '' || $urlHost === '' || $urlScheme !== $baseScheme || $urlHost !== $baseHost) {
+            return false;
+        }
+
+        $urlPort = (int) ($urlParts['port'] ?? ($urlScheme === 'https' ? 443 : 80));
+        $basePort = (int) ($baseParts['port'] ?? ($baseScheme === 'https' ? 443 : 80));
+        if ($urlPort !== $basePort) {
+            return false;
+        }
+
+        $slugPrefix = TenantContext::getSlugPrefix();
+        if ($slugPrefix === '') {
+            return true;
+        }
+
+        $path = '/' . ltrim((string) ($urlParts['path'] ?? '/'), '/');
+
+        return $path === $slugPrefix || str_starts_with($path, $slugPrefix . '/');
+    }
+
     /**
      * Sync a tier's prices to Stripe (creates Product + Prices if missing).
      */

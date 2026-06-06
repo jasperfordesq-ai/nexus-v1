@@ -249,23 +249,23 @@ function ExploreSection({ section, data, theme }: { section: SectionMeta; data: 
   );
 }
 
-function getSectionItems(sectionKey: string, data: ExploreData | null): Array<Record<string, unknown> & { id: number }> {
+function getSectionItems(sectionKey: string, data: ExploreData | null): (Record<string, unknown> & { id: number })[] {
   if (!data) return [];
-  const map: Record<string, Array<Record<string, unknown> & { id: number }>> = {
-    recommended: data.recommended_listings as unknown as Array<Record<string, unknown> & { id: number }>,
-    popularListings: data.popular_listings as unknown as Array<Record<string, unknown> & { id: number }>,
-    nearYou: data.near_you_listings as unknown as Array<Record<string, unknown> & { id: number }>,
-    events: data.upcoming_events as unknown as Array<Record<string, unknown> & { id: number }>,
-    groups: data.active_groups as unknown as Array<Record<string, unknown> & { id: number }>,
-    people: [...data.suggested_connections, ...data.new_members] as unknown as Array<Record<string, unknown> & { id: number }>,
-    contributors: data.top_contributors as unknown as Array<Record<string, unknown> & { id: number }>,
-    posts: data.trending_posts as unknown as Array<Record<string, unknown> & { id: number }>,
-    volunteering: data.volunteering_opportunities as unknown as Array<Record<string, unknown> & { id: number }>,
-    organisations: data.active_organisations as unknown as Array<Record<string, unknown> & { id: number }>,
-    blog: data.trending_blog_posts as unknown as Array<Record<string, unknown> & { id: number }>,
-    jobs: data.latest_jobs as unknown as Array<Record<string, unknown> & { id: number }>,
-    polls: data.active_polls as unknown as Array<Record<string, unknown> & { id: number }>,
-    resources: data.featured_resources as unknown as Array<Record<string, unknown> & { id: number }>,
+  const map: Record<string, (Record<string, unknown> & { id: number })[]> = {
+    recommended: data.recommended_listings as unknown as (Record<string, unknown> & { id: number })[],
+    popularListings: data.popular_listings as unknown as (Record<string, unknown> & { id: number })[],
+    nearYou: data.near_you_listings as unknown as (Record<string, unknown> & { id: number })[],
+    events: data.upcoming_events as unknown as (Record<string, unknown> & { id: number })[],
+    groups: data.active_groups as unknown as (Record<string, unknown> & { id: number })[],
+    people: [...data.suggested_connections, ...data.new_members] as unknown as (Record<string, unknown> & { id: number })[],
+    contributors: data.top_contributors as unknown as (Record<string, unknown> & { id: number })[],
+    posts: data.trending_posts as unknown as (Record<string, unknown> & { id: number })[],
+    volunteering: data.volunteering_opportunities as unknown as (Record<string, unknown> & { id: number })[],
+    organisations: data.active_organisations as unknown as (Record<string, unknown> & { id: number })[],
+    blog: data.trending_blog_posts as unknown as (Record<string, unknown> & { id: number })[],
+    jobs: data.latest_jobs as unknown as (Record<string, unknown> & { id: number })[],
+    polls: data.active_polls as unknown as (Record<string, unknown> & { id: number })[],
+    resources: data.featured_resources as unknown as (Record<string, unknown> & { id: number })[],
   };
   return map[sectionKey] ?? [];
 }

@@ -10,6 +10,7 @@ namespace App\Services\Auth;
 
 use App\Models\User;
 use App\Services\TenantSettingsService;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -30,6 +31,10 @@ use Illuminate\Support\Str;
 class SocialAuthService
 {
     public const SUPPORTED_PROVIDERS = ['google', 'apple', 'facebook'];
+    public const LINK_NONCE_COOKIE = 'nexus_oauth_link_nonce';
+
+    private const STATE_TTL_SECONDS = 3600;
+    private const CALLBACK_CODE_TTL_SECONDS = 300;
 
     public function __construct(
         private readonly TenantSettingsService $tenantSettings,
@@ -48,7 +53,8 @@ class SocialAuthService
         $this->assertProviderSupported($provider);
         $this->assertProviderEnabledForTenant($provider, $tenantId);
 
-        $state = $this->buildState($tenantId, $intent, $userId);
+        $linkNonce = $intent === 'link' ? Str::random(40) : null;
+        $state = $this->buildState($tenantId, $intent, $userId, $linkNonce);
 
         if (! class_exists(\Laravel\Socialite\Facades\Socialite::class)) {
             // Socialite not installed yet — return a synthetic URL so the
@@ -56,6 +62,7 @@ class SocialAuthService
             return [
                 'url' => '',
                 'state' => $state,
+                'link_nonce' => $linkNonce,
                 'error' => 'socialite_not_installed',
             ];
         }
@@ -72,13 +79,16 @@ class SocialAuthService
 
         $url = $driver->with(['state' => $state])->redirect()->getTargetUrl();
 
-        return ['url' => $url, 'state' => $state];
+        return array_filter(
+            ['url' => $url, 'state' => $state, 'link_nonce' => $linkNonce],
+            static fn ($value) => $value !== null
+        );
     }
 
     /**
      * Process an OAuth callback. Returns ['user' => User, 'is_new' => bool, 'tenant_id' => int].
      */
-    public function handleCallback(string $provider, string $state): array
+    public function handleCallback(string $provider, string $state, ?string $linkBrowserNonce = null): array
     {
         $this->assertProviderSupported($provider);
 
@@ -86,6 +96,10 @@ class SocialAuthService
         $tenantId = $payload['tenant_id'];
         $intent = $payload['intent'];
         $linkUserId = $payload['user_id'] ?? null;
+
+        if ($intent === 'link') {
+            $this->assertLinkStateBoundToBrowser($payload, $linkBrowserNonce);
+        }
 
         if (! class_exists(\Laravel\Socialite\Facades\Socialite::class)) {
             throw new \RuntimeException('Laravel Socialite is not installed. Run: composer require laravel/socialite');
@@ -299,6 +313,41 @@ class SocialAuthService
         ])->all();
     }
 
+    public function issueCallbackCode(string $token, string $provider, bool $isNew, int $tenantId): string
+    {
+        $code = Str::random(64);
+        Cache::put($this->callbackCodeCacheKey($code), [
+            'token' => $token,
+            'provider' => $provider,
+            'is_new' => $isNew,
+            'tenant_id' => $tenantId,
+        ], self::CALLBACK_CODE_TTL_SECONDS);
+
+        return $code;
+    }
+
+    /**
+     * @return array{token:string,provider:string,is_new:bool,tenant_id:int}
+     */
+    public function consumeCallbackCode(string $code): array
+    {
+        if (!preg_match('/^[A-Za-z0-9]{40,128}$/', $code)) {
+            throw new \RuntimeException('OAuth callback code is invalid or expired.');
+        }
+
+        $payload = Cache::pull($this->callbackCodeCacheKey($code));
+        if (!is_array($payload) || empty($payload['token']) || empty($payload['provider'])) {
+            throw new \RuntimeException('OAuth callback code is invalid or expired.');
+        }
+
+        return [
+            'token' => (string) $payload['token'],
+            'provider' => (string) $payload['provider'],
+            'is_new' => (bool) ($payload['is_new'] ?? false),
+            'tenant_id' => (int) ($payload['tenant_id'] ?? 0),
+        ];
+    }
+
     /**
      * Get the list of OAuth providers enabled for a tenant.
      *
@@ -342,7 +391,7 @@ class SocialAuthService
         }
     }
 
-    private function buildState(int $tenantId, string $intent, ?int $userId): string
+    private function buildState(int $tenantId, string $intent, ?int $userId, ?string $linkBrowserNonce = null): string
     {
         $payload = [
             't' => $tenantId,
@@ -351,13 +400,27 @@ class SocialAuthService
             'n' => Str::random(16),
             'x' => now()->timestamp,
         ];
+
+        if ($intent === 'link') {
+            if (!$userId) {
+                throw new \RuntimeException('OAuth link intent requires a user.');
+            }
+
+            $linkBrowserNonce ??= Str::random(40);
+            Cache::put($this->linkStateCacheKey($payload['n']), [
+                'tenant_id' => $tenantId,
+                'user_id' => $userId,
+                'browser_nonce_hash' => hash('sha256', $linkBrowserNonce),
+            ], self::STATE_TTL_SECONDS);
+        }
+
         $body = base64_encode(json_encode($payload));
         $sig = hash_hmac('sha256', $body, (string) config('app.key'));
         return $body . '.' . $sig;
     }
 
     /**
-     * @return array{tenant_id:int, intent:string, user_id:?int}
+     * @return array{tenant_id:int, intent:string, user_id:?int, state_nonce:string}
      */
     private function verifyState(string $state): array
     {
@@ -381,7 +444,44 @@ class SocialAuthService
             'tenant_id' => (int) $decoded['t'],
             'intent' => (string) $decoded['i'],
             'user_id' => isset($decoded['u']) ? (int) $decoded['u'] : null,
+            'state_nonce' => (string) ($decoded['n'] ?? ''),
         ];
+    }
+
+    /**
+     * @param array{tenant_id:int,intent:string,user_id:?int,state_nonce:string} $payload
+     */
+    private function assertLinkStateBoundToBrowser(array $payload, ?string $linkBrowserNonce): void
+    {
+        if (($payload['intent'] ?? '') !== 'link'
+            || empty($payload['user_id'])
+            || empty($payload['state_nonce'])
+            || empty($linkBrowserNonce)
+        ) {
+            throw new \RuntimeException('OAuth link state is not bound to this browser session.');
+        }
+
+        $cacheKey = $this->linkStateCacheKey($payload['state_nonce']);
+        $binding = Cache::get($cacheKey);
+        if (!is_array($binding)
+            || (int) ($binding['tenant_id'] ?? 0) !== (int) $payload['tenant_id']
+            || (int) ($binding['user_id'] ?? 0) !== (int) $payload['user_id']
+            || !hash_equals((string) ($binding['browser_nonce_hash'] ?? ''), hash('sha256', $linkBrowserNonce))
+        ) {
+            throw new \RuntimeException('OAuth link state is not bound to this browser session.');
+        }
+
+        Cache::forget($cacheKey);
+    }
+
+    private function callbackCodeCacheKey(string $code): string
+    {
+        return 'oauth:callback-code:' . hash('sha256', $code);
+    }
+
+    private function linkStateCacheKey(string $stateNonce): string
+    {
+        return 'oauth:link-state:' . hash('sha256', $stateNonce);
     }
 
     private function insertIdentity(

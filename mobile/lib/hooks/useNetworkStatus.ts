@@ -9,10 +9,10 @@ import NetInfo from '@react-native-community/netinfo';
 import { API_BASE_URL } from '@/lib/constants';
 
 /** How long to wait for the health-check ping before treating as offline (ms). */
-const PING_TIMEOUT_MS = 5_000;
+const PING_TIMEOUT_MS = 10_000;
 
-/** URL to ping — Laravel's lightweight health endpoint with CORS enabled. */
-const HEALTH_URL = `${API_BASE_URL}/up`;
+/** URL to ping - lightweight PHP health endpoint with CORS enabled. */
+const HEALTH_URL = `${API_BASE_URL}/health.php`;
 
 export interface NetworkStatus {
   /** True when the device appears to have connectivity. */
@@ -25,7 +25,7 @@ export interface NetworkStatus {
  * Detects connectivity by two different strategies depending on platform:
  *
  * **Native (iOS / Android)**
- *   Pings the API health endpoint (`/up`) on mount and every time the app
+ *   Pings the API health endpoint (`/health.php`) on mount and every time the app
  *   returns to the foreground. This confirms actual backend connectivity
  *   rather than just local-network reachability.
  *
@@ -64,7 +64,6 @@ export function useNetworkStatus(): NetworkStatus {
   // ── Native path ─────────────────────────────────────────────────────────────
   const isMountedRef = useRef(true);
   const isCheckingRef = useRef(false); // guard against concurrent pings
-  const isHardOfflineRef = useRef(false);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -88,8 +87,6 @@ export function useNetworkStatus(): NetworkStatus {
       const response = await fetch(HEALTH_URL, {
         method: 'GET',
         signal: controller.signal,
-        // Bypass any HTTP caches — we need a live round-trip.
-        cache: 'no-store',
       });
       online = response.ok || response.status < 500;
     } catch {
@@ -100,7 +97,7 @@ export function useNetworkStatus(): NetworkStatus {
     }
 
     if (isMountedRef.current) {
-      setIsOnline(isHardOfflineRef.current ? false : online);
+      setIsOnline(online);
       setIsChecking(false);
     }
     isCheckingRef.current = false;
@@ -118,25 +115,15 @@ export function useNetworkStatus(): NetworkStatus {
     if (Platform.OS === 'web') return;
 
     return NetInfo.addEventListener((state) => {
-      if (state.isConnected === false) {
-        isHardOfflineRef.current = true;
-        setIsOnline(false);
-        return;
-      }
-
-      isHardOfflineRef.current = false;
-
       if (state.isInternetReachable === true) {
         setIsOnline(true);
         return;
       }
 
-      // Android emulators and some networks can report internet reachability
-      // as false while the configured API is reachable. Confirm with the
+      // Android emulators and some networks can report native reachability as
+      // disconnected while the configured API is reachable. Confirm with the
       // backend before showing a global offline banner.
-      if (state.isConnected) {
-        void checkConnectivity();
-      }
+      void checkConnectivity();
     });
   }, [checkConnectivity]);
 

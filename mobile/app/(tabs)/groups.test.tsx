@@ -188,8 +188,9 @@ describe('GroupsScreen', () => {
   });
 
   it('renders search input', () => {
-    const { getByPlaceholderText } = render(<GroupsScreen />);
+    const { getByPlaceholderText, getByTestId } = render(<GroupsScreen />);
     expect(getByPlaceholderText('Search groups…')).toBeTruthy();
+    expect(getByTestId('groups-search')).toBeTruthy();
   });
 
   it('renders skeletons in empty slot when loading', () => {

@@ -66,6 +66,20 @@ class EventsControllerTest extends TestCase
         ], $overrides));
     }
 
+    private function createPoll(int $userId, array $overrides = []): int
+    {
+        return DB::table('polls')->insertGetId(array_merge([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $userId,
+            'question' => 'Which activity should we choose?',
+            'description' => 'Community planning poll.',
+            'is_active' => 1,
+            'poll_type' => 'standard',
+            'category' => 'events',
+            'created_at' => now(),
+        ], $overrides));
+    }
+
     private function setDailyNotificationPreference(int $userId): void
     {
         DB::table('notification_settings')->insert([
@@ -182,6 +196,26 @@ class EventsControllerTest extends TestCase
         $this->assertContains($response->getStatusCode(), [400, 422]);
     }
 
+    public function test_store_cannot_link_poll_owned_by_another_member(): void
+    {
+        $user = $this->authenticatedUser();
+        $otherUser = User::factory()->forTenant($this->testTenantId)->create();
+        $otherPollId = $this->createPoll($otherUser->id);
+
+        $response = $this->apiPost('/v2/events', [
+            'title' => 'Community Gathering',
+            'description' => 'A fun community gathering for all members.',
+            'location' => 'Community Hall',
+            'start_time' => now()->addDays(14)->format('Y-m-d H:i:s'),
+            'end_time' => now()->addDays(14)->addHours(3)->format('Y-m-d H:i:s'),
+            'poll_ids' => [$otherPollId],
+        ]);
+
+        $response->assertStatus(403);
+        $this->assertNull(DB::table('polls')->where('id', $otherPollId)->value('event_id'));
+        $this->assertSame(0, DB::table('events')->where('tenant_id', $this->testTenantId)->where('user_id', $user->id)->where('title', 'Community Gathering')->count());
+    }
+
     // ================================================================
     // UPDATE — Happy path
     // ================================================================
@@ -229,6 +263,23 @@ class EventsControllerTest extends TestCase
         ]);
 
         $this->assertContains($response->getStatusCode(), [404, 422]);
+    }
+
+    public function test_update_cannot_link_poll_owned_by_another_member(): void
+    {
+        $user = $this->authenticatedUser();
+        $eventId = $this->createEvent($user->id, ['title' => 'Original Event Title']);
+        $otherUser = User::factory()->forTenant($this->testTenantId)->create();
+        $otherPollId = $this->createPoll($otherUser->id);
+
+        $response = $this->apiPut("/v2/events/{$eventId}", [
+            'title' => 'Hijack Poll Association',
+            'poll_ids' => [$otherPollId],
+        ]);
+
+        $response->assertStatus(403);
+        $this->assertNull(DB::table('polls')->where('id', $otherPollId)->value('event_id'));
+        $this->assertSame('Original Event Title', DB::table('events')->where('id', $eventId)->value('title'));
     }
 
     // ================================================================

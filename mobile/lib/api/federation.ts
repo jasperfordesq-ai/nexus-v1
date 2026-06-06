@@ -345,7 +345,7 @@ export function markFederationMessageRead(id: number | string): Promise<{ data?:
   return api.post<{ data?: unknown }>(`${API_V2}/federation/messages/${id}/mark-read`, {});
 }
 
-export function markFederationMessagesReadBatch(ids: Array<number | string>): Promise<{ data?: { updated?: number } }> {
+export function markFederationMessagesReadBatch(ids: (number | string)[]): Promise<{ data?: { updated?: number } }> {
   return api.post<{ data?: { updated?: number } }>(`${API_V2}/federation/messages/mark-read-batch`, { ids });
 }
 

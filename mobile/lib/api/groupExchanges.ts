@@ -66,12 +66,12 @@ export interface CreateGroupExchangePayload {
   description?: string | null;
   split_type: GroupExchange['split_type'];
   total_hours: number;
-  participants?: Array<{
+  participants?: {
     user_id: number;
     role: 'provider' | 'receiver';
     hours?: number;
     weight?: number;
-  }>;
+  }[];
 }
 
 export function getGroupExchanges(params: { status?: string; limit?: number; offset?: number } = {}): Promise<GroupExchangeListResponse> {

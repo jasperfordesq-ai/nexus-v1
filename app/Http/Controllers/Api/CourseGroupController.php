@@ -30,8 +30,9 @@ class CourseGroupController extends BaseApiController
         $userId = $this->requireCourseAuthor();
         $course = $this->findCourseOrFail($courseId);
         $this->ensureCourseOwnerOrAdmin($course, $userId);
-        if (!Group::where('id', $groupId)->exists()) {
-            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.courses.not_found'), null, 404);
+        $groupGuard = $this->requireManageableGroup($groupId, $userId);
+        if ($groupGuard instanceof JsonResponse) {
+            return $groupGuard;
         }
 
         $link = CourseGroupService::attach($courseId, $groupId);
@@ -46,6 +47,10 @@ class CourseGroupController extends BaseApiController
         $userId = $this->requireCourseAuthor();
         $course = $this->findCourseOrFail($courseId);
         $this->ensureCourseOwnerOrAdmin($course, $userId);
+        $groupGuard = $this->requireManageableGroup($groupId, $userId);
+        if ($groupGuard instanceof JsonResponse) {
+            return $groupGuard;
+        }
 
         CourseGroupService::detach($courseId, $groupId);
 
@@ -74,5 +79,18 @@ class CourseGroupController extends BaseApiController
         $this->ensureCourseOwnerOrAdmin($course, $userId);
 
         return $this->respondWithData(CourseGroupService::groupIdsForCourse($courseId));
+    }
+
+    private function requireManageableGroup(int $groupId, int $userId): ?JsonResponse
+    {
+        if (!Group::where('id', $groupId)->exists()) {
+            return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.group_not_found'), null, 404);
+        }
+
+        if (!GroupService::canModify($groupId, $userId)) {
+            return $this->respondWithError('FORBIDDEN', __('api.group_modify_forbidden'), null, 403);
+        }
+
+        return null;
     }
 }

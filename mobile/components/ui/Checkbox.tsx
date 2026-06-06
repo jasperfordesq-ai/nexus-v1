@@ -13,12 +13,31 @@ interface CheckboxProps {
   onPress: () => void;
   label?: string;
   disabled?: boolean;
+  testID?: string;
+  accessibilityLabel?: string;
 }
 
-export default function Checkbox({ checked, onPress, label, disabled = false }: CheckboxProps) {
+export default function Checkbox({
+  checked,
+  onPress,
+  label,
+  disabled = false,
+  testID,
+  accessibilityLabel,
+}: CheckboxProps) {
   const handleChange = (isSelected: boolean) => {
+    if (disabled) {
+      return;
+    }
+
     if (isSelected !== checked) {
       Haptics.selectionAsync().catch(() => {});
+      onPress();
+    }
+  };
+
+  const handleLabelPress = () => {
+    if (!disabled) {
       onPress();
     }
   };
@@ -26,12 +45,19 @@ export default function Checkbox({ checked, onPress, label, disabled = false }: 
   return (
     <View className="flex-row items-center gap-2.5">
       <HeroCheckbox
+        testID={testID}
+        accessibilityLabel={accessibilityLabel ?? label}
         isSelected={checked}
         onSelectedChange={handleChange}
         isDisabled={disabled}
       />
       {label ? (
-        <Text className="text-base text-foreground font-normal flex-1">{label}</Text>
+        <Text
+          className="text-base text-foreground font-normal flex-1"
+          onPress={handleLabelPress}
+        >
+          {label}
+        </Text>
       ) : null}
     </View>
   );

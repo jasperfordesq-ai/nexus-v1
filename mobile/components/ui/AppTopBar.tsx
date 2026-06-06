@@ -3,7 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Text, View } from 'react-native';
+import { useCallback, useEffect } from 'react';
+import { BackHandler, Platform, Text, View } from 'react-native';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Surface } from 'heroui-native';
@@ -37,7 +38,7 @@ export default function AppTopBar({
   const primary = usePrimaryColor();
   const theme = useTheme();
 
-  function goBack() {
+  const goBack = useCallback(() => {
     if (onBack) {
       onBack();
       return;
@@ -48,7 +49,18 @@ export default function AppTopBar({
     } else {
       router.replace(fallbackHref);
     }
-  }
+  }, [fallbackHref, onBack]);
+
+  useEffect(() => {
+    if (Platform.OS !== 'android') return undefined;
+
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      goBack();
+      return true;
+    });
+
+    return () => subscription.remove();
+  }, [goBack]);
 
   return (
     <Surface variant="default" className="mx-4 mt-2 mb-3 flex-row items-center gap-3 rounded-panel-inner px-3 py-2">

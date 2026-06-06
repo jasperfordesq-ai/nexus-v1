@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Support\OutboundUrlGuard;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -89,7 +90,7 @@ class AdminFederationWebhooksController extends BaseApiController
         }
 
         // SSRF protection: reject URLs targeting private/internal IPs
-        if (\App\Services\WebhookDispatchService::isPrivateUrl($url)) {
+        if (!OutboundUrlGuard::isSafeHttpUrl($url, requireHttps: true)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.url_no_private_ip'), 'url', 422);
         }
 
@@ -162,7 +163,7 @@ class AdminFederationWebhooksController extends BaseApiController
                 return $this->respondWithError('VALIDATION_ERROR', __('api.url_must_use_https'), 'url', 422);
             }
             // SSRF protection: reject URLs targeting private/internal IPs
-            if (\App\Services\WebhookDispatchService::isPrivateUrl($url)) {
+            if (!OutboundUrlGuard::isSafeHttpUrl($url, requireHttps: true)) {
                 return $this->respondWithError('VALIDATION_ERROR', __('api.url_no_private_ip'), 'url', 422);
             }
             $updates['url'] = $url;
@@ -271,7 +272,7 @@ class AdminFederationWebhooksController extends BaseApiController
         }
 
         // SSRF protection: re-check at dispatch time (DNS rebinding defense)
-        if (\App\Services\WebhookDispatchService::isPrivateUrl($webhook->url)) {
+        if (!OutboundUrlGuard::isSafeHttpUrl($webhook->url, requireHttps: true)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.webhook_private_ip'), 'url', 422);
         }
 
@@ -295,6 +296,7 @@ class AdminFederationWebhooksController extends BaseApiController
 
         try {
             $response = Http::timeout(10)
+                ->withOptions(OutboundUrlGuard::httpClientOptions($webhook->url, requireHttps: true))
                 ->withHeaders([
                     'Content-Type' => 'application/json',
                     'X-Nexus-Signature' => $signature,
@@ -445,7 +447,7 @@ class AdminFederationWebhooksController extends BaseApiController
         }
 
         // SSRF protection: re-check at dispatch time (DNS rebinding defense)
-        if (\App\Services\WebhookDispatchService::isPrivateUrl($webhook->url)) {
+        if (!OutboundUrlGuard::isSafeHttpUrl($webhook->url, requireHttps: true)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.webhook_private_ip'), 'url', 422);
         }
 
@@ -461,6 +463,7 @@ class AdminFederationWebhooksController extends BaseApiController
 
         try {
             $response = Http::timeout(10)
+                ->withOptions(OutboundUrlGuard::httpClientOptions($webhook->url, requireHttps: true))
                 ->withHeaders([
                     'Content-Type' => 'application/json',
                     'X-Nexus-Signature' => $signature,

@@ -115,4 +115,11 @@ describe('native create/detail route layout coverage', () => {
 
     expect(riskyRoutes).toEqual([]);
   });
+
+  it('keeps the chat modal on explicit native flex frames for Android release builds', () => {
+    const source = fs.readFileSync(path.join(projectDir, 'app/(modals)/chat.tsx'), 'utf8');
+
+    expect(/<SafeAreaView[\s\S]{0,280}style=\{\{[^}]*flex:\s*1/.test(source)).toBe(true);
+    expect(/<KeyboardAvoidingView[\s\S]{0,280}style=\{\{[^}]*flex:\s*1/.test(source)).toBe(true);
+  });
 });

@@ -6,6 +6,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Pusher\Pusher;
 
@@ -289,13 +290,38 @@ class PusherService
                 return true;
             }
 
-            // Conversation and group channels: tenant membership check here,
-            // participant-level checks handled by Broadcast::channel() rules
-            // in routes/channels.php
-            return true;
+            if (preg_match('/^conversation\.(\d+)$/', $suffix, $conversationMatch)) {
+                return $this->isConversationParticipant((int) $conversationMatch[1], $userId, $channelTenantId);
+            }
+
+            if (preg_match('/^group\.(\d+)(?:\.|$)/', $suffix, $groupMatch)) {
+                return $this->isActiveGroupMember((int) $groupMatch[1], $userId, $channelTenantId);
+            }
+
+            return false;
         }
 
         // Unknown channel pattern — deny by default
         return false;
+    }
+
+    private function isConversationParticipant(int $conversationId, int $userId, int $tenantId): bool
+    {
+        return DB::table('conversation_participants')
+            ->where('tenant_id', $tenantId)
+            ->where('conversation_id', $conversationId)
+            ->where('user_id', $userId)
+            ->exists();
+    }
+
+    private function isActiveGroupMember(int $groupId, int $userId, int $tenantId): bool
+    {
+        return DB::table('group_members as gm')
+            ->join('groups as g', 'g.id', '=', 'gm.group_id')
+            ->where('g.tenant_id', $tenantId)
+            ->where('gm.group_id', $groupId)
+            ->where('gm.user_id', $userId)
+            ->where('gm.status', 'active')
+            ->exists();
     }
 }

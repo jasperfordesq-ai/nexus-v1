@@ -1664,7 +1664,7 @@ function VolunteeringScreenInner() {
     }
   }
 
-  const tabs: Array<{ key: TabKey; label: string; icon: IoniconName; requiresAuth?: boolean }> = useMemo(() => [
+  const tabs: { key: TabKey; label: string; icon: IoniconName; requiresAuth?: boolean }[] = useMemo(() => [
     { key: 'opportunities', label: t('tabs.opportunities'), icon: 'briefcase-outline' },
     { key: 'applications', label: t('tabs.applications'), icon: 'send-outline', requiresAuth: true },
     { key: 'shifts', label: t('tabs.shifts'), icon: 'calendar-outline', requiresAuth: true },

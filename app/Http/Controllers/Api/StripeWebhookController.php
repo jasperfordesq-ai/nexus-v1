@@ -47,7 +47,12 @@ class StripeWebhookController extends BaseApiController
 
         // Verify webhook signature
         try {
-            $event = StripeService::constructWebhookEvent($payload, $sigHeader);
+            $event = StripeService::constructWebhookEvent(
+                $payload,
+                $sigHeader,
+                $this->webhookSecretForRequest($request),
+                $this->webhookSecretEnvNameForRequest($request),
+            );
         } catch (SignatureVerificationException $e) {
             Log::warning('Stripe webhook signature verification failed', [
                 'error' => $e->getMessage(),
@@ -192,6 +197,30 @@ class StripeWebhookController extends BaseApiController
             ]);
 
         return $this->respondWithData(['received' => true]);
+    }
+
+    private function webhookSecretForRequest(Request $request): ?string
+    {
+        if (!$this->isMarketplaceWebhookRequest($request)) {
+            return null;
+        }
+
+        return config('services.stripe.marketplace_webhook_secret')
+            ?: env('STRIPE_MARKETPLACE_WEBHOOK_SECRET')
+            ?: '';
+    }
+
+    private function webhookSecretEnvNameForRequest(Request $request): string
+    {
+        return $this->isMarketplaceWebhookRequest($request)
+            ? 'STRIPE_MARKETPLACE_WEBHOOK_SECRET'
+            : 'STRIPE_WEBHOOK_SECRET';
+    }
+
+    private function isMarketplaceWebhookRequest(Request $request): bool
+    {
+        return $request->is('api/v2/marketplace/webhooks/stripe')
+            || $request->is('v2/marketplace/webhooks/stripe');
     }
 
     // ============================================

@@ -1405,6 +1405,10 @@ class JobVacanciesController extends BaseApiController
             return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_access_denied'), null, 403);
         }
 
+        if (!$isApplicant && (bool) ($application->vacancy->blind_hiring ?? false)) {
+            return $this->respondWithError('RESOURCE_FORBIDDEN', __('api.job_access_denied'), null, 403);
+        }
+
         if (empty($application->cv_path)) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.job_no_cv_attached'), null, 404);
         }

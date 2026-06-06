@@ -2630,7 +2630,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
      */
     public function suppressions(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
 
         $limit = max(1, min((int) ($this->input('limit', 50) ?: 50), 200));
         $offset = max(0, (int) ($this->input('offset', 0)));
@@ -2669,7 +2669,7 @@ class AdminEmailDeliverabilityController extends BaseApiController
      */
     public function removeSuppression(int $id): JsonResponse
     {
-        $this->requireSuperAdmin();
+        $this->requirePlatformSuperAdmin();
 
         $row = DB::table('email_suppression')->where('id', $id)->first();
         if (!$row) {

@@ -19,8 +19,8 @@ use Illuminate\Support\Facades\Storage;
  * AG59 — Partner-facing endpoints for paying regional-analytics subscribers.
  *
  * Auth: a `subscription_token` is provided per subscription and presented as
- * either an `Authorization: Bearer <token>` header or a `?token=` query
- * parameter. Every call is recorded in regional_analytics_access_log.
+ * an `Authorization: Bearer <token>` header. Every call is recorded in
+ * regional_analytics_access_log.
  */
 class RegionalAnalyticsPartnerController extends BaseApiController
 {
@@ -60,6 +60,9 @@ class RegionalAnalyticsPartnerController extends BaseApiController
         if (! $sub) {
             return $this->respondWithError('unauthorized', 'Invalid or missing subscription token.', null, 401);
         }
+        if (! in_array($sub->status, ['active', 'trialing'], true)) {
+            return $this->respondWithError('forbidden', 'Subscription is not active.', null, 403);
+        }
 
         $rows = DB::table('regional_analytics_reports')
             ->where('subscription_id', $sub->id)
@@ -79,6 +82,9 @@ class RegionalAnalyticsPartnerController extends BaseApiController
         $sub = $this->resolveSubscription($request);
         if (! $sub) {
             return $this->respondWithError('unauthorized', 'Invalid or missing subscription token.', null, 401);
+        }
+        if (! in_array($sub->status, ['active', 'trialing'], true)) {
+            return $this->respondWithError('forbidden', 'Subscription is not active.', null, 403);
         }
 
         $report = DB::table('regional_analytics_reports')
@@ -115,10 +121,7 @@ class RegionalAnalyticsPartnerController extends BaseApiController
     private function resolveSubscription(Request $request): ?object
     {
         $token = $request->bearerToken();
-        if (! $token) {
-            $token = (string) $request->query('token', '');
-        }
-        if ($token === '') {
+        if (! is_string($token) || $token === '') {
             return null;
         }
         return DB::table('regional_analytics_subscriptions')

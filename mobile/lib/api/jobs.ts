@@ -136,9 +136,9 @@ export interface JobAnalyticsData {
   conversion_rate: number;
   avg_time_to_apply_hours: number | null;
   time_to_fill_days: number | null;
-  views_by_day: Array<{ date: string; count: number }>;
-  applications_by_stage: Array<{ stage: string; count: number }>;
-  weekly_trend: Array<{ week: string; count: number }>;
+  views_by_day: { date: string; count: number }[];
+  applications_by_stage: { stage: string; count: number }[];
+  weekly_trend: { week: string; count: number }[];
   referral_stats: {
     total_shares: number;
     referral_applications: number;
