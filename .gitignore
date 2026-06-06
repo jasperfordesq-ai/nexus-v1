@@ -78,6 +78,7 @@ CLAUDE.md
 !/scripts/check-i18n-vars.mjs
 !/scripts/check-php-i18n-coverage.mjs
 !/scripts/check-admin-breadcrumbs.mjs
+!/scripts/check-test-skip-budget.mjs
 !/scripts/translate-i18n-gaps.mjs
 !/scripts/prerender-tenants.sh
 !/scripts/prerender-worker.mjs

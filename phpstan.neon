@@ -2,12 +2,13 @@
 #
 # Scans app/ at level 1. The ignoreErrors block silences Laravel/Eloquent
 # magic methods and facade aliases that PHPStan can't resolve without larastan.
-# Legacy src/ path-scoped ignores below are no-ops (src/ was removed post-migration)
-# but kept harmless via reportUnmatchedIgnoredErrors: false.
+# Adopting larastan would let most of those broad ignores be removed and the
+# level raised — tracked as a follow-up (needs --memory-limit above 512M so the
+# parallel workers don't OOM locally).
 #
 # PHPStan 1.12's --generate-baseline emits invalid NEON (escaped colons
 # like "\:" that the parser rejects). Do NOT use --generate-baseline.
-# CI/pre-push currently run phpstan as warning-only (|| true).
+# CI runs phpstan as a BLOCKING gate (no `|| true`).
 parameters:
     level: 1
     paths:
@@ -23,13 +24,6 @@ parameters:
         - '#Call to an undefined method#'
         - '#Access to an undefined property#'
         - identifier: missingType.iterableValue
-        - message: '#should always throw an exception or terminate script execution#'
-          path: src/Controllers/Api/BaseApiController.php
-
-        # SocialApiController: Non-standard PHPDoc @param tags (missing $ prefix).
-        # These are doc-only descriptions for request body params, not PHP method params.
-        - message: '#PHPDoc tag @param has invalid value#'
-          path: src/Controllers/Api/SocialApiController.php
 
         # ActivityLog: Optional service class that may not be present in all deployments.
         # DeliverabilityTrackingService and Review model call it wrapped in class_exists checks.
@@ -46,32 +40,6 @@ parameters:
 
         # NotificationService::create: Called inside class_exists guard in JobVacancyService.
         - message: '#Call to an undefined static method Nexus\\Services\\NotificationService::create\(\)#'
-
-        # RedisCache: PHP Redis extension type quirks — del() and exists() return mixed types
-        # depending on Redis extension version. The comparison is correct at runtime.
-        - message: '#Comparison operation ">" between \(int\|Redis\|false\) and 0#'
-          path: src/Services/RedisCache.php
-        - message: '#Comparison operation ">" between \(bool\|int\|Redis\) and 0#'
-          path: src/Services/RedisCache.php
-
-        # empty() on always-defined variables: PHPStan is overly strict here.
-        # empty() on a string or array variable that could be empty-string/null/[] is valid defensive PHP.
-        - message: '#Variable \$email in empty\(\) always exists and is not falsy#'
-          path: src/Controllers/Api/AuthController.php
-        - message: '#Variable \$uploadedFile in empty\(\) always exists and is not falsy#'
-          path: src/Controllers/Api/VolunteerApiController.php
-        - message: '#Variable \$categoryFilter in empty\(\) always exists and is not falsy#'
-          path: src/Services/SmartMatchingEngine.php
-        - message: '#Variable \$password in empty\(\) always exists and is not falsy#'
-          path: src/Services/TwoFactorChallengeManager.php
-        - message: '#Variable \$password in empty\(\) always exists and is not falsy#'
-          path: src/Services/RedisCache.php
-
-        # GamificationService: Constructor accepts $db for backward compatibility with
-        # NexusScoreService and NexusScoreController which pass a PDO instance.
-        # All GamificationService methods are static so $db is intentionally unused.
-        - message: '#Constructor of class Nexus\\Services\\GamificationService has an unused parameter \$db#'
-          path: src/Services/GamificationService.php
 
         # Laravel Eloquent magic statics — every model exposes static where(), find(),
         # create(), updateOrCreate(), firstOrCreate(), findOrFail(), all(), query(),

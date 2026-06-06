@@ -114,7 +114,15 @@ jobs:
           QUEUE_CONNECTION: sync
           LOG_CHANNEL: null
 
-      - name: "BLOCKING: PHPStan static analysis (level 3)"
+      # Schema-driven test-skip ratchet. ~172 PHPUnit tests skip when the test DB
+      # (built from database/schema/mysql-schema.sql) lacks a table/column, so they
+      # provide no protection. This freezes that count so new schema-skip debt can't
+      # be added; refresh the schema dump and convert skips to real tests to lower it.
+      # (node is preinstalled on the runner; the script uses only built-in modules.)
+      - name: "BLOCKING: Schema-driven test-skip budget"
+        run: node scripts/check-test-skip-budget.mjs
+
+      - name: "BLOCKING: PHPStan static analysis (level 1)"
         run: vendor/bin/phpstan analyse --no-progress --memory-limit=512M --error-format=github
 
       # TD15: Validate that all required env vars referenced in config/ are
@@ -186,6 +194,13 @@ jobs:
       - name: TypeScript Check (BLOCKING)
         working-directory: react-frontend
         run: npx tsc --noEmit
+
+      # ESLint ratchet (BLOCKING). Cap tracks the current warning count (25) with
+      # a small buffer; it must only ever be LOWERED, never raised. Previously the
+      # cap was 1000 and eslint ran in no CI step at all, so warnings were ungated.
+      - name: ESLint (BLOCKING)
+        working-directory: react-frontend
+        run: npx eslint src --max-warnings 30
 
       - name: Vitest Focused Smoke Tests (BLOCKING)
         working-directory: react-frontend
