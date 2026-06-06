@@ -60,7 +60,9 @@ jobs:
         with:
           php-version: ${{ env.PHP_VERSION }}
           extensions: pdo_mysql, mbstring, xml, zip, redis, gd, intl, bcmath, opcache, curl, fileinfo, gmp
-          coverage: xdebug
+          # php-checks does not consume coverage output, but xdebug instrumented
+          # all 8303 tests and made the blocking suite take 20+ min. Disable it.
+          coverage: none
 
       - name: Cache Composer Dependencies
         uses: actions/cache@v5
@@ -105,7 +107,7 @@ jobs:
           echo "All PHP files passed syntax check."
 
       - name: "BLOCKING: PHPUnit Laravel suite"
-        run: vendor/bin/phpunit --testsuite=Laravel,LaravelMigrated --colors=always
+        run: vendor/bin/phpunit --testsuite=Laravel,LaravelMigrated --colors=always --no-coverage
         env:
           DB_HOST: 127.0.0.1
           DB_PORT: 3306
