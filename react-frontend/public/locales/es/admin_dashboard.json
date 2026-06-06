@@ -3,6 +3,7 @@
   "subtitle": "Descripción general de la plataforma en tiempo real y centro de comando",
   "tour_btn": "Recorrido",
   "refresh": "Refrescar",
+  "loading": "Loading",
   "view_all_activity": "Ver toda la actividad",
   "tour": {
     "welcome_title": "¡Bienvenidos a Control de Misión!",
@@ -120,6 +121,5 @@
     "cache": "caché",
     "queue": "Trabajos cronificados",
     "api": "API de correo electrónico"
-  },
-  "loading": "Loading"
+  }
 }

@@ -3,6 +3,7 @@
   "subtitle": "Forbhreathnú ardán fíor-ama agus ionad ordaithe",
   "tour_btn": "Turas",
   "refresh": "Athnuaigh",
+  "loading": "Loading",
   "view_all_activity": "Féach ar Gach Gníomhaíocht",
   "tour": {
     "welcome_title": "Fáilte go dtí Rialú Misean!",
@@ -120,6 +121,5 @@
     "cache": "Taisce",
     "queue": "Cron Jobs",
     "api": "Ríomhphost API"
-  },
-  "loading": "Loading"
+  }
 }

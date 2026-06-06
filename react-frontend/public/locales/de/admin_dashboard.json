@@ -3,6 +3,7 @@
   "subtitle": "Plattformübersicht und Kommandozentrale in Echtzeit",
   "tour_btn": "Rundgang",
   "refresh": "Aktualisieren",
+  "loading": "Loading",
   "view_all_activity": "Alle Aktivitäten anzeigen",
   "tour": {
     "welcome_title": "Willkommen bei Mission Control!",
@@ -120,6 +121,5 @@
     "cache": "Cache",
     "queue": "Cron-Jobs",
     "api": "E-Mail-API"
-  },
-  "loading": "Loading"
+  }
 }

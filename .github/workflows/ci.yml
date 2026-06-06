@@ -486,9 +486,10 @@ jobs:
       - name: "BLOCKING: Check for hardcoded strings in PHP code"
         run: bash scripts/check-i18n.sh
 
-      # check-admin-i18n REMOVED 2026-04-22 — admin panel is English-only by design.
-      # Hardcoded English in admin code is intentional, not a violation.
-      # See memory/feedback_admin_english_only.md.
+      # Re-added 2026-06-06: admin panel is multilingual again (policy reversed
+      # 2026-05-22). Validates admin t() keys resolve against the English locale.
+      - name: "BLOCKING: Admin translation key coverage"
+        run: node scripts/check-admin-i18n.mjs
 
       # Floating-baseline gate — surfaces drift but does not block merge.
       # Counts strings where translation == English (i.e. English fallback in

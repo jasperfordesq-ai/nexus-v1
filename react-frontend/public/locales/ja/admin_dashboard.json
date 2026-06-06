@@ -3,6 +3,7 @@
   "subtitle": "リアルタイム プラットフォームの概要とコマンド センター",
   "tour_btn": "ツアー",
   "refresh": "リフレッシュ",
+  "loading": "Loading",
   "view_all_activity": "すべてのアクティビティを表示",
   "tour": {
     "welcome_title": "ミッションコントロールへようこそ！",
@@ -120,6 +121,5 @@
     "cache": "キャッシュ",
     "queue": "クロンジョブ",
     "api": "メールAPI"
-  },
-  "loading": "Loading"
+  }
 }

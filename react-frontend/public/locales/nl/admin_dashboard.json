@@ -3,6 +3,7 @@
   "subtitle": "Realtime platformoverzicht en commandocentrum",
   "tour_btn": "Rondleiding",
   "refresh": "Vernieuwen",
+  "loading": "Loading",
   "view_all_activity": "Bekijk alle activiteiten",
   "tour": {
     "welcome_title": "Welkom bij MissionControl!",
@@ -120,6 +121,5 @@
     "cache": "Cache",
     "queue": "Cron-banen",
     "api": "E-mail-API"
-  },
-  "loading": "Loading"
+  }
 }

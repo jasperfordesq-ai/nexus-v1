@@ -55,17 +55,11 @@ if (!existsSync(enDir)) {
   process.exit(1);
 }
 
-// Admin locale files are EXCLUDED from drift checks. Admin panel is English-only
-// by design — other-language admin files will be deleted. See memory/feedback_admin_english_only.md.
-const ADMIN_LOCALE_FILES = new Set([
-  'admin.json',
-  'admin_nav.json',
-  'admin_dashboard.json',
-  'super_admin.json',
-]);
-
+// Admin locale files are INCLUDED in drift checks. The admin panel is translated
+// across all 11 languages (the old English-only policy was reversed 2026-05-22),
+// so the same drift rules apply. See memory/feedback_admin_english_only.md.
 const enFiles = readdirSync(enDir)
-  .filter(f => f.endsWith('.json') && !ADMIN_LOCALE_FILES.has(f))
+  .filter(f => f.endsWith('.json'))
   .sort();
 const nonEnLangs = langs.filter(l => l !== 'en');
 

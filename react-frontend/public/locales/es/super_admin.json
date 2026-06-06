@@ -22,6 +22,56 @@
     "regional_analytics": "Regional Analytics",
     "national_dashboard": "National Dashboard"
   },
+  "layout": {
+    "loading": "Loading super admin",
+    "skip_to_main": "Skip to main content",
+    "close_navigation": "Close super admin navigation",
+    "navigation": "Super admin navigation"
+  },
+  "header": {
+    "back_to_admin": "Back to admin",
+    "toggle_sidebar": "Toggle sidebar",
+    "notifications": "Notifications",
+    "user_fallback": "Super Admin",
+    "user_menu": "Super admin menu",
+    "my_profile": "My Profile",
+    "sign_out": "Sign Out"
+  },
+  "sidebar": {
+    "section_overview": "Overview",
+    "section_tenants": "Tenants",
+    "section_federation": "Federation",
+    "section_commercial": "Commercial",
+    "expand": "Expand sidebar",
+    "collapse": "Collapse sidebar",
+    "nav_label": "Super admin navigation"
+  },
+  "breadcrumbs": {
+    "aria_label": "Breadcrumbs",
+    "super_admin": "Super Admin",
+    "tenants": "Tenants",
+    "create": "Create",
+    "edit": "Edit",
+    "hierarchy": "Hierarchy",
+    "users": "Users",
+    "bulk": "Bulk Operations",
+    "audit": "Audit Log",
+    "federation": "Federation",
+    "whitelist": "Whitelist",
+    "partnerships": "Partnerships",
+    "tenant": "Tenant",
+    "features": "Features",
+    "billing": "Billing",
+    "revenue": "Revenue",
+    "platform": "Platform",
+    "pilot_inquiries": "Pilot Inquiries",
+    "provisioning_requests": "Provisioning Requests",
+    "national": "National",
+    "kiss": "KISS",
+    "regional_analytics": "Regional Analytics",
+    "subscriptions": "Subscriptions",
+    "unknown": "{{segment}}"
+  },
   "dashboard": {
     "title": "Panel de infraestructura",
     "subtitle_global": "Descripción general global de todos los inquilinos y la infraestructura",
@@ -756,55 +806,5 @@
       "feat_groups_title": "Grupos",
       "feat_groups_desc": "Permitir la pertenencia a grupos entre inquilinos"
     }
-  },
-  "layout": {
-    "loading": "Loading super admin",
-    "skip_to_main": "Skip to main content",
-    "close_navigation": "Close super admin navigation",
-    "navigation": "Super admin navigation"
-  },
-  "header": {
-    "back_to_admin": "Back to admin",
-    "toggle_sidebar": "Toggle sidebar",
-    "notifications": "Notifications",
-    "user_fallback": "Super Admin",
-    "user_menu": "Super admin menu",
-    "my_profile": "My Profile",
-    "sign_out": "Sign Out"
-  },
-  "sidebar": {
-    "section_overview": "Overview",
-    "section_tenants": "Tenants",
-    "section_federation": "Federation",
-    "section_commercial": "Commercial",
-    "expand": "Expand sidebar",
-    "collapse": "Collapse sidebar",
-    "nav_label": "Super admin navigation"
-  },
-  "breadcrumbs": {
-    "aria_label": "Breadcrumbs",
-    "super_admin": "Super Admin",
-    "tenants": "Tenants",
-    "create": "Create",
-    "edit": "Edit",
-    "hierarchy": "Hierarchy",
-    "users": "Users",
-    "bulk": "Bulk Operations",
-    "audit": "Audit Log",
-    "federation": "Federation",
-    "whitelist": "Whitelist",
-    "partnerships": "Partnerships",
-    "tenant": "Tenant",
-    "features": "Features",
-    "billing": "Billing",
-    "revenue": "Revenue",
-    "platform": "Platform",
-    "pilot_inquiries": "Pilot Inquiries",
-    "provisioning_requests": "Provisioning Requests",
-    "national": "National",
-    "kiss": "KISS",
-    "regional_analytics": "Regional Analytics",
-    "subscriptions": "Subscriptions",
-    "unknown": "{{segment}}"
   }
 }

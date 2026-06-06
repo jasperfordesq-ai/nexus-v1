@@ -3,6 +3,7 @@
   "subtitle": "Visão geral da plataforma e centro de comando em tempo real",
   "tour_btn": "Percorrer",
   "refresh": "Atualizar",
+  "loading": "Loading",
   "view_all_activity": "Ver todas as atividades",
   "tour": {
     "welcome_title": "Bem-vindo ao Controle da Missão!",
@@ -120,6 +121,5 @@
     "cache": "Cache",
     "queue": "Cron Jobs",
     "api": "API de e-mail"
-  },
-  "loading": "Loading"
+  }
 }
