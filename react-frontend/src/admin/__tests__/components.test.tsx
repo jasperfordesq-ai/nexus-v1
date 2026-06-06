@@ -125,7 +125,9 @@ describe('AdminSidebar', () => {
         <AdminSidebar collapsed={false} onToggle={vi.fn()} />
       </Wrapper>
     );
-    expect(screen.getByText('Super Admin')).toBeInTheDocument();
+    // Label renders via t('super_admin_panel') from admin_nav.json => "Super Admin Panel"
+    // (admin sidebar was i18n-converted; the old literal "Super Admin" no longer matches).
+    expect(screen.getByText('Super Admin Panel')).toBeInTheDocument();
   });
 
   it('shows federation section when feature enabled', () => {
