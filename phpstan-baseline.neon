@@ -1,0 +1,403 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: app/Console/Commands/PrerenderPlanRoutes.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: app/Core/Env.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: app/Core/Mailer.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: app/Http/Controllers/Api/AdminConfigController.php
+
+		-
+			message: '#^Call to static method error\(\) on an unknown class App\\Http\\Controllers\\Api\\Log\.$#'
+			identifier: class.notFound
+			count: 2
+			path: app/Http/Controllers/Api/AdminEnterpriseController.php
+
+		-
+			message: '#^Class App\\Services\\RedisCacheService not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AdminOnboardingConfigController.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: app/Http/Controllers/Api/AdminPrerenderController.php
+
+		-
+			message: '#^Static method App\\Models\\User\:\:createWithTenant\(\) invoked with 7 parameters, 2 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: app/Http/Controllers/Api/AdminSuperController.php
+
+		-
+			message: '#^Undefined variable\: \$status$#'
+			identifier: variable.undefined
+			count: 1
+			path: app/Http/Controllers/Api/AdminVettingController.php
+
+		-
+			message: '#^Undefined variable\: \$tenantId$#'
+			identifier: variable.undefined
+			count: 1
+			path: app/Http/Controllers/Api/AdminVettingController.php
+
+		-
+			message: '#^Undefined variable\: \$id$#'
+			identifier: variable.undefined
+			count: 1
+			path: app/Http/Controllers/Api/AdminVolunteerController.php
+
+		-
+			message: '#^Method Illuminate\\Database\\Eloquent\\Model\:\:delete\(\) invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: app/Http/Controllers/Api/AiChatController.php
+
+		-
+			message: '#^Static method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\AiConversation\>\:\:create\(\) invoked with 2 parameters, 0\-1 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: app/Http/Controllers/Api/AiChatController.php
+
+		-
+			message: '#^Static method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Event\>\:\:upcoming\(\) invoked with 2 parameters, 0 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: app/Http/Controllers/Api/AiChatController.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: app/Http/Controllers/Api/AuthController.php
+
+		-
+			message: '#^Variable \$job might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: app/Http/Controllers/Api/JobVacanciesController.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: app/Http/Controllers/Api/OptionalIdentityVerificationController.php
+
+		-
+			message: '#^Call to static method isPrivateUrl\(\) on an unknown class App\\Http\\Controllers\\Api\\PartnerApi\\WebhookDispatchService\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Http/Controllers/Api/PartnerApi/PartnerV1Controller.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: app/Http/Controllers/Api/SendGridWebhookController.php
+
+		-
+			message: '#^Static method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\FeedPost\>\:\:create\(\) invoked with 6 parameters, 0\-1 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: app/Http/Controllers/Api/SocialController.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: app/Http/Controllers/Api/StripeWebhookController.php
+
+		-
+			message: '#^Call to private method resolveUser\(\) of class App\\Http\\Controllers\\Api\\BaseApiController\.$#'
+			identifier: method.private
+			count: 1
+			path: app/Http/Controllers/Api/SuperAdmin/TenantProvisioningController.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: app/Http/Controllers/Api/Verein/MyDuesController.php
+
+		-
+			message: '#^Call to private method resolveUser\(\) of class App\\Http\\Controllers\\Api\\BaseApiController\.$#'
+			identifier: method.private
+			count: 1
+			path: app/Http/Controllers/Api/VolunteerController.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: app/Http/Controllers/GovukAlpha/AlphaController.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: app/Http/Controllers/SitemapController.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: app/Http/Middleware/CheckMaintenanceMode.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 2
+			path: app/Http/Middleware/SecurityHeaders.php
+
+		-
+			message: '#^Undefined variable\: \$skipEmailFanout$#'
+			identifier: variable.undefined
+			count: 1
+			path: app/Listeners/NotifyAdminOfNewListing.php
+
+		-
+			message: '#^Call to static method endRequest\(\) on an unknown class App\\Services\\PerformanceMonitorService\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Middleware/PerformanceMonitoringMiddleware.php
+
+		-
+			message: '#^Call to static method isEnabled\(\) on an unknown class App\\Services\\PerformanceMonitorService\.$#'
+			identifier: class.notFound
+			count: 2
+			path: app/Middleware/PerformanceMonitoringMiddleware.php
+
+		-
+			message: '#^Call to static method startRequest\(\) on an unknown class App\\Services\\PerformanceMonitorService\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Middleware/PerformanceMonitoringMiddleware.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 4
+			path: app/Models/EmailSettings.php
+
+		-
+			message: '#^Property ''start_date'' is not a computed property, remove from \$appends\.$#'
+			identifier: rules.modelAppends
+			count: 1
+			path: app/Models/Event.php
+
+		-
+			message: '#^Property ''read_at'' is not a computed property, remove from \$appends\.$#'
+			identifier: rules.modelAppends
+			count: 1
+			path: app/Models/Notification.php
+
+		-
+			message: '#^Property ''title'' is not a computed property, remove from \$appends\.$#'
+			identifier: rules.modelAppends
+			count: 1
+			path: app/Models/Notification.php
+
+		-
+			message: '#^Property ''tagline'' is not a computed property, remove from \$appends\.$#'
+			identifier: rules.modelAppends
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Class App\\Services\\TokenService does not have a constructor and must be instantiated without any parameters\.$#'
+			identifier: new.noConstructor
+			count: 1
+			path: app/Providers/AppServiceProvider.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: app/Services/Agent/Agents/BaseAgent.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: app/Services/Auth/SocialAuthService.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 3
+			path: app/Services/BlogService.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: app/Services/CaringCommunity/MunicipalCommunicationCopilotService.php
+
+		-
+			message: '#^Variable \$lockKey in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.variable
+			count: 1
+			path: app/Services/CronJobRunner.php
+
+		-
+			message: '#^Instantiated class App\\Core\\VaultClient not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Services/Enterprise/ConfigService.php
+
+		-
+			message: '#^Property App\\Services\\Enterprise\\ConfigService\:\:\$vault has unknown class App\\Core\\VaultClient as its type\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Services/Enterprise/ConfigService.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 2
+			path: app/Services/Enterprise/GdprService.php
+
+		-
+			message: '#^Undefined variable\: \$this$#'
+			identifier: variable.undefined
+			count: 1
+			path: app/Services/Enterprise/LoggerService.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 4
+			path: app/Services/FederationRealtimeService.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 2
+			path: app/Services/GroupSearchService.php
+
+		-
+			message: '#^Undefined variable\: \$ideaId$#'
+			identifier: variable.undefined
+			count: 1
+			path: app/Services/IdeationChallengeService.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: app/Services/Identity/IdentityProviderRegistry.php
+
+		-
+			message: '#^Relation ''vacancy'' is not found in App\\Models\\JobPipelineRule model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Services/JobPipelineRuleService.php
+
+		-
+			message: '#^Relation ''user'' is not found in App\\Models\\JobVacancyTeam model\.$#'
+			identifier: larastan.relationExistence
+			count: 1
+			path: app/Services/JobTeamService.php
+
+		-
+			message: '#^Undefined variable\: \$authorId$#'
+			identifier: variable.undefined
+			count: 1
+			path: app/Services/KnowledgeBaseService.php
+
+		-
+			message: '#^Undefined variable\: \$tenantId$#'
+			identifier: variable.undefined
+			count: 1
+			path: app/Services/ListingExpiryService.php
+
+		-
+			message: '#^Undefined variable\: \$listing$#'
+			identifier: variable.undefined
+			count: 1
+			path: app/Services/ListingModerationService.php
+
+		-
+			message: '#^Undefined variable\: \$id$#'
+			identifier: variable.undefined
+			count: 1
+			path: app/Services/ListingService.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 2
+			path: app/Services/MailchimpService.php
+
+		-
+			message: '#^Undefined variable\: \$userId$#'
+			identifier: variable.undefined
+			count: 1
+			path: app/Services/NotificationDispatcher.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 4
+			path: app/Services/PrerenderService.php
+
+		-
+			message: '#^Static method Redis\:\:set\(\) invoked with 5 parameters, 2\-3 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: app/Services/PresenceService.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 2
+			path: app/Services/PwnedPasswordService.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 5
+			path: app/Services/RegionalAnalytics/RegionalAnalyticsBilling.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 2
+			path: app/Services/SearchService.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 4
+			path: app/Services/SitemapService.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 2
+			path: app/Services/StripeService.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: app/Services/TurnstileService.php

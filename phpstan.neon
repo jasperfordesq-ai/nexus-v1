@@ -9,6 +9,17 @@
 # PHPStan 1.12's --generate-baseline emits invalid NEON (escaped colons
 # like "\:" that the parser rejects). Do NOT use --generate-baseline.
 # CI runs phpstan as a BLOCKING gate (no `|| true`).
+#
+# larastan (Laravel-aware) is enabled here. phpstan-baseline.neon (added below)
+# grandfathers the pre-existing findings so the gate stays green and only NEW
+# issues fail — burn the baseline down over time. Regenerate the baseline in the
+# Docker app container (Linux + all PHP extensions = CI-accurate), NOT on Windows:
+#   docker exec nexus-php-app php vendor/bin/phpstan analyse \
+#     --configuration phpstan.neon --generate-baseline phpstan-baseline.neon --memory-limit=2G
+includes:
+    - vendor/larastan/larastan/extension.neon
+    - phpstan-baseline.neon
+
 parameters:
     level: 1
     paths:

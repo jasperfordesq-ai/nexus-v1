@@ -122,8 +122,10 @@ jobs:
       - name: "BLOCKING: Schema-driven test-skip budget"
         run: node scripts/check-test-skip-budget.mjs
 
-      - name: "BLOCKING: PHPStan static analysis (level 1)"
-        run: vendor/bin/phpstan analyse --no-progress --memory-limit=512M --error-format=github
+      # --memory-limit=2G: larastan boots the Laravel app, which doesn't fit in
+      # 512M alongside the parallel workers (it OOMs). GitHub runners have ample RAM.
+      - name: "BLOCKING: PHPStan static analysis (level 1, larastan + baseline)"
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=2G --error-format=github
 
       # TD15: Validate that all required env vars referenced in config/ are
       # documented in .env.example. Catches the class of bug where a new

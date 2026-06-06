@@ -454,6 +454,8 @@ Full deployment guide: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
 | **Legacy Wrapper** | `scripts/safe-deploy.sh` (compatibility shim only; production delegates to blue-green) |
 | **Method** | Zero-downtime blue/green switch via Apache route file |
 
+**Preferred: gated deploy from the dev machine.** Run `bash scripts/deploy.sh` — it runs the larastan/PHPStan static-analysis gate first (catches the job-offers class of bug; only NEW findings beyond `phpstan-baseline.neon` block — override a false alarm with `ALLOW_PHPSTAN_FAIL=1`), then pushes and runs the blue/green deploy below. The gate runs locally in the `nexus-php-app` container, so it adds only a couple of minutes and can't break the server-side deploy. The raw steps below still work as a fallback.
+
 ```bash
 # Step 1: Push code
 git push origin main
