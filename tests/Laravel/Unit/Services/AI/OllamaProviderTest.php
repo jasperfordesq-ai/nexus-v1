@@ -23,17 +23,23 @@ class OllamaProviderTest extends TestCase
         $this->assertEquals('Ollama (Self-hosted)', $provider->getName());
     }
 
-    public function test_isConfigured_returns_true_with_url(): void
+    public function test_isConfigured_returns_true_with_public_url(): void
     {
-        $provider = new OllamaProvider(['api_url' => 'http://localhost:11434']);
+        // isConfigured() now runs the OutboundUrlGuard SSRF check, so the
+        // configured host must resolve to a public IP. A public-IP URL passes;
+        // loopback/private hosts (incl. the localhost default) are rejected.
+        $provider = new OllamaProvider(['api_url' => 'https://93.184.216.34:11434']);
         $this->assertTrue($provider->isConfigured());
     }
 
-    public function test_isConfigured_returns_true_by_default(): void
+    public function test_isConfigured_returns_false_for_loopback_default(): void
     {
-        // Default URL is http://localhost:11434
+        // The default URL is http://localhost:11434. The SSRF guard
+        // (OutboundUrlGuard) blocks loopback/local hostnames, so a self-hosted
+        // Ollama on localhost is intentionally treated as not safe-configured
+        // for server-side outbound calls.
         $provider = new OllamaProvider([]);
-        $this->assertTrue($provider->isConfigured());
+        $this->assertFalse($provider->isConfigured());
     }
 
     public function test_isConfigured_returns_false_with_empty_url(): void

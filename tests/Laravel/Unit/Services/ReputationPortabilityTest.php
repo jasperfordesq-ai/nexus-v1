@@ -13,6 +13,7 @@ use App\Models\Review;
 use App\Models\User;
 use App\Services\MemberRankingService;
 use App\Services\Protocols\KomunitinAdapter;
+use App\Core\TenantContext;
 use App\Services\ReviewService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
@@ -62,6 +63,12 @@ class ReputationPortabilityTest extends TestCase
             'created_at'         => now(),
         ]);
 
+        // User factory observers reset TenantContext to tenant 1 during create();
+        // ReviewService::scopeWithFederated() reads TenantContext::getId() to build
+        // the local-OR-federated filter, so re-pin the test tenant before querying
+        // or both reviews fall outside the (tenant 1) scope and total comes back 0.
+        TenantContext::setById($this->testTenantId);
+
         /** @var ReviewService $service */
         $service = app(ReviewService::class);
         $result = $service->getForUser($receiver->id);
@@ -102,13 +109,26 @@ class ReputationPortabilityTest extends TestCase
             'created_at'         => now(),
         ]);
 
+        // Re-pin after factory observers reset TenantContext to tenant 1.
+        TenantContext::setById($this->testTenantId);
+
         $service = new MemberRankingService(new User());
+        // rankMembers() returns ['items' => [...rows], 'total' => N]; the ranked
+        // member rows live under 'items' (previously the method returned a flat list).
         $ranked = $service->rankMembers($this->testTenantId);
 
-        $row = collect($ranked)->firstWhere('user_id', $receiver->id);
+        $row = collect($ranked['items'])->firstWhere('user_id', $receiver->id);
         $this->assertNotNull($row);
-        // Avg of [2, 5] = 3.5 → reputation = 3.5 / 5 = 0.7
-        $this->assertEqualsWithDelta(0.7, $row['reputation'], 0.01);
+        // Reputation is no longer a naive avg/5; calculateReputationScore() blends a
+        // Bayesian average (prior mean 3.8, strength 5) with a Wilson lower bound
+        // (z=1.96), weighted 0.55/0.45. For reviews [2 (local), 5 (federated)]:
+        //   count=2, avg=3.5, positive(>=4)=1
+        //   bayes = (5*3.8 + 3.5*2)/(5+2) = 3.7142857 → /5 = 0.7428571
+        //   wilson(1/2) = 0.0945287
+        //   reputation = 0.7428571*0.55 + 0.0945287*0.45 = 0.451109
+        // The federated review IS included: local-only [2] would score 0.385, so
+        // this value still proves federated reviews count toward reputation.
+        $this->assertEqualsWithDelta(0.4511, $row['reputation'], 0.001);
     }
 
     public function test_review_created_event_is_dispatched_on_create(): void

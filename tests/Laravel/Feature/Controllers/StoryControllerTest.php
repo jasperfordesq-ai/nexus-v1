@@ -280,7 +280,9 @@ class StoryControllerTest extends TestCase
             'reaction_type' => 'heart',
         ]);
 
-        $response->assertStatus(400);
+        // The controller resolves the story up-front and returns NOT_FOUND (404)
+        // when it does not exist for the current tenant.
+        $response->assertStatus(404);
     }
 
     public function test_react_fails_for_invalid_reaction_type(): void

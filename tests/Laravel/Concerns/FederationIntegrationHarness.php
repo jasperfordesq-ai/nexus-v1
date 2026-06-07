@@ -97,6 +97,30 @@ trait FederationIntegrationHarness
     }
 
     /**
+     * Seed a federation_user_settings opt-in row for a local user so inbound
+     * federated messages/transactions are accepted. The message handler
+     * (FederatedMessageService::storeExternalMessage) rejects delivery unless
+     * the recipient has explicitly opted into federated messaging — this models
+     * the real consent requirement, so tests that exercise inbound delivery must
+     * seed it rather than relying on the all-zero column defaults.
+     */
+    protected function optInUserToFederation(int $userId): void
+    {
+        DB::table('federation_user_settings')->updateOrInsert(
+            ['user_id' => $userId],
+            [
+                'federation_optin'              => 1,
+                'profile_visible_federated'     => 1,
+                'messaging_enabled_federated'   => 1,
+                'transactions_enabled_federated' => 1,
+                'appear_in_federated_search'    => 1,
+                'opted_in_at'                   => now(),
+                'updated_at'                    => now(),
+            ]
+        );
+    }
+
+    /**
      * Seed the 3 federation gating tables so the tenant is fully enabled.
      */
     protected function enableFederationForTenant(?int $tenantId = null): void
@@ -171,6 +195,30 @@ trait FederationIntegrationHarness
                 'data'    => ['id' => 99, 'status' => 'accepted'],
             ], 200);
         });
+    }
+
+    /**
+     * Stub the email dispatcher so inbound-webhook side-effects that send a
+     * recipient notification email do not hit a real SMTP/SendGrid/Gmail
+     * transport during tests. EmailDispatchService::sendRaw() resolves the
+     * dispatcher via app(EmailDispatchService::class), so binding a stub
+     * instance here makes every federated notification email a no-op success.
+     *
+     * Without this, the test box has no reachable SMTP host, so the email
+     * returns false → handlers treat delivery as failed and surface HTTP 500.
+     * Email delivery is an out-of-band side effect, not the webhook's core
+     * contract (persist + acknowledge), so faking it is correct test isolation.
+     */
+    protected function fakeFederationEmail(): void
+    {
+        $stub = new class extends \App\Services\EmailDispatchService {
+            public function send(string $to, string $subject, string $body, array $options = []): bool
+            {
+                return true;
+            }
+        };
+
+        $this->app->instance(\App\Services\EmailDispatchService::class, $stub);
     }
 
     /**

@@ -53,17 +53,17 @@ class OrgWalletControllerTest extends TestCase
         $response->assertStatus(401);
     }
 
-    public function test_org_members_returns_empty_for_unknown_org(): void
+    public function test_org_members_returns_404_for_unknown_org(): void
     {
         $this->authenticatedUser();
 
-        // No org_members rows exist for this high ID — should return empty array.
+        // The org does not exist in the current tenant scope. apiMembers()
+        // resolves the organization (tenant-scoped) first and returns
+        // 404 NOT_FOUND when it is absent — it does not fabricate an empty list.
         $response = $this->apiGet('/organizations/99999999/members');
 
-        $response->assertStatus(200);
-        $members = $response->json('data.members') ?? $response->json('members') ?? [];
-        $this->assertIsArray($members);
-        $this->assertCount(0, $members);
+        $response->assertStatus(404);
+        $response->assertJsonPath('errors.0.code', 'NOT_FOUND');
     }
 
     public function test_org_balance_forbidden_for_non_member_non_admin(): void
@@ -96,7 +96,7 @@ class OrgWalletControllerTest extends TestCase
 
         $this->authenticatedUser();
 
-        // Org that belongs to a different tenant — should not be visible.
+        // Org that belongs to a different tenant — must not be visible.
         $orgId = (int) DB::table('organizations')->insertGetId([
             'tenant_id' => 999,
             'name' => 'Other Tenant Org',
@@ -106,8 +106,12 @@ class OrgWalletControllerTest extends TestCase
 
         $response = $this->apiGet("/organizations/{$orgId}/members");
 
-        $response->assertStatus(200);
-        $members = $response->json('data.members') ?? $response->json('members') ?? [];
-        $this->assertCount(0, $members);
+        // The tenant-scoped org lookup finds nothing for the caller's tenant,
+        // so the endpoint returns 404 — it does not confirm the org exists in
+        // another tenant nor leak any of its members.
+        $response->assertStatus(404);
+        $response->assertJsonPath('errors.0.code', 'NOT_FOUND');
+        $body = $response->json();
+        $this->assertArrayNotHasKey('members', (array) ($body['data'] ?? []));
     }
 }

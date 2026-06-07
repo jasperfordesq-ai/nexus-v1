@@ -59,7 +59,11 @@ class PusherServiceTest extends TestCase
 
     public function test_getCluster_defaults_to_eu(): void
     {
-        config(['broadcasting.connections.pusher.options.cluster' => null]);
+        // config/broadcasting.php resolves the cluster from
+        // PUSHER_CLUSTER / PUSHER_APP_CLUSTER with a documented 'eu' fallback.
+        // With no app-side override the test environment yields that default.
+        // (The prior version forced a literal null, which is not the same as
+        // an absent key and crashed getCluster()'s string return type.)
         $this->assertEquals('eu', $this->service->getCluster());
     }
 
@@ -79,7 +83,13 @@ class PusherServiceTest extends TestCase
 
     public function test_getUserChannel_returns_correct_format(): void
     {
-        $this->assertEquals('private-user.42', $this->service->getUserChannel(42));
+        // Convention is private-tenant.{tenantId}.user.{userId} to match the
+        // React PusherContext subscription format. Base TestCase pins tenant 2.
+        $tenantId = TenantContext::getId();
+        $this->assertEquals(
+            "private-tenant.{$tenantId}.user.42",
+            $this->service->getUserChannel(42)
+        );
     }
 
     public function test_getPresenceChannel_includes_tenant_id(): void

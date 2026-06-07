@@ -54,7 +54,9 @@ class PostMediaServiceTest extends TestCase
 
     public function test_isMediaOwnedByUser_returns_true_when_owned(): void
     {
-        DB::shouldReceive('table->join->where->where->where->exists')
+        // isMediaOwnedByUser() chains four where() calls:
+        // pm.id, pm.tenant_id, fp.tenant_id, fp.user_id (double tenant scoping).
+        DB::shouldReceive('table->join->where->where->where->where->exists')
             ->once()
             ->andReturn(true);
 
@@ -64,7 +66,7 @@ class PostMediaServiceTest extends TestCase
 
     public function test_isMediaOwnedByUser_returns_false_when_not_owned(): void
     {
-        DB::shouldReceive('table->join->where->where->where->exists')
+        DB::shouldReceive('table->join->where->where->where->where->exists')
             ->once()
             ->andReturn(false);
 

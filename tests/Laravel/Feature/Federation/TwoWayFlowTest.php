@@ -50,6 +50,9 @@ final class TwoWayFlowTest extends TestCase
         parent::setUp();
         $this->enableFederationForTenant($this->testTenantId);
         $this->fakePartnerHttp();
+        // Inbound webhook side-effects send recipient notification emails; the
+        // test box has no SMTP host, so stub the dispatcher to a no-op success.
+        $this->fakeFederationEmail();
     }
 
     // ========================================================================
@@ -241,6 +244,8 @@ final class TwoWayFlowTest extends TestCase
     {
         $partner = $this->setupPartner($protocol);
         $recipient = User::factory()->forTenant($this->testTenantId)->create();
+        // Recipient must have opted into federated messaging for delivery to be accepted.
+        $this->optInUserToFederation($recipient->id);
 
         $response = $this->simulateInboundWebhook($partner, 'message.sent', [
             'recipient_id'       => $recipient->id,

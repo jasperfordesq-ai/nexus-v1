@@ -41,11 +41,19 @@ class ReviewServiceTest extends TestCase
 
     public function test_getStats_returns_zero_for_user_without_reviews(): void
     {
+        // getStats() builds a base query (newQuery->withFederated->where->where)
+        // then runs two aggregate passes:
+        //   1) selectRaw('COUNT(*)..AVG(rating)..')->first()
+        //   2) selectRaw('rating, COUNT(*)..')->groupBy('rating')->get()
+        // For a user with no reviews, the aggregate row is empty and the
+        // distribution collection is empty.
         $mockQuery = Mockery::mock();
         $mockQuery->shouldReceive('withFederated')->andReturnSelf();
         $mockQuery->shouldReceive('where')->andReturnSelf();
-        $mockQuery->shouldReceive('count')->andReturn(0);
-        $mockQuery->shouldReceive('avg')->andReturn(null);
+        $mockQuery->shouldReceive('selectRaw')->andReturnSelf();
+        $mockQuery->shouldReceive('groupBy')->andReturnSelf();
+        $mockQuery->shouldReceive('first')->andReturn((object) ['total' => 0, 'average' => null]);
+        $mockQuery->shouldReceive('get')->andReturn(collect());
         $this->mockReview->shouldReceive('newQuery')->andReturn($mockQuery);
 
         $result = $this->service->getStats(999);
@@ -83,9 +91,13 @@ class ReviewServiceTest extends TestCase
 
     public function test_delete_sets_status_to_hidden(): void
     {
+        // delete() is a soft-delete: it sets $review->status = 'hidden' (which on
+        // an Eloquent model routes through setAttribute) and calls save().
+        // Expect exactly that attribute write — the previous `$review->status =
+        // 'approved'` line tripped an unexpected setAttribute('status','approved')
+        // call on the mock and asserted nothing useful.
         $review = Mockery::mock(Review::class);
-        $review->shouldReceive('setAttribute')->with('status', 'hidden');
-        $review->status = 'approved';
+        $review->shouldReceive('setAttribute')->once()->with('status', 'hidden');
         $review->shouldReceive('save')->once()->andReturn(true);
 
         $mockQuery = Mockery::mock();

@@ -39,8 +39,11 @@ class TenantServiceTest extends TestCase
 
     public function test_bootstrap_returns_tenant_and_settings(): void
     {
+        // Tenant is an Eloquent model: writing ->id routes through setAttribute()
+        // and reading ->id through getAttribute(). Stub those rather than assigning
+        // the property directly (which raises an unexpected setAttribute() call).
         $tenantModel = Mockery::mock(Tenant::class);
-        $tenantModel->id = 2;
+        $tenantModel->shouldReceive('getAttribute')->with('id')->andReturn(2);
         $tenantModel->shouldReceive('toArray')->andReturn(['id' => 2, 'name' => 'Test']);
 
         $builder = Mockery::mock(Builder::class);
@@ -65,7 +68,9 @@ class TenantServiceTest extends TestCase
         $builder = Mockery::mock(Builder::class);
         $builder->shouldReceive('where')->with('is_active', true)->andReturnSelf();
         $builder->shouldReceive('orderBy')->with('name')->andReturnSelf();
-        $builder->shouldReceive('get')->andReturn(collect([]));
+        // getAll() declares a return type of Eloquent\Collection, so the query
+        // builder must yield an Eloquent collection (not a base Support collection).
+        $builder->shouldReceive('get')->andReturn(new \Illuminate\Database\Eloquent\Collection([]));
 
         $this->mockTenant->shouldReceive('newQuery')->andReturn($builder);
 

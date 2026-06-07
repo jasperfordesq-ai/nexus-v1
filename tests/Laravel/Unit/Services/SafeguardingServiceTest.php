@@ -52,13 +52,21 @@ class SafeguardingServiceTest extends TestCase
 
     public function test_recordTraining_accepts_valid_types(): void
     {
+        // recordTraining() guards on activeUserBelongsToTenant() (a real
+        // User::where()->exists() Eloquent query that bypasses the DB facade),
+        // then inserts a real row. Seed an active user in the test tenant and
+        // run against the real DB rather than stubbing the brittle DB chain.
+        $userId = $this->seedActiveUser($this->testTenantId);
+
         $validTypes = ['children_first', 'vulnerable_adults', 'first_aid', 'manual_handling', 'other'];
         foreach ($validTypes as $type) {
-            DB::shouldReceive('table->insertGetId')->andReturn(1);
-            DB::shouldReceive('table->where->where->first')->andReturn((object) ['id' => 1]);
-
-            $result = $this->service->recordTraining(1, ['training_type' => $type, 'training_name' => 'Test'], $this->testTenantId);
-            $this->assertIsArray($result);
+            $result = $this->service->recordTraining(
+                $userId,
+                ['training_type' => $type, 'training_name' => 'Test'],
+                $this->testTenantId
+            );
+            $this->assertIsArray($result, "Valid training type '{$type}' should be accepted");
+            $this->assertSame($type, $result['training_type'] ?? null);
         }
     }
 
@@ -89,16 +97,30 @@ class SafeguardingServiceTest extends TestCase
 
     public function test_updateIncident_sets_resolved_at_for_closed_status(): void
     {
-        DB::shouldReceive('table->where->where->first')->andReturn((object) [
-            'reported_by' => 1,
-            'assigned_to' => null,
-            'severity' => 'low',
-        ]);
-        DB::shouldReceive('table->where->where->update')->once()->andReturn(1);
-        DB::shouldReceive('table->insert')->andReturn(true);
+        // updateIncident() now enforces a status state machine
+        // (INCIDENT_STATUS_TRANSITIONS): the current incident must be in a
+        // state from which the target status is reachable. 'open' -> 'resolved'
+        // is valid. Seed a real open incident and verify the transition + the
+        // resolved_at timestamp it sets. The notification side-effects are
+        // wrapped in try/catch inside the service so they cannot fail the call.
+        $reporterId = $this->seedActiveUser($this->testTenantId);
+        $incidentId = $this->seedIncident($this->testTenantId, $reporterId, 'open');
 
-        $result = $this->service->updateIncident(1, ['status' => 'resolved'], 1, $this->testTenantId);
+        $result = $this->service->updateIncident(
+            $incidentId,
+            ['status' => 'resolved'],
+            $reporterId,
+            $this->testTenantId
+        );
+
         $this->assertTrue($result);
+
+        $row = DB::table('vol_safeguarding_incidents')
+            ->where('id', $incidentId)
+            ->where('tenant_id', $this->testTenantId)
+            ->first();
+        $this->assertSame('resolved', $row->status);
+        $this->assertNotNull($row->resolved_at);
     }
 
     // ── getErrors ──
@@ -106,5 +128,42 @@ class SafeguardingServiceTest extends TestCase
     public function test_getErrors_initially_empty(): void
     {
         $this->assertEquals([], $this->service->getErrors());
+    }
+
+    // ── helpers ──
+
+    /**
+     * Seed an active user in the given tenant and return its id.
+     */
+    private function seedActiveUser(int $tenantId): int
+    {
+        return (int) DB::table('users')->insertGetId([
+            'tenant_id' => $tenantId,
+            'name' => 'Safeguarding Test User',
+            'first_name' => 'Safeguarding',
+            'last_name' => 'User',
+            'email' => 'safeguarding-' . uniqid('', true) . '@example.test',
+            'role' => 'member',
+            'status' => 'active',
+            'preferred_language' => 'en',
+            'created_at' => now(),
+        ]);
+    }
+
+    /**
+     * Seed a safeguarding incident in the given tenant and return its id.
+     */
+    private function seedIncident(int $tenantId, int $reporterId, string $status): int
+    {
+        return (int) DB::table('vol_safeguarding_incidents')->insertGetId([
+            'tenant_id' => $tenantId,
+            'reported_by' => $reporterId,
+            'incident_type' => 'concern',
+            'severity' => 'low',
+            'description' => 'Test incident',
+            'status' => $status,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 }

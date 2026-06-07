@@ -9,10 +9,13 @@ namespace Tests\Laravel\Unit\Services;
 use Tests\Laravel\TestCase;
 use App\Services\SearchLogService;
 use App\Models\SearchLog;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Mockery;
 
 class SearchLogServiceTest extends TestCase
 {
+    use DatabaseTransactions;
+
     private SearchLogService $service;
 
     protected function setUp(): void
@@ -25,17 +28,28 @@ class SearchLogServiceTest extends TestCase
 
     public function test_log_truncates_long_queries(): void
     {
-        SearchLog::shouldReceive('create')->once()->withArgs(function ($args) {
-            return strlen($args['query']) <= 500;
-        });
-
+        // log() persists via SearchLog::create() (HasTenantScope auto-fills tenant_id).
+        // Assert the stored query is truncated to 500 chars against the real DB.
         $longQuery = str_repeat('a', 600);
         $this->service->log($longQuery);
+
+        $stored = SearchLog::query()->latest('id')->first();
+        $this->assertNotNull($stored, 'log() should have persisted a SearchLog row');
+        $this->assertLessThanOrEqual(500, mb_strlen($stored->query));
     }
 
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
     public function test_log_does_not_throw_on_failure(): void
     {
-        SearchLog::shouldReceive('create')->andThrow(new \RuntimeException('fail'));
+        // log() must swallow any persistence error. Overload-mock the model so the
+        // static SearchLog::create() throws, proving the service's try/catch does
+        // not propagate the exception. Runs in a separate process because the
+        // overload alias replaces the real class for the whole process.
+        $mock = Mockery::mock('overload:' . SearchLog::class);
+        $mock->shouldReceive('create')->andThrow(new \RuntimeException('fail'));
 
         // Should not throw
         $this->service->log('test query');

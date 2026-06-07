@@ -63,7 +63,12 @@ class TenantContextTest extends TestCase
 
     public function test_getSlugPrefix_returns_empty_for_custom_domain_tenant(): void
     {
-        // hour-timebank (tenant 2) has custom domain hour-timebank.ie
+        // A tenant (id > 1) WITH a custom domain is identified by its domain,
+        // so it needs no slug prefix in URLs. Give tenant 2 a domain and assert ''.
+        \Illuminate\Support\Facades\DB::table('tenants')
+            ->where('id', $this->testTenantId)
+            ->update(['domain' => 'custom-domain-test.example']);
+
         TenantContext::setById($this->testTenantId);
         $prefix = TenantContext::getSlugPrefix();
         $this->assertSame('', $prefix);
@@ -71,10 +76,15 @@ class TenantContextTest extends TestCase
 
     public function test_getSlugPrefix_returns_slug_with_slash_for_tenant_without_domain(): void
     {
-        // public-sector-demo (tenant 3) has no custom domain
-        TenantContext::setById(3);
+        // A tenant WITHOUT a custom domain must carry its slug in URLs.
+        // Ensure tenant 2 (slug hour-timebank) has no domain, then assert '/<slug>'.
+        \Illuminate\Support\Facades\DB::table('tenants')
+            ->where('id', $this->testTenantId)
+            ->update(['domain' => null]);
+
+        TenantContext::setById($this->testTenantId);
         $prefix = TenantContext::getSlugPrefix();
-        $this->assertSame('/public-sector-demo', $prefix);
+        $this->assertSame('/hour-timebank', $prefix);
     }
 
     // -------------------------------------------------------

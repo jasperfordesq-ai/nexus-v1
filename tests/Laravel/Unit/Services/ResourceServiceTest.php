@@ -27,9 +27,14 @@ class ResourceServiceTest extends TestCase
 
     public function test_getAll_returns_paginated_structure(): void
     {
+        // getAll() fetches limit+1 rows, then serialises the page with
+        // $items->toArray() and only consults isNotEmpty()/last() when there is
+        // a next page. For an empty result set hasMore is false, so only count()
+        // and toArray() are exercised.
         $collection = Mockery::mock(\Illuminate\Database\Eloquent\Collection::class);
         $collection->shouldReceive('count')->andReturn(0);
         $collection->shouldReceive('isNotEmpty')->andReturn(false);
+        $collection->shouldReceive('toArray')->andReturn([]);
 
         $mockQuery = Mockery::mock();
         $mockQuery->shouldReceive('with')->andReturnSelf();
@@ -59,8 +64,14 @@ class ResourceServiceTest extends TestCase
 
     public function test_download_returns_file_path(): void
     {
-        $resource = Mockery::mock(ResourceItem::class);
-        $resource->file_path = '/uploads/test.pdf';
+        // download() increments the counter then returns $resource->file_path.
+        // On an Eloquent mock, reading file_path routes through getAttribute();
+        // assigning the property (as before) instead fired an unexpected
+        // setAttribute() on the strict mock.
+        // Model::increment() is protected in this Laravel version, so the mock
+        // must explicitly allow mocking protected methods.
+        $resource = Mockery::mock(ResourceItem::class)->shouldAllowMockingProtectedMethods();
+        $resource->shouldReceive('getAttribute')->with('file_path')->andReturn('/uploads/test.pdf');
         $resource->shouldReceive('increment')->with('downloads')->once();
 
         $mockQuery = Mockery::mock();

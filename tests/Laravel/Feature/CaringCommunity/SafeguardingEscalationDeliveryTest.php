@@ -9,13 +9,13 @@ declare(strict_types=1);
 namespace Tests\Laravel\Feature\CaringCommunity;
 
 use App\Core\TenantContext;
-use App\Mail\SafeguardingCriticalMail;
 use App\Services\CaringCommunity\SafeguardingService;
+use App\Services\EmailDispatchService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
+use Mockery;
 use Tests\Laravel\TestCase;
 
 /**
@@ -24,6 +24,13 @@ use Tests\Laravel\TestCase;
  *   2) email to coordinators holding `safeguarding.view`,
  *
  * with each coordinator's email rendered in their own preferred_language.
+ *
+ * NOTE: the service deliberately does NOT use Mail::to(...)->send($mailable)
+ * (the default Mail SMTP transport is unconfigured in prod and silently dropped
+ * every critical alert). It renders SafeguardingCriticalMail to HTML and
+ * dispatches through EmailDispatchService::sendRaw() — the platform mailer used
+ * by every other outbound email. These tests therefore spy on
+ * EmailDispatchService rather than Mail::fake().
  *
  * Failures in the email pipeline must not break report submission.
  */
@@ -108,9 +115,30 @@ class SafeguardingEscalationDeliveryTest extends TestCase
         }
     }
 
+    /**
+     * Bind a spy for EmailDispatchService that records every send() call's
+     * recipient + subject, and returns true (delivered). sendRaw() resolves the
+     * instance via app(EmailDispatchService::class), so this captures the real
+     * critical fan-out path.
+     *
+     * @return array<int,array{to:string,subject:string}> a reference array that
+     *         accumulates captured sends
+     */
+    private function spyEmailDispatch(array &$captured): void
+    {
+        $spy = Mockery::mock(EmailDispatchService::class);
+        $spy->shouldReceive('send')
+            ->andReturnUsing(function (string $to, string $subject, string $body, array $options = []) use (&$captured) {
+                $captured[] = ['to' => $to, 'subject' => $subject];
+                return true;
+            });
+        $this->app->instance(EmailDispatchService::class, $spy);
+    }
+
     public function test_critical_report_sends_email_to_coordinator(): void
     {
-        Mail::fake();
+        $captured = [];
+        $this->spyEmailDispatch($captured);
 
         $coordinator = $this->makeUser(self::TENANT_ID, 'coord.' . uniqid() . '@example.test', 'coordinator', 'en');
         if (!$this->grantSafeguardingView(self::TENANT_ID, $coordinator)) {
@@ -128,14 +156,18 @@ class SafeguardingEscalationDeliveryTest extends TestCase
             'description' => 'Urgent — please act now.',
         ]);
 
-        Mail::assertSent(SafeguardingCriticalMail::class, function ($mail) use ($coordinatorEmail) {
-            return $mail->hasTo($coordinatorEmail);
-        });
+        $recipients = array_column($captured, 'to');
+        $this->assertContains(
+            $coordinatorEmail,
+            $recipients,
+            'Critical report must dispatch an email to the safeguarding.view coordinator.'
+        );
     }
 
     public function test_recipient_locale_is_honored_during_render(): void
     {
-        Mail::fake();
+        $captured = [];
+        $this->spyEmailDispatch($captured);
 
         $coordinator = $this->makeUser(self::TENANT_ID, 'coord_de.' . uniqid() . '@example.test', 'coordinator', 'de');
         if (!$this->grantSafeguardingView(self::TENANT_ID, $coordinator)) {
@@ -158,21 +190,23 @@ class SafeguardingEscalationDeliveryTest extends TestCase
         // 1) Caller locale restored — proves the wrapper executed and ran finally{}.
         $this->assertSame('en', App::getLocale(), 'Caller locale must be restored after fan-out.');
 
-        // 2) Mailable was dispatched to the German-speaking coordinator.
-        Mail::assertSent(SafeguardingCriticalMail::class, function ($mail) use ($coordinator) {
-            $email = (string) DB::table('users')->where('id', $coordinator)->value('email');
-            return $mail->hasTo($email);
-        });
+        // 2) Email was dispatched to the German-speaking coordinator.
+        $coordinatorEmail = (string) DB::table('users')->where('id', $coordinator)->value('email');
+        $this->assertContains(
+            $coordinatorEmail,
+            array_column($captured, 'to'),
+            'Critical report must dispatch an email to the German-speaking coordinator.'
+        );
     }
 
     public function test_mail_failure_does_not_break_report_submission(): void
     {
-        // Force the mail layer to throw on every send.
-        Mail::shouldReceive('to')->andThrow(new \RuntimeException('SMTP down'));
-        // Some Laravel call paths resolve `mailer` first; cover both.
-        Mail::shouldReceive('mailer')->andReturnUsing(function () {
-            throw new \RuntimeException('SMTP down');
-        });
+        // Force the platform mailer (the real critical-alert delivery path) to
+        // throw on every send. fanOutCriticalNotification wraps each send in a
+        // per-recipient try/catch, so submitReport must still succeed.
+        $failingMailer = Mockery::mock(EmailDispatchService::class);
+        $failingMailer->shouldReceive('send')->andThrow(new \RuntimeException('SMTP down'));
+        $this->app->instance(EmailDispatchService::class, $failingMailer);
 
         $coordinator = $this->makeUser(self::TENANT_ID, 'coord_fail.' . uniqid() . '@example.test', 'coordinator', 'en');
         $this->grantSafeguardingView(self::TENANT_ID, $coordinator);
