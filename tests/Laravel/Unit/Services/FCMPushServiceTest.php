@@ -114,21 +114,32 @@ class FCMPushServiceTest extends TestCase
 
     public function test_unregisterDevice_returns_true_when_token_deleted(): void
     {
-        DB::shouldReceive('table->where->delete')->andReturn(1);
+        // unregisterDevice chains ->where('token')->where('tenant_id')
+        // (tenant-scoped delete) before ->delete().
+        $query = \Mockery::mock();
+        $query->shouldReceive('where')->andReturnSelf();
+        $query->shouldReceive('delete')->andReturn(1);
+        DB::shouldReceive('table')->with('fcm_device_tokens')->andReturn($query);
 
         $this->assertTrue($this->service->unregisterDevice('token123'));
     }
 
     public function test_unregisterDevice_returns_false_when_token_not_found(): void
     {
-        DB::shouldReceive('table->where->delete')->andReturn(0);
+        $query = \Mockery::mock();
+        $query->shouldReceive('where')->andReturnSelf();
+        $query->shouldReceive('delete')->andReturn(0);
+        DB::shouldReceive('table')->with('fcm_device_tokens')->andReturn($query);
 
         $this->assertFalse($this->service->unregisterDevice('nonexistent'));
     }
 
     public function test_unregisterDevice_returns_false_on_exception(): void
     {
-        DB::shouldReceive('table->where->delete')->andThrow(new \Exception('DB error'));
+        $query = \Mockery::mock();
+        $query->shouldReceive('where')->andReturnSelf();
+        $query->shouldReceive('delete')->andThrow(new \Exception('DB error'));
+        DB::shouldReceive('table')->with('fcm_device_tokens')->andReturn($query);
         Log::shouldReceive('error')->once();
 
         $this->assertFalse($this->service->unregisterDevice('token123'));

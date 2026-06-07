@@ -97,11 +97,17 @@ class EnsureIsSuperAdminTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function test_handle_tenant_super_admin_passes_through(): void
+    public function test_handle_tenant_super_admin_returns_403(): void
     {
+        // Platform-level routes intentionally reject tenant super-admins:
+        // a tenant-scoped admin must NOT gain cross-tenant platform access.
+        // See EnsureIsSuperAdmin docblock — use the 'admin' middleware for
+        // within-tenant operations instead.
         $user = User::factory()->create([
             'tenant_id' => $this->testTenantId,
             'is_tenant_super_admin' => true,
+            'is_super_admin' => false,
+            'is_god' => false,
         ]);
 
         $request = Request::create('/api/v2/super-admin/tenants', 'GET');
@@ -109,7 +115,9 @@ class EnsureIsSuperAdminTest extends TestCase
 
         $response = $this->middleware->handle($request, $this->makeNext());
 
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(403, $response->getStatusCode());
+        $data = $response->getData(true);
+        $this->assertEquals('forbidden', $data['errors'][0]['code']);
     }
 
     public function test_handle_god_user_passes_through(): void

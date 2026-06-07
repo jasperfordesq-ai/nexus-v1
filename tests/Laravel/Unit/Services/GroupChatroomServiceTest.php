@@ -23,7 +23,7 @@ class GroupChatroomServiceTest extends TestCase
     public function test_getChatrooms_returns_array(): void
     {
         $rows = collect([
-            (object) ['id' => 1, 'group_id' => 1, 'name' => 'General', 'description' => null, 'is_default' => 1, 'created_by' => 5, 'created_at' => '2026-01-01'],
+            (object) ['id' => 1, 'group_id' => 1, 'name' => 'General', 'description' => null, 'category' => null, 'is_default' => 1, 'is_private' => 0, 'created_by' => 5, 'created_at' => '2026-01-01'],
         ]);
 
         DB::shouldReceive('table->where->where->orderByDesc->orderBy->get')->andReturn($rows);

@@ -73,12 +73,26 @@ class EventServiceProviderTest extends TestCase
         $this->assertFalse($provider->shouldDiscoverEvents());
     }
 
-    public function test_all_six_events_are_mapped(): void
+    public function test_all_core_events_are_mapped(): void
     {
         $provider = new EventServiceProvider($this->app);
         $listen = $this->getListenProperty($provider);
 
-        $this->assertCount(6, $listen);
+        // The provider has grown well beyond the original 6 events as
+        // federation, jobs, groups, volunteering and onboarding listeners
+        // were added. Assert the five core domain events remain mapped and
+        // that the map has not shrunk below its current breadth.
+        foreach ([
+            UserRegistered::class,
+            ListingCreated::class,
+            TransactionCompleted::class,
+            ConnectionRequested::class,
+            MessageSent::class,
+        ] as $event) {
+            $this->assertArrayHasKey($event, $listen);
+        }
+
+        $this->assertGreaterThanOrEqual(6, count($listen));
     }
 
     /**

@@ -465,6 +465,10 @@ class FederationInboundHandlersTest extends TestCase
     public function test_external_webhook_delivery_paths_keep_explicit_tenant_predicates(): void
     {
         $source = file_get_contents(app_path('Http/Controllers/Api/FederationExternalWebhookController.php'));
+        // Normalise line endings — the controller is checked out with CRLF on
+        // Windows, but the needles below are written with LF, so the multi-line
+        // substring checks would never match without this.
+        $source = str_replace("\r\n", "\n", $source);
 
         $this->assertStringContainsString("->where('tenant_id', \$tenantId)\n            ->where('external_partner_id', \$partner->id)", $source);
         $this->assertStringContainsString("->where('id', \$existing->id)\n                ->where('tenant_id', \$tenantId)", $source);
@@ -528,7 +532,12 @@ class FederationInboundHandlersTest extends TestCase
         ];
 
         $failingMailer = $this->fakeEmailDispatchService(false);
-        $this->postWebhook('connection.requested', $payload)->assertStatus(500);
+        // The connection listener now fails the email gracefully (persists
+        // email_failed_at / email_last_error, does NOT throw) so the inbound
+        // webhook still ACKs 200 — throwing would retry the queued listener and
+        // re-fire the bell/push side-effects. The failure is recorded for a
+        // later replay/sweep to repair, which the assertions below verify.
+        $this->postWebhook('connection.requested', $payload)->assertStatus(200);
 
         $connection = DB::table('federation_inbound_connections')
             ->where('external_partner_id', $this->partnerId)

@@ -62,15 +62,27 @@ class FederationCreditServiceTest extends TestCase
 
     public function test_approveAgreement_succeeds(): void
     {
-        // Test tenant is 2; give an agreement where tenant 2 is a party
+        // Test tenant is 2; give an agreement where tenant 2 is a party.
+        // approveAgreement() now does a two-party approval:
+        //   1) selectOne — load the pending agreement
+        //   2) update    — record this party's approval column
+        //   3) selectOne — reload to see whether BOTH parties have approved
+        // Only when both approved_by_from and approved_by_to are set does it
+        // flip status to 'active'. Simulate the other party having already
+        // approved so this approval completes the agreement.
         $agreement = (object) [
             'id' => 1,
             'status' => 'pending',
             'from_tenant_id' => 2,
             'to_tenant_id' => 3,
         ];
-        DB::shouldReceive('selectOne')->andReturn($agreement);
-        DB::shouldReceive('update')->once();
+        $reloaded = (object) [
+            'approved_by_from' => 5,
+            'approved_by_to'   => 9,
+            'status'           => 'pending',
+        ];
+        DB::shouldReceive('selectOne')->andReturn($agreement, $reloaded);
+        DB::shouldReceive('update')->andReturn(1);
         Log::shouldReceive('info')->zeroOrMoreTimes();
         Log::shouldReceive('error')->zeroOrMoreTimes();
 

@@ -42,7 +42,7 @@ class GroupQAServiceTest extends TestCase
     {
         try {
             $svc = new GroupQAService();
-            $result = $svc->listQuestions(0);
+            $result = $svc->listQuestions(0, 0);
             $this->assertIsArray($result);
         } catch (\TypeError $e) {
             $this->fail('TypeError: ' . $e->getMessage());

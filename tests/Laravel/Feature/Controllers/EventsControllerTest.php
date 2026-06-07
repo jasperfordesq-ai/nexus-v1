@@ -109,14 +109,17 @@ class EventsControllerTest extends TestCase
     }
 
     // ================================================================
-    // INDEX — Authentication required
+    // INDEX — Public (no auth required)
     // ================================================================
 
-    public function test_index_returns_401_without_auth(): void
+    public function test_index_is_public_without_auth(): void
     {
+        // GET /v2/events is intentionally public (->withoutMiddleware('auth:sanctum')
+        // in routes/api.php) — community event listings are browsable by anyone,
+        // consistent with the public show/nearby/attendees endpoints.
         $response = $this->apiGet('/v2/events');
 
-        $this->assertContains($response->getStatusCode(), [401, 403]);
+        $response->assertStatus(200);
     }
 
     // ================================================================

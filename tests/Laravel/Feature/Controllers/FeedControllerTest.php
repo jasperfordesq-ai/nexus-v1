@@ -274,11 +274,14 @@ class FeedControllerTest extends TestCase
 
     public function test_hide_post_succeeds_with_valid_post_id(): void
     {
-        $this->authenticatedUser();
+        $user = $this->authenticatedUser();
 
-        // Create the user_hidden_posts table expectation - the endpoint uses insertOrIgnore
+        // hidePost() now verifies the post exists and belongs to the tenant
+        // (IDOR prevention), so seed a real feed_posts row for this tenant.
+        $postId = $this->createFeedPost($user->id);
+
         $response = $this->apiPost('/feed/hide', [
-            'post_id' => 1,
+            'post_id' => $postId,
         ]);
 
         $response->assertStatus(200);

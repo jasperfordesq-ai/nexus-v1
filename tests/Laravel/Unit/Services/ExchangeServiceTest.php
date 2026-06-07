@@ -95,7 +95,10 @@ class ExchangeServiceTest extends TestCase
             })
             ->andReturn(1);
 
-        $this->service->create(5, 1, ['proposed_hours' => 100]);
+        // The withArgs() callback above asserts the clamp (0.25 <= hours <= 24);
+        // assert the returned id explicitly so PHPUnit doesn't flag this risky.
+        $result = $this->service->create(5, 1, ['proposed_hours' => 100]);
+        $this->assertEquals(1, $result);
     }
 
     // =========================================================================

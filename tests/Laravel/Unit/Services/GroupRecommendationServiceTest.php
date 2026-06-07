@@ -9,6 +9,7 @@ namespace Tests\Laravel\Unit\Services;
 use Tests\Laravel\TestCase;
 use App\Services\GroupRecommendationService;
 use Illuminate\Support\Facades\DB;
+use Mockery;
 
 class GroupRecommendationServiceTest extends TestCase
 {

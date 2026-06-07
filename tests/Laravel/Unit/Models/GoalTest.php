@@ -25,6 +25,8 @@ class GoalTest extends TestCase
         $expected = [
             'tenant_id', 'user_id', 'title', 'description',
             'deadline', 'is_public', 'status', 'mentor_id',
+            'current_value', 'target_value', 'checkin_frequency',
+            'last_checkin_at', 'completed_at', 'template_id',
         ];
         $this->assertEquals($expected, $model->getFillable());
     }

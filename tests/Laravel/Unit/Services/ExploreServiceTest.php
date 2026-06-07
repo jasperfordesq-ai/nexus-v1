@@ -552,8 +552,11 @@ class ExploreServiceTest extends TestCase
         DB::shouldReceive('selectOne')->andThrow(new \RuntimeException('DB down'));
         DB::shouldReceive('table')->andThrow(new \RuntimeException('DB down'));
 
-        // Expect warning logs for each failed section
+        // Failed sections log via debug/warning/error depending on the path
+        // (cache-miss debug lines, section warnings, community-stats errors).
+        Log::shouldReceive('debug')->zeroOrMoreTimes();
         Log::shouldReceive('warning')->zeroOrMoreTimes();
+        Log::shouldReceive('error')->zeroOrMoreTimes();
 
         Cache::shouldReceive('put')->zeroOrMoreTimes();
 

@@ -35,7 +35,9 @@ class GamificationServiceTest extends TestCase
 
     public function test_level_thresholds_has_10_levels(): void
     {
-        $this->assertCount(10, GamificationService::LEVEL_THRESHOLDS);
+        // V1 LEVEL_THRESHOLDS is the 25-level legacy system (preserved as fallback).
+        // The 10 named levels live in LEVEL_THRESHOLDS_V2 (gamification redesign).
+        $this->assertCount(10, GamificationService::LEVEL_THRESHOLDS_V2);
     }
 
     // Static methods use Eloquent models extensively

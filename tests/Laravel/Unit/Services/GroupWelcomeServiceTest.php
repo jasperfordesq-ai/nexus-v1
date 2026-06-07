@@ -113,8 +113,8 @@ class GroupWelcomeServiceTest extends TestCase
         DB::shouldReceive('table')->with('notifications')->once()->andReturnSelf();
         DB::shouldReceive('insert')->once()
             ->withArgs(function ($data) {
-                return str_contains($data['content'], 'Alice')
-                    && str_contains($data['content'], 'Timebank');
+                return str_contains($data['message'], 'Alice')
+                    && str_contains($data['message'], 'Timebank');
             })
             ->andReturn(true);
 

@@ -37,6 +37,10 @@ class FederationUserServiceTest extends TestCase
             'service_reach' => 'remote_ok',
             'travel_radius_km' => 50,
         ];
+        // getUserSettings() now first calls userBelongsToCurrentTenant(), which runs
+        // DB::table('users')->where('id', …)->where('tenant_id', …)->exists().
+        // Stub that chain to true so execution proceeds to the settings lookup.
+        DB::shouldReceive('table->where->where->exists')->andReturn(true);
         DB::shouldReceive('table->where->first')->andReturn($row);
 
         $result = FederationUserService::getUserSettings(1);

@@ -180,9 +180,9 @@ class GuardianConsentServiceTest extends TestCase
 
     public function test_withdrawConsent_succeeds(): void
     {
-        $consent = (object) ['id' => 1];
+        $consent = (object) ['id' => 1, 'minor_user_id' => 5];
         DB::shouldReceive('table->where->where->where->first')->andReturn($consent);
-        DB::shouldReceive('table->where->update')->once();
+        DB::shouldReceive('table->where->where->update')->once();
 
         $this->assertTrue(GuardianConsentService::withdrawConsent(1, 5));
     }

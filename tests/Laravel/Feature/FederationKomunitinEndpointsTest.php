@@ -266,6 +266,9 @@ class FederationKomunitinEndpointsTest extends TestCase
         $payer = \App\Models\User::factory()->forTenant($this->testTenantId)->create([
             'balance' => 1.00, // only enough for one 1h transfer
             'status'  => 'active',
+            // createTransfer() now requires the payer to have opted into federation
+            // before their balance may be debited (federation consent gate).
+            'federation_optin' => 1,
         ]);
         $payee = \App\Models\User::factory()->forTenant($this->testTenantId)->create([
             'balance' => 0.00,

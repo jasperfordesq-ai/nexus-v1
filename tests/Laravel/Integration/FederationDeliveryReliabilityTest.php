@@ -65,22 +65,23 @@ class FederationDeliveryReliabilityTest extends TestCase
 
         $listener = new HandleFederatedReviewReceived();
 
-        try {
-            $listener->handle(new FederatedReviewReceived(
-                $tenantId,
-                12345,
-                $reviewId,
-                [
-                    'receiver_id' => (int) $receiver->id,
-                    'rating' => 5,
-                    'comment' => 'Federated review delivery regression',
-                ]
-            ));
-
-            $this->fail('Expected failed federated review email delivery to throw for queue retry.');
-        } catch (\RuntimeException $e) {
-            $this->assertSame('Federated review email dispatch returned false', $e->getMessage());
-        }
+        // On email-dispatch failure the listener deliberately does NOT throw:
+        // it is a ShouldQueue listener, so throwing would retry the whole job and
+        // re-fire the bell/push side-effects (duplicate-notification risk) and,
+        // under the sync queue, 500 the federated-review ingest. Instead it
+        // persists the failure (email_failed_at / email_last_error) and clears
+        // email_claimed_at so a background sweep can retry the email alone. The
+        // post-conditions below assert that retryable state.
+        $listener->handle(new FederatedReviewReceived(
+            $tenantId,
+            12345,
+            $reviewId,
+            [
+                'receiver_id' => (int) $receiver->id,
+                'rating' => 5,
+                'comment' => 'Federated review delivery regression',
+            ]
+        ));
 
         $review = DB::table('reviews')->where('id', $reviewId)->where('tenant_id', $tenantId)->first();
         $this->assertNull($review->email_sent_at);

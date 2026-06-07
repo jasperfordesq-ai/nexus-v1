@@ -774,7 +774,7 @@ class GdprServiceTest extends \Tests\Laravel\TestCase
         $html = $method->invoke($this->service, $data);
 
         $this->assertStringContainsString('<!DOCTYPE html>', $html);
-        $this->assertStringContainsString('<title>Your Data Export - NEXUS</title>', $html);
+        $this->assertStringContainsString('<title>Your Data Export — Project NEXUS</title>', $html);
         $this->assertStringContainsString('2026-02-19T10:00:00+00:00', $html);
         $this->assertStringContainsString('</html>', $html);
     }
