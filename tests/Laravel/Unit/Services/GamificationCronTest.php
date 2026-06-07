@@ -32,23 +32,27 @@ class GamificationCronTest extends \Tests\Laravel\TestCase
     // =========================================================================
 
     /**
-     * Test that checkExpiredStreaks method exists and is static
+     * Test that recordActivity (the cron-relevant activity recorder) is static.
+     *
+     * The current StreakService exposes recordActivity(tenantId, userId) rather
+     * than the older checkExpiredStreaks/resetWeeklyFreezes cron helpers; streak
+     * expiry is computed lazily on read (see getStreak / updateStreak).
      */
-    public function testCheckExpiredStreaksMethodIsStatic(): void
+    public function testRecordActivityMethodIsStatic(): void
     {
-        $ref = new \ReflectionMethod(StreakService::class, 'checkExpiredStreaks');
-        $this->assertTrue($ref->isStatic(), 'checkExpiredStreaks should be a static method');
-        $this->assertTrue($ref->isPublic(), 'checkExpiredStreaks should be public');
+        $ref = new \ReflectionMethod(StreakService::class, 'recordActivity');
+        $this->assertTrue($ref->isStatic(), 'recordActivity should be a static method');
+        $this->assertTrue($ref->isPublic(), 'recordActivity should be public');
     }
 
     /**
-     * Test that resetWeeklyFreezes method exists and is static
+     * Test that getStreakLeaderboard (used by cron-driven leaderboards) is static.
      */
-    public function testResetWeeklyFreezesMethodIsStatic(): void
+    public function testGetStreakLeaderboardMethodIsStatic(): void
     {
-        $ref = new \ReflectionMethod(StreakService::class, 'resetWeeklyFreezes');
-        $this->assertTrue($ref->isStatic(), 'resetWeeklyFreezes should be a static method');
-        $this->assertTrue($ref->isPublic(), 'resetWeeklyFreezes should be public');
+        $ref = new \ReflectionMethod(StreakService::class, 'getStreakLeaderboard');
+        $this->assertTrue($ref->isStatic(), 'getStreakLeaderboard should be a static method');
+        $this->assertTrue($ref->isPublic(), 'getStreakLeaderboard should be public');
     }
 
     /**
@@ -66,22 +70,38 @@ class GamificationCronTest extends \Tests\Laravel\TestCase
     }
 
     /**
-     * Test recordActivity rejects invalid streak types
+     * Test recordActivity signature accepts (tenantId, userId).
+     *
+     * The streak type is fixed to 'activity' internally; updateStreak() guards
+     * against unknown types via the STREAK_TYPES whitelist.
      */
-    public function testRecordActivityRejectsInvalidStreakType(): void
+    public function testRecordActivityAcceptsTenantAndUser(): void
     {
-        // Invalid streak type should return false without touching DB
-        $result = StreakService::recordActivity(1, 'invalid_type');
-        $this->assertFalse($result, 'Invalid streak type should return false');
+        $ref = new \ReflectionMethod(StreakService::class, 'recordActivity');
+        $params = $ref->getParameters();
+
+        $this->assertCount(2, $params, 'recordActivity should accept tenantId and userId');
+        $this->assertEquals('tenantId', $params[0]->getName());
+        $this->assertEquals('userId', $params[1]->getName());
+        $this->assertEquals('bool', (string) $ref->getReturnType(), 'recordActivity should return bool');
     }
 
     /**
-     * Test recordActivity rejects empty streak type
+     * Test that the private updateStreak guards against unknown streak types.
+     *
+     * Only the four whitelisted STREAK_TYPES are valid; anything else returns
+     * false without touching the database.
      */
-    public function testRecordActivityRejectsEmptyStreakType(): void
+    public function testUpdateStreakRejectsInvalidStreakType(): void
     {
-        $result = StreakService::recordActivity(1, '');
-        $this->assertFalse($result, 'Empty streak type should return false');
+        $ref = new \ReflectionMethod(StreakService::class, 'updateStreak');
+        $ref->setAccessible(true);
+
+        $result = $ref->invoke(null, 1, 'invalid_type');
+        $this->assertFalse($result, 'Invalid streak type should return false');
+
+        $resultEmpty = $ref->invoke(null, 1, '');
+        $this->assertFalse($resultEmpty, 'Empty streak type should return false');
     }
 
     /**
@@ -164,27 +184,25 @@ class GamificationCronTest extends \Tests\Laravel\TestCase
     }
 
     /**
-     * Test recordGiving delegates to recordActivity with 'giving' type
+     * Test that 'giving' is a recognised streak type for cron processing.
+     *
+     * There is no dedicated recordGiving() alias on the current service; giving
+     * streaks are recorded through the generic updateStreak('giving') path.
      */
-    public function testRecordGivingIsAliasForRecordActivityGiving(): void
+    public function testGivingIsARecognisedStreakType(): void
     {
-        $ref = new \ReflectionMethod(StreakService::class, 'recordGiving');
-        $this->assertTrue($ref->isStatic(), 'recordGiving should be static');
-
-        $params = $ref->getParameters();
-        $this->assertCount(1, $params, 'recordGiving should only accept userId');
+        $this->assertContains('giving', StreakService::STREAK_TYPES);
     }
 
     /**
-     * Test recordVolunteer delegates to recordActivity with 'volunteer' type
+     * Test that 'volunteer' is a recognised streak type for cron processing.
+     *
+     * There is no dedicated recordVolunteer() alias on the current service;
+     * volunteer streaks are recorded through updateStreak('volunteer').
      */
-    public function testRecordVolunteerIsAliasForRecordActivityVolunteer(): void
+    public function testVolunteerIsARecognisedStreakType(): void
     {
-        $ref = new \ReflectionMethod(StreakService::class, 'recordVolunteer');
-        $this->assertTrue($ref->isStatic(), 'recordVolunteer should be static');
-
-        $params = $ref->getParameters();
-        $this->assertCount(1, $params, 'recordVolunteer should only accept userId');
+        $this->assertContains('volunteer', StreakService::STREAK_TYPES);
     }
 
     // =========================================================================
@@ -192,32 +210,50 @@ class GamificationCronTest extends \Tests\Laravel\TestCase
     // =========================================================================
 
     /**
-     * Test daily XP reward constants are reasonable
+     * Test daily XP reward base constant is reasonable.
+     *
+     * The current service stores configuration in the private BASE_XP constant
+     * and a STREAK_BONUSES milestone map (read via getRewardConfig()).
      */
     public function testDailyRewardConstantsAreReasonable(): void
     {
-        $this->assertGreaterThan(0, DailyRewardService::DAILY_XP_BASE, 'Base XP should be positive');
-        $this->assertGreaterThan(0, DailyRewardService::DAILY_XP_STREAK_BONUS, 'Streak bonus should be positive');
-        $this->assertGreaterThan(0, DailyRewardService::DAILY_XP_MAX_BONUS, 'Max bonus should be positive');
+        $config = DailyRewardService::getRewardConfig(2);
+
+        $this->assertGreaterThan(0, $config['base_xp'], 'Base XP should be positive');
+        $this->assertIsArray($config['streak_bonuses'], 'Streak bonuses should be a map');
+        $this->assertNotEmpty($config['streak_bonuses'], 'Streak bonuses should not be empty');
+        $this->assertGreaterThan(0, $config['max_streak_bonus'], 'Max streak bonus should be positive');
         $this->assertGreaterThanOrEqual(
-            DailyRewardService::DAILY_XP_STREAK_BONUS,
-            DailyRewardService::DAILY_XP_MAX_BONUS,
-            'Max bonus should be >= streak bonus per day'
+            min($config['streak_bonuses']),
+            $config['max_streak_bonus'],
+            'Max bonus should be >= the smallest milestone bonus'
         );
     }
 
     /**
-     * Test milestone bonus constants exist and increase progressively
+     * Test milestone streak bonuses increase progressively with streak length.
+     *
+     * STREAK_BONUSES is keyed by streak day; longer streaks award larger bonuses.
      */
     public function testMilestoneBonusesIncreaseProgressively(): void
     {
-        $this->assertGreaterThan(0, DailyRewardService::WEEKLY_BONUS_XP, 'Weekly bonus should be positive');
-        $this->assertGreaterThan(0, DailyRewardService::MONTHLY_BONUS_XP, 'Monthly bonus should be positive');
-        $this->assertGreaterThan(
-            DailyRewardService::WEEKLY_BONUS_XP,
-            DailyRewardService::MONTHLY_BONUS_XP,
-            'Monthly bonus should be greater than weekly'
-        );
+        $bonuses = DailyRewardService::getRewardConfig(2)['streak_bonuses'];
+
+        // Keys (streak days) ascending should yield non-decreasing bonus values.
+        ksort($bonuses);
+        $previous = 0;
+        foreach ($bonuses as $day => $bonus) {
+            $this->assertGreaterThan(0, $bonus, "Milestone bonus for day {$day} should be positive");
+            $this->assertGreaterThanOrEqual(
+                $previous,
+                $bonus,
+                "Milestone bonus for day {$day} should be >= the previous milestone"
+            );
+            $previous = $bonus;
+        }
+
+        // Sanity: the longest milestone awards strictly more than the shortest.
+        $this->assertGreaterThan(min($bonuses), max($bonuses), 'Largest milestone should exceed smallest');
     }
 
     /**
@@ -293,13 +329,16 @@ class GamificationCronTest extends \Tests\Laravel\TestCase
     }
 
     /**
-     * Test checkMembershipBadges exists for cron-triggered membership duration checks
+     * Test checkMembershipBadges exists for cron-triggered membership duration checks.
+     *
+     * It is a private static helper invoked from runAllBadgeChecks() (the public
+     * cron entry point), so it is correctly not part of the public API.
      */
     public function testCheckMembershipBadgesMethodExists(): void
     {
         $ref = new \ReflectionMethod(GamificationService::class, 'checkMembershipBadges');
         $this->assertTrue($ref->isStatic(), 'checkMembershipBadges should be static');
-        $this->assertTrue($ref->isPublic(), 'checkMembershipBadges should be public');
+        $this->assertTrue($ref->isPrivate(), 'checkMembershipBadges is a private helper of runAllBadgeChecks');
     }
 
     /**
@@ -341,18 +380,21 @@ class GamificationCronTest extends \Tests\Laravel\TestCase
     }
 
     /**
-     * Test getActionTypes returns expected challenge action types
+     * Test getChallengesWithProgress exists for cron/dashboard progress reporting.
+     *
+     * The current service has no fixed getActionTypes() catalogue — action_type
+     * is a free-form column matched directly in updateProgress(). Progress
+     * reporting is exposed via getChallengesWithProgress(userId).
      */
-    public function testGetActionTypesReturnsExpectedTypes(): void
+    public function testGetChallengesWithProgressMethodIsStatic(): void
     {
-        $types = ChallengeService::getActionTypes();
+        $ref = new \ReflectionMethod(ChallengeService::class, 'getChallengesWithProgress');
+        $this->assertTrue($ref->isStatic(), 'getChallengesWithProgress should be static');
+        $this->assertTrue($ref->isPublic(), 'getChallengesWithProgress should be public');
 
-        $this->assertIsArray($types);
-        $this->assertNotEmpty($types);
-        $this->assertArrayHasKey('transaction', $types, 'Should include transaction action type');
-        $this->assertArrayHasKey('login', $types, 'Should include login action type for daily cron');
-        $this->assertArrayHasKey('volunteer_hours', $types, 'Should include volunteer_hours action type');
-        $this->assertArrayHasKey('credits_sent', $types, 'Should include credits_sent action type');
+        $params = $ref->getParameters();
+        $this->assertCount(1, $params, 'getChallengesWithProgress should accept userId');
+        $this->assertEquals('userId', $params[0]->getName());
     }
 
     /**
@@ -380,20 +422,27 @@ class GamificationCronTest extends \Tests\Laravel\TestCase
         $this->assertTrue($ref->isPublic());
 
         $params = $ref->getParameters();
-        $this->assertCount(1, $params, 'create should accept a data array');
+        $this->assertCount(2, $params, 'create should accept tenantId and a data array');
+        $this->assertEquals('tenantId', $params[0]->getName());
+        $this->assertEquals('data', $params[1]->getName());
     }
 
     /**
-     * Test challenge stats method exists for monitoring expired challenges
+     * Test getById exists for monitoring/inspecting individual challenges.
+     *
+     * The current service has no getStats() aggregate; per-challenge state is
+     * read via getById(id, tenantId).
      */
-    public function testGetStatsMethodExists(): void
+    public function testGetByIdMethodExists(): void
     {
-        $ref = new \ReflectionMethod(ChallengeService::class, 'getStats');
+        $ref = new \ReflectionMethod(ChallengeService::class, 'getById');
         $this->assertTrue($ref->isStatic());
         $this->assertTrue($ref->isPublic());
 
         $params = $ref->getParameters();
-        $this->assertCount(1, $params, 'getStats should accept challengeId');
+        $this->assertCount(2, $params, 'getById should accept id and tenantId');
+        $this->assertEquals('id', $params[0]->getName());
+        $this->assertEquals('tenantId', $params[1]->getName());
     }
 
     // =========================================================================
@@ -416,9 +465,14 @@ class GamificationCronTest extends \Tests\Laravel\TestCase
         // Level 3: 300 XP
         $this->assertEquals(3, GamificationService::calculateLevel(300));
 
-        // Max level (10): 5500 XP
+        // Level 10: 5500 XP (boundary in the V1 LEVEL_THRESHOLDS table)
         $this->assertEquals(10, GamificationService::calculateLevel(5500));
-        $this->assertEquals(10, GamificationService::calculateLevel(99999));
+
+        // Beyond the highest defined threshold caps at the max level.
+        $maxLevel = max(array_keys(GamificationService::LEVEL_THRESHOLDS));
+        $maxThreshold = GamificationService::LEVEL_THRESHOLDS[$maxLevel];
+        $this->assertEquals($maxLevel, GamificationService::calculateLevel($maxThreshold));
+        $this->assertEquals($maxLevel, GamificationService::calculateLevel($maxThreshold + 1_000_000));
     }
 
     /**

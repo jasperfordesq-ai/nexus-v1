@@ -37,16 +37,19 @@ class BalanceAlertCronTest extends \Tests\Laravel\TestCase
     }
 
     /**
-     * Test all cron-related methods exist and are static
+     * Test all cron-related public methods exist and are public instance methods.
+     *
+     * The service is dependency-injectable (instance methods, not static); the
+     * scheduler resolves it from the container. getBalanceStatus was removed in
+     * the refactor — balance classification now lives inline in checkBalance.
      */
-    public function testCronRelatedMethodsExistAndAreStatic(): void
+    public function testCronRelatedMethodsExistAndArePublicInstance(): void
     {
         $methods = [
             'checkAllBalances',
             'checkBalance',
             'getThresholds',
             'setThresholds',
-            'getBalanceStatus',
             'areAlertsEnabled',
         ];
 
@@ -58,19 +61,22 @@ class BalanceAlertCronTest extends \Tests\Laravel\TestCase
                 "Method {$methodName} should exist"
             );
             $method = $ref->getMethod($methodName);
-            $this->assertTrue($method->isStatic(), "{$methodName} should be static");
+            $this->assertFalse($method->isStatic(), "{$methodName} should be an instance method");
             $this->assertTrue($method->isPublic(), "{$methodName} should be public");
         }
     }
 
     /**
-     * Test private helper methods exist
+     * Test private helper methods exist.
+     *
+     * In the refactored service, recordAlert + sendBalanceAlert were consolidated
+     * into sendAndRecordAlert(), and sendAlertEmail was renamed sendBalanceAlertEmail.
      */
     public function testPrivateHelperMethodsExist(): void
     {
         $ref = new \ReflectionClass(BalanceAlertService::class);
 
-        $privateMethods = ['hasAlertedToday', 'recordAlert', 'sendBalanceAlert', 'sendAlertEmail'];
+        $privateMethods = ['hasAlertedToday', 'sendAndRecordAlert', 'sendBalanceAlertEmail'];
         foreach ($privateMethods as $methodName) {
             $this->assertTrue(
                 $ref->hasMethod($methodName),
@@ -78,7 +84,7 @@ class BalanceAlertCronTest extends \Tests\Laravel\TestCase
             );
             $method = $ref->getMethod($methodName);
             $this->assertTrue($method->isPrivate(), "{$methodName} should be private");
-            $this->assertTrue($method->isStatic(), "{$methodName} should be static");
+            $this->assertFalse($method->isStatic(), "{$methodName} should be an instance method");
         }
     }
 
@@ -222,15 +228,19 @@ class BalanceAlertCronTest extends \Tests\Laravel\TestCase
     // =========================================================================
 
     /**
-     * Test getBalanceStatus method signature
+     * Test checkBalance returns a structured classification.
+     *
+     * The standalone getBalanceStatus() helper was removed in the refactor;
+     * checkBalance() now returns the balance, thresholds, and the resolved
+     * alert_type ('critical' | 'low' | null) in one array.
      */
-    public function testGetBalanceStatusMethodSignature(): void
+    public function testCheckBalanceReturnsClassificationArray(): void
     {
-        $ref = new \ReflectionMethod(BalanceAlertService::class, 'getBalanceStatus');
-        $params = $ref->getParameters();
+        $ref = new \ReflectionMethod(BalanceAlertService::class, 'checkBalance');
+        $returnType = (string) $ref->getReturnType();
 
-        $this->assertCount(1, $params, 'getBalanceStatus should accept organizationId');
-        $this->assertEquals('organizationId', $params[0]->getName());
+        $this->assertEquals('array', $returnType, 'checkBalance should return an array');
+        $this->assertFalse($ref->isStatic(), 'checkBalance should be an instance method');
     }
 
     // =========================================================================
@@ -247,25 +257,30 @@ class BalanceAlertCronTest extends \Tests\Laravel\TestCase
 
         $method = $ref->getMethod('hasAlertedToday');
         $this->assertTrue($method->isPrivate(), 'hasAlertedToday should be private');
-        $this->assertTrue($method->isStatic(), 'hasAlertedToday should be static');
+        $this->assertFalse($method->isStatic(), 'hasAlertedToday should be an instance method');
 
         $params = $method->getParameters();
         $this->assertCount(1, $params, 'Should accept organizationId');
     }
 
     /**
-     * Test recordAlert private method exists
+     * Test sendAndRecordAlert private method exists.
+     *
+     * Replaces the former recordAlert + sendBalanceAlert pair — it sends the
+     * alert first and only records it (for daily idempotency) on success.
      */
-    public function testRecordAlertMethodExists(): void
+    public function testSendAndRecordAlertMethodExists(): void
     {
         $ref = new \ReflectionClass(BalanceAlertService::class);
-        $method = $ref->getMethod('recordAlert');
+        $method = $ref->getMethod('sendAndRecordAlert');
 
         $this->assertTrue($method->isPrivate());
-        $this->assertTrue($method->isStatic());
+        $this->assertFalse($method->isStatic(), 'sendAndRecordAlert should be an instance method');
 
         $params = $method->getParameters();
         $this->assertGreaterThanOrEqual(2, count($params), 'Should accept organizationId and alertType');
+        $this->assertEquals('organizationId', $params[0]->getName());
+        $this->assertEquals('alertType', $params[1]->getName());
     }
 
     // =========================================================================
@@ -273,30 +288,21 @@ class BalanceAlertCronTest extends \Tests\Laravel\TestCase
     // =========================================================================
 
     /**
-     * Test sendBalanceAlert private method exists
+     * Test sendBalanceAlertEmail private method exists.
+     *
+     * This is the renamed email-sending helper (was sendAlertEmail). It accepts
+     * the resolved owner object, org name, balance and alert type.
      */
-    public function testSendBalanceAlertMethodExists(): void
+    public function testSendBalanceAlertEmailMethodExists(): void
     {
         $ref = new \ReflectionClass(BalanceAlertService::class);
-        $method = $ref->getMethod('sendBalanceAlert');
+        $method = $ref->getMethod('sendBalanceAlertEmail');
 
         $this->assertTrue($method->isPrivate());
-        $this->assertTrue($method->isStatic());
+        $this->assertFalse($method->isStatic(), 'sendBalanceAlertEmail should be an instance method');
 
         $params = $method->getParameters();
-        $this->assertGreaterThanOrEqual(4, count($params), 'Should accept organizationId, orgName, balance, severity');
-    }
-
-    /**
-     * Test sendAlertEmail private method exists
-     */
-    public function testSendAlertEmailMethodExists(): void
-    {
-        $ref = new \ReflectionClass(BalanceAlertService::class);
-        $method = $ref->getMethod('sendAlertEmail');
-
-        $this->assertTrue($method->isPrivate());
-        $this->assertTrue($method->isStatic());
+        $this->assertGreaterThanOrEqual(4, count($params), 'Should accept owner, orgName, balance, alertType');
     }
 
     // =========================================================================
@@ -439,7 +445,7 @@ class BalanceAlertCronTest extends \Tests\Laravel\TestCase
 
         $method = $ref->getMethod('areAlertsEnabled');
         $this->assertTrue($method->isPublic(), 'areAlertsEnabled should be public');
-        $this->assertTrue($method->isStatic(), 'areAlertsEnabled should be static');
+        $this->assertFalse($method->isStatic(), 'areAlertsEnabled should be an instance method');
 
         $params = $method->getParameters();
         $this->assertCount(1, $params, 'Should accept organizationId');
@@ -491,26 +497,27 @@ class BalanceAlertCronTest extends \Tests\Laravel\TestCase
     // =========================================================================
 
     /**
-     * Test that sendBalanceAlert scopes recipients by severity
+     * Test that the alert sender resolves the organization owner as recipient.
      *
-     * Low alerts: owner only
-     * Critical alerts: owner + admins
+     * The refactored service notifies the organization owner (vol_organizations.user_id)
+     * for both severities via sendAndRecordAlert() -> sendBalanceAlertEmail(). The old
+     * getOwner/getAdminsAndOwners helpers were removed; recipient resolution now happens
+     * inline against vol_organizations.user_id.
      */
-    public function testSendBalanceAlertScopesRecipientsBySeverity(): void
+    public function testAlertSenderResolvesOrganizationOwner(): void
     {
         $ref = new \ReflectionClass(BalanceAlertService::class);
-        $method = $ref->getMethod('sendBalanceAlert');
+        $method = $ref->getMethod('sendAndRecordAlert');
 
-        // Verify the method exists and accepts severity parameter
         $params = $method->getParameters();
-        $this->assertGreaterThanOrEqual(4, count($params));
+        $this->assertGreaterThanOrEqual(2, count($params));
 
-        // The implementation should call getOwner for low alerts
-        // and getAdminsAndOwners for critical alerts
         $sourceFile = file_get_contents($ref->getFileName());
-        $this->assertStringContainsString('getOwner', $sourceFile,
-            'sendBalanceAlert should use getOwner for low-severity alerts');
-        $this->assertStringContainsString('getAdminsAndOwners', $sourceFile,
-            'sendBalanceAlert should use getAdminsAndOwners for critical alerts');
+        $this->assertStringContainsString('vol_organizations', $sourceFile,
+            'sendAndRecordAlert should resolve the owner from vol_organizations');
+        $this->assertStringContainsString('user_id', $sourceFile,
+            'sendAndRecordAlert should resolve the owner via vol_organizations.user_id');
+        $this->assertStringContainsString('sendBalanceAlertEmail', $sourceFile,
+            'sendAndRecordAlert should dispatch via sendBalanceAlertEmail');
     }
 }

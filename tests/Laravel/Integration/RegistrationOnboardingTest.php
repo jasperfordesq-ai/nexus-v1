@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -29,23 +30,48 @@ class RegistrationOnboardingTest extends TestCase
     {
         parent::setUp();
 
-        // Seed tenant settings needed for registration
-        DB::table('tenant_settings')->insertOrIgnore([
-            [
-                'tenant_id'     => $this->testTenantId,
-                'category'      => 'general',
-                'setting_key'   => 'registration_enabled',
-                'setting_value' => '1',
-                'setting_type'  => 'boolean',
-            ],
-            [
-                'tenant_id'     => $this->testTenantId,
-                'category'      => 'general',
-                'setting_key'   => 'registration_policy',
-                'setting_value' => 'open',
-                'setting_type'  => 'string',
-            ],
-        ]);
+        // The registration endpoint applies an IP-keyed rate limit
+        // (RegistrationController::register -> rateLimit('registration', 3, 300))
+        // plus a route-level throttle:30,1. In the test environment the limiter is
+        // backed by a persistent cache store (Redis), so attempts accumulate across
+        // tests AND across PHPUnit runs from the fixed test IP (127.0.0.1), producing
+        // spurious 429s. Rebind the RateLimiter onto an ephemeral array cache store
+        // so every test (and every run) starts with a clean quota.
+        $this->app->singleton(\Illuminate\Cache\RateLimiter::class, function ($app) {
+            return new \Illuminate\Cache\RateLimiter(
+                $app->make(\Illuminate\Cache\CacheManager::class)->store('array')
+            );
+        });
+        // Drop any RateLimiter instance the facade resolved during boot so the
+        // next RateLimiter::attempt() picks up the array-backed binding above.
+        RateLimiter::clearResolvedInstance(\Illuminate\Cache\RateLimiter::class);
+
+        // Seed tenant settings needed for registration.
+        //
+        // RegistrationPolicyService::getEffectivePolicy() reads the registration
+        // mode from the `general.registration_mode` / `registration_mode` settings
+        // keys (NOT the older registration_enabled/registration_policy keys). We
+        // must set registration_mode='open', otherwise the service defaults can
+        // resolve to 'closed' (HTTP 403) when a stale cached settings set is read.
+        foreach (['general.registration_mode', 'registration_mode'] as $modeKey) {
+            // updateOrInsert (not insertOrIgnore): a stale persistent row from another
+            // test fixture may already hold registration_mode='closed', which would
+            // be silently kept by insertOrIgnore and resolve the policy to closed (403).
+            DB::table('tenant_settings')->updateOrInsert(
+                ['tenant_id' => $this->testTenantId, 'setting_key' => $modeKey],
+                [
+                    'category'      => 'general',
+                    'setting_value' => 'open',
+                    'setting_type'  => 'string',
+                ]
+            );
+        }
+
+        // Settings are cached in a persistent store (Redis) for 5 minutes keyed by
+        // tenant. A stale cached set from a previous run would shadow the freshly
+        // seeded rows above (Cache::remember short-circuits the DB read), so forget
+        // the tenant's settings cache to force a clean reload from the test DB.
+        app(\App\Services\TenantSettingsService::class)->clearCacheForTenant($this->testTenantId);
 
         // Seed some categories for onboarding interest selection
         Category::factory()->forTenant($this->testTenantId)->count(3)->create([
@@ -60,10 +86,14 @@ class RegistrationOnboardingTest extends TestCase
     public function test_register_creates_user_with_correct_tenant(): void
     {
         $response = $this->apiPost('/v2/auth/register', [
-            'name'                  => 'Jane Doe',
-            'email'                 => 'jane.doe@example.com',
-            'password'              => 'SecurePass123!',
-            'password_confirmation' => 'SecurePass123!',
+            'first_name'            => 'Jane',
+            'last_name'             => 'Doe',
+            'email'                 => 'jane.doe@gmail.com',
+            'location'              => 'Springfield',
+            'phone'                 => '+15551234567',
+            'password'              => 'Xq7!vM2pLw9zRt4B',
+            'password_confirmation' => 'Xq7!vM2pLw9zRt4B',
+            'terms_accepted'        => true,
         ]);
 
         // Registration may return 201 (created) or 200
@@ -76,13 +106,13 @@ class RegistrationOnboardingTest extends TestCase
         $this->assertContains($response->getStatusCode(), [200, 201]);
 
         // Verify user exists in the database with the correct tenant
-        $user = User::where('email', 'jane.doe@example.com')
+        $user = User::where('email', 'jane.doe@gmail.com')
             ->where('tenant_id', $this->testTenantId)
             ->first();
 
         $this->assertNotNull($user, 'User should exist in the database');
         $this->assertEquals($this->testTenantId, $user->tenant_id);
-        $this->assertEquals('jane.doe@example.com', $user->email);
+        $this->assertEquals('jane.doe@gmail.com', $user->email);
         $this->assertContains($user->role, ['member', 'pending']);
     }
 
@@ -110,6 +140,7 @@ class RegistrationOnboardingTest extends TestCase
             'email'                 => 'weak@example.com',
             'password'              => '123',
             'password_confirmation' => '123',
+            'terms_accepted'        => true,
         ]);
 
         // Should be rejected for weak password
@@ -122,9 +153,12 @@ class RegistrationOnboardingTest extends TestCase
 
     public function test_login_with_newly_registered_credentials(): void
     {
-        // Create user directly (registration may require email verification)
+        // Create user directly (registration may require email verification).
+        // Unique email per run to avoid colliding with leftover rows from a
+        // prior non-transactional run on the (email, tenant_id) unique key.
+        $email = 'newuser+' . uniqid() . '@example.com';
         $user = User::factory()->forTenant($this->testTenantId)->create([
-            'email'             => 'newuser@example.com',
+            'email'             => $email,
             'password_hash'     => Hash::make('SecurePass123!'),
             'status'            => 'active',
             'is_approved'       => true,
@@ -132,7 +166,7 @@ class RegistrationOnboardingTest extends TestCase
         ]);
 
         $response = $this->apiPost('/auth/login', [
-            'email'    => 'newuser@example.com',
+            'email'    => $email,
             'password' => 'SecurePass123!',
         ]);
 
@@ -155,8 +189,12 @@ class RegistrationOnboardingTest extends TestCase
             'updated_at' => now(),
         ]);
 
+        // Use a unique email per run: a previous (non-transactional) run may have
+        // left an `otheruser@example.com` row on tenant 999, and the
+        // (email, tenant_id) unique key would collide on re-insert.
+        $otherEmail = 'otheruser+' . uniqid() . '@example.com';
         User::factory()->forTenant($otherTenantId)->create([
-            'email'             => 'otheruser@example.com',
+            'email'             => $otherEmail,
             'password_hash'     => Hash::make('SecurePass123!'),
             'status'            => 'active',
             'email_verified_at' => now(),
@@ -164,7 +202,7 @@ class RegistrationOnboardingTest extends TestCase
 
         // Try to login with the test tenant's header (tenant 2)
         $response = $this->apiPost('/auth/login', [
-            'email'    => 'otheruser@example.com',
+            'email'    => $otherEmail,
             'password' => 'SecurePass123!',
         ]);
 
@@ -213,10 +251,14 @@ class RegistrationOnboardingTest extends TestCase
 
     public function test_complete_onboarding(): void
     {
+        // Onboarding completion requires a profile photo and bio to be present
+        // (OnboardingController::complete enforces avatar_url + bio before saving).
         $user = User::factory()->forTenant($this->testTenantId)->create([
             'status'               => 'active',
             'is_approved'          => true,
             'onboarding_completed' => false,
+            'avatar_url'           => 'https://example.com/avatar.png',
+            'bio'                  => 'I love helping my local community.',
         ]);
 
         Sanctum::actingAs($user, ['*']);
@@ -241,6 +283,8 @@ class RegistrationOnboardingTest extends TestCase
             'status'               => 'active',
             'is_approved'          => true,
             'onboarding_completed' => false,
+            'avatar_url'           => 'https://example.com/avatar.png',
+            'bio'                  => 'I love helping my local community.',
         ]);
 
         Sanctum::actingAs($user, ['*']);
@@ -278,6 +322,8 @@ class RegistrationOnboardingTest extends TestCase
             'status'               => 'active',
             'is_approved'          => true,
             'onboarding_completed' => false,
+            'avatar_url'           => 'https://example.com/avatar.png',
+            'bio'                  => 'I love helping my local community.',
         ]);
 
         Sanctum::actingAs($user, ['*']);
@@ -328,13 +374,17 @@ class RegistrationOnboardingTest extends TestCase
 
         Sanctum::actingAs($user, ['*']);
 
+        $categoryId = Category::where('tenant_id', $this->testTenantId)
+            ->where('type', 'listing')
+            ->value('id');
+
         $response = $this->apiPost('/v2/listings', [
             'title'        => 'My First Offer',
             'description'  => 'I can help with cooking and meal prep for families.',
             'type'         => 'offer',
-            'price'        => 1.50,
+            'category_id'  => $categoryId,
             'hours_estimate' => 1.50,
-            'service_type' => 'in-person',
+            'service_type' => 'physical_only',
         ]);
 
         $this->assertContains($response->getStatusCode(), [200, 201]);
@@ -355,12 +405,18 @@ class RegistrationOnboardingTest extends TestCase
 
     public function test_full_registration_to_first_listing_journey(): void
     {
-        // Step 1: Register
+        // Step 1: Register. The current contract requires first_name/last_name,
+        // a deliverable email domain (MX-checked), a valid international phone,
+        // a location, a >=12-char password, and accepted terms.
         $registerResponse = $this->apiPost('/v2/auth/register', [
-            'name'                  => 'Full Journey User',
-            'email'                 => 'journey@example.com',
-            'password'              => 'StrongPass456!',
-            'password_confirmation' => 'StrongPass456!',
+            'first_name'            => 'Full',
+            'last_name'             => 'Journey',
+            'email'                 => 'journey.user@gmail.com',
+            'location'              => 'Springfield',
+            'phone'                 => '+15557654321',
+            'password'              => 'Kp4!wZ9tQm2xLs7N',
+            'password_confirmation' => 'Kp4!wZ9tQm2xLs7N',
+            'terms_accepted'        => true,
         ]);
 
         if ($registerResponse->getStatusCode() === 422 || $registerResponse->getStatusCode() === 400) {
@@ -369,8 +425,9 @@ class RegistrationOnboardingTest extends TestCase
             );
         }
 
-        // Step 2: Manually activate user (email verification would be async)
-        $user = User::where('email', 'journey@example.com')
+        // Step 2: Manually activate user (email verification would be async) and
+        // give the profile the avatar + bio that onboarding completion requires.
+        $user = User::where('email', 'journey.user@gmail.com')
             ->where('tenant_id', $this->testTenantId)
             ->first();
 
@@ -382,12 +439,15 @@ class RegistrationOnboardingTest extends TestCase
             'status'            => 'active',
             'is_approved'       => true,
             'email_verified_at' => now(),
+            'avatar_url'        => 'https://example.com/avatar.png',
+            'bio'               => 'Excited to join the timebank.',
+            'password_hash'     => Hash::make('Kp4!wZ9tQm2xLs7N'),
         ]);
 
         // Step 3: Login
         $loginResponse = $this->apiPost('/auth/login', [
-            'email'    => 'journey@example.com',
-            'password' => 'StrongPass456!',
+            'email'    => 'journey.user@gmail.com',
+            'password' => 'Kp4!wZ9tQm2xLs7N',
         ]);
 
         $this->assertEquals(200, $loginResponse->getStatusCode());
@@ -400,14 +460,24 @@ class RegistrationOnboardingTest extends TestCase
         ]);
         $this->assertContains($onboardResponse->getStatusCode(), [200, 201]);
 
+        // Re-authenticate with a fresh user instance so the onboarding-required
+        // middleware (which reads $request->user()->onboarding_completed) sees the
+        // updated flag — Sanctum::actingAs caches the in-memory instance otherwise.
+        $user = $user->fresh();
+        Sanctum::actingAs($user, ['*']);
+
         // Step 5: Create first listing
+        $categoryId = Category::where('tenant_id', $this->testTenantId)
+            ->where('type', 'listing')
+            ->value('id');
+
         $listingResponse = $this->apiPost('/v2/listings', [
             'title'        => 'Journey Listing',
-            'description'  => 'My first community offer after onboarding.',
+            'description'  => 'My first community offer after onboarding, ready to help.',
             'type'         => 'offer',
-            'price'        => 1.00,
+            'category_id'  => $categoryId,
             'hours_estimate' => 1.00,
-            'service_type' => 'either',
+            'service_type' => 'hybrid',
         ]);
 
         $this->assertContains($listingResponse->getStatusCode(), [200, 201]);

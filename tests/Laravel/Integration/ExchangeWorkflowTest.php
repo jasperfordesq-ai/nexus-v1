@@ -6,6 +6,7 @@
 
 namespace Tests\Laravel\Integration;
 
+use App\Models\Category;
 use App\Models\ExchangeRequest;
 use App\Models\Listing;
 use App\Models\Transaction;
@@ -30,31 +31,45 @@ class ExchangeWorkflowTest extends TestCase
 
     private User $provider;
     private User $requester;
+    private int $listingCategoryId;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        // Ensure exchange workflow is enabled for the test tenant
-        DB::table('tenant_settings')->insertOrIgnore([
-            'tenant_id'     => $this->testTenantId,
-            'category'      => 'general',
-            'setting_key'   => 'exchange_workflow_enabled',
-            'setting_value' => '1',
-            'setting_type'  => 'boolean',
+        // Ensure exchange workflow is enabled for the test tenant.
+        //
+        // The gate (ExchangesController -> BrokerControlConfigService::isExchangeWorkflowEnabled)
+        // reads exchange_workflow.enabled from the nested broker config (stored in
+        // tenants.configuration / tenant_settings.broker_config), NOT a flat
+        // exchange_workflow_enabled setting. Use the service's own writer, which maps
+        // the flat key to exchange_workflow.enabled and clears the config cache.
+        \App\Services\BrokerControlConfigService::updateConfig([
+            'exchange_workflow_enabled' => true,
         ]);
 
-        // Create provider and requester with known balances
+        // Listing creation requires a valid listing category for the tenant
+        // (ListingService enforces a required, tenant-scoped, type=listing category).
+        $this->listingCategoryId = (int) (Category::where('tenant_id', $this->testTenantId)
+            ->where('type', 'listing')
+            ->value('id')
+            ?? Category::factory()->forTenant($this->testTenantId)->create(['type' => 'listing'])->id);
+
+        // Create provider and requester with known balances. onboarding_completed
+        // is required because POST /v2/listings is behind the onboarding-required
+        // middleware.
         $this->provider = User::factory()->forTenant($this->testTenantId)->create([
             'balance' => 10.00,
             'status'  => 'active',
             'is_approved' => true,
+            'onboarding_completed' => true,
         ]);
 
         $this->requester = User::factory()->forTenant($this->testTenantId)->create([
             'balance' => 10.00,
             'status'  => 'active',
             'is_approved' => true,
+            'onboarding_completed' => true,
         ]);
     }
 
@@ -69,11 +84,11 @@ class ExchangeWorkflowTest extends TestCase
 
         $listingResponse = $this->apiPost('/v2/listings', [
             'title'       => 'Garden Help',
-            'description' => 'I can help with your garden',
+            'description' => 'I can help with your garden and outdoor spaces.',
             'type'        => 'offer',
-            'price'       => 2.00,
+            'category_id' => $this->listingCategoryId,
             'hours_estimate' => 2.00,
-            'service_type'   => 'in-person',
+            'service_type'   => 'physical_only',
         ]);
 
         // Listing creation should succeed (201 or 200)
@@ -113,10 +128,12 @@ class ExchangeWorkflowTest extends TestCase
         $exchangeId = $exchangeData['id'] ?? $exchangeData['data']['id'] ?? null;
         $this->assertNotNull($exchangeId, 'Exchange ID should be returned');
 
-        // Verify exchange is in pending status
+        // Verify exchange is in an initial pending status. A freshly created
+        // exchange starts at 'pending_provider' (or 'pending_broker' when broker
+        // approval is enabled for the tenant) — there is no bare 'pending' state.
         $exchange = ExchangeRequest::find($exchangeId);
         $this->assertNotNull($exchange);
-        $this->assertEquals('pending', $exchange->status);
+        $this->assertContains($exchange->status, ['pending_provider', 'pending_broker']);
 
         // Step 3: Provider accepts the exchange
         Sanctum::actingAs($this->provider, ['*']);
@@ -228,10 +245,13 @@ class ExchangeWorkflowTest extends TestCase
 
     public function test_provider_can_decline_exchange(): void
     {
+        // 'pending_provider' is the canonical initial status the app assigns to a
+        // new exchange request (ExchangeWorkflowService::STATUS_PENDING_PROVIDER).
+        // declineRequest() only acts on that status; 'pending' is not a real state.
         $scenario = $this->createExchangeScenario([
             'provider'  => ['status' => 'active', 'is_approved' => true],
             'requester' => ['status' => 'active', 'is_approved' => true],
-            'exchange'  => ['status' => 'pending'],
+            'exchange'  => ['status' => 'pending_provider'],
         ]);
 
         Sanctum::actingAs($scenario['provider'], ['*']);
@@ -243,6 +263,8 @@ class ExchangeWorkflowTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
 
         $scenario['exchange']->refresh();
+        // Declining transitions the exchange to 'cancelled' (the workflow has no
+        // separate 'declined' terminal state — decline maps to cancelled).
         $this->assertContains($scenario['exchange']->status, ['declined', 'cancelled']);
     }
 
@@ -251,7 +273,7 @@ class ExchangeWorkflowTest extends TestCase
         $scenario = $this->createExchangeScenario([
             'provider'  => ['status' => 'active', 'is_approved' => true],
             'requester' => ['status' => 'active', 'is_approved' => true],
-            'exchange'  => ['status' => 'pending'],
+            'exchange'  => ['status' => 'pending_provider'],
         ]);
 
         Sanctum::actingAs($scenario['requester'], ['*']);

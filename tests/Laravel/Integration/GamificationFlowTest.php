@@ -6,6 +6,7 @@
 
 namespace Tests\Laravel\Integration;
 
+use App\Models\Category;
 use App\Models\ExchangeRequest;
 use App\Models\Listing;
 use App\Models\Notification;
@@ -32,6 +33,8 @@ class GamificationFlowTest extends TestCase
     use ActsAsMember;
     use CreatesExchangeData;
 
+    private int $listingCategoryId;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -53,6 +56,12 @@ class GamificationFlowTest extends TestCase
                 'setting_type'  => 'boolean',
             ],
         ]);
+
+        // Listing creation requires a valid tenant-scoped listing category.
+        $this->listingCategoryId = (int) (Category::where('tenant_id', $this->testTenantId)
+            ->where('type', 'listing')
+            ->value('id')
+            ?? Category::factory()->forTenant($this->testTenantId)->create(['type' => 'listing'])->id);
     }
 
     // =========================================================================
@@ -100,6 +109,7 @@ class GamificationFlowTest extends TestCase
         $user = User::factory()->forTenant($this->testTenantId)->create([
             'status'      => 'active',
             'is_approved' => true,
+            'onboarding_completed' => true,
             'xp'          => 0,
         ]);
 
@@ -111,9 +121,9 @@ class GamificationFlowTest extends TestCase
             'title'        => 'XP Test Listing',
             'description'  => 'Testing that XP is awarded for creating a listing.',
             'type'         => 'offer',
-            'price'        => 1.00,
+            'category_id'  => $this->listingCategoryId,
             'hours_estimate' => 1.00,
-            'service_type' => 'remote',
+            'service_type' => 'remote_only',
         ]);
 
         $this->assertContains($response->getStatusCode(), [200, 201]);
@@ -392,6 +402,7 @@ class GamificationFlowTest extends TestCase
         $user = User::factory()->forTenant($this->testTenantId)->create([
             'status'      => 'active',
             'is_approved' => true,
+            'onboarding_completed' => true,
             'xp'          => 0,
             'balance'     => 10.00,
         ]);
@@ -405,9 +416,9 @@ class GamificationFlowTest extends TestCase
             'title'        => 'Gamification Test Offer',
             'description'  => 'Testing gamification XP from listing creation.',
             'type'         => 'offer',
-            'price'        => 1.00,
+            'category_id'  => $this->listingCategoryId,
             'hours_estimate' => 1.00,
-            'service_type' => 'remote',
+            'service_type' => 'remote_only',
         ]);
 
         $this->assertContains($listingResponse->getStatusCode(), [200, 201]);
