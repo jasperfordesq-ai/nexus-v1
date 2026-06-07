@@ -52,9 +52,13 @@ class StoryServiceTest extends TestCase
             ->once()
             ->andReturnUsing(fn (callable $cb) => $cb());
 
-        // Active count check (inside transaction, with FOR UPDATE)
+        // selectOne is called three times, in order:
+        //  1) active-count check (inside the transaction, FOR UPDATE)
+        //  2) notifyConnections — story author name lookup
+        //  3) getStoryById — the created story row (joined with user)
         DB::shouldReceive('selectOne')
             ->once()
+            ->ordered()
             ->andReturn((object) ['cnt' => 0]);
 
         // Insert
@@ -67,9 +71,16 @@ class StoryServiceTest extends TestCase
         $mockPdo->shouldReceive('lastInsertId')->andReturn('42');
         DB::shouldReceive('getPdo')->once()->andReturn($mockPdo);
 
-        // getStoryById (inner query)
+        // notifyConnections — author lookup, then accepted-connections list (none)
         DB::shouldReceive('selectOne')
             ->once()
+            ->ordered()
+            ->andReturn((object) ['first_name' => 'Test', 'last_name' => 'User']);
+
+        // getStoryById (inner query joined with the author)
+        DB::shouldReceive('selectOne')
+            ->once()
+            ->ordered()
             ->andReturn((object) [
                 'id' => 42,
                 'user_id' => 1,
@@ -91,6 +102,10 @@ class StoryServiceTest extends TestCase
                 'poll_question' => null,
                 'poll_options' => null,
             ]);
+
+        // DB::select is called for: notifyConnections (connections list) and
+        // getStickers (story stickers) — both empty here.
+        DB::shouldReceive('select')->andReturn([]);
 
         $result = $this->service->create(1, [
             'media_type' => 'text',
@@ -134,8 +149,10 @@ class StoryServiceTest extends TestCase
             ->once()
             ->andReturnUsing(fn (callable $cb) => $cb());
 
+        // active-count check (inside transaction)
         DB::shouldReceive('selectOne')
             ->once()
+            ->ordered()
             ->andReturn((object) ['cnt' => 0]);
 
         // Capture the insert parameters to verify duration clamping
@@ -152,8 +169,16 @@ class StoryServiceTest extends TestCase
         $mockPdo->shouldReceive('lastInsertId')->andReturn('1');
         DB::shouldReceive('getPdo')->once()->andReturn($mockPdo);
 
+        // notifyConnections author lookup
         DB::shouldReceive('selectOne')
             ->once()
+            ->ordered()
+            ->andReturn((object) ['first_name' => 'Test', 'last_name' => 'User']);
+
+        // getStoryById
+        DB::shouldReceive('selectOne')
+            ->once()
+            ->ordered()
             ->andReturn((object) [
                 'id' => 1, 'user_id' => 1, 'media_type' => 'text', 'media_url' => null,
                 'thumbnail_url' => null, 'text_content' => 'Test', 'text_style' => null,
@@ -162,6 +187,9 @@ class StoryServiceTest extends TestCase
                 'created_at' => '2026-03-23', 'first_name' => 'Test', 'last_name' => 'User',
                 'avatar_url' => null, 'poll_question' => null, 'poll_options' => null,
             ]);
+
+        // connections list + stickers — both empty
+        DB::shouldReceive('select')->andReturn([]);
 
         $this->service->create(1, [
             'media_type' => 'text',
@@ -191,8 +219,8 @@ class StoryServiceTest extends TestCase
             ->once()
             ->andReturn((object) ['id' => 1, 'user_id' => 5]);
 
-        // DB::statement and DB::update should NOT be called because it's a self-view
-        DB::shouldNotReceive('statement');
+        // No view INSERT or count increment should happen on a self-view.
+        DB::shouldNotReceive('affectingStatement');
         DB::shouldNotReceive('update');
 
         $this->service->viewStory(1, 5);
@@ -205,9 +233,12 @@ class StoryServiceTest extends TestCase
             ->once()
             ->andReturn((object) ['id' => 1, 'user_id' => 10]);
 
-        DB::shouldReceive('statement')
+        // INSERT IGNORE now goes through affectingStatement so the service can
+        // tell whether a NEW view row was written (affected > 0) and only then
+        // increment view_count.
+        DB::shouldReceive('affectingStatement')
             ->once()
-            ->andReturn(true);
+            ->andReturn(1);
 
         DB::shouldReceive('update')
             ->once()
@@ -282,9 +313,11 @@ class StoryServiceTest extends TestCase
 
     public function test_reactToStory_throws_for_invalid_reaction(): void
     {
+        // Story row now carries user_id (canViewStory reads it). Reactor is the
+        // owner here, so visibility passes and we reach the reaction-type guard.
         DB::shouldReceive('selectOne')
             ->once()
-            ->andReturn((object) ['id' => 1]);
+            ->andReturn((object) ['id' => 1, 'user_id' => 1]);
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Invalid reaction type');
@@ -294,9 +327,17 @@ class StoryServiceTest extends TestCase
 
     public function test_reactToStory_inserts_valid_reaction(): void
     {
+        // Reactor (5) is the story owner → the reaction-broadcast block is skipped
+        // (it only fires for non-owner reactors), keeping the DB sequence minimal.
+        // 1) story lookup, 2) existing-reaction check (none).
         DB::shouldReceive('selectOne')
             ->once()
-            ->andReturn((object) ['id' => 1]);
+            ->ordered()
+            ->andReturn((object) ['id' => 1, 'user_id' => 5]);
+        DB::shouldReceive('selectOne')
+            ->once()
+            ->ordered()
+            ->andReturn(null);
 
         DB::shouldReceive('insert')
             ->once()
@@ -311,9 +352,15 @@ class StoryServiceTest extends TestCase
         $validTypes = ['heart', 'laugh', 'wow', 'fire', 'clap', 'sad'];
 
         foreach ($validTypes as $type) {
+            // story lookup (owner == reactor), then existing-reaction check (none)
             DB::shouldReceive('selectOne')
                 ->once()
-                ->andReturn((object) ['id' => 1]);
+                ->ordered()
+                ->andReturn((object) ['id' => 1, 'user_id' => 5]);
+            DB::shouldReceive('selectOne')
+                ->once()
+                ->ordered()
+                ->andReturn(null);
 
             DB::shouldReceive('insert')
                 ->once()
@@ -405,7 +452,13 @@ class StoryServiceTest extends TestCase
                 'poll_options' => json_encode(['Red', 'Blue']),
             ]);
 
-        // Already voted
+        // The check-then-insert is now wrapped in a transaction to close a
+        // double-vote race. Execute the closure directly so the body runs.
+        DB::shouldReceive('transaction')
+            ->once()
+            ->andReturnUsing(fn (callable $cb) => $cb());
+
+        // Already voted (inside the transaction)
         DB::shouldReceive('selectOne')
             ->once()
             ->andReturn((object) ['id' => 100]);
@@ -427,15 +480,23 @@ class StoryServiceTest extends TestCase
                 'poll_options' => json_encode(['Red', 'Blue', 'Green']),
             ]);
 
+        // Vote write is wrapped in a transaction; run the closure inline.
+        DB::shouldReceive('transaction')
+            ->once()
+            ->andReturnUsing(fn (callable $cb) => $cb());
+
         // Existing vote check (none)
         DB::shouldReceive('selectOne')
             ->once()
             ->andReturn(null);
 
-        // Insert vote
-        DB::shouldReceive('insert')
+        // Vote insert now goes through the query builder's insertOrIgnore.
+        $voteTable = \Mockery::mock();
+        $voteTable->shouldReceive('insertOrIgnore')->once()->andReturn(1);
+        DB::shouldReceive('table')
+            ->with('story_poll_votes')
             ->once()
-            ->andReturn(true);
+            ->andReturn($voteTable);
 
         // getPollResults
         DB::shouldReceive('select')
@@ -612,6 +673,11 @@ class StoryServiceTest extends TestCase
 
     public function test_cleanupExpired_deactivates_and_cleans_media(): void
     {
+        // Archive step (INSERT IGNORE ... SELECT) runs first via affectingStatement.
+        DB::shouldReceive('affectingStatement')
+            ->once()
+            ->andReturn(0);
+
         // Deactivate expired
         DB::shouldReceive('update')
             ->once()
@@ -632,6 +698,11 @@ class StoryServiceTest extends TestCase
 
     public function test_cleanupExpired_skips_logging_when_nothing_to_deactivate(): void
     {
+        // Nothing archived and nothing deactivated.
+        DB::shouldReceive('affectingStatement')
+            ->once()
+            ->andReturn(0);
+
         DB::shouldReceive('update')
             ->once()
             ->andReturn(0);
@@ -729,6 +800,10 @@ class StoryServiceTest extends TestCase
                     'poll_options' => null,
                 ],
             ]);
+
+        // formatStory() now loads stickers per story via a second DB::select.
+        DB::shouldReceive('select')
+            ->andReturn([]);
 
         $result = $this->service->getUserStories(5, 1);
 

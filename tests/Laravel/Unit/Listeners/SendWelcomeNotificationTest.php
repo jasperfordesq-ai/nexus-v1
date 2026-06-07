@@ -6,12 +6,11 @@
 
 namespace Tests\Laravel\Unit\Listeners;
 
-use App\Core\TenantContext;
 use App\Events\UserRegistered;
 use App\Listeners\SendWelcomeNotification;
 use App\Models\Notification;
 use App\Models\User;
-use App\Services\EmailService;
+use App\Services\EmailDispatchService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -24,6 +23,16 @@ use Tests\Laravel\TestCase;
  */
 class SendWelcomeNotificationTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // The listener has a Cache-backed idempotency guard keyed by
+        // tenant_id:user_id. Without flushing between tests (the array cache
+        // store persists across methods in the same process) a prior test's
+        // "done" key would short-circuit handle() before any work runs.
+        Cache::flush();
+    }
+
     public function test_implements_should_queue(): void
     {
         $this->assertTrue(
@@ -33,41 +42,44 @@ class SendWelcomeNotificationTest extends TestCase
 
     public function test_handle_creates_notification_and_sends_email(): void
     {
+        // Active + verified user → generic welcome branch (no verification-token
+        // DB writes). The welcome email goes out via the static
+        // EmailDispatchService::sendRaw (not an injected EmailService instance).
+        // TenantContext runs for real against the test tenant.
         $user = new User();
         $user->id = 42;
         $user->first_name = 'Alice';
         $user->email = 'alice@example.com';
+        $user->status = 'active';
+        $user->email_verified_at = now();
 
-        $event = new UserRegistered($user, 2);
+        $event = new UserRegistered($user, $this->testTenantId);
 
-        // Mock Notification::create
         $notificationMock = Mockery::mock('alias:' . Notification::class);
         $notificationMock->shouldReceive('create')
             ->once()
             ->with(Mockery::on(function ($data) {
-                return $data['tenant_id'] === 2
+                return $data['tenant_id'] === $this->testTenantId
                     && $data['user_id'] === 42
                     && $data['type'] === 'welcome'
                     && $data['link'] === '/feed'
                     && $data['is_read'] === false;
             }));
 
-        // Mock TenantContext::get()
-        Mockery::mock('alias:' . TenantContext::class)
-            ->shouldReceive('get')
-            ->andReturn(['name' => 'Test Timebank']);
-
-        // Mock EmailService
-        $emailServiceMock = Mockery::mock(EmailService::class);
-        $emailServiceMock->shouldReceive('send')
+        Mockery::mock('alias:' . EmailDispatchService::class)
+            ->shouldReceive('sendRaw')
             ->once()
             ->with(
                 'alice@example.com',
-                'Welcome to Test Timebank!',
-                Mockery::type('string')
-            );
-
-        $this->app->instance(EmailService::class, $emailServiceMock);
+                Mockery::type('string'),
+                Mockery::type('string'),
+                null,
+                null,
+                null,
+                'welcome',
+                Mockery::type('array')
+            )
+            ->andReturn(true);
 
         $listener = new SendWelcomeNotification();
         $listener->handle($event);
@@ -75,25 +87,22 @@ class SendWelcomeNotificationTest extends TestCase
 
     public function test_handle_skips_email_when_no_email_provided(): void
     {
+        // No recipient email → the welcome closure returns right after the in-app
+        // bell is created, before any EmailDispatchService::sendRaw call.
         $user = new User();
-        $user->id = 42;
+        $user->id = 43;
         $user->first_name = 'Alice';
         $user->email = null;
+        $user->status = 'active';
+        $user->email_verified_at = now();
 
-        $event = new UserRegistered($user, 2);
+        $event = new UserRegistered($user, $this->testTenantId);
 
         $notificationMock = Mockery::mock('alias:' . Notification::class);
         $notificationMock->shouldReceive('create')->once();
 
-        Mockery::mock('alias:' . TenantContext::class)
-            ->shouldReceive('get')
-            ->andReturn(['name' => 'Test']);
-
-        // EmailService::send should NOT be called
-        $emailServiceMock = Mockery::mock(EmailService::class);
-        $emailServiceMock->shouldNotReceive('send');
-
-        $this->app->instance(EmailService::class, $emailServiceMock);
+        Mockery::mock('alias:' . EmailDispatchService::class)
+            ->shouldNotReceive('sendRaw');
 
         $listener = new SendWelcomeNotification();
         $listener->handle($event);
@@ -102,9 +111,9 @@ class SendWelcomeNotificationTest extends TestCase
     public function test_handle_catches_exceptions_and_logs_error(): void
     {
         $user = new User();
-        $user->id = 42;
+        $user->id = 44;
 
-        $event = new UserRegistered($user, 2);
+        $event = new UserRegistered($user, $this->testTenantId);
 
         $notificationMock = Mockery::mock('alias:' . Notification::class);
         $notificationMock->shouldReceive('create')

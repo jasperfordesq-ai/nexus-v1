@@ -6,105 +6,78 @@
 
 namespace Tests\Laravel\Unit\Observers;
 
+use App\Jobs\SyncUserSearchIndexJob;
 use App\Models\User;
 use App\Observers\UserObserver;
-use App\Services\SearchService;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Queue;
 use Mockery;
 use Tests\Laravel\TestCase;
 
 /**
+ * UserObserver keeps the Meilisearch users index in sync by dispatching
+ * SyncUserSearchIndexJob (queue-backed, auto-retrying) rather than calling
+ * SearchService inline — so a transient Meilisearch outage during signup or a
+ * profile edit doesn't leave the user missing from search forever.
+ *
  * @runInSeparateProcess
  * @preserveGlobalState disabled
  */
 class UserObserverTest extends TestCase
 {
-    public function test_created_indexes_new_user(): void
+    public function test_created_dispatches_index_job(): void
     {
+        Queue::fake();
+
         $user = new User();
         $user->id = 123;
 
-        $searchMock = Mockery::mock('alias:' . SearchService::class);
-        $searchMock->shouldReceive('indexUser')->once()->with($user);
-
         (new UserObserver())->created($user);
 
-        $this->assertTrue(true);
-    }
-
-    public function test_created_catches_exception_and_logs(): void
-    {
-        $user = new User();
-        $user->id = 123;
-
-        $searchMock = Mockery::mock('alias:' . SearchService::class);
-        $searchMock->shouldReceive('indexUser')->andThrow(new \RuntimeException('Meili down'));
-
-        Log::shouldReceive('error')
-            ->once()
-            ->with('UserObserver: failed to index new user', Mockery::type('array'));
-
-        (new UserObserver())->created($user);
-
-        $this->assertTrue(true);
+        Queue::assertPushed(SyncUserSearchIndexJob::class, function (SyncUserSearchIndexJob $job) {
+            return $job->userId === 123 && $job->action === 'index';
+        });
     }
 
     public function test_updated_skips_reindex_when_no_searchable_fields_dirty(): void
     {
+        Queue::fake();
+
         $user = Mockery::mock(User::class)->makePartial();
         $user->id = 123;
         $user->shouldReceive('getDirty')->andReturn(['last_login_at' => '2026-04-12']);
 
-        // SearchService should NOT be called — assert by not declaring any expectations
-        $searchMock = Mockery::mock('alias:' . SearchService::class);
-        $searchMock->shouldNotReceive('indexUser');
-
         (new UserObserver())->updated($user);
 
-        $this->assertTrue(true);
+        // Non-searchable field changed → no search index job dispatched.
+        Queue::assertNotPushed(SyncUserSearchIndexJob::class);
     }
 
     public function test_updated_reindexes_when_searchable_field_changed(): void
     {
+        Queue::fake();
+
         $user = Mockery::mock(User::class)->makePartial();
         $user->id = 123;
         $user->shouldReceive('getDirty')->andReturn(['first_name' => 'Alice', 'email' => 'a@b.c']);
 
-        $searchMock = Mockery::mock('alias:' . SearchService::class);
-        $searchMock->shouldReceive('indexUser')->once()->with($user);
-
         (new UserObserver())->updated($user);
 
-        $this->assertTrue(true);
+        Queue::assertPushed(SyncUserSearchIndexJob::class, function (SyncUserSearchIndexJob $job) {
+            return $job->userId === 123 && $job->action === 'index';
+        });
     }
 
-    public function test_deleted_removes_user_from_index(): void
+    public function test_deleted_dispatches_remove_job(): void
     {
+        Queue::fake();
+
         $user = new User();
         $user->id = 456;
 
-        $searchMock = Mockery::mock('alias:' . SearchService::class);
-        $searchMock->shouldReceive('removeUser')->once()->with(456);
-
         (new UserObserver())->deleted($user);
 
-        $this->assertTrue(true);
-    }
-
-    public function test_deleted_catches_exception_and_logs(): void
-    {
-        $user = new User();
-        $user->id = 456;
-
-        $searchMock = Mockery::mock('alias:' . SearchService::class);
-        $searchMock->shouldReceive('removeUser')->andThrow(new \RuntimeException('fail'));
-
-        Log::shouldReceive('error')
-            ->once()
-            ->with('UserObserver: failed to remove deleted user from index', Mockery::type('array'));
-
-        (new UserObserver())->deleted($user);
-
-        $this->assertTrue(true);
+        Queue::assertPushed(SyncUserSearchIndexJob::class, function (SyncUserSearchIndexJob $job) {
+            return $job->userId === 456 && $job->action === 'remove';
+        });
     }
 }

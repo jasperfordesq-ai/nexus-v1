@@ -30,43 +30,40 @@ class NotifyMessageReceivedTest extends TestCase
         );
     }
 
-    public function test_handle_dispatches_notification_to_recipients(): void
+    public function test_handle_dispatches_notification_to_recipient(): void
     {
+        // Messages are now 1-to-1 direct messages: the recipient is the
+        // Message->receiver_id, not a list of conversation_participants. The
+        // listener resolves the recipient locale, builds the HTML email, then
+        // dispatches a single notification (link points at the SENDER's thread).
         $sender = new User();
         $sender->id = 10;
         $sender->first_name = 'Bob';
 
         $message = new Message();
-        $conversationId = 42;
+        $message->receiver_id = 20;
+        $message->body = 'Hello there';
+        $message->is_voice = false;
 
-        $event = new MessageSent($message, $sender, $conversationId, 2);
+        // conversationId arg is retained on the event but the recipient is the receiver_id.
+        $event = new MessageSent($message, $sender, 42, $this->testTenantId);
 
-        // Mock DB query for conversation participants
-        DB::shouldReceive('table')
-            ->with('conversation_participants')
-            ->andReturnSelf();
-        DB::shouldReceive('where')
-            ->with('conversation_id', 42)
-            ->andReturnSelf();
-        DB::shouldReceive('where')
-            ->with('user_id', '!=', 10)
-            ->andReturnSelf();
-        DB::shouldReceive('pluck')
-            ->with('user_id')
-            ->andReturn(collect([20, 30]));
-
+        // The HTML email is built via the real EmailTemplateBuilder against the
+        // test tenant context; only the dispatcher call is asserted. Link is the
+        // sender's thread: /messages/{senderId}. Content renders via emails.message.in_app_content.
         Mockery::mock('alias:' . NotificationDispatcher::class)
             ->shouldReceive('dispatch')
-            ->twice()
+            ->once()
             ->with(
-                Mockery::type('int'),
+                20,
                 'global',
                 null,
                 'new_message',
                 'Bob sent you a message',
-                '/messages/42',
-                null
-            );
+                '/messages/10',
+                Mockery::type('string')
+            )
+            ->andReturn(true);
 
         $listener = new NotifyMessageReceived();
         $listener->handle($event);
