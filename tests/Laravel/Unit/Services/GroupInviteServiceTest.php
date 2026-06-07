@@ -6,12 +6,27 @@
 
 namespace Tests\Laravel\Unit\Services;
 
-use Tests\Laravel\TestCase;
+use App\Core\TenantContext;
+use App\Models\User;
 use App\Services\GroupInviteService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Tests\Laravel\TestCase;
 
+/**
+ * Unit tests for GroupInviteService.
+ *
+ * These run against real seeded rows (DatabaseTransactions). The service's
+ * permission gate (createLink / sendEmailInvites / revokeInvite) now delegates
+ * to GroupService::canModify(), which mixes Eloquent (User::find /
+ * Group::query()->find) with a DB query — a chain that cannot be faithfully
+ * reproduced with Mockery DB-facade expectations. Seeding a genuine group +
+ * owner exercises the real authorisation path instead.
+ */
 class GroupInviteServiceTest extends TestCase
 {
+    use DatabaseTransactions;
+
     private GroupInviteService $service;
 
     protected function setUp(): void
@@ -20,14 +35,45 @@ class GroupInviteServiceTest extends TestCase
         $this->service = new GroupInviteService();
     }
 
+    /**
+     * Create a real, active user under the test tenant. Re-pins the tenant
+     * context in case a model observer reset it during creation.
+     */
+    private function seedUser(): int
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'status'      => 'active',
+            'is_approved' => true,
+        ]);
+        TenantContext::setById($this->testTenantId);
+
+        return (int) $user->id;
+    }
+
+    /**
+     * Seed a group owned by $ownerId. The owner passes GroupService::canModify().
+     */
+    private function seedGroup(int $ownerId): int
+    {
+        return DB::table('groups')->insertGetId([
+            'tenant_id'  => $this->testTenantId,
+            'owner_id'   => $ownerId,
+            'name'       => 'Invite service unit-test group',
+            'visibility' => 'public',
+            'status'     => 'active',
+            'is_active'  => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
     public function test_createLink_returns_null_when_user_cannot_invite(): void
     {
-        // canInvite checks group_members joined with groups — mock the chain to return false
-        DB::shouldReceive('table->join->where->where->where->where->exists')
-            ->once()
-            ->andReturn(false);
+        $ownerId = $this->seedUser();
+        $outsiderId = $this->seedUser(); // not owner, not a member
+        $groupId = $this->seedGroup($ownerId);
 
-        $result = $this->service->createLink(1, 99);
+        $result = $this->service->createLink($groupId, $outsiderId);
 
         $this->assertNull($result);
         $errors = $this->service->getErrors();
@@ -37,33 +83,33 @@ class GroupInviteServiceTest extends TestCase
 
     public function test_createLink_returns_invite_data_on_success(): void
     {
-        // canInvite returns true
-        DB::shouldReceive('table->join->where->where->where->where->exists')
-            ->once()
-            ->andReturn(true);
+        $ownerId = $this->seedUser();
+        $groupId = $this->seedGroup($ownerId);
 
-        // insertGetId for the invite
-        DB::shouldReceive('table->insertGetId')
-            ->once()
-            ->andReturn(42);
-
-        $result = $this->service->createLink(1, 10);
+        $result = $this->service->createLink($groupId, $ownerId);
 
         $this->assertIsArray($result);
-        $this->assertEquals(42, $result['id']);
+        $this->assertArrayHasKey('id', $result);
         $this->assertArrayHasKey('token', $result);
         $this->assertArrayHasKey('invite_url', $result);
         $this->assertArrayHasKey('expires_at', $result);
         $this->assertEquals(40, strlen($result['token']));
+
+        // The invite row persisted as a pending link under the test tenant.
+        $this->assertTrue(
+            DB::table('group_invites')
+                ->where('id', $result['id'])
+                ->where('tenant_id', $this->testTenantId)
+                ->where('group_id', $groupId)
+                ->where('invite_type', 'link')
+                ->where('status', GroupInviteService::STATUS_PENDING)
+                ->exists()
+        );
     }
 
     public function test_acceptInvite_returns_null_when_token_not_found(): void
     {
-        DB::shouldReceive('table->where->where->where->first')
-            ->once()
-            ->andReturn(null);
-
-        $result = $this->service->acceptInvite('invalid-token', 5);
+        $result = $this->service->acceptInvite('definitely-not-a-real-token', $this->seedUser());
 
         $this->assertNull($result);
         $errors = $this->service->getErrors();
@@ -73,23 +119,38 @@ class GroupInviteServiceTest extends TestCase
 
     public function test_revokeInvite_returns_true_on_success(): void
     {
-        DB::shouldReceive('table->where->where->where->update')
-            ->once()
-            ->andReturn(1);
+        $ownerId = $this->seedUser();
+        $groupId = $this->seedGroup($ownerId);
 
-        $result = $this->service->revokeInvite(10, 5);
+        $inviteId = DB::table('group_invites')->insertGetId([
+            'tenant_id'   => $this->testTenantId,
+            'group_id'    => $groupId,
+            'invited_by'  => $ownerId,
+            'invite_type' => 'link',
+            'token'       => str_repeat('a', 40),
+            'status'      => GroupInviteService::STATUS_PENDING,
+            'expires_at'  => now()->addDays(14),
+            'created_at'  => now(),
+            'updated_at'  => now(),
+        ]);
+
+        $result = $this->service->revokeInvite($groupId, $inviteId, $ownerId);
 
         $this->assertTrue($result);
         $this->assertEmpty($this->service->getErrors());
+        $this->assertEquals(
+            GroupInviteService::STATUS_REVOKED,
+            DB::table('group_invites')->where('id', $inviteId)->value('status')
+        );
     }
 
     public function test_revokeInvite_returns_false_when_invite_not_found(): void
     {
-        DB::shouldReceive('table->where->where->where->update')
-            ->once()
-            ->andReturn(0);
+        $ownerId = $this->seedUser();
+        $groupId = $this->seedGroup($ownerId);
 
-        $result = $this->service->revokeInvite(999, 5);
+        // No invite row with id 999999 → update affects 0 rows.
+        $result = $this->service->revokeInvite($groupId, 999999, $ownerId);
 
         $this->assertFalse($result);
         $errors = $this->service->getErrors();
@@ -99,11 +160,11 @@ class GroupInviteServiceTest extends TestCase
 
     public function test_sendEmailInvites_returns_empty_when_user_cannot_invite(): void
     {
-        DB::shouldReceive('table->join->where->where->where->where->exists')
-            ->once()
-            ->andReturn(false);
+        $ownerId = $this->seedUser();
+        $outsiderId = $this->seedUser();
+        $groupId = $this->seedGroup($ownerId);
 
-        $result = $this->service->sendEmailInvites(1, 99, ['test@example.com']);
+        $result = $this->service->sendEmailInvites($groupId, $outsiderId, ['test@example.com']);
 
         $this->assertEmpty($result);
         $errors = $this->service->getErrors();

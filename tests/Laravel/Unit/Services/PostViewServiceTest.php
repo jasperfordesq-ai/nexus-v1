@@ -6,86 +6,158 @@
 
 namespace Tests\Laravel\Unit\Services;
 
+use App\Core\TenantContext;
+use App\Models\User;
 use App\Services\PostViewService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Tests\Laravel\TestCase;
 
+/**
+ * Unit tests for PostViewService.
+ *
+ * The recordView tests run against real seeded rows (DatabaseTransactions)
+ * because recordView now calls FeedItemTables::canView('post', …) — a real DB
+ * visibility check — before debouncing/inserting. That guard cannot be
+ * satisfied under a fully-mocked DB facade, so these tests exercise the
+ * service against a genuine (rolled-back) post and the array cache driver.
+ *
+ * getViewCount stays mock-isolated (it never touches canView).
+ */
 class PostViewServiceTest extends TestCase
 {
+    use DatabaseTransactions;
+
     private PostViewService $service;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->service = new PostViewService();
+        Cache::flush();
+    }
+
+    /**
+     * Create a real, active user under the test tenant and return its id.
+     * Re-pins the tenant context in case a model observer reset it.
+     */
+    private function seedUser(): int
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'status'      => 'active',
+            'is_approved' => true,
+        ]);
+        TenantContext::setById($this->testTenantId);
+
+        return (int) $user->id;
+    }
+
+    /**
+     * Seed a public, viewable feed_posts row (with views_count = 0) so
+     * FeedItemTables::canView('post', …) returns true. Returns the post id.
+     */
+    private function seedViewablePost(int $authorId): int
+    {
+        return DB::table('feed_posts')->insertGetId([
+            'tenant_id'   => $this->testTenantId,
+            'user_id'     => $authorId,
+            'content'     => 'Post view service unit-test post',
+            'type'        => 'post',
+            'visibility'  => 'public',
+            'views_count' => 0,
+            'created_at'  => now(),
+            'updated_at'  => now(),
+        ]);
+    }
+
+    private function viewsCount(int $postId): int
+    {
+        return (int) DB::table('feed_posts')
+            ->where('id', $postId)
+            ->where('tenant_id', $this->testTenantId)
+            ->value('views_count');
     }
 
     // ── recordView: debounce via cache ───────────────────────────────
 
     public function test_recordView_skips_when_cache_hit(): void
     {
-        Cache::shouldReceive('has')->once()->andReturn(true);
-        // DB::table MUST NOT be called — if it were, mock would miss
-        DB::shouldReceive('table')->never();
-        Cache::shouldReceive('put')->never();
+        $userId = $this->seedUser();
+        $postId = $this->seedViewablePost($userId);
 
-        $this->service->recordView(10, 5, 'ip-hash');
-        $this->assertTrue(true);
+        // Pre-seed the debounce cache key so recordView short-circuits.
+        $cacheKey = "post_view:{$this->testTenantId}:{$postId}:u:{$userId}";
+        Cache::put($cacheKey, true, now()->addMinutes(30));
+
+        $this->service->recordView($postId, $userId, 'ip-hash');
+
+        // No view row written and the counter stays at zero.
+        $this->assertFalse(
+            DB::table('post_views')
+                ->where('tenant_id', $this->testTenantId)
+                ->where('post_id', $postId)
+                ->exists()
+        );
+        $this->assertSame(0, $this->viewsCount($postId));
     }
 
     public function test_recordView_logged_in_inserts_and_increments_counter(): void
     {
-        Cache::shouldReceive('has')->once()->andReturn(false);
-        Cache::shouldReceive('put')->once();
+        $userId = $this->seedUser();
+        $postId = $this->seedViewablePost($userId);
 
-        // First call: post_views insert
-        DB::shouldReceive('table')->with('post_views')->once()->andReturnSelf();
-        DB::shouldReceive('insertOrIgnore')->once()->andReturn(1);
+        $this->service->recordView($postId, $userId, 'ip-hash');
 
-        // Second call: feed_posts increment
-        DB::shouldReceive('table')->with('feed_posts')->once()->andReturnSelf();
-        DB::shouldReceive('where')->twice()->andReturnSelf();
-        DB::shouldReceive('increment')->with('views_count')->once()->andReturn(1);
-
-        $this->service->recordView(10, 5, 'ip-hash');
-        $this->assertTrue(true);
+        // A logged-in view row is stored keyed by user_id (ip_hash null).
+        $this->assertTrue(
+            DB::table('post_views')
+                ->where('tenant_id', $this->testTenantId)
+                ->where('post_id', $postId)
+                ->where('user_id', $userId)
+                ->whereNull('ip_hash')
+                ->exists()
+        );
+        $this->assertSame(1, $this->viewsCount($postId));
     }
 
     public function test_recordView_anonymous_uses_ip_hash(): void
     {
-        Cache::shouldReceive('has')->once()->andReturn(false);
-        Cache::shouldReceive('put')->once();
+        $authorId = $this->seedUser();
+        $postId = $this->seedViewablePost($authorId);
 
-        DB::shouldReceive('table')->with('post_views')->once()->andReturnSelf();
-        DB::shouldReceive('insertOrIgnore')->once()
-            ->withArgs(function ($data) {
-                return $data['user_id'] === null
-                    && $data['ip_hash'] === 'hash-xyz';
-            })
-            ->andReturn(1);
+        $this->service->recordView($postId, null, 'hash-xyz');
 
-        DB::shouldReceive('table')->with('feed_posts')->once()->andReturnSelf();
-        DB::shouldReceive('where')->twice()->andReturnSelf();
-        DB::shouldReceive('increment')->once()->andReturn(1);
-
-        $this->service->recordView(10, null, 'hash-xyz');
-        $this->assertTrue(true);
+        // An anonymous view row is keyed by ip_hash (user_id null).
+        $this->assertTrue(
+            DB::table('post_views')
+                ->where('tenant_id', $this->testTenantId)
+                ->where('post_id', $postId)
+                ->whereNull('user_id')
+                ->where('ip_hash', 'hash-xyz')
+                ->exists()
+        );
+        $this->assertSame(1, $this->viewsCount($postId));
     }
 
     public function test_recordView_skips_counter_when_insert_is_duplicate(): void
     {
-        Cache::shouldReceive('has')->once()->andReturn(false);
-        Cache::shouldReceive('put')->once();
+        $userId = $this->seedUser();
+        $postId = $this->seedViewablePost($userId);
 
-        DB::shouldReceive('table')->with('post_views')->once()->andReturnSelf();
-        DB::shouldReceive('insertOrIgnore')->once()->andReturn(0); // already exists
+        // Pre-insert the same (tenant, post, user) view row so the service's
+        // insertOrIgnore is a no-op and the counter must NOT increment.
+        DB::table('post_views')->insert([
+            'tenant_id' => $this->testTenantId,
+            'post_id'   => $postId,
+            'user_id'   => $userId,
+            'ip_hash'   => null,
+            'viewed_at' => now(),
+        ]);
 
-        // increment MUST NOT be called
-        DB::shouldReceive('table')->with('feed_posts')->never();
+        $this->service->recordView($postId, $userId, 'ip-hash');
 
-        $this->service->recordView(10, 5, 'ip-hash');
-        $this->assertTrue(true);
+        $this->assertSame(0, $this->viewsCount($postId));
     }
 
     // ── getViewCount ────────────────────────────────────────────────

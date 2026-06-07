@@ -512,7 +512,7 @@ class MessagesControllerTest extends TestCase
         ]);
 
         // Mock the OpenAI API response
-        config(['services.openai.key' => 'test-key']);
+        config(['services.openai.api_key' => 'test-key']);
         Http::fake([
             'api.openai.com/*' => Http::response([
                 'choices' => [['message' => ['content' => 'Hello, how are you?']]],
@@ -556,7 +556,7 @@ class MessagesControllerTest extends TestCase
             'created_at' => now(),
         ]);
 
-        config(['services.openai.key' => 'test-key']);
+        config(['services.openai.api_key' => 'test-key']);
         Http::fake([
             'api.openai.com/*' => Http::response([
                 'choices' => [['message' => ['content' => 'Hello, how are you?']]],
@@ -608,7 +608,7 @@ class MessagesControllerTest extends TestCase
             'created_at' => now(),
         ]);
 
-        config(['services.openai.key' => 'test-key']);
+        config(['services.openai.api_key' => 'test-key']);
         Http::fake([
             'api.openai.com/*' => Http::response([
                 'choices' => [['message' => ['content' => 'Translated transcript']]],
@@ -647,7 +647,7 @@ class MessagesControllerTest extends TestCase
             'created_at' => now(),
         ]);
 
-        config(['services.openai.key' => 'test-key']);
+        config(['services.openai.api_key' => 'test-key']);
         Http::fake([
             'api.openai.com/*' => Http::response([
                 'choices' => [['message' => ['content' => 'Good morning!']]],
@@ -710,7 +710,7 @@ class MessagesControllerTest extends TestCase
             'created_at' => now(),
         ]);
 
-        config(['services.openai.key' => 'test-key']);
+        config(['services.openai.api_key' => 'test-key']);
         Http::fake([
             'api.openai.com/*' => Http::response([
                 'choices' => [['message' => ['content' => 'Good morning!']]],

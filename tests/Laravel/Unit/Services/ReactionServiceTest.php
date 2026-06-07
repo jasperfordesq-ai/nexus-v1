@@ -6,7 +6,10 @@
 
 namespace Tests\Laravel\Unit\Services;
 
+use App\Core\TenantContext;
+use App\Models\User;
 use App\Services\ReactionService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Tests\Laravel\TestCase;
 
@@ -14,21 +17,87 @@ use Tests\Laravel\TestCase;
  * Unit tests for ReactionService — toggle, get reactions, get reactors,
  * and batch post reactions.
  *
- * Uses Mockery DB facade expectations to isolate from the database.
+ * The read-path methods (getReactions / getReactors / getReactionsForPosts)
+ * are isolated from the database with Mockery DB facade expectations.
+ *
+ * The toggleReaction tests use real seeded rows (DatabaseTransactions) because
+ * toggleReaction now calls FeedItemTables::canView() — a real DB visibility
+ * check added 2026-05-05 — before touching the reactions table. That guard
+ * cannot be satisfied under a fully-mocked DB facade, so those tests exercise
+ * the service against a genuine (rolled-back) post/comment row.
  */
 class ReactionServiceTest extends TestCase
 {
+    use DatabaseTransactions;
+
     private ReactionService $service;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->service = new ReactionService();
+    }
 
-        // Allow DB::raw() calls used in select/groupBy expressions
+    /**
+     * Register the DB::raw() pass-through used by the read-path mocks.
+     * Only called by the mock-based tests — NOT by the toggleReaction tests,
+     * which run against the real (transaction-wrapped) database.
+     */
+    private function mockDbRaw(): void
+    {
         DB::shouldReceive('raw')->andReturnUsing(
             fn ($v) => new \Illuminate\Database\Query\Expression($v)
         );
+    }
+
+    /**
+     * Create a real, active user under the test tenant and return its id.
+     * The feed_posts / reactions FK constraints require a genuine users row.
+     * Re-pins the tenant context afterwards in case a model observer reset it.
+     */
+    private function seedUser(): int
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'status'      => 'active',
+            'is_approved' => true,
+        ]);
+        TenantContext::setById($this->testTenantId);
+
+        return (int) $user->id;
+    }
+
+    /**
+     * Seed a public, viewable feed_posts row so FeedItemTables::canView('post', …)
+     * returns true. Returns the new post id.
+     */
+    private function seedViewablePost(int $authorId): int
+    {
+        return DB::table('feed_posts')->insertGetId([
+            'tenant_id'  => $this->testTenantId,
+            'user_id'    => $authorId,
+            'content'    => 'Reaction service unit-test post',
+            'type'       => 'post',
+            'visibility' => 'public',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    /**
+     * Seed a comment on a viewable post so FeedItemTables::canView('comment', …)
+     * resolves (it recurses into the parent post's visibility). Returns comment id.
+     */
+    private function seedViewableComment(int $postId, int $authorId): int
+    {
+        return DB::table('comments')->insertGetId([
+            'tenant_id'   => $this->testTenantId,
+            'target_type' => 'post',
+            'target_id'   => $postId,
+            'user_id'     => $authorId,
+            'content'     => 'Reaction service unit-test comment',
+            'created_at'  => now(),
+            'updated_at'  => now(),
+        ]);
     }
 
     // ======================================================================
@@ -52,92 +121,71 @@ class ReactionServiceTest extends TestCase
 
     public function test_toggleReaction_adds_new_reaction(): void
     {
-        // 4 where() calls: tenant_id, target_type, target_id, user_id → first()
-        DB::shouldReceive('table->where->where->where->where->first')->once()->andReturn(null);
+        $userId = $this->seedUser();
+        $postId = $this->seedViewablePost($userId);
 
-        // Insert
-        DB::shouldReceive('table->insert')->once();
-
-        // getReactions internal call — counts query: 3 where() calls + select + groupBy + get
-        DB::shouldReceive('table->where->where->where->select->groupBy->get')
-            ->once()
-            ->andReturn(collect([(object) ['emoji' => 'love', 'count' => 1]]));
-
-        // getReactions — user reaction: 4 where() calls + first
-        DB::shouldReceive('table->where->where->where->where->first')
-            ->once()
-            ->andReturn((object) ['emoji' => 'love']);
-
-        // getReactions — top reactors
-        DB::shouldReceive('table->join->where->where->where->orderByDesc->limit->select->get->map->all')
-            ->once()
-            ->andReturn([['id' => 5, 'name' => 'Test User', 'avatar_url' => null]]);
-
-        $result = $this->service->toggleReaction(1, 'post', 'love', 5);
+        $result = $this->service->toggleReaction($postId, 'post', 'love', $userId);
 
         $this->assertEquals('added', $result['action']);
         $this->assertEquals('love', $result['reaction_type']);
         $this->assertArrayHasKey('reactions', $result);
+        $this->assertSame(1, $result['reactions']['counts']['love'] ?? null);
+        $this->assertEquals('love', $result['reactions']['user_reaction']);
+
+        // Row persisted under the test tenant.
+        $this->assertTrue(
+            DB::table('reactions')
+                ->where('tenant_id', $this->testTenantId)
+                ->where('target_type', 'post')
+                ->where('target_id', $postId)
+                ->where('user_id', $userId)
+                ->where('emoji', 'love')
+                ->exists()
+        );
     }
 
     public function test_toggleReaction_removes_same_type(): void
     {
-        DB::shouldReceive('table->where->where->where->where->first')
-            ->once()
-            ->andReturn((object) ['id' => 42, 'emoji' => 'love']);
+        $userId = $this->seedUser();
+        $postId = $this->seedViewablePost($userId);
 
-        // Delete: where(id)->where(tenant_id)->delete
-        DB::shouldReceive('table->where->where->delete')->once();
-
-        // getReactions — counts
-        DB::shouldReceive('table->where->where->where->select->groupBy->get')
-            ->once()
-            ->andReturn(collect([]));
-
-        // getReactions — user reaction
-        DB::shouldReceive('table->where->where->where->where->first')
-            ->once()
-            ->andReturn(null);
-
-        // getReactions — top reactors
-        DB::shouldReceive('table->join->where->where->where->orderByDesc->limit->select->get->map->all')
-            ->once()
-            ->andReturn([]);
-
-        $result = $this->service->toggleReaction(1, 'post', 'love', 5);
+        // First toggle adds it, second toggle of the same type removes it.
+        $this->service->toggleReaction($postId, 'post', 'love', $userId);
+        $result = $this->service->toggleReaction($postId, 'post', 'love', $userId);
 
         $this->assertEquals('removed', $result['action']);
         $this->assertNull($result['reaction_type']);
+        $this->assertFalse(
+            DB::table('reactions')
+                ->where('tenant_id', $this->testTenantId)
+                ->where('target_type', 'post')
+                ->where('target_id', $postId)
+                ->where('user_id', $userId)
+                ->exists()
+        );
     }
 
     public function test_toggleReaction_updates_different_type(): void
     {
-        DB::shouldReceive('table->where->where->where->where->first')
-            ->once()
-            ->andReturn((object) ['id' => 42, 'emoji' => 'love']);
+        $userId = $this->seedUser();
+        $postId = $this->seedViewablePost($userId);
 
-        // Update: where(id)->where(tenant_id)->update
-        DB::shouldReceive('table->where->where->update')->once();
-
-        // getReactions — counts
-        DB::shouldReceive('table->where->where->where->select->groupBy->get')
-            ->once()
-            ->andReturn(collect([(object) ['emoji' => 'laugh', 'count' => 1]]));
-
-        // getReactions — user reaction
-        DB::shouldReceive('table->where->where->where->where->first')
-            ->once()
-            ->andReturn((object) ['emoji' => 'laugh']);
-
-        // getReactions — top reactors
-        DB::shouldReceive('table->join->where->where->where->orderByDesc->limit->select->get->map->all')
-            ->once()
-            ->andReturn([]);
-
-        $result = $this->service->toggleReaction(1, 'post', 'laugh', 5);
+        // Existing 'love' reaction, then toggle to 'laugh' updates in place.
+        $this->service->toggleReaction($postId, 'post', 'love', $userId);
+        $result = $this->service->toggleReaction($postId, 'post', 'laugh', $userId);
 
         $this->assertEquals('updated', $result['action']);
         $this->assertEquals('laugh', $result['reaction_type']);
+
+        // Exactly one row remains, now carrying the new emoji.
+        $rows = DB::table('reactions')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('target_type', 'post')
+            ->where('target_id', $postId)
+            ->where('user_id', $userId)
+            ->pluck('emoji')
+            ->all();
+        $this->assertSame(['laugh'], $rows);
     }
 
     public function test_toggleReaction_throws_for_invalid_entity_type(): void
@@ -150,19 +198,23 @@ class ReactionServiceTest extends TestCase
 
     public function test_toggleReaction_works_for_comment_entity(): void
     {
-        DB::shouldReceive('table->where->where->where->where->first')->once()->andReturn(null);
-        DB::shouldReceive('table->insert')->once();
-        DB::shouldReceive('table->where->where->where->select->groupBy->get')
-            ->once()->andReturn(collect([(object) ['emoji' => 'clap', 'count' => 1]]));
-        DB::shouldReceive('table->where->where->where->where->first')
-            ->once()->andReturn((object) ['emoji' => 'clap']);
-        DB::shouldReceive('table->join->where->where->where->orderByDesc->limit->select->get->map->all')
-            ->once()->andReturn([]);
+        $userId = $this->seedUser();
+        $postId = $this->seedViewablePost($userId);
+        $commentId = $this->seedViewableComment($postId, $userId);
 
-        $result = $this->service->toggleReaction(10, 'comment', 'clap', 5);
+        $result = $this->service->toggleReaction($commentId, 'comment', 'clap', $userId);
 
         $this->assertEquals('added', $result['action']);
         $this->assertEquals('clap', $result['reaction_type']);
+        $this->assertTrue(
+            DB::table('reactions')
+                ->where('tenant_id', $this->testTenantId)
+                ->where('target_type', 'comment')
+                ->where('target_id', $commentId)
+                ->where('user_id', $userId)
+                ->where('emoji', 'clap')
+                ->exists()
+        );
     }
 
     // ======================================================================
@@ -171,6 +223,7 @@ class ReactionServiceTest extends TestCase
 
     public function test_getReactions_returns_counts_and_user_reaction(): void
     {
+        $this->mockDbRaw();
         DB::shouldReceive('table->where->where->where->select->groupBy->get')
             ->once()
             ->andReturn(collect([
@@ -199,6 +252,7 @@ class ReactionServiceTest extends TestCase
 
     public function test_getReactions_returns_null_user_reaction_when_no_user(): void
     {
+        $this->mockDbRaw();
         DB::shouldReceive('table->where->where->where->select->groupBy->get')
             ->once()
             ->andReturn(collect([(object) ['emoji' => 'love', 'count' => 2]]));
@@ -217,6 +271,7 @@ class ReactionServiceTest extends TestCase
 
     public function test_getReactions_returns_empty_when_no_reactions(): void
     {
+        $this->mockDbRaw();
         DB::shouldReceive('table->where->where->where->select->groupBy->get')
             ->once()
             ->andReturn(collect([]));
@@ -251,6 +306,7 @@ class ReactionServiceTest extends TestCase
 
     public function test_getReactors_returns_paginated_users(): void
     {
+        $this->mockDbRaw();
         // count() — 5 where calls: join + 4 where
         DB::shouldReceive('table->join->where->where->where->where->count')
             ->once()
@@ -273,6 +329,7 @@ class ReactionServiceTest extends TestCase
 
     public function test_getReactors_returns_no_more_when_last_page(): void
     {
+        $this->mockDbRaw();
         DB::shouldReceive('table->join->where->where->where->where->count')
             ->once()
             ->andReturn(2);
@@ -292,6 +349,7 @@ class ReactionServiceTest extends TestCase
 
     public function test_getReactors_returns_empty_for_no_reactions(): void
     {
+        $this->mockDbRaw();
         DB::shouldReceive('table->join->where->where->where->where->count')
             ->once()
             ->andReturn(0);

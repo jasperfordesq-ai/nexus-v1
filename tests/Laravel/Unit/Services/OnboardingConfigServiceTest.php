@@ -6,6 +6,7 @@
 
 namespace Tests\Laravel\Unit\Services;
 
+use App\Core\TenantContext;
 use App\Models\User;
 use App\Services\OnboardingConfigService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -98,6 +99,10 @@ class OnboardingConfigServiceTest extends TestCase
             'avatar_url' => 'https://example.com/photo.jpg',
             'bio' => 'A bio that is long enough to pass validation easily.',
         ]);
+        // Factory creation fires the UserObserver (sync search/embedding jobs)
+        // which leaves TenantContext pinned to tenant 1. Re-pin to the test
+        // tenant so User::find()'s global tenant scope resolves the new user.
+        TenantContext::setById($this->testTenantId);
 
         $unmet = OnboardingConfigService::validateCompletion($this->testTenantId, $user->id);
 
@@ -110,6 +115,7 @@ class OnboardingConfigServiceTest extends TestCase
             'avatar_url' => null,
             'bio' => 'A bio that is long enough.',
         ]);
+        TenantContext::setById($this->testTenantId);
 
         $unmet = OnboardingConfigService::validateCompletion($this->testTenantId, $user->id);
 
@@ -122,6 +128,7 @@ class OnboardingConfigServiceTest extends TestCase
             'avatar_url' => 'https://example.com/photo.jpg',
             'bio' => null,
         ]);
+        TenantContext::setById($this->testTenantId);
 
         $unmet = OnboardingConfigService::validateCompletion($this->testTenantId, $user->id);
 
@@ -135,6 +142,7 @@ class OnboardingConfigServiceTest extends TestCase
             'avatar_url' => null,
             'bio' => null,
         ]);
+        TenantContext::setById($this->testTenantId);
 
         // Default gating settings are all false
         $this->assertTrue(OnboardingConfigService::isProfileVisible($this->testTenantId, $user->id));
@@ -150,10 +158,13 @@ class OnboardingConfigServiceTest extends TestCase
         $user = User::factory()->forTenant($this->testTenantId)->create([
             'onboarding_completed' => false,
         ]);
+        TenantContext::setById($this->testTenantId);
 
         $this->assertFalse(OnboardingConfigService::isProfileVisible($this->testTenantId, $user->id));
 
         $user->update(['onboarding_completed' => true]);
+        // update() re-fires the observer and resets the tenant context again.
+        TenantContext::setById($this->testTenantId);
         $this->assertTrue(OnboardingConfigService::isProfileVisible($this->testTenantId, $user->id));
     }
 

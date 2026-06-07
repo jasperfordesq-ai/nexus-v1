@@ -6,34 +6,53 @@
 
 namespace Tests\Laravel\Unit\Services;
 
+use App\Services\FeedRankingService;
 use Tests\Laravel\TestCase;
-use App\Services\RankingService;
 
-class RankingServiceTest extends \Tests\Laravel\TestCase
+/**
+ * Ranking service contract tests.
+ *
+ * The original monolithic App\Services\RankingService (a thin DI wrapper around
+ * the now-deleted legacy \Nexus\Services\RankingService) was removed during the
+ * Laravel migration and split into dedicated services: FeedRankingService,
+ * ListingRankingService, MemberRankingService, PollRankingService and
+ * SmartGroupRankingService. FeedRankingService is the canonical EdgeRank
+ * implementation, so these tests assert its current public contract.
+ */
+class RankingServiceTest extends TestCase
 {
     public function testClassExists(): void
     {
-        $this->assertTrue(class_exists(RankingService::class));
+        $this->assertTrue(class_exists(FeedRankingService::class));
     }
 
-    public function testDefaultScoreConstant(): void
+    public function testSignalWeightConstants(): void
     {
-        $this->assertEquals(1.0, RankingService::DEFAULT_SCORE);
+        $this->assertSame(1, FeedRankingService::LIKE_WEIGHT);
+        $this->assertSame(5, FeedRankingService::COMMENT_WEIGHT);
+        $this->assertSame(8, FeedRankingService::SHARE_WEIGHT);
     }
 
-    public function testEarthRadiusConstant(): void
+    public function testGetConfigMethodExists(): void
     {
-        $this->assertEquals(6371, RankingService::EARTH_RADIUS_KM);
+        $this->assertTrue(method_exists(FeedRankingService::class, 'getConfig'));
     }
 
-    public function testGetSharedConfigMethodExists(): void
+    public function testGetConfigIsStatic(): void
     {
-        $this->assertTrue(method_exists(RankingService::class, 'getSharedConfig'));
-    }
-
-    public function testGetSharedConfigIsStatic(): void
-    {
-        $ref = new \ReflectionMethod(RankingService::class, 'getSharedConfig');
+        $ref = new \ReflectionMethod(FeedRankingService::class, 'getConfig');
         $this->assertTrue($ref->isStatic());
+    }
+
+    public function testGetConfigReturnsDefaultsArray(): void
+    {
+        FeedRankingService::clearStaticCache();
+
+        $config = FeedRankingService::getConfig();
+
+        $this->assertIsArray($config);
+        $this->assertTrue($config['enabled']);
+        // validateConfigArray() normalises weights to float, so compare loosely.
+        $this->assertEquals(FeedRankingService::LIKE_WEIGHT, $config['like_weight']);
     }
 }

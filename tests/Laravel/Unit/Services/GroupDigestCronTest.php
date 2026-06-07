@@ -7,7 +7,6 @@
 namespace Tests\Laravel\Unit\Services;
 
 use Tests\Laravel\TestCase;
-use App\Services\DigestService;
 use App\Services\NotificationDispatcher;
 use App\Services\GroupService;
 
@@ -15,67 +14,24 @@ use App\Services\GroupService;
  * GroupDigestCronTest
  *
  * Tests for group activity digest cron operations:
- * - Weekly digest email generation (DigestService)
  * - Notification queue processing with frequency settings (NotificationDispatcher)
  * - Group activity aggregation
  * - Opt-out handling via notification frequency settings
  * - Digest scheduling and frequency hierarchy (thread > group > global)
  *
- * @covers \App\Services\DigestService
+ * NOTE: the old `App\Services\DigestService` was a dead stub (zero callers, its
+ * methods only logged "Legacy delegation removed") and was deleted during the
+ * Laravel migration — commit aa27af479, "convert all 93 stub services". The
+ * real weekly-digest implementation now lives in
+ * `GamificationEmailService::sendWeeklyDigests()` with a different (instance,
+ * array-returning) API, so the former reflection assertions against
+ * DigestService no longer apply and have been removed.
+ *
  * @covers \App\Services\NotificationDispatcher
  * @covers \App\Services\GroupService
  */
 class GroupDigestCronTest extends \Tests\Laravel\TestCase
 {
-    // =========================================================================
-    // DIGEST SERVICE — CLASS & METHOD EXISTENCE
-    // =========================================================================
-
-    /**
-     * Test DigestService class exists
-     */
-    public function testDigestServiceClassExists(): void
-    {
-        $this->assertTrue(class_exists(DigestService::class));
-    }
-
-    /**
-     * Test sendWeeklyDigests method exists and is static
-     */
-    public function testSendWeeklyDigestsMethodIsStatic(): void
-    {
-        $ref = new \ReflectionMethod(DigestService::class, 'sendWeeklyDigests');
-        $this->assertTrue($ref->isStatic(), 'sendWeeklyDigests should be static');
-        $this->assertTrue($ref->isPublic(), 'sendWeeklyDigests should be public');
-    }
-
-    /**
-     * Test sendWeeklyDigests takes no parameters (cron entry point)
-     */
-    public function testSendWeeklyDigestsMethodSignature(): void
-    {
-        $ref = new \ReflectionMethod(DigestService::class, 'sendWeeklyDigests');
-        $params = $ref->getParameters();
-
-        $this->assertCount(0, $params, 'sendWeeklyDigests should take no parameters (cron entry point)');
-    }
-
-    /**
-     * Test renderTemplate private method exists for email HTML generation
-     */
-    public function testRenderTemplateMethodExists(): void
-    {
-        $ref = new \ReflectionClass(DigestService::class);
-        $this->assertTrue(
-            $ref->hasMethod('renderTemplate'),
-            'renderTemplate should exist for digest email rendering'
-        );
-
-        $method = $ref->getMethod('renderTemplate');
-        $this->assertTrue($method->isPrivate(), 'renderTemplate should be private');
-        $this->assertTrue($method->isStatic(), 'renderTemplate should be static');
-    }
-
     // =========================================================================
     // NOTIFICATION DISPATCHER — DIGEST & FREQUENCY MANAGEMENT
     // =========================================================================
@@ -431,26 +387,6 @@ class GroupDigestCronTest extends \Tests\Laravel\TestCase
         $this->assertGreaterThanOrEqual(2, count($params));
         $this->assertEquals('userId', $params[0]->getName());
         $this->assertEquals('type', $params[1]->getName());
-    }
-
-    // =========================================================================
-    // DIGEST TEMPLATE
-    // =========================================================================
-
-    /**
-     * Test renderTemplate method accepts user, offers, requests, events
-     */
-    public function testRenderTemplateMethodSignature(): void
-    {
-        $ref = new \ReflectionClass(DigestService::class);
-        $method = $ref->getMethod('renderTemplate');
-        $params = $method->getParameters();
-
-        $this->assertGreaterThanOrEqual(4, count($params), 'Should accept user, offers, requests, events');
-        $this->assertEquals('user', $params[0]->getName());
-        $this->assertEquals('offers', $params[1]->getName());
-        $this->assertEquals('requests', $params[2]->getName());
-        $this->assertEquals('events', $params[3]->getName());
     }
 
     // =========================================================================

@@ -39,10 +39,14 @@ class UserModelTest extends TestCase
         User::factory()->forTenant($this->testTenantId)->count(2)->create();
         User::factory()->forTenant(999)->count(3)->create();
 
-        // TenantContext is set to testTenantId (2) in setUp()
+        // Factories fire observers that reset TenantContext to tenant 1; re-pin
+        // to the test tenant so the global TenantScope filters to tenant 2.
+        TenantContext::setById($this->testTenantId);
+
         $users = User::all();
 
-        // Should only return users from tenant 2
+        // Should only return users from tenant 2 (and at least the 2 we created).
+        $this->assertGreaterThanOrEqual(2, $users->count());
         foreach ($users as $user) {
             $this->assertEquals(
                 $this->testTenantId,
@@ -109,6 +113,12 @@ class UserModelTest extends TestCase
         Listing::factory()->forTenant($this->testTenantId)->count(2)->create([
             'user_id' => $user->id,
         ]);
+
+        // Model observers (fired by the factories above) reset TenantContext to
+        // tenant 1. Re-pin to the test tenant so the TenantScope on the listings
+        // relationship resolves against tenant 2 — otherwise it filters to tenant 1
+        // and returns zero rows.
+        TenantContext::setById($this->testTenantId);
 
         $this->assertCount(2, $user->listings);
     }
@@ -280,8 +290,12 @@ class UserModelTest extends TestCase
         User::factory()->forTenant($this->testTenantId)->create(['status' => 'inactive']);
         User::factory()->forTenant($this->testTenantId)->create(['status' => 'suspended']);
 
+        // Re-pin tenant context (factories reset it to tenant 1 via observers).
+        TenantContext::setById($this->testTenantId);
+
         $activeUsers = User::active()->get();
 
+        $this->assertGreaterThanOrEqual(1, $activeUsers->count());
         foreach ($activeUsers as $user) {
             $this->assertEquals('active', $user->status);
         }
@@ -295,8 +309,12 @@ class UserModelTest extends TestCase
         User::factory()->forTenant($this->testTenantId)->create(['is_verified' => true]);
         User::factory()->forTenant($this->testTenantId)->create(['is_verified' => false]);
 
+        // Re-pin tenant context (factories reset it to tenant 1 via observers).
+        TenantContext::setById($this->testTenantId);
+
         $verifiedUsers = User::verified()->get();
 
+        $this->assertGreaterThanOrEqual(1, $verifiedUsers->count());
         foreach ($verifiedUsers as $user) {
             $this->assertTrue($user->is_verified);
         }

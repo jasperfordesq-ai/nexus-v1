@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Tests\Laravel\Feature\Marketplace;
 
+use App\Core\TenantContext;
 use App\Models\MarketplaceListing;
 use App\Models\User;
 use App\Services\MarketplaceInventoryService;
@@ -32,7 +33,7 @@ class InventoryTrackingTest extends TestCase
     private function createListing(int $count = 5, bool $oversoldProtected = true, ?int $threshold = null): int
     {
         $user = User::factory()->forTenant($this->testTenantId)->create();
-        return (int) DB::table('marketplace_listings')->insertGetId([
+        $id = (int) DB::table('marketplace_listings')->insertGetId([
             'tenant_id' => $this->testTenantId,
             'user_id' => $user->id,
             'title' => 'Inv Widget',
@@ -46,6 +47,29 @@ class InventoryTrackingTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
+        // The User factory above fires observers that reset TenantContext to
+        // tenant 1. Re-pin to the test tenant so the TenantScope on
+        // MarketplaceListing::find() (used throughout these tests to verify
+        // results) resolves against tenant 2 — otherwise it returns null.
+        TenantContext::setById($this->testTenantId);
+
+        return $id;
+    }
+
+    /**
+     * Load a listing for verification.
+     *
+     * The inventory service's own writes call MarketplaceListing::save(),
+     * whose model observer resets TenantContext to tenant 1. Re-pin to the
+     * test tenant before each scoped read so MarketplaceListing::find()
+     * resolves against tenant 2 instead of returning null.
+     */
+    private function findListing(int $id): ?MarketplaceListing
+    {
+        TenantContext::setById($this->testTenantId);
+
+        return MarketplaceListing::find($id);
     }
 
     public function test_decrement_reduces_inventory(): void
@@ -57,7 +81,7 @@ class InventoryTrackingTest extends TestCase
         $listingId = $this->createListing(3);
         MarketplaceInventoryService::decrementForOrder($listingId, 1);
 
-        $listing = MarketplaceListing::find($listingId);
+        $listing = $this->findListing($listingId);
         $this->assertSame(2, (int) $listing->inventory_count);
         $this->assertSame('active', $listing->status);
     }
@@ -71,7 +95,7 @@ class InventoryTrackingTest extends TestCase
         $listingId = $this->createListing(1);
         MarketplaceInventoryService::decrementForOrder($listingId, 1);
 
-        $listing = MarketplaceListing::find($listingId);
+        $listing = $this->findListing($listingId);
         $this->assertSame(0, (int) $listing->inventory_count);
         $this->assertSame('sold', $listing->status);
     }
@@ -105,7 +129,7 @@ class InventoryTrackingTest extends TestCase
 
         // Should not throw — unlimited stock is null
         MarketplaceInventoryService::decrementForOrder($listingId, 5);
-        $this->assertNull(MarketplaceListing::find($listingId)->inventory_count);
+        $this->assertNull($this->findListing($listingId)->inventory_count);
     }
 
     public function test_increment_for_cancellation_restocks(): void
@@ -119,7 +143,7 @@ class InventoryTrackingTest extends TestCase
 
         MarketplaceInventoryService::incrementForCancellation($listingId, 2);
 
-        $listing = MarketplaceListing::find($listingId);
+        $listing = $this->findListing($listingId);
         $this->assertSame(2, (int) $listing->inventory_count);
         $this->assertSame('active', $listing->status);
     }
@@ -133,12 +157,12 @@ class InventoryTrackingTest extends TestCase
         $listingId = $this->createListing(0);
         DB::table('marketplace_listings')->where('id', $listingId)->update(['status' => 'sold']);
 
-        $listing = MarketplaceListing::find($listingId);
+        $listing = $this->findListing($listingId);
         MarketplaceInventoryService::updateInventory($listing, [
             'inventory_count' => 3,
         ]);
 
-        $fresh = MarketplaceListing::find($listingId);
+        $fresh = $this->findListing($listingId);
         $this->assertSame(3, (int) $fresh->inventory_count);
         $this->assertSame('active', $fresh->status);
     }
