@@ -55,19 +55,25 @@ abstract class TestCase extends BaseTestCase
      */
     protected function setUpTenantContext(): void
     {
-        // Seed the test tenant if it doesn't exist (RefreshDatabase creates empty tables)
+        // Seed the test tenant. Use updateOrInsert (NOT insertOrIgnore) keyed on id:
+        // CI pre-seeds tenant id=2 with slug 'test-tenant-2', so insertOrIgnore was a
+        // no-op and the slug never became the expected 'hour-timebank' — every test
+        // that resolves tenant 2 by slug then 400s / asserts the wrong slug. Forcing
+        // the row guarantees id=2 carries slug=$testTenantSlug regardless of pre-seed.
         try {
-            DB::table('tenants')->insertOrIgnore([
-                'id' => $this->testTenantId,
-                'name' => 'Hour Timebank',
-                'slug' => $this->testTenantSlug,
-                'domain' => null,
-                'is_active' => true,
-                'depth' => 0,
-                'allows_subtenants' => false,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            DB::table('tenants')->updateOrInsert(
+                ['id' => $this->testTenantId],
+                [
+                    'name' => 'Hour Timebank',
+                    'slug' => $this->testTenantSlug,
+                    'domain' => null,
+                    'is_active' => true,
+                    'depth' => 0,
+                    'allows_subtenants' => false,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
 
             // Keep the secondary tenant active even if a stale local fixture row
             // already exists from an earlier non-transactional test run.
