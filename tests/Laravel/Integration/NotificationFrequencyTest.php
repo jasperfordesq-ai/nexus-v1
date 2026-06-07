@@ -16,9 +16,19 @@ use Tests\Laravel\TestCase;
 /**
  * Integration test: verify notification frequency cascade logic.
  *
- * The frequency cascade is: thread → group → global → tenant config → 'daily'.
- * After the production incident where the default was changed to 'instant'
- * (commit 7f5f270f, reverted in 91eecf10), these tests guard the default.
+ * The frequency cascade is: thread → group → global → tenant config → 'off'.
+ *
+ * Design history:
+ *  - A production incident once flipped the default to 'instant' (commit
+ *    7f5f270f, reverted in 91eecf10). These tests still guard against 'instant'
+ *    ever becoming the silent default.
+ *  - 2026-05-17 (commit 464603657 "daily-digest opt-in"): the silent default
+ *    changed from 'daily' to 'off'. Members now opt INTO the digest; we do not
+ *    email until they say yes. Critical/social types are forced to 'instant'
+ *    inside dispatch() so 'off' never silences direct social actions.
+ *  - 2026-05-18 (commit 14c68496b "Replace weekly digests with monthly
+ *    defaults"): any 'weekly' frequency (DB value or config default) is
+ *    normalized to 'monthly'.
  */
 class NotificationFrequencyTest extends TestCase
 {
@@ -34,19 +44,21 @@ class NotificationFrequencyTest extends TestCase
     }
 
     /**
-     * The final fallback frequency must be 'daily', never 'instant'.
-     * This is the regression test for commit 7f5f270f.
+     * The silent fallback frequency must be the opt-in default ('off'), and must
+     * NEVER be 'instant' (the 7f5f270f incident that caused 2000+ email spam).
      */
-    public function test_default_frequency_fallback_is_daily_in_source_code(): void
+    public function test_default_frequency_fallback_is_optin_off_in_source_code(): void
     {
         $source = file_get_contents(app_path('Services/NotificationDispatcher.php'));
 
+        // Members opt IN to digests — the un-configured global default is 'off'.
         $this->assertStringContainsString(
-            "?? 'daily'",
+            "?? 'off'",
             $source,
-            'NotificationDispatcher default frequency must be daily, not instant'
+            "NotificationDispatcher silent default frequency must be 'off' (opt-in digest)"
         );
 
+        // The original regression guard still holds: never default to 'instant'.
         $this->assertStringNotContainsString(
             "?? 'instant'",
             $source,
@@ -55,9 +67,10 @@ class NotificationFrequencyTest extends TestCase
     }
 
     /**
-     * Test that getFrequencySetting returns 'daily' when no preferences exist.
+     * Test that getFrequencySetting returns the opt-in default 'off' when no
+     * preferences and no tenant config default_frequency exist.
      */
-    public function test_global_default_returns_daily_when_no_settings(): void
+    public function test_global_default_returns_off_when_no_settings(): void
     {
         $tenant = TenantContext::get();
         $config = json_decode($tenant['configuration'] ?? '{}', true);
@@ -74,13 +87,14 @@ class NotificationFrequencyTest extends TestCase
             0
         );
 
-        $this->assertEquals('daily', $result);
+        $this->assertEquals('off', $result);
     }
 
     /**
-     * Test that tenant config default_frequency overrides the 'daily' fallback.
+     * Test that tenant config default_frequency overrides the 'off' fallback.
+     * 'weekly' is normalized to 'monthly' (commit 14c68496b).
      */
-    public function test_tenant_config_overrides_daily_default(): void
+    public function test_tenant_config_overrides_default_and_weekly_maps_to_monthly(): void
     {
         $tenant = TenantContext::get();
         $config = json_decode($tenant['configuration'] ?? '{}', true);
@@ -97,7 +111,8 @@ class NotificationFrequencyTest extends TestCase
             0
         );
 
-        $this->assertEquals('weekly', $result);
+        // weekly digests were replaced by monthly defaults.
+        $this->assertEquals('monthly', $result);
     }
 
     /**
@@ -126,16 +141,19 @@ class NotificationFrequencyTest extends TestCase
     {
         $userId = $this->userId;
 
+        // Use 'daily' (not 'weekly') so this asserts the group→global fallback
+        // path specifically, without the weekly→monthly normalization muddying
+        // the assertion.
         DB::table('notification_settings')->insert([
             'user_id' => $userId,
             'context_type' => 'global',
             'context_id' => 0,
-            'frequency' => 'weekly',
+            'frequency' => 'daily',
         ]);
 
         $result = $this->callGetFrequencySetting($userId, 'group', 999);
 
-        $this->assertEquals('weekly', $result);
+        $this->assertEquals('daily', $result);
     }
 
     /**

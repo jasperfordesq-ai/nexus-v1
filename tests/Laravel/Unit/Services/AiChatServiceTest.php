@@ -22,9 +22,25 @@ class AiChatServiceTest extends TestCase
         $this->service = new AiChatService();
     }
 
+    /**
+     * Build a chainable query-builder mock for the saveMessage() flow.
+     * first() returns an existing conversation (avoids the insert/lastInsertId
+     * path); insert()/update() are no-ops.
+     */
+    private function mockSaveMessageBuilder()
+    {
+        $mock = \Mockery::mock('Illuminate\Database\Query\Builder');
+        $mock->shouldReceive('where')->andReturnSelf();
+        $mock->shouldReceive('orderByDesc')->andReturnSelf();
+        $mock->shouldReceive('first')->andReturn((object) ['id' => 1]);
+        $mock->shouldReceive('insert')->andReturn(true);
+        $mock->shouldReceive('update')->andReturn(1);
+        return $mock;
+    }
+
     public function test_chat_returns_error_when_api_key_missing(): void
     {
-        config(['services.openai.key' => null]);
+        config(['services.openai.api_key' => null]);
 
         $result = $this->service->chat(1, 'Hello');
 
@@ -34,7 +50,7 @@ class AiChatServiceTest extends TestCase
 
     public function test_chat_calls_openai_and_saves_message(): void
     {
-        config(['services.openai.key' => 'test-key']);
+        config(['services.openai.api_key' => 'test-key']);
 
         Http::fake([
             'api.openai.com/*' => Http::response([
@@ -42,8 +58,9 @@ class AiChatServiceTest extends TestCase
             ]),
         ]);
 
-        DB::shouldReceive('table')->with('ai_chat_messages')->andReturnSelf();
-        DB::shouldReceive('insert')->once();
+        // saveMessage() touches ai_conversations (lookup + update) and ai_messages (insert).
+        DB::shouldReceive('table')->with('ai_conversations')->andReturn($this->mockSaveMessageBuilder());
+        DB::shouldReceive('table')->with('ai_messages')->andReturn($this->mockSaveMessageBuilder());
 
         $result = $this->service->chat(1, 'Hi');
 
@@ -53,10 +70,12 @@ class AiChatServiceTest extends TestCase
 
     public function test_chat_returns_error_on_http_failure(): void
     {
-        config(['services.openai.key' => 'test-key']);
+        config(['services.openai.api_key' => 'test-key']);
 
+        // A 5xx response makes ->json() succeed but saveMessage still runs; force a
+        // throw inside the try block so the catch logs and returns error=true.
         Http::fake([
-            'api.openai.com/*' => Http::response([], 500),
+            'api.openai.com/*' => fn () => throw new \RuntimeException('boom'),
         ]);
 
         Log::shouldReceive('error')->once();
@@ -84,8 +103,11 @@ class AiChatServiceTest extends TestCase
 
     public function test_getHistory_returns_array(): void
     {
-        DB::shouldReceive('table')->with('ai_chat_messages')->andReturnSelf();
+        // getHistory() queries `ai_messages as m` joined to `ai_conversations as c`.
+        DB::shouldReceive('table')->with('ai_messages as m')->andReturnSelf();
+        DB::shouldReceive('join')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('select')->andReturnSelf();
         DB::shouldReceive('orderByDesc')->andReturnSelf();
         DB::shouldReceive('limit')->andReturnSelf();
         DB::shouldReceive('get')->andReturn(collect([]));
@@ -96,8 +118,10 @@ class AiChatServiceTest extends TestCase
 
     public function test_getHistory_clamps_limit_to_200(): void
     {
-        DB::shouldReceive('table')->with('ai_chat_messages')->andReturnSelf();
+        DB::shouldReceive('table')->with('ai_messages as m')->andReturnSelf();
+        DB::shouldReceive('join')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('select')->andReturnSelf();
         DB::shouldReceive('orderByDesc')->andReturnSelf();
         DB::shouldReceive('limit')->with(200)->andReturnSelf();
         DB::shouldReceive('get')->andReturn(collect([]));

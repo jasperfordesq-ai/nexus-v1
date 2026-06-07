@@ -94,7 +94,9 @@ class JobBiasAuditServiceTest extends TestCase
 
         $result = $this->service->generateReport($this->testTenantId);
 
-        $stages = array_column($result['funnel'], 'stage');
+        // buildFunnel returns an assoc array keyed by stage name (stage => count),
+        // not a list of {stage,count,percentage} objects.
+        $stages = array_keys($result['funnel']);
         $this->assertContains('applied', $stages);
         $this->assertContains('screening', $stages);
         $this->assertContains('interview', $stages);
@@ -102,28 +104,28 @@ class JobBiasAuditServiceTest extends TestCase
         $this->assertContains('accepted', $stages);
     }
 
-    public function test_generateReport_funnel_has_percentage_and_count(): void
+    public function test_generateReport_funnel_values_are_integer_counts(): void
     {
         $this->mockDbForReport(totalApps: 20);
 
         $result = $this->service->generateReport($this->testTenantId);
 
-        foreach ($result['funnel'] as $stage) {
-            $this->assertArrayHasKey('stage', $stage);
-            $this->assertArrayHasKey('count', $stage);
-            $this->assertArrayHasKey('percentage', $stage);
+        // Each funnel value is an integer count keyed by stage name.
+        foreach ($result['funnel'] as $stage => $count) {
+            $this->assertIsString($stage);
+            $this->assertIsInt($count);
         }
     }
 
-    public function test_generateReport_funnel_zero_total_returns_zero_percentages(): void
+    public function test_generateReport_funnel_zero_total_returns_zero_counts(): void
     {
         $this->mockDbForReport(totalApps: 0);
 
         $result = $this->service->generateReport($this->testTenantId);
 
-        foreach ($result['funnel'] as $stage) {
-            $this->assertSame(0, $stage['count']);
-            $this->assertSame(0, $stage['percentage']);
+        // When there are no applications, every stage count is 0.
+        foreach ($result['funnel'] as $count) {
+            $this->assertSame(0, $count);
         }
     }
 
@@ -138,15 +140,18 @@ class JobBiasAuditServiceTest extends TestCase
         $this->assertArrayNotHasKey('accepted', $result['rejection_rates']);
     }
 
-    public function test_generateReport_skills_match_has_acceptance_rate(): void
+    public function test_generateReport_skills_match_has_outcome_counts_and_averages(): void
     {
         $this->mockDbForReport();
 
         $result = $this->service->generateReport($this->testTenantId);
 
+        // getSkillsMatchCorrelation returns accepted/rejected counts plus
+        // their normalized averages — not an 'acceptance_rate' key.
         $this->assertArrayHasKey('accepted_count', $result['skills_match_correlation']);
         $this->assertArrayHasKey('rejected_count', $result['skills_match_correlation']);
-        $this->assertArrayHasKey('acceptance_rate', $result['skills_match_correlation']);
+        $this->assertArrayHasKey('accepted_avg', $result['skills_match_correlation']);
+        $this->assertArrayHasKey('rejected_avg', $result['skills_match_correlation']);
     }
 
     public function test_generateReport_source_effectiveness_contains_direct(): void

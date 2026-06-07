@@ -10,6 +10,7 @@ use Tests\Laravel\TestCase;
 use App\Services\FederatedConnectionService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Mockery;
 
 class FederatedConnectionServiceTest extends TestCase
 {
@@ -32,20 +33,61 @@ class FederatedConnectionServiceTest extends TestCase
         $this->assertStringContainsString('yourself', $result['error']);
     }
 
+    /**
+     * Stub DB::table('federation_partnerships') so FederationPartnershipService::getPartnership()
+     * returns an active, profiles-enabled partnership. getPartnership() builds the query with
+     * where()->orWhere()->first(), so the chain mock must accept those calls.
+     */
+    private function stubActivePartnership(): void
+    {
+        $partnershipQuery = Mockery::mock();
+        $partnershipQuery->shouldReceive('where')->andReturnSelf();
+        $partnershipQuery->shouldReceive('orWhere')->andReturnSelf();
+        $partnershipQuery->shouldReceive('first')->andReturn(
+            (object) ['status' => 'active', 'profiles_enabled' => 1]
+        );
+        DB::shouldReceive('table')->with('federation_partnerships')->andReturn($partnershipQuery);
+    }
+
+    /**
+     * Stub the DB::table chains used by the post-action notification side-effects
+     * (Notification::createNotification → DB::table('users')->where->value + table('notifications')->insertGetId).
+     * These run inside try/catch blocks in the service; we let them succeed harmlessly.
+     */
+    private function stubNotificationSideEffects(): void
+    {
+        $chain = Mockery::mock();
+        $chain->shouldReceive('where')->andReturnSelf();
+        $chain->shouldReceive('value')->andReturn(2);
+        $chain->shouldReceive('insertGetId')->andReturn(99);
+        DB::shouldReceive('table')->with('users')->andReturn($chain);
+        DB::shouldReceive('table')->with('notifications')->andReturn($chain);
+        DB::shouldReceive('table')->andReturn($chain); // catch-all for any other table()
+    }
+
     public function test_sendRequest_rejects_already_accepted(): void
     {
-        $existing = (object) ['id' => 1, 'status' => 'accepted'];
-        DB::shouldReceive('selectOne')->andReturn($existing);
+        // Ordered selectOne sequence: (1) requester active, (2) receiver opted-in, (3) existing connection.
+        DB::shouldReceive('selectOne')->once()->ordered()->andReturn((object) ['id' => 1]);
+        DB::shouldReceive('selectOne')->once()->ordered()->andReturn(
+            (object) ['id' => 2, 'federation_optin' => 1, 'messaging_enabled_federated' => 1]
+        );
+        $this->stubActivePartnership();
+        DB::shouldReceive('selectOne')->once()->ordered()->andReturn((object) ['id' => 1, 'status' => 'accepted']);
 
         $result = $this->service->sendRequest(1, 2, 3);
         $this->assertFalse($result['success']);
-        $this->assertStringContainsString('Already connected', $result['error']);
+        $this->assertStringContainsString('already exists', $result['error']);
     }
 
     public function test_sendRequest_rejects_pending_request(): void
     {
-        $existing = (object) ['id' => 1, 'status' => 'pending'];
-        DB::shouldReceive('selectOne')->andReturn($existing);
+        DB::shouldReceive('selectOne')->once()->ordered()->andReturn((object) ['id' => 1]);
+        DB::shouldReceive('selectOne')->once()->ordered()->andReturn(
+            (object) ['id' => 2, 'federation_optin' => 1, 'messaging_enabled_federated' => 1]
+        );
+        $this->stubActivePartnership();
+        DB::shouldReceive('selectOne')->once()->ordered()->andReturn((object) ['id' => 1, 'status' => 'pending']);
 
         $result = $this->service->sendRequest(1, 2, 3);
         $this->assertFalse($result['success']);
@@ -54,12 +96,21 @@ class FederatedConnectionServiceTest extends TestCase
 
     public function test_sendRequest_replaces_rejected_request(): void
     {
-        $existing = (object) ['id' => 1, 'status' => 'rejected'];
-        DB::shouldReceive('selectOne')->andReturn($existing);
+        DB::shouldReceive('selectOne')->once()->ordered()->andReturn((object) ['id' => 1]);
+        DB::shouldReceive('selectOne')->once()->ordered()->andReturn(
+            (object) ['id' => 2, 'federation_optin' => 1, 'messaging_enabled_federated' => 1]
+        );
+        $this->stubActivePartnership();
+        DB::shouldReceive('selectOne')->once()->ordered()->andReturn((object) ['id' => 1, 'status' => 'rejected']);
         DB::shouldReceive('delete')->once();
         DB::shouldReceive('insert')->once();
         DB::shouldReceive('getPdo->lastInsertId')->andReturn(5);
+        // Post-insert notification lookups (sender, community, receiver locale) — return null;
+        // the notification/email side-effects are wrapped in try/catch and log ->warning on failure.
+        DB::shouldReceive('selectOne')->andReturn(null);
+        $this->stubNotificationSideEffects();
         Log::shouldReceive('info')->once();
+        Log::shouldReceive('warning')->zeroOrMoreTimes();
 
         $result = $this->service->sendRequest(1, 2, 3, 'Hello!');
         $this->assertTrue($result['success']);
@@ -80,10 +131,19 @@ class FederatedConnectionServiceTest extends TestCase
 
     public function test_acceptRequest_succeeds(): void
     {
-        $connection = (object) ['id' => 1, 'status' => 'pending'];
+        // Connection must carry requester_* fields used by the post-accept notification block.
+        $connection = (object) [
+            'id' => 1,
+            'status' => 'pending',
+            'requester_user_id' => 7,
+            'requester_tenant_id' => 3,
+        ];
         DB::shouldReceive('selectOne')->andReturn($connection);
         DB::shouldReceive('update')->once();
+        $this->stubNotificationSideEffects();
         Log::shouldReceive('info')->once();
+        // Cross-tenant notification + email side-effects are wrapped in try/catch logging ->warning.
+        Log::shouldReceive('warning')->zeroOrMoreTimes();
 
         $result = $this->service->acceptRequest(1, 5);
         $this->assertTrue($result['success']);

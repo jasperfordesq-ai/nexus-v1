@@ -9,6 +9,7 @@ namespace Tests\Laravel\Unit\Services;
 use Tests\Laravel\TestCase;
 use App\Services\DeliverableService;
 use Illuminate\Support\Facades\DB;
+use Mockery;
 
 class DeliverableServiceTest extends TestCase
 {
@@ -71,7 +72,8 @@ class DeliverableServiceTest extends TestCase
 
         DB::shouldReceive('table')->with('deliverables')->andReturn($mockQuery);
 
-        $this->service->getAll(2, ['limit' => 500]);
+        $result = $this->service->getAll(2, ['limit' => 500]);
+        $this->assertArrayHasKey('items', $result);
     }
 
     // =========================================================================
@@ -135,7 +137,8 @@ class DeliverableServiceTest extends TestCase
             })
             ->andReturn(1);
 
-        $this->service->update(1, 2, ['title' => 'OK', 'evil_field' => 'bad']);
+        $result = $this->service->update(1, 2, ['title' => 'OK', 'evil_field' => 'bad']);
+        $this->assertTrue($result);
     }
 
     // =========================================================================

@@ -45,7 +45,8 @@ class EventNotificationServiceTest extends TestCase
     {
         $event = (object) ['id' => 1, 'title' => 'Test Event', 'user_id' => 10];
         DB::shouldReceive('table->where->where->select->first')->andReturn($event);
-        DB::shouldReceive('table->where->where->whereIn->distinct->pluck->map->all')->andReturn([]);
+        DB::shouldReceive('table->join->where->where->whereIn->select->distinct->get')
+            ->andReturn(collect([]));
 
         $result = $this->service->notifyAttendees(2, 1, 'Hello');
         $this->assertEquals(0, $result);
@@ -55,8 +56,14 @@ class EventNotificationServiceTest extends TestCase
     {
         $event = (object) ['id' => 1, 'title' => 'Test Event', 'user_id' => 10];
         DB::shouldReceive('table->where->where->select->first')->andReturn($event);
-        DB::shouldReceive('table->where->where->whereIn->distinct->pluck->map->all')
-            ->andReturn([10, 20, 30]); // 10 is organizer
+        // Attendees query: table('event_rsvps as r')->join->where->where->whereIn->select->distinct->get()
+        // returns a Collection of user objects (10 is the organizer and must be skipped).
+        DB::shouldReceive('table->join->where->where->whereIn->select->distinct->get')
+            ->andReturn(collect([
+                (object) ['user_id' => 10, 'email' => null, 'name' => 'Org', 'first_name' => 'Org', 'preferred_language' => 'en'],
+                (object) ['user_id' => 20, 'email' => null, 'name' => 'A', 'first_name' => 'A', 'preferred_language' => 'en'],
+                (object) ['user_id' => 30, 'email' => null, 'name' => 'B', 'first_name' => 'B', 'preferred_language' => 'en'],
+            ]));
 
         $this->notificationAlias->shouldReceive('create')->twice(); // 20 and 30 only
 
@@ -90,10 +97,17 @@ class EventNotificationServiceTest extends TestCase
     {
         $event = (object) ['id' => 1, 'title' => 'Test Event'];
         DB::shouldReceive('table->where->where->select->first')->andReturn($event);
-        DB::shouldReceive('table->where->where->whereIn->distinct->pluck->map->all')
-            ->andReturn([10, 20]); // RSVP users
-        DB::shouldReceive('table->where->where->where->distinct->pluck->map->all')
-            ->andReturn([30]); // Waitlisted
+        // RSVP users: table('event_rsvps as r')->join->where->where->whereIn->select->distinct->get()
+        DB::shouldReceive('table->join->where->where->whereIn->select->distinct->get')
+            ->andReturn(collect([
+                (object) ['user_id' => 10, 'email' => null, 'name' => 'A', 'first_name' => 'A', 'preferred_language' => 'en'],
+                (object) ['user_id' => 20, 'email' => null, 'name' => 'B', 'first_name' => 'B', 'preferred_language' => 'en'],
+            ]));
+        // Waitlisted users: table('event_waitlist as w')->join->where->where->where->select->distinct->get()
+        DB::shouldReceive('table->join->where->where->where->select->distinct->get')
+            ->andReturn(collect([
+                (object) ['user_id' => 30, 'email' => null, 'name' => 'C', 'first_name' => 'C', 'preferred_language' => 'en'],
+            ]));
 
         $this->notificationAlias->shouldReceive('create')->times(3);
 
@@ -105,18 +119,21 @@ class EventNotificationServiceTest extends TestCase
     {
         $event = (object) ['id' => 1, 'title' => 'Test Event'];
         DB::shouldReceive('table->where->where->select->first')->andReturn($event);
-        DB::shouldReceive('table->where->where->whereIn->distinct->pluck->map->all')
-            ->andReturn([10]);
-        DB::shouldReceive('table->where->where->where->distinct->pluck->map->all')
-            ->andReturn([]);
+        DB::shouldReceive('table->join->where->where->whereIn->select->distinct->get')
+            ->andReturn(collect([
+                (object) ['user_id' => 10, 'email' => null, 'name' => 'A', 'first_name' => 'A', 'preferred_language' => 'en'],
+            ]));
+        DB::shouldReceive('table->join->where->where->where->select->distinct->get')
+            ->andReturn(collect([]));
 
         $this->notificationAlias->shouldReceive('create')
             ->withArgs(function ($args) {
-                return str_contains($args['message'], 'Reason: Weather');
+                return is_array($args) && str_contains($args['message'], 'Reason: Weather');
             })
             ->once();
 
-        $this->service->notifyCancellation(2, 1, 'Weather');
+        $result = $this->service->notifyCancellation(2, 1, 'Weather');
+        $this->assertEquals(1, $result);
     }
 
     // =========================================================================
@@ -155,8 +172,12 @@ class EventNotificationServiceTest extends TestCase
     {
         $event = (object) ['id' => 1, 'title' => 'Test', 'start_time' => '2026-04-01 10:00', 'location' => 'Cork', 'user_id' => 10];
         DB::shouldReceive('table->where->where->select->first')->andReturn($event);
-        DB::shouldReceive('table->where->where->whereIn->distinct->pluck->map->all')
-            ->andReturn([20, 30]);
+        // Attendees (organizer 10 excluded): 20 and 30 receive a notification.
+        DB::shouldReceive('table->join->where->where->whereIn->select->distinct->get')
+            ->andReturn(collect([
+                (object) ['user_id' => 20, 'email' => null, 'name' => 'A', 'first_name' => 'A', 'preferred_language' => 'en'],
+                (object) ['user_id' => 30, 'email' => null, 'name' => 'B', 'first_name' => 'B', 'preferred_language' => 'en'],
+            ]));
 
         $this->notificationAlias->shouldReceive('create')->twice();
 

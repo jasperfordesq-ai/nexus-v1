@@ -98,15 +98,27 @@ class AdminToolsControllerTest extends TestCase
     // 404 ERRORS — GET /v2/admin/tools/404-errors
     // ================================================================
 
-    public function test_404_errors_returns_200_for_admin(): void
+    public function test_404_errors_returns_200_for_super_admin(): void
+    {
+        // get404Errors() reads the global, cross-tenant error_404_log and is
+        // gated by requirePlatformSuperAdmin() — a tenant admin gets 403.
+        $superAdmin = User::factory()->forTenant($this->testTenantId)->admin()->create(['role' => 'super_admin']);
+        Sanctum::actingAs($superAdmin);
+
+        $response = $this->apiGet('/v2/admin/tools/404-errors');
+
+        $response->assertStatus(200);
+        $response->assertJsonStructure(['data']);
+    }
+
+    public function test_404_errors_returns_403_for_tenant_admin(): void
     {
         $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
         Sanctum::actingAs($admin);
 
         $response = $this->apiGet('/v2/admin/tools/404-errors');
 
-        $response->assertStatus(200);
-        $response->assertJsonStructure(['data']);
+        $response->assertStatus(403);
     }
 
     public function test_404_errors_returns_403_for_regular_member(): void
@@ -167,10 +179,13 @@ class AdminToolsControllerTest extends TestCase
     // SEED GENERATOR — POST /v2/admin/tools/seed
     // ================================================================
 
+    // runSeedGenerator() is gated by requirePlatformSuperAdmin(); a plain tenant
+    // admin receives 403 before validation runs. These tests use a super admin.
+
     public function test_seed_generator_requires_types(): void
     {
-        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
-        Sanctum::actingAs($admin);
+        $superAdmin = User::factory()->forTenant($this->testTenantId)->admin()->create(['role' => 'super_admin']);
+        Sanctum::actingAs($superAdmin);
 
         $response = $this->apiPost('/v2/admin/tools/seed', []);
 
@@ -179,8 +194,8 @@ class AdminToolsControllerTest extends TestCase
 
     public function test_seed_generator_rejects_invalid_types(): void
     {
-        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
-        Sanctum::actingAs($admin);
+        $superAdmin = User::factory()->forTenant($this->testTenantId)->admin()->create(['role' => 'super_admin']);
+        Sanctum::actingAs($superAdmin);
 
         $response = $this->apiPost('/v2/admin/tools/seed', [
             'types' => ['invalid_type'],
@@ -191,8 +206,8 @@ class AdminToolsControllerTest extends TestCase
 
     public function test_seed_generator_returns_200_for_valid_types(): void
     {
-        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
-        Sanctum::actingAs($admin);
+        $superAdmin = User::factory()->forTenant($this->testTenantId)->admin()->create(['role' => 'super_admin']);
+        Sanctum::actingAs($superAdmin);
 
         $response = $this->apiPost('/v2/admin/tools/seed', [
             'types' => ['users', 'listings'],
@@ -203,6 +218,18 @@ class AdminToolsControllerTest extends TestCase
         $response->assertJsonStructure([
             'data' => ['started', 'message', 'types'],
         ]);
+    }
+
+    public function test_seed_generator_returns_403_for_tenant_admin(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/tools/seed', [
+            'types' => ['users'],
+        ]);
+
+        $response->assertStatus(403);
     }
 
     // ================================================================

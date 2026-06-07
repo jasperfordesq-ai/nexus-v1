@@ -7,46 +7,57 @@
 namespace Tests\Laravel\Unit\Services\Identity;
 
 use Tests\Laravel\TestCase;
+use App\Core\TenantContext;
 use App\Services\Identity\RegistrationOrchestrationService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * RegistrationOrchestrationService drives its decisions off a real
+ * `tenant_registration_policies` row read via DB::selectOne (through
+ * RegistrationPolicyService) and persists via DB::statement. The previous
+ * version of this test mocked a non-existent DB::fetch()/DB::statement()->self
+ * custom layer that the Laravel service never used. We now seed a real policy
+ * row for the test tenant and exercise the service against nexus_ci.
+ */
 class RegistrationOrchestrationServiceTest extends TestCase
 {
-    /**
-     * Set up a DB mock that returns an 'open' policy, which causes
-     * processRegistration to activate the user immediately. This is
-     * the simplest path through the orchestration logic and requires
-     * no external provider calls.
-     */
-    private function mockOpenPolicyDb(): void
-    {
-        // getEffectivePolicy calls DB twice: getPolicy row + fallback construction
-        // We mock statement to chain-return self for fetch calls
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn([
-            'id' => 1,
-            'tenant_id' => 2,
-            'registration_mode' => 'open',
-            'verification_level' => 'none',
-            'verification_provider' => null,
-            'post_verification' => 'activate',
-            'fallback_mode' => 'none',
-            'invite_code_required' => 0,
-            'email_verification_required' => 0,
-            'waitlist_enabled' => 0,
-            'provider_config' => null,
-        ]);
+    use DatabaseTransactions;
 
-        // The 'open' path calls UPDATE users SET is_approved = 1
-        // and IdentityVerificationEventService::log — both use DB::statement
-        // We allow any number of statement calls
+    /**
+     * Seed a registration policy row for the test tenant with the given mode.
+     *
+     * @param array<string,mixed> $overrides
+     */
+    private function seedPolicy(string $mode, array $overrides = []): void
+    {
+        $tenantId = $this->testTenantId;
+
+        DB::table('tenant_registration_policies')->updateOrInsert(
+            ['tenant_id' => $tenantId],
+            array_merge([
+                'registration_mode' => $mode,
+                'verification_provider' => null,
+                'verification_level' => 'none',
+                'post_verification' => 'activate',
+                'fallback_mode' => 'none',
+                'require_email_verify' => 0,
+                'provider_config' => null,
+                'is_active' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ], $overrides)
+        );
+
+        // Factory/observer side effects can re-pin TenantContext to tenant 1.
+        TenantContext::setById($tenantId);
     }
 
     public function test_process_registration_returns_array_with_required_keys_for_open_mode(): void
     {
-        $this->mockOpenPolicyDb();
+        $this->seedPolicy('open');
 
-        $result = RegistrationOrchestrationService::processRegistration(1, 2);
+        $result = RegistrationOrchestrationService::processRegistration(1, $this->testTenantId);
 
         $this->assertArrayHasKey('action', $result);
         $this->assertArrayHasKey('requires_verification', $result);
@@ -57,9 +68,9 @@ class RegistrationOrchestrationServiceTest extends TestCase
 
     public function test_process_registration_open_mode_returns_activated_action(): void
     {
-        $this->mockOpenPolicyDb();
+        $this->seedPolicy('open');
 
-        $result = RegistrationOrchestrationService::processRegistration(1, 2);
+        $result = RegistrationOrchestrationService::processRegistration(1, $this->testTenantId);
 
         $this->assertSame('activated', $result['action']);
         $this->assertFalse($result['requires_verification']);
@@ -70,22 +81,9 @@ class RegistrationOrchestrationServiceTest extends TestCase
 
     public function test_process_registration_invite_only_requires_approval(): void
     {
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn([
-            'id' => 1,
-            'tenant_id' => 2,
-            'registration_mode' => 'invite_only',
-            'verification_level' => 'none',
-            'verification_provider' => null,
-            'post_verification' => 'activate',
-            'fallback_mode' => 'none',
-            'invite_code_required' => 1,
-            'email_verification_required' => 0,
-            'waitlist_enabled' => 0,
-            'provider_config' => null,
-        ]);
+        $this->seedPolicy('invite_only');
 
-        $result = RegistrationOrchestrationService::processRegistration(1, 2);
+        $result = RegistrationOrchestrationService::processRegistration(1, $this->testTenantId);
 
         $this->assertSame('pending_approval', $result['action']);
         $this->assertTrue($result['requires_approval']);
@@ -93,22 +91,9 @@ class RegistrationOrchestrationServiceTest extends TestCase
 
     public function test_process_registration_open_with_approval_requires_approval(): void
     {
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn([
-            'id' => 1,
-            'tenant_id' => 2,
-            'registration_mode' => 'open_with_approval',
-            'verification_level' => 'none',
-            'verification_provider' => null,
-            'post_verification' => 'activate',
-            'fallback_mode' => 'none',
-            'invite_code_required' => 0,
-            'email_verification_required' => 0,
-            'waitlist_enabled' => 0,
-            'provider_config' => null,
-        ]);
+        $this->seedPolicy('open_with_approval');
 
-        $result = RegistrationOrchestrationService::processRegistration(1, 2);
+        $result = RegistrationOrchestrationService::processRegistration(1, $this->testTenantId);
 
         $this->assertSame('pending_approval', $result['action']);
         $this->assertFalse($result['requires_verification']);
@@ -117,24 +102,16 @@ class RegistrationOrchestrationServiceTest extends TestCase
 
     public function test_process_registration_verified_identity_no_provider_falls_back_to_approval(): void
     {
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn([
-            'id' => 1,
-            'tenant_id' => 2,
-            'registration_mode' => 'verified_identity',
+        // verified_identity with no provider AND fallback_mode 'none'
+        // falls through to handleOpenWithApproval.
+        $this->seedPolicy('verified_identity', [
             'verification_level' => 'document_selfie',
-            'verification_provider' => null, // No provider configured
-            'post_verification' => 'activate',
+            'verification_provider' => null,
             'fallback_mode' => 'none',
-            'invite_code_required' => 0,
-            'email_verification_required' => 0,
-            'waitlist_enabled' => 0,
-            'provider_config' => null,
         ]);
 
-        $result = RegistrationOrchestrationService::processRegistration(1, 2);
+        $result = RegistrationOrchestrationService::processRegistration(1, $this->testTenantId);
 
-        // With no provider and no fallback, it falls through to handleOpenWithApproval
         $this->assertSame('pending_approval', $result['action']);
     }
 
@@ -148,33 +125,23 @@ class RegistrationOrchestrationServiceTest extends TestCase
 
     public function test_admin_review_throws_when_session_not_found(): void
     {
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn(false);
-
+        // No identity_verification_sessions row with this id → getById() returns
+        // null → service throws InvalidArgumentException.
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Verification session not found.');
 
-        RegistrationOrchestrationService::adminReview(999, 1, 'approve');
+        RegistrationOrchestrationService::adminReview(999999, 1, 'approve');
     }
 
     public function test_trigger_fallback_admin_review_returns_pending_approval(): void
     {
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn([
-            'id' => 1,
-            'tenant_id' => 2,
-            'registration_mode' => 'verified_identity',
+        $this->seedPolicy('verified_identity', [
             'verification_level' => 'document_selfie',
             'verification_provider' => 'stripe_identity',
-            'post_verification' => 'activate',
             'fallback_mode' => 'admin_review',
-            'invite_code_required' => 0,
-            'email_verification_required' => 0,
-            'waitlist_enabled' => 0,
-            'provider_config' => null,
         ]);
 
-        $result = RegistrationOrchestrationService::triggerFallback(1, 2, 'provider_unavailable');
+        $result = RegistrationOrchestrationService::triggerFallback(1, $this->testTenantId, 'provider_unavailable');
 
         $this->assertSame('pending_approval', $result['action']);
         $this->assertTrue($result['requires_approval']);
@@ -183,10 +150,7 @@ class RegistrationOrchestrationServiceTest extends TestCase
 
     public function test_get_registration_status_returns_not_found_for_unknown_user(): void
     {
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn(false);
-
-        $result = RegistrationOrchestrationService::getRegistrationStatus(99999, 2);
+        $result = RegistrationOrchestrationService::getRegistrationStatus(99999999, $this->testTenantId);
 
         $this->assertSame('not_found', $result['status']);
     }
