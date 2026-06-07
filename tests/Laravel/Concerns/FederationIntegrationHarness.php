@@ -206,21 +206,31 @@ trait FederationIntegrationHarness
      */
     protected function simulateInboundWebhook(object $partner, string $eventType, array $data = []): TestResponse
     {
+        $uri       = '/api/v2/federation/external/webhooks/receive';
+        $timestamp = (string) time();
+        $nonce     = bin2hex(random_bytes(16)); // 32 chars (8–128 required), fresh per call
+
         $payload = [
             'event'      => $eventType,
             'partner_id' => $partner->id,
-            'timestamp'  => (string) time(),
+            'timestamp'  => $timestamp,
             'data'       => $data,
         ];
         $body = json_encode($payload);
-        $signature = hash_hmac('sha256', $body, $this->testSigningSecret);
+
+        // FederationExternalWebhookController::identifyAndVerifyPartner() verifies the
+        // HMAC over a canonical string (METHOD\nURI\nTIMESTAMP\nNONCE\nBODY) and requires
+        // X-Federation-Nonce for replay protection. Sign exactly that.
+        $stringToSign = implode("\n", ['POST', $uri, $timestamp, $nonce, $body]);
+        $signature = hash_hmac('sha256', $stringToSign, $this->testSigningSecret);
 
         return $this->postJson(
-            '/api/v2/federation/external/webhooks/receive',
+            $uri,
             $payload,
             [
                 'X-Webhook-Signature' => $signature,
-                'X-Webhook-Timestamp' => (string) time(),
+                'X-Webhook-Timestamp' => $timestamp,
+                'X-Federation-Nonce'  => $nonce,
                 'Content-Type'        => 'application/json',
                 'Accept'              => 'application/json',
             ]
