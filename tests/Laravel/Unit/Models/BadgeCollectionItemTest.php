@@ -20,10 +20,12 @@ class BadgeCollectionItemTest extends TestCase
         $this->assertEquals('badge_collection_items', $model->getTable());
     }
 
-    public function test_timestamps_are_disabled(): void
+    public function test_timestamps_are_enabled(): void
     {
+        // M9 (migration 2026_04_12_000002) added created_at/updated_at to
+        // badge_collection_items; the model no longer disables timestamps.
         $model = new BadgeCollectionItem();
-        $this->assertFalse($model->usesTimestamps());
+        $this->assertTrue($model->usesTimestamps());
     }
 
     public function test_fillable_contains_expected_fields(): void

@@ -16,7 +16,7 @@ class ConnectionServiceTest extends TestCase
     public function test_request_throws_when_connecting_with_self(): void
     {
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Cannot connect with yourself');
+        $this->expectExceptionMessage('You cannot connect with yourself');
 
         ConnectionService::request(1, 1);
     }

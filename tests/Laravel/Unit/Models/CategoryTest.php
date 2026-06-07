@@ -89,7 +89,10 @@ class CategoryTest extends TestCase
 
     public function test_scope_active(): void
     {
+        // categories has no status column, so scopeActive is intentionally a
+        // no-op that returns the query unchanged (all rows are active).
         $query = Category::withoutGlobalScopes()->active();
-        $this->assertStringContainsString('`status`', $query->toSql());
+        $this->assertStringNotContainsString('`status`', $query->toSql());
+        $this->assertEquals('select * from `categories`', $query->toSql());
     }
 }

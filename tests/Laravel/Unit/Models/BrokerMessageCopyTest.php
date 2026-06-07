@@ -27,8 +27,11 @@ class BrokerMessageCopyTest extends TestCase
         $expected = [
             'tenant_id', 'original_message_id', 'conversation_key',
             'sender_id', 'receiver_id', 'message_body', 'sent_at',
-            'copy_reason', 'related_listing_id',
-            'reviewed_by', 'reviewed_at', 'flagged',
+            'copy_reason', 'related_listing_id', 'related_exchange_id',
+            'reviewed_by', 'reviewed_at', 'review_notes', 'flagged',
+            'flag_reason', 'flag_severity',
+            'action_taken', 'action_notes',
+            'archived_at', 'archive_id',
         ];
         $this->assertEquals($expected, $model->getFillable());
     }

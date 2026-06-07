@@ -191,6 +191,12 @@ class AuditLogServiceTest extends TestCase
             'is_active' => true,
             'features' => '{}',
         ]);
+        // getId() memoizes into a separate $cachedId property (perf optimization);
+        // the base TestCase pins tenant 2, so the cache must be reset for the
+        // forced tenant above to take effect.
+        $cachedId = $ref->getProperty('cachedId');
+        $cachedId->setAccessible(true);
+        $cachedId->setValue(null, null);
 
         $captured = null;
         DB::shouldReceive('table')->with('org_audit_log')->andReturnSelf();

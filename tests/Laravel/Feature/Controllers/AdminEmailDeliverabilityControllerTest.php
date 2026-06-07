@@ -822,7 +822,7 @@ class AdminEmailDeliverabilityControllerTest extends TestCase
         if (
             !Schema::hasTable('job_interviews')
             || !Schema::hasTable('job_vacancies')
-            || !Schema::hasTable('job_applications')
+            || !Schema::hasTable('job_vacancy_applications')
             || !Schema::hasTable('email_log')
             || !Schema::hasColumn('job_interviews', 'reminder_24h_sent_at')
             || !Schema::hasColumn('job_interviews', 'reminder_1h_sent_at')
@@ -849,11 +849,15 @@ class AdminEmailDeliverabilityControllerTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $applicationId = DB::table('job_applications')->insertGetId([
+        // job_interviews.application_id FKs to job_vacancy_applications (the
+        // canonical applications table), and the controller resolves the
+        // candidate email by joining job_vacancy_applications.user_id -> users.
+        $applicationId = DB::table('job_vacancy_applications')->insertGetId([
             'tenant_id' => $this->testTenantId,
             'vacancy_id' => $vacancyId,
             'user_id' => $candidate->id,
-            'status' => 'pending',
+            'status' => 'applied',
+            'stage' => 'applied',
             'created_at' => now(),
             'updated_at' => now(),
         ]);

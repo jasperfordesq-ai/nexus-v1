@@ -241,7 +241,13 @@ class BaseProviderTest extends \Tests\Laravel\TestCase
 
         $result = $provider->testConnection();
         $this->assertFalse($result['success']);
-        $this->assertStringContainsString('Connection refused', $result['message']);
+        // testConnection() intentionally returns a generic, non-leaking error
+        // message (svc_notifications_2.ai.provider_error) rather than echoing
+        // the internal exception text back to the caller.
+        $this->assertSame(
+            'An error occurred while processing your AI request. Please try again.',
+            $result['message']
+        );
     }
 
     // ---------------------------------------------------------------

@@ -95,15 +95,23 @@ class ContextualMessageServiceTest extends TestCase
 
     public function test_enrichMessagesWithContext_adds_context_info(): void
     {
+        // At least one message must carry a context so the enrichment loop
+        // runs (an all-null batch short-circuits and returns unchanged — that
+        // path is covered by test_enrichMessagesWithContext_returns_unchanged_when_no_contexts).
+        // An invalid context type resolves to null without touching the DB.
         $messages = [
             ['id' => 1, 'context_type' => null, 'context_id' => null],
             ['id' => 2, 'context_type' => null, 'context_id' => null],
+            ['id' => 3, 'context_type' => 'invalid', 'context_id' => 999],
         ];
 
         $result = $this->service->enrichMessagesWithContext($messages);
 
+        $this->assertArrayHasKey('context_info', $result[0]);
+        $this->assertArrayHasKey('context_info', $result[1]);
         $this->assertNull($result[0]['context_info']);
         $this->assertNull($result[1]['context_info']);
+        $this->assertNull($result[2]['context_info']);
     }
 
     public function test_enrichMessagesWithContext_returns_unchanged_when_no_contexts(): void

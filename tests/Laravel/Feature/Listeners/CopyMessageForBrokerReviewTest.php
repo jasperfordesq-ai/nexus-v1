@@ -128,13 +128,14 @@ class CopyMessageForBrokerReviewTest extends TestCase
         $receiver = User::factory()->forTenant($this->testTenantId)->create();
 
         $message = new Message([
-            'id'          => 88881,
-            'tenant_id'   => $this->testTenantId,
             'sender_id'   => $sender->id,
             'receiver_id' => $receiver->id,
             'body'        => 'Test message',
             'listing_id'  => null,
         ]);
+        // id and tenant_id are not in Message::$fillable, so set them directly.
+        $message->id = 88881;
+        $message->tenant_id = $this->testTenantId;
         $message->exists = true;
 
         $mockService = \Mockery::mock(BrokerMessageVisibilityService::class);

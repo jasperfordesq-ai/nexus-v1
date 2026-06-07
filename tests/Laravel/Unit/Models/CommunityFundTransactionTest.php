@@ -23,8 +23,8 @@ class CommunityFundTransactionTest extends TestCase
     {
         $model = new CommunityFundTransaction();
         $casts = $model->getCasts();
-        $this->assertEquals('float', $casts['amount']);
-        $this->assertEquals('float', $casts['balance_after']);
+        $this->assertEquals('decimal:2', $casts['amount']);
+        $this->assertEquals('decimal:2', $casts['balance_after']);
     }
 
     public function test_uses_has_tenant_scope_trait(): void

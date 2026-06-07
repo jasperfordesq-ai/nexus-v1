@@ -46,7 +46,9 @@ class AccessLogTest extends TestCase
 
         $countBefore = (int) DB::table('regional_analytics_access_log')->count();
 
-        $response = $this->getJson('/api/partner-analytics/me/dashboard?token=' . $token);
+        $response = $this->getJson('/api/partner-analytics/me/dashboard', [
+            'Authorization' => 'Bearer ' . $token,
+        ]);
         $response->assertStatus(200);
 
         $countAfter = (int) DB::table('regional_analytics_access_log')->count();
@@ -69,7 +71,9 @@ class AccessLogTest extends TestCase
 
         $countBefore = (int) DB::table('regional_analytics_access_log')->count();
 
-        $response = $this->getJson('/api/partner-analytics/me/dashboard?token=not_a_real_token');
+        $response = $this->getJson('/api/partner-analytics/me/dashboard', [
+            'Authorization' => 'Bearer not_a_real_token',
+        ]);
         $response->assertStatus(401);
 
         $this->assertSame($countBefore, (int) DB::table('regional_analytics_access_log')->count());

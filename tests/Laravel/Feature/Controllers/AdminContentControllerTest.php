@@ -135,7 +135,9 @@ class AdminContentControllerTest extends TestCase
 
     public function test_get_plans_returns_200_for_admin(): void
     {
-        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        // Plans management is platform-super-admin only (getPlans() calls
+        // requirePlatformSuperAdmin()); a plain tenant admin gets 403.
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create(['is_super_admin' => true]);
         Sanctum::actingAs($admin);
 
         $response = $this->apiGet('/v2/admin/plans');

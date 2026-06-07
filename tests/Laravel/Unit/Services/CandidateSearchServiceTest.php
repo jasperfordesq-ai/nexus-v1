@@ -168,7 +168,9 @@ class CandidateSearchServiceTest extends TestCase
     public function test_search_applies_location_filter(): void
     {
         $query = Mockery::mock();
-        $query->shouldReceive('where')->andReturnSelf();
+        $query->shouldReceive('where')->with('tenant_id', Mockery::any())->andReturnSelf();
+        $query->shouldReceive('where')->with('resume_searchable', Mockery::any())->andReturnSelf();
+        $query->shouldReceive('where')->with('status', Mockery::any())->andReturnSelf();
         $query->shouldReceive('select')->andReturnSelf();
         $query->shouldReceive('where')->with('location', 'LIKE', '%Berlin%')->once()->andReturnSelf();
         $query->shouldReceive('count')->andReturn(0);

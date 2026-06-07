@@ -10,6 +10,7 @@ use Tests\Laravel\TestCase;
 use App\Services\BrokerControlConfigService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Mockery;
 
 class BrokerControlConfigServiceTest extends TestCase
 {
@@ -81,7 +82,12 @@ class BrokerControlConfigServiceTest extends TestCase
         DB::shouldReceive('first')->andReturn((object) ['configuration' => '{}']);
         DB::shouldReceive('update')->once()->andReturn(1);
 
-        Cache::shouldReceive('forget')->twice();
+        // clearCache() forgets the broker_config key on the default store, then
+        // forgets the tenant_bootstrap key on the explicit 'redis' store.
+        Cache::shouldReceive('forget')->once();
+        $redisStore = Mockery::mock();
+        $redisStore->shouldReceive('forget')->once();
+        Cache::shouldReceive('store')->with('redis')->once()->andReturn($redisStore);
 
         $result = BrokerControlConfigService::updateConfig(['messaging' => ['direct_messaging_enabled' => false]]);
         $this->assertTrue($result);

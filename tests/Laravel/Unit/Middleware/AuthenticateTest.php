@@ -57,6 +57,11 @@ class AuthenticateTest extends TestCase
             'status' => 'active',
         ]);
 
+        // Creating the user fires observers that reset TenantContext to tenant 1;
+        // re-pin tenant 2 so the middleware's tenant check sees the request tenant
+        // the user actually belongs to.
+        TenantContext::setById($this->testTenantId);
+
         $request = Request::create('/api/v2/feed', 'GET');
         $this->actingAs($user, 'sanctum');
 
@@ -88,6 +93,9 @@ class AuthenticateTest extends TestCase
             'is_tenant_super_admin' => false,
         ]);
 
+        // Re-pin tenant 2 after the create (observers reset TenantContext to 1).
+        TenantContext::setById($this->testTenantId);
+
         $request = Request::create('/api/v2/feed', 'GET');
         $this->actingAs($user, 'sanctum');
 
@@ -118,6 +126,9 @@ class AuthenticateTest extends TestCase
             'is_super_admin' => true,
         ]);
 
+        // Re-pin tenant 2 after the create (observers reset TenantContext to 1).
+        TenantContext::setById($this->testTenantId);
+
         $request = Request::create('/api/v2/feed', 'GET');
         $this->actingAs($user, 'sanctum');
 
@@ -126,7 +137,14 @@ class AuthenticateTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function test_handle_tenant_super_admin_bypasses_tenant_check(): void
+    /**
+     * A TENANT super-admin is scoped to its own tenant and must NOT cross into
+     * another tenant. This was hardened in commit f1a6b4ab0 ("resolve platform
+     * audit findings"): only platform super_admin / god / is_super_admin / is_god
+     * bypass the cross-tenant check. The legacy bypass for is_tenant_super_admin
+     * was deliberately removed.
+     */
+    public function test_handle_tenant_super_admin_does_not_bypass_tenant_check(): void
     {
         \Illuminate\Support\Facades\DB::table('tenants')->insertOrIgnore([
             'id' => 99,
@@ -142,15 +160,23 @@ class AuthenticateTest extends TestCase
         $user = User::factory()->create([
             'tenant_id' => 99,
             'status' => 'active',
+            'is_super_admin' => false,
+            'is_god' => false,
             'is_tenant_super_admin' => true,
         ]);
+
+        // Re-pin tenant 2 after the create (observers reset TenantContext to 1).
+        TenantContext::setById($this->testTenantId);
 
         $request = Request::create('/api/v2/feed', 'GET');
         $this->actingAs($user, 'sanctum');
 
         $response = $this->middleware->handle($request, $this->makeNext());
 
-        $this->assertEquals(200, $response->getStatusCode());
+        // Tenant super-admin in tenant 99 cannot access tenant 2 → 403.
+        $this->assertEquals(403, $response->getStatusCode());
+        $data = $response->getData(true);
+        $this->assertEquals('tenant_mismatch', $data['errors'][0]['code']);
     }
 
     public function test_handle_invalid_bearer_token_returns_401(): void

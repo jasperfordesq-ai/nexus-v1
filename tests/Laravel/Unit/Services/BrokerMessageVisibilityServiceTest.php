@@ -65,9 +65,12 @@ class BrokerMessageVisibilityServiceTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function test_copyMessageForBroker_returns_null_when_already_copied(): void
+    public function test_copyMessageForBroker_is_idempotent_when_already_copied(): void
     {
-        // Create a real message in the DB, then a broker copy, and verify null is returned
+        // copyMessageForBroker() now uses firstOrCreate() against the
+        // (tenant_id, original_message_id) unique index for idempotency. When a
+        // copy already exists (e.g. a retried queue job), it returns the
+        // EXISTING copy's id rather than null, and inserts no duplicate row.
         DB::table('users')->insertOrIgnore([
             'id' => 9001, 'tenant_id' => 2, 'name' => 'Sender Test',
             'email' => 'sender-bmv@test.com', 'role' => 'member', 'status' => 'active',
@@ -84,7 +87,7 @@ class BrokerMessageVisibilityServiceTest extends TestCase
             'body' => 'Test message', 'created_at' => now(),
         ]);
 
-        DB::table('broker_message_copies')->insert([
+        $existingCopyId = DB::table('broker_message_copies')->insertGetId([
             'tenant_id' => 2, 'original_message_id' => $messageId,
             'conversation_key' => md5('9001-9002'),
             'sender_id' => 9001, 'receiver_id' => 9002,
@@ -93,7 +96,16 @@ class BrokerMessageVisibilityServiceTest extends TestCase
         ]);
 
         $result = $this->service->copyMessageForBroker($messageId, 'first_contact');
-        $this->assertNull($result);
+
+        // Returns the existing copy id, not null, and creates no duplicate.
+        $this->assertSame($existingCopyId, $result);
+        $this->assertSame(
+            1,
+            DB::table('broker_message_copies')
+                ->where('tenant_id', 2)
+                ->where('original_message_id', $messageId)
+                ->count()
+        );
     }
 
     public function test_markAsReviewed_returns_false_when_not_found(): void

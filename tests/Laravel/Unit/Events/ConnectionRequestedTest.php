@@ -26,7 +26,7 @@ class ConnectionRequestedTest extends TestCase
 
         $event = new ConnectionRequested($connection, $requester, $target, $tenantId);
 
-        $this->assertSame($connection, $event->connection);
+        $this->assertSame($connection, $event->connectionModel);
         $this->assertSame($requester, $event->requester);
         $this->assertSame($target, $event->target);
         $this->assertSame(2, $event->tenantId);

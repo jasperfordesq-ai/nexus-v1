@@ -23,6 +23,55 @@ class AdminCaringCommunityControllerTest extends TestCase
 {
     use DatabaseTransactions;
 
+    /**
+     * Seed the verein_admin role + RBAC permissions that migration
+     * 2026_04_28_150000_add_verein_admin_scope normally inserts. The CI schema
+     * dump captures the schema but not these seeded rows, so any test that
+     * exercises assignVereinAdmin() must seed them itself.
+     */
+    private function seedVereinAdminRbac(): void
+    {
+        DB::statement("
+            INSERT IGNORE INTO roles (name, display_name, description, level, is_system, tenant_id)
+            VALUES (
+                'verein_admin',
+                'Verein Admin',
+                'Scoped association administrator for importing and managing members of one Verein.',
+                4,
+                1,
+                NULL
+            )
+        ");
+
+        $permissions = [
+            ['verein.members.import', 'Import Verein Members', 'vereine'],
+            ['verein.members.manage', 'Manage Verein Members', 'vereine'],
+            ['verein.view', 'View Verein', 'vereine'],
+        ];
+
+        foreach ($permissions as [$name, $displayName, $category]) {
+            DB::statement(
+                'INSERT IGNORE INTO permissions (name, display_name, category) VALUES (?, ?, ?)',
+                [$name, $displayName, $category]
+            );
+        }
+
+        $roleId = DB::table('roles')->where('name', 'verein_admin')->value('id');
+        if (!$roleId) {
+            return;
+        }
+
+        foreach ($permissions as [$name]) {
+            $permissionId = DB::table('permissions')->where('name', $name)->value('id');
+            if ($permissionId) {
+                DB::statement(
+                    'INSERT IGNORE INTO role_permissions (role_id, permission_id, tenant_id) VALUES (?, ?, NULL)',
+                    [$roleId, $permissionId]
+                );
+            }
+        }
+    }
+
     private function setCaringCommunityFeature(bool $enabled): void
     {
         $tenant = DB::table('tenants')->where('id', $this->testTenantId)->first();
@@ -866,6 +915,7 @@ class AdminCaringCommunityControllerTest extends TestCase
     public function test_scoped_verein_admin_can_import_only_their_verein(): void
     {
         $this->setCaringCommunityFeature(true);
+        $this->seedVereinAdminRbac();
         $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
         $vereinAdmin = User::factory()->forTenant($this->testTenantId)->create();
         $vereinId = $this->createVerein($admin->id);

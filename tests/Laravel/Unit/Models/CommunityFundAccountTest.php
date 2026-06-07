@@ -22,10 +22,10 @@ class CommunityFundAccountTest extends TestCase
     {
         $model = new CommunityFundAccount();
         $casts = $model->getCasts();
-        $this->assertEquals('float', $casts['balance']);
-        $this->assertEquals('float', $casts['total_deposited']);
-        $this->assertEquals('float', $casts['total_withdrawn']);
-        $this->assertEquals('float', $casts['total_donated']);
+        $this->assertEquals('decimal:2', $casts['balance']);
+        $this->assertEquals('decimal:2', $casts['total_deposited']);
+        $this->assertEquals('decimal:2', $casts['total_withdrawn']);
+        $this->assertEquals('decimal:2', $casts['total_donated']);
     }
 
     public function test_uses_has_tenant_scope_trait(): void

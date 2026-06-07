@@ -43,6 +43,7 @@ class CrossInvitationTest extends TestCase
             'password' => password_hash('x', PASSWORD_BCRYPT),
             'preferred_language' => $lang,
             'status' => 'active',
+            'is_approved' => 1,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -144,7 +145,13 @@ class CrossInvitationTest extends TestCase
         $this->assertNotNull($userModel);
         Sanctum::actingAs($userModel);
 
-        $response = $this->getJson("/api/v2/vereine/cross-invite-targets/{$invitee}");
+        // Pin the request to tenant 2 so ResolveTenant matches the acting
+        // user's tenant_id — without HTTP_X_TENANT_ID the request resolves a
+        // different tenant and Authenticate returns tenant_mismatch (403).
+        $response = $this->getJson(
+            "/api/v2/vereine/cross-invite-targets/{$invitee}",
+            ['X-Tenant-Id' => (string) self::TENANT_ID]
+        );
 
         $response->assertOk()
             ->assertJsonPath('data.0.source_organization_id', $source)
