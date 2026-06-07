@@ -34,6 +34,8 @@ class UserInsightsServiceTest extends TestCase
         DB::shouldReceive('whereYear')->andReturnSelf();
         DB::shouldReceive('whereMonth')->andReturnSelf();
         DB::shouldReceive('select')->andReturnSelf();
+        // getSummary() builds its month aggregate via selectRaw() with bindings.
+        DB::shouldReceive('selectRaw')->andReturnSelf();
         DB::shouldReceive('orWhere')->andReturnSelf();
         DB::shouldReceive('first')->andReturn((object) [
             'earned_this_month' => 5.0,

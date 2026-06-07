@@ -10,6 +10,7 @@ use Tests\Laravel\TestCase;
 use App\Services\BlogService;
 use App\Models\Post;
 use App\Models\Category;
+use Illuminate\Database\Eloquent\Builder;
 use Mockery;
 
 class BlogServiceTest extends TestCase
@@ -28,7 +29,7 @@ class BlogServiceTest extends TestCase
 
     public function test_getAll_returns_expected_structure(): void
     {
-        $mockQuery = Mockery::mock();
+        $mockQuery = Mockery::mock(Builder::class);
         $mockQuery->shouldReceive('published')->andReturnSelf();
         $mockQuery->shouldReceive('with')->andReturnSelf();
         $mockQuery->shouldReceive('whereNotIn')->andReturnSelf();
@@ -69,7 +70,7 @@ class BlogServiceTest extends TestCase
 
     public function test_getPosts_returns_expected_structure(): void
     {
-        $mockQuery = Mockery::mock();
+        $mockQuery = Mockery::mock(Builder::class);
         $mockQuery->shouldReceive('published')->andReturnSelf();
         $mockQuery->shouldReceive('with')->andReturnSelf();
         $mockQuery->shouldReceive('whereNotIn')->andReturnSelf();

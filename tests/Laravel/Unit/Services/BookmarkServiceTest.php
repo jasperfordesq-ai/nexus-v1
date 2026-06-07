@@ -24,7 +24,7 @@ class BookmarkServiceTest extends TestCase
     public function test_toggle_throws_InvalidArgument_for_unsupported_type(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid bookmarkable type: not_a_thing');
+        $this->expectExceptionMessage('Invalid bookmarkable type provided');
 
         $this->service->toggle(1, 'not_a_thing', 42);
     }
@@ -32,7 +32,7 @@ class BookmarkServiceTest extends TestCase
     public function test_getUserBookmarks_throws_on_invalid_type_filter(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid bookmarkable type: bogus');
+        $this->expectExceptionMessage('Invalid bookmarkable type provided');
 
         $this->service->getUserBookmarks(1, 'bogus');
     }

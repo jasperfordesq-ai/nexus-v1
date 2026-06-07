@@ -9,10 +9,13 @@ namespace Tests\Laravel\Unit\Services\Identity;
 use Tests\Laravel\TestCase;
 use App\Services\Identity\VeriffProvider;
 use App\Services\Identity\IdentityVerificationProviderInterface;
-use Illuminate\Support\Facades\DB;
+use App\Services\Identity\TenantProviderCredentialService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class VeriffProviderTest extends TestCase
 {
+    use DatabaseTransactions;
+
     private VeriffProvider $provider;
 
     protected function setUp(): void
@@ -63,9 +66,7 @@ class VeriffProviderTest extends TestCase
         putenv('VERIFF_API_KEY=test-pub-key');
         putenv('VERIFF_API_SECRET='); // Missing secret
 
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn(false);
-
+        // No tenant credential row seeded, so the per-tenant fallback also fails.
         $result = $this->provider->isAvailable(2);
 
         // isAvailable requires BOTH keys to be non-empty for global shortcut
@@ -79,9 +80,7 @@ class VeriffProviderTest extends TestCase
         putenv('VERIFF_API_KEY=');
         putenv('VERIFF_API_SECRET=');
 
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn(false);
-
+        // No global keys and no stored tenant credentials → unavailable.
         $result = $this->provider->isAvailable(2);
 
         $this->assertFalse($result);
@@ -92,12 +91,10 @@ class VeriffProviderTest extends TestCase
         putenv('VERIFF_API_KEY=');
         putenv('VERIFF_API_SECRET=');
 
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn([
-            'id' => 1,
-            'tenant_id' => 2,
-            'provider_slug' => 'veriff',
-            'credentials' => json_encode(['api_key' => 'pub-key', 'webhook_secret' => 'sec']),
+        // Seed a real, encrypted per-tenant credential row so the fallback succeeds.
+        TenantProviderCredentialService::save(2, 'veriff', [
+            'api_key' => 'pub-key',
+            'webhook_secret' => 'sec',
         ]);
 
         $result = $this->provider->isAvailable(2);

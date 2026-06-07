@@ -6,6 +6,7 @@
 
 namespace Tests\Laravel\Feature\Auth\Oauth;
 
+use App\Core\TenantContext;
 use App\Models\User;
 use App\Services\Auth\SocialAuthService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -41,6 +42,10 @@ class UnlinkLastMethodTest extends TestCase
         // Force password to NULL/empty in case the factory set a value
         DB::table('users')->where('id', $user->id)->update(['password_hash' => '']);
 
+        // Factory observers can reset TenantContext to tenant 1; re-pin so the
+        // tenant-scoped User::find() inside unlinkProvider() resolves the user.
+        TenantContext::setById($this->testTenantId);
+
         $service = app(SocialAuthService::class);
 
         $this->expectException(\RuntimeException::class);
@@ -63,6 +68,10 @@ class UnlinkLastMethodTest extends TestCase
              VALUES (?, ?, ?, ?, ?, NOW(), NOW(), NOW())',
             [$user->id, $this->testTenantId, 'google', 'g_pw_' . uniqid(), $user->email]
         );
+
+        // Factory observers can reset TenantContext to tenant 1; re-pin so the
+        // tenant-scoped User::find() inside unlinkProvider() resolves the user.
+        TenantContext::setById($this->testTenantId);
 
         $service = app(SocialAuthService::class);
         $service->unlinkProvider((int) $user->id, 'google');

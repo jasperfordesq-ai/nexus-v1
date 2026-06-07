@@ -53,13 +53,27 @@ class VolunteerDonationServiceTest extends TestCase
 
     public function test_createDonation_rejects_foreign_tenant_opportunity(): void
     {
+        // Seed the FK parent organisation (vol_opportunities.organization_id
+        // references vol_organizations.id) under the foreign tenant.
+        $foreignOrgId = (int) DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => 999,
+            'user_id' => 1,
+            'name' => 'Foreign Tenant Org',
+            'slug' => 'foreign-tenant-org-' . uniqid(),
+            'description' => 'A foreign-tenant organisation for cross-tenant donation rejection coverage.',
+            'contact_email' => 'foreign-org@example.test',
+            'status' => 'active',
+            'created_at' => now(),
+        ]);
+
         $foreignOpportunityId = (int) DB::table('vol_opportunities')->insertGetId([
             'tenant_id' => 999,
-            'organization_id' => 1,
+            'organization_id' => $foreignOrgId,
             'title' => 'Foreign Tenant Opportunity',
             'description' => 'This opportunity must not be donation-addressable from tenant 2.',
             'status' => 'active',
             'is_active' => 1,
+            'created_by' => 1,
             'created_at' => now(),
         ]);
 

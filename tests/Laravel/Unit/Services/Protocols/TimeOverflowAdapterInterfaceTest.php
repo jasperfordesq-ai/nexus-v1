@@ -111,7 +111,9 @@ class TimeOverflowAdapterInterfaceTest extends TestCase
 
         $this->assertSame(10, $result['partner_id']);
         $this->assertSame('123', $result['external_transaction_id']);
-        $this->assertSame('outbound', $result['direction']);
+        // Direction is intentionally inverted: Nexus 'outbound' is received by
+        // TimeOverflow as 'inbound' (see buildTransferPayload).
+        $this->assertSame('inbound', $result['direction']);
         $this->assertSame(456, $result['local_account_id']);
         $this->assertSame('alice@example.com', $result['remote_user_identifier']);
         // 2.5 hours = 9000 seconds

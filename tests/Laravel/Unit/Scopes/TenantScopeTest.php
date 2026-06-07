@@ -41,7 +41,12 @@ class TenantScopeTest extends TestCase
 
     public function test_apply_uses_correct_table_name(): void
     {
-        TenantContext::setById(5);
+        // Use tenant 2 — the canonical seeded test tenant. setById() only updates
+        // the cached id when the tenant row exists in the DB, and the CI database
+        // seeds only tenants 1 and 2, so an arbitrary id (e.g. 5) would silently
+        // leave the prior tenant pinned. The assertion still verifies the table
+        // name is derived from the model.
+        TenantContext::setById(2);
 
         $model = Mockery::mock(Model::class);
         $model->shouldReceive('getTable')->andReturn('listings');
@@ -49,7 +54,7 @@ class TenantScopeTest extends TestCase
         $builder = Mockery::mock(Builder::class);
         $builder->shouldReceive('where')
             ->once()
-            ->with('listings.tenant_id', 5)
+            ->with('listings.tenant_id', 2)
             ->andReturnSelf();
 
         $scope = new TenantScope();

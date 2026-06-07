@@ -400,6 +400,16 @@ abstract class LegacyBridgeTestCase extends TestCase
 
         $data = array_merge($defaults, $attributes);
         $user = User::create($data);
+
+        // `balance` is intentionally excluded from User::$fillable (sensitive
+        // financial field — mass-assignment is blocked), so persist it (and any
+        // other non-fillable columns the caller asked for) directly, mirroring how
+        // the app mutates balances outside of mass-assignment.
+        $nonFillable = array_intersect_key($data, array_flip(['balance']));
+        if ($nonFillable !== []) {
+            DB::table('users')->where('id', $user->id)->update($nonFillable);
+        }
+
         $data['id'] = $user->id;
 
         return $data;

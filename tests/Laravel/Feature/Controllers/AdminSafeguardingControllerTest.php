@@ -36,7 +36,13 @@ class AdminSafeguardingControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
-            'data' => ['total_flagged', 'pending_review', 'active_assignments', 'resolved'],
+            'data' => [
+                'active_assignments',
+                'unreviewed_flags',
+                'consented_wards',
+                'total_flags_this_month',
+                'critical_flags',
+            ],
         ]);
     }
 
@@ -194,23 +200,26 @@ class AdminSafeguardingControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonStructure([
             'data' => [
-                'total_flagged',
-                'pending_review',
                 'active_assignments',
-                'resolved',
+                'unreviewed_flags',
+                'consented_wards',
+                'total_flags_this_month',
+                'critical_flags',
             ],
         ]);
 
         // Verify all keys are numeric (even if zero)
         $data = $response->json('data');
-        $this->assertIsInt($data['total_flagged']);
-        $this->assertIsInt($data['pending_review']);
         $this->assertIsInt($data['active_assignments']);
-        $this->assertIsInt($data['resolved']);
-        $this->assertGreaterThanOrEqual(0, $data['total_flagged']);
-        $this->assertGreaterThanOrEqual(0, $data['pending_review']);
+        $this->assertIsInt($data['unreviewed_flags']);
+        $this->assertIsInt($data['consented_wards']);
+        $this->assertIsInt($data['total_flags_this_month']);
+        $this->assertIsInt($data['critical_flags']);
         $this->assertGreaterThanOrEqual(0, $data['active_assignments']);
-        $this->assertGreaterThanOrEqual(0, $data['resolved']);
+        $this->assertGreaterThanOrEqual(0, $data['unreviewed_flags']);
+        $this->assertGreaterThanOrEqual(0, $data['consented_wards']);
+        $this->assertGreaterThanOrEqual(0, $data['total_flags_this_month']);
+        $this->assertGreaterThanOrEqual(0, $data['critical_flags']);
     }
 
     // ================================================================

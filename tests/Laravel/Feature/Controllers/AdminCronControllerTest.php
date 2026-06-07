@@ -83,7 +83,12 @@ class AdminCronControllerTest extends TestCase
 
     public function test_get_global_settings_returns_200_for_admin(): void
     {
-        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        // Global cron settings live in the platform-wide `cron_settings` table
+        // (no tenant_id), so the controller now requires a PLATFORM super-admin
+        // (role super_admin/god or is_super_admin), not a tenant admin.
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create([
+            'role' => 'super_admin',
+        ]);
         Sanctum::actingAs($admin);
 
         $response = $this->apiGet('/v2/admin/system/cron-jobs/settings');
@@ -108,7 +113,11 @@ class AdminCronControllerTest extends TestCase
 
     public function test_update_global_settings_returns_200_for_admin(): void
     {
-        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        // Updating global cron settings touches the platform-wide `cron_settings`
+        // table, so the controller now requires a PLATFORM super-admin.
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create([
+            'role' => 'super_admin',
+        ]);
         Sanctum::actingAs($admin);
 
         $response = $this->apiPut('/v2/admin/system/cron-jobs/settings', [

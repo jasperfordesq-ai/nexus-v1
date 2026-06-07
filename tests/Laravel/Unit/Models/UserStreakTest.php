@@ -26,9 +26,13 @@ class UserStreakTest extends TestCase
         $this->assertEquals('user_streaks', $this->model->getTable());
     }
 
-    public function test_timestamps_disabled(): void
+    public function test_created_at_disabled_but_updated_at_tracked(): void
     {
-        $this->assertFalse($this->model->usesTimestamps());
+        // The user_streaks table has only an `updated_at` column (no `created_at`),
+        // so the model disables CREATED_AT while still tracking updated_at.
+        $this->assertNull(UserStreak::CREATED_AT);
+        $this->assertTrue($this->model->usesTimestamps());
+        $this->assertSame('updated_at', $this->model->getUpdatedAtColumn());
     }
 
     public function test_fillable_contains_expected_fields(): void

@@ -49,7 +49,12 @@ class TotpControllerTest extends TestCase
     {
         $response = $this->apiPost('/totp/verify', []);
 
-        $this->assertContains($response->getStatusCode(), [400, 422]);
+        // An empty body carries neither a two_factor_token nor a CSRF token, so the
+        // controller rejects it. Without a two_factor_token it enters the
+        // session/CSRF flow and fails the CSRF check (403) before reaching the
+        // "code required" (400) branch. Either rejection is acceptable here — the
+        // endpoint must not process a credential-less, code-less request.
+        $this->assertContains($response->getStatusCode(), [400, 403, 422]);
     }
 
     // ------------------------------------------------------------------

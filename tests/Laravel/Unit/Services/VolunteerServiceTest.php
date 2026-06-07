@@ -80,6 +80,10 @@ class VolunteerServiceTest extends TestCase
             'created_at' => now(),
         ]);
 
+        // Factory creates above fire model observers that reset TenantContext to
+        // tenant 1; re-pin tenant 2 so verifyHours scopes to the seeded rows.
+        TenantContext::setById(2);
+
         $this->assertTrue(VolunteerService::verifyHours($logId, $admin->id, 'approve'));
 
         $this->assertEquals(8.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
