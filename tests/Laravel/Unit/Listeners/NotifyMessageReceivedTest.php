@@ -23,6 +23,19 @@ use Tests\Laravel\TestCase;
  */
 class NotifyMessageReceivedTest extends TestCase
 {
+    private $dispatcherAlias;
+
+    protected function setUp(): void
+    {
+        // App\Services\NotificationDispatcher may already be autoloaded by app
+        // boot or an earlier test in the combined run, so the alias mock MUST be
+        // created before parent::setUp() and tolerate the class already existing.
+        // shouldIgnoreMissing() makes boot-time/static calls no-ops; per-test
+        // expectations are layered on the shared instance in each test.
+        $this->dispatcherAlias = Mockery::mock('alias:' . NotificationDispatcher::class)->shouldIgnoreMissing();
+        parent::setUp();
+    }
+
     public function test_implements_should_queue(): void
     {
         $this->assertTrue(
@@ -51,7 +64,7 @@ class NotifyMessageReceivedTest extends TestCase
         // The HTML email is built via the real EmailTemplateBuilder against the
         // test tenant context; only the dispatcher call is asserted. Link is the
         // sender's thread: /messages/{senderId}. Content renders via emails.message.in_app_content.
-        Mockery::mock('alias:' . NotificationDispatcher::class)
+        $this->dispatcherAlias
             ->shouldReceive('dispatch')
             ->once()
             ->with(

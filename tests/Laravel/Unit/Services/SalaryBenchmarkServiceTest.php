@@ -18,6 +18,19 @@ use Mockery;
  */
 class SalaryBenchmarkServiceTest extends TestCase
 {
+    private $benchmarkAlias;
+
+    protected function setUp(): void
+    {
+        // App\Models\SalaryBenchmark may already be autoloaded by app boot or an
+        // earlier test in the combined run, so the alias mock MUST be created
+        // before parent::setUp() and tolerate the class already existing.
+        // shouldIgnoreMissing() makes boot-time/static calls no-ops; per-test
+        // expectations are layered on the shared instance in each test.
+        $this->benchmarkAlias = Mockery::mock('alias:' . SalaryBenchmark::class)->shouldIgnoreMissing();
+        parent::setUp();
+    }
+
     // ── findForTitle ────────────────────────────────────────────
 
     public function test_findForTitle_returns_matching_benchmark(): void
@@ -33,7 +46,7 @@ class SalaryBenchmarkServiceTest extends TestCase
         $builder->shouldReceive('orWhereNull')->andReturnSelf();
         $builder->shouldReceive('get')->andReturn(collect([$benchmark]));
 
-        $mock = Mockery::mock('alias:' . SalaryBenchmark::class);
+        $mock = $this->benchmarkAlias;
         $mock->shouldReceive('orderByRaw')->andReturn($builder);
 
         $result = SalaryBenchmarkService::findForTitle('Senior Developer');
@@ -54,7 +67,7 @@ class SalaryBenchmarkServiceTest extends TestCase
         $builder->shouldReceive('orWhereNull')->andReturnSelf();
         $builder->shouldReceive('get')->andReturn(collect([$benchmark]));
 
-        $mock = Mockery::mock('alias:' . SalaryBenchmark::class);
+        $mock = $this->benchmarkAlias;
         $mock->shouldReceive('orderByRaw')->andReturn($builder);
 
         // Title is lowercased, and role_keyword is lowered for comparison
@@ -72,7 +85,7 @@ class SalaryBenchmarkServiceTest extends TestCase
         $builder->shouldReceive('orWhereNull')->andReturnSelf();
         $builder->shouldReceive('get')->andReturn(collect([$benchmark]));
 
-        $mock = Mockery::mock('alias:' . SalaryBenchmark::class);
+        $mock = $this->benchmarkAlias;
         $mock->shouldReceive('orderByRaw')->andReturn($builder);
 
         // "Chef" doesn't contain "developer"
@@ -84,7 +97,7 @@ class SalaryBenchmarkServiceTest extends TestCase
     {
         Log::shouldReceive('error')->once();
 
-        $mock = Mockery::mock('alias:' . SalaryBenchmark::class);
+        $mock = $this->benchmarkAlias;
         $mock->shouldReceive('orderByRaw')->andThrow(new \Exception('DB error'));
 
         $result = SalaryBenchmarkService::findForTitle('Developer');
@@ -111,7 +124,7 @@ class SalaryBenchmarkServiceTest extends TestCase
         $builder->shouldReceive('orWhereNull')->andReturnSelf();
         $builder->shouldReceive('get')->andReturn(collect([$tenantBenchmark, $globalBenchmark]));
 
-        $mock = Mockery::mock('alias:' . SalaryBenchmark::class);
+        $mock = $this->benchmarkAlias;
         $mock->shouldReceive('orderByRaw')->andReturn($builder);
 
         $result = SalaryBenchmarkService::findForTitle('Developer');
@@ -130,7 +143,7 @@ class SalaryBenchmarkServiceTest extends TestCase
         $builder->shouldReceive('get')->andReturn(collect([]));
         $builder->shouldReceive('get->toArray')->andReturn([]);
 
-        $mock = Mockery::mock('alias:' . SalaryBenchmark::class);
+        $mock = $this->benchmarkAlias;
         $mock->shouldReceive('where')->andReturn($builder);
 
         $result = SalaryBenchmarkService::list();
@@ -141,7 +154,7 @@ class SalaryBenchmarkServiceTest extends TestCase
     {
         Log::shouldReceive('error')->once();
 
-        $mock = Mockery::mock('alias:' . SalaryBenchmark::class);
+        $mock = $this->benchmarkAlias;
         $mock->shouldReceive('where')->andThrow(new \Exception('DB error'));
 
         $result = SalaryBenchmarkService::list();

@@ -23,8 +23,16 @@ use Tests\Laravel\TestCase;
  */
 class SendWelcomeNotificationTest extends TestCase
 {
+    private $notificationAlias;
+
     protected function setUp(): void
     {
+        // App\Models\Notification may already be autoloaded by app boot or an
+        // earlier test in the combined run, so the alias mock MUST be created
+        // before parent::setUp() and tolerate the class already existing.
+        // shouldIgnoreMissing() makes boot-time/static calls no-ops; per-test
+        // expectations are layered on the shared instance in each test.
+        $this->notificationAlias = Mockery::mock('alias:' . Notification::class)->shouldIgnoreMissing();
         parent::setUp();
         // The listener has a Cache-backed idempotency guard keyed by
         // tenant_id:user_id. Without flushing between tests (the array cache
@@ -55,7 +63,7 @@ class SendWelcomeNotificationTest extends TestCase
 
         $event = new UserRegistered($user, $this->testTenantId);
 
-        $notificationMock = Mockery::mock('alias:' . Notification::class);
+        $notificationMock = $this->notificationAlias;
         $notificationMock->shouldReceive('create')
             ->once()
             ->with(Mockery::on(function ($data) {
@@ -98,7 +106,7 @@ class SendWelcomeNotificationTest extends TestCase
 
         $event = new UserRegistered($user, $this->testTenantId);
 
-        $notificationMock = Mockery::mock('alias:' . Notification::class);
+        $notificationMock = $this->notificationAlias;
         $notificationMock->shouldReceive('create')->once();
 
         Mockery::mock('alias:' . EmailDispatchService::class)
@@ -115,7 +123,7 @@ class SendWelcomeNotificationTest extends TestCase
 
         $event = new UserRegistered($user, $this->testTenantId);
 
-        $notificationMock = Mockery::mock('alias:' . Notification::class);
+        $notificationMock = $this->notificationAlias;
         $notificationMock->shouldReceive('create')
             ->andThrow(new \RuntimeException('DB error'));
 

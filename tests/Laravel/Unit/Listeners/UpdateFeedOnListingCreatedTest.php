@@ -22,6 +22,19 @@ use Tests\Laravel\TestCase;
  */
 class UpdateFeedOnListingCreatedTest extends TestCase
 {
+    private $feedMock;
+
+    protected function setUp(): void
+    {
+        // App\Models\FeedActivity may already be autoloaded by app boot or an
+        // earlier test in the combined run, so the alias mock MUST be created
+        // before parent::setUp() and tolerate the class already existing.
+        // shouldIgnoreMissing() makes boot-time/static calls no-ops; per-test
+        // expectations are layered on the shared instance in each test.
+        $this->feedMock = Mockery::mock('alias:' . FeedActivity::class)->shouldIgnoreMissing();
+        parent::setUp();
+    }
+
     public function test_implements_should_queue(): void
     {
         $this->assertTrue(
@@ -42,7 +55,7 @@ class UpdateFeedOnListingCreatedTest extends TestCase
 
         $event = new ListingCreated($listing, $user, 2);
 
-        $feedMock = Mockery::mock('alias:' . FeedActivity::class);
+        $feedMock = $this->feedMock;
         $feedMock->shouldReceive('create')
             ->once()
             ->with(Mockery::on(function ($data) {
@@ -70,7 +83,7 @@ class UpdateFeedOnListingCreatedTest extends TestCase
 
         $event = new ListingCreated($listing, $user, 2);
 
-        $feedMock = Mockery::mock('alias:' . FeedActivity::class);
+        $feedMock = $this->feedMock;
         $feedMock->shouldReceive('create')
             ->once()
             ->with(Mockery::on(function ($data) {
@@ -91,7 +104,7 @@ class UpdateFeedOnListingCreatedTest extends TestCase
 
         $event = new ListingCreated($listing, $user, 2);
 
-        $feedMock = Mockery::mock('alias:' . FeedActivity::class);
+        $feedMock = $this->feedMock;
         $feedMock->shouldReceive('create')
             ->andThrow(new \RuntimeException('DB error'));
 

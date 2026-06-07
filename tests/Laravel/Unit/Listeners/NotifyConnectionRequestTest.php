@@ -21,6 +21,19 @@ use Tests\Laravel\TestCase;
  */
 class NotifyConnectionRequestTest extends TestCase
 {
+    private $dispatcherAlias;
+
+    protected function setUp(): void
+    {
+        // App\Services\NotificationDispatcher may already be autoloaded by app
+        // boot or an earlier test in the combined run, so the alias mock MUST be
+        // created before parent::setUp() and tolerate the class already existing.
+        // shouldIgnoreMissing() makes boot-time/static calls no-ops; per-test
+        // expectations are layered on the shared instance in each test.
+        $this->dispatcherAlias = Mockery::mock('alias:' . NotificationDispatcher::class)->shouldIgnoreMissing();
+        parent::setUp();
+    }
+
     public function test_implements_should_queue(): void
     {
         $this->assertTrue(
@@ -42,7 +55,7 @@ class NotifyConnectionRequestTest extends TestCase
         $event = new ConnectionRequested($connection, $requester, $target, 2);
 
         // Mock the static NotificationDispatcher::dispatch call
-        Mockery::mock('alias:' . NotificationDispatcher::class)
+        $this->dispatcherAlias
             ->shouldReceive('dispatch')
             ->once()
             ->with(
@@ -72,7 +85,7 @@ class NotifyConnectionRequestTest extends TestCase
 
         $event = new ConnectionRequested($connection, $requester, $target, 2);
 
-        Mockery::mock('alias:' . NotificationDispatcher::class)
+        $this->dispatcherAlias
             ->shouldReceive('dispatch')
             ->once()
             ->with(
@@ -101,7 +114,7 @@ class NotifyConnectionRequestTest extends TestCase
         $connection = new Connection();
         $event = new ConnectionRequested($connection, $requester, $target, 2);
 
-        Mockery::mock('alias:' . NotificationDispatcher::class)
+        $this->dispatcherAlias
             ->shouldReceive('dispatch')
             ->once()
             ->andThrow(new \RuntimeException('Test failure'));

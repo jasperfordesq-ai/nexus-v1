@@ -18,9 +18,22 @@ use Mockery;
  */
 class TenantVisibilityServiceTest extends TestCase
 {
+    private $superPanelAlias;
+
+    protected function setUp(): void
+    {
+        // App\Core\SuperPanelAccess may already be autoloaded by app boot or an
+        // earlier test in the combined run, so the alias mock MUST be created
+        // before parent::setUp() and tolerate the class already existing.
+        // shouldIgnoreMissing() makes boot-time/static calls no-ops; per-test
+        // expectations are layered on the shared instance in each test.
+        $this->superPanelAlias = Mockery::mock('alias:' . SuperPanelAccess::class)->shouldIgnoreMissing();
+        parent::setUp();
+    }
+
     public function test_getVisibleTenantIds_returns_empty_when_access_denied(): void
     {
-        Mockery::mock('alias:' . SuperPanelAccess::class)
+        $this->superPanelAlias
             ->shouldReceive('getAccess')
             ->andReturn(['granted' => false]);
 
@@ -32,7 +45,7 @@ class TenantVisibilityServiceTest extends TestCase
     {
         // Force an error
         DB::shouldReceive('table')->andThrow(new \Exception('DB error'));
-        Mockery::mock('alias:' . SuperPanelAccess::class)
+        $this->superPanelAlias
             ->shouldReceive('getAccess')
             ->andReturn(['granted' => true, 'level' => 'master']);
 
@@ -42,7 +55,7 @@ class TenantVisibilityServiceTest extends TestCase
 
     public function test_getTenant_returns_null_when_access_denied(): void
     {
-        Mockery::mock('alias:' . SuperPanelAccess::class)
+        $this->superPanelAlias
             ->shouldReceive('canAccessTenant')
             ->with(999)
             ->andReturn(false);
@@ -52,7 +65,7 @@ class TenantVisibilityServiceTest extends TestCase
 
     public function test_getDashboardStats_returns_zeroed_when_no_visible_ids(): void
     {
-        Mockery::mock('alias:' . SuperPanelAccess::class)
+        $this->superPanelAlias
             ->shouldReceive('getAccess')
             ->andReturn(['granted' => false]);
 

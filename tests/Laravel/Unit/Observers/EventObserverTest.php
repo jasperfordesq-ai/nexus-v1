@@ -19,13 +19,25 @@ use Tests\Laravel\TestCase;
  */
 class EventObserverTest extends TestCase
 {
+    private $searchMock;
+
+    protected function setUp(): void
+    {
+        // App\Services\SearchService may already be autoloaded by app boot or an
+        // earlier test in the combined run, so the alias mock MUST be created
+        // before parent::setUp() and tolerate the class already existing.
+        // shouldIgnoreMissing() makes boot-time/static calls no-ops; per-test
+        // expectations are layered on the shared instance below.
+        $this->searchMock = Mockery::mock('alias:' . SearchService::class)->shouldIgnoreMissing();
+        parent::setUp();
+    }
+
     public function test_created_indexes_event(): void
     {
         $event = new Event();
         $event->id = 7;
 
-        $searchMock = Mockery::mock('alias:' . SearchService::class);
-        $searchMock->shouldReceive('indexEvent')->once()->with($event);
+        $this->searchMock->shouldReceive('indexEvent')->once()->with($event);
 
         (new EventObserver())->created($event);
 
@@ -37,8 +49,7 @@ class EventObserverTest extends TestCase
         $event = new Event();
         $event->id = 7;
 
-        $searchMock = Mockery::mock('alias:' . SearchService::class);
-        $searchMock->shouldReceive('indexEvent')->andThrow(new \RuntimeException('fail'));
+        $this->searchMock->shouldReceive('indexEvent')->andThrow(new \RuntimeException('fail'));
 
         Log::shouldReceive('error')
             ->once()
@@ -55,8 +66,7 @@ class EventObserverTest extends TestCase
         $event->id = 7;
         $event->shouldReceive('getDirty')->andReturn(['updated_at' => '2026-04-12']);
 
-        $searchMock = Mockery::mock('alias:' . SearchService::class);
-        $searchMock->shouldNotReceive('indexEvent');
+        $this->searchMock->shouldNotReceive('indexEvent');
 
         (new EventObserver())->updated($event);
 
@@ -69,8 +79,7 @@ class EventObserverTest extends TestCase
         $event->id = 7;
         $event->shouldReceive('getDirty')->andReturn(['title' => 'New Title']);
 
-        $searchMock = Mockery::mock('alias:' . SearchService::class);
-        $searchMock->shouldReceive('indexEvent')->once()->with($event);
+        $this->searchMock->shouldReceive('indexEvent')->once()->with($event);
 
         (new EventObserver())->updated($event);
 
@@ -82,8 +91,7 @@ class EventObserverTest extends TestCase
         $event = new Event();
         $event->id = 99;
 
-        $searchMock = Mockery::mock('alias:' . SearchService::class);
-        $searchMock->shouldReceive('removeEvent')->once()->with(99);
+        $this->searchMock->shouldReceive('removeEvent')->once()->with(99);
 
         (new EventObserver())->deleted($event);
 

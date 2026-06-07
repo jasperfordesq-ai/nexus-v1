@@ -19,8 +19,16 @@ use Mockery;
  */
 class ShiftGroupReservationServiceTest extends TestCase
 {
+    private $shiftAlias;
+
     protected function setUp(): void
     {
+        // App\Models\VolShift may already be autoloaded by app boot or an earlier
+        // test in the combined run, so the alias mock MUST be created before
+        // parent::setUp() and tolerate the class already existing.
+        // shouldIgnoreMissing() makes boot-time/static calls no-ops; per-test
+        // expectations are layered on the shared instance in each test.
+        $this->shiftAlias = Mockery::mock('alias:' . VolShift::class)->shouldIgnoreMissing();
         parent::setUp();
     }
 
@@ -36,7 +44,7 @@ class ShiftGroupReservationServiceTest extends TestCase
 
     public function test_reserve_fails_when_shift_not_found(): void
     {
-        $mock = Mockery::mock('alias:' . VolShift::class);
+        $mock = $this->shiftAlias;
         $mock->shouldReceive('find')->with(999)->andReturnNull();
 
         $result = ShiftGroupReservationService::reserve(999, 1, 1, 2);

@@ -19,13 +19,25 @@ use Tests\Laravel\TestCase;
  */
 class GroupObserverTest extends TestCase
 {
+    private $searchMock;
+
+    protected function setUp(): void
+    {
+        // App\Services\SearchService may already be autoloaded by app boot or an
+        // earlier test in the combined run, so the alias mock MUST be created
+        // before parent::setUp() and tolerate the class already existing.
+        // shouldIgnoreMissing() makes boot-time/static calls no-ops; per-test
+        // expectations are layered on the shared instance below.
+        $this->searchMock = Mockery::mock('alias:' . SearchService::class)->shouldIgnoreMissing();
+        parent::setUp();
+    }
+
     public function test_created_indexes_group(): void
     {
         $group = new Group();
         $group->id = 5;
 
-        $searchMock = Mockery::mock('alias:' . SearchService::class);
-        $searchMock->shouldReceive('indexGroup')->once()->with($group);
+        $this->searchMock->shouldReceive('indexGroup')->once()->with($group);
 
         (new GroupObserver())->created($group);
 
@@ -38,8 +50,7 @@ class GroupObserverTest extends TestCase
         $group->id = 5;
         $group->shouldReceive('getDirty')->andReturn(['member_count' => 25]);
 
-        $searchMock = Mockery::mock('alias:' . SearchService::class);
-        $searchMock->shouldNotReceive('indexGroup');
+        $this->searchMock->shouldNotReceive('indexGroup');
 
         (new GroupObserver())->updated($group);
 
@@ -52,8 +63,7 @@ class GroupObserverTest extends TestCase
         $group->id = 5;
         $group->shouldReceive('getDirty')->andReturn(['name' => 'New Name']);
 
-        $searchMock = Mockery::mock('alias:' . SearchService::class);
-        $searchMock->shouldReceive('indexGroup')->once()->with($group);
+        $this->searchMock->shouldReceive('indexGroup')->once()->with($group);
 
         (new GroupObserver())->updated($group);
 
@@ -66,8 +76,7 @@ class GroupObserverTest extends TestCase
         $group->id = 5;
         $group->shouldReceive('getDirty')->andReturn(['visibility' => 'private']);
 
-        $searchMock = Mockery::mock('alias:' . SearchService::class);
-        $searchMock->shouldReceive('indexGroup')->once()->with($group);
+        $this->searchMock->shouldReceive('indexGroup')->once()->with($group);
 
         (new GroupObserver())->updated($group);
 
@@ -79,8 +88,7 @@ class GroupObserverTest extends TestCase
         $group = new Group();
         $group->id = 50;
 
-        $searchMock = Mockery::mock('alias:' . SearchService::class);
-        $searchMock->shouldReceive('removeGroup')->once()->with(50);
+        $this->searchMock->shouldReceive('removeGroup')->once()->with(50);
 
         (new GroupObserver())->deleted($group);
 
@@ -92,8 +100,7 @@ class GroupObserverTest extends TestCase
         $group = new Group();
         $group->id = 50;
 
-        $searchMock = Mockery::mock('alias:' . SearchService::class);
-        $searchMock->shouldReceive('removeGroup')->andThrow(new \RuntimeException('x'));
+        $this->searchMock->shouldReceive('removeGroup')->andThrow(new \RuntimeException('x'));
 
         Log::shouldReceive('error')
             ->once()

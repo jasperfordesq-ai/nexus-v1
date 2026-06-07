@@ -19,9 +19,16 @@ use Mockery;
 class VolunteerCheckInServiceTest extends TestCase
 {
     private VolunteerCheckInService $service;
+    private $checkinAlias;
 
     protected function setUp(): void
     {
+        // App\Models\VolShiftCheckin may already be autoloaded by app boot or an
+        // earlier test in the combined run, so the alias mock MUST be created
+        // before parent::setUp() and tolerate the class already existing.
+        // shouldIgnoreMissing() makes boot-time/static calls no-ops; per-test
+        // expectations are layered on the shared instance in each test.
+        $this->checkinAlias = Mockery::mock('alias:' . VolShiftCheckin::class)->shouldIgnoreMissing();
         parent::setUp();
         $this->service = new VolunteerCheckInService();
     }
@@ -33,7 +40,7 @@ class VolunteerCheckInServiceTest extends TestCase
 
     public function test_checkOut_returns_false_when_token_not_found(): void
     {
-        $mock = Mockery::mock('alias:' . VolShiftCheckin::class);
+        $mock = $this->checkinAlias;
         $mock->shouldReceive('where')->andReturnSelf();
         $mock->shouldReceive('first')->andReturn(null);
 
@@ -45,7 +52,7 @@ class VolunteerCheckInServiceTest extends TestCase
 
     public function test_verifyCheckIn_returns_null_for_invalid_token(): void
     {
-        $mock = Mockery::mock('alias:' . VolShiftCheckin::class);
+        $mock = $this->checkinAlias;
         $mock->shouldReceive('with')->andReturnSelf();
         $mock->shouldReceive('where')->andReturnSelf();
         $mock->shouldReceive('first')->andReturn(null);
@@ -58,7 +65,7 @@ class VolunteerCheckInServiceTest extends TestCase
 
     public function test_getUserIdByToken_returns_null_when_not_found(): void
     {
-        $mock = Mockery::mock('alias:' . VolShiftCheckin::class);
+        $mock = $this->checkinAlias;
         $mock->shouldReceive('where')->andReturnSelf();
         $mock->shouldReceive('value')->andReturn(null);
 
@@ -67,7 +74,7 @@ class VolunteerCheckInServiceTest extends TestCase
 
     public function test_getShiftIdByToken_returns_null_when_not_found(): void
     {
-        $mock = Mockery::mock('alias:' . VolShiftCheckin::class);
+        $mock = $this->checkinAlias;
         $mock->shouldReceive('where')->andReturnSelf();
         $mock->shouldReceive('value')->andReturn(null);
 

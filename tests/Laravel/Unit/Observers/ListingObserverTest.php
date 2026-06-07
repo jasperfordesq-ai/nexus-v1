@@ -19,13 +19,25 @@ use Tests\Laravel\TestCase;
  */
 class ListingObserverTest extends TestCase
 {
+    private $searchMock;
+
+    protected function setUp(): void
+    {
+        // App\Services\SearchService may already be autoloaded by app boot or an
+        // earlier test in the combined run, so the alias mock MUST be created
+        // before parent::setUp() and tolerate the class already existing.
+        // shouldIgnoreMissing() makes boot-time/static calls no-ops; per-test
+        // expectations are layered on the shared instance below.
+        $this->searchMock = Mockery::mock('alias:' . SearchService::class)->shouldIgnoreMissing();
+        parent::setUp();
+    }
+
     public function test_updated_reindexes_listing(): void
     {
         $listing = new Listing();
         $listing->id = 10;
 
-        $searchMock = Mockery::mock('alias:' . SearchService::class);
-        $searchMock->shouldReceive('indexListing')->once()->with($listing);
+        $this->searchMock->shouldReceive('indexListing')->once()->with($listing);
 
         (new ListingObserver())->updated($listing);
 
@@ -37,8 +49,7 @@ class ListingObserverTest extends TestCase
         $listing = new Listing();
         $listing->id = 10;
 
-        $searchMock = Mockery::mock('alias:' . SearchService::class);
-        $searchMock->shouldReceive('indexListing')->andThrow(new \RuntimeException('boom'));
+        $this->searchMock->shouldReceive('indexListing')->andThrow(new \RuntimeException('boom'));
 
         Log::shouldReceive('error')
             ->once()
@@ -54,8 +65,7 @@ class ListingObserverTest extends TestCase
         $listing = new Listing();
         $listing->id = 42;
 
-        $searchMock = Mockery::mock('alias:' . SearchService::class);
-        $searchMock->shouldReceive('removeListing')->once()->with(42);
+        $this->searchMock->shouldReceive('removeListing')->once()->with(42);
 
         (new ListingObserver())->deleted($listing);
 
@@ -67,8 +77,7 @@ class ListingObserverTest extends TestCase
         $listing = new Listing();
         $listing->id = 42;
 
-        $searchMock = Mockery::mock('alias:' . SearchService::class);
-        $searchMock->shouldReceive('removeListing')->andThrow(new \RuntimeException('fail'));
+        $this->searchMock->shouldReceive('removeListing')->andThrow(new \RuntimeException('fail'));
 
         Log::shouldReceive('error')
             ->once()
