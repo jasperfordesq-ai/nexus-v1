@@ -34,16 +34,40 @@ class PurgeBrokerMessageCopiesCommandTest extends TestCase
     // ----------------------------------------------------------------
 
     /**
+     * Create a real user on the given tenant and return its id.
+     *
+     * messages.{sender_id,receiver_id} and broker_message_copies.{sender_id,
+     * receiver_id,reviewed_by} all FK to users(id). CI builds its test DB from
+     * the schema dump with no user rows, so the old hard-coded ids (1, 2) blew
+     * the FK constraint. Seed real users instead.
+     */
+    private function makeUserId(int $tenantId): int
+    {
+        return (int) \App\Models\User::factory()->forTenant($tenantId)->create()->id;
+    }
+
+    /**
      * Insert a real messages row (required by broker_message_copies FK) and a
      * broker_message_copies row.  Returns the broker_message_copies.id.
+     *
+     * Sender, receiver and reviewer users are created on the row's tenant when
+     * not supplied so every FK (messages + broker_message_copies) is satisfied
+     * on a clean CI database.
      *
      * @param array<string, mixed> $overrides  Extra columns for broker_message_copies
      */
     private function insertCopy(array $overrides = []): int
     {
         $tenantId = $overrides['tenant_id'] ?? $this->testTenantId;
-        $senderId = $overrides['sender_id'] ?? 1;
-        $receiverId = $overrides['receiver_id'] ?? 2;
+        $senderId = $overrides['sender_id'] ?? $this->makeUserId($tenantId);
+        $receiverId = $overrides['receiver_id'] ?? $this->makeUserId($tenantId);
+
+        // reviewed_by FKs to users(id); resolve it before building the row so a
+        // reviewed copy always references a real reviewer. A null override
+        // (unreviewed copy) is preserved as-is.
+        $reviewedBy = array_key_exists('reviewed_by', $overrides)
+            ? $overrides['reviewed_by']
+            : $this->makeUserId($tenantId);
 
         $msgId = DB::table('messages')->insertGetId([
             'tenant_id'   => $tenantId,
@@ -63,11 +87,11 @@ class PurgeBrokerMessageCopiesCommandTest extends TestCase
             'sent_at'             => now()->subDays(100),  // old by default
             'copy_reason'         => 'first_contact',
             'flagged'             => false,
-            'reviewed_by'         => 1,
+            'reviewed_by'         => $reviewedBy,
             'reviewed_at'         => now()->subDays(100),
             'conversation_key'    => 'key-' . uniqid(),
             'created_at'          => now()->subDays(100),
-        ], $overrides));
+        ], $overrides, ['sender_id' => $senderId, 'receiver_id' => $receiverId, 'reviewed_by' => $reviewedBy]));
     }
 
     /**
@@ -137,9 +161,8 @@ class PurgeBrokerMessageCopiesCommandTest extends TestCase
 
         Artisan::call(self::COMMAND, ['--days' => 30]);
 
-        $this->assertDatabaseHas('broker_message_copies', ['id' => $unreviewedId],
-            'Unreviewed broker copies must never be purged regardless of age'
-        );
+        // Unreviewed broker copies must never be purged regardless of age.
+        $this->assertDatabaseHas('broker_message_copies', ['id' => $unreviewedId]);
     }
 
     // ----------------------------------------------------------------
@@ -165,10 +188,9 @@ class PurgeBrokerMessageCopiesCommandTest extends TestCase
 
         Artisan::call(self::COMMAND, ['--days' => 0]);
 
-        // 3-day row is protected by 7-day floor
-        $this->assertDatabaseHas('broker_message_copies', ['id' => $recentId],
-            'Safety floor: rows newer than 7 days must never be deleted even if config says 0'
-        );
+        // 3-day row is protected by 7-day floor: rows newer than 7 days must
+        // never be deleted even if config says 0.
+        $this->assertDatabaseHas('broker_message_copies', ['id' => $recentId]);
 
         // 10-day row exceeds the 7-day floor and should be gone
         $this->assertDatabaseMissing('broker_message_copies', ['id' => $oldId]);
@@ -194,9 +216,8 @@ class PurgeBrokerMessageCopiesCommandTest extends TestCase
 
         Artisan::call(self::COMMAND, ['--days' => 30, '--flagged-days' => 365]);
 
-        $this->assertDatabaseHas('broker_message_copies', ['id' => $flaggedId],
-            'Flagged copies must survive the standard retention window'
-        );
+        // Flagged copies must survive the standard retention window.
+        $this->assertDatabaseHas('broker_message_copies', ['id' => $flaggedId]);
     }
 
     public function test_flagged_copies_are_deleted_after_flagged_retention(): void
@@ -212,9 +233,8 @@ class PurgeBrokerMessageCopiesCommandTest extends TestCase
 
         Artisan::call(self::COMMAND, ['--days' => 90, '--flagged-days' => 365]);
 
-        $this->assertDatabaseMissing('broker_message_copies', ['id' => $flaggedId],
-            'Flagged copies older than flagged-days retention should be deleted'
-        );
+        // Flagged copies older than flagged-days retention should be deleted.
+        $this->assertDatabaseMissing('broker_message_copies', ['id' => $flaggedId]);
     }
 
     // ----------------------------------------------------------------

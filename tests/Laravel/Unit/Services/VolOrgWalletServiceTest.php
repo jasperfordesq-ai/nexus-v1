@@ -18,6 +18,24 @@ class VolOrgWalletServiceTest extends TestCase
 {
     use DatabaseTransactions;
 
+    /**
+     * Re-pin the tenant context to tenant 2 (hour-timebank).
+     *
+     * Creating a User via the factory fires UserObserver, whose post-create
+     * notification path calls TenantContext::reset(). Once reset, the next
+     * TenantContext::getId() re-resolves to the Master tenant (id=1) via the
+     * host/path fallback. Every VolOrgWalletService method scopes its queries
+     * by TenantContext::getId(), so on CI's clean DB the tenant-2 fixtures
+     * become invisible ("User/Organization not found") unless the context is
+     * re-established *after* fixtures are created and *before* the service is
+     * invoked. This mirrors the explicit setById(2) the cross-tenant test
+     * already relies on.
+     */
+    private function pinTenant(int $tenantId = 2): void
+    {
+        TenantContext::setById($tenantId);
+    }
+
     // -------- Smoke tests (kept) --------
 
     public function test_class_exists(): void
@@ -57,6 +75,7 @@ class VolOrgWalletServiceTest extends TestCase
     {
         $user = User::factory()->forTenant(2)->create(['balance' => 100]);
         $orgId = $this->makeOrg(2, 50.00);
+        $this->pinTenant();
 
         $result = VolOrgWalletService::depositFromUser($user->id, $orgId, 25.0);
 
@@ -78,6 +97,7 @@ class VolOrgWalletServiceTest extends TestCase
     {
         $user = User::factory()->forTenant(2)->create(['balance' => 10]);
         $orgId = $this->makeOrg(2, 0.00);
+        $this->pinTenant();
 
         $result = VolOrgWalletService::depositFromUser($user->id, $orgId, 1.75);
 
@@ -95,6 +115,7 @@ class VolOrgWalletServiceTest extends TestCase
     {
         $user = User::factory()->forTenant(2)->create(['balance' => 100]);
         $orgId = $this->makeOrg(2, 0);
+        $this->pinTenant();
 
         $this->assertFalse(VolOrgWalletService::depositFromUser($user->id, $orgId, 0)['success']);
         $this->assertFalse(VolOrgWalletService::depositFromUser($user->id, $orgId, -5)['success']);
@@ -107,6 +128,7 @@ class VolOrgWalletServiceTest extends TestCase
     {
         $user = User::factory()->forTenant(2)->create(['balance' => 5]);
         $orgId = $this->makeOrg(2, 0);
+        $this->pinTenant();
 
         $result = VolOrgWalletService::depositFromUser($user->id, $orgId, 50);
 
@@ -122,6 +144,7 @@ class VolOrgWalletServiceTest extends TestCase
         $admin = User::factory()->forTenant(2)->create();
         $volunteer = User::factory()->forTenant(2)->create(['balance' => 10]);
         $orgId = $this->makeOrg(2, 100.0, $admin->id);
+        $this->pinTenant();
 
         $result = VolOrgWalletService::payVolunteer($orgId, $volunteer->id, 20.0, $admin->id, 'Test pay');
 
@@ -152,6 +175,7 @@ class VolOrgWalletServiceTest extends TestCase
         $admin = User::factory()->forTenant(2)->create();
         $volunteer = User::factory()->forTenant(2)->create(['balance' => 0]);
         $orgId = $this->makeOrg(2, 10.0, $admin->id);
+        $this->pinTenant();
 
         $result = VolOrgWalletService::payVolunteer($orgId, $volunteer->id, 2.75, $admin->id);
 
@@ -173,6 +197,7 @@ class VolOrgWalletServiceTest extends TestCase
         $admin = User::factory()->forTenant(2)->create();
         $volunteer = User::factory()->forTenant(2)->create(['balance' => 0]);
         $orgId = $this->makeOrg(2, 5.0, $admin->id);
+        $this->pinTenant();
 
         $result = VolOrgWalletService::payVolunteer($orgId, $volunteer->id, 50.0, $admin->id);
 
@@ -186,6 +211,7 @@ class VolOrgWalletServiceTest extends TestCase
     {
         $admin = User::factory()->forTenant(2)->create();
         $orgId = $this->makeOrg(2, 100.0, $admin->id);
+        $this->pinTenant();
 
         $up = VolOrgWalletService::adminAdjustment($orgId, 50.0, $admin->id, 'top up');
         $this->assertTrue($up['success']);
@@ -211,8 +237,8 @@ class VolOrgWalletServiceTest extends TestCase
         $otherOrgId = $this->makeOrg(999, 100.0, $otherOwner->id);
 
         // Current context is tenant 2
-        TenantContext::setById(2);
         $user2 = User::factory()->forTenant(2)->create(['balance' => 100]);
+        $this->pinTenant(2);
 
         // getBalance returns empty for cross-tenant org
         $bal = VolOrgWalletService::getBalance($otherOrgId);
@@ -231,9 +257,11 @@ class VolOrgWalletServiceTest extends TestCase
     {
         $user = User::factory()->forTenant(2)->create(['balance' => 1000]);
         $orgId = $this->makeOrg(2, 0, $user->id);
+        $this->pinTenant();
 
         for ($i = 0; $i < 3; $i++) {
-            VolOrgWalletService::depositFromUser($user->id, $orgId, 10);
+            $dep = VolOrgWalletService::depositFromUser($user->id, $orgId, 10);
+            $this->assertTrue($dep['success'], $dep['message'] ?? '');
         }
 
         $result = VolOrgWalletService::getTransactions($orgId, ['limit' => 20]);

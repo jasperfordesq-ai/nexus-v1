@@ -94,19 +94,45 @@ class LoyaltyEdgeCasesTest extends TestCase
         return $merchantId;
     }
 
+    /**
+     * Create an active + approved marketplace listing owned by the given seller.
+     *
+     * The loyalty service requires a real listing that belongs to the merchant
+     * (CaringLoyaltyService::assertListingBelongsToSeller) for both quote and
+     * redeem; the quote/redeem API endpoints pass a concrete listing_id. CI's
+     * clean DB has no listings, so each test must seed its own.
+     */
+    private function makeListing(int $sellerId): int
+    {
+        return (int) DB::table('marketplace_listings')->insertGetId([
+            'tenant_id'         => self::TENANT_ID,
+            'user_id'           => $sellerId,
+            'title'             => 'Loyalty Test Listing',
+            'description'       => 'Listing used by loyalty edge-case tests.',
+            'price'             => 100.00,
+            'price_currency'    => 'CHF',
+            'price_type'        => 'fixed',
+            'status'            => 'active',
+            'moderation_status' => 'approved',
+            'created_at'        => now(),
+            'updated_at'        => now(),
+        ]);
+    }
+
     // ─── Scenario 1: Zero-balance redemption ──────────────────────────────────
 
     public function test_zero_balance_member_redeem_rejects_with_translated_error(): void
     {
         $member = $this->makeUser('zero', 0);
         $merchant = $this->makeMerchantWithSettings();
+        $listing = $this->makeListing($merchant);
 
         $expected = __('caring_community.loyalty.errors.zero_balance');
         $this->assertNotSame('caring_community.loyalty.errors.zero_balance', $expected,
             'Translation key must resolve to a real string (lang/en/caring_community.json missing).');
 
         try {
-            $this->service->redeem($member, $merchant, null, 1.0, 100.0);
+            $this->service->redeem($member, $merchant, $listing, 1.0, 100.0);
             $this->fail('Expected RuntimeException for zero balance');
         } catch (RuntimeException $e) {
             $this->assertSame($expected, $e->getMessage());
@@ -125,8 +151,9 @@ class LoyaltyEdgeCasesTest extends TestCase
     {
         $member = $this->makeUser('zero_quote', 0);
         $merchant = $this->makeMerchantWithSettings();
+        $listing = $this->makeListing($merchant);
 
-        $quote = $this->service->calculateAvailableDiscount($member, $merchant, 100.0);
+        $quote = $this->service->calculateAvailableDiscount($member, $merchant, 100.0, $listing);
 
         $this->assertTrue($quote['accepts']);
         $this->assertSame(0.0, $quote['member_credits']);
@@ -142,8 +169,9 @@ class LoyaltyEdgeCasesTest extends TestCase
         // 2h × 25 = 50 CHF discount → fits within 50% cap. Remainder 50 CHF paid in cash off-platform.
         $member   = $this->makeUser('partial', 2.0);
         $merchant = $this->makeMerchantWithSettings(true, 25.00, 50);
+        $listing  = $this->makeListing($merchant);
 
-        $result = $this->service->redeem($member, $merchant, null, 2.0, 100.0);
+        $result = $this->service->redeem($member, $merchant, $listing, 2.0, 100.0);
 
         $this->assertEqualsWithDelta(50.0, $result['discount_chf'], 0.01);
         $this->assertEqualsWithDelta(0.0, $result['new_wallet_balance'], 0.01);
@@ -163,15 +191,16 @@ class LoyaltyEdgeCasesTest extends TestCase
         // Quote should advertise max_credits_usable = 30/25 = 1.20h, not 10
         $member   = $this->makeUser('partial_cap', 10.0);
         $merchant = $this->makeMerchantWithSettings(true, 25.00, 30);
+        $listing  = $this->makeListing($merchant);
 
-        $quote = $this->service->calculateAvailableDiscount($member, $merchant, 100.0);
+        $quote = $this->service->calculateAvailableDiscount($member, $merchant, 100.0, $listing);
         $this->assertEqualsWithDelta(1.20, $quote['max_credits_usable'], 0.01);
         $this->assertEqualsWithDelta(30.0, $quote['max_discount_chf'], 0.01);
 
         // Trying to use more than the cap allows must be rejected
         $expected = __('caring_community.loyalty.errors.exceeds_max_discount');
         try {
-            $this->service->redeem($member, $merchant, null, 5.0, 100.0); // 5h × 25 = 125 CHF > 30 CHF cap
+            $this->service->redeem($member, $merchant, $listing, 5.0, 100.0); // 5h × 25 = 125 CHF > 30 CHF cap
             $this->fail('Expected RuntimeException for over-cap discount');
         } catch (RuntimeException $e) {
             $this->assertSame($expected, $e->getMessage());
@@ -187,9 +216,10 @@ class LoyaltyEdgeCasesTest extends TestCase
     {
         $member   = $this->makeUser('refund', 5.0);
         $merchant = $this->makeMerchantWithSettings(true, 25.00, 50);
+        $listing  = $this->makeListing($merchant);
         $admin    = $this->makeUser('refund_admin', 0);
 
-        $applied = $this->service->redeem($member, $merchant, null, 2.0, 100.0);
+        $applied = $this->service->redeem($member, $merchant, $listing, 2.0, 100.0);
         $this->assertEqualsWithDelta(3.0, (float) DB::table('users')->where('id', $member)->value('balance'), 0.001);
 
         $reversal = $this->service->reverse($applied['redemption_id'], 'Customer requested refund', $admin);
@@ -219,9 +249,10 @@ class LoyaltyEdgeCasesTest extends TestCase
     {
         $member   = $this->makeUser('double', 5.0);
         $merchant = $this->makeMerchantWithSettings();
+        $listing  = $this->makeListing($merchant);
         $admin    = $this->makeUser('double_admin', 0);
 
-        $applied = $this->service->redeem($member, $merchant, null, 1.0, 100.0);
+        $applied = $this->service->redeem($member, $merchant, $listing, 1.0, 100.0);
         $this->service->reverse($applied['redemption_id'], 'first reversal', $admin);
 
         $expected = __('caring_community.loyalty.errors.redemption_not_reversible');
@@ -240,9 +271,10 @@ class LoyaltyEdgeCasesTest extends TestCase
     {
         $member   = $this->makeUser('tenant_scope', 5.0);
         $merchant = $this->makeMerchantWithSettings();
+        $listing  = $this->makeListing($merchant);
         $admin    = $this->makeUser('tenant_scope_admin', 0);
 
-        $applied = $this->service->redeem($member, $merchant, null, 1.0, 100.0);
+        $applied = $this->service->redeem($member, $merchant, $listing, 1.0, 100.0);
 
         // Find any other live tenant to switch to (tenant_id != TENANT_ID).
         // setById() refuses to switch to a non-existent tenant, so we must use a real one.
@@ -277,9 +309,10 @@ class LoyaltyEdgeCasesTest extends TestCase
     {
         $member   = $this->makeUser('exhaust', 5.0);
         $merchant = $this->makeMerchantWithSettings(true, 25.00, 50);
+        $listing  = $this->makeListing($merchant);
 
         // Step 1: quote — merchant accepts
-        $quote = $this->service->calculateAvailableDiscount($member, $merchant, 100.0);
+        $quote = $this->service->calculateAvailableDiscount($member, $merchant, 100.0, $listing);
         $this->assertTrue($quote['accepts']);
 
         // Step 2: between preview and confirm, merchant flips off
@@ -291,7 +324,7 @@ class LoyaltyEdgeCasesTest extends TestCase
         // Step 3: confirm must reject with translated merchant_disabled error
         $expected = __('caring_community.loyalty.errors.merchant_disabled');
         try {
-            $this->service->redeem($member, $merchant, null, 2.0, 100.0);
+            $this->service->redeem($member, $merchant, $listing, 2.0, 100.0);
             $this->fail('Expected RuntimeException for merchant disabled mid-checkout');
         } catch (RuntimeException $e) {
             $this->assertSame($expected, $e->getMessage());
@@ -310,9 +343,10 @@ class LoyaltyEdgeCasesTest extends TestCase
     {
         $member   = $this->makeUser('tighten', 5.0);
         $merchant = $this->makeMerchantWithSettings(true, 25.00, 50);
+        $listing  = $this->makeListing($merchant);
 
         // Quote at 50% cap → max 50 CHF discount on 100 CHF = 2h usable
-        $quote = $this->service->calculateAvailableDiscount($member, $merchant, 100.0);
+        $quote = $this->service->calculateAvailableDiscount($member, $merchant, 100.0, $listing);
         $this->assertEqualsWithDelta(2.0, $quote['max_credits_usable'], 0.01);
 
         // Merchant tightens cap to 10% of order before user clicks confirm
@@ -324,7 +358,7 @@ class LoyaltyEdgeCasesTest extends TestCase
         // User confirms with the originally-quoted 2h (50 CHF) — now exceeds 10 CHF cap
         $expected = __('caring_community.loyalty.errors.exceeds_max_discount');
         try {
-            $this->service->redeem($member, $merchant, null, 2.0, 100.0);
+            $this->service->redeem($member, $merchant, $listing, 2.0, 100.0);
             $this->fail('Expected RuntimeException for cap tightened mid-checkout');
         } catch (RuntimeException $e) {
             $this->assertSame($expected, $e->getMessage());
