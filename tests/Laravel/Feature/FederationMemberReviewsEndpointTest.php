@@ -11,8 +11,10 @@ namespace Tests\Laravel\Feature;
 use App\Core\TenantContext;
 use App\Http\Controllers\Api\FederationV2Controller;
 use App\Models\User;
+use App\Services\FederationFeatureService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Tests\Laravel\Concerns\FederationIntegrationHarness;
 use Tests\Laravel\TestCase;
 
 /**
@@ -25,13 +27,31 @@ use Tests\Laravel\TestCase;
 class FederationMemberReviewsEndpointTest extends TestCase
 {
     use DatabaseTransactions;
+    use FederationIntegrationHarness;
 
+    /**
+     * Toggle the tenant's federation feature through the real 3-table gate that
+     * FederationV2Controller::requireFederationOperation() consults
+     * (FederationFeatureService::isOperationAllowed). The legacy tenants.features
+     * JSON column is NOT what the controller gate reads.
+     */
     private function setFederationFeature(int $tenantId, bool $enabled): void
     {
         $row = DB::table('tenants')->where('id', $tenantId)->first();
         if (!$row) {
             $this->markTestSkipped("Tenant {$tenantId} does not exist.");
         }
+
+        $this->enableFederationForTenant($tenantId);
+        if (!$enabled) {
+            // Reach the tenant-feature branch, then disable it so the gate fires.
+            DB::table('federation_tenant_features')->updateOrInsert(
+                ['tenant_id' => $tenantId, 'feature_key' => FederationFeatureService::TENANT_FEDERATION_ENABLED],
+                ['is_enabled' => 0, 'updated_at' => now()]
+            );
+        }
+
+        // Keep tenants.features JSON in sync for any TenantContext::hasFeature() use.
         $features = [];
         if (!empty($row->features)) {
             $decoded = is_string($row->features) ? json_decode($row->features, true) : $row->features;
@@ -42,10 +62,53 @@ class FederationMemberReviewsEndpointTest extends TestCase
         $features['federation'] = $enabled;
         DB::table('tenants')->where('id', $tenantId)->update(['features' => json_encode($features)]);
         TenantContext::setById($tenantId);
+
+        // FederationFeatureService is a container singleton that caches the gating
+        // tables in-memory. DatabaseTransactions rolls rows back between tests, so
+        // the singleton can carry a previous test's cached verdict into this one.
+        // Bust its cache after re-seeding so the gate re-reads the fresh rows.
+        $this->app->make(FederationFeatureService::class)->clearCache();
+    }
+
+    /**
+     * The local-member reviews path gates on the receiver being a federation-
+     * visible member: it requires a federation_user_settings opt-in row (with
+     * show_reviews_federated = 1) plus an active federation_partnerships row
+     * (profiles_enabled = 1). For a LOCAL member the controller query resolves
+     * u.tenant_id == memberTenantId == acting tenant, so the partnership row is a
+     * tenant↔itself pairing. The clean DB has none of this, so seed it.
+     */
+    private function makeReceiverReviewsVisible(int $receiverId, int $tenantId): void
+    {
+        DB::table('federation_user_settings')->updateOrInsert(
+            ['user_id' => $receiverId],
+            [
+                'federation_optin'          => 1,
+                'profile_visible_federated' => 1,
+                'show_reviews_federated'    => 1,
+                'opted_in_at'               => now(),
+                'updated_at'                => now(),
+            ]
+        );
+
+        DB::table('federation_partnerships')->updateOrInsert(
+            ['tenant_id' => $tenantId, 'partner_tenant_id' => $tenantId],
+            [
+                'canonical_pair'   => min($tenantId, $tenantId) . '-' . max($tenantId, $tenantId),
+                'status'           => 'active',
+                'profiles_enabled' => 1,
+                'created_at'       => now(),
+                'updated_at'       => now(),
+            ]
+        );
     }
 
     private function makeController(): FederationV2Controller
     {
+        // User factory observers reset TenantContext to tenant 1; re-pin tenant 2
+        // so the controller's getTenantId() (and the federation gate) see tenant 2.
+        TenantContext::setById($this->testTenantId);
+
         return $this->app->make(FederationV2Controller::class);
     }
 
@@ -88,6 +151,8 @@ class FederationMemberReviewsEndpointTest extends TestCase
             'show_cross_tenant'  => 1,
             'created_at'         => now(),
         ]);
+
+        $this->makeReceiverReviewsVisible((int) $receiver->id, $this->testTenantId);
 
         $actingUser = User::factory()->forTenant($this->testTenantId)->create();
         $this->actingAs($actingUser);

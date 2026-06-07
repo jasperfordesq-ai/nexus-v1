@@ -36,6 +36,14 @@ class CoreControllerTest extends TestCase
 
     public function test_contact_form_accepts_submission(): void
     {
+        // CoreController::apiSubmit returns a 500 (no_contact_email_configured)
+        // when the tenant has no contact_email. The clean test tenant row created
+        // by TestCase omits it, so seed one to exercise the normal flow.
+        \Illuminate\Support\Facades\DB::table('tenants')
+            ->where('id', $this->testTenantId)
+            ->update(['contact_email' => 'contact@example.com']);
+        \App\Core\TenantContext::setById($this->testTenantId);
+
         $response = $this->apiPost('/v2/contact', [
             'name' => 'Test User',
             'email' => 'test@example.com',
@@ -53,7 +61,7 @@ class CoreControllerTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->apiGet('/messages/unread-count');
+        $response = $this->apiGet('/v2/messages/unread-count');
 
         $response->assertStatus(200);
     }

@@ -8,7 +8,9 @@ namespace Tests\Laravel\Unit\Services;
 
 use Tests\Laravel\TestCase;
 use App\Services\GoalProgressService;
+use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
+use Mockery;
 
 class GoalProgressServiceTest extends TestCase
 {
@@ -38,13 +40,43 @@ class GoalProgressServiceTest extends TestCase
 
     public function test_getSummary_returns_expected_structure(): void
     {
-        DB::shouldReceive('table->where->count')->andReturn(5);
-        DB::shouldReceive('table->where->selectRaw->groupBy->pluck->all')
-            ->andReturn(['checkin' => 3, 'milestone' => 2]);
+        // getSummary() prechecks tenant ownership via Goal::findOrFail() (HasTenantScope
+        // global scope), so a real Goal row plus history rows must exist for the
+        // pinned test tenant (2). Seed them and run against the real DB.
+        $tenantId = TenantContext::getId();
 
-        $result = $this->service->getSummary(1);
+        $goalId = DB::table('goals')->insertGetId([
+            'tenant_id'     => $tenantId,
+            'user_id'       => 1,
+            'title'         => 'Summary test goal',
+            'status'        => 'active',
+            'current_value' => 0,
+            'target_value'  => 0,
+            'created_at'    => now(),
+        ]);
+
+        $rows = [
+            ['checkin', 'checkin'], ['checkin', 'checkin'], ['checkin', 'checkin'],
+            ['milestone', 'milestone'], ['milestone', 'milestone'],
+        ];
+        foreach ($rows as [$type]) {
+            DB::table('goal_progress_history')->insert([
+                'goal_id'    => $goalId,
+                'tenant_id'  => $tenantId,
+                'event_type' => $type,
+                'description' => 'evt',
+                'created_at' => now(),
+            ]);
+        }
+
+        // Factory/observer side effects may reset the tenant context to 1.
+        TenantContext::setById($tenantId);
+
+        $result = $this->service->getSummary($goalId);
         $this->assertArrayHasKey('total_events', $result);
         $this->assertArrayHasKey('events_by_type', $result);
         $this->assertEquals(5, $result['total_events']);
+        $this->assertEquals(3, $result['events_by_type']['checkin']);
+        $this->assertEquals(2, $result['events_by_type']['milestone']);
     }
 }

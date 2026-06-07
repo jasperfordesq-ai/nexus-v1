@@ -31,7 +31,7 @@ class ExchangeHistoryTest extends TestCase
     {
         $model = new ExchangeHistory();
         $expected = [
-            'exchange_id', 'action', 'actor_id', 'actor_role',
+            'tenant_id', 'exchange_id', 'action', 'actor_id', 'actor_role',
             'old_status', 'new_status', 'notes', 'created_at',
         ];
         $this->assertEquals($expected, $model->getFillable());
@@ -44,9 +44,9 @@ class ExchangeHistoryTest extends TestCase
         $this->assertEquals('datetime', $casts['created_at']);
     }
 
-    public function test_does_not_use_has_tenant_scope_trait(): void
+    public function test_uses_has_tenant_scope_trait(): void
     {
-        $this->assertNotContains(
+        $this->assertContains(
             HasTenantScope::class,
             class_uses_recursive(ExchangeHistory::class)
         );

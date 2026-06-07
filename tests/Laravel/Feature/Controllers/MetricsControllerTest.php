@@ -18,9 +18,14 @@ class MetricsControllerTest extends TestCase
 {
     use DatabaseTransactions;
 
-    private function authenticatedUser(): User
+    private function authenticatedUser(bool $admin = false): User
     {
-        $user = User::factory()->forTenant($this->testTenantId)->create([
+        $factory = User::factory()->forTenant($this->testTenantId);
+        if ($admin) {
+            $factory = $factory->admin();
+        }
+
+        $user = $factory->create([
             'status' => 'active',
             'is_approved' => true,
         ]);
@@ -48,10 +53,12 @@ class MetricsControllerTest extends TestCase
     {
         $this->authenticatedUser();
 
+        // store() requires an 'event' field; metric payload lives under
+        // 'properties' with an optional 'duration_ms'.
         $response = $this->apiPost('/v2/metrics', [
-            'name' => 'page_load',
-            'value' => 1200,
-            'page' => '/dashboard',
+            'event' => 'page_load',
+            'properties' => ['page' => '/dashboard'],
+            'duration_ms' => 1200,
         ]);
 
         $this->assertContains($response->getStatusCode(), [200, 201, 204]);
@@ -70,7 +77,8 @@ class MetricsControllerTest extends TestCase
 
     public function test_summary_returns_data(): void
     {
-        $this->authenticatedUser();
+        // summary() is admin-only (requireAdmin); a plain member gets 403.
+        $this->authenticatedUser(admin: true);
 
         $response = $this->apiGet('/v2/metrics/summary');
 

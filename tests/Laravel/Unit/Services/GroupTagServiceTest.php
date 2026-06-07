@@ -92,26 +92,28 @@ class GroupTagServiceTest extends TestCase
 
     public function test_delete_scopes_by_tenant(): void
     {
-        // Assignments cleanup (no tenant scope on join table)
-        DB::shouldReceive('table')->with('group_tag_assignments')->once()->andReturnSelf();
-        DB::shouldReceive('where')->with('tag_id', 5)->once()->andReturnSelf();
-        DB::shouldReceive('delete')->once()->andReturn(1);
-
-        // Main delete with tenant scope
-        DB::shouldReceive('table')->with('group_tags')->once()->andReturnSelf();
-        DB::shouldReceive('where')->with('id', 5)->once()->andReturnSelf();
-        DB::shouldReceive('where')->with('tenant_id', $this->testTenantId)->once()->andReturnSelf();
-        DB::shouldReceive('delete')->once()->andReturn(1);
+        // delete() now performs a tenant-ownership precheck (first()) BEFORE
+        // touching the join table, so a foreign tagId cannot wipe cross-tenant
+        // assignments. Flow: precheck on group_tags → assignments cleanup →
+        // tenant-scoped delete on group_tags.
+        DB::shouldReceive('table')->with('group_tags')->andReturnSelf();
+        DB::shouldReceive('table')->with('group_tag_assignments')->andReturnSelf();
+        DB::shouldReceive('where')->with('id', 5)->andReturnSelf();
+        DB::shouldReceive('where')->with('tenant_id', $this->testTenantId)->andReturnSelf();
+        DB::shouldReceive('where')->with('tag_id', 5)->andReturnSelf();
+        DB::shouldReceive('first')->once()->andReturn((object) ['id' => 5, 'tenant_id' => $this->testTenantId]);
+        DB::shouldReceive('delete')->andReturn(1);
 
         $this->assertTrue(GroupTagService::delete(5));
     }
 
     public function test_delete_returns_false_when_no_rows(): void
     {
-        DB::shouldReceive('table')->with('group_tag_assignments')->once()->andReturnSelf();
+        // Precheck returns null (tag not found / not owned) → delete short-circuits
+        // to false and never touches the join table.
+        DB::shouldReceive('table')->with('group_tags')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('delete')->andReturn(0, 0);
-        DB::shouldReceive('table')->with('group_tags')->once()->andReturnSelf();
+        DB::shouldReceive('first')->once()->andReturnNull();
 
         $this->assertFalse(GroupTagService::delete(999));
     }

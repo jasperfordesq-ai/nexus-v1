@@ -8,6 +8,7 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use Tests\Laravel\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use App\Models\User;
 
@@ -45,6 +46,26 @@ class GdprControllerTest extends TestCase
     {
         $this->authenticatedUser();
 
+        // GdprService::updateUserConsent resolves the slug against an active
+        // consent_types row; the clean CI DB has none, so seed 'marketing'.
+        // consent_types is a global (non-tenant) table keyed by slug.
+        DB::table('consent_types')->updateOrInsert(
+            ['slug' => 'marketing'],
+            [
+                'name' => 'Marketing',
+                'description' => 'Marketing communications consent',
+                'category' => 'marketing',
+                'is_required' => 0,
+                'current_version' => '1.0',
+                'current_text' => 'I agree to receive marketing communications.',
+                'legal_basis' => 'consent',
+                'is_active' => 1,
+                'display_order' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+
         $response = $this->apiPost('/gdpr/consent', [
             'consent_type' => 'marketing',
             'granted' => true,
@@ -68,8 +89,10 @@ class GdprControllerTest extends TestCase
     {
         $this->authenticatedUser();
 
+        // Controller's type map accepts the data_* prefixed types
+        // (data_export → portability), not the bare 'export'.
         $response = $this->apiPost('/gdpr/request', [
-            'type' => 'export',
+            'type' => 'data_export',
         ]);
 
         $this->assertContains($response->getStatusCode(), [200, 201]);

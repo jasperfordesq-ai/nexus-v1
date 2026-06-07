@@ -106,7 +106,7 @@ class EmbeddingServiceTest extends TestCase
             (object) ['content_id' => 30, 'embedding' => json_encode([0.0, 0.0, 1.0])], // orthogonal
         ]);
 
-        DB::shouldReceive('table->where->where->where->get')->andReturn($candidates);
+        DB::shouldReceive('table->where->where->where->orderByDesc->limit->get')->andReturn($candidates);
 
         $result = $this->service->findSimilar(1, 'listing', 2, 5);
 
@@ -128,7 +128,7 @@ class EmbeddingServiceTest extends TestCase
             (object) ['content_id' => 30, 'embedding' => json_encode([0.7, 0.3])],
         ]);
 
-        DB::shouldReceive('table->where->where->where->get')->andReturn($candidates);
+        DB::shouldReceive('table->where->where->where->orderByDesc->limit->get')->andReturn($candidates);
 
         $result = $this->service->findSimilar(1, 'listing', 2, 2);
         $this->assertCount(2, $result);

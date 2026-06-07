@@ -11,9 +11,11 @@ namespace Tests\Laravel\Feature;
 use App\Core\TenantContext;
 use App\Http\Controllers\Api\FederationV2Controller;
 use App\Models\User;
+use App\Services\FederationFeatureService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Tests\Laravel\Concerns\FederationIntegrationHarness;
 use Tests\Laravel\TestCase;
 
 /**
@@ -28,6 +30,7 @@ use Tests\Laravel\TestCase;
 class FederationFeatureGateTest extends TestCase
 {
     use DatabaseTransactions;
+    use FederationIntegrationHarness;
 
     protected function setUp(): void
     {
@@ -38,12 +41,35 @@ class FederationFeatureGateTest extends TestCase
             ->delete();
     }
 
+    /**
+     * Toggle the tenant's federation feature through the real 3-table gate that
+     * FederationV2Controller::requireFederationOperation() consults
+     * (FederationFeatureService::isOperationAllowed). The legacy tenants.features
+     * JSON column is NOT what the controller gate reads, so we drive the gating
+     * tables directly. The JSON column is kept in sync only for the separate
+     * TenantContext::hasFeature() assertion below.
+     */
     private function setFederationFeature(int $tenantId, bool $enabled): void
     {
         $row = DB::table('tenants')->where('id', $tenantId)->first();
         if (!$row) {
             $this->markTestSkipped("Tenant {$tenantId} does not exist.");
         }
+
+        if ($enabled) {
+            $this->enableFederationForTenant($tenantId);
+        } else {
+            // Fully enable the system + whitelist so the gate reaches the
+            // tenant-feature branch, then disable the tenant federation flag so
+            // isOperationAllowed() returns ['allowed' => false].
+            $this->enableFederationForTenant($tenantId);
+            DB::table('federation_tenant_features')->updateOrInsert(
+                ['tenant_id' => $tenantId, 'feature_key' => FederationFeatureService::TENANT_FEDERATION_ENABLED],
+                ['is_enabled' => 0, 'updated_at' => now()]
+            );
+        }
+
+        // Keep tenants.features JSON in sync for TenantContext::hasFeature().
         $features = [];
         if (!empty($row->features)) {
             $decoded = is_string($row->features) ? json_decode($row->features, true) : $row->features;
@@ -54,6 +80,11 @@ class FederationFeatureGateTest extends TestCase
         $features['federation'] = $enabled;
         DB::table('tenants')->where('id', $tenantId)->update(['features' => json_encode($features)]);
         TenantContext::setById($tenantId);
+
+        // FederationFeatureService is a container singleton that caches the gating
+        // tables in-memory. DatabaseTransactions rolls rows back between tests, so
+        // bust its cache after re-seeding so the gate re-reads the fresh rows.
+        $this->app->make(FederationFeatureService::class)->clearCache();
     }
 
     public function test_has_feature_returns_false_after_disabling(): void
@@ -80,6 +111,9 @@ class FederationFeatureGateTest extends TestCase
             json_encode(['receiver_id' => 999, 'receiver_tenant_id' => 3, 'body' => 'hi'])
         ));
 
+        // User factory observers reset TenantContext to tenant 1; re-pin tenant 2
+        // so the controller gate evaluates the tenant we actually disabled.
+        TenantContext::setById($this->testTenantId);
         $controller = $this->app->make(FederationV2Controller::class);
         $response = $controller->sendMessage();
 
@@ -107,6 +141,9 @@ class FederationFeatureGateTest extends TestCase
             json_encode(['receiver_id' => 999, 'receiver_tenant_id' => 3, 'amount' => 2, 'description' => 'x'])
         ));
 
+        // User factory observers reset TenantContext to tenant 1; re-pin tenant 2
+        // so the controller gate evaluates the tenant we actually disabled.
+        TenantContext::setById($this->testTenantId);
         $controller = $this->app->make(FederationV2Controller::class);
         $response = $controller->sendTransaction();
 

@@ -47,15 +47,21 @@ class ListingsControllerTest extends TestCase
 
     private function ensureListingCategory(int $id = 1): void
     {
-        DB::table('categories')->insertOrIgnore([
-            'id' => $id,
-            'tenant_id' => $this->testTenantId,
-            'name' => 'General',
-            'slug' => 'general',
-            'type' => 'listing',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        // The CI seed already contains category id=1 pinned to tenant 1, so a
+        // plain insertOrIgnore was a no-op and left the row owned by the wrong
+        // tenant — the store() exists-rule (tenant_id = testTenant AND
+        // type = 'listing') then 422s. Force the row onto the test tenant.
+        // Runs inside DatabaseTransactions, so this is rolled back per test.
+        DB::table('categories')->updateOrInsert(
+            ['id' => $id],
+            [
+                'tenant_id' => $this->testTenantId,
+                'name' => 'General',
+                'slug' => 'general',
+                'type' => 'listing',
+                'updated_at' => now(),
+            ]
+        );
     }
 
     // ================================================================

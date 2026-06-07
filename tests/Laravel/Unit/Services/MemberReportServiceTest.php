@@ -28,6 +28,9 @@ class MemberReportServiceTest extends TestCase
         DB::shouldReceive('where')->andReturnSelf();
         DB::shouldReceive('count')->andReturn(0);
         DB::shouldReceive('select')->andReturnSelf();
+        // Service builds the aggregate subqueries via selectRaw() (bound params),
+        // not select(DB::raw()).
+        DB::shouldReceive('selectRaw')->andReturnSelf();
         DB::shouldReceive('orderByDesc')->andReturnSelf();
         DB::shouldReceive('limit')->andReturnSelf();
         DB::shouldReceive('offset')->andReturnSelf();
@@ -88,6 +91,7 @@ class MemberReportServiceTest extends TestCase
         DB::shouldReceive('table')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
         DB::shouldReceive('select')->andReturnSelf();
+        DB::shouldReceive('selectRaw')->andReturnSelf();
         DB::shouldReceive('havingRaw')->andReturnSelf();
         DB::shouldReceive('orderByRaw')->andReturnSelf();
         DB::shouldReceive('limit')->andReturnSelf();

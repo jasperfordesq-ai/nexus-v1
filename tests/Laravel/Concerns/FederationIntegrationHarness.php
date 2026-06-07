@@ -33,6 +33,16 @@ trait FederationIntegrationHarness
     protected string $testSigningSecret = 'test-federation-secret-1234567890';
 
     /**
+     * Monotonic counter for generating distinct partner base URLs.
+     *
+     * federation_external_partners has a UNIQUE (tenant_id, base_url) constraint
+     * (uk_tenant_url), so creating several partners for one tenant in a single
+     * test — e.g. one per protocol — must use distinct base URLs. Each must still
+     * be a public-IP literal so OutboundUrlGuard::isSafeHttpUrl() passes without DNS.
+     */
+    protected static int $partnerUrlSeq = 0;
+
+    /**
      * Create a test partner with the given protocol_type and all allow_* flags ON.
      * Returns the partner row as a stdClass so callers can ->id, ->signing_secret etc.
      */
@@ -42,14 +52,20 @@ trait FederationIntegrationHarness
 
         $encryptedSecret = Crypt::encryptString($this->testSigningSecret);
 
+        // Distinct public-IP literal per partner so the UNIQUE (tenant_id, base_url)
+        // constraint isn't violated when a test creates several partners for one
+        // tenant (e.g. one per protocol). 93.184.216.0/24 is example.com's public
+        // block; any host in it is a public IP, so OutboundUrlGuard::isSafeHttpUrl()
+        // passes without DNS (it short-circuits on IP literals). A '.test' hostname
+        // would be unresolvable and the SSRF guard would block every outbound request.
+        $octet = 1 + (self::$partnerUrlSeq++ % 254);
+        $baseUrl = 'https://93.184.216.' . $octet;
+
         $row = [
             'tenant_id'            => $tenantId,
             'name'                 => 'Test ' . ucfirst($protocol) . ' Partner ' . uniqid(),
             'description'          => 'Harness-created partner for ' . $protocol,
-            // Public IP literal so OutboundUrlGuard::isSafeHttpUrl() passes without DNS
-            // (it short-circuits on IP literals). A '.test' hostname is unresolvable and
-            // the SSRF guard would block every outbound request before it is sent.
-            'base_url'             => 'https://93.184.216.34',
+            'base_url'             => $baseUrl,
             'api_path'             => '/api/v1',
             'api_key'              => 'test-api-key',
             'auth_method'          => 'hmac',

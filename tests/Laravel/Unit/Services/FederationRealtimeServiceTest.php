@@ -14,7 +14,8 @@ class FederationRealtimeServiceTest extends TestCase
     public function test_getUserFederationChannel_format(): void
     {
         $channel = FederationRealtimeService::getUserFederationChannel(5, 2);
-        $this->assertEquals('private-federation.user.5.2', $channel);
+        // Channel format is private-tenant.{tenantId}.user.{userId}
+        $this->assertEquals('private-tenant.2.user.5', $channel);
     }
 
     public function test_getConversationChannel_is_deterministic(): void
@@ -28,8 +29,9 @@ class FederationRealtimeServiceTest extends TestCase
     public function test_getConversationChannel_uses_sorted_pairs(): void
     {
         $channel = FederationRealtimeService::getConversationChannel(10, 2, 5, 1);
-        // "10-2" vs "5-1" — "10-2" > "5-1" so 5-1 comes first
-        $this->assertEquals('private-federation.conversation.10-2.5-1', $channel);
+        // Sorted by integer user ID first: user 5 < user 10, so the 5-1 pair
+        // comes first regardless of lexicographic ordering.
+        $this->assertEquals('private-federation.conversation.5-1.10-2', $channel);
     }
 
     public function test_broadcastNewMessage_returns_false_without_pusher(): void
