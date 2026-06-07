@@ -20,8 +20,17 @@ class JobFeedServiceTest extends TestCase
 {
     private JobFeedService $service;
 
+    /** @var \Mockery\MockInterface */
+    private $jobVacancyAlias;
+
     protected function setUp(): void
     {
+        // The real App\Models\JobVacancy is eagerly loaded during Laravel boot
+        // (AppServiceProvider registers JobVacancy::observe(...)), so the alias
+        // mock MUST be created before parent::setUp() boots the framework.
+        // shouldIgnoreMissing() makes the boot-time static ::observe() calls no-ops.
+        $this->jobVacancyAlias = Mockery::mock('alias:' . JobVacancy::class)->shouldIgnoreMissing();
+
         parent::setUp();
         $this->service = new JobFeedService();
     }
@@ -297,7 +306,6 @@ class JobFeedServiceTest extends TestCase
         $builder->shouldReceive('limit')->with(100)->andReturnSelf();
         $builder->shouldReceive('get')->andReturn(new \Illuminate\Database\Eloquent\Collection($jobs));
 
-        $mock = Mockery::mock('alias:' . JobVacancy::class);
-        $mock->shouldReceive('withoutGlobalScopes')->andReturn($builder);
+        $this->jobVacancyAlias->shouldReceive('withoutGlobalScopes')->andReturn($builder);
     }
 }

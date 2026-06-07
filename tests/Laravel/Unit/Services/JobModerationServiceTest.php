@@ -23,8 +23,12 @@ class JobModerationServiceTest extends TestCase
 
     protected function setUp(): void
     {
+        // The real App\Models\JobVacancy is eagerly loaded during Laravel boot
+        // (AppServiceProvider registers JobVacancy::observe(...)), so the alias
+        // mock MUST be created before parent::setUp() boots the framework.
+        // shouldIgnoreMissing() makes the boot-time static ::observe() calls no-ops.
+        $this->jobVacancyAlias = Mockery::mock('alias:' . JobVacancy::class)->shouldIgnoreMissing();
         parent::setUp();
-        $this->jobVacancyAlias = Mockery::mock('alias:' . JobVacancy::class);
     }
 
     // ── isModerationEnabled ──────────────────────────────────────

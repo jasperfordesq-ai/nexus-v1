@@ -21,8 +21,16 @@ use Mockery;
  */
 class JobPipelineRuleServiceTest extends TestCase
 {
+    /** @var \Mockery\MockInterface */
+    private $jobVacancyAlias;
+
     protected function setUp(): void
     {
+        // The real App\Models\JobVacancy is eagerly loaded during Laravel boot
+        // (AppServiceProvider registers JobVacancy::observe(...)), so the alias
+        // mock MUST be created before parent::setUp() boots the framework.
+        // shouldIgnoreMissing() makes the boot-time static ::observe() calls no-ops.
+        $this->jobVacancyAlias = Mockery::mock('alias:' . JobVacancy::class)->shouldIgnoreMissing();
         parent::setUp();
     }
 
@@ -57,16 +65,22 @@ class JobPipelineRuleServiceTest extends TestCase
     {
         Log::shouldReceive('error')->once();
 
-        // Force an exception via a non-existent model operation
+        // Force the query chain to throw so the catch block (which logs and
+        // returns []) is genuinely exercised. A non-existent vacancy id alone
+        // just returns an empty result set — it does not raise an exception.
+        $mock = Mockery::mock('alias:' . JobPipelineRule::class);
+        $mock->shouldReceive('where')->andThrow(new \RuntimeException('DB error'));
+
         $result = JobPipelineRuleService::listForVacancy(99999);
         $this->assertIsArray($result);
+        $this->assertSame([], $result);
     }
 
     // ── create ──────────────────────────────────────────────────
 
     public function test_create_returns_false_when_vacancy_not_found(): void
     {
-        $mock = Mockery::mock('alias:' . JobVacancy::class);
+        $mock = $this->jobVacancyAlias;
         $mock->shouldReceive('find')->with(999)->andReturnNull();
 
         $result = JobPipelineRuleService::create(999, 1, ['name' => 'Test']);
@@ -79,7 +93,7 @@ class JobPipelineRuleServiceTest extends TestCase
         $vacancy->tenant_id = 999; // wrong tenant
         $vacancy->user_id = 1;
 
-        $mock = Mockery::mock('alias:' . JobVacancy::class);
+        $mock = $this->jobVacancyAlias;
         $mock->shouldReceive('find')->with(10)->andReturn($vacancy);
 
         $result = JobPipelineRuleService::create(10, 1, ['name' => 'Test']);
@@ -92,7 +106,7 @@ class JobPipelineRuleServiceTest extends TestCase
         $vacancy->tenant_id = $this->testTenantId;
         $vacancy->user_id = 5; // different user
 
-        $mock = Mockery::mock('alias:' . JobVacancy::class);
+        $mock = $this->jobVacancyAlias;
         $mock->shouldReceive('find')->with(10)->andReturn($vacancy);
 
         $result = JobPipelineRuleService::create(10, 1, ['name' => 'Test']); // user 1 != owner 5
@@ -111,7 +125,7 @@ class JobPipelineRuleServiceTest extends TestCase
         $ruleMock = Mockery::mock();
         $ruleMock->shouldReceive('toArray')->andReturn($ruleArr);
 
-        $mock = Mockery::mock('alias:' . JobVacancy::class);
+        $mock = $this->jobVacancyAlias;
         $mock->shouldReceive('find')->with(10)->andReturn($vacancy);
 
         $pipelineMock = Mockery::mock('alias:' . JobPipelineRule::class);

@@ -12,6 +12,7 @@ use App\Models\JobVacancy;
 use App\Models\JobVacancyTeam;
 use App\Models\Notification;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Mockery;
 
 /**
@@ -20,11 +21,44 @@ use Mockery;
  */
 class JobTeamServiceTest extends TestCase
 {
+    /** @var \Mockery\MockInterface */
+    private $jobVacancyAlias;
+
+    protected function setUp(): void
+    {
+        // The real App\Models\JobVacancy is eagerly loaded during Laravel boot
+        // (AppServiceProvider registers JobVacancy::observe(...)), so the alias
+        // mock MUST be created before parent::setUp() boots the framework.
+        // shouldIgnoreMissing() makes the boot-time static ::observe() calls no-ops.
+        $this->jobVacancyAlias = Mockery::mock('alias:' . JobVacancy::class)->shouldIgnoreMissing();
+        parent::setUp();
+    }
+
+    /**
+     * Ensure a user exists in the test tenant so JobTeamService::addMember's
+     * User::where(...)->exists() guard passes for the happy-path tests.
+     */
+    private function seedTargetUser(int $userId): void
+    {
+        DB::table('users')->insertOrIgnore([
+            'id'         => $userId,
+            'tenant_id'  => $this->testTenantId,
+            'first_name' => 'Team',
+            'last_name'  => 'Member',
+            'email'      => "jobteam_{$userId}@example.com",
+            'username'   => "jobteam_{$userId}",
+            'password'   => password_hash('password', PASSWORD_BCRYPT),
+            'status'     => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
     // ── addMember ───────────────────────────────────────────────
 
     public function test_addMember_returns_false_when_vacancy_not_found(): void
     {
-        $mock = Mockery::mock('alias:' . JobVacancy::class);
+        $mock = $this->jobVacancyAlias;
         $mock->shouldReceive('find')->with(999)->andReturnNull();
 
         $result = JobTeamService::addMember(999, 1, 2);
@@ -37,7 +71,7 @@ class JobTeamServiceTest extends TestCase
         $vacancy->tenant_id = 999; // wrong tenant
         $vacancy->user_id = 1;
 
-        $mock = Mockery::mock('alias:' . JobVacancy::class);
+        $mock = $this->jobVacancyAlias;
         $mock->shouldReceive('find')->with(10)->andReturn($vacancy);
 
         $result = JobTeamService::addMember(10, 1, 2);
@@ -50,7 +84,7 @@ class JobTeamServiceTest extends TestCase
         $vacancy->tenant_id = $this->testTenantId;
         $vacancy->user_id = 5; // different user
 
-        $mock = Mockery::mock('alias:' . JobVacancy::class);
+        $mock = $this->jobVacancyAlias;
         $mock->shouldReceive('find')->with(10)->andReturn($vacancy);
 
         $result = JobTeamService::addMember(10, 1, 2); // user 1 != owner 5
@@ -64,7 +98,7 @@ class JobTeamServiceTest extends TestCase
         $vacancy->user_id = 1;
         $vacancy->title = 'Test Job';
 
-        $mock = Mockery::mock('alias:' . JobVacancy::class);
+        $mock = $this->jobVacancyAlias;
         $mock->shouldReceive('find')->with(10)->andReturn($vacancy);
 
         // Owner tries to add themselves
@@ -74,6 +108,8 @@ class JobTeamServiceTest extends TestCase
 
     public function test_addMember_creates_team_member_and_notifies(): void
     {
+        $this->seedTargetUser(2);
+
         $vacancy = Mockery::mock();
         $vacancy->tenant_id = $this->testTenantId;
         $vacancy->user_id = 1;
@@ -84,7 +120,7 @@ class JobTeamServiceTest extends TestCase
             'vacancy_id' => 10, 'user_id' => 2, 'role' => 'reviewer',
         ]);
 
-        $mock = Mockery::mock('alias:' . JobVacancy::class);
+        $mock = $this->jobVacancyAlias;
         $mock->shouldReceive('find')->with(10)->andReturn($vacancy);
 
         $teamMock = Mockery::mock('alias:' . JobVacancyTeam::class);
@@ -100,6 +136,8 @@ class JobTeamServiceTest extends TestCase
 
     public function test_addMember_defaults_invalid_role_to_reviewer(): void
     {
+        $this->seedTargetUser(2);
+
         $vacancy = Mockery::mock();
         $vacancy->tenant_id = $this->testTenantId;
         $vacancy->user_id = 1;
@@ -110,7 +148,7 @@ class JobTeamServiceTest extends TestCase
             'vacancy_id' => 10, 'user_id' => 2, 'role' => 'reviewer',
         ]);
 
-        $mock = Mockery::mock('alias:' . JobVacancy::class);
+        $mock = $this->jobVacancyAlias;
         $mock->shouldReceive('find')->with(10)->andReturn($vacancy);
 
         $teamMock = Mockery::mock('alias:' . JobVacancyTeam::class);
@@ -129,7 +167,7 @@ class JobTeamServiceTest extends TestCase
     {
         Log::shouldReceive('error')->once();
 
-        $mock = Mockery::mock('alias:' . JobVacancy::class);
+        $mock = $this->jobVacancyAlias;
         $mock->shouldReceive('find')->andThrow(new \Exception('DB error'));
 
         $result = JobTeamService::addMember(10, 1, 2);
@@ -140,7 +178,7 @@ class JobTeamServiceTest extends TestCase
 
     public function test_removeMember_returns_false_when_vacancy_not_found(): void
     {
-        $mock = Mockery::mock('alias:' . JobVacancy::class);
+        $mock = $this->jobVacancyAlias;
         $mock->shouldReceive('find')->with(999)->andReturnNull();
 
         $result = JobTeamService::removeMember(999, 1, 2);
@@ -153,7 +191,7 @@ class JobTeamServiceTest extends TestCase
         $vacancy->tenant_id = $this->testTenantId;
         $vacancy->user_id = 5;
 
-        $mock = Mockery::mock('alias:' . JobVacancy::class);
+        $mock = $this->jobVacancyAlias;
         $mock->shouldReceive('find')->with(10)->andReturn($vacancy);
 
         $result = JobTeamService::removeMember(10, 1, 2); // user 1 != owner 5
@@ -170,7 +208,7 @@ class JobTeamServiceTest extends TestCase
         $builder->shouldReceive('where')->andReturnSelf();
         $builder->shouldReceive('delete')->once()->andReturn(1);
 
-        $mock = Mockery::mock('alias:' . JobVacancy::class);
+        $mock = $this->jobVacancyAlias;
         $mock->shouldReceive('find')->with(10)->andReturn($vacancy);
 
         $teamMock = Mockery::mock('alias:' . JobVacancyTeam::class);
@@ -184,7 +222,7 @@ class JobTeamServiceTest extends TestCase
     {
         Log::shouldReceive('error')->once();
 
-        $mock = Mockery::mock('alias:' . JobVacancy::class);
+        $mock = $this->jobVacancyAlias;
         $mock->shouldReceive('find')->andThrow(new \Exception('DB error'));
 
         $result = JobTeamService::removeMember(10, 1, 2);
