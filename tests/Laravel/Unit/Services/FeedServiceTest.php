@@ -12,6 +12,7 @@ use App\Models\FeedActivity;
 use App\Models\FeedPost;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Mockery;
 
 class FeedServiceTest extends TestCase
@@ -66,9 +67,64 @@ class FeedServiceTest extends TestCase
         $mockConnection->shouldReceive('rollBack')->andReturn(null);
         $mockConnection->shouldReceive('transactionLevel')->andReturn(0);
 
-        // Create a single mock resolver for BOTH Model and DB facade
+        // A permissive query-builder mock used for ALL DB::table(...) calls made
+        // during getFeed enrichment (likes/comments counts, groups visibility,
+        // orphan filtering, etc.). Every fluent method returns the builder itself;
+        // terminal methods return empty/zero so enrichment is a no-op.
+        $makeBuilder = function (?string $table = null) {
+            $builder = Mockery::mock(\Illuminate\Database\Query\Builder::class);
+            $builder->shouldReceive(
+                'select', 'selectRaw', 'where', 'whereIn', 'whereNotIn', 'whereNull',
+                'whereNotNull', 'whereColumn', 'whereRaw', 'whereExists', 'whereNotExists',
+                'orWhere', 'orWhereExists', 'join', 'leftJoin', 'groupBy', 'orderBy',
+                'orderByDesc', 'limit', 'tap', 'from', 'distinct', 'having'
+            )->andReturnSelf();
+            $builder->shouldReceive('get')->andReturn(collect([]));
+            $builder->shouldReceive('pluck')->andReturn(collect([]));
+            // FeedItemTables::canViewGroup()/canPostInGroup() look up `groups` and
+            // expect a public, active group for the visibility pre-checks to pass.
+            // Returning a public group keeps group-scoped feed items visible.
+            if ($table === 'groups') {
+                $builder->shouldReceive('first')->andReturn(
+                    (object) ['id' => 5, 'owner_id' => 0, 'visibility' => 'public', 'status' => 'active']
+                );
+            } elseif ($table === 'users') {
+                // FeedItemTables::canViewProfile() looks up the profile owner and
+                // expects a public profile for the user-scoped feed pre-check to pass.
+                $builder->shouldReceive('first')->andReturn(
+                    (object) ['id' => 42, 'privacy_profile' => 'public']
+                );
+            } else {
+                $builder->shouldReceive('first')->andReturn(null);
+            }
+            $builder->shouldReceive('exists')->andReturn(false);
+            $builder->shouldReceive('count')->andReturn(0);
+            $builder->shouldReceive('value')->andReturn(null);
+            $builder->shouldReceive('insert')->andReturn(true);
+            $builder->shouldReceive('insertOrIgnore')->andReturn(true);
+            $builder->shouldReceive('update')->andReturn(1);
+            $builder->shouldReceive('delete')->andReturn(1);
+            return $builder;
+        };
+
+        // Create a single mock resolver for BOTH Model and DB facade.
+        // It also proxies table()/select()/selectOne()/raw() so DB::table(...) and
+        // raw DB::select(...) calls resolve through the mock connection.
         $mockResolver = Mockery::mock(\Illuminate\Database\DatabaseManager::class);
         $mockResolver->shouldReceive('connection')->andReturn($mockConnection);
+        $mockResolver->shouldReceive('table')->andReturnUsing(fn ($table = null) => $makeBuilder(is_string($table) ? $table : null));
+        $mockResolver->shouldReceive('select')->andReturn([]);
+        $mockResolver->shouldReceive('selectOne')->andReturn(null);
+        $mockResolver->shouldReceive('raw')->andReturnUsing(
+            fn ($v) => new \Illuminate\Database\Query\Expression($v)
+        );
+
+        // Schema::hasColumn() is consulted by FeedService::getFeed/getItem and
+        // FeedItemTables before the mock connection can answer schema lookups
+        // (the mocked MySqlProcessor can't process a real column listing). Stub it
+        // so the service takes the deleted_at-aware branch deterministically.
+        Schema::shouldReceive('hasColumn')->andReturn(true);
+        Schema::shouldReceive('hasTable')->andReturn(true);
 
         // Save original resolver before swapping
         $this->originalDbResolver = Model::getConnectionResolver();
@@ -76,8 +132,11 @@ class FeedServiceTest extends TestCase
         // Swap the Model's connection resolver
         Model::setConnectionResolver($mockResolver);
 
-        // Swap the app container's 'db' binding so DB facade uses the same resolver
+        // Swap the app container's 'db' binding so DB facade uses the same resolver.
+        // DB::swap() also clears the facade's resolved-instance cache, so subsequent
+        // DB::table()/DB::select() calls route through the mock (not the real test DB).
         $this->app->instance('db', $mockResolver);
+        DB::swap($mockResolver);
 
         // Create service AFTER mocking so the models resolve the mock connection
         return new FeedService(new FeedActivity(), new FeedPost());
@@ -89,9 +148,102 @@ class FeedServiceTest extends TestCase
         if ($this->originalDbResolver !== null) {
             Model::setConnectionResolver($this->originalDbResolver);
             $this->app->instance('db', $this->originalDbResolver);
+            DB::swap($this->originalDbResolver);
             $this->originalDbResolver = null;
         }
         parent::tearDown();
+    }
+
+    /**
+     * Make FeedItemTables visibility pre-checks (canView/canViewPost/canViewGroup)
+     * pass for a public post owned by $authorId, without a live DB.
+     *
+     * getItem()/createPost() gate on these helpers before running their real
+     * queries; the tests mock the real queries separately via DB::select etc.
+     * This only needs to cover the polymorphic existence/visibility lookups.
+     */
+    private function stubFeedItemTablesPermissive(int $authorId = 10): void
+    {
+        Schema::shouldReceive('hasColumn')->andReturn(true);
+        Schema::shouldReceive('hasTable')->andReturn(true);
+
+        DB::shouldReceive('table')->andReturnUsing(function ($table) use ($authorId) {
+            $builder = Mockery::mock(\Illuminate\Database\Query\Builder::class);
+            $builder->shouldReceive(
+                'where', 'whereIn', 'whereNull', 'whereNotNull', 'whereColumn',
+                'select', 'selectRaw', 'orWhere', 'join', 'leftJoin', 'groupBy',
+                'orderBy', 'orderByDesc', 'limit'
+            )->andReturnSelf();
+            $builder->shouldReceive('exists')->andReturn(true);
+            $builder->shouldReceive('count')->andReturn(0);
+            $builder->shouldReceive('get')->andReturn(collect([]));
+            $builder->shouldReceive('pluck')->andReturn(collect([]));
+            // feed_posts / groups visibility lookups resolve to a public, viewable
+            // row. Reaction (and any other) lookups resolve to "no row".
+            if ($table === 'feed_posts' || $table === 'groups') {
+                $builder->shouldReceive('first')->andReturn(
+                    (object) [
+                        'id' => 100, 'user_id' => $authorId, 'owner_id' => $authorId,
+                        'group_id' => null, 'visibility' => 'public', 'status' => 'active',
+                    ]
+                );
+            } else {
+                $builder->shouldReceive('first')->andReturn(null);
+            }
+            return $builder;
+        });
+        // ReactionService::getReactions() (invoked for valid feed types) uses DB::raw().
+        DB::shouldReceive('raw')->andReturnUsing(
+            fn ($v) => new \Illuminate\Database\Query\Expression($v)
+        );
+    }
+
+    /**
+     * Mock the DB facade for createPost(): a table-aware builder that lets the
+     * municipality-announcer role check, group-membership check, spam-queue and
+     * feed_activity sync run without a live DB. Captures the feed_activity
+     * insertOrIgnore payload into $capturedActivityData.
+     */
+    private function mockCreatePostDb(&$capturedActivityData, int $userId = 10): void
+    {
+        Schema::shouldReceive('hasColumn')->andReturn(true);
+        Schema::shouldReceive('hasTable')->andReturn(true);
+
+        DB::shouldReceive('statement')->andReturn(true);
+
+        DB::shouldReceive('table')->andReturnUsing(function ($table) use (&$capturedActivityData, $userId) {
+            $builder = Mockery::mock(\Illuminate\Database\Query\Builder::class);
+            $builder->shouldReceive(
+                'join', 'leftJoin', 'where', 'whereIn', 'whereNull', 'whereNotNull',
+                'whereColumn', 'orWhere', 'select', 'selectRaw', 'groupBy'
+            )->andReturnSelf();
+            // user_roles → municipality_announcer check resolves to "not an announcer".
+            $builder->shouldReceive('exists')->andReturn(false);
+            $builder->shouldReceive('count')->andReturn(0);
+            $builder->shouldReceive('update')->andReturn(1);
+            $builder->shouldReceive('delete')->andReturn(1);
+            $builder->shouldReceive('get')->andReturn(collect([]));
+            $builder->shouldReceive('pluck')->andReturn(collect([]));
+            // groups → caller is the owner so canPostInGroup() passes.
+            if ($table === 'groups') {
+                $builder->shouldReceive('first')->andReturn(
+                    (object) ['id' => 5, 'owner_id' => $userId, 'visibility' => 'public', 'status' => 'active']
+                );
+            } else {
+                $builder->shouldReceive('first')->andReturn(null);
+            }
+            if ($table === 'feed_activity') {
+                $builder->shouldReceive('insertOrIgnore')->andReturnUsing(
+                    function ($data) use (&$capturedActivityData) {
+                        $capturedActivityData = $data;
+                        return true;
+                    }
+                );
+            } else {
+                $builder->shouldReceive('insertOrIgnore')->andReturn(true);
+            }
+            return $builder;
+        });
     }
 
     // ── Helper: build a feed_activity row object ──────────────────────
@@ -206,9 +358,15 @@ class FeedServiceTest extends TestCase
         $this->assertNotNull($result['cursor']);
         $this->assertCount(20, $result['items']);
 
-        // Verify cursor is base64-encoded "created_at|activity_id"
+        // Cursor is now an HMAC-signed token: base64("sha256_sig.json_payload")
+        // where the payload is {"ts":<created_at>,"id":<activity_id>}.
         $decoded = base64_decode($result['cursor'], true);
-        $this->assertStringContainsString('|', $decoded);
+        $this->assertStringContainsString('.', $decoded);
+        [$sig, $payload] = explode('.', $decoded, 2);
+        $this->assertSame(64, strlen($sig)); // sha256 hex digest
+        $data = json_decode($payload, true);
+        $this->assertArrayHasKey('ts', $data);
+        $this->assertArrayHasKey('id', $data);
     }
 
     public function test_getFeed_pagination_no_cursor_when_no_more(): void
@@ -220,7 +378,9 @@ class FeedServiceTest extends TestCase
 
         $service = $this->mockEloquentConnectionAndBuildService([$rows]);
 
-        $result = $service->getFeed(10, ['limit' => 20]);
+        // Chronological mode: cursor is only emitted when there are more pages.
+        // (Ranked mode, the default, always emits a resume cursor — covered elsewhere.)
+        $result = $service->getFeed(10, ['limit' => 20, 'mode' => 'chronological']);
 
         $this->assertFalse($result['has_more']);
         $this->assertNull($result['cursor']);
@@ -288,10 +448,13 @@ class FeedServiceTest extends TestCase
             ->once()
             ->andReturn($mockPost);
 
+        // mockPost->fresh() returns mockPost; the service then reads ->quotedPost.
+        $mockPost->setRelation('quotedPost', null);
+
         $service = new FeedService(new FeedActivity(), $mockFeedPost);
 
-        DB::shouldReceive('table')->with('feed_activity')->once()->andReturnSelf();
-        DB::shouldReceive('insertOrIgnore')->once()->andReturn(true);
+        $capturedActivityData = null;
+        $this->mockCreatePostDb($capturedActivityData);
 
         $result = $service->createPost(10, [
             'content' => 'Hello world',
@@ -319,10 +482,12 @@ class FeedServiceTest extends TestCase
             })
             ->andReturn($mockPost);
 
+        $mockPost->setRelation('quotedPost', null);
+
         $service = new FeedService(new FeedActivity(), $mockFeedPost);
 
-        DB::shouldReceive('table')->andReturnSelf();
-        DB::shouldReceive('insertOrIgnore')->andReturn(true);
+        $capturedActivityData = null;
+        $this->mockCreatePostDb($capturedActivityData);
 
         $service->createPost(10, [
             'content' => 'My post content',
@@ -394,16 +559,12 @@ class FeedServiceTest extends TestCase
             })
             ->andReturn($mockPost);
 
+        $mockPost->setRelation('quotedPost', null);
+
         $service = new FeedService(new FeedActivity(), $mockFeedPost);
 
-        DB::shouldReceive('table')->with('feed_activity')->once()->andReturnSelf();
-        DB::shouldReceive('insertOrIgnore')
-            ->once()
-            ->withArgs(function ($data) use (&$capturedActivityData) {
-                $capturedActivityData = $data;
-                return true;
-            })
-            ->andReturn(true);
+        $capturedActivityData = null;
+        $this->mockCreatePostDb($capturedActivityData);
 
         $service->createPost(10, [
             'content' => 'Group post',
@@ -433,10 +594,12 @@ class FeedServiceTest extends TestCase
             })
             ->andReturn($mockPost);
 
+        $mockPost->setRelation('quotedPost', null);
+
         $service = new FeedService(new FeedActivity(), $mockFeedPost);
 
-        DB::shouldReceive('table')->andReturnSelf();
-        DB::shouldReceive('insertOrIgnore')->andReturn(true);
+        $capturedActivityData = null;
+        $this->mockCreatePostDb($capturedActivityData);
 
         $service->createPost(10, ['content' => 'No group']);
 
@@ -449,13 +612,20 @@ class FeedServiceTest extends TestCase
     {
         $service = new FeedService(new FeedActivity(), new FeedPost());
 
-        $mockBuilder = Mockery::mock(\Illuminate\Database\Query\Builder::class);
-        $mockBuilder->shouldReceive('where')->andReturnSelf();
-        $mockBuilder->shouldReceive('first')->once()->andReturn(null);
-        $mockBuilder->shouldReceive('insert')->once()->andReturn(true);
-        $mockBuilder->shouldReceive('count')->once()->andReturn(1);
+        // like() first verifies the target post exists in the tenant (feed_posts),
+        // then toggles the like. New like uses an atomic INSERT IGNORE via DB::statement.
+        $feedPostsBuilder = Mockery::mock(\Illuminate\Database\Query\Builder::class);
+        $feedPostsBuilder->shouldReceive('where')->andReturnSelf();
+        $feedPostsBuilder->shouldReceive('exists')->once()->andReturn(true);
 
-        DB::shouldReceive('table')->with('likes')->andReturn($mockBuilder);
+        $likesBuilder = Mockery::mock(\Illuminate\Database\Query\Builder::class);
+        $likesBuilder->shouldReceive('where')->andReturnSelf();
+        $likesBuilder->shouldReceive('first')->once()->andReturn(null);
+        $likesBuilder->shouldReceive('count')->once()->andReturn(1);
+
+        DB::shouldReceive('table')->with('feed_posts')->once()->andReturn($feedPostsBuilder);
+        DB::shouldReceive('table')->with('likes')->andReturn($likesBuilder);
+        DB::shouldReceive('statement')->once()->andReturn(true);
 
         $result = $service->like(100, 10);
 
@@ -469,13 +639,18 @@ class FeedServiceTest extends TestCase
 
         $existingLike = (object) ['id' => 1, 'target_type' => 'post', 'target_id' => 100, 'user_id' => 10];
 
-        $mockBuilder = Mockery::mock(\Illuminate\Database\Query\Builder::class);
-        $mockBuilder->shouldReceive('where')->andReturnSelf();
-        $mockBuilder->shouldReceive('first')->once()->andReturn($existingLike);
-        $mockBuilder->shouldReceive('delete')->once()->andReturn(1);
-        $mockBuilder->shouldReceive('count')->once()->andReturn(0);
+        $feedPostsBuilder = Mockery::mock(\Illuminate\Database\Query\Builder::class);
+        $feedPostsBuilder->shouldReceive('where')->andReturnSelf();
+        $feedPostsBuilder->shouldReceive('exists')->once()->andReturn(true);
 
-        DB::shouldReceive('table')->with('likes')->andReturn($mockBuilder);
+        $likesBuilder = Mockery::mock(\Illuminate\Database\Query\Builder::class);
+        $likesBuilder->shouldReceive('where')->andReturnSelf();
+        $likesBuilder->shouldReceive('first')->once()->andReturn($existingLike);
+        $likesBuilder->shouldReceive('delete')->once()->andReturn(1);
+        $likesBuilder->shouldReceive('count')->once()->andReturn(0);
+
+        DB::shouldReceive('table')->with('feed_posts')->once()->andReturn($feedPostsBuilder);
+        DB::shouldReceive('table')->with('likes')->andReturn($likesBuilder);
 
         $result = $service->like(100, 10);
 
@@ -502,6 +677,7 @@ class FeedServiceTest extends TestCase
             'comments_count' => 3,
         ];
 
+        $this->stubFeedItemTablesPermissive();
         DB::shouldReceive('select')->once()->andReturn([$postRow]);
         DB::shouldReceive('selectOne')->once()->andReturn(
             (object) ['1' => 1]
@@ -526,6 +702,7 @@ class FeedServiceTest extends TestCase
     {
         $service = new FeedService(new FeedActivity(), new FeedPost());
 
+        $this->stubFeedItemTablesPermissive();
         DB::shouldReceive('select')->once()->andReturn([]);
 
         $result = $service->getItem('post', 999, 10);
@@ -551,6 +728,7 @@ class FeedServiceTest extends TestCase
             'comments_count' => 0,
         ];
 
+        $this->stubFeedItemTablesPermissive();
         DB::shouldReceive('select')->once()->andReturn([$postRow]);
         DB::shouldReceive('selectOne')->once()->andReturn(null);
 
@@ -577,6 +755,7 @@ class FeedServiceTest extends TestCase
             'comments_count' => 0,
         ];
 
+        $this->stubFeedItemTablesPermissive();
         DB::shouldReceive('select')->once()->andReturn([$postRow]);
 
         $result = $service->getItem('post', 100, null);

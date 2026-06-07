@@ -14,8 +14,9 @@ class InviteCodeServiceTest extends TestCase
 {
     public function test_validate_returns_invalid_for_unknown_code(): void
     {
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn(false);
+        // validate() reads the row via DB::selectOne() (returns ?stdClass), not
+        // DB::statement()->fetch(). A null row means the code is unknown.
+        DB::shouldReceive('selectOne')->andReturn(null);
 
         $result = InviteCodeService::validate(2, 'BADCODE1');
 
@@ -25,8 +26,7 @@ class InviteCodeServiceTest extends TestCase
 
     public function test_validate_returns_invalid_for_deactivated_code(): void
     {
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn([
+        DB::shouldReceive('selectOne')->andReturn((object) [
             'id' => 1, 'is_active' => 0, 'max_uses' => 1, 'uses_count' => 0, 'expires_at' => null,
         ]);
 
@@ -38,8 +38,7 @@ class InviteCodeServiceTest extends TestCase
 
     public function test_validate_returns_invalid_for_exhausted_code(): void
     {
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn([
+        DB::shouldReceive('selectOne')->andReturn((object) [
             'id' => 1, 'is_active' => 1, 'max_uses' => 1, 'uses_count' => 1, 'expires_at' => null,
         ]);
 
@@ -51,8 +50,7 @@ class InviteCodeServiceTest extends TestCase
 
     public function test_validate_returns_invalid_for_expired_code(): void
     {
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn([
+        DB::shouldReceive('selectOne')->andReturn((object) [
             'id' => 1, 'is_active' => 1, 'max_uses' => 10, 'uses_count' => 0,
             'expires_at' => '2020-01-01 00:00:00',
         ]);
@@ -65,8 +63,7 @@ class InviteCodeServiceTest extends TestCase
 
     public function test_validate_returns_valid_for_good_code(): void
     {
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn([
+        DB::shouldReceive('selectOne')->andReturn((object) [
             'id' => 42, 'is_active' => 1, 'max_uses' => 10, 'uses_count' => 3, 'expires_at' => null,
         ]);
 
@@ -78,12 +75,17 @@ class InviteCodeServiceTest extends TestCase
 
     public function test_validate_uppercases_and_trims_code(): void
     {
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn(false);
+        // Capture the looked-up code to confirm it is trimmed + uppercased.
+        $capturedCode = null;
+        DB::shouldReceive('selectOne')->andReturnUsing(function ($sql, $bindings) use (&$capturedCode) {
+            $capturedCode = $bindings[1] ?? null;
+            return null;
+        });
 
-        // The code should be trimmed and uppercased before lookup
         $result = InviteCodeService::validate(2, '  lowercase  ');
+
         $this->assertFalse($result['valid']);
+        $this->assertSame('LOWERCASE', $capturedCode);
     }
 
     public function test_deactivate_returns_false_when_not_found(): void

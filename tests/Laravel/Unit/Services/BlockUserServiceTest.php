@@ -8,16 +8,28 @@ namespace Tests\Laravel\Unit\Services;
 
 use App\Services\BlockUserService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Tests\Laravel\TestCase;
 
 class BlockUserServiceTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // scopedBlocks()/block() gate the tenant_id WHERE on this column probe.
+        // Stub it to false so the query mocks below don't need to resolve the
+        // real schema/connection. The block-vs-no-block logic is identical either way.
+        Schema::shouldReceive('hasColumn')->with('user_blocks', 'tenant_id')->andReturn(false);
+    }
+
     // ── block ────────────────────────────────────────────────────────
 
     public function test_block_throws_when_blocking_self(): void
     {
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Cannot block yourself');
+        // Message comes from __('api.cannot_block_yourself') = "You cannot block yourself".
+        $this->expectExceptionMessage('You cannot block yourself');
 
         BlockUserService::block(42, 42);
     }

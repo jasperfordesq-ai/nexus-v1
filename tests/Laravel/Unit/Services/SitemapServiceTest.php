@@ -362,32 +362,16 @@ class SitemapServiceTest extends TestCase
     }
 
     // =========================================================================
-    // resolveTenantBySlug()
+    // resolveTenantBySlug() — REMOVED
+    //
+    // SitemapService::resolveTenantBySlug() was deleted as dead code in commit
+    // 983f43d5a once SitemapController::tenant() was refactored to resolve the
+    // slug→tenant mapping with direct DB queries (including a 'main' special-case).
+    // No service method remains to unit-test, and the controller's inline
+    // resolution is covered by the controller/feature suite. The three former
+    // unit tests here are intentionally dropped rather than retargeted at a
+    // private controller code path.
     // =========================================================================
-
-    public function test_resolveTenantBySlug_finds_existing_tenant(): void
-    {
-        $id = $this->service->resolveTenantBySlug('hour-timebank');
-        $this->assertSame($this->testTenantId, $id);
-    }
-
-    public function test_resolveTenantBySlug_returns_null_for_unknown(): void
-    {
-        $id = $this->service->resolveTenantBySlug('nonexistent-tenant-slug');
-        $this->assertNull($id);
-    }
-
-    public function test_resolveTenantBySlug_handles_main_slug(): void
-    {
-        // Ensure tenant 1 exists with empty slug
-        DB::table('tenants')->updateOrInsert(
-            ['id' => 1],
-            ['name' => 'Master', 'slug' => '', 'is_active' => 1, 'depth' => 0, 'allows_subtenants' => false, 'created_at' => now(), 'updated_at' => now()]
-        );
-
-        $id = $this->service->resolveTenantBySlug('main');
-        $this->assertNotNull($id);
-    }
 
     // =========================================================================
     // clearCache()

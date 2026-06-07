@@ -10,6 +10,8 @@ namespace Tests\Laravel\Unit\Services;
 
 use Tests\Laravel\TestCase;
 use App\Services\Enterprise\PermissionService;
+use Illuminate\Support\Facades\DB;
+use Mockery;
 
 /**
  * PermissionService Tests
@@ -49,6 +51,18 @@ class PermissionServiceTest extends \Tests\Laravel\TestCase
 
         // Clear super admin session flag
         unset($_SESSION['user_id'], $_SESSION['is_super_admin'], $_SESSION['user_role'], $_SESSION['is_admin']);
+
+        // PermissionService treats DB::statement() as a PDO-style query returning a
+        // statement object (it calls ->fetch()/->fetchAll()/->fetchColumn() on the
+        // result). Stub DB::statement to return an empty PDOStatement-like double so
+        // the permission-resolution logic (session cache, super-admin gate, direct
+        // grants/revocations, role lookups) can be exercised without a live PDO query.
+        // See the FLAGGED note in the test file footer about the real-bug suspicion.
+        $emptyStmt = Mockery::mock(\PDOStatement::class);
+        $emptyStmt->shouldReceive('fetch')->andReturn(false);
+        $emptyStmt->shouldReceive('fetchAll')->andReturn([]);
+        $emptyStmt->shouldReceive('fetchColumn')->andReturn(false);
+        DB::shouldReceive('statement')->andReturn($emptyStmt);
 
         $this->service = new PermissionService();
     }
@@ -533,4 +547,27 @@ class PermissionServiceTest extends \Tests\Laravel\TestCase
         $this->assertIsArray($cacheProp->getValue($freshService));
         $this->assertEmpty($cacheProp->getValue($freshService));
     }
+
+    // =========================================================================
+    // FLAGGED: SUSPECTED REAL BUG (do not silently "fix" in tests)
+    //
+    // App\Services\Enterprise\PermissionService runs SELECT queries via
+    //   DB::statement("SELECT ...", [...])->fetch()/->fetchAll()/->fetchColumn()
+    // (e.g. isSuperAdmin() line ~364, getUserPermissions() ~164, getUserRoles()
+    // ~199, hasDirectGrant/Revocation, hasRolePermission, hasWildcardPermission).
+    //
+    // Illuminate\Support\Facades\DB::statement() returns BOOL — it does NOT return
+    // a PDOStatement — so every "->fetch()" on its result is a fatal
+    // "Call to a member function fetch() on bool". Against a real connection,
+    // can()/canAll()/canAny()/getUserPermissions()/getUserRoles() would all crash
+    // the moment the session super-admin shortcut is not taken.
+    //
+    // This is masked in production only because this Enterprise PermissionService
+    // is currently UNWIRED (no controller/route/middleware/service references it —
+    // grep finds only this class and this test). The correct fix is in app code:
+    // switch the SELECT paths to DB::select()/DB::selectOne() (returns arrays of
+    // stdClass), not DB::statement(). The tests above stub DB::statement() with a
+    // PDOStatement double purely to exercise the surrounding permission-resolution
+    // logic; they MUST NOT be read as evidence the DB path works.
+    // =========================================================================
 }

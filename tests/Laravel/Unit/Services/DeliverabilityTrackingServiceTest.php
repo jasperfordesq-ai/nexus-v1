@@ -127,20 +127,23 @@ class DeliverabilityTrackingServiceTest extends \Tests\Laravel\TestCase
 
     public function testRecalculateProgressFromMilestones()
     {
-        $deliverable = Deliverable::create($this->testUserId, 'Milestone Progress Test');
+        $deliverable = DeliverabilityTrackingService::createDeliverable($this->testUserId, 'Milestone Progress Test');
+        $tenantId = TenantContext::getId();
 
-        // Create 4 milestones
-        DeliverableMilestone::create($deliverable['id'], 'Milestone 1');
-        DeliverableMilestone::create($deliverable['id'], 'Milestone 2');
-        DeliverableMilestone::create($deliverable['id'], 'Milestone 3');
-        $milestone4 = DeliverableMilestone::create($deliverable['id'], 'Milestone 4');
+        // Create 4 milestones (Eloquent — the legacy active-record API is gone)
+        $milestones = [];
+        for ($i = 1; $i <= 4; $i++) {
+            $milestones[] = DeliverableMilestone::create([
+                'tenant_id' => $tenantId,
+                'deliverable_id' => $deliverable['id'],
+                'title' => "Milestone {$i}",
+                'order_position' => $i,
+            ]);
+        }
 
         // Complete 2 out of 4 milestones (50%)
-        DeliverableMilestone::complete($milestone4['id'], $this->testUserId);
-
-        $milestones = DeliverableMilestone::getByDeliverable($deliverable['id']);
-        $completedMilestone = $milestones[0];
-        DeliverableMilestone::complete($completedMilestone['id'], $this->testUserId);
+        $milestones[0]->update(['completed_at' => now(), 'completed_by' => $this->testUserId]);
+        $milestones[3]->update(['completed_at' => now(), 'completed_by' => $this->testUserId]);
 
         // Recalculate progress
         $progress = DeliverabilityTrackingService::recalculateProgress(
@@ -150,17 +153,17 @@ class DeliverabilityTrackingServiceTest extends \Tests\Laravel\TestCase
 
         $this->assertEquals(50, $progress);
 
-        $updated = Deliverable::findById($deliverable['id']);
-        $this->assertEquals(50, $updated['progress_percentage']);
+        $updated = Deliverable::query()->find($deliverable['id']);
+        $this->assertEquals(50, (float) $updated->progress_percentage);
     }
 
     public function testGetAnalytics()
     {
         // Create diverse test data
-        Deliverable::create($this->testUserId, 'D1', null, ['status' => 'draft', 'priority' => 'low']);
-        Deliverable::create($this->testUserId, 'D2', null, ['status' => 'in_progress', 'priority' => 'high']);
-        Deliverable::create($this->testUserId, 'D3', null, ['status' => 'completed', 'priority' => 'medium']);
-        Deliverable::create($this->testUserId, 'D4', null, ['status' => 'blocked', 'priority' => 'urgent']);
+        DeliverabilityTrackingService::createDeliverable($this->testUserId, 'D1', null, ['status' => 'draft', 'priority' => 'low']);
+        DeliverabilityTrackingService::createDeliverable($this->testUserId, 'D2', null, ['status' => 'in_progress', 'priority' => 'high']);
+        DeliverabilityTrackingService::createDeliverable($this->testUserId, 'D3', null, ['status' => 'completed', 'priority' => 'medium']);
+        DeliverabilityTrackingService::createDeliverable($this->testUserId, 'D4', null, ['status' => 'blocked', 'priority' => 'urgent']);
 
         $analytics = DeliverabilityTrackingService::getAnalytics();
 
@@ -177,8 +180,8 @@ class DeliverabilityTrackingServiceTest extends \Tests\Laravel\TestCase
     public function testGetUserDashboard()
     {
         // Create deliverables for user
-        Deliverable::create($this->testUserId, 'Owned 1', null, ['owner_id' => $this->testUserId]);
-        Deliverable::create($this->testUserId, 'Assigned 1', null, ['assigned_to' => $this->testUserId]);
+        DeliverabilityTrackingService::createDeliverable($this->testUserId, 'Owned 1', null, ['owner_id' => $this->testUserId]);
+        DeliverabilityTrackingService::createDeliverable($this->testUserId, 'Assigned 1', null, ['assigned_to' => $this->testUserId]);
 
         $dashboard = DeliverabilityTrackingService::getUserDashboard($this->testUserId);
 
@@ -196,8 +199,8 @@ class DeliverabilityTrackingServiceTest extends \Tests\Laravel\TestCase
     public function testGenerateReport()
     {
         // Create test deliverables
-        Deliverable::create($this->testUserId, 'Report Test 1', null, ['status' => 'completed']);
-        Deliverable::create($this->testUserId, 'Report Test 2', null, ['status' => 'in_progress']);
+        DeliverabilityTrackingService::createDeliverable($this->testUserId, 'Report Test 1', null, ['status' => 'completed']);
+        DeliverabilityTrackingService::createDeliverable($this->testUserId, 'Report Test 2', null, ['status' => 'in_progress']);
 
         $report = DeliverabilityTrackingService::generateReport();
 
@@ -213,8 +216,8 @@ class DeliverabilityTrackingServiceTest extends \Tests\Laravel\TestCase
 
     public function testGenerateReportWithFilters()
     {
-        Deliverable::create($this->testUserId, 'Filtered 1', null, ['status' => 'completed']);
-        Deliverable::create($this->testUserId, 'Filtered 2', null, ['status' => 'in_progress']);
+        DeliverabilityTrackingService::createDeliverable($this->testUserId, 'Filtered 1', null, ['status' => 'completed']);
+        DeliverabilityTrackingService::createDeliverable($this->testUserId, 'Filtered 2', null, ['status' => 'in_progress']);
 
         $report = DeliverabilityTrackingService::generateReport(['status' => 'completed']);
 
