@@ -17,6 +17,9 @@ use Mockery;
 
 /**
  * @covers \App\Services\SafeguardingTriggerService
+ *
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
  */
 class SafeguardingTriggerServiceTest extends TestCase
 {

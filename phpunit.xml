@@ -14,6 +14,9 @@
   </testsuites>
   <php>
     <env name="APP_ENV" value="testing"/>
+    <!-- Fixed test key (NOT a secret) so encryption/cookie/session tests don't throw
+         MissingAppKeyException — the CI phpunit step never set APP_KEY (~107 errors). -->
+    <env name="APP_KEY" value="base64:HfQEDtbtr90JIXhsaAhSFWnzIo1f31VZ2e5qLqKKnls=" force="true"/>
     <!-- DB_NAME takes precedence over DB_DATABASE in config/database.php.
          Both must be set to nexus_test to prevent RefreshDatabase from wiping the dev DB. -->
     <env name="DB_NAME" value="nexus_test" force="true"/>

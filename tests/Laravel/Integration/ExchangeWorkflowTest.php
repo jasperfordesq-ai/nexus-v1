@@ -37,10 +37,11 @@ class ExchangeWorkflowTest extends TestCase
 
         // Ensure exchange workflow is enabled for the test tenant
         DB::table('tenant_settings')->insertOrIgnore([
-            'tenant_id' => $this->testTenantId,
-            'category'  => 'general',
-            'name'      => 'exchange_workflow_enabled',
-            'value'     => '1',
+            'tenant_id'     => $this->testTenantId,
+            'category'      => 'general',
+            'setting_key'   => 'exchange_workflow_enabled',
+            'setting_value' => '1',
+            'setting_type'  => 'boolean',
         ]);
 
         // Create provider and requester with known balances

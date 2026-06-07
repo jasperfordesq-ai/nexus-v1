@@ -115,6 +115,9 @@ jobs:
           DB_USER: nexus
           DB_PASS: nexus_test
           APP_ENV: testing
+          # Fixed test key (matches phpunit.xml) so encryption/Crypt tests don't
+          # MissingAppKeyException — this step runs before key:generate.
+          APP_KEY: base64:HfQEDtbtr90JIXhsaAhSFWnzIo1f31VZ2e5qLqKKnls=
           CACHE_DRIVER: array
           SESSION_DRIVER: array
           QUEUE_CONNECTION: sync

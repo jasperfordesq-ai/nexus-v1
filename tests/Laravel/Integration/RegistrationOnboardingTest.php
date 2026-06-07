@@ -32,16 +32,18 @@ class RegistrationOnboardingTest extends TestCase
         // Seed tenant settings needed for registration
         DB::table('tenant_settings')->insertOrIgnore([
             [
-                'tenant_id' => $this->testTenantId,
-                'category'  => 'general',
-                'name'      => 'registration_enabled',
-                'value'     => '1',
+                'tenant_id'     => $this->testTenantId,
+                'category'      => 'general',
+                'setting_key'   => 'registration_enabled',
+                'setting_value' => '1',
+                'setting_type'  => 'boolean',
             ],
             [
-                'tenant_id' => $this->testTenantId,
-                'category'  => 'general',
-                'name'      => 'registration_policy',
-                'value'     => 'open',
+                'tenant_id'     => $this->testTenantId,
+                'category'      => 'general',
+                'setting_key'   => 'registration_policy',
+                'setting_value' => 'open',
+                'setting_type'  => 'string',
             ],
         ]);
 

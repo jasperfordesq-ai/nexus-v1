@@ -28,4 +28,13 @@ final class Database
 
         return $statement;
     }
+
+    /**
+     * ID of the last inserted row on the shared PDO connection.
+     * Mirrors the pre-Laravel Database facade contract used by legacy tests.
+     */
+    public static function lastInsertId(): string|false
+    {
+        return self::getInstance()->lastInsertId();
+    }
 }

@@ -11,6 +11,10 @@ use App\Services\CreditCommonsNodeService;
 use App\Services\Protocols\CreditCommonsAdapter;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
+ */
 class CreditCommonsNodeServiceTest extends TestCase
 {
     // ─────────────────────────────────────────────────────────────────────────

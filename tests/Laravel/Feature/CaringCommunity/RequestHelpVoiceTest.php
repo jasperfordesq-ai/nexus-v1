@@ -22,6 +22,9 @@ use Tests\Laravel\TestCase;
 
 /**
  * Feature test for AG36/AG37 audio-first help-request voice endpoint.
+ *
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
  */
 class RequestHelpVoiceTest extends TestCase
 {

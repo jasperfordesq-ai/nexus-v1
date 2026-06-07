@@ -39,16 +39,18 @@ class GamificationFlowTest extends TestCase
         // Seed tenant settings for gamification
         DB::table('tenant_settings')->insertOrIgnore([
             [
-                'tenant_id' => $this->testTenantId,
-                'category'  => 'general',
-                'name'      => 'gamification_enabled',
-                'value'     => '1',
+                'tenant_id'     => $this->testTenantId,
+                'category'      => 'general',
+                'setting_key'   => 'gamification_enabled',
+                'setting_value' => '1',
+                'setting_type'  => 'boolean',
             ],
             [
-                'tenant_id' => $this->testTenantId,
-                'category'  => 'general',
-                'name'      => 'exchange_workflow_enabled',
-                'value'     => '1',
+                'tenant_id'     => $this->testTenantId,
+                'category'      => 'general',
+                'setting_key'   => 'exchange_workflow_enabled',
+                'setting_value' => '1',
+                'setting_type'  => 'boolean',
             ],
         ]);
     }
