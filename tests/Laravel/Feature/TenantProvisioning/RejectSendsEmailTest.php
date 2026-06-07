@@ -136,6 +136,15 @@ class RejectSendsEmailTest extends TestCase
         $mailer = new TenantProvisioningRejectionMailerStub(true);
         $this->app->instance(EmailDispatchService::class, $mailer);
 
+        // Rejection emails are sent from the console/queue, where there is no
+        // session/host tenant for TenantContext::resolve() to fall back to after
+        // the mailer resets context. A prior HTTP-based test in the same phpunit
+        // invocation can leave $_SESSION['tenant_id'] / host server vars set,
+        // which would let resolve() re-derive hour-timebank and defeat the very
+        // leak this test guards against. Clear that ambient state so the test
+        // faithfully reproduces the real (console) send path.
+        unset($_SESSION['tenant_id'], $_SERVER['HTTP_X_TENANT_SLUG'], $_SERVER['HTTP_X_TENANT_ID'], $_SERVER['HTTP_HOST']);
+
         TenantContext::setById($this->testTenantId);
 
         \App\Services\TenantProvisioning\TenantProvisioningMailer::sendRejection([

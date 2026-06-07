@@ -29,6 +29,10 @@ class GroupApprovalWorkflowServiceTest extends \Tests\Laravel\TestCase
     {
         parent::setUpBeforeClass();
 
+        // Boot a Laravel app so facade-backed helpers (DB, TenantContext) work
+        // inside this static hook — Laravel only boots the app in instance setUp.
+        self::bootApplicationForClass();
+
         self::$staticTenantId = 2;
         TenantContext::setById(self::$staticTenantId);
 

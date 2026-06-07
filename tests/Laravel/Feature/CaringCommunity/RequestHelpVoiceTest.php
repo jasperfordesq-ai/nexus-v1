@@ -23,8 +23,12 @@ use Tests\Laravel\TestCase;
 /**
  * Feature test for AG36/AG37 audio-first help-request voice endpoint.
  *
- * @runTestsInSeparateProcesses
- * @preserveGlobalState disabled
+ * NOTE: Only the alias-mock test (returns_parsed_intent) needs process
+ * isolation, so @runInSeparateProcess lives on that method rather than the
+ * class. The auth / feature-gate tests run in-process. Each $this->call()
+ * carries HTTP_X_TENANT_ID so ResolveTenant pins the request to tenant 2 —
+ * matching the acting user's tenant (factory observers otherwise leave the
+ * request resolving a different tenant → tenant_mismatch 403).
  */
 class RequestHelpVoiceTest extends TestCase
 {
@@ -106,12 +110,16 @@ class RequestHelpVoiceTest extends TestCase
             [],
             [],
             ['audio' => $this->fakeAudio()],
-            ['HTTP_ACCEPT' => 'application/json']
+            ['HTTP_ACCEPT' => 'application/json', 'HTTP_X_TENANT_ID' => (string) self::TENANT_ID]
         );
 
         $this->assertSame(403, $resp->status());
     }
 
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     */
     public function test_voice_endpoint_returns_parsed_intent_when_services_succeed(): void
     {
         $member = $this->makeMember();
@@ -143,7 +151,7 @@ class RequestHelpVoiceTest extends TestCase
             ['locale' => 'en'],
             [],
             ['audio' => $this->fakeAudio()],
-            ['HTTP_ACCEPT' => 'application/json']
+            ['HTTP_ACCEPT' => 'application/json', 'HTTP_X_TENANT_ID' => (string) self::TENANT_ID]
         );
 
         $this->assertSame(200, $resp->status(), 'body=' . $resp->getContent());

@@ -76,7 +76,8 @@ class PushNotificationServiceTest extends TestCase
 
     public function test_getVapidKey_returns_config_value(): void
     {
-        config(['services.webpush.vapid_public_key' => 'vapid-test-key']);
+        // The service reads config('services.vapid.public_key').
+        config(['services.vapid.public_key' => 'vapid-test-key']);
         $result = $this->service->getVapidKey();
         $this->assertEquals('vapid-test-key', $result);
     }

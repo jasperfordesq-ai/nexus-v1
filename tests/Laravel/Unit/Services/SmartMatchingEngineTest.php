@@ -57,13 +57,15 @@ class SmartMatchingEngineTest extends TestCase
 
     public function test_clearCache_resets_internal_state(): void
     {
-        DB::shouldReceive('table->where->value')->andReturnNull();
-        $this->engine->getConfig();
-        $this->engine->clearCache();
+        // getConfig() caches its result in-memory; clearCache() resets it so the
+        // next getConfig() re-queries the DB. With a single getConfig() the
+        // tenants config row is read once; clearing the cache between two calls
+        // forces a second read — proving the cache was reset.
+        DB::shouldReceive('table->where->value')->twice()->andReturnNull();
 
-        // After clearing, next call should query DB again
-        DB::shouldReceive('table->where->value')->once()->andReturnNull();
-        $this->engine->getConfig();
+        $this->engine->getConfig();   // 1st DB read
+        $this->engine->clearCache();
+        $this->engine->getConfig();   // 2nd DB read (cache was cleared)
     }
 
     // ── extractKeywords ──

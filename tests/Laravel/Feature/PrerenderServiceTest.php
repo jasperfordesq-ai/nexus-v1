@@ -30,6 +30,13 @@ class PrerenderServiceTest extends TestCase
         if (! Schema::hasTable('prerender_jobs')) {
             $this->markTestSkipped('prerender_jobs table not present.');
         }
+        // Several tests assert the exact FIFO/priority order of freshly enqueued
+        // jobs (claimNextJob returns the oldest eligible row). A stray queued row
+        // committed by an earlier non-transactional run would always be claimed
+        // first and break those assertions. Clear the table so each test starts
+        // from a known-empty queue. The delete runs inside the DatabaseTransactions
+        // wrapper, so it rolls back after the test and never mutates CI long-term.
+        DB::table('prerender_jobs')->delete();
         $this->tmpCache = sys_get_temp_dir() . '/nexus-prerender-test-' . uniqid();
         mkdir($this->tmpCache, 0777, true);
         putenv('PRERENDER_CACHE_PATH=' . $this->tmpCache);

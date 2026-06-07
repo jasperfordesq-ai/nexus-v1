@@ -38,14 +38,16 @@ class SafeguardingPreferenceServiceTest extends TestCase
         $this->assertEquals('https://example.com/help', $result);
     }
 
-    public function test_validateUrl_acceptsHttpUrl(): void
+    public function test_validateUrl_rejectsPlainHttpUrl(): void
     {
+        // HTTPS-only enforcement (commit 408ffb632 "HTTPS-only"): plain http URLs
+        // are intentionally rejected to prevent insecure safeguarding links.
         $method = new \ReflectionMethod(SafeguardingPreferenceService::class, 'validateUrl');
         $method->setAccessible(true);
 
         $result = $method->invoke(null, 'http://example.com/help');
 
-        $this->assertEquals('http://example.com/help', $result);
+        $this->assertNull($result);
     }
 
     public function test_validateUrl_rejectsJavascriptUrl(): void

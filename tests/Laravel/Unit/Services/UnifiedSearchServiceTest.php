@@ -8,183 +8,171 @@ declare(strict_types=1);
 
 namespace Tests\Laravel\Unit\Services;
 
-use App\Services\UnifiedSearchService;
+use App\Services\SearchService;
 use App\Core\TenantContext;
 use App\Core\Database;
+use App\Models\User;
+use App\Models\Listing;
+use App\Models\Event;
+use App\Models\Group;
 use Tests\Laravel\TestCase;
 
 /**
- * UnifiedSearchService Tests
+ * Unified search tests.
  *
- * Tests unified search across listings, users, events, and groups.
+ * Exercises SearchService::unifiedSearch() / ::suggestions() — the real
+ * cross-entity search across listings, users, events, and groups. The former
+ * standalone `App\Services\UnifiedSearchService` was a dead delegation stub
+ * (returned empty arrays + logged warnings) and was deleted during the Laravel
+ * migration's 45-stub cleanup; this suite is repointed at the live service.
+ *
+ * Meilisearch is not running in the test environment, so SearchService falls
+ * back to its SQL LIKE path — that is the code under test here.
  */
 class UnifiedSearchServiceTest extends \Tests\Laravel\TestCase
 {
-    protected static ?int $staticTenantId = null;
-    protected static ?int $testUserId = null;
-    protected static ?int $testListingId = null;
-    protected static ?int $testEventId = null;
-    protected static ?int $testGroupId = null;
-    protected static ?UnifiedSearchService $svc = null;
+    protected int $tenantId = 2;
+    protected ?int $testUserId = null;
+    protected ?int $testListingId = null;
+    protected ?int $testEventId = null;
+    protected ?int $testGroupId = null;
+    protected string $token;
+    protected SearchService $svc;
 
-    /**
-     * Get shared service instance.
-     */
-    protected static function svc(): UnifiedSearchService
+    protected function setUp(): void
     {
-        if (self::$svc === null) {
-            self::$svc = new UnifiedSearchService();
-        }
-        return self::$svc;
+        parent::setUp();
+
+        // Factories/observers can reset TenantContext to tenant 1; pin tenant 2.
+        TenantContext::setById($this->tenantId);
+
+        $this->svc = new SearchService(new User(), new Listing(), new Event(), new Group());
+
+        // Unique token so LIKE searches resolve to *our* seeded rows only.
+        $this->token = 'Searchz' . substr(md5(uniqid('', true)), 0, 8);
+        $this->createTestData();
     }
 
-    public static function setUpBeforeClass(): void
+    protected function createTestData(): void
     {
-        parent::setUpBeforeClass();
+        $t = $this->token;
 
-        self::$staticTenantId = 2;
-        TenantContext::setById(self::$staticTenantId);
-
-        self::createTestData();
-    }
-
-    protected static function createTestData(): void
-    {
-        $ts = time();
-
-        // Create test user
         Database::query(
-            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, is_approved, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, 1, NOW())",
-            [self::$staticTenantId, "searchsvc_{$ts}@test.com", "searchsvc_{$ts}", 'SearchJohn', 'SearchDoe', 'SearchJohn SearchDoe']
+            "INSERT INTO users (tenant_id, email, username, first_name, last_name, name, status, is_approved, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, 'active', 1, NOW())",
+            [$this->tenantId, "{$t}@test.com", $t, "{$t}John", 'SearchDoe', "{$t}John SearchDoe"]
         );
-        self::$testUserId = (int)Database::getInstance()->lastInsertId();
+        $this->testUserId = (int) Database::getInstance()->lastInsertId();
 
-        // Create test listing
         Database::query(
-            "INSERT INTO listings (tenant_id, user_id, title, description, type, status, created_at)
-             VALUES (?, ?, ?, ?, 'offer', 'active', NOW())",
-            [self::$staticTenantId, self::$testUserId, "SearchGardening Services {$ts}", 'Test description for search']
+            "INSERT INTO listings (tenant_id, user_id, title, description, type, status, moderation_status, created_at)
+             VALUES (?, ?, ?, ?, 'offer', 'active', 'approved', NOW())",
+            [$this->tenantId, $this->testUserId, "{$t}Gardening Services", 'Test description for search']
         );
-        self::$testListingId = (int)Database::getInstance()->lastInsertId();
+        $this->testListingId = (int) Database::getInstance()->lastInsertId();
 
-        // Create test event
         Database::query(
             "INSERT INTO events (tenant_id, user_id, title, description, start_time, end_time, created_at)
              VALUES (?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 7 DAY), DATE_ADD(NOW(), INTERVAL 8 DAY), NOW())",
-            [self::$staticTenantId, self::$testUserId, "SearchCommunity Meetup {$ts}", 'Test event for search']
+            [$this->tenantId, $this->testUserId, "{$t}Community Meetup", 'Test event for search']
         );
-        self::$testEventId = (int)Database::getInstance()->lastInsertId();
+        $this->testEventId = (int) Database::getInstance()->lastInsertId();
 
-        // Create test group
         Database::query(
             "INSERT INTO `groups` (tenant_id, owner_id, name, description, visibility, created_at)
              VALUES (?, ?, ?, ?, 'public', NOW())",
-            [self::$staticTenantId, self::$testUserId, "SearchLocal Gardeners {$ts}", 'Test group for search']
+            [$this->tenantId, $this->testUserId, "{$t}Local Gardeners", 'Test group for search']
         );
-        self::$testGroupId = (int)Database::getInstance()->lastInsertId();
+        $this->testGroupId = (int) Database::getInstance()->lastInsertId();
     }
 
-    public static function tearDownAfterClass(): void
+    protected function tearDown(): void
     {
-        if (self::$testGroupId) {
-            try {
-                Database::query("DELETE FROM `groups` WHERE id = ?", [self::$testGroupId]);
-            } catch (\Exception $e) {}
-        }
-        if (self::$testEventId) {
-            try {
-                Database::query("DELETE FROM events WHERE id = ?", [self::$testEventId]);
-            } catch (\Exception $e) {}
-        }
-        if (self::$testListingId) {
-            try {
-                Database::query("DELETE FROM listings WHERE id = ?", [self::$testListingId]);
-            } catch (\Exception $e) {}
-        }
-        if (self::$testUserId) {
-            try {
-                Database::query("DELETE FROM users WHERE id = ?", [self::$testUserId]);
-            } catch (\Exception $e) {}
-        }
-
-        parent::tearDownAfterClass();
-    }
-
-    /**
-     * Helper: attempt a search call, marking test incomplete if DB schema issues arise
-     */
-    private function safeSearch(string $query, ?int $userId, array $filters = []): array
-    {
-        try {
-            return self::svc()->search($query, $userId, $filters);
-        } catch (\Exception $e) {
-            if (str_contains($e->getMessage(), 'Unknown column') || str_contains($e->getMessage(), "doesn't exist")) {
-                $this->markTestIncomplete('Search query failed due to missing DB column/table: ' . $e->getMessage());
+        foreach ([
+            ['groups', $this->testGroupId],
+            ['events', $this->testEventId],
+            ['listings', $this->testListingId],
+            ['users', $this->testUserId],
+        ] as [$table, $id]) {
+            if ($id) {
+                try {
+                    Database::query("DELETE FROM `{$table}` WHERE id = ?", [$id]);
+                } catch (\Exception $e) {
+                }
             }
-            throw $e;
         }
+
+        parent::tearDown();
     }
 
     // ==========================================
-    // Search Structure Tests
+    // Structure
     // ==========================================
 
     public function testSearchReturnsValidStructure(): void
     {
-        $result = $this->safeSearch('search', null);
+        $result = $this->svc->unifiedSearch($this->token, null);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('items', $result);
         $this->assertArrayHasKey('total', $result);
+        $this->assertArrayHasKey('query', $result);
+        $this->assertSame($this->token, $result['query']);
     }
 
     public function testSearchReturnsListings(): void
     {
-        $result = $this->safeSearch('SearchGardening', null);
+        $result = $this->svc->unifiedSearch($this->token . 'Gardening', null);
 
-        $this->assertArrayHasKey('items', $result);
-        $this->assertGreaterThan(0, count($result['items']));
-
-        $listing = array_values(array_filter($result['items'], fn($item) => $item['type'] === 'listing'))[0] ?? null;
+        $listing = array_values(array_filter(
+            $result['items'],
+            fn ($item) => $item['type'] === 'listing'
+        ))[0] ?? null;
         $this->assertNotNull($listing, 'Expected to find a listing in search results');
     }
 
     public function testSearchReturnsUsers(): void
     {
-        $result = $this->safeSearch('SearchJohn', null);
+        $result = $this->svc->unifiedSearch($this->token . 'John', null);
 
-        $this->assertArrayHasKey('items', $result);
-        $user = array_values(array_filter($result['items'], fn($item) => $item['type'] === 'user'))[0] ?? null;
+        $user = array_values(array_filter(
+            $result['items'],
+            fn ($item) => $item['type'] === 'user'
+        ))[0] ?? null;
         $this->assertNotNull($user, 'Expected to find a user in search results');
     }
 
     public function testSearchReturnsEvents(): void
     {
-        $result = $this->safeSearch('SearchCommunity', null);
+        $result = $this->svc->unifiedSearch($this->token . 'Community', null);
 
-        $this->assertArrayHasKey('items', $result);
-        $event = array_values(array_filter($result['items'], fn($item) => $item['type'] === 'event'))[0] ?? null;
+        $event = array_values(array_filter(
+            $result['items'],
+            fn ($item) => $item['type'] === 'event'
+        ))[0] ?? null;
         $this->assertNotNull($event, 'Expected to find an event in search results');
     }
 
     public function testSearchReturnsGroups(): void
     {
-        $result = $this->safeSearch('SearchLocal', null);
+        $result = $this->svc->unifiedSearch($this->token . 'Local', null);
 
-        $this->assertArrayHasKey('items', $result);
-        $group = array_values(array_filter($result['items'], fn($item) => $item['type'] === 'group'))[0] ?? null;
+        $group = array_values(array_filter(
+            $result['items'],
+            fn ($item) => $item['type'] === 'group'
+        ))[0] ?? null;
         $this->assertNotNull($group, 'Expected to find a group in search results');
     }
 
     // ==========================================
-    // Filter Tests
+    // Type filters
     // ==========================================
 
     public function testSearchWithTypeFilterListings(): void
     {
-        $result = $this->safeSearch('SearchGardening', null, ['type' => 'listings']);
+        $result = $this->svc->unifiedSearch($this->token . 'Gardening', null, ['type' => 'listings']);
 
+        $this->assertNotEmpty($result['items']);
         foreach ($result['items'] as $item) {
             $this->assertEquals('listing', $item['type']);
         }
@@ -192,52 +180,47 @@ class UnifiedSearchServiceTest extends \Tests\Laravel\TestCase
 
     public function testSearchWithTypeFilterUsers(): void
     {
-        $result = $this->safeSearch('SearchJohn', null, ['type' => 'users']);
+        $result = $this->svc->unifiedSearch($this->token . 'John', null, ['type' => 'users']);
 
+        $this->assertNotEmpty($result['items']);
         foreach ($result['items'] as $item) {
             $this->assertEquals('user', $item['type']);
         }
     }
 
     // ==========================================
-    // Validation Tests
+    // Limit handling
     // ==========================================
 
-    public function testSearchWithShortQuery(): void
+    public function testSearchCapsLimit(): void
     {
-        $result = $this->safeSearch('a', null);
-
-        $this->assertArrayHasKey('items', $result);
-        $this->assertCount(0, $result['items']);
-        $this->assertNotEmpty(self::svc()->getErrors());
+        // Internally capped at 50 — must not crash on an oversized request.
+        $result = $this->svc->unifiedSearch($this->token, null, ['limit' => 500]);
+        $this->assertIsArray($result['items']);
     }
 
     // ==========================================
-    // Suggestions Tests
+    // Suggestions
     // ==========================================
 
     public function testGetSuggestionsReturnsStructure(): void
     {
-        try {
-            $suggestions = self::svc()->getSuggestions('SearchGardening', self::$staticTenantId);
-        } catch (\Exception $e) {
-            if (str_contains($e->getMessage(), 'Unknown column') || str_contains($e->getMessage(), "doesn't exist")) {
-                $this->markTestIncomplete('getSuggestions failed due to missing DB column/table: ' . $e->getMessage());
-                return;
-            }
-            throw $e;
-        }
+        $suggestions = $this->svc->suggestions($this->token . 'Gardening');
 
         $this->assertIsArray($suggestions);
         $this->assertArrayHasKey('listings', $suggestions);
         $this->assertArrayHasKey('users', $suggestions);
+        $this->assertArrayHasKey('events', $suggestions);
+        $this->assertArrayHasKey('groups', $suggestions);
     }
 
     public function testGetSuggestionsWithShortQuery(): void
     {
-        $suggestions = self::svc()->getSuggestions('a', self::$staticTenantId);
+        $suggestions = $this->svc->suggestions('a');
 
         $this->assertEmpty($suggestions['listings']);
         $this->assertEmpty($suggestions['users']);
+        $this->assertEmpty($suggestions['events']);
+        $this->assertEmpty($suggestions['groups']);
     }
 }

@@ -9,6 +9,7 @@ namespace Tests\Laravel\Unit\Services\Identity;
 use Tests\Laravel\TestCase;
 use App\Services\Identity\StripeIdentityProvider;
 use App\Services\Identity\IdentityVerificationProviderInterface;
+use App\Services\Identity\TenantProviderCredentialService;
 use Illuminate\Support\Facades\DB;
 
 class StripeIdentityProviderTest extends TestCase
@@ -59,8 +60,11 @@ class StripeIdentityProviderTest extends TestCase
     {
         putenv('STRIPE_IDENTITY_SECRET_KEY=');
 
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn(false);
+        // Ensure no stored credentials for tenant 2 / stripe_identity.
+        DB::table('tenant_provider_credentials')
+            ->where('tenant_id', 2)
+            ->where('provider_slug', 'stripe_identity')
+            ->delete();
 
         $result = $this->provider->isAvailable(2);
 
@@ -71,17 +75,23 @@ class StripeIdentityProviderTest extends TestCase
     {
         putenv('STRIPE_IDENTITY_SECRET_KEY=');
 
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn([
-            'id' => 1,
-            'tenant_id' => 2,
-            'provider_slug' => 'stripe_identity',
-            'credentials' => json_encode(['api_key' => 'sk_live_xyz', 'webhook_secret' => 'whsec_abc']),
+        // isAvailable() delegates to TenantProviderCredentialService::hasCredentials(),
+        // which reads a real tenant_provider_credentials row (DB::selectOne). Seed one.
+        TenantProviderCredentialService::save(2, 'stripe_identity', [
+            'api_key' => 'sk_live_xyz',
+            'webhook_secret' => 'whsec_abc',
         ]);
 
-        $result = $this->provider->isAvailable(2);
+        try {
+            $result = $this->provider->isAvailable(2);
 
-        $this->assertTrue($result);
+            $this->assertTrue($result);
+        } finally {
+            DB::table('tenant_provider_credentials')
+                ->where('tenant_id', 2)
+                ->where('provider_slug', 'stripe_identity')
+                ->delete();
+        }
     }
 
     public function test_verify_webhook_signature_returns_false_without_signature_header(): void

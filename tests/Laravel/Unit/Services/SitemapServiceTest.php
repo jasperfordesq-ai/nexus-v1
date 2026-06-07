@@ -247,10 +247,21 @@ class SitemapServiceTest extends TestCase
 
     public function test_generateForTenant_includes_public_groups(): void
     {
+        // getGroupUrls() selects public + active groups for the tenant. The clean
+        // CI DB has none, so seed one to exercise the per-group URL path.
+        $id = DB::table('groups')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'owner_id' => $this->userId,
+            'name' => 'Public Sitemap Group',
+            'visibility' => 'public',
+            'is_active' => 1,
+            'status' => 'active',
+            'created_at' => now(),
+        ]);
+
         Cache::flush();
         $xml = $this->service->generateForTenant($this->testTenantId);
-        // Tenant 2 has public groups
-        $this->assertStringContainsString('/groups/', $xml);
+        $this->assertStringContainsString("/groups/{$id}", $xml);
     }
 
     public function test_generateForTenant_includes_events_listing(): void

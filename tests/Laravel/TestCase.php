@@ -24,6 +24,41 @@ abstract class TestCase extends BaseTestCase
     use CreatesApplication;
 
     /**
+     * Application instance booted for class-level setup (setUpBeforeClass).
+     *
+     * Laravel's TestCase only boots the application in the instance setUp(),
+     * so any test that does data seeding / TenantContext work in a static
+     * setUpBeforeClass() hits "A facade root has not been set" (or, once a
+     * prior class booted then tore the container down, "Class config does not
+     * exist"). Booting a dedicated app here and pointing the Facade root at it
+     * makes facade-backed helpers (DB, Config, TenantContext) usable from
+     * setUpBeforeClass, mirroring how they behave at runtime.
+     */
+    private static ?\Illuminate\Foundation\Application $classApp = null;
+
+    /**
+     * Boot a Laravel application for class-level (static) setup and point the
+     * Facade root at it. Idempotent — safe to call from every setUpBeforeClass.
+     *
+     * Tests that seed fixtures or set TenantContext inside setUpBeforeClass MUST
+     * call this first, before touching any facade-backed helper.
+     */
+    protected static function bootApplicationForClass(): \Illuminate\Foundation\Application
+    {
+        $app = require dirname(__DIR__, 2) . '/bootstrap/app.php';
+        $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+
+        // Point the Facade root at this freshly-booted container so DB::,
+        // Config::, Log:: etc. resolve during static setup.
+        \Illuminate\Support\Facades\Facade::clearResolvedInstances();
+        \Illuminate\Support\Facades\Facade::setFacadeApplication($app);
+
+        self::$classApp = $app;
+
+        return $app;
+    }
+
+    /**
      * Default tenant ID for testing (hour-timebank).
      */
     protected int $testTenantId = 2;

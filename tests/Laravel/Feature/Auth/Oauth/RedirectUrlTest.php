@@ -23,12 +23,25 @@ class RedirectUrlTest extends TestCase
 
     public function test_redirect_returns_signed_state_token(): void
     {
-        $service = app(SocialAuthService::class);
-        $result = $service->redirectUrl('google', $this->testTenantId, 'login');
+        // OAuth has a global kill switch (env OAUTH_ENABLED, default false). When
+        // off, every provider is "disabled for this community" and redirectUrl()
+        // throws. Enable it for this assertion so we exercise the real state-token
+        // build path. env() resolves via $_ENV/$_SERVER/getenv, so set all three.
+        putenv('OAUTH_ENABLED=true');
+        $_ENV['OAUTH_ENABLED'] = 'true';
+        $_SERVER['OAUTH_ENABLED'] = 'true';
 
-        $this->assertArrayHasKey('state', $result);
-        $this->assertNotEmpty($result['state']);
-        $this->assertStringContainsString('.', $result['state']); // body.signature
+        try {
+            $service = app(SocialAuthService::class);
+            $result = $service->redirectUrl('google', $this->testTenantId, 'login');
+
+            $this->assertArrayHasKey('state', $result);
+            $this->assertNotEmpty($result['state']);
+            $this->assertStringContainsString('.', $result['state']); // body.signature
+        } finally {
+            putenv('OAUTH_ENABLED');
+            unset($_ENV['OAUTH_ENABLED'], $_SERVER['OAUTH_ENABLED']);
+        }
     }
 
     public function test_redirect_endpoint_responds(): void

@@ -151,7 +151,9 @@ class SkillTaxonomyServiceTest extends TestCase
 
     public function test_search_returns_array(): void
     {
-        DB::shouldReceive('table->where->where->orderBy->limit->get->map->all')->andReturn([]);
+        // search() now scopes by tenant_id (commit 833dd3bf8), adding a third
+        // ->where() before ->orderBy(): tenant_id, is_active, name LIKE.
+        DB::shouldReceive('table->where->where->where->orderBy->limit->get->map->all')->andReturn([]);
 
         $result = $this->service->search('test');
         $this->assertIsArray($result);

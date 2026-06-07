@@ -25,10 +25,12 @@ class PollOptionTest extends TestCase
         $this->assertEquals('poll_options', $this->model->getTable());
     }
 
-    public function test_does_not_use_has_tenant_scope(): void
+    public function test_uses_has_tenant_scope(): void
     {
+        // PollOption was tenant-scoped in the platform audit (commit 81ab54907)
+        // to close a cross-tenant IDOR; it now carries HasTenantScope + tenant_id.
         $traits = class_uses_recursive(PollOption::class);
-        $this->assertNotContains(\App\Models\Concerns\HasTenantScope::class, $traits);
+        $this->assertContains(\App\Models\Concerns\HasTenantScope::class, $traits);
     }
 
     public function test_poll_relationship(): void
