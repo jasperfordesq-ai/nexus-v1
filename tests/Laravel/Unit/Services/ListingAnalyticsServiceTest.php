@@ -58,6 +58,7 @@ class ListingAnalyticsServiceTest extends TestCase
 
     public function test_recordContact_valid_type(): void
     {
+        DB::shouldReceive('selectOne')->once()->andReturn((object) ['status' => 'active']);
         DB::shouldReceive('insert')->once()->andReturn(true);
         DB::shouldReceive('update')->once()->andReturn(1);
 
@@ -67,6 +68,7 @@ class ListingAnalyticsServiceTest extends TestCase
 
     public function test_recordContact_invalid_type_defaults_to_message(): void
     {
+        DB::shouldReceive('selectOne')->once()->andReturn((object) ['status' => 'active']);
         DB::shouldReceive('insert')->once()->andReturn(true);
         DB::shouldReceive('update')->once()->andReturn(1);
 
@@ -84,7 +86,7 @@ class ListingAnalyticsServiceTest extends TestCase
 
     public function test_updateSaveCount_increment(): void
     {
-        DB::shouldReceive('update')->once()->andReturn(1);
+        DB::shouldReceive('statement')->once()->andReturn(true);
 
         $this->service->updateSaveCount(1, true);
         $this->assertTrue(true); // void method

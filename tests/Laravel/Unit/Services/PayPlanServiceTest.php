@@ -7,48 +7,56 @@
 namespace Tests\Laravel\Unit\Services;
 
 use Tests\Laravel\TestCase;
-use App\Services\PayPlanService;
+use App\Services\TenantBillingService;
 
+/**
+ * The legacy `App\Services\PayPlanService` was a no-op delegation stub
+ * (every method logged "Legacy delegation removed" and returned null). It was
+ * deleted in the Laravel migration (commit aa27af479). The only real survivor
+ * is plan assignment, which now lives on TenantBillingService as a static
+ * method with a richer signature. These tests assert the current reality.
+ */
 class PayPlanServiceTest extends \Tests\Laravel\TestCase
 {
-    public function testClassExists(): void
+    public function testLegacyPayPlanServiceIsRemoved(): void
     {
-        $this->assertTrue(class_exists(PayPlanService::class));
+        $this->assertFalse(
+            class_exists(\App\Services\PayPlanService::class),
+            'Legacy PayPlanService stub should remain deleted; use TenantBillingService.'
+        );
     }
 
-    public function testPublicMethodsExist(): void
+    public function testTenantBillingServiceExists(): void
     {
-        $methods = [
-            'validateLayoutAccess', 'validateFeatureAccess', 'validateMenuCreation',
-            'getUpgradeSuggestions', 'assignPlan', 'startTrial',
-            'getPlanStatus', 'canDowngradeTo'
-        ];
-
-        foreach ($methods as $method) {
-            $this->assertTrue(
-                method_exists(PayPlanService::class, $method),
-                "Method {$method} should exist on PayPlanService"
-            );
-        }
+        $this->assertTrue(class_exists(TenantBillingService::class));
     }
 
-    public function testMethodSignatures(): void
+    public function testAssignPlanMethodExists(): void
     {
-        $ref = new \ReflectionClass(PayPlanService::class);
+        $this->assertTrue(
+            method_exists(TenantBillingService::class, 'assignPlan'),
+            'Method assignPlan should exist on TenantBillingService'
+        );
+    }
 
-        // validateLayoutAccess($layout, $tenantId = null)
-        $method = $ref->getMethod('validateLayoutAccess');
-        $this->assertTrue($method->isStatic());
-        $params = $method->getParameters();
-        $this->assertEquals('layout', $params[0]->getName());
-        $this->assertTrue($params[1]->isOptional());
+    public function testAssignPlanSignature(): void
+    {
+        $ref = new \ReflectionClass(TenantBillingService::class);
+        $method = $ref->getMethod('assignPlan');
 
-        // startTrial($tenantId, $planId, $trialDays = 14)
-        $method = $ref->getMethod('startTrial');
+        $this->assertTrue($method->isStatic(), 'assignPlan is a static method');
+
         $params = $method->getParameters();
+        // assignPlan(int $tenantId, int $planId, ?string $expiresAt, ?string $notes, int $assignedBy, ...)
         $this->assertEquals('tenantId', $params[0]->getName());
         $this->assertEquals('planId', $params[1]->getName());
-        $this->assertEquals('trialDays', $params[2]->getName());
-        $this->assertEquals(14, $params[2]->getDefaultValue());
+        $this->assertEquals('expiresAt', $params[2]->getName());
+        $this->assertEquals('notes', $params[3]->getName());
+        $this->assertEquals('assignedBy', $params[4]->getName());
+
+        // assignedBy is required; the trailing pricing/discount params are optional.
+        $this->assertFalse($params[4]->isOptional());
+        $this->assertTrue($params[5]->isOptional(), 'customPriceMonthly is optional');
+        $this->assertEquals('void', (string) $method->getReturnType());
     }
 }

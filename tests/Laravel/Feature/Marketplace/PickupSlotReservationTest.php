@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Tests\Laravel\Feature\Marketplace;
 
+use App\Core\TenantContext;
 use App\Models\MarketplacePickupReservation;
 use App\Models\MarketplacePickupSlot;
 use App\Models\User;
@@ -35,10 +36,18 @@ class PickupSlotReservationTest extends TestCase
 
     private function createUser(): User
     {
-        return User::factory()->forTenant($this->testTenantId)->create([
+        $user = User::factory()->forTenant($this->testTenantId)->create([
             'status' => 'active',
             'is_approved' => true,
         ]);
+
+        // User factory observers reset TenantContext to tenant 1. Re-pin to the
+        // test tenant so the slot create + reserve calls (which read
+        // TenantContext::getId()) align with the hardcoded tenant_id=2 used for
+        // the seller profile / listing / order rows.
+        TenantContext::setById($this->testTenantId);
+
+        return $user;
     }
 
     private function createSellerProfile(int $userId): int
@@ -70,16 +79,22 @@ class PickupSlotReservationTest extends TestCase
 
     private function createOrder(int $buyerId, int $sellerId, int $listingId): int
     {
+        // marketplace_orders schema: requires unit_price/total_price (NOT
+        // subtotal/total), quantity, and a valid status enum value
+        // (pending_payment). The reservation service only reads id/tenant_id/
+        // buyer_id off the order, so the monetary columns just need to insert
+        // validly.
         return (int) DB::table('marketplace_orders')->insertGetId([
             'tenant_id' => $this->testTenantId,
             'buyer_id' => $buyerId,
             'seller_id' => $sellerId,
             'marketplace_listing_id' => $listingId,
             'order_number' => 'TEST-' . uniqid(),
-            'subtotal' => 5.00,
-            'total' => 5.00,
+            'quantity' => 1,
+            'unit_price' => 5.00,
+            'total_price' => 5.00,
             'currency' => 'EUR',
-            'status' => 'pending',
+            'status' => 'pending_payment',
             'created_at' => now(),
             'updated_at' => now(),
         ]);

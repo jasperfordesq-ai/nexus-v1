@@ -137,7 +137,8 @@ class GroupLifecycleTest extends TestCase
         Sanctum::actingAs($this->memberUser, ['*']);
 
         $response = $this->apiDelete("/v2/groups/{$group->id}/membership");
-        $this->assertEquals(200, $response->getStatusCode());
+        // Leaving a group is a successful DELETE — controller returns 204 No Content.
+        $this->assertContains($response->getStatusCode(), [200, 204]);
 
         // Verify membership is removed or status changed
         $membership = GroupMember::where('group_id', $group->id)
@@ -206,7 +207,8 @@ class GroupLifecycleTest extends TestCase
         Sanctum::actingAs($this->owner, ['*']);
 
         $response = $this->apiPost("/v2/groups/{$group->id}/discussions", [
-            'title' => 'Best plants for beginners',
+            'title'   => 'Best plants for beginners',
+            'content' => 'Let us share tips for plants that are easy to grow.',
         ]);
 
         $this->assertContains($response->getStatusCode(), [200, 201]);
@@ -342,7 +344,8 @@ class GroupLifecycleTest extends TestCase
         Sanctum::actingAs($this->owner, ['*']);
 
         $discussionResponse = $this->apiPost("/v2/groups/{$groupId}/discussions", [
-            'title' => 'Welcome to our group!',
+            'title'   => 'Welcome to our group!',
+            'content' => 'Introduce yourself and say hello to the group.',
         ]);
         $this->assertContains($discussionResponse->getStatusCode(), [200, 201]);
 

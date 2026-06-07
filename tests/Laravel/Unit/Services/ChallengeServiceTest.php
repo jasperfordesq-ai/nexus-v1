@@ -178,6 +178,12 @@ class ChallengeServiceTest extends TestCase
     {
         $this->mockEloquentConnection([[]]);
 
+        // claim() first verifies the user belongs to the tenant via DB::table('users')
+        $usersQuery = Mockery::mock();
+        $usersQuery->shouldReceive('where')->andReturnSelf();
+        $usersQuery->shouldReceive('exists')->andReturn(true);
+        DB::shouldReceive('table')->with('users')->andReturn($usersQuery);
+
         $result = ChallengeService::claim(5, 1, 2);
 
         $this->assertFalse($result);
@@ -188,11 +194,18 @@ class ChallengeServiceTest extends TestCase
         $row = $this->challengeRow(['id' => 5]);
         $this->mockEloquentConnection([[$row]]);
 
+        // claim() first verifies the user belongs to the tenant via DB::table('users')
+        $usersQuery = Mockery::mock();
+        $usersQuery->shouldReceive('where')->andReturnSelf();
+        $usersQuery->shouldReceive('exists')->andReturn(true);
+        DB::shouldReceive('table')->with('users')->andReturn($usersQuery);
+
         // Override DB facade for the claims table check
-        DB::shouldReceive('table')->with('challenge_claims')->andReturnSelf();
-        DB::shouldReceive('where')->with('challenge_id', 5)->andReturnSelf();
-        DB::shouldReceive('where')->with('user_id', 1)->andReturnSelf();
-        DB::shouldReceive('exists')->andReturn(true);
+        $claimsQuery = Mockery::mock();
+        $claimsQuery->shouldReceive('where')->with('challenge_id', 5)->andReturnSelf();
+        $claimsQuery->shouldReceive('where')->with('user_id', 1)->andReturnSelf();
+        $claimsQuery->shouldReceive('exists')->andReturn(true);
+        DB::shouldReceive('table')->with('challenge_claims')->andReturn($claimsQuery);
 
         $result = ChallengeService::claim(5, 1, 2);
 
@@ -204,11 +217,18 @@ class ChallengeServiceTest extends TestCase
         $row = $this->challengeRow(['id' => 5]);
         $this->mockEloquentConnection([[$row]]);
 
-        DB::shouldReceive('table')->with('challenge_claims')->andReturnSelf();
-        DB::shouldReceive('where')->with('challenge_id', 5)->andReturnSelf();
-        DB::shouldReceive('where')->with('user_id', 1)->andReturnSelf();
-        DB::shouldReceive('exists')->andReturn(false);
-        DB::shouldReceive('insert')->once()->andReturn(true);
+        // claim() first verifies the user belongs to the tenant via DB::table('users')
+        $usersQuery = Mockery::mock();
+        $usersQuery->shouldReceive('where')->andReturnSelf();
+        $usersQuery->shouldReceive('exists')->andReturn(true);
+        DB::shouldReceive('table')->with('users')->andReturn($usersQuery);
+
+        $claimsQuery = Mockery::mock();
+        $claimsQuery->shouldReceive('where')->with('challenge_id', 5)->andReturnSelf();
+        $claimsQuery->shouldReceive('where')->with('user_id', 1)->andReturnSelf();
+        $claimsQuery->shouldReceive('exists')->andReturn(false);
+        $claimsQuery->shouldReceive('insert')->once()->andReturn(true);
+        DB::shouldReceive('table')->with('challenge_claims')->andReturn($claimsQuery);
 
         $result = ChallengeService::claim(5, 1, 2);
 

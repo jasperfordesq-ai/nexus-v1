@@ -946,7 +946,7 @@ class EmailTriggerAuditServiceTest extends TestCase
         if (
             !Schema::hasTable('job_interviews')
             || !Schema::hasTable('job_vacancies')
-            || !Schema::hasTable('job_applications')
+            || !Schema::hasTable('job_vacancy_applications')
             || !Schema::hasColumn('job_interviews', 'reminder_24h_sent_at')
             || !Schema::hasColumn('job_interviews', 'reminder_1h_sent_at')
         ) {
@@ -982,7 +982,9 @@ class EmailTriggerAuditServiceTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        $applicationId = DB::table('job_applications')->insertGetId([
+        // job_interviews.application_id FKs to job_vacancy_applications (canonical),
+        // NOT the legacy job_applications table — insert there to satisfy the FK.
+        $applicationId = DB::table('job_vacancy_applications')->insertGetId([
             'tenant_id' => 2,
             'vacancy_id' => $vacancyId,
             'user_id' => $candidateId,

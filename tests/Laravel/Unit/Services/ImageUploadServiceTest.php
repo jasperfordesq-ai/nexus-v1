@@ -24,10 +24,42 @@ class ImageUploadServiceTest extends TestCase
 
     // ─── upload ──────────────────────────────────────────────────
 
+    /** @var list<string> Temp files created during a test, cleaned up in tearDown. */
+    private array $tmpFiles = [];
+
+    protected function tearDown(): void
+    {
+        foreach ($this->tmpFiles as $f) {
+            if (is_file($f)) {
+                @unlink($f);
+            }
+        }
+        $this->tmpFiles = [];
+        parent::tearDown();
+    }
+
+    /**
+     * Create a real temp file of the requested byte size and track it for cleanup.
+     * The service reads the real path via getPathname() + filesize().
+     */
+    private function makeTempFile(int $bytes): string
+    {
+        $path = tempnam(sys_get_temp_dir(), 'img_upload_test_');
+        $this->tmpFiles[] = $path;
+        // Allocate the requested size without writing every byte.
+        $fh = fopen($path, 'wb');
+        if ($bytes > 0) {
+            fseek($fh, $bytes - 1);
+            fwrite($fh, "\0");
+        }
+        fclose($fh);
+        return $path;
+    }
+
     public function test_upload_exceeds_max_size_throws(): void
     {
         $file = Mockery::mock(UploadedFile::class);
-        $file->shouldReceive('getSize')->andReturn(20 * 1024 * 1024); // 20MB
+        $file->shouldReceive('getPathname')->andReturn($this->makeTempFile(11 * 1024 * 1024)); // > 10MB limit
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('File exceeds maximum size');
@@ -38,7 +70,7 @@ class ImageUploadServiceTest extends TestCase
     public function test_upload_invalid_mime_type_throws(): void
     {
         $file = Mockery::mock(UploadedFile::class);
-        $file->shouldReceive('getSize')->andReturn(1024);
+        $file->shouldReceive('getPathname')->andReturn($this->makeTempFile(1024));
         $file->shouldReceive('getMimeType')->andReturn('application/pdf');
 
         $this->expectException(\InvalidArgumentException::class);
@@ -50,7 +82,7 @@ class ImageUploadServiceTest extends TestCase
     public function test_upload_valid_image_stores_and_returns_result(): void
     {
         $file = Mockery::mock(UploadedFile::class);
-        $file->shouldReceive('getSize')->andReturn(1024);
+        $file->shouldReceive('getPathname')->andReturn($this->makeTempFile(1024));
         $file->shouldReceive('getMimeType')->andReturn('image/jpeg');
         $file->shouldReceive('getClientOriginalExtension')->andReturn('jpg');
         $file->shouldReceive('storeAs')->once()->andReturn('tenant_2/uploads/test.jpg');

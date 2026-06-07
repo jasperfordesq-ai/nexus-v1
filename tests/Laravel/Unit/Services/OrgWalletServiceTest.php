@@ -105,7 +105,7 @@ class OrgWalletServiceTest extends TestCase
 
     public function test_cancelRequest_fails_when_not_found(): void
     {
-        DB::shouldReceive('table->where->first')->andReturnNull();
+        DB::shouldReceive('table->where->where->first')->andReturnNull();
         $result = OrgWalletService::cancelRequest(999, 1);
         $this->assertFalse($result['success']);
     }
@@ -113,7 +113,7 @@ class OrgWalletServiceTest extends TestCase
     public function test_cancelRequest_fails_for_wrong_requester(): void
     {
         $request = (object) ['id' => 1, 'status' => 'pending', 'requester_id' => 5];
-        DB::shouldReceive('table->where->first')->andReturn($request);
+        DB::shouldReceive('table->where->where->first')->andReturn($request);
         $result = OrgWalletService::cancelRequest(1, 99);
         $this->assertFalse($result['success']);
         $this->assertStringContainsString('Only the requester', $result['message']);
@@ -123,11 +123,10 @@ class OrgWalletServiceTest extends TestCase
 
     public function test_getWalletSummary_returns_expected_keys(): void
     {
-        DB::shouldReceive('table->where->first')->andReturnNull();
-        DB::shouldReceive('table->where->where->sum')->andReturn(0);
-        DB::shouldReceive('table->where->where->sum')->andReturn(0);
-        DB::shouldReceive('table->where->count')->andReturn(0);
+        DB::shouldReceive('table->where->where->first')->andReturnNull();
+        DB::shouldReceive('table->where->where->where->sum')->andReturn(0);
         DB::shouldReceive('table->where->where->count')->andReturn(0);
+        DB::shouldReceive('table->where->where->where->count')->andReturn(0);
 
         $result = OrgWalletService::getWalletSummary(1);
         $this->assertArrayHasKey('balance', $result);
