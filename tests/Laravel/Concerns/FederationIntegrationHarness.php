@@ -46,7 +46,10 @@ trait FederationIntegrationHarness
             'tenant_id'            => $tenantId,
             'name'                 => 'Test ' . ucfirst($protocol) . ' Partner ' . uniqid(),
             'description'          => 'Harness-created partner for ' . $protocol,
-            'base_url'             => 'https://partner-' . $protocol . '-' . uniqid() . '.test',
+            // Public IP literal so OutboundUrlGuard::isSafeHttpUrl() passes without DNS
+            // (it short-circuits on IP literals). A '.test' hostname is unresolvable and
+            // the SSRF guard would block every outbound request before it is sent.
+            'base_url'             => 'https://93.184.216.34',
             'api_path'             => '/api/v1',
             'api_key'              => 'test-api-key',
             'auth_method'          => 'hmac',

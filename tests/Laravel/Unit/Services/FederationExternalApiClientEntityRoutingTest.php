@@ -73,7 +73,7 @@ class FederationExternalApiClientEntityRoutingTest extends TestCase
             'id'             => $this->partnerId,
             'tenant_id'      => $this->testTenantId,
             'name'           => 'Routing Partner',
-            'base_url'       => 'https://partner.test',
+            'base_url'       => 'https://93.184.216.34',
             'api_path'       => '/api/v1',
             'api_key'        => $encryptedApiKey,
             'auth_method'    => 'api_key',
@@ -126,7 +126,7 @@ class FederationExternalApiClientEntityRoutingTest extends TestCase
 
         $this->assertTrue($result['success'], "{$method} should succeed");
 
-        $expectedUrl = 'https://partner.test/api/v1' . $expectedPath;
+        $expectedUrl = 'https://93.184.216.34/api/v1' . $expectedPath;
 
         Http::assertSent(function ($request) use ($expectedUrl, $payloadKey) {
             if ($request->method() !== 'POST') {

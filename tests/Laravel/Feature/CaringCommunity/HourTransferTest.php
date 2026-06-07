@@ -244,7 +244,7 @@ class HourTransferTest extends TestCase
             'tenant_id' => self::SOURCE_TENANT_ID,
             'peer_slug' => $peerSlug,
             'display_name' => 'Remote Coop',
-            'base_url' => 'https://remote.example.test',
+            'base_url' => 'https://93.184.216.34',
             'shared_secret' => str_repeat('a', 64),
             'status' => 'active',
             'created_at' => now(),
@@ -261,7 +261,7 @@ class HourTransferTest extends TestCase
         $init = $service->initiate($sourceUser, $peerSlug, 5.0, 'Remote move');
         $result = $service->approveAtSource($init['transfer_id'], $admin);
 
-        Http::assertSent(fn ($request) => $request->url() === 'https://remote.example.test/api/v2/federation/hour-transfer/inbound');
+        Http::assertSent(fn ($request) => $request->url() === 'https://93.184.216.34/api/v2/federation/hour-transfer/inbound');
 
         $this->assertSame('sent', $result['status']);
         $this->assertEqualsWithDelta(20.0, (float) DB::table('users')->where('id', $sourceUser)->value('balance'), 0.001);

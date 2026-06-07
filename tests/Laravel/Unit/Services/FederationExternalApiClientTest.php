@@ -75,7 +75,11 @@ class FederationExternalApiClientTest extends TestCase
             'id'             => $this->partnerId,
             'tenant_id'      => $this->testTenantId,
             'name'           => 'Mock Partner',
-            'base_url'       => 'https://partner.test',
+            // Public IP literal: OutboundUrlGuard::isSafeHttpUrl() short-circuits on
+            // IP literals (no DNS), so the SSRF guard passes deterministically while
+            // Http::fake() intercepts the actual request. A '.test' hostname would be
+            // rejected as unresolvable and block every request before it is sent.
+            'base_url'       => 'https://93.184.216.34',
             'api_path'       => '/api/v1/federation',
             'api_key'        => $encryptedApiKey,
             'auth_method'    => 'api_key',
@@ -320,8 +324,8 @@ class FederationExternalApiClientTest extends TestCase
         $result = FederationExternalApiClient::get($this->partnerId, '/ping');
 
         $this->assertFalse($result['success']);
-        // MAX_RETRIES = 3, so 1 initial + 3 retries = 4 attempts
-        Http::assertSentCount(4);
+        // MAX_RETRIES = 1 (single immediate retry), so 1 initial + 1 retry = 2 attempts
+        Http::assertSentCount(2);
     }
 
     public function test_4xx_does_not_retry(): void
