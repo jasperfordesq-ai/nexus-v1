@@ -9,6 +9,7 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Tests\Laravel\TestCase;
 
 /**
@@ -46,7 +47,9 @@ class SitemapControllerTest extends TestCase
 
     public function test_sitemap_index_contains_sitemapindex_root(): void
     {
-        $response = $this->get('/sitemap.xml');
+        $host = $this->seedParentDomainWithSubTenant();
+
+        $response = $this->withHeaders(['X-Sitemap-Host' => $host])->get('/sitemap.xml');
         $content = $response->getContent();
 
         $this->assertStringContainsString('<sitemapindex', $content);
@@ -56,11 +59,45 @@ class SitemapControllerTest extends TestCase
 
     public function test_sitemap_index_contains_tenant_sitemaps(): void
     {
-        $response = $this->get('/sitemap.xml');
+        $host = $this->seedParentDomainWithSubTenant();
+
+        $response = $this->withHeaders(['X-Sitemap-Host' => $host])->get('/sitemap.xml');
         $content = $response->getContent();
 
         $this->assertStringContainsString('<sitemap>', $content);
         $this->assertStringContainsString('<loc>', $content);
+    }
+
+    /**
+     * Seed a parent tenant that owns a domain plus an active sub-tenant inheriting
+     * that domain. The controller returns a <sitemapindex> (listing parent + sub
+     * sitemaps) only for this topology; on the bare app/other domains it serves a
+     * flat <urlset>. Returns the parent domain to pass as X-Sitemap-Host.
+     */
+    private function seedParentDomainWithSubTenant(): string
+    {
+        $domain = 'sitemap-parent-' . uniqid() . '.test';
+
+        DB::table('tenants')->updateOrInsert(
+            ['id' => $this->testTenantId],
+            ['domain' => $domain, 'is_active' => true, 'updated_at' => now()]
+        );
+
+        DB::table('tenants')->updateOrInsert(
+            ['id' => 999],
+            [
+                'name'              => 'Sitemap Sub Tenant',
+                'slug'              => 'sitemap-sub-' . uniqid(),
+                'domain'            => null,
+                'parent_id'         => $this->testTenantId,
+                'is_active'         => true,
+                'depth'             => 1,
+                'allows_subtenants' => false,
+                'updated_at'        => now(),
+            ]
+        );
+
+        return $domain;
     }
 
     public function test_sitemap_index_has_cache_headers(): void

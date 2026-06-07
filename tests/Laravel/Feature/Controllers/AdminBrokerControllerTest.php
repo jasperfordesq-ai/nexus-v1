@@ -253,6 +253,27 @@ class AdminBrokerControllerTest extends TestCase
     // ================================================================
 
     /**
+     * Create a listing for the given tenant and return its id.
+     *
+     * exchange_requests.listing_id carries a NOT NULL FK to listings(id); inserting
+     * an exchange without a real listing trips a foreign-key violation, so every
+     * exchange fixture must reference a listing that exists.
+     */
+    private function makeListingId(int $tenantId, int $ownerId): int
+    {
+        return (int) DB::table('listings')->insertGetId([
+            'tenant_id'   => $tenantId,
+            'user_id'     => $ownerId,
+            'title'       => 'Exchange fixture listing',
+            'description' => 'Listing backing an exchange_requests fixture row.',
+            'type'        => 'offer',
+            'status'      => 'active',
+            'created_at'  => now(),
+            'updated_at'  => now(),
+        ]);
+    }
+
+    /**
      * Insert a real messages row (required by broker_message_copies FK) and a
      * broker_message_copies row.  Returns the broker_message_copies.id.
      *
@@ -293,9 +314,11 @@ class AdminBrokerControllerTest extends TestCase
         $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
         $requester = User::factory()->forTenant($this->testTenantId)->create();
         $provider = User::factory()->forTenant($this->testTenantId)->create();
+        $listingId = $this->makeListingId($this->testTenantId, $provider->id);
 
         $exchangeId = DB::table('exchange_requests')->insertGetId([
             'tenant_id'      => $this->testTenantId,
+            'listing_id'     => $listingId,
             'requester_id'   => $requester->id,
             'provider_id'    => $provider->id,
             'proposed_hours' => 2.0,
@@ -320,9 +343,11 @@ class AdminBrokerControllerTest extends TestCase
         $adminB = User::factory()->forTenant(999)->admin()->create();
         $requester = User::factory()->forTenant($this->testTenantId)->create();
         $provider = User::factory()->forTenant($this->testTenantId)->create();
+        $listingId = $this->makeListingId($this->testTenantId, $provider->id);
 
         $exchangeId = DB::table('exchange_requests')->insertGetId([
             'tenant_id'      => $this->testTenantId,
+            'listing_id'     => $listingId,
             'requester_id'   => $requester->id,
             'provider_id'    => $provider->id,
             'proposed_hours' => 2.0,
@@ -348,9 +373,11 @@ class AdminBrokerControllerTest extends TestCase
         $member = User::factory()->forTenant($this->testTenantId)->create();
         $requester = User::factory()->forTenant($this->testTenantId)->create();
         $provider = User::factory()->forTenant($this->testTenantId)->create();
+        $listingId = $this->makeListingId($this->testTenantId, $provider->id);
 
         $exchangeId = DB::table('exchange_requests')->insertGetId([
             'tenant_id'      => $this->testTenantId,
+            'listing_id'     => $listingId,
             'requester_id'   => $requester->id,
             'provider_id'    => $provider->id,
             'proposed_hours' => 2.0,
@@ -379,9 +406,12 @@ class AdminBrokerControllerTest extends TestCase
         $requester = User::factory()->forTenant($this->testTenantId)->create();
         $provider = User::factory()->forTenant($this->testTenantId)->create();
 
+        $listingId = $this->makeListingId($this->testTenantId, $provider->id);
+
         // Status is 'pending' (not 'pending_broker') — not approvable
         $exchangeId = DB::table('exchange_requests')->insertGetId([
             'tenant_id'      => $this->testTenantId,
+            'listing_id'     => $listingId,
             'requester_id'   => $requester->id,
             'provider_id'    => $provider->id,
             'proposed_hours' => 2.0,
@@ -394,8 +424,9 @@ class AdminBrokerControllerTest extends TestCase
 
         $response = $this->apiPost("/v2/admin/broker/exchanges/{$exchangeId}/approve");
 
-        // Controller returns error (not a 422 HTTP code — it uses respondWithError without explicit status)
-        $response->assertStatus(200);
+        // respondWithError() defaults to HTTP 400; a non-approvable status yields
+        // a 400 with the INVALID_STATUS error code.
+        $response->assertStatus(400);
         $response->assertJsonPath('errors.0.code', 'INVALID_STATUS');
     }
 
@@ -408,9 +439,11 @@ class AdminBrokerControllerTest extends TestCase
         $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
         $requester = User::factory()->forTenant($this->testTenantId)->create();
         $provider = User::factory()->forTenant($this->testTenantId)->create();
+        $listingId = $this->makeListingId($this->testTenantId, $provider->id);
 
         $exchangeId = DB::table('exchange_requests')->insertGetId([
             'tenant_id'      => $this->testTenantId,
+            'listing_id'     => $listingId,
             'requester_id'   => $requester->id,
             'provider_id'    => $provider->id,
             'proposed_hours' => 2.0,
@@ -434,9 +467,11 @@ class AdminBrokerControllerTest extends TestCase
         $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
         $requester = User::factory()->forTenant($this->testTenantId)->create();
         $provider = User::factory()->forTenant($this->testTenantId)->create();
+        $listingId = $this->makeListingId($this->testTenantId, $provider->id);
 
         $exchangeId = DB::table('exchange_requests')->insertGetId([
             'tenant_id'      => $this->testTenantId,
+            'listing_id'     => $listingId,
             'requester_id'   => $requester->id,
             'provider_id'    => $provider->id,
             'proposed_hours' => 2.0,
@@ -460,9 +495,11 @@ class AdminBrokerControllerTest extends TestCase
         $adminB = User::factory()->forTenant(999)->admin()->create();
         $requester = User::factory()->forTenant($this->testTenantId)->create();
         $provider = User::factory()->forTenant($this->testTenantId)->create();
+        $listingId = $this->makeListingId($this->testTenantId, $provider->id);
 
         $exchangeId = DB::table('exchange_requests')->insertGetId([
             'tenant_id'      => $this->testTenantId,
+            'listing_id'     => $listingId,
             'requester_id'   => $requester->id,
             'provider_id'    => $provider->id,
             'proposed_hours' => 2.0,
@@ -484,10 +521,14 @@ class AdminBrokerControllerTest extends TestCase
     public function test_reject_exchange_returns_403_for_non_broker(): void
     {
         $member = User::factory()->forTenant($this->testTenantId)->create();
+        $requester = User::factory()->forTenant($this->testTenantId)->create();
+        $provider = User::factory()->forTenant($this->testTenantId)->create();
+        $listingId = $this->makeListingId($this->testTenantId, $provider->id);
         $exchangeId = DB::table('exchange_requests')->insertGetId([
             'tenant_id'      => $this->testTenantId,
-            'requester_id'   => User::factory()->forTenant($this->testTenantId)->create()->id,
-            'provider_id'    => User::factory()->forTenant($this->testTenantId)->create()->id,
+            'listing_id'     => $listingId,
+            'requester_id'   => $requester->id,
+            'provider_id'    => $provider->id,
             'proposed_hours' => 2.0,
             'status'         => 'pending_broker',
             'created_at'     => now(),
@@ -768,6 +809,7 @@ class AdminBrokerControllerTest extends TestCase
     public function test_remove_risk_tag_returns_404_for_wrong_tenant(): void
     {
         $adminB = User::factory()->forTenant(999)->admin()->create();
+        $tagger = User::factory()->forTenant($this->testTenantId)->admin()->create();
         $listing = \App\Models\Listing::factory()->forTenant($this->testTenantId)->create();
 
         // Tag exists on tenant 2
@@ -776,7 +818,7 @@ class AdminBrokerControllerTest extends TestCase
             'tenant_id'     => $this->testTenantId,
             'risk_level'    => 'low',
             'risk_category' => 'other',
-            'tagged_by'     => 1,
+            'tagged_by'     => $tagger->id,
             'created_at'    => now(),
             'updated_at'    => now(),
         ]);
@@ -1206,7 +1248,7 @@ class AdminBrokerControllerTest extends TestCase
             'target_message_sent_at' => now()->subDay(),
             'conversation_snapshot'  => '[]',
             'decision'               => 'approved',
-            'decided_by'             => $admin->id,
+            'decided_by'             => $adminB->id,
             'decided_by_name'        => 'Admin',
             'decided_at'             => now(),
             'created_at'             => now(),
@@ -1352,8 +1394,10 @@ class AdminBrokerControllerTest extends TestCase
         // Create an exchange on the test tenant
         $requester = User::factory()->forTenant($this->testTenantId)->create();
         $provider = User::factory()->forTenant($this->testTenantId)->create();
+        $listingId = $this->makeListingId($this->testTenantId, $provider->id);
         DB::table('exchange_requests')->insert([
             'tenant_id'      => $this->testTenantId,
+            'listing_id'     => $listingId,
             'requester_id'   => $requester->id,
             'provider_id'    => $provider->id,
             'proposed_hours' => 1.0,
@@ -1378,8 +1422,10 @@ class AdminBrokerControllerTest extends TestCase
         // Create an exchange on tenant 999
         $requesterB = User::factory()->forTenant(999)->create();
         $providerB = User::factory()->forTenant(999)->create();
+        $listingIdB = $this->makeListingId(999, $providerB->id);
         $exchangeIdB = DB::table('exchange_requests')->insertGetId([
             'tenant_id'      => 999,
+            'listing_id'     => $listingIdB,
             'requester_id'   => $requesterB->id,
             'provider_id'    => $providerB->id,
             'proposed_hours' => 1.0,

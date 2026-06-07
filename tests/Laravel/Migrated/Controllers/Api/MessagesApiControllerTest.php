@@ -35,6 +35,11 @@ class MessagesApiControllerTest extends LegacyBridgeTestCase
 
         TenantContext::setById(static::$legacyTestTenantId);
 
+        // MessageService::send() resolves the active tenant via app('tenant.id'),
+        // a binding normally set by the ResolveTenant middleware on HTTP requests.
+        // These tests call the service directly (no HTTP cycle), so bind it here.
+        $this->app->instance('tenant.id', static::$legacyTestTenantId);
+
         $this->messageService = $this->app->make(MessageService::class);
 
         // Create a recipient user for message tests
@@ -88,15 +93,17 @@ class MessagesApiControllerTest extends LegacyBridgeTestCase
         $this->assertNotNull($result, 'MessageService::send should return a result');
         $this->assertArrayNotHasKey('error', $result, 'Should not have error key');
 
-        // Required fields for frontend Message type
+        // Required fields. MessageService::send() returns the canonical message
+        // shape keyed on `body` (the `content` alias is only added by the read
+        // paths such as getConversations(), not by send()).
         $this->assertArrayHasKey('id', $result, 'Response must have id');
-        $this->assertArrayHasKey('content', $result, 'Response must have body');
+        $this->assertArrayHasKey('body', $result, 'Response must have body');
         $this->assertArrayHasKey('sender_id', $result, 'Response must have sender_id for frontend compatibility');
         $this->assertArrayHasKey('created_at', $result, 'Response must have created_at timestamp');
 
         // Type validation
         $this->assertIsInt($result['id'], 'id should be an integer');
-        $this->assertIsString($result['content'], 'content should be a string');
+        $this->assertIsString($result['body'], 'body should be a string');
         $this->assertIsInt($result['sender_id'], 'sender_id should be an integer');
 
         $this->assertEquals(static::$testUserId, $result['sender_id'], 'sender_id should match the sending user');
@@ -144,8 +151,12 @@ class MessagesApiControllerTest extends LegacyBridgeTestCase
             'body' => 'Test message without recipient',
         ]);
 
-        $this->assertArrayHasKey('error', $result, 'Should return error for missing recipient');
-        $this->assertStringContainsString('recipient', strtolower($result['error']));
+        // On validation failure the service returns [] and records the reason via
+        // getErrors() (the mechanism the HTTP controller surfaces as a 422).
+        $this->assertSame([], $result, 'Failed send should return an empty array');
+        $errors = $this->messageService->getErrors();
+        $this->assertNotEmpty($errors, 'Should record an error for missing recipient');
+        $this->assertStringContainsString('recipient', strtolower($errors[0]['message'] ?? ''));
     }
 
     /**
@@ -158,7 +169,9 @@ class MessagesApiControllerTest extends LegacyBridgeTestCase
             'body' => '',
         ]);
 
-        $this->assertArrayHasKey('error', $result, 'Should return error for empty body');
+        // Empty body is a validation failure: [] return + getErrors() populated.
+        $this->assertSame([], $result, 'Failed send should return an empty array');
+        $this->assertNotEmpty($this->messageService->getErrors(), 'Should record an error for empty body');
     }
 
     /**
@@ -221,7 +234,8 @@ class MessagesApiControllerTest extends LegacyBridgeTestCase
         if (!empty($result['items'])) {
             $message = $result['items'][0];
             $this->assertArrayHasKey('id', $message);
-            $this->assertArrayHasKey('content', $message);
+            // getMessages() items are raw message models keyed on `body`.
+            $this->assertArrayHasKey('body', $message);
             $this->assertArrayHasKey('created_at', $message);
             $this->assertArrayHasKey('sender', $message);
         }
@@ -248,7 +262,11 @@ class MessagesApiControllerTest extends LegacyBridgeTestCase
             $conversation = $result['items'][0];
             $this->assertArrayHasKey('id', $conversation);
             $this->assertArrayHasKey('sender', $conversation);
-            $this->assertArrayHasKey('content', $conversation);
+            // Conversation rows are raw message models (keyed on `body`) enriched
+            // with partner/unread/last_message metadata; the `content` alias lives
+            // under last_message, not at the top level.
+            $this->assertArrayHasKey('body', $conversation);
+            $this->assertArrayHasKey('content', $conversation['last_message']);
         }
     }
 }

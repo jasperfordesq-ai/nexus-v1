@@ -32,6 +32,33 @@ class RegistrationControllerTest extends TestCase
         \Illuminate\Support\Facades\Cache::forget('register_tenant_breaker:' . $this->testTenantId);
         \Illuminate\Support\Facades\Cache::forget('register_tenant_breaker:' . $this->testTenantId . ':ttl');
         \Illuminate\Support\Facades\Cache::forget('register_tenant_hourly:' . $this->testTenantId);
+
+        // Ensure registration is OPEN for the test tenant. A persistent local test DB
+        // can hold a stale `general.registration_mode = closed` row (e.g. left by other
+        // suites), which makes every register request 403 REGISTRATION_CLOSED. Seed
+        // 'open' explicitly so these tests exercise the real validation pipeline.
+        DB::table('tenant_settings')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId, 'setting_key' => 'general.registration_mode'],
+            [
+                'setting_value' => 'open',
+                'setting_type' => 'string',
+                'updated_at' => now(),
+            ]
+        );
+        DB::table('tenant_registration_policies')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId],
+            [
+                'registration_mode' => 'open',
+                'verification_level' => 'none',
+                'post_verification' => 'activate',
+                'fallback_mode' => 'none',
+                'require_email_verify' => 1,
+                'is_active' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+        app(\App\Services\TenantSettingsService::class)->clearCacheForTenant($this->testTenantId);
     }
 
     // ------------------------------------------------------------------
@@ -223,23 +250,33 @@ class RegistrationControllerTest extends TestCase
 
     public function test_register_rejects_unverified_location(): void
     {
-        $response = $this->apiPost('/v2/auth/register', [
-            'first_name' => 'Test',
-            'last_name' => 'User',
-            'email' => 'newuser-' . uniqid() . '@gmail.com',
-            'location' => '555',
-            'phone' => '+15551234567',
-            'password' => 'CoffeeMugSundayMorningPhpUnitTest2026',
-            'password_confirmation' => 'CoffeeMugSundayMorningPhpUnitTest2026',
-            'terms_accepted' => true,
-            'form_started_at' => (int) (microtime(true) * 1000) - 6000,
-            // latitude / longitude intentionally omitted — simulates the
-            // free-text bypass we've seen in the wild.
-        ]);
+        // Verified-location enforcement (reject free-text location with no coords)
+        // is OPT-IN per tenant via REGISTRATION_REQUIRE_VERIFIED_LOCATION; it is off
+        // by default so tenants without Google Maps aren't bricked. Enable it for
+        // this test so the free-text bypass we've seen in the wild is rejected.
+        putenv('REGISTRATION_REQUIRE_VERIFIED_LOCATION=true');
 
-        $this->assertSame(422, $response->getStatusCode());
-        $body = json_decode((string) $response->getContent(), true);
-        $this->assertSame('LOCATION_NOT_VERIFIED', $body['errors'][0]['code'] ?? null);
+        try {
+            $response = $this->apiPost('/v2/auth/register', [
+                'first_name' => 'Test',
+                'last_name' => 'User',
+                'email' => 'newuser-' . uniqid() . '@gmail.com',
+                'location' => '555',
+                'phone' => '+15551234567',
+                'password' => 'CoffeeMugSundayMorningPhpUnitTest2026',
+                'password_confirmation' => 'CoffeeMugSundayMorningPhpUnitTest2026',
+                'terms_accepted' => true,
+                'form_started_at' => (int) (microtime(true) * 1000) - 6000,
+                // latitude / longitude intentionally omitted — simulates the
+                // free-text bypass we've seen in the wild.
+            ]);
+
+            $this->assertSame(422, $response->getStatusCode());
+            $body = json_decode((string) $response->getContent(), true);
+            $this->assertSame('LOCATION_NOT_VERIFIED', $body['errors'][0]['code'] ?? null);
+        } finally {
+            putenv('REGISTRATION_REQUIRE_VERIFIED_LOCATION');
+        }
     }
 
     public function test_register_rejects_disposable_email_domain(): void

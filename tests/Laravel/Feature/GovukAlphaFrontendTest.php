@@ -210,6 +210,7 @@ class GovukAlphaFrontendTest extends TestCase
             'password_hash' => Hash::make('CorrectPassword123'),
             'status' => 'active',
             'is_approved' => true,
+            'email_verified_at' => now(),
         ]);
 
         $login = $this->post("/{$this->testTenantSlug}/alpha/login", [
@@ -249,6 +250,7 @@ class GovukAlphaFrontendTest extends TestCase
             'source_id' => $post->id,
             'user_id' => $user->id,
             'content' => 'Alpha feed verification post',
+            'created_at' => now()->addMinute(),
         ]);
 
         $response = $this->get("/{$this->testTenantSlug}/alpha/feed");
@@ -270,6 +272,12 @@ class GovukAlphaFrontendTest extends TestCase
 
     public function test_feed_page_has_html_auth_required_state_when_unauthenticated(): void
     {
+        // Pin the tenant display name so the community-name assertion does not depend
+        // on whatever name a persistent (non-transactional) local test DB happens to hold.
+        DB::table('tenants')->where('id', $this->testTenantId)->update(['name' => 'hOUR Timebank']);
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+
         $response = $this->get("/{$this->testTenantSlug}/alpha/feed");
 
         $response->assertOk();
@@ -333,6 +341,7 @@ class GovukAlphaFrontendTest extends TestCase
             'source_id' => $post->id,
             'user_id' => $user->id,
             'content' => 'Accessible like sync post',
+            'created_at' => now()->addMinute(),
         ]);
 
         $like = $this->post("/{$this->testTenantSlug}/alpha/feed/items/post/{$post->id}/like", [
@@ -353,7 +362,7 @@ class GovukAlphaFrontendTest extends TestCase
         $page->assertSee(__('govuk_alpha.actions.unlike'));
         $page->assertSee(trans_choice('govuk_alpha.feed.likes', 1, ['count' => 1]));
 
-        $api = $this->getJson('/api/v2/feed?per_page=20&type=posts&personalised=false');
+        $api = $this->getJson('/api/v2/feed?per_page=20&type=posts&personalised=false', $this->withTenantHeader());
         $api->assertOk();
         $apiItems = $api->json('data');
         $apiPost = collect($apiItems)->firstWhere('id', $post->id);
@@ -374,6 +383,7 @@ class GovukAlphaFrontendTest extends TestCase
             'source_id' => $post->id,
             'user_id' => $user->id,
             'content' => 'Accessible comment sync post',
+            'created_at' => now()->addMinute(),
         ]);
 
         $comment = $this->post("/{$this->testTenantSlug}/alpha/feed/items/post/{$post->id}/comments", [
@@ -397,7 +407,7 @@ class GovukAlphaFrontendTest extends TestCase
         $page->assertSee('Accessible frontend comment synced to social module.');
         $page->assertSee(trans_choice('govuk_alpha.feed.comments', 1, ['count' => 1]));
 
-        $api = $this->getJson('/api/v2/feed?per_page=20&type=posts&personalised=false');
+        $api = $this->getJson('/api/v2/feed?per_page=20&type=posts&personalised=false', $this->withTenantHeader());
         $api->assertOk();
         $apiItems = $api->json('data');
         $apiPost = collect($apiItems)->firstWhere('id', $post->id);
@@ -422,6 +432,7 @@ class GovukAlphaFrontendTest extends TestCase
             'source_id' => $visiblePost->id,
             'user_id' => $user->id,
             'content' => 'Visible alpha tenant post',
+            'created_at' => now()->addMinute(),
         ]);
 
         $otherPost = FeedPost::factory()->forTenant(999)->create([
@@ -978,7 +989,9 @@ class GovukAlphaFrontendTest extends TestCase
         $response = $this->get("/{$this->testTenantSlug}/alpha/members/{$member->id}");
 
         $response->assertOk();
-        $response->assertSee('Alpha Profile');
+        // Surnames are private by default: UserService::getPublicProfile() hides
+        // last_name from non-admin viewers, so the displayed name is the first name.
+        $response->assertSee('Alpha');
         $response->assertSee('Useful neighbour');
         $response->assertSee('Accessible member profile biography.');
         $response->assertSee(__('govuk_alpha.profile.skills_title'));
