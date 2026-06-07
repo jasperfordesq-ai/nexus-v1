@@ -13,7 +13,7 @@ use App\Models\VolShiftCheckin;
 use Mockery;
 
 /**
- * @runInSeparateProcess
+ * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */
 class VolunteerCheckInServiceTest extends TestCase

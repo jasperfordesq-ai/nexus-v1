@@ -19,7 +19,7 @@ use Tests\Laravel\TestCase;
  * SearchService inline — so a transient Meilisearch outage during signup or a
  * profile edit doesn't leave the user missing from search forever.
  *
- * @runInSeparateProcess
+ * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */
 class UserObserverTest extends TestCase

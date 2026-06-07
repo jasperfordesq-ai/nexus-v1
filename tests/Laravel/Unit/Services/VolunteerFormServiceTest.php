@@ -13,7 +13,7 @@ use App\Models\VolAccessibilityNeed;
 use Mockery;
 
 /**
- * @runInSeparateProcess
+ * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */
 class VolunteerFormServiceTest extends TestCase

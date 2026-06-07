@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Mockery;
 
 /**
- * @runInSeparateProcess
+ * @runTestsInSeparateProcesses
  * @preserveGlobalState disabled
  */
 class ShiftGroupReservationServiceTest extends TestCase
