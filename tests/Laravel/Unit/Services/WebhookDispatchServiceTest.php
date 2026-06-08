@@ -9,10 +9,41 @@ namespace Tests\Laravel\Unit\Services;
 use Tests\Laravel\TestCase;
 use App\Services\WebhookDispatchService;
 use App\Core\TenantContext;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class WebhookDispatchServiceTest extends TestCase
 {
+    /**
+     * Defensively clear any leaked DB-facade Mockery expectation before each test.
+     *
+     * Hypothesis for the polluted failure of test_createWebhook_throws_when_secret_missing:
+     * these are Unit tests that swap the DB facade with Mockery (DB::shouldReceive(...)).
+     * createWebhook() only throws InvalidArgumentException for a missing secret indirectly —
+     * an empty secret is auto-generated, then execution reaches DB::table('outbound_webhooks')
+     * ->insertGetId(...). When a stale DB-facade mock leaks in from an earlier test (in this
+     * class or another Unit class run earlier in the full suite), that insert resolves against
+     * the leaked mock instead of throwing the validation exception the test expects, so the
+     * expected InvalidArgumentException never surfaces.
+     *
+     * Resetting the DB facade (and the Mockery container) here guarantees each test starts
+     * from the real DB facade, exactly as it does when this file runs on its own.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Drop any leaked facade mocks (DB::swap/shouldReceive) from a prior test/class
+        // so the validation-then-DB path in the service behaves deterministically.
+        \Mockery::close();
+        DB::clearResolvedInstances();
+
+        Cache::flush();
+
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+    }
+
     public function test_getWebhooks_returns_array(): void
     {
         DB::shouldReceive('table')->with('outbound_webhooks')->andReturnSelf();

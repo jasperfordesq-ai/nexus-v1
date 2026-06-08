@@ -6,10 +6,12 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
+use App\Core\TenantContext;
 use App\Models\User;
 use App\Services\EmailDispatchService;
 use Tests\Laravel\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 
@@ -21,6 +23,43 @@ use Laravel\Sanctum\Sanctum;
 class EmailVerificationControllerTest extends TestCase
 {
     use DatabaseTransactions;
+
+    /**
+     * Defensively reset state that earlier (unrelated) tests in the full suite
+     * can leak into this class and that is NOT rolled back by DatabaseTransactions.
+     *
+     * Hypothesis for the polluted failure of test_resend_verification_requires_email:
+     * resendVerification() runs requireAuth() first (expects 401 when anonymous), but
+     * BaseApiController::resolveSanctumUserOptionally() probes Auth::guard('sanctum')->user()
+     * — a stale Sanctum actingAs() user left by a prior test makes the endpoint treat the
+     * caller as authenticated, skip the 401, then fall through to its file-based
+     * App\Core\RateLimiter (429) or a missing-user 404 — both outside [400,401,422].
+     *
+     * Resets, smallest-first:
+     *  - forgetGuards(): drop any leaked actingAs() user so anonymous stays anonymous.
+     *  - TenantContext reset + re-pin: clear stale token/header tenant ids before re-pinning 2.
+     *  - Cache::flush(): clear Laravel cache-backed limiter counters (array driver, safe).
+     *  - clear App\Core\RateLimiter file dir: that limiter is file-backed, NOT in the cache,
+     *    so a leaked resend counter file would otherwise survive into this run.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->app['auth']->forgetGuards();
+
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+
+        Cache::flush();
+
+        $rateLimitDir = sys_get_temp_dir() . '/nexus_ratelimit';
+        if (is_dir($rateLimitDir)) {
+            foreach (glob($rateLimitDir . '/*.json') ?: [] as $file) {
+                @unlink($file);
+            }
+        }
+    }
 
     // ------------------------------------------------------------------
     //  POST /auth/verify-email (public, rate-limited)

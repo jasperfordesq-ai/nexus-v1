@@ -13,6 +13,7 @@ use App\Models\GroupMember;
 use App\Models\User;
 use App\Services\CourseGroupService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
@@ -23,6 +24,29 @@ use Tests\Laravel\TestCase;
 class CourseControllerTest extends TestCase
 {
     use DatabaseTransactions;
+
+    /**
+     * Defensively reset auth + tenant state leaked by earlier tests in the full suite.
+     *
+     * Hypothesis for the polluted failure of test_members_only_course_detail_requires_authenticated_member:
+     * the test first requests a members-only course ANONYMOUSLY and asserts 404. The course
+     * detail endpoint uses optional auth (BaseApiController::getOptionalUserId →
+     * resolveSanctumUserOptionally → Auth::guard('sanctum')->user()). A stale Sanctum actingAs()
+     * user leaked from a prior test makes that "anonymous" request resolve as an authenticated
+     * member, so the members-only course is returned with 200 instead of the expected 404.
+     *
+     * forgetGuards() drops the leaked guard user so the anonymous request is genuinely anonymous,
+     * exactly as it is when this file runs on its own.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->app['auth']->forgetGuards();
+        Cache::flush();
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+    }
 
     private function enableCourses(bool $enabled = true): void
     {

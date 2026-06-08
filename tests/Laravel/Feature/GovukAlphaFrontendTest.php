@@ -21,6 +21,42 @@ class GovukAlphaFrontendTest extends TestCase
 {
     use DatabaseTransactions;
 
+    /**
+     * Defensively scrub request-scoped tenant/auth state that earlier tests in the
+     * full suite leak through PHP superglobals and the auth guards.
+     *
+     * Hypothesis for the polluted failure of test_root_renders_accessible_tenant_chooser:
+     * AlphaController::tenantChooser() only renders the chooser when TenantContext resolves
+     * to the host tenant (id 1). The test resets TenantContext, but on the GET '/' the context
+     * re-resolves from the request — and TenantContext::get() reads $_SERVER['HTTP_X_TENANT_ID']
+     * / HTTP_X_TENANT_SLUG / HTTP_AUTHORIZATION. A prior API request in the suite leaves
+     * X-Tenant-ID=2 (and friends) in $_SERVER, so '/' re-pins to tenant 2 and the controller
+     * redirects to the tenant home instead of returning 200 with the chooser.
+     *
+     * Clearing those superglobals (and forgetting stale guards) makes '/' resolve to the host
+     * tenant exactly as it does when this file runs on its own.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->app['auth']->forgetGuards();
+
+        foreach ([
+            'HTTP_X_TENANT_ID',
+            'HTTP_X_TENANT_SLUG',
+            'HTTP_AUTHORIZATION',
+            'REDIRECT_HTTP_AUTHORIZATION',
+        ] as $serverKey) {
+            unset($_SERVER[$serverKey]);
+        }
+
+        \App\Core\TenantContext::reset();
+        \App\Core\TenantContext::setById($this->testTenantId);
+
+        \Illuminate\Support\Facades\Cache::flush();
+    }
+
     public function test_root_renders_accessible_tenant_chooser(): void
     {
         \App\Core\TenantContext::reset();

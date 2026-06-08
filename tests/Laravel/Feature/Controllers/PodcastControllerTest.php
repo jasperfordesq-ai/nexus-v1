@@ -25,6 +25,28 @@ class PodcastControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        // Defensively reset auth + tenant state leaked by earlier tests in the full suite.
+        //
+        // Hypothesis for the polluted failure of
+        // test_anonymous_public_listens_are_recorded_without_authentication:
+        // the test exercises the anonymous-listen path and asserts the row is written under
+        // tenant 2 with user_id NULL. TenantContext re-resolves from the request, reading
+        // $_SERVER['HTTP_X_TENANT_ID'] / HTTP_AUTHORIZATION; a prior request can leave those set,
+        // pinning the wrong tenant or making the "anonymous" listener resolve as an authenticated
+        // user (so user_id is non-null / the listen is attributed elsewhere). The cache-backed
+        // listen-dedup + feature flags can likewise carry counters across tests.
+        //
+        // Clearing the guards, the leaked tenant superglobals, and the (array) cache makes this
+        // file behave in the full suite exactly as it does on its own.
+        $this->app['auth']->forgetGuards();
+        foreach (['HTTP_X_TENANT_ID', 'HTTP_X_TENANT_SLUG', 'HTTP_AUTHORIZATION', 'REDIRECT_HTTP_AUTHORIZATION'] as $serverKey) {
+            unset($_SERVER[$serverKey]);
+        }
+        \Illuminate\Support\Facades\Cache::flush();
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+
         $this->ensurePodcastTables();
     }
 

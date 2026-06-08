@@ -6,9 +6,11 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
+use App\Core\TenantContext;
 use App\Models\Group;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -18,6 +20,30 @@ use Tests\Laravel\TestCase;
 class GroupsControllerTest extends TestCase
 {
     use DatabaseTransactions;
+
+    /**
+     * Defensively reset auth + tenant state leaked by earlier tests in the full suite.
+     *
+     * Hypothesis for the polluted failure of test_members_returns_list:
+     * GroupsController::members() takes a private-group branch (the Group factory's default
+     * visibility is randomly public/private) that resolves the viewer via
+     * BaseApiController::resolveSanctumUserOptionally() — which probes Auth::guard('sanctum')->user().
+     * A stale Sanctum actingAs() user leaked from a prior test resolves as the "viewer" instead of
+     * the group owner the test just authenticated, so the membership check fails and the endpoint
+     * returns 403 ("must be a member to view members of a private group") instead of 200.
+     *
+     * forgetGuards() drops the leaked guard user so each test's Sanctum::actingAs() binds the
+     * correct viewer, exactly as it does when this file runs on its own.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->app['auth']->forgetGuards();
+        Cache::flush();
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+    }
 
     private function authenticatedUser(array $overrides = []): User
     {
