@@ -738,13 +738,6 @@ class AdminSuperServiceTest extends \Tests\Laravel\TestCase
      */
     public function testCreateTenantSeedsAttributes(): void
     {
-        // KNOWN GAP: TenantHierarchyService::seedTenantDefaults() currently seeds
-        // tenant_settings, categories, federation_tenant_features and AI docs — but NOT
-        // the attributes table (historically tenant creation also seeded default member
-        // attributes). Restoring that needs a product decision on the default attribute
-        // set, so this is flagged rather than masked. See spawn-task.
-        $this->markTestIncomplete('Default attribute seeding on tenant creation is not currently implemented (seedTenantDefaults seeds settings/categories/features only).');
-
         $result = $this->createTestTenant();
         $this->assertTrue($result['success']);
 
@@ -753,7 +746,9 @@ class AdminSuperServiceTest extends \Tests\Laravel\TestCase
             [$result['tenant_id']]
         )->fetchColumn();
 
+        // seedTenantDefaults() seeds the canonical nine-attribute default set.
         $this->assertGreaterThan(0, (int)$count, 'Attributes should be seeded');
+        $this->assertSame(9, (int)$count, 'The full default attribute set (9) should be seeded');
     }
 
     /**
@@ -761,11 +756,6 @@ class AdminSuperServiceTest extends \Tests\Laravel\TestCase
      */
     public function testCreateTenantSeedsMenus(): void
     {
-        // KNOWN GAP: seedTenantDefaults() does not seed the menus table (historically
-        // tenant creation seeded default navigation menus). Restoring it needs a product
-        // decision on the default menu set, so this is flagged rather than masked.
-        $this->markTestIncomplete('Default menu seeding on tenant creation is not currently implemented (seedTenantDefaults seeds settings/categories/features only).');
-
         $result = $this->createTestTenant();
         $this->assertTrue($result['success']);
 
@@ -774,7 +764,19 @@ class AdminSuperServiceTest extends \Tests\Laravel\TestCase
             [$result['tenant_id']]
         )->fetchColumn();
 
+        // seedTenantDefaults() seeds the Main Navigation + Footer Navigation menus.
         $this->assertGreaterThan(0, (int)$count, 'Menus should be seeded');
+        $this->assertSame(2, (int)$count, 'Both default menus (header + footer) should be seeded');
+
+        // The header menu's nested "Community" dropdown and its children should
+        // also be present, proving menu_items seeding ran (not just the menu rows).
+        $itemCount = Database::query(
+            "SELECT COUNT(*) FROM menu_items mi
+             JOIN menus m ON m.id = mi.menu_id
+             WHERE m.tenant_id = ?",
+            [$result['tenant_id']]
+        )->fetchColumn();
+        $this->assertGreaterThan(0, (int)$itemCount, 'Menu items should be seeded');
     }
 
     /**

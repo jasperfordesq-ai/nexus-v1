@@ -579,8 +579,16 @@ class TenantHierarchyService
      * Seed required default data for a newly created tenant.
      *
      * Seeds: tenant_settings (security defaults), default categories,
-     * and federation tables. This ensures a new tenant is fully functional
+     * federation tables, AI module docs, default member attributes, and
+     * default navigation menus. This ensures a new tenant is fully functional
      * from the moment it is created.
+     *
+     * Note on skills: the `skills` table is intentionally NOT seeded here.
+     * It is populated through member activity (offers/requests), never by
+     * provisioning — every healthy tenant (incl. tenant 2 'hour-timebank')
+     * has zero rows in `skills` at creation. The historical "seeds skills"
+     * note referred to the separate `skill_categories` taxonomy, not this
+     * table, so there is nothing to restore here.
      */
     private static function seedTenantDefaults(int $tenantId): void
     {
@@ -694,6 +702,232 @@ class TenantHierarchyService
                 'tenant_id' => $tenantId,
                 'error' => $e->getMessage(),
             ]);
+        }
+
+        // 5. Seed default member attributes (offer/request filters). Restores a
+        //    Laravel-migration regression — historically every new tenant was
+        //    seeded with this set. Failure is non-fatal.
+        try {
+            self::seedDefaultAttributes($tenantId);
+        } catch (\Throwable $e) {
+            Log::warning('TenantHierarchyService: seedDefaultAttributes failed', [
+                'tenant_id' => $tenantId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        // 6. Seed default navigation menus (header + footer). Restores a
+        //    Laravel-migration regression — historically every new tenant was
+        //    seeded with these menus. Failure is non-fatal.
+        try {
+            self::seedDefaultMenus($tenantId);
+        } catch (\Throwable $e) {
+            Log::warning('TenantHierarchyService: seedDefaultMenus failed', [
+                'tenant_id' => $tenantId,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Seed the default member-attribute set for a new tenant.
+     *
+     * Mirrors the canonical set every healthy tenant shares (tenant 2
+     * 'hour-timebank' and all later test tenants carry exactly these nine).
+     * The one Ireland-specific legacy term ("Garda Vetted") is replaced with
+     * the globally-neutral "Background Checked" to honour the platform's
+     * global-platform / no-locale-specific-defaults rule.
+     *
+     * Attribute names are admin-editable content (like categories), not UI
+     * chrome, so they are stored as plain strings rather than translation
+     * keys — consistent with how default categories are seeded above.
+     *
+     * Idempotent via the (tenant_id, name, target_type) unique key.
+     */
+    private static function seedDefaultAttributes(int $tenantId): void
+    {
+        // [name, target_type] — all checkbox, all active.
+        $attributes = [
+            // Offer-side trust/capability signals
+            ['Background Checked', 'offer'],
+            ['Tools Provided', 'offer'],
+            ['Materials Provided', 'offer'],
+            ['References Available', 'offer'],
+            // Request-side requirements
+            ['Tools Required', 'request'],
+            ['Materials Required', 'request'],
+            // Applies to either side
+            ['Wheelchair Accessible', 'any'],
+            ['Pet Friendly', 'any'],
+            ['Online Only', 'any'],
+        ];
+
+        $now = now();
+        foreach ($attributes as [$name, $targetType]) {
+            DB::table('attributes')->insertOrIgnore([
+                'tenant_id'   => $tenantId,
+                'name'        => $name,
+                'target_type' => $targetType,
+                'input_type'  => 'checkbox',
+                'is_active'   => 1,
+                'created_at'  => $now,
+                'updated_at'  => $now,
+            ]);
+        }
+    }
+
+    /**
+     * Seed the default navigation menus (Main Navigation + Footer Navigation)
+     * for a new tenant.
+     *
+     * Reproduces the canonical structure from the legacy menu seeder
+     * (`migrations/create_menu_and_pay_plans.sql`), which is exactly what the
+     * master tenant carries: a header menu with a nested "Community" dropdown
+     * plus a footer menu. Visibility rules gate feature/auth-dependent items so
+     * MenuManager filters them correctly per tenant.
+     *
+     * Menu/item labels are admin-editable content, stored as plain strings
+     * (consistent with categories and attributes above).
+     *
+     * Idempotent: a menu (and its items) is only seeded when no menu with the
+     * same (tenant_id, slug) already exists — menu_items have no natural unique
+     * key, so this guards against duplicate items on re-run.
+     */
+    private static function seedDefaultMenus(int $tenantId): void
+    {
+        $now = now();
+
+        // ── Main Navigation (header-main) ────────────────────────────────────
+        if (! DB::table('menus')->where('tenant_id', $tenantId)->where('slug', 'main-nav')->exists()) {
+            $mainMenuId = (int) DB::table('menus')->insertGetId([
+                'tenant_id'     => $tenantId,
+                'name'          => 'Main Navigation',
+                'slug'          => 'main-nav',
+                'description'   => 'Primary navigation menu',
+                'location'      => 'header-main',
+                'layout'        => null,
+                'min_plan_tier' => 0,
+                'is_active'     => 1,
+                'created_at'    => $now,
+                'updated_at'    => $now,
+            ]);
+
+            DB::table('menu_items')->insert([
+                'menu_id'    => $mainMenuId,
+                'type'       => 'link',
+                'label'      => 'Home',
+                'url'        => '/',
+                'sort_order' => 10,
+                'is_active'  => 1,
+                'created_at' => $now,
+            ]);
+            DB::table('menu_items')->insert([
+                'menu_id'          => $mainMenuId,
+                'type'             => 'link',
+                'label'            => 'Explore',
+                'url'              => '/listings',
+                'sort_order'       => 20,
+                'visibility_rules' => json_encode(['requires_auth' => false]),
+                'is_active'        => 1,
+                'created_at'       => $now,
+            ]);
+
+            // "Community" dropdown + its children
+            $communityId = (int) DB::table('menu_items')->insertGetId([
+                'menu_id'    => $mainMenuId,
+                'type'       => 'dropdown',
+                'label'      => 'Community',
+                'url'        => null,
+                'sort_order' => 30,
+                'is_active'  => 1,
+                'created_at' => $now,
+            ]);
+            DB::table('menu_items')->insert([
+                'menu_id'          => $mainMenuId,
+                'parent_id'        => $communityId,
+                'type'             => 'link',
+                'label'            => 'Groups',
+                'url'              => '/groups',
+                'sort_order'       => 10,
+                'visibility_rules' => json_encode(['requires_feature' => 'groups']),
+                'is_active'        => 1,
+                'created_at'       => $now,
+            ]);
+            DB::table('menu_items')->insert([
+                'menu_id'          => $mainMenuId,
+                'parent_id'        => $communityId,
+                'type'             => 'link',
+                'label'            => 'Members',
+                'url'              => '/members',
+                'sort_order'       => 20,
+                'visibility_rules' => json_encode(['requires_auth' => true]),
+                'is_active'        => 1,
+                'created_at'       => $now,
+            ]);
+            DB::table('menu_items')->insert([
+                'menu_id'    => $mainMenuId,
+                'parent_id'  => $communityId,
+                'type'       => 'link',
+                'label'      => 'Events',
+                'url'        => '/events',
+                'sort_order' => 30,
+                'is_active'  => 1,
+                'created_at' => $now,
+            ]);
+
+            DB::table('menu_items')->insert([
+                'menu_id'    => $mainMenuId,
+                'type'       => 'link',
+                'label'      => 'About',
+                'url'        => '/about',
+                'sort_order' => 40,
+                'is_active'  => 1,
+                'created_at' => $now,
+            ]);
+            DB::table('menu_items')->insert([
+                'menu_id'          => $mainMenuId,
+                'type'             => 'link',
+                'label'            => 'Dashboard',
+                'url'              => '/dashboard',
+                'sort_order'       => 50,
+                'visibility_rules' => json_encode(['requires_auth' => true, 'min_role' => 'user']),
+                'is_active'        => 1,
+                'created_at'       => $now,
+            ]);
+        }
+
+        // ── Footer Navigation (footer) ───────────────────────────────────────
+        if (! DB::table('menus')->where('tenant_id', $tenantId)->where('slug', 'footer-nav')->exists()) {
+            $footerMenuId = (int) DB::table('menus')->insertGetId([
+                'tenant_id'     => $tenantId,
+                'name'          => 'Footer Navigation',
+                'slug'          => 'footer-nav',
+                'description'   => 'Footer links',
+                'location'      => 'footer',
+                'layout'        => null,
+                'min_plan_tier' => 0,
+                'is_active'     => 1,
+                'created_at'    => $now,
+                'updated_at'    => $now,
+            ]);
+
+            $footerItems = [
+                ['Privacy Policy', '/privacy', 10],
+                ['Terms of Service', '/terms', 20],
+                ['Contact', '/contact', 30],
+                ['Help', '/help', 40],
+            ];
+            foreach ($footerItems as [$label, $url, $sort]) {
+                DB::table('menu_items')->insert([
+                    'menu_id'    => $footerMenuId,
+                    'type'       => 'link',
+                    'label'      => $label,
+                    'url'        => $url,
+                    'sort_order' => $sort,
+                    'is_active'  => 1,
+                    'created_at' => $now,
+                ]);
+            }
         }
     }
 
