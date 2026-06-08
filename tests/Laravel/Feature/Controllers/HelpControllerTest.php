@@ -8,6 +8,7 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use Tests\Laravel\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use App\Models\User;
 
@@ -61,9 +62,22 @@ class HelpControllerTest extends TestCase
     {
         $this->authenticatedUser();
 
+        // The feedback endpoint records helpfulness against a help article,
+        // keyed by article_slug. Seed a public article for the test tenant.
+        $slug = 'test-help-article-' . uniqid();
+        DB::table('help_articles')->insert([
+            'tenant_id'  => $this->testTenantId,
+            'title'      => 'Test Help Article',
+            'slug'       => $slug,
+            'content'    => 'Body',
+            'module_tag' => 'core',
+            'is_public'  => 1,
+            'created_at' => now(),
+        ]);
+
         $response = $this->apiPost('/help/feedback', [
-            'message' => 'Great platform!',
-            'rating' => 5,
+            'article_slug' => $slug,
+            'helpful'      => true,
         ]);
 
         $this->assertContains($response->getStatusCode(), [200, 201]);

@@ -33,6 +33,7 @@ class MessageServiceTest extends TestCase
         DB::shouldReceive('table')->with('messages')->andReturnSelf();
         DB::shouldReceive('selectRaw')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('when')->andReturnSelf();
         DB::shouldReceive('groupByRaw')->andReturnSelf();
         DB::shouldReceive('orderByDesc')->andReturnSelf();
         DB::shouldReceive('limit')->andReturnSelf();

@@ -34,7 +34,7 @@ class OrgTransferRequestTest extends TestCase
         $this->assertEquals('integer', $casts['requester_id']);
         $this->assertEquals('integer', $casts['recipient_id']);
         $this->assertEquals('integer', $casts['approved_by']);
-        $this->assertEquals('float', $casts['amount']);
+        $this->assertEquals('decimal:2', $casts['amount']);
         $this->assertEquals('datetime', $casts['approved_at']);
     }
 

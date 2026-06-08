@@ -38,7 +38,7 @@ class OrgTransactionTest extends TestCase
         $this->assertEquals('integer', $casts['transfer_request_id']);
         $this->assertEquals('integer', $casts['sender_id']);
         $this->assertEquals('integer', $casts['receiver_id']);
-        $this->assertEquals('float', $casts['amount']);
+        $this->assertEquals('decimal:2', $casts['amount']);
     }
 
     public function test_uses_has_tenant_scope(): void

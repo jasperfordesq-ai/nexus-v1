@@ -23,9 +23,11 @@ class MenuControllerTest extends TestCase
 
     private function authenticatedUser(): User
     {
+        // POST /menus/clear-cache calls requireAdmin() — needs an admin role.
         $user = User::factory()->forTenant($this->testTenantId)->create([
             'status' => 'active',
             'is_approved' => true,
+            'role' => 'admin',
         ]);
 
         Sanctum::actingAs($user, ['*']);

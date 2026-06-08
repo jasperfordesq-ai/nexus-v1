@@ -9,10 +9,13 @@ namespace Tests\Laravel\Unit\Services\Identity;
 use Tests\Laravel\TestCase;
 use App\Services\Identity\JumioProvider;
 use App\Services\Identity\IdentityVerificationProviderInterface;
-use Illuminate\Support\Facades\DB;
+use App\Services\Identity\TenantProviderCredentialService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class JumioProviderTest extends TestCase
 {
+    use DatabaseTransactions;
+
     private JumioProvider $provider;
 
     protected function setUp(): void
@@ -63,10 +66,8 @@ class JumioProviderTest extends TestCase
         putenv('JUMIO_API_TOKEN=');
         putenv('JUMIO_API_SECRET=');
 
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn(false);
-
-        $result = $this->provider->isAvailable(2);
+        // No tenant credentials stored for an unrelated tenant id.
+        $result = $this->provider->isAvailable(999999);
 
         $this->assertFalse($result);
     }
@@ -76,12 +77,10 @@ class JumioProviderTest extends TestCase
         putenv('JUMIO_API_TOKEN=');
         putenv('JUMIO_API_SECRET=');
 
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn([
-            'id' => 1,
-            'tenant_id' => 2,
-            'provider_slug' => 'jumio',
-            'credentials' => json_encode(['api_key' => 'token', 'webhook_secret' => 'sec']),
+        // Seed a real per-tenant credential row (encrypted at rest by the service).
+        TenantProviderCredentialService::save(2, 'jumio', [
+            'api_key' => 'token',
+            'webhook_secret' => 'sec',
         ]);
 
         $result = $this->provider->isAvailable(2);

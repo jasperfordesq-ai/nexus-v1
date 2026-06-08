@@ -110,12 +110,22 @@ class OnboardingRegressionTest extends TestCase
             'is_approved' => true,
             'onboarding_completed' => true,
         ]);
+        // Factory observers reset TenantContext to tenant 1 — re-pin to the test tenant.
+        \App\Core\TenantContext::setById($this->testTenantId);
+
+        // listing.require_category defaults to true, so supply a valid listing
+        // category for the test tenant (categories are created in setUp()).
+        $category = Category::where('tenant_id', $this->testTenantId)
+            ->where('type', 'listing')
+            ->firstOrFail();
+
         Sanctum::actingAs($user, ['*']);
 
         $response = $this->apiPost('/v2/listings', [
             'title' => 'Regression Test Listing',
             'description' => 'This listing should be created normally.',
             'type' => 'offer',
+            'category_id' => $category->id,
             'price' => 1.00,
             'hours_estimate' => 1.00,
         ]);

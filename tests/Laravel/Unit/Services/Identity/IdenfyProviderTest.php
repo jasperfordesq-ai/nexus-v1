@@ -9,10 +9,13 @@ namespace Tests\Laravel\Unit\Services\Identity;
 use Tests\Laravel\TestCase;
 use App\Services\Identity\IdenfyProvider;
 use App\Services\Identity\IdentityVerificationProviderInterface;
-use Illuminate\Support\Facades\DB;
+use App\Services\Identity\TenantProviderCredentialService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class IdenfyProviderTest extends TestCase
 {
+    use DatabaseTransactions;
+
     private IdenfyProvider $provider;
 
     protected function setUp(): void
@@ -64,10 +67,8 @@ class IdenfyProviderTest extends TestCase
         putenv('IDENFY_API_KEY=');
         putenv('IDENFY_API_SECRET=');
 
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn(false);
-
-        $result = $this->provider->isAvailable(2);
+        // No tenant credentials stored for an unrelated tenant id.
+        $result = $this->provider->isAvailable(999999);
 
         $this->assertFalse($result);
     }
@@ -77,12 +78,10 @@ class IdenfyProviderTest extends TestCase
         putenv('IDENFY_API_KEY=');
         putenv('IDENFY_API_SECRET=');
 
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn([
-            'id' => 1,
-            'tenant_id' => 2,
-            'provider_slug' => 'idenfy',
-            'credentials' => json_encode(['api_key' => 'sk', 'webhook_secret' => 'wh']),
+        // Seed a real per-tenant credential row (encrypted at rest by the service).
+        TenantProviderCredentialService::save(2, 'idenfy', [
+            'api_key' => 'sk',
+            'webhook_secret' => 'wh',
         ]);
 
         $result = $this->provider->isAvailable(2);

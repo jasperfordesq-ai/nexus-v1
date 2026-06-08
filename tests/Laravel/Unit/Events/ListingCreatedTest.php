@@ -9,7 +9,7 @@ namespace Tests\Laravel\Unit\Events;
 use App\Events\ListingCreated;
 use App\Models\Listing;
 use App\Models\User;
-use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Tests\Laravel\TestCase;
 
@@ -36,7 +36,7 @@ class ListingCreatedTest extends TestCase
         );
     }
 
-    public function test_broadcast_on_returns_public_tenant_feed_channel(): void
+    public function test_broadcast_on_returns_private_tenant_feed_channel(): void
     {
         $listing = new Listing();
         $user = new User();
@@ -45,9 +45,11 @@ class ListingCreatedTest extends TestCase
         $event = new ListingCreated($listing, $user, 7);
         $channels = $event->broadcastOn();
 
+        // Feed broadcasts use a PrivateChannel so only authenticated tenant
+        // members receive updates; the "private-" prefix is added by Laravel.
         $this->assertCount(1, $channels);
-        $this->assertInstanceOf(Channel::class, $channels[0]);
-        $this->assertEquals('tenant.7.feed', $channels[0]->name);
+        $this->assertInstanceOf(PrivateChannel::class, $channels[0]);
+        $this->assertEquals('private-tenant.7.feed', $channels[0]->name);
     }
 
     public function test_broadcast_as_returns_correct_name(): void

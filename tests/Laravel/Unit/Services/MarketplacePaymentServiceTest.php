@@ -74,9 +74,14 @@ class MarketplacePaymentServiceTest extends TestCase
 
     public function test_processRefund_uses_refund_email_category_for_webhook_dedupe(): void
     {
+        // The refund-email dedupe/send logic now lives in the dedicated
+        // sendMarketplaceRefundNotification* helpers (and the matching
+        // *HaveEvidence guard), not inline in processRefund(). It must use the
+        // 'marketplace_refund' email-log category for both the dedupe lookup and
+        // the send — never the payment-receipt category 'marketplace_payment'.
         $source = file_get_contents(app_path('Services/MarketplacePaymentService.php'));
-        $start = strpos($source, 'public static function processRefund');
-        $end = strpos($source, 'private static function handleChargeRefunded', $start);
+        $start = strpos($source, 'private static function marketplaceRefundNotificationsHaveEvidence');
+        $end = strpos($source, 'private static function handleAccountUpdated', $start);
         $method = substr($source, $start, $end - $start);
 
         $this->assertStringContainsString("'marketplace_refund'", $method);

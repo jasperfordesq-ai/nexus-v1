@@ -90,7 +90,10 @@ class ListingSkillTagServiceTest extends TestCase
 
     public function test_autocompleteTags_valid_prefix(): void
     {
-        DB::shouldReceive('table')->with('listing_skill_tags')->andReturnSelf();
+        // autocompleteTags() now joins listings (active/approved scoping) and
+        // aliases the skill-tags table as "lst".
+        DB::shouldReceive('table')->with('listing_skill_tags as lst')->andReturnSelf();
+        DB::shouldReceive('join')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
         DB::shouldReceive('distinct')->andReturnSelf();
         DB::shouldReceive('orderBy')->andReturnSelf();

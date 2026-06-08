@@ -6,6 +6,7 @@
 
 namespace Tests\Laravel\Unit\Models;
 
+use App\Core\TenantContext;
 use App\Models\Concerns\HasTenantScope;
 use App\Models\NewsletterSubscriber;
 use App\Models\User;
@@ -82,6 +83,11 @@ class NewsletterSubscriberTest extends TestCase
             'status' => 'active',
             'is_approved' => 1,
         ]);
+
+        // User::factory()->create() fires UserObserver::created(), whose indexing
+        // path resets TenantContext to tenant 1. Re-pin the test tenant before the
+        // tenant-scoped sync read so it queries tenant 999 (where the users live).
+        TenantContext::setById($this->testTenantId);
 
         $result = NewsletterSubscriber::syncMembersWithStats();
 

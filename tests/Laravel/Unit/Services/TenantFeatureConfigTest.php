@@ -87,11 +87,20 @@ class TenantFeatureConfigTest extends TestCase
         }
     }
 
-    public function test_all_defaults_are_true(): void
+    public function test_all_defaults_are_booleans(): void
     {
         foreach (TenantFeatureConfig::FEATURE_DEFAULTS as $key => $value) {
-            $this->assertTrue($value, "Feature default for '{$key}' should be true");
+            $this->assertIsBool($value, "Feature default for '{$key}' should be a boolean");
         }
+        foreach (TenantFeatureConfig::MODULE_DEFAULTS as $key => $value) {
+            $this->assertIsBool($value, "Module default for '{$key}' should be a boolean");
+        }
+    }
+
+    public function test_core_modules_default_enabled(): void
+    {
+        // Core modules are always-on; opt-in/alpha features (caring_community,
+        // marketplace, courses, etc.) intentionally default to false.
         foreach (TenantFeatureConfig::MODULE_DEFAULTS as $key => $value) {
             $this->assertTrue($value, "Module default for '{$key}' should be true");
         }

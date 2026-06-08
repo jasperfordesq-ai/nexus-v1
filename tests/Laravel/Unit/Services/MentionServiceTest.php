@@ -298,6 +298,14 @@ class MentionServiceTest extends TestCase
             ->once()
             ->andReturn((object) ['name' => 'Charlie', 'first_name' => 'Charlie']);
 
+        // createMentions: batch-load preferred_language for mentioned users
+        DB::shouldReceive('table->where->whereIn->select->get')
+            ->once()
+            ->andReturn(collect([
+                (object) ['id' => 10, 'preferred_language' => 'en'],
+                (object) ['id' => 20, 'preferred_language' => 'en'],
+            ]));
+
         // createMentions: insert mention record (called twice, once per resolved user)
         DB::shouldReceive('table->insert')->twice();
 

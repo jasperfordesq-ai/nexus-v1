@@ -6,6 +6,7 @@
 
 namespace Tests\Laravel\Feature\Services;
 
+use App\Core\TenantContext;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Services\WalletService;
@@ -76,6 +77,9 @@ class WalletServiceTest extends TestCase
             'status' => 'completed',
         ]);
 
+        // Factory creates fire observers that drift TenantContext to tenant 1;
+        // re-pin to the test tenant before the tenant-scoped service read.
+        TenantContext::setById($this->testTenantId);
         $balance = $this->service->getBalance($user->id);
 
         $this->assertEquals(3.00, $balance['total_earned']);
@@ -97,6 +101,7 @@ class WalletServiceTest extends TestCase
             'status' => 'pending',
         ]);
 
+        TenantContext::setById($this->testTenantId);
         $balance = $this->service->getBalance($user->id);
 
         // Pending transactions should not be in total_earned
@@ -118,6 +123,7 @@ class WalletServiceTest extends TestCase
             'balance' => 5.00,
         ]);
 
+        TenantContext::setById($this->testTenantId);
         $result = $this->service->transfer($sender->id, [
             'recipient' => $receiver->id,
             'amount' => 3.0,
@@ -141,6 +147,7 @@ class WalletServiceTest extends TestCase
         ]);
         $receiver = User::factory()->forTenant($this->testTenantId)->create();
 
+        TenantContext::setById($this->testTenantId);
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Insufficient balance');
 
@@ -157,6 +164,7 @@ class WalletServiceTest extends TestCase
             'balance' => 20.00,
         ]);
 
+        TenantContext::setById($this->testTenantId);
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Cannot transfer to yourself');
 
@@ -244,6 +252,7 @@ class WalletServiceTest extends TestCase
         // Create user in tenant 999 — should not be resolvable from tenant 2
         $otherTenantUser = User::factory()->forTenant(999)->create();
 
+        TenantContext::setById($this->testTenantId);
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Recipient not found');
 
@@ -269,6 +278,7 @@ class WalletServiceTest extends TestCase
             'status' => 'completed',
         ]);
 
+        TenantContext::setById($this->testTenantId);
         $result = $this->service->getTransactions($user->id, ['limit' => 10]);
 
         $this->assertArrayHasKey('items', $result);
@@ -289,6 +299,7 @@ class WalletServiceTest extends TestCase
             'status' => 'completed',
         ]);
 
+        TenantContext::setById($this->testTenantId);
         $result = $this->service->getTransactions($user->id, ['limit' => 2]);
 
         $this->assertCount(2, $result['items']);

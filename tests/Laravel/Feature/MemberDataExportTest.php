@@ -52,6 +52,7 @@ class MemberDataExportTest extends TestCase
             'password'   => password_hash('password', PASSWORD_BCRYPT),
             'balance'    => $balance,
             'status'     => 'active',
+            'is_approved' => 1,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

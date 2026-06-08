@@ -24,7 +24,7 @@ class MemberVerificationBadgeServiceTest extends TestCase
     {
         $this->assertContains('email_verified', MemberVerificationBadgeService::BADGE_TYPES);
         $this->assertContains('admin_verified', MemberVerificationBadgeService::BADGE_TYPES);
-        $this->assertCount(5, MemberVerificationBadgeService::BADGE_TYPES);
+        $this->assertCount(8, MemberVerificationBadgeService::BADGE_TYPES);
     }
 
     public function test_grantBadge_invalid_type_returns_null(): void

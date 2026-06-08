@@ -72,9 +72,13 @@ class LegalDocumentServiceTest extends TestCase
 
     public function test_getVersions_returns_array(): void
     {
-        DB::shouldReceive('table')->with('legal_document_versions')->andReturnSelf();
+        // getVersions() now tenant-scopes via a join to legal_documents and aliases
+        // the versions table as "ldv".
+        DB::shouldReceive('table')->with('legal_document_versions as ldv')->andReturnSelf();
+        DB::shouldReceive('join')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
         DB::shouldReceive('orderByDesc')->andReturnSelf();
+        DB::shouldReceive('select')->andReturnSelf();
         DB::shouldReceive('get')->andReturn(collect([]));
 
         $this->assertSame([], LegalDocumentService::getVersions(1));

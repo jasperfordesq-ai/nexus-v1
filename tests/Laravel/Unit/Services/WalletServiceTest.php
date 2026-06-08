@@ -34,12 +34,20 @@ class WalletServiceTest extends TestCase
 
         $this->mockUser->shouldReceive('newQuery')->andReturn($mockBuilder);
 
+        // getBalance() now computes all aggregates in a single selectRaw()->first()
+        // query instead of separate sum()/count() calls.
         $txnBuilder = Mockery::mock(Builder::class);
         $txnBuilder->shouldReceive('where')->andReturnSelf();
         $txnBuilder->shouldReceive('completed')->andReturnSelf();
-        $txnBuilder->shouldReceive('sum')->andReturn(25.0, 14.5, 5.0, 2.0);
-        $txnBuilder->shouldReceive('count')->andReturn(10);
+        $txnBuilder->shouldReceive('selectRaw')->andReturnSelf();
         $txnBuilder->shouldReceive('orWhere')->andReturnSelf();
+        $txnBuilder->shouldReceive('first')->andReturn((object) [
+            'total_earned' => 25.0,
+            'total_spent' => 14.5,
+            'pending_incoming' => 5.0,
+            'pending_outgoing' => 2.0,
+            'tx_count' => 10,
+        ]);
 
         $this->mockTransaction->shouldReceive('newQuery')->andReturn($txnBuilder);
 
@@ -87,7 +95,9 @@ class WalletServiceTest extends TestCase
     public function test_transfer_throws_for_self_transfer(): void
     {
         $mockBuilder = Mockery::mock(Builder::class);
-        $receiver = Mockery::mock(User::class);
+        // Use a real (unsaved) User so reading ->id doesn't trigger Mockery's
+        // setAttribute() expectation error; only ->id is read before the throw.
+        $receiver = new User();
         $receiver->id = 1;
         $mockBuilder->shouldReceive('find')->andReturn($receiver);
 

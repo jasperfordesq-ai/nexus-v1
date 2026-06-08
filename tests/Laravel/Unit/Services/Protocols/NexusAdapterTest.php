@@ -42,7 +42,7 @@ class NexusAdapterTest extends TestCase
         $this->assertEquals('/custom', $this->adapter->mapEndpoint('custom'));
     }
 
-    public function test_transformOutboundTransaction_passes_through(): void
+    public function test_transformOutboundTransaction_stamps_source_platform(): void
     {
         $tx = [
             'amount' => 2.5,
@@ -54,7 +54,9 @@ class NexusAdapterTest extends TestCase
 
         $result = $this->adapter->transformOutboundTransaction($tx, 1);
 
-        $this->assertSame($tx, $result);
+        // The adapter stamps source_platform=nexus on outbound transactions
+        // so the receiving partner can attribute the federated transfer.
+        $this->assertSame(array_merge($tx, ['source_platform' => 'nexus']), $result);
     }
 
     public function test_transformInboundMember_adds_source_platform(): void

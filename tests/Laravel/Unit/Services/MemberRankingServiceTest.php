@@ -88,6 +88,7 @@ class MemberRankingServiceTest extends TestCase
     public function test_clearCache_clears_key(): void
     {
         Cache::shouldReceive('forget')->once()->with('community_rank:2');
+        Cache::shouldReceive('forget')->once()->with('community_rank_last_persist:2');
         $this->service->clearCache();
     }
 }

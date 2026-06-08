@@ -43,8 +43,8 @@ class PartnerApiWalletReliabilityTest extends TestCase
         ]);
         $partnerId = $this->createPartner($tenantId, 'credit-partner');
         $otherPartnerId = $this->createPartner($tenantId, 'other-partner');
-        $this->createWebhookSubscription($partnerId, 'https://partner.example.test/hook');
-        $this->createWebhookSubscription($otherPartnerId, 'https://other.example.test/hook');
+        $this->createWebhookSubscription($partnerId, 'https://93.184.216.34/hook');
+        $this->createWebhookSubscription($otherPartnerId, 'https://93.184.216.35/hook');
 
         Http::fake(fn () => Http::response([], 204));
         $mailer = $this->fakeMailer();
@@ -72,7 +72,7 @@ class PartnerApiWalletReliabilityTest extends TestCase
         $this->assertCount(1, $mailer->calls);
 
         Http::assertSentCount(1);
-        Http::assertSent(fn ($request) => $request->url() === 'https://partner.example.test/hook');
+        Http::assertSent(fn ($request) => $request->url() === 'https://93.184.216.34/hook');
     }
 
     public function test_partner_wallet_credit_reference_conflict_does_not_mutate_wallet(): void

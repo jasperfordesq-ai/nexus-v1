@@ -9,10 +9,13 @@ namespace Tests\Laravel\Unit\Services\Identity;
 use Tests\Laravel\TestCase;
 use App\Services\Identity\OnfidoProvider;
 use App\Services\Identity\IdentityVerificationProviderInterface;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 
 class OnfidoProviderTest extends TestCase
 {
+    use DatabaseTransactions;
+
     private OnfidoProvider $provider;
 
     protected function setUp(): void
@@ -59,8 +62,11 @@ class OnfidoProviderTest extends TestCase
     {
         putenv('ONFIDO_API_TOKEN=');
 
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn(false);
+        // No global token and no active credential row for the tenant.
+        DB::table('tenant_provider_credentials')
+            ->where('tenant_id', 2)
+            ->where('provider_slug', 'onfido')
+            ->delete();
 
         $result = $this->provider->isAvailable(2);
 
@@ -71,12 +77,15 @@ class OnfidoProviderTest extends TestCase
     {
         putenv('ONFIDO_API_TOKEN=');
 
-        DB::shouldReceive('statement')->andReturnSelf();
-        DB::shouldReceive('fetch')->andReturn([
-            'id' => 1,
-            'tenant_id' => 2,
-            'provider_slug' => 'onfido',
-            'credentials' => json_encode(['api_key' => 'live_abc']),
+        // isAvailable() now delegates to TenantProviderCredentialService::hasCredentials(),
+        // which queries the real tenant_provider_credentials table. Seed an active row.
+        DB::table('tenant_provider_credentials')->insert([
+            'tenant_id'             => 2,
+            'provider_slug'         => 'onfido',
+            'credentials_encrypted' => 'encrypted-blob',
+            'is_active'             => 1,
+            'created_at'            => now(),
+            'updated_at'            => now(),
         ]);
 
         $result = $this->provider->isAvailable(2);

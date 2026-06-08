@@ -99,9 +99,12 @@ class MemberAvailabilityServiceTest extends TestCase
         $query = Mockery::mock();
         $query->shouldReceive('where')->andReturnSelf();
         $query->shouldReceive('orderBy')->andReturnSelf();
+        // getAvailability() calls ->get()->toArray(); Collection::toArray() only
+        // converts Arrayable items, so stdClass would survive as objects. Use real
+        // models so toArray() yields the arrays the service indexes by string key.
         $query->shouldReceive('get')->andReturn(collect([
-            (object) ['user_id' => 1, 'day_of_week' => 1, 'start_time' => '09:00', 'end_time' => '17:00', 'is_recurring' => 1, 'specific_date' => null, 'note' => null, 'id' => 1, 'tenant_id' => 2],
-            (object) ['user_id' => 2, 'day_of_week' => 1, 'start_time' => '14:00', 'end_time' => '20:00', 'is_recurring' => 1, 'specific_date' => null, 'note' => null, 'id' => 2, 'tenant_id' => 2],
+            new MemberAvailability(['user_id' => 1, 'day_of_week' => 1, 'start_time' => '09:00', 'end_time' => '17:00', 'is_recurring' => 1, 'specific_date' => null, 'note' => null, 'tenant_id' => 2]),
+            new MemberAvailability(['user_id' => 2, 'day_of_week' => 1, 'start_time' => '14:00', 'end_time' => '20:00', 'is_recurring' => 1, 'specific_date' => null, 'note' => null, 'tenant_id' => 2]),
         ]));
         $this->mockAvailability->shouldReceive('newQuery')->andReturn($query);
 
