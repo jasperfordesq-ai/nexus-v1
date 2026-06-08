@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
-use App\Services\EmailDispatchService;
+use App\Services\EmailService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -21,7 +21,7 @@ class SalesOrderController extends BaseApiController
 
     private const RECIPIENT_EMAIL = 'jasper.ford.esq@gmail.com';
 
-    public function submit(Request $request): JsonResponse
+    public function submit(Request $request, EmailService $emailService): JsonResponse
     {
         if (trim((string) $request->input('website', '')) !== '') {
             return $this->receivedResponse($this->generateReference());
@@ -71,7 +71,7 @@ class SalesOrderController extends BaseApiController
         $body = $this->renderOrderEmail($validated, $reference, $request);
         $replyTo = $this->formatReplyTo((string) $validated['contact_name'], (string) $validated['email']);
 
-        $sent = EmailDispatchService::sendWithOptions(self::RECIPIENT_EMAIL, $subject, $body, [
+        $sent = $emailService->send(self::RECIPIENT_EMAIL, $subject, $body, [
             'replyTo' => $replyTo,
             'category' => 'billing',
             'source' => self::class . '::submit',

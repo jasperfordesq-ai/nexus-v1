@@ -14,24 +14,32 @@ class RateLimitServiceTest extends TestCase
 {
     // ── check ──
 
-    public function test_check_returns_true_when_under_limit(): void
+    public function test_check_returns_false_when_under_limit(): void
     {
-        RateLimiter::shouldReceive('remaining')
+        // check() returns TRUE when rate-limited, FALSE when still allowed.
+        // Under the limit: tooManyAttempts() is false, so it records a hit and allows.
+        RateLimiter::shouldReceive('tooManyAttempts')
             ->with('test:key', 5)
-            ->andReturn(3);
-
-        $result = RateLimitService::check('test:key', 5);
-        $this->assertTrue($result);
-    }
-
-    public function test_check_returns_false_when_at_limit(): void
-    {
-        RateLimiter::shouldReceive('remaining')
-            ->with('test:key', 5)
-            ->andReturn(0);
+            ->andReturn(false);
+        RateLimiter::shouldReceive('hit')
+            ->with('test:key', 60)
+            ->andReturn(1);
 
         $result = RateLimitService::check('test:key', 5);
         $this->assertFalse($result);
+    }
+
+    public function test_check_returns_true_when_at_limit(): void
+    {
+        // At/over the limit: tooManyAttempts() is true → check() returns true (limited),
+        // and must NOT record a further hit.
+        RateLimiter::shouldReceive('tooManyAttempts')
+            ->with('test:key', 5)
+            ->andReturn(true);
+        RateLimiter::shouldReceive('hit')->never();
+
+        $result = RateLimitService::check('test:key', 5);
+        $this->assertTrue($result);
     }
 
     // ── increment ──

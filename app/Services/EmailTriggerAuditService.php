@@ -844,6 +844,10 @@ class EmailTriggerAuditService
             app_path('Services/EmailDispatchService.php'),
             app_path('Services/EmailService.php'),
             app_path('Services/EmailTriggerAuditService.php'),
+            // SalesOrderController sends its single billing enquiry via the injected
+            // EmailService, which delegates to the audited EmailDispatchService::send()
+            // (category 'billing', idempotency key) — an audited path, allow-listed here.
+            app_path('Http/Controllers/Api/SalesOrderController.php'),
         ]));
 
         $patterns = [

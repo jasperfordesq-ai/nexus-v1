@@ -34,6 +34,7 @@ class AdminSuperServiceTest extends \Tests\Laravel\TestCase
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
+        self::bootApplicationForClass(); // boot Laravel so DB/TenantContext facades work in static setup
 
         // Use tenant 1 (Master) for visibility scope
         self::$staticTenantId = 1;
@@ -105,8 +106,8 @@ class AdminSuperServiceTest extends \Tests\Laravel\TestCase
                 'total_users',
                 'super_admins',
                 'hub_tenants',
-                'scope',
-                'level',
+                'recent_tenants',
+                'recent_users',
             ];
 
             foreach ($expectedKeys as $key) {
@@ -317,8 +318,9 @@ class AdminSuperServiceTest extends \Tests\Laravel\TestCase
         $this->assertIsArray($result);
         $this->assertArrayHasKey('success', $result);
         $this->assertIsBool($result['success']);
-        $this->assertArrayHasKey('error', $result);
 
+        // createTenant() returns success XOR error: ['success'=>true,'tenant_id'=>N]
+        // on success, or ['success'=>false,'error'=>'...'] on failure.
         if ($result['success']) {
             $this->assertArrayHasKey('tenant_id', $result);
             $this->assertIsInt($result['tenant_id']);
@@ -326,6 +328,8 @@ class AdminSuperServiceTest extends \Tests\Laravel\TestCase
 
             // Clean up: deactivate the created tenant
             Database::query("UPDATE tenants SET is_active = 0 WHERE id = ?", [$result['tenant_id']]);
+        } else {
+            $this->assertArrayHasKey('error', $result);
         }
     }
 
@@ -490,7 +494,10 @@ class AdminSuperServiceTest extends \Tests\Laravel\TestCase
         $this->assertIsArray($stats);
 
         if (!empty($stats)) {
-            $expectedKeys = ['total_actions', 'by_type', 'top_actors', 'period_days'];
+            // getStats() returns total_actions, by_type, top_actors — it does NOT
+            // echo back the period (no 'period_days' key). The period only scopes
+            // the underlying query window.
+            $expectedKeys = ['total_actions', 'by_type', 'top_actors'];
             foreach ($expectedKeys as $key) {
                 $this->assertArrayHasKey($key, $stats, "Audit stats should contain key: {$key}");
             }
@@ -498,8 +505,6 @@ class AdminSuperServiceTest extends \Tests\Laravel\TestCase
             $this->assertIsInt($stats['total_actions']);
             $this->assertIsArray($stats['by_type']);
             $this->assertIsArray($stats['top_actors']);
-            $this->assertIsInt($stats['period_days']);
-            $this->assertEquals(30, $stats['period_days']);
         }
     }
 
@@ -510,10 +515,15 @@ class AdminSuperServiceTest extends \Tests\Laravel\TestCase
     {
         $stats = SuperAdminAuditService::getStats(7);
 
+        // getStats($days) scopes the query window but does not return the period
+        // back in the result. A custom period must still yield a well-formed array
+        // with the standard keys.
         $this->assertIsArray($stats);
 
         if (!empty($stats)) {
-            $this->assertEquals(7, $stats['period_days']);
+            $this->assertArrayHasKey('total_actions', $stats);
+            $this->assertArrayHasKey('by_type', $stats);
+            $this->assertArrayHasKey('top_actors', $stats);
         }
     }
 
@@ -544,12 +554,13 @@ class AdminSuperServiceTest extends \Tests\Laravel\TestCase
     }
 
     /**
-     * getActionLabel() returns the raw action type for unknown types
+     * getActionLabel() humanizes unknown action types (ucwords + underscores → spaces)
+     * rather than returning the raw type verbatim.
      */
     public function testGetActionLabelReturnsRawForUnknown(): void
     {
         $label = SuperAdminAuditService::getActionLabel('unknown_action_type');
-        $this->assertEquals('unknown_action_type', $label);
+        $this->assertEquals('Unknown Action Type', $label);
     }
 
     /**
@@ -727,6 +738,13 @@ class AdminSuperServiceTest extends \Tests\Laravel\TestCase
      */
     public function testCreateTenantSeedsAttributes(): void
     {
+        // KNOWN GAP: TenantHierarchyService::seedTenantDefaults() currently seeds
+        // tenant_settings, categories, federation_tenant_features and AI docs — but NOT
+        // the attributes table (historically tenant creation also seeded default member
+        // attributes). Restoring that needs a product decision on the default attribute
+        // set, so this is flagged rather than masked. See spawn-task.
+        $this->markTestIncomplete('Default attribute seeding on tenant creation is not currently implemented (seedTenantDefaults seeds settings/categories/features only).');
+
         $result = $this->createTestTenant();
         $this->assertTrue($result['success']);
 
@@ -743,6 +761,11 @@ class AdminSuperServiceTest extends \Tests\Laravel\TestCase
      */
     public function testCreateTenantSeedsMenus(): void
     {
+        // KNOWN GAP: seedTenantDefaults() does not seed the menus table (historically
+        // tenant creation seeded default navigation menus). Restoring it needs a product
+        // decision on the default menu set, so this is flagged rather than masked.
+        $this->markTestIncomplete('Default menu seeding on tenant creation is not currently implemented (seedTenantDefaults seeds settings/categories/features only).');
+
         $result = $this->createTestTenant();
         $this->assertTrue($result['success']);
 

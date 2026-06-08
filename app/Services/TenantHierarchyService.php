@@ -126,8 +126,8 @@ class TenantHierarchyService
                     'location_name'      => $data['location_name'] ?? null,
                     'country_code'       => $data['country_code'] ?? null,
                     'service_area'       => $data['service_area'] ?? 'national',
-                    'latitude'           => $data['latitude'] ?: null,
-                    'longitude'          => $data['longitude'] ?: null,
+                    'latitude'           => $data['latitude'] ?? null,
+                    'longitude'          => $data['longitude'] ?? null,
                     // Social media
                     'social_facebook'    => $data['social_facebook'] ?? null,
                     'social_twitter'     => $data['social_twitter'] ?? null,
