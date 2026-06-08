@@ -152,6 +152,8 @@ class ConnectionsController extends BaseApiController
 
         try {
             $connection = $this->connectionService->accept($id, $userId);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return $this->respondWithError('NOT_FOUND', __('api.connection_request_not_found'), null, 404);
         } catch (\RuntimeException $e) {
             $msg = $e->getMessage();
             $status = 422;
@@ -163,8 +165,6 @@ class ConnectionsController extends BaseApiController
             }
 
             return $this->respondWithError('INVALID_STATE', $msg, null, $status);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return $this->respondWithError('NOT_FOUND', __('api.connection_request_not_found'), null, 404);
         }
 
         // Award XP to both users for making a connection

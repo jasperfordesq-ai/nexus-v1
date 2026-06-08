@@ -42,7 +42,6 @@ class IdentityWebhookController extends BaseApiController
                 429
             );
         }
-        $this->rateLimitService->increment("webhook:identity:$ip", 60);
 
         // Extract provider slug from route
         $providerSlug = request()->route('provider_slug');

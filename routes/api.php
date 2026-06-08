@@ -109,6 +109,15 @@ Route::get('/v2/groups/{id}', [\App\Http\Controllers\Api\GroupsController::class
 Route::get('/v2/groups/{id}/members', [\App\Http\Controllers\Api\GroupsController::class, 'members']);
 
 // ============================================
+// AG44 — Public self-service tenant provisioning (NO auth — anyone may apply)
+// These are outside the auth:sanctum group so Sanctum middleware doesn't interfere.
+// ============================================
+Route::post('/v2/provisioning-requests', [\App\Http\Controllers\Api\TenantProvisioningController::class, 'submit'])
+    ->middleware('throttle:5,60');
+Route::get('/v2/provisioning-requests/check-slug/{slug}', [\App\Http\Controllers\Api\TenantProvisioningController::class, 'checkSlug']);
+Route::get('/v2/provisioning-requests/status/{token}', [\App\Http\Controllers\Api\TenantProvisioningController::class, 'status']);
+
+// ============================================
 // Authenticated routes — Sanctum token authentication required
 // Controllers also enforce auth via $this->requireAuth() as a fallback
 // ============================================
@@ -2413,6 +2422,13 @@ Route::post('/v2/admin/super/billing/delegate/revoke', [\App\Http\Controllers\Ap
 Route::post('/v2/admin/super/billing/pause', [\App\Http\Controllers\Api\AdminSuperController::class, 'pauseTenantBilling']);
 Route::post('/v2/admin/super/billing/resume', [\App\Http\Controllers\Api\AdminSuperController::class, 'resumeTenantBilling']);
 Route::post('/v2/admin/super/billing/grace-period', [\App\Http\Controllers\Api\AdminSuperController::class, 'setBillingGracePeriod']);
+
+// AG44 — Tenant provisioning queue (super-admin review + approve)
+Route::get('/v2/super-admin/provisioning-requests', [\App\Http\Controllers\Api\SuperAdmin\TenantProvisioningController::class, 'index']);
+Route::get('/v2/super-admin/provisioning-requests/{id}', [\App\Http\Controllers\Api\SuperAdmin\TenantProvisioningController::class, 'show'])->whereNumber('id');
+Route::post('/v2/super-admin/provisioning-requests/{id}/approve', [\App\Http\Controllers\Api\SuperAdmin\TenantProvisioningController::class, 'approve'])->whereNumber('id');
+Route::post('/v2/super-admin/provisioning-requests/{id}/reject', [\App\Http\Controllers\Api\SuperAdmin\TenantProvisioningController::class, 'reject'])->whereNumber('id');
+Route::post('/v2/super-admin/provisioning-requests/{id}/retry', [\App\Http\Controllers\Api\SuperAdmin\TenantProvisioningController::class, 'retry'])->whereNumber('id');
 
 }); // End Route::middleware(['auth:sanctum', 'super-admin'])
 

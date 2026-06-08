@@ -150,6 +150,10 @@ class EmailTriggerAuditService
             ['module' => 'safeguarding', 'event' => 'vetting_result', 'category' => 'vetting', 'critical' => true, 'source_table' => 'email_log'],
             ['module' => 'analytics', 'event' => 'regional_monthly_report', 'category' => 'regional_analytics', 'critical' => false, 'source_table' => 'email_log'],
             ['module' => 'billing', 'event' => 'stripe_subscription_billing', 'category' => 'billing', 'critical' => true, 'source_table' => 'email_log'],
+            ['module' => 'moderation', 'event' => 'content_hidden_removed_or_flagged', 'category' => 'moderation', 'critical' => true, 'source_table' => 'email_log'],
+            ['module' => 'jobs', 'event' => 'job_posting_approved_or_rejected', 'category' => 'job_moderation', 'critical' => true, 'source_table' => 'email_log'],
+            ['module' => 'courses', 'event' => 'course_completed', 'category' => 'course_completed', 'critical' => true, 'source_table' => 'email_log'],
+            ['module' => 'support', 'event' => 'support_report_created', 'category' => 'support_report', 'critical' => true, 'source_table' => 'email_log'],
         ];
     }
 

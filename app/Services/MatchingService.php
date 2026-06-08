@@ -90,8 +90,11 @@ class MatchingService
     public static function savePreferences($userId, array $preferences)
     {
         try {
+            $tenantId = \App\Core\TenantContext::getId();
+
             $data = [
                 'user_id'    => $userId,
+                'tenant_id'  => $tenantId,
                 'updated_at' => now(),
             ];
 
@@ -114,12 +117,14 @@ class MatchingService
             $categories = $preferences['categories'] ?? null;
 
             DB::table('match_preferences')->updateOrInsert(
-                ['user_id' => $userId],
+                ['user_id' => $userId, 'tenant_id' => $tenantId],
                 $data
             );
 
-            // Sync category preferences
-            if (is_array($categories)) {
+            // Sync category preferences only when an explicit, non-empty list is
+            // provided. An empty array (the default) means "no categories to sync"
+            // and must not touch the optional match_preference_categories table.
+            if (is_array($categories) && count($categories) > 0) {
                 DB::table('match_preference_categories')
                     ->where('user_id', $userId)
                     ->delete();
@@ -147,6 +152,7 @@ class MatchingService
         try {
             $row = DB::table('match_preferences')
                 ->where('user_id', $userId)
+                ->where('tenant_id', \App\Core\TenantContext::getId())
                 ->first();
 
             if (!$row) {

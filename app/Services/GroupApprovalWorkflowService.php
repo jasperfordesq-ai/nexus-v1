@@ -58,8 +58,8 @@ class GroupApprovalWorkflowService
 
         // Insert new approval request
         DB::insert(
-            "INSERT INTO group_approval_requests (tenant_id, group_id, submitted_by, status, notes, created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?, NOW(), NOW())",
+            "INSERT INTO group_approval_requests (tenant_id, group_id, submitted_by, status, submission_notes, created_at)
+             VALUES (?, ?, ?, ?, ?, NOW())",
             [$tenantId, $groupId, $userId, self::STATUS_PENDING, $notes]
         );
 
@@ -107,7 +107,7 @@ class GroupApprovalWorkflowService
 
         $affected = DB::update(
             "UPDATE group_approval_requests
-             SET status = ?, reviewed_by = ?, reviewer_notes = ?, updated_at = NOW()
+             SET status = ?, reviewed_by = ?, review_notes = ?, reviewed_at = NOW()
              WHERE id = ? AND tenant_id = ? AND status = ?",
             [self::STATUS_APPROVED, $approverId, $notes, $requestId, $tenantId, self::STATUS_PENDING]
         );
@@ -162,7 +162,7 @@ class GroupApprovalWorkflowService
 
         $affected = DB::update(
             "UPDATE group_approval_requests
-             SET status = ?, reviewed_by = ?, reviewer_notes = ?, updated_at = NOW()
+             SET status = ?, reviewed_by = ?, review_notes = ?, reviewed_at = NOW()
              WHERE id = ? AND tenant_id = ? AND status = ?",
             [self::STATUS_REJECTED, $rejecterId, $notes, $requestId, $tenantId, self::STATUS_PENDING]
         );

@@ -107,6 +107,7 @@ class TransactionExportService
             throw new \Symfony\Component\HttpKernel\Exception\HttpException(
                 200,
                 $csv,
+                null,
                 ['Content-Type' => 'text/csv; charset=utf-8', 'Content-Disposition' => 'attachment; filename="' . $filename . '"']
             );
         }

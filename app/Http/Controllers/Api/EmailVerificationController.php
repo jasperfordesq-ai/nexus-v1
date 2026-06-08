@@ -202,7 +202,6 @@ class EmailVerificationController extends BaseApiController
                 429
             );
         }
-        $this->rateLimitService->increment("resend_verify:$ip", 300);
 
         $email = strtolower(trim($this->input('email', '')));
         $tenantId = TenantContext::getId();

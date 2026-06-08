@@ -1166,12 +1166,14 @@ class PrerenderService
         $s = $this->summary();
         $lines = [];
 
-        $g = fn(string $name, $value, string $help, string $type = 'gauge') => array_push(
-            $lines,
-            "# HELP {$name} {$help}",
-            "# TYPE {$name} {$type}",
-            sprintf('%s %s', $name, is_bool($value) ? ($value ? 1 : 0) : $value)
-        );
+        $g = function (string $name, $value, string $help, string $type = 'gauge') use (&$lines): void {
+            array_push(
+                $lines,
+                "# HELP {$name} {$help}",
+                "# TYPE {$name} {$type}",
+                sprintf('%s %s', $name, is_bool($value) ? ($value ? 1 : 0) : $value)
+            );
+        };
 
         $g('nexus_prerender_cache_readable',     $s['cache_readable'], 'Cache mount reachable from app');
         $g('nexus_prerender_snapshots_total',    $s['total_snapshots'], 'Snapshot files on disk');

@@ -268,7 +268,7 @@ class SocialAuthService
             throw new \RuntimeException('User not found.');
         }
 
-        $hasPassword = ! empty($user->password);
+        $hasPassword = ! empty($user->password_hash) || ! empty($user->password);
         $hasPasskey = false;
         if (\Schema::hasTable('webauthn_credentials')) {
             $hasPasskey = DB::table('webauthn_credentials')

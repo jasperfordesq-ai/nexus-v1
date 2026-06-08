@@ -33,13 +33,16 @@ class PollRankingService
             return false;
         }
 
-        DB::transaction(function () use ($pollId, $userId, $rankings) {
+        $tenantId = \App\Core\TenantContext::getId();
+
+        DB::transaction(function () use ($pollId, $userId, $rankings, $tenantId) {
             foreach ($rankings as $ranking) {
                 DB::table('poll_rankings')->insert([
                     'poll_id'    => $pollId,
                     'user_id'    => $userId,
                     'option_id'  => (int) $ranking['option_id'],
                     'rank'       => (int) $ranking['rank'],
+                    'tenant_id'  => $tenantId,
                     'created_at' => now(),
                 ]);
             }
@@ -65,7 +68,7 @@ class PollRankingService
 
         $options = DB::table('poll_options')
             ->where('poll_id', $pollId)
-            ->pluck('option_text', 'id')
+            ->pluck('label', 'id')
             ->all();
 
         // Simple first-choice tally (simplified IRV)

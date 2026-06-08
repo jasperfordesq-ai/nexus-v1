@@ -527,7 +527,7 @@ class VereinFederationService
         $rows = DB::table('verein_federation_consents as c')
             ->join('vol_organizations as o', 'o.id', '=', 'c.organization_id')
             ->join('events as e', function ($join) {
-                $join->on('e.user_id', '=', 'o.user_id')->orOn('e.tenant_id', '=', 'o.tenant_id');
+                $join->on('e.user_id', '=', 'o.user_id');
             })
             ->where('c.tenant_id', $tenantId)
             ->where('c.is_active', 1)

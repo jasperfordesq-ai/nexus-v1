@@ -25,11 +25,17 @@ class RateLimitService
      * @param string $key Unique identifier (e.g., "auth:login:192.168.1.1")
      * @param int $maxAttempts Maximum number of attempts allowed
      * @param int $windowSeconds Time window in seconds
-     * @return bool True if allowed, false if rate-limited
+     * @return bool True if rate-limited (too many attempts), false if still allowed
      */
     public static function check(string $key, int $maxAttempts, int $windowSeconds = 60): bool
     {
-        return RateLimiter::remaining($key, $maxAttempts) > 0;
+        if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
+            return true;
+        }
+
+        RateLimiter::hit($key, $windowSeconds);
+
+        return false;
     }
 
     /**

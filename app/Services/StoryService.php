@@ -391,25 +391,25 @@ class StoryService
 
         // Toggle reaction: remove if same type exists, otherwise upsert
         $existing = DB::selectOne(
-            'SELECT id, reaction_type FROM story_reactions WHERE story_id = ? AND user_id = ?',
-            [$storyId, $userId]
+            'SELECT id, reaction_type FROM story_reactions WHERE story_id = ? AND user_id = ? AND tenant_id = ?',
+            [$storyId, $userId, $tenantId]
         );
 
         if ($existing) {
             if ($existing->reaction_type === $reactionType) {
                 // Same reaction — remove it (toggle off)
-                DB::delete('DELETE FROM story_reactions WHERE id = ?', [$existing->id]);
+                DB::delete('DELETE FROM story_reactions WHERE id = ? AND tenant_id = ?', [$existing->id, $tenantId]);
                 return;
             }
             // Different reaction — update in place
             DB::update(
-                'UPDATE story_reactions SET reaction_type = ?, created_at = NOW() WHERE id = ?',
-                [$reactionType, $existing->id]
+                'UPDATE story_reactions SET reaction_type = ?, created_at = NOW() WHERE id = ? AND tenant_id = ?',
+                [$reactionType, $existing->id, $tenantId]
             );
         } else {
             DB::insert(
-                'INSERT INTO story_reactions (story_id, user_id, reaction_type, created_at) VALUES (?, ?, ?, NOW())',
-                [$storyId, $userId, $reactionType]
+                'INSERT INTO story_reactions (tenant_id, story_id, user_id, reaction_type, created_at) VALUES (?, ?, ?, ?, NOW())',
+                [$tenantId, $storyId, $userId, $reactionType]
             );
         }
 
