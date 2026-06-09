@@ -19,6 +19,7 @@ import MapPin from 'lucide-react/icons/map-pin';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { safeLocalStorageGet, safeLocalStorageSetJSON } from '@/lib/safeStorage';
 
 export interface SubRegion {
   id: number;
@@ -58,7 +59,7 @@ function storageKey(tenantKey: string): string {
 
 function readCache(tenantKey: string): SubRegion[] | null {
   try {
-    const raw = window.localStorage.getItem(storageKey(tenantKey));
+    const raw = safeLocalStorageGet(storageKey(tenantKey));
     if (!raw) return null;
     const parsed = JSON.parse(raw) as CachedPayload;
     if (!parsed?.fetched_at || !Array.isArray(parsed.regions)) return null;
@@ -70,12 +71,8 @@ function readCache(tenantKey: string): SubRegion[] | null {
 }
 
 function writeCache(tenantKey: string, regions: SubRegion[]): void {
-  try {
-    const payload: CachedPayload = { fetched_at: Date.now(), regions };
-    window.localStorage.setItem(storageKey(tenantKey), JSON.stringify(payload));
-  } catch {
-    /* ignore quota / privacy-mode failures */
-  }
+  const payload: CachedPayload = { fetched_at: Date.now(), regions };
+  safeLocalStorageSetJSON(storageKey(tenantKey), payload);
 }
 
 export function SubRegionFilter({

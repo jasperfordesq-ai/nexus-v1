@@ -22,6 +22,7 @@ import UserCog from 'lucide-react/icons/user-cog';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { safeLocalStorageSet } from '@/lib/safeStorage';
 import { adminSuper, adminUsers } from '../../api/adminApi';
 import { PageHeader, ConfirmModal } from '../../components';
 import type { SuperAdminUserDetail, SuperAdminTenant } from '../../api/types';
@@ -167,7 +168,7 @@ export function UserShow() {
         toast.success(t('super.impersonation_started'));
         // Store token & navigate to member dashboard. The backend returns a
         // short-lived token scoped to the target user.
-        localStorage.setItem('impersonation_token', res.data.token);
+        safeLocalStorageSet('impersonation_token', res.data.token);
         setImpersonateModalOpen(false);
         navigate(tenantPath('/dashboard'));
       } else {

@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';import Globe from 'lucide-react/i
 import { api,
   tokenManager } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { safeLocalStorageSet } from '@/lib/safeStorage';
 import { useTenantLanguages } from '@/contexts/TenantContext';
 
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from '@/components/ui';
@@ -65,7 +66,7 @@ export function LanguageSwitcher({ compact = true, triggerClassName }: LanguageS
     i18n.changeLanguage(code);
     // Mark that the user explicitly chose a language (not auto-detected).
     // TenantContext checks this flag to decide whether to apply the tenant default.
-    localStorage.setItem('nexus_language_user_chosen', 'true');
+    safeLocalStorageSet('nexus_language_user_chosen', 'true');
 
     // Persist to user profile if authenticated
     if (tokenManager.hasAccessToken()) {

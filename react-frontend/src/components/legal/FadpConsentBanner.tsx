@@ -24,6 +24,7 @@ import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import api from '@/lib/api';
+import { safeLocalStorageGet, safeLocalStorageSet } from '@/lib/safeStorage';
 
 const STORAGE_KEY = 'fadp_consented';
 
@@ -32,7 +33,7 @@ export function FadpConsentBanner() {
   const { hasFeature } = useTenant();
 
   const [dismissed, setDismissed] = useState<boolean>(
-    () => localStorage.getItem(STORAGE_KEY) === 'true'
+    () => safeLocalStorageGet(STORAGE_KEY) === 'true'
   );
   const [loading, setLoading] = useState<'accept' | 'decline' | null>(null);
 
@@ -41,7 +42,7 @@ export function FadpConsentBanner() {
   if (dismissed) return null;
 
   const dismiss = () => {
-    localStorage.setItem(STORAGE_KEY, 'true');
+    safeLocalStorageSet(STORAGE_KEY, 'true');
     setDismissed(true);
   };
 

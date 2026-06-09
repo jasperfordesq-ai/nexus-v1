@@ -21,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { safeLocalStorageGet, safeLocalStorageSet, safeLocalStorageRemove } from '@/lib/safeStorage';
 import { Button, Modal, ModalContent, ModalHeader, ModalBody } from '@/components/ui';
 
 export type OnboardingChoice = 'recipient' | 'helper' | 'browse';
@@ -67,11 +68,7 @@ function storageKey(tenantScope?: string | null): string {
 }
 
 export function persistOnboardingChoice(choice: OnboardingChoice, tenantScope?: string | null): void {
-  try {
-    localStorage.setItem(storageKey(tenantScope), choice);
-  } catch {
-    // localStorage may be unavailable (private mode); non-fatal
-  }
+  safeLocalStorageSet(storageKey(tenantScope), choice);
   // Fire-and-forget — the choice is a UX hint, not load-bearing data.
   void api
     .put('/v2/caring-community/me/onboarding-choice', { choice })
@@ -81,23 +78,15 @@ export function persistOnboardingChoice(choice: OnboardingChoice, tenantScope?: 
 }
 
 export function readStoredOnboardingChoice(tenantScope?: string | null): OnboardingChoice | null {
-  try {
-    const raw = localStorage.getItem(storageKey(tenantScope));
-    if (raw === 'recipient' || raw === 'helper' || raw === 'browse') {
-      return raw;
-    }
-  } catch {
-    // ignore
+  const raw = safeLocalStorageGet(storageKey(tenantScope));
+  if (raw === 'recipient' || raw === 'helper' || raw === 'browse') {
+    return raw;
   }
   return null;
 }
 
 export function clearStoredOnboardingChoice(tenantScope?: string | null): void {
-  try {
-    localStorage.removeItem(storageKey(tenantScope));
-  } catch {
-    // ignore
-  }
+  safeLocalStorageRemove(storageKey(tenantScope));
 }
 
 export function OnboardingChoiceModal({ isOpen, onChoice, onClose, tenantScope }: OnboardingChoiceModalProps) {

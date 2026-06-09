@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { safeLocalStorageGet, safeLocalStorageSet, safeLocalStorageRemove } from '@/lib/safeStorage';
 
 /**
  * useDraftPersistence — Saves and restores compose form drafts from localStorage.
@@ -27,17 +28,13 @@ export function useDraftPersistence<T>(
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [value, setValueInternal] = useState<T>(() => {
-    try {
-      const stored = localStorage.getItem(key);
-      if (stored !== null) {
-        return JSON.parse(stored) as T;
-      }
-    } catch {
-      // Corrupt data — remove it and fall back to initialValue
+    const stored = safeLocalStorageGet(key);
+    if (stored !== null) {
       try {
-        localStorage.removeItem(key);
+        return JSON.parse(stored) as T;
       } catch {
-        // localStorage might be unavailable entirely; ignore
+        // Corrupt data — remove it and fall back to initialValue
+        safeLocalStorageRemove(key);
       }
     }
     return initialValue;
@@ -62,13 +59,13 @@ export function useDraftPersistence<T>(
         // Also guard against extremely large drafts (>100KB) that could cause
         // quota issues on mobile browsers with limited localStorage.
         if (serialized === JSON.stringify(initialValueRef.current)) {
-          localStorage.removeItem(keyRef.current);
+          safeLocalStorageRemove(keyRef.current);
         } else if (serialized.length <= 100_000) {
-          localStorage.setItem(keyRef.current, serialized);
+          safeLocalStorageSet(keyRef.current, serialized);
         }
         // If >100KB, silently skip — the draft is still in React state
       } catch {
-        // Quota exceeded or localStorage unavailable — silently fail
+        // JSON.stringify failed (circular ref) — silently skip
       }
       debounceRef.current = null;
     }, 2000);
@@ -90,11 +87,7 @@ export function useDraftPersistence<T>(
       clearTimeout(debounceRef.current);
       debounceRef.current = null;
     }
-    try {
-      localStorage.removeItem(keyRef.current);
-    } catch {
-      // localStorage unavailable — ignore
-    }
+    safeLocalStorageRemove(keyRef.current);
     setValueInternal(initialValueRef.current);
   }, []);
 

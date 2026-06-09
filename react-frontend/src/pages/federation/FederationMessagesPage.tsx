@@ -40,6 +40,7 @@ import { usePusherOptional } from '@/contexts/PusherContext';
 import { api } from '@/lib/api';
 import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
+import { safeLocalStorageGetJSON, safeLocalStorageSetJSON } from '@/lib/safeStorage';
 import type { FederatedMessage } from '@/types/api';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -479,13 +480,8 @@ export function FederationMessagesPage() {
 
       // Restore auto-translate preference for this thread
       const fedTranslateKey = `nexus_fed_auto_translate_${tenantSlug || 'default'}`;
-      try {
-        const prefs = JSON.parse(localStorage.getItem(fedTranslateKey) || '{}');
-        setAutoTranslateOn(!!prefs[key]);
-      } catch (err) {
-        if (import.meta.env.DEV) console.warn('[FederationMessages] Failed to parse auto-translate prefs', err);
-        setAutoTranslateOn(false);
-      }
+      const prefs = safeLocalStorageGetJSON<Record<string, string>>(fedTranslateKey, {});
+      setAutoTranslateOn(!!prefs[key]);
 
       // Mark as read
       markThreadRead(thread);
@@ -503,17 +499,17 @@ export function FederationMessagesPage() {
     if (!activeThreadKey) return;
     const fedTranslateKey = `nexus_fed_auto_translate_${tenantSlug || 'default'}`;
     try {
-      const prefs = JSON.parse(localStorage.getItem(fedTranslateKey) || '{}');
+      const prefs = safeLocalStorageGetJSON<Record<string, string>>(fedTranslateKey, {});
       if (prefs[activeThreadKey]) {
         delete prefs[activeThreadKey];
-        localStorage.setItem(fedTranslateKey, JSON.stringify(prefs));
+        safeLocalStorageSetJSON(fedTranslateKey, prefs);
         setAutoTranslateOn(false);
         setAutoTranslations(new Map());
         translatedIdsRef.current.clear();
         toast.info(t('messages.auto_translate_disabled'));
       } else {
         prefs[activeThreadKey] = userLangBase;
-        localStorage.setItem(fedTranslateKey, JSON.stringify(prefs));
+        safeLocalStorageSetJSON(fedTranslateKey, prefs);
         setAutoTranslateOn(true);
         toast.success(t('messages.auto_translate_enabled'));
       }

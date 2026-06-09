@@ -10,6 +10,7 @@
 import type { User } from '@/types/api';
 import { logError } from './logger';
 import i18n from '../i18n';
+import { safeLocalStorageGetJSON, safeLocalStorageSetJSON, safeLocalStorageRemove } from './safeStorage';
 
 type DateValue = Date | number | string;
 
@@ -233,31 +234,24 @@ export function cn(...classes: (string | undefined | null | false)[]): string {
 }
 
 /**
- * Storage helpers with error handling
+ * Storage helpers with error handling.
+ *
+ * Delegates to lib/safeStorage so writes are eviction-aware: a full localStorage
+ * triggers two-stage cache eviction and retries, rather than silently failing or
+ * crashing the caller. JSON-serializes values.
  */
 export const storage = {
   get<T>(key: string, fallbackValue: T): T {
-    try {
-      const item = localStorage.getItem(key);
-      return item ? JSON.parse(item) : fallbackValue;
-    } catch {
-      return fallbackValue;
-    }
+    return safeLocalStorageGetJSON(key, fallbackValue);
   },
 
   set<T>(key: string, value: T): void {
-    try {
-      localStorage.setItem(key, JSON.stringify(value));
-    } catch {
+    if (!safeLocalStorageSetJSON(key, value)) {
       logError(`Failed to save ${key} to localStorage`);
     }
   },
 
   remove(key: string): void {
-    try {
-      localStorage.removeItem(key);
-    } catch {
-      logError(`Failed to remove ${key} from localStorage`);
-    }
+    safeLocalStorageRemove(key);
   },
 };

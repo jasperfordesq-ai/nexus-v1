@@ -35,6 +35,7 @@ import type { MarketplaceListingItem } from '@/types/marketplace';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { safeLocalStorageGet, safeLocalStorageSet } from '@/lib/safeStorage';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
 
@@ -107,13 +108,9 @@ export function MyListingsPage() {
   const [listings, setListings] = useState<MarketplaceListingItem[]>([]);
   const [stats, setStats] = useState<SellerDashboardStats | null>(null);
   const [onboardingDone, setOnboardingDone] = useState<boolean>(true);
-  const [onboardingDismissed, setOnboardingDismissed] = useState<boolean>(() => {
-    try {
-      return localStorage.getItem('nx_merchant_onboarding_dismissed') === '1';
-    } catch {
-      return false;
-    }
-  });
+  const [onboardingDismissed, setOnboardingDismissed] = useState<boolean>(
+    () => safeLocalStorageGet('nx_merchant_onboarding_dismissed') === '1'
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isLoadingStats, setIsLoadingStats] = useState(true);
@@ -326,11 +323,7 @@ export function MyListingsPage() {
                 variant="tertiary"
                 onPress={() => {
                   setOnboardingDismissed(true);
-                  try {
-                    localStorage.setItem('nx_merchant_onboarding_dismissed', '1');
-                  } catch {
-                    /* ignore */
-                  }
+                  safeLocalStorageSet('nx_merchant_onboarding_dismissed', '1');
                 }}
               >
                 {t('common.dismiss')}

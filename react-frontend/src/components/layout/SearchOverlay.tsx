@@ -28,6 +28,7 @@ import ArrowRight from 'lucide-react/icons/arrow-right';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useTheme } from '@/contexts';
 import { api } from '@/lib/api';
+import { safeLocalStorageGetJSON, safeLocalStorageSetJSON, safeLocalStorageRemove } from '@/lib/safeStorage';
 import { Button, Kbd } from '@/components/ui';
 
 const RECENT_SEARCHES_KEY = 'nexus_recent_searches';
@@ -101,12 +102,8 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
   // ─── Load recent searches on open ──────────────────────────────────────
   useEffect(() => {
     if (!isOpen) return;
-    try {
-      const stored = localStorage.getItem(RECENT_SEARCHES_KEY);
-      if (stored) setRecentSearches(JSON.parse(stored));
-    } catch {
-      // ignore
-    }
+    const stored = safeLocalStorageGetJSON<string[]>(RECENT_SEARCHES_KEY, []);
+    if (stored.length > 0) setRecentSearches(stored);
   }, [isOpen]);
 
   // ─── Debounced search ──────────────────────────────────────────────────
@@ -155,22 +152,14 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     if (!trimmed || trimmed.length < 2) return;
     setRecentSearches(prev => {
       const updated = [trimmed, ...prev.filter(s => s !== trimmed)].slice(0, 5);
-      try {
-        localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated));
-      } catch {
-        // ignore
-      }
+      safeLocalStorageSetJSON(RECENT_SEARCHES_KEY, updated);
       return updated;
     });
   }, []);
 
   const clearRecent = useCallback(() => {
     setRecentSearches([]);
-    try {
-      localStorage.removeItem(RECENT_SEARCHES_KEY);
-    } catch {
-      // ignore
-    }
+    safeLocalStorageRemove(RECENT_SEARCHES_KEY);
   }, []);
 
   // ─── Quick actions ─────────────────────────────────────────────────────

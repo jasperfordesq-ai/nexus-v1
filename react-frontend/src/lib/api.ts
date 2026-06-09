@@ -22,6 +22,7 @@ import { validateResponse } from '@/lib/api-validation';
 import { apiResponseSchema } from '@/lib/api-schemas';
 import { captureApiCall, addSentryBreadcrumb, captureSentryMessage } from '@/lib/sentry';
 import { recordApiDiagnostic } from '@/lib/supportDiagnostics';
+import { safeLocalStorageSet } from '@/lib/safeStorage';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -114,7 +115,7 @@ function checkStaleBuild(response: Response): void {
     // (a) the new SW activates + controllerchange auto-reloads,
     // (b) a user-initiated navigation hits NetworkFirst and pulls in the
     //     fresh shell, or (c) the timer below fires the hard recovery.
-    try { localStorage.setItem(BUILD_MISMATCH_KEY, String(now)); } catch { /* non-blocking */ }
+    safeLocalStorageSet(BUILD_MISMATCH_KEY, String(now));
     addSentryBreadcrumb(
       'Stale client detected',
       'pwa',
@@ -229,89 +230,8 @@ export interface RequestOptions extends Omit<RequestInit, 'body'> {
   onUploadProgress?: (percent: number) => void;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// localStorage helpers
-// ─────────────────────────────────────────────────────────────────────────────
-
-// Keys that are safe to evict when localStorage is full — ordered cheapest first.
-// Auth tokens and tenant config are NOT in this list; they must always be stored.
-// `i18n_` is this app's real i18next-localstorage-backend prefix (configured in
-// i18n.ts as `i18n_<buildCommit>_`); `i18next_res_` is the library default and
-// is kept only for safety. The translation cache is the largest evictable
-// consumer, so it must be matched here for quota self-healing to work.
-const EVICTABLE_PREFIXES = ['i18n_', 'i18next_res_', 'nexus_connection_dismissed_'];
-const EVICTABLE_KEYS = [
-  'nexus_performance_metrics',
-  'nexus_recent_searches',
-  'nexus_recent_pages',
-  'nexus_proximity',
-];
-
-// Last-resort allowlist: anything NOT in this set is wiped if storage is still
-// full after the soft eviction above. Auth tokens, tenant identity, and a few
-// cheap user-preference keys survive; everything else (drafts, caches, UI
-// state) is sacrificed so the user can keep using the app.
-const CRITICAL_KEYS = new Set([
-  'nexus_access_token',
-  'nexus_refresh_token',
-  'nexus_tenant_id',
-  'nexus_tenant_slug',
-  'nexus_theme',
-  'nexus_language_user_chosen',
-  'userId',
-]);
-
-function evictNonCriticalStorage(): void {
-  const toRemove: string[] = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (!key) continue;
-    if (EVICTABLE_KEYS.includes(key) || EVICTABLE_PREFIXES.some((p) => key.startsWith(p))) {
-      toRemove.push(key);
-    }
-  }
-  toRemove.forEach((k) => localStorage.removeItem(k));
-}
-
-function evictAllNonCritical(): void {
-  const toRemove: string[] = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (!key) continue;
-    if (!CRITICAL_KEYS.has(key)) toRemove.push(key);
-  }
-  toRemove.forEach((k) => localStorage.removeItem(k));
-}
-
-function safeLocalStorageSet(key: string, value: string): void {
-  try {
-    localStorage.setItem(key, value);
-  } catch (e) {
-    if (e instanceof DOMException && (e.name === 'QuotaExceededError' || e.code === 22)) {
-      // Stage 1: soft eviction (caches + dismissed banners only).
-      evictNonCriticalStorage();
-      try {
-        localStorage.setItem(key, value);
-        return;
-      } catch (e2) {
-        if (!(e2 instanceof DOMException) || (e2.name !== 'QuotaExceededError' && (e2 as DOMException).code !== 22)) {
-          throw e2;
-        }
-      }
-      // Stage 2: aggressive eviction — wipe everything except the critical
-      // allowlist. Sacrifices drafts/UI state to keep the user signed in.
-      evictAllNonCritical();
-      try {
-        localStorage.setItem(key, value);
-        return;
-      } catch {
-        // Still full after wiping non-critical keys means the value itself
-        // exceeds quota (e.g. an oversized token). Log so we can investigate.
-        console.error(`[NEXUS] localStorage quota exceeded storing "${key}" — even after full eviction. Value size: ${value.length} chars.`);
-      }
-    }
-  }
-}
+// localStorage writes go through `safeLocalStorageSet` (imported from
+// lib/safeStorage) so a full store triggers eviction instead of throwing.
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Token Management

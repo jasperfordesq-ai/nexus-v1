@@ -16,6 +16,7 @@
  */
 
 import { api } from '@/lib/api';
+import { safeLocalStorageGetJSON, safeLocalStorageSetJSON } from '@/lib/safeStorage';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -169,33 +170,23 @@ export function trackError(error: Error, context?: string): void {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function storeMetric(metric: PerformanceMetric): void {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    const metrics: PerformanceMetric[] = stored ? JSON.parse(stored) : [];
+  const metrics = safeLocalStorageGetJSON<PerformanceMetric[]>(STORAGE_KEY, []);
 
-    metrics.push(metric);
+  metrics.push(metric);
 
-    // Keep only the latest MAX_STORED_METRICS
-    if (metrics.length > MAX_STORED_METRICS) {
-      metrics.splice(0, metrics.length - MAX_STORED_METRICS);
-    }
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(metrics));
-  } catch (e) {
-    console.warn('Failed to store performance metric:', e);
+  // Keep only the latest MAX_STORED_METRICS
+  if (metrics.length > MAX_STORED_METRICS) {
+    metrics.splice(0, metrics.length - MAX_STORED_METRICS);
   }
+
+  safeLocalStorageSetJSON(STORAGE_KEY, metrics);
 }
 
 /**
  * Get stored metrics (dev mode)
  */
 export function getStoredMetrics(): PerformanceMetric[] {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch {
-    return [];
-  }
+  return safeLocalStorageGetJSON<PerformanceMetric[]>(STORAGE_KEY, []);
 }
 
 /**

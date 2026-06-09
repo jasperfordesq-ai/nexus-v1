@@ -32,6 +32,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { safeLocalStorageGet, safeLocalStorageSetJSON, safeLocalStorageRemove } from '@/lib/safeStorage';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 
@@ -93,7 +94,7 @@ export function EmployerOnboardingPage() {
 
   const [state, setState] = useState<WizardState>(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = safeLocalStorageGet(STORAGE_KEY);
       if (saved) {
         return { ...INITIAL_STATE, ...JSON.parse(saved) };
       }
@@ -108,11 +109,7 @@ export function EmployerOnboardingPage() {
 
   // Persist state to localStorage
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch {
-      // ignore
-    }
+    safeLocalStorageSetJSON(STORAGE_KEY, state);
   }, [state]);
 
   const updateState = useCallback((updates: Partial<WizardState>) => {
@@ -161,7 +158,7 @@ export function EmployerOnboardingPage() {
       if (response.success && response.data) {
         const jobId = response.data.id;
         updateState({ createdJobId: jobId, step: 3 });
-        try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
+        safeLocalStorageRemove(STORAGE_KEY);
         toast.success(t('form.create_success'));
       } else {
         toast.error(response.error || t('form.create_error'));
@@ -175,11 +172,7 @@ export function EmployerOnboardingPage() {
   };
 
   const handleFinish = () => {
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-    } catch {
-      // ignore
-    }
+    safeLocalStorageRemove(STORAGE_KEY);
     navigate(tenantPath('/jobs'));
   };
 

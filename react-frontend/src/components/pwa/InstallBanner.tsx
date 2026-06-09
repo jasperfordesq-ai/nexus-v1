@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';import X from 'lucide-react/icons/x';
 import Download from 'lucide-react/icons/download';
 import { useInstallPrompt, shouldOfferInstall } from '@/lib/installPrompt';
+import { safeLocalStorageGet, safeLocalStorageSet } from '@/lib/safeStorage';
 import { IosInstallModal } from './IosInstallModal';
 import { Button } from '@/components/ui';
 
@@ -37,12 +38,12 @@ export function InstallBanner() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (!shouldOfferInstall(state)) return;
-    if (window.localStorage.getItem(DISMISS_KEY) === '1') return;
+    if (safeLocalStorageGet(DISMISS_KEY) === '1') return;
 
-    let firstSeen = Number(window.localStorage.getItem(FIRST_SEEN_KEY) || 0);
+    let firstSeen = Number(safeLocalStorageGet(FIRST_SEEN_KEY) || 0);
     if (!firstSeen) {
       firstSeen = Date.now();
-      window.localStorage.setItem(FIRST_SEEN_KEY, String(firstSeen));
+      safeLocalStorageSet(FIRST_SEEN_KEY, String(firstSeen));
     }
 
     const elapsed = Date.now() - firstSeen;
@@ -58,7 +59,7 @@ export function InstallBanner() {
 
   const dismiss = () => {
     setVisible(false);
-    try { window.localStorage.setItem(DISMISS_KEY, '1'); } catch { /* private mode — ignore */ }
+    safeLocalStorageSet(DISMISS_KEY, '1');
   };
 
   const onInstall = () => {

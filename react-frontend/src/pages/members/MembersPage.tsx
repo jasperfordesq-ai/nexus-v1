@@ -1,4 +1,3 @@
-import { Select, SelectItem, GlassCard, MemberCardSkeleton, AlgorithmLabel, useAlgorithmInfo, Button, ToggleButton, ToggleButtonGroup, Chip, SearchField, Avatar, Tooltip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -8,6 +7,7 @@ import { Select, SelectItem, GlassCard, MemberCardSkeleton, AlgorithmLabel, useA
  * Members Page - Community member directory
  */
 
+import { Select, SelectItem, GlassCard, MemberCardSkeleton, AlgorithmLabel, useAlgorithmInfo, Button, ToggleButton, ToggleButtonGroup, Chip, SearchField, Avatar, Tooltip } from '@/components/ui';
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from '@/lib/motion';
@@ -38,6 +38,7 @@ import { usePresenceOptional } from '@/contexts/PresenceContext';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { safeLocalStorageGet, safeLocalStorageSet } from '@/lib/safeStorage';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { usePageTitle } from '@/hooks';
 import type { User } from '@/types/api';
@@ -87,14 +88,7 @@ export function MembersPage() {
   const rawSort = searchParams.get('sort');
   const initialSort: SortOption | null = rawSort && (VALID_SORTS as string[]).includes(rawSort) ? rawSort as SortOption : null;
   const [sortBy, setSortBy] = useState<SortOption | null>(initialSort);
-  const storedViewMode = (() => {
-    try {
-      return localStorage.getItem('members_view_mode');
-    } catch {
-      // localStorage unavailable (private mode / blocked) — fall back to default
-      return null;
-    }
-  })();
+  const storedViewMode = safeLocalStorageGet('members_view_mode');
   const [viewMode, setViewMode] = useState<ViewMode>(
     storedViewMode && (VALID_VIEW_MODES as string[]).includes(storedViewMode) ? storedViewMode as ViewMode : 'grid'
   );
@@ -145,11 +139,7 @@ export function MembersPage() {
   // A bare preference write is tiny; a QuotaExceededError here means storage is
   // already full of something else, and the preference simply won't persist.
   useEffect(() => {
-    try {
-      localStorage.setItem('members_view_mode', viewMode);
-    } catch {
-      // storage full / unavailable (private mode) — non-fatal, skip persistence
-    }
+    safeLocalStorageSet('members_view_mode', viewMode);
   }, [viewMode]);
 
   useEffect(() => {

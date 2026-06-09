@@ -26,6 +26,7 @@ import {
 } from 'react';
 import { api, tokenManager } from '@/lib/api';
 import { logWarn } from '@/lib/logger';
+import { safeLocalStorageGet, safeLocalStorageSet, safeLocalStorageSetJSON } from '@/lib/safeStorage';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -153,7 +154,7 @@ function applyPreferencesToDOM(prefs: ThemePreferences): void {
 
 function getStoredTheme(): ThemeMode | null {
   if (typeof localStorage === 'undefined') return null;
-  const stored = localStorage.getItem(THEME_STORAGE_KEY);
+  const stored = safeLocalStorageGet(THEME_STORAGE_KEY);
   if (stored === 'light' || stored === 'dark' || stored === 'system') {
     return stored;
   }
@@ -162,17 +163,13 @@ function getStoredTheme(): ThemeMode | null {
 
 function storeTheme(theme: ThemeMode): void {
   if (typeof localStorage === 'undefined') return;
-  try {
-    localStorage.setItem(THEME_STORAGE_KEY, theme);
-  } catch {
-    // QuotaExceededError or storage disabled — non-fatal, theme still applies in-memory
-  }
+  safeLocalStorageSet(THEME_STORAGE_KEY, theme);
 }
 
 function getStoredPreferences(): ThemePreferences | null {
   if (typeof localStorage === 'undefined') return null;
   try {
-    const stored = localStorage.getItem(THEME_PREFS_STORAGE_KEY);
+    const stored = safeLocalStorageGet(THEME_PREFS_STORAGE_KEY);
     if (stored) {
       const parsed = JSON.parse(stored);
       return {
@@ -193,11 +190,7 @@ function getStoredPreferences(): ThemePreferences | null {
 
 function storePreferences(prefs: ThemePreferences): void {
   if (typeof localStorage === 'undefined') return;
-  try {
-    localStorage.setItem(THEME_PREFS_STORAGE_KEY, JSON.stringify(prefs));
-  } catch {
-    // QuotaExceededError or storage disabled — non-fatal, prefs still apply in-memory
-  }
+  safeLocalStorageSetJSON(THEME_PREFS_STORAGE_KEY, prefs);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -309,7 +302,7 @@ export function ThemeProvider({
   // This fires once on mount and re-syncs if the OS setting changes at runtime.
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const hasStoredPrefs = !!localStorage.getItem(THEME_PREFS_STORAGE_KEY);
+    const hasStoredPrefs = !!safeLocalStorageGet(THEME_PREFS_STORAGE_KEY);
     if (hasStoredPrefs) return; // user has an explicit preference — don't override
 
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');

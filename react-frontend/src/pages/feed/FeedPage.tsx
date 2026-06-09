@@ -45,6 +45,7 @@ import { api } from '@/lib/api';
 import { applyFeedSyncToItem, dispatchFeedSync, FEED_SYNC_EVENT, type FeedSyncPayload } from '@/lib/feedSync';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { safeLocalStorageGet, safeLocalStorageSet } from '@/lib/safeStorage';
 import { usePageTitle } from '@/hooks';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
@@ -158,7 +159,7 @@ export function FeedPage() {
   const [feedMode, setFeedMode] = useState<'ranking' | 'recent'>(() => {
     const urlMode = searchParams.get('mode');
     if (urlMode === 'ranking' || urlMode === 'recent') return urlMode;
-    const stored = localStorage.getItem(FEED_MODE_KEY);
+    const stored = safeLocalStorageGet(FEED_MODE_KEY);
     return stored === 'ranking' || stored === 'recent' ? stored : 'ranking';
   });
 
@@ -913,7 +914,7 @@ export function FeedPage() {
       {/* Feed controls */}
       <section data-testid="feed-controls" aria-label={t('controls_region_label')} className="w-full min-w-0 max-w-full space-y-3 overflow-hidden rounded-xl border border-theme-default bg-[var(--surface-base)]/95 px-3 py-3 shadow-sm sm:px-4">
         <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <FeedModeToggle mode={feedMode} onModeChange={(mode) => { localStorage.setItem(FEED_MODE_KEY, mode); setFeedMode(mode); syncToUrl({ mode }); }} />
+          <FeedModeToggle mode={feedMode} onModeChange={(mode) => { safeLocalStorageSet(FEED_MODE_KEY, mode); setFeedMode(mode); syncToUrl({ mode }); }} />
           {hasActiveFeedView && (
             <Button
               isIconOnly

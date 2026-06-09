@@ -21,6 +21,7 @@
 
 import { createContext, useContext, useState, useCallback, useMemo, useEffect, useRef, type ReactNode } from 'react';
 import { api, tokenManager } from '@/lib/api';
+import { safeLocalStorageGet, safeLocalStorageRemove, safeLocalStorageSetJSON } from '@/lib/safeStorage';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -69,14 +70,14 @@ const CONSENT_MAX_AGE_MS = 6 * 30 * 24 * 60 * 60 * 1000; // ~6 months
  */
 export function readStoredConsent(): CookieConsent | null {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = safeLocalStorageGet(STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
     if (parsed && typeof parsed.essential === 'boolean' && typeof parsed.timestamp === 'string') {
       // Check expiry — re-prompt after 6 months
       const age = Date.now() - new Date(parsed.timestamp).getTime();
       if (age > CONSENT_MAX_AGE_MS) {
-        localStorage.removeItem(STORAGE_KEY);
+        safeLocalStorageRemove(STORAGE_KEY);
         return null;
       }
       return parsed as CookieConsent;
@@ -151,7 +152,7 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
 
   const persist = useCallback((newConsent: CookieConsent) => {
     setConsent(newConsent);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newConsent));
+    safeLocalStorageSetJSON(STORAGE_KEY, newConsent);
     syncConsentToServer(newConsent);
   }, []);
 
@@ -169,7 +170,7 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
       // If no local consent, use server consent (e.g. new device)
       if (!localConsent) {
         setConsent(serverConsent);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(serverConsent));
+        safeLocalStorageSetJSON(STORAGE_KEY, serverConsent);
         return;
       }
 
@@ -178,7 +179,7 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
       const serverTime = new Date(serverConsent.timestamp).getTime();
       if (serverTime > localTime) {
         setConsent(serverConsent);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(serverConsent));
+        safeLocalStorageSetJSON(STORAGE_KEY, serverConsent);
       }
     });
   }, []);
@@ -227,7 +228,7 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
 
   const resetConsent = useCallback(() => {
     setConsent(null);
-    localStorage.removeItem(STORAGE_KEY);
+    safeLocalStorageRemove(STORAGE_KEY);
   }, []);
 
   const showBanner = consent === null;

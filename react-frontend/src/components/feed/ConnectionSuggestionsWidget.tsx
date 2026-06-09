@@ -21,6 +21,7 @@ import { useFeature, useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
+import { safeLocalStorageGetJSON, safeLocalStorageSetJSON } from '@/lib/safeStorage';
 
 /* ─── Types ────────────────────────────────────────────────── */
 
@@ -42,19 +43,14 @@ interface ConnectionSuggestionsWidgetProps {
 /* ─── Dismissed storage ────────────────────────────────────── */
 
 function getDismissed(key: string): number[] {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
+  return safeLocalStorageGetJSON<number[]>(key, []);
 }
 
 function addDismissed(key: string, userId: number): void {
   const list = getDismissed(key);
   if (!list.includes(userId)) {
     list.push(userId);
-    localStorage.setItem(key, JSON.stringify(list.slice(-100)));
+    safeLocalStorageSetJSON(key, list.slice(-100));
   }
 }
 

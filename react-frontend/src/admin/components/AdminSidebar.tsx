@@ -21,6 +21,7 @@ import { ScrollShadow } from '@/components/ui';
 import { useAuth,
   useTenant } from '@/contexts';
 import { api } from '@/lib/api';
+import { safeLocalStorageGet, safeLocalStorageSetJSON } from '@/lib/safeStorage';
 import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
 import Users from 'lucide-react/icons/users';
 import ListChecks from 'lucide-react/icons/list-checks';
@@ -157,7 +158,7 @@ const ZONES: NavZone[] = [
 
 function readRecentPages(): RecentPage[] {
   try {
-    const raw = localStorage.getItem(RECENT_PAGES_KEY);
+    const raw = safeLocalStorageGet(RECENT_PAGES_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as unknown;
     if (!Array.isArray(parsed)) return [];
@@ -176,11 +177,7 @@ function readRecentPages(): RecentPage[] {
 function saveRecentPage(page: RecentPage): RecentPage[] {
   const existing = readRecentPages();
   const updated = [page, ...existing.filter((p) => p.href !== page.href)].slice(0, RECENT_PAGES_MAX);
-  try {
-    localStorage.setItem(RECENT_PAGES_KEY, JSON.stringify(updated));
-  } catch {
-    // Ignore storage quota and private-mode errors.
-  }
+  safeLocalStorageSetJSON(RECENT_PAGES_KEY, updated);
   return updated;
 }
 

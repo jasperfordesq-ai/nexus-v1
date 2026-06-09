@@ -40,6 +40,7 @@ import type { NewMessageEvent, TypingEvent } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { safeLocalStorageGet, safeLocalStorageSet, safeLocalStorageGetJSON, safeLocalStorageSetJSON } from '@/lib/safeStorage';
 import type { Message, User } from '@/types/api';
 import { MessageContextCard } from '@/components/messages/MessageContextCard';
 import { MessageBubble } from './components/MessageBubble';
@@ -165,18 +166,18 @@ export function ConversationPage() {
   const TRANSLATION_HINT_KEY = `nexus_translation_hint_dismissed_${tenantScope}`;
   const translationFeatureEnabled = hasFeature('message_translation');
   const [translationHintDismissed, setTranslationHintDismissed] = useState(() =>
-    localStorage.getItem(TRANSLATION_HINT_KEY) === '1'
+    safeLocalStorageGet(TRANSLATION_HINT_KEY) === '1'
   );
   const dismissTranslationHint = useCallback(() => {
     setTranslationHintDismissed(true);
-    localStorage.setItem(TRANSLATION_HINT_KEY, '1');
+    safeLocalStorageSet(TRANSLATION_HINT_KEY, '1');
   }, [TRANSLATION_HINT_KEY]);
 
   // ── Auto-translate state (scoped to tenant) ──────────────────────────────
   const STORAGE_KEY = `nexus_auto_translate_${tenantScope}`;
 
   function getAutoTranslatePrefs(): Record<string, string> {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch { return {}; }
+    return safeLocalStorageGetJSON<Record<string, string>>(STORAGE_KEY, {});
   }
 
   function isAutoTranslateEnabled(otherUserId: number): boolean {
@@ -187,11 +188,11 @@ export function ConversationPage() {
     const prefs = getAutoTranslatePrefs();
     if (prefs[String(otherUserId)]) {
       delete prefs[String(otherUserId)];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+      safeLocalStorageSetJSON(STORAGE_KEY, prefs);
       return false;
     } else {
       prefs[String(otherUserId)] = targetLang;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+      safeLocalStorageSetJSON(STORAGE_KEY, prefs);
       return true;
     }
   }
