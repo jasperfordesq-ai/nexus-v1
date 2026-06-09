@@ -346,6 +346,34 @@ describe('AdminSidebar', () => {
     expect(screen.getByRole('link', { name: 'Menus' })).toHaveAttribute('href', '/test/admin/menus');
   });
 
+  it('shows the Module Configuration link to super admins', () => {
+    render(
+      <W><AdminSidebar collapsed={false} onToggle={mockOnToggle} /></W>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Platform Operations' }));
+
+    expect(screen.getByRole('link', { name: 'Module Configuration' })).toHaveAttribute('href', '/test/admin/module-configuration');
+  });
+
+  it('hides the Module Configuration link from non-super admins', () => {
+    Object.assign(mockUser, {
+      role: 'admin',
+      is_super_admin: false,
+      is_tenant_super_admin: false,
+      is_god: false,
+    });
+
+    render(
+      <W><AdminSidebar collapsed={false} onToggle={mockOnToggle} /></W>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Platform Operations' }));
+
+    expect(screen.getByRole('link', { name: 'Settings' })).toHaveAttribute('href', '/test/admin/settings');
+    expect(screen.queryByRole('link', { name: 'Module Configuration' })).not.toBeInTheDocument();
+  });
+
   it('applies w-16 class when collapsed', () => {
     const { container } = render(
       <W><AdminSidebar collapsed={true} onToggle={mockOnToggle} /></W>

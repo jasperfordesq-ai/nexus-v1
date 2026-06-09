@@ -479,7 +479,7 @@ function useAdminNav(safeguardingFlagCount: number): NavSection[] {
         items: [
           { label: t('settings'), href: '/admin/settings', icon: Settings },
           { label: t('onboarding_settings'), href: '/admin/onboarding-settings', icon: Heart },
-          { label: t('module_configuration'), href: '/admin/module-configuration', icon: Puzzle },
+          ...(isSuperAdmin ? [{ label: t('module_configuration'), href: '/admin/module-configuration', icon: Puzzle }] : []),
           { label: t('operations'), href: '/admin/operations', icon: Activity },
           { label: t('support_reports'), href: '/admin/support-reports', icon: Bug, keywords: keyword('bugs', 'feedback', 'diagnostics', 'sentry') },
           { label: t('translation_config'), href: '/admin/translation-config', icon: Languages },
