@@ -87,7 +87,14 @@ export function MembersPage() {
   const rawSort = searchParams.get('sort');
   const initialSort: SortOption | null = rawSort && (VALID_SORTS as string[]).includes(rawSort) ? rawSort as SortOption : null;
   const [sortBy, setSortBy] = useState<SortOption | null>(initialSort);
-  const storedViewMode = localStorage.getItem('members_view_mode');
+  const storedViewMode = (() => {
+    try {
+      return localStorage.getItem('members_view_mode');
+    } catch {
+      // localStorage unavailable (private mode / blocked) — fall back to default
+      return null;
+    }
+  })();
   const [viewMode, setViewMode] = useState<ViewMode>(
     storedViewMode && (VALID_VIEW_MODES as string[]).includes(storedViewMode) ? storedViewMode as ViewMode : 'grid'
   );
@@ -134,9 +141,15 @@ export function MembersPage() {
   // Keep ref in sync for offset calculation without stale closures
   useEffect(() => { membersCountRef.current = members.length; }, [members.length]);
 
-  // Persist view mode
+  // Persist view mode — never let a full or blocked localStorage crash the page.
+  // A bare preference write is tiny; a QuotaExceededError here means storage is
+  // already full of something else, and the preference simply won't persist.
   useEffect(() => {
-    localStorage.setItem('members_view_mode', viewMode);
+    try {
+      localStorage.setItem('members_view_mode', viewMode);
+    } catch {
+      // storage full / unavailable (private mode) — non-fatal, skip persistence
+    }
   }, [viewMode]);
 
   useEffect(() => {

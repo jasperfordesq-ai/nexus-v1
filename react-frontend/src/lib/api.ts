@@ -235,7 +235,11 @@ export interface RequestOptions extends Omit<RequestInit, 'body'> {
 
 // Keys that are safe to evict when localStorage is full — ordered cheapest first.
 // Auth tokens and tenant config are NOT in this list; they must always be stored.
-const EVICTABLE_PREFIXES = ['i18next_res_', 'nexus_connection_dismissed_'];
+// `i18n_` is this app's real i18next-localstorage-backend prefix (configured in
+// i18n.ts as `i18n_<buildCommit>_`); `i18next_res_` is the library default and
+// is kept only for safety. The translation cache is the largest evictable
+// consumer, so it must be matched here for quota self-healing to work.
+const EVICTABLE_PREFIXES = ['i18n_', 'i18next_res_', 'nexus_connection_dismissed_'];
 const EVICTABLE_KEYS = [
   'nexus_performance_metrics',
   'nexus_recent_searches',

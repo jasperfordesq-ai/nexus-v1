@@ -51,6 +51,32 @@ const localeBackendOptions = import.meta.env.DEV
       },
     ];
 
+// The production LocalStorageBackend namespaces its cache under
+// `i18n_<buildCommit>_`. Because the prefix changes on every deploy, each
+// build's cached translations (11 locales × ~60 namespaces) are abandoned and
+// never reclaimed — across many deploys they accumulate until localStorage hits
+// its quota, at which point ANY setItem (even a tiny UI preference) throws
+// QuotaExceededError and can crash a page. Purge every orphaned i18n_ cache
+// whose prefix doesn't match the current build so storage stays bounded.
+const I18N_CACHE_PREFIX = `i18n_${__BUILD_COMMIT__}_`;
+const purgeOrphanedI18nCaches = () => {
+  if (import.meta.env.DEV) return; // LocalStorageBackend is not used in dev
+  try {
+    const stale: string[] = [];
+    for (let i = 0; i < window.localStorage.length; i++) {
+      const key = window.localStorage.key(i);
+      if (key && key.startsWith('i18n_') && !key.startsWith(I18N_CACHE_PREFIX)) {
+        stale.push(key);
+      }
+    }
+    stale.forEach((key) => window.localStorage.removeItem(key));
+  } catch {
+    // localStorage unavailable (private mode / blocked) — nothing to purge
+  }
+};
+
+purgeOrphanedI18nCaches();
+
 const isStrictMissingKeyMode = () => {
   if (!import.meta.env.DEV) return false;
   if (import.meta.env.VITE_I18N_STRICT_MISSING === '1') return true;
