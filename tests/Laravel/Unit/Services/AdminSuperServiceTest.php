@@ -670,9 +670,15 @@ class AdminSuperServiceTest extends \Tests\Laravel\TestCase
 
     protected function tearDown(): void
     {
-        // Deactivate any tenants created during tests
+        // Clean up tenants created during tests. The suite is non-transactional,
+        // so delete the rows the default seeders insert (menus cascade to
+        // menu_items via FK) to stop them accumulating across runs, then
+        // deactivate the tenant row itself.
         foreach ($this->tenantsToCleanUp as $id) {
             try {
+                Database::query("DELETE FROM menus WHERE tenant_id = ?", [$id]);
+                Database::query("DELETE FROM attributes WHERE tenant_id = ?", [$id]);
+                Database::query("DELETE FROM categories WHERE tenant_id = ?", [$id]);
                 Database::query("UPDATE tenants SET is_active = 0 WHERE id = ?", [$id]);
             } catch (\Exception $e) {
                 // ignore cleanup errors
@@ -749,6 +755,14 @@ class AdminSuperServiceTest extends \Tests\Laravel\TestCase
         // seedTenantDefaults() seeds the canonical nine-attribute default set.
         $this->assertGreaterThan(0, (int)$count, 'Attributes should be seeded');
         $this->assertSame(9, (int)$count, 'The full default attribute set (9) should be seeded');
+
+        // Re-running must be idempotent (insertOrIgnore on the unique key).
+        \App\Services\TenantDefaultsSeeder::seedAttributes((int)$result['tenant_id']);
+        $countAfter = Database::query(
+            "SELECT COUNT(*) FROM attributes WHERE tenant_id = ?",
+            [$result['tenant_id']]
+        )->fetchColumn();
+        $this->assertSame(9, (int)$countAfter, 'Re-seeding must not duplicate attributes');
     }
 
     /**
@@ -768,15 +782,25 @@ class AdminSuperServiceTest extends \Tests\Laravel\TestCase
         $this->assertGreaterThan(0, (int)$count, 'Menus should be seeded');
         $this->assertSame(2, (int)$count, 'Both default menus (header + footer) should be seeded');
 
-        // The header menu's nested "Community" dropdown and its children should
-        // also be present, proving menu_items seeding ran (not just the menu rows).
-        $itemCount = Database::query(
-            "SELECT COUNT(*) FROM menu_items mi
+        // The full default item set must be present (8 main-nav items incl. the
+        // nested "Community" dropdown + its 3 children, and 4 footer items),
+        // proving menu_items seeding ran completely — not just the menu rows.
+        $itemCountSql = "SELECT COUNT(*) FROM menu_items mi
              JOIN menus m ON m.id = mi.menu_id
-             WHERE m.tenant_id = ?",
+             WHERE m.tenant_id = ?";
+        $itemCount = Database::query($itemCountSql, [$result['tenant_id']])->fetchColumn();
+        $this->assertSame(12, (int)$itemCount, 'The full default menu-item set (12) should be seeded');
+
+        // Re-running the seeder must be idempotent: the slug-existence guard
+        // skips already-seeded menus, so counts stay at 2 menus / 12 items.
+        \App\Services\TenantDefaultsSeeder::seedMenus((int)$result['tenant_id']);
+        $menuCountAfter = Database::query(
+            "SELECT COUNT(*) FROM menus WHERE tenant_id = ?",
             [$result['tenant_id']]
         )->fetchColumn();
-        $this->assertGreaterThan(0, (int)$itemCount, 'Menu items should be seeded');
+        $itemCountAfter = Database::query($itemCountSql, [$result['tenant_id']])->fetchColumn();
+        $this->assertSame(2, (int)$menuCountAfter, 'Re-seeding must not duplicate menus');
+        $this->assertSame(12, (int)$itemCountAfter, 'Re-seeding must not duplicate menu items');
     }
 
     /**

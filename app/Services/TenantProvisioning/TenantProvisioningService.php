@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Services\TenantProvisioning;
 
+use App\Services\TenantDefaultsSeeder;
 use App\Services\TenantFeatureConfig;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -29,7 +30,8 @@ use Throwable;
  *
  * Provisioning steps (each appended to `provisioning_log`):
  *   1. Create tenants row
- *   2. Seed default categories / settings / menus / features / federation tables
+ *   2. Seed default categories / member attributes / navigation menus / settings /
+ *      federation tables (shared with the hierarchy path via TenantDefaultsSeeder)
  *   3. Create initial admin user (applicant_email)
  *   4. Apply caring-community preset if applicable
  *   5. Mark request `provisioned` and link `provisioned_tenant_id`
@@ -250,7 +252,7 @@ class TenantProvisioningService
             $tenantId = self::createTenantRow((array) $request);
             $log[] = self::logEntry('create_tenant', 'ok', ['tenant_id' => $tenantId]);
 
-            // Step 2 — seed defaults (categories/settings/menus/features/federation)
+            // Step 2 — seed defaults (categories/attributes/menus/settings/federation)
             self::seedTenantDefaults($tenantId, (array) $request);
             $log[] = self::logEntry('seed_defaults', 'ok');
 
@@ -478,6 +480,32 @@ class TenantProvisioningService
                 } catch (Throwable $e) {
                     Log::info('seedTenantDefaults: tenant_settings entry skipped', ['key' => $key, 'error' => $e->getMessage()]);
                 }
+            }
+        }
+
+        // Default categories / member attributes / navigation menus — the same
+        // canonical day-one defaults the hierarchy path seeds, via the shared
+        // TenantDefaultsSeeder so the two creation paths never drift. Each is
+        // idempotent and non-fatal (a provisioned tenant must still come up).
+        if (Schema::hasTable('categories')) {
+            try {
+                TenantDefaultsSeeder::seedCategories($tenantId);
+            } catch (Throwable $e) {
+                Log::info('seedTenantDefaults: seedCategories skipped', ['error' => $e->getMessage()]);
+            }
+        }
+        if (Schema::hasTable('attributes')) {
+            try {
+                TenantDefaultsSeeder::seedAttributes($tenantId);
+            } catch (Throwable $e) {
+                Log::info('seedTenantDefaults: seedAttributes skipped', ['error' => $e->getMessage()]);
+            }
+        }
+        if (Schema::hasTable('menus') && Schema::hasTable('menu_items')) {
+            try {
+                TenantDefaultsSeeder::seedMenus($tenantId);
+            } catch (Throwable $e) {
+                Log::info('seedTenantDefaults: seedMenus skipped', ['error' => $e->getMessage()]);
             }
         }
     }

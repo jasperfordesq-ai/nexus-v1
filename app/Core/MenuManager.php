@@ -378,15 +378,23 @@ class MenuManager
         foreach ($items as $item) {
             $rules = $item['visibility_rules'] ?? [];
 
-            // Check feature requirement
-            if (!empty($rules['require_feature'])) {
-                $feature = $rules['require_feature'];
-                if (empty($tenantFeatures[$feature])) {
-                    continue;
-                }
+            // Feature requirement. Accept both the legacy `require_feature` key
+            // and the canonical `requires_feature` key — the latter is what the
+            // React renderer (MenuNavItems), the admin VisibilityRulesEditor, and
+            // TenantDefaultsSeeder all write, so server-side gating must honour it
+            // too (otherwise feature-gated items leak on the mobile/prerender path).
+            $requiredFeature = $rules['require_feature'] ?? $rules['requires_feature'] ?? null;
+            if (!empty($requiredFeature) && empty($tenantFeatures[$requiredFeature])) {
+                continue;
             }
 
-            // Check role requirement
+            // Role requirement (legacy `require_role`). Note: the canonical
+            // `min_role` ordered gate is intentionally NOT enforced here — the
+            // server-side role vocabulary (member/admin/broker/moderator/…) does
+            // not align with the ordered list the `min_role` editor uses, so an
+            // ordered comparison would mis-gate. `min_role` is enforced
+            // client-side by the React renderer; server-side we gate on the
+            // unambiguous `requires_auth` / feature signals only.
             if (!empty($rules['require_role'])) {
                 $requiredRole = $rules['require_role'];
                 $currentRole = $user['role'] ?? 'guest';
@@ -399,8 +407,9 @@ class MenuManager
                 }
             }
 
-            // Check auth requirement
-            if (!empty($rules['require_auth']) && !$user) {
+            // Auth requirement. Accept both `require_auth` and the canonical
+            // `requires_auth`.
+            if ((!empty($rules['require_auth']) || !empty($rules['requires_auth'])) && !$user) {
                 continue;
             }
             if (!empty($rules['require_guest']) && $user) {
