@@ -596,6 +596,7 @@ return [
     // USER-FACING — WALLET / EXCHANGES
     // ============================================
     'amount_gt_zero'                       => 'Amount must be greater than 0',
+    'invalid_amount'                       => 'Amount is outside the permitted range.',
     'recipient_required'                   => 'recipient_id is required',
     'amount_required'                      => 'Amount is required',
     'rating_required'                      => 'Rating is required (1-5)',
@@ -610,6 +611,11 @@ return [
     'statement_exported'                   => 'Statement exported',
     'exchange_declined'                    => 'Exchange request declined',
     'exchange_cancelled'                   => 'Exchange cancelled',
+    'marketplace_order_participant_required' => 'You are not a participant in this order.',
+
+    'metrics_event_invalid'                => 'Metric event name is invalid.',
+    'metrics_properties_invalid'           => 'Metric properties must be an object.',
+    'metrics_properties_too_large'         => 'Metric properties are too large.',
 
     // ============================================
     // USER-FACING — EVENTS

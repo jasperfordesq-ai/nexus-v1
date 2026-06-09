@@ -28,10 +28,19 @@ class TeamTaskService
      *
      * @return array{items: array, cursor: string|null, has_more: bool}
      */
-    public function getTasks(int $groupId, array $filters = []): array
+    public function getTasks(int $groupId, array $filters = [], ?int $userId = null): array
     {
+        $this->errors = [];
         $tenantId = TenantContext::getId();
         $limit = $filters['limit'] ?? 50;
+
+        if ($userId !== null && !$this->isActiveGroupMember($groupId, $userId)) {
+            $this->errors[] = [
+                'code' => 'FORBIDDEN',
+                'message' => __('api.group_member_required_view_discussions'),
+            ];
+            return ['items' => [], 'cursor' => null, 'has_more' => false];
+        }
 
         $query = DB::table('team_tasks')
             ->where('tenant_id', $tenantId)
@@ -72,8 +81,9 @@ class TeamTaskService
     /**
      * Get a single task by ID (tenant-scoped).
      */
-    public function getById(int $taskId): ?array
+    public function getById(int $taskId, ?int $userId = null): ?array
     {
+        $this->errors = [];
         $tenantId = TenantContext::getId();
 
         $task = DB::table('team_tasks')
@@ -81,7 +91,19 @@ class TeamTaskService
             ->where('tenant_id', $tenantId)
             ->first();
 
-        return $task ? (array) $task : null;
+        if (!$task) {
+            return null;
+        }
+
+        if ($userId !== null && !$this->isActiveGroupMember((int) $task->group_id, $userId)) {
+            $this->errors[] = [
+                'code' => 'FORBIDDEN',
+                'message' => __('api.group_member_required_view_discussions'),
+            ];
+            return null;
+        }
+
+        return (array) $task;
     }
 
     /**
@@ -125,6 +147,15 @@ class TeamTaskService
             return null;
         }
 
+        if (!$this->isActiveGroupMember($groupId, $userId)) {
+            $this->errors[] = [
+                'code' => 'FORBIDDEN',
+                'message' => __('api.group_member_required_post'),
+                'field' => 'group_id',
+            ];
+            return null;
+        }
+
         $now = now();
 
         $id = DB::table('team_tasks')->insertGetId([
@@ -161,6 +192,14 @@ class TeamTaskService
             $this->errors[] = [
                 'code' => 'RESOURCE_NOT_FOUND',
                 'message' => __('svc_notifications_2.team_task.task_not_found'),
+            ];
+            return false;
+        }
+
+        if (!$this->isActiveGroupMember((int) $task->group_id, $userId)) {
+            $this->errors[] = [
+                'code' => 'FORBIDDEN',
+                'message' => __('api.group_member_required_post'),
             ];
             return false;
         }
@@ -247,12 +286,12 @@ class TeamTaskService
         $this->errors = [];
         $tenantId = TenantContext::getId();
 
-        $deleted = DB::table('team_tasks')
+        $task = DB::table('team_tasks')
             ->where('id', $taskId)
             ->where('tenant_id', $tenantId)
-            ->delete();
+            ->first();
 
-        if (!$deleted) {
+        if (!$task) {
             $this->errors[] = [
                 'code' => 'RESOURCE_NOT_FOUND',
                 'message' => __('svc_notifications_2.team_task.task_not_found'),
@@ -260,15 +299,37 @@ class TeamTaskService
             return false;
         }
 
+        if (!$this->isActiveGroupMember((int) $task->group_id, $userId)) {
+            $this->errors[] = [
+                'code' => 'FORBIDDEN',
+                'message' => __('api.group_member_required_post'),
+            ];
+            return false;
+        }
+
+        DB::table('team_tasks')
+            ->where('id', $taskId)
+            ->where('tenant_id', $tenantId)
+            ->delete();
+
         return true;
     }
 
     /**
      * Get task statistics for a group.
      */
-    public function getStats(int $groupId): array
+    public function getStats(int $groupId, ?int $userId = null): array
     {
+        $this->errors = [];
         $tenantId = TenantContext::getId();
+
+        if ($userId !== null && !$this->isActiveGroupMember($groupId, $userId)) {
+            $this->errors[] = [
+                'code' => 'FORBIDDEN',
+                'message' => __('api.group_member_required_view_discussions'),
+            ];
+            return ['total' => 0, 'todo' => 0, 'in_progress' => 0, 'done' => 0, 'overdue' => 0];
+        }
 
         $counts = DB::table('team_tasks')
             ->where('group_id', $groupId)
@@ -289,5 +350,14 @@ class TeamTaskService
             'done' => (int) ($counts->done ?? 0),
             'overdue' => (int) ($counts->overdue ?? 0),
         ];
+    }
+
+    private function isActiveGroupMember(int $groupId, int $userId): bool
+    {
+        return DB::table('group_members')
+            ->where('group_id', $groupId)
+            ->where('user_id', $userId)
+            ->where('status', 'active')
+            ->exists();
     }
 }

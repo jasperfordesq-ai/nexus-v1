@@ -130,6 +130,7 @@ class NationalKissDashboardController extends BaseApiController
     private function userHasNationalDashboardPermission(int $userId): bool
     {
         if (! Schema::hasTable('user_roles')
+            || ! Schema::hasTable('roles')
             || ! Schema::hasTable('role_permissions')
             || ! Schema::hasTable('permissions')
         ) {
@@ -139,10 +140,14 @@ class NationalKissDashboardController extends BaseApiController
         $row = DB::selectOne(
             "SELECT 1 AS ok
              FROM user_roles ur
+             JOIN roles r ON r.id = ur.role_id
              JOIN role_permissions rp ON rp.role_id = ur.role_id
              JOIN permissions p ON p.id = rp.permission_id
              WHERE ur.user_id = ?
                AND p.name = 'national.kiss_dashboard.view'
+               AND r.name = 'kiss_national_admin'
+               AND r.is_system = 1
+               AND r.tenant_id IS NULL
                AND (ur.expires_at IS NULL OR ur.expires_at > NOW())
              LIMIT 1",
             [$userId]

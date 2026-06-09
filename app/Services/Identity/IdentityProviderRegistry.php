@@ -87,11 +87,15 @@ class IdentityProviderRegistry
 
     public static function mockProviderAllowed(): bool
     {
+        if (app()->environment('production')) {
+            return false;
+        }
+
         if ((bool) env('ALLOW_MOCK_IDENTITY_PROVIDER', false)) {
             return true;
         }
 
-        return ! app()->environment('production');
+        return true;
     }
 
     /**

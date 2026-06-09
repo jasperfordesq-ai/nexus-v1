@@ -89,7 +89,7 @@ class MerchantCouponController extends BaseApiController
     public function redeemQr(): JsonResponse
     {
         $this->ensureFeature();
-        $this->requireAuth();
+        $staffUserId = $this->requireAuth();
         $this->rateLimit('coupon_qr_redeem', 30, 60);
 
         $data = request()->validate([
@@ -97,7 +97,7 @@ class MerchantCouponController extends BaseApiController
         ]);
 
         try {
-            $redemption = MerchantCouponService::redeemQrToken($data['token']);
+            $redemption = MerchantCouponService::redeemQrToken($data['token'], $staffUserId);
             return $this->respondWithData([
                 'redemption_id' => $redemption->id,
                 'coupon_id' => $redemption->coupon_id,

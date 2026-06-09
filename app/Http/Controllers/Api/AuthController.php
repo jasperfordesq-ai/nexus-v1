@@ -465,22 +465,13 @@ class AuthController extends BaseApiController
             );
         }
 
-        // Validate the refresh token
-        $payload = $this->tokenService->validateToken($refreshToken);
+        // Validate the refresh token with refresh-token specific revocation checks.
+        $payload = $this->tokenService->validateRefreshToken($refreshToken);
 
         if (!$payload) {
             return $this->authError(
                 __('api.invalid_or_expired_refresh_token'),
                 ApiErrorCodes::AUTH_TOKEN_EXPIRED,
-                401
-            );
-        }
-
-        // Check it's actually a refresh token
-        if (($payload['type'] ?? '') !== 'refresh') {
-            return $this->authError(
-                __('api.invalid_token_type'),
-                ApiErrorCodes::AUTH_TOKEN_INVALID,
                 401
             );
         }

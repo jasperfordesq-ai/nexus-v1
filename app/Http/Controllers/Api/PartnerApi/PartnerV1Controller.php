@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\BaseApiController;
 use App\Models\Notification;
 use App\Services\NotificationDispatcher;
 use App\Services\PartnerApi\PartnerWebhookDispatcher;
+use App\Support\SecurityBounds;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -169,6 +170,10 @@ class PartnerV1Controller extends BaseApiController
 
         if ($userId <= 0 || $hours <= 0 || $reference === '') {
             return $this->respondWithError('invalid_request', __('api.partner_wallet_credit_required'), null, 422);
+        }
+
+        if (!SecurityBounds::isAcceptableHourAmount($hours)) {
+            return $this->respondWithError('invalid_request', __('api.invalid_amount'), null, 422);
         }
 
         if ($partnerId <= 0) {

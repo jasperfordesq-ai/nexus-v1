@@ -29,10 +29,19 @@ class TeamDocumentService
      *
      * @return array{items: array, cursor: string|null, has_more: bool}
      */
-    public function getDocuments(int $groupId, array $filters = []): array
+    public function getDocuments(int $groupId, array $filters = [], ?int $userId = null): array
     {
+        $this->errors = [];
         $tenantId = TenantContext::getId();
         $limit = $filters['limit'] ?? 50;
+
+        if ($userId !== null && !$this->isActiveGroupMember($groupId, $userId)) {
+            $this->errors[] = [
+                'code' => 'FORBIDDEN',
+                'message' => __('api.group_member_required_view_discussions'),
+            ];
+            return ['items' => [], 'cursor' => null, 'has_more' => false];
+        }
 
         $query = DB::table('team_documents')
             ->where('tenant_id', $tenantId)
@@ -91,6 +100,15 @@ class TeamDocumentService
                 'code' => 'VALIDATION_ERROR',
                 'message' => __('svc_notifications_2.team_document.file_upload_failed'),
                 'field' => 'file',
+            ];
+            return null;
+        }
+
+        if (!$this->isActiveGroupMember($groupId, $userId)) {
+            $this->errors[] = [
+                'code' => 'FORBIDDEN',
+                'message' => __('api.group_member_required_post'),
+                'field' => 'group_id',
             ];
             return null;
         }
@@ -204,6 +222,14 @@ class TeamDocumentService
             return false;
         }
 
+        if (!$this->canManageDocument($doc, $userId)) {
+            $this->errors[] = [
+                'code' => 'FORBIDDEN',
+                'message' => __('api.group_modify_forbidden'),
+            ];
+            return false;
+        }
+
         // Delete the physical file if it exists
         if (!empty($doc->file_path) && file_exists($doc->file_path)) {
             @unlink($doc->file_path);
@@ -215,5 +241,29 @@ class TeamDocumentService
             ->delete();
 
         return true;
+    }
+
+    private function isActiveGroupMember(int $groupId, int $userId): bool
+    {
+        return DB::table('group_members')
+            ->where('group_id', $groupId)
+            ->where('user_id', $userId)
+            ->where('status', 'active')
+            ->exists();
+    }
+
+    private function canManageDocument(object $doc, int $userId): bool
+    {
+        if ((int) ($doc->uploaded_by ?? 0) === $userId) {
+            return true;
+        }
+
+        $membership = DB::table('group_members')
+            ->where('group_id', (int) $doc->group_id)
+            ->where('user_id', $userId)
+            ->where('status', 'active')
+            ->first();
+
+        return $membership && in_array((string) $membership->role, ['owner', 'admin'], true);
     }
 }

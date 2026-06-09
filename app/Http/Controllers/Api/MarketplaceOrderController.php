@@ -234,7 +234,7 @@ class MarketplaceOrderController extends BaseApiController
         $role = $order->buyer_id === $userId ? 'buyer' : ($order->seller_id === $userId ? 'seller' : null);
 
         if (!$role) {
-            return $this->respondWithError('FORBIDDEN', 'You are not a participant in this order.', null, 403);
+            return $this->respondWithError('FORBIDDEN', __('api.marketplace_order_participant_required'), null, 403);
         }
 
         try {
@@ -251,7 +251,15 @@ class MarketplaceOrderController extends BaseApiController
     public function orderRatings(int $id): JsonResponse
     {
         $this->ensureFeature();
+        $userId = $this->requireAuth();
         $this->rateLimit('marketplace_rate', 30, 60);
+
+        $order = MarketplaceOrder::where('id', $id)
+            ->where('tenant_id', TenantContext::getId())
+            ->firstOrFail();
+        if ((int) $order->buyer_id !== $userId && (int) $order->seller_id !== $userId) {
+            return $this->respondWithError('FORBIDDEN', __('api.marketplace_order_participant_required'), null, 403);
+        }
 
         return $this->respondWithData(MarketplaceRatingService::getOrderRatings($id));
     }

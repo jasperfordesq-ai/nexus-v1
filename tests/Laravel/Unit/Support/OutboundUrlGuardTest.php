@@ -53,6 +53,18 @@ class OutboundUrlGuardTest extends TestCase
         $this->assertTrue(OutboundUrlGuard::isSafeHttpUrl('https://93.184.216.34/webhook', requireHttps: true));
     }
 
+    public function testBrowserNavigableUrlsOnlyAllowHttpAndHttpsSchemes(): void
+    {
+        $this->assertTrue(OutboundUrlGuard::isSafeBrowserUrl('https://example.com/path'));
+        $this->assertTrue(OutboundUrlGuard::isSafeBrowserUrl('http://example.com/path'));
+        $this->assertFalse(OutboundUrlGuard::isSafeBrowserUrl('javascript:alert(1)'));
+        $this->assertFalse(OutboundUrlGuard::isSafeBrowserUrl('data:text/html,<script>alert(1)</script>'));
+        $this->assertFalse(OutboundUrlGuard::isSafeBrowserUrl('//example.com/protocol-relative'));
+        $this->assertFalse(OutboundUrlGuard::isSafeBrowserUrl('https://localhost/settings'));
+        $this->assertFalse(OutboundUrlGuard::isSafeBrowserUrl('https://127.0.0.1/settings'));
+        $this->assertFalse(OutboundUrlGuard::isSafeBrowserUrl('https://[::1]/settings'));
+    }
+
     public function testBuildsCurlSafetyOptionsForPublicUrl(): void
     {
         $options = OutboundUrlGuard::curlOptionsForUrl('https://93.184.216.34/webhook', requireHttps: true);

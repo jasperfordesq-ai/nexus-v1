@@ -975,7 +975,7 @@ class IdeationChallengesController extends BaseApiController
     public function getTeamLinks($id): JsonResponse
     {
         $this->ensureFeature();
-        $links = $this->ideaTeamConversionService->getLinksForChallenge((int) $id);
+        $links = $this->ideaTeamConversionService->getLinksForChallenge((int) $id, $this->getUserId());
         return $this->respondWithData($links);
     }
 
@@ -987,7 +987,7 @@ class IdeationChallengesController extends BaseApiController
     public function listChatrooms($id): JsonResponse
     {
         $this->ensureFeature();
-        $chatrooms = $this->groupChatroomService->getChatrooms((int) $id);
+        $chatrooms = $this->groupChatroomService->getChatrooms((int) $id, null, $this->getUserId());
         return $this->respondWithData($chatrooms);
     }
 
@@ -1038,7 +1038,12 @@ class IdeationChallengesController extends BaseApiController
             $filters['cursor'] = $this->query('cursor');
         }
 
-        $result = $this->groupChatroomService->getMessages((int) $id, $filters);
+        $result = $this->groupChatroomService->getMessages((int) $id, $filters, $this->getUserId());
+        if ($result === null) {
+            $errors = $this->groupChatroomService->getErrors();
+            return $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));
+        }
+
         return $this->respondWithCollection($result['items'], $result['cursor'], $filters['limit'], $result['has_more']);
     }
 
@@ -1115,7 +1120,12 @@ class IdeationChallengesController extends BaseApiController
     public function pinnedChatroomMessages($groupId, $chatroomId): JsonResponse
     {
         $this->ensureFeature();
-        $pinned = $this->groupChatroomService->getPinnedMessages((int) $chatroomId);
+        $pinned = $this->groupChatroomService->getPinnedMessages((int) $chatroomId, $this->getUserId());
+        if ($pinned === null) {
+            $errors = $this->groupChatroomService->getErrors();
+            return $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));
+        }
+
         return $this->respondWithData($pinned);
     }
 
@@ -1140,7 +1150,12 @@ class IdeationChallengesController extends BaseApiController
             $filters['cursor'] = $this->query('cursor');
         }
 
-        $result = $this->teamTaskService->getTasks((int) $id, $filters);
+        $result = $this->teamTaskService->getTasks((int) $id, $filters, $this->getUserId());
+        if (!empty($this->teamTaskService->getErrors())) {
+            $errors = $this->teamTaskService->getErrors();
+            return $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));
+        }
+
         return $this->respondWithCollection($result['items'], $result['cursor'], $filters['limit'], $result['has_more']);
     }
 
@@ -1159,7 +1174,7 @@ class IdeationChallengesController extends BaseApiController
             return $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));
         }
 
-        $task = $this->teamTaskService->getById($taskId);
+        $task = $this->teamTaskService->getById($taskId, $userId);
         return $this->respondWithData($task, null, 201);
     }
 
@@ -1167,9 +1182,13 @@ class IdeationChallengesController extends BaseApiController
     public function showTask($id): JsonResponse
     {
         $this->ensureFeature();
-        $task = $this->teamTaskService->getById((int) $id);
+        $task = $this->teamTaskService->getById((int) $id, $this->getUserId());
 
         if (!$task) {
+            $errors = $this->teamTaskService->getErrors();
+            if (!empty($errors)) {
+                return $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));
+            }
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.task_not_found'), null, 404);
         }
 
@@ -1191,7 +1210,7 @@ class IdeationChallengesController extends BaseApiController
             return $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));
         }
 
-        $task = $this->teamTaskService->getById((int) $id);
+        $task = $this->teamTaskService->getById((int) $id, $userId);
         return $this->respondWithData($task);
     }
 
@@ -1216,7 +1235,12 @@ class IdeationChallengesController extends BaseApiController
     public function taskStats($id): JsonResponse
     {
         $this->ensureFeature();
-        $stats = $this->teamTaskService->getStats((int) $id);
+        $stats = $this->teamTaskService->getStats((int) $id, $this->getUserId());
+        if (!empty($this->teamTaskService->getErrors())) {
+            $errors = $this->teamTaskService->getErrors();
+            return $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));
+        }
+
         return $this->respondWithData($stats);
     }
 
@@ -1235,7 +1259,12 @@ class IdeationChallengesController extends BaseApiController
             $filters['cursor'] = $this->query('cursor');
         }
 
-        $result = $this->teamDocumentService->getDocuments((int) $id, $filters);
+        $result = $this->teamDocumentService->getDocuments((int) $id, $filters, $this->getUserId());
+        if (!empty($this->teamDocumentService->getErrors())) {
+            $errors = $this->teamDocumentService->getErrors();
+            return $this->respondWithErrors($errors, $this->resolveErrorStatus($errors));
+        }
+
         return $this->respondWithCollection($result['items'], $result['cursor'], $filters['limit'], $result['has_more']);
     }
 

@@ -51,6 +51,44 @@ class GroupChatroomServiceTest extends TestCase
         $this->assertEquals(1, $result['id']);
     }
 
+    public function test_getMessages_rejects_private_chatroom_for_non_member(): void
+    {
+        $chatroom = (object) ['id' => 5, 'group_id' => 10, 'is_private' => 1];
+
+        DB::shouldReceive('table')->with('group_chatrooms')->andReturnSelf();
+        DB::shouldReceive('where')->with('id', 5)->andReturnSelf();
+        DB::shouldReceive('where')->with('tenant_id', \Mockery::any())->andReturnSelf();
+        DB::shouldReceive('first')->andReturn($chatroom);
+
+        DB::shouldReceive('table')->with('group_members')->andReturnSelf();
+        DB::shouldReceive('where')->with('group_id', 10)->andReturnSelf();
+        DB::shouldReceive('where')->with('user_id', 99)->andReturnSelf();
+        DB::shouldReceive('where')->with('status', 'active')->andReturnSelf();
+        DB::shouldReceive('exists')->andReturn(false);
+
+        $this->assertNull($this->service->getMessages(5, [], 99));
+        $this->assertEquals('FORBIDDEN', $this->service->getErrors()[0]['code']);
+    }
+
+    public function test_getPinnedMessages_rejects_private_chatroom_for_non_member(): void
+    {
+        $chatroom = (object) ['id' => 5, 'group_id' => 10, 'is_private' => 1];
+
+        DB::shouldReceive('table')->with('group_chatrooms')->andReturnSelf();
+        DB::shouldReceive('where')->with('id', 5)->andReturnSelf();
+        DB::shouldReceive('where')->with('tenant_id', \Mockery::any())->andReturnSelf();
+        DB::shouldReceive('first')->andReturn($chatroom);
+
+        DB::shouldReceive('table')->with('group_members')->andReturnSelf();
+        DB::shouldReceive('where')->with('group_id', 10)->andReturnSelf();
+        DB::shouldReceive('where')->with('user_id', 99)->andReturnSelf();
+        DB::shouldReceive('where')->with('status', 'active')->andReturnSelf();
+        DB::shouldReceive('exists')->andReturn(false);
+
+        $this->assertNull($this->service->getPinnedMessages(5, 99));
+        $this->assertEquals('FORBIDDEN', $this->service->getErrors()[0]['code']);
+    }
+
     public function test_getErrors_returns_array(): void
     {
         $this->assertIsArray($this->service->getErrors());

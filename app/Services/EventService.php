@@ -11,6 +11,7 @@ use App\Events\CommunityEventCreated;
 use App\Events\CommunityEventUpdated;
 use App\Models\Event;
 use App\Models\EventRsvp;
+use App\Support\SecurityBounds;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -795,7 +796,7 @@ class EventService
      *
      * @return array{items: array, cursor: string|null, has_more: bool}
      */
-    public static function getAttendees(int $eventId, array $filters = []): array
+    public static function getAttendees(int $eventId, array $filters = [], ?int $viewerId = null): array
     {
         $limit = min($filters['limit'] ?? 20, 100);
         $status = $filters['status'] ?? 'going';
@@ -1034,6 +1035,14 @@ class EventService
         self::$errors = [];
         self::$lastCancellationRecipientIds = [];
         $tenantId = \App\Core\TenantContext::getId();
+
+        if ($viewerId !== null && !self::canViewEventRoster($eventId, $viewerId, $tenantId)) {
+            return [
+                'items' => [],
+                'cursor' => null,
+                'has_more' => false,
+            ];
+        }
 
         $event = DB::selectOne("SELECT * FROM events WHERE id = ? AND tenant_id = ?", [$eventId, $tenantId]);
         if (!$event) {
@@ -1286,12 +1295,54 @@ class EventService
         }
     }
 
+    private static function canViewEventRoster(int $eventId, int $viewerId, int $tenantId): bool
+    {
+        if (self::canManageEventAttendance($eventId, $viewerId, $tenantId)) {
+            return true;
+        }
+
+        return DB::selectOne(
+            "SELECT 1 FROM event_rsvps WHERE event_id = ? AND user_id = ? AND tenant_id = ? LIMIT 1",
+            [$eventId, $viewerId, $tenantId]
+        ) !== null;
+    }
+
+    private static function canManageEventAttendance(int $eventId, int $userId, int $tenantId): bool
+    {
+        $event = DB::selectOne(
+            "SELECT user_id FROM events WHERE id = ? AND tenant_id = ?",
+            [$eventId, $tenantId]
+        );
+        if (!$event) {
+            return false;
+        }
+
+        if ((int) $event->user_id === $userId) {
+            return true;
+        }
+
+        $user = DB::selectOne(
+            "SELECT role, is_super_admin, is_tenant_super_admin FROM users WHERE id = ? AND tenant_id = ?",
+            [$userId, $tenantId]
+        );
+
+        return $user !== null && (
+            in_array($user->role ?? '', ['admin', 'tenant_admin', 'super_admin', 'god'], true)
+            || !empty($user->is_super_admin)
+            || !empty($user->is_tenant_super_admin)
+        );
+    }
+
     /**
      * Get attendance records for an event.
      */
-    public static function getAttendanceRecords(int $eventId): array
+    public static function getAttendanceRecords(int $eventId, ?int $viewerId = null): ?array
     {
         $tenantId = \App\Core\TenantContext::getId();
+
+        if ($viewerId !== null && !self::canManageEventAttendance($eventId, $viewerId, $tenantId)) {
+            return null;
+        }
 
         try {
             $rows = DB::select(
@@ -1341,13 +1392,27 @@ class EventService
             return false;
         }
 
-        // Ownership / admin check
-        if ((int) $event->user_id !== $markedById) {
-            $user = DB::selectOne("SELECT role FROM users WHERE id = ? AND tenant_id = ?", [$markedById, $tenantId]);
-            if (!$user || !in_array($user->role ?? '', ['admin', 'super_admin', 'god'])) {
-                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.event_attendance_forbidden')];
-                return false;
-            }
+        if (!self::canManageEventAttendance($eventId, $markedById, $tenantId)) {
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.event_attendance_forbidden')];
+            return false;
+        }
+
+        $attendee = DB::selectOne(
+            "SELECT id FROM users WHERE id = ? AND tenant_id = ? AND status = 'active'",
+            [$attendeeId, $tenantId]
+        );
+        if (!$attendee) {
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.user_not_found')];
+            return false;
+        }
+
+        $rsvp = DB::selectOne(
+            "SELECT status FROM event_rsvps WHERE event_id = ? AND user_id = ? AND tenant_id = ?",
+            [$eventId, $attendeeId, $tenantId]
+        );
+        if (!$rsvp || !in_array((string) $rsvp->status, ['going', 'interested', 'invited', 'attended'], true)) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.event_not_rsvped')];
+            return false;
         }
 
         // Calculate hours from event duration
@@ -1362,6 +1427,11 @@ class EventService
         }
         if ($hours === null) {
             $hours = 1.0;
+        }
+        $hours = round((float) $hours, 2);
+        if (!SecurityBounds::isAcceptableHourAmount($hours, SecurityBounds::MAX_EVENT_ATTENDANCE_HOURS)) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.invalid_amount')];
+            return false;
         }
 
         try {

@@ -10,6 +10,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
 use App\Services\PaidPushCampaignService;
+use App\Support\SecurityBounds;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
@@ -99,6 +100,8 @@ class PaidPushCampaignController extends BaseApiController
         try {
             $campaign = PaidPushCampaignService::createCampaign($tenantId, $userId, $data);
             return $this->respondWithData($campaign, null, 201);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         } catch (\Throwable $e) {
             Log::error('[PaidPushCampaign] createCampaign error', ['error' => $e->getMessage()]);
             return $this->respondServerError(__('api.generic_error'));
@@ -127,7 +130,10 @@ class PaidPushCampaignController extends BaseApiController
 
         try {
             $count = PaidPushCampaignService::estimateAudience($tenantId, $audienceFilter);
-            return $this->respondWithData(['estimated_count' => $count]);
+            return $this->respondWithData([
+                'estimated_count' => SecurityBounds::bucketAudienceCount($count),
+                'minimum_reached' => $count >= SecurityBounds::MIN_REPORTABLE_AUDIENCE_COUNT,
+            ]);
         } catch (\Throwable $e) {
             Log::error('[PaidPushCampaign] estimateAudience error', ['error' => $e->getMessage()]);
             return $this->respondServerError(__('api.generic_error'));
@@ -174,6 +180,8 @@ class PaidPushCampaignController extends BaseApiController
         try {
             $updated = PaidPushCampaignService::updateCampaign($id, $tenantId, $data);
             return $this->respondWithData($updated);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         } catch (\RuntimeException $e) {
             return $this->respondWithError('CAMPAIGN_UPDATE_FAILED', $e->getMessage(), null, 422);
         } catch (\Throwable $e) {

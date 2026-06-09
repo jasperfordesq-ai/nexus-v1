@@ -116,9 +116,23 @@ class TokenService
     }
 
     /**
-     * Validate a token and return its payload if valid.
+     * Validate an access token and return its payload if valid.
      */
     public function validateToken(string $token): ?array
+    {
+        $payload = $this->validateSignedToken($token);
+
+        if (!$payload || ($payload['type'] ?? '') !== 'access') {
+            return null;
+        }
+
+        return $payload;
+    }
+
+    /**
+     * Validate a signed JWT regardless of token purpose.
+     */
+    private function validateSignedToken(string $token): ?array
     {
         $parts = explode('.', $token);
 
@@ -175,7 +189,7 @@ class TokenService
      */
     public function validateRefreshToken(string $token): ?array
     {
-        $payload = $this->validateToken($token);
+        $payload = $this->validateSignedToken($token);
 
         if (!$payload) {
             return null;
@@ -241,7 +255,7 @@ class TokenService
      */
     public function revokeToken(string $refreshToken, int $userId): bool
     {
-        $payload = $this->validateToken($refreshToken);
+        $payload = $this->validateSignedToken($refreshToken);
 
         if (!$payload) {
             return false;
@@ -327,7 +341,7 @@ class TokenService
      */
     public function validateImpersonationToken(string $token): ?array
     {
-        $payload = $this->validateToken($token);
+        $payload = $this->validateSignedToken($token);
 
         if (!$payload) {
             return null;
@@ -399,7 +413,7 @@ class TokenService
      */
     public function isTokenRevoked(string $refreshToken): bool
     {
-        $payload = $this->validateToken($refreshToken);
+        $payload = $this->validateSignedToken($refreshToken);
 
         if (!$payload) {
             return true;

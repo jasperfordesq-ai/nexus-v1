@@ -104,7 +104,7 @@ class Message extends Model
     /**
      * Get reactions for multiple messages (batch).
      */
-    public static function getReactionsBatch(array $messageIds): array
+    public static function getReactionsBatch(array $messageIds, ?int $viewerId = null): array
     {
         if (empty($messageIds)) {
             return [];
@@ -123,6 +123,12 @@ class Message extends Model
             ])
             ->where('messages.tenant_id', $tenantId)
             ->whereIn('message_reactions.message_id', $messageIds)
+            ->when($viewerId !== null, function ($query) use ($viewerId): void {
+                $query->where(function ($q) use ($viewerId): void {
+                    $q->where('messages.sender_id', $viewerId)
+                        ->orWhere('messages.receiver_id', $viewerId);
+                });
+            })
             ->groupBy('message_reactions.message_id', 'message_reactions.emoji')
             ->orderBy('message_reactions.message_id')
             ->orderByRaw('MIN(message_reactions.created_at)')

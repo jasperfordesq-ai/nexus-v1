@@ -226,13 +226,12 @@ class FederationKomunitinEndpointsTest extends TestCase
 
     public function test_transfer_amount_exceeding_max_is_rejected(): void
     {
-        // Amount in minor units — 999_999_99 == 999999.99 hours, one above max
-        // (KomunitinAdapter has MINOR_UNITS_PER_HOUR typically = 100)
+        // Amount in minor units; KomunitinAdapter has MINOR_UNITS_PER_HOUR typically = 100.
         $response = $this->json('POST', '/api/v2/federation/komunitin/HOURS/transfers', [
             'data' => [
                 'type' => 'transfers',
                 'attributes' => [
-                    'amount' => 100_000_000_00, // huge — far above 999_999.99
+                    'amount' => 2_500, // 25 hours, above the external-credit cap
                     'meta' => 'oversized',
                     'state' => 'committed',
                 ],

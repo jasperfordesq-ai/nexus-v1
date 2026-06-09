@@ -75,8 +75,14 @@ class MarketplaceCommunityDeliveryController extends BaseApiController
             return $this->respondWithError('UNAUTHORIZED', __('api_controllers_2.marketplace_delivery.auth_required'), null, 401);
         }
 
-        $offers = MarketplaceCommunityDeliveryService::getDeliveryOffers($orderId);
-        return $this->respondWithData($offers);
+        try {
+            $offers = MarketplaceCommunityDeliveryService::getDeliveryOffers($orderId, (int) $userId);
+            return $this->respondWithData($offers);
+        } catch (AuthorizationException $e) {
+            return $this->respondWithError('FORBIDDEN', $e->getMessage(), null, 403);
+        } catch (\RuntimeException $e) {
+            return $this->respondWithError('DELIVERY_OFFER_ERROR', $e->getMessage(), null, 400);
+        }
     }
 
     /**

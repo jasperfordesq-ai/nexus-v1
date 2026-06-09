@@ -203,7 +203,29 @@ class MarketplaceCommunityDeliveryService
         }
 
         DB::transaction(function () use ($offer, $order, $tenantId) {
-            // Mark offer as completed
+            // Award time credits: buyer pays deliverer
+            $buyerId = $order->buyer_id;
+            $delivererId = $offer->deliverer_id;
+            $amount = (float) $offer->time_credits;
+
+            // Check buyer balance before completing the offer.
+            $buyer = DB::table('users')
+                ->where('id', $buyerId)
+                ->where('tenant_id', $tenantId)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$buyer || (float) $buyer->balance < $amount) {
+                Log::warning('Community delivery: buyer has insufficient balance for time credit payment', [
+                    'order_id' => $order->id,
+                    'buyer_id' => $buyerId,
+                    'deliverer_id' => $delivererId,
+                    'amount' => $amount,
+                    'balance' => $buyer->balance ?? 0,
+                ]);
+                throw new \RuntimeException(__('api.organizer_insufficient_balance'));
+            }
+
             DB::table('marketplace_delivery_offers')
                 ->where('id', $offer->id)
                 ->where('tenant_id', $tenantId)
@@ -212,29 +234,6 @@ class MarketplaceCommunityDeliveryService
                     'completed_at' => now(),
                     'updated_at' => now(),
                 ]);
-
-            // Award time credits: buyer pays deliverer
-            $buyerId = $order->buyer_id;
-            $delivererId = $offer->deliverer_id;
-            $amount = (float) $offer->time_credits;
-
-            // Check buyer balance
-            $buyer = DB::table('users')
-                ->where('id', $buyerId)
-                ->where('tenant_id', $tenantId)
-                ->first();
-
-            if (!$buyer || (float) $buyer->balance < $amount) {
-                // If buyer cannot pay, log warning but still complete delivery
-                Log::warning('Community delivery: buyer has insufficient balance for time credit payment', [
-                    'order_id' => $order->id,
-                    'buyer_id' => $buyerId,
-                    'deliverer_id' => $delivererId,
-                    'amount' => $amount,
-                    'balance' => $buyer->balance ?? 0,
-                ]);
-                return;
-            }
 
             // Create transaction record
             DB::table('transactions')->insert([
@@ -270,9 +269,10 @@ class MarketplaceCommunityDeliveryService
      * @param int $orderId
      * @return array List of delivery offers with deliverer info
      */
-    public static function getDeliveryOffers(int $orderId): array
+    public static function getDeliveryOffers(int $orderId, int $actorId): array
     {
         $tenantId = TenantContext::getId();
+        self::requireOrderParticipant($orderId, $tenantId, $actorId);
 
         $offers = DB::table('marketplace_delivery_offers as mdo')
             ->leftJoin('users as u', function ($join): void {

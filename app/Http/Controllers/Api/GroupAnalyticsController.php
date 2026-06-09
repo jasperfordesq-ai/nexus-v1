@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
 use App\Services\GroupAnalyticsService;
 use App\Services\GroupService;
+use App\Support\CsvExportSanitizer;
 
 /**
  * GroupAnalyticsController — Dashboard, growth, engagement, retention, and export analytics for groups.
@@ -123,7 +124,7 @@ class GroupAnalyticsController extends BaseApiController
             }
 
             foreach ($members as $row) {
-                fputcsv($output, (array) $row);
+                fputcsv($output, CsvExportSanitizer::row((array) $row));
             }
 
             fclose($output);
@@ -155,7 +156,7 @@ class GroupAnalyticsController extends BaseApiController
             }
 
             foreach ($activity as $row) {
-                fputcsv($output, (array) $row);
+                fputcsv($output, CsvExportSanitizer::row((array) $row));
             }
 
             fclose($output);

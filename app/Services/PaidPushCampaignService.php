@@ -9,6 +9,8 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\Support\OutboundUrlGuard;
+use App\Support\SecurityBounds;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -112,6 +114,7 @@ class PaidPushCampaignService
     public static function createCampaign(int $tenantId, int $userId, array $data): array
     {
         $now = Carbon::now();
+        $ctaUrl = self::safeCtaUrl($data['cta_url'] ?? null);
 
         $id = DB::table(self::TABLE)->insertGetId([
             'tenant_id'       => $tenantId,
@@ -121,7 +124,7 @@ class PaidPushCampaignService
             'advertiser_type' => $data['advertiser_type'] ?? 'sme',
             'title'           => $data['title'],
             'body'            => $data['body'],
-            'cta_url'         => $data['cta_url'] ?? null,
+            'cta_url'         => $ctaUrl,
             'audience_filter' => isset($data['audience_filter'])
                 ? json_encode($data['audience_filter'])
                 : null,
@@ -130,7 +133,7 @@ class PaidPushCampaignService
             'scheduled_at'    => isset($data['scheduled_at']) && $data['scheduled_at'] !== ''
                 ? Carbon::parse($data['scheduled_at'])->toDateTimeString()
                 : null,
-            'cost_per_send'   => isset($data['cost_per_send']) ? (int) $data['cost_per_send'] : 5,
+            'cost_per_send'   => SecurityBounds::paidPushCostPerSend($data['cost_per_send'] ?? 5),
             'total_cost_cents' => 0,
             'open_count'      => 0,
             'click_count'     => 0,
@@ -158,11 +161,15 @@ class PaidPushCampaignService
 
         $updatePayload = ['updated_at' => Carbon::now()];
 
-        $allowedFields = ['name', 'advertiser_type', 'title', 'body', 'cta_url'];
+        $allowedFields = ['name', 'advertiser_type', 'title', 'body'];
         foreach ($allowedFields as $field) {
             if (array_key_exists($field, $data)) {
                 $updatePayload[$field] = $data[$field];
             }
+        }
+
+        if (array_key_exists('cta_url', $data)) {
+            $updatePayload['cta_url'] = self::safeCtaUrl($data['cta_url']);
         }
 
         if (array_key_exists('audience_filter', $data)) {
@@ -178,7 +185,7 @@ class PaidPushCampaignService
         }
 
         if (array_key_exists('cost_per_send', $data)) {
-            $updatePayload['cost_per_send'] = (int) $data['cost_per_send'];
+            $updatePayload['cost_per_send'] = SecurityBounds::paidPushCostPerSend($data['cost_per_send']);
         }
 
         DB::table(self::TABLE)
@@ -396,7 +403,7 @@ class PaidPushCampaignService
         }
 
         $actualSendCount = count($recipientIds);
-        $costPerSend     = (int) ($campaign['cost_per_send'] ?? 5);
+        $costPerSend     = SecurityBounds::paidPushCostPerSend($campaign['cost_per_send'] ?? 5);
         $totalCostCents  = $actualSendCount * $costPerSend;
 
         DB::table(self::TABLE)
@@ -551,6 +558,20 @@ class PaidPushCampaignService
     // -----------------------------------------------------------------------
     // Internal helpers
     // -----------------------------------------------------------------------
+
+    private static function safeCtaUrl(mixed $url): ?string
+    {
+        $value = is_string($url) ? trim($url) : '';
+        if ($value === '') {
+            return null;
+        }
+
+        if (!OutboundUrlGuard::isSafeBrowserUrl($value)) {
+            throw new \InvalidArgumentException(__('api.invalid_url'));
+        }
+
+        return $value;
+    }
 
     /**
      * Resolve recipient user IDs from the tenant, applying audience filters.

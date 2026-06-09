@@ -2637,15 +2637,16 @@ class JobVacanciesController extends BaseApiController
             return response('Forbidden', 403);
         }
 
-        $title = 'Interview: ' . ($interview->vacancy->title ?? 'Job Interview');
+        $title = $this->icsText('Interview: ' . ($interview->vacancy->title ?? 'Job Interview'));
         $start = $interview->scheduled_at;
         $end = $start->copy()->addMinutes($interview->duration_mins ?? 60);
-        $location = $interview->location_notes ?? $interview->vacancy->location ?? '';
-        $type = ucfirst($interview->interview_type ?? 'video');
-        $description = "Type: {$type}\\nDuration: " . ($interview->duration_mins ?? 60) . " minutes";
+        $location = $this->icsText($interview->location_notes ?? $interview->vacancy->location ?? '');
+        $type = $this->icsText(ucfirst($interview->interview_type ?? 'video'));
+        $description = "Type: {$type}\nDuration: " . ($interview->duration_mins ?? 60) . " minutes";
         if ($interview->location_notes) {
-            $description .= "\\nNotes: {$interview->location_notes}";
+            $description .= "\nNotes: " . $interview->location_notes;
         }
+        $description = $this->icsText($description);
 
         $uid = "interview-{$interview->id}@" . config('app.url', 'project-nexus.ie');
         $now = now()->format('Ymd\THis\Z');
@@ -2683,6 +2684,15 @@ class JobVacanciesController extends BaseApiController
             'Content-Type' => 'text/calendar; charset=utf-8',
             'Content-Disposition' => 'attachment; filename="interview.ics"',
         ]);
+    }
+
+    private function icsText(mixed $value): string
+    {
+        $text = str_replace(["\r\n", "\r"], "\n", (string) $value);
+        $text = str_replace('\\', '\\\\', $text);
+        $text = str_replace(["\n", ';', ','], ['\\n', '\\;', '\\,'], $text);
+
+        return $text;
     }
 
     /** GET /api/v2/jobs/interviews/{interviewId}/calendar-links — Get Add-to-Calendar deep links. */

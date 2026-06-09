@@ -11,6 +11,7 @@ namespace App\Http\Controllers\Api;
 use App\Core\TenantContext;
 use App\Services\CreditCommonsNodeService;
 use App\Services\Protocols\CreditCommonsAdapter;
+use App\Support\SecurityBounds;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -277,8 +278,8 @@ class FederationCreditCommonsController extends BaseApiController
         }
 
         // Amount bounds validation
-        if ($quant > 999999.99) {
-            return $this->ccError('MissingParameter', 'Amount exceeds maximum (999999.99)', 400);
+        if (!SecurityBounds::isAcceptableHourAmount($quant)) {
+            return $this->ccError('MissingParameter', 'Amount exceeds maximum', 400);
         }
 
         $payerId = $this->resolveAccountId($payerPath, $tenantId);
@@ -830,6 +831,10 @@ class FederationCreditCommonsController extends BaseApiController
             return $this->ccError('MissingParameter', 'Required: payer, payee, quant > 0', 400);
         }
 
+        if (!SecurityBounds::isAcceptableHourAmount($quant)) {
+            return $this->ccError('MissingParameter', 'Amount exceeds maximum', 400);
+        }
+
         $payeeIsLocal = CreditCommonsNodeService::isLocalAccount($payeePath, $tenantId);
 
         if ($payeeIsLocal) {
@@ -993,8 +998,8 @@ class FederationCreditCommonsController extends BaseApiController
             return $this->ccError('MissingParameter', 'Required: payer, payee, quant > 0', 400);
         }
 
-        if ($quant > 999999.99) {
-            return $this->ccError('MissingParameter', 'Amount exceeds maximum (999999.99)', 400);
+        if (!SecurityBounds::isAcceptableHourAmount($quant)) {
+            return $this->ccError('MissingParameter', 'Amount exceeds maximum', 400);
         }
 
         $uuid = (string) Str::uuid();
@@ -1096,6 +1101,15 @@ class FederationCreditCommonsController extends BaseApiController
         $payerId = $this->resolveAccountId($entry->payer, $tenantId);
         $payeeId = $this->resolveAccountId($entry->payee, $tenantId);
         $quant = (float) $entry->quant;
+
+        if (!SecurityBounds::isAcceptableHourAmount($quant)) {
+            return $this->ccError('MissingParameter', 'Amount exceeds maximum', 400);
+        }
+
+        if (!$payerId && $payeeId) {
+            return $this->ccError('PermissionViolation',
+                'Remote-only payer cannot credit a local payee without a local debit branch', 403);
+        }
 
         DB::beginTransaction();
         try {

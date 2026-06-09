@@ -246,6 +246,8 @@ class LocalAdvertisingController extends BaseApiController
                 'destination_url' => $this->input('destination_url'),
             ]);
             return $this->respondWithData($creative, null, 201);
+        } catch (\InvalidArgumentException $e) {
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), 'destination_url', 422);
         } catch (\Throwable $e) {
             return $this->respondServerError(__('api.service_unavailable'));
         }
@@ -457,6 +459,7 @@ class LocalAdvertisingController extends BaseApiController
         $campaignId = $this->inputInt('campaign_id');
         $creativeId = $this->inputInt('creative_id');
         $placement  = trim((string) $this->input('placement', 'feed'));
+        $trackingToken = $this->input('tracking_token');
 
         if ($campaignId === null || $creativeId === null) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'campaign_id']));
@@ -468,7 +471,8 @@ class LocalAdvertisingController extends BaseApiController
                 $creativeId,
                 $tenantId,
                 $placement,
-                $userId
+                $userId,
+                is_string($trackingToken) ? $trackingToken : null
             );
             return $this->respondWithData(['impression_id' => $impressionId]);
         } catch (\Throwable $e) {

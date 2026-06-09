@@ -37,6 +37,20 @@ class TeamTaskServiceTest extends TestCase
         $this->assertArrayHasKey('has_more', $result);
     }
 
+    public function test_getTasks_requires_active_group_membership_when_user_is_supplied(): void
+    {
+        DB::shouldReceive('table')->with('group_members')->andReturnSelf();
+        DB::shouldReceive('where')->with('group_id', 10)->andReturnSelf();
+        DB::shouldReceive('where')->with('user_id', 99)->andReturnSelf();
+        DB::shouldReceive('where')->with('status', 'active')->andReturnSelf();
+        DB::shouldReceive('exists')->andReturn(false);
+
+        $result = $this->service->getTasks(10, [], 99);
+
+        $this->assertSame(['items' => [], 'cursor' => null, 'has_more' => false], $result);
+        $this->assertEquals('FORBIDDEN', $this->service->getErrors()[0]['code']);
+    }
+
     public function test_getById_returns_null_when_not_found(): void
     {
         DB::shouldReceive('table')->with('team_tasks')->andReturnSelf();
@@ -84,12 +98,38 @@ class TeamTaskServiceTest extends TestCase
         $this->assertEquals('RESOURCE_NOT_FOUND', $this->service->getErrors()[0]['code']);
     }
 
+    public function test_update_requires_group_membership(): void
+    {
+        $task = (object) ['id' => 1, 'group_id' => 10, 'status' => 'todo'];
+
+        DB::shouldReceive('table')->with('team_tasks')->andReturnSelf();
+        DB::shouldReceive('where')->with('id', 1)->andReturnSelf();
+        DB::shouldReceive('where')->with('tenant_id', Mockery::any())->andReturnSelf();
+        DB::shouldReceive('first')->andReturn($task);
+
+        DB::shouldReceive('table')->with('group_members')->andReturnSelf();
+        DB::shouldReceive('where')->with('group_id', 10)->andReturnSelf();
+        DB::shouldReceive('where')->with('user_id', 99)->andReturnSelf();
+        DB::shouldReceive('where')->with('status', 'active')->andReturnSelf();
+        DB::shouldReceive('exists')->andReturn(false);
+
+        $result = $this->service->update(1, 99, ['title' => 'Updated']);
+
+        $this->assertFalse($result);
+        $this->assertEquals('FORBIDDEN', $this->service->getErrors()[0]['code']);
+    }
+
     public function test_update_returns_false_when_title_set_to_empty(): void
     {
-        $task = (object) ['id' => 1, 'status' => 'todo'];
+        $task = (object) ['id' => 1, 'group_id' => 10, 'status' => 'todo'];
         DB::shouldReceive('table')->with('team_tasks')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
         DB::shouldReceive('first')->andReturn($task);
+        DB::shouldReceive('table')->with('group_members')->andReturnSelf();
+        DB::shouldReceive('where')->with('group_id', 10)->andReturnSelf();
+        DB::shouldReceive('where')->with('user_id', 1)->andReturnSelf();
+        DB::shouldReceive('where')->with('status', 'active')->andReturnSelf();
+        DB::shouldReceive('exists')->andReturn(true);
 
         $result = $this->service->update(1, 1, ['title' => '   ']);
 
@@ -101,7 +141,7 @@ class TeamTaskServiceTest extends TestCase
     {
         DB::shouldReceive('table')->with('team_tasks')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('delete')->andReturn(0);
+        DB::shouldReceive('first')->andReturn(null);
 
         $result = $this->service->delete(999, 1);
 

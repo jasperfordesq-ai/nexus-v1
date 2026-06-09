@@ -310,7 +310,7 @@ class MerchantCouponService
     /**
      * Staff-side: redeem a QR token.
      */
-    public static function redeemQrToken(string $token): MerchantCouponRedemption
+    public static function redeemQrToken(string $token, int $staffUserId): MerchantCouponRedemption
     {
         $tenantId = TenantContext::getId();
         $key = "merchant_coupon_qr:{$tenantId}:" . strtoupper(trim($token));
@@ -324,6 +324,21 @@ class MerchantCouponService
         $userId = (int) ($payload['user_id'] ?? 0);
         if ($couponId <= 0 || $userId <= 0) {
             throw new \InvalidArgumentException('QR token payload is malformed.');
+        }
+
+        $coupon = MerchantCoupon::where('id', $couponId)
+            ->where('tenant_id', $tenantId)
+            ->first();
+        if (!$coupon) {
+            throw new \InvalidArgumentException(__('api_controllers_2.merchant_coupon.not_found'));
+        }
+
+        $isSellerStaff = MarketplaceSellerProfile::where('id', $coupon->seller_id)
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $staffUserId)
+            ->exists();
+        if (!$isSellerStaff) {
+            throw new \InvalidArgumentException(__('api.admin_access_required'));
         }
 
         $redemption = self::redeemForOrder($couponId, null, $userId, 'qr_scan');

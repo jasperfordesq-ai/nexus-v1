@@ -10,6 +10,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
 use App\Services\Protocols\KomunitinAdapter;
+use App\Support\SecurityBounds;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -654,7 +655,7 @@ class FederationKomunitinController extends BaseApiController
         }
 
         // Amount bounds validation
-        if ($amount > 999999.99) {
+        if (!SecurityBounds::isAcceptableHourAmount($amount)) {
             return $this->jsonApiError('BadRequest', 'Bad Request',
                 'Amount exceeds maximum allowed value', 400);
         }

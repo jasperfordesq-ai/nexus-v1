@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use App\Services\PilotInquiryService;
 use App\Core\TenantContext;
+use App\Support\CsvExportSanitizer;
 use InvalidArgumentException;
 
 /**
@@ -281,6 +282,8 @@ class PilotInquiryController extends BaseApiController
 
     private function csvEscape(string $value): string
     {
+        $value = CsvExportSanitizer::cell($value);
+
         if (str_contains($value, ',') || str_contains($value, '"') || str_contains($value, "\n")) {
             return '"' . str_replace('"', '""', $value) . '"';
         }

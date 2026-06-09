@@ -248,11 +248,15 @@ class GroupChatroomService
      *
      * @return array{items: array, cursor: string|null, has_more: bool}
      */
-    public function getMessages(int $chatroomId, array $filters = []): array
+    public function getMessages(int $chatroomId, array $filters = [], ?int $userId = null): ?array
     {
         $limit = min((int) ($filters['limit'] ?? 50), 100);
         $cursor = $filters['cursor'] ?? null;
         $tenantId = TenantContext::getId();
+
+        if ($userId !== null && $this->assertAccess($chatroomId, $userId) === null) {
+            return null;
+        }
 
         $query = DB::table('group_chatroom_messages as m')
             ->join('users as u', 'm.user_id', '=', 'u.id')
@@ -563,9 +567,13 @@ class GroupChatroomService
     /**
      * Get all pinned messages for a chatroom.
      */
-    public function getPinnedMessages(int $chatroomId): array
+    public function getPinnedMessages(int $chatroomId, ?int $userId = null): ?array
     {
         $tenantId = TenantContext::getId();
+
+        if ($userId !== null && $this->assertAccess($chatroomId, $userId) === null) {
+            return null;
+        }
 
         $pinned = DB::table('group_chatroom_pinned_messages as p')
             ->join('group_chatroom_messages as m', 'p.message_id', '=', 'm.id')

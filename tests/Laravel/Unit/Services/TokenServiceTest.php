@@ -8,6 +8,7 @@ namespace Tests\Laravel\Unit\Services;
 
 use Tests\Laravel\TestCase;
 use App\Services\TokenService;
+use Illuminate\Support\Facades\DB;
 
 class TokenServiceTest extends TestCase
 {
@@ -38,6 +39,13 @@ class TokenServiceTest extends TestCase
         $this->assertEquals(1, $payload['user_id']);
         $this->assertEquals(2, $payload['tenant_id']);
         $this->assertEquals('access', $payload['type']);
+    }
+
+    public function test_validateToken_rejects_refresh_token_when_used_as_bearer_access_token(): void
+    {
+        $token = $this->service->generateRefreshToken(1, 2, false);
+
+        $this->assertNull($this->service->validateToken($token));
     }
 
     public function test_validateToken_returns_null_for_invalid_token(): void
@@ -117,7 +125,9 @@ class TokenServiceTest extends TestCase
     public function test_generateRefreshToken_has_refresh_type(): void
     {
         $token = $this->service->generateRefreshToken(1, 2, false);
-        $payload = $this->service->validateToken($token);
+        DB::shouldReceive('selectOne')->andReturn(null);
+
+        $payload = $this->service->validateRefreshToken($token);
 
         $this->assertEquals('refresh', $payload['type']);
         $this->assertNotEmpty($payload['jti']);
@@ -133,11 +143,13 @@ class TokenServiceTest extends TestCase
     public function test_generateImpersonationToken_has_correct_claims(): void
     {
         $token = $this->service->generateImpersonationToken(1, 2, 99);
-        $payload = $this->service->validateToken($token);
+        $parts = explode('.', $token);
+        $payload = json_decode(base64_decode(strtr($parts[1], '-_', '+/')), true);
 
         $this->assertEquals('impersonation', $payload['type']);
         $this->assertEquals(99, $payload['impersonated_by']);
         $this->assertEquals(1, $payload['user_id']);
+        $this->assertNull($this->service->validateToken($token));
     }
 
     public function test_getTimeRemaining_returns_positive_for_fresh_token(): void

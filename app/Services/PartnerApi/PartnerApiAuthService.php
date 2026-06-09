@@ -166,6 +166,16 @@ class PartnerApiAuthService
             ->update(['revoked_at' => now()]) > 0;
     }
 
+    public static function revokeAccessTokenForPartner(string $rawToken, int $partnerId): bool
+    {
+        $hash = hash('sha256', $rawToken);
+        return DB::table('api_oauth_tokens')
+            ->where('access_token_hash', $hash)
+            ->where('partner_id', $partnerId)
+            ->whereNull('revoked_at')
+            ->update(['revoked_at' => now()]) > 0;
+    }
+
     private static function decodeJsonArray(mixed $value): array
     {
         if (is_string($value)) {

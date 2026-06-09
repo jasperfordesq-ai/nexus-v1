@@ -811,6 +811,9 @@ class AdminUsersController extends BaseApiController
         if (!$user || $user['tenant_id'] != $tenantId) {
             return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
+        if (!$this->canManageSecurityTarget($adminId, $user)) {
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.insufficient_permissions'), null, 403);
+        }
 
         $reason = $this->input('reason', __('svc_notifications.reset_by_admin'));
 
@@ -1329,6 +1332,9 @@ class AdminUsersController extends BaseApiController
         if (!$user || $user['tenant_id'] != $tenantId) {
             return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
         }
+        if (!$this->canManageSecurityTarget($adminId, $user)) {
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.insufficient_permissions'), null, 403);
+        }
 
         try {
             $token = bin2hex(random_bytes(32));
@@ -1698,6 +1704,48 @@ class AdminUsersController extends BaseApiController
         }
 
         return !empty($row->is_super_admin) || !empty($row->is_tenant_super_admin);
+    }
+
+    /**
+     * Prevent lower/equal admin tiers from resetting security state for peers
+     * or higher-tier admins.
+     *
+     * @param array<string,mixed> $targetUser
+     */
+    private function canManageSecurityTarget(int $adminId, array $targetUser): bool
+    {
+        $actor = User::findById($adminId, true);
+        if (!$actor) {
+            return false;
+        }
+
+        $actorTier = $this->securityTier($actor);
+        $targetTier = $this->securityTier($targetUser);
+
+        if ($actorTier >= 4) {
+            return true;
+        }
+
+        return $actorTier > $targetTier;
+    }
+
+    /**
+     * @param array<string,mixed> $user
+     */
+    private function securityTier(array $user): int
+    {
+        $role = (string) ($user['role'] ?? 'member');
+        if ($role === 'god' || !empty($user['is_god'])) {
+            return 4;
+        }
+        if ($role === 'super_admin' || !empty($user['is_super_admin'])) {
+            return 3;
+        }
+        if (in_array($role, ['admin', 'tenant_admin'], true) || !empty($user['is_tenant_super_admin'])) {
+            return 2;
+        }
+
+        return 1;
     }
 
     /**

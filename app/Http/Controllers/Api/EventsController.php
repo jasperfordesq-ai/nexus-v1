@@ -488,6 +488,7 @@ class EventsController extends BaseApiController
     public function attendees($id): JsonResponse
     {
         $id = (int) $id;
+        $userId = $this->requireAuth();
 
         $event = $this->eventService->getById($id);
         if (!$event) {
@@ -503,7 +504,7 @@ class EventsController extends BaseApiController
             $filters['cursor'] = $this->query('cursor');
         }
 
-        $result = $this->eventService->getAttendees($id, $filters);
+        $result = $this->eventService->getAttendees($id, $filters, $userId);
 
         return $this->respondWithCollection(
             $result['items'],
@@ -827,14 +828,17 @@ class EventsController extends BaseApiController
     public function getAttendance($id): JsonResponse
     {
         $id = (int) $id;
-        $this->requireAuth();
+        $userId = $this->requireAuth();
 
         $event = $this->eventService->getById($id);
         if (!$event) {
             return $this->respondWithError('NOT_FOUND', __('api.event_not_found'), null, 404);
         }
 
-        $records = $this->eventService->getAttendanceRecords($id);
+        $records = $this->eventService->getAttendanceRecords($id, $userId);
+        if ($records === null) {
+            return $this->respondWithError('FORBIDDEN', __('api.event_attendance_forbidden'), null, 403);
+        }
 
         return $this->respondWithData($records);
     }

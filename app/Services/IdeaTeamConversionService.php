@@ -212,11 +212,11 @@ class IdeaTeamConversionService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getLinksForChallenge(int $challengeId): array
+    public function getLinksForChallenge(int $challengeId, ?int $viewerId = null): array
     {
         $tenantId = TenantContext::getId();
 
-        return DB::table('idea_team_links as itl')
+        $query = DB::table('idea_team_links as itl')
             ->join('groups as g', 'g.id', '=', 'itl.group_id')
             ->join('challenge_ideas as ci', 'ci.id', '=', 'itl.idea_id')
             ->where('itl.challenge_id', $challengeId)
@@ -231,8 +231,23 @@ class IdeaTeamConversionService
                 'ci.title as idea_title',
                 'g.name as group_name',
                 'g.cached_member_count as group_member_count',
-            )
-            ->orderByDesc('itl.converted_at')
+            );
+
+        if ($viewerId !== null && !$this->canViewAllLinksForChallenge($challengeId, $tenantId, $viewerId)) {
+            $query->where(function ($q) use ($viewerId): void {
+                $q->where('ci.user_id', $viewerId)
+                    ->orWhere('itl.converted_by', $viewerId)
+                    ->orWhereExists(function ($sub) use ($viewerId): void {
+                        $sub->selectRaw('1')
+                            ->from('group_members as gm')
+                            ->whereColumn('gm.group_id', 'itl.group_id')
+                            ->where('gm.user_id', $viewerId)
+                            ->where('gm.status', 'active');
+                    });
+            });
+        }
+
+        return $query->orderByDesc('itl.converted_at')
             ->get()
             ->map(fn ($row) => [
                 'id'                 => (int) $row->id,
@@ -246,6 +261,19 @@ class IdeaTeamConversionService
                 'converted_at'       => $row->converted_at,
             ])
             ->all();
+    }
+
+    private function canViewAllLinksForChallenge(int $challengeId, int $tenantId, int $viewerId): bool
+    {
+        if ($this->isAdmin($viewerId)) {
+            return true;
+        }
+
+        return DB::table('ideation_challenges')
+            ->where('id', $challengeId)
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $viewerId)
+            ->exists();
     }
 
     /**

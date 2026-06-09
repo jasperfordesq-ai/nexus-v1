@@ -14,6 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 /**
@@ -84,7 +85,10 @@ class RegionalAnalyticsAdminController extends BaseApiController
         }
         $modules = array_values(array_intersect($modules, ['trends', 'demand_supply', 'demographics', 'footfall']));
 
-        $id = DB::table('regional_analytics_subscriptions')->insertGetId([
+        $rawToken = Str::random(64);
+        $storesHash = Schema::hasColumn('regional_analytics_subscriptions', 'subscription_token_hash');
+
+        $insert = [
             'tenant_id' => $tenantId,
             'partner_name' => $partnerName,
             'partner_type' => $partnerType,
@@ -93,7 +97,7 @@ class RegionalAnalyticsAdminController extends BaseApiController
             'plan_tier' => $planTier,
             'status' => 'trialing',
             'stripe_subscription_id' => null,
-            'subscription_token' => Str::random(64),
+            'subscription_token' => $storesHash ? 'token-ref-new-' . Str::random(24) : $rawToken,
             'trial_ends_at' => now()->addDays(14),
             'monthly_price_cents' => max(0, (int) $request->input('monthly_price_cents', 0)),
             'currency' => strtoupper(substr((string) $request->input('currency', 'CHF'), 0, 3)),
@@ -101,7 +105,20 @@ class RegionalAnalyticsAdminController extends BaseApiController
             'created_by_admin_id' => $adminId,
             'created_at' => now(),
             'updated_at' => now(),
-        ]);
+        ];
+        if ($storesHash) {
+            $insert['subscription_token_hash'] = hash('sha256', $rawToken);
+        }
+
+        $id = DB::table('regional_analytics_subscriptions')->insertGetId($insert);
+        if ($storesHash) {
+            DB::table('regional_analytics_subscriptions')
+                ->where('id', $id)
+                ->update([
+                    'subscription_token' => 'token-ref-' . $id . '-' . substr(hash('sha256', $rawToken), 0, 16),
+                    'updated_at' => now(),
+                ]);
+        }
 
         // Optional Stripe attach (no-op if SDK absent / no price configured).
         if ((bool) $request->input('create_stripe_subscription', false)) {
@@ -114,7 +131,10 @@ class RegionalAnalyticsAdminController extends BaseApiController
             }
         }
 
-        return $this->respondWithData(['subscription_id' => $id], null, 201);
+        return $this->respondWithData([
+            'subscription_id' => $id,
+            'subscription_token' => $rawToken,
+        ], null, 201);
     }
 
     public function update(Request $request, int $id): JsonResponse

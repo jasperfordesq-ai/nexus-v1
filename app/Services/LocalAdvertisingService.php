@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Support\OutboundUrlGuard;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -31,6 +32,7 @@ class LocalAdvertisingService
 
     /** Default cost-per-click in cents when no explicit CPC is configured. */
     private const DEFAULT_CPC_CENTS = 10;
+    private const TRACKING_TOKEN_TTL_SECONDS = 900;
 
     // ──────────────────────────────────────────────────────────────────────────
     // Availability guard
@@ -292,6 +294,10 @@ class LocalAdvertisingService
         self::assertAvailable();
 
         $now = Carbon::now();
+        $destinationUrl = isset($data['destination_url']) ? trim((string) $data['destination_url']) : '';
+        if ($destinationUrl !== '' && !OutboundUrlGuard::isSafeBrowserUrl($destinationUrl)) {
+            throw new \InvalidArgumentException(__('api.invalid_url'));
+        }
 
         $id = DB::table(self::TABLE_CREATIVES)->insertGetId([
             'campaign_id'     => $campaignId,
@@ -300,7 +306,7 @@ class LocalAdvertisingService
             'body'            => $data['body'],
             'cta_text'        => $data['cta_text'] ?? null,
             'image_url'       => $data['image_url'] ?? null,
-            'destination_url' => $data['destination_url'] ?? null,
+            'destination_url' => $destinationUrl !== '' ? $destinationUrl : null,
             'is_active'       => 1,
             'created_at'      => $now,
             'updated_at'      => $now,
@@ -355,17 +361,35 @@ class LocalAdvertisingService
         $results = [];
 
         foreach ($campaigns as $campaign) {
-            $row = (array) $campaign;
-
-            $row['creatives'] = DB::table(self::TABLE_CREATIVES)
+            $creatives = DB::table(self::TABLE_CREATIVES)
                 ->where('campaign_id', $campaign->id)
                 ->where('tenant_id', $tenantId)
                 ->where('is_active', 1)
                 ->get()
-                ->map(fn ($r) => (array) $r)
+                ->map(function ($creative) use ($campaign, $tenantId, $placement): array {
+                    return [
+                        'id' => (int) $creative->id,
+                        'campaign_id' => (int) $campaign->id,
+                        'headline' => $creative->headline,
+                        'body' => $creative->body,
+                        'cta_text' => $creative->cta_text,
+                        'image_url' => $creative->image_url,
+                        'destination_url' => $creative->destination_url,
+                        'tracking_token' => self::trackingToken($tenantId, (int) $campaign->id, (int) $creative->id, $placement),
+                    ];
+                })
                 ->all();
 
-            $results[] = $row;
+            if ($creatives === []) {
+                continue;
+            }
+
+            $results[] = [
+                'id' => (int) $campaign->id,
+                'placement' => $campaign->placement,
+                'advertiser_type' => $campaign->advertiser_type,
+                'creatives' => $creatives,
+            ];
         }
 
         return $results;
@@ -387,9 +411,18 @@ class LocalAdvertisingService
         int $creativeId,
         int $tenantId,
         string $placement,
-        ?int $userId = null
+        ?int $userId = null,
+        ?string $trackingToken = null
     ): int {
         self::assertAvailable();
+
+        if (!self::verifyTrackingToken($trackingToken, $tenantId, $campaignId, $creativeId, $placement)) {
+            throw new \InvalidArgumentException(__('api.invalid_token_payload'));
+        }
+
+        if (!self::isServeableCreative($tenantId, $campaignId, $creativeId, $placement)) {
+            throw new \InvalidArgumentException(__('api.invalid_id', ['resource' => 'ad']));
+        }
 
         $impressionId = DB::table(self::TABLE_IMPRESSIONS)->insertGetId([
             'campaign_id' => $campaignId,
@@ -422,6 +455,24 @@ class LocalAdvertisingService
     ): void {
         self::assertAvailable();
 
+        $impression = DB::table(self::TABLE_IMPRESSIONS)
+            ->where('id', $impressionId)
+            ->where('campaign_id', $campaignId)
+            ->where('tenant_id', $tenantId)
+            ->first(['id', 'creative_id']);
+        if (!$impression) {
+            throw new \InvalidArgumentException(__('api.invalid_id', ['resource' => 'impression']));
+        }
+
+        $alreadyClicked = DB::table(self::TABLE_CLICKS)
+            ->where('impression_id', $impressionId)
+            ->where('campaign_id', $campaignId)
+            ->where('tenant_id', $tenantId)
+            ->exists();
+        if ($alreadyClicked) {
+            return;
+        }
+
         DB::table(self::TABLE_CLICKS)->insert([
             'impression_id' => $impressionId,
             'campaign_id'   => $campaignId,
@@ -438,6 +489,98 @@ class LocalAdvertisingService
                 'spent_cents'  => DB::raw('spent_cents + ' . self::DEFAULT_CPC_CENTS),
                 'updated_at'   => Carbon::now(),
             ]);
+    }
+
+    private static function isServeableCreative(int $tenantId, int $campaignId, int $creativeId, string $placement): bool
+    {
+        $today = Carbon::today()->toDateString();
+
+        return DB::table(self::TABLE_CAMPAIGNS . ' as c')
+            ->join(self::TABLE_CREATIVES . ' as cr', function ($join): void {
+                $join->on('cr.campaign_id', '=', 'c.id')
+                    ->on('cr.tenant_id', '=', 'c.tenant_id');
+            })
+            ->where('c.id', $campaignId)
+            ->where('c.tenant_id', $tenantId)
+            ->where('c.status', 'active')
+            ->where('cr.id', $creativeId)
+            ->where('cr.is_active', 1)
+            ->where(function ($q) use ($placement): void {
+                $q->where('c.placement', $placement)
+                    ->orWhere('c.placement', 'all');
+            })
+            ->where(function ($q) use ($today): void {
+                $q->whereNull('c.start_date')->orWhere('c.start_date', '<=', $today);
+            })
+            ->where(function ($q) use ($today): void {
+                $q->whereNull('c.end_date')->orWhere('c.end_date', '>=', $today);
+            })
+            ->where(function ($q): void {
+                $q->where('c.budget_cents', 0)
+                    ->orWhereColumn('c.spent_cents', '<', 'c.budget_cents');
+            })
+            ->exists();
+    }
+
+    private static function trackingToken(int $tenantId, int $campaignId, int $creativeId, string $placement): string
+    {
+        $payload = [
+            't' => $tenantId,
+            'c' => $campaignId,
+            'r' => $creativeId,
+            'p' => $placement,
+            'e' => time() + self::TRACKING_TOKEN_TTL_SECONDS,
+        ];
+        $encoded = self::base64UrlEncode(json_encode($payload, JSON_THROW_ON_ERROR));
+        $signature = hash_hmac('sha256', $encoded, self::trackingSecret());
+
+        return $encoded . '.' . $signature;
+    }
+
+    private static function verifyTrackingToken(?string $token, int $tenantId, int $campaignId, int $creativeId, string $placement): bool
+    {
+        if (!is_string($token) || !str_contains($token, '.')) {
+            return false;
+        }
+
+        [$encoded, $signature] = explode('.', $token, 2);
+        if (!hash_equals(hash_hmac('sha256', $encoded, self::trackingSecret()), $signature)) {
+            return false;
+        }
+
+        $json = self::base64UrlDecode($encoded);
+        if ($json === null) {
+            return false;
+        }
+        $payload = json_decode($json, true);
+        if (!is_array($payload)) {
+            return false;
+        }
+
+        return (int) ($payload['t'] ?? 0) === $tenantId
+            && (int) ($payload['c'] ?? 0) === $campaignId
+            && (int) ($payload['r'] ?? 0) === $creativeId
+            && (string) ($payload['p'] ?? '') === $placement
+            && (int) ($payload['e'] ?? 0) >= time();
+    }
+
+    private static function trackingSecret(): string
+    {
+        return (string) config('app.key', 'local-ad-tracking');
+    }
+
+    private static function base64UrlEncode(string $value): string
+    {
+        return rtrim(strtr(base64_encode($value), '+/', '-_'), '=');
+    }
+
+    private static function base64UrlDecode(string $value): ?string
+    {
+        $length = strlen($value);
+        $paddedLength = $length % 4 === 0 ? $length : $length + 4 - ($length % 4);
+        $decoded = base64_decode(str_pad(strtr($value, '-_', '+/'), $paddedLength, '=', STR_PAD_RIGHT), true);
+
+        return $decoded === false ? null : $decoded;
     }
 
     // ──────────────────────────────────────────────────────────────────────────

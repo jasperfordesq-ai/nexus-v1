@@ -13,6 +13,7 @@ use App\Events\TransactionCompleted;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Support\OutboundUrlGuard;
+use App\Support\SecurityBounds;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -74,6 +75,9 @@ class CaringHourTransferService
         }
         if (round($hours, 2) != $hours) {
             throw new InvalidArgumentException('Hours must have at most 2 decimal places.');
+        }
+        if (!SecurityBounds::isAcceptableHourAmount($hours)) {
+            throw new InvalidArgumentException('Hours exceed the permitted single-transfer limit.');
         }
 
         if ($destinationTenantSlug === '') {
@@ -902,6 +906,9 @@ class CaringHourTransferService
         if ($sourceSlug === '' || $sourceTransferId <= 0 || $sourceEmail === '' || $hours <= 0) {
             return ['accepted' => false, 'destination_transfer_id' => null, 'error' => 'payload_invalid', 'duplicated' => false];
         }
+        if (!SecurityBounds::isAcceptableHourAmount($hours)) {
+            return ['accepted' => false, 'destination_transfer_id' => null, 'error' => 'amount_exceeds_limit', 'duplicated' => false];
+        }
 
         $idempotencyKey = $sourceSlug . ':' . $sourceTransferId;
 
@@ -1037,6 +1044,10 @@ class CaringHourTransferService
         }
 
         $hours = round((float) $payload['hours'], 2);
+        if (!SecurityBounds::isAcceptableHourAmount($hours)) {
+            throw new RuntimeException('Transfer amount exceeds the permitted single-transfer limit.');
+        }
+
         $now = now();
 
         // Insert destination row

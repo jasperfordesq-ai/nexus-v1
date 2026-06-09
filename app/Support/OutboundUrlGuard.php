@@ -55,6 +55,42 @@ final class OutboundUrlGuard
     }
 
     /**
+     * Validate a user-visible/browser navigation URL.
+     *
+     * Unlike server-side callbacks, this does not resolve DNS; it only enforces
+     * a navigable HTTP(S) scheme and rejects obvious local targets.
+     */
+    public static function isSafeBrowserUrl(string $url): bool
+    {
+        $url = trim($url);
+        if ($url === '' || str_starts_with($url, '//')) {
+            return false;
+        }
+
+        $parts = parse_url($url);
+        if (!is_array($parts)) {
+            return false;
+        }
+
+        $scheme = strtolower((string) ($parts['scheme'] ?? ''));
+        $host = self::normalizeHost((string) ($parts['host'] ?? ''));
+
+        if ($host === '' || !in_array($scheme, ['http', 'https'], true)) {
+            return false;
+        }
+
+        if (self::isBlockedLocalName($host)) {
+            return false;
+        }
+
+        if (filter_var($host, FILTER_VALIDATE_IP) && !self::isPublicIp($host)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * @return array<int,mixed>
      */
     public static function curlOptionsForUrl(string $url, bool $requireHttps = false): array

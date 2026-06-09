@@ -22,6 +22,7 @@ use App\Services\FederatedMessageService;
 use App\Services\FederationEmailService;
 use App\Services\FederationExternalApiClient;
 use App\Services\FederationExternalPartnerService;
+use App\Support\SecurityBounds;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -113,7 +114,7 @@ class FederationExternalWebhookController extends BaseApiController
         // (Bearer) to stay backward-compatible with existing partner clients,
         // but strongly recommended — when present it is always enforced.
         $nonce = $request->header('X-Federation-Nonce');
-        if ($this->authenticatedWithHmac && empty($nonce)) {
+        if (empty($nonce)) {
             return $this->respondWithError('INVALID_NONCE', __('api.federation.webhook_nonce_required'), null, 400);
         }
 
@@ -1081,6 +1082,10 @@ class FederationExternalWebhookController extends BaseApiController
         $description = $data['description'] ?? '';
 
         if ($recipientId && $amount > 0) {
+            if (!SecurityBounds::isAcceptableHourAmount($amount)) {
+                return ['status' => 'rejected', 'reason' => 'Amount exceeds the permitted single-transfer limit'];
+            }
+
             if (!is_string($externalTxId) || trim($externalTxId) === '') {
                 return ['status' => 'rejected', 'reason' => 'Missing external_transaction_id'];
             }
@@ -1304,6 +1309,10 @@ class FederationExternalWebhookController extends BaseApiController
 
         if (!is_string($externalTxId) || trim($externalTxId) === '') {
             return ['status' => 'rejected', 'reason' => 'Missing external_transaction_id'];
+        }
+
+        if (!SecurityBounds::isAcceptableHourAmount($amountInHours)) {
+            return ['status' => 'rejected', 'reason' => 'Amount exceeds the permitted single-transfer limit'];
         }
 
         // Validate receiver exists

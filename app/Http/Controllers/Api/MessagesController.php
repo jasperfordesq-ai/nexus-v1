@@ -389,7 +389,7 @@ class MessagesController extends BaseApiController
      */
     public function getReactionsBatch(): JsonResponse
     {
-        $this->requireAuth();
+        $userId = $this->requireAuth();
         $this->rateLimit('messages_reactions_batch', 30, 60);
 
         $idsParam = $this->query('ids', '');
@@ -406,7 +406,7 @@ class MessagesController extends BaseApiController
         $ids = array_slice($ids, 0, 100);
 
         try {
-            $reactions = Message::getReactionsBatch($ids);
+            $reactions = Message::getReactionsBatch($ids, $userId);
             return $this->success(['reactions' => $reactions]);
         } catch (\Throwable $e) {
             Log::error('Failed to fetch reactions batch', ['error' => $e->getMessage(), 'ids' => $ids]);

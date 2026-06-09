@@ -13,6 +13,7 @@ use App\Services\RegionalAnalytics\RegionalAnalyticsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -124,6 +125,21 @@ class RegionalAnalyticsPartnerController extends BaseApiController
         if (! is_string($token) || $token === '') {
             return null;
         }
+
+        if (Schema::hasColumn('regional_analytics_subscriptions', 'subscription_token_hash')) {
+            $sub = DB::table('regional_analytics_subscriptions')
+                ->where('subscription_token_hash', hash('sha256', $token))
+                ->first();
+            if ($sub) {
+                return $sub;
+            }
+
+            return DB::table('regional_analytics_subscriptions')
+                ->whereNull('subscription_token_hash')
+                ->where('subscription_token', $token)
+                ->first();
+        }
+
         return DB::table('regional_analytics_subscriptions')
             ->where('subscription_token', $token)
             ->first();
