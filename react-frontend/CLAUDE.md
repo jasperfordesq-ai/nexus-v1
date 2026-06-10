@@ -124,13 +124,14 @@ Three independent per-tenant settings, all configurable in `/admin/tenant-featur
 | Setting | Values | Default | Effect |
 | --- | --- | --- | --- |
 | `maps` (feature flag) | on / off | on | Off ⇒ no map components render anywhere; no Google API key reaches the browser. |
-| `map_provider` (general setting) | `google` / `openstreetmap` | `google` | Renderer for interactive maps. |
-| `geocoding_provider` (general setting) | `google` / `nominatim` | `google` | Address autocomplete. **Always on regardless of `maps` flag.** |
+| `map_provider` (general setting) | `google` / `openstreetmap` / `ordnance_survey` | `google` | Renderer for interactive maps. `ordnance_survey` reuses the Leaflet view with OS Maps API tiles (Crown copyright attribution); degrades to free OSM tiles when no OS key resolves. |
+| `geocoding_provider` (general setting) | `google` / `nominatim` / `os_places` | `google` | Address autocomplete. **Always on regardless of `maps` flag.** `os_places` gives UPRN-backed UK address validation via the server-side proxy `/v2/geo/os-places/search` (OS Data Hub key never reaches the browser). |
 
 **Dispatch:**
 
-- `LocationMap` checks `hasFeature('maps')` → `mapProvider` → `<OpenStreetMapView/>` (lazy-loaded Leaflet) or `<GoogleMapsProvider/>`.
-- `PlaceAutocompleteInput` checks `geocodingProvider` → `<NominatimAutocomplete/>` or Google Places. The Google branch never mounts on Nominatim tenants — zero billable traffic.
+- `LocationMap` checks `hasFeature('maps')` → `mapProvider` → `<OpenStreetMapView/>` (lazy-loaded Leaflet, serves both `openstreetmap` and `ordnance_survey` — the server picks the tile URL) or `<GoogleMapsProvider/>`.
+- `PlaceAutocompleteInput` checks `geocodingProvider` → `<NominatimAutocomplete/>`, `<OsPlacesAutocomplete/>` (UPRN on `PlaceResult.uprn`), or Google Places. The Google branch never mounts on non-Google tenants — zero billable traffic.
+- OS Data Hub: one project key (`general.os_maps_api_key`, env fallback `OS_MAPS_API_KEY`) covers both the OS Maps basemap and the OS Places lookup. UK public-sector tenants are typically covered by the PSGA.
 
 **Defence in depth:** `MapsConfigController` (`/api/v2/config/google-maps`) only returns the Google API key when `maps=on` AND `map_provider=google`. `AdminConfigController::updateSettings` validates provider values against allow-lists.
 
