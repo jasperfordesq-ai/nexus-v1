@@ -89,8 +89,10 @@ class FederationInboundHandlersTest extends TestCase
     private function postWebhook(string $event, array $data, ?string $token = null): \Illuminate\Testing\TestResponse
     {
         return $this->withHeaders([
-            'Authorization' => 'Bearer ' . ($token ?? $this->partnerToken),
-            'Content-Type'  => 'application/json',
+            'Authorization'      => 'Bearer ' . ($token ?? $this->partnerToken),
+            'Content-Type'       => 'application/json',
+            // Replay protection requires a unique nonce on every webhook
+            'X-Federation-Nonce' => 'test-nonce-' . bin2hex(random_bytes(16)),
         ])->postJson(self::WEBHOOK_URL, [
             'event' => $event,
             'data'  => $data,

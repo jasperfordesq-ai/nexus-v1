@@ -108,40 +108,35 @@ class FederationExternalWebhookController extends BaseApiController
         }
 
         // ---- Replay protection via X-Federation-Nonce ----
-        // HMAC alone is not enough: a captured-but-still-fresh (<5 min) signed
-        // request could be replayed. Require a nonce and reject duplicates
-        // scoped by (partner_id, nonce). Header is optional for API-key auth
-        // (Bearer) to stay backward-compatible with existing partner clients,
-        // but strongly recommended — when present it is always enforced.
+        // Auth alone is not enough: a captured-but-still-fresh (<5 min) request
+        // could be replayed. Every webhook — Bearer or HMAC — must carry a nonce;
+        // duplicates are rejected scoped by (partner_id, nonce).
         $nonce = $request->header('X-Federation-Nonce');
         if (empty($nonce)) {
             return $this->respondWithError('INVALID_NONCE', __('api.federation.webhook_nonce_required'), null, 400);
         }
-
-        if (!empty($nonce)) {
-            if (!is_string($nonce) || strlen($nonce) < 8 || strlen($nonce) > 128) {
-                return $this->respondWithError('INVALID_NONCE', __('api.federation.webhook_invalid_nonce'), null, 400);
+        if (!is_string($nonce) || strlen($nonce) < 8 || strlen($nonce) > 128) {
+            return $this->respondWithError('INVALID_NONCE', __('api.federation.webhook_invalid_nonce'), null, 400);
+        }
+        try {
+            // INSERT IGNORE — atomic "first-seen" claim.
+            $inserted = DB::affectingStatement(
+                "INSERT IGNORE INTO federation_webhook_nonces (partner_id, nonce, seen_at) VALUES (?, ?, NOW())",
+                [$partner->id, $nonce]
+            );
+            if ($inserted === 0) {
+                Log::warning('[FederationExternalWebhook] Rejecting replayed nonce', [
+                    'partner_id' => $partner->id,
+                    'nonce_prefix' => substr($nonce, 0, 8),
+                ]);
+                return $this->respondWithError('REPLAY_DETECTED', __('api.federation.webhook_replay_detected'), null, 409);
             }
-            try {
-                // INSERT IGNORE — atomic "first-seen" claim.
-                $inserted = DB::affectingStatement(
-                    "INSERT IGNORE INTO federation_webhook_nonces (partner_id, nonce, seen_at) VALUES (?, ?, NOW())",
-                    [$partner->id, $nonce]
-                );
-                if ($inserted === 0) {
-                    Log::warning('[FederationExternalWebhook] Rejecting replayed nonce', [
-                        'partner_id' => $partner->id,
-                        'nonce_prefix' => substr($nonce, 0, 8),
-                    ]);
-                    return $this->respondWithError('REPLAY_DETECTED', __('api.federation.webhook_replay_detected'), null, 409);
-                }
-            } catch (\Throwable $e) {
-                // Nonce store unavailable — fail closed to preserve replay protection.
-                // A temporarily unavailable DB is safer to reject than to silently
-                // bypass the only defence against replayed signed requests.
-                Log::error('[FederationExternalWebhook] Nonce store unavailable — rejecting request', ['error' => $e->getMessage()]);
-                return response()->json(['error' => __('api_controllers_1.federation.webhook_service_unavailable')], 503);
-            }
+        } catch (\Throwable $e) {
+            // Nonce store unavailable — fail closed to preserve replay protection.
+            // A temporarily unavailable DB is safer to reject than to silently
+            // bypass the only defence against replayed signed requests.
+            Log::error('[FederationExternalWebhook] Nonce store unavailable — rejecting request', ['error' => $e->getMessage()]);
+            return response()->json(['error' => __('api_controllers_1.federation.webhook_service_unavailable')], 503);
         }
 
         // ---- Parse body (post-auth) ----

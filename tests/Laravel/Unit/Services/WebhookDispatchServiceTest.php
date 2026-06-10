@@ -73,10 +73,25 @@ class WebhookDispatchServiceTest extends TestCase
         WebhookDispatchService::createWebhook(1, ['name' => 'Test', 'secret' => 'x', 'events' => ['test']]);
     }
 
-    public function test_createWebhook_throws_when_secret_missing(): void
+    public function test_createWebhook_generates_secret_when_missing(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        WebhookDispatchService::createWebhook(1, ['name' => 'Test', 'url' => 'https://example.com', 'events' => ['test']]);
+        // A missing secret is NOT an error: createWebhook() auto-generates one
+        // (f1a6b4ab0, platform-audit fix) so webhooks are never unsigned. The
+        // old expect-throws version of this test only passed on machines where
+        // DNS resolution for example.com failed and the SSRF guard threw by
+        // coincidence. Use an IP-literal URL so the guard short-circuits DNS
+        // and is deterministic, and mock the insert so no real DB is needed.
+        DB::shouldReceive('table')->with('outbound_webhooks')->andReturnSelf();
+        DB::shouldReceive('insertGetId')->withArgs(function (array $row) {
+            return is_string($row['secret'] ?? null) && strlen($row['secret']) >= 32;
+        })->andReturn(42);
+
+        $result = WebhookDispatchService::createWebhook(
+            1,
+            ['name' => 'Test', 'url' => 'https://93.184.216.34', 'events' => ['test']]
+        );
+
+        $this->assertSame(42, $result['id']);
     }
 
     public function test_createWebhook_throws_when_events_missing(): void

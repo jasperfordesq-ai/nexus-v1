@@ -1683,7 +1683,11 @@ class AlphaController extends Controller
     {
         $tenant = TenantContext::get();
         $tenantSlug = (string) ($tenant['slug'] ?? '');
-        if ($tenantSlug === '') {
+
+        // The host tenant (id 1) renders tenant-agnostic pages (the tenant
+        // chooser) — same rule as tenantChooser(). Its feedback link must be
+        // the generic platform mailto, not a tenant contact form.
+        if ($tenantSlug === '' || (int) ($tenant['id'] ?? 0) <= 1) {
             return (string) __('govuk_alpha.feedback_url');
         }
 

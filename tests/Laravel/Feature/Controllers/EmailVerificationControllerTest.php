@@ -48,6 +48,13 @@ class EmailVerificationControllerTest extends TestCase
 
         $this->app['auth']->forgetGuards();
 
+        // forgetGuards() does NOT clear the legacy PHP session superglobal, and
+        // BaseApiController::resolveUserId() falls back to $_SESSION['user_id']
+        // when no guard user exists — a leaked legacy session id from an earlier
+        // test makes the anonymous resend request authenticate as a user that
+        // doesn't exist in this tenant (404 instead of 401).
+        unset($_SESSION['user_id']);
+
         TenantContext::reset();
         TenantContext::setById($this->testTenantId);
 

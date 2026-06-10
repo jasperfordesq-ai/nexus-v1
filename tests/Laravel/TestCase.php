@@ -75,6 +75,15 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
+        // BaseApiController::resolveUserId() falls back to the legacy
+        // $_SESSION['user_id'] superglobal, which survives across tests in the
+        // shared PHPUnit process. A leaked id makes "anonymous" requests in
+        // later tests silently authenticate as a user from an earlier test
+        // (wrong tenant, rolled-back row, etc.). Clear it so every test starts
+        // truly anonymous; tests that need a legacy session set it themselves
+        // after parent::setUp().
+        unset($_SESSION['user_id']);
+
         $this->setUpTenantContext();
     }
 

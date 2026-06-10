@@ -817,6 +817,16 @@ class EventService
 
         $tenantId = \App\Core\TenantContext::getId();
 
+        // Roster privacy: only organizers/admins or fellow RSVPed attendees may
+        // enumerate who is going to an event.
+        if ($viewerId !== null && !self::canViewEventRoster($eventId, $viewerId, $tenantId)) {
+            return [
+                'items' => [],
+                'cursor' => null,
+                'has_more' => false,
+            ];
+        }
+
         // Build WHERE clause: 'all' returns going + interested
         if ($status === 'all') {
             $params = [$eventId, 'going', 'interested', $tenantId];
@@ -1035,14 +1045,6 @@ class EventService
         self::$errors = [];
         self::$lastCancellationRecipientIds = [];
         $tenantId = \App\Core\TenantContext::getId();
-
-        if ($viewerId !== null && !self::canViewEventRoster($eventId, $viewerId, $tenantId)) {
-            return [
-                'items' => [],
-                'cursor' => null,
-                'has_more' => false,
-            ];
-        }
 
         $event = DB::selectOne("SELECT * FROM events WHERE id = ? AND tenant_id = ?", [$eventId, $tenantId]);
         if (!$event) {
