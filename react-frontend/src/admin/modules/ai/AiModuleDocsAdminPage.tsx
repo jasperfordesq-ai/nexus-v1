@@ -16,6 +16,7 @@ import Sparkles from 'lucide-react/icons/sparkles';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
+import { ConfirmModal } from '../../components';
 
 interface ModuleDoc {
   id: number;
@@ -55,6 +56,8 @@ export default function AiModuleDocsAdminPage() {
   const [form, setForm] = useState<DocForm>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [seeding, setSeeding] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<ModuleDoc | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -117,14 +120,18 @@ export default function AiModuleDocsAdminPage() {
     }
   }
 
-  async function handleDelete(doc: ModuleDoc) {
-    if (!confirm(t('ai.module_docs.confirm_delete', { title: doc.title }))) return;
+  async function handleDelete() {
+    if (!deleteTarget) return;
+    setDeleting(true);
     try {
-      await api.delete(`/v2/admin/ai-module-docs/${doc.id}`);
+      await api.delete(`/v2/admin/ai-module-docs/${deleteTarget.id}`);
       toast.success(t('ai.module_docs.toasts.deleted'));
       void load();
     } catch {
       toast.error(t('ai.module_docs.toasts.delete_failed'));
+    } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
     }
   }
 
@@ -234,7 +241,7 @@ export default function AiModuleDocsAdminPage() {
                     size="sm"
                     variant="danger"
                     isIconOnly
-                    onPress={() => void handleDelete(doc)}
+                    onPress={() => setDeleteTarget(doc)}
                     aria-label={t('ai.module_docs.actions.delete')}
                   >
                     <Trash2 size={14} />
@@ -245,6 +252,18 @@ export default function AiModuleDocsAdminPage() {
           ))}
         </TableBody>
       </Table>
+
+      <ConfirmModal
+        isOpen={deleteTarget !== null}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={() => void handleDelete()}
+        title={t('ai.module_docs.actions.delete')}
+        message={deleteTarget ? t('ai.module_docs.confirm_delete', { title: deleteTarget.title }) : ''}
+        confirmLabel={t('ai.module_docs.actions.delete')}
+        cancelLabel={t('ai.common.cancel')}
+        confirmColor="danger"
+        isLoading={deleting}
+      />
 
       <Modal isOpen={editorOpen} onClose={() => setEditorOpen(false)} size="3xl" scrollBehavior="inside">
         <ModalContent>

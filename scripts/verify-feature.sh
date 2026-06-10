@@ -142,9 +142,9 @@ else
 fi
 
 # Check for undefined ApiErrorCodes constants
-UNDEFINED_CODES=$(grep -rn 'ApiErrorCodes::' src/ --include="*.php" 2>/dev/null | grep -v 'class ApiErrorCodes' | while read -r line; do
+UNDEFINED_CODES=$(grep -rn 'ApiErrorCodes::' app/ --include="*.php" 2>/dev/null | grep -v 'class ApiErrorCodes' | while read -r line; do
     CONST=$(echo "$line" | grep -oP 'ApiErrorCodes::\K[A-Z_]+')
-    if [ -n "$CONST" ] && ! grep -q "const $CONST" src/Core/ApiErrorCodes.php 2>/dev/null; then
+    if [ -n "$CONST" ] && ! grep -q "const $CONST" app/Core/ApiErrorCodes.php 2>/dev/null; then
         echo "$line"
     fi
 done | wc -l || true)

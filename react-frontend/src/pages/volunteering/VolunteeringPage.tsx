@@ -407,6 +407,7 @@ function OpportunitiesTab() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
   const [proximityParams, setProximityParams] = useState<ProximityFilterParams | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [, setCursor] = useState<string | undefined>();
@@ -414,6 +415,19 @@ function OpportunitiesTab() {
   const tRef = useRef(t);
   tRef.current = t;
   const abortOpportunitiesRef = useRef<AbortController | null>(null);
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Debounce search input so we don't fire an API request on every keystroke
+  // (same pattern as OrganisationsPage)
+  useEffect(() => {
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    searchTimeoutRef.current = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 300);
+    return () => {
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    };
+  }, [searchQuery]);
 
   // Apply modal
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -435,7 +449,7 @@ function OpportunitiesTab() {
       const params = new URLSearchParams();
       params.set('per_page', '20');
       if (append && cursorRef.current) params.set('cursor', cursorRef.current);
-      if (searchQuery.trim()) params.set('search', searchQuery.trim());
+      if (debouncedQuery.trim()) params.set('search', debouncedQuery.trim());
       if (proximityParams) {
         params.set('near_lat', String(proximityParams.near_lat));
         params.set('near_lng', String(proximityParams.near_lng));
@@ -472,7 +486,7 @@ function OpportunitiesTab() {
         setIsLoading(false);
       }
     }
-  }, [searchQuery, proximityParams]);
+  }, [debouncedQuery, proximityParams]);
 
   const loadOpportunitiesRef = useRef(loadOpportunities);
   loadOpportunitiesRef.current = loadOpportunities;
@@ -482,7 +496,7 @@ function OpportunitiesTab() {
     setCursor(undefined);
     loadOpportunitiesRef.current();
     return () => { abortOpportunitiesRef.current?.abort(); };
-  }, [searchQuery, proximityParams]);
+  }, [debouncedQuery, proximityParams]);
 
   const handleApply = async () => {
     if (!selectedOpportunity) return;

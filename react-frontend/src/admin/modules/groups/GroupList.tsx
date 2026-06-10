@@ -68,6 +68,8 @@ export function GroupList() {
   const [cloneLoading, setCloneLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [confirmBulkDelete, setConfirmBulkDelete] = useState(false);
+  const [bulkDeleteLoading, setBulkDeleteLoading] = useState(false);
 
   const loadItems = useCallback(async () => {
     setLoading(true);
@@ -182,13 +184,15 @@ export function GroupList() {
   };
 
   const handleBulkDelete = async () => {
-    if (!confirm(t('groups.confirm_bulk_delete'))) return;
+    setBulkDeleteLoading(true);
     // Delete one by one (no bulk delete endpoint)
     for (const id of selectedIds) {
       try { await adminGroups.delete(id); } catch { /* skip failures */ }
     }
     toast.success(t('groups.groups_deleted'));
     setSelectedIds(new Set());
+    setBulkDeleteLoading(false);
+    setConfirmBulkDelete(false);
     loadItems();
   };
 
@@ -375,7 +379,7 @@ export function GroupList() {
         <div className="flex items-center gap-3 p-3 mb-4 bg-accent/10 rounded-lg">
           <span className="text-sm font-medium">{t('groups.selected_count', { count: selectedIds.size })}</span>
           <Button size="sm" variant="tertiary" onPress={handleBulkArchive}>{t('groups.archive')}</Button>
-              <Button size="sm" variant="danger" onPress={handleBulkDelete}>{t('groups.delete')}</Button>
+              <Button size="sm" variant="danger" onPress={() => setConfirmBulkDelete(true)}>{t('groups.delete')}</Button>
           <Button size="sm" variant="tertiary" onPress={() => setSelectedIds(new Set())}>{t('common.clear')}</Button>
         </div>
       )}
@@ -408,6 +412,17 @@ export function GroupList() {
           isLoading={actionLoading}
         />
       )}
+
+      <ConfirmModal
+        isOpen={confirmBulkDelete}
+        onClose={() => setConfirmBulkDelete(false)}
+        onConfirm={handleBulkDelete}
+        title={t('groups.delete')}
+        message={t('groups.confirm_bulk_delete')}
+        confirmLabel={t('groups.delete')}
+        confirmColor="danger"
+        isLoading={bulkDeleteLoading}
+      />
 
       {/* Clone Group Modal */}
       <Modal

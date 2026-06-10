@@ -449,7 +449,7 @@ export function AlgorithmSettings() {
                       color={health.embeddings.total > 0 ? 'success' : 'default'}
                       variant="tertiary"
                     >
-                      {t('total_count')}
+                      {t('total_count', { count: health.embeddings.total })}
                     </Chip>
                   </div>
                   {health.embeddings.total === 0 && (

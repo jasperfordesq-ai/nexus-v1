@@ -1,8 +1,8 @@
 # Project NEXUS
 
-> **Version 1.5 — Generally Available** — Project NEXUS V1.5 is generally available and in active production use. The platform runs on Laravel 12 + PHP 8.2+ with a React 18 frontend. It is currently in use by communities in **Ireland** and being evaluated by communities in the **United Kingdom**, **Spain**, **Switzerland**, and the **United States**. Newer modules may still ship with their own per-module maturity label (Beta / Preview). Contributions and feedback are welcome.
+> **Version 1.5 — Generally Available** — Project NEXUS V1.5 is generally available and in active production use. The platform runs on Laravel 12 + PHP 8.2+ with a React 19 frontend. It is currently in use by communities in **Ireland** and being evaluated by communities in the **United Kingdom**, **Spain**, **Switzerland**, and the **United States**. Newer modules may still ship with their own per-module maturity label (Beta / Preview). Contributions and feedback are welcome.
 
-A modern, multi-tenant community time banking platform built with Laravel 12 + PHP 8.2+, React 18, and MariaDB.
+A modern, multi-tenant community time banking platform built with Laravel 12 + PHP 8.2+, React 19, and MariaDB.
 
 ## What is Time Banking?
 
@@ -32,7 +32,7 @@ Time banking is a community-based system where members exchange services using t
 
 | Layer | Technology |
 |-------|-----------|
-| **Frontend** | React 18 + TypeScript + HeroUI + Tailwind CSS 4 |
+| **Frontend** | React 19 + TypeScript + HeroUI + Tailwind CSS 4 |
 | **Accessible Frontend** | Laravel-rendered HTML + GOV.UK Frontend Sass/JS |
 | **Backend API** | Laravel 12 + PHP 8.2+ |
 | **Database** | MariaDB 10.11 |
@@ -42,7 +42,7 @@ Time banking is a community-based system where members exchange services using t
 | **Real-Time** | Pusher (WebSockets) + Firebase Cloud Messaging |
 | **Dev Environment** | Docker Compose |
 | **Icons** | Lucide React |
-| **Animations** | Framer Motion |
+| **Animations** | CSS transitions via a local motion shim (no framer-motion) |
 | **Charts** | Recharts |
 | **Rich Text** | Lexical |
 
@@ -51,13 +51,12 @@ Time banking is a community-based system where members exchange services using t
 | Path | Purpose |
 |------|---------|
 | `app/`, `routes/`, `config/`, `bootstrap/` | Laravel 12 application, API routing, middleware, providers, and runtime configuration |
-| `react-frontend/` | Primary React 18 + TypeScript UI for members and current admin workflows |
+| `react-frontend/` | Primary React 19 + TypeScript UI for members and current admin workflows |
 | `accessible-frontend/` | Accessibility-first, HTML-first frontend served by Laravel at `accessible.project-nexus.ie` and `/{tenantSlug}/alpha/...` |
-| `views/` | Laravel Blade/email views plus legacy admin compatibility surfaces only |
+| `views/` | Live email templates (`views/emails/match_*.php`) and the module-404 page; everything else under `views/` is retired legacy code |
 | `httpdocs/` | Apache web root, public health endpoints, and compatibility entrypoints |
 | `database/`, `migrations/`, `schema.sql` | Laravel migrations, legacy SQL history, and schema reference artifacts |
 | `tests/`, `e2e/`, `playwright.config.ts` | PHPUnit, integration, and browser test coverage |
-| `sales-site/` | Public marketing site container |
 | `.github/` | CI, security, contributor, release, and dependency automation |
 | `scripts/` | Build, migration, deployment, maintenance, and audit tooling |
 
@@ -108,7 +107,7 @@ This is **version 1.5 — generally available**, in active production use. Per-m
 - The **React frontend** (`react-frontend/`) is the primary UI for user-facing pages and current admin workflows
 - The **Accessible frontend** (`accessible-frontend/`) is an approved HTML-first UI track for core tenant pages, served by Laravel and planned for `accessible.project-nexus.ie`
 - The **Laravel 12 backend** provides the API — all services are native Laravel implementations (zero stubs)
-- The **legacy PHP admin views** are compatibility-only surfaces for `/admin-legacy/` and `/super-admin/`
+- The **legacy PHP admin** (`/admin-legacy/`, `/super-admin/`) has been decommissioned — all admin workflows live in the React admin
 - **Zero-downtime blue/green deployments** — production switches between blue and green container stacks with no maintenance window
 - **Native mobile packaging** is managed separately from the default public Docker checkout
 - **Tests** are in `tests/`, `react-frontend/src/**/*.test.*`, and `e2e/`; CI also runs static analysis, build, migration, i18n, SPDX, smoke, accessibility, and security gates
@@ -189,10 +188,10 @@ Project NEXUS is being actively developed across two codebases:
 
 | Version | Stack | Repository |
 | ------- | ----- | --------- |
-| **V1** (this repo) | Laravel 12 + PHP 8.2+ / React 18 / MariaDB | [nexus-v1](https://github.com/jasperfordesq-ai/nexus-v1) |
-| **V2** | ASP.NET Core 8 / React 18 / PostgreSQL | [api.project-nexus.net](https://github.com/jasperfordesq-ai/api.project-nexus.net) |
+| **V1** (this repo) | Laravel 12 + PHP 8.2+ / React 19 / MariaDB | [nexus-v1](https://github.com/jasperfordesq-ai/nexus-v1) |
+| **V2** | ASP.NET Core 8 / React 19 / PostgreSQL | [api.project-nexus.net](https://github.com/jasperfordesq-ai/api.project-nexus.net) |
 
-V1 is the original platform — functional, in production, and the foundation of all Project NEXUS communities. It runs on Laravel 12 + PHP 8.2+ with a React 18 frontend. V2 is a new backend being built alongside V1, progressively replacing the PHP API using the [Strangler Fig pattern](https://martinfowler.com/bliki/StranglerFigApplication.html). Both share the same React frontend and design system.
+V1 is the original platform — functional, in production, and the foundation of all Project NEXUS communities. It runs on Laravel 12 + PHP 8.2+ with a React 19 frontend. V2 is a new backend being built alongside V1, progressively replacing the PHP API using the [Strangler Fig pattern](https://martinfowler.com/bliki/StranglerFigApplication.html). Both share the same React frontend and design system.
 
 ## Source Code
 

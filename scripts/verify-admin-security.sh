@@ -129,9 +129,9 @@ echo ""
 echo -e "${BLUE}═══ GATE 2: Source Code Security Assertions ═══${NC}"
 
 # 2a: isTokenUserSuperAdmin uses !empty() not loose checks
-TENANT_CTX="$PROJECT_ROOT/src/Core/TenantContext.php"
+TENANT_CTX="$PROJECT_ROOT/app/Core/TenantContext.php"
 if [ -f "$TENANT_CTX" ]; then
-    if grep -q "!empty(\$user\['is_super_admin'\])" "$TENANT_CTX"; then
+    if grep -q '!empty($userRow->is_super_admin)' "$TENANT_CTX"; then
         check_pass "TenantContext: isTokenUserSuperAdmin uses !empty() for is_super_admin"
     else
         check_fail "TenantContext: isTokenUserSuperAdmin does NOT use !empty() for is_super_admin"
@@ -146,8 +146,8 @@ else
     check_fail "TenantContext.php not found at $TENANT_CTX"
 fi
 
-# 2b: AdminSuperApiController checks SuperPanelAccess
-SUPER_CTRL="$PROJECT_ROOT/src/Controllers/Api/AdminSuperApiController.php"
+# 2b: AdminSuperController checks SuperPanelAccess
+SUPER_CTRL="$PROJECT_ROOT/app/Http/Controllers/Api/AdminSuperController.php"
 if [ -f "$SUPER_CTRL" ]; then
     if grep -q "SUPER_PANEL_ACCESS_DENIED" "$SUPER_CTRL"; then
         check_pass "AdminSuperApiController: Uses SUPER_PANEL_ACCESS_DENIED error code"
@@ -165,7 +165,7 @@ else
 fi
 
 # 2c: ApiErrorCodes has SUPER_PANEL_ACCESS_DENIED
-ERROR_CODES="$PROJECT_ROOT/src/Core/ApiErrorCodes.php"
+ERROR_CODES="$PROJECT_ROOT/app/Core/ApiErrorCodes.php"
 if [ -f "$ERROR_CODES" ]; then
     if grep -q "SUPER_PANEL_ACCESS_DENIED" "$ERROR_CODES"; then
         check_pass "ApiErrorCodes: SUPER_PANEL_ACCESS_DENIED constant exists"
@@ -183,7 +183,7 @@ else
 fi
 
 # 2d: SuperPanelAccess checks allows_subtenants
-SPA_FILE="$PROJECT_ROOT/src/Middleware/SuperPanelAccess.php"
+SPA_FILE="$PROJECT_ROOT/app/Middleware/SuperPanelAccess.php"
 if [ -f "$SPA_FILE" ]; then
     if grep -q "allows_subtenants" "$SPA_FILE"; then
         check_pass "SuperPanelAccess: Checks allows_subtenants flag"
@@ -209,7 +209,7 @@ else
 fi
 
 # 3b: Check for unscoped DELETE/UPDATE in admin controllers (scan the directory)
-UNSCOPED=$(grep -rn 'DELETE FROM\|UPDATE.*SET' "$PROJECT_ROOT/src/Controllers/Api/" --include="Admin*.php" 2>/dev/null | grep -v 'tenant_id' | grep -v '// ' | grep -v '\*' | wc -l || true)
+UNSCOPED=$(grep -rn 'DELETE FROM\|UPDATE.*SET' "$PROJECT_ROOT/app/Http/Controllers/Api/" --include="Admin*.php" 2>/dev/null | grep -v 'tenant_id' | grep -v '// ' | grep -v '\*' | wc -l || true)
 if [ "$UNSCOPED" -eq 0 ]; then
     check_pass "No unscoped DELETE/UPDATE in admin API controllers"
 else

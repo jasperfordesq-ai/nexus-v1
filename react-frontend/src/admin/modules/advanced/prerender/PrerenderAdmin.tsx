@@ -22,7 +22,7 @@ import Zap from 'lucide-react/icons/zap';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useAuth, usePusherOptional } from '@/contexts';
-import { PageHeader } from '../../../components';
+import { PageHeader, ConfirmModal } from '../../../components';
 import {
   adminPrerender,
   type PrerenderSummary,
@@ -1297,10 +1297,12 @@ function Info({ label, value, mono = false }: { label: string; value: string; mo
 
 function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boolean; toast: ToastShape; onDrillDown: (slug: string) => void }) {
   const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.coverage' });
+  const { t: tAdmin } = useTranslation('admin');
   const [rows, setRows] = useState<PrerenderCoverageRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [enqueuingFor, setEnqueuingFor] = useState<string | null>(null);
   const [bulkLoading, setBulkLoading] = useState(false);
+  const [confirmRecacheOpen, setConfirmRecacheOpen] = useState(false);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -1335,9 +1337,9 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
     );
     if (needsWork.length === 0) {
       toast.success(t('messages.no_stale'));
+      setConfirmRecacheOpen(false);
       return;
     }
-    if (!confirm(t('confirm.queue_recache', { count: needsWork.length }))) return;
     setBulkLoading(true);
     let queued = 0;
     try {
@@ -1360,6 +1362,7 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
       toast.error(t('errors.bulk_enqueue'));
     } finally {
       setBulkLoading(false);
+      setConfirmRecacheOpen(false);
     }
   };
 
@@ -1380,13 +1383,23 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
         <Button
           variant="tertiary"
           startContent={<Zap size={14} />}
-          onPress={refreshAllStale}
+          onPress={() => setConfirmRecacheOpen(true)}
           isLoading={bulkLoading}
           isDisabled={!isSuperAdmin || totalNeedingWork === 0}
         >
           {t('actions.refresh_all_stale', { count: totalNeedingWork })}
         </Button>
       </div>
+      <ConfirmModal
+        isOpen={confirmRecacheOpen}
+        onClose={() => setConfirmRecacheOpen(false)}
+        onConfirm={refreshAllStale}
+        title={tAdmin('common.confirm')}
+        message={t('confirm.queue_recache', { count: totalNeedingWork })}
+        confirmLabel={tAdmin('common.confirm')}
+        confirmColor="primary"
+        isLoading={bulkLoading}
+      />
     <Table aria-label={t('table_aria')} removeWrapper isStriped>
       <TableHeader>
         <TableColumn>{t('columns.tenant')}</TableColumn>

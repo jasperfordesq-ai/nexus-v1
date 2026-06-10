@@ -15,6 +15,7 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { useToast } from '@/contexts/ToastContext';
 import { adminGroups } from '@/admin/api/adminApi';
 import type { GroupType } from '@/admin/api/types';
+import { ConfirmModal } from '../../components';
 import GroupPolicies from './GroupPolicies';
 
 export default function GroupTypes() {
@@ -24,6 +25,8 @@ export default function GroupTypes() {
   const [types, setTypes] = useState<GroupType[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedType, setSelectedType] = useState<GroupType | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -87,17 +90,18 @@ export default function GroupTypes() {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm(t('groups.confirm_delete_group_type'))) {
-      return;
-    }
-
+  const handleDelete = async () => {
+    if (deleteTarget === null) return;
+    setDeleteLoading(true);
     try {
-      await adminGroups.deleteGroupType(id);
+      await adminGroups.deleteGroupType(deleteTarget);
       success(t('groups.group_type_deleted'));
       loadTypes();
     } catch {
       error(t('groups.failed_to_delete_group_type'));
+    } finally {
+      setDeleteLoading(false);
+      setDeleteTarget(null);
     }
   };
 
@@ -192,7 +196,7 @@ export default function GroupTypes() {
                       variant="danger"
                       isIconOnly
                       aria-label={t('groups.label_delete_group_type')}
-                      onPress={() => handleDelete(type.id)}
+                      onPress={() => setDeleteTarget(type.id)}
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -289,6 +293,17 @@ export default function GroupTypes() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      <ConfirmModal
+        isOpen={deleteTarget !== null}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDelete}
+        title={t('common.confirm')}
+        message={t('groups.confirm_delete_group_type')}
+        confirmLabel={t('groups.delete')}
+        confirmColor="danger"
+        isLoading={deleteLoading}
+      />
 
       {/* Policies Modal */}
       {selectedType && (

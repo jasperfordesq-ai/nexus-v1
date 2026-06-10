@@ -20,6 +20,7 @@ import { adminGroups } from '@/admin/api/adminApi';
 import type { AdminGroup, GroupMember as GroupMemberType } from '@/admin/api/types';
 interface AdminGroupDetail extends AdminGroup {  stats?: { total_exchanges: number; total_hours: number; active_members: number; posts_count: number; events_count: number; activity_score: number };  latitude?: number;  longitude?: number;}
 import type { GroupMember } from '@/admin/api/types';
+import { ConfirmModal } from '../../components';
 import { Button, Chip, Input, Textarea, Card, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 
 export default function GroupDetail() {
@@ -33,6 +34,8 @@ export default function GroupDetail() {
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({ name: '', description: '', location: '' });
+  const [kickTarget, setKickTarget] = useState<number | null>(null);
+  const [kickLoading, setKickLoading] = useState(false);
 
   const loadGroup = useCallback(async () => {
     try {
@@ -115,14 +118,18 @@ export default function GroupDetail() {
     }
   };
 
-  const handleKick = async (userId: number) => {
-    if (!confirm(t('groups.confirm_remove_member'))) return;
+  const handleKick = async () => {
+    if (kickTarget === null) return;
+    setKickLoading(true);
     try {
-      await adminGroups.kickMember(Number(id), userId);
+      await adminGroups.kickMember(Number(id), kickTarget);
       success(t('groups.member_removed'));
       loadMembers();
     } catch {
       error(t('groups.failed_to_remove_member'));
+    } finally {
+      setKickLoading(false);
+      setKickTarget(null);
     }
   };
 
@@ -247,7 +254,7 @@ export default function GroupDetail() {
                             <Button size="sm" variant="tertiary" onPress={() => handleDemote(member.user_id)}>{t('groups.demote')}</Button>
                           </>
                         )}
-                        {member.role !== 'owner' && <Button size="sm" variant="danger" onPress={() => handleKick(member.user_id)}>{t('groups.kick')}</Button>}
+                        {member.role !== 'owner' && <Button size="sm" variant="danger" onPress={() => setKickTarget(member.user_id)}>{t('groups.kick')}</Button>}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -279,6 +286,17 @@ export default function GroupDetail() {
           </Card>
         </Tab>
       </Tabs>
+
+      <ConfirmModal
+        isOpen={kickTarget !== null}
+        onClose={() => setKickTarget(null)}
+        onConfirm={handleKick}
+        title={t('common.confirm')}
+        message={t('groups.confirm_remove_member')}
+        confirmLabel={t('groups.kick')}
+        confirmColor="danger"
+        isLoading={kickLoading}
+      />
     </div>
   );
 }

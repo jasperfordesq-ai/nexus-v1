@@ -47,8 +47,7 @@ class ContentModerationService
      *
      * Returns true if any pattern matches. Used during post creation to
      * flag content for review without blocking submission.
-     *
-     * TODO: Wire this into post creation via FeedService::createPost()
+     * (Wired into FeedService::createPost().)
      */
     public static function detectSpam(string $content): bool
     {

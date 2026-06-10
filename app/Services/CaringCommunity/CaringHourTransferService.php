@@ -335,19 +335,6 @@ class CaringHourTransferService
                     ]);
             }
 
-            // Best-effort event dispatch — do not fail the transfer on event errors
-            try {
-                /** @var Transaction|null $txnModel */
-                $txnModel = Transaction::query()->find($sourceTxnId);
-                $sender = User::query()->find((int) $transfer->member_user_id);
-                $receiver = User::query()->find($approverUserId);
-                if ($txnModel && $sender && $receiver) {
-                    event(new TransactionCompleted($txnModel, $sender, $receiver, $sourceTenantId));
-                }
-            } catch (\Throwable $e) {
-                Log::warning('[CaringHourTransfer] TransactionCompleted dispatch failed: ' . $e->getMessage());
-            }
-
             $finalStatus = (string) (DB::table('caring_hour_transfers')->where('id', $transferId)->value('status') ?? '');
             $linkedRow = (int) (DB::table('caring_hour_transfers')->where('id', $transferId)->value('linked_transfer_id') ?? 0);
 
@@ -357,8 +344,24 @@ class CaringHourTransferService
                 'destination_transfer_id' => $linkedRow,
                 'remote'                  => $isRemote,
                 'needs_remote_delivery'   => $isRemote,
+                'source_transaction_id'   => $sourceTxnId,
             ];
         });
+
+        // Best-effort event dispatch — AFTER the transaction commits, so the
+        // queued NotifyTransactionCompleted listener can never observe (or
+        // notify about) an uncommitted/rolled-back transfer.
+        try {
+            /** @var Transaction|null $txnModel */
+            $txnModel = Transaction::query()->find((int) ($result['source_transaction_id'] ?? 0));
+            $sender = User::query()->find((int) $transfer->member_user_id);
+            $receiver = User::query()->find($approverUserId);
+            if ($txnModel && $sender && $receiver) {
+                event(new TransactionCompleted($txnModel, $sender, $receiver, $sourceTenantId));
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[CaringHourTransfer] TransactionCompleted dispatch failed: ' . $e->getMessage());
+        }
 
         if (!empty($result['needs_remote_delivery'])) {
             $deliveryResult = $this->attemptRemoteDelivery(

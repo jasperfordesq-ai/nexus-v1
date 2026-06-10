@@ -138,7 +138,7 @@ Three independent per-tenant settings, all configurable in `/admin/tenant-featur
 
 **Cost playbook:** Switch `geocoding_provider` to `nominatim` first (Places sessions are usually the biggest cost). Then `map_provider`. Kill switch is the emergency cutoff.
 
-Files: [src/components/location/LocationMap.tsx](src/components/location/LocationMap.tsx), [OpenStreetMapView.tsx](src/components/location/OpenStreetMapView.tsx), [PlaceAutocompleteInput.tsx](src/components/location/PlaceAutocompleteInput.tsx), [NominatimAutocomplete.tsx](src/components/location/NominatimAutocomplete.tsx), admin UI in [src/admin/modules/config/TenantFeatures.tsx](src/admin/modules/config/TenantFeatures.tsx).
+Files: [src/components/location/LocationMap.tsx](src/components/location/LocationMap.tsx), [OpenStreetMapView.tsx](src/components/location/OpenStreetMapView.tsx), [PlaceAutocompleteInput.tsx](src/components/location/PlaceAutocompleteInput.tsx), [NominatimAutocomplete.tsx](src/components/location/NominatimAutocomplete.tsx), admin UI in [src/admin/modules/config/ModuleConfiguration.tsx](src/admin/modules/config/ModuleConfiguration.tsx).
 
 ## Feature & Module Gating
 
@@ -265,14 +265,14 @@ Every API response carries `X-Build: <commit-sha>` set by `app/Http/Middleware/S
 In [src/lib/api.ts](src/lib/api.ts), `checkStaleBuild()` runs on every response from `request()`, `download()`, and `upload()`:
 
 - **Match** → clear the mismatch tracker.
-- **First mismatch** → record timestamp in `localStorage` (`nexus_build_mismatch_since`), dispatch the existing `nexus:sw_update_available` event so `UpdateAvailableBanner` fires.
+- **First mismatch** → record timestamp in `localStorage` (`nexus_build_mismatch_since`) and dispatch the `nexus:sw_update_available` event. (The old `UpdateAvailableBanner` UI that listened for this has been removed — the event is currently fire-and-forget; NetworkFirst navigation is the recovery path.)
 - **Mismatch persists ≥ 10 minutes** → `window.location.replace('/api/sw-reset')`. Forces nuclear recovery via the nginx route that returns `Clear-Site-Data` plus an inline SW unregister + cache wipe script.
 
-The 10-minute grace gives the soft-update path (banner click → SkipWaiting → controllerchange reload) a chance to recover the user gracefully. Only when that path has clearly failed do we eject them.
+The 10-minute grace gives NetworkFirst navigation (any page navigation fetches a fresh shell) a chance to recover the user organically. Only when that has clearly failed do we eject them.
 
-### 3. Soft update banner (defence-in-depth, rarely seen)
+### 3. ~~Soft update banner~~ (removed)
 
-[`UpdateAvailableBanner.tsx`](src/components/feedback/UpdateAvailableBanner.tsx) shows when either the API gate or `useVersionCheck` (`/build-info.json` poll, every 5 min) detects a mismatch. Click handler still does the Android-Chrome dance (disconnect Pusher → postMessage SKIP_WAITING → 8s `controllerchange`-fallback that calls `forceClearAppCaches` + cache-busted reload). With layers 1 and 2 above, the user almost never sees this banner — but if they do, it works.
+`UpdateAvailableBanner.tsx` and `useVersionCheck` have been removed — layers 1 and 2 proved sufficient and users should never need a manual "update" button. If a visible banner is ever reintroduced, it must listen for `nexus:sw_update_available` and do the Android-Chrome dance (disconnect Pusher → postMessage SKIP_WAITING → `controllerchange`-fallback with cache-busted reload).
 
 ### Sentry visibility
 

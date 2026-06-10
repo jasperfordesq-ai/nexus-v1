@@ -27,7 +27,12 @@
 
 set -euo pipefail
 
-NGINX_CONTAINER="${NGINX_CONTAINER:-nexus-react-prod}"
+# Default: auto-detect the active blue/green react container; fall back to
+# the legacy single-color name for pre-bluegreen installs.
+if [ -z "${NGINX_CONTAINER:-}" ]; then
+    NGINX_CONTAINER=$(docker ps --format '{{.Names}}' 2>/dev/null | grep -E '^nexus-(blue|green)-react$' | head -1 || true)
+    NGINX_CONTAINER="${NGINX_CONTAINER:-nexus-react-prod}"
+fi
 TARGET_PATH="${TARGET_PATH:-/etc/nginx/prerender-trusted-bot-ips.list}"
 
 SOURCES=(

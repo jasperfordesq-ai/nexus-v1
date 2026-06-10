@@ -54,8 +54,6 @@ project-nexus/
 │   └── Core/                     # Legacy helpers (TenantContext, ImageUploader)
 ├── views/                        # PHP admin templates only (DEAD — see rules below)
 ├── httpdocs/                     # Web root (index.php, routes.php, health.php)
-├── sales-site/                   # Static marketing site (project-nexus.ie)
-│   └── CLAUDE.md                 # Sales site conventions
 ├── tests/                        # PHPUnit tests
 ├── migrations/                   # SQL migration files
 ├── scripts/                      # Build, deploy, maintenance
@@ -71,17 +69,13 @@ project-nexus/
 | Document | Purpose |
 |----------|---------|
 | [react-frontend/CLAUDE.md](react-frontend/CLAUDE.md) | React frontend stack conventions, contexts, hooks, pages |
-| [sales-site/CLAUDE.md](sales-site/CLAUDE.md) | Sales site stack conventions |
 | [docs/govuk-alpha/RESEARCH.md](docs/govuk-alpha/RESEARCH.md) | GOV.UK Alpha frontend architecture, official repos, licensing, and branding limits |
-| [docs/PHP_CONVENTIONS.md](docs/PHP_CONVENTIONS.md) | PHP code patterns, services/models reference |
-| [docs/API_REFERENCE.md](docs/API_REFERENCE.md) | V2 API endpoints (50+) |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Consolidated feature roadmap (single source of truth) |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Deployment guide (Azure production) |
-| [docs/REGRESSION_PREVENTION.md](docs/REGRESSION_PREVENTION.md) | 7-layer regression prevention system |
-| [docs/QA_AUDIT_AND_TEST_PLAN.md](docs/QA_AUDIT_AND_TEST_PLAN.md) | Master QA document |
-| [docs/LOCAL_DEV_SETUP.md](docs/LOCAL_DEV_SETUP.md) | Docker development setup |
 | [LARAVEL_MIGRATION_PLAN.md](LARAVEL_MIGRATION_PLAN.md) | Laravel migration plan, workflow, and effort estimates |
 | [BACKUP.md](BACKUP.md) | Full backup system — private repo for machine transfers (gitignored from public) |
+
+> Note: `docs/` is gitignored in the public repo; the linked docs exist on the dev machine only. PHP_CONVENTIONS / API_REFERENCE / REGRESSION_PREVENTION / QA_AUDIT_AND_TEST_PLAN / LOCAL_DEV_SETUP have been retired — follow existing code patterns in `app/Services/` and `routes/api.php` instead.
 
 ---
 
@@ -353,7 +347,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 ## Code Patterns
 
-Full PHP patterns with examples: [docs/PHP_CONVENTIONS.md](docs/PHP_CONVENTIONS.md)
+PHP patterns: follow existing services in `app/Services/` (the conventions doc has been retired).
 
 ### Multi-Tenant Awareness (CRITICAL)
 
@@ -608,7 +602,7 @@ Prefer the checked-in wrappers for raw SQL migrations:
 
 ## Regression Prevention
 
-Full guide: [docs/REGRESSION_PREVENTION.md](docs/REGRESSION_PREVENTION.md)
+(The standalone regression-prevention doc has been retired; the layers are summarised below.)
 
 **7 layers:** Pre-commit hooks (Husky + lint-staged) → Pre-push (tsc + build) → CI pipeline (5 stages) → PR enforcement → Zod runtime validation (dev only) → Local scripts → Deploy rules.
 
@@ -634,7 +628,7 @@ Full guide: [docs/REGRESSION_PREVENTION.md](docs/REGRESSION_PREVENTION.md)
 ### Add a New Service
 
 1. Create in `app/Services/` (scope by tenant — see existing services)
-2. Always scope by tenant — see [docs/PHP_CONVENTIONS.md](docs/PHP_CONVENTIONS.md)
+2. Always scope by tenant — follow existing services
 3. Add unit tests
 
 ### Add a New Page (React Frontend)
