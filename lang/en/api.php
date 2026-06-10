@@ -758,6 +758,7 @@ return [
     'unknown_report_type'                  => 'Unknown report type: :type. Valid types: active, registrations, retention, engagement, top_contributors, least_active',
     'unknown_group_by'                     => 'Unknown group_by: :value. Valid values: category, member, period, summary',
     'supported_formats_csv_pdf'            => 'Supported formats: csv, pdf',
+    'supported_formats_csv_pdf_xlsx'       => 'Supported formats: csv, pdf, xlsx',
     'unknown_export_type'                  => 'Unknown report type: :type. Valid types: :valid',
     'no_data_for_export'                   => 'No data found for export',
 

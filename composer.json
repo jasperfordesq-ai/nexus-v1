@@ -44,6 +44,7 @@
         "lbuchs/webauthn": "^2.2",
         "meilisearch/meilisearch-php": "^1.10",
         "minishlink/web-push": "^10.0",
+        "openspout/openspout": "^4.28",
         "pusher/pusher-php-server": "^7.2",
         "rubix/ml": "^2.0",
         "sendgrid/sendgrid": "^8.1",
