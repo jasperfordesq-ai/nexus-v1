@@ -18,6 +18,7 @@ use App\Services\AuditLogService;
 use App\Services\EmailDispatchService;
 use App\Services\Enterprise\GdprService;
 use App\Services\GamificationService;
+use App\Services\PasswordHistoryService;
 use App\Services\TenantSettingsService;
 use App\Services\TokenService;
 use App\Core\EmailTemplateBuilder;
@@ -1053,8 +1054,19 @@ class AdminUsersController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.password_min_length'), 'password', 422);
         }
 
+        $currentHash = DB::table('users')
+            ->where('id', $id)
+            ->where('tenant_id', $tenantId)
+            ->value('password_hash');
+        $currentHash = is_string($currentHash) ? $currentHash : null;
+
+        if (PasswordHistoryService::isReused($id, $tenantId, $password, $currentHash)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.password_reused'), 'password', 422);
+        }
+
         $hashed = password_hash($password, PASSWORD_ARGON2ID);
         DB::update("UPDATE users SET password_hash = ? WHERE id = ? AND tenant_id = ?", [$hashed, $id, $tenantId]);
+        PasswordHistoryService::record($id, $tenantId, $currentHash);
 
         ActivityLog::log($adminId, 'admin_set_password', "Admin set password for user #{$id} ({$user['email']})");
         $this->auditLogService->logAdminAction('admin_set_password', $adminId, $id, ['email' => $user['email']]);
