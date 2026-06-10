@@ -484,13 +484,23 @@ class User extends Authenticatable
 
     /**
      * Move a user to a different tenant (updates users.tenant_id).
+     *
+     * Returns the result shape the super-admin move endpoints consume.
+     * NB: only the users row moves — the user's content stays in the old
+     * tenant (a full content migration has never been implemented).
+     *
+     * @return array{success: bool, moved: int, failed: array<string>}
      */
-    public static function moveTenant(int $userId, int $newTenantId): bool
+    public static function moveTenant(int $userId, int $newTenantId): array
     {
         $affected = DB::table('users')
             ->where('id', $userId)
             ->update(['tenant_id' => $newTenantId]);
 
-        return $affected > 0;
+        return [
+            'success' => $affected > 0,
+            'moved'   => (int) $affected,
+            'failed'  => [],
+        ];
     }
 }

@@ -655,7 +655,13 @@ class UserService
         }
 
         try {
-            $user->status     = 'deleted';
+            // users.status is enum('active','inactive','suspended','banned',
+            // 'pending') — 'deleted' is not in the set and made every account
+            // deletion throw before any anonymization ran. Soft-delete state =
+            // status 'inactive' + deleted_at/anonymized_at stamps.
+            $user->status        = 'inactive';
+            $user->deleted_at    = now();
+            $user->anonymized_at = now();
             $user->email      = 'deleted_' . $userId . '@anonymized.invalid';
             $user->first_name = 'Deleted';
             $user->last_name  = 'User';

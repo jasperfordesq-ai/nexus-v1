@@ -96,8 +96,10 @@ class ReviewServiceTest extends TestCase
         // Expect exactly that attribute write — the previous `$review->status =
         // 'approved'` line tripped an unexpected setAttribute('status','approved')
         // call on the mock and asserted nothing useful.
+        // 'rejected' (not 'hidden') — reviews.status is enum('pending',
+        // 'approved','rejected'); 'hidden' threw on every reviewer-delete.
         $review = Mockery::mock(Review::class);
-        $review->shouldReceive('setAttribute')->once()->with('status', 'hidden');
+        $review->shouldReceive('setAttribute')->once()->with('status', 'rejected');
         $review->shouldReceive('save')->once()->andReturn(true);
 
         $mockQuery = Mockery::mock();

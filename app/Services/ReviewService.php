@@ -475,7 +475,10 @@ class ReviewService
             return false;
         }
 
-        $review->status = 'hidden';
+        // reviews.status is enum('pending','approved','rejected') — 'hidden'
+        // is not in the set and made every reviewer-delete throw. 'rejected'
+        // is the soft-hide state all read paths already exclude.
+        $review->status = 'rejected';
         $review->save();
 
         return true;

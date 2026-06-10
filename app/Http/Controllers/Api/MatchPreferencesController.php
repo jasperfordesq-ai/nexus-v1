@@ -61,7 +61,7 @@ class MatchPreferencesController extends BaseApiController
             if (!in_array($notificationFrequency, $allowed, true)) {
                 return $this->respondWithError(
                     'VALIDATION_ERROR',
-                    'Invalid frequency. Must be: daily, monthly, fortnightly, or never',
+                    __('api_controllers_2.users.invalid_frequency'),
                     'notification_frequency'
                 );
             }

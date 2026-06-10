@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use App\Services\CookieConsentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * CookieConsentController — Cookie consent preferences management.
@@ -202,14 +203,19 @@ class CookieConsentController extends BaseApiController
                 $userId = $this->getOptionalUserId();
                 if ($userId) {
                     try {
-                        DB::table('activity_logs')->insert([
+                        // Canonical table is activity_log (singular) — the
+                        // plural duplicate was dropped 2026-04-12 (M7).
+                        DB::table('activity_log')->insert([
                             'user_id'    => $userId,
                             'tenant_id'  => $tenantId,
                             'action'     => 'cookie_consent_updated',
                             'details'    => 'Cookie consent preferences updated',
+                            'ip_address' => request()->ip(),
                             'created_at' => now(),
                         ]);
-                    } catch (\Exception $e) { /* activity_logs may not exist */ }
+                    } catch (\Exception $e) {
+                        Log::warning('[CookieConsent] audit log write failed: ' . $e->getMessage());
+                    }
                 }
 
                 return $this->respondWithData([
@@ -255,14 +261,19 @@ class CookieConsentController extends BaseApiController
                 $userId = $this->getOptionalUserId();
                 if ($userId) {
                     try {
-                        DB::table('activity_logs')->insert([
+                        // Canonical table is activity_log (singular) — the
+                        // plural duplicate was dropped 2026-04-12 (M7).
+                        DB::table('activity_log')->insert([
                             'user_id'    => $userId,
                             'tenant_id'  => $tenantId,
                             'action'     => 'cookie_consent_withdrawn',
                             'details'    => 'Cookie consent withdrawn',
+                            'ip_address' => request()->ip(),
                             'created_at' => now(),
                         ]);
-                    } catch (\Exception $e) { /* activity_logs may not exist */ }
+                    } catch (\Exception $e) {
+                        Log::warning('[CookieConsent] audit log write failed: ' . $e->getMessage());
+                    }
                 }
 
                 return $this->respondWithData([

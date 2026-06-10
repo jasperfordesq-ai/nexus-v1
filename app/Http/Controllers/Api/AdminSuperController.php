@@ -842,7 +842,7 @@ class AdminSuperController extends BaseApiController
             $userName,
             ['tenant_id' => $oldTenantId],
             ['tenant_id' => $newTenantId],
-            "Moved '{$userName}' to tenant '{$newTenant['name']}' (with all content)"
+            "Moved '{$userName}' to tenant '{$newTenant['name']}'"
         );
 
         return $this->respondWithData([
@@ -913,7 +913,7 @@ class AdminSuperController extends BaseApiController
             $userName,
             ['tenant_id' => $oldTenantId, 'is_tenant_super_admin' => $user['is_tenant_super_admin'] ?? 0],
             ['tenant_id' => $targetTenantId, 'is_tenant_super_admin' => 1],
-            "Moved '{$userName}' to '{$targetTenant['name']}' and granted Super Admin privileges (with all content)"
+            "Moved '{$userName}' to '{$targetTenant['name']}' and granted Super Admin privileges"
         );
 
         return $this->respondWithData([

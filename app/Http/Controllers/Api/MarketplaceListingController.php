@@ -946,7 +946,7 @@ class MarketplaceListingController extends BaseApiController
         foreach ($listings as $listing) {
             switch ($action) {
                 case 'activate':
-                    if (in_array($listing->status, ['draft', 'inactive'], true)) {
+                    if ($listing->status === 'draft') {
                         $listing->status = 'active';
                         $listing->save();
                         $processed++;
@@ -954,8 +954,10 @@ class MarketplaceListingController extends BaseApiController
                     break;
 
                 case 'deactivate':
+                    // marketplace_listings.status enum has no 'inactive' —
+                    // unpublish back to 'draft' (the state 'activate' restores from)
                     if ($listing->status === 'active') {
-                        $listing->status = 'inactive';
+                        $listing->status = 'draft';
                         $listing->save();
                         $processed++;
                     }

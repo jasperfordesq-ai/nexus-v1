@@ -11,6 +11,7 @@ use App\Services\OnboardingConfigService;
 use App\Services\SafeguardingPreferenceService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Admin endpoints for onboarding module configuration.
@@ -157,12 +158,14 @@ class AdminOnboardingConfigController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', implode('; ', $errors), null, 422);
         }
 
-        // Clear tenant bootstrap cache so frontend picks up changes
+        // Clear tenant bootstrap cache so frontend picks up changes.
+        // (Class is RedisCache — the old RedisCacheService name silently
+        // failed to resolve, so this cache was never actually cleared.)
         try {
-            $redisCache = app(\App\Services\RedisCacheService::class);
+            $redisCache = app(\App\Services\RedisCache::class);
             $redisCache->delete('tenant_bootstrap', $tenantId);
         } catch (\Throwable $e) {
-            // Redis not available — cache will expire naturally
+            Log::warning('[AdminOnboardingConfig] tenant_bootstrap cache clear failed: ' . $e->getMessage());
         }
 
         // Invalidate the per-tenant onboarding config cache so the next read

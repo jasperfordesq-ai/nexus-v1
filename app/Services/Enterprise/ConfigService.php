@@ -46,6 +46,12 @@ class ConfigService
     private function initializeVault(): void
     {
         try {
+            // VaultClient did not survive the Laravel migration — fail soft.
+            // (class-not-found raises \Error, which catch(\Exception) misses)
+            if (!class_exists(VaultClient::class)) {
+                throw new \RuntimeException('VaultClient is not available in this build — falling back to env config');
+            }
+
             $this->vault = new VaultClient();
 
             // Try AppRole authentication
@@ -58,7 +64,7 @@ class ConfigService
                 // Fallback to token authentication (development)
                 $this->vault->authenticateToken($token);
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning("Failed to initialize Vault: " . $e->getMessage());
             $this->vault = null;
             $this->useVault = false;

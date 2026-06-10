@@ -52,12 +52,15 @@ class UploadController extends BaseApiController
         }
 
         $type = $this->input('type', 'general');
-        $tenantId = $this->getTenantId();
 
-        $result = $this->uploadService->upload($file, $userId, $tenantId, $type);
-
-        if (isset($result['error'])) {
-            return $this->respondWithError('UPLOAD_FAILED', $result['error'], null, 422);
+        // ImageUploadService::upload(UploadedFile $file, string $directory).
+        // The old 4-arg call coerced $userId into the directory name, so
+        // files landed in a directory named after the user's id and $type
+        // was silently ignored. Failures throw — they don't return ['error'].
+        try {
+            $result = $this->uploadService->upload($file, 'uploads/' . preg_replace('/[^a-z0-9_-]/i', '', $type));
+        } catch (\Throwable $e) {
+            return $this->respondWithError('UPLOAD_FAILED', $e->getMessage(), null, 422);
         }
 
         return $this->respondWithData($result, null, 201);
