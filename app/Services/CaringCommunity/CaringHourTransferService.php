@@ -301,6 +301,7 @@ class CaringHourTransferService
             // Mark source row approved + sent
             DB::table('caring_hour_transfers')
                 ->where('id', $transferId)
+                ->where('tenant_id', $sourceTenantId)
                 ->update([
                     'status'       => self::STATUS_SENT,
                     'signature'    => $signature,
@@ -326,6 +327,7 @@ class CaringHourTransferService
                 // Mark source row completed + cross-link
                 DB::table('caring_hour_transfers')
                     ->where('id', $transferId)
+                    ->where('tenant_id', $sourceTenantId)
                     ->update([
                         'status'             => self::STATUS_COMPLETED,
                         'linked_transfer_id' => $destinationRowId,
@@ -494,6 +496,7 @@ class CaringHourTransferService
 
         DB::table('caring_hour_transfers')
             ->where('id', $transferId)
+            ->where('tenant_id', $sourceTenantId)
             ->update([
                 'status'     => self::STATUS_REJECTED,
                 'reason'     => $appendedReason,

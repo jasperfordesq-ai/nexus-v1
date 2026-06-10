@@ -15,8 +15,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * FederatedIdentity — maps a local User to an identity on a federation partner.
  *
- * Tenant-scoped by the local user's tenant so partner identity IDs cannot
- * collide across communities.
+ * NOT auto-scoped (no HasTenantScope): federation listeners must read
+ * identities across tenants. Every tenant-bound query MUST filter
+ * tenant_id explicitly (the local user's tenant) so partner identity IDs
+ * cannot collide across communities.
  */
 class FederatedIdentity extends Model
 {
