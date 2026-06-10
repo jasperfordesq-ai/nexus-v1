@@ -36,6 +36,7 @@ import { MenuProvider } from '@/contexts/MenuContext';
 import { PresenceProvider } from '@/contexts/PresenceContext';
 import { detectTenantFromUrl } from '@/lib/tenant-routing';
 import { CookieConsentBanner } from '@/components/feedback/CookieConsentBanner';
+import { IdleLogoutGuard } from '@/components/security/IdleLogoutGuard';
 import { LoadingScreen } from '@/components/feedback/LoadingScreen';
 import { lazy, Suspense, useEffect, useLayoutEffect } from 'react';
 import { listenForImpersonationToken } from '@/lib/impersonate';
@@ -87,6 +88,7 @@ export function TenantShell({ appRoutes }: TenantShellProps) {
                 <TenantGuard slugPrefix={effectiveSlug} appRoutes={appRoutes}>
                   <Outlet />
                 </TenantGuard>
+                <IdleLogoutGuard />
                 <CookieConsentBanner />
               </MenuProvider>
             </PresenceProvider>

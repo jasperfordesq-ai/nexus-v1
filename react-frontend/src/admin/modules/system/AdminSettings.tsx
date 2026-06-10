@@ -59,6 +59,7 @@ interface SettingsForm {
   powered_by_image_dark: string;  // general.powered_by_image_dark
   powered_by_url: string;         // general.powered_by_url
   default_currency: string;       // general.default_currency (ISO 4217 lowercase, e.g. 'eur', 'usd')
+  inactivity_timeout_minutes: string; // general.inactivity_timeout_minutes ('0' = disabled, 5–480)
 }
 
 const CURRENCY_OPTIONS: Array<{ code: string; labelKey: string }> = [
@@ -87,6 +88,7 @@ const DEFAULT_SETTINGS: SettingsForm = {
   powered_by_image_dark: '',
   powered_by_url: '',
   default_currency: 'eur',
+  inactivity_timeout_minutes: '0',
 };
 
 export function AdminSettings() {
@@ -141,6 +143,7 @@ export function AdminSettings() {
           powered_by_image_dark: (settings.powered_by_image_dark as string) ?? '',
           powered_by_url: (settings.powered_by_url as string) ?? '',
           default_currency: (settings.default_currency as string)?.toLowerCase() || 'eur',
+          inactivity_timeout_minutes: String(settings.inactivity_timeout_minutes ?? '0'),
         };
         setForm(loaded);
         setOriginalForm(loaded);
@@ -182,6 +185,9 @@ export function AdminSettings() {
       if (isPlatformGod && form.powered_by_image_light !== originalForm.powered_by_image_light) changes.powered_by_image_light = form.powered_by_image_light;
       if (isPlatformGod && form.powered_by_image_dark !== originalForm.powered_by_image_dark) changes.powered_by_image_dark = form.powered_by_image_dark;
       if (form.default_currency !== originalForm.default_currency) changes.default_currency = form.default_currency;
+      if (form.inactivity_timeout_minutes !== originalForm.inactivity_timeout_minutes) {
+        changes.inactivity_timeout_minutes = String(parseInt(form.inactivity_timeout_minutes, 10) || 0);
+      }
 
       if (Object.keys(changes).length === 0) {
         toast.error(t('system.no_changes_to_save'));
@@ -589,6 +595,22 @@ export function AdminSettings() {
                 onValueChange={(val) => setForm(prev => ({ ...prev, admin_approval: val }))}
                 isDisabled={!isGod}
                 aria-label={t('system.label_admin_approval')}
+              />
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex-1">
+                <p className="font-medium">{t('system.label_inactivity_timeout')}</p>
+                <p className="text-sm text-muted">{t('system.desc_inactivity_timeout')}</p>
+              </div>
+              <Input
+                type="number"
+                min={0}
+                max={480}
+                step={5}
+                className="w-28"
+                value={form.inactivity_timeout_minutes}
+                onValueChange={(val) => setForm(prev => ({ ...prev, inactivity_timeout_minutes: val }))}
+                aria-label={t('system.label_inactivity_timeout')}
               />
             </div>
             <div className="flex items-center justify-between">

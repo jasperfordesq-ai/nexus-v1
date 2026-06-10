@@ -130,6 +130,7 @@ return [
     'password_pwned'                => 'This password appears in a known data breach and cannot be used. Please choose a different password.',
     'password_reused'               => 'You cannot reuse a recent password. Please choose a password you have not used before.',
     'audit_export_failed'           => 'Error exporting audit data',
+    'inactivity_timeout_range'      => 'Inactivity timeout must be 0 (disabled) or between 5 and 480 minutes.',
     'password_mismatch'             => 'Password and confirmation do not match.',
     'terms_required'                => 'You must accept the terms of service and privacy policy to register.',
     'invite_code_required'          => 'An invite code is required to register on this community.',
