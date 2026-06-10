@@ -891,7 +891,10 @@ class SearchService
                 ->map(fn (Listing $l) => [
                     ...$l->toArray(),
                     'result_type'   => 'listing',
-                    'category_name' => $l->category?->name,
+                    // listings has a junk legacy `category` COLUMN that shadows
+                    // the category() relation — $l->category returns the column
+                    // (null), so read the eager-loaded relation explicitly.
+                    'category_name' => $l->relationLoaded('category') ? $l->getRelation('category')?->name : null,
                 ])
                 ->all();
         }
@@ -1113,7 +1116,8 @@ class SearchService
                     ...$l->toArray(),
                     'type'          => 'listing',
                     'listing_type'  => $l->type,
-                    'category_name' => $l->category?->name,
+                    // see above — column shadows the relation
+                    'category_name' => $l->relationLoaded('category') ? $l->getRelation('category')?->name : null,
                 ];
             }
         }

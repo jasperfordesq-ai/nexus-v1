@@ -93,10 +93,23 @@ class MarketplaceEscrowService
         }
 
         DB::transaction(function () use ($escrow, $trigger) {
-            $escrow->status = 'released';
-            $escrow->released_at = now();
-            $escrow->release_trigger = $trigger;
-            $escrow->save();
+            // Atomic claim — the in-memory 'held' check above can race
+            // (buyer confirm vs auto-release cron). Exactly one caller wins;
+            // the loser throws like the fast-path check (cron catches per-item).
+            $claimed = MarketplaceEscrow::query()
+                ->whereKey($escrow->id)
+                ->where('status', 'held')
+                ->update([
+                    'status' => 'released',
+                    'released_at' => now(),
+                    'release_trigger' => $trigger,
+                ]);
+
+            if ($claimed === 0) {
+                throw new \InvalidArgumentException("Escrow is not in 'held' status. Current: released");
+            }
+
+            $escrow->refresh();
 
             // Update the payment's payout status
             $payment = $escrow->payment;

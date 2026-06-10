@@ -286,7 +286,19 @@ class VolOrgWalletService
         $tenantId = TenantContext::getId();
 
         $result = DB::transaction(function () use ($volOrgId, $volunteerId, $amount, $adminId, $note, $logId, $tenantId) {
-            // Lock org row
+            // Lock volunteer user row FIRST — depositFromUser() locks
+            // user -> org, so locking org -> user here is a lock-order
+            // inversion deadlock when a deposit and a payout race.
+            $volunteer = DB::selectOne(
+                "SELECT id, name FROM users WHERE id = ? AND tenant_id = ? FOR UPDATE",
+                [$volunteerId, $tenantId]
+            );
+
+            if (!$volunteer) {
+                return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.volunteer_not_found')];
+            }
+
+            // Then lock the org row (same order as depositFromUser)
             $org = DB::selectOne(
                 "SELECT id, name, balance, user_id FROM vol_organizations WHERE id = ? AND tenant_id = ? FOR UPDATE",
                 [$volOrgId, $tenantId]
@@ -298,16 +310,6 @@ class VolOrgWalletService
 
             if ((float) $org->balance < $amount) {
                 return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.insufficient_organization_balance')];
-            }
-
-            // Lock volunteer user row
-            $volunteer = DB::selectOne(
-                "SELECT id, name FROM users WHERE id = ? AND tenant_id = ? FOR UPDATE",
-                [$volunteerId, $tenantId]
-            );
-
-            if (!$volunteer) {
-                return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.volunteer_not_found')];
             }
 
             // users.balance is an INT (whole hours). If the org is paying out

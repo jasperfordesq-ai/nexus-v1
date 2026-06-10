@@ -381,11 +381,24 @@ class MarketplaceOrderService
             throw new \InvalidArgumentException('Order must be delivered before it can be completed.');
         }
 
-        $order = self::withOrderTenant($order, function () use ($order): MarketplaceOrder {
-            return DB::transaction(function () use ($order) {
-            $order->status = 'completed';
-            $order->escrow_released_at = now();
-            $order->save();
+        $claimed = false;
+        $order = self::withOrderTenant($order, function () use ($order, &$claimed): MarketplaceOrder {
+            return DB::transaction(function () use ($order, &$claimed) {
+            // Atomic claim — the in-memory status check above can race
+            // (buyer confirm vs auto-release cron, or a double-click): both
+            // would pass and double-increment seller stats. The status
+            // predicate makes exactly one caller win.
+            $claimedRows = MarketplaceOrder::query()
+                ->whereKey($order->id)
+                ->whereIn('status', ['delivered', 'paid', 'shipped'])
+                ->update(['status' => 'completed', 'escrow_released_at' => now()]);
+
+            $claimed = $claimedRows > 0;
+            $order->refresh();
+
+            if (!$claimed) {
+                return $order; // another request completed it first
+            }
 
             $sellerProfile = \App\Models\MarketplaceSellerProfile::where('user_id', $order->seller_id)
                 ->lockForUpdate()
@@ -399,7 +412,10 @@ class MarketplaceOrderService
             });
         });
 
-        self::sendCompletedNotifications($order);
+        // Race loser: stats untouched, and the winner already notified.
+        if ($claimed) {
+            self::sendCompletedNotifications($order);
+        }
 
         return $order;
     }

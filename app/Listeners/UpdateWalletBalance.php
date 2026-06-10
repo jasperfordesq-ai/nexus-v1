@@ -10,6 +10,7 @@ use App\Core\TenantContext;
 use App\Events\TransactionCompleted;
 use App\Services\GamificationService;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -21,6 +22,10 @@ use Illuminate\Support\Facades\Log;
  */
 class UpdateWalletBalance implements ShouldQueue
 {
+    /** Never retry — XP awards have no natural dedup key in user_xp_log. */
+    public int $tries = 1;
+    public int $timeout = 60;
+
     public function __construct()
     {
         //
@@ -31,6 +36,16 @@ class UpdateWalletBalance implements ShouldQueue
      */
     public function handle(TransactionCompleted $event): void
     {
+        // One-time claim per transaction — a queue re-delivery (timeout kill
+        // mid-badge-checks) must not double-award send/receive XP.
+        $claimKey = 'wallet_xp:done:' . $event->tenantId . ':' . ($event->transaction->id ?? 0);
+        if (!Cache::add($claimKey, 1, now()->addHour())) {
+            Log::info('UpdateWalletBalance: duplicate delivery suppressed', [
+                'transaction_id' => $event->transaction->id ?? null,
+            ]);
+            return;
+        }
+
         $previousTenantId = TenantContext::currentId();
 
         try {

@@ -2240,7 +2240,7 @@ class CronJobRunner
             echo "  Users needing geocoding: {$stats['users_without_coords']}\n";
             echo "  Listings with coordinates: {$stats['listings_with_coords']}\n";
             echo "  Listings needing geocoding: {$stats['listings_without_coords']}\n";
-            echo "  Cache entries: {$stats['cache_entries']}\n\n";
+            echo '  Cache entries: ' . ($stats['cache_entries'] ?? 0) . "\n\n";
 
             // Geocode users (limit to 50 per run to avoid timeouts)
             echo "Geocoding users...\n";
