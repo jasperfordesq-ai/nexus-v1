@@ -1,6 +1,4 @@
 {
-  "load_failed": "Impossibile caricare le corrispondenze",
-  "match_hidden": "Corrispondenza nascosta — te ne mostreremo meno di questo tipo",
   "page_title": "Abbinamenti",
   "breadcrumb_dashboard": "Cruscotto",
   "breadcrumb_matches": "Abbinamenti",
@@ -25,9 +23,11 @@
   "reasons_more": "+{{count}} altri",
   "view_details": "Vedi dettagli abbinamento",
   "not_interested": "Non interessato",
+  "load_failed": "Impossibile caricare le corrispondenze",
+  "match_hidden": "Corrispondenza nascosta — te ne mostreremo meno di questo tipo",
   "page_meta": {
     "title": "Corrispondenze"
   },
-  "filter_tabs_aria": "Match source filter",
-  "loading": "Loading matches..."
+  "filter_tabs_aria": "Corrispondenza filtro di origine",
+  "loading": "Caricamento partite..."
 }

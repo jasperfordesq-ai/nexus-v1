@@ -1,6 +1,7 @@
 {
   "page_title": "مساعد الذكاء الاصطناعي",
   "aria_chat": "دردشة الذكاء الاصطناعي",
+  "messages_region": "رسائل الدردشة",
   "header_title": "مساعد الذكاء الاصطناعي",
   "header_subtitle": "مدعوم بالذكاء الاصطناعي",
   "limits_left_today": "{{count}} ترك اليوم",
@@ -27,9 +28,6 @@
   "starter_q3": "كيف يعمل تبادل الوقت؟",
   "starter_q4": "ما هي الفعاليات القادمة التي ستحدث؟",
   "starter_q5": "كيف يمكنني إنشاء قائمة لتقديم مهاراتي؟",
-  "page_meta": {
-    "title": "دردشة الذكاء الاصطناعي"
-  },
   "thumbs_up_aria": "إجابة مفيدة",
   "thumbs_down_aria": "إجابة غير مفيدة",
   "card_online": "متصل",
@@ -39,5 +37,7 @@
   "tool_results": {
     "view": "عرض"
   },
-  "messages_region": "Chat messages"
+  "page_meta": {
+    "title": "دردشة الذكاء الاصطناعي"
+  }
 }

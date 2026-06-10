@@ -1,21 +1,21 @@
 {
   "page_title": "Léirmheasanna",
   "tabs": {
+    "received": "Léirmheasanna Faighte",
     "given": "Léirmheasanna Tugtha",
-    "pending": "Léirmheasanna ar Feitheamh",
-    "received": "Léirmheasanna Faighte"
+    "pending": "Léirmheasanna ar Feitheamh"
   },
   "stats": {
     "average": "Meánmharcáil",
-    "no_reviews": "Níl aon léirmheasanna go fóill",
-    "total": "Léirmheasanna iomlána"
+    "total": "Léirmheasanna iomlána",
+    "no_reviews": "Níl aon léirmheasanna go fóill"
   },
   "review_card": {
     "anonymous": "Anaithnid",
     "delete": "Scrios léirmheas",
     "delete_confirm": "An bhfuil tú cinnte gur mhaith leat an léirmheas seo a scriosadh?",
-    "delete_error": "Theip ar scriosadh an léirmheasa",
-    "delete_success": "Léirmheas scriosta"
+    "delete_success": "Léirmheas scriosta",
+    "delete_error": "Theip ar scriosadh an léirmheasa"
   },
   "pending": {
     "empty": "Níl aon léirmheasanna ar feitheamh",
@@ -34,5 +34,5 @@
   "load_more": "Luchtaigh níos mó",
   "stars": "{{count}} réalta",
   "stars_plural": "{{count}} réalta",
-  "rating_aria": "{{n}} out of 5 stars"
+  "rating_aria": "{{n}} as 5 réalta"
 }

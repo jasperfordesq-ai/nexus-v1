@@ -398,7 +398,7 @@
   "skills": {
     "title": "Jouw Vaardigheden",
     "description": "Voeg vaardigheden toe aan je profiel zodat andere leden je kunnen vinden. Gemeenschapsleden kunnen je vaardigheden goedkeuren.",
-    "loading": "Loading skills..."
+    "loading": "Vaardigheden laden..."
   },
   "password_modal": {
     "title": "Wachtwoord Wijzigen",
@@ -609,6 +609,6 @@
   },
   "push_campaign_opt_in": "Gesponsorde pushmeldingen ontvangen",
   "push_campaign_opt_in_description": "Sta lokale bedrijven en organisaties toe om gerichte pushmeldingen naar je te sturen. Je kunt je op elk moment afmelden.",
-  "tabs_aria": "Settings sections",
-  "twofa_loading_setup": "Loading two-factor setup..."
+  "tabs_aria": "Instellingensecties",
+  "twofa_loading_setup": "Tweefactorconfiguratie laden..."
 }

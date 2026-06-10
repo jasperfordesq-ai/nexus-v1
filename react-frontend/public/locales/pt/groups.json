@@ -1,4 +1,5 @@
 {
+  "member_fallback": "User",
   "title": "Grupos",
   "discover": "Descobrir Grupos",
   "create_group": "Criar Grupo",
@@ -50,6 +51,7 @@
   "posts_count_label": "{{count}} publicações",
   "detail": {
     "loading": "A carregar grupo...",
+    "loading_replies": "Carregando respostas...",
     "unable_to_load": "Não Foi Possível Carregar o Grupo",
     "not_found_desc": "O grupo que procura não existe",
     "error_load_failed": "Falha ao carregar grupo. Tente novamente.",
@@ -127,6 +129,8 @@
     "no_members_title": "Ainda sem membros",
     "no_members_desc": "Seja o primeiro a aderir a este grupo",
     "members_loading_aria": "A carregar os membros do grupo",
+    "feed_loading": "Carregando feed do grupo...",
+    "events_loading": "Carregando eventos de grupo...",
     "member_owner": "Proprietário",
     "member_admin": "Administrador",
     "member_joined": "Aderiu em {{date}}",
@@ -195,10 +199,7 @@
     "feed_empty_desc": "Seja o primeiro a partilhar algo com este grupo!",
     "feed_create_post": "Criar Publicação",
     "feed_load_more": "Carregar Mais",
-    "member_actions_aria": "Ações do membro",
-    "feed_loading": "Loading group feed...",
-    "events_loading": "Loading group events...",
-    "loading_replies": "Loading replies..."
+    "member_actions_aria": "Ações do membro"
   },
   "form": {
     "create_title": "Criar Novo Grupo",
@@ -258,6 +259,7 @@
     "template_label": "Começar a partir de um modelo (opcional)"
   },
   "announcements": {
+    "loading": "Carregando anúncios...",
     "heading": "Comunicados",
     "new": "Novo Comunicado",
     "no_announcements_title": "Sem comunicados",
@@ -285,8 +287,7 @@
     "pinned_success": "Fixado",
     "update_failed": "Falha ao atualizar comunicado",
     "deleted": "Comunicado eliminado",
-    "delete_failed": "Falha ao eliminar comunicado",
-    "loading": "Loading announcements..."
+    "delete_failed": "Falha ao eliminar comunicado"
   },
   "challenges": {
     "heading": "Desafios",
@@ -414,7 +415,7 @@
     "video_player": "Leitor de vídeo",
     "fullsize_alt": "Imagem em tamanho real",
     "delete": "Eliminar",
-    "delete_confirm": "Delete this media item? This cannot be undone."
+    "delete_confirm": "Excluir este item de mídia? Isto não pode ser desfeito."
   },
   "webhooks": {
     "load_failed": "Não foi possível carregar os webhooks",
@@ -442,7 +443,7 @@
     "secret_placeholder": "Segredo de assinatura para verificação do payload",
     "cancel": "Cancelar",
     "create_btn": "Criar webhook",
-    "delete_confirm": "Delete this webhook? This cannot be undone."
+    "delete_confirm": "Excluir este webhook? Isto não pode ser desfeito."
   },
   "toast": {
     "left": "Saiu do grupo",
@@ -516,6 +517,7 @@
     "downvote_aria": "Voto negativo",
     "vote_count_aria": "{{count}} votos",
     "loading": "A carregar perguntas",
+    "loading_detail": "Carregando detalhes da pergunta...",
     "search_placeholder": "Pesquisar perguntas…",
     "search_aria": "Pesquisar perguntas",
     "sort_aria": "Classificar perguntas",
@@ -553,8 +555,7 @@
     "answer_posted_success": "Resposta postada!",
     "answer_posted_error": "Falha ao postar resposta",
     "vote_error": "Não foi possível votar",
-    "accept_error": "Falha ao aceitar a resposta",
-    "loading_detail": "Loading question details..."
+    "accept_error": "Falha ao aceitar a resposta"
   },
   "wiki": {
     "load_failed": "Não foi possível carregar as páginas da wiki",
@@ -567,6 +568,7 @@
     "delete_failed": "Não foi possível eliminar a página",
     "revisions_failed": "Não foi possível carregar o histórico de revisões",
     "loading": "A carregar a wiki",
+    "loading_page": "Carregando página wiki...",
     "heading": "Wikipédia",
     "new_page": "Nova página",
     "pages": "Páginas",
@@ -602,8 +604,7 @@
     "content_label": "Conteúdo",
     "create": "Criar página",
     "delete_title": "Eliminar página da wiki",
-    "delete_confirm": "Tens a certeza de que queres eliminar \"{{name}}\"? Esta ação não pode ser anulada.",
-    "loading_page": "Loading wiki page..."
+    "delete_confirm": "Tens a certeza de que queres eliminar \"{{name}}\"? Esta ação não pode ser anulada."
   },
   "page_meta": {
     "create": {
@@ -711,6 +712,5 @@
     "accent_color": "Cor de destaque",
     "hue": "Matiz",
     "preview": "Pre-visualizacao"
-  },
-  "member_fallback": "User"
+  }
 }

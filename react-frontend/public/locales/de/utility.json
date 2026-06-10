@@ -134,8 +134,8 @@
     "aria_upload_progress": "Hochladefortschritt",
     "download": "Herunterladen",
     "download_failed": "Download fehlgeschlagen",
-    "filter_by_category": "Filter by category",
-    "loading": "Loading resources"
+    "filter_by_category": "Nach Kategorie filtern",
+    "loading": "Laden von Ressourcen"
   },
   "not_found": {
     "page_title": "Seite nicht gefunden",

@@ -97,6 +97,7 @@
   "create_opportunity_subtitle": "Erstellen Sie einen neuen Freiwilligeneinsatz für Ihre Organisation",
   "form_org_label": "Organisation",
   "form_org_placeholder": "Wählen Sie Ihre Organisation",
+  "search_organisations": "Suchorganisationen",
   "form_org_required": "Bitte wählen Sie eine Organisation",
   "form_title_label": "Titel des Einsatzes",
   "form_title_placeholder": "z.B. Gemeinschaftsgarten-Helfer, Veranstaltungskoordinator",
@@ -197,6 +198,7 @@
   "all_hours_reviewed": "Alle eingereichten Freiwilligenstunden wurden überprüft.",
   "org_hours_approved_paid": "Stunden genehmigt. Zeitgutschriften, die an Freiwillige gezahlt werden.",
   "org_hours_approved": "Stunden genehmigt.",
+  "org_hours_approved_unpaid": "Stunden genehmigt. Laden Sie das Guthaben auf, um diese:n Freiwillige:n zu bezahlen.",
   "org_hours_declined": "Die Stunden wurden abgelehnt.",
   "org_all_hours_reviewed": "Alle ehrenamtlichen Stunden wurden überprüft.",
   "org_balance_low_warning": "Das Guthaben reicht möglicherweise für {{count}} ausstehende Stunden nicht aus.",
@@ -468,6 +470,7 @@
   "aria": {
     "volunteering_sections": "Freiwilligenarbeit-Bereiche"
   },
+  "filter_by_status": "Nach Status filtern",
   "credentials": {
     "heading": "Nachweisprüfung",
     "upload_new": "Neuen Nachweis hochladen",
@@ -634,7 +637,7 @@
     "aria_select_all": "Alle sichtbaren ausstehenden Bewerbungen auswählen",
     "aria_select_application": "Bewerbung von {{name}} auswählen",
     "aria_search_volunteers": "Freiwillige nach Name suchen",
-    "filter_label": "Filter applications"
+    "filter_label": "Anwendungen filtern"
   },
   "org_wallet_balance": "Wallet-Guthaben:",
   "auto_pay_on": "Automatische Zahlung EIN",
@@ -837,8 +840,5 @@
   "my_organisations_none": "Noch keine Organisationen",
   "my_organisations_none_desc": "Registrieren Sie eine Freiwilligenorganisation, um Einsätze zu veröffentlichen, Freiwillige zu verwalten und Zeitguthaben zu vergeben.",
   "my_organisations_pending": "Genehmigung ausstehend",
-  "my_organisations_pending_desc": "Wartet auf Admin-Genehmigung",
-  "filter_by_status": "Filter by status",
-  "search_organisations": "Search organisations",
-  "org_hours_approved_unpaid": "Stunden genehmigt. Laden Sie das Guthaben auf, um diese:n Freiwillige:n zu bezahlen."
+  "my_organisations_pending_desc": "Wartet auf Admin-Genehmigung"
 }

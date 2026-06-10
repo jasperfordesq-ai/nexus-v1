@@ -100,6 +100,7 @@
     "create_poll": "Créer le sondage",
     "listing_title_label": "Titre",
     "listing_title_placeholder": "Que proposez-vous ou recherchez-vous ?",
+    "listing_type_label": "Type d'annonce",
     "listing_offering": "Je propose",
     "listing_looking_for": "Je recherche",
     "listing_desc_placeholder": "Décrivez votre annonce...",
@@ -141,6 +142,7 @@
     "image_remove_aria": "Supprimer l'image",
     "group_label": "Publier dans",
     "group_placeholder": "Fil public",
+    "group_search": "Rechercher des groupes",
     "group_members": "{{count}} membres",
     "ai_title_required": "Saisissez d'abord un titre pour que l'IA puisse générer une description",
     "ai_generated": "Description générée par l'IA !",
@@ -229,9 +231,7 @@
     "file_size_mb": "{{name}} ({{size}} Mo)",
     "listing_preview_alt": "Aper?u de l?annonce",
     "image_preview_alt": "Aper?u du t?l?versement",
-    "listing_type_label": "Listing type",
-    "type_tabs_aria": "Compose content type",
-    "group_search": "Search groups"
+    "type_tabs_aria": "Composer un type de contenu"
   },
   "moderation": {
     "unauthorized": "Vous n'avez pas la permission d'effectuer cette action."
@@ -343,7 +343,7 @@
       "badge_unlocked": "Badge débloqué",
       "level_reached": "Niveau atteint"
     },
-    "read_more_about": "Read more about {{title}}",
+    "read_more_about": "En savoir plus sur {{title}}",
     "detail_course": "Voir le cours",
     "type_course": "Cours"
   },
@@ -615,9 +615,9 @@
     "not_found": "Élément introuvable",
     "load_failed": "Impossible de charger l'élément"
   },
-  "controls_region_label": "Feed controls",
-  "new_posts_available": "New posts available",
+  "controls_region_label": "Contrôles d'alimentation",
+  "new_posts_available": "Nouveaux messages disponibles",
   "confirm": {
-    "delete_post": "Delete this post? This cannot be undone."
+    "delete_post": "Supprimer ce message ? Cela ne peut pas être annulé."
   }
 }

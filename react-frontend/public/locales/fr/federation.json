@@ -123,6 +123,7 @@
     "search_placeholder": "Rechercher des membres...",
     "aria_search": "Rechercher des membres de la fédération",
     "all_communities": "Toutes les communautés",
+    "search_communities": "Communautés de recherche",
     "aria_filter_community": "Filtrer par communauté",
     "service_reach_filter": "Filtrer par portée de service",
     "reach_all": "Tous",
@@ -149,8 +150,7 @@
     "external_profile_title": "Membre externe",
     "external_profile_message": "Ce membre est sur une plateforme partenaire externe. L’affichage direct du profil n’est pas disponible.",
     "external_member": "Membre externe",
-    "member_fallback": "Membre",
-    "search_communities": "Search communities"
+    "member_fallback": "Membre"
   },
   "messages": {
     "page_title": "Messages de la Fédération",
@@ -217,9 +217,9 @@
     "message_placeholder": "Écrivez votre message...",
     "cancel": "Annuler",
     "send_message": "Envoyer un message",
-    "thread_aria_no_unread": "Conversation with {{name}} from {{tenant}}",
-    "thread_aria_unread": "Conversation with {{name}} from {{tenant}}, {{count}} unread message",
-    "thread_aria_unread_plural": "Conversation with {{name}} from {{tenant}}, {{count}} unread messages"
+    "thread_aria_no_unread": "Conversation avec {{name}} de {{tenant}}",
+    "thread_aria_unread": "Conversation avec {{name}} de {{tenant}}, {{count}} message non lu",
+    "thread_aria_unread_plural": "Conversation avec {{name}} de {{tenant}}, {{count}} messages non lus"
   },
   "listings": {
     "page_title": "Listes de la Fédération",
@@ -229,6 +229,7 @@
     "subtitle": "Parcourez les offres et les demandes des membres des communautés partenaires.",
     "search_placeholder": "Rechercher des annonces...",
     "all_communities": "Toutes les communautés",
+    "search_communities": "Communautés de recherche",
     "filter_by_community": "Filtrer par communauté",
     "filter_by_type": "Filtrer par type",
     "type_all": "Tous",
@@ -248,8 +249,7 @@
     "hours_estimated": "~{{hours}}h",
     "view_profile": "Voir le profil",
     "contact_author": "Contact",
-    "close": "Fermer",
-    "search_communities": "Search communities"
+    "close": "Fermer"
   },
   "settings": {
     "page_title": "Paramètres de fédération",
@@ -317,6 +317,7 @@
     "search_placeholder": "Rechercher des événements...",
     "filter_by_community": "Filtrer par communauté",
     "all_communities": "Toutes les communautés",
+    "search_communities": "Communautés de recherche",
     "upcoming_only": "À venir seulement",
     "unable_to_load": "Impossible de charger les événements",
     "try_again": "Essayer à nouveau",
@@ -329,8 +330,7 @@
     "online": "En ligne",
     "date_at_time": "{{date}} ? {{time}}",
     "attendees_going_one": "{{count}} participant",
-    "attendees_going_other": "{{count}} participants",
-    "search_communities": "Search communities"
+    "attendees_going_other": "{{count}} participants"
   },
   "groups": {
     "page_title": "Groupes de fédération",
@@ -341,6 +341,7 @@
     "search_placeholder": "Rechercher des groupes...",
     "filter_by_community": "Filtrer par communauté",
     "all_communities": "Toutes les communautés",
+    "search_communities": "Communautés de recherche",
     "unable_to_load": "Impossible de charger les groupes",
     "try_again": "Essayer à nouveau",
     "empty_title": "Aucun groupe trouvé",
@@ -350,8 +351,7 @@
     "load_more_error": "Impossible de charger plus de groupes.",
     "member_count": "Membre {{count}}",
     "member_count_plural": "Membres de {{count}}",
-    "private": "Privé",
-    "search_communities": "Search communities"
+    "private": "Privé"
   },
   "connections": {
     "page_title": "Connexions de la Fédération",
@@ -382,7 +382,7 @@
     "rejected_success": "Connexion refusée",
     "removed_success": "Connexion supprimée",
     "action_failed": "L'action a échoué. Veuillez réessayer.",
-    "tabs_aria": "Federation connection status"
+    "tabs_aria": "État de la connexion à la fédération"
   },
   "partner_detail": {
     "page_title": "Communauté de partenaires",

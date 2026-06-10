@@ -284,6 +284,8 @@
   "clear_filters": "Wyczyść filtry",
   "results_count": "{{count}} znalezione ogłoszenia",
   "results_loading": "Wyszukiwanie ogłoszeń",
+  "loading_progress": "Ładowanie aukcji",
+  "filter_form_label": "Filtruj oferty",
   "radius_5": "5 km",
   "radius_10": "10 km",
   "radius_25": "25 km",
@@ -338,7 +340,5 @@
   "listing_image_alt": "Obraz aukcji",
   "open_listing_aria": "Otwórz ogłoszenie: {{title}}",
   "distance_meters": "{{distance}} m",
-  "distance_kilometers": "{{distance}} km",
-  "loading_progress": "Loading listings",
-  "filter_form_label": "Filter listings"
+  "distance_kilometers": "{{distance}} km"
 }

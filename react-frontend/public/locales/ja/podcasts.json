@@ -8,19 +8,19 @@
   },
   "browse": {
     "search_placeholder": "番組を検索する",
+    "category_label": "カテゴリ",
     "all_categories": "すべてのカテゴリー",
     "sort_label": "番組を並べ替える",
+    "clear_filters": "クリア",
     "sort": {
-      "episodes": "ほとんどのエピソード",
-      "followers": "最もフォローされている",
       "newest": "最新",
-      "title": "A-Z"
+      "title": "A-Z",
+      "episodes": "ほとんどのエピソード",
+      "followers": "最もフォローされている"
     },
     "empty": "ポッドキャスト番組はまだありません",
     "empty_hint": "メンバーが承認された番組を公開すると、ここに表示されます。",
-    "load_more": "さらにロードする",
-    "category_label": "カテゴリ",
-    "clear_filters": "クリア"
+    "load_more": "さらにロードする"
   },
   "show": {
     "not_found": "ポッドキャスト番組が見つかりません",
@@ -29,6 +29,8 @@
     "community_show": "コミュニティショー",
     "episode_count_one": "{{count}} episode",
     "episode_count_other": "{{count}} episodes",
+    "follower_count_one": "{{count}} 人のフォロワー",
+    "follower_count_other": "{{count}} 人のフォロワー",
     "rss_feed": "RSSフィード",
     "subscribe": "番組をフォローする",
     "unsubscribe": "番組のフォローを解除する",
@@ -36,9 +38,7 @@
     "unsubscribed": "フォローされていない人を表示します。",
     "subscribe_failed": "フォロー設定を更新できませんでした。",
     "episodes": "Episodes",
-    "no_episodes": "公開されたエピソードはまだありません。",
-    "follower_count_one": "{{count}} 人のフォロワー",
-    "follower_count_other": "{{count}} 人のフォロワー"
+    "no_episodes": "公開されたエピソードはまだありません。"
   },
   "episode": {
     "title": "ポッドキャストのエピソード",
@@ -53,7 +53,12 @@
     "explicit": "Explicit",
     "react": "React",
     "reacted": "Reacted",
+    "reaction_failed": "反応を更新できませんでした。",
+    "reactions_count_one": "{{count}} reaction",
+    "reactions_count_other": "{{count}} reactions",
+    "report": "報告",
     "report_title": "レポートエピソード",
+    "report_reason": "理由",
     "report_details": "モデレーター向けの詳細",
     "submit_report": "レポートの送信",
     "reported": "レポートはモデレーターに送信されました。",
@@ -68,21 +73,16 @@
       "full": "エピソード全体",
       "trailer": "Trailer",
       "bonus": "Bonus"
-    },
-    "report": "報告",
-    "report_reason": "理由",
-    "reaction_failed": "Could not update your reaction.",
-    "reactions_count_one": "{{count}} reaction",
-    "reactions_count_other": "{{count}} reactions"
+    }
   },
   "player": {
     "unsupported": "お使いのブラウザはオーディオ プレーヤーをサポートしていません。",
+    "load_error": "このエピソードの音声をロードできませんでした。利用できないか、まだ処理中の可能性があります。",
     "duration_unknown": "期間不明",
     "progress": "再生の進行状況",
     "skip_back": "バック 15 秒",
     "skip_forward": "30秒前へ",
-    "speed": "{{レート}}x",
-    "load_error": "This episode's audio could not be loaded. It may be unavailable or still processing.",
+    "speed": "{{rate}}x",
     "jump_to_chapter": "Jump to {{time}} — {{title}}"
   },
   "studio": {
@@ -101,6 +101,7 @@
     "archive_episode": "アーカイブエピソード",
     "delete_episode": "エピソードを削除する",
     "readiness_title": "準備を示す",
+    "readiness_subtitle": "{{title}} チェックリスト",
     "readiness": {
       "public_show": "ショーは公開され、公開され、承認されています",
       "owner_email": "ディレクトリ所有者の電子メールが設定されています",
@@ -108,16 +109,18 @@
       "artwork": "アートワークの表示URLが設定されています",
       "published_episode": "少なくとも 1 つの承認されたエピソードが公開されている"
     },
+    "media_scan_status": "スキャン: {{status}}",
+    "media_processing_status": "メディア: {{status}}",
     "media_status": {
-      "not_required": "不要",
       "pending": "保留中",
       "complete": "完了",
+      "ready_for_processing": "??????",
       "clean": "クリーン",
+      "scan_unavailable": "?????????????",
       "failed": "失敗した",
       "blocked": "ブロックされました",
       "infected": "ブロックされました",
-      "ready_for_processing": "??????",
-      "scan_unavailable": "?????????????"
+      "not_required": "不要"
     },
     "show_created": "ショーが作成されました。",
     "show_published": "ショーが公開されました。",
@@ -128,16 +131,13 @@
     "episode_archived": "エピソードがアーカイブされました。",
     "episode_deleted": "エピソードが削除されました。",
     "save_failed": "変更を保存できませんでした。",
+    "uploading": "音声をアップロードしています…",
+    "chapter_format_warning_one": "{{count}} の章行にはタイムスタンプがなく、0:00 に始まります。",
+    "chapter_format_warning_other": "{{count}} の章行にはタイムスタンプがなく、0:00 から始まります。",
     "confirm_archive_show": "{{title}} をアーカイブしますか?公開ポッドキャスト リストからは非表示になります。",
     "confirm_delete_show": "{{title}} とそのすべてのエピソードを削除しますか?これを元に戻すことはできません。",
     "confirm_archive_episode": "{{title}} をアーカイブしますか?公開ポッドキャスト リストからは非表示になります。",
-    "confirm_delete_episode": "{{title}} を削除しますか?これを元に戻すことはできません。",
-    "readiness_subtitle": "{{title}} チェックリスト",
-    "media_scan_status": "スキャン: {{ステータス}}",
-    "media_processing_status": "メディア: {{ステータス}}",
-    "uploading": "Uploading audio…",
-    "chapter_format_warning_one": "{{count}} chapter line has no timestamp and will start at 0:00.",
-    "chapter_format_warning_other": "{{count}} chapter lines have no timestamp and will start at 0:00."
+    "confirm_delete_episode": "{{title}} を削除しますか?これを元に戻すことはできません。"
   },
   "fields": {
     "show": "Show",
@@ -147,6 +147,7 @@
     "author_name": "ディレクトリ作成者名",
     "owner_email": "ディレクトリ所有者の電子メール",
     "copyright": "著作権表示",
+    "funding_url": "ファンディングURL",
     "explicit_show": "この番組を露骨なものとしてマークします",
     "artwork_url": "Artwork URL",
     "audio_url": "Audio URL",
@@ -162,8 +163,7 @@
     "episode_type": "エピソードの種類",
     "transcript": "Transcript",
     "chapters": "Chapters",
-    "chapters_hint": "1 行に 1 章、例: 00:30 はじめに",
-    "funding_url": "ファンディングURL"
+    "chapters_hint": "1 行に 1 章、例: 00:30 はじめに"
   },
   "visibility": {
     "public": "Public",

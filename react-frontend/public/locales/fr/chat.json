@@ -1,6 +1,7 @@
 {
   "page_title": "Assistant IA",
   "aria_chat": "Chat IA",
+  "messages_region": "Messages de discussion",
   "header_title": "Assistant IA",
   "header_subtitle": "Propulsé par l’IA",
   "limits_left_today": "{{count}} restant(s) aujourd’hui",
@@ -27,9 +28,6 @@
   "starter_q3": "Comment fonctionne la banque de temps ?",
   "starter_q4": "Quels événements sont à venir ?",
   "starter_q5": "Comment créer une annonce pour offrir mes compétences ?",
-  "page_meta": {
-    "title": "Chat IA"
-  },
   "thumbs_up_aria": "Réponse utile",
   "thumbs_down_aria": "Réponse inutile",
   "card_online": "En ligne",
@@ -39,5 +37,7 @@
   "tool_results": {
     "view": "Voir"
   },
-  "messages_region": "Chat messages"
+  "page_meta": {
+    "title": "Chat IA"
+  }
 }

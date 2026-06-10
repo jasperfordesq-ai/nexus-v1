@@ -1,4 +1,5 @@
 {
+  "loading": "Loading...",
   "trust_tier": {
     "title": "Mijn vertrouwensniveau",
     "subtitle": "Jouw positie in de gemeenschap",
@@ -285,6 +286,7 @@
       "collapse": "Zijbalk samenvouwen",
       "help_centre": "Helpcentrum",
       "full_admin": "Volledige beheerder",
+      "nav_label": "Zorgzame gemeenschapsnavigatie",
       "search_aria": "Search caring community navigation",
       "search_placeholder": "Search navigation...",
       "clear_search": "Duidelijke zoekopdracht",
@@ -336,8 +338,7 @@
         "kpi_baselines": "KPI-basislijnen",
         "municipal_roi": "Gemeentelijke ROI",
         "category_coefficients": "Categoriecoëfficiënten"
-      },
-      "nav_label": "Caring community navigation"
+      }
     }
   },
   "admin": {
@@ -1173,6 +1174,5 @@
     "refresh_federation_peers": "Federatie-peers vernieuwen",
     "refresh_kpi_baselines": "KPI-basislijnen vernieuwen",
     "refresh_research_partnerships": "Onderzoekspartnerschappen vernieuwen"
-  },
-  "loading": "Loading..."
+  }
 }

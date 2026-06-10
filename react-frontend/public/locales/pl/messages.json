@@ -208,5 +208,5 @@
     }
   },
   "character_count": "{{current}}/{{max}}",
-  "loading_older": "Loading older messages"
+  "loading_older": "Ładowanie starszych wiadomości"
 }

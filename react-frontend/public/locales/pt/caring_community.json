@@ -1,4 +1,5 @@
 {
+  "loading": "Loading...",
   "trust_tier": {
     "title": "Meu nível de confiança",
     "subtitle": "Sua posição na comunidade",
@@ -285,6 +286,7 @@
       "collapse": "Recolher barra lateral",
       "help_centre": "Central de Ajuda",
       "full_admin": "Administrador completo",
+      "nav_label": "Navegação cuidadosa da comunidade",
       "search_aria": "Search caring community navigation",
       "search_placeholder": "Search navigation...",
       "clear_search": "Limpar pesquisa",
@@ -336,8 +338,7 @@
         "kpi_baselines": "Linhas de base de KPI",
         "municipal_roi": "ROI municipal",
         "category_coefficients": "Coeficientes de categoria"
-      },
-      "nav_label": "Caring community navigation"
+      }
     }
   },
   "admin": {
@@ -1173,6 +1174,5 @@
     "refresh_federation_peers": "Atualizar pares da federação",
     "refresh_kpi_baselines": "Atualizar linhas de base de KPI",
     "refresh_research_partnerships": "Atualizar parcerias de pesquisa"
-  },
-  "loading": "Loading..."
+  }
 }

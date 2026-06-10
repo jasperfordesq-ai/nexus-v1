@@ -1,4 +1,5 @@
 {
+  "breadcrumb": "Breadcrumb",
   "page_title": "マーケットプレイス",
   "meta_description": "ご近所さんと地域でアイテムを売買・シェアしましょう — コミュニティマーケットプレイスの出品、無料アイテム、グループ購入、タイムバンク内の配送。",
   "hub": {
@@ -166,6 +167,7 @@
     "price_type_label": "価格タイプ",
     "price_label": "価格",
     "currency_label": "通貨",
+    "currency_search": "通貨の検索",
     "location_delivery": "場所と配送",
     "location_label": "場所",
     "location_placeholder": "市町村またはエリア",
@@ -178,11 +180,11 @@
     "created_success": "リスティングを作成しました!",
     "created_error": "リスティングの作成に失敗しました",
     "created_error_retry": "リスティングの作成に失敗しました。もう一度お試しください。",
-    "draft_saved": "下書きを保存しました",
-    "currency_search": "Search currency"
+    "draft_saved": "下書きを保存しました"
   },
   "search": {
     "page_title": "マーケットプレイスを検索",
+    "page_heading": "Search Marketplace",
     "meta_description": "コミュニティマーケットプレイスでアイテムを検索・絞り込みできます。",
     "breadcrumb_search": "検索",
     "search_placeholder": "マーケットプレイスを検索…",
@@ -221,8 +223,7 @@
     "price_from": "{{min}} 以上",
     "price_up_to": "{{max}} 以下",
     "last_days_one": "過去 {{count}} 日間",
-    "last_days_other": "過去 {{count}} 日間",
-    "page_heading": "Search Marketplace"
+    "last_days_other": "過去 {{count}} 日間"
   },
   "seller": {
     "page_title": "セラープロフィール",
@@ -638,7 +639,7 @@
     "search_this_area": "このエリアを検索",
     "distance_km": "{{km}} km 先",
     "distance_meters": "{{m}} m 先",
-    "view_toggle": "View mode"
+    "view_toggle": "ビューモード"
   },
   "shipping": {
     "title": "配送オプション",
@@ -672,7 +673,7 @@
     "recommended": "おすすめ",
     "loading": "配送オプションを読み込み中…",
     "no_options": "このセラーには利用可能な配送オプションがありません。",
-    "delete_confirm": "Remove this shipping option? This cannot be undone."
+    "delete_confirm": "この配送オプションを削除しますか?これを元に戻すことはできません。"
   },
   "listing_location": {
     "location_title": "場所",
@@ -809,12 +810,11 @@
     "not_available_title": "決済処理を設定中",
     "not_available_description": "決済処理の設定中です。支払い方法については販売者にお問い合わせください。"
   },
-  "breadcrumb": "Breadcrumb",
-  "buyer_orders_tabs_aria": "Buyer order status filter",
-  "collections_tabs_aria": "Marketplace collections sections",
-  "my_listings_tabs_aria": "My listings status filter",
-  "my_offers_tabs_aria": "My offers sections",
-  "seller_orders_tabs_aria": "Seller order status filter",
-  "seller_profile_tabs_aria": "Seller profile sections",
-  "category_filter_label": "Filter by category"
+  "buyer_orders_tabs_aria": "購入者の注文ステータスフィルター",
+  "collections_tabs_aria": "マーケットプレイスのコレクションセクション",
+  "my_listings_tabs_aria": "私の商品ステータスフィルター",
+  "my_offers_tabs_aria": "私のオファーセクション",
+  "seller_orders_tabs_aria": "販売者の注文ステータスフィルター",
+  "seller_profile_tabs_aria": "販売者のプロフィールセクション",
+  "category_filter_label": "カテゴリでフィルタリングする"
 }

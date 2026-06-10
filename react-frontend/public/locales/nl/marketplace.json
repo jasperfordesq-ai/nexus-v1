@@ -1,4 +1,5 @@
 {
+  "breadcrumb": "Breadcrumb",
   "page_title": "Marktplaats",
   "meta_description": "Koop, verkoop of deel spullen lokaal met buren — communitymarktplaats, gratis items, groepsaankopen en leveringen binnen je tijdbank.",
   "hub": {
@@ -166,6 +167,7 @@
     "price_type_label": "Prijs Type",
     "price_label": "Prijs",
     "currency_label": "Valuta",
+    "currency_search": "Zoek valuta",
     "location_delivery": "Locatie & Levering",
     "location_label": "Locatie",
     "location_placeholder": "Stad, dorp of gebied",
@@ -178,11 +180,11 @@
     "created_success": "Advertentie succesvol aangemaakt!",
     "created_error": "Mislukt om advertentie aan te maken",
     "created_error_retry": "Mislukt om advertentie aan te maken. Probeer het opnieuw.",
-    "draft_saved": "Concept opgeslagen",
-    "currency_search": "Search currency"
+    "draft_saved": "Concept opgeslagen"
   },
   "search": {
     "page_title": "Zoek Marktplaats",
+    "page_heading": "Search Marketplace",
     "meta_description": "Zoek en filter items in de gemeenschapsmarkt.",
     "breadcrumb_search": "Zoeken",
     "search_placeholder": "Zoek marktplaats...",
@@ -221,8 +223,7 @@
     "price_from": "Van {{min}}",
     "price_up_to": "Tot {{max}}",
     "last_days_one": "Laatste {{count}} dag",
-    "last_days_other": "Laatste {{count}} dagen",
-    "page_heading": "Search Marketplace"
+    "last_days_other": "Laatste {{count}} dagen"
   },
   "seller": {
     "page_title": "Verkoper profiel",
@@ -638,7 +639,7 @@
     "search_this_area": "Zoek Dit Gebied",
     "distance_km": "{{km}} km afstand",
     "distance_meters": "{{m}}m afstand",
-    "view_toggle": "View mode"
+    "view_toggle": "Bekijk modus"
   },
   "shipping": {
     "title": "Verzendopties",
@@ -672,7 +673,7 @@
     "recommended": "Aanbevolen",
     "loading": "Verzendopties laden...",
     "no_options": "Geen verzendopties beschikbaar voor deze verkoper.",
-    "delete_confirm": "Remove this shipping option? This cannot be undone."
+    "delete_confirm": "Deze verzendoptie verwijderen? Dit kan niet ongedaan worden gemaakt."
   },
   "listing_location": {
     "location_title": "Locatie",
@@ -809,12 +810,11 @@
     "not_available_title": "Betalingsverwerking wordt ingesteld",
     "not_available_description": "Betalingsverwerking wordt ingesteld. Neem contact op met de verkoper om de betaling te regelen."
   },
-  "breadcrumb": "Breadcrumb",
-  "buyer_orders_tabs_aria": "Buyer order status filter",
-  "collections_tabs_aria": "Marketplace collections sections",
-  "my_listings_tabs_aria": "My listings status filter",
-  "my_offers_tabs_aria": "My offers sections",
-  "seller_orders_tabs_aria": "Seller order status filter",
-  "seller_profile_tabs_aria": "Seller profile sections",
-  "category_filter_label": "Filter by category"
+  "buyer_orders_tabs_aria": "Filter voor bestelstatus van koper",
+  "collections_tabs_aria": "Marktplaatscollectiesecties",
+  "my_listings_tabs_aria": "Statusfilter voor mijn vermeldingen",
+  "my_offers_tabs_aria": "Mijn aanbiedingen secties",
+  "seller_orders_tabs_aria": "Statusfilter voor verkopersorders",
+  "seller_profile_tabs_aria": "Verkoperprofielsecties",
+  "category_filter_label": "Filter op categorie"
 }

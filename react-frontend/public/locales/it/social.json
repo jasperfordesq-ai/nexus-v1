@@ -1,5 +1,8 @@
 {
   "cancel": "Annulla",
+  "comments": {
+    "edit_label": "Modifica commento"
+  },
   "comments_title": "Commenti",
   "copy_failed": "Impossibile copiare il link",
   "copy_link": "Copia Link",
@@ -68,6 +71,7 @@
   },
   "status": {
     "set_status": "Imposta stato",
+    "set_status_current": "Imposta stato (attualmente: {{status}})",
     "online": "In linea",
     "online_desc": "Visibile agli altri",
     "away": "Assente",
@@ -84,8 +88,7 @@
     "status_label": "Stato",
     "status_placeholder": "In riunione",
     "char_count": "{{current}}/80 caratteri",
-    "offline": "Non in linea",
-    "set_status_current": "Set status (currently: {{status}})"
+    "offline": "Non in linea"
   },
   "endorse": {
     "tooltip_remove": "Rimuovi raccomandazione per {{skillName}}",
@@ -105,9 +108,10 @@
     "no_collection": "Generale (nessuna collezione)",
     "new_collection": "Nuova collezione",
     "collection_name": "Nome della collezione",
-    "confirm_create": "Create collection"
+    "confirm_create": "Crea raccolta"
   },
   "bookmarks": {
+    "loading": "Caricamento segnalibri...",
     "page_title": "Salvato",
     "meta_description": "Rivedi e organizza i tuoi post salvati, annunci, eventi, offerte di lavoro, articoli del blog e discussioni.",
     "title": "Elementi salvati",
@@ -115,6 +119,7 @@
     "new_collection": "Nuova Collezione",
     "all_items": "Tutti",
     "collection_filter_label": "Raccolta",
+    "collection_search": "Cerca raccolte",
     "tab_all": "Tutti",
     "count": "{{count}} elementi salvati",
     "remove": "Rimuovi dai salvati",
@@ -148,9 +153,7 @@
     "collection_description": "Descrizione (opzionale)",
     "cancel": "Annulla",
     "save": "Salva",
-    "create": "Crea",
-    "loading": "Loading bookmarks...",
-    "collection_search": "Search collections"
+    "create": "Crea"
   },
   "verified": "Verificato",
   "hover_card": {
@@ -162,9 +165,6 @@
     "connections": "{{count}} connessioni",
     "listings": "{{count}} annunci"
   },
-  "comments": {
-    "edit_label": "Edit comment"
-  },
-  "reactions_tabs_aria": "Reaction type filter",
-  "content_type_tabs_aria": "Bookmark content type filter"
+  "reactions_tabs_aria": "Filtro del tipo di reazione",
+  "content_type_tabs_aria": "Filtro del tipo di contenuto dei segnalibri"
 }

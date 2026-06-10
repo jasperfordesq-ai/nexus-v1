@@ -97,6 +97,7 @@
   "create_opportunity_subtitle": "あなたの組織のために新しいボランティアの機会を作成します",
   "form_org_label": "組織",
   "form_org_placeholder": "あなたの組織を選択してください",
+  "search_organisations": "組織を検索する",
   "form_org_required": "組織を選択してください",
   "form_title_label": "機会のタイトル",
   "form_title_placeholder": "例: コミュニティガーデンの手伝い、イベントコーディネーター",
@@ -197,6 +198,7 @@
   "all_hours_reviewed": "すべての提出物がレビューされました — 追いつきました。",
   "org_hours_approved_paid": "承認された時間帯。ボランティアに支払われる時間単位。",
   "org_hours_approved": "承認された時間帯。",
+  "org_hours_approved_unpaid": "時間が承認されました。このボランティアに支払うにはウォレットにチャージしてください。",
   "org_hours_declined": "営業時間は減少しました。",
   "org_all_hours_reviewed": "すべてのボランティア時間は確認されました。",
   "org_balance_low_warning": "{{count}} の保留時間に対して残高が不足している可能性があります。",
@@ -468,6 +470,7 @@
   "aria": {
     "volunteering_sections": "ボランティアセクション"
   },
+  "filter_by_status": "ステータスでフィルタリングする",
   "credentials": {
     "heading": "資格情報の検証",
     "upload_new": "新しい認証情報をアップロードする",
@@ -634,7 +637,7 @@
     "aria_select_all": "表示されている保留中の申請をすべて選択",
     "aria_select_application": "{{name}} からアプリケーションを選択します",
     "aria_search_volunteers": "名前でボランティアを検索",
-    "filter_label": "Filter applications"
+    "filter_label": "フィルターアプリケーション"
   },
   "org_wallet_balance": "ウォレット残高:",
   "auto_pay_on": "自動支払いON",
@@ -837,8 +840,5 @@
   "my_organisations_none": "まだ組織がありません",
   "my_organisations_none_desc": "ボランティア組織を登録して、機会の投稿、ボランティアの管理、時間単位の付与を開始します。",
   "my_organisations_pending": "承認待ち",
-  "my_organisations_pending_desc": "管理者の承認を待っています",
-  "filter_by_status": "Filter by status",
-  "search_organisations": "Search organisations",
-  "org_hours_approved_unpaid": "時間が承認されました。このボランティアに支払うにはウォレットにチャージしてください。"
+  "my_organisations_pending_desc": "管理者の承認を待っています"
 }

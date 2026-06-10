@@ -5,7 +5,7 @@
   "browse_listings": "تصفح القوائم",
   "load_more": "تحميل المزيد",
   "try_again": "حاول مرة أخرى",
-  "loading": "Loading exchanges...",
+  "loading": "جارٍ تحميل التبادلات...",
   "service_exchange": "تبادل الخدمة",
   "unknown": "غير معروف",
   "hours_count": "{{count}} ساعة",
@@ -109,7 +109,7 @@
     "ratings": "التقييمات",
     "rate_exchange": "قيم هذا التبادل",
     "prep_time_value": "{{count}}ح",
-    "rating_value": "Rating: {{rating}} out of 5"
+    "rating_value": "التقييم: {{rating}} من أصل 5"
   },
   "modal": {
     "decline_title": "رفض طلب التبادل",

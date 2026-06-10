@@ -97,6 +97,7 @@
   "create_opportunity_subtitle": "Cruthaigh deis oibre deonaí nua do d'eagras",
   "form_org_label": "Eagras",
   "form_org_placeholder": "Roghnaigh d'eagras",
+  "search_organisations": "Cuardaigh eagraíochtaí",
   "form_org_required": "Roghnaigh eagras le do thoil",
   "form_title_label": "Teideal na Deise",
   "form_title_placeholder": "m.sh., Cúntóir Gairdín Pobail, Comhordaitheoir Imeachtaí",
@@ -197,6 +198,7 @@
   "all_hours_reviewed": "Tá gach uair oibre deonaí athbhreithnithe.",
   "org_hours_approved_paid": "Uaireanta ceadaithe. Creidmheasanna ama íoctha leis an oibrí deonach.",
   "org_hours_approved": "Uaireanta ceadaithe.",
+  "org_hours_approved_unpaid": "Uaireanta ceadaithe. Cuir leis an sparán chun an saorálaí seo a íoc.",
   "org_hours_declined": "Uaireanta laghdú.",
   "org_all_hours_reviewed": "Tá athbhreithniú déanta ar na huaireanta oibrithe deonacha go léir.",
   "org_balance_low_warning": "D’fhéadfadh nach leor an t-iarmhéid do {{count}} uaireanta ar feitheamh.",
@@ -468,6 +470,7 @@
   "aria": {
     "volunteering_sections": "Rannóga oibre deonaí"
   },
+  "filter_by_status": "Scag de réir stádais",
   "credentials": {
     "heading": "Fíorú Dintiúir",
     "upload_new": "Íoslódáil an Dearbhú nua",
@@ -634,7 +637,7 @@
     "aria_select_all": "Roghnaigh gach iarratas ar feitheamh infheicthe",
     "aria_select_application": "Roghnaigh feidhmchlár ó {{name}}",
     "aria_search_volunteers": "Cuardaigh oibrí deonacha de réir ainm",
-    "filter_label": "Filter applications"
+    "filter_label": "Feidhmchláir a scagadh"
   },
   "org_wallet_balance": "Iarmhéid sparán:",
   "auto_pay_on": "Uath-íoc AR",
@@ -837,8 +840,5 @@
   "my_organisations_none": "Gan Eagraíochtaí fós",
   "my_organisations_none_desc": "Cláraigh eagraíocht dheonach chun tús a chur le deiseanna postála, oibrithe deonacha a bhainistiú, agus creidmheasanna ama a bhronnadh.",
   "my_organisations_pending": "Ceadú ar Feitheamh",
-  "my_organisations_pending_desc": "Ag feitheamh le ceadú riarthóir",
-  "filter_by_status": "Filter by status",
-  "search_organisations": "Search organisations",
-  "org_hours_approved_unpaid": "Uaireanta ceadaithe. Cuir leis an sparán chun an saorálaí seo a íoc."
+  "my_organisations_pending_desc": "Ag feitheamh le ceadú riarthóir"
 }

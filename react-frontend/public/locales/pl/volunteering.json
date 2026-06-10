@@ -97,6 +97,7 @@
   "create_opportunity_subtitle": "Stwórz nową możliwość wolontariatu dla swojej organizacji",
   "form_org_label": "Organizacja",
   "form_org_placeholder": "Wybierz swoją organizację",
+  "search_organisations": "Wyszukaj organizacje",
   "form_org_required": "Wybierz organizację",
   "form_title_label": "Tytuł możliwości",
   "form_title_placeholder": "np. pomoc społeczna w ogrodzie, koordynator wydarzeń",
@@ -197,6 +198,7 @@
   "all_hours_reviewed": "Wszystko już gotowe — każde zgłoszenie zostało sprawdzone.",
   "org_hours_approved_paid": "Godziny zatwierdzone. Kredyty czasowe wypłacane wolontariuszom.",
   "org_hours_approved": "Godziny zatwierdzone.",
+  "org_hours_approved_unpaid": "Godziny zatwierdzone. Doładuj portfel, aby zapłacić temu wolontariuszowi.",
   "org_hours_declined": "Liczba godzin spadła.",
   "org_all_hours_reviewed": "Wszystkie godziny pracy wolontariuszy zostały sprawdzone.",
   "org_balance_low_warning": "Saldo może być niewystarczające dla {{count}} oczekujących godzin.",
@@ -468,6 +470,7 @@
   "aria": {
     "volunteering_sections": "Sekcje wolontariatu"
   },
+  "filter_by_status": "Filtruj według stanu",
   "credentials": {
     "heading": "Weryfikacja poświadczeń",
     "upload_new": "Prześlij nowe dane uwierzytelniające",
@@ -634,7 +637,7 @@
     "aria_select_all": "Wybierz wszystkie widoczne oczekujące aplikacje",
     "aria_select_application": "Wybierz aplikację z {{name}}",
     "aria_search_volunteers": "Wyszukaj wolontariuszy po imieniu",
-    "filter_label": "Filter applications"
+    "filter_label": "Filtruj aplikacje"
   },
   "org_wallet_balance": "Saldo portfela:",
   "auto_pay_on": "Płatność automatyczna WŁĄCZONA",
@@ -837,8 +840,5 @@
   "my_organisations_none": "Nie ma jeszcze organizacji",
   "my_organisations_none_desc": "Zarejestruj organizację wolontariacką, aby rozpocząć publikowanie ofert pracy, zarządzanie wolontariuszami i przyznawanie punktów czasowych.",
   "my_organisations_pending": "Oczekujące na zatwierdzenie",
-  "my_organisations_pending_desc": "Oczekiwanie na zgodę administratora",
-  "filter_by_status": "Filter by status",
-  "search_organisations": "Search organisations",
-  "org_hours_approved_unpaid": "Godziny zatwierdzone. Doładuj portfel, aby zapłacić temu wolontariuszowi."
+  "my_organisations_pending_desc": "Oczekiwanie na zgodę administratora"
 }

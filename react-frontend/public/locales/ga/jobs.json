@@ -3,6 +3,7 @@
   "page_title": "Folúntais Poist",
   "page_description": "Brabhsáil deiseanna oibre, róil dheonacha agus poist bhainc ama arna dtairiscint ag baill an phobail agus ag eagraíochtaí comhpháirtíochta gar duit.",
   "subtitle": "Aimsigh deiseanna i do phobal",
+  "loading": "Folúntais á lódáil...",
   "create_vacancy": "Postail Foluntas",
   "edit_vacancy": "Cuir Foluntas in Eagar",
   "my_postings": {
@@ -379,8 +380,8 @@
     "personal_message_placeholder": "Nóta don iarrthóir...",
     "interview_location_placeholder": "https://meet.google.com/...",
     "offer_salary_placeholder": "m.sh. 45000",
-    "tabs_aria": "Job pipeline sections",
-    "change_stage_aria": "Change stage for {{name}}",
+    "tabs_aria": "Rannóga píblíne poist",
+    "change_stage_aria": "Athraigh an chéim le haghaidh {{name}}",
     "event_type": {
       "status_change": "Athrú stádais",
       "interview": "Agallamh",
@@ -466,10 +467,10 @@
     "message_applicant": "Teachtaireacht",
     "kanban_board": "Clár Kanban",
     "cv_download_error": "Theip ar CV a íoslódáil",
-    "confirm_close_title": "Close this vacancy?",
-    "confirm_close": "Closing stops new applications from coming in. You can reopen it at any time.",
-    "confirm_reopen_title": "Reopen this vacancy?",
-    "confirm_reopen": "Reopening makes the vacancy visible again and lets people apply."
+    "confirm_close_title": "Dún an folúntas seo?",
+    "confirm_close": "Cuireann sé seo stop le feidhmchláir nua ó theacht isteach. Is féidir leat é a oscailt arís am ar bith.",
+    "confirm_reopen_title": "An folúntas seo a athoscailt?",
+    "confirm_reopen": "Fágann athoscailt an folúntas arís agus ligeann sé do dhaoine iarratas a dhéanamh."
   },
   "interview": {
     "schedule": "Sceideal Agallamh",
@@ -831,13 +832,13 @@
     "date_to": "Chuig",
     "filter_by_job": "Scag de réir Poist",
     "all_jobs": "Gach Post",
+    "search_jobs": "Cuardaigh poist",
     "generate": "Gin Tuairisc",
     "loading": "Tuairisc á giniúint...",
     "no_data": "Níl sonraí iarratais ar fáil don tréimhse roghnaithe",
     "access_denied": "Rochtain diúltaithe",
     "load_error": "Theip ar thuairisc iniúchta laofachta a lódáil",
-    "note_privacy": "Déanann an tuairisc seo anailís ar mhéadrachtaí próisis amháin. Ní bhailítear ná ní úsáidtear sonraí déimeagrafacha.",
-    "search_jobs": "Search jobs"
+    "note_privacy": "Déanann an tuairisc seo anailís ar mhéadrachtaí próisis amháin. Ní bhailítear ná ní úsáidtear sonraí déimeagrafacha."
   },
   "self_scheduling": {
     "title": "Sliotáin Agallaimh",
@@ -1047,6 +1048,5 @@
   "jobs": {
     "view_details": "Féach ar shonraí an phoist"
   },
-  "tabs_aria": "Jobs view",
-  "loading": "Loading vacancies..."
+  "tabs_aria": "Radharc poist"
 }

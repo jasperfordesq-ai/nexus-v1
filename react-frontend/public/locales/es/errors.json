@@ -43,9 +43,9 @@
   "offline_message": "Parece que no tienes conexi?n",
   "session_expired": "Sesi?n caducada",
   "session_expired_message": "Tu sesi?n ha caducado. Inicia sesi?n de nuevo para continuar.",
-  "session_expiring": "Your session is about to expire",
-  "session_expiring_message": "Your session will expire in {{seconds}} seconds. Extend your session to stay logged in.",
-  "session_expiring_countdown_aria": "Session expires in {{seconds}} seconds",
-  "extend_session": "Extend session",
+  "session_expiring": "Tu sesión está a punto de caducar",
+  "session_expiring_message": "Your session will expire in {{seconds}} seconds. Amplíe su sesión para permanecer conectado.",
+  "session_expiring_countdown_aria": "La sesión caduca en {{seconds}} segundos",
+  "extend_session": "Ampliar sesión",
   "dismiss": "Cerrar"
 }

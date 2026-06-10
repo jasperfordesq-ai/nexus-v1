@@ -123,6 +123,7 @@
     "search_placeholder": "Wyszukaj członków...",
     "aria_search": "Wyszukaj członków federacji",
     "all_communities": "Wszystkie społeczności",
+    "search_communities": "Przeszukaj społeczności",
     "aria_filter_community": "Filtruj według społeczności",
     "service_reach_filter": "Filtruj według zasięgu usługi",
     "reach_all": "Wszystko",
@@ -149,8 +150,7 @@
     "external_profile_title": "Członek zewnętrzny",
     "external_profile_message": "Ten członek znajduje się na platformie partnerów zewnętrznych. Bezpośrednie przeglądanie profilu nie jest dostępne.",
     "external_member": "Członek zewnętrzny",
-    "member_fallback": "Członek",
-    "search_communities": "Search communities"
+    "member_fallback": "Członek"
   },
   "messages": {
     "page_title": "Wiadomości Federacji",
@@ -217,9 +217,9 @@
     "message_placeholder": "Napisz swoją wiadomość...",
     "cancel": "Anulować",
     "send_message": "Wyślij wiadomość",
-    "thread_aria_no_unread": "Conversation with {{name}} from {{tenant}}",
-    "thread_aria_unread": "Conversation with {{name}} from {{tenant}}, {{count}} unread message",
-    "thread_aria_unread_plural": "Conversation with {{name}} from {{tenant}}, {{count}} unread messages"
+    "thread_aria_no_unread": "Rozmowa z {{name}} z {{tenant}}",
+    "thread_aria_unread": "Rozmowa z {{name}} z {{tenant}}, {{count}} nieprzeczytana wiadomość",
+    "thread_aria_unread_plural": "Rozmowa z {{name}} z {{tenant}}, nieprzeczytane wiadomości {{count}}"
   },
   "listings": {
     "page_title": "Listy Federacji",
@@ -229,6 +229,7 @@
     "subtitle": "Przeglądaj oferty i prośby od członków społeczności partnerskich.",
     "search_placeholder": "Przeszukaj oferty...",
     "all_communities": "Wszystkie społeczności",
+    "search_communities": "Przeszukaj społeczności",
     "filter_by_community": "Filtruj według społeczności",
     "filter_by_type": "Filtruj według typu",
     "type_all": "Wszystko",
@@ -248,8 +249,7 @@
     "hours_estimated": "~{{hours}}godz",
     "view_profile": "Zobacz profil",
     "contact_author": "Kontakt",
-    "close": "Zamknąć",
-    "search_communities": "Search communities"
+    "close": "Zamknąć"
   },
   "settings": {
     "page_title": "Ustawienia Federacji",
@@ -317,6 +317,7 @@
     "search_placeholder": "Wyszukaj wydarzenia...",
     "filter_by_community": "Filtruj według społeczności",
     "all_communities": "Wszystkie społeczności",
+    "search_communities": "Przeszukaj społeczności",
     "upcoming_only": "Tylko nadchodzące",
     "unable_to_load": "Nie można wczytać wydarzeń",
     "try_again": "Spróbuj ponownie",
@@ -329,8 +330,7 @@
     "online": "W Internecie",
     "date_at_time": "{{date}} o {{time}}",
     "attendees_going_one": "{{count}} uczestnik",
-    "attendees_going_other": "{{count}} uczestnik?w",
-    "search_communities": "Search communities"
+    "attendees_going_other": "{{count}} uczestnik?w"
   },
   "groups": {
     "page_title": "Grupy Federacji",
@@ -341,6 +341,7 @@
     "search_placeholder": "Przeszukaj grupy...",
     "filter_by_community": "Filtruj według społeczności",
     "all_communities": "Wszystkie społeczności",
+    "search_communities": "Przeszukaj społeczności",
     "unable_to_load": "Nie można wczytać grup",
     "try_again": "Spróbuj ponownie",
     "empty_title": "Nie znaleziono żadnych grup",
@@ -350,8 +351,7 @@
     "load_more_error": "Nie można załadować więcej grup.",
     "member_count": "Członek {{count}}",
     "member_count_plural": "Członkowie {{count}}",
-    "private": "Prywatny",
-    "search_communities": "Search communities"
+    "private": "Prywatny"
   },
   "connections": {
     "page_title": "Połączenia Federacji",
@@ -382,7 +382,7 @@
     "rejected_success": "Połączenie odrzucone",
     "removed_success": "Połączenie usunięte",
     "action_failed": "Akcja nie powiodła się. Spróbuj ponownie.",
-    "tabs_aria": "Federation connection status"
+    "tabs_aria": "Stan połączenia federacyjnego"
   },
   "partner_detail": {
     "page_title": "Społeczność partnerów",

@@ -185,7 +185,7 @@
     "terms_required": "Debes aceptar los términos para registrar tu organización.",
     "opportunity_count_one": "{{count}} oportunidad",
     "opportunity_count_other": "{{count}} oportunidades",
-    "loading": "Loading organisations"
+    "loading": "Organizaciones de carga"
   },
   "organisation_detail": {
     "page_title": "Organización",
@@ -219,7 +219,7 @@
     "cancel": "Cancelar",
     "submit_application": "Enviar Solicitud",
     "job_openings": "Ofertas de empleo",
-    "rating_sr": "{{n}} out of 5 stars"
+    "rating_sr": "{{n}} de 5 estrellas"
   },
   "emergency_alerts": {
     "heading": "Alertas de Emergencia",

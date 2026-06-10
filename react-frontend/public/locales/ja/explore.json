@@ -101,8 +101,8 @@
     "votes": "{{count}}票",
     "options": "{{count}}の選択肢",
     "vote_now": "今すぐ投票",
-    "closes": "締切 {{date}}",
-    "vote_now_for": "Vote now on: {{question}}"
+    "vote_now_for": "今すぐ投票してください: {{question}}",
+    "closes": "締切 {{date}}"
   },
   "in_demand_skills": {
     "title": "需要のあるスキル",

@@ -43,9 +43,9 @@
   "offline_message": "Wygl?da na to, ?e jeste? offline",
   "session_expired": "Sesja wygas?a",
   "session_expired_message": "Twoja sesja wygas?a. Zaloguj si? ponownie, aby kontynuowa?.",
-  "session_expiring": "Your session is about to expire",
-  "session_expiring_message": "Your session will expire in {{seconds}} seconds. Extend your session to stay logged in.",
-  "session_expiring_countdown_aria": "Session expires in {{seconds}} seconds",
-  "extend_session": "Extend session",
+  "session_expiring": "Twoja sesja wkrótce wygaśnie",
+  "session_expiring_message": "Twoja sesja wygaśnie za {{seconds}} sekund. Przedłuż sesję, aby pozostać zalogowanym.",
+  "session_expiring_countdown_aria": "Sesja wygasa za {{seconds}} sekund",
+  "extend_session": "Przedłuż sesję",
   "dismiss": "Zamknij"
 }

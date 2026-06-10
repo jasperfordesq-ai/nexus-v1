@@ -100,6 +100,7 @@
     "create_poll": "Umfrage erstellen",
     "listing_title_label": "Titel",
     "listing_title_placeholder": "Was bieten Sie an oder suchen Sie?",
+    "listing_type_label": "Auflistungstyp",
     "listing_offering": "Anbieten",
     "listing_looking_for": "Suchen",
     "listing_desc_placeholder": "Beschreiben Sie Ihr Inserat...",
@@ -141,6 +142,7 @@
     "image_remove_aria": "Bild entfernen",
     "group_label": "Posten in",
     "group_placeholder": "Öffentlicher Feed",
+    "group_search": "Suchgruppen",
     "group_members": "{{count}} Mitglieder",
     "ai_title_required": "Geben Sie zuerst einen Titel ein, damit die KI eine Beschreibung generieren kann",
     "ai_generated": "KI-Beschreibung generiert!",
@@ -229,9 +231,7 @@
     "file_size_mb": "{{name}} ({{size}} MB)",
     "listing_preview_alt": "Vorschau des Eintrags",
     "image_preview_alt": "Upload-Vorschau",
-    "listing_type_label": "Listing type",
-    "type_tabs_aria": "Compose content type",
-    "group_search": "Search groups"
+    "type_tabs_aria": "Inhaltstyp erstellen"
   },
   "moderation": {
     "unauthorized": "Sie sind nicht berechtigt, diese Aktion auszuführen."
@@ -343,7 +343,7 @@
       "badge_unlocked": "Abzeichen freigeschaltet",
       "level_reached": "Stufe erreicht"
     },
-    "read_more_about": "Read more about {{title}}",
+    "read_more_about": "Lesen Sie mehr über {{title}}",
     "detail_course": "Kurs ansehen",
     "type_course": "Kurs"
   },
@@ -615,9 +615,9 @@
     "not_found": "Element nicht gefunden",
     "load_failed": "Element konnte nicht geladen werden"
   },
-  "controls_region_label": "Feed controls",
-  "new_posts_available": "New posts available",
+  "controls_region_label": "Feed-Kontrollen",
+  "new_posts_available": "Neue Beiträge verfügbar",
   "confirm": {
-    "delete_post": "Delete this post? This cannot be undone."
+    "delete_post": "Diesen Beitrag löschen? Dies kann nicht rückgängig gemacht werden."
   }
 }

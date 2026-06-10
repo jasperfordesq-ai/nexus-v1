@@ -3,6 +3,7 @@
   "page_title": "Ofertas de empleo",
   "page_description": "Explora oportunidades de trabajo, roles de voluntariado y puestos de banco de tiempo ofrecidos por miembros de la comunidad y organizaciones asociadas cerca de ti.",
   "subtitle": "Encuentra oportunidades en tu comunidad",
+  "loading": "Cargando vacantes...",
   "create_vacancy": "Publicar Oferta",
   "edit_vacancy": "Editar Oferta",
   "my_postings": {
@@ -379,8 +380,8 @@
     "personal_message_placeholder": "Una nota para el candidato...",
     "interview_location_placeholder": "https://meet.google.com/...",
     "offer_salary_placeholder": "p. ej., 45000",
-    "tabs_aria": "Job pipeline sections",
-    "change_stage_aria": "Change stage for {{name}}",
+    "tabs_aria": "Secciones de la cartera de trabajos",
+    "change_stage_aria": "Cambiar etapa para {{name}}",
     "event_type": {
       "status_change": "Cambio de estado",
       "interview": "Entrevista",
@@ -466,10 +467,10 @@
     "message_applicant": "Mensaje",
     "kanban_board": "Tablero Kanban",
     "cv_download_error": "No se pudo descargar el CV",
-    "confirm_close_title": "Close this vacancy?",
-    "confirm_close": "Closing stops new applications from coming in. You can reopen it at any time.",
-    "confirm_reopen_title": "Reopen this vacancy?",
-    "confirm_reopen": "Reopening makes the vacancy visible again and lets people apply."
+    "confirm_close_title": "¿Cerrar esta vacante?",
+    "confirm_close": "Cerrar impide que entren nuevas aplicaciones. Puede volver a abrirla en cualquier momento.",
+    "confirm_reopen_title": "¿Reabrir esta vacante?",
+    "confirm_reopen": "La reapertura hace que la vacante vuelva a ser visible y permite que la gente presente su solicitud."
   },
   "interview": {
     "schedule": "Programar Entrevista",
@@ -831,13 +832,13 @@
     "date_to": "Hasta",
     "filter_by_job": "Filtrar por Empleo",
     "all_jobs": "Todos los Empleos",
+    "search_jobs": "Buscar empleos",
     "generate": "Generar Informe",
     "loading": "Generando informe...",
     "no_data": "No hay datos de solicitudes disponibles para el período seleccionado",
     "access_denied": "Acceso denegado",
     "load_error": "No se pudo cargar el informe de auditoría de sesgo",
-    "note_privacy": "Este informe solo analiza métricas de proceso. No se recopilan ni utilizan datos demográficos.",
-    "search_jobs": "Search jobs"
+    "note_privacy": "Este informe solo analiza métricas de proceso. No se recopilan ni utilizan datos demográficos."
   },
   "self_scheduling": {
     "title": "Horarios de Entrevista",
@@ -1047,6 +1048,5 @@
   "jobs": {
     "view_details": "Ver detalles del empleo"
   },
-  "tabs_aria": "Jobs view",
-  "loading": "Loading vacancies..."
+  "tabs_aria": "Vista de trabajos"
 }

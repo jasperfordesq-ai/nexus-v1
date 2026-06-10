@@ -1,4 +1,5 @@
 {
+  "loading": "Loading...",
   "trust_tier": {
     "title": "私の信頼レベル",
     "subtitle": "コミュニティ内でのあなたの立場",
@@ -285,6 +286,7 @@
       "collapse": "サイドバーを折りたたむ",
       "help_centre": "ヘルプセンター",
       "full_admin": "完全な管理者",
+      "nav_label": "思いやりのあるコミュニティナビゲーション",
       "search_aria": "Search caring community navigation",
       "search_placeholder": "Search navigation...",
       "clear_search": "検索をクリア",
@@ -336,8 +338,7 @@
         "kpi_baselines": "KPI ベースライン",
         "municipal_roi": "自治体の ROI",
         "category_coefficients": "カテゴリ係数"
-      },
-      "nav_label": "Caring community navigation"
+      }
     }
   },
   "admin": {
@@ -1173,6 +1174,5 @@
     "refresh_federation_peers": "フェデレーションピアを更新する",
     "refresh_kpi_baselines": "KPI ベースラインを更新する",
     "refresh_research_partnerships": "研究パートナーシップを更新する"
-  },
-  "loading": "Loading..."
+  }
 }

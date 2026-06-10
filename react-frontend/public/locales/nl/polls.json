@@ -88,6 +88,10 @@
   "view_ranked_results": "Gerangschikte resultaten bekijken",
   "winner_label": "Winnaar: {{name}}",
   "submit_rankings": "Rangschikking indienen",
+  "loading": "Polls laden...",
+  "vote_now": "Vote Now",
+  "vote_now_for": "Stem nu op: {{question}}",
+  "vote_for_option": "Stem op {{option}} in: {{question}}",
   "aria": {
     "export_csv": "Exporteer resultaten als CSV",
     "move_rank_down": "{{option}} omlaag verplaatsen",
@@ -96,9 +100,5 @@
   "page_meta": {
     "title": "Peilingen"
   },
-  "loading": "Loading polls...",
-  "vote_now": "Vote Now",
-  "vote_now_for": "Vote now on: {{question}}",
-  "vote_for_option": "Vote for {{option}} in: {{question}}",
-  "category_filter_label": "Filter by category"
+  "category_filter_label": "Filter op categorie"
 }

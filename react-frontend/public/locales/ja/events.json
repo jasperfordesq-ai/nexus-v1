@@ -84,6 +84,7 @@
     "attendee_rsvp": "RSVP",
     "attendee_checked_in": "チェックインしました",
     "checkin_progress": "チェックインの進行状況",
+    "checkin_progress_chart_aria": "チェックインの進行状況: {{percent}} 容量の %",
     "no_checkin_attendees": "まだチェックインする参加者がいません。",
     "no_checkin_attendees_title": "まだチェックインはありません",
     "check_in": "チェックイン",
@@ -120,6 +121,7 @@
     "waitlist_count": "{{count}} は順番待ちリストにあります",
     "cancel_modal_title": "イベントのキャンセル",
     "cancel_confirm": "「{{title}}」をキャンセルしてもよろしいですか?これにより、参加者全員に通知されます。",
+    "cancel_reason_label": "キャンセルの理由",
     "cancel_reason_placeholder": "キャンセル理由（任意）",
     "keep_event": "キープイベント",
     "cancel_event": "イベントのキャンセル",
@@ -133,9 +135,7 @@
     "join_meeting_aria": "{{title}} のミーティングに参加",
     "join_waitlist_aria": "このイベントのキャンセル待ちに参加",
     "leave_waitlist_aria": "このイベントのキャンセル待ちから外れる",
-    "tabs_aria": "Event detail sections",
-    "checkin_progress_chart_aria": "Check-in progress: {{percent}}% of capacity",
-    "cancel_reason_label": "Reason for cancellation"
+    "tabs_aria": "イベント詳細セクション"
   },
   "card": {
     "cancelled": "キャンセル",
@@ -275,14 +275,14 @@
     "coming_soon_desc": "グローバルなリマインダー設定は近日中に公開されます。それまでの間、詳細ページから個々のイベントにリマインダーを設定できます。"
   },
   "polls": {
+    "loading": "投票を読み込んでいます...",
     "title": "イベント投票",
     "status_open": "開ける",
     "status_closed": "閉店",
     "total_votes": "{{count}} 票",
     "vote_success": "投票が記録されました！",
     "vote_failed": "投票を記録できませんでした",
-    "view_full": "アンケート全文を見る",
-    "loading": "Loading polls..."
+    "view_full": "アンケート全文を見る"
   },
   "radius_5": "5km",
   "radius_10": "10km",
@@ -296,9 +296,9 @@
   },
   "count_pill": "{{count}} 件のイベント",
   "load_more_count": "さらに読み込む (残り {{remaining}} 件)",
+  "loading_more_aria": "さらにイベントを読み込んでいます",
   "active_filters": "アクティブフィルター",
   "active_search": "検索: {{query}}",
   "active_near_me": "{{radius}} キロ以内",
-  "clear_filters": "フィルターをクリアする",
-  "loading_more_aria": "Loading more events"
+  "clear_filters": "フィルターをクリアする"
 }

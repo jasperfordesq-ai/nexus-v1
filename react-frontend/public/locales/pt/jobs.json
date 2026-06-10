@@ -3,6 +3,7 @@
   "page_title": "Vagas de Emprego",
   "page_description": "Explore oportunidades de emprego, funções de voluntariado e posições de banco de tempo oferecidas por membros da comunidade e organizações parceiras perto de você.",
   "subtitle": "Encontre oportunidades na sua comunidade",
+  "loading": "Carregando vagas...",
   "create_vacancy": "Publicar Vaga",
   "edit_vacancy": "Editar Vaga",
   "my_postings": {
@@ -379,8 +380,8 @@
     "personal_message_placeholder": "Uma nota para o candidato...",
     "interview_location_placeholder": "https://meet.google.com/...",
     "offer_salary_placeholder": "ex.: 45000",
-    "tabs_aria": "Job pipeline sections",
-    "change_stage_aria": "Change stage for {{name}}",
+    "tabs_aria": "Seções do pipeline de trabalho",
+    "change_stage_aria": "Alterar estágio para {{name}}",
     "event_type": {
       "status_change": "Mudança de estado",
       "interview": "Entrevista",
@@ -466,10 +467,10 @@
     "message_applicant": "Mensagem",
     "kanban_board": "Quadro Kanban",
     "cv_download_error": "Falha ao baixar currículo",
-    "confirm_close_title": "Close this vacancy?",
-    "confirm_close": "Closing stops new applications from coming in. You can reopen it at any time.",
-    "confirm_reopen_title": "Reopen this vacancy?",
-    "confirm_reopen": "Reopening makes the vacancy visible again and lets people apply."
+    "confirm_close_title": "Fechar esta vaga?",
+    "confirm_close": "O fechamento impede a entrada de novos aplicativos. Você pode reabri-lo a qualquer momento.",
+    "confirm_reopen_title": "Reabrir esta vaga?",
+    "confirm_reopen": "A reabertura torna a vaga visível novamente e permite que as pessoas se inscrevam."
   },
   "interview": {
     "schedule": "Agendar Entrevista",
@@ -831,13 +832,13 @@
     "date_to": "Até",
     "filter_by_job": "Filtrar por Emprego",
     "all_jobs": "Todos os Empregos",
+    "search_jobs": "Pesquisar empregos",
     "generate": "Gerar Relatório",
     "loading": "A gerar relatório...",
     "no_data": "Sem dados de candidaturas disponíveis para o período selecionado",
     "access_denied": "Acesso negado",
     "load_error": "Falha ao carregar relatório de auditoria de enviesamento",
-    "note_privacy": "Este relatório analisa apenas métricas de processo. Nenhum dado demográfico é recolhido ou utilizado.",
-    "search_jobs": "Search jobs"
+    "note_privacy": "Este relatório analisa apenas métricas de processo. Nenhum dado demográfico é recolhido ou utilizado."
   },
   "self_scheduling": {
     "title": "Horários de Entrevista",
@@ -1047,6 +1048,5 @@
   "jobs": {
     "view_details": "Ver detalhes da vaga"
   },
-  "tabs_aria": "Jobs view",
-  "loading": "Loading vacancies..."
+  "tabs_aria": "Visualização de empregos"
 }

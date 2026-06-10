@@ -342,7 +342,7 @@
     "load_error": "Laden van de ranglijst is mislukt. Probeer het opnieuw.",
     "type_nexus_score": "NexusScore",
     "load_more": "Laad meer",
-    "retry": "Retry loading leaderboard"
+    "retry": "Probeer het klassement opnieuw te laden"
   },
   "community": {
     "total_hours": "Totaal Uren Uitgewisseld",
@@ -420,7 +420,7 @@
       "legendary": "Legendarisch"
     },
     "max_score_label": "/ {{max}}",
-    "loading": "Loading your NexusScore..."
+    "loading": "Uw NexusScore laden..."
   },
   "common": {
     "refresh": "Vernieuwen",

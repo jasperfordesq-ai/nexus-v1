@@ -1,4 +1,5 @@
 {
+  "loading": "Loading...",
   "trust_tier": {
     "title": "Mój poziom zaufania",
     "subtitle": "Twoja pozycja w społeczeństwie",
@@ -285,6 +286,7 @@
       "collapse": "Zwiń pasek boczny",
       "help_centre": "Centrum pomocy",
       "full_admin": "Pełny administrator",
+      "nav_label": "Troskliwa nawigacja społecznościowa",
       "search_aria": "Search caring community navigation",
       "search_placeholder": "Search navigation...",
       "clear_search": "Wyczyść wyszukiwanie",
@@ -336,8 +338,7 @@
         "kpi_baselines": "Wartości bazowe KPI",
         "municipal_roi": "Miejski zwrot z inwestycji",
         "category_coefficients": "Współczynniki kategorii"
-      },
-      "nav_label": "Caring community navigation"
+      }
     }
   },
   "admin": {
@@ -1173,6 +1174,5 @@
     "refresh_federation_peers": "Odśwież kolegów z federacji",
     "refresh_kpi_baselines": "Odśwież wartości bazowe KPI",
     "refresh_research_partnerships": "Odśwież partnerstwa badawcze"
-  },
-  "loading": "Loading..."
+  }
 }

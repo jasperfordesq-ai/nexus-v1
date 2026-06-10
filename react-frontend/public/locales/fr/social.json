@@ -1,5 +1,8 @@
 {
   "cancel": "Annuler",
+  "comments": {
+    "edit_label": "Modifier le commentaire"
+  },
   "comments_title": "Commentaires",
   "copy_failed": "Echec de la copie du lien",
   "copy_link": "Copier le lien",
@@ -68,6 +71,7 @@
   },
   "status": {
     "set_status": "Définir le statut",
+    "set_status_current": "Définir le statut (actuellement : {{status}})",
     "online": "En ligne",
     "online_desc": "Visible pour les autres",
     "away": "Absent(e)",
@@ -84,8 +88,7 @@
     "status_label": "Statut",
     "status_placeholder": "En réunion",
     "char_count": "{{current}}/80 caractères",
-    "offline": "Hors ligne",
-    "set_status_current": "Set status (currently: {{status}})"
+    "offline": "Hors ligne"
   },
   "endorse": {
     "tooltip_remove": "Retirer la recommandation pour {{skillName}}",
@@ -105,9 +108,10 @@
     "no_collection": "Général (pas de collection)",
     "new_collection": "Nouvelle collection",
     "collection_name": "Nom de la collection",
-    "confirm_create": "Create collection"
+    "confirm_create": "Créer une collection"
   },
   "bookmarks": {
+    "loading": "Chargement des favoris...",
     "page_title": "Enregistré",
     "meta_description": "Consultez et organisez vos publications, annonces, événements, emplois, articles de blog et discussions enregistrés.",
     "title": "Éléments enregistrés",
@@ -115,6 +119,7 @@
     "new_collection": "Nouvelle Collection",
     "all_items": "Tout",
     "collection_filter_label": "Collection",
+    "collection_search": "Rechercher des collections",
     "tab_all": "Tout",
     "count": "{{count}} éléments enregistrés",
     "remove": "Retirer des éléments enregistrés",
@@ -148,9 +153,7 @@
     "collection_description": "Description (facultatif)",
     "cancel": "Annuler",
     "save": "Enregistrer",
-    "create": "Créer",
-    "loading": "Loading bookmarks...",
-    "collection_search": "Search collections"
+    "create": "Créer"
   },
   "verified": "Vérifié",
   "hover_card": {
@@ -162,9 +165,6 @@
     "connections": "{{count}} connexions",
     "listings": "{{count}} annonces"
   },
-  "comments": {
-    "edit_label": "Edit comment"
-  },
-  "reactions_tabs_aria": "Reaction type filter",
-  "content_type_tabs_aria": "Bookmark content type filter"
+  "reactions_tabs_aria": "Filtre de type de réaction",
+  "content_type_tabs_aria": "Filtre de type de contenu de signet"
 }

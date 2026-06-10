@@ -68,8 +68,8 @@
     "premium": "Premie",
     "verify_identity": "Verifieer uw identiteit",
     "accessibility_alpha": "Toegankelijkheid (alfa)",
+    "accessibility_alpha_tooltip": "Verbeterde toegankelijke versie — WCAG 2.2 AA-compatibel. Opent in een nieuw tabblad.",
     "features": "Functies",
-    "accessibility_alpha_tooltip": "Enhanced accessible version — WCAG 2.2 AA compliant. Opens in a new tab.",
     "courses": "Cursussen",
     "podcasts": "Podcasts"
   },
@@ -134,7 +134,7 @@
     "premium": "Premium lidmaatschapsniveaus",
     "accessibility_alpha": "Open de alfa-frontend met focus op toegankelijkheid",
     "features": "Alles wat Project NEXUS doet, met eerlijke volwassenheidslabels",
-    "dashboard": "Your personalised home overview",
+    "dashboard": "Jouw persoonlijke woningoverzicht",
     "courses": "Leer nieuwe vaardigheden met uw community",
     "podcasts": "Communityshows en audioverhalen"
   },
@@ -396,6 +396,59 @@
     "title": "Zorgzame Gemeenschap",
     "subtitle": "Breng tijdbank-uitwisseling, geverifieerd vrijwilligerswerk, vertrouwde organisaties, groepen, evenementen, bronnen en impactsignalen samen in één gecoördineerd zorgproces.",
     "welcome_banner": "Welkom! Hier kun je om hulp vragen, je tijd aanbieden of gewoon een burenact registreren. Elke bijdrage — groot of klein — maakt je gemeenschap sterker.",
+    "alpha": {
+      "badge": "Nieuw · Vroege toegang"
+    },
+    "preview_tag": "Voorbeeld",
+    "hero": {
+      "title": "Zorgzame Gemeenschap",
+      "intro": "De Zorgzame Gemeenschap is een plek waar buren elkaar helpen in het dagelijks leven — een ritje naar een afspraak, wat boodschappen of gewoon gezelschap op een middag. Vraag om hulp wanneer je die nodig hebt en bied hulp aan wanneer je kunt.",
+      "timebank_note": "Het werkt samen met de tijdbank: als je je tijd geeft, wordt die geregistreerd als uren die je later kunt gebruiken — dezelfde uren, in één gedeeld saldo.",
+      "cta_get_help": "Ik heb hulp nodig",
+      "cta_give_help": "Ik wil helpen"
+    },
+    "new_notice": {
+      "title": "Dit is gloednieuw.",
+      "body": "De Zorgzame Gemeenschap is hier net gestart en we bouwen er nog aan. Sommige functies zijn previews en het werkt niet vanzelf — het draait op buren die zich vrijwillig inzetten om te helpen. Bedankt dat je er vanaf het begin bij bent."
+    },
+    "how": {
+      "title": "Hoe het werkt",
+      "subtitle": "Drie eenvoudige stappen.",
+      "step1_title": "Vraag om hulp",
+      "step1_desc": "Vertel ons in je eigen woorden wat je nodig hebt. Je verzoek gaat naar vertrouwde leden in de buurt.",
+      "step2_title": "Een buur biedt hulp aan",
+      "step2_desc": "Iemand uit de gemeenschap biedt hulp aan en jullie spreken een tijd af die jullie allebei schikt.",
+      "step3_title": "Uren worden geregistreerd",
+      "step3_desc": "De gegeven tijd wordt als uren geregistreerd, zodat helpers uren opbouwen om later te gebruiken of door te geven."
+    },
+    "recruit": {
+      "title": "We zoeken onze eerste zorgverleners",
+      "body": "De Zorgzame Gemeenschap werkt alleen als mensen zich aanbieden om te helpen. We hebben nog geen team van zorgverleners — we bouwen het op. Als je een beetje tijd kunt vrijmaken, kun je een van de eersten zijn.",
+      "cta": "Hulp aanbieden"
+    },
+    "your_hours_note": "Dit zijn dezelfde tijdcredits als in de tijdbank — één gedeeld saldo, geen aparte munt van de Zorgzame Gemeenschap.",
+    "groups": {
+      "get_help": {
+        "title": "Hulp krijgen",
+        "desc": "Vraag om steun en houd zicht op de mensen die je helpen."
+      },
+      "give_help": {
+        "title": "Hulp geven",
+        "desc": "Bied je tijd en vaardigheden aan buren die een handje nodig hebben."
+      },
+      "your_hours": {
+        "title": "Jouw uren",
+        "desc": "Bekijk en gebruik de tijdcredits die je hebt verdiend."
+      },
+      "caregiver_tools": {
+        "title": "Hulpmiddelen voor zorgverleners",
+        "desc": "Hulpmiddelen voor wie regelmatig zorg verleent. Ze worden nuttiger naarmate ons netwerk van zorgverleners groeit."
+      },
+      "safety": {
+        "title": "Veiligheid & nieuws",
+        "desc": "Meld een zorg of volg wat er bij jou in de buurt gebeurt."
+      }
+    },
     "actions": {
       "request_help": "Hulp vragen",
       "request_help_sub": "Vraag je gemeenschap om praktische ondersteuning",
@@ -417,6 +470,8 @@
       "future_care_fund_sub": "Zie je gespaarde uren als verzekering voor toekomstige zorg.",
       "cover_care": "Vervanging voor zorgverleners",
       "cover_care_sub": "Voor zorgverleners: regel vertrouwde vervanging als je een pauze nodig hebt. Nuttiger naarmate het netwerk groeit.",
+      "become_caregiver": "Word zorgverlener",
+      "become_caregiver_sub": "Laat ons weten dat je regelmatig zorg wilt verlenen en help ons het team op te bouwen.",
       "hour_gift": "Uren schenken",
       "hour_gift_sub": "Schenk je gespaarde uren aan familie of vrienden.",
       "hour_transfer": "Uren overdragen",
@@ -424,9 +479,7 @@
       "safeguarding_report": "Een zorg melden",
       "safeguarding_report_sub": "Meld beschermingszorgen vertrouwelijk.",
       "projects": "Gemeenschapsprojecten",
-      "projects_sub": "Volg gemeentelijke en buurtupdates.",
-      "become_caregiver": "Word zorgverlener",
-      "become_caregiver_sub": "Laat ons weten dat je regelmatig zorg wilt verlenen en help ons het team op te bouwen."
+      "projects_sub": "Volg gemeentelijke en buurtupdates."
     },
     "operating_model": {
       "title": "Operationeel model",
@@ -510,59 +563,6 @@
       "show_all": "Alle acties tonen",
       "show_recommended": "Aanbevolen tonen",
       "change_answer": "Antwoord wijzigen"
-    },
-    "alpha": {
-      "badge": "Nieuw · Vroege toegang"
-    },
-    "preview_tag": "Voorbeeld",
-    "hero": {
-      "title": "Zorgzame Gemeenschap",
-      "intro": "De Zorgzame Gemeenschap is een plek waar buren elkaar helpen in het dagelijks leven — een ritje naar een afspraak, wat boodschappen of gewoon gezelschap op een middag. Vraag om hulp wanneer je die nodig hebt en bied hulp aan wanneer je kunt.",
-      "timebank_note": "Het werkt samen met de tijdbank: als je je tijd geeft, wordt die geregistreerd als uren die je later kunt gebruiken — dezelfde uren, in één gedeeld saldo.",
-      "cta_get_help": "Ik heb hulp nodig",
-      "cta_give_help": "Ik wil helpen"
-    },
-    "new_notice": {
-      "title": "Dit is gloednieuw.",
-      "body": "De Zorgzame Gemeenschap is hier net gestart en we bouwen er nog aan. Sommige functies zijn previews en het werkt niet vanzelf — het draait op buren die zich vrijwillig inzetten om te helpen. Bedankt dat je er vanaf het begin bij bent."
-    },
-    "how": {
-      "title": "Hoe het werkt",
-      "subtitle": "Drie eenvoudige stappen.",
-      "step1_title": "Vraag om hulp",
-      "step1_desc": "Vertel ons in je eigen woorden wat je nodig hebt. Je verzoek gaat naar vertrouwde leden in de buurt.",
-      "step2_title": "Een buur biedt hulp aan",
-      "step2_desc": "Iemand uit de gemeenschap biedt hulp aan en jullie spreken een tijd af die jullie allebei schikt.",
-      "step3_title": "Uren worden geregistreerd",
-      "step3_desc": "De gegeven tijd wordt als uren geregistreerd, zodat helpers uren opbouwen om later te gebruiken of door te geven."
-    },
-    "recruit": {
-      "title": "We zoeken onze eerste zorgverleners",
-      "body": "De Zorgzame Gemeenschap werkt alleen als mensen zich aanbieden om te helpen. We hebben nog geen team van zorgverleners — we bouwen het op. Als je een beetje tijd kunt vrijmaken, kun je een van de eersten zijn.",
-      "cta": "Hulp aanbieden"
-    },
-    "your_hours_note": "Dit zijn dezelfde tijdcredits als in de tijdbank — één gedeeld saldo, geen aparte munt van de Zorgzame Gemeenschap.",
-    "groups": {
-      "get_help": {
-        "title": "Hulp krijgen",
-        "desc": "Vraag om steun en houd zicht op de mensen die je helpen."
-      },
-      "give_help": {
-        "title": "Hulp geven",
-        "desc": "Bied je tijd en vaardigheden aan buren die een handje nodig hebben."
-      },
-      "your_hours": {
-        "title": "Jouw uren",
-        "desc": "Bekijk en gebruik de tijdcredits die je hebt verdiend."
-      },
-      "caregiver_tools": {
-        "title": "Hulpmiddelen voor zorgverleners",
-        "desc": "Hulpmiddelen voor wie regelmatig zorg verleent. Ze worden nuttiger naarmate ons netwerk van zorgverleners groeit."
-      },
-      "safety": {
-        "title": "Veiligheid & nieuws",
-        "desc": "Meld een zorg of volg wat er bij jou in de buurt gebeurt."
-      }
     }
   },
   "request_help": {
@@ -631,8 +631,8 @@
       "confirm_body": "Je uren worden nu afgeboekt en gecrediteerd aan de ontvanger zodra die accepteert.",
       "confirm_button": "Ja, uren schenken",
       "cancel": "Annuleren",
-      "recipient_hint": "Type at least 2 letters to search",
-      "recipient_no_results": "No members found"
+      "recipient_hint": "Typ minimaal 2 letters om te zoeken",
+      "recipient_no_results": "Geen leden gevonden"
     },
     "inbox": {
       "empty": "Op dit moment geen cadeaus te accepteren.",
@@ -870,9 +870,9 @@
     "select_category": "Selecteer een categorie",
     "verification_badges": "Verificatiebadges",
     "search_skills": "Vaardigheden zoeken",
-    "user_menu_trigger": "User menu for {{name}}",
-    "feed_sidebar": "Community sidebar",
-    "filter_panel": "Filter panel",
+    "user_menu_trigger": "Gebruikersmenu voor {{name}}",
+    "feed_sidebar": "Zijbalk van de community",
+    "filter_panel": "Filterpaneel",
     "remove": "Remove"
   },
   "skills": {
@@ -935,7 +935,7 @@
   "toast": {
     "aria_notifications": "Meldingen",
     "aria_dismiss_notification": "Melding negeren",
-    "aria_urgent_notifications": "Urgent notifications"
+    "aria_urgent_notifications": "Dringende meldingen"
   },
   "verified": "Geverifieerd",
   "map_unavailable": "Kaartweergave is niet beschikbaar",
@@ -970,7 +970,9 @@
   "verify_identity": "Identiteit verifiëren",
   "level_short": "Nv. {{level}}",
   "cancel": "Annuleren",
+  "confirm": "Confirm",
   "save": "Opslaan",
+  "delete": "Delete",
   "offer_favour": {
     "meta": {
       "title": "Bied een gunst aan",
@@ -1716,8 +1718,8 @@
     "webhook_create_title": "Een abonnement aanmaken",
     "webhook_create_body": "POST naar /api/partner/v1/webhooks/subscriptions met event_types (array) en target_url (alleen https). Het antwoord bevat een eenmalig secret — bewaar het.",
     "tabs": {
-      "code_examples": "Code examples",
-      "verification_examples": "Verification examples"
+      "code_examples": "Codevoorbeelden",
+      "verification_examples": "Verificatie voorbeelden"
     }
   },
   "regional_analytics": {
@@ -1813,10 +1815,10 @@
     "distinct_visitors": "Unieke bezoekers",
     "suppressed_value": "Onderdrukt",
     "suppressed_short": "--",
-    "line_chart_aria": "Line chart showing partner activity over time",
-    "bar_chart_aria": "Bar chart showing partner performance metrics",
-    "pie_chart_aria": "Pie chart showing distribution of partner data",
-    "area_chart_aria": "Area chart showing partner trends over time"
+    "line_chart_aria": "Lijndiagram dat de partneractiviteit in de loop van de tijd weergeeft",
+    "bar_chart_aria": "Staafdiagram met prestatiestatistieken van partners",
+    "pie_chart_aria": "Cirkeldiagram dat de verdeling van partnergegevens weergeeft",
+    "area_chart_aria": "Vlakdiagram met partnertrends in de loop van de tijd"
   },
   "provisioning": {
     "meta": {
@@ -1922,6 +1924,7 @@
       "slot_created": "Afhaaltijd aangemaakt",
       "slot_create_failed": "Kon tijdslot niet aanmaken",
       "slot_deleted": "Tijdslot verwijderd",
+      "slot_delete_confirm": "Dit ophaalmoment verwijderen? Dit kan niet ongedaan worden gemaakt.",
       "capacity": "Capaciteit",
       "recurring": "Terugkerend",
       "recurring_weekly": "Wekelijks herhalen",
@@ -1940,8 +1943,7 @@
       "window": "Afhaalvenster",
       "choose_slot": "Kies een afhaaltijd",
       "no_slot_selected": "Geen afhaaltijd geselecteerd",
-      "left": "resterend",
-      "slot_delete_confirm": "Delete this pickup slot? This cannot be undone."
+      "left": "resterend"
     },
     "inventory": {
       "section_title": "Voorraad",
@@ -2010,6 +2012,7 @@
     "invite_modal_title": "Cross-club uitnodiging",
     "invite_modal_subtitle": "Nodig deze persoon uit zich ook aan te sluiten bij een van de gefedereerde clubs.",
     "invite_target_label": "Kies een club",
+    "invite_target_search": "Zoek clubs",
     "invite_message_label": "Persoonlijk bericht (optioneel)",
     "invite_message_placeholder": "Hoi! Ik dacht dat je deze club ook leuk zou vinden.",
     "invite_send": "Uitnodiging verzenden",
@@ -2042,8 +2045,7 @@
       "today": "Vandaag",
       "from_label": "Van",
       "load_failed": "Kon kalender niet laden."
-    },
-    "invite_target_search": "Search clubs"
+    }
   },
   "oauth": {
     "continue_with_google": "Doorgaan met Google",
@@ -2174,7 +2176,7 @@
     "description_label": "Beschrijving (optioneel)",
     "make_public": "Openbaar maken",
     "create": "Aanmaken",
-    "confirm_create": "Create collection"
+    "confirm_create": "Verzameling maken"
   },
   "appreciations": {
     "title": "Een bedankje sturen",
@@ -2293,17 +2295,15 @@
   "xp_progress": "{{current}} / {{required}} XP",
   "level_progress_aria": "Voortgang niveau {{level}}: {{percentage}}%",
   "user_fallback": "User",
-  "release_stage": "Generally Available (v1.5.1)",
-  "confirm": "Confirm",
+  "release_stage": "Algemeen beschikbaar (v1.5.1)",
   "theme_picker": {
     "title": "Appearance",
-    "subtitle": "Tune color scheme, accent, and density.",
-    "open_label": "Open theme picker",
-    "color_scheme": "Color scheme",
+    "subtitle": "Stem het kleurenschema, accent en dichtheid af.",
+    "open_label": "Themakiezer openen",
+    "color_scheme": "Kleurenschema",
     "scheme_light": "Light",
     "scheme_dark": "Dark",
     "scheme_system": "System"
   },
-  "delete": "Delete",
   "alpha_badge": "Alfa"
 }

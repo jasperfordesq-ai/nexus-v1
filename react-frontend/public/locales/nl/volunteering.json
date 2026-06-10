@@ -97,6 +97,7 @@
   "create_opportunity_subtitle": "Creëer een nieuwe vrijwilligersmogelijkheid voor uw organisatie",
   "form_org_label": "Organisatie",
   "form_org_placeholder": "Selecteer uw organisatie",
+  "search_organisations": "Zoek organisaties",
   "form_org_required": "Selecteer een organisatie",
   "form_title_label": "Titel van de kans",
   "form_title_placeholder": "bijv. gemeenschapstuinhelper, evenementencoördinator",
@@ -197,6 +198,7 @@
   "all_hours_reviewed": "U bent helemaal bij de les: elke inzending is beoordeeld.",
   "org_hours_approved_paid": "Uren goedgekeurd. Tijdskredieten betaald voor vrijwilligerswerk.",
   "org_hours_approved": "Uren goedgekeurd.",
+  "org_hours_approved_unpaid": "Uren goedgekeurd. Vul de portemonnee aan om deze vrijwilliger te betalen.",
   "org_hours_declined": "Uren daalden.",
   "org_all_hours_reviewed": "Alle vrijwilligersuren zijn herzien.",
   "org_balance_low_warning": "Het saldo is mogelijk onvoldoende voor {{count}} openstaande uren.",
@@ -468,6 +470,7 @@
   "aria": {
     "volunteering_sections": "Afdelingen vrijwilligerswerk"
   },
+  "filter_by_status": "Filter op status",
   "credentials": {
     "heading": "Referentieverificatie",
     "upload_new": "Upload nieuwe inloggegevens",
@@ -634,7 +637,7 @@
     "aria_select_all": "Selecteer alle zichtbare aanvragen die in behandeling zijn",
     "aria_select_application": "Selecteer een applicatie uit {{name}}",
     "aria_search_volunteers": "Zoek vrijwilligers op naam",
-    "filter_label": "Filter applications"
+    "filter_label": "Toepassingen filteren"
   },
   "org_wallet_balance": "Wallet-saldo:",
   "auto_pay_on": "Automatisch betalen AAN",
@@ -837,8 +840,5 @@
   "my_organisations_none": "Nog geen organisaties",
   "my_organisations_none_desc": "Registreer een vrijwilligersorganisatie om vacatures te plaatsen, vrijwilligers te beheren en tijdskredieten toe te kennen.",
   "my_organisations_pending": "In afwachting van goedkeuring",
-  "my_organisations_pending_desc": "In afwachting van goedkeuring door de beheerder",
-  "filter_by_status": "Filter by status",
-  "search_organisations": "Search organisations",
-  "org_hours_approved_unpaid": "Uren goedgekeurd. Vul de portemonnee aan om deze vrijwilliger te betalen."
+  "my_organisations_pending_desc": "In afwachting van goedkeuring door de beheerder"
 }

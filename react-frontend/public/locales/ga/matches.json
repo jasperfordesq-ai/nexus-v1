@@ -1,6 +1,4 @@
 {
-  "load_failed": "Theip ar na meaitseálacha a lódáil",
-  "match_hidden": "Meaitseáil i bhfolach — taispeánfaimid níos lú mar seo duit",
   "page_title": "Meaitseanna",
   "breadcrumb_dashboard": "Deais",
   "breadcrumb_matches": "Meaitseanna",
@@ -25,9 +23,11 @@
   "reasons_more": "+{{count}} eile",
   "view_details": "Féach ar shonraí meaitseála",
   "not_interested": "Níl suim agam",
+  "load_failed": "Theip ar na meaitseálacha a lódáil",
+  "match_hidden": "Meaitseáil i bhfolach — taispeánfaimid níos lú mar seo duit",
   "page_meta": {
     "title": "Meaitseálacha"
   },
-  "filter_tabs_aria": "Match source filter",
-  "loading": "Loading matches..."
+  "filter_tabs_aria": "Comhoiriúnaigh an scagaire foinse",
+  "loading": "Meaitseálacha á lódáil..."
 }

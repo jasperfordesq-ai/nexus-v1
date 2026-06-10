@@ -3,6 +3,7 @@
   "page_title": "الوظائف الشاغرة",
   "page_description": "تصفح فرص العمل وأدوار التطوع ومواقع بنك الوقت التي يقدمها أعضاء المجتمع والمنظمات الشريكة بالقرب منك.",
   "subtitle": "ابحث عن الفرص في مجتمعك",
+  "loading": "جارٍ تحميل الوظائف الشاغرة...",
   "create_vacancy": "نشر وظيفة شاغرة",
   "edit_vacancy": "تعديل الوظيفة الشاغرة",
   "my_postings": {
@@ -379,8 +380,8 @@
     "personal_message_placeholder": "ملاحظة للمرشح...",
     "interview_location_placeholder": "https://meet.google.com/...",
     "offer_salary_placeholder": "مثال: 45000",
-    "tabs_aria": "Job pipeline sections",
-    "change_stage_aria": "Change stage for {{name}}",
+    "tabs_aria": "أقسام خط أنابيب العمل",
+    "change_stage_aria": "مرحلة التغيير لـ {{name}}",
     "event_type": {
       "status_change": "تغيير الحالة",
       "interview": "مقابلة",
@@ -466,10 +467,10 @@
     "message_applicant": "رسالة",
     "kanban_board": "مجلس كانبان",
     "cv_download_error": "فشل في تنزيل السيرة الذاتية",
-    "confirm_close_title": "Close this vacancy?",
-    "confirm_close": "Closing stops new applications from coming in. You can reopen it at any time.",
-    "confirm_reopen_title": "Reopen this vacancy?",
-    "confirm_reopen": "Reopening makes the vacancy visible again and lets people apply."
+    "confirm_close_title": "إغلاق هذا الشاغر؟",
+    "confirm_close": "يؤدي الإغلاق إلى إيقاف وصول التطبيقات الجديدة. ويمكنك إعادة فتحه في أي وقت.",
+    "confirm_reopen_title": "إعادة فتح هذا المنصب الشاغر؟",
+    "confirm_reopen": "إعادة الفتح تجعل الوظيفة الشاغرة مرئية مرة أخرى وتتيح للأشخاص التقدم."
   },
   "interview": {
     "schedule": "جدولة المقابلة",
@@ -831,13 +832,13 @@
     "date_to": "ل",
     "filter_by_job": "تصفية حسب الوظيفة",
     "all_jobs": "جميع الوظائف",
+    "search_jobs": "البحث عن وظائف",
     "generate": "إنشاء تقرير",
     "loading": "جارٍ إنشاء التقرير...",
     "no_data": "لا توجد بيانات تقديم متاحة للفترة المحددة",
     "access_denied": "الوصول مرفوض",
     "load_error": "فشل في تحميل تقرير تدقيق التحيز",
-    "note_privacy": "هذا التقرير يحلل مقاييس العملية فقط. لا يتم جمع أو استخدام أي بيانات ديموغرافية.",
-    "search_jobs": "Search jobs"
+    "note_privacy": "هذا التقرير يحلل مقاييس العملية فقط. لا يتم جمع أو استخدام أي بيانات ديموغرافية."
   },
   "self_scheduling": {
     "title": "مواعيد المقابلات",
@@ -1047,6 +1048,5 @@
   "jobs": {
     "view_details": "عرض تفاصيل الوظيفة"
   },
-  "tabs_aria": "Jobs view",
-  "loading": "Loading vacancies..."
+  "tabs_aria": "عرض الوظائف"
 }

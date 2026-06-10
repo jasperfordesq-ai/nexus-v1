@@ -1,4 +1,7 @@
 {
+  "empty": {
+    "no_stories": "ストーリーはありません"
+  },
   "creator": {
     "title": "ストーリーを作成",
     "close": "クリエイターを閉じる",
@@ -64,7 +67,10 @@
     "error_image_size": "画像は10MB未満でなければなりません",
     "error_video_type": "ビデオファイルを選択してください",
     "error_video_size": "ビデオは50MB未満でなければなりません",
+    "share_story": "ストーリーをシェア",
     "error_camera": "カメラにアクセスできませんでした。権限を確認してください。",
+    "error_camera_permission": "カメラへのアクセスが拒否されました。ブラウザの設定で有効にしてください。",
+    "error_camera_not_found": "このデバイスにカメラが見つかりません。",
     "error_process": "画像の処理に失敗しました",
     "error_create": "ストーリーの作成に失敗しました",
     "flip_camera": "カメラを反転",
@@ -92,9 +98,6 @@
     "or_divider": "または",
     "poll_add_option_button": "選択肢を追加",
     "videos_trimmed_notice": "60秒を超える動画は60秒の表示時間にトリミングされます",
-    "share_story": "ストーリーをシェア",
-    "error_camera_permission": "カメラへのアクセスが拒否されました。ブラウザの設定で有効にしてください。",
-    "error_camera_not_found": "このデバイスにカメラが見つかりません。",
     "video_duration_seconds": "{{count}}秒"
   },
   "viewer": {
@@ -129,10 +132,7 @@
     "reply_placeholder_generic": "ストーリーに返信...",
     "react_with": "{{type}}でリアクション",
     "viewers_title_count": "視聴者 ({{count}})",
-    "delete_story_confirm": "Delete this story? This cannot be undone."
-  },
-  "empty": {
-    "no_stories": "ストーリーはありません"
+    "delete_story_confirm": "このストーリーを削除しますか?これを元に戻すことはできません。"
   },
   "highlights": {
     "no_stories": "このハイライトにはストーリーがありません",
@@ -161,6 +161,6 @@
     "story_type_image": "画像ストーリー",
     "story_type_text": "テキストストーリー",
     "story_type_poll": "投票ストーリー",
-    "delete_confirm": "Delete this highlight? This cannot be undone."
+    "delete_confirm": "このハイライトを削除しますか?これを元に戻すことはできません。"
   }
 }

@@ -3,6 +3,7 @@
   "page_title": "Vacatures",
   "page_description": "Blader door vacatures, vrijwilligersrollen en tijdbank-posities aangeboden door gemeenschapsleden en partnerorganisaties bij u in de buurt.",
   "subtitle": "Vind kansen in jouw gemeenschap",
+  "loading": "Vacatures laden...",
   "create_vacancy": "Plaats Vacature",
   "edit_vacancy": "Bewerk Vacature",
   "my_postings": {
@@ -379,8 +380,8 @@
     "personal_message_placeholder": "Een notitie voor de kandidaat...",
     "interview_location_placeholder": "https://meet.google.com/...",
     "offer_salary_placeholder": "bijv. 45000",
-    "tabs_aria": "Job pipeline sections",
-    "change_stage_aria": "Change stage for {{name}}",
+    "tabs_aria": "Taakpijplijnsecties",
+    "change_stage_aria": "Wijzig de fase voor {{name}}",
     "event_type": {
       "status_change": "Statuswijziging",
       "interview": "Sollicitatiegesprek",
@@ -466,10 +467,10 @@
     "message_applicant": "Bericht",
     "kanban_board": "Kanban Bord",
     "cv_download_error": "Kan CV niet downloaden",
-    "confirm_close_title": "Close this vacancy?",
-    "confirm_close": "Closing stops new applications from coming in. You can reopen it at any time.",
-    "confirm_reopen_title": "Reopen this vacancy?",
-    "confirm_reopen": "Reopening makes the vacancy visible again and lets people apply."
+    "confirm_close_title": "Deze vacature sluiten?",
+    "confirm_close": "Als u sluit, komen er geen nieuwe aanvragen meer binnen. U kunt deze op elk gewenst moment opnieuw openen.",
+    "confirm_reopen_title": "Deze vacature heropenen?",
+    "confirm_reopen": "Door het heropenen wordt de vacature weer zichtbaar en kunnen mensen solliciteren."
   },
   "interview": {
     "schedule": "Plan Interview",
@@ -831,13 +832,13 @@
     "date_to": "Naar",
     "filter_by_job": "Filter op Functie",
     "all_jobs": "Alle Functies",
+    "search_jobs": "Vacatures zoeken",
     "generate": "Genereer Rapport",
     "loading": "Rapport aan het genereren...",
     "no_data": "Geen aanvraaggegevens beschikbaar voor de geselecteerde periode",
     "access_denied": "Toegang geweigerd",
     "load_error": "Kon het bias audit rapport niet laden",
-    "note_privacy": "Dit rapport analyseert alleen processtatistieken. Er worden geen demografische gegevens verzameld of gebruikt.",
-    "search_jobs": "Search jobs"
+    "note_privacy": "Dit rapport analyseert alleen processtatistieken. Er worden geen demografische gegevens verzameld of gebruikt."
   },
   "self_scheduling": {
     "title": "Interviewslots",
@@ -1047,6 +1048,5 @@
   "jobs": {
     "view_details": "Vacaturedetails bekijken"
   },
-  "tabs_aria": "Jobs view",
-  "loading": "Loading vacancies..."
+  "tabs_aria": "Vacatures bekijken"
 }

@@ -123,6 +123,7 @@
     "search_placeholder": "Mitglieder suchen...",
     "aria_search": "Suchen Sie nach Föderationsmitgliedern",
     "all_communities": "Alle Communities",
+    "search_communities": "Communitys durchsuchen",
     "aria_filter_community": "Nach Community filtern",
     "service_reach_filter": "Filtern Sie nach Servicereichweite",
     "reach_all": "Alle",
@@ -149,8 +150,7 @@
     "external_profile_title": "Externes Mitglied",
     "external_profile_message": "Dieses Mitglied befindet sich auf einer externen Partnerplattform. Eine direkte Profilansicht ist nicht verfügbar.",
     "external_member": "Externes Mitglied",
-    "member_fallback": "Mitglied",
-    "search_communities": "Search communities"
+    "member_fallback": "Mitglied"
   },
   "messages": {
     "page_title": "Föderationsnachrichten",
@@ -217,9 +217,9 @@
     "message_placeholder": "Schreiben Sie Ihre Nachricht...",
     "cancel": "Stornieren",
     "send_message": "Nachricht senden",
-    "thread_aria_no_unread": "Conversation with {{name}} from {{tenant}}",
-    "thread_aria_unread": "Conversation with {{name}} from {{tenant}}, {{count}} unread message",
-    "thread_aria_unread_plural": "Conversation with {{name}} from {{tenant}}, {{count}} unread messages"
+    "thread_aria_no_unread": "Unterhaltung mit {{name}} von {{tenant}}",
+    "thread_aria_unread": "Konversation mit {{name}} von {{tenant}}, {{count}} ungelesene Nachricht",
+    "thread_aria_unread_plural": "Konversation mit {{name}} von {{tenant}}, {{count}} ungelesene Nachrichten"
   },
   "listings": {
     "page_title": "Föderationseinträge",
@@ -229,6 +229,7 @@
     "subtitle": "Durchsuchen Sie Angebote und Anfragen von Mitgliedern aus Partner-Communities.",
     "search_placeholder": "Einträge durchsuchen...",
     "all_communities": "Alle Communities",
+    "search_communities": "Communitys durchsuchen",
     "filter_by_community": "Nach Community filtern",
     "filter_by_type": "Nach Typ filtern",
     "type_all": "Alle",
@@ -248,8 +249,7 @@
     "hours_estimated": "~{{hours}}h",
     "view_profile": "Profil anzeigen",
     "contact_author": "Kontakt",
-    "close": "Schließen",
-    "search_communities": "Search communities"
+    "close": "Schließen"
   },
   "settings": {
     "page_title": "Föderationseinstellungen",
@@ -317,6 +317,7 @@
     "search_placeholder": "Veranstaltungen suchen...",
     "filter_by_community": "Nach Community filtern",
     "all_communities": "Alle Communities",
+    "search_communities": "Communitys durchsuchen",
     "upcoming_only": "Nur demnächst verfügbar",
     "unable_to_load": "Ereignisse können nicht geladen werden",
     "try_again": "Versuchen Sie es erneut",
@@ -329,8 +330,7 @@
     "online": "Online",
     "date_at_time": "{{date}} um {{time}}",
     "attendees_going_one": "{{count}} nimmt teil",
-    "attendees_going_other": "{{count}} nehmen teil",
-    "search_communities": "Search communities"
+    "attendees_going_other": "{{count}} nehmen teil"
   },
   "groups": {
     "page_title": "Föderationsgruppen",
@@ -341,6 +341,7 @@
     "search_placeholder": "Gruppen durchsuchen...",
     "filter_by_community": "Nach Community filtern",
     "all_communities": "Alle Communities",
+    "search_communities": "Communitys durchsuchen",
     "unable_to_load": "Gruppen können nicht geladen werden",
     "try_again": "Versuchen Sie es erneut",
     "empty_title": "Keine Gruppen gefunden",
@@ -350,8 +351,7 @@
     "load_more_error": "Es konnten keine weiteren Gruppen geladen werden.",
     "member_count": "{{count}}-Mitglied",
     "member_count_plural": "{{count}}-Mitglieder",
-    "private": "Privat",
-    "search_communities": "Search communities"
+    "private": "Privat"
   },
   "connections": {
     "page_title": "Föderationsverbindungen",
@@ -382,7 +382,7 @@
     "rejected_success": "Verbindung abgelehnt",
     "removed_success": "Verbindung entfernt",
     "action_failed": "Aktion fehlgeschlagen. Bitte versuchen Sie es erneut.",
-    "tabs_aria": "Federation connection status"
+    "tabs_aria": "Verbundverbindungsstatus"
   },
   "partner_detail": {
     "page_title": "Partner-Community",

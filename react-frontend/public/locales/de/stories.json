@@ -132,7 +132,7 @@
     "reply_placeholder_generic": "Auf Story antworten...",
     "react_with": "Reagiere mit {{type}}",
     "viewers_title_count": "Zuschauer ({{count}})",
-    "delete_story_confirm": "Delete this story? This cannot be undone."
+    "delete_story_confirm": "Diese Geschichte löschen? Dies kann nicht rückgängig gemacht werden."
   },
   "highlights": {
     "no_stories": "Diese Highlight hat keine Geschichten",
@@ -161,6 +161,6 @@
     "story_type_image": "Bild-Geschichte",
     "story_type_text": "Text-Geschichte",
     "story_type_poll": "Umfrage-Geschichte",
-    "delete_confirm": "Delete this highlight? This cannot be undone."
+    "delete_confirm": "Dieses Highlight löschen? Dies kann nicht rückgängig gemacht werden."
   }
 }

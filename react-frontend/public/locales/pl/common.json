@@ -68,8 +68,8 @@
     "premium": "Premia",
     "verify_identity": "Zweryfikuj swoją tożsamość",
     "accessibility_alpha": "Dostępność (alfa)",
+    "accessibility_alpha_tooltip": "Enhanced accessible version — WCAG 2.2 AA compliant. Otwiera się w nowej karcie.",
     "features": "Funkcje",
-    "accessibility_alpha_tooltip": "Enhanced accessible version — WCAG 2.2 AA compliant. Opens in a new tab.",
     "courses": "Kursy",
     "podcasts": "Podcasty"
   },
@@ -134,7 +134,7 @@
     "premium": "Poziomy członkostwa premium",
     "accessibility_alpha": "Otwórz interfejs alfa z naciskiem na dostępność",
     "features": "Wszystko, co robi Project NEXUS, z uczciwymi etykietami dojrzałości",
-    "dashboard": "Your personalised home overview",
+    "dashboard": "Twój spersonalizowany przegląd domu",
     "courses": "Ucz się nowych umiejętności razem ze swoją społecznością",
     "podcasts": "Programy społecznościowe i historie audio"
   },
@@ -396,6 +396,59 @@
     "title": "Wspierająca Społeczność",
     "subtitle": "Połącz wymianę banku czasu, zweryfikowany wolontariat, zaufane organizacje, grupy, wydarzenia, zasoby i sygnały wpływu w jeden skoordynowany proces opieki.",
     "welcome_banner": "Witaj! Tu możesz poprosić o pomoc, zaoferować swój czas lub po prostu zapisać sąsiedzki gest. Każdy wkład — duży czy mały — wzmacnia Twoją społeczność.",
+    "alpha": {
+      "badge": "Nowość · Wczesny dostęp"
+    },
+    "preview_tag": "Podgląd",
+    "hero": {
+      "title": "Wspierająca Społeczność",
+      "intro": "Wspierająca Społeczność to miejsce, gdzie sąsiedzi pomagają sobie na co dzień — podwiezienie na wizytę, drobne zakupy albo po prostu towarzystwo na popołudnie. Poproś o pomoc, gdy jej potrzebujesz, i zaoferuj ją, gdy możesz.",
+      "timebank_note": "Działa razem z bankiem czasu: gdy dajesz swój czas, jest on zapisywany jako godziny, których możesz użyć później — te same godziny, na jednym wspólnym saldzie.",
+      "cta_get_help": "Potrzebuję pomocy",
+      "cta_give_help": "Chcę pomóc"
+    },
+    "new_notice": {
+      "title": "To zupełna nowość.",
+      "body": "Wspierająca Społeczność dopiero co tu wystartowała i wciąż ją budujemy. Niektóre funkcje to wczesne podglądy i nie działa sama — opiera się na sąsiadach, którzy ochotniczo niosą pomoc. Dziękujemy, że jesteś z nami od początku."
+    },
+    "how": {
+      "title": "Jak to działa",
+      "subtitle": "Trzy proste kroki.",
+      "step1_title": "Poproś o pomoc",
+      "step1_desc": "Opisz własnymi słowami, czego potrzebujesz. Twoja prośba trafia do zaufanych członków w pobliżu.",
+      "step2_title": "Sąsiad oferuje pomoc",
+      "step2_desc": "Ktoś ze społeczności proponuje pomoc, a wy uzgadniacie termin, który pasuje wam obojgu.",
+      "step3_title": "Godziny są zapisywane",
+      "step3_desc": "Poświęcony czas jest zapisywany jako godziny, więc pomagający gromadzą godziny do wykorzystania lub przekazania później."
+    },
+    "recruit": {
+      "title": "Szukamy naszych pierwszych opiekunów",
+      "body": "Wspierająca Społeczność działa tylko wtedy, gdy ludzie zgłaszają się do pomocy. Nie mamy jeszcze zespołu opiekunów — dopiero go tworzymy. Jeśli możesz poświęcić trochę czasu, możesz być jednym z pierwszych.",
+      "cta": "Zaoferuj pomoc"
+    },
+    "your_hours_note": "To te same kredyty czasu, co w banku czasu — jedno wspólne saldo, a nie osobna waluta Wspierającej Społeczności.",
+    "groups": {
+      "get_help": {
+        "title": "Otrzymaj pomoc",
+        "desc": "Poproś o wsparcie i śledź osoby, które ci pomagają."
+      },
+      "give_help": {
+        "title": "Pomóż innym",
+        "desc": "Zaoferuj swój czas i umiejętności sąsiadom, którzy potrzebują wsparcia."
+      },
+      "your_hours": {
+        "title": "Twoje godziny",
+        "desc": "Sprawdź i wykorzystaj zgromadzone kredyty czasu."
+      },
+      "caregiver_tools": {
+        "title": "Narzędzia dla opiekunów",
+        "desc": "Narzędzia dla osób, które regularnie się opiekują. Stają się przydatniejsze, w miarę jak rośnie nasza sieć opiekunów."
+      },
+      "safety": {
+        "title": "Bezpieczeństwo i aktualności",
+        "desc": "Zgłoś problem lub śledź to, co dzieje się w okolicy."
+      }
+    },
     "actions": {
       "request_help": "Poproś o pomoc",
       "request_help_sub": "Poproś społeczność o praktyczne wsparcie",
@@ -417,6 +470,8 @@
       "future_care_fund_sub": "Traktuj zgromadzone godziny jak ubezpieczenie na przyszłą opiekę.",
       "cover_care": "Zastępstwo opiekuna",
       "cover_care_sub": "Dla opiekunów: zorganizuj zaufane zastępstwo, gdy potrzebujesz przerwy. Bardziej przydatne, w miarę jak sieć rośnie.",
+      "become_caregiver": "Zostań opiekunem",
+      "become_caregiver_sub": "Daj nam znać, że chcesz regularnie się opiekować, i pomóż nam zbudować zespół.",
       "hour_gift": "Podaruj godziny",
       "hour_gift_sub": "Podaruj zgromadzone godziny rodzinie lub przyjaciołom.",
       "hour_transfer": "Przenieś godziny",
@@ -424,9 +479,7 @@
       "safeguarding_report": "Zgłoś obawy",
       "safeguarding_report_sub": "Zgłaszaj obawy dotyczące ochrony poufnie.",
       "projects": "Projekty społeczne",
-      "projects_sub": "Śledź aktualności gmin i okolicy.",
-      "become_caregiver": "Zostań opiekunem",
-      "become_caregiver_sub": "Daj nam znać, że chcesz regularnie się opiekować, i pomóż nam zbudować zespół."
+      "projects_sub": "Śledź aktualności gmin i okolicy."
     },
     "operating_model": {
       "title": "Model operacyjny",
@@ -510,59 +563,6 @@
       "show_all": "Pokaż wszystkie działania",
       "show_recommended": "Pokaż polecane",
       "change_answer": "Zmień odpowiedź"
-    },
-    "alpha": {
-      "badge": "Nowość · Wczesny dostęp"
-    },
-    "preview_tag": "Podgląd",
-    "hero": {
-      "title": "Wspierająca Społeczność",
-      "intro": "Wspierająca Społeczność to miejsce, gdzie sąsiedzi pomagają sobie na co dzień — podwiezienie na wizytę, drobne zakupy albo po prostu towarzystwo na popołudnie. Poproś o pomoc, gdy jej potrzebujesz, i zaoferuj ją, gdy możesz.",
-      "timebank_note": "Działa razem z bankiem czasu: gdy dajesz swój czas, jest on zapisywany jako godziny, których możesz użyć później — te same godziny, na jednym wspólnym saldzie.",
-      "cta_get_help": "Potrzebuję pomocy",
-      "cta_give_help": "Chcę pomóc"
-    },
-    "new_notice": {
-      "title": "To zupełna nowość.",
-      "body": "Wspierająca Społeczność dopiero co tu wystartowała i wciąż ją budujemy. Niektóre funkcje to wczesne podglądy i nie działa sama — opiera się na sąsiadach, którzy ochotniczo niosą pomoc. Dziękujemy, że jesteś z nami od początku."
-    },
-    "how": {
-      "title": "Jak to działa",
-      "subtitle": "Trzy proste kroki.",
-      "step1_title": "Poproś o pomoc",
-      "step1_desc": "Opisz własnymi słowami, czego potrzebujesz. Twoja prośba trafia do zaufanych członków w pobliżu.",
-      "step2_title": "Sąsiad oferuje pomoc",
-      "step2_desc": "Ktoś ze społeczności proponuje pomoc, a wy uzgadniacie termin, który pasuje wam obojgu.",
-      "step3_title": "Godziny są zapisywane",
-      "step3_desc": "Poświęcony czas jest zapisywany jako godziny, więc pomagający gromadzą godziny do wykorzystania lub przekazania później."
-    },
-    "recruit": {
-      "title": "Szukamy naszych pierwszych opiekunów",
-      "body": "Wspierająca Społeczność działa tylko wtedy, gdy ludzie zgłaszają się do pomocy. Nie mamy jeszcze zespołu opiekunów — dopiero go tworzymy. Jeśli możesz poświęcić trochę czasu, możesz być jednym z pierwszych.",
-      "cta": "Zaoferuj pomoc"
-    },
-    "your_hours_note": "To te same kredyty czasu, co w banku czasu — jedno wspólne saldo, a nie osobna waluta Wspierającej Społeczności.",
-    "groups": {
-      "get_help": {
-        "title": "Otrzymaj pomoc",
-        "desc": "Poproś o wsparcie i śledź osoby, które ci pomagają."
-      },
-      "give_help": {
-        "title": "Pomóż innym",
-        "desc": "Zaoferuj swój czas i umiejętności sąsiadom, którzy potrzebują wsparcia."
-      },
-      "your_hours": {
-        "title": "Twoje godziny",
-        "desc": "Sprawdź i wykorzystaj zgromadzone kredyty czasu."
-      },
-      "caregiver_tools": {
-        "title": "Narzędzia dla opiekunów",
-        "desc": "Narzędzia dla osób, które regularnie się opiekują. Stają się przydatniejsze, w miarę jak rośnie nasza sieć opiekunów."
-      },
-      "safety": {
-        "title": "Bezpieczeństwo i aktualności",
-        "desc": "Zgłoś problem lub śledź to, co dzieje się w okolicy."
-      }
     }
   },
   "request_help": {
@@ -631,8 +631,8 @@
       "confirm_body": "Twoje godziny zostaną teraz pobrane i dopisane odbiorcy, gdy zaakceptuje.",
       "confirm_button": "Tak, podaruj godziny",
       "cancel": "Anuluj",
-      "recipient_hint": "Type at least 2 letters to search",
-      "recipient_no_results": "No members found"
+      "recipient_hint": "Wpisz co najmniej 2 litery, aby wyszukać",
+      "recipient_no_results": "Nie znaleziono żadnych członków"
     },
     "inbox": {
       "empty": "Brak prezentów do zaakceptowania.",
@@ -870,9 +870,9 @@
     "select_category": "Wybierz kategorię",
     "verification_badges": "Odznaki weryfikacyjne",
     "search_skills": "Szukaj umiejętności",
-    "user_menu_trigger": "User menu for {{name}}",
-    "feed_sidebar": "Community sidebar",
-    "filter_panel": "Filter panel",
+    "user_menu_trigger": "Menu użytkownika dla {{name}}",
+    "feed_sidebar": "Pasek boczny społeczności",
+    "filter_panel": "Panel filtrów",
     "remove": "Remove"
   },
   "skills": {
@@ -935,7 +935,7 @@
   "toast": {
     "aria_notifications": "Powiadomienia",
     "aria_dismiss_notification": "Odrzuć powiadomienie",
-    "aria_urgent_notifications": "Urgent notifications"
+    "aria_urgent_notifications": "Pilne powiadomienia"
   },
   "verified": "Zweryfikowany",
   "map_unavailable": "Widok mapy jest niedostępny",
@@ -970,7 +970,9 @@
   "verify_identity": "Zweryfikuj tożsamość",
   "level_short": "Pz. {{level}}",
   "cancel": "Anuluj",
+  "confirm": "Confirm",
   "save": "Zapisz",
+  "delete": "Delete",
   "offer_favour": {
     "meta": {
       "title": "Zaoferuj przysługę",
@@ -1716,8 +1718,8 @@
     "webhook_create_title": "Utwórz subskrypcję",
     "webhook_create_body": "POST na /api/partner/v1/webhooks/subscriptions z event_types (tablica) i target_url (tylko https). Odpowiedź zawiera jednorazowy secret — zapisz go.",
     "tabs": {
-      "code_examples": "Code examples",
-      "verification_examples": "Verification examples"
+      "code_examples": "Przykłady kodu",
+      "verification_examples": "Przykłady weryfikacji"
     }
   },
   "regional_analytics": {
@@ -1813,10 +1815,10 @@
     "distinct_visitors": "Unikalni odwiedzający",
     "suppressed_value": "Ukryte",
     "suppressed_short": "--",
-    "line_chart_aria": "Line chart showing partner activity over time",
-    "bar_chart_aria": "Bar chart showing partner performance metrics",
-    "pie_chart_aria": "Pie chart showing distribution of partner data",
-    "area_chart_aria": "Area chart showing partner trends over time"
+    "line_chart_aria": "Wykres liniowy pokazujący aktywność partnera w czasie",
+    "bar_chart_aria": "Wykres słupkowy przedstawiający wskaźniki wydajności partnera",
+    "pie_chart_aria": "Wykres kołowy przedstawiający rozkład danych partnerów",
+    "area_chart_aria": "Wykres warstwowy przedstawiający trendy partnerów na przestrzeni czasu"
   },
   "provisioning": {
     "meta": {
@@ -1922,6 +1924,7 @@
       "slot_created": "Termin odbioru utworzony",
       "slot_create_failed": "Nie udało się utworzyć terminu",
       "slot_deleted": "Termin usunięty",
+      "slot_delete_confirm": "Usunąć to miejsce odbioru? Tego nie można cofnąć.",
       "capacity": "Pojemność",
       "recurring": "Cykliczne",
       "recurring_weekly": "Powtarzaj co tydzień",
@@ -1940,8 +1943,7 @@
       "window": "Okno odbioru",
       "choose_slot": "Wybierz termin odbioru",
       "no_slot_selected": "Nie wybrano terminu odbioru",
-      "left": "pozostało",
-      "slot_delete_confirm": "Delete this pickup slot? This cannot be undone."
+      "left": "pozostało"
     },
     "inventory": {
       "section_title": "Magazyn",
@@ -2010,6 +2012,7 @@
     "invite_modal_title": "Zaproszenie między klubami",
     "invite_modal_subtitle": "Zaproś tę osobę, aby dołączyła także do jednego ze sfederowanych klubów.",
     "invite_target_label": "Wybierz klub",
+    "invite_target_search": "Wyszukaj kluby",
     "invite_message_label": "Osobista wiadomość (opcjonalnie)",
     "invite_message_placeholder": "Cześć! Pomyślałem, że ten klub też ci się spodoba.",
     "invite_send": "Wyślij zaproszenie",
@@ -2042,8 +2045,7 @@
       "today": "Dziś",
       "from_label": "Od",
       "load_failed": "Nie udało się załadować kalendarza."
-    },
-    "invite_target_search": "Search clubs"
+    }
   },
   "oauth": {
     "continue_with_google": "Kontynuuj z Google",
@@ -2174,7 +2176,7 @@
     "description_label": "Opis (opcjonalnie)",
     "make_public": "Uczyń publiczną",
     "create": "Utwórz",
-    "confirm_create": "Create collection"
+    "confirm_create": "Utwórz kolekcję"
   },
   "appreciations": {
     "title": "Wyślij podziękowanie",
@@ -2293,17 +2295,15 @@
   "xp_progress": "{{current}} / {{required}} XP",
   "level_progress_aria": "Postęp poziomu {{level}}: {{percentage}}%",
   "user_fallback": "User",
-  "release_stage": "Generally Available (v1.5.1)",
-  "confirm": "Confirm",
+  "release_stage": "Ogólnie dostępne (v1.5.1)",
   "theme_picker": {
     "title": "Appearance",
-    "subtitle": "Tune color scheme, accent, and density.",
-    "open_label": "Open theme picker",
-    "color_scheme": "Color scheme",
+    "subtitle": "Dostosuj schemat kolorów, akcent i gęstość.",
+    "open_label": "Otwórz selektor motywów",
+    "color_scheme": "Schemat kolorów",
     "scheme_light": "Light",
     "scheme_dark": "Dark",
     "scheme_system": "System"
   },
-  "delete": "Delete",
   "alpha_badge": "Alfa"
 }

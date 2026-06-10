@@ -123,6 +123,7 @@
     "search_placeholder": "Cuardaigh baill...",
     "aria_search": "Cuardaigh baill an chónaidhm",
     "all_communities": "Gach Pobal",
+    "search_communities": "Cuardaigh pobail",
     "aria_filter_community": "Scag de réir pobail",
     "service_reach_filter": "Scag de réir teacht seirbhíse",
     "reach_all": "Gach",
@@ -149,8 +150,7 @@
     "external_profile_title": "Ball Seachtrach",
     "external_profile_message": "Tá an comhalta seo ar ardán comhpháirtíochta seachtrach. Níl féachaint ar phróifíl dhíreach ar fáil.",
     "external_member": "Ball Seachtrach",
-    "member_fallback": "Ball",
-    "search_communities": "Search communities"
+    "member_fallback": "Ball"
   },
   "messages": {
     "page_title": "Teachtaireachtaí Cónaidhme",
@@ -217,9 +217,9 @@
     "message_placeholder": "Scríobh do theachtaireacht...",
     "cancel": "Cealaigh",
     "send_message": "Seol Teachtaireacht",
-    "thread_aria_no_unread": "Conversation with {{name}} from {{tenant}}",
-    "thread_aria_unread": "Conversation with {{name}} from {{tenant}}, {{count}} unread message",
-    "thread_aria_unread_plural": "Conversation with {{name}} from {{tenant}}, {{count}} unread messages"
+    "thread_aria_no_unread": "Comhrá le {{name}} ó {{tenant}}",
+    "thread_aria_unread": "Comhrá le {{name}} ó {{tenant}}, {{count}} teachtaireacht neamhléite",
+    "thread_aria_unread_plural": "Comhrá le {{name}} ó {{tenant}}, {{count}} teachtaireachtaí neamhléite"
   },
   "listings": {
     "page_title": "Liostaí Cónaidhme",
@@ -229,6 +229,7 @@
     "subtitle": "Brabhsáil tairiscintí agus iarratais ó bhaill ar fud na bpobal comhpháirtíochta.",
     "search_placeholder": "Cuardaigh liostaí...",
     "all_communities": "Gach Pobal",
+    "search_communities": "Cuardaigh pobail",
     "filter_by_community": "Scag de réir pobail",
     "filter_by_type": "Scag de réir cineáil",
     "type_all": "Gach",
@@ -248,8 +249,7 @@
     "hours_estimated": "~{{hours}}h",
     "view_profile": "Próifíl Amharc",
     "contact_author": "Teagmháil",
-    "close": "Dún",
-    "search_communities": "Search communities"
+    "close": "Dún"
   },
   "settings": {
     "page_title": "Socruithe Cónaidhme",
@@ -317,6 +317,7 @@
     "search_placeholder": "Cuardaigh imeachtaí...",
     "filter_by_community": "Scag de réir pobail",
     "all_communities": "Gach Pobal",
+    "search_communities": "Cuardaigh pobail",
     "upcoming_only": "Le teacht amháin",
     "unable_to_load": "Ní féidir Imeachtaí a Luchtú",
     "try_again": "Bain triail eile as",
@@ -329,8 +330,7 @@
     "online": "Ar líne",
     "date_at_time": "{{date}} ag {{time}}",
     "attendees_going_one": "{{count}} ag dul",
-    "attendees_going_other": "{{count}} ag dul",
-    "search_communities": "Search communities"
+    "attendees_going_other": "{{count}} ag dul"
   },
   "groups": {
     "page_title": "Grúpaí Cónaidhme",
@@ -341,6 +341,7 @@
     "search_placeholder": "Cuardaigh grúpaí...",
     "filter_by_community": "Scag de réir pobail",
     "all_communities": "Gach Pobal",
+    "search_communities": "Cuardaigh pobail",
     "unable_to_load": "Ní féidir Grúpaí a Luchtú",
     "try_again": "Bain triail eile as",
     "empty_title": "Níor aimsíodh Grúpaí ar bith",
@@ -350,8 +351,7 @@
     "load_more_error": "Níorbh fhéidir níos mó grúpaí a lódáil.",
     "member_count": "ball {{count}}",
     "member_count_plural": "baill {{count}}",
-    "private": "Príobháideach",
-    "search_communities": "Search communities"
+    "private": "Príobháideach"
   },
   "connections": {
     "page_title": "Cónaidhm Naisc",
@@ -382,7 +382,7 @@
     "rejected_success": "Ceangal dhiúltaigh",
     "removed_success": "Ceangal bainte",
     "action_failed": "Theip ar an ngníomh. Bain triail eile as.",
-    "tabs_aria": "Federation connection status"
+    "tabs_aria": "Stádas ceangail Cónaidhm"
   },
   "partner_detail": {
     "page_title": "Comhphobal",

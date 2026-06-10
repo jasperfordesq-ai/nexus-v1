@@ -24,8 +24,8 @@
     "given": "مُعطى",
     "received": "مُستلم",
     "monthly_activity": "النشاط الشهري",
-    "no_data": "لا توجد بيانات رسم بياني متاحة",
-    "monthly_activity_aria": "Bar chart showing monthly hours given and received"
+    "monthly_activity_aria": "مخطط شريطي يوضح الساعات الشهرية المقدمة والمستلمة",
+    "no_data": "لا توجد بيانات رسم بياني متاحة"
   },
   "recent_activity": "النشاط الأخير",
   "empty_title": "لا توجد نشاطات حديثة",

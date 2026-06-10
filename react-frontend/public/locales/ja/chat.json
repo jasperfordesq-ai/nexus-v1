@@ -1,6 +1,7 @@
 {
   "page_title": "AIアシスタント",
   "aria_chat": "AIチャット",
+  "messages_region": "チャットメッセージ",
   "header_title": "AIアシスタント",
   "header_subtitle": "AIによって提供されています",
   "limits_left_today": "{{count}}が今日残っています",
@@ -27,9 +28,6 @@
   "starter_q3": "タイムバンキングはどのように機能しますか？",
   "starter_q4": "今後のイベントは何がありますか？",
   "starter_q5": "自分のスキルを提供するためのリスティングをどのように作成しますか？",
-  "page_meta": {
-    "title": "AIチャット"
-  },
   "thumbs_up_aria": "役に立つ回答",
   "thumbs_down_aria": "役に立たない回答",
   "card_online": "オンライン",
@@ -39,5 +37,7 @@
   "tool_results": {
     "view": "表示"
   },
-  "messages_region": "Chat messages"
+  "page_meta": {
+    "title": "AIチャット"
+  }
 }

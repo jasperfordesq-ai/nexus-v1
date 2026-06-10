@@ -5,7 +5,7 @@
   "browse_listings": "Parcourir les annonces",
   "load_more": "Charger plus",
   "try_again": "Réessayer",
-  "loading": "Loading exchanges...",
+  "loading": "Chargement des échanges...",
   "service_exchange": "Échange de service",
   "unknown": "Inconnu",
   "hours_count": "{{count}} heure",
@@ -109,7 +109,7 @@
     "ratings": "Évaluations",
     "rate_exchange": "Évaluer cet échange",
     "prep_time_value": "{{count}}h",
-    "rating_value": "Rating: {{rating}} out of 5"
+    "rating_value": "Note : {{rating}} sur 5"
   },
   "modal": {
     "decline_title": "Refuser la demande d'échange",

@@ -101,8 +101,8 @@
     "votes": "{{count}} Stimmen",
     "options": "{{count}} Optionen",
     "vote_now": "Jetzt abstimmen",
-    "closes": "Endet am {{date}}",
-    "vote_now_for": "Vote now on: {{question}}"
+    "vote_now_for": "Jetzt abstimmen über: {{question}}",
+    "closes": "Endet am {{date}}"
   },
   "in_demand_skills": {
     "title": "Gefragte Fähigkeiten",

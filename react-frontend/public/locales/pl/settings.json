@@ -398,7 +398,7 @@
   "skills": {
     "title": "Twoje umiejętności",
     "description": "Dodaj umiejętności do swojego profilu, aby inni członkowie mogli Cię znaleźć. Członkowie społeczności mogą potwierdzać Twoje umiejętności.",
-    "loading": "Loading skills..."
+    "loading": "Ładowanie umiejętności..."
   },
   "password_modal": {
     "title": "Zmień hasło",
@@ -609,6 +609,6 @@
   },
   "push_campaign_opt_in": "Otrzymuj promowane powiadomienia push",
   "push_campaign_opt_in_description": "Zezwól lokalnym firmom i organizacjom na wysyłanie ukierunkowanych powiadomień push. Możesz zrezygnować w dowolnym momencie.",
-  "tabs_aria": "Settings sections",
-  "twofa_loading_setup": "Loading two-factor setup..."
+  "tabs_aria": "Sekcje ustawień",
+  "twofa_loading_setup": "Ładowanie konfiguracji dwuskładnikowej..."
 }

@@ -100,6 +100,7 @@
     "create_poll": "Poll aanmaken",
     "listing_title_label": "Titel",
     "listing_title_placeholder": "Wat bied je aan of waar ben je naar op zoek?",
+    "listing_type_label": "Advertentietype",
     "listing_offering": "Aanbod",
     "listing_looking_for": "Op zoek naar",
     "listing_desc_placeholder": "Beschrijf je aanbieding...",
@@ -141,6 +142,7 @@
     "image_remove_aria": "Verwijder afbeelding",
     "group_label": "Plaatsen op",
     "group_placeholder": "Openbare feed",
+    "group_search": "Zoek groepen",
     "group_members": "{{count}} leden",
     "ai_title_required": "Voer eerst een titel in zodat AI een beschrijving kan genereren",
     "ai_generated": "AI-beschrijving gegenereerd!",
@@ -229,9 +231,7 @@
     "file_size_mb": "{{name}} ({{size}}MB)",
     "listing_preview_alt": "Voorbeeld van vermelding",
     "image_preview_alt": "Uploadvoorbeeld",
-    "listing_type_label": "Listing type",
-    "type_tabs_aria": "Compose content type",
-    "group_search": "Search groups"
+    "type_tabs_aria": "Inhoudstype samenstellen"
   },
   "moderation": {
     "unauthorized": "Je hebt geen toestemming om deze actie uit te voeren."
@@ -343,7 +343,7 @@
       "badge_unlocked": "Badge ontgrendeld",
       "level_reached": "Niveau bereikt"
     },
-    "read_more_about": "Read more about {{title}}",
+    "read_more_about": "Lees meer over {{title}}",
     "detail_course": "Bekijk cursus",
     "type_course": "Cursus"
   },
@@ -615,9 +615,9 @@
     "not_found": "Item niet gevonden",
     "load_failed": "Item laden mislukt"
   },
-  "controls_region_label": "Feed controls",
-  "new_posts_available": "New posts available",
+  "controls_region_label": "Voercontroles",
+  "new_posts_available": "Nieuwe berichten beschikbaar",
   "confirm": {
-    "delete_post": "Delete this post? This cannot be undone."
+    "delete_post": "Dit bericht verwijderen? Dit kan niet ongedaan worden gemaakt."
   }
 }

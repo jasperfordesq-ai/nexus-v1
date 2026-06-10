@@ -100,6 +100,7 @@
     "create_poll": "Utwórz ankietę",
     "listing_title_label": "Tytuł",
     "listing_title_placeholder": "Co oferujesz lub czego szukasz?",
+    "listing_type_label": "Typ aukcji",
     "listing_offering": "Oferuję",
     "listing_looking_for": "Szukam",
     "listing_desc_placeholder": "Opisz swoją ofertę...",
@@ -141,6 +142,7 @@
     "image_remove_aria": "Usuń obraz",
     "group_label": "Opublikuj na",
     "group_placeholder": "Publiczny kanał",
+    "group_search": "Przeszukaj grupy",
     "group_members": "{{count}} członków",
     "ai_title_required": "Najpierw wprowadź tytuł, aby AI mogło wygenerować opis",
     "ai_generated": "Opis AI został wygenerowany!",
@@ -229,9 +231,7 @@
     "file_size_mb": "{{name}} ({{size}}MB)",
     "listing_preview_alt": "Podgl?d og?oszenia",
     "image_preview_alt": "Podgl?d przesy?ania",
-    "listing_type_label": "Listing type",
-    "type_tabs_aria": "Compose content type",
-    "group_search": "Search groups"
+    "type_tabs_aria": "Utwórz typ zawartości"
   },
   "moderation": {
     "unauthorized": "Nie masz uprawnień do wykonania tej czynności."
@@ -343,7 +343,7 @@
       "badge_unlocked": "Odznaka odblokowana",
       "level_reached": "Osiągnięto poziom"
     },
-    "read_more_about": "Read more about {{title}}",
+    "read_more_about": "Przeczytaj więcej o {{title}}",
     "detail_course": "Zobacz kurs",
     "type_course": "Kurs"
   },
@@ -615,9 +615,9 @@
     "not_found": "Nie znaleziono elementu",
     "load_failed": "Nie udało się załadować elementu"
   },
-  "controls_region_label": "Feed controls",
-  "new_posts_available": "New posts available",
+  "controls_region_label": "Kontrola karmienia",
+  "new_posts_available": "Dostępne nowe posty",
   "confirm": {
-    "delete_post": "Delete this post? This cannot be undone."
+    "delete_post": "Usunąć ten post? Tego nie można cofnąć."
   }
 }

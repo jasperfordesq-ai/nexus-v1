@@ -3,6 +3,8 @@
   "title": "Defis d'ideation",
   "subtitle": "Partagez des idees, votez et contribuez a faconner votre communaute",
   "page_description": "Parcourez les défis de la communauté, soumettez des idées et votez pour des solutions. Aidez à façonner l'avenir de votre communauté.",
+  "loading": "Loading...",
+  "tabs_filter_aria": "Filtrer les défis",
   "actions": {
     "retry": "Reessayer"
   },
@@ -52,7 +54,7 @@
     "create": "Creer un defi",
     "load_error": "Impossible de charger les defis",
     "load_more": "Charger plus",
-    "loading": "Loading challenge..."
+    "loading": "Chargement du défi..."
   },
   "ideas": {
     "title": "Idees",
@@ -85,7 +87,7 @@
     "draft_created": "Cree le {{date}}",
     "new_idea": "Nouvelle idee",
     "sort_label": "Trier les idées",
-    "loading": "Loading ideas..."
+    "loading": "Chargement des idées..."
   },
   "idea_detail": {
     "page_title": "Details de l'idee",
@@ -98,14 +100,14 @@
     "title": "Commentaires",
     "empty_title": "Aucun commentaire pour le moment",
     "empty_description": "Soyez le premier a partager vos reflexions sur cette idee.",
+    "add_label": "Ajouter un commentaire",
     "add_placeholder": "Partagez vos reflexions...",
     "add_button": "Publier le commentaire",
     "delete": "Supprimer",
     "delete_confirm": "Etes-vous sur de vouloir supprimer ce commentaire ?",
     "load_more": "Charger plus de commentaires",
     "load_error": "Impossible de charger les commentaires",
-    "add_label": "Add a comment",
-    "loading": "Loading comments..."
+    "loading": "Chargement des commentaires..."
   },
   "form": {
     "title_label": "Titre",
@@ -425,10 +427,8 @@
   "challenge_detail": {
     "actions": "Actions du défi"
   },
-  "loading": "Loading...",
-  "tabs_filter_aria": "Filter challenges",
   "confirm": {
-    "delete_task": "Delete this task? This cannot be undone.",
-    "delete_message": "Delete this message? This cannot be undone."
+    "delete_task": "Supprimer cette tâche ? Cela ne peut pas être annulé.",
+    "delete_message": "Supprimer ce message ? Cela ne peut pas être annulé."
   }
 }

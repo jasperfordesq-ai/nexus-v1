@@ -25,6 +25,10 @@
     "open": "Oscailte",
     "closed": "Dúnta"
   },
+  "badges": {
+    "ranked": "Rangaithe",
+    "anonymous": "Anaithnid"
+  },
   "tabs": {
     "open": "Oscailte",
     "closed": "Dúnta",
@@ -74,14 +78,6 @@
   "category_placeholder": "m.sh. Pobal, Imeachtaí, Aiseolas",
   "anonymous_voting": "Vótáil Gan Ainm",
   "anonymous_voting_desc": "Ceil aitheantas na vótálaithe sna torthaí",
-  "aria": {
-    "export_csv": "Easpórtáil torthaí mar CSV",
-    "move_rank_down": "Bog {{option}} síos",
-    "move_rank_up": "Bog {{option}} suas"
-  },
-  "page_meta": {
-    "title": "Pobalbhreith"
-  },
   "ranked_results_title": "Torthaí Babhta ar Bhabhta",
   "round_number": "Babhta {{number}}",
   "eliminated_candidate": "Díbeartha: {{name}}",
@@ -92,13 +88,17 @@
   "view_ranked_results": "Féach ar na torthaí rangaithe",
   "winner_label": "Buaiteoir: {{name}}",
   "submit_rankings": "Cuir an rangú isteach",
-  "badges": {
-    "ranked": "Rangaithe",
-    "anonymous": "Anaithnid"
-  },
-  "loading": "Loading polls...",
+  "loading": "Pobalbhreith á lódáil...",
   "vote_now": "Vote Now",
-  "vote_now_for": "Vote now on: {{question}}",
-  "vote_for_option": "Vote for {{option}} in: {{question}}",
-  "category_filter_label": "Filter by category"
+  "vote_now_for": "Vóta anois ar: {{question}}",
+  "vote_for_option": "Vóta ar son {{option}} in: {{question}}",
+  "aria": {
+    "export_csv": "Easpórtáil torthaí mar CSV",
+    "move_rank_down": "Bog {{option}} síos",
+    "move_rank_up": "Bog {{option}} suas"
+  },
+  "page_meta": {
+    "title": "Pobalbhreith"
+  },
+  "category_filter_label": "Scag de réir catagóire"
 }

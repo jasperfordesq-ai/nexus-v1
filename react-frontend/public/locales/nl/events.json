@@ -84,6 +84,7 @@
     "attendee_rsvp": "RSVP",
     "attendee_checked_in": "Ingecheckt",
     "checkin_progress": "Voortgang van het inchecken",
+    "checkin_progress_chart_aria": "Voortgang van inchecken: {{percent}}% van capaciteit",
     "no_checkin_attendees": "Er zijn nog geen deelnemers om in te checken.",
     "no_checkin_attendees_title": "Nog geen check-ins",
     "check_in": "Inchecken",
@@ -120,6 +121,7 @@
     "waitlist_count": "{{count}} op wachtlijst",
     "cancel_modal_title": "Evenement annuleren",
     "cancel_confirm": "Weet u zeker dat u “{{title}}” wilt annuleren? Hiermee worden alle aanwezigen geïnformeerd.",
+    "cancel_reason_label": "Reden van annulering",
     "cancel_reason_placeholder": "Reden van annulering (optioneel)",
     "keep_event": "Evenement behouden",
     "cancel_event": "Evenement annuleren",
@@ -133,9 +135,7 @@
     "join_meeting_aria": "Deelnemen aan vergadering voor {{title}}",
     "join_waitlist_aria": "Op de wachtlijst voor dit evenement",
     "leave_waitlist_aria": "Wachtlijst voor dit evenement verlaten",
-    "tabs_aria": "Event detail sections",
-    "checkin_progress_chart_aria": "Check-in progress: {{percent}}% of capacity",
-    "cancel_reason_label": "Reason for cancellation"
+    "tabs_aria": "Secties met evenementdetails"
   },
   "card": {
     "cancelled": "Geannuleerd",
@@ -275,14 +275,14 @@
     "coming_soon_desc": "Algemene herinneringsvoorkeuren komen binnenkort beschikbaar. In de tussentijd kunt u vanaf de detailpagina herinneringen instellen voor afzonderlijke gebeurtenissen."
   },
   "polls": {
+    "loading": "Polls laden...",
     "title": "Evenementpeilingen",
     "status_open": "Open",
     "status_closed": "Gesloten",
     "total_votes": "{{count}} stemmen",
     "vote_success": "Stem opgenomen!",
     "vote_failed": "Kan de stemming niet registreren",
-    "view_full": "Bekijk de volledige opiniepeiling",
-    "loading": "Loading polls..."
+    "view_full": "Bekijk de volledige opiniepeiling"
   },
   "radius_5": "5 km",
   "radius_10": "10 km",
@@ -296,9 +296,9 @@
   },
   "count_pill": "{{count}} evenementen",
   "load_more_count": "Meer laden ({{remaining}} resterend)",
+  "loading_more_aria": "Meer evenementen laden",
   "active_filters": "Actieve filters",
   "active_search": "Zoek: {{query}}",
   "active_near_me": "Binnen {{radius}} km",
-  "clear_filters": "Filters wissen",
-  "loading_more_aria": "Loading more events"
+  "clear_filters": "Filters wissen"
 }

@@ -398,7 +398,7 @@
   "skills": {
     "title": "Ihre Fähigkeiten",
     "description": "Fügen Sie Fähigkeiten zu Ihrem Profil hinzu, damit andere Mitglieder Sie finden können. Gemeinschaftsmitglieder können Ihre Fähigkeiten empfehlen.",
-    "loading": "Loading skills..."
+    "loading": "Fähigkeiten werden geladen..."
   },
   "password_modal": {
     "title": "Passwort ändern",
@@ -609,6 +609,6 @@
   },
   "push_campaign_opt_in": "Geförderte Push-Benachrichtigungen erhalten",
   "push_campaign_opt_in_description": "Erlauben Sie lokalen Unternehmen und Organisationen, Ihnen gezielte Push-Benachrichtigungen zu senden. Sie können sich jederzeit abmelden.",
-  "tabs_aria": "Settings sections",
-  "twofa_loading_setup": "Loading two-factor setup..."
+  "tabs_aria": "Abschnitte „Einstellungen“.",
+  "twofa_loading_setup": "Zwei-Faktor-Setup wird geladen..."
 }

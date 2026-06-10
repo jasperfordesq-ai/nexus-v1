@@ -100,6 +100,7 @@
     "create_poll": "投票を作成",
     "listing_title_label": "タイトル",
     "listing_title_placeholder": "あなたが提供しているものまたは探しているものは何ですか？",
+    "listing_type_label": "出品タイプ",
     "listing_offering": "提供",
     "listing_looking_for": "探しているもの",
     "listing_desc_placeholder": "リストの説明...",
@@ -141,6 +142,7 @@
     "image_remove_aria": "画像を削除",
     "group_label": "投稿先",
     "group_placeholder": "公開フィード",
+    "group_search": "グループを検索する",
     "group_members": "{{count}}人のメンバー",
     "ai_title_required": "最初にタイトルを入力してください。AIが説明を生成できるようにします。",
     "ai_generated": "AIによる説明が生成されました！",
@@ -229,9 +231,7 @@
     "file_size_mb": "{{name}} ({{size}}MB)",
     "listing_preview_alt": "??????????",
     "image_preview_alt": "????????????",
-    "listing_type_label": "Listing type",
-    "type_tabs_aria": "Compose content type",
-    "group_search": "Search groups"
+    "type_tabs_aria": "コンテンツタイプを作成する"
   },
   "moderation": {
     "unauthorized": "この操作を実行する権限がありません。"
@@ -343,7 +343,7 @@
       "badge_unlocked": "バッジ解除",
       "level_reached": "レベル到達"
     },
-    "read_more_about": "Read more about {{title}}",
+    "read_more_about": "{{title}} について詳しく読む",
     "detail_course": "コースを見る",
     "type_course": "コース"
   },
@@ -615,9 +615,9 @@
     "not_found": "アイテムが見つかりません",
     "load_failed": "アイテムの読み込みに失敗しました"
   },
-  "controls_region_label": "Feed controls",
-  "new_posts_available": "New posts available",
+  "controls_region_label": "フィード制御",
+  "new_posts_available": "新しい投稿が利用可能",
   "confirm": {
-    "delete_post": "Delete this post? This cannot be undone."
+    "delete_post": "この投稿を削除しますか?これを元に戻すことはできません。"
   }
 }

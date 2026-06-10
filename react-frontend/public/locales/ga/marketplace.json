@@ -1,4 +1,5 @@
 {
+  "breadcrumb": "Breadcrumb",
   "page_title": "Margadh",
   "meta_description": "Ceannaigh, díol nó roinn earraí go háitiúil le comharsana — liostaí margaidh pobail, earraí saor in aisce, ceannacháin ghrúpa, agus seachadtaí laistigh de do bhanc ama.",
   "hub": {
@@ -166,6 +167,7 @@
     "price_type_label": "Cineál Praghais",
     "price_label": "Praghas",
     "currency_label": "Airgeadra",
+    "currency_search": "Cuardaigh airgeadra",
     "location_delivery": "Suíomh & Seachadadh",
     "location_label": "Suíomh",
     "location_placeholder": "Cathair, baile nó ceantar",
@@ -178,11 +180,11 @@
     "created_success": "D'éirigh le cruthú an liosta!",
     "created_error": "Theip ar chruthú an liosta",
     "created_error_retry": "Theip ar chruthú an liosta. Bain triail eile as.",
-    "draft_saved": "Dréacht sábháilte",
-    "currency_search": "Search currency"
+    "draft_saved": "Dréacht sábháilte"
   },
   "search": {
     "page_title": "Cuardaigh an Margadh",
+    "page_heading": "Search Marketplace",
     "meta_description": "Cuardaigh agus scag earraí i margadh an phobail.",
     "breadcrumb_search": "Cuardach",
     "search_placeholder": "Cuardaigh an margadh...",
@@ -221,8 +223,7 @@
     "price_from": "Ó {{min}}",
     "price_up_to": "Suas le {{max}}",
     "last_days_one": "{{count}} lá seo caite",
-    "last_days_other": "{{count}} lá seo caite",
-    "page_heading": "Search Marketplace"
+    "last_days_other": "{{count}} lá seo caite"
   },
   "seller": {
     "page_title": "Próifíl an Díoltóra",
@@ -638,7 +639,7 @@
     "search_this_area": "Cuardaigh an Limistéar Seo",
     "distance_km": "{{km}} km ar shiúl",
     "distance_meters": "{{m}}m ar shiúl",
-    "view_toggle": "View mode"
+    "view_toggle": "Mód amhairc"
   },
   "shipping": {
     "title": "Roghanna Loingseoireachta",
@@ -672,7 +673,7 @@
     "recommended": "Molta",
     "loading": "Roghanna loingseoireachta á luchtú...",
     "no_options": "Níl aon roghanna loingseoireachta ar fáil don díoltóir seo.",
-    "delete_confirm": "Remove this shipping option? This cannot be undone."
+    "delete_confirm": "An bhfuil fonn ort an rogha seolta seo a bhaint? Ní féidir é seo a chealú."
   },
   "listing_location": {
     "location_title": "Suíomh",
@@ -809,12 +810,11 @@
     "not_available_title": "Ag Socrú Próiseála Íocaíochtaí",
     "not_available_description": "Tá próiseáil íocaíochtaí á socrú. Déan teagmháil leis an díoltóir chun íocaíocht a shocrú."
   },
-  "breadcrumb": "Breadcrumb",
-  "buyer_orders_tabs_aria": "Buyer order status filter",
-  "collections_tabs_aria": "Marketplace collections sections",
-  "my_listings_tabs_aria": "My listings status filter",
-  "my_offers_tabs_aria": "My offers sections",
-  "seller_orders_tabs_aria": "Seller order status filter",
-  "seller_profile_tabs_aria": "Seller profile sections",
-  "category_filter_label": "Filter by category"
+  "buyer_orders_tabs_aria": "Scagaire stádais ordú ceannaitheora",
+  "collections_tabs_aria": "Rannóga bailiúcháin an mhargaidh",
+  "my_listings_tabs_aria": "Scagaire stádais mo liostaí",
+  "my_offers_tabs_aria": "Mo rannóga tairiscintí",
+  "seller_orders_tabs_aria": "Scagaire stádais ordú díoltóra",
+  "seller_profile_tabs_aria": "Ailt phróifíl an díoltóra",
+  "category_filter_label": "Scag de réir catagóire"
 }

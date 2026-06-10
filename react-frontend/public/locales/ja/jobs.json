@@ -3,6 +3,7 @@
   "page_title": "求人情報",
   "page_description": "お近くのコミュニティメンバーやパートナー団体が提供する求人、ボランティア活動、タイムバンクのポジションをご覧ください。",
   "subtitle": "コミュニティ内の機会を見つける",
+  "loading": "求人情報を読み込んでいます...",
   "create_vacancy": "求人を投稿する",
   "edit_vacancy": "求人を編集する",
   "my_postings": {
@@ -379,8 +380,8 @@
     "personal_message_placeholder": "候補者へのメモ...",
     "interview_location_placeholder": "https://meet.google.com/...",
     "offer_salary_placeholder": "例: 45000",
-    "tabs_aria": "Job pipeline sections",
-    "change_stage_aria": "Change stage for {{name}}",
+    "tabs_aria": "ジョブ パイプライン セクション",
+    "change_stage_aria": "{{name}} のステージを変更します",
     "event_type": {
       "status_change": "ステータス変更",
       "interview": "面接",
@@ -466,10 +467,10 @@
     "message_applicant": "メッセージ",
     "kanban_board": "カンバンボード",
     "cv_download_error": "履歴書のダウンロードに失敗しました",
-    "confirm_close_title": "Close this vacancy?",
-    "confirm_close": "Closing stops new applications from coming in. You can reopen it at any time.",
-    "confirm_reopen_title": "Reopen this vacancy?",
-    "confirm_reopen": "Reopening makes the vacancy visible again and lets people apply."
+    "confirm_close_title": "この求人を締め切りますか?",
+    "confirm_close": "閉じると、新しいアプリケーションの受信が停止されます。いつでも再度開くことができます。",
+    "confirm_reopen_title": "この求人を再開しますか?",
+    "confirm_reopen": "再開により求人が再び表示され、応募できるようになります。"
   },
   "interview": {
     "schedule": "面接をスケジュールする",
@@ -831,13 +832,13 @@
     "date_to": "に",
     "filter_by_job": "職種でフィルタ",
     "all_jobs": "すべての職種",
+    "search_jobs": "求人を検索する",
     "generate": "レポートを生成",
     "loading": "レポートを生成しています...",
     "no_data": "選択した期間の応募データは利用できません",
     "access_denied": "アクセス拒否",
     "load_error": "バイアス監査レポートの読み込みに失敗しました",
-    "note_privacy": "このレポートはプロセスメトリのみを分析します。人口統計データは収集または使用されません。",
-    "search_jobs": "Search jobs"
+    "note_privacy": "このレポートはプロセスメトリのみを分析します。人口統計データは収集または使用されません。"
   },
   "self_scheduling": {
     "title": "面接スロット",
@@ -1047,6 +1048,5 @@
   "jobs": {
     "view_details": "求人詳細を見る"
   },
-  "tabs_aria": "Jobs view",
-  "loading": "Loading vacancies..."
+  "tabs_aria": "ジョブビュー"
 }

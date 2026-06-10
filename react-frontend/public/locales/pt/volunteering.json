@@ -97,6 +97,7 @@
   "create_opportunity_subtitle": "Crie uma nova oportunidade de voluntariado para a sua organização",
   "form_org_label": "Organização",
   "form_org_placeholder": "Selecione a sua organização",
+  "search_organisations": "Pesquisar organizações",
   "form_org_required": "Selecione uma organização",
   "form_title_label": "Título da Oportunidade",
   "form_title_placeholder": "ex.: Ajudante de Horta Comunitária, Coordenador de Eventos",
@@ -197,6 +198,7 @@
   "all_hours_reviewed": "Todas as submissões de horas de voluntariado foram revistas.",
   "org_hours_approved_paid": "Horário aprovado. Créditos de tempo pagos ao voluntário.",
   "org_hours_approved": "Horário aprovado.",
+  "org_hours_approved_unpaid": "Horas aprovadas. Carregue a carteira para pagar este voluntário.",
   "org_hours_declined": "O horário diminuiu.",
   "org_all_hours_reviewed": "Todas as horas de voluntariado foram revisadas.",
   "org_balance_low_warning": "O saldo pode ser insuficiente para {{count}} horas pendentes.",
@@ -468,6 +470,7 @@
   "aria": {
     "volunteering_sections": "Secções de voluntariado"
   },
+  "filter_by_status": "Filtrar por status",
   "credentials": {
     "heading": "Verificação de credenciais",
     "upload_new": "Carregar nova credencial",
@@ -634,7 +637,7 @@
     "aria_select_all": "Selecionar todas as candidaturas pendentes visíveis",
     "aria_select_application": "Selecione o aplicativo em {{name}}",
     "aria_search_volunteers": "Pesquisar voluntários por nome",
-    "filter_label": "Filter applications"
+    "filter_label": "Filtrar aplicativos"
   },
   "org_wallet_balance": "Saldo da carteira:",
   "auto_pay_on": "Pagamento automático ativado",
@@ -837,8 +840,5 @@
   "my_organisations_none": "Nenhuma organização ainda",
   "my_organisations_none_desc": "Registre uma organização voluntária para começar a publicar oportunidades, gerenciar voluntários e conceder créditos de tempo.",
   "my_organisations_pending": "Aprovação pendente",
-  "my_organisations_pending_desc": "Aguardando aprovação do administrador",
-  "filter_by_status": "Filter by status",
-  "search_organisations": "Search organisations",
-  "org_hours_approved_unpaid": "Horas aprovadas. Carregue a carteira para pagar este voluntário."
+  "my_organisations_pending_desc": "Aguardando aprovação do administrador"
 }

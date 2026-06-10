@@ -398,7 +398,7 @@
   "skills": {
     "title": "Do Scileanna",
     "description": "Cuir scileanna le do phróifíl ionas gur féidir le baill eile tú a aimsiú. Is féidir le baill phobail tacú le do scileanna.",
-    "loading": "Loading skills..."
+    "loading": "Scileanna á lódáil..."
   },
   "password_modal": {
     "title": "Athraigh Pasfhocal",
@@ -609,6 +609,6 @@
   },
   "push_campaign_opt_in": "Fógraí brú maoinithe a fháil",
   "push_campaign_opt_in_description": "Ceadaigh do ghnólachtaí agus eagraíochtaí áitiúla fógraí brú dírithe a sheoladh chugat. Is féidir leat díliostáil am ar bith.",
-  "tabs_aria": "Settings sections",
-  "twofa_loading_setup": "Loading two-factor setup..."
+  "tabs_aria": "Codanna socruithe",
+  "twofa_loading_setup": "Socrú dhá-fhachtóir á lódáil..."
 }

@@ -43,9 +43,9 @@
   "offline_message": "Vous semblez ?tre hors ligne",
   "session_expired": "Session expir?e",
   "session_expired_message": "Votre session a expir?. Reconnectez-vous pour continuer.",
-  "session_expiring": "Your session is about to expire",
-  "session_expiring_message": "Your session will expire in {{seconds}} seconds. Extend your session to stay logged in.",
-  "session_expiring_countdown_aria": "Session expires in {{seconds}} seconds",
-  "extend_session": "Extend session",
+  "session_expiring": "Votre session est sur le point d'expirer",
+  "session_expiring_message": "Votre session expirera dans {{seconds}} secondes. Prolongez votre session pour rester connecté.",
+  "session_expiring_countdown_aria": "La session expire dans {{seconds}} secondes",
+  "extend_session": "Prolonger la session",
   "dismiss": "Fermer"
 }

@@ -84,6 +84,7 @@
     "attendee_rsvp": "Confirmar",
     "attendee_checked_in": "Check-in feito",
     "checkin_progress": "Progresso de Check-in",
+    "checkin_progress_chart_aria": "Progresso do check-in: {{percent}}% da capacidade",
     "no_checkin_attendees": "Ainda sem participantes para fazer check-in.",
     "no_checkin_attendees_title": "Ainda sem check-ins",
     "check_in": "Fazer check-in",
@@ -120,6 +121,7 @@
     "waitlist_count": "{{count}} na lista de espera",
     "cancel_modal_title": "Cancelar Evento",
     "cancel_confirm": "Tem a certeza de que pretende cancelar “{{title}}”? Todos os participantes serão notificados.",
+    "cancel_reason_label": "Motivo do cancelamento",
     "cancel_reason_placeholder": "Motivo do cancelamento (opcional)",
     "keep_event": "Manter Evento",
     "cancel_event": "Cancelar Evento",
@@ -133,9 +135,7 @@
     "join_meeting_aria": "Entrar na reunião de {{title}}",
     "join_waitlist_aria": "Entrar na lista de espera deste evento",
     "leave_waitlist_aria": "Sair da lista de espera deste evento",
-    "tabs_aria": "Event detail sections",
-    "checkin_progress_chart_aria": "Check-in progress: {{percent}}% of capacity",
-    "cancel_reason_label": "Reason for cancellation"
+    "tabs_aria": "Seções de detalhes do evento"
   },
   "card": {
     "cancelled": "Cancelado",
@@ -275,14 +275,14 @@
     "coming_soon_desc": "As preferências globais de lembrete estarão disponíveis em breve. Entretanto, pode definir lembretes em eventos individuais a partir da página de detalhes."
   },
   "polls": {
+    "loading": "Carregando enquetes...",
     "title": "Sondagens do evento",
     "status_open": "Aberta",
     "status_closed": "Fechada",
     "total_votes": "{{count}} votos",
     "vote_success": "Voto registado!",
     "vote_failed": "Falha ao registar voto",
-    "view_full": "Ver sondagem completa",
-    "loading": "Loading polls..."
+    "view_full": "Ver sondagem completa"
   },
   "radius_5": "5 km",
   "radius_10": "10km",
@@ -296,9 +296,9 @@
   },
   "count_pill": "{{count}} eventos",
   "load_more_count": "Carregar mais ({{remaining}} restantes)",
+  "loading_more_aria": "Carregando mais eventos",
   "active_filters": "Filtros ativos",
   "active_search": "Pesquisa: {{query}}",
   "active_near_me": "Dentro de {{radius}} km",
-  "clear_filters": "Limpar filtros",
-  "loading_more_aria": "Loading more events"
+  "clear_filters": "Limpar filtros"
 }

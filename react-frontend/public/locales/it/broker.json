@@ -10,7 +10,7 @@
     "section_compliance": "Conformità e supervisione",
     "section_records": "Record",
     "section_settings": "Impostazioni",
-    "nav_label": "Broker navigation"
+    "nav_label": "Navigazione del broker"
   },
   "header": {
     "toggle_sidebar": "Attiva/disattiva barra laterale",
@@ -194,9 +194,9 @@
     "time_days_ago": "{{count}} g fa",
     "note_system_author": "Sistema",
     "hours_short": "h",
-    "tabs_aria": "Member status filter",
-    "open_notes_for": "Open notes for {{name}}",
-    "send_note": "Send note"
+    "tabs_aria": "Filtro stato membro",
+    "open_notes_for": "Apri le note per {{name}}",
+    "send_note": "Invia nota"
   },
   "onboarding": {
     "title": "Onboarding",
@@ -468,7 +468,7 @@
       "status_changed": "Stato modificato"
     },
     "detail_no_history": "Nessuna cronologia disponibile.",
-    "tabs_aria": "Exchange status filter"
+    "tabs_aria": "Filtro sullo stato dello scambio"
   },
   "messages": {
     "title": "Revisione Messaggi",
@@ -577,7 +577,7 @@
     "copy_reason_flagged_user": "Utente segnalato",
     "copy_reason_manual_monitoring": "Monitoraggio manuale",
     "copy_reason_random_sample": "Campione casuale",
-    "review_tabs_aria": "Message review filter"
+    "review_tabs_aria": "Filtro di revisione dei messaggi"
   },
   "monitoring": {
     "title": "Monitoraggio utenti",
@@ -691,7 +691,7 @@
     "category_reputation": "Reputazione",
     "category_fraud": "Possibile frode",
     "category_other": "Altro",
-    "tabs_aria": "Risk level filter"
+    "tabs_aria": "Filtro del livello di rischio"
   },
   "insurance": {
     "title": "Certificati assicurativi",
@@ -787,7 +787,7 @@
     "label_created": "Creato",
     "label_verified_at": "Verificato il",
     "label_verified_by": "Verificato da",
-    "tabs_aria": "Insurance certificate status filter"
+    "tabs_aria": "Filtro sullo stato del certificato assicurativo"
   },
   "archives": {
     "title": "Archivio revisioni",
@@ -846,7 +846,7 @@
     "severity_medium": "Media",
     "severity_high": "Alta",
     "severity_critical": "Critica",
-    "tabs_aria": "Review archive filter"
+    "tabs_aria": "Rivedi il filtro dell'archivio"
   },
   "configuration": {
     "title": "Configurazione del broker",
@@ -1094,8 +1094,8 @@
     }
   },
   "layout": {
-    "close_navigation": "Close navigation",
+    "close_navigation": "Chiudi la navigazione",
     "navigation": "Navigation",
-    "skip_to_main": "Skip to main content"
+    "skip_to_main": "Passa al contenuto principale"
   }
 }

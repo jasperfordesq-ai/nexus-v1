@@ -342,7 +342,7 @@
     "load_error": "リーダーボードの読み込みに失敗しました。もう一度試してください。",
     "type_nexus_score": "ネクサススコア",
     "load_more": "もっと読み込む",
-    "retry": "Retry loading leaderboard"
+    "retry": "リーダーボードの読み込みを再試行します"
   },
   "community": {
     "total_hours": "合計交換時間数",
@@ -420,7 +420,7 @@
       "legendary": "伝説の"
     },
     "max_score_label": "/{{max}}",
-    "loading": "Loading your NexusScore..."
+    "loading": "NexusScore を読み込んでいます..."
   },
   "common": {
     "refresh": "リフレッシュ",

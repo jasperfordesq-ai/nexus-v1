@@ -24,8 +24,8 @@
     "given": "Gegeben",
     "received": "Erhalten",
     "monthly_activity": "Monatliche Aktivität",
-    "no_data": "Keine Diagrammdaten verfügbar",
-    "monthly_activity_aria": "Bar chart showing monthly hours given and received"
+    "monthly_activity_aria": "Balkendiagramm, das die monatlichen geleisteten und erhaltenen Stunden zeigt",
+    "no_data": "Keine Diagrammdaten verfügbar"
   },
   "recent_activity": "Aktuelle Aktivität",
   "empty_title": "Keine aktuelle Aktivität",

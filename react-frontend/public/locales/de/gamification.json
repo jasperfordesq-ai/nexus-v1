@@ -342,7 +342,7 @@
     "load_error": "Rangliste konnte nicht geladen werden. Bitte versuchen Sie es erneut.",
     "type_nexus_score": "NexusScore",
     "load_more": "Mehr laden",
-    "retry": "Retry loading leaderboard"
+    "retry": "Versuchen Sie erneut, die Bestenliste zu laden"
   },
   "community": {
     "total_hours": "Insgesamt getauschte Stunden",
@@ -420,7 +420,7 @@
       "legendary": "Legendär"
     },
     "max_score_label": "/ {{max}}",
-    "loading": "Loading your NexusScore..."
+    "loading": "Ihr NexusScore wird geladen..."
   },
   "common": {
     "refresh": "Aktualisieren",

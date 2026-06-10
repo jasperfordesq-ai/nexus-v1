@@ -84,6 +84,7 @@
     "attendee_rsvp": "Confirmar",
     "attendee_checked_in": "Registrado",
     "checkin_progress": "Progreso de Registro",
+    "checkin_progress_chart_aria": "Progreso de check-in: {{percent}}% de capacidad",
     "no_checkin_attendees": "Aún no hay asistentes para registrar.",
     "no_checkin_attendees_title": "Aún no hay registros de entrada",
     "check_in": "Registrar",
@@ -120,6 +121,7 @@
     "waitlist_count": "{{count}} en lista de espera",
     "cancel_modal_title": "Cancelar Evento",
     "cancel_confirm": "¿Estás seguro de que quieres cancelar “{{title}}”? Esto notificará a todos los asistentes.",
+    "cancel_reason_label": "Motivo de la cancelación",
     "cancel_reason_placeholder": "Motivo de la cancelación (opcional)",
     "keep_event": "Mantener Evento",
     "cancel_event": "Cancelar Evento",
@@ -133,9 +135,7 @@
     "join_meeting_aria": "Unirse a la reunión de {{title}}",
     "join_waitlist_aria": "Unirse a la lista de espera de este evento",
     "leave_waitlist_aria": "Salir de la lista de espera de este evento",
-    "tabs_aria": "Event detail sections",
-    "checkin_progress_chart_aria": "Check-in progress: {{percent}}% of capacity",
-    "cancel_reason_label": "Reason for cancellation"
+    "tabs_aria": "Secciones de detalles del evento"
   },
   "card": {
     "cancelled": "Cancelado",
@@ -275,14 +275,14 @@
     "coming_soon_desc": "Las preferencias globales de recordatorios estarán disponibles pronto. Mientras tanto, puede configurar recordatorios en eventos individuales."
   },
   "polls": {
+    "loading": "Cargando encuestas...",
     "title": "Encuestas del evento",
     "status_open": "Abierta",
     "status_closed": "Cerrada",
     "total_votes": "{{count}} votos",
     "vote_success": "Voto registrado!",
     "vote_failed": "No se pudo registrar el voto",
-    "view_full": "Ver encuesta completa",
-    "loading": "Loading polls..."
+    "view_full": "Ver encuesta completa"
   },
   "radius_5": "5 kilometros",
   "radius_10": "10 kilometros",
@@ -296,9 +296,9 @@
   },
   "count_pill": "{{count}} eventos",
   "load_more_count": "Cargar más ({{remaining}} restantes)",
+  "loading_more_aria": "Cargando más eventos",
   "active_filters": "Filtros activos",
   "active_search": "Buscar: {{query}}",
   "active_near_me": "Dentro de {{radius}} km",
-  "clear_filters": "Limpiar filtros",
-  "loading_more_aria": "Loading more events"
+  "clear_filters": "Limpiar filtros"
 }

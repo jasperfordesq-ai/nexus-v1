@@ -3,6 +3,8 @@
   "title": "Idee-uitdagingen",
   "subtitle": "Deel ideeën, stem en help je gemeenschap vorm te geven",
   "page_description": "Blader door de gemeenschapsuitdagingen, dien ideeën in en stem op oplossingen. Help de toekomst van je gemeenschap vorm te geven.",
+  "loading": "Loading...",
+  "tabs_filter_aria": "Filter uitdagingen",
   "actions": {
     "retry": "Opnieuw proberen"
   },
@@ -52,7 +54,7 @@
     "create": "Uitdaging maken",
     "load_error": "Kan uitdagingen niet laden",
     "load_more": "Meer laden",
-    "loading": "Loading challenge..."
+    "loading": "Uitdaging laden..."
   },
   "ideas": {
     "title": "Ideeën",
@@ -85,7 +87,7 @@
     "draft_created": "Aangemaakt {{date}}",
     "new_idea": "Nieuw Idee",
     "sort_label": "Ideeën sorteren",
-    "loading": "Loading ideas..."
+    "loading": "Ideeën laden..."
   },
   "idea_detail": {
     "page_title": "Idee Details",
@@ -98,14 +100,14 @@
     "title": "Reacties",
     "empty_title": "Nog Geen Reacties",
     "empty_description": "Wees de eerste om je gedachten over dit idee te delen.",
+    "add_label": "Voeg een opmerking toe",
     "add_placeholder": "Deel je gedachten...",
     "add_button": "Plaats Reactie",
     "delete": "Verwijderen",
     "delete_confirm": "Weet je zeker dat je deze reactie wilt verwijderen?",
     "load_more": "Laad Meer Reacties",
     "load_error": "Kan reacties niet laden",
-    "add_label": "Add a comment",
-    "loading": "Loading comments..."
+    "loading": "Opmerkingen laden..."
   },
   "form": {
     "title_label": "Titel",
@@ -425,10 +427,8 @@
   "challenge_detail": {
     "actions": "Uitdagingsacties"
   },
-  "loading": "Loading...",
-  "tabs_filter_aria": "Filter challenges",
   "confirm": {
-    "delete_task": "Delete this task? This cannot be undone.",
-    "delete_message": "Delete this message? This cannot be undone."
+    "delete_task": "Deze taak verwijderen? Dit kan niet ongedaan worden gemaakt.",
+    "delete_message": "Dit bericht verwijderen? Dit kan niet ongedaan worden gemaakt."
   }
 }

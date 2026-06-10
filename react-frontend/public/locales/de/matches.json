@@ -1,6 +1,4 @@
 {
-  "load_failed": "Matches konnten nicht geladen werden",
-  "match_hidden": "Match ausgeblendet — wir zeigen dir weniger davon",
   "page_title": "Treffer",
   "breadcrumb_dashboard": "Übersicht",
   "breadcrumb_matches": "Treffer",
@@ -25,9 +23,11 @@
   "reasons_more": "+{{count}} mehr",
   "view_details": "Treffer-Details ansehen",
   "not_interested": "Kein Interesse",
+  "load_failed": "Matches konnten nicht geladen werden",
+  "match_hidden": "Match ausgeblendet — wir zeigen dir weniger davon",
   "page_meta": {
     "title": "Treffer"
   },
-  "filter_tabs_aria": "Match source filter",
-  "loading": "Loading matches..."
+  "filter_tabs_aria": "Quellfilter anpassen",
+  "loading": "Spiele werden geladen..."
 }

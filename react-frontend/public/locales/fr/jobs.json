@@ -3,6 +3,7 @@
   "page_title": "Offres d'emploi",
   "page_description": "Parcourez les opportunités d'emploi, les rôles de bénévolat et les postes de banque de temps proposés par les membres de la communauté et les organisations partenaires près de chez vous.",
   "subtitle": "Trouvez des opportunités dans votre communauté",
+  "loading": "Chargement des offres d'emploi...",
   "create_vacancy": "Publier une offre",
   "edit_vacancy": "Modifier l'offre",
   "my_postings": {
@@ -379,8 +380,8 @@
     "personal_message_placeholder": "Une note pour le candidat...",
     "interview_location_placeholder": "https://meet.google.com/...",
     "offer_salary_placeholder": "p. ex. 45000",
-    "tabs_aria": "Job pipeline sections",
-    "change_stage_aria": "Change stage for {{name}}",
+    "tabs_aria": "Sections du pipeline de travaux",
+    "change_stage_aria": "Changer d'étape pour {{name}}",
     "event_type": {
       "status_change": "Changement de statut",
       "interview": "Entretien",
@@ -466,10 +467,10 @@
     "message_applicant": "Message",
     "kanban_board": "Tableau Kanban",
     "cv_download_error": "Échec du téléchargement du CV",
-    "confirm_close_title": "Close this vacancy?",
-    "confirm_close": "Closing stops new applications from coming in. You can reopen it at any time.",
-    "confirm_reopen_title": "Reopen this vacancy?",
-    "confirm_reopen": "Reopening makes the vacancy visible again and lets people apply."
+    "confirm_close_title": "Fermer ce poste ?",
+    "confirm_close": "La fermeture empêche l'arrivée de nouvelles applications. Vous pouvez la rouvrir à tout moment.",
+    "confirm_reopen_title": "Rouvrir ce poste ?",
+    "confirm_reopen": "La réouverture rend le poste vacant à nouveau visible et permet aux personnes de postuler."
   },
   "interview": {
     "schedule": "Planifier un entretien",
@@ -831,13 +832,13 @@
     "date_to": "Au",
     "filter_by_job": "Filtrer par offre",
     "all_jobs": "Toutes les offres",
+    "search_jobs": "Rechercher des emplois",
     "generate": "Générer le rapport",
     "loading": "Génération du rapport...",
     "no_data": "Aucune donnée de candidature disponible pour la période sélectionnée",
     "access_denied": "Accès refusé",
     "load_error": "Échec du chargement du rapport d'audit des biais",
-    "note_privacy": "Ce rapport analyse uniquement les métriques de processus. Aucune donnée démographique n'est collectée ou utilisée.",
-    "search_jobs": "Search jobs"
+    "note_privacy": "Ce rapport analyse uniquement les métriques de processus. Aucune donnée démographique n'est collectée ou utilisée."
   },
   "self_scheduling": {
     "title": "Créneaux d'entretien",
@@ -1047,6 +1048,5 @@
   "jobs": {
     "view_details": "Voir les détails du poste"
   },
-  "tabs_aria": "Jobs view",
-  "loading": "Loading vacancies..."
+  "tabs_aria": "Vue des tâches"
 }

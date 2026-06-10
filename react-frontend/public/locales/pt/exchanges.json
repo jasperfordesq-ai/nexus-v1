@@ -5,7 +5,7 @@
   "browse_listings": "Explorar Anúncios",
   "load_more": "Carregar Mais",
   "try_again": "Tentar Novamente",
-  "loading": "Loading exchanges...",
+  "loading": "Carregando trocas...",
   "service_exchange": "Troca de Serviço",
   "unknown": "Desconhecido",
   "hours_count": "{{count}} hora",
@@ -109,7 +109,7 @@
     "ratings": "Avaliações",
     "rate_exchange": "Avaliar Esta Troca",
     "prep_time_value": "{{count}}h",
-    "rating_value": "Rating: {{rating}} out of 5"
+    "rating_value": "Avaliação: {{rating}} de 5"
   },
   "modal": {
     "decline_title": "Recusar Pedido de Troca",

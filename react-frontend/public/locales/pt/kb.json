@@ -1,4 +1,5 @@
 {
+  "breadcrumb": "Breadcrumb",
   "title": "Base de Conhecimento",
   "description": "Encontre respostas, guias e recursos úteis",
   "search_placeholder": "Pesquisar na base de conhecimento...",
@@ -51,9 +52,8 @@
   "all_categories": "Tudo",
   "author_by": "por {{name}}",
   "attachments": "Anexos",
-  "breadcrumb": "Breadcrumb",
-  "category_tabs_aria": "Knowledge base categories",
-  "loading": "Loading knowledge base...",
+  "category_tabs_aria": "Categorias da base de conhecimento",
+  "loading": "Carregando base de conhecimento...",
   "article_count_one": "{{count}} article",
   "article_count_other": "{{count}} articles",
   "category_count_one": "{{count}} category",

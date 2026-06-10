@@ -84,6 +84,7 @@
     "attendee_rsvp": "Confirmer sa présence",
     "attendee_checked_in": "Enregistré(e)",
     "checkin_progress": "Progression de l'enregistrement",
+    "checkin_progress_chart_aria": "Progression de l'enregistrement : {{percent}} % de la capacité",
     "no_checkin_attendees": "Aucun participant à enregistrer pour l'instant.",
     "no_checkin_attendees_title": "Aucune arrivée enregistrée",
     "check_in": "Enregistrer",
@@ -120,6 +121,7 @@
     "waitlist_count": "{{count}} en liste d'attente",
     "cancel_modal_title": "Annuler l'événement",
     "cancel_confirm": "Êtes-vous sûr(e) de vouloir annuler « {{title}} » ? Tous les participants seront notifiés.",
+    "cancel_reason_label": "Raison de l'annulation",
     "cancel_reason_placeholder": "Motif de l'annulation (facultatif)",
     "keep_event": "Garder l'événement",
     "cancel_event": "Annuler l'événement",
@@ -133,9 +135,7 @@
     "join_meeting_aria": "Rejoindre la réunion pour {{title}}",
     "join_waitlist_aria": "Rejoindre la liste d'attente de cet événement",
     "leave_waitlist_aria": "Quitter la liste d'attente de cet événement",
-    "tabs_aria": "Event detail sections",
-    "checkin_progress_chart_aria": "Check-in progress: {{percent}}% of capacity",
-    "cancel_reason_label": "Reason for cancellation"
+    "tabs_aria": "Sections de détails de l'événement"
   },
   "card": {
     "cancelled": "Annulé",
@@ -275,14 +275,14 @@
     "coming_soon_desc": "Les préférences de rappel globales seront bientôt disponibles. En attendant, vous pouvez configurer des rappels pour chaque événement depuis sa page de détails."
   },
   "polls": {
+    "loading": "Chargement des sondages...",
     "title": "Sondages de l'événement",
     "status_open": "Ouvert",
     "status_closed": "Fermé",
     "total_votes": "{{count}} voix",
     "vote_success": "Vote enregistré !",
     "vote_failed": "Impossible d'enregistrer le vote",
-    "view_full": "Voir le sondage complet",
-    "loading": "Loading polls..."
+    "view_full": "Voir le sondage complet"
   },
   "radius_5": "5km",
   "radius_10": "10km",
@@ -296,9 +296,9 @@
   },
   "count_pill": "{{count}} événements",
   "load_more_count": "Charger plus ({{remaining}} restants)",
+  "loading_more_aria": "Chargement de plus d'événements",
   "active_filters": "Filtres actifs",
   "active_search": "Rechercher : {{query}}",
   "active_near_me": "Dans un rayon de {{radius}} km",
-  "clear_filters": "Effacer les filtres",
-  "loading_more_aria": "Loading more events"
+  "clear_filters": "Effacer les filtres"
 }

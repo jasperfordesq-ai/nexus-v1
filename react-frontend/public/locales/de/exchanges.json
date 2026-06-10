@@ -5,7 +5,7 @@
   "browse_listings": "Angebote durchsuchen",
   "load_more": "Mehr laden",
   "try_again": "Erneut versuchen",
-  "loading": "Loading exchanges...",
+  "loading": "Börsen werden geladen...",
   "service_exchange": "Dienstleistungstausch",
   "unknown": "Unbekannt",
   "hours_count": "{{count}} Stunde",
@@ -109,7 +109,7 @@
     "ratings": "Bewertungen",
     "rate_exchange": "Diesen Tausch bewerten",
     "prep_time_value": "{{count}}h",
-    "rating_value": "Rating: {{rating}} out of 5"
+    "rating_value": "Bewertung: {{rating}} von 5"
   },
   "modal": {
     "decline_title": "Tauschanfrage ablehnen",

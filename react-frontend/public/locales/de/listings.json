@@ -284,6 +284,8 @@
   "clear_filters": "Filter zurücksetzen",
   "results_count": "{{count}} Inserate gefunden",
   "results_loading": "Einträge werden gesucht",
+  "loading_progress": "Einträge werden geladen",
+  "filter_form_label": "Einträge filtern",
   "radius_5": "5 km",
   "radius_10": "10 km",
   "radius_25": "25 km",
@@ -338,7 +340,5 @@
   "listing_image_alt": "Auflistungsbild",
   "open_listing_aria": "Eintrag öffnen: {{title}}",
   "distance_meters": "{{distance}} m",
-  "distance_kilometers": "{{distance}} km",
-  "loading_progress": "Loading listings",
-  "filter_form_label": "Filter listings"
+  "distance_kilometers": "{{distance}} km"
 }

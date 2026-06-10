@@ -123,6 +123,7 @@
     "search_placeholder": "Leden zoeken...",
     "aria_search": "Zoek federatieleden",
     "all_communities": "Alle gemeenschappen",
+    "search_communities": "Zoek gemeenschappen",
     "aria_filter_community": "Filter op gemeenschap",
     "service_reach_filter": "Filter op servicebereik",
     "reach_all": "Alle",
@@ -149,8 +150,7 @@
     "external_profile_title": "Extern lid",
     "external_profile_message": "Dit lid bevindt zich op een extern partnerplatform. Directe profielweergave is niet beschikbaar.",
     "external_member": "Extern lid",
-    "member_fallback": "Lid",
-    "search_communities": "Search communities"
+    "member_fallback": "Lid"
   },
   "messages": {
     "page_title": "Federatie berichten",
@@ -217,9 +217,9 @@
     "message_placeholder": "Schrijf uw bericht...",
     "cancel": "Annuleren",
     "send_message": "Bericht verzenden",
-    "thread_aria_no_unread": "Conversation with {{name}} from {{tenant}}",
-    "thread_aria_unread": "Conversation with {{name}} from {{tenant}}, {{count}} unread message",
-    "thread_aria_unread_plural": "Conversation with {{name}} from {{tenant}}, {{count}} unread messages"
+    "thread_aria_no_unread": "Gesprek met {{name}} van {{tenant}}",
+    "thread_aria_unread": "Gesprek met {{name}} van {{tenant}}, {{count}} ongelezen bericht",
+    "thread_aria_unread_plural": "Gesprek met {{name}} van {{tenant}}, {{count}} ongelezen berichten"
   },
   "listings": {
     "page_title": "Federatie-vermeldingen",
@@ -229,6 +229,7 @@
     "subtitle": "Blader door aanbiedingen en verzoeken van leden uit partnergemeenschappen.",
     "search_placeholder": "Advertenties zoeken...",
     "all_communities": "Alle gemeenschappen",
+    "search_communities": "Zoek gemeenschappen",
     "filter_by_community": "Filter op gemeenschap",
     "filter_by_type": "Filter op type",
     "type_all": "Alle",
@@ -248,8 +249,7 @@
     "hours_estimated": "~{{hours}}h",
     "view_profile": "Bekijk profiel",
     "contact_author": "Contact",
-    "close": "Dichtbij",
-    "search_communities": "Search communities"
+    "close": "Dichtbij"
   },
   "settings": {
     "page_title": "Federatie-instellingen",
@@ -317,6 +317,7 @@
     "search_placeholder": "Zoek evenementen...",
     "filter_by_community": "Filter op gemeenschap",
     "all_communities": "Alle gemeenschappen",
+    "search_communities": "Zoek gemeenschappen",
     "upcoming_only": "Alleen aankomende",
     "unable_to_load": "Kan gebeurtenissen niet laden",
     "try_again": "Probeer het opnieuw",
@@ -329,8 +330,7 @@
     "online": "Online",
     "date_at_time": "{{date}} om {{time}}",
     "attendees_going_one": "{{count}} gaat",
-    "attendees_going_other": "{{count}} gaan",
-    "search_communities": "Search communities"
+    "attendees_going_other": "{{count}} gaan"
   },
   "groups": {
     "page_title": "Federatie groepen",
@@ -341,6 +341,7 @@
     "search_placeholder": "Groepen zoeken...",
     "filter_by_community": "Filter op gemeenschap",
     "all_communities": "Alle gemeenschappen",
+    "search_communities": "Zoek gemeenschappen",
     "unable_to_load": "Kan groepen niet laden",
     "try_again": "Probeer het opnieuw",
     "empty_title": "Geen groepen gevonden",
@@ -350,8 +351,7 @@
     "load_more_error": "Kan niet meer groepen laden.",
     "member_count": "{{count}} lid",
     "member_count_plural": "{{count}} leden",
-    "private": "Privé",
-    "search_communities": "Search communities"
+    "private": "Privé"
   },
   "connections": {
     "page_title": "Federatieverbindingen",
@@ -382,7 +382,7 @@
     "rejected_success": "Verbinding geweigerd",
     "removed_success": "Verbinding verwijderd",
     "action_failed": "Actie mislukt. Probeer het opnieuw.",
-    "tabs_aria": "Federation connection status"
+    "tabs_aria": "Federatie-verbindingsstatus"
   },
   "partner_detail": {
     "page_title": "Partnergemeenschap",

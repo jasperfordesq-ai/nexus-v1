@@ -284,6 +284,8 @@
   "clear_filters": "フィルターをクリア",
   "results_count": "{{count}} 件のリスティングが見つかりました",
   "results_loading": "投稿を検索中",
+  "loading_progress": "リストを読み込み中",
+  "filter_form_label": "リストのフィルタリング",
   "radius_5": "5km",
   "radius_10": "10km",
   "radius_25": "25km",
@@ -338,7 +340,5 @@
   "listing_image_alt": "出品画像",
   "open_listing_aria": "投稿を開く: {{title}}",
   "distance_meters": "{{distance}} 分",
-  "distance_kilometers": "{{distance}} km",
-  "loading_progress": "Loading listings",
-  "filter_form_label": "Filter listings"
+  "distance_kilometers": "{{distance}} km"
 }

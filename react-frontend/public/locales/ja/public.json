@@ -831,6 +831,6 @@
       "title": "メンテナンス"
     }
   },
-  "unknown_error": "Unknown error",
-  "release_stage": "Generally Available (v1.5.1)"
+  "unknown_error": "不明なエラー",
+  "release_stage": "一般提供 (v1.5.1)"
 }

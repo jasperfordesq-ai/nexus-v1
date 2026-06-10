@@ -3,6 +3,8 @@
   "title": "アイデアチャレンジ",
   "subtitle": "アイデアを共有し、投票して、コミュニティを形作る手助けをしましょう",
   "page_description": "コミュニティのチャレンジを閲覧し、アイデアを提出し、解決策に投票しましょう。あなたのコミュニティの未来を形作る手助けをしましょう。",
+  "loading": "Loading...",
+  "tabs_filter_aria": "フィルターの課題",
   "actions": {
     "retry": "再試行"
   },
@@ -52,7 +54,7 @@
     "create": "チャレンジを作成",
     "load_error": "チャレンジを読み込めません",
     "load_more": "もっと読み込む",
-    "loading": "Loading challenge..."
+    "loading": "チャレンジを読み込み中..."
   },
   "ideas": {
     "title": "アイデア",
@@ -85,7 +87,7 @@
     "draft_created": "作成された {{date}}",
     "new_idea": "新しいアイデア",
     "sort_label": "アイデアを並べ替え",
-    "loading": "Loading ideas..."
+    "loading": "アイデアを読み込んでいます..."
   },
   "idea_detail": {
     "page_title": "アイデアの詳細",
@@ -98,14 +100,14 @@
     "title": "コメント",
     "empty_title": "まだコメントはありません",
     "empty_description": "このアイデアについてあなたの考えを最初に共有しましょう。",
+    "add_label": "コメントを追加する",
     "add_placeholder": "あなたの考えを共有...",
     "add_button": "コメントを投稿",
     "delete": "削除",
     "delete_confirm": "このコメントを削除してもよろしいですか？",
     "load_more": "さらにコメントを読み込む",
     "load_error": "コメントを読み込めません",
-    "add_label": "Add a comment",
-    "loading": "Loading comments..."
+    "loading": "コメントを読み込んでいます..."
   },
   "form": {
     "title_label": "タイトル",
@@ -425,10 +427,8 @@
   "challenge_detail": {
     "actions": "チャレンジアクション"
   },
-  "loading": "Loading...",
-  "tabs_filter_aria": "Filter challenges",
   "confirm": {
-    "delete_task": "Delete this task? This cannot be undone.",
-    "delete_message": "Delete this message? This cannot be undone."
+    "delete_task": "このタスクを削除しますか?これを元に戻すことはできません。",
+    "delete_message": "このメッセージを削除しますか?これを元に戻すことはできません。"
   }
 }

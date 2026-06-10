@@ -97,6 +97,7 @@
   "create_opportunity_subtitle": "خلق فرصة تطوعية جديدة لمؤسستك",
   "form_org_label": "منظمة",
   "form_org_placeholder": "حدد مؤسستك",
+  "search_organisations": "منظمات البحث",
   "form_org_required": "الرجاء تحديد منظمة",
   "form_title_label": "عنوان الفرصة",
   "form_title_placeholder": "على سبيل المثال، مساعد حديقة المجتمع، منسق الأحداث",
@@ -197,6 +198,7 @@
   "all_hours_reviewed": "لقد تم استيعابك جميعًا — تمت مراجعة كل إرسال.",
   "org_hours_approved_paid": "الساعات المعتمدة. الاعتمادات الزمنية المدفوعة للمتطوعين.",
   "org_hours_approved": "الساعات المعتمدة.",
+  "org_hours_approved_unpaid": "تمت الموافقة على الساعات. اشحن المحفظة لدفع أجر هذا المتطوع.",
   "org_hours_declined": "ساعات انخفضت.",
   "org_all_hours_reviewed": "تمت مراجعة كافة الساعات التطوعية.",
   "org_balance_low_warning": "قد لا يكون الرصيد كافيًا لمدة {{count}} من الساعات المعلقة.",
@@ -468,6 +470,7 @@
   "aria": {
     "volunteering_sections": "أقسام التطوع"
   },
+  "filter_by_status": "التصفية حسب الحالة",
   "credentials": {
     "heading": "التحقق من بيانات الاعتماد",
     "upload_new": "تحميل بيانات الاعتماد الجديدة",
@@ -634,7 +637,7 @@
     "aria_select_all": "حدد جميع التطبيقات المعلقة المرئية",
     "aria_select_application": "حدد التطبيق من {{name}}",
     "aria_search_volunteers": "بحث المتطوعين بالاسم",
-    "filter_label": "Filter applications"
+    "filter_label": "تطبيقات التصفية"
   },
   "org_wallet_balance": "رصيد المحفظة:",
   "auto_pay_on": "تشغيل الدفع التلقائي",
@@ -837,8 +840,5 @@
   "my_organisations_none": "لا توجد منظمات حتى الآن",
   "my_organisations_none_desc": "قم بتسجيل منظمة تطوعية لبدء نشر الفرص وإدارة المتطوعين ومنح الاعتمادات الزمنية.",
   "my_organisations_pending": "في انتظار الموافقة",
-  "my_organisations_pending_desc": "في انتظار موافقة المشرف",
-  "filter_by_status": "Filter by status",
-  "search_organisations": "Search organisations",
-  "org_hours_approved_unpaid": "تمت الموافقة على الساعات. اشحن المحفظة لدفع أجر هذا المتطوع."
+  "my_organisations_pending_desc": "في انتظار موافقة المشرف"
 }

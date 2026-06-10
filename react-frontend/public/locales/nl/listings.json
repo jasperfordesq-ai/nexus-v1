@@ -284,6 +284,8 @@
   "clear_filters": "Filters wissen",
   "results_count": "{{count}} vermeldingen gevonden",
   "results_loading": "Vermeldingen zoeken",
+  "loading_progress": "Advertenties laden",
+  "filter_form_label": "Filter vermeldingen",
   "radius_5": "5 km",
   "radius_10": "10 km",
   "radius_25": "25 km",
@@ -338,7 +340,5 @@
   "listing_image_alt": "Afbeelding van vermelding",
   "open_listing_aria": "Vermelding openen: {{title}}",
   "distance_meters": "{{distance}} m",
-  "distance_kilometers": "{{distance}} kilometer",
-  "loading_progress": "Loading listings",
-  "filter_form_label": "Filter listings"
+  "distance_kilometers": "{{distance}} kilometer"
 }

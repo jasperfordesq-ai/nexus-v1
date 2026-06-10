@@ -398,7 +398,7 @@
   "skills": {
     "title": "Vos compétences",
     "description": "Ajoutez des compétences à votre profil pour que les autres membres puissent vous trouver. Les membres de la communauté peuvent approuver vos compétences.",
-    "loading": "Loading skills..."
+    "loading": "Chargement des compétences..."
   },
   "password_modal": {
     "title": "Changer le mot de passe",
@@ -609,6 +609,6 @@
   },
   "push_campaign_opt_in": "Recevoir des notifications push sponsorisées",
   "push_campaign_opt_in_description": "Autorisez les entreprises et organisations locales à vous envoyer des notifications push ciblées. Vous pouvez vous désabonner à tout moment.",
-  "tabs_aria": "Settings sections",
-  "twofa_loading_setup": "Loading two-factor setup..."
+  "tabs_aria": "Sections de paramètres",
+  "twofa_loading_setup": "Chargement de la configuration à deux facteurs..."
 }

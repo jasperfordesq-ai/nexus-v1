@@ -128,8 +128,11 @@
   },
   "organisations": {
     "page_title": "Organizzazioni",
+    "page_description": "Scopri organizzazioni di volontariato, partner locali e gruppi comunitari che offrono opportunità, supporto e servizi tramite la tua rete di banca del tempo.",
     "heading": "Organizzazioni",
     "subtitle": "Scopra le organizzazioni di volontariato nella Sua comunità",
+    "hero_eyebrow": "Partner locali di fiducia",
+    "hero_partners_label": "Partner mostrati",
     "breadcrumb_volunteering": "Volontariato",
     "breadcrumb_organisations": "Organizzazioni",
     "search_placeholder": "Cerca organizzazioni...",
@@ -140,6 +143,9 @@
     "no_organisations_found": "Nessuna organizzazione trovata",
     "try_different_search": "Provi con un altro termine di ricerca",
     "no_organisations_available": "Nessuna organizzazione di volontariato disponibile al momento",
+    "empty_tip_volunteer": "Gruppi di volontariato",
+    "empty_tip_partner": "Partner comunitari",
+    "empty_tip_register": "Registra un'organizzazione",
     "load_more": "Carica altro",
     "volunteer_count": "{{count}} volontari",
     "hours_logged": "{{hours}}h registrate",
@@ -179,13 +185,7 @@
     "terms_required": "Deve accettare i termini per registrare la Sua organizzazione.",
     "opportunity_count_one": "{{count}} opportunità",
     "opportunity_count_other": "{{count}} opportunità",
-    "page_description": "Scopri organizzazioni di volontariato, partner locali e gruppi comunitari che offrono opportunità, supporto e servizi tramite la tua rete di banca del tempo.",
-    "hero_eyebrow": "Partner locali di fiducia",
-    "hero_partners_label": "Partner mostrati",
-    "empty_tip_volunteer": "Gruppi di volontariato",
-    "empty_tip_partner": "Partner comunitari",
-    "empty_tip_register": "Registra un'organizzazione",
-    "loading": "Loading organisations"
+    "loading": "Caricamento organizzazioni"
   },
   "organisation_detail": {
     "page_title": "Organizzazione",
@@ -196,6 +196,7 @@
     "not_found": "Organizzazione non trovata.",
     "error_load_retry": "Caricamento dei dettagli dell'organizzazione non riuscito. La preghiamo di riprovare.",
     "unable_to_load": "Impossibile caricare l'organizzazione",
+    "meta_description_fallback": "Esplora {{name}} e {{count}} opportunità di volontariato attive su questa banca del tempo comunitaria.",
     "try_again": "Riprova",
     "browse_organisations": "Sfoglia le organizzazioni",
     "website": "Sito web",
@@ -218,8 +219,7 @@
     "cancel": "Annulla",
     "submit_application": "Invia candidatura",
     "job_openings": "Posizioni aperte",
-    "meta_description_fallback": "Esplora {{name}} e {{count}} opportunità di volontariato attive su questa banca del tempo comunitaria.",
-    "rating_sr": "{{n}} out of 5 stars"
+    "rating_sr": "{{n}} su 5 stelle"
   },
   "emergency_alerts": {
     "heading": "Avvisi di Emergenza",
@@ -287,11 +287,11 @@
     "load_failed": "Impossibile caricare i certificati",
     "load_error": "Impossibile caricare i certificati."
   },
+  "remote": "Da remoto",
+  "closes_date": "Chiude il {{date}}",
   "page_meta": {
     "register_organisation": {
       "title": "Registrare l'Organizzazione"
     }
-  },
-  "remote": "Da remoto",
-  "closes_date": "Chiude il {{date}}"
+  }
 }

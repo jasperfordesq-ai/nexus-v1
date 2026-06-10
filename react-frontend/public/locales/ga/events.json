@@ -84,6 +84,7 @@
     "attendee_rsvp": "RSVP",
     "attendee_checked_in": "Seiceáilte Isteach",
     "checkin_progress": "Dul Chun Cinn Seiceála",
+    "checkin_progress_chart_aria": "Seiceáil isteach: {{percent}} % den acmhainn",
     "no_checkin_attendees": "Gan freastalaitheoirí le seiceáil isteach fós.",
     "no_checkin_attendees_title": "Níl aon seiceáil isteach go fóill",
     "check_in": "Seiceáil Isteach",
@@ -120,6 +121,7 @@
     "waitlist_count": "{{count}} ar an liosta feithimh",
     "cancel_modal_title": "Cealaigh Imeacht",
     "cancel_confirm": "An bhfuil tú cinnte gur mhaith leat “{{title}}” a chealú? Cuirfear gach freastalaitheoir ar an eolas.",
+    "cancel_reason_label": "An chúis le cealú",
     "cancel_reason_placeholder": "Cúis le cealú (roghnach)",
     "keep_event": "Coinnigh an tImeacht",
     "cancel_event": "Cealaigh Imeacht",
@@ -133,9 +135,7 @@
     "join_meeting_aria": "Glac páirt sa chruinniú do {{title}}",
     "join_waitlist_aria": "Téigh ar liosta feithimh an imeachta seo",
     "leave_waitlist_aria": "Fág liosta feithimh an imeachta seo",
-    "tabs_aria": "Event detail sections",
-    "checkin_progress_chart_aria": "Check-in progress: {{percent}}% of capacity",
-    "cancel_reason_label": "Reason for cancellation"
+    "tabs_aria": "Rannóga sonraí imeachta"
   },
   "card": {
     "cancelled": "Cealaithe",
@@ -275,14 +275,14 @@
     "coming_soon_desc": "Tá roghanna meabhrúcháin domhanda ag teacht go luath. Idir an dá linn, is féidir leat meabhrúcháin a shocrú ar imeachtaí aonair ón leathanach sonraí."
   },
   "polls": {
+    "loading": "Pobalbhreith á lódáil...",
     "title": "Pobalbhreitheanna Imeachta",
     "status_open": "Oscailte",
     "status_closed": "Dúnta",
     "total_votes": "{{count}} vóta",
     "vote_success": "Vóta taifeadta!",
     "vote_failed": "Theip ar vóta a thaifeadadh",
-    "view_full": "Féach ar an bpobalbhreith iomlán",
-    "loading": "Loading polls..."
+    "view_full": "Féach ar an bpobalbhreith iomlán"
   },
   "radius_5": "5 km",
   "radius_10": "10 km",
@@ -296,9 +296,9 @@
   },
   "count_pill": "{{count}} imeacht",
   "load_more_count": "Lódáil tuilleadh ({{remaining}} fágtha)",
+  "loading_more_aria": "Tuilleadh imeachtaí á lódáil",
   "active_filters": "Scagairí gníomhacha",
   "active_search": "Cuardaigh: {{query}}",
   "active_near_me": "Laistigh de {{radius}} km",
-  "clear_filters": "Glan na scagairí",
-  "loading_more_aria": "Loading more events"
+  "clear_filters": "Glan na scagairí"
 }

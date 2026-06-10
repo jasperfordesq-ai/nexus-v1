@@ -88,6 +88,10 @@
   "view_ranked_results": "Voir les résultats classés",
   "winner_label": "Gagnant : {{name}}",
   "submit_rankings": "Envoyer le classement",
+  "loading": "Chargement des sondages...",
+  "vote_now": "Vote Now",
+  "vote_now_for": "Votez maintenant sur : {{question}}",
+  "vote_for_option": "Votez pour {{option}} dans : {{question}}",
   "aria": {
     "export_csv": "Exporter les résultats en CSV",
     "move_rank_down": "Déplacer {{option}} vers le bas",
@@ -96,9 +100,5 @@
   "page_meta": {
     "title": "Sondages"
   },
-  "loading": "Loading polls...",
-  "vote_now": "Vote Now",
-  "vote_now_for": "Vote now on: {{question}}",
-  "vote_for_option": "Vote for {{option}} in: {{question}}",
-  "category_filter_label": "Filter by category"
+  "category_filter_label": "Filtrer par catégorie"
 }

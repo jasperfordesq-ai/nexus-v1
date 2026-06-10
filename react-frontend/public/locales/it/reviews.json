@@ -1,21 +1,21 @@
 {
   "page_title": "Recensioni",
   "tabs": {
+    "received": "Recensioni ricevute",
     "given": "Recensioni date",
-    "pending": "Recensioni in sospeso",
-    "received": "Recensioni ricevute"
+    "pending": "Recensioni in sospeso"
   },
   "stats": {
     "average": "Valutazione media",
-    "no_reviews": "Nessuna recensione ancora",
-    "total": "Recensioni totali"
+    "total": "Recensioni totali",
+    "no_reviews": "Nessuna recensione ancora"
   },
   "review_card": {
     "anonymous": "Anonimo",
     "delete": "Elimina recensione",
     "delete_confirm": "Sei sicuro di voler eliminare questa recensione?",
-    "delete_error": "Eliminazione della recensione non riuscita",
-    "delete_success": "Recensione eliminata"
+    "delete_success": "Recensione eliminata",
+    "delete_error": "Eliminazione della recensione non riuscita"
   },
   "pending": {
     "empty": "Nessuna recensione in sospeso",
@@ -34,5 +34,5 @@
   "load_more": "Carica altro",
   "stars": "{{count}} stella",
   "stars_plural": "{{count}} stelle",
-  "rating_aria": "{{n}} out of 5 stars"
+  "rating_aria": "{{n}} su 5 stelle"
 }

@@ -398,7 +398,7 @@
   "skills": {
     "title": "مهاراتك",
     "description": "أضف المهارات إلى ملفك الشخصي حتى يتمكن الأعضاء الآخرون من العثور عليك. يمكن لأعضاء المجتمع تأييد مهاراتك.",
-    "loading": "Loading skills..."
+    "loading": "تحميل المهارات..."
   },
   "password_modal": {
     "title": "تغيير كلمة المرور",
@@ -609,6 +609,6 @@
   },
   "push_campaign_opt_in": "تلقي إشعارات دفع مروّجة",
   "push_campaign_opt_in_description": "السماح للشركات والمنظمات المحلية بإرسال إشعارات دفع مستهدفة إليك. يمكنك إلغاء الاشتراك في أي وقت.",
-  "tabs_aria": "Settings sections",
-  "twofa_loading_setup": "Loading two-factor setup..."
+  "tabs_aria": "أقسام الإعدادات",
+  "twofa_loading_setup": "جارٍ تحميل الإعداد الثنائي..."
 }

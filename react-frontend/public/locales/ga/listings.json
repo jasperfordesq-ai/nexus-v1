@@ -284,6 +284,8 @@
   "clear_filters": "Glan na scagairí",
   "results_count": "{{count}} liosta aimsithe",
   "results_loading": "Liostaí á n-aimsiú",
+  "loading_progress": "Liostaí á lódáil",
+  "filter_form_label": "Scag liostaí",
   "radius_5": "5 km",
   "radius_10": "10 km",
   "radius_25": "25 km",
@@ -338,7 +340,5 @@
   "listing_image_alt": "Íomhá liostú",
   "open_listing_aria": "Oscail an liosta: {{title}}",
   "distance_meters": "{{distance}} m",
-  "distance_kilometers": "{{distance}} km",
-  "loading_progress": "Loading listings",
-  "filter_form_label": "Filter listings"
+  "distance_kilometers": "{{distance}} km"
 }

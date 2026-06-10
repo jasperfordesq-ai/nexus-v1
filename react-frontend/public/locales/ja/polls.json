@@ -88,6 +88,10 @@
   "view_ranked_results": "順位結果を見る",
   "winner_label": "勝者: {{name}}",
   "submit_rankings": "順位を送信",
+  "loading": "投票を読み込んでいます...",
+  "vote_now": "Vote Now",
+  "vote_now_for": "今すぐ投票してください: {{question}}",
+  "vote_for_option": "{{question}} で {{option}} に投票します。",
   "aria": {
     "export_csv": "結果をCSVとしてエクスポート",
     "move_rank_down": "{{option}} を下に移動",
@@ -96,9 +100,5 @@
   "page_meta": {
     "title": "投票"
   },
-  "loading": "Loading polls...",
-  "vote_now": "Vote Now",
-  "vote_now_for": "Vote now on: {{question}}",
-  "vote_for_option": "Vote for {{option}} in: {{question}}",
-  "category_filter_label": "Filter by category"
+  "category_filter_label": "カテゴリでフィルタリングする"
 }

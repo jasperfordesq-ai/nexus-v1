@@ -1,5 +1,8 @@
 {
   "cancel": "Abbrechen",
+  "comments": {
+    "edit_label": "Kommentar bearbeiten"
+  },
   "comments_title": "Kommentare",
   "copy_failed": "Link konnte nicht kopiert werden",
   "copy_link": "Link kopieren",
@@ -68,6 +71,7 @@
   },
   "status": {
     "set_status": "Status setzen",
+    "set_status_current": "Status setzen (aktuell: {{status}})",
     "online": "Online",
     "online_desc": "Für andere sichtbar",
     "away": "Abwesend",
@@ -84,8 +88,7 @@
     "status_label": "Status",
     "status_placeholder": "In einem Meeting",
     "char_count": "{{current}}/80 Zeichen",
-    "offline": "Offline",
-    "set_status_current": "Set status (currently: {{status}})"
+    "offline": "Offline"
   },
   "endorse": {
     "tooltip_remove": "Empfehlung für {{skillName}} entfernen",
@@ -105,9 +108,10 @@
     "no_collection": "Allgemein (keine Sammlung)",
     "new_collection": "Neue Sammlung",
     "collection_name": "Sammlungsname",
-    "confirm_create": "Create collection"
+    "confirm_create": "Sammlung erstellen"
   },
   "bookmarks": {
+    "loading": "Lesezeichen werden geladen...",
     "page_title": "Gespeichert",
     "meta_description": "Überprüfen und organisieren Sie Ihre gespeicherten Beiträge, Anzeigen, Veranstaltungen, Stellen, Blogbeiträge und Diskussionen.",
     "title": "Gespeicherte Artikel",
@@ -115,6 +119,7 @@
     "new_collection": "Neue Sammlung",
     "all_items": "Alle",
     "collection_filter_label": "Sammlung",
+    "collection_search": "Sammlungen durchsuchen",
     "tab_all": "Alle",
     "count": "{{count}} gespeicherte Artikel",
     "remove": "Aus Gespeichertem entfernen",
@@ -148,9 +153,7 @@
     "collection_description": "Beschreibung (optional)",
     "cancel": "Abbrechen",
     "save": "Speichern",
-    "create": "Erstellen",
-    "loading": "Loading bookmarks...",
-    "collection_search": "Search collections"
+    "create": "Erstellen"
   },
   "verified": "Verifiziert",
   "hover_card": {
@@ -162,9 +165,6 @@
     "connections": "{{count}} Verbindungen",
     "listings": "{{count}} Inserate"
   },
-  "comments": {
-    "edit_label": "Edit comment"
-  },
-  "reactions_tabs_aria": "Reaction type filter",
-  "content_type_tabs_aria": "Bookmark content type filter"
+  "reactions_tabs_aria": "Reaktionstypfilter",
+  "content_type_tabs_aria": "Lesezeichen-Inhaltstypfilter"
 }

@@ -10,7 +10,7 @@
     "section_compliance": "Compliance en toezicht",
     "section_records": "Dossiers",
     "section_settings": "Instellingen",
-    "nav_label": "Broker navigation"
+    "nav_label": "Makelaar navigatie"
   },
   "header": {
     "toggle_sidebar": "Zijbalk in- of uitschakelen",
@@ -194,9 +194,9 @@
     "time_days_ago": "{{count}} d geleden",
     "note_system_author": "Systeem",
     "hours_short": "u",
-    "tabs_aria": "Member status filter",
-    "open_notes_for": "Open notes for {{name}}",
-    "send_note": "Send note"
+    "tabs_aria": "Lidstatusfilter",
+    "open_notes_for": "Open notities voor {{name}}",
+    "send_note": "Notitie verzenden"
   },
   "onboarding": {
     "title": "Aan boord",
@@ -468,7 +468,7 @@
       "status_changed": "Status gewijzigd"
     },
     "detail_no_history": "Geen geschiedenis beschikbaar.",
-    "tabs_aria": "Exchange status filter"
+    "tabs_aria": "Uitwisselingsstatusfilter"
   },
   "messages": {
     "title": "Bericht Beoordeling",
@@ -577,7 +577,7 @@
     "copy_reason_flagged_user": "Gemarkeerde gebruiker",
     "copy_reason_manual_monitoring": "Handmatige monitoring",
     "copy_reason_random_sample": "Willekeurige steekproef",
-    "review_tabs_aria": "Message review filter"
+    "review_tabs_aria": "Filter voor berichtbeoordeling"
   },
   "monitoring": {
     "title": "Gebruikersbewaking",
@@ -691,7 +691,7 @@
     "category_reputation": "Reputatie",
     "category_fraud": "Mogelijke fraude",
     "category_other": "Anders",
-    "tabs_aria": "Risk level filter"
+    "tabs_aria": "Risiconiveaufilter"
   },
   "insurance": {
     "title": "Verzekeringscertificaten",
@@ -787,7 +787,7 @@
     "label_created": "Aangemaakt",
     "label_verified_at": "Geverifieerd op",
     "label_verified_by": "Geverifieerd door",
-    "tabs_aria": "Insurance certificate status filter"
+    "tabs_aria": "Statusfilter voor verzekeringscertificaten"
   },
   "archives": {
     "title": "Beoordelingsarchief",
@@ -846,7 +846,7 @@
     "severity_medium": "Gemiddeld",
     "severity_high": "Hoog",
     "severity_critical": "Kritiek",
-    "tabs_aria": "Review archive filter"
+    "tabs_aria": "Archieffilter bekijken"
   },
   "configuration": {
     "title": "Makelaarconfiguratie",
@@ -1094,8 +1094,8 @@
     }
   },
   "layout": {
-    "close_navigation": "Close navigation",
+    "close_navigation": "Navigatie sluiten",
     "navigation": "Navigation",
-    "skip_to_main": "Skip to main content"
+    "skip_to_main": "Ga naar de hoofdinhoud"
   }
 }

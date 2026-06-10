@@ -185,7 +185,7 @@
     "terms_required": "Sie müssen den Bedingungen zustimmen, um Ihre Organisation zu registrieren.",
     "opportunity_count_one": "{{count}} Einsatz",
     "opportunity_count_other": "{{count}} Einsätze",
-    "loading": "Loading organisations"
+    "loading": "Laden von Organisationen"
   },
   "organisation_detail": {
     "page_title": "Organisation",
@@ -219,7 +219,7 @@
     "cancel": "Abbrechen",
     "submit_application": "Bewerbung absenden",
     "job_openings": "Stellenangebote",
-    "rating_sr": "{{n}} out of 5 stars"
+    "rating_sr": "{{n}} von 5 Sternen"
   },
   "emergency_alerts": {
     "heading": "Notfallwarnungen",

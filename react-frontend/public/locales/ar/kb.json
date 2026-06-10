@@ -1,4 +1,5 @@
 {
+  "breadcrumb": "Breadcrumb",
   "title": "قاعدة المعرفة",
   "description": "ابحث عن الإجابات، الأدلة، والموارد المفيدة",
   "search_placeholder": "ابحث في قاعدة المعرفة...",
@@ -51,9 +52,8 @@
   "all_categories": "الكل",
   "author_by": "بواسطة {{name}}",
   "attachments": "المرفقات",
-  "breadcrumb": "Breadcrumb",
-  "category_tabs_aria": "Knowledge base categories",
-  "loading": "Loading knowledge base...",
+  "category_tabs_aria": "فئات قاعدة المعرفة",
+  "loading": "جارٍ تحميل قاعدة المعرفة...",
   "article_count_one": "{{count}} article",
   "article_count_other": "{{count}} articles",
   "category_count_one": "{{count}} category",

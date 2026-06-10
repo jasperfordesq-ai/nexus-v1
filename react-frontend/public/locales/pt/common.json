@@ -68,8 +68,8 @@
     "premium": "Prêmio",
     "verify_identity": "Verifique a sua identidade",
     "accessibility_alpha": "Acessibilidade (alfa)",
+    "accessibility_alpha_tooltip": "Versão acessível aprimorada – compatível com WCAG 2.2 AA. Abre em uma nova guia.",
     "features": "Funcionalidades",
-    "accessibility_alpha_tooltip": "Enhanced accessible version — WCAG 2.2 AA compliant. Opens in a new tab.",
     "courses": "Cursos",
     "podcasts": "Podcasts"
   },
@@ -134,7 +134,7 @@
     "premium": "Níveis de adesão premium",
     "accessibility_alpha": "Abrir o frontend alfa centrado em acessibilidade",
     "features": "Tudo o que o Project NEXUS faz, com etiquetas de maturidade honestas",
-    "dashboard": "Your personalised home overview",
+    "dashboard": "Visão geral da sua casa personalizada",
     "courses": "Aprenda novas habilidades com sua comunidade",
     "podcasts": "Programas comunitários e histórias em áudio"
   },
@@ -396,6 +396,59 @@
     "title": "Comunidade Solidária",
     "subtitle": "Junta troca de banco de tempo, voluntariado verificado, organizações de confiança, grupos, eventos, recursos e sinais de impacto num único fluxo de cuidados coordenado.",
     "welcome_banner": "Bem-vindo/a! Aqui podes pedir ajuda, oferecer o teu tempo ou simplesmente registar um gesto de vizinhança. Cada contributo — grande ou pequeno — torna a tua comunidade mais forte.",
+    "alpha": {
+      "badge": "Novo · Acesso antecipado"
+    },
+    "preview_tag": "Pré-visualização",
+    "hero": {
+      "title": "Comunidade Solidária",
+      "intro": "A Comunidade Solidária é um espaço onde os vizinhos se ajudam no dia a dia — uma boleia para uma consulta, umas compras ou simplesmente companhia numa tarde. Pede ajuda quando precisares e oferece-a quando puderes.",
+      "timebank_note": "Funciona em conjunto com o banco de tempo: quando dás o teu tempo, ele é registado como horas que podes usar mais tarde — as mesmas horas, num saldo partilhado.",
+      "cta_get_help": "Preciso de ajuda",
+      "cta_give_help": "Quero ajudar"
+    },
+    "new_notice": {
+      "title": "Isto é totalmente novo.",
+      "body": "A Comunidade Solidária acabou de arrancar aqui e ainda a estamos a construir. Algumas funcionalidades são pré-visualizações e não funciona sozinha — depende de vizinhos que se voluntariam para cuidar. Obrigado por estares connosco desde o início."
+    },
+    "how": {
+      "title": "Como funciona",
+      "subtitle": "Três passos simples.",
+      "step1_title": "Pede ajuda",
+      "step1_desc": "Diz-nos por palavras tuas do que precisas. O teu pedido chega a membros de confiança por perto.",
+      "step2_title": "Um vizinho oferece-se",
+      "step2_desc": "Alguém da comunidade oferece-se para ajudar e combinam uma hora que vos dê jeito a ambos.",
+      "step3_title": "As horas são registadas",
+      "step3_desc": "O tempo dado é registado em horas, por isso quem ajuda acumula horas para usar ou ceder mais tarde."
+    },
+    "recruit": {
+      "title": "Procuramos os nossos primeiros cuidadores",
+      "body": "A Comunidade Solidária só funciona quando há pessoas dispostas a ajudar. Ainda não temos uma equipa de cuidadores — estamos a criá-la. Se puderes dispensar um pouco de tempo, podes ser dos primeiros.",
+      "cta": "Oferecer ajuda"
+    },
+    "your_hours_note": "São os mesmos créditos de tempo usados no banco de tempo — um saldo partilhado, não uma moeda separada da Comunidade Solidária.",
+    "groups": {
+      "get_help": {
+        "title": "Receber ajuda",
+        "desc": "Pede apoio e acompanha as pessoas que te ajudam."
+      },
+      "give_help": {
+        "title": "Dar uma ajuda",
+        "desc": "Oferece o teu tempo e as tuas competências a vizinhos que precisem."
+      },
+      "your_hours": {
+        "title": "As tuas horas",
+        "desc": "Vê e usa os créditos de tempo que ganhaste."
+      },
+      "caregiver_tools": {
+        "title": "Ferramentas para cuidadores",
+        "desc": "Ferramentas para quem presta cuidados regulares. Tornam-se mais úteis à medida que a nossa rede de cuidadores cresce."
+      },
+      "safety": {
+        "title": "Segurança e novidades",
+        "desc": "Comunica uma preocupação ou acompanha o que se passa perto de ti."
+      }
+    },
     "actions": {
       "request_help": "Pedir ajuda",
       "request_help_sub": "Pede à tua comunidade apoio prático",
@@ -417,6 +470,8 @@
       "future_care_fund_sub": "Vê as tuas horas acumuladas como um seguro para cuidados futuros.",
       "cover_care": "Substituição de cuidadores",
       "cover_care_sub": "Para cuidadores: organiza uma substituição de confiança quando precisares de uma pausa. Mais útil à medida que a rede cresce.",
+      "become_caregiver": "Tornar-me cuidador",
+      "become_caregiver_sub": "Diz-nos que queres prestar cuidados regulares e ajuda-nos a formar a equipa.",
       "hour_gift": "Oferecer horas",
       "hour_gift_sub": "Oferece as tuas horas acumuladas a familiares ou amigos.",
       "hour_transfer": "Transferir horas",
@@ -424,9 +479,7 @@
       "safeguarding_report": "Reportar uma preocupação",
       "safeguarding_report_sub": "Reporta preocupações de salvaguarda de forma confidencial.",
       "projects": "Projetos comunitários",
-      "projects_sub": "Acompanha as atualizações dos municípios e bairros.",
-      "become_caregiver": "Tornar-me cuidador",
-      "become_caregiver_sub": "Diz-nos que queres prestar cuidados regulares e ajuda-nos a formar a equipa."
+      "projects_sub": "Acompanha as atualizações dos municípios e bairros."
     },
     "operating_model": {
       "title": "Modelo operacional",
@@ -510,59 +563,6 @@
       "show_all": "Mostrar todas as ações",
       "show_recommended": "Mostrar recomendadas",
       "change_answer": "Alterar resposta"
-    },
-    "alpha": {
-      "badge": "Novo · Acesso antecipado"
-    },
-    "preview_tag": "Pré-visualização",
-    "hero": {
-      "title": "Comunidade Solidária",
-      "intro": "A Comunidade Solidária é um espaço onde os vizinhos se ajudam no dia a dia — uma boleia para uma consulta, umas compras ou simplesmente companhia numa tarde. Pede ajuda quando precisares e oferece-a quando puderes.",
-      "timebank_note": "Funciona em conjunto com o banco de tempo: quando dás o teu tempo, ele é registado como horas que podes usar mais tarde — as mesmas horas, num saldo partilhado.",
-      "cta_get_help": "Preciso de ajuda",
-      "cta_give_help": "Quero ajudar"
-    },
-    "new_notice": {
-      "title": "Isto é totalmente novo.",
-      "body": "A Comunidade Solidária acabou de arrancar aqui e ainda a estamos a construir. Algumas funcionalidades são pré-visualizações e não funciona sozinha — depende de vizinhos que se voluntariam para cuidar. Obrigado por estares connosco desde o início."
-    },
-    "how": {
-      "title": "Como funciona",
-      "subtitle": "Três passos simples.",
-      "step1_title": "Pede ajuda",
-      "step1_desc": "Diz-nos por palavras tuas do que precisas. O teu pedido chega a membros de confiança por perto.",
-      "step2_title": "Um vizinho oferece-se",
-      "step2_desc": "Alguém da comunidade oferece-se para ajudar e combinam uma hora que vos dê jeito a ambos.",
-      "step3_title": "As horas são registadas",
-      "step3_desc": "O tempo dado é registado em horas, por isso quem ajuda acumula horas para usar ou ceder mais tarde."
-    },
-    "recruit": {
-      "title": "Procuramos os nossos primeiros cuidadores",
-      "body": "A Comunidade Solidária só funciona quando há pessoas dispostas a ajudar. Ainda não temos uma equipa de cuidadores — estamos a criá-la. Se puderes dispensar um pouco de tempo, podes ser dos primeiros.",
-      "cta": "Oferecer ajuda"
-    },
-    "your_hours_note": "São os mesmos créditos de tempo usados no banco de tempo — um saldo partilhado, não uma moeda separada da Comunidade Solidária.",
-    "groups": {
-      "get_help": {
-        "title": "Receber ajuda",
-        "desc": "Pede apoio e acompanha as pessoas que te ajudam."
-      },
-      "give_help": {
-        "title": "Dar uma ajuda",
-        "desc": "Oferece o teu tempo e as tuas competências a vizinhos que precisem."
-      },
-      "your_hours": {
-        "title": "As tuas horas",
-        "desc": "Vê e usa os créditos de tempo que ganhaste."
-      },
-      "caregiver_tools": {
-        "title": "Ferramentas para cuidadores",
-        "desc": "Ferramentas para quem presta cuidados regulares. Tornam-se mais úteis à medida que a nossa rede de cuidadores cresce."
-      },
-      "safety": {
-        "title": "Segurança e novidades",
-        "desc": "Comunica uma preocupação ou acompanha o que se passa perto de ti."
-      }
     }
   },
   "request_help": {
@@ -631,8 +631,8 @@
       "confirm_body": "As tuas horas vão ser debitadas agora e creditadas à pessoa quando ela aceitar.",
       "confirm_button": "Sim, oferecer horas",
       "cancel": "Cancelar",
-      "recipient_hint": "Type at least 2 letters to search",
-      "recipient_no_results": "No members found"
+      "recipient_hint": "Digite pelo menos 2 letras para pesquisar",
+      "recipient_no_results": "Nenhum membro encontrado"
     },
     "inbox": {
       "empty": "Sem ofertas para aceitar agora.",
@@ -870,9 +870,9 @@
     "select_category": "Selecionar uma categoria",
     "verification_badges": "Emblemas de verificação",
     "search_skills": "Pesquisar competências",
-    "user_menu_trigger": "User menu for {{name}}",
-    "feed_sidebar": "Community sidebar",
-    "filter_panel": "Filter panel",
+    "user_menu_trigger": "Menu do usuário para {{name}}",
+    "feed_sidebar": "Barra lateral da comunidade",
+    "filter_panel": "Painel de filtro",
     "remove": "Remove"
   },
   "skills": {
@@ -935,7 +935,7 @@
   "toast": {
     "aria_notifications": "Notificações",
     "aria_dismiss_notification": "Ignorar notificação",
-    "aria_urgent_notifications": "Urgent notifications"
+    "aria_urgent_notifications": "Notificações urgentes"
   },
   "verified": "Verificado",
   "map_unavailable": "A vista de mapa não está disponível",
@@ -970,7 +970,9 @@
   "verify_identity": "Verificar identidade",
   "level_short": "Nv. {{level}}",
   "cancel": "Cancelar",
+  "confirm": "Confirm",
   "save": "Guardar",
+  "delete": "Delete",
   "offer_favour": {
     "meta": {
       "title": "Oferecer um favor",
@@ -1716,8 +1718,8 @@
     "webhook_create_title": "Criar uma subscrição",
     "webhook_create_body": "POST para /api/partner/v1/webhooks/subscriptions com event_types (array) e target_url (apenas https). A resposta inclui um secret único — guarda-o.",
     "tabs": {
-      "code_examples": "Code examples",
-      "verification_examples": "Verification examples"
+      "code_examples": "Exemplos de código",
+      "verification_examples": "Exemplos de verificação"
     }
   },
   "regional_analytics": {
@@ -1813,10 +1815,10 @@
     "distinct_visitors": "Visitantes únicos",
     "suppressed_value": "Suprimido",
     "suppressed_short": "--",
-    "line_chart_aria": "Line chart showing partner activity over time",
-    "bar_chart_aria": "Bar chart showing partner performance metrics",
-    "pie_chart_aria": "Pie chart showing distribution of partner data",
-    "area_chart_aria": "Area chart showing partner trends over time"
+    "line_chart_aria": "Gráfico de linhas mostrando a atividade do parceiro ao longo do tempo",
+    "bar_chart_aria": "Gráfico de barras mostrando métricas de desempenho do parceiro",
+    "pie_chart_aria": "Gráfico de pizza mostrando a distribuição de dados de parceiros",
+    "area_chart_aria": "Gráfico de área mostrando tendências de parceiros ao longo do tempo"
   },
   "provisioning": {
     "meta": {
@@ -1922,6 +1924,7 @@
       "slot_created": "Horário de recolha criado",
       "slot_create_failed": "Falha ao criar o horário",
       "slot_deleted": "Horário eliminado",
+      "slot_delete_confirm": "Excluir este slot de coleta? Isto não pode ser desfeito.",
       "capacity": "Capacidade",
       "recurring": "Recorrente",
       "recurring_weekly": "Repetir semanalmente",
@@ -1940,8 +1943,7 @@
       "window": "Janela de recolha",
       "choose_slot": "Escolha um horário de recolha",
       "no_slot_selected": "Sem horário de recolha",
-      "left": "restantes",
-      "slot_delete_confirm": "Delete this pickup slot? This cannot be undone."
+      "left": "restantes"
     },
     "inventory": {
       "section_title": "Stock",
@@ -2010,6 +2012,7 @@
     "invite_modal_title": "Convite entre clubes",
     "invite_modal_subtitle": "Convide esta pessoa a juntar-se também a um dos clubes federados.",
     "invite_target_label": "Escolha um clube",
+    "invite_target_search": "Pesquisar clubes",
     "invite_message_label": "Mensagem pessoal (opcional)",
     "invite_message_placeholder": "Olá! Achei que também ias gostar deste clube.",
     "invite_send": "Enviar convite",
@@ -2042,8 +2045,7 @@
       "today": "Hoje",
       "from_label": "De",
       "load_failed": "Não foi possível carregar o calendário."
-    },
-    "invite_target_search": "Search clubs"
+    }
   },
   "oauth": {
     "continue_with_google": "Continuar com o Google",
@@ -2174,7 +2176,7 @@
     "description_label": "Descrição (opcional)",
     "make_public": "Tornar pública",
     "create": "Criar",
-    "confirm_create": "Create collection"
+    "confirm_create": "Criar coleção"
   },
   "appreciations": {
     "title": "Enviar um agradecimento",
@@ -2293,17 +2295,15 @@
   "xp_progress": "{{current}} / {{required}} XP",
   "level_progress_aria": "Progresso do nível {{level}}: {{percentage}}%",
   "user_fallback": "User",
-  "release_stage": "Generally Available (v1.5.1)",
-  "confirm": "Confirm",
+  "release_stage": "Geralmente disponível (v1.5.1)",
   "theme_picker": {
     "title": "Appearance",
-    "subtitle": "Tune color scheme, accent, and density.",
-    "open_label": "Open theme picker",
-    "color_scheme": "Color scheme",
+    "subtitle": "Ajuste o esquema de cores, destaque e densidade.",
+    "open_label": "Abrir seletor de tema",
+    "color_scheme": "Esquema de cores",
     "scheme_light": "Light",
     "scheme_dark": "Dark",
     "scheme_system": "System"
   },
-  "delete": "Delete",
   "alpha_badge": "Alfa"
 }

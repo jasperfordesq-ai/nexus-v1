@@ -10,7 +10,7 @@
     "section_compliance": "Conformidade e supervisão",
     "section_records": "Registos",
     "section_settings": "Definições",
-    "nav_label": "Broker navigation"
+    "nav_label": "Navegação do corretor"
   },
   "header": {
     "toggle_sidebar": "Alternar barra lateral",
@@ -194,9 +194,9 @@
     "time_days_ago": "há {{count}} d",
     "note_system_author": "Sistema",
     "hours_short": "h",
-    "tabs_aria": "Member status filter",
-    "open_notes_for": "Open notes for {{name}}",
-    "send_note": "Send note"
+    "tabs_aria": "Filtro de status de membro",
+    "open_notes_for": "Notas abertas para {{name}}",
+    "send_note": "Enviar nota"
   },
   "onboarding": {
     "title": "Integração",
@@ -468,7 +468,7 @@
       "status_changed": "Estado alterado"
     },
     "detail_no_history": "Sem histórico disponível.",
-    "tabs_aria": "Exchange status filter"
+    "tabs_aria": "Filtro de status do Exchange"
   },
   "messages": {
     "title": "Revisão de Mensagem",
@@ -577,7 +577,7 @@
     "copy_reason_flagged_user": "Utilizador sinalizado",
     "copy_reason_manual_monitoring": "Monitorização manual",
     "copy_reason_random_sample": "Amostra aleatória",
-    "review_tabs_aria": "Message review filter"
+    "review_tabs_aria": "Filtro de revisão de mensagens"
   },
   "monitoring": {
     "title": "Monitorização de utilizadores",
@@ -691,7 +691,7 @@
     "category_reputation": "Reputação",
     "category_fraud": "Possível fraude",
     "category_other": "Outro",
-    "tabs_aria": "Risk level filter"
+    "tabs_aria": "Filtro de nível de risco"
   },
   "insurance": {
     "title": "Certificados de seguro",
@@ -787,7 +787,7 @@
     "label_created": "Criado",
     "label_verified_at": "Verificado em",
     "label_verified_by": "Verificado por",
-    "tabs_aria": "Insurance certificate status filter"
+    "tabs_aria": "Filtro de status do certificado de seguro"
   },
   "archives": {
     "title": "Arquivo de revisão",
@@ -846,7 +846,7 @@
     "severity_medium": "Média",
     "severity_high": "Alta",
     "severity_critical": "Crítica",
-    "tabs_aria": "Review archive filter"
+    "tabs_aria": "Rever filtro de arquivo"
   },
   "configuration": {
     "title": "Configuração do mediador",
@@ -1094,8 +1094,8 @@
     }
   },
   "layout": {
-    "close_navigation": "Close navigation",
+    "close_navigation": "Fechar navegação",
     "navigation": "Navigation",
-    "skip_to_main": "Skip to main content"
+    "skip_to_main": "Pular para o conteúdo principal"
   }
 }

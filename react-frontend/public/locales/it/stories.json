@@ -132,7 +132,7 @@
     "reply_placeholder_generic": "Rispondi alla storia...",
     "react_with": "Reagisci con {{type}}",
     "viewers_title_count": "Spettatori ({{count}})",
-    "delete_story_confirm": "Delete this story? This cannot be undone."
+    "delete_story_confirm": "Eliminare questa storia? Questa operazione non può essere annullata."
   },
   "highlights": {
     "no_stories": "Questo highlight non ha storie",
@@ -161,6 +161,6 @@
     "story_type_image": "Storia immagine",
     "story_type_text": "Storia testo",
     "story_type_poll": "Storia sondaggio",
-    "delete_confirm": "Delete this highlight? This cannot be undone."
+    "delete_confirm": "Eliminare questa evidenziazione? Questa operazione non può essere annullata."
   }
 }

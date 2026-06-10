@@ -68,8 +68,8 @@
     "premium": "Prämie",
     "verify_identity": "Identität verifizieren",
     "accessibility_alpha": "Barrierefreiheit (Alpha)",
+    "accessibility_alpha_tooltip": "Erweiterte barrierefreie Version – WCAG 2.2 AA-konform. Öffnet in einem neuen Tab.",
     "features": "Funktionen",
-    "accessibility_alpha_tooltip": "Enhanced accessible version — WCAG 2.2 AA compliant. Opens in a new tab.",
     "courses": "Kurse",
     "podcasts": "Podcasts"
   },
@@ -134,7 +134,7 @@
     "premium": "Premium-Mitgliedschaftsstufen",
     "accessibility_alpha": "Öffnen Sie das barrierefreiheits-orientierte Alpha-Frontend",
     "features": "Alle Funktionen von Project NEXUS mit ehrlichen Reifegradkennzeichnungen",
-    "dashboard": "Your personalised home overview",
+    "dashboard": "Ihre persönliche Hausübersicht",
     "courses": "Lernen Sie neue Fähigkeiten mit Ihrer Community",
     "podcasts": "Community-Shows und Audio-Storys"
   },
@@ -396,6 +396,59 @@
     "title": "Fürsorgliche Gemeinschaft",
     "subtitle": "Zeitvorsorge, verifizierte Freiwilligenarbeit, vertrauenswürdige Organisationen, Gruppen, Veranstaltungen, Ressourcen und Wirkungsdaten – alles in einem koordinierten Sorge-Workflow.",
     "welcome_banner": "Willkommen! Hier kannst du um Hilfe bitten, deine Zeit anbieten oder einfach eine nachbarschaftliche Gefälligkeit festhalten. Jeder Beitrag – ob gross oder klein – stärkt deine Gemeinschaft.",
+    "alpha": {
+      "badge": "Neu · Früher Zugang"
+    },
+    "preview_tag": "Vorschau",
+    "hero": {
+      "title": "Fürsorgliche Gemeinschaft",
+      "intro": "Die Fürsorgliche Gemeinschaft ist ein Ort, an dem sich Nachbarinnen und Nachbarn im Alltag gegenseitig unterstützen – eine Fahrt zum Termin, ein paar Einkäufe oder einfach Gesellschaft an einem Nachmittag. Bitte um Hilfe, wenn du sie brauchst, und biete Hilfe an, wenn du kannst.",
+      "timebank_note": "Sie arbeitet Hand in Hand mit der Zeitbank: Wenn du deine Zeit gibst, wird sie als Stunden erfasst, die du später nutzen kannst – dieselben Stunden, in einem gemeinsamen Guthaben.",
+      "cta_get_help": "Ich brauche Hilfe",
+      "cta_give_help": "Ich möchte helfen"
+    },
+    "new_notice": {
+      "title": "Das ist brandneu.",
+      "body": "Die Fürsorgliche Gemeinschaft ist hier gerade erst gestartet und wir bauen sie noch auf. Einige Funktionen sind frühe Vorschauen, und sie funktioniert nicht von allein – sie lebt davon, dass Nachbarinnen und Nachbarn freiwillig Fürsorge leisten. Danke, dass du von Anfang an dabei bist."
+    },
+    "how": {
+      "title": "So funktioniert es",
+      "subtitle": "Drei einfache Schritte.",
+      "step1_title": "Um Hilfe bitten",
+      "step1_desc": "Sag uns mit eigenen Worten, was du brauchst. Deine Anfrage geht an vertrauenswürdige Mitglieder in der Nähe.",
+      "step2_title": "Eine Nachbarin bietet Hilfe an",
+      "step2_desc": "Jemand aus der Gemeinschaft bietet Hilfe an, und ihr vereinbart eine Zeit, die euch beiden passt.",
+      "step3_title": "Stunden werden erfasst",
+      "step3_desc": "Die geleistete Zeit wird als Stunden erfasst, sodass Helfende Stunden aufbauen, die sie später nutzen oder weitergeben können."
+    },
+    "recruit": {
+      "title": "Wir suchen unsere ersten Pflegenden",
+      "body": "Die Fürsorgliche Gemeinschaft funktioniert nur, wenn Menschen bereit sind zu helfen. Wir haben noch kein fertiges Team von Pflegenden – wir bauen es gerade auf. Wenn du ein wenig Zeit erübrigen kannst, könntest du eine:r der Ersten sein.",
+      "cta": "Hilfe anbieten"
+    },
+    "your_hours_note": "Das sind dieselben Zeitgutschriften wie in der Zeitbank – ein gemeinsames Guthaben, keine separate Währung der Fürsorglichen Gemeinschaft.",
+    "groups": {
+      "get_help": {
+        "title": "Hilfe erhalten",
+        "desc": "Bitte um Unterstützung und behalte den Überblick über die Menschen, die dir helfen."
+      },
+      "give_help": {
+        "title": "Hilfe geben",
+        "desc": "Biete Nachbarinnen und Nachbarn, die Unterstützung brauchen, deine Zeit und Fähigkeiten an."
+      },
+      "your_hours": {
+        "title": "Deine Stunden",
+        "desc": "Sieh dir die verdienten Zeitgutschriften an und nutze sie."
+      },
+      "caregiver_tools": {
+        "title": "Werkzeuge für Pflegende",
+        "desc": "Werkzeuge für Menschen, die regelmässig Fürsorge leisten. Sie werden nützlicher, je grösser unser Netzwerk an Pflegenden wird."
+      },
+      "safety": {
+        "title": "Sicherheit & Neuigkeiten",
+        "desc": "Melde ein Anliegen oder verfolge, was vor Ort passiert."
+      }
+    },
     "actions": {
       "request_help": "Hilfe anfragen",
       "request_help_sub": "Bitte deine Gemeinschaft um praktische Unterstützung",
@@ -417,6 +470,8 @@
       "future_care_fund_sub": "Deine gesparten Stunden als Zukunftsvorsorge sehen.",
       "cover_care": "Vertretung für Pflegende",
       "cover_care_sub": "Für Pflegende: organisiere vertrauenswürdige Vertretung, wenn du eine Pause brauchst. Wird nützlicher, je grösser das Netzwerk wird.",
+      "become_caregiver": "Pflegende:r werden",
+      "become_caregiver_sub": "Sag uns, dass du regelmässig Fürsorge leisten möchtest, und hilf uns, das Team aufzubauen.",
       "hour_gift": "Stunden schenken",
       "hour_gift_sub": "Schenke deine gesparten Stunden an Familie oder Freund:innen.",
       "hour_transfer": "Stunden übertragen",
@@ -424,9 +479,7 @@
       "safeguarding_report": "Anliegen melden",
       "safeguarding_report_sub": "Sicherheitsanliegen vertraulich melden.",
       "projects": "Gemeinschaftsprojekte",
-      "projects_sub": "Mehrstufige Updates aus Gemeinde und Quartier verfolgen.",
-      "become_caregiver": "Pflegende:r werden",
-      "become_caregiver_sub": "Sag uns, dass du regelmässig Fürsorge leisten möchtest, und hilf uns, das Team aufzubauen."
+      "projects_sub": "Mehrstufige Updates aus Gemeinde und Quartier verfolgen."
     },
     "operating_model": {
       "title": "Funktionsweise",
@@ -510,59 +563,6 @@
       "show_all": "Alle Aktionen anzeigen",
       "show_recommended": "Empfohlene anzeigen",
       "change_answer": "Antwort ändern"
-    },
-    "alpha": {
-      "badge": "Neu · Früher Zugang"
-    },
-    "preview_tag": "Vorschau",
-    "hero": {
-      "title": "Fürsorgliche Gemeinschaft",
-      "intro": "Die Fürsorgliche Gemeinschaft ist ein Ort, an dem sich Nachbarinnen und Nachbarn im Alltag gegenseitig unterstützen – eine Fahrt zum Termin, ein paar Einkäufe oder einfach Gesellschaft an einem Nachmittag. Bitte um Hilfe, wenn du sie brauchst, und biete Hilfe an, wenn du kannst.",
-      "timebank_note": "Sie arbeitet Hand in Hand mit der Zeitbank: Wenn du deine Zeit gibst, wird sie als Stunden erfasst, die du später nutzen kannst – dieselben Stunden, in einem gemeinsamen Guthaben.",
-      "cta_get_help": "Ich brauche Hilfe",
-      "cta_give_help": "Ich möchte helfen"
-    },
-    "new_notice": {
-      "title": "Das ist brandneu.",
-      "body": "Die Fürsorgliche Gemeinschaft ist hier gerade erst gestartet und wir bauen sie noch auf. Einige Funktionen sind frühe Vorschauen, und sie funktioniert nicht von allein – sie lebt davon, dass Nachbarinnen und Nachbarn freiwillig Fürsorge leisten. Danke, dass du von Anfang an dabei bist."
-    },
-    "how": {
-      "title": "So funktioniert es",
-      "subtitle": "Drei einfache Schritte.",
-      "step1_title": "Um Hilfe bitten",
-      "step1_desc": "Sag uns mit eigenen Worten, was du brauchst. Deine Anfrage geht an vertrauenswürdige Mitglieder in der Nähe.",
-      "step2_title": "Eine Nachbarin bietet Hilfe an",
-      "step2_desc": "Jemand aus der Gemeinschaft bietet Hilfe an, und ihr vereinbart eine Zeit, die euch beiden passt.",
-      "step3_title": "Stunden werden erfasst",
-      "step3_desc": "Die geleistete Zeit wird als Stunden erfasst, sodass Helfende Stunden aufbauen, die sie später nutzen oder weitergeben können."
-    },
-    "recruit": {
-      "title": "Wir suchen unsere ersten Pflegenden",
-      "body": "Die Fürsorgliche Gemeinschaft funktioniert nur, wenn Menschen bereit sind zu helfen. Wir haben noch kein fertiges Team von Pflegenden – wir bauen es gerade auf. Wenn du ein wenig Zeit erübrigen kannst, könntest du eine:r der Ersten sein.",
-      "cta": "Hilfe anbieten"
-    },
-    "your_hours_note": "Das sind dieselben Zeitgutschriften wie in der Zeitbank – ein gemeinsames Guthaben, keine separate Währung der Fürsorglichen Gemeinschaft.",
-    "groups": {
-      "get_help": {
-        "title": "Hilfe erhalten",
-        "desc": "Bitte um Unterstützung und behalte den Überblick über die Menschen, die dir helfen."
-      },
-      "give_help": {
-        "title": "Hilfe geben",
-        "desc": "Biete Nachbarinnen und Nachbarn, die Unterstützung brauchen, deine Zeit und Fähigkeiten an."
-      },
-      "your_hours": {
-        "title": "Deine Stunden",
-        "desc": "Sieh dir die verdienten Zeitgutschriften an und nutze sie."
-      },
-      "caregiver_tools": {
-        "title": "Werkzeuge für Pflegende",
-        "desc": "Werkzeuge für Menschen, die regelmässig Fürsorge leisten. Sie werden nützlicher, je grösser unser Netzwerk an Pflegenden wird."
-      },
-      "safety": {
-        "title": "Sicherheit & Neuigkeiten",
-        "desc": "Melde ein Anliegen oder verfolge, was vor Ort passiert."
-      }
     }
   },
   "request_help": {
@@ -631,8 +631,8 @@
       "confirm_body": "Deine Stunden werden jetzt abgebucht und gutgeschrieben, sobald die Person das Geschenk annimmt.",
       "confirm_button": "Ja, Stunden schenken",
       "cancel": "Abbrechen",
-      "recipient_hint": "Type at least 2 letters to search",
-      "recipient_no_results": "No members found"
+      "recipient_hint": "Geben Sie für die Suche mindestens zwei Buchstaben ein",
+      "recipient_no_results": "Keine Mitglieder gefunden"
     },
     "inbox": {
       "empty": "Aktuell keine Geschenke zur Annahme.",
@@ -870,9 +870,9 @@
     "select_category": "Kategorie auswählen",
     "verification_badges": "Verifizierungsabzeichen",
     "search_skills": "Fähigkeiten suchen",
-    "user_menu_trigger": "User menu for {{name}}",
-    "feed_sidebar": "Community sidebar",
-    "filter_panel": "Filter panel",
+    "user_menu_trigger": "Benutzermenü für {{name}}",
+    "feed_sidebar": "Community-Seitenleiste",
+    "filter_panel": "Filterplatte",
     "remove": "Remove"
   },
   "skills": {
@@ -935,7 +935,7 @@
   "toast": {
     "aria_notifications": "Benachrichtigungen",
     "aria_dismiss_notification": "Benachrichtigung schliessen",
-    "aria_urgent_notifications": "Urgent notifications"
+    "aria_urgent_notifications": "Dringende Benachrichtigungen"
   },
   "verified": "Verifiziert",
   "map_unavailable": "Kartenansicht ist nicht verfügbar",
@@ -970,7 +970,9 @@
   "verify_identity": "Identität verifizieren",
   "level_short": "St. {{level}}",
   "cancel": "Abbrechen",
+  "confirm": "Confirm",
   "save": "Speichern",
+  "delete": "Delete",
   "offer_favour": {
     "meta": {
       "title": "Gefälligkeit erfassen",
@@ -1716,8 +1718,8 @@
     "webhook_create_title": "Ein Abonnement erstellen",
     "webhook_create_body": "POST an /api/partner/v1/webhooks/subscriptions mit event_types (Array) und target_url (nur https). Die Antwort enthält ein einmaliges Secret — speichern Sie es.",
     "tabs": {
-      "code_examples": "Code examples",
-      "verification_examples": "Verification examples"
+      "code_examples": "Codebeispiele",
+      "verification_examples": "Verifizierungsbeispiele"
     }
   },
   "regional_analytics": {
@@ -1813,10 +1815,10 @@
     "distinct_visitors": "Eindeutige Besucher",
     "suppressed_value": "Unterdrückt",
     "suppressed_short": "--",
-    "line_chart_aria": "Line chart showing partner activity over time",
-    "bar_chart_aria": "Bar chart showing partner performance metrics",
-    "pie_chart_aria": "Pie chart showing distribution of partner data",
-    "area_chart_aria": "Area chart showing partner trends over time"
+    "line_chart_aria": "Liniendiagramm, das die Partneraktivität im Zeitverlauf zeigt",
+    "bar_chart_aria": "Balkendiagramm mit Kennzahlen zur Partnerleistung",
+    "pie_chart_aria": "Kreisdiagramm, das die Verteilung der Partnerdaten zeigt",
+    "area_chart_aria": "Flächendiagramm, das Partnertrends im Zeitverlauf zeigt"
   },
   "provisioning": {
     "meta": {
@@ -1922,6 +1924,7 @@
       "slot_created": "Abholfenster erstellt",
       "slot_create_failed": "Fenster konnte nicht erstellt werden",
       "slot_deleted": "Fenster gelöscht",
+      "slot_delete_confirm": "Diesen Abholplatz löschen? Dies kann nicht rückgängig gemacht werden.",
       "capacity": "Kapazität",
       "recurring": "Wiederkehrend",
       "recurring_weekly": "Wöchentlich wiederholen",
@@ -1940,8 +1943,7 @@
       "window": "Abholfenster",
       "choose_slot": "Abholfenster wählen",
       "no_slot_selected": "Kein Abholfenster gewählt",
-      "left": "verbleibend",
-      "slot_delete_confirm": "Delete this pickup slot? This cannot be undone."
+      "left": "verbleibend"
     },
     "inventory": {
       "section_title": "Lagerbestand",
@@ -2010,6 +2012,7 @@
     "invite_modal_title": "Vereinsübergreifende Einladung",
     "invite_modal_subtitle": "Laden Sie diese Person ein, auch einem der föderierten Vereine beizutreten.",
     "invite_target_label": "Verein auswählen",
+    "invite_target_search": "Clubs suchen",
     "invite_message_label": "Persönliche Nachricht (optional)",
     "invite_message_placeholder": "Hallo! Ich dachte, dieser Verein könnte dir auch gefallen.",
     "invite_send": "Einladung senden",
@@ -2042,8 +2045,7 @@
       "today": "Heute",
       "from_label": "Von",
       "load_failed": "Kalender konnte nicht geladen werden."
-    },
-    "invite_target_search": "Search clubs"
+    }
   },
   "oauth": {
     "continue_with_google": "Mit Google fortfahren",
@@ -2174,7 +2176,7 @@
     "description_label": "Beschreibung (optional)",
     "make_public": "Öffentlich machen",
     "create": "Erstellen",
-    "confirm_create": "Create collection"
+    "confirm_create": "Sammlung erstellen"
   },
   "appreciations": {
     "title": "Ein Dankeschön senden",
@@ -2293,17 +2295,15 @@
   "xp_progress": "{{current}} / {{required}} XP",
   "level_progress_aria": "Fortschritt Stufe {{level}}: {{percentage}}%",
   "user_fallback": "User",
-  "release_stage": "Generally Available (v1.5.1)",
-  "confirm": "Confirm",
+  "release_stage": "Allgemein verfügbar (v1.5.1)",
   "theme_picker": {
     "title": "Appearance",
-    "subtitle": "Tune color scheme, accent, and density.",
-    "open_label": "Open theme picker",
-    "color_scheme": "Color scheme",
+    "subtitle": "Passen Sie Farbschema, Akzent und Dichte an.",
+    "open_label": "Öffnen Sie die Themenauswahl",
+    "color_scheme": "Farbschema",
     "scheme_light": "Light",
     "scheme_dark": "Dark",
     "scheme_system": "System"
   },
-  "delete": "Delete",
   "alpha_badge": "Alpha"
 }

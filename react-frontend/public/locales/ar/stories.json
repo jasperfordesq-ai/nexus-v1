@@ -1,4 +1,7 @@
 {
+  "empty": {
+    "no_stories": "لا توجد قصص متاحة"
+  },
   "creator": {
     "title": "إنشاء قصة",
     "close": "إغلاق المنشئ",
@@ -64,7 +67,10 @@
     "error_image_size": "يجب أن تكون الصورة أقل من 10 ميجابايت",
     "error_video_type": "يرجى اختيار ملف فيديو",
     "error_video_size": "يجب أن يكون الفيديو أقل من 50 ميجابايت",
+    "share_story": "مشاركة القصة",
     "error_camera": "تعذر الوصول إلى الكاميرا. يرجى التحقق من الأذونات.",
+    "error_camera_permission": "تم رفض الوصول إلى الكاميرا. يرجى تمكينه في إعدادات المتصفح.",
+    "error_camera_not_found": "لم يتم العثور على كاميرا على هذا الجهاز.",
     "error_process": "فشل في معالجة الصورة",
     "error_create": "فشل في إنشاء القصة",
     "flip_camera": "قم بتدوير الكاميرا",
@@ -92,9 +98,6 @@
     "or_divider": "أو",
     "poll_add_option_button": "إضافة خيار",
     "videos_trimmed_notice": "سيتم قطع الفيديوهات الأطول من 60 ثانية إلى 60 ثانية مدة عرض",
-    "share_story": "مشاركة القصة",
-    "error_camera_permission": "تم رفض الوصول إلى الكاميرا. يرجى تمكينه في إعدادات المتصفح.",
-    "error_camera_not_found": "لم يتم العثور على كاميرا على هذا الجهاز.",
     "video_duration_seconds": "{{count}}ث"
   },
   "viewer": {
@@ -129,10 +132,7 @@
     "reply_placeholder_generic": "رد على القصة...",
     "react_with": "تفاعل بـ {{type}}",
     "viewers_title_count": "المشاهدون ({{count}})",
-    "delete_story_confirm": "Delete this story? This cannot be undone."
-  },
-  "empty": {
-    "no_stories": "لا توجد قصص متاحة"
+    "delete_story_confirm": "هل تريد حذف هذه القصة؟ لا يمكن التراجع عن هذا."
   },
   "highlights": {
     "no_stories": "لا توجد قصص في هذا التسليط",
@@ -161,6 +161,6 @@
     "story_type_image": "قصة صورة",
     "story_type_text": "قصة نصية",
     "story_type_poll": "قصة استطلاع",
-    "delete_confirm": "Delete this highlight? This cannot be undone."
+    "delete_confirm": "هل تريد حذف هذا التمييز؟ لا يمكن التراجع عن هذا."
   }
 }

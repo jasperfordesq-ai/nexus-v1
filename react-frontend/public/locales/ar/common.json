@@ -68,8 +68,8 @@
     "premium": "المميز",
     "verify_identity": "تحقّق من هويتك",
     "accessibility_alpha": "إمكانية الوصول (ألفا)",
+    "accessibility_alpha_tooltip": "نسخة محسنة يمكن الوصول إليها — متوافقة مع WCAG 2.2 AA. يفتح في علامة تبويب جديدة.",
     "features": "الميزات",
-    "accessibility_alpha_tooltip": "Enhanced accessible version — WCAG 2.2 AA compliant. Opens in a new tab.",
     "courses": "الدورات",
     "podcasts": "البودكاست"
   },
@@ -134,7 +134,7 @@
     "premium": "مستويات العضوية المميزة",
     "accessibility_alpha": "افتح الواجهة التجريبية ذات الأولوية لإمكانية الوصول",
     "features": "كل ما يفعله Project NEXUS، مع علامات نضج صادقة",
-    "dashboard": "Your personalised home overview",
+    "dashboard": "نظرة عامة على منزلك المخصص",
     "courses": "تعلم مهارات جديدة مع مجتمعك",
     "podcasts": "عروض المجتمع والقصص الصوتية"
   },
@@ -396,6 +396,59 @@
     "title": "مجتمع راعٍ",
     "subtitle": "اجمع تبادل بنك الوقت والتطوع الموثّق والمنظمات الموثوقة والمجموعات والفعاليات والموارد ومؤشرات الأثر في سير عمل رعائي منسّق واحد.",
     "welcome_banner": "مرحبًا! هنا يمكنك طلب المساعدة، أو تقديم وقتك، أو ببساطة تسجيل لفتة جوار طيبة. كل مساهمة — كبيرة كانت أم صغيرة — تجعل مجتمعك أقوى.",
+    "alpha": {
+      "badge": "جديد · وصول مبكر"
+    },
+    "preview_tag": "معاينة",
+    "hero": {
+      "title": "مجتمع راعٍ",
+      "intro": "المجتمع الراعي مكان يساعد فيه الجيران بعضهم بعضًا في الحياة اليومية — توصيلة إلى موعد، بعض التسوّق، أو مجرد مؤانسة بعد الظهر. اطلب المساعدة عند الحاجة، وقدّمها متى استطعت.",
+      "timebank_note": "يعمل جنبًا إلى جنب مع بنك الوقت: عندما تمنح وقتك يُسجَّل كساعات يمكنك استخدامها لاحقًا — الساعات نفسها، في رصيد واحد مشترك.",
+      "cta_get_help": "أحتاج إلى مساعدة",
+      "cta_give_help": "أريد أن أساعد"
+    },
+    "new_notice": {
+      "title": "هذا جديد تمامًا.",
+      "body": "انطلق المجتمع الراعي هنا للتو وما زلنا نبنيه. بعض الميزات معاينات مبكرة، وهو لا يعمل من تلقاء نفسه — فهو يعتمد على الجيران الذين يتطوّعون لتقديم الرعاية. شكرًا لكونك من الأوائل."
+    },
+    "how": {
+      "title": "كيف يعمل",
+      "subtitle": "ثلاث خطوات بسيطة.",
+      "step1_title": "اطلب المساعدة",
+      "step1_desc": "أخبرنا بما تحتاجه بكلماتك. يصل طلبك إلى أعضاء موثوقين قريبين منك.",
+      "step2_title": "جار يعرض المساعدة",
+      "step2_desc": "يعرض أحد أفراد المجتمع المساعدة، وتتفقان على وقت يناسبكما معًا.",
+      "step3_title": "تُسجَّل الساعات",
+      "step3_desc": "يُسجَّل الوقت المُقدَّم كساعات، فيراكم من يساعدون ساعاتٍ يستخدمونها أو يمنحونها لاحقًا."
+    },
+    "recruit": {
+      "title": "نبحث عن أوائل مقدّمي الرعاية لدينا",
+      "body": "لا يعمل المجتمع الراعي إلا عندما يتقدّم الناس للمساعدة. ليس لدينا بعد فريق من مقدّمي الرعاية — نحن نكوّنه الآن. إذا كان بإمكانك تخصيص بعض الوقت، فقد تكون من الأوائل.",
+      "cta": "اعرض مساعدتك"
+    },
+    "your_hours_note": "هذه هي رصيد الوقت نفسه المُستخدَم في بنك الوقت — رصيد واحد مشترك، وليست عملة منفصلة للمجتمع الراعي.",
+    "groups": {
+      "get_help": {
+        "title": "احصل على مساعدة",
+        "desc": "اطلب الدعم وتابع الأشخاص الذين يساعدونك."
+      },
+      "give_help": {
+        "title": "قدّم المساعدة",
+        "desc": "قدّم وقتك ومهاراتك للجيران الذين يحتاجون إلى يد العون."
+      },
+      "your_hours": {
+        "title": "ساعاتك",
+        "desc": "اطّلع على رصيد الوقت الذي كسبته واستخدمه."
+      },
+      "caregiver_tools": {
+        "title": "أدوات مقدّمي الرعاية",
+        "desc": "أدوات لمن يقدّمون الرعاية بانتظام. تزداد فائدتها مع نمو شبكة مقدّمي الرعاية لدينا."
+      },
+      "safety": {
+        "title": "الأمان والمستجدات",
+        "desc": "أبلغ عن قلق أو تابع ما يحدث في منطقتك."
+      }
+    },
     "actions": {
       "request_help": "اطلب المساعدة",
       "request_help_sub": "اطلب من مجتمعك دعمًا عمليًا",
@@ -417,6 +470,8 @@
       "future_care_fund_sub": "اعتبر ساعاتك المدّخرة تأمينًا للرعاية المستقبلية.",
       "cover_care": "تغطية لمقدّمي الرعاية",
       "cover_care_sub": "لمقدّمي الرعاية: رتّب بديلاً موثوقًا عندما تحتاج إلى استراحة. أكثر فائدة مع نمو الشبكة.",
+      "become_caregiver": "كن مقدّم رعاية",
+      "become_caregiver_sub": "أخبرنا أنك ترغب في تقديم رعاية منتظمة وساعدنا في بناء الفريق.",
       "hour_gift": "إهداء الساعات",
       "hour_gift_sub": "أهدِ ساعاتك المدّخرة لعائلتك أو أصدقائك.",
       "hour_transfer": "تحويل الساعات",
@@ -424,9 +479,7 @@
       "safeguarding_report": "الإبلاغ عن مخاوف",
       "safeguarding_report_sub": "أبلِغ بمخاوف الحماية بسرية.",
       "projects": "مشاريع مجتمعية",
-      "projects_sub": "تابع تحديثات البلديات والأحياء.",
-      "become_caregiver": "كن مقدّم رعاية",
-      "become_caregiver_sub": "أخبرنا أنك ترغب في تقديم رعاية منتظمة وساعدنا في بناء الفريق."
+      "projects_sub": "تابع تحديثات البلديات والأحياء."
     },
     "operating_model": {
       "title": "نموذج التشغيل",
@@ -510,59 +563,6 @@
       "show_all": "عرض كل الإجراءات",
       "show_recommended": "عرض المُوصى به",
       "change_answer": "تغيير الإجابة"
-    },
-    "alpha": {
-      "badge": "جديد · وصول مبكر"
-    },
-    "preview_tag": "معاينة",
-    "hero": {
-      "title": "مجتمع راعٍ",
-      "intro": "المجتمع الراعي مكان يساعد فيه الجيران بعضهم بعضًا في الحياة اليومية — توصيلة إلى موعد، بعض التسوّق، أو مجرد مؤانسة بعد الظهر. اطلب المساعدة عند الحاجة، وقدّمها متى استطعت.",
-      "timebank_note": "يعمل جنبًا إلى جنب مع بنك الوقت: عندما تمنح وقتك يُسجَّل كساعات يمكنك استخدامها لاحقًا — الساعات نفسها، في رصيد واحد مشترك.",
-      "cta_get_help": "أحتاج إلى مساعدة",
-      "cta_give_help": "أريد أن أساعد"
-    },
-    "new_notice": {
-      "title": "هذا جديد تمامًا.",
-      "body": "انطلق المجتمع الراعي هنا للتو وما زلنا نبنيه. بعض الميزات معاينات مبكرة، وهو لا يعمل من تلقاء نفسه — فهو يعتمد على الجيران الذين يتطوّعون لتقديم الرعاية. شكرًا لكونك من الأوائل."
-    },
-    "how": {
-      "title": "كيف يعمل",
-      "subtitle": "ثلاث خطوات بسيطة.",
-      "step1_title": "اطلب المساعدة",
-      "step1_desc": "أخبرنا بما تحتاجه بكلماتك. يصل طلبك إلى أعضاء موثوقين قريبين منك.",
-      "step2_title": "جار يعرض المساعدة",
-      "step2_desc": "يعرض أحد أفراد المجتمع المساعدة، وتتفقان على وقت يناسبكما معًا.",
-      "step3_title": "تُسجَّل الساعات",
-      "step3_desc": "يُسجَّل الوقت المُقدَّم كساعات، فيراكم من يساعدون ساعاتٍ يستخدمونها أو يمنحونها لاحقًا."
-    },
-    "recruit": {
-      "title": "نبحث عن أوائل مقدّمي الرعاية لدينا",
-      "body": "لا يعمل المجتمع الراعي إلا عندما يتقدّم الناس للمساعدة. ليس لدينا بعد فريق من مقدّمي الرعاية — نحن نكوّنه الآن. إذا كان بإمكانك تخصيص بعض الوقت، فقد تكون من الأوائل.",
-      "cta": "اعرض مساعدتك"
-    },
-    "your_hours_note": "هذه هي رصيد الوقت نفسه المُستخدَم في بنك الوقت — رصيد واحد مشترك، وليست عملة منفصلة للمجتمع الراعي.",
-    "groups": {
-      "get_help": {
-        "title": "احصل على مساعدة",
-        "desc": "اطلب الدعم وتابع الأشخاص الذين يساعدونك."
-      },
-      "give_help": {
-        "title": "قدّم المساعدة",
-        "desc": "قدّم وقتك ومهاراتك للجيران الذين يحتاجون إلى يد العون."
-      },
-      "your_hours": {
-        "title": "ساعاتك",
-        "desc": "اطّلع على رصيد الوقت الذي كسبته واستخدمه."
-      },
-      "caregiver_tools": {
-        "title": "أدوات مقدّمي الرعاية",
-        "desc": "أدوات لمن يقدّمون الرعاية بانتظام. تزداد فائدتها مع نمو شبكة مقدّمي الرعاية لدينا."
-      },
-      "safety": {
-        "title": "الأمان والمستجدات",
-        "desc": "أبلغ عن قلق أو تابع ما يحدث في منطقتك."
-      }
     }
   },
   "request_help": {
@@ -631,8 +631,8 @@
       "confirm_body": "ستُخصم ساعاتك الآن وتُضاف إليه عند قبوله.",
       "confirm_button": "نعم، أهدِ الساعات",
       "cancel": "إلغاء",
-      "recipient_hint": "Type at least 2 letters to search",
-      "recipient_no_results": "No members found"
+      "recipient_hint": "اكتب حرفين على الأقل للبحث",
+      "recipient_no_results": "لم يتم العثور على أعضاء"
     },
     "inbox": {
       "empty": "لا توجد هدايا لقبولها الآن.",
@@ -870,9 +870,9 @@
     "select_category": "اختر فئة",
     "verification_badges": "شارات التحقق",
     "search_skills": "البحث عن مهارات",
-    "user_menu_trigger": "User menu for {{name}}",
-    "feed_sidebar": "Community sidebar",
-    "filter_panel": "Filter panel",
+    "user_menu_trigger": "قائمة المستخدم لـ {{name}}",
+    "feed_sidebar": "الشريط الجانبي للمجتمع",
+    "filter_panel": "لوحة التصفية",
     "remove": "Remove"
   },
   "skills": {
@@ -935,7 +935,7 @@
   "toast": {
     "aria_notifications": "الإشعارات",
     "aria_dismiss_notification": "تجاهل الإشعار",
-    "aria_urgent_notifications": "Urgent notifications"
+    "aria_urgent_notifications": "إخطارات عاجلة"
   },
   "verified": "موثّق",
   "map_unavailable": "عرض الخريطة غير متاح",
@@ -970,7 +970,9 @@
   "verify_identity": "تحقق من الهوية",
   "level_short": "م. {{level}}",
   "cancel": "إلغاء",
+  "confirm": "Confirm",
   "save": "حفظ",
+  "delete": "Delete",
   "offer_favour": {
     "meta": {
       "title": "قدّم خدمة",
@@ -1716,8 +1718,8 @@
     "webhook_create_title": "إنشاء اشتراك",
     "webhook_create_body": "أرسل POST إلى /api/partner/v1/webhooks/subscriptions مع event_types (مصفوفة) وtarget_url (https فقط). تتضمن الاستجابة secret لمرة واحدة — احتفظ به.",
     "tabs": {
-      "code_examples": "Code examples",
-      "verification_examples": "Verification examples"
+      "code_examples": "أمثلة على التعليمات البرمجية",
+      "verification_examples": "أمثلة التحقق"
     }
   },
   "regional_analytics": {
@@ -1813,10 +1815,10 @@
     "distinct_visitors": "زوار مميزون",
     "suppressed_value": "مخفي",
     "suppressed_short": "--",
-    "line_chart_aria": "Line chart showing partner activity over time",
-    "bar_chart_aria": "Bar chart showing partner performance metrics",
-    "pie_chart_aria": "Pie chart showing distribution of partner data",
-    "area_chart_aria": "Area chart showing partner trends over time"
+    "line_chart_aria": "مخطط خطي يوضح نشاط الشريك بمرور الوقت",
+    "bar_chart_aria": "مخطط شريطي يعرض مقاييس أداء الشريك",
+    "pie_chart_aria": "مخطط دائري يوضح توزيع بيانات الشريك",
+    "area_chart_aria": "مخطط مساحي يوضح اتجاهات الشركاء بمرور الوقت"
   },
   "provisioning": {
     "meta": {
@@ -1922,6 +1924,7 @@
       "slot_created": "تم إنشاء موعد الاستلام",
       "slot_create_failed": "تعذّر إنشاء الموعد",
       "slot_deleted": "تم حذف الموعد",
+      "slot_delete_confirm": "هل تريد حذف فتحة الالتقاط هذه؟ لا يمكن التراجع عن هذا.",
       "capacity": "السعة",
       "recurring": "متكرر",
       "recurring_weekly": "كرّر أسبوعيًا",
@@ -1940,8 +1943,7 @@
       "window": "نافذة الاستلام",
       "choose_slot": "اختر موعد الاستلام",
       "no_slot_selected": "لم يُحدَّد موعد استلام",
-      "left": "متبقٍّ",
-      "slot_delete_confirm": "Delete this pickup slot? This cannot be undone."
+      "left": "متبقٍّ"
     },
     "inventory": {
       "section_title": "المخزون",
@@ -2010,6 +2012,7 @@
     "invite_modal_title": "دعوة بين النوادي",
     "invite_modal_subtitle": "ادعُ هذا الشخص للانضمام إلى أحد النوادي المتحدة أيضًا.",
     "invite_target_label": "اختر ناديًا",
+    "invite_target_search": "أندية البحث",
     "invite_message_label": "رسالة شخصية (اختيارية)",
     "invite_message_placeholder": "مرحبًا! اعتقدت أن هذا النادي سيعجبك أيضًا.",
     "invite_send": "إرسال الدعوة",
@@ -2042,8 +2045,7 @@
       "today": "اليوم",
       "from_label": "من",
       "load_failed": "تعذّر تحميل التقويم."
-    },
-    "invite_target_search": "Search clubs"
+    }
   },
   "oauth": {
     "continue_with_google": "المتابعة باستخدام Google",
@@ -2174,7 +2176,7 @@
     "description_label": "الوصف (اختياري)",
     "make_public": "اجعلها عامة",
     "create": "إنشاء",
-    "confirm_create": "Create collection"
+    "confirm_create": "إنشاء مجموعة"
   },
   "appreciations": {
     "title": "أرسل رسالة شكر",
@@ -2293,17 +2295,15 @@
   "xp_progress": "{{current}} / {{required}} XP",
   "level_progress_aria": "تقدّم المستوى {{level}}: {{percentage}}%",
   "user_fallback": "User",
-  "release_stage": "Generally Available (v1.5.1)",
-  "confirm": "Confirm",
+  "release_stage": "متاح بشكل عام (الإصدار 1.5.1)",
   "theme_picker": {
     "title": "Appearance",
-    "subtitle": "Tune color scheme, accent, and density.",
-    "open_label": "Open theme picker",
-    "color_scheme": "Color scheme",
+    "subtitle": "ضبط نظام الألوان واللكنة والكثافة.",
+    "open_label": "افتح منتقي السمات",
+    "color_scheme": "نظام الألوان",
     "scheme_light": "Light",
     "scheme_dark": "Dark",
     "scheme_system": "System"
   },
-  "delete": "Delete",
   "alpha_badge": "ألفا"
 }

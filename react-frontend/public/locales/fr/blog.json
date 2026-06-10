@@ -1,12 +1,14 @@
 {
   "page_title": "Blogue",
-  "loading_post": "Loading blog post...",
+  "loading_post": "Chargement de l'article de blog...",
   "hero_eyebrow": "Histoires de la communauté",
   "hero_posts_label": "Articles affichés",
   "title": "Blog et actualités",
   "subtitle": "Histoires communautaires, mises à jour et annonces",
   "search_placeholder": "Rechercher des articles...",
   "filter_all": "Tous",
+  "filter_by_category": "Filtrer par catégorie",
+  "loading_posts": "Chargement des articles de blog",
   "unable_to_load": "Impossible de charger les articles",
   "try_again": "Réessayer",
   "error_load_posts": "Impossible de charger les articles du blog.",
@@ -62,7 +64,5 @@
     "reaction_sad": "Triste",
     "reaction_celebrate": "Célébrer"
   },
-  "page_description": "Histoires, guides et mises à jour de la communauté de banque du temps — des échanges réussis, des leçons apprises et les dernières nouvelles des groupes locaux et partenaires.",
-  "filter_by_category": "Filter by category",
-  "loading_posts": "Loading blog posts"
+  "page_description": "Histoires, guides et mises à jour de la communauté de banque du temps — des échanges réussis, des leçons apprises et les dernières nouvelles des groupes locaux et partenaires."
 }

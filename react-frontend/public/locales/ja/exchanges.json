@@ -5,7 +5,7 @@
   "browse_listings": "リストをブラウズ",
   "load_more": "もっと読み込む",
   "try_again": "再試行",
-  "loading": "Loading exchanges...",
+  "loading": "交換を読み込み中...",
   "service_exchange": "サービス交換",
   "unknown": "不明",
   "hours_count": "{{count}} 時間",
@@ -109,7 +109,7 @@
     "ratings": "評価",
     "rate_exchange": "この交換を評価",
     "prep_time_value": "{{count}}h",
-    "rating_value": "Rating: {{rating}} out of 5"
+    "rating_value": "評価: {{rating}} (5 点満点中)"
   },
   "modal": {
     "decline_title": "交換リクエストを拒否",

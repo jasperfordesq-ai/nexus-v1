@@ -1,21 +1,21 @@
 {
   "page_title": "レビュー",
   "tabs": {
+    "received": "受け取ったレビュー",
     "given": "書いたレビュー",
-    "pending": "保留中のレビュー",
-    "received": "受け取ったレビュー"
+    "pending": "保留中のレビュー"
   },
   "stats": {
     "average": "平均評価",
-    "no_reviews": "まだレビューはありません",
-    "total": "レビュー総数"
+    "total": "レビュー総数",
+    "no_reviews": "まだレビューはありません"
   },
   "review_card": {
     "anonymous": "匿名",
     "delete": "レビューを削除",
     "delete_confirm": "このレビューを削除してもよろしいですか？",
-    "delete_error": "レビューの削除に失敗しました",
-    "delete_success": "レビューを削除しました"
+    "delete_success": "レビューを削除しました",
+    "delete_error": "レビューの削除に失敗しました"
   },
   "pending": {
     "empty": "保留中のレビューはありません",
@@ -34,5 +34,5 @@
   "load_more": "もっと読み込む",
   "stars": "{{count}}つ星",
   "stars_plural": "{{count}}つ星",
-  "rating_aria": "{{n}} out of 5 stars"
+  "rating_aria": "{{n}} 5つ星のうち"
 }

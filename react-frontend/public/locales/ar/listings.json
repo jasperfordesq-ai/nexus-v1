@@ -284,6 +284,8 @@
   "clear_filters": "مسح الفلاتر",
   "results_count": "{{count}} قوائم تم العثور عليها",
   "results_loading": "جارٍ البحث عن الإعلانات",
+  "loading_progress": "تحميل القوائم",
+  "filter_form_label": "قوائم التصفية",
   "radius_5": "5 كم",
   "radius_10": "10 كم",
   "radius_25": "25 كم",
@@ -338,7 +340,5 @@
   "listing_image_alt": "صورة القائمة",
   "open_listing_aria": "فتح الإعلان: {{title}}",
   "distance_meters": "{{distance}} م",
-  "distance_kilometers": "{{distance}} كم",
-  "loading_progress": "Loading listings",
-  "filter_form_label": "Filter listings"
+  "distance_kilometers": "{{distance}} كم"
 }

@@ -5,7 +5,7 @@
   "browse_listings": "Blader door Lijsten",
   "load_more": "Laad Meer",
   "try_again": "Probeer Opnieuw",
-  "loading": "Loading exchanges...",
+  "loading": "Bezig met laden van uitwisselingen...",
   "service_exchange": "Service-uitwisseling",
   "unknown": "Onbekend",
   "hours_count": "{{count}} uur",
@@ -109,7 +109,7 @@
     "ratings": "Beoordelingen",
     "rate_exchange": "Beoordeel Deze Uitwisseling",
     "prep_time_value": "{{count}}u",
-    "rating_value": "Rating: {{rating}} out of 5"
+    "rating_value": "Beoordeling: {{rating}} uit 5"
   },
   "modal": {
     "decline_title": "Weiger Uitwisselingsverzoek",

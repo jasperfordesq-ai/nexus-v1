@@ -342,7 +342,7 @@
     "load_error": "Nie udało się załadować tabeli liderów. Spróbuj ponownie.",
     "type_nexus_score": "Wynik Nexusa",
     "load_more": "Załaduj więcej",
-    "retry": "Retry loading leaderboard"
+    "retry": "Spróbuj ponownie załadować tabelę wyników"
   },
   "community": {
     "total_hours": "Łączna liczba zamienionych godzin",
@@ -420,7 +420,7 @@
       "legendary": "Legendarny"
     },
     "max_score_label": "/{{max}}",
-    "loading": "Loading your NexusScore..."
+    "loading": "Ładowanie wyniku NexusScore..."
   },
   "common": {
     "refresh": "Odświeżać",

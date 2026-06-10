@@ -25,6 +25,10 @@
     "open": "Abierta",
     "closed": "Cerrada"
   },
+  "badges": {
+    "ranked": "Clasificado",
+    "anonymous": "Anónimo"
+  },
   "tabs": {
     "open": "Abiertas",
     "closed": "Cerradas",
@@ -74,14 +78,6 @@
   "category_placeholder": "Ej. Comunidad, Eventos, Comentarios",
   "anonymous_voting": "Votación anónima",
   "anonymous_voting_desc": "Ocultar la identidad de los votantes en los resultados",
-  "aria": {
-    "export_csv": "Exportar resultados como CSV",
-    "move_rank_down": "Mover {{option}} hacia abajo",
-    "move_rank_up": "Mover {{option}} hacia arriba"
-  },
-  "page_meta": {
-    "title": "Encuestas"
-  },
   "ranked_results_title": "Resultados ronda a ronda",
   "round_number": "Ronda {{number}}",
   "eliminated_candidate": "Eliminado: {{name}}",
@@ -92,13 +88,17 @@
   "view_ranked_results": "Ver resultados ordenados",
   "winner_label": "Ganador: {{name}}",
   "submit_rankings": "Enviar clasificación",
-  "badges": {
-    "ranked": "Clasificado",
-    "anonymous": "Anónimo"
-  },
-  "loading": "Loading polls...",
+  "loading": "Cargando encuestas...",
   "vote_now": "Vote Now",
-  "vote_now_for": "Vote now on: {{question}}",
-  "vote_for_option": "Vote for {{option}} in: {{question}}",
-  "category_filter_label": "Filter by category"
+  "vote_now_for": "Vota ahora por: {{question}}",
+  "vote_for_option": "Vota por {{option}} en: {{question}}",
+  "aria": {
+    "export_csv": "Exportar resultados como CSV",
+    "move_rank_down": "Mover {{option}} hacia abajo",
+    "move_rank_up": "Mover {{option}} hacia arriba"
+  },
+  "page_meta": {
+    "title": "Encuestas"
+  },
+  "category_filter_label": "Filtrar por categoría"
 }

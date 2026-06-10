@@ -1,4 +1,5 @@
 {
+  "member_fallback": "User",
   "title": "Gruppi",
   "discover": "Scopri i Gruppi",
   "create_group": "Crea Gruppo",
@@ -50,6 +51,7 @@
   "posts_count_label": "{{count}} post",
   "detail": {
     "loading": "Caricamento del gruppo...",
+    "loading_replies": "Caricamento risposte...",
     "unable_to_load": "Impossibile caricare il gruppo",
     "not_found_desc": "Il gruppo che sta cercando non esiste",
     "error_load_failed": "Caricamento del gruppo non riuscito. La preghiamo di riprovare.",
@@ -127,6 +129,8 @@
     "no_members_title": "Nessun membro al momento",
     "no_members_desc": "Sia la prima persona ad iscriversi a questo gruppo",
     "members_loading_aria": "Caricamento dei membri del gruppo",
+    "feed_loading": "Caricamento feed di gruppo...",
+    "events_loading": "Caricamento eventi di gruppo...",
     "member_owner": "Proprietario",
     "member_admin": "Amministratore",
     "member_joined": "Iscritto il {{date}}",
@@ -195,10 +199,7 @@
     "feed_empty_desc": "Sii il primo a condividere qualcosa con questo gruppo!",
     "feed_create_post": "Crea Post",
     "feed_load_more": "Carica Altro",
-    "member_actions_aria": "Azioni membro",
-    "feed_loading": "Loading group feed...",
-    "events_loading": "Loading group events...",
-    "loading_replies": "Loading replies..."
+    "member_actions_aria": "Azioni membro"
   },
   "form": {
     "create_title": "Crea nuovo gruppo",
@@ -258,6 +259,7 @@
     "template_label": "Inizia da un modello (opzionale)"
   },
   "announcements": {
+    "loading": "Caricamento annunci...",
     "heading": "Annunci",
     "new": "Nuovo annuncio",
     "no_announcements_title": "Nessun annuncio",
@@ -285,8 +287,7 @@
     "pinned_success": "Fissato",
     "update_failed": "Impossibile aggiornare l'annuncio",
     "deleted": "Annuncio eliminato",
-    "delete_failed": "Impossibile eliminare l'annuncio",
-    "loading": "Loading announcements..."
+    "delete_failed": "Impossibile eliminare l'annuncio"
   },
   "challenges": {
     "heading": "Sfide",
@@ -414,7 +415,7 @@
     "video_player": "Lettore video",
     "fullsize_alt": "Immagine a dimensione piena",
     "delete": "Elimina",
-    "delete_confirm": "Delete this media item? This cannot be undone."
+    "delete_confirm": "Eliminare questo elemento multimediale? Questa operazione non può essere annullata."
   },
   "webhooks": {
     "load_failed": "Impossibile caricare i webhook",
@@ -442,7 +443,7 @@
     "secret_placeholder": "Segreto di firma per la verifica del payload",
     "cancel": "Annulla",
     "create_btn": "Crea webhook",
-    "delete_confirm": "Delete this webhook? This cannot be undone."
+    "delete_confirm": "Eliminare questo webhook? Questa operazione non può essere annullata."
   },
   "toast": {
     "left": "Ha lasciato il gruppo",
@@ -516,6 +517,7 @@
     "downvote_aria": "Voto negativo",
     "vote_count_aria": "{{count}} voti",
     "loading": "Caricamento domande",
+    "loading_detail": "Caricamento dettagli domanda...",
     "search_placeholder": "Cerca domande...",
     "search_aria": "Cerca domande",
     "sort_aria": "Ordina domande",
@@ -553,8 +555,7 @@
     "answer_posted_success": "Risposta pubblicata!",
     "answer_posted_error": "Impossibile pubblicare la risposta",
     "vote_error": "Impossibile votare",
-    "accept_error": "Impossibile accettare la risposta",
-    "loading_detail": "Loading question details..."
+    "accept_error": "Impossibile accettare la risposta"
   },
   "wiki": {
     "load_failed": "Impossibile caricare le pagine wiki",
@@ -567,6 +568,7 @@
     "delete_failed": "Impossibile eliminare la pagina",
     "revisions_failed": "Impossibile caricare la cronologia delle revisioni",
     "loading": "Caricamento wiki",
+    "loading_page": "Caricamento pagina wiki...",
     "heading": "Wiki",
     "new_page": "Nuova pagina",
     "pages": "Pagine",
@@ -602,8 +604,7 @@
     "content_label": "Contenuto",
     "create": "Crea pagina",
     "delete_title": "Elimina pagina wiki",
-    "delete_confirm": "Vuoi davvero eliminare \"{{name}}\"? Questa azione non può essere annullata.",
-    "loading_page": "Loading wiki page..."
+    "delete_confirm": "Vuoi davvero eliminare \"{{name}}\"? Questa azione non può essere annullata."
   },
   "page_meta": {
     "create": {
@@ -711,6 +712,5 @@
     "accent_color": "Colore accento",
     "hue": "Tonalità",
     "preview": "Anteprima"
-  },
-  "member_fallback": "User"
+  }
 }

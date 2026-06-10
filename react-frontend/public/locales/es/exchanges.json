@@ -5,7 +5,7 @@
   "browse_listings": "Explorar Anuncios",
   "load_more": "Cargar Más",
   "try_again": "Intentar de Nuevo",
-  "loading": "Loading exchanges...",
+  "loading": "Cargando intercambios...",
   "service_exchange": "Intercambio de Servicios",
   "unknown": "Desconocido",
   "hours_count": "{{count}} hora",
@@ -109,7 +109,7 @@
     "ratings": "Valoraciones",
     "rate_exchange": "Valorar Este Intercambio",
     "prep_time_value": "{{count}}h",
-    "rating_value": "Rating: {{rating}} out of 5"
+    "rating_value": "Calificación: {{rating}} sobre 5"
   },
   "modal": {
     "decline_title": "Rechazar Solicitud de Intercambio",

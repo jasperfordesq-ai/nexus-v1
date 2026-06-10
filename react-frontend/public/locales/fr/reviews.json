@@ -1,21 +1,21 @@
 {
   "page_title": "Avis",
   "tabs": {
+    "received": "Avis reçus",
     "given": "Avis donnés",
-    "pending": "Avis en attente",
-    "received": "Avis reçus"
+    "pending": "Avis en attente"
   },
   "stats": {
     "average": "Note moyenne",
-    "no_reviews": "Aucun avis pour l'instant",
-    "total": "Total des avis"
+    "total": "Total des avis",
+    "no_reviews": "Aucun avis pour l'instant"
   },
   "review_card": {
     "anonymous": "Anonyme",
     "delete": "Supprimer l'avis",
     "delete_confirm": "Êtes-vous sûr de vouloir supprimer cet avis ?",
-    "delete_error": "Échec de la suppression de l'avis",
-    "delete_success": "Avis supprimé"
+    "delete_success": "Avis supprimé",
+    "delete_error": "Échec de la suppression de l'avis"
   },
   "pending": {
     "empty": "Aucun avis en attente",
@@ -34,5 +34,5 @@
   "load_more": "Charger plus",
   "stars": "{{count}} étoile",
   "stars_plural": "{{count}} étoiles",
-  "rating_aria": "{{n}} out of 5 stars"
+  "rating_aria": "{{n}} étoiles sur 5"
 }

@@ -185,7 +185,7 @@
     "terms_required": "Om uw organisatie te kunnen registreren, moet u akkoord gaan met de voorwaarden.",
     "opportunity_count_one": "{{count}} mogelijkheid",
     "opportunity_count_other": "{{count}} mogelijkheden",
-    "loading": "Loading organisations"
+    "loading": "Organisaties laden"
   },
   "organisation_detail": {
     "page_title": "Organisatie",
@@ -219,7 +219,7 @@
     "cancel": "Annuleren",
     "submit_application": "Aanvraag indienen",
     "job_openings": "Vacatures",
-    "rating_sr": "{{n}} out of 5 stars"
+    "rating_sr": "{{n}} van 5 sterren"
   },
   "emergency_alerts": {
     "heading": "Noodmeldingen",

@@ -1,4 +1,5 @@
 {
+  "breadcrumb": "Breadcrumb",
   "page_title": "Mercado",
   "meta_description": "Compre, venda ou partilhe artigos localmente com os seus vizinhos — anúncios do mercado comunitário, artigos gratuitos, compras em grupo e entregas no seu banco de tempo.",
   "hub": {
@@ -166,6 +167,7 @@
     "price_type_label": "Tipo de Preço",
     "price_label": "Preço",
     "currency_label": "Moeda",
+    "currency_search": "Moeda de pesquisa",
     "location_delivery": "Localização e Entrega",
     "location_label": "Localização",
     "location_placeholder": "Cidade, município ou área",
@@ -178,11 +180,11 @@
     "created_success": "Anúncio criado com sucesso!",
     "created_error": "Falha ao criar anúncio",
     "created_error_retry": "Falha ao criar anúncio. Por favor, tente novamente.",
-    "draft_saved": "Rascunho guardado",
-    "currency_search": "Search currency"
+    "draft_saved": "Rascunho guardado"
   },
   "search": {
     "page_title": "Pesquisar Mercado",
+    "page_heading": "Search Marketplace",
     "meta_description": "Pesquise e filtre itens no mercado da comunidade.",
     "breadcrumb_search": "Pesquisa",
     "search_placeholder": "Pesquisar mercado...",
@@ -221,8 +223,7 @@
     "price_from": "De {{min}}",
     "price_up_to": "Até {{max}}",
     "last_days_one": "Último {{count}} dia",
-    "last_days_other": "Últimos {{count}} dias",
-    "page_heading": "Search Marketplace"
+    "last_days_other": "Últimos {{count}} dias"
   },
   "seller": {
     "page_title": "Perfil do Vendedor",
@@ -638,7 +639,7 @@
     "search_this_area": "Buscar Nesta Área",
     "distance_km": "{{km}} km de distância",
     "distance_meters": "{{m}}m de distância",
-    "view_toggle": "View mode"
+    "view_toggle": "Modo de visualização"
   },
   "shipping": {
     "title": "Opções de Envio",
@@ -672,7 +673,7 @@
     "recommended": "Recomendado",
     "loading": "Carregando opções de envio...",
     "no_options": "Nenhuma opção de envio disponível para este vendedor.",
-    "delete_confirm": "Remove this shipping option? This cannot be undone."
+    "delete_confirm": "Remover esta opção de envio? Isto não pode ser desfeito."
   },
   "listing_location": {
     "location_title": "Localização",
@@ -809,12 +810,11 @@
     "not_available_title": "A configurar o processamento de pagamentos",
     "not_available_description": "O processamento de pagamentos está a ser configurado. Contacte o vendedor para combinar o pagamento."
   },
-  "breadcrumb": "Breadcrumb",
-  "buyer_orders_tabs_aria": "Buyer order status filter",
-  "collections_tabs_aria": "Marketplace collections sections",
-  "my_listings_tabs_aria": "My listings status filter",
-  "my_offers_tabs_aria": "My offers sections",
-  "seller_orders_tabs_aria": "Seller order status filter",
-  "seller_profile_tabs_aria": "Seller profile sections",
-  "category_filter_label": "Filter by category"
+  "buyer_orders_tabs_aria": "Filtro de status do pedido do comprador",
+  "collections_tabs_aria": "Seções de coleções do Marketplace",
+  "my_listings_tabs_aria": "Filtro de status dos meus anúncios",
+  "my_offers_tabs_aria": "Minhas seções de ofertas",
+  "seller_orders_tabs_aria": "Filtro de status do pedido do vendedor",
+  "seller_profile_tabs_aria": "Seções de perfil do vendedor",
+  "category_filter_label": "Filtrar por categoria"
 }

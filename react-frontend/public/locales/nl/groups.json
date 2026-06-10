@@ -1,4 +1,5 @@
 {
+  "member_fallback": "User",
   "title": "Groepen",
   "discover": "Ontdek Groepen",
   "create_group": "Groep Aanmaken",
@@ -50,6 +51,7 @@
   "posts_count_label": "{{count}} berichten",
   "detail": {
     "loading": "Groep Laden...",
+    "loading_replies": "Antwoorden laden...",
     "unable_to_load": "Kon Groep Niet Laden",
     "not_found_desc": "De groep die je zoekt bestaat niet",
     "error_load_failed": "Laden van groep mislukt. Probeer het opnieuw.",
@@ -127,6 +129,8 @@
     "no_members_title": "Nog geen leden",
     "no_members_desc": "Wees de eerste die deze groep aansluit",
     "members_loading_aria": "Groepsleden worden geladen",
+    "feed_loading": "Groepsfeed laden...",
+    "events_loading": "Groepsevenementen laden...",
     "member_owner": "Eigenaar",
     "member_admin": "Beheerder",
     "member_joined": "Lid sinds {{date}}",
@@ -195,10 +199,7 @@
     "feed_empty_desc": "Wees de eerste om iets met deze groep te delen!",
     "feed_create_post": "Bericht aanmaken",
     "feed_load_more": "Laad meer",
-    "member_actions_aria": "Acties van leden",
-    "feed_loading": "Loading group feed...",
-    "events_loading": "Loading group events...",
-    "loading_replies": "Loading replies..."
+    "member_actions_aria": "Acties van leden"
   },
   "form": {
     "create_title": "Nieuwe groep aanmaken",
@@ -258,6 +259,7 @@
     "template_label": "Begin vanuit een sjabloon (optioneel)"
   },
   "announcements": {
+    "loading": "Aankondigingen laden...",
     "heading": "Aankondigingen",
     "new": "Nieuwe Aankondiging",
     "no_announcements_title": "Geen aankondigingen",
@@ -285,8 +287,7 @@
     "pinned_success": "Vastgezet",
     "update_failed": "Mislukt om aankondiging bij te werken",
     "deleted": "Aankondiging verwijderd",
-    "delete_failed": "Mislukt om aankondiging te verwijderen",
-    "loading": "Loading announcements..."
+    "delete_failed": "Mislukt om aankondiging te verwijderen"
   },
   "challenges": {
     "heading": "Uitdagingen",
@@ -414,7 +415,7 @@
     "video_player": "Videospeler",
     "fullsize_alt": "Afbeelding op volledige grootte",
     "delete": "Verwijderen",
-    "delete_confirm": "Delete this media item? This cannot be undone."
+    "delete_confirm": "Dit media-item verwijderen? Dit kan niet ongedaan worden gemaakt."
   },
   "webhooks": {
     "load_failed": "Webhooks konden niet worden geladen",
@@ -442,7 +443,7 @@
     "secret_placeholder": "Ondertekeningsgeheim voor payload-verificatie",
     "cancel": "Annuleren",
     "create_btn": "Webhook maken",
-    "delete_confirm": "Delete this webhook? This cannot be undone."
+    "delete_confirm": "Deze webhook verwijderen? Dit kan niet ongedaan worden gemaakt."
   },
   "toast": {
     "left": "Verliet de groep",
@@ -516,6 +517,7 @@
     "downvote_aria": "Omlaag stemmen",
     "vote_count_aria": "{{count}} stemmen",
     "loading": "Vragen laden",
+    "loading_detail": "Vraagdetails laden...",
     "search_placeholder": "Zoek vragen...",
     "search_aria": "Zoek vragen",
     "sort_aria": "Sorteer vragen",
@@ -553,8 +555,7 @@
     "answer_posted_success": "Antwoord geplaatst!",
     "answer_posted_error": "Het plaatsen van het antwoord is mislukt",
     "vote_error": "Stemmen is mislukt",
-    "accept_error": "Accepteren van het antwoord is mislukt",
-    "loading_detail": "Loading question details..."
+    "accept_error": "Accepteren van het antwoord is mislukt"
   },
   "wiki": {
     "load_failed": "Wikipagina's konden niet worden geladen",
@@ -567,6 +568,7 @@
     "delete_failed": "Pagina kon niet worden verwijderd",
     "revisions_failed": "Revisiegeschiedenis kon niet worden geladen",
     "loading": "Wiki wordt geladen",
+    "loading_page": "Wikipagina laden...",
     "heading": "Wiki",
     "new_page": "Nieuwe pagina",
     "pages": "Pagina's",
@@ -602,8 +604,7 @@
     "content_label": "Inhoud",
     "create": "Pagina maken",
     "delete_title": "Wikipagina verwijderen",
-    "delete_confirm": "Weet je zeker dat je \"{{name}}\" wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.",
-    "loading_page": "Loading wiki page..."
+    "delete_confirm": "Weet je zeker dat je \"{{name}}\" wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt."
   },
   "page_meta": {
     "create": {
@@ -711,6 +712,5 @@
     "accent_color": "Accentkleur",
     "hue": "Tint",
     "preview": "Voorbeeld"
-  },
-  "member_fallback": "User"
+  }
 }

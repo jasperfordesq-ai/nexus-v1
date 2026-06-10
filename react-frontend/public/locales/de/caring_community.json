@@ -1,4 +1,5 @@
 {
+  "loading": "Loading...",
   "trust_tier": {
     "title": "Meine Vertrauensstufe",
     "subtitle": "Ihr Stellenwert in der Gemeinschaft",
@@ -285,6 +286,7 @@
       "collapse": "Seitenleiste einklappen",
       "help_centre": "Hilfecenter",
       "full_admin": "Vollständiger Admin",
+      "nav_label": "Fürsorgliche Community-Navigation",
       "search_aria": "Search caring community navigation",
       "search_placeholder": "Search navigation...",
       "clear_search": "Suche löschen",
@@ -336,8 +338,7 @@
         "kpi_baselines": "KPI-Baselines",
         "municipal_roi": "Kommunaler ROI",
         "category_coefficients": "Kategoriekoeffizienten"
-      },
-      "nav_label": "Caring community navigation"
+      }
     }
   },
   "admin": {
@@ -1173,6 +1174,5 @@
     "refresh_federation_peers": "Verbund-Peers aktualisieren",
     "refresh_kpi_baselines": "Aktualisieren Sie die KPI-Baselines",
     "refresh_research_partnerships": "Forschungskooperationen auffrischen"
-  },
-  "loading": "Loading..."
+  }
 }

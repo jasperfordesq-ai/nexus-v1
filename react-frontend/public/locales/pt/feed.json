@@ -100,6 +100,7 @@
     "create_poll": "Criar Sondagem",
     "listing_title_label": "Título",
     "listing_title_placeholder": "O que está a oferecer ou procurar?",
+    "listing_type_label": "Tipo de listagem",
     "listing_offering": "A Oferecer",
     "listing_looking_for": "A Procurar",
     "listing_desc_placeholder": "Descreva o seu anúncio...",
@@ -141,6 +142,7 @@
     "image_remove_aria": "Remover imagem",
     "group_label": "Publicar em",
     "group_placeholder": "Feed Público",
+    "group_search": "Grupos de pesquisa",
     "group_members": "{{count}} membros",
     "ai_title_required": "Introduza um título primeiro para a IA gerar uma descrição",
     "ai_generated": "Descrição de IA gerada!",
@@ -229,9 +231,7 @@
     "file_size_mb": "{{name}} ({{size}}MB)",
     "listing_preview_alt": "Pr?-visualiza??o do an?ncio",
     "image_preview_alt": "Pr?-visualiza??o do envio",
-    "listing_type_label": "Listing type",
-    "type_tabs_aria": "Compose content type",
-    "group_search": "Search groups"
+    "type_tabs_aria": "Compor tipo de conteúdo"
   },
   "moderation": {
     "unauthorized": "Não tem permissão para realizar esta ação."
@@ -343,7 +343,7 @@
       "badge_unlocked": "Distintivo desbloqueado",
       "level_reached": "Nível atingido"
     },
-    "read_more_about": "Read more about {{title}}",
+    "read_more_about": "Leia mais sobre {{title}}",
     "detail_course": "Ver curso",
     "type_course": "Curso"
   },
@@ -615,9 +615,9 @@
     "not_found": "Item não encontrado",
     "load_failed": "Falha ao carregar item"
   },
-  "controls_region_label": "Feed controls",
-  "new_posts_available": "New posts available",
+  "controls_region_label": "Controles de feed",
+  "new_posts_available": "Novas postagens disponíveis",
   "confirm": {
-    "delete_post": "Delete this post? This cannot be undone."
+    "delete_post": "Excluir esta postagem? Isto não pode ser desfeito."
   }
 }

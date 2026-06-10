@@ -10,7 +10,7 @@
     "section_compliance": "Comhlíonadh agus maoirseacht",
     "section_records": "Taifid",
     "section_settings": "Socruithe",
-    "nav_label": "Broker navigation"
+    "nav_label": "Nascleanúint bróicéir"
   },
   "header": {
     "toggle_sidebar": "Scoránaigh an barra taoibh",
@@ -194,9 +194,9 @@
     "time_days_ago": "{{count}} l ó shin",
     "note_system_author": "Córas",
     "hours_short": "u",
-    "tabs_aria": "Member status filter",
-    "open_notes_for": "Open notes for {{name}}",
-    "send_note": "Send note"
+    "tabs_aria": "Scagaire stádais ball",
+    "open_notes_for": "Oscail nótaí do {{name}}",
+    "send_note": "Seol nóta"
   },
   "onboarding": {
     "title": "Inbhordáil",
@@ -468,7 +468,7 @@
       "status_changed": "Athraíodh an stádas"
     },
     "detail_no_history": "Níl aon stair ar fáil.",
-    "tabs_aria": "Exchange status filter"
+    "tabs_aria": "Scagaire stádais malairte"
   },
   "messages": {
     "title": "Athbhreithniú Teachtaireachtaí",
@@ -577,7 +577,7 @@
     "copy_reason_flagged_user": "Úsáideoir marcáilte",
     "copy_reason_manual_monitoring": "Monatóireacht láimhe",
     "copy_reason_random_sample": "Sampla randamach",
-    "review_tabs_aria": "Message review filter"
+    "review_tabs_aria": "Scagaire athbhreithnithe teachtaireachta"
   },
   "monitoring": {
     "title": "Monatóireacht úsáideoirí",
@@ -691,7 +691,7 @@
     "category_reputation": "Cáil",
     "category_fraud": "Calaois fhéideartha",
     "category_other": "Eile",
-    "tabs_aria": "Risk level filter"
+    "tabs_aria": "Scagaire leibhéal riosca"
   },
   "insurance": {
     "title": "Teastais árachais",
@@ -787,7 +787,7 @@
     "label_created": "Cruthaithe",
     "label_verified_at": "Fíoraithe ag",
     "label_verified_by": "Fíoraithe ag",
-    "tabs_aria": "Insurance certificate status filter"
+    "tabs_aria": "Scagaire stádais deimhnithe árachais"
   },
   "archives": {
     "title": "Cartlann Athbhreithnithe",
@@ -846,7 +846,7 @@
     "severity_medium": "Meánach",
     "severity_high": "Ard",
     "severity_critical": "Criticiúil",
-    "tabs_aria": "Review archive filter"
+    "tabs_aria": "Athbhreithnigh an scagaire cartlainne"
   },
   "configuration": {
     "title": "Cumraíocht Bhróicéara",
@@ -1094,8 +1094,8 @@
     }
   },
   "layout": {
-    "close_navigation": "Close navigation",
+    "close_navigation": "Dún nascleanúint",
     "navigation": "Navigation",
-    "skip_to_main": "Skip to main content"
+    "skip_to_main": "Téigh ar aghaidh chuig an bpríomhábhar"
   }
 }

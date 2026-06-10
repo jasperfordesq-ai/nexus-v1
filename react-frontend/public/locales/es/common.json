@@ -68,8 +68,8 @@
     "premium": "De primera calidad",
     "verify_identity": "Verifica tu identidad",
     "accessibility_alpha": "Accesibilidad (alfa)",
+    "accessibility_alpha_tooltip": "Versión accesible mejorada: compatible con WCAG 2.2 AA. Se abre en una nueva pestaña.",
     "features": "Funciones",
-    "accessibility_alpha_tooltip": "Enhanced accessible version — WCAG 2.2 AA compliant. Opens in a new tab.",
     "courses": "Cursos",
     "podcasts": "Pódcasts"
   },
@@ -134,7 +134,7 @@
     "premium": "Niveles de membresía premium",
     "accessibility_alpha": "Abrir el frontend alfa centrado en accesibilidad",
     "features": "Todo lo que hace Project NEXUS, con etiquetas de madurez honestas",
-    "dashboard": "Your personalised home overview",
+    "dashboard": "Resumen personalizado de tu hogar",
     "courses": "Aprende nuevas habilidades con tu comunidad",
     "podcasts": "Programas comunitarios e historias de audio."
   },
@@ -396,6 +396,59 @@
     "title": "Comunidad Solidaria",
     "subtitle": "Une el intercambio de banco de tiempo, voluntariado verificado, organizaciones de confianza, grupos, eventos, recursos y señales de impacto en un único flujo de cuidados coordinado.",
     "welcome_banner": "¡Bienvenido/a! Aquí puedes pedir ayuda, ofrecer tu tiempo o simplemente registrar un gesto vecinal. Cada contribución — grande o pequeña — fortalece tu comunidad.",
+    "alpha": {
+      "badge": "Nuevo · Acceso anticipado"
+    },
+    "preview_tag": "Vista previa",
+    "hero": {
+      "title": "Comunidad Solidaria",
+      "intro": "La Comunidad Solidaria es un espacio donde los vecinos se ayudan en el día a día — un viaje a una cita, hacer unas compras o simplemente acompañar una tarde. Pide ayuda cuando la necesites y ofrécela cuando puedas.",
+      "timebank_note": "Funciona junto al banco de tiempo: cuando das tu tiempo, se registra como horas que podrás usar más adelante — las mismas horas, en un saldo compartido.",
+      "cta_get_help": "Necesito ayuda",
+      "cta_give_help": "Quiero ayudar"
+    },
+    "new_notice": {
+      "title": "Es totalmente nuevo.",
+      "body": "La Comunidad Solidaria acaba de estrenarse aquí y todavía la estamos construyendo. Algunas funciones son vistas previas y no funciona sola — depende de que los vecinos se ofrezcan como voluntarios para cuidar. Gracias por estar desde el principio."
+    },
+    "how": {
+      "title": "Cómo funciona",
+      "subtitle": "Tres pasos sencillos.",
+      "step1_title": "Pide ayuda",
+      "step1_desc": "Cuéntanos con tus palabras qué necesitas. Tu solicitud llega a miembros de confianza cercanos.",
+      "step2_title": "Un vecino se ofrece",
+      "step2_desc": "Alguien de la comunidad se ofrece a ayudar y acordáis una hora que os venga bien a ambos.",
+      "step3_title": "Se registran las horas",
+      "step3_desc": "El tiempo dado se registra en horas, así quienes ayudan acumulan horas para usar o ceder más adelante."
+    },
+    "recruit": {
+      "title": "Buscamos a nuestras primeras personas cuidadoras",
+      "body": "La Comunidad Solidaria solo funciona si la gente da un paso al frente para ayudar. Aún no tenemos un equipo de personas cuidadoras — lo estamos creando. Si puedes dedicar un poco de tiempo, podrías ser de las primeras.",
+      "cta": "Ofrecer mi ayuda"
+    },
+    "your_hours_note": "Son los mismos créditos de tiempo del banco de tiempo — un saldo compartido, no una moneda aparte de la Comunidad Solidaria.",
+    "groups": {
+      "get_help": {
+        "title": "Recibir ayuda",
+        "desc": "Pide apoyo y haz seguimiento de las personas que te ayudan."
+      },
+      "give_help": {
+        "title": "Echar una mano",
+        "desc": "Ofrece tu tiempo y tus habilidades a vecinos que lo necesiten."
+      },
+      "your_hours": {
+        "title": "Tus horas",
+        "desc": "Consulta y usa los créditos de tiempo que has ganado."
+      },
+      "caregiver_tools": {
+        "title": "Herramientas para cuidadores",
+        "desc": "Herramientas para quienes cuidan de forma habitual. Serán más útiles a medida que crezca nuestra red de personas cuidadoras."
+      },
+      "safety": {
+        "title": "Seguridad y novedades",
+        "desc": "Comunica una preocupación o sigue lo que ocurre cerca de ti."
+      }
+    },
     "actions": {
       "request_help": "Pedir ayuda",
       "request_help_sub": "Pide a tu comunidad apoyo práctico",
@@ -417,6 +470,8 @@
       "future_care_fund_sub": "Considera tus horas acumuladas como un seguro para cuidados futuros.",
       "cover_care": "Relevo de cuidados",
       "cover_care_sub": "Para cuidadores: organiza un relevo de confianza cuando necesites un descanso. Más útil a medida que crece la red.",
+      "become_caregiver": "Hazte cuidador/a",
+      "become_caregiver_sub": "Dinos que quieres cuidar de forma habitual y ayúdanos a formar el equipo.",
       "hour_gift": "Regalar horas",
       "hour_gift_sub": "Regala tus horas acumuladas a familiares o amigos.",
       "hour_transfer": "Transferir horas",
@@ -424,9 +479,7 @@
       "safeguarding_report": "Reportar una preocupación",
       "safeguarding_report_sub": "Reporta inquietudes de salvaguardia de forma confidencial.",
       "projects": "Proyectos comunitarios",
-      "projects_sub": "Sigue las actualizaciones de municipios y barrios.",
-      "become_caregiver": "Hazte cuidador/a",
-      "become_caregiver_sub": "Dinos que quieres cuidar de forma habitual y ayúdanos a formar el equipo."
+      "projects_sub": "Sigue las actualizaciones de municipios y barrios."
     },
     "operating_model": {
       "title": "Modelo operativo",
@@ -510,59 +563,6 @@
       "show_all": "Mostrar todas las acciones",
       "show_recommended": "Mostrar recomendadas",
       "change_answer": "Cambiar respuesta"
-    },
-    "alpha": {
-      "badge": "Nuevo · Acceso anticipado"
-    },
-    "preview_tag": "Vista previa",
-    "hero": {
-      "title": "Comunidad Solidaria",
-      "intro": "La Comunidad Solidaria es un espacio donde los vecinos se ayudan en el día a día — un viaje a una cita, hacer unas compras o simplemente acompañar una tarde. Pide ayuda cuando la necesites y ofrécela cuando puedas.",
-      "timebank_note": "Funciona junto al banco de tiempo: cuando das tu tiempo, se registra como horas que podrás usar más adelante — las mismas horas, en un saldo compartido.",
-      "cta_get_help": "Necesito ayuda",
-      "cta_give_help": "Quiero ayudar"
-    },
-    "new_notice": {
-      "title": "Es totalmente nuevo.",
-      "body": "La Comunidad Solidaria acaba de estrenarse aquí y todavía la estamos construyendo. Algunas funciones son vistas previas y no funciona sola — depende de que los vecinos se ofrezcan como voluntarios para cuidar. Gracias por estar desde el principio."
-    },
-    "how": {
-      "title": "Cómo funciona",
-      "subtitle": "Tres pasos sencillos.",
-      "step1_title": "Pide ayuda",
-      "step1_desc": "Cuéntanos con tus palabras qué necesitas. Tu solicitud llega a miembros de confianza cercanos.",
-      "step2_title": "Un vecino se ofrece",
-      "step2_desc": "Alguien de la comunidad se ofrece a ayudar y acordáis una hora que os venga bien a ambos.",
-      "step3_title": "Se registran las horas",
-      "step3_desc": "El tiempo dado se registra en horas, así quienes ayudan acumulan horas para usar o ceder más adelante."
-    },
-    "recruit": {
-      "title": "Buscamos a nuestras primeras personas cuidadoras",
-      "body": "La Comunidad Solidaria solo funciona si la gente da un paso al frente para ayudar. Aún no tenemos un equipo de personas cuidadoras — lo estamos creando. Si puedes dedicar un poco de tiempo, podrías ser de las primeras.",
-      "cta": "Ofrecer mi ayuda"
-    },
-    "your_hours_note": "Son los mismos créditos de tiempo del banco de tiempo — un saldo compartido, no una moneda aparte de la Comunidad Solidaria.",
-    "groups": {
-      "get_help": {
-        "title": "Recibir ayuda",
-        "desc": "Pide apoyo y haz seguimiento de las personas que te ayudan."
-      },
-      "give_help": {
-        "title": "Echar una mano",
-        "desc": "Ofrece tu tiempo y tus habilidades a vecinos que lo necesiten."
-      },
-      "your_hours": {
-        "title": "Tus horas",
-        "desc": "Consulta y usa los créditos de tiempo que has ganado."
-      },
-      "caregiver_tools": {
-        "title": "Herramientas para cuidadores",
-        "desc": "Herramientas para quienes cuidan de forma habitual. Serán más útiles a medida que crezca nuestra red de personas cuidadoras."
-      },
-      "safety": {
-        "title": "Seguridad y novedades",
-        "desc": "Comunica una preocupación o sigue lo que ocurre cerca de ti."
-      }
     }
   },
   "request_help": {
@@ -631,8 +631,8 @@
       "confirm_body": "Tus horas se descontarán ahora y se acreditarán cuando la otra persona acepte.",
       "confirm_button": "Sí, regalar horas",
       "cancel": "Cancelar",
-      "recipient_hint": "Type at least 2 letters to search",
-      "recipient_no_results": "No members found"
+      "recipient_hint": "Escribe al menos 2 letras para buscar",
+      "recipient_no_results": "No se encontraron miembros"
     },
     "inbox": {
       "empty": "No hay regalos por aceptar ahora mismo.",
@@ -870,9 +870,9 @@
     "select_category": "Seleccionar una categoría",
     "verification_badges": "Insignias de verificación",
     "search_skills": "Buscar habilidades",
-    "user_menu_trigger": "User menu for {{name}}",
-    "feed_sidebar": "Community sidebar",
-    "filter_panel": "Filter panel",
+    "user_menu_trigger": "Menú de usuario para {{name}}",
+    "feed_sidebar": "Barra lateral de la comunidad",
+    "filter_panel": "Panel de filtro",
     "remove": "Remove"
   },
   "skills": {
@@ -935,7 +935,7 @@
   "toast": {
     "aria_notifications": "Notificaciones",
     "aria_dismiss_notification": "Descartar notificación",
-    "aria_urgent_notifications": "Urgent notifications"
+    "aria_urgent_notifications": "Notificaciones urgentes"
   },
   "verified": "Verificado",
   "map_unavailable": "La vista de mapa no está disponible",
@@ -970,7 +970,9 @@
   "verify_identity": "Verificar identidad",
   "level_short": "Niv. {{level}}",
   "cancel": "Cancelar",
+  "confirm": "Confirm",
   "save": "Guardar",
+  "delete": "Delete",
   "offer_favour": {
     "meta": {
       "title": "Ofrecer un favor",
@@ -1716,8 +1718,8 @@
     "webhook_create_title": "Crear una suscripción",
     "webhook_create_body": "POST a /api/partner/v1/webhooks/subscriptions con event_types (array) y target_url (solo https). La respuesta incluye un secret único — guárdalo.",
     "tabs": {
-      "code_examples": "Code examples",
-      "verification_examples": "Verification examples"
+      "code_examples": "Ejemplos de código",
+      "verification_examples": "Ejemplos de verificación"
     }
   },
   "regional_analytics": {
@@ -1813,10 +1815,10 @@
     "distinct_visitors": "Visitantes únicos",
     "suppressed_value": "Suprimido",
     "suppressed_short": "--",
-    "line_chart_aria": "Line chart showing partner activity over time",
-    "bar_chart_aria": "Bar chart showing partner performance metrics",
-    "pie_chart_aria": "Pie chart showing distribution of partner data",
-    "area_chart_aria": "Area chart showing partner trends over time"
+    "line_chart_aria": "Gráfico de líneas que muestra la actividad de los socios a lo largo del tiempo",
+    "bar_chart_aria": "Gráfico de barras que muestra las métricas de rendimiento de los socios",
+    "pie_chart_aria": "Gráfico circular que muestra la distribución de los datos de los socios",
+    "area_chart_aria": "Gráfico de áreas que muestra las tendencias de los socios a lo largo del tiempo"
   },
   "provisioning": {
     "meta": {
@@ -1922,6 +1924,7 @@
       "slot_created": "Franja de recogida creada",
       "slot_create_failed": "No se pudo crear la franja",
       "slot_deleted": "Franja eliminada",
+      "slot_delete_confirm": "¿Eliminar esta ranura de recogida? Esto no se puede deshacer.",
       "capacity": "Capacidad",
       "recurring": "Recurrente",
       "recurring_weekly": "Repetir semanalmente",
@@ -1940,8 +1943,7 @@
       "window": "Ventana de recogida",
       "choose_slot": "Elige una franja de recogida",
       "no_slot_selected": "Sin franja de recogida",
-      "left": "restante",
-      "slot_delete_confirm": "Delete this pickup slot? This cannot be undone."
+      "left": "restante"
     },
     "inventory": {
       "section_title": "Inventario",
@@ -2010,6 +2012,7 @@
     "invite_modal_title": "Invitación entre clubes",
     "invite_modal_subtitle": "Invita a esta persona a unirse también a uno de los clubes federados.",
     "invite_target_label": "Elige un club",
+    "invite_target_search": "Buscar clubes",
     "invite_message_label": "Mensaje personal (opcional)",
     "invite_message_placeholder": "¡Hola! Pensé que también te gustaría este club.",
     "invite_send": "Enviar invitación",
@@ -2042,8 +2045,7 @@
       "today": "Hoy",
       "from_label": "De",
       "load_failed": "No se pudo cargar el calendario."
-    },
-    "invite_target_search": "Search clubs"
+    }
   },
   "oauth": {
     "continue_with_google": "Continuar con Google",
@@ -2174,7 +2176,7 @@
     "description_label": "Descripción (opcional)",
     "make_public": "Hacer pública",
     "create": "Crear",
-    "confirm_create": "Create collection"
+    "confirm_create": "Crear colección"
   },
   "appreciations": {
     "title": "Enviar un agradecimiento",
@@ -2293,17 +2295,15 @@
   "xp_progress": "{{current}} / {{required}} XP",
   "level_progress_aria": "Progreso del nivel {{level}}: {{percentage}}%",
   "user_fallback": "User",
-  "release_stage": "Generally Available (v1.5.1)",
-  "confirm": "Confirm",
+  "release_stage": "Disponible de forma general (v1.5.1)",
   "theme_picker": {
     "title": "Appearance",
-    "subtitle": "Tune color scheme, accent, and density.",
-    "open_label": "Open theme picker",
-    "color_scheme": "Color scheme",
+    "subtitle": "Ajuste la combinación de colores, el acento y la densidad.",
+    "open_label": "Abrir selector de temas",
+    "color_scheme": "esquema de color",
     "scheme_light": "Light",
     "scheme_dark": "Dark",
     "scheme_system": "System"
   },
-  "delete": "Delete",
   "alpha_badge": "Alfa"
 }

@@ -1,4 +1,5 @@
 {
+  "breadcrumb": "Breadcrumb",
   "page_title": "Mercato",
   "meta_description": "Compra, vendi o condividi oggetti localmente con i tuoi vicini — annunci del mercato comunitario, articoli gratuiti, acquisti di gruppo e consegne all'interno della tua banca del tempo.",
   "hub": {
@@ -166,6 +167,7 @@
     "price_type_label": "Tipo di prezzo",
     "price_label": "Prezzo",
     "currency_label": "Valuta",
+    "currency_search": "Cerca valuta",
     "location_delivery": "Posizione e consegna",
     "location_label": "Posizione",
     "location_placeholder": "Città, paese o area",
@@ -178,11 +180,11 @@
     "created_success": "Annuncio creato con successo!",
     "created_error": "Impossibile creare l'annuncio",
     "created_error_retry": "Impossibile creare l'annuncio. Riprova.",
-    "draft_saved": "Bozza salvata",
-    "currency_search": "Search currency"
+    "draft_saved": "Bozza salvata"
   },
   "search": {
     "page_title": "Cerca nel Marketplace",
+    "page_heading": "Search Marketplace",
     "meta_description": "Cerca e filtra articoli nel marketplace della comunità.",
     "breadcrumb_search": "Cerca",
     "search_placeholder": "Cerca nel marketplace...",
@@ -221,8 +223,7 @@
     "price_from": "Da {{min}}",
     "price_up_to": "Fino a {{max}}",
     "last_days_one": "Ultimo {{count}} giorno",
-    "last_days_other": "Ultimi {{count}} giorni",
-    "page_heading": "Search Marketplace"
+    "last_days_other": "Ultimi {{count}} giorni"
   },
   "seller": {
     "page_title": "Profilo Venditore",
@@ -638,7 +639,7 @@
     "search_this_area": "Cerca in quest'area",
     "distance_km": "{{km}} km di distanza",
     "distance_meters": "{{m}}m di distanza",
-    "view_toggle": "View mode"
+    "view_toggle": "Modalità di visualizzazione"
   },
   "shipping": {
     "title": "Opzioni di Spedizione",
@@ -672,7 +673,7 @@
     "recommended": "Consigliato",
     "loading": "Caricamento opzioni di spedizione...",
     "no_options": "Nessuna opzione di spedizione disponibile per questo venditore.",
-    "delete_confirm": "Remove this shipping option? This cannot be undone."
+    "delete_confirm": "Rimuovere questa opzione di spedizione? Questa operazione non può essere annullata."
   },
   "listing_location": {
     "location_title": "Posizione",
@@ -809,12 +810,11 @@
     "not_available_title": "Configurazione del pagamento in corso",
     "not_available_description": "L'elaborazione dei pagamenti è in fase di configurazione. Contatta il venditore per concordare il pagamento."
   },
-  "breadcrumb": "Breadcrumb",
-  "buyer_orders_tabs_aria": "Buyer order status filter",
-  "collections_tabs_aria": "Marketplace collections sections",
-  "my_listings_tabs_aria": "My listings status filter",
-  "my_offers_tabs_aria": "My offers sections",
-  "seller_orders_tabs_aria": "Seller order status filter",
-  "seller_profile_tabs_aria": "Seller profile sections",
-  "category_filter_label": "Filter by category"
+  "buyer_orders_tabs_aria": "Filtro sullo stato dell'ordine dell'acquirente",
+  "collections_tabs_aria": "Sezioni delle raccolte del Marketplace",
+  "my_listings_tabs_aria": "Filtro sullo stato delle mie inserzioni",
+  "my_offers_tabs_aria": "Le mie sezioni offerte",
+  "seller_orders_tabs_aria": "Filtro sullo stato dell'ordine del venditore",
+  "seller_profile_tabs_aria": "Sezioni del profilo del venditore",
+  "category_filter_label": "Filtra per categoria"
 }

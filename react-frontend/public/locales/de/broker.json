@@ -10,7 +10,7 @@
     "section_compliance": "Compliance & Aufsicht",
     "section_records": "Datensätze",
     "section_settings": "Einstellungen",
-    "nav_label": "Broker navigation"
+    "nav_label": "Broker-Navigation"
   },
   "header": {
     "toggle_sidebar": "Seitenleiste umschalten",
@@ -194,9 +194,9 @@
     "time_days_ago": "vor {{count}} T",
     "note_system_author": "System",
     "hours_short": "Std",
-    "tabs_aria": "Member status filter",
-    "open_notes_for": "Open notes for {{name}}",
-    "send_note": "Send note"
+    "tabs_aria": "Filter für den Mitgliedsstatus",
+    "open_notes_for": "Notizen für {{name}} öffnen",
+    "send_note": "Notiz senden"
   },
   "onboarding": {
     "title": "Onboarding",
@@ -468,7 +468,7 @@
       "status_changed": "Status geändert"
     },
     "detail_no_history": "Kein Verlauf verfügbar.",
-    "tabs_aria": "Exchange status filter"
+    "tabs_aria": "Exchange-Statusfilter"
   },
   "messages": {
     "title": "Nachrichtenüberprüfung",
@@ -577,7 +577,7 @@
     "copy_reason_flagged_user": "Markierter Nutzer",
     "copy_reason_manual_monitoring": "Manuelle Überwachung",
     "copy_reason_random_sample": "Zufallsstichprobe",
-    "review_tabs_aria": "Message review filter"
+    "review_tabs_aria": "Nachrichtenüberprüfungsfilter"
   },
   "monitoring": {
     "title": "Nutzerüberwachung",
@@ -691,7 +691,7 @@
     "category_reputation": "Ruf",
     "category_fraud": "Möglicher Betrug",
     "category_other": "Sonstige",
-    "tabs_aria": "Risk level filter"
+    "tabs_aria": "Risikostufenfilter"
   },
   "insurance": {
     "title": "Versicherungszertifikate",
@@ -787,7 +787,7 @@
     "label_created": "Erstellt",
     "label_verified_at": "Verifiziert am",
     "label_verified_by": "Verifiziert von",
-    "tabs_aria": "Insurance certificate status filter"
+    "tabs_aria": "Filter für den Status des Versicherungszertifikats"
   },
   "archives": {
     "title": "Prüfungsarchiv",
@@ -846,7 +846,7 @@
     "severity_medium": "Mittel",
     "severity_high": "Hoch",
     "severity_critical": "Kritisch",
-    "tabs_aria": "Review archive filter"
+    "tabs_aria": "Überprüfen Sie den Archivfilter"
   },
   "configuration": {
     "title": "Broker-Konfiguration",
@@ -1094,8 +1094,8 @@
     }
   },
   "layout": {
-    "close_navigation": "Close navigation",
+    "close_navigation": "Navigation schließen",
     "navigation": "Navigation",
-    "skip_to_main": "Skip to main content"
+    "skip_to_main": "Zum Hauptinhalt springen"
   }
 }

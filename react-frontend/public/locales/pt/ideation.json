@@ -3,6 +3,8 @@
   "title": "Desafios de Ideação",
   "subtitle": "Partilhe ideias, vote e ajude a moldar a sua comunidade",
   "page_description": "Explore os desafios da comunidade, envie ideias e vote em soluções. Ajude a moldar o futuro da sua comunidade.",
+  "loading": "Loading...",
+  "tabs_filter_aria": "Filtrar desafios",
   "actions": {
     "retry": "Tentar Novamente"
   },
@@ -52,7 +54,7 @@
     "create": "Criar Desafio",
     "load_error": "Não foi possível carregar desafios",
     "load_more": "Carregar Mais",
-    "loading": "Loading challenge..."
+    "loading": "Carregando desafio..."
   },
   "ideas": {
     "title": "Ideias",
@@ -85,7 +87,7 @@
     "draft_created": "Criado {{date}}",
     "new_idea": "Nova Ideia",
     "sort_label": "Ordenar ideias",
-    "loading": "Loading ideas..."
+    "loading": "Carregando ideias..."
   },
   "idea_detail": {
     "page_title": "Detalhes da Ideia",
@@ -98,14 +100,14 @@
     "title": "Comentários",
     "empty_title": "Ainda Sem Comentários",
     "empty_description": "Seja o primeiro a partilhar os seus pensamentos sobre esta ideia.",
+    "add_label": "Adicione um comentário",
     "add_placeholder": "Partilhe os seus pensamentos...",
     "add_button": "Publicar Comentário",
     "delete": "Eliminar",
     "delete_confirm": "Tem a certeza de que pretende eliminar este comentário?",
     "load_more": "Carregar Mais Comentários",
     "load_error": "Não foi possível carregar comentários",
-    "add_label": "Add a comment",
-    "loading": "Loading comments..."
+    "loading": "Carregando comentários..."
   },
   "form": {
     "title_label": "Título",
@@ -425,10 +427,8 @@
   "challenge_detail": {
     "actions": "Ações do desafio"
   },
-  "loading": "Loading...",
-  "tabs_filter_aria": "Filter challenges",
   "confirm": {
-    "delete_task": "Delete this task? This cannot be undone.",
-    "delete_message": "Delete this message? This cannot be undone."
+    "delete_task": "Excluir esta tarefa? Isto não pode ser desfeito.",
+    "delete_message": "Excluir esta mensagem? Isto não pode ser desfeito."
   }
 }

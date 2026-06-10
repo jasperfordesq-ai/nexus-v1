@@ -1,6 +1,7 @@
 {
   "page_title": "AI Assistent",
   "aria_chat": "AI Gesprek",
+  "messages_region": "Chatberichten",
   "header_title": "AI Assistent",
   "header_subtitle": "Aangedreven door AI",
   "limits_left_today": "{{count}} is vandaag vertrokken",
@@ -27,9 +28,6 @@
   "starter_q3": "Hoe werkt timebanking?",
   "starter_q4": "Welke aankomende evenementen zijn er?",
   "starter_q5": "Hoe maak ik een aanbieding om mijn vaardigheden aan te bieden?",
-  "page_meta": {
-    "title": "AI Gesprek"
-  },
   "thumbs_up_aria": "Nuttig antwoord",
   "thumbs_down_aria": "Niet nuttig antwoord",
   "card_online": "Online",
@@ -39,5 +37,7 @@
   "tool_results": {
     "view": "Bekijken"
   },
-  "messages_region": "Chat messages"
+  "page_meta": {
+    "title": "AI Gesprek"
+  }
 }

@@ -1,4 +1,5 @@
 {
+  "breadcrumb": "Breadcrumb",
   "page_title": "السوق",
   "meta_description": "اشترِ أو بِع أو شارك المنتجات محلياً مع جيرانك — قوائم السوق المجتمعي، المنتجات المجانية، المشتريات الجماعية، والتوصيل داخل بنك وقتك.",
   "hub": {
@@ -166,6 +167,7 @@
     "price_type_label": "نوع السعر",
     "price_label": "السعر",
     "currency_label": "العملة",
+    "currency_search": "عملة البحث",
     "location_delivery": "الموقع والتوصيل",
     "location_label": "الموقع",
     "location_placeholder": "المدينة أو البلدة أو المنطقة",
@@ -178,11 +180,11 @@
     "created_success": "تم إنشاء القائمة بنجاح!",
     "created_error": "فشل في إنشاء القائمة",
     "created_error_retry": "فشل في إنشاء القائمة. يرجى المحاولة مرة أخرى.",
-    "draft_saved": "تم حفظ المسودة",
-    "currency_search": "Search currency"
+    "draft_saved": "تم حفظ المسودة"
   },
   "search": {
     "page_title": "ابحث في السوق",
+    "page_heading": "Search Marketplace",
     "meta_description": "ابحث وقم بتصفية العناصر في سوق المجتمع.",
     "breadcrumb_search": "بحث",
     "search_placeholder": "ابحث في السوق...",
@@ -221,8 +223,7 @@
     "price_from": "من {{min}}",
     "price_up_to": "حتى {{max}}",
     "last_days_one": "آخر {{count}} يوم",
-    "last_days_other": "آخر {{count}} أيام",
-    "page_heading": "Search Marketplace"
+    "last_days_other": "آخر {{count}} أيام"
   },
   "seller": {
     "page_title": "ملف البائع",
@@ -638,7 +639,7 @@
     "search_this_area": "ابحث في هذه المنطقة",
     "distance_km": "{{km}} كم بعيد",
     "distance_meters": "{{m}}م بعيد",
-    "view_toggle": "View mode"
+    "view_toggle": "وضع العرض"
   },
   "shipping": {
     "title": "خيارات الشحن",
@@ -672,7 +673,7 @@
     "recommended": "موصى به",
     "loading": "جارٍ تحميل خيارات الشحن...",
     "no_options": "لا توجد خيارات شحن متاحة لهذا البائع.",
-    "delete_confirm": "Remove this shipping option? This cannot be undone."
+    "delete_confirm": "هل تريد إزالة خيار الشحن هذا؟ لا يمكن التراجع عن هذا."
   },
   "listing_location": {
     "location_title": "الموقع",
@@ -809,12 +810,11 @@
     "not_available_title": "جارٍ إعداد معالجة الدفع",
     "not_available_description": "جارٍ إعداد معالجة الدفع. يرجى التواصل مع البائع لترتيب الدفع."
   },
-  "breadcrumb": "Breadcrumb",
-  "buyer_orders_tabs_aria": "Buyer order status filter",
-  "collections_tabs_aria": "Marketplace collections sections",
-  "my_listings_tabs_aria": "My listings status filter",
-  "my_offers_tabs_aria": "My offers sections",
-  "seller_orders_tabs_aria": "Seller order status filter",
-  "seller_profile_tabs_aria": "Seller profile sections",
-  "category_filter_label": "Filter by category"
+  "buyer_orders_tabs_aria": "مرشح حالة طلب المشتري",
+  "collections_tabs_aria": "أقسام مجموعات السوق",
+  "my_listings_tabs_aria": "مرشح حالة القوائم الخاصة بي",
+  "my_offers_tabs_aria": "أقسام عروضي",
+  "seller_orders_tabs_aria": "مرشح حالة طلب البائع",
+  "seller_profile_tabs_aria": "أقسام ملف تعريف البائع",
+  "category_filter_label": "تصفية حسب الفئة"
 }

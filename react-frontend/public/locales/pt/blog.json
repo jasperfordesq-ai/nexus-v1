@@ -1,12 +1,14 @@
 {
   "page_title": "Blogue",
-  "loading_post": "Loading blog post...",
+  "loading_post": "Carregando postagem do blog...",
   "hero_eyebrow": "Histórias da comunidade",
   "hero_posts_label": "Publicações exibidas",
   "title": "Blogue e Notícias",
   "subtitle": "Histórias da comunidade, atualizações e comunicados",
   "search_placeholder": "Pesquisar artigos...",
   "filter_all": "Todos",
+  "filter_by_category": "Filtrar por categoria",
+  "loading_posts": "Carregando postagens do blog",
   "unable_to_load": "Não Foi Possível Carregar os Artigos",
   "try_again": "Tentar Novamente",
   "error_load_posts": "Falha ao carregar artigos do blogue.",
@@ -62,7 +64,5 @@
     "reaction_sad": "Triste",
     "reaction_celebrate": "Celebrar"
   },
-  "page_description": "Histórias, guias e atualizações da comunidade de banco de tempo — trocas que funcionaram, lições aprendidas e as últimas novidades de grupos locais e parceiros.",
-  "filter_by_category": "Filter by category",
-  "loading_posts": "Loading blog posts"
+  "page_description": "Histórias, guias e atualizações da comunidade de banco de tempo — trocas que funcionaram, lições aprendidas e as últimas novidades de grupos locais e parceiros."
 }

@@ -1,4 +1,5 @@
 {
+  "member_fallback": "User",
   "title": "Gruppen",
   "discover": "Gruppen entdecken",
   "create_group": "Gruppe erstellen",
@@ -50,6 +51,7 @@
   "posts_count_label": "{{count}} Beiträge",
   "detail": {
     "loading": "Gruppe wird geladen...",
+    "loading_replies": "Antworten werden geladen...",
     "unable_to_load": "Gruppe kann nicht geladen werden",
     "not_found_desc": "Die gesuchte Gruppe existiert nicht",
     "error_load_failed": "Gruppe konnte nicht geladen werden. Bitte versuchen Sie es erneut.",
@@ -127,6 +129,8 @@
     "no_members_title": "Noch keine Mitglieder",
     "no_members_desc": "Seien Sie die erste Person, die dieser Gruppe beitritt",
     "members_loading_aria": "Gruppenmitglieder werden geladen",
+    "feed_loading": "Gruppenfeed wird geladen...",
+    "events_loading": "Gruppenveranstaltungen werden geladen...",
     "member_owner": "Inhaber",
     "member_admin": "Administrator",
     "member_joined": "Beigetreten am {{date}}",
@@ -195,10 +199,7 @@
     "feed_empty_desc": "Teilen Sie als Erster etwas mit dieser Gruppe!",
     "feed_create_post": "Beitrag erstellen",
     "feed_load_more": "Mehr laden",
-    "member_actions_aria": "Mitglieder-Aktionen",
-    "feed_loading": "Loading group feed...",
-    "events_loading": "Loading group events...",
-    "loading_replies": "Loading replies..."
+    "member_actions_aria": "Mitglieder-Aktionen"
   },
   "form": {
     "create_title": "Neue Gruppe erstellen",
@@ -258,6 +259,7 @@
     "template_label": "Von einer Vorlage starten (optional)"
   },
   "announcements": {
+    "loading": "Ankündigungen werden geladen...",
     "heading": "Ankündigungen",
     "new": "Neue Ankündigung",
     "no_announcements_title": "Keine Ankündigungen",
@@ -285,8 +287,7 @@
     "pinned_success": "Angepinnt",
     "update_failed": "Ankündigung konnte nicht aktualisiert werden",
     "deleted": "Ankündigung gelöscht",
-    "delete_failed": "Ankündigung konnte nicht gelöscht werden",
-    "loading": "Loading announcements..."
+    "delete_failed": "Ankündigung konnte nicht gelöscht werden"
   },
   "challenges": {
     "heading": "Herausforderungen",
@@ -414,7 +415,7 @@
     "video_player": "Videoplayer",
     "fullsize_alt": "Bild in voller Größe",
     "delete": "Löschen",
-    "delete_confirm": "Delete this media item? This cannot be undone."
+    "delete_confirm": "Dieses Medienelement löschen? Dies kann nicht rückgängig gemacht werden."
   },
   "webhooks": {
     "load_failed": "Webhooks konnten nicht geladen werden",
@@ -442,7 +443,7 @@
     "secret_placeholder": "Signatur-Secret zur Payload-Verifizierung",
     "cancel": "Abbrechen",
     "create_btn": "Webhook erstellen",
-    "delete_confirm": "Delete this webhook? This cannot be undone."
+    "delete_confirm": "Diesen Webhook löschen? Dies kann nicht rückgängig gemacht werden."
   },
   "toast": {
     "left": "Gruppe verlassen",
@@ -516,6 +517,7 @@
     "downvote_aria": "Runterstimmen",
     "vote_count_aria": "{{count}} Stimmen",
     "loading": "Fragen werden geladen",
+    "loading_detail": "Fragendetails werden geladen...",
     "search_placeholder": "Fragen suchen...",
     "search_aria": "Fragen suchen",
     "sort_aria": "Fragen sortieren",
@@ -553,8 +555,7 @@
     "answer_posted_success": "Antwort gepostet!",
     "answer_posted_error": "Fehler beim Posten der Antwort",
     "vote_error": "Fehler beim Abstimmen",
-    "accept_error": "Fehler beim Akzeptieren der Antwort",
-    "loading_detail": "Loading question details..."
+    "accept_error": "Fehler beim Akzeptieren der Antwort"
   },
   "wiki": {
     "load_failed": "Wiki-Seiten konnten nicht geladen werden",
@@ -567,6 +568,7 @@
     "delete_failed": "Seite konnte nicht gelöscht werden",
     "revisions_failed": "Versionsverlauf konnte nicht geladen werden",
     "loading": "Wiki wird geladen",
+    "loading_page": "Wiki-Seite wird geladen...",
     "heading": "Wiki",
     "new_page": "Neue Seite",
     "pages": "Seiten",
@@ -602,8 +604,7 @@
     "content_label": "Inhalt",
     "create": "Seite erstellen",
     "delete_title": "Wiki-Seite löschen",
-    "delete_confirm": "Möchtest du \"{{name}}\" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
-    "loading_page": "Loading wiki page..."
+    "delete_confirm": "Möchtest du \"{{name}}\" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden."
   },
   "page_meta": {
     "create": {
@@ -711,6 +712,5 @@
     "accent_color": "Akzentfarbe",
     "hue": "Farbton",
     "preview": "Vorschau"
-  },
-  "member_fallback": "User"
+  }
 }

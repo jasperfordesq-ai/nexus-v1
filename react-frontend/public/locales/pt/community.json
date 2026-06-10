@@ -185,7 +185,7 @@
     "terms_required": "Deve concordar com os termos para registar a sua organização.",
     "opportunity_count_one": "{{count}} oportunidade",
     "opportunity_count_other": "{{count}} oportunidades",
-    "loading": "Loading organisations"
+    "loading": "Carregando organizações"
   },
   "organisation_detail": {
     "page_title": "Organização",
@@ -219,7 +219,7 @@
     "cancel": "Cancelar",
     "submit_application": "Submeter Candidatura",
     "job_openings": "Vagas de emprego",
-    "rating_sr": "{{n}} out of 5 stars"
+    "rating_sr": "{{n}} de 5 estrelas"
   },
   "emergency_alerts": {
     "heading": "Alertas de Emergência",

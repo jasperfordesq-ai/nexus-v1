@@ -28,6 +28,6 @@
   "page_meta": {
     "title": "マッチ"
   },
-  "filter_tabs_aria": "Match source filter",
-  "loading": "Loading matches..."
+  "filter_tabs_aria": "一致ソースフィルター",
+  "loading": "試合をロード中..."
 }

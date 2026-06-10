@@ -1,6 +1,7 @@
 {
   "page_title": "Cúntóir IS",
   "aria_chat": "Comhrá IS",
+  "messages_region": "Teachtaireachtaí comhrá",
   "header_title": "Cúntóir IS",
   "header_subtitle": "Le Cumhacht IS",
   "limits_left_today": "{{count}} fágtha inniu",
@@ -27,9 +28,6 @@
   "starter_q3": "Conas a oibríonn baincéireacht ama?",
   "starter_q4": "Cad iad na himeachtaí atá le teacht?",
   "starter_q5": "Conas a chruthaím liostú chun mo scileanna a thairiscint?",
-  "page_meta": {
-    "title": "Comhrá AI"
-  },
   "thumbs_up_aria": "Freagra úsáideach",
   "thumbs_down_aria": "Freagra gan úsáid",
   "card_online": "Ar líne",
@@ -39,5 +37,7 @@
   "tool_results": {
     "view": "Amharc"
   },
-  "messages_region": "Chat messages"
+  "page_meta": {
+    "title": "Comhrá AI"
+  }
 }

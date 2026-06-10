@@ -1,21 +1,21 @@
 {
   "page_title": "Beoordelingen",
   "tabs": {
+    "received": "Ontvangen beoordelingen",
     "given": "Gegeven beoordelingen",
-    "pending": "Openstaande beoordelingen",
-    "received": "Ontvangen beoordelingen"
+    "pending": "Openstaande beoordelingen"
   },
   "stats": {
     "average": "Gemiddelde beoordeling",
-    "no_reviews": "Nog geen beoordelingen",
-    "total": "Totaal beoordelingen"
+    "total": "Totaal beoordelingen",
+    "no_reviews": "Nog geen beoordelingen"
   },
   "review_card": {
     "anonymous": "Anoniem",
     "delete": "Beoordeling verwijderen",
     "delete_confirm": "Weet je zeker dat je deze beoordeling wilt verwijderen?",
-    "delete_error": "Verwijderen van beoordeling mislukt",
-    "delete_success": "Beoordeling verwijderd"
+    "delete_success": "Beoordeling verwijderd",
+    "delete_error": "Verwijderen van beoordeling mislukt"
   },
   "pending": {
     "empty": "Geen openstaande beoordelingen",
@@ -34,5 +34,5 @@
   "load_more": "Meer laden",
   "stars": "{{count}} ster",
   "stars_plural": "{{count}} sterren",
-  "rating_aria": "{{n}} out of 5 stars"
+  "rating_aria": "{{n}} van 5 sterren"
 }

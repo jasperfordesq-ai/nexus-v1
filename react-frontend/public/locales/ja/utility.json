@@ -134,8 +134,8 @@
     "aria_upload_progress": "アップロードの進捗",
     "download": "ダウンロード",
     "download_failed": "ダウンロード失敗",
-    "filter_by_category": "Filter by category",
-    "loading": "Loading resources"
+    "filter_by_category": "カテゴリでフィルタリングする",
+    "loading": "リソースをロードしています"
   },
   "not_found": {
     "page_title": "ページが見つかりません",

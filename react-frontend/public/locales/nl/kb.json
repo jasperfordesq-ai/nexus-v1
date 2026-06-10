@@ -1,4 +1,5 @@
 {
+  "breadcrumb": "Breadcrumb",
   "title": "Kennisbank",
   "description": "Vind antwoorden, handleidingen en nuttige bronnen",
   "search_placeholder": "Zoek in de kennisbank...",
@@ -51,9 +52,8 @@
   "all_categories": "Alles",
   "author_by": "door {{name}}",
   "attachments": "Bijlagen",
-  "breadcrumb": "Breadcrumb",
-  "category_tabs_aria": "Knowledge base categories",
-  "loading": "Loading knowledge base...",
+  "category_tabs_aria": "Kennisbankcategorieën",
+  "loading": "Kennisbank laden...",
   "article_count_one": "{{count}} article",
   "article_count_other": "{{count}} articles",
   "category_count_one": "{{count}} category",

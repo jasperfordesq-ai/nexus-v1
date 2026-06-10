@@ -1,4 +1,5 @@
 {
+  "loading": "Loading...",
   "trust_tier": {
     "title": "مستوى ثقتي",
     "subtitle": "مكانتك في المجتمع",
@@ -285,6 +286,7 @@
       "collapse": "طي الشريط الجانبي",
       "help_centre": "مركز المساعدة",
       "full_admin": "المشرف الكامل",
+      "nav_label": "رعاية الملاحة المجتمعية",
       "search_aria": "Search caring community navigation",
       "search_placeholder": "Search navigation...",
       "clear_search": "مسح البحث",
@@ -336,8 +338,7 @@
         "kpi_baselines": "خطوط الأساس لمؤشرات الأداء الرئيسية",
         "municipal_roi": "عائد الاستثمار البلدي",
         "category_coefficients": "معاملات الفئة"
-      },
-      "nav_label": "Caring community navigation"
+      }
     }
   },
   "admin": {
@@ -1173,6 +1174,5 @@
     "refresh_federation_peers": "تحديث أقرانهم الاتحاد",
     "refresh_kpi_baselines": "قم بتحديث الخطوط الأساسية لمؤشرات الأداء الرئيسية",
     "refresh_research_partnerships": "تحديث الشراكات البحثية"
-  },
-  "loading": "Loading..."
+  }
 }

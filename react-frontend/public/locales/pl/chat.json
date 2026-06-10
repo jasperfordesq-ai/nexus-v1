@@ -1,6 +1,7 @@
 {
   "page_title": "Asystent AI",
   "aria_chat": "Czat AI",
+  "messages_region": "Wiadomości na czacie",
   "header_title": "Asystent AI",
   "header_subtitle": "Zasilane przez AI",
   "limits_left_today": "{{count}} opuścił dzisiaj",
@@ -27,9 +28,6 @@
   "starter_q3": "Jak działa timebanking?",
   "starter_q4": "Jakie nadchodzące wydarzenia się odbywają?",
   "starter_q5": "Jak mogę stworzyć ogłoszenie, aby zaoferować swoje umiejętności?",
-  "page_meta": {
-    "title": "Czat AI"
-  },
   "thumbs_up_aria": "Użyteczna odpowiedź",
   "thumbs_down_aria": "Nieużyteczna odpowiedź",
   "card_online": "Online",
@@ -39,5 +37,7 @@
   "tool_results": {
     "view": "Zobacz"
   },
-  "messages_region": "Chat messages"
+  "page_meta": {
+    "title": "Czat AI"
+  }
 }

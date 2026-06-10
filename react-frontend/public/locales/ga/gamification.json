@@ -342,7 +342,7 @@
     "load_error": "Theip ar lódáil an chláir ceannais. Bain triail eile as le do thoil.",
     "type_nexus_score": "NexusScór",
     "load_more": "Luchtaigh Níos mó",
-    "retry": "Retry loading leaderboard"
+    "retry": "Bain triail eile as an gclár ceannairí a lódáil"
   },
   "community": {
     "total_hours": "Uaireanta Iomlána Malartaithe",
@@ -420,7 +420,7 @@
       "legendary": "Finscéalach"
     },
     "max_score_label": "/ {{max}}",
-    "loading": "Loading your NexusScore..."
+    "loading": "Do NexusScore á lódáil..."
   },
   "common": {
     "refresh": "Athnuaigh",

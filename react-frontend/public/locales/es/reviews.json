@@ -1,21 +1,21 @@
 {
   "page_title": "Reseñas",
   "tabs": {
+    "received": "Reseñas recibidas",
     "given": "Reseñas dadas",
-    "pending": "Reseñas pendientes",
-    "received": "Reseñas recibidas"
+    "pending": "Reseñas pendientes"
   },
   "stats": {
     "average": "Valoración media",
-    "no_reviews": "Aún no hay reseñas",
-    "total": "Total de reseñas"
+    "total": "Total de reseñas",
+    "no_reviews": "Aún no hay reseñas"
   },
   "review_card": {
     "anonymous": "Anónimo",
     "delete": "Eliminar reseña",
     "delete_confirm": "¿Estás seguro de que quieres eliminar esta reseña?",
-    "delete_error": "Error al eliminar la reseña",
-    "delete_success": "Reseña eliminada"
+    "delete_success": "Reseña eliminada",
+    "delete_error": "Error al eliminar la reseña"
   },
   "pending": {
     "empty": "No hay reseñas pendientes",
@@ -34,5 +34,5 @@
   "load_more": "Cargar más",
   "stars": "{{count}} estrella",
   "stars_plural": "{{count}} estrellas",
-  "rating_aria": "{{n}} out of 5 stars"
+  "rating_aria": "{{n}} de 5 estrellas"
 }

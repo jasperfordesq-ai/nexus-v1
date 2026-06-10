@@ -68,8 +68,8 @@
     "premium": "プレミアム",
     "verify_identity": "本人確認をする",
     "accessibility_alpha": "アクセシビリティ（アルファ）",
+    "accessibility_alpha_tooltip": "拡張されたアクセス可能なバージョン - WCAG 2.2 AA 準拠。新しいタブで開きます。",
     "features": "機能",
-    "accessibility_alpha_tooltip": "Enhanced accessible version — WCAG 2.2 AA compliant. Opens in a new tab.",
     "courses": "コース",
     "podcasts": "ポッドキャスト"
   },
@@ -134,7 +134,7 @@
     "premium": "プレミアム会員プラン",
     "accessibility_alpha": "アクセシビリティ重視のアルファフロントエンドを開く",
     "features": "Project NEXUSのすべての機能と正直な成熟度ラベル",
-    "dashboard": "Your personalised home overview",
+    "dashboard": "あなただけのパーソナライズされた家の概要",
     "courses": "コミュニティと一緒に新しいスキルを学びましょう",
     "podcasts": "コミュニティ ショーとオーディオ ストーリー"
   },
@@ -396,6 +396,59 @@
     "title": "ケアリングコミュニティ",
     "subtitle": "タイムバンク交換、検証済みボランティア、信頼できる組織、グループ、イベント、リソース、インパクトのシグナルを一つの調整されたケアフローに統合します。",
     "welcome_banner": "ようこそ！ここでは、助けを求めたり、時間を提供したり、ご近所の親切を記録したりできます。どんな小さな貢献でも、コミュニティを強くします。",
+    "alpha": {
+      "badge": "新着 · 早期アクセス"
+    },
+    "preview_tag": "プレビュー",
+    "hero": {
+      "title": "ケアリングコミュニティ",
+      "intro": "ケアリングコミュニティは、ご近所どうしが日々の暮らしで助け合う場です。通院の送り迎え、ちょっとした買い物、午後のひとときの付き添いなど。必要なときは助けを求め、できるときは手を貸してください。",
+      "timebank_note": "タイムバンクと連動しています。あなたが時間を提供すると、それは後で使える時間として記録されます。同じ時間が、ひとつの共有残高にまとまります。",
+      "cta_get_help": "助けが必要です",
+      "cta_give_help": "手伝いたい"
+    },
+    "new_notice": {
+      "title": "これは新しい取り組みです。",
+      "body": "ケアリングコミュニティはここで始まったばかりで、まだ作り込んでいる最中です。一部の機能は早期プレビューで、ひとりでに動くものではありません。ご近所の方々がボランティアでケアを担うことで成り立ちます。最初の参加者でいてくださり、ありがとうございます。"
+    },
+    "how": {
+      "title": "使い方",
+      "subtitle": "かんたんな3ステップ。",
+      "step1_title": "助けを求める",
+      "step1_desc": "必要なことを自分の言葉で教えてください。あなたの依頼は近くの信頼できるメンバーに届きます。",
+      "step2_title": "ご近所が手を挙げる",
+      "step2_desc": "コミュニティの誰かが手伝いを申し出て、お互いに都合のよい時間を決めます。",
+      "step3_title": "時間が記録される",
+      "step3_desc": "提供した時間は時間として記録され、手伝った人は後で使えるか譲れる時間を貯めていきます。"
+    },
+    "recruit": {
+      "title": "最初のケア担い手を募集しています",
+      "body": "ケアリングコミュニティは、人々が手を挙げてこそ成り立ちます。ケアの担い手チームはまだなく、これから作っていきます。少しでも時間を割けるなら、あなたが最初のひとりになれます。",
+      "cta": "手伝いを申し出る"
+    },
+    "your_hours_note": "これはタイムバンクで使うのと同じ時間クレジットです。ケアリングコミュニティ専用の通貨ではなく、ひとつの共有残高です。",
+    "groups": {
+      "get_help": {
+        "title": "助けを受ける",
+        "desc": "支援を求め、助けてくれる人たちを把握できます。"
+      },
+      "give_help": {
+        "title": "手を貸す",
+        "desc": "支援を必要とするご近所に、あなたの時間とスキルを提供しましょう。"
+      },
+      "your_hours": {
+        "title": "あなたの時間",
+        "desc": "貯めた時間クレジットを確認して使えます。"
+      },
+      "caregiver_tools": {
+        "title": "ケア担い手向けツール",
+        "desc": "日常的にケアを行う人のためのツールです。担い手のネットワークが広がるほど役立ちます。"
+      },
+      "safety": {
+        "title": "安全とお知らせ",
+        "desc": "懸念を報告したり、地域の動きを追ったりできます。"
+      }
+    },
     "actions": {
       "request_help": "助けを求める",
       "request_help_sub": "コミュニティに具体的な支援を求めます",
@@ -417,6 +470,8 @@
       "future_care_fund_sub": "貯めた時間を将来のケアのための保険と考えましょう。",
       "cover_care": "ケア担い手の代理",
       "cover_care_sub": "ケア担い手向け：休みが必要なときに信頼できる代理を手配します。ネットワークが広がるほど便利になります。",
+      "become_caregiver": "ケア担い手になる",
+      "become_caregiver_sub": "日常的にケアを担いたいことを教えてください。チームづくりにご協力を。",
       "hour_gift": "時間を贈る",
       "hour_gift_sub": "貯めた時間を家族や友人に贈ります。",
       "hour_transfer": "時間を移転",
@@ -424,9 +479,7 @@
       "safeguarding_report": "懸念を報告",
       "safeguarding_report_sub": "セーフガーディングに関する懸念を機密で報告します。",
       "projects": "コミュニティプロジェクト",
-      "projects_sub": "自治体や地域の最新情報を追跡します。",
-      "become_caregiver": "ケア担い手になる",
-      "become_caregiver_sub": "日常的にケアを担いたいことを教えてください。チームづくりにご協力を。"
+      "projects_sub": "自治体や地域の最新情報を追跡します。"
     },
     "operating_model": {
       "title": "運営モデル",
@@ -510,59 +563,6 @@
       "show_all": "すべてのアクションを表示",
       "show_recommended": "おすすめを表示",
       "change_answer": "回答を変更"
-    },
-    "alpha": {
-      "badge": "新着 · 早期アクセス"
-    },
-    "preview_tag": "プレビュー",
-    "hero": {
-      "title": "ケアリングコミュニティ",
-      "intro": "ケアリングコミュニティは、ご近所どうしが日々の暮らしで助け合う場です。通院の送り迎え、ちょっとした買い物、午後のひとときの付き添いなど。必要なときは助けを求め、できるときは手を貸してください。",
-      "timebank_note": "タイムバンクと連動しています。あなたが時間を提供すると、それは後で使える時間として記録されます。同じ時間が、ひとつの共有残高にまとまります。",
-      "cta_get_help": "助けが必要です",
-      "cta_give_help": "手伝いたい"
-    },
-    "new_notice": {
-      "title": "これは新しい取り組みです。",
-      "body": "ケアリングコミュニティはここで始まったばかりで、まだ作り込んでいる最中です。一部の機能は早期プレビューで、ひとりでに動くものではありません。ご近所の方々がボランティアでケアを担うことで成り立ちます。最初の参加者でいてくださり、ありがとうございます。"
-    },
-    "how": {
-      "title": "使い方",
-      "subtitle": "かんたんな3ステップ。",
-      "step1_title": "助けを求める",
-      "step1_desc": "必要なことを自分の言葉で教えてください。あなたの依頼は近くの信頼できるメンバーに届きます。",
-      "step2_title": "ご近所が手を挙げる",
-      "step2_desc": "コミュニティの誰かが手伝いを申し出て、お互いに都合のよい時間を決めます。",
-      "step3_title": "時間が記録される",
-      "step3_desc": "提供した時間は時間として記録され、手伝った人は後で使えるか譲れる時間を貯めていきます。"
-    },
-    "recruit": {
-      "title": "最初のケア担い手を募集しています",
-      "body": "ケアリングコミュニティは、人々が手を挙げてこそ成り立ちます。ケアの担い手チームはまだなく、これから作っていきます。少しでも時間を割けるなら、あなたが最初のひとりになれます。",
-      "cta": "手伝いを申し出る"
-    },
-    "your_hours_note": "これはタイムバンクで使うのと同じ時間クレジットです。ケアリングコミュニティ専用の通貨ではなく、ひとつの共有残高です。",
-    "groups": {
-      "get_help": {
-        "title": "助けを受ける",
-        "desc": "支援を求め、助けてくれる人たちを把握できます。"
-      },
-      "give_help": {
-        "title": "手を貸す",
-        "desc": "支援を必要とするご近所に、あなたの時間とスキルを提供しましょう。"
-      },
-      "your_hours": {
-        "title": "あなたの時間",
-        "desc": "貯めた時間クレジットを確認して使えます。"
-      },
-      "caregiver_tools": {
-        "title": "ケア担い手向けツール",
-        "desc": "日常的にケアを行う人のためのツールです。担い手のネットワークが広がるほど役立ちます。"
-      },
-      "safety": {
-        "title": "安全とお知らせ",
-        "desc": "懸念を報告したり、地域の動きを追ったりできます。"
-      }
     }
   },
   "request_help": {
@@ -631,8 +631,8 @@
       "confirm_body": "あなたの時間が今引き落とされ、相手が受け入れた時点で相手にクレジットされます。",
       "confirm_button": "はい、時間を贈ります",
       "cancel": "キャンセル",
-      "recipient_hint": "Type at least 2 letters to search",
-      "recipient_no_results": "No members found"
+      "recipient_hint": "検索するには少なくとも 2 文字を入力してください",
+      "recipient_no_results": "メンバーが見つかりませんでした"
     },
     "inbox": {
       "empty": "受け取り待ちの贈り物はありません。",
@@ -870,9 +870,9 @@
     "select_category": "カテゴリを選択",
     "verification_badges": "認証バッジ",
     "search_skills": "スキルを検索",
-    "user_menu_trigger": "User menu for {{name}}",
-    "feed_sidebar": "Community sidebar",
-    "filter_panel": "Filter panel",
+    "user_menu_trigger": "{{name}} のユーザー メニュー",
+    "feed_sidebar": "コミュニティサイドバー",
+    "filter_panel": "フィルターパネル",
     "remove": "Remove"
   },
   "skills": {
@@ -935,7 +935,7 @@
   "toast": {
     "aria_notifications": "通知",
     "aria_dismiss_notification": "通知を閉じる",
-    "aria_urgent_notifications": "Urgent notifications"
+    "aria_urgent_notifications": "緊急のお知らせ"
   },
   "verified": "認証済み",
   "map_unavailable": "地図表示は利用できません",
@@ -970,7 +970,9 @@
   "verify_identity": "本人確認",
   "level_short": "Lv.{{level}}",
   "cancel": "キャンセル",
+  "confirm": "Confirm",
   "save": "保存",
+  "delete": "Delete",
   "offer_favour": {
     "meta": {
       "title": "親切を提供する",
@@ -1716,8 +1718,8 @@
     "webhook_create_title": "サブスクリプションを作成",
     "webhook_create_body": "/api/partner/v1/webhooks/subscriptionsにevent_types（配列）とtarget_url（httpsのみ）を付けてPOST。応答にはワンタイムのシークレットが含まれます — 保管してください。",
     "tabs": {
-      "code_examples": "Code examples",
-      "verification_examples": "Verification examples"
+      "code_examples": "コード例",
+      "verification_examples": "検証例"
     }
   },
   "regional_analytics": {
@@ -1813,10 +1815,10 @@
     "distinct_visitors": "ユニーク訪問者",
     "suppressed_value": "非表示",
     "suppressed_short": "--",
-    "line_chart_aria": "Line chart showing partner activity over time",
-    "bar_chart_aria": "Bar chart showing partner performance metrics",
-    "pie_chart_aria": "Pie chart showing distribution of partner data",
-    "area_chart_aria": "Area chart showing partner trends over time"
+    "line_chart_aria": "パートナーのアクティビティを時系列で示す折れ線グラフ",
+    "bar_chart_aria": "パートナーのパフォーマンス指標を示す棒グラフ",
+    "pie_chart_aria": "パートナーデータの分布を示す円グラフ",
+    "area_chart_aria": "時間の経過に伴うパートナーの傾向を示す面グラフ"
   },
   "provisioning": {
     "meta": {
@@ -1922,6 +1924,7 @@
       "slot_created": "受取枠を作成しました",
       "slot_create_failed": "枠の作成に失敗しました",
       "slot_deleted": "枠を削除しました",
+      "slot_delete_confirm": "このピックアップ スロットを削除しますか?これを元に戻すことはできません。",
       "capacity": "受付数",
       "recurring": "繰り返し",
       "recurring_weekly": "毎週繰り返す",
@@ -1940,8 +1943,7 @@
       "window": "受取時間枠",
       "choose_slot": "受取枠を選択",
       "no_slot_selected": "受取枠が選択されていません",
-      "left": "残り",
-      "slot_delete_confirm": "Delete this pickup slot? This cannot be undone."
+      "left": "残り"
     },
     "inventory": {
       "section_title": "在庫",
@@ -2010,6 +2012,7 @@
     "invite_modal_title": "クラブ間の招待",
     "invite_modal_subtitle": "この人を連携クラブの1つにも招待します。",
     "invite_target_label": "クラブを選択",
+    "invite_target_search": "クラブを検索する",
     "invite_message_label": "個人メッセージ（任意）",
     "invite_message_placeholder": "こんにちは！このクラブもきっと気に入ると思います。",
     "invite_send": "招待を送信",
@@ -2042,8 +2045,7 @@
       "today": "今日",
       "from_label": "差出人",
       "load_failed": "カレンダーを読み込めませんでした。"
-    },
-    "invite_target_search": "Search clubs"
+    }
   },
   "oauth": {
     "continue_with_google": "Googleで続ける",
@@ -2174,7 +2176,7 @@
     "description_label": "説明（任意）",
     "make_public": "公開する",
     "create": "作成",
-    "confirm_create": "Create collection"
+    "confirm_create": "コレクションの作成"
   },
   "appreciations": {
     "title": "感謝を送る",
@@ -2293,17 +2295,15 @@
   "xp_progress": "{{current}} / {{required}} XP",
   "level_progress_aria": "レベル{{level}}の進捗：{{percentage}}%",
   "user_fallback": "User",
-  "release_stage": "Generally Available (v1.5.1)",
-  "confirm": "Confirm",
+  "release_stage": "一般提供 (v1.5.1)",
   "theme_picker": {
     "title": "Appearance",
-    "subtitle": "Tune color scheme, accent, and density.",
-    "open_label": "Open theme picker",
-    "color_scheme": "Color scheme",
+    "subtitle": "配色、アクセント、密度を調整します。",
+    "open_label": "テーマピッカーを開く",
+    "color_scheme": "配色",
     "scheme_light": "Light",
     "scheme_dark": "Dark",
     "scheme_system": "System"
   },
-  "delete": "Delete",
   "alpha_badge": "アルファ"
 }

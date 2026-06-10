@@ -342,7 +342,7 @@
     "load_error": "فشل تحميل لوحة الصدارة. يرجى المحاولة مرة أخرى.",
     "type_nexus_score": "NexusScore",
     "load_more": "تحميل المزيد",
-    "retry": "Retry loading leaderboard"
+    "retry": "أعد محاولة تحميل لوحة الصدارة"
   },
   "community": {
     "total_hours": "إجمالي الساعات المتبادلة",
@@ -420,7 +420,7 @@
       "legendary": "الأسطوري"
     },
     "max_score_label": "/ {{max}}",
-    "loading": "Loading your NexusScore..."
+    "loading": "جارٍ تحميل NexusScore..."
   },
   "common": {
     "refresh": "ينعش",

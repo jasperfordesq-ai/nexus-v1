@@ -3,6 +3,8 @@
   "title": "تحديات الإبداع",
   "subtitle": "شارك الأفكار، صوت، وساعد في تشكيل مجتمعك",
   "page_description": "تصفح تحديات المجتمع، قدم أفكارك، وصوت على الحلول. ساعد في تشكيل مستقبل مجتمعك.",
+  "loading": "Loading...",
+  "tabs_filter_aria": "تحديات التصفية",
   "actions": {
     "retry": "إعادة المحاولة"
   },
@@ -52,7 +54,7 @@
     "create": "إنشاء تحدي",
     "load_error": "غير قادر على تحميل التحديات",
     "load_more": "تحميل المزيد",
-    "loading": "Loading challenge..."
+    "loading": "جاري تحميل التحدي..."
   },
   "ideas": {
     "title": "الأفكار",
@@ -85,7 +87,7 @@
     "draft_created": "تم إنشاء {{date}}",
     "new_idea": "فكرة جديدة",
     "sort_label": "ترتيب الأفكار",
-    "loading": "Loading ideas..."
+    "loading": "جارٍ تحميل الأفكار..."
   },
   "idea_detail": {
     "page_title": "تفاصيل الفكرة",
@@ -98,14 +100,14 @@
     "title": "التعليقات",
     "empty_title": "لا تعليقات حتى الآن",
     "empty_description": "كن أول من يشارك أفكاره حول هذه الفكرة.",
+    "add_label": "أضف تعليقا",
     "add_placeholder": "شارك أفكارك...",
     "add_button": "نشر تعليق",
     "delete": "حذف",
     "delete_confirm": "هل أنت متأكد أنك تريد حذف هذا التعليق؟",
     "load_more": "تحميل المزيد من التعليقات",
     "load_error": "غير قادر على تحميل التعليقات",
-    "add_label": "Add a comment",
-    "loading": "Loading comments..."
+    "loading": "جارٍ تحميل التعليقات..."
   },
   "form": {
     "title_label": "العنوان",
@@ -425,10 +427,8 @@
   "challenge_detail": {
     "actions": "إجراءات التحدي"
   },
-  "loading": "Loading...",
-  "tabs_filter_aria": "Filter challenges",
   "confirm": {
-    "delete_task": "Delete this task? This cannot be undone.",
-    "delete_message": "Delete this message? This cannot be undone."
+    "delete_task": "هل تريد حذف هذه المهمة؟ لا يمكن التراجع عن هذا.",
+    "delete_message": "هل تريد حذف هذه الرسالة؟ لا يمكن التراجع عن هذا."
   }
 }

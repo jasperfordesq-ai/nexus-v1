@@ -3,6 +3,8 @@
   "title": "Wyzwania Ideacyjne",
   "subtitle": "Dziel się pomysłami, głosuj i pomóż kształtować swoją społeczność",
   "page_description": "Przeglądaj wyzwania społeczności, zgłaszaj pomysły i głosuj na rozwiązania. Pomóż kształtować przyszłość swojej społeczności.",
+  "loading": "Loading...",
+  "tabs_filter_aria": "Filtruj wyzwania",
   "actions": {
     "retry": "Ponów próbę"
   },
@@ -52,7 +54,7 @@
     "create": "Utwórz Wyzwanie",
     "load_error": "Nie można załadować wyzwań",
     "load_more": "Załaduj Więcej",
-    "loading": "Loading challenge..."
+    "loading": "Ładowanie wyzwania..."
   },
   "ideas": {
     "title": "Pomysły",
@@ -85,7 +87,7 @@
     "draft_created": "Utworzono {{date}}",
     "new_idea": "Nowy Pomysł",
     "sort_label": "Sortuj pomysły",
-    "loading": "Loading ideas..."
+    "loading": "Ładowanie pomysłów..."
   },
   "idea_detail": {
     "page_title": "Szczegóły Pomysłu",
@@ -98,14 +100,14 @@
     "title": "Komentarze",
     "empty_title": "Brak Komentarzy",
     "empty_description": "Bądź pierwszym, który podzieli się swoimi myślami na ten temat.",
+    "add_label": "Dodaj komentarz",
     "add_placeholder": "Podziel się swoimi myślami...",
     "add_button": "Opublikuj Komentarz",
     "delete": "Usuń",
     "delete_confirm": "Czy na pewno chcesz usunąć ten komentarz?",
     "load_more": "Załaduj Więcej Komentarzy",
     "load_error": "Nie można załadować komentarzy",
-    "add_label": "Add a comment",
-    "loading": "Loading comments..."
+    "loading": "Ładowanie komentarzy..."
   },
   "form": {
     "title_label": "Tytuł",
@@ -425,10 +427,8 @@
   "challenge_detail": {
     "actions": "Akcje wyzwania"
   },
-  "loading": "Loading...",
-  "tabs_filter_aria": "Filter challenges",
   "confirm": {
-    "delete_task": "Delete this task? This cannot be undone.",
-    "delete_message": "Delete this message? This cannot be undone."
+    "delete_task": "Usunąć to zadanie? Tego nie można cofnąć.",
+    "delete_message": "Usunąć tę wiadomość? Tego nie można cofnąć."
   }
 }

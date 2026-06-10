@@ -3,6 +3,8 @@
   "title": "Retos de Ideación",
   "subtitle": "Comparte ideas, vota y ayuda a dar forma a tu comunidad",
   "page_description": "Explora los desafíos de la comunidad, envía ideas y vota por soluciones. Ayuda a dar forma al futuro de tu comunidad.",
+  "loading": "Loading...",
+  "tabs_filter_aria": "Filtrar desafíos",
   "actions": {
     "retry": "Reintentar"
   },
@@ -52,7 +54,7 @@
     "create": "Crear Reto",
     "load_error": "No se pudieron cargar los retos",
     "load_more": "Cargar Más",
-    "loading": "Loading challenge..."
+    "loading": "Cargando desafío..."
   },
   "ideas": {
     "title": "Ideas",
@@ -85,7 +87,7 @@
     "draft_created": "Creado {{date}}",
     "new_idea": "Nueva Idea",
     "sort_label": "Ordenar ideas",
-    "loading": "Loading ideas..."
+    "loading": "Cargando ideas..."
   },
   "idea_detail": {
     "page_title": "Detalles de la Idea",
@@ -98,14 +100,14 @@
     "title": "Comentarios",
     "empty_title": "Aún No Hay Comentarios",
     "empty_description": "Sé el primero en compartir tus pensamientos sobre esta idea.",
+    "add_label": "Añadir un comentario",
     "add_placeholder": "Comparte tus pensamientos...",
     "add_button": "Publicar Comentario",
     "delete": "Eliminar",
     "delete_confirm": "¿Estás seguro de que quieres eliminar este comentario?",
     "load_more": "Cargar Más Comentarios",
     "load_error": "No se pudieron cargar los comentarios",
-    "add_label": "Add a comment",
-    "loading": "Loading comments..."
+    "loading": "Cargando comentarios..."
   },
   "form": {
     "title_label": "Título",
@@ -425,10 +427,8 @@
   "challenge_detail": {
     "actions": "Acciones del desafío"
   },
-  "loading": "Loading...",
-  "tabs_filter_aria": "Filter challenges",
   "confirm": {
-    "delete_task": "Delete this task? This cannot be undone.",
-    "delete_message": "Delete this message? This cannot be undone."
+    "delete_task": "¿Eliminar esta tarea? Esto no se puede deshacer.",
+    "delete_message": "¿Eliminar este mensaje? Esto no se puede deshacer."
   }
 }

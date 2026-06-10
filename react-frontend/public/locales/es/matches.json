@@ -1,6 +1,4 @@
 {
-  "load_failed": "Error al cargar las coincidencias",
-  "match_hidden": "Coincidencia oculta — te mostraremos menos como esta",
   "page_title": "Coincidencias",
   "breadcrumb_dashboard": "Panel",
   "breadcrumb_matches": "Coincidencias",
@@ -25,9 +23,11 @@
   "reasons_more": "+{{count}} más",
   "view_details": "Ver detalles de coincidencia",
   "not_interested": "No me interesa",
+  "load_failed": "Error al cargar las coincidencias",
+  "match_hidden": "Coincidencia oculta — te mostraremos menos como esta",
   "page_meta": {
     "title": "Coincidencias"
   },
-  "filter_tabs_aria": "Match source filter",
-  "loading": "Loading matches..."
+  "filter_tabs_aria": "Filtro de fuente coincidente",
+  "loading": "Cargando coincidencias..."
 }

@@ -342,7 +342,7 @@
     "load_error": "Error al cargar la clasificación. Inténtalo de nuevo.",
     "type_nexus_score": "Puntuación Nexus",
     "load_more": "Cargar más",
-    "retry": "Retry loading leaderboard"
+    "retry": "Reintentar cargar la tabla de clasificación"
   },
   "community": {
     "total_hours": "Total de horas intercambiadas",
@@ -420,7 +420,7 @@
       "legendary": "Legendario"
     },
     "max_score_label": "/ {{max}}",
-    "loading": "Loading your NexusScore..."
+    "loading": "Cargando tu NexusScore..."
   },
   "common": {
     "refresh": "Refrescar",

@@ -8,19 +8,19 @@
   },
   "browse": {
     "search_placeholder": "يظهر البحث",
+    "category_label": "فئة",
     "all_categories": "جميع الفئات",
     "sort_label": "فرز العروض",
+    "clear_filters": "واضح",
     "sort": {
-      "episodes": "معظم الحلقات",
-      "followers": "الأكثر متابعة",
       "newest": "الأحدث",
-      "title": "من الألف إلى الياء"
+      "title": "من الألف إلى الياء",
+      "episodes": "معظم الحلقات",
+      "followers": "الأكثر متابعة"
     },
     "empty": "لا يوجد عروض بودكاست حتى الآن",
     "empty_hint": "عندما ينشر الأعضاء العروض المعتمدة، ستظهر هنا.",
-    "load_more": "تحميل المزيد",
-    "category_label": "فئة",
-    "clear_filters": "واضح"
+    "load_more": "تحميل المزيد"
   },
   "show": {
     "not_found": "لم يتم العثور على عرض البودكاست",
@@ -29,6 +29,8 @@
     "community_show": "عرض المجتمع",
     "episode_count_one": "{{count}} episode",
     "episode_count_other": "{{count}} episodes",
+    "follower_count_one": "{{count}} متابع",
+    "follower_count_other": "{{count}} متابعين",
     "rss_feed": "تغذية آر إس إس",
     "subscribe": "اتبع العرض",
     "unsubscribe": "إلغاء متابعة العرض",
@@ -36,9 +38,7 @@
     "unsubscribed": "إظهار غير المتابعة.",
     "subscribe_failed": "تعذر تحديث تفضيلات المتابعة.",
     "episodes": "Episodes",
-    "no_episodes": "لم يتم نشر أي حلقات بعد.",
-    "follower_count_one": "{{عدد}} متابع",
-    "follower_count_other": "{{عدد}} متابعين"
+    "no_episodes": "لم يتم نشر أي حلقات بعد."
   },
   "episode": {
     "title": "حلقة بودكاست",
@@ -53,7 +53,12 @@
     "explicit": "Explicit",
     "react": "React",
     "reacted": "Reacted",
+    "reaction_failed": "لا يمكن تحديث رد فعلك.",
+    "reactions_count_one": "{{count}} reaction",
+    "reactions_count_other": "{{count}} reactions",
+    "report": "تقرير",
     "report_title": "الإبلاغ عن الحلقة",
+    "report_reason": "سبب",
     "report_details": "التفاصيل للمشرفين",
     "submit_report": "إرسال التقرير",
     "reported": "تم إرسال التقرير إلى المشرفين.",
@@ -68,21 +73,16 @@
       "full": "الحلقة كاملة",
       "trailer": "Trailer",
       "bonus": "Bonus"
-    },
-    "report": "تقرير",
-    "report_reason": "سبب",
-    "reaction_failed": "Could not update your reaction.",
-    "reactions_count_one": "{{count}} reaction",
-    "reactions_count_other": "{{count}} reactions"
+    }
   },
   "player": {
     "unsupported": "متصفحك لا يدعم مشغل الصوت.",
+    "load_error": "تعذر تحميل الصوت لهذه الحلقة. قد يكون غير متوفر أو لا يزال قيد المعالجة.",
     "duration_unknown": "المدة غير معروفة",
     "progress": "تقدم التشغيل",
     "skip_back": "العودة 15 ثانية",
     "skip_forward": "إلى الأمام 30 ثانية",
-    "speed": "{{معدل}}x",
-    "load_error": "This episode's audio could not be loaded. It may be unavailable or still processing.",
+    "speed": "{{rate}}x",
     "jump_to_chapter": "Jump to {{time}} — {{title}}"
   },
   "studio": {
@@ -101,6 +101,7 @@
     "archive_episode": "الحلقة الأرشيفية",
     "delete_episode": "حذف الحلقة",
     "readiness_title": "إظهار الاستعداد",
+    "readiness_subtitle": "قائمة التحقق {{title}}.",
     "readiness": {
       "public_show": "يتم نشر العرض، للعامة، والموافقة عليه",
       "owner_email": "تم تعيين البريد الإلكتروني لمالك الدليل",
@@ -108,16 +109,18 @@
       "artwork": "تم تعيين إظهار عنوان URL للعمل الفني",
       "published_episode": "يتم نشر حلقة واحدة معتمدة على الأقل"
     },
+    "media_scan_status": "الفحص: {{status}}",
+    "media_processing_status": "الوسائط: {{status}}",
     "media_status": {
-      "not_required": "غير مطلوب",
       "pending": "قيد الانتظار",
       "complete": "مكتمل",
+      "ready_for_processing": "???? ????????",
       "clean": "ينظف",
+      "scan_unavailable": "?????? ??? ????",
       "failed": "فشل",
       "blocked": "محظور",
       "infected": "محظور",
-      "ready_for_processing": "???? ????????",
-      "scan_unavailable": "?????? ??? ????"
+      "not_required": "غير مطلوب"
     },
     "show_created": "عرض تم إنشاؤه.",
     "show_published": "عرض المنشورة.",
@@ -128,16 +131,13 @@
     "episode_archived": "تم أرشفة الحلقة.",
     "episode_deleted": "تم حذف الحلقة.",
     "save_failed": "لا يمكن حفظ التغييرات.",
+    "uploading": "جارٍ تحميل الصوت…",
+    "chapter_format_warning_one": "{{count}} لا يحتوي سطر الفصل على طابع زمني وسيبدأ عند الساعة 0:00.",
+    "chapter_format_warning_other": "{{count}} لا تحتوي أسطر الفصل على طابع زمني وستبدأ عند الساعة 0:00.",
     "confirm_archive_show": "أرشيف {{title}}؟ سيتم إخفاؤه من قوائم البودكاست العامة.",
     "confirm_delete_show": "هل تريد حذف {{title}} وجميع حلقاته؟ لا يمكن التراجع عن هذا.",
     "confirm_archive_episode": "أرشيف {{title}}؟ سيتم إخفاؤه من قوائم البودكاست العامة.",
-    "confirm_delete_episode": "هل تريد حذف {{title}}؟ لا يمكن التراجع عن هذا.",
-    "readiness_subtitle": "قائمة التحقق {{title}}.",
-    "media_scan_status": "مسح: {{الحالة}}",
-    "media_processing_status": "الوسائط: {{الحالة}}",
-    "uploading": "Uploading audio…",
-    "chapter_format_warning_one": "{{count}} chapter line has no timestamp and will start at 0:00.",
-    "chapter_format_warning_other": "{{count}} chapter lines have no timestamp and will start at 0:00."
+    "confirm_delete_episode": "هل تريد حذف {{title}}؟ لا يمكن التراجع عن هذا."
   },
   "fields": {
     "show": "Show",
@@ -147,6 +147,7 @@
     "author_name": "اسم مؤلف الدليل",
     "owner_email": "البريد الإلكتروني لصاحب الدليل",
     "copyright": "إشعار حقوق النشر",
+    "funding_url": "عنوان URL للتمويل",
     "explicit_show": "ضع علامة على هذا العرض على أنه صريح",
     "artwork_url": "Artwork URL",
     "audio_url": "Audio URL",
@@ -162,8 +163,7 @@
     "episode_type": "نوع الحلقة",
     "transcript": "Transcript",
     "chapters": "Chapters",
-    "chapters_hint": "فصل واحد في كل سطر، على سبيل المثال: 00:30 مقدمات",
-    "funding_url": "عنوان URL للتمويل"
+    "chapters_hint": "فصل واحد في كل سطر، على سبيل المثال: 00:30 مقدمات"
   },
   "visibility": {
     "public": "Public",

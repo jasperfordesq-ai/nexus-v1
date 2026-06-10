@@ -284,6 +284,8 @@
   "clear_filters": "Limpiar filtros",
   "results_count": "{{count}} listados encontrados",
   "results_loading": "Buscando anuncios",
+  "loading_progress": "Cargando listados",
+  "filter_form_label": "Filtrar listados",
   "radius_5": "5 kilometros",
   "radius_10": "10 kilometros",
   "radius_25": "25 kilometros",
@@ -338,7 +340,5 @@
   "listing_image_alt": "Imagen de listado",
   "open_listing_aria": "Abrir anuncio: {{title}}",
   "distance_meters": "{{distance}} m",
-  "distance_kilometers": "{{distance}} km",
-  "loading_progress": "Loading listings",
-  "filter_form_label": "Filter listings"
+  "distance_kilometers": "{{distance}} km"
 }

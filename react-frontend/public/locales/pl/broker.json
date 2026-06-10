@@ -10,7 +10,7 @@
     "section_compliance": "Zgodność i nadzór",
     "section_records": "Rekordy",
     "section_settings": "Ustawienia",
-    "nav_label": "Broker navigation"
+    "nav_label": "Nawigacja brokera"
   },
   "header": {
     "toggle_sidebar": "Przełącz pasek boczny",
@@ -194,9 +194,9 @@
     "time_days_ago": "{{count}} dni temu",
     "note_system_author": "System",
     "hours_short": "godz",
-    "tabs_aria": "Member status filter",
-    "open_notes_for": "Open notes for {{name}}",
-    "send_note": "Send note"
+    "tabs_aria": "Filtr statusu członkowskiego",
+    "open_notes_for": "Otwórz notatki dla {{name}}",
+    "send_note": "Wyślij notatkę"
   },
   "onboarding": {
     "title": "Wdrożenie",
@@ -468,7 +468,7 @@
       "status_changed": "Zmieniono status"
     },
     "detail_no_history": "Brak dostępnej historii.",
-    "tabs_aria": "Exchange status filter"
+    "tabs_aria": "Filtr stanu wymiany"
   },
   "messages": {
     "title": "Przegląd wiadomości",
@@ -577,7 +577,7 @@
     "copy_reason_flagged_user": "Oznaczony użytkownik",
     "copy_reason_manual_monitoring": "Ręczne monitorowanie",
     "copy_reason_random_sample": "Losowa próbka",
-    "review_tabs_aria": "Message review filter"
+    "review_tabs_aria": "Filtr przeglądu wiadomości"
   },
   "monitoring": {
     "title": "Monitorowanie użytkowników",
@@ -691,7 +691,7 @@
     "category_reputation": "Reputacja",
     "category_fraud": "Potencjalne oszustwo",
     "category_other": "Inny",
-    "tabs_aria": "Risk level filter"
+    "tabs_aria": "Filtr poziomu ryzyka"
   },
   "insurance": {
     "title": "Certyfikaty ubezpieczeniowe",
@@ -787,7 +787,7 @@
     "label_created": "Utworzono",
     "label_verified_at": "Zweryfikowano",
     "label_verified_by": "Zweryfikowano przez",
-    "tabs_aria": "Insurance certificate status filter"
+    "tabs_aria": "Filtr statusu certyfikatu ubezpieczenia"
   },
   "archives": {
     "title": "Archiwum przeglądu",
@@ -846,7 +846,7 @@
     "severity_medium": "Średnia",
     "severity_high": "Wysoka",
     "severity_critical": "Krytyczna",
-    "tabs_aria": "Review archive filter"
+    "tabs_aria": "Przejrzyj filtr archiwum"
   },
   "configuration": {
     "title": "Konfiguracja brokera",
@@ -1094,8 +1094,8 @@
     }
   },
   "layout": {
-    "close_navigation": "Close navigation",
+    "close_navigation": "Zamknij nawigację",
     "navigation": "Navigation",
-    "skip_to_main": "Skip to main content"
+    "skip_to_main": "Przejdź do głównej treści"
   }
 }

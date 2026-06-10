@@ -100,6 +100,7 @@
     "create_poll": "Cruthaigh Pobalbhreith",
     "listing_title_label": "Teideal",
     "listing_title_placeholder": "Cad atá á thairiscint nó á lorg agat?",
+    "listing_type_label": "Cineál liostála",
     "listing_offering": "Ag Tairiscint",
     "listing_looking_for": "Ag Lorg",
     "listing_desc_placeholder": "Déan cur síos ar do liostáil...",
@@ -141,6 +142,7 @@
     "image_remove_aria": "Bain íomhá",
     "group_label": "Postáil chuig",
     "group_placeholder": "Fotha Poiblí",
+    "group_search": "Cuardaigh grúpaí",
     "group_members": "{{count}} comhalta",
     "ai_title_required": "Cuir teideal isteach ar dtús ionas gur féidir le AI cur síos a ghiniúint",
     "ai_generated": "Cur síos AI ginte!",
@@ -229,9 +231,7 @@
     "file_size_mb": "{{name}} ({{size}}MB)",
     "listing_preview_alt": "R?amhamharc liost?la",
     "image_preview_alt": "R?amhamharc uasl?d?la",
-    "listing_type_label": "Listing type",
-    "type_tabs_aria": "Compose content type",
-    "group_search": "Search groups"
+    "type_tabs_aria": "Cum cineál ábhair"
   },
   "moderation": {
     "unauthorized": "Níl cead agat an gníomh seo a dhéanamh."
@@ -343,7 +343,7 @@
       "badge_unlocked": "Suaitheantas díghlasáilte",
       "level_reached": "Leibhéal bainte amach"
     },
-    "read_more_about": "Read more about {{title}}",
+    "read_more_about": "Léigh tuilleadh faoi {{title}}",
     "detail_course": "Féach ar an gcúrsa",
     "type_course": "Cúrsa"
   },
@@ -615,9 +615,9 @@
     "not_found": "Mír gan fáil",
     "load_failed": "Theip ar mhír a luchtú"
   },
-  "controls_region_label": "Feed controls",
-  "new_posts_available": "New posts available",
+  "controls_region_label": "Rialuithe beatha",
+  "new_posts_available": "Poist nua ar fáil",
   "confirm": {
-    "delete_post": "Delete this post? This cannot be undone."
+    "delete_post": "Scrios an postáil seo? Ní féidir é seo a chealú."
   }
 }

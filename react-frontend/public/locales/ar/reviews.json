@@ -1,21 +1,21 @@
 {
   "page_title": "التقييمات",
   "tabs": {
+    "received": "التقييمات المستلمة",
     "given": "التقييمات المُعطاة",
-    "pending": "التقييمات المعلقة",
-    "received": "التقييمات المستلمة"
+    "pending": "التقييمات المعلقة"
   },
   "stats": {
     "average": "متوسط التقييم",
-    "no_reviews": "لا توجد تقييمات بعد",
-    "total": "إجمالي التقييمات"
+    "total": "إجمالي التقييمات",
+    "no_reviews": "لا توجد تقييمات بعد"
   },
   "review_card": {
     "anonymous": "مجهول",
     "delete": "حذف التقييم",
     "delete_confirm": "هل أنت متأكد أنك تريد حذف هذا التقييم؟",
-    "delete_error": "فشل حذف التقييم",
-    "delete_success": "تم حذف التقييم"
+    "delete_success": "تم حذف التقييم",
+    "delete_error": "فشل حذف التقييم"
   },
   "pending": {
     "empty": "لا توجد تقييمات معلقة",
@@ -34,5 +34,5 @@
   "load_more": "تحميل المزيد",
   "stars": "{{count}} نجمة",
   "stars_plural": "{{count}} نجوم",
-  "rating_aria": "{{n}} out of 5 stars"
+  "rating_aria": "{{n}} من أصل 5 نجوم"
 }

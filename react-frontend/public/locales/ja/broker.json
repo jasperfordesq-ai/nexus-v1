@@ -10,7 +10,7 @@
     "section_compliance": "コンプライアンスと監督",
     "section_records": "記録",
     "section_settings": "設定",
-    "nav_label": "Broker navigation"
+    "nav_label": "ブローカーのナビゲーション"
   },
   "header": {
     "toggle_sidebar": "サイドバーを切り替え",
@@ -194,9 +194,9 @@
     "time_days_ago": "{{count}}日前",
     "note_system_author": "システム",
     "hours_short": "時間",
-    "tabs_aria": "Member status filter",
-    "open_notes_for": "Open notes for {{name}}",
-    "send_note": "Send note"
+    "tabs_aria": "メンバーステータスフィルター",
+    "open_notes_for": "{{name}} のメモを開く",
+    "send_note": "メモを送信する"
   },
   "onboarding": {
     "title": "オンボーディング",
@@ -468,7 +468,7 @@
       "status_changed": "ステータスが変更されました"
     },
     "detail_no_history": "履歴はありません。",
-    "tabs_aria": "Exchange status filter"
+    "tabs_aria": "交換ステータスフィルター"
   },
   "messages": {
     "title": "メッセージレビュー",
@@ -577,7 +577,7 @@
     "copy_reason_flagged_user": "フラグ付きユーザー",
     "copy_reason_manual_monitoring": "手動監視",
     "copy_reason_random_sample": "ランダムサンプル",
-    "review_tabs_aria": "Message review filter"
+    "review_tabs_aria": "メッセージレビューフィルター"
   },
   "monitoring": {
     "title": "ユーザー監視",
@@ -691,7 +691,7 @@
     "category_reputation": "評判",
     "category_fraud": "不正の可能性",
     "category_other": "その他",
-    "tabs_aria": "Risk level filter"
+    "tabs_aria": "リスクレベルフィルター"
   },
   "insurance": {
     "title": "保険証明書",
@@ -787,7 +787,7 @@
     "label_created": "作成日",
     "label_verified_at": "検証日時",
     "label_verified_by": "検証者",
-    "tabs_aria": "Insurance certificate status filter"
+    "tabs_aria": "保険証ステータスフィルター"
   },
   "archives": {
     "title": "レビューアーカイブ",
@@ -846,7 +846,7 @@
     "severity_medium": "中",
     "severity_high": "高",
     "severity_critical": "重大",
-    "tabs_aria": "Review archive filter"
+    "tabs_aria": "アーカイブフィルターを確認する"
   },
   "configuration": {
     "title": "ブローカー設定",
@@ -1094,8 +1094,8 @@
     }
   },
   "layout": {
-    "close_navigation": "Close navigation",
+    "close_navigation": "ナビゲーションを閉じる",
     "navigation": "Navigation",
-    "skip_to_main": "Skip to main content"
+    "skip_to_main": "メインコンテンツにスキップ"
   }
 }

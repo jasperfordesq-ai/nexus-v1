@@ -5,7 +5,7 @@
   "browse_listings": "Brabhsáil Liostuithe",
   "load_more": "Lódáil Tuilleadh",
   "try_again": "Bain Triail Eile As",
-  "loading": "Loading exchanges...",
+  "loading": "Malartuithe á lódáil...",
   "service_exchange": "Malartú Seirbhíse",
   "unknown": "Anaithnid",
   "hours_count": "{{count}} uair",
@@ -109,7 +109,7 @@
     "ratings": "Rátálacha",
     "rate_exchange": "Rátáil an Malartú seo",
     "prep_time_value": "{{count}}h",
-    "rating_value": "Rating: {{rating}} out of 5"
+    "rating_value": "Rátáil: {{rating}} as 5"
   },
   "modal": {
     "decline_title": "Diúltaigh d'Iarratas Malartaithe",

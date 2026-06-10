@@ -3,6 +3,7 @@
   "page_title": "Oferty pracy",
   "page_description": "Przeglądaj oferty pracy, role wolontariackie i stanowiska banku czasu oferowane przez członków społeczności i organizacje partnerskie w pobliżu.",
   "subtitle": "Znajdź możliwości w swojej społeczności",
+  "loading": "Ładuję oferty pracy...",
   "create_vacancy": "Dodaj ofertę",
   "edit_vacancy": "Edytuj ofertę",
   "my_postings": {
@@ -379,8 +380,8 @@
     "personal_message_placeholder": "Notatka do kandydata...",
     "interview_location_placeholder": "https://meet.google.com/...",
     "offer_salary_placeholder": "np. 45000",
-    "tabs_aria": "Job pipeline sections",
-    "change_stage_aria": "Change stage for {{name}}",
+    "tabs_aria": "Sekcje potoku zadań",
+    "change_stage_aria": "Zmień etap dla {{name}}",
     "event_type": {
       "status_change": "Zmiana statusu",
       "interview": "Rozmowa kwalifikacyjna",
@@ -466,10 +467,10 @@
     "message_applicant": "Wiadomość",
     "kanban_board": "Tablica Kanban",
     "cv_download_error": "Nie udało się pobrać CV",
-    "confirm_close_title": "Close this vacancy?",
-    "confirm_close": "Closing stops new applications from coming in. You can reopen it at any time.",
-    "confirm_reopen_title": "Reopen this vacancy?",
-    "confirm_reopen": "Reopening makes the vacancy visible again and lets people apply."
+    "confirm_close_title": "Zamknąć ten wakat?",
+    "confirm_close": "Zamknięcie zatrzymuje napływ nowych aplikacji. Możesz je ponownie otworzyć w dowolnym momencie.",
+    "confirm_reopen_title": "Otworzyć ponownie ten wakat?",
+    "confirm_reopen": "Ponowne otwarcie sprawia, że ​​wakat jest ponownie widoczny i umożliwia aplikowanie."
   },
   "interview": {
     "schedule": "Umów Rozmowę Kwalifikacyjną",
@@ -831,13 +832,13 @@
     "date_to": "Do",
     "filter_by_job": "Filtruj według Pracy",
     "all_jobs": "Wszystkie Prace",
+    "search_jobs": "Wyszukaj oferty pracy",
     "generate": "Generuj Raport",
     "loading": "Generowanie raportu...",
     "no_data": "Brak danych aplikacyjnych dostępnych za wybrany okres",
     "access_denied": "Odmowa dostępu",
     "load_error": "Nie udało się załadować raportu audytu stronniczości",
-    "note_privacy": "Ten raport analizuje tylko metryki procesu. Żadne dane demograficzne nie są zbierane ani używane.",
-    "search_jobs": "Search jobs"
+    "note_privacy": "Ten raport analizuje tylko metryki procesu. Żadne dane demograficzne nie są zbierane ani używane."
   },
   "self_scheduling": {
     "title": "Sloty Rozmów Kwalifikacyjnych",
@@ -1047,6 +1048,5 @@
   "jobs": {
     "view_details": "Zobacz szczegóły oferty"
   },
-  "tabs_aria": "Jobs view",
-  "loading": "Loading vacancies..."
+  "tabs_aria": "Widok zadań"
 }

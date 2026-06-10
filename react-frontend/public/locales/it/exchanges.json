@@ -5,7 +5,7 @@
   "browse_listings": "Sfoglia annunci",
   "load_more": "Carica altri",
   "try_again": "Riprova",
-  "loading": "Loading exchanges...",
+  "loading": "Caricamento scambi...",
   "service_exchange": "Scambio di servizio",
   "unknown": "Sconosciuto",
   "hours_count": "{{count}} ora",
@@ -109,7 +109,7 @@
     "ratings": "Valutazioni",
     "rate_exchange": "Valuta Questo Scambio",
     "prep_time_value": "{{count}}h",
-    "rating_value": "Rating: {{rating}} out of 5"
+    "rating_value": "Valutazione: {{rating}} su 5"
   },
   "modal": {
     "decline_title": "Rifiuta richiesta di scambio",

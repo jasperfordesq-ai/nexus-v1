@@ -132,7 +132,7 @@
     "reply_placeholder_generic": "Freagair an scéal...",
     "react_with": "Freagair le {{type}}",
     "viewers_title_count": "Breathnóirí ({{count}})",
-    "delete_story_confirm": "Delete this story? This cannot be undone."
+    "delete_story_confirm": "Scrios an scéal seo? Ní féidir é seo a chealú."
   },
   "highlights": {
     "no_stories": "Níl aon scéal sa rogha seo",
@@ -161,6 +161,6 @@
     "story_type_image": "Scéal íomhá",
     "story_type_text": "Scéal téacs",
     "story_type_poll": "Scéal vótála",
-    "delete_confirm": "Delete this highlight? This cannot be undone."
+    "delete_confirm": "An bhfuil fonn ort an buaicphointe seo a scriosadh? Ní féidir é seo a chealú."
   }
 }

@@ -1,4 +1,5 @@
 {
+  "member_fallback": "User",
   "title": "Grúpaí",
   "discover": "Faigh Grúpaí",
   "create_group": "Cruthaigh Grúpa",
@@ -50,6 +51,7 @@
   "posts_count_label": "{{count}} post",
   "detail": {
     "loading": "Ag luchtú an ghrúpa...",
+    "loading_replies": "Freagraí á lódáil...",
     "unable_to_load": "Ní féidir an Grúpa a Luchtú",
     "not_found_desc": "Níl an grúpa atá á lorg agat ann",
     "error_load_failed": "Theip ar luchtú an ghrúpa. Triail arís le do thoil.",
@@ -127,6 +129,8 @@
     "no_members_title": "Gan baill fós",
     "no_members_desc": "Bí ar an gcéad duine chun bheith páirteach sa ghrúpa seo",
     "members_loading_aria": "Baill an ghrúpa á lódáil",
+    "feed_loading": "Fotha grúpa á lódáil...",
+    "events_loading": "Imeachtaí grúpa á lódáil...",
     "member_owner": "Úinéir",
     "member_admin": "Riarthóir",
     "member_joined": "Tháinig isteach {{date}}",
@@ -195,10 +199,7 @@
     "feed_empty_desc": "Bí ar an gcéad duine le rud a roinnt leis an ngrúpa seo!",
     "feed_create_post": "Cruthaigh Postáil",
     "feed_load_more": "Lódáil Tuilleadh",
-    "member_actions_aria": "Gníomhartha baill",
-    "feed_loading": "Loading group feed...",
-    "events_loading": "Loading group events...",
-    "loading_replies": "Loading replies..."
+    "member_actions_aria": "Gníomhartha baill"
   },
   "form": {
     "create_title": "Cruthaigh Grúpa Nua",
@@ -258,6 +259,7 @@
     "template_label": "Tosaigh ó theimpléad (roghnach)"
   },
   "announcements": {
+    "loading": "Fógraí á lódáil...",
     "heading": "Fógraí",
     "new": "Fógra Nua",
     "no_announcements_title": "Gan fógraí",
@@ -285,8 +287,7 @@
     "pinned_success": "Greamaithe",
     "update_failed": "Theip ar fhógra a nuashonrú",
     "deleted": "Fógra scriosta",
-    "delete_failed": "Theip ar fhógra a scriosadh",
-    "loading": "Loading announcements..."
+    "delete_failed": "Theip ar fhógra a scriosadh"
   },
   "challenges": {
     "heading": "Dúshláin",
@@ -414,7 +415,7 @@
     "video_player": "Imreoir físeáin",
     "fullsize_alt": "Íomhá lánmhéide",
     "delete": "Scrios",
-    "delete_confirm": "Delete this media item? This cannot be undone."
+    "delete_confirm": "An bhfuil fonn ort an mhír mheán seo a scriosadh? Ní féidir é seo a chealú."
   },
   "webhooks": {
     "load_failed": "Theip ar lódáil na ngréasánghríoga",
@@ -442,7 +443,7 @@
     "secret_placeholder": "Rún sínithe le haghaidh fíorúcháin pálasta",
     "cancel": "Cealaigh",
     "create_btn": "Cruthaigh gréasánghríoga",
-    "delete_confirm": "Delete this webhook? This cannot be undone."
+    "delete_confirm": "An bhfuil fonn ort an cuaille seo a scriosadh? Ní féidir é seo a chealú."
   },
   "toast": {
     "left": "D'fhág tú an grúpa",
@@ -516,6 +517,7 @@
     "downvote_aria": "Vótáil síos",
     "vote_count_aria": "{{count}} vóta",
     "loading": "Ceisteanna á lódáil",
+    "loading_detail": "Sonraí ceiste á lódáil...",
     "search_placeholder": "Ceisteanna a chuardach…",
     "search_aria": "Ceisteanna a chuardach",
     "sort_aria": "Sórtáil ceisteanna",
@@ -553,8 +555,7 @@
     "answer_posted_success": "Freagra postáilte!",
     "answer_posted_error": "Theip ar an bhfreagra a phostáil",
     "vote_error": "Theip ar vótáil",
-    "accept_error": "Theip ar glacadh leis an bhfreagra",
-    "loading_detail": "Loading question details..."
+    "accept_error": "Theip ar glacadh leis an bhfreagra"
   },
   "wiki": {
     "load_failed": "Theip ar lódáil leathanaigh wiki",
@@ -567,6 +568,7 @@
     "delete_failed": "Theip ar scriosadh an leathanaigh",
     "revisions_failed": "Theip ar lódáil stair na n-athbhreithnithe",
     "loading": "Wiki á lódáil",
+    "loading_page": "Leathanach wiki á lódáil...",
     "heading": "Vicí",
     "new_page": "Leathanach nua",
     "pages": "Leathanaigh",
@@ -602,8 +604,7 @@
     "content_label": "Ábhar",
     "create": "Cruthaigh leathanach",
     "delete_title": "Scrios leathanach wiki",
-    "delete_confirm": "An bhfuil tú cinnte gur mhaith leat \"{{name}}\" a scriosadh? Ní féidir an gníomh seo a chealú.",
-    "loading_page": "Loading wiki page..."
+    "delete_confirm": "An bhfuil tú cinnte gur mhaith leat \"{{name}}\" a scriosadh? Ní féidir an gníomh seo a chealú."
   },
   "page_meta": {
     "create": {
@@ -711,6 +712,5 @@
     "accent_color": "Dath Béime",
     "hue": "Lí",
     "preview": "Réamhamharc"
-  },
-  "member_fallback": "User"
+  }
 }

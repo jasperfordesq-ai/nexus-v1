@@ -132,7 +132,7 @@
     "reply_placeholder_generic": "Odpowiedz na historię...",
     "react_with": "Zareaguj z {{type}}",
     "viewers_title_count": "Widzowie ({{count}})",
-    "delete_story_confirm": "Delete this story? This cannot be undone."
+    "delete_story_confirm": "Usunąć tę historię? Tego nie można cofnąć."
   },
   "highlights": {
     "no_stories": "Ten wyróżnienie nie ma historii",
@@ -161,6 +161,6 @@
     "story_type_image": "Historia ze zdjęciem",
     "story_type_text": "Historia tekstowa",
     "story_type_poll": "Historia z ankietą",
-    "delete_confirm": "Delete this highlight? This cannot be undone."
+    "delete_confirm": "Usunąć to wyróżnienie? Tego nie można cofnąć."
   }
 }

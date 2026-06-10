@@ -284,6 +284,8 @@
   "clear_filters": "Cancella filtri",
   "results_count": "{{count}} annunci trovati",
   "results_loading": "Ricerca annunci",
+  "loading_progress": "Caricamento elenchi",
+  "filter_form_label": "Filtra elenchi",
   "radius_5": "5 km",
   "radius_10": "10 km",
   "radius_25": "25 km",
@@ -338,7 +340,5 @@
   "listing_image_alt": "Immagine dell'elenco",
   "open_listing_aria": "Apri annuncio: {{title}}",
   "distance_meters": "{{distance}} m",
-  "distance_kilometers": "{{distance}} km",
-  "loading_progress": "Loading listings",
-  "filter_form_label": "Filter listings"
+  "distance_kilometers": "{{distance}} km"
 }

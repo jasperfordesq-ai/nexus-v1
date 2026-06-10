@@ -3,6 +3,8 @@
   "title": "Sfide di Ideazione",
   "subtitle": "Condividi idee, vota e contribuisci a plasmare la tua comunita",
   "page_description": "Esplora le sfide della comunità, invia idee e vota le soluzioni. Aiuta a plasmare il futuro della tua comunità.",
+  "loading": "Loading...",
+  "tabs_filter_aria": "Filtra le sfide",
   "actions": {
     "retry": "Riprova"
   },
@@ -52,7 +54,7 @@
     "create": "Crea Sfida",
     "load_error": "Impossibile caricare le sfide",
     "load_more": "Carica Altro",
-    "loading": "Loading challenge..."
+    "loading": "Caricamento sfida..."
   },
   "ideas": {
     "title": "Idee",
@@ -85,7 +87,7 @@
     "draft_created": "Creata {{date}}",
     "new_idea": "Nuova Idea",
     "sort_label": "Ordina idee",
-    "loading": "Loading ideas..."
+    "loading": "Caricamento idee..."
   },
   "idea_detail": {
     "page_title": "Dettagli dell'Idea",
@@ -98,14 +100,14 @@
     "title": "Commenti",
     "empty_title": "Nessun Commento Ancora",
     "empty_description": "Sii il primo a condividere i tuoi pensieri su questa idea.",
+    "add_label": "Aggiungi un commento",
     "add_placeholder": "Condividi i tuoi pensieri...",
     "add_button": "Pubblica Commento",
     "delete": "Elimina",
     "delete_confirm": "Sei sicuro di voler eliminare questo commento?",
     "load_more": "Carica Altri Commenti",
     "load_error": "Impossibile caricare i commenti",
-    "add_label": "Add a comment",
-    "loading": "Loading comments..."
+    "loading": "Caricamento commenti..."
   },
   "form": {
     "title_label": "Titolo",
@@ -425,10 +427,8 @@
   "challenge_detail": {
     "actions": "Azioni della sfida"
   },
-  "loading": "Loading...",
-  "tabs_filter_aria": "Filter challenges",
   "confirm": {
-    "delete_task": "Delete this task? This cannot be undone.",
-    "delete_message": "Delete this message? This cannot be undone."
+    "delete_task": "Eliminare questa attività? Questa operazione non può essere annullata.",
+    "delete_message": "Eliminare questo messaggio? Questa operazione non può essere annullata."
   }
 }

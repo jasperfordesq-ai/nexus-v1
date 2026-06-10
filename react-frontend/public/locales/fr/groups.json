@@ -1,4 +1,5 @@
 {
+  "member_fallback": "User",
   "title": "Groupes",
   "discover": "Découvrir des groupes",
   "create_group": "Créer un groupe",
@@ -50,6 +51,7 @@
   "posts_count_label": "{{count}} publications",
   "detail": {
     "loading": "Chargement du groupe...",
+    "loading_replies": "Chargement des réponses...",
     "unable_to_load": "Impossible de charger le groupe",
     "not_found_desc": "Le groupe que vous recherchez n'existe pas",
     "error_load_failed": "Échec du chargement du groupe. Veuillez réessayer.",
@@ -127,6 +129,8 @@
     "no_members_title": "Aucun membre pour l'instant",
     "no_members_desc": "Soyez la première personne à rejoindre ce groupe",
     "members_loading_aria": "Chargement des membres du groupe",
+    "feed_loading": "Chargement du flux de groupe...",
+    "events_loading": "Chargement des événements de groupe...",
     "member_owner": "Propriétaire",
     "member_admin": "Administrateur",
     "member_joined": "A rejoint le {{date}}",
@@ -195,10 +199,7 @@
     "feed_empty_desc": "Soyez le premier à partager quelque chose avec ce groupe !",
     "feed_create_post": "Créer une publication",
     "feed_load_more": "Charger plus",
-    "member_actions_aria": "Actions sur le membre",
-    "feed_loading": "Loading group feed...",
-    "events_loading": "Loading group events...",
-    "loading_replies": "Loading replies..."
+    "member_actions_aria": "Actions sur le membre"
   },
   "form": {
     "create_title": "Créer un nouveau groupe",
@@ -258,6 +259,7 @@
     "template_label": "Commencer à partir d'un modèle (facultatif)"
   },
   "announcements": {
+    "loading": "Chargement des annonces...",
     "heading": "Annonces",
     "new": "Nouvelle annonce",
     "no_announcements_title": "Aucune annonce",
@@ -285,8 +287,7 @@
     "pinned_success": "Épinglée",
     "update_failed": "Impossible de mettre à jour l’annonce",
     "deleted": "Annonce supprimée",
-    "delete_failed": "Impossible de supprimer l’annonce",
-    "loading": "Loading announcements..."
+    "delete_failed": "Impossible de supprimer l’annonce"
   },
   "challenges": {
     "heading": "Défis",
@@ -414,7 +415,7 @@
     "video_player": "Lecteur vidéo",
     "fullsize_alt": "Image en taille réelle",
     "delete": "Supprimer",
-    "delete_confirm": "Delete this media item? This cannot be undone."
+    "delete_confirm": "Supprimer cet élément multimédia ? Cela ne peut pas être annulé."
   },
   "webhooks": {
     "load_failed": "Échec du chargement des webhooks",
@@ -442,7 +443,7 @@
     "secret_placeholder": "Secret de signature pour vérifier la charge utile",
     "cancel": "Annuler",
     "create_btn": "Créer le webhook",
-    "delete_confirm": "Delete this webhook? This cannot be undone."
+    "delete_confirm": "Supprimer ce webhook ? Cela ne peut pas être annulé."
   },
   "toast": {
     "left": "Vous avez quitté le groupe",
@@ -516,6 +517,7 @@
     "downvote_aria": "Voter contre",
     "vote_count_aria": "{{count}} voix",
     "loading": "Chargement des questions",
+    "loading_detail": "Chargement des détails de la question...",
     "search_placeholder": "Rechercher des questions…",
     "search_aria": "Rechercher des questions",
     "sort_aria": "Trier les questions",
@@ -553,8 +555,7 @@
     "answer_posted_success": "Réponse postée !",
     "answer_posted_error": "Échec de la publication de la réponse",
     "vote_error": "Je n'ai pas réussi à voter",
-    "accept_error": "Échec de l'acceptation de la réponse",
-    "loading_detail": "Loading question details..."
+    "accept_error": "Échec de l'acceptation de la réponse"
   },
   "wiki": {
     "load_failed": "Échec du chargement des pages wiki",
@@ -567,6 +568,7 @@
     "delete_failed": "Échec de la suppression de la page",
     "revisions_failed": "Échec du chargement de l'historique des révisions",
     "loading": "Chargement du wiki",
+    "loading_page": "Chargement de la page wiki...",
     "heading": "Wiki",
     "new_page": "Nouvelle page",
     "pages": "Pages",
@@ -602,8 +604,7 @@
     "content_label": "Contenu",
     "create": "Créer la page",
     "delete_title": "Supprimer la page wiki",
-    "delete_confirm": "Voulez-vous vraiment supprimer \"{{name}}\" ? Cette action est irréversible.",
-    "loading_page": "Loading wiki page..."
+    "delete_confirm": "Voulez-vous vraiment supprimer \"{{name}}\" ? Cette action est irréversible."
   },
   "page_meta": {
     "create": {
@@ -711,6 +712,5 @@
     "accent_color": "Couleur d accent",
     "hue": "Teinte",
     "preview": "Apercu"
-  },
-  "member_fallback": "User"
+  }
 }

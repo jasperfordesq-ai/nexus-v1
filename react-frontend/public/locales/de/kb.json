@@ -1,4 +1,5 @@
 {
+  "breadcrumb": "Breadcrumb",
   "title": "Wissensdatenbank",
   "description": "Antworten, Anleitungen und hilfreiche Ressourcen finden",
   "search_placeholder": "Wissensdatenbank durchsuchen...",
@@ -51,9 +52,8 @@
   "all_categories": "Alle",
   "author_by": "von {{name}}",
   "attachments": "Anhänge",
-  "breadcrumb": "Breadcrumb",
-  "category_tabs_aria": "Knowledge base categories",
-  "loading": "Loading knowledge base...",
+  "category_tabs_aria": "Kategorien der Wissensdatenbank",
+  "loading": "Wissensdatenbank wird geladen...",
   "article_count_one": "{{count}} article",
   "article_count_other": "{{count}} articles",
   "category_count_one": "{{count}} category",

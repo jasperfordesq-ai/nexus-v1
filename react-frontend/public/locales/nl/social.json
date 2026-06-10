@@ -1,5 +1,8 @@
 {
   "cancel": "Annuleren",
+  "comments": {
+    "edit_label": "Opmerking bewerken"
+  },
   "comments_title": "Reacties",
   "copy_failed": "Link kopiëren is mislukt",
   "copy_link": "Kopieer link",
@@ -68,6 +71,7 @@
   },
   "status": {
     "set_status": "Status instellen",
+    "set_status_current": "Status instellen (momenteel: {{status}})",
     "online": "Online",
     "online_desc": "Zichtbaar voor anderen",
     "away": "Afwezig",
@@ -84,8 +88,7 @@
     "status_label": "Status",
     "status_placeholder": "In een vergadering",
     "char_count": "{{current}}/80 tekens",
-    "offline": "Offline",
-    "set_status_current": "Set status (currently: {{status}})"
+    "offline": "Offline"
   },
   "endorse": {
     "tooltip_remove": "Verwijder goedkeuring voor {{skillName}}",
@@ -105,9 +108,10 @@
     "no_collection": "Algemeen (geen collectie)",
     "new_collection": "Nieuwe collectie",
     "collection_name": "Collectienaam",
-    "confirm_create": "Create collection"
+    "confirm_create": "Verzameling maken"
   },
   "bookmarks": {
+    "loading": "Bladwijzers laden...",
     "page_title": "Opgeslagen",
     "meta_description": "Bekijk en organiseer je opgeslagen berichten, advertenties, evenementen, vacatures, blogposts en discussies.",
     "title": "Opgeslagen Items",
@@ -115,6 +119,7 @@
     "new_collection": "Nieuwe Collectie",
     "all_items": "Alles",
     "collection_filter_label": "Collectie",
+    "collection_search": "Zoek collecties",
     "tab_all": "Alles",
     "count": "{{count}} opgeslagen items",
     "remove": "Verwijderen uit opgeslagen",
@@ -148,9 +153,7 @@
     "collection_description": "Beschrijving (optioneel)",
     "cancel": "Annuleren",
     "save": "Opslaan",
-    "create": "Aanmaken",
-    "loading": "Loading bookmarks...",
-    "collection_search": "Search collections"
+    "create": "Aanmaken"
   },
   "verified": "Geverifieerd",
   "hover_card": {
@@ -162,9 +165,6 @@
     "connections": "{{count}} verbindingen",
     "listings": "{{count}} advertenties"
   },
-  "comments": {
-    "edit_label": "Edit comment"
-  },
-  "reactions_tabs_aria": "Reaction type filter",
-  "content_type_tabs_aria": "Bookmark content type filter"
+  "reactions_tabs_aria": "Reactietypefilter",
+  "content_type_tabs_aria": "Voeg een bladwijzer voor het inhoudstypefilter toe"
 }

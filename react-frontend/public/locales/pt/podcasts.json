@@ -8,19 +8,19 @@
   },
   "browse": {
     "search_placeholder": "Programas de pesquisa",
+    "category_label": "Categoria",
     "all_categories": "Todas as categorias",
     "sort_label": "Classificar programas",
+    "clear_filters": "Claro",
     "sort": {
-      "episodes": "A maioria dos episódios",
-      "followers": "Mais seguidos",
       "newest": "Mais recente",
-      "title": "A-Z"
+      "title": "A-Z",
+      "episodes": "A maioria dos episódios",
+      "followers": "Mais seguidos"
     },
     "empty": "Ainda não há programas de podcast",
     "empty_hint": "Quando os membros publicarem programas aprovados, eles aparecerão aqui.",
-    "load_more": "Carregar mais",
-    "category_label": "Categoria",
-    "clear_filters": "Claro"
+    "load_more": "Carregar mais"
   },
   "show": {
     "not_found": "Programa de podcast não encontrado",
@@ -29,6 +29,8 @@
     "community_show": "Programa comunitário",
     "episode_count_one": "{{count}} episode",
     "episode_count_other": "{{count}} episodes",
+    "follower_count_one": "{{count}} seguidores",
+    "follower_count_other": "{{count}} seguidores",
     "rss_feed": "Feed RSS",
     "subscribe": "Seguir programa",
     "unsubscribe": "Deixar de seguir o programa",
@@ -36,9 +38,7 @@
     "unsubscribed": "Mostrar não seguido.",
     "subscribe_failed": "Não foi possível atualizar a preferência de acompanhamento.",
     "episodes": "Episodes",
-    "no_episodes": "Nenhum episódio publicado ainda.",
-    "follower_count_one": "{{count}} seguidores",
-    "follower_count_other": "{{count}} seguidores"
+    "no_episodes": "Nenhum episódio publicado ainda."
   },
   "episode": {
     "title": "Episódio de podcast",
@@ -53,7 +53,12 @@
     "explicit": "Explicit",
     "react": "React",
     "reacted": "Reacted",
+    "reaction_failed": "Não foi possível atualizar sua reação.",
+    "reactions_count_one": "{{count}} reaction",
+    "reactions_count_other": "{{count}} reactions",
+    "report": "Relatório",
     "report_title": "Relatar episódio",
+    "report_reason": "Razão",
     "report_details": "Detalhes para moderadores",
     "submit_report": "Enviar relatório",
     "reported": "Relatório enviado aos moderadores.",
@@ -68,21 +73,16 @@
       "full": "Episódio completo",
       "trailer": "Trailer",
       "bonus": "Bonus"
-    },
-    "report": "Relatório",
-    "report_reason": "Razão",
-    "reaction_failed": "Could not update your reaction.",
-    "reactions_count_one": "{{count}} reaction",
-    "reactions_count_other": "{{count}} reactions"
+    }
   },
   "player": {
     "unsupported": "Seu navegador não suporta o reprodutor de áudio.",
+    "load_error": "Não foi possível carregar o áudio deste episódio. Ele pode estar indisponível ou ainda em processamento.",
     "duration_unknown": "Duração desconhecida",
     "progress": "Progresso da reprodução",
     "skip_back": "Voltar 15s",
     "skip_forward": "Avançando 30 anos",
-    "speed": "{{taxa}}x",
-    "load_error": "This episode's audio could not be loaded. It may be unavailable or still processing.",
+    "speed": "{{rate}}x",
     "jump_to_chapter": "Jump to {{time}} — {{title}}"
   },
   "studio": {
@@ -101,6 +101,7 @@
     "archive_episode": "Arquivar episódio",
     "delete_episode": "Excluir episódio",
     "readiness_title": "Mostrar prontidão",
+    "readiness_subtitle": "lista de verificação {{title}}",
     "readiness": {
       "public_show": "O programa é publicado, público e aprovado",
       "owner_email": "O e-mail do proprietário do diretório está definido",
@@ -108,16 +109,18 @@
       "artwork": "Mostrar URL da arte está definido",
       "published_episode": "Pelo menos um episódio aprovado é publicado"
     },
+    "media_scan_status": "Verificação: {{status}}",
+    "media_processing_status": "Mídia: {{status}}",
     "media_status": {
-      "not_required": "Não obrigatório",
       "pending": "Pendente",
       "complete": "Completo",
+      "ready_for_processing": "Pronto para processamento",
       "clean": "Limpar",
+      "scan_unavailable": "Scanner indispon?vel",
       "failed": "Fracassado",
       "blocked": "Bloqueado",
       "infected": "Bloqueado",
-      "ready_for_processing": "Pronto para processamento",
-      "scan_unavailable": "Scanner indispon?vel"
+      "not_required": "Não obrigatório"
     },
     "show_created": "Espetáculo criado.",
     "show_published": "Espetáculo publicado.",
@@ -128,16 +131,13 @@
     "episode_archived": "Episódio arquivado.",
     "episode_deleted": "Episódio excluído.",
     "save_failed": "Não foi possível salvar as alterações.",
+    "uploading": "Fazendo upload de áudio…",
+    "chapter_format_warning_one": "A linha do capítulo {{count}} não tem carimbo de data/hora e começará às 0:00.",
+    "chapter_format_warning_other": "As linhas do capítulo {{count}} não têm carimbo de data/hora e começarão às 0:00.",
     "confirm_archive_show": "Arquivar {{title}}? Ele ficará oculto nas listas públicas de podcast.",
     "confirm_delete_show": "Excluir {{title}} e todos os seus episódios? Isto não pode ser desfeito.",
     "confirm_archive_episode": "Arquivar {{title}}? Ele ficará oculto nas listas públicas de podcast.",
-    "confirm_delete_episode": "Excluir {{title}}? Isto não pode ser desfeito.",
-    "readiness_subtitle": "lista de verificação {{title}}",
-    "media_scan_status": "Verificação: {{status}}",
-    "media_processing_status": "Mídia: {{status}}",
-    "uploading": "Uploading audio…",
-    "chapter_format_warning_one": "{{count}} chapter line has no timestamp and will start at 0:00.",
-    "chapter_format_warning_other": "{{count}} chapter lines have no timestamp and will start at 0:00."
+    "confirm_delete_episode": "Excluir {{title}}? Isto não pode ser desfeito."
   },
   "fields": {
     "show": "Show",
@@ -147,6 +147,7 @@
     "author_name": "Nome do autor do diretório",
     "owner_email": "E-mail do proprietário do diretório",
     "copyright": "Aviso de direitos autorais",
+    "funding_url": "URL de financiamento",
     "explicit_show": "Marcar este programa como explícito",
     "artwork_url": "Artwork URL",
     "audio_url": "Audio URL",
@@ -162,8 +163,7 @@
     "episode_type": "Tipo de episódio",
     "transcript": "Transcript",
     "chapters": "Chapters",
-    "chapters_hint": "Um capítulo por linha, por exemplo: 00:30 Apresentações",
-    "funding_url": "URL de financiamento"
+    "chapters_hint": "Um capítulo por linha, por exemplo: 00:30 Apresentações"
   },
   "visibility": {
     "public": "Public",

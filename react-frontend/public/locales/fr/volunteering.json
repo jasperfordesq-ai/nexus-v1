@@ -97,6 +97,7 @@
   "create_opportunity_subtitle": "Créez une nouvelle opportunité de bénévolat pour votre organisation",
   "form_org_label": "Organisation",
   "form_org_placeholder": "Sélectionner votre organisation",
+  "search_organisations": "Rechercher des organisations",
   "form_org_required": "Veuillez sélectionner une organisation",
   "form_title_label": "Titre de l'opportunité",
   "form_title_placeholder": "p. ex., Aide au jardin communautaire, Coordinateur d'événements",
@@ -197,6 +198,7 @@
   "all_hours_reviewed": "Toutes les soumissions d'heures de bénévolat ont été examinées.",
   "org_hours_approved_paid": "Horaires approuvés. Crédits de temps versés au bénévolat.",
   "org_hours_approved": "Horaires approuvés.",
+  "org_hours_approved_unpaid": "Heures approuvées. Rechargez le portefeuille pour payer ce bénévole.",
   "org_hours_declined": "Les horaires ont diminué.",
   "org_all_hours_reviewed": "Toutes les heures de bénévolat ont été revues.",
   "org_balance_low_warning": "Le solde peut être insuffisant pour {{count}} heures en attente.",
@@ -468,6 +470,7 @@
   "aria": {
     "volunteering_sections": "Sections de bénévolat"
   },
+  "filter_by_status": "Filtrer par statut",
   "credentials": {
     "heading": "Vérification des informations d'identification",
     "upload_new": "Télécharger un nouvel identifiant",
@@ -634,7 +637,7 @@
     "aria_select_all": "Sélectionner toutes les candidatures en attente visibles",
     "aria_select_application": "Sélectionnez une application sur {{name}}",
     "aria_search_volunteers": "Rechercher des bénévoles par nom",
-    "filter_label": "Filter applications"
+    "filter_label": "Filtrer les applications"
   },
   "org_wallet_balance": "Solde du portefeuille :",
   "auto_pay_on": "Paiement automatique activé",
@@ -837,8 +840,5 @@
   "my_organisations_none": "Aucune organisation pour l'instant",
   "my_organisations_none_desc": "Enregistrez une organisation bénévole pour commencer à publier des opportunités, à gérer des bénévoles et à attribuer des crédits de temps.",
   "my_organisations_pending": "En attente d'approbation",
-  "my_organisations_pending_desc": "En attente de l'approbation de l'administrateur",
-  "filter_by_status": "Filter by status",
-  "search_organisations": "Search organisations",
-  "org_hours_approved_unpaid": "Heures approuvées. Rechargez le portefeuille pour payer ce bénévole."
+  "my_organisations_pending_desc": "En attente de l'approbation de l'administrateur"
 }

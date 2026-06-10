@@ -1,12 +1,14 @@
 {
   "page_title": "Bloggen",
-  "loading_post": "Loading blog post...",
+  "loading_post": "Blogbericht laden...",
   "hero_eyebrow": "Communityverhalen",
   "hero_posts_label": "Getoonde berichten",
   "title": "Blog & Nieuws",
   "subtitle": "Verhalen, updates en aankondigingen uit de gemeenschap",
   "search_placeholder": "Zoek berichten...",
   "filter_all": "Alles",
+  "filter_by_category": "Filter op categorie",
+  "loading_posts": "Blogposts laden",
   "unable_to_load": "Kon berichten niet laden",
   "try_again": "Probeer het opnieuw",
   "error_load_posts": "Kon blogberichten niet laden.",
@@ -62,7 +64,5 @@
     "reaction_sad": "Verdrietig",
     "reaction_celebrate": "Vieren"
   },
-  "page_description": "Verhalen, gidsen en updates van de tijdbank-gemeenschap — uitwisselingen die werkten, geleerde lessen en het laatste nieuws van lokale groepen en partners.",
-  "filter_by_category": "Filter by category",
-  "loading_posts": "Loading blog posts"
+  "page_description": "Verhalen, gidsen en updates van de tijdbank-gemeenschap — uitwisselingen die werkten, geleerde lessen en het laatste nieuws van lokale groepen en partners."
 }

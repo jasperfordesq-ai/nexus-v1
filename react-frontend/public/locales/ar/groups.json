@@ -1,4 +1,5 @@
 {
+  "member_fallback": "User",
   "title": "المجموعات",
   "discover": "اكتشف المجموعات",
   "create_group": "إنشاء مجموعة",
@@ -50,6 +51,7 @@
   "posts_count_label": "{{count}} منشور",
   "detail": {
     "loading": "جارٍ تحميل المجموعة...",
+    "loading_replies": "جارٍ تحميل الردود...",
     "unable_to_load": "تعذر تحميل المجموعة",
     "not_found_desc": "المجموعة التي تبحث عنها غير موجودة",
     "error_load_failed": "فشل في تحميل المجموعة. يرجى المحاولة مرة أخرى.",
@@ -127,6 +129,8 @@
     "no_members_title": "لا يوجد أعضاء بعد",
     "no_members_desc": "كن أول من ينضم إلى هذه المجموعة",
     "members_loading_aria": "جارٍ تحميل أعضاء المجموعة",
+    "feed_loading": "جارٍ تحميل خلاصة المجموعة...",
+    "events_loading": "جارٍ تحميل أحداث المجموعة...",
     "member_owner": "المالك",
     "member_admin": "مشرف",
     "member_joined": "انضم في {{date}}",
@@ -195,10 +199,7 @@
     "feed_empty_desc": "كن أول من يشارك شيئًا مع هذه المجموعة!",
     "feed_create_post": "إنشاء منشور",
     "feed_load_more": "تحميل المزيد",
-    "member_actions_aria": "إجراءات الأعضاء",
-    "feed_loading": "Loading group feed...",
-    "events_loading": "Loading group events...",
-    "loading_replies": "Loading replies..."
+    "member_actions_aria": "إجراءات الأعضاء"
   },
   "form": {
     "create_title": "إنشاء مجموعة جديدة",
@@ -258,6 +259,7 @@
     "template_label": "البدء من قالب (اختياري)"
   },
   "announcements": {
+    "loading": "جارٍ تحميل الإعلانات...",
     "heading": "الإعلانات",
     "new": "إعلان جديد",
     "no_announcements_title": "لا توجد إعلانات",
@@ -285,8 +287,7 @@
     "pinned_success": "تم التثبيت",
     "update_failed": "فشل في تحديث الإعلان",
     "deleted": "تم حذف الإعلان",
-    "delete_failed": "فشل في حذف الإعلان",
-    "loading": "Loading announcements..."
+    "delete_failed": "فشل في حذف الإعلان"
   },
   "challenges": {
     "heading": "التحديات",
@@ -414,7 +415,7 @@
     "video_player": "مشغّل الفيديو",
     "fullsize_alt": "صورة بالحجم الكامل",
     "delete": "حذف",
-    "delete_confirm": "Delete this media item? This cannot be undone."
+    "delete_confirm": "هل تريد حذف عنصر الوسائط هذا؟ لا يمكن التراجع عن هذا."
   },
   "webhooks": {
     "load_failed": "فشل تحميل الـ Webhooks",
@@ -442,7 +443,7 @@
     "secret_placeholder": "سر التوقيع للتحقق من الحمولة",
     "cancel": "إلغاء",
     "create_btn": "إنشاء Webhook",
-    "delete_confirm": "Delete this webhook? This cannot be undone."
+    "delete_confirm": "هل تريد حذف الرد التلقائي على الويب هذا؟ لا يمكن التراجع عن هذا."
   },
   "toast": {
     "left": "غادر المجموعة",
@@ -516,6 +517,7 @@
     "downvote_aria": "تصويت سلبي",
     "vote_count_aria": "{{count}} صوتًا",
     "loading": "جارٍ تحميل الأسئلة",
+    "loading_detail": "جارٍ تحميل تفاصيل السؤال...",
     "search_placeholder": "ابحث عن الأسئلة...",
     "search_aria": "ابحث عن الأسئلة",
     "sort_aria": "فرز الأسئلة",
@@ -553,8 +555,7 @@
     "answer_posted_success": "تم نشر الإجابة!",
     "answer_posted_error": "فشل في نشر الإجابة",
     "vote_error": "فشل في التصويت",
-    "accept_error": "فشل في قبول الإجابة",
-    "loading_detail": "Loading question details..."
+    "accept_error": "فشل في قبول الإجابة"
   },
   "wiki": {
     "load_failed": "فشل تحميل صفحات الويكي",
@@ -567,6 +568,7 @@
     "delete_failed": "فشل حذف الصفحة",
     "revisions_failed": "فشل تحميل سجل المراجعات",
     "loading": "جارٍ تحميل الويكي",
+    "loading_page": "جارٍ تحميل صفحة wiki...",
     "heading": "الويكي",
     "new_page": "صفحة جديدة",
     "pages": "الصفحات",
@@ -602,8 +604,7 @@
     "content_label": "المحتوى",
     "create": "إنشاء الصفحة",
     "delete_title": "حذف صفحة الويكي",
-    "delete_confirm": "هل أنت متأكد من حذف \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
-    "loading_page": "Loading wiki page..."
+    "delete_confirm": "هل أنت متأكد من حذف \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء."
   },
   "page_meta": {
     "create": {
@@ -711,6 +712,5 @@
     "accent_color": "لون التمييز",
     "hue": "تدرج اللون",
     "preview": "معاينة"
-  },
-  "member_fallback": "User"
+  }
 }

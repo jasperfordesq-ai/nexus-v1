@@ -88,6 +88,10 @@
   "view_ranked_results": "Zobacz wyniki rankingowe",
   "winner_label": "Zwycięzca: {{name}}",
   "submit_rankings": "Prześlij ranking",
+  "loading": "Ładowanie ankiet...",
+  "vote_now": "Vote Now",
+  "vote_now_for": "Zagłosuj teraz na: {{question}}",
+  "vote_for_option": "Zagłosuj na {{option}} w: {{question}}",
   "aria": {
     "export_csv": "Eksportuj wyniki jako CSV",
     "move_rank_down": "Przenieś {{option}} w dół",
@@ -96,9 +100,5 @@
   "page_meta": {
     "title": "Ankiety"
   },
-  "loading": "Loading polls...",
-  "vote_now": "Vote Now",
-  "vote_now_for": "Vote now on: {{question}}",
-  "vote_for_option": "Vote for {{option}} in: {{question}}",
-  "category_filter_label": "Filter by category"
+  "category_filter_label": "Filtruj według kategorii"
 }

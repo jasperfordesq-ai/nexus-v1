@@ -10,7 +10,7 @@
     "section_compliance": "الامتثال والإشراف",
     "section_records": "السجلات",
     "section_settings": "الإعدادات",
-    "nav_label": "Broker navigation"
+    "nav_label": "الملاحة وسيط"
   },
   "header": {
     "toggle_sidebar": "تبديل الشريط الجانبي",
@@ -194,9 +194,9 @@
     "time_days_ago": "قبل {{count}} يوم",
     "note_system_author": "النظام",
     "hours_short": "س",
-    "tabs_aria": "Member status filter",
-    "open_notes_for": "Open notes for {{name}}",
-    "send_note": "Send note"
+    "tabs_aria": "مرشح حالة العضو",
+    "open_notes_for": "افتح الملاحظات لـ {{name}}",
+    "send_note": "إرسال ملاحظة"
   },
   "onboarding": {
     "title": "الإلحاق",
@@ -468,7 +468,7 @@
       "status_changed": "تم تغيير الحالة"
     },
     "detail_no_history": "لا يوجد سجل متاح.",
-    "tabs_aria": "Exchange status filter"
+    "tabs_aria": "مرشح حالة الصرف"
   },
   "messages": {
     "title": "مراجعة الرسالة",
@@ -577,7 +577,7 @@
     "copy_reason_flagged_user": "مستخدم مُعلَّم",
     "copy_reason_manual_monitoring": "مراقبة يدوية",
     "copy_reason_random_sample": "عينة عشوائية",
-    "review_tabs_aria": "Message review filter"
+    "review_tabs_aria": "مرشح مراجعة الرسائل"
   },
   "monitoring": {
     "title": "مراقبة المستخدمين",
@@ -691,7 +691,7 @@
     "category_reputation": "السمعة",
     "category_fraud": "احتيال محتمل",
     "category_other": "أخرى",
-    "tabs_aria": "Risk level filter"
+    "tabs_aria": "مرشح مستوى المخاطر"
   },
   "insurance": {
     "title": "شهادات التأمين",
@@ -787,7 +787,7 @@
     "label_created": "أُنشئت في",
     "label_verified_at": "تم التحقق في",
     "label_verified_by": "تم التحقق بواسطة",
-    "tabs_aria": "Insurance certificate status filter"
+    "tabs_aria": "مرشح حالة شهادة التأمين"
   },
   "archives": {
     "title": "أرشيف المراجعة",
@@ -846,7 +846,7 @@
     "severity_medium": "متوسطة",
     "severity_high": "عالية",
     "severity_critical": "حرجة",
-    "tabs_aria": "Review archive filter"
+    "tabs_aria": "مراجعة مرشح الأرشيف"
   },
   "configuration": {
     "title": "إعدادات الوسيط",
@@ -1094,8 +1094,8 @@
     }
   },
   "layout": {
-    "close_navigation": "Close navigation",
+    "close_navigation": "إغلاق التنقل",
     "navigation": "Navigation",
-    "skip_to_main": "Skip to main content"
+    "skip_to_main": "انتقل إلى المحتوى الرئيسي"
   }
 }

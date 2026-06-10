@@ -134,8 +134,8 @@
     "aria_upload_progress": "Uploadvoortgang",
     "download": "Downloaden",
     "download_failed": "Downloaden mislukt",
-    "filter_by_category": "Filter by category",
-    "loading": "Loading resources"
+    "filter_by_category": "Filter op categorie",
+    "loading": "Bronnen laden"
   },
   "not_found": {
     "page_title": "Pagina niet gevonden",

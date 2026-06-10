@@ -1,6 +1,4 @@
 {
-  "load_failed": "Falha ao carregar correspondências",
-  "match_hidden": "Correspondência oculta — mostraremos menos como esta",
   "page_title": "Correspondências",
   "breadcrumb_dashboard": "Painel",
   "breadcrumb_matches": "Correspondências",
@@ -25,9 +23,11 @@
   "reasons_more": "+{{count}} mais",
   "view_details": "Ver detalhes da correspondência",
   "not_interested": "Sem interesse",
+  "load_failed": "Falha ao carregar correspondências",
+  "match_hidden": "Correspondência oculta — mostraremos menos como esta",
   "page_meta": {
     "title": "Correspondências"
   },
-  "filter_tabs_aria": "Match source filter",
-  "loading": "Loading matches..."
+  "filter_tabs_aria": "Filtro de origem correspondente",
+  "loading": "Carregando partidas..."
 }
