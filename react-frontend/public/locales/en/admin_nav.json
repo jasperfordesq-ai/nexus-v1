@@ -267,5 +267,6 @@
   "zone_commerce": "Commerce",
   "zone_platform": "Platform",
   "zone_diagnostics": "Diagnostics",
-  "admin_meta_description": "Private admin tools for managing this community."
+  "admin_meta_description": "Private admin tools for managing this community.",
+  "retention_policies": "Data Retention"
 }
