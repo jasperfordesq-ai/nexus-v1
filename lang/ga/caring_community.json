@@ -63,10 +63,10 @@
       "message": "We've missed you lately — would you like a warmth pass with a fellow helper?"
     },
     "unfulfilled_help_request": {
-      "message": "T? iarratas cabhrach :name ag fanacht le breis agus :days l?. An bhf?adfaimis an cuardach a leathn??"
+      "message": "Tá iarratas cabhrach :name ag fanacht le breis agus :days lá. An bhféadfaimis an cuardach a leathnú?"
     },
     "low_coverage_subregion": {
-      "message": "T? ganntanas taca?ochta ag :name faoi l?thair. Smaoinigh ar n?os m? c?nt?ir? a earc? ansin."
+      "message": "Tá ganntanas tacaíochta ag :name faoi láthair. Smaoinigh ar níos mó cúntóirí a earcú ansin."
     }
   },
   "requests": {

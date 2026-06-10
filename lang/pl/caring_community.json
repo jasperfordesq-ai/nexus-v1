@@ -63,10 +63,10 @@
       "message": "We've missed you lately — would you like a warmth pass with a fellow helper?"
     },
     "unfulfilled_help_request": {
-      "message": "Pro?ba o pomoc od :name czeka ju? ponad :days dni. Czy mo?emy rozszerzy? poszukiwania?"
+      "message": "Prośba o pomoc od :name czeka już ponad :days dni. Czy możemy rozszerzyć poszukiwania?"
     },
     "low_coverage_subregion": {
-      "message": ":name ma obecnie zbyt ma?o wsparcia. Rozwa? pozyskanie tam wi?kszej liczby pomagaj?cych."
+      "message": ":name ma obecnie zbyt mało wsparcia. Rozważ pozyskanie tam większej liczby pomagających."
     }
   },
   "requests": {
