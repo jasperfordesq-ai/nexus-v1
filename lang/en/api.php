@@ -129,6 +129,7 @@ return [
     'turnstile_failed'              => 'We could not verify that you are human. Please retry the challenge and submit again.',
     'password_pwned'                => 'This password appears in a known data breach and cannot be used. Please choose a different password.',
     'password_reused'               => 'You cannot reuse a recent password. Please choose a password you have not used before.',
+    'audit_export_failed'           => 'Error exporting audit data',
     'password_mismatch'             => 'Password and confirmation do not match.',
     'terms_required'                => 'You must accept the terms of service and privacy policy to register.',
     'invite_code_required'          => 'An invite code is required to register on this community.',

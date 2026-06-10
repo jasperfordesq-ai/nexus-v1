@@ -1180,6 +1180,9 @@ Route::post('/v2/admin/users/{id}/verification-badges', [\App\Http\Controllers\A
 Route::delete('/v2/admin/users/{id}/verification-badges/{type}', [\App\Http\Controllers\Api\MemberVerificationBadgeController::class, 'revokeBadge']);
 Route::get('/v2/admin/users/{id}/verification-badges', [\App\Http\Controllers\Api\MemberVerificationBadgeController::class, 'getAdminBadgeList']);
 
+// Tenant-wide audit trail export (CSV) — activity_log + org_audit_log
+Route::get('/v2/admin/audit-log/export.csv', [\App\Http\Controllers\Api\AdminAuditLogController::class, 'exportCsv']);
+
 Route::get('/v2/admin/dashboard/stats', [\App\Http\Controllers\Api\AdminDashboardController::class, 'stats']);
 Route::get('/v2/admin/dashboard/trends', [\App\Http\Controllers\Api\AdminDashboardController::class, 'trends']);
 Route::get('/v2/admin/dashboard/activity', [\App\Http\Controllers\Api\AdminDashboardController::class, 'activity']);
