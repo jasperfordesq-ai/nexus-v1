@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-10T09:32:10.852Z",
+  "generatedAt": "2026-06-10T11:39:24.670Z",
   "source": "scripts/check-i18n-gap-regression.mjs",
   "localesDir": "react-frontend/public/locales",
   "languages": [
@@ -14,7 +14,7 @@
     "ar",
     "ga"
   ],
-  "totalGaps": 652,
+  "totalGaps": 639,
   "files": {
     "de/auth.json": 6,
     "de/broker.json": 2,
@@ -22,7 +22,6 @@
     "de/civic_digest.json": 1,
     "de/common.json": 8,
     "de/community.json": 1,
-    "de/courses.json": 1,
     "de/dashboard.json": 2,
     "de/explore.json": 1,
     "de/federation.json": 1,
@@ -49,7 +48,6 @@
     "fr/caring_community.json": 4,
     "fr/civic_digest.json": 1,
     "fr/common.json": 8,
-    "fr/courses.json": 1,
     "fr/dashboard.json": 2,
     "fr/emails.json": 1,
     "fr/explore.json": 1,
@@ -62,6 +60,7 @@
     "fr/kb.json": 6,
     "fr/legal.json": 1,
     "fr/marketplace.json": 4,
+    "fr/messages.json": 1,
     "fr/municipality_feedback.json": 1,
     "fr/onboarding.json": 1,
     "fr/podcasts.json": 10,
@@ -72,7 +71,6 @@
     "fr/stories.json": 2,
     "fr/utility.json": 9,
     "it/auth.json": 3,
-    "it/blog.json": 3,
     "it/broker.json": 2,
     "it/caring_community.json": 3,
     "it/civic_digest.json": 1,
@@ -84,7 +82,6 @@
     "it/feed.json": 1,
     "it/goals.json": 1,
     "it/ideation.json": 1,
-    "it/jobs.json": 9,
     "it/kb.json": 6,
     "it/marketplace.json": 2,
     "it/municipality_feedback.json": 1,

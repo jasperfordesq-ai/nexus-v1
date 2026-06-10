@@ -379,8 +379,8 @@
     "personal_message_placeholder": "Una nota per il candidato...",
     "interview_location_placeholder": "https://meet.google.com/...",
     "offer_salary_placeholder": "es. 45000",
-    "tabs_aria": "Job pipeline sections",
-    "change_stage_aria": "Change stage for {{name}}",
+    "tabs_aria": "Sezioni della pipeline delle candidature",
+    "change_stage_aria": "Cambia fase per {{name}}",
     "event_type": {
       "status_change": "Cambio di stato",
       "interview": "Colloquio",
@@ -466,10 +466,10 @@
     "message_applicant": "Messaggio",
     "kanban_board": "Bacheca Kanban",
     "cv_download_error": "Impossibile scaricare il CV",
-    "confirm_close_title": "Close this vacancy?",
-    "confirm_close": "Closing stops new applications from coming in. You can reopen it at any time.",
-    "confirm_reopen_title": "Reopen this vacancy?",
-    "confirm_reopen": "Reopening makes the vacancy visible again and lets people apply."
+    "confirm_close_title": "Chiudere questo annuncio?",
+    "confirm_close": "La chiusura blocca l'arrivo di nuove candidature. Puoi riaprire l'annuncio in qualsiasi momento.",
+    "confirm_reopen_title": "Riaprire questo annuncio?",
+    "confirm_reopen": "La riapertura rende l'annuncio di nuovo visibile e permette alle persone di candidarsi."
   },
   "interview": {
     "schedule": "Pianifica Colloquio",
@@ -837,7 +837,7 @@
     "access_denied": "Accesso negato",
     "load_error": "Impossibile caricare il report dell'audit sui pregiudizi",
     "note_privacy": "Questo report analizza solo metriche di processo. Nessun dato demografico viene raccolto o utilizzato.",
-    "search_jobs": "Search jobs"
+    "search_jobs": "Cerca offerte di lavoro"
   },
   "self_scheduling": {
     "title": "Slot per Colloqui",
@@ -1047,6 +1047,6 @@
   "jobs": {
     "view_details": "Visualizza dettagli offerta"
   },
-  "tabs_aria": "Jobs view",
-  "loading": "Loading vacancies..."
+  "tabs_aria": "Vista offerte di lavoro",
+  "loading": "Caricamento delle offerte di lavoro..."
 }

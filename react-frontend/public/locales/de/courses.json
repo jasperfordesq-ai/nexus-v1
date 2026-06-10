@@ -116,7 +116,7 @@
     "empty": "Im Moment gibt es nichts zu benoten.",
     "score": "Punktzahl (%)",
     "passed": "Bestanden",
-    "feedback": "Feedback (optional)",
+    "feedback": "Rückmeldung (optional)",
     "submit": "Note abgeben",
     "graded": "Note gespeichert",
     "error": "Die Note konnte nicht gespeichert werden.",

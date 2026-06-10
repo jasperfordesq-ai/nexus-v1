@@ -114,7 +114,7 @@
   "grading": {
     "title": "Classement",
     "empty": "Rien à noter pour le moment.",
-    "score": "Score (%)",
+    "score": "Note (%)",
     "passed": "Passé",
     "feedback": "Commentaires (facultatif)",
     "submit": "Soumettre la note",
