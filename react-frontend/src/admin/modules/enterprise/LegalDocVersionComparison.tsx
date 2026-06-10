@@ -65,7 +65,7 @@ export default function LegalDocVersionComparison({
 
       <ModalBody>
         {loading ? (
-          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center items-center min-h-[300px]">
+          <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center items-center min-h-[300px]">
             <Spinner size="lg" />
           </div>
         ) : comparison ? (

@@ -14,11 +14,13 @@ import { useEffect, useState, useCallback } from 'react';
 import Key from 'lucide-react/icons/key';
 import Lock from 'lucide-react/icons/lock';
 import { usePageTitle } from '@/hooks';
+import { useTranslation } from 'react-i18next';
 import { adminEnterprise } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
 export function PermissionBrowser() {
   usePageTitle("Enterprise");
+  const { t } = useTranslation('admin');
 
   const [permissions, setPermissions] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(true);
@@ -49,7 +51,7 @@ export function PermissionBrowser() {
       />
 
       {loading ? (
-        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-16">
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
       ) : (

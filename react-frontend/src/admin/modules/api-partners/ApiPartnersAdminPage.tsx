@@ -182,7 +182,7 @@ export default function ApiPartnersAdminPage() {
         <CardBody className="p-0">
           {loading ? (
             <div className="p-10 flex justify-center">
-              <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner /></div>
+              <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-4"><Spinner /></div>
             </div>
           ) : partners.length === 0 ? (
             <div className="p-10 text-center text-[var(--color-text-muted)]">
@@ -295,7 +295,7 @@ export default function ApiPartnersAdminPage() {
               <Tab key="log" title={t('api_partners.detail.call_log_tab')}>
                 {callLogLoading ? (
                   <div className="p-6 flex justify-center">
-                    <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner /></div>
+                    <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-4"><Spinner /></div>
                   </div>
                 ) : callLog.length === 0 ? (
                   <div className="p-6 text-center text-[var(--color-text-muted)]">

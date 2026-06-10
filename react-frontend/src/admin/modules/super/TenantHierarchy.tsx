@@ -246,7 +246,7 @@ export function TenantHierarchy() {
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" /></div>
+          <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-4"><Spinner size="lg" /></div>
         </div>
       ) : hierarchy.length === 0 ? (
         <Card >

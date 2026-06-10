@@ -199,7 +199,7 @@ class PollService
             'id'         => (int) $user->id,
             'name'       => trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')),
             'avatar_url' => $user->avatar_url ?? null,
-        ] : ['id' => (int) $poll->user_id, 'name' => 'Unknown', 'avatar_url' => null];
+        ] : ['id' => (int) $poll->user_id, 'name' => __('api.unknown_user'), 'avatar_url' => null];
 
         return $data;
     }
@@ -213,7 +213,7 @@ class PollService
         if (!empty($endDate)) {
             $endTimestamp = strtotime($endDate);
             if ($endTimestamp === false || $endTimestamp <= time()) {
-                throw new \InvalidArgumentException('Poll end date must be in the future');
+                throw new \InvalidArgumentException(__('api.poll_end_date_future'));
             }
         }
 

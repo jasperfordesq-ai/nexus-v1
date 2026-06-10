@@ -100,6 +100,7 @@ const SCORE_COMPONENTS: Array<{ key: keyof DebugScores; i18nKey: string }> = [
 export function MatchDebugPanel() {
   const { t } = useTranslation('admin', { keyPrefix: 'advanced' });
   const { t: tNav } = useTranslation('admin_nav');
+  const { t: tAdmin } = useTranslation('admin');
   usePageTitle(tNav('advanced'));
   const toast = useToast();
 
@@ -234,7 +235,7 @@ export function MatchDebugPanel() {
               aria-label={t('label_search_users')}
               startContent={
                 searchLoading
-                  ? <span role="status" aria-busy="true" aria-label="Loading" className="inline-flex"><Spinner size="sm" /></span>
+                  ? <span role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="inline-flex"><Spinner size="sm" /></span>
                   : <Search className="w-4 h-4 text-muted" />
               }
               isClearable
@@ -300,7 +301,7 @@ export function MatchDebugPanel() {
 
       {/* Loading state */}
       {matchesLoading && (
-        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-16">
+        <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-16">
           <div className="flex flex-col items-center gap-3">
             <Spinner size="lg" />
             <p className="text-sm text-muted">{t('loading_match_scores')}</p>

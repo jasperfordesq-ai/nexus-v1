@@ -104,7 +104,7 @@ class SkillTaxonomyService
 
         $name = trim($data['name'] ?? '');
         if (empty($name) || strlen($name) > 100) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Name is required (max 100 chars)', 'field' => 'name'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.skill_category_name_required'), 'field' => 'name'];
             return null;
         }
 
@@ -119,7 +119,7 @@ class SkillTaxonomyService
                 ->exists();
 
             if (! $parentExists) {
-                self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Parent category not found', 'field' => 'parent_id'];
+                self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.parent_category_not_found'), 'field' => 'parent_id'];
                 return null;
             }
         }
@@ -165,7 +165,7 @@ class SkillTaxonomyService
             ->exists();
 
         if (! $exists) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Category not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.category_not_found')];
             return false;
         }
 
@@ -174,7 +174,7 @@ class SkillTaxonomyService
         if (isset($data['name'])) {
             $name = trim($data['name']);
             if (empty($name) || strlen($name) > 100) {
-                self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Name is required (max 100 chars)', 'field' => 'name'];
+                self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.skill_category_name_required'), 'field' => 'name'];
                 return false;
             }
             $updates['name'] = $name;
@@ -225,7 +225,7 @@ class SkillTaxonomyService
                 ->count();
 
             if ($count > 0) {
-                self::$errors[] = ['code' => 'HAS_DEPENDENCIES', 'message' => 'Category has assigned skills; deactivate instead'];
+                self::$errors[] = ['code' => 'HAS_DEPENDENCIES', 'message' => __('api.skill_category_has_skills')];
                 return false;
             }
 
@@ -359,7 +359,7 @@ class SkillTaxonomyService
 
         $skillName = trim($data['skill_name'] ?? '');
         if (empty($skillName) || strlen($skillName) > 100) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Skill name is required (max 100 chars)', 'field' => 'skill_name'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.skill_name_required_max'), 'field' => 'skill_name'];
             return null;
         }
 
@@ -378,7 +378,7 @@ class SkillTaxonomyService
             ->exists();
 
         if ($existing) {
-            self::$errors[] = ['code' => 'DUPLICATE', 'message' => 'You already have this skill', 'field' => 'skill_name'];
+            self::$errors[] = ['code' => 'DUPLICATE', 'message' => __('api.skill_already_added'), 'field' => 'skill_name'];
             return null;
         }
 
@@ -419,7 +419,7 @@ class SkillTaxonomyService
             ->exists();
 
         if (! $exists) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Skill not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.skill_not_found')];
             return false;
         }
 

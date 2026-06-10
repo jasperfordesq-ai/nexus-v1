@@ -45,11 +45,11 @@ class GroupConversationService
 
         $name = trim($name);
         if (empty($name)) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Group name is required'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.group_conversation_name_required')];
             return null;
         }
         if (mb_strlen($name) > 100) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Group name must be 100 characters or less'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.group_conversation_name_too_long')];
             return null;
         }
 
@@ -59,13 +59,13 @@ class GroupConversationService
 
         // Minimum 2 others + creator = 3 participants
         if (count($memberIds) < 2) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Group must have at least 3 participants'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.group_conversation_min_participants')];
             return null;
         }
 
         // Maximum 50 participants total
         if (count($memberIds) > 49) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Group cannot have more than 50 participants'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.group_conversation_max_participants')];
             return null;
         }
 
@@ -78,7 +78,7 @@ class GroupConversationService
             ->all();
 
         if (count($validMembers) < 2) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Not enough valid members found'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.group_conversation_not_enough_members')];
             return null;
         }
 
@@ -87,7 +87,7 @@ class GroupConversationService
         $validMembers = array_diff($validMembers, $blockedIds);
 
         if (count($validMembers) < 2) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Not enough valid members (some may be blocked)'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.group_conversation_not_enough_members_blocked')];
             return null;
         }
 
@@ -133,7 +133,7 @@ class GroupConversationService
 
         $conversation = Conversation::find($conversationId);
         if (!$conversation || !$conversation->is_group) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Group conversation not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_conversation_not_found')];
             return null;
         }
 
@@ -144,7 +144,7 @@ class GroupConversationService
             ->first();
 
         if (!$adder || $adder->role !== 'admin') {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only admins can add members'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_conversation_admin_only_add')];
             return null;
         }
 
@@ -153,7 +153,7 @@ class GroupConversationService
             ->whereNull('left_at')
             ->count();
         if ($activeCount >= 50) {
-            self::$errors[] = ['code' => 'LIMIT_EXCEEDED', 'message' => 'Group cannot have more than 50 participants'];
+            self::$errors[] = ['code' => 'LIMIT_EXCEEDED', 'message' => __('api.group_conversation_max_participants')];
             return null;
         }
 
@@ -163,7 +163,7 @@ class GroupConversationService
             ->where('tenant_id', $tenantId)
             ->first();
         if (!$user) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'User not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.user_not_found')];
             return null;
         }
 
@@ -173,7 +173,7 @@ class GroupConversationService
             ->first();
 
         if ($existing && $existing->left_at === null) {
-            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'User is already a member'];
+            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => __('api.group_conversation_already_member')];
             return null;
         }
 
@@ -201,7 +201,7 @@ class GroupConversationService
 
         $conversation = Conversation::find($conversationId);
         if (!$conversation || !$conversation->is_group) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Group conversation not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_conversation_not_found')];
             return false;
         }
 
@@ -215,7 +215,7 @@ class GroupConversationService
                 ->first();
 
             if (!$remover || $remover->role !== 'admin') {
-                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only admins can remove members'];
+                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_conversation_admin_only_remove')];
                 return false;
             }
         }
@@ -226,7 +226,7 @@ class GroupConversationService
             ->first();
 
         if (!$participant) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'User is not an active member'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_conversation_user_not_active_member')];
             return false;
         }
 
@@ -263,7 +263,7 @@ class GroupConversationService
 
         $conversation = Conversation::find($conversationId);
         if (!$conversation || !$conversation->is_group) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Group conversation not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_conversation_not_found')];
             return null;
         }
 
@@ -273,14 +273,14 @@ class GroupConversationService
             ->first();
 
         if (!$participant || $participant->role !== 'admin') {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only admins can update group settings'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_conversation_admin_only_update')];
             return null;
         }
 
         if (isset($data['name'])) {
             $name = trim($data['name']);
             if (empty($name) || mb_strlen($name) > 100) {
-                self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Group name must be 1-100 characters'];
+                self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.group_conversation_name_length')];
                 return null;
             }
             $conversation->group_name = $name;
@@ -304,7 +304,7 @@ class GroupConversationService
 
         $conversation = Conversation::find($conversationId);
         if (!$conversation || !$conversation->is_group) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Group conversation not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_conversation_not_found')];
             return null;
         }
 
@@ -315,7 +315,7 @@ class GroupConversationService
             ->exists();
 
         if (!$isParticipant) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You are not a member of this group'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_conversation_not_member')];
             return null;
         }
 
@@ -416,7 +416,7 @@ class GroupConversationService
 
         $conversation = Conversation::find($conversationId);
         if (!$conversation || !$conversation->is_group) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Group conversation not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_conversation_not_found')];
             return null;
         }
 
@@ -426,7 +426,7 @@ class GroupConversationService
             ->first();
 
         if (!$participant) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You are not a member of this group'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_conversation_not_member')];
             return null;
         }
 
@@ -521,7 +521,7 @@ class GroupConversationService
 
         $conversation = Conversation::find($conversationId);
         if (!$conversation || !$conversation->is_group) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Group conversation not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_conversation_not_found')];
             return null;
         }
 
@@ -532,13 +532,13 @@ class GroupConversationService
             ->first();
 
         if (!$participant) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You are not an active member of this group'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_conversation_not_active_member')];
             return null;
         }
 
         $body = \App\Helpers\HtmlSanitizer::stripAll(trim($body));
         if (empty($body)) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Message body is required'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.message_body_required')];
             return null;
         }
 

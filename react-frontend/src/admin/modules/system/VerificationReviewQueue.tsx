@@ -155,7 +155,7 @@ export function VerificationReviewQueue() {
         </CardHeader>
         <CardBody className="px-6 pb-5">
           {loading ? (
-            <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-8">
+            <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-8">
               <Spinner size="lg" />
             </div>
           ) : sessions.length === 0 ? (

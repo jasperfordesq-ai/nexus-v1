@@ -77,6 +77,7 @@ export default function LoyaltyAdminPage() {
   const toast = useToast();
   const { user } = useAuth();
   const { t } = useTranslation('caring_community');
+  const { t: tAdmin } = useTranslation('admin');
   const canManage = canManageCaring(user);
   usePageTitle(t('admin.loyalty.title'));
 
@@ -229,7 +230,7 @@ export default function LoyaltyAdminPage() {
 
   if (loading) {
     return (
-      <div role="status" aria-busy="true" aria-label="Loading" className="flex items-center justify-center py-16">
+      <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex items-center justify-center py-16">
         <Spinner size="lg" />
       </div>
     );
@@ -323,7 +324,7 @@ export default function LoyaltyAdminPage() {
           {selectedSeller && (
             <>
               {settingsLoading && (
-                <div role="status" aria-busy="true" aria-label="Loading" className="flex items-center justify-center py-8">
+                <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex items-center justify-center py-8">
                   <Spinner size="md" />
                 </div>
               )}

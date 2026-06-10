@@ -78,7 +78,7 @@ export function UserPermissions() {
       />
 
       {loading ? (
-        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-12"><Spinner size="lg" /></div>
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-12"><Spinner size="lg" /></div>
       ) : !user ? (
         <Card >
           <CardBody className="py-8 text-center text-muted">

@@ -119,12 +119,12 @@ class GroupChatroomService
 
         $name = trim($data['name'] ?? '');
         if (empty($name)) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Chatroom name is required', 'field' => 'name'];
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.group_chatroom_name_required'), 'field' => 'name'];
             return null;
         }
 
         if (mb_strlen($name) > 100) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Chatroom name must not exceed 100 characters', 'field' => 'name'];
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.group_chatroom_name_too_long'), 'field' => 'name'];
             return null;
         }
 
@@ -136,7 +136,7 @@ class GroupChatroomService
             ->exists();
 
         if (! $isMember) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must be a group member to create chatrooms'];
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_chatroom_member_only_create')];
             return null;
         }
 
@@ -210,12 +210,12 @@ class GroupChatroomService
             ->first();
 
         if (! $chatroom) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Chatroom not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_chatroom_not_found')];
             return false;
         }
 
         if ($chatroom->is_default) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Cannot delete the default chatroom'];
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_chatroom_cannot_delete_default')];
             return false;
         }
 
@@ -230,7 +230,7 @@ class GroupChatroomService
         $isCreator = (int) $chatroom->created_by === $userId;
 
         if (! $isAdmin && ! $isCreator) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only the chatroom creator or a group admin can delete this chatroom'];
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_chatroom_delete_forbidden')];
             return false;
         }
 
@@ -319,7 +319,7 @@ class GroupChatroomService
 
         $body = trim($body);
         if (empty($body)) {
-            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Message body is required', 'field' => 'body'];
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.message_body_required'), 'field' => 'body'];
             return null;
         }
 
@@ -332,7 +332,7 @@ class GroupChatroomService
             ->first();
 
         if (! $chatroom) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Chatroom not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_chatroom_not_found')];
             return null;
         }
 
@@ -344,7 +344,7 @@ class GroupChatroomService
             ->exists();
 
         if (! $isMember) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must be a group member to post messages'];
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_chatroom_member_only_post')];
             return null;
         }
 
@@ -392,7 +392,7 @@ class GroupChatroomService
             ->first();
 
         if (! $message) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Message not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.message_not_found')];
             return false;
         }
 
@@ -409,7 +409,7 @@ class GroupChatroomService
             $isAdmin = $membership && in_array($membership->role, ['owner', 'admin']);
 
             if (! $isAdmin) {
-                $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only the message author or a group admin can delete this message'];
+                $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_chatroom_message_delete_forbidden')];
                 return false;
             }
         }
@@ -436,7 +436,7 @@ class GroupChatroomService
             ->first();
 
         if (! $chatroom) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Chatroom not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_chatroom_not_found')];
             return null;
         }
 
@@ -448,7 +448,7 @@ class GroupChatroomService
                 ->exists();
 
             if (! $isMember) {
-                $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'This channel is private'];
+                $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_chatroom_private_channel')];
                 return null;
             }
         }
@@ -471,7 +471,7 @@ class GroupChatroomService
             ->first();
 
         if (! $chatroom) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Chatroom not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_chatroom_not_found')];
             return false;
         }
 
@@ -482,7 +482,7 @@ class GroupChatroomService
             ->first();
 
         if (! $message) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Message not found in this chatroom'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_chatroom_message_not_in_chatroom')];
             return false;
         }
 
@@ -494,7 +494,7 @@ class GroupChatroomService
             ->first();
 
         if (! $membership || ! in_array($membership->role, ['owner', 'admin'])) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only group admins can pin messages'];
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_chatroom_admin_only_pin')];
             return false;
         }
 
@@ -535,7 +535,7 @@ class GroupChatroomService
             ->first();
 
         if (! $chatroom) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Chatroom not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_chatroom_not_found')];
             return false;
         }
 
@@ -547,7 +547,7 @@ class GroupChatroomService
             ->first();
 
         if (! $membership || ! in_array($membership->role, ['owner', 'admin'])) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only group admins can unpin messages'];
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.group_chatroom_admin_only_unpin')];
             return false;
         }
 
@@ -557,7 +557,7 @@ class GroupChatroomService
             ->delete();
 
         if ($deleted === 0) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Pinned message not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_chatroom_pinned_message_not_found')];
             return false;
         }
 

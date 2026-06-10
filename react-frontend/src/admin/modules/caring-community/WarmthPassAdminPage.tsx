@@ -57,6 +57,7 @@ function formatDate(iso: string | null, fallback: string): string {
 
 export function WarmthPassAdminPage() {
   const { t } = useTranslation('caring_community');
+  const { t: tAdmin } = useTranslation('admin');
   usePageTitle(t('admin.warmth_pass.title'));
   const { userId: routeUserId } = useParams<{ userId?: string }>();
   const [userId, setUserId] = useState(routeUserId ?? '');
@@ -158,7 +159,7 @@ export function WarmthPassAdminPage() {
       {/* Loading */}
       {loading && (
         <div className="flex justify-center py-10">
-          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" label={t('admin.warmth_pass.loading')} /></div>
+          <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-4"><Spinner size="lg" label={t('admin.warmth_pass.loading')} /></div>
         </div>
       )}
 

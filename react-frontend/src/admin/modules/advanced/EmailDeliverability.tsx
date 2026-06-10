@@ -472,7 +472,7 @@ export default function EmailDeliverability() {
                   <div className="text-xs font-semibold uppercase text-theme-subtle">{metric.label}</div>
                   <Icon aria-hidden="true" className={`h-4 w-4 ${metric.color}`} />
                 </div>
-                <div className={`text-2xl font-bold ${metric.color}`}>{loadingSummary ? <span role="status" aria-busy="true" aria-label="Loading" className="inline-flex"><Spinner size="sm" /></span>: metric.value}</div>
+                <div className={`text-2xl font-bold ${metric.color}`}>{loadingSummary ? <span role="status" aria-busy="true" aria-label={t('common.loading')} className="inline-flex"><Spinner size="sm" /></span>: metric.value}</div>
                 <div className="text-xs text-theme-secondary">{metric.detail}</div>
               </CardBody>
             </Card>
@@ -509,7 +509,7 @@ export default function EmailDeliverability() {
                   <div key={tile.key} className="rounded-md border border-[var(--color-border)] p-3">
                     <div className="text-xs font-semibold uppercase text-theme-subtle">{tile.label}</div>
                     <div className={`mt-1 text-xl font-semibold ${tile.color}`}>
-                      {loadingPushSummary ? <span role="status" aria-busy="true" aria-label="Loading" className="inline-flex"><Spinner size="sm" /></span> : tile.value}
+                      {loadingPushSummary ? <span role="status" aria-busy="true" aria-label={t('common.loading')} className="inline-flex"><Spinner size="sm" /></span> : tile.value}
                     </div>
                   </div>
                 ))}
@@ -637,7 +637,7 @@ export default function EmailDeliverability() {
         </CardHeader>
         <Separator />
         <CardBody>
-          {loadingQueues ? <span role="status" aria-busy="true" aria-label="Loading" className="inline-flex"><Spinner /></span>: (
+          {loadingQueues ? <span role="status" aria-busy="true" aria-label={t('common.loading')} className="inline-flex"><Spinner /></span>: (
             <Table aria-label={t('email_deliverability.queues.table_label')} removeWrapper>
               <TableHeader>
                 <TableColumn>{t('email_deliverability.queues.columns.source')}</TableColumn>
@@ -716,7 +716,7 @@ export default function EmailDeliverability() {
           </div>
         </CardHeader>
         <CardBody className="gap-4">
-          {loadingLogs ? <span role="status" aria-busy="true" aria-label="Loading" className="inline-flex"><Spinner /></span>: (
+          {loadingLogs ? <span role="status" aria-busy="true" aria-label={t('common.loading')} className="inline-flex"><Spinner /></span>: (
             <Table aria-label={t('email_deliverability.logs.table_label')} removeWrapper>
               <TableHeader>
                 <TableColumn>{t('email_deliverability.logs.columns.recipient')}</TableColumn>
@@ -805,7 +805,7 @@ export default function EmailDeliverability() {
           </div>
         </CardHeader>
         <CardBody className="gap-4">
-          {loadingSupp ? <span role="status" aria-busy="true" aria-label="Loading" className="inline-flex"><Spinner /></span>: (
+          {loadingSupp ? <span role="status" aria-busy="true" aria-label={t('common.loading')} className="inline-flex"><Spinner /></span>: (
             <Table aria-label={t('email_deliverability.suppressions.table_label')} removeWrapper>
               <TableHeader>
                 <TableColumn>{t('email_deliverability.suppressions.columns.email')}</TableColumn>

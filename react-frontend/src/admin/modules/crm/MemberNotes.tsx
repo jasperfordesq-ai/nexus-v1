@@ -351,7 +351,7 @@ export function MemberNotes() {
       {/* Content */}
       {loading ? (
         <div className="flex justify-center py-16">
-          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" label={t('crm.loading_notes')} /></div>
+          <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-4"><Spinner size="lg" label={t('crm.loading_notes')} /></div>
         </div>
       ) : notes.length === 0 ? (
         <Card>

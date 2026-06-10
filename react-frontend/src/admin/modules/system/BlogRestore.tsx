@@ -96,7 +96,7 @@ export function BlogRestore() {
     return (
       <div>
         <PageHeader title={t('system.blog_restore_title')} description={t('system.blog_restore_desc')} />
-        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-16">
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
       </div>

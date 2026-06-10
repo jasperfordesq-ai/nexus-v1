@@ -120,7 +120,7 @@ export function BadgeConfiguration() {
     return (
       <div>
         <PageHeader title={t('gamification.badge_configuration_title')} description={t('gamification.badge_configuration_desc')} />
-        <div role="status" aria-busy="true" aria-label="Loading" className="flex items-center justify-center py-24">
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex items-center justify-center py-24">
           <Spinner size="lg" />
         </div>
       </div>

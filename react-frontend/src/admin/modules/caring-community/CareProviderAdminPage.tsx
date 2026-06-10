@@ -124,6 +124,7 @@ function typeColor(type: ProviderType): ChipColor {
 
 export default function CareProviderAdminPage() {
   const { t } = useTranslation(['caring_community', 'common']);
+  const { t: tAdmin } = useTranslation('admin');
   const confirm = useConfirm();
   usePageTitle(t('admin.providers.meta_title'));
   const { showToast } = useToast();
@@ -397,7 +398,7 @@ export default function CareProviderAdminPage() {
 
           {duplicatesLoading ? (
             <div className="flex justify-center py-6">
-              <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" /></div>
+              <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-4"><Spinner size="sm" /></div>
             </div>
           ) : duplicates && duplicates.pairs.length === 0 ? (
             <p className="text-sm text-muted py-3">
@@ -481,7 +482,7 @@ export default function CareProviderAdminPage() {
       {/* Table */}
       {loading ? (
         <div className="flex justify-center py-12">
-          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" /></div>
+          <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-4"><Spinner size="lg" /></div>
         </div>
       ) : error ? (
         <div className="rounded-xl border border-danger/30 bg-danger/5 p-6 text-center text-danger">

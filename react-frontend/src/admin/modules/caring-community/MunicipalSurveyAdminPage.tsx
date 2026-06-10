@@ -187,6 +187,7 @@ function AnalyticsView({ analytics, t }: { analytics: Analytics; t: TFunction<'c
 
 export default function MunicipalSurveyAdminPage() {
   const { t } = useTranslation('caring_community');
+  const { t: tAdmin } = useTranslation('admin');
   const { showToast } = useToast();
   usePageTitle(t('admin.surveys.meta_title'));
   const createModal    = useDisclosure();
@@ -432,7 +433,7 @@ export default function MunicipalSurveyAdminPage() {
         <Separator />
         <CardBody>
           {loading && (
-            <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-10">
+            <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-10">
               <Spinner size="lg" />
             </div>
           )}
@@ -741,7 +742,7 @@ export default function MunicipalSurveyAdminPage() {
           </ModalHeader>
           <ModalBody>
             {analyticsLoading && (
-              <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-8">
+              <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-8">
                 <Spinner size="lg" />
               </div>
             )}

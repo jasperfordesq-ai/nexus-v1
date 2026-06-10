@@ -232,7 +232,7 @@ function CommunityFundGrantForm({ fundBalance, onComplete }: { fundBalance: numb
             />
             {searching && (
               <div className="flex items-center justify-center py-4">
-                <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" /></div>
+                <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-4"><Spinner size="sm" /></div>
               </div>
             )}
             {searchResults.length > 0 && (

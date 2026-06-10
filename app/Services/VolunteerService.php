@@ -703,12 +703,12 @@ class VolunteerService
         ", [$id, $tenantId, $tenantId]);
 
         if (!$opp) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Opportunity not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.opportunity_not_found')];
             return false;
         }
 
         if (!self::canManageOpportunity((array) $opp, $userId)) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage this opportunity'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.volunteer_opportunity_manage_forbidden')];
             return false;
         }
 
@@ -762,7 +762,7 @@ class VolunteerService
             return true;
         } catch (\Exception $e) {
             Log::warning("VolunteerService::updateOpportunity error: " . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to update opportunity'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.volunteer_opportunity_update_failed')];
             return false;
         }
     }
@@ -783,12 +783,12 @@ class VolunteerService
         ", [$id, $tenantId, $tenantId]);
 
         if (!$opp) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Opportunity not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.opportunity_not_found')];
             return false;
         }
 
         if (!self::canManageOpportunity((array) $opp, $userId)) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage this opportunity'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.volunteer_opportunity_manage_forbidden')];
             return false;
         }
 
@@ -824,7 +824,7 @@ class VolunteerService
             return true;
         } catch (\Exception $e) {
             Log::warning("VolunteerService::deleteOpportunity error: " . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to delete opportunity'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.volunteer_opportunity_delete_failed')];
             return false;
         }
     }
@@ -849,12 +849,12 @@ class VolunteerService
         ", [$opportunityId, $tenantId, $tenantId]);
 
         if (!$opp) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Opportunity not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.opportunity_not_found')];
             return null;
         }
 
         if (!self::canManageOpportunity((array) $opp, $adminUserId)) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage this opportunity'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.volunteer_opportunity_manage_forbidden')];
             return null;
         }
 
@@ -928,7 +928,7 @@ class VolunteerService
         self::$errors = [];
 
         if (!in_array($action, ['approve', 'decline'])) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Action must be approve or decline'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.action_must_be_approve_or_decline')];
             return false;
         }
 
@@ -943,12 +943,12 @@ class VolunteerService
         ", [$applicationId, $tenantId]);
 
         if (!$app) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Application not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.job_application_not_found')];
             return false;
         }
 
         if (!self::canManageOpportunity((array) $app, $adminUserId)) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to manage this opportunity'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.volunteer_opportunity_manage_forbidden')];
             return false;
         }
 
@@ -972,7 +972,7 @@ class VolunteerService
             return false;
         } catch (\Exception $e) {
             Log::warning("VolunteerService::handleApplication error: " . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to update application'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.job_application_update_failed')];
             return false;
         }
     }
@@ -994,17 +994,17 @@ class VolunteerService
         ", [$applicationId, $tenantId]);
 
         if (!$app) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Application not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.job_application_not_found')];
             return false;
         }
 
         if ((int) $app->user_id !== $userId) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'This is not your application'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.volunteer_application_not_yours')];
             return false;
         }
 
         if ($app->status === 'approved') {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'You cannot withdraw an approved application. Please contact the organisation directly.'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_application_withdraw_approved')];
             return false;
         }
 
@@ -1013,7 +1013,7 @@ class VolunteerService
             return true;
         } catch (\Exception $e) {
             Log::warning("VolunteerService::withdrawApplication error: " . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to withdraw application'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.volunteer_application_withdraw_failed')];
             return false;
         }
     }
@@ -1062,7 +1062,7 @@ class VolunteerService
         // Check user has approved application for this opportunity (outside lock — read-only pre-check)
         $shift = DB::selectOne("SELECT * FROM vol_shifts WHERE id = ? AND tenant_id = ?", [$shiftId, $tenantId]);
         if (!$shift) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Shift not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.volunteer_shift_not_found')];
             return false;
         }
 
@@ -1074,13 +1074,13 @@ class VolunteerService
         );
 
         if (!$app) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must have an approved application to sign up for shifts'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.volunteer_shift_approved_application_required')];
             return false;
         }
 
         // Check shift hasn't passed
         if (strtotime($shift->start_time) < time()) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'This shift has already started'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_shift_started')];
             return false;
         }
 
@@ -1094,7 +1094,7 @@ class VolunteerService
                 );
 
                 if (!$lockedShift) {
-                    self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Shift not found'];
+                    self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.volunteer_shift_not_found')];
                     return false;
                 }
 
@@ -1105,7 +1105,7 @@ class VolunteerService
                 )->cnt;
 
                 if ($lockedShift->capacity && $signupCount >= (int) $lockedShift->capacity) {
-                    self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'This shift is at capacity'];
+                    self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_shift_at_capacity')];
                     return false;
                 }
 
@@ -1141,7 +1141,7 @@ class VolunteerService
             });
         } catch (\Exception $e) {
             Log::warning("VolunteerService::signUpForShift error: " . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to sign up for shift'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.volunteer_shift_signup_failed')];
             return false;
         }
     }
@@ -1156,12 +1156,12 @@ class VolunteerService
 
         $shift = DB::selectOne("SELECT * FROM vol_shifts WHERE id = ? AND tenant_id = ?", [$shiftId, $tenantId]);
         if (!$shift) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Shift not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.volunteer_shift_not_found')];
             return false;
         }
 
         if (strtotime($shift->start_time) < time()) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Cannot cancel a shift that has already started'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_shift_cancel_started')];
             return false;
         }
 
@@ -1172,7 +1172,7 @@ class VolunteerService
             );
 
             if ($affected === 0) {
-                self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'You are not signed up for this shift'];
+                self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.volunteer_shift_not_signed_up')];
                 return false;
             }
 
@@ -1199,7 +1199,7 @@ class VolunteerService
             return true;
         } catch (\Exception $e) {
             Log::warning("VolunteerService::cancelShiftSignup error: " . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to cancel shift signup'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.volunteer_shift_cancel_failed')];
             return false;
         }
     }
@@ -1228,27 +1228,27 @@ class VolunteerService
         }
 
         if (empty($data['organization_id'])) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Organization is required', 'field' => 'organization_id'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_organization_required'), 'field' => 'organization_id'];
             return null;
         }
 
         if (empty($data['date'])) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Date is required', 'field' => 'date'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_log_date_required'), 'field' => 'date'];
             return null;
         }
 
         if (empty($data['hours']) || $data['hours'] <= 0) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Hours must be greater than 0', 'field' => 'hours'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_log_hours_positive'), 'field' => 'hours'];
             return null;
         }
 
         if ($data['hours'] > 24) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Cannot log more than 24 hours in a single entry', 'field' => 'hours'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_log_hours_max'), 'field' => 'hours'];
             return null;
         }
 
         if (strtotime($data['date']) > time()) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Cannot log hours for a future date', 'field' => 'date'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_log_future_date'), 'field' => 'date'];
             return null;
         }
 
@@ -1295,7 +1295,7 @@ class VolunteerService
         $dupLock = Cache::lock($dupLockKey, 10);
         if (! $dupLock->get()) {
             // A concurrent identical submission already holds the lock.
-            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'You have already logged hours for this organization and date'];
+            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => __('api.volunteer_log_duplicate')];
             return null;
         }
 
@@ -1313,7 +1313,7 @@ class VolunteerService
                 );
             }
             if ($duplicateCheck) {
-                self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'You have already logged hours for this organization and date'];
+                self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => __('api.volunteer_log_duplicate')];
                 return null;
             }
 
@@ -1355,7 +1355,7 @@ class VolunteerService
             return $logId;
         } catch (\Exception $e) {
             Log::warning("VolunteerService::logHours error: " . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to log hours'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.volunteer_log_failed')];
             return null;
         } finally {
             $dupLock->release();
@@ -1447,7 +1447,7 @@ class VolunteerService
         self::$lastPaymentOutcome = null;
 
         if (!in_array($action, ['approve', 'decline'])) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Action must be approve or decline'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.action_must_be_approve_or_decline')];
             return false;
         }
 
@@ -1455,18 +1455,18 @@ class VolunteerService
 
         $log = DB::selectOne("SELECT * FROM vol_logs WHERE id = ? AND tenant_id = ?", [$logId, $tenantId]);
         if (!$log) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Log entry not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.volunteer_log_not_found')];
             return false;
         }
 
         if ($log->status !== 'pending') {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Only pending hours can be verified'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.only_pending_can_be_verified')];
             return false;
         }
 
         // Prevent users from approving their own hours
         if ((int) $log->user_id === $adminUserId) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You cannot verify your own logged hours'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.volunteer_verify_own_hours_forbidden')];
             return false;
         }
 
@@ -1671,7 +1671,7 @@ class VolunteerService
             return true;
         } catch (\Exception $e) {
             Log::warning("VolunteerService::verifyHours error: " . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to verify hours'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.volunteer_verify_hours_failed')];
             return false;
         }
     }
@@ -1756,42 +1756,42 @@ class VolunteerService
         $website = trim($data['website'] ?? '');
 
         if (empty($name)) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Organisation name is required', 'field' => 'name'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_org_name_required'), 'field' => 'name'];
             return null;
         }
 
         if (mb_strlen($name) < 3) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Organisation name must be at least 3 characters', 'field' => 'name'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_org_name_min_length'), 'field' => 'name'];
             return null;
         }
 
         if (mb_strlen($name) > 200) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Organisation name must be under 200 characters', 'field' => 'name'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_org_name_max_length'), 'field' => 'name'];
             return null;
         }
 
         if (empty($description)) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Description is required', 'field' => 'description'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.description_required'), 'field' => 'description'];
             return null;
         }
 
         if (mb_strlen($description) < 20) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Description must be at least 20 characters', 'field' => 'description'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_org_description_min_length'), 'field' => 'description'];
             return null;
         }
 
         if (empty($contactEmail)) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Contact email is required', 'field' => 'contact_email'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_org_contact_email_required'), 'field' => 'contact_email'];
             return null;
         }
 
         if (!filter_var($contactEmail, FILTER_VALIDATE_EMAIL)) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Please enter a valid email address', 'field' => 'contact_email'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_org_contact_email_invalid'), 'field' => 'contact_email'];
             return null;
         }
 
         if (!empty($website) && !filter_var($website, FILTER_VALIDATE_URL)) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Please enter a valid URL', 'field' => 'website'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_org_website_invalid'), 'field' => 'website'];
             return null;
         }
 
@@ -1802,7 +1802,7 @@ class VolunteerService
         );
 
         if ($existing) {
-            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'An organisation with this name already exists', 'field' => 'name'];
+            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => __('api.volunteer_org_name_exists'), 'field' => 'name'];
             return null;
         }
 
@@ -1833,18 +1833,18 @@ class VolunteerService
                 // Retry on duplicate slug (integrity constraint violation)
                 if ($attempt >= $maxRetries || $e->getCode() !== '23000') {
                     Log::warning("VolunteerService::createOrganization error: " . $e->getMessage());
-                    self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to register organisation'];
+                    self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.volunteer_org_register_failed')];
                     return null;
                 }
                 // Retry — generateOrgSlug will pick a new suffix on next attempt
             } catch (\Exception $e) {
                 Log::warning("VolunteerService::createOrganization error: " . $e->getMessage());
-                self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to register organisation'];
+                self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.volunteer_org_register_failed')];
                 return null;
             }
         }
 
-        self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to register organisation'];
+        self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.volunteer_org_register_failed')];
         return null;
     }
 
@@ -1922,18 +1922,18 @@ class VolunteerService
         $tenantId = self::getTenantId();
 
         if (!in_array($targetType, ['organization', 'user'])) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Target type must be organization or user'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_review_target_type_invalid')];
             return null;
         }
 
         if ($rating < 1 || $rating > 5) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Rating must be between 1 and 5', 'field' => 'rating'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_review_rating_range'), 'field' => 'rating'];
             return null;
         }
 
         // Prevent self-review
         if ($targetType === 'user' && $targetId === $reviewerId) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'You cannot review yourself'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_review_self_forbidden')];
             return null;
         }
 
@@ -1943,7 +1943,7 @@ class VolunteerService
             [$reviewerId, $targetType, $targetId, $tenantId]
         );
         if ($existingReview) {
-            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'You have already reviewed this ' . $targetType];
+            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => __('api.volunteer_review_already_exists', ['target' => $targetType])];
             return null;
         }
 
@@ -1951,7 +1951,7 @@ class VolunteerService
         if ($targetType === 'organization') {
             $org = DB::selectOne("SELECT id FROM vol_organizations WHERE id = ? AND tenant_id = ?", [$targetId, $tenantId]);
             if (!$org) {
-                self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Organization not found'];
+                self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.organization_not_found')];
                 return null;
             }
             $history = DB::selectOne("
@@ -1964,13 +1964,13 @@ class VolunteerService
             ", [$reviewerId, $targetId, $tenantId, $reviewerId, $targetId, $tenantId]);
 
             if (!$history) {
-                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must have volunteered with this organisation to leave a review'];
+                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.volunteer_review_org_history_required')];
                 return null;
             }
         } else {
             $user = DB::selectOne("SELECT id FROM users WHERE id = ? AND tenant_id = ?", [$targetId, $tenantId]);
             if (!$user) {
-                self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'User not found'];
+                self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.user_not_found')];
                 return null;
             }
             $history = DB::selectOne("
@@ -1981,7 +1981,7 @@ class VolunteerService
             ", [$reviewerId, $targetId, $tenantId]);
 
             if (!$history) {
-                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You must have volunteered together to leave a review'];
+                self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.volunteer_review_user_history_required')];
                 return null;
             }
         }
@@ -1996,7 +1996,7 @@ class VolunteerService
             return (int) DB::getPdo()->lastInsertId();
         } catch (\Exception $e) {
             Log::warning("VolunteerService::createReview error: " . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to create review'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.volunteer_review_create_failed')];
             return null;
         }
     }

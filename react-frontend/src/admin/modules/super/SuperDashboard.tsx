@@ -161,7 +161,7 @@ export function SuperDashboard() {
       <h3 className="text-lg font-semibold text-foreground mb-4">{t('super.tenants')}</h3>
       {loading ? (
         <div className="flex justify-center py-12">
-          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" /></div>
+          <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-4"><Spinner size="lg" /></div>
         </div>
       ) : tenants.length === 0 ? (
         <Card >

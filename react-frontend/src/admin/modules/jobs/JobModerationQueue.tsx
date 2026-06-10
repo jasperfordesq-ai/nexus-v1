@@ -77,6 +77,7 @@ function getSpamScoreColor(score: number): 'success' | 'warning' | 'danger' | 'd
 
 export function JobModerationQueue() {
   const { t } = useTranslation('jobs');
+  const { t: tAdmin } = useTranslation('admin');
   usePageTitle(t('moderation.title'));
   const toast = useToast();
 
@@ -301,7 +302,7 @@ export function JobModerationQueue() {
       {/* Pending Jobs List */}
       {loading ? (
         <div className="flex justify-center py-16">
-          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner label={t('moderation.loading')} /></div>
+          <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-4"><Spinner label={t('moderation.loading')} /></div>
         </div>
       ) : pendingJobs.length === 0 ? (
         <EmptyState

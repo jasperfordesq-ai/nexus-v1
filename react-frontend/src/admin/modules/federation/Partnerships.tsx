@@ -792,7 +792,7 @@ export function Partnerships() {
               </ModalHeader>
               <ModalBody>
                 {detailLoading ? (
-                  <div role="status" aria-busy="true" aria-label="Loading" className="flex h-40 items-center justify-center">
+                  <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex h-40 items-center justify-center">
                     <Spinner size="lg" />
                   </div>
                 ) : detailPartnership ? (
@@ -934,7 +934,7 @@ export function Partnerships() {
                         <CardBody>
                           {auditLoading ? (
                             <div className="flex h-24 items-center justify-center">
-                              <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" /></div>
+                              <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-4"><Spinner size="sm" /></div>
                             </div>
                           ) : auditLog.length === 0 ? (
                             <p className="text-sm text-muted text-center py-4">
@@ -990,7 +990,7 @@ export function Partnerships() {
                         <CardBody>
                           {statsLoading ? (
                             <div className="flex h-24 items-center justify-center">
-                              <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" /></div>
+                              <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-4"><Spinner size="sm" /></div>
                             </div>
                           ) : stats ? (
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

@@ -358,7 +358,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
         <Card>
           <CardBody>
             <div className="flex justify-center py-12">
-              <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner /></div>
+              <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-4"><Spinner /></div>
             </div>
           </CardBody>
         </Card>

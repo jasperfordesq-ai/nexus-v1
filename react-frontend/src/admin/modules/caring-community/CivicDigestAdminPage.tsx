@@ -40,6 +40,7 @@ const DIGEST_SOURCES = [
 
 export default function CivicDigestAdminPage() {
   const { t } = useTranslation('caring_community');
+  const { t: tAdmin } = useTranslation('admin');
   usePageTitle(t('admin.civic_digest.meta_title'));
   const { showToast } = useToast();
   const { tenantPath } = useTenant();
@@ -137,7 +138,7 @@ export default function CivicDigestAdminPage() {
 
       {loading && (
         <div className="flex justify-center py-16">
-          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" /></div>
+          <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-4"><Spinner size="lg" /></div>
         </div>
       )}
 

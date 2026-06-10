@@ -121,7 +121,7 @@ export default function LegalDocComplianceDashboard() {
 
   if (loading) {
     return (
-      <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center items-center min-h-[400px]">
+      <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center items-center min-h-[400px]">
         <Spinner size="lg" />
       </div>
     );

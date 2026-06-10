@@ -94,7 +94,7 @@ export default function CaringCommunityAdmin() {
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
-        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" /></div>
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-4"><Spinner size="lg" /></div>
       </div>
     );
   }

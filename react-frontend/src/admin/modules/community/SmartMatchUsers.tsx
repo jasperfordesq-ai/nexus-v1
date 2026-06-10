@@ -11,6 +11,7 @@
 
 import { useState, useEffect, useCallback } from 'react';import Users from 'lucide-react/icons/users';
 import { usePageTitle } from '@/hooks';
+import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { adminMatching } from '../../api/adminApi';
 import { PageHeader, DataTable, StatusBadge, EmptyState, type Column } from '../../components';
@@ -20,6 +21,7 @@ import { Chip, Spinner } from '@/components/ui';
 export function SmartMatchUsers() {
   usePageTitle("Community");
   const toast = useToast();
+  const { t } = useTranslation('admin');
 
   const [data, setData] = useState<MatchApproval[]>([]);
   const [loading, setLoading] = useState(true);
@@ -119,7 +121,7 @@ export function SmartMatchUsers() {
     return (
       <div>
         <PageHeader title={"Smart Match Users"} description={"View and manage users participating in the smart matching system"} />
-        <div className="flex justify-center py-12" role="status" aria-busy="true" aria-label="Loading"><Spinner size="lg" /></div>
+        <div className="flex justify-center py-12" role="status" aria-busy="true" aria-label={t('common.loading')}><Spinner size="lg" /></div>
       </div>
     );
   }

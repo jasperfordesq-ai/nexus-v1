@@ -180,7 +180,7 @@ export function SmartMatchingOverview() {
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
-              <div role="status" aria-busy="true" aria-label="Loading" className="flex h-48 items-center justify-center">
+              <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex h-48 items-center justify-center">
                 <Spinner />
               </div>
             ) : config ? (
@@ -294,7 +294,7 @@ export function SmartMatchingOverview() {
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
-              <div role="status" aria-busy="true" aria-label="Loading" className="flex h-32 items-center justify-center">
+              <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex h-32 items-center justify-center">
                 <Spinner />
               </div>
             ) : overview ? (
@@ -353,7 +353,7 @@ export function SmartMatchingOverview() {
           <CardBody className="px-4 pb-4">
             {loading ? (
               <div className="flex h-32 items-center justify-center">
-                <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner /></div>
+                <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-4"><Spinner /></div>
               </div>
             ) : stats ? (
               <div className="space-y-4">

@@ -129,7 +129,7 @@ export function MatchingAnalytics() {
       />
 
       {loading ? (
-        <div role="status" aria-busy="true" aria-label="Loading" className="flex h-64 items-center justify-center">
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex h-64 items-center justify-center">
           <Spinner size="lg" />
         </div>
       ) : !hasData ? (

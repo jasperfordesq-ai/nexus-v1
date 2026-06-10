@@ -37,37 +37,37 @@ class ShiftGroupReservationService
         $tenantId = TenantContext::getId();
 
         if ($slots < 1) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Must reserve at least 1 slot', 'field' => 'reserved_slots'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.shift_reservation_min_slots'), 'field' => 'reserved_slots'];
             return null;
         }
 
         $shift = VolShift::find($shiftId);
         if (! $shift) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Shift not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.volunteer_shift_not_found')];
             return null;
         }
 
         if ($shift->start_time->isPast()) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Cannot reserve slots for a shift that has already started'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.shift_reservation_shift_started')];
             return null;
         }
 
         // Verify group exists
         $group = Group::find($groupId);
         if (! $group) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Group not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.group_not_found')];
             return null;
         }
 
         if (! self::canManageGroup($groupId, $reservedBy, $tenantId)) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only group leaders/admins can reserve slots for this group'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.shift_reservation_leader_only_reserve')];
             return null;
         }
 
         // Check available capacity
         $availableSlots = self::getAvailableSlots($shiftId, $shift);
         if ($availableSlots !== null && $slots > $availableSlots) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => "Only {$availableSlots} slots available", 'field' => 'reserved_slots'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.shift_reservation_slots_available', ['count' => $availableSlots]), 'field' => 'reserved_slots'];
             return null;
         }
 
@@ -80,7 +80,7 @@ class ShiftGroupReservationService
             ->exists();
 
         if ($existing) {
-            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'This group already has a reservation for this shift'];
+            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => __('api.shift_reservation_already_exists')];
             return null;
         }
 
@@ -98,7 +98,7 @@ class ShiftGroupReservationService
             ]);
         } catch (\Exception $e) {
             Log::error('ShiftGroupReservationService::reserve error: ' . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to create reservation'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.shift_reservation_create_failed')];
             return null;
         }
     }
@@ -118,17 +118,17 @@ class ShiftGroupReservationService
             ->first();
 
         if (! $reservation) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Reservation not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.shift_reservation_not_found')];
             return false;
         }
 
         if (! self::canManageReservation((int) $reservation->group_id, (int) $reservation->reserved_by, $leaderUserId, $tenantId)) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only group leaders/admins can manage this reservation'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.shift_reservation_leader_only_manage')];
             return false;
         }
 
         if ((int) $reservation->filled_slots >= (int) $reservation->reserved_slots) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'All reserved slots are filled'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.shift_reservation_slots_filled')];
             return false;
         }
 
@@ -140,7 +140,7 @@ class ShiftGroupReservationService
             ->exists();
 
         if ($alreadyMember) {
-            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'User is already in this group reservation'];
+            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => __('api.shift_reservation_member_already_added')];
             return false;
         }
 
@@ -162,7 +162,7 @@ class ShiftGroupReservationService
             });
         } catch (\Exception $e) {
             Log::error('ShiftGroupReservationService::addMember error: ' . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to add member'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.shift_reservation_add_member_failed')];
             return false;
         }
     }
@@ -181,12 +181,12 @@ class ShiftGroupReservationService
             ->first();
 
         if (! $reservation) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Reservation not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.shift_reservation_not_found')];
             return false;
         }
 
         if (! self::canManageReservation((int) $reservation->group_id, (int) $reservation->reserved_by, $leaderUserId, $tenantId)) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only group leaders/admins can manage this reservation'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.shift_reservation_leader_only_manage')];
             return false;
         }
 
@@ -197,7 +197,7 @@ class ShiftGroupReservationService
             ->first();
 
         if (! $member) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Member not found in this reservation'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.shift_reservation_member_not_found')];
             return false;
         }
 
@@ -216,7 +216,7 @@ class ShiftGroupReservationService
             });
         } catch (\Exception $e) {
             Log::error('ShiftGroupReservationService::removeMember error: ' . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to remove member'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.shift_reservation_remove_member_failed')];
             return false;
         }
     }
@@ -236,12 +236,12 @@ class ShiftGroupReservationService
             ->first();
 
         if (! $reservation) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Reservation not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.shift_reservation_not_found')];
             return false;
         }
 
         if (! self::canManageReservation((int) $reservation->group_id, (int) $reservation->reserved_by, $leaderUserId, $tenantId)) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'Only group leaders/admins can cancel this reservation'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.shift_reservation_leader_only_cancel')];
             return false;
         }
 
@@ -260,7 +260,7 @@ class ShiftGroupReservationService
             });
         } catch (\Exception $e) {
             Log::error('ShiftGroupReservationService::cancelReservation error: ' . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to cancel reservation'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.shift_reservation_cancel_failed')];
             return false;
         }
     }

@@ -138,12 +138,12 @@ class SubAccountService
         $this->errors = [];
 
         if ($parentUserId === $childUserId) {
-            $this->errors[] = ['code' => 'SELF_RELATIONSHIP', 'message' => 'Cannot create a relationship with yourself'];
+            $this->errors[] = ['code' => 'SELF_RELATIONSHIP', 'message' => __('api.subaccount_self_relationship')];
             return null;
         }
 
         if (! in_array($type, self::RELATIONSHIP_TYPES, true)) {
-            $this->errors[] = ['code' => 'INVALID_TYPE', 'message' => 'Invalid relationship type', 'field' => 'relationship_type'];
+            $this->errors[] = ['code' => 'INVALID_TYPE', 'message' => __('api.subaccount_invalid_type'), 'field' => 'relationship_type'];
             return null;
         }
 
@@ -152,7 +152,7 @@ class SubAccountService
         $child = User::query()->where('id', $childUserId)->first();
 
         if (! $parent || ! $child) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'User not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.user_not_found')];
             return null;
         }
 
@@ -164,12 +164,12 @@ class SubAccountService
 
         if ($existing) {
             if ($existing->status === 'active') {
-                $this->errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'Relationship already exists'];
+                $this->errors[] = ['code' => 'ALREADY_EXISTS', 'message' => __('api.subaccount_already_exists')];
                 return $existing->id;
             }
 
             if ($existing->status === 'pending') {
-                $this->errors[] = ['code' => 'PENDING', 'message' => 'Relationship request is already pending'];
+                $this->errors[] = ['code' => 'PENDING', 'message' => __('api.subaccount_request_pending')];
                 return $existing->id;
             }
 
@@ -192,7 +192,7 @@ class SubAccountService
             ->exists();
 
         if ($circular) {
-            $this->errors[] = ['code' => 'CIRCULAR', 'message' => 'This user already manages your account'];
+            $this->errors[] = ['code' => 'CIRCULAR', 'message' => __('api.subaccount_circular')];
             return null;
         }
 
@@ -203,7 +203,7 @@ class SubAccountService
             ->exists();
 
         if ($childIsParent) {
-            $this->errors[] = ['code' => 'NESTING_NOT_ALLOWED', 'message' => 'This user already manages other accounts and cannot be added as a child'];
+            $this->errors[] = ['code' => 'NESTING_NOT_ALLOWED', 'message' => __('api.subaccount_child_is_parent')];
             return null;
         }
 
@@ -214,7 +214,7 @@ class SubAccountService
             ->exists();
 
         if ($parentIsChild) {
-            $this->errors[] = ['code' => 'NESTING_NOT_ALLOWED', 'message' => 'You are a managed account and cannot manage other accounts'];
+            $this->errors[] = ['code' => 'NESTING_NOT_ALLOWED', 'message' => __('api.subaccount_parent_is_child')];
             return null;
         }
 
@@ -225,7 +225,7 @@ class SubAccountService
             ->count();
 
         if ($currentChildCount >= self::MAX_CHILDREN) {
-            $this->errors[] = ['code' => 'LIMIT_REACHED', 'message' => 'Maximum number of sub-accounts (' . self::MAX_CHILDREN . ') reached'];
+            $this->errors[] = ['code' => 'LIMIT_REACHED', 'message' => __('api.subaccount_limit_reached', ['max' => self::MAX_CHILDREN])];
             return null;
         }
 
@@ -326,7 +326,7 @@ class SubAccountService
             ->first();
 
         if (! $existing) {
-            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => 'Relationship not found'];
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.subaccount_relationship_not_found')];
             return false;
         }
 
@@ -364,7 +364,7 @@ class SubAccountService
     public function getChildActivitySummary(int $parentUserId, int $childUserId): ?array
     {
         if (! $this->hasPermission($parentUserId, $childUserId, 'can_view_activity')) {
-            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => 'You do not have permission to view this activity'];
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.subaccount_no_activity_permission')];
             return null;
         }
 

@@ -317,7 +317,7 @@ export function CreditAgreements() {
     return (
       <div>
         <PageHeader title={t('federation.credit_agreements_title')} description={t('federation.credit_agreements_desc')} />
-        <div role="status" aria-busy="true" aria-label="Loading" className="flex h-64 items-center justify-center">
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex h-64 items-center justify-center">
           <Spinner size="lg" />
         </div>
       </div>
@@ -526,7 +526,7 @@ export function CreditAgreements() {
 
           {/* Per-partner balances */}
           {balancesLoading ? (
-            <div role="status" aria-busy="true" aria-label="Loading" className="flex h-32 items-center justify-center">
+            <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex h-32 items-center justify-center">
               <Spinner size="lg" />
             </div>
           ) : balances.length === 0 ? (
@@ -726,7 +726,7 @@ export function CreditAgreements() {
                       <CardBody>
                         {detailLoading ? (
                           <div className="flex h-24 items-center justify-center">
-                            <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" /></div>
+                            <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-4"><Spinner size="sm" /></div>
                           </div>
                         ) : detailTransactions.length === 0 ? (
                           <p className="text-sm text-muted text-center py-4">

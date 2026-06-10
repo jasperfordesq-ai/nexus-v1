@@ -1,4 +1,5 @@
 import { Card, CardBody, Skeleton } from '@/components/ui';
+import { useTranslation } from 'react-i18next';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -58,6 +59,7 @@ export function StatCard({
   to,
   linkAriaLabel,
 }: StatCardProps) {
+  const { t } = useTranslation('admin');
   const resolvedLabel = label ?? title ?? '';
   // Lucide icons are React.forwardRef objects (typeof === 'object'), not functions.
   // Discriminate via isValidElement: pre-rendered JSX passes through; component
@@ -72,7 +74,7 @@ export function StatCard({
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium text-muted">{resolvedLabel}</p>
         {loading ? (
-          <Skeleton role="status" aria-busy="true" aria-label="Loading" className="mt-1 h-7 w-20 rounded bg-surface-tertiary" />
+          <Skeleton role="status" aria-busy="true" aria-label={t('common.loading')} className="mt-1 h-7 w-20 rounded bg-surface-tertiary" />
         ) : (
           <p className="mt-0.5 text-2xl font-semibold text-foreground">
             {typeof value === 'number' ? value.toLocaleString() : value}

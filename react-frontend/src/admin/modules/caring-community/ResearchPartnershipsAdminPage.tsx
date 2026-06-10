@@ -321,7 +321,7 @@ export default function ResearchPartnershipsAdminPage() {
         </CardHeader>
         <CardBody className="p-0">
           {loading ? (
-            <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-10"><Spinner /></div>
+            <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-10"><Spinner /></div>
           ) : (
             <Table aria-label={t('research_partnerships.partners.table_aria')} removeWrapper>
               <TableHeader>

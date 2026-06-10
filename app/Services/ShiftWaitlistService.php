@@ -37,12 +37,12 @@ class ShiftWaitlistService
 
         $shift = VolShift::find($shiftId);
         if (! $shift) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Shift not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.volunteer_shift_not_found')];
             return null;
         }
 
         if ($shift->start_time->isPast()) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'This shift has already started'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_shift_started')];
             return null;
         }
 
@@ -55,7 +55,7 @@ class ShiftWaitlistService
             ->exists();
 
         if ($onWaitlist) {
-            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'You are already on the waitlist for this shift'];
+            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => __('api.shift_waitlist_already_joined')];
             return null;
         }
 
@@ -68,7 +68,7 @@ class ShiftWaitlistService
             ->exists();
 
         if ($signedUp) {
-            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'You are already signed up for this shift'];
+            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => __('api.shift_waitlist_already_signed_up')];
             return null;
         }
 
@@ -93,7 +93,7 @@ class ShiftWaitlistService
             });
         } catch (\Exception $e) {
             Log::error('ShiftWaitlistService::join error: ' . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to join waitlist'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.event_waitlist_failed')];
             return null;
         }
     }
@@ -114,7 +114,7 @@ class ShiftWaitlistService
             ->first();
 
         if (! $entry) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'You are not on the waitlist for this shift'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.shift_waitlist_not_on_waitlist')];
             return false;
         }
 
@@ -138,7 +138,7 @@ class ShiftWaitlistService
             });
         } catch (\Exception $e) {
             Log::error('ShiftWaitlistService::leave error: ' . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to leave waitlist'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.shift_waitlist_leave_failed')];
             return false;
         }
     }

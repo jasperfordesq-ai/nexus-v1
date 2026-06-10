@@ -138,7 +138,7 @@ export function EnterpriseDashboard() {
         <CardBody className="p-4">
           <h3 className="text-lg font-semibold text-foreground mb-4">{t('enterprise.quick_links')}</h3>
           {loading ? (
-            <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-8">
+            <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-8">
               <Spinner />
             </div>
           ) : (

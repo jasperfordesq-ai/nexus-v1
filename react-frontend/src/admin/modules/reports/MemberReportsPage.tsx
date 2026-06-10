@@ -410,7 +410,7 @@ export function MemberReportsPage() {
             <CardBody className="p-4">
               <p className="text-sm text-muted">{t('reports.active_30d_total')}</p>
               {loading ? (
-                <Skeleton role="status" aria-busy="true" aria-label="Loading" className="mt-1 h-7 w-20 rounded bg-surface-secondary" />
+                <Skeleton role="status" aria-busy="true" aria-label={t('common.loading')} className="mt-1 h-7 w-20 rounded bg-surface-secondary" />
               ) : (
                 <p className="text-2xl font-bold text-foreground">
                   {metrics?.total_active_30d?.toLocaleString() ?? 0} / {metrics?.total_members?.toLocaleString() ?? 0}
@@ -422,7 +422,7 @@ export function MemberReportsPage() {
             <CardBody className="p-4">
               <p className="text-sm text-muted">{t('reports.avg_sessions_per_user')}</p>
               {loading ? (
-                <Skeleton role="status" aria-busy="true" aria-label="Loading" className="mt-1 h-7 w-20 rounded bg-surface-secondary" />
+                <Skeleton role="status" aria-busy="true" aria-label={t('common.loading')} className="mt-1 h-7 w-20 rounded bg-surface-secondary" />
               ) : (
                 <p className="text-2xl font-bold text-foreground">
                   {metrics?.avg_sessions_per_user?.toFixed(1) ?? '0.0'}
@@ -434,7 +434,7 @@ export function MemberReportsPage() {
             <CardBody className="p-4">
               <p className="text-sm text-muted">{t('reports.avg_transactions_per_user')}</p>
               {loading ? (
-                <Skeleton role="status" aria-busy="true" aria-label="Loading" className="mt-1 h-7 w-20 rounded bg-surface-secondary" />
+                <Skeleton role="status" aria-busy="true" aria-label={t('common.loading')} className="mt-1 h-7 w-20 rounded bg-surface-secondary" />
               ) : (
                 <p className="text-2xl font-bold text-foreground">
                   {metrics?.avg_transactions_per_user?.toFixed(1) ?? '0.0'}

@@ -542,7 +542,7 @@ export function NewsletterForm() {
               )}
 
               <Separator />
-              <Suspense fallback={<div role="status" aria-busy="true" aria-label="Loading"><Spinner size="sm" className="m-4" /></div>}>
+              <Suspense fallback={<div role="status" aria-busy="true" aria-label={t('common.loading')}><Spinner size="sm" className="m-4" /></div>}>
                 <RichTextEditor
                   label={t('newsletter_form.label_content')}
                   placeholder={t('newsletters.placeholder_write_your_newsletter_content')}

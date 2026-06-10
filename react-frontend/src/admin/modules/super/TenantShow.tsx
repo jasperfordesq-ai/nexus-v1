@@ -251,7 +251,7 @@ export function TenantShow() {
 
   if (loading) {
     return (
-      <div role="status" aria-busy="true" aria-label="Loading" className="flex items-center justify-center py-20">
+      <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex items-center justify-center py-20">
         <Spinner size="lg" />
       </div>
     );

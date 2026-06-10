@@ -87,7 +87,7 @@ export function WebpConverter() {
         </CardHeader>
         <CardBody>
           {loading ? (
-            <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-8">
+            <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-8">
               <Spinner size="lg" />
             </div>
           ) : (

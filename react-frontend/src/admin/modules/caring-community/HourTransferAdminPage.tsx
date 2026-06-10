@@ -87,6 +87,7 @@ export default function HourTransferAdminPage() {
   const toast = useToast();
   const { user } = useAuth();
   const { t } = useTranslation('caring_community');
+  const { t: tAdmin } = useTranslation('admin');
   const canManage = canManageCaring(user);
   usePageTitle(t('admin.hour_transfers.title'));
 
@@ -245,7 +246,7 @@ export default function HourTransferAdminPage() {
             <CardBody className="p-0">
               {loadingPending ? (
                 <div className="flex justify-center py-12">
-                  <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="md" /></div>
+                  <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-4"><Spinner size="md" /></div>
                 </div>
               ) : pending.length === 0 ? (
                 <div className="py-12 text-center text-sm text-muted">
@@ -341,7 +342,7 @@ export default function HourTransferAdminPage() {
             <CardBody className="p-0">
               {loadingInbound ? (
                 <div className="flex justify-center py-12">
-                  <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="md" /></div>
+                  <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-4"><Spinner size="md" /></div>
                 </div>
               ) : inbound.length === 0 ? (
                 <div className="py-12 text-center text-sm text-muted">

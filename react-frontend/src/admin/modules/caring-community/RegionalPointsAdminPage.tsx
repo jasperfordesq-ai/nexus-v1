@@ -75,6 +75,7 @@ interface LedgerResponse {
 export default function RegionalPointsAdminPage() {
   const toast = useToast();
   const { t } = useTranslation('caring_community');
+  const { t: tAdmin } = useTranslation('admin');
   usePageTitle(t('admin.regional_points.title'));
 
   const [config, setConfig] = useState<RegionalPointsConfig | null>(null);
@@ -208,7 +209,7 @@ export default function RegionalPointsAdminPage() {
 
   if (loading || !config) {
     return (
-      <div role="status" aria-busy="true" aria-label="Loading" className="flex items-center justify-center py-16">
+      <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex items-center justify-center py-16">
         <Spinner size="lg" />
       </div>
     );

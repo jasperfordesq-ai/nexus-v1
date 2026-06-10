@@ -80,7 +80,7 @@ export function CheckoutReturn() {
         <CardBody className="text-center py-10 px-8 gap-4">
           {status === 'polling' && (
             <>
-              <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" className="mx-auto" /></div>
+              <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-4"><Spinner size="lg" className="mx-auto" /></div>
               <h2 className="text-xl font-semibold mt-4">
                 {t('billing.processing')}
               </h2>

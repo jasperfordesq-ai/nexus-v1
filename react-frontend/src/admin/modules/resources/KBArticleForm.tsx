@@ -495,7 +495,7 @@ export function KBArticleForm() {
 
             {/* Content — Write mode */}
             {mode === 'write' && contentType !== 'markdown' && (
-              <Suspense fallback={<div role="status" aria-busy="true" aria-label="Loading"><Spinner size="sm" className="m-4" /></div>}>
+              <Suspense fallback={<div role="status" aria-busy="true" aria-label={t('common.loading')}><Spinner size="sm" className="m-4" /></div>}>
                 <RichTextEditor
                   label={t('resources.content')}
                   placeholder={t('resources.placeholder_content')}

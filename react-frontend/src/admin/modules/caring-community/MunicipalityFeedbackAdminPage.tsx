@@ -115,6 +115,7 @@ function relativeTime(iso: string, t: TFunction<'caring_community'>): string {
 
 export default function MunicipalityFeedbackAdminPage() {
   const { t } = useTranslation('caring_community');
+  const { t: tAdmin } = useTranslation('admin');
   const { user } = useAuth();
   const canManage = canManageCaring(user);
   usePageTitle(t('admin.feedback.title'));
@@ -432,7 +433,7 @@ export default function MunicipalityFeedbackAdminPage() {
       <Card>
         <CardBody className="p-0">
           {loading ? (
-            <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-12">
+            <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-12">
               <Spinner size="lg" />
             </div>
           ) : items.length === 0 ? (

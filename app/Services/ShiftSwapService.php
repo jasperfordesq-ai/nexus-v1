@@ -54,12 +54,12 @@ class ShiftSwapService
         $message     = trim($data['message'] ?? '');
 
         if (! $fromShiftId || ! $toShiftId || ! $toUserId) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'from_shift_id, to_shift_id, and to_user_id are required'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.shift_swap_fields_required')];
             return null;
         }
 
         if ($fromUserId === $toUserId) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Cannot swap with yourself'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.shift_swap_cannot_swap_self')];
             return null;
         }
 
@@ -70,7 +70,7 @@ class ShiftSwapService
             ->first();
 
         if (! $fromApp) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You are not signed up for the source shift'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.shift_swap_not_signed_up_source')];
             return null;
         }
 
@@ -81,7 +81,7 @@ class ShiftSwapService
             ->first();
 
         if (! $toApp) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Target user is not signed up for the requested shift'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.shift_swap_target_not_signed_up')];
             return null;
         }
 
@@ -90,12 +90,12 @@ class ShiftSwapService
         $toShift   = VolShift::find($toShiftId);
 
         if (! $fromShift || ! $toShift) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'One or both shifts not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.shift_swap_shifts_not_found')];
             return null;
         }
 
         if ($fromShift->start_time->isPast() || $toShift->start_time->isPast()) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Cannot swap shifts that have already started'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.shift_swap_shift_started')];
             return null;
         }
 
@@ -110,7 +110,7 @@ class ShiftSwapService
             ->exists();
 
         if ($duplicate) {
-            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => 'A swap request already exists for these shifts'];
+            self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => __('api.shift_swap_already_exists')];
             return null;
         }
 
@@ -136,7 +136,7 @@ class ShiftSwapService
             return (int) $swapId;
         } catch (\Exception $e) {
             Log::error('ShiftSwapService::requestSwap error: ' . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to create swap request'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.shift_swap_create_failed')];
             return null;
         }
     }
@@ -150,7 +150,7 @@ class ShiftSwapService
         $tenantId = TenantContext::getId();
 
         if (! in_array($action, ['accept', 'reject'])) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Action must be accept or reject'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.vol_action_accept_reject')];
             return false;
         }
 
@@ -161,12 +161,12 @@ class ShiftSwapService
             ->first();
 
         if (! $swap) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Swap request not found or already processed'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.shift_swap_not_found_or_processed')];
             return false;
         }
 
         if ((int) $swap->to_user_id !== $userId) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'This swap request is not addressed to you'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.shift_swap_not_addressed_to_you')];
             return false;
         }
 
@@ -203,7 +203,7 @@ class ShiftSwapService
             return $result;
         } catch (\Exception $e) {
             Log::error('ShiftSwapService::respond error: ' . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to process swap response'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.shift_swap_response_failed')];
             return false;
         }
     }
@@ -217,7 +217,7 @@ class ShiftSwapService
         $tenantId = TenantContext::getId();
 
         if (! in_array($action, ['approve', 'reject'])) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Action must be approve or reject'];
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.vol_action_approve_reject')];
             return false;
         }
 
@@ -228,7 +228,7 @@ class ShiftSwapService
             ->first();
 
         if (! $swap) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Swap request not found or not pending admin approval'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.shift_swap_not_found_or_not_pending')];
             return false;
         }
 
@@ -263,7 +263,7 @@ class ShiftSwapService
             return $result;
         } catch (\Exception $e) {
             Log::error('ShiftSwapService::adminDecision error: ' . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to process admin decision'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.shift_swap_admin_decision_failed')];
             return false;
         }
     }
@@ -359,7 +359,7 @@ class ShiftSwapService
             ->first();
 
         if (! $swap) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Swap request not found or cannot be cancelled'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.shift_swap_not_found_or_not_cancellable')];
             return false;
         }
 
@@ -371,7 +371,7 @@ class ShiftSwapService
             return true;
         } catch (\Exception $e) {
             Log::error('ShiftSwapService::cancel error: ' . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to cancel swap request'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.shift_swap_cancel_failed')];
             return false;
         }
     }
@@ -405,18 +405,18 @@ class ShiftSwapService
                     ->first();
 
                 if (! $fromApp || ! $toApp) {
-                    self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'One or both volunteers are no longer assigned to the requested shifts'];
+                    self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.shift_swap_volunteers_unassigned')];
                     return false;
                 }
 
                 // Double-booking check: ensure neither user already has an overlapping
                 // approved shift assignment for the shift they are moving INTO.
                 if (self::hasOverlappingShift((int) $swap->from_user_id, (int) $swap->to_shift_id, (int) $swap->from_shift_id, $tenantId)) {
-                    self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Swap would double-book the requester with an overlapping shift'];
+                    self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.shift_swap_double_book_requester')];
                     return false;
                 }
                 if (self::hasOverlappingShift((int) $swap->to_user_id, (int) $swap->from_shift_id, (int) $swap->to_shift_id, $tenantId)) {
-                    self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => 'Swap would double-book the recipient with an overlapping shift'];
+                    self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.shift_swap_double_book_recipient')];
                     return false;
                 }
 
@@ -433,7 +433,7 @@ class ShiftSwapService
                     ->update(['shift_id' => $swap->from_shift_id]);
 
                 if ($updatedFrom !== 1 || $updatedTo !== 1) {
-                    self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to apply swap assignments atomically'];
+                    self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.shift_swap_apply_failed')];
                     throw new \RuntimeException('Swap update mismatch');
                 }
 
@@ -450,7 +450,7 @@ class ShiftSwapService
             return false;
         } catch (\Exception $e) {
             Log::error('ShiftSwapService::executeSwap error: ' . $e->getMessage());
-            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => 'Failed to execute shift swap'];
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.shift_swap_execute_failed')];
             return false;
         }
     }

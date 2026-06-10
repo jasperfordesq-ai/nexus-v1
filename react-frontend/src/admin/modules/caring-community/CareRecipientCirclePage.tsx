@@ -74,6 +74,7 @@ function fmtDate(iso: string | null, emptyValue: string): string {
 
 export default function CareRecipientCirclePage() {
   const { t } = useTranslation('caring_community');
+  const { t: tAdmin } = useTranslation('admin');
   usePageTitle(t('admin.recipient_circle.meta_title'));
 
   const [userIdInput, setUserIdInput] = useState('');
@@ -191,7 +192,7 @@ export default function CareRecipientCirclePage() {
       {/* Loading */}
       {loading && (
         <div className="flex justify-center py-12">
-          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" label={t('admin.recipient_circle.loading')} /></div>
+          <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-4"><Spinner size="lg" label={t('admin.recipient_circle.loading')} /></div>
         </div>
       )}
 

@@ -193,7 +193,7 @@ export function BlogPostForm() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" label={t('blog.loading_post')} /></div>
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-4"><Spinner size="lg" label={t('blog.loading_post')} /></div>
       </div>
     );
   }
@@ -271,7 +271,7 @@ export function BlogPostForm() {
             />
 
             {/* Content */}
-            <Suspense fallback={<div role="status" aria-busy="true" aria-label="Loading"><Spinner size="sm" className="m-4" /></div>}>
+            <Suspense fallback={<div role="status" aria-busy="true" aria-label={t('common.loading')}><Spinner size="sm" className="m-4" /></div>}>
               <RichTextEditor
                 label={t('blog.label_content')}
                 placeholder={t('blog.placeholder_content')}

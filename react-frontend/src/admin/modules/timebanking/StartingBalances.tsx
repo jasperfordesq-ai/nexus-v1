@@ -129,7 +129,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
               variant="secondary"
             />
             {searching && (
-              <div role="status" aria-busy="true" aria-label="Loading" className="flex items-center justify-center py-4">
+              <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex items-center justify-center py-4">
                 <Spinner size="sm" />
               </div>
             )}

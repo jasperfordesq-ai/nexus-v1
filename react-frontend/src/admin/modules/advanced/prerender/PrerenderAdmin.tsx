@@ -288,6 +288,7 @@ interface ToastShape {
 
 function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: boolean; toast: ToastShape; lastUpdate: number; live: boolean }) {
   const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.overview' });
+  const { t: tAdmin } = useTranslation('admin');
   const [summary, setSummary] = useState<PrerenderSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [enqueuing, setEnqueuing] = useState(false);
@@ -337,7 +338,7 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
   };
 
   if (loading && !summary) {
-    return <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-8"><Spinner /></div>;
+    return <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-8"><Spinner /></div>;
   }
   if (!summary) return <p className="text-muted">{t('empty_summary')}</p>;
 
@@ -784,6 +785,7 @@ function KpiCard({
 
 function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string | null; onPresetConsumed: () => void }) {
   const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.inventory' });
+  const { t: tAdmin } = useTranslation('admin');
   const toast = useToast();
   const { user } = useAuth();
   const isSuperAdmin = Boolean(user?.is_super_admin || user?.is_god || user?.role === 'super_admin');
@@ -1003,7 +1005,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
       </Card>
 
       {loading ? (
-        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-8"><Spinner /></div>
+        <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-8"><Spinner /></div>
       ) : (
         <Table aria-label={t('table_aria')} removeWrapper isStriped>
           <TableHeader>
@@ -1103,7 +1105,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
               <ModalHeader>{t('inspect.modal_title')}</ModalHeader>
               <ModalBody>
                 {inspectLoading || !inspecting ? (
-                  <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-8"><Spinner /></div>
+                  <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-8"><Spinner /></div>
                 ) : (
                   <div className="space-y-3 text-sm">
                     {/* SEO score header — at the top so it's the first thing reviewers see. */}
@@ -1366,7 +1368,7 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
     }
   };
 
-  if (loading) return <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-8"><Spinner /></div>;
+  if (loading) return <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-8"><Spinner /></div>;
 
   const totalNeedingWork = rows.filter(
     (r) => r.missing_routes.length > 0 || r.stale_routes.length > 0 || r.asset_invalid_routes.length > 0,
@@ -1491,6 +1493,7 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
  */
 function AnalyticsTab() {
   const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.analytics' });
+  const { t: tAdmin } = useTranslation('admin');
   const toast = useToast();
   const [data, setData] = useState<PrerenderAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
@@ -1524,7 +1527,7 @@ function AnalyticsTab() {
 
   useEffect(() => { load(); }, [load]);
 
-  if (loading && !data) return <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-8"><Spinner /></div>;
+  if (loading && !data) return <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-8"><Spinner /></div>;
   if (!data) return <p className="text-muted">{t('empty')}</p>;
 
   const verifiedPct = data.total_hits > 0 ? Math.round((data.verified_hits / data.total_hits) * 100) : 0;
@@ -1661,6 +1664,7 @@ function AnalyticsTab() {
 
 function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: boolean; toast: ToastShape; lastUpdate: number; live: boolean }) {
   const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.jobs' });
+  const { t: tAdmin } = useTranslation('admin');
   const [jobs, setJobs] = useState<PrerenderJob[]>([]);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState<string>('all');
@@ -1739,7 +1743,7 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
       </Card>
 
       {loading ? (
-        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-8"><Spinner /></div>
+        <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-8"><Spinner /></div>
       ) : (
         <Table aria-label={t('table_aria')} removeWrapper isStriped>
           <TableHeader>
@@ -1885,6 +1889,7 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
 
 function EventsTab() {
   const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.events' });
+  const { t: tAdmin } = useTranslation('admin');
   const toast = useToast();
   const [events, setEvents] = useState<PrerenderEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -1935,7 +1940,7 @@ function EventsTab() {
       </Card>
 
       {loading ? (
-        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-8"><Spinner /></div>
+        <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-8"><Spinner /></div>
       ) : (
         <Table aria-label={t('table_aria')} removeWrapper isStriped>
           <TableHeader>
@@ -1979,6 +1984,7 @@ function EventsTab() {
 
 function FailuresTab() {
   const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.failures' });
+  const { t: tAdmin } = useTranslation('admin');
   const toast = useToast();
   const [items, setItems] = useState<PrerenderFailure[]>([]);
   const [loading, setLoading] = useState(true);
@@ -2006,7 +2012,7 @@ function FailuresTab() {
         </CardBody>
       </Card>
       {loading ? (
-        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-8"><Spinner /></div>
+        <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-8"><Spinner /></div>
       ) : items.length === 0 ? (
         <Card>
           <CardBody className="text-center py-8 flex flex-col items-center gap-2">
@@ -2180,6 +2186,7 @@ function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boole
 
 function AuditTab() {
   const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.audit' });
+  const { t: tAdmin } = useTranslation('admin');
   const [items, setItems] = useState<PrerenderAuditEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('');
@@ -2228,7 +2235,7 @@ function AuditTab() {
         </Button>
       </div>
       {loading && items.length === 0 ? (
-        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-8"><Spinner /></div>
+        <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-8"><Spinner /></div>
       ) : items.length === 0 ? (
         <p className="text-muted">{t('empty')}</p>
       ) : (

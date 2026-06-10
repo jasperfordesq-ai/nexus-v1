@@ -383,7 +383,7 @@ export function MyProfile() {
           </CardHeader>
           <CardBody className="gap-5">
             {topicsLoading ? (
-              <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-6">
+              <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-6">
                 <Spinner size="sm" />
               </div>
             ) : (

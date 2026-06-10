@@ -130,7 +130,7 @@ class XPShopService
             ->first();
 
         if (!$item) {
-            return ['success' => false, 'error' => 'Item not found'];
+            return ['success' => false, 'error' => __('api.xp_shop_item_not_found')];
         }
 
         $itemArr = (array) $item;
@@ -138,7 +138,7 @@ class XPShopService
         // Pre-check outside transaction (fast path for common rejection cases)
         if (!self::canPurchaseItem($userId, $itemArr)) {
             $reason = self::getPurchaseBlockReason($userId, $itemArr, null);
-            return ['success' => false, 'error' => $reason ?? 'Cannot purchase'];
+            return ['success' => false, 'error' => $reason ?? __('api.xp_shop_cannot_purchase')];
         }
 
         DB::beginTransaction();
@@ -153,7 +153,7 @@ class XPShopService
                     ->count();
                 if ($totalPurchases >= $item->stock_limit) {
                     DB::rollBack();
-                    return ['success' => false, 'error' => 'Out of stock'];
+                    return ['success' => false, 'error' => __('api.xp_shop_out_of_stock')];
                 }
             }
 
@@ -166,7 +166,7 @@ class XPShopService
                     ->count();
                 if ($userPurchases >= $item->per_user_limit) {
                     DB::rollBack();
-                    return ['success' => false, 'error' => 'Already owned'];
+                    return ['success' => false, 'error' => __('api.xp_shop_already_owned')];
                 }
             }
 
@@ -178,7 +178,7 @@ class XPShopService
 
             if ($affected === 0) {
                 DB::rollBack();
-                return ['success' => false, 'error' => 'Not enough XP'];
+                return ['success' => false, 'error' => __('api.xp_shop_not_enough_xp')];
             }
 
             // Record purchase
@@ -200,7 +200,7 @@ class XPShopService
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('XPShopService::purchaseItem error: ' . $e->getMessage());
-            return ['success' => false, 'error' => 'Purchase failed'];
+            return ['success' => false, 'error' => __('api.purchase_failed')];
         }
 
         return [
@@ -302,7 +302,7 @@ class XPShopService
         }
 
         if ($userXP < $item['xp_cost']) {
-            return 'Not enough XP';
+            return __('api.xp_shop_not_enough_xp');
         }
 
         $tenantId = TenantContext::getId();
@@ -313,7 +313,7 @@ class XPShopService
                 ->where('tenant_id', $tenantId)
                 ->count();
             if ($totalPurchases >= $item['stock_limit']) {
-                return 'Out of stock';
+                return __('api.xp_shop_out_of_stock');
             }
         }
 
@@ -324,7 +324,7 @@ class XPShopService
                 ->where('tenant_id', $tenantId)
                 ->count();
             if ($userPurchases >= $item['per_user_limit']) {
-                return 'Already owned';
+                return __('api.xp_shop_already_owned');
             }
         }
 

@@ -191,7 +191,7 @@ export function GamificationHub() {
           </CardHeader>
           <CardBody>
             {loading ? (
-              <div role="status" aria-busy="true" aria-label="Loading" className="flex items-center justify-center py-12">
+              <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex items-center justify-center py-12">
                 <Spinner size="lg" />
               </div>
             ) : stats?.badge_distribution && stats.badge_distribution.length > 0 ? (
@@ -300,7 +300,7 @@ export function GamificationHub() {
               {t('gamification.bulk_award_modal_desc')}
             </p>
             {badgesLoading ? (
-              <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner /></div>
+              <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-4"><Spinner /></div>
             ) : (
               <Select
                 label={t('gamification.bulk_award_badge_label')}

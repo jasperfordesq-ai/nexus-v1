@@ -177,7 +177,7 @@ export function CronJobSettingsPage() {
           <CardBody className="space-y-4">
             {loadingJobs ? (
               <div className="flex items-center justify-center py-8">
-                <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" /></div>
+                <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-4"><Spinner size="sm" /></div>
               </div>
             ) : (
               <>
@@ -201,7 +201,7 @@ export function CronJobSettingsPage() {
 
                     {loadingJobSettings ? (
                       <div className="flex items-center justify-center py-8">
-                        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" /></div>
+                        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-4"><Spinner size="sm" /></div>
                       </div>
                     ) : (
                       <div className="space-y-4">
@@ -335,7 +335,7 @@ export function CronJobSettingsPage() {
           <CardBody className="space-y-4">
             {loadingGlobalSettings ? (
               <div className="flex items-center justify-center py-8">
-                <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" /></div>
+                <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-4"><Spinner size="sm" /></div>
               </div>
             ) : (
               <>

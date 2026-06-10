@@ -94,7 +94,7 @@ export function StatsSection({ content }: StatsSectionProps) {
       className="mt-16 sm:mt-24 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8"
       role={isLoading ? 'status' : undefined}
       aria-busy={isLoading}
-      aria-label={isLoading ? 'Loading' : undefined}
+      aria-label={isLoading ? t('loading', { ns: 'common' }) : undefined}
     >
       {stats.map((stat, index) => (
         <div key={`stat-${index}`} className="text-center">

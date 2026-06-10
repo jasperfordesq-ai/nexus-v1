@@ -119,7 +119,7 @@ export function SeoAudit() {
           description={t('seo_audit_desc')}
         />
         <div className="flex h-64 items-center justify-center">
-          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" /></div>
+          <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-4"><Spinner size="lg" /></div>
         </div>
       </div>
     );

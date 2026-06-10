@@ -242,12 +242,12 @@ class MessageService
         }
 
         if ($receiverId <= 0) {
-            self::$errors = [['code' => 'VALIDATION_ERROR', 'message' => 'recipient_id is required']];
+            self::$errors = [['code' => 'VALIDATION_ERROR', 'message' => __('api.message_recipient_required')]];
             return [];
         }
 
         if ($senderId === $receiverId) {
-            self::$errors = [['code' => 'VALIDATION_ERROR', 'message' => 'You cannot send a message to yourself']];
+            self::$errors = [['code' => 'VALIDATION_ERROR', 'message' => __('api.message_cannot_send_to_self')]];
             return [];
         }
 
@@ -259,7 +259,7 @@ class MessageService
             ->where('tenant_id', $tenantId)
             ->first();
         if (!$sender || in_array($sender->status ?? 'active', ['suspended', 'banned', 'deactivated'])) {
-            self::$errors = [['code' => 'FORBIDDEN', 'message' => 'Your account is not allowed to send messages']];
+            self::$errors = [['code' => 'FORBIDDEN', 'message' => __('api.message_sender_not_allowed')]];
             return [];
         }
 
@@ -269,7 +269,7 @@ class MessageService
             ->where('tenant_id', $tenantId)
             ->first();
         if (!$receiver) {
-            self::$errors = [['code' => 'NOT_FOUND', 'message' => 'Recipient not found']];
+            self::$errors = [['code' => 'NOT_FOUND', 'message' => __('api.message_recipient_not_found')]];
             return [];
         }
 
@@ -280,7 +280,7 @@ class MessageService
             ->where('messaging_disabled', true)
             ->exists();
         if ($isDisabled) {
-            self::$errors = [['code' => 'MESSAGING_DISABLED', 'message' => 'Your messaging has been restricted by an administrator']];
+            self::$errors = [['code' => 'MESSAGING_DISABLED', 'message' => __('api.message_messaging_restricted')]];
             return [];
         }
 
@@ -321,7 +321,7 @@ class MessageService
             })
             ->exists();
         if ($blocked) {
-            self::$errors = [['code' => 'BLOCKED', 'message' => 'You cannot send messages to this user']];
+            self::$errors = [['code' => 'BLOCKED', 'message' => __('api.message_blocked_user')]];
             return [];
         }
 
@@ -331,7 +331,7 @@ class MessageService
         $isVoice = !empty($data['is_voice']) || !empty($voiceUrl);
 
         if (empty($content) && !$isVoice) {
-            self::$errors = [['code' => 'VALIDATION_ERROR', 'message' => 'Message body is required']];
+            self::$errors = [['code' => 'VALIDATION_ERROR', 'message' => __('api.message_body_required')]];
             return [];
         }
 
@@ -443,7 +443,7 @@ class MessageService
             ->where('tenant_id', $tenantId)
             ->first();
         if (! $otherUser) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'User not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.user_not_found')];
             return null;
         }
 
@@ -672,18 +672,18 @@ class MessageService
         $message = Message::query()->find($messageId);
 
         if (! $message) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Message not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.message_not_found')];
             return null;
         }
 
         if ((int) $message->sender_id !== $userId) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You can only edit your own messages'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.message_edit_own_only')];
             return null;
         }
 
         // Enforce 24-hour edit window
         if ($message->created_at && $message->created_at->lt(now()->subHours(24))) {
-            self::$errors[] = ['code' => 'EDIT_EXPIRED', 'message' => 'Messages can only be edited within 24 hours of sending'];
+            self::$errors[] = ['code' => 'EDIT_EXPIRED', 'message' => __('api.message_edit_window_expired')];
             return null;
         }
 
@@ -722,7 +722,7 @@ class MessageService
         $message = Message::query()->find($messageId);
 
         if (! $message) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Message not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.message_not_found')];
             return false;
         }
 
@@ -730,7 +730,7 @@ class MessageService
         $isReceiver = (int) $message->receiver_id === $userId;
 
         if (! $isSender && ! $isReceiver) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You are not a participant in this conversation'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.message_not_participant')];
             return false;
         }
 
@@ -791,7 +791,7 @@ class MessageService
         $message = Message::query()->find($messageId);
 
         if (! $message) {
-            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => 'Message not found'];
+            self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.message_not_found')];
             return null;
         }
 
@@ -808,7 +808,7 @@ class MessageService
         }
 
         if (!$isParticipant) {
-            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => 'You cannot react to this message'];
+            self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.message_cannot_react')];
             return null;
         }
 
