@@ -75,10 +75,10 @@ interface TenantContextValue extends TenantState {
   geocodingProvider: GeocodingProvider;
 }
 
-export type MapProvider = 'google' | 'openstreetmap';
+export type MapProvider = 'google' | 'openstreetmap' | 'ordnance_survey';
 export type GeocodingProvider = 'google' | 'nominatim';
 
-const ALLOWED_MAP_PROVIDERS: readonly MapProvider[] = ['google', 'openstreetmap'];
+const ALLOWED_MAP_PROVIDERS: readonly MapProvider[] = ['google', 'openstreetmap', 'ordnance_survey'];
 const ALLOWED_GEOCODING_PROVIDERS: readonly GeocodingProvider[] = ['google', 'nominatim'];
 
 // Default features — synced with PHP TenantFeatureConfig::FEATURE_DEFAULTS

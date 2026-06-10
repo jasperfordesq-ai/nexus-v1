@@ -131,6 +131,7 @@ return [
     'password_reused'               => 'You cannot reuse a recent password. Please choose a password you have not used before.',
     'audit_export_failed'           => 'Error exporting audit data',
     'inactivity_timeout_range'      => 'Inactivity timeout must be 0 (disabled) or between 5 and 480 minutes.',
+    'os_maps_api_key_invalid'       => 'That does not look like a valid Ordnance Survey API key (expected 16-64 letters/digits).',
     'password_mismatch'             => 'Password and confirmation do not match.',
     'terms_required'                => 'You must accept the terms of service and privacy policy to register.',
     'invite_code_required'          => 'An invite code is required to register on this community.',

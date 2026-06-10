@@ -17,7 +17,8 @@ use Illuminate\Support\Facades\DB;
  *   - `maps` feature flag — kill switch for map *display*. When off, no
  *     interactive map tiles render. Google Places may still receive a key
  *     when `geocoding_provider=google`.
- *   - `map_provider` — `google` | `openstreetmap`. Default: `google`.
+ *   - `map_provider` — `google` | `openstreetmap` | `ordnance_survey`.
+ *     Default: `google`.
  *   - `geocoding_provider` — `google` | `nominatim`. Default: `google`.
  *   - `google_maps_api_key` — tenant override for Google billing. Falls
  *     back to env `GOOGLE_MAPS_API_KEY` when not set.
@@ -26,6 +27,10 @@ use Illuminate\Support\Facades\DB;
  *   - `maptiler_api_key` — tenant override that switches OSM tiles from
  *     the free `tile.openstreetmap.org` service to MapTiler's paid host
  *     (proper dark mode, vector tiles, no OSMF policy concerns at scale).
+ *   - `os_maps_api_key` — OS Data Hub key for the Ordnance Survey Maps
+ *     API (UK basemaps, ZXY/EPSG:3857 — UK public bodies are typically
+ *     covered by the PSGA). Falls back to env `OS_MAPS_API_KEY`; when no
+ *     key resolves, the ordnance_survey branch degrades to free OSM tiles.
  *
  * Browser API keys are intentionally public — they reach JS and network
  * requests. Protect them via Console-side restrictions (HTTP referrer,
@@ -37,7 +42,7 @@ class MapsConfigController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
-    private const ALLOWED_MAP_PROVIDERS = ['google', 'openstreetmap'];
+    private const ALLOWED_MAP_PROVIDERS = ['google', 'openstreetmap', 'ordnance_survey'];
     private const ALLOWED_GEOCODING_PROVIDERS = ['google', 'nominatim'];
     private const DEFAULT_MAP_PROVIDER = 'google';
     private const DEFAULT_GEOCODING_PROVIDER = 'google';
@@ -51,6 +56,9 @@ class MapsConfigController extends BaseApiController
     private const MAPTILER_TILE_URL = 'https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}@2x.png?key=';
     private const MAPTILER_ATTRIBUTION = '&copy; <a href="https://www.maptiler.com/copyright/" target="_blank" rel="noopener">MapTiler</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors';
 
+    /** Ordnance Survey Maps API — ZXY raster tiles in Web Mercator (EPSG:3857). */
+    private const OS_MAPS_TILE_URL = 'https://api.os.uk/maps/raster/v1/zxy/Road_3857/{z}/{x}/{y}.png?key=';
+
     public function show(): JsonResponse
     {
         $tenantId = TenantContext::getId();
@@ -62,6 +70,8 @@ class MapsConfigController extends BaseApiController
         $tenantGoogleKey = $this->readSetting($tenantId, 'google_maps_api_key');
         $tenantMapId     = $this->readSetting($tenantId, 'google_maps_map_id');
         $tenantTilerKey  = $this->readSetting($tenantId, 'maptiler_api_key');
+        $tenantOsKey     = $this->readSetting($tenantId, 'os_maps_api_key');
+        $resolvedOsKey   = $tenantOsKey !== '' ? $tenantOsKey : (string) (getenv('OS_MAPS_API_KEY') ?: '');
 
         $envGoogleKey = (string) (getenv('GOOGLE_MAPS_API_KEY') ?: '');
         $envMapId     = (string) (getenv('GOOGLE_MAPS_MAP_ID') ?: '');
@@ -78,14 +88,20 @@ class MapsConfigController extends BaseApiController
         $googleMapId = $googleMapsEnabled ? $resolvedMapId : '';
         $googleRuntimeEnabled = $googleApiKey !== '' && ($googleMapsEnabled || $googlePlacesEnabled);
 
-        // OSM tile URL — MapTiler if a tenant key is set, otherwise the
-        // free OSM service. Only delivered when maps are enabled AND the
-        // OSM map branch is selected.
-        $osmEnabled = $mapsEnabled && $mapProvider === 'openstreetmap';
-        if ($osmEnabled && $tenantTilerKey !== '') {
+        // Leaflet tile URL — serves both the openstreetmap branch (MapTiler
+        // if a tenant key is set, else free OSM) and the ordnance_survey
+        // branch (OS Maps API when a key resolves, degrading to free OSM
+        // so maps never go blank on a missing key). Only delivered when
+        // maps are enabled AND a Leaflet-rendered provider is selected.
+        $leafletEnabled = $mapsEnabled && in_array($mapProvider, ['openstreetmap', 'ordnance_survey'], true);
+        $osTilesActive = $leafletEnabled && $mapProvider === 'ordnance_survey' && $resolvedOsKey !== '';
+        if ($osTilesActive) {
+            $osmTileUrl = self::OS_MAPS_TILE_URL . rawurlencode($resolvedOsKey);
+            $osmTileAttribution = 'Contains OS data &copy; Crown copyright and database rights ' . now()->format('Y');
+        } elseif ($leafletEnabled && $mapProvider === 'openstreetmap' && $tenantTilerKey !== '') {
             $osmTileUrl = self::MAPTILER_TILE_URL . rawurlencode($tenantTilerKey);
             $osmTileAttribution = self::MAPTILER_ATTRIBUTION;
-        } elseif ($osmEnabled) {
+        } elseif ($leafletEnabled) {
             $osmTileUrl = self::OSM_FREE_TILE_URL;
             $osmTileAttribution = self::OSM_FREE_ATTRIBUTION;
         } else {
@@ -107,11 +123,13 @@ class MapsConfigController extends BaseApiController
             'googlePlacesEnabled' => $googleApiKey !== '' && $googlePlacesEnabled,
             'nominatimBaseUrl'   => self::NOMINATIM_BASE_URL,
 
-            // OSM tile config (MapTiler if tenant key set, else free OSM)
+            // Leaflet tile config (OS Maps / MapTiler / free OSM)
             'osmTileUrl'         => $osmTileUrl,
             'osmTileAttribution' => $osmTileAttribution,
-            'osmTileProvider'    => $osmEnabled
-                ? ($tenantTilerKey !== '' ? 'maptiler' : 'osm')
+            'osmTileProvider'    => $leafletEnabled
+                ? ($osTilesActive
+                    ? 'ordnance_survey'
+                    : (($mapProvider === 'openstreetmap' && $tenantTilerKey !== '') ? 'maptiler' : 'osm'))
                 : null,
 
             // Telemetry for the admin UI / tests — flags whether the
@@ -120,6 +138,7 @@ class MapsConfigController extends BaseApiController
                 'google_maps_api_key' => $tenantGoogleKey !== '',
                 'google_maps_map_id'  => $tenantMapId !== '',
                 'maptiler_api_key'    => $tenantTilerKey !== '',
+                'os_maps_api_key'     => $tenantOsKey !== '',
             ],
         ]);
     }

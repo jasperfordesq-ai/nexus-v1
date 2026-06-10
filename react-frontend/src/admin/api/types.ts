@@ -1774,6 +1774,9 @@ export interface AdminSettingsResponse {
     /** Masked on read. */
     maptiler_api_key: string | null;
     maptiler_api_key_set?: boolean;
+    /** Masked on read. OS Data Hub key for the Ordnance Survey Maps API. */
+    os_maps_api_key?: string | null;
+    os_maps_api_key_set?: boolean;
     /** '0' = disabled; 5–480 minutes when enabled. */
     inactivity_timeout_minutes?: string | null;
   };

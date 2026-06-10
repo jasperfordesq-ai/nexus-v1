@@ -545,6 +545,8 @@ function ClusterChooser({
 //                       (existing implementation, paid)
 //   - 'openstreetmap' → react-leaflet + OSM tiles (free, see
 //                       OpenStreetMapView.tsx)
+//   - 'ordnance_survey' → same Leaflet view; the server-issued tile URL
+//                       points at the OS Maps API (UK basemaps)
 // ---------------------------------------------------------------------------
 
 export function LocationMap(props: LocationMapProps) {
@@ -555,7 +557,7 @@ export function LocationMap(props: LocationMapProps) {
     return null;
   }
 
-  if (mapProvider === 'openstreetmap') {
+  if (mapProvider === 'openstreetmap' || mapProvider === 'ordnance_survey') {
     return (
       <Suspense
         fallback={

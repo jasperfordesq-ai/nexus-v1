@@ -15370,7 +15370,13 @@
     "maps_kill_switch_aria": "Map display kill switch (locked off)",
     "map_provider_aria": "Map provider",
     "geocoding_provider_aria": "Autocomplete provider",
-    "clear_failed": "Failed to clear"
+    "clear_failed": "Failed to clear",
+    "provider_os_maps": "Ordnance Survey (UK)",
+    "os_maps_api_key_label": "Ordnance Survey Maps API key",
+    "os_maps_api_key_hint": "OS Data Hub project key for the OS Maps API. Used when the map provider is Ordnance Survey; UK public-sector tenants are typically covered by the PSGA. Without a key, Ordnance Survey tenants fall back to free OpenStreetMap tiles.",
+    "os_maps_key_cleared": "Ordnance Survey key cleared",
+    "tiles_status_os_maps": "OS Maps API active",
+    "tiles_status_os_maps_unset": "No key — falls back to free OSM"
   },
   "cron_setup": {
     "notice_title": "Important: how cron works on Project NEXUS",
