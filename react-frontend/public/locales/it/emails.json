@@ -62,7 +62,7 @@
     "expiry": "Questo link scade tra {{hours}} ore."
   },
   "password_reset": {
-    "subject": "Reimposta la password ? {{community}}",
+    "subject": "Reimposta la password — {{community}}",
     "title": "Reimposta la tua password",
     "preview": "Hai richiesto un link di reset della password",
     "greeting": "Gentile {{name}},",

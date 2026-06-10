@@ -2361,7 +2361,7 @@
         "messages": {
           "bulk_queued": "Remise en file d'attente pour les locataires {{count}}",
           "no_stale": "Pas de locataires périmés - la couverture est saine",
-          "tenant_queued": "#{{id}} mis en file d?attente pour {{slug}}"
+          "tenant_queued": "#{{id}} mis en file d'attente pour {{slug}}"
         },
         "summary": {
           "healthy": "Tous les locataires de {{count}} en bonne santé.",
@@ -2524,12 +2524,12 @@
       },
       "jobs": {
         "actions": {
-          "cancel_job": "Annuler la t?che #{{id}}",
+          "cancel_job": "Annuler la tâche #{{id}}",
           "close": "Fermer",
           "reload": "Recharger",
-          "retry_job": "R?essayer la t?che #{{id}}",
+          "retry_job": "Réessayer la tâche #{{id}}",
           "retry_same_parameters": "Réessayez avec les mêmes paramètres",
-          "view_details": "Voir les d?tails de la t?che #{{id}}"
+          "view_details": "Voir les détails de la tâche #{{id}}"
         },
         "columns": {
           "actions": "Actes",
@@ -2556,7 +2556,7 @@
           "started_at": "Commencé à",
           "status": "Statut",
           "tenant": "Locataire",
-          "title": "T?che #{{id}}"
+          "title": "Tâche #{{id}}"
         },
         "empty": "Aucun emploi",
         "errors": {
@@ -2579,8 +2579,8 @@
           "force": "forcer"
         },
         "messages": {
-          "cancelled": "T?che #{{id}} annul?e",
-          "retry_queued": "Nouvelle tentative #{{retryId}} en file d?attente (depuis #{{id}})"
+          "cancelled": "Tâche #{{id}} annulée",
+          "retry_queued": "Nouvelle tentative #{{retryId}} en file d'attente (depuis #{{id}})"
         },
         "priority": {
           "high": "Haut",
@@ -2729,7 +2729,7 @@
         },
         "last_run": "Dernière exécution terminée",
         "messages": {
-          "job_queued": "T?che #{{id}} mise en file d?attente"
+          "job_queued": "Tâche #{{id}} mise en file d'attente"
         },
         "placeholders": {
           "routes": "/about,/blog (vide = tout)",
@@ -5357,7 +5357,7 @@
     "all": "Tout",
     "back": "Retour",
     "cancel": "Annuler",
-    "delete_confirm_message": "Supprimer ?{{title}}?? Cela ne peut pas être annulé.",
+    "delete_confirm_message": "Supprimer «{{title}}» ? Cela ne peut pas être annulé.",
     "delete_confirm_title": "Supprimer l'article de blog",
     "item_updated": "Article mis à jour",
     "label_actions": "Actions",
@@ -7306,7 +7306,7 @@
     "slug_description": "Limace",
     "slug_must_be_url_safe": "Slug doit être sécurisé pour les URL",
     "slug_reserved": "Limace réservée",
-    "slug_reserved_error": "\"{{slug}}\" est une route syst?me r?serv?e. Choisissez un autre slug.",
+    "slug_reserved_error": "\"{{slug}}\" est une route système réservée. Choisissez un autre slug.",
     "slug_reserved_message": "Le slug «{{slug}}» est réservé par le système. Veuillez choisir un autre slug.",
     "started": "Commencé",
     "stripe": "Bande",
@@ -8467,7 +8467,7 @@
     "gdpr_notify_dpa": "GDPR Notify Dpa",
     "gdpr_occurred": "GDPR Occurred",
     "gdpr_old_value": "GDPR Old Value",
-    "gdpr_overdue_requests": "{{count}} demandes GDPR en retard n?cessitent une attention",
+    "gdpr_overdue_requests": "{{count}} demandes GDPR en retard nécessitent une attention",
     "gdpr_overview": "GDPR Overview",
     "gdpr_pending_requests": "Demandes en attente",
     "gdpr_prevention_measures": "GDPR Prevention Measures",
@@ -8942,7 +8942,7 @@
     "groups_enabled": "Groupes activés",
     "health_check": "Bilan de santé",
     "health_check_failed": "La vérification de l'état a échoué",
-    "health_check_success": "{{name}} est op?rationnel ({{time}} ms)",
+    "health_check_success": "{{name}} est opérationnel ({{time}} ms)",
     "hide_partnered": "Masquer le partenaire",
     "import_csv_only": "Importer CSV uniquement",
     "import_data": "Importer des données",
@@ -9247,13 +9247,13 @@
     "webhooks_response": "Réponse",
     "webhooks_retry": "Réessayer",
     "webhooks_retry_failed": "Échec de la nouvelle tentative du webhook",
-    "webhooks_retry_success": "Nouvelle tentative r?ussie ({{code}}, {{time}} ms)",
+    "webhooks_retry_success": "Nouvelle tentative réussie ({{code}}, {{time}} ms)",
     "webhooks_save_failed": "Échec de l'enregistrement du webhook",
     "webhooks_secret_warning": "Conservez ce secret en toute sécurité: il ne sera plus affiché",
     "webhooks_select_all": "Sélectionner tout",
     "webhooks_test": "Tester le webhook",
     "webhooks_test_failed": "Le test du webhook a échoué",
-    "webhooks_test_success": "Envoi de test r?ussi ({{code}}, {{time}} ms)",
+    "webhooks_test_success": "Envoi de test réussi ({{code}}, {{time}} ms)",
     "webhooks_title": "Webhooks",
     "webhooks_updated": "Webhook mis à jour",
     "webhooks_url_hint": "L'URL du point de terminaison qui recevra les événements webhook",
@@ -9507,9 +9507,9 @@
     "import_success": "L'importation a réussi",
     "import_summary_committed": "Import Summary Committed",
     "import_summary_dry_run": "Import Summary Dry Run",
-    "import_summary_external_partners": "Partenaires externes : {{new}} nouveaux, {{skipped}} ignor?s, {{invalid}} non valides",
+    "import_summary_external_partners": "Partenaires externes : {{new}} nouveaux, {{skipped}} ignorés, {{invalid}} non valides",
     "import_summary_heading": "Résumé de l'importation",
-    "import_summary_partnerships": "Partenariats : {{new}} nouveaux, {{skipped}} ignor?s, {{invalid}} non valides",
+    "import_summary_partnerships": "Partenariats : {{new}} nouveaux, {{skipped}} ignorés, {{invalid}} non valides",
     "import_title": "Importer",
     "kpi_active_partnerships": "KPI Partenariats Actifs",
     "kpi_external_partners": "KPI Partenaires externes",
@@ -10485,7 +10485,7 @@
     "templates_load_error": "Échec du chargement des modèles",
     "templates_delete": "Supprimer",
     "templates_delete_title": "Supprimer le modèle",
-    "templates_delete_confirm": "Voulez-vous vraiment supprimer \"{{name}}\" ? Cette action est irr?versible.",
+    "templates_delete_confirm": "Voulez-vous vraiment supprimer \"{{name}}\" ? Cette action est irréversible.",
     "templates_delete_error": "Échec de la suppression du modèle",
     "templates_deleted": "Modèle supprimé",
     "stage_applied": "Appliqué",
@@ -10954,7 +10954,7 @@
     "no_pending_description": "Tout a été rattrapé: aucun élément n'est en attente d'examen.",
     "notes_label": "Remarques",
     "notes_placeholder": "Ajouter des notes de modération...",
-    "posted_by": "Publi? par {{name}}",
+    "posted_by": "Publié par {{name}}",
     "reason_label": "Raison",
     "reason_placeholder": "Entrez la raison...",
     "reason_required": "Une raison est requise",
@@ -13522,7 +13522,7 @@
     "failed_count": "Échec de{{count}}",
     "generate_thumbnails": "Générer des vignettes",
     "generate_thumbnails_desc": "Generate Thumbnails.",
-    "generated_data_for": "Donn?es g?n?r?es pour {{count}} types de donn?es s?lectionn?s",
+    "generated_data_for": "Données générées pour {{count}} types de données sélectionnés",
     "health_check_complete": "Bilan de santé terminé",
     "health_check_failed": "Échec du bilan de santé",
     "health_check_unreachable": "Bilan de santé inaccessible",
@@ -13580,7 +13580,7 @@
     "pwa_settings_heading": "Paramètres de la page",
     "restore_backup": "Restaurer la sauvegarde",
     "restore_blog_backup": "Restaurer la sauvegarde du blog",
-    "restore_blog_confirm": "Restaurer les articles de blog depuis {{filename}} ? Cela peut ?craser les donn?es de blog actuelles.",
+    "restore_blog_confirm": "Restaurer les articles de blog depuis {{filename}} ? Cela peut écraser les données de blog actuelles.",
     "restore_complete": "Restauration terminée",
     "restore_error_occurred": "Une erreur de restauration s'est produite",
     "restore_failed": "La restauration a échoué",
@@ -13805,7 +13805,7 @@
     "desc_mark_as_under_investigation": "Marquer comme faisant l'objet d'une enquête",
     "desc_positive_to_credit_negative_to_debit": "Positif au crédit, négatif au débit du compte",
     "desc_required_this_will_be_recorded_in_the_g": "Obligatoire. Cela sera enregistré dans le grand livre général",
-    "download_statement_for": "T?l?charger le relev? pour {{name}}",
+    "download_statement_for": "Télécharger le relevé pour {{name}}",
     "failed_to_adjust_balance": "Échec du réglage du solde",
     "failed_to_grant_credits": "Échec de l'octroi des crédits",
     "failed_to_load_alerts": "Échec du chargement des alertes",
@@ -14243,11 +14243,11 @@
     "validation_role_required": "Le rôle est requis",
     "tabs_aria": "User status filter",
     "smart_search_label": "Recherche intelligente des utilisateurs",
-    "smart_search_placeholder": "Rechercher par nom, e-mail, t?l?phone, r?le, statut ou ID...",
-    "smart_search_description": "Essayez des noms, e-mails, t?l?phones, role:admin, pending, never logged in ou id:42.",
+    "smart_search_placeholder": "Rechercher par nom, e-mail, téléphone, rôle, statut ou ID...",
+    "smart_search_description": "Essayez des noms, e-mails, téléphones, role:admin, pending, never logged in ou id:42.",
     "smart_search_clear": "Effacer la recherche",
     "smart_search_status_chip": "Statut : {{status}}",
-    "smart_search_role_chip": "R?le : {{role}}",
+    "smart_search_role_chip": "Rôle : {{role}}",
     "smart_search_text_chip": "Recherche : {{query}}",
     "role_super_admin": "Super administrateur"
   },
@@ -14335,7 +14335,7 @@
     "adjust_balance": "Adjust Balance",
     "adjust_failed": "Adjust failed",
     "adjust_wallet_title": "Adjust Wallet",
-    "alert_pending_applications": "{{count}} candidatures en attente de v?rification",
+    "alert_pending_applications": "{{count}} candidatures en attente de vérification",
     "amount_label": "Amount",
     "amount_nonzero": "Amount Nonzero",
     "amount_placeholder": "par ex. 50 ou -20",
@@ -14357,15 +14357,15 @@
     "assign_dlp_title": "Attribuer un DLP",
     "balance_adjusted": "Balance Adjusted",
     "bulk_approve": "Approuver ({{count}})",
-    "bulk_approved": "{{count}} candidatures approuv?es",
+    "bulk_approved": "{{count}} candidatures approuvées",
     "bulk_decline": "Refuser ({{count}})",
-    "bulk_declined": "{{count}} candidatures refus?es",
-    "bulk_selected": "{{count}} dossier en attente s?lectionn?",
+    "bulk_declined": "{{count}} candidatures refusées",
+    "bulk_selected": "{{count}} dossier en attente sélectionné",
     "bulk_selected_plural": "{{count}}enregistrements en attente sélectionnés",
     "bulk_verify": "Bulk Verify",
-    "bulk_verify_fail": "{{count}} dossier n?a pas pu ?tre v?rifi?",
+    "bulk_verify_fail": "{{count}} dossier n'a pas pu être vérifié",
     "bulk_verify_fail_plural": "Échec de la vérification des enregistrements{{count}}",
-    "bulk_verify_success": "{{count}} dossier v?rifi?",
+    "bulk_verify_success": "{{count}} dossier vérifié",
     "bulk_verify_success_plural": "Enregistrements{{count}}vérifiés",
     "campaign_analytics": "Analyse de campagne",
     "change_dlp": "Changer le DLP",
@@ -14488,7 +14488,7 @@
     "expense_type_travel": "Voyage",
     "expired": "Expiré",
     "expires_on": "expire le {{date}}",
-    "expiring_consents_warning": "{{count}} consentement de responsable l?gal expire dans les 30 jours",
+    "expiring_consents_warning": "{{count}} consentement de responsable légal expire dans les 30 jours",
     "expiring_consents_warning_plural": "Les consentements du tuteur{{count}}expirent dans les 30 jours",
     "expiry_alert_title": "{{count}} dossier de formation expire dans les 30 jours",
     "expiry_alert_title_plural": "Dossiers de formation{{count}}expirant dans les 30 jours",
@@ -14676,7 +14676,7 @@
     "reminder_job_sent": "Reminder job sent {{count}} notification(s)",
     "reminder_job_sent_plural": "Tâche de rappel envoyée aux notifications{{count}}",
     "reminder_job_failed": "Échec de l'envoi du travail de rappel",
-    "reported_by": "Signal? par {{name}}",
+    "reported_by": "Signalé par {{name}}",
     "required": "Obligatoire",
     "resolution_notes": "Notes de résolution",
     "resolution_notes_placeholder": "Entrez les notes de résolution...",
@@ -14711,9 +14711,9 @@
     "search_organizations": "Search Organizations",
     "select_all": "Select All",
     "select_application": "Select Application",
-    "select_record": "S?lectionner {{name}}",
+    "select_record": "Sélectionner {{name}}",
     "select_status": "Select Status",
-    "selected_count": "{{count}} s?lectionn?s",
+    "selected_count": "{{count}} sélectionnés",
     "send_test": "Send Test",
     "stat_approved_hours": "Stat Approved Hours",
     "stat_approved_total": "Stat Approved Total",
@@ -14764,7 +14764,7 @@
     "tab_webhooks": "Webhooks",
     "target_amount": "Montant cible",
     "target_hours": "Heures cibles",
-    "test_reminder_sent": "La t?che de rappel a envoy? {{count}} notification(s)",
+    "test_reminder_sent": "La tâche de rappel a envoyé {{count}} notification(s)",
     "test_reminder_failed": "Échec de l'envoi du travail de rappel",
     "test_reminder_title": "Rappel de test",
     "timing_value": "Valeur de synchronisation",
@@ -15352,7 +15352,7 @@
     "desc_newsletter": "Campagnes de newsletter par e-mail, abonnés, segments et analyses",
     "desc_partner_api": "Autoriser les partenaires externes à s'intégrer à ce locataire via l'API partenaire",
     "desc_regional_analytics": "Produit d'analyse régionale payant — rapports mensuels pour les municipalités et les organismes régionaux",
-    "cost_warning": "Ce locataire est configuré pour utiliser les services Google payants. La saisie semi-automatique de Google Places est généralement le facteur de coût le plus important ? les sessions sont facturées par rafale de frappe. Passez à Nominatim pour supprimer complètement ce composant de facture.",
+    "cost_warning": "Ce locataire est configuré pour utiliser les services Google payants. La saisie semi-automatique de Google Places est généralement le facteur de coût le plus important — les sessions sont facturées par rafale de frappe. Passez à Nominatim pour supprimer complètement ce composant de facture.",
     "currently_serving": "Actif actuellement :",
     "status_autocomplete": "Autocomplétion",
     "status_google_paid": "Google (payant)",
@@ -15597,7 +15597,7 @@
     "tenant_removed_from_whitelist": "Locataire supprimé de la liste blanche",
     "view": "Voir",
     "whitelisted_tenants_aria": "Locataires sur liste blanche",
-    "whitelisted_tenants_count": "Locataires autoris?s ({{count}})"
+    "whitelisted_tenants_count": "Locataires autorisés ({{count}})"
   },
   "impact_report_labels": {
     "transactions": "Opérations",
@@ -16705,7 +16705,7 @@
         "save_failed": "Échec de l'enregistrement des paramètres du niveau de confiance."
       },
       "messages": {
-        "recomputed": "Niveaux de confiance recalcul?s pour {{count}} membres.",
+        "recomputed": "Niveaux de confiance recalculés pour {{count}} membres.",
         "saved": "Trust tier settings saved."
       },
       "recompute_confirm": "Recalculer les niveaux de confiance pour tous les membres ? Cela peut prendre quelques minutes."

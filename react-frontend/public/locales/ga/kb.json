@@ -44,8 +44,8 @@
   },
   "feedback": {
     "question": "An raibh an t-alt seo cabhrach?",
-    "yes": "T?",
-    "no": "N?l"
+    "yes": "Tá",
+    "no": "Níl"
   },
   "page_title": "Bonn Eolais",
   "page_description": "Airteagail, treoracha, agus ranganna teagaisc don phobal....",

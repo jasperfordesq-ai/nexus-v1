@@ -288,16 +288,16 @@
   "report_problem": {
     "trigger": "Informar de un problema",
     "title": "Informar de un problema",
-    "auth_title": "Inicio de sesi?n requerido",
-    "auth_description": "Inicia sesi?n antes de enviar un informe t?cnico de soporte.",
+    "auth_title": "Inicio de sesión requerido",
+    "auth_description": "Inicia sesión antes de enviar un informe técnico de soporte.",
     "summary_label": "Resumen breve",
-    "description_label": "?Qu? ocurri??",
+    "description_label": "¿Qué ocurrió?",
     "impact_label": "Impacto",
-    "include_diagnostics": "Incluir diagn?sticos t?cnicos de esta p?gina",
+    "include_diagnostics": "Incluir diagnósticos técnicos de esta página",
     "cancel": "Cancelar",
     "submit": "Enviar informe",
     "submit_success": "Informe de problema enviado.",
-    "submit_failed": "No pudimos enviar el informe. Int?ntalo de nuevo.",
+    "submit_failed": "No pudimos enviar el informe. Inténtalo de nuevo.",
     "success_title": "Informe enviado",
     "success_description": "Se ha creado la referencia {{reference}}.",
     "impact": {
@@ -1500,7 +1500,7 @@
       "saved": "Cupón guardado",
       "deleted": "Cupón eliminado"
     },
-    "qr_code_alt": "C?digo QR"
+    "qr_code_alt": "Código QR"
   },
   "regional_points": {
     "title": "Puntos regionales",

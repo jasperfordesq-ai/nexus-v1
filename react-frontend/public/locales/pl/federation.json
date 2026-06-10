@@ -1,6 +1,6 @@
 {
-  "relay_no_remote_node": "Nie mo?na okre?li? zdalnego w?z?a dla konta: {{account}}",
-  "relay_no_route_to_node": "Brak trasy do w?z?a: {{node}}",
+  "relay_no_remote_node": "Nie można określić zdalnego węzła dla konta: {{account}}",
+  "relay_no_route_to_node": "Brak trasy do węzła: {{node}}",
   "relay_url_blocked": "Docelowy adres URL przekaźnika zablokowany przez filtr bezpieczeństwa",
   "external": "Zewnętrzny",
   "hub": {
@@ -330,7 +330,7 @@
     "online": "W Internecie",
     "date_at_time": "{{date}} o {{time}}",
     "attendees_going_one": "{{count}} uczestnik",
-    "attendees_going_other": "{{count}} uczestnik?w"
+    "attendees_going_other": "{{count}} uczestników"
   },
   "groups": {
     "page_title": "Grupy Federacji",
@@ -401,8 +401,8 @@
     "browse_listings": "Przeglądaj oferty",
     "available_features": "Dostępne funkcje",
     "level_prefix": "Poziom {{level}}",
-    "member_count_one": "{{count}} cz?onek",
-    "member_count_other": "{{count}} cz?onk?w",
+    "member_count_one": "{{count}} członek",
+    "member_count_other": "{{count}} członków",
     "partner_since": "Partner od {{date}}"
   },
   "onboarding": {
@@ -478,11 +478,11 @@
     "kilometers_short": "km",
     "progress_aria": "Krok {{current}} z {{total}}",
     "up_to_km": "do {{km}} km",
-    "partners_available_one": "{{count}} spo?eczno?? partnerska dost?pna",
-    "partners_available_other": "{{count}} spo?eczno?ci partnerskich dost?pnych",
-    "member_count_one": "{{count}} cz?onek",
-    "member_count_other": "{{count}} cz?onk?w",
-    "and_more": "+{{count}} wi?cej"
+    "partners_available_one": "{{count}} społeczność partnerska dostępna",
+    "partners_available_other": "{{count}} społeczności partnerskich dostępnych",
+    "member_count_one": "{{count}} członek",
+    "member_count_other": "{{count}} członków",
+    "and_more": "+{{count}} więcej"
   },
   "member_profile": {
     "page_title": "Profil członka",

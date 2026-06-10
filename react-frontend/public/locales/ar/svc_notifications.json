@@ -1,6 +1,6 @@
 {
   "badge_collection": {
-    "collection_complete": "?????? ????????! ??? ????? '{{name}}' ????? ??? {{xp}} ???? ???? ??????! {{icon}}"
+    "collection_complete": "اكتملت المجموعة! لقد أنهيت '{{name}}' وحصلت على {{xp}} نقطة خبرة إضافية! {{icon}}"
   },
   "broker": {
     "message_for_review": "رسالة جديدة للمراجعة من {{sender}}"
@@ -46,7 +46,7 @@
     "complete_earned": "اكتمل التحدي! لقد أنهيت '{{title}}' وحصلت على {{xp}} XP!"
   },
   "gamification": {
-    "badge_earned": "??? ???? ??? ???? '{{name}}'! {{icon}}",
+    "badge_earned": "لقد حصلت على شارة '{{name}}'! {{icon}}",
     "level_up": "تهانينا! لقد وصلت إلى المستوى {{level}}!"
   },
   "job_offer": {

@@ -445,7 +445,7 @@
     "unavailable_desc": "Dieses Video konnte nicht geladen werden.",
     "default_title": "Videobeitrag",
     "play_label": "Video abspielen: {{title}}",
-    "thumbnail_alt": "Vorschaubild f?r {{title}}"
+    "thumbnail_alt": "Vorschaubild für {{title}}"
   },
   "trending": {
     "title": "Im Trend",

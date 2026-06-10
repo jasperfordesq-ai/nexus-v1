@@ -20,7 +20,7 @@
   "loading_label": "Chargement des mises à jour de la communauté...",
   "empty_title": "Aucune publication pour le moment",
   "empty_desc": "Soyez la première personne à partager quelque chose avec votre communauté !",
-  "empty_filtered": "Rien ne correspond ? cette vue pour le moment. Essayez un autre filtre.",
+  "empty_filtered": "Rien ne correspond à cette vue pour le moment. Essayez un autre filtre.",
   "empty_filtered_with_filter": "Aucune mise à jour {{filter}} pour le moment. Essayez tous les articles ou démarrez une nouvelle conversation.",
   "filter": {
     "all": "Tout",
@@ -229,8 +229,8 @@
     "video": "Vidéo",
     "video_remove": "Supprimer la vidéo",
     "file_size_mb": "{{name}} ({{size}} Mo)",
-    "listing_preview_alt": "Aper?u de l?annonce",
-    "image_preview_alt": "Aper?u du t?l?versement",
+    "listing_preview_alt": "Aperçu de l'annonce",
+    "image_preview_alt": "Aperçu du téléversement",
     "type_tabs_aria": "Composer un type de contenu"
   },
   "moderation": {
@@ -443,8 +443,8 @@
     "aria_label": "Vidéo",
     "unavailable": "Vidéo indisponible",
     "unavailable_desc": "Cette vidéo n'a pas pu être chargée.",
-    "default_title": "Vid?o",
-    "play_label": "Lire la vid?o : {{title}}",
+    "default_title": "Vidéo",
+    "play_label": "Lire la vidéo : {{title}}",
     "thumbnail_alt": "Miniature de {{title}}"
   },
   "trending": {

@@ -443,8 +443,8 @@
     "aria_label": "Vídeo",
     "unavailable": "Vídeo no disponible",
     "unavailable_desc": "Este vídeo no se pudo cargar.",
-    "default_title": "V?deo",
-    "play_label": "Reproducir v?deo: {{title}}",
+    "default_title": "Vídeo",
+    "play_label": "Reproducir vídeo: {{title}}",
     "thumbnail_alt": "Miniatura de {{title}}"
   },
   "trending": {

@@ -114,9 +114,9 @@
     "media_status": {
       "pending": "保留中",
       "complete": "完了",
-      "ready_for_processing": "??????",
+      "ready_for_processing": "処理の準備完了",
       "clean": "クリーン",
-      "scan_unavailable": "?????????????",
+      "scan_unavailable": "スキャナーを利用できません",
       "failed": "失敗した",
       "blocked": "ブロックされました",
       "infected": "ブロックされました",

@@ -288,22 +288,22 @@
   "report_problem": {
     "trigger": "Comunicar um problema",
     "title": "Comunicar um problema",
-    "auth_title": "In?cio de sess?o necess?rio",
-    "auth_description": "Inicie sess?o antes de enviar um relat?rio t?cnico ao suporte.",
+    "auth_title": "Início de sessão necessário",
+    "auth_description": "Inicie sessão antes de enviar um relatório técnico ao suporte.",
     "summary_label": "Resumo breve",
     "description_label": "O que aconteceu?",
     "impact_label": "Impacto",
-    "include_diagnostics": "Incluir diagn?sticos t?cnicos desta p?gina",
+    "include_diagnostics": "Incluir diagnósticos técnicos desta página",
     "cancel": "Cancelar",
-    "submit": "Enviar relat?rio",
-    "submit_success": "Relat?rio de problema enviado.",
-    "submit_failed": "N?o foi poss?vel enviar o relat?rio. Tente novamente.",
-    "success_title": "Relat?rio enviado",
-    "success_description": "A refer?ncia {{reference}} foi criada.",
+    "submit": "Enviar relatório",
+    "submit_success": "Relatório de problema enviado.",
+    "submit_failed": "Não foi possível enviar o relatório. Tente novamente.",
+    "success_title": "Relatório enviado",
+    "success_description": "A referência {{reference}} foi criada.",
     "impact": {
-      "blocked": "N?o consigo continuar",
-      "major": "Uma tarefa principal n?o funciona",
-      "minor": "Algo est? errado, mas consigo continuar",
+      "blocked": "Não consigo continuar",
+      "major": "Uma tarefa principal não funciona",
+      "minor": "Algo está errado, mas consigo continuar",
       "cosmetic": "Problema visual ou de texto"
     }
   },
@@ -1500,7 +1500,7 @@
       "saved": "Cupão guardado",
       "deleted": "Cupão eliminado"
     },
-    "qr_code_alt": "C?digo QR"
+    "qr_code_alt": "Código QR"
   },
   "regional_points": {
     "title": "Pontos regionais",

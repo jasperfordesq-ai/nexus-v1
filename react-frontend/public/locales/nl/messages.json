@@ -158,7 +158,7 @@
     "disabled_toast": "Automatisch vertalen uitgeschakeld",
     "translating_all": "Berichten aan het vertalen...",
     "tooltip_off": "Alle berichten automatisch vertalen",
-    "tooltip_on": "Automatisch vertalen staat aan ? klik om uit te schakelen",
+    "tooltip_on": "Automatisch vertalen staat aan — klik om uit te schakelen",
     "active_banner": "Berichten in dit gesprek worden automatisch naar jouw taal vertaald.",
     "turn_off": "Uitschakelen"
   },
@@ -171,7 +171,7 @@
   "translate_hint.body": "Jij en deze persoon kunnen ieder in je eigen taal schrijven. Tik op \"Vertalen\" bij een bericht om het in jouw taal te lezen, of gebruik de vertaalknop in de kop om alles automatisch te vertalen.",
   "translate_hint.dismiss": "Vertaalhint sluiten",
   "auto_translate.tooltip_off": "Alle berichten automatisch vertalen",
-  "auto_translate.tooltip_on": "Automatisch vertalen staat aan ? klik om uit te schakelen",
+  "auto_translate.tooltip_on": "Automatisch vertalen staat aan — klik om uit te schakelen",
   "auto_translate.active_banner": "Berichten in dit gesprek worden automatisch naar jouw taal vertaald.",
   "auto_translate.turn_off": "Uitschakelen",
   "new_group": "Nieuwe Groep",

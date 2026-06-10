@@ -288,23 +288,23 @@
   "report_problem": {
     "trigger": "Tuairiscigh fadhb",
     "title": "Tuairiscigh fadhb",
-    "auth_title": "Log?il isteach riachtanach",
-    "auth_description": "Log?il isteach sula seolann t? tuairisc taca?ochta theicni?il.",
+    "auth_title": "Logáil isteach riachtanach",
+    "auth_description": "Logáil isteach sula seolann tú tuairisc tacaíochta theicniúil.",
     "summary_label": "Achoimre ghearr",
     "description_label": "Cad a tharla?",
     "impact_label": "Tionchar",
-    "include_diagnostics": "Cuir diagn?isic theicni?il ?n leathanach seo san ?ireamh",
+    "include_diagnostics": "Cuir diagnóisic theicniúil ón leathanach seo san áireamh",
     "cancel": "Cealaigh",
     "submit": "Seol tuairisc",
     "submit_success": "Seoladh an tuairisc fhadhbe.",
-    "submit_failed": "N?orbh fh?idir an tuairisc a sheoladh. Bain triail eile as.",
+    "submit_failed": "Níorbh fhéidir an tuairisc a sheoladh. Bain triail eile as.",
     "success_title": "Tuairisc seolta",
-    "success_description": "Crutha?odh tagairt {{reference}}.",
+    "success_description": "Cruthaíodh tagairt {{reference}}.",
     "impact": {
-      "blocked": "N? f?idir liom lean?int ar aghaidh",
-      "major": "T? tasc l?rnach briste",
-      "minor": "T? rud ?igin m?cheart ach is f?idir liom lean?int ar aghaidh",
-      "cosmetic": "Fadhb amhairc n? focla?ochta"
+      "blocked": "Ní féidir liom leanúint ar aghaidh",
+      "major": "Tá tasc lárnach briste",
+      "minor": "Tá rud éigin mícheart ach is féidir liom leanúint ar aghaidh",
+      "cosmetic": "Fadhb amhairc nó foclaíochta"
     }
   },
   "mobile_tab": {
@@ -1500,7 +1500,7 @@
       "saved": "Cúpón sábháilte",
       "deleted": "Cúpón scriosta"
     },
-    "qr_code_alt": "C?d QR"
+    "qr_code_alt": "Cód QR"
   },
   "regional_points": {
     "title": "Pointí Réigiúnacha",

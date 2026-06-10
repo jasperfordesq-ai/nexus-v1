@@ -51,9 +51,9 @@
     "what_they_said": "Cad a dúirt siad"
   },
   "exchange": {
-    "label_service": "Seirbh?s",
-    "label_requester": "Iarrth?ir",
-    "label_provider": "Sol?thra?",
+    "label_service": "Seirbhís",
+    "label_requester": "Iarrthóir",
+    "label_provider": "Soláthraí",
     "label_proposed_hours": "Uaireanta Beartaithe",
     "label_approved_hours": "Uaireanta Ceadaithe",
     "label_hours_transferred": "Uaireanta Aistrithe",

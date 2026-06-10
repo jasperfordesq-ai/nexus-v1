@@ -229,8 +229,8 @@
     "video": "Vídeo",
     "video_remove": "Remover vídeo",
     "file_size_mb": "{{name}} ({{size}}MB)",
-    "listing_preview_alt": "Pr?-visualiza??o do an?ncio",
-    "image_preview_alt": "Pr?-visualiza??o do envio",
+    "listing_preview_alt": "Pré-visualização do anúncio",
+    "image_preview_alt": "Pré-visualização do envio",
     "type_tabs_aria": "Compor tipo de conteúdo"
   },
   "moderation": {
@@ -443,8 +443,8 @@
     "aria_label": "Vídeo",
     "unavailable": "Vídeo indisponível",
     "unavailable_desc": "Este vídeo não pôde ser carregado.",
-    "default_title": "V?deo",
-    "play_label": "Reproduzir v?deo: {{title}}",
+    "default_title": "Vídeo",
+    "play_label": "Reproduzir vídeo: {{title}}",
     "thumbnail_alt": "Miniatura de {{title}}"
   },
   "trending": {

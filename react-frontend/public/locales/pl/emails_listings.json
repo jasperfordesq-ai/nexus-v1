@@ -20,10 +20,10 @@
       "days_one": "1 dzień",
       "days_other": "{{count}} dni",
       "urgent_note": "Działaj szybko, aby Twój wpis był widoczny!",
-      "expired_subject": "Twoje og?oszenie ?{{title}}? wygas?o",
+      "expired_subject": "Twoje ogłoszenie „{{title}}” wygasło",
       "expired_title": "Lista wygasła",
       "expired_preview": "Twój wpis wygasł — odnów go, aby pozostać widocznym",
-      "expired_body": "Twoje og?oszenie <strong>?{{title}}?</strong> wygas?o. Odn?w je teraz, aby nadal otrzymywa? odpowiedzi od cz?onk?w spo?eczno?ci.",
+      "expired_body": "Twoje ogłoszenie <strong>„{{title}}”</strong> wygasło. Odnów je teraz, aby nadal otrzymywać odpowiedzi od członków społeczności.",
       "expired_cta": "Odnów ogłoszenie"
     },
     "approved": {

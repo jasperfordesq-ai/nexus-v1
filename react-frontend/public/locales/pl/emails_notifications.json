@@ -51,8 +51,8 @@
     "what_they_said": "Co powiedzieli"
   },
   "exchange": {
-    "label_service": "Us?uga",
-    "label_requester": "Osoba zg?aszaj?ca",
+    "label_service": "Usługa",
+    "label_requester": "Osoba zgłaszająca",
     "label_provider": "Dostawca",
     "label_proposed_hours": "Proponowane godziny",
     "label_approved_hours": "Zatwierdzone godziny",
@@ -95,7 +95,7 @@
     "heading_accepted": "Zgłoszenie zaakceptowane!",
     "tenant_volunteering": "{{community}} Wolontariat",
     "approved_body": "Świetna wiadomość! Twoje zgłoszenie wolontariusza zostało <strong style=\"color: #16a34a;\">zatwierdzone</strong>.",
-    "label_opportunity": "Mo?liwo??",
+    "label_opportunity": "Możliwość",
     "approved_next": "Możesz teraz zapisać się na zmiany i rozpocząć rejestrowanie godzin pracy wolontariatu. Dziękujemy za dokonanie zmian w Twojej społeczności!",
     "btn_view_opportunity": "Zobacz okazję",
     "heading_declined": "Aktualizacja aplikacji",

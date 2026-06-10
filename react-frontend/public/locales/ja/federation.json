@@ -1,6 +1,6 @@
 {
-  "relay_no_remote_node": "?????????????????????: {{account}}",
-  "relay_no_route_to_node": "??????????????: {{node}}",
+  "relay_no_remote_node": "アカウントのリモートノードを特定できません: {{account}}",
+  "relay_no_route_to_node": "ノードへのルートがありません: {{node}}",
   "relay_url_blocked": "リレーターゲット URL がセキュリティフィルターによってブロックされました",
   "external": "外部の",
   "hub": {
@@ -329,8 +329,8 @@
     "load_more_error": "これ以上のイベントを読み込むことができませんでした。",
     "online": "オンライン",
     "date_at_time": "{{date}} {{time}}",
-    "attendees_going_one": "{{count}}??????",
-    "attendees_going_other": "{{count}}??????"
+    "attendees_going_one": "{{count}} 人参加予定",
+    "attendees_going_other": "{{count}} 人参加予定"
   },
   "groups": {
     "page_title": "フェデレーショングループ",
@@ -400,10 +400,10 @@
     "browse_members": "メンバーを参照",
     "browse_listings": "リストを参照する",
     "available_features": "利用可能な機能",
-    "level_prefix": "???{{level}}",
-    "member_count_one": "{{count}}??????",
-    "member_count_other": "{{count}}??????",
-    "partner_since": "{{date}}????"
+    "level_prefix": "レベル {{level}}",
+    "member_count_one": "{{count}} 人のメンバー",
+    "member_count_other": "{{count}} 人のメンバー",
+    "partner_since": "{{date}} からのパートナー"
   },
   "onboarding": {
     "page_title": "フェデレーションのセットアップ",
@@ -476,13 +476,13 @@
     "toast_welcome": "フェデレーション ネットワークへようこそ!",
     "toast_generic_error": "予期しないエラーが発生しました。もう一度試してください。",
     "kilometers_short": "km",
-    "progress_aria": "{{total}}?{{current}}????",
-    "up_to_km": "??{{km}} km",
-    "partners_available_one": "{{count}}?????????????????",
-    "partners_available_other": "{{count}}?????????????????",
-    "member_count_one": "{{count}}??????",
-    "member_count_other": "{{count}}??????",
-    "and_more": "???{{count}}?"
+    "progress_aria": "ステップ {{current}} / {{total}}",
+    "up_to_km": "最大 {{km}} km",
+    "partners_available_one": "{{count}} 件のパートナーコミュニティが利用可能",
+    "partners_available_other": "{{count}} 件のパートナーコミュニティが利用可能",
+    "member_count_one": "{{count}} 人のメンバー",
+    "member_count_other": "{{count}} 人のメンバー",
+    "and_more": "ほか {{count}} 件"
   },
   "member_profile": {
     "page_title": "メンバープロフィール",
@@ -536,6 +536,6 @@
     "anonymous": "匿名",
     "rating_label": "5 段階中 {{rating}} と評価されました",
     "from_partner": "{{partner}}経由",
-    "title": "????"
+    "title": "レビュー"
   }
 }

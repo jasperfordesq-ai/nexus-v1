@@ -47,7 +47,7 @@
     "orgs_pending_one": "{{count}}組織保留中",
     "orgs_pending_other": "{{count}}保留中の組織",
     "orgs_pending_text": "承認待ちのボランティア団体",
-    "review": "??"
+    "review": "レビュー"
   },
   "modules": {
     "section_title": "プラットフォームモジュール",

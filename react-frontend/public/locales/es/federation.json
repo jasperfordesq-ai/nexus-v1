@@ -329,8 +329,8 @@
     "load_more_error": "No se pudieron cargar más eventos.",
     "online": "En línea",
     "date_at_time": "{{date}} a las {{time}}",
-    "attendees_going_one": "{{count}} asistir?",
-    "attendees_going_other": "{{count}} asistir?n"
+    "attendees_going_one": "{{count}} asistirá",
+    "attendees_going_other": "{{count}} asistirán"
   },
   "groups": {
     "page_title": "Grupos de federación",
@@ -482,7 +482,7 @@
     "partners_available_other": "{{count}} comunidades socias disponibles",
     "member_count_one": "{{count}} miembro",
     "member_count_other": "{{count}} miembros",
-    "and_more": "+{{count}} m?s"
+    "and_more": "+{{count}} más"
   },
   "member_profile": {
     "page_title": "Perfil de miembro",
@@ -536,6 +536,6 @@
     "anonymous": "Anónimo",
     "rating_label": "Calificado {{rating}} sobre 5",
     "from_partner": "vía {{partner}}",
-    "title": "Rese?as"
+    "title": "Reseñas"
   }
 }

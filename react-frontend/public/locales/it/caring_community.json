@@ -357,7 +357,7 @@
       "yes": "SÌ",
       "no": "NO",
       "empty": "Ancora nessun fornitore di servizi sanitari: aggiungine uno per iniziare.",
-      "confirm_delete": "Eliminare \"{{name}}\"? Verr? nascosto dalla directory.",
+      "confirm_delete": "Eliminare \"{{name}}\"? Verrà nascosto dalla directory.",
       "confirm_deactivate": "Contrassegnare \"{{name}}\" come inattivo? Potrai riattivarlo in seguito.",
       "actions": {
         "add_provider": "Aggiungi fornitore",

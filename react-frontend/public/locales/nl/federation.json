@@ -479,7 +479,7 @@
     "progress_aria": "Stap {{current}} van {{total}}",
     "up_to_km": "tot {{km}} km",
     "partners_available_one": "{{count}} partnercommunity beschikbaar",
-    "partners_available_other": "{{count}} partnercommunity?s beschikbaar",
+    "partners_available_other": "{{count}} partnercommunity's beschikbaar",
     "member_count_one": "{{count}} lid",
     "member_count_other": "{{count}} leden",
     "and_more": "+{{count}} meer"

@@ -822,13 +822,13 @@
       "note": "Remarque (facultatif)"
     },
     "cancel": "Annuler",
-    "deposit_button": "D?poser",
+    "deposit_button": "Déposer",
     "invalid_amount": "Veuillez saisir un montant valide.",
     "deposit_amount_too_large": "Le montant du dépôt ne peut pas dépasser 1 000 heures.",
     "deposit_success": "Crédits déposés avec succès.",
     "deposit_error": "Échec du dépôt des crédits.",
     "types": {
-      "deposit": "D?p?t",
+      "deposit": "Dépôt",
       "volunteer_payment": "Paiement du bénévole",
       "withdrawal": "Retrait",
       "admin_adjustment": "Ajustement administratif"

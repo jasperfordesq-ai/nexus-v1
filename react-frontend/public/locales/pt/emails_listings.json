@@ -20,10 +20,10 @@
       "days_one": "1 dia",
       "days_other": "{{count}} dias",
       "urgent_note": "Aja logo para manter sua listagem visível!",
-      "expired_subject": "O seu an?ncio \"{{title}}\" expirou",
+      "expired_subject": "O seu anúncio \"{{title}}\" expirou",
       "expired_title": "Listagem expirada",
       "expired_preview": "Sua listagem expirou – renove-a para permanecer visível",
-      "expired_body": "O seu an?ncio <strong>\"{{title}}\"</strong> expirou. Renove-o agora para continuar a receber respostas de membros da comunidade.",
+      "expired_body": "O seu anúncio <strong>\"{{title}}\"</strong> expirou. Renove-o agora para continuar a receber respostas de membros da comunidade.",
       "expired_cta": "Renovar listagem"
     },
     "approved": {

@@ -526,7 +526,7 @@
     "leave_failed": "No se pudo salir de la lista de espera.",
     "no_entries_title": "No hay entradas en la lista de espera",
     "no_entries_desc": "Actualmente no estás en ninguna lista de espera de turno. Cuando un turno está completo, puede unirse a la lista de espera y recibir una notificación cuando se abra un lugar.",
-    "position": "Posici?n {{position}}",
+    "position": "Posición {{position}}",
     "spots": "{{count}} lugares",
     "joined": "Lista de espera unida",
     "leave": "Dejar",

@@ -293,7 +293,7 @@
     "summary_label": "Kurze Zusammenfassung",
     "description_label": "Was ist passiert?",
     "impact_label": "Auswirkung",
-    "include_diagnostics": "Technische Diagnosedaten von dieser Seite einschlie?en",
+    "include_diagnostics": "Technische Diagnosedaten von dieser Seite einschließen",
     "cancel": "Abbrechen",
     "submit": "Bericht senden",
     "submit_success": "Problembericht gesendet.",

@@ -1,5 +1,5 @@
 {
-  "relay_no_remote_node": "Remote-Knoten f?r Konto kann nicht bestimmt werden: {{account}}",
+  "relay_no_remote_node": "Remote-Knoten für Konto kann nicht bestimmt werden: {{account}}",
   "relay_no_route_to_node": "Keine Route zum Knoten: {{node}}",
   "relay_url_blocked": "Relay-Ziel-URL durch Sicherheitsfilter blockiert",
   "external": "Extern",
@@ -478,8 +478,8 @@
     "kilometers_short": "km",
     "progress_aria": "Schritt {{current}} von {{total}}",
     "up_to_km": "bis zu {{km}} km",
-    "partners_available_one": "{{count}} Partner-Community verf?gbar",
-    "partners_available_other": "{{count}} Partner-Communitys verf?gbar",
+    "partners_available_one": "{{count}} Partner-Community verfügbar",
+    "partners_available_other": "{{count}} Partner-Communitys verfügbar",
     "member_count_one": "{{count}} Mitglied",
     "member_count_other": "{{count}} Mitglieder",
     "and_more": "+{{count}} weitere"

@@ -35,17 +35,17 @@
   "federation": {
     "feature_disabled": "Níl an chónaidhm cumasaithe don phobal seo"
   },
-  "update_available": "Nuashonr? ar f?il",
-  "version_info": "Reatha: {{currentVersion}} ? Ar f?il: {{clientVersion}}",
-  "whats_new": "Cad at? nua",
-  "later": "N?os d?ana?",
-  "download_update": "?osl?d?il an nuashonr?",
-  "offline_message": "Is cos?il go bhfuil t? as l?ne",
-  "session_expired": "Seisi?n imithe in ?ag",
-  "session_expired_message": "T? do sheisi?n imithe in ?ag. Log?il isteach ar?s chun lean?int ar aghaidh.",
+  "update_available": "Nuashonrú ar fáil",
+  "version_info": "Reatha: {{currentVersion}} · Ar fáil: {{clientVersion}}",
+  "whats_new": "Cad atá nua",
+  "later": "Níos déanaí",
+  "download_update": "Íoslódáil an nuashonrú",
+  "offline_message": "Is cosúil go bhfuil tú as líne",
+  "session_expired": "Seisiún imithe in éag",
+  "session_expired_message": "Tá do sheisiún imithe in éag. Logáil isteach arís chun leanúint ar aghaidh.",
   "session_expiring": "Tá do sheisiún ar tí dul in éag",
   "session_expiring_message": "Rachaidh do sheisiún in éag i {{seconds}} soicind. Leathnaigh do sheisiún chun fanacht logáilte isteach.",
   "session_expiring_countdown_aria": "Rachaidh an seisiún in éag i {{seconds}} soicind",
   "extend_session": "Seisiún a leathnú",
-  "dismiss": "D?n"
+  "dismiss": "Dún"
 }

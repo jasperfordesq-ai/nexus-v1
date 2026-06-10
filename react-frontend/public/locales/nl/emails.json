@@ -62,7 +62,7 @@
     "expiry": "Deze link verloopt over {{hours}} uur."
   },
   "password_reset": {
-    "subject": "Reset je wachtwoord ? {{community}}",
+    "subject": "Reset je wachtwoord — {{community}}",
     "title": "Stel je wachtwoord opnieuw in",
     "preview": "Je hebt een link voor het opnieuw instellen van het wachtwoord aangevraagd",
     "greeting": "Hallo {{name}},",

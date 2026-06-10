@@ -1,6 +1,6 @@
 {
-  "relay_no_remote_node": "Impossible de d?terminer le n?ud distant du compte : {{account}}",
-  "relay_no_route_to_node": "Aucune route vers le n?ud : {{node}}",
+  "relay_no_remote_node": "Impossible de déterminer le nœud distant du compte : {{account}}",
+  "relay_no_route_to_node": "Aucune route vers le nœud : {{node}}",
   "relay_url_blocked": "URL cible du relais bloquée par le filtre de sécurité",
   "external": "Externe",
   "hub": {
@@ -328,7 +328,7 @@
     "load_error": "Impossible de charger les événements. Veuillez réessayer.",
     "load_more_error": "Impossible de charger plus d'événements.",
     "online": "En ligne",
-    "date_at_time": "{{date}} ? {{time}}",
+    "date_at_time": "{{date}} à {{time}}",
     "attendees_going_one": "{{count}} participant",
     "attendees_going_other": "{{count}} participants"
   },
@@ -476,10 +476,10 @@
     "toast_welcome": "Bienvenue sur le réseau de la fédération !",
     "toast_generic_error": "Une erreur inattendue s'est produite. Veuillez réessayer.",
     "kilometers_short": "kilomètres",
-    "progress_aria": "?tape {{current}} sur {{total}}",
-    "up_to_km": "jusqu?? {{km}} km",
-    "partners_available_one": "{{count}} communaut? partenaire disponible",
-    "partners_available_other": "{{count}} communaut?s partenaires disponibles",
+    "progress_aria": "Étape {{current}} sur {{total}}",
+    "up_to_km": "jusqu'à {{km}} km",
+    "partners_available_one": "{{count}} communauté partenaire disponible",
+    "partners_available_other": "{{count}} communautés partenaires disponibles",
     "member_count_one": "{{count}} membre",
     "member_count_other": "{{count}} membres",
     "and_more": "+{{count}} de plus"

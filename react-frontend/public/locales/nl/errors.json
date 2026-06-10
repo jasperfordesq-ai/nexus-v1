@@ -36,7 +36,7 @@
     "feature_disabled": "Federatie is niet ingeschakeld voor deze gemeenschap"
   },
   "update_available": "Update beschikbaar",
-  "version_info": "Huidig: {{currentVersion}} ? Beschikbaar: {{clientVersion}}",
+  "version_info": "Huidig: {{currentVersion}} · Beschikbaar: {{clientVersion}}",
   "whats_new": "Nieuw",
   "later": "Later",
   "download_update": "Update downloaden",

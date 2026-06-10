@@ -35,17 +35,17 @@
   "federation": {
     "feature_disabled": "このコミュニティではフェデレーションが有効になっていません"
   },
-  "update_available": "???????????",
-  "version_info": "??: {{currentVersion}} ? ????: {{clientVersion}}",
-  "whats_new": "???",
-  "later": "??",
-  "download_update": "?????????????",
-  "offline_message": "??????????",
-  "session_expired": "??????????????",
-  "session_expired_message": "????????????????????????????????????",
+  "update_available": "アップデートが利用可能",
+  "version_info": "現在: {{currentVersion}} · 利用可能: {{clientVersion}}",
+  "whats_new": "新着情報",
+  "later": "後で",
+  "download_update": "アップデートをダウンロード",
+  "offline_message": "オフラインのようです",
+  "session_expired": "セッションの有効期限切れ",
+  "session_expired_message": "セッションの有効期限が切れました。続行するには再度ログインしてください。",
   "session_expiring": "セッションの有効期限が近づいています",
   "session_expiring_message": "セッションは {{seconds}} 秒後に期限切れになります。セッションを延長してログイン状態を維持します。",
   "session_expiring_countdown_aria": "セッションは {{seconds}} 秒後に期限切れになります",
   "extend_session": "セッションを延長する",
-  "dismiss": "???"
+  "dismiss": "閉じる"
 }

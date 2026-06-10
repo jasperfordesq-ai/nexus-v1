@@ -25230,7 +25230,7 @@ export default interface Resources {
       "badge_keys_must_be_array": "badge_keys must be an array",
       "member_ids_must_be_array": "member_ids must be an array"
     },
-    "version_info": "Current: {{currentVersion}} ? Available: {{clientVersion}}",
+    "version_info": "Current: {{currentVersion}} · Available: {{clientVersion}}",
     "whats_new": "What's new"
   },
   "events": {

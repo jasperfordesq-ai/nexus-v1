@@ -16,7 +16,7 @@
     "heading": "{{period}} 試合ダイジェスト",
     "matches_waiting": "{{count}} の新しい試合があなたを待っています",
     "top_matches": "トップマッチ",
-    "by_poster": "{{name}}??",
+    "by_poster": "{{name}} より",
     "hot_badge": "{{count}} ホット",
     "mutual_badge": "{{count}} 相互"
   },
@@ -51,9 +51,9 @@
     "what_they_said": "彼らが言ったこと"
   },
   "exchange": {
-    "label_service": "????",
-    "label_requester": "???",
-    "label_provider": "???",
+    "label_service": "サービス",
+    "label_requester": "リクエスト者",
+    "label_provider": "提供者",
     "label_proposed_hours": "提案された時間",
     "label_approved_hours": "承認された時間",
     "label_hours_transferred": "転送時間",
@@ -95,7 +95,7 @@
     "heading_accepted": "申し込み受付中！",
     "tenant_volunteering": "{{community}} ボランティア活動",
     "approved_body": "素晴らしいニュースです！ボランティアの申請は<strong style=\"color: #16a34a;\">承認</strong>されました。",
-    "label_opportunity": "??",
+    "label_opportunity": "機会",
     "approved_next": "シフトにサインアップして、ボランティア時間の記録を開始できるようになりました。コミュニティに変化をもたらしてくれてありがとう!",
     "btn_view_opportunity": "機会を見る",
     "heading_declined": "アプリケーションのアップデート",

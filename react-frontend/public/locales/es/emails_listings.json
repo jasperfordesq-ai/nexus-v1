@@ -23,7 +23,7 @@
       "expired_subject": "Tu anuncio \"{{title}}\" ha caducado",
       "expired_title": "Listado caducado",
       "expired_preview": "Su anuncio ha caducado: renuévelo para permanecer visible",
-      "expired_body": "Tu anuncio <strong>\"{{title}}\"</strong> ha caducado. Renu?valo ahora para seguir recibiendo respuestas de miembros de la comunidad.",
+      "expired_body": "Tu anuncio <strong>\"{{title}}\"</strong> ha caducado. Renuévalo ahora para seguir recibiendo respuestas de miembros de la comunidad.",
       "expired_cta": "Renovar listado"
     },
     "approved": {

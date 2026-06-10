@@ -36,7 +36,7 @@
     "feature_disabled": "Federation is not enabled for this community"
   },
   "update_available": "Update available",
-  "version_info": "Current: {{currentVersion}} ? Available: {{clientVersion}}",
+  "version_info": "Current: {{currentVersion}} · Available: {{clientVersion}}",
   "whats_new": "What's new",
   "later": "Later",
   "download_update": "Download update",

@@ -114,9 +114,9 @@
     "media_status": {
       "pending": "Ar feitheamh",
       "complete": "Críochnaigh",
-      "ready_for_processing": "R?idh le pr?ise?il",
+      "ready_for_processing": "Réidh le próiseáil",
       "clean": "Glan",
-      "scan_unavailable": "N?l an scan?ir ar f?il",
+      "scan_unavailable": "Níl an scanóir ar fáil",
       "failed": "Theip",
       "blocked": "bactha",
       "infected": "bactha",

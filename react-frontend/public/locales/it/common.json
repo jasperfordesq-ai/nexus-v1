@@ -291,7 +291,7 @@
     "auth_title": "Accesso richiesto",
     "auth_description": "Accedi prima di inviare una segnalazione tecnica al supporto.",
     "summary_label": "Breve riepilogo",
-    "description_label": "Che cosa ? successo?",
+    "description_label": "Che cosa è successo?",
     "impact_label": "Impatto",
     "include_diagnostics": "Includi la diagnostica tecnica di questa pagina",
     "cancel": "Annulla",
@@ -299,10 +299,10 @@
     "submit_success": "Segnalazione inviata.",
     "submit_failed": "Non siamo riusciti a inviare la segnalazione. Riprova.",
     "success_title": "Segnalazione inviata",
-    "success_description": "Il riferimento {{reference}} ? stato creato.",
+    "success_description": "Il riferimento {{reference}} è stato creato.",
     "impact": {
       "blocked": "Non posso continuare",
-      "major": "Un?attivit? principale non funziona",
+      "major": "Un'attività principale non funziona",
       "minor": "Qualcosa non va, ma posso continuare",
       "cosmetic": "Problema visivo o di testo"
     }

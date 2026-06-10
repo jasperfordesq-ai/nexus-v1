@@ -20,10 +20,10 @@
       "days_one": "1 lá",
       "days_other": "{{count}} lá",
       "urgent_note": "Gníomhaigh go luath chun do liostú a choinneáil le feiceáil!",
-      "expired_subject": "T? do liost? \"{{title}}\" imithe in ?ag",
+      "expired_subject": "Tá do liostú \"{{title}}\" imithe in éag",
       "expired_title": "Liosta in éag",
       "expired_preview": "Tá do liostú imithe in éag - athnuachan é chun fanacht le feiceáil",
-      "expired_body": "T? do liost? <strong>\"{{title}}\"</strong> imithe in ?ag. Athnuaigh anois ? chun freagra? ? bhaill an phobail a fh?il f?s.",
+      "expired_body": "Tá do liostú <strong>\"{{title}}\"</strong> imithe in éag. Athnuaigh anois é chun freagraí ó bhaill an phobail a fháil fós.",
       "expired_cta": "Athnuaigh Liostú"
     },
     "approved": {

@@ -20,7 +20,7 @@
   "loading_label": "Nuashonruithe pobail á luchtú...",
   "empty_title": "Níl aon phostálacha fós",
   "empty_desc": "Bí ar an gcéad duine rud éigin a roinnt le do phobal!",
-  "empty_filtered": "N? mheaitse?lann aon rud an radharc seo faoi l?thair. Bain triail as scagaire eile.",
+  "empty_filtered": "Ní mheaitseálann aon rud an radharc seo faoi láthair. Bain triail as scagaire eile.",
   "empty_filtered_with_filter": "Níl aon nuashonrú de chineál {{filter}} ann faoi láthair. Bain triail as gach postáil nó tosaigh comhrá nua.",
   "filter": {
     "all": "Uile",
@@ -229,8 +229,8 @@
     "video": "Físeán",
     "video_remove": "Bain físeán",
     "file_size_mb": "{{name}} ({{size}}MB)",
-    "listing_preview_alt": "R?amhamharc liost?la",
-    "image_preview_alt": "R?amhamharc uasl?d?la",
+    "listing_preview_alt": "Réamhamharc liostála",
+    "image_preview_alt": "Réamhamharc uaslódála",
     "type_tabs_aria": "Cum cineál ábhair"
   },
   "moderation": {
@@ -443,8 +443,8 @@
     "aria_label": "Físeán",
     "unavailable": "Físeán gan fáil",
     "unavailable_desc": "Níorbh fhéidir an físeán seo a luchtú.",
-    "default_title": "F?se?n",
-    "play_label": "Seinn f?se?n: {{title}}",
+    "default_title": "Físeán",
+    "play_label": "Seinn físeán: {{title}}",
     "thumbnail_alt": "Mionsamhail do {{title}}"
   },
   "trending": {
@@ -548,7 +548,7 @@
     "go_to_image": "Téigh chuig íomhá {{number}}",
     "more_images": "{{count}} íomhá eile",
     "video_of": "Físeán {{current}} as {{total}}",
-    "role_description": "timpeall?n"
+    "role_description": "timpeallán"
   },
   "lightbox": {
     "aria_label": "Amharcóir íomhánna",

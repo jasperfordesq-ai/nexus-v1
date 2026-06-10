@@ -20,7 +20,7 @@
   "loading_label": "Ładowanie aktualizacji społeczności...",
   "empty_title": "Brak postów",
   "empty_desc": "Bądź pierwszym, który podzieli się czymś ze swoją społecznością!",
-  "empty_filtered": "Nic nie pasuje teraz do tego widoku. Spr?buj innego filtra.",
+  "empty_filtered": "Nic nie pasuje teraz do tego widoku. Spróbuj innego filtra.",
   "empty_filtered_with_filter": "Nie ma teraz aktualizacji typu {{filter}}. Spróbuj wszystkich wpisów lub rozpocznij nową rozmowę.",
   "filter": {
     "all": "Wszystkie",
@@ -229,8 +229,8 @@
     "video": "Wideo",
     "video_remove": "Usuń wideo",
     "file_size_mb": "{{name}} ({{size}}MB)",
-    "listing_preview_alt": "Podgl?d og?oszenia",
-    "image_preview_alt": "Podgl?d przesy?ania",
+    "listing_preview_alt": "Podgląd ogłoszenia",
+    "image_preview_alt": "Podgląd przesyłania",
     "type_tabs_aria": "Utwórz typ zawartości"
   },
   "moderation": {
@@ -444,7 +444,7 @@
     "unavailable": "Wideo niedostępne",
     "unavailable_desc": "Tego wideo nie można było załadować.",
     "default_title": "Wideo",
-    "play_label": "Odtw?rz wideo: {{title}}",
+    "play_label": "Odtwórz wideo: {{title}}",
     "thumbnail_alt": "Miniatura dla {{title}}"
   },
   "trending": {

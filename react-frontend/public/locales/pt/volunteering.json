@@ -749,9 +749,9 @@
     "score_aria": "Pontuação de bem-estar: {{score}} em 100",
     "score_excellent": "Excelente",
     "score_good": "Bom",
-    "score_fair": "Razo?vel",
+    "score_fair": "Razoável",
     "score_needs_attention": "Precisa de atenção",
-    "score_critical": "Cr?tico",
+    "score_critical": "Crítico",
     "risk_low": "Risco Baixo",
     "risk_moderate": "Risco moderado",
     "risk_high": "Alto risco",
@@ -828,7 +828,7 @@
     "deposit_success": "Créditos depositados com sucesso.",
     "deposit_error": "Falha ao depositar créditos.",
     "types": {
-      "deposit": "Dep?sito",
+      "deposit": "Depósito",
       "volunteer_payment": "Pagamento Voluntário",
       "withdrawal": "Levantamento",
       "admin_adjustment": "Ajuste de administrador"

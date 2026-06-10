@@ -13,10 +13,10 @@
   },
   "api_partners": {
     "meta": {
-      "title": "API ?????"
+      "title": "インバウンド API パートナー"
     },
     "header": {
-      "title": "API ?????",
+      "title": "インバウンド API パートナー",
       "description": "パートナー API を呼び出す外部統合 (銀行、決済プロセッサ、管理システム) をプロビジョニングおよび管理します。"
     },
     "actions": {
@@ -64,11 +64,11 @@
       "contact_email_placeholder": "integrations@partner.example",
       "description": "説明",
       "name": "名前",
-      "name_placeholder": "?: PostFinance Switzerland",
+      "name_placeholder": "例: PostFinance Switzerland",
       "rate_limit": "レート制限 (リクエスト/分)",
       "sandbox_mode": "サンドボックス モード (読み取り専用 - 書き込みは拒否されます)",
       "submit": "認証情報の作成と発行",
-      "title": "??? API ?????"
+      "title": "新しい API パートナー"
     },
     "credentials_modal": {
       "client_id": "client_id",
@@ -113,7 +113,7 @@
       "suspended": "パートナーの停止"
     },
     "table": {
-      "aria": "API ?????"
+      "aria": "API パートナー"
     }
   },
   "federation_admin_guidance": {
@@ -414,7 +414,7 @@
       "subject_user": "対象ユーザー: {{id}}",
       "target_user": "対象ユーザー：{{id}}",
       "meta": {
-        "title": "AI ?????????",
+        "title": "AI エージェント提案",
         "description": "テナント データに影響を与える前に、自律エージェントの提案を確認、編集、承認、または拒否します。"
       },
       "actions": {
@@ -620,7 +620,7 @@
         "proposals_load_failed": "プロポーザルの読み込みに失敗しました。",
         "run_details_load_failed": "実行の詳細をロードできませんでした。",
         "run_trigger_failed": "実行のトリガーに失敗しました。",
-        "run_triggered": "??????????: {{count}} ?????????????",
+        "run_triggered": "実行がトリガーされました: {{count}} 件の提案が生成されました。",
         "runs_load_failed": "実行のロードに失敗しました。"
       }
     },
@@ -664,14 +664,14 @@
           "title": "タイトル"
         },
         "hints": {
-          "active": "?????????? AI ??????????????",
+          "active": "非アクティブなドキュメントが AI プロンプトに挿入されることはありません。",
           "keywords": "これらの単語のいずれかがチャット メッセージに表示されると、このドキュメントが AI プロンプトに挿入されます。",
           "module_slug": "小文字、数字、アンダースコア、ダッシュ。作成後に変更することはできません。"
         },
         "placeholders": {
           "body": "このモジュールの平易な説明。何ができるのか、どうやって使うのか、何ができないのか。",
-          "keywords": "?: timebank?hours?credits?exchange",
-          "module_slug": "?: listings?wallet?events",
+          "keywords": "例: timebank、hours、credits、exchange",
+          "module_slug": "例: listings、wallet、events",
           "title": "例えばcreditsの仕組み"
         }
       },
@@ -706,7 +706,7 @@
       },
       "stats": {
         "avg_latency": "平均レイテンシー",
-        "cost": "??? (USD)",
+        "cost": "コスト (USD)",
         "latency_value": "{{value}} ミリ秒",
         "thumbs_down": "親指を下げる",
         "thumbs_up": "いいぞ",
@@ -782,7 +782,7 @@
     "retention": {
       "data_residency_label": "データ常駐宣言",
       "dpa_contact_description": "データ保護責任者または責任者の電子メール。",
-      "dpa_contact_label": "DPA ?????????? (??)",
+      "dpa_contact_label": "DPA 連絡先メールアドレス (任意)",
       "periods_title": "保存期間",
       "residency_title": "データの保存場所と DPA への連絡先",
       "fields": {
@@ -810,16 +810,16 @@
         "consent_type": "同意の種類",
         "date": "日付",
         "ip_address": "IP アドレス",
-        "member_id": "???? ID"
+        "member_id": "メンバー ID"
       }
     },
     "residency": {
       "article_16": "国境を越えた個人データの開示は、宛先国が連邦理事会によって認められた適切なデータ保護を確保している場合に許可されます。 Switzerland、EU/EEA 加盟国、およびその他の少数の国が対象となります。",
       "article_16_label": "FADPアート。 16",
-      "article_17": "?????????????FDPIC ???????????????????????????????????????????????????????",
+      "article_17": "移転先が要件を満たさない場合は、FDPIC が承認した標準データ保護条項、拘束的企業準則、またはメンバーの同意など、適切な保護措置を講じる必要があります。",
       "article_17_label": "FADPアート。 17",
       "description": "テナント メンバー データが保存および処理される場所。",
-      "dpa_contact": "DPA ???",
+      "dpa_contact": "DPA 連絡先",
       "title": "宣言されたデータ常駐性",
       "update_hint_prefix": "宣言された居住権を更新するには、",
       "update_hint_suffix": "タブ。",
@@ -977,7 +977,7 @@
       },
       "header": {
         "title": "ローカル広告",
-        "description": "SME??????????????????????????"
+        "description": "中小企業、団体、自治体からのローカル広告キャンペーンを管理します"
       },
       "placement": {
         "all": "すべてのプレースメント",
@@ -986,7 +986,7 @@
         "market": "市場"
       },
       "placeholders": {
-        "budget": "?: 5000 = EUR 50.00",
+        "budget": "例: 5000 = EUR 50.00",
         "campaign_name": "サマーセール - Cafe Helvetia"
       },
       "stats": {
@@ -996,7 +996,7 @@
         "total_revenue": "総収益"
       },
       "toasts": {
-        "approved": "???????{{name}}?????????",
+        "approved": "キャンペーン「{{name}}」が承認されました",
         "approve_failed": "キャンペーンの承認に失敗しました",
         "audience_json_invalid": "オーディエンスフィルターは有効なJSONである必要があります",
         "created": "キャンペーンを作成し、レビューのために送信しました",
@@ -1004,7 +1004,7 @@
         "details_failed": "キャンペーンの詳細を読み込めませんでした",
         "load_failed": "広告キャンペーンを読み込めませんでした",
         "name_required": "キャンペーン名は必須です",
-        "paused": "???????{{name}}??????????",
+        "paused": "キャンペーン「{{name}}」が一時停止されました",
         "pause_failed": "キャンペーンを一時停止できませんでした",
         "rejected": "キャンペーン「{{name}}」が拒否されました",
         "reject_failed": "キャンペーンを拒否できませんでした"
@@ -1012,8 +1012,8 @@
     },
     "push": {
       "page_title": "プッシュキャンペーン",
-      "chart_opens_title": "{{count}} ????",
-      "chart_sends_title": "{{count}} ????",
+      "chart_opens_title": "{{count}} 件の開封",
+      "chart_sends_title": "{{count}} 件の送信",
       "create_title": "新しいプッシュキャンペーン",
       "daily_breakdown": "一日の内訳",
       "immediate": "すぐに",
@@ -1048,7 +1048,7 @@
         "scheduled_at": "スケジュール済み (オプション - 承認時に送信するには空白のままにします)"
       },
       "header": {
-        "title": "???????????? (AG57)"
+        "title": "有料プッシュキャンペーン (AG57)"
       },
       "metrics": {
         "opens": "開く",
@@ -1069,14 +1069,14 @@
         "total_campaigns": "キャンペーンの合計"
       },
       "toasts": {
-        "approved": "???????{{name}}??????????",
+        "approved": "キャンペーン「{{name}}」が承認されました。",
         "approve_failed": "キャンペーンの承認に失敗しました。",
         "created": "キャンペーンが作成されました。",
         "create_failed": "キャンペーンの作成に失敗しました。",
-        "dispatched": "???????{{name}}?????????",
+        "dispatched": "キャンペーン「{{name}}」が配信されました。",
         "dispatch_failed": "キャンペーンのディスパッチに失敗しました。",
         "load_failed": "キャンペーンの読み込みに失敗しました",
-        "rejected": "???????{{name}}??????????",
+        "rejected": "キャンペーン「{{name}}」が拒否されました。",
         "reject_failed": "キャンペーンを拒否できませんでした。",
         "required_fields": "名前、タイトル、本文は必須です。"
       }
@@ -1251,7 +1251,7 @@
     "pending": {
       "title": "保留中のレビュー",
       "description_prefix": "コーディネーターのレビューと承認を待つ時間。マークのある項目",
-      "description_middle": "???? SLA ?????????????????????",
+      "description_middle": "件がレビュー SLA を超過しています。マークされた項目",
       "description_suffix": "エスカレーション SLA を超えています。各提出物を承認または拒否するか、特定のコーディネーターに割り当てます。",
       "needs_review": "見直しが必要",
       "escalate_now": "今すぐエスカレーションしてください",
@@ -1302,12 +1302,12 @@
     },
     "tandem": {
       "title": "Tandem の提案",
-      "description": "??????????????????? AI ????????????????????",
+      "description": "場所、言語、スキル、空き状況に基づいて AI が提案するサポーターと受け手のペアです。",
       "empty": "現在提案はありません。さらにメンバーを追加するか、空き状況を調整します。",
       "load_failed": "タンデムの提案を読み込めませんでした。",
       "dismiss_success": "提案は却下されました。",
       "dismiss_failed": "提案を却下できませんでした。",
-      "relationship_title": "Tandem: {{supporter}} ? {{recipient}}",
+      "relationship_title": "Tandem: {{supporter}} と {{recipient}}",
       "distance_km": "{{value}}km",
       "same_language": "同じ言語",
       "complementary_skills": "補完的なスキル",
@@ -1315,7 +1315,7 @@
       "shared_interests": "共通の興味",
       "score": "スコア {{value}}%",
       "dismiss": "却下する",
-      "create": "Tandem ???"
+      "create": "Tandem を作成"
     },
     "safeguarding": {
       "title": "レポートの保護",
@@ -1326,9 +1326,9 @@
       "no_reports": "まだ報告はありません。",
       "table_aria": "最近の安全対策レポート",
       "open": "開ける",
-      "org_subject": "?? #{{id}}",
+      "org_subject": "組織 #{{id}}",
       "age_hours": "{{count}}h",
-      "age_days": "{{count}}?",
+      "age_days": "{{count}}日",
       "columns": {
         "severity": "重大度",
         "category": "カテゴリ",
@@ -1353,9 +1353,9 @@
     },
     "role_pack": {
       "title": "役割のプリセット",
-      "description": "??????????????????????????????????????????????????????????????????????????????{{countLabel}}?",
+      "description": "ケアリングコミュニティの各役割向けに事前構成された権限セットです。完全なロールパックをインストールすると、コーディネーターに正しいアクセス権をすばやく設定できます。{{countLabel}}。",
       "installed_count": "{{total}} ロール プリセットの {{installed}} がインストールされました",
-      "available_count": "{{count}} ???????????????",
+      "available_count": "{{count}} 件のロールプリセットが利用可能",
       "installing": "インストール中...",
       "install": "役割パックをインストールする",
       "install_success": "ロールパックがインストールされました。",
@@ -1452,7 +1452,7 @@
     "favours": {
       "title": "非公式の好意",
       "loading": "読み込み中...",
-      "total_recorded": "?? {{count}} ?????",
+      "total_recorded": "合計 {{count}} 件記録済み",
       "loading_favours": "好意を読み込んでいます...",
       "empty": "まだ好意は記録されていません。",
       "anonymous": "匿名",
@@ -1550,12 +1550,12 @@
       "sub_region_coverage": "サブリージョンの適用範囲 (過去 {{days}} 日間)",
       "under_supplied_count": "{{count}}の供給が不足しています",
       "sub_region_coverage_aria": "サブリージョンのカバー範囲",
-      "helper_churn": "?????? ({{days}} ??????)",
+      "helper_churn": "ヘルパーの離脱 ({{days}} 日以上経過)",
       "overall_percent": "全体で {{value}}%",
       "helper_churn_note": "以前アクティブだった {{prior}} の {{lapsed}} は、最近時間を記録していません。",
       "helper_churn_aria": "カテゴリ別のヘルパー チャーン",
       "coefficient_drift": "カテゴリ係数ドリフト",
-      "drifting_count": "{{count}} ???????",
+      "drifting_count": "{{count}} 人が離れつつあります",
       "coefficient_drift_note": "絶対ドリフト > {{threshold}}% を持つカテゴリにはフラグが立てられます。カテゴリ係数エディタでベースライン係数を確認します。",
       "coefficient_drift_aria": "カテゴリ係数ドリフト",
       "proactive_alerts": "プロアクティブなアラート",
@@ -1605,8 +1605,8 @@
       "create": "関係を築く",
       "empty": "まだサポート関係はありません。上に作成します。",
       "pair": "{{recipient}} をサポートする {{supporter}}",
-      "started": "{{date}} ???",
-      "next_check_in": "???????? {{date}}",
+      "started": "{{date}} に開始",
+      "next_check_in": "次回チェックイン {{date}}",
       "pause": "一時停止",
       "resume": "再開する",
       "log_date": "日付",
@@ -2305,7 +2305,7 @@
         },
         "hints": {
           "spoofed": "主要なボットを主張し、IP 範囲に失敗しました",
-          "top_50_cap": "top-50 ????",
+          "top_50_cap": "上位 50 件の上限から",
           "verified_of_total": "{{total}} の {{verified}}"
         },
         "kpi": {
@@ -2322,7 +2322,7 @@
           "hits_by_crawler": "クローラーによるヒット",
           "hits_by_status": "HTTP ステータスによるヒット数",
           "recent_activity": "最近のアクティビティ (新しい順、最後の {{count}})",
-          "top_uris": "?? URI (?????? 50 ?)"
+          "top_uris": "上位 URI (ヒット数上位 50 件)"
         },
         "tables": {
           "recent_hits_aria": "最近のボットのヒット数",
@@ -2350,7 +2350,7 @@
           "tenant": "NEXUSTERM30トークン"
         },
         "confirm": {
-          "queue_recache": "{{count}} ?????????????????????????"
+          "queue_recache": "{{count}} 件のテナントの再キャッシュをキューに入れますか?"
         },
         "empty": "テナントなし",
         "errors": {
@@ -2361,10 +2361,10 @@
         "messages": {
           "bulk_queued": "{{count}} テナントのキューに入れられた再キャッシュ",
           "no_stale": "古いテナントはありません - カバレッジは健全です",
-          "tenant_queued": "{{slug}} ? #{{id}} ???????????"
+          "tenant_queued": "{{slug}} の #{{id}} をキューに入れました"
         },
         "summary": {
-          "healthy": "???? {{count}} ????????????",
+          "healthy": "{{count}} 件のテナントすべてが正常です。",
           "needs_work": "{{total}} テナントの {{needing}} には、ルートが見つからないか、古くなっているか、資産が壊れています。"
         },
         "table_aria": "カバレッジ"
@@ -2392,7 +2392,7 @@
           "auto_recache_dry_run": "自動再キャッシュのドライランが完了しました",
           "drift_applied": "ドリフト検出が適用されました",
           "drift_dry_run": "ドリフト予行演習完了",
-          "purge_dry_run": "?????: {{count}} ?????????????????",
+          "purge_dry_run": "ドライラン: {{count}} 件のスナップショットが削除される見込みです",
           "purged_ungated": "{{tenants}} テナント全体で {{count}} のゲートされていないスナップショットをパージしました"
         },
         "no_output": "(出力なし)",
@@ -2417,7 +2417,7 @@
           "reset_queue": "キューをリセット"
         },
         "engine_healthy": "エンジンは健全です",
-        "issue_count_one": "{{count}} ????",
+        "issue_count_one": "{{count}} 件の問題",
         "issue_count_other": "{{count}}の問題",
         "modal": {
           "body_middle": "または",
@@ -2428,8 +2428,8 @@
         },
         "toasts": {
           "breaker_reset": "サーキットブレーカーのリセット",
-          "queue_reset_one": "{{count}} ???????????????????????????",
-          "queue_reset_other": "{{count}} ???????????????????????????",
+          "queue_reset_one": "{{count}} 件のスタックした行をリセットしました。ブレーカーをクリアしました",
+          "queue_reset_other": "{{count}} 件のスタックした行をリセットしました。ブレーカーをクリアしました",
           "queue_reset_failed": "キューのリセットに失敗しました",
           "reset_failed": "リセットに失敗しました"
         }
@@ -2489,7 +2489,7 @@
           "flags": "フラグ",
           "h1_count": "H1 (カウント)",
           "html_parse_warnings": "HTML 解析の警告",
-          "html_preview": "HTML ????? (??? 12KB???????????)",
+          "html_preview": "HTML プレビュー (最初の 12KB、スクリプト除去済み)",
           "integrity_mismatch": "レンダリング後にバイトが変更されました - sha256 {{expected}}... が期待されていましたが、{{actual}} を取得しました...",
           "integrity_missing": "sha256 サイドカーがありません - スナップショットは整合性検証より前のものであるか、手動で編集されました",
           "integrity_ok": "バイトはレンダリング時に書き込まれた sha256 と一致します",
@@ -2510,7 +2510,7 @@
           "path": "パス",
           "seo_score": "SEO スコア",
           "size": "サイズ",
-          "tips": "??? ({{count}})",
+          "tips": "ヒント ({{count}})",
           "title": "タイトル"
         },
         "selected": "{{count}} が選択されました",
@@ -2524,12 +2524,12 @@
       },
       "jobs": {
         "actions": {
-          "cancel_job": "??? #{{id}} ??????",
+          "cancel_job": "ジョブ #{{id}} をキャンセル",
           "close": "近い",
           "reload": "リロード",
-          "retry_job": "??? #{{id}} ????",
+          "retry_job": "ジョブ #{{id}} を再試行",
           "retry_same_parameters": "同じパラメータで再試行します",
-          "view_details": "??? #{{id}} ??????"
+          "view_details": "ジョブ #{{id}} の詳細を表示"
         },
         "columns": {
           "actions": "アクション",
@@ -2556,7 +2556,7 @@
           "started_at": "に開始",
           "status": "状態",
           "tenant": "テナント",
-          "title": "??? #{{id}}"
+          "title": "ジョブ #{{id}}"
         },
         "empty": "仕事がありません",
         "errors": {
@@ -2579,17 +2579,17 @@
           "force": "力"
         },
         "messages": {
-          "cancelled": "??? #{{id}} ??????????",
-          "retry_queued": "??? #{{retryId}} ??????????? (#{{id}} ??)"
+          "cancelled": "ジョブ #{{id}} をキャンセルしました",
+          "retry_queued": "再試行 #{{retryId}} をキューに入れました (#{{id}} から)"
         },
         "priority": {
           "high": "高い",
           "low": "低い",
           "normal": "普通",
-          "tooltip": "priority={{priority}} (??????)"
+          "tooltip": "priority={{priority}} (小さいほど優先)"
         },
         "result": {
-          "invalid": "{{count}} ????"
+          "invalid": "{{count}} 件が無効"
         },
         "scope": {
           "all_tenants": "すべてのテナント"
@@ -2709,7 +2709,7 @@
           "backoff_window": "6 時間のバックオフ ウィンドウ内",
           "cache_age": "最古の {{oldest}} / 最新の {{newest}}",
           "content_stale": "スナップショットより新しいソース コンテンツ",
-          "event_at": "???? {{time}}",
+          "event_at": "イベント {{time}}",
           "no_events": "イベントはありません",
           "prometheus": "プロメテウスのテキスト形式",
           "tenants_routes": "{{tenants}} テナント x {{routes}} ルート"
@@ -2729,7 +2729,7 @@
         },
         "last_run": "最後に完了した実行",
         "messages": {
-          "job_queued": "??? #{{id}} ???????????"
+          "job_queued": "ジョブ #{{id}} をキューに入れました"
         },
         "placeholders": {
           "routes": "/about、/blog (空白 = すべて)",
@@ -2757,7 +2757,7 @@
           "tenant_slug": "テナントナメクジ"
         },
         "messages": {
-          "dry_run": "?????: {{count}} ?????????????????",
+          "dry_run": "ドライラン: {{count}} 件のスナップショットが削除される見込みです",
           "purged": "パージされた {{count}} スナップショット{{job}}"
         },
         "placeholders": {
@@ -2765,8 +2765,8 @@
           "tenant_slug": "オプション - すべて空白のままにします"
         },
         "result": {
-          "deleted": "{{count}} ?????????????????",
-          "would_delete": "{{count}} ????????????????"
+          "deleted": "{{count}} 件のスナップショットを削除しました",
+          "would_delete": "{{count}} 件のスナップショットが削除される見込みです"
         },
         "title": "ワイルドカードキャッシュのパージ"
       },
@@ -2792,7 +2792,7 @@
         },
         "title": "TTL検査官",
         "units": {
-          "days": "{{count}}?",
+          "days": "{{count}} 日",
           "hours": "{{count}}h",
           "minutes": "{{count}} 分"
         }
@@ -2962,7 +2962,7 @@
         "geographic_activity_density": "地理的な活動密度",
         "member_demographics": "会員層",
         "demand_supply_by_category": "カテゴリ別の需要と供給",
-        "demand_supply_note": "1.0 ??????????????????????????????????????????",
+        "demand_supply_note": "1.0 を超える比率は、そのカテゴリで需要が利用可能なオファーを上回っていることを意味します。",
         "monthly_engagement_metrics": "毎月のエンゲージメント指標",
         "volunteer_activity": "ボランティア活動",
         "help_request_analysis": "ヘルプリクエストの分析"
@@ -3000,8 +3000,8 @@
         "age_distribution": "年齢分布",
         "language_distribution": "言語の分布",
         "member_growth_12m": "過去 12 か月間のメンバーの増加",
-        "total_with_data": "?????????????? {{total}} ?",
-        "total_active_members": "????????? {{total}} ?"
+        "total_with_data": "人口統計データのあるメンバー {{total}} 人",
+        "total_active_members": "アクティブメンバー {{total}} 人"
       },
       "volunteer": {
         "total_hours": "合計時間",
@@ -5196,7 +5196,7 @@
     "checkout_failed": "チェックアウトに失敗しました",
     "checkout_failed_desc": "There was a problem processing your checkout. Please try again.",
     "checkout_success": "チェックアウトに成功しました",
-    "checkout_success_desc": "{{plan}} ?????????",
+    "checkout_success_desc": "現在 {{plan}} プランをご利用中です",
     "checkout_success_generic": "チェックアウトが正常に完了しました",
     "checkout_title": "チェックアウト",
     "choose_plan": "プランを選択",
@@ -5314,7 +5314,7 @@
     "upgrade_message": "アップグレード",
     "upgrade_message_placeholder": "アップグレード メッセージを入力してください...",
     "upgrade_sent": "アップグレードが送信されました",
-    "user_count_label": "{{count}} / {{max}} ????",
+    "user_count_label": "{{count}} / {{max}} ユーザー",
     "your_plan_usage": "プランの使用状況",
     "over_limit_warning": "プランの制限に達しました。続行するにはアップグレードしてください。",
     "upgrade_modal_desc": "プランをアップグレードすると、追加の機能と容量が利用可能になります。"
@@ -5357,7 +5357,7 @@
     "all": "すべて",
     "back": "戻る",
     "cancel": "キャンセル",
-    "delete_confirm_message": "?{{title}}?? を削除します。これを元に戻すことはできません。",
+    "delete_confirm_message": "「{{title}}」を削除しますか?これを元に戻すことはできません。",
     "delete_confirm_title": "ブログ投稿を削除する",
     "item_updated": "項目が更新されました",
     "label_actions": "アクション",
@@ -6335,7 +6335,7 @@
     "item_added": "カテゴリを追加しました",
     "item_deleted": "カテゴリが削除されました",
     "item_updated": "カテゴリを更新しました",
-    "label_category_actions": "カテ���リのアクション",
+    "label_category_actions": "カテゴリのアクション",
     "label_colour": "色",
     "label_created": "作成されました",
     "label_listings": "リスト",
@@ -7306,7 +7306,7 @@
     "slug_description": "ナメクジ",
     "slug_must_be_url_safe": "スラッグは URL セーフでなければなりません",
     "slug_reserved": "スラグ予約済み",
-    "slug_reserved_error": "?{{slug}}?????????????????????????????????",
+    "slug_reserved_error": "「{{slug}}」は予約済みのシステムルートです。別のスラッグを選択してください。",
     "slug_reserved_message": "スラグ「{{slug}}」はシステムによって予約されています。別のスラッグを選択してください。",
     "started": "開始しました",
     "stripe": "ストライプ",
@@ -7749,10 +7749,10 @@
     "status_completed": "完了しました",
     "status_in_progress": "進行中",
     "status_pending": "保留中",
-    "days_ago": "{{count}} ??",
-    "hours_ago": "{{count}} ???",
+    "days_ago": "{{count}} 日前",
+    "hours_ago": "{{count}} 時間前",
     "just_now": "Just Now",
-    "minutes_ago": "{{count}} ??"
+    "minutes_ago": "{{count}} 分前"
   },
   "data_table": {
     "admin_data_table": "データ",
@@ -8467,7 +8467,7 @@
     "gdpr_notify_dpa": "GDPR Notify Dpa",
     "gdpr_occurred": "GDPR Occurred",
     "gdpr_old_value": "GDPR Old Value",
-    "gdpr_overdue_requests": "{{count}} ?????? GDPR ?????????????",
+    "gdpr_overdue_requests": "{{count}} 件の期限超過リクエストに対応が必要です",
     "gdpr_overview": "GDPR Overview",
     "gdpr_pending_requests": "保留中のリクエスト",
     "gdpr_prevention_measures": "GDPR Prevention Measures",
@@ -8591,7 +8591,7 @@
     "notify_modal_intro": "Notify Modal Intro",
     "notify_non_accepted": "不受理通知",
     "overall_compliance": "全体的なコンプライアンス",
-    "pending_users_count": "{{count}} ?????????????????????????",
+    "pending_users_count": "{{count}} 人のメンバーがまだこのバージョンに同意していません",
     "placeholder_document_content": "文書の内容を入力してください...",
     "placeholder_title": "タイトルを入力してください...",
     "publish_version_confirm": "Publish Version Confirm",
@@ -8942,7 +8942,7 @@
     "groups_enabled": "有効なグループ",
     "health_check": "健康診断",
     "health_check_failed": "ヘルスチェックに失敗しました",
-    "health_check_success": "{{name}} ????? ({{time}} ???)",
+    "health_check_success": "{{name}} は正常です ({{time}} ミリ秒)",
     "hide_partnered": "パートナーを隠す",
     "import_csv_only": "CSVのみをインポート",
     "import_data": "データのインポート",
@@ -9247,13 +9247,13 @@
     "webhooks_response": "応答",
     "webhooks_retry": "再試行",
     "webhooks_retry_failed": "Webhook の再試行に失敗しました",
-    "webhooks_retry_success": "?????????? ({{code}}, {{time}} ???)",
+    "webhooks_retry_success": "再試行に成功しました ({{code}}, {{time}} ミリ秒)",
     "webhooks_save_failed": "Webhook の保存に失敗しました",
     "webhooks_secret_warning": "このシークレットは安全に保管してください。再度表示されることはありません",
     "webhooks_select_all": "すべて選択",
     "webhooks_test": "Webhook のテスト",
     "webhooks_test_failed": "Webhook テストに失敗しました",
-    "webhooks_test_success": "???????????? ({{code}}, {{time}} ???)",
+    "webhooks_test_success": "テスト配信に成功しました ({{code}}, {{time}} ミリ秒)",
     "webhooks_title": "Webhook",
     "webhooks_updated": "Webhook が更新されました",
     "webhooks_url_hint": "Webhook イベントを受信するエンドポイント URL",
@@ -9507,9 +9507,9 @@
     "import_success": "インポートに成功しました",
     "import_summary_committed": "Import Summary Committed",
     "import_summary_dry_run": "Import Summary Dry Run",
-    "import_summary_external_partners": "???????: ?? {{new}}????? {{skipped}}??? {{invalid}}",
+    "import_summary_external_partners": "外部パートナー: 新規 {{new}}、スキップ {{skipped}}、無効 {{invalid}}",
     "import_summary_heading": "インポートの概要",
-    "import_summary_partnerships": "????????: ?? {{new}}????? {{skipped}}??? {{invalid}}",
+    "import_summary_partnerships": "パートナーシップ: 新規 {{new}}、スキップ {{skipped}}、無効 {{invalid}}",
     "import_title": "インポート",
     "kpi_active_partnerships": "KPI アクティブなパートナーシップ",
     "kpi_external_partners": "KPI 外部パートナー",
@@ -10485,7 +10485,7 @@
     "templates_load_error": "テンプレートのロードに失敗しました",
     "templates_delete": "削除",
     "templates_delete_title": "テンプレートの削除",
-    "templates_delete_confirm": "?{{name}}????????????????????????????",
+    "templates_delete_confirm": "「{{name}}」を削除してもよろしいですか?この操作は元に戻せません。",
     "templates_delete_error": "テンプレートの削除に失敗しました",
     "templates_deleted": "テンプレートが削除されました",
     "stage_applied": "適用済み",
@@ -10756,7 +10756,7 @@
     "matched_user": "一致したユーザー",
     "review_details": "レビューの詳細",
     "reject_match": "一致を拒否する",
-    "rejecting_match_between": "{{user1}} ? {{user2}} ????????????",
+    "rejecting_match_between": "{{user1}} と {{user2}} のマッチを拒否しています",
     "rejection_reason_label": "拒否理由",
     "reviewed_at": "レビュー先",
     "reviewed_by": "レビュー者",
@@ -10954,11 +10954,11 @@
     "no_pending_description": "すべて完了しました - レビューを待っているアイテムはありません。",
     "notes_label": "注意事項",
     "notes_placeholder": "モデレートメモを追加...",
-    "posted_by": "{{name}} ???",
+    "posted_by": "{{name}} が投稿",
     "reason_label": "理由",
     "reason_placeholder": "理由を入力してください...",
     "reason_required": "理由が必要です",
-    "spam_score": "??????: {{score}}",
+    "spam_score": "スパムスコア: {{score}}",
     "stats": {
       "pending_count": "保留中",
       "flagged_count": "フラグ付き",
@@ -11594,7 +11594,7 @@
     "content_type_post": "役職",
     "content_approved": "コンテンツが承認されました",
     "content_rejected": "拒否されたコンテンツ",
-    "days_count": "{{count}} ?",
+    "days_count": "{{count}} 日",
     "detection_complete": "検出完了",
     "detection_failed": "検出に失敗しました",
     "ellipsis": "...",
@@ -11990,12 +11990,12 @@
         "title": "メンバー設定の読み取り",
         "intro_prefix": "[メンバー設定] タブには、フラグが設定されたすべてのメンバーが、選択した特定のオプションとともにリストされます。このデータは",
         "special_category": "特別なカテゴリの個人データ",
-        "intro_suffix": "GDPR ????????????????",
+        "intro_suffix": "GDPR の対象となるため、慎重に取り扱ってください。",
         "audit_logged": "すべてのビューは、ユーザーの ID とタイムスタンプとともに監査ログに記録されます。",
         "not_public": "メンバーの公開プロフィールに公開されることはありません。",
         "admin_only": "他のメンバーはこのタブを表示できません。アクセスするには管理者クラスの役割が必要です。",
         "confidential": "他のメンバーの旗について、保護チーム以外の人と議論しないでください。",
-        "activity_trail": "???????????????????????????????????????????????????????????????????????????????????????????????????????????? CSV ??????????????"
+        "activity_trail": "メンバーの行をクリックすると、コピーされたすべてのメッセージ、すべての担当変更、すべてのトリガー発動が時系列で表示される完全なアクティビティ証跡が開きます。証跡は、規制当局への対応やインシデント報告のために CSV としてダウンロードできます。"
       },
       "autonomy": {
         "aria": "大人の自主性の原則",
@@ -12007,7 +12007,7 @@
         "cannot": "できない",
         "rule_suffix": "メンバーの自己取り消しをブロックします。",
         "grounded_prefix": "これは根拠があります",
-        "guidance": "Safeguarding Ireland ??????????",
+        "guidance": "Safeguarding Ireland の成人自律性ガイダンス",
         "grounded_suffix": "(および同等の UK 法的ガイダンス - 「Making Safeguarding Personal」)。フラグを取り消すと、次のことがトリガーされます。",
         "trigger_reevaluation": "トリガーの再評価 -> 監視/承認要件が解除される可能性があります。",
         "admin_notification": "管理者/ブローカーへのアプリ内ベル通知 - 通知されますが、拒否することはできません。",
@@ -12845,7 +12845,7 @@
     "user_moved_and_promoted_to_tenant_super_admin": "ユーザーがテナントのスーパー管理者に移動され、昇格されました",
     "user_not_found": "ユーザーが見つかりません",
     "users": "ユーザー",
-    "users_count": "{{count}} ??????",
+    "users_count": "{{count}} ユーザー",
     "users_error": "ユーザーエラー",
     "users_error_detail": "ユーザー: {{error}}",
     "updated_at": "{{time}} を更新しました",
@@ -13522,7 +13522,7 @@
     "failed_count": "{{count}}が失敗しました",
     "generate_thumbnails": "サムネイルの生成",
     "generate_thumbnails_desc": "Generate Thumbnails.",
-    "generated_data_for": "???? {{count}} ?????????????",
+    "generated_data_for": "選択した {{count}} 件のデータタイプのデータを生成しました",
     "health_check_complete": "ヘルスチェックが完了しました",
     "health_check_failed": "ヘルスチェックに失敗しました",
     "health_check_unreachable": "ヘルスチェックに到達できません",
@@ -13580,7 +13580,7 @@
     "pwa_settings_heading": "Pwa設定",
     "restore_backup": "バックアップを復元する",
     "restore_blog_backup": "ブログのバックアップを復元する",
-    "restore_blog_confirm": "{{filename}} ???????????????????????????????????????",
+    "restore_blog_confirm": "{{filename}} からブログ投稿を復元しますか?現在のブログデータが上書きされる可能性があります。",
     "restore_complete": "復元が完了しました",
     "restore_error_occurred": "復元エラーが発生しました",
     "restore_failed": "復元に失敗しました",
@@ -13805,7 +13805,7 @@
     "desc_mark_as_under_investigation": "調査中としてマークする",
     "desc_positive_to_credit_negative_to_debit": "口座の貸方を正、借方を負とします",
     "desc_required_this_will_be_recorded_in_the_g": "Required.これは総勘定元帳に記録されます",
-    "download_statement_for": "{{name}} ??????????",
+    "download_statement_for": "{{name}} の明細をダウンロード",
     "failed_to_adjust_balance": "バランス調整に失敗しました",
     "failed_to_grant_credits": "クレジットの付与に失敗しました",
     "failed_to_load_alerts": "アラートのロードに失敗しました",
@@ -14242,14 +14242,14 @@
     "validation_password_min": "パスワードは8文字以上である必要があります",
     "validation_role_required": "役割は必須です",
     "tabs_aria": "User status filter",
-    "smart_search_label": "??????????",
-    "smart_search_placeholder": "????????????????????ID???...",
-    "smart_search_description": "????????????role:admin?pending?never logged in?id:42 ??????",
-    "smart_search_clear": "??????",
-    "smart_search_status_chip": "?????: {{status}}",
-    "smart_search_role_chip": "???: {{role}}",
-    "smart_search_text_chip": "???: {{query}}",
-    "role_super_admin": "???????"
+    "smart_search_label": "スマートユーザー検索",
+    "smart_search_placeholder": "名前、メール、電話番号、役割、ステータス、ID で検索...",
+    "smart_search_description": "名前、メール、電話番号、role:admin、pending、never logged in、id:42 などを試してください。",
+    "smart_search_clear": "検索をクリア",
+    "smart_search_status_chip": "ステータス: {{status}}",
+    "smart_search_role_chip": "役割: {{role}}",
+    "smart_search_text_chip": "クエリ: {{query}}",
+    "role_super_admin": "スーパー管理者"
   },
   "view_all": "すべて見る",
   "visibility_rules": {
@@ -14274,7 +14274,7 @@
       "resources": "リソース",
       "volunteering": "ボランティア活動",
       "exchange_workflow": "交換ワークフロー",
-      "organisations": "��織",
+      "organisations": "組織",
       "federation": "連邦",
       "connections": "接続",
       "reviews": "レビュー",
@@ -14288,7 +14288,7 @@
     "application_approved": "Application Approved",
     "application_declined": "Application Declined",
     "approve": "承認する",
-    "by_name": "{{name}} ???",
+    "by_name": "{{name}} による",
     "col_actions": "アクション",
     "col_applicant": "申請者",
     "col_applied": "適用済み",
@@ -14335,7 +14335,7 @@
     "adjust_balance": "Adjust Balance",
     "adjust_failed": "Adjust failed",
     "adjust_wallet_title": "Adjust Wallet",
-    "alert_pending_applications": "{{count}} ?????????????",
+    "alert_pending_applications": "{{count}} 件の応募がレビュー待ちです",
     "amount_label": "Amount",
     "amount_nonzero": "Amount Nonzero",
     "amount_placeholder": "例えば50 または -20",
@@ -14356,16 +14356,16 @@
     "assign_dlp": "DLP の割り当て",
     "assign_dlp_title": "DLP の割り当て",
     "balance_adjusted": "Balance Adjusted",
-    "bulk_approve": "?? ({{count}})",
-    "bulk_approved": "{{count}} ???????????",
-    "bulk_decline": "?? ({{count}})",
-    "bulk_declined": "{{count}} ???????????",
-    "bulk_selected": "{{count}} ????????????????",
+    "bulk_approve": "承認 ({{count}})",
+    "bulk_approved": "{{count}} 件の応募を承認しました",
+    "bulk_decline": "却下 ({{count}})",
+    "bulk_declined": "{{count}} 件の応募を却下しました",
+    "bulk_selected": "{{count}} 件の保留中レコードが選択されています",
     "bulk_selected_plural": "{{count}}保留中のレコードが選択されました",
     "bulk_verify": "Bulk Verify",
-    "bulk_verify_fail": "{{count}} ?????????????????",
+    "bulk_verify_fail": "{{count}} 件のレコードの検証に失敗しました",
     "bulk_verify_fail_plural": "{{count}}レコードの検証に失敗しました",
-    "bulk_verify_success": "{{count}} ?????????????",
+    "bulk_verify_success": "{{count}} 件のレコードを検証しました",
     "bulk_verify_success_plural": "{{count}}レコードが検証されました",
     "campaign_analytics": "キャンペーン分析",
     "change_dlp": "DLP の変更",
@@ -14487,10 +14487,10 @@
     "expense_type_supplies": "用品",
     "expense_type_travel": "旅行",
     "expired": "期限切れ",
-    "expires_on": "{{date}} ?????",
-    "expiring_consents_warning": "{{count}} ????????30?????????????",
+    "expires_on": "{{date}} に期限切れ",
+    "expiring_consents_warning": "{{count}} 件の保護者同意が 30 日以内に期限切れになります",
     "expiring_consents_warning_plural": "{{count}}保護者の同意は 30 日以内に期限切れになります",
-    "expiry_alert_title": "{{count}} ?????????30?????????????",
+    "expiry_alert_title": "{{count}} 件のトレーニング記録が 30 日以内に期限切れになります",
     "expiry_alert_title_plural": "{{count}}トレーニング記録の有効期限は 30 日以内です",
     "export_csv": "CSVのエクスポート",
     "export_donations": "輸出寄付",
@@ -14676,7 +14676,7 @@
     "reminder_job_sent": "Reminder job sent {{count}} notification(s)",
     "reminder_job_sent_plural": "リマインダー ジョブが{{count}}通知を送信しました",
     "reminder_job_failed": "リマインダージョブの送信に失敗しました",
-    "reported_by": "{{name}} ???",
+    "reported_by": "{{name}} による報告",
     "required": "必須",
     "resolution_notes": "解決メモ",
     "resolution_notes_placeholder": "解決策のメモを入力してください...",
@@ -14711,9 +14711,9 @@
     "search_organizations": "Search Organizations",
     "select_all": "Select All",
     "select_application": "Select Application",
-    "select_record": "{{name}} ???",
+    "select_record": "{{name}} を選択",
     "select_status": "Select Status",
-    "selected_count": "{{count}} ?????",
+    "selected_count": "{{count}} 件選択済み",
     "send_test": "Send Test",
     "stat_approved_hours": "Stat Approved Hours",
     "stat_approved_total": "Stat Approved Total",
@@ -14748,7 +14748,7 @@
     "status_suspended": "一時停止中",
     "status_unknown": "未知",
     "status_update_failed": "Update Failed",
-    "status_updated": "?? {{status}}",
+    "status_updated": "組織 {{status}}",
     "status_verified": "確認済み",
     "submit_adjustment": "Submit Adjustment",
     "submit_review": "Submit Review",
@@ -14764,7 +14764,7 @@
     "tab_webhooks": "Webhook",
     "target_amount": "目標金額",
     "target_hours": "目標時間",
-    "test_reminder_sent": "?????????? {{count}} ???????????",
+    "test_reminder_sent": "リマインダージョブが {{count}} 件の通知を送信しました",
     "test_reminder_failed": "リマインダージョブの送信に失敗しました",
     "test_reminder_title": "テストリマインダー",
     "timing_value": "タイミング値",
@@ -14941,7 +14941,7 @@
     "type_external_label": "外部リンク",
     "type_external_desc": "外部ウェブサイトへのリンク",
     "type_dropdown_label": "ドロップダウン",
-    "type_dropdown_desc": "子項目を���むドロップダウン メニュー",
+    "type_dropdown_desc": "子項目を含むドロップダウン メニュー",
     "type_page_label": "カスタムページ",
     "type_page_desc": "このプラットフォームのカスタム ページへのリンク",
     "type_route_label": "名前付きルート",
@@ -15510,7 +15510,7 @@
     "bulk_update_desc": "一括更新。",
     "bulk_update_tenants": "テナントの一括更新",
     "confirm_bulk_move": "一括移動してもよろしいですか?",
-    "confirm_bulk_update": "一括更新してもよろしいです��?",
+    "confirm_bulk_update": "一括更新してもよろしいですか?",
     "deselect_all": "すべての選択を解除",
     "grant_sa_note": "グラント・サ",
     "grant_sa_on_arrival": "到着時に Sa を付与する",
@@ -15597,7 +15597,7 @@
     "tenant_removed_from_whitelist": "テナントがホワイトリストから削除されました",
     "view": "見る",
     "whitelisted_tenants_aria": "ホワイトリストに登録されたテナント",
-    "whitelisted_tenants_count": "???????? ({{count}})"
+    "whitelisted_tenants_count": "ホワイトリスト登録済みテナント ({{count}})"
   },
   "impact_report_labels": {
     "transactions": "取引",
@@ -15659,7 +15659,7 @@
     "filter_application": "アプリケーション",
     "filter_cron": "クロン",
     "filter_errors": "エラー",
-    "lines_count": "{{count}} ?",
+    "lines_count": "{{count}} 行",
     "search_placeholder": "検索を入力してください...",
     "total_files": "総ファイル数",
     "total_size": "合計サイズ"
@@ -15669,7 +15669,7 @@
     "associated_listing": "関連リスト",
     "category": "カテゴリ",
     "distance": "距離",
-    "listing_owner": "リ���ティングの所有者",
+    "listing_owner": "リスティングの所有者",
     "match_information": "試合情報",
     "match_reasons": "一致理由",
     "match_score": "試合スコア",
@@ -15926,7 +15926,7 @@
     "start_writing": "書き始めてください..."
   },
   "seed_generator": {
-    "count_aria_label": "{{label}} ?",
+    "count_aria_label": "{{label}} の件数",
     "data_types_heading": "データ型",
     "development_only": "開発のみ",
     "generate_button": "生成する",
@@ -16683,7 +16683,7 @@
             "name": "信頼できる",
             "color": "緑",
             "description": "口コミで活躍中。",
-            "unlocks": "Warmth Pass ?????????????????"
+            "unlocks": "Warmth Pass の対象となり、ケアの推薦を受けられます。"
           },
           "3": {
             "name": "確認済み",
@@ -16705,14 +16705,14 @@
         "save_failed": "信頼層の設定を保存できませんでした。"
       },
       "messages": {
-        "recomputed": "{{count}} ?????????????????????",
+        "recomputed": "{{count}} 人のメンバーの信頼レベルを再計算しました。",
         "saved": "Trust tier settings saved."
       },
       "recompute_confirm": "すべてのメンバーの信頼層を再計算しますか?これには数分かかる場合があります。"
     },
     "operating_policy": {
       "title": "運営方針",
-      "subtitle": "Caring Community ?????????????: ??????????????????",
+      "subtitle": "Caring Community 運用ポリシーワークショップ: ソフトウェアが推測できないルール。",
       "loading": "操作ポリシーをロードしています",
       "last_updated": "最終更新日: {{date}}",
       "meta": {
@@ -16729,7 +16729,7 @@
         "methodology_prefix": "の",
         "methodology_middle": "時間単価と予防乗数フィールドでは、",
         "methodology_suffix": "hourly rate and prevention multiplier fields use the Caring Community methodology. If your community uses a different currency or local care economics, set the rate to your local formal-care hourly equivalent and the multiplier to 1.0.",
-        "methodology_tail": "????????????????????????????????? 1.0 ???????"
+        "methodology_tail": "パイロットでは、レートを地域の正規ケアの時給相当額に、乗数を 1.0 に設定してください。"
       },
       "sections": {
         "approvals": "承認と信頼",
@@ -16749,11 +16749,11 @@
           "help": "メンバーが信頼できるレビュー担当者になるか、信頼できるレベルに到達するまでの最小承認時間。"
         },
         "sla_first_response_hours": {
-          "label": "SLA: ???? (??)",
+          "label": "SLA: 初回対応 (時間)",
           "help": "新しいヘルプ リクエストに対する最初の応答までの目標時間を設定します。"
         },
         "sla_help_request_hours": {
-          "label": "SLA: ?????????? (??)",
+          "label": "SLA: 支援リクエストの解決 (時間)",
           "help": "ヘルプ リクエストを終了または一致させるまでの目標時間を設定します。"
         },
         "legacy_hour_settlement": {
@@ -16765,8 +16765,8 @@
           "help": "メンバーの授受の不均衡により、コーディネーターのチェックインがトリガーされた場合。"
         },
         "safeguarding_escalation_user_id": {
-          "label": "????????????????????? (???? ID)",
-          "help": "??????????????????????????? ID??????????????????????????"
+          "label": "セーフガーディングエスカレーションの担当者 (ユーザー ID)",
+          "help": "セーフガーディングエスカレーションを受け取るユーザー ID。空欄の場合は管理者グループが使用されます。"
         },
         "chf_hourly_rate": {
           "label": "CHF 1 時間あたりの社会的価値",
@@ -16888,7 +16888,7 @@
       "not_available": "トリガー監査データなし",
       "total": "合計",
       "trigger_score": "トリガースコア",
-      "unconfirmed": "{{count}} ??????????????",
+      "unconfirmed": "{{count}} 件は受理済みですが未確認です",
       "webhook_confirmed": "プロバイダー Webhook で確認済み",
       "window_days": "{{days}} の日枠"
     },
@@ -17000,7 +17000,7 @@
       "confirm_remove": "{{email}} を抑制リストから削除しますか?再度メールを受信できるようになります。",
       "remove": "抑制を解除する",
       "remove_failed": "抑制を解除できませんでした。",
-      "removed": "{{email}} ????????",
+      "removed": "{{email}} を削除しました。",
       "columns": {
         "actions": "アクション",
         "detail": "詳細",
@@ -17077,7 +17077,7 @@
       },
       "group_members_tenant_mismatch": {
         "title": "グループメンバーシップテナントの不一致",
-        "body": "{{count}} ???????????????????????????????????????????????????????????????????????????"
+        "body": "{{count}} 件のグループメンバーシップが、所属グループとは異なるテナントに属しています。これらの行は、誤ったテナントへの役割および通知ルーティングのリスクがあります。"
       },
       "group_member_joined_without_owner_notification_queue": {
         "title": "グループ参加通知がキューに登録されませんでした",
@@ -17085,7 +17085,7 @@
       },
       "instant_notifications_stuck_pending": {
         "title": "インスタントメールが止まってしまう",
-        "body": "{{count}} ?????????? {{minutes}} ???????????"
+        "body": "{{count}} 件のインスタント通知メールが {{minutes}} 分以上保留中です。"
       },
       "notification_queue_failed_recently": {
         "title": "通知メールが失敗しました",
@@ -17097,19 +17097,19 @@
       },
       "notification_queue_missing_tenant_id": {
         "title": "通知キューにテナントがありません",
-        "body": "{{count}} ???????????????????????????????????????????????????????"
+        "body": "{{count}} 件のキュー済み通知が、テナント所有権のないまま保留中または処理中です。修復されるまで確実にルーティングできません。"
       },
       "notification_queue_tenant_mismatch": {
         "title": "通知キューのテナントの不一致",
-        "body": "{{count}} ????????????????????????????????????????????????????????????????"
+        "body": "{{count}} 件のキュー済み通知が、受信者ユーザーとは異なるテナントに属しています。これらの行は誤ったテナントへのルーティングのリスクがあります。"
       },
       "notifications_missing_tenant_id": {
         "title": "テナントが見つからない通知",
-        "body": "{{count}} ??????????????????????????????????????????????"
+        "body": "{{count}} 件のアプリ内通知にテナント所有権がないため、ユーザーに一貫して表示されない可能性があります。"
       },
       "notifications_tenant_mismatch": {
         "title": "通知テナントの不一致",
-        "body": "{{count}} ?????????????????????????????????????????????????????????????"
+        "body": "{{count}} 件のアプリ内通知が、受信者ユーザーとは異なるテナントに属しています。これらの行はテナント間の表示障害のリスクがあります。"
       },
       "notification_queue_marked_sent_without_email_log": {
         "title": "電子メールによる証拠なしで送信済みとマークされた通知",
@@ -17117,7 +17117,7 @@
       },
       "newsletter_queue_missing_tenant_id": {
         "title": "ニュースレターのキューにテナントがありません",
-        "body": "{{count}} ??????????????????????????????????????????????????"
+        "body": "{{count}} 件のニュースレターキュー行にテナント所有権がありません。修復されるまで確実にルーティングできません。"
       },
       "newsletter_queue_tenant_mismatch": {
         "title": "ニュースレターキューのテナントの不一致",
@@ -17149,7 +17149,7 @@
       },
       "marketplace_report_received_without_notification_outbox": {
         "title": "マーケットプレイスのレポート受信メールがキューに登録されませんでした",
-        "body": "?? {{window_hours}} ??????{{count}} ????????????????????????????????????????"
+        "body": "過去 {{window_hours}} 時間に、{{count}} 件のマーケットプレイス報告が、対応する受領メール通知行なしで受信されました。"
       },
       "marketplace_report_acknowledged_without_notification_outbox": {
         "title": "マーケットプレイスのレポート確認メールがキューに登録されませんでした",
@@ -17161,7 +17161,7 @@
       },
       "marketplace_report_appealed_without_notification_outbox": {
         "title": "マーケットプレイス レポートの異議メールがキューに登録されませんでした",
-        "body": "?? {{window_hours}} ??????{{count}} ???????????????????????????????????????????????????"
+        "body": "過去 {{window_hours}} 時間に、{{count}} 件のマーケットプレイス報告の異議申し立てが、対応する受領メール通知行なしで提出されました。"
       },
       "marketplace_report_appeal_resolved_without_notification_outbox": {
         "title": "マーケットプレイス レポートの異議申し立て解決メールがキューに登録されませんでした",
@@ -17217,11 +17217,11 @@
       },
       "direct_email_send_paths_remaining": {
         "title": "従来のダイレクトメールパスはそのまま残ります",
-        "body": "{{count}} ?????????????????????????????????????????????????????????????????????????????????????"
+        "body": "{{count}} 件の生のメール送信パスが、依然として統合通知ディスパッチャーを迂回しています。すべてのモジュールが監査可能なディスパッチャーを経由するまで、これらのパスの強化を続けてください。"
       },
       "email_dispatch_missing_explicit_tenant": {
         "title": "ディスパッチャーのメールに明示的なテナントがありません",
-        "body": "{{count}} ???????????????????????????????????????????????????cron?Webhook????????????????????????tenant_id ??? tenantId ?????????????"
+        "body": "{{count}} 件のメールディスパッチャー呼び出し箇所が、依然として推測されたテナントコンテキストに依存しています。キュー、cron、Webhook、テナント間のすべての送信を監査可能にするため、tenant_id または tenantId を明示的に渡してください。"
       },
       "email_trigger_audit_failed": {
         "title": "電子メールトリガー監査に失敗しました",

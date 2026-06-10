@@ -17,7 +17,7 @@
     "matches_waiting": "مباريات {{count}} الجديدة في انتظارك",
     "top_matches": "أهم المباريات",
     "by_poster": "بواسطة {{name}}",
-    "hot_badge": "{{count}} ?????",
+    "hot_badge": "{{count}} رائج",
     "mutual_badge": "{{count}} المتبادل"
   },
   "match_approval": {
@@ -51,9 +51,9 @@
     "what_they_said": "ماذا قالوا"
   },
   "exchange": {
-    "label_service": "??????",
-    "label_requester": "???? ?????",
-    "label_provider": "???????",
+    "label_service": "الخدمة",
+    "label_requester": "مقدم الطلب",
+    "label_provider": "المزوّد",
     "label_proposed_hours": "الساعات المقترحة",
     "label_approved_hours": "الساعات المعتمدة",
     "label_hours_transferred": "الساعات المنقولة",
@@ -95,7 +95,7 @@
     "heading_accepted": "تم قبول الطلب!",
     "tenant_volunteering": "{{community}} التطوعية",
     "approved_body": "أخبار عظيمة! تمت الموافقة على طلبك التطوعي <strong style=\"color: #16a34a;\"></strong>.",
-    "label_opportunity": "??????",
+    "label_opportunity": "الفرصة",
     "approved_next": "يمكنك الآن الاشتراك في المناوبات والبدء في تسجيل ساعات العمل التطوعي الخاصة بك. شكرا لك على إحداث فرق في مجتمعك!",
     "btn_view_opportunity": "عرض الفرصة",
     "heading_declined": "تحديث التطبيق",

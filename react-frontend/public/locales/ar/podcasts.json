@@ -114,9 +114,9 @@
     "media_status": {
       "pending": "قيد الانتظار",
       "complete": "مكتمل",
-      "ready_for_processing": "???? ????????",
+      "ready_for_processing": "جاهز للمعالجة",
       "clean": "ينظف",
-      "scan_unavailable": "?????? ??? ????",
+      "scan_unavailable": "الماسح غير متاح",
       "failed": "فشل",
       "blocked": "محظور",
       "infected": "محظور",

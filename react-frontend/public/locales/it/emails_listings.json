@@ -20,10 +20,10 @@
       "days_one": "1 giorno",
       "days_other": "{{count}} giorni",
       "urgent_note": "Agisci presto per mantenere visibile la tua inserzione!",
-      "expired_subject": "Il tuo annuncio \"{{title}}\" ? scaduto",
+      "expired_subject": "Il tuo annuncio \"{{title}}\" è scaduto",
       "expired_title": "Inserzione scaduta",
       "expired_preview": "La tua inserzione è scaduta: rinnovala per rimanere visibile",
-      "expired_body": "Il tuo annuncio <strong>\"{{title}}\"</strong> ? scaduto. Rinnovalo ora per continuare a ricevere risposte dai membri della comunit?.",
+      "expired_body": "Il tuo annuncio <strong>\"{{title}}\"</strong> è scaduto. Rinnovalo ora per continuare a ricevere risposte dai membri della comunità.",
       "expired_cta": "Rinnova l'elenco"
     },
     "approved": {

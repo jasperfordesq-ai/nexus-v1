@@ -20,7 +20,7 @@
   "loading_label": "コミュニティの更新を読み込み中...",
   "empty_title": "まだ投稿はありません",
   "empty_desc": "コミュニティと何かを共有する最初の人になりましょう！",
-  "empty_filtered": "??????????????????????????????????????",
+  "empty_filtered": "このビューに一致するものは現在ありません。別のフィルターをお試しください。",
   "empty_filtered_with_filter": "現在 {{filter}} の更新はありません。すべての投稿を見るか、新しい会話を始めてみてください。",
   "filter": {
     "all": "すべて",
@@ -229,8 +229,8 @@
     "video": "動画",
     "video_remove": "動画を削除",
     "file_size_mb": "{{name}} ({{size}}MB)",
-    "listing_preview_alt": "??????????",
-    "image_preview_alt": "????????????",
+    "listing_preview_alt": "リスティングのプレビュー",
+    "image_preview_alt": "アップロードのプレビュー",
     "type_tabs_aria": "コンテンツタイプを作成する"
   },
   "moderation": {
@@ -443,9 +443,9 @@
     "aria_label": "動画",
     "unavailable": "動画を視聴できません",
     "unavailable_desc": "この動画を読み込めませんでした。",
-    "default_title": "??",
-    "play_label": "?????: {{title}}",
-    "thumbnail_alt": "{{title}} ??????"
+    "default_title": "動画",
+    "play_label": "動画を再生: {{title}}",
+    "thumbnail_alt": "{{title}} のサムネイル"
   },
   "trending": {
     "title": "トレンド",
@@ -548,7 +548,7 @@
     "go_to_image": "画像 {{number}} に移動",
     "more_images": "{{count}} 枚の画像がさらにあります",
     "video_of": "動画 {{current}} / {{total}}",
-    "role_description": "?????"
+    "role_description": "カルーセル"
   },
   "lightbox": {
     "aria_label": "画像ビューア",

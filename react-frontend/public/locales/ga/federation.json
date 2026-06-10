@@ -1,6 +1,6 @@
 {
-  "relay_no_remote_node": "N? f?idir an n?d cianda don chuntas a aimsi?: {{account}}",
-  "relay_no_route_to_node": "N?l aon bhealach chuig an n?d: {{node}}",
+  "relay_no_remote_node": "Ní féidir an nód cianda don chuntas a aimsiú: {{account}}",
+  "relay_no_route_to_node": "Níl aon bhealach chuig an nód: {{node}}",
   "relay_url_blocked": "URL sprice athsheolta bactha ag scagaire slándála",
   "external": "Seachtrach",
   "hub": {
@@ -400,10 +400,10 @@
     "browse_members": "Brabhsáil Baill",
     "browse_listings": "Brabhsáil Liostaí",
     "available_features": "Gnéithe atá ar Fáil",
-    "level_prefix": "Leibh?al {{level}}",
+    "level_prefix": "Leibhéal {{level}}",
     "member_count_one": "{{count}} bhall",
     "member_count_other": "{{count}} ball",
-    "partner_since": "Comhph?irt? ? {{date}}"
+    "partner_since": "Comhpháirtí ó {{date}}"
   },
   "onboarding": {
     "page_title": "Socrú Cónaidhm",
@@ -476,10 +476,10 @@
     "toast_welcome": "Fáilte chuig líonra na Cónaidhme!",
     "toast_generic_error": "Tharla earráid gan choinne. Bain triail eile as.",
     "kilometers_short": "km",
-    "progress_aria": "C?im {{current}} as {{total}}",
+    "progress_aria": "Céim {{current}} as {{total}}",
     "up_to_km": "suas le {{km}} km",
-    "partners_available_one": "{{count}} phobal comhph?irt?ochta ar f?il",
-    "partners_available_other": "{{count}} pobal comhph?irt?ochta ar f?il",
+    "partners_available_one": "{{count}} phobal comhpháirtíochta ar fáil",
+    "partners_available_other": "{{count}} pobal comhpháirtíochta ar fáil",
     "member_count_one": "{{count}} bhall",
     "member_count_other": "{{count}} ball",
     "and_more": "+{{count}} eile"
@@ -536,6 +536,6 @@
     "anonymous": "Gan ainm",
     "rating_label": "Rátáilte {{rating}} as 5",
     "from_partner": "trí {{partner}}",
-    "title": "L?irmheasanna"
+    "title": "Léirmheasanna"
   }
 }

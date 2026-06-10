@@ -478,8 +478,8 @@
     "kilometers_short": "km",
     "progress_aria": "Passaggio {{current}} di {{total}}",
     "up_to_km": "fino a {{km}} km",
-    "partners_available_one": "{{count}} comunit? partner disponibile",
-    "partners_available_other": "{{count}} comunit? partner disponibili",
+    "partners_available_one": "{{count}} comunità partner disponibile",
+    "partners_available_other": "{{count}} comunità partner disponibili",
     "member_count_one": "{{count}} membro",
     "member_count_other": "{{count}} membri",
     "and_more": "+{{count}} altri"

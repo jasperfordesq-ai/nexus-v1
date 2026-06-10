@@ -388,7 +388,7 @@
     "updated_success": "تم تحديث القائمة بنجاح!",
     "updated_error": "فشل في تحديث القائمة",
     "updated_error_retry": "فشل في تحديث القائمة. يرجى المحاولة مرة أخرى.",
-    "action_edit": "?????"
+    "action_edit": "تعديل"
   },
   "my_listings": {
     "page_title": "قوائمي - السوق",

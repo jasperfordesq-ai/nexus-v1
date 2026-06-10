@@ -47,7 +47,7 @@
     "orgs_pending_one": "{{count}}Organisation ausstehend",
     "orgs_pending_other": "{{count}}Organisationen ausstehend",
     "orgs_pending_text": "Freiwilligenorganisationen warten auf Genehmigung",
-    "review": "Pr?fen"
+    "review": "Prüfen"
   },
   "modules": {
     "section_title": "Plattformmodule",

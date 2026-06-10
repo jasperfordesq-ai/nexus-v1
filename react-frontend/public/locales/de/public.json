@@ -612,7 +612,7 @@
       "login_link": "Anmelden",
       "login_prompt_after": "für schnelleren Support."
     },
-    "turnstile_error": "Sicherheitspr?fung konnte nicht geladen werden. Aktualisieren Sie die Seite und versuchen Sie es erneut."
+    "turnstile_error": "Sicherheitsprüfung konnte nicht geladen werden. Aktualisieren Sie die Seite und versuchen Sie es erneut."
   },
   "faq": {
     "page_title": "Häufig gestellte Fragen",

@@ -1,6 +1,6 @@
 {
   "title": "Messages",
-  "conversation_with": "{{name}} ? Messages",
+  "conversation_with": "{{name}} — Messages",
   "new_message": "Nouveau message",
   "search_placeholder": "Rechercher des conversations...",
   "empty": "Aucun message pour l'instant",
@@ -139,18 +139,18 @@
   "translate": {
     "translate": "Traduire",
     "translate_to": "Traduire en",
-    "view_original": "Voir l?original",
+    "view_original": "Voir l'original",
     "show_translation": "Afficher la traduction",
     "translating": "Traduction en cours...",
-    "translation_failed": "La traduction a ?chou?. Veuillez r?essayer.",
+    "translation_failed": "La traduction a échoué. Veuillez réessayer.",
     "translated_label": "Traduit"
   },
   "translate.translate": "Traduire",
   "translate.translate_to": "Traduire en",
-  "translate.view_original": "Voir l?original",
+  "translate.view_original": "Voir l'original",
   "translate.show_translation": "Afficher la traduction",
   "translate.translating": "Traduction en cours...",
-  "translate.translation_failed": "La traduction a ?chou?. Veuillez r?essayer.",
+  "translate.translation_failed": "La traduction a échoué. Veuillez réessayer.",
   "translate.translated_label": "Traduit",
   "auto_translate": {
     "enable": "Traduction automatique",
@@ -158,22 +158,22 @@
     "disabled_toast": "Traduction automatique désactivée",
     "translating_all": "Traduction des messages...",
     "tooltip_off": "Traduire automatiquement tous les messages",
-    "tooltip_on": "La traduction automatique est activ?e ? cliquez pour la d?sactiver",
+    "tooltip_on": "La traduction automatique est activée — cliquez pour la désactiver",
     "active_banner": "Les messages de cette conversation sont automatiquement traduits dans votre langue.",
-    "turn_off": "D?sactiver"
+    "turn_off": "Désactiver"
   },
   "translate_hint": {
     "title": "Traduction disponible",
-    "body": "Vous et cette personne pouvez chacun ?crire dans votre propre langue. Touchez \"Traduire\" sur n?importe quel message pour le lire dans la v?tre, ou utilisez le bouton de traduction dans l?en-t?te pour tout traduire automatiquement.",
-    "dismiss": "Masquer l?indication de traduction"
+    "body": "Vous et cette personne pouvez chacun écrire dans votre propre langue. Touchez \"Traduire\" sur n'importe quel message pour le lire dans la vôtre, ou utilisez le bouton de traduction dans l'en-tête pour tout traduire automatiquement.",
+    "dismiss": "Masquer l'indication de traduction"
   },
   "translate_hint.title": "Traduction disponible",
-  "translate_hint.body": "Vous et cette personne pouvez chacun ?crire dans votre propre langue. Touchez \"Traduire\" sur n?importe quel message pour le lire dans la v?tre, ou utilisez le bouton de traduction dans l?en-t?te pour tout traduire automatiquement.",
-  "translate_hint.dismiss": "Masquer l?indication de traduction",
+  "translate_hint.body": "Vous et cette personne pouvez chacun écrire dans votre propre langue. Touchez \"Traduire\" sur n'importe quel message pour le lire dans la vôtre, ou utilisez le bouton de traduction dans l'en-tête pour tout traduire automatiquement.",
+  "translate_hint.dismiss": "Masquer l'indication de traduction",
   "auto_translate.tooltip_off": "Traduire automatiquement tous les messages",
-  "auto_translate.tooltip_on": "La traduction automatique est activ?e ? cliquez pour la d?sactiver",
+  "auto_translate.tooltip_on": "La traduction automatique est activée — cliquez pour la désactiver",
   "auto_translate.active_banner": "Les messages de cette conversation sont automatiquement traduits dans votre langue.",
-  "auto_translate.turn_off": "D?sactiver",
+  "auto_translate.turn_off": "Désactiver",
   "new_group": "Nouveau groupe",
   "create_group": "Créer un groupe",
   "create_group_title": "Créer une conversation de groupe",

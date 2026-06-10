@@ -20,10 +20,10 @@
       "days_one": "1 jour",
       "days_other": "{{count}} jours",
       "urgent_note": "Agissez vite pour garder votre annonce visible !",
-      "expired_subject": "Votre annonce \"{{title}}\" a expir?",
+      "expired_subject": "Votre annonce \"{{title}}\" a expiré",
       "expired_title": "Annonce expirée",
       "expired_preview": "Votre annonce a expiré : renouvelez-la pour rester visible",
-      "expired_body": "Votre annonce <strong>\"{{title}}\"</strong> a expir?. Renouvelez-la maintenant pour continuer ? recevoir des r?ponses des membres de la communaut?.",
+      "expired_body": "Votre annonce <strong>\"{{title}}\"</strong> a expiré. Renouvelez-la maintenant pour continuer à recevoir des réponses des membres de la communauté.",
       "expired_cta": "Renouveler l'annonce"
     },
     "approved": {

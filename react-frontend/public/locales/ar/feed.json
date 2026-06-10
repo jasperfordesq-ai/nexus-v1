@@ -20,7 +20,7 @@
   "loading_label": "جارٍ تحميل تحديثات المجتمع...",
   "empty_title": "لا توجد منشورات حتى الآن",
   "empty_desc": "كن أول من يشارك شيئًا مع مجتمعك!",
-  "empty_filtered": "?? ???? ?? ????? ??? ????? ????. ???? ?????? ???????.",
+  "empty_filtered": "لا يوجد ما يطابق هذا العرض حاليًا. جرّب عامل تصفية مختلفًا.",
   "empty_filtered_with_filter": "لا توجد تحديثات من نوع {{filter}} الآن. جرّب جميع المنشورات أو ابدأ محادثة جديدة.",
   "filter": {
     "all": "الكل",
@@ -229,8 +229,8 @@
     "video": "فيديو",
     "video_remove": "إزالة الفيديو",
     "file_size_mb": "{{name}} ({{size}}ميجابايت)",
-    "listing_preview_alt": "?????? ???????",
-    "image_preview_alt": "?????? ?????",
+    "listing_preview_alt": "معاينة الإعلان",
+    "image_preview_alt": "معاينة الرفع",
     "type_tabs_aria": "يؤلف نوع المحتوى"
   },
   "moderation": {
@@ -443,9 +443,9 @@
     "aria_label": "فيديو",
     "unavailable": "الفيديو غير متاح",
     "unavailable_desc": "تعذّر تحميل هذا الفيديو.",
-    "default_title": "?????",
-    "play_label": "????? ???????: {{title}}",
-    "thumbnail_alt": "???? ????? ?? {{title}}"
+    "default_title": "فيديو",
+    "play_label": "تشغيل الفيديو: {{title}}",
+    "thumbnail_alt": "صورة مصغرة لـ {{title}}"
   },
   "trending": {
     "title": "الأكثر رواجاً",
@@ -548,7 +548,7 @@
     "go_to_image": "اذهب إلى الصورة {{number}}",
     "more_images": "{{count}} صور إضافية",
     "video_of": "فيديو {{current}} من {{total}}",
-    "role_description": "?????"
+    "role_description": "شريط عرض دوّار"
   },
   "lightbox": {
     "aria_label": "عارض الصور",

@@ -62,7 +62,7 @@
     "expiry": "Este enlace expira en {{hours}} horas."
   },
   "password_reset": {
-    "subject": "Restablece tu contrase?a ? {{community}}",
+    "subject": "Restablece tu contraseña — {{community}}",
     "title": "Restablece tu contraseña",
     "preview": "Solicitaste un enlace para restablecer la contraseña",
     "greeting": "Hola {{name}},",
@@ -91,7 +91,7 @@
     "description": "Descripción: {{description}}"
   },
   "review_request": {
-    "subject": "Deja una rese?a para :name",
+    "subject": "Deja una reseña para :name",
     "greeting": "Hola :name,",
     "body": "¿Cómo fue tu intercambio con :name? Deja una reseña para ayudar a la comunidad.",
     "cta": "Dejar Reseña"

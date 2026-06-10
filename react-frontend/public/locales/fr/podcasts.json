@@ -114,7 +114,7 @@
     "media_status": {
       "pending": "En attente",
       "complete": "Complet",
-      "ready_for_processing": "Pr?t pour le traitement",
+      "ready_for_processing": "Prêt pour le traitement",
       "clean": "Faire le ménage",
       "scan_unavailable": "Analyseur indisponible",
       "failed": "Échoué",

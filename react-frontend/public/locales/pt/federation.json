@@ -1,6 +1,6 @@
 {
-  "relay_no_remote_node": "N?o ? poss?vel determinar o n? remoto da conta: {{account}}",
-  "relay_no_route_to_node": "Sem rota para o n?: {{node}}",
+  "relay_no_remote_node": "Não é possível determinar o nó remoto da conta: {{account}}",
+  "relay_no_route_to_node": "Sem rota para o nó: {{node}}",
   "relay_url_blocked": "URL de destino de retransmissão bloqueado pelo filtro de segurança",
   "external": "Externo",
   "hub": {
@@ -328,7 +328,7 @@
     "load_error": "Não foi possível carregar eventos. Por favor, tente novamente.",
     "load_more_error": "Não foi possível carregar mais eventos.",
     "online": "On-line",
-    "date_at_time": "{{date}} ?s {{time}}",
+    "date_at_time": "{{date}} às {{time}}",
     "attendees_going_one": "{{count}} participante",
     "attendees_going_other": "{{count}} participantes"
   },
@@ -400,7 +400,7 @@
     "browse_members": "Procure membros",
     "browse_listings": "Navegar nas listagens",
     "available_features": "Recursos disponíveis",
-    "level_prefix": "N?vel {{level}}",
+    "level_prefix": "Nível {{level}}",
     "member_count_one": "{{count}} membro",
     "member_count_other": "{{count}} membros",
     "partner_since": "Parceiro desde {{date}}"
@@ -477,9 +477,9 @@
     "toast_generic_error": "Ocorreu um erro inesperado. Por favor, tente novamente.",
     "kilometers_short": "quilômetros",
     "progress_aria": "Passo {{current}} de {{total}}",
-    "up_to_km": "at? {{km}} km",
-    "partners_available_one": "{{count}} comunidade parceira dispon?vel",
-    "partners_available_other": "{{count}} comunidades parceiras dispon?veis",
+    "up_to_km": "até {{km}} km",
+    "partners_available_one": "{{count}} comunidade parceira disponível",
+    "partners_available_other": "{{count}} comunidades parceiras disponíveis",
     "member_count_one": "{{count}} membro",
     "member_count_other": "{{count}} membros",
     "and_more": "+{{count}} mais"
@@ -536,6 +536,6 @@
     "anonymous": "Anônimo",
     "rating_label": "Avaliado {{rating}} em 5",
     "from_partner": "através de {{partner}}",
-    "title": "Avalia??es"
+    "title": "Avaliações"
   }
 }

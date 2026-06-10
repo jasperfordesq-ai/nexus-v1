@@ -47,7 +47,7 @@
     "orgs_pending_one": "منظمة{{count}}معلقة",
     "orgs_pending_other": "منظمات{{count}}معلقة",
     "orgs_pending_text": "المنظمات التطوعية في انتظار الموافقة",
-    "review": "??????"
+    "review": "مراجعة"
   },
   "modules": {
     "section_title": "وحدات المنصة",

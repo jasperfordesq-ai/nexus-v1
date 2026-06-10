@@ -286,25 +286,25 @@
     "nexus_link_label": "Visiter le site Project NEXUS"
   },
   "report_problem": {
-    "trigger": "Signaler un probl?me",
-    "title": "Signaler un probl?me",
+    "trigger": "Signaler un problème",
+    "title": "Signaler un problème",
     "auth_title": "Connexion requise",
-    "auth_description": "Veuillez vous connecter avant d?envoyer un rapport technique au support.",
-    "summary_label": "Court r?sum?",
-    "description_label": "Que s?est-il pass? ?",
+    "auth_description": "Veuillez vous connecter avant d'envoyer un rapport technique au support.",
+    "summary_label": "Court résumé",
+    "description_label": "Que s'est-il passé ?",
     "impact_label": "Impact",
     "include_diagnostics": "Inclure les diagnostics techniques de cette page",
     "cancel": "Annuler",
     "submit": "Envoyer le rapport",
-    "submit_success": "Rapport de probl?me envoy?.",
-    "submit_failed": "Nous n?avons pas pu envoyer le rapport. Veuillez r?essayer.",
-    "success_title": "Rapport envoy?",
-    "success_description": "La r?f?rence {{reference}} a ?t? cr??e.",
+    "submit_success": "Rapport de problème envoyé.",
+    "submit_failed": "Nous n'avons pas pu envoyer le rapport. Veuillez réessayer.",
+    "success_title": "Rapport envoyé",
+    "success_description": "La référence {{reference}} a été créée.",
     "impact": {
       "blocked": "Je ne peux pas continuer",
-      "major": "Une t?che essentielle est bloqu?e",
+      "major": "Une tâche essentielle est bloquée",
       "minor": "Quelque chose ne va pas, mais je peux continuer",
-      "cosmetic": "Probl?me visuel ou de texte"
+      "cosmetic": "Problème visuel ou de texte"
     }
   },
   "mobile_tab": {
