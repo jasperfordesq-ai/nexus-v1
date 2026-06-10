@@ -456,6 +456,9 @@ export function CreateEventPage() {
       const recurrenceRule = buildRecurrenceRule(formData);
       if (recurrenceRule) {
         payload.recurrence_rule = recurrenceRule;
+        // Backend (EventService::createRecurring) reads the rrule string
+        // from `recurrence_rrule`
+        payload.recurrence_rrule = recurrenceRule;
         // Also send structured fields for backend flexibility
         payload.recurrence_frequency = formData.recurrenceFrequency === 'biweekly' ? 'weekly' : formData.recurrenceFrequency;
         if (formData.recurrenceFrequency === 'biweekly') {
@@ -475,14 +478,19 @@ export function CreateEventPage() {
       let response;
       if (isEditing) {
         response = await api.put(`/v2/events/${id}`, payload);
+      } else if (recurrenceRule) {
+        // Recurrence-aware endpoint — creates the template event AND its
+        // occurrences. Plain POST /v2/events ignores recurrence fields.
+        response = await api.post('/v2/events/recurring', payload);
       } else {
         response = await api.post('/v2/events', payload);
       }
 
       if (response.success) {
+        const responseData = response.data as { id?: number; template?: { id?: number } } | undefined;
         const eventId = isEditing
           ? Number(id)
-          : (response.data as { id?: number })?.id;
+          : (responseData?.template?.id ?? responseData?.id);
 
         if (imageFile && eventId) {
           await uploadImage(eventId);

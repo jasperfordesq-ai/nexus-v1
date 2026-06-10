@@ -5317,7 +5317,8 @@
     "user_count_label": "{{count}} / {{max}} úsáideoir",
     "your_plan_usage": "Úsáid do Phlean",
     "over_limit_warning": "Tá teorainneacha do phlean sroichte agat. Uasghrádú chun leanúint ar aghaidh.",
-    "upgrade_modal_desc": "Uasghrádaigh do phlean chun gnéithe agus acmhainn bhreise a dhíghlasáil."
+    "upgrade_modal_desc": "Uasghrádaigh do phlean chun gnéithe agus acmhainn bhreise a dhíghlasáil.",
+    "upgrade_mailto_subject": "Iarratas ar Uasghrádú Plean"
   },
   "blog": {
     "an_unexpected_error_occurred": "Tharla earráid gan choinne",

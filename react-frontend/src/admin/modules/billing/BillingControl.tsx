@@ -127,19 +127,13 @@ export function BillingControl() {
 
   const fetchSnapshot = useCallback(async () => {
     setLoading(true);
-    try {
-      const data = await api.get('/api/v2/admin/super/billing/snapshot') as unknown;
-      if (Array.isArray(data)) {
-        setSnapshot(data as TenantSnapshot[]);
-      } else if (data && typeof data === 'object') {
-        const obj = data as { data?: TenantSnapshot[] };
-        setSnapshot(obj.data ?? []);
-      }
-    } catch {
+    const response = await api.get<TenantSnapshot[]>('/v2/admin/super/billing/snapshot');
+    if (response.success && Array.isArray(response.data)) {
+      setSnapshot(response.data);
+    } else {
       toast.error(t('billing.failed_to_load'));
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   }, [t, toast]);
 
 
@@ -150,19 +144,12 @@ export function BillingControl() {
   const fetchPlans = useCallback(async () => {
     if (plans.length > 0) return;
     setPlansLoading(true);
-    try {
-      const data = await api.get('/api/v2/admin/plans') as unknown;
-      if (Array.isArray(data)) {
-        setPlans(data as PlanItem[]);
-      } else if (data && typeof data === 'object') {
-        const obj = data as { data?: PlanItem[] };
-        setPlans(obj.data ?? []);
-      }
-    } catch {
-      // non-critical — plans list will be empty
-    } finally {
-      setPlansLoading(false);
+    const response = await api.get<PlanItem[]>('/v2/admin/plans');
+    if (response.success && Array.isArray(response.data)) {
+      setPlans(response.data);
     }
+    // failure is non-critical — plans list will be empty
+    setPlansLoading(false);
   }, [plans.length]);
 
   // ---------------------------------------------------------------------------
@@ -186,26 +173,25 @@ export function BillingControl() {
   const handleAssign = async () => {
     if (!selectedTenant || !selectedPlanId) return;
     setAssigning(true);
-    try {
-      await api.post('/api/v2/admin/super/billing/assign-plan', {
-        tenant_id: selectedTenant.tenant_id,
-        pay_plan_id: Number(selectedPlanId),
-        expires_at: expiresAt || null,
-        notes: notes || null,
-        custom_price_monthly: customPriceMonthly !== '' ? Number(customPriceMonthly) : null,
-        custom_price_yearly: customPriceYearly !== '' ? Number(customPriceYearly) : null,
-        discount_percentage: Number(discountPct) || 0,
-        discount_reason: discountReason || null,
-        nonprofit_verified: nonprofitVerified,
-      });
+    const response = await api.post('/v2/admin/super/billing/assign-plan', {
+      tenant_id: selectedTenant.tenant_id,
+      pay_plan_id: Number(selectedPlanId),
+      expires_at: expiresAt || null,
+      notes: notes || null,
+      custom_price_monthly: customPriceMonthly !== '' ? Number(customPriceMonthly) : null,
+      custom_price_yearly: customPriceYearly !== '' ? Number(customPriceYearly) : null,
+      discount_percentage: Number(discountPct) || 0,
+      discount_reason: discountReason || null,
+      nonprofit_verified: nonprofitVerified,
+    });
+    if (response.success) {
       toast.success(t('billing.plan_assigned'));
       onAssignClose();
       void fetchSnapshot();
-    } catch {
-      toast.error(t('billing.failed_to_assign'));
-    } finally {
-      setAssigning(false);
+    } else {
+      toast.error(response.error ?? t('billing.failed_to_assign'));
     }
+    setAssigning(false);
   };
 
   // ---------------------------------------------------------------------------
@@ -214,18 +200,17 @@ export function BillingControl() {
 
   const handlePause = async (tenant: TenantSnapshot) => {
     setPausingId(tenant.tenant_id);
-    try {
-      const endpoint = tenant.is_paused
-        ? '/api/v2/admin/super/billing/resume'
-        : '/api/v2/admin/super/billing/pause';
-      await api.post(endpoint, { tenant_id: tenant.tenant_id });
+    const endpoint = tenant.is_paused
+      ? '/v2/admin/super/billing/resume'
+      : '/v2/admin/super/billing/pause';
+    const response = await api.post(endpoint, { tenant_id: tenant.tenant_id });
+    if (response.success) {
       toast.success(tenant.is_paused ? t('billing.resume_billing') : t('billing.pause_billing'));
       void fetchSnapshot();
-    } catch {
-      toast.error(t('billing.failed_to_assign'));
-    } finally {
-      setPausingId(null);
+    } else {
+      toast.error(response.error ?? t('billing.failed_to_assign'));
     }
+    setPausingId(null);
   };
 
   // ---------------------------------------------------------------------------
@@ -242,19 +227,18 @@ export function BillingControl() {
     if (!graceTenant) return;
     const days = Math.max(1, Math.min(365, Number(graceDays) || 30));
     setSettingGrace(true);
-    try {
-      await api.post('/api/v2/admin/super/billing/grace-period', {
-        tenant_id: graceTenant.tenant_id,
-        days,
-      });
+    const response = await api.post('/v2/admin/super/billing/grace-period', {
+      tenant_id: graceTenant.tenant_id,
+      days,
+    });
+    if (response.success) {
       toast.success(t('billing.set_grace_period'));
       onGraceClose();
       void fetchSnapshot();
-    } catch {
-      toast.error(t('billing.failed_to_assign'));
-    } finally {
-      setSettingGrace(false);
+    } else {
+      toast.error(response.error ?? t('billing.failed_to_assign'));
     }
+    setSettingGrace(false);
   };
 
   // ---------------------------------------------------------------------------
@@ -318,7 +302,11 @@ export function BillingControl() {
             size="sm"
             variant="tertiary"
             startContent={<Download size={14} />}
-            onPress={() => window.open('/api/v2/admin/super/billing/export', '_blank')}
+            onPress={() => {
+              void api
+                .download('/v2/admin/super/billing/export', { filename: 'billing-export.csv' })
+                .catch(() => toast.error(t('billing.failed_to_load')));
+            }}
           >
             {t('billing.export_csv')}
           </Button>

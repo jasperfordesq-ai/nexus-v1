@@ -5317,7 +5317,8 @@
     "user_count_label": "{{count}} / {{max}} usuarios",
     "your_plan_usage": "Uso de su plan",
     "over_limit_warning": "Has alcanzado los límites de tu plan. Actualiza para continuar.",
-    "upgrade_modal_desc": "Actualice su plan para desbloquear funciones y capacidad adicionales."
+    "upgrade_modal_desc": "Actualice su plan para desbloquear funciones y capacidad adicionales.",
+    "upgrade_mailto_subject": "Solicitud de mejora de plan"
   },
   "blog": {
     "an_unexpected_error_occurred": "Ocurrió un error inesperado",

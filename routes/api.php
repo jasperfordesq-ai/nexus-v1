@@ -565,6 +565,10 @@ Route::post('/v2/notifications/group/read', [\App\Http\Controllers\Api\Notificat
 Route::post('/v2/notifications/group/{groupKey}/read', [\App\Http\Controllers\Api\NotificationsController::class, 'markGroupRead']);
 Route::post('/v2/notifications/read-all', [\App\Http\Controllers\Api\NotificationsController::class, 'markAllRead']);
 Route::delete('/v2/notifications', [\App\Http\Controllers\Api\NotificationsController::class, 'destroyAll']);
+// Per-context notification frequency settings (digest). Must be registered
+// BEFORE /v2/notifications/{id} or 'settings' is swallowed as an {id}.
+Route::get('/v2/notifications/settings', [\App\Http\Controllers\Api\UsersController::class, 'getSettings']);
+Route::post('/v2/notifications/settings', [\App\Http\Controllers\Api\UsersController::class, 'updateSettings']);
 Route::get('/v2/notifications/{id}', [\App\Http\Controllers\Api\NotificationsController::class, 'show']);
 Route::post('/v2/notifications/{id}/read', [\App\Http\Controllers\Api\NotificationsController::class, 'markRead']);
 Route::delete('/v2/notifications/{id}', [\App\Http\Controllers\Api\NotificationsController::class, 'destroy']);
@@ -1514,6 +1518,10 @@ Route::get('/v2/me/verein-invitations', [\App\Http\Controllers\Api\Verein\Verein
     ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
 Route::post('/v2/me/verein-invitations/{id}/respond', [\App\Http\Controllers\Api\Verein\VereinFederationMemberController::class, 'respond'])
     ->withoutMiddleware(\App\Http\Middleware\EnsureIsAdmin::class);
+// Public municipality events calendar (consent-gated upstream; throttled)
+Route::get('/v2/municipality/{municipalityCode}/events-calendar', [\App\Http\Controllers\Api\Verein\VereinFederationMemberController::class, 'municipalityCalendar'])
+    ->middleware('throttle:30,1')
+    ->withoutMiddleware(['auth:sanctum', \App\Http\Middleware\EnsureIsAdmin::class]);
 
 // Caring Community — Safeguarding reports (K9)
 // AG32 — KISS estate / legacy hours

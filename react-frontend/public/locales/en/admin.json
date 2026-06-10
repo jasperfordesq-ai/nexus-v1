@@ -3554,49 +3554,49 @@
       "rejected": "Rejected",
       "flagged": "Flagged"
     },
-      "sections": {
-        "shows": "Shows",
-        "episodes": "Episodes",
-        "top_episodes": "Top episodes",
-        "client_breakdown": "Client breakdown",
-        "retention": "Retention",
-        "reports": "Open reports"
-      },
-      "readiness": {
-        "moderation": "Moderation",
-        "reports": "Reports",
-        "media": "Media",
-        "rss": "RSS",
-        "pending_items_one": "{{count}} item waiting for review",
-        "pending_items_other": "{{count}} items waiting for review",
-        "open_reports_one": "{{count}} open member report",
-        "open_reports_other": "{{count}} open member reports",
-        "media_jobs_one": "{{count}} media job waiting",
-        "media_jobs_other": "{{count}} media jobs waiting",
-        "rss_ready_one": "{{count}} published show can be checked",
-        "rss_ready_other": "{{count}} published shows can be checked"
-      },
-      "feed_validation": {
-        "title": "RSS validation",
-        "subtitle": "Latest check for {{title}}",
-        "valid": "Ready",
-        "invalid": "Needs work",
-        "errors": "Blocking issues",
-        "warnings": "Recommended fixes"
-      },
-      "feed_issues": {
-        "show_not_public": "The show must be public, published, and approved before directories can read it.",
-        "missing_public_episodes": "Publish at least one approved public episode.",
-        "missing_title": "Add a show title.",
-        "missing_description": "Add a show summary or description.",
-        "missing_language": "Set the show language.",
-        "missing_owner_email": "Add the directory owner email.",
-        "missing_artwork": "Add show artwork for podcast directory readiness.",
-        "episode_missing_audio_url": "An episode is missing a valid HTTP audio URL.",
-        "episode_missing_audio_length": "An episode is missing the audio file size.",
-        "episode_missing_audio_mime": "An episode is missing the audio MIME type."
-      },
-      "columns": {
+    "sections": {
+      "shows": "Shows",
+      "episodes": "Episodes",
+      "top_episodes": "Top episodes",
+      "client_breakdown": "Client breakdown",
+      "retention": "Retention",
+      "reports": "Open reports"
+    },
+    "readiness": {
+      "moderation": "Moderation",
+      "reports": "Reports",
+      "media": "Media",
+      "rss": "RSS",
+      "pending_items_one": "{{count}} item waiting for review",
+      "pending_items_other": "{{count}} items waiting for review",
+      "open_reports_one": "{{count}} open member report",
+      "open_reports_other": "{{count}} open member reports",
+      "media_jobs_one": "{{count}} media job waiting",
+      "media_jobs_other": "{{count}} media jobs waiting",
+      "rss_ready_one": "{{count}} published show can be checked",
+      "rss_ready_other": "{{count}} published shows can be checked"
+    },
+    "feed_validation": {
+      "title": "RSS validation",
+      "subtitle": "Latest check for {{title}}",
+      "valid": "Ready",
+      "invalid": "Needs work",
+      "errors": "Blocking issues",
+      "warnings": "Recommended fixes"
+    },
+    "feed_issues": {
+      "show_not_public": "The show must be public, published, and approved before directories can read it.",
+      "missing_public_episodes": "Publish at least one approved public episode.",
+      "missing_title": "Add a show title.",
+      "missing_description": "Add a show summary or description.",
+      "missing_language": "Set the show language.",
+      "missing_owner_email": "Add the directory owner email.",
+      "missing_artwork": "Add show artwork for podcast directory readiness.",
+      "episode_missing_audio_url": "An episode is missing a valid HTTP audio URL.",
+      "episode_missing_audio_length": "An episode is missing the audio file size.",
+      "episode_missing_audio_mime": "An episode is missing the audio MIME type."
+    },
+    "columns": {
       "title": "Title",
       "owner": "Owner",
       "show": "Show",
@@ -3610,17 +3610,17 @@
       "bucket": "Bucket",
       "episode": "Episode",
       "reason": "Reason",
-        "details": "Details"
-      },
-      "report_unknown_episode": "Episode #{{id}}",
-      "reporter": "Reported by {{name}}",
-      "report_meta": "{{show}} · {{reporter}}",
-      "report_reasons": {
-        "safety": "Safety or harm",
-        "spam": "Spam or misleading content",
-        "rights": "Copyright or rights concern",
-        "other": "Other"
-      },
+      "details": "Details"
+    },
+    "report_unknown_episode": "Episode #{{id}}",
+    "reporter": "Reported by {{name}}",
+    "report_meta": "{{show}} · {{reporter}}",
+    "report_reasons": {
+      "safety": "Safety or harm",
+      "spam": "Spam or misleading content",
+      "rights": "Copyright or rights concern",
+      "other": "Other"
+    },
     "stats": {
       "total_shows": "Shows",
       "published_shows": "Published shows",
@@ -5317,7 +5317,8 @@
     "user_count_label": "{{count}} / {{max}} users",
     "your_plan_usage": "Your Plan Usage",
     "over_limit_warning": "You've reached your plan limits. Upgrade to continue.",
-    "upgrade_modal_desc": "Upgrade your plan to unlock additional features and capacity."
+    "upgrade_modal_desc": "Upgrade your plan to unlock additional features and capacity.",
+    "upgrade_mailto_subject": "Plan Upgrade Request"
   },
   "blog": {
     "an_unexpected_error_occurred": "An unexpected error occurred",

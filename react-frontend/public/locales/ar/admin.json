@@ -5317,7 +5317,8 @@
     "user_count_label": "{{count}} / {{max}} مستخدمًا",
     "your_plan_usage": "استخدام خطتك",
     "over_limit_warning": "لقد وصلت إلى حدود خطتك. الترقية للمتابعة.",
-    "upgrade_modal_desc": "قم بترقية خطتك لفتح الميزات والسعة الإضافية."
+    "upgrade_modal_desc": "قم بترقية خطتك لفتح الميزات والسعة الإضافية.",
+    "upgrade_mailto_subject": "طلب ترقية الخطة"
   },
   "blog": {
     "an_unexpected_error_occurred": "حدث خطأ غير متوقع",

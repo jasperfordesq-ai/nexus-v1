@@ -11,6 +11,7 @@ import Users from 'lucide-react/icons/users';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
+import { api } from '@/lib/api';
 import { billingApi, type SubscriptionDetails } from '../../api/billingApi';
 import { PageHeader } from '../../components';
 // Copyright © 2024–2026 Jasper Ford
@@ -127,24 +128,20 @@ export function BillingPage() {
 
   const handleUpgradeRequest = async () => {
     setUpgradeSending(true);
-    try {
-      // Fire and forget — endpoint may not exist yet; fall back to mailto on failure
-      await fetch('/api/v2/admin/billing/upgrade-request', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: upgradeMessage }),
-      });
+    const response = await api.post('/v2/admin/billing/upgrade-request', {
+      message: upgradeMessage,
+    });
+    if (response.success) {
       toast.success(t('billing.upgrade_sent'));
       onUpgradeClose();
       setUpgradeMessage('');
-    } catch {
+    } else {
       // Fallback: open mailto link
-      const subject = encodeURIComponent('Plan Upgrade Request');
+      const subject = encodeURIComponent(t('billing.upgrade_mailto_subject'));
       const body = encodeURIComponent(upgradeMessage);
       window.location.href = `mailto:jasper@hour-timebank.ie?subject=${subject}&body=${body}`;
-    } finally {
-      setUpgradeSending(false);
     }
+    setUpgradeSending(false);
   };
 
   const hasActiveSubscription =

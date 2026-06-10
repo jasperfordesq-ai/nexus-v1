@@ -5317,7 +5317,8 @@
     "user_count_label": "{{count}} / {{max}} użytkowników",
     "your_plan_usage": "Wykorzystanie Twojego planu",
     "over_limit_warning": "Osiągnąłeś limity swojego planu. Uaktualnij, aby kontynuować.",
-    "upgrade_modal_desc": "Uaktualnij swój plan, aby odblokować dodatkowe funkcje i pojemność."
+    "upgrade_modal_desc": "Uaktualnij swój plan, aby odblokować dodatkowe funkcje i pojemność.",
+    "upgrade_mailto_subject": "Prośba o zmianę planu na wyższy"
   },
   "blog": {
     "an_unexpected_error_occurred": "Wystąpił nieoczekiwany błąd",

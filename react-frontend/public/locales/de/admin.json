@@ -5317,7 +5317,8 @@
     "user_count_label": "{{count}} / {{max}} Benutzer",
     "your_plan_usage": "Ihre Plannutzung",
     "over_limit_warning": "Sie haben die Grenzen Ihres Plans erreicht. Aktualisieren Sie, um fortzufahren.",
-    "upgrade_modal_desc": "Aktualisieren Sie Ihren Plan, um zusätzliche Funktionen und Kapazität freizuschalten."
+    "upgrade_modal_desc": "Aktualisieren Sie Ihren Plan, um zusätzliche Funktionen und Kapazität freizuschalten.",
+    "upgrade_mailto_subject": "Anfrage zum Plan-Upgrade"
   },
   "blog": {
     "an_unexpected_error_occurred": "Es ist ein unerwarteter Fehler aufgetreten",
