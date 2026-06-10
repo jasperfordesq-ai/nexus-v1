@@ -459,8 +459,11 @@ function createMotionComponent(tag: string) {
         [drag, onDragStart, userPointerDown],
       );
 
+      // Keyed on the null↔non-null transition (not dragVisual itself) so the
+      // window listeners attach once per drag instead of on every pointermove.
+      const dragActive = dragVisual !== null;
       React.useEffect(() => {
-        if (!drag || dragVisual === null) return;
+        if (!drag || !dragActive) return;
         const onMove = (e: PointerEvent) => {
           const d = dragData.current;
           if (!d || e.pointerId !== d.pointerId) return;
@@ -494,7 +497,7 @@ function createMotionComponent(tag: string) {
           window.removeEventListener('pointerup', onUp);
           window.removeEventListener('pointercancel', onUp);
         };
-      }, [drag, dragVisual === null, elasticFactor, onDragEnd]);
+      }, [drag, dragActive, elasticFactor, onDragEnd]);
 
       // ---- interaction handlers (only wired when the prop is present) ----
       const handlers: Record<string, unknown> = {};
@@ -531,7 +534,6 @@ function createMotionComponent(tag: string) {
           delayChildren: staggerTransition.delayChildren,
           nextIndex: () => indexCounter.current++,
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
       }, [providesVariants, effInitial, effAnimate, effCustom, staggerTransition.staggerChildren, staggerTransition.delayChildren]);
 
       const finalDragProps = drag ? { onPointerDown: handlePointerDown } : {};

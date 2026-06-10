@@ -62,7 +62,7 @@ export function PagesAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [toast])
+  }, [toast, t])
 
 
   useEffect(() => {

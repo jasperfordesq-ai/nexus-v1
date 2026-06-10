@@ -10,7 +10,6 @@ import { cn } from '@/lib/helpers';
 
 type HeroAccordionProps = HeroAccordionTypes['Props'];
 type HeroAccordionItemProps = HeroAccordionTypes['ItemProps'];
-type HeroAccordionTriggerProps = HeroAccordionTypes['TriggerProps'];
 type HeroAccordionBodyProps = ComponentProps<typeof HeroAccordion.Body>;
 
 type LegacyAccordionVariant = 'light' | 'shadow' | 'bordered' | 'splitted' | 'default' | 'surface';

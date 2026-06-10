@@ -51,7 +51,7 @@ export function ChangelogPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [t]);
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 py-4 px-4 sm:px-0">

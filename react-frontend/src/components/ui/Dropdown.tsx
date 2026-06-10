@@ -66,7 +66,7 @@ export function Dropdown({ children, placement, shouldBlockScroll, ...props }: D
   );
 }
 
-export interface DropdownTriggerProps extends HeroDropdownTriggerProps {}
+export type DropdownTriggerProps = HeroDropdownTriggerProps;
 
 export function DropdownTrigger({ children, className, ...props }: DropdownTriggerProps) {
   if (isValidElement<{ className?: string }>(children)) {

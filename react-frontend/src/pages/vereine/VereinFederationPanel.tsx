@@ -207,7 +207,7 @@ export default function VereinFederationPanel({ organizationId }: Props) {
       logError('VereinFederationPanel: withdraw failed', err);
       toast.error(t('verein_federation.share_event_failed'));
     }
-  }, [organizationId, toast, t, loadAll]);
+  }, [organizationId, toast, t, loadAll, confirm]);
 
   if (loading) {
     return (

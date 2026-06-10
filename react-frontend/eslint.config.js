@@ -20,7 +20,7 @@ export default tseslint.config(
 
       // TypeScript — warn only so brownfield code doesn't block commits
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
       '@typescript-eslint/ban-ts-comment': 'warn',
       '@typescript-eslint/no-require-imports': 'warn',
       '@typescript-eslint/no-empty-object-type': 'warn',

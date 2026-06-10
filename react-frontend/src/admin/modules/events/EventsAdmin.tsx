@@ -134,7 +134,7 @@ export function EventsAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [page, status, search, toast])
+  }, [page, status, search, toast, t])
 
 
   useEffect(() => {

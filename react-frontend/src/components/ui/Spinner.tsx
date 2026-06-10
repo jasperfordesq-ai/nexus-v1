@@ -68,7 +68,7 @@ export function Spinner({
   classNames,
   color,
   label,
-  labelColor,
+  labelColor: _labelColor,
   variant: _variant,
   ...props
 }: SpinnerProps) {
