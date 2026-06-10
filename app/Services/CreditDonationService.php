@@ -50,7 +50,7 @@ class CreditDonationService
             return false;
         }
 
-        $success = DB::transaction(function () use ($tenantId, $fromUserId, $toUserId, $amount, $message) {
+        $success = DB::transaction(function () use ($tenantId, $fromUserId, $toUserId, $amount, $message, $recipient) {
             // Atomic deduct
             $affected = DB::table('users')
                 ->where('id', $fromUserId)
@@ -67,14 +67,23 @@ class CreditDonationService
                 ->where('tenant_id', $tenantId)
                 ->increment('balance', $amount);
 
+            // Stored receipt line — a persisted string can only be in ONE
+            // language, so render it in the RECIPIENT's (they read it in
+            // their wallet history; the donor's confirmation is separate).
+            // Rendering at call time would bake in the donor's locale.
+            $description = LocaleContext::withLocale(
+                $recipient,
+                fn () => __('svc_notifications_2.credit_donation.transaction_description', [
+                    'message' => $message ?: __('svc_notifications_2.credit_donation.no_message'),
+                ])
+            );
+
             $transactionId = DB::table('transactions')->insertGetId([
                 'tenant_id' => $tenantId,
                 'sender_id' => $fromUserId,
                 'receiver_id' => $toUserId,
                 'amount' => $amount,
-                'description' => __('svc_notifications_2.credit_donation.transaction_description', [
-                    'message' => $message ?: __('svc_notifications_2.credit_donation.no_message'),
-                ]),
+                'description' => $description,
                 'transaction_type' => 'donation',
                 'status' => 'completed',
                 'created_at' => now(),

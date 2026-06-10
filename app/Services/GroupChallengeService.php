@@ -139,18 +139,16 @@ class GroupChallengeService
                 ->pluck('user_id');
 
             foreach ($members as $userId) {
-                try {
-                    DB::table('user_xp_log')->insert([
-                        'tenant_id' => $challenge->tenant_id,
-                        'user_id' => $userId,
-                        'xp_amount' => $challenge->reward_xp,
-                        'action' => 'group_challenge',
-                        'description' => __('api.group_challenge_completed_xp', ['title' => $challenge->title]),
-                        'created_at' => now(),
-                    ]);
-                } catch (\Exception $e) {
-                    // user_xp_log may not exist yet — non-critical
-                }
+                // Canonical XP path: logs to user_xp_log AND increments
+                // users.xp (the balance the shop/leaderboard read), plus
+                // leaderboard invalidation, broadcast, and level-up check.
+                // A bare user_xp_log insert leaves the reward unspendable.
+                GamificationService::awardXP(
+                    (int) $userId,
+                    (int) $challenge->reward_xp,
+                    'group_challenge',
+                    __('api.group_challenge_completed_xp', ['title' => $challenge->title])
+                );
             }
         }
     }
