@@ -15376,7 +15376,9 @@
     "os_maps_api_key_hint": "OS Data Hub project key for the OS Maps API. Used when the map provider is Ordnance Survey; UK public-sector tenants are typically covered by the PSGA. Without a key, Ordnance Survey tenants fall back to free OpenStreetMap tiles.",
     "os_maps_key_cleared": "Ordnance Survey key cleared",
     "tiles_status_os_maps": "OS Maps API active",
-    "tiles_status_os_maps_unset": "No key — falls back to free OSM"
+    "tiles_status_os_maps_unset": "No key — falls back to free OSM",
+    "provider_os_places": "Ordnance Survey Places (UK, UPRN)",
+    "status_os_places": "OS Places (PSGA)"
   },
   "cron_setup": {
     "notice_title": "Important: how cron works on Project NEXUS",

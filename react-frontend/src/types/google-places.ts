@@ -27,6 +27,9 @@ export interface PlaceResult {
   name?: string;
   /** Google Place types (e.g., ['locality', 'political']). */
   types?: string[];
+  /** UK Unique Property Reference Number — present when the address was
+   *  validated via the Ordnance Survey Places provider (AddressBase). */
+  uprn?: string;
 }
 
 /** Parsed address components from Google Places response. */

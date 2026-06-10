@@ -62,7 +62,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
 
   // Provider state
   const [mapProvider, setMapProvider] = useState<'google' | 'openstreetmap' | 'ordnance_survey'>('google');
-  const [geocodingProvider, setGeocodingProvider] = useState<'google' | 'nominatim'>('google');
+  const [geocodingProvider, setGeocodingProvider] = useState<'google' | 'nominatim' | 'os_places'>('google');
   const [savingProviders, setSavingProviders] = useState(false);
 
   // API keys
@@ -94,7 +94,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
       const mp = s.map_provider;
       const gp = s.geocoding_provider;
       if (mp === 'google' || mp === 'openstreetmap' || mp === 'ordnance_survey') setMapProvider(mp);
-      if (gp === 'google' || gp === 'nominatim') setGeocodingProvider(gp);
+      if (gp === 'google' || gp === 'nominatim' || gp === 'os_places') setGeocodingProvider(gp);
 
       const gk = s.google_maps_api_key;
       setGoogleMapsKeyDisplay(typeof gk === 'string' ? gk : '');
@@ -309,7 +309,9 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                 {t('tenant_features.status_autocomplete')}{': '}
                 {geocodingProvider === 'google'
                   ? t('tenant_features.status_google_places_paid')
-                  : t('tenant_features.status_nominatim_free')}
+                  : geocodingProvider === 'os_places'
+                    ? t('tenant_features.status_os_places')
+                    : t('tenant_features.status_nominatim_free')}
               </span>
             </div>
 
@@ -382,13 +384,14 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                 selectedKeys={[geocodingProvider]}
                 onSelectionChange={(keys) => {
                   const val = Array.from(keys)[0] as string;
-                  if (val === 'google' || val === 'nominatim') setGeocodingProvider(val);
+                  if (val === 'google' || val === 'nominatim' || val === 'os_places') setGeocodingProvider(val);
                 }}
                 className="max-w-xs"
                 size="sm"
               >
                 <SelectItem key="google" id="google">{t('tenant_features.provider_google_places')}</SelectItem>
                 <SelectItem key="nominatim" id="nominatim">{t('tenant_features.provider_nominatim')}</SelectItem>
+                <SelectItem key="os_places" id="os_places">{t('tenant_features.provider_os_places')}</SelectItem>
               </Select>
             </div>
 
