@@ -1187,6 +1187,11 @@ Route::get('/v2/admin/users/{id}/verification-badges', [\App\Http\Controllers\Ap
 // Tenant-wide audit trail export (CSV) — activity_log + org_audit_log
 Route::get('/v2/admin/audit-log/export.csv', [\App\Http\Controllers\Api\AdminAuditLogController::class, 'exportCsv']);
 
+// Data retention policies (IT-Data-03)
+Route::get('/v2/admin/retention/policies', [\App\Http\Controllers\Api\AdminRetentionController::class, 'index']);
+Route::put('/v2/admin/retention/policies/{dataType}', [\App\Http\Controllers\Api\AdminRetentionController::class, 'update']);
+Route::get('/v2/admin/retention/runs', [\App\Http\Controllers\Api\AdminRetentionController::class, 'runs']);
+
 Route::get('/v2/admin/dashboard/stats', [\App\Http\Controllers\Api\AdminDashboardController::class, 'stats']);
 Route::get('/v2/admin/dashboard/trends', [\App\Http\Controllers\Api\AdminDashboardController::class, 'trends']);
 Route::get('/v2/admin/dashboard/activity', [\App\Http\Controllers\Api\AdminDashboardController::class, 'activity']);
