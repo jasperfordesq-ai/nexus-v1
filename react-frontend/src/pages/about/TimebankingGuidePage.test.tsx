@@ -120,29 +120,31 @@ describe('TimebankingGuidePage', () => {
     expect(screen.getByText('Social Networks')).toBeInTheDocument();
   });
 
-  it('shows register link in CTA when user is not authenticated', () => {
+  // The CTA renders `Button as={Link} to=...`; the shared uiMock renders these as
+  // buttons that expose the router destination via an href attribute.
+  it('shows register CTA when user is not authenticated', () => {
     render(<TimebankingGuidePage />);
-    const registerLinks = screen.getAllByRole('link').filter(l =>
-      l.getAttribute('href')?.includes('/register')
+    const registerCtas = screen.getAllByRole('button').filter(b =>
+      b.getAttribute('href')?.includes('/register')
     );
-    expect(registerLinks.length).toBeGreaterThan(0);
+    expect(registerCtas.length).toBeGreaterThan(0);
   });
 
-  it('shows listings link in CTA when user is authenticated', () => {
+  it('shows listings CTA when user is authenticated', () => {
     mockUseAuth.mockReturnValue({ isAuthenticated: true, user: { id: 1 } });
     render(<TimebankingGuidePage />);
-    const listingsLinks = screen.getAllByRole('link').filter(l =>
-      l.getAttribute('href')?.includes('/listings')
+    const listingsCtas = screen.getAllByRole('button').filter(b =>
+      b.getAttribute('href')?.includes('/listings')
     );
-    expect(listingsLinks.length).toBeGreaterThan(0);
+    expect(listingsCtas.length).toBeGreaterThan(0);
   });
 
-  it('renders the partner link in CTA', () => {
+  it('renders the partner CTA', () => {
     render(<TimebankingGuidePage />);
-    const partnerLinks = screen.getAllByRole('link').filter(l =>
-      l.getAttribute('href')?.includes('/partner')
+    const partnerCtas = screen.getAllByRole('button').filter(b =>
+      b.getAttribute('href')?.includes('/partner')
     );
-    expect(partnerLinks.length).toBeGreaterThan(0);
+    expect(partnerCtas.length).toBeGreaterThan(0);
   });
 
   it('renders the related pages section', () => {

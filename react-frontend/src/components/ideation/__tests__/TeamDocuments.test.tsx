@@ -111,10 +111,11 @@ describe('TeamDocuments', () => {
     vi.mocked(api.get).mockImplementation(() => new Promise(() => {}));
 
     render(<TeamDocuments groupId={10} isGroupAdmin={false} />);
-    // The loading container (and its mocked Spinner) both expose a "Loading"
-    // accessible name; scope to the component's own loading region (aria-busy).
+    // The loading container (and its mocked Spinner) both expose a "Loading..."
+    // accessible name (common "loading" i18n key); scope to the component's own
+    // loading region (aria-busy).
     const loading = screen
-      .getAllByLabelText('Loading')
+      .getAllByLabelText(/loading/i)
       .find((el) => el.getAttribute('aria-busy') === 'true');
     expect(loading).toBeInTheDocument();
   });

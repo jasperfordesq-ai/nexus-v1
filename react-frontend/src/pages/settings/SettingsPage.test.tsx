@@ -77,6 +77,10 @@ vi.mock('@/components/ui', async () => {
     ModalBody: ({ children }: { children: ReactNode }) => R.createElement('div', null, children),
     ModalFooter: ({ children }: { children: ReactNode }) => R.createElement('div', null, children),
     Chip: ({ children }: { children: ReactNode }) => R.createElement('span', null, children),
+    ToggleButtonGroup: ({ children, ...rest }: Record<string, unknown>) =>
+      R.createElement('div', { role: 'radiogroup', 'aria-label': rest['aria-label'] as string | undefined }, children as ReactNode),
+    ToggleButton: ({ children }: { children: ReactNode }) =>
+      R.createElement('button', { type: 'button' }, children),
     Spinner: noop,
     useDisclosure: useDisclosureMock,
   };

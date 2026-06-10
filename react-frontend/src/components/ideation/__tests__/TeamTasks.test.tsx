@@ -130,7 +130,8 @@ describe('TeamTasks', () => {
     vi.mocked(api.get).mockImplementation(() => new Promise(() => {}));
 
     render(<TeamTasks groupId={10} isGroupAdmin={false} />);
-    expect(screen.getByLabelText('Loading')).toBeInTheDocument();
+    // The loading region's aria-label comes from the common "loading" i18n key ("Loading...")
+    expect(screen.getByLabelText(/loading/i)).toBeInTheDocument();
   });
 
   it('renders tasks after loading', async () => {

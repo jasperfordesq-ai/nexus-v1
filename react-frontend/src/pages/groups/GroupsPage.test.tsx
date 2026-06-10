@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@/test/test-utils';
+import { render, screen, userEvent, waitFor } from '@/test/test-utils';
 import { api } from '@/lib/api';
 
 vi.mock('@/lib/api', () => ({
@@ -84,9 +84,11 @@ describe('GroupsPage', () => {
   });
 
   it('loads public groups when the public filter is selected', async () => {
+    const user = userEvent.setup();
     render(<GroupsPage />);
 
-    fireEvent.click(screen.getByRole('button', { name: /Public/i }));
+    // The visibility filter is a HeroUI ToggleButtonGroup — items expose role="radio"
+    await user.click(screen.getByRole('radio', { name: /Public/i }));
 
     await waitFor(() => {
       expect(api.get).toHaveBeenCalledWith(

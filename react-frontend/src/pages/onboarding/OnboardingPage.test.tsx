@@ -100,41 +100,59 @@ vi.mock('@/hooks/useOnboardingConfig', () => ({
 }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
-// Extend the shared UI mock with an interactive Chip. The generic stub does
-// not forward a direct `onClick`/`onKeyDown` (only `onPress`) nor `aria-pressed`,
-// so the interest chips render as inert. This override forwards the interaction
-// props the interest selector relies on, modelling a real clickable chip.
+// Extend the shared UI mock with an interactive TagGroup/Tag pair. The page's
+// interest/skill pickers use HeroUI v3's selection-based TagGroup, whose
+// generic stubs render as inert divs. This override wires `selectedKeys` /
+// `onSelectionChange` through context so clicking a Tag toggles selection,
+// and exposes the selected state via role="button" + aria-pressed for queries.
 vi.mock('@/components/ui', async () => {
+  const R = await import('react');
   const { uiMock } = await import('@/test/uiMock');
+
+  type TagCtxValue = { selected: Set<string>; toggle: (id: string) => void };
+  const TagSelectionContext = R.createContext<TagCtxValue>({ selected: new Set(), toggle: () => {} });
+
+  function TagGroupMock({
+    children,
+    selectedKeys,
+    onSelectionChange,
+    ...rest
+  }: {
+    children?: React.ReactNode;
+    selectedKeys?: Iterable<unknown>;
+    selectionMode?: string;
+    onSelectionChange?: (keys: Set<string>) => void;
+    'aria-label'?: string;
+  }) {
+    const selected = new Set(Array.from(selectedKeys ?? [], String));
+    const toggle = (id: string) => {
+      const next = new Set(selected);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      onSelectionChange?.(next);
+    };
+    return (
+      <div aria-label={rest['aria-label']}>
+        <TagSelectionContext.Provider value={{ selected, toggle }}>{children}</TagSelectionContext.Provider>
+      </div>
+    );
+  }
+  TagGroupMock.List = ({ children }: { children?: React.ReactNode }) => <div>{children}</div>;
+
+  function TagMock({ id, children }: { id?: string | number; children?: React.ReactNode }) {
+    const { selected, toggle } = R.useContext(TagSelectionContext);
+    const key = String(id);
+    return (
+      <span role="button" tabIndex={0} aria-pressed={selected.has(key)} onClick={() => toggle(key)}>
+        {children}
+      </span>
+    );
+  }
+
   return new Proxy(uiMock, {
     get(target, prop: string | symbol) {
-      if (prop === 'Chip') {
-        return ({
-          children,
-          onClick,
-          onKeyDown,
-          role,
-          tabIndex,
-          ['aria-pressed']: ariaPressed,
-        }: {
-          children?: React.ReactNode;
-          onClick?: React.MouseEventHandler;
-          onKeyDown?: React.KeyboardEventHandler;
-          role?: string;
-          tabIndex?: number;
-          'aria-pressed'?: boolean;
-        }) => (
-          <span
-            role={role}
-            tabIndex={tabIndex}
-            aria-pressed={ariaPressed}
-            onClick={onClick}
-            onKeyDown={onKeyDown}
-          >
-            {children}
-          </span>
-        );
-      }
+      if (prop === 'TagGroup') return TagGroupMock;
+      if (prop === 'Tag') return TagMock;
       return Reflect.get(target, prop);
     },
   });

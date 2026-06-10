@@ -68,7 +68,28 @@ vi.mock('@/lib/motion', async () => {
   return framerMotionMock;
 });
 
-vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
+vi.mock('@/components/ui', async () => {
+  const { uiMock } = await import('@/test/uiMock');
+
+  // The shared input-like stub renders a single bare <input> and drops compound
+  // children, so the HeroUI v3 compound NumberField (Label + NumberField.Group +
+  // NumberField.Input with the placeholder) loses its placeholder. Override
+  // NumberField with a stub that renders its compound children.
+  const NumberFieldMock = ({ children }: { children?: React.ReactNode }) => <div>{children}</div>;
+  NumberFieldMock.Group = ({ children }: { children?: React.ReactNode }) => <div>{children}</div>;
+  NumberFieldMock.Input = ({ placeholder }: { placeholder?: string }) => (
+    <input placeholder={placeholder} readOnly />
+  );
+  NumberFieldMock.DecrementButton = () => <button type="button">-</button>;
+  NumberFieldMock.IncrementButton = () => <button type="button">+</button>;
+
+  return new Proxy(uiMock as Record<string, unknown>, {
+    get(target, prop, receiver) {
+      if (prop === 'NumberField') return NumberFieldMock;
+      return Reflect.get(target, prop, receiver);
+    },
+  });
+});
 
 vi.mock('@/components/navigation', () => ({
   Breadcrumbs: ({ items }: { items: { label: string }[] }) => (

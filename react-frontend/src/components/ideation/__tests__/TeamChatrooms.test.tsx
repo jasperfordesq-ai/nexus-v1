@@ -126,8 +126,8 @@ describe('TeamChatrooms', () => {
     vi.mocked(api.get).mockImplementation(() => new Promise(() => {}));
 
     render(<TeamChatrooms groupId={10} isGroupAdmin={false} />);
-    // HeroUI Spinner renders with aria-label="Loading"
-    expect(screen.getByLabelText('Loading')).toBeInTheDocument();
+    // The loading region's aria-label comes from the common "loading" i18n key ("Loading...")
+    expect(screen.getByLabelText(/loading/i)).toBeInTheDocument();
   });
 
   it('renders messages after loading', async () => {

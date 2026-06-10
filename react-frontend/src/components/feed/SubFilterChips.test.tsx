@@ -63,12 +63,13 @@ describe('SubFilterChips', () => {
     expect(screen.getByText('Requests')).toBeInTheDocument();
   });
 
-  it('renders three buttons for listings filter', () => {
+  it('renders three selectable tags for listings filter', () => {
     render(
       <SubFilterChips filter="listings" subFilter={null} onSubFilterChange={mockOnSubFilterChange} />
     );
-    const buttons = screen.getAllByRole('button');
-    expect(buttons).toHaveLength(3);
+    // HeroUI TagGroup renders each Tag with role="row" inside a grid
+    const tags = screen.getAllByRole('row');
+    expect(tags).toHaveLength(3);
   });
 
   it('calls onSubFilterChange with null when "All" is clicked', async () => {
@@ -98,20 +99,20 @@ describe('SubFilterChips', () => {
     expect(mockOnSubFilterChange).toHaveBeenCalledWith('request');
   });
 
-  it('applies active styling to the selected sub-filter', () => {
+  it('marks the selected sub-filter as selected', () => {
     render(
       <SubFilterChips filter="listings" subFilter="offer" onSubFilterChange={mockOnSubFilterChange} />
     );
-    // The "Offers" button should have the active class with the primary color
-    const offersBtn = screen.getByText('Offers').closest('button')!;
-    expect(offersBtn.className).toContain('var(--color-primary)');
+    // The "Offers" tag should be the selected one (TagGroup selection state)
+    const offersTag = screen.getByRole('row', { name: 'Offers' });
+    expect(offersTag).toHaveAttribute('aria-selected', 'true');
   });
 
-  it('applies inactive styling to non-selected sub-filters', () => {
+  it('marks non-selected sub-filters as unselected', () => {
     render(
       <SubFilterChips filter="listings" subFilter="offer" onSubFilterChange={mockOnSubFilterChange} />
     );
-    const allBtn = screen.getByText('All').closest('button')!;
-    expect(allBtn.className).toContain('text-[var(--text-muted)]');
+    const allTag = screen.getByRole('row', { name: 'All' });
+    expect(allTag).toHaveAttribute('aria-selected', 'false');
   });
 });

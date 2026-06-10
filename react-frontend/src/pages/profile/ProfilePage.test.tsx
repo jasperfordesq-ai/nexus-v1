@@ -206,6 +206,8 @@ describe('ProfilePage', () => {
       expect(screen.getByText('Back to Explore')).toBeInTheDocument();
     });
 
-    expect(screen.getByRole('link', { name: /Back to Explore/i })).toHaveAttribute('href', '/test/explore');
+    // `Button as={Link}` is stubbed by the shared uiMock as a button carrying
+    // the router destination in an href attribute.
+    expect(screen.getByRole('button', { name: /Back to Explore/i })).toHaveAttribute('href', '/test/explore');
   });
 });

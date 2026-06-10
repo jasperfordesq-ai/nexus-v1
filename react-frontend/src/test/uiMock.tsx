@@ -133,6 +133,9 @@ function makeStub(name: string): unknown {
           ref: ref as React.Ref<HTMLButtonElement>,
           type: 'button',
           ...domSafe(props),
+          // `Button as={Link} to="...">` — surface the router destination as an
+          // href attribute so tests can still assert where the button navigates.
+          href: (props.href as string | undefined) ?? (typeof props.to === 'string' ? props.to : undefined),
           onClick: (typeof onPress === 'function' ? onPress : onClick) as (() => void) | undefined,
           onKeyDown: onKeyDown as ((e: unknown) => void) | undefined,
           disabled: props.isDisabled === true || props.disabled === true || undefined,
