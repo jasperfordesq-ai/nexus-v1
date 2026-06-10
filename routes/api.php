@@ -51,6 +51,10 @@ Route::get('/v2/platform/stats', [\App\Http\Controllers\Api\TenantBootstrapContr
 Route::get('/v2/config/algorithms', [\App\Http\Controllers\Api\AdminConfigController::class, 'getAlgorithmInfo']);
 Route::get('/v2/config/google-maps', [\App\Http\Controllers\Api\MapsConfigController::class, 'show'])
     ->middleware('throttle:60,1');
+// UPRN-backed UK address lookup (OS Places API proxy; active only when
+// the tenant's geocoding_provider is os_places)
+Route::get('/v2/geo/os-places/search', [\App\Http\Controllers\Api\OsPlacesController::class, 'search'])
+    ->middleware('throttle:60,1');
 
 // ============================================
 

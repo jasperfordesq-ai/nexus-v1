@@ -43,7 +43,7 @@ class MapsConfigController extends BaseApiController
     protected bool $isV2Api = true;
 
     private const ALLOWED_MAP_PROVIDERS = ['google', 'openstreetmap', 'ordnance_survey'];
-    private const ALLOWED_GEOCODING_PROVIDERS = ['google', 'nominatim'];
+    private const ALLOWED_GEOCODING_PROVIDERS = ['google', 'nominatim', 'os_places'];
     private const DEFAULT_MAP_PROVIDER = 'google';
     private const DEFAULT_GEOCODING_PROVIDER = 'google';
     private const NOMINATIM_BASE_URL = 'https://nominatim.openstreetmap.org';

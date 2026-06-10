@@ -1013,7 +1013,7 @@ class AdminConfigController extends BaseApiController
 
         // Validate geocoding_provider — restricted to known frontend dispatch branches.
         if (isset($kvUpdates['geocoding_provider'])) {
-            if (!in_array($kvUpdates['geocoding_provider'], ['google', 'nominatim'], true)) {
+            if (!in_array($kvUpdates['geocoding_provider'], ['google', 'nominatim', 'os_places'], true)) {
                 return $this->respondWithError('VALIDATION_ERROR', __('api.geocoding_provider_invalid'), 'geocoding_provider', 422);
             }
         }
