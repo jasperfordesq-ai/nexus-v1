@@ -1759,19 +1759,22 @@ HTML;
     public static function initializeABStats(int $newsletterId): bool
     {
         try {
-            DB::table('newsletter_ab_stats')->updateOrInsert(
-                ['newsletter_id' => $newsletterId],
-                [
-                    'variant_a_sent' => 0,
-                    'variant_b_sent' => 0,
-                    'variant_a_opened' => 0,
-                    'variant_b_opened' => 0,
-                    'variant_a_clicked' => 0,
-                    'variant_b_clicked' => 0,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]
-            );
+            // Table is per-variant-row: one row each for variant 'a' and 'b'.
+            $tenantId = (int) DB::table('newsletters')->where('id', $newsletterId)->value('tenant_id');
+            foreach (['a', 'b'] as $variant) {
+                DB::table('newsletter_ab_stats')->updateOrInsert(
+                    ['newsletter_id' => $newsletterId, 'variant' => $variant],
+                    [
+                        'tenant_id' => $tenantId,
+                        'total_sent' => 0,
+                        'total_opens' => 0,
+                        'unique_opens' => 0,
+                        'total_clicks' => 0,
+                        'unique_clicks' => 0,
+                        'updated_at' => now(),
+                    ]
+                );
+            }
             return true;
         } catch (\Exception $e) {
             Log::error('initializeABStats error: ' . $e->getMessage());
@@ -1788,15 +1791,16 @@ HTML;
     public static function getABTestResults(int $newsletterId): ?array
     {
         try {
-            $stats = DB::table('newsletter_ab_stats')
+            $rows = DB::table('newsletter_ab_stats')
                 ->where('newsletter_id', $newsletterId)
-                ->first();
+                ->get();
 
-            if (!$stats) {
+            if ($rows->isEmpty()) {
                 return null;
             }
 
-            return (array) $stats;
+            // Key per-variant rows by variant letter: ['a' => [...], 'b' => [...]]
+            return $rows->mapWithKeys(fn ($row) => [$row->variant => (array) $row])->all();
         } catch (\Exception $e) {
             Log::warning('[Newsletter] Failed to fetch A/B test results: ' . $e->getMessage());
             return null;

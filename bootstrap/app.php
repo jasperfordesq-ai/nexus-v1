@@ -145,6 +145,11 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->name('feed:publish-scheduled-posts')
             ->withoutOverlapping(5);
 
+        $schedule->command('groups:publish-scheduled')
+            ->everyFiveMinutes()
+            ->withoutOverlapping()
+            ->name('groups-publish-scheduled');
+
         $schedule->command('listings:process-search-alerts')
             ->hourly()
             ->withoutOverlapping()

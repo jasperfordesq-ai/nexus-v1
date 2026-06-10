@@ -158,6 +158,42 @@ class GroupAchievementService
     }
 
     /**
+     * Resolve (and lazily seed) the tenant's definition row for an
+     * achievement key in `group_achievements`, returning its id.
+     */
+    private static function resolveAchievementId(string $key, array $achievement): ?int
+    {
+        $tenantId = TenantContext::getId();
+
+        $id = DB::table('group_achievements')
+            ->where('tenant_id', $tenantId)
+            ->where('achievement_key', $key)
+            ->value('id');
+        if ($id) {
+            return (int) $id;
+        }
+
+        DB::table('group_achievements')->insertOrIgnore([
+            'tenant_id'            => $tenantId,
+            'achievement_key'      => $key,
+            'name'                 => $achievement['name'],
+            'description'          => $achievement['description'] ?? null,
+            'icon'                 => $achievement['icon'] ?? null,
+            'action_type'          => $achievement['target_type'],
+            'target_count'         => $achievement['target_value'],
+            'xp_reward_per_member' => $achievement['xp_reward'] ?? 25,
+            'is_active'            => 1,
+        ]);
+
+        $id = DB::table('group_achievements')
+            ->where('tenant_id', $tenantId)
+            ->where('achievement_key', $key)
+            ->value('id');
+
+        return $id ? (int) $id : null;
+    }
+
+    /**
      * Get achievements that have been earned by a group.
      */
     public static function getEarnedAchievements($groupId)
@@ -170,10 +206,13 @@ class GroupAchievementService
             return array_map(
                 fn ($row) => (array) $row,
                 DB::select(
-                    "SELECT * FROM group_achievement_progress
-                     WHERE group_id = ? AND earned = 1
-                     ORDER BY earned_at DESC",
-                    [$groupId]
+                    "SELECT gap.*, gap.completed_at AS earned_at,
+                            ga.achievement_key, ga.name, ga.icon, ga.xp_reward_per_member
+                     FROM group_achievement_progress gap
+                     JOIN group_achievements ga ON ga.id = gap.achievement_id
+                     WHERE gap.group_id = ? AND ga.tenant_id = ? AND gap.completed_at IS NOT NULL
+                     ORDER BY gap.completed_at DESC",
+                    [$groupId, TenantContext::getId()]
                 )
             );
         } catch (\Throwable $e) {
@@ -201,18 +240,27 @@ class GroupAchievementService
             if ($progress['current'] >= $achievement['target_value']) {
                 // Check if already awarded
                 try {
+                    $achievementId = self::resolveAchievementId($key, $achievement);
+                    if ($achievementId === null) {
+                        continue;
+                    }
+
                     $existing = DB::table('group_achievement_progress')
                         ->where('group_id', $groupId)
-                        ->where('achievement_key', $key)
-                        ->where('earned', 1)
+                        ->where('achievement_id', $achievementId)
+                        ->whereNotNull('completed_at')
                         ->exists();
 
                     if (!$existing) {
-                        self::awardAchievement($groupId, $key, $achievement);
+                        self::awardAchievement($groupId, $key, $achievement, $progress['current']);
                         $newAchievements[] = $key;
                     }
                 } catch (\Throwable $e) {
-                    // Table may not exist
+                    Log::warning('[GroupAchievement] checkAndAwardAchievements failed', [
+                        'group_id' => $groupId,
+                        'key' => $key,
+                        'error' => $e->getMessage(),
+                    ]);
                 }
             }
         }
@@ -223,20 +271,24 @@ class GroupAchievementService
     /**
      * Award a specific achievement to a group.
      */
-    public static function awardAchievement($groupId, $achievementKey, $achievement)
+    public static function awardAchievement($groupId, $achievementKey, $achievement, ?int $currentCount = null)
     {
         if (!self::verifyGroupTenant((int) $groupId)) {
             return false;
         }
 
         try {
+            $achievementId = self::resolveAchievementId((string) $achievementKey, (array) $achievement);
+            if ($achievementId === null) {
+                return false;
+            }
+
             DB::table('group_achievement_progress')->updateOrInsert(
-                ['group_id' => $groupId, 'achievement_key' => $achievementKey],
+                ['group_id' => $groupId, 'achievement_id' => $achievementId],
                 [
-                    'earned'     => 1,
-                    'earned_at'  => now(),
-                    'xp_reward'  => $achievement['xp_reward'] ?? 0,
-                    'updated_at' => now(),
+                    'current_count' => $currentCount ?? ($achievement['target_value'] ?? 0),
+                    'completed_at'  => now(),
+                    'updated_at'    => now(),
                 ]
             );
             return true;

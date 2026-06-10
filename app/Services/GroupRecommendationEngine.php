@@ -90,13 +90,14 @@ class GroupRecommendationEngine
     {
         try {
             DB::table('group_recommendation_interactions')->insert([
+                'tenant_id' => TenantContext::getId(),
                 'user_id' => $userId,
                 'group_id' => $groupId,
                 'action' => $action,
                 'created_at' => now(),
             ]);
         } catch (\Exception $e) {
-            // Table may not exist — silent fail
+            Log::warning('[GroupRecommendationEngine] trackInteraction failed', ['error' => $e->getMessage()]);
         }
     }
 

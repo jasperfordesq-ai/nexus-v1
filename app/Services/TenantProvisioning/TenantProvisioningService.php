@@ -253,7 +253,7 @@ class TenantProvisioningService
             $log[] = self::logEntry('create_tenant', 'ok', ['tenant_id' => $tenantId]);
 
             // Step 2 — seed defaults (categories/attributes/menus/settings/federation)
-            self::seedTenantDefaults($tenantId, (array) $request);
+            self::seedTenantDefaults($tenantId, (array) $request, $reviewerId);
             $log[] = self::logEntry('seed_defaults', 'ok');
 
             // Step 3 — create admin user
@@ -415,29 +415,22 @@ class TenantProvisioningService
      * one optional seeder MUST NOT abort the pipeline — they're logged and
      * skipped. The tenant is still usable from the admin panel.
      */
-    private static function seedTenantDefaults(int $tenantId, array $request): void
+    private static function seedTenantDefaults(int $tenantId, array $request, ?int $reviewerId = null): void
     {
-        // Federation tables: insert pass-through rows so the tenant shows up
-        // as a "platform-internal" node with default-on features.
+        // Federation tables: mirror the canonical seeding in
+        // TenantHierarchyService (per-feature rows, default-on).
+        // federation_system_control is a platform-wide singleton — never
+        // seeded per tenant.
         $now = now();
 
-        if (Schema::hasTable('federation_system_control')) {
+        if (Schema::hasTable('federation_tenant_whitelist') && $reviewerId !== null) {
             try {
-                DB::table('federation_system_control')->updateOrInsert(
-                    ['tenant_id' => $tenantId],
-                    ['enabled' => 1, 'created_at' => $now, 'updated_at' => $now]
-                );
-            } catch (Throwable $e) {
-                Log::info('seedTenantDefaults: federation_system_control skipped', ['error' => $e->getMessage()]);
-            }
-        }
-
-        if (Schema::hasTable('federation_tenant_whitelist')) {
-            try {
-                DB::table('federation_tenant_whitelist')->updateOrInsert(
-                    ['tenant_id' => $tenantId],
-                    ['allowed' => 1, 'created_at' => $now, 'updated_at' => $now]
-                );
+                DB::table('federation_tenant_whitelist')->insertOrIgnore([
+                    'tenant_id'   => $tenantId,
+                    'approved_at' => $now,
+                    'approved_by' => $reviewerId,
+                    'notes'       => 'Auto-approved during tenant provisioning',
+                ]);
             } catch (Throwable $e) {
                 Log::info('seedTenantDefaults: federation_tenant_whitelist skipped', ['error' => $e->getMessage()]);
             }
@@ -445,14 +438,22 @@ class TenantProvisioningService
 
         if (Schema::hasTable('federation_tenant_features')) {
             try {
-                $existing = DB::table('federation_tenant_features')
-                    ->where('tenant_id', $tenantId)->exists();
-                if (! $existing) {
-                    DB::table('federation_tenant_features')->insert([
-                        'tenant_id'  => $tenantId,
-                        'features'   => json_encode(TenantFeatureConfig::FEATURE_DEFAULTS ?? []),
-                        'created_at' => $now,
-                        'updated_at' => $now,
+                $federationFeatures = [
+                    'tenant_federation_enabled',
+                    'tenant_appear_in_directory',
+                    'tenant_profiles_enabled',
+                    'tenant_messaging_enabled',
+                    'tenant_transactions_enabled',
+                    'tenant_listings_enabled',
+                    'tenant_events_enabled',
+                    'tenant_groups_enabled',
+                ];
+                foreach ($federationFeatures as $featureKey) {
+                    DB::table('federation_tenant_features')->insertOrIgnore([
+                        'tenant_id'   => $tenantId,
+                        'feature_key' => $featureKey,
+                        'is_enabled'  => 1,
+                        'updated_at'  => $now,
                     ]);
                 }
             } catch (Throwable $e) {

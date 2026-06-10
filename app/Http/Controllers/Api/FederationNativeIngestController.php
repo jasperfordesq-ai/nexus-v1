@@ -204,7 +204,6 @@ class FederationNativeIngestController extends BaseApiController
                 'response_body'     => $responseBody ? substr(json_encode($responseBody) ?: '{}', 0, 10000) : null,
                 'error_message'     => $errorMessage,
                 'created_at'        => now(),
-                'updated_at'        => now(),
             ]);
         } catch (\Throwable $e) {
             Log::warning('[FederationNativeIngest] Log write failed', [

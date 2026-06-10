@@ -99,7 +99,6 @@ class GroupScheduledPostService
                         'user_id' => $post->user_id,
                         'content' => $post->content,
                         'created_at' => now(),
-                        'updated_at' => now(),
                     ]);
                 }
 

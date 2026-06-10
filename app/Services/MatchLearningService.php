@@ -112,13 +112,14 @@ class MatchLearningService
 
         try {
             DB::table('match_history')->insert([
-                'tenant_id'  => $tenantId,
-                'user_id'    => (int) $userId,
-                'listing_id' => (int) $listingId,
-                'action'     => $action,
-                'score'      => $metadata['match_score'] ?? $metadata['score'] ?? null,
-                'metadata'   => !empty($metadata) ? json_encode($metadata) : null,
-                'created_at' => now(),
+                'tenant_id'     => $tenantId,
+                'user_id'       => (int) $userId,
+                'listing_id'    => (int) $listingId,
+                'action'        => $action,
+                'match_score'   => (float) ($metadata['match_score'] ?? $metadata['score'] ?? 0),
+                'distance_km'   => isset($metadata['distance_km']) ? (float) $metadata['distance_km'] : null,
+                'match_reasons' => !empty($metadata['reasons']) ? json_encode($metadata['reasons']) : null,
+                'created_at'    => now(),
             ]);
 
             return true;

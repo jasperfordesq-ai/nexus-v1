@@ -155,7 +155,10 @@ class UgcTranslationService
         $tenantId = TenantContext::getId();
         if ($tenantId) {
             try {
-                $default = DB::table('tenants')->where('id', $tenantId)->value('default_language');
+                // Tenant default language lives in the `configuration` JSON column.
+                $configuration = DB::table('tenants')->where('id', $tenantId)->value('configuration');
+                $config = is_string($configuration) ? json_decode($configuration, true) : null;
+                $default = is_array($config) ? ($config['default_language'] ?? null) : null;
                 if (is_string($default) && $default !== '') {
                     return strtolower($default);
                 }

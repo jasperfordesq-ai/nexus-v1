@@ -193,8 +193,7 @@ class XPShopService
                 'item_id' => $itemId,
                 'xp_spent' => $item->xp_cost,
                 'expires_at' => $expiresAt,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'purchased_at' => now(),
             ]);
 
             DB::commit();
