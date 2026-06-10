@@ -63,9 +63,13 @@ export default function AdminCouponsPage() {
     });
     if (!ok) return;
     try {
-      await api.post(`/v2/admin/marketplace/coupons/${id}/suspend`, {});
-      toast.success(t('marketplace.coupons.suspended'));
-      load();
+      const res = await api.post(`/v2/admin/marketplace/coupons/${id}/suspend`, {});
+      if (res.success) {
+        toast.success(t('marketplace.coupons.suspended'));
+        load();
+      } else {
+        toast.error(res.error || t('marketplace.coupons.failed_suspend'));
+      }
     } catch {
       toast.error(t('marketplace.coupons.failed_suspend'));
     }
@@ -79,9 +83,13 @@ export default function AdminCouponsPage() {
     });
     if (!ok) return;
     try {
-      await api.delete(`/v2/admin/marketplace/coupons/${id}`);
-      toast.success(t('marketplace.coupons.deleted'));
-      load();
+      const res = await api.delete(`/v2/admin/marketplace/coupons/${id}`);
+      if (res.success) {
+        toast.success(t('marketplace.coupons.deleted'));
+        load();
+      } else {
+        toast.error(res.error || t('marketplace.coupons.failed_delete'));
+      }
     } catch {
       toast.error(t('marketplace.coupons.failed_delete'));
     }

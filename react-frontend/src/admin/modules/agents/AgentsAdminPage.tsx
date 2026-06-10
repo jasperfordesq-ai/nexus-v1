@@ -65,11 +65,15 @@ export default function AgentsAdminPage() {
   const handleToggle = async (def: AgentDefinition) => {
     setBusyId(def.id);
     try {
-      await api.post(`/v2/admin/agents/${def.id}/toggle`, {});
-      toast.success(t(def.is_enabled ? 'agents.definitions.toasts.disabled' : 'agents.definitions.toasts.enabled', {
-        name: def.name,
-      }));
-      await fetchItems();
+      const res = await api.post(`/v2/admin/agents/${def.id}/toggle`, {});
+      if (res.success) {
+        toast.success(t(def.is_enabled ? 'agents.definitions.toasts.disabled' : 'agents.definitions.toasts.enabled', {
+          name: def.name,
+        }));
+        await fetchItems();
+      } else {
+        toast.error(res.error || t('agents.definitions.toasts.toggle_failed'));
+      }
     } catch {
       toast.error(t('agents.definitions.toasts.toggle_failed'));
     } finally {
@@ -117,13 +121,17 @@ export default function AgentsAdminPage() {
       return;
     }
     try {
-      await api.patch(`/v2/admin/agents/${editing.id}`, {
+      const res = await api.patch(`/v2/admin/agents/${editing.id}`, {
         name: editName,
         config: parsedConfig,
       });
-      toast.success(t('agents.definitions.toasts.updated'));
-      setEditing(null);
-      await fetchItems();
+      if (res.success) {
+        toast.success(t('agents.definitions.toasts.updated'));
+        setEditing(null);
+        await fetchItems();
+      } else {
+        toast.error(res.error || t('agents.definitions.toasts.update_failed'));
+      }
     } catch {
       toast.error(t('agents.definitions.toasts.update_failed'));
     }

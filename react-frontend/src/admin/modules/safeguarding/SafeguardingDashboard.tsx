@@ -268,11 +268,15 @@ export function SafeguardingDashboard() {
   // ─── Revoke assignment ───
   const handleRevokeAssignment = useCallback(async (assignmentId: number) => {
     try {
-      await api.delete(`/v2/admin/safeguarding/assignments/${assignmentId}`);
-      toast.success(t('safeguarding.assignment_revoked'));
-      setAssignments((prev) =>
-        prev.map((a) => a.id === assignmentId ? { ...a, status: 'revoked' as const } : a)
-      );
+      const res = await api.delete(`/v2/admin/safeguarding/assignments/${assignmentId}`);
+      if (res.success) {
+        toast.success(t('safeguarding.assignment_revoked'));
+        setAssignments((prev) =>
+          prev.map((a) => a.id === assignmentId ? { ...a, status: 'revoked' as const } : a)
+        );
+      } else {
+        toast.error(res.error || t('safeguarding.failed_to_revoke_assignment'));
+      }
     } catch (err) {
       logError('SafeguardingDashboard.revoke', err);
       toast.error(t('safeguarding.failed_to_revoke_assignment'));

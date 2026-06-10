@@ -544,9 +544,10 @@ export function MenuBuilder() {
         if (res?.success) {
           const newMenu = res.data as { id?: number } | undefined;
           const newMenuId = newMenu?.id;
+          let itemFailures = 0;
           if (newMenuId && menuItems.length > 0) {
             for (const item of menuItems) {
-              await adminMenus.createItem(newMenuId, {
+              const itemRes = await adminMenus.createItem(newMenuId, {
                 label: item.label,
                 url: item.url,
                 type: item.type,
@@ -556,9 +557,14 @@ export function MenuBuilder() {
                 visibility_rules: item.visibility_rules,
                 is_active: item.is_active,
               });
+              if (!itemRes?.success) itemFailures++;
             }
           }
-          toast.success(t('menu_builder.menu_created'));
+          if (itemFailures > 0) {
+            toast.error(t('menu_builder.failed_to_add_item'));
+          } else {
+            toast.success(t('menu_builder.menu_created'));
+          }
           navigate(tenantPath('/admin/menus'));
           return;
         } else {
@@ -735,7 +741,7 @@ export function MenuBuilder() {
 
     if (isEdit) {
       try {
-        await adminMenus.reorderItems(
+        const res = await adminMenus.reorderItems(
           Number(id),
           final.map((item) => ({
             id: item.id,
@@ -743,6 +749,11 @@ export function MenuBuilder() {
             parent_id: item.parent_id,
           })),
         );
+        if (!res?.success) {
+          toast.error(res?.error || t('menu_builder.failed_to_save_reorder'));
+          // Revert the optimistic reorder to the server's saved order
+          await loadMenu();
+        }
       } catch {
         toast.error(t('menu_builder.failed_to_save_reorder'));
         await loadMenu();

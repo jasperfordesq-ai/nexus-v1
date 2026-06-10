@@ -10,6 +10,7 @@ use App\Core\TenantContext;
 use App\Events\GroupMemberJoined;
 use App\I18n\LocaleContext;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -18,6 +19,15 @@ use Illuminate\Support\Facades\Log;
  */
 class NotifyGroupMemberJoined implements ShouldQueue
 {
+    /**
+     * Fail fast rather than letting redis re-deliver mid-flight. The queue's
+     * retry_after is 90s; a slow run released back to another worker would
+     * re-send the owner notification. Killing at 60s and not retrying keeps one
+     * join → one notification. Belt-and-braces with the Cache guard in handle().
+     */
+    public int $tries = 1;
+    public int $timeout = 60;
+
     public function __construct()
     {
         //
@@ -28,6 +38,21 @@ class NotifyGroupMemberJoined implements ShouldQueue
      */
     public function handle(GroupMemberJoined $event): void
     {
+        // Idempotency guard: suppress duplicate/concurrent re-deliveries for the
+        // same (group, member) join so the owner is notified exactly once.
+        $guardTenantId = (int) ($event->tenantId ?? 0);
+        $handledKey = 'notify_group_member_joined:done:' . $guardTenantId . ':' . (int) $event->groupId . ':' . (int) $event->userId;
+        $claimKey = 'notify_group_member_joined:claim:' . $guardTenantId . ':' . (int) $event->groupId . ':' . (int) $event->userId;
+        if (Cache::has($handledKey)) {
+            Log::info('NotifyGroupMemberJoined: duplicate delivery suppressed', ['group_id' => $event->groupId, 'user_id' => $event->userId, 'tenant_id' => $guardTenantId]);
+            return;
+        }
+        $claimAcquired = Cache::add($claimKey, 1, now()->addMinutes(5));
+        if (!$claimAcquired) {
+            Log::info('NotifyGroupMemberJoined: concurrent delivery suppressed', ['group_id' => $event->groupId, 'user_id' => $event->userId, 'tenant_id' => $guardTenantId]);
+            return;
+        }
+
         $previousTenantId = TenantContext::currentId();
 
         try {
@@ -88,6 +113,10 @@ class NotifyGroupMemberJoined implements ShouldQueue
                     null
                 );
             });
+
+            // Mark handled only after the flow ran to completion so a redis
+            // re-delivery cannot re-send the owner notification.
+            Cache::put($handledKey, 1, now()->addHour());
         } catch (\Throwable $e) {
             Log::error('NotifyGroupMemberJoined listener failed', [
                 'group_id'  => $event->groupId,
@@ -97,6 +126,9 @@ class NotifyGroupMemberJoined implements ShouldQueue
                 'trace'     => $e->getTraceAsString(),
             ]);
         } finally {
+            if ($claimAcquired) {
+                Cache::forget($claimKey);
+            }
             TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }

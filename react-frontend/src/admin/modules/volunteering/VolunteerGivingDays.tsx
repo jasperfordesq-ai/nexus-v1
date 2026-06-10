@@ -168,15 +168,17 @@ export default function VolunteerGivingDays() {
         start_date: form.start_date,
         end_date: form.end_date,
       };
-      if (editingId) {
-        await adminVolunteering.updateGivingDay(editingId, payload);
-        toast.success(t('volunteering.giving_day_updated'));
+      const res = editingId
+        ? await adminVolunteering.updateGivingDay(editingId, payload)
+        : await adminVolunteering.createGivingDay(payload);
+
+      if (res.success) {
+        toast.success(editingId ? t('volunteering.giving_day_updated') : t('volunteering.giving_day_created'));
+        onClose();
+        loadData();
       } else {
-        await adminVolunteering.createGivingDay(payload);
-        toast.success(t('volunteering.giving_day_created'));
+        toast.error(res.error || t('volunteering.failed_to_save'));
       }
-      onClose();
-      loadData();
     } catch {
       toast.error(t('volunteering.failed_to_save'));
     }
@@ -185,11 +187,15 @@ export default function VolunteerGivingDays() {
 
   const handleDeactivate = async (day: GivingDay) => {
     try {
-      await adminVolunteering.updateGivingDay(day.id, { is_active: !day.is_active });
-      toast.success(day.is_active
-        ? t('volunteering.giving_day_deactivated')
-        : t('volunteering.giving_day_activated'));
-      loadData();
+      const res = await adminVolunteering.updateGivingDay(day.id, { is_active: !day.is_active });
+      if (res.success) {
+        toast.success(day.is_active
+          ? t('volunteering.giving_day_deactivated')
+          : t('volunteering.giving_day_activated'));
+        loadData();
+      } else {
+        toast.error(res.error || t('volunteering.failed_to_update_status'));
+      }
     } catch {
       toast.error(t('volunteering.failed_to_update_status'));
     }

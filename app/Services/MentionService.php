@@ -54,6 +54,7 @@ class MentionService
         $users = DB::table('users')
             ->where('tenant_id', $tenantId)
             ->where('status', '!=', 'banned')
+            ->whereNull('deleted_at')
             ->where(function ($q) use ($usernames) {
                 $q->whereIn('username', $usernames)
                   ->orWhereIn('first_name', $usernames)
@@ -296,6 +297,7 @@ class MentionService
                 FROM users u
                 WHERE u.tenant_id = ?
                   AND u.status != 'banned'
+                  AND u.deleted_at IS NULL
                   AND (u.name LIKE ? OR u.first_name LIKE ? OR u.last_name LIKE ? OR u.username LIKE ?)";
 
         // WHERE bindings

@@ -177,9 +177,13 @@ export function TranslationConfig() {
   const saveSetting = async (key: string, value: ConfigValue) => {
     setSaving(key);
     try {
-      await api.put('/v2/admin/config/translation', { key, value });
-      setConfig((prev) => ({ ...prev, [key]: value }));
-      toast.success(t('config.translation_setting_updated', { setting: meta(key).label }));
+      const res = await api.put('/v2/admin/config/translation', { key, value });
+      if (res.success) {
+        setConfig((prev) => ({ ...prev, [key]: value }));
+        toast.success(t('config.translation_setting_updated', { setting: meta(key).label }));
+      } else {
+        toast.error(res.error || t('config.translation_setting_update_failed', { setting: meta(key).label }));
+      }
     } catch {
       toast.error(t('config.translation_setting_update_failed', { setting: meta(key).label }));
     } finally {
@@ -196,16 +200,20 @@ export function TranslationConfig() {
     }
     setAddingEntry(true);
     try {
-      await api.post('/v2/admin/translation/glossary', {
+      const res = await api.post('/v2/admin/translation/glossary', {
         source_term: newSource.trim(),
         target_term: newTarget.trim(),
         target_language: newLang,
       });
-      toast.success(t('config.translation_glossary_entry_added'));
-      setNewSource('');
-      setNewTarget('');
-      setNewLang('');
-      loadGlossary();
+      if (res.success) {
+        toast.success(t('config.translation_glossary_entry_added'));
+        setNewSource('');
+        setNewTarget('');
+        setNewLang('');
+        loadGlossary();
+      } else {
+        toast.error(res.error || t('config.translation_glossary_add_failed'));
+      }
     } catch {
       toast.error(t('config.translation_glossary_add_failed'));
     } finally {
@@ -216,9 +224,13 @@ export function TranslationConfig() {
   const handleDeleteEntry = async (id: number) => {
     setDeletingId(id);
     try {
-      await api.delete(`/v2/admin/translation/glossary/${id}`);
-      setGlossary((prev) => prev.filter((e) => e.id !== id));
-      toast.success(t('config.translation_glossary_entry_removed'));
+      const res = await api.delete(`/v2/admin/translation/glossary/${id}`);
+      if (res.success) {
+        setGlossary((prev) => prev.filter((e) => e.id !== id));
+        toast.success(t('config.translation_glossary_entry_removed'));
+      } else {
+        toast.error(res.error || t('config.translation_glossary_delete_failed'));
+      }
     } catch {
       toast.error(t('config.translation_glossary_delete_failed'));
     } finally {

@@ -39,6 +39,19 @@ class GoalReminderService
      */
     public function setReminder(int $goalId, int $userId, array $data): array
     {
+        // Only the goal owner (or anyone, for a public goal) may set a
+        // reminder — without this, any member could attach reminders to other
+        // members' PRIVATE goals and the reminder cron would email them the
+        // private goal's title.
+        $goal = DB::table('goals')
+            ->where('id', $goalId)
+            ->where('tenant_id', TenantContext::getId())
+            ->first(['user_id', 'is_public']);
+
+        if (! $goal || ((int) $goal->user_id !== $userId && empty($goal->is_public))) {
+            return [];
+        }
+
         $existing = DB::table('goal_reminders')
             ->where('goal_id', $goalId)
             ->where('user_id', $userId)

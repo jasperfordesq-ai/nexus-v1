@@ -103,15 +103,16 @@ export default function AiModuleDocsAdminPage() {
         keywords: form.keywords.split(',').map((s) => s.trim()).filter(Boolean),
         is_active: form.is_active,
       };
-      if (editing) {
-        await api.put(`/v2/admin/ai-module-docs/${editing.id}`, payload);
-        toast.success(t('ai.module_docs.toasts.updated'));
+      const res = editing
+        ? await api.put(`/v2/admin/ai-module-docs/${editing.id}`, payload)
+        : await api.post('/v2/admin/ai-module-docs', payload);
+      if (res.success) {
+        toast.success(t(editing ? 'ai.module_docs.toasts.updated' : 'ai.module_docs.toasts.created'));
+        setEditorOpen(false);
+        void load();
       } else {
-        await api.post('/v2/admin/ai-module-docs', payload);
-        toast.success(t('ai.module_docs.toasts.created'));
+        toast.error(res.error || t('ai.module_docs.toasts.save_failed'));
       }
-      setEditorOpen(false);
-      void load();
     } catch (e) {
       const msg = e instanceof Error ? e.message : t('ai.module_docs.toasts.save_failed');
       toast.error(msg);
@@ -124,9 +125,13 @@ export default function AiModuleDocsAdminPage() {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      await api.delete(`/v2/admin/ai-module-docs/${deleteTarget.id}`);
-      toast.success(t('ai.module_docs.toasts.deleted'));
-      void load();
+      const res = await api.delete(`/v2/admin/ai-module-docs/${deleteTarget.id}`);
+      if (res.success) {
+        toast.success(t('ai.module_docs.toasts.deleted'));
+        void load();
+      } else {
+        toast.error(res.error || t('ai.module_docs.toasts.delete_failed'));
+      }
     } catch {
       toast.error(t('ai.module_docs.toasts.delete_failed'));
     } finally {

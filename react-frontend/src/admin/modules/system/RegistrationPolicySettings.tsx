@@ -233,10 +233,14 @@ export function RegistrationPolicySettings() {
       const body: Record<string, string> = {};
       if (input.api_key) body.api_key = input.api_key;
       if (input.webhook_secret) body.webhook_secret = input.webhook_secret;
-      await api.put(`/v2/admin/identity/provider-credentials/${slug}`, body);
-      toast.success(t('system.reg.credentials_saved'));
-      setCredentialInputs(prev => ({ ...prev, [slug]: { api_key: '', webhook_secret: '' } }));
-      fetchData();
+      const res = await api.put(`/v2/admin/identity/provider-credentials/${slug}`, body);
+      if (res.success) {
+        toast.success(t('system.reg.credentials_saved'));
+        setCredentialInputs(prev => ({ ...prev, [slug]: { api_key: '', webhook_secret: '' } }));
+        fetchData();
+      } else {
+        toast.error(res.error || t('system.failed_to_save_credentials_please_check'));
+      }
     } catch {
       toast.error(t('system.failed_to_save_credentials_please_check'));
     } finally {
@@ -252,9 +256,13 @@ export function RegistrationPolicySettings() {
     });
     if (!ok) return;
     try {
-      await api.delete(`/v2/admin/identity/provider-credentials/${slug}`);
-      toast.success(t('system.reg.credentials_removed'));
-      fetchData();
+      const res = await api.delete(`/v2/admin/identity/provider-credentials/${slug}`);
+      if (res.success) {
+        toast.success(t('system.reg.credentials_removed'));
+        fetchData();
+      } else {
+        toast.error(res.error || t('system.failed_to_remove_credentials'));
+      }
     } catch {
       toast.error(t('system.failed_to_remove_credentials'));
     }
@@ -283,9 +291,13 @@ export function RegistrationPolicySettings() {
 
   const handleDeactivateCode = async (id: number) => {
     try {
-      await api.delete(`/v2/admin/invite-codes/${id}`);
-      toast.success(t('system.invite_code_deactivated'));
-      fetchInviteCodes();
+      const res = await api.delete(`/v2/admin/invite-codes/${id}`);
+      if (res.success) {
+        toast.success(t('system.invite_code_deactivated'));
+        fetchInviteCodes();
+      } else {
+        toast.error(res.error || t('system.failed_to_deactivate_invite_code'));
+      }
     } catch {
       toast.error(t('system.failed_to_deactivate_invite_code'));
     }

@@ -165,11 +165,15 @@ export default function PilotScoreboardAdminPage() {
   const capturePre = async () => {
     setSubmitting(true);
     try {
-      await api.post('/v2/admin/caring-community/pilot-scoreboard/pre-pilot', { notes: preNotes });
-      showToast(t('pilot_scoreboard.toasts.pre_captured'), 'success');
-      setShowPreModal(false);
-      setPreNotes('');
-      await load();
+      const res = await api.post('/v2/admin/caring-community/pilot-scoreboard/pre-pilot', { notes: preNotes });
+      if (res.success) {
+        showToast(t('pilot_scoreboard.toasts.pre_captured'), 'success');
+        setShowPreModal(false);
+        setPreNotes('');
+        await load();
+      } else {
+        showToast(res.error || t('pilot_scoreboard.toasts.pre_failed'), 'error');
+      }
     } catch {
       showToast(t('pilot_scoreboard.toasts.pre_failed'), 'error');
     } finally {
@@ -180,15 +184,19 @@ export default function PilotScoreboardAdminPage() {
   const captureQuarterly = async () => {
     setSubmitting(true);
     try {
-      await api.post('/v2/admin/caring-community/pilot-scoreboard/quarterly', {
+      const res = await api.post('/v2/admin/caring-community/pilot-scoreboard/quarterly', {
         label: quarterlyLabel || undefined,
         notes: quarterlyNotes,
       });
-      showToast(t('pilot_scoreboard.toasts.quarterly_captured'), 'success');
-      setShowQuarterlyModal(false);
-      setQuarterlyLabel('');
-      setQuarterlyNotes('');
-      await load();
+      if (res.success) {
+        showToast(t('pilot_scoreboard.toasts.quarterly_captured'), 'success');
+        setShowQuarterlyModal(false);
+        setQuarterlyLabel('');
+        setQuarterlyNotes('');
+        await load();
+      } else {
+        showToast(res.error || t('pilot_scoreboard.toasts.quarterly_failed'), 'error');
+      }
     } catch {
       showToast(t('pilot_scoreboard.toasts.quarterly_failed'), 'error');
     } finally {

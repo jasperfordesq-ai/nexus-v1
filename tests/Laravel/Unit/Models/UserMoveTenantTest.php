@@ -84,7 +84,9 @@ class UserMoveTenantTest extends \Tests\Laravel\TestCase
         $returnType = $method->getReturnType();
 
         $this->assertNotNull($returnType, 'moveTenant should declare a return type');
-        $this->assertEquals('bool', $returnType->getName());
+        // array{success,moved,failed} — the shape the super-admin move
+        // endpoints consume (was bool before 8fa15107b).
+        $this->assertEquals('array', $returnType->getName());
     }
 
     public function testMoveTenantSourceUpdatesTenantId(): void

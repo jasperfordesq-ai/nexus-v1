@@ -286,11 +286,15 @@ export function FadpAdminPage() {
         is_automated_profiling: activityForm.is_automated_profiling,
         sort_order: parseInt(activityForm.sort_order, 10) || 0,
       };
-      await api.post('/v2/admin/fadp/processing-activities', payload);
-      toast.showToast(t('fadp.toasts.activity_saved'), 'success');
-      setActivityModalOpen(false);
-      void loadActivities();
-      void loadRegister();
+      const res = await api.post('/v2/admin/fadp/processing-activities', payload);
+      if (res.success) {
+        toast.showToast(t('fadp.toasts.activity_saved'), 'success');
+        setActivityModalOpen(false);
+        void loadActivities();
+        void loadRegister();
+      } else {
+        toast.showToast(res.error || t('fadp.toasts.activity_save_failed'), 'error');
+      }
     } catch {
       toast.showToast(t('fadp.toasts.activity_save_failed'), 'error');
     } finally {
@@ -303,11 +307,15 @@ export function FadpAdminPage() {
 
     setActivityDeleting(true);
     try {
-      await api.delete(`/v2/admin/fadp/processing-activities/${deleteTarget.id}`);
-      toast.showToast(t('fadp.toasts.activity_deleted'), 'success');
-      setDeleteTarget(null);
-      void loadActivities();
-      void loadRegister();
+      const res = await api.delete(`/v2/admin/fadp/processing-activities/${deleteTarget.id}`);
+      if (res.success) {
+        toast.showToast(t('fadp.toasts.activity_deleted'), 'success');
+        setDeleteTarget(null);
+        void loadActivities();
+        void loadRegister();
+      } else {
+        toast.showToast(res.error || t('fadp.toasts.activity_delete_failed'), 'error');
+      }
     } catch {
       toast.showToast(t('fadp.toasts.activity_delete_failed'), 'error');
     } finally {
@@ -318,9 +326,13 @@ export function FadpAdminPage() {
   async function saveRetention() {
     setRetentionSaving(true);
     try {
-      await api.put('/v2/admin/fadp/retention-config', retention);
-      toast.showToast(t('fadp.toasts.retention_saved'), 'success');
-      void loadRegister();
+      const res = await api.put('/v2/admin/fadp/retention-config', retention);
+      if (res.success) {
+        toast.showToast(t('fadp.toasts.retention_saved'), 'success');
+        void loadRegister();
+      } else {
+        toast.showToast(res.error || t('fadp.toasts.retention_save_failed'), 'error');
+      }
     } catch {
       toast.showToast(t('fadp.toasts.retention_save_failed'), 'error');
     } finally {

@@ -62,11 +62,15 @@ export function SeedGenerator() {
         counts[key] = countsRef.current[key] ?? SEED_OPTIONS.find(o => o.key === key)?.count ?? 10;
       }
 
-      await adminTools.runSeedGenerator({ types: selected, counts });
-      toast.success(
-        t('system.seed_data_generated'),
-        t('system.generated_data_for', { count: selected.length })
-      );
+      const res = await adminTools.runSeedGenerator({ types: selected, counts });
+      if (res.success) {
+        toast.success(
+          t('system.seed_data_generated'),
+          t('system.generated_data_for', { count: selected.length })
+        );
+      } else {
+        toast.error(t('system.seed_generation_failed'), res.error || t('system.seed_generation_error'));
+      }
     } catch {
       toast.error(t('system.seed_generation_failed'), t('system.seed_generation_error'));
     } finally {

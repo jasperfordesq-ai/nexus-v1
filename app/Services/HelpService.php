@@ -28,7 +28,8 @@ class HelpService
             ->where('is_published', 1);
 
         if ($categoryId) {
-            $query->where('category_id', $categoryId);
+            // help_faqs has no category_id column — category is a varchar
+            $query->where('category', $categoryId);
         }
 
         if ($search) {

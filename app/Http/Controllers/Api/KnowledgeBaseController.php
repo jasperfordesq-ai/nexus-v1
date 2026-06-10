@@ -147,7 +147,8 @@ class KnowledgeBaseController extends BaseApiController
         // user view.
         $isHead = strtoupper(request()->method()) === 'HEAD';
         if (! $isAdminPreview && ! $isHead) {
-            DB::table('knowledge_base_articles')->where('id', $article->id)->where('tenant_id', \App\Core\TenantContext::getId())->increment('view_count');
+            // Column is views_count — 'view_count' 500ed every public slug fetch
+            DB::table('knowledge_base_articles')->where('id', $article->id)->where('tenant_id', \App\Core\TenantContext::getId())->increment('views_count');
         }
 
         return $this->respondWithData($articleArr);

@@ -186,13 +186,17 @@ function InquiryDetailModal({
   async function saveStage() {
     setSaving(true);
     try {
-      await api.post(`/v2/admin/pilot-inquiries/${inquiry!.id}/stage`, {
+      const res = await api.post(`/v2/admin/pilot-inquiries/${inquiry!.id}/stage`, {
         stage: newStage,
         rejection_reason: newStage === 'rejected' ? rejectionReason : undefined,
       });
-      toast.success(t('toasts.stage_updated'));
-      onRefresh();
-      onClose();
+      if (res.success) {
+        toast.success(t('toasts.stage_updated'));
+        onRefresh();
+        onClose();
+      } else {
+        toast.error(res.error || t('toasts.stage_update_failed'));
+      }
     } catch (err) {
       logError('stage update failed', err);
       toast.error(t('toasts.stage_update_failed'));
@@ -204,9 +208,13 @@ function InquiryDetailModal({
   async function saveNotes() {
     setSaving(true);
     try {
-      await api.post(`/v2/admin/pilot-inquiries/${inquiry!.id}/notes`, { internal_notes: internalNotes });
-      toast.success(t('toasts.notes_saved'));
-      onRefresh();
+      const res = await api.post(`/v2/admin/pilot-inquiries/${inquiry!.id}/notes`, { internal_notes: internalNotes });
+      if (res.success) {
+        toast.success(t('toasts.notes_saved'));
+        onRefresh();
+      } else {
+        toast.error(res.error || t('toasts.notes_save_failed'));
+      }
     } catch (err) {
       logError('notes save failed', err);
       toast.error(t('toasts.notes_save_failed'));

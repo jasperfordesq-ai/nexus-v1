@@ -110,12 +110,16 @@ export function NativeApp() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await adminSettings.updateNativeAppSettings(formData);
-      const refreshed = await adminSettings.getNativeAppSettings();
-      const payload = (refreshed.data ?? {}) as NativeAppResponse;
-      setFormData((prev) => ({ ...prev, ...(payload.native_app ?? {}) }));
-      setReadiness(payload.deployment_readiness ?? {});
-      toast.success(t('system.native_app_settings_saved_successfully'));
+      const res = await adminSettings.updateNativeAppSettings(formData);
+      if (res.success) {
+        const refreshed = await adminSettings.getNativeAppSettings();
+        const payload = (refreshed.data ?? {}) as NativeAppResponse;
+        setFormData((prev) => ({ ...prev, ...(payload.native_app ?? {}) }));
+        setReadiness(payload.deployment_readiness ?? {});
+        toast.success(t('system.native_app_settings_saved_successfully'));
+      } else {
+        toast.error(res.error || t('system.failed_to_save_native_app_settings'));
+      }
     } catch {
       toast.error(t('system.failed_to_save_native_app_settings'));
     } finally {

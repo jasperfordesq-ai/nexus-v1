@@ -254,6 +254,8 @@ export function CreditAgreements() {
         setMonthlyLimit('100');
         createModal.onClose();
         loadData();
+      } else {
+        toast.error(res.error || t('federation.failed_to_create_agreement'));
       }
     } catch (err) {
       logError('CreditAgreements.create', err);
@@ -270,6 +272,8 @@ export function CreditAgreements() {
       if (res.success) {
         toast.success(t('federation.agreement_action_success'));
         loadData();
+      } else {
+        toast.error(res.error || t('federation.agreement_action_failed'));
       }
     } catch (err) {
       logError('CreditAgreements.statusChange', err);

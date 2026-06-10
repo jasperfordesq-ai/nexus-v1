@@ -18,7 +18,7 @@ import Pencil from 'lucide-react/icons/pencil';
 import Trash2 from 'lucide-react/icons/trash-2';
 import Users from 'lucide-react/icons/users';
 import { usePageTitle } from '@/hooks';
-import { useTenant } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
 import { DataTable, PageHeader, EmptyState, ConfirmModal, type Column } from '../../components';
 
@@ -38,6 +38,7 @@ interface Segment {
 export function Segments() {
   const { t } = useTranslation('admin');
   const { tenantPath } = useTenant();
+  const { error: showError } = useToast();
   usePageTitle(t('newsletters.page_title'));
   const navigate = useNavigate();
   const [items, setItems] = useState<Segment[]>([]);
@@ -70,15 +71,19 @@ export function Segments() {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      await adminNewsletters.deleteSegment(deleteTarget.id);
-      setItems(prev => prev.filter(s => s.id !== deleteTarget.id));
-      onDeleteClose();
+      const res = await adminNewsletters.deleteSegment(deleteTarget.id);
+      if (res.success) {
+        setItems(prev => prev.filter(s => s.id !== deleteTarget.id));
+        onDeleteClose();
+        setDeleteTarget(null);
+      } else {
+        showError(res.error || t('common.an_unexpected_error'));
+      }
     } catch {
-      // Error handled silently
+      showError(t('common.an_unexpected_error'));
     }
     setDeleting(false);
-    setDeleteTarget(null);
-  }, [deleteTarget, onDeleteClose]);
+  }, [deleteTarget, onDeleteClose, showError, t]);
 
   const columns: Column<Segment>[] = [
     {

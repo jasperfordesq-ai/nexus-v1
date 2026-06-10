@@ -13,6 +13,7 @@ use App\Models\Notification;
 use App\Models\User;
 use App\Services\NotificationDispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -20,6 +21,15 @@ use Illuminate\Support\Facades\Log;
  */
 class NotifyConnectionRequest implements ShouldQueue
 {
+    /**
+     * Fail fast rather than letting redis re-deliver mid-flight. The queue's
+     * retry_after is 90s; a slow run released back to another worker would
+     * re-send the request email. Killing at 60s and not retrying keeps one
+     * request → one notification. Belt-and-braces with the Cache guard in handle().
+     */
+    public int $tries = 1;
+    public int $timeout = 60;
+
     public function __construct()
     {
         //
@@ -30,6 +40,27 @@ class NotifyConnectionRequest implements ShouldQueue
      */
     public function handle(ConnectionRequested $event): void
     {
+        // Idempotency guard: suppress duplicate/concurrent re-deliveries for the
+        // same connection request so the notification is sent exactly once.
+        $connectionId = (int) ($event->connectionModel->id ?? 0);
+        $guardTenantId = (int) ($event->tenantId ?? 0);
+        $handledKey = null;
+        $claimKey = null;
+        $claimAcquired = false;
+        if ($connectionId > 0) {
+            $handledKey = 'notify_connection_request:done:' . $guardTenantId . ':' . $connectionId;
+            $claimKey = 'notify_connection_request:claim:' . $guardTenantId . ':' . $connectionId;
+            if (Cache::has($handledKey)) {
+                Log::info('NotifyConnectionRequest: duplicate delivery suppressed', ['connection_id' => $connectionId, 'tenant_id' => $guardTenantId]);
+                return;
+            }
+            $claimAcquired = Cache::add($claimKey, 1, now()->addMinutes(5));
+            if (!$claimAcquired) {
+                Log::info('NotifyConnectionRequest: concurrent delivery suppressed', ['connection_id' => $connectionId, 'tenant_id' => $guardTenantId]);
+                return;
+            }
+        }
+
         $previousTenantId = TenantContext::currentId();
 
         try {
@@ -77,6 +108,12 @@ class NotifyConnectionRequest implements ShouldQueue
                     \App\Services\NotificationDispatcher::fanOutPush((int) ($targetUserId), 'connection_request', $content, $link);
                 }
             });
+
+            // Mark handled only after the flow ran to completion so a redis
+            // re-delivery cannot re-send the request notification.
+            if ($handledKey !== null) {
+                Cache::put($handledKey, 1, now()->addHour());
+            }
         } catch (\Throwable $e) {
             Log::error('NotifyConnectionRequest listener failed', [
                 'requester_id' => $event->requester->id ?? null,
@@ -85,6 +122,9 @@ class NotifyConnectionRequest implements ShouldQueue
                 'trace' => $e->getTraceAsString(),
             ]);
         } finally {
+            if ($claimAcquired && $claimKey !== null) {
+                Cache::forget($claimKey);
+            }
             TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }

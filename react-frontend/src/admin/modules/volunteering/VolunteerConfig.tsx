@@ -559,10 +559,16 @@ function CustomFieldsTab() {
                 setSaving(true);
                 try {
                   const fieldIds = sortedFields.map((f) => f.id);
-                  await adminVolunteering.reorderCustomFields(fieldIds);
-                  toast.success(t('volunteering.order_saved'));
-                  setOrderChanged(false);
-                  loadData();
+                  const res = await adminVolunteering.reorderCustomFields(fieldIds);
+                  if (res.success) {
+                    toast.success(t('volunteering.order_saved'));
+                    setOrderChanged(false);
+                    loadData();
+                  } else {
+                    toast.error(res.error || t('volunteering.order_save_failed'));
+                    // Revert the local reorder to the server's saved order
+                    loadData();
+                  }
                 } catch {
                   toast.error(t('volunteering.order_save_failed'));
                 }

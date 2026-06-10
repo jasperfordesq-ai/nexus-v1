@@ -145,6 +145,8 @@ export function GroupList() {
       if (res?.success) {
         toast.success(t('groups.group_action_success'));
         loadItems();
+      } else {
+        toast.error(res?.error || t('groups.failed_to_action_group'));
       }
     } catch {
       toast.error(t('groups.failed_to_action_group'));
@@ -166,6 +168,8 @@ export function GroupList() {
         setCloneTarget(null);
         setCloneName('');
         loadItems();
+      } else {
+        toast.error(res?.error || t('groups.failed_to_clone_group'));
       }
     } catch {
       toast.error(t('groups.failed_to_clone_group'));
@@ -176,21 +180,40 @@ export function GroupList() {
 
   const handleBulkArchive = async () => {
     try {
-      await api.post('/v2/admin/groups/bulk-archive', { group_ids: Array.from(selectedIds) });
-      toast.success(t('groups.groups_archived'));
-      setSelectedIds(new Set());
-      loadItems();
+      const res = await api.post('/v2/admin/groups/bulk-archive', { group_ids: Array.from(selectedIds) });
+      if (res?.success) {
+        toast.success(t('groups.groups_archived'));
+        setSelectedIds(new Set());
+        loadItems();
+      } else {
+        toast.error(res?.error || t('groups.failed_to_archive_groups'));
+      }
     } catch { toast.error(t('groups.failed_to_archive_groups')); }
   };
 
   const handleBulkDelete = async () => {
     setBulkDeleteLoading(true);
     // Delete one by one (no bulk delete endpoint)
+    const failedIds = new Set<number>();
+    let firstError: string | undefined;
     for (const id of selectedIds) {
-      try { await adminGroups.delete(id); } catch { /* skip failures */ }
+      try {
+        const res = await adminGroups.delete(id);
+        if (!res?.success) {
+          failedIds.add(id);
+          if (!firstError && res?.error) firstError = res.error;
+        }
+      } catch {
+        failedIds.add(id);
+      }
     }
-    toast.success(t('groups.groups_deleted'));
-    setSelectedIds(new Set());
+    if (failedIds.size === 0) {
+      toast.success(t('groups.groups_deleted'));
+    } else {
+      toast.error(firstError || t('groups.failed_to_delete_group'));
+    }
+    // Keep failed ids selected so nothing is silently lost
+    setSelectedIds(failedIds);
     setBulkDeleteLoading(false);
     setConfirmBulkDelete(false);
     loadItems();

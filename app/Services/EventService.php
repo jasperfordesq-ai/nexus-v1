@@ -461,30 +461,40 @@ class EventService
             }
         }
 
-        // Recurring template: delete the recurrence rule and all FUTURE
-        // occurrences with it (they're unreachable orphans otherwise), but
-        // detach past occurrences so attendance history survives.
-        if (!empty($event->is_recurring_template)) {
-            DB::delete(
-                "DELETE FROM event_recurrence_rules WHERE event_id = ? AND tenant_id = ?",
-                [$id, $tenantId]
-            );
+        try {
+            DB::transaction(function () use ($event, $id, $tenantId): void {
+                // Recurring template: delete the recurrence rule and all FUTURE
+                // occurrences with it (they're unreachable orphans otherwise),
+                // but detach past occurrences so attendance history survives.
+                // Transactional: a failure mid-cascade must not leave the rule
+                // gone with half the occurrences still live.
+                if (!empty($event->is_recurring_template)) {
+                    DB::delete(
+                        "DELETE FROM event_recurrence_rules WHERE event_id = ? AND tenant_id = ?",
+                        [$id, $tenantId]
+                    );
 
-            $futureOccurrences = Event::query()
-                ->where('parent_event_id', $id)
-                ->where('start_time', '>=', now())
-                ->get();
-            foreach ($futureOccurrences as $occurrence) {
-                $occurrence->delete();
-            }
+                    $futureOccurrences = Event::query()
+                        ->where('parent_event_id', $id)
+                        ->where('start_time', '>=', now())
+                        ->get();
+                    foreach ($futureOccurrences as $occurrence) {
+                        $occurrence->delete();
+                    }
 
-            DB::update(
-                "UPDATE events SET parent_event_id = NULL WHERE parent_event_id = ? AND tenant_id = ?",
-                [$id, $tenantId]
-            );
+                    DB::update(
+                        "UPDATE events SET parent_event_id = NULL WHERE parent_event_id = ? AND tenant_id = ?",
+                        [$id, $tenantId]
+                    );
+                }
+
+                $event->delete();
+            });
+        } catch (\Throwable $e) {
+            Log::error("EventService::delete error: " . $e->getMessage());
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.delete_failed', ['resource' => 'event'])];
+            return false;
         }
-
-        $event->delete();
 
         return true;
     }

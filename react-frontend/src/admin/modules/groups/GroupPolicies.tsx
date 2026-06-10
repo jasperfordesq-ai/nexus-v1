@@ -103,7 +103,12 @@ export default function GroupPolicies({
 
   const handlePolicyChange = async (policy: GroupPolicy, newValue: string | number | boolean) => {
     try {
-      await adminGroups.setPolicy(typeId, policy.key, newValue);
+      const res = await adminGroups.setPolicy(typeId, policy.key, newValue);
+      if (!res.success) {
+        // Leave local state untouched so the control reverts to the saved value
+        error(res.error || t('groups.failed_to_update_policy'));
+        return;
+      }
       success(t('groups.policy_updated'));
 
       // Update local state

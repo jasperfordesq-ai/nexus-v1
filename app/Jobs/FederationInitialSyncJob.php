@@ -15,6 +15,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -38,11 +39,13 @@ class FederationInitialSyncJob implements ShouldQueue
 
     public string $queue = 'federation';
 
-    /** Retry on transient DB failures. */
-    public int $tries = 3;
-
-    /** Exponential-style backoff (seconds). */
-    public array $backoff = [30, 120, 300];
+    /**
+     * Fail fast rather than letting redis re-deliver mid-flight. The queue's
+     * retry_after is 90s but the timeout is 300s, so a long-running sync would
+     * be re-delivered to a second worker and write duplicate audit entries.
+     * One attempt plus the Cache guard in handle() keeps one activation → one sync.
+     */
+    public int $tries = 1;
 
     /** 5 minutes — may scan large tenant tables. */
     public int $timeout = 300;
@@ -55,6 +58,22 @@ class FederationInitialSyncJob implements ShouldQueue
 
     public function handle(): void
     {
+        // Idempotency guard: suppress duplicate/concurrent re-deliveries for the
+        // same partnership so the initial sync (audit entries + counts) runs
+        // exactly once. The partnership id is the natural key — it uniquely
+        // identifies both tenants and the activation.
+        $handledKey = 'federation_initial_sync:done:' . $this->partnershipId;
+        $claimKey = 'federation_initial_sync:claim:' . $this->partnershipId;
+        if (Cache::has($handledKey)) {
+            Log::info('FederationInitialSyncJob: duplicate delivery suppressed', ['partnership_id' => $this->partnershipId]);
+            return;
+        }
+        $claimAcquired = Cache::add($claimKey, 1, now()->addMinutes(10));
+        if (!$claimAcquired) {
+            Log::info('FederationInitialSyncJob: concurrent delivery suppressed', ['partnership_id' => $this->partnershipId]);
+            return;
+        }
+
         try {
             // Confirm the partnership is still active — it may have been suspended
             // or terminated between approval and when this job was dequeued.
@@ -116,7 +135,14 @@ class FederationInitialSyncJob implements ShouldQueue
                 'partner_members'       => $partnerMemberCount,
                 'partner_listings'      => $partnerListingCount,
             ]);
+
+            // Mark handled only after both audit entries were written so a redis
+            // re-delivery cannot duplicate the sync.
+            Cache::put($handledKey, 1, now()->addHour());
         } finally {
+            if ($claimAcquired) {
+                Cache::forget($claimKey);
+            }
             TenantContext::reset();
         }
     }

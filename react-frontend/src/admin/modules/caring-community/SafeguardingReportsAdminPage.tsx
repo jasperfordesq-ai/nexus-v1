@@ -154,13 +154,17 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
     const id = Number(assigneeId.trim());
     if (!id) return;
     try {
-      await api.post(`/v2/admin/caring-community/safeguarding/reports/${selectedId}/assign`, {
+      const res = await api.post(`/v2/admin/caring-community/safeguarding/reports/${selectedId}/assign`, {
         assignee_user_id: id,
       });
-      showToast(t('admin.safeguarding_reports.messages.assigned'), 'success');
-      setAssigneeId('');
-      await openDetail(selectedId);
-      await load();
+      if (res.success) {
+        showToast(t('admin.safeguarding_reports.messages.assigned'), 'success');
+        setAssigneeId('');
+        await openDetail(selectedId);
+        await load();
+      } else {
+        showToast(res.error || t('admin.safeguarding_reports.errors.assign'), 'error');
+      }
     } catch {
       showToast(t('admin.safeguarding_reports.errors.assign'), 'error');
     }
@@ -169,13 +173,17 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
   const handleEscalate = async () => {
     if (selectedId === null) return;
     try {
-      await api.post(`/v2/admin/caring-community/safeguarding/reports/${selectedId}/escalate`, {
+      const res = await api.post(`/v2/admin/caring-community/safeguarding/reports/${selectedId}/escalate`, {
         note: escalationNote.trim() || undefined,
       });
-      showToast(t('admin.safeguarding_reports.messages.escalated'), 'success');
-      setEscalationNote('');
-      await openDetail(selectedId);
-      await load();
+      if (res.success) {
+        showToast(t('admin.safeguarding_reports.messages.escalated'), 'success');
+        setEscalationNote('');
+        await openDetail(selectedId);
+        await load();
+      } else {
+        showToast(res.error || t('admin.safeguarding_reports.errors.escalate'), 'error');
+      }
     } catch {
       showToast(t('admin.safeguarding_reports.errors.escalate'), 'error');
     }
@@ -184,14 +192,18 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
   const handleStatus = async () => {
     if (selectedId === null) return;
     try {
-      await api.post(`/v2/admin/caring-community/safeguarding/reports/${selectedId}/status`, {
+      const res = await api.post(`/v2/admin/caring-community/safeguarding/reports/${selectedId}/status`, {
         status: statusToSet,
         notes: statusNotes.trim() || undefined,
       });
-      showToast(t('admin.safeguarding_reports.messages.status_updated'), 'success');
-      setStatusNotes('');
-      await openDetail(selectedId);
-      await load();
+      if (res.success) {
+        showToast(t('admin.safeguarding_reports.messages.status_updated'), 'success');
+        setStatusNotes('');
+        await openDetail(selectedId);
+        await load();
+      } else {
+        showToast(res.error || t('admin.safeguarding_reports.errors.status'), 'error');
+      }
     } catch {
       showToast(t('admin.safeguarding_reports.errors.status'), 'error');
     }
@@ -202,12 +214,16 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
     const note = newNote.trim();
     if (!note) return;
     try {
-      await api.post(`/v2/admin/caring-community/safeguarding/reports/${selectedId}/note`, {
+      const res = await api.post(`/v2/admin/caring-community/safeguarding/reports/${selectedId}/note`, {
         note,
       });
-      showToast(t('admin.safeguarding_reports.messages.note_added'), 'success');
-      setNewNote('');
-      await openDetail(selectedId);
+      if (res.success) {
+        showToast(t('admin.safeguarding_reports.messages.note_added'), 'success');
+        setNewNote('');
+        await openDetail(selectedId);
+      } else {
+        showToast(res.error || t('admin.safeguarding_reports.errors.note'), 'error');
+      }
     } catch {
       showToast(t('admin.safeguarding_reports.errors.note'), 'error');
     }

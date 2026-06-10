@@ -10,6 +10,7 @@ use App\Core\TenantContext;
 use App\Events\MessageSent;
 use App\Services\BrokerMessageVisibilityService;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -27,6 +28,16 @@ use Illuminate\Support\Facades\Log;
  */
 class CopyMessageForBrokerReview implements ShouldQueue
 {
+    /**
+     * Fail fast rather than letting redis re-deliver mid-flight. The queue's
+     * retry_after is 90s; a slow run released back to another worker would
+     * copy the same message to the broker review queue twice. Killing at 60s
+     * and not retrying keeps one message → at most one broker copy.
+     * Belt-and-braces with the Cache guard in handle().
+     */
+    public int $tries = 1;
+    public int $timeout = 60;
+
     public function __construct()
     {
         //
@@ -34,6 +45,27 @@ class CopyMessageForBrokerReview implements ShouldQueue
 
     public function handle(MessageSent $event): void
     {
+        // Idempotency guard: suppress duplicate/concurrent re-deliveries for the
+        // same message so it is copied to the broker queue at most once.
+        $messageId = (int) ($event->message->id ?? 0);
+        $guardTenantId = (int) ($event->tenantId ?? 0);
+        $handledKey = null;
+        $claimKey = null;
+        $claimAcquired = false;
+        if ($messageId > 0) {
+            $handledKey = 'copy_message_broker_review:done:' . $guardTenantId . ':' . $messageId;
+            $claimKey = 'copy_message_broker_review:claim:' . $guardTenantId . ':' . $messageId;
+            if (Cache::has($handledKey)) {
+                Log::info('CopyMessageForBrokerReview: duplicate delivery suppressed', ['message_id' => $messageId, 'tenant_id' => $guardTenantId]);
+                return;
+            }
+            $claimAcquired = Cache::add($claimKey, 1, now()->addMinutes(5));
+            if (!$claimAcquired) {
+                Log::info('CopyMessageForBrokerReview: concurrent delivery suppressed', ['message_id' => $messageId, 'tenant_id' => $guardTenantId]);
+                return;
+            }
+        }
+
         $previousTenantId = TenantContext::currentId();
 
         try {
@@ -56,6 +88,12 @@ class CopyMessageForBrokerReview implements ShouldQueue
             if ($copyReason !== null) {
                 $visibilityService->copyMessageForBroker($message->id, $copyReason);
             }
+
+            // Mark handled only after the visibility check ran to completion so
+            // a redis re-delivery cannot copy the message a second time.
+            if ($handledKey !== null) {
+                Cache::put($handledKey, 1, now()->addHour());
+            }
         } catch (\Throwable $e) {
             Log::error('CopyMessageForBrokerReview: failed', [
                 'message_id' => $event->message->id ?? null,
@@ -63,6 +101,9 @@ class CopyMessageForBrokerReview implements ShouldQueue
                 'error' => $e->getMessage(),
             ]);
         } finally {
+            if ($claimAcquired && $claimKey !== null) {
+                Cache::forget($claimKey);
+            }
             TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }

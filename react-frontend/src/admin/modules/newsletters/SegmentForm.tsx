@@ -244,12 +244,15 @@ export function SegmentForm() {
         rules: validRules,
       };
 
-      if (isEdit && id) {
-        await adminNewsletters.updateSegment(Number(id), payload);
+      const res = isEdit && id
+        ? await adminNewsletters.updateSegment(Number(id), payload)
+        : await adminNewsletters.createSegment(payload);
+
+      if (res.success) {
+        navigate(tenantPath('/admin/newsletters/segments'));
       } else {
-        await adminNewsletters.createSegment(payload);
+        setErrors({ form: res.error || t('newsletters.failed_to_save_segment') });
       }
-      navigate(tenantPath('/admin/newsletters/segments'));
     } catch {
       setErrors({ form: t('newsletters.failed_to_save_segment') });
     }

@@ -76,9 +76,13 @@ export default function AgentProposalsPage() {
   const handleApprove = async (p: AgentProposal) => {
     setBusyId(p.id);
     try {
-      await api.post(`/v2/admin/agents/proposals/${p.id}/approve`, {});
-      toast.success(t('agents.proposals.toasts.approved'));
-      await fetchItems();
+      const res = await api.post(`/v2/admin/agents/proposals/${p.id}/approve`, {});
+      if (res.success) {
+        toast.success(t('agents.proposals.toasts.approved'));
+        await fetchItems();
+      } else {
+        toast.error(res.error || t('agents.proposals.toasts.approve_failed'));
+      }
     } catch {
       toast.error(t('agents.proposals.toasts.approve_failed'));
     } finally {
@@ -90,11 +94,15 @@ export default function AgentProposalsPage() {
     if (!rejecting) return;
     setBusyId(rejecting.id);
     try {
-      await api.post(`/v2/admin/agents/proposals/${rejecting.id}/reject`, { note: rejectNote });
-      toast.success(t('agents.proposals.toasts.rejected'));
-      setRejecting(null);
-      setRejectNote('');
-      await fetchItems();
+      const res = await api.post(`/v2/admin/agents/proposals/${rejecting.id}/reject`, { note: rejectNote });
+      if (res.success) {
+        toast.success(t('agents.proposals.toasts.rejected'));
+        setRejecting(null);
+        setRejectNote('');
+        await fetchItems();
+      } else {
+        toast.error(res.error || t('agents.proposals.toasts.reject_failed'));
+      }
     } catch {
       toast.error(t('agents.proposals.toasts.reject_failed'));
     } finally {
@@ -118,12 +126,16 @@ export default function AgentProposalsPage() {
     }
     setBusyId(editing.id);
     try {
-      await api.post(`/v2/admin/agents/proposals/${editing.id}/edit-approve`, {
+      const res = await api.post(`/v2/admin/agents/proposals/${editing.id}/edit-approve`, {
         edited_payload: parsed,
       });
-      toast.success(t('agents.proposals.toasts.edited_approved'));
-      setEditing(null);
-      await fetchItems();
+      if (res.success) {
+        toast.success(t('agents.proposals.toasts.edited_approved'));
+        setEditing(null);
+        await fetchItems();
+      } else {
+        toast.error(res.error || t('agents.proposals.toasts.edit_approve_failed'));
+      }
     } catch {
       toast.error(t('agents.proposals.toasts.edit_approve_failed'));
     } finally {

@@ -126,14 +126,18 @@ export default function LeadNurtureAdminPage() {
     if (!editing) return;
     setSaving(true);
     try {
-      await api.put(`/v2/admin/caring-community/leads/${editing.id}`, {
+      const res = await api.put(`/v2/admin/caring-community/leads/${editing.id}`, {
         stage: draftStage,
         follow_up_at: draftFollowUp || null,
         notes: draftNotes || null,
       });
-      showToast(t('lead_nurture.toasts.updated'), 'success');
-      closeEdit();
-      await load();
+      if (res.success) {
+        showToast(t('lead_nurture.toasts.updated'), 'success');
+        closeEdit();
+        await load();
+      } else {
+        showToast(res.error || t('lead_nurture.toasts.update_failed'), 'error');
+      }
     } catch {
       showToast(t('lead_nurture.toasts.update_failed'), 'error');
     } finally {
@@ -149,9 +153,13 @@ export default function LeadNurtureAdminPage() {
     });
     if (!ok) return;
     try {
-      await api.post(`/v2/admin/caring-community/leads/${contact.id}/unsubscribe`);
-      showToast(t('lead_nurture.toasts.unsubscribed'), 'success');
-      await load();
+      const res = await api.post(`/v2/admin/caring-community/leads/${contact.id}/unsubscribe`);
+      if (res.success) {
+        showToast(t('lead_nurture.toasts.unsubscribed'), 'success');
+        await load();
+      } else {
+        showToast(res.error || t('lead_nurture.toasts.unsubscribe_failed'), 'error');
+      }
     } catch {
       showToast(t('lead_nurture.toasts.unsubscribe_failed'), 'error');
     }

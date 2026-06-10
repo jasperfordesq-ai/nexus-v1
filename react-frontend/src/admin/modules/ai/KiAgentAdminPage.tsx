@@ -285,9 +285,13 @@ export default function KiAgentAdminPage() {
 
   async function handleApprove(id: number) {
     try {
-      await api.post(`/v2/admin/ki-agents/proposals/${id}/approve`, {});
-      toast.success(t('ai.ki_agents.toasts.proposal_approved'));
-      void fetchProposals();
+      const res = await api.post(`/v2/admin/ki-agents/proposals/${id}/approve`, {});
+      if (res.success) {
+        toast.success(t('ai.ki_agents.toasts.proposal_approved'));
+        void fetchProposals();
+      } else {
+        toast.error(res.error || t('ai.ki_agents.toasts.proposal_approve_failed'));
+      }
     } catch {
       toast.error(t('ai.ki_agents.toasts.proposal_approve_failed'));
     }
@@ -295,9 +299,13 @@ export default function KiAgentAdminPage() {
 
   async function handleReject(id: number) {
     try {
-      await api.post(`/v2/admin/ki-agents/proposals/${id}/reject`, {});
-      toast.success(t('ai.ki_agents.toasts.proposal_rejected'));
-      void fetchProposals();
+      const res = await api.post(`/v2/admin/ki-agents/proposals/${id}/reject`, {});
+      if (res.success) {
+        toast.success(t('ai.ki_agents.toasts.proposal_rejected'));
+        void fetchProposals();
+      } else {
+        toast.error(res.error || t('ai.ki_agents.toasts.proposal_reject_failed'));
+      }
     } catch {
       toast.error(t('ai.ki_agents.toasts.proposal_reject_failed'));
     }

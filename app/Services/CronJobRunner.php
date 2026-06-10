@@ -1282,7 +1282,9 @@ class CronJobRunner
 
         // Acquire exclusive lock — prevents concurrent execution from HTTP + scheduler.
         // If another runner holds the lock, bail immediately to avoid double-sends.
-        $lock = Cache::lock('cron:run-all', 600); // 10-minute TTL
+        // TTL must comfortably exceed the scheduler's withoutOverlapping(30) window
+        // in bootstrap/app.php so the cache lock never expires before the mutex.
+        $lock = Cache::lock('cron:run-all', 1800); // 30-minute TTL
         if (!$lock->get()) {
             if (php_sapi_name() !== 'cli') {
                 header('Content-Type: text/plain');

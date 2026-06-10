@@ -51,8 +51,12 @@ export function ImageSettings() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await adminSettings.updateImageSettings(formData);
-      toast.success(t('system.image_settings_saved_successfully'));
+      const res = await adminSettings.updateImageSettings(formData);
+      if (res.success) {
+        toast.success(t('system.image_settings_saved_successfully'));
+      } else {
+        toast.error(res.error || t('system.failed_to_save_image_settings'));
+      }
     } catch {
       toast.error(t('system.failed_to_save_image_settings'));
     } finally {

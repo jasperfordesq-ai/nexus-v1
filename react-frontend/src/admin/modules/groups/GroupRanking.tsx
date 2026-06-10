@@ -42,9 +42,13 @@ export default function GroupRanking() {
   const handleUpdateRankings = async () => {
     try {
       setUpdating(true);
-      await adminGroups.updateFeaturedGroups();
-      success(t('groups.rankings_updated'));
-      loadGroups();
+      const res = await adminGroups.updateFeaturedGroups();
+      if (res.success) {
+        success(t('groups.rankings_updated'));
+        loadGroups();
+      } else {
+        error(res.error || t('groups.failed_to_update_rankings'));
+      }
     } catch {
       error(t('groups.failed_to_update_rankings'));
     } finally {
@@ -54,9 +58,13 @@ export default function GroupRanking() {
 
   const handleToggleFeatured = async (groupId: number) => {
     try {
-      await adminGroups.toggleFeatured(groupId);
-      success(t('groups.featured_status_updated'));
-      loadGroups();
+      const res = await adminGroups.toggleFeatured(groupId);
+      if (res.success) {
+        success(t('groups.featured_status_updated'));
+        loadGroups();
+      } else {
+        error(res.error || t('groups.failed_to_update_featured_status'));
+      }
     } catch {
       error(t('groups.failed_to_update_featured_status'));
     }

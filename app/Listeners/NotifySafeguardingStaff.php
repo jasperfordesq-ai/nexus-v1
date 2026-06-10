@@ -14,6 +14,7 @@ use App\Models\Notification;
 use App\Models\User;
 use App\Services\EmailDispatchService;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -27,11 +28,16 @@ use Illuminate\Support\Facades\Log;
 class NotifySafeguardingStaff implements ShouldQueue
 {
     /**
-     * Retry up to 3 times with exponential backoff.
-     * Safeguarding notifications are legally critical — must not be silently lost.
+     * Fail fast rather than letting redis re-deliver mid-flight. The queue's
+     * retry_after is 90s; a slow staff fanout (bell + email per admin/broker)
+     * released back to another worker would re-alert every staff member.
+     * Killing at 60s and not retrying keeps one flag → one fanout.
+     * Belt-and-braces with the Cache guard in handle(); the done marker is only
+     * set after the FULL fanout succeeds, so a never-delivered alert is never
+     * suppressed — a failed run still surfaces via failed() (logged critical).
      */
-    public int $tries = 3;
-    public array $backoff = [10, 60, 300];
+    public int $tries = 1;
+    public int $timeout = 60;
 
     public function __construct()
     {
@@ -40,6 +46,24 @@ class NotifySafeguardingStaff implements ShouldQueue
 
     public function handle(SafeguardingFlaggedEvent $event): void
     {
+        // Idempotency guard: suppress duplicate/concurrent re-deliveries for the
+        // same flag event. The key includes the triggers so a genuinely NEW flag
+        // for the same member (e.g. settings updated again) is never suppressed;
+        // the done marker is only written after every staff member was notified.
+        $guardTenantId = (int) ($event->tenantId ?? 0);
+        $triggersHash = md5(json_encode($event->triggers));
+        $handledKey = 'notify_safeguarding_staff:done:' . $guardTenantId . ':' . (int) $event->userId . ':' . $triggersHash;
+        $claimKey = 'notify_safeguarding_staff:claim:' . $guardTenantId . ':' . (int) $event->userId . ':' . $triggersHash;
+        if (Cache::has($handledKey)) {
+            Log::info('NotifySafeguardingStaff: duplicate delivery suppressed', ['user_id' => $event->userId, 'tenant_id' => $guardTenantId]);
+            return;
+        }
+        $claimAcquired = Cache::add($claimKey, 1, now()->addMinutes(5));
+        if (!$claimAcquired) {
+            Log::info('NotifySafeguardingStaff: concurrent delivery suppressed', ['user_id' => $event->userId, 'tenant_id' => $guardTenantId]);
+            return;
+        }
+
         $previousTenantId = TenantContext::currentId();
 
         try {
@@ -115,6 +139,11 @@ class NotifySafeguardingStaff implements ShouldQueue
                 'staff_notified'   => count($staffUsers),
                 'options_selected_count' => count($optionLabels),
             ]);
+
+            // Mark handled only after EVERY staff member was notified so a redis
+            // re-delivery cannot re-alert staff — and a partial/failed run is
+            // never marked done (the alert is never silently suppressed).
+            Cache::put($handledKey, 1, now()->addHour());
         } catch (\Throwable $e) {
             Log::error('NotifySafeguardingStaff: failed to notify staff', [
                 'user_id'   => $event->userId ?? null,
@@ -122,9 +151,13 @@ class NotifySafeguardingStaff implements ShouldQueue
                 'error'     => $e->getMessage(),
                 'trace'     => $e->getTraceAsString(),
             ]);
-            // Re-throw so Laravel queue retries (safeguarding notifications are legally critical)
+            // Re-throw so the job is marked failed and failed() fires
+            // (safeguarding notifications are legally critical — must not be silently lost)
             throw $e;
         } finally {
+            if ($claimAcquired) {
+                Cache::forget($claimKey);
+            }
             TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }
@@ -134,7 +167,7 @@ class NotifySafeguardingStaff implements ShouldQueue
      */
     public function failed(SafeguardingFlaggedEvent $event, \Throwable $exception): void
     {
-        Log::critical('NotifySafeguardingStaff: PERMANENTLY FAILED after all retries', [
+        Log::critical('NotifySafeguardingStaff: PERMANENTLY FAILED', [
             'user_id'   => $event->userId,
             'tenant_id' => $event->tenantId,
             'error'     => $exception->getMessage(),
@@ -180,7 +213,7 @@ class NotifySafeguardingStaff implements ShouldQueue
                 'tenant_id'       => $tenantId,
             ]);
             throw new \RuntimeException(
-                "Safeguarding email failed to send to staff {$staff->id} ({$staff->email}) — queue will retry"
+                "Safeguarding email failed to send to staff {$staff->id} ({$staff->email}) — job will be marked failed"
             );
         }
     }

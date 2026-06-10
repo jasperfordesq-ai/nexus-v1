@@ -138,9 +138,13 @@ export default function FederationPeersAdminPage() {
 
   async function handleStatus(peer: Peer, status: PeerStatus) {
     try {
-      await api.put(`/v2/admin/caring-community/federation-peers/${peer.id}/status`, { status });
-      showToast(t('federation_peers_admin.toasts.status_updated', { status: t(`federation_peers_admin.status.${status}`) }), 'success');
-      void fetchPeers();
+      const res = await api.put(`/v2/admin/caring-community/federation-peers/${peer.id}/status`, { status });
+      if (res.success) {
+        showToast(t('federation_peers_admin.toasts.status_updated', { status: t(`federation_peers_admin.status.${status}`) }), 'success');
+        void fetchPeers();
+      } else {
+        showToast(res.error || t('federation_peers_admin.toasts.status_failed'), 'error');
+      }
     } catch (err) {
       logError('FederationPeersAdminPage.status', err);
       showToast(t('federation_peers_admin.toasts.status_failed'), 'error');
@@ -184,9 +188,13 @@ export default function FederationPeersAdminPage() {
       return;
     }
     try {
-      await api.delete(`/v2/admin/caring-community/federation-peers/${peer.id}`);
-      showToast(t('federation_peers_admin.toasts.deleted'), 'success');
-      void fetchPeers();
+      const res = await api.delete(`/v2/admin/caring-community/federation-peers/${peer.id}`);
+      if (res.success) {
+        showToast(t('federation_peers_admin.toasts.deleted'), 'success');
+        void fetchPeers();
+      } else {
+        showToast(res.error || t('federation_peers_admin.toasts.delete_failed'), 'error');
+      }
     } catch (err) {
       logError('FederationPeersAdminPage.delete', err);
       showToast(t('federation_peers_admin.toasts.delete_failed'), 'error');

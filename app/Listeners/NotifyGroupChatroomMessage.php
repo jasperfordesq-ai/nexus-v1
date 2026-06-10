@@ -12,6 +12,7 @@ use App\Core\TenantContext;
 use App\Events\GroupChatroomMessagePosted;
 use App\Models\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -34,12 +35,39 @@ class NotifyGroupChatroomMessage implements ShouldQueue
 {
     public string $queue = 'default';
 
-    public int $tries = 3;
-
-    public array $backoff = [10, 30, 60];
+    /**
+     * Fail fast rather than letting redis re-deliver mid-flight. The queue's
+     * retry_after is 90s; a slow fanout released back to another worker would
+     * push duplicate bell/push notifications. Killing at 60s and not retrying
+     * keeps one chat message → one fanout. Belt-and-braces with the Cache
+     * guard in handle().
+     */
+    public int $tries = 1;
+    public int $timeout = 60;
 
     public function handle(GroupChatroomMessagePosted $event): void
     {
+        // Idempotency guard: suppress duplicate/concurrent re-deliveries for the
+        // same chat message so the bell/push fanout runs exactly once.
+        $guardMessageId = (int) ($event->message['id'] ?? 0);
+        $guardTenantId = (int) ($event->tenantId ?? 0);
+        $handledKey = null;
+        $claimKey = null;
+        $claimAcquired = false;
+        if ($guardMessageId > 0) {
+            $handledKey = 'notify_group_chatroom_message:done:' . $guardTenantId . ':' . $guardMessageId;
+            $claimKey = 'notify_group_chatroom_message:claim:' . $guardTenantId . ':' . $guardMessageId;
+            if (Cache::has($handledKey)) {
+                Log::info('NotifyGroupChatroomMessage: duplicate delivery suppressed', ['message_id' => $guardMessageId, 'tenant_id' => $guardTenantId]);
+                return;
+            }
+            $claimAcquired = Cache::add($claimKey, 1, now()->addMinutes(5));
+            if (!$claimAcquired) {
+                Log::info('NotifyGroupChatroomMessage: concurrent delivery suppressed', ['message_id' => $guardMessageId, 'tenant_id' => $guardTenantId]);
+                return;
+            }
+        }
+
         $previousTenantId = TenantContext::currentId();
 
         try {
@@ -131,6 +159,12 @@ class NotifyGroupChatroomMessage implements ShouldQueue
                 'sent'        => count($newRecipients),
                 'deduped'     => count($recentlyNotified),
             ]);
+
+            // Mark handled only after the full fanout ran so a redis re-delivery
+            // cannot re-run the notification loop.
+            if ($handledKey !== null) {
+                Cache::put($handledKey, 1, now()->addHour());
+            }
         } catch (\Throwable $e) {
             Log::warning('NotifyGroupChatroomMessage listener failed', [
                 'tenant_id'   => $event->tenantId ?? null,
@@ -139,6 +173,9 @@ class NotifyGroupChatroomMessage implements ShouldQueue
                 'error'       => $e->getMessage(),
             ]);
         } finally {
+            if ($claimAcquired && $claimKey !== null) {
+                Cache::forget($claimKey);
+            }
             TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }

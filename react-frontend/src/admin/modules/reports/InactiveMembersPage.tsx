@@ -198,9 +198,11 @@ export function InactiveMembersPage() {
       const res = await api.post('/v2/admin/members/inactive/detect', {
         threshold_days: parseInt(days, 10),
       });
-      if (res.data) {
+      if (res.success) {
         toast.success(t('reports.detection_complete'));
         await loadData();
+      } else {
+        toast.error(res.error || t('reports.detection_failed'));
       }
     } catch {
       toast.error(t('reports.detection_failed'));
@@ -220,11 +222,13 @@ export function InactiveMembersPage() {
     try {
       const userIds = Array.from(selectedIds);
       const res = await api.post('/v2/admin/members/inactive/notify', { user_ids: userIds });
-      if (res.data) {
-        const result = res.data as NotifyResult;
-        toast.success(result.message || t('reports.members_marked_notified'));
+      if (res.success) {
+        const result = res.data as NotifyResult | undefined;
+        toast.success(result?.message || t('reports.members_marked_notified'));
         setSelectedIds(new Set());
         await loadData();
+      } else {
+        toast.error(res.error || t('reports.failed_to_mark_members_as_notified'));
       }
     } catch {
       toast.error(t('reports.failed_to_mark_members_as_notified'));

@@ -109,9 +109,13 @@ export default function RegionalAnalyticsAdminPage() {
 
   const updateStatus = async (id: number, status: SubStatus) => {
     try {
-      await api.put(`/super-admin/regional-analytics/subscriptions/${id}`, { status });
-      toast.success(t('regional_analytics_admin.toasts.status_updated', { status: t(`regional_analytics_admin.statuses.${status}`) }));
-      void load();
+      const res = await api.put(`/super-admin/regional-analytics/subscriptions/${id}`, { status });
+      if (res.success) {
+        toast.success(t('regional_analytics_admin.toasts.status_updated', { status: t(`regional_analytics_admin.statuses.${status}`) }));
+        void load();
+      } else {
+        toast.error(res.error || t('regional_analytics_admin.toasts.update_failed'));
+      }
     } catch {
       toast.error(t('regional_analytics_admin.toasts.update_failed'));
     }
@@ -119,8 +123,12 @@ export default function RegionalAnalyticsAdminPage() {
 
   const generateReport = async (id: number) => {
     try {
-      await api.post(`/super-admin/regional-analytics/subscriptions/${id}/generate-report`);
-      toast.success(t('regional_analytics_admin.toasts.report_queued'));
+      const res = await api.post(`/super-admin/regional-analytics/subscriptions/${id}/generate-report`);
+      if (res.success) {
+        toast.success(t('regional_analytics_admin.toasts.report_queued'));
+      } else {
+        toast.error(res.error || t('regional_analytics_admin.toasts.report_failed'));
+      }
     } catch {
       toast.error(t('regional_analytics_admin.toasts.report_failed'));
     }
@@ -359,7 +367,7 @@ function CreateSubscriptionModal({
     }
     setSubmitting(true);
     try {
-      await api.post('/super-admin/regional-analytics/subscriptions', {
+      const res = await api.post('/super-admin/regional-analytics/subscriptions', {
         tenant_id: Number(tenantId),
         partner_name: partnerName.trim(),
         partner_type: partnerType,
@@ -370,9 +378,13 @@ function CreateSubscriptionModal({
         currency: currency.toUpperCase().slice(0, 3),
         enabled_modules: modules,
       });
-      toast.success(t('regional_analytics_admin.toasts.created'));
-      reset();
-      onCreated();
+      if (res.success) {
+        toast.success(t('regional_analytics_admin.toasts.created'));
+        reset();
+        onCreated();
+      } else {
+        toast.error(res.error || t('regional_analytics_admin.toasts.create_failed'));
+      }
     } catch {
       toast.error(t('regional_analytics_admin.toasts.create_failed'));
     } finally {

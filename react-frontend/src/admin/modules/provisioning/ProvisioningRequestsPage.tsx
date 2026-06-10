@@ -110,10 +110,14 @@ export function ProvisioningRequestsPage() {
     if (!selected) return;
     setActionInFlight(true);
     try {
-      await api.post(`/v2/super-admin/provisioning-requests/${selected.id}/approve`, {});
-      toast.success(t('approval_queued'));
-      detail.onClose();
-      await load();
+      const res = await api.post(`/v2/super-admin/provisioning-requests/${selected.id}/approve`, {});
+      if (res.success) {
+        toast.success(t('approval_queued'));
+        detail.onClose();
+        await load();
+      } else {
+        toast.error(res.error || t('approve_failed'));
+      }
     } catch (err) {
       logError('approve failed', err);
       toast.error(t('approve_failed'));
@@ -130,12 +134,16 @@ export function ProvisioningRequestsPage() {
     }
     setActionInFlight(true);
     try {
-      await api.post(`/v2/super-admin/provisioning-requests/${selected.id}/reject`, {
+      const res = await api.post(`/v2/super-admin/provisioning-requests/${selected.id}/reject`, {
         reason: rejectionReason.trim(),
       });
-      toast.success(t('request_rejected'));
-      detail.onClose();
-      await load();
+      if (res.success) {
+        toast.success(t('request_rejected'));
+        detail.onClose();
+        await load();
+      } else {
+        toast.error(res.error || t('reject_failed'));
+      }
     } catch (err) {
       logError('reject failed', err);
       toast.error(t('reject_failed'));
@@ -148,10 +156,14 @@ export function ProvisioningRequestsPage() {
     if (!selected) return;
     setActionInFlight(true);
     try {
-      await api.post(`/v2/super-admin/provisioning-requests/${selected.id}/retry`, {});
-      toast.success(t('retry_queued'));
-      detail.onClose();
-      await load();
+      const res = await api.post(`/v2/super-admin/provisioning-requests/${selected.id}/retry`, {});
+      if (res.success) {
+        toast.success(t('retry_queued'));
+        detail.onClose();
+        await load();
+      } else {
+        toast.error(res.error || t('retry_failed'));
+      }
     } catch (err) {
       logError('retry failed', err);
       toast.error(t('retry_failed'));

@@ -13,6 +13,7 @@ use App\Models\JobAlert;
 use App\Models\Notification;
 use App\Services\RealtimeService;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -23,6 +24,17 @@ use Illuminate\Support\Facades\Log;
  */
 class NotifyJobAlertSubscribers implements ShouldQueue
 {
+    /**
+     * Fail fast rather than letting redis re-deliver mid-flight. The queue's
+     * retry_after is 90s; a long alert fanout (bell + push + email per subscriber)
+     * released back to another worker would re-send every matching alert email.
+     * Killing at 60s and not retrying keeps one vacancy → one fanout.
+     * Belt-and-braces with the Cache guard in handle() plus a per-recipient
+     * sent marker inside the loop.
+     */
+    public int $tries = 1;
+    public int $timeout = 60;
+
     public function __construct()
     {
         //
@@ -33,6 +45,28 @@ class NotifyJobAlertSubscribers implements ShouldQueue
      */
     public function handle(JobVacancyCreated $event): void
     {
+        // Idempotency guard: suppress duplicate/concurrent re-deliveries for the
+        // same vacancy so the alert fanout runs exactly once (regression guard
+        // for the 2026-04-02 email-bombing class).
+        $vacancyId = (int) ($event->vacancy->id ?? 0);
+        $guardTenantId = (int) ($event->tenantId ?? 0);
+        $handledKey = null;
+        $claimKey = null;
+        $claimAcquired = false;
+        if ($vacancyId > 0) {
+            $handledKey = 'notify_job_alert_subscribers:done:' . $guardTenantId . ':' . $vacancyId;
+            $claimKey = 'notify_job_alert_subscribers:claim:' . $guardTenantId . ':' . $vacancyId;
+            if (Cache::has($handledKey)) {
+                Log::info('NotifyJobAlertSubscribers: duplicate delivery suppressed', ['vacancy_id' => $vacancyId, 'tenant_id' => $guardTenantId]);
+                return;
+            }
+            $claimAcquired = Cache::add($claimKey, 1, now()->addMinutes(5));
+            if (!$claimAcquired) {
+                Log::info('NotifyJobAlertSubscribers: concurrent delivery suppressed', ['vacancy_id' => $vacancyId, 'tenant_id' => $guardTenantId]);
+                return;
+            }
+        }
+
         $previousTenantId = TenantContext::currentId();
 
         try {
@@ -53,6 +87,15 @@ class NotifyJobAlertSubscribers implements ShouldQueue
 
                 try {
                     $alertUserId = (int) $alert->user_id;
+
+                    // Per-recipient idempotency: each (tenant, vacancy, alert) is
+                    // notified at most once even if a re-delivered copy slips past
+                    // the vacancy-level claim mid-fanout.
+                    $sentKey = 'notify_job_alert_subscribers:sent:' . $guardTenantId . ':' . $vacancyId . ':' . (int) $alert->id;
+                    if (!Cache::add($sentKey, 1, now()->addHour())) {
+                        continue;
+                    }
+
                     $user = \App\Models\User::find($alert->user_id);
                     $emailSent = false;
 
@@ -98,6 +141,12 @@ class NotifyJobAlertSubscribers implements ShouldQueue
                     ]);
                 }
             }
+
+            // Mark handled only after the full fanout ran so a redis re-delivery
+            // cannot re-run the alert loop.
+            if ($handledKey !== null) {
+                Cache::put($handledKey, 1, now()->addHour());
+            }
         } catch (\Throwable $e) {
             Log::error('NotifyJobAlertSubscribers listener failed', [
                 'vacancy_id' => $event->vacancy->id ?? null,
@@ -105,6 +154,9 @@ class NotifyJobAlertSubscribers implements ShouldQueue
                 'trace'      => $e->getTraceAsString(),
             ]);
         } finally {
+            if ($claimAcquired && $claimKey !== null) {
+                Cache::forget($claimKey);
+            }
             TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }

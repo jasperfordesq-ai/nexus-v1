@@ -485,6 +485,9 @@ class WalletService
         return $this->user->newQuery()
             ->where('id', '!=', $excludeUserId)
             ->where('status', '!=', 'banned')
+            // Deleted accounts can't log in — credits sent to one are
+            // irrecoverable, so never offer them as transfer recipients
+            ->whereNull('deleted_at')
             ->where(function (Builder $q) use ($like) {
                 $q->where('first_name', 'LIKE', $like)
                   ->orWhere('last_name', 'LIKE', $like)

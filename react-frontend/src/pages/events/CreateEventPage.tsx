@@ -540,7 +540,9 @@ export function CreateEventPage() {
         delete seriesPayload.end_time;
         response = await api.put(`/v2/events/${id}/recurring`, seriesPayload);
       } else {
-        response = await api.put(`/v2/events/${id}`, payload);
+        // scope 'single' via the recurring endpoint DETACHES the occurrence
+        // from the series, so later series-wide edits won't overwrite it.
+        response = await api.put(`/v2/events/${id}/recurring`, { ...payload, scope: 'single' });
       }
 
       if (response.success) {

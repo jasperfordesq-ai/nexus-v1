@@ -35,7 +35,9 @@ $app = Application::configure(basePath: dirname(__DIR__))
         })
             ->everyMinute()
             ->name('nexus:run-all')
-            ->withoutOverlapping(10);
+            // Must stay below the 30-min cron:run-all cache-lock TTL in
+            // CronJobRunner::runAll() so the mutex expires before the lock.
+            ->withoutOverlapping(30);
 
         $schedule->call(function () {
             \App\Services\JobExpiryNotificationService::notifyExpiringSoon();

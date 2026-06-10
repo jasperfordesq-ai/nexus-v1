@@ -250,16 +250,18 @@ export default function CoordinatorTasks() {
         due_date: formDueDate || (editingTask ? null : undefined),
       };
 
-      if (editingTask) {
-        await adminCrm.updateTask(editingTask.id, payload as Parameters<typeof adminCrm.updateTask>[1]);
-        toast.success(t('crm.task_updated'));
+      const res = editingTask
+        ? await adminCrm.updateTask(editingTask.id, payload as Parameters<typeof adminCrm.updateTask>[1])
+        : await adminCrm.createTask(payload as Parameters<typeof adminCrm.createTask>[0]);
+
+      if (res.success) {
+        toast.success(editingTask ? t('crm.task_updated') : t('crm.task_created'));
+        createModal.onClose();
+        resetForm();
+        await loadTasks();
       } else {
-        await adminCrm.createTask(payload as Parameters<typeof adminCrm.createTask>[0]);
-        toast.success(t('crm.task_created'));
+        toast.error(res.error || (editingTask ? t('crm.failed_to_update_task') : t('crm.failed_to_create_task')));
       }
-      createModal.onClose();
-      resetForm();
-      await loadTasks();
     } catch {
       toast.error(editingTask ? t('crm.failed_to_update_task') : t('crm.failed_to_create_task'));
     }
@@ -271,11 +273,15 @@ export default function CoordinatorTasks() {
     if (!deletingTask) return;
     setDeleting(true);
     try {
-      await adminCrm.deleteTask(deletingTask.id);
-      toast.success(t('crm.task_deleted'));
-      deleteModal.onClose();
-      setDeletingTask(null);
-      await loadTasks();
+      const res = await adminCrm.deleteTask(deletingTask.id);
+      if (res.success) {
+        toast.success(t('crm.task_deleted'));
+        deleteModal.onClose();
+        setDeletingTask(null);
+        await loadTasks();
+      } else {
+        toast.error(res.error || t('crm.failed_to_delete_task'));
+      }
     } catch {
       toast.error(t('crm.failed_to_delete_task'));
     }
@@ -285,9 +291,13 @@ export default function CoordinatorTasks() {
 
   const handleStatusChange = useCallback(async (task: Task, newStatus: Task['status']) => {
     try {
-      await adminCrm.updateTask(task.id, { status: newStatus });
-      toast.success(t('crm.task_status_changed'));
-      await loadTasks();
+      const res = await adminCrm.updateTask(task.id, { status: newStatus });
+      if (res.success) {
+        toast.success(t('crm.task_status_changed'));
+        await loadTasks();
+      } else {
+        toast.error(res.error || t('crm.failed_to_update_task_status'));
+      }
     } catch {
       toast.error(t('crm.failed_to_update_task_status'));
     }

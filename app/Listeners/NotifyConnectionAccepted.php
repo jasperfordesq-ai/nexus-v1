@@ -13,6 +13,7 @@ use App\Models\Notification;
 use App\Models\User;
 use App\Services\NotificationDispatcher;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -21,8 +22,38 @@ use Illuminate\Support\Facades\Log;
  */
 class NotifyConnectionAccepted implements ShouldQueue
 {
+    /**
+     * Fail fast rather than letting redis re-deliver mid-flight. The queue's
+     * retry_after is 90s; a slow run released back to another worker would
+     * re-send the acceptance email. Killing at 60s and not retrying keeps one
+     * acceptance → one notification. Belt-and-braces with the Cache guard in handle().
+     */
+    public int $tries = 1;
+    public int $timeout = 60;
+
     public function handle(ConnectionAccepted $event): void
     {
+        // Idempotency guard: suppress duplicate/concurrent re-deliveries for the
+        // same connection so the acceptance notification is sent exactly once.
+        $connectionId = (int) ($event->connectionModel->id ?? 0);
+        $guardTenantId = (int) ($event->tenantId ?? 0);
+        $handledKey = null;
+        $claimKey = null;
+        $claimAcquired = false;
+        if ($connectionId > 0) {
+            $handledKey = 'notify_connection_accepted:done:' . $guardTenantId . ':' . $connectionId;
+            $claimKey = 'notify_connection_accepted:claim:' . $guardTenantId . ':' . $connectionId;
+            if (Cache::has($handledKey)) {
+                Log::info('NotifyConnectionAccepted: duplicate delivery suppressed', ['connection_id' => $connectionId, 'tenant_id' => $guardTenantId]);
+                return;
+            }
+            $claimAcquired = Cache::add($claimKey, 1, now()->addMinutes(5));
+            if (!$claimAcquired) {
+                Log::info('NotifyConnectionAccepted: concurrent delivery suppressed', ['connection_id' => $connectionId, 'tenant_id' => $guardTenantId]);
+                return;
+            }
+        }
+
         $previousTenantId = TenantContext::currentId();
 
         try {
@@ -82,6 +113,12 @@ class NotifyConnectionAccepted implements ShouldQueue
                     \App\Services\NotificationDispatcher::fanOutPush((int) ($requesterId), 'connection_accepted', $content, $link);
                 }
             });
+
+            // Mark handled only after the flow ran to completion so a redis
+            // re-delivery cannot re-send the acceptance notification.
+            if ($handledKey !== null) {
+                Cache::put($handledKey, 1, now()->addHour());
+            }
         } catch (\Throwable $e) {
             Log::error('NotifyConnectionAccepted listener failed', [
                 'connection_id' => $event->connectionModel->id ?? null,
@@ -90,6 +127,9 @@ class NotifyConnectionAccepted implements ShouldQueue
                 'trace'         => $e->getTraceAsString(),
             ]);
         } finally {
+            if ($claimAcquired && $claimKey !== null) {
+                Cache::forget($claimKey);
+            }
             TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }

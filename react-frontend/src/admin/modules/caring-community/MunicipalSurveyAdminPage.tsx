@@ -280,9 +280,13 @@ export default function MunicipalSurveyAdminPage() {
             sort_order: i,
           })),
       };
-      await api.post('/v2/admin/caring-community/surveys', payload);
-      createModal.onClose();
-      await fetchSurveys();
+      const res = await api.post('/v2/admin/caring-community/surveys', payload);
+      if (res.success) {
+        createModal.onClose();
+        await fetchSurveys();
+      } else {
+        setCreateError(res.error || t('admin.surveys.errors.create'));
+      }
     } catch (e: unknown) {
       setCreateError(e instanceof Error ? e.message : t('admin.surveys.errors.create'));
     } finally {
@@ -312,8 +316,13 @@ export default function MunicipalSurveyAdminPage() {
   const handlePublish = async (id: number) => {
     setActionId(id);
     try {
-      await api.post(`/v2/admin/caring-community/surveys/${id}/publish`);
-      await fetchSurveys();
+      const res = await api.post(`/v2/admin/caring-community/surveys/${id}/publish`);
+      if (res.success) {
+        showToast(t('admin.surveys.status.active'), 'success');
+        await fetchSurveys();
+      } else {
+        showToast(res.error || tAdmin('common.an_unexpected_error'), 'error');
+      }
     } finally {
       setActionId(null);
     }
@@ -322,8 +331,13 @@ export default function MunicipalSurveyAdminPage() {
   const handleClose = async (id: number) => {
     setActionId(id);
     try {
-      await api.post(`/v2/admin/caring-community/surveys/${id}/close`);
-      await fetchSurveys();
+      const res = await api.post(`/v2/admin/caring-community/surveys/${id}/close`);
+      if (res.success) {
+        showToast(t('admin.surveys.status.closed'), 'success');
+        await fetchSurveys();
+      } else {
+        showToast(res.error || tAdmin('common.an_unexpected_error'), 'error');
+      }
     } finally {
       setActionId(null);
     }

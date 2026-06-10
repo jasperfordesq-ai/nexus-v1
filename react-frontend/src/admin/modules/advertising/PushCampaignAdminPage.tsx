@@ -333,9 +333,13 @@ export default function PushCampaignAdminPage() {
     setApproving(campaign.id);
     setActionMsg(null);
     try {
-      await api.post(`/v2/admin/push-campaigns/${campaign.id}/approve`);
-      setActionMsg(t('advertising.push.toasts.approved', { name: campaign.name }));
-      await fetchCampaigns();
+      const res = await api.post(`/v2/admin/push-campaigns/${campaign.id}/approve`);
+      if (res.success) {
+        setActionMsg(t('advertising.push.toasts.approved', { name: campaign.name }));
+        await fetchCampaigns();
+      } else {
+        setActionMsg(res.error || t('advertising.push.toasts.approve_failed'));
+      }
     } catch (e: unknown) {
       setActionMsg(e instanceof Error ? e.message : t('advertising.push.toasts.approve_failed'));
     } finally {
@@ -347,9 +351,13 @@ export default function PushCampaignAdminPage() {
     setDispatching(campaign.id);
     setActionMsg(null);
     try {
-      await api.post(`/v2/admin/push-campaigns/${campaign.id}/dispatch`);
-      setActionMsg(t('advertising.push.toasts.dispatched', { name: campaign.name }));
-      await fetchCampaigns();
+      const res = await api.post(`/v2/admin/push-campaigns/${campaign.id}/dispatch`);
+      if (res.success) {
+        setActionMsg(t('advertising.push.toasts.dispatched', { name: campaign.name }));
+        await fetchCampaigns();
+      } else {
+        setActionMsg(res.error || t('advertising.push.toasts.dispatch_failed'));
+      }
     } catch (e: unknown) {
       setActionMsg(e instanceof Error ? e.message : t('advertising.push.toasts.dispatch_failed'));
     } finally {
@@ -367,12 +375,16 @@ export default function PushCampaignAdminPage() {
     if (!rejectTarget || !rejectReason.trim()) return;
     setRejectSubmitting(true);
     try {
-      await api.post(`/v2/admin/push-campaigns/${rejectTarget.id}/reject`, {
+      const res = await api.post(`/v2/admin/push-campaigns/${rejectTarget.id}/reject`, {
         reason: rejectReason.trim(),
       });
-      rejectDisc.onClose();
-      setActionMsg(t('advertising.push.toasts.rejected', { name: rejectTarget.name }));
-      await fetchCampaigns();
+      if (res.success) {
+        rejectDisc.onClose();
+        setActionMsg(t('advertising.push.toasts.rejected', { name: rejectTarget.name }));
+        await fetchCampaigns();
+      } else {
+        setActionMsg(res.error || t('advertising.push.toasts.reject_failed'));
+      }
     } catch (e: unknown) {
       setActionMsg(e instanceof Error ? e.message : t('advertising.push.toasts.reject_failed'));
     } finally {

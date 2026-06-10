@@ -613,13 +613,15 @@ export default function RegionalAnalyticsPage() {
   const handleInvalidate = async () => {
     setInvalidating(true);
     try {
-      await api.post(`${BASE}/invalidate-cache`);
-      loadedTabs.current.clear();
-      setTabData({});
-      setTabLoading({});
-      setTabError({});
-      setOverviewData(null);
-      loadOverview();
+      const res = await api.post(`${BASE}/invalidate-cache`);
+      if (res.success) {
+        loadedTabs.current.clear();
+        setTabData({});
+        setTabLoading({});
+        setTabError({});
+        setOverviewData(null);
+        loadOverview();
+      }
     } catch {
       // Silently fail
     } finally {

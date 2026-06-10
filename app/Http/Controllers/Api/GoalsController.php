@@ -715,6 +715,10 @@ class GoalsController extends BaseApiController
 
         $reminder = $this->reminderService->setReminder($id, $userId, $this->getAllInput());
 
+        if ($reminder === []) {
+            return $this->respondWithError('NOT_FOUND', __('api.goal_not_found'), null, 404);
+        }
+
         return $this->respondWithData($reminder);
     }
 

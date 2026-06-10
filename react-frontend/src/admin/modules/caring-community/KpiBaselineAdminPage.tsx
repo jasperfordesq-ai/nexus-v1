@@ -246,16 +246,20 @@ export default function KpiBaselineAdminPage() {
   const handleCapture = useCallback(async () => {
     setCapturing(true);
     try {
-      await api.post('/v2/admin/caring-community/kpi-baselines', {
+      const res = await api.post('/v2/admin/caring-community/kpi-baselines', {
         label: captureLabel.trim() || undefined,
         period: { start: capturePeriodStart, end: capturePeriodEnd },
         notes: captureNotes.trim() || undefined,
       });
-      showToast(t('kpi_baselines.toasts.saved'), 'success');
-      setCaptureModalOpen(false);
-      setCaptureLabel('');
-      setCaptureNotes('');
-      await loadBaselines();
+      if (res.success) {
+        showToast(t('kpi_baselines.toasts.saved'), 'success');
+        setCaptureModalOpen(false);
+        setCaptureLabel('');
+        setCaptureNotes('');
+        await loadBaselines();
+      } else {
+        showToast(res.error || t('kpi_baselines.toasts.capture_failed'), 'error');
+      }
     } catch {
       showToast(t('kpi_baselines.toasts.capture_failed'), 'error');
     } finally {

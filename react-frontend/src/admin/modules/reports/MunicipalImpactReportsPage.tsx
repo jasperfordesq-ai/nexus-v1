@@ -315,11 +315,15 @@ export default function MunicipalImpactReportsPage() {
         hour_value_chf: templateForm.hour_value_chf === '' ? null : Number(templateForm.hour_value_chf),
       };
       const res = await api.post<{ template: ReportTemplate }>('/v2/admin/reports/municipal-impact/templates', payload);
-      const template = res.data?.template;
-      await loadTemplates();
-      if (template) setSelectedTemplateId(template.id);
-      toast.success(t('municipal_reports.toast.template_saved'));
-      onClose();
+      if (res.success) {
+        const template = res.data?.template;
+        await loadTemplates();
+        if (template) setSelectedTemplateId(template.id);
+        toast.success(t('municipal_reports.toast.template_saved'));
+        onClose();
+      } else {
+        toast.error(res.error || t('municipal_reports.toast.template_save_failed'));
+      }
     } catch {
       toast.error(t('municipal_reports.toast.template_save_failed'));
     } finally {
@@ -336,10 +340,14 @@ export default function MunicipalImpactReportsPage() {
     if (!ok) return;
     setDeletingTemplateId(templateId);
     try {
-      await api.delete(`/v2/admin/reports/municipal-impact/templates/${templateId}`);
-      if (selectedTemplateId === templateId) setSelectedTemplateId(null);
-      await loadTemplates();
-      toast.success(t('municipal_reports.toast.template_deleted'));
+      const res = await api.delete(`/v2/admin/reports/municipal-impact/templates/${templateId}`);
+      if (res.success) {
+        if (selectedTemplateId === templateId) setSelectedTemplateId(null);
+        await loadTemplates();
+        toast.success(t('municipal_reports.toast.template_deleted'));
+      } else {
+        toast.error(res.error || t('municipal_reports.toast.template_delete_failed'));
+      }
     } catch {
       toast.error(t('municipal_reports.toast.template_delete_failed'));
     } finally {

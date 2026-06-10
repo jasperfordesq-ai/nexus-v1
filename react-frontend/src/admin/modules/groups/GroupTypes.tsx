@@ -62,11 +62,15 @@ export default function GroupTypes() {
     }
 
     try {
-      await adminGroups.createGroupType(formData);
-      success(t('groups.group_type_created'));
-      onCreateClose();
-      setFormData({ name: '', description: '', icon: 'fa-layer-group', color: '#6366f1' });
-      loadTypes();
+      const res = await adminGroups.createGroupType(formData);
+      if (res.success) {
+        success(t('groups.group_type_created'));
+        onCreateClose();
+        setFormData({ name: '', description: '', icon: 'fa-layer-group', color: '#6366f1' });
+        loadTypes();
+      } else {
+        error(res.error || t('groups.failed_to_create_group_type'));
+      }
     } catch {
       error(t('groups.failed_to_create_group_type'));
     }
@@ -79,12 +83,16 @@ export default function GroupTypes() {
     }
 
     try {
-      await adminGroups.updateGroupType(selectedType.id, formData);
-      success(t('groups.group_type_updated'));
-      onEditClose();
-      setSelectedType(null);
-      setFormData({ name: '', description: '', icon: 'fa-layer-group', color: '#6366f1' });
-      loadTypes();
+      const res = await adminGroups.updateGroupType(selectedType.id, formData);
+      if (res.success) {
+        success(t('groups.group_type_updated'));
+        onEditClose();
+        setSelectedType(null);
+        setFormData({ name: '', description: '', icon: 'fa-layer-group', color: '#6366f1' });
+        loadTypes();
+      } else {
+        error(res.error || t('groups.failed_to_update_group_type'));
+      }
     } catch {
       error(t('groups.failed_to_update_group_type'));
     }
@@ -94,9 +102,13 @@ export default function GroupTypes() {
     if (deleteTarget === null) return;
     setDeleteLoading(true);
     try {
-      await adminGroups.deleteGroupType(deleteTarget);
-      success(t('groups.group_type_deleted'));
-      loadTypes();
+      const res = await adminGroups.deleteGroupType(deleteTarget);
+      if (res.success) {
+        success(t('groups.group_type_deleted'));
+        loadTypes();
+      } else {
+        error(res.error || t('groups.failed_to_delete_group_type'));
+      }
     } catch {
       error(t('groups.failed_to_delete_group_type'));
     } finally {

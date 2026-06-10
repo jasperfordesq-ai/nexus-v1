@@ -226,6 +226,9 @@ class UserService
                   ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", [$like]);
             })
             ->whereNotIn('status', ['banned', 'suspended', 'deleted'])
+            // Soft-deleted accounts (status='inactive' + deleted_at) must
+            // never surface as "Deleted User" rows in search
+            ->whereNull('deleted_at')
             ->where(function (Builder $q) {
                 $q->where('privacy_search', true)
                   ->orWhereNull('privacy_search');

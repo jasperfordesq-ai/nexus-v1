@@ -481,14 +481,33 @@ class GroupExchangeService
         // Each entry: ['user_id' => int, 'role' => 'provider'|string, 'hours' => int]
         $balanceChanges = [];
 
-        DB::transaction(function () use ($exchangeId, $exchange, $split, $tenantId, &$transactionIds, &$balanceChanges) {
+        $completed = DB::transaction(function () use ($exchangeId, $exchange, $split, $tenantId, &$transactionIds, &$balanceChanges): bool {
+            // Claim completion FIRST, atomically — the status predicate makes a
+            // concurrent double-complete (double-click / parallel request) a
+            // no-op instead of crediting every participant twice.
+            $claimed = DB::table('group_exchanges')
+                ->where('id', $exchangeId)
+                ->where('tenant_id', $tenantId)
+                ->whereNotIn('status', ['completed', 'cancelled'])
+                ->update([
+                    'status'       => 'completed',
+                    'completed_at' => now(),
+                    'updated_at'   => now(),
+                ]);
+
+            if ($claimed === 0) {
+                return false; // another request completed it first
+            }
+
             // Create wallet transactions for each participant
             foreach ($split as $entry) {
-                if ((float) $entry['hours'] <= 0) {
+                // Keep the 2-decimal split — (int) casting truncated shares
+                // (3×3.33h credited 9h while debiting 10h) and zeroed sub-1h
+                // shares while still writing their ledger rows.
+                $hours = round((float) $entry['hours'], 2);
+                if ($hours <= 0) {
                     continue;
                 }
-
-                $hours = (int) $entry['hours'];
 
                 // Providers earn credits, receivers spend them
                 if ($entry['role'] === 'provider') {
@@ -511,11 +530,18 @@ class GroupExchangeService
                         ->where('tenant_id', $tenantId)
                         ->increment('balance', $hours);
                 } else {
-                    // Debit the receiver
-                    DB::table('users')
+                    // Debit the receiver — guarded like every other debit path
+                    // (balance >= amount) so receivers can't be driven negative;
+                    // failure rolls back the whole completion.
+                    $debited = DB::table('users')
                         ->where('id', $entry['user_id'])
                         ->where('tenant_id', $tenantId)
+                        ->where('balance', '>=', $hours)
                         ->decrement('balance', $hours);
+
+                    if ($debited === 0) {
+                        throw new \RuntimeException(__('api.insufficient_balance'));
+                    }
                 }
 
                 $balanceChanges[] = [
@@ -525,16 +551,12 @@ class GroupExchangeService
                 ];
             }
 
-            // Mark exchange as completed
-            DB::table('group_exchanges')
-                ->where('id', $exchangeId)
-                ->where('tenant_id', $tenantId)
-                ->update([
-                    'status'       => 'completed',
-                    'completed_at' => now(),
-                    'updated_at'   => now(),
-                ]);
+            return true;
         });
+
+        if (! $completed) {
+            return ['success' => false, 'error' => __('api.group_exchange_already_completed')];
+        }
 
         // SUCCESS PATH ONLY — the DB::transaction above committed. Bell each
         // participant whose balance actually changed so the financial event is no

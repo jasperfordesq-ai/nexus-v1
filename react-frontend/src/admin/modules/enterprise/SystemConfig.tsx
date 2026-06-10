@@ -501,10 +501,14 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
         setSaving(false);
         return;
       }
-      await adminEnterprise.updateConfig(payload);
-      toast.success(t('enterprise.settings_saved'));
-      await loadData();
-      onAfterChange?.();
+      const res = await adminEnterprise.updateConfig(payload);
+      if (res.success) {
+        toast.success(t('enterprise.settings_saved'));
+        await loadData();
+        onAfterChange?.();
+      } else {
+        toast.error(res.error || t('enterprise.failed_to_save_settings'));
+      }
     } catch {
       toast.error(t('enterprise.failed_to_save_settings'));
     } finally {
@@ -517,11 +521,15 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
   async function handleReset() {
     setResetting(true);
     try {
-      await adminEnterprise.resetConfig();
-      toast.success(t('enterprise.configuration_reset_to_defaults'));
-      setShowResetModal(false);
-      await loadData();
-      onAfterChange?.();
+      const res = await adminEnterprise.resetConfig();
+      if (res.success) {
+        toast.success(t('enterprise.configuration_reset_to_defaults'));
+        setShowResetModal(false);
+        await loadData();
+        onAfterChange?.();
+      } else {
+        toast.error(res.error || t('enterprise.failed_to_reset_configuration'));
+      }
     } catch {
       toast.error(t('enterprise.failed_to_reset_configuration'));
     } finally {

@@ -120,10 +120,14 @@ export function TrustTierAdminPage() {
     if (!criteria) return;
     setSaving(true);
     try {
-      await api.put('/v2/admin/caring-community/trust-tier/config', { criteria });
-      showToast(t('admin.trust_tier.messages.saved'), 'success');
-      setLocalCriteria(null);
-      void refetch();
+      const res = await api.put('/v2/admin/caring-community/trust-tier/config', { criteria });
+      if (res.success) {
+        showToast(t('admin.trust_tier.messages.saved'), 'success');
+        setLocalCriteria(null);
+        void refetch();
+      } else {
+        showToast(res.error || t('admin.trust_tier.errors.save_failed'), 'error');
+      }
     } catch {
       showToast(t('admin.trust_tier.errors.save_failed'), 'error');
     } finally {

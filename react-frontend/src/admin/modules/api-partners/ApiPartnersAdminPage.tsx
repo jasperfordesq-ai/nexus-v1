@@ -108,9 +108,13 @@ export default function ApiPartnersAdminPage() {
 
   const handleSuspend = async (id: number) => {
     try {
-      await api.post(`/v2/admin/api-partners/${id}/suspend`);
-      toast.success(t('api_partners.toasts.suspended'));
-      void load();
+      const res = await api.post(`/v2/admin/api-partners/${id}/suspend`);
+      if (res.success) {
+        toast.success(t('api_partners.toasts.suspended'));
+        void load();
+      } else {
+        toast.error(res.error || t('api_partners.toasts.suspend_failed'));
+      }
     } catch {
       toast.error(t('api_partners.toasts.suspend_failed'));
     }
@@ -118,9 +122,13 @@ export default function ApiPartnersAdminPage() {
 
   const handleActivate = async (id: number) => {
     try {
-      await api.post(`/v2/admin/api-partners/${id}/activate`);
-      toast.success(t('api_partners.toasts.activated'));
-      void load();
+      const res = await api.post(`/v2/admin/api-partners/${id}/activate`);
+      if (res.success) {
+        toast.success(t('api_partners.toasts.activated'));
+        void load();
+      } else {
+        toast.error(res.error || t('api_partners.toasts.activate_failed'));
+      }
     } catch {
       toast.error(t('api_partners.toasts.activate_failed'));
     }

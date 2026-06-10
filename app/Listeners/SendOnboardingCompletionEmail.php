@@ -13,6 +13,7 @@ use App\I18n\LocaleContext;
 use App\Models\User;
 use App\Services\EmailDispatchService;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
@@ -24,8 +25,33 @@ use Illuminate\Support\Facades\Schema;
  */
 class SendOnboardingCompletionEmail implements ShouldQueue
 {
+    /**
+     * Fail fast rather than letting redis re-deliver mid-flight. The queue's
+     * retry_after is 90s; a slow run (HTML build + email send) released back to
+     * another worker would re-send the completion email. Killing at 60s and not
+     * retrying keeps one completion → one email. Belt-and-braces with the Cache
+     * guard in handle() and the email_log sent-check.
+     */
+    public int $tries = 1;
+    public int $timeout = 60;
+
     public function handle(OnboardingCompleted $event): void
     {
+        // Idempotency guard: suppress duplicate/concurrent re-deliveries for the
+        // same completion so the email is sent exactly once.
+        $guardTenantId = (int) ($event->tenantId ?? 0);
+        $handledKey = 'send_onboarding_completion:done:' . $guardTenantId . ':' . (int) $event->userId;
+        $claimKey = 'send_onboarding_completion:claim:' . $guardTenantId . ':' . (int) $event->userId;
+        if (Cache::has($handledKey)) {
+            Log::info('SendOnboardingCompletionEmail: duplicate delivery suppressed', ['user_id' => $event->userId, 'tenant_id' => $guardTenantId]);
+            return;
+        }
+        $claimAcquired = Cache::add($claimKey, 1, now()->addMinutes(5));
+        if (!$claimAcquired) {
+            Log::info('SendOnboardingCompletionEmail: concurrent delivery suppressed', ['user_id' => $event->userId, 'tenant_id' => $guardTenantId]);
+            return;
+        }
+
         $previousTenantId = TenantContext::currentId();
 
         try {
@@ -90,6 +116,10 @@ class SendOnboardingCompletionEmail implements ShouldQueue
                     'user_id'   => $event->userId,
                     'tenant_id' => $event->tenantId,
                 ]);
+            } else {
+                // Mark handled only after the send succeeded so a redis
+                // re-delivery cannot re-send the completion email.
+                Cache::put($handledKey, 1, now()->addHours(24));
             }
         } catch (\Throwable $e) {
             Log::error('SendOnboardingCompletionEmail: failed', [
@@ -98,6 +128,9 @@ class SendOnboardingCompletionEmail implements ShouldQueue
                 'error'     => $e->getMessage(),
             ]);
         } finally {
+            if ($claimAcquired) {
+                Cache::forget($claimKey);
+            }
             TenantContext::restoreAfterScopedListener($previousTenantId);
         }
     }

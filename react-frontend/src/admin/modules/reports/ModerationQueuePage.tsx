@@ -255,10 +255,12 @@ export function ModerationQueuePage() {
       const res = await api.post(`/v2/admin/moderation/${id}/review`, {
         decision: 'approved',
       });
-      if (res.data) {
+      if (res.success) {
         toast.success(t('reports.content_approved'));
         await loadQueue();
         await loadStats();
+      } else {
+        toast.error(res.error || t('reports.failed_to_approve_content'));
       }
     } catch {
       toast.error(t('reports.failed_to_approve_content'));
@@ -288,11 +290,13 @@ export function ModerationQueuePage() {
         decision: 'rejected',
         rejection_reason: rejectReason.trim(),
       });
-      if (res.data) {
+      if (res.success) {
         toast.success(t('reports.content_rejected'));
         onRejectClose();
         await loadQueue();
         await loadStats();
+      } else {
+        toast.error(res.error || t('reports.failed_to_reject_content'));
       }
     } catch {
       toast.error(t('reports.failed_to_reject_content'));
@@ -307,10 +311,12 @@ export function ModerationQueuePage() {
     setSavingSettings(true);
     try {
       const res = await api.put('/v2/admin/moderation/settings', localSettings);
-      if (res.data) {
+      if (res.success) {
         toast.success(t('reports.moderation_settings_updated'));
         await loadSettings();
         onSettingsClose();
+      } else {
+        toast.error(res.error || t('reports.failed_to_update_settings'));
       }
     } catch {
       toast.error(t('reports.failed_to_update_settings'));

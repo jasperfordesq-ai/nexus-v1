@@ -220,14 +220,16 @@ export default function SubRegionsAdminPage() {
       };
       if (form.slug.trim()) payload.slug = form.slug.trim();
 
-      if (editTarget) {
-        await api.put(`/v2/admin/caring-community/sub-regions/${editTarget.id}`, payload);
-        showToast(t('sub_regions.toasts.updated'), 'success');
-      } else {
-        await api.post('/v2/admin/caring-community/sub-regions', payload);
-        showToast(t('sub_regions.toasts.created'), 'success');
+      const res = editTarget
+        ? await api.put(`/v2/admin/caring-community/sub-regions/${editTarget.id}`, payload)
+        : await api.post('/v2/admin/caring-community/sub-regions', payload);
+
+      if (!res.success) {
+        showToast(res.error || t('sub_regions.errors.save_failed'), 'error');
+        return;
       }
 
+      showToast(t(editTarget ? 'sub_regions.toasts.updated' : 'sub_regions.toasts.created'), 'success');
       closeModal();
       void fetchRegions();
     } catch (err) {
@@ -262,9 +264,13 @@ export default function SubRegionsAdminPage() {
       return;
     }
     try {
-      await api.delete(`/v2/admin/caring-community/sub-regions/${region.id}`);
-      showToast(t('sub_regions.toasts.marked_inactive'), 'success');
-      void fetchRegions();
+      const res = await api.delete(`/v2/admin/caring-community/sub-regions/${region.id}`);
+      if (res.success) {
+        showToast(t('sub_regions.toasts.marked_inactive'), 'success');
+        void fetchRegions();
+      } else {
+        showToast(res.error || t('sub_regions.errors.delete_failed'), 'error');
+      }
     } catch (err) {
       logError('SubRegionsAdminPage.delete', err);
       showToast(t('sub_regions.errors.delete_failed'), 'error');

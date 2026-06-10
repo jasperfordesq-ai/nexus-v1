@@ -79,10 +79,14 @@ export default function GroupDetail() {
 
   const handleSave = async () => {
     try {
-      await adminGroups.updateGroup(Number(id), formData);
-      success(t('groups.group_updated'));
-      setEditMode(false);
-      loadGroup();
+      const res = await adminGroups.updateGroup(Number(id), formData);
+      if (res.success) {
+        success(t('groups.group_updated'));
+        setEditMode(false);
+        loadGroup();
+      } else {
+        error(res.error || t('groups.failed_to_update_group'));
+      }
     } catch {
       error(t('groups.failed_to_update_group'));
     }
@@ -90,9 +94,13 @@ export default function GroupDetail() {
 
   const handleGeocode = async () => {
     try {
-      await adminGroups.geocodeGroup(Number(id));
-      success(t('groups.location_geocoded'));
-      loadGroup();
+      const res = await adminGroups.geocodeGroup(Number(id));
+      if (res.success) {
+        success(t('groups.location_geocoded'));
+        loadGroup();
+      } else {
+        error(res.error || t('groups.failed_to_geocode_location'));
+      }
     } catch {
       error(t('groups.failed_to_geocode_location'));
     }
@@ -100,9 +108,13 @@ export default function GroupDetail() {
 
   const handlePromote = async (userId: number) => {
     try {
-      await adminGroups.promoteMember(Number(id), userId);
-      success(t('groups.member_promoted'));
-      loadMembers();
+      const res = await adminGroups.promoteMember(Number(id), userId);
+      if (res.success) {
+        success(t('groups.member_promoted'));
+        loadMembers();
+      } else {
+        error(res.error || t('groups.failed_to_promote_member'));
+      }
     } catch {
       error(t('groups.failed_to_promote_member'));
     }
@@ -110,9 +122,13 @@ export default function GroupDetail() {
 
   const handleDemote = async (userId: number) => {
     try {
-      await adminGroups.demoteMember(Number(id), userId);
-      success(t('groups.member_demoted'));
-      loadMembers();
+      const res = await adminGroups.demoteMember(Number(id), userId);
+      if (res.success) {
+        success(t('groups.member_demoted'));
+        loadMembers();
+      } else {
+        error(res.error || t('groups.failed_to_demote_member'));
+      }
     } catch {
       error(t('groups.failed_to_demote_member'));
     }
@@ -122,9 +138,13 @@ export default function GroupDetail() {
     if (kickTarget === null) return;
     setKickLoading(true);
     try {
-      await adminGroups.kickMember(Number(id), kickTarget);
-      success(t('groups.member_removed'));
-      loadMembers();
+      const res = await adminGroups.kickMember(Number(id), kickTarget);
+      if (res.success) {
+        success(t('groups.member_removed'));
+        loadMembers();
+      } else {
+        error(res.error || t('groups.failed_to_remove_member'));
+      }
     } catch {
       error(t('groups.failed_to_remove_member'));
     } finally {

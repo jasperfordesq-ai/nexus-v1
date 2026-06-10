@@ -1296,17 +1296,21 @@ export default function CaringCommunityWorkflowPage() {
 
     setLoggingRelationshipId(relationship.id);
     try {
-      await api.post(`/v2/admin/caring-community/support-relationships/${relationship.id}/hours`, {
+      const res = await api.post(`/v2/admin/caring-community/support-relationships/${relationship.id}/hours`, {
         date: relationshipLogDate,
         hours,
         description: relationshipLogDescription || undefined,
       });
-      toast.success(t('caring_workflow.relationships.log_success'));
-      setRelationshipLogDate('');
-      setRelationshipLogHours('');
-      setRelationshipLogDescription('');
-      loadSupportRelationships();
-      loadWorkflow();
+      if (res.success) {
+        toast.success(t('caring_workflow.relationships.log_success'));
+        setRelationshipLogDate('');
+        setRelationshipLogHours('');
+        setRelationshipLogDescription('');
+        loadSupportRelationships();
+        loadWorkflow();
+      } else {
+        toast.error(res.error || t('caring_workflow.relationships.log_failed'));
+      }
     } catch {
       toast.error(t('caring_workflow.relationships.log_failed'));
     } finally {

@@ -270,13 +270,21 @@ export function UserEdit() {
     setAnnouncerLoading(true);
     try {
       if (isMunicipalityAnnouncer) {
-        await api.delete(`/v2/admin/feed/revoke-announcer/${id}`);
-        setIsMunicipalityAnnouncer(false);
-        toast.success(t('toasts.announcer_revoked'));
+        const res = await api.delete(`/v2/admin/feed/revoke-announcer/${id}`);
+        if (res.success) {
+          setIsMunicipalityAnnouncer(false);
+          toast.success(t('toasts.announcer_revoked'));
+        } else {
+          toast.error(res.error || t('toasts.announcer_failed'));
+        }
       } else {
-        await api.post('/v2/admin/feed/grant-announcer', { user_id: Number(id) });
-        setIsMunicipalityAnnouncer(true);
-        toast.success(t('toasts.announcer_granted'));
+        const res = await api.post('/v2/admin/feed/grant-announcer', { user_id: Number(id) });
+        if (res.success) {
+          setIsMunicipalityAnnouncer(true);
+          toast.success(t('toasts.announcer_granted'));
+        } else {
+          toast.error(res.error || t('toasts.announcer_failed'));
+        }
       }
     } catch {
       toast.error(t('toasts.announcer_failed'));
