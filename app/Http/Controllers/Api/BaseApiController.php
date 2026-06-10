@@ -338,13 +338,17 @@ abstract class BaseApiController extends Controller
     /**
      * Get input data from the current request (JSON body, form data, or query)
      *
+     * A key sent with an explicit JSON null falls back to $default, so
+     * callers like trim($this->input('title', '')) never receive null
+     * (PHP 8.1+ deprecates passing null to trim/strtolower/etc.).
+     *
      * @param string $key Input key
-     * @param mixed $default Default value if key not found
+     * @param mixed $default Default value if key not found or null
      * @return mixed
      */
     protected function input(string $key, $default = null)
     {
-        return request()->input($key, $default);
+        return request()->input($key, $default) ?? $default;
     }
 
     /**
