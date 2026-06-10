@@ -131,7 +131,13 @@
     "fallback_organization": "Organizacja",
     "community_label": "Społeczność",
     "or_separator": "lub",
-    "signoff": "Z poważaniem,\n{{app}}"
+    "signoff": "Z poważaniem,\n{{app}}",
+    "fallback_listing": "Nowe ogłoszenie",
+    "fallback_their_listing": "Ich ogłoszenie",
+    "listing_type_offer": "Oferta",
+    "listing_type_request": "Prośba",
+    "fallback_they_offer": "umiejętność, której potrzebujesz",
+    "fallback_you_offer": "coś, czego oni potrzebują"
   },
   "footer": {
     "unsubscribe": "Zrezygnuj z subskrypcji tych e-maili",
@@ -295,7 +301,12 @@
     "greeting": "Cześć {{name}},",
     "intro": "Oto podsumowanie tego, co przegapiłeś/aś w Project NEXUS:",
     "opted_in_notice": "Otrzymałeś/aś ten e-mail, ponieważ wybrałeś/aś podsumowanie {{frequency}}.",
-    "manage_notifications": "Zarządzaj powiadomieniami"
+    "manage_notifications": "Zarządzaj powiadomieniami",
+    "view_item": "Zobacz",
+    "frequency_instant": "Natychmiastowe",
+    "frequency_daily": "Codzienne",
+    "frequency_weekly": "Cotygodniowe",
+    "frequency_monthly": "Comiesięczne"
   },
   "weekly_digest": {
     "title": "Puls społeczności - miesięczne podsumowanie",
@@ -334,7 +345,15 @@
     "mutual_matches_link": "Wzajemne dopasowania",
     "all_matches_link": "Wszystkie dopasowania",
     "receiving_digest": "Otrzymujesz to podsumowanie za {{period}}, ponieważ masz włączone dopasowania.",
-    "manage_frequency": "Zarządzaj częstotliwością podsumowań"
+    "manage_frequency": "Zarządzaj częstotliwością podsumowań",
+    "period_title_daily": "Codzienne",
+    "period_title_weekly": "Cotygodniowe",
+    "period_title_fortnightly": "Co dwa tygodnie",
+    "period_title_monthly": "Comiesięczne",
+    "period_day": "dzień",
+    "period_week": "tydzień",
+    "period_fortnight": "dwa tygodnie",
+    "period_month": "miesiąc"
   },
   "match_hot": {
     "title": "Znaleziono gorące dopasowanie!",

@@ -131,7 +131,13 @@
     "fallback_organization": "Organisation",
     "community_label": "Gemeinschaft",
     "or_separator": "oder",
-    "signoff": "Mit freundlichen Grüßen,\n{{app}}"
+    "signoff": "Mit freundlichen Grüßen,\n{{app}}",
+    "fallback_listing": "Neues Inserat",
+    "fallback_their_listing": "Das Inserat des Mitglieds",
+    "listing_type_offer": "Angebot",
+    "listing_type_request": "Gesuch",
+    "fallback_they_offer": "eine Fähigkeit, die Sie benötigen",
+    "fallback_you_offer": "etwas, das sie benötigen"
   },
   "footer": {
     "unsubscribe": "Von diesen E-Mails abmelden",
@@ -295,7 +301,12 @@
     "greeting": "Hallo {{name}},",
     "intro": "Hier ist eine Zusammenfassung der Neuigkeiten bei Project NEXUS, die Sie verpasst haben:",
     "opted_in_notice": "Sie haben diese E-Mail erhalten, weil Sie sich für eine {{frequency}} Zusammenfassung entschieden haben.",
-    "manage_notifications": "Benachrichtigungen verwalten"
+    "manage_notifications": "Benachrichtigungen verwalten",
+    "view_item": "Ansehen",
+    "frequency_instant": "Sofort",
+    "frequency_daily": "Täglich",
+    "frequency_weekly": "Wöchentlich",
+    "frequency_monthly": "Monatlich"
   },
   "weekly_digest": {
     "title": "Gemeinschaftspuls - Monatlicher Bericht",
@@ -334,7 +345,15 @@
     "mutual_matches_link": "Gegenseitige Übereinstimmungen",
     "all_matches_link": "Alle Übereinstimmungen",
     "receiving_digest": "Sie erhalten diesen {{period}} Bericht, weil Sie Matching aktiviert haben.",
-    "manage_frequency": "Berichtshäufigkeit verwalten"
+    "manage_frequency": "Berichtshäufigkeit verwalten",
+    "period_title_daily": "Täglich",
+    "period_title_weekly": "Wöchentlich",
+    "period_title_fortnightly": "Zweiwöchentlich",
+    "period_title_monthly": "Monatlich",
+    "period_day": "Tag",
+    "period_week": "Woche",
+    "period_fortnight": "zwei Wochen",
+    "period_month": "Monat"
   },
   "match_hot": {
     "title": "Heiße Übereinstimmung gefunden!",

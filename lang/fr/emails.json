@@ -131,7 +131,13 @@
     "fallback_organization": "Organisation",
     "community_label": "Communauté",
     "or_separator": "ou",
-    "signoff": "Cordialement,\n{{app}}"
+    "signoff": "Cordialement,\n{{app}}",
+    "fallback_listing": "Nouvelle annonce",
+    "fallback_their_listing": "Leur annonce",
+    "listing_type_offer": "Offre",
+    "listing_type_request": "Demande",
+    "fallback_they_offer": "une compétence dont vous avez besoin",
+    "fallback_you_offer": "quelque chose dont ils ont besoin"
   },
   "footer": {
     "unsubscribe": "Se désabonner de ces e-mails",
@@ -295,7 +301,12 @@
     "greeting": "Bonjour {{name}},",
     "intro": "Voici un résumé de ce que vous avez manqué sur Project NEXUS :",
     "opted_in_notice": "Vous avez reçu cet e-mail parce que vous avez opté pour un résumé {{frequency}}.",
-    "manage_notifications": "Gérer les notifications"
+    "manage_notifications": "Gérer les notifications",
+    "view_item": "Voir",
+    "frequency_instant": "Instantané",
+    "frequency_daily": "Quotidien",
+    "frequency_weekly": "Hebdomadaire",
+    "frequency_monthly": "Mensuel"
   },
   "weekly_digest": {
     "title": "Pouls communautaire - Bilan mensuel",
@@ -334,7 +345,15 @@
     "mutual_matches_link": "Correspondances mutuelles",
     "all_matches_link": "Toutes les correspondances",
     "receiving_digest": "Vous recevez ce bilan {{period}} parce que vous avez activé les correspondances.",
-    "manage_frequency": "Gérer la fréquence du bilan"
+    "manage_frequency": "Gérer la fréquence du bilan",
+    "period_title_daily": "Quotidien",
+    "period_title_weekly": "Hebdomadaire",
+    "period_title_fortnightly": "Bimensuel",
+    "period_title_monthly": "Mensuel",
+    "period_day": "jour",
+    "period_week": "semaine",
+    "period_fortnight": "quinzaine",
+    "period_month": "mois"
   },
   "match_hot": {
     "title": "Correspondance très pertinente trouvée !",

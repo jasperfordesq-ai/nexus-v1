@@ -394,4 +394,10 @@ return [
         'low_stock' => 'Low stock for ":title" (:count remaining).',
         'restocked' => '":title" is back in stock.',
     ],
+
+    // Digest period words (interpolated into match_digest_content)
+    'period_daily' => 'daily',
+    'period_weekly' => 'weekly',
+    'period_fortnightly' => 'fortnightly',
+    'period_monthly' => 'monthly',
 ];

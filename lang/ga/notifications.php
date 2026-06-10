@@ -284,4 +284,10 @@ return [
     'federation' => [
         'new_message' => 'New federated message from :sender (:tenant): :subject',
     ],
+
+    // Digest period words (interpolated into match_digest_content)
+    'period_daily' => 'laethúil',
+    'period_weekly' => 'seachtainiúil',
+    'period_fortnightly' => 'coicísiúil',
+    'period_monthly' => 'míosúil',
 ];

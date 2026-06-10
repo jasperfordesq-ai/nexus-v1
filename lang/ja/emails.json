@@ -131,7 +131,13 @@
     "fallback_organization": "組織",
     "community_label": "コミュニティ",
     "or_separator": "または",
-    "signoff": "よろしくお願いいたします。\n{{app}}"
+    "signoff": "よろしくお願いいたします。\n{{app}}",
+    "fallback_listing": "新しい掲載",
+    "fallback_their_listing": "相手の掲載",
+    "listing_type_offer": "オファー",
+    "listing_type_request": "リクエスト",
+    "fallback_they_offer": "あなたが必要とするスキル",
+    "fallback_you_offer": "相手が必要とするもの"
   },
   "footer": {
     "unsubscribe": "このメールの配信を停止する",
@@ -295,7 +301,12 @@
     "greeting": "{{name}} 様、",
     "intro": "Project NEXUS で見逃したものをまとめました：",
     "opted_in_notice": "{{frequency}} サマリーを選択したためこのメールをお送りしました。",
-    "manage_notifications": "通知を管理する"
+    "manage_notifications": "通知を管理する",
+    "view_item": "表示",
+    "frequency_instant": "即時",
+    "frequency_daily": "毎日",
+    "frequency_weekly": "毎週",
+    "frequency_monthly": "毎月"
   },
   "weekly_digest": {
     "title": "コミュニティパルス - 月間ダイジェスト",
@@ -334,7 +345,15 @@
     "mutual_matches_link": "相互マッチ",
     "all_matches_link": "すべてのマッチ",
     "receiving_digest": "マッチを有効にしているため、この{{period}}ダイジェストをお送りしています。",
-    "manage_frequency": "ダイジストの頻度を管理する"
+    "manage_frequency": "ダイジストの頻度を管理する",
+    "period_title_daily": "毎日",
+    "period_title_weekly": "毎週",
+    "period_title_fortnightly": "隔週",
+    "period_title_monthly": "毎月",
+    "period_day": "日",
+    "period_week": "週",
+    "period_fortnight": "2週間",
+    "period_month": "月"
   },
   "match_hot": {
     "title": "ホットマッチが見つかりました！",

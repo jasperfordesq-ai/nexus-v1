@@ -440,7 +440,7 @@ class AlphaController extends Controller
         $request->merge([
             'name' => $name,
             'email' => $email,
-            'subject' => trim(self::asStr($request->input('subject'))) ?: 'General Inquiry',
+            'subject' => trim(self::asStr($request->input('subject'))) ?: __('govuk_alpha.contact.form.subjects.general'),
             'message' => $message,
         ]);
 
@@ -803,6 +803,7 @@ class AlphaController extends Controller
     public function feed(Request $request, string $tenantSlug): Response
     {
         $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('feed'), 403);
         $userId = $this->currentUserId();
         $type = $this->allowed($request->query('type', 'all'), ['all', 'following', 'saved', 'posts', 'listings', 'events', 'goals', 'polls', 'jobs', 'challenges', 'volunteering', 'blogs', 'discussions'], 'all');
         $mode = $this->allowed($request->query('mode', 'ranking'), ['ranking', 'recent'], 'ranking');
@@ -855,6 +856,7 @@ class AlphaController extends Controller
     public function storeFeedPost(Request $request, string $tenantSlug): RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('feed'), 403);
         $userId = $this->currentUserId();
         if ($userId === null) {
             return redirect()->route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug]);
@@ -884,6 +886,7 @@ class AlphaController extends Controller
     public function storeFeedLike(Request $request, string $tenantSlug, string $type, int $id): RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('feed'), 403);
         $userId = $this->currentUserId();
         if ($userId === null) {
             return $this->redirectToFeed($request, $tenantSlug, 'auth-required', $type, $id);
@@ -906,6 +909,7 @@ class AlphaController extends Controller
     public function storeFeedComment(Request $request, string $tenantSlug, string $type, int $id): RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('feed'), 403);
         $userId = $this->currentUserId();
         if ($userId === null) {
             return $this->redirectToFeed($request, $tenantSlug, 'auth-required', $type, $id);
@@ -1275,6 +1279,7 @@ class AlphaController extends Controller
     public function exchanges(Request $request, string $tenantSlug): Response|RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('listings'), 403);
 
         $userId = $this->currentUserId();
         if ($userId === null) {
@@ -1308,6 +1313,7 @@ class AlphaController extends Controller
     public function exchange(string $tenantSlug, int $id): Response|RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('listings'), 403);
 
         $userId = $this->currentUserId();
         if ($userId === null) {
@@ -1332,6 +1338,7 @@ class AlphaController extends Controller
     public function storeExchangeAction(Request $request, string $tenantSlug, int $id): RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('listings'), 403);
 
         $userId = $this->currentUserId();
         if ($userId === null) {
@@ -1369,6 +1376,7 @@ class AlphaController extends Controller
     public function messages(Request $request, string $tenantSlug): Response|RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('messages'), 403);
 
         $userId = $this->currentUserId();
         if ($userId === null) {
@@ -1399,6 +1407,7 @@ class AlphaController extends Controller
     public function conversation(Request $request, string $tenantSlug, int $userId): Response|RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('messages'), 403);
 
         $currentUserId = $this->currentUserId();
         if ($currentUserId === null) {
@@ -1437,6 +1446,7 @@ class AlphaController extends Controller
     public function storeMessage(Request $request, string $tenantSlug, int $userId): RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('messages'), 403);
 
         $currentUserId = $this->currentUserId();
         if ($currentUserId === null) {
@@ -1469,6 +1479,7 @@ class AlphaController extends Controller
     public function archiveConversation(string $tenantSlug, int $userId): RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('messages'), 403);
 
         $currentUserId = $this->currentUserId();
         if ($currentUserId === null) {
@@ -1483,6 +1494,7 @@ class AlphaController extends Controller
     public function restoreConversation(string $tenantSlug, int $userId): RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasModule('messages'), 403);
 
         $currentUserId = $this->currentUserId();
         if ($currentUserId === null) {
@@ -1497,6 +1509,7 @@ class AlphaController extends Controller
     public function members(Request $request, string $tenantSlug): Response
     {
         $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('connections'), 403);
         $userId = $this->currentUserId();
         $filters = $this->memberFilters($request);
         $items = [];
@@ -1541,6 +1554,7 @@ class AlphaController extends Controller
     public function memberProfile(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
     {
         $this->assertTenantSlug($tenantSlug);
+        abort_unless(TenantContext::hasFeature('connections'), 403);
         $viewerId = $this->currentUserId();
 
         if ($viewerId === null) {

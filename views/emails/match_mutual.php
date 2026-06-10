@@ -31,8 +31,8 @@ $bgColor = '#f0fdf9';
 $cardBg = '#ffffff';
 $borderColor = '#a7f3d0';
 
-$tenantName = $tenantName ?? 'Community';
-$userName = $userName ?? 'there';
+$tenantName = $tenantName ?? __('emails.common.fallback_tenant_name');
+$userName = $userName ?? __('emails.common.fallback_name');
 $appUrl = TenantContext::getFrontendUrl();
 $basePath = TenantContext::getSlugPrefix();
 $year = date('Y');
@@ -41,11 +41,13 @@ $listingUrl = $appUrl . $basePath . '/listings/' . ($match['listing_id'] ?? $mat
 $matchesUrl = $appUrl . $basePath . '/matches?type=mutual';
 $settingsUrl = $appUrl . $basePath . '/matches/preferences';
 
-$posterName = $match['user_name'] ?? $match['first_name'] ?? 'Someone';
-$listingTitle = $match['title'] ?? 'Their Listing';
-$theyOffer = $reciprocalInfo['they_offer'] ?? 'a skill you need';
-$youOffer = $reciprocalInfo['you_offer'] ?? 'something they need';
-$matchScore = (int)($match['match_score'] ?? 75);
+$posterName = $match['user_name'] ?? $match['first_name'] ?? __('emails.common.fallback_someone');
+$listingTitle = $match['title'] ?? __('emails.common.fallback_their_listing');
+$theyOffer = $reciprocalInfo['they_offer'] ?? __('emails.common.fallback_they_offer');
+$youOffer = $reciprocalInfo['you_offer'] ?? __('emails.common.fallback_you_offer');
+// Only show a compatibility score when one was actually computed —
+// never fabricate a default percentage.
+$matchScore = isset($match['match_score']) ? (int) $match['match_score'] : null;
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
@@ -109,7 +111,9 @@ $matchScore = (int)($match['match_score'] ?? 75);
 
     <!-- Preview text -->
     <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all;">
-        <?= __('emails.match_mutual.preview', ['name' => htmlspecialchars($posterName), 'score' => $matchScore]) ?>
+        <?= $matchScore !== null
+            ? __('emails.match_mutual.preview', ['name' => htmlspecialchars($posterName), 'score' => $matchScore])
+            : __('emails.match_mutual.title') ?>
         &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847;
     </div>
 
@@ -153,6 +157,7 @@ $matchScore = (int)($match['match_score'] ?? 75);
                                 </tr>
                             </table>
 
+                            <?php if ($matchScore !== null): ?>
                             <!-- Match Score Badge -->
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                                 <tr>
@@ -163,6 +168,7 @@ $matchScore = (int)($match['match_score'] ?? 75);
                                     </td>
                                 </tr>
                             </table>
+                            <?php endif; ?>
 
                             <!-- Exchange Visualization -->
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">

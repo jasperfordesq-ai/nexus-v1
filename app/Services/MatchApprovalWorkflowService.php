@@ -205,9 +205,11 @@ class MatchApprovalWorkflowService
                         'id' => $listingId,
                         'user_name' => $trimmedUserName !== '' ? $trimmedUserName : null,
                     ];
+                    // Pass null when unknown so the dispatcher applies its
+                    // localized fallback under the recipient's LocaleContext.
                     $reciprocalInfo = [
-                        'they_offer' => $matchData['matched_listing'] ?? 'a skill you need',
-                        'you_offer' => $listingTitle ?? 'something they need',
+                        'they_offer' => $matchData['matched_listing'] ?? null,
+                        'you_offer' => $listingTitle ?? null,
                     ];
 
                     NotificationDispatcher::dispatchMutualMatch(
@@ -228,8 +230,8 @@ class MatchApprovalWorkflowService
                         'user_name' => $trimmedOwnerName !== '' ? $trimmedOwnerName : null,
                     ];
                     $reverseReciprocalInfo = [
-                        'they_offer' => $listingTitle ?? 'a skill you need',
-                        'you_offer' => $matchData['matched_listing'] ?? 'something they need',
+                        'they_offer' => $listingTitle ?? null,
+                        'you_offer' => $matchData['matched_listing'] ?? null,
                     ];
 
                     NotificationDispatcher::dispatchMutualMatch(

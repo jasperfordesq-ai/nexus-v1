@@ -131,7 +131,13 @@
     "fallback_organization": "Organisatie",
     "community_label": "Gemeenschap",
     "or_separator": "of",
-    "signoff": "Met vriendelijke groet,\n{{app}}"
+    "signoff": "Met vriendelijke groet,\n{{app}}",
+    "fallback_listing": "Nieuwe advertentie",
+    "fallback_their_listing": "Hun advertentie",
+    "listing_type_offer": "Aanbod",
+    "listing_type_request": "Verzoek",
+    "fallback_they_offer": "een vaardigheid die u nodig heeft",
+    "fallback_you_offer": "iets wat zij nodig hebben"
   },
   "footer": {
     "unsubscribe": "Afmelden voor deze e-mails",
@@ -295,7 +301,12 @@
     "greeting": "Hallo {{name}},",
     "intro": "Hier is een samenvatting van wat u heeft gemist op Project NEXUS:",
     "opted_in_notice": "U ontvangt deze e-mail omdat u heeft gekozen voor een {{frequency}} samenvatting.",
-    "manage_notifications": "Meldingen beheren"
+    "manage_notifications": "Meldingen beheren",
+    "view_item": "Bekijken",
+    "frequency_instant": "Direct",
+    "frequency_daily": "Dagelijks",
+    "frequency_weekly": "Wekelijks",
+    "frequency_monthly": "Maandelijks"
   },
   "weekly_digest": {
     "title": "Community Pulse - Maandelijks overzicht",
@@ -334,7 +345,15 @@
     "mutual_matches_link": "Wederzijdse matches",
     "all_matches_link": "Alle matches",
     "receiving_digest": "U ontvangt dit {{period}} overzicht omdat u matches heeft ingeschakeld.",
-    "manage_frequency": "Overzichtsfrequentie beheren"
+    "manage_frequency": "Overzichtsfrequentie beheren",
+    "period_title_daily": "Dagelijks",
+    "period_title_weekly": "Wekelijks",
+    "period_title_fortnightly": "Tweewekelijks",
+    "period_title_monthly": "Maandelijks",
+    "period_day": "dag",
+    "period_week": "week",
+    "period_fortnight": "twee weken",
+    "period_month": "maand"
   },
   "match_hot": {
     "title": "Populaire match gevonden!",

@@ -131,7 +131,13 @@
     "fallback_organization": "Organização",
     "community_label": "Comunidade",
     "or_separator": "ou",
-    "signoff": "Com os melhores cumprimentos,\n{{app}}"
+    "signoff": "Com os melhores cumprimentos,\n{{app}}",
+    "fallback_listing": "Novo anúncio",
+    "fallback_their_listing": "O anúncio deles",
+    "listing_type_offer": "Oferta",
+    "listing_type_request": "Pedido",
+    "fallback_they_offer": "uma competência de que precisa",
+    "fallback_you_offer": "algo de que eles precisam"
   },
   "footer": {
     "unsubscribe": "Cancelar subscrição destes e-mails",
@@ -295,7 +301,12 @@
     "greeting": "Olá {{name}},",
     "intro": "Aqui está um resumo do que perdeu no Project NEXUS:",
     "opted_in_notice": "Recebeu este e-mail porque optou por um resumo {{frequency}}.",
-    "manage_notifications": "Gerir notificações"
+    "manage_notifications": "Gerir notificações",
+    "view_item": "Ver",
+    "frequency_instant": "Instantâneo",
+    "frequency_daily": "Diário",
+    "frequency_weekly": "Semanal",
+    "frequency_monthly": "Mensal"
   },
   "weekly_digest": {
     "title": "Pulso da Comunidade - Resumo Mensal",
@@ -334,7 +345,15 @@
     "mutual_matches_link": "Correspondências mútuas",
     "all_matches_link": "Todas as correspondências",
     "receiving_digest": "Está a receber este resumo {{period}} porque tem as correspondências ativadas.",
-    "manage_frequency": "Gerir frequência do resumo"
+    "manage_frequency": "Gerir frequência do resumo",
+    "period_title_daily": "Diário",
+    "period_title_weekly": "Semanal",
+    "period_title_fortnightly": "Quinzenal",
+    "period_title_monthly": "Mensal",
+    "period_day": "dia",
+    "period_week": "semana",
+    "period_fortnight": "quinzena",
+    "period_month": "mês"
   },
   "match_hot": {
     "title": "Correspondência em destaque encontrada!",

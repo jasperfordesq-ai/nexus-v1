@@ -131,7 +131,13 @@
     "fallback_organization": "Organization",
     "community_label": "Community",
     "or_separator": "or",
-    "signoff": "Thanks,\n{{app}}"
+    "signoff": "Thanks,\n{{app}}",
+    "fallback_listing": "New Listing",
+    "fallback_their_listing": "Their Listing",
+    "listing_type_offer": "Offer",
+    "listing_type_request": "Request",
+    "fallback_they_offer": "a skill you need",
+    "fallback_you_offer": "something they need"
   },
   "footer": {
     "unsubscribe": "Unsubscribe from these emails",
@@ -295,7 +301,12 @@
     "greeting": "Hello {{name}},",
     "intro": "Here is a summary of what you missed on Project NEXUS:",
     "opted_in_notice": "You received this email because you opted for a {{frequency}} summary.",
-    "manage_notifications": "Manage Notifications"
+    "manage_notifications": "Manage Notifications",
+    "view_item": "View",
+    "frequency_instant": "Instant",
+    "frequency_daily": "Daily",
+    "frequency_weekly": "Weekly",
+    "frequency_monthly": "Monthly"
   },
   "weekly_digest": {
     "title": "Community Pulse - Monthly Digest",
@@ -334,7 +345,15 @@
     "mutual_matches_link": "Mutual matches",
     "all_matches_link": "All matches",
     "receiving_digest": "You're receiving this {{period}} digest because you have matches enabled.",
-    "manage_frequency": "Manage digest frequency"
+    "manage_frequency": "Manage digest frequency",
+    "period_title_daily": "Daily",
+    "period_title_weekly": "Weekly",
+    "period_title_fortnightly": "Fortnightly",
+    "period_title_monthly": "Monthly",
+    "period_day": "day",
+    "period_week": "week",
+    "period_fortnight": "fortnight",
+    "period_month": "month"
   },
   "match_hot": {
     "title": "Hot Match Found!",

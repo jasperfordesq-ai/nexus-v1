@@ -519,13 +519,15 @@ class NotificationDispatcher
             ->first();
 
         return (bool) LocaleContext::withLocale($recipient, function () use ($userId, $match, $queueFrequency): bool {
-            $listingTitle = $match['title'] ?? 'New Listing';
+            $listingTitle = $match['title'] ?? __('emails.common.fallback_listing');
             $matchScore = (int) ($match['match_score'] ?? 85);
             $userName = $match['user_name'] ?? __('emails.common.fallback_someone');
             $distance = $match['distance_km'] ?? null;
             $listingId = $match['id'] ?? 0;
 
-            $distanceText = $distance !== null ? " ({$distance}km away)" : '';
+            $distanceText = $distance !== null
+                ? ' (' . __('emails_notifications.hot_match.km_away', ['distance' => $distance]) . ')'
+                : '';
             $content = __('notifications.hot_match_content', ['name' => $userName, 'title' => $listingTitle, 'score' => $matchScore, 'distance' => $distanceText]);
             $link = "/listings/{$listingId}";
 
@@ -534,7 +536,9 @@ class NotificationDispatcher
             // digest frequency this method queues below.
             self::fanOutPush((int) $userId, 'hot_match', $content, $link);
 
-            $htmlContent = self::buildHotMatchEmail($match, $matchScore);
+            // Inject the recipient id so the email template can personalize
+            // the greeting (call sites only pass listing/match data).
+            $htmlContent = self::buildHotMatchEmail(array_merge($match, ['recipient_user_id' => (int) $userId]), $matchScore);
             return self::queueNotification($userId, 'hot_match', $content, $link, $queueFrequency, $htmlContent);
         });
     }
@@ -570,8 +574,8 @@ class NotificationDispatcher
 
         LocaleContext::withLocale($recipient, function () use ($userId, $match, $reciprocalInfo, $queueFrequency) {
             $userName = $match['user_name'] ?? __('emails.common.fallback_someone');
-            $theyOffer = $reciprocalInfo['they_offer'] ?? 'a skill you need';
-            $youOffer = $reciprocalInfo['you_offer'] ?? 'something they need';
+            $theyOffer = $reciprocalInfo['they_offer'] ?? __('emails.common.fallback_they_offer');
+            $youOffer = $reciprocalInfo['you_offer'] ?? __('emails.common.fallback_you_offer');
             $listingId = $match['id'] ?? 0;
 
             $content = __('notifications.mutual_match_content', ['name' => $userName, 'they_offer' => $theyOffer, 'you_offer' => $youOffer]);
@@ -581,7 +585,9 @@ class NotificationDispatcher
             // Device push (curated push_mutual_match title).
             self::fanOutPush((int) $userId, 'mutual_match', $content, $link);
 
-            $htmlContent = self::buildMutualMatchEmail($match, $reciprocalInfo);
+            // Inject the recipient id so the email template can personalize
+            // the greeting (call sites only pass listing/match data).
+            $htmlContent = self::buildMutualMatchEmail(array_merge($match, ['recipient_user_id' => (int) $userId]), $reciprocalInfo);
             self::queueNotification($userId, 'mutual_match', $content, $link, $queueFrequency, $htmlContent);
         });
     }
@@ -608,7 +614,10 @@ class NotificationDispatcher
             $hotCount = count(array_filter($matches, fn($m) => ($m['match_score'] ?? 0) >= 85));
             $mutualCount = count(array_filter($matches, fn($m) => ($m['match_type'] ?? '') === 'mutual'));
 
-            $content = __('notifications.match_digest_content', ['period' => $period, 'count' => $count]);
+            $periodLabel = in_array($period, ['daily', 'weekly', 'fortnightly', 'monthly'], true)
+                ? __('notifications.period_' . $period)
+                : $period;
+            $content = __('notifications.match_digest_content', ['period' => $periodLabel, 'count' => $count]);
             if ($hotCount > 0) {
                 $content .= __('notifications.match_digest_hot', ['count' => $hotCount]);
             }
@@ -623,7 +632,7 @@ class NotificationDispatcher
             // push_match_digest); this is an explicit, low-frequency digest.
             self::fanOutPush((int) $userId, 'match_digest', $content, $link);
 
-            $htmlContent = self::buildMatchDigestEmail($matches, $period, $hotCount, $mutualCount);
+            $htmlContent = self::buildMatchDigestEmail($matches, $period, $hotCount, $mutualCount, (int) $userId);
             self::queueNotification($userId, 'match_digest', $content, $link, 'instant', $htmlContent);
         });
     }
@@ -1650,7 +1659,7 @@ class NotificationDispatcher
         $userName = $user->name ?? $user->first_name ?? __('emails.common.fallback_name');
 
         $tenant = TenantContext::get();
-        $tenantName = $tenant['name'] ?? 'Community';
+        $tenantName = $tenant['name'] ?? __('emails.common.fallback_tenant_name');
 
         $templatePath = base_path('views/emails/match_hot.php');
         if (file_exists($templatePath)) {
@@ -1659,7 +1668,7 @@ class NotificationDispatcher
             return ob_get_clean();
         }
 
-        $title = htmlspecialchars($match['title'] ?? 'New Listing');
+        $title = htmlspecialchars($match['title'] ?? __('emails.common.fallback_listing'));
         $posterName = htmlspecialchars($match['user_name'] ?? __('emails.common.fallback_someone'));
         $distance = $match['distance_km'] ?? null;
         $distanceLabel = $distance !== null ? __('emails_notifications.hot_match.km_away', ['distance' => $distance]) : '';
@@ -1699,7 +1708,7 @@ HTML;
         $userName = $user->name ?? $user->first_name ?? __('emails.common.fallback_name');
 
         $tenant = TenantContext::get();
-        $tenantName = $tenant['name'] ?? 'Community';
+        $tenantName = $tenant['name'] ?? __('emails.common.fallback_tenant_name');
 
         $templatePath = base_path('views/emails/match_mutual.php');
         if (file_exists($templatePath)) {
@@ -1709,8 +1718,8 @@ HTML;
         }
 
         $posterName = htmlspecialchars($match['user_name'] ?? __('emails.common.fallback_someone'));
-        $theyOffer = htmlspecialchars($reciprocalInfo['they_offer'] ?? 'a skill you need');
-        $youOffer = htmlspecialchars($reciprocalInfo['you_offer'] ?? 'something they need');
+        $theyOffer = htmlspecialchars($reciprocalInfo['they_offer'] ?? __('emails.common.fallback_they_offer'));
+        $youOffer = htmlspecialchars($reciprocalInfo['you_offer'] ?? __('emails.common.fallback_you_offer'));
 
         $mutualHeading = __('emails_notifications.mutual_match.heading');
         $mutualSubheading = __('emails_notifications.mutual_match.subheading');
@@ -1739,11 +1748,20 @@ HTML;
 HTML;
     }
 
-    private static function buildMatchDigestEmail($matches, $period, $hotCount, $mutualCount): string
+    private static function buildMatchDigestEmail($matches, $period, $hotCount, $mutualCount, int $recipientUserId = 0): string
     {
         $tenant = TenantContext::get();
         $tenantName = $tenant['name'] ?? __('emails.common.fallback_tenant_name');
-        $userName = __('emails.common.fallback_name');
+
+        $recipient = null;
+        if ($recipientUserId > 0) {
+            $recipient = DB::table('users')
+                ->where('id', $recipientUserId)
+                ->where('tenant_id', TenantContext::getId())
+                ->select(['name', 'first_name'])
+                ->first();
+        }
+        $userName = $recipient->name ?? $recipient->first_name ?? __('emails.common.fallback_name');
 
         $templatePath = base_path('views/emails/match_digest.php');
         if (file_exists($templatePath)) {
@@ -1758,14 +1776,16 @@ HTML;
         }
 
         $count = count($matches);
-        $periodTitle = ucfirst($period);
+        $periodTitle = in_array($period, ['daily', 'weekly', 'fortnightly', 'monthly'], true)
+            ? __('emails.match_digest.period_title_' . $period)
+            : ucfirst($period);
 
         $matchListHtml = '';
         foreach (array_slice($matches, 0, 5) as $match) {
-            $title = htmlspecialchars($match['title'] ?? 'Listing');
+            $title = htmlspecialchars($match['title'] ?? __('emails.common.fallback_listing'));
             $score = (int) ($match['match_score'] ?? 0);
             $matchUserName = !empty($match['user_name']) ? $match['user_name'] : trim(($match['first_name'] ?? '') . ' ' . ($match['last_name'] ?? ''));
-            $posterName = htmlspecialchars($matchUserName ?: 'A member');
+            $posterName = htmlspecialchars($matchUserName ?: __('emails.common.fallback_member_name'));
             $scoreColor = $score >= 85 ? '#ef4444' : ($score >= 70 ? '#6366f1' : '#64748b');
             $byPosterText = __('emails_notifications.match_digest.by_poster', ['name' => $posterName]);
             $matchListHtml .= <<<HTML

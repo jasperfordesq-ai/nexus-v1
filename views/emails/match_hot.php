@@ -30,8 +30,8 @@ $bgColor = '#fef7f0';
 $cardBg = '#ffffff';
 $borderColor = '#fed7aa';
 
-$tenantName = $tenantName ?? 'Community';
-$userName = $userName ?? 'there';
+$tenantName = $tenantName ?? __('emails.common.fallback_tenant_name');
+$userName = $userName ?? __('emails.common.fallback_name');
 $appUrl = TenantContext::getFrontendUrl();
 $basePath = TenantContext::getSlugPrefix();
 $year = date('Y');
@@ -44,9 +44,10 @@ $matchScore = (int)($match['match_score'] ?? 85);
 $distance = $match['distance_km'] ?? null;
 $reasons = $match['match_reasons'] ?? [];
 $categoryName = $match['category_name'] ?? '';
-$listingTitle = $match['title'] ?? 'New Listing';
-$posterName = $match['user_name'] ?? $match['first_name'] ?? 'Someone';
-$listingType = ucfirst($match['type'] ?? 'offer');
+$listingTitle = $match['title'] ?? __('emails.common.fallback_listing');
+$posterName = $match['user_name'] ?? $match['first_name'] ?? __('emails.common.fallback_someone');
+$listingTypeKey = ($match['type'] ?? 'offer') === 'request' ? 'request' : 'offer';
+$listingType = __('emails.common.listing_type_' . $listingTypeKey);
 
 // Distance label
 $distanceLabel = '';
@@ -181,7 +182,7 @@ if ($distance !== null) {
                                             <div style="padding: 28px;">
                                                 <!-- Type badge -->
                                                 <div style="margin-bottom: 12px;">
-                                                    <span style="display: inline-block; background: <?= $match['type'] === 'offer' ? '#dcfce7' : '#dbeafe' ?>; color: <?= $match['type'] === 'offer' ? '#16a34a' : '#2563eb' ?>; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                                                    <span style="display: inline-block; background: <?= $listingTypeKey === 'offer' ? '#dcfce7' : '#dbeafe' ?>; color: <?= $listingTypeKey === 'offer' ? '#16a34a' : '#2563eb' ?>; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
                                                         <?= $listingType ?>
                                                     </span>
                                                 </div>

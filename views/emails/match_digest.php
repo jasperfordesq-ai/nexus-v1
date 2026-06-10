@@ -33,8 +33,8 @@ $bgColor = '#f5f3ff';
 $cardBg = '#ffffff';
 $borderColor = '#c4b5fd';
 
-$tenantName = $tenantName ?? 'Community';
-$userName = $userName ?? 'there';
+$tenantName = $tenantName ?? __('emails.common.fallback_tenant_name');
+$userName = $userName ?? __('emails.common.fallback_name');
 $appUrl = TenantContext::getFrontendUrl();
 $basePath = TenantContext::getSlugPrefix();
 $year = date('Y');
@@ -43,9 +43,9 @@ $matchesUrl = $appUrl . $basePath . '/matches';
 $settingsUrl = $appUrl . $basePath . '/settings?tab=notifications';
 
 $period = $period ?? 'fortnightly';
-$periodTitle = ucfirst($period);
-$periodLabels = ['daily' => 'day', 'weekly' => 'week', 'fortnightly' => 'fortnight'];
-$periodLabel = $periodLabels[$period] ?? $period;
+$knownPeriods = ['daily' => 'day', 'weekly' => 'week', 'fortnightly' => 'fortnight', 'monthly' => 'month'];
+$periodTitle = isset($knownPeriods[$period]) ? __('emails.match_digest.period_title_' . $period) : ucfirst($period);
+$periodLabel = isset($knownPeriods[$period]) ? __('emails.match_digest.period_' . $knownPeriods[$period]) : $period;
 $totalCount = count($matches);
 $hotCount = $stats['hotCount'] ?? count(array_filter($matches, fn($m) => ($m['match_score'] ?? 0) >= 85));
 $mutualCount = $stats['mutualCount'] ?? count(array_filter($matches, fn($m) => ($m['match_type'] ?? '') === 'mutual'));
@@ -222,7 +222,7 @@ $remainingCount = max(0, $totalCount - 5);
                                                 <tr>
                                                     <td style="vertical-align: top;">
                                                         <p style="margin: 0 0 6px; font-size: 17px; font-weight: 700; color: <?= $textColor ?>; line-height: 1.3;">
-                                                            <a href="<?= $listingUrl ?>" style="color: <?= $textColor ?>; text-decoration: none;"><?= htmlspecialchars($match['title'] ?? 'Listing') ?></a>
+                                                            <a href="<?= $listingUrl ?>" style="color: <?= $textColor ?>; text-decoration: none;"><?= htmlspecialchars($match['title'] ?? __('emails.common.fallback_listing')) ?></a>
                                                         </p>
                                                         <p style="margin: 0; font-size: 14px; color: <?= $textMuted ?>; line-height: 1.4;">
                                                             <?= __('emails.match_digest.by_author', ['name' => '<span style="color: ' . $primaryColor . '; font-weight: 600;">' . htmlspecialchars(!empty($match['user_name']) ? $match['user_name'] : __('emails.match_digest.a_member')) . '</span>']) ?>

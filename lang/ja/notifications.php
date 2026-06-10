@@ -284,4 +284,10 @@ return [
     'label_action_needed' => 'Action needed:',
     'label_why_approval' => 'Why approval?',
     'label_under_review' => 'Under review:',
+
+    // Digest period words (interpolated into match_digest_content)
+    'period_daily' => '毎日',
+    'period_weekly' => '毎週',
+    'period_fortnightly' => '隔週',
+    'period_monthly' => '毎月',
 ];

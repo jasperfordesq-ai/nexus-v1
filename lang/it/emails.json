@@ -131,7 +131,13 @@
     "fallback_organization": "Organizzazione",
     "community_label": "Comunità",
     "or_separator": "o",
-    "signoff": "Cordiali saluti,\n{{app}}"
+    "signoff": "Cordiali saluti,\n{{app}}",
+    "fallback_listing": "Nuovo annuncio",
+    "fallback_their_listing": "Il loro annuncio",
+    "listing_type_offer": "Offerta",
+    "listing_type_request": "Richiesta",
+    "fallback_they_offer": "una competenza di cui ha bisogno",
+    "fallback_you_offer": "qualcosa di cui hanno bisogno"
   },
   "footer": {
     "unsubscribe": "Annulla l'iscrizione a queste e-mail",
@@ -295,7 +301,12 @@
     "greeting": "Salve {{name}},",
     "intro": "Ecco un riepilogo di quello che si è perso su Project NEXUS:",
     "opted_in_notice": "Ha ricevuto questa e-mail perché ha optato per un riepilogo {{frequency}}.",
-    "manage_notifications": "Gestisci notifiche"
+    "manage_notifications": "Gestisci notifiche",
+    "view_item": "Vedi",
+    "frequency_instant": "Istantaneo",
+    "frequency_daily": "Giornaliero",
+    "frequency_weekly": "Settimanale",
+    "frequency_monthly": "Mensile"
   },
   "weekly_digest": {
     "title": "Polso della comunità - Riepilogo mensile",
@@ -334,7 +345,15 @@
     "mutual_matches_link": "Corrispondenze reciproche",
     "all_matches_link": "Tutte le corrispondenze",
     "receiving_digest": "Sta ricevendo questo riepilogo {{period}} perché ha le corrispondenze attive.",
-    "manage_frequency": "Gestisci la frequenza del riepilogo"
+    "manage_frequency": "Gestisci la frequenza del riepilogo",
+    "period_title_daily": "Giornaliero",
+    "period_title_weekly": "Settimanale",
+    "period_title_fortnightly": "Quindicinale",
+    "period_title_monthly": "Mensile",
+    "period_day": "giorno",
+    "period_week": "settimana",
+    "period_fortnight": "quindicina",
+    "period_month": "mese"
   },
   "match_hot": {
     "title": "Corrispondenza di punta trovata!",

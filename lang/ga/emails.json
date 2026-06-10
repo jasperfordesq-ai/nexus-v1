@@ -131,7 +131,13 @@
     "fallback_organization": "Eagraíocht",
     "community_label": "Pobal",
     "or_separator": "nó",
-    "signoff": "Go raibh maith agat,\n{{app}}"
+    "signoff": "Go raibh maith agat,\n{{app}}",
+    "fallback_listing": "Fógra nua",
+    "fallback_their_listing": "An fógra acu",
+    "listing_type_offer": "Tairiscint",
+    "listing_type_request": "Iarratas",
+    "fallback_they_offer": "scil atá de dhíth ort",
+    "fallback_you_offer": "rud atá de dhíth orthu"
   },
   "footer": {
     "unsubscribe": "Díliostáil ó na ríomhphoist seo",
@@ -295,7 +301,12 @@
     "greeting": "Dia duit {{name}},",
     "intro": "Seo achoimre ar an méid a chaill tú ar Project NEXUS:",
     "opted_in_notice": "Fuair tú an ríomhphost seo toisc gur roghnaigh tú achoimre {{frequency}}.",
-    "manage_notifications": "Bainistigh Fógraí"
+    "manage_notifications": "Bainistigh Fógraí",
+    "view_item": "Féach",
+    "frequency_instant": "Láithreach",
+    "frequency_daily": "Laethúil",
+    "frequency_weekly": "Seachtainiúil",
+    "frequency_monthly": "Míosúil"
   },
   "weekly_digest": {
     "title": "Cuisle Pobail - Achoimre Míosúil",
@@ -334,7 +345,15 @@
     "mutual_matches_link": "Meaitseálacha frithpháirteacha",
     "all_matches_link": "Gach meaitseáil",
     "receiving_digest": "Faigheann tú an achoimre {{period}} seo toisc go bhfuil meaitseálacha cumasaithe agat.",
-    "manage_frequency": "Bainistigh minicíocht achoimre"
+    "manage_frequency": "Bainistigh minicíocht achoimre",
+    "period_title_daily": "Laethúil",
+    "period_title_weekly": "Seachtainiúil",
+    "period_title_fortnightly": "Coicísiúil",
+    "period_title_monthly": "Míosúil",
+    "period_day": "lá",
+    "period_week": "seachtain",
+    "period_fortnight": "coicís",
+    "period_month": "mí"
   },
   "match_hot": {
     "title": "Meaitseáil The Aimsithe!",

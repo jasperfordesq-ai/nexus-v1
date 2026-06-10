@@ -131,7 +131,13 @@
     "fallback_organization": "المنظمة",
     "community_label": "المجتمع",
     "or_separator": "أو",
-    "signoff": "مع التحية،\n{{app}}"
+    "signoff": "مع التحية،\n{{app}}",
+    "fallback_listing": "إعلان جديد",
+    "fallback_their_listing": "إعلانهم",
+    "listing_type_offer": "عرض",
+    "listing_type_request": "طلب",
+    "fallback_they_offer": "مهارة تحتاجها",
+    "fallback_you_offer": "شيء يحتاجونه"
   },
   "footer": {
     "unsubscribe": "إلغاء الاشتراك من هذه الرسائل",
@@ -295,7 +301,12 @@
     "greeting": "مرحباً {{name}}،",
     "intro": "إليك ملخص ما فاتك على Project NEXUS:",
     "opted_in_notice": "تلقيت هذا البريد الإلكتروني لأنك اخترت ملخصاً {{frequency}}.",
-    "manage_notifications": "إدارة الإشعارات"
+    "manage_notifications": "إدارة الإشعارات",
+    "view_item": "عرض",
+    "frequency_instant": "فوري",
+    "frequency_daily": "يومي",
+    "frequency_weekly": "أسبوعي",
+    "frequency_monthly": "شهري"
   },
   "weekly_digest": {
     "title": "نبض المجتمع - الملخص الشهري",
@@ -334,7 +345,15 @@
     "mutual_matches_link": "التطابقات المتبادلة",
     "all_matches_link": "جميع التطابقات",
     "receiving_digest": "تستقبل هذا الملخص لـ {{period}} لأنك مكّنت التطابقات.",
-    "manage_frequency": "إدارة تكرار الملخص"
+    "manage_frequency": "إدارة تكرار الملخص",
+    "period_title_daily": "يومي",
+    "period_title_weekly": "أسبوعي",
+    "period_title_fortnightly": "نصف شهري",
+    "period_title_monthly": "شهري",
+    "period_day": "يوم",
+    "period_week": "أسبوع",
+    "period_fortnight": "أسبوعان",
+    "period_month": "شهر"
   },
   "match_hot": {
     "title": "تم العثور على تطابق رائج!",

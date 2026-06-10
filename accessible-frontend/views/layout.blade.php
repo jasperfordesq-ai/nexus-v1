@@ -41,7 +41,9 @@
         <link rel="stylesheet" href="{{ $stylesheet }}">
     @endforeach
 </head>
-<body class="govuk-template__body js-enabled govuk-frontend-supported">
+<body class="govuk-template__body">
+    {{-- GOV.UK progressive enhancement: only claim JS support when JS actually runs --}}
+    <script>document.body.className += ' js-enabled' + ('noModule' in HTMLScriptElement.prototype ? ' govuk-frontend-supported' : '');</script>
     <a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">{{ __('govuk_alpha.skip_to_content') }}</a>
 
     <header class="nexus-alpha-header" role="banner">

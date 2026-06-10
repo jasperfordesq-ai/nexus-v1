@@ -873,9 +873,14 @@ class CronJobRunner
     private function generateEmailHtml($user, $items, $frequency)
     {
         // Simple HTML Template
+        $viewLabel = __('emails.digest.view_item');
         $listHtml = '';
         foreach ($items as $item) {
-            $date = date('M j, g:i a', strtotime($item['created_at']));
+            // translatedFormat renders month names in the recipient's locale
+            // (the caller wraps this in LocaleContext::withLocale).
+            $date = \Illuminate\Support\Carbon::parse($item['created_at'])
+                ->locale(app()->getLocale())
+                ->translatedFormat('M j, g:i a');
             $snippet = htmlspecialchars($item['content_snippet']);
             $link = $item['link'] ? TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $item['link'] : '#';
 
@@ -883,25 +888,31 @@ class CronJobRunner
             <div style='margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee;'>
                 <div style='font-size: 14px; color: #333;'>$snippet</div>
                 <div style='font-size: 12px; color: #888; margin-top: 4px;'>
-                    $date - <a href='$link' style='color: #4f46e5; text-decoration: none;'>View</a>
+                    $date - <a href='$link' style='color: #4f46e5; text-decoration: none;'>{$viewLabel}</a>
                 </div>
             </div>";
         }
 
-        $freqLabel = ucfirst($frequency);
+        $freqLabel = in_array($frequency, ['instant', 'daily', 'weekly', 'monthly'], true)
+            ? __('emails.digest.frequency_' . $frequency)
+            : ucfirst($frequency);
         $digestTitle = __('emails.digest.title', ['frequency' => $freqLabel]);
         $userName = htmlspecialchars($user['name'] ?? __('emails.common.fallback_name'), ENT_QUOTES, 'UTF-8');
         $digestGreeting = __('emails.digest.greeting', ['name' => $userName]);
         $digestIntro = __('emails.digest.intro');
-        $digestOptedIn = __('emails.digest.opted_in_notice', ['frequency' => $frequency]);
+        $digestOptedIn = __('emails.digest.opted_in_notice', ['frequency' => $freqLabel]);
         $manageNotifications = __('emails.digest.manage_notifications');
         $settingsUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . '/dashboard?tab=notifications';
+        $tenantName = htmlspecialchars(TenantContext::get()['name'] ?? __('emails.common.platform_name'), ENT_QUOTES, 'UTF-8');
+        $allRightsReserved = __('emails.footer.all_rights_reserved');
+        $year = date('Y');
 
         return "
         <html>
         <body style='font-family: sans-serif; line-height: 1.5; color: #333;'>
             <div style='max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;'>
-                <h2 style='color: #4f46e5;'>{$digestTitle}</h2>
+                <p style='margin: 0 0 4px; font-size: 14px; font-weight: 600; color: #4f46e5;'>{$tenantName}</p>
+                <h2 style='color: #4f46e5; margin-top: 0;'>{$digestTitle}</h2>
                 <p>{$digestGreeting}</p>
                 <p>{$digestIntro}</p>
 
@@ -912,6 +923,7 @@ class CronJobRunner
                 <div style='margin-top: 30px; font-size: 12px; color: #aaa; text-align: center;'>
                     <p>{$digestOptedIn}</p>
                     <p><a href='{$settingsUrl}' style='color: #aaa;'>{$manageNotifications}</a></p>
+                    <p>&copy; {$year} {$tenantName}. {$allRightsReserved}</p>
                 </div>
             </div>
         </body>

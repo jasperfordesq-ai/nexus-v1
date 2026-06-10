@@ -206,9 +206,10 @@
                             <div class="govuk-checkboxes__item">
                                 <input class="govuk-checkboxes__input" id="terms_accepted" name="terms_accepted" type="checkbox" value="1" required>
                                 <label class="govuk-label govuk-checkboxes__label" for="terms_accepted">
+                                    {{-- Terms/privacy live on the React frontend, not this host — link via $mainSiteUrl --}}
                                     {!! __('govuk_alpha.auth.terms_label', [
-                                        'terms' => '<a class="govuk-link" href="' . e(url($tenantSlug . '/terms')) . '">' . e(__('govuk_alpha.auth.terms_link_text')) . '</a>',
-                                        'privacy' => '<a class="govuk-link" href="' . e(url($tenantSlug . '/privacy')) . '">' . e(__('govuk_alpha.auth.privacy_link_text')) . '</a>',
+                                        'terms' => '<a class="govuk-link" href="' . e(rtrim($mainSiteUrl ?? url($tenantSlug), '/') . '/terms') . '">' . e(__('govuk_alpha.auth.terms_link_text')) . '</a>',
+                                        'privacy' => '<a class="govuk-link" href="' . e(rtrim($mainSiteUrl ?? url($tenantSlug), '/') . '/privacy') . '">' . e(__('govuk_alpha.auth.privacy_link_text')) . '</a>',
                                     ]) !!}
                                 </label>
                             </div>

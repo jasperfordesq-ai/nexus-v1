@@ -161,13 +161,13 @@
                 <div class="govuk-grid-column-one-third">
                     <div class="govuk-form-group">
                         <label class="govuk-label" for="subtype">{{ __('govuk_alpha.feed.subtype_label') }}</label>
-                        <select class="govuk-select" id="subtype" name="subtype">
+                        <div id="subtype-hint" class="govuk-hint">{{ __('govuk_alpha.feed.subtype_hint') }}</div>
+                        <select class="govuk-select" id="subtype" name="subtype" aria-describedby="subtype-hint">
                             <option value="">{{ __('govuk_alpha.feed.subtypes.all') }}</option>
                             @foreach (['offer', 'request'] as $subtype)
                                 <option value="{{ $subtype }}" @selected($selectedSubtype === $subtype)>{{ __('govuk_alpha.feed.subtypes.' . $subtype) }}</option>
                             @endforeach
                         </select>
-                        <div class="govuk-hint">{{ __('govuk_alpha.feed.subtype_hint') }}</div>
                     </div>
                 </div>
             </div>
