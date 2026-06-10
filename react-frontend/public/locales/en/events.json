@@ -135,7 +135,9 @@
     "join_meeting_aria": "Join meeting for {{title}}",
     "join_waitlist_aria": "Join the waitlist for this event",
     "leave_waitlist_aria": "Leave the waitlist for this event",
-    "tabs_aria": "Event detail sections"
+    "tabs_aria": "Event detail sections",
+    "delete_series_note": "This is a recurring event. Deleting it will also delete all of its future occurrences.",
+    "cancel_series_note": "This is a recurring event. Cancelling it will also cancel all future occurrences and notify their attendees."
   },
   "card": {
     "cancelled": "Cancelled",
@@ -246,7 +248,12 @@
     "summary_remote": "Remote enabled",
     "summary_in_person": "In person or local",
     "summary_not_set": "Not set yet",
-    "essentials_section": "Event essentials"
+    "essentials_section": "Event essentials",
+    "edit_scope_title": "Edit recurring event",
+    "edit_scope_message": "This event is part of a recurring series. What would you like to update?",
+    "edit_scope_single": "Only this event",
+    "edit_scope_all": "This and all future events",
+    "edit_scope_all_note": "Date and time changes apply only to this event."
   },
   "toast": {
     "rsvp_removed": "RSVP removed",

@@ -461,6 +461,29 @@ class EventService
             }
         }
 
+        // Recurring template: delete the recurrence rule and all FUTURE
+        // occurrences with it (they're unreachable orphans otherwise), but
+        // detach past occurrences so attendance history survives.
+        if (!empty($event->is_recurring_template)) {
+            DB::delete(
+                "DELETE FROM event_recurrence_rules WHERE event_id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            );
+
+            $futureOccurrences = Event::query()
+                ->where('parent_event_id', $id)
+                ->where('start_time', '>=', now())
+                ->get();
+            foreach ($futureOccurrences as $occurrence) {
+                $occurrence->delete();
+            }
+
+            DB::update(
+                "UPDATE events SET parent_event_id = NULL WHERE parent_event_id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            );
+        }
+
         $event->delete();
 
         return true;
@@ -1067,47 +1090,70 @@ class EventService
         }
 
         try {
-            $rsvpUserIds = DB::select(
-                "SELECT DISTINCT user_id FROM event_rsvps WHERE event_id = ? AND tenant_id = ? AND status IN ('going', 'interested', 'invited')",
-                [$eventId, $tenantId]
-            );
+            // Recurring template: cancel every future, not-yet-cancelled
+            // occurrence with it — each has its own RSVPs/waitlist/reminders,
+            // and their attendees must be notified too.
+            $targetIds = [$eventId];
+            if (!empty($event->is_recurring_template)) {
+                $occurrenceRows = DB::select(
+                    "SELECT id FROM events
+                     WHERE parent_event_id = ? AND tenant_id = ?
+                       AND start_time >= NOW()
+                       AND (status IS NULL OR status != 'cancelled')",
+                    [$eventId, $tenantId]
+                );
+                foreach ($occurrenceRows as $row) {
+                    $targetIds[] = (int) $row->id;
+                }
+            }
 
-            $waitlistUserIds = DB::select(
-                "SELECT DISTINCT user_id FROM event_waitlist WHERE event_id = ? AND tenant_id = ? AND status = 'waiting'",
-                [$eventId, $tenantId]
-            );
+            $recipientIds = collect();
+            foreach ($targetIds as $targetId) {
+                $rsvpUserIds = DB::select(
+                    "SELECT DISTINCT user_id FROM event_rsvps WHERE event_id = ? AND tenant_id = ? AND status IN ('going', 'interested', 'invited')",
+                    [$targetId, $tenantId]
+                );
 
-            self::$lastCancellationRecipientIds = collect($rsvpUserIds)->pluck('user_id')
-                ->merge(collect($waitlistUserIds)->pluck('user_id'))
+                $waitlistUserIds = DB::select(
+                    "SELECT DISTINCT user_id FROM event_waitlist WHERE event_id = ? AND tenant_id = ? AND status = 'waiting'",
+                    [$targetId, $tenantId]
+                );
+
+                $recipientIds = $recipientIds
+                    ->merge(collect($rsvpUserIds)->pluck('user_id'))
+                    ->merge(collect($waitlistUserIds)->pluck('user_id'));
+
+                // Update event status
+                DB::update(
+                    "UPDATE events SET status = 'cancelled', cancellation_reason = ?, cancelled_at = NOW(), cancelled_by = ? WHERE id = ? AND tenant_id = ?",
+                    [$reason, $userId, $targetId, $tenantId]
+                );
+
+                // Cancel all pending reminders
+                DB::update(
+                    "UPDATE event_reminders SET status = 'cancelled' WHERE event_id = ? AND status = 'pending' AND tenant_id = ?",
+                    [$targetId, $tenantId]
+                );
+
+                // Cancel all waitlist entries
+                DB::update(
+                    "UPDATE event_waitlist SET status = 'cancelled', cancelled_at = NOW() WHERE event_id = ? AND status = 'waiting' AND tenant_id = ?",
+                    [$targetId, $tenantId]
+                );
+
+                // Mark all active RSVPs as cancelled
+                DB::update(
+                    "UPDATE event_rsvps SET status = 'cancelled' WHERE event_id = ? AND tenant_id = ? AND status IN ('going', 'interested', 'invited')",
+                    [$targetId, $tenantId]
+                );
+            }
+
+            self::$lastCancellationRecipientIds = $recipientIds
                 ->map(fn ($id) => (int) $id)
                 ->filter(fn (int $id) => $id > 0)
                 ->unique()
                 ->values()
                 ->all();
-
-            // Update event status
-            DB::update(
-                "UPDATE events SET status = 'cancelled', cancellation_reason = ?, cancelled_at = NOW(), cancelled_by = ? WHERE id = ? AND tenant_id = ?",
-                [$reason, $userId, $eventId, $tenantId]
-            );
-
-            // Cancel all pending reminders
-            DB::update(
-                "UPDATE event_reminders SET status = 'cancelled' WHERE event_id = ? AND status = 'pending' AND tenant_id = ?",
-                [$eventId, $tenantId]
-            );
-
-            // Cancel all waitlist entries
-            DB::update(
-                "UPDATE event_waitlist SET status = 'cancelled', cancelled_at = NOW() WHERE event_id = ? AND status = 'waiting' AND tenant_id = ?",
-                [$eventId, $tenantId]
-            );
-
-            // Mark all active RSVPs as cancelled
-            DB::update(
-                "UPDATE event_rsvps SET status = 'cancelled' WHERE event_id = ? AND tenant_id = ? AND status IN ('going', 'interested', 'invited')",
-                [$eventId, $tenantId]
-            );
 
             return true;
         } catch (\Exception $e) {
@@ -1831,6 +1877,11 @@ class EventService
             self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.event_not_found')];
             return false;
         }
+
+        // Time fields are per-occurrence — applying one start_time to every
+        // future occurrence would collapse the whole series onto a single
+        // timestamp. Series-wide edits cover content fields only.
+        unset($data['start_time'], $data['end_time']);
 
         $parentId = $event->parent_event_id ?? $eventId;
 

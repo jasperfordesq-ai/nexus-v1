@@ -1,4 +1,4 @@
-import { Select, SelectItem, TimeInput, type TimeInputValue, GlassCard, Button, Chip, Input, Textarea, Switch, CheckboxGroup, Checkbox } from '@/components/ui';
+import { Select, SelectItem, TimeInput, type TimeInputValue, GlassCard, Button, Chip, Input, Textarea, Switch, CheckboxGroup, Checkbox, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -173,6 +173,11 @@ export function CreateEventPage() {
   const [selectedPollIds, setSelectedPollIds] = useState<Set<string>>(new Set());
   const [isLoadingPolls, setIsLoadingPolls] = useState(false);
 
+  // Recurring-series edit scope ("only this event" vs "all future events")
+  const [seriesLinked, setSeriesLinked] = useState(false);
+  const [showScopeModal, setShowScopeModal] = useState(false);
+  const pendingPayloadRef = useRef<Record<string, unknown> | null>(null);
+
   const loadEvent = useCallback(async () => {
     if (!id) return;
 
@@ -182,6 +187,8 @@ export function CreateEventPage() {
       const response = await api.get<Event>(`/v2/events/${id}`);
       if (response.success && response.data) {
         const event = response.data;
+        const seriesFields = event as Event & { is_recurring_template?: number | boolean; parent_event_id?: number | null };
+        setSeriesLinked(!!seriesFields.is_recurring_template || !!seriesFields.parent_event_id);
         const startDate = new Date(event.start_date);
         const endDate = event.end_date ? new Date(event.end_date) : null;
 
@@ -477,6 +484,13 @@ export function CreateEventPage() {
 
       let response;
       if (isEditing) {
+        if (seriesLinked) {
+          // Part of a recurring series — ask the organiser whether the edit
+          // applies to just this event or the whole series (saveWithScope).
+          pendingPayloadRef.current = payload;
+          setShowScopeModal(true);
+          return; // finally{} clears isSubmitting
+        }
         response = await api.put(`/v2/events/${id}`, payload);
       } else if (recurrenceRule) {
         // Recurrence-aware endpoint — creates the template event AND its
@@ -497,6 +511,43 @@ export function CreateEventPage() {
         }
 
         toast.success(isEditing ? t('form.toast.updated') : t('form.toast.created'));
+        navigate(tenantPath('/events'));
+      } else {
+        toast.error(response.error || t('form.toast.error'));
+      }
+    } catch (error) {
+      logError('Failed to save event', error);
+      toast.error(t('form.toast.error'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  // Confirmed scope from the recurring-series modal.
+  async function saveWithScope(scope: 'single' | 'all') {
+    const payload = pendingPayloadRef.current;
+    if (!payload || !id) return;
+    setShowScopeModal(false);
+
+    try {
+      setIsSubmitting(true);
+      let response;
+      if (scope === 'all') {
+        // Series-wide edits cover content fields only — time changes are
+        // per-occurrence (the backend strips them defensively too).
+        const seriesPayload: Record<string, unknown> = { ...payload, scope: 'all' };
+        delete seriesPayload.start_time;
+        delete seriesPayload.end_time;
+        response = await api.put(`/v2/events/${id}/recurring`, seriesPayload);
+      } else {
+        response = await api.put(`/v2/events/${id}`, payload);
+      }
+
+      if (response.success) {
+        if (imageFile) {
+          await uploadImage(Number(id));
+        }
+        toast.success(t('form.toast.updated'));
         navigate(tenantPath('/events'));
       } else {
         toast.error(response.error || t('form.toast.error'));
@@ -1128,6 +1179,34 @@ export function CreateEventPage() {
           </div>
         </form>
       </GlassCard>
+
+      {/* Recurring-series edit scope */}
+      <Modal isOpen={showScopeModal} onClose={() => setShowScopeModal(false)}>
+        <ModalContent>
+          <ModalHeader className="text-theme-primary">{t('form.edit_scope_title')}</ModalHeader>
+          <ModalBody>
+            <p className="text-theme-muted">{t('form.edit_scope_message')}</p>
+            <p className="text-sm text-theme-muted">{t('form.edit_scope_all_note')}</p>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="flat"
+              className="bg-theme-elevated text-theme-primary"
+              onPress={() => void saveWithScope('single')}
+              isDisabled={isSubmitting}
+            >
+              {t('form.edit_scope_single')}
+            </Button>
+            <Button
+              color="primary"
+              onPress={() => void saveWithScope('all')}
+              isLoading={isSubmitting}
+            >
+              {t('form.edit_scope_all')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </motion.div>
   );
 }

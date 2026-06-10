@@ -135,7 +135,9 @@
     "join_meeting_aria": "Rejoindre la réunion pour {{title}}",
     "join_waitlist_aria": "Rejoindre la liste d'attente de cet événement",
     "leave_waitlist_aria": "Quitter la liste d'attente de cet événement",
-    "tabs_aria": "Sections de détails de l'événement"
+    "tabs_aria": "Sections de détails de l'événement",
+    "delete_series_note": "Il s'agit d'un événement récurrent. Sa suppression supprimera également toutes ses occurrences futures.",
+    "cancel_series_note": "Il s'agit d'un événement récurrent. Son annulation annulera également toutes les occurrences futures et leurs participants seront informés."
   },
   "card": {
     "cancelled": "Annulé",
@@ -246,7 +248,12 @@
     "summary_remote": "Activé à distance",
     "summary_in_person": "En personne ou sur place",
     "summary_not_set": "Pas encore défini",
-    "essentials_section": "Les essentiels de l'événement"
+    "essentials_section": "Les essentiels de l'événement",
+    "edit_scope_title": "Modifier l'événement récurrent",
+    "edit_scope_message": "Cet événement fait partie d'une série récurrente. Que souhaitez-vous mettre à jour ?",
+    "edit_scope_single": "Seulement cet événement",
+    "edit_scope_all": "Cet événement et tous les suivants",
+    "edit_scope_all_note": "Les modifications de date et d'heure ne s'appliquent qu'à cet événement."
   },
   "toast": {
     "rsvp_removed": "RSVP annulé",

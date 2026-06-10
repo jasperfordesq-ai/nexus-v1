@@ -135,7 +135,9 @@
     "join_meeting_aria": "Meeting für {{title}} beitreten",
     "join_waitlist_aria": "Der Warteliste für diese Veranstaltung beitreten",
     "leave_waitlist_aria": "Warteliste für diese Veranstaltung verlassen",
-    "tabs_aria": "Abschnitte mit Veranstaltungsdetails"
+    "tabs_aria": "Abschnitte mit Veranstaltungsdetails",
+    "delete_series_note": "Dies ist ein wiederkehrender Termin. Beim Löschen werden auch alle zukünftigen Termine der Serie gelöscht.",
+    "cancel_series_note": "Dies ist ein wiederkehrender Termin. Bei der Absage werden auch alle zukünftigen Termine abgesagt und deren Teilnehmende benachrichtigt."
   },
   "card": {
     "cancelled": "Abgesagt",
@@ -246,7 +248,12 @@
     "summary_remote": "Remote aktiviert",
     "summary_in_person": "Persönlich oder vor Ort",
     "summary_not_set": "Noch nicht festgelegt",
-    "essentials_section": "Event-Essentials"
+    "essentials_section": "Event-Essentials",
+    "edit_scope_title": "Wiederkehrenden Termin bearbeiten",
+    "edit_scope_message": "Dieser Termin ist Teil einer wiederkehrenden Serie. Was möchten Sie aktualisieren?",
+    "edit_scope_single": "Nur diesen Termin",
+    "edit_scope_all": "Diesen und alle zukünftigen Termine",
+    "edit_scope_all_note": "Datums- und Zeitänderungen gelten nur für diesen Termin."
   },
   "toast": {
     "rsvp_removed": "RSVP entfernt",

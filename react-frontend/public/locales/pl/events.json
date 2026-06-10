@@ -135,7 +135,9 @@
     "join_meeting_aria": "Dołącz do spotkania {{title}}",
     "join_waitlist_aria": "Dołącz do listy oczekujących na to wydarzenie",
     "leave_waitlist_aria": "Opuść listę oczekujących na to wydarzenie",
-    "tabs_aria": "Sekcje szczegółów wydarzenia"
+    "tabs_aria": "Sekcje szczegółów wydarzenia",
+    "delete_series_note": "To wydarzenie cykliczne. Jego usunięcie spowoduje również usunięcie wszystkich przyszłych wystąpień.",
+    "cancel_series_note": "To wydarzenie cykliczne. Jego odwołanie spowoduje również odwołanie wszystkich przyszłych wystąpień i powiadomienie ich uczestników."
   },
   "card": {
     "cancelled": "Odwołany",
@@ -246,7 +248,12 @@
     "summary_remote": "Zdalne włączone",
     "summary_in_person": "Osobiście lub lokalnie",
     "summary_not_set": "Jeszcze nie ustawione",
-    "essentials_section": "Niezbędne informacje na temat wydarzenia"
+    "essentials_section": "Niezbędne informacje na temat wydarzenia",
+    "edit_scope_title": "Edytuj wydarzenie cykliczne",
+    "edit_scope_message": "To wydarzenie jest częścią cyklicznej serii. Co chcesz zaktualizować?",
+    "edit_scope_single": "Tylko to wydarzenie",
+    "edit_scope_all": "To i wszystkie przyszłe wydarzenia",
+    "edit_scope_all_note": "Zmiany daty i godziny dotyczą tylko tego wydarzenia."
   },
   "toast": {
     "rsvp_removed": "Odpowiedź została usunięta",

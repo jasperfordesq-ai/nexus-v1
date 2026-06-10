@@ -135,7 +135,9 @@
     "join_meeting_aria": "{{title}} のミーティングに参加",
     "join_waitlist_aria": "このイベントのキャンセル待ちに参加",
     "leave_waitlist_aria": "このイベントのキャンセル待ちから外れる",
-    "tabs_aria": "イベント詳細セクション"
+    "tabs_aria": "イベント詳細セクション",
+    "delete_series_note": "これは定期イベントです。削除すると、今後のすべての開催回も削除されます。",
+    "cancel_series_note": "これは定期イベントです。中止すると、今後のすべての開催回も中止され、参加者に通知されます。"
   },
   "card": {
     "cancelled": "キャンセル",
@@ -246,7 +248,12 @@
     "summary_remote": "リモート有効",
     "summary_in_person": "直接または現地で",
     "summary_not_set": "まだ設定されていません",
-    "essentials_section": "イベント必需品"
+    "essentials_section": "イベント必需品",
+    "edit_scope_title": "定期イベントを編集",
+    "edit_scope_message": "このイベントは定期シリーズの一部です。どちらを更新しますか？",
+    "edit_scope_single": "このイベントのみ",
+    "edit_scope_all": "このイベントと今後すべて",
+    "edit_scope_all_note": "日時の変更はこのイベントにのみ適用されます。"
   },
   "toast": {
     "rsvp_removed": "出欠確認を削除しました",

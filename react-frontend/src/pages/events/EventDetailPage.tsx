@@ -1456,6 +1456,11 @@ export function EventDetailPage() {
             <p className="text-theme-muted">
               {t('detail.delete_confirm', { title: event.title })}
             </p>
+            {!!(event as { is_recurring_template?: number | boolean }).is_recurring_template && (
+              <p className="text-sm text-[var(--color-warning)]">
+                {t('detail.delete_series_note')}
+              </p>
+            )}
           </ModalBody>
           <ModalFooter>
             <Button
@@ -1493,6 +1498,11 @@ export function EventDetailPage() {
             <p className="text-theme-muted mb-4">
               {t('detail.cancel_confirm', { title: event.title })}
             </p>
+            {!!(event as { is_recurring_template?: number | boolean }).is_recurring_template && (
+              <p className="text-sm text-[var(--color-warning)] mb-4">
+                {t('detail.cancel_series_note')}
+              </p>
+            )}
             <Textarea
               label={t('detail.cancel_reason_label')}
               placeholder={t('detail.cancel_reason_placeholder')}
