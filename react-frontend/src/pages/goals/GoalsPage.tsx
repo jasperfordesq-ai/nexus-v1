@@ -240,6 +240,8 @@ export function GoalsPage() {
         setNewGoal({ title: '', description: '', target_value: 100, checkin_frequency: 'weekly', deadline: '', is_public: false });
         toastRef.current.success(tRef.current('goals.toast.created'));
         loadGoals();
+      } else {
+        toastRef.current.error(response.error || tRef.current('goals.toast.create_failed'));
       }
     } catch (err) {
       logError('Failed to create goal', err);
@@ -255,6 +257,8 @@ export function GoalsPage() {
       if (response.success) {
         toastRef.current.success(tRef.current('goals.toast.progress_updated'));
         loadGoals();
+      } else {
+        toastRef.current.error(response.error || tRef.current('goals.toast.progress_failed'));
       }
     } catch (err) {
       logError('Failed to update progress', err);
@@ -295,6 +299,8 @@ export function GoalsPage() {
         setEditGoal(null);
         toastRef.current.success(tRef.current('goals.toast.updated'));
         loadGoals();
+      } else {
+        toastRef.current.error(response.error || tRef.current('goals.toast.update_failed'));
       }
     } catch (err) {
       logError('Failed to update goal', err);
@@ -322,6 +328,8 @@ export function GoalsPage() {
         setGoals((prev) => prev.filter((g) => g.id !== deleteGoal.id));
         setDeleteGoal(null);
         toastRef.current.success(tRef.current('goals.toast.deleted'));
+      } else {
+        toastRef.current.error(response.error || tRef.current('goals.toast.delete_failed'));
       }
     } catch (err) {
       logError('Failed to delete goal', err);
@@ -349,6 +357,8 @@ export function GoalsPage() {
         toastRef.current.success(tRef.current('goals.toast.completed'));
         // Clear celebration after animation
         setTimeout(() => setCelebratingId(null), 2000);
+      } else {
+        toastRef.current.error(response.error || tRef.current('goals.toast.complete_failed'));
       }
     } catch (err) {
       logError('Failed to complete goal', err);

@@ -479,7 +479,7 @@ export function ProfilePage() {
 
   // Redirect unauthenticated /profile/me to login once auth state is resolved
   if (id === 'me' && !isAuthLoading && !isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to={tenantPath('/login')} replace />;
   }
 
   if (isLoading || isAuthLoading) {

@@ -194,17 +194,21 @@ export function NotificationsPage() {
   async function markGroupAsRead(notification: Notification) {
     if (!notification.group_key) return;
     try {
-      await api.post('/v2/notifications/group/read', {
+      const response = await api.post('/v2/notifications/group/read', {
         group_key: notification.group_key,
       });
-      setNotifications((prev) =>
-        prev.map((n) =>
-          n.group_key === notification.group_key
-            ? { ...n, read_at: new Date().toISOString() }
-            : n
-        )
-      );
-      refreshCounts();
+      if (response.success) {
+        setNotifications((prev) =>
+          prev.map((n) =>
+            n.group_key === notification.group_key
+              ? { ...n, read_at: new Date().toISOString() }
+              : n
+          )
+        );
+        refreshCounts();
+      } else {
+        toastRef.current.error(response.error || tRef.current('toast.mark_read_failed'));
+      }
     } catch (error) {
       logError('Failed to mark group as read', error);
       toastRef.current.error(tRef.current('toast.mark_read_failed'));
@@ -225,9 +229,19 @@ export function NotificationsPage() {
     const undoTimeout = setTimeout(async () => {
       if (undone) return;
       try {
-        await api.delete(`/v2/notifications/${id}`);
-        if (!notification.read_at) {
-          refreshCounts();
+        const response = await api.delete(`/v2/notifications/${id}`);
+        if (response.success) {
+          if (!notification.read_at) {
+            refreshCounts();
+          }
+        } else {
+          // Restore if delete actually failed
+          setNotifications((prev) => {
+            const updated = [...prev];
+            updated.splice(notificationIndex, 0, notification);
+            return updated;
+          });
+          toastRef.current.error(response.error || tRef.current('toast.delete_failed'));
         }
       } catch (error) {
         logError('Failed to delete notification', error);

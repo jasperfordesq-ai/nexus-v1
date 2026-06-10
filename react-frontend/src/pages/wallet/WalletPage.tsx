@@ -47,6 +47,7 @@ export function WalletPage() {
   const [hasMoreTransactions, setHasMoreTransactions] = useState(true);
   const [txCursor, setTxCursor] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [txError, setTxError] = useState<string | null>(null);
   const [filter, setFilter] = useState<TransactionFilter>('all');
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [isDonateModalOpen, setIsDonateModalOpen] = useState(false);
@@ -70,6 +71,7 @@ export function WalletPage() {
     try {
       setIsLoading(true);
       setError(null);
+      setTxError(null);
       setTxCursor(null);
       const [balanceRes, transactionsRes] = await Promise.all([
         api.get<WalletBalance>('/v2/wallet/balance'),
@@ -90,6 +92,9 @@ export function WalletPage() {
         setTransactions(transactionsRes.data);
         setTxCursor(transactionsRes.meta?.cursor ?? null);
         setHasMoreTransactions(transactionsRes.meta?.has_more ?? transactionsRes.data.length >= 50);
+      } else {
+        // Don't show a fake "No transactions yet" when only the transactions request failed
+        setTxError(transactionsRes.error || tRef.current('error.load_wallet'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;
@@ -394,7 +399,7 @@ export function WalletPage() {
           <Tabs
             aria-label={t('aria.transaction_filters')}
             selectedKey={filter}
-            onSelectionChange={(key) => { setFilter(key as TransactionFilter); setTxCursor(null); setHasMoreTransactions(true); }}
+            onSelectionChange={(key) => setFilter(key as TransactionFilter)}
             classNames={{
               base: 'w-full max-w-full overflow-x-auto',
               tabList: 'bg-theme-elevated p-1 rounded-lg min-w-max flex-nowrap',
@@ -423,6 +428,19 @@ export function WalletPage() {
                   </div>
                 </div>
                 ))}
+              </div>
+              ) : txError ? (
+              <div className="py-8 text-center" role="alert">
+                <AlertTriangle className="mx-auto mb-3 h-10 w-10 text-[var(--color-warning)]" aria-hidden="true" />
+                <p className="mb-4 text-theme-muted">{txError}</p>
+                <Button
+                  variant="secondary"
+                  className="bg-theme-elevated text-theme-muted"
+                  startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
+                  onPress={() => loadWalletData()}
+                >
+                  {t('try_again')}
+                </Button>
               </div>
               ) : filteredTransactions.length === 0 ? (
               <EmptyState

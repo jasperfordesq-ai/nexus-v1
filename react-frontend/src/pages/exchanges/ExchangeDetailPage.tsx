@@ -229,9 +229,13 @@ export function ExchangeDetailPage() {
 
     try {
       setIsSubmitting(true);
-      await api.post(`/v2/exchanges/${exchange.id}/accept`);
-      toastRef.current.success(tRef.current('toast.accepted'));
-      loadExchange();
+      const response = await api.post(`/v2/exchanges/${exchange.id}/accept`);
+      if (response.success) {
+        toastRef.current.success(tRef.current('toast.accepted'));
+        loadExchange();
+      } else {
+        toastRef.current.error(response.error || tRef.current('toast.accept_failed'));
+      }
     } catch (err) {
       toastRef.current.error(tRef.current('toast.accept_failed'));
       logError('Failed to accept exchange', err);
@@ -245,10 +249,14 @@ export function ExchangeDetailPage() {
 
     try {
       setIsSubmitting(true);
-      await api.post(`/v2/exchanges/${exchange.id}/decline`, { reason: declineReason });
-      toastRef.current.success(tRef.current('toast.declined'));
-      setShowDeclineModal(false);
-      loadExchange();
+      const response = await api.post(`/v2/exchanges/${exchange.id}/decline`, { reason: declineReason });
+      if (response.success) {
+        toastRef.current.success(tRef.current('toast.declined'));
+        setShowDeclineModal(false);
+        loadExchange();
+      } else {
+        toastRef.current.error(response.error || tRef.current('toast.decline_failed'));
+      }
     } catch (err) {
       toastRef.current.error(tRef.current('toast.decline_failed'));
       logError('Failed to decline exchange', err);
@@ -262,9 +270,13 @@ export function ExchangeDetailPage() {
 
     try {
       setIsSubmitting(true);
-      await api.post(`/v2/exchanges/${exchange.id}/start`);
-      toastRef.current.success(tRef.current('toast.started'));
-      loadExchange();
+      const response = await api.post(`/v2/exchanges/${exchange.id}/start`);
+      if (response.success) {
+        toastRef.current.success(tRef.current('toast.started'));
+        loadExchange();
+      } else {
+        toastRef.current.error(response.error || tRef.current('toast.start_failed'));
+      }
     } catch (err) {
       toastRef.current.error(tRef.current('toast.start_failed'));
       logError('Failed to start exchange', err);
@@ -278,9 +290,13 @@ export function ExchangeDetailPage() {
 
     try {
       setIsSubmitting(true);
-      await api.post(`/v2/exchanges/${exchange.id}/complete`);
-      toastRef.current.success(tRef.current('toast.completed'));
-      loadExchange();
+      const response = await api.post(`/v2/exchanges/${exchange.id}/complete`);
+      if (response.success) {
+        toastRef.current.success(tRef.current('toast.completed'));
+        loadExchange();
+      } else {
+        toastRef.current.error(response.error || tRef.current('toast.complete_failed'));
+      }
     } catch (err) {
       toastRef.current.error(tRef.current('toast.complete_failed'));
       logError('Failed to complete exchange', err);
@@ -305,10 +321,14 @@ export function ExchangeDetailPage() {
 
     try {
       setIsSubmitting(true);
-      await api.post(`/v2/exchanges/${exchange.id}/confirm`, { hours });
-      toastRef.current.success(tRef.current('toast.hours_confirmed'));
-      setShowConfirmModal(false);
-      loadExchange();
+      const response = await api.post(`/v2/exchanges/${exchange.id}/confirm`, { hours });
+      if (response.success) {
+        toastRef.current.success(tRef.current('toast.hours_confirmed'));
+        setShowConfirmModal(false);
+        loadExchange();
+      } else {
+        toastRef.current.error(response.error || tRef.current('toast.confirm_failed'));
+      }
     } catch (err) {
       toastRef.current.error(tRef.current('toast.confirm_failed'));
       logError('Failed to confirm hours', err);
@@ -322,10 +342,14 @@ export function ExchangeDetailPage() {
 
     try {
       setIsSubmitting(true);
-      await api.delete(`/v2/exchanges/${exchange.id}`);
-      toastRef.current.success(tRef.current('toast.cancelled'));
-      setShowCancelModal(false);
-      navigate(tenantPath('/exchanges'));
+      const response = await api.delete(`/v2/exchanges/${exchange.id}`);
+      if (response.success) {
+        toastRef.current.success(tRef.current('toast.cancelled'));
+        setShowCancelModal(false);
+        navigate(tenantPath('/exchanges'));
+      } else {
+        toastRef.current.error(response.error || tRef.current('toast.cancel_failed'));
+      }
     } catch (err) {
       toastRef.current.error(tRef.current('toast.cancel_failed'));
       logError('Failed to cancel exchange', err);

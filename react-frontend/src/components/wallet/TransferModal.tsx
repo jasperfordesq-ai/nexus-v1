@@ -119,6 +119,8 @@ export function TransferModal({
                   username: u.username || null,
                 } as WalletUserSearchResult,
               }));
+            } else {
+              toast.warning(t('toast.recipient_load_failed'));
             }
           })
           .catch(() => {
@@ -157,13 +159,18 @@ export function TransferModal({
       if (response.success && response.data?.users) {
         setSearchResults(response.data.users);
         setShowResults(true);
+      } else {
+        // Failed search must not look like "no results"
+        setSearchResults([]);
+        setShowResults(false);
+        toast.warning(t('toast.recipient_load_failed'));
       }
     } catch (err) {
       logError('User search failed', err);
     } finally {
       setIsSearching(false);
     }
-  }, []);
+  }, [t, toast]);
 
   // Handle search input change with debounce
   const handleSearchChange = (value: string) => {

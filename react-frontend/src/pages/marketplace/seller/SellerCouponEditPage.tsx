@@ -120,13 +120,15 @@ export default function SellerCouponEditPage() {
         status: form.status,
         applies_to: form.applies_to,
       };
-      if (isEdit) {
-        await api.put(`/v2/marketplace/seller/coupons/${id}`, payload);
+      const response = isEdit
+        ? await api.put(`/v2/marketplace/seller/coupons/${id}`, payload)
+        : await api.post('/v2/marketplace/seller/coupons', payload);
+      if (response.success) {
+        toast.success(t('coupon.seller.saved'));
+        navigate(tenantPath('/marketplace/seller/coupons'));
       } else {
-        await api.post('/v2/marketplace/seller/coupons', payload);
+        toast.error(response.error || t('errors.unexpected'));
       }
-      toast.success(t('coupon.seller.saved'));
-      navigate(tenantPath('/marketplace/seller/coupons'));
     } catch (err) {
       logError('SellerCouponEditPage.save', err);
       toast.error(t('errors.unexpected'));

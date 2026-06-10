@@ -143,14 +143,12 @@ export function EventsPage() {
   }, [searchQuery]);
 
   const loadEvents = useCallback(async (append = false): Promise<void> => {
-    // Abort any in-flight request to prevent race conditions
-    if (!append && abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
+    // Abort any in-flight request (initial OR append) to prevent race conditions —
+    // a stale append finishing after a filter change must not concatenate
+    // old-filter events into the new list
+    abortControllerRef.current?.abort();
     const controller = new AbortController();
-    if (!append) {
-      abortControllerRef.current = controller;
-    }
+    abortControllerRef.current = controller;
 
     try {
       if (controller.signal.aborted) return;
@@ -200,6 +198,8 @@ export function EventsPage() {
         if (controller.signal.aborted) return;
         if (!append) {
           setError(tRef.current('unable_to_load'));
+        } else {
+          toastRef.current.error(response.error || tRef.current('error_load_more'));
         }
       }
     } catch (err) {

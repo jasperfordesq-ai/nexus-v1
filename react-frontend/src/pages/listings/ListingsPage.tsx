@@ -230,7 +230,10 @@ export function ListingsPage() {
         }
       } else {
         if (reset) {
-          setListings([]);
+          setLoadError(tRef.current('load_error'));
+        } else {
+          setPaginationError(true);
+          toastRef.current.error(tRef.current('load_more_error'));
         }
         setHasMore(false);
       }

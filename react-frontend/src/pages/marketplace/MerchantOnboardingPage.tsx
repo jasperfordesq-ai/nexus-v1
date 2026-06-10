@@ -285,14 +285,17 @@ export function MerchantOnboardingPage() {
   const saveStep1 = useCallback(async (): Promise<boolean> => {
     setSaving(true);
     try {
-      await api.post('/v2/merchant-onboarding/step-1', {
+      const response = await api.post('/v2/merchant-onboarding/step-1', {
         seller_type: sellerType,
         business_name: businessName,
         display_name: displayName,
         bio,
         business_registration: businessReg || undefined,
       });
-      return true;
+      if (!response.success) {
+        showToast(response.error || t('errors.save_failed'), 'error');
+      }
+      return response.success;
     } catch (err) {
       logError('MerchantOnboardingPage: saveStep1', err);
       showToast(t('errors.save_failed'), 'error');
@@ -305,11 +308,14 @@ export function MerchantOnboardingPage() {
   const saveStep2 = useCallback(async (): Promise<boolean> => {
     setSaving(true);
     try {
-      await api.post('/v2/merchant-onboarding/step-2', {
+      const response = await api.post('/v2/merchant-onboarding/step-2', {
         business_address: address,
         opening_hours: openingHours,
       });
-      return true;
+      if (!response.success) {
+        showToast(response.error || t('errors.save_failed'), 'error');
+      }
+      return response.success;
     } catch (err) {
       logError('MerchantOnboardingPage: saveStep2', err);
       showToast(t('errors.save_failed'), 'error');
@@ -323,11 +329,14 @@ export function MerchantOnboardingPage() {
     if (!avatarUrl) return true; // photo is optional — allow skipping
     setSaving(true);
     try {
-      await api.post('/v2/merchant-onboarding/step-3', {
+      const response = await api.post('/v2/merchant-onboarding/step-3', {
         avatar_url: avatarUrl || undefined,
         cover_image_url: coverImageUrl || undefined,
       });
-      return true;
+      if (!response.success) {
+        showToast(response.error || t('errors.save_failed'), 'error');
+      }
+      return response.success;
     } catch (err) {
       logError('MerchantOnboardingPage: saveStep3', err);
       showToast(t('errors.save_failed'), 'error');
@@ -341,8 +350,12 @@ export function MerchantOnboardingPage() {
     setSaving(true);
     try {
       const res = await api.post<CompleteResult>('/v2/merchant-onboarding/complete', {});
-      setBadgeGranted(res.data?.badge_granted ?? false);
-      setCompleted(true);
+      if (res.success) {
+        setBadgeGranted(res.data?.badge_granted ?? false);
+        setCompleted(true);
+      } else {
+        showToast(res.error || t('errors.complete_failed'), 'error');
+      }
     } catch (err) {
       logError('MerchantOnboardingPage: complete', err);
       showToast(t('errors.complete_failed'), 'error');

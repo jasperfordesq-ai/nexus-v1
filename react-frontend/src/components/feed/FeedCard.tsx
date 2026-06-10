@@ -477,12 +477,14 @@ const FeedCard = React.memo(function FeedCard({
   // Load poll data lazily ONLY when the item is a poll, poll_data was NOT
   // provided inline, and we haven't already loaded or started loading it.
   useEffect(() => {
-    if (item.type === 'poll' && !item.poll_data && !pollData && !isLoadingPoll) {
+    if (item.type === 'poll' && !item.poll_data && !pollData && !isLoadingPoll && !pollLoadError) {
       setIsLoadingPoll(true);
       api.get<PollData>(`/v2/feed/polls/${item.id}`)
         .then((response) => {
           if (response.success && response.data) {
             setPollData(response.data);
+          } else {
+            setPollLoadError(true);
           }
         })
         .catch((err) => {
@@ -491,7 +493,7 @@ const FeedCard = React.memo(function FeedCard({
         })
         .finally(() => setIsLoadingPoll(false));
     }
-  }, [item.type, item.id, item.poll_data, pollData, isLoadingPoll]);
+  }, [item.type, item.id, item.poll_data, pollData, isLoadingPoll, pollLoadError]);
 
   const handleVote = (optionId: number) => {
     if (!pollData) return;

@@ -169,9 +169,13 @@ export function EventDetailPage() {
     loadEvent();
   }, [loadEvent]);
 
-  // Fetch other events in the same series
+  // Fetch other events in the same series.
+  // Depend on the ids (not the whole event object) so an RSVP refetch of the
+  // same event doesn't re-trigger the series request.
+  const seriesId = event?.series?.id;
+  const eventId = event?.id;
   useEffect(() => {
-    if (!event?.series?.id) {
+    if (!seriesId) {
       setSeriesEvents([]);
       return;
     }
@@ -180,11 +184,11 @@ export function EventDetailPage() {
     async function fetchSeriesEvents() {
       setIsLoadingSeriesEvents(true);
       try {
-        const res = await api.get<Event[]>(`/v2/events?series_id=${event!.series!.id}&per_page=5`);
+        const res = await api.get<Event[]>(`/v2/events?series_id=${seriesId}&per_page=5`);
         if (!cancelled && res.success && res.data) {
           // Filter out the current event
           setSeriesEvents(
-            (Array.isArray(res.data) ? res.data : []).filter((e) => e.id !== event!.id)
+            (Array.isArray(res.data) ? res.data : []).filter((e) => e.id !== eventId)
           );
         }
       } catch (err) {
@@ -196,7 +200,7 @@ export function EventDetailPage() {
 
     fetchSeriesEvents();
     return () => { cancelled = true; };
-  }, [event]);
+  }, [seriesId, eventId]);
 
   // Fetch polls linked to this event
   useEffect(() => {

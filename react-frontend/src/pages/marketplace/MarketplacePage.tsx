@@ -218,12 +218,16 @@ export function MarketplacePage() {
       return;
     }
     try {
-      await api.post(`/v2/marketplace/listings/${id}/save`);
-      const updateSaved = (list: MarketplaceListingItem[]) =>
-        list.map((l) => (l.id === id ? { ...l, is_saved: true } : l));
-      setListings(updateSaved);
-      setFeaturedListings(updateSaved);
-      toast.success(t('common.saved_for_later'));
+      const response = await api.post(`/v2/marketplace/listings/${id}/save`);
+      if (response.success) {
+        const updateSaved = (list: MarketplaceListingItem[]) =>
+          list.map((l) => (l.id === id ? { ...l, is_saved: true } : l));
+        setListings(updateSaved);
+        setFeaturedListings(updateSaved);
+        toast.success(t('common.saved_for_later'));
+      } else {
+        toast.error(response.error || t('common.save_failed'));
+      }
     } catch (err) {
       logError('Failed to save listing', err);
       toast.error(t('common.save_failed'));
@@ -236,12 +240,16 @@ export function MarketplacePage() {
       return;
     }
     try {
-      await api.delete(`/v2/marketplace/listings/${id}/save`);
-      const updateSaved = (list: MarketplaceListingItem[]) =>
-        list.map((l) => (l.id === id ? { ...l, is_saved: false } : l));
-      setListings(updateSaved);
-      setFeaturedListings(updateSaved);
-      toast.success(t('common.removed_from_saved'));
+      const response = await api.delete(`/v2/marketplace/listings/${id}/save`);
+      if (response.success) {
+        const updateSaved = (list: MarketplaceListingItem[]) =>
+          list.map((l) => (l.id === id ? { ...l, is_saved: false } : l));
+        setListings(updateSaved);
+        setFeaturedListings(updateSaved);
+        toast.success(t('common.removed_from_saved'));
+      } else {
+        toast.error(response.error || t('common.save_failed'));
+      }
     } catch (err) {
       logError('Failed to unsave listing', err);
       toast.error(t('common.save_failed'));

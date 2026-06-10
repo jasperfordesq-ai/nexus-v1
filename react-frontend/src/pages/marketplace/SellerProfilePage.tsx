@@ -175,11 +175,15 @@ export function SellerProfilePage() {
       return;
     }
     try {
-      await api.post(`/v2/marketplace/listings/${listingId}/save`);
-      setListings((prev) =>
-        prev.map((l) => (l.id === listingId ? { ...l, is_saved: true } : l))
-      );
-      toast.success(t('common.saved_for_later'));
+      const response = await api.post(`/v2/marketplace/listings/${listingId}/save`);
+      if (response.success) {
+        setListings((prev) =>
+          prev.map((l) => (l.id === listingId ? { ...l, is_saved: true } : l))
+        );
+        toast.success(t('common.saved_for_later'));
+      } else {
+        toast.error(response.error || t('common.save_failed'));
+      }
     } catch (err) {
       logError('Failed to save listing', err);
       toast.error(t('common.save_failed'));
@@ -192,11 +196,15 @@ export function SellerProfilePage() {
       return;
     }
     try {
-      await api.delete(`/v2/marketplace/listings/${listingId}/save`);
-      setListings((prev) =>
-        prev.map((l) => (l.id === listingId ? { ...l, is_saved: false } : l))
-      );
-      toast.success(t('common.removed_from_saved'));
+      const response = await api.delete(`/v2/marketplace/listings/${listingId}/save`);
+      if (response.success) {
+        setListings((prev) =>
+          prev.map((l) => (l.id === listingId ? { ...l, is_saved: false } : l))
+        );
+        toast.success(t('common.removed_from_saved'));
+      } else {
+        toast.error(response.error || t('common.save_failed'));
+      }
     } catch (err) {
       logError('Failed to unsave listing', err);
       toast.error(t('common.save_failed'));

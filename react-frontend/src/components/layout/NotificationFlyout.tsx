@@ -54,6 +54,7 @@ export function NotificationFlyout() {
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState(false);
   const fetchIdRef = useRef(0);
 
   // Stable ref for t — avoids re-creating callbacks when i18n namespace loads
@@ -65,13 +66,21 @@ export function NotificationFlyout() {
     const fetchId = ++fetchIdRef.current;
     try {
       setIsLoading(true);
+      setLoadError(false);
       const response = await api.get<Notification[]>('/v2/notifications/grouped?per_page=8');
       // Only apply if this is still the latest fetch
-      if (fetchId === fetchIdRef.current && response.success && response.data) {
-        setNotifications(response.data);
+      if (fetchId === fetchIdRef.current) {
+        if (response.success && response.data) {
+          setNotifications(response.data);
+        } else {
+          setLoadError(true);
+        }
       }
     } catch (error) {
       logError('Failed to load notifications for flyout', error);
+      if (fetchId === fetchIdRef.current) {
+        setLoadError(true);
+      }
     } finally {
       if (fetchId === fetchIdRef.current) {
         setIsLoading(false);
@@ -165,6 +174,11 @@ export function NotificationFlyout() {
               </div>
             </div>
           ))}
+        </div>
+      ) : loadError ? (
+        <div className="py-8 text-center bg-[var(--surface-solid)]">
+          <Bell className="w-8 h-8 mx-auto text-theme-subtle mb-2 opacity-40" />
+          <p className="text-sm text-theme-subtle">{t('error_load')}</p>
         </div>
       ) : notifications.length === 0 ? (
         <div className="py-8 text-center bg-[var(--surface-solid)]">

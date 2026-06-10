@@ -35,7 +35,7 @@ import { useTranslation } from 'react-i18next';
 import { GlassCard, useDisclosure, Button, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 import { EmptyState, LoadingScreen } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';
-import { useAuth, useTenant } from '@/contexts';
+import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -97,10 +97,11 @@ interface MinimalJob {
 /* ───────────────────────── Main Component ───────────────────────── */
 
 export function OrganisationDetailPage() {
-  const { t } = useTranslation('community');
+  const { t } = useTranslation(['community', 'volunteering']);
   const { id } = useParams<{ id: string }>();
   const { isAuthenticated } = useAuth();
   const { tenantPath } = useTenant();
+  const toast = useToast();
 
   const [organisation, setOrganisation] = useState<OrganisationDetail | null>(null);
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
@@ -192,10 +193,14 @@ export function OrganisationDetailPage() {
         applyModal.onClose();
         setApplyMessage('');
         setSelectedOpp(null);
+        toast.success(t('applied_success', { ns: 'volunteering' }));
         loadData();
+      } else {
+        toast.error(response.error || t('apply_error', { ns: 'volunteering' }));
       }
     } catch (err) {
       logError('Failed to apply', err);
+      toast.error(t('apply_error', { ns: 'volunteering' }));
     } finally {
       setIsApplying(false);
     }

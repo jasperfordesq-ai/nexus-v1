@@ -65,9 +65,17 @@ export function ExchangesPage() {
       if (response.success && response.data) {
         setConfig(response.data);
         configLoadedRef.current = true;
+      } else {
+        // Without config the load-effect never fires — surface the error UI
+        // instead of leaving the skeleton up forever.
+        logError('Failed to load exchange config', response.error);
+        setError(tRef.current('error.load_failed'));
+        setIsLoading(false);
       }
     } catch (err) {
       logError('Failed to load exchange config', err);
+      setError(tRef.current('error.load_failed'));
+      setIsLoading(false);
     }
   }, []);
 
@@ -256,7 +264,17 @@ export function ExchangesPage() {
           <Button
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
-            onPress={() => loadExchanges()}
+            onPress={() => {
+              if (!configLoadedRef.current) {
+                // Config never loaded — refetch it; the load-effect picks up
+                // the exchanges once config arrives.
+                setError(null);
+                setIsLoading(true);
+                loadConfig();
+              } else {
+                loadExchanges();
+              }
+            }}
           >
             {t('try_again')}
           </Button>

@@ -626,8 +626,11 @@ export function ConversationPage() {
       pollingIntervalRef.current = null;
     }
 
-    // Only poll if: document visible, not new conversation, and have messages loaded
-    if (!isDocumentVisible || isNewConversation || !lastMessageIdRef.current) {
+    // Only poll if: document visible, not new conversation, and have messages loaded.
+    // isLoading is in the deps so this re-evaluates once loadConversation has
+    // populated lastMessageIdRef — otherwise polling never starts for an
+    // existing conversation opened normally.
+    if (!isDocumentVisible || isNewConversation || isLoading || !lastMessageIdRef.current) {
       return;
     }
 
@@ -645,7 +648,7 @@ export function ConversationPage() {
         pollingIntervalRef.current = null;
       }
     };
-  }, [targetId, isNewConversation, pusher?.isConnected, isDocumentVisible, pollForNewMessages]);
+  }, [targetId, isNewConversation, isLoading, pusher?.isConnected, isDocumentVisible, pollForNewMessages]);
 
   // Scroll to bottom when messages change (only for new messages, not history)
   useEffect(() => {
@@ -782,7 +785,13 @@ export function ConversationPage() {
     }
   }
 
-  // Cleanup on unmount
+  // Track current previews in a ref so the unmount cleanup can revoke them
+  // without re-running (and tearing down an in-progress recording) every time
+  // the attachment list changes. Removal/send paths revoke their own URLs.
+  const attachmentPreviewsRef = useRef(attachmentPreviews);
+  attachmentPreviewsRef.current = attachmentPreviews;
+
+  // Cleanup on unmount only
   useEffect(() => {
     return () => {
       // Stop any active recording
@@ -802,9 +811,9 @@ export function ConversationPage() {
         clearTimeout(typingDebounceRef.current);
       }
       // Revoke any remaining blob URLs
-      attachmentPreviews.forEach((a) => { if (a.preview) URL.revokeObjectURL(a.preview); });
+      attachmentPreviewsRef.current.forEach((a) => { if (a.preview) URL.revokeObjectURL(a.preview); });
     };
-  }, [attachmentPreviews]);
+  }, []);
 
   /**
    * Start voice recording
@@ -958,9 +967,12 @@ export function ConversationPage() {
                 } else {
                   reactions[emoji] = currentCount - 1;
                 }
-              } else {
+              } else if (response.data?.action === 'added') {
                 // Reaction was added
                 reactions[emoji] = currentCount + 1;
+              } else {
+                // Unknown/missing action — don't guess; leave counts unchanged
+                return msg;
               }
 
               return { ...msg, reactions };
@@ -1293,6 +1305,8 @@ export function ConversationPage() {
         });
         cancelEditing();
         toast.success(t('message_updated'), t('message_updated_subtitle'));
+      } else {
+        toast.error(t('error_title'), response.error || t('edit_error'));
       }
     } catch (error) {
       logError('Failed to edit message', error);
@@ -1334,6 +1348,8 @@ export function ConversationPage() {
           });
           toast.success(t('message_deleted'), t('message_deleted_subtitle'));
         }
+      } else {
+        toast.error(t('error_title'), response.error || t('delete_error'));
       }
     } catch (error) {
       logError('Failed to delete message', error);
@@ -1343,7 +1359,7 @@ export function ConversationPage() {
 
   // Feature gate: redirect if messages module is disabled for this tenant
   if (!hasModule('messages')) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={tenantPath('/')} replace />;
   }
 
   if (isLoading) {

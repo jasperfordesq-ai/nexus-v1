@@ -268,12 +268,15 @@ export function MessagesPage() {
     }
   }, [conversations, navigate, tenantPath]);
 
-  // Handle new conversation params separately
+  // Handle new conversation params separately.
+  // Wait until conversations have finished loading (not until the list is non-empty) —
+  // users with zero conversations must still be routed to /messages/new/{userId}.
+  // Skip on load error: an empty list then doesn't prove no conversation exists.
   useEffect(() => {
-    if (toUserId && conversations.length > 0) {
+    if (toUserId && !isLoading && !error) {
       startNewConversation(parseInt(toUserId), listingId ? parseInt(listingId) : undefined);
     }
-  }, [toUserId, listingId, conversations.length, startNewConversation]);
+  }, [toUserId, listingId, isLoading, error, startNewConversation]);
 
   // Debounced user search
   const searchAbortRef = useRef<AbortController | null>(null);
@@ -347,6 +350,8 @@ export function MessagesPage() {
         // Reload main inbox to show restored conversation
         loadConversations();
         toastRef.current.success(tRef.current('conversation_restored'), tRef.current('conversation_restored_desc'));
+      } else {
+        toastRef.current.error(tRef.current('error_title'), response.error || tRef.current('restore_failed'));
       }
     } catch (error) {
       logError('Failed to restore conversation', error);

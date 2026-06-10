@@ -405,13 +405,15 @@ export function MarketplaceListingPage() {
       return;
     }
     try {
-      if (listing.is_saved) {
-        await api.delete(`/v2/marketplace/listings/${listing.id}/save`);
+      const response = listing.is_saved
+        ? await api.delete(`/v2/marketplace/listings/${listing.id}/save`)
+        : await api.post(`/v2/marketplace/listings/${listing.id}/save`);
+      if (response.success) {
+        setListing((prev) => prev ? { ...prev, is_saved: !prev.is_saved } : prev);
+        toast.success(listing.is_saved ? t('common.removed_from_saved') : t('common.saved_for_later'));
       } else {
-        await api.post(`/v2/marketplace/listings/${listing.id}/save`);
+        toast.error(response.error || t('common.save_failed'));
       }
-      setListing((prev) => prev ? { ...prev, is_saved: !prev.is_saved } : prev);
-      toast.success(listing.is_saved ? t('common.removed_from_saved') : t('common.saved_for_later'));
     } catch (err) {
       logError('Failed to toggle save', err);
       toast.error(t('common.save_failed'));
@@ -437,8 +439,12 @@ export function MarketplaceListingPage() {
   const handleSubmitReport = useCallback(async () => {
     if (!listing || !reportReason.trim()) return;
     try {
-      await api.post(`/v2/marketplace/listings/${listing.id}/report`, { reason: 'other', description: reportReason.trim() });
-      toast.success(t('listing.report_submitted'));
+      const response = await api.post(`/v2/marketplace/listings/${listing.id}/report`, { reason: 'other', description: reportReason.trim() });
+      if (response.success) {
+        toast.success(t('listing.report_submitted'));
+      } else {
+        toast.error(response.error || t('listing.report_error'));
+      }
     } catch {
       toast.error(t('listing.report_error'));
     } finally {
@@ -457,14 +463,18 @@ export function MarketplaceListingPage() {
     }
     setIsSubmittingOffer(true);
     try {
-      await api.post(`/v2/marketplace/listings/${listing.id}/offers`, {
+      const response = await api.post(`/v2/marketplace/listings/${listing.id}/offers`, {
         amount: parsedOffer,
         message: offerMessage || undefined,
       });
-      toast.success(t('offer.sent_success'));
-      offerModal.onClose();
-      setOfferAmount('');
-      setOfferMessage('');
+      if (response.success) {
+        toast.success(t('offer.sent_success'));
+        offerModal.onClose();
+        setOfferAmount('');
+        setOfferMessage('');
+      } else {
+        toast.error(response.error || t('offer.sent_error'));
+      }
     } catch (err) {
       logError('Failed to make offer', err);
       toast.error(t('offer.sent_error'));

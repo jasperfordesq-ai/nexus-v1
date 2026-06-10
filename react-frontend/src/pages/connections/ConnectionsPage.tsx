@@ -435,6 +435,8 @@ export default function ConnectionsPage() {
         setterMap[status](prev => isInitial ? items : [...prev, ...items]);
         setCursors(prev => ({ ...prev, [status]: nextCursor }));
         setHasMore(prev => ({ ...prev, [status]: hasMoreItems }));
+      } else {
+        toastErrorRef.current(response.error || tRef.current('toast_load_failed'));
       }
     } catch {
       if (controller.signal.aborted) return;

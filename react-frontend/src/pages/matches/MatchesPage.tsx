@@ -68,7 +68,7 @@ type SourceFilter = 'all' | 'listing' | 'job' | 'volunteering' | 'group';
 const SOURCE_CONFIG: Record<string, { icon: typeof ListChecks; labelKey: string; color: string; path: string }> = {
   listing: { icon: ListChecks, labelKey: 'source_listing', color: 'text-blue-700 dark:text-blue-400 bg-blue-400/10', path: '/listings' },
   job: { icon: Briefcase, labelKey: 'source_job', color: 'text-amber-700 dark:text-amber-400 bg-amber-400/10', path: '/jobs' },
-  volunteering: { icon: Heart, labelKey: 'source_volunteering', color: 'text-rose-600 dark:text-rose-400 bg-rose-400/10', path: '/volunteering' },
+  volunteering: { icon: Heart, labelKey: 'source_volunteering', color: 'text-rose-600 dark:text-rose-400 bg-rose-400/10', path: '/volunteering/opportunities' },
   group: { icon: Users, labelKey: 'source_group', color: 'text-emerald-700 dark:text-emerald-400 bg-emerald-400/10', path: '/groups' },
 };
 
@@ -122,11 +122,16 @@ export function MatchesPage() {
     const listingId = match.source_id;
     setDismissing((prev) => new Set(prev).add(listingId));
     try {
-      await api.post(`/v2/matches/${listingId}/dismiss`, { reason: 'not_relevant' });
-      setMatches((prev) => prev.filter((m) => !(m.source_type === 'listing' && m.source_id === listingId)));
-      toast.success(t('match_hidden'));
+      const res = await api.post(`/v2/matches/${listingId}/dismiss`, { reason: 'not_relevant' });
+      if (res.success) {
+        setMatches((prev) => prev.filter((m) => !(m.source_type === 'listing' && m.source_id === listingId)));
+        toast.success(t('match_hidden'));
+      } else {
+        toast.error(res.error || t('load_failed'));
+      }
     } catch (err) {
       logError('MatchesPage.dismiss', err);
+      toast.error(t('load_failed'));
     }
     setDismissing((prev) => { const s = new Set(prev); s.delete(listingId); return s; });
   }, [toast, t]);

@@ -606,9 +606,13 @@ export function FeedPage() {
 
   const handleHidePost = useCallback(async (item: FeedItem) => {
     try {
-      await api.post(`/v2/feed/posts/${item.id}/hide`, { type: item.type });
-      setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
-      toastRef.current.success(tRef.current('toast.post_hidden'));
+      const response = await api.post(`/v2/feed/posts/${item.id}/hide`, { type: item.type });
+      if (response.success) {
+        setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
+        toastRef.current.success(tRef.current('toast.post_hidden'));
+      } else {
+        toastRef.current.error(response.error || tRef.current('toast.hide_failed'));
+      }
     } catch (err) {
       logError('Failed to hide post', err);
       toastRef.current.error(tRef.current('toast.hide_failed'));
@@ -618,9 +622,13 @@ export function FeedPage() {
   const handleMuteUser = useCallback(async (item: FeedItem) => {
     const userId = getAuthor(item).id;
     try {
-      await api.post(`/v2/feed/users/${userId}/mute`);
-      setItems((prev) => prev.filter((fi) => getAuthor(fi).id !== userId));
-      toastRef.current.success(tRef.current('toast.user_muted'));
+      const response = await api.post(`/v2/feed/users/${userId}/mute`);
+      if (response.success) {
+        setItems((prev) => prev.filter((fi) => getAuthor(fi).id !== userId));
+        toastRef.current.success(tRef.current('toast.user_muted'));
+      } else {
+        toastRef.current.error(response.error || tRef.current('toast.mute_failed'));
+      }
     } catch (err) {
       logError('Failed to mute user', err);
       toastRef.current.error(tRef.current('toast.mute_failed'));
@@ -641,13 +649,17 @@ export function FeedPage() {
 
     try {
       setIsReporting(true);
-      await api.post(`/v2/feed/items/${reportTarget.type}/${reportTarget.id}/report`, {
+      const response = await api.post(`/v2/feed/items/${reportTarget.type}/${reportTarget.id}/report`, {
         reason: reportReason.trim(),
       });
-      onReportClose();
-      setReportTarget(null);
-      setReportReason('');
-      toastRef.current.success(tRef.current('toast.reported'));
+      if (response.success) {
+        onReportClose();
+        setReportTarget(null);
+        setReportReason('');
+        toastRef.current.success(tRef.current('toast.reported'));
+      } else {
+        toastRef.current.error(response.error || tRef.current('toast.report_failed'));
+      }
     } catch (err) {
       logError('Failed to report post', err);
       toastRef.current.error(tRef.current('toast.report_failed'));
@@ -665,9 +677,13 @@ export function FeedPage() {
     });
     if (!ok) return;
     try {
-      await api.delete(`/v2/feed/posts/${item.id}`);
-      setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
-      toastRef.current.success(tRef.current('toast.deleted'));
+      const response = await api.delete(`/v2/feed/posts/${item.id}`);
+      if (response.success) {
+        setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
+        toastRef.current.success(tRef.current('toast.deleted'));
+      } else {
+        toastRef.current.error(response.error || tRef.current('toast.delete_failed'));
+      }
     } catch (err) {
       logError('Failed to delete post', err);
       toastRef.current.error(tRef.current('toast.delete_failed'));
@@ -683,9 +699,13 @@ export function FeedPage() {
     if (!ok) return;
     try {
       const sourceType = item.type || 'post';
-      await api.delete(`/v2/admin/feed/posts/${item.id}?type=${encodeURIComponent(sourceType)}`);
-      setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
-      toastRef.current.success(tRef.current('toast.deleted'));
+      const response = await api.delete(`/v2/admin/feed/posts/${item.id}?type=${encodeURIComponent(sourceType)}`);
+      if (response.success) {
+        setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
+        toastRef.current.success(tRef.current('toast.deleted'));
+      } else {
+        toastRef.current.error(response.error || tRef.current('toast.delete_failed'));
+      }
     } catch (err) {
       logError('Failed to admin-delete post', err);
       toastRef.current.error(tRef.current('toast.delete_failed'));
@@ -726,8 +746,17 @@ export function FeedPage() {
     // Optimistic removal — revert by re-inserting on failure
     setItems((prev) => prev.filter((fi) => !(fi.id === item.id && fi.type === item.type)));
     try {
-      await api.post(`/v2/feed/posts/${item.id}/not-interested`, { type: item.type });
-      toastRef.current.success(tRef.current('toast.not_interested'));
+      const response = await api.post(`/v2/feed/posts/${item.id}/not-interested`, { type: item.type });
+      if (response.success) {
+        toastRef.current.success(tRef.current('toast.not_interested'));
+      } else {
+        // Revert: re-insert the item (may not be in original position, but that's acceptable)
+        setItems((prev) => {
+          if (prev.some((fi) => fi.id === item.id && fi.type === item.type)) return prev;
+          return [item, ...prev];
+        });
+        toastRef.current.error(response.error || tRef.current('toast.hide_failed'));
+      }
     } catch (err) {
       logError('Failed to record not-interested', err);
       // Revert: re-insert the item (may not be in original position, but that's acceptable)
@@ -755,6 +784,8 @@ export function FeedPage() {
               : fi
           )
         );
+      } else {
+        toastRef.current.error(response.error || tRef.current('toast.vote_failed'));
       }
     } catch (err) {
       logError('Failed to vote', err);

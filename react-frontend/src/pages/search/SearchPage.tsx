@@ -161,6 +161,9 @@ export function SearchPage() {
       if (controller.signal.aborted) return;
       if (response.success && response.data) {
         setResults(groupSearchItems(response.data));
+      } else {
+        setSearchError(tRef.current('error_message'));
+        toastRef.current.error(response.error || tRef.current('toast.search_failed'));
       }
     } catch (error) {
       if (controller.signal.aborted) return;
