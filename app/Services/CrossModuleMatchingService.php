@@ -222,12 +222,13 @@ class CrossModuleMatchingService
     private function getVolunteeringMatches(int $userId, int $tenantId, int $minScore, int $limit): array
     {
         try {
-            // Check if volunteering_organizations table exists and has data
+            // vol_organizations is the live table (volunteering_organizations
+            // is a legacy table nothing writes to). No address column.
             $orgs = DB::select(
                 "SELECT vo.id, vo.name, vo.description, vo.contact_email, vo.website,
-                        vo.address, vo.status, vo.created_at
-                 FROM volunteering_organizations vo
-                 WHERE vo.tenant_id = ? AND vo.status = 'approved'
+                        NULL as address, vo.status, vo.created_at
+                 FROM vol_organizations vo
+                 WHERE vo.tenant_id = ? AND vo.status IN ('approved', 'active')
                  ORDER BY vo.created_at DESC
                  LIMIT ?",
                 [$tenantId, $limit * 2]

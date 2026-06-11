@@ -1209,7 +1209,7 @@ class ExploreService
                     COALESCE(org.name, '') AS org_name,
                     (SELECT COUNT(*) FROM vol_applications va WHERE va.opportunity_id = vo.id) AS application_count
                 FROM vol_opportunities vo
-                LEFT JOIN volunteering_organizations org ON org.id = vo.organization_id AND org.tenant_id = ?
+                LEFT JOIN vol_organizations org ON org.id = vo.organization_id AND org.tenant_id = ?
                 WHERE vo.tenant_id = ?
                     AND vo.is_active = 1
                 ORDER BY vo.created_at DESC
@@ -1238,7 +1238,7 @@ class ExploreService
     private function getActiveOrganisations(int $tenantId): array
     {
         try {
-            $tableExists = DB::select("SHOW TABLES LIKE 'volunteering_organizations'");
+            $tableExists = DB::select("SHOW TABLES LIKE 'vol_organizations'");
             if (empty($tableExists)) {
                 return [];
             }
@@ -1248,9 +1248,9 @@ class ExploreService
                     o.id, o.name, o.description,
                     o.website, o.created_at,
                     (SELECT COUNT(*) FROM vol_opportunities vo WHERE vo.organization_id = o.id AND vo.tenant_id = ? AND vo.is_active = 1) AS opportunity_count
-                FROM volunteering_organizations o
+                FROM vol_organizations o
                 WHERE o.tenant_id = ?
-                    AND o.status = 'approved'
+                    AND o.status IN ('approved', 'active')
                 ORDER BY opportunity_count DESC, o.created_at DESC
                 LIMIT 4
             ", [$tenantId, $tenantId]);
@@ -1374,7 +1374,7 @@ class ExploreService
                     COALESCE(org.name, '') AS org_name,
                     (SELECT COUNT(*) FROM job_vacancy_applications ja WHERE ja.vacancy_id = jv.id) AS application_count
                 FROM job_vacancies jv
-                LEFT JOIN volunteering_organizations org ON org.id = jv.organization_id AND org.tenant_id = ?
+                LEFT JOIN organizations org ON org.id = jv.organization_id AND org.tenant_id = ?
                 WHERE jv.tenant_id = ?
                     AND jv.status = 'open'
                     AND (jv.deadline IS NULL OR jv.deadline > NOW())
