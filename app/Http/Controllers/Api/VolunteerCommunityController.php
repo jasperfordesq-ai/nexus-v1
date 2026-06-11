@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Support\CsvExportSanitizer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -740,7 +741,19 @@ class VolunteerCommunityController extends BaseApiController
             'date_to' => $this->query('date_to'),
         ];
 
-        $csv = $this->volunteerDonationService->exportDonations(TenantContext::getId(), $filters);
+        // The service returns rows — build real CSV (the array used to be
+        // JSON-encoded straight into the .csv attachment).
+        $rows = $this->volunteerDonationService->exportDonations(TenantContext::getId(), $filters);
+        $handle = fopen('php://temp', 'r+');
+        if (!empty($rows)) {
+            fputcsv($handle, array_keys((array) $rows[0]));
+            foreach ($rows as $row) {
+                fputcsv($handle, CsvExportSanitizer::row(array_values((array) $row)));
+            }
+        }
+        rewind($handle);
+        $csv = stream_get_contents($handle);
+        fclose($handle);
 
         return response($csv, 200)
             ->header('Content-Type', 'text/csv')
