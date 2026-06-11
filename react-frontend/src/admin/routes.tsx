@@ -72,6 +72,7 @@ const UserPermissions = lazy(() => import('./modules/users/UserPermissions'));
 const ListingsAdmin = lazy(() => import('./modules/listings/ListingsAdmin'));
 const ActivityLog = lazy(() => import('./modules/system/ActivityLog'));
 const RetentionPolicies = lazy(() => import('./modules/system/RetentionPolicies'));
+const SsoProviders = lazy(() => import('./modules/system/SsoProviders'));
 const CategoriesAdmin = lazy(() => import('./modules/categories/CategoriesAdmin'));
 const CronJobs = lazy(() => import('./modules/system/CronJobs'));
 const CronJobLogs = lazy(() => import('./modules/system/CronJobLogs'));
@@ -573,6 +574,7 @@ export function AdminRoutes() {
       <Route path="cron-jobs/setup" element={<Lazy><CronJobSetup /></Lazy>} />
       <Route path="activity-log" element={<Lazy><ActivityLog /></Lazy>} />
       <Route path="retention" element={<Lazy><RetentionPolicies /></Lazy>} />
+      <Route path="sso" element={<Lazy><SsoProviders /></Lazy>} />
       <Route path="tests" element={<Lazy><TestRunner /></Lazy>} />
       <Route path="seed-generator" element={<Lazy><SeedGenerator /></Lazy>} />
       <Route path="webp-converter" element={<Lazy><WebpConverter /></Lazy>} />
