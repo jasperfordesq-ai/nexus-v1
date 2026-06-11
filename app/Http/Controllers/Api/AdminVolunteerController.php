@@ -1014,7 +1014,9 @@ class AdminVolunteerController extends BaseApiController
     /** POST /api/v2/admin/volunteering/send-shift-reminders -- delegates to service (email sending) */
     public function sendShiftReminders(): JsonResponse
     {
-        $this->requireSuperAdmin();
+        // Tenant-scoped action exposed to all admins in the admin UI — a
+        // super-admin gate here just 403'd every legitimate use.
+        $this->requireAdmin();
         $this->ensureFeature();
 
         $tenantId = TenantContext::getId();
@@ -1039,7 +1041,8 @@ class AdminVolunteerController extends BaseApiController
      */
     public function adjustOrgWallet(int $id): JsonResponse
     {
-        $this->requireSuperAdmin();
+        // Tenant-scoped action exposed to all admins in the admin UI.
+        $this->requireAdmin();
         $this->ensureFeature();
         // Defence-in-depth: even super-admin adjustments should be rate-limited
         // so an accidental loop or compromised session cannot drain/inflate a
@@ -1117,7 +1120,8 @@ class AdminVolunteerController extends BaseApiController
      */
     public function orgWalletTransactions(int $id): JsonResponse
     {
-        $this->requireSuperAdmin();
+        // Tenant-scoped read exposed to all admins in the admin UI.
+        $this->requireAdmin();
         $this->ensureFeature();
 
         $filters = [
