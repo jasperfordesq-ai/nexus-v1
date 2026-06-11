@@ -522,13 +522,13 @@ class SafeguardingService
                 $opportunity = DB::table('vol_opportunities')
                     ->where('id', $opportunityId)
                     ->where('tenant_id', $tenantId)
-                    ->first(['id', 'org_id']);
+                    ->first(['id', 'organization_id']);
 
-                if (!$opportunity || ($organizationId !== null && (int) $opportunity->org_id !== $organizationId)) {
+                if (!$opportunity || ($organizationId !== null && (int) $opportunity->organization_id !== $organizationId)) {
                     return false;
                 }
 
-                $organizationId = $organizationId ?? (int) $opportunity->org_id;
+                $organizationId = $organizationId ?? (int) $opportunity->organization_id;
             }
 
             if ($shiftId !== null) {
@@ -539,7 +539,7 @@ class SafeguardingService
                     })
                     ->where('s.id', $shiftId)
                     ->where('s.tenant_id', $tenantId)
-                    ->first(['s.id', 's.opportunity_id', 'o.org_id']);
+                    ->first(['s.id', 's.opportunity_id', 'o.organization_id']);
 
                 if (!$shift) {
                     return false;
@@ -549,12 +549,12 @@ class SafeguardingService
                     return false;
                 }
 
-                if ($organizationId !== null && (int) $shift->org_id !== $organizationId) {
+                if ($organizationId !== null && (int) $shift->organization_id !== $organizationId) {
                     return false;
                 }
 
                 $opportunityId = (int) $shift->opportunity_id;
-                $organizationId = (int) $shift->org_id;
+                $organizationId = (int) $shift->organization_id;
             }
 
             foreach (array_filter([$involvedUserId, $subjectUserId]) as $relatedUserId) {
