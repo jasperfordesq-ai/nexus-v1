@@ -71,6 +71,18 @@ class SecurityHeadersTest extends TestCase
         $this->assertEquals('strict-origin-when-cross-origin', $response->headers->get('Referrer-Policy'));
     }
 
+    public function test_handle_sets_permissions_policy(): void
+    {
+        $request = Request::create('/api/v2/feed', 'GET');
+        $response = $this->middleware->handle($request, $this->makeNext());
+
+        $policy = $response->headers->get('Permissions-Policy');
+        $this->assertNotNull($policy);
+        $this->assertStringContainsString('camera=(self)', $policy);
+        $this->assertStringContainsString('microphone=(self)', $policy);
+        $this->assertStringContainsString('payment=()', $policy);
+    }
+
     public function test_handle_sets_hsts_on_secure_request(): void
     {
         $request = Request::create('https://app.project-nexus.ie/api/v2/feed', 'GET', [], [], [], [

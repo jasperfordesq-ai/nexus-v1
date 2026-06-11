@@ -130,6 +130,14 @@ class SecurityHeaders
         $response->headers->set('Content-Security-Policy', $csp);
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
+        // Self-only grants: camera (story creator), microphone (voice
+        // messages), geolocation (maps); everything else denied to
+        // embedded third-party content.
+        $response->headers->set(
+            'Permissions-Policy',
+            'camera=(self), microphone=(self), geolocation=(self), fullscreen=(self), payment=(), usb=(), browsing-topics=()'
+        );
+
         if ($request->secure()) {
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
         }
