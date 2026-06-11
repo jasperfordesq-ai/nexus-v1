@@ -89,8 +89,15 @@ class SsoAuthController extends Controller
         $state = (string) $request->input('state', '');
         $code = (string) $request->input('code', '');
 
-        // Tenant context for the frontend redirect comes from the state
-        // token (the OIDC round-trip loses the tenant host).
+        // The OIDC round-trip lands on the tenant-less api host, so ambient
+        // TenantContext would resolve to the default tenant. Re-establish the
+        // tenant from the signed state token (its signature is verified) so
+        // the post-login redirect — success AND error — targets the right
+        // community's frontend, including custom-domain tenants.
+        $stateTenantId = $this->sso->tenantIdFromState($state);
+        if ($stateTenantId !== null) {
+            TenantContext::setById($stateTenantId);
+        }
         $frontend = rtrim(TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix(), '/');
 
         try {

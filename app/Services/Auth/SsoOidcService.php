@@ -120,6 +120,22 @@ class SsoOidcService
      *
      * @return array{user:User, is_new:bool, tenant_id:int, provider_key:string}
      */
+    /**
+     * Resolve the tenant id from a signed state token without running the
+     * full callback — lets the controller target the correct tenant
+     * frontend for the post-login redirect (incl. the error path), since
+     * the OIDC round-trip lands on the tenant-less api host. Returns null
+     * if the state is missing or its signature does not verify.
+     */
+    public function tenantIdFromState(string $state): ?int
+    {
+        try {
+            return $this->verifyState($state)['tenant_id'];
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
     public function handleCallback(string $state, string $code): array
     {
         $payload = $this->verifyState($state);
@@ -137,9 +153,10 @@ class SsoOidcService
         $claims = $this->exchangeAndValidate($provider, $discovery, $code, $flow);
 
         $email = $this->extractEmail($claims);
+        $emailVerified = $this->emailIsVerified($claims);
         $this->assertDomainAllowed($provider, $email);
 
-        $result = $this->findOrCreateFromClaims($provider, $claims, $email);
+        $result = $this->findOrCreateFromClaims($provider, $claims, $email, $emailVerified);
         $result['provider_key'] = $providerKey;
         return $result;
     }
@@ -252,6 +269,7 @@ class SsoOidcService
         $issuerUrl = rtrim($issuerUrl, '/');
 
         return Cache::remember($this->discoveryCacheKey($issuerUrl), self::DISCOVERY_CACHE_SECONDS, function () use ($issuerUrl) {
+            $this->assertPublicHttpsUrl($issuerUrl);
             $response = Http::timeout(self::HTTP_TIMEOUT_SECONDS)
                 ->get($issuerUrl . '/.well-known/openid-configuration');
 
@@ -265,6 +283,14 @@ class SsoOidcService
                     throw new \RuntimeException("OIDC discovery document missing '{$field}'.");
                 }
             }
+
+            // The endpoints come from the (admin-configured) issuer's
+            // document but are fetched/posted-to by the server — enforce
+            // https + public address so a misconfigured or hostile issuer
+            // cannot turn discovery into an SSRF probe or redirect the
+            // client-secret POST to an internal/attacker host.
+            $this->assertPublicHttpsUrl($doc['token_endpoint']);
+            $this->assertPublicHttpsUrl($doc['jwks_uri']);
 
             return [
                 'issuer' => $doc['issuer'],
@@ -293,6 +319,10 @@ class SsoOidcService
         if (! empty($provider->client_secret_encrypted)) {
             $form['client_secret'] = Crypt::decryptString($provider->client_secret_encrypted);
         }
+
+        // Re-assert before sending the secret — discovery is cached, so this
+        // also covers a token_endpoint that became internal after caching.
+        $this->assertPublicHttpsUrl($discovery['token_endpoint']);
 
         $response = Http::asForm()
             ->timeout(self::HTTP_TIMEOUT_SECONDS)
@@ -341,31 +371,162 @@ class SsoOidcService
      */
     private function decodeIdToken(string $idToken, string $jwksUri): array
     {
-        $jwks = Cache::remember($this->jwksCacheKey($jwksUri), self::JWKS_CACHE_SECONDS, function () use ($jwksUri) {
+        JWT::$leeway = 60;
+
+        $jwks = $this->fetchJwks($jwksUri, false);
+        try {
+            $decoded = JWT::decode($idToken, $this->asymmetricKeySet($jwks));
+        } catch (\Throwable $first) {
+            // Only a genuinely unknown key id (key rotation) warrants a
+            // refetch. Signature, expiry and audience failures must NOT
+            // trigger one — otherwise a flood of bad tokens would defeat
+            // the JWKS cache and hammer the issuer (self-inflicted DoS /
+            // rate-limit). Re-throw everything except a missing kid.
+            if (! $this->kidMissingFromSet($idToken, $jwks)) {
+                throw $first;
+            }
+            $jwks = $this->fetchJwks($jwksUri, true);
+            $decoded = JWT::decode($idToken, $this->asymmetricKeySet($jwks));
+        }
+
+        return json_decode((string) json_encode($decoded), true) ?: [];
+    }
+
+    /**
+     * Fetch the JWKS, cached. $forceRefresh evicts the cache first (used
+     * once on a key-rotation miss).
+     *
+     * @return array<string, mixed>
+     */
+    private function fetchJwks(string $jwksUri, bool $forceRefresh): array
+    {
+        $cacheKey = $this->jwksCacheKey($jwksUri);
+        if ($forceRefresh) {
+            Cache::forget($cacheKey);
+        }
+        return Cache::remember($cacheKey, self::JWKS_CACHE_SECONDS, function () use ($jwksUri) {
             $response = Http::timeout(self::HTTP_TIMEOUT_SECONDS)->get($jwksUri);
             if (! $response->ok() || ! is_array($response->json('keys'))) {
                 throw new \RuntimeException('Could not fetch identity provider signing keys.');
             }
             return $response->json();
         });
+    }
 
-        JWT::$leeway = 60;
-        try {
-            $decoded = JWT::decode($idToken, JWK::parseKeySet($jwks, 'RS256'));
-        } catch (\Throwable $first) {
-            // Unknown kid — the provider may have rotated keys since we
-            // cached. Refresh once and retry before giving up.
-            Cache::forget($this->jwksCacheKey($jwksUri));
-            $response = Http::timeout(self::HTTP_TIMEOUT_SECONDS)->get($jwksUri);
-            if (! $response->ok() || ! is_array($response->json('keys'))) {
-                throw new \RuntimeException('Could not fetch identity provider signing keys.');
+    /**
+     * Parse the JWKS and keep ONLY asymmetric signing keys. Defence in
+     * depth against algorithm-confusion: a JWKS that (maliciously or by
+     * accident) carries a symmetric `oct`/HS* key — whose `k` is public —
+     * must never be usable to forge a token, even though firebase/php-jwt
+     * already binds token.alg to key.alg.
+     *
+     * @param array<string, mixed> $jwks
+     * @return array<string, \Firebase\JWT\Key>
+     */
+    private function asymmetricKeySet(array $jwks): array
+    {
+        $allowed = ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512'];
+        $safe = [];
+        foreach (JWK::parseKeySet($jwks, 'RS256') as $kid => $key) {
+            if (in_array($key->getAlgorithm(), $allowed, true)) {
+                $safe[$kid] = $key;
             }
-            $jwks = $response->json();
-            Cache::put($this->jwksCacheKey($jwksUri), $jwks, self::JWKS_CACHE_SECONDS);
-            $decoded = JWT::decode($idToken, JWK::parseKeySet($jwks, 'RS256'));
+        }
+        if ($safe === []) {
+            throw new \RuntimeException('Identity provider JWKS contains no usable asymmetric signing keys.');
+        }
+        return $safe;
+    }
+
+    /**
+     * True when the token's `kid` header is absent from the given JWKS
+     * (i.e. a refetch could plausibly help). A present kid means the key
+     * is known and the failure was something else (bad signature, expiry).
+     *
+     * @param array<string, mixed> $jwks
+     */
+    private function kidMissingFromSet(string $idToken, array $jwks): bool
+    {
+        $parts = explode('.', $idToken);
+        if (count($parts) < 2) {
+            return false;
+        }
+        $header = json_decode((string) base64_decode(strtr($parts[0], '-_', '+/'), true), true);
+        $kid = is_array($header) ? ($header['kid'] ?? null) : null;
+        if (! $kid) {
+            return true;
+        }
+        foreach (($jwks['keys'] ?? []) as $k) {
+            if (is_array($k) && ($k['kid'] ?? null) === $kid) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Reject any URL that is not https or that resolves to a non-public
+     * address (loopback, link-local incl. 169.254.169.254, private,
+     * reserved) — SSRF guard for admin-supplied issuer/endpoint URLs.
+     */
+    private function assertPublicHttpsUrl(string $url): void
+    {
+        $parts = parse_url($url);
+        if (($parts['scheme'] ?? '') !== 'https' || empty($parts['host'])) {
+            throw new \RuntimeException('SSO endpoint must be a valid https URL.');
+        }
+        $host = $parts['host'];
+
+        $publicIp = static function (string $ip): bool {
+            return (bool) filter_var(
+                $ip,
+                FILTER_VALIDATE_IP,
+                FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
+            );
+        };
+
+        // Literal IP host — check directly, no DNS needed.
+        if (filter_var($host, FILTER_VALIDATE_IP)) {
+            if (! $publicIp($host)) {
+                throw new \RuntimeException('SSO endpoint resolves to a non-public address.');
+            }
+            return;
         }
 
-        return json_decode((string) json_encode($decoded), true) ?: [];
+        // Hostname — resolve and check every A/AAAA record. Skipped under
+        // the testing env, where Http is faked and test hosts (*.example)
+        // do not resolve; the literal-IP and scheme branches above are the
+        // ones an attacker would actually use and remain enforced.
+        if (app()->environment('testing')) {
+            return;
+        }
+
+        $ips = [];
+        $records = @dns_get_record($host, DNS_A | DNS_AAAA);
+        if (is_array($records)) {
+            foreach ($records as $r) {
+                if (! empty($r['ip'])) {
+                    $ips[] = $r['ip'];
+                }
+                if (! empty($r['ipv6'])) {
+                    $ips[] = $r['ipv6'];
+                }
+            }
+        }
+        if ($ips === []) {
+            $resolved = gethostbynamel($host);
+            if (is_array($resolved)) {
+                $ips = $resolved;
+            }
+        }
+        if ($ips === []) {
+            throw new \RuntimeException('SSO endpoint host could not be resolved.');
+        }
+        foreach ($ips as $ip) {
+            if (! $publicIp($ip)) {
+                throw new \RuntimeException('SSO endpoint resolves to a non-public address.');
+            }
+        }
     }
 
     // ------------------------------------------------------- user resolution
@@ -377,7 +538,7 @@ class SsoOidcService
      * @param array<string, mixed> $claims
      * @return array{user:User, is_new:bool, tenant_id:int}
      */
-    private function findOrCreateFromClaims(object $provider, array $claims, ?string $email): array
+    private function findOrCreateFromClaims(object $provider, array $claims, ?string $email, bool $emailVerified): array
     {
         $tenantId = (int) $provider->tenant_id;
         $identityProvider = $this->identityProviderString($tenantId, $provider->provider_key);
@@ -402,20 +563,29 @@ class SsoOidcService
             return ['user' => $user, 'is_new' => false, 'tenant_id' => $tenantId];
         }
 
-        // 2. Email match within tenant? Only auto-link verified accounts.
+        // 2. Email match within an existing local account.
+        //
+        // 🔴 nOAuth guard: auto-linking by email is account takeover unless
+        // BOTH sides are trustworthy. We require the IdP to assert
+        // `email_verified: true` for THIS login (the email/UPN claim is
+        // owner-mutable in Entra and many generic IdPs — an attacker can
+        // self-assert victim@council.gov.uk) AND the local account to be
+        // verified. If either is missing we refuse and steer the user to
+        // the explicit, authenticated account-link flow rather than silently
+        // binding a stranger's `sub` to an existing user.
         if ($email) {
             $emailMatch = DB::selectOne(
                 'SELECT id, email_verified_at FROM users WHERE tenant_id = ? AND email = ? LIMIT 1',
                 [$tenantId, $email]
             );
-            if ($emailMatch && ! empty($emailMatch->email_verified_at)) {
-                $this->insertIdentity((int) $emailMatch->id, $tenantId, $identityProvider, $subject, $email, $rawPayload);
-                $user = User::find((int) $emailMatch->id);
-                return ['user' => $user, 'is_new' => false, 'tenant_id' => $tenantId];
-            }
             if ($emailMatch) {
-                // Unverified local account with the same address — refuse
-                // rather than risk account takeover via a colliding email.
+                if ($emailVerified && ! empty($emailMatch->email_verified_at)) {
+                    $this->insertIdentity((int) $emailMatch->id, $tenantId, $identityProvider, $subject, $email, $rawPayload);
+                    $user = User::find((int) $emailMatch->id);
+                    return ['user' => $user, 'is_new' => false, 'tenant_id' => $tenantId];
+                }
+                // Either the IdP did not vouch for the email, or the local
+                // account is unverified — refuse rather than risk takeover.
                 throw new \RuntimeException(__('api.sso_account_exists_unverified'));
             }
         }
@@ -435,7 +605,11 @@ class SsoOidcService
             'last_name' => $names['last'],
             'email' => $email,
             'password' => password_hash(Str::random(48), PASSWORD_BCRYPT),
-            'email_verified_at' => now(),
+            // Only inherit verified status when the IdP actually vouched for
+            // the address; otherwise leave null so the standard email
+            // verification path runs (and a squatted address can't pre-seed
+            // a "verified" record for a future takeover).
+            'email_verified_at' => $emailVerified ? now() : null,
             'preferred_language' => 'en',
             'is_approved' => 1,
             'role' => 'member',
@@ -483,15 +657,31 @@ class SsoOidcService
         throw new \RuntimeException(__('api.sso_domain_not_allowed'));
     }
 
+    /**
+     * The email used for matching/provisioning. Only the standard `email`
+     * claim is honoured — `preferred_username`/`upn` are display/login
+     * hints that are owner-mutable and unverified in Entra and other IdPs,
+     * so trusting them as an email identity is an account-takeover vector.
+     */
     private function extractEmail(array $claims): ?string
     {
-        foreach (['email', 'preferred_username', 'upn'] as $claim) {
-            $candidate = $claims[$claim] ?? null;
-            if (is_string($candidate) && filter_var($candidate, FILTER_VALIDATE_EMAIL)) {
-                return strtolower($candidate);
-            }
+        $candidate = $claims['email'] ?? null;
+        if (is_string($candidate) && filter_var($candidate, FILTER_VALIDATE_EMAIL)) {
+            return strtolower($candidate);
         }
         return null;
+    }
+
+    /**
+     * Whether the IdP asserted the email address is verified. Defaults to
+     * false (fail closed) when the claim is absent — many IdPs, including
+     * single-tenant Entra, omit it, in which case the email is treated as
+     * unverified and never auto-links to an existing account.
+     */
+    private function emailIsVerified(array $claims): bool
+    {
+        $v = $claims['email_verified'] ?? null;
+        return $v === true || $v === 'true' || $v === 1 || $v === '1';
     }
 
     /**

@@ -107,11 +107,66 @@ class SsoOidcServiceTest extends TestCase
 
     // ------------------------------------------------------------ claims
 
-    public function test_extract_email_prefers_email_claim_and_validates(): void
+    public function test_extract_email_only_trusts_the_email_claim(): void
     {
+        // The verified `email` claim is honoured (lower-cased)...
         $this->assertSame('a@b.example', $this->invokePrivate('extractEmail', ['email' => 'A@b.example', 'preferred_username' => 'x@y.example']));
-        $this->assertSame('x@y.example', $this->invokePrivate('extractEmail', ['preferred_username' => 'x@y.example']));
-        $this->assertNull($this->invokePrivate('extractEmail', ['preferred_username' => 'not-an-email']));
+        // ...but preferred_username / upn are owner-mutable login hints and
+        // MUST NOT be treated as an email identity (nOAuth takeover vector).
+        $this->assertNull($this->invokePrivate('extractEmail', ['preferred_username' => 'x@y.example']));
+        $this->assertNull($this->invokePrivate('extractEmail', ['upn' => 'x@y.example']));
+        $this->assertNull($this->invokePrivate('extractEmail', ['email' => 'not-an-email']));
+    }
+
+    public function test_email_verified_claim_parsing_fails_closed(): void
+    {
+        $this->assertTrue($this->invokePrivate('emailIsVerified', ['email_verified' => true]));
+        $this->assertTrue($this->invokePrivate('emailIsVerified', ['email_verified' => 'true']));
+        $this->assertTrue($this->invokePrivate('emailIsVerified', ['email_verified' => 1]));
+        // Absent or false → unverified (fail closed).
+        $this->assertFalse($this->invokePrivate('emailIsVerified', []));
+        $this->assertFalse($this->invokePrivate('emailIsVerified', ['email_verified' => false]));
+        $this->assertFalse($this->invokePrivate('emailIsVerified', ['email_verified' => 'false']));
+        $this->assertFalse($this->invokePrivate('emailIsVerified', ['email_verified' => 0]));
+    }
+
+    public function test_ssrf_guard_blocks_non_public_and_non_https_urls(): void
+    {
+        // Literal internal/loopback/link-local IPs are rejected outright.
+        foreach ([
+            'https://169.254.169.254/.well-known/openid-configuration',
+            'https://127.0.0.1/x',
+            'https://10.0.0.5/x',
+            'https://192.168.1.1/x',
+            'http://login.microsoftonline.com/x',
+        ] as $bad) {
+            $threw = false;
+            try {
+                $this->invokePrivate('assertPublicHttpsUrl', $bad);
+            } catch (\Throwable $e) {
+                $threw = true;
+            }
+            $this->assertTrue($threw, "Expected rejection for {$bad}");
+        }
+
+        // A public https literal IP is allowed.
+        $this->invokePrivate('assertPublicHttpsUrl', 'https://8.8.8.8/x');
+        $this->assertTrue(true);
+    }
+
+    public function test_asymmetric_key_set_drops_symmetric_keys(): void
+    {
+        // A JWKS carrying only a symmetric oct/HS256 key must yield no
+        // usable keys (alg-confusion defence in depth).
+        $jwks = ['keys' => [[
+            'kty' => 'oct',
+            'kid' => 'sym-1',
+            'alg' => 'HS256',
+            'k' => rtrim(strtr(base64_encode('public-symmetric-secret'), '+/', '-_'), '='),
+        ]]];
+
+        $this->expectExceptionMessage('no usable asymmetric signing keys');
+        $this->invokePrivate('asymmetricKeySet', $jwks);
     }
 
     public function test_identity_provider_string_is_tenant_qualified(): void
