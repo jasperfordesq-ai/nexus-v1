@@ -29,7 +29,7 @@ import {
 } from '@/lib/api/marketplace';
 import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
-import { withAlpha } from '@/lib/utils/color';
+import { contrastText, withAlpha } from '@/lib/utils/color';
 
 const CONDITION_FILTERS: (MarketplaceCondition | '')[] = ['', 'new', 'like_new', 'good', 'fair', 'poor'];
 const SORTS: ('newest' | 'price_asc' | 'price_desc' | 'popular')[] = ['newest', 'price_asc', 'price_desc', 'popular'];
@@ -230,7 +230,7 @@ function MarketplaceCategoryScreen() {
                       id={id}
                       style={isSelected ? { backgroundColor: primary } : undefined}
                     >
-                      <TagGroup.ItemLabel style={isSelected ? { color: '#FFFFFF' } : undefined}>
+                      <TagGroup.ItemLabel style={isSelected ? { color: contrastText(primary) } : undefined}>
                         {value ? t(`condition.${value}`) : t('category.allConditions')}
                       </TagGroup.ItemLabel>
                     </TagGroup.Item>
@@ -258,7 +258,7 @@ function MarketplaceCategoryScreen() {
                       id={value}
                       style={isSelected ? { backgroundColor: primary } : undefined}
                     >
-                      <TagGroup.ItemLabel style={isSelected ? { color: '#FFFFFF' } : undefined}>
+                      <TagGroup.ItemLabel style={isSelected ? { color: contrastText(primary) } : undefined}>
                         {t(`advancedSearch.sortOptions.${value}`)}
                       </TagGroup.ItemLabel>
                     </TagGroup.Item>

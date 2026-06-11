@@ -23,6 +23,7 @@ import AppTopBar from '@/components/ui/AppTopBar';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -42,7 +43,7 @@ const ACTIVITY_ICONS: Record<string, IoniconName> = {
 function formatDate(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '';
-  return date.toLocaleDateString('default', { day: 'numeric', month: 'short' });
+  return date.toLocaleDateString(dateLocale(), { day: 'numeric', month: 'short' });
 }
 
 function emptyDashboard(): ActivityDashboard {

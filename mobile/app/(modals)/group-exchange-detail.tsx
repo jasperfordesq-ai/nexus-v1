@@ -23,6 +23,7 @@ import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 const statusTones: Record<GroupExchangeStatus, string> = {
   draft: '#64748b',
@@ -39,7 +40,7 @@ function formatDate(value?: string | null) {
   if (!value) return '';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '';
-  return date.toLocaleDateString('default', { day: 'numeric', month: 'short', year: 'numeric' });
+  return date.toLocaleDateString(dateLocale(), { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 export default function GroupExchangeDetailScreen() {

@@ -14,6 +14,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 export function formatMarketplacePrice(
   price: number | null | undefined,
@@ -26,7 +27,7 @@ export function formatMarketplacePrice(
   }
 
   try {
-    return new Intl.NumberFormat(undefined, {
+    return new Intl.NumberFormat(dateLocale(), {
       style: 'currency',
       currency: currency || 'EUR',
       minimumFractionDigits: 0,

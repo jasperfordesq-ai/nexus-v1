@@ -40,6 +40,7 @@ import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import AppTopBar from '@/components/ui/AppTopBar';
 import { useAppToast } from '@/components/ui/AppToast';
 import { useConfirm } from '@/components/ui/useConfirm';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 const WEB_URL = 'https://app.project-nexus.ie';
 const REMINDER_OPTIONS = [60, 1440, 10080] as const;
@@ -121,10 +122,10 @@ function EventDetailScreenInner() {
   const start = event.start_date ? new Date(event.start_date) : null;
   const isValidDate = start && !Number.isNaN(start.getTime());
   const dateStr = isValidDate
-    ? start.toLocaleDateString('default', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+    ? start.toLocaleDateString(dateLocale(), { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
     : '-';
   const timeStr = isValidDate
-    ? start.toLocaleTimeString('default', { hour: '2-digit', minute: '2-digit' })
+    ? start.toLocaleTimeString(dateLocale(), { hour: '2-digit', minute: '2-digit' })
     : '-';
   const accent = event.category?.color ?? '#F59E0B';
   const coverImage = resolveImageUrl(event.cover_image);

@@ -35,6 +35,7 @@ import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 type OfferMode = 'sent' | 'received';
 
@@ -205,7 +206,7 @@ function normalizeOfferMode(value?: string): OfferMode {
 
 function formatOfferAmount(amount: number, currency: string): string {
   try {
-    return new Intl.NumberFormat(undefined, {
+    return new Intl.NumberFormat(dateLocale(), {
       style: 'currency',
       currency: currency || 'EUR',
       minimumFractionDigits: 0,
@@ -219,7 +220,7 @@ function formatOfferAmount(amount: number, currency: string): string {
 function formatOfferDate(value?: string | null): string | null {
   if (!value) return null;
   try {
-    return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium' }).format(new Date(value));
+    return new Intl.DateTimeFormat(dateLocale(), { dateStyle: 'medium' }).format(new Date(value));
   } catch {
     return value;
   }

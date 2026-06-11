@@ -49,6 +49,7 @@ import { useAppToast } from '@/components/ui/AppToast';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 type Tab = 'badges' | 'challenges' | 'journeys' | 'leaderboard' | 'score' | 'shop';
 type LeaderboardPeriod = 'weekly' | 'monthly' | 'all_time';
@@ -447,7 +448,7 @@ function BadgeCard({
   t: (key: string) => string;
 }) {
   const earnedDate = badge.earned_at
-    ? new Date(badge.earned_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
+    ? new Date(badge.earned_at).toLocaleDateString(dateLocale(), { day: 'numeric', month: 'short', year: 'numeric' })
     : null;
   const iconName = normalizeBadgeIcon(badge.icon);
   const earned = isBadgeEarned(badge);
@@ -595,7 +596,7 @@ function ChallengeCard({
 }) {
   const progress = getChallengeProgress(challenge);
   const canClaim = challenge.is_completed && !challenge.reward_claimed;
-  const endDate = challenge.end_date ? new Date(challenge.end_date).toLocaleDateString() : null;
+  const endDate = challenge.end_date ? new Date(challenge.end_date).toLocaleDateString(dateLocale()) : null;
 
   return (
     <HeroCard className="rounded-panel-inner p-0">

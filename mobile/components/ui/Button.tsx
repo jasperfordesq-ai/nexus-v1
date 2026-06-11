@@ -7,6 +7,7 @@ import React from 'react';
 import { View, type ViewStyle, type StyleProp } from 'react-native';
 import { Button as HeroButton, Spinner } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
+import { contrastText } from '@/lib/utils/color';
 
 // Legacy variant names kept for backwards compatibility with 32 importing screens.
 // 'solid' is mapped to HeroUI's 'primary'.
@@ -75,7 +76,7 @@ export default function Button({
     >
       {isLoading ? (
         <View className="flex-row items-center gap-2">
-          <Spinner size="sm" color={variant === 'solid' ? '#fff' : color ?? 'default'} />
+          <Spinner size="sm" color={variant === 'solid' ? (color ? contrastText(color) : '#fff') : color ?? 'default'} />
         </View>
       ) : typeof children === 'string' ? (
         <HeroButton.Label>{children}</HeroButton.Label>

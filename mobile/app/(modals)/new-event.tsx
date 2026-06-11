@@ -18,7 +18,7 @@ import { createEvent, getEvent, getEventOnlineLink, updateEvent, uploadEventImag
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
-import { withAlpha } from '@/lib/utils/color';
+import { contrastText, withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
 import { useAppToast } from '@/components/ui/AppToast';
 import FormActionFooter from '@/components/ui/FormActionFooter';
@@ -347,7 +347,7 @@ function NewEventScreen() {
                         id={value}
                         style={isSelected ? { backgroundColor: primary } : undefined}
                       >
-                        <TagGroup.ItemLabel style={isSelected ? { color: '#FFFFFF' } : undefined}>
+                        <TagGroup.ItemLabel style={isSelected ? { color: contrastText(primary) } : undefined}>
                           {t(`category.${value}`)}
                         </TagGroup.ItemLabel>
                       </TagGroup.Item>

@@ -21,6 +21,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import NativePressable from '@/components/ui/NativePressable';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 const statusFilters = ['all', 'active', 'pending_confirmation', 'completed', 'cancelled'] as const;
 type StatusFilter = (typeof statusFilters)[number];
@@ -48,7 +49,7 @@ function formatDate(value?: string | null) {
   if (!value) return '';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '';
-  return date.toLocaleDateString('default', { day: 'numeric', month: 'short', year: 'numeric' });
+  return date.toLocaleDateString(dateLocale(), { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 export default function GroupExchangesScreen() {

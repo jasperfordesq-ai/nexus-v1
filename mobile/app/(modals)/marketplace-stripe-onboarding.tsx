@@ -27,6 +27,7 @@ import {
 import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 export default function MarketplaceStripeOnboardingRoute() {
   return (
@@ -310,7 +311,7 @@ function PayoutRow({ payout }: { payout: MarketplaceSellerPayout }) {
             {t('stripeOnboarding.payoutOrder', { order: payout.order_id })}
           </Text>
           <Text className="mt-1 text-xs" style={{ color: theme.textSecondary }}>
-            {payout.created_at ? new Date(payout.created_at).toLocaleDateString() : t('stripeOnboarding.dateUnknown')}
+            {payout.created_at ? new Date(payout.created_at).toLocaleDateString(dateLocale()) : t('stripeOnboarding.dateUnknown')}
           </Text>
         </View>
         <View className="items-end">

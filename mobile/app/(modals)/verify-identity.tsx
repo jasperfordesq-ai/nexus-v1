@@ -26,6 +26,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { presentIdentityPayment } from '@/lib/payments/identityPayment';
 import { withAlpha } from '@/lib/utils/color';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 type PageState = 'loading' | 'dob_collection' | 'payment_required' | 'start' | 'in_progress' | 'verified' | 'failed' | 'error';
 type TFunction = (key: string, options?: Record<string, unknown>) => string;
@@ -373,7 +374,7 @@ function bodyForState(pageState: PageState, t: TFunction, fee: string): string {
 
 function formatFee(cents: number, currency: string): string {
   try {
-    return new Intl.NumberFormat(undefined, { style: 'currency', currency: currency || 'EUR' }).format((cents || 0) / 100);
+    return new Intl.NumberFormat(dateLocale(), { style: 'currency', currency: currency || 'EUR' }).format((cents || 0) / 100);
   } catch {
     return `${((cents || 0) / 100).toFixed(2)} ${currency || 'EUR'}`;
   }

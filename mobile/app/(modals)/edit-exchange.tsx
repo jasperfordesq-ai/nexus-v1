@@ -29,7 +29,7 @@ import { useApi } from '@/lib/hooks/useApi';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
-import { withAlpha } from '@/lib/utils/color';
+import { contrastText, withAlpha } from '@/lib/utils/color';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 import * as Haptics from '@/lib/haptics';
 import AppTopBar from '@/components/ui/AppTopBar';
@@ -377,7 +377,7 @@ function EditExchangeModalInner() {
                         id={value}
                         style={isSelected ? { backgroundColor: primary } : undefined}
                       >
-                        <TagGroup.ItemLabel style={isSelected ? { color: '#FFFFFF' } : undefined}>
+                        <TagGroup.ItemLabel style={isSelected ? { color: contrastText(primary) } : undefined}>
                           {t(`serviceType.${value}`)}
                         </TagGroup.ItemLabel>
                       </TagGroup.Item>

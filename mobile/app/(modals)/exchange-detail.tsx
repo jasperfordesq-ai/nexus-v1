@@ -52,6 +52,7 @@ import { useConfirm } from '@/components/ui/useConfirm';
 import VerificationBadgeRow from '@/components/verification/VerificationBadgeRow';
 import CommentSheet from '@/components/comments/CommentSheet';
 import NativePressable from '@/components/ui/NativePressable';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 interface DetailStateProps {
   title: string;
@@ -993,7 +994,7 @@ function formatDate(iso: string): string {
   try {
     const d = new Date(iso);
     if (Number.isNaN(d.getTime())) return iso;
-    return d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+    return d.toLocaleDateString(dateLocale(), { year: 'numeric', month: 'long', day: 'numeric' });
   } catch {
     return iso;
   }

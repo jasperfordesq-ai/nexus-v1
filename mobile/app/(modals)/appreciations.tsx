@@ -28,6 +28,7 @@ import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 const REACTIONS: { key: AppreciationReactionType; icon: keyof typeof Ionicons.glyphMap }[] = [
   { key: 'heart', icon: 'heart-outline' },
@@ -38,7 +39,7 @@ const REACTIONS: { key: AppreciationReactionType; icon: keyof typeof Ionicons.gl
 function formatDate(value: string): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '';
-  return date.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+  return date.toLocaleDateString(dateLocale(), { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 export default function AppreciationsScreen() {

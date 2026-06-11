@@ -27,6 +27,7 @@ import { useDebounce } from '@/lib/hooks/useDebounce';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
+import { contrastText } from '@/lib/utils/color';
 import ExchangeCard from '@/components/ExchangeCard';
 import OfflineBanner from '@/components/OfflineBanner';
 import SearchInput from '@/components/ui/SearchInput';
@@ -385,8 +386,8 @@ export default function ExchangesScreen() {
           isDisabled={isLocating}
           accessibilityState={{ selected: nearMeCoordinates !== null, busy: isLocating }}
         >
-          {isLocating ? <Spinner size="sm" /> : <Ionicons name={nearMeCoordinates ? 'location' : 'location-outline'} size={15} color={nearMeCoordinates ? '#FFFFFF' : primary} />}
-          <HeroButton.Label style={nearMeCoordinates ? { color: '#FFFFFF' } : undefined} numberOfLines={1}>
+          {isLocating ? <Spinner size="sm" /> : <Ionicons name={nearMeCoordinates ? 'location' : 'location-outline'} size={15} color={nearMeCoordinates ? contrastText(primary) : primary} />}
+          <HeroButton.Label style={nearMeCoordinates ? { color: contrastText(primary) } : undefined} numberOfLines={1}>
             {nearMeCoordinates ? t('nearMeOnWithRadius', { radius: radiusKm }) : t('nearMe')}
           </HeroButton.Label>
         </HeroButton>
@@ -398,8 +399,8 @@ export default function ExchangesScreen() {
           onPress={() => setShowAdvancedFilters((current) => !current)}
           accessibilityState={{ expanded: showAdvancedFilters }}
         >
-          <Ionicons name="options-outline" size={15} color={showAdvancedFilters ? '#FFFFFF' : theme.textMuted} />
-          <HeroButton.Label style={showAdvancedFilters ? { color: '#FFFFFF' } : undefined} numberOfLines={1}>
+          <Ionicons name="options-outline" size={15} color={showAdvancedFilters ? contrastText(primary) : theme.textMuted} />
+          <HeroButton.Label style={showAdvancedFilters ? { color: contrastText(primary) } : undefined} numberOfLines={1}>
             {activeFilterCount > 0 ? t('filtersWithCount', { count: activeFilterCount }) : t('filters')}
           </HeroButton.Label>
         </HeroButton>
@@ -630,8 +631,8 @@ function FilterButton({
       onPress={onPress}
       accessibilityState={{ selected: active }}
     >
-      <Ionicons name={icon} size={14} color={active ? '#FFFFFF' : theme.textMuted} />
-      <HeroButton.Label style={active ? { color: '#FFFFFF' } : undefined} numberOfLines={1}>
+      <Ionicons name={icon} size={14} color={active ? contrastText(primary) : theme.textMuted} />
+      <HeroButton.Label style={active ? { color: contrastText(primary) } : undefined} numberOfLines={1}>
         {label}
       </HeroButton.Label>
     </HeroButton>
@@ -700,7 +701,7 @@ function NearMeFilter({
               onPress={() => onPresetPress(preset)}
               accessibilityState={{ selected: appliedRadiusKm === preset }}
             >
-              <HeroButton.Label style={appliedRadiusKm === preset ? { color: '#FFFFFF' } : undefined}>
+              <HeroButton.Label style={appliedRadiusKm === preset ? { color: contrastText(primary) } : undefined}>
                 {t('radiusKm', { radius: preset })}
               </HeroButton.Label>
             </HeroButton>

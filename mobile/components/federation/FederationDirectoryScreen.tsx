@@ -48,6 +48,7 @@ import Input from '@/components/ui/Input';
 import NativePressable from '@/components/ui/NativePressable';
 import Toggle from '@/components/ui/Toggle';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 type DirectoryMode = 'partners' | 'members' | 'messages' | 'listings' | 'groups' | 'events' | 'settings';
 type IoniconName = ComponentProps<typeof Ionicons>['name'];
@@ -119,7 +120,7 @@ function formatDate(value?: string | null) {
   if (!value) return '';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '';
-  return date.toLocaleDateString('default', { day: 'numeric', month: 'short', year: 'numeric' });
+  return date.toLocaleDateString(dateLocale(), { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 function displayMemberName(member: FederatedMember, fallback: string) {

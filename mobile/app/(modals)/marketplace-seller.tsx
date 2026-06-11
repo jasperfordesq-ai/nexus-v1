@@ -33,6 +33,7 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 type SellerTab = 'listings' | 'reviews';
 type SellerListItem = MarketplaceListingItem | ReviewItem;
@@ -176,7 +177,7 @@ function SellerReviewCard({ review }: { review: ReviewItem }) {
   const theme = useTheme();
   const reviewerName = getReviewerName(review, t);
   const reviewerAvatar = resolveImageUrl(review.reviewer?.avatar_url ?? review.reviewer?.avatar ?? null);
-  const createdAt = review.created_at ? new Date(review.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : null;
+  const createdAt = review.created_at ? new Date(review.created_at).toLocaleDateString(dateLocale(), { month: 'short', day: 'numeric', year: 'numeric' }) : null;
 
   return (
     <HeroCard className="mb-3 rounded-panel p-0">
@@ -218,8 +219,8 @@ function SellerHeader({ profile, canMessage }: { profile: MarketplaceSellerProfi
   const { t } = useTranslation('marketplace');
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const memberSince = profile.member_since ? new Date(profile.member_since).toLocaleDateString(undefined, { month: 'short', year: 'numeric' }) : null;
-  const joinedMarketplace = profile.joined_marketplace_at ? new Date(profile.joined_marketplace_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' }) : null;
+  const memberSince = profile.member_since ? new Date(profile.member_since).toLocaleDateString(dateLocale(), { month: 'short', year: 'numeric' }) : null;
+  const joinedMarketplace = profile.joined_marketplace_at ? new Date(profile.joined_marketplace_at).toLocaleDateString(dateLocale(), { month: 'short', year: 'numeric' }) : null;
   const trustScore = typeof profile.community_trust_score === 'number' ? Math.max(0, Math.min(100, profile.community_trust_score)) : null;
   const coverImageUrl = resolveImageUrl(profile.cover_image_url);
   return (

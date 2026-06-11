@@ -30,6 +30,7 @@ import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 function extractBlogPage(response: BlogListResponse) {
   return {
@@ -174,7 +175,7 @@ export default function BlogScreen() {
     const imageHeight = index === 0 && !committedSearch ? 190 : 150;
     const coverImage = resolveImageUrl(item.cover_image);
     const publishedLabel = item.published_at
-      ? t('publishedOn', { date: new Date(item.published_at).toLocaleDateString() })
+      ? t('publishedOn', { date: new Date(item.published_at).toLocaleDateString(dateLocale()) })
       : null;
 
     return (

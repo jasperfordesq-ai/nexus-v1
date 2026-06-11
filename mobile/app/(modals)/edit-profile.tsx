@@ -34,6 +34,7 @@ import Avatar from '@/components/ui/Avatar';
 import FormActionFooter from '@/components/ui/FormActionFooter';
 import Input from '@/components/ui/Input';
 import OfflineBanner from '@/components/OfflineBanner';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 // E.164-ish: optional + then digits, spaces, dashes — at least 7 digits total
 const PHONE_RE = /^\+?[\d\s\-().]{7,20}$/;
@@ -43,7 +44,7 @@ interface FieldErrors {
   phone?: string;
 }
 
-export default function EditProfileScreen() {
+function EditProfileScreenInner() {
   const { t } = useTranslation(['profile', 'common']);
   const navigation = useNavigation();
   const { user, refreshUser } = useAuth();
@@ -461,5 +462,13 @@ function SectionTitle({ icon, title, primary }: { icon: React.ComponentProps<typ
       <Ionicons name={icon} size={18} color={primary} />
       <Text className="text-base font-semibold text-foreground">{title}</Text>
     </View>
+  );
+}
+
+export default function EditProfileScreen() {
+  return (
+    <ModalErrorBoundary>
+      <EditProfileScreenInner />
+    </ModalErrorBoundary>
   );
 }

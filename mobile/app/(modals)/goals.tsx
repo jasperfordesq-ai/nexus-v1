@@ -40,6 +40,7 @@ import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 type ApiGoal = Goal & {
@@ -241,7 +242,7 @@ function GoalCard({
   const tone = statusTone(goal, primary, theme);
   const dueDate = getGoalDueDate(goal);
   const dueDateStr = dueDate
-    ? new Date(dueDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
+    ? new Date(dueDate).toLocaleDateString(dateLocale(), { day: 'numeric', month: 'short', year: 'numeric' })
     : null;
   const openDetail = () => {
     router.push({ pathname: '/(modals)/goal-detail', params: { id: String(goal.id) } } as unknown as Href);
