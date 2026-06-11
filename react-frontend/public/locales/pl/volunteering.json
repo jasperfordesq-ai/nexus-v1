@@ -566,7 +566,8 @@
     "accept": "Przyjąć",
     "reject": "Odrzucić",
     "cancel": "Anulować",
-    "reject_confirm": "Czy na pewno chcesz odrzucić tę prośbę o wymianę?"
+    "reject_confirm": "Czy na pewno chcesz odrzucić tę prośbę o wymianę?",
+    "accept_pending_admin": "Zamiana zaakceptowana — oczekuje na zatwierdzenie przez administratora przed zmianą zmian."
   },
   "opportunity": {
     "search_placeholder": "Szukaj według nazwy...",

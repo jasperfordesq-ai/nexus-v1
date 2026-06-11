@@ -566,7 +566,8 @@
     "accept": "Annehmen",
     "reject": "Ablehnen",
     "cancel": "Abbrechen",
-    "reject_confirm": "Möchten Sie diese Tauschanfrage wirklich ablehnen?"
+    "reject_confirm": "Möchten Sie diese Tauschanfrage wirklich ablehnen?",
+    "accept_pending_admin": "Tausch angenommen — wartet auf Admin-Freigabe, bevor die Schichten wechseln."
   },
   "opportunity": {
     "search_placeholder": "Nach Name suchen...",

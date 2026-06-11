@@ -566,7 +566,8 @@
     "accept": "Accepter",
     "reject": "Rejeter",
     "cancel": "Annuler",
-    "reject_confirm": "Etes-vous sûr de vouloir rejeter cette demande d'échange ?"
+    "reject_confirm": "Etes-vous sûr de vouloir rejeter cette demande d'échange ?",
+    "accept_pending_admin": "Échange accepté — en attente de l'approbation d'un administrateur avant le changement des créneaux."
   },
   "opportunity": {
     "search_placeholder": "Rechercher par nom...",

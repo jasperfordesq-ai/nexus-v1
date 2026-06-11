@@ -566,7 +566,8 @@
     "accept": "Glac",
     "reject": "Diúltaigh",
     "cancel": "Cealaigh",
-    "reject_confirm": "An bhfuil tú cinnte gur mhaith leat diúltú don iarratas babhtála seo?"
+    "reject_confirm": "An bhfuil tú cinnte gur mhaith leat diúltú don iarratas babhtála seo?",
+    "accept_pending_admin": "Glacadh leis an mbabhtáil — ag fanacht le ceadú riarthóra sula n-athraítear na sealanna."
   },
   "opportunity": {
     "search_placeholder": "Cuardaigh de réir ainm...",

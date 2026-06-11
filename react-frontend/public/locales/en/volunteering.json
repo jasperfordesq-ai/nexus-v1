@@ -566,7 +566,8 @@
     "accept": "Accept",
     "reject": "Reject",
     "cancel": "Cancel",
-    "reject_confirm": "Are you sure you want to reject this swap request?"
+    "reject_confirm": "Are you sure you want to reject this swap request?",
+    "accept_pending_admin": "Swap accepted — awaiting admin approval before the shifts change."
   },
   "opportunity": {
     "search_placeholder": "Search by name...",

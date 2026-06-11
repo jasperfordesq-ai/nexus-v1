@@ -566,7 +566,8 @@
     "accept": "Accettare",
     "reject": "Rifiutare",
     "cancel": "Cancellare",
-    "reject_confirm": "Sei sicuro di voler rifiutare questa richiesta di scambio?"
+    "reject_confirm": "Sei sicuro di voler rifiutare questa richiesta di scambio?",
+    "accept_pending_admin": "Scambio accettato: in attesa dell'approvazione dell'amministratore prima del cambio turni."
   },
   "opportunity": {
     "search_placeholder": "Cerca per nome...",

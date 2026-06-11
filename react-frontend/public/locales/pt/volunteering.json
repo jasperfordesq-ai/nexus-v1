@@ -566,7 +566,8 @@
     "accept": "Aceitar",
     "reject": "Rejeitar",
     "cancel": "Cancelar",
-    "reject_confirm": "Tem certeza de que deseja rejeitar esta solicitação de troca?"
+    "reject_confirm": "Tem certeza de que deseja rejeitar esta solicitação de troca?",
+    "accept_pending_admin": "Troca aceite — a aguardar aprovação do administrador antes de alterar os turnos."
   },
   "opportunity": {
     "search_placeholder": "Pesquise por nome...",
