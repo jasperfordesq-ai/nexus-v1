@@ -100,6 +100,9 @@ class ReviewServiceTest extends TestCase
         // 'approved','rejected'); 'hidden' threw on every reviewer-delete.
         $review = Mockery::mock(Review::class);
         $review->shouldReceive('setAttribute')->once()->with('status', 'rejected');
+        // delete() also stamps deleted_by_author_at to distinguish an
+        // author-delete from a moderator-reject.
+        $review->shouldReceive('setAttribute')->once()->with('deleted_by_author_at', Mockery::type(\Illuminate\Support\Carbon::class));
         $review->shouldReceive('save')->once()->andReturn(true);
 
         $mockQuery = Mockery::mock();

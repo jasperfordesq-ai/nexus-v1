@@ -559,7 +559,9 @@ class AdminAnalyticsReportsControllerTest extends TestCase
         $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
         Sanctum::actingAs($admin);
 
-        $response = $this->apiGet('/v2/admin/reports/members/export?format=xlsx');
+        // xlsx is now a supported format (IT-Data-01 native XLSX export);
+        // use a genuinely unsupported format to exercise the 400 path.
+        $response = $this->apiGet('/v2/admin/reports/members/export?format=docx');
 
         $response->assertStatus(400);
     }
