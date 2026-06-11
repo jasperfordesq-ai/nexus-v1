@@ -33,3 +33,4 @@ firebase-service-account*.json
 
 expo-env.d.ts
 # @end expo-cli
+emu-screen.png
