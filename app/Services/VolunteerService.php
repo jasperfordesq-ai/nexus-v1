@@ -1395,6 +1395,7 @@ class VolunteerService
             LEFT JOIN org_members om
                 ON om.tenant_id = l.tenant_id
                 AND om.organization_id = org.id
+                AND om.org_type = 'volunteer'
                 AND om.user_id = ?
                 AND om.status = 'active'
                 AND om.role IN ('owner', 'admin')
@@ -1490,7 +1491,7 @@ class VolunteerService
         }
 
         $orgAdminRole = DB::selectOne(
-            "SELECT role FROM org_members WHERE tenant_id = ? AND organization_id = ? AND user_id = ? AND status = 'active'",
+            "SELECT role FROM org_members WHERE tenant_id = ? AND organization_id = ? AND org_type = 'volunteer' AND user_id = ? AND status = 'active'",
             [$tenantId, (int) $org->id, $adminUserId]
         );
 
@@ -1709,6 +1710,7 @@ class VolunteerService
             FROM vol_organizations vo
             LEFT JOIN org_members om
                 ON om.organization_id = vo.id
+                AND om.org_type = 'volunteer'
                 AND om.tenant_id = vo.tenant_id
                 AND om.user_id = ?
                 AND om.status = 'active'
@@ -1835,7 +1837,7 @@ class VolunteerService
 
                     // Initialize owner membership
                     DB::insert(
-                        "INSERT INTO org_members (tenant_id, organization_id, user_id, role, status, created_at) VALUES (?, ?, ?, 'owner', 'active', NOW())",
+                        "INSERT INTO org_members (tenant_id, organization_id, org_type, user_id, role, status, created_at) VALUES (?, ?, 'volunteer', ?, 'owner', 'active', NOW())",
                         [$tenantId, $orgId, $userId]
                     );
 
@@ -2094,7 +2096,7 @@ class VolunteerService
         }
 
         $orgRole = DB::selectOne(
-            "SELECT role FROM org_members WHERE tenant_id = ? AND organization_id = ? AND user_id = ? AND status = 'active'",
+            "SELECT role FROM org_members WHERE tenant_id = ? AND organization_id = ? AND org_type = 'volunteer' AND user_id = ? AND status = 'active'",
             [self::getTenantId(), $orgId, $userId]
         );
 
@@ -2119,7 +2121,7 @@ class VolunteerService
         }
 
         $orgRole = DB::selectOne(
-            "SELECT role FROM org_members WHERE tenant_id = ? AND organization_id = ? AND user_id = ? AND status = 'active'",
+            "SELECT role FROM org_members WHERE tenant_id = ? AND organization_id = ? AND org_type = 'volunteer' AND user_id = ? AND status = 'active'",
             [$tenantId, $orgId, $userId]
         );
 
@@ -2156,6 +2158,7 @@ class VolunteerService
              FROM vol_organizations org
              LEFT JOIN org_members om
                ON om.organization_id = org.id
+              AND om.org_type = 'volunteer'
               AND om.tenant_id = org.tenant_id
               AND om.user_id = ?
               AND om.status = 'active'

@@ -73,7 +73,7 @@ class ClubsApiController extends BaseApiController
                 o.created_at,
                 (SELECT COUNT(DISTINCT om.user_id)
                  FROM org_members om
-                 WHERE om.organization_id = o.id AND om.status = 'active') AS member_count
+                 WHERE om.organization_id = o.id AND om.org_type = 'volunteer' AND om.status = 'active') AS member_count
              FROM vol_organizations o
              WHERE {$where}
              ORDER BY o.name ASC

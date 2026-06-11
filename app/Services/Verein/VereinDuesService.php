@@ -123,6 +123,7 @@ class VereinDuesService
 
         $members = DB::table('org_members')
             ->where('organization_id', $organizationId)
+            ->where('org_type', 'volunteer')
             ->where('tenant_id', $tenantId)
             ->where('status', 'active')
             ->pluck('user_id')

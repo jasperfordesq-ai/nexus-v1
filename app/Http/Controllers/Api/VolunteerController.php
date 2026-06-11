@@ -661,7 +661,7 @@ class VolunteerController extends BaseApiController
 
         // Org members with owner/admin role have access
         $membership = DB::selectOne(
-            "SELECT role FROM org_members WHERE tenant_id = ? AND organization_id = ? AND user_id = ? AND status = 'active'",
+            "SELECT role FROM org_members WHERE tenant_id = ? AND organization_id = ? AND org_type = 'volunteer' AND user_id = ? AND status = 'active'",
             [$tenantId, $orgId, $userId]
         );
 

@@ -624,7 +624,7 @@ class AdminVolunteerController extends BaseApiController
                      LEFT JOIN (
                          SELECT organization_id, COUNT(*) as member_count
                          FROM org_members
-                         WHERE tenant_id = ? AND status = 'active'
+                         WHERE tenant_id = ? AND org_type = 'volunteer' AND status = 'active'
                          GROUP BY organization_id
                      ) mc ON mc.organization_id = vo.id
                      LEFT JOIN (
@@ -791,7 +791,7 @@ class AdminVolunteerController extends BaseApiController
              LEFT JOIN vol_logs vl ON vl.user_id = om.user_id
                 AND vl.organization_id = om.organization_id
                 AND vl.tenant_id = om.tenant_id
-             WHERE om.organization_id = ? AND om.tenant_id = ? AND om.status = 'active'
+             WHERE om.organization_id = ? AND om.org_type = 'volunteer' AND om.tenant_id = ? AND om.status = 'active'
              GROUP BY om.id, om.user_id, u.first_name, u.last_name, u.name, om.role
              ORDER BY om.id DESC
              LIMIT 100",

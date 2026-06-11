@@ -571,6 +571,7 @@ class VolunteerExpenseService
             ->leftJoin('org_members as om', function ($join) use ($userId) {
                 $join->on('om.organization_id', '=', 'org.id')
                     ->whereColumn('om.tenant_id', 'org.tenant_id')
+                    ->where('om.org_type', 'volunteer')
                     ->where('om.user_id', $userId)
                     ->where('om.status', 'active');
             })
