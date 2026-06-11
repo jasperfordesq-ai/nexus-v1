@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Single sign-on (SSO) engine — sign in with your organisation's account.** Communities can now plug in any standards-based (OpenID Connect) identity provider — Microsoft Entra ID for councils and workplaces, Hivebrite, Google Workspace and others — as configuration, with no code change. Members of the connected organisation see a "Sign in with …" button on the login and registration screens and use their existing work account; no separate password to manage. Administrators get a new **Admin → Single Sign-On** page to add providers (with a Microsoft Entra ID preset), restrict sign-in to approved email domains (e.g. only `@coventry.gov.uk` addresses), choose whether new accounts are created automatically on first sign-in, and test the connection before enabling it. Security: standards-based flow (Authorization Code + PKCE), identity-provider signatures verified cryptographically, provider secrets stored encrypted and never shown again, and each community's SSO is completely isolated from every other community's. Communities without SSO configured see no change at all. Fully translated across all 11 languages.
+
+- **Permissions-Policy security header.** API responses now also restrict which browser features embedded third-party content may use (camera, microphone and location are limited to the platform itself; payment and USB access are denied outright) — closing a gap in the security-header suite alongside the existing CSP, HSTS and frame protections.
+
 ### Changed
 
 - **Feed page polish — social-network-grade feel.** A micro-interaction and consistency pass across the whole community feed. The Like heart and Bookmark icons now "pop" with a satisfying spring when tapped (respecting reduced-motion settings); the For You / Recent toggle clearly highlights the active mode; image carousels respond to lighter swipes and their arrows fade in smoothly (and now appear for keyboard users too); hover states across the stories bar, sidebar widgets, link previews, and quoted posts all transition smoothly instead of snapping. If stories fail to load you now get a quiet "Couldn't load stories — Retry" instead of a blank space, and a failed connection request properly rolls back the "Pending" button state. Also fixed two missing screen-reader labels (feed sidebar region and mobile composer) — all new text translated across the 11 languages.
