@@ -327,7 +327,10 @@ class GroupsControllerTest extends TestCase
     public function test_members_returns_list(): void
     {
         $user = $this->authenticatedUser();
-        $group = $this->createGroup(['owner_id' => $user->id]);
+        // Pin visibility: the factory randomises public/private, and a private
+        // group 403s for an owner with no group_members row (factory bypasses
+        // the create flow that would add one) — the test was a coin flip.
+        $group = $this->createGroup(['owner_id' => $user->id, 'visibility' => 'public']);
 
         $response = $this->apiGet("/v2/groups/{$group->id}/members");
 

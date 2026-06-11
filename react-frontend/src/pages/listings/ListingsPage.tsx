@@ -1,4 +1,3 @@
-import { Select, SelectItem, GlassCard, AlgorithmLabel, ListingSkeleton, ImagePlaceholder, Button, ToggleButton, ToggleButtonGroup, Progress, Chip, SearchField, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,14 +8,15 @@ import { Select, SelectItem, GlassCard, AlgorithmLabel, ListingSkeleton, ImagePl
  */
 
 import { useState, useEffect, useCallback, memo, useRef, useMemo, type ReactNode } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Select, SelectItem, GlassCard, AlgorithmLabel, ListingSkeleton, MediaRowsSkeleton, ImagePlaceholder, Button, ToggleButton, ToggleButtonGroup, Progress, Chip, SearchField, Avatar } from '@/components/ui';
+import { motion } from '@/lib/motion';
 
 const listingContainerVariants = {
   hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.05 } }, };
 const listingItemVariants = {
   hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.25 } }, };
-import { Link, useSearchParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { motion } from '@/lib/motion';
 
 import Search from 'lucide-react/icons/search';
 import Plus from 'lucide-react/icons/plus';
@@ -84,7 +84,10 @@ export function ListingsPage() {
     return v && validTypes.includes(v as ListingType) ? (v as ListingType) : 'all';
   });
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '');
-  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    const v = searchParams.get('view');
+    return v === 'list' || (v === 'map' && canUseMapView) ? v : 'grid';
+  });
   const [hasMore, setHasMore] = useState(false);
   const [totalItems, setTotalItems] = useState<number | null>(null);
   const [proximityParams, setProximityParams] = useState<ProximityFilterParams | null>(() => {
@@ -338,8 +341,9 @@ export function ListingsPage() {
       params.set('radius_km', String(proximityParams.radius_km));
     }
     if (sortMode !== 'recommended') params.set('sort', sortMode);
+    if (viewMode !== 'grid') params.set('view', viewMode);
     setSearchParams(params, { replace: true });
-  }, [searchInput, selectedType, selectedCategory, hoursRange, serviceMode, postedWithin, proximityParams, sortMode, setSearchParams]);
+  }, [searchInput, selectedType, selectedCategory, hoursRange, serviceMode, postedWithin, proximityParams, sortMode, viewMode, setSearchParams]);
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -695,7 +699,9 @@ export function ListingsPage() {
           aria-busy="true"
         >
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <ListingSkeleton key={i} />
+            viewMode === 'grid'
+              ? <ListingSkeleton key={i} />
+              : <MediaRowsSkeleton key={i} className="p-4" mediaClassName="h-20 w-20" />
           ))}
         </div>
       ) : loadError ? (
@@ -953,6 +959,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
                 <ListingBadge tone={listing.type === 'offer' ? 'offer' : 'request'}>
                   {listing.type === 'offer' ? t('offering') : t('requesting')}
                 </ListingBadge>
+                {listing.is_featured && <FeaturedBadge />}
                 {listing.reciprocity_match === 'mutual' && (
                   <ListingBadge tone="mutual" icon={Zap}>{t('reciprocity_mutual')}</ListingBadge>
                 )}
@@ -979,6 +986,15 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
                 </Link>
               </h3>
               <p className="mt-1 line-clamp-2 text-sm leading-6 text-theme-muted sm:line-clamp-1">{listing.description}</p>
+              <div className="mt-2 flex items-center gap-2 text-xs text-theme-subtle">
+                <span className="truncate">{authorName}</span>
+                {listing.author_rating != null && listing.author_rating > 0 && (
+                  <span className="flex items-center gap-0.5 text-[11px] text-[var(--color-warning)] shrink-0">
+                    <Star className="w-3 h-3 fill-amber-500" aria-hidden="true" />
+                    {listing.author_rating.toFixed(1)}
+                  </span>
+                )}
+              </div>
             </div>
             <div className="flex flex-row flex-wrap items-center justify-between gap-3 text-xs text-theme-subtle sm:flex-col sm:items-end sm:justify-start sm:gap-1 sm:shrink-0">
               {hours && (

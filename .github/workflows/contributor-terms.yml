@@ -15,10 +15,14 @@ jobs:
     # Skip bot-authored PRs (Dependabot, Renovate, GitHub Actions, etc.).
     # Bots cannot legally accept a CLA, and their commits are not copyrightable
     # contributions. Without this guard the check blocks every dependency PR.
+    # Also skip PRs authored by the repository owner: the owner is the licensor
+    # and cannot meaningfully accept their own contributor terms. This includes
+    # agent-created PRs opened with the owner's token (Claude Code, etc.).
     if: >-
       github.event.pull_request.user.type != 'Bot' &&
       github.event.pull_request.user.login != 'dependabot[bot]' &&
-      github.event.pull_request.user.login != 'github-actions[bot]'
+      github.event.pull_request.user.login != 'github-actions[bot]' &&
+      github.event.pull_request.author_association != 'OWNER'
 
     steps:
       - name: Validate contributor terms acknowledgement

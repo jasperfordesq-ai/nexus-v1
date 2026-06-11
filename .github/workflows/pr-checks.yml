@@ -13,6 +13,11 @@ jobs:
   translation-review-check:
     name: Translation Review Check
     runs-on: ubuntu-latest
+    # Owner-authored PRs (including agent PRs opened with the owner's token)
+    # skip this gate: the owner is the designated translation approver, so
+    # requiring them to attest "Translation Reviewer: @me" on their own PR is
+    # circular. External contributions still require explicit review metadata.
+    if: github.event.pull_request.author_association != 'OWNER'
 
     steps:
       - name: Check PR description for locale review metadata

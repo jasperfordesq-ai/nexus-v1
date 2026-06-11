@@ -343,6 +343,21 @@ Example: feat(wallet): Add time credit transfer confirmation modal
 Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
+### GitHub PR Gates (READ BEFORE OPENING ANY PR)
+
+Some environments (Claude Code on the web, GitHub Actions) force a branch + PR workflow. PRs in this repo are gated by **description checks** that fail instantly unless the PR body contains exact fields from `.github/pull_request_template.md`. These gates re-run when the PR body is **edited** — no push needed to clear them.
+
+When opening a PR, always build the body from `.github/pull_request_template.md`. The hard requirements:
+
+1. **Root Cause Analysis Check** — any PR whose title starts with `fix` or contains `bug`/`hotfix` MUST include literal `**Root Cause:**` and `**Prevention:**` fields (the colon is required; a `### Root Cause` heading does NOT satisfy it).
+2. **Translation Review Check** — any PR touching `react-frontend/public/locales/<non-en>/*.json` MUST include `**Translation Status:** reviewed` (or `approved`) and `**Translation Reviewer:** @handle`. Owner-authored PRs are exempt; call out machine-filled translations in a `**Translation Notes:**` field regardless.
+3. **Contributor Terms Acceptance** — the `## Contributor Terms` section with all three checkboxes checked (`- [x]`) plus `**Third-Party Material Disclosure:**` and `**AI Contribution Disclosure:**` fields (use `None` when not applicable). Owner-authored and bot PRs are exempt.
+4. **Translation Drift Detection** — `node scripts/check-php-lang-parity.mjs` must pass. If you add keys to `lang/en/*.php`, add translated counterparts to ALL other `lang/<locale>/*.php` files in the same commit.
+
+### 🔴 Keep `main` green
+
+A failing check on `main` is inherited by **every** subsequent PR and trains everyone to ignore CI. If a push to `main` turns any CI gate red (lang parity, i18n baseline, build), fix it or revert it immediately — do not leave it for "later". Before starting feature work on a branch, if CI on `main` is already red for a mechanical reason (e.g. missing translation keys), fix that first in its own commit so your PR isn't born failing.
+
 ---
 
 ## Code Patterns
