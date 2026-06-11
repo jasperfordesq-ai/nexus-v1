@@ -1078,6 +1078,43 @@ class GdprService
                 );
             } catch (\Throwable $e) { $this->logger->warning('GDPR deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
 
+            // 3o. Volunteering — delete sensitive personal records outright
+            // (credentials/vetting docs, wellbeing data, accessibility needs incl.
+            // emergency contacts, guardian PII, training certs, achievement
+            // certificates, future-facing queue entries, reviews authored).
+            try {
+                $this->query("DELETE FROM vol_credentials WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                $this->query("DELETE FROM vol_mood_checkins WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                $this->query("DELETE FROM vol_wellbeing_alerts WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                $this->query("DELETE FROM vol_accessibility_needs WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                $this->query("DELETE FROM vol_guardian_consents WHERE minor_user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                $this->query("DELETE FROM vol_safeguarding_training WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                $this->query("DELETE FROM vol_certificates WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                $this->query("DELETE FROM vol_shift_waitlist WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                $this->query("DELETE FROM vol_shift_swap_requests WHERE (from_user_id = ? OR to_user_id = ?) AND tenant_id = ?", [$userId, $userId, $this->tenantId]);
+                $this->query("DELETE FROM vol_emergency_alert_recipients WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                $this->query("DELETE FROM vol_reviews WHERE reviewer_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                // Custom form answers attached to the user's applications
+                $this->query(
+                    "DELETE FROM vol_custom_field_values
+                     WHERE tenant_id = ?
+                       AND entity_id IN (SELECT va.id FROM vol_applications va WHERE va.user_id = ? AND va.tenant_id = ?)",
+                    [$this->tenantId, $userId, $this->tenantId]
+                );
+            } catch (\Throwable $e) { $this->logger->warning('GDPR volunteering deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
+
+            // 3p. Volunteering — anonymize records kept for org accounting/audit.
+            // Hours and donation amounts stay (they back org wallet ledgers and
+            // giving-day totals — same rationale as 3n transactions); free-text
+            // content and copied PII are wiped. Identity linkage is broken by
+            // the users-row anonymization above.
+            try {
+                $this->query("UPDATE vol_donations SET donor_name = NULL, donor_email = NULL WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                $this->query("UPDATE vol_applications SET message = NULL, org_note = NULL WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                $this->query("UPDATE vol_logs SET description = NULL, feedback = NULL WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                $this->query("UPDATE vol_expenses SET description = NULL WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+            } catch (\Throwable $e) { $this->logger->warning('GDPR volunteering anonymization step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
+
             // 4. Soft delete listings
             $this->query(
                 "UPDATE listings SET status = 'deleted', description = '[DELETED]', deleted_at = NOW()

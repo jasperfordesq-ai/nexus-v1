@@ -316,7 +316,7 @@ class VolunteerExpenseService
                         'type'     => $expense->expense_type,
                     ];
 
-                    $link    = '/volunteering/expenses/' . $id;
+                    $link    = '/volunteering?tab=expenses'; // no per-expense route exists — deep-link to the Expenses tab
                     $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
                     $user = DB::table('users')->where('id', $expense->user_id)->where('tenant_id', TenantContext::getId())->select(['email', 'first_name', 'name', 'preferred_language'])->first();
                     if ($user && !empty($user->email)) {
@@ -378,7 +378,7 @@ class VolunteerExpenseService
                                 'currency' => $expense->currency ?? 'EUR',
                                 'type'     => $expense->expense_type,
                             ];
-                            $link    = '/volunteering/expenses/' . $id;
+                            $link    = '/volunteering?tab=expenses'; // no per-expense route exists — deep-link to the Expenses tab
                             $fullUrl = TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $link;
 
                             $builder = EmailTemplateBuilder::make()

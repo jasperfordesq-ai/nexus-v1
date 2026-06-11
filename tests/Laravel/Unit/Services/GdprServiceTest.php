@@ -805,4 +805,52 @@ class GdprServiceTest extends \Tests\Laravel\TestCase
         $this->assertStringContainsString('data.html', $readme);
         $this->assertStringContainsString('expire in 7 days', $readme);
     }
+
+    // =========================================================================
+    // ACCOUNT DELETION — VOLUNTEERING DATA COVERAGE (2026-06-11 audit)
+    // =========================================================================
+
+    /**
+     * Regression guard: account deletion previously exported volunteering data
+     * but never deleted or anonymized it — sensitive records (credentials,
+     * wellbeing, accessibility needs, guardian PII, donor name/email) survived
+     * GDPR erasure. This source-coverage test fails if the volunteering
+     * erasure block is ever removed from executeAccountDeletion().
+     */
+    public function testAccountDeletionCoversVolunteeringTables(): void
+    {
+        $src = file_get_contents(app_path('Services/Enterprise/GdprService.php'));
+        $start = strpos($src, 'function executeAccountDeletion');
+        $this->assertNotFalse($start, 'executeAccountDeletion not found');
+        $deletionSrc = substr($src, $start);
+
+        $required = [
+            // Hard deletes — sensitive personal records
+            'DELETE FROM vol_credentials',
+            'DELETE FROM vol_mood_checkins',
+            'DELETE FROM vol_wellbeing_alerts',
+            'DELETE FROM vol_accessibility_needs',
+            'DELETE FROM vol_guardian_consents',
+            'DELETE FROM vol_safeguarding_training',
+            'DELETE FROM vol_certificates',
+            'DELETE FROM vol_shift_waitlist',
+            'DELETE FROM vol_shift_swap_requests',
+            'DELETE FROM vol_emergency_alert_recipients',
+            'DELETE FROM vol_reviews',
+            'DELETE FROM vol_custom_field_values',
+            // Anonymization — records kept for org accounting
+            'UPDATE vol_donations SET donor_name = NULL, donor_email = NULL',
+            'UPDATE vol_applications SET message = NULL, org_note = NULL',
+            'UPDATE vol_logs SET description = NULL, feedback = NULL',
+            'UPDATE vol_expenses SET description = NULL',
+        ];
+
+        foreach ($required as $needle) {
+            $this->assertStringContainsString(
+                $needle,
+                $deletionSrc,
+                "GDPR account deletion lost volunteering coverage: {$needle}"
+            );
+        }
+    }
 }
