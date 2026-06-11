@@ -2070,7 +2070,8 @@
     },
     "connect_modal": {
       "confirm": "Dies ist Ihre einzig verbleibende Anmeldemethode. Wenn Sie sie trennen, werden Sie ausgesperrt, sofern Sie nicht zuerst ein Passwort festlegen oder einen Passkey hinzufügen. Fortfahren?"
-    }
+    },
+    "sign_in_with_provider": "Sign in with {{name}}"
   },
   "verein_dues": {
     "my_page_title": "Meine Vereinsmitgliedsbeiträge",

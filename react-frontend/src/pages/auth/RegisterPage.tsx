@@ -46,6 +46,7 @@ import { useAuth,
 import type { RegisterResult } from '@/contexts/AuthContext';
 import { usePageTitle } from '@/hooks';
 import { OAuthButtons } from '@/components/auth/OAuthButtons';
+import { SsoButtons } from '@/components/auth/SsoButtons';
 import { PageMeta } from '@/components/seo';
 import { PlaceAutocompleteInput } from '@/components/location';
 import { api, tokenManager } from '@/lib/api';
@@ -968,7 +969,10 @@ export function RegisterPage() {
       return (
         <form onSubmit={handleSubmit} aria-label={t('register.title')} className="space-y-4">
           {oauthTenantId && (
-            <OAuthButtons intent="register" tenantId={oauthTenantId} />
+            <div className="space-y-3">
+              <SsoButtons tenantId={oauthTenantId} />
+              <OAuthButtons intent="register" tenantId={oauthTenantId} />
+            </div>
           )}
           {/* Honeypot — single field, off-screen. Multi-field decoys were
               autofilled by browsers and silently blocked real users. */}
@@ -1006,7 +1010,10 @@ export function RegisterPage() {
     return (
       <form onSubmit={handleSubmit} aria-label={t('register.title')} className="space-y-4">
         {currentStep === 1 && oauthTenantIdMobile && (
-          <OAuthButtons intent="register" tenantId={oauthTenantIdMobile} />
+          <div className="space-y-3">
+            <SsoButtons tenantId={oauthTenantIdMobile} />
+            <OAuthButtons intent="register" tenantId={oauthTenantIdMobile} />
+          </div>
         )}
         {/* Honeypot — single field, off-screen. See desktop block above. */}
         <div

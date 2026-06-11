@@ -2070,7 +2070,8 @@
     },
     "connect_modal": {
       "confirm": "Este é o seu único método de início de sessão restante. Se o desligar, ficará bloqueado a menos que defina primeiro uma palavra-passe ou adicione uma passkey. Continuar?"
-    }
+    },
+    "sign_in_with_provider": "Sign in with {{name}}"
   },
   "verein_dues": {
     "my_page_title": "As minhas quotas de membro Verein",

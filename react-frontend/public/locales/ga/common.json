@@ -2070,7 +2070,8 @@
     },
     "connect_modal": {
       "confirm": "Is é seo an t-aon mhodh síniú isteach atá fágtha agat. Má dhícheanglaíonn tú é, cuirfidh sé glas ort mura socraíonn tú pasfhocal nó mura gcuireann tú eochair phasála leis ar dtús. Lean ar aghaidh?"
-    }
+    },
+    "sign_in_with_provider": "Sign in with {{name}}"
   },
   "verein_dues": {
     "my_page_title": "Mo tháillí ballraíochta Verein",

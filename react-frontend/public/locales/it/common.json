@@ -2070,7 +2070,8 @@
     },
     "connect_modal": {
       "confirm": "Questo è il tuo unico metodo di accesso rimasto. Se lo disconnetti, non potrai più entrare a meno che tu non imposti prima una password o aggiunga una passkey. Continuare?"
-    }
+    },
+    "sign_in_with_provider": "Sign in with {{name}}"
   },
   "verein_dues": {
     "my_page_title": "Le mie quote associative Verein",

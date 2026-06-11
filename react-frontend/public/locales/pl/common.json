@@ -2070,7 +2070,8 @@
     },
     "connect_modal": {
       "confirm": "To jedyna pozostała metoda logowania. Odłączenie jej spowoduje zablokowanie dostępu, chyba że najpierw ustawisz hasło lub dodasz passkey. Kontynuować?"
-    }
+    },
+    "sign_in_with_provider": "Sign in with {{name}}"
   },
   "verein_dues": {
     "my_page_title": "Moje składki członkowskie Verein",

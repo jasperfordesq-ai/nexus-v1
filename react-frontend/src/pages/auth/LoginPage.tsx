@@ -32,6 +32,7 @@ import ShieldX from 'lucide-react/icons/shield-x';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { OAuthButtons } from '@/components/auth/OAuthButtons';
+import { SsoButtons } from '@/components/auth/SsoButtons';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { api, tokenManager } from '@/lib/api';
@@ -439,7 +440,8 @@ export function LoginPage() {
 
                   {/* Social login buttons (SOC13) */}
                   {selectedTenantId && (
-                    <div className="mb-5">
+                    <div className="mb-5 space-y-3">
+                      <SsoButtons tenantId={selectedTenantId} />
                       <OAuthButtons intent="login" tenantId={selectedTenantId} />
                     </div>
                   )}
