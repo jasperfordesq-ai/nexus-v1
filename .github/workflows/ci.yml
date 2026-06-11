@@ -113,7 +113,14 @@ jobs:
           APP_KEY: base64:HfQEDtbtr90JIXhsaAhSFWnzIo1f31VZ2e5qLqKKnls=
           CACHE_DRIVER: array
           SESSION_DRIVER: array
+          QUEUE_CONNECTION: sync
           LOG_CHANNEL: "null"
+          # Without this, booting artisan resolves the default 'pusher'
+          # broadcaster with a null PUSHER_KEY and throws at boot (same
+          # reason phpunit.xml pins it). Migrations don't broadcast, so
+          # the null driver is correct here.
+          BROADCAST_CONNECTION: "null"
+          BROADCAST_DRIVER: "null"
 
       - name: PHP Syntax Check
         run: |
