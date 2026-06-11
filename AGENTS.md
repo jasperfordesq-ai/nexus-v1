@@ -69,11 +69,11 @@ project-nexus/
 | Document | Purpose |
 |----------|---------|
 | [react-frontend/CLAUDE.md](react-frontend/CLAUDE.md) | React frontend stack conventions, contexts, hooks, pages |
-| [docs/govuk-alpha/RESEARCH.md](docs/govuk-alpha/RESEARCH.md) | GOV.UK Alpha frontend architecture, official repos, licensing, and branding limits |
-| [docs/ROADMAP.md](docs/ROADMAP.md) | Consolidated feature roadmap (single source of truth) |
-| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Deployment guide (Azure production) |
+| `docs/govuk-alpha/RESEARCH.md` (private, dev machine only) | GOV.UK Alpha frontend architecture, official repos, licensing, and branding limits |
+| `docs/ROADMAP.md` (private, dev machine only) | Consolidated feature roadmap (single source of truth) |
+| `docs/DEPLOYMENT.md` (private, dev machine only) | Deployment guide (Azure production) |
 | [LARAVEL_MIGRATION_PLAN.md](LARAVEL_MIGRATION_PLAN.md) | Laravel migration plan, workflow, and effort estimates |
-| [BACKUP.md](BACKUP.md) | Full backup system — private repo for machine transfers (gitignored from public) |
+| `BACKUP.md` (private, dev machine only) | Full backup system — private repo for machine transfers (gitignored from public) |
 
 > Note: `docs/` is gitignored in the public repo; the linked docs exist on the dev machine only. PHP_CONVENTIONS / API_REFERENCE / REGRESSION_PREVENTION / QA_AUDIT_AND_TEST_PLAN / LOCAL_DEV_SETUP have been retired — follow existing code patterns in `app/Services/` and `routes/api.php` instead.
 
@@ -281,7 +281,7 @@ The accessible frontend is an explicitly approved new UI track that complements,
 - All user-facing strings must use `lang/en/govuk_alpha.php`.
 - Preserve tenant context, module gates, and AGPL Section 7(b) attribution on every alpha page.
 
-See [docs/govuk-alpha/RESEARCH.md](docs/govuk-alpha/RESEARCH.md) for the architecture decision and source list.
+See `docs/govuk-alpha/RESEARCH.md` (private, dev machine only) for the architecture decision and source list.
 
 ---
 
@@ -297,7 +297,7 @@ No agent may initiate SSH, run `bluegreen-deploy.sh` / `safe-deploy.sh`, or trig
 
 **NEVER push to the `backup` remote (`nexus-v1-backup`) unless the user explicitly tells you to.** The backup repo is private and contains credentials, secrets, and all gitignored files.
 
-See [BACKUP.md](BACKUP.md) for the full backup system documentation.
+See `BACKUP.md` (private, dev machine only) for the full backup system documentation.
 
 ---
 
@@ -437,7 +437,7 @@ Test environment: `APP_ENV=testing`, `DB_DATABASE=nexus_test`, `CACHE_DRIVER=arr
 
 ## Deployment
 
-Full deployment guide: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
+Full deployment guide: `docs/DEPLOYMENT.md` (private, dev machine only)
 
 | Item | Value |
 |------|-------|
