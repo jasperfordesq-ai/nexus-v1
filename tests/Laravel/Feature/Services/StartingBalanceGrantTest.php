@@ -115,16 +115,20 @@ class StartingBalanceGrantTest extends TestCase
         $this->assertSame(1, $this->grantTransactionCount($user));
     }
 
-    public function test_applyToNewUser_grants_nothing_when_unset(): void
+    public function test_applyToNewUser_grants_platform_default_when_unset(): void
     {
+        // Unconfigured tenants grant the platform default of 5 — the same
+        // default grantWelcomeCredits uses on admin-approval tenants, so
+        // both signup routes behave identically (Jasper, 2026-06-11).
         $user = $this->makeUser();
 
         $result = StartingBalanceService::applyToNewUser((int) $user->id);
 
         $this->assertTrue($result['success']);
-        $this->assertSame('none', $result['source']);
-        $this->assertSame(0, $this->balanceOf($user));
-        $this->assertSame(0, $this->grantTransactionCount($user));
+        $this->assertSame(5.0, $result['amount']);
+        $this->assertSame('starting_balance', $result['source']);
+        $this->assertSame(5, $this->balanceOf($user));
+        $this->assertSame(1, $this->grantTransactionCount($user));
     }
 
     public function test_applyToNewUser_grants_nothing_when_zero(): void

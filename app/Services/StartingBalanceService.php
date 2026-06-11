@@ -29,13 +29,21 @@ class StartingBalanceService
     private const LEGACY_SETTING_KEY = 'general.welcome_credits';
 
     /**
+     * Platform-wide default when a tenant has never saved the setting.
+     * MUST match AdminUsersController::grantWelcomeCredits so self-serve
+     * (email verification) and admin-approval tenants behave identically.
+     * A tenant that wants no welcome credits sets the value to 0 explicitly.
+     */
+    private const DEFAULT_BALANCE = 5;
+
+    /**
      * Get the configured starting balance for the current tenant.
      *
      * Reads the canonical 'wallet.starting_balance' key first (written by the
      * wallet admin endpoints), then falls back to the legacy
      * 'general.welcome_credits' key (written by the general admin Settings
      * page) so tenants configured via either surface behave the same.
-     * Unset on both keys = 0 = no grant.
+     * Unset on both keys = the platform default (5). Explicit 0 = no grant.
      *
      * @return float Always >= 0.
      */
@@ -45,7 +53,7 @@ class StartingBalanceService
         $settings = app(TenantSettingsService::class);
         $value = $settings->get($tenantId, self::SETTING_KEY);
         if ($value === null) {
-            $value = $settings->get($tenantId, self::LEGACY_SETTING_KEY, '0');
+            $value = $settings->get($tenantId, self::LEGACY_SETTING_KEY, (string) self::DEFAULT_BALANCE);
         }
 
         return max(0.0, (float) $value);
