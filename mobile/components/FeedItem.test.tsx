@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { fireEvent, render } from '@testing-library/react-native';
+import { act, fireEvent, render } from '@testing-library/react-native';
 
 import type { FeedItem as FeedItemType } from '@/lib/api/feed';
 import FeedItem from './FeedItem';
@@ -61,8 +61,8 @@ jest.mock('heroui-native', () => {
   const React = require('react');
   const { Pressable, Text, View } = require('react-native');
 
-  const Button = ({ children, onPress, accessibilityLabel }: { children?: React.ReactNode; onPress?: () => void; accessibilityLabel?: string }) => (
-    <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel} onPress={onPress}>
+  const Button = ({ children, onPress, onPressIn, onPressOut, accessibilityLabel }: { children?: React.ReactNode; onPress?: () => void; onPressIn?: () => void; onPressOut?: () => void; accessibilityLabel?: string }) => (
+    <Pressable accessibilityRole="button" accessibilityLabel={accessibilityLabel} onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut}>
       {children}
     </Pressable>
   );
@@ -363,7 +363,13 @@ describe('FeedItem', () => {
 
     expect(queryByLabelText('reaction.celebrate')).toBeNull();
 
-    fireEvent(getByLabelText('likePost'), 'longPress');
+    // Hold-to-react is timed manually from pressIn (the reanimated pressable's
+    // own longPress classification swallowed quick taps on-device).
+    jest.useFakeTimers();
+    fireEvent(getByLabelText('likePost'), 'pressIn');
+    act(() => { jest.advanceTimersByTime(500); });
+    jest.useRealTimers();
+    fireEvent(getByLabelText('likePost'), 'pressOut');
     fireEvent.press(getByLabelText('reaction.celebrate'));
 
     expect(toggleReaction).toHaveBeenCalledWith('post', 601, 'celebrate');

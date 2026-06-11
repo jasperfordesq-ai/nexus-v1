@@ -373,7 +373,42 @@ export default function FeedItem({
     }
   }
 
+  // Hold-to-react detection. We deliberately do NOT pass onLongPress to the
+  // button: with the reanimated-wrapped Pressable, supplying onLongPress made
+  // QUICK taps fire neither callback (verified on-device 2026-06-11 — single
+  // taps produced no event while hold-and-release fired BOTH callbacks).
+  // Instead we time the press ourselves from onPressIn/onPressOut — the same
+  // events that drive the press animation, which fire reliably — and open the
+  // reaction bar mid-hold (Instagram-style). onPress still handles the tap and
+  // is skipped when the hold already fired.
+  const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const holdFiredRef = useRef(false);
+
+  function handleLikePressIn() {
+    holdFiredRef.current = false;
+    if (!isReactable) return;
+    holdTimerRef.current = setTimeout(() => {
+      holdTimerRef.current = null;
+      holdFiredRef.current = true;
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      setReactionBarVisible(true);
+    }, 450);
+  }
+
+  function handleLikePressOut() {
+    if (holdTimerRef.current) {
+      clearTimeout(holdTimerRef.current);
+      holdTimerRef.current = null;
+    }
+  }
+
   function handleLikePress() {
+    if (holdFiredRef.current) {
+      // The hold already opened the reaction bar — releasing the finger must
+      // not ALSO toggle a like.
+      holdFiredRef.current = false;
+      return;
+    }
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     animateHeartButton();
     if (isReactable) {
@@ -382,12 +417,6 @@ export default function FeedItem({
       return;
     }
     void performLike();
-  }
-
-  function handleLikeLongPress() {
-    if (!isReactable) return;
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    setReactionBarVisible(true);
   }
 
   const typeConfig = getTypeConfig(item.type);
@@ -676,7 +705,8 @@ export default function FeedItem({
             size="sm"
             variant={likeButtonActive ? 'secondary' : 'ghost'}
             onPress={handleLikePress}
-            onLongPress={handleLikeLongPress}
+            onPressIn={handleLikePressIn}
+            onPressOut={handleLikePressOut}
             accessibilityLabel={likeButtonActive ? t('unlikePost') : t('likePost')}
             accessibilityHint={isReactable ? t('reaction.longPressHint') : undefined}
           >
