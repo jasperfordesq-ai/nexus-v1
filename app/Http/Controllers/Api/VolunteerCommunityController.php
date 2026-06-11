@@ -541,6 +541,7 @@ class VolunteerCommunityController extends BaseApiController
             'sort' => $this->query('sort') ?: 'newest',
             'cursor' => $this->query('cursor'),
             'limit' => $this->queryInt('per_page', 20, 1, 50),
+            'user_id' => $this->getOptionalUserId(),
         ];
 
         $result = $this->communityProjectService->getProposals($filters);
@@ -596,7 +597,7 @@ class VolunteerCommunityController extends BaseApiController
         $this->ensureFeature();
         $this->rateLimit('vol_public_read', 60, 30);
 
-        $project = $this->communityProjectService->getProposal((int) $id, true);
+        $project = $this->communityProjectService->getProposal((int) $id, true, $this->getOptionalUserId());
         if (!$project) {
             return $this->respondWithError('NOT_FOUND', __('api.vol_project_not_found'), null, 404);
         }
