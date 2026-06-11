@@ -840,5 +840,9 @@
   "my_organisations_none": "Nessuna organizzazione ancora",
   "my_organisations_none_desc": "Registra un'organizzazione di volontariato per iniziare a pubblicare opportunità, gestire i volontari e assegnare crediti di tempo.",
   "my_organisations_pending": "In attesa di approvazione",
-  "my_organisations_pending_desc": "In attesa di approvazione da parte dell'amministratore"
+  "my_organisations_pending_desc": "In attesa di approvazione da parte dell'amministratore",
+  "federation_share_label": "Condivida con le comunità partner",
+  "federation_share_description": "Renda questa opportunità visibile alle comunità partner della Sua rete di federazione.",
+  "federation_share_updated": "Preferenza di condivisione aggiornata.",
+  "federation_share_update_failed": "Impossibile aggiornare la preferenza di condivisione. Riprovi."
 }

@@ -840,5 +840,9 @@
   "my_organisations_none": "Gan Eagraíochtaí fós",
   "my_organisations_none_desc": "Cláraigh eagraíocht dheonach chun tús a chur le deiseanna postála, oibrithe deonacha a bhainistiú, agus creidmheasanna ama a bhronnadh.",
   "my_organisations_pending": "Ceadú ar Feitheamh",
-  "my_organisations_pending_desc": "Ag feitheamh le ceadú riarthóir"
+  "my_organisations_pending_desc": "Ag feitheamh le ceadú riarthóir",
+  "federation_share_label": "Comhroinn le pobail chomhpháirtíochta",
+  "federation_share_description": "Déan an deis seo infheicthe do phobail chomhpháirtíochta i do líonra cónaidhme.",
+  "federation_share_updated": "Sainrogha comhroinnte nuashonraithe.",
+  "federation_share_update_failed": "Níorbh fhéidir an tsainrogha comhroinnte a nuashonrú. Bain triail eile as."
 }

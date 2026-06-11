@@ -64,19 +64,27 @@ class PushVolunteerOpportunityToFederatedPartners implements ShouldQueue
                 return;
             }
 
-            // Only push opportunities that are explicitly marked for federation.
-            // The vol_opportunities schema does not yet have a federated_visibility
-            // column â€” check is_federated (if present) or fall back to is_active
-            // as a minimum gate so inactive/draft opportunities are never pushed.
-            // TODO: add `is_federated` tinyint column to vol_opportunities to allow
-            //       per-opportunity opt-in (mirrors listings.federated_visibility).
-            if (empty($opportunity->is_federated) && empty($opportunity->federated_visibility)) {
-                // Fall back: only push active, open opportunities
-                $isActive = !empty($opportunity->is_active);
-                $isOpen   = ($opportunity->status ?? 'open') === 'open';
-                if (!$isActive || !$isOpen) {
-                    return;
-                }
+            // (a) Only LOCAL rows may be exported. `is_federated` / `external_id`
+            // mark rows IMPORTED from a partner (set by
+            // IngestFederatedVolunteerOpportunity) — re-exporting them would
+            // echo partner content back into the federation network.
+            if (!empty($opportunity->is_federated) || !empty($opportunity->external_id)) {
+                return;
+            }
+
+            // (b) Per-opportunity opt-in: only push when the owner explicitly
+            // chose to share (mirrors listings.federated_visibility).
+            if (($opportunity->federated_visibility ?? 'none') !== 'listed') {
+                return;
+            }
+
+            // (c) Never push inactive or closed opportunities. The service
+            // writes status 'active' on create and treats both 'open' and
+            // 'active' as publicly visible (see VolunteerService).
+            $isActive = !empty($opportunity->is_active);
+            $isOpen   = in_array((string) ($opportunity->status ?? 'open'), ['open', 'active'], true);
+            if (!$isActive || !$isOpen) {
+                return;
             }
 
             $partners = FederationExternalPartnerService::getActivePartnersWithFlag($tenantId, 'allow_volunteering');

@@ -189,6 +189,10 @@ class VolunteerService
             'is_active'       => true,
         ];
 
+        if (Schema::hasColumn('vol_opportunities', 'federated_visibility')) {
+            $opportunityData['federated_visibility'] = self::sanitizeFederatedVisibility($data['federated_visibility'] ?? null);
+        }
+
         $opportunity = VolOpportunity::unguarded(
             fn () => VolOpportunity::create($opportunityData)
         );
@@ -735,6 +739,12 @@ class VolunteerService
                     $fields[] = "{$field} = ?";
                     $params[] = $field === 'is_remote' ? (!empty($data[$field]) ? 1 : 0) : $data[$field];
                 }
+            }
+
+            if (array_key_exists('federated_visibility', $data)
+                && Schema::hasColumn('vol_opportunities', 'federated_visibility')) {
+                $fields[] = 'federated_visibility = ?';
+                $params[] = self::sanitizeFederatedVisibility($data['federated_visibility']);
             }
 
             if (empty($fields)) {
@@ -2268,6 +2278,21 @@ class VolunteerService
     /**
      * Format opportunity for API response.
      */
+    /**
+     * Normalise a requested federated_visibility value. Only 'none'|'listed'
+     * are valid (MariaDB strict=false silently corrupts invalid enum writes
+     * to ''), and tenants without the federation feature are always forced
+     * to 'none'.
+     */
+    private static function sanitizeFederatedVisibility(mixed $value): string
+    {
+        if (! TenantContext::hasFeature('federation')) {
+            return 'none';
+        }
+
+        return in_array($value, ['none', 'listed'], true) ? $value : 'none';
+    }
+
     private static function formatOpportunity(array $opp): array
     {
         return [
@@ -2288,6 +2313,7 @@ class VolunteerService
             ],
             'created_at' => $opp['created_at'],
             'status'     => $opp['status'] ?? null,
+            'federated_visibility' => $opp['federated_visibility'] ?? 'none',
         ];
     }
 

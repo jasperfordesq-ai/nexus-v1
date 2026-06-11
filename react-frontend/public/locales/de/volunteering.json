@@ -840,5 +840,9 @@
   "my_organisations_none": "Noch keine Organisationen",
   "my_organisations_none_desc": "Registrieren Sie eine Freiwilligenorganisation, um Einsätze zu veröffentlichen, Freiwillige zu verwalten und Zeitguthaben zu vergeben.",
   "my_organisations_pending": "Genehmigung ausstehend",
-  "my_organisations_pending_desc": "Wartet auf Admin-Genehmigung"
+  "my_organisations_pending_desc": "Wartet auf Admin-Genehmigung",
+  "federation_share_label": "Mit Partnergemeinschaften teilen",
+  "federation_share_description": "Machen Sie diesen Einsatz für Partnergemeinschaften in Ihrem Föderationsnetzwerk sichtbar.",
+  "federation_share_updated": "Freigabeeinstellung aktualisiert.",
+  "federation_share_update_failed": "Die Freigabeeinstellung konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut."
 }

@@ -1,4 +1,4 @@
-import { Autocomplete, AutocompleteItem, GlassCard, Button, Input, Textarea } from '@/components/ui';
+import { Autocomplete, AutocompleteItem, GlassCard, Button, Input, Switch, Textarea } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -23,6 +23,7 @@ import Heart from 'lucide-react/icons/heart';
 import Building2 from 'lucide-react/icons/building-2';
 import Briefcase from 'lucide-react/icons/briefcase';
 import Wrench from 'lucide-react/icons/wrench';
+import Globe from 'lucide-react/icons/globe';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { PlaceAutocompleteInput } from '@/components/location';
 import { Breadcrumbs } from '@/components/navigation';
@@ -64,10 +65,11 @@ export default function CreateOpportunityPage() {
   const { t } = useTranslation('volunteering');
   usePageTitle(t('create_opportunity_title'));
   const navigate = useNavigate();
-  const { tenantPath } = useTenant();
+  const { tenantPath, hasFeature } = useTenant();
   const toast = useToast();
 
   const [formData, setFormData] = useState<FormData>(initialFormData);
+  const [shareFederated, setShareFederated] = useState(false);
   const [approvedOrgs, setApprovedOrgs] = useState<MyOrganisation[]>([]);
   const [isLoadingOrgs, setIsLoadingOrgs] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -151,6 +153,10 @@ export default function CreateOpportunityPage() {
       }
       if (formData.end_date) {
         payload.end_date = formData.end_date.toString();
+      }
+
+      if (hasFeature('federation')) {
+        payload.federated_visibility = shareFederated ? 'listed' : 'none';
       }
 
       const response = await api.post('/v2/volunteering/opportunities', payload);
@@ -364,6 +370,33 @@ export default function CreateOpportunityPage() {
               />
             </div>
           </fieldset>
+
+          {/* Federation sharing opt-in — only when the tenant has federation */}
+          {hasFeature('federation') && (
+            <div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-theme-elevated border border-theme-default">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-indigo-500/20">
+                  <Globe className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+                </div>
+                <div>
+                  <p className="font-medium text-theme-primary">
+                    {t('federation_share_label')}
+                  </p>
+                  <p className="text-sm text-theme-subtle">
+                    {t('federation_share_description')}
+                  </p>
+                </div>
+              </div>
+              <Switch
+                aria-label={t('federation_share_label')}
+                isSelected={shareFederated}
+                onValueChange={setShareFederated}
+                classNames={{
+                  wrapper: 'group-data-[selected=true]:bg-indigo-500',
+                }}
+              />
+            </div>
+          )}
 
           {/* Submit buttons */}
           <div className="flex flex-col gap-3 pt-4 sm:flex-row">

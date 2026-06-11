@@ -840,5 +840,9 @@
   "my_organisations_none": "まだ組織がありません",
   "my_organisations_none_desc": "ボランティア組織を登録して、機会の投稿、ボランティアの管理、時間単位の付与を開始します。",
   "my_organisations_pending": "承認待ち",
-  "my_organisations_pending_desc": "管理者の承認を待っています"
+  "my_organisations_pending_desc": "管理者の承認を待っています",
+  "federation_share_label": "パートナーコミュニティと共有",
+  "federation_share_description": "この機会をフェデレーションネットワーク内のパートナーコミュニティに公開します。",
+  "federation_share_updated": "共有設定を更新しました。",
+  "federation_share_update_failed": "共有設定の更新に失敗しました。もう一度お試しください。"
 }

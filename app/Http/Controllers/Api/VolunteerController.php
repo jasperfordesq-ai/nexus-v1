@@ -147,6 +147,7 @@ class VolunteerController extends BaseApiController
         }
         if ($this->input('is_remote') !== null) $data['is_remote'] = $this->inputBool('is_remote');
         if ($this->input('category_id') !== null) $data['category_id'] = $this->inputInt('category_id') ?: null;
+        if ($this->input('federated_visibility') !== null) $data['federated_visibility'] = $this->input('federated_visibility');
 
         $success = $this->volunteerService->updateOpportunity((int) $id, $userId, $data);
         if (!$success) {

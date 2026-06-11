@@ -29,6 +29,8 @@ class CreateOpportunityRequest extends FormRequest
             'end_date' => ['nullable', 'date', 'after:start_date'],
             'category_id' => ['nullable', 'integer', 'exists:categories,id'],
             'organization_id' => ['required', 'integer'],
+            // Strict enum — MariaDB strict=false silently corrupts invalid enum writes to ''.
+            'federated_visibility' => ['sometimes', 'nullable', 'in:none,listed'],
         ];
     }
 }

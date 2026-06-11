@@ -840,5 +840,9 @@
   "my_organisations_none": "Nog geen organisaties",
   "my_organisations_none_desc": "Registreer een vrijwilligersorganisatie om vacatures te plaatsen, vrijwilligers te beheren en tijdskredieten toe te kennen.",
   "my_organisations_pending": "In afwachting van goedkeuring",
-  "my_organisations_pending_desc": "In afwachting van goedkeuring door de beheerder"
+  "my_organisations_pending_desc": "In afwachting van goedkeuring door de beheerder",
+  "federation_share_label": "Delen met partnergemeenschappen",
+  "federation_share_description": "Maak deze kans zichtbaar voor partnergemeenschappen in je federatienetwerk.",
+  "federation_share_updated": "Deelvoorkeur bijgewerkt.",
+  "federation_share_update_failed": "Kan de deelvoorkeur niet bijwerken. Probeer het opnieuw."
 }

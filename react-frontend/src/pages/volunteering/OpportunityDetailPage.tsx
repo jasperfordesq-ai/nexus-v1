@@ -1,4 +1,4 @@
-import { Card, GlassCard, useDisclosure, Button, Chip, Spinner, SearchField, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Checkbox, ToggleButton, ToggleButtonGroup } from '@/components/ui';
+import { Card, GlassCard, useDisclosure, Button, Chip, Spinner, SearchField, Switch, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Checkbox, ToggleButton, ToggleButtonGroup } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -33,6 +33,7 @@ import ClipboardList from 'lucide-react/icons/clipboard-list';
 import MessageSquare from 'lucide-react/icons/message-square';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import QrCode from 'lucide-react/icons/qr-code';
+import Globe from 'lucide-react/icons/globe';
 import { Helmet } from 'react-helmet-async';
 import { PageMeta } from '@/components/seo';
 import { LoadingScreen } from '@/components/feedback';
@@ -84,6 +85,7 @@ interface OpportunityDetail {
   is_liked?: boolean;
   likes_count?: number;
   comments_count?: number;
+  federated_visibility?: 'none' | 'listed';
 }
 
 interface OppApplicationItem {
@@ -617,7 +619,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
 export function OpportunityDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { isAuthenticated, user } = useAuth();
-  const { tenantPath } = useTenant();
+  const { tenantPath, hasFeature } = useTenant();
   const toast = useToast();
   const { t } = useTranslation('volunteering');
 
@@ -626,6 +628,7 @@ export function OpportunityDetailPage() {
   const [opportunity, setOpportunity] = useState<OpportunityDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isUpdatingShare, setIsUpdatingShare] = useState(false);
 
   // Apply modal
   const applyModal = useDisclosure();
@@ -693,6 +696,28 @@ export function OpportunityDetailPage() {
       toast.error(t('something_wrong'));
     } finally {
       setIsApplying(false);
+    }
+  }
+
+  async function handleFederatedShareChange(share: boolean) {
+    if (!id) return;
+    const visibility = share ? 'listed' : 'none';
+    try {
+      setIsUpdatingShare(true);
+      const response = await api.put(`/v2/volunteering/opportunities/${id}`, {
+        federated_visibility: visibility,
+      });
+      if (response.success) {
+        setOpportunity((prev) => (prev ? { ...prev, federated_visibility: visibility } : prev));
+        toast.success(t('federation_share_updated'));
+      } else {
+        toast.error(t('federation_share_update_failed'));
+      }
+    } catch (err) {
+      logError('Failed to update federated visibility', err);
+      toast.error(t('federation_share_update_failed'));
+    } finally {
+      setIsUpdatingShare(false);
     }
   }
 
@@ -873,6 +898,34 @@ export function OpportunityDetailPage() {
                   {t('opportunity.application_status', { status: opp.application.status })} &middot; {t('opportunity.applied_on', { date: formatDate(opp.application.created_at) })}
                 </p>
               </div>
+            </div>
+          )}
+
+          {/* Federation sharing — owner only, when the tenant has federation */}
+          {opp.is_owner && hasFeature('federation') && (
+            <div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-theme-elevated border border-theme-default">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-indigo-500/20">
+                  <Globe className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+                </div>
+                <div>
+                  <p className="font-medium text-theme-primary">
+                    {t('federation_share_label')}
+                  </p>
+                  <p className="text-sm text-theme-subtle">
+                    {t('federation_share_description')}
+                  </p>
+                </div>
+              </div>
+              <Switch
+                aria-label={t('federation_share_label')}
+                isSelected={opp.federated_visibility === 'listed'}
+                isDisabled={isUpdatingShare}
+                onValueChange={handleFederatedShareChange}
+                classNames={{
+                  wrapper: 'group-data-[selected=true]:bg-indigo-500',
+                }}
+              />
             </div>
           )}
 

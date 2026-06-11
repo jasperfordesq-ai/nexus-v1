@@ -840,5 +840,9 @@
   "my_organisations_none": "No Organisations Yet",
   "my_organisations_none_desc": "Register a volunteer organisation to start posting opportunities, managing volunteers, and awarding time credits.",
   "my_organisations_pending": "Pending Approval",
-  "my_organisations_pending_desc": "Awaiting admin approval"
+  "my_organisations_pending_desc": "Awaiting admin approval",
+  "federation_share_label": "Share with partner communities",
+  "federation_share_description": "Make this opportunity visible to partner communities in your federation network.",
+  "federation_share_updated": "Sharing preference updated.",
+  "federation_share_update_failed": "Failed to update sharing preference. Please try again."
 }

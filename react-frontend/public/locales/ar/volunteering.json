@@ -840,5 +840,9 @@
   "my_organisations_none": "لا توجد منظمات حتى الآن",
   "my_organisations_none_desc": "قم بتسجيل منظمة تطوعية لبدء نشر الفرص وإدارة المتطوعين ومنح الاعتمادات الزمنية.",
   "my_organisations_pending": "في انتظار الموافقة",
-  "my_organisations_pending_desc": "في انتظار موافقة المشرف"
+  "my_organisations_pending_desc": "في انتظار موافقة المشرف",
+  "federation_share_label": "المشاركة مع المجتمعات الشريكة",
+  "federation_share_description": "اجعل هذه الفرصة مرئية للمجتمعات الشريكة في شبكة الاتحاد الخاصة بك.",
+  "federation_share_updated": "تم تحديث تفضيل المشاركة.",
+  "federation_share_update_failed": "فشل تحديث تفضيل المشاركة. يرجى المحاولة مرة أخرى."
 }

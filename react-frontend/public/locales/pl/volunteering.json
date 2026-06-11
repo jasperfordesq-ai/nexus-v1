@@ -840,5 +840,9 @@
   "my_organisations_none": "Nie ma jeszcze organizacji",
   "my_organisations_none_desc": "Zarejestruj organizację wolontariacką, aby rozpocząć publikowanie ofert pracy, zarządzanie wolontariuszami i przyznawanie punktów czasowych.",
   "my_organisations_pending": "Oczekujące na zatwierdzenie",
-  "my_organisations_pending_desc": "Oczekiwanie na zgodę administratora"
+  "my_organisations_pending_desc": "Oczekiwanie na zgodę administratora",
+  "federation_share_label": "Udostępnij społecznościom partnerskim",
+  "federation_share_description": "Spraw, aby ta okazja była widoczna dla społeczności partnerskich w Twojej sieci federacji.",
+  "federation_share_updated": "Zaktualizowano preferencję udostępniania.",
+  "federation_share_update_failed": "Nie udało się zaktualizować preferencji udostępniania. Spróbuj ponownie."
 }

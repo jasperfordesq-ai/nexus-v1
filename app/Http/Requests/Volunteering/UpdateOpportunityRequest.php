@@ -29,6 +29,8 @@ class UpdateOpportunityRequest extends FormRequest
             'start_date' => ['sometimes', 'nullable', 'date'],
             'end_date' => ['sometimes', 'nullable', 'date', 'after_or_equal:start_date'],
             'category_id' => ['sometimes', 'nullable', 'integer', 'exists:categories,id'],
+            // Strict enum — MariaDB strict=false silently corrupts invalid enum writes to ''.
+            'federated_visibility' => ['sometimes', 'nullable', 'in:none,listed'],
         ];
     }
 }
