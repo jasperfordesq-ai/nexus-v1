@@ -514,17 +514,41 @@ class VolunteerExpenseService
             return false;
         }
 
-        $affected = VolExpensePolicy::where('id', $policyId)
-            ->where('tenant_id', $tenantId)
-            ->update([
-                'max_amount' => $data['max_amount'] ?? null,
-                'max_monthly' => $data['max_monthly'] ?? null,
-                'requires_receipt_above' => $data['requires_receipt_above'] ?? 0,
-                'requires_approval' => ($data['requires_approval'] ?? true) ? 1 : 0,
-                'updated_at' => now(),
-            ]);
+        // Partial update: only touch fields the caller sent — the old
+        // behaviour nulled/reset every omitted column.
+        $updates = [];
+        foreach (['max_amount', 'max_monthly'] as $field) {
+            if (array_key_exists($field, $data)) {
+                $updates[$field] = $data[$field] !== null ? (float) $data[$field] : null;
+            }
+        }
+        if (array_key_exists('requires_receipt_above', $data)) {
+            $updates['requires_receipt_above'] = $data['requires_receipt_above'] !== null
+                ? (float) $data['requires_receipt_above']
+                : 0;
+        }
+        if (array_key_exists('requires_approval', $data)) {
+            $updates['requires_approval'] = !empty($data['requires_approval']) ? 1 : 0;
+        }
 
-        return $affected > 0;
+        if (empty($updates)) {
+            return false;
+        }
+
+        $exists = VolExpensePolicy::where('id', $policyId)
+            ->where('tenant_id', $tenantId)
+            ->exists();
+        if (!$exists) {
+            return false;
+        }
+
+        $updates['updated_at'] = now();
+        VolExpensePolicy::where('id', $policyId)
+            ->where('tenant_id', $tenantId)
+            ->update($updates);
+
+        // update() returns 0 when values are unchanged — that is still success.
+        return true;
     }
 
     /**

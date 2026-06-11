@@ -238,6 +238,11 @@ class VolunteerExpenseController extends BaseApiController
         }
 
         $result = $this->volunteerExpenseService->updatePolicy((int)($data['id'] ?? 0), $data, TenantContext::getId());
-        return $this->respondWithData(['success' => $result]);
+        if (!$result) {
+            // A 200 with {success:false} reads as success to the admin UI's
+            // envelope check — failures must be real error responses.
+            return $this->respondWithError('NOT_FOUND', __('api.vol_expense_policy_not_found'), null, 404);
+        }
+        return $this->respondWithData(['success' => true]);
     }
 }
