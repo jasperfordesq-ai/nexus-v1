@@ -117,6 +117,9 @@ jobs:
           SESSION_DRIVER: array
           QUEUE_CONNECTION: sync
           LOG_CHANNEL: null
+          # PUSHER_* are unset in CI; booting artisan with the default 'pusher'
+          # connection throws in Pusher::__construct (same fix as phpunit.xml).
+          BROADCAST_CONNECTION: 'null'
 
       - name: PHP Syntax Check
         run: |
