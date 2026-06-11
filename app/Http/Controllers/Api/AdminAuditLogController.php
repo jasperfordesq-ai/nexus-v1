@@ -58,7 +58,9 @@ class AdminAuditLogController extends BaseApiController
     private function streamActivityLog(int $tenantId, array $filters): void
     {
         $handle = fopen('php://output', 'w');
-        fputcsv($handle, ['ID', 'User ID', 'User', 'Action', 'Action Type', 'Entity Type', 'Entity ID', 'Details', 'IP Address', 'Date']);
+        // BOM so Excel reads UTF-8 names/details correctly.
+        fwrite($handle, "\xEF\xBB\xBF");
+        $this->putRow($handle, ['ID', 'User ID', 'User', 'Action', 'Action Type', 'Entity Type', 'Entity ID', 'Details', 'IP Address', 'Date']);
 
         [$where, $params] = $this->buildWhere('al', $tenantId, $filters);
 
@@ -76,7 +78,7 @@ class AdminAuditLogController extends BaseApiController
             );
 
             foreach ($rows as $row) {
-                fputcsv($handle, [
+                $this->putRow($handle, [
                     $row->id,
                     $row->user_id ?? '',
                     trim($row->user_name ?? ''),
@@ -91,7 +93,7 @@ class AdminAuditLogController extends BaseApiController
             }
         } catch (\Throwable $e) {
             Log::warning('[AdminAuditLog] activity export failed: ' . $e->getMessage(), ['tenant_id' => $tenantId]);
-            fputcsv($handle, [__('api.audit_export_failed'), '', '', '', '', '', '', '', '', '']);
+            $this->putRow($handle, [__('api.audit_export_failed'), '', '', '', '', '', '', '', '', '']);
         }
 
         fclose($handle);
@@ -101,7 +103,9 @@ class AdminAuditLogController extends BaseApiController
     private function streamOrgAuditLog(int $tenantId, array $filters): void
     {
         $handle = fopen('php://output', 'w');
-        fputcsv($handle, ['ID', 'Organization ID', 'Actor User ID', 'Actor', 'Target User ID', 'Action', 'Details', 'IP Address', 'User Agent', 'Date']);
+        // BOM so Excel reads UTF-8 names/details correctly.
+        fwrite($handle, "\xEF\xBB\xBF");
+        $this->putRow($handle, ['ID', 'Organization ID', 'Actor User ID', 'Actor', 'Target User ID', 'Action', 'Details', 'IP Address', 'User Agent', 'Date']);
 
         [$where, $params] = $this->buildWhere('oal', $tenantId, $filters);
 
@@ -119,7 +123,7 @@ class AdminAuditLogController extends BaseApiController
             );
 
             foreach ($rows as $row) {
-                fputcsv($handle, [
+                $this->putRow($handle, [
                     $row->id,
                     $row->organization_id ?? '',
                     $row->user_id ?? '',
@@ -134,7 +138,7 @@ class AdminAuditLogController extends BaseApiController
             }
         } catch (\Throwable $e) {
             Log::warning('[AdminAuditLog] admin export failed: ' . $e->getMessage(), ['tenant_id' => $tenantId]);
-            fputcsv($handle, [__('api.audit_export_failed'), '', '', '', '', '', '', '', '', '']);
+            $this->putRow($handle, [__('api.audit_export_failed'), '', '', '', '', '', '', '', '', '']);
         }
 
         fclose($handle);
@@ -172,5 +176,25 @@ class AdminAuditLogController extends BaseApiController
         }
 
         return [$where, $params];
+    }
+
+    /**
+     * Write one CSV row with every cell sanitised against spreadsheet
+     * formula injection. Audit rows carry attacker-influenced data — most
+     * dangerously the raw User-Agent header in org_audit_log — and an
+     * administrator opens this file in Excel, so a leading =/+/-/@/tab/CR
+     * could execute. Prefix those with a single quote to neutralise them.
+     *
+     * @param resource $handle
+     * @param array<int, mixed> $row
+     */
+    private function putRow($handle, array $row): void
+    {
+        fputcsv($handle, array_map(static function ($value) {
+            if (is_string($value) && $value !== '' && preg_match('/^[=+\-@\t\r]/', $value)) {
+                return "'" . $value;
+            }
+            return $value;
+        }, $row));
     }
 }

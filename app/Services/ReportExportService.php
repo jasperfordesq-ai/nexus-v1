@@ -130,7 +130,15 @@ class ReportExportService
 
             foreach ($rows as $row) {
                 $cells = array_map(
-                    static fn ($value) => is_scalar($value) || $value === null ? $value : (string) json_encode($value),
+                    function ($value) {
+                        $scalar = is_scalar($value) || $value === null ? $value : (string) json_encode($value);
+                        // OpenSpout turns any string beginning with '=' into a
+                        // live formula cell; neutralise it (and the other
+                        // spreadsheet formula triggers) the same way the CSV
+                        // path does, since report rows carry user-controlled
+                        // names/titles/descriptions.
+                        return $this->sanitizeCsvCell($scalar);
+                    },
                     array_values($row)
                 );
                 $writer->addRow(\OpenSpout\Common\Entity\Row::fromValues($cells));

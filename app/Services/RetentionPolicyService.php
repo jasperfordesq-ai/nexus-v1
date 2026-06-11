@@ -60,10 +60,10 @@ class RetentionPolicyService
             'table' => 'email_log',
             'column' => 'created_at',
         ],
-        'login_attempts' => [
-            'table' => 'login_attempts',
-            'column' => 'attempted_at',
-        ],
+        // NOTE: login_attempts is deliberately NOT here. It is global
+        // rate-limiting data with no tenant_id column, so a per-tenant
+        // retention policy cannot scope it correctly; every registered
+        // type MUST be a tenant-scoped table (see enforcePolicy guard).
     ];
 
     /**
@@ -171,6 +171,23 @@ class RetentionPolicyService
         $affected = 0;
         $status = 'completed';
         $error = null;
+
+        // Fail safe rather than fail nightly: a registered type whose table
+        // lacks tenant_id or the timestamp column could never be scoped
+        // correctly. Skip it (status 'skipped', no DELETE) instead of
+        // throwing an unscoped query every run.
+        if (
+            !\Schema::hasColumn($config['table'], 'tenant_id')
+            || !\Schema::hasColumn($config['table'], $config['column'])
+        ) {
+            Log::warning('[Retention] skipped — table missing tenant_id/timestamp column', [
+                'tenant_id' => $tenantId,
+                'data_type' => $dataType,
+                'table' => $config['table'],
+            ]);
+            self::recordRun($tenantId, $dataType, $action, $retentionDays, 0, 'skipped', 'missing_column');
+            return ['affected' => 0, 'status' => 'skipped'];
+        }
 
         try {
             for ($batch = 0; $batch < self::MAX_BATCHES_PER_RUN; $batch++) {

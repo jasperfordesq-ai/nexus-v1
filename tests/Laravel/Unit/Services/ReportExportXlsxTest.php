@@ -94,4 +94,24 @@ class ReportExportXlsxTest extends TestCase
 
         $this->assertStringContainsString('value', $sheet . $sharedStrings);
     }
+
+    public function test_formula_injection_is_neutralised(): void
+    {
+        // A member named "=cmd|..." must NOT become a live formula cell.
+        $xlsx = $this->arrayToXlsx(
+            ['Name'],
+            [['=1+2'], ['=HYPERLINK("http://evil","x")']],
+            'Members'
+        );
+
+        $sheet = $this->zipEntry($xlsx, 'xl/worksheets/sheet1.xml') ?? '';
+        $sharedStrings = $this->zipEntry($xlsx, 'xl/sharedStrings.xml') ?? '';
+        $haystack = $sheet . $sharedStrings;
+
+        // No formula cell element should be emitted.
+        $this->assertStringNotContainsString('<f>', $sheet);
+        // The neutralising single-quote prefix is present on the stored
+        // value (the quote is XML-encoded as &#039; in the cell text).
+        $this->assertMatchesRegularExpression('/(&#0?39;|\')=1\+2/', $haystack);
+    }
 }
