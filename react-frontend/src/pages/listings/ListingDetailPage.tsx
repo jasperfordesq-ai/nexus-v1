@@ -128,7 +128,7 @@ function buildListingStructuredData(listing: Listing, options: ListingStructured
 }
 
 export function ListingDetailPage() {
-  const { t } = useTranslation('listings');
+  const { t, i18n } = useTranslation('listings');
   usePageTitle(t('title'));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -559,7 +559,7 @@ export function ListingDetailPage() {
             <div className="min-w-0">
               <div className="text-xs text-theme-subtle">{t('detail_posted')}</div>
               <div className="truncate text-sm font-medium text-theme-primary sm:text-base">
-                {new Date(listing.created_at).toLocaleDateString()}
+                {new Date(listing.created_at).toLocaleDateString(i18n.language)}
               </div>
             </div>
           </div>
@@ -1102,8 +1102,8 @@ export function ListingDetailPage() {
             <Calendar className="w-4 h-4 text-theme-muted" aria-hidden="true" />
             <span className="text-theme-muted">
               {listing.status === 'expired'
-                ? t('detail_expired_on', { date: new Date(listing.expires_at).toLocaleDateString() })
-                : t('detail_expires_on', { date: new Date(listing.expires_at).toLocaleDateString() })}
+                ? t('detail_expired_on', { date: new Date(listing.expires_at).toLocaleDateString(i18n.language) })
+                : t('detail_expires_on', { date: new Date(listing.expires_at).toLocaleDateString(i18n.language) })}
             </span>
             {listing.renewal_count !== undefined && listing.renewal_count > 0 && (
               <span className="text-xs text-theme-subtle">
