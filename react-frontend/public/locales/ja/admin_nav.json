@@ -268,5 +268,11 @@
   "zone_platform": "プラットフォーム",
   "zone_diagnostics": "診断",
   "admin_meta_description": "このコミュニティを管理するためのプライベート管理ツール。",
-  "retention_policies": "データ保持"
+  "retention_policies": "データ保持",
+  "group_organization": "タグとコレクション",
+  "residency_verifications": "居住確認",
+  "help_faqs": "ヘルプFAQ",
+  "search_analytics": "検索アナリティクス",
+  "donation_refunds": "寄付の返金",
+  "sso_providers": "Single Sign-On"
 }

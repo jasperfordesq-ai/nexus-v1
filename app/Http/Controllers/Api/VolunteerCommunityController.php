@@ -704,6 +704,31 @@ class VolunteerCommunityController extends BaseApiController
         }
     }
 
+    /**
+     * Admin JSON list of donations (powers the Donation Refunds admin page).
+     *
+     * Same row shape as the export below, but as a proper JSON envelope —
+     * the export endpoint serves a text/csv download and must not be used
+     * as a list API.
+     */
+    public function listDonations(): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->requireAdmin();
+
+        $filters = [
+            'opportunity_id' => $this->query('opportunity_id'),
+            'giving_day_id'  => $this->query('giving_day_id'),
+            'status'         => $this->query('status'),
+            'date_from'      => $this->query('date_from'),
+            'date_to'        => $this->query('date_to'),
+        ];
+
+        $rows = $this->volunteerDonationService->exportDonations(TenantContext::getId(), $filters);
+
+        return $this->respondWithData(['items' => $rows]);
+    }
+
     /** Returns raw CSV for donation export */
     public function exportDonations(): Response
     {

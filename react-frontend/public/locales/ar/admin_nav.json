@@ -268,5 +268,11 @@
   "zone_platform": "منصة",
   "zone_diagnostics": "التشخيصات",
   "admin_meta_description": "أدوات الإدارة الخاصة لإدارة هذا المجتمع.",
-  "retention_policies": "الاحتفاظ بالبيانات"
+  "retention_policies": "الاحتفاظ بالبيانات",
+  "group_organization": "الوسوم والتشكيلات",
+  "residency_verifications": "التحقق من الإقامة",
+  "help_faqs": "الأسئلة الشائعة للمساعدة",
+  "search_analytics": "تحليلات البحث",
+  "donation_refunds": "استرداد التبرعات",
+  "sso_providers": "Single Sign-On"
 }

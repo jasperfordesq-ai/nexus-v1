@@ -268,5 +268,11 @@
   "zone_platform": "Platforma",
   "zone_diagnostics": "Diagnostyka",
   "admin_meta_description": "Prywatne narzedzia administracyjne do zarzadzania ta spolecznoscia.",
-  "retention_policies": "Retencja danych"
+  "retention_policies": "Retencja danych",
+  "group_organization": "Tagi i kolekcje",
+  "residency_verifications": "Weryfikacje zamieszkania",
+  "help_faqs": "FAQ pomocy",
+  "search_analytics": "Analityka wyszukiwania",
+  "donation_refunds": "Zwroty darowizn",
+  "sso_providers": "Single Sign-On"
 }

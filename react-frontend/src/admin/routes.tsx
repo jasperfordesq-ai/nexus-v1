@@ -110,6 +110,8 @@ const GroupEdit = lazy(() => import('./modules/groups/GroupEdit'));
 const GroupRecommendations = lazy(() => import('./modules/groups/GroupRecommendations'));
 const GroupRanking = lazy(() => import('./modules/groups/GroupRanking'));
 const GroupGeocode = lazy(() => import('./modules/groups/GroupGeocode'));
+const GroupOrganization = lazy(() => import('./modules/groups/GroupOrganization'));
+const ResidencyVerifications = lazy(() => import('./modules/users/ResidencyVerifications'));
 
 // Enterprise module
 const EnterpriseDashboard = lazy(() => import('./modules/enterprise/EnterpriseDashboard'));
@@ -167,6 +169,7 @@ const VolunteerGivingDays = lazy(() => import('./modules/volunteering/VolunteerG
 const VolunteerConsents = lazy(() => import('./modules/volunteering/VolunteerConsents'));
 const VolunteerProjects = lazy(() => import('./modules/volunteering/VolunteerProjects'));
 const VolunteerConfig = lazy(() => import('./modules/volunteering/VolunteerConfig'));
+const DonationRefunds = lazy(() => import('./modules/volunteering/DonationRefunds'));
 // Caring Community pages moved to /caring/* (CaringApp) — no longer registered here.
 
 // Advertising module
@@ -297,6 +300,7 @@ const NexusScoreAnalytics = lazy(() => import('./modules/diagnostics/NexusScoreA
 
 // Analytics & Reporting
 const CommunityAnalytics = lazy(() => import('./modules/analytics/CommunityAnalytics'));
+const SearchAnalytics = lazy(() => import('./modules/analytics/SearchAnalytics'));
 const ImpactReport = lazy(() => import('./modules/impact/ImpactReport'));
 
 // Admin Reports & Moderation Queue (A1-A5, A7)
@@ -308,6 +312,7 @@ const ModerationQueuePage = lazy(() => import('./modules/reports/ModerationQueue
 
 // Help Centre
 const AdminHelpCenterPage = lazy(() => import('./modules/help/AdminHelpCenterPage'));
+const HelpFaqsAdmin = lazy(() => import('./modules/help/HelpFaqsAdmin'));
 
 // Admin 404
 const AdminNotFound = lazy(() => import('./modules/AdminNotFound'));
@@ -585,6 +590,8 @@ export function AdminRoutes() {
       <Route path="groups/:id/edit" element={<Lazy><GroupEdit /></Lazy>} />
       <Route path="groups/recommendations" element={<Lazy><GroupRecommendations /></Lazy>} />
       <Route path="groups/ranking" element={<Lazy><GroupRanking /></Lazy>} />
+      <Route path="groups/organization" element={<Lazy><GroupOrganization /></Lazy>} />
+      <Route path="residency-verifications" element={<FeatureGatedElement feature="caring_community"><Lazy><ResidencyVerifications /></Lazy></FeatureGatedElement>} />
       <Route path="group-types" element={<Lazy><GroupList /></Lazy>} />
       <Route path="group-ranking" element={<Lazy><GroupList /></Lazy>} />
       <Route path="group-locations" element={<Lazy><GroupGeocode /></Lazy>} />
@@ -599,6 +606,7 @@ export function AdminRoutes() {
       <Route path="volunteering/safeguarding" element={<FeatureGatedElement feature="volunteering"><Lazy><VolunteerSafeguarding /></Lazy></FeatureGatedElement>} />
       <Route path="volunteering/hours" element={<FeatureGatedElement feature="volunteering"><Lazy><VolunteerHoursAudit /></Lazy></FeatureGatedElement>} />
       <Route path="volunteering/giving-days" element={<FeatureGatedElement feature="volunteering"><Lazy><VolunteerGivingDays /></Lazy></FeatureGatedElement>} />
+      <Route path="volunteering/donations" element={<FeatureGatedElement feature="volunteering"><Lazy><DonationRefunds /></Lazy></FeatureGatedElement>} />
       <Route path="volunteering/consents" element={<FeatureGatedElement feature="volunteering"><Lazy><VolunteerConsents /></Lazy></FeatureGatedElement>} />
       <Route path="volunteering/projects" element={<FeatureGatedElement feature="volunteering"><Lazy><VolunteerProjects /></Lazy></FeatureGatedElement>} />
       <Route path="volunteering/config" element={<FeatureGatedElement feature="volunteering"><Lazy><VolunteerConfig /></Lazy></FeatureGatedElement>} />
@@ -738,6 +746,7 @@ export function AdminRoutes() {
 
       {/* ─── ANALYTICS & REPORTING ─── */}
       <Route path="community-analytics" element={<Lazy><CommunityAnalytics /></Lazy>} />
+      <Route path="search-analytics" element={<Lazy><SearchAnalytics /></Lazy>} />
       <Route path="impact-report" element={<Lazy><ImpactReport /></Lazy>} />
       <Route path="reports/social-value" element={<TenantRedirect to="/admin/impact-report" />} />
       <Route path="reports/members" element={<Lazy><MemberReportsPage /></Lazy>} />
@@ -764,6 +773,7 @@ export function AdminRoutes() {
 
       {/* ─── HELP CENTRE ─── */}
       <Route path="help" element={<Lazy><AdminHelpCenterPage /></Lazy>} />
+      <Route path="help/faqs" element={<Lazy><HelpFaqsAdmin /></Lazy>} />
 
       {/* ─── 404 CATCH-ALL ─── */}
       <Route path="*" element={<Lazy><AdminNotFound /></Lazy>} />

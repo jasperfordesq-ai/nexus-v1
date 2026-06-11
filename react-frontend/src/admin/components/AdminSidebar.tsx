@@ -92,6 +92,8 @@ import Languages from 'lucide-react/icons/languages';
 import X from 'lucide-react/icons/x';
 import BellRing from 'lucide-react/icons/bell-ring';
 import Bug from 'lucide-react/icons/bug';
+import HelpCircle from 'lucide-react/icons/help-circle';
+import HandCoins from 'lucide-react/icons/hand-coins';
 import type { LucideIcon } from 'lucide-react';
 
 import { Accordion, AccordionItem, Button, Input, Tooltip } from '@/components/ui';
@@ -226,6 +228,7 @@ function useAdminNav(safeguardingFlagCount: number): NavSection[] {
         { label: t('group_types'), href: '/admin/groups/types', icon: FolderTree },
         { label: t('group_recommendations'), href: '/admin/groups/recommendations', icon: Brain },
         { label: t('group_ranking'), href: '/admin/groups/ranking', icon: Trophy },
+        { label: t('group_organization'), href: '/admin/groups/organization', icon: Tags, keywords: keyword('tags', 'collections', 'auto-assign', 'bundles') },
       ] : []),
       ...(hasFeature('events') ? [{ label: t('events'), href: '/admin/events', icon: Calendar }] : []),
       ...(hasFeature('polls') ? [{ label: t('polls'), href: '/admin/polls', icon: BarChart2 }] : []),
@@ -265,6 +268,7 @@ function useAdminNav(safeguardingFlagCount: number): NavSection[] {
         items: [
           { label: t('all_users'), href: '/admin/users', icon: Users, keywords: keyword('members', 'accounts') },
           { label: t('pending_approvals'), href: '/admin/users?filter=pending', icon: UserCheck, keywords: keyword('approval', 'waiting') },
+          ...(hasFeature('caring_community') ? [{ label: t('residency_verifications'), href: '/admin/residency-verifications', icon: MapPin, keywords: keyword('residency', 'address', 'municipality', 'verification', 'attest') }] : []),
         ],
       },
       {
@@ -315,6 +319,7 @@ function useAdminNav(safeguardingFlagCount: number): NavSection[] {
           ...(isGod ? [{ label: t('menus'), href: '/admin/menus', icon: Menu }] : []),
           { label: t('categories'), href: '/admin/categories', icon: FolderTree },
           { label: t('attributes'), href: '/admin/attributes', icon: Tags },
+          { label: t('help_faqs'), href: '/admin/help/faqs', icon: HelpCircle, keywords: keyword('faq', 'questions', 'help centre', 'answers') },
         ],
       },
       ...(hasFeature('job_vacancies') ? [{
@@ -433,6 +438,7 @@ function useAdminNav(safeguardingFlagCount: number): NavSection[] {
         zone: 'growth',
         items: [
           { label: t('seo_overview'), href: '/admin/seo', icon: Search },
+          { label: t('search_analytics'), href: '/admin/search-analytics', icon: BarChart3, keywords: keyword('queries', 'zero results', 'trending', 'meilisearch') },
           ...(isPlatformSuperAdmin ? [{ label: t('prerender_engine'), href: '/admin/seo/prerender', icon: Zap }] : []),
           { label: t('error_404_tracking'), href: '/admin/404-errors', icon: AlertTriangle, keywords: keyword('not found', 'broken links') },
         ],
@@ -449,6 +455,9 @@ function useAdminNav(safeguardingFlagCount: number): NavSection[] {
             { label: t('community_fund'), href: '/admin/timebanking/community-fund', icon: Wallet },
             { label: t('org_wallets'), href: '/admin/timebanking/org-wallets', icon: Wallet },
             { label: t('starting_balances'), href: '/admin/timebanking/starting-balances', icon: Wallet },
+          ] : []),
+          ...(hasFeature('volunteering') ? [
+            { label: t('donation_refunds'), href: '/admin/volunteering/donations', icon: HandCoins, keywords: keyword('donations', 'refund', 'stripe', 'giving') },
           ] : []),
           ...(isGod ? [
             { label: t('plans_pricing'), href: '/admin/plans', icon: CreditCard },

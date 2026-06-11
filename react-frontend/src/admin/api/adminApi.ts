@@ -63,6 +63,11 @@ import type {
   GroupModerationItem,
   GroupType,
   GroupPolicy,
+  GroupTag,
+  GroupCollection,
+  GroupAutoAssignRule,
+  GroupAutoAssignRuleType,
+  ResidencyVerification,
   GroupMember,
   GroupRecommendation,
   FeaturedGroup,
@@ -855,6 +860,57 @@ export const adminGroups = {
 
   toggleFeatured: (groupId: number) =>
     api.put<{ success: boolean }>(`/v2/admin/groups/${groupId}/toggle-featured`, {}),
+
+  // Tags
+  getTags: (params: { q?: string; limit?: number } = {}) =>
+    api.get<GroupTag[]>(`/v2/admin/group-tags${buildQuery(params)}`),
+
+  createTag: (data: { name: string; color?: string | null }) =>
+    api.post<GroupTag>('/v2/admin/group-tags', data),
+
+  deleteTag: (tagId: number) =>
+    api.delete<{ message: string }>(`/v2/admin/group-tags/${tagId}`),
+
+  // Collections
+  getCollections: () =>
+    api.get<GroupCollection[]>('/v2/admin/group-collections'),
+
+  createCollection: (data: { name: string; description?: string | null; image_url?: string | null; sort_order?: number }) =>
+    api.post<{ id: number }>('/v2/admin/group-collections', data),
+
+  updateCollection: (id: number, data: Partial<{ name: string; description: string | null; image_url: string | null; sort_order: number; is_active: boolean }>) =>
+    api.put<{ message: string }>(`/v2/admin/group-collections/${id}`, data),
+
+  deleteCollection: (id: number) =>
+    api.delete<{ message: string }>(`/v2/admin/group-collections/${id}`),
+
+  setCollectionGroups: (id: number, groupIds: number[]) =>
+    api.put<{ message: string }>(`/v2/admin/group-collections/${id}/groups`, { group_ids: groupIds }),
+
+  // Auto-assign rules
+  getAutoAssignRules: () =>
+    api.get<GroupAutoAssignRule[]>('/v2/admin/group-auto-assign-rules'),
+
+  createAutoAssignRule: (data: { group_id: number; rule_type: GroupAutoAssignRuleType; rule_value: string }) =>
+    api.post<{ id: number }>('/v2/admin/group-auto-assign-rules', data),
+
+  deleteAutoAssignRule: (id: number) =>
+    api.delete<{ message: string }>(`/v2/admin/group-auto-assign-rules/${id}`),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Residency Verification (AG43 — caring_community)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const adminResidency = {
+  list: (status: 'pending' | 'approved' | 'rejected' | 'all' = 'pending') =>
+    api.get<{ items: ResidencyVerification[] }>(`/v2/admin/residency-verifications${buildQuery({ status })}`),
+
+  attest: (id: number, decision: 'approved' | 'rejected', reason?: string) =>
+    api.post<{ status: string; verification: ResidencyVerification }>(
+      `/v2/admin/residency-verifications/${id}/attest`,
+      reason ? { decision, reason } : { decision }
+    ),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -2548,6 +2604,113 @@ export const adminLandingPage = {
 
   update: (config: import('../../types/landing-page').LandingPageConfig | null) =>
     api.put<{ success: boolean }>('/v2/admin/config/landing-page', { config }),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Help FAQs (member help centre content)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface AdminHelpFaq {
+  id: number;
+  category: string;
+  question: string;
+  answer: string;
+  sort_order: number;
+  is_published: boolean;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface AdminHelpFaqPayload {
+  category?: string;
+  question?: string;
+  answer?: string;
+  sort_order?: number;
+  is_published?: boolean;
+}
+
+export const adminHelpFaqs = {
+  list: () =>
+    api.get<AdminHelpFaq[]>('/v2/admin/help/faqs'),
+
+  create: (data: AdminHelpFaqPayload) =>
+    api.post<{ id: number; created: boolean }>('/v2/admin/help/faqs', data),
+
+  update: (id: number, data: AdminHelpFaqPayload) =>
+    api.put<{ id: number; updated: boolean }>(`/v2/admin/help/faqs/${id}`, data),
+
+  delete: (id: number) =>
+    api.delete<{ id: number; deleted: boolean }>(`/v2/admin/help/faqs/${id}`),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Search Analytics
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface SearchAnalyticsSummary {
+  total_searches: number;
+  unique_queries: number;
+  zero_result_rate: number;
+  avg_results: number;
+  searches_by_type: Array<{ type: string | null; count: number }>;
+  daily_volume: Array<{ date: string; count: number }>;
+}
+
+export interface TrendingSearch {
+  query: string;
+  count: number;
+}
+
+export interface ZeroResultSearch {
+  query: string;
+  count: number;
+  last_searched: string;
+}
+
+export const adminSearchAnalytics = {
+  getSummary: (days = 30) =>
+    api.get<SearchAnalyticsSummary>(`/v2/admin/search/analytics?days=${days}`),
+
+  getTrending: (days = 7, limit = 20) =>
+    api.get<TrendingSearch[]>(`/v2/admin/search/trending?days=${days}&limit=${limit}`),
+
+  getZeroResults: (days = 30, limit = 20) =>
+    api.get<ZeroResultSearch[]>(`/v2/admin/search/zero-results?days=${days}&limit=${limit}`),
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Donations (volunteering donations + Stripe refunds)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface AdminDonation {
+  id: number;
+  user_id: number | null;
+  opportunity_id: number | null;
+  giving_day_id: number | null;
+  amount: number | string;
+  currency: string | null;
+  payment_method: string | null;
+  payment_reference: string | null;
+  message: string | null;
+  is_anonymous: boolean | number;
+  status: 'pending' | 'completed' | 'refunded' | 'failed' | string;
+  created_at: string | null;
+}
+
+export const adminDonations = {
+  /**
+   * Lists all donations for the tenant (optionally filtered by created_at
+   * range). The sibling /donations/export endpoint is a text/csv download —
+   * never use it as a list API.
+   */
+  list: (params: { date_from?: string; date_to?: string } = {}) =>
+    api.get<{ items: AdminDonation[] }>(
+      `/v2/admin/volunteering/donations${buildQuery(params)}`
+    ),
+
+  /** Issues a full Stripe refund for a completed donation. */
+  refund: (id: number) =>
+    api.post<{ success: boolean; refund_id: string }>(`/v2/admin/donations/${id}/refund`),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

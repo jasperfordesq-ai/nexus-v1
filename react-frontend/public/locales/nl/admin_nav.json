@@ -268,5 +268,11 @@
   "zone_platform": "Platform",
   "zone_diagnostics": "Diagnostiek",
   "admin_meta_description": "Prive beheertools om deze community te beheren.",
-  "retention_policies": "Gegevensbewaring"
+  "retention_policies": "Gegevensbewaring",
+  "group_organization": "Tags & collecties",
+  "residency_verifications": "Woonplaatsverificaties",
+  "help_faqs": "Help-FAQ’s",
+  "search_analytics": "Zoekanalyse",
+  "donation_refunds": "Donatieterugbetalingen",
+  "sso_providers": "Single Sign-On"
 }

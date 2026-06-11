@@ -268,5 +268,11 @@
   "zone_platform": "Ardán",
   "zone_diagnostics": "Diagnóisic",
   "admin_meta_description": "Uirlisi riarachain phribhideacha chun an pobal seo a bhainistiu.",
-  "retention_policies": "Coinneáil Sonraí"
+  "retention_policies": "Coinneáil Sonraí",
+  "group_organization": "Clibeanna & Bailiúcháin",
+  "residency_verifications": "Fíoruithe Cónaithe",
+  "help_faqs": "Ceisteanna Coitianta Cabhrach",
+  "search_analytics": "Anailísíocht Cuardaigh",
+  "donation_refunds": "Aisíocaíochtaí Síntiús",
+  "sso_providers": "Single Sign-On"
 }

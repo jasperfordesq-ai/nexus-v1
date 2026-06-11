@@ -268,5 +268,11 @@
   "zone_platform": "Plataforma",
   "zone_diagnostics": "Diagnósticos",
   "admin_meta_description": "Ferramentas privadas de administracao para gerir esta comunidade.",
-  "retention_policies": "Retenção de dados"
+  "retention_policies": "Retenção de dados",
+  "group_organization": "Etiquetas e coleções",
+  "residency_verifications": "Verificações de residência",
+  "help_faqs": "FAQs de ajuda",
+  "search_analytics": "Análise de pesquisas",
+  "donation_refunds": "Reembolsos de doações",
+  "sso_providers": "Single Sign-On"
 }
