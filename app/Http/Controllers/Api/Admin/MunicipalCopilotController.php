@@ -18,9 +18,12 @@ use Illuminate\Http\JsonResponse;
  *
  * Endpoints for the draft → AI review → auditable proposal → human-accept
  * flow. Distinct from AG14 announcements (raw publish) and AG61 KI-Agenten
- * (autonomous agent runs). Acceptance here only marks the proposal accepted;
- * the actual announcement publish must still be done via the existing
- * announcement surface (see TODO in accept()).
+ * (autonomous agent runs). Accepting a proposal publishes it in the same
+ * flow: the polished text is broadcast via the existing announcement surface
+ * (EmergencyAlertService::createAndBroadcast, severity "info") and the
+ * proposal is stamped published with the source_announcement_id. Re-accepting
+ * is idempotent and never double-publishes; if the broadcast fails the
+ * proposal stays "accepted" so the admin can retry from the UI.
  *
  * Tenant-scoped via TenantContext::getId(). Feature gate `caring_community`
  * enforced inline as defence in depth on top of the route-level admin
@@ -128,7 +131,7 @@ class MunicipalCopilotController extends BaseApiController
             $editedFields['edited_audience'] = mb_substr(trim($editedAudience), 0, 120);
         }
 
-        $proposal = $this->service->acceptProposal(
+        $proposal = $this->service->acceptAndPublish(
             TenantContext::getId(),
             $proposalId,
             $editedFields !== [] ? $editedFields : null,
@@ -139,16 +142,10 @@ class MunicipalCopilotController extends BaseApiController
             return $this->respondNotFound('Proposal not found.');
         }
 
-        // TODO(AG89): wire acceptance into the existing announcement publish
-        // path. The intended integration point is
-        // App\Http\Controllers\Api\EmergencyAlertController::store — once an
-        // admin accepts, we should POST the polished_text + audience to the
-        // existing emergency-alert / announcement endpoint, then call
-        // $this->service->markPublished(tenantId, proposalId, $newAnnouncementId)
-        // to stamp the audit trail. For this MVP the page surfaces a "Now
-        // publish via the announcements admin" link instead.
-
-        return $this->respondWithData(['proposal' => $proposal]);
+        return $this->respondWithData([
+            'proposal'  => $proposal,
+            'published' => ($proposal['status'] ?? '') === 'published',
+        ]);
     }
 
     /** POST /v2/admin/caring-community/copilot/proposals/{proposalId}/reject */

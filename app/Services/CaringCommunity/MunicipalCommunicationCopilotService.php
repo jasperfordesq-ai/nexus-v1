@@ -30,10 +30,13 @@ use Illuminate\Support\Facades\Schema;
  * parses a strict JSON response. Otherwise, returns a deterministic offline
  * stub so the page remains usable without an OpenAI key configured.
  *
- * NOT a publish path — accepting a proposal only marks it accepted. The
- * controller/coordinator must then publish via the existing announcement
- * surface (e.g. EmergencyAlertController::store) and call markPublished()
- * with the resulting source_announcement_id.
+ * Publish path: accepting a proposal publishes it in the same flow via
+ * acceptAndPublish() — the polished text is broadcast through the existing
+ * announcement surface (EmergencyAlertService::createAndBroadcast, severity
+ * "info") and the proposal is stamped published with the resulting
+ * source_announcement_id. Re-accepting a published proposal is a no-op
+ * (never double-publishes). If the broadcast fails the proposal stays
+ * "accepted" so the admin can retry from the UI.
  */
 class MunicipalCommunicationCopilotService
 {
@@ -130,14 +133,122 @@ class MunicipalCommunicationCopilotService
     }
 
     /**
+     * Accept a proposal and immediately publish it as a tenant announcement.
+     *
+     * This is the one-flow entry point used by the accept endpoint:
+     *  1. Idempotency guard — an already-published proposal is returned
+     *     unchanged (re-accepting never creates a second announcement).
+     *  2. acceptProposal() records the human decision (+ optional edits).
+     *  3. publishAcceptedProposal() broadcasts the polished text via the
+     *     existing announcement surface and stamps the audit trail.
+     *
+     * If the broadcast fails, the proposal is returned in status "accepted"
+     * so the caller can surface a retry affordance.
+     *
+     * @param array<string, mixed>|null $editedFields
+     * @return array<string, mixed>|null
+     */
+    public function acceptAndPublish(
+        int $tenantId,
+        string $proposalId,
+        ?array $editedFields,
+        int $adminUserId,
+    ): ?array {
+        $existing = $this->getProposal($tenantId, $proposalId);
+        if ($existing === null) {
+            return null;
+        }
+
+        if (($existing['status'] ?? '') === 'published') {
+            return $existing; // already live — idempotent no-op
+        }
+
+        $accepted = $this->acceptProposal($tenantId, $proposalId, $editedFields, $adminUserId);
+        if ($accepted === null) {
+            return null;
+        }
+
+        return $this->publishAcceptedProposal($tenantId, $proposalId, $adminUserId) ?? $accepted;
+    }
+
+    /**
+     * Publish an accepted proposal through the existing announcement surface
+     * (EmergencyAlertService::createAndBroadcast — the AG70 banner + push
+     * surface, sent with severity "info") and stamp it published with the
+     * resulting source_announcement_id.
+     *
+     * The announcement goes tenant-wide; the proposal's audience_suggestion
+     * remains recorded on the audit trail (no audience→user resolution exists
+     * on the announcement surface, so we do not invent one here).
+     *
+     * Idempotent: already-published proposals are returned unchanged. Only
+     * proposals in status "accepted" are published — proposed/rejected ones
+     * are returned untouched. On broadcast failure the proposal stays
+     * "accepted" (retryable) and the failure is logged.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function publishAcceptedProposal(int $tenantId, string $proposalId, int $adminUserId): ?array
+    {
+        $proposal = $this->getProposal($tenantId, $proposalId);
+        if ($proposal === null) {
+            return null;
+        }
+
+        if (($proposal['status'] ?? '') === 'published') {
+            return $proposal;
+        }
+
+        if (($proposal['status'] ?? '') !== 'accepted') {
+            return $proposal;
+        }
+
+        $body = trim((string) ($proposal['polished_text'] ?? ''));
+        if ($body === '') {
+            $body = trim((string) ($proposal['draft_text'] ?? ''));
+        }
+        if ($body === '') {
+            Log::warning('AG89 copilot publish skipped: proposal has no text', [
+                'tenant_id'   => $tenantId,
+                'proposal_id' => $proposalId,
+            ]);
+            return $proposal;
+        }
+
+        try {
+            $alert = EmergencyAlertService::createAndBroadcast($tenantId, [
+                'title'    => $this->deriveAnnouncementTitle($body),
+                'body'     => $body,
+                'severity' => 'info',
+            ], $adminUserId);
+        } catch (\Throwable $e) {
+            Log::warning('AG89 copilot publish failed', [
+                'tenant_id'   => $tenantId,
+                'proposal_id' => $proposalId,
+                'msg'         => $e->getMessage(),
+            ]);
+            return $proposal; // stays "accepted" — admin can retry
+        }
+
+        $alertId = (int) ($alert['id'] ?? 0);
+        if ($alertId <= 0) {
+            Log::warning('AG89 copilot publish returned no announcement id', [
+                'tenant_id'   => $tenantId,
+                'proposal_id' => $proposalId,
+            ]);
+            return $proposal;
+        }
+
+        return $this->markPublished($tenantId, $proposalId, $alertId, $adminUserId);
+    }
+
+    /**
      * Mark a proposal accepted. Optional editedFields lets the admin override
      * the polished_text and audience before acceptance — those overrides are
      * recorded directly onto the proposal.
      *
-     * NOTE: this method does NOT publish the announcement. The caller (the
-     * controller) is responsible for invoking the existing announcement
-     * publish path, then calling markPublished() with the resulting
-     * source_announcement_id.
+     * NOTE: this method does NOT publish the announcement. Use
+     * acceptAndPublish() for the full accept → publish flow.
      *
      * @param array<string, mixed>|null $editedFields
      * @return array<string, mixed>|null
@@ -156,6 +267,10 @@ class MunicipalCommunicationCopilotService
 
         $now = now()->toIso8601String();
         $existing = $items[$idx];
+
+        if (($existing['status'] ?? '') === 'published') {
+            return $existing; // never downgrade a published proposal
+        }
 
         if ($editedFields !== null) {
             if (isset($editedFields['edited_polished_text']) && is_string($editedFields['edited_polished_text'])) {
@@ -211,8 +326,12 @@ class MunicipalCommunicationCopilotService
      *
      * @return array<string, mixed>|null
      */
-    public function markPublished(int $tenantId, string $proposalId, int $sourceAnnouncementId): ?array
-    {
+    public function markPublished(
+        int $tenantId,
+        string $proposalId,
+        int $sourceAnnouncementId,
+        ?int $publishedBy = null,
+    ): ?array {
         $items = $this->loadItems($tenantId);
         $idx = $this->findIndex($items, $proposalId);
         if ($idx === null) {
@@ -223,12 +342,47 @@ class MunicipalCommunicationCopilotService
         $existing = $items[$idx];
         $existing['status']                 = 'published';
         $existing['source_announcement_id'] = $sourceAnnouncementId;
+        $existing['published_at']           = $now;
+        if ($publishedBy !== null) {
+            $existing['published_by'] = $publishedBy;
+        }
         $existing['updated_at']             = $now;
 
         $items[$idx] = $existing;
         $this->save($tenantId, $items);
 
         return $existing;
+    }
+
+    /**
+     * Derive a short announcement title from the published body: first
+     * non-empty line, cut at a word boundary within 120 characters.
+     */
+    private function deriveAnnouncementTitle(string $body): string
+    {
+        $firstLine = '';
+        foreach (preg_split('/\r\n|\r|\n/', $body) ?: [] as $line) {
+            $line = trim($line);
+            if ($line !== '') {
+                $firstLine = $line;
+                break;
+            }
+        }
+        if ($firstLine === '') {
+            $firstLine = trim($body);
+        }
+
+        if (mb_strlen($firstLine) <= 120) {
+            return $firstLine;
+        }
+
+        $cut = mb_substr($firstLine, 0, 120);
+        $lastSpace = mb_strrpos($cut, ' ');
+        if ($lastSpace !== false && $lastSpace > 60) {
+            $cut = mb_substr($cut, 0, $lastSpace);
+        }
+
+        return rtrim($cut) . '…';
     }
 
     // ------------------------------------------------------------------

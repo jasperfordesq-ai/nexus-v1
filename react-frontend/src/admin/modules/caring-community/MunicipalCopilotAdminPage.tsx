@@ -55,6 +55,7 @@ interface ListResponse {
 
 interface ProposalResponse {
   proposal: Proposal;
+  published?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -182,7 +183,11 @@ export default function MunicipalCopilotAdminPage() {
         const updated = res.data?.proposal ?? null;
         if (updated) {
           setProposals((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
-          showToast(t('municipal_copilot.toasts.accepted'), 'success');
+          if (updated.status === 'published') {
+            showToast(t('municipal_copilot.toasts.accepted'), 'success');
+          } else {
+            showToast(t('municipal_copilot.toasts.publish_failed'), 'error');
+          }
         }
       } catch {
         showToast(t('municipal_copilot.toasts.accept_failed'), 'error');
@@ -386,8 +391,26 @@ export default function MunicipalCopilotAdminPage() {
                 )}
 
                 {latest.status === 'accepted' && (
-                  <div className="rounded-md border border-warning-200 bg-warning-50 px-3 py-2 text-xs text-warning-700">
-                    {t('municipal_copilot.states.accepted')}
+                  <>
+                    <div className="rounded-md border border-warning-200 bg-warning-50 px-3 py-2 text-xs text-warning-700">
+                      {t('municipal_copilot.states.accepted')}
+                    </div>
+                    <div className="flex justify-end">
+                      <Button
+                        size="sm"
+                        variant="primary"
+                        startContent={<CheckCircle2 size={14} />}
+                        onPress={() => handleAccept(latest)}
+                      >
+                        {t('municipal_copilot.actions.publish')}
+                      </Button>
+                    </div>
+                  </>
+                )}
+
+                {latest.status === 'published' && latest.source_announcement_id != null && (
+                  <div className="rounded-md border border-success-200 bg-success-50 px-3 py-2 text-xs text-success-700">
+                    {t('municipal_copilot.states.published', { id: latest.source_announcement_id })}
                   </div>
                 )}
 
@@ -504,6 +527,15 @@ export default function MunicipalCopilotAdminPage() {
                               {t('municipal_copilot.actions.reject')}
                             </Button>
                           </>
+                        )}
+                        {p.status === 'accepted' && (
+                          <Button
+                            size="sm"
+                            variant="primary"
+                            onPress={() => handleAccept(p)}
+                          >
+                            {t('municipal_copilot.actions.publish')}
+                          </Button>
                         )}
                       </div>
                     </TableCell>
