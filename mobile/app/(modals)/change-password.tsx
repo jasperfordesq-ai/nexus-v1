@@ -27,8 +27,9 @@ import { useAppToast } from '@/components/ui/AppToast';
 import FormActionFooter from '@/components/ui/FormActionFooter';
 import Input from '@/components/ui/Input';
 import OfflineBanner from '@/components/OfflineBanner';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
-export default function ChangePasswordScreen() {
+function ChangePasswordScreenInner() {
   const { t } = useTranslation(['settings', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
@@ -51,7 +52,7 @@ export default function ChangePasswordScreen() {
     }
     if (!newPassword.trim()) {
       errors.newPassword = t('password.validation.newRequired');
-    } else if (newPassword.length < 8) {
+    } else if (newPassword.length < 12) {
       errors.newPassword = t('password.validation.tooShort');
     }
     if (newPassword.trim() && newPassword !== confirmPassword) {
@@ -194,5 +195,13 @@ function PasswordField({
         <Description isInvalid={!!error} hideOnInvalid className="text-xs">{helper}</Description>
       ) : null}
     </View>
+  );
+}
+
+export default function ChangePasswordScreen() {
+  return (
+    <ModalErrorBoundary>
+      <ChangePasswordScreenInner />
+    </ModalErrorBoundary>
   );
 }
