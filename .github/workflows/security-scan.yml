@@ -53,6 +53,10 @@ jobs:
 
       - name: Run Trivy Vulnerability Scanner (SARIF)
         uses: aquasecurity/trivy-action@master
+        # always(): the blocking table step above exits 1 on findings, which
+        # would skip this step and leave the upload below erroring on a
+        # missing file — exactly when the Security tab needs the results most.
+        if: always()
         with:
           scan-type: 'fs'
           scan-ref: '.'
@@ -73,9 +77,11 @@ jobs:
       # Uses .semgrepignore to exclude legacy/dead code paths.
       # Findings are uploaded to GitHub Security tab via SARIF.
       - name: Install Semgrep
+        if: always()
         run: pip install semgrep
 
       - name: SAST Scan with Semgrep
+        if: always()
         run: |
           semgrep ci \
             --config p/php \
@@ -183,6 +189,10 @@ jobs:
 
       - name: Run Trivy Container Scan (SARIF)
         uses: aquasecurity/trivy-action@master
+        # always() + the image-exists guard pattern: the blocking table step
+        # exits 1 on findings; without this the SARIF never generates and the
+        # upload step errors on a missing file.
+        if: always()
         with:
           image-ref: 'nexus-app:scan'
           format: 'sarif'

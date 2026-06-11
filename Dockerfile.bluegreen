@@ -6,7 +6,10 @@ FROM php:8.2.30-apache
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# `apt-get -y upgrade` first: the pinned php base image ships Debian packages
+# that accumulate known CVEs between its releases — the Trivy container gate
+# blocks on fixed-but-not-installed CRITICAL/HIGH findings.
+RUN apt-get update && apt-get -y upgrade && apt-get install -y --no-install-recommends \
     libpng-dev \
     libjpeg-dev \
     libwebp-dev \
