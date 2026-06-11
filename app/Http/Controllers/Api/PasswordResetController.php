@@ -18,6 +18,7 @@ use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\EmailDispatchService;
+use App\Services\PasswordHistoryService;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -211,6 +212,16 @@ class PasswordResetController extends BaseApiController
             );
         }
 
+        // Reject reuse of the current password or any recent historical one
+        if (PasswordHistoryService::isReused((int) $user['id'], (int) $user['tenant_id'], $password, $user['password_hash'] ?? null)) {
+            return $this->respondWithError(
+                ApiErrorCodes::VALIDATION_ERROR,
+                __('api.password_reused'),
+                'password',
+                422
+            );
+        }
+
         // Atomically update password, delete reset tokens, and revoke session tokens
         DB::transaction(function () use ($hashedPassword, $user, $email, $tokenTenantId) {
             // Update by user ID AND tenant_id — defense-in-depth against cross-tenant updates
@@ -218,6 +229,8 @@ class PasswordResetController extends BaseApiController
                 "UPDATE users SET password_hash = ? WHERE id = ? AND tenant_id = ?",
                 [$hashedPassword, $user['id'], $user['tenant_id']]
             );
+
+            PasswordHistoryService::record((int) $user['id'], (int) $user['tenant_id'], $user['password_hash'] ?? null);
 
             // Delete reset tokens for this (email, tenant) pair only.
             if ($tokenTenantId !== null) {

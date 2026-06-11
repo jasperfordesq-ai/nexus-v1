@@ -484,6 +484,7 @@ function useAdminNav(safeguardingFlagCount: number): NavSection[] {
           { label: t('support_reports'), href: '/admin/support-reports', icon: Bug, keywords: keyword('bugs', 'feedback', 'diagnostics', 'sentry') },
           { label: t('translation_config'), href: '/admin/translation-config', icon: Languages },
           { label: t('activity_log'), href: '/admin/activity-log', icon: Activity },
+          { label: t('retention_policies'), href: '/admin/retention', icon: Activity, keywords: keyword('retention', 'gdpr', 'disposal', 'purge', 'archive') },
           { label: t('cron_jobs'), href: '/admin/cron-jobs', icon: Timer },
           { label: t('cron_logs'), href: '/admin/cron-jobs/logs', icon: FileText },
           { label: t('cron_setup'), href: '/admin/cron-jobs/setup', icon: Wrench },

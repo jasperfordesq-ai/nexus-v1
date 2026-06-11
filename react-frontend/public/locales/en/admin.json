@@ -13731,7 +13731,9 @@
       "welcome_credits_issued": "Welcome Credits Issued"
     },
     "partner_logo_link_url": "Partner Logo Link URL",
-    "partner_logo_link_url_description": "Optional website link for the partner logo in the footer."
+    "partner_logo_link_url_description": "Optional website link for the partner logo in the footer.",
+    "label_inactivity_timeout": "Inactivity timeout (minutes)",
+    "desc_inactivity_timeout": "Automatically sign members out after this many minutes without activity. 0 disables the timeout; allowed range is 5–480 minutes. Recommended: 120."
   },
   "timebanking": {
     "col_description": "Description",
@@ -15369,7 +15371,15 @@
     "maps_kill_switch_aria": "Map display kill switch (locked off)",
     "map_provider_aria": "Map provider",
     "geocoding_provider_aria": "Autocomplete provider",
-    "clear_failed": "Failed to clear"
+    "clear_failed": "Failed to clear",
+    "provider_os_maps": "Ordnance Survey (UK)",
+    "os_maps_api_key_label": "Ordnance Survey Maps API key",
+    "os_maps_api_key_hint": "OS Data Hub project key for the OS Maps API. Used when the map provider is Ordnance Survey; UK public-sector tenants are typically covered by the PSGA. Without a key, Ordnance Survey tenants fall back to free OpenStreetMap tiles.",
+    "os_maps_key_cleared": "Ordnance Survey key cleared",
+    "tiles_status_os_maps": "OS Maps API active",
+    "tiles_status_os_maps_unset": "No key — falls back to free OSM",
+    "provider_os_places": "Ordnance Survey Places (UK, UPRN)",
+    "status_os_places": "OS Places (PSGA)"
   },
   "cron_setup": {
     "notice_title": "Important: how cron works on Project NEXUS",
@@ -17303,5 +17313,36 @@
     "never_run": "Never run",
     "no_jobs": "No background jobs configured",
     "loading": "Loading"
+  },
+  "retention": {
+    "page_title": "Data Retention",
+    "page_subtitle": "Configure how long operational data is kept before automatic disposal. Disabled policies retain data indefinitely.",
+    "loading": "Loading retention policies",
+    "refresh": "Refresh",
+    "policies_title": "Retention policies",
+    "policies_intro": "Enable a policy and set its retention window ({{min}}–{{max}} days). Data older than the window is deleted by the nightly enforcement run, and every disposal is logged below.",
+    "load_failed": "Failed to load retention policies",
+    "policy_saved": "Retention policy saved",
+    "save_failed": "Failed to save retention policy",
+    "save": "Save",
+    "days_suffix": "days",
+    "days_aria": "Retention period in days for {{type}}",
+    "enable_aria": "Enable retention policy for {{type}}",
+    "runs_title": "Recent disposal runs",
+    "no_runs": "No disposal runs yet. Runs appear here after the nightly enforcement has processed an enabled policy.",
+    "run_summary": "{{rows}} rows disposed (older than {{days}} days)",
+    "status_completed": "Completed",
+    "status_partial": "Partial",
+    "status_failed": "Failed",
+    "type_activity_log": "Activity log",
+    "type_activity_log_desc": "Member and system activity trail (logins, record changes).",
+    "type_admin_audit_log": "Admin audit log",
+    "type_admin_audit_log_desc": "Administrator and organisation management actions.",
+    "type_notifications": "Notifications",
+    "type_notifications_desc": "In-app bell notifications delivered to members.",
+    "type_email_log": "Email log",
+    "type_email_log_desc": "Outbound email delivery records (encrypted bodies).",
+    "type_login_attempts": "Login attempts",
+    "type_login_attempts_desc": "Successful and failed sign-in attempt records."
   }
 }

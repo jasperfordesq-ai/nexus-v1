@@ -51,6 +51,13 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->withoutOverlapping()
             ->name('safeguarding-clear-expired-monitoring');
 
+        // Tenant data retention disposal (IT-Data-03) — off-peak nightly pass
+        $schedule->command('retention:enforce')
+            ->dailyAt('03:30')
+            ->withoutOverlapping()
+            ->onOneServer()
+            ->name('retention-enforce');
+
         $schedule->command('safeguarding:sla-escalate')
             ->everyFifteenMinutes()
             ->withoutOverlapping()

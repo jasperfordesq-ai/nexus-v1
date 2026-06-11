@@ -9,10 +9,10 @@ namespace App\Services;
 use Illuminate\Support\Facades\DB;
 
 /**
- * ReportExportService — Native Eloquent implementation for CSV/PDF report exports.
+ * ReportExportService — Native Eloquent implementation for CSV/PDF/XLSX report exports.
  *
  * Generates downloadable reports for admin analytics. Each report type queries
- * tenant-scoped data and returns either CSV content or PDF content with metadata.
+ * tenant-scoped data and returns CSV, PDF, or XLSX content with metadata.
  */
 class ReportExportService
 {
@@ -69,6 +69,84 @@ class ReportExportService
             'filename' => $filename,
             'rows'     => count($data['rows']),
         ];
+    }
+
+    /**
+     * Export a report as XLSX (Excel workbook, via OpenSpout).
+     *
+     * @param string $type     Report type key
+     * @param int    $tenantId
+     * @param array  $filters  ['date_from', 'date_to', 'status', 'days']
+     * @return array ['success' => bool, 'xlsx' => string, 'filename' => string, 'message' => ?string]
+     */
+    public function exportXlsx(string $type, int $tenantId, array $filters = []): array
+    {
+        $data = $this->getReportData($type, $tenantId, $filters);
+
+        if (empty($data['rows'])) {
+            return [
+                'success'  => false,
+                'message'  => __('svc_notifications_2.report_export.no_data'),
+                'xlsx'     => '',
+                'filename' => '',
+            ];
+        }
+
+        $xlsx = $this->arrayToXlsx($data['headers'], $data['rows'], self::SUPPORTED_TYPES[$type] ?? $type);
+        $date = now()->format('Y-m-d');
+        $filename = "{$type}_report_{$date}.xlsx";
+
+        return [
+            'success'  => true,
+            'xlsx'     => $xlsx,
+            'filename' => $filename,
+            'rows'     => count($data['rows']),
+        ];
+    }
+
+    /**
+     * Build an XLSX workbook from headers + rows and return its binary content.
+     * OpenSpout streams to a temp file (constant memory even for large reports).
+     *
+     * @param array<int, string> $headers
+     * @param array<int, array<int, mixed>> $rows
+     */
+    private function arrayToXlsx(array $headers, array $rows, string $sheetName): string
+    {
+        $tmpPath = tempnam(sys_get_temp_dir(), 'nexus_xlsx_');
+        if ($tmpPath === false) {
+            throw new \RuntimeException('Unable to create temp file for XLSX export');
+        }
+
+        try {
+            $writer = new \OpenSpout\Writer\XLSX\Writer();
+            $writer->openToFile($tmpPath);
+
+            // Sheet names are capped at 31 chars by the XLSX spec
+            $writer->getCurrentSheet()->setName(mb_substr($sheetName, 0, 31));
+
+            $headerStyle = (new \OpenSpout\Common\Entity\Style\Style())->setFontBold();
+            $writer->addRow(\OpenSpout\Common\Entity\Row::fromValues($headers, $headerStyle));
+
+            foreach ($rows as $row) {
+                $cells = array_map(
+                    static fn ($value) => is_scalar($value) || $value === null ? $value : (string) json_encode($value),
+                    array_values($row)
+                );
+                $writer->addRow(\OpenSpout\Common\Entity\Row::fromValues($cells));
+            }
+
+            $writer->close();
+
+            $content = file_get_contents($tmpPath);
+            if ($content === false) {
+                throw new \RuntimeException('Unable to read generated XLSX export');
+            }
+
+            return $content;
+        } finally {
+            @unlink($tmpPath);
+        }
     }
 
     /**

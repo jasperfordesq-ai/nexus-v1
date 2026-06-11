@@ -51,6 +51,10 @@ Route::get('/v2/platform/stats', [\App\Http\Controllers\Api\TenantBootstrapContr
 Route::get('/v2/config/algorithms', [\App\Http\Controllers\Api\AdminConfigController::class, 'getAlgorithmInfo']);
 Route::get('/v2/config/google-maps', [\App\Http\Controllers\Api\MapsConfigController::class, 'show'])
     ->middleware('throttle:60,1');
+// UPRN-backed UK address lookup (OS Places API proxy; active only when
+// the tenant's geocoding_provider is os_places)
+Route::get('/v2/geo/os-places/search', [\App\Http\Controllers\Api\OsPlacesController::class, 'search'])
+    ->middleware('throttle:60,1');
 
 // ============================================
 
@@ -1183,6 +1187,14 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 Route::post('/v2/admin/users/{id}/verification-badges', [\App\Http\Controllers\Api\MemberVerificationBadgeController::class, 'grantBadge']);
 Route::delete('/v2/admin/users/{id}/verification-badges/{type}', [\App\Http\Controllers\Api\MemberVerificationBadgeController::class, 'revokeBadge']);
 Route::get('/v2/admin/users/{id}/verification-badges', [\App\Http\Controllers\Api\MemberVerificationBadgeController::class, 'getAdminBadgeList']);
+
+// Tenant-wide audit trail export (CSV) — activity_log + org_audit_log
+Route::get('/v2/admin/audit-log/export.csv', [\App\Http\Controllers\Api\AdminAuditLogController::class, 'exportCsv']);
+
+// Data retention policies (IT-Data-03)
+Route::get('/v2/admin/retention/policies', [\App\Http\Controllers\Api\AdminRetentionController::class, 'index']);
+Route::put('/v2/admin/retention/policies/{dataType}', [\App\Http\Controllers\Api\AdminRetentionController::class, 'update']);
+Route::get('/v2/admin/retention/runs', [\App\Http\Controllers\Api\AdminRetentionController::class, 'runs']);
 
 Route::get('/v2/admin/dashboard/stats', [\App\Http\Controllers\Api\AdminDashboardController::class, 'stats']);
 Route::get('/v2/admin/dashboard/trends', [\App\Http\Controllers\Api\AdminDashboardController::class, 'trends']);

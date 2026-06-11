@@ -417,6 +417,7 @@ class TenantBootstrapController extends BaseApiController
         'items_per_page', 'welcome_credits', 'footer_text', 'welcome_message',
         'seo_google_verification', 'seo_bing_verification',
         'map_provider', 'geocoding_provider',
+        'inactivity_timeout_minutes',
     ];
 
     private function buildGeneralSettings(int $tenantId): array

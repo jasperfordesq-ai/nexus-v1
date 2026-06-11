@@ -61,8 +61,8 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
   const [savingLang, setSavingLang] = useState(false);
 
   // Provider state
-  const [mapProvider, setMapProvider] = useState<'google' | 'openstreetmap'>('google');
-  const [geocodingProvider, setGeocodingProvider] = useState<'google' | 'nominatim'>('google');
+  const [mapProvider, setMapProvider] = useState<'google' | 'openstreetmap' | 'ordnance_survey'>('google');
+  const [geocodingProvider, setGeocodingProvider] = useState<'google' | 'nominatim' | 'os_places'>('google');
   const [savingProviders, setSavingProviders] = useState(false);
 
   // API keys
@@ -73,9 +73,13 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
   const [maptilerKeyDisplay, setMaptilerKeyDisplay] = useState('');
   const [maptilerKeyInput, setMaptilerKeyInput] = useState('');
   const [maptilerKeySet, setMaptilerKeySet] = useState(false);
+  const [osMapsKeyDisplay, setOsMapsKeyDisplay] = useState('');
+  const [osMapsKeyInput, setOsMapsKeyInput] = useState('');
+  const [osMapsKeySet, setOsMapsKeySet] = useState(false);
   const [savingKeys, setSavingKeys] = useState(false);
   const [showGoogleKey, setShowGoogleKey] = useState(false);
   const [showMaptilerKey, setShowMaptilerKey] = useState(false);
+  const [showOsMapsKey, setShowOsMapsKey] = useState(false);
 
   useEffect(() => {
     setLangDefault(defaultLanguage);
@@ -89,8 +93,8 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
       const s = settingsRes.data.settings as Record<string, unknown>;
       const mp = s.map_provider;
       const gp = s.geocoding_provider;
-      if (mp === 'google' || mp === 'openstreetmap') setMapProvider(mp);
-      if (gp === 'google' || gp === 'nominatim') setGeocodingProvider(gp);
+      if (mp === 'google' || mp === 'openstreetmap' || mp === 'ordnance_survey') setMapProvider(mp);
+      if (gp === 'google' || gp === 'nominatim' || gp === 'os_places') setGeocodingProvider(gp);
 
       const gk = s.google_maps_api_key;
       setGoogleMapsKeyDisplay(typeof gk === 'string' ? gk : '');
@@ -102,6 +106,10 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
       const mk = s.maptiler_api_key;
       setMaptilerKeyDisplay(typeof mk === 'string' ? mk : '');
       setMaptilerKeySet(s.maptiler_api_key_set === true);
+
+      const ok = s.os_maps_api_key;
+      setOsMapsKeyDisplay(typeof ok === 'string' ? ok : '');
+      setOsMapsKeySet(s.os_maps_api_key_set === true);
     }
     setLoading(false);
   }, []);
@@ -155,11 +163,13 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
     if (googleMapsKeyInput !== '') payload.google_maps_api_key = googleMapsKeyInput.trim();
     payload.google_maps_map_id = googleMapId.trim();
     if (maptilerKeyInput !== '') payload.maptiler_api_key = maptilerKeyInput.trim();
+    if (osMapsKeyInput !== '') payload.os_maps_api_key = osMapsKeyInput.trim();
     const res = await adminSettings.update(payload);
     if (res.success) {
       toast.success(t('tenant_features.api_keys_saved'));
       setGoogleMapsKeyInput('');
       setMaptilerKeyInput('');
+      setOsMapsKeyInput('');
       await loadSettings();
     } else {
       toast.error(res.error || t('tenant_features.api_keys_save_failed'));
@@ -184,6 +194,18 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
     const res = await adminSettings.update({ maptiler_api_key: '' });
     if (res.success) {
       toast.success(t('tenant_features.maptiler_key_cleared'));
+      await loadSettings();
+    } else {
+      toast.error(res.error || t('tenant_features.clear_failed'));
+    }
+    setSavingKeys(false);
+  };
+
+  const handleClearOsMapsKey = async () => {
+    setSavingKeys(true);
+    const res = await adminSettings.update({ os_maps_api_key: '' });
+    if (res.success) {
+      toast.success(t('tenant_features.os_maps_key_cleared'));
       await loadSettings();
     } else {
       toast.error(res.error || t('tenant_features.clear_failed'));
@@ -287,7 +309,9 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                 {t('tenant_features.status_autocomplete')}{': '}
                 {geocodingProvider === 'google'
                   ? t('tenant_features.status_google_places_paid')
-                  : t('tenant_features.status_nominatim_free')}
+                  : geocodingProvider === 'os_places'
+                    ? t('tenant_features.status_os_places')
+                    : t('tenant_features.status_nominatim_free')}
               </span>
             </div>
 
@@ -336,7 +360,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                 selectedKeys={[mapProvider]}
                 onSelectionChange={(keys) => {
                   const val = Array.from(keys)[0] as string;
-                  if (val === 'google' || val === 'openstreetmap') setMapProvider(val);
+                  if (val === 'google' || val === 'openstreetmap' || val === 'ordnance_survey') setMapProvider(val);
                 }}
                 className="max-w-xs"
                 size="sm"
@@ -344,6 +368,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
               >
                 <SelectItem key="google" id="google">{t('tenant_features.provider_google')}</SelectItem>
                 <SelectItem key="openstreetmap" id="openstreetmap">{t('tenant_features.provider_osm')}</SelectItem>
+                <SelectItem key="ordnance_survey" id="ordnance_survey">{t('tenant_features.provider_os_maps')}</SelectItem>
               </Select>
             </div>
 
@@ -359,13 +384,14 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                 selectedKeys={[geocodingProvider]}
                 onSelectionChange={(keys) => {
                   const val = Array.from(keys)[0] as string;
-                  if (val === 'google' || val === 'nominatim') setGeocodingProvider(val);
+                  if (val === 'google' || val === 'nominatim' || val === 'os_places') setGeocodingProvider(val);
                 }}
                 className="max-w-xs"
                 size="sm"
               >
                 <SelectItem key="google" id="google">{t('tenant_features.provider_google_places')}</SelectItem>
                 <SelectItem key="nominatim" id="nominatim">{t('tenant_features.provider_nominatim')}</SelectItem>
+                <SelectItem key="os_places" id="os_places">{t('tenant_features.provider_os_places')}</SelectItem>
               </Select>
             </div>
 
@@ -519,11 +545,63 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
               </div>
             </div>
 
+            <Separator />
+
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-sm font-medium">
+                  {t('tenant_features.os_maps_api_key_label')}
+                </p>
+                <span className={`text-xs px-2 py-0.5 rounded-full ${osMapsKeySet ? 'bg-success/10 text-success' : 'bg-surface-secondary text-muted'}`}>
+                  {osMapsKeySet
+                    ? t('tenant_features.tiles_status_os_maps')
+                    : t('tenant_features.tiles_status_os_maps_unset')}
+                </span>
+              </div>
+              <p className="text-xs text-muted mb-2">
+                {t('tenant_features.os_maps_api_key_hint')}
+              </p>
+              <div className="flex gap-2">
+                <Input
+                  aria-label={t('tenant_features.os_maps_api_key_label')}
+                  placeholder={osMapsKeySet ? osMapsKeyDisplay : '…'}
+                  value={osMapsKeyInput}
+                  onValueChange={setOsMapsKeyInput}
+                  type={showOsMapsKey ? 'text' : 'password'}
+                  size="sm"
+                  autoComplete="off"
+                  isDisabled={savingKeys}
+                  endContent={
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      variant="ghost"
+                      className="text-muted"
+                      aria-label={showOsMapsKey ? t('tenant_features.hide_key') : t('tenant_features.show_key')}
+                      onPress={() => setShowOsMapsKey((v) => !v)}
+                    >
+                      {showOsMapsKey ? <EyeOff size={14} /> : <Eye size={14} />}
+                    </Button>
+                  }
+                />
+                {osMapsKeySet && (
+                  <Button
+                    size="sm"
+                    variant="danger"
+                    isDisabled={savingKeys}
+                    onPress={handleClearOsMapsKey}
+                  >
+                    {t('tenant_features.clear')}
+                  </Button>
+                )}
+              </div>
+            </div>
+
             <div className="flex justify-end">
               <Button
                 size="sm"
                 isLoading={savingKeys}
-                isDisabled={savingKeys || (!googleMapsKeyInput && !maptilerKeyInput && googleMapId === '')}
+                isDisabled={savingKeys || (!googleMapsKeyInput && !maptilerKeyInput && !osMapsKeyInput && googleMapId === '')}
                 onPress={handleSaveApiKeys}
               >
                 {t('tenant_features.save_api_keys')}

@@ -476,8 +476,8 @@ class AdminAnalyticsReportsController extends BaseApiController
 
         $format = $this->query('format', 'csv');
 
-        if (!in_array($format, ['csv', 'pdf'], true)) {
-            return $this->respondWithError('VALIDATION_ERROR', __('api.supported_formats_csv_pdf'), 'format', 400);
+        if (!in_array($format, ['csv', 'pdf', 'xlsx'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.supported_formats_csv_pdf_xlsx'), 'format', 400);
         }
 
         $supportedTypes = $this->reportExportService->getSupportedTypes();
@@ -535,6 +535,21 @@ class AdminAnalyticsReportsController extends BaseApiController
                 'Pragma' => 'no-cache',
                 'Expires' => '0',
                 'Content-Length' => strlen($result['pdf']),
+            ]);
+        }
+
+        if ($format === 'xlsx') {
+            $result = $this->reportExportService->exportXlsx($type, $tenantId, $filters);
+            if (!$result['success']) {
+                return $this->respondWithError('NO_DATA', $result['message'] ?? __('api.no_data_for_export'), null, 404);
+            }
+            return response($result['xlsx'], 200, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Disposition' => 'attachment; filename="' . $result['filename'] . '"',
+                'Cache-Control' => 'no-cache, no-store, must-revalidate',
+                'Pragma' => 'no-cache',
+                'Expires' => '0',
+                'Content-Length' => strlen($result['xlsx']),
             ]);
         }
 

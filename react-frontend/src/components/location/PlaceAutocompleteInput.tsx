@@ -31,6 +31,7 @@ import { useMapsLibrary } from '@vis.gl/react-google-maps';
 import type { PlaceAutocompleteInputProps, PlaceResult, AddressComponents } from '@/types/google-places';
 import { GoogleMapsProvider } from './GoogleMapsProvider';
 import { NominatimAutocomplete } from './NominatimAutocomplete';
+import { OsPlacesAutocomplete } from './OsPlacesAutocomplete';
 import { useTenant } from '@/contexts';
 import { Button, Input } from '@/components/ui';
 
@@ -359,16 +360,23 @@ function PlaceAutocompleteWithGoogle(props: PlaceAutocompleteInputProps) {
  *                   network failure).
  *   - 'nominatim' → OpenStreetMap Nominatim (free, no API key, rate-limited
  *                   to 1 req/sec via internal debounce).
+ *   - 'os_places' → Ordnance Survey Places API via the platform proxy
+ *                   (UPRN-backed UK address validation; key stays server-side).
  *
  * Autocomplete is always rendered — the choice is *which* provider, never
  * whether to offer it. The cost-bearing Google branch never mounts when the
- * tenant has selected Nominatim, so no Maps script is loaded on those pages.
+ * tenant has selected Nominatim or OS Places, so no Maps script is loaded
+ * on those pages.
  */
 export function PlaceAutocompleteInput(props: PlaceAutocompleteInputProps) {
   const { geocodingProvider } = useTenant();
 
   if (geocodingProvider === 'nominatim') {
     return <NominatimAutocomplete {...props} />;
+  }
+
+  if (geocodingProvider === 'os_places') {
+    return <OsPlacesAutocomplete {...props} />;
   }
 
   return (

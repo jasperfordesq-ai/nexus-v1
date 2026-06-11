@@ -525,8 +525,16 @@ class UserService
             return false;
         }
 
+        if (PasswordHistoryService::isReused((int) $user->id, (int) $user->tenant_id, $newPassword, $user->password_hash)) {
+            self::setError('PASSWORD_REUSED', __('api.password_reused'));
+            return false;
+        }
+
+        $previousHash = $user->password_hash;
         $user->password_hash = Hash::make($newPassword);
         $user->save();
+
+        PasswordHistoryService::record((int) $user->id, (int) $user->tenant_id, $previousHash);
 
         self::notifyPasswordChanged($user);
 

@@ -32,4 +32,9 @@ return [
             'expire' => 60,
         ],
     ],
+
+    // Number of previous password hashes retained per user for the reuse
+    // check (PasswordHistoryService). 0 disables the history check; the
+    // current password is always rejected regardless.
+    'password_history_depth' => env('PASSWORD_HISTORY_DEPTH', 5),
 ];

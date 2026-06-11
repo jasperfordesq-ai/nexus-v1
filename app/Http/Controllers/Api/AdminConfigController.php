@@ -72,6 +72,8 @@ class AdminConfigController extends BaseApiController
         'powered_by_image_dark',
         'map_provider', 'geocoding_provider',
         'google_maps_api_key', 'google_maps_map_id', 'maptiler_api_key',
+        'os_maps_api_key',
+        'inactivity_timeout_minutes',
     ];
 
     /**
@@ -91,7 +93,7 @@ class AdminConfigController extends BaseApiController
      * when the corresponding map/geocoding provider is selected.
      */
     private const SECRET_KEYS = [
-        'google_maps_api_key', 'maptiler_api_key',
+        'google_maps_api_key', 'maptiler_api_key', 'os_maps_api_key',
     ];
 
     private const FEED_ALGO_DEFAULTS = [
@@ -1004,14 +1006,14 @@ class AdminConfigController extends BaseApiController
 
         // Validate map_provider — restricted to known frontend dispatch branches.
         if (isset($kvUpdates['map_provider'])) {
-            if (!in_array($kvUpdates['map_provider'], ['google', 'openstreetmap'], true)) {
+            if (!in_array($kvUpdates['map_provider'], ['google', 'openstreetmap', 'ordnance_survey'], true)) {
                 return $this->respondWithError('VALIDATION_ERROR', __('api.map_provider_invalid'), 'map_provider', 422);
             }
         }
 
         // Validate geocoding_provider — restricted to known frontend dispatch branches.
         if (isset($kvUpdates['geocoding_provider'])) {
-            if (!in_array($kvUpdates['geocoding_provider'], ['google', 'nominatim'], true)) {
+            if (!in_array($kvUpdates['geocoding_provider'], ['google', 'nominatim', 'os_places'], true)) {
                 return $this->respondWithError('VALIDATION_ERROR', __('api.geocoding_provider_invalid'), 'geocoding_provider', 422);
             }
         }
@@ -1025,6 +1027,8 @@ class AdminConfigController extends BaseApiController
             'google_maps_api_key' => ['/^AIza[0-9A-Za-z_-]{35}$/', 'api.google_maps_api_key_invalid'],
             'maptiler_api_key'    => ['/^[0-9A-Za-z]{16,64}$/',     'api.maptiler_api_key_invalid'],
             'google_maps_map_id'  => ['/^[0-9A-Za-z_-]{4,64}$/',    'api.google_maps_map_id_invalid'],
+            // OS Data Hub project API keys are alphanumeric strings
+            'os_maps_api_key'     => ['/^[0-9A-Za-z]{16,64}$/',     'api.os_maps_api_key_invalid'],
         ];
         foreach ($keyShapes as $field => [$pattern, $errorKey]) {
             if (!array_key_exists($field, $kvUpdates)) {
@@ -1041,6 +1045,17 @@ class AdminConfigController extends BaseApiController
                 return $this->respondWithError('VALIDATION_ERROR', __($errorKey), $field, 422);
             }
             $kvUpdates[$field] = $val;
+        }
+
+        // Validate inactivity_timeout_minutes — 0 disables the auto-logout;
+        // otherwise 5–480 minutes. Values 1–4 are rejected so a stored "1"
+        // is never coerced to boolean true by bootstrap's true/false mapping.
+        if (isset($kvUpdates['inactivity_timeout_minutes'])) {
+            $mins = (int) $kvUpdates['inactivity_timeout_minutes'];
+            if ($mins !== 0 && ($mins < 5 || $mins > 480)) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.inactivity_timeout_range'), 'inactivity_timeout_minutes', 422);
+            }
+            $kvUpdates['inactivity_timeout_minutes'] = (string) $mins;
         }
 
         // Validate default_currency — must be a 3-letter ISO 4217 code (lowercase).
