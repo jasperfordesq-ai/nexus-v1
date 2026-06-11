@@ -74,6 +74,12 @@ class AdminReviewsController extends BaseApiController
         $conditions = [];
         $params = [];
 
+        // Author-deleted reviews (deleted_by_author_at set) carry status
+        // 'rejected' but are NOT moderator-rejected — the member removed their
+        // own review. Keep them out of every moderation queue so an admin can
+        // never resurrect one via flag().
+        $conditions[] = 'r.deleted_by_author_at IS NULL';
+
         $effectiveTenantId = $this->resolveEffectiveTenantId($superAdmin, $tenantId);
         if ($effectiveTenantId !== null) {
             $conditions[] = 'r.tenant_id = ?';
@@ -222,18 +228,20 @@ class AdminReviewsController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         if ($superAdmin) {
-            $review = DB::selectOne("SELECT id, status, tenant_id FROM reviews WHERE id = ?", [$id]);
+            $review = DB::selectOne("SELECT id, status, tenant_id, deleted_by_author_at FROM reviews WHERE id = ?", [$id]);
         } else {
-            $review = DB::selectOne("SELECT id, status, tenant_id FROM reviews WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            $review = DB::selectOne("SELECT id, status, tenant_id, deleted_by_author_at FROM reviews WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         }
 
-        if (!$review) {
+        // Author-deleted reviews must never be resurrected into the moderation
+        // flow — treat them as not found even when called directly by ID.
+        if (!$review || $review->deleted_by_author_at !== null) {
             return $this->respondWithError('NOT_FOUND', __('api.review_not_found'), null, 404);
         }
 
         $reviewTenantId = (int) $review->tenant_id;
 
-        DB::update("UPDATE reviews SET status = 'pending' WHERE id = ? AND tenant_id = ?", [$id, $reviewTenantId]);
+        DB::update("UPDATE reviews SET status = 'pending' WHERE id = ? AND tenant_id = ? AND deleted_by_author_at IS NULL", [$id, $reviewTenantId]);
 
         ActivityLog::log(
             $adminId,
@@ -254,12 +262,14 @@ class AdminReviewsController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         if ($superAdmin) {
-            $review = DB::selectOne("SELECT id, status, tenant_id, reviewer_id FROM reviews WHERE id = ?", [$id]);
+            $review = DB::selectOne("SELECT id, status, tenant_id, reviewer_id, deleted_by_author_at FROM reviews WHERE id = ?", [$id]);
         } else {
-            $review = DB::selectOne("SELECT id, status, tenant_id, reviewer_id FROM reviews WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            $review = DB::selectOne("SELECT id, status, tenant_id, reviewer_id, deleted_by_author_at FROM reviews WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         }
 
-        if (!$review) {
+        // Author-deleted reviews are outside the moderation flow — hiding one
+        // would only confuse the author with a "review hidden" notification.
+        if (!$review || $review->deleted_by_author_at !== null) {
             return $this->respondWithError('NOT_FOUND', __('api.review_not_found'), null, 404);
         }
 

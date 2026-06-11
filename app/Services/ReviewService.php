@@ -478,7 +478,11 @@ class ReviewService
         // reviews.status is enum('pending','approved','rejected') — 'hidden'
         // is not in the set and made every reviewer-delete throw. 'rejected'
         // is the soft-hide state all read paths already exclude.
+        // deleted_by_author_at distinguishes an author-delete from a
+        // moderator-reject so the admin moderation queue can never resurrect
+        // a review its author chose to remove.
         $review->status = 'rejected';
+        $review->deleted_by_author_at = now();
         $review->save();
 
         return true;

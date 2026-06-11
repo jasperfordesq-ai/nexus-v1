@@ -142,6 +142,96 @@ class AdminReviewsControllerTest extends TestCase
     }
 
     // ================================================================
+    // AUTHOR-DELETED REVIEWS — excluded from moderation entirely
+    // ================================================================
+
+    /**
+     * Insert a review row directly; returns the new ID.
+     */
+    private function insertReview(array $overrides = []): int
+    {
+        $reviewer = User::factory()->forTenant($this->testTenantId)->create();
+        $receiver = User::factory()->forTenant($this->testTenantId)->create();
+
+        return (int) DB::table('reviews')->insertGetId(array_merge([
+            'tenant_id' => $this->testTenantId,
+            'reviewer_id' => $reviewer->id,
+            'receiver_id' => $receiver->id,
+            'rating' => 4,
+            'comment' => 'Moderation test review',
+            'status' => 'rejected',
+            'deleted_by_author_at' => null,
+            'created_at' => now(),
+        ], $overrides));
+    }
+
+    public function test_rejected_queue_excludes_author_deleted_reviews(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $moderatorRejectedId = $this->insertReview(['comment' => 'Moderator rejected']);
+        $authorDeletedId = $this->insertReview([
+            'comment' => 'Author deleted',
+            'deleted_by_author_at' => now(),
+        ]);
+
+        $response = $this->apiGet('/v2/admin/reviews?status=rejected&limit=100');
+
+        $response->assertStatus(200);
+        $ids = array_column($response->json('data') ?? [], 'id');
+        $this->assertContains($moderatorRejectedId, $ids, 'Moderator-rejected review must stay in the rejected queue');
+        $this->assertNotContains($authorDeletedId, $ids, 'Author-deleted review must not appear in the rejected queue');
+    }
+
+    public function test_flag_refuses_author_deleted_review(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $authorDeletedId = $this->insertReview(['deleted_by_author_at' => now()]);
+
+        $response = $this->apiPost("/v2/admin/reviews/{$authorDeletedId}/flag");
+
+        $response->assertStatus(404);
+
+        $row = DB::table('reviews')->where('id', $authorDeletedId)->first();
+        $this->assertSame('rejected', $row->status, 'Author-deleted review must not be resurrected to pending');
+        $this->assertNotNull($row->deleted_by_author_at);
+    }
+
+    public function test_flag_still_works_for_moderator_rejected_review(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $moderatorRejectedId = $this->insertReview();
+
+        $response = $this->apiPost("/v2/admin/reviews/{$moderatorRejectedId}/flag");
+
+        $response->assertStatus(200);
+
+        $row = DB::table('reviews')->where('id', $moderatorRejectedId)->first();
+        $this->assertSame('pending', $row->status);
+        $this->assertNull($row->deleted_by_author_at);
+    }
+
+    public function test_hide_refuses_author_deleted_review(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $authorDeletedId = $this->insertReview([
+            'status' => 'approved',
+            'deleted_by_author_at' => now(),
+        ]);
+
+        $response = $this->apiPost("/v2/admin/reviews/{$authorDeletedId}/hide");
+
+        $response->assertStatus(404);
+    }
+
+    // ================================================================
     // DELETE — DELETE /v2/admin/reviews/{id}
     // ================================================================
 

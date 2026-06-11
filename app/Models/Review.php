@@ -39,6 +39,7 @@ class Review extends Model
     protected $casts = [
         'rating' => 'integer',
         'dimensions' => 'array',
+        'deleted_by_author_at' => 'datetime',
     ];
 
     public function reviewer(): BelongsTo

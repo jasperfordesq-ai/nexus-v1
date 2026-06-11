@@ -259,6 +259,27 @@ class ReviewsControllerTest extends TestCase
         $this->assertContains($response->getStatusCode(), [200, 204]);
     }
 
+    public function test_author_delete_marks_deleted_by_author_at(): void
+    {
+        $user = $this->authenticatedUser();
+        $other = User::factory()->forTenant($this->testTenantId)->create();
+
+        $review = Review::factory()->forTenant($this->testTenantId)->create([
+            'reviewer_id' => $user->id,
+            'receiver_id' => $other->id,
+            'status' => 'approved',
+        ]);
+
+        $response = $this->apiDelete("/v2/reviews/{$review->id}");
+
+        $this->assertContains($response->getStatusCode(), [200, 204]);
+
+        $row = \Illuminate\Support\Facades\DB::table('reviews')->where('id', $review->id)->first();
+        $this->assertNotNull($row);
+        $this->assertSame('rejected', $row->status);
+        $this->assertNotNull($row->deleted_by_author_at, 'Author delete must set deleted_by_author_at');
+    }
+
     public function test_non_author_cannot_delete_review(): void
     {
         $author = User::factory()->forTenant($this->testTenantId)->create();
