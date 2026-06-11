@@ -65,7 +65,7 @@ export default function CommentSheet({
   const [loadedTargetKey, setLoadedTargetKey] = useState<string | null>(null);
   const [draft, setDraft] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { mounted: sheetMounted, open: sheetOpen } = useDeferredBottomSheetState(visible);
+  const { mounted: sheetMounted, open: sheetOpen, shouldHonorClose } = useDeferredBottomSheetState(visible);
   const targetKey = `${targetType}-${targetId}`;
   // Android modal screens report bottom inset 0 — floor with the root inset
   // so the composer footer clears the system navigation bar.
@@ -137,7 +137,10 @@ export default function CommentSheet({
     <HeroBottomSheet
       isOpen={sheetOpen}
       onOpenChange={(open) => {
-        if (!open && sheetOpen) onClose();
+        // shouldHonorClose() filters the library's spurious mount-time close
+        // event (see useDeferredBottomSheetState) that made the comment sheet
+        // need multiple taps to open.
+        if (!open && shouldHonorClose()) onClose();
       }}
     >
       <HeroBottomSheet.Portal unstable_accessibilityContainerViewIsModal>

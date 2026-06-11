@@ -108,5 +108,17 @@
     "createdTitle": "Poll created",
     "createdMessage": "Your poll is now open.",
     "createError": "Could not create poll."
+  },
+  "reaction": {
+    "like": "Like",
+    "love": "Love",
+    "laugh": "Laugh",
+    "wow": "Wow",
+    "sad": "Sad",
+    "celebrate": "Celebrate",
+    "clap": "Clap",
+    "time_credit": "Time Credit",
+    "longPressHint": "Long press to choose a reaction",
+    "dismiss": "Dismiss reaction picker"
   }
 }

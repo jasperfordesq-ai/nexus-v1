@@ -29,11 +29,24 @@ const CLOSE_ANIMATION_MS = 350;
  *   the close animation) and the unmount is deferred by CLOSE_ANIMATION_MS so
  *   that animation can finish. Re-opening before then cancels the unmount.
  */
+/**
+ * How long after the open-flip the library's close events are ignored.
+ * HeroUI Native's swipe-close detector (progress > 1.5) can fire on the
+ * very first frame after mount — the sheet STARTS at the fully-closed
+ * position, which satisfies the threshold — emitting a spurious
+ * onOpenChange(false). When that landed after our open flip it was treated
+ * as a user dismissal and the sheet tore down: users had to tap the
+ * trigger 2-3 times. A real pan-down dismissal cannot complete within the
+ * open animation, so ignoring early close events is safe.
+ */
+const OPEN_SETTLE_MS = 350;
+
 export function useDeferredBottomSheetState(visible: boolean) {
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const openTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const openedAtRef = useRef(0);
 
   useEffect(() => {
     if (openTimerRef.current) {
@@ -73,6 +86,7 @@ export function useDeferredBottomSheetState(visible: boolean) {
 
     openTimerRef.current = setTimeout(() => {
       openTimerRef.current = null;
+      openedAtRef.current = Date.now();
       setOpen(true);
     }, 16);
 
@@ -84,5 +98,13 @@ export function useDeferredBottomSheetState(visible: boolean) {
     };
   }, [mounted, visible]);
 
-  return { mounted, open };
+  /**
+   * Whether an onOpenChange(false) from the library should be honoured as a
+   * real dismissal. False while the sheet is still opening (see
+   * OPEN_SETTLE_MS) or not open at all.
+   */
+  const shouldHonorClose = () =>
+    open && Date.now() - openedAtRef.current > OPEN_SETTLE_MS;
+
+  return { mounted, open, shouldHonorClose };
 }

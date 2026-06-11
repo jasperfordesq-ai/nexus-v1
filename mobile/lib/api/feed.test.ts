@@ -146,24 +146,24 @@ describe('toggleLike', () => {
   beforeEach(() => { jest.clearAllMocks(); });
 
   it('sends POST with target_type and target_id to /api/v2/feed/like', async () => {
-    (api.post as jest.Mock).mockResolvedValue({ data: { liked: true, likes_count: 4 } });
+    (api.post as jest.Mock).mockResolvedValue({ data: { action: 'liked', likes_count: 4 } });
     const result = await toggleLike('post', 1);
     expect(api.post).toHaveBeenCalledWith('/api/v2/feed/like', {
       target_type: 'post',
       target_id: 1,
     });
-    expect(result.data.liked).toBe(true);
+    expect(result.data.action).toBe('liked');
     expect(result.data.likes_count).toBe(4);
   });
 
-  it('handles unlike (liked=false) response correctly', async () => {
-    (api.post as jest.Mock).mockResolvedValue({ data: { liked: false, likes_count: 2 } });
+  it('handles unlike (action=unliked) response correctly', async () => {
+    (api.post as jest.Mock).mockResolvedValue({ data: { action: 'unliked', likes_count: 2 } });
     const result = await toggleLike('listing', 55);
     expect(api.post).toHaveBeenCalledWith('/api/v2/feed/like', {
       target_type: 'listing',
       target_id: 55,
     });
-    expect(result.data.liked).toBe(false);
+    expect(result.data.action).toBe('unliked');
   });
 
   it('propagates errors from the API', async () => {

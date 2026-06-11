@@ -34,7 +34,7 @@ export default function BottomSheet({
   childrenClassName,
 }: BottomSheetProps) {
   const insets = useSafeAreaInsets();
-  const { mounted: sheetMounted, open: sheetOpen } = useDeferredBottomSheetState(visible);
+  const { mounted: sheetMounted, open: sheetOpen, shouldHonorClose } = useDeferredBottomSheetState(visible);
 
   // Inside Android `presentation: 'modal'` screens useSafeAreaInsets()
   // reports bottom: 0, which put sheet footers underneath the system nav
@@ -56,7 +56,10 @@ export default function BottomSheet({
     <HeroBottomSheet
       isOpen={sheetOpen}
       onOpenChange={(open) => {
-        if (!open && sheetOpen) onClose();
+        // shouldHonorClose() filters the library's spurious mount-time close
+        // event (see useDeferredBottomSheetState) that made sheets need
+        // multiple taps to open.
+        if (!open && shouldHonorClose()) onClose();
       }}
     >
       <HeroBottomSheet.Portal unstable_accessibilityContainerViewIsModal>

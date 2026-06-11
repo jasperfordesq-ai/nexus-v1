@@ -13,7 +13,7 @@ import * as Haptics from '@/lib/haptics';
 
 import { useTranslation } from 'react-i18next';
 
-import { getFeedAuthor, toggleBookmark, toggleLike, type FeedItem as FeedItemType, type PollData } from '@/lib/api/feed';
+import { getFeedAuthor, toggleBookmark, toggleLike, toggleReaction, type FeedItem as FeedItemType, type PollData, type ReactionsSummary, type ReactionType } from '@/lib/api/feed';
 import type { CommentTargetType } from '@/lib/api/comments';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
@@ -22,6 +22,7 @@ import Avatar from '@/components/ui/Avatar';
 import ImageCarousel from '@/components/ui/ImageCarousel';
 import ActionSheet from '@/components/ui/ActionSheet';
 import CommentSheet from '@/components/comments/CommentSheet';
+import ReactionBar, { REACTION_EMOJI_MAP } from '@/components/reactions/ReactionBar';
 import PollCard from '@/components/PollCard';
 import { formatRelativeTime } from '@/lib/utils/formatRelativeTime';
 
@@ -147,6 +148,26 @@ const BOOKMARKABLE_TYPES = new Set<FeedItemType['type']>([
   'discussion',
 ]);
 
+/**
+ * Feed item types that support emoji reactions — MUST stay in sync with
+ * App\Services\ReactionService::VALID_TARGET_TYPES (mirrors the web
+ * REACTABLE_FEED_TYPES in FeedCard.tsx).
+ */
+const REACTABLE_TYPES = new Set<FeedItemType['type']>([
+  'post',
+  'listing',
+  'event',
+  'goal',
+  'poll',
+  'review',
+  'volunteer',
+  'challenge',
+  'resource',
+  'job',
+  'blog',
+  'discussion',
+]);
+
 function getTypeConfig(type: FeedItemType['type'] | string) {
   return TYPE_CONFIG[type as FeedItemType['type']] ?? DEFAULT_TYPE_CONFIG;
 }
@@ -201,6 +222,9 @@ export default function FeedItem({
 
   const [liked, setLiked] = useState(item.is_liked ?? false);
   const [likesCount, setLikesCount] = useState(item.likes_count ?? 0);
+  const [reactions, setReactions] = useState<ReactionsSummary | null>(item.reactions ?? null);
+  const [reactionBarVisible, setReactionBarVisible] = useState(false);
+  const [isReacting, setIsReacting] = useState(false);
   const [localCommentsCount, setLocalCommentsCount] = useState(item.comments_count ?? 0);
   const [pollData, setPollData] = useState<PollData | null | undefined>(item.poll_data);
   const [bookmarked, setBookmarked] = useState(item.is_bookmarked ?? false);
@@ -221,13 +245,55 @@ export default function FeedItem({
 
     try {
       const result = await toggleLike(item.type, item.id);
-      setLiked(result.data.liked);
+      setLiked(result.data.action === 'liked');
       setLikesCount(result.data.likes_count);
     } catch {
       setLiked(wasLiked);
       setLikesCount((n) => (wasLiked ? n + 1 : n - 1));
     }
   }, [liked, item.id, item.type]);
+
+  const isReactable = REACTABLE_TYPES.has(item.type);
+  const userReaction = reactions?.user_reaction ?? null;
+
+  /**
+   * Toggle an emoji reaction (web parity). Tapping the current reaction
+   * removes it; selecting a different one switches to it. Optimistic update
+   * reconciled from the server's authoritative summary.
+   */
+  const performReact = useCallback(async (type: ReactionType) => {
+    if (isReacting) return;
+    setReactionBarVisible(false);
+    setIsReacting(true);
+
+    const previous = reactions ?? { counts: {}, total: 0, user_reaction: null };
+    const counts = { ...previous.counts };
+    let newUserReaction: string | null;
+    if (previous.user_reaction === type) {
+      counts[type] = Math.max(0, (counts[type] ?? 1) - 1);
+      newUserReaction = null;
+    } else {
+      if (previous.user_reaction) {
+        counts[previous.user_reaction] = Math.max(0, (counts[previous.user_reaction] ?? 1) - 1);
+      }
+      counts[type] = (counts[type] ?? 0) + 1;
+      newUserReaction = type;
+    }
+    const total = Object.values(counts).reduce((sum, n) => sum + n, 0);
+    setReactions({ ...previous, counts, total, user_reaction: newUserReaction });
+
+    try {
+      const result = await toggleReaction(item.type, item.id, type);
+      if (result.data?.reactions) {
+        setReactions(result.data.reactions);
+      }
+    } catch {
+      setReactions(previous);
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    } finally {
+      setIsReacting(false);
+    }
+  }, [isReacting, item.id, item.type, reactions]);
 
   function showHeartOverlay() {
     overlayOpacity.setValue(1);
@@ -294,7 +360,9 @@ export default function FeedItem({
       void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       showHeartOverlay();
       animateHeartButton();
-      if (!liked) {
+      if (isReactable) {
+        if (!userReaction) void performReact('like');
+      } else if (!liked) {
         void performLike();
       }
     } else {
@@ -308,7 +376,18 @@ export default function FeedItem({
   function handleLikePress() {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     animateHeartButton();
+    if (isReactable) {
+      // Quick tap: toggle the current reaction, or add the default 'like'.
+      void performReact((userReaction as ReactionType | null) ?? 'like');
+      return;
+    }
     void performLike();
+  }
+
+  function handleLikeLongPress() {
+    if (!isReactable) return;
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setReactionBarVisible(true);
   }
 
   const typeConfig = getTypeConfig(item.type);
@@ -324,7 +403,9 @@ export default function FeedItem({
   const isCommentable = COMMENTABLE_TYPES.has(item.type);
   const canBookmark = BOOKMARKABLE_TYPES.has(item.type);
   const commentsCount = commentsCountOverride ?? localCommentsCount;
-  const reactionTotal = item.reactions?.total ?? likesCount;
+  const reactionTotal = reactions?.total ?? likesCount;
+  const userReactionEmoji = userReaction ? REACTION_EMOJI_MAP[userReaction] : null;
+  const likeButtonActive = isReactable ? userReaction !== null : liked;
   const linkPreview = item.link_previews?.[0];
   const linkPreviewImageUrl = resolveImageUrl(linkPreview?.image_url);
   const commentTarget = isCommentable
@@ -593,15 +674,27 @@ export default function FeedItem({
         <HeroCard.Footer className="flex-row items-center gap-2 px-4 py-3">
           <HeroButton
             size="sm"
-            variant={liked ? 'secondary' : 'ghost'}
+            variant={likeButtonActive ? 'secondary' : 'ghost'}
             onPress={handleLikePress}
-            accessibilityLabel={liked ? t('unlikePost') : t('likePost')}
+            onLongPress={handleLikeLongPress}
+            accessibilityLabel={likeButtonActive ? t('unlikePost') : t('likePost')}
+            accessibilityHint={isReactable ? t('reaction.longPressHint') : undefined}
           >
             <Animated.View style={{ transform: [{ scale: heartBtnScale }] }}>
-              <Ionicons name={liked ? 'heart' : 'heart-outline'} size={18} color={liked ? primary : theme.textMuted} />
+              {userReactionEmoji ? (
+                userReaction === 'time_credit' ? (
+                  <Ionicons name="time-outline" size={18} color={primary} />
+                ) : (
+                  <Text style={{ fontSize: 16 }}>{userReactionEmoji}</Text>
+                )
+              ) : (
+                <Ionicons name={likeButtonActive ? 'heart' : 'heart-outline'} size={18} color={likeButtonActive ? primary : theme.textMuted} />
+              )}
             </Animated.View>
-            {likesCount > 0 ? (
-              <HeroButton.Label style={{ color: liked ? primary : theme.textMuted }}>{likesCount}</HeroButton.Label>
+            {(isReactable ? reactionTotal : likesCount) > 0 ? (
+              <HeroButton.Label style={{ color: likeButtonActive ? primary : theme.textMuted }}>
+                {isReactable ? reactionTotal : likesCount}
+              </HeroButton.Label>
             ) : null}
           </HeroButton>
 
@@ -625,6 +718,16 @@ export default function FeedItem({
             </HeroButton>
           ) : null}
         </HeroCard.Footer>
+
+        {isReactable ? (
+          <ReactionBar
+            visible={reactionBarVisible}
+            userReaction={userReaction}
+            primary={primary}
+            onSelect={(type) => void performReact(type)}
+            onDismiss={() => setReactionBarVisible(false)}
+          />
+        ) : null}
       </HeroCard>
 
       <ActionSheet

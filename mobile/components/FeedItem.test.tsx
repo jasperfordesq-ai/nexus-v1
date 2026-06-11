@@ -39,6 +39,7 @@ jest.mock('@/lib/api/feed', () => ({
   getFeedAuthor: () => ({ id: 1, name: 'Alice Smith', avatar: null }),
   toggleBookmark: jest.fn(),
   toggleLike: jest.fn(),
+  toggleReaction: jest.fn(),
 }));
 
 jest.mock('@/lib/haptics', () => ({
@@ -277,5 +278,94 @@ describe('FeedItem', () => {
       pathname: '/(modals)/feed-item-detail',
       params: { id: '504', type: 'post' },
     });
+  });
+
+  it('quick-tapping like on a reactable post toggles the default like reaction and stays highlighted', async () => {
+    const { toggleReaction } = require('@/lib/api/feed');
+    (toggleReaction as jest.Mock).mockResolvedValue({
+      data: {
+        action: 'added',
+        reaction_type: 'like',
+        // Server-authoritative summary — the button must stay highlighted
+        // after this resolves (regression: the legacy path read a `liked`
+        // field that the API never sent and un-highlighted the button).
+        reactions: { counts: { like: 3 }, total: 3, user_reaction: 'like' },
+      },
+    });
+
+    const item = {
+      id: 600,
+      type: 'post',
+      title: 'Reactable post',
+      content: 'React to me.',
+      image_url: null,
+      user_id: 1,
+      author_name: 'Alice Smith',
+      author_avatar: null,
+      is_liked: false,
+      likes_count: 2,
+      reactions: { counts: { like: 2 }, total: 2, user_reaction: null },
+      comments_count: 0,
+      created_at: '2026-05-30T10:00:00Z',
+      location: null,
+      rating: null,
+      start_date: null,
+      job_type: null,
+      commitment: null,
+      submission_deadline: null,
+      receiver: null,
+    } as unknown as FeedItemType;
+
+    const { getByLabelText, findByLabelText, findByText } = render(<FeedItem item={item} />);
+
+    fireEvent.press(getByLabelText('likePost'));
+
+    expect(toggleReaction).toHaveBeenCalledWith('post', 600, 'like');
+    // After the server reconciles, the button reflects the reacted state.
+    expect(await findByLabelText('unlikePost')).toBeTruthy();
+    expect(await findByText('3')).toBeTruthy();
+  });
+
+  it('long-pressing like opens the reaction bar and selecting an emoji sends that reaction', async () => {
+    const { toggleReaction } = require('@/lib/api/feed');
+    (toggleReaction as jest.Mock).mockResolvedValue({
+      data: {
+        action: 'added',
+        reaction_type: 'celebrate',
+        reactions: { counts: { celebrate: 1 }, total: 1, user_reaction: 'celebrate' },
+      },
+    });
+
+    const item = {
+      id: 601,
+      type: 'post',
+      title: 'Celebrate post',
+      content: 'Party time.',
+      image_url: null,
+      user_id: 1,
+      author_name: 'Alice Smith',
+      author_avatar: null,
+      is_liked: false,
+      likes_count: 0,
+      reactions: { counts: {}, total: 0, user_reaction: null },
+      comments_count: 0,
+      created_at: '2026-05-30T10:00:00Z',
+      location: null,
+      rating: null,
+      start_date: null,
+      job_type: null,
+      commitment: null,
+      submission_deadline: null,
+      receiver: null,
+    } as unknown as FeedItemType;
+
+    const { getByLabelText, queryByLabelText } = render(<FeedItem item={item} />);
+
+    expect(queryByLabelText('reaction.celebrate')).toBeNull();
+
+    fireEvent(getByLabelText('likePost'), 'longPress');
+    fireEvent.press(getByLabelText('reaction.celebrate'));
+
+    expect(toggleReaction).toHaveBeenCalledWith('post', 601, 'celebrate');
   });
 });

@@ -100,11 +100,7 @@ export interface FeedItem {
   badge_name?: string | null;
   badge_icon?: string | null;
   new_level?: number | null;
-  reactions?: {
-    counts: Record<string, number>;
-    total: number;
-    user_reaction: string | null;
-  };
+  reactions?: ReactionsSummary;
   link_previews?: {
     url: string;
     title?: string | null;
@@ -240,8 +236,45 @@ export function getHashtagFeed(tag: string, cursor?: string | null, perPage = 20
   return api.get<HashtagFeedResponse>(`${API_V2}/feed/hashtags/${encodeURIComponent(tag)}`, params);
 }
 
+/** Mirrors App\Services\ReactionService::VALID_TYPES (and the web ReactionPicker). */
+export type ReactionType = 'love' | 'like' | 'laugh' | 'wow' | 'sad' | 'celebrate' | 'clap' | 'time_credit';
+
+export interface ReactionsSummary {
+  counts: Record<string, number>;
+  total: number;
+  user_reaction: string | null;
+  top_reactors?: { id: number; name: string | null; avatar_url?: string | null }[];
+}
+
+export interface ReactionToggleResult {
+  action: 'added' | 'removed' | 'updated';
+  reaction_type: ReactionType | null;
+  reactions: ReactionsSummary;
+}
+
+/**
+ * POST /api/v2/reactions — toggle an emoji reaction on any reactable entity.
+ * Polymorphic: target_type must be one of ReactionService::VALID_TARGET_TYPES
+ * (post, listing, event, goal, poll, review, volunteer, challenge, resource,
+ * job, blog, discussion, comment).
+ */
+export function toggleReaction(
+  targetType: string,
+  targetId: number,
+  reactionType: ReactionType,
+): Promise<{ data: ReactionToggleResult }> {
+  return api.post<{ data: ReactionToggleResult }>(`${API_V2}/reactions`, {
+    target_type: targetType,
+    target_id: targetId,
+    reaction_type: reactionType,
+  });
+}
+
 export interface LikeResult {
-  liked: boolean;
+  /** The API returns action: 'liked' | 'unliked' — there is NO boolean
+   *  `liked` field. Reading `.liked` returned undefined and un-highlighted
+   *  the button the moment the server responded (2026-06-11 bug). */
+  action: 'liked' | 'unliked';
   likes_count: number;
 }
 

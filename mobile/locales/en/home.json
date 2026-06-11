@@ -235,5 +235,17 @@
     "unableToLoad": "Could not load this hashtag",
     "emptyTitle": "No posts yet",
     "emptySubtitle": "No feed posts are tagged #{{tag}} yet."
+  },
+  "reaction": {
+    "like": "Like",
+    "love": "Love",
+    "laugh": "Laugh",
+    "wow": "Wow",
+    "sad": "Sad",
+    "celebrate": "Celebrate",
+    "clap": "Clap",
+    "time_credit": "Time Credit",
+    "longPressHint": "Long press to choose a reaction",
+    "dismiss": "Dismiss reaction picker"
   }
 }
