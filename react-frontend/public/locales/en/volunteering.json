@@ -679,7 +679,11 @@
       "confirmed": "Confirmed",
       "pending": "Pending",
       "cancelled": "Cancelled"
-    }
+    },
+    "search_label": "Member name",
+    "search_placeholder": "Search members by name…",
+    "search_description": "Search for the member you would like to add to this group reservation, then select them from the results. They will receive an invitation to join.",
+    "no_results": "No members match your search."
   },
   "recommendations": {
     "title": "Recommended for You",

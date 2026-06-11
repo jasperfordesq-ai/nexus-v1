@@ -679,7 +679,11 @@
       "confirmed": "Bestätigt",
       "pending": "Ausstehend",
       "cancelled": "Abgesagt"
-    }
+    },
+    "search_label": "Mitgliedsname",
+    "search_placeholder": "Mitglieder nach Namen suchen…",
+    "search_description": "Suchen Sie das Mitglied, das Sie dieser Gruppenreservierung hinzufügen möchten, und wählen Sie es aus den Ergebnissen aus. Es erhält eine Einladung.",
+    "no_results": "Keine Mitglieder entsprechen Ihrer Suche."
   },
   "recommendations": {
     "title": "Für Sie empfohlen",

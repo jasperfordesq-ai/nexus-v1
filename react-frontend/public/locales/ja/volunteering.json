@@ -679,7 +679,11 @@
       "confirmed": "確定",
       "pending": "保留中",
       "cancelled": "キャンセル済み"
-    }
+    },
+    "search_label": "メンバー名",
+    "search_placeholder": "名前でメンバーを検索…",
+    "search_description": "このグループ予約に追加したいメンバーを検索し、結果から選択してください。招待が送信されます。",
+    "no_results": "検索に一致するメンバーがいません。"
   },
   "recommendations": {
     "title": "あなたへのおすすめ",

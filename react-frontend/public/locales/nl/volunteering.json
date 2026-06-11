@@ -679,7 +679,11 @@
       "confirmed": "Bevestigd",
       "pending": "In afwachting",
       "cancelled": "Geannuleerd"
-    }
+    },
+    "search_label": "Naam van lid",
+    "search_placeholder": "Zoek leden op naam…",
+    "search_description": "Zoek het lid dat je aan deze groepsreservering wilt toevoegen en selecteer het uit de resultaten. Het lid ontvangt een uitnodiging.",
+    "no_results": "Geen leden komen overeen met je zoekopdracht."
   },
   "recommendations": {
     "title": "Aanbevolen voor jou",

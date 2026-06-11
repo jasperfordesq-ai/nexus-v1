@@ -679,7 +679,11 @@
       "confirmed": "Confirmado",
       "pending": "Pendiente",
       "cancelled": "Cancelado"
-    }
+    },
+    "search_label": "Nombre del miembro",
+    "search_placeholder": "Buscar miembros por nombre…",
+    "search_description": "Busca al miembro que quieres añadir a esta reserva de grupo y selecciónalo en los resultados. Recibirá una invitación para unirse.",
+    "no_results": "Ningún miembro coincide con tu búsqueda."
   },
   "recommendations": {
     "title": "Recomendado para ti",

@@ -679,7 +679,11 @@
       "confirmed": "Confermato",
       "pending": "In attesa",
       "cancelled": "Annullato"
-    }
+    },
+    "search_label": "Nome del membro",
+    "search_placeholder": "Cerca membri per nome…",
+    "search_description": "Cerca il membro da aggiungere a questa prenotazione di gruppo, poi selezionalo dai risultati. Riceverà un invito a partecipare.",
+    "no_results": "Nessun membro corrisponde alla tua ricerca."
   },
   "recommendations": {
     "title": "Consigliato per te",
