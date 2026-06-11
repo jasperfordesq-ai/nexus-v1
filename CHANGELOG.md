@@ -58,6 +58,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Mobile app: the Like button now responds to every single tap.** A component-library quirk meant that adding long-press support to the Like button silently broke ordinary taps — a quick tap did nothing at all, while a long hold could register a stray like. The press handling was rebuilt (verified live on a device against the running API): one tap likes instantly, holding the button slides out the emoji picker while your finger is still down — just like Instagram — and releasing after the picker opens never fires an accidental like.
 - **Mobile app: emoji reactions arrive, and the Like button finally behaves.** The feed's Like button now matches the web app: a quick tap likes (and stays highlighted — previously the highlight vanished the instant the server replied, because the app read a field the server never sent), and a long-press opens the full emoji picker (👍 ❤️ 😂 😮 😢 🎉 👏 ⏰) — the same eight reactions as the web, on every reactable feed card.
 - **Mobile app: slide-up panels open on the first tap.** Comment sheets and other slide-up panels sometimes needed two or three taps to open — a quirk in the sheet library could fire a phantom "close" signal the moment a sheet was created, instantly cancelling it. Phantom closes are now filtered out everywhere, so every sheet opens first time.
 
