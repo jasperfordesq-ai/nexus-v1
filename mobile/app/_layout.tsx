@@ -11,7 +11,8 @@ import { Stack, router, usePathname } from 'expo-router';
 import * as Notifications from 'expo-notifications';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { setRootBottomInset } from '@/lib/ui/rootInsets';
 import { ThemeProvider, DarkTheme, DefaultTheme, type Theme } from '@react-navigation/native';
 import { HeroUINativeProvider } from 'heroui-native';
 
@@ -98,11 +99,23 @@ Sentry.init({
  * Root layout — wraps the entire app in providers and handles the
  * initial auth redirect (auth check → home or login).
  */
+/**
+ * Records the root-level bottom inset so UI inside Android modal screens
+ * (where useSafeAreaInsets reports bottom: 0) can still clear the system
+ * navigation bar. See lib/ui/rootInsets.ts.
+ */
+function RootInsetRecorder() {
+  const insets = useSafeAreaInsets();
+  setRootBottomInset(insets.bottom);
+  return null;
+}
+
 function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <HeroUINativeProvider>
         <SafeAreaProvider>
+          <RootInsetRecorder />
           <ErrorBoundary>
             <TenantProvider>
               <AuthProvider>

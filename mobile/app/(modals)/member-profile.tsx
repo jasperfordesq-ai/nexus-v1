@@ -1343,20 +1343,20 @@ function ListingsSection({
           listings.map((listing) => {
             const isOffer = listing.type === 'offer';
             return (
-              <HeroButton
+              <NativePressable
                 key={String(listing.id)}
-                variant="ghost"
-                feedbackVariant="scale"
-                className="w-full p-0"
+                className="w-full"
                 accessibilityLabel={t('profile.viewListing', { title: listing.title })}
-                isDisabled={isFederatedProfile}
+                disabled={isFederatedProfile}
                 onPress={
                   isFederatedProfile
                     ? undefined
                     : () => router.push({ pathname: '/(modals)/exchange-detail', params: { id: String(listing.id) } })
                 }
               >
-                <Surface variant="secondary" className="rounded-panel-inner px-3 py-3">
+                {/* HeroButton collapsed raw children to content width — the rows
+                    rendered as bare chip-coloured slivers with no text. */}
+                <Surface variant="secondary" className="w-full rounded-panel-inner px-3 py-3">
                 <View className="flex-row items-start justify-between gap-3">
                   <View className="min-w-0 flex-1 gap-1">
                     <View className="flex-row flex-wrap items-center gap-2">
@@ -1391,7 +1391,7 @@ function ListingsSection({
                   {!isFederatedProfile ? <Ionicons name="chevron-forward" size={18} color={primary} /> : null}
                 </View>
                 </Surface>
-              </HeroButton>
+              </NativePressable>
             );
           })
         ) : (

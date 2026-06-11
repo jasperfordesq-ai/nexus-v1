@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Spinner, Surface, Text } from 'heroui-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { getRootBottomInset } from '@/lib/ui/rootInsets';
 import { useTheme } from '@/lib/hooks/useTheme';
 
 export default function FormActionFooter({
@@ -35,12 +36,15 @@ export default function FormActionFooter({
 }) {
   const insets = useSafeAreaInsets();
   const theme = useTheme();
+  // Android modal screens report bottom inset 0 — use the root-recorded
+  // inset as a floor so the footer clears the system navigation bar.
+  const bottomInset = Math.max(insets.bottom, getRootBottomInset());
 
   return (
     <Surface
       variant="default"
       className="border-t border-border/50 px-4 pt-3"
-      style={{ paddingBottom: Math.max(12, insets.bottom) }}
+      style={{ paddingBottom: Math.max(12, bottomInset) }}
     >
       <View className="flex-row items-center gap-3">
         <View className="min-w-0 flex-1">

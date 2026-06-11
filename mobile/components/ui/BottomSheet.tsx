@@ -7,6 +7,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { BottomSheet as HeroBottomSheet } from 'heroui-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getRootBottomInset } from '@/lib/ui/rootInsets';
 import { useDeferredBottomSheetState } from './useDeferredBottomSheetState';
 
 interface BottomSheetProps {
@@ -35,14 +36,19 @@ export default function BottomSheet({
   const insets = useSafeAreaInsets();
   const { mounted: sheetMounted, open: sheetOpen } = useDeferredBottomSheetState(visible);
 
+  // Inside Android `presentation: 'modal'` screens useSafeAreaInsets()
+  // reports bottom: 0, which put sheet footers underneath the system nav
+  // bar. Fall back to the inset recorded at the app root.
+  const bottomInset = Math.max(insets.bottom, getRootBottomInset());
+
   // With explicit snap points, honour them (numbers get the bottom inset added
   // so content isn't clipped). With none, let the library size the sheet to its
   // content — no magic height math, no clipping, no dead space.
   const hasSnapPoints = Array.isArray(snapPoints) && snapPoints.length > 0;
   const resolvedSnapPoints = hasSnapPoints
-    ? snapPoints!.map((point) => (typeof point === 'number' ? point + insets.bottom : point))
+    ? snapPoints!.map((point) => (typeof point === 'number' ? point + bottomInset : point))
     : undefined;
-  const bottomPadding = Math.max(16, insets.bottom + 16);
+  const bottomPadding = Math.max(16, bottomInset + 16);
 
   if (!sheetMounted) return null;
 
