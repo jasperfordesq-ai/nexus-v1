@@ -578,6 +578,8 @@ Route::post('/v2/notifications/{id}/read', [\App\Http\Controllers\Api\Notificati
 Route::delete('/v2/notifications/{id}', [\App\Http\Controllers\Api\NotificationsController::class, 'destroy']);
 // Reviews
 Route::get('/v2/reviews/pending', [\App\Http\Controllers\Api\ReviewsController::class, 'pending']);
+// Registered BEFORE /v2/reviews/{id} so 'given' is not swallowed as an {id}.
+Route::get('/v2/reviews/given', [\App\Http\Controllers\Api\ReviewsController::class, 'given']);
 Route::get('/v2/reviews/user/{userId}', [\App\Http\Controllers\Api\ReviewsController::class, 'userReviews']);
 Route::get('/v2/users/{userId}/reviews', [\App\Http\Controllers\Api\ReviewsController::class, 'userReviews']);
 Route::get('/v2/reviews/user/{userId}/stats', [\App\Http\Controllers\Api\ReviewsController::class, 'userStats']);
@@ -1190,6 +1192,15 @@ Route::get('/v2/admin/users/{id}/verification-badges', [\App\Http\Controllers\Ap
 
 // Tenant-wide audit trail export (CSV) — activity_log + org_audit_log
 Route::get('/v2/admin/audit-log/export.csv', [\App\Http\Controllers\Api\AdminAuditLogController::class, 'exportCsv']);
+
+// SSO provider management (IT-Sec-05)
+Route::get('/v2/admin/sso/providers', [\App\Http\Controllers\Api\AdminSsoProvidersController::class, 'index']);
+Route::put('/v2/admin/sso/providers/{providerKey}', [\App\Http\Controllers\Api\AdminSsoProvidersController::class, 'upsert'])
+    ->where('providerKey', '[a-z0-9_-]{2,20}');
+Route::delete('/v2/admin/sso/providers/{providerKey}', [\App\Http\Controllers\Api\AdminSsoProvidersController::class, 'destroy'])
+    ->where('providerKey', '[a-z0-9_-]{2,20}');
+Route::post('/v2/admin/sso/providers/{providerKey}/test', [\App\Http\Controllers\Api\AdminSsoProvidersController::class, 'test'])
+    ->where('providerKey', '[a-z0-9_-]{2,20}');
 
 // Data retention policies (IT-Data-03)
 Route::get('/v2/admin/retention/policies', [\App\Http\Controllers\Api\AdminRetentionController::class, 'index']);
@@ -2563,6 +2574,16 @@ Route::middleware('throttle:30,1')->group(function () {
         ->where('provider', 'google|apple|facebook');
     Route::match(['get', 'post'], '/v2/auth/oauth/{provider}/callback', [\App\Http\Controllers\Auth\SocialAuthController::class, 'callback'])
         ->where('provider', 'google|apple|facebook');
+});
+
+// SSO engine (IT-Sec-05) — tenant-configured OIDC providers (Entra ID,
+// Hivebrite, …). Public so anonymous visitors can start a sign-in flow;
+// token exchange reuses /v2/auth/oauth/exchange above.
+Route::middleware('throttle:30,1')->group(function () {
+    Route::get('/v2/auth/sso/providers', [\App\Http\Controllers\Auth\SsoAuthController::class, 'providers']);
+    Route::get('/v2/auth/sso/callback', [\App\Http\Controllers\Auth\SsoAuthController::class, 'callback']);
+    Route::get('/v2/auth/sso/{provider}/redirect', [\App\Http\Controllers\Auth\SsoAuthController::class, 'redirect'])
+        ->where('provider', '[a-z0-9_-]{2,20}');
 });
 
 // ============================================

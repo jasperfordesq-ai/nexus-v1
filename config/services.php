@@ -84,4 +84,10 @@ return [
         'service_account_path' => env('FIREBASE_SERVICE_ACCOUNT_PATH', base_path('firebase-service-account.json')),
     ],
 
+    'sso' => [
+        // Base URL identity providers redirect back to; defaults to
+        // app.url. Override when the API is served from another host.
+        'redirect_base' => env('SSO_REDIRECT_BASE'),
+    ],
+
 ];
