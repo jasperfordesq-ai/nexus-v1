@@ -95,6 +95,26 @@ jobs:
           mysql -h 127.0.0.1 -u root -ptesting nexus -e "INSERT IGNORE INTO categories (id, name, slug, tenant_id, type) VALUES (1, 'General', 'general', 1, 'listing');"
           echo "Test database schema and seed data loaded successfully."
 
+      # The schema dump is refreshed from PRODUCTION, so migrations that
+      # haven't been deployed yet are missing from it. Run pending Laravel
+      # migrations on both databases so feature tests see new tables/columns
+      # before the code that needs them ships.
+      - name: Run pending migrations on test databases
+        run: |
+          php artisan migrate --force
+          DB_DATABASE=nexus php artisan migrate --force
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: nexus_test
+          DB_USER: root
+          DB_PASS: testing
+          APP_ENV: testing
+          APP_KEY: base64:HfQEDtbtr90JIXhsaAhSFWnzIo1f31VZ2e5qLqKKnls=
+          CACHE_DRIVER: array
+          SESSION_DRIVER: array
+          LOG_CHANNEL: "null"
+
       - name: PHP Syntax Check
         run: |
           echo "Checking PHP syntax in app/ ..."
