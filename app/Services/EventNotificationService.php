@@ -238,10 +238,13 @@ class EventNotificationService
     /**
      * @param array<int> $recipientUserIds
      */
-    public function notifyCancellation(int $tenantId, int $eventId, ?string $reason = null, array $recipientUserIds = []): int
+    public function notifyCancellation(int $tenantId, int $eventId, ?string $reason = null, array $recipientUserIds = [], ?object $eventSnapshot = null): int
     {
         try {
-            $event = DB::table('events')
+            // Series DELETE removes the event rows before notifying, so the caller
+            // passes a pre-deletion snapshot (id/title/start_time/location) — the
+            // DB lookup below would find nothing post-delete.
+            $event = $eventSnapshot ?? DB::table('events')
                 ->where('id', $eventId)
                 ->where('tenant_id', $tenantId)
                 ->select(['id', 'title', 'start_time', 'location'])

@@ -438,6 +438,7 @@ class EventService
     public static function delete(int $id, int $userId): bool
     {
         self::$errors = [];
+        self::$lastCancellationRecipientIds = [];
         $tenantId = \App\Core\TenantContext::getId();
 
         /** @var Event|null $event */
@@ -469,6 +470,45 @@ class EventService
                 // Transactional: a failure mid-cascade must not leave the rule
                 // gone with half the occurrences still live.
                 if (!empty($event->is_recurring_template)) {
+                    // Collect attendees/waitlisted of the future, not-yet-cancelled
+                    // occurrences (including the template itself when it's a future
+                    // occurrence) BEFORE the rows are removed — same recipient rules
+                    // as cancelEvent(). Already-cancelled occurrences are skipped:
+                    // their attendees were notified at cancel time and their
+                    // RSVP/waitlist rows are already 'cancelled' (no double-send).
+                    $targetRows = DB::select(
+                        "SELECT id FROM events
+                         WHERE tenant_id = ?
+                           AND (id = ? OR parent_event_id = ?)
+                           AND start_time >= NOW()
+                           AND (status IS NULL OR status != 'cancelled')",
+                        [$tenantId, $id, $id]
+                    );
+
+                    $recipientIds = collect();
+                    foreach ($targetRows as $row) {
+                        $rsvpUserIds = DB::select(
+                            "SELECT DISTINCT user_id FROM event_rsvps WHERE event_id = ? AND tenant_id = ? AND status IN ('going', 'interested', 'invited')",
+                            [(int) $row->id, $tenantId]
+                        );
+
+                        $waitlistUserIds = DB::select(
+                            "SELECT DISTINCT user_id FROM event_waitlist WHERE event_id = ? AND tenant_id = ? AND status = 'waiting'",
+                            [(int) $row->id, $tenantId]
+                        );
+
+                        $recipientIds = $recipientIds
+                            ->merge(collect($rsvpUserIds)->pluck('user_id'))
+                            ->merge(collect($waitlistUserIds)->pluck('user_id'));
+                    }
+
+                    self::$lastCancellationRecipientIds = $recipientIds
+                        ->map(fn ($recipientId) => (int) $recipientId)
+                        ->filter(fn (int $recipientId) => $recipientId > 0)
+                        ->unique()
+                        ->values()
+                        ->all();
+
                     DB::delete(
                         "DELETE FROM event_recurrence_rules WHERE event_id = ? AND tenant_id = ?",
                         [$id, $tenantId]
@@ -491,9 +531,37 @@ class EventService
                 $event->delete();
             });
         } catch (\Throwable $e) {
+            self::$lastCancellationRecipientIds = [];
             Log::error("EventService::delete error: " . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.delete_failed', ['resource' => 'event'])];
             return false;
+        }
+
+        // Notify attendees of the removed future occurrences — same mechanism,
+        // translation keys, and channels as the cancel path (event_cancelled bell
+        // + cancellation email/push), with each render wrapped per-recipient in
+        // LocaleContext inside notifyCancellation(). Sent AFTER the commit so a
+        // rolled-back delete never notifies; an event snapshot is passed because
+        // the event rows no longer exist.
+        if (self::$lastCancellationRecipientIds !== []) {
+            try {
+                app(EventNotificationService::class)->notifyCancellation(
+                    $tenantId,
+                    $id,
+                    '',
+                    self::$lastCancellationRecipientIds,
+                    (object) [
+                        'id'         => $id,
+                        'title'      => $event->title,
+                        // Stringified: the email builder runs strtotime() on it,
+                        // and the model casts start_time to Carbon.
+                        'start_time' => $event->start_time ? (string) $event->start_time : null,
+                        'location'   => $event->location,
+                    ]
+                );
+            } catch (\Throwable $e) {
+                Log::warning("EventService::delete cancellation-notification error: " . $e->getMessage());
+            }
         }
 
         return true;

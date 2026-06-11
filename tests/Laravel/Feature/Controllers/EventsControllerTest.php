@@ -300,6 +300,165 @@ class EventsControllerTest extends TestCase
     }
 
     // ================================================================
+    // DELETE — Recurring series notifies future attendees (cancel parity)
+    // ================================================================
+
+    public function test_series_delete_notifies_future_attendees_once_and_skips_past_and_cancelled(): void
+    {
+        $organizer = $this->authenticatedUser();
+        $futureAttendee = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'email' => 'series-delete-future-' . uniqid('', true) . '@example.test',
+        ]);
+        $waitlisted = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'email' => 'series-delete-waitlist-' . uniqid('', true) . '@example.test',
+        ]);
+        $pastAttendee = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'email' => 'series-delete-past-' . uniqid('', true) . '@example.test',
+        ]);
+        $cancelledAttendee = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'email' => 'series-delete-cancelled-' . uniqid('', true) . '@example.test',
+        ]);
+
+        $templateId = $this->createEvent((int) $organizer->id, [
+            'title' => 'Recurring Series',
+            'is_recurring_template' => 1,
+        ]);
+        $futureOccurrenceA = $this->createEvent((int) $organizer->id, [
+            'parent_event_id' => $templateId,
+            'start_time' => now()->addDays(14)->format('Y-m-d H:i:s'),
+            'end_time' => now()->addDays(14)->addHours(2)->format('Y-m-d H:i:s'),
+        ]);
+        $futureOccurrenceB = $this->createEvent((int) $organizer->id, [
+            'parent_event_id' => $templateId,
+            'start_time' => now()->addDays(21)->format('Y-m-d H:i:s'),
+            'end_time' => now()->addDays(21)->addHours(2)->format('Y-m-d H:i:s'),
+        ]);
+        $pastOccurrence = $this->createEvent((int) $organizer->id, [
+            'parent_event_id' => $templateId,
+            'start_time' => now()->subDays(7)->format('Y-m-d H:i:s'),
+            'end_time' => now()->subDays(7)->addHours(2)->format('Y-m-d H:i:s'),
+        ]);
+        // Already cancelled future occurrence — its attendees were notified when it
+        // was cancelled; deleting the series must NOT notify them a second time.
+        $cancelledOccurrence = $this->createEvent((int) $organizer->id, [
+            'parent_event_id' => $templateId,
+            'status' => 'cancelled',
+            'start_time' => now()->addDays(28)->format('Y-m-d H:i:s'),
+            'end_time' => now()->addDays(28)->addHours(2)->format('Y-m-d H:i:s'),
+        ]);
+
+        // Future attendee RSVPs to BOTH future occurrences — must be notified exactly once.
+        foreach ([$futureOccurrenceA, $futureOccurrenceB] as $occurrenceId) {
+            DB::table('event_rsvps')->insert([
+                'tenant_id' => $this->testTenantId,
+                'event_id' => $occurrenceId,
+                'user_id' => $futureAttendee->id,
+                'status' => 'going',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+        DB::table('event_waitlist')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $futureOccurrenceA,
+            'user_id' => $waitlisted->id,
+            'position' => 1,
+            'status' => 'waiting',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('event_rsvps')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $pastOccurrence,
+            'user_id' => $pastAttendee->id,
+            'status' => 'going',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('event_rsvps')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $cancelledOccurrence,
+            'user_id' => $cancelledAttendee->id,
+            'status' => 'cancelled',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->setDailyNotificationPreference((int) $futureAttendee->id);
+        $this->setDailyNotificationPreference((int) $waitlisted->id);
+
+        $response = $this->apiDelete("/v2/events/{$templateId}");
+
+        $this->assertContains($response->getStatusCode(), [200, 204]);
+
+        // Series rows removed: template + future occurrences gone, past detached but kept.
+        $this->assertNull(DB::table('events')->where('id', $templateId)->value('id'));
+        $this->assertNull(DB::table('events')->where('id', $futureOccurrenceA)->value('id'));
+        $this->assertNull(DB::table('events')->where('id', $futureOccurrenceB)->value('id'));
+        $this->assertNotNull(DB::table('events')->where('id', $pastOccurrence)->value('id'));
+        $this->assertNull(DB::table('events')->where('id', $pastOccurrence)->value('parent_event_id'));
+
+        // Future attendee + waitlisted user each get EXACTLY ONE cancellation bell.
+        $bells = fn (int $userId) => DB::table('notifications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $userId)
+            ->where('link', "/events/{$templateId}")
+            ->where('type', 'event')
+            ->count();
+        $this->assertSame(1, $bells((int) $futureAttendee->id));
+        $this->assertSame(1, $bells((int) $waitlisted->id));
+
+        // Past and already-cancelled attendees get nothing.
+        $this->assertSame(0, $bells((int) $pastAttendee->id));
+        $this->assertSame(0, $bells((int) $cancelledAttendee->id));
+
+        // Email channel mirrors the cancel path: one queued digest entry each
+        // (daily frequency), none for past/cancelled attendees.
+        $queued = fn (int $userId) => DB::table('notification_queue')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $userId)
+            ->where('link', "/events/{$templateId}")
+            ->where('activity_type', 'event_cancellation')
+            ->count();
+        $this->assertSame(1, $queued((int) $futureAttendee->id));
+        $this->assertSame(1, $queued((int) $waitlisted->id));
+        $this->assertSame(0, $queued((int) $pastAttendee->id));
+        $this->assertSame(0, $queued((int) $cancelledAttendee->id));
+    }
+
+    public function test_non_recurring_delete_sends_no_cancellation_notifications(): void
+    {
+        $organizer = $this->authenticatedUser();
+        $attendee = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'email' => 'plain-delete-attendee-' . uniqid('', true) . '@example.test',
+        ]);
+        $eventId = $this->createEvent((int) $organizer->id);
+        DB::table('event_rsvps')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $attendee->id,
+            'status' => 'going',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $this->setDailyNotificationPreference((int) $attendee->id);
+
+        $response = $this->apiDelete("/v2/events/{$eventId}");
+
+        $this->assertContains($response->getStatusCode(), [200, 204]);
+        $this->assertSame(0, DB::table('notifications')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $attendee->id)
+            ->where('link', "/events/{$eventId}")
+            ->count());
+    }
+
+    // ================================================================
     // DELETE — Authorization (403)
     // ================================================================
 
