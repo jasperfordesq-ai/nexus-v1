@@ -163,7 +163,8 @@ class VolunteerWellbeingService
             $daysSinceLastActivity = (int) abs(now()->diffInDays($lastActivity));
         } else {
             // No activity ever — check if they have any signups at all
-            $hasAnySignup = DB::table('vol_shift_signups')
+            // (live signups are vol_applications; vol_shift_signups is legacy)
+            $hasAnySignup = DB::table('vol_applications')
                 ->where('user_id', $userId)
                 ->where('tenant_id', $tenantId)
                 ->exists();
@@ -185,11 +186,11 @@ class VolunteerWellbeingService
 
         // ── 5. Overcommitment check ──
         // Count upcoming scheduled shifts in the next 7 days
-        $upcomingShifts = (int) DB::table('vol_shift_signups as ss')
-            ->join('vol_shifts as s', 'ss.shift_id', '=', 's.id')
-            ->where('ss.user_id', $userId)
-            ->where('ss.tenant_id', $tenantId)
-            ->where('ss.status', 'confirmed')
+        $upcomingShifts = (int) DB::table('vol_applications as a')
+            ->join('vol_shifts as s', 'a.shift_id', '=', 's.id')
+            ->where('a.user_id', $userId)
+            ->where('a.tenant_id', $tenantId)
+            ->where('a.status', 'approved')
             ->where('s.start_time', '>=', now())
             ->where('s.start_time', '<=', now()->addDays(7))
             ->count();
