@@ -217,15 +217,21 @@ class VolunteerExpenseController extends BaseApiController
         if (empty($data['expense_type']) && !empty($data['type'])) {
             $data['expense_type'] = $data['type'];
         }
+        // Receipt requirements are threshold-based (requires_receipt_above:
+        // 0 = never required, >0 = required above that amount — see the
+        // !empty() check in VolunteerExpenseService::validate). The old
+        // boolean requires_receipt alias mapped true to 0, which the
+        // validation reads as "never required" — a silent no-op. Nothing in
+        // the codebase sends it; reject rather than mis-apply it.
         if (array_key_exists('requires_receipt', $data) && !array_key_exists('requires_receipt_above', $data)) {
-            $data['requires_receipt_above'] = $data['requires_receipt'] ? 0 : null;
+            return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'requires_receipt_above']), 'requires_receipt_above', 422);
         }
 
         if (empty($data['expense_type'])) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'expense_type']), 'expense_type', 422);
         }
 
-        $policyFields = ['max_amount', 'max_monthly', 'requires_receipt', 'requires_receipt_above', 'auto_approve_below', 'description', 'enabled'];
+        $policyFields = ['max_amount', 'max_monthly', 'requires_receipt_above', 'requires_approval'];
         $hasPolicyField = false;
         foreach ($policyFields as $field) {
             if (array_key_exists($field, $data)) {

@@ -693,12 +693,17 @@ class VolunteerService
         $formatted['shifts'] = self::getShiftsForOpportunity($id);
 
         if ($viewerId) {
+            // Only pending/approved applications block re-applying — apply()
+            // permits a fresh application after a decline/withdrawal, and the
+            // UI hides the Apply button whenever has_applied is true.
             $formatted['has_applied'] = (bool) DB::selectOne(
-                "SELECT 1 FROM vol_applications WHERE opportunity_id = ? AND user_id = ? AND tenant_id = ? LIMIT 1",
+                "SELECT 1 FROM vol_applications WHERE opportunity_id = ? AND user_id = ? AND tenant_id = ?
+                 AND status IN ('pending', 'approved') LIMIT 1",
                 [$id, $viewerId, $tenantId]
             );
             $userApp = DB::selectOne(
-                "SELECT * FROM vol_applications WHERE opportunity_id = ? AND user_id = ? AND tenant_id = ?",
+                "SELECT * FROM vol_applications WHERE opportunity_id = ? AND user_id = ? AND tenant_id = ?
+                 ORDER BY id DESC LIMIT 1",
                 [$id, $viewerId, $tenantId]
             );
             $formatted['application'] = $userApp ? [
