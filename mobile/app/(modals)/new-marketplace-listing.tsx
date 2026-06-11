@@ -41,7 +41,7 @@ import {
 } from '@/lib/api/marketplace';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
-import { withAlpha } from '@/lib/utils/color';
+import { contrastText, withAlpha } from '@/lib/utils/color';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 
 const PRICE_TYPES: MarketplacePriceType[] = ['fixed', 'negotiable', 'free', 'contact'];
@@ -651,7 +651,7 @@ function ButtonGroup<T extends string>({
                 id={value}
                 style={isSelected ? { backgroundColor: primary } : undefined}
               >
-                <TagGroup.ItemLabel style={isSelected ? { color: '#FFFFFF' } : undefined}>
+                <TagGroup.ItemLabel style={isSelected ? { color: contrastText(primary) } : undefined}>
                   {labelFor(value)}
                 </TagGroup.ItemLabel>
               </TagGroup.Item>

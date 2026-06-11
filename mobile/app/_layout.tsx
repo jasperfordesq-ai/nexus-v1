@@ -72,6 +72,26 @@ Sentry.init({
   // Sample 10% of traces in production to reduce Sentry quota usage
   tracesSampleRate: 0.1,
   enabled: !!process.env.EXPO_PUBLIC_SENTRY_DSN,
+  // Strip auth material before events leave the device. Tokens can ride along
+  // in request headers (breadcrumbs) or extra context attached by API errors.
+  sendDefaultPii: false,
+  beforeSend(event) {
+    if (event.request?.headers) {
+      delete event.request.headers.Authorization;
+      delete event.request.headers.authorization;
+      delete event.request.headers.Cookie;
+      delete event.request.headers.cookie;
+    }
+    return event;
+  },
+  beforeBreadcrumb(breadcrumb) {
+    const data = breadcrumb.data as Record<string, unknown> | undefined;
+    if (data) {
+      delete data.Authorization;
+      delete data.authorization;
+    }
+    return breadcrumb;
+  },
 });
 
 /**

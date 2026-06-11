@@ -46,6 +46,7 @@ import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import NativePressable from '@/components/ui/NativePressable';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 type Tab = 'skills' | 'endorsements' | 'discover';
 type ListItem = Skill | Endorsement;
@@ -328,7 +329,7 @@ export default function EndorsementsScreen() {
 
   const renderEndorsement = useCallback(
     ({ item }: { item: Endorsement }) => {
-      const date = new Date(item.created_at).toLocaleDateString('default', {
+      const date = new Date(item.created_at).toLocaleDateString(dateLocale(), {
         day: 'numeric',
         month: 'short',
         year: 'numeric',

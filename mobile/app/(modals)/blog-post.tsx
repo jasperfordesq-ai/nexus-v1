@@ -29,6 +29,7 @@ import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 const WEB_URL = 'https://app.project-nexus.ie';
 
@@ -133,7 +134,7 @@ export default function BlogPostScreen() {
   }
 
   const publishedDate = post.published_at
-    ? new Date(post.published_at).toLocaleDateString('default', {
+    ? new Date(post.published_at).toLocaleDateString(dateLocale(), {
         year: 'numeric',
         month: 'long',
         day: 'numeric',

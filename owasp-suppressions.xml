@@ -49,18 +49,27 @@
   </suppress>
 
   <!--
-    ACCEPTED RISK: web-token/jwt-library@4.1.3 — CVE-2025-45770 (CVSS 7.0)
-    No patched version available yet (4.1.3 is the latest stable).
-    The vulnerability relates to JWT signature validation edge cases.
-    Our usage is limited to internal API token handling with controlled inputs.
-    Will update when a fix is released. Tracked for next review.
+    FALSE POSITIVE: web-token/jwt-library → matched to generic "jwt" CPE
+    (cpe:2.3:a:jwt_project:jwt). CVE-2025-45770 is filed against "jwt v5.4.3"
+    — a DIFFERENT JWT library and a version that does not exist in
+    web-token/jwt-library's 4.x line — and the CVE itself is VENDOR-DISPUTED
+    ("key lengths are expected to be set by the application, not the
+    library"). Neither composer audit (GitHub advisories) nor Trivy flags
+    web-token/jwt-library at any version. Re-confirmed 2026-06-11 against
+    4.1.7 (latest, 2026-06-06): the fuzzy CPE match still fires, proving the
+    flag tracks the product NAME, not our package. Permanent suppression —
+    wrong-product CPE matches don't expire.
+    (History: previously suppressed as accepted-risk on 4.1.3 until
+    2026-06-01; that expiry is what turned the Security Scan red.)
   -->
-  <suppress until="2026-06-01Z">
+  <suppress>
     <notes><![CDATA[
-      ACCEPTED RISK: CVE-2025-45770 in jwt-library 4.1.3.
-      No fix available — 4.1.3 is latest. Suppress until 2026-06-01 and re-evaluate.
+      FP: web-token/jwt-library is not NVD's "jwt_project:jwt".
+      CVE-2025-45770 targets a different library ("jwt v5.4.3") and is
+      vendor-disputed. composer audit + Trivy both report no advisory
+      for web-token/jwt-library.
     ]]></notes>
-    <packageUrl regex="true">^pkg:composer/web-token/jwt-library@4\.1\.3$</packageUrl>
+    <packageUrl regex="true">^pkg:composer/web-token/jwt-library@.*$</packageUrl>
     <vulnerabilityName>CVE-2025-45770</vulnerabilityName>
   </suppress>
 

@@ -54,6 +54,7 @@ import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import NativePressable from '@/components/ui/NativePressable';
 import SearchInput from '@/components/ui/SearchInput';
 import Toggle from '@/components/ui/Toggle';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 // ---------------------------------------------------------------------------
 // Type filter options
@@ -93,7 +94,7 @@ function JobCard({
 
   const deadlineStr = item.deadline
     ? t('card.deadline', {
-        date: new Date(item.deadline).toLocaleDateString('default', {
+        date: new Date(item.deadline).toLocaleDateString(dateLocale(), {
           month: 'short',
           day: 'numeric',
           year: 'numeric',
@@ -312,7 +313,7 @@ function ApplicationCard({
   const orgName = item.vacancy?.organization?.name ?? item.vacancy?.creator?.name ?? null;
 
   const appliedStr = t('applications.appliedOn', {
-    date: new Date(item.created_at).toLocaleDateString('default', {
+    date: new Date(item.created_at).toLocaleDateString(dateLocale(), {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -543,7 +544,7 @@ function ApplicationCard({
                     })}
                   </Text>
                   <Text className="text-[11px] text-muted-foreground">
-                    {new Date(entry.changed_at).toLocaleDateString('default', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    {new Date(entry.changed_at).toLocaleDateString(dateLocale(), { month: 'short', day: 'numeric', year: 'numeric' })}
                   </Text>
                 </View>
               ))}
@@ -571,7 +572,7 @@ function JobAlertCard({
   isBusy: boolean;
 }) {
   const created = t('alerts.createdDate', {
-    date: new Date(alert.created_at).toLocaleDateString('default', {
+    date: new Date(alert.created_at).toLocaleDateString(dateLocale(), {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -579,7 +580,7 @@ function JobAlertCard({
   });
   const notified = t('alerts.lastNotified', {
     date: alert.last_notified_at
-      ? new Date(alert.last_notified_at).toLocaleDateString('default', {
+      ? new Date(alert.last_notified_at).toLocaleDateString(dateLocale(), {
           month: 'short',
           day: 'numeric',
           year: 'numeric',

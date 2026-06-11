@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { createJob, generateJobDescription, getJobDetail, updateJob, type CreateJobPayload, type JobVacancy } from '@/lib/api/jobs';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
-import { withAlpha } from '@/lib/utils/color';
+import { contrastText, withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
 import { useAppToast } from '@/components/ui/AppToast';
 import FormActionFooter from '@/components/ui/FormActionFooter';
@@ -368,7 +368,7 @@ function ButtonGroup<T extends string>({
                 id={value}
                 style={isSelected ? { backgroundColor: primary } : undefined}
               >
-                <TagGroup.ItemLabel style={isSelected ? { color: '#FFFFFF' } : undefined}>
+                <TagGroup.ItemLabel style={isSelected ? { color: contrastText(primary) } : undefined}>
                   {labelFor(value)}
                 </TagGroup.ItemLabel>
               </TagGroup.Item>

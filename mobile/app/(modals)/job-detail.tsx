@@ -32,6 +32,7 @@ import EmptyState from '@/components/ui/EmptyState';
 import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 const WEB_URL = 'https://app.project-nexus.ie';
 
@@ -741,7 +742,7 @@ function OwnerApplicationCard({
   const [isUpdating, setIsUpdating] = useState(false);
   const applicantName = application.applicant?.name?.trim() || t('owner.unknownApplicant');
   const submitted = application.created_at
-    ? new Date(application.created_at).toLocaleDateString('default', { day: 'numeric', month: 'short', year: 'numeric' })
+    ? new Date(application.created_at).toLocaleDateString(dateLocale(), { day: 'numeric', month: 'short', year: 'numeric' })
     : '';
 
   async function updateStatus(status: JobOwnerApplication['status']) {

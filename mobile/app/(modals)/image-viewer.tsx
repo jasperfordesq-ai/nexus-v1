@@ -11,8 +11,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button as HeroButton, Surface } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
-export default function ImageViewerScreen() {
+function ImageViewerScreenInner() {
   const { t } = useTranslation('home');
   const { uri, title } = useLocalSearchParams<{ uri: string; title?: string }>();
 
@@ -102,5 +103,13 @@ export default function ImageViewerScreen() {
         <View className="pb-3" />
       </SafeAreaView>
     </View>
+  );
+}
+
+export default function ImageViewerScreen() {
+  return (
+    <ModalErrorBoundary>
+      <ImageViewerScreenInner />
+    </ModalErrorBoundary>
   );
 }

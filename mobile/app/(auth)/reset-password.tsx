@@ -28,7 +28,9 @@ type ResetPasswordFormValues = {
 
 function makeResetPasswordSchema(t: (key: string) => string) {
   return z.object({
-    password: z.string().min(8, t('errors.weakPassword')),
+    // 12 matches the backend PasswordResetController::MIN_PASSWORD_LENGTH —
+    // a lower client minimum just turns into a server 422 after submit.
+    password: z.string().min(12, t('errors.weakPassword')),
     passwordConfirmation: z.string().min(1, t('resetPassword.confirmRequired')),
   }).refine((data) => data.password === data.passwordConfirmation, {
     path: ['passwordConfirmation'],

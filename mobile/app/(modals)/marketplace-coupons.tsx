@@ -19,6 +19,7 @@ import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 export default function MarketplaceCouponsRoute() {
   return (
@@ -115,7 +116,7 @@ function CouponCard({ item }: { item: PublicMerchantCoupon }) {
         </Surface>
         {item.valid_until ? (
           <Text className="text-xs" style={{ color: theme.textSecondary }}>
-            {t('publicCoupons.validUntil', { date: new Date(item.valid_until).toLocaleDateString() })}
+            {t('publicCoupons.validUntil', { date: new Date(item.valid_until).toLocaleDateString(dateLocale()) })}
           </Text>
         ) : null}
         {terms.length > 0 ? (

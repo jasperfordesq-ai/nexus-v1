@@ -21,6 +21,7 @@ import { withAlpha } from '@/lib/utils/color';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 import { EventCardSkeleton } from '@/components/ui/Skeleton';
 import NativePressable from '@/components/ui/NativePressable';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 function extractEventsPage(r: EventsResponse) {
   return {
@@ -232,10 +233,10 @@ function EventCard({
   const theme = useTheme();
   const start = event.start_date ? new Date(event.start_date) : null;
   const isValidDate = start && !isNaN(start.getTime());
-  const month = isValidDate ? start.toLocaleString('default', { month: 'short' }) : '-';
+  const month = isValidDate ? start.toLocaleString(dateLocale(), { month: 'short' }) : '-';
   const day = isValidDate ? String(start.getDate()) : '-';
-  const weekday = isValidDate ? start.toLocaleString('default', { weekday: 'short' }) : '';
-  const time = isValidDate ? start.toLocaleTimeString('default', { hour: '2-digit', minute: '2-digit' }) : '-';
+  const weekday = isValidDate ? start.toLocaleString(dateLocale(), { weekday: 'short' }) : '';
+  const time = isValidDate ? start.toLocaleTimeString(dateLocale(), { hour: '2-digit', minute: '2-digit' }) : '-';
   const coverImage = resolveImageUrl(event.cover_image);
   const accent = event.category?.color ?? '#F59E0B';
   const isCancelled = event.status === 'cancelled';

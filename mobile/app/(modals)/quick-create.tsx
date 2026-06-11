@@ -15,6 +15,7 @@ import EmptyState from '@/components/ui/EmptyState';
 import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -94,7 +95,7 @@ const QUICK_CREATE_OPTIONS: QuickCreateOption[] = [
   },
 ];
 
-export default function QuickCreateRoute() {
+function QuickCreateRouteInner() {
   const { t } = useTranslation(['common']);
   const { hasFeature, hasModule } = useTenant();
   const primary = usePrimaryColor();
@@ -160,5 +161,13 @@ export default function QuickCreateRoute() {
         )}
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+export default function QuickCreateRoute() {
+  return (
+    <ModalErrorBoundary>
+      <QuickCreateRouteInner />
+    </ModalErrorBoundary>
   );
 }

@@ -42,6 +42,7 @@ import BottomSheet from '@/components/ui/BottomSheet';
 import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 const WEB_URL = 'https://app.project-nexus.ie';
 
@@ -53,7 +54,7 @@ function formatDate(value?: string | null, mode: 'short' | 'long' = 'long') {
   if (!value) return null;
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return null;
-  return new Intl.DateTimeFormat(undefined, mode === 'short'
+  return new Intl.DateTimeFormat(dateLocale(), mode === 'short'
     ? { weekday: 'short', month: 'short', day: 'numeric' }
     : { day: 'numeric', month: 'long', year: 'numeric' }).format(date);
 }
@@ -62,7 +63,7 @@ function formatTime(value?: string | null) {
   if (!value) return null;
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return null;
-  return new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(date);
+  return new Intl.DateTimeFormat(dateLocale(), { hour: '2-digit', minute: '2-digit' }).format(date);
 }
 
 function stripHtml(value?: string | null) {

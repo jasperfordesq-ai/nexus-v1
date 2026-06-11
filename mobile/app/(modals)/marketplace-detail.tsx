@@ -420,6 +420,7 @@ function MarketplaceDetailScreen() {
                       isIconOnly
                       variant={activeImage === index ? 'primary' : 'secondary'}
                       onPress={() => setActiveImage(index)}
+                      accessibilityLabel={t('common:aria.carouselImage', { current: index + 1, total: images.length })}
                       style={activeImage === index ? { backgroundColor: primary } : undefined}
                     >
                       {thumb ? <Image source={{ uri: thumb }} className="size-9 rounded-xl" resizeMode="cover" /> : <Ionicons name="image-outline" size={17} color={activeImage === index ? '#fff' : primary} />}

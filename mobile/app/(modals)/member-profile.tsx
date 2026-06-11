@@ -50,6 +50,7 @@ import {
   type MemberReview,
 } from '@/lib/api/members';
 import type { Exchange } from '@/lib/api/exchanges';
+import { dateLocale } from '@/lib/utils/dateLocale';
 import {
   getBadges,
   getGamificationProfile,
@@ -1614,7 +1615,7 @@ function formatDate(iso: string): string {
   try {
     const d = new Date(iso);
     if (Number.isNaN(d.getTime())) return iso;
-    return d.toLocaleDateString(undefined, {
+    return d.toLocaleDateString(dateLocale(), {
       year: 'numeric',
       month: 'long',
     });

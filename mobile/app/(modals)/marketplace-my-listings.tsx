@@ -35,7 +35,7 @@ import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { storage } from '@/lib/storage';
-import { withAlpha } from '@/lib/utils/color';
+import { contrastText, withAlpha } from '@/lib/utils/color';
 
 type ListingTab = 'active' | 'draft' | 'sold' | 'expired';
 
@@ -283,7 +283,7 @@ function DashboardCard({
                   id={tab}
                   style={isSelected ? { backgroundColor: primary } : undefined}
                 >
-                  <TagGroup.ItemLabel style={isSelected ? { color: '#FFFFFF' } : undefined}>
+                  <TagGroup.ItemLabel style={isSelected ? { color: contrastText(primary) } : undefined}>
                     {t(`myListings.tabs.${tab}`, { count: listingTabCount(stats, tab) })}
                   </TagGroup.ItemLabel>
                 </TagGroup.Item>

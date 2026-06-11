@@ -3,13 +3,15 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { dateLocale } from '@/lib/utils/dateLocale';
+
 /**
  * Formats a date value as a human-readable absolute date string.
  *
  * @param date - ISO 8601 string or Date object
  */
 export function formatDate(date: string | Date): string {
-  return new Date(date).toLocaleDateString('default', {
+  return new Date(date).toLocaleDateString(dateLocale(), {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -44,5 +46,5 @@ export function formatRelativeTime(iso: string, short = false): string {
   if (short) return `${days}d`;
   if (days < 7) return `${days}d ago`;
 
-  return parsed.toLocaleDateString();
+  return parsed.toLocaleDateString(dateLocale());
 }

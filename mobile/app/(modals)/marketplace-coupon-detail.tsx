@@ -27,6 +27,7 @@ import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 export default function MarketplaceCouponDetailRoute() {
   return (
@@ -117,7 +118,7 @@ function MarketplaceCouponDetailScreen() {
                 <Image source={{ uri: qrImageUrl(qr.token) }} className="size-56 rounded-2xl" accessibilityLabel={t('publicCoupons.qrAlt')} />
                 <Text className="text-center text-sm" style={{ color: theme.textSecondary }}>{t('publicCoupons.scanAtCheckout')}</Text>
                 <Text className="text-xs" style={{ color: theme.textSecondary }}>
-                  {t('publicCoupons.qrExpires', { time: new Date(qr.expires_at).toLocaleTimeString() })}
+                  {t('publicCoupons.qrExpires', { time: new Date(qr.expires_at).toLocaleTimeString(dateLocale()) })}
                 </Text>
                 <Surface variant="secondary" className="rounded-2xl px-3 py-2">
                   <Text className="font-mono text-xs" style={{ color: theme.text }}>{qr.token}</Text>
@@ -167,7 +168,7 @@ function CouponDetailCard({
         </Surface>
         {item.valid_until ? (
           <Text className="text-sm" style={{ color: theme.textSecondary }}>
-            {t('publicCoupons.validUntil', { date: new Date(item.valid_until).toLocaleDateString() })}
+            {t('publicCoupons.validUntil', { date: new Date(item.valid_until).toLocaleDateString(dateLocale()) })}
           </Text>
         ) : null}
         {terms.length > 0 ? (

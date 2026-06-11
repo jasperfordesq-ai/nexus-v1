@@ -108,6 +108,7 @@ import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import MarketplaceListingCard from '@/components/marketplace/MarketplaceListingCard';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 const WEB_URL = 'https://app.project-nexus.ie';
 const CARD_MIN_HEIGHT = 118;
@@ -138,14 +139,14 @@ function formatDate(value?: string | null) {
   if (!value) return null;
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return null;
-  return new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short', year: 'numeric' }).format(date);
+  return new Intl.DateTimeFormat(dateLocale(), { day: 'numeric', month: 'short', year: 'numeric' }).format(date);
 }
 
 function formatTime(value?: string | null) {
   if (!value) return null;
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return null;
-  return new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(date);
+  return new Intl.DateTimeFormat(dateLocale(), { hour: '2-digit', minute: '2-digit' }).format(date);
 }
 
 function formatDateParts(value?: string | null) {
@@ -153,8 +154,8 @@ function formatDateParts(value?: string | null) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return null;
   return {
-    day: new Intl.DateTimeFormat(undefined, { day: 'numeric' }).format(date),
-    month: new Intl.DateTimeFormat(undefined, { month: 'short' }).format(date),
+    day: new Intl.DateTimeFormat(dateLocale(), { day: 'numeric' }).format(date),
+    month: new Intl.DateTimeFormat(dateLocale(), { month: 'short' }).format(date),
   };
 }
 
@@ -169,7 +170,7 @@ function formatFileSize(bytes?: number | null) {
 
 function formatMetric(value?: number | null, options?: Intl.NumberFormatOptions) {
   const amount = Number(value ?? 0);
-  return new Intl.NumberFormat(undefined, options).format(Number.isFinite(amount) ? amount : 0);
+  return new Intl.NumberFormat(dateLocale(), options).format(Number.isFinite(amount) ? amount : 0);
 }
 
 function StatusChip({ icon, label, color }: { icon: IoniconName; label: string; color: string }) {

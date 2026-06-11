@@ -11,6 +11,7 @@ import { Button as HeroButton } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
+import { contrastText } from '@/lib/utils/color';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -47,7 +48,7 @@ export default function FAB({ icon = 'add', onPress, color, position = 'bottom-r
         className="h-14 w-14 rounded-full"
         style={{ backgroundColor: bgColor, elevation: 6, shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.27, shadowRadius: 4.65 }}
       >
-        <Ionicons name={icon} size={28} color="#fff" />
+        <Ionicons name={icon} size={28} color={contrastText(bgColor)} />
       </HeroButton>
     </View>
   );

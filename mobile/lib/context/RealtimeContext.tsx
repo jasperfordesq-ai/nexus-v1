@@ -117,9 +117,11 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
       try {
         let config = pusherConfigRef.current;
 
-        // Only fetch Pusher config if we don't have it cached
+        // Only fetch Pusher config if we don't have it cached.
+        // NOTE: this route lives OUTSIDE the /v2 prefix on the backend —
+        // /api/v2/pusher/config does not exist (404) and would silently kill realtime.
         if (!config) {
-          config = await api.get<PusherConfig>(`${API_V2}/pusher/config`);
+          config = await api.get<PusherConfig>('/api/pusher/config');
           if (!mounted) return;
           pusherConfigRef.current = config;
         }

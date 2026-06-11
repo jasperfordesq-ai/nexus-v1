@@ -75,6 +75,7 @@ import Input from '@/components/ui/Input';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import SearchInput from '@/components/ui/SearchInput';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 type TabKey = 'opportunities' | 'applications' | 'shifts' | 'swaps' | 'hours' | 'certificates' | 'expenses' | 'donations' | 'organisations';
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
@@ -84,20 +85,20 @@ function formatDate(value?: string | null) {
   if (!value) return null;
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return null;
-  return new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short', year: 'numeric' }).format(date);
+  return new Intl.DateTimeFormat(dateLocale(), { day: 'numeric', month: 'short', year: 'numeric' }).format(date);
 }
 
 function formatTime(value?: string | null) {
   if (!value) return null;
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return null;
-  return new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(date);
+  return new Intl.DateTimeFormat(dateLocale(), { hour: '2-digit', minute: '2-digit' }).format(date);
 }
 
 function formatMoney(value: number | string | null | undefined, currency = 'EUR') {
   const amount = Number(value ?? 0);
   try {
-    return new Intl.NumberFormat(undefined, {
+    return new Intl.NumberFormat(dateLocale(), {
       style: 'currency',
       currency: currency || 'EUR',
       minimumFractionDigits: 2,

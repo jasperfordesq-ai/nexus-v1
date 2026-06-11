@@ -41,8 +41,9 @@ import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { presentMarketplacePayment } from '@/lib/payments/marketplacePayment';
-import { withAlpha } from '@/lib/utils/color';
+import { contrastText, withAlpha } from '@/lib/utils/color';
 import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 type OrderMode = 'purchases' | 'sales';
 type OrderStatusTab = 'all' | 'active' | 'completed' | 'cancelled';
@@ -60,7 +61,7 @@ const ORDER_STATUS_FILTERS: Record<OrderStatusTab, string | null> = {
 };
 
 function formatOrderTotal(value: number, currency: string): string {
-  return new Intl.NumberFormat(undefined, {
+  return new Intl.NumberFormat(dateLocale(), {
     style: 'currency',
     currency: currency || 'EUR',
     minimumFractionDigits: 0,
@@ -430,7 +431,7 @@ function MarketplaceOrdersScreen() {
                         id={tab}
                         style={isSelected ? { backgroundColor: primary } : undefined}
                       >
-                        <TagGroup.ItemLabel style={isSelected ? { color: '#FFFFFF' } : undefined}>
+                        <TagGroup.ItemLabel style={isSelected ? { color: contrastText(primary) } : undefined}>
                           {t(`orders.tabs.${tab}`)}
                         </TagGroup.ItemLabel>
                       </TagGroup.Item>
@@ -536,6 +537,7 @@ function MarketplaceOrdersScreen() {
                       size="sm"
                       variant={rating >= value ? 'primary' : 'secondary'}
                       onPress={() => setRating(value)}
+                      accessibilityLabel={`${t('orders.rating')}: ${value}/5`}
                       style={rating >= value ? { backgroundColor: theme.warning } : undefined}
                     >
                       <Ionicons name={rating >= value ? 'star' : 'star-outline'} size={17} color={rating >= value ? '#111827' : primary} />
@@ -651,7 +653,7 @@ function OrderCard({
   const imageUrl = resolveImageUrl(item.listing?.image?.url);
   const counterparty = mode === 'purchases' ? item.seller : item.buyer;
   const counterpartyLabel = mode === 'purchases' ? t('orders.sellerLabel') : t('orders.buyerLabel');
-  const orderDate = item.created_at ? new Date(item.created_at).toLocaleDateString() : null;
+  const orderDate = item.created_at ? new Date(item.created_at).toLocaleDateString(dateLocale()) : null;
   const statusTone = orderStatusTone(item.status);
   const statusColor = statusTone === 'success'
     ? theme.success

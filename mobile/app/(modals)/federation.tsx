@@ -31,6 +31,7 @@ import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 import NativePressable from '@/components/ui/NativePressable';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 type IoniconName = ComponentProps<typeof Ionicons>['name'];
 
@@ -58,7 +59,7 @@ function formatDate(value?: string | null) {
   if (!value) return '';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '';
-  return date.toLocaleDateString('default', { month: 'long', year: 'numeric' });
+  return date.toLocaleDateString(dateLocale(), { month: 'long', year: 'numeric' });
 }
 
 function relativeTime(value: string, t: (key: string, opts?: Record<string, unknown>) => string) {

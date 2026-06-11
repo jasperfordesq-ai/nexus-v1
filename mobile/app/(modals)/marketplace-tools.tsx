@@ -62,6 +62,7 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
+import { dateLocale } from '@/lib/utils/dateLocale';
 
 type ToolTab = 'collections' | 'savedSearches' | 'promotions' | 'pickups' | 'coupons';
 type CouponDiscountType = 'percent' | 'fixed' | 'bogo';
@@ -788,7 +789,7 @@ function PickupSlotToolCard({
         <HeroButton className="flex-1" size="sm" variant="secondary" onPress={onToggle}>
           <HeroButton.Label>{item.is_active ? t('tools.pickups.pause') : t('tools.pickups.activate')}</HeroButton.Label>
         </HeroButton>
-        <HeroButton isIconOnly size="sm" variant="danger-soft" onPress={onDelete}>
+        <HeroButton isIconOnly size="sm" variant="danger-soft" onPress={onDelete} accessibilityLabel={t('common:buttons.delete')}>
           <Ionicons name="trash-outline" size={16} color={theme.error} />
         </HeroButton>
       </View>
@@ -1200,7 +1201,7 @@ function CouponToolCard({
           <Chip.Label>{t('tools.coupons.usageCount', { count: usageCount })}</Chip.Label>
         </Chip>
         <Chip size="sm" variant="secondary">
-          <Chip.Label>{item.valid_until ? t('tools.coupons.validUntilShort', { date: new Date(item.valid_until).toLocaleDateString() }) : t('tools.coupons.noExpiry')}</Chip.Label>
+          <Chip.Label>{item.valid_until ? t('tools.coupons.validUntilShort', { date: new Date(item.valid_until).toLocaleDateString(dateLocale()) }) : t('tools.coupons.noExpiry')}</Chip.Label>
         </Chip>
         <Chip size="sm" variant="secondary">
           <Chip.Label>{t('tools.coupons.appliesLabel', { scope: appliesLabel })}</Chip.Label>
@@ -1213,7 +1214,7 @@ function CouponToolCard({
         <HeroButton className="flex-1" size="sm" variant="secondary" onPress={onRedemptions}>
           <HeroButton.Label>{t('tools.coupons.redemptions')}</HeroButton.Label>
         </HeroButton>
-        <HeroButton isIconOnly size="sm" variant="danger-soft" onPress={onDelete}>
+        <HeroButton isIconOnly size="sm" variant="danger-soft" onPress={onDelete} accessibilityLabel={t('common:buttons.delete')}>
           <Ionicons name="trash-outline" size={16} color={theme.error} />
         </HeroButton>
       </View>

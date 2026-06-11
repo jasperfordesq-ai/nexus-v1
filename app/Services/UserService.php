@@ -520,8 +520,11 @@ class UserService
             return false;
         }
 
-        if (strlen($newPassword) < 8) {
-            self::setError('WEAK_PASSWORD', 'New password must be at least 8 characters');
+        // 12 matches registration (RegistrationController) and the reset flow
+        // (PasswordResetController::MIN_PASSWORD_LENGTH) — change-password must
+        // not be a weaker back door.
+        if (strlen($newPassword) < 12) {
+            self::setError('WEAK_PASSWORD', __('api.password_min_length_generic', ['length' => 12]));
             return false;
         }
 

@@ -2671,6 +2671,9 @@ Route::post('/app/log', [\App\Http\Controllers\Api\AppController::class, 'log'])
 Route::post('/pusher/auth', [\App\Http\Controllers\Api\PusherController::class, 'auth']);
 Route::get('/pusher/auth', [\App\Http\Controllers\Api\PusherController::class, 'auth']);
 Route::get('/pusher/config', [\App\Http\Controllers\Api\PusherController::class, 'config']);
+// Alias under /v2 — already-shipped mobile builds request /api/v2/pusher/config;
+// without this alias those binaries 404 and realtime silently dies on mobile.
+Route::get('/v2/pusher/config', [\App\Http\Controllers\Api\PusherController::class, 'config']);
 // WebAuthn state-changing endpoints — rate-limited (10 req/min per IP) to prevent abuse of
 // challenge generation and credential mutation. Public pre-login WebAuthn endpoints
 // (/webauthn/auth-challenge, /webauthn/auth-verify) are throttled separately at throttle:30,1

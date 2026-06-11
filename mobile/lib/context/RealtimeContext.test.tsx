@@ -82,6 +82,18 @@ describe('RealtimeContext', () => {
     await waitFor(() => expect(result.current.unreadMessages).toBe(3));
   });
 
+  it('fetches Pusher config from the non-versioned /api/pusher/config route', async () => {
+    // Regression: the backend registers /pusher/config OUTSIDE the v2 prefix —
+    // /api/v2/pusher/config 404s in production and realtime silently dies.
+    const { result } = renderHook(() => useRealtimeContext(), { wrapper });
+
+    await waitFor(() => expect(result.current.unreadMessages).toBe(3));
+    await waitFor(() =>
+      expect(mockApiGet).toHaveBeenCalledWith('/api/pusher/config'),
+    );
+    expect(mockApiGet).not.toHaveBeenCalledWith('/api/v2/pusher/config');
+  });
+
   it('resets unread to 0 when not authenticated', async () => {
     mockIsAuthenticated = false;
 

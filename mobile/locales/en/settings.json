@@ -60,7 +60,7 @@
       "currentRequired": "Please enter your current password.",
       "newRequired": "Please enter a new password.",
       "mismatch": "New password and confirmation do not match.",
-      "tooShort": "New password must be at least 8 characters."
+      "tooShort": "New password must be at least 12 characters."
     },
     "changeError": "Could not change password. Please try again."
   },
