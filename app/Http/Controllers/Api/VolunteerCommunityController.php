@@ -106,21 +106,22 @@ class VolunteerCommunityController extends BaseApiController
 
         $tenantId = TenantContext::getId();
 
-        // Authorization: only the waitlisted user themselves can claim a promoted spot
+        // {id} is the SHIFT id (route: shifts/{id}/waitlist/promote). Resolve
+        // the caller's own offer for that shift — users can only claim their
+        // own notified spot.
         $entry = DB::table('vol_shift_waitlist')
-            ->where('id', (int) $id)
+            ->where('shift_id', (int) $id)
+            ->where('user_id', $userId)
+            ->whereIn('status', ['waiting', 'notified'])
             ->where('tenant_id', $tenantId)
+            ->orderByRaw("status = 'notified' DESC")
             ->first();
 
         if (!$entry) {
             return $this->respondWithError('NOT_FOUND', __('api.vol_waitlist_not_found'), null, 404);
         }
 
-        if ((int) $entry->user_id !== $userId) {
-            return $this->respondWithError('FORBIDDEN', __('api.vol_waitlist_own_only'), null, 403);
-        }
-
-        $success = $this->shiftWaitlistService->promoteUser((int) $id, $tenantId);
+        $success = $this->shiftWaitlistService->promoteUser((int) $entry->id, $tenantId);
         if (!$success) {
             $errors = $this->shiftWaitlistService->getErrors();
             return $this->respondWithErrors($errors, $this->getErrorStatus($errors));

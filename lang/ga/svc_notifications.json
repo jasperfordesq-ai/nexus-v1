@@ -150,5 +150,8 @@
   "marketplace_payout": {
     "onboarding_complete_bell": "Tá do chuntas díoltóra socraithe go hiomlán — is féidir leat íocaíochtaí margaidh a fháil anois.",
     "payout_sent_bell": "Scaoileadh d'íocaíocht {{amount}} don ordú #{{order}} chugat."
+  },
+  "shift_waitlist": {
+    "spot_available": "A spot opened up on a shift you're waitlisted for — claim it before it expires"
   }
 }

@@ -530,7 +530,12 @@
     "spots": "{{count}} points",
     "joined": "Liste d'attente inscrite",
     "leave": "Partir",
-    "leave_confirm": "Etes-vous sûr de vouloir quitter cette liste d'attente ? Vous perdrez votre position actuelle."
+    "leave_confirm": "Etes-vous sûr de vouloir quitter cette liste d'attente ? Vous perdrez votre position actuelle.",
+    "spot_available": "Spot available!",
+    "claim": "Claim spot",
+    "claim_success": "You're in — signed up for the shift!",
+    "claim_failed": "Couldn't claim the spot",
+    "claim_hint": "A spot opened up for you. Claim it soon — unclaimed spots pass to the next person after 48 hours."
   },
   "swaps": {
     "heading": "Échanges de quarts de travail",

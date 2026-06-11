@@ -7,6 +7,7 @@
 namespace App\Services;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\VolShift;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -107,20 +108,22 @@ class ShiftWaitlistService
         $tenantId = TenantContext::getId();
 
         try {
-            return DB::transaction(function () use ($shiftId, $userId, $tenantId) {
+            $left = DB::transaction(function () use ($shiftId, $userId, $tenantId) {
                 // Lock the entry so concurrent leave() calls reorder from the
                 // live position instead of a stale snapshot (which left gaps).
+                // A 'notified' entry (outstanding spot offer) can also leave —
+                // its declined offer is passed to the next person below.
                 $entry = DB::table('vol_shift_waitlist')
                     ->where('shift_id', $shiftId)
                     ->where('user_id', $userId)
-                    ->where('status', 'waiting')
+                    ->whereIn('status', ['waiting', 'notified'])
                     ->where('tenant_id', $tenantId)
                     ->lockForUpdate()
                     ->first();
 
                 if (! $entry) {
                     self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.shift_waitlist_not_on_waitlist')];
-                    return false;
+                    return null;
                 }
 
                 // Cancel the entry
@@ -137,8 +140,18 @@ class ShiftWaitlistService
                     ->where('tenant_id', $tenantId)
                     ->decrement('position');
 
-                return true;
+                return $entry;
             });
+
+            if ($left === null) {
+                return false;
+            }
+
+            if ($left->status === 'notified') {
+                self::notifyNext($shiftId, $tenantId);
+            }
+
+            return true;
         } catch (\Exception $e) {
             Log::error('ShiftWaitlistService::leave error: ' . $e->getMessage());
             self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.shift_waitlist_leave_failed')];
@@ -219,10 +232,10 @@ class ShiftWaitlistService
                 ->leftJoin('vol_organizations as org', 'opp.organization_id', '=', 'org.id')
                 ->where('w.user_id', $userId)
                 ->where('w.tenant_id', $tenantId)
-                ->where('w.status', 'waiting')
+                ->whereIn('w.status', ['waiting', 'notified'])
                 ->orderBy('s.start_time')
                 ->select(
-                    'w.id', 'w.position', 'w.created_at as joined_at',
+                    'w.id', 'w.position', 'w.status', 'w.notified_at', 'w.created_at as joined_at',
                     's.id as shift_id', 's.start_time', 's.end_time', 's.capacity',
                     'opp.id as opportunity_id', 'opp.title as opportunity_title', 'opp.location as opportunity_location',
                     'org.id as organization_id', 'org.name as organization_name', 'org.logo_url as organization_logo_url'
@@ -231,9 +244,11 @@ class ShiftWaitlistService
 
             return $rows->map(function ($row) {
                 return [
-                    'id'       => (int) $row->id,
-                    'position' => (int) $row->position,
-                    'shift'    => [
+                    'id'          => (int) $row->id,
+                    'position'    => (int) $row->position,
+                    'status'      => $row->status,
+                    'notified_at' => $row->notified_at,
+                    'shift'       => [
                         'id'         => (int) $row->shift_id,
                         'start_time' => $row->start_time,
                         'end_time'   => $row->end_time,
@@ -260,68 +275,246 @@ class ShiftWaitlistService
 
     /**
      * Promote a user from the waitlist to the shift.
+     *
+     * Requires the entry to be in 'notified' state (the user was offered the
+     * freed spot via notifyNext). Re-checks shift capacity under a row lock
+     * so a claim can never overbook the shift.
      */
     public static function promoteUser(int $waitlistId, int $tenantId): bool
     {
-        $entry = DB::table('vol_shift_waitlist')
-            ->where('id', $waitlistId)
-            ->where('tenant_id', $tenantId)
-            ->where('status', 'notified')
-            ->first();
-
-        if (! $entry) {
-            return false;
-        }
+        self::$errors = [];
 
         try {
-            // Mark as promoted
-            DB::table('vol_shift_waitlist')
-                ->where('id', $waitlistId)
-                ->where('tenant_id', $tenantId)
-                ->update([
-                    'status'      => 'promoted',
-                    'promoted_at' => now(),
-                ]);
-
-            // Sign up for shift — create an approved application
-            $existingApp = DB::table('vol_applications')
-                ->where('shift_id', $entry->shift_id)
-                ->where('user_id', $entry->user_id)
-                ->where('tenant_id', $tenantId)
-                ->first();
-
-            if ($existingApp) {
-                // Reactivate existing application
-                DB::table('vol_applications')
-                    ->where('id', $existingApp->id)
+            return DB::transaction(function () use ($waitlistId, $tenantId) {
+                $entry = DB::table('vol_shift_waitlist')
+                    ->where('id', $waitlistId)
                     ->where('tenant_id', $tenantId)
-                    ->update(['status' => 'approved']);
-            } else {
-                // Get the opportunity_id from the shift
-                $shift = DB::table('vol_shifts')->where('id', $entry->shift_id)->first();
+                    ->lockForUpdate()
+                    ->first();
 
-                DB::table('vol_applications')->insert([
-                    'tenant_id'      => $tenantId,
-                    'opportunity_id' => $shift->opportunity_id ?? 0,
-                    'shift_id'       => $entry->shift_id,
-                    'user_id'        => $entry->user_id,
-                    'status'         => 'approved',
-                    'created_at'     => now(),
-                    'updated_at'     => now(),
-                ]);
+                if (! $entry) {
+                    self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.vol_waitlist_not_found')];
+                    return false;
+                }
+
+                if ($entry->status !== 'notified') {
+                    self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.vol_waitlist_not_notified')];
+                    return false;
+                }
+
+                // Lock the shift and re-check capacity — the freed spot may have
+                // been taken through another path since the notification.
+                $shift = DB::table('vol_shifts')
+                    ->where('id', $entry->shift_id)
+                    ->where('tenant_id', $tenantId)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $shift) {
+                    self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.volunteer_shift_not_found')];
+                    return false;
+                }
+
+                if (strtotime($shift->start_time) < time()) {
+                    self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_shift_started')];
+                    return false;
+                }
+
+                if ($shift->capacity) {
+                    $approvedCount = (int) DB::selectOne(
+                        "SELECT COUNT(*) as cnt FROM vol_applications WHERE shift_id = ? AND status = 'approved' AND tenant_id = ?",
+                        [$entry->shift_id, $tenantId]
+                    )->cnt;
+
+                    if ($approvedCount >= (int) $shift->capacity) {
+                        self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.vol_waitlist_spot_gone')];
+                        return false;
+                    }
+                }
+
+                // Mark as promoted
+                DB::table('vol_shift_waitlist')
+                    ->where('id', $waitlistId)
+                    ->where('tenant_id', $tenantId)
+                    ->update([
+                        'status'      => 'promoted',
+                        'promoted_at' => now(),
+                    ]);
+
+                // Sign up for shift — create an approved application
+                $existingApp = DB::table('vol_applications')
+                    ->where('opportunity_id', (int) $shift->opportunity_id)
+                    ->where('user_id', $entry->user_id)
+                    ->where('tenant_id', $tenantId)
+                    ->first();
+
+                if ($existingApp) {
+                    // Reactivate existing application and attach the shift
+                    DB::table('vol_applications')
+                        ->where('id', $existingApp->id)
+                        ->where('tenant_id', $tenantId)
+                        ->update(['status' => 'approved', 'shift_id' => $entry->shift_id, 'updated_at' => now()]);
+                } else {
+                    DB::table('vol_applications')->insert([
+                        'tenant_id'      => $tenantId,
+                        'opportunity_id' => (int) $shift->opportunity_id,
+                        'shift_id'       => $entry->shift_id,
+                        'user_id'        => $entry->user_id,
+                        'status'         => 'approved',
+                        'created_at'     => now(),
+                        'updated_at'     => now(),
+                    ]);
+                }
+
+                return true;
+            });
+        } catch (\Exception $e) {
+            Log::error('ShiftWaitlistService::promoteUser error: ' . $e->getMessage());
+            self::$errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.vol_waitlist_claim_failed')];
+            return false;
+        }
+    }
+
+    /**
+     * Offer a freed shift spot to the next person on the waitlist.
+     *
+     * Called whenever a shift slot frees (signup cancelled, approved
+     * application declined). Picks the lowest-position 'waiting' entry,
+     * marks it 'notified', and sends the user a bell + push notification
+     * in their own language. The user then claims the spot via
+     * promoteUser() (or it expires via expireStaleNotifications()).
+     *
+     * No-op when the shift has no free capacity, has already started, or
+     * the waitlist is empty. Safe to call from any slot-freeing code path —
+     * never throws.
+     */
+    public static function notifyNext(int $shiftId, int $tenantId): bool
+    {
+        try {
+            $notifiedEntry = DB::transaction(function () use ($shiftId, $tenantId) {
+                $shift = DB::table('vol_shifts')
+                    ->where('id', $shiftId)
+                    ->where('tenant_id', $tenantId)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $shift || strtotime($shift->start_time) < time()) {
+                    return null;
+                }
+
+                // Only offer a spot if there is genuinely free capacity once
+                // approved signups AND outstanding (unexpired) offers are counted.
+                if ($shift->capacity) {
+                    $approvedCount = (int) DB::selectOne(
+                        "SELECT COUNT(*) as cnt FROM vol_applications WHERE shift_id = ? AND status = 'approved' AND tenant_id = ?",
+                        [$shiftId, $tenantId]
+                    )->cnt;
+
+                    $outstandingOffers = (int) DB::table('vol_shift_waitlist')
+                        ->where('shift_id', $shiftId)
+                        ->where('status', 'notified')
+                        ->where('tenant_id', $tenantId)
+                        ->count();
+
+                    if ($approvedCount + $outstandingOffers >= (int) $shift->capacity) {
+                        return null;
+                    }
+                }
+
+                $entry = DB::table('vol_shift_waitlist')
+                    ->where('shift_id', $shiftId)
+                    ->where('status', 'waiting')
+                    ->where('tenant_id', $tenantId)
+                    ->orderBy('position')
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $entry) {
+                    return null;
+                }
+
+                DB::table('vol_shift_waitlist')
+                    ->where('id', $entry->id)
+                    ->where('tenant_id', $tenantId)
+                    ->update(['status' => 'notified', 'notified_at' => now()]);
+
+                return $entry;
+            });
+
+            if (! $notifiedEntry) {
+                return false;
+            }
+
+            // Notify outside the transaction — a notification failure must not
+            // roll back the state change (the cron expiry path re-offers).
+            try {
+                $recipient = DB::table('users')
+                    ->where('id', $notifiedEntry->user_id)
+                    ->where('tenant_id', $tenantId)
+                    ->select(['id', 'preferred_language'])
+                    ->first();
+
+                LocaleContext::withLocale($recipient, function () use ($notifiedEntry) {
+                    $content = __('svc_notifications.shift_waitlist.spot_available');
+                    NotificationDispatcher::dispatch(
+                        (int) $notifiedEntry->user_id,
+                        'global',
+                        null,
+                        'vol_waitlist_spot',
+                        $content,
+                        '/volunteering?tab=waitlist',
+                        null,
+                        false
+                    );
+                });
+            } catch (\Throwable $notifErr) {
+                Log::warning('ShiftWaitlistService::notifyNext notification failed', ['error' => $notifErr->getMessage()]);
             }
 
             return true;
-        } catch (\Exception $e) {
-            Log::error('ShiftWaitlistService::promoteUser error: ' . $e->getMessage());
-
-            // Revert promotion on failure
-            DB::table('vol_shift_waitlist')
-                ->where('id', $waitlistId)
-                ->where('tenant_id', $tenantId)
-                ->update(['status' => 'waiting']);
-
+        } catch (\Throwable $e) {
+            Log::error('ShiftWaitlistService::notifyNext error: ' . $e->getMessage());
             return false;
         }
+    }
+
+    /**
+     * Expire stale spot offers and pass them to the next person in line.
+     *
+     * Cron entry point (CronJobRunner). Any 'notified' entry older than
+     * $hours is marked 'expired' and notifyNext() runs for its shift so the
+     * offer cascades down the queue. Returns the number of expired offers.
+     */
+    public static function expireStaleNotifications(int $hours = 48): int
+    {
+        $cutoff = now()->subHours($hours);
+
+        $stale = DB::table('vol_shift_waitlist')
+            ->where('status', 'notified')
+            ->where('notified_at', '<', $cutoff)
+            ->select(['id', 'shift_id', 'tenant_id'])
+            ->get();
+
+        $expired = 0;
+        foreach ($stale as $entry) {
+            try {
+                $affected = DB::table('vol_shift_waitlist')
+                    ->where('id', $entry->id)
+                    ->where('status', 'notified')
+                    ->update(['status' => 'expired']);
+
+                if ($affected > 0) {
+                    $expired++;
+                    self::notifyNext((int) $entry->shift_id, (int) $entry->tenant_id);
+                }
+            } catch (\Throwable $e) {
+                Log::warning('ShiftWaitlistService::expireStaleNotifications entry failed', [
+                    'waitlist_id' => $entry->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return $expired;
     }
 }

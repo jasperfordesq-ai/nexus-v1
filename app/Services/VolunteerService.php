@@ -1086,6 +1086,12 @@ class VolunteerService
                 );
             });
 
+            // Declining a previously approved application with a shift frees
+            // that slot — offer it to the next person on the waitlist.
+            if ($status === 'declined' && $app->status === 'approved' && !empty($app->shift_id)) {
+                ShiftWaitlistService::notifyNext((int) $app->shift_id, $tenantId);
+            }
+
             return true;
         } catch (\DomainException $e) {
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => $e->getMessage(), 'field' => 'shift_id'];
@@ -1330,6 +1336,9 @@ class VolunteerService
             } catch (\Throwable $notifErr) {
                 Log::warning('VolunteerService::cancelShiftSignup notification failed', ['error' => $notifErr->getMessage()]);
             }
+
+            // Offer the freed spot to the next person on the waitlist
+            ShiftWaitlistService::notifyNext($shiftId, $tenantId);
 
             return true;
         } catch (\Exception $e) {

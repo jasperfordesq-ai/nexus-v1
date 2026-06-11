@@ -19,6 +19,8 @@ import Building2 from 'lucide-react/icons/building-2';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Hash from 'lucide-react/icons/hash';
+import Check from 'lucide-react/icons/check';
+import PartyPopper from 'lucide-react/icons/party-popper';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, CardRowsSkeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
@@ -31,6 +33,8 @@ import { logError } from '@/lib/logger';
 interface WaitlistEntry {
   id: number;
   position: number;
+  status: 'waiting' | 'notified';
+  notified_at: string | null;
   shift: {
     id: number;
     start_time: string;
@@ -60,6 +64,7 @@ export function WaitlistTab() {
   const [error, setError] = useState<string | null>(null);
   const [removingId, setRemovingId] = useState<number | null>(null);
   const [leaveTarget, setLeaveTarget] = useState<number | null>(null);
+  const [claimingId, setClaimingId] = useState<number | null>(null);
 
   // AbortController ref to cancel stale requests
   const abortRef = useRef<AbortController | null>(null);
@@ -124,6 +129,26 @@ export function WaitlistTab() {
     } finally {
       setRemovingId(null);
       setLeaveTarget(null);
+    }
+  };
+
+  const handleClaimSpot = async (entry: WaitlistEntry) => {
+    try {
+      setClaimingId(entry.id);
+      const response = await api.post(`/v2/volunteering/shifts/${entry.shift.id}/waitlist/promote`);
+      if (response.success) {
+        toastRef.current.success(tRef.current('waitlist.claim_success'));
+        load();
+      } else {
+        toastRef.current.error(response.error || tRef.current('waitlist.claim_failed'));
+        // The spot may have gone to someone else — refresh to show live state
+        load();
+      }
+    } catch (err) {
+      logError('Failed to claim waitlist spot', err);
+      toastRef.current.error(tRef.current('waitlist.claim_failed'));
+    } finally {
+      setClaimingId(null);
     }
   };
 
@@ -195,22 +220,39 @@ export function WaitlistTab() {
         >
           {entries.map((entry) => (
             <motion.div key={entry.id} variants={itemVariants}>
-              <GlassCard className="p-5">
+              <GlassCard className={`p-5 ${entry.status === 'notified' ? 'ring-2 ring-emerald-500/40 bg-emerald-500/5' : ''}`}>
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
                       <h3 className="font-semibold text-theme-primary text-lg">
                         {entry.opportunity.title}
                       </h3>
-                      <Chip
-                        size="sm"
-                        color="warning"
-                        variant="soft"
-                        startContent={<Hash className="w-3 h-3" />}
-                      >
-                        {t('waitlist.position', { position: entry.position })}
-                      </Chip>
+                      {entry.status === 'notified' ? (
+                        <Chip
+                          size="sm"
+                          color="success"
+                          variant="soft"
+                          startContent={<PartyPopper className="w-3 h-3" />}
+                        >
+                          {t('waitlist.spot_available')}
+                        </Chip>
+                      ) : (
+                        <Chip
+                          size="sm"
+                          color="warning"
+                          variant="soft"
+                          startContent={<Hash className="w-3 h-3" />}
+                        >
+                          {t('waitlist.position', { position: entry.position })}
+                        </Chip>
+                      )}
                     </div>
+
+                    {entry.status === 'notified' && (
+                      <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium mb-2">
+                        {t('waitlist.claim_hint')}
+                      </p>
+                    )}
 
                     <div className="flex flex-wrap items-center gap-3 text-xs text-theme-subtle mb-2">
                       <span className="flex items-center gap-1">
@@ -246,15 +288,29 @@ export function WaitlistTab() {
                     </p>
                   </div>
 
-                  <Button
-                    size="sm"
-                    variant="danger-soft"
-                    startContent={<X className="w-4 h-4" aria-hidden="true" />}
-                    onPress={() => setLeaveTarget(entry.shift.id)}
-                    isLoading={removingId === entry.shift.id}
-                  >
-                    {t('waitlist.leave')}
-                  </Button>
+                  <div className="flex flex-col gap-2 shrink-0">
+                    {entry.status === 'notified' && (
+                      <Button
+                        size="sm"
+                        className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
+                        startContent={!claimingId ? <Check className="w-4 h-4" aria-hidden="true" /> : undefined}
+                        onPress={() => handleClaimSpot(entry)}
+                        isLoading={claimingId === entry.id}
+                      >
+                        {t('waitlist.claim')}
+                      </Button>
+                    )}
+                    <Button
+                      size="sm"
+                      variant="danger-soft"
+                      startContent={<X className="w-4 h-4" aria-hidden="true" />}
+                      onPress={() => setLeaveTarget(entry.shift.id)}
+                      isLoading={removingId === entry.shift.id}
+                      isDisabled={claimingId === entry.id}
+                    >
+                      {t('waitlist.leave')}
+                    </Button>
+                  </div>
                 </div>
               </GlassCard>
             </motion.div>

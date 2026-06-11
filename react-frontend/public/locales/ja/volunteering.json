@@ -530,7 +530,12 @@
     "spots": "{{count}} スポット",
     "joined": "待機リストに参加しました",
     "leave": "離れる",
-    "leave_confirm": "この順番待ちリストを解除してもよろしいですか?現在の地位を失うことになります。"
+    "leave_confirm": "この順番待ちリストを解除してもよろしいですか?現在の地位を失うことになります。",
+    "spot_available": "Spot available!",
+    "claim": "Claim spot",
+    "claim_success": "You're in — signed up for the shift!",
+    "claim_failed": "Couldn't claim the spot",
+    "claim_hint": "A spot opened up for you. Claim it soon — unclaimed spots pass to the next person after 48 hours."
   },
   "swaps": {
     "heading": "シフト交換",

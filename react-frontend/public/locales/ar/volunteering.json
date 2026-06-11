@@ -530,7 +530,12 @@
     "spots": "{{count}} البقع",
     "joined": "انضم إلى قائمة الانتظار",
     "leave": "يترك",
-    "leave_confirm": "هل أنت متأكد أنك تريد مغادرة قائمة الانتظار هذه؟ سوف تفقد موقعك الحالي."
+    "leave_confirm": "هل أنت متأكد أنك تريد مغادرة قائمة الانتظار هذه؟ سوف تفقد موقعك الحالي.",
+    "spot_available": "Spot available!",
+    "claim": "Claim spot",
+    "claim_success": "You're in — signed up for the shift!",
+    "claim_failed": "Couldn't claim the spot",
+    "claim_hint": "A spot opened up for you. Claim it soon — unclaimed spots pass to the next person after 48 hours."
   },
   "swaps": {
     "heading": "مقايضات التحول",

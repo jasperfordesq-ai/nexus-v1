@@ -150,5 +150,8 @@
   "marketplace_payout": {
     "onboarding_complete_bell": "Votre compte vendeur est entièrement configuré — vous pouvez désormais recevoir les versements de la place de marché.",
     "payout_sent_bell": "Votre versement de {{amount}} pour la commande #{{order}} a été débloqué."
+  },
+  "shift_waitlist": {
+    "spot_available": "A spot opened up on a shift you're waitlisted for — claim it before it expires"
   }
 }

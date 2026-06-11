@@ -1356,6 +1356,9 @@ function HoursTab() {
             />
             <Input
               type="number"
+              min="0.25"
+              max="24"
+              step="0.25"
               label={t('hours_label')}
               placeholder={t('hours_placeholder')}
               value={logForm.hours}

@@ -1371,6 +1371,10 @@ class CronJobRunner
                 $taskNum++;
                 echo "\n[{$taskNum}] Volunteer post-shift feedback...\n";
                 echo $this->runSubTask('volunteer-post-shift', fn() => $this->volunteerPostShiftFeedbackInternal());
+
+                $taskNum++;
+                echo "\n[{$taskNum}] Volunteer waitlist offer expiry...\n";
+                echo $this->runSubTask('volunteer-waitlist-expiry', fn() => $this->volunteerWaitlistExpiryInternal());
             }
 
             if ($minute === 30) {
@@ -3253,6 +3257,20 @@ class CronJobRunner
                 echo "   [{$slug}] Pre-shift error: {$e->getMessage()}\n";
             }
         });
+    }
+
+    private function volunteerWaitlistExpiryInternal(): void
+    {
+        // Cross-tenant by design: the service iterates stale offers globally
+        // and NotificationDispatcher resolves each recipient's tenant itself.
+        try {
+            $expired = \App\Services\ShiftWaitlistService::expireStaleNotifications();
+            if ($expired > 0) {
+                echo "   Waitlist offers expired and passed on: {$expired}.\n";
+            }
+        } catch (\Throwable $e) {
+            echo "   Waitlist expiry error: {$e->getMessage()}\n";
+        }
     }
 
     private function volunteerPostShiftFeedbackInternal(): void

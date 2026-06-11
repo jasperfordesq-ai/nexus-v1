@@ -409,6 +409,19 @@ class ShiftSwapService
                     return false;
                 }
 
+                // A swap can be accepted/admin-approved long after it was
+                // requested — refuse to execute once either shift has started.
+                $startedShift = DB::table('vol_shifts')
+                    ->whereIn('id', [(int) $swap->from_shift_id, (int) $swap->to_shift_id])
+                    ->where('tenant_id', $tenantId)
+                    ->where('start_time', '<', now())
+                    ->exists();
+
+                if ($startedShift) {
+                    self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.shift_swap_shift_started')];
+                    return false;
+                }
+
                 // Double-booking check: ensure neither user already has an overlapping
                 // approved shift assignment for the shift they are moving INTO.
                 if (self::hasOverlappingShift((int) $swap->from_user_id, (int) $swap->to_shift_id, (int) $swap->from_shift_id, $tenantId)) {

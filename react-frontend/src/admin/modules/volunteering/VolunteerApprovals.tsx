@@ -25,12 +25,19 @@ import { DataTable, PageHeader, EmptyState, StatusBadge, type Column } from '../
 
 import { useTranslation } from 'react-i18next';
 
+// Prefix cells that spreadsheet apps would treat as formulas (=, +, -, @)
+// so member-supplied text can't execute when the CSV is opened in Excel.
+function csvCell(value: unknown): string {
+  const str = String(value ?? '');
+  return JSON.stringify(/^[=+\-@\t\r]/.test(str) ? `'${str}` : str);
+}
+
 function exportToCsv(data: Array<Record<string, unknown>>, filename: string) {
   if (data.length === 0) return;
   const headers = Object.keys(data[0] ?? {});
   const csv = [
     headers.join(','),
-    ...data.map(r => headers.map(h => JSON.stringify(r[h] ?? '')).join(',')),
+    ...data.map(r => headers.map(h => csvCell(r[h])).join(',')),
   ].join('\n');
   const blob = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);

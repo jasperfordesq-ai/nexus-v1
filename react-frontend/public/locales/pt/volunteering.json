@@ -530,7 +530,12 @@
     "spots": "{{count}} pontos",
     "joined": "Entrou na lista de espera",
     "leave": "Deixar",
-    "leave_confirm": "Tem certeza de que deseja sair desta lista de espera? Você perderá sua posição atual."
+    "leave_confirm": "Tem certeza de que deseja sair desta lista de espera? Você perderá sua posição atual.",
+    "spot_available": "Spot available!",
+    "claim": "Claim spot",
+    "claim_success": "You're in — signed up for the shift!",
+    "claim_failed": "Couldn't claim the spot",
+    "claim_hint": "A spot opened up for you. Claim it soon — unclaimed spots pass to the next person after 48 hours."
   },
   "swaps": {
     "heading": "Trocas de turno",

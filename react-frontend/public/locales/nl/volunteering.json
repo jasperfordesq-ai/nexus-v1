@@ -530,7 +530,12 @@
     "spots": "{{count}} plekken",
     "joined": "Aangesloten op de wachtlijst",
     "leave": "Vertrekken",
-    "leave_confirm": "Weet u zeker dat u deze wachtlijst wilt verlaten? U verliest uw huidige positie."
+    "leave_confirm": "Weet u zeker dat u deze wachtlijst wilt verlaten? U verliest uw huidige positie.",
+    "spot_available": "Spot available!",
+    "claim": "Claim spot",
+    "claim_success": "You're in — signed up for the shift!",
+    "claim_failed": "Couldn't claim the spot",
+    "claim_hint": "A spot opened up for you. Claim it soon — unclaimed spots pass to the next person after 48 hours."
   },
   "swaps": {
     "heading": "Wissels van ploegendiensten",
