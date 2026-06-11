@@ -72,16 +72,15 @@ class VolunteerService
             });
         }
 
-        if (is_string($cursor) && ($cid = base64_decode($cursor, true)) !== false) {
-            $query->where('id', '<', (int) $cid);
-        }
-
         // Proximity / radius filter using Haversine formula
         $nearLat = isset($filters['near_lat']) ? (float) $filters['near_lat'] : null;
         $nearLng = isset($filters['near_lng']) ? (float) $filters['near_lng'] : null;
         $radiusKm = isset($filters['radius_km']) ? (float) $filters['radius_km'] : null;
+        $proximity = $nearLat !== null && $nearLng !== null && $radiusKm !== null;
 
-        if ($nearLat !== null && $nearLng !== null && $radiusKm !== null) {
+        $decodedCursor = is_string($cursor) ? base64_decode($cursor, true) : false;
+
+        if ($proximity) {
             $haversine = "(6371 * acos(LEAST(1.0, GREATEST(-1.0,
                 cos(radians(?)) * cos(radians(vol_opportunities.latitude)) * cos(radians(vol_opportunities.longitude) - radians(?)) +
                 sin(radians(?)) * sin(radians(vol_opportunities.latitude))
@@ -90,8 +89,22 @@ class VolunteerService
                   ->whereNotNull('vol_opportunities.longitude')
                   ->selectRaw("vol_opportunities.*, {$haversine} AS distance_km", [$nearLat, $nearLng, $nearLat])
                   ->having('distance_km', '<=', $radiusKm)
-                  ->orderBy('distance_km');
+                  ->orderBy('distance_km')
+                  ->orderBy('id');
+
+            // Distance ordering needs a (distance, id) keyset cursor — an
+            // id-based one would skip/repeat items across pages.
+            if ($decodedCursor !== false && str_starts_with($decodedCursor, 'D:') && str_contains($decodedCursor, '|')) {
+                [$lastDistance, $lastId] = explode('|', substr($decodedCursor, 2), 2);
+                $query->havingRaw(
+                    '(distance_km > ?) OR (distance_km = ? AND vol_opportunities.id > ?)',
+                    [(float) $lastDistance, (float) $lastDistance, (int) $lastId]
+                );
+            }
         } else {
+            if ($decodedCursor !== false && is_numeric($decodedCursor)) {
+                $query->where('id', '<', (int) $decodedCursor);
+            }
             $query->orderByDesc('id');
         }
 
@@ -110,9 +123,17 @@ class VolunteerService
             return $data;
         })->all();
 
+        $nextCursor = null;
+        if ($hasMore && $items->isNotEmpty()) {
+            $last = $items->last();
+            $nextCursor = $proximity
+                ? base64_encode('D:' . (float) $last->distance_km . '|' . $last->id)
+                : base64_encode((string) $last->id);
+        }
+
         return [
             'items'    => array_values($results),
-            'cursor'   => $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null,
+            'cursor'   => $nextCursor,
             'has_more' => $hasMore,
         ];
     }
