@@ -158,7 +158,9 @@ class VolunteerWellbeingService
 
         $daysSinceLastActivity = 0;
         if ($lastActivity) {
-            $daysSinceLastActivity = (int) now()->diffInDays($lastActivity);
+            // Carbon 3 diffInDays() is signed — now()->diffInDays(past) is negative,
+            // which made every engagement-gap threshold below unreachable.
+            $daysSinceLastActivity = (int) abs(now()->diffInDays($lastActivity));
         } else {
             // No activity ever — check if they have any signups at all
             $hasAnySignup = DB::table('vol_shift_signups')

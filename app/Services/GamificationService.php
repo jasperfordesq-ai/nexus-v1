@@ -1054,8 +1054,9 @@ class GamificationService
     private static function checkVolOrgBadges(int $userId): void
     {
         try {
-            $count = (int) DB::table('vol_organisations')
-                ->where('created_by', $userId)
+            $count = (int) DB::table('vol_organizations')
+                ->where('user_id', $userId)
+                ->where('tenant_id', TenantContext::getId())
                 ->count();
 
             foreach (self::getBadgeDefinitions() as $def) {
