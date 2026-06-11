@@ -534,11 +534,12 @@ class VolunteerReminderService
 
         foreach ($allTenantIds as $tenantId) {
             try {
-                // Get pre_shift reminder setting for this tenant (or use 24h default)
+                // Get pre_shift reminder setting for this tenant (or use 24h default).
+                // Must NOT filter enabled=true here: a disabled setting would come
+                // back null and fall into the "no setting → send defaults" path.
                 $setting = DB::table('vol_reminder_settings')
                     ->where('tenant_id', $tenantId)
                     ->where('reminder_type', 'pre_shift')
-                    ->where('enabled', true)
                     ->first();
 
                 // Skip tenant if setting explicitly disabled
@@ -709,10 +710,11 @@ class VolunteerReminderService
 
         $totalSent = 0;
 
-        // Collect tenants that have post_shift_feedback enabled
+        // Collect post_shift_feedback settings for all tenants — including
+        // disabled ones, so the explicit-disable guard below can fire instead
+        // of disabled tenants falling into the "no setting → defaults" path.
         $settingsByTenant = DB::table('vol_reminder_settings')
             ->where('reminder_type', 'post_shift_feedback')
-            ->where('enabled', true)
             ->get()
             ->keyBy('tenant_id');
 
@@ -731,7 +733,13 @@ class VolunteerReminderService
 
         foreach ($allTenantIds as $tenantId) {
             try {
-                $setting      = $settingsByTenant->get($tenantId);
+                $setting = $settingsByTenant->get($tenantId);
+
+                // Tenant explicitly disabled post-shift feedback — respect it.
+                if ($setting !== null && !(bool) $setting->enabled) {
+                    continue;
+                }
+
                 $hoursAfter   = (int) ($setting->hours_after ?? 2);
                 $emailEnabled = (bool) ($setting->email_enabled ?? true);
 
